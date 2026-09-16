@@ -1,0 +1,20 @@
+{
+  "wxml": {
+    "files": [
+      "pages/admin/index.wxml"
+    ],
+    "exitCode": 0,
+    "outputBytes": 48273,
+    "stderr": ""
+  },
+  "wxss": {
+    "files": [
+      "app.wxss",
+      "pages/admin/index.wxss"
+    ],
+    "exitCode": 0,
+    "outputBytes": 6086,
+    "stderr": ""
+  },
+  "success": true
+}

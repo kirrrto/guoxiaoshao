@@ -1,0 +1,322 @@
+{
+  "renderer": "headless Chromium rendering generated WXML/WXSS approximation; not WeChat",
+  "generatedAt": "2026-09-16T09:54:43.778Z",
+  "snapshots": [
+    {
+      "page": "admin",
+      "scenario": "operator-ready",
+      "width": 320,
+      "file": "admin-operator-ready-320.html",
+      "expectedText": [
+        "运行统计",
+        "128"
+      ],
+      "viewport": 320,
+      "scrollWidth": 320,
+      "bodyHeight": 952,
+      "overflow": [],
+      "clippedText": [],
+      "images": [],
+      "missingText": []
+    },
+    {
+      "page": "admin",
+      "scenario": "operator-ready",
+      "width": 375,
+      "file": "admin-operator-ready-375.html",
+      "expectedText": [
+        "运行统计",
+        "128"
+      ],
+      "viewport": 375,
+      "scrollWidth": 375,
+      "bodyHeight": 1076,
+      "overflow": [],
+      "clippedText": [],
+      "images": [],
+      "missingText": []
+    },
+    {
+      "page": "admin",
+      "scenario": "operator-ready",
+      "width": 430,
+      "file": "admin-operator-ready-430.html",
+      "expectedText": [
+        "运行统计",
+        "128"
+      ],
+      "viewport": 430,
+      "scrollWidth": 430,
+      "bodyHeight": 1201,
+      "overflow": [],
+      "clippedText": [],
+      "images": [],
+      "missingText": []
+    },
+    {
+      "page": "admin",
+      "scenario": "operator-denied",
+      "width": 320,
+      "file": "admin-operator-denied-320.html",
+      "expectedText": [
+        "当前账号没有管理权限",
+        "重新检查"
+      ],
+      "viewport": 320,
+      "scrollWidth": 320,
+      "bodyHeight": 304,
+      "overflow": [],
+      "clippedText": [],
+      "images": [],
+      "missingText": []
+    },
+    {
+      "page": "admin",
+      "scenario": "operator-denied",
+      "width": 375,
+      "file": "admin-operator-denied-375.html",
+      "expectedText": [
+        "当前账号没有管理权限",
+        "重新检查"
+      ],
+      "viewport": 375,
+      "scrollWidth": 375,
+      "bodyHeight": 331,
+      "overflow": [],
+      "clippedText": [],
+      "images": [],
+      "missingText": []
+    },
+    {
+      "page": "admin",
+      "scenario": "operator-denied",
+      "width": 430,
+      "file": "admin-operator-denied-430.html",
+      "expectedText": [
+        "当前账号没有管理权限",
+        "重新检查"
+      ],
+      "viewport": 430,
+      "scrollWidth": 430,
+      "bodyHeight": 358,
+      "overflow": [],
+      "clippedText": [],
+      "images": [],
+      "missingText": []
+    },
+    {
+      "page": "admin",
+      "scenario": "operator-loading",
+      "width": 320,
+      "file": "admin-operator-loading-320.html",
+      "expectedText": [
+        "校验权限"
+      ],
+      "viewport": 320,
+      "scrollWidth": 320,
+      "bodyHeight": 210,
+      "overflow": [],
+      "clippedText": [],
+      "images": [],
+      "missingText": []
+    },
+    {
+      "page": "admin",
+      "scenario": "operator-loading",
+      "width": 375,
+      "file": "admin-operator-loading-375.html",
+      "expectedText": [
+        "校验权限"
+      ],
+      "viewport": 375,
+      "scrollWidth": 375,
+      "bodyHeight": 228,
+      "overflow": [],
+      "clippedText": [],
+      "images": [],
+      "missingText": []
+    },
+    {
+      "page": "admin",
+      "scenario": "operator-loading",
+      "width": 430,
+      "file": "admin-operator-loading-430.html",
+      "expectedText": [
+        "校验权限"
+      ],
+      "viewport": 430,
+      "scrollWidth": 430,
+      "bodyHeight": 247,
+      "overflow": [],
+      "clippedText": [],
+      "images": [],
+      "missingText": []
+    },
+    {
+      "page": "admin",
+      "scenario": "operator-error",
+      "width": 320,
+      "file": "admin-operator-error-320.html",
+      "expectedText": [
+        "权限检查失败",
+        "重新检查"
+      ],
+      "viewport": 320,
+      "scrollWidth": 320,
+      "bodyHeight": 285,
+      "overflow": [],
+      "clippedText": [],
+      "images": [],
+      "missingText": []
+    },
+    {
+      "page": "admin",
+      "scenario": "operator-error",
+      "width": 375,
+      "file": "admin-operator-error-375.html",
+      "expectedText": [
+        "权限检查失败",
+        "重新检查"
+      ],
+      "viewport": 375,
+      "scrollWidth": 375,
+      "bodyHeight": 309,
+      "overflow": [],
+      "clippedText": [],
+      "images": [],
+      "missingText": []
+    },
+    {
+      "page": "admin",
+      "scenario": "operator-error",
+      "width": 430,
+      "file": "admin-operator-error-430.html",
+      "expectedText": [
+        "权限检查失败",
+        "重新检查"
+      ],
+      "viewport": 430,
+      "scrollWidth": 430,
+      "bodyHeight": 333,
+      "overflow": [],
+      "clippedText": [],
+      "images": [],
+      "missingText": []
+    },
+    {
+      "page": "admin",
+      "scenario": "operator-longcontent",
+      "width": 320,
+      "file": "admin-operator-longcontent-320.html",
+      "expectedText": [
+        "运行统计",
+        "查询结果",
+        "运营查询长文本换行验收"
+      ],
+      "viewport": 320,
+      "scrollWidth": 320,
+      "bodyHeight": 1051,
+      "overflow": [],
+      "clippedText": [],
+      "images": [],
+      "missingText": [],
+      "screenshot": "admin-operator-longcontent-320.png"
+    },
+    {
+      "page": "admin",
+      "scenario": "operator-longcontent",
+      "width": 375,
+      "file": "admin-operator-longcontent-375.html",
+      "expectedText": [
+        "运行统计",
+        "查询结果",
+        "运营查询长文本换行验收"
+      ],
+      "viewport": 375,
+      "scrollWidth": 375,
+      "bodyHeight": 1192,
+      "overflow": [],
+      "clippedText": [],
+      "images": [],
+      "missingText": []
+    },
+    {
+      "page": "admin",
+      "scenario": "operator-longcontent",
+      "width": 430,
+      "file": "admin-operator-longcontent-430.html",
+      "expectedText": [
+        "运行统计",
+        "查询结果",
+        "运营查询长文本换行验收"
+      ],
+      "viewport": 430,
+      "scrollWidth": 430,
+      "bodyHeight": 1335,
+      "overflow": [],
+      "clippedText": [],
+      "images": [],
+      "missingText": []
+    },
+    {
+      "page": "admin",
+      "scenario": "operator-saving",
+      "width": 320,
+      "file": "admin-operator-saving-320.html",
+      "expectedText": [
+        "已修改",
+        "保存配置"
+      ],
+      "viewport": 320,
+      "scrollWidth": 320,
+      "bodyHeight": 952,
+      "overflow": [],
+      "clippedText": [],
+      "images": [],
+      "missingText": []
+    },
+    {
+      "page": "admin",
+      "scenario": "operator-saving",
+      "width": 375,
+      "file": "admin-operator-saving-375.html",
+      "expectedText": [
+        "已修改",
+        "保存配置"
+      ],
+      "viewport": 375,
+      "scrollWidth": 375,
+      "bodyHeight": 1076,
+      "overflow": [],
+      "clippedText": [],
+      "images": [],
+      "missingText": []
+    },
+    {
+      "page": "admin",
+      "scenario": "operator-saving",
+      "width": 430,
+      "file": "admin-operator-saving-430.html",
+      "expectedText": [
+        "已修改",
+        "保存配置"
+      ],
+      "viewport": 430,
+      "scrollWidth": 430,
+      "bodyHeight": 1201,
+      "overflow": [],
+      "clippedText": [],
+      "images": [],
+      "missingText": []
+    }
+  ],
+  "screenshotDirectory": "C:\\Users\\Administrator\\WeChatProjects\\miniprogram-6\\output\\audit-admin-preview\\screenshots",
+  "summary": {
+    "total": 18,
+    "expressionErrors": 0,
+    "missingText": 0,
+    "horizontalOverflow": 0,
+    "clippedText": 0,
+    "failedImages": 0
+  }
+}
