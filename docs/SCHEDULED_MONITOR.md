@@ -15,12 +15,20 @@
 修改共享后端代码后，在仓库根目录执行：
 
 ```powershell
+npm ci
 node tools/build-monitor.mjs
 node tools/build-monitor.mjs --check
-node --test tests/scheduled-monitor.test.mjs tests/collector.test.mjs tests/engine-reliability.test.mjs
+node --test tests/monitor-bundle.test.mjs tests/scheduled-monitor.test.mjs tests/collector.test.mjs tests/engine-reliability.test.mjs
+node tools/release/check.mjs
 ```
 
-`cloudfunctions/gxs_monitor/lib` 是上述脚本复制的部署副本，应只改 `gxs_api/lib` 后重新生成。上传整个 `gxs_monitor` 目录，云端安装 `wx-server-sdk@4.0.2`。`config.json` 已包含触发器名 `gxs-monitor-minute` 及每分钟的配置。
+`cloudfunctions/gxs_monitor/lib` 是自动生成的部署目录，应只改 `gxs_api/lib` 后重新生成。生成器从 `gxs_monitor/index.js` 出发，使用 Acorn 解析实际的字面量 `require()`，只复制递归依赖到的模块。自动观测与手动查询共用 `engine/observations.js`，监测包不再引入 API 路由或 `services/*`。仓储中的共享事务仍按模块复用，不能将“没有 API 路由”理解成已经按每个函数裁剪所有代码。
+
+生成的 `lib-manifest.json` 按路径排序，记录入口和共享文件的 SHA256、字节数及外部依赖，不含构建时间，因此相同输入可复现。文本按 UTF-8 严格解码并统一 LF 换行后计算字节数、哈希、复制及检查，Windows CRLF 工作树和 Linux CI 得到相同清单。`--check` 和发布预检查共用规则：缺失文件、内容变化、额外文件或清单过期都会失败。新增模块依赖无需手工维护复制名单；删除依赖后，构建会清理仅位于 `gxs_monitor/lib` 内的过期普通文件，不会清理函数根目录、源目录或其他位置。
+
+构建对路径越界、符号链接、目录 junction、动态或别名 `require`、`require.resolve`、动态 `import()` 和未声明的运行时依赖直接报错。共享本地模块限 `.js` / `.json` 与默认 `index`，不支持含 `package.json` 的本地目录包；需要新形式时先扩展解析和测试。Acorn 是根项目的开发依赖，由根目录 `npm ci` 安装，不放进云函数依赖或上传包。
+
+上传整个 `gxs_monitor` 目录（包括生成的清单），云端安装 `wx-server-sdk@4.0.2`。发布检查还需要三个云函数本地已各自完成 `npm ci`。`config.json` 已包含触发器名 `gxs-monitor-minute` 及每分钟的配置。
 
 ## 先验证触发身份，再启用采集
 
