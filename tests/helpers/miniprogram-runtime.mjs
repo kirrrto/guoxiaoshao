@@ -2,9 +2,10 @@ import fs from 'node:fs';
 import path from 'node:path';
 import vm from 'node:vm';
 import { fileURLToPath } from 'node:url';
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../miniprogram');
+const defaultRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../miniprogram');
 const copy = value => JSON.parse(JSON.stringify(value));
 export function runtime(handler = async () => ({}), options = {}) {
+  const root = path.resolve(options.root || defaultRoot);
   const storage = new Map(), timers = new Map(), cache = new Map(), calls = [], messages = [];
   let nextId = 0, captured, app = { globalData: { bootstrap: null, catalog: null, pendingFollow: null } };
   const wx = { getStorageSync: key => storage.get(key), setStorageSync: (key, value) => storage.set(key, copy(value)), removeStorageSync: key => storage.delete(key),

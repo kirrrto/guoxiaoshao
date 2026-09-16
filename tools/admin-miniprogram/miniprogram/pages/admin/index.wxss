@@ -7,3 +7,4 @@
 .config-editor { width: 100%; min-height: 400rpx; background: var(--green-mist); border-radius: 14rpx; padding: 18rpx; font-size: 22rpx; line-height: 1.5; }
 .input-row { min-width: 0; }
 .config-editor { overflow-wrap: anywhere; }
+.btn { min-height: 44px; }

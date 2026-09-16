@@ -1,0 +1,12 @@
+{
+  "pages": ["pages/admin/index"],
+  "window": {
+    "navigationBarTitleText": "果小哨运营",
+    "navigationBarBackgroundColor": "#F0FBF6",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#F0FBF6"
+  },
+  "sitemapLocation": "sitemap.json",
+  "style": "v2",
+  "lazyCodeLoading": "requiredComponents"
+}

@@ -6,8 +6,11 @@ import vm from 'node:vm';
 import { fileURLToPath } from 'node:url';
 
 const project = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
-const mini = path.join(project, 'miniprogram');
+const adminPreview = process.argv.includes('--admin-only');
+if (adminPreview && process.argv.some(arg => /^--(?:reminders|stock|redemption|monitoring|history-task)-only$/.test(arg))) throw Error('--admin-only cannot be combined with consumer scenarios');
+const mini = path.join(project, adminPreview ? 'tools/admin-miniprogram/miniprogram' : 'miniprogram');
 const appConfig = JSON.parse(fs.readFileSync(path.join(mini, 'app.json'), 'utf8'));
+appConfig.tabBar = appConfig.tabBar || { custom: false, list: [] };
 const outputAt = process.argv.indexOf('--out');
 const out = path.resolve(outputAt >= 0 ? process.argv[outputAt + 1] : path.join(os.tmpdir(), 'guoxiaoshao-ui-preview'));
 const allowRemoteImages = process.argv.includes('--remote-images');
@@ -69,7 +72,7 @@ const evaluate = (value, scope) => {
   return source.replace(/\{\{([\s\S]*?)\}\}/g, (_, code) => String(expr(code, scope) ?? ''));
 };
 const truth = (value, scope) => Boolean(evaluate(value, scope));
-const pickerAst = parse(fs.readFileSync(path.join(mini, 'components/target-picker/index.wxml'), 'utf8'));
+const pickerAst = adminPreview ? null : parse(fs.readFileSync(path.join(mini, 'components/target-picker/index.wxml'), 'utf8'));
 
 function renderChildren(children, scope, context) {
   let previousIf = null, result = '';
@@ -133,8 +136,8 @@ const stockPreview = process.argv.includes('--stock-only');
 const redemptionPreview = process.argv.includes('--redemption-only');
 const monitoringPreview = process.argv.includes('--monitoring-only');
 const historyTaskPreview = process.argv.includes('--history-task-only');
-const widths = [320, 375, 430], scenarios = historyTaskPreview ? ['history-member-reward', 'history-free-first', 'history-read-error', 'history-balance-cap', 'history-completed', 'history-longcontent', 'history-loading'] : monitoringPreview ? ['monitor-template-missing', 'monitor-ready-authorized', 'monitor-needs-authorization', 'monitor-stale', 'monitor-disabled', 'monitor-expired-paused'] : redemptionPreview ? ['redemption-input', 'redemption-loading', 'redemption-error', 'redemption-success', 'redemption-used', 'redemption-limited', 'redemption-empty'] : stockPreview ? ['stock-fresh', 'stock-old', 'stock-unknown', 'stock-missing', 'stock-restricted'] : reminderPreview ? ['reminders', 'reminder-empty', 'reminder-loading', 'reminder-deleting', 'reminder-clearing', 'reminder-error', 'reminder-more-error', 'longcontent'] : ['free', 'member', 'expired', 'empty', 'error', 'longcontent'];
-const names = historyTaskPreview ? { history: '历史', mine: '我的' } : stockPreview || monitoringPreview ? { follow: '小哨提醒' } : reminderPreview || redemptionPreview ? { mine: '我的' } : { query: '查询', follow: '小哨提醒', history: '历史', mine: '我的', admin: '管理' };
+const widths = [320, 375, 430], scenarios = adminPreview ? ['operator-ready', 'operator-denied', 'operator-loading', 'operator-error', 'operator-longcontent', 'operator-saving'] : historyTaskPreview ? ['history-member-reward', 'history-free-first', 'history-read-error', 'history-balance-cap', 'history-completed', 'history-longcontent', 'history-loading'] : monitoringPreview ? ['monitor-template-missing', 'monitor-ready-authorized', 'monitor-needs-authorization', 'monitor-stale', 'monitor-disabled', 'monitor-expired-paused'] : redemptionPreview ? ['redemption-input', 'redemption-loading', 'redemption-error', 'redemption-success', 'redemption-used', 'redemption-limited', 'redemption-empty'] : stockPreview ? ['stock-fresh', 'stock-old', 'stock-unknown', 'stock-missing', 'stock-restricted'] : reminderPreview ? ['reminders', 'reminder-empty', 'reminder-loading', 'reminder-deleting', 'reminder-clearing', 'reminder-error', 'reminder-more-error', 'longcontent'] : ['free', 'member', 'expired', 'empty', 'error', 'longcontent'];
+const names = adminPreview ? { admin: '运营工具' } : historyTaskPreview ? { history: '历史', mine: '我的' } : stockPreview || monitoringPreview ? { follow: '小哨提醒' } : reminderPreview || redemptionPreview ? { mine: '我的' } : { query: '查询', follow: '小哨提醒', history: '历史', mine: '我的' };
 if (monitoringPreview) scenarios.push('monitor-no-follows', 'monitor-all-paused', 'monitor-user-disabled', 'monitor-dnd');
 fs.mkdirSync(out, { recursive: true });
 const manifest = [];
@@ -218,14 +221,18 @@ for (const scenario of scenarios) {
     if (action === 'quota.ledger') return { balance: bootstrap.quota.balance, entries: copy(ledgerEntries) };
     if (action === 'member.status') return { orders: [] };
     if (action === 'notify.list') return { notifications: reminderRecords, hasMore: reminderPreview && ['reminders','reminder-more-error'].includes(scenario), nextCursor: 'preview-next-cursor', clearBefore: 'preview-opaque-clear-token' };
+    if (action === 'admin.stats' && scenario === 'operator-denied') throw Object.assign(Error('需要管理员权限'), { code: 'forbidden' });
+    if (action === 'admin.stats' && scenario === 'operator-error') throw Error('连接中断');
     if (action === 'admin.stats') return { users: 128, activeFollows: 32, events: 1024, queries: 2086, serverTime: now.toISOString() };
     if (action === 'admin.getConfig') return { config: { announcement: '离线模拟预览', quota: { balanceCap: 10 }, notifications: { enabled: false }, memberProduct: { enabled: false } } };
     return {};
   });
-  const catalog = await rt.load('utils/store.js').getCatalog({ force: true });
+  const catalog = adminPreview ? null : await rt.load('utils/store.js').getCatalog({ force: true });
   for (const pageName of Object.keys(names)) {
     const page = rt.instantiate(`pages/${pageName}/index.js`);
-    await page.onLoad();
+    if (scenario !== 'operator-loading') await page.onLoad();
+    if (scenario === 'operator-saving') page.setData({ saving: true, configDirty: true });
+    if (scenario === 'operator-longcontent') page.setData({ lookup: { user: true }, lookupText: JSON.stringify({ userKey: 'wxe96ad9e77b602f1b:long-user-identity-0123456789abcdefghijklmnopqrstuvwxyz', note: '运营查询长文本换行验收' }, null, 2), configText: JSON.stringify({ announcement: '运行配置说明需要在小屏完整换行且不遮挡操作按钮。'.repeat(5) }, null, 2) });
     if (pageName === 'history' && scenario !== 'history-loading' && page.browsePending) await page.browsePending;
     if (pageName === 'mine' && historyTaskPreview) await page.onToggleLedger();
     if (redemptionPreview) {
@@ -258,7 +265,7 @@ for (const scenario of scenarios) {
     if (scenario === 'error') { if (pageName === 'admin') page.setData({ allowed: false, checked: true, accessError: '模拟错误：网络连接中断，无法完成权限校验。请检查网络后重新加载。' }); else page.setData({ loadError: '模拟错误：云环境连接超时。请检查网络或稍后重试。request-id-abcdefghijklmnopqrstuvwxyz0123456789' }); }
     const ast = parse(fs.readFileSync(path.join(mini, `pages/${pageName}/index.wxml`), 'utf8'));
     const rendered = renderNode(ast, page.data, { rt });
-    const componentCss = cssFile('components/target-picker/index.wxss').replace(/\/\*[\s\S]*?\*\//g, '').replace(/([^{}]+)\{/g, (_, selectors) => selectors.split(',').map(selector => `.component-target-picker ${selector.trim()}`).join(',') + '{');
+    const componentCss = adminPreview ? '' : cssFile('components/target-picker/index.wxss').replace(/\/\*[\s\S]*?\*\//g, '').replace(/([^{}]+)\{/g, (_, selectors) => selectors.split(',').map(selector => `.component-target-picker ${selector.trim()}`).join(',') + '{');
     const tabIndex = appConfig.tabBar.list.findIndex(tab => tab.pagePath === `pages/${pageName}/index`);
     let renderedTabs = '', tabCss = '';
     if (appConfig.tabBar.custom && tabIndex >= 0) {
@@ -278,7 +285,7 @@ for (const scenario of scenarios) {
       }).join('') + '</div>';
       const body = `<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${names[pageName]} · ${scenario} · ${width}px 离线预览</title><style>html{width:${width}px;max-width:100%;margin:0 auto}body{margin:0}button,input,textarea{font:inherit}button{cursor:default}img{display:block}input[type=checkbox]{width:36px;height:22px;flex:none;accent-color:#1ba35a}.simulation{position:sticky;top:0;z-index:10;padding:8px 12px;background:#fff2ce;color:#705000;font:11px/1.5 sans-serif;border-bottom:1px solid #ead49c}.native-nav{background:${appConfig.window.navigationBarBackgroundColor};color:${appConfig.window.navigationBarTextStyle === 'black' ? '#203932' : '#fff'};text-align:center;padding:16px;font:600 15px sans-serif}.preview-tabbar{display:flex;justify-content:space-around;gap:6px;background:white;padding:15px 8px;border-top:1px solid #ddd;font-size:12px;color:#65776c}${css}</style><div class="simulation">离线模拟 · ${width}px · ${scenario} · 使用实际 WXML/WXSS；不代表微信实测或实时库存</div><div class="native-nav">果小哨 · ${names[pageName]}</div>${rendered}${tabbar}<script>window.previewAudit=()=>({width:innerWidth,scrollWidth:document.documentElement.scrollWidth,overflow:[...document.querySelectorAll('body *')].filter(e=>{const r=e.getBoundingClientRect();return r.width&&r.right>document.documentElement.clientWidth+1&&getComputedStyle(e.parentElement).overflowX!=='auto'}).map(e=>({tag:e.tagName,class:e.className,right:e.getBoundingClientRect().right,text:e.textContent.slice(0,60)}))});</script></html>`;
       fs.writeFileSync(path.join(out, filename), body, 'utf8');
-      const expectedText = historyTaskPreview ? pageName === 'history' ? ['最近浏览', '浏览不扣次数', p.title, ...{
+      const expectedText = adminPreview ? { 'operator-ready': ['运行统计', '128'], 'operator-denied': ['当前账号没有管理权限', '重新检查'], 'operator-loading': ['校验权限'], 'operator-error': ['权限检查失败', '重新检查'], 'operator-longcontent': ['运行统计', '查询结果', '运营查询长文本换行验收'], 'operator-saving': ['已修改', '保存配置'] }[scenario] : historyTaskPreview ? pageName === 'history' ? ['最近浏览', '浏览不扣次数', p.title, ...{
         'history-member-reward': ['今日浏览任务完成，+1 次', '已计入次数明细'],
         'history-free-first': ['还没有浏览记录', '今日浏览任务完成，+1 次', '余 1 次'],
         'history-read-error': ['浏览记录加载或奖励确认未完成', '重新加载'],

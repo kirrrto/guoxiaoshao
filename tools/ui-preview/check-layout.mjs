@@ -41,7 +41,7 @@ try {
     const bodyText = await page.locator('body').innerText();
     const missingText = (item.expectedText || []).filter(text => !bodyText.replace(/\s+/g, '').includes(text.replace(/\s+/g, '')));
     const record = { ...item, ...metrics, missingText }; report.snapshots.push(record);
-    const representative = item.width === 320 && ['longcontent', 'history-longcontent', 'history-balance-cap'].includes(item.scenario) || item.width === 375 && ['mine', 'follow'].includes(item.page) && item.scenario === 'expired' || item.width === 430 && item.page === 'query' && item.scenario === 'member' || item.width === 375 && item.scenario.startsWith('monitor-') || item.width === 375 && item.scenario.startsWith('history-') && (item.page === 'history' || item.scenario === 'history-free-first');
+    const representative = item.width === 320 && ['longcontent', 'history-longcontent', 'history-balance-cap', 'operator-longcontent'].includes(item.scenario) || item.width === 375 && ['mine', 'follow'].includes(item.page) && item.scenario === 'expired' || item.width === 430 && item.page === 'query' && item.scenario === 'member' || item.width === 375 && item.scenario.startsWith('monitor-') || item.width === 375 && item.scenario.startsWith('history-') && (item.page === 'history' || item.scenario === 'history-free-first');
     if (representative) { const name = item.file.replace('.html', '.png'); await page.screenshot({ path: path.join(screenshots, name), fullPage: true }); record.screenshot = name; }
     if (item.width === 375 && item.scenario === 'monitor-template-missing') {
       await page.setViewportSize({ width: 375, height: 850 });

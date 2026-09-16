@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
+import { checkMonitorBundle } from '../lib/monitor-bundle.mjs';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const require = createRequire(import.meta.url);
 const json = file => JSON.parse(fs.readFileSync(path.join(root, file), 'utf8'));
@@ -28,23 +29,20 @@ const timer = json('cloudfunctions/gxs_monitor/config.json').triggers;
 check('scheduled monitor has the expected minute trigger', timer.length === 1 && timer[0].name === 'gxs-monitor-minute' && timer[0].type === 'timer' && timer[0].config === '0 * * * * * *');
 const { isTrustedTimer } = require(path.join(root, 'cloudfunctions/gxs_monitor/lib/engine/scheduled.js'));
 check('monitor rejects client-supplied timer payloads', !isTrustedTimer({ Type: 'Timer', TriggerName: 'gxs-monitor-minute' }, { SOURCE: 'wx_client', OPENID: 'untrusted' }));
-function sharedLibMatches(relative = '') {
-  const source = path.join(root, 'cloudfunctions/gxs_api/lib', relative);
-  return fs.readdirSync(source, { withFileTypes: true }).every(entry => {
-    const next = path.join(relative, entry.name);
-    if (entry.isDirectory()) return sharedLibMatches(next);
-    if (!entry.name.endsWith('.js')) return true;
-    const target = path.join(root, 'cloudfunctions/gxs_monitor/lib', next);
-    return fs.existsSync(target) && fs.readFileSync(path.join(source, entry.name)).equals(fs.readFileSync(target));
-  });
-}
-check('API and monitor share identical business logic', sharedLibMatches());
+let monitorBundle;
+try { monitorBundle = checkMonitorBundle(root); }
+catch (error) { monitorBundle = { passed: false, issues: [{ kind: 'invalid_dependency_graph', message: error.message }] }; }
+check('monitor contains exactly its canonical runtime dependency closure', monitorBundle.passed);
 check('consumer AppID matches project and frontend', json('project.config.json').appid === connection.consumerAppid && miniConnection.consumerAppid === connection.consumerAppid);
 check('shared resource identifiers match', miniConnection.resourceEnv === connection.envId && miniConnection.resourceAppid === connection.resourceAppid && backendConnection.envId === connection.envId && backendConnection.consumerAppid === connection.consumerAppid);
 const { authorize } = require(path.join(root, 'cloudfunctions/cloudbase_auth/authorize.js'));
 check('shared auth allows configured consumer and rejects payload spoofing', authorize({ FROM_APPID: connection.consumerAppid }, {}).allowed && !authorize({}, { fromAppid: connection.consumerAppid }).allowed);
-const sitemap = json('miniprogram/sitemap.json');
-check('private routes excluded from search', sitemap.rules.find(rule => rule.page === 'pages/admin/index')?.action === 'disallow');
+const consumerPages = json('miniprogram/app.json').pages;
+check('consumer package contains only the four consumer pages', consumerPages.length === 4 && ['query', 'follow', 'history', 'mine'].every(name => consumerPages.includes(`pages/${name}/index`)) && !fs.existsSync(path.join(root, 'miniprogram/pages/admin')));
+const adminProject = json('tools/admin-miniprogram/project.config.json');
+const adminApp = json('tools/admin-miniprogram/miniprogram/app.json');
+check('operator project is separate and uses the existing resource AppID', adminProject.appid === connection.resourceAppid && adminProject.miniprogramRoot === 'miniprogram/' && adminProject.setting.urlCheck === true && adminApp.pages.length === 1 && adminApp.pages[0] === 'pages/admin/index');
+check('operator project is excluded from search', json('tools/admin-miniprogram/miniprogram/sitemap.json').rules.some(rule => rule.page === '*' && rule.action === 'disallow'));
 const defaults = require(path.join(root, 'cloudfunctions/gxs_api/lib/config.js')).DEFAULTS;
 check('payment stays closed in defaults', defaults.memberProduct.enabled === false);
 const app = json('miniprogram/app.json');
@@ -64,6 +62,7 @@ const report = { checkedAt: new Date().toISOString(), version: project.version, 
   { item: 'iOS and Android layout, images, failure recovery and package size', status: 'requires physical-device acceptance' },
   { item: 'Automatic collection and actual subscription delivery', status: 'separate checks: verify automatic observations; enable messages only with real template, credentials and user authorization' }
 ] };
+report.monitorBundle = monitorBundle;
 const outputAt = process.argv.indexOf('--out');
 if (outputAt !== -1) { const file = path.resolve(process.argv[outputAt + 1]); fs.mkdirSync(path.dirname(file), { recursive: true }); fs.writeFileSync(file, JSON.stringify(report, null, 2) + '\n'); }
 console.log(JSON.stringify(report, null, 2));

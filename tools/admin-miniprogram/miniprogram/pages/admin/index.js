@@ -1,9 +1,8 @@
 const { call, showError, toast } = require('../../utils/api');
-const { getBootstrap, invalidateBootstrap } = require('../../utils/store');
 const fmt = require('../../utils/format');
 const operation = require('../../utils/operation');
 
-const EDITABLE_KEYS = ['quota', 'tasks', 'memberProduct', 'newProductWindows', 'notifications', 'collector', 'query', 'adminUserKeys', 'announcement'];
+const EDITABLE_KEYS = ['quota', 'tasks', 'memberProduct', 'memberRedemption', 'newProductWindows', 'notifications', 'collector', 'query', 'announcement'];
 
 Page({
   data: {
@@ -16,7 +15,6 @@ Page({
     grant: { userKey: '', days: '30', amount: '5', note: '' },
     lookup: null,
     lookupText: '',
-    myUserKey: '',
     busy: '',
     accessError: null,
   },
@@ -34,12 +32,10 @@ Page({
     this.loadingBoot = true;
     this.setData({ allowed: false, checked: false, accessError: null });
     try {
-      // The page is only reachable through the separate developer route.
-      // A cached client flag is never enough to reveal administrative data.
+      // This separate operator project still requires server authorization.
+      // Developer-tool operators may have no consumer user identity.
       const stats = await call('admin.stats');
-      const boot = await getBootstrap({ force: true });
-      const userKey = boot.identity.userKey || '';
-      this.setData({ checked: true, allowed: true, accessError: null, stats: { ...stats, serverTimeText: fmt.fmtDateTime(stats.serverTime) }, myUserKey: userKey, 'grant.userKey': this.data.grant.userKey || userKey });
+      this.setData({ checked: true, allowed: true, accessError: null, stats: { ...stats, serverTimeText: fmt.fmtDateTime(stats.serverTime) } });
       if (!this.data.configDirty) await this.loadConfig();
     } catch (error) {
       this.clearAccess(error);
@@ -48,7 +44,7 @@ Page({
 
   clearAccess(error) {
     const denied = error && ['forbidden', 'user_required', 'app_not_allowed'].includes(error.code);
-    this.setData({ allowed: false, checked: Boolean(error), stats: null, configText: '', configDirty: false, lookup: null, lookupText: '', myUserKey: '', grant: { userKey: '', days: '30', amount: '5', note: '' }, accessError: error ? (denied ? '当前账号没有管理权限。' : '权限检查失败，请稍后重试。') : null });
+    this.setData({ allowed: false, checked: Boolean(error), stats: null, configText: '', configDirty: false, lookup: null, lookupText: '', grant: { userKey: '', days: '30', amount: '5', note: '' }, accessError: error ? (denied ? '当前账号没有管理权限，请由项目所有者在云端配置授权。' : '权限检查失败，请稍后重试。') : null });
   },
 
   async callAdmin(action, payload) {
@@ -62,10 +58,6 @@ Page({
 
   onRetryAccess() {
     return this.checkAccess();
-  },
-
-  onReturnToMine() {
-    wx.switchTab({ url: '/pages/mine/index' });
   },
 
   async loadStats() {
@@ -95,6 +87,8 @@ Page({
     } catch (error) {
       return toast('JSON 格式错误');
     }
+    if (!patch || typeof patch !== 'object' || Array.isArray(patch)) return toast('配置需为 JSON 对象');
+    if (Object.keys(patch).some(key => !EDITABLE_KEYS.includes(key))) return toast('含不可编辑项，请重新加载配置');
     const filtered = {};
     for (const key of Object.keys(patch)) if (EDITABLE_KEYS.includes(key)) filtered[key] = patch[key];
     this.setData({ saving: true });
@@ -102,7 +96,6 @@ Page({
       await this.callAdmin('admin.updateConfig', { patch: filtered });
       toast('配置已保存', 'success');
       await this.loadConfig();
-      invalidateBootstrap();
     } catch (error) {
       showError(error);
     } finally {
@@ -112,10 +105,6 @@ Page({
 
   onGrantInput(e) {
     this.setData({ [`grant.${e.currentTarget.dataset.field}`]: e.detail.value });
-  },
-
-  onUseMyKey() {
-    this.setData({ 'grant.userKey': this.data.myUserKey });
   },
 
   async onGrantMembership() {
@@ -130,7 +119,6 @@ Page({
       const data = await this.callAdmin('admin.grantMembership', { ...payload, grantId });
       operation.finish('gm');
       wx.showModal({ title: data.applied ? '已发放会员' : '已存在（幂等）', content: `有效期至 ${fmt.fmtDateTime(data.expiresAt)}`, showCancel: false });
-      invalidateBootstrap();
     } catch (error) {
       if (!operation.uncertain(error)) operation.finish('gm');
       showError(error);
@@ -151,7 +139,6 @@ Page({
       const data = await this.callAdmin('admin.grantCredits', { ...payload, grantId });
       operation.finish('gc');
       toast(`已发放，余额 ${data.balance}`, 'success');
-      invalidateBootstrap();
     } catch (error) {
       if (!operation.uncertain(error)) operation.finish('gc');
       showError(error);
@@ -186,8 +173,6 @@ Page({
         try {
           const data = await this.callAdmin('admin.seedCatalog');
           wx.showModal({ title: '目录已导入', content: `门店 ${data.stores} · 商品 ${data.products}（可监测 ${data.supportedProducts}）\n版本 ${data.version}`, showCancel: false });
-          getApp().globalData.catalog = null;
-          try { wx.removeStorageSync('gxs_catalog_v1'); } catch (e) { /* ignore */ }
         } catch (error) {
           showError(error);
         } finally {

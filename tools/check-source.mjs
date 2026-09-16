@@ -5,7 +5,7 @@ import { spawnSync } from 'node:child_process';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const decoder = new TextDecoder('utf-8', { fatal: true });
-const extensions = new Set(['.js', '.mjs', '.json', '.wxml', '.wxss', '.md', '.yaml']);
+const extensions = new Set(['.js', '.mjs', '.json', '.wxml', '.wxss', '.md', '.yaml', '.yml']);
 const files = [];
 function scan(dir) {
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
@@ -16,6 +16,7 @@ function scan(dir) {
   }
 }
 for (const dir of ['miniprogram', 'cloudfunctions', 'tools', 'tests', 'config', 'docs', 'catalog']) scan(path.join(root, dir));
+if (fs.existsSync(path.join(root, '.github'))) scan(path.join(root, '.github'));
 files.push(path.join(root, 'README.md'), path.join(root, 'package.json'), path.join(root, 'project.config.json'));
 const errors = [];
 let jsCount = 0; let jsonCount = 0;
@@ -44,5 +45,10 @@ const app = JSON.parse(fs.readFileSync(path.join(root, 'miniprogram/app.json'), 
 for (const page of app.pages) for (const ext of ['.js', '.json', '.wxml', '.wxss']) {
   if (!fs.existsSync(path.join(root, 'miniprogram', `${page}${ext}`))) errors.push(`Missing page resource ${page}${ext}`);
 }
-console.log(JSON.stringify({ files: files.length, javaScript: jsCount, json: jsonCount, pages: app.pages.length, errors }, null, 2));
+const adminRoot = path.join(root, 'tools/admin-miniprogram/miniprogram');
+const adminApp = JSON.parse(fs.readFileSync(path.join(adminRoot, 'app.json'), 'utf8'));
+for (const page of adminApp.pages) for (const ext of ['.js', '.json', '.wxml', '.wxss']) {
+  if (!fs.existsSync(path.join(adminRoot, `${page}${ext}`))) errors.push(`Missing operator page resource ${page}${ext}`);
+}
+console.log(JSON.stringify({ files: files.length, javaScript: jsCount, json: jsonCount, pages: app.pages.length, operatorPages: adminApp.pages.length, errors }, null, 2));
 if (errors.length) process.exitCode = 1;

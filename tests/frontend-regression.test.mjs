@@ -205,14 +205,19 @@ test('isolated picker styles contain only class selectors and no imported global
 });
 
 test('all page event handlers exist; WXML expressions have no XML entity operators; UTF-8 is valid', () => {
-  for (const name of ['query', 'follow', 'history', 'mine', 'admin']) {
-    const rt = runtime(), page = rt.instance(`pages/${name}/index.js`);
-    const markup = fs.readFileSync(path.join(root, `pages/${name}/index.wxml`), 'utf8');
-    for (const match of markup.matchAll(/(?:bind|catch)(?:tap|change|input|error)="([\w]+)"/g)) assert.equal(typeof page[match[1]], 'function', `${name}: ${match[1]}`);
+  const roots = [root, path.resolve(root, '../tools/admin-miniprogram/miniprogram')];
+  for (const pageRoot of roots) {
+    const pages = JSON.parse(fs.readFileSync(path.join(pageRoot, 'app.json'), 'utf8')).pages;
+    assert.ok(pages.length, `${pageRoot}: no pages registered`);
+    for (const route of pages) {
+      const rt = runtime(undefined, { root: pageRoot }), page = rt.instance(`${route}.js`);
+      const markup = fs.readFileSync(path.join(pageRoot, `${route}.wxml`), 'utf8');
+      for (const match of markup.matchAll(/(?:capture-bind|capture-catch|bind|catch):?[\w-]+="([\w]+)"/g)) assert.equal(typeof page[match[1]], 'function', `${pageRoot}/${route}: ${match[1]}`);
+    }
   }
   const walk = directory => { for (const entry of fs.readdirSync(directory, { withFileTypes: true })) { const p = path.join(directory, entry.name); if (entry.isDirectory()) walk(p); else if (/\.(js|json|wxml|wxss)$/.test(p)) {
     const bytes = fs.readFileSync(p); const text = new TextDecoder('utf-8', { fatal: true }).decode(bytes); assert.doesNotMatch(text, /\uFFFD/);
     if (p.endsWith('.wxml')) for (const expression of text.matchAll(/\{\{([\s\S]*?)\}\}/g)) assert.doesNotMatch(expression[1], /&(?:amp|lt|gt);/, p);
   } } };
-  walk(root);
+  roots.forEach(walk);
 });

@@ -3,8 +3,7 @@
     "pages/query/index",
     "pages/follow/index",
     "pages/history/index",
-    "pages/mine/index",
-    "pages/admin/index"
+    "pages/mine/index"
   ],
   "window": {
     "backgroundColor": "#F0FBF6",

@@ -1,0 +1,19 @@
+{
+  "appid": "wxc6dfebb77650f3a9",
+  "projectname": "guoxiaoshao-operator",
+  "description": "果小哨独立运营工具；不随消费者小程序上传",
+  "compileType": "miniprogram",
+  "miniprogramRoot": "miniprogram/",
+  "libVersion": "3.17.3",
+  "setting": {
+    "urlCheck": true,
+    "es6": true,
+    "enhance": true,
+    "postcss": true,
+    "minified": true,
+    "useCompilerModule": true,
+    "swc": false,
+    "disableSWC": true
+  },
+  "packOptions": { "ignore": [], "include": [] }
+}

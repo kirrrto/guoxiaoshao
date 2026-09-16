@@ -4,11 +4,11 @@
   <view wx:elif="{{!allowed}}" class="card">
     <view class="banner banner-bad">{{accessError || '当前账号没有管理权限。请联系项目管理员。'}}</view>
     <button class="btn btn-ghost btn-block mt" bindtap="onRetryAccess">重新检查</button>
-    <button class="btn btn-outline btn-block mt" bindtap="onReturnToMine">返回我的</button>
+    <view class="small muted">这是独立运营工具，请使用获授权的开发者账号。普通小程序账号不会因打开此工具获得权限。</view>
   </view>
 
   <block wx:else>
-    <view class="page-heading"><view class="page-title">管理后台</view><view class="page-subtitle">账号、目录与运行配置</view></view>
+    <view class="page-heading"><view class="page-title">果小哨运营</view><view class="page-subtitle">独立运营工具 · 操作连接真实云环境</view></view>
     <view class="card">
       <view class="card-title"><text>运行统计</text><text class="sub">{{stats ? stats.serverTimeText : ''}}</text></view>
       <view wx:if="{{stats}}" class="stat-row">
@@ -27,7 +27,6 @@
       <view class="card-title"><text>用户操作</text></view>
       <view class="input-row">
         <input class="input" value="{{grant.userKey}}" placeholder="userKey（appid:openid）" data-field="userKey" bindinput="onGrantInput" />
-        <text class="small link" bindtap="onUseMyKey">用我的</text>
       </view>
       <view class="input-row">
         <input class="input" type="number" value="{{grant.days}}" placeholder="会员天数" data-field="days" bindinput="onGrantInput" />
@@ -58,7 +57,7 @@
         <button class="btn btn-outline btn-sm" bindtap="loadConfig">重新加载</button>
         <button class="btn btn-primary btn-sm {{saving || !configDirty ? 'disabled' : ''}}" disabled="{{saving || !configDirty}}" bindtap="onSaveConfig">保存配置</button>
       </view>
-      <view class="tiny muted mt">可编辑：quota / tasks / memberProduct / newProductWindows / notifications / collector / query / adminUserKeys / announcement。保存后立即生效，无需重新部署。</view>
+      <view class="tiny muted mt">可编辑：quota / tasks / memberProduct / memberRedemption / newProductWindows / notifications / collector / query / announcement。保存后立即生效。管理员名单仅由云端配置管理。</view>
     </view>
   </block>
 </view>

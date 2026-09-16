@@ -209,6 +209,46 @@ test('denied queries never schedule focus or create a successful result', async 
   page.onUnload();
 });
 
+test('refunded upstream failures without a product keep the requested identity and show the real failure', async () => {
+  for (const reason of ['query_failed', 'upstream_paused', 'upstream_budget_limited']) {
+    const { page, rt, ticks } = await opened({ query: async () => ({ ok: false, reason, results: [],
+      balance: 4, charged: 1, refunded: 1, retryAfterMs: 1201, queriedAt: new Date().toISOString() }) });
+    page.visible = true;
+    await page.onQuery();
+    assert.equal(page.data.result.product.partNumber, product.partNumber, reason);
+    assert.equal(page.data.result.ok, false);
+    assert.equal(page.data.result.results.length, 0);
+    assert.equal(page.data.boot.balance, 4);
+    assert.equal(page.data.querying, false);
+    assert.equal(rt.storage.has('gxs_pending_q_v1'), false, 'confirmed failed requests must not remain uncertain');
+    assert.match(page.data.restriction, /2 秒后重试/);
+    assert.doesNotMatch(page.data.restriction, /结果尚未确认/);
+    assert.deepEqual(rt.messages, ['本次未取得有效结果，已返还次数']);
+    assert.equal(ticks.length, 0, 'failed requests do not scroll as a success');
+    assert.equal(rt.calls.filter(call => call.action === 'query.pickup').length, 1);
+    page.onUnload();
+  }
+});
+
+test('a partially guarded response retains both store states and explains the retry delay without auto-querying', async () => {
+  const { page, rt } = await opened({ query: async payload => ({ ...response(payload), partial: true, retryAfterMs: 9991,
+    charged: 1, refunded: 0, results: [
+      { storeNumber: 'R577', status: 'available', observedAt: new Date().toISOString() },
+      { storeNumber: 'R639', status: 'unknown', observedAt: new Date().toISOString(), reason: { code: 'upstream_paused', message: '上游暂停' } },
+    ] }) });
+  await page.onQuery();
+  assert.equal(page.data.result.ok, true);
+  assert.deepEqual(page.data.result.results.map(row => row.status), ['available', 'unknown']);
+  assert.match(page.data.restriction, /部分门店暂未查询成功/);
+  assert.match(page.data.restriction, /10 秒后重试/);
+  assert.equal(page.data.boot.balance, 3);
+  assert.equal(page.data.querying, false);
+  assert.equal(rt.storage.has('gxs_pending_q_v1'), false);
+  assert.equal(rt.messages.length, 0);
+  assert.equal(rt.calls.filter(call => call.action === 'query.pickup').length, 1, 'partial results must not initiate another charged query');
+  page.onUnload();
+});
+
 test('a changed active route blocks queued focus even before its hide callback arrives', async () => {
   let route = 'pages/query/index';
   const { page, ticks, scrolls } = await opened({ getCurrentPages: () => [{ route }] });
