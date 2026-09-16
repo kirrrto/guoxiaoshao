@@ -1,0 +1,27 @@
+{
+  "scope": "Official WeChat compiler syntax check for query page; not device rendering",
+  "results": [
+    {
+      "compiler": "wcc.exe",
+      "exitCode": 0,
+      "inputs": [
+        "pages/query/index.wxml"
+      ],
+      "outputBytes": 59298,
+      "stderr": ""
+    },
+    {
+      "compiler": "wcsc.exe",
+      "exitCode": 0,
+      "inputs": [
+        "-js",
+        "app.wxss",
+        "styles/common.wxss",
+        "pages/query/index.wxss"
+      ],
+      "outputBytes": 16866,
+      "stderr": ""
+    }
+  ],
+  "passed": true
+}

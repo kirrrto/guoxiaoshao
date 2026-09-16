@@ -36,9 +36,23 @@
         {{!accountReady ? '正在连接账户…' : (querying ? '查询中…' : (boot.member ? '立即查询' : '立即查询（消耗 ' + boot.queryCost + ' 次）'))}}
       </button>
       <button class="btn btn-outline btn-block mt selection-follow-action" disabled="{{!accountReady || querying}}" bindtap="onFollowSelection"><image class="selection-whistle" src="/images/brand/whistle-green.png" mode="aspectFit" aria-hidden="true" /><text>关注此配置 · 小哨提醒</text></button>
-      <view wx:if="{{accountReady && !boot.member}}" class="small muted mt">受限新品开售 30 天内，免费用户暂不可实时查询；历史可查看昨天及更早记录。</view>
-      <view wx:if="{{accountReady}}" class="tiny muted selection-follow-note">可直接关注所选商品和门店，无需先查询。微信提醒需有效会员及订阅授权。</view>
-      <view wx:if="{{accountReady}}" class="footer-note">{{boot.member ? '会员查询不扣次数。' : '免费查询按次扣除；全部门店信息获取失败时，本次次数自动返还。'}}</view>
+      <view wx:if="{{accountReady}}" class="selection-rules">
+        <view class="selection-rule">
+          <text class="selection-rule-label">关注提醒</text>
+          <view class="selection-rule-copy">
+            <view>直接关注，无需先查询。</view>
+            <view class="selection-rule-detail">需会员、微信授权及服务就绪。</view>
+          </view>
+        </view>
+        <view class="selection-rule">
+          <text class="selection-rule-label">查询规则</text>
+          <view class="selection-rule-copy">{{boot.member ? '会员查询不扣次数。' : '每次扣 ' + boot.queryCost + ' 次；全部门店查询失败，自动返还。'}}</view>
+        </view>
+        <view wx:if="{{!boot.member}}" class="selection-rule">
+          <text class="selection-rule-label">新品限制</text>
+          <view class="selection-rule-copy">受限新品开售 30 天内，免费用户可查看昨天及更早的历史，暂不可实时查询。</view>
+        </view>
+      </view>
     </view>
 
     <view wx:if="{{result}}" id="query-result" class="card query-result-card">
@@ -70,9 +84,9 @@
           <text wx:for="{{item.events}}" wx:for-item="ev" wx:key="type" class="pill pill-{{ev.cls}} tiny">{{ev.label}}</text>
         </view>
       </view>
-      <view class="btn-row">
+      <view class="btn-row result-actions">
         <button class="btn btn-ghost btn-sm" bindtap="onAddFollow">加入关注</button>
-        <button class="btn btn-outline btn-sm {{querying ? 'disabled' : ''}}" disabled="{{querying || !accountReady}}" bindtap="onRequery">重查此结果的配置与门店</button>
+        <button class="btn btn-outline btn-sm {{querying ? 'disabled' : ''}}" disabled="{{querying || !accountReady}}" bindtap="onRequery" aria-label="重新查询此结果的配置与门店">{{querying ? '查询中…' : '重新查询'}}</button>
       </view>
     </view>
 

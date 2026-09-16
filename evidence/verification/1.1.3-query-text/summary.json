@@ -1,0 +1,29 @@
+{
+  "checkedAt": "2026-09-16T10:17:35.187669+00:00",
+  "scope": "Query-page copy and layout only. No backend or deployed package changes. Offline screenshots use simulated data, not WeChat device rendering.",
+  "targetedTests": {
+    "command": "node --test tests/frontend-regression.test.mjs tests/query-compact-selection.test.mjs",
+    "passed": 37,
+    "failed": 0
+  },
+  "sources": [
+    {
+      "path": "miniprogram/pages/query/index.wxml",
+      "sha256": "6bc4bbd701491908d9db486800a38250ee5b8a31ea60a40e8c90ac005a4538e5"
+    },
+    {
+      "path": "miniprogram/pages/query/index.wxss",
+      "sha256": "7653940f15591cfdf8db222df1446ee622c01c5268a1d2e0eab79251ae4f5ecc"
+    }
+  ],
+  "checks": {
+    "queryTextCases": 36,
+    "layoutCases": 72,
+    "navigationChecks": 288,
+    "officialCompilersPassed": true
+  },
+  "visualReview": [
+    "selection-member-320-130.png",
+    "result-member-320-130.png"
+  ]
+}
