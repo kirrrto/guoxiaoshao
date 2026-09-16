@@ -9,10 +9,10 @@
  */
 const { mergeConfig } = require('../config');
 const { isMember } = require('../rules/membership');
-const { fetchPickup: defaultFetchPickup } = require('../apple-pickup');
+const { guardedPickup } = require('./guarded-pickup');
 const { createScheduler, buildGroups } = require('./scheduler');
 const { createLeaseKeeper } = require('./lease');
-const { recordObservations } = require('../services/query');
+const { recordObservations } = require('./observations');
 const { buildTasks, sendTask, TASK_STATUS } = require('./notifier');
 
 function createCollector({ repo, fetchImpl, clock = () => new Date(), log = console, sendImpl = null, ownerId = `collector-${process.pid}-${Date.now()}`, sleep = ms => new Promise(resolve => setTimeout(resolve, ms)), refreshEveryMs = 10000, statusEveryMs = 5000, mode = 'resident', minimumIntervalMs = 0, statusTtlMs = 0, shouldContinue = () => true }) {
@@ -31,15 +31,8 @@ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = cons
     alignIntervalMs: mode === 'scheduled' ? 60000 : 0,
     fetchPickup: async ({ storeNumber, partNumbers, timeoutMs }) => {
       if (stopping || !lease.isHeld()) return { record: { httpStatus: null, error: { message: 'lease_lost' } }, observations: [] };
-      const now = clock();
-      budget = await repo.consumeCollectorBudget({ now: now.toISOString(), maxRequestsPerMinute: config.collector.maxRequestsPerMinute || 60, maxRequestsPerDay: config.collector.maxRequestsPerDay || 10000 });
-      if (!budget.allowed) {
-        const { dayKey, endOfDay } = require('../time');
-        const retryAt = budget.reason === 'daily_budget' ? endOfDay(dayKey(now)).getTime() : Math.floor(now.getTime() / 60000) * 60000 + 60000;
-        return { record: { httpStatus: null, budgetDenied: true, retryAt, error: { message: budget.reason } }, observations: [] };
-      }
-      if (stopping || !shouldContinue() || !await lease.renew()) return { record: { httpStatus: null, error: { message: 'lease_lost' } }, observations: [] };
-      return defaultFetchPickup({ storeNumber, partNumbers, fetchImpl, now: clock, timeoutMs });
+      return guardedPickup({ repo, config, clock, fetchImpl, storeNumber, partNumbers, timeoutMs,
+        onBudget: value => { budget = value; }, beforeRequest: async () => !stopping && shouldContinue() && await lease.renew() });
     },
     onBatch: handleBatch,
   });
@@ -122,7 +115,7 @@ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = cons
       _id: 'collector_status',
       ownerId,
       mode,
-      state: !lease.isHeld() ? 'no_lease' : !config.collector.enabled ? 'disabled' : !budget.allowed ? 'budget_limited' : snap.state,
+      state: !lease.isHeld() ? 'no_lease' : !config.collector.enabled ? 'disabled' : !budget.allowed ? (budget.reason === 'upstream_paused' ? 'throttled' : 'budget_limited') : snap.state,
       breaker: { state: snap.breaker.state, reason: snap.breaker.reason, until: snap.breaker.until ? new Date(snap.breaker.until).toISOString() : null },
       groupCount: snap.groupCount,
       inFlight: snap.inFlight,

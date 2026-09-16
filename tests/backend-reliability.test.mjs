@@ -228,7 +228,7 @@ test('retained disabled payment repository primitives prevent transaction reuse 
 test('unknown invocation origins cannot become administrators and cross-account identity cannot mix OPENIDs', async () => {
   const { resolveIdentity } = require('../cloudfunctions/gxs_api/lib/identity.js');
   const { authorize } = require('../cloudfunctions/cloudbase_auth/authorize.js');
-  const options = { allowedAppids: ['wxe96ad9e77b602f1b'], adminUserKeys: [], adminOpenids: [] };
+  const options = { allowedAppids: ['wxe96ad9e77b602f1b'], adminUserKeys: [] };
   for (const source of [undefined, '', 'wx_http', 'scf', 'wx_unknown', 'wx_client,scf', 'wx_http,wx_devtools', 'wx_devtools,unknown']) {
     assert.equal(resolveIdentity({ SOURCE: source }, options).isAdmin, false, String(source));
   }
@@ -267,7 +267,7 @@ test('real wx-server-sdk 4.0.2 adapter preserves transaction results, null/objec
   const previousRequest = Database.reqClass;
   const copy = value => EJSON.parse(EJSON.stringify(value));
   let committed = { [C.users]: { user: { _id: 'user', quota: { balance: 1 }, membership: { expiresAt: null } } } };
-  const transactions = new Map(); const calls = []; let sequence = 0; let conflict = false; let conflictRead = false; let conflictWrite = false; let failWrite = false; let conflictRuntimePatch = null;
+  const transactions = new Map(); const calls = []; let sequence = 0; let conflict = false; let conflictRead = false; let conflictWrite = false; let failWrite = false; let conflictRuntimePatch = null; let failConfigAuditWrite = false;
   Database.reqClass = class OfflineTransport {
     async send(action, args = {}) {
       calls.push({ action, args: copy(args) });
@@ -310,6 +310,7 @@ test('real wx-server-sdk 4.0.2 adapter preserves transaction results, null/objec
       }
       if (action === 'database.insertDocument') {
         const inserted = args.data.map(data => EJSON.parse(data));
+        if (failConfigAuditWrite && inserted.some(doc => doc.kind === 'runtime_config_audit')) { failConfigAuditWrite = false; throw new Error('simulated audit storage outage'); }
         for (const doc of inserted) rows[doc._id] = doc;
         return { data: { insertedIds: inserted.map(doc => doc._id) } };
       }
@@ -387,15 +388,62 @@ test('real wx-server-sdk 4.0.2 adapter preserves transaction results, null/objec
     assert.equal(redeemed.user.membership.expiresAt, new Date(Date.parse(beforeRedemption) + 30 * 86400000).toISOString());
     assert.equal((await repo.redeemMembershipCode({ userKey: 'user', codeHash: hashCode('hbw666'), nowIso })).alreadyRedeemed, true);
     assert.equal(Object.values(committed[C.orders]).filter(o => o.type === 'membership_redemption').length, 1);
-    await repo.patchRuntimeConfig({ patch: { memberRedemption: { enabled: true }, collector: { intervalSeconds: 12 } }, updatedAt: nowIso, updatedBy: 'operator' });
+    await repo.patchRuntimeConfig({ patch: { memberRedemption: { enabled: true }, collector: { intervalSeconds: 12 } }, updatedAt: nowIso, actor: { isOperator: true, userKey: null, source: 'wx_devtools' } });
     conflict = true; conflictRuntimePatch = { memberRedemption: { enabled: false } };
     const configStarts = sequence;
-    const patched = await repo.patchRuntimeConfig({ patch: { announcement: 'SDK concurrent update', collector: { maxConcurrency: 3 } }, updatedAt: nowIso, updatedBy: 'operator' });
+    const patched = await repo.patchRuntimeConfig({ patch: { announcement: 'SDK concurrent update', collector: { maxConcurrency: 3 } }, updatedAt: nowIso, actor: { isOperator: true, userKey: null, source: 'wx_devtools' } });
     assert.equal(sequence - configStarts, 2, 'conflicting configuration edits must retry against the latest runtime');
     assert.equal(patched.config.memberRedemption.enabled, false);
     assert.equal(committed[C.config].runtime.memberRedemption.enabled, false);
     assert.equal(committed[C.config].runtime.announcement, 'SDK concurrent update');
     assert.deepEqual(committed[C.config].runtime.collector, { intervalSeconds: 12, maxConcurrency: 3 });
+    const configAudits = Object.values(committed[C.config]).filter(row => row.kind === 'runtime_config_audit').sort((a, b) => a.revision - b.revision);
+    assert.deepEqual(configAudits.map(row => row.revision), [1, 2], 'SDK conflict retries must commit only one audit per successful update');
+    assert.equal(configAudits[1].changes.collector.before.maxConcurrency, 2);
+    assert.equal(configAudits[1].changes.collector.after.maxConcurrency, 3);
+    const configBeforeFailure = copy(committed[C.config]);
+    failConfigAuditWrite = true;
+    await assert.rejects(repo.patchRuntimeConfig({ patch: { announcement: 'must roll back with audit failure' }, updatedAt: nowIso, actor: { isOperator: true, userKey: null, source: 'wx_devtools' } }));
+    assert.deepEqual(committed[C.config], configBeforeFailure, 'audit insert failure must roll back the preceding runtime write through the actual SDK');
+    const guardNow = '2026-09-16T02:00:00.000Z';
+    const guardLimits = { now: guardNow, maxRequestsPerMinute: 1, maxRequestsPerDay: 10 };
+    conflict = true;
+    const budgetStarts = sequence;
+    const reserved = await repo.consumeCollectorBudget(guardLimits);
+    assert.equal(sequence - budgetStarts, 2, 'SDK retries the shared budget transaction after a commit conflict');
+    assert.equal(reserved.allowed, true);
+    assert.equal(committed[C.config]['collector_budget_2026-09-16'].dayCount, 1, 'a transaction retry must not spend budget twice');
+    const secondInstance = createCloudbaseRepo(db);
+    assert.equal((await secondInstance.consumeCollectorBudget(guardLimits)).reason, 'minute_budget', 'another repository instance must read the persisted budget');
+    conflict = true;
+    const tripStarts = sequence;
+    await repo.recordUpstreamOutcome({ token: reserved.token, record: { httpStatus: 429, retryAfter: '180' }, success: false, now: guardNow });
+    assert.equal(sequence - tripStarts, 2);
+    assert.equal(committed[C.config].upstream_breaker.generation, 1);
+    assert.equal(committed[C.config].upstream_breaker.trips, 1, 'a failed commit cannot add another breaker generation');
+    assert.equal(committed[C.config].upstream_breaker.until, Date.parse(guardNow) + 180000);
+    assert.equal((await secondInstance.consumeCollectorBudget(guardLimits)).reason, 'upstream_paused');
+    const probeNow = new Date(Date.parse(guardNow) + 180000).toISOString();
+    conflictWrite = true;
+    const probeStarts = sequence;
+    const probeBudget = await secondInstance.consumeCollectorBudget({ ...guardLimits, now: probeNow });
+    assert.equal(sequence - probeStarts, 2, 'SDK retries a wrapped write conflict while claiming the probe');
+    assert.equal(probeBudget.token.probe, true);
+    assert.equal(committed[C.config].upstream_breaker.probeId, probeBudget.token.id);
+    assert.equal(committed[C.config]['collector_budget_2026-09-16'].dayCount, 2);
+    assert.equal((await repo.consumeCollectorBudget({ ...guardLimits, now: probeNow })).reason, 'upstream_paused', 'a second instance cannot acquire the live probe lease');
+    const probeState = copy(committed[C.config]);
+    failWrite = true;
+    await assert.rejects(repo.recordUpstreamOutcome({ token: probeBudget.token, record: { httpStatus: 200 }, success: true, now: probeNow }));
+    assert.deepEqual(committed[C.config], probeState, 'failed breaker close must leave the persisted state unchanged');
+    conflict = true;
+    const closeStarts = sequence;
+    const closed = await secondInstance.recordUpstreamOutcome({ token: probeBudget.token, record: { httpStatus: 200 }, success: true, now: probeNow });
+    assert.equal(sequence - closeStarts, 2);
+    assert.equal(closed.paused, false);
+    assert.equal(committed[C.config].upstream_breaker.until, null);
+    assert.equal(committed[C.config].upstream_breaker.probeId, null);
+    assert.equal(committed[C.config]['collector_budget_2026-09-16'].dayCount, 2, 'recording an outcome must not consume another request budget');
     committed[C.config] = { catalog: { _id: 'catalog', version: 'sdk-catalog' }, collector_status: { _id: 'collector_status', state: 'running', updatedAt: nowIso } };
     const metadata = await repo.getBootstrapMetadata();
     assert.equal(metadata.catalogMeta.version, 'sdk-catalog');

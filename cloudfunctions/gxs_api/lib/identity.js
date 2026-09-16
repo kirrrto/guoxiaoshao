@@ -10,7 +10,7 @@
  */
 const OPERATOR_ORIGINS = new Set(['wx_devtools', 'wx_localdebug', 'wx_trigger']);
 
-function resolveIdentity(wxContext, { allowedAppids, adminUserKeys, adminOpenids }) {
+function resolveIdentity(wxContext, { allowedAppids, adminUserKeys }) {
   const text = value => typeof value === 'string' && value.trim() ? value.trim() : null;
   const crossAccount = Boolean(text(wxContext.FROM_APPID));
   const appid = crossAccount ? text(wxContext.FROM_APPID) : text(wxContext.APPID);
@@ -25,8 +25,7 @@ function resolveIdentity(wxContext, { allowedAppids, adminUserKeys, adminOpenids
   const isOperator = !openid && !crossAccount && !text(wxContext.FROM_OPENID)
     && chain.length > 0 && OPERATOR_ORIGINS.has(chain[0]) && chain.slice(1).every(hop => hop === 'scf');
   const isAdmin = isOperator
-    || (userKey && Array.isArray(adminUserKeys) && adminUserKeys.includes(userKey))
-    || (openid && Array.isArray(adminOpenids) && adminOpenids.includes(openid));
+    || (userKey && Array.isArray(adminUserKeys) && adminUserKeys.includes(userKey));
   const appAllowed = !appid || !Array.isArray(allowedAppids) || allowedAppids.length === 0 || allowedAppids.includes(appid);
   return { appid, openid, source, crossAccount, userKey, isOperator, isAdmin: Boolean(isAdmin), appAllowed, env: wxContext.ENV || null };
 }

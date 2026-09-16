@@ -72,7 +72,7 @@ function createHandler({ repo, fetchImpl, clock = () => new Date(), log = consol
       if (!entry) throw new ApiError('unknown_action', `未知操作：${String(action)}`);
       const stored = await repo.getConfig();
       const config = mergeConfig(stored);
-      const identity = resolveIdentity(wxContext || {}, { allowedAppids, adminUserKeys: config.adminUserKeys, adminOpenids: [] });
+      const identity = resolveIdentity(wxContext || {}, { allowedAppids, adminUserKeys: config.adminUserKeys });
       if (!identity.appAllowed) throw new ApiError('app_not_allowed', '该小程序未被允许访问');
       const [handler, requiresUser] = entry;
       if (requiresUser && !identity.userKey) throw new ApiError('user_required', '该操作需要小程序用户身份');

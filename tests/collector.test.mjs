@@ -103,6 +103,9 @@ test('collector runs the loop: observations → events → deduped notification 
   assert.equal(s.collector.stats.batches, 6);
   assert.ok(status.stats.batches >= 4, 'status is published at the start of a step, before that step\'s batches land');
   assert.equal(status.stats.sent, 2);
+  // The heartbeat taken at step start only includes completed requests. Publish
+  // after drain to inspect this round's actual network calls (not dispatches).
+  await s.collector.publishStatus();
   const health = [...s.repo.tables.get(COLLECTIONS.health).values()];
   assert.ok(health.length >= 2);
   assert.equal(health.find(h => h.storeNumber === 'R577').requests, 3);

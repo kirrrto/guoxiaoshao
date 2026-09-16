@@ -1,7 +1,7 @@
 'use strict';
 // Shared transaction bodies. Both adapters must serialize read/modify/write and
 // roll back every write if the callback fails; services never emulate a transaction.
-const { createHash } = require('node:crypto');
+const { createHash, randomUUID } = require('node:crypto');
 const { COLLECTIONS: C } = require('../collections');
 const { ApiError } = require('../errors');
 const { dayKey } = require('../time');
@@ -11,7 +11,9 @@ const { isMember, extendMembership, validateFollowLimits } = require('../rules/m
 const { applyObservation, targetKeyOf } = require('../engine/events');
 const { viewId, newView, decodeToken } = require('../notification-view');
 const { mergeConfig, patchConfig } = require('../config');
+const { assertConfigEditor, makeConfigAudit } = require('../config-audit');
 const { CAMPAIGN, MAX_FAILURES, LOCK_MS, matchesCodeHash, attemptsId } = require('../member-redemption');
+const { upstreamGuardMethods, reserveAccountQuery, releaseAccountQuery } = require('./upstream-guard');
 
 async function applyLedgerIn(tx, entry) {
   const user = await tx.get(C.users, entry.userKey);
@@ -61,12 +63,18 @@ function atomicMethods(run) {
       await tx.put(C.config, { ...status, _id: 'collector_status' });
       return { saved: true };
     }),
-    patchRuntimeConfig: ({ patch, updatedAt, updatedBy }) => run(async tx => {
+    patchRuntimeConfig: ({ patch, updatedAt, actor, requestId, auditId = randomUUID() }) => run(async tx => {
       // Merge after acquiring the transaction snapshot; concurrent unrelated
       // edits must not restore a stale enabled flag or overwrite sibling fields.
       const stored = await tx.get(C.config, 'runtime') || {};
-      const next = { ...patchConfig(stored, patch), _id: 'runtime', updatedAt, updatedBy };
+      // Revocation must also win against requests authorized before this snapshot.
+      assertConfigEditor(stored, patch, actor);
+      const revision = (Number.isSafeInteger(stored.configRevision) ? stored.configRevision : 0) + 1;
+      const next = { ...patchConfig(stored, patch), _id: 'runtime', updatedAt, updatedBy: actor.userKey || 'operator', configRevision: revision };
+      const audit = makeConfigAudit({ auditId, before: stored, after: next, patch, actor, updatedAt, requestId, revision });
+      if (await tx.get(C.config, audit._id)) throw new ApiError('config_audit_conflict', '配置审计编号已存在，请重新发起操作');
       await tx.put(C.config, next);
+      await tx.put(C.config, audit);
       return { config: mergeConfig(next) };
     }),
 
@@ -179,6 +187,8 @@ function atomicMethods(run) {
         // A crashed worker is fenced out. Its debit belongs to this same request;
         // recovery is allowed even when the debit used the user's last credit.
         const resumed = { ...existing, status: 'pending', ownerId, leaseUntil: new Date(Date.parse(nowIso) + leaseMs).toISOString(), attempts: (existing.attempts || 1) + 1 };
+        const guarded = await reserveAccountQuery(tx, { record, ownerId, nowIso, leaseMs, config });
+        if (guarded) return { denied: guarded, balance: user.quota.balance };
         await tx.put(C.queries, resumed);
         return { record: resumed, balance: user.quota.balance, recovered: true };
       }
@@ -186,6 +196,8 @@ function atomicMethods(run) {
         ? decideHistoryQuery({ user, product, requestedDayKey: record.dayKey, now: new Date(nowIso), config })
         : decideLiveQuery({ user, product, now: new Date(nowIso), config });
       if (!decision.allowed) return { denied: decision, balance: user.quota.balance };
+      const guarded = await reserveAccountQuery(tx, { record, ownerId, nowIso, leaseMs, config });
+      if (guarded) return { denied: guarded, balance: user.quota.balance };
       let balance = user.quota.balance;
       if (decision.cost > 0) {
         const id = record.kind === 'history' ? ledgerIds.historyDebit(user._id, record.queryId) : ledgerIds.queryDebit(user._id, record.queryId);
@@ -202,6 +214,7 @@ function atomicMethods(run) {
       if (!record) throw new ApiError('unknown_query', '查询记录不存在');
       if (record.status !== 'pending') return { completed: false, record, response: record.response };
       if (record.ownerId !== ownerId) return { completed: false, stale: true, record };
+      await releaseAccountQuery(tx, record, ownerId, nowIso);
       let user = await tx.get(C.users, record.userKey);
       let refunded = 0;
       if (refund && record.charged > 0) {
@@ -360,16 +373,7 @@ function atomicMethods(run) {
       return { order: paid, applied: !receipt };
     }),
 
-    consumeCollectorBudget: ({ now, maxRequestsPerMinute, maxRequestsPerDay }) => run(async tx => {
-      const date = dayKey(now);
-      const id = `collector_budget_${date}`;
-      const minuteKey = new Date(now).toISOString().slice(0, 16);
-      const current = await tx.get(C.config, id) || { _id: id, dayCount: 0 };
-      const minuteCount = current.minuteKey === minuteKey ? current.minuteCount || 0 : 0;
-      if (minuteCount >= maxRequestsPerMinute || current.dayCount >= maxRequestsPerDay) return { allowed: false, reason: current.dayCount >= maxRequestsPerDay ? 'daily_budget' : 'minute_budget', minuteCount, dayCount: current.dayCount };
-      await tx.put(C.config, { ...current, minuteKey, minuteCount: minuteCount + 1, dayCount: current.dayCount + 1, updatedAt: now, expiresAt: new Date(Date.parse(now) + 7 * 86400000).toISOString() });
-      return { allowed: true, reason: null, minuteCount: minuteCount + 1, dayCount: current.dayCount + 1 };
-    }),
+    ...upstreamGuardMethods(run),
 
     claimNotification: ({ id, ownerId, now, leaseUntil }) => run(async tx => {
       const task = await tx.get(C.notifications, id);

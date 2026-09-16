@@ -171,9 +171,6 @@ function createScheduler(options) {
     const wasProbe = breaker.state === 'half_open';
     const generation = breaker.trips;
     if (wasProbe) breaker.probeInFlight = true;
-    if (health.lastRequestAt !== null) addSample(health.requestInterval, nowMs - health.lastRequestAt);
-    health.lastRequestAt = nowMs;
-    health.requests += 1;
     let result;
     try {
       result = await fetchPickup({ storeNumber: group.storeNumber, partNumbers: group.partNumbers, timeoutMs: opts.timeoutMs });
@@ -188,6 +185,9 @@ function createScheduler(options) {
       if (wasProbe && generation === breaker.trips) breaker.probeInFlight = false;
       return;
     }
+    if (health.lastRequestAt !== null) addSample(health.requestInterval, nowMs - health.lastRequestAt);
+    health.lastRequestAt = nowMs;
+    health.requests += 1;
     addSample(health.latency, Number.isFinite(record.elapsedMs) ? record.elapsedMs : finishedMs - nowMs);
     const succeeded = observations.length > 0 && observations.every(o => o.status !== 'unknown');
     if (succeeded) {

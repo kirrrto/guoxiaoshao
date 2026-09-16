@@ -5,6 +5,7 @@ const { ledgerIds } = require('../rules/quota');
 const { COLLECTIONS } = require('../collections');
 const catalog = require('./catalog');
 const { fulfilOrder } = require('./member');
+const { assertConfigEditor } = require('../config-audit');
 
 const ID_PATTERN = /^[A-Za-z0-9_-]{4,64}$/;
 
@@ -19,7 +20,9 @@ async function getConfig(ctx) {
 
 async function updateConfig(ctx, payload) {
   requireAdmin(ctx);
-  return ctx.repo.patchRuntimeConfig({ patch: payload && payload.patch, updatedAt: ctx.nowIso, updatedBy: ctx.identity.userKey || 'operator' });
+  const patch = payload && payload.patch;
+  assertConfigEditor(ctx.config, patch, ctx.identity);
+  return ctx.repo.patchRuntimeConfig({ patch, updatedAt: ctx.nowIso, actor: ctx.identity, requestId: ctx.requestId });
 }
 
 async function seedCatalog(ctx) {

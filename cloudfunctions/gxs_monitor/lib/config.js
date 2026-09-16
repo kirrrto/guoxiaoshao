@@ -45,6 +45,8 @@ const DEFAULTS = Object.freeze({
   query: {
     maxStores: 3,
     upstreamTimeoutMs: 8000,
+    maxRequestsPerUserMinute: 6,
+    maxConcurrentPerUser: 1,
   },
   adminUserKeys: [],
   announcement: null,
@@ -95,6 +97,8 @@ function validateConfig(config) {
   integer(config.memberProduct.priceFen, 1, 10000000, 'memberProduct.priceFen');
   integer(config.query.maxStores, 1, 3, 'query.maxStores');
   integer(config.query.upstreamTimeoutMs, 1000, 10000, 'query.upstreamTimeoutMs');
+  integer(config.query.maxRequestsPerUserMinute, 1, 60, 'query.maxRequestsPerUserMinute');
+  integer(config.query.maxConcurrentPerUser, 1, 3, 'query.maxConcurrentPerUser');
   integer(config.collector.intervalSeconds, 1, 3600, 'collector.intervalSeconds');
   integer(config.collector.maxConcurrency, 1, 10, 'collector.maxConcurrency');
   integer(config.collector.continuityGapMs, 1000, 86400000, 'collector.continuityGapMs');
