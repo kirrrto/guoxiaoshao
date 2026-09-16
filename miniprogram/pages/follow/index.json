@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "果小哨 · 小哨提醒",
+  "enablePullDownRefresh": true,
+  "usingComponents": {
+    "target-picker": "/components/target-picker/index"
+  }
+}

@@ -1,0 +1,622 @@
+{
+  "checkedAt": "2026-09-16T08:37:36.410Z",
+  "renderer": "Offline Chromium rendering actual WXML/WXSS; not WeChat",
+  "summary": {
+    "total": 42,
+    "failed": 0
+  },
+  "records": [
+    {
+      "page": "history",
+      "scenario": "history-member-reward",
+      "width": 320,
+      "fontScale": 1,
+      "rows": [
+        {
+          "button": {
+            "width": 76,
+            "height": 44
+          },
+          "copyWidth": 189.125
+        }
+      ],
+      "issues": []
+    },
+    {
+      "page": "history",
+      "scenario": "history-member-reward",
+      "width": 320,
+      "fontScale": 1.3,
+      "rows": [
+        {
+          "button": {
+            "width": 78.4375,
+            "height": 44
+          },
+          "copyWidth": 186.6875
+        }
+      ],
+      "issues": []
+    },
+    {
+      "page": "history",
+      "scenario": "history-member-reward",
+      "width": 375,
+      "fontScale": 1,
+      "rows": [
+        {
+          "button": {
+            "width": 76,
+            "height": 44
+          },
+          "copyWidth": 235
+        }
+      ],
+      "issues": []
+    },
+    {
+      "page": "history",
+      "scenario": "history-member-reward",
+      "width": 375,
+      "fontScale": 1.3,
+      "rows": [
+        {
+          "button": {
+            "width": 91.609375,
+            "height": 44
+          },
+          "copyWidth": 219.390625
+        }
+      ],
+      "issues": []
+    },
+    {
+      "page": "history",
+      "scenario": "history-member-reward",
+      "width": 430,
+      "fontScale": 1,
+      "rows": [
+        {
+          "button": {
+            "width": 86.828125,
+            "height": 44
+          },
+          "copyWidth": 270.125
+        }
+      ],
+      "issues": []
+    },
+    {
+      "page": "history",
+      "scenario": "history-member-reward",
+      "width": 430,
+      "fontScale": 1.3,
+      "rows": [
+        {
+          "button": {
+            "width": 104.703125,
+            "height": 44
+          },
+          "copyWidth": 252.25
+        }
+      ],
+      "issues": []
+    },
+    {
+      "page": "history",
+      "scenario": "history-free-first",
+      "width": 320,
+      "fontScale": 1,
+      "rows": [],
+      "issues": []
+    },
+    {
+      "page": "history",
+      "scenario": "history-free-first",
+      "width": 320,
+      "fontScale": 1.3,
+      "rows": [],
+      "issues": []
+    },
+    {
+      "page": "history",
+      "scenario": "history-free-first",
+      "width": 375,
+      "fontScale": 1,
+      "rows": [],
+      "issues": []
+    },
+    {
+      "page": "history",
+      "scenario": "history-free-first",
+      "width": 375,
+      "fontScale": 1.3,
+      "rows": [],
+      "issues": []
+    },
+    {
+      "page": "history",
+      "scenario": "history-free-first",
+      "width": 430,
+      "fontScale": 1,
+      "rows": [],
+      "issues": []
+    },
+    {
+      "page": "history",
+      "scenario": "history-free-first",
+      "width": 430,
+      "fontScale": 1.3,
+      "rows": [],
+      "issues": []
+    },
+    {
+      "page": "history",
+      "scenario": "history-read-error",
+      "width": 320,
+      "fontScale": 1,
+      "rows": [],
+      "issues": []
+    },
+    {
+      "page": "history",
+      "scenario": "history-read-error",
+      "width": 320,
+      "fontScale": 1.3,
+      "rows": [],
+      "issues": []
+    },
+    {
+      "page": "history",
+      "scenario": "history-read-error",
+      "width": 375,
+      "fontScale": 1,
+      "rows": [],
+      "issues": []
+    },
+    {
+      "page": "history",
+      "scenario": "history-read-error",
+      "width": 375,
+      "fontScale": 1.3,
+      "rows": [],
+      "issues": []
+    },
+    {
+      "page": "history",
+      "scenario": "history-read-error",
+      "width": 430,
+      "fontScale": 1,
+      "rows": [],
+      "issues": []
+    },
+    {
+      "page": "history",
+      "scenario": "history-read-error",
+      "width": 430,
+      "fontScale": 1.3,
+      "rows": [],
+      "issues": []
+    },
+    {
+      "page": "history",
+      "scenario": "history-balance-cap",
+      "width": 320,
+      "fontScale": 1,
+      "rows": [
+        {
+          "button": {
+            "width": 76,
+            "height": 44
+          },
+          "copyWidth": 189.125
+        }
+      ],
+      "issues": []
+    },
+    {
+      "page": "history",
+      "scenario": "history-balance-cap",
+      "width": 320,
+      "fontScale": 1.3,
+      "rows": [
+        {
+          "button": {
+            "width": 78.4375,
+            "height": 44
+          },
+          "copyWidth": 186.6875
+        }
+      ],
+      "issues": []
+    },
+    {
+      "page": "history",
+      "scenario": "history-balance-cap",
+      "width": 375,
+      "fontScale": 1,
+      "rows": [
+        {
+          "button": {
+            "width": 76,
+            "height": 44
+          },
+          "copyWidth": 235
+        }
+      ],
+      "issues": []
+    },
+    {
+      "page": "history",
+      "scenario": "history-balance-cap",
+      "width": 375,
+      "fontScale": 1.3,
+      "rows": [
+        {
+          "button": {
+            "width": 91.609375,
+            "height": 44
+          },
+          "copyWidth": 219.390625
+        }
+      ],
+      "issues": []
+    },
+    {
+      "page": "history",
+      "scenario": "history-balance-cap",
+      "width": 430,
+      "fontScale": 1,
+      "rows": [
+        {
+          "button": {
+            "width": 86.828125,
+            "height": 44
+          },
+          "copyWidth": 270.125
+        }
+      ],
+      "issues": []
+    },
+    {
+      "page": "history",
+      "scenario": "history-balance-cap",
+      "width": 430,
+      "fontScale": 1.3,
+      "rows": [
+        {
+          "button": {
+            "width": 104.703125,
+            "height": 44
+          },
+          "copyWidth": 252.25
+        }
+      ],
+      "issues": []
+    },
+    {
+      "page": "history",
+      "scenario": "history-completed",
+      "width": 320,
+      "fontScale": 1,
+      "rows": [
+        {
+          "button": {
+            "width": 76,
+            "height": 44
+          },
+          "copyWidth": 189.125
+        }
+      ],
+      "issues": []
+    },
+    {
+      "page": "history",
+      "scenario": "history-completed",
+      "width": 320,
+      "fontScale": 1.3,
+      "rows": [
+        {
+          "button": {
+            "width": 78.4375,
+            "height": 44
+          },
+          "copyWidth": 186.6875
+        }
+      ],
+      "issues": []
+    },
+    {
+      "page": "history",
+      "scenario": "history-completed",
+      "width": 375,
+      "fontScale": 1,
+      "rows": [
+        {
+          "button": {
+            "width": 76,
+            "height": 44
+          },
+          "copyWidth": 235
+        }
+      ],
+      "issues": []
+    },
+    {
+      "page": "history",
+      "scenario": "history-completed",
+      "width": 375,
+      "fontScale": 1.3,
+      "rows": [
+        {
+          "button": {
+            "width": 91.609375,
+            "height": 44
+          },
+          "copyWidth": 219.390625
+        }
+      ],
+      "issues": []
+    },
+    {
+      "page": "history",
+      "scenario": "history-completed",
+      "width": 430,
+      "fontScale": 1,
+      "rows": [
+        {
+          "button": {
+            "width": 86.828125,
+            "height": 44
+          },
+          "copyWidth": 270.125
+        }
+      ],
+      "issues": []
+    },
+    {
+      "page": "history",
+      "scenario": "history-completed",
+      "width": 430,
+      "fontScale": 1.3,
+      "rows": [
+        {
+          "button": {
+            "width": 104.703125,
+            "height": 44
+          },
+          "copyWidth": 252.25
+        }
+      ],
+      "issues": []
+    },
+    {
+      "page": "history",
+      "scenario": "history-longcontent",
+      "width": 320,
+      "fontScale": 1,
+      "rows": [
+        {
+          "button": {
+            "width": 76,
+            "height": 44
+          },
+          "copyWidth": 189.125
+        },
+        {
+          "button": {
+            "width": 76,
+            "height": 44
+          },
+          "copyWidth": 189.125
+        },
+        {
+          "button": {
+            "width": 76,
+            "height": 44
+          },
+          "copyWidth": 189.125
+        }
+      ],
+      "issues": []
+    },
+    {
+      "page": "history",
+      "scenario": "history-longcontent",
+      "width": 320,
+      "fontScale": 1.3,
+      "rows": [
+        {
+          "button": {
+            "width": 78.4375,
+            "height": 44
+          },
+          "copyWidth": 186.6875
+        },
+        {
+          "button": {
+            "width": 78.4375,
+            "height": 44
+          },
+          "copyWidth": 186.6875
+        },
+        {
+          "button": {
+            "width": 78.4375,
+            "height": 44
+          },
+          "copyWidth": 186.6875
+        }
+      ],
+      "issues": []
+    },
+    {
+      "page": "history",
+      "scenario": "history-longcontent",
+      "width": 375,
+      "fontScale": 1,
+      "rows": [
+        {
+          "button": {
+            "width": 76,
+            "height": 44
+          },
+          "copyWidth": 235
+        },
+        {
+          "button": {
+            "width": 76,
+            "height": 44
+          },
+          "copyWidth": 235
+        },
+        {
+          "button": {
+            "width": 76,
+            "height": 44
+          },
+          "copyWidth": 235
+        }
+      ],
+      "issues": []
+    },
+    {
+      "page": "history",
+      "scenario": "history-longcontent",
+      "width": 375,
+      "fontScale": 1.3,
+      "rows": [
+        {
+          "button": {
+            "width": 91.609375,
+            "height": 44
+          },
+          "copyWidth": 219.390625
+        },
+        {
+          "button": {
+            "width": 91.609375,
+            "height": 44
+          },
+          "copyWidth": 219.390625
+        },
+        {
+          "button": {
+            "width": 91.609375,
+            "height": 44
+          },
+          "copyWidth": 219.390625
+        }
+      ],
+      "issues": []
+    },
+    {
+      "page": "history",
+      "scenario": "history-longcontent",
+      "width": 430,
+      "fontScale": 1,
+      "rows": [
+        {
+          "button": {
+            "width": 86.828125,
+            "height": 44
+          },
+          "copyWidth": 270.125
+        },
+        {
+          "button": {
+            "width": 86.828125,
+            "height": 44
+          },
+          "copyWidth": 270.125
+        },
+        {
+          "button": {
+            "width": 86.828125,
+            "height": 44
+          },
+          "copyWidth": 270.125
+        }
+      ],
+      "issues": []
+    },
+    {
+      "page": "history",
+      "scenario": "history-longcontent",
+      "width": 430,
+      "fontScale": 1.3,
+      "rows": [
+        {
+          "button": {
+            "width": 104.703125,
+            "height": 44
+          },
+          "copyWidth": 252.25
+        },
+        {
+          "button": {
+            "width": 104.703125,
+            "height": 44
+          },
+          "copyWidth": 252.25
+        },
+        {
+          "button": {
+            "width": 104.703125,
+            "height": 44
+          },
+          "copyWidth": 252.25
+        }
+      ],
+      "issues": []
+    },
+    {
+      "page": "history",
+      "scenario": "history-loading",
+      "width": 320,
+      "fontScale": 1,
+      "rows": [],
+      "issues": []
+    },
+    {
+      "page": "history",
+      "scenario": "history-loading",
+      "width": 320,
+      "fontScale": 1.3,
+      "rows": [],
+      "issues": []
+    },
+    {
+      "page": "history",
+      "scenario": "history-loading",
+      "width": 375,
+      "fontScale": 1,
+      "rows": [],
+      "issues": []
+    },
+    {
+      "page": "history",
+      "scenario": "history-loading",
+      "width": 375,
+      "fontScale": 1.3,
+      "rows": [],
+      "issues": []
+    },
+    {
+      "page": "history",
+      "scenario": "history-loading",
+      "width": 430,
+      "fontScale": 1,
+      "rows": [],
+      "issues": []
+    },
+    {
+      "page": "history",
+      "scenario": "history-loading",
+      "width": 430,
+      "fontScale": 1.3,
+      "rows": [],
+      "issues": []
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "checkedAt": "2026-09-16T08:42:28.441Z",
+  "command": "node --test --test-reporter=tap tests/**/*.test.mjs",
+  "exitCode": 0,
+  "elapsedMs": 3000,
+  "tests": 321,
+  "suites": 0,
+  "pass": 321,
+  "fail": 0,
+  "cancelled": 0,
+  "skipped": 0,
+  "todo": 0
+}

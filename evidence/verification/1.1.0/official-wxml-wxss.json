@@ -1,0 +1,10 @@
+{
+  "checkedAt": "2026-09-16T01:34:18.1408466Z",
+  "method": "Installed official WeChat WXML/WXSS compiler, normalized forward-slash input paths; not simulator interaction",
+  "wxmlFiles": 6,
+  "wxssFiles": 8,
+  "wccExit": 0,
+  "wcscExit": 0,
+  "wccSha256": "2EC832EA823C5F53E264230960637290A8CC7694773016B4C232A439193C9179",
+  "wcscSha256": "23914DED6433A178C184E4E0FCDB077B499502B4E5A784A1F44F3DB55699CE31"
+}

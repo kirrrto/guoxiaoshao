@@ -1,0 +1,5 @@
+{
+  "triggers": [
+    { "name": "gxs-monitor-minute", "type": "timer", "config": "0 * * * * * *" }
+  ]
+}

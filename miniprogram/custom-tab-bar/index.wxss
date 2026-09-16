@@ -1,0 +1,98 @@
+/* Clear center with small frosted ends. No filter covers the whole capsule.
+   If mask or backdrop-filter is unavailable, only the transparent rim remains. */
+.floating-tab-shell {
+  position: fixed;
+  z-index: 90;
+  left: 12px;
+  right: 12px;
+  bottom: 8px;
+  bottom: calc(8px + constant(safe-area-inset-bottom));
+  bottom: calc(8px + env(safe-area-inset-bottom));
+  max-width: 520px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+.floating-tab-glass {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  height: 66px;
+  padding: 5px;
+  box-sizing: border-box;
+  border-radius: 999px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.64);
+  background: rgba(255, 255, 255, 0.055);
+  box-shadow: 0 3px 16px rgba(40, 60, 53, 0.065), 0 1px 3px rgba(34, 52, 47, 0.035), inset 0 1px 0 rgba(255, 255, 255, 0.62), inset 0 -1px 0 rgba(102, 137, 120, 0.12);
+}
+.floating-tab-edge {
+  position: absolute;
+  z-index: 0;
+  top: 0;
+  bottom: 0;
+  width: 36px;
+  pointer-events: none;
+}
+.floating-tab-edge-left {
+  left: 0;
+  border-radius: 999px 0 0 999px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.36), rgba(255, 255, 255, 0.13) 35%, rgba(255, 255, 255, 0) 100%);
+  box-shadow: inset 1px 0 0 rgba(255, 255, 255, 0.65);
+}
+.floating-tab-edge-right {
+  right: 0;
+  border-radius: 0 999px 999px 0;
+  background: linear-gradient(270deg, rgba(255, 255, 255, 0.36), rgba(255, 255, 255, 0.13) 35%, rgba(255, 255, 255, 0) 100%);
+  box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.65);
+}
+/* Both capabilities are needed: no hard-edged blur block on older renderers. */
+@supports ((-webkit-backdrop-filter: blur(7px)) or (backdrop-filter: blur(7px))) {
+  @supports ((-webkit-mask-image: linear-gradient(black, transparent)) or (mask-image: linear-gradient(black, transparent))) {
+    .floating-tab-edge {
+      -webkit-backdrop-filter: blur(7px) saturate(108%);
+      backdrop-filter: blur(7px) saturate(108%);
+    }
+    .floating-tab-edge-left {
+      -webkit-mask-image: linear-gradient(90deg, black, rgba(0, 0, 0, 0.6) 38%, transparent);
+      mask-image: linear-gradient(90deg, black, rgba(0, 0, 0, 0.6) 38%, transparent);
+    }
+    .floating-tab-edge-right {
+      -webkit-mask-image: linear-gradient(270deg, black, rgba(0, 0, 0, 0.6) 38%, transparent);
+      mask-image: linear-gradient(270deg, black, rgba(0, 0, 0, 0.6) 38%, transparent);
+    }
+  }
+}
+.floating-tab-item {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-width: 0;
+  min-height: 54px;
+  height: 54px;
+  padding: 2px 0;
+  margin: 0;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  box-sizing: border-box;
+  background: transparent;
+  color: #5D6F66;
+  line-height: 1.2;
+  font-weight: 500;
+  text-align: center;
+}
+.floating-tab-item::after { border: 0; }
+.floating-tab-item.is-selected {
+  background: rgba(89, 130, 111, 0.10);
+  border-color: rgba(255, 255, 255, 0.34);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.30);
+  color: #007A49;
+  font-weight: 600;
+}
+.floating-tab-pressed { opacity: 0.68; }
+.floating-tab-icon { display: block; flex: none; width: 25px; height: 25px; }
+.floating-tab-label { display: block; font-size: 12px; line-height: 16px; white-space: nowrap; text-shadow: 0 1px 2px rgba(255, 255, 255, 0.85); }

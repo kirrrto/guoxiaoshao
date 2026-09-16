@@ -1,0 +1,48 @@
+{
+  "checkedAt": "2026-09-16T01:33:04.260640+00:00",
+  "backups": [
+    {
+      "function": "gxs_api",
+      "sha256": "54566f9711ed5ff55c2964525b4dd38c0814955b8efe355a1b699b71b2a22564",
+      "bytes": 7531804,
+      "version": "1.0.1",
+      "crcVerified": true
+    },
+    {
+      "function": "cloudbase_auth",
+      "sha256": "3e0520fcd2044b66637c164c4f8b12271f971ac9ade54722fcb9b038ede0614e",
+      "bytes": 7406922,
+      "version": "1.0.1",
+      "crcVerified": true
+    }
+  ],
+  "deployed": [
+    {
+      "function": "gxs_api",
+      "sha256": "5d08c6f5ed5d6202ec350fabd0c2749fb710321bd4c4fa6cb7455fe2181334c8",
+      "bytes": 7493402,
+      "version": "1.1.0",
+      "crcVerified": true,
+      "sdkVersion": "4.0.2",
+      "sourceFilesMatched": 39
+    },
+    {
+      "function": "cloudbase_auth",
+      "sha256": "a1c9948b886f8c8f6b9160df6bb372670977d81aa43143a3511840f92e920249",
+      "bytes": 7364322,
+      "version": "1.1.0",
+      "crcVerified": true,
+      "sdkVersion": "4.0.2",
+      "sourceFilesMatched": 4
+    },
+    {
+      "function": "gxs_monitor",
+      "sha256": "3e52d2edee6723b674396d474816fd264027d7da2948690d28a8d7171a3ae3dc",
+      "bytes": 7435691,
+      "version": "1.1.0",
+      "crcVerified": true,
+      "sdkVersion": "4.0.2",
+      "sourceFilesMatched": 37
+    }
+  ]
+}

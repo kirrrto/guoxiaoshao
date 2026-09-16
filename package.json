@@ -1,0 +1,17 @@
+{
+  "name": "guoxiaoshao",
+  "version": "1.1.2",
+  "private": true,
+  "description": "果小哨 —— Apple 直营店取货供应监测小程序（云开发共享环境）",
+  "scripts": {
+    "test": "node --test \"tests/**/*.test.mjs\"",
+    "check": "node tools/check-source.mjs",
+    "catalog:stores": "node tools/catalog/fetch-stores.mjs",
+    "catalog:products": "node tools/catalog/fetch-products.mjs",
+    "catalog:sample": "node tools/catalog/sample-pickup.mjs",
+    "catalog:sync": "node tools/catalog/sync-to-function.mjs"
+  },
+  "engines": {
+    "node": ">=18.18"
+  }
+}

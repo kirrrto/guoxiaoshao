@@ -1,0 +1,29 @@
+{
+  "copiedAt": "2026-09-16T08:50:16.205524+00:00",
+  "copies": [
+    {
+      "name": "layout-metrics.json",
+      "source": "C:\\Users\\Administrator\\Documents\\ChatGPT\\果小哨\\ui-competitor-1.1.2\\layout-metrics.json",
+      "target": "C:\\Users\\Administrator\\WeChatProjects\\miniprogram-6\\evidence\\verification\\1.1.2-competitor\\layout-metrics.json",
+      "sha256": "bc7afbb0d946ab1d4b75aa5cd53179862797b48a60f15bc68f99d23856b802e1",
+      "summary": {
+        "total": 90,
+        "expressionErrors": 0,
+        "missingText": 0,
+        "horizontalOverflow": 0,
+        "clippedText": 0,
+        "failedImages": 0
+      }
+    },
+    {
+      "name": "floating-tab-metrics.json",
+      "source": "C:\\Users\\Administrator\\Documents\\ChatGPT\\果小哨\\ui-competitor-1.1.2\\floating-tab-metrics.json",
+      "target": "C:\\Users\\Administrator\\WeChatProjects\\miniprogram-6\\evidence\\verification\\1.1.2-competitor\\floating-tab-metrics.json",
+      "sha256": "5f14584969cb278be141b63dcccbe3b14905d22b43a1ee0b43c29c36d12148b7",
+      "summary": {
+        "total": 306,
+        "failed": 0
+      }
+    }
+  ]
+}

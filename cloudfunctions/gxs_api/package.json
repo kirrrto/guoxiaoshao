@@ -1,0 +1,11 @@
+{
+  "name": "gxs_api",
+  "version": "1.1.2",
+  "private": true,
+  "description": "果小哨业务云函数：身份、目录、实时查询、次数账本、关注、会员、历史与管理",
+  "main": "index.js",
+  "type": "commonjs",
+  "dependencies": {
+    "wx-server-sdk": "4.0.2"
+  }
+}

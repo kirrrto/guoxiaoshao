@@ -1,0 +1,142 @@
+{
+  "release": "1.1.1-mint-glass",
+  "generatedAt": "2026-09-16T03:59:18.732084+00:00",
+  "workingDirectory": "C:\\Users\\Administrator\\WeChatProjects\\miniprogram-6\\miniprogram",
+  "method": "Installed official WeChat DevTools wcc.exe and wcsc.exe; source paths normalized to forward slashes",
+  "scope": "All current WXML and WXSS. Compilation validates syntax, not native UI or real-device glass rendering.",
+  "sourceFiles": [
+    {
+      "path": "components/target-picker/index.wxml",
+      "sha256": "1f9ef7df9d3d2bce128f52fc61d8c0683e224606743a70b46115e4d1e03fc35a"
+    },
+    {
+      "path": "custom-tab-bar/index.wxml",
+      "sha256": "0815bf08a7d475376855437e6448b7699ec0eed38b4a207a0b8fb626243b21a4"
+    },
+    {
+      "path": "pages/admin/index.wxml",
+      "sha256": "1734db004e5a0448460c0461d175dc40bdfe94e3a303d0d6a9b982f148974c2a"
+    },
+    {
+      "path": "pages/follow/index.wxml",
+      "sha256": "92722f4e33bf323fb88fa767c1fae2529cc55a0725c9eaeecf77e6c6c4af54bd"
+    },
+    {
+      "path": "pages/history/index.wxml",
+      "sha256": "ce7cd07c365fb122cc3dfe6fc8aebdb79fd1237ee95c95b0d4c2bc08bd9f57b5"
+    },
+    {
+      "path": "pages/mine/index.wxml",
+      "sha256": "2961d476177d29d059c48662f5cb1fbe2e11035d5618410c34d4dbe6df68a640"
+    },
+    {
+      "path": "pages/query/index.wxml",
+      "sha256": "225650cded98fc7e8cfe5cfbd5b31c31d24049a5715b97b306e4b0481819d70d"
+    },
+    {
+      "path": "app.wxss",
+      "sha256": "665a60577aa895632dec08502942b7a6aa13eaf40142500e7827e42c806bb469"
+    },
+    {
+      "path": "components/target-picker/index.wxss",
+      "sha256": "1eb2a03e5f464d3eeff0c5d3f5a3c27a6a9badcd2d9c5da8aa0e45d10387de46"
+    },
+    {
+      "path": "custom-tab-bar/index.wxss",
+      "sha256": "14ac5fcdaca05c2ef6a950d56f965bccca155ce4f8179d121f0f5654e9516047"
+    },
+    {
+      "path": "pages/admin/index.wxss",
+      "sha256": "cf9e98224184e69b5df463225331b3bbef55213b76355808f0ab8f02a3978f1c"
+    },
+    {
+      "path": "pages/follow/index.wxss",
+      "sha256": "f3eecf3a3c53d03956253692523f92cb6703366fb2a9d14ce07708e3c56be2b3"
+    },
+    {
+      "path": "pages/history/index.wxss",
+      "sha256": "2920728beb9542fd73b4a3e14c73fd774400040f38bc413dec72b3be8bf4a84c"
+    },
+    {
+      "path": "pages/mine/index.wxss",
+      "sha256": "cd5bd2e9a72f0d809427e3398ed6b8366fe4e845d4ce53be6b351843e8afff12"
+    },
+    {
+      "path": "pages/query/index.wxss",
+      "sha256": "549c9ad451cff9ff593c23d265eb6608e87426e96c8b44331a8b8774f040daf2"
+    },
+    {
+      "path": "styles/common.wxss",
+      "sha256": "ac5faef31d5cea649fb509bdb04f280658ee5ffc88b887491765b4e059fcbb22"
+    }
+  ],
+  "wxml": {
+    "compiler": "D:\\微信web开发者工具\\resources\\app.asar.unpacked\\node_modules\\wcc-exec\\wcc.exe",
+    "compilerSha256": "2ec832ea823c5f53e264230960637290a8cc7694773016b4c232a439193c9179",
+    "arguments": [
+      "-o",
+      "C:\\Users\\Administrator\\Documents\\ChatGPT\\果小哨\\official-compiler-1.1.1-mint-glass\\wxml.js",
+      "components/target-picker/index.wxml",
+      "custom-tab-bar/index.wxml",
+      "pages/admin/index.wxml",
+      "pages/follow/index.wxml",
+      "pages/history/index.wxml",
+      "pages/mine/index.wxml",
+      "pages/query/index.wxml"
+    ],
+    "exitCode": 0,
+    "files": [
+      "components/target-picker/index.wxml",
+      "custom-tab-bar/index.wxml",
+      "pages/admin/index.wxml",
+      "pages/follow/index.wxml",
+      "pages/history/index.wxml",
+      "pages/mine/index.wxml",
+      "pages/query/index.wxml"
+    ],
+    "fileCount": 7,
+    "stdout": "",
+    "stderr": "",
+    "output": "C:\\Users\\Administrator\\Documents\\ChatGPT\\果小哨\\official-compiler-1.1.1-mint-glass\\wxml.js",
+    "outputBytes": 146520,
+    "outputSha256": "dc3a829503a8930e18a799ff8fc947cebbd9932b8019fe9d7a44587b8881fd71"
+  },
+  "wxss": {
+    "compiler": "D:\\微信web开发者工具\\resources\\app.asar.unpacked\\node_modules\\wcc-exec\\wcsc.exe",
+    "compilerSha256": "23914ded6433a178c184e4e0fcdb077b499502b4e5a784a1f44f3db55699ce31",
+    "arguments": [
+      "-js",
+      "-o",
+      "C:\\Users\\Administrator\\Documents\\ChatGPT\\果小哨\\official-compiler-1.1.1-mint-glass\\wxss.js",
+      "app.wxss",
+      "components/target-picker/index.wxss",
+      "custom-tab-bar/index.wxss",
+      "pages/admin/index.wxss",
+      "pages/follow/index.wxss",
+      "pages/history/index.wxss",
+      "pages/mine/index.wxss",
+      "pages/query/index.wxss",
+      "styles/common.wxss"
+    ],
+    "exitCode": 0,
+    "files": [
+      "app.wxss",
+      "components/target-picker/index.wxss",
+      "custom-tab-bar/index.wxss",
+      "pages/admin/index.wxss",
+      "pages/follow/index.wxss",
+      "pages/history/index.wxss",
+      "pages/mine/index.wxss",
+      "pages/query/index.wxss",
+      "styles/common.wxss"
+    ],
+    "fileCount": 9,
+    "stdout": "",
+    "stderr": "",
+    "output": "C:\\Users\\Administrator\\Documents\\ChatGPT\\果小哨\\official-compiler-1.1.1-mint-glass\\wxss.js",
+    "outputBytes": 16866,
+    "outputSha256": "4b7c40fb0ee578d50ccf3cb2540008d113da419cd89d20588a7874b5baafe714"
+  },
+  "sourcesStableDuringCompile": true,
+  "success": true
+}

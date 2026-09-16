@@ -1,0 +1,309 @@
+{
+  "version": "1.0.1",
+  "updatedAt": "2026-09-15T10:57:41.613Z",
+  "environment": "flowermean-6gjaxfqhf6c13e88",
+  "functions": [
+    {
+      "name": "gxs_api",
+      "status": "Active",
+      "availableStatus": "Available",
+      "modifiedAt": "2026-09-15 18:55:25",
+      "runtime": "Nodejs18.15",
+      "timeout": 30,
+      "handler": "index.main",
+      "environmentVariableCount": 0,
+      "codeBytes": 7531804
+    },
+    {
+      "name": "cloudbase_auth",
+      "status": "Active",
+      "availableStatus": "Available",
+      "modifiedAt": "2026-09-15 18:55:32",
+      "runtime": "Nodejs18.15",
+      "timeout": 5,
+      "handler": "index.main",
+      "environmentVariableCount": 0,
+      "codeBytes": 7406922
+    }
+  ],
+  "probes": [
+    {
+      "name": "ping",
+      "result": {
+        "ok": true,
+        "data": {
+          "version": "1.0.1",
+          "env": null,
+          "appid": null,
+          "crossAccount": false,
+          "hasUser": false,
+          "isAdmin": false
+        },
+        "serverTime": "2026-09-15T10:56:07.460Z",
+        "requestId": "1f0bbe28-d6ff-4ac0-a658-a2dba044fd83"
+      },
+      "requestId": "1f0bbe28-d6ff-4ac0-a658-a2dba044fd83"
+    },
+    {
+      "name": "redeem-auth",
+      "result": {
+        "ok": false,
+        "error": {
+          "code": "user_required",
+          "message": "该操作需要小程序用户身份",
+          "details": null
+        },
+        "serverTime": "2026-09-15T10:56:18.670Z",
+        "requestId": "e508a900-99f5-4aea-ba42-9da8bb9fae61"
+      },
+      "requestId": "e508a900-99f5-4aea-ba42-9da8bb9fae61"
+    },
+    {
+      "name": "shared-auth",
+      "result": {
+        "errCode": -1,
+        "errMsg": "appid not allowed: unknown"
+      },
+      "requestId": "bf36a48c-0bc0-487a-bb0d-79e46c65fe0c"
+    }
+  ],
+  "indexes": {
+    "added": 16,
+    "checks": [
+      {
+        "collectionName": "gxs_quota_ledger",
+        "checks": [
+          {
+            "name": "user_day",
+            "passed": true
+          },
+          {
+            "name": "user_day_created_id",
+            "passed": true
+          },
+          {
+            "name": "user_created_id",
+            "passed": true
+          }
+        ]
+      },
+      {
+        "collectionName": "gxs_queries",
+        "checks": [
+          {
+            "name": "user_created",
+            "passed": true
+          },
+          {
+            "name": "user_created_id",
+            "passed": true
+          },
+          {
+            "name": "user_status_lease_id",
+            "passed": true
+          },
+          {
+            "name": "user_history_finished_id",
+            "passed": true
+          }
+        ]
+      },
+      {
+        "collectionName": "gxs_follows",
+        "checks": [
+          {
+            "name": "user_status",
+            "passed": true
+          },
+          {
+            "name": "status_part",
+            "passed": true
+          },
+          {
+            "name": "user_created_id_status",
+            "passed": true
+          },
+          {
+            "name": "status_id",
+            "passed": true
+          }
+        ]
+      },
+      {
+        "collectionName": "gxs_events",
+        "checks": [
+          {
+            "name": "target_detected",
+            "passed": true
+          },
+          {
+            "name": "part_day_detected",
+            "passed": true
+          },
+          {
+            "name": "part_day_detected_id",
+            "passed": true
+          },
+          {
+            "name": "part_day_store_detected_id",
+            "passed": true
+          },
+          {
+            "name": "part_day_type_detected",
+            "passed": true
+          },
+          {
+            "name": "part_day_store_type_detected",
+            "passed": true
+          },
+          {
+            "name": "notify_planning",
+            "passed": true
+          }
+        ]
+      },
+      {
+        "collectionName": "gxs_target_health",
+        "checks": [
+          {
+            "name": "target_bucket",
+            "passed": true
+          }
+        ]
+      },
+      {
+        "collectionName": "gxs_orders",
+        "checks": [
+          {
+            "name": "user_created",
+            "passed": true
+          }
+        ]
+      },
+      {
+        "collectionName": "gxs_notifications",
+        "checks": [
+          {
+            "name": "user_created",
+            "passed": true
+          },
+          {
+            "name": "user_created_id_view",
+            "passed": true
+          },
+          {
+            "name": "user_view_sequence",
+            "passed": true
+          },
+          {
+            "name": "status_created",
+            "passed": true
+          },
+          {
+            "name": "status_created_id",
+            "passed": true
+          },
+          {
+            "name": "status_lease",
+            "passed": true
+          }
+        ]
+      },
+      {
+        "collectionName": "gxs_catalog_products",
+        "checks": [
+          {
+            "name": "family",
+            "passed": true
+          }
+        ]
+      }
+    ]
+  },
+  "databasePermissions": [
+    {
+      "Resource": "gxs_users",
+      "Permission": "ADMINONLY",
+      "ResourceType": "collection",
+      "SecurityRule": ""
+    },
+    {
+      "Resource": "gxs_quota_ledger",
+      "Permission": "ADMINONLY",
+      "ResourceType": "collection",
+      "SecurityRule": ""
+    },
+    {
+      "Resource": "gxs_queries",
+      "Permission": "ADMINONLY",
+      "ResourceType": "collection",
+      "SecurityRule": ""
+    },
+    {
+      "Resource": "gxs_follows",
+      "Permission": "ADMINONLY",
+      "ResourceType": "collection",
+      "SecurityRule": ""
+    },
+    {
+      "Resource": "gxs_latest",
+      "Permission": "ADMINONLY",
+      "ResourceType": "collection",
+      "SecurityRule": ""
+    },
+    {
+      "Resource": "gxs_events",
+      "Permission": "ADMINONLY",
+      "ResourceType": "collection",
+      "SecurityRule": ""
+    },
+    {
+      "Resource": "gxs_target_health",
+      "Permission": "ADMINONLY",
+      "ResourceType": "collection",
+      "SecurityRule": ""
+    },
+    {
+      "Resource": "gxs_orders",
+      "Permission": "ADMINONLY",
+      "ResourceType": "collection",
+      "SecurityRule": ""
+    },
+    {
+      "Resource": "gxs_notifications",
+      "Permission": "ADMINONLY",
+      "ResourceType": "collection",
+      "SecurityRule": ""
+    },
+    {
+      "Resource": "gxs_config",
+      "Permission": "ADMINONLY",
+      "ResourceType": "collection",
+      "SecurityRule": ""
+    },
+    {
+      "Resource": "gxs_catalog_stores",
+      "Permission": "ADMINONLY",
+      "ResourceType": "collection",
+      "SecurityRule": ""
+    },
+    {
+      "Resource": "gxs_catalog_products",
+      "Permission": "ADMINONLY",
+      "ResourceType": "collection",
+      "SecurityRule": ""
+    }
+  ],
+  "nativeCheck": {
+    "accountBootstrap": "Real consumer account loaded after exiting acceptance mode through UI",
+    "redemptionPanel": "Real account input and enabled confirm button verified; correct code typed but not submitted",
+    "physicalDeviceTested": false
+  },
+  "boundaries": [
+    "Functions updated; consumer mini program not submitted or published.",
+    "No payment enabled; no collector process or notification delivery started.",
+    "Read-only unauthenticated probes do not prove real-account redemption.",
+    "Existing runtime configuration and unrelated data preserved.",
+    "Collection rules and cloud catalog were not changed during this deployment."
+  ]
+}

@@ -1,0 +1,1234 @@
+ 
+ 
+ 
+ 
+ 
+ 小程序环境共享 | 微信开放文档 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+(function () {
+ 'use strict';
+
+ const SCRIPT_URLs = [
+ 'https://dldir1.qq.com/WechatWebDev/devPlatform/px.min.js',
+ 'https://dev.weixin.qq.com/platform-console/proxy/assets/tel/px.min.js',
+ ];
+ const param = {
+ maskMode: 'no-mask', // 隐私策略, all-mask 或 no-mask, 详见：https://dev.weixin.qq.com/docs/analysis/sdk/docs.html
+ recordCanvas: false, // 若要采集canvas, 设为true
+ projectId: 'wxef34f91ddab0c534-0HLdQNKAk-dzsFsA', // 项目 ID，需替换为体验分析项目 ID
+ iframe: false, // 是否采集 iframe 页面
+ console: true, // 是否采集 console 输出的错误日志
+ network: true, // 是否采集网络错误
+ };
+ function loadScript(url) {
+ return new Promise((resolve, reject) => {
+ const scriptEle = document.createElement('script');
+ scriptEle.type = 'text/javascript';
+ scriptEle.async = true;
+ scriptEle.src = url;
+ scriptEle.onload = () => {
+ resolve(url);
+ };
+ scriptEle.onerror = () => {
+ reject(new Error('Script load error'));
+ };
+ document.head.appendChild(scriptEle);
+ });
+ }
+ async function main() {
+ try {
+ sessionStorage.setItem('wxobs_start_timestamp', String(Date.now()));
+ const fastestUrl = await Promise.race(SCRIPT_URLs.map(url => loadScript(url)));
+ window.__startPX && window.__startPX(param);
+ }
+ catch (error) {
+ console.error('Error loading scripts:', error);
+ }
+ }
+ main();
+
+})();
+ 
+ 
+ 
+ 
+ 
+ 
+ 小程序 
+ 小程序
+ 
+ 小游戏
+ 
+ 公众号
+ 
+ 服务号
+ 
+ 开放平台
+ 
+ 企业微信
+ 
+ 微信支付
+ 
+ 视频号
+ 
+ 微信小店
+ 
+ 智能对话
+ 
+ 腾讯小微
+ 
+ 教育平台
+ 
+ 开发
+ 
+ 介绍
+ 
+ 设计
+ 
+ 运营
+ 
+ 数据
+ 
+ 安全
+ 
+ 社区
+ 
+ 学堂
+ 取消 查看更多 在小程序下暂无结果，查看其它业务相关内容 > 
+ 指南
+ 
+ 框架
+ 
+ 组件
+ 
+ API
+ 
+ 服务端
+ 平台能力 
+ 行业能力
+ 
+ 商业能力
+ 
+ 多端能力
+ 
+ 服务市场
+ 
+ 城市服务
+ 
+ 付费能力
+ 
+ 拓展能力
+ 
+ 工具
+ 云服务 
+ 云开发
+ 
+ 云托管
+ 
+ AI 能力
+ 开发 
+ 开发
+ 
+ 介绍
+ 
+ 设计
+ 
+ 运营
+ 
+ 数据
+ 
+ 安全
+ 中文 EN 取消 云服务 
+ 介绍
+ 
+ 快速开始
+ 
+ 微信小程序/小游戏
+ 
+ 微信公众号/服务号
+ 
+ 多端应用
+ 
+ 基础概念
+ 
+ 云开发能力
+ 
+ 重要概念
+ 
+ 环境
+ 
+ 账号
+ 
+ 插件支持
+ 
+ Web 端支持
+ 
+ 跨账号环境共享
+ 
+ 未登录模式
+ 
+ 权限设置
+ 
+ 服务商模式
+ 
+ 开发指引
+ 
+ 指引
+ 
+ 控制台
+ 
+ 初始化
+ 
+ 编辑器
+ 
+ Skill / MCP 辅助开发
+ 
+ 调试
+ 
+ 核心能力
+ 
+ 初始化
+ 
+ 数据库
+ 
+ 上手
+ 
+ 数据类型
+ 
+ 权限管理
+ 
+ 简介
+ 
+ 安全规则
+ 
+ 简易权限配置
+ 
+ 增删查改 (SDK)
+ 
+ 初始化
+ 
+ 插入
+ 
+ 查询
+ 
+ 查询指令
+ 
+ 更新
+ 
+ 删除数据
+ 
+ 查询、更新数组/对象
+ 
+ 联表查询
+ 
+ 增删查改 (管理端)
+ 
+ 控制台数据库高级操作
+ 
+ 数据库脚本
+ 
+ 实时数据推送
+ 
+ 地理位置
+ 
+ 聚合
+ 
+ 能力说明
+ 
+ 示例
+ 
+ 事务
+ 
+ 索引
+ 
+ Explain 查询分析
+ 
+ 数据迁移
+ 
+ 导入
+ 
+ 导出
+ 
+ 数据备份
+ 
+ AI
+ 
+ 快速开始
+ 
+ 接入大模型
+ 
+ 大模型接入
+ 
+ 流式输出
+ 
+ 多轮对话
+ 
+ 深度思考
+ 
+ 图片生成
+ 
+ 接入 Agent
+ 
+ Agent 接入
+ 
+ Agent UI 小程序组件
+ 
+ 存储
+ 
+ API
+ 
+ 管理文件
+ 
+ 文件名命名限制
+ 
+ 组件支持
+ 
+ 存储安全规则
+ 
+ 云函数
+ 
+ 我的第一个云函数
+ 
+ 获取小程序用户信息
+ 
+ 异步返回结果
+ 
+ 使用 npm
+ 
+ 使用 wx-server-sdk
+ 
+ 本地调试
+ 
+ 灰度/版本管理
+ 
+ 高级日志
+ 
+ 定时触发器
+ 
+ 运行机制
+ 
+ 注意事项
+ 
+ 管理云函数
+ 
+ 安全规则
+ 
+ 测试、日志与监控
+ 
+ 消息推送
+ 
+ 事件触发器
+ 
+ 常驻云函数
+ 
+ HTTP 云函数
+ 
+ 静态网站
+ 
+ 简介
+ 
+ H5 跳小程序
+ 
+ 短信跳小程序
+ 
+ 数据模型
+ 
+ 快速上手
+ 
+ 从空白开始
+ 
+ 云数据库
+ 
+ MySQL 数据库
+ 
+ 从已有数据开始
+ 
+ 数据集合
+ 
+ CMS
+ 
+ 初始化 SDK
+ 
+ 增删改查
+ 
+ 指定查询字段
+ 
+ 关联查询
+ 
+ 过滤与排序
+ 
+ 数据库原生查询
+ 
+ 同步模型定义
+ 
+ 云后台
+ 
+ 介绍
+ 
+ 快速开始
+ 
+ 用户管理
+ 
+ 消息通知
+ 
+ 常见问题
+ 
+ CMS内容管理
+ 
+ 介绍
+ 
+ 开通使用
+ 
+ 内容模型
+ 
+ 营销工具
+ 
+ 工作流
+ 
+ 介绍
+ 
+ 使用指南
+ 
+ 节点介绍
+ 
+ 微信生态
+ 
+ 小程序环境共享
+ 
+ 介绍
+ 
+ 使用指南
+ 
+ 示例
+ 
+ 公众号环境共享
+ 
+ 使用指南
+ 
+ Web SDK
+ 
+ 云调用
+ 
+ 消息推送
+ 
+ 第三方 Cookie 限制说明
+ 
+ 使用云开发·示例
+ 
+ 简介
+ 
+ HTML
+ 
+ echo 云函数
+ 
+ cloudbase_auth 云函数
+ 
+ jump-mp
+ 
+ 云调用
+ 
+ 内容安全
+ 
+ 图片处理
+ 
+ 微信支付
+ 
+ 介绍
+ 
+ 使用 AI 工具快速接入小程序虚拟支付
+ 
+ 工作流实现付款场景
+ 
+ 工作流实现退款场景
+ 
+ 云调用对接微信支付
+ 
+ 云调用分账
+ 
+ 小程序虚拟支付回调处理
+ 
+ 微信支付管理系统
+ 
+ 基于微信云开发构建小程序 Skill
+ 
+ 运维
+ 
+ 告警
+ 
+ 监控图表
+ 
+ 工单
+ 
+ 计费相关
+ 
+ 计费说明
+ 
+ 操作说明
+ 
+ 支付方式
+ 
+ 发票管理
+ 
+ 代金券
+ 
+ 开发者资源
+ 
+ HTTP API 文档
+ 
+ 云函数
+ 
+ 触发云函数
+ 
+ 数据库
+ 
+ 导入
+ 
+ 导出
+ 
+ 迁移状态查询
+ 
+ 更新索引
+ 
+ 新增集合
+ 
+ 删除集合
+ 
+ 获取集合信息
+ 
+ 插入记录
+ 
+ 删除记录
+ 
+ 更新记录
+ 
+ 查询记录
+ 
+ 聚合
+ 
+ 统计记录数量
+ 
+ 存储
+ 
+ 获取文件上传链接
+ 
+ 获取文件下载链接
+ 
+ 删除文件
+ 
+ 其他
+ 
+ 获取腾讯云 API 调用凭证
+ 
+ SDK 文档
+ 
+ (index)
+ 
+ 初始化
+ 
+ 小程序
+ 
+ 云函数
+ 
+ Web
+ 
+ 常量
+ 
+ DYNAMIC_CURRENT_ENV
+ 
+ 云函数
+ 
+ callFunction
+ 
+ 文件存储
+ 
+ uploadFile
+ 
+ 小程序
+ 
+ 云函数
+ 
+ downloadFile
+ 
+ 小程序
+ 
+ 云函数
+ 
+ deleteFile
+ 
+ getTempFileURL
+ 
+ 工具类
+ 
+ getWXContext
+ 
+ Cloud
+ 
+ logger
+ 
+ CDN
+ 
+ getCloudCallSign
+ 
+ 开放能力
+ 
+ CloudID
+ 
+ openapi
+ 
+ getOpenData
+ 
+ getVoIPSign
+ 
+ 拓展能力
+ 
+ AI
+ 
+ 小程序
+ 
+ 云函数
+ 
+ 微信支付
+ 
+ 统一下单
+ 
+ 支付结果回调
+ 
+ 查询订单
+ 
+ 关闭订单
+ 
+ 申请退款
+ 
+ 查询退款
+ 
+ 下载对账单
+ 
+ 分账能力
+ 
+ 请求单次分账
+ 
+ 请求多次分账
+ 
+ 查询分账结果
+ 
+ 添加分账接收方
+ 
+ 删除分账接收方
+ 
+ 完结分账
+ 
+ 分账回退
+ 
+ 回退结果查询
+ 
+ Web API
+ 
+ checkLogin
+ 
+ startLogin
+ 
+ getJSSDKSignature
+ 
+ refreshAuth
+ 
+ 数据模型
+ 
+ 数据库
+ 
+ database
+ 
+ Database
+ 
+ (index)
+ 
+ collection
+ 
+ command
+ 
+ Geo
+ 
+ serverDate
+ 
+ RegExp
+ 
+ createCollection
+ 
+ runTransaction
+ 
+ startTransaction
+ 
+ Collection
+ 
+ (index)
+ 
+ doc
+ 
+ aggregate
+ 
+ 构建查询条件
+ 
+ where
+ 
+ limit
+ 
+ orderBy
+ 
+ skip
+ 
+ field
+ 
+ 请求
+ 
+ get
+ 
+ update
+ 
+ remove
+ 
+ count
+ 
+ add
+ 
+ watch
+ 
+ Document
+ 
+ (index)
+ 
+ get
+ 
+ set
+ 
+ update
+ 
+ remove
+ 
+ Aggregate
+ 
+ (index)
+ 
+ addFields
+ 
+ bucket
+ 
+ bucketAuto
+ 
+ count
+ 
+ geoNear
+ 
+ group
+ 
+ limit
+ 
+ lookup
+ 
+ match
+ 
+ project
+ 
+ replaceRoot
+ 
+ sample
+ 
+ skip
+ 
+ sort
+ 
+ sortByCount
+ 
+ unwind
+ 
+ end
+ 
+ Geo
+ 
+ Point
+ 
+ LineString
+ 
+ Polygon
+ 
+ MultiPoint
+ 
+ MultiLineString
+ 
+ MultiPolygon
+ 
+ 类型
+ 
+ GeoPoint
+ 
+ GeoLineString
+ 
+ GeoPolygon
+ 
+ GeoMultiPoint
+ 
+ GeoMultiLineString
+ 
+ GeoMultiPolygon
+ 
+ Transaction
+ 
+ (index)
+ 
+ collection
+ 
+ rollback
+ 
+ commit
+ 
+ Command
+ 
+ (index)
+ 
+ 查询·逻辑操作符
+ 
+ and
+ 
+ or
+ 
+ not
+ 
+ nor
+ 
+ 查询·比较操作符
+ 
+ eq
+ 
+ neq
+ 
+ lt
+ 
+ lte
+ 
+ gt
+ 
+ gte
+ 
+ in
+ 
+ nin
+ 
+ 查询·字段操作符
+ 
+ exists
+ 
+ mod
+ 
+ 查询·数组操作符
+ 
+ all
+ 
+ elemMatch
+ 
+ size
+ 
+ 查询·地理位置操作符
+ 
+ geoNear
+ 
+ geoWithin
+ 
+ geoIntersects
+ 
+ 查询·表达式操作符
+ 
+ expr
+ 
+ 更新·字段操作符
+ 
+ set
+ 
+ remove
+ 
+ inc
+ 
+ mul
+ 
+ min
+ 
+ max
+ 
+ rename
+ 
+ 更新·数组操作符
+ 
+ push
+ 
+ pop
+ 
+ unshift
+ 
+ shift
+ 
+ pull
+ 
+ pullAll
+ 
+ addToSet
+ 
+ 聚合操作符 $
+ 
+ (index)
+ 
+ Expression
+ 
+ 算术操作符
+ 
+ abs
+ 
+ add
+ 
+ ceil
+ 
+ divide
+ 
+ exp
+ 
+ floor
+ 
+ ln
+ 
+ log
+ 
+ log10
+ 
+ mod
+ 
+ multiply
+ 
+ pow
+ 
+ sqrt
+ 
+ subtract
+ 
+ trunc
+ 
+ 数组操作符
+ 
+ arrayElemAt
+ 
+ arrayToObject
+ 
+ concatArrays
+ 
+ filter
+ 
+ in
+ 
+ indexOfArray
+ 
+ isArray
+ 
+ map
+ 
+ objectToArray
+ 
+ range
+ 
+ reduce
+ 
+ reverseArray
+ 
+ size
+ 
+ slice
+ 
+ zip
+ 
+ 布尔操作符
+ 
+ and
+ 
+ not
+ 
+ or
+ 
+ 比较操作符
+ 
+ cmp
+ 
+ eq
+ 
+ gt
+ 
+ gte
+ 
+ lt
+ 
+ lte
+ 
+ neq
+ 
+ 条件操作符
+ 
+ cond
+ 
+ ifNull
+ 
+ switch
+ 
+ 日期操作符
+ 
+ dateFromParts
+ 
+ dateFromString
+ 
+ dateToString
+ 
+ dayOfMonth
+ 
+ dayOfWeek
+ 
+ dayOfYear
+ 
+ hour
+ 
+ isoDayOfWeek
+ 
+ isoWeek
+ 
+ isoWeekYear
+ 
+ millisecond
+ 
+ minute
+ 
+ month
+ 
+ second
+ 
+ week
+ 
+ year
+ 
+ subtract
+ 
+ 常量操作符
+ 
+ literal
+ 
+ 对象操作符
+ 
+ mergeObjects
+ 
+ objectToArray
+ 
+ 集合操作符
+ 
+ allElementsTrue
+ 
+ anyElementTrue
+ 
+ setDifference
+ 
+ setEquals
+ 
+ setIntersection
+ 
+ setIsSubset
+ 
+ setUnion
+ 
+ 字符串操作符
+ 
+ concat
+ 
+ dateFromString
+ 
+ dateToString
+ 
+ indexOfBytes
+ 
+ indexOfCP
+ 
+ split
+ 
+ strLenBytes
+ 
+ strLenCP
+ 
+ strcasecmp
+ 
+ substr
+ 
+ substrBytes
+ 
+ substrCP
+ 
+ toLower
+ 
+ toUpper
+ 
+ 累计器操作符
+ 
+ addToSet
+ 
+ avg
+ 
+ first
+ 
+ last
+ 
+ max
+ 
+ mergeObjects
+ 
+ min
+ 
+ push
+ 
+ stdDevPop
+ 
+ stdDevSamp
+ 
+ sum
+ 
+ 变量操作符
+ 
+ let
+ 
+ 参考信息
+ 
+ 错误码
+ 
+ 兼容性问题
+ 
+ 常见问题
+ 
+ 更新日志
+ 
+ 基础库
+ 
+ wx-server-sdk
+ 
+ Web SDK
+ 
+ IDE & 控制台
+ # 小程序环境共享 版本要求：开发者工具 >= 1.03.2009140 （ 稳定版下载 ） 云开发支持跨账号环境（资源）共享，即一个小程序的云开发资源可以授权共享给同主体下其他小程序 / 公众号使用，并有以下好处： 优势 & 特点 说明 资源复用 云开发资源可共享给其他账号使用，创建新小程序无需复制或迁移数据 能力复用 开发好的云函数可以授权给其他账号原生调用，类似 HTTP 服务，做到能力复用 Web 支持 在 Web 中既可以 使用公众号登录态访问微信云开发资源和能力 ，又可以在 Web 中用 未登录模式 访问 细粒度授权 授权粒度细，如可以只授权云函数调用权限而不授权修改权限 单层级授权 单层级授权保证了安全，如 A 有 B 的授权，B 有 C 的授权，但 A 没有 C 的授权，此时 A 可以调 B 但不能直接调 C # 小程序间跨账号资源共享 # 操作步骤 1.开通，使用 1.03.2009140 或以上版本的开发者工具，进入云控制台，到 「设置 - 拓展能力 - 环境共享」 点击开通即开通环境共享能力。 2.共享，环境共享开通后将在顶部 tab 显示环境共享功能，进入 「环境共享」 的页面，点击「添加共享」，即可授权 同主体下 其他小程序/公众号使用当前小程序下的云开发资源。 3.授权，选择共享的云环境，默认选中所有环境操作权限，可根据实际使用场景自定义授权。授权只可授权当前小程序的自有环境，如 A 有 B 授权的环境，A 不可将 B 授权的环境再次授权给 C； 4.被共享环境的小程序使用，使用 1.03.2009140 或以上版本的开发者工具，进入云控制台，点击「环境共享」进入「环境共享」页面可查看被共享小程序情况；如需在云控制台查看授权环境的资源情况，可前往「设置-环境名称」将环境切换至该授权环境即可，同时在被授权操作的情况下可以对授权环境进行操作。 # cloudbase_auth 云函数 在使用共享环境之前，需要保证资源方拥有 cloudbase_auth 云函数，用于鉴权调用方的身份并制定相关权限。 在调用方 cloud.init() 的过程中，会 首先执行 这个函数，如果这个函数不存在，会提示找不到对应的 FunctionName 。请务必参考示例在资源方添加此函数。 被调的资源方小程序 cloudbase_auth 云函数简易示例： const cloud = require ( 'wx-server-sdk' ) 
+cloud . init ( { 
+ env : cloud . DYNAMIC_CURRENT_ENV 
+ } ) 
+
+ // 云函数入口函数 
+exports . main = async ( event , context ) => { 
+ const wxContext = cloud . getWXContext ( ) 
+
+ console . log ( event ) 
+ console . log ( wxContext ) 
+ // 跨账号调用时，由此拿到来源方小程序/公众号 AppID 
+ console . log ( wxContext . FROM_APPID ) 
+ // 跨账号调用时，由此拿到来源方小程序/公众号的用户 OpenID 
+ console . log ( wxContext . FROM_OPENID ) 
+ // 跨账号调用、且满足 unionid 获取条件时，由此拿到同主体下的用户 UnionID 
+ console . log ( wxContext . FROM_UNIONID ) 
+
+ return { 
+ errCode : 0 , 
+ errMsg : '' , 
+ auth : JSON . stringify ( { 
+ // 自定义安全规则 
+ // 在前端访问资源方数据库、云函数等资源时，资源方可以通过 
+ // 安全规则的 `auth.custom` 字段获取此对象的内容做校验， 
+ // 像这个示例就是资源方可以在安全规则中通过 `auth.custom.x` 获取 
+ x : 1 , 
+ } ) , 
+ } 
+ } 
+ cloudbase_auth 云函数交互协议说明 cloudbase_auth 云函数返回的对象结构协议： 属性 类型 默认值 必填 说明 errCode number 是 自定义错误码，0 表示授权通过，非 0 表示拒绝授权，会透传回给调用方 errMsg string 否 自定义错误信息，errCode 非 0 时透传回给调用方 auth string 否 安全规则对象，必须序列化成字符串 # 代码使用 小程序代码使用示例（需小程序公共库 2.13.0 或以上）： // 声明新的 cloud 实例 
+ var c1 = new wx . cloud . Cloud ( { 
+ // 资源方 AppID 
+ resourceAppid : 'wxe0e2656d74f0bff3' , 
+ // 资源方环境 ID 
+ resourceEnv : '环境ID' , 
+ } ) 
+
+ // 跨账号调用，必须等待 init 完成 
+ // init 过程中，资源方小程序对应环境下的 cloudbase_auth 函数会被调用，并需返回协议字段（见下）来确认允许访问、并可自定义安全规则 
+ await c1 . init ( ) 
+
+ // 完成后正常使用资源方的已授权的云资源 
+ await c1 . callFunction ( { 
+ name : '函数名' , 
+ data : { } , 
+ } ) 
+ 在云函数中使用与在小程序中并没有多少区别（需 wx-server-sdk 版本大于或等于 2.3.0 ）： const cloud = require ( 'wx-server-sdk' ) 
+
+exports . main = async ( event ) => { 
+ // 声明新的 cloud 实例 
+ var c1 = new cloud . Cloud ( { 
+ // 资源方 AppID 
+ resourceAppid : 'wxe0e2656d74f0bff3' , 
+ // 资源方环境 ID 
+ resourceEnv : '环境ID' , 
+ } ) 
+
+ // 跨账号调用，必须等待 init 完成 
+ // init 过程中，资源方小程序对应环境下的 cloudbase_auth 函数会被调用，并需返回协议字段（见下）来确认允许访问、并可自定义安全规则 
+ await c1 . init ( ) 
+
+ // 完成后正常使用资源方的已授权的云资源 
+ return c1 . callFunction ( { 
+ name : '函数名' , 
+ data : { } , 
+ } ) 
+ } 
+ 如果有些云调用能力，需要指定发起方 appid，可以在云调用之前传入调用方 appid cloud 正常形式 const cloud = require ( 'wx-server-sdk' ) 
+
+exports . main = async ( event ) => { 
+ // 初始化 
+ cloud . init ( { 
+ env : cloud . DYNAMIC_CURRENT_ENV 
+ } ) 
+
+ // 使用使用方小程序（非资源方）身份发起支付 
+ return cloud . cloudPay ( { appid : '发起支付的小程序appid' } ) . unifiedOrder ( { 
+ "body" : "小秋TIT店-超市" , // 商品描述 
+ "outTradeNo" : "1217752501201407033233368018" , // 商户订单号 
+ "spbillCreateIp" : "请传入终端 ip 地址，支持 ipv6" , // 终端 IP 
+ "subMchId" : "1900009231" , // 商户号 
+ "totalFee" : 1 , // 总金额 
+ "envId" : "环境ID" , // 云函数环境名称 
+ "functionName" : "pay_cb" // 支付结果通知回调云函数名 
+ } ) 
+ } 
+ 实例调用形式 const cloud = require ( 'wx-server-sdk' ) 
+
+exports . main = async ( event ) => { 
+ // 声明新的 cloud 实例 
+ var c1 = new cloud . Cloud ( { 
+ // 资源方 AppID 
+ resourceAppid : 'wxe0e2656d74f0bff3' , 
+ // 资源方环境 ID 
+ resourceEnv : '环境ID' , 
+ } ) 
+
+ // 跨账号调用，必须等待 init 完成 
+ // init 过程中，资源方小程序对应环境下的 cloudbase_auth 函数会被调用，并需返回协议字段（见下）来确认允许访问、并可自定义安全规则 
+ await c1 . init ( ) 
+
+ // 完成后正常使用资源方的已授权的云资源， 
+ return c1 . cloudPay ( { appid : '发起支付的小程序appid' } ) . unifiedOrder ( { 
+ "body" : "小秋TIT店-超市" , // 商品描述 
+ "outTradeNo" : "1217752501201407033233368018" , // 商户订单号 
+ "spbillCreateIp" : "请传入终端 ip 地址，支持 ipv6" , // 终端 IP 
+ "subMchId" : "1900009231" , // 商户号 
+ "totalFee" : 1 , // 总金额 
+ "envId" : "环境ID" , // 云函数环境名称 
+ "functionName" : "pay_cb" // 支付结果通知回调云函数名 
+ } ) 
+ } 
+ # 环境共享给未开通云开发的小程序 1）未开通云开发的小程序无法进入云开发控制台，如被同主体的其他小程序共享环境后，默认允许未开通云开发的小程序可进入云开发控制台，且默认开通「环境共享」功能；进入控制台后默认显示授权共享环境的第一个小程序的云开发环境。 2）未开通云开发的小程序被共享后，如需开通云开发，则可通过路径「设置-切换环境-创建环境」开通云开发并创建环境； 3）未开通云开发的小程序被共享后，解除所有小程序的共享关系，则环境共享功能注销，且云开发控制台入口消失； The translations are provided by WeChat Translation and are for reference only. In case of any inconsistency and discrepancy between the Chinese version and the English version, the Chinese version shall prevail.Incorrect translation. Tap to report. 关于腾讯 文档中心 辟谣中心 客服中心 Copyright © 2012- 2026 Tencent. All Rights Reserved. 复制 问题反馈 反馈 
+ 
+ 
+ 

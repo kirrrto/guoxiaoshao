@@ -1,0 +1,125 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
+import vm from 'node:vm';
+import { createRequire } from 'node:module';
+import { fileURLToPath } from 'node:url';
+import { createFixture } from './helpers/fixture.mjs';
+
+const require = createRequire(import.meta.url);
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../miniprogram');
+const clone = value => JSON.parse(JSON.stringify(value));
+const boot = () => ({ identity: { isAdmin: true, userKey: 'consumer:user', openidMasked: 'user…1234' },
+  membership: { active: false, remainingMs: 0 }, quota: { balance: 1, tasksDoneToday: [] }, tasks: [],
+  collector: { state: 'not_deployed' }, memberProduct: { priceFen: 900, paymentReason: 'payment_not_enabled' },
+  limits: { maxFollows: 3, maxStoresPerFollow: 3 }, followCount: 0 });
+const forbidden = () => Object.assign(new Error('需要管理员权限'), { code: 'forbidden' });
+
+function runtime(pageName, handler = async action => action === 'notify.list' ? { notifications: [] } : { orders: [] }) {
+  let definition;
+  const calls = [], bootstrapCalls = [], messages = [];
+  const api = { call: async (action, payload) => { calls.push({ action, payload }); return handler(action, payload); }, showError: error => messages.push(error.message), toast: message => messages.push(message) };
+  const store = { getBootstrap: async (options = {}) => { bootstrapCalls.push(options); return boot(); }, invalidateBootstrap() {}, publishQuota() {}, subscribeQuota: () => () => {} };
+  const wx = { stopPullDownRefresh() {}, switchTab() {}, showModal() {}, setClipboardData() {} };
+  const sandbox = { console, Date, Promise, wx, Page: value => { definition = value; }, require: name => name.endsWith('/api') ? api : name.endsWith('/store') ? store : name.endsWith('/operation') ? { begin: () => 'grant-test', finish() {}, uncertain: () => false } : require(path.join(root, 'pages', pageName, name)) };
+  vm.runInNewContext(fs.readFileSync(path.join(root, 'pages', pageName, 'index.js'), 'utf8'), sandbox);
+  const page = { ...definition, data: clone(definition.data) };
+  page.setData = patch => { for (const [key, value] of Object.entries(patch)) { const parts = key.split('.'); let target = page.data; for (const part of parts.slice(0, -1)) target = target[part] || (target[part] = {}); target[parts.at(-1)] = value; } };
+  return { page, calls, bootstrapCalls, messages };
+}
+
+test('account tab reuses secondary results and loads membership records only when opened', async () => {
+  const rt = runtime('mine');
+  await rt.page.onLoad();
+  await rt.page.onShow();
+  await rt.page.onShow();
+  assert.equal(rt.calls.filter(c => c.action === 'notify.list').length, 1);
+  assert.equal(rt.calls.filter(c => c.action === 'member.status').length, 0);
+  assert.ok(rt.bootstrapCalls.every(options => options.force === false));
+  await rt.page.onToggleOrders();
+  await rt.page.onToggleOrders();
+  await rt.page.onToggleOrders();
+  assert.equal(rt.calls.filter(c => c.action === 'member.status').length, 1);
+  await rt.page.refresh({ quiet: true, force: true });
+  assert.equal(rt.calls.filter(c => c.action === 'notify.list').length, 2);
+  assert.equal(rt.calls.filter(c => c.action === 'member.status').length, 2);
+  assert.equal(rt.bootstrapCalls.at(-1).force, true);
+});
+
+test('overlapping account refreshes share the pending request', async () => {
+  let finish, started;
+  const pendingStarted = new Promise(resolve => { started = resolve; });
+  const rt = runtime('mine', () => new Promise(resolve => { finish = resolve; started(); }));
+  const a = rt.page.refresh();
+  await pendingStarted;
+  const b = rt.page.refresh({ quiet: true });
+  assert.equal(rt.bootstrapCalls.length, 1);
+  assert.equal(rt.calls.length, 1);
+  finish({ notifications: [] });
+  await Promise.all([a, b]);
+  assert.equal(rt.page.data.ready, true);
+  assert.equal(rt.page.data.notificationsLoading, false);
+});
+
+test('failed account records show retryable errors instead of claiming no records', async () => {
+  const rt = runtime('mine', async () => { throw Error('timeout'); });
+  await rt.page.onLoad();
+  await rt.page.onToggleOrders();
+  assert.equal(rt.page.data.ready, true);
+  assert.match(rt.page.data.notificationsError, /失败/);
+  assert.match(rt.page.data.ordersError, /失败/);
+  assert.equal(rt.page.data.notificationsLoading, false);
+  assert.equal(rt.page.data.ordersLoading, false);
+});
+
+test('cached admin identity never reveals admin controls before server authorization', async () => {
+  const rt = runtime('admin', async () => { throw forbidden(); });
+  await rt.page.onLoad();
+  assert.equal(rt.page.data.allowed, false);
+  assert.equal(rt.page.data.checked, true);
+  assert.equal(rt.page.data.stats, null);
+  assert.equal(rt.page.data.configText, '');
+  assert.deepEqual(rt.calls.map(c => c.action), ['admin.stats']);
+  assert.equal(rt.bootstrapCalls.length, 0);
+  await rt.page.onGrantMembership();
+  await rt.page.onGrantCredits();
+  await rt.page.onSaveConfig();
+  assert.equal(rt.calls.length, 1);
+});
+
+test('admin access rechecks on returning and removes previously loaded data if revoked', async () => {
+  let revoked = false;
+  const rt = runtime('admin', async action => {
+    if (revoked) throw forbidden();
+    return action === 'admin.stats' ? { users: 12, serverTime: '2026-09-15T00:00:00Z' } : { config: { adminUserKeys: ['private:user'] } };
+  });
+  await rt.page.onLoad();
+  assert.equal(rt.page.data.allowed, true);
+  assert.match(rt.page.data.configText, /private:user/);
+  rt.page.data.lookupText = 'previous user details';
+  revoked = true;
+  await rt.page.onShow();
+  assert.equal(rt.page.data.allowed, false);
+  assert.equal(rt.page.data.configText, '');
+  assert.equal(rt.page.data.lookupText, '');
+  assert.equal(rt.page.data.stats, null);
+});
+
+test('ordinary users cannot call administrative APIs directly regardless of client flags', async () => {
+  const f = createFixture();
+  for (const action of ['admin.stats', 'admin.getConfig', 'admin.updateConfig', 'admin.seedCatalog', 'admin.grantMembership', 'admin.grantCredits', 'admin.lookupUser']) {
+    const result = await f.call(action, { isAdmin: true, userKey: 'someone-else', patch: { adminUserKeys: ['consumer:user'] } });
+    assert.equal(result.ok, false, action);
+    assert.equal(result.error.code, 'forbidden', action);
+  }
+  assert.equal(await f.repo.getConfig(), null);
+});
+
+test('consumer account page contains no admin route or catalog timestamp', () => {
+  const source = fs.readFileSync(path.join(root, 'pages/mine/index.js'), 'utf8');
+  const markup = fs.readFileSync(path.join(root, 'pages/mine/index.wxml'), 'utf8');
+  assert.doesNotMatch(source, /pages\/admin|onAdmin|catalogVersion/);
+  assert.doesNotMatch(markup, /管理后台|onAdmin|catalogVersion|目录版本/);
+  assert.match(markup, /class="action-row feedback"[^>]+open-type="feedback"/);
+});

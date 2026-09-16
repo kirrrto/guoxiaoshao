@@ -1,0 +1,504 @@
+{
+  "schemaVersion": 1,
+  "kind": "apple-retail-stores-cn",
+  "source": {
+    "url": "https://www.apple.com.cn/retail/storelist/",
+    "fetchedAt": "2026-09-15T02:43:32.425Z",
+    "sha256": "7a51910bb135625d219550de509a66de32eff078f908135480042899769bf349",
+    "bytes": 518841
+  },
+  "note": "中国大陆 Apple 直营店目录，来源为苹果官网门店列表页；不含授权经销商。storeNumber 用于取货接口 store 参数。",
+  "count": 49,
+  "stores": [
+    {
+      "storeNumber": "R765",
+      "slug": "mixchefei",
+      "name": "合肥万象城",
+      "city": "合肥",
+      "province": "安徽",
+      "address": "合肥市蜀山区潜山路 111 号 合肥万象城商场一层",
+      "phone": "400-000-5292",
+      "pageUrl": "https://www.apple.com.cn/retail/mixchefei/"
+    },
+    {
+      "storeNumber": "R320",
+      "slug": "sanlitun",
+      "name": "三里屯",
+      "city": "北京",
+      "province": "北京",
+      "address": "北京市朝阳区三里屯路 19 号院 三里屯太古里南区 7 号楼",
+      "phone": "400-617-1363",
+      "pageUrl": "https://www.apple.com.cn/retail/sanlitun/"
+    },
+    {
+      "storeNumber": "R388",
+      "slug": "xidanjoycity",
+      "name": "西单大悦城",
+      "city": "北京",
+      "province": "北京",
+      "address": "北京市西城区西单北大街 131 号大悦城",
+      "phone": "400-617-1204",
+      "pageUrl": "https://www.apple.com.cn/retail/xidanjoycity/"
+    },
+    {
+      "storeNumber": "R448",
+      "slug": "wangfujing",
+      "name": "王府井",
+      "city": "北京",
+      "province": "北京",
+      "address": "北京市东城区王府井大街 138 号北京 apm",
+      "phone": "400-617-1205",
+      "pageUrl": "https://www.apple.com.cn/retail/wangfujing/"
+    },
+    {
+      "storeNumber": "R479",
+      "slug": "chinacentralmall",
+      "name": "华贸购物中心",
+      "city": "北京",
+      "province": "北京",
+      "address": "北京市朝阳区建国路 81 号华贸购物中心",
+      "phone": "400-617-1210",
+      "pageUrl": "https://www.apple.com.cn/retail/chinacentralmall/"
+    },
+    {
+      "storeNumber": "R645",
+      "slug": "chaoyangjoycity",
+      "name": "朝阳大悦城",
+      "city": "北京",
+      "province": "北京",
+      "address": "北京市朝阳区朝阳北路 101 号",
+      "phone": "400-617-1284",
+      "pageUrl": "https://www.apple.com.cn/retail/chaoyangjoycity/"
+    },
+    {
+      "storeNumber": "R792",
+      "slug": "livatbeijing",
+      "name": "北京荟聚",
+      "city": "北京",
+      "province": "北京",
+      "address": "北京市大兴区欣宁街 15 号 北京荟聚 1 层",
+      "phone": "400-009-6560",
+      "pageUrl": "https://www.apple.com.cn/retail/livatbeijing/"
+    },
+    {
+      "storeNumber": "R476",
+      "slug": "paradisewalkchongqing",
+      "name": "重庆北城天街",
+      "city": "重庆",
+      "province": "重庆",
+      "address": "重庆市两江新区北城天街 8 号",
+      "phone": "400-617-1240",
+      "pageUrl": "https://www.apple.com.cn/retail/paradisewalkchongqing/"
+    },
+    {
+      "storeNumber": "R480",
+      "slug": "jiefangbei",
+      "name": "解放碑",
+      "city": "重庆",
+      "province": "重庆",
+      "address": "重庆市渝中区邹容路 108 号",
+      "phone": "400-617-1224",
+      "pageUrl": "https://www.apple.com.cn/retail/jiefangbei/"
+    },
+    {
+      "storeNumber": "R573",
+      "slug": "mixcchongqing",
+      "name": "重庆万象城",
+      "city": "重庆",
+      "province": "重庆",
+      "address": "重庆市九龙坡区谢家湾正街 55 号",
+      "phone": "400-617-1215",
+      "pageUrl": "https://www.apple.com.cn/retail/mixcchongqing/"
+    },
+    {
+      "storeNumber": "R646",
+      "slug": "tahoeplaza",
+      "name": "泰禾广场",
+      "city": "福州",
+      "province": "福建",
+      "address": "福州市晋安区竹屿路 6 号 东二环泰禾广场",
+      "phone": "400-617-1354",
+      "pageUrl": "https://www.apple.com.cn/retail/tahoeplaza/"
+    },
+    {
+      "storeNumber": "R644",
+      "slug": "xiamenlifestylecenter",
+      "name": "厦门新生活广场",
+      "city": "厦门",
+      "province": "福建",
+      "address": "厦门市思明区嘉禾路 399 号 SM 新生活广场",
+      "phone": "400-617-1383",
+      "pageUrl": "https://www.apple.com.cn/retail/xiamenlifestylecenter/"
+    },
+    {
+      "storeNumber": "R577",
+      "slug": "parccentral",
+      "name": "天环广场",
+      "city": "广州",
+      "province": "广东",
+      "address": "广州市天河区天河路 218 号",
+      "phone": "400-613-9742",
+      "pageUrl": "https://www.apple.com.cn/retail/parccentral/"
+    },
+    {
+      "storeNumber": "R639",
+      "slug": "zhujiangnewtown",
+      "name": "珠江新城",
+      "city": "广州",
+      "province": "广东",
+      "address": "广州珠江新城兴民路 222 号 天汇广场 1 层",
+      "phone": "400-639-3601",
+      "pageUrl": "https://www.apple.com.cn/retail/zhujiangnewtown/"
+    },
+    {
+      "storeNumber": "R484",
+      "slug": "holidayplazashenzhen",
+      "name": "深圳益田假日广场",
+      "city": "深圳",
+      "province": "广东",
+      "address": "深圳市南山区深南大道 9028 号益田假日广场",
+      "phone": "400-617-1254",
+      "pageUrl": "https://www.apple.com.cn/retail/holidayplazashenzhen/"
+    },
+    {
+      "storeNumber": "R761",
+      "slug": "mixcshenzhen",
+      "name": "深圳万象城",
+      "city": "深圳",
+      "province": "广东",
+      "address": "深圳市罗湖区宝安南路 1881 号 深圳万象城（一期）B1 层",
+      "phone": "400-050-1588",
+      "pageUrl": "https://www.apple.com.cn/retail/mixcshenzhen/"
+    },
+    {
+      "storeNumber": "R793",
+      "slug": "uniwalkqianhai",
+      "name": "前海壹方城",
+      "city": "深圳",
+      "province": "广东",
+      "address": "深圳市宝安区新湖路 99 号 前海壹方城 L1 层",
+      "phone": "400-002-7805",
+      "pageUrl": "https://www.apple.com.cn/retail/uniwalkqianhai/"
+    },
+    {
+      "storeNumber": "R571",
+      "slug": "mixcnanning",
+      "name": "南宁万象城",
+      "city": "南宁",
+      "province": "广西壮族自治区",
+      "address": "南宁市青秀区民族大道 136 号",
+      "phone": "400-617-1265",
+      "pageUrl": "https://www.apple.com.cn/retail/mixcnanning/"
+    },
+    {
+      "storeNumber": "R572",
+      "slug": "mixczhengzhou",
+      "name": "郑州万象城",
+      "city": "郑州",
+      "province": "河南",
+      "address": "郑州市二七区民主路 10 号",
+      "phone": "400-617-1264",
+      "pageUrl": "https://www.apple.com.cn/retail/mixczhengzhou/"
+    },
+    {
+      "storeNumber": "R575",
+      "slug": "wuhan",
+      "name": "武汉",
+      "city": "武汉",
+      "province": "湖北",
+      "address": "武汉市江汉区解放大道 690 号 武商 MALL B 座 2F",
+      "phone": "400-638-3818",
+      "pageUrl": "https://www.apple.com.cn/retail/wuhan/"
+    },
+    {
+      "storeNumber": "R617",
+      "slug": "changsha",
+      "name": "长沙",
+      "city": "长沙",
+      "province": "湖南",
+      "address": "长沙市芙蓉区解放西路 188 号 长沙国金中心一层",
+      "phone": "400-604-3168",
+      "pageUrl": "https://www.apple.com.cn/retail/changsha/"
+    },
+    {
+      "storeNumber": "R493",
+      "slug": "xinjiekou",
+      "name": "新街口",
+      "city": "南京",
+      "province": "江苏",
+      "address": "南京市玄武区中山路 100 号",
+      "phone": "400-617-1334",
+      "pageUrl": "https://www.apple.com.cn/retail/xinjiekou/"
+    },
+    {
+      "storeNumber": "R643",
+      "slug": "wondercity",
+      "name": "虹悦城",
+      "city": "南京",
+      "province": "江苏",
+      "address": "南京市雨花台区应天大街 619 号",
+      "phone": "400-617-1332",
+      "pageUrl": "https://www.apple.com.cn/retail/wondercity/"
+    },
+    {
+      "storeNumber": "R703",
+      "slug": "xuanwulake",
+      "name": "玄武湖",
+      "city": "南京",
+      "province": "江苏",
+      "address": "南京市鼓楼区中央路 201 号",
+      "phone": "400-613-9772",
+      "pageUrl": "https://www.apple.com.cn/retail/xuanwulake/"
+    },
+    {
+      "storeNumber": "R688",
+      "slug": "suzhou",
+      "name": "苏州",
+      "city": "苏州",
+      "province": "江苏",
+      "address": "苏州市苏州工业园区 苏州中心商场",
+      "phone": "400-613-9775",
+      "pageUrl": "https://www.apple.com.cn/retail/suzhou/"
+    },
+    {
+      "storeNumber": "R574",
+      "slug": "center66wuxi",
+      "name": "无锡恒隆广场",
+      "city": "无锡",
+      "province": "江苏",
+      "address": "无锡市梁溪区 人民中路 139 号",
+      "phone": "400-617-1325",
+      "pageUrl": "https://www.apple.com.cn/retail/center66wuxi/"
+    },
+    {
+      "storeNumber": "R609",
+      "slug": "olympia66dalian",
+      "name": "大连恒隆广场",
+      "city": "大连",
+      "province": "辽宁",
+      "address": "大连市西岗区五四路 66 号",
+      "phone": "400-613-9741",
+      "pageUrl": "https://www.apple.com.cn/retail/olympia66dalian/"
+    },
+    {
+      "storeNumber": "R534",
+      "slug": "zhongjiejoycity",
+      "name": "中街大悦城",
+      "city": "沈阳",
+      "province": "辽宁",
+      "address": "沈阳市大东区小东路 5 号",
+      "phone": "400-617-1252",
+      "pageUrl": "https://www.apple.com.cn/retail/zhongjiejoycity/"
+    },
+    {
+      "storeNumber": "R576",
+      "slug": "mixcshenyang",
+      "name": "沈阳万象城",
+      "city": "沈阳",
+      "province": "辽宁",
+      "address": "沈阳市和平区青年大街 288 号",
+      "phone": "400-617-1274",
+      "pageUrl": "https://www.apple.com.cn/retail/mixcshenyang/"
+    },
+    {
+      "storeNumber": "R648",
+      "slug": "parc66jinan",
+      "name": "济南恒隆广场",
+      "city": "济南",
+      "province": "山东",
+      "address": "济南市历下区泉城路 188 号",
+      "phone": "400-613-9743",
+      "pageUrl": "https://www.apple.com.cn/retail/parc66jinan/"
+    },
+    {
+      "storeNumber": "R557",
+      "slug": "mixcqingdao",
+      "name": "青岛万象城",
+      "city": "青岛",
+      "province": "山东",
+      "address": "青岛市市南区山东路 6A 号",
+      "phone": "400-617-1285",
+      "pageUrl": "https://www.apple.com.cn/retail/mixcqingdao/"
+    },
+    {
+      "storeNumber": "R359",
+      "slug": "nanjingeast",
+      "name": "南京东路",
+      "city": "上海",
+      "province": "上海",
+      "address": "上海市黄浦区南京东路 300 号",
+      "phone": "400-663-9988",
+      "pageUrl": "https://www.apple.com.cn/retail/nanjingeast/"
+    },
+    {
+      "storeNumber": "R389",
+      "slug": "pudong",
+      "name": "浦东",
+      "city": "上海",
+      "province": "上海",
+      "address": "上海市浦东新区陆家嘴世纪大道 8 号 上海国金中心 IFC 商场 LG2－27 号店铺",
+      "phone": "400-617-1305",
+      "pageUrl": "https://www.apple.com.cn/retail/pudong/"
+    },
+    {
+      "storeNumber": "R390",
+      "slug": "hongkongplaza",
+      "name": "香港广场",
+      "city": "上海",
+      "province": "上海",
+      "address": "上海市黄浦区淮海中路 282 号 香港广场北座",
+      "phone": "400-617-1312",
+      "pageUrl": "https://www.apple.com.cn/retail/hongkongplaza/"
+    },
+    {
+      "storeNumber": "R401",
+      "slug": "shanghaiiapm",
+      "name": "上海环贸 iapm",
+      "city": "上海",
+      "province": "上海",
+      "address": "上海市徐汇区淮海中路 999 号 环贸 iapm 商场",
+      "phone": "400-617-1324",
+      "pageUrl": "https://www.apple.com.cn/retail/shanghaiiapm/"
+    },
+    {
+      "storeNumber": "R581",
+      "slug": "wujiaochang",
+      "name": "五角场",
+      "city": "上海",
+      "province": "上海",
+      "address": "上海市杨浦区翔殷路 1099 号 上海合生汇",
+      "phone": "400-613-9771",
+      "pageUrl": "https://www.apple.com.cn/retail/wujiaochang/"
+    },
+    {
+      "storeNumber": "R678",
+      "slug": "jingan",
+      "name": "静安",
+      "city": "上海",
+      "province": "上海",
+      "address": "上海市静安区南京西路 1699 号",
+      "phone": "400-000-3235",
+      "pageUrl": "https://www.apple.com.cn/retail/jingan/"
+    },
+    {
+      "storeNumber": "R683",
+      "slug": "globalharbor",
+      "name": "环球港",
+      "city": "上海",
+      "province": "上海",
+      "address": "上海市普陀区中山北路 3300 号",
+      "phone": "400-617-1335",
+      "pageUrl": "https://www.apple.com.cn/retail/globalharbor/"
+    },
+    {
+      "storeNumber": "R705",
+      "slug": "qibao",
+      "name": "七宝",
+      "city": "上海",
+      "province": "上海",
+      "address": "上海市闵行区漕宝路 3366 号 七宝领展广场",
+      "phone": "400-613-9773",
+      "pageUrl": "https://www.apple.com.cn/retail/qibao/"
+    },
+    {
+      "storeNumber": "R502",
+      "slug": "mixcchengdu",
+      "name": "成都万象城",
+      "city": "成都",
+      "province": "四川",
+      "address": "成都市成华区双庆路 8 号万象城",
+      "phone": "400-617-1214",
+      "pageUrl": "https://www.apple.com.cn/retail/mixcchengdu/"
+    },
+    {
+      "storeNumber": "R580",
+      "slug": "taikoolichengdu",
+      "name": "成都太古里",
+      "city": "成都",
+      "province": "四川",
+      "address": "成都市锦江区中纱帽街 8 号",
+      "phone": "400-617-1275",
+      "pageUrl": "https://www.apple.com.cn/retail/taikoolichengdu/"
+    },
+    {
+      "storeNumber": "R579",
+      "slug": "riverside66tianjin",
+      "name": "天津恒隆广场",
+      "city": "天津",
+      "province": "天津",
+      "address": "天津市和平区兴安路 166 号",
+      "phone": "400-613-9744",
+      "pageUrl": "https://www.apple.com.cn/retail/riverside66tianjin/"
+    },
+    {
+      "storeNumber": "R637",
+      "slug": "tianjinjoycity",
+      "name": "天津大悦城",
+      "city": "天津",
+      "province": "天津",
+      "address": "天津市南开区南门外大街 2 号",
+      "phone": "400-617-1262",
+      "pageUrl": "https://www.apple.com.cn/retail/tianjinjoycity/"
+    },
+    {
+      "storeNumber": "R638",
+      "slug": "mixctianjin",
+      "name": "天津万象城",
+      "city": "天津",
+      "province": "天津",
+      "address": "天津市河西区乐园道 9 号",
+      "phone": "400-613-9745",
+      "pageUrl": "https://www.apple.com.cn/retail/mixctianjin/"
+    },
+    {
+      "storeNumber": "R670",
+      "slug": "kunming",
+      "name": "昆明",
+      "city": "昆明",
+      "province": "云南",
+      "address": "昆明市五华区东风西路 11 号 顺城购物中心",
+      "phone": "400-639-3602",
+      "pageUrl": "https://www.apple.com.cn/retail/kunming/"
+    },
+    {
+      "storeNumber": "R471",
+      "slug": "westlake",
+      "name": "西湖",
+      "city": "杭州",
+      "province": "浙江",
+      "address": "杭州市上城区平海路 100 号",
+      "phone": "400-617-1302",
+      "pageUrl": "https://www.apple.com.cn/retail/westlake/"
+    },
+    {
+      "storeNumber": "R532",
+      "slug": "mixchangzhou",
+      "name": "杭州万象城",
+      "city": "杭州",
+      "province": "浙江",
+      "address": "杭州市上城区富春路 701 号",
+      "phone": "400-617-1304",
+      "pageUrl": "https://www.apple.com.cn/retail/mixchangzhou/"
+    },
+    {
+      "storeNumber": "R531",
+      "slug": "tianyisquare",
+      "name": "天一广场",
+      "city": "宁波",
+      "province": "浙江",
+      "address": "宁波市海曙区碶闸街 155 号 天一广场",
+      "phone": "400-613-9774",
+      "pageUrl": "https://www.apple.com.cn/retail/tianyisquare/"
+    },
+    {
+      "storeNumber": "R766",
+      "slug": "mixcwenzhou",
+      "name": "温州万象城",
+      "city": "温州",
+      "province": "浙江",
+      "address": "浙江省温州市瓯海区瓯越大道1999号 温州万象城 L1层",
+      "phone": "400-000-2385",
+      "pageUrl": "https://www.apple.com.cn/retail/mixcwenzhou/"
+    }
+  ]
+}

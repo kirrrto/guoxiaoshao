@@ -1,0 +1,200 @@
+/* 果小哨 · 公共样式（页面与自定义组件共用；颜色变量定义在 app.wxss 的 page 上） */
+view, text { box-sizing: border-box; }
+
+.page { padding: 24rpx 24rpx 48rpx; }
+.page-bottom-space { height: 40rpx; }
+
+/* 卡片 */
+.card {
+  background: var(--card);
+  background-image: linear-gradient(145deg, rgba(255, 255, 255, 0.52), rgba(255, 255, 255, 0.04));
+  border-radius: 34rpx;
+  padding: 30rpx;
+  margin-bottom: 26rpx;
+  box-shadow: inset 0 1rpx 0 rgba(255, 255, 255, 0.96), var(--shadow-soft);
+}
+.card-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  margin-bottom: 20rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.card-title .sub { font-size: 24rpx; color: var(--text-3); font-weight: 400; }
+.section-label { font-size: 24rpx; color: var(--text-3); margin: 20rpx 0 12rpx; }
+
+/* 按钮 */
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999rpx;
+  font-size: 30rpx;
+  font-weight: 600;
+  padding: 0 40rpx;
+  height: 88rpx;
+  line-height: 88rpx;
+  margin: 0;
+  border: none;
+}
+.btn::after { border: none; }
+.btn-primary { background: linear-gradient(155deg, #1ED58A, #00C375); color: var(--green-ink); box-shadow: inset 0 2rpx 0 rgba(255, 255, 255, 0.34), 0 6rpx 16rpx rgba(0, 195, 117, 0.16); }
+.btn-primary.disabled, .btn-primary[disabled] { background: #DBF1E5; color: #587664; }
+.btn-outline { background: rgba(255, 255, 255, 0.78); color: var(--green-dark); border: 2rpx solid rgba(0, 195, 117, 0.44); }
+.btn-ghost { background: var(--green-soft); color: var(--green-dark); box-shadow: inset 0 1rpx 0 rgba(255, 255, 255, 0.88); }
+.btn-danger { background: var(--bad-soft); color: var(--bad); }
+.btn-sm { height: 64rpx; line-height: 64rpx; font-size: 26rpx; padding: 0 28rpx; }
+.btn-block { width: 100%; }
+.btn-row { display: flex; gap: 16rpx; margin-top: 20rpx; }
+.btn-row .btn { flex: 1; }
+
+/* 文本 */
+.muted { color: var(--text-3); }
+.text-2 { color: var(--text-2); }
+.small { font-size: 24rpx; }
+.tiny { font-size: 22rpx; }
+.bold { font-weight: 600; }
+.mono { font-family: Menlo, Consolas, monospace; }
+.row { display: flex; align-items: center; }
+.row-between { display: flex; align-items: center; justify-content: space-between; }
+.wrap { flex-wrap: wrap; }
+.gap { gap: 12rpx; }
+.mt { margin-top: 16rpx; }
+.mb { margin-bottom: 16rpx; }
+
+/* 状态标签 */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999rpx;
+  padding: 4rpx 18rpx;
+  font-size: 24rpx;
+  font-weight: 500;
+  line-height: 1.6;
+  white-space: nowrap;
+}
+.pill-ok { background: var(--green-soft); color: var(--green-dark); }
+.pill-bad { background: var(--bad-soft); color: var(--bad); }
+.pill-warn { background: var(--warn-soft); color: var(--warn); }
+.pill-muted { background: #EEF2F0; color: var(--text-2); }
+.pill-unknown { background: #ECF1F0; color: #5F746C; }
+.pill-dot::before { content: ''; width: 14rpx; height: 14rpx; border-radius: 50%; background: currentColor; margin-right: 10rpx; }
+
+/* 选择芯片 */
+.chips { display: flex; flex-wrap: wrap; gap: 16rpx; }
+.chip {
+  padding: 12rpx 26rpx;
+  border-radius: 999rpx;
+  background: rgba(238, 250, 243, 0.85);
+  color: var(--text-2);
+  font-size: 26rpx;
+  border: 2rpx solid transparent;
+}
+.chip.on { background: var(--green-soft); color: var(--green-dark); border-color: rgba(0, 195, 117, 0.52); font-weight: 600; box-shadow: inset 0 1rpx 0 rgba(255, 255, 255, 0.85); }
+.chip.disabled { opacity: 0.45; }
+
+/* 分段 tab */
+.segments { display: flex; background: rgba(225, 245, 234, 0.76); border: 1rpx solid var(--glass-line); border-radius: 999rpx; padding: 6rpx; }
+.segment { flex: 1; text-align: center; padding: 14rpx 0; border-radius: 999rpx; font-size: 26rpx; color: var(--text-2); }
+.segment.on { background: #fff; color: var(--green-dark); font-weight: 600; box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.06); }
+.scroll-tabs { white-space: nowrap; }
+.scroll-tabs .tab { display: inline-block; padding: 14rpx 28rpx; border-radius: 999rpx; margin-right: 12rpx; background: #F4F7F5; color: var(--text-2); font-size: 26rpx; }
+.scroll-tabs .tab.on { background: var(--green); color: var(--green-ink); font-weight: 600; }
+
+/* 表单行 */
+.field { display: flex; align-items: center; justify-content: space-between; padding: 22rpx 0; border-bottom: 2rpx solid var(--line); }
+.field:last-child { border-bottom: none; }
+.field .label { color: var(--text-2); font-size: 28rpx; }
+.field .value { color: var(--text); font-size: 28rpx; max-width: 62%; text-align: right; }
+.field .value.placeholder { color: var(--text-3); }
+.field .arrow { color: var(--text-3); margin-left: 12rpx; }
+
+/* 提示条 */
+.banner { border-radius: 22rpx; padding: 20rpx 24rpx; border: 1rpx solid rgba(255, 255, 255, 0.68); font-size: 26rpx; margin-bottom: 20rpx; display: flex; align-items: flex-start; gap: 12rpx; }
+.banner-info { background: var(--info-soft); color: var(--green-dark); }
+.banner-ok { background: var(--green-soft); color: var(--green-dark); }
+.banner-warn { background: var(--warn-soft); color: #9C5A00; }
+.banner-bad { background: var(--bad-soft); color: var(--bad); }
+
+/* 空状态 */
+.empty { text-align: center; color: var(--text-3); padding: 60rpx 0; font-size: 26rpx; }
+.empty .icon { font-size: 60rpx; margin-bottom: 12rpx; }
+
+/* 列表项 */
+.list-item { padding: 22rpx 0; border-bottom: 2rpx solid var(--line); }
+.list-item:last-child { border-bottom: none; }
+
+/* 数字 */
+.stat-row { display: flex; gap: 16rpx; }
+.stat { flex: 1; background: var(--surface-soft); border: 1rpx solid var(--glass-line); border-radius: 24rpx; padding: 20rpx; text-align: center; }
+.stat .num { font-size: 40rpx; font-weight: 700; color: var(--green-dark); }
+.stat .lbl { font-size: 22rpx; color: var(--text-3); margin-top: 4rpx; }
+
+/* 页脚 */
+.footer-note { text-align: center; color: var(--text-3); font-size: 22rpx; padding: 24rpx 0 0; }
+
+/* 加载 */
+.loading-line { text-align: center; color: var(--text-3); font-size: 24rpx; padding: 20rpx 0; }
+
+/* Shared responsive contract: every row can shrink or wrap at 320px. */
+view, text, button, input, textarea, image, scroll-view, picker { box-sizing: border-box; }
+.page { width: 100%; max-width: 1000rpx; margin: 0 auto; padding: 30rpx 24rpx calc(40rpx + env(safe-area-inset-bottom)); overflow-wrap: anywhere; }
+/* Custom navigation floats over the viewport. Keep the last action completely
+   scrollable above its 66px body, 8px offset and the device home indicator. */
+.page.tab-page { padding-bottom: 98px; padding-bottom: calc(98px + constant(safe-area-inset-bottom)); padding-bottom: calc(98px + env(safe-area-inset-bottom)); }
+.page-heading { margin: 8rpx 10rpx 30rpx; }
+.page-title { font-size: 44rpx; font-weight: 700; line-height: 1.3; letter-spacing: -0.5rpx; }
+.page-subtitle { margin-top: 12rpx; color: var(--text-2); font-size: 25rpx; line-height: 1.65; }
+.card { min-width: 0; border: 1rpx solid var(--glass-line); }
+.card-title { align-items: flex-start; flex-wrap: wrap; gap: 10rpx 16rpx; line-height: 1.45; }
+.card-title > text:first-child { flex: 1 1 220rpx; min-width: 0; white-space: normal; overflow-wrap: anywhere; }
+.card-title .sub { max-width: 100%; overflow-wrap: anywhere; color: var(--text-2); }
+.row, .row-between { min-width: 0; gap: 12rpx; }
+.row-between { flex-wrap: wrap; }
+.row-between > view, .row-between > text, .row > view, .row > text { min-width: 0; max-width: 100%; }
+.row-between > view:first-child { flex: 1 1 220rpx; }
+.row-between > text:first-child { flex: 1 1 180rpx; }
+.row-between > .pill { flex: 0 1 auto; }
+.btn { min-width: 0; max-width: 100%; min-height: 88rpx; height: auto; padding: 18rpx 28rpx; line-height: 1.5; white-space: normal; overflow-wrap: anywhere; text-align: center; }
+.btn-sm { min-height: 68rpx; padding: 12rpx 22rpx; line-height: 1.45; }
+.btn-row { flex-wrap: wrap; align-items: stretch; }
+.btn-row .btn { flex: 1 1 180rpx; }
+/* Native WeChat button defaults have higher specificity than a lone class.
+   Keep full-width actions and flex rows consistent with the actual renderer. */
+.btn.btn { box-sizing: border-box; min-width: 0; max-width: 100%; height: auto; margin: 0; padding: 18rpx 28rpx; line-height: 1.5; font-size: 30rpx; font-weight: 600; text-align: center; }
+.btn.btn-sm { padding: 12rpx 22rpx; min-height: 68rpx; line-height: 1.45; font-size: 26rpx; }
+.btn.btn-block { width: 100%; }
+.btn.btn.mt { margin-top: 16rpx; }
+.btn.btn.mb { margin-bottom: 16rpx; }
+.btn-row .btn.btn { width: auto; flex: 1 1 180rpx; }
+.btn[disabled] { background: #E3ECE7; color: #5E7569; border-color: transparent; box-shadow: none; }
+.field { gap: 16rpx; min-width: 0; }
+.field .label { flex: 0 0 auto; max-width: 38%; }
+.field .value { min-width: 0; white-space: normal; overflow-wrap: anywhere; }
+.field .row { flex: 1; justify-content: flex-end; }
+.banner { display: block; overflow-wrap: anywhere; line-height: 1.6; }
+.banner:last-child { margin-bottom: 0; }
+.pill { max-width: 100%; white-space: normal; line-height: 1.5; overflow-wrap: anywhere; }
+.pill-dot::before { flex: none; }
+.chip { max-width: 100%; min-height: 64rpx; overflow-wrap: anywhere; }
+.muted, .section-label, .tiny.muted, .footer-note { color: var(--text-3); }
+.stat-row { flex-wrap: wrap; }
+.stat { flex: 1 1 calc(50% - 16rpx); min-width: 0; padding: 18rpx 12rpx; }
+.stat .num { overflow-wrap: anywhere; }
+.mono { word-break: break-all; }
+.empty { padding: 42rpx 12rpx; }
+.empty-symbol { display: inline-flex; align-items: center; justify-content: center; width: 96rpx; height: 96rpx; margin-bottom: 18rpx; border: 1rpx solid var(--glass-line); border-radius: 30rpx; background: var(--green-soft); color: var(--green-dark); font-size: 26rpx; font-weight: 600; box-shadow: inset 0 2rpx 0 rgba(255, 255, 255, 0.84); }
+.stale-note { color: #915600; margin-top: 8rpx; }
+.product-preview { display: flex; gap: 20rpx; padding: 20rpx; border: 1rpx solid var(--glass-line); border-radius: 24rpx; background: var(--surface-soft); align-items: center; min-width: 0; }
+.product-image-box { width: 164rpx; height: 164rpx; flex: 0 0 164rpx; background: #fff; border-radius: 16rpx; overflow: hidden; }
+.product-image { width: 164rpx; height: 164rpx; display: block; }
+.product-copy { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.image-placeholder { width: 100%; height: 100%; padding: 16rpx; display: flex; align-items: center; justify-content: center; text-align: center; color: #6b7c72; font-size: 22rpx; }
+.result-image-wrap { width: 100%; height: 260rpx; text-align: center; margin: 8rpx 0 22rpx; padding: 10rpx; background: linear-gradient(135deg, rgba(224, 250, 235, 0.72), rgba(247, 253, 249, 0.72)); border: 1rpx solid var(--glass-line); border-radius: 26rpx; }
+.result-image { width: 240rpx; height: 240rpx; display: block; margin: 0 auto; }
+.follow-image { width: 140rpx; height: 140rpx; display: block; margin: 0 0 16rpx; border-radius: 16rpx; background: #f8faf9; }
+.benefit-list { color: var(--text-2); font-size: 24rpx; line-height: 1.7; }
+.benefit-list > view { padding: 12rpx 0; border-bottom: 1rpx solid var(--line); }
+.benefit-list > view:last-child { border-bottom: 0; }
+.onboarding { background: rgba(231, 248, 238, 0.82); }

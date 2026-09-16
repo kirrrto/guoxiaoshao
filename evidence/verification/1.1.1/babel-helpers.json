@@ -1,0 +1,452 @@
+{
+  "recordedAt": "2026-09-16T02:28:39.815Z",
+  "method": "Read-only invocation of the installed official DevTools enhance compiler through ELECTRON_RUN_AS_NODE=1; compile both source snapshots independently with Babel transforms enabled.",
+  "runtime": {
+    "node": "v22.16.0",
+    "electron": "36.6.0",
+    "babel": "7.21.4",
+    "helperVersion": "7.21.0"
+  },
+  "compilerEntry": "D:/微信web开发者工具/resources/app.asar/js/common/miniprogram-builder/modules/corecompiler/original/js/enhance.js",
+  "previousArchive": "C:/Users/Administrator/Documents/ChatGPT/果小哨/果小哨-1.0.1-编译修复版-20260915.zip",
+  "currentProject": "C:/Users/Administrator/WeChatProjects/miniprogram-6",
+  "checkedFiles": 16,
+  "allOldDependencies": [
+    "@babel/runtime/helpers/Arrayincludes",
+    "@babel/runtime/helpers/Objectvalues",
+    "@babel/runtime/helpers/arrayLikeToArray",
+    "@babel/runtime/helpers/arrayWithoutHoles",
+    "@babel/runtime/helpers/assertThisInitialized",
+    "@babel/runtime/helpers/asyncToGenerator",
+    "@babel/runtime/helpers/classCallCheck",
+    "@babel/runtime/helpers/construct",
+    "@babel/runtime/helpers/createClass",
+    "@babel/runtime/helpers/createForOfIteratorHelper",
+    "@babel/runtime/helpers/defineProperty",
+    "@babel/runtime/helpers/getPrototypeOf",
+    "@babel/runtime/helpers/inherits",
+    "@babel/runtime/helpers/isNativeFunction",
+    "@babel/runtime/helpers/isNativeReflectConstruct",
+    "@babel/runtime/helpers/iterableToArray",
+    "@babel/runtime/helpers/nonIterableSpread",
+    "@babel/runtime/helpers/objectSpread2",
+    "@babel/runtime/helpers/possibleConstructorReturn",
+    "@babel/runtime/helpers/regeneratorRuntime",
+    "@babel/runtime/helpers/setPrototypeOf",
+    "@babel/runtime/helpers/toConsumableArray",
+    "@babel/runtime/helpers/toPrimitive",
+    "@babel/runtime/helpers/toPropertyKey",
+    "@babel/runtime/helpers/typeof",
+    "@babel/runtime/helpers/unsupportedIterableToArray",
+    "@babel/runtime/helpers/wrapNativeSuper"
+  ],
+  "allNewDependencies": [
+    "@babel/runtime/helpers/Arrayincludes",
+    "@babel/runtime/helpers/Objectvalues",
+    "@babel/runtime/helpers/arrayLikeToArray",
+    "@babel/runtime/helpers/arrayWithoutHoles",
+    "@babel/runtime/helpers/assertThisInitialized",
+    "@babel/runtime/helpers/asyncToGenerator",
+    "@babel/runtime/helpers/classCallCheck",
+    "@babel/runtime/helpers/construct",
+    "@babel/runtime/helpers/createClass",
+    "@babel/runtime/helpers/createForOfIteratorHelper",
+    "@babel/runtime/helpers/defineProperty",
+    "@babel/runtime/helpers/getPrototypeOf",
+    "@babel/runtime/helpers/inherits",
+    "@babel/runtime/helpers/isNativeFunction",
+    "@babel/runtime/helpers/isNativeReflectConstruct",
+    "@babel/runtime/helpers/iterableToArray",
+    "@babel/runtime/helpers/nonIterableSpread",
+    "@babel/runtime/helpers/objectSpread2",
+    "@babel/runtime/helpers/possibleConstructorReturn",
+    "@babel/runtime/helpers/regeneratorRuntime",
+    "@babel/runtime/helpers/setPrototypeOf",
+    "@babel/runtime/helpers/toConsumableArray",
+    "@babel/runtime/helpers/toPrimitive",
+    "@babel/runtime/helpers/toPropertyKey",
+    "@babel/runtime/helpers/typeof",
+    "@babel/runtime/helpers/unsupportedIterableToArray",
+    "@babel/runtime/helpers/wrapNativeSuper"
+  ],
+  "removedDependencies": [],
+  "changedFiles": [
+    {
+      "file": "miniprogram/pages/follow/index.js",
+      "before": {
+        "sourceSha256": "d3cba8a0401951b73635698511d437d60ca4ca9317215e3c605c448b3a19dc17",
+        "helpers": [
+          "@babel/runtime/helpers/Arrayincludes",
+          "@babel/runtime/helpers/Objectvalues",
+          "@babel/runtime/helpers/asyncToGenerator",
+          "@babel/runtime/helpers/createForOfIteratorHelper",
+          "@babel/runtime/helpers/defineProperty",
+          "@babel/runtime/helpers/objectSpread2",
+          "@babel/runtime/helpers/regeneratorRuntime"
+        ],
+        "dependencies": [
+          "@babel/runtime/helpers/Arrayincludes",
+          "@babel/runtime/helpers/Objectvalues",
+          "@babel/runtime/helpers/arrayLikeToArray",
+          "@babel/runtime/helpers/asyncToGenerator",
+          "@babel/runtime/helpers/createForOfIteratorHelper",
+          "@babel/runtime/helpers/defineProperty",
+          "@babel/runtime/helpers/objectSpread2",
+          "@babel/runtime/helpers/regeneratorRuntime",
+          "@babel/runtime/helpers/toPrimitive",
+          "@babel/runtime/helpers/toPropertyKey",
+          "@babel/runtime/helpers/typeof",
+          "@babel/runtime/helpers/unsupportedIterableToArray"
+        ],
+        "generatedPreamble": "\"use strict\";\n\nvar _defineProperty2 = require(\"../../@babel/runtime/helpers/defineProperty\");\nrequire(\"../../@babel/runtime/helpers/Arrayincludes\");\nrequire(\"../../@babel/runtime/helpers/Objectvalues\");\nvar _createForOfIteratorHelper2 = require(\"../../@babel/runtime/helpers/createForOfIteratorHelper\");\nvar _regeneratorRuntime2 = require(\"../../@babel/runtime/helpers/regeneratorRuntime\");\nvar _asyncToGenerator2 = require(\"../../@babel/runtime/helpers/asyncToGenerator\");\nvar _objectSpread2 = require(\"../../@babel/runtime/helpers/objectSpread2\");\nvar _require = require('../../utils/api'),\n  call = _require.call,\n  newId = _require.newId,",
+        "outputLength": 29304
+      },
+      "after": {
+        "sourceSha256": "ea2edd3a67a638b787b2fff414834b6b782453dcacb84a85471f711ccc3549aa",
+        "helpers": [
+          "@babel/runtime/helpers/Arrayincludes",
+          "@babel/runtime/helpers/Objectvalues",
+          "@babel/runtime/helpers/asyncToGenerator",
+          "@babel/runtime/helpers/createForOfIteratorHelper",
+          "@babel/runtime/helpers/defineProperty",
+          "@babel/runtime/helpers/objectSpread2",
+          "@babel/runtime/helpers/regeneratorRuntime"
+        ],
+        "dependencies": [
+          "@babel/runtime/helpers/Arrayincludes",
+          "@babel/runtime/helpers/Objectvalues",
+          "@babel/runtime/helpers/arrayLikeToArray",
+          "@babel/runtime/helpers/asyncToGenerator",
+          "@babel/runtime/helpers/createForOfIteratorHelper",
+          "@babel/runtime/helpers/defineProperty",
+          "@babel/runtime/helpers/objectSpread2",
+          "@babel/runtime/helpers/regeneratorRuntime",
+          "@babel/runtime/helpers/toPrimitive",
+          "@babel/runtime/helpers/toPropertyKey",
+          "@babel/runtime/helpers/typeof",
+          "@babel/runtime/helpers/unsupportedIterableToArray"
+        ],
+        "generatedPreamble": "\"use strict\";\n\nvar _defineProperty2 = require(\"../../@babel/runtime/helpers/defineProperty\");\nrequire(\"../../@babel/runtime/helpers/Arrayincludes\");\nvar _createForOfIteratorHelper2 = require(\"../../@babel/runtime/helpers/createForOfIteratorHelper\");\nrequire(\"../../@babel/runtime/helpers/Objectvalues\");\nvar _regeneratorRuntime2 = require(\"../../@babel/runtime/helpers/regeneratorRuntime\");\nvar _asyncToGenerator2 = require(\"../../@babel/runtime/helpers/asyncToGenerator\");\nvar _objectSpread2 = require(\"../../@babel/runtime/helpers/objectSpread2\");\nvar _require = require('../../utils/api'),\n  call = _require.call,\n  newId = _require.newId,",
+        "outputLength": 35648
+      }
+    },
+    {
+      "file": "miniprogram/pages/history/index.js",
+      "before": {
+        "sourceSha256": "06ae549851d92cdf6b4ad02e4a213e2b2a1d25a97d2fdbed41840465094ce042",
+        "helpers": [
+          "@babel/runtime/helpers/asyncToGenerator",
+          "@babel/runtime/helpers/objectSpread2",
+          "@babel/runtime/helpers/regeneratorRuntime",
+          "@babel/runtime/helpers/toConsumableArray"
+        ],
+        "dependencies": [
+          "@babel/runtime/helpers/arrayLikeToArray",
+          "@babel/runtime/helpers/arrayWithoutHoles",
+          "@babel/runtime/helpers/asyncToGenerator",
+          "@babel/runtime/helpers/defineProperty",
+          "@babel/runtime/helpers/iterableToArray",
+          "@babel/runtime/helpers/nonIterableSpread",
+          "@babel/runtime/helpers/objectSpread2",
+          "@babel/runtime/helpers/regeneratorRuntime",
+          "@babel/runtime/helpers/toConsumableArray",
+          "@babel/runtime/helpers/toPrimitive",
+          "@babel/runtime/helpers/toPropertyKey",
+          "@babel/runtime/helpers/typeof",
+          "@babel/runtime/helpers/unsupportedIterableToArray"
+        ],
+        "generatedPreamble": "\"use strict\";\n\nvar _toConsumableArray2 = require(\"../../@babel/runtime/helpers/toConsumableArray\");\nvar _regeneratorRuntime2 = require(\"../../@babel/runtime/helpers/regeneratorRuntime\");\nvar _asyncToGenerator2 = require(\"../../@babel/runtime/helpers/asyncToGenerator\");\nvar _objectSpread2 = require(\"../../@babel/runtime/helpers/objectSpread2\");\nvar _require = require('../../utils/api'),\n  call = _require.call,\n  newId = _require.newId,\n  showError = _require.showError,\n  toast = _require.toast;\nvar _require2 = require('../../utils/store'),",
+        "outputLength": 19231
+      },
+      "after": {
+        "sourceSha256": "b8a50375c3de3bc628c8174263547fb6b801fd630b56983f1f5f5903acc784b6",
+        "helpers": [
+          "@babel/runtime/helpers/asyncToGenerator",
+          "@babel/runtime/helpers/objectSpread2",
+          "@babel/runtime/helpers/regeneratorRuntime",
+          "@babel/runtime/helpers/toConsumableArray"
+        ],
+        "dependencies": [
+          "@babel/runtime/helpers/arrayLikeToArray",
+          "@babel/runtime/helpers/arrayWithoutHoles",
+          "@babel/runtime/helpers/asyncToGenerator",
+          "@babel/runtime/helpers/defineProperty",
+          "@babel/runtime/helpers/iterableToArray",
+          "@babel/runtime/helpers/nonIterableSpread",
+          "@babel/runtime/helpers/objectSpread2",
+          "@babel/runtime/helpers/regeneratorRuntime",
+          "@babel/runtime/helpers/toConsumableArray",
+          "@babel/runtime/helpers/toPrimitive",
+          "@babel/runtime/helpers/toPropertyKey",
+          "@babel/runtime/helpers/typeof",
+          "@babel/runtime/helpers/unsupportedIterableToArray"
+        ],
+        "generatedPreamble": "\"use strict\";\n\nvar _toConsumableArray2 = require(\"../../@babel/runtime/helpers/toConsumableArray\");\nvar _regeneratorRuntime2 = require(\"../../@babel/runtime/helpers/regeneratorRuntime\");\nvar _asyncToGenerator2 = require(\"../../@babel/runtime/helpers/asyncToGenerator\");\nvar _objectSpread2 = require(\"../../@babel/runtime/helpers/objectSpread2\");\nvar _require = require('../../utils/api'),\n  call = _require.call,\n  showError = _require.showError,\n  toast = _require.toast;\nvar _require2 = require('../../utils/store'),\n  getBootstrap = _require2.getBootstrap,",
+        "outputLength": 25866
+      }
+    },
+    {
+      "file": "miniprogram/pages/mine/index.js",
+      "before": {
+        "sourceSha256": "1f57edd28fdf3b8cfc330f3219afe7732c27832d0c247ad78d7effc63f2faa77",
+        "helpers": [
+          "@babel/runtime/helpers/Arrayincludes",
+          "@babel/runtime/helpers/asyncToGenerator",
+          "@babel/runtime/helpers/createForOfIteratorHelper",
+          "@babel/runtime/helpers/objectSpread2",
+          "@babel/runtime/helpers/regeneratorRuntime",
+          "@babel/runtime/helpers/toConsumableArray"
+        ],
+        "dependencies": [
+          "@babel/runtime/helpers/Arrayincludes",
+          "@babel/runtime/helpers/arrayLikeToArray",
+          "@babel/runtime/helpers/arrayWithoutHoles",
+          "@babel/runtime/helpers/asyncToGenerator",
+          "@babel/runtime/helpers/createForOfIteratorHelper",
+          "@babel/runtime/helpers/defineProperty",
+          "@babel/runtime/helpers/iterableToArray",
+          "@babel/runtime/helpers/nonIterableSpread",
+          "@babel/runtime/helpers/objectSpread2",
+          "@babel/runtime/helpers/regeneratorRuntime",
+          "@babel/runtime/helpers/toConsumableArray",
+          "@babel/runtime/helpers/toPrimitive",
+          "@babel/runtime/helpers/toPropertyKey",
+          "@babel/runtime/helpers/typeof",
+          "@babel/runtime/helpers/unsupportedIterableToArray"
+        ],
+        "generatedPreamble": "\"use strict\";\n\nvar _toConsumableArray2 = require(\"../../@babel/runtime/helpers/toConsumableArray\");\nvar _createForOfIteratorHelper2 = require(\"../../@babel/runtime/helpers/createForOfIteratorHelper\");\nvar _regeneratorRuntime2 = require(\"../../@babel/runtime/helpers/regeneratorRuntime\");\nvar _asyncToGenerator2 = require(\"../../@babel/runtime/helpers/asyncToGenerator\");\nrequire(\"../../@babel/runtime/helpers/Arrayincludes\");\nvar _objectSpread2 = require(\"../../@babel/runtime/helpers/objectSpread2\");\nvar _require = require('../../utils/api'),\n  call = _require.call,\n  showError = _require.showError,\n  toast = _require.toast;",
+        "outputLength": 50397
+      },
+      "after": {
+        "sourceSha256": "14834999f287532d31ee0e397980c0a7cc897d95b1f4ecbc205b7a689033ca04",
+        "helpers": [
+          "@babel/runtime/helpers/Arrayincludes",
+          "@babel/runtime/helpers/asyncToGenerator",
+          "@babel/runtime/helpers/createForOfIteratorHelper",
+          "@babel/runtime/helpers/objectSpread2",
+          "@babel/runtime/helpers/regeneratorRuntime",
+          "@babel/runtime/helpers/toConsumableArray"
+        ],
+        "dependencies": [
+          "@babel/runtime/helpers/Arrayincludes",
+          "@babel/runtime/helpers/arrayLikeToArray",
+          "@babel/runtime/helpers/arrayWithoutHoles",
+          "@babel/runtime/helpers/asyncToGenerator",
+          "@babel/runtime/helpers/createForOfIteratorHelper",
+          "@babel/runtime/helpers/defineProperty",
+          "@babel/runtime/helpers/iterableToArray",
+          "@babel/runtime/helpers/nonIterableSpread",
+          "@babel/runtime/helpers/objectSpread2",
+          "@babel/runtime/helpers/regeneratorRuntime",
+          "@babel/runtime/helpers/toConsumableArray",
+          "@babel/runtime/helpers/toPrimitive",
+          "@babel/runtime/helpers/toPropertyKey",
+          "@babel/runtime/helpers/typeof",
+          "@babel/runtime/helpers/unsupportedIterableToArray"
+        ],
+        "generatedPreamble": "\"use strict\";\n\nvar _toConsumableArray2 = require(\"../../@babel/runtime/helpers/toConsumableArray\");\nvar _createForOfIteratorHelper2 = require(\"../../@babel/runtime/helpers/createForOfIteratorHelper\");\nvar _regeneratorRuntime2 = require(\"../../@babel/runtime/helpers/regeneratorRuntime\");\nvar _asyncToGenerator2 = require(\"../../@babel/runtime/helpers/asyncToGenerator\");\nrequire(\"../../@babel/runtime/helpers/Arrayincludes\");\nvar _objectSpread2 = require(\"../../@babel/runtime/helpers/objectSpread2\");\nvar _require = require('../../utils/api'),\n  call = _require.call,\n  showError = _require.showError,\n  toast = _require.toast;",
+        "outputLength": 52487
+      }
+    },
+    {
+      "file": "miniprogram/pages/query/index.js",
+      "before": {
+        "sourceSha256": "84dfb484f5f367cb544e99c4f406ab5cc3cbdc3feefa8731aa1b16dd89068817",
+        "helpers": [
+          "@babel/runtime/helpers/asyncToGenerator",
+          "@babel/runtime/helpers/objectSpread2",
+          "@babel/runtime/helpers/regeneratorRuntime"
+        ],
+        "dependencies": [
+          "@babel/runtime/helpers/asyncToGenerator",
+          "@babel/runtime/helpers/defineProperty",
+          "@babel/runtime/helpers/objectSpread2",
+          "@babel/runtime/helpers/regeneratorRuntime",
+          "@babel/runtime/helpers/toPrimitive",
+          "@babel/runtime/helpers/toPropertyKey",
+          "@babel/runtime/helpers/typeof"
+        ],
+        "generatedPreamble": "\"use strict\";\n\nvar _regeneratorRuntime2 = require(\"../../@babel/runtime/helpers/regeneratorRuntime\");\nvar _asyncToGenerator2 = require(\"../../@babel/runtime/helpers/asyncToGenerator\");\nvar _objectSpread2 = require(\"../../@babel/runtime/helpers/objectSpread2\");\nvar _require = require('../../utils/api'),\n  call = _require.call,\n  newId = _require.newId,\n  showError = _require.showError,\n  toast = _require.toast;\nvar _require2 = require('../../utils/store'),\n  getBootstrap = _require2.getBootstrap,",
+        "outputLength": 19737
+      },
+      "after": {
+        "sourceSha256": "55a031759f1577a111953fa9038199b2661bad4b365e75c08d64e8471e6b9e2f",
+        "helpers": [
+          "@babel/runtime/helpers/asyncToGenerator",
+          "@babel/runtime/helpers/objectSpread2",
+          "@babel/runtime/helpers/regeneratorRuntime"
+        ],
+        "dependencies": [
+          "@babel/runtime/helpers/asyncToGenerator",
+          "@babel/runtime/helpers/defineProperty",
+          "@babel/runtime/helpers/objectSpread2",
+          "@babel/runtime/helpers/regeneratorRuntime",
+          "@babel/runtime/helpers/toPrimitive",
+          "@babel/runtime/helpers/toPropertyKey",
+          "@babel/runtime/helpers/typeof"
+        ],
+        "generatedPreamble": "\"use strict\";\n\nvar _regeneratorRuntime2 = require(\"../../@babel/runtime/helpers/regeneratorRuntime\");\nvar _asyncToGenerator2 = require(\"../../@babel/runtime/helpers/asyncToGenerator\");\nvar _objectSpread2 = require(\"../../@babel/runtime/helpers/objectSpread2\");\nvar _require = require('../../utils/api'),\n  call = _require.call,\n  newId = _require.newId,\n  showError = _require.showError,\n  toast = _require.toast;\nvar _require2 = require('../../utils/store'),\n  getBootstrap = _require2.getBootstrap,",
+        "outputLength": 20925
+      }
+    },
+    {
+      "file": "miniprogram/utils/api.js",
+      "before": {
+        "sourceSha256": "3031e2684e2aca2974fb77f6f6bf32a9756625a3bfdca666e4e39216c02d33cc",
+        "helpers": [
+          "@babel/runtime/helpers/asyncToGenerator",
+          "@babel/runtime/helpers/classCallCheck",
+          "@babel/runtime/helpers/createClass",
+          "@babel/runtime/helpers/getPrototypeOf",
+          "@babel/runtime/helpers/inherits",
+          "@babel/runtime/helpers/possibleConstructorReturn",
+          "@babel/runtime/helpers/regeneratorRuntime",
+          "@babel/runtime/helpers/typeof",
+          "@babel/runtime/helpers/wrapNativeSuper"
+        ],
+        "dependencies": [
+          "@babel/runtime/helpers/assertThisInitialized",
+          "@babel/runtime/helpers/asyncToGenerator",
+          "@babel/runtime/helpers/classCallCheck",
+          "@babel/runtime/helpers/construct",
+          "@babel/runtime/helpers/createClass",
+          "@babel/runtime/helpers/getPrototypeOf",
+          "@babel/runtime/helpers/inherits",
+          "@babel/runtime/helpers/isNativeFunction",
+          "@babel/runtime/helpers/isNativeReflectConstruct",
+          "@babel/runtime/helpers/possibleConstructorReturn",
+          "@babel/runtime/helpers/regeneratorRuntime",
+          "@babel/runtime/helpers/setPrototypeOf",
+          "@babel/runtime/helpers/toPrimitive",
+          "@babel/runtime/helpers/toPropertyKey",
+          "@babel/runtime/helpers/typeof",
+          "@babel/runtime/helpers/wrapNativeSuper"
+        ],
+        "generatedPreamble": "\"use strict\";\n\nvar _regeneratorRuntime2 = require(\"../@babel/runtime/helpers/regeneratorRuntime\");\nvar _typeof2 = require(\"../@babel/runtime/helpers/typeof\");\nvar _asyncToGenerator2 = require(\"../@babel/runtime/helpers/asyncToGenerator\");\nvar _createClass2 = require(\"../@babel/runtime/helpers/createClass\");\nvar _classCallCheck2 = require(\"../@babel/runtime/helpers/classCallCheck\");\nvar _possibleConstructorReturn2 = require(\"../@babel/runtime/helpers/possibleConstructorReturn\");\nvar _getPrototypeOf2 = require(\"../@babel/runtime/helpers/getPrototypeOf\");\nvar _inherits2 = require(\"../@babel/runtime/helpers/inherits\");\nvar _wrapNativeSuper2 = require(\"../@babel/runtime/helpers/wrapNativeSuper\");\nfunction _callSuper(_this, derived, args) {",
+        "outputLength": 5297
+      },
+      "after": {
+        "sourceSha256": "7a3e2c72178f9d380bcf9b5e5c8c9076b7453125b6fdd5d7e2362b5a2dfbd01e",
+        "helpers": [
+          "@babel/runtime/helpers/asyncToGenerator",
+          "@babel/runtime/helpers/classCallCheck",
+          "@babel/runtime/helpers/createClass",
+          "@babel/runtime/helpers/getPrototypeOf",
+          "@babel/runtime/helpers/inherits",
+          "@babel/runtime/helpers/possibleConstructorReturn",
+          "@babel/runtime/helpers/regeneratorRuntime",
+          "@babel/runtime/helpers/typeof",
+          "@babel/runtime/helpers/wrapNativeSuper"
+        ],
+        "dependencies": [
+          "@babel/runtime/helpers/assertThisInitialized",
+          "@babel/runtime/helpers/asyncToGenerator",
+          "@babel/runtime/helpers/classCallCheck",
+          "@babel/runtime/helpers/construct",
+          "@babel/runtime/helpers/createClass",
+          "@babel/runtime/helpers/getPrototypeOf",
+          "@babel/runtime/helpers/inherits",
+          "@babel/runtime/helpers/isNativeFunction",
+          "@babel/runtime/helpers/isNativeReflectConstruct",
+          "@babel/runtime/helpers/possibleConstructorReturn",
+          "@babel/runtime/helpers/regeneratorRuntime",
+          "@babel/runtime/helpers/setPrototypeOf",
+          "@babel/runtime/helpers/toPrimitive",
+          "@babel/runtime/helpers/toPropertyKey",
+          "@babel/runtime/helpers/typeof",
+          "@babel/runtime/helpers/wrapNativeSuper"
+        ],
+        "generatedPreamble": "\"use strict\";\n\nvar _regeneratorRuntime2 = require(\"../@babel/runtime/helpers/regeneratorRuntime\");\nvar _typeof2 = require(\"../@babel/runtime/helpers/typeof\");\nvar _asyncToGenerator2 = require(\"../@babel/runtime/helpers/asyncToGenerator\");\nvar _createClass2 = require(\"../@babel/runtime/helpers/createClass\");\nvar _classCallCheck2 = require(\"../@babel/runtime/helpers/classCallCheck\");\nvar _possibleConstructorReturn2 = require(\"../@babel/runtime/helpers/possibleConstructorReturn\");\nvar _getPrototypeOf2 = require(\"../@babel/runtime/helpers/getPrototypeOf\");\nvar _inherits2 = require(\"../@babel/runtime/helpers/inherits\");\nvar _wrapNativeSuper2 = require(\"../@babel/runtime/helpers/wrapNativeSuper\");\nfunction _callSuper(_this, derived, args) {",
+        "outputLength": 5382
+      }
+    },
+    {
+      "file": "miniprogram/utils/format.js",
+      "before": {
+        "sourceSha256": "d6679f1f0600b9e8d198048b19babceea723ef0eb0dbd965d3092eb90e4b4f07",
+        "helpers": [
+          "@babel/runtime/helpers/objectSpread2"
+        ],
+        "dependencies": [
+          "@babel/runtime/helpers/defineProperty",
+          "@babel/runtime/helpers/objectSpread2",
+          "@babel/runtime/helpers/toPrimitive",
+          "@babel/runtime/helpers/toPropertyKey",
+          "@babel/runtime/helpers/typeof"
+        ],
+        "generatedPreamble": "\"use strict\";\n\nvar _objectSpread2 = require(\"../@babel/runtime/helpers/objectSpread2\");\nvar BEIJING_OFFSET = 8 * 60 * 60 * 1000;\nfunction beijing(iso) {\n  var ms = typeof iso === 'number' ? iso : Date.parse(iso);\n  if (!Number.isFinite(ms)) return null;\n  return new Date(ms + BEIJING_OFFSET);\n}\nvar pad = function pad(n) {\n  return String(n).padStart(2, '0');\n};",
+        "outputLength": 7743
+      },
+      "after": {
+        "sourceSha256": "f174f12cb020a0c1b6eee09f38b89bdfc759f6710e10a2b1028a6f8ba24b5564",
+        "helpers": [
+          "@babel/runtime/helpers/objectSpread2"
+        ],
+        "dependencies": [
+          "@babel/runtime/helpers/defineProperty",
+          "@babel/runtime/helpers/objectSpread2",
+          "@babel/runtime/helpers/toPrimitive",
+          "@babel/runtime/helpers/toPropertyKey",
+          "@babel/runtime/helpers/typeof"
+        ],
+        "generatedPreamble": "\"use strict\";\n\nvar _objectSpread2 = require(\"../@babel/runtime/helpers/objectSpread2\");\nvar BEIJING_OFFSET = 8 * 60 * 60 * 1000;\nfunction beijing(iso) {\n  var ms = typeof iso === 'number' ? iso : Date.parse(iso);\n  if (!Number.isFinite(ms)) return null;\n  return new Date(ms + BEIJING_OFFSET);\n}\nvar pad = function pad(n) {\n  return String(n).padStart(2, '0');\n};",
+        "outputLength": 7795
+      }
+    },
+    {
+      "file": "miniprogram/utils/store.js",
+      "before": {
+        "sourceSha256": "e7f1bd221dc883c3a0b96a41b1f617dd40fa1c024f09343363be6b78dc429bc0",
+        "helpers": [
+          "@babel/runtime/helpers/asyncToGenerator",
+          "@babel/runtime/helpers/createForOfIteratorHelper",
+          "@babel/runtime/helpers/objectSpread2",
+          "@babel/runtime/helpers/regeneratorRuntime"
+        ],
+        "dependencies": [
+          "@babel/runtime/helpers/arrayLikeToArray",
+          "@babel/runtime/helpers/asyncToGenerator",
+          "@babel/runtime/helpers/createForOfIteratorHelper",
+          "@babel/runtime/helpers/defineProperty",
+          "@babel/runtime/helpers/objectSpread2",
+          "@babel/runtime/helpers/regeneratorRuntime",
+          "@babel/runtime/helpers/toPrimitive",
+          "@babel/runtime/helpers/toPropertyKey",
+          "@babel/runtime/helpers/typeof",
+          "@babel/runtime/helpers/unsupportedIterableToArray"
+        ],
+        "generatedPreamble": "\"use strict\";\n\nvar _regeneratorRuntime2 = require(\"../@babel/runtime/helpers/regeneratorRuntime\");\nvar _createForOfIteratorHelper2 = require(\"../@babel/runtime/helpers/createForOfIteratorHelper\");\nvar _objectSpread2 = require(\"../@babel/runtime/helpers/objectSpread2\");\nvar _asyncToGenerator2 = require(\"../@babel/runtime/helpers/asyncToGenerator\");\n/**\n * Tiny session store: bootstrap (identity/quota/membership) and the catalog.\n * Catalog is cached in local storage and refreshed by version.\n */\nvar _require = require('./api'),\n  call = _require.call;",
+        "outputLength": 17605
+      },
+      "after": {
+        "sourceSha256": "c6bc5441cd03387135a87d6fd1cd74427357035441c0cc6d9be677e9f9ed56a2",
+        "helpers": [
+          "@babel/runtime/helpers/asyncToGenerator",
+          "@babel/runtime/helpers/createForOfIteratorHelper",
+          "@babel/runtime/helpers/objectSpread2",
+          "@babel/runtime/helpers/regeneratorRuntime"
+        ],
+        "dependencies": [
+          "@babel/runtime/helpers/arrayLikeToArray",
+          "@babel/runtime/helpers/asyncToGenerator",
+          "@babel/runtime/helpers/createForOfIteratorHelper",
+          "@babel/runtime/helpers/defineProperty",
+          "@babel/runtime/helpers/objectSpread2",
+          "@babel/runtime/helpers/regeneratorRuntime",
+          "@babel/runtime/helpers/toPrimitive",
+          "@babel/runtime/helpers/toPropertyKey",
+          "@babel/runtime/helpers/typeof",
+          "@babel/runtime/helpers/unsupportedIterableToArray"
+        ],
+        "generatedPreamble": "\"use strict\";\n\nvar _regeneratorRuntime2 = require(\"../@babel/runtime/helpers/regeneratorRuntime\");\nvar _createForOfIteratorHelper2 = require(\"../@babel/runtime/helpers/createForOfIteratorHelper\");\nvar _objectSpread2 = require(\"../@babel/runtime/helpers/objectSpread2\");\nvar _asyncToGenerator2 = require(\"../@babel/runtime/helpers/asyncToGenerator\");\n/**\n * Tiny session store: bootstrap (identity/quota/membership) and the catalog.\n * Catalog is cached in local storage and refreshed by version.\n */\nvar _require = require('./api'),\n  call = _require.call;",
+        "outputLength": 19470
+      }
+    }
+  ],
+  "boundaries": [
+    "This is an independent compiler result comparison, not a dump of the running simulator cache or its injected module registry.",
+    "It proves the revised client source no longer requests the removed array-destructuring helper chain under the official Babel compiler.",
+    "It does not identify the internal cause of the earlier simulator missing-module injection; no cache or installation files were changed.",
+    "This compiler report is separate from the native interaction evidence for this release."
+  ]
+}

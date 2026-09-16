@@ -1,0 +1,11 @@
+{
+  "name": "gxs_monitor",
+  "version": "1.1.2",
+  "private": true,
+  "description": "果小哨每分钟补货监测与订阅通知定时云函数",
+  "main": "index.js",
+  "type": "commonjs",
+  "dependencies": {
+    "wx-server-sdk": "4.0.2"
+  }
+}

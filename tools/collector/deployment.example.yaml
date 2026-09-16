@@ -1,0 +1,47 @@
+# Portable Kubernetes deployment. CloudBase Run equivalent settings are in
+# docs/COLLECTOR_OPERATIONS.md. This file is a template, never auto-applied.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: guoxiaoshao-collector
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels: {app: guoxiaoshao-collector}
+  template:
+    metadata:
+      labels: {app: guoxiaoshao-collector}
+    spec:
+      terminationGracePeriodSeconds: 35
+      containers:
+        - name: collector
+          image: YOUR_REGISTRY/guoxiaoshao-collector:0.2.0
+          ports: [{containerPort: 8080}]
+          env:
+            - {name: GXS_ENABLE_COLLECTOR_PROCESS, value: "false"}
+            - {name: GXS_CLOUDBASE_ENV, value: "flowermean-6gjaxfqhf6c13e88"}
+            - {name: GXS_CLOUDBASE_REGION, value: "ap-shanghai"}
+            - name: GXS_CONSUMER_APPID
+              valueFrom: {secretKeyRef: {name: gxs-consumer-app, key: appid}}
+            - name: GXS_CONSUMER_APPSECRET
+              valueFrom: {secretKeyRef: {name: gxs-consumer-app, key: secret}}
+          # Use workload credentials on CloudBase Run. Self-hosted containers
+          # also need TENCENTCLOUD_SECRETID/SECRETKEY (and SESSIONTOKEN if used)
+          # from a secret, never literals in source control.
+          resources:
+            requests: {cpu: "100m", memory: "128Mi"}
+            limits: {cpu: "500m", memory: "384Mi"}
+          livenessProbe:
+            httpGet: {path: /healthz, port: 8080}
+            initialDelaySeconds: 20
+            periodSeconds: 15
+          readinessProbe:
+            httpGet: {path: /readyz, port: 8080}
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true

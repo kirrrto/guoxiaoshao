@@ -1,0 +1,343 @@
+{
+  "renderer": "Offline Chromium approximation; 130% font sizes, not WeChat system font scaling",
+  "cases": [
+    {
+      "page": "follow",
+      "scenario": "monitor-template-missing",
+      "width": 320,
+      "file": "follow-monitor-template-missing-320.html",
+      "expectedText": [
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色",
+        "后台检测",
+        "消息发送",
+        "微信授权",
+        "监测服务运行中",
+        "模板尚未配置",
+        "关注已开启",
+        "查看原因"
+      ],
+      "scrollWidth": 320,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "follow",
+      "scenario": "monitor-template-missing",
+      "width": 375,
+      "file": "follow-monitor-template-missing-375.html",
+      "expectedText": [
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色",
+        "后台检测",
+        "消息发送",
+        "微信授权",
+        "监测服务运行中",
+        "模板尚未配置",
+        "关注已开启",
+        "查看原因"
+      ],
+      "scrollWidth": 375,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "follow",
+      "scenario": "monitor-template-missing",
+      "width": 430,
+      "file": "follow-monitor-template-missing-430.html",
+      "expectedText": [
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色",
+        "后台检测",
+        "消息发送",
+        "微信授权",
+        "监测服务运行中",
+        "模板尚未配置",
+        "关注已开启",
+        "查看原因"
+      ],
+      "scrollWidth": 430,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "follow",
+      "scenario": "monitor-ready-authorized",
+      "width": 320,
+      "file": "follow-monitor-ready-authorized-320.html",
+      "expectedText": [
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色",
+        "后台检测",
+        "消息发送",
+        "微信授权",
+        "监测服务运行中",
+        "发送服务已就绪",
+        "剩余 1 条提醒授权",
+        "关注已开启"
+      ],
+      "scrollWidth": 320,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "follow",
+      "scenario": "monitor-ready-authorized",
+      "width": 375,
+      "file": "follow-monitor-ready-authorized-375.html",
+      "expectedText": [
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色",
+        "后台检测",
+        "消息发送",
+        "微信授权",
+        "监测服务运行中",
+        "发送服务已就绪",
+        "剩余 1 条提醒授权",
+        "关注已开启"
+      ],
+      "scrollWidth": 375,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "follow",
+      "scenario": "monitor-ready-authorized",
+      "width": 430,
+      "file": "follow-monitor-ready-authorized-430.html",
+      "expectedText": [
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色",
+        "后台检测",
+        "消息发送",
+        "微信授权",
+        "监测服务运行中",
+        "发送服务已就绪",
+        "剩余 1 条提醒授权",
+        "关注已开启"
+      ],
+      "scrollWidth": 430,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "follow",
+      "scenario": "monitor-needs-authorization",
+      "width": 320,
+      "file": "follow-monitor-needs-authorization-320.html",
+      "expectedText": [
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色",
+        "后台检测",
+        "消息发送",
+        "微信授权",
+        "监测服务运行中",
+        "发送服务已就绪",
+        "剩余 0 条提醒授权",
+        "请授权微信提醒"
+      ],
+      "scrollWidth": 320,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "follow",
+      "scenario": "monitor-needs-authorization",
+      "width": 375,
+      "file": "follow-monitor-needs-authorization-375.html",
+      "expectedText": [
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色",
+        "后台检测",
+        "消息发送",
+        "微信授权",
+        "监测服务运行中",
+        "发送服务已就绪",
+        "剩余 0 条提醒授权",
+        "请授权微信提醒"
+      ],
+      "scrollWidth": 375,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "follow",
+      "scenario": "monitor-needs-authorization",
+      "width": 430,
+      "file": "follow-monitor-needs-authorization-430.html",
+      "expectedText": [
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色",
+        "后台检测",
+        "消息发送",
+        "微信授权",
+        "监测服务运行中",
+        "发送服务已就绪",
+        "剩余 0 条提醒授权",
+        "请授权微信提醒"
+      ],
+      "scrollWidth": 430,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "follow",
+      "scenario": "monitor-stale",
+      "width": 320,
+      "file": "follow-monitor-stale-320.html",
+      "expectedText": [
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色",
+        "后台检测",
+        "消息发送",
+        "微信授权",
+        "后台状态已过期",
+        "发送服务未就绪",
+        "关注已开启"
+      ],
+      "scrollWidth": 320,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "follow",
+      "scenario": "monitor-stale",
+      "width": 375,
+      "file": "follow-monitor-stale-375.html",
+      "expectedText": [
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色",
+        "后台检测",
+        "消息发送",
+        "微信授权",
+        "后台状态已过期",
+        "发送服务未就绪",
+        "关注已开启"
+      ],
+      "scrollWidth": 375,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "follow",
+      "scenario": "monitor-stale",
+      "width": 430,
+      "file": "follow-monitor-stale-430.html",
+      "expectedText": [
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色",
+        "后台检测",
+        "消息发送",
+        "微信授权",
+        "后台状态已过期",
+        "发送服务未就绪",
+        "关注已开启"
+      ],
+      "scrollWidth": 430,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "follow",
+      "scenario": "monitor-disabled",
+      "width": 320,
+      "file": "follow-monitor-disabled-320.html",
+      "expectedText": [
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色",
+        "后台检测",
+        "消息发送",
+        "微信授权",
+        "后台检测尚未开放",
+        "发送服务未就绪",
+        "关注已开启"
+      ],
+      "scrollWidth": 320,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "follow",
+      "scenario": "monitor-disabled",
+      "width": 375,
+      "file": "follow-monitor-disabled-375.html",
+      "expectedText": [
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色",
+        "后台检测",
+        "消息发送",
+        "微信授权",
+        "后台检测尚未开放",
+        "发送服务未就绪",
+        "关注已开启"
+      ],
+      "scrollWidth": 375,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "follow",
+      "scenario": "monitor-disabled",
+      "width": 430,
+      "file": "follow-monitor-disabled-430.html",
+      "expectedText": [
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色",
+        "后台检测",
+        "消息发送",
+        "微信授权",
+        "后台检测尚未开放",
+        "发送服务未就绪",
+        "关注已开启"
+      ],
+      "scrollWidth": 430,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "follow",
+      "scenario": "monitor-expired-paused",
+      "width": 320,
+      "file": "follow-monitor-expired-paused-320.html",
+      "expectedText": [
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色",
+        "后台检测",
+        "消息发送",
+        "微信授权",
+        "会员已到期",
+        "会员到期，已暂停",
+        "了解会员"
+      ],
+      "scrollWidth": 320,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "follow",
+      "scenario": "monitor-expired-paused",
+      "width": 375,
+      "file": "follow-monitor-expired-paused-375.html",
+      "expectedText": [
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色",
+        "后台检测",
+        "消息发送",
+        "微信授权",
+        "会员已到期",
+        "会员到期，已暂停",
+        "了解会员"
+      ],
+      "scrollWidth": 375,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "follow",
+      "scenario": "monitor-expired-paused",
+      "width": 430,
+      "file": "follow-monitor-expired-paused-430.html",
+      "expectedText": [
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色",
+        "后台检测",
+        "消息发送",
+        "微信授权",
+        "会员已到期",
+        "会员到期，已暂停",
+        "了解会员"
+      ],
+      "scrollWidth": 430,
+      "overflow": [],
+      "clippedText": []
+    }
+  ],
+  "summary": {
+    "total": 18,
+    "horizontalOverflow": 0,
+    "clippedText": 0
+  }
+}

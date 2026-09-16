@@ -1,0 +1,16 @@
+{
+  "name": "guoxiaoshao-collector",
+  "version": "0.2.0",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "start": "node runner.js",
+    "check": "node --check runner.js"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "wx-server-sdk": "4.0.2"
+  }
+}

@@ -1,0 +1,20 @@
+.ellipsis { flex: 1; min-width: 0; margin-right: 16rpx; white-space: normal; overflow-wrap: anywhere; }
+.latest-row { padding: 14rpx 0; border-bottom: 2rpx solid var(--line); }
+.latest-row:last-child { border-bottom: none; }
+.event { display: flex; gap: 18rpx; padding: 24rpx 0; border-bottom: 1rpx solid var(--line); }
+.event:last-child { border-bottom: none; }
+.event-time { width: 160rpx; flex: none; color: var(--text-2); font-size: 23rpx; padding-top: 4rpx; font-variant-numeric: tabular-nums; white-space: nowrap; word-break: normal; }
+.event-body { flex: 1; min-width: 0; }
+.history-selection-card > .card-title { padding-bottom: 20rpx; border-bottom: 1rpx solid var(--line); margin-bottom: 8rpx; }
+.history-selection-card > .card-title .sub { padding: 7rpx 16rpx; background: var(--surface-soft); color: var(--green-dark); border-radius: 999rpx; }
+.history-result-card > .section-label { font-weight: 600; color: var(--text-2); margin-top: 28rpx; }
+.latest-row { padding: 20rpx 0; }
+.event-body .row-between { gap: 10rpx; }
+.event-body .row-between > text:first-child { flex-basis: 120rpx; }
+.date-field { flex-wrap: wrap; gap: 12rpx; }
+.date-field .label { flex: 1 1 100%; max-width: 100%; font-size: 24rpx; }
+.date-field .row { flex: 1 1 100%; justify-content: space-between; }
+.date-field .value { max-width: 100%; text-align: left; font-variant-numeric: tabular-nums; }
+.history-recent { display: flex; align-items: center; gap: 16rpx; }
+.history-recent-copy { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.history-restore.btn { flex: 0 0 auto; min-width: 76px; min-height: 44px; max-width: 42%; }

@@ -1,0 +1,718 @@
+{
+  "generatedAt": "2026-09-15T02:53:59.478Z",
+  "stopped": false,
+  "entries": [
+    {
+      "familyKey": "iphone-18-pro",
+      "category": "iphone",
+      "rawFile": "iphone-18-pro.html",
+      "record": {
+        "requestUrl": "https://www.apple.com.cn/shop/buy-iphone/iphone-18-pro",
+        "method": "GET",
+        "startedAt": "2026-09-15T02:52:30.369Z",
+        "retries": 0,
+        "httpStatus": 200,
+        "headers": {
+          "content-type": "text/html;charset=utf-8",
+          "date": "Tue, 15 Sep 2026 02:52:32 GMT",
+          "cache-control": "public, max-age=120, s-maxage=120"
+        },
+        "bytes": 568215,
+        "sha256": "e60c82288a88a2040cd17d4111692ab5b952a6b30b060f3b0cc7fadf88eaab95",
+        "elapsedMs": 2831,
+        "finishedAt": "2026-09-15T02:52:33.200Z"
+      },
+      "parse": {
+        "supported": true,
+        "reason": null,
+        "pageTitle": "选购 iPhone 18 Pro 和 iPhone 18 Pro Max",
+        "dimensions": [
+          "dimensionScreensize",
+          "dimensionColor",
+          "dimensionCapacity"
+        ],
+        "productCount": 32,
+        "rejected": 0
+      }
+    },
+    {
+      "familyKey": "iphone-air",
+      "category": "iphone",
+      "rawFile": "iphone-air.html",
+      "record": {
+        "requestUrl": "https://www.apple.com.cn/shop/buy-iphone/iphone-air",
+        "method": "GET",
+        "startedAt": "2026-09-15T02:52:35.215Z",
+        "retries": 0,
+        "httpStatus": 200,
+        "headers": {
+          "content-type": "text/html;charset=utf-8",
+          "date": "Tue, 15 Sep 2026 02:52:36 GMT",
+          "cache-control": "public, max-age=120, s-maxage=120"
+        },
+        "bytes": 466390,
+        "sha256": "bb330703f065dfda02e5a47b7e78bcaf76821bfd767910f642568f7756a04d66",
+        "elapsedMs": 3037,
+        "finishedAt": "2026-09-15T02:52:38.252Z"
+      },
+      "parse": {
+        "supported": true,
+        "reason": null,
+        "pageTitle": "iPhone Air",
+        "dimensions": [
+          "dimensionColor",
+          "dimensionCapacity"
+        ],
+        "productCount": 12,
+        "rejected": 0
+      }
+    },
+    {
+      "familyKey": "iphone-duo",
+      "category": "iphone",
+      "rawFile": "iphone-duo.html",
+      "record": {
+        "requestUrl": "https://www.apple.com.cn/shop/buy-iphone/iphone-duo",
+        "method": "GET",
+        "startedAt": "2026-09-15T02:52:40.269Z",
+        "retries": 0,
+        "httpStatus": 200,
+        "headers": {
+          "content-type": "text/html;charset=utf-8",
+          "date": "Tue, 15 Sep 2026 02:52:40 GMT",
+          "cache-control": "public, max-age=107, s-maxage=120"
+        },
+        "bytes": 435839,
+        "sha256": "df0007132e3c29cf48fb9ac449bd2bc92b077a9c7c05bf1f32679db988e7a165",
+        "elapsedMs": 1492,
+        "finishedAt": "2026-09-15T02:52:41.761Z"
+      },
+      "parse": {
+        "supported": true,
+        "reason": null,
+        "pageTitle": "iPhone Duo",
+        "dimensions": [
+          "dimensionColor",
+          "dimensionCapacity"
+        ],
+        "productCount": 8,
+        "rejected": 0
+      }
+    },
+    {
+      "familyKey": "iphone-17",
+      "category": "iphone",
+      "rawFile": "iphone-17.html",
+      "record": {
+        "requestUrl": "https://www.apple.com.cn/shop/buy-iphone/iphone-17",
+        "method": "GET",
+        "startedAt": "2026-09-15T02:52:43.767Z",
+        "retries": 0,
+        "httpStatus": 200,
+        "headers": {
+          "content-type": "text/html;charset=utf-8",
+          "date": "Tue, 15 Sep 2026 02:52:43 GMT",
+          "cache-control": "public, max-age=71, s-maxage=71"
+        },
+        "bytes": 440634,
+        "sha256": "4b74c3d268cfaf6646f705255824e2c9acbea893689987bbc5e76ad02cd4b4f5",
+        "elapsedMs": 1245,
+        "finishedAt": "2026-09-15T02:52:45.012Z"
+      },
+      "parse": {
+        "supported": true,
+        "reason": null,
+        "pageTitle": "iPhone 17",
+        "dimensions": [
+          "dimensionColor",
+          "dimensionCapacity"
+        ],
+        "productCount": 10,
+        "rejected": 0
+      }
+    },
+    {
+      "familyKey": "iphone-17e",
+      "category": "iphone",
+      "rawFile": "iphone-17e.html",
+      "record": {
+        "requestUrl": "https://www.apple.com.cn/shop/buy-iphone/iphone-17e",
+        "method": "GET",
+        "startedAt": "2026-09-15T02:52:47.027Z",
+        "retries": 0,
+        "httpStatus": 200,
+        "headers": {
+          "content-type": "text/html;charset=utf-8",
+          "date": "Tue, 15 Sep 2026 02:52:47 GMT",
+          "cache-control": "public, max-age=120, s-maxage=120"
+        },
+        "bytes": 411383,
+        "sha256": "4cf8021ce092227592f98b7bb2b6421d08bd9b7e615e418d1c09c2d0e928e18a",
+        "elapsedMs": 1890,
+        "finishedAt": "2026-09-15T02:52:48.917Z"
+      },
+      "parse": {
+        "supported": true,
+        "reason": null,
+        "pageTitle": "iPhone 17e",
+        "dimensions": [
+          "dimensionColor",
+          "dimensionCapacity"
+        ],
+        "productCount": 6,
+        "rejected": 0
+      }
+    },
+    {
+      "familyKey": "iphone-16",
+      "category": "iphone",
+      "rawFile": "iphone-16.html",
+      "record": {
+        "requestUrl": "https://www.apple.com.cn/shop/buy-iphone/iphone-16",
+        "method": "GET",
+        "startedAt": "2026-09-15T02:52:50.934Z",
+        "retries": 0,
+        "httpStatus": 200,
+        "headers": {
+          "content-type": "text/html;charset=utf-8",
+          "date": "Tue, 15 Sep 2026 02:52:52 GMT",
+          "cache-control": "public, max-age=120, s-maxage=120"
+        },
+        "bytes": 418632,
+        "sha256": "3ffc2f87afd37b1b6c24d48f160180510fab09d2984730b172726d43d8d72509",
+        "elapsedMs": 2551,
+        "finishedAt": "2026-09-15T02:52:53.485Z"
+      },
+      "parse": {
+        "supported": true,
+        "reason": null,
+        "pageTitle": "iPhone 16",
+        "dimensions": [
+          "dimensionScreensize",
+          "dimensionColor",
+          "dimensionCapacity"
+        ],
+        "productCount": 5,
+        "rejected": 0
+      }
+    },
+    {
+      "familyKey": "ipad-pro",
+      "category": "ipad",
+      "rawFile": "ipad-pro.html",
+      "record": {
+        "requestUrl": "https://www.apple.com.cn/shop/buy-ipad/ipad-pro",
+        "method": "GET",
+        "startedAt": "2026-09-15T02:52:55.498Z",
+        "retries": 0,
+        "httpStatus": 200,
+        "headers": {
+          "content-type": "text/html;charset=utf-8",
+          "date": "Tue, 15 Sep 2026 02:52:56 GMT",
+          "cache-control": "public, max-age=120, s-maxage=120"
+        },
+        "bytes": 929523,
+        "sha256": "b01f4d197883167eeed4d7ddd917f04b8893bf9dec30adfb839b832b75061aef",
+        "elapsedMs": 1769,
+        "finishedAt": "2026-09-15T02:52:57.267Z"
+      },
+      "parse": {
+        "supported": true,
+        "reason": null,
+        "pageTitle": "iPad Pro",
+        "dimensions": [
+          "dimensionScreensize",
+          "dimensionColor",
+          "dimensionCapacity",
+          "dimensionFinish",
+          "dimensionConnection"
+        ],
+        "productCount": 48,
+        "rejected": 0
+      }
+    },
+    {
+      "familyKey": "ipad-air",
+      "category": "ipad",
+      "rawFile": "ipad-air.html",
+      "record": {
+        "requestUrl": "https://www.apple.com.cn/shop/buy-ipad/ipad-air",
+        "method": "GET",
+        "startedAt": "2026-09-15T02:52:59.275Z",
+        "retries": 0,
+        "httpStatus": 200,
+        "headers": {
+          "content-type": "text/html;charset=utf-8",
+          "date": "Tue, 15 Sep 2026 02:52:59 GMT",
+          "cache-control": "public, max-age=120, s-maxage=120"
+        },
+        "bytes": 1005622,
+        "sha256": "62d1b6d5af7e198cd7a3b322a3079277a60444ecd6603b3214314f22d6fa2f25",
+        "elapsedMs": 1865,
+        "finishedAt": "2026-09-15T02:53:01.140Z"
+      },
+      "parse": {
+        "supported": true,
+        "reason": null,
+        "pageTitle": "或折抵换购 iPad Air",
+        "dimensions": [
+          "dimensionScreensize",
+          "dimensionColor",
+          "dimensionCapacity",
+          "dimensionConnection"
+        ],
+        "productCount": 64,
+        "rejected": 0
+      }
+    },
+    {
+      "familyKey": "ipad",
+      "category": "ipad",
+      "rawFile": "ipad.html",
+      "record": {
+        "requestUrl": "https://www.apple.com.cn/shop/buy-ipad/ipad",
+        "method": "GET",
+        "startedAt": "2026-09-15T02:53:03.157Z",
+        "retries": 0,
+        "httpStatus": 200,
+        "headers": {
+          "content-type": "text/html;charset=utf-8",
+          "date": "Tue, 15 Sep 2026 02:53:03 GMT",
+          "cache-control": "public, max-age=120, s-maxage=120"
+        },
+        "bytes": 544150,
+        "sha256": "b7c49b9fac107bf0bec4dc617369d1e089d0ac0f199f6322cd317aabbae0416e",
+        "elapsedMs": 2438,
+        "finishedAt": "2026-09-15T02:53:05.595Z"
+      },
+      "parse": {
+        "supported": true,
+        "reason": null,
+        "pageTitle": "iPad",
+        "dimensions": [
+          "dimensionColor",
+          "dimensionCapacity",
+          "dimensionConnection"
+        ],
+        "productCount": 24,
+        "rejected": 0
+      }
+    },
+    {
+      "familyKey": "ipad-10-2",
+      "category": "ipad",
+      "rawFile": "ipad-10-2.html",
+      "record": {
+        "requestUrl": "https://www.apple.com.cn/shop/buy-ipad/ipad-10-2",
+        "method": "GET",
+        "startedAt": "2026-09-15T02:53:07.600Z",
+        "retries": 0,
+        "httpStatus": 301,
+        "headers": {
+          "date": "Tue, 15 Sep 2026 02:53:08 GMT",
+          "cache-control": "public, max-age=120, s-maxage=120",
+          "location": "https://www.apple.com.cn/ipad"
+        },
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "elapsedMs": 1106,
+        "finishedAt": "2026-09-15T02:53:08.706Z"
+      },
+      "parse": {
+        "supported": false,
+        "reason": "http_301"
+      }
+    },
+    {
+      "familyKey": "ipad-mini",
+      "category": "ipad",
+      "rawFile": "ipad-mini.html",
+      "record": {
+        "requestUrl": "https://www.apple.com.cn/shop/buy-ipad/ipad-mini",
+        "method": "GET",
+        "startedAt": "2026-09-15T02:53:10.722Z",
+        "retries": 0,
+        "httpStatus": 200,
+        "headers": {
+          "content-type": "text/html;charset=utf-8",
+          "date": "Tue, 15 Sep 2026 02:53:10 GMT",
+          "cache-control": "public, max-age=49, s-maxage=49"
+        },
+        "bytes": 525492,
+        "sha256": "1f38477c1a857c61af67fc71eaa903091fe81ebac6d7bfb9a4a77172f6665cdc",
+        "elapsedMs": 1201,
+        "finishedAt": "2026-09-15T02:53:11.923Z"
+      },
+      "parse": {
+        "supported": true,
+        "reason": null,
+        "pageTitle": "iPad mini",
+        "dimensions": [
+          "dimensionColor",
+          "dimensionCapacity",
+          "dimensionConnection"
+        ],
+        "productCount": 24,
+        "rejected": 0
+      }
+    },
+    {
+      "familyKey": "macbook-air",
+      "category": "mac",
+      "rawFile": "macbook-air.html",
+      "record": {
+        "requestUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-air",
+        "method": "GET",
+        "startedAt": "2026-09-15T02:53:13.932Z",
+        "retries": 0,
+        "httpStatus": 200,
+        "headers": {
+          "content-type": "text/html;charset=utf-8",
+          "date": "Tue, 15 Sep 2026 02:53:15 GMT",
+          "cache-control": "public, max-age=120, s-maxage=120"
+        },
+        "bytes": 329545,
+        "sha256": "9a4cb66e908843e0d725d2cbc0ce04abd1f73d55718f9a2e90e94299e6a5183b",
+        "elapsedMs": 2434,
+        "finishedAt": "2026-09-15T02:53:16.366Z"
+      },
+      "parse": {
+        "supported": false,
+        "reason": "only_component_parts",
+        "pageTitle": "MacBook Air",
+        "dimensions": [],
+        "productCount": 0,
+        "rejected": 12
+      }
+    },
+    {
+      "familyKey": "macbook-pro",
+      "category": "mac",
+      "rawFile": "macbook-pro.html",
+      "record": {
+        "requestUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro",
+        "method": "GET",
+        "startedAt": "2026-09-15T02:53:18.375Z",
+        "retries": 0,
+        "httpStatus": 200,
+        "headers": {
+          "content-type": "text/html;charset=utf-8",
+          "date": "Tue, 15 Sep 2026 02:53:18 GMT",
+          "cache-control": "public, max-age=120, s-maxage=120"
+        },
+        "bytes": 358874,
+        "sha256": "d7bcaae20c16694c2e9eb48361e714fd073d11ac65a9054a7e69daab83a527c8",
+        "elapsedMs": 1573,
+        "finishedAt": "2026-09-15T02:53:19.948Z"
+      },
+      "parse": {
+        "supported": false,
+        "reason": "only_component_parts",
+        "pageTitle": "MacBook Pro",
+        "dimensions": [],
+        "productCount": 0,
+        "rejected": 32
+      }
+    },
+    {
+      "familyKey": "macbook-neo",
+      "category": "mac",
+      "rawFile": "macbook-neo.html",
+      "record": {
+        "requestUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-neo",
+        "method": "GET",
+        "startedAt": "2026-09-15T02:53:21.956Z",
+        "retries": 0,
+        "httpStatus": 200,
+        "headers": {
+          "content-type": "text/html;charset=utf-8",
+          "date": "Tue, 15 Sep 2026 02:53:22 GMT",
+          "cache-control": "public, max-age=120, s-maxage=120"
+        },
+        "bytes": 279329,
+        "sha256": "62aafb28e90add5b90af462396aeffee9923d47c26b0e1071c050f0c4ec5e0bc",
+        "elapsedMs": 3213,
+        "finishedAt": "2026-09-15T02:53:25.169Z"
+      },
+      "parse": {
+        "supported": false,
+        "reason": "only_component_parts",
+        "pageTitle": "MacBook Neo",
+        "dimensions": [],
+        "productCount": 0,
+        "rejected": 8
+      }
+    },
+    {
+      "familyKey": "imac",
+      "category": "mac",
+      "rawFile": "imac.html",
+      "record": {
+        "requestUrl": "https://www.apple.com.cn/shop/buy-mac/imac",
+        "method": "GET",
+        "startedAt": "2026-09-15T02:53:27.183Z",
+        "retries": 0,
+        "httpStatus": 200,
+        "headers": {
+          "content-type": "text/html;charset=utf-8",
+          "date": "Tue, 15 Sep 2026 02:53:27 GMT",
+          "cache-control": "public, max-age=120, s-maxage=120"
+        },
+        "bytes": 328940,
+        "sha256": "4e9074b6489a870014821fb7c4091b4551fe75b09f4c5b411c6ead350a7fdf8d",
+        "elapsedMs": 1506,
+        "finishedAt": "2026-09-15T02:53:28.689Z"
+      },
+      "parse": {
+        "supported": false,
+        "reason": "only_component_parts",
+        "pageTitle": "iMac",
+        "dimensions": [],
+        "productCount": 0,
+        "rejected": 14
+      }
+    },
+    {
+      "familyKey": "mac-mini",
+      "category": "mac",
+      "rawFile": "mac-mini.html",
+      "record": {
+        "requestUrl": "https://www.apple.com.cn/shop/buy-mac/mac-mini",
+        "method": "GET",
+        "startedAt": "2026-09-15T02:53:30.698Z",
+        "retries": 0,
+        "httpStatus": 200,
+        "headers": {
+          "content-type": "text/html;charset=utf-8",
+          "date": "Tue, 15 Sep 2026 02:53:31 GMT",
+          "cache-control": "public, max-age=120, s-maxage=120"
+        },
+        "bytes": 319363,
+        "sha256": "c5e6d25ce71664f7a22ae6723ddc4bcf082a7b260e4f880ed1f1c6f752574161",
+        "elapsedMs": 1653,
+        "finishedAt": "2026-09-15T02:53:32.351Z"
+      },
+      "parse": {
+        "supported": false,
+        "reason": "only_component_parts",
+        "pageTitle": "Mac mini",
+        "dimensions": [],
+        "productCount": 0,
+        "rejected": 3
+      }
+    },
+    {
+      "familyKey": "mac-studio",
+      "category": "mac",
+      "rawFile": "mac-studio.html",
+      "record": {
+        "requestUrl": "https://www.apple.com.cn/shop/buy-mac/mac-studio",
+        "method": "GET",
+        "startedAt": "2026-09-15T02:53:34.354Z",
+        "retries": 0,
+        "httpStatus": 200,
+        "headers": {
+          "content-type": "text/html;charset=utf-8",
+          "date": "Tue, 15 Sep 2026 02:53:34 GMT",
+          "cache-control": "public, max-age=120, s-maxage=120"
+        },
+        "bytes": 316929,
+        "sha256": "d356408e33c666443d55922a8ff761d941154681fd34e95a56dd6e77655b5906",
+        "elapsedMs": 1355,
+        "finishedAt": "2026-09-15T02:53:35.709Z"
+      },
+      "parse": {
+        "supported": false,
+        "reason": "only_component_parts",
+        "pageTitle": "Mac Studio",
+        "dimensions": [],
+        "productCount": 0,
+        "rejected": 4
+      }
+    },
+    {
+      "familyKey": "airpods-pro-3",
+      "category": "airpods",
+      "rawFile": "airpods-pro-3.html",
+      "record": {
+        "requestUrl": "https://www.apple.com.cn/shop/buy-airpods/airpods-pro-3",
+        "method": "GET",
+        "startedAt": "2026-09-15T02:53:37.719Z",
+        "retries": 0,
+        "httpStatus": 200,
+        "headers": {
+          "content-type": "text/html;charset=utf-8",
+          "date": "Tue, 15 Sep 2026 02:53:38 GMT",
+          "cache-control": "public, max-age=120, s-maxage=120"
+        },
+        "bytes": 246930,
+        "sha256": "b14f222cbc2af80a0fb1e99951582a3a91c73c238cf9447ec0e45c10044ac53c",
+        "elapsedMs": 3003,
+        "finishedAt": "2026-09-15T02:53:40.722Z"
+      },
+      "parse": {
+        "supported": true,
+        "reason": null,
+        "pageTitle": "AirPods Pro 3",
+        "dimensions": [],
+        "productCount": 1,
+        "rejected": 0
+      }
+    },
+    {
+      "familyKey": "airpods-5",
+      "category": "airpods",
+      "rawFile": "airpods-5.html",
+      "record": {
+        "requestUrl": "https://www.apple.com.cn/shop/buy-airpods/airpods-5",
+        "method": "GET",
+        "startedAt": "2026-09-15T02:53:42.734Z",
+        "retries": 0,
+        "httpStatus": 200,
+        "headers": {
+          "content-type": "text/html;charset=utf-8",
+          "date": "Tue, 15 Sep 2026 02:53:43 GMT",
+          "cache-control": "public, max-age=120, s-maxage=120"
+        },
+        "bytes": 246661,
+        "sha256": "cdac29f2fbe8be8d305bc87ac01c6f32e837f7e38fcf1e1725710c7918f33144",
+        "elapsedMs": 1475,
+        "finishedAt": "2026-09-15T02:53:44.209Z"
+      },
+      "parse": {
+        "supported": true,
+        "reason": null,
+        "pageTitle": "AirPods 5",
+        "dimensions": [
+          "dimensionCharging"
+        ],
+        "productCount": 2,
+        "rejected": 0
+      }
+    },
+    {
+      "familyKey": "airpods-max-2",
+      "category": "airpods",
+      "rawFile": "airpods-max-2.html",
+      "record": {
+        "requestUrl": "https://www.apple.com.cn/shop/buy-airpods/airpods-max-2",
+        "method": "GET",
+        "startedAt": "2026-09-15T02:53:46.218Z",
+        "retries": 0,
+        "httpStatus": 200,
+        "headers": {
+          "content-type": "text/html;charset=utf-8",
+          "date": "Tue, 15 Sep 2026 02:53:46 GMT",
+          "cache-control": "public, max-age=120, s-maxage=120"
+        },
+        "bytes": 259284,
+        "sha256": "f4121f0e56668d115dadacd6e48f515457191b36e2367a5c100c0192ca5bdc76",
+        "elapsedMs": 1443,
+        "finishedAt": "2026-09-15T02:53:47.661Z"
+      },
+      "parse": {
+        "supported": true,
+        "reason": null,
+        "pageTitle": "AirPods Max 2",
+        "dimensions": [
+          "dimensionColor"
+        ],
+        "productCount": 5,
+        "rejected": 0
+      }
+    },
+    {
+      "familyKey": "apple-vision-pro",
+      "category": "vision",
+      "rawFile": "apple-vision-pro.html",
+      "record": {
+        "requestUrl": "https://www.apple.com.cn/shop/buy-vision/apple-vision-pro",
+        "method": "GET",
+        "startedAt": "2026-09-15T02:53:49.668Z",
+        "retries": 0,
+        "httpStatus": 200,
+        "headers": {
+          "content-type": "text/html;charset=utf-8",
+          "date": "Tue, 15 Sep 2026 02:53:51 GMT",
+          "cache-control": "public, max-age=120, s-maxage=120"
+        },
+        "bytes": 298116,
+        "sha256": "ed6c37c8b7daa468ede730d0151a8921988228de57ef12a7055662eee0d945ef",
+        "elapsedMs": 2962,
+        "finishedAt": "2026-09-15T02:53:52.630Z"
+      },
+      "parse": {
+        "supported": true,
+        "reason": null,
+        "pageTitle": "Apple Vision Pro",
+        "dimensions": [
+          "apple_vision_pro_2025-dimensionCapacity"
+        ],
+        "productCount": 3,
+        "rejected": 0
+      }
+    },
+    {
+      "familyKey": "homepod",
+      "category": "homepod",
+      "rawFile": "homepod.html",
+      "record": {
+        "requestUrl": "https://www.apple.com.cn/shop/buy-homepod/homepod",
+        "method": "GET",
+        "startedAt": "2026-09-15T02:53:54.639Z",
+        "retries": 0,
+        "httpStatus": 200,
+        "headers": {
+          "content-type": "text/html;charset=utf-8",
+          "date": "Tue, 15 Sep 2026 02:53:55 GMT",
+          "cache-control": "public, max-age=120, s-maxage=120"
+        },
+        "bytes": 215525,
+        "sha256": "a2f3929131f9f85c1187d08e64409f49d2745d1ccf78ba321cd79e66b5fc3465",
+        "elapsedMs": 1732,
+        "finishedAt": "2026-09-15T02:53:56.371Z"
+      },
+      "parse": {
+        "supported": true,
+        "reason": null,
+        "pageTitle": "HomePod",
+        "dimensions": [
+          "dimensionColor"
+        ],
+        "productCount": 2,
+        "rejected": 0
+      }
+    },
+    {
+      "familyKey": "homepod-mini",
+      "category": "homepod",
+      "rawFile": "homepod-mini.html",
+      "record": {
+        "requestUrl": "https://www.apple.com.cn/shop/buy-homepod/homepod-mini",
+        "method": "GET",
+        "startedAt": "2026-09-15T02:53:58.397Z",
+        "retries": 0,
+        "httpStatus": 200,
+        "headers": {
+          "content-type": "text/html;charset=utf-8",
+          "date": "Tue, 15 Sep 2026 02:53:58 GMT",
+          "cache-control": "public, max-age=120, s-maxage=120"
+        },
+        "bytes": 222925,
+        "sha256": "334768716068931ec44df6e14e3d5bade5141ecbfe846f2b98263a9f1c979a5d",
+        "elapsedMs": 1079,
+        "finishedAt": "2026-09-15T02:53:59.476Z"
+      },
+      "parse": {
+        "supported": true,
+        "reason": null,
+        "pageTitle": "HomePod mini",
+        "dimensions": [
+          "dimensionColor"
+        ],
+        "productCount": 5,
+        "rejected": 0
+      }
+    }
+  ]
+}

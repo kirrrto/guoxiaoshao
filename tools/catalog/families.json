@@ -1,0 +1,41 @@
+{
+  "note": "果小哨首版目录来源：苹果中国大陆官网购买页。include=false 的系列只记录原因，不进入可监测目录。发现日期 2026-09-15。",
+  "families": [
+    { "category": "iphone", "familyKey": "iphone-18-pro", "displayName": "iPhone 18 Pro / Pro Max", "url": "https://www.apple.com.cn/shop/buy-iphone/iphone-18-pro", "include": true },
+    { "category": "iphone", "familyKey": "iphone-air", "displayName": "iPhone Air", "url": "https://www.apple.com.cn/shop/buy-iphone/iphone-air", "include": true },
+    { "category": "iphone", "familyKey": "iphone-duo", "displayName": "iPhone Duo", "url": "https://www.apple.com.cn/shop/buy-iphone/iphone-duo", "include": true },
+    { "category": "iphone", "familyKey": "iphone-17", "displayName": "iPhone 17", "url": "https://www.apple.com.cn/shop/buy-iphone/iphone-17", "include": true },
+    { "category": "iphone", "familyKey": "iphone-17e", "displayName": "iPhone 17e", "url": "https://www.apple.com.cn/shop/buy-iphone/iphone-17e", "include": true },
+    { "category": "iphone", "familyKey": "iphone-16", "displayName": "iPhone 16", "url": "https://www.apple.com.cn/shop/buy-iphone/iphone-16", "include": true },
+
+    { "category": "ipad", "familyKey": "ipad-pro", "displayName": "iPad Pro", "url": "https://www.apple.com.cn/shop/buy-ipad/ipad-pro", "include": true },
+    { "category": "ipad", "familyKey": "ipad-air", "displayName": "iPad Air", "url": "https://www.apple.com.cn/shop/buy-ipad/ipad-air", "include": true },
+    { "category": "ipad", "familyKey": "ipad", "displayName": "iPad", "url": "https://www.apple.com.cn/shop/buy-ipad/ipad", "include": true },
+    { "category": "ipad", "familyKey": "ipad-10-2", "displayName": "iPad (10.2 英寸)", "url": "https://www.apple.com.cn/shop/buy-ipad/ipad-10-2", "include": true },
+    { "category": "ipad", "familyKey": "ipad-mini", "displayName": "iPad mini", "url": "https://www.apple.com.cn/shop/buy-ipad/ipad-mini", "include": true },
+
+    { "category": "mac", "familyKey": "macbook-air", "displayName": "MacBook Air", "url": "https://www.apple.com.cn/shop/buy-mac/macbook-air", "include": true },
+    { "category": "mac", "familyKey": "macbook-pro", "displayName": "MacBook Pro", "url": "https://www.apple.com.cn/shop/buy-mac/macbook-pro", "include": true },
+    { "category": "mac", "familyKey": "macbook-neo", "displayName": "MacBook Neo", "url": "https://www.apple.com.cn/shop/buy-mac/macbook-neo", "include": true },
+    { "category": "mac", "familyKey": "imac", "displayName": "iMac", "url": "https://www.apple.com.cn/shop/buy-mac/imac", "include": true },
+    { "category": "mac", "familyKey": "mac-mini", "displayName": "Mac mini", "url": "https://www.apple.com.cn/shop/buy-mac/mac-mini", "include": true },
+    { "category": "mac", "familyKey": "mac-studio", "displayName": "Mac Studio", "url": "https://www.apple.com.cn/shop/buy-mac/mac-studio", "include": true },
+    { "category": "mac", "familyKey": "studio-display", "displayName": "Studio Display", "url": "https://www.apple.com.cn/shop/buy-mac/studio-display", "include": false, "excludeReason": "显示器属于配件范围，首版不纳入" },
+    { "category": "mac", "familyKey": "studio-display-xdr", "displayName": "Pro Display XDR", "url": "https://www.apple.com.cn/shop/buy-mac/studio-display-xdr", "include": false, "excludeReason": "显示器属于配件范围，首版不纳入" },
+
+    { "category": "watch", "familyKey": "apple-watch", "displayName": "Apple Watch Series", "url": "https://www.apple.com.cn/shop/buy-watch/apple-watch", "include": false, "excludeReason": "购买页仅含表壳部件号(…CH/B)，零售 SKU 需按表壳+表带组合动态解析，首版暂不支持监测" },
+    { "category": "watch", "familyKey": "apple-watch-se", "displayName": "Apple Watch SE", "url": "https://www.apple.com.cn/shop/buy-watch/apple-watch-se", "include": false, "excludeReason": "同 Apple Watch Series：需组合 SKU 解析" },
+    { "category": "watch", "familyKey": "apple-watch-ultra", "displayName": "Apple Watch Ultra", "url": "https://www.apple.com.cn/shop/buy-watch/apple-watch-ultra", "include": false, "excludeReason": "同 Apple Watch Series：需组合 SKU 解析" },
+    { "category": "watch", "familyKey": "apple-watch-hermes", "displayName": "Apple Watch Hermès", "url": "https://www.apple.com.cn/shop/buy-watch/apple-watch-hermes", "include": false, "excludeReason": "特别版本，首版不纳入" },
+    { "category": "watch", "familyKey": "apple-watch-hermes-ultra", "displayName": "Apple Watch Hermès Ultra", "url": "https://www.apple.com.cn/shop/buy-watch/apple-watch-hermes-ultra", "include": false, "excludeReason": "特别版本，首版不纳入" },
+
+    { "category": "airpods", "familyKey": "airpods-pro-3", "displayName": "AirPods Pro 3", "url": "https://www.apple.com.cn/shop/buy-airpods/airpods-pro-3", "include": true },
+    { "category": "airpods", "familyKey": "airpods-5", "displayName": "AirPods 5", "url": "https://www.apple.com.cn/shop/buy-airpods/airpods-5", "include": true },
+    { "category": "airpods", "familyKey": "airpods-max-2", "displayName": "AirPods Max 2", "url": "https://www.apple.com.cn/shop/buy-airpods/airpods-max-2", "include": true },
+
+    { "category": "vision", "familyKey": "apple-vision-pro", "displayName": "Apple Vision Pro", "url": "https://www.apple.com.cn/shop/buy-vision/apple-vision-pro", "include": true },
+
+    { "category": "homepod", "familyKey": "homepod", "displayName": "HomePod", "url": "https://www.apple.com.cn/shop/buy-homepod/homepod", "include": true },
+    { "category": "homepod", "familyKey": "homepod-mini", "displayName": "HomePod mini", "url": "https://www.apple.com.cn/shop/buy-homepod/homepod-mini", "include": true }
+  ]
+}

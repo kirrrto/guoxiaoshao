@@ -1,0 +1,106 @@
+<view class="page tab-page query-page">
+  <view wx:if="{{loadError}}" class="card">
+    <view class="banner banner-bad">加载失败：{{loadError}}</view>
+    <button class="btn btn-outline btn-block" bindtap="onRetryLoad">重试</button>
+  </view>
+
+  <block wx:elif="{{!ready}}">
+    <view class="card"><view class="loading-line">正在连接云环境并加载目录…</view></view>
+  </block>
+
+  <block wx:else>
+    <view class="page-heading"><view class="page-title">门店取货查询</view><view class="page-subtitle">选择具体配置，查看苹果直营店最近的取货信息</view></view>
+    <view wx:if="{{announcement}}" class="banner banner-info">{{announcement}}</view>
+    <view wx:if="{{!accountReady}}" class="banner banner-info small">{{accountError || '正在连接微信账户，你可以先选择商品和门店。'}}<button wx:if="{{accountError}}" class="btn btn-outline btn-sm mt" bindtap="onRetryAccount">重试账户连接</button></view>
+    <view wx:if="{{boot && !boot.member && boot.balance < boot.queryCost}}" class="card onboarding"><view class="bold">先领取免费查询次数</view><view class="small text-2 mt">新用户从「我的」签到开始，再选择容量、颜色和门店。</view><button class="btn btn-primary btn-block mt" bindtap="onGoMine">去签到 / 查看次数</button></view>
+
+    <view class="card selection-card">
+      <view class="card-title">
+        <text>{{selectionExpanded ? '选择机型与门店' : '当前查询配置'}}</text>
+        <text class="sub">{{!accountReady ? '账户连接中' : (boot.member ? '会员 · 不限次数' : '余 ' + boot.balance + ' 次')}}</text>
+      </view>
+      <view wx:if="{{!selectionExpanded && selectionSummary}}" class="selection-summary">
+        <view class="selection-summary-product">
+          <view class="selection-summary-image-box"><image wx:if="{{selectionSummary.imageUrl && !selectionImageFailed}}" class="selection-summary-image" src="{{selectionSummary.imageUrl}}" mode="aspectFit" aria-label="{{selectionSummary.imageAlt}}" binderror="onSelectionImageError" /><view wx:else class="selection-summary-image-placeholder">商品</view></view>
+          <view class="selection-summary-copy"><view class="selection-summary-title">{{selectionSummary.title}}</view><view class="selection-summary-city">{{selectionSummary.cityLabel}}</view></view>
+          <button class="btn btn-outline btn-sm selection-summary-change" bindtap="onEditSelection">修改</button>
+        </view>
+        <view class="selection-summary-stores">{{selectionSummary.storeLabel}}</view>
+      </view>
+      <view class="selection-editor" style="display: {{selectionExpanded ? 'block' : 'none'}};" bindtouchstart="onSelectionInteraction">
+        <target-picker catalog="{{catalog}}" value="{{pickerValue}}" max-stores="{{boot ? boot.maxStores : 3}}" bindchange="onPickerChange" />
+        <button class="btn btn-ghost btn-block mt selection-done" disabled="{{!selectionCanCollapse}}" bindtap="onDoneSelection">完成选择 · 收起</button>
+      </view>
+      <view wx:if="{{restriction}}" class="banner banner-warn mt">{{restriction}}</view>
+      <button class="btn btn-primary btn-block mt {{querying ? 'disabled' : ''}}" disabled="{{querying || !accountReady}}" bindtap="onQuery">
+        {{!accountReady ? '正在连接账户…' : (querying ? '查询中…' : (boot.member ? '立即查询' : '立即查询（消耗 ' + boot.queryCost + ' 次）'))}}
+      </button>
+      <button class="btn btn-outline btn-block mt selection-follow-action" disabled="{{!accountReady || querying}}" bindtap="onFollowSelection"><image class="selection-whistle" src="/images/brand/whistle-green.png" mode="aspectFit" aria-hidden="true" /><text>关注此配置 · 小哨提醒</text></button>
+      <view wx:if="{{accountReady && !boot.member}}" class="small muted mt">受限新品开售 30 天内，免费用户暂不可实时查询；历史可查看昨天及更早记录。</view>
+      <view wx:if="{{accountReady}}" class="tiny muted selection-follow-note">可直接关注所选商品和门店，无需先查询。微信提醒需有效会员及订阅授权。</view>
+      <view wx:if="{{accountReady}}" class="footer-note">{{boot.member ? '会员查询不扣次数。' : '免费查询按次扣除；全部门店信息获取失败时，本次次数自动返还。'}}</view>
+    </view>
+
+    <view wx:if="{{result}}" id="query-result" class="card query-result-card">
+      <view class="result-target-note {{resultTargetDifferent ? 'result-target-different' : ''}}">{{resultTargetDifferent ? '与当前选择不同 · 下方保留原查询结果' : '对应当前所选配置与门店'}}</view>
+      <view class="card-title">
+        <text>{{result.product.title}}</text>
+        <text class="pill pill-muted">{{resultIsCache ? '本地缓存' : '查询快照'}}</text>
+      </view>
+      <view wx:if="{{result.product.imageUrl}}" class="result-image-wrap"><image class="result-image" src="{{result.product.imageUrl}}" mode="aspectFit" aria-label="{{result.product.imageAlt || result.product.title}}" binderror="onResultImageError" /></view>
+      <view class="small muted mb">查询时间 {{result.queriedText}} · {{result.product.partNumber}}</view>
+      <view wx:for="{{result.results}}" wx:key="storeNumber" class="list-item">
+        <view class="row-between">
+          <view>
+            <text class="bold">{{item.storeName}}</text>
+            <text class="small muted"> {{item.city}}</text>
+          </view>
+          <view class="pill pill-dot pill-{{item.statusCls}}">{{item.statusLabel}}</view>
+        </view>
+        <view class="small text-2 mt" wx:if="{{item.quote && item.observationState === 'fresh'}}">{{item.quote}}</view>
+        <view class="tiny muted mt">
+          观测 {{item.observedText}}
+          <text wx:if="{{item.sinceText}}"> · 距本轮首次记录 {{item.sinceText}}</text>
+          <text wx:if="{{item.status === 'unknown' && item.reason}}"> · {{item.reason}}</text>
+        </view>
+        <view wx:if="{{item.observationNote}}" class="tiny muted mt">{{item.observationNote}}</view>
+        <view wx:if="{{item.lastKnownText}}" class="tiny muted mt">{{item.lastKnownText}}</view>
+        <view wx:if="{{item.freshnessText}}" class="tiny mt {{item.observationState === 'fresh' ? 'muted' : 'stale-note'}}">{{item.freshnessText}}</view>
+        <view wx:if="{{item.events.length}}" class="row wrap gap mt">
+          <text wx:for="{{item.events}}" wx:for-item="ev" wx:key="type" class="pill pill-{{ev.cls}} tiny">{{ev.label}}</text>
+        </view>
+      </view>
+      <view class="btn-row">
+        <button class="btn btn-ghost btn-sm" bindtap="onAddFollow">加入关注</button>
+        <button class="btn btn-outline btn-sm {{querying ? 'disabled' : ''}}" disabled="{{querying || !accountReady}}" bindtap="onRequery">重查此结果的配置与门店</button>
+      </view>
+    </view>
+
+    <view wx:if="{{followTargets.length}}" class="card">
+      <view class="card-title">
+        <text>我的关注 · 最近观测</text>
+        <text class="sub">{{followRefreshedText ? '刷新于 ' + followRefreshedText : ''}}</text>
+      </view>
+      <view wx:if="{{followRefreshError}}" class="banner banner-warn small">刷新失败，以下保留上次观测。</view>
+      <view wx:for="{{followTargets}}" wx:key="key" class="row-between target-row">
+        <view class="target-text">
+          <text class="small bold">{{item.productTitle}}</text>
+          <view class="tiny muted">{{item.city ? item.city + ' · ' : ''}}{{item.storeName}}</view>
+          <view wx:if="{{item.observedText}}" class="tiny muted">{{item.observedText}}</view>
+          <view wx:if="{{item.lastKnownText}}" class="tiny muted">{{item.lastKnownText}}</view>
+          <view wx:if="{{item.freshnessText}}" class="tiny {{item.observationState === 'fresh' ? 'muted' : 'stale-note'}}">{{item.freshnessText}}</view>
+        </view>
+        <view class="pill pill-dot pill-{{item.statusCls}} tiny">{{item.statusLabel}}</view>
+      </view>
+      <view class="tiny muted mt">显示后台记录的观测时间。页面每 15 秒读取一次，读取列表不会产生新观测。</view>
+    </view>
+
+    <view class="card">
+      <view class="row-between">
+        <text class="small text-2">自动监测状态</text>
+        <view class="pill pill-dot pill-{{collector.cls}}">{{collector.label}}</view>
+      </view>
+      <view class="tiny muted mt">结果是标注时间的观测快照，库存可能随后变化。是否可取货请以苹果官网结算页面为准。</view>
+    </view>
+  </block>
+</view>

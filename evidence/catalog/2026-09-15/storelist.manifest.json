@@ -1,0 +1,19 @@
+{
+  "record": {
+    "requestUrl": "https://www.apple.com.cn/retail/storelist/",
+    "method": "GET",
+    "startedAt": "2026-09-15T02:43:25.096Z",
+    "retries": 0,
+    "httpStatus": 200,
+    "headers": {
+      "content-type": "text/html; charset=utf-8",
+      "date": "Tue, 15 Sep 2026 02:43:28 GMT",
+      "cache-control": "public, max-age=60"
+    },
+    "bytes": 518841,
+    "sha256": "7a51910bb135625d219550de509a66de32eff078f908135480042899769bf349",
+    "elapsedMs": 7329,
+    "finishedAt": "2026-09-15T02:43:32.425Z"
+  },
+  "parsedStores": 49
+}

@@ -1,0 +1,184 @@
+<view class="page tab-page mine-page">
+  <view wx:if="{{loadError}}" class="card">
+    <view class="banner banner-bad">加载失败：{{loadError}}</view>
+    <button class="btn btn-outline btn-block" bindtap="onRetryLoad">重试</button>
+  </view>
+
+  <block wx:elif="{{!ready}}">
+    <view class="card"><view class="loading-line">正在加载账户信息…</view></view>
+  </block>
+
+  <block wx:else>
+    <view wx:if="{{refreshError}}" class="banner banner-warn">{{refreshError}}</view>
+    <!-- 头部 -->
+    <view class="hero">
+      <image class="logo" src="/images/brand/logo-mint-144.png" mode="aspectFit" />
+      <view class="hero-text">
+        <view class="hero-name">果小哨</view>
+        <view class="hero-tagline">你的个人选购小助手</view>
+        <view class="hero-sub" bindtap="onCopyId">用户 {{boot.identity.openidMasked}} · 点击复制</view>
+      </view>
+      <text class="pill {{membership.active ? 'pill-ok' : 'pill-muted'}}">{{membership.active ? '会员' : (membership.expired ? '会员已到期' : '免费用户')}}</text>
+    </view>
+
+    <!-- 会员 -->
+    <view id="membership-card" class="card membership-card">
+      <view class="card-title">
+        <text>会员</text>
+        <text class="sub">{{boot.memberProduct.title}} · {{boot.priceText}}</text>
+      </view>
+      <block wx:if="{{membership.active}}">
+        <view class="row-between">
+          <text class="text-2">有效期至</text>
+          <text class="bold">{{membership.expiresText}}</text>
+        </view>
+        <view class="row-between mt">
+          <text class="text-2">剩余</text>
+          <text class="bold" style="color: var(--green-dark);">{{membership.daysLeft}} 天</text>
+        </view>
+        <view class="row-between mt">
+          <text class="text-2">关注中</text>
+        <text>{{boot.followCount}} / {{boot.limits.maxFollows}} 个具体配置</text>
+        </view>
+        <view class="tiny muted mt">续费按剩余天数顺延，不自动续费。</view>
+      </block>
+      <block wx:else>
+        <view wx:if="{{membership.expired}}" class="banner banner-warn small">会员已于 {{membership.expiresText}} 到期，自动监测和提醒已停止。保留关注配置与剩余查询次数。</view>
+        <view class="small text-2">会员可使用不扣次数的查询、历史与自动关注功能。补货提醒还需微信订阅授权。</view>
+      </block>
+      <view class="benefit-list mt"><view>免费：签到和体验任务获取次数，实时查询消耗 {{quota.queryCost}} 次，历史查询消耗 {{quota.historyCost}} 次。</view><view>会员：查询不扣次数，最多 {{boot.limits.maxFollows}} 个具体配置 × 每配置 {{boot.limits.maxStoresPerFollow}} 家门店。</view><view>不同容量或颜色分别占用名额。受限新品开售 30 天内，免费用户不能实时查询，仅能看昨天及更早历史。</view></view>
+      <view class="membership-entry-list">
+        <button class="member-entry redemption-entry" disabled="{{redeeming}}" bindtap="onOpenRedemption">{{redemptionOpen ? '收起兑换码窗口' : '兑换码开通'}}</button>
+        <button class="member-entry payment-entry" disabled="{{true}}">付费购买（暂未开放）</button>
+      </view>
+      <view wx:if="{{redemptionOpen}}" class="redemption-panel">
+        <view class="redemption-title">兑换会员</view>
+        <view class="redemption-description">输入你收到的兑换码，为当前微信账号开通会员。兑换权益与有效期以确认结果为准。</view>
+        <input class="redemption-input" type="text" value="{{redemptionCode}}" placeholder="请输入兑换码" placeholder-class="redemption-placeholder" maxlength="64" disabled="{{redeeming}}" confirm-type="done" adjust-position="{{true}}" cursor-spacing="24" bindinput="onRedemptionInput" bindconfirm="onRedeemCode" />
+        <button class="member-entry redemption-entry" disabled="{{redeeming || !redemptionCode}}" bindtap="onRedeemCode">{{redeeming ? '兑换中，请稍候…' : '确认兑换'}}</button>
+        <view class="redemption-hint">兑换成功后立即更新会员状态，同一账号重复提交不会重复增加会员时间。</view>
+        <view wx:if="{{redemptionError}}" class="redemption-message redemption-message-error">{{redemptionError}}</view>
+        <view wx:if="{{redemptionResult}}" class="redemption-message redemption-message-{{redemptionResult.kind}}"><view class="bold">{{redemptionResult.title}}</view><view class="mt">{{redemptionResult.detail}}</view></view>
+      </view>
+      <view class="row-between mt" bindtap="onToggleOrders">
+        <text class="small muted">会员记录</text>
+        <text class="small muted">{{showOrders ? '收起 ▴' : '展开 ▾'}}</text>
+      </view>
+      <block wx:if="{{showOrders}}">
+        <view wx:if="{{ordersLoading && !orders.length}}" class="loading-line">正在加载会员记录…</view>
+        <view wx:elif="{{ordersError}}" class="record-error"><text>{{ordersError}}</text><text class="retry-link" bindtap="onRetryOrders">重试</text></view>
+        <view wx:elif="{{!orders.length}}" class="empty small">暂无会员记录</view>
+        <view wx:for="{{orders}}" wx:key="orderId" class="row-between ledger-row">
+          <view>
+            <text class="small">{{item.days}} 天会员 · {{item.sourceLabel}}<text wx:if="{{item.amountText}}"> · {{item.amountText}}</text></text>
+            <view class="tiny muted">{{item.timeText}} · {{item.orderId}}</view>
+          </view>
+          <text class="pill pill-{{item.status === 'fulfilled' ? 'ok' : 'muted'}} tiny">{{item.statusLabel}}</text>
+        </view>
+      </block>
+    </view>
+
+    <!-- 次数 -->
+    <view class="card quota-card">
+      <view class="card-title">
+        <text>查询次数</text>
+        <text class="sub">今日已获 {{quota.grantedToday}}/{{quota.dailyGrantCap}} · 上限 {{quota.balanceCap}}</text>
+      </view>
+      <view class="row-between">
+        <view>
+          <text class="balance">{{quota.balance}}</text>
+          <text class="small muted"> 次可用</text>
+          <view class="tiny muted">{{membership.active ? '会员查询不扣次数，余额可在到期后使用' : '实时查询 ' + quota.queryCost + ' 次 / 历史查询 ' + quota.historyCost + ' 次'}}</view>
+        </view>
+        <button class="btn btn-primary btn-sm {{quota.signedInToday || signing ? 'disabled' : ''}}" disabled="{{quota.signedInToday || signing}}" bindtap="onSignin">
+          {{signing ? '签到中…' : (quota.signedInToday ? '今日已签到' : '每日签到')}}
+        </button>
+      </view>
+      <view wx:if="{{!membership.active && !quota.signedInToday && quota.balance < quota.queryCost}}" class="banner banner-ok small mt">第一次使用？先点「每日签到」领取查询次数，再到查询页选择配置和门店。</view>
+
+      <view class="section-label">每日体验任务</view>
+      <view wx:for="{{tasks}}" wx:key="id" class="row-between task">
+        <view>
+          <text class="small">{{item.title}}</text>
+          <text class="tiny muted"> +{{item.reward}} 次</text>
+        </view>
+        <text wx:if="{{item.done}}" class="pill pill-ok tiny">已完成</text>
+        <text wx:else class="small" style="color: var(--green-dark);" bindtap="onGoHistory">{{item.pendingLabel || '去完成'}} ›</text>
+      </view>
+
+      <view class="row-between mt" bindtap="onToggleLedger">
+        <text class="small muted">次数明细</text>
+        <text class="small muted">{{showLedger ? '收起 ▴' : '展开 ▾'}}</text>
+      </view>
+      <block wx:if="{{showLedger}}">
+        <view wx:if="{{!ledger.length}}" class="empty small">暂无记录</view>
+        <view wx:for="{{ledger}}" wx:key="id" class="row-between ledger-row">
+          <view>
+            <text class="small">{{item.label}}</text>
+            <view class="tiny muted">{{item.timeText}}</view>
+          </view>
+          <text class="bold {{item.delta > 0 ? 'plus' : 'minus'}}">{{item.deltaText}}</text>
+        </view>
+      </block>
+    </view>
+
+    <!-- 提醒设置 -->
+    <view id="reminder-settings" class="card">
+      <view class="card-title">
+        <view class="whistle-section-title"><image class="section-whistle" src="/images/brand/whistle-green.png" mode="aspectFit" aria-hidden="true" /><text>小哨提醒设置</text></view>
+        <view class="pill pill-dot pill-{{boot.collector.cls}} tiny">{{boot.collector.label}}</view>
+      </view>
+      <view class="field">
+        <text class="label">接收补货提醒</text>
+        <switch checked="{{settings.notifyEnabled}}" disabled="{{savingSettings}}" color="#00C375" bindchange="onNotifyToggle" />
+      </view>
+      <view class="field">
+        <text class="label">免打扰时段</text>
+        <switch checked="{{settings.dnd.enabled}}" disabled="{{savingSettings}}" color="#00C375" bindchange="onDndToggle" />
+      </view>
+      <block wx:if="{{settings.dnd.enabled}}">
+        <picker mode="time" value="{{dndStart}}" disabled="{{savingSettings}}" bindchange="onDndStart">
+          <view class="field"><text class="label">开始</text><view class="row"><text class="value">{{dndStart}}</text><text class="arrow">›</text></view></view>
+        </picker>
+        <picker mode="time" value="{{dndEnd}}" disabled="{{savingSettings}}" bindchange="onDndEnd">
+          <view class="field"><text class="label">结束</text><view class="row"><text class="value">{{dndEnd}}</text><text class="arrow">›</text></view></view>
+        </picker>
+      </block>
+      <view class="tiny muted mt">免打扰期间不推送订阅消息，监测与历史记录继续。开始和结束相同表示全天免打扰。</view>
+    </view>
+
+    <!-- 个人提醒记录；与共享库存历史分开管理 -->
+    <view class="card notification-card">
+      <view class="notification-heading">
+        <view class="notification-heading-copy"><view class="notification-heading-title whistle-section-title"><image class="section-whistle" src="/images/brand/whistle-green.png" mode="aspectFit" aria-hidden="true" /><text>小哨提醒记录</text></view><view class="tiny muted">{{notifications.length ? '已显示 ' + notifications.length + ' 条' : '你的个人提醒记录'}}</view></view>
+        <button wx:if="{{notifications.length}}" class="notification-button notification-clear" disabled="{{notificationActionBusy || notificationConfirming || !notificationsClearBefore}}" bindtap="onClearNotifications">{{notificationActionBusy === 'clear' ? '清空中…' : '清空'}}</button>
+      </view>
+      <view class="tiny muted notification-scope">清理个人提醒记录不会取消关注、撤回微信消息或删除库存历史。</view>
+      <view wx:if="{{notificationsLoading && !notifications.length}}" class="loading-line">正在加载提醒记录…</view>
+      <view wx:elif="{{notificationsLoading}}" class="loading-line">正在更新提醒记录…</view>
+      <view wx:if="{{notificationsError}}" class="record-error"><text>{{notificationsError}}</text><button class="notification-button notification-retry" disabled="{{notificationsLoading || notificationActionBusy || notificationConfirming}}" bindtap="onRetryNotifications">重试加载</button></view>
+      <view wx:if="{{notificationsActionError}}" class="record-error"><text>{{notificationsActionError}}</text><button class="notification-button notification-retry" disabled="{{notificationActionBusy || notificationConfirming}}" bindtap="onRetryNotificationAction">重试操作</button></view>
+      <view wx:if="{{!notificationsLoading && !notificationsError && !notificationsActionError && !notifications.length}}" class="empty small"><image class="record-empty-whistle" src="/images/brand/whistle-green.png" mode="aspectFit" aria-hidden="true" /><view>小哨还没有提醒记录</view></view>
+      <view wx:for="{{notifications}}" wx:key="id" class="notification-item">
+        <view class="notification-product">{{item.productTitle || item.partNumber}}</view>
+        <view class="notification-meta"><text class="pill pill-{{item.statusCls}} tiny">{{item.statusLabel}}</text><text class="tiny muted">{{item.timeText}}</text></view>
+        <view class="notification-detail">{{item.storeName || item.storeNumber}} · {{item.eventLabel}}</view>
+        <view wx:if="{{item.reasonText}}" class="notification-reason">{{item.reasonText}}</view>
+        <view class="notification-actions"><button wx:if="{{item.action}}" class="notification-button notification-retry" data-id="{{item.id}}" disabled="{{notificationActionBusy || notificationConfirming}}" bindtap="onNotificationAction">{{item.actionLabel}}</button><button class="notification-button notification-delete" data-id="{{item.id}}" disabled="{{notificationActionBusy || notificationConfirming}}" bindtap="onDeleteNotification">{{notificationDeletingId === item.id ? '删除中…' : '删除记录'}}</button></view>
+      </view>
+      <view wx:if="{{notificationsMoreError}}" class="record-error"><text>{{notificationsMoreError}}</text><button class="notification-button notification-retry" disabled="{{notificationsLoadingMore || notificationsLoading || notificationActionBusy || notificationConfirming}}" bindtap="onLoadMoreNotifications">重试加载</button></view>
+      <button wx:elif="{{notificationsHasMore}}" class="notification-button notification-more" disabled="{{notificationsLoadingMore || notificationsLoading || notificationActionBusy || notificationConfirming}}" bindtap="onLoadMoreNotifications">{{notificationsLoadingMore ? '正在加载…' : '加载更早提醒'}}</button>
+      <view wx:elif="{{notifications.length && notificationsPaginationKnown && !notificationsLoading && !notificationsError}}" class="tiny muted notification-end">已显示全部提醒记录</view>
+    </view>
+
+    <!-- 其他 -->
+    <view class="card">
+      <view class="action-row" bindtap="onHelp"><text class="action-label">使用说明</text><text class="action-arrow">›</text></view>
+      <view class="action-row" bindtap="onPrivacy"><text class="action-label">隐私说明</text><text class="action-arrow">›</text></view>
+      <view class="action-row" bindtap="onDisclaimer"><text class="action-label">免责声明</text><text class="action-arrow">›</text></view>
+      <button class="action-row feedback" open-type="feedback" hover-class="action-row-hover"><text class="action-label">意见反馈</text><text class="action-arrow">›</text></button>
+    </view>
+
+    <view class="footer-note">果小哨 · 为心仪好物留个哨</view>
+  </block>
+</view>

@@ -1,0 +1,32 @@
+<view class="picker">
+  <view class="picker-section-heading"><text class="picker-step">01</text><text>产品配置</text></view>
+  <block wx:if="{{categories.length}}">
+  <view class="section-label">产品类别</view>
+  <scroll-view scroll-x class="scroll-tabs" enhanced show-scrollbar="{{false}}"><view wx:for="{{categories}}" wx:key="key" class="tab {{index === categoryIndex ? 'on' : ''}}" data-index="{{index}}" bindtap="onCategoryTap">{{item.name}}</view></scroll-view>
+  <picker mode="selector" range="{{familyNames}}" value="{{familyIndex}}" bindchange="onFamilyChange"><view class="field"><text class="label">系列</text><text class="value">{{families[familyIndex].name || '请选择'}} ›</text></view></picker>
+  <picker mode="selector" range="{{models}}" value="{{modelIndex}}" bindchange="onModelChange"><view class="field"><text class="label">型号</text><text class="value">{{models[modelIndex] || '请选择'}} ›</text></view></picker>
+  <picker wx:if="{{capacities.length && (capacities.length > 1 || capacities[0] !== '标准配置')}}" mode="selector" range="{{capacities}}" value="{{capacityIndex}}" bindchange="onCapacityChange"><view class="field"><text class="label">容量</text><text class="value">{{capacities[capacityIndex]}} ›</text></view></picker>
+  <block wx:if="{{colors.length && (colors.length > 1 || colors[0] !== '标准外观')}}"><view class="section-label">颜色</view><view class="chips"><view wx:for="{{colors}}" wx:key="*this" class="chip {{index === colorIndex ? 'on' : ''}}" data-index="{{index}}" bindtap="onColorTap">{{item}}</view></view></block>
+  <picker wx:if="{{candidates.length > 1}}" mode="selector" range="{{productTitles}}" value="{{productIndex}}" bindchange="onProductChange"><view class="field"><text class="label">具体配置</text><text class="value">{{product.title}} ›</text></view></picker>
+  <view wx:if="{{product}}" class="product-preview mt"><view class="product-image-box"><image wx:if="{{product.imageUrl && !imageFailed}}" class="product-image" src="{{product.imageUrl}}" mode="aspectFit" aria-label="{{product.imageAlt}}" binderror="onImageError" /><view wx:else class="image-placeholder">暂无图片</view></view><view class="product-copy"><view class="bold">{{product.title}}</view><view class="tiny muted mono mt">{{product.partNumber}}</view><view wx:if="{{product.priceCny}}" class="small muted">官网参考价 ¥{{product.priceCny}}</view></view></view>
+  <view wx:if="{{product && !product.supported}}" class="banner banner-warn small mt">此配置的取货接口尚未通过验证，暂不开放查询和关注。</view>
+  </block>
+  <view wx:if="{{selectionNote}}" class="banner banner-info small mt">{{selectionNote}}</view>
+  <view class="picker-section-heading picker-store-heading"><text class="picker-step">02</text><text>选择门店{{storesOptional ? '（可选）' : ''}}</text><text class="picker-count">{{selectedStores.length}} / {{maxStores}}</text></view>
+  <view class="store-search"><view class="search-glass" aria-hidden="true"></view><input class="search-input" value="{{searchKeyword}}" maxlength="60" placeholder="搜索城市、门店或省份" placeholder-class="search-placeholder" confirm-type="search" bindinput="onSearchInput" /><view wx:if="{{searchKeyword}}" class="search-clear" bindtap="onClearSearch" role="button" aria-label="清空搜索">清空</view></view>
+  <view class="search-hint">支持城市拼音和首字母，如 guangzhou、gz</view>
+  <block wx:if="{{searchActive}}">
+    <view class="search-summary">找到 {{searchResults.length}} 家门店 · 可跨城市选择</view>
+    <scroll-view wx:if="{{searchResults.length}}" class="search-results results-{{searchResults.length}}" scroll-y enhanced show-scrollbar="{{true}}">
+      <view wx:for="{{searchResults}}" wx:key="storeNumber" class="store-result {{item.on ? 'chosen' : ''}}" data-store="{{item.storeNumber}}" bindtap="onStoreTap" role="button" aria-label="{{item.city + ' ' + item.name + (item.on ? '，已选，点击移除' : '，点击选择')}}">
+        <view class="store-result-copy"><view class="store-result-name">{{item.name}}</view><view class="store-result-city">{{item.province === item.city ? item.city : item.province + ' · ' + item.city}}</view></view><view class="store-result-action">{{item.on ? '已选' : '选择'}}</view>
+      </view>
+    </scroll-view>
+    <view wx:else class="search-empty">没有找到相关直营店，试试城市名称或其他关键词。</view>
+  </block>
+  <block wx:else>
+    <picker mode="selector" range="{{cities}}" value="{{cityIndex}}" bindchange="onCityChange"><view class="field"><text class="label">城市</text><text class="value">{{cities[cityIndex] || '暂无门店'}} ›</text></view></picker>
+    <view class="chips mt"><view wx:for="{{cityStores}}" wx:key="storeNumber" class="chip {{item.on ? 'on' : ''}}" data-store="{{item.storeNumber}}" bindtap="onStoreTap">{{item.name}}</view></view>
+  </block>
+  <view wx:if="{{selectedStores.length}}" class="selected mt"><view class="tiny muted">已选门店（点击移除）</view><view class="chips mt"><view wx:for="{{selectedStores}}" wx:key="storeNumber" class="chip on" data-store="{{item.storeNumber}}" bindtap="onRemoveStore">{{item.city}} · {{item.name}} ×</view></view></view>
+</view>

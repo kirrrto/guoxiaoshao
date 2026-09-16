@@ -1,0 +1,420 @@
+{
+  "checkedAt": "2026-09-16T08:46:03.520846+00:00",
+  "release": "1.1.2",
+  "scope": "Read-only audit of downloaded deployed function archives and rollback backups; does not invoke functions or prove message delivery.",
+  "backups": [
+    {
+      "function": "gxs_api",
+      "archive": "C:\\Users\\Administrator\\Documents\\ChatGPT\\果小哨\\cloud-backup-before-1.1.2\\gxs_api.zip",
+      "sha256": "ff1c5d3203145234459d8c46e814ab135869609f6fb0de89810e18b4555e4b9f",
+      "bytes": 7494443,
+      "version": "1.1.1",
+      "sdkVersion": "4.0.2",
+      "sdkDependency": "4.0.2",
+      "lockVersion": "1.1.1",
+      "lockRootVersion": "1.1.1",
+      "crcVerified": true,
+      "duplicateFileNames": false
+    },
+    {
+      "function": "cloudbase_auth",
+      "archive": "C:\\Users\\Administrator\\Documents\\ChatGPT\\果小哨\\cloud-backup-before-1.1.2\\cloudbase_auth.zip",
+      "sha256": "7ed547597a748360c1ebdad16f768fb4303368e192fafdad93c04b295b9226d6",
+      "bytes": 7364288,
+      "version": "1.1.1",
+      "sdkVersion": "4.0.2",
+      "sdkDependency": "4.0.2",
+      "lockVersion": "1.1.1",
+      "lockRootVersion": "1.1.1",
+      "crcVerified": true,
+      "duplicateFileNames": false
+    },
+    {
+      "function": "gxs_monitor",
+      "archive": "C:\\Users\\Administrator\\Documents\\ChatGPT\\果小哨\\cloud-backup-before-1.1.2\\gxs_monitor.zip",
+      "sha256": "37454ead3b4489a880ad996c49e41b48d644e2353669bff01709c198ddaf1d7c",
+      "bytes": 7436803,
+      "version": "1.1.1",
+      "sdkVersion": "4.0.2",
+      "sdkDependency": "4.0.2",
+      "lockVersion": "1.1.1",
+      "lockRootVersion": "1.1.1",
+      "crcVerified": true,
+      "duplicateFileNames": false
+    }
+  ],
+  "deployed": [
+    {
+      "function": "gxs_api",
+      "archive": "C:\\Users\\Administrator\\Documents\\ChatGPT\\果小哨\\cloud-deployed-1.1.2\\gxs_api.zip",
+      "sha256": "543bf4d6287a3698ad3b18bb65cbe85c3bed3679d72d63b7415e07444bf177c3",
+      "bytes": 7494740,
+      "version": "1.1.2",
+      "sdkVersion": "4.0.2",
+      "sdkDependency": "4.0.2",
+      "lockVersion": "1.1.2",
+      "lockRootVersion": "1.1.2",
+      "crcVerified": true,
+      "duplicateFileNames": false,
+      "sourceFilesMatched": 39,
+      "sourceFiles": [
+        {
+          "path": "catalog/manifest.json",
+          "sha256": "be537fdc4d8eacff2f3a4e65440567e846d642400cbedf214eccfd42ad5bb37d"
+        },
+        {
+          "path": "catalog/products.json",
+          "sha256": "0273e07bd8767bb824488499fb2f51b471555d7998f7ed82422e9664e2b0d8fd"
+        },
+        {
+          "path": "catalog/stores.json",
+          "sha256": "ff62ad48138c04eac7fd6f4ad93895bacc260e0f87b881cc433a0501a6b2d5c6"
+        },
+        {
+          "path": "index.js",
+          "sha256": "8676eb83b1eff8e59ab14cde5834e3eb36ab9b42de5f3eb6c83e16f199974f84"
+        },
+        {
+          "path": "lib/app.js",
+          "sha256": "454cb356acf86837eef00b5da1467cb0ed11d45f9850b920f1fe63983b58a3eb"
+        },
+        {
+          "path": "lib/apple-pickup.js",
+          "sha256": "dbd35fb494a68c82358c3c3a4f4e7e0de141e162d061c5e7f31b29c539a0cfed"
+        },
+        {
+          "path": "lib/collections.js",
+          "sha256": "a0e93d291c7648621244acd429767e7ee2bcc9e2c1fa858cbcff4c667b42d232"
+        },
+        {
+          "path": "lib/config.js",
+          "sha256": "9e597d514ce580b80508deb184a3992d0838b2ac50671448f86fe1c765e9ae4c"
+        },
+        {
+          "path": "lib/connection.js",
+          "sha256": "8099a99c0454283891b5ca93e14c59e58f0b524d7a59d9543accf765fc57e694"
+        },
+        {
+          "path": "lib/engine/collector.js",
+          "sha256": "cb4ecef3656365ee192131e39b3251a3a53102c6313f202f732a028b1be873ae"
+        },
+        {
+          "path": "lib/engine/events.js",
+          "sha256": "23900314b4a89344a2b97beef4e8aa65c16dce4885e7342472bdca954ed63884"
+        },
+        {
+          "path": "lib/engine/lease.js",
+          "sha256": "863379f4ac898ae6da4f15a21bd88097877edb1f8624faf120875034affa0e63"
+        },
+        {
+          "path": "lib/engine/notifier.js",
+          "sha256": "6d94a43fca715655b95ef7353b55128a787913d769a4eb0a22dbe908560a2510"
+        },
+        {
+          "path": "lib/engine/scheduled.js",
+          "sha256": "8aa2056e7f67248280910055c91750c7050fad057804c6f3fca2b36af98b07cc"
+        },
+        {
+          "path": "lib/engine/scheduler.js",
+          "sha256": "246fcc8177339bf5c98d7a669bea50b5eafb7c979eee04c0d384685dfe81f2e7"
+        },
+        {
+          "path": "lib/engine/wechat-sender.js",
+          "sha256": "fab6b633d4dc96b72e36c5f780faa6e7f457e9245dcfae9dfc8e9b6320c42f60"
+        },
+        {
+          "path": "lib/errors.js",
+          "sha256": "0eaacc48b4a991e598048cb529202e9eed770d17bea46ffee2241aaf5661a8b3"
+        },
+        {
+          "path": "lib/identity.js",
+          "sha256": "da5cfe7f13114c9ddb00dbaf7198b1b4e13d3359561e278adbb18759eab40f68"
+        },
+        {
+          "path": "lib/member-redemption.js",
+          "sha256": "3ca9db45e505fd7c1bcb0229c4eacca6f689c7a676ba23add877aaefb5d360f2"
+        },
+        {
+          "path": "lib/monitor-readiness.js",
+          "sha256": "6bce472c2a716491e9e2809a796a1fcafabc5a1a1157ed3293b07a27e8d42ffd"
+        },
+        {
+          "path": "lib/notification-view.js",
+          "sha256": "d5745dcd17f16dc9dd10fb9b08d2e5eabd1eb75da0480a0358a3ef1755a575d6"
+        },
+        {
+          "path": "lib/repo/atomic-ops.js",
+          "sha256": "c5fe4b7407aade294b6f947e7fc5cf3dbff8a8ecff0109ef6bfd940429c3d574"
+        },
+        {
+          "path": "lib/repo/cloudbase-repo.js",
+          "sha256": "ac26d3c4ef6e00ebc34d32eab6c7443af8f2f83dc2463331c69be1b925bc18fa"
+        },
+        {
+          "path": "lib/rules/access.js",
+          "sha256": "fe8e23d3b3413526fcdf5a3f7d2e1308c09f6e30a2840a30071d078e199c4388"
+        },
+        {
+          "path": "lib/rules/membership.js",
+          "sha256": "028365284f8093a7a36ad5f798534edc0695fcc4ee85a1cb89381b28963b987c"
+        },
+        {
+          "path": "lib/rules/new-product.js",
+          "sha256": "a5b57d59e52ba1190a4e97ce19903d680f83b8ede1ec7088bcc5bdd840cc490a"
+        },
+        {
+          "path": "lib/rules/quota.js",
+          "sha256": "3d959021c4a34b5d0cd0326a7f696d56cfb0c8e99e6536c05985f2d2fe80c9d3"
+        },
+        {
+          "path": "lib/services/admin.js",
+          "sha256": "2a47985caa0c62bd5712701cb46bd08167431e48b407a55547d33671c107dd47"
+        },
+        {
+          "path": "lib/services/catalog.js",
+          "sha256": "6550811e2e0aca2c96c4fb3621b9412190c6f28e02a1b97ca6942beb642c2072"
+        },
+        {
+          "path": "lib/services/follows.js",
+          "sha256": "0f7421c5a649af1d21a7288411225e8dde3d1486c80f754e787326b8f1a9fabd"
+        },
+        {
+          "path": "lib/services/history.js",
+          "sha256": "c6f116699ad4a827e7dd925fc51b59cbf4e4da54b7e758c23a2f99359c397208"
+        },
+        {
+          "path": "lib/services/member.js",
+          "sha256": "34ebb64d2bb5dac390fb0c9640753c48ef9e94552086f2a41ba6b1db22b4beb5"
+        },
+        {
+          "path": "lib/services/notify.js",
+          "sha256": "2efef9cdab0ce6319046082f9848e9825f5c675fed87706a7865b3a6dd2c0fab"
+        },
+        {
+          "path": "lib/services/query.js",
+          "sha256": "9264e1a401da0d8078b7d334e1869abc84c83e4c05939c50b2ffee8f82a4d961"
+        },
+        {
+          "path": "lib/services/quota.js",
+          "sha256": "da67ea623ed668b8577f1d094f2194af7ad1771ab98f98a1faa966451b6136a9"
+        },
+        {
+          "path": "lib/services/users.js",
+          "sha256": "0b14dfd4f2cfb7d3964b4267d180d2d6c5a8fad52db09781aca51dc16570ba6c"
+        },
+        {
+          "path": "lib/time.js",
+          "sha256": "6b0e76b43a671ced5f5c68f4826f97c13d53de9078c5c5ab7882721e2c6d9d3f"
+        },
+        {
+          "path": "package-lock.json",
+          "sha256": "ec863ecf487bd66e8409ec9f7b4b90e8736ca63a2ca95215eb02a3771ebf8ee2"
+        },
+        {
+          "path": "package.json",
+          "sha256": "3571e0f933922a5611c0257f616580dafcaf05a9d40574ef480e8c1dea080b54"
+        }
+      ],
+      "unexpectedSourceFiles": []
+    },
+    {
+      "function": "cloudbase_auth",
+      "archive": "C:\\Users\\Administrator\\Documents\\ChatGPT\\果小哨\\cloud-deployed-1.1.2\\cloudbase_auth.zip",
+      "sha256": "64cf7a05b4ee51b761fdad281f741b75ebb9844318e933493421a2ef9c7e3d4a",
+      "bytes": 7364293,
+      "version": "1.1.2",
+      "sdkVersion": "4.0.2",
+      "sdkDependency": "4.0.2",
+      "lockVersion": "1.1.2",
+      "lockRootVersion": "1.1.2",
+      "crcVerified": true,
+      "duplicateFileNames": false,
+      "sourceFilesMatched": 4,
+      "sourceFiles": [
+        {
+          "path": "authorize.js",
+          "sha256": "7bc9a3d5c860c6791cad8e712dc9b6d080afc477f71f8c890784190215a45357"
+        },
+        {
+          "path": "index.js",
+          "sha256": "911fcdd3c6175398e6a36c5c4dc2cd25e670383bb3b7dfa336ddbdbeb8010e63"
+        },
+        {
+          "path": "package-lock.json",
+          "sha256": "cd67287e9d9fa9a4dbb79bedb1962bca92758ff0b07696dfef4d4fdb4997f3c5"
+        },
+        {
+          "path": "package.json",
+          "sha256": "c120ccbe93c007748212def88bcfbf0064d439c81ebd8a9b186c3eb3527ea454"
+        }
+      ],
+      "unexpectedSourceFiles": []
+    },
+    {
+      "function": "gxs_monitor",
+      "archive": "C:\\Users\\Administrator\\Documents\\ChatGPT\\果小哨\\cloud-deployed-1.1.2\\gxs_monitor.zip",
+      "sha256": "2c40508f4abe082f1e789635e84c19525ceba7998042d1832abe955b09ff575c",
+      "bytes": 7437045,
+      "version": "1.1.2",
+      "sdkVersion": "4.0.2",
+      "sdkDependency": "4.0.2",
+      "lockVersion": "1.1.2",
+      "lockRootVersion": "1.1.2",
+      "crcVerified": true,
+      "duplicateFileNames": false,
+      "sourceFilesMatched": 37,
+      "sourceFiles": [
+        {
+          "path": "config.json",
+          "sha256": "e88863f42739b0272a7f60f6c8c92a21491c1b79a155b8a8b4c4111bb4e08bab"
+        },
+        {
+          "path": "index.js",
+          "sha256": "1ea2597bd65f7f7ef6b472a1cc414d32bfb458ce965040834c9db241cfd0c950"
+        },
+        {
+          "path": "lib/app.js",
+          "sha256": "454cb356acf86837eef00b5da1467cb0ed11d45f9850b920f1fe63983b58a3eb"
+        },
+        {
+          "path": "lib/apple-pickup.js",
+          "sha256": "dbd35fb494a68c82358c3c3a4f4e7e0de141e162d061c5e7f31b29c539a0cfed"
+        },
+        {
+          "path": "lib/collections.js",
+          "sha256": "a0e93d291c7648621244acd429767e7ee2bcc9e2c1fa858cbcff4c667b42d232"
+        },
+        {
+          "path": "lib/config.js",
+          "sha256": "9e597d514ce580b80508deb184a3992d0838b2ac50671448f86fe1c765e9ae4c"
+        },
+        {
+          "path": "lib/connection.js",
+          "sha256": "8099a99c0454283891b5ca93e14c59e58f0b524d7a59d9543accf765fc57e694"
+        },
+        {
+          "path": "lib/engine/collector.js",
+          "sha256": "cb4ecef3656365ee192131e39b3251a3a53102c6313f202f732a028b1be873ae"
+        },
+        {
+          "path": "lib/engine/events.js",
+          "sha256": "23900314b4a89344a2b97beef4e8aa65c16dce4885e7342472bdca954ed63884"
+        },
+        {
+          "path": "lib/engine/lease.js",
+          "sha256": "863379f4ac898ae6da4f15a21bd88097877edb1f8624faf120875034affa0e63"
+        },
+        {
+          "path": "lib/engine/notifier.js",
+          "sha256": "6d94a43fca715655b95ef7353b55128a787913d769a4eb0a22dbe908560a2510"
+        },
+        {
+          "path": "lib/engine/scheduled.js",
+          "sha256": "8aa2056e7f67248280910055c91750c7050fad057804c6f3fca2b36af98b07cc"
+        },
+        {
+          "path": "lib/engine/scheduler.js",
+          "sha256": "246fcc8177339bf5c98d7a669bea50b5eafb7c979eee04c0d384685dfe81f2e7"
+        },
+        {
+          "path": "lib/engine/wechat-sender.js",
+          "sha256": "fab6b633d4dc96b72e36c5f780faa6e7f457e9245dcfae9dfc8e9b6320c42f60"
+        },
+        {
+          "path": "lib/errors.js",
+          "sha256": "0eaacc48b4a991e598048cb529202e9eed770d17bea46ffee2241aaf5661a8b3"
+        },
+        {
+          "path": "lib/identity.js",
+          "sha256": "da5cfe7f13114c9ddb00dbaf7198b1b4e13d3359561e278adbb18759eab40f68"
+        },
+        {
+          "path": "lib/member-redemption.js",
+          "sha256": "3ca9db45e505fd7c1bcb0229c4eacca6f689c7a676ba23add877aaefb5d360f2"
+        },
+        {
+          "path": "lib/monitor-readiness.js",
+          "sha256": "6bce472c2a716491e9e2809a796a1fcafabc5a1a1157ed3293b07a27e8d42ffd"
+        },
+        {
+          "path": "lib/notification-view.js",
+          "sha256": "d5745dcd17f16dc9dd10fb9b08d2e5eabd1eb75da0480a0358a3ef1755a575d6"
+        },
+        {
+          "path": "lib/repo/atomic-ops.js",
+          "sha256": "c5fe4b7407aade294b6f947e7fc5cf3dbff8a8ecff0109ef6bfd940429c3d574"
+        },
+        {
+          "path": "lib/repo/cloudbase-repo.js",
+          "sha256": "ac26d3c4ef6e00ebc34d32eab6c7443af8f2f83dc2463331c69be1b925bc18fa"
+        },
+        {
+          "path": "lib/rules/access.js",
+          "sha256": "fe8e23d3b3413526fcdf5a3f7d2e1308c09f6e30a2840a30071d078e199c4388"
+        },
+        {
+          "path": "lib/rules/membership.js",
+          "sha256": "028365284f8093a7a36ad5f798534edc0695fcc4ee85a1cb89381b28963b987c"
+        },
+        {
+          "path": "lib/rules/new-product.js",
+          "sha256": "a5b57d59e52ba1190a4e97ce19903d680f83b8ede1ec7088bcc5bdd840cc490a"
+        },
+        {
+          "path": "lib/rules/quota.js",
+          "sha256": "3d959021c4a34b5d0cd0326a7f696d56cfb0c8e99e6536c05985f2d2fe80c9d3"
+        },
+        {
+          "path": "lib/services/admin.js",
+          "sha256": "2a47985caa0c62bd5712701cb46bd08167431e48b407a55547d33671c107dd47"
+        },
+        {
+          "path": "lib/services/catalog.js",
+          "sha256": "6550811e2e0aca2c96c4fb3621b9412190c6f28e02a1b97ca6942beb642c2072"
+        },
+        {
+          "path": "lib/services/follows.js",
+          "sha256": "0f7421c5a649af1d21a7288411225e8dde3d1486c80f754e787326b8f1a9fabd"
+        },
+        {
+          "path": "lib/services/history.js",
+          "sha256": "c6f116699ad4a827e7dd925fc51b59cbf4e4da54b7e758c23a2f99359c397208"
+        },
+        {
+          "path": "lib/services/member.js",
+          "sha256": "34ebb64d2bb5dac390fb0c9640753c48ef9e94552086f2a41ba6b1db22b4beb5"
+        },
+        {
+          "path": "lib/services/notify.js",
+          "sha256": "2efef9cdab0ce6319046082f9848e9825f5c675fed87706a7865b3a6dd2c0fab"
+        },
+        {
+          "path": "lib/services/query.js",
+          "sha256": "9264e1a401da0d8078b7d334e1869abc84c83e4c05939c50b2ffee8f82a4d961"
+        },
+        {
+          "path": "lib/services/quota.js",
+          "sha256": "da67ea623ed668b8577f1d094f2194af7ad1771ab98f98a1faa966451b6136a9"
+        },
+        {
+          "path": "lib/services/users.js",
+          "sha256": "0b14dfd4f2cfb7d3964b4267d180d2d6c5a8fad52db09781aca51dc16570ba6c"
+        },
+        {
+          "path": "lib/time.js",
+          "sha256": "6b0e76b43a671ced5f5c68f4826f97c13d53de9078c5c5ab7882721e2c6d9d3f"
+        },
+        {
+          "path": "package-lock.json",
+          "sha256": "4f858c93f7723d74d781bbe9e42f23197d41c14f406a3a2c9897dac4e2af8f01"
+        },
+        {
+          "path": "package.json",
+          "sha256": "1585f2e7356ab05289c758d559f0cf3ab9de60fdebdf183c8695d46f54f95d4a"
+        }
+      ],
+      "unexpectedSourceFiles": []
+    }
+  ],
+  "success": true
+}

@@ -1,0 +1,10 @@
+<view wx:if="{{!keyboardHidden}}" class="floating-tab-shell">
+  <view class="floating-tab-glass" aria-role="navigation" aria-label="主导航">
+    <view class="floating-tab-edge floating-tab-edge-left" aria-hidden="true"></view>
+    <view class="floating-tab-edge floating-tab-edge-right" aria-hidden="true"></view>
+    <button wx:for="{{tabs}}" wx:key="pagePath" class="floating-tab-item {{selected === index ? 'is-selected' : ''}}" data-index="{{index}}" bindtap="onTabTap" hover-class="floating-tab-pressed" hover-stay-time="70" aria-label="{{item.text}}，{{selected === index ? '当前页面' : '切换页面'}}">
+      <image class="floating-tab-icon" src="{{selected === index ? item.selectedIconPath : item.iconPath}}" mode="aspectFit" aria-hidden="true" />
+      <text class="floating-tab-label">{{item.text}}</text>
+    </button>
+  </view>
+</view>

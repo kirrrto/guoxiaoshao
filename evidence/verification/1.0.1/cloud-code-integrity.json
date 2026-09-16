@@ -1,0 +1,42 @@
+{
+  "backups": [
+    {
+      "function": "gxs_api",
+      "path": "C:\\Users\\Administrator\\Documents\\ChatGPT\\果小哨\\cloud-backup-before-1.0.1\\gxs_api.zip",
+      "sha256": "65ee5871d96b1af3222c5c3c0344ab9dee35ed37a1e25f156b0a82be4fbbece4",
+      "bytes": 11183344,
+      "version": "0.1.0",
+      "crcVerified": true
+    },
+    {
+      "function": "cloudbase_auth",
+      "path": "C:\\Users\\Administrator\\Documents\\ChatGPT\\果小哨\\cloud-backup-before-1.0.1\\cloudbase_auth.zip",
+      "sha256": "249c3f09fefec2ba58f61fc89c30fb9214cc12c25f1c28feef3429d2a0fd7a95",
+      "bytes": 11112133,
+      "version": "0.1.0",
+      "crcVerified": true
+    }
+  ],
+  "deployed": [
+    {
+      "function": "gxs_api",
+      "path": "C:\\Users\\Administrator\\Documents\\ChatGPT\\果小哨\\cloud-deployed-1.0.1\\gxs_api.zip",
+      "sha256": "54566f9711ed5ff55c2964525b4dd38c0814955b8efe355a1b699b71b2a22564",
+      "bytes": 7531804,
+      "version": "1.0.1",
+      "crcVerified": true,
+      "sdkVersion": "4.0.2",
+      "sourceFilesMatched": 37
+    },
+    {
+      "function": "cloudbase_auth",
+      "path": "C:\\Users\\Administrator\\Documents\\ChatGPT\\果小哨\\cloud-deployed-1.0.1\\cloudbase_auth.zip",
+      "sha256": "3e0520fcd2044b66637c164c4f8b12271f971ac9ade54722fcb9b038ede0614e",
+      "bytes": 7406922,
+      "version": "1.0.1",
+      "crcVerified": true,
+      "sdkVersion": "4.0.2",
+      "sourceFilesMatched": 4
+    }
+  ]
+}

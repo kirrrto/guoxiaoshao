@@ -1,0 +1,964 @@
+{
+  "renderer": "Offline Chromium approximation; 130% font sizes, not WeChat system font scaling",
+  "cases": [
+    {
+      "page": "query",
+      "scenario": "free",
+      "width": 320,
+      "file": "query-free-320.html",
+      "expectedText": [
+        "MJYH4CH/A",
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色"
+      ],
+      "scrollWidth": 320,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "query",
+      "scenario": "free",
+      "width": 375,
+      "file": "query-free-375.html",
+      "expectedText": [
+        "MJYH4CH/A",
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色"
+      ],
+      "scrollWidth": 375,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "query",
+      "scenario": "free",
+      "width": 430,
+      "file": "query-free-430.html",
+      "expectedText": [
+        "MJYH4CH/A",
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色"
+      ],
+      "scrollWidth": 430,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "follow",
+      "scenario": "free",
+      "width": 320,
+      "file": "follow-free-320.html",
+      "expectedText": [
+        "给心仪的配置留个小哨"
+      ],
+      "scrollWidth": 320,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "follow",
+      "scenario": "free",
+      "width": 375,
+      "file": "follow-free-375.html",
+      "expectedText": [
+        "给心仪的配置留个小哨"
+      ],
+      "scrollWidth": 375,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "follow",
+      "scenario": "free",
+      "width": 430,
+      "file": "follow-free-430.html",
+      "expectedText": [
+        "给心仪的配置留个小哨"
+      ],
+      "scrollWidth": 430,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "history",
+      "scenario": "free",
+      "width": 320,
+      "file": "history-free-320.html",
+      "expectedText": [
+        "MJYH4CH/A",
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色"
+      ],
+      "scrollWidth": 320,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "history",
+      "scenario": "free",
+      "width": 375,
+      "file": "history-free-375.html",
+      "expectedText": [
+        "MJYH4CH/A",
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色"
+      ],
+      "scrollWidth": 375,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "history",
+      "scenario": "free",
+      "width": 430,
+      "file": "history-free-430.html",
+      "expectedText": [
+        "MJYH4CH/A",
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色"
+      ],
+      "scrollWidth": 430,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "mine",
+      "scenario": "free",
+      "width": 320,
+      "file": "mine-free-320.html",
+      "expectedText": [
+        "30 天会员",
+        "¥9.00",
+        "付费购买（暂未开放）",
+        "提醒记录"
+      ],
+      "scrollWidth": 320,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "mine",
+      "scenario": "free",
+      "width": 375,
+      "file": "mine-free-375.html",
+      "expectedText": [
+        "30 天会员",
+        "¥9.00",
+        "付费购买（暂未开放）",
+        "提醒记录"
+      ],
+      "scrollWidth": 375,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "mine",
+      "scenario": "free",
+      "width": 430,
+      "file": "mine-free-430.html",
+      "expectedText": [
+        "30 天会员",
+        "¥9.00",
+        "付费购买（暂未开放）",
+        "提醒记录"
+      ],
+      "scrollWidth": 430,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "query",
+      "scenario": "member",
+      "width": 320,
+      "file": "query-member-320.html",
+      "expectedText": [
+        "MJYH4CH/A",
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色"
+      ],
+      "scrollWidth": 320,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "query",
+      "scenario": "member",
+      "width": 375,
+      "file": "query-member-375.html",
+      "expectedText": [
+        "MJYH4CH/A",
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色"
+      ],
+      "scrollWidth": 375,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "query",
+      "scenario": "member",
+      "width": 430,
+      "file": "query-member-430.html",
+      "expectedText": [
+        "MJYH4CH/A",
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色"
+      ],
+      "scrollWidth": 430,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "follow",
+      "scenario": "member",
+      "width": 320,
+      "file": "follow-member-320.html",
+      "expectedText": [
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色",
+        "合肥万象城"
+      ],
+      "scrollWidth": 320,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "follow",
+      "scenario": "member",
+      "width": 375,
+      "file": "follow-member-375.html",
+      "expectedText": [
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色",
+        "合肥万象城"
+      ],
+      "scrollWidth": 375,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "follow",
+      "scenario": "member",
+      "width": 430,
+      "file": "follow-member-430.html",
+      "expectedText": [
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色",
+        "合肥万象城"
+      ],
+      "scrollWidth": 430,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "history",
+      "scenario": "member",
+      "width": 320,
+      "file": "history-member-320.html",
+      "expectedText": [
+        "MJYH4CH/A",
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色"
+      ],
+      "scrollWidth": 320,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "history",
+      "scenario": "member",
+      "width": 375,
+      "file": "history-member-375.html",
+      "expectedText": [
+        "MJYH4CH/A",
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色"
+      ],
+      "scrollWidth": 375,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "history",
+      "scenario": "member",
+      "width": 430,
+      "file": "history-member-430.html",
+      "expectedText": [
+        "MJYH4CH/A",
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色"
+      ],
+      "scrollWidth": 430,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "mine",
+      "scenario": "member",
+      "width": 320,
+      "file": "mine-member-320.html",
+      "expectedText": [
+        "30 天会员",
+        "¥9.00",
+        "付费购买（暂未开放）",
+        "提醒记录"
+      ],
+      "scrollWidth": 320,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "mine",
+      "scenario": "member",
+      "width": 375,
+      "file": "mine-member-375.html",
+      "expectedText": [
+        "30 天会员",
+        "¥9.00",
+        "付费购买（暂未开放）",
+        "提醒记录"
+      ],
+      "scrollWidth": 375,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "mine",
+      "scenario": "member",
+      "width": 430,
+      "file": "mine-member-430.html",
+      "expectedText": [
+        "30 天会员",
+        "¥9.00",
+        "付费购买（暂未开放）",
+        "提醒记录"
+      ],
+      "scrollWidth": 430,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "query",
+      "scenario": "expired",
+      "width": 320,
+      "file": "query-expired-320.html",
+      "expectedText": [
+        "MJYH4CH/A",
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色"
+      ],
+      "scrollWidth": 320,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "query",
+      "scenario": "expired",
+      "width": 375,
+      "file": "query-expired-375.html",
+      "expectedText": [
+        "MJYH4CH/A",
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色"
+      ],
+      "scrollWidth": 375,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "query",
+      "scenario": "expired",
+      "width": 430,
+      "file": "query-expired-430.html",
+      "expectedText": [
+        "MJYH4CH/A",
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色"
+      ],
+      "scrollWidth": 430,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "follow",
+      "scenario": "expired",
+      "width": 320,
+      "file": "follow-expired-320.html",
+      "expectedText": [
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色",
+        "合肥万象城"
+      ],
+      "scrollWidth": 320,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "follow",
+      "scenario": "expired",
+      "width": 375,
+      "file": "follow-expired-375.html",
+      "expectedText": [
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色",
+        "合肥万象城"
+      ],
+      "scrollWidth": 375,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "follow",
+      "scenario": "expired",
+      "width": 430,
+      "file": "follow-expired-430.html",
+      "expectedText": [
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色",
+        "合肥万象城"
+      ],
+      "scrollWidth": 430,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "history",
+      "scenario": "expired",
+      "width": 320,
+      "file": "history-expired-320.html",
+      "expectedText": [
+        "MJYH4CH/A",
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色"
+      ],
+      "scrollWidth": 320,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "history",
+      "scenario": "expired",
+      "width": 375,
+      "file": "history-expired-375.html",
+      "expectedText": [
+        "MJYH4CH/A",
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色"
+      ],
+      "scrollWidth": 375,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "history",
+      "scenario": "expired",
+      "width": 430,
+      "file": "history-expired-430.html",
+      "expectedText": [
+        "MJYH4CH/A",
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色"
+      ],
+      "scrollWidth": 430,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "mine",
+      "scenario": "expired",
+      "width": 320,
+      "file": "mine-expired-320.html",
+      "expectedText": [
+        "30 天会员",
+        "¥9.00",
+        "付费购买（暂未开放）",
+        "提醒记录"
+      ],
+      "scrollWidth": 320,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "mine",
+      "scenario": "expired",
+      "width": 375,
+      "file": "mine-expired-375.html",
+      "expectedText": [
+        "30 天会员",
+        "¥9.00",
+        "付费购买（暂未开放）",
+        "提醒记录"
+      ],
+      "scrollWidth": 375,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "mine",
+      "scenario": "expired",
+      "width": 430,
+      "file": "mine-expired-430.html",
+      "expectedText": [
+        "30 天会员",
+        "¥9.00",
+        "付费购买（暂未开放）",
+        "提醒记录"
+      ],
+      "scrollWidth": 430,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "query",
+      "scenario": "empty",
+      "width": 320,
+      "file": "query-empty-320.html",
+      "expectedText": [
+        "MJYH4CH/A",
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色"
+      ],
+      "scrollWidth": 320,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "query",
+      "scenario": "empty",
+      "width": 375,
+      "file": "query-empty-375.html",
+      "expectedText": [
+        "MJYH4CH/A",
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色"
+      ],
+      "scrollWidth": 375,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "query",
+      "scenario": "empty",
+      "width": 430,
+      "file": "query-empty-430.html",
+      "expectedText": [
+        "MJYH4CH/A",
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色"
+      ],
+      "scrollWidth": 430,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "follow",
+      "scenario": "empty",
+      "width": 320,
+      "file": "follow-empty-320.html",
+      "expectedText": [
+        "给心仪的配置留个小哨"
+      ],
+      "scrollWidth": 320,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "follow",
+      "scenario": "empty",
+      "width": 375,
+      "file": "follow-empty-375.html",
+      "expectedText": [
+        "给心仪的配置留个小哨"
+      ],
+      "scrollWidth": 375,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "follow",
+      "scenario": "empty",
+      "width": 430,
+      "file": "follow-empty-430.html",
+      "expectedText": [
+        "给心仪的配置留个小哨"
+      ],
+      "scrollWidth": 430,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "history",
+      "scenario": "empty",
+      "width": 320,
+      "file": "history-empty-320.html",
+      "expectedText": [
+        "MJYH4CH/A",
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色"
+      ],
+      "scrollWidth": 320,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "history",
+      "scenario": "empty",
+      "width": 375,
+      "file": "history-empty-375.html",
+      "expectedText": [
+        "MJYH4CH/A",
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色"
+      ],
+      "scrollWidth": 375,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "history",
+      "scenario": "empty",
+      "width": 430,
+      "file": "history-empty-430.html",
+      "expectedText": [
+        "MJYH4CH/A",
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色"
+      ],
+      "scrollWidth": 430,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "mine",
+      "scenario": "empty",
+      "width": 320,
+      "file": "mine-empty-320.html",
+      "expectedText": [
+        "30 天会员",
+        "¥9.00",
+        "付费购买（暂未开放）",
+        "提醒记录"
+      ],
+      "scrollWidth": 320,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "mine",
+      "scenario": "empty",
+      "width": 375,
+      "file": "mine-empty-375.html",
+      "expectedText": [
+        "30 天会员",
+        "¥9.00",
+        "付费购买（暂未开放）",
+        "提醒记录"
+      ],
+      "scrollWidth": 375,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "mine",
+      "scenario": "empty",
+      "width": 430,
+      "file": "mine-empty-430.html",
+      "expectedText": [
+        "30 天会员",
+        "¥9.00",
+        "付费购买（暂未开放）",
+        "提醒记录"
+      ],
+      "scrollWidth": 430,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "query",
+      "scenario": "error",
+      "width": 320,
+      "file": "query-error-320.html",
+      "expectedText": [
+        "模拟错误：云环境连接超时"
+      ],
+      "scrollWidth": 320,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "query",
+      "scenario": "error",
+      "width": 375,
+      "file": "query-error-375.html",
+      "expectedText": [
+        "模拟错误：云环境连接超时"
+      ],
+      "scrollWidth": 375,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "query",
+      "scenario": "error",
+      "width": 430,
+      "file": "query-error-430.html",
+      "expectedText": [
+        "模拟错误：云环境连接超时"
+      ],
+      "scrollWidth": 430,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "follow",
+      "scenario": "error",
+      "width": 320,
+      "file": "follow-error-320.html",
+      "expectedText": [
+        "模拟错误：云环境连接超时"
+      ],
+      "scrollWidth": 320,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "follow",
+      "scenario": "error",
+      "width": 375,
+      "file": "follow-error-375.html",
+      "expectedText": [
+        "模拟错误：云环境连接超时"
+      ],
+      "scrollWidth": 375,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "follow",
+      "scenario": "error",
+      "width": 430,
+      "file": "follow-error-430.html",
+      "expectedText": [
+        "模拟错误：云环境连接超时"
+      ],
+      "scrollWidth": 430,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "history",
+      "scenario": "error",
+      "width": 320,
+      "file": "history-error-320.html",
+      "expectedText": [
+        "模拟错误：云环境连接超时"
+      ],
+      "scrollWidth": 320,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "history",
+      "scenario": "error",
+      "width": 375,
+      "file": "history-error-375.html",
+      "expectedText": [
+        "模拟错误：云环境连接超时"
+      ],
+      "scrollWidth": 375,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "history",
+      "scenario": "error",
+      "width": 430,
+      "file": "history-error-430.html",
+      "expectedText": [
+        "模拟错误：云环境连接超时"
+      ],
+      "scrollWidth": 430,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "mine",
+      "scenario": "error",
+      "width": 320,
+      "file": "mine-error-320.html",
+      "expectedText": [
+        "模拟错误：云环境连接超时"
+      ],
+      "scrollWidth": 320,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "mine",
+      "scenario": "error",
+      "width": 375,
+      "file": "mine-error-375.html",
+      "expectedText": [
+        "模拟错误：云环境连接超时"
+      ],
+      "scrollWidth": 375,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "mine",
+      "scenario": "error",
+      "width": 430,
+      "file": "mine-error-430.html",
+      "expectedText": [
+        "模拟错误：云环境连接超时"
+      ],
+      "scrollWidth": 430,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "query",
+      "scenario": "longcontent",
+      "width": 320,
+      "file": "query-longcontent-320.html",
+      "expectedText": [
+        "MJYH4CH/A",
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色 · 超长商品名称与配置说明用于检查换行及小屏布局 ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+      ],
+      "scrollWidth": 320,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "query",
+      "scenario": "longcontent",
+      "width": 375,
+      "file": "query-longcontent-375.html",
+      "expectedText": [
+        "MJYH4CH/A",
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色 · 超长商品名称与配置说明用于检查换行及小屏布局 ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+      ],
+      "scrollWidth": 375,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "query",
+      "scenario": "longcontent",
+      "width": 430,
+      "file": "query-longcontent-430.html",
+      "expectedText": [
+        "MJYH4CH/A",
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色 · 超长商品名称与配置说明用于检查换行及小屏布局 ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+      ],
+      "scrollWidth": 430,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "follow",
+      "scenario": "longcontent",
+      "width": 320,
+      "file": "follow-longcontent-320.html",
+      "expectedText": [
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色 · 超长商品名称与配置说明用于检查换行及小屏布局 ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+        "合肥万象城"
+      ],
+      "scrollWidth": 320,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "follow",
+      "scenario": "longcontent",
+      "width": 375,
+      "file": "follow-longcontent-375.html",
+      "expectedText": [
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色 · 超长商品名称与配置说明用于检查换行及小屏布局 ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+        "合肥万象城"
+      ],
+      "scrollWidth": 375,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "follow",
+      "scenario": "longcontent",
+      "width": 430,
+      "file": "follow-longcontent-430.html",
+      "expectedText": [
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色 · 超长商品名称与配置说明用于检查换行及小屏布局 ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+        "合肥万象城"
+      ],
+      "scrollWidth": 430,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "history",
+      "scenario": "longcontent",
+      "width": 320,
+      "file": "history-longcontent-320.html",
+      "expectedText": [
+        "MJYH4CH/A",
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色 · 超长商品名称与配置说明用于检查换行及小屏布局 ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+      ],
+      "scrollWidth": 320,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "history",
+      "scenario": "longcontent",
+      "width": 375,
+      "file": "history-longcontent-375.html",
+      "expectedText": [
+        "MJYH4CH/A",
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色 · 超长商品名称与配置说明用于检查换行及小屏布局 ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+      ],
+      "scrollWidth": 375,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "history",
+      "scenario": "longcontent",
+      "width": 430,
+      "file": "history-longcontent-430.html",
+      "expectedText": [
+        "MJYH4CH/A",
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色 · 超长商品名称与配置说明用于检查换行及小屏布局 ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+      ],
+      "scrollWidth": 430,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "mine",
+      "scenario": "longcontent",
+      "width": 320,
+      "file": "mine-longcontent-320.html",
+      "expectedText": [
+        "30 天会员",
+        "¥9.00",
+        "付费购买（暂未开放）",
+        "提醒记录",
+        "删除记录",
+        "清空"
+      ],
+      "scrollWidth": 320,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "mine",
+      "scenario": "longcontent",
+      "width": 375,
+      "file": "mine-longcontent-375.html",
+      "expectedText": [
+        "30 天会员",
+        "¥9.00",
+        "付费购买（暂未开放）",
+        "提醒记录",
+        "删除记录",
+        "清空"
+      ],
+      "scrollWidth": 375,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "mine",
+      "scenario": "longcontent",
+      "width": 430,
+      "file": "mine-longcontent-430.html",
+      "expectedText": [
+        "30 天会员",
+        "¥9.00",
+        "付费购买（暂未开放）",
+        "提醒记录",
+        "删除记录",
+        "清空"
+      ],
+      "scrollWidth": 430,
+      "overflow": [],
+      "clippedText": []
+    }
+  ],
+  "summary": {
+    "total": 72,
+    "horizontalOverflow": 0,
+    "clippedText": 0
+  }
+}

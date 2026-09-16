@@ -1,0 +1,29 @@
+/* 查询页专用样式（公共样式见 app.wxss） */
+.card-title text:first-child { flex: 1; min-width: 0; white-space: normal; }
+.target-row { padding: 14rpx 0; border-bottom: 2rpx solid var(--line); }
+.target-row:last-of-type { border-bottom: none; }
+.target-text { flex: 1; min-width: 0; margin-right: 16rpx; }
+.target-text .bold { display: block; white-space: normal; overflow-wrap: anywhere; }
+.selection-card > .card-title { padding-bottom: 20rpx; border-bottom: 1rpx solid var(--line); margin-bottom: 8rpx; }
+.selection-card > .card-title .sub { padding: 7rpx 16rpx; background: var(--green-soft); color: var(--green-dark); border-radius: 999rpx; }
+.query-result-card .list-item { padding: 24rpx 0; }
+.query-result-card > .small.muted { line-height: 1.65; }
+.target-row { padding: 22rpx 0; }
+.selection-follow-action { margin-top: 16rpx; gap: 12rpx; }
+.selection-follow-action > text { min-width: 0; overflow-wrap: anywhere; }
+.selection-whistle { display: block; flex: 0 0 34rpx; width: 34rpx; height: 34rpx; }
+.selection-follow-note { margin-top: 14rpx; line-height: 1.65; text-align: center; }
+.selection-summary { padding-top: 14rpx; }
+.selection-summary-product { display: flex; align-items: center; gap: 16rpx; min-width: 0; }
+.selection-summary-image-box { width: 108rpx; height: 116rpx; flex: 0 0 108rpx; background: rgba(255,255,255,.88); border: 1rpx solid var(--glass-line); border-radius: 20rpx; overflow: hidden; }
+.selection-summary-image { display: block; width: 100%; height: 100%; }
+.selection-summary-image-placeholder { display: flex; align-items: center; justify-content: center; height: 100%; font-size: 22rpx; color: var(--text-3); }
+.selection-summary-copy { flex: 1 1 0; min-width: 0; }
+.selection-summary-title { font-size: 28rpx; font-weight: 600; line-height: 1.5; overflow-wrap: anywhere; }
+.selection-summary-city { margin-top: 8rpx; color: var(--text-2); font-size: 23rpx; line-height: 1.5; overflow-wrap: anywhere; }
+.selection-summary-change.btn { flex: 0 0 auto; width: auto; min-width: 44px; min-width: max(44px, 92rpx); min-height: 44px; min-height: max(44px, 88rpx); padding: 12rpx 16rpx; font-size: 25rpx; }
+.selection-summary-stores { margin-top: 18rpx; padding-top: 16rpx; border-top: 1rpx solid var(--line); color: var(--text-2); font-size: 24rpx; line-height: 1.6; overflow-wrap: anywhere; }
+.selection-done.btn { margin-top: 24rpx; }
+.selection-card > .btn, .selection-done.btn { min-height: 44px; min-height: max(44px, 88rpx); }
+.result-target-note { margin-bottom: 20rpx; padding: 14rpx 18rpx; border-radius: 16rpx; background: var(--surface-soft); color: var(--text-2); font-size: 23rpx; line-height: 1.55; overflow-wrap: anywhere; }
+.result-target-different { background: var(--warn-soft); color: var(--warn); }

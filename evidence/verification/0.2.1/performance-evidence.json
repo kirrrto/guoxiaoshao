@@ -1,0 +1,14 @@
+{
+  "measuredAt": "2026-09-15T08:13:38.355Z",
+  "products": 292,
+  "stores": 49,
+  "priorSetDataBytes": 816991,
+  "currentSetDataBytes": 269648,
+  "reductionPercent": 66.99,
+  "metric": "UTF-8 JSON bytes of {catalog: ...}; not load time or frame rate",
+  "bootstrapRegularRepositoryReads": {
+    "before": 7,
+    "after": 4,
+    "evidenceTest": "tests/account-bootstrap.test.mjs"
+  }
+}

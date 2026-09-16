@@ -1,0 +1,378 @@
+{
+  "recordedAt": "2026-09-16T01:35:17.674Z",
+  "environment": "flowermean-6gjaxfqhf6c13e88",
+  "version": "1.1.0",
+  "scope": "Actual cloud deployment and three consecutive real timer runs; not a proof of long-term availability or notification delivery",
+  "functions": [
+    {
+      "name": "gxs_monitor",
+      "status": "Active",
+      "modifiedAtBeijing": "2026-09-16 09:31:32",
+      "runtime": "Nodejs20.19",
+      "timeoutSeconds": 60,
+      "type": "Event",
+      "environmentVariableNames": [
+        "GXS_CONSUMER_APPID",
+        "GXS_ENABLE_SCHEDULED_MONITOR"
+      ],
+      "triggers": [
+        {
+          "AddTime": "2026-09-16 09:16:58",
+          "AvailableStatus": "",
+          "BindStatus": "on",
+          "CustomArgument": "",
+          "Description": "",
+          "Enable": 1,
+          "InstanceStatus": "",
+          "ModTime": "2026-09-16 09:16:58",
+          "Qualifier": "$LATEST",
+          "ResourceId": "qcs::scf:sh:uin/100046007369:function/gxs_monitor/gxs-monitor-minute",
+          "TriggerAttribute": "single",
+          "TriggerDesc": "{\"cron\":\"0 * * * * * *\"}",
+          "TriggerName": "gxs-monitor-minute",
+          "Type": "timer"
+        }
+      ]
+    },
+    {
+      "name": "gxs_api",
+      "status": "Active",
+      "modifiedAtBeijing": "2026-09-16 09:31:41",
+      "runtime": "Nodejs18.15",
+      "timeoutSeconds": 30,
+      "type": "Event",
+      "environmentVariableNames": [],
+      "triggers": []
+    },
+    {
+      "name": "cloudbase_auth",
+      "status": "Active",
+      "modifiedAtBeijing": "2026-09-16 09:23:11",
+      "runtime": "Nodejs18.15",
+      "timeoutSeconds": 5,
+      "type": "Event",
+      "environmentVariableNames": [],
+      "triggers": []
+    }
+  ],
+  "runtimeConfig": [
+    {
+      "_id": "runtime",
+      "collector": {
+        "enabled": true,
+        "intervalSeconds": 60,
+        "statusStaleAfterSeconds": 150
+      },
+      "notifications": {
+        "enabled": false
+      }
+    }
+  ],
+  "clientFunctionPermissionRule": {
+    "*": {
+      "invoke": "auth != null"
+    },
+    "gxs_monitor": {
+      "invoke": false
+    }
+  },
+  "functionPermissionToolReadback": {
+    "success": true,
+    "data": {
+      "action": "getResourcePermission",
+      "envId": "flowermean-6gjaxfqhf6c13e88",
+      "resourceType": "function",
+      "resourceId": "gxs_monitor",
+      "aclTag": "CUSTOM",
+      "permissions": [
+        {
+          "Resource": "",
+          "Permission": "CUSTOM",
+          "ResourceType": "function",
+          "SecurityRule": "{\"*\":{\"invoke\":\"auth != null\"},\"gxs_monitor\":{\"invoke\":false}}"
+        }
+      ],
+      "hints": [],
+      "raw": {
+        "RequestId": "a17bb825-7155-41a0-916e-2c240786cf9f",
+        "Data": {
+          "TotalCount": 1,
+          "PermissionList": [
+            {
+              "Resource": "",
+              "Permission": "CUSTOM",
+              "ResourceType": "function",
+              "SecurityRule": "{\"*\":{\"invoke\":\"auth != null\"},\"gxs_monitor\":{\"invoke\":false}}"
+            }
+          ]
+        }
+      }
+    },
+    "message": "资源权限查询成功"
+  },
+  "finalDeployCompletedAt": "2026-09-16T01:31:42.778Z",
+  "timerRuns": [
+    {
+      "requestId": "5955d021-b03e-47cf-a116-6d5aeff3dff9",
+      "source": "TRIGGER_TIMER",
+      "startedAt": "2026-09-16T01:34:00.369Z",
+      "result": {
+        "ok": true,
+        "state": "running",
+        "scanned": 2,
+        "observations": 2,
+        "events": 0,
+        "sent": 0,
+        "deadlineReached": false
+      }
+    },
+    {
+      "requestId": "a596a14e-fc4d-4f23-a3b8-1b8a875c7359",
+      "source": "TRIGGER_TIMER",
+      "startedAt": "2026-09-16T01:33:00.459Z",
+      "result": {
+        "ok": true,
+        "state": "running",
+        "scanned": 2,
+        "observations": 2,
+        "events": 0,
+        "sent": 0,
+        "deadlineReached": false
+      }
+    },
+    {
+      "requestId": "d55d5edc-c741-4685-af46-0de2c856dc23",
+      "source": "TRIGGER_TIMER",
+      "startedAt": "2026-09-16T01:32:00.744Z",
+      "result": {
+        "ok": true,
+        "state": "running",
+        "scanned": 2,
+        "observations": 2,
+        "events": 0,
+        "sent": 0,
+        "deadlineReached": false
+      }
+    }
+  ],
+  "automaticObservations": [
+    {
+      "_id": "R577|MJYE4CH/A",
+      "knownAt": "2026-09-16T01:34:01.968Z",
+      "lastReason": null,
+      "observedAt": "2026-09-16T01:34:01.968Z",
+      "partNumber": "MJYE4CH/A",
+      "pickupDisplay": "unavailable",
+      "productTitle": "iPhone 18 Pro Max 512GB 冰川蓝色",
+      "quote": "暂无供应",
+      "sampleCount": 13,
+      "source": "auto",
+      "status": "unavailable",
+      "statusSince": "2026-09-15T07:33:06.893Z",
+      "storeName": "天环广场",
+      "storeNumber": "R577",
+      "unknownCount": 0,
+      "unknownSince": null
+    },
+    {
+      "_id": "R639|MJYE4CH/A",
+      "knownAt": "2026-09-16T01:34:01.791Z",
+      "lastReason": null,
+      "observedAt": "2026-09-16T01:34:01.791Z",
+      "partNumber": "MJYE4CH/A",
+      "pickupDisplay": "unavailable",
+      "productTitle": "iPhone 18 Pro Max 512GB 冰川蓝色",
+      "quote": "暂无供应",
+      "sampleCount": 14,
+      "source": "auto",
+      "status": "unavailable",
+      "statusSince": "2026-09-15T07:33:07.387Z",
+      "storeName": "珠江新城",
+      "storeNumber": "R639",
+      "unknownCount": 0,
+      "unknownSince": null
+    }
+  ],
+  "collectorStatus": {
+    "_id": "collector_status",
+    "breaker": {
+      "reason": null,
+      "state": "closed",
+      "until": null
+    },
+    "budget": {
+      "allowed": true,
+      "dayCount": 20,
+      "maxRequestsPerDay": 10000,
+      "maxRequestsPerMinute": 60,
+      "minuteCount": 2,
+      "reason": null
+    },
+    "expiresAt": "2026-09-16T01:36:33.214Z",
+    "groupCount": 2,
+    "inFlight": 0,
+    "intervalMs": 60000,
+    "maxConcurrency": 2,
+    "mode": "scheduled",
+    "nextRunAt": "2026-09-16T01:35:00.000Z",
+    "notifications": {
+      "enabled": false,
+      "reason": "notifications_disabled"
+    },
+    "ownerId": "timer-08da8893-dd71-4fe9-b1b9-b8b311ffa816",
+    "scheduler": {
+      "breaker": {
+        "failures": [],
+        "openedAt": null,
+        "probeInFlight": false,
+        "reason": null,
+        "state": "closed",
+        "trips": 0,
+        "until": null
+      },
+      "targets": [
+        {
+          "failures": 0,
+          "health": {
+            "consecutiveFailures": 0,
+            "failures": 0,
+            "lastError": "observation_persistence_failed",
+            "lastFailureAt": null,
+            "lastPersistedAt": 1789522442521,
+            "lastRequestAt": 1789522441167,
+            "lastSuccessAt": 1789522441968,
+            "latency": {
+              "count": 10,
+              "maxMs": 973,
+              "sumMs": 6547
+            },
+            "persistenceFailed": false,
+            "persistenceFailures": 2,
+            "requestInterval": {
+              "count": 9,
+              "maxMs": 62234,
+              "sumMs": 538118
+            },
+            "requests": 10,
+            "successInterval": {
+              "count": 9,
+              "maxMs": 62840,
+              "sumMs": 537257
+            },
+            "successes": 10
+          },
+          "key": "R577|MJYE4CH/A",
+          "nextDueAt": 1789522500000
+        },
+        {
+          "failures": 0,
+          "health": {
+            "consecutiveFailures": 0,
+            "failures": 0,
+            "lastError": "observation_persistence_failed",
+            "lastFailureAt": null,
+            "lastPersistedAt": 1789522442367,
+            "lastRequestAt": 1789522441167,
+            "lastSuccessAt": 1789522441791,
+            "latency": {
+              "count": 10,
+              "maxMs": 1179,
+              "sumMs": 7388
+            },
+            "persistenceFailed": false,
+            "persistenceFailures": 1,
+            "requestInterval": {
+              "count": 9,
+              "maxMs": 62234,
+              "sumMs": 538118
+            },
+            "requests": 10,
+            "successInterval": {
+              "count": 9,
+              "maxMs": 62491,
+              "sumMs": 537095
+            },
+            "successes": 10
+          },
+          "key": "R639|MJYE4CH/A",
+          "nextDueAt": 1789522500000
+        }
+      ],
+      "version": 1
+    },
+    "state": "running",
+    "stats": {
+      "batches": 2,
+      "events": 0,
+      "lastBatchAt": "2026-09-16T01:34:02.258Z",
+      "observations": 2,
+      "sent": 0,
+      "tasks": 0
+    },
+    "updatedAt": "2026-09-16T01:34:03.214Z"
+  },
+  "readinessProbe": {
+    "ok": true,
+    "serverTime": "2026-09-16T01:33:50.407Z",
+    "requestId": "9f9497db-f615-403e-a963-798dfff204a0",
+    "keys": [
+      "collector",
+      "serverTime",
+      "identity",
+      "membership",
+      "quota",
+      "tasks",
+      "followCount",
+      "memberProduct",
+      "newProductWindows",
+      "limits",
+      "notifications",
+      "settings",
+      "subscriptions",
+      "catalogVersion",
+      "announcement"
+    ],
+    "notifications": {
+      "enabled": false,
+      "templateIds": {},
+      "templateConfigured": false,
+      "deliveryReady": false,
+      "reason": "template_missing"
+    },
+    "collector": {
+      "enabled": true,
+      "state": "running",
+      "stale": false,
+      "mode": "scheduled",
+      "breaker": {
+        "state": "closed",
+        "reason": null,
+        "until": null
+      },
+      "intervalMs": 60000,
+      "groupCount": 2,
+      "lastBatchAt": "2026-09-16T01:33:02.928Z",
+      "updatedAt": "2026-09-16T01:33:03.480Z",
+      "nextRunAt": "2026-09-16T01:34:00.000Z"
+    }
+  },
+  "applicationLogQuery": {
+    "startTimeBeijing": "2026-09-16 09:32:00",
+    "queriedAt": "2026-09-16T01:35:17.675Z",
+    "records": [],
+    "note": "No application-level records returned in this short post-fix window; function system reports above prove execution."
+  },
+  "notifications": {
+    "enabled": false,
+    "templateConfigured": false,
+    "sentDuringVerifiedRuns": 0,
+    "realRestockEventObserved": false,
+    "phoneDeliveryVerified": false
+  },
+  "frontend": {
+    "sourceChanged": true,
+    "uploaded": false,
+    "published": false,
+    "nativeInteractionVerifiedThisTurn": false
+  }
+}

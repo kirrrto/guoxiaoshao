@@ -1,27 +1,33 @@
-/**app.wxss**/
-.container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  box-sizing: border-box;
-} 
-
-button {
-  background: initial;
-}
-
-button:focus{
-  outline: 0;
-}
-
-button::after{
-  border: none;
-}
-
+/* 果小哨 · 页面全局样式。隔离组件使用独立的 class 样式。 */
+@import "styles/common.wxss";
 
 page {
-  background: #f6f6f6;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
+  /* Brand green follows the supplied reference; ink stays dark for legibility. */
+  --green: #00C375;
+  --green-dark: #007A49;
+  --green-ink: #073C2C;
+  --green-soft: rgba(217, 249, 233, 0.85);
+  --green-mist: #F0FBF6;
+  --text: #183C2D;
+  --text-2: #47685A;
+  --text-3: #637C70;
+  --line: rgba(0, 145, 87, 0.12);
+  --card: rgba(255, 255, 255, 0.80);
+  --surface-soft: rgba(242, 252, 246, 0.86);
+  --glass-line: rgba(255, 255, 255, 0.92);
+  --shadow-soft: 0 12rpx 34rpx rgba(21, 106, 65, 0.055);
+  --warn: #946019;
+  --warn-soft: #FFF3DD;
+  --bad: #B54848;
+  --bad-soft: #FCECED;
+  --info-soft: #EAF7F1;
+  /* Static light and translucent surfaces keep scrolling inexpensive on phones.
+     No full-page filters, animated gradients, or backdrop-filter dependency. */
+  background-color: var(--green-mist);
+  background-image: radial-gradient(ellipse at 0% 0%, rgba(149, 240, 190, 0.22) 0%, rgba(149, 240, 190, 0) 58%), radial-gradient(ellipse at 100% 24%, rgba(203, 251, 222, 0.26) 0%, rgba(203, 251, 222, 0) 58%), linear-gradient(160deg, #F3FCF7 0%, #F7FCF9 48%, #F4FBF7 100%);
+  min-height: 100%;
+  color: var(--text);
+  font-size: 28rpx;
+  line-height: 1.5;
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", Helvetica, sans-serif;
 }

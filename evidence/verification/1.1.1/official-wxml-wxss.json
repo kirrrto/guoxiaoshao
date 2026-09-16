@@ -1,0 +1,104 @@
+{
+  "release": "1.1.1",
+  "generatedAt": "2026-09-16T02:35:27.6004211Z",
+  "method": "Installed official WeChat DevTools wcc.exe and wcsc.exe; source paths normalized to forward slashes",
+  "scope": "All WXML and WXSS in miniprogram; compiler validation, not native UI or real device rendering",
+  "workingDirectory": "C:\\Users\\Administrator\\WeChatProjects\\miniprogram-6\\miniprogram",
+  "success": true,
+  "wxml": {
+    "compiler": "D:\\微信web开发者工具\\resources\\app.asar.unpacked\\node_modules\\wcc-exec\\wcc.exe",
+    "compilerSha256": "2ec832ea823c5f53e264230960637290a8cc7694773016b4c232a439193c9179",
+    "fileCount": 6,
+    "files": [
+      "components/target-picker/index.wxml",
+      "pages/admin/index.wxml",
+      "pages/follow/index.wxml",
+      "pages/history/index.wxml",
+      "pages/mine/index.wxml",
+      "pages/query/index.wxml"
+    ],
+    "exitCode": 0,
+    "output": "C:\\Users\\Administrator\\Documents\\ChatGPT\\果小哨\\official-compiler-1.1.1\\wxml.js",
+    "outputSha256": "fec27b8c177ae17a97db0ea3545bedc95ac4f0bc406c2aa382236930ff91ce60",
+    "outputBytes": 142704,
+    "log": ""
+  },
+  "wxss": {
+    "compiler": "D:\\微信web开发者工具\\resources\\app.asar.unpacked\\node_modules\\wcc-exec\\wcsc.exe",
+    "compilerSha256": "23914ded6433a178c184e4e0fcdb077b499502b4e5a784a1f44f3db55699ce31",
+    "fileCount": 8,
+    "files": [
+      "app.wxss",
+      "components/target-picker/index.wxss",
+      "pages/admin/index.wxss",
+      "pages/follow/index.wxss",
+      "pages/history/index.wxss",
+      "pages/mine/index.wxss",
+      "pages/query/index.wxss",
+      "styles/common.wxss"
+    ],
+    "exitCode": 0,
+    "output": "C:\\Users\\Administrator\\Documents\\ChatGPT\\果小哨\\official-compiler-1.1.1\\wxss.js",
+    "outputSha256": "344b8568e04c27b20c724b497e42393b255f8e434b1fa4573772c00c9fc29d47",
+    "outputBytes": 14628,
+    "log": ""
+  },
+  "sourceFiles": [
+    {
+      "path": "components/target-picker/index.wxml",
+      "sha256": "1f9ef7df9d3d2bce128f52fc61d8c0683e224606743a70b46115e4d1e03fc35a"
+    },
+    {
+      "path": "pages/admin/index.wxml",
+      "sha256": "1734db004e5a0448460c0461d175dc40bdfe94e3a303d0d6a9b982f148974c2a"
+    },
+    {
+      "path": "pages/follow/index.wxml",
+      "sha256": "e94a1adb3d405f86fbb77675e74d4ddf0ded790193cb09ab464da06a23b0f0cf"
+    },
+    {
+      "path": "pages/history/index.wxml",
+      "sha256": "462fc45674866395931dc8b9fff363e6172aa2dcb11ce248f2b6ead321bff1e2"
+    },
+    {
+      "path": "pages/mine/index.wxml",
+      "sha256": "56da29b08d6f0c604a83d45b57fe05c40f7d6a185f69c1cb34cba9d2bdeefac6"
+    },
+    {
+      "path": "pages/query/index.wxml",
+      "sha256": "4326680738260f65c64520d0d1e87b6cb9049ecbdd9eea688b98510b8191b951"
+    },
+    {
+      "path": "app.wxss",
+      "sha256": "d9e1e2f29885cadb0d93b605dcdb02a9d7c738b1b99c46791214888277d0cff6"
+    },
+    {
+      "path": "components/target-picker/index.wxss",
+      "sha256": "552c639cf28df3fcf7bde92cef64be10aafdf443990f0a07596bbc54d1291bdc"
+    },
+    {
+      "path": "pages/admin/index.wxss",
+      "sha256": "4f865af392e3681562927349054cfe92250764eb0d12a9cb91fd3a37da59dacc"
+    },
+    {
+      "path": "pages/follow/index.wxss",
+      "sha256": "cba0554d060be59738853ba47762c07e837127bb9fd4c10bb3317ea4c63cc70a"
+    },
+    {
+      "path": "pages/history/index.wxss",
+      "sha256": "2920728beb9542fd73b4a3e14c73fd774400040f38bc413dec72b3be8bf4a84c"
+    },
+    {
+      "path": "pages/mine/index.wxss",
+      "sha256": "02b8fb88a1b75b8d7527ad549e5d7d2f6e1c590b03ebda59b4e328f9ab801720"
+    },
+    {
+      "path": "pages/query/index.wxss",
+      "sha256": "075f36d99671453e6b7e3237939e40e123e9acdfbabdd851f4ba5b316173c014"
+    },
+    {
+      "path": "styles/common.wxss",
+      "sha256": "f460d34ce5a67f3b78dfbc027566fd002ad98a717c4af236cefb5783e947a48c"
+    }
+  ]
+}

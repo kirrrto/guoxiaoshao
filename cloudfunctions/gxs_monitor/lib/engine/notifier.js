@@ -1,0 +1,141 @@
+'use strict';
+/**
+ * Turn recognised events into notification tasks and send them.
+ *
+ * Matching is re-checked at send time (membership, follow active, DND,
+ * global switch, subscription credit) — never trusted from when the follow
+ * was created. One user receives at most one task per event even when several
+ * of their follows overlap. Task ids are deterministic so retries dedupe.
+ *
+ * Sending is injected (`sendImpl`) so this module has no WeChat dependency;
+ * the worker passes the sender authenticated for the consumer mini program.
+ */
+const { NOTIFIABLE_TYPES } = require('./events');
+const { isMember } = require('../rules/membership');
+const { inMinuteWindow } = require('../time');
+
+const TASK_STATUS = Object.freeze({ pending: 'pending', sending: 'sending', accepted: 'accepted', failed: 'failed', uncertain: 'uncertain', skipped: 'skipped' });
+
+function taskId(userKey, eventId) {
+  return `${userKey}|${eventId}`;
+}
+
+/**
+ * Build tasks for one batch of events. `follows` are active follows (any user),
+ * `users` a Map userKey → user. Returns tasks including skipped ones with reasons,
+ * so the audit trail explains every non-delivery.
+ */
+function buildTasks({ events, follows, users, config, now }) {
+  const tasks = [];
+  const templateId = config.notifications.templateIds && config.notifications.templateIds.restock;
+  for (const event of events) {
+    if (!NOTIFIABLE_TYPES.has(event.type)) continue;
+    const matching = follows.filter(f => f.partNumber === event.partNumber && f.storeNumbers.includes(event.storeNumber));
+    const seen = new Set();
+    for (const follow of matching) {
+      if (seen.has(follow.userKey)) continue;
+      seen.add(follow.userKey);
+      const user = users.get(follow.userKey);
+      const base = {
+        _id: taskId(follow.userKey, event._id), userKey: follow.userKey, followId: follow._id, eventId: event._id, eventType: event.type,
+        partNumber: event.partNumber, storeNumber: event.storeNumber, storeName: event.storeName || null, productTitle: event.productTitle || follow.productTitle || null,
+        detectedAt: event.detectedAt, createdAt: now.toISOString(), templateId: templateId || null, status: TASK_STATUS.pending, reason: null, sentAt: null, attempts: 0,
+      };
+      const skip = reason => tasks.push({ ...base, status: TASK_STATUS.skipped, reason });
+      if (!config.notifications.enabled) { skip('notifications_disabled'); continue; }
+      if (!templateId) { skip('template_missing'); continue; }
+      if (!user) { skip('user_missing'); continue; }
+      if (!isMember(user, now)) { skip('member_expired'); continue; }
+      if (follow.status !== 'active') { skip('follow_not_active'); continue; }
+      if (user.settings && user.settings.notifyEnabled === false) { skip('user_disabled'); continue; }
+      const dnd = user.settings && user.settings.dnd;
+      if (dnd && dnd.enabled && inMinuteWindow(now, dnd.startMinute, dnd.endMinute)) { skip('dnd'); continue; }
+      const sub = user.subscriptions && user.subscriptions[templateId];
+      if (!sub || sub.credits <= 0) { skip('no_subscription_credit'); continue; }
+      tasks.push(base);
+    }
+  }
+  return tasks;
+}
+
+/** Subscribe-message payload: keep values short; WeChat truncates long thing fields. */
+function buildMessage(task, config) {
+  const trim = (value, max) => (value ? String(value).replace(/<[^>]+>/g, '').slice(0, max) : '—');
+  const time = new Date(task.detectedAt);
+  const beijing = new Date(time.getTime() + 8 * 60 * 60 * 1000);
+  const hh = String(beijing.getUTCHours()).padStart(2, '0');
+  const mm = String(beijing.getUTCMinutes()).padStart(2, '0');
+  const ss = String(beijing.getUTCSeconds()).padStart(2, '0');
+  const wording = { first_seen_available: '发现可取货', restock_confirmed: '确认补货', recovered_available: '恢复可取货' }[task.eventType] || '可取货';
+  const fields = { product: 'thing1', store: 'thing2', time: 'time3', status: 'thing4', ...(config.notifications.templateFields || {}) };
+  return {
+    templateId: task.templateId,
+    page: (config.notifications.page || 'pages/follow/index'),
+    data: {
+      [fields.product]: { value: trim(task.productTitle, 20) },
+      [fields.store]: { value: trim(task.storeName || task.storeNumber, 20) },
+      [fields.time]: { value: `${beijing.getUTCFullYear()}年${beijing.getUTCMonth() + 1}月${beijing.getUTCDate()}日 ${hh}:${mm}:${ss}` },
+      [fields.status]: { value: wording },
+    },
+  };
+}
+
+/**
+ * Send one pending task. Result statuses:
+ *  accepted  — WeChat accepted the message (errcode 0);
+ *  failed    — WeChat rejected it (invalid template, user refused, quota…);
+ *  uncertain — transport timeout/exception: the message may or may not have
+ *              been accepted, so it is NOT retried blindly.
+ */
+function skipReason({ task, user, follow, config, now, senderAppid }) {
+  const settings = user && user.settings;
+  if (!config.notifications.enabled) return 'notifications_disabled';
+  if (!task.templateId || config.notifications.templateIds.restock !== task.templateId) return 'template_changed';
+  if (!user || !isMember(user, now)) return 'member_expired';
+  if (senderAppid && user.appid !== senderAppid) return 'consumer_appid_mismatch';
+  if (!user.openid) return 'openid_missing';
+  if (!follow || follow.status !== 'active' || follow.userKey !== task.userKey || follow.partNumber !== task.partNumber || !follow.storeNumbers.includes(task.storeNumber)) return 'follow_not_active';
+  if (settings && settings.notifyEnabled === false) return 'user_disabled';
+  if (settings && settings.dnd && settings.dnd.enabled && inMinuteWindow(now, settings.dnd.startMinute, settings.dnd.endMinute)) return 'dnd';
+  if (now.getTime() - Date.parse(task.detectedAt) > (config.notifications.maxEventAgeSeconds || 120) * 1000) return 'event_expired';
+  return null;
+}
+
+/** A claimed task is never replayed after an ambiguous send or worker crash. */
+async function sendTask({ task, config, sendImpl, repo, now, ownerId = 'notifier', clock = () => now, beforeSend = async () => true }) {
+  if (!sendImpl || sendImpl.enabled === false) return { ...task, deliveryDisabled: sendImpl ? sendImpl.disabledReason : 'sender_missing' };
+  const claim = await repo.claimNotification({ id: task._id, ownerId, now: now.toISOString(), leaseUntil: new Date(now.getTime() + 60000).toISOString() });
+  if (!claim.claimed) return claim.task || task;
+  task = claim.task;
+  const finish = async patch => {
+    await repo.updateNotification(task._id, patch);
+    return { ...task, ...patch };
+  };
+  // Read after the claim, rather than trusting task-planning snapshots.
+  const user = await repo.getUser(task.userKey);
+  const follow = await repo.getFollow(task.followId);
+  const { mergeConfig } = require('../config');
+  config = mergeConfig(await repo.getConfig());
+  now = clock();
+  const reason = skipReason({ task, user, follow, config, now, senderAppid: sendImpl.appid || config.notifications.consumerAppId });
+  if (reason) return finish({ status: TASK_STATUS.skipped, reason, sentAt: null });
+  if (!await beforeSend()) return finish({ status: TASK_STATUS.skipped, reason: 'lease_lost', sentAt: null });
+  const reservation = await repo.reserveSubscriptionCredit({ userKey: task.userKey, templateId: task.templateId, taskId: task._id, now: now.toISOString(), targetKey: `${task.storeNumber}|${task.partNumber}`, cooldownMinutes: config.notifications.cooldownMinutes || 0 });
+  if (!reservation.reserved) return finish({ status: TASK_STATUS.skipped, reason: reservation.reason || 'no_subscription_credit', sentAt: null });
+  let outcome;
+  try {
+    const response = await sendImpl({ touser: user.openid, appid: user.appid, ...buildMessage(task, config), miniprogramState: config.notifications.miniprogramState || 'formal', lang: 'zh_CN' });
+    const code = response && (response.errCode ?? response.errcode);
+    if (code === undefined || !Number.isFinite(Number(code))) outcome = { status: TASK_STATUS.uncertain, reason: 'invalid_platform_response' };
+    else if (Number(code) === 0) outcome = { status: TASK_STATUS.accepted, reason: null };
+    else outcome = { status: TASK_STATUS.failed, reason: `wx_${code}:${response.errMsg || response.errmsg || ''}` };
+  } catch (error) {
+    // Unknown exceptions after handing off may already have delivered. Only an
+    // adapter explicitly proving the send never started can release the credit.
+    outcome = { status: error && error.definitelyNotSent ? TASK_STATUS.failed : TASK_STATUS.uncertain, reason: error && error.code || 'send_transport_error' };
+  }
+  if (outcome.status === TASK_STATUS.failed) await repo.releaseSubscriptionCredit({ userKey: task.userKey, templateId: task.templateId, taskId: task._id, now: clock().toISOString() });
+  return finish({ ...outcome, attempts: (task.attempts || 0) + 1, sentAt: clock().toISOString() });
+}
+
+module.exports = { TASK_STATUS, taskId, buildTasks, buildMessage, sendTask, skipReason };

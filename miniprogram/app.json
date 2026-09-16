@@ -1,14 +1,30 @@
 {
   "pages": [
-    "pages/index/index",
-    "pages/example/index"
+    "pages/query/index",
+    "pages/follow/index",
+    "pages/history/index",
+    "pages/mine/index",
+    "pages/admin/index"
   ],
   "window": {
-    "backgroundColor": "#F6F6F6",
-    "backgroundTextStyle": "light",
-    "navigationBarBackgroundColor": "#F6F6F6",
-    "navigationBarTitleText": "云开发 QuickStart",
+    "backgroundColor": "#F0FBF6",
+    "backgroundTextStyle": "dark",
+    "navigationBarBackgroundColor": "#F0FBF6",
+    "navigationBarTitleText": "果小哨",
     "navigationBarTextStyle": "black"
+  },
+  "tabBar": {
+    "custom": true,
+    "color": "#6C8179",
+    "selectedColor": "#007A49",
+    "backgroundColor": "#F8FCFA",
+    "borderStyle": "white",
+    "list": [
+      { "pagePath": "pages/query/index", "text": "查询", "iconPath": "images/tab/query.png", "selectedIconPath": "images/tab/query-active.png" },
+      { "pagePath": "pages/follow/index", "text": "小哨", "iconPath": "images/tab/follow.png", "selectedIconPath": "images/tab/follow-active.png" },
+      { "pagePath": "pages/history/index", "text": "历史", "iconPath": "images/tab/history.png", "selectedIconPath": "images/tab/history-active.png" },
+      { "pagePath": "pages/mine/index", "text": "我的", "iconPath": "images/tab/mine.png", "selectedIconPath": "images/tab/mine-active.png" }
+    ]
   },
   "sitemapLocation": "sitemap.json",
   "style": "v2",

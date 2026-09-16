@@ -1,0 +1,9 @@
+.input-row { display: flex; align-items: center; gap: 16rpx; margin-bottom: 16rpx; }
+.input { flex: 1; min-width: 0; max-width: 100%; background: var(--green-mist); border-radius: 14rpx; padding: 18rpx 22rpx; font-size: 26rpx; height: 76rpx; margin-bottom: 0; }
+.input-row + .input { margin-bottom: 0; }
+.link { color: var(--green-dark); flex: none; }
+.json-box { max-height: 480rpx; background: var(--green-mist); border-radius: 14rpx; padding: 16rpx; margin-top: 12rpx; }
+.json-box text { white-space: pre-wrap; word-break: break-all; }
+.config-editor { width: 100%; min-height: 400rpx; background: var(--green-mist); border-radius: 14rpx; padding: 18rpx; font-size: 22rpx; line-height: 1.5; }
+.input-row { min-width: 0; }
+.config-editor { overflow-wrap: anywhere; }

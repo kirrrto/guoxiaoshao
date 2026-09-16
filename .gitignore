@@ -12,3 +12,25 @@ $RECYCLE.BIN/
 
 # Node.js
 node_modules/
+
+# Machine configuration and credentials stay local.
+project.private.config.json
+**/project.private.config.json
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Full-size visual evidence stays in release archives; keep textual reports in Git.
+evidence/**/*.png
+evidence/**/*.jpg
+evidence/**/*.jpeg
+evidence/**/*.webp
+evidence/**/*.mp4
+evidence/**/*.zip
+
+# Raw upstream captures (large HTML/JSON bodies); hashes live in evidence/**/manifest files
+evidence/raw/

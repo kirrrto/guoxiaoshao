@@ -1,19 +1,61 @@
-// app.js
+const cloudConfig = require('./config/cloud');
+
 App({
-  onLaunch: function () {
-    this.globalData = {
-      // env 参数说明：
-      // env 参数决定接下来小程序发起的云开发调用（wx.cloud.xxx）会请求到哪个云环境的资源
-      // 此处请填入环境 ID, 环境 ID 可在微信开发者工具右上顶部工具栏点击云开发按钮打开获取
-      env: "",
-    };
+  globalData: {
+    cloud: null,
+    cloudError: null,
+    bootstrap: null,
+    catalog: null,
+    pendingFollow: null,
+    lastQuery: null,
+  },
+
+  onLaunch() {
+    this.cloudReady = this.ensureCloud();
+    this.cloudReady.catch(() => {});
+  },
+
+  ensureCloud() {
+    if (this.globalData.cloud) return Promise.resolve(this.globalData.cloud);
+    if (this.cloudInitPromise) return this.cloudInitPromise;
+    const pending = this.initCloud();
+    this.cloudInitPromise = pending;
+    pending.then(() => { if (this.cloudInitPromise === pending) this.cloudInitPromise = null; }, () => {
+      if (this.cloudInitPromise === pending) this.cloudInitPromise = null;
+    });
+    this.cloudReady = pending;
+    return pending;
+  },
+
+  /**
+   * 果小哨 is a *consumer* of a shared environment: it must open the resource
+   * owner's environment through wx.cloud.Cloud and await init(), which runs the
+   * owner's cloudbase_auth hook. When this code runs inside the owner's own
+   * app (console testing), the plain wx.cloud.init path is used instead.
+   */
+  async initCloud() {
     if (!wx.cloud) {
-      console.error("请使用 2.2.3 或以上的基础库以使用云能力");
-    } else {
-      wx.cloud.init({
-        env: this.globalData.env,
-        traceUser: true,
-      });
+      this.globalData.cloudError = '请使用 2.23.0 或以上的基础库';
+      throw new Error(this.globalData.cloudError);
+    }
+    const account = wx.getAccountInfoSync ? wx.getAccountInfoSync() : null;
+    const selfAppid = account && account.miniProgram ? account.miniProgram.appId : null;
+    try {
+      let cloud;
+      if (selfAppid && selfAppid === cloudConfig.resourceAppid) {
+        wx.cloud.init({ env: cloudConfig.resourceEnv, traceUser: true });
+        cloud = wx.cloud;
+      } else {
+        cloud = new wx.cloud.Cloud({ resourceAppid: cloudConfig.resourceAppid, resourceEnv: cloudConfig.resourceEnv });
+        await cloud.init();
+      }
+      this.globalData.cloud = cloud;
+      this.globalData.cloudError = null;
+      return cloud;
+    } catch (error) {
+      this.globalData.cloudError = (error && (error.errMsg || error.message)) || String(error);
+      console.error('[gxs] cloud init failed', error);
+      throw error;
     }
   },
 });

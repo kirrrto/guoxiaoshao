@@ -1,0 +1,30 @@
+{
+  "checkedAt": "2026-09-16T08:46:21.764Z",
+  "environment": "flowermean-6gjaxfqhf6c13e88",
+  "version": "1.1.2",
+  "deploymentRequests": {
+    "gxs_api": "d409c9f8-e1dc-4336-bc53-014fe843d237",
+    "gxs_monitor": "74949846-9a02-47eb-a578-c8a93dacb2b2",
+    "cloudbase_auth": "cf9d83cc-f2fe-40ab-a158-16eadea083d3"
+  },
+  "trigger": "0 * * * * * *",
+  "logs": [
+    {
+      "timestamp": "2026-09-16 16:45:05.775",
+      "requestId": "58a24d59-741a-4852-8b79-79dcdb3f8b60",
+      "source": "TRIGGER_TIMER",
+      "status": "200",
+      "durationMs": "4513",
+      "result": "{\"ok\":true,\"state\":\"running\",\"scanned\":2,\"observations\":2,\"events\":0,\"sent\":0,\"deadlineReached\":false}"
+    },
+    {
+      "timestamp": "2026-09-16 16:44:06.744",
+      "requestId": "27d51e04-38af-4ffd-8e8e-3bf61c5e2ff8",
+      "source": "TRIGGER_TIMER",
+      "status": "200",
+      "durationMs": "4185",
+      "result": "{\"ok\":true,\"state\":\"running\",\"scanned\":2,\"observations\":2,\"events\":0,\"sent\":0,\"deadlineReached\":false}"
+    }
+  ],
+  "note": "Monitor deployment completed 16:44:11. 16:45 invocation is after deployment. Two observed targets do not establish nationwide coverage or successful message delivery. Legacy listFunctionLogs unavailable; used CLS searchLogs."
+}

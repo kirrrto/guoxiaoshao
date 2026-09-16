@@ -1,0 +1,406 @@
+{
+  "renderer": "Offline Chromium approximation; 130% font sizes, not WeChat system font scaling",
+  "cases": [
+    {
+      "page": "mine",
+      "scenario": "reminders",
+      "width": 320,
+      "file": "mine-reminders-320.html",
+      "expectedText": [
+        "30 天会员",
+        "¥9.00",
+        "付费购买（暂未开放）",
+        "提醒记录",
+        "删除记录",
+        "清空"
+      ],
+      "scrollWidth": 320,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "mine",
+      "scenario": "reminders",
+      "width": 375,
+      "file": "mine-reminders-375.html",
+      "expectedText": [
+        "30 天会员",
+        "¥9.00",
+        "付费购买（暂未开放）",
+        "提醒记录",
+        "删除记录",
+        "清空"
+      ],
+      "scrollWidth": 375,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "mine",
+      "scenario": "reminders",
+      "width": 430,
+      "file": "mine-reminders-430.html",
+      "expectedText": [
+        "30 天会员",
+        "¥9.00",
+        "付费购买（暂未开放）",
+        "提醒记录",
+        "删除记录",
+        "清空"
+      ],
+      "scrollWidth": 430,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "mine",
+      "scenario": "reminder-empty",
+      "width": 320,
+      "file": "mine-reminder-empty-320.html",
+      "expectedText": [
+        "30 天会员",
+        "¥9.00",
+        "付费购买（暂未开放）",
+        "提醒记录"
+      ],
+      "scrollWidth": 320,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "mine",
+      "scenario": "reminder-empty",
+      "width": 375,
+      "file": "mine-reminder-empty-375.html",
+      "expectedText": [
+        "30 天会员",
+        "¥9.00",
+        "付费购买（暂未开放）",
+        "提醒记录"
+      ],
+      "scrollWidth": 375,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "mine",
+      "scenario": "reminder-empty",
+      "width": 430,
+      "file": "mine-reminder-empty-430.html",
+      "expectedText": [
+        "30 天会员",
+        "¥9.00",
+        "付费购买（暂未开放）",
+        "提醒记录"
+      ],
+      "scrollWidth": 430,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "mine",
+      "scenario": "reminder-loading",
+      "width": 320,
+      "file": "mine-reminder-loading-320.html",
+      "expectedText": [
+        "30 天会员",
+        "¥9.00",
+        "付费购买（暂未开放）",
+        "提醒记录"
+      ],
+      "scrollWidth": 320,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "mine",
+      "scenario": "reminder-loading",
+      "width": 375,
+      "file": "mine-reminder-loading-375.html",
+      "expectedText": [
+        "30 天会员",
+        "¥9.00",
+        "付费购买（暂未开放）",
+        "提醒记录"
+      ],
+      "scrollWidth": 375,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "mine",
+      "scenario": "reminder-loading",
+      "width": 430,
+      "file": "mine-reminder-loading-430.html",
+      "expectedText": [
+        "30 天会员",
+        "¥9.00",
+        "付费购买（暂未开放）",
+        "提醒记录"
+      ],
+      "scrollWidth": 430,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "mine",
+      "scenario": "reminder-deleting",
+      "width": 320,
+      "file": "mine-reminder-deleting-320.html",
+      "expectedText": [
+        "30 天会员",
+        "¥9.00",
+        "付费购买（暂未开放）",
+        "提醒记录",
+        "删除记录",
+        "清空"
+      ],
+      "scrollWidth": 320,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "mine",
+      "scenario": "reminder-deleting",
+      "width": 375,
+      "file": "mine-reminder-deleting-375.html",
+      "expectedText": [
+        "30 天会员",
+        "¥9.00",
+        "付费购买（暂未开放）",
+        "提醒记录",
+        "删除记录",
+        "清空"
+      ],
+      "scrollWidth": 375,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "mine",
+      "scenario": "reminder-deleting",
+      "width": 430,
+      "file": "mine-reminder-deleting-430.html",
+      "expectedText": [
+        "30 天会员",
+        "¥9.00",
+        "付费购买（暂未开放）",
+        "提醒记录",
+        "删除记录",
+        "清空"
+      ],
+      "scrollWidth": 430,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "mine",
+      "scenario": "reminder-clearing",
+      "width": 320,
+      "file": "mine-reminder-clearing-320.html",
+      "expectedText": [
+        "30 天会员",
+        "¥9.00",
+        "付费购买（暂未开放）",
+        "提醒记录",
+        "删除记录",
+        "清空中"
+      ],
+      "scrollWidth": 320,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "mine",
+      "scenario": "reminder-clearing",
+      "width": 375,
+      "file": "mine-reminder-clearing-375.html",
+      "expectedText": [
+        "30 天会员",
+        "¥9.00",
+        "付费购买（暂未开放）",
+        "提醒记录",
+        "删除记录",
+        "清空中"
+      ],
+      "scrollWidth": 375,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "mine",
+      "scenario": "reminder-clearing",
+      "width": 430,
+      "file": "mine-reminder-clearing-430.html",
+      "expectedText": [
+        "30 天会员",
+        "¥9.00",
+        "付费购买（暂未开放）",
+        "提醒记录",
+        "删除记录",
+        "清空中"
+      ],
+      "scrollWidth": 430,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "mine",
+      "scenario": "reminder-error",
+      "width": 320,
+      "file": "mine-reminder-error-320.html",
+      "expectedText": [
+        "30 天会员",
+        "¥9.00",
+        "付费购买（暂未开放）",
+        "提醒记录",
+        "删除记录",
+        "清空"
+      ],
+      "scrollWidth": 320,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "mine",
+      "scenario": "reminder-error",
+      "width": 375,
+      "file": "mine-reminder-error-375.html",
+      "expectedText": [
+        "30 天会员",
+        "¥9.00",
+        "付费购买（暂未开放）",
+        "提醒记录",
+        "删除记录",
+        "清空"
+      ],
+      "scrollWidth": 375,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "mine",
+      "scenario": "reminder-error",
+      "width": 430,
+      "file": "mine-reminder-error-430.html",
+      "expectedText": [
+        "30 天会员",
+        "¥9.00",
+        "付费购买（暂未开放）",
+        "提醒记录",
+        "删除记录",
+        "清空"
+      ],
+      "scrollWidth": 430,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "mine",
+      "scenario": "reminder-more-error",
+      "width": 320,
+      "file": "mine-reminder-more-error-320.html",
+      "expectedText": [
+        "30 天会员",
+        "¥9.00",
+        "付费购买（暂未开放）",
+        "提醒记录",
+        "删除记录",
+        "清空"
+      ],
+      "scrollWidth": 320,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "mine",
+      "scenario": "reminder-more-error",
+      "width": 375,
+      "file": "mine-reminder-more-error-375.html",
+      "expectedText": [
+        "30 天会员",
+        "¥9.00",
+        "付费购买（暂未开放）",
+        "提醒记录",
+        "删除记录",
+        "清空"
+      ],
+      "scrollWidth": 375,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "mine",
+      "scenario": "reminder-more-error",
+      "width": 430,
+      "file": "mine-reminder-more-error-430.html",
+      "expectedText": [
+        "30 天会员",
+        "¥9.00",
+        "付费购买（暂未开放）",
+        "提醒记录",
+        "删除记录",
+        "清空"
+      ],
+      "scrollWidth": 430,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "mine",
+      "scenario": "longcontent",
+      "width": 320,
+      "file": "mine-longcontent-320.html",
+      "expectedText": [
+        "30 天会员",
+        "¥9.00",
+        "付费购买（暂未开放）",
+        "提醒记录",
+        "删除记录",
+        "清空"
+      ],
+      "scrollWidth": 320,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "mine",
+      "scenario": "longcontent",
+      "width": 375,
+      "file": "mine-longcontent-375.html",
+      "expectedText": [
+        "30 天会员",
+        "¥9.00",
+        "付费购买（暂未开放）",
+        "提醒记录",
+        "删除记录",
+        "清空"
+      ],
+      "scrollWidth": 375,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "mine",
+      "scenario": "longcontent",
+      "width": 430,
+      "file": "mine-longcontent-430.html",
+      "expectedText": [
+        "30 天会员",
+        "¥9.00",
+        "付费购买（暂未开放）",
+        "提醒记录",
+        "删除记录",
+        "清空"
+      ],
+      "scrollWidth": 430,
+      "overflow": [],
+      "clippedText": []
+    }
+  ],
+  "summary": {
+    "total": 24,
+    "horizontalOverflow": 0,
+    "clippedText": 0
+  }
+}

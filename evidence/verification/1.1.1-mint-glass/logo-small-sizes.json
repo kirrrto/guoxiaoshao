@@ -1,0 +1,24 @@
+{
+  "checkedAt": "2026-09-16T03:59:59.649Z",
+  "source": "miniprogram/images/brand/logo-mint-144.png",
+  "sha256": "959b2f848f03466a2e04a1940f54fba1790b10e44775716be73bb7cab580e360",
+  "renderer": "Headless Chromium, image displayed at 36/48/60/144 CSS px with device scale 1",
+  "sizes": [
+    36,
+    48,
+    60,
+    144
+  ],
+  "notes": "Actual production PNG. Visual review required; no automatic icon-identification claim.",
+  "visualReview": {
+    "result": "pass",
+    "reviewedSizes": [
+      36,
+      48,
+      60,
+      144
+    ],
+    "findings": "White whistle body, circular cutout, leaf and two sound marks remain distinguishable at all reviewed sizes. Fine rim highlight becomes subtle at 36px as expected; it does not carry meaning.",
+    "limitation": "Visual inspection of Chromium-rendered PNG sizes, not a user recognition study or physical-device result."
+  }
+}

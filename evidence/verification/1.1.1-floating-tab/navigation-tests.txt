@@ -1,0 +1,18 @@
+✔ each cold tab selects its actual route before account and catalog loading can finish (78.4613ms)
+✔ a late mounted tab bar recovers the page selection when onShow ran before getTabBar existed (60.6134ms)
+✔ cached pages recover selection after real programmatic query, history and mine navigation (25.1801ms)
+✔ rapid taps share one navigation and select only the page that actually becomes visible (3.8683ms)
+✔ a failed navigation preserves the current tab and permits a retry (3.6106ms)
+✔ arrival at the real destination permits the next tap before the previous native completion callback (14.1152ms)
+✔ a synchronous switchTab exception releases navigation so the user can retry (3.6952ms)
+✔ keyboard hides only the visible bar and returning to a cached tab restores it (2.0566ms)
+✔ detaching releases the keyboard listener and late native callbacks never write to that bar (6.6362ms)
+✔ unexpected gesture datasets cannot navigate outside the configured tabs (3.7258ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 347.9653

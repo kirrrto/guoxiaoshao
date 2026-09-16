@@ -1,0 +1,112 @@
+<view class="page tab-page">
+  <view wx:if="{{loadError}}" class="card">
+    <view class="banner banner-bad">加载失败：{{loadError}}</view>
+    <button class="btn btn-outline btn-block" bindtap="onRetryLoad">重试</button>
+  </view>
+
+  <block wx:elif="{{!ready}}">
+    <view class="card"><view class="loading-line">正在加载关注列表…</view></view>
+  </block>
+
+  <block wx:else>
+    <view class="page-heading whistle-heading"><view class="whistle-mark"><image class="whistle-heading-image" src="/images/brand/whistle-green.png" mode="aspectFit" aria-hidden="true" /></view><view class="whistle-heading-copy"><view class="page-title">小哨提醒</view><view class="page-subtitle">为心仪配置留个哨，取货变化及时留意</view></view></view>
+    <view wx:if="{{refreshError}}" class="banner banner-warn">{{refreshError}}</view>
+    <view id="reminder-health" class="card monitor-panel">
+      <view class="card-title monitor-heading">
+        <text>我的提醒体检</text>
+        <button class="btn btn-ghost btn-sm compact-action" loading="{{refreshing}}" disabled="{{refreshing}}" bindtap="onRefreshStatus">{{refreshing ? '刷新中' : '刷新状态'}}</button>
+      </view>
+      <view class="readiness-summary readiness-{{readiness.tone}}" aria-live="polite">
+        <view class="readiness-title">{{readiness.title}}</view>
+        <view class="readiness-detail">{{readiness.detail}}</view>
+        <button wx:if="{{readiness.action}}" class="btn btn-primary readiness-action" disabled="{{subscribing || refreshing || saving}}" bindtap="onReadinessAction">{{subscribing && readiness.action === 'subscribe' ? '处理中…' : readiness.actionLabel}}</button>
+      </view>
+      <view class="readiness-metrics">
+        <view class="readiness-metric"><text class="readiness-value">{{followsLoaded ? readiness.activeCount : '—'}}</text><text class="readiness-caption">已开启配置</text></view>
+        <view class="readiness-metric"><text class="readiness-value">{{followsLoaded ? readiness.storeCount : '—'}}</text><text class="readiness-caption">覆盖门店</text></view>
+        <view class="readiness-metric"><text class="readiness-value">{{subscription.templateCount ? subscription.credits : '—'}}</text><text class="readiness-caption">补货提醒授权</text></view>
+      </view>
+      <view class="member-summary">
+        <text class="small text-2">
+          {{boot.member ? '会员有效至 ' + boot.expiresText : (boot.expired ? '会员已到期，自动监测和提醒已停止' : '当前为免费用户，关注提醒需开通会员')}}
+        </text>
+        <text wx:if="{{!boot.member}}" class="small" style="color: var(--green-dark);" bindtap="onGoMine">了解会员 ›</text>
+      </view>
+      <view class="service-row">
+        <view class="service-heading"><text class="service-title">后台检测</text><view class="pill pill-dot pill-{{collector.cls}}">{{collector.label}}</view></view>
+        <view class="service-detail">{{collector.detail}}</view>
+      </view>
+      <view class="service-row">
+        <view class="service-heading"><text class="service-title">消息发送</text><view class="pill pill-dot pill-{{delivery.cls}}">{{delivery.label}}</view></view>
+        <view class="service-detail">{{delivery.detail}}</view>
+      </view>
+      <view class="service-row authorization-row">
+        <view class="authorization-copy"><view class="service-title">微信授权</view><view class="service-detail">{{subscription.templateCount ? '剩余 ' + subscription.credits + ' 条提醒授权' : '待消息模板配置完成'}}</view></view>
+        <button class="btn btn-ghost btn-sm compact-action" disabled="{{subscribing}}" bindtap="onSubscribe">{{subscribing ? '处理中' : (subscriptionPending ? '同步授权' : (delivery.cls === 'ok' ? '授权提醒' : '查看原因'))}}</button>
+      </view>
+      <view class="status-footer"><text class="tiny muted">{{refreshedText ? '最近读取 ' + refreshedText : '正在读取状态'}}</text><text class="service-link" bindtap="onServiceDetails">服务详情 ›</text></view>
+      <view class="tiny muted subscription-rule">小哨通过微信订阅消息提醒，声音遵循微信与手机设置。每次授权增加一条提醒额度；免打扰时段不发送。</view>
+    </view>
+
+    <!-- 编辑器 -->
+    <view wx:if="{{editing}}" class="card">
+      <view class="card-title">
+        <text>{{editor.isNew ? '添加关注' : '编辑关注'}}</text>
+        <text class="sub">每机型最多 {{limits.maxStoresPerFollow}} 家门店</text>
+      </view>
+      <target-picker catalog="{{catalog}}" value="{{editor.pickerValue}}" max-stores="{{limits.maxStoresPerFollow}}" supported-only="{{true}}" bindchange="onEditorChange" />
+      <view class="btn-row">
+        <button class="btn btn-outline" bindtap="onCancelEdit">取消</button>
+        <button class="btn btn-primary {{saving ? 'disabled' : ''}}" disabled="{{saving}}" bindtap="onSave">{{saving ? '保存中…' : '保存'}}</button>
+      </view>
+    </view>
+
+    <!-- 关注列表 -->
+    <view id="follow-configurations" class="card">
+      <view class="card-title">
+        <text>我的关注 <text class="follow-count">{{follows.length}}/{{limits.maxFollows}}</text></text>
+        <button wx:if="{{!editing}}" class="btn btn-primary btn-sm compact-action" bindtap="onAdd">＋ 添加</button>
+      </view>
+
+      <view wx:if="{{!follows.length}}" class="empty">
+        <view class="empty-symbol"><image class="empty-whistle" src="/images/brand/whistle-green.png" mode="aspectFit" aria-hidden="true" /></view>
+        <view>给心仪的配置留个小哨</view>
+        <view class="tiny mt">{{boot.member ? '点击添加，选择型号、容量、颜色和门店' : '会员可添加关注；购买开放情况见「我的」'}}</view>
+      </view>
+
+      <view wx:for="{{follows}}" wx:key="followId" id="follow-entry-{{index}}" class="follow">
+        <view class="follow-product">
+          <image wx:if="{{item.imageUrl}}" class="follow-image" src="{{item.imageUrl}}" mode="aspectFit" aria-label="{{item.imageAlt}}" data-index="{{index}}" binderror="onFollowImageError" />
+          <view class="follow-head">
+            <view class="follow-title">
+              <text class="bold">{{item.productTitle}}</text>
+              <view class="tiny muted mono">{{item.partNumber}}</view>
+            </view>
+            <text class="pill pill-{{item.statusCls}}">{{item.statusLabel}}</text>
+          </view>
+        </view>
+        <view wx:if="{{item.monitoringText}}" class="tiny muted follow-note">{{item.monitoringText}}</view>
+        <view wx:for="{{item.stores}}" wx:for-item="s" wx:key="storeNumber" class="store-row">
+          <view class="store-heading">
+            <text class="small store-name">{{s.city ? s.city + ' · ' : ''}}{{s.storeName}}</text>
+            <view class="pill pill-dot pill-{{s.statusCls}} tiny">{{s.statusLabel}}</view>
+          </view>
+          <view class="tiny muted">
+            {{s.observedText}}
+            <text wx:if="{{s.sinceText}}"> · 距本轮首次记录 {{s.sinceText}}</text>
+          </view>
+          <view wx:if="{{s.lastKnownText}}" class="tiny muted mt">{{s.lastKnownText}}</view>
+          <view wx:if="{{s.observationState !== 'fresh'}}" class="tiny stale-note">{{s.freshnessText}}</view>
+          <view wx:elif="{{s.observationNote}}" class="tiny muted mt">{{s.observationNote}}</view>
+        </view>
+        <view class="btn-row follow-actions">
+          <button class="btn btn-ghost btn-sm" data-id="{{item.followId}}" bindtap="onEdit">编辑</button>
+          <button wx:if="{{boot.member}}" class="btn btn-outline btn-sm" data-id="{{item.followId}}" data-status="{{item.status}}" bindtap="onToggle">{{item.status === 'active' ? '暂停关注' : '开启关注'}}</button>
+          <button class="btn btn-danger btn-sm" data-id="{{item.followId}}" bindtap="onRemove">删除</button>
+        </view>
+      </view>
+    </view>
+
+    <view class="footer-note"><view>每个配置最多 {{limits.maxStoresPerFollow}} 家门店。不同容量或颜色各占一个名额。</view><view>页面每 15 秒读取已有观测，自动检测由后台服务执行。</view></view>
+  </block>
+</view>
