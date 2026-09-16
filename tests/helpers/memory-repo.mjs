@@ -89,6 +89,11 @@ export function createMemoryRepo(seed = {}) {
       put(COLLECTIONS.config, { ...meta, _id: 'catalog' });
     },
     async getLatest(targetKeys) { return targetKeys.map(k => get(COLLECTIONS.latest, k)).filter(Boolean); },
+    async getObservationCoverage({ partNumber, storeNumbers = [], dayKey }) {
+      return all(COLLECTIONS.observationDays)
+        .filter(row => row.partNumber === partNumber && row.dayKey === dayKey && (!storeNumbers.length || storeNumbers.includes(row.storeNumber)))
+        .sort(byAsc('storeNumber'));
+    },
     async saveLatest(latest) { put(COLLECTIONS.latest, latest); },
     async saveEvents(events) {
       let inserted = 0;

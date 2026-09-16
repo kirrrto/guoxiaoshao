@@ -15,6 +15,7 @@ const { isDuplicateKeyError } = require('../errors');
 const { atomicMethods } = require('./atomic-ops');
 const { NOTIFIABLE_TYPES } = require('../engine/events');
 const { dayKey: beijingDayKey } = require('../time');
+const { observationDayId } = require('../engine/observation-day');
 
 const CHUNK = 20;
 
@@ -165,6 +166,13 @@ function createCloudbaseRepo(db) {
     async getLatest(targetKeys) {
       if (!targetKeys.length) return [];
       return readIds(COLLECTIONS.latest, targetKeys);
+    },
+    async getObservationCoverage({ partNumber, storeNumbers = [], dayKey }) {
+      // Missing documents mean no verifiable daily summary, never zero historical samples.
+      const rows = storeNumbers.length
+        ? await readIds(COLLECTIONS.observationDays, storeNumbers.map(store => observationDayId(store, partNumber, dayKey)))
+        : await readAll(col(COLLECTIONS.observationDays).where({ partNumber, dayKey }).orderBy('storeNumber', 'asc'));
+      return rows.sort((a, b) => a.storeNumber.localeCompare(b.storeNumber));
     },
     async saveLatest(latest) {
       const { _id, ...data } = latest;

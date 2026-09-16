@@ -47,7 +47,8 @@
       <button class="btn btn-primary btn-block mt {{querying ? 'disabled' : ''}}" disabled="{{querying || !accountReady}}" bindtap="onQuery">
         {{!accountReady ? '正在连接账户…' : (querying ? '加载中…' : (boot.member ? '查看历史' : '查看历史（消耗 ' + boot.historyCost + ' 次，余 ' + boot.balance + ' 次）'))}}
       </button>
-      <view class="footer-note">不选门店时，展示此配置在各地门店的已有观测记录；不代表全国所有门店都在持续监测。</view>
+      <view class="footer-note history-scope-note">仅查询本小程序已积累的历史；未采集的过去记录无法补查。不选门店时，展示各地已有记录，不代表全国覆盖。</view>
+      <view wx:if="{{!boot.member}}" class="tiny muted history-scope-note">查询需有足够余额；未查到历史事件，次数自动退还。</view>
     </view>
 
     <view wx:if="{{result}}" class="card history-result-card">
@@ -56,38 +57,34 @@
         <text class="sub">{{result.dayText}}</text>
       </view>
 
-      <view class="stat-row">
+      <view class="history-data-notice">
+        <view class="history-data-title">{{result.coverageTitle}}</view>
+        <view class="small text-2 mt">{{result.coverageNote}}</view>
+        <view wx:if="{{result.billingText}}" class="small history-billing-note mt">{{result.billingText}}</view>
+      </view>
+
+      <view wx:if="{{result.hasEventRecords}}" class="section-label">已记录事件统计</view>
+      <view wx:if="{{result.hasEventRecords}}" class="stat-row">
         <view class="stat"><view class="num">{{result.summary.available}}</view><view class="lbl">首次可取货</view></view>
         <view class="stat"><view class="num">{{result.summary.restocks}}</view><view class="lbl">确认补货</view></view>
         <view class="stat"><view class="num">{{result.summary.recoveries}}</view><view class="lbl">恢复</view></view>
         <view class="stat"><view class="num">{{result.summary.ended}}</view><view class="lbl">供应结束</view></view>
       </view>
-      <view class="tiny muted mt">上方四项按事件类型分别计数，其他状态变化只列入下方事件记录，因此四项之和可能小于事件总数。</view>
-      <view class="row-between mt">
-        <text class="small text-2">{{result.lastHour === null ? '统计对应所选日期' : (result.lastHourComplete ? '' : '已加载记录中，') + result.lastHourWindowText + '确认补货 ' + result.lastHour + ' 次'}}</text>
-        <view class="pill pill-dot pill-{{collector.cls}} tiny">{{collector.label}}</view>
-      </view>
+      <view wx:if="{{result.hasEventRecords}}" class="tiny muted mt">上方四项按事件类型分别计数，其他状态变化只列入下方事件记录，因此四项之和可能小于事件总数。</view>
+      <view wx:if="{{result.hasEventRecords && result.lastHour !== null}}" class="small text-2 mt">{{(result.lastHourComplete ? '' : '已加载记录中，') + result.lastHourWindowText + '记录到确认补货 ' + result.lastHour + ' 次'}}</view>
 
-      <block wx:if="{{result.latest.length}}">
-        <view class="section-label">所选门店最近观测</view>
-        <view wx:for="{{result.latest}}" wx:key="storeNumber" class="row-between latest-row">
-          <view>
-            <text class="small">{{item.storeName}}</text>
-            <view wx:if="{{item.observedText}}" class="tiny muted">{{item.observedText}}<text wx:if="{{item.sinceText}}"> · 距本轮首次记录 {{item.sinceText}}</text></view>
-            <view wx:if="{{item.observationNote}}" class="tiny muted">{{item.observationNote}}</view>
-            <view wx:if="{{item.lastKnownText}}" class="tiny muted">{{item.lastKnownText}}</view>
-            <view wx:if="{{item.freshnessText}}" class="tiny {{item.observationState === 'fresh' ? 'muted' : 'stale-note'}}">{{item.freshnessText}}</view>
-          </view>
-          <view class="pill pill-dot pill-{{item.statusCls}} tiny">{{item.statusLabel}}</view>
-        </view>
-      </block>
+      <view class="section-label">当天观测凭据</view>
+      <view class="small text-2">{{result.coverageSummary}}</view>
+      <view wx:if="{{result.coverageCheckedText}}" class="tiny muted mt">采样摘要单独更新于 {{result.coverageCheckedText}}</view>
+      <view wx:for="{{result.coverageStores}}" wx:key="storeNumber" class="history-coverage-row">
+        <view class="small bold">{{item.storeName}}</view>
+        <view class="tiny text-2">有效 {{item.knownCount}} 次 · 未确认 {{item.unknownCount}} 次</view>
+        <view class="tiny muted">首末观测 {{item.rangeText}}</view>
+      </view>
+      <view class="tiny muted mt">凭据从启用记录后积累；首末观测之间不代表持续监测，较早的数据可能没有采样摘要。</view>
 
       <view wx:if="{{result.latestRestricted}}" class="banner banner-info small mt">当前配置处于免费用户新品限制期，本页仅提供所选日期历史，不显示当前库存。</view>
-      <view class="section-label">事件记录 · 已加载 {{result.events.length}} / {{result.pagination.total}}</view>
-      <view wx:if="{{!result.events.length}}" class="empty">
-        <view>当天没有状态变化记录</view>
-        <view class="tiny mt">没有记录 ≠ 没有货：可能当天无人查询、也未被自动监测</view>
-      </view>
+      <view wx:if="{{result.hasEventRecords}}" class="section-label">事件记录 · 已加载 {{result.events.length}} / {{result.pagination.total}}</view>
       <view wx:if="{{moreError}}" class="banner banner-warn small mt">{{moreError}}</view>
       <button wx:if="{{result.pagination.hasMore}}" class="btn btn-ghost btn-block mt" disabled="{{loadingMore}}" bindtap="onLoadMore">{{loadingMore ? '加载中…' : '加载更多（不额外扣次）'}}</button>
       <view wx:for="{{result.events}}" wx:key="id" class="event">
@@ -102,6 +99,22 @@
           <view class="tiny muted">来源：{{item.sourceText}}</view>
         </view>
       </view>
+    </view>
+
+    <view wx:if="{{result && result.latest.length}}" class="card history-latest-card">
+        <view class="card-title">所选门店最近观测</view>
+        <view class="small text-2 mt">此处为最近读取的状态，与上方所选日期的历史独立。</view>
+        <view class="row-between mt"><text class="tiny muted">服务当前状态</text><view class="pill pill-dot pill-{{collector.cls}} tiny">{{collector.label}}</view></view>
+        <view wx:for="{{result.latest}}" wx:key="storeNumber" class="row-between latest-row">
+          <view>
+            <text class="small">{{item.storeName}}</text>
+            <view wx:if="{{item.observedText}}" class="tiny muted">{{item.observedText}}<text wx:if="{{item.sinceText}}"> · 距本轮首次记录 {{item.sinceText}}</text></view>
+            <view wx:if="{{item.observationNote}}" class="tiny muted">{{item.observationNote}}</view>
+            <view wx:if="{{item.lastKnownText}}" class="tiny muted">{{item.lastKnownText}}</view>
+            <view wx:if="{{item.freshnessText}}" class="tiny {{item.observationState === 'fresh' ? 'muted' : 'stale-note'}}">{{item.freshnessText}}</view>
+          </view>
+          <view class="pill pill-dot pill-{{item.statusCls}} tiny">{{item.statusLabel}}</view>
+        </view>
     </view>
   </block>
 </view>

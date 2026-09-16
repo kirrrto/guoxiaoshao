@@ -9,6 +9,7 @@ const { decideLiveQuery, decideHistoryQuery } = require('../rules/access');
 const { grantableAmount, ledgerIds } = require('../rules/quota');
 const { isMember, extendMembership, validateFollowLimits } = require('../rules/membership');
 const { applyObservation, targetKeyOf } = require('../engine/events');
+const { observationDayId, appendObservationDay } = require('../engine/observation-day');
 const { viewId, newView, decodeToken } = require('../notification-view');
 const { mergeConfig, patchConfig } = require('../config');
 const { assertConfigEditor, makeConfigAudit } = require('../config-audit');
@@ -258,8 +259,11 @@ function atomicMethods(run) {
       const previous = await tx.get(C.latest, targetKeyOf(observation.storeNumber, observation.partNumber));
       const result = applyObservation(previous, observation, Number.isFinite(continuityGapMs) ? { continuityGapMs } : undefined);
       if (result.outcome !== 'stale' && result.outcome !== 'duplicate') {
+        const summaryId = observationDayId(observation.storeNumber, observation.partNumber, dayKey(observation.observedAt));
+        const previousDay = await tx.get(C.observationDays, summaryId);
         await tx.put(C.latest, result.latest);
         for (const event of result.events) await tx.put(C.events, { ...event, dayKey: dayKey(event.detectedAt), notificationPlannedAt: null });
+        await tx.put(C.observationDays, appendObservationDay(previousDay, observation));
       }
       return { ...result, observation };
     }),

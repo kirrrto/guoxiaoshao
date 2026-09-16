@@ -145,6 +145,24 @@
       "indexes": []
     },
     {
+      "collectionName": "gxs_observation_days",
+      "rules": {
+        "read": false,
+        "write": false
+      },
+      "indexes": [
+        {
+          "name": "part_day_store",
+          "keys": {
+            "partNumber": 1,
+            "dayKey": 1,
+            "storeNumber": 1
+          },
+          "unique": false
+        }
+      ]
+    },
+    {
       "collectionName": "gxs_events",
       "rules": {
         "read": false,

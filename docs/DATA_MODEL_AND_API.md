@@ -4,6 +4,12 @@
 
 ## 1. 数据与身份边界
 
+### 1.1.4 历史数据补充（2026-09-16）
+
+新增 `gxs_observation_days`（仅服务端可访问），主键 `storeNumber|partNumber|dayKey`，索引 `part_day_store`。记录 sampleCount、knownCount、unknownCount、manualCount、autoCount、firstObservedAt、lastObservedAt、firstKnownAt、lastKnownAt。新观测与 latest/events/day 摘要同事务提交；旧 latest/health 不回填，首末时间不表示连续覆盖。
+
+`history.list` 增加 `dataAvailability`、`billing.reason` 和 `observationCoverage`。日摘要在其独立 `checkedAt` 时刻读取后冻结用于分页，不伪装成事件 `snapshotAt` 的严格快照。没有事件时按完整总数原子退还已扣次数；未知采样、有效但无事件、无日摘要分别显示，均不将空事件等同于全天无货。零余额仍有查询前门槛。下文较早的计费说明若有差异，以本补充和当前源码为准。
+
 全部业务集合位于共享环境，前缀为 `gxs_`。客户端禁止直接读写，经过 `gxs_api` 服务端鉴权后访问。时间使用 UTC ISO 8601 字符串，业务日 `dayKey` 使用北京时间 YYYY-MM-DD。
 
 身份仅从 `cloud.getWXContext()` 获取。跨账号调用使用完整的 FROM_APPID + FROM_OPENID，本账号调用使用 APPID + OPENID，用户主键为 appid:openid。请求中自报的 openid、会员状态或余额没有授权作用。

@@ -172,6 +172,8 @@ test('restock detail labels an observation gap without calling it unavailable du
 
 test('delayed browse reward cannot restore credits after a newer explicit paid history query', async () => {
   const f = createFixture(), api = apiOf(f), late = deferred();
+  // A paid lookup needs an actual saved event; empty histories are refunded.
+  await f.repo.saveEvents([{ _id: 'paid-history-race-event', partNumber: 'MXXX1CH/A', storeNumber: 'R577', dayKey: '2026-09-14', detectedAt: '2026-09-14T01:00:00.000Z', type: 'restock_confirmed' }]);
   let browseResult;
   const rt = runtime(async (action, payload) => {
     const result = await api(action, payload);

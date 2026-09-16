@@ -6,6 +6,7 @@ const COLLECTIONS = Object.freeze({
   queries: 'gxs_queries',
   follows: 'gxs_follows',
   latest: 'gxs_latest',
+  observationDays: 'gxs_observation_days',
   events: 'gxs_events',
   health: 'gxs_target_health',
   orders: 'gxs_orders',
@@ -45,6 +46,9 @@ const INDEX_PLAN = Object.freeze({
   ],
   [COLLECTIONS.health]: [
     { name: 'target_bucket', keys: { targetKey: 1, bucket: -1 }, unique: false },
+  ],
+  [COLLECTIONS.observationDays]: [
+    { name: 'part_day_store', keys: { partNumber: 1, dayKey: 1, storeNumber: 1 }, unique: false },
   ],
   [COLLECTIONS.orders]: [
     { name: 'user_created', keys: { userKey: 1, createdAt: -1 }, unique: false },

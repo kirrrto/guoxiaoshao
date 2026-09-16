@@ -1,0 +1,39 @@
+{
+  "version": "1.1.4",
+  "generatedAt": "2026-09-16T10:45:41.472Z",
+  "tests": {
+    "total": 378,
+    "passed": 378,
+    "failed": 0,
+    "skipped": 0,
+    "afterLedgerLabelUpdate": {
+      "targetedFrontend": 26,
+      "passed": 26
+    }
+  },
+  "layout": {
+    "baseScenarios": 18,
+    "fontScaledScenarios": 36,
+    "failed": 0,
+    "kind": "offline actual WXML/WXSS approximation"
+  },
+  "officialCompilers": {
+    "wxml": 6,
+    "wxss": 8,
+    "passed": true
+  },
+  "deployed": true,
+  "phoneUiVerified": false,
+  "historicalBackfill": false,
+  "nationwideCollection": false,
+  "sourceHashes": {
+    "miniprogram/pages/history/index.js": "37d5260a278a71ba48a7eadb9dc9b6df13b5fb9566e4a9ebd668a4ad112e0ef1",
+    "miniprogram/pages/history/index.wxml": "b88310f9b5056268300aa8ebaa3a67a0fc44da8d76885126bbe96cb88be497b3",
+    "miniprogram/pages/history/index.wxss": "3dd2a405a379afb13dd5988ddaa41e0d307323cb991f2339807f4f65352925d6",
+    "miniprogram/pages/mine/index.js": "1dfc3b6fd45c1c2f3d8f03f6eec527c6beb0ff95fdb77dcf11924729b1a406c4",
+    "cloudfunctions/gxs_api/lib/services/history.js": "88dbb4ca7def3b9bec002df1e3d7069e4b0e2542c47146166219cdd75229df50",
+    "cloudfunctions/gxs_api/lib/engine/observation-day.js": "c531f19f484ce6d8e093b683b3903a8f7ba508ff824c6b8ddb9ef0a2afbe1b00",
+    "cloudfunctions/gxs_api/lib/repo/atomic-ops.js": "cc48bdfe601547e96c853f9802d68d3ba7d01a7edf49dc07e28178363559ed41",
+    "cloudfunctions/gxs_api/lib/repo/cloudbase-repo.js": "34ae567279659734d72217c85d6b7424bbbd294ae42f2f95f2090a3e128a95a8"
+  }
+}

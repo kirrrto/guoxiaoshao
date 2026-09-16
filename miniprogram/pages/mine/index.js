@@ -8,7 +8,7 @@ const LEDGER_TEXT = {
   signin_reward: '每日签到',
   task_reward: '体验任务',
   query_debit: '实时查询',
-  query_refund: '查询失败返还',
+  query_refund: '查询次数返还',
   history_debit: '查看历史',
   admin_grant: '平台发放',
 };

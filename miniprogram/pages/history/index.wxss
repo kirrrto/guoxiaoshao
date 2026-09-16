@@ -18,3 +18,11 @@
 .history-recent { display: flex; align-items: center; gap: 16rpx; }
 .history-recent-copy { flex: 1; min-width: 0; overflow-wrap: anywhere; }
 .history-restore.btn { flex: 0 0 auto; min-width: 76px; min-height: 44px; max-width: 42%; }
+.history-scope-note { text-align: left; line-height: 1.7; }
+.history-data-notice { margin-top: 24rpx; padding: 24rpx; background: var(--surface-soft); border: 1rpx solid var(--line); border-radius: 24rpx; }
+.history-data-title { font-size: 30rpx; font-weight: 600; line-height: 1.5; color: var(--text); }
+.history-billing-note { color: var(--green-dark); }
+.history-coverage-row { padding: 18rpx 0; border-bottom: 1rpx solid var(--line); line-height: 1.7; }
+.history-coverage-row:last-of-type { border-bottom: none; }
+.history-latest-card .latest-row > view:first-child { flex: 1; min-width: 0; }
+.history-data-notice, .history-coverage-row, .history-latest-card { overflow-wrap: anywhere; }

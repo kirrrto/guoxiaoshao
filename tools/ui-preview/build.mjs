@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 
 const project = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const adminPreview = process.argv.includes('--admin-only');
-if (adminPreview && process.argv.some(arg => /^--(?:reminders|stock|redemption|monitoring|history-task)-only$/.test(arg))) throw Error('--admin-only cannot be combined with consumer scenarios');
+if (adminPreview && process.argv.some(arg => /^--(?:reminders|stock|redemption|monitoring|history-task|history-data)-only$/.test(arg))) throw Error('--admin-only cannot be combined with consumer scenarios');
 const mini = path.join(project, adminPreview ? 'tools/admin-miniprogram/miniprogram' : 'miniprogram');
 const appConfig = JSON.parse(fs.readFileSync(path.join(mini, 'app.json'), 'utf8'));
 appConfig.tabBar = appConfig.tabBar || { custom: false, list: [] };
@@ -136,8 +136,10 @@ const stockPreview = process.argv.includes('--stock-only');
 const redemptionPreview = process.argv.includes('--redemption-only');
 const monitoringPreview = process.argv.includes('--monitoring-only');
 const historyTaskPreview = process.argv.includes('--history-task-only');
+const historyDataPreview = process.argv.includes('--history-data-only');
 const widths = [320, 375, 430], scenarios = adminPreview ? ['operator-ready', 'operator-denied', 'operator-loading', 'operator-error', 'operator-longcontent', 'operator-saving'] : historyTaskPreview ? ['history-member-reward', 'history-free-first', 'history-read-error', 'history-balance-cap', 'history-completed', 'history-longcontent', 'history-loading'] : monitoringPreview ? ['monitor-template-missing', 'monitor-ready-authorized', 'monitor-needs-authorization', 'monitor-stale', 'monitor-disabled', 'monitor-expired-paused'] : redemptionPreview ? ['redemption-input', 'redemption-loading', 'redemption-error', 'redemption-success', 'redemption-used', 'redemption-limited', 'redemption-empty'] : stockPreview ? ['stock-fresh', 'stock-old', 'stock-unknown', 'stock-missing', 'stock-restricted'] : reminderPreview ? ['reminders', 'reminder-empty', 'reminder-loading', 'reminder-deleting', 'reminder-clearing', 'reminder-error', 'reminder-more-error', 'longcontent'] : ['free', 'member', 'expired', 'empty', 'error', 'longcontent'];
-const names = adminPreview ? { admin: '运营工具' } : historyTaskPreview ? { history: '历史', mine: '我的' } : stockPreview || monitoringPreview ? { follow: '小哨提醒' } : reminderPreview || redemptionPreview ? { mine: '我的' } : { query: '查询', follow: '小哨提醒', history: '历史', mine: '我的' };
+if (historyDataPreview) scenarios.splice(0, scenarios.length, 'history-no-data', 'history-unknown-only', 'history-observed-no-events', 'history-events-only', 'history-observed-events', 'history-partial-stores');
+const names = adminPreview ? { admin: '运营工具' } : historyDataPreview ? { history: '历史' } : historyTaskPreview ? { history: '历史', mine: '我的' } : stockPreview || monitoringPreview ? { follow: '小哨提醒' } : reminderPreview || redemptionPreview ? { mine: '我的' } : { query: '查询', follow: '小哨提醒', history: '历史', mine: '我的' };
 if (monitoringPreview) scenarios.push('monitor-no-follows', 'monitor-all-paused', 'monitor-user-disabled', 'monitor-dnd');
 fs.mkdirSync(out, { recursive: true });
 const manifest = [];
@@ -175,6 +177,14 @@ for (const scenario of scenarios) {
   const response = { ok: true, product: p, balance: 4, dayKey: '2026-09-15', queriedAt: now.toISOString(), latest: [],
     results: stores.slice(0, 2).map(s => ({ storeNumber: s.storeNumber, storeName: s.name, status: 'unknown', observedAt: now.toISOString(), quote: '模拟观测数据，非实时库存' })),
     events: scenario === 'empty' ? [] : [event, { ...event, id: 'e2', type: 'became_unavailable' }], summary: { available: 1, restocks: 1, recoveries: 0, ended: 1, lastHourRestocks: 1 }, pagination: { total: scenario === 'empty' ? 0 : 2, hasMore: false } };
+  if (historyDataPreview) {
+    const hasEvents = ['history-events-only', 'history-observed-events', 'history-partial-stores'].includes(scenario);
+    response.summary.available = 0;
+    if (!hasEvents) { response.events = []; response.summary = { available: 0, restocks: 0, recoveries: 0, ended: 0, lastHourRestocks: 0 }; response.pagination.total = 0; response.refunded = 1; }
+    response.observationCoverage = { tracking: 'daily_samples_v1', requestedStoreNumbers: stores.slice(0, 2).map(s => s.storeNumber), checkedAt: now.toISOString(), stores: [] };
+    if (!['history-no-data', 'history-events-only'].includes(scenario)) response.observationCoverage.stores = stores.slice(0, scenario === 'history-partial-stores' ? 1 : 2).map(s => ({ storeNumber: s.storeNumber, sampleCount: 30, knownCount: scenario === 'history-unknown-only' ? 0 : 28, unknownCount: scenario === 'history-unknown-only' ? 30 : 2, firstObservedAt: '2026-09-15T01:00:00Z', lastObservedAt: '2026-09-15T01:30:00Z' }));
+    response.latest = [{ ...response.results[0], status: 'unavailable' }];
+  }
   const follows = scenario === 'empty' || scenario === 'free' ? [] : [{ followId: 'f-preview', partNumber: p.partNumber, productTitle: p.title, status: expired ? 'expired' : 'active', statusReason: expired ? 'membership_expired' : null, stores: response.results }];
   if (monitoringPreview) {
     const templateId = 'offline-template-example';
@@ -260,7 +270,7 @@ for (const scenario of scenarios) {
         page.onPickerChange({ detail: selected });
         if (['member', 'longcontent', 'expired'].includes(scenario)) page.onDoneSelection();
       }
-      if (['member', 'longcontent', 'expired', 'empty'].includes(scenario)) await page.onQuery();
+      if (historyDataPreview || ['member', 'longcontent', 'expired', 'empty'].includes(scenario)) await page.onQuery();
     }
     if (scenario === 'error') { if (pageName === 'admin') page.setData({ allowed: false, checked: true, accessError: '模拟错误：网络连接中断，无法完成权限校验。请检查网络后重新加载。' }); else page.setData({ loadError: '模拟错误：云环境连接超时。请检查网络或稍后重试。request-id-abcdefghijklmnopqrstuvwxyz0123456789' }); }
     const ast = parse(fs.readFileSync(path.join(mini, `pages/${pageName}/index.wxml`), 'utf8'));

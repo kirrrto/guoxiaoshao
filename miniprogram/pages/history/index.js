@@ -17,9 +17,32 @@ function presentHistory(response, catalog) {
   const referenceTime = Number.isFinite(snapshotTime) ? snapshotTime : now;
   const lastHour = sorted.filter(e => referenceTime - Date.parse(e.detectedAt) <= 60 * 60 * 1000 && referenceTime >= Date.parse(e.detectedAt) && e.type === 'restock_confirmed').length;
   const isToday = response.dayKey === fmt.todayKey();
+  const eventCount = response.pagination ? response.pagination.total : (response.total || sorted.length);
+  const coverage = response.observationCoverage;
+  const samples = coverage && Array.isArray(coverage.stores) ? coverage.stores : [];
+  const knownCount = samples.reduce((sum, item) => sum + (item.knownCount || 0), 0);
+  const unknownCount = samples.reduce((sum, item) => sum + (item.unknownCount || 0), 0);
+  const requestedStores = coverage && coverage.requestedStoreNumbers || [];
+  const coverageTitle = eventCount > 0 ? `已记录 ${eventCount} 条变化事件`
+    : knownCount > 0 ? '已留存观测，暂无变化事件'
+    : unknownCount > 0 ? '当天观测未获得有效结果' : '暂无该日期的历史数据';
+  const coverageNote = eventCount > 0 ? '以下统计仅包含已保存的事件，不代表全天全部供应变化。'
+    : knownCount > 0 ? '本次未查到变化事件；仅凭已有采样，不能判断全天没有补货。'
+    : unknownCount > 0 ? '已记录的请求未能确认供应状态，不能据此判断当天是否有货。'
+    : '未查到该条件的历史事件或当日观测凭据，无法判断当天供应情况。';
   return {
     ...response,
     dayText: response.dayKey,
+    hasEventRecords: eventCount > 0,
+    coverageTitle,
+    coverageNote,
+    coverageCheckedText: coverage && coverage.checkedAt ? fmt.fmtDateTime(coverage.checkedAt) : '',
+    coverageSummary: samples.length ? `${requestedStores.length ? `所选 ${requestedStores.length} 家门店中，` : ''}${samples.length} 家留存了当日观测；有效 ${knownCount} 次，未确认 ${unknownCount} 次。` : '缺少当日采样摘要，无法确认观测覆盖范围。',
+    coverageStores: samples.map(item => ({ ...item, storeName: storeName(item.storeNumber),
+      rangeText: `${fmt.fmtTime(item.firstObservedAt)} — ${fmt.fmtTime(item.lastObservedAt)}`,
+    })),
+    billingText: response.refunded > 0 ? `本次未查到历史事件，已退还 ${response.refunded} 次。`
+      : response.billing && response.billing.reason === 'empty_history_no_charge' ? '本次未查到历史事件，未扣次数。' : '',
     lastHour: isToday ? (Number.isFinite(response.summary.lastHourRestocks) ? response.summary.lastHourRestocks : lastHour) : null,
     lastHourComplete: Number.isFinite(response.summary.lastHourRestocks),
     lastHourWindowText: Number.isFinite(snapshotTime) ? `截至 ${fmt.fmtTime(snapshotAt)} 的近一小时${fmt.fmtDate(snapshotTime - 3600000) !== response.dayKey ? '（含前一日）' : ''}` : '本次查询统计的近一小时',
@@ -305,7 +328,7 @@ Page({
   onExplain() {
     wx.showModal({
       title: '数据说明',
-      content: `历史记录来自会员关注的自动监测和用户手动查询。只有状态发生变化才产生记录。首次可取货和中断后恢复不等同于确认补货。\n\n免费用户每次查询历史消耗 ${this.data.boot.historyCost} 次，同一查询加载更多不额外扣次。受限新品开售 30 天内，免费用户仅能查看昨天及更早记录。时间均为北京时间。`,
+      content: `历史来自本小程序的实际查询和会员关注监测，并非可追溯任意日期的完整数据库。未采集的过去记录不能补查；没有事件不代表没有货。\n\n观测摘要从启用记录后积累，首末观测之间不代表连续覆盖。首次可取货和中断后恢复不等同于确认补货。\n\n免费用户查询需有 ${this.data.boot.historyCost} 次余额；未查到事件会自动退还，同一查询分页不额外扣次。受限新品开售 30 天内，仅会员可看今天。时间均为北京时间。`,
       showCancel: false,
     });
   },

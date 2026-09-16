@@ -189,7 +189,9 @@ test('history: one credit per historyQueryId, re-reads are free, events from liv
   assert.equal(again.charged, 1);
   assert.equal(again.balance, 2, 'same history id is not charged twice');
   const otherDay = ok(await f.call('history.list', { historyQueryId: 'h-0002-bbbb', partNumber: 'MXXX1CH/A', dayKey: '2026-09-14' }));
-  assert.equal(otherDay.balance, 1);
+  assert.equal(otherDay.balance, 2, 'an empty past-day result returns its reserved credit');
+  assert.equal(otherDay.refunded, 1);
+  assert.equal(otherDay.billing.reason, 'empty_history_refunded');
   assert.equal(otherDay.events.length, 0);
 });
 

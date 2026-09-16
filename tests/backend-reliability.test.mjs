@@ -117,6 +117,7 @@ test('new-product history cannot expose live status and cannot reuse payment for
   const f = createFixture({ config: { newProductWindows: [{ familyKey: 'iphone-18-pro', releaseAt: '2026-09-11T00:00:00.000Z' }] } });
   ok(await f.call('quota.signin'));
   await f.repo.saveLatest({ _id: 'R577|MJYH4CH/A', storeNumber: 'R577', partNumber: 'MJYH4CH/A', status: 'available', observedAt: f.state.now.toISOString(), quote: '今天可取货' });
+  await f.repo.saveEvents([{ _id: 'bound-paid-history-event', partNumber: 'MJYH4CH/A', storeNumber: 'R577', dayKey: '2026-09-14', detectedAt: '2026-09-14T01:00:00.000Z', type: 'restock_confirmed' }]);
   const request = { historyQueryId: 'history-bound-01', partNumber: 'MJYH4CH/A', storeNumbers: ['R577'], dayKey: '2026-09-14' };
   const history = ok(await f.call('history.list', request));
   assert.deepEqual(history.latest, []);
