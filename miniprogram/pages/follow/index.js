@@ -20,6 +20,8 @@ const DELIVERY_REASON = {
   collector_stopped: '后台检测服务暂不可用，当前无法自动发送提醒。',
   consumer_credentials_missing: '提醒发送服务尚未完成配置。',
   consumer_appid_mismatch: '提醒发送配置需要修复，暂不能发送消息。',
+  consumer_auth_unchecked: '提醒发送服务的连接状态尚未验证。',
+  consumer_auth_failed: '提醒发送服务验证未通过，暂不能发送消息。',
   sender_missing: '提醒发送服务尚未接入。',
   sender_unknown: '提醒发送服务状态尚未确认。',
 };
@@ -180,7 +182,7 @@ Page({
     const collector = boot.collector || { state: 'not_deployed' };
     const delivery = deliveryView(notifications, templateIds);
     this.setData({
-      boot: { member: boot.membership.active, expired: !boot.membership.active && Boolean(boot.membership.expiresAt), expiresAt: boot.membership.expiresAt, expiresText: boot.membership.expiresAt ? fmt.fmtDate(boot.membership.expiresAt) : null, notificationsEnabled: notifications.enabled, notificationReason: delivery.detail, templateIds, memberProduct: boot.memberProduct },
+      boot: { member: boot.membership.active, expired: !boot.membership.active && Boolean(boot.membership.expiresAt), expiresAt: boot.membership.expiresAt, expiresText: boot.membership.expiresAt ? fmt.fmtDate(boot.membership.expiresAt) : null, notificationsEnabled: notifications.enabled, notificationReason: delivery.detail, templateIds, templateTitle: typeof notifications.templateTitle === 'string' ? notifications.templateTitle.trim() : '', memberProduct: boot.memberProduct },
       collector: { ...collector, ...fmt.collectorMeta(collector.state), detail: DETECTION_DETAIL[collector.state] || '暂未取得后台检测状态，请稍后刷新。', updatedText: collector.updatedAt ? fmt.fmtDateTime(collector.updatedAt) : null, batchText: collector.lastBatchAt ? fmt.fmtDateTime(collector.lastBatchAt) : null },
       delivery,
       settings: boot.settings || { notifyEnabled: true },
@@ -340,6 +342,7 @@ Page({
 
   async onSubscribe() {
     if (this.data.subscribing) return;
+    if (!this.data.boot) return toast('正在读取账户，请稍后再试');
     let saved;
     try { saved = wx.getStorageSync(localKey(SUBSCRIPTION_PENDING_KEY)); } catch (e) { /* ignore */ }
     if (saved) return this.flushSubscription(saved);
@@ -348,7 +351,8 @@ Page({
       wx.showModal({ title: '提醒暂未开放', content: this.data.boot.notificationReason || '尚未配置可用的订阅消息模板。可在关注页查看已有观测，页面可见时每 15 秒刷新。', showCancel: false });
       return;
     }
-    if (this.data.delivery.cls === 'warn') { this.onServiceDetails(); return; }
+    // User consent can be recorded before the sending service is ready. The
+    // separate readiness status still gates actual delivery on the server.
     let res;
     const requestId = newId('ns');
     this.setData({ subscribing: true });
@@ -365,6 +369,7 @@ Page({
     const pending = { requestId, results };
     try { wx.setStorageSync(localKey(SUBSCRIPTION_PENDING_KEY), pending); } catch (e) { /* kept in local call */ }
     this.setData({ subscriptionPending: true });
+    this.refreshReadiness();
     return this.flushSubscription(pending);
   },
 
@@ -377,7 +382,12 @@ Page({
       try { wx.removeStorageSync(localKey(SUBSCRIPTION_PENDING_KEY)); } catch (e) { /* ignore */ }
       this.setData({ 'subscription.credits': credits, subscriptionPending: false });
       this.refreshReadiness();
-      toast(credits > 0 ? `已同步，可接收 ${credits} 条补货提醒` : '尚无有效补货提醒授权');
+      const result = pending.results && pending.results[restockId];
+      if (result === 'accept') {
+        toast(this.data.delivery.cls === 'ok' ? `授权已同步，剩余 ${credits} 次` : `已记录 ${credits} 次授权，服务准备中`);
+      } else {
+        toast(result === 'ban' ? '微信授权已关闭，本次未增加' : '本次未授权，次数未增加');
+      }
       refreshBootstrap().catch(() => {});
     } catch (error) {
       if (['invalid_subscription_result', 'invalid_request_id', 'invalid_payload'].includes(error.code)) {
@@ -393,6 +403,7 @@ Page({
       showError(error);
     } finally {
       this.setData({ subscribing: false });
+      this.refreshReadiness();
     }
   },
 

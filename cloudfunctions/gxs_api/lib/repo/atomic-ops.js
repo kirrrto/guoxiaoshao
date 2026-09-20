@@ -15,6 +15,7 @@ const { mergeConfig, patchConfig } = require('../config');
 const { assertConfigEditor, makeConfigAudit } = require('../config-audit');
 const { CAMPAIGN, MAX_FAILURES, LOCK_MS, matchesCodeHash, attemptsId } = require('../member-redemption');
 const { upstreamGuardMethods, reserveAccountQuery, releaseAccountQuery } = require('./upstream-guard');
+const subscriptionCredits = require('./subscription-credit-ledger');
 
 async function applyLedgerIn(tx, entry) {
   const user = await tx.get(C.users, entry.userKey);
@@ -69,7 +70,7 @@ function atomicMethods(run) {
       // edits must not restore a stale enabled flag or overwrite sibling fields.
       const stored = await tx.get(C.config, 'runtime') || {};
       // Revocation must also win against requests authorized before this snapshot.
-      assertConfigEditor(stored, patch, actor);
+      assertConfigEditor(stored, patch, actor, 'admin.updateConfig.transaction');
       const revision = (Number.isSafeInteger(stored.configRevision) ? stored.configRevision : 0) + 1;
       const next = { ...patchConfig(stored, patch), _id: 'runtime', updatedAt, updatedBy: actor.userKey || 'operator', configRevision: revision };
       const audit = makeConfigAudit({ auditId, before: stored, after: next, patch, actor, updatedAt, requestId, revision });
@@ -391,34 +392,62 @@ function atomicMethods(run) {
       const task = await tx.get(C.notifications, taskId);
       const user = await tx.get(C.users, userKey);
       if (!task || task.userKey !== userKey || !user) return { reserved: false, reason: 'missing_task_or_user' };
-      if (task.subscriptionReserved) return { reserved: !task.subscriptionReleased, reason: task.subscriptionReleased ? 'credit_released' : null, replayed: true };
       const subscription = user.subscriptions && user.subscriptions[templateId];
-      if (!subscription || !(subscription.credits > 0)) return { reserved: false, reason: 'no_subscription_credit' };
+      if (task.subscriptionReserved) {
+        if (task.subscriptionTemplateId !== templateId) return { reserved: false, reason: 'template_changed', replayed: true };
+        const invalidated = task.subscriptionInvalidated || subscriptionCredits.reservationInvalid(subscriptionCredits.readLedger(subscription), task);
+        return { reserved: !task.subscriptionReleased && !invalidated, reason: invalidated ? 'subscription_authorization_expired' : task.subscriptionReleased ? 'credit_released' : null, replayed: true };
+      }
+      const credit = subscriptionCredits.reserveCredit(subscription);
+      if (!credit.reserved) return { reserved: false, reason: 'no_subscription_credit' };
       const cooldownId = targetKey ? `notify_cooldown_${createHash('sha256').update(`${userKey}|${targetKey}`).digest('hex')}` : null;
       if (cooldownId) {
         const cooldown = await tx.get(C.config, cooldownId);
         if (cooldown && Date.parse(now) - Date.parse(cooldown.lastReservedAt) < cooldownMinutes * 60000) return { reserved: false, reason: 'cooldown' };
         await tx.put(C.config, { _id: cooldownId, taskId, lastReservedAt: now });
       }
-      user.subscriptions[templateId] = { ...subscription, credits: subscription.credits - 1, updatedAt: now };
+      user.subscriptions[templateId] = subscriptionCredits.writeLedger(subscription, credit.ledger, now);
       await tx.put(C.users, user);
-      await tx.put(C.notifications, { ...task, subscriptionReserved: true, subscriptionTemplateId: templateId, subscriptionReservedAt: now, cooldownId });
+      await tx.put(C.notifications, { ...task, subscriptionReserved: true, subscriptionTemplateId: templateId, subscriptionReservedAt: now, subscriptionCreditSequence: credit.ticket, subscriptionCreditHighWater: credit.highWater, cooldownId });
       return { reserved: true, reason: null };
     }),
 
     releaseSubscriptionCredit: ({ userKey, templateId, taskId, now }) => run(async tx => {
       const task = await tx.get(C.notifications, taskId);
       const user = await tx.get(C.users, userKey);
-      if (!task || task.userKey !== userKey || !user || !task.subscriptionReserved || task.subscriptionReleased || task.subscriptionTemplateId !== templateId) return { released: false };
+      if (!task || task.userKey !== userKey || !user || !task.subscriptionReserved || task.subscriptionReleased || task.subscriptionInvalidated || task.subscriptionTemplateId !== templateId) return { released: false };
       const subscription = user.subscriptions && user.subscriptions[templateId] || { credits: 0 };
-      user.subscriptions = { ...user.subscriptions, [templateId]: { ...subscription, credits: subscription.credits + 1, updatedAt: now } };
+      const credit = subscriptionCredits.refundCredit(subscription, task);
+      const updated = subscriptionCredits.writeLedger(subscription, credit.ledger, now);
+      if (updated.credits > 0) updated.needsReauthorization = false;
+      user.subscriptions = { ...user.subscriptions, [templateId]: updated };
       await tx.put(C.users, user);
-      await tx.put(C.notifications, { ...task, subscriptionReleased: true, subscriptionReleasedAt: now });
+      // Even a non-refundable old reservation is settled, and its own failed
+      // attempt must not keep blocking fresh consent through the cooldown.
+      await tx.put(C.notifications, { ...task, subscriptionReleased: true, subscriptionReleasedAt: now, subscriptionCreditRestored: credit.refunded });
       if (task.cooldownId) {
         const cooldown = await tx.get(C.config, task.cooldownId);
         if (cooldown && cooldown.taskId === taskId) await tx.put(C.config, { ...cooldown, lastReservedAt: '1970-01-01T00:00:00.000Z' });
       }
-      return { released: true };
+      return { released: credit.refunded };
+    }),
+
+    invalidateSubscriptionCredit: ({ userKey, templateId, taskId, now }) => run(async tx => {
+      const task = await tx.get(C.notifications, taskId);
+      const user = await tx.get(C.users, userKey);
+      if (!task || task.userKey !== userKey || !user || !task.subscriptionReserved || task.subscriptionInvalidated || task.subscriptionReleased || task.subscriptionTemplateId !== templateId) return { invalidated: false };
+      const subscription = user.subscriptions && user.subscriptions[templateId] || { credits: 0, accepted: 0 };
+      const ledger = subscriptionCredits.invalidateCredits(subscription, task);
+      const updated = subscriptionCredits.writeLedger(subscription, ledger, now);
+      const credits = updated.credits;
+      user.subscriptions = { ...user.subscriptions, [templateId]: { ...updated, needsReauthorization: credits === 0, invalidatedAt: now } };
+      await tx.put(C.users, user);
+      await tx.put(C.notifications, { ...task, subscriptionInvalidated: true, subscriptionInvalidatedAt: now });
+      if (task.cooldownId) {
+        const cooldown = await tx.get(C.config, task.cooldownId);
+        if (cooldown && cooldown.taskId === taskId) await tx.put(C.config, { ...cooldown, lastReservedAt: '1970-01-01T00:00:00.000Z' });
+      }
+      return { invalidated: true, credits };
     }),
 
     recordSubscriptionGrant: ({ userKey, requestId, templateIds, results, now }) => run(async tx => {
@@ -433,7 +462,8 @@ function atomicMethods(run) {
         const result = results[templateId];
         if (!['accept', 'reject', 'ban', 'filter'].includes(result)) continue;
         const current = subscriptions[templateId] || { credits: 0, accepted: 0, rejected: 0 };
-        subscriptions[templateId] = { ...current, credits: (current.credits || 0) + (result === 'accept' ? 1 : 0), accepted: (current.accepted || 0) + (result === 'accept' ? 1 : 0), rejected: (current.rejected || 0) + (result === 'reject' ? 1 : 0), lastResult: result, updatedAt: now };
+        const credited = result === 'accept' ? subscriptionCredits.writeLedger(current, subscriptionCredits.grantCredit(current), now) : current;
+        subscriptions[templateId] = { ...credited, accepted: (current.accepted || 0) + (result === 'accept' ? 1 : 0), rejected: (current.rejected || 0) + (result === 'reject' ? 1 : 0), ...(result === 'accept' ? { needsReauthorization: false } : {}), lastResult: result, updatedAt: now };
         if (result === 'accept') accepted.push(templateId);
       }
       await tx.put(C.users, { ...user, subscriptions });

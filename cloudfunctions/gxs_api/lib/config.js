@@ -25,6 +25,8 @@ const DEFAULTS = Object.freeze({
   notifications: {
     enabled: false,
     templateIds: {},
+    templateTitle: '',
+    contentMode: 'stock_status',
     cooldownMinutes: 30,
     maxEventAgeSeconds: 120,
     page: 'pages/follow/index',
@@ -53,6 +55,11 @@ const DEFAULTS = Object.freeze({
 });
 
 const EDITABLE = new Set(['quota', 'tasks', 'memberProduct', 'memberRedemption', 'newProductWindows', 'notifications', 'collector', 'query', 'adminUserKeys', 'announcement']);
+
+// A template library number is not an ID. Do not guess a fixed ID length.
+function isValidTemplateId(value) {
+  return typeof value === 'string' && value.length > 0 && value.length <= 128 && /^[A-Za-z0-9_-]+$/.test(value) && !/^\d+$/.test(value);
+}
 
 function mergeConfig(stored) {
   const merged = { ...DEFAULTS };
@@ -112,10 +119,13 @@ function validateConfig(config) {
   if (!/^wx[a-zA-Z0-9]{16}$/.test(config.notifications.consumerAppId)) invalid('notifications.consumerAppId');
   if (typeof config.notifications.page !== 'string' || !/^pages\/[a-zA-Z0-9_/-]+$/.test(config.notifications.page)) invalid('notifications.page');
   const templates = config.notifications.templateIds;
-  if (!templates || typeof templates !== 'object' || Array.isArray(templates) || Object.values(templates).some(id => typeof id !== 'string' || id.length > 128)) invalid('notifications.templateIds');
+  if (!templates || typeof templates !== 'object' || Array.isArray(templates) || Object.values(templates).some(id => !isValidTemplateId(id))) invalid('notifications.templateIds');
   if (config.notifications.enabled && !templates.restock) invalid('notifications.templateIds.restock');
+  if (typeof config.notifications.templateTitle !== 'string' || config.notifications.templateTitle.length > 50 || /[\x00-\x1f\x7f]/.test(config.notifications.templateTitle)) invalid('notifications.templateTitle');
+  if (!['stock_status', 'watch_item'].includes(config.notifications.contentMode)) invalid('notifications.contentMode');
   const fields = config.notifications.templateFields;
   if (!fields || ['product', 'store'].some(key => !/^thing\d+$/.test(fields[key])) || !/^(thing|phrase)\d+$/.test(fields.status) || !/^time\d+$/.test(fields.time) || new Set(Object.values(fields)).size !== 4) invalid('notifications.templateFields');
+  if (config.notifications.contentMode === 'watch_item' && !/^thing\d+$/.test(fields.status)) invalid('notifications.templateFields.status');
   if (!Array.isArray(config.tasks) || config.tasks.length > 20 || new Set(config.tasks.map(t => t && t.id)).size !== config.tasks.length) invalid('tasks');
   for (const task of config.tasks) {
     if (!task || task.id !== 'view_history') invalid('tasks.id');
@@ -131,4 +141,4 @@ function validateConfig(config) {
   return config;
 }
 
-module.exports = { DEFAULTS, EDITABLE, mergeConfig, patchConfig, validateConfig };
+module.exports = { DEFAULTS, EDITABLE, mergeConfig, patchConfig, validateConfig, isValidTemplateId };

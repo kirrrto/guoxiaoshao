@@ -24,6 +24,7 @@ const NOTIFY_STATUS = {
 const SKIP_REASON = {
   cooldown: '提醒冷却期间',
   no_subscription_credit: '未授权订阅消息',
+  subscription_authorization_expired: '微信授权已失效，请重新授权提醒',
   dnd: '免打扰时段',
   notifications_disabled: '平台暂停推送',
   template_missing: '提醒服务暂未就绪',

@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
 import { runtime } from './helpers/miniprogram-runtime.mjs';
 const require = createRequire(import.meta.url);
-const { reminderReadiness, restockSubscription } = require('../miniprogram/utils/reminder-readiness.js');
+const { reminderReadiness, restockSubscription, notificationAdvice } = require('../miniprogram/utils/reminder-readiness.js');
 const copy = value => JSON.parse(JSON.stringify(value));
 const active = (id = 'f1', stores = ['R001']) => ({ followId: id, partNumber: id, status: 'active', stores: stores.map(storeNumber => ({ storeNumber })) });
 const boot = patch => ({ membership: { active: true, expiresAt: '2027-01-01T00:00:00Z' }, collector: { state: 'running' }, notifications: { enabled: true, deliveryReady: true, templateIds: { restock: 'A', other: 'B' } }, subscriptions: { A: { credits: 1 }, B: { credits: 9 } }, settings: { notifyEnabled: true, dnd: { enabled: false } }, limits: { maxFollows: 3, maxStoresPerFollow: 3 }, ...patch });
@@ -83,6 +83,20 @@ test('notification reasons lead to settings or live readiness, while uncertain m
   tap('auth'); assert.equal(routes.at(-1), '/pages/follow/index'); assert.equal(rt.app.globalData.pendingFollowFocus.section, 'reminder-health');
   tap('unknown'); assert.match(rt.messages.at(-1).content, /不会自动重发/); assert.equal(rt.calls.length, 0);
   tap('removed'); assert.equal(rt.app.globalData.pendingFollowFocus.partNumber, 'SKU-A');
+});
+
+test('expired platform authorization leads back to authorization without automatically requesting consent or resending', () => {
+  const notification = { id: 'expired-auth', status: 'failed', reason: 'subscription_authorization_expired' };
+  assert.deepEqual(notificationAdvice(notification), { action: 'authorization', actionLabel: '重新授权提醒' });
+  const rt = runtime(), mine = rt.instance('pages/mine/index.js'), routes = [];
+  let prompts = 0;
+  rt.wx.switchTab = value => routes.push(value.url);
+  rt.wx.requestSubscribeMessage = async () => { prompts++; return {}; };
+  mine.setData({ notifications: [notification] });
+  mine.onNotificationAction({ currentTarget: { dataset: { id: 'expired-auth' } } });
+  assert.equal(routes.at(-1), '/pages/follow/index');
+  assert.equal(rt.app.globalData.pendingFollowFocus.section, 'reminder-health');
+  assert.equal(prompts, 0); assert.equal(rt.calls.length, 0);
 });
 
 test('settings deep link survives a cold page and a deferred callback after hiding cannot scroll another page', () => {

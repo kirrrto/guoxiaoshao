@@ -1,4 +1,5 @@
 'use strict';
+const { isValidTemplateId } = require('./config');
 
 /** Publish configuration and observed worker health separately. No secrets leave the server. */
 function monitoringSnapshot(config, status, now) {
@@ -21,13 +22,17 @@ function monitoringSnapshot(config, status, now) {
     nextRunAt: status && status.nextRunAt || null,
   };
   const notifications = config.notifications;
-  const templateConfigured = Boolean(notifications.templateIds && notifications.templateIds.restock);
+  const templateConfigured = isValidTemplateId(notifications.templateIds && notifications.templateIds.restock);
+  const sender = status && status.notifications;
+  const authExpiry = sender && Date.parse(sender.validUntil);
+  const authReady = Boolean(sender && sender.authReady === true && sender.authState === 'ready' && Number.isFinite(authExpiry) && authExpiry > now.getTime());
   let reason = !templateConfigured ? 'template_missing' : !notifications.enabled ? 'notifications_disabled'
     : !status ? 'collector_not_deployed' : stale ? 'collector_stale'
     : ['stopped', 'no_lease', 'disabled', 'error'].includes(state) || !config.collector.enabled ? 'collector_stopped'
-    : !status.notifications ? 'sender_unknown' : status.notifications.reason || (status.notifications.enabled ? null : 'sender_missing');
+    : !sender ? 'sender_unknown' : sender.reason || (!sender.enabled ? 'sender_missing' : !authReady ? 'consumer_auth_unchecked' : null);
   return { collector, notifications: {
     enabled: Boolean(notifications.enabled), templateIds: notifications.templateIds,
+    templateTitle: notifications.templateTitle || '',
     templateConfigured, deliveryReady: reason === null, reason,
   } };
 }

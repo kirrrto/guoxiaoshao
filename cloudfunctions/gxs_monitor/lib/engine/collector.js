@@ -15,10 +15,11 @@ const { createLeaseKeeper } = require('./lease');
 const { recordObservations } = require('./observations');
 const { buildTasks, sendTask, TASK_STATUS } = require('./notifier');
 
-function createCollector({ repo, fetchImpl, clock = () => new Date(), log = console, sendImpl = null, ownerId = `collector-${process.pid}-${Date.now()}`, sleep = ms => new Promise(resolve => setTimeout(resolve, ms)), refreshEveryMs = 10000, statusEveryMs = 5000, mode = 'resident', minimumIntervalMs = 0, statusTtlMs = 0, shouldContinue = () => true }) {
+function createCollector({ repo, fetchImpl, clock = () => new Date(), log = console, sendImpl = null, ownerId = `collector-${process.pid}-${Date.now()}`, sleep = ms => new Promise(resolve => setTimeout(resolve, ms)), refreshEveryMs = 10000, statusEveryMs = 5000, mode = 'resident', minimumIntervalMs = 0, statusTtlMs = 0, shouldContinue = () => true, remainingMs = () => Infinity }) {
   let config = mergeConfig(null);
   let lastRefreshAt = -Infinity;
   let lastStatusAt = -Infinity;
+  let lastSenderProbeAt = -Infinity;
   let running = false;
   let stopping = false;
   let budget = { allowed: true, reason: null, minuteCount: 0, dayCount: 0 };
@@ -85,8 +86,10 @@ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = cons
       const events = await repo.listUnprocessedEvents({ limit: 50 });
       if (events.length) await planEvents(events);
       if (!sendImpl || sendImpl.enabled === false) return;
+      if (typeof sendImpl.getHealth === 'function' && !sendImpl.getHealth().authReady) return;
       for (const task of await repo.listPendingNotifications({ limit: 20 })) {
         if (stopping || !shouldContinue() || !await lease.renew()) break;
+        if (typeof sendImpl.getHealth === 'function' && !sendImpl.getHealth().authReady) break;
         const result = await sendTask({ task, config, sendImpl, repo, now: clock(), clock, ownerId,
           beforeSend: async () => !stopping && shouldContinue() && await lease.renew() });
         if (result.status === TASK_STATUS.accepted) stats.sent += 1;
@@ -108,6 +111,31 @@ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = cons
     return { follows: follows.length, eligible: eligible.length, groups: groups.length, enabled: config.collector.enabled };
   }
 
+  async function probeSender() {
+    if (!config.notifications.enabled || !sendImpl || sendImpl.enabled === false || typeof sendImpl.probe !== 'function') return;
+    if (stopping || !shouldContinue() || !lease.isHeld() || clock().getTime() - lastSenderProbeAt < 60000) return;
+    // A scheduled invocation reserves time to persist status and release its
+    // lease. The bounded token-only request also stays below the lease TTL.
+    if (remainingMs() <= 1000 || !await lease.renew() || !shouldContinue()) return;
+    const timeoutMs = Math.min(3000, Math.floor(remainingMs()) - 1000);
+    if (timeoutMs < 1) return;
+    lastSenderProbeAt = clock().getTime();
+    await sendImpl.probe({ timeoutMs });
+    await lease.renew();
+  }
+
+  function notificationStatus() {
+    const health = sendImpl && typeof sendImpl.getHealth === 'function' ? sendImpl.getHealth() : null;
+    const authReady = Boolean(health && health.authReady === true);
+    const reason = !config.notifications.enabled ? 'notifications_disabled' : !sendImpl ? 'sender_missing'
+      : sendImpl.disabledReason || (!health ? 'sender_unknown' : health.reason || (authReady ? null : 'consumer_auth_unchecked'));
+    return { enabled: Boolean(config.notifications.enabled && sendImpl && sendImpl.enabled !== false && authReady), reason,
+      credentialsConfigured: health ? health.credentialsConfigured === true : false,
+      authState: health && ['unchecked', 'ready', 'failed'].includes(health.authState) ? health.authState : 'unchecked', authReady,
+      checkedAt: health && health.checkedAt || null, validUntil: health && health.validUntil || null,
+      lastErrorCode: health && health.lastErrorCode || null };
+  }
+
   async function publishStatus(extra) {
     const snap = scheduler.snapshot();
     const now = clock();
@@ -122,7 +150,7 @@ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = cons
       intervalMs: snap.intervalMs,
       maxConcurrency: snap.maxConcurrency,
       budget: { ...budget, maxRequestsPerMinute: config.collector.maxRequestsPerMinute || 60, maxRequestsPerDay: config.collector.maxRequestsPerDay || 10000 },
-      notifications: { enabled: Boolean(config.notifications.enabled && sendImpl && sendImpl.enabled !== false), reason: !config.notifications.enabled ? 'notifications_disabled' : !sendImpl ? 'sender_missing' : sendImpl.disabledReason || null },
+      notifications: notificationStatus(),
       stats,
       updatedAt: now.toISOString(),
       expiresAt: new Date(now.getTime() + Math.max(statusTtlMs, (config.collector.statusStaleAfterSeconds || 30) * 1000)).toISOString(),
@@ -146,6 +174,8 @@ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = cons
       return { held: false, started: [] };
     }
     if (nowMs - lastRefreshAt >= refreshEveryMs) await refreshTargets();
+    await probeSender();
+    if (!lease.isHeld()) return { held: false, started: [] };
     await drainNotifications();
     const started = shouldContinue() ? scheduler.tick() : [];
     if (nowMs - lastStatusAt >= statusEveryMs) await publishStatus();

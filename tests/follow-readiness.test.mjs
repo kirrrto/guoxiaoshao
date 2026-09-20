@@ -41,17 +41,17 @@ test('missing subscription template gives a specific actionable reason without i
   assert.match(rt.messages.at(-1).content, /模板尚未配置/);
 });
 
-test('configuration enabled alone never claims that delivery is running', async () => {
+test('configuration enabled alone never claims that delivery is running', () => {
   const rt = runtime(); const page = followPage(rt);
   page.applyBoot(boot({ notifications: { enabled: true, templateIds: { restock: 'template-A' } } }));
   assert.equal(page.data.delivery.cls, 'warn');
   assert.match(page.data.notice, /消息发送服务尚未就绪/);
-  await page.onSubscribe(); assert.equal(rt.calls.length, 0);
+  page.onServiceDetails(); assert.equal(rt.calls.length, 0);
   assert.match(rt.messages.at(-1).content, /每 15 秒读取已有观测/);
 });
 
 test('sender and credential faults are presented in plain language, never as a user pause', () => {
-  for (const reason of ['consumer_credentials_missing', 'consumer_appid_mismatch', 'sender_missing', 'sender_unknown']) {
+  for (const reason of ['consumer_credentials_missing', 'consumer_appid_mismatch', 'consumer_auth_unchecked', 'consumer_auth_failed', 'sender_missing', 'sender_unknown']) {
     const rt = runtime(); const page = followPage(rt);
     page.applyBoot(boot({ notifications: { enabled: true, deliveryReady: false, reason, templateIds: { restock: 'template-A' } } }));
     assert.equal(page.data.delivery.cls, 'warn');

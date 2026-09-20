@@ -7,9 +7,26 @@ const AUDIT_PREFIX = 'config_audit_';
 const owns = (value, key) => value && typeof value === 'object' && Object.prototype.hasOwnProperty.call(value, key);
 const fingerprint = value => createHash('sha256').update(String(value)).digest('hex');
 
+/** Server-only denial diagnostics. Never include identities, values or patches. */
+function logConfigAuthorizationDenial(stage, stored, actor) {
+  const adminList = stored && stored.adminUserKeys;
+  console.warn('[gxs_config_auth_denied]', JSON.stringify({
+    stage,
+    documentIsArray: Array.isArray(stored),
+    documentHasId: Boolean(stored && stored._id),
+    adminListIsArray: Array.isArray(adminList),
+    adminCount: Array.isArray(adminList) ? adminList.length : 0,
+    actorHasUser: Boolean(actor && actor.userKey),
+    isOperator: Boolean(actor && actor.isOperator),
+    isAdmin: Boolean(actor && actor.isAdmin),
+    matchesAdminList: Boolean(actor && actor.userKey && Array.isArray(adminList) && adminList.includes(actor.userKey)),
+  }));
+}
+
 /** actor is constructed from the SDK context, never from a request payload. */
-function assertConfigEditor(stored, patch, actor) {
+function assertConfigEditor(stored, patch, actor, stage = 'config.assertEditor') {
   if (!actor || (!actor.isOperator && (!actor.userKey || !Array.isArray(stored.adminUserKeys) || !stored.adminUserKeys.includes(actor.userKey)))) {
+    logConfigAuthorizationDenial(stage, stored, actor);
     throw new ApiError('forbidden', '需要管理员权限');
   }
   if (owns(patch, 'adminUserKeys') && !actor.isOperator) {
@@ -52,4 +69,4 @@ function makeConfigAudit({ auditId, before, after, patch, actor, updatedAt, requ
   };
 }
 
-module.exports = { AUDIT_PREFIX, assertConfigEditor, makeConfigAudit };
+module.exports = { AUDIT_PREFIX, assertConfigEditor, makeConfigAudit, logConfigAuthorizationDenial };

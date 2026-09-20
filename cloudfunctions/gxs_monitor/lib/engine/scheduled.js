@@ -43,7 +43,7 @@ async function runScheduled({ repo, fetchImpl, sendImpl, clock = () => new Date(
   const shouldContinue = () => clock().getTime() < deadline;
   const collector = createCollector({ repo, fetchImpl, sendImpl, clock, log, ownerId,
     mode: 'scheduled', minimumIntervalMs: 60000, statusTtlMs: 150000,
-    refreshEveryMs: 60000, statusEveryMs: 0, shouldContinue });
+    refreshEveryMs: 60000, statusEveryMs: 0, shouldContinue, remainingMs: () => Math.max(0, deadline - clock().getTime()) });
   if (!await collector.lease.acquire()) return { state: 'standby', scanned: 0 };
   let failed = false;
   try {

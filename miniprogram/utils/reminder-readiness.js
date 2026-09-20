@@ -34,7 +34,7 @@ function reminderReadiness({ boot, follows = [], followsLoaded = false, collecto
     if (collector && collector.state === 'idle') return state('collector_idle', '等待后台下一轮检测', '关注已保存，等待后台下一轮检测，无需重复操作。', 'refresh', '刷新检测状态');
     return state('collector_unready', '后台检测暂未就绪', '关注已开启时无需重复操作；后台恢复后才会自动检测补货。可查看具体服务状态。', 'service', '查看服务状态');
   }
-  if (!delivery || delivery.cls !== 'ok') return state('delivery_unready', '正在检测，微信发送未就绪', '后台正在检测，消息发送服务尚未就绪，暂不能收到微信提醒。无需重复授权。', 'service', '查看服务状态');
+  if (!delivery || delivery.cls !== 'ok') return state('delivery_unready', '正在检测，微信发送未就绪', '后台正在检测，消息发送服务尚未就绪，暂不能收到微信提醒。' + (subscriptionPending ? '已有授权记录待同步，可点击下方「同步授权」。' : subscription.credits ? '已记录的授权会保留，无需重复授权。' : '可先点击下方「授权提醒」记录授权，服务就绪后才能发送。'), 'service', '查看服务状态');
   if (settings.notifyEnabled === false) return state('user_disabled', '你的消息提醒已关闭', '后台检测继续。请到「我的」开启接收补货提醒。', 'settings', '前往提醒设置');
   if (dndActive) return state('dnd', '当前处于免打扰时段', '后台检测继续，期间不发送提醒，也不会在时段结束后补发旧消息。可查看或调整免打扰时间。', 'settings', '查看免打扰设置');
   if (subscriptionPending) return state('subscription_pending', '授权记录等待同步', '上次微信授权的记录尚未确认。同步已有记录即可，无需再次向微信授权。', 'subscribe', '同步授权记录');
@@ -46,6 +46,7 @@ function notificationAdvice(notification) {
   if (notification.status === 'uncertain') return { action: 'uncertain', actionLabel: '查看结果说明' };
   if (!['failed', 'skipped'].includes(notification.status)) return { action: '', actionLabel: '' };
   const reason = notification.reason;
+  if (reason === 'subscription_authorization_expired') return { action: 'authorization', actionLabel: '重新授权提醒' };
   if (reason === 'no_subscription_credit') return { action: 'authorization', actionLabel: '查看授权状态' };
   if (reason === 'user_disabled' || reason === 'dnd') return { action: 'settings', actionLabel: '查看提醒设置' };
   if (reason === 'follow_not_active') return { action: 'follow', actionLabel: '查看对应关注' };

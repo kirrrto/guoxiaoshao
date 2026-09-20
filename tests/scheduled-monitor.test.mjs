@@ -136,7 +136,8 @@ test('readiness distinguishes stale worker, missing credentials and configured s
   const status = { mode: 'scheduled', state: 'running', updatedAt: now.toISOString(), expiresAt: new Date(now.getTime() + 150000).toISOString(), notifications: { enabled: false, reason: 'consumer_credentials_missing' } };
   assert.equal(monitoringSnapshot(config, status, new Date(now.getTime() + 60000)).notifications.reason, 'consumer_credentials_missing');
   assert.equal(monitoringSnapshot(config, status, new Date(now.getTime() + 150001)).notifications.reason, 'collector_stale');
-  assert.equal(monitoringSnapshot(config, { ...status, notifications: { enabled: true, reason: null } }, now).notifications.deliveryReady, true);
+  assert.equal(monitoringSnapshot(config, { ...status, notifications: { enabled: true, reason: null } }, now).notifications.deliveryReady, false, 'a legacy configured-only heartbeat is not proof of token authentication');
+  assert.equal(monitoringSnapshot(config, { ...status, notifications: { enabled: true, reason: null, authReady: true, authState: 'ready', validUntil: new Date(now.getTime() + 3600000).toISOString() } }, now).notifications.deliveryReady, true);
   assert.equal(monitoringSnapshot(config, { ...status, notifications: null }, now).notifications.reason, 'sender_unknown');
   assert.equal(monitoringSnapshot({ ...config, collector: { ...config.collector, enabled: false } }, status, now).collector.state, 'disabled', 'fresh heartbeat does not override an operator stop');
 });

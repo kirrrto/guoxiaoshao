@@ -2,6 +2,7 @@
 const { ApiError } = require('../errors');
 const { ensureUser } = require('./users');
 const { encodeToken, decodeToken } = require('../notification-view');
+const { isValidTemplateId } = require('../config');
 
 /**
  * Record the outcome of wx.requestSubscribeMessage. Each accepted one-time
@@ -12,7 +13,7 @@ async function recordSubscription(ctx, payload) {
   const results = payload && payload.results && typeof payload.results === 'object' ? payload.results : null;
   if (!results || Array.isArray(results)) throw new ApiError('invalid_payload', 'results 需为模板ID→结果 映射');
   if (!/^[A-Za-z0-9_-]{8,64}$/.test(payload.requestId || '')) throw new ApiError('invalid_request_id', '授权请求需要有效 requestId');
-  const templateIds = [...new Set(Object.values(ctx.config.notifications.templateIds || {}).filter(id => typeof id === 'string' && id.length > 0 && id.length <= 128))];
+  const templateIds = [...new Set(Object.values(ctx.config.notifications.templateIds || {}).filter(isValidTemplateId))];
   const entries = Object.entries(results);
   if (!entries.length || entries.length > 3 || entries.some(([id, result]) => !templateIds.includes(id) || !['accept', 'reject', 'ban'].includes(result))) {
     throw new ApiError('invalid_subscription_result', '只接受当前配置模板的 accept、reject 或 ban 结果');

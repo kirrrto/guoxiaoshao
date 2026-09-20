@@ -5,12 +5,15 @@ const { ledgerIds } = require('../rules/quota');
 const { COLLECTIONS } = require('../collections');
 const catalog = require('./catalog');
 const { fulfilOrder } = require('./member');
-const { assertConfigEditor } = require('../config-audit');
+const { assertConfigEditor, logConfigAuthorizationDenial } = require('../config-audit');
 
 const ID_PATTERN = /^[A-Za-z0-9_-]{4,64}$/;
 
-function requireAdmin(ctx) {
-  if (!ctx.identity.isAdmin) throw new ApiError('forbidden', '需要管理员权限');
+function requireAdmin(ctx, diagnosticStage) {
+  if (!ctx.identity.isAdmin) {
+    if (diagnosticStage) logConfigAuthorizationDenial(diagnosticStage, ctx.config, ctx.identity);
+    throw new ApiError('forbidden', '需要管理员权限');
+  }
 }
 
 async function getConfig(ctx) {
@@ -19,9 +22,9 @@ async function getConfig(ctx) {
 }
 
 async function updateConfig(ctx, payload) {
-  requireAdmin(ctx);
+  requireAdmin(ctx, 'admin.updateConfig.requireAdmin');
   const patch = payload && payload.patch;
-  assertConfigEditor(ctx.config, patch, ctx.identity);
+  assertConfigEditor(ctx.config, patch, ctx.identity, 'admin.updateConfig.snapshot');
   return ctx.repo.patchRuntimeConfig({ patch, updatedAt: ctx.nowIso, actor: ctx.identity, requestId: ctx.requestId });
 }
 

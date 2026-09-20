@@ -41,11 +41,11 @@
         <view class="service-detail">{{delivery.detail}}</view>
       </view>
       <view class="service-row authorization-row">
-        <view class="authorization-copy"><view class="service-title">微信授权</view><view class="service-detail">{{subscription.templateCount ? '剩余 ' + subscription.credits + ' 条提醒授权' : '待消息模板配置完成'}}</view></view>
-        <button class="btn btn-ghost btn-sm compact-action" disabled="{{subscribing}}" bindtap="onSubscribe">{{subscribing ? '处理中' : (subscriptionPending ? '同步授权' : (delivery.cls === 'ok' ? '授权提醒' : '查看原因'))}}</button>
+        <view class="authorization-copy"><view class="service-title">微信授权</view><view class="service-detail">{{subscription.templateCount ? '剩余 ' + subscription.credits + ' 条提醒授权' : '待消息模板配置完成'}}</view><view wx:if="{{boot.templateTitle}}" class="service-detail">微信授权卡片名称：{{boot.templateTitle}}</view></view>
+        <button class="btn btn-ghost btn-sm compact-action" disabled="{{subscribing}}" bindtap="onSubscribe">{{subscribing ? '处理中' : (subscriptionPending ? '同步授权' : (subscription.templateCount ? '授权提醒' : '查看原因'))}}</button>
       </view>
       <view class="status-footer"><text class="tiny muted">{{refreshedText ? '最近读取 ' + refreshedText : '正在读取状态'}}</text><text class="service-link" bindtap="onServiceDetails">服务详情 ›</text></view>
-      <view class="tiny muted subscription-rule">小哨通过微信订阅消息提醒，声音遵循微信与手机设置。每次授权增加一条提醒额度；免打扰时段不发送。</view>
+      <view class="tiny muted subscription-rule">小哨通过微信订阅消息提醒，声音遵循微信与手机设置。每次同意授权并同步后记录一次；发送需服务就绪，免打扰时段不发送。</view>
     </view>
 
     <!-- 编辑器 -->

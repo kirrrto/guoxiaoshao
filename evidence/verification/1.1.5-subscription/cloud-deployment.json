@@ -1,0 +1,60 @@
+{
+  "version": "1.1.5",
+  "verifiedAt": "2026-09-20T04:03:46.055Z",
+  "template": {
+    "id": "6vsQ7AjaRjwfyNWIJIETQQIKKnjzkgVZhClfrHB47q0",
+    "title": "订单状态提醒",
+    "fields": {
+      "product": "thing17",
+      "watchItem": "thing33",
+      "time": "time20",
+      "store": "thing14"
+    },
+    "source": "User screenshot and exact template ID confirmed in text on 2026-09-20",
+    "platformScenarioAcceptance": "not independently verified"
+  },
+  "runtimePatch": {
+    "ok": true,
+    "serverTime": "2026-09-20T04:02:14.443Z",
+    "requestId": "8d0c3e2e-370d-4b95-86e0-3b47cc349c9c"
+  },
+  "bootstrap": {
+    "ok": true,
+    "serverTime": "2026-09-20T04:03:46.055Z",
+    "notifications": {
+      "enabled": true,
+      "templateIds": {
+        "restock": "6vsQ7AjaRjwfyNWIJIETQQIKKnjzkgVZhClfrHB47q0"
+      },
+      "templateTitle": "订单状态提醒",
+      "templateConfigured": true,
+      "deliveryReady": true,
+      "reason": null
+    },
+    "collector": {
+      "enabled": true,
+      "state": "running",
+      "stale": false,
+      "mode": "scheduled",
+      "breaker": {
+        "state": "closed",
+        "reason": null,
+        "until": null
+      },
+      "intervalMs": 60000,
+      "groupCount": 2,
+      "lastBatchAt": "2026-09-20T04:03:05.773Z",
+      "updatedAt": "2026-09-20T04:03:06.402Z",
+      "nextRunAt": "2026-09-20T04:04:00.000Z"
+    },
+    "account": {
+      "memberActive": true,
+      "followCount": 1,
+      "remindersEnabled": true,
+      "subscriptionCredits": 0
+    }
+  },
+  "phoneDeliveryVerified": false,
+  "realNotificationSentByAgent": false,
+  "frontendPublished": false
+}

@@ -1,6 +1,24 @@
 # 果小哨：接通微信补货提醒
 
-更新：2026-09-16。适用于消费者小程序 `wxe96ad9e77b602f1b`。
+更新：2026-09-20。适用于消费者小程序 `wxe96ad9e77b602f1b`。
+
+## 本次接入的实际模板
+
+管理员已提供后台截图，并于 2026-09-20 以文字确认完整 ID：
+
+```text
+模板 ID：6vsQ7AjaRjwfyNWIJIETQQIKKnjzkgVZhClfrHB47q0
+模板库编号：524（不能作为模板 ID 使用）
+微信卡片固定标题：订单状态提醒
+商品名称：thing17
+预约项目：thing33
+更新时间：time20
+商家名称：thing14
+```
+
+本次使用 `notifications.contentMode=watch_item`：商品名称填写完整短配置（例如 `18 ProMax 512G 冰川蓝色`），商家名称填写实际门店，更新时间填写真实检测的北京时间，预约项目填写真实的关注事项 `商品到货关注`。不把库存状态塞入预约字段，也不编造订单、预约成功或交易状态。过长且无法完整保留的商品配置用精确 SKU 代替，点击卡片进入关注页查看完整信息。
+
+微信授权弹窗及消息卡片的标题仍是“订单状态提醒”，代码不能改成“补货提醒”。字段格式适配不代表微信已确认此模板适用于本业务；其业务场景是否被允许以及手机实际收信仍需验证。后续取得更匹配的到货模板时，可替换 ID 和映射，旧模板的授权不转移至新模板。
 
 ## 先弄清三个状态
 
@@ -41,6 +59,8 @@ notifications.templateFields.product = 商品字段编号
 notifications.templateFields.store = 门店字段编号
 notifications.templateFields.time = 时间字段编号
 notifications.templateFields.status = 状态字段编号
+notifications.contentMode = stock_status
+notifications.templateTitle = 后台的实际模板标题
 notifications.consumerAppId = wxe96ad9e77b602f1b
 notifications.page = pages/follow/index
 notifications.miniprogramState = formal
@@ -51,12 +71,35 @@ notifications.enabled = true
 
 模板未完成时保持 `notifications.enabled=false`。不要把整个 runtime 文档替换为上面的片段，也不要把发送凭据写进数据库。
 
+本次模板使用的配置为：
+
+```json
+{
+  "notifications": {
+    "enabled": true,
+    "templateIds": {"restock": "6vsQ7AjaRjwfyNWIJIETQQIKKnjzkgVZhClfrHB47q0"},
+    "templateTitle": "订单状态提醒",
+    "contentMode": "watch_item",
+    "templateFields": {"product": "thing17", "store": "thing14", "time": "time20", "status": "thing33"},
+    "consumerAppId": "wxe96ad9e77b602f1b",
+    "page": "pages/follow/index",
+    "miniprogramState": "formal"
+  }
+}
+```
+
+这是 `admin.updateConfig` 的 **patch** 内容，不是完整 runtime 文档。`status` 是兼容现有配置的槽位名称；在 `watch_item` 模式下它承载关注事项，不表示模板中存在库存状态字段。
+
+开启发送开关后，后台会先进行有超时限制的微信令牌鉴权检查，该检查不会发送通知或扣授权次数。缺少凭据、凭据不正确、网络失败、令牌失效均显示未就绪；凭据非空不再等于鉴权通过。鉴权通过仍不能证明模板内容已被微信受理或手机已经收到消息。
+
 ## 第四步：用户主动授权
 
 1. 使用有效会员账号进入“关注”，添加准确的型号、容量、颜色和门店，并保持关注开启。
 2. 打开“我的”中的提醒开关，检查免打扰时段。
 3. 回到“关注”，点击“授权提醒”，在微信原生弹窗中允许接收该模板消息。
 4. 检查页面是否显示已授权/可用提醒次数，以及监测服务、微信发送服务是否就绪。
+
+模板已配置即可主动申请授权，暂时缺少发送凭据不阻拦授权；页面会分别显示授权记录与发送服务状态。微信拒绝（43101）后，系统作废本次发送开始前的失效本地额度并引导重新授权，同时保留发送期间新增的授权。其他明确发送失败返还本次预扣次数，结果不确定时不会自动重发。
 
 当前采用用户点击弹窗的一次性订阅方式。用户勾选保持选择不代表无限发送；后续仍需通过有效的用户操作获得订阅次数。微信官方还有其他订阅类型，是否适用取决于账号类目和模板，本项目不把一次性模板伪装成长效无限提醒。
 
@@ -88,4 +131,4 @@ notifications.enabled = true
 - [用户点击订阅接口 wx.requestSubscribeMessage](https://developers.weixin.qq.com/miniprogram/dev/api/open-api/subscribe-message/wx.requestSubscribeMessage.html)
 - [发送订阅消息及字段限制](https://developers.weixin.qq.com/miniprogram/dev/server/API/mp-message-management/subscribe-message/api_sendmessage.html)
 
-以上官方页面于 2026-09-16 读取。后台入口和账号可用模板需以实际后台为准。
+订阅消息概述、发送接口及字段限制于 2026-09-20 重新读取。后台入口和账号可用模板需以实际后台为准。

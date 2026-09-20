@@ -13,6 +13,7 @@
 const { NOTIFIABLE_TYPES } = require('./events');
 const { isMember } = require('../rules/membership');
 const { inMinuteWindow } = require('../time');
+const { isValidTemplateId } = require('../config');
 
 const TASK_STATUS = Object.freeze({ pending: 'pending', sending: 'sending', accepted: 'accepted', failed: 'failed', uncertain: 'uncertain', skipped: 'skipped' });
 
@@ -43,7 +44,7 @@ function buildTasks({ events, follows, users, config, now }) {
       };
       const skip = reason => tasks.push({ ...base, status: TASK_STATUS.skipped, reason });
       if (!config.notifications.enabled) { skip('notifications_disabled'); continue; }
-      if (!templateId) { skip('template_missing'); continue; }
+      if (!isValidTemplateId(templateId)) { skip('template_missing'); continue; }
       if (!user) { skip('user_missing'); continue; }
       if (!isMember(user, now)) { skip('member_expired'); continue; }
       if (follow.status !== 'active') { skip('follow_not_active'); continue; }
@@ -58,9 +59,20 @@ function buildTasks({ events, follows, users, config, now }) {
   return tasks;
 }
 
-/** Subscribe-message payload: keep values short; WeChat truncates long thing fields. */
+const plainText = value => String(value || '').replace(/<[^>]+>/g, '').replace(/[\x00-\x1f\x7f]/g, ' ').replace(/\s+/g, ' ').trim();
+const clip = (value, max) => Array.from(plainText(value)).slice(0, max).join('') || '—';
+
+/** Keep the exact capacity and colour together; use SKU if a full descriptor cannot fit. */
+function compactProduct(task) {
+  const title = plainText(task.productTitle);
+  const compact = title.replace(/(\d+(?:\.\d+)?)\s*GB\b/gi, '$1G').replace(/(\d+(?:\.\d+)?)\s*TB\b/gi, '$1T').replace(/Pro\s+Max/g, 'ProMax');
+  const withoutBrand = compact.replace(/^iPhone\s*/i, '').replace(/勃艮第酒红色/g, '酒红色');
+  const candidate = [title, compact, withoutBrand].find(value => value && Array.from(value).length <= 20);
+  return candidate || clip(task.partNumber || title, 20);
+}
+
+/** WeChat rejects overlong thing fields; keep all values within the documented limits. */
 function buildMessage(task, config) {
-  const trim = (value, max) => (value ? String(value).replace(/<[^>]+>/g, '').slice(0, max) : '—');
   const time = new Date(task.detectedAt);
   const beijing = new Date(time.getTime() + 8 * 60 * 60 * 1000);
   const hh = String(beijing.getUTCHours()).padStart(2, '0');
@@ -72,10 +84,12 @@ function buildMessage(task, config) {
     templateId: task.templateId,
     page: (config.notifications.page || 'pages/follow/index'),
     data: {
-      [fields.product]: { value: trim(task.productTitle, 20) },
-      [fields.store]: { value: trim(task.storeName || task.storeNumber, 20) },
+      [fields.product]: { value: compactProduct(task) },
+      [fields.store]: { value: clip(task.storeName || task.storeNumber, 20) },
       [fields.time]: { value: `${beijing.getUTCFullYear()}年${beijing.getUTCMonth() + 1}月${beijing.getUTCDate()}日 ${hh}:${mm}:${ss}` },
-      [fields.status]: { value: wording },
+      // Template 524 calls this slot "预约项目". Describe the real watch item,
+      // without fabricating an order, reservation or a successful purchase.
+      [fields.status]: { value: config.notifications.contentMode === 'watch_item' ? '商品到货关注' : wording },
     },
   };
 }
@@ -90,7 +104,7 @@ function buildMessage(task, config) {
 function skipReason({ task, user, follow, config, now, senderAppid }) {
   const settings = user && user.settings;
   if (!config.notifications.enabled) return 'notifications_disabled';
-  if (!task.templateId || config.notifications.templateIds.restock !== task.templateId) return 'template_changed';
+  if (!isValidTemplateId(task.templateId) || config.notifications.templateIds.restock !== task.templateId) return 'template_changed';
   if (!user || !isMember(user, now)) return 'member_expired';
   if (senderAppid && user.appid !== senderAppid) return 'consumer_appid_mismatch';
   if (!user.openid) return 'openid_missing';
@@ -128,14 +142,17 @@ async function sendTask({ task, config, sendImpl, repo, now, ownerId = 'notifier
     const code = response && (response.errCode ?? response.errcode);
     if (code === undefined || !Number.isFinite(Number(code))) outcome = { status: TASK_STATUS.uncertain, reason: 'invalid_platform_response' };
     else if (Number(code) === 0) outcome = { status: TASK_STATUS.accepted, reason: null };
-    else outcome = { status: TASK_STATUS.failed, reason: `wx_${code}:${response.errMsg || response.errmsg || ''}` };
+    else outcome = { status: TASK_STATUS.failed, reason: Number(code) === 43101 ? 'subscription_authorization_expired' : `wx_${Number(code)}` };
   } catch (error) {
     // Unknown exceptions after handing off may already have delivered. Only an
     // adapter explicitly proving the send never started can release the credit.
     outcome = { status: error && error.definitelyNotSent ? TASK_STATUS.failed : TASK_STATUS.uncertain, reason: error && error.code || 'send_transport_error' };
   }
-  if (outcome.status === TASK_STATUS.failed) await repo.releaseSubscriptionCredit({ userKey: task.userKey, templateId: task.templateId, taskId: task._id, now: clock().toISOString() });
+  if (outcome.status === TASK_STATUS.failed) {
+    const creditAction = outcome.reason === 'subscription_authorization_expired' ? repo.invalidateSubscriptionCredit : repo.releaseSubscriptionCredit;
+    await creditAction({ userKey: task.userKey, templateId: task.templateId, taskId: task._id, now: clock().toISOString() });
+  }
   return finish({ ...outcome, attempts: (task.attempts || 0) + 1, sentAt: clock().toISOString() });
 }
 
-module.exports = { TASK_STATUS, taskId, buildTasks, buildMessage, sendTask, skipReason };
+module.exports = { TASK_STATUS, taskId, buildTasks, buildMessage, compactProduct, sendTask, skipReason };
