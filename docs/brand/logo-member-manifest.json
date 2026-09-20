@@ -1,0 +1,29 @@
+{
+  "method": "ImageGen edit; master unchanged; 512 and 200 derivatives resized only",
+  "files": [
+    {
+      "file": "C:\\Users\\Administrator\\Documents\\ChatGPT\\果小哨\\output\\member-logo\\果小哨会员-黑金Logo-高清.png",
+      "width": 1254,
+      "height": 1254,
+      "format": "png",
+      "bytes": 1147004,
+      "sha256": "8bf02ead4bff9040d307635776cbb368111164e0058e50723584bbeae25e4f31"
+    },
+    {
+      "file": "C:\\Users\\Administrator\\Documents\\ChatGPT\\果小哨\\output\\member-logo\\果小哨会员-黑金Logo-512.png",
+      "width": 512,
+      "height": 512,
+      "format": "png",
+      "bytes": 239306,
+      "sha256": "f2c6becf0de7cda9dca8dc066a8107a9251f3bb976c94aa1fb3553adb5f32dd1"
+    },
+    {
+      "file": "docs/brand/logo-member-black-gold-200.png",
+      "width": 200,
+      "height": 200,
+      "format": "png",
+      "bytes": 37214,
+      "sha256": "1bcbbb62a63e47752bbadc91604786f01a8c0a578fb5ac6fbff8ae0d453f60f9"
+    }
+  ]
+}
