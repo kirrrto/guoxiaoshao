@@ -48,14 +48,29 @@
       </block>
       <view class="benefit-list mt"><view>免费：签到和体验任务获取次数，实时查询消耗 {{quota.queryCost}} 次，历史查询消耗 {{quota.historyCost}} 次。</view><view>会员：查询不扣次数，最多 {{boot.limits.maxFollows}} 个具体配置 × 每配置 {{boot.limits.maxStoresPerFollow}} 家门店。</view><view>不同容量或颜色分别占用名额。受限新品开售 30 天内，免费用户不能实时查询，仅能看昨天及更早历史。</view></view>
       <view class="membership-entry-list">
-        <button class="member-entry redemption-entry" disabled="{{redeeming}}" bindtap="onOpenRedemption">{{redemptionOpen ? '收起兑换码窗口' : '兑换码开通'}}</button>
-        <button class="member-entry payment-entry" disabled="{{true}}">付费购买（暂未开放）</button>
+        <button class="member-entry redemption-entry" disabled="{{redeeming || paymentBusy || paymentChecking}}" bindtap="onOpenRedemption">{{redemptionOpen ? '收起兑换码窗口' : '兑换码开通'}}</button>
+        <button class="member-entry payment-entry" disabled="{{!boot.paymentReady || redeeming || paymentBusy || paymentChecking || paymentPendingId}}" bindtap="onBuyMembership">{{paymentBusy ? '正在处理支付…' : membership.active ? '续费会员' : '购买会员'}} · {{boot.priceText}} / {{boot.memberProduct.days}} 天</button>
+      </view>
+      <view wx:if="{{!boot.paymentReady}}" class="payment-note">{{boot.paymentReason}}</view>
+      <view wx:else class="purchase-notice">
+        <view class="purchase-notice-title">购买须知</view>
+        <view class="payment-note">{{boot.purchaseNotice}}</view>
+      </view>
+      <view wx:if="{{paymentPendingId || paymentMessage || paymentError}}" class="payment-panel">
+        <view wx:if="{{paymentMessage}}" class="payment-status">{{paymentMessage}}</view>
+        <view wx:if="{{paymentError}}" class="payment-error">{{paymentError}}</view>
+        <view wx:if="{{paymentPendingId}}" class="payment-order-id">订单号：{{paymentPendingId}}</view>
+        <view wx:if="{{paymentPendingId}}" class="payment-actions">
+          <button class="member-entry payment-check" disabled="{{paymentBusy || paymentChecking || redeeming}}" bindtap="onCheckPayment">{{paymentChecking ? '正在查询支付结果…' : '查询支付结果'}}</button>
+          <button wx:if="{{paymentCanRetry && boot.paymentReady}}" class="member-entry payment-check" disabled="{{paymentBusy || paymentChecking || redeeming}}" bindtap="onBuyMembership">继续支付这笔订单</button>
+        </view>
+        <view wx:if="{{paymentPendingId}}" class="payment-note">订单会为当前账号保留。退出后可回到这里查询，系统不会自动再次扣款。</view>
       </view>
       <view wx:if="{{redemptionOpen}}" class="redemption-panel">
         <view class="redemption-title">兑换会员</view>
         <view class="redemption-description">输入你收到的兑换码，为当前微信账号开通会员。兑换权益与有效期以确认结果为准。</view>
         <input class="redemption-input" type="text" value="{{redemptionCode}}" placeholder="请输入兑换码" placeholder-class="redemption-placeholder" maxlength="64" disabled="{{redeeming}}" confirm-type="done" adjust-position="{{true}}" cursor-spacing="24" bindinput="onRedemptionInput" bindconfirm="onRedeemCode" />
-        <button class="member-entry redemption-entry" disabled="{{redeeming || !redemptionCode}}" bindtap="onRedeemCode">{{redeeming ? '兑换中，请稍候…' : '确认兑换'}}</button>
+        <button class="member-entry redemption-entry" disabled="{{redeeming || paymentBusy || paymentChecking || !redemptionCode}}" bindtap="onRedeemCode">{{redeeming ? '兑换中，请稍候…' : '确认兑换'}}</button>
         <view class="redemption-hint">兑换成功后立即更新会员状态，同一账号重复提交不会重复增加会员时间。</view>
         <view wx:if="{{redemptionError}}" class="redemption-message redemption-message-error">{{redemptionError}}</view>
         <view wx:if="{{redemptionResult}}" class="redemption-message redemption-message-{{redemptionResult.kind}}"><view class="bold">{{redemptionResult.title}}</view><view class="mt">{{redemptionResult.detail}}</view></view>
@@ -72,6 +87,7 @@
           <view>
             <text class="small">{{item.days}} 天会员 · {{item.sourceLabel}}<text wx:if="{{item.amountText}}"> · {{item.amountText}}</text></text>
             <view class="tiny muted">{{item.timeText}} · {{item.orderId}}</view>
+            <view wx:if="{{item.refundText}}" class="tiny muted">{{item.refundText}}</view>
           </view>
           <text class="pill pill-{{item.status === 'fulfilled' ? 'ok' : 'muted'}} tiny">{{item.statusLabel}}</text>
         </view>

@@ -45,6 +45,12 @@ check('operator project is separate and uses the existing resource AppID', admin
 check('operator project is excluded from search', json('tools/admin-miniprogram/miniprogram/sitemap.json').rules.some(rule => rule.page === '*' && rule.action === 'disallow'));
 const defaults = require(path.join(root, 'cloudfunctions/gxs_api/lib/config.js')).DEFAULTS;
 check('payment stays closed in defaults', defaults.memberProduct.enabled === false);
+check('membership purchase uses the confirmed seven-day product', defaults.memberProduct.id === 'vip666' && defaults.memberProduct.days === 7 && defaults.memberProduct.priceFen === 700);
+check('purchase notice states a non-refundable one-time virtual service', typeof defaults.memberProduct.note === 'string' && defaults.memberProduct.note.includes('一次性虚拟服务') && defaults.memberProduct.note.includes('一经售出不予退款'));
+const paymentTimer = json('cloudfunctions/gxs_api/config.json').triggers;
+const { isTrustedPaymentTimer, CALLBACK_PATH } = require(path.join(root, 'cloudfunctions/gxs_api/lib/payment/entry.js'));
+check('payment recovery timer is five minutes and rejects client-triggered scans', paymentTimer.length === 1 && paymentTimer[0].name === 'gxs-payment-reconcile-five-minutes' && paymentTimer[0].config === '0 */5 * * * * *' && !isTrustedPaymentTimer({ Type: 'Timer', TriggerName: paymentTimer[0].name }, { SOURCE: 'wx_client', OPENID: 'untrusted' }, {}));
+check('payment HTTP ingress uses its exact callback path', CALLBACK_PATH === '/payment/callback');
 const app = json('miniprogram/app.json');
 check('acceptance page and mock runtime absent from mini program', !app.pages.some(page => /acceptance/.test(page)) && !fs.existsSync(path.join(root, 'miniprogram/utils/acceptance.js')) && !['.js','.json','.wxml','.wxss'].some(ext => fs.existsSync(path.join(root, 'miniprogram/pages/acceptance/index' + ext))));
 check('tab icons and page resources exist', app.pages.every(page => ['.js','.wxml','.wxss','.json'].every(ext => fs.existsSync(path.join(root, 'miniprogram', page + ext)))) && app.tabBar.list.every(tab => [tab.iconPath,tab.selectedIconPath].every(icon => fs.existsSync(path.join(root,'miniprogram',icon)))));
@@ -60,7 +66,8 @@ const report = { checkedAt: new Date().toISOString(), version: project.version, 
   { item: 'Apply database indexes/rules and seed verified catalog', status: 'not checked by this local tool; consult the versioned cloud-deployment evidence' },
   { item: 'Real-account signin, quota, history and reminder deletion/clear', status: 'requires deployed-cloud acceptance' },
   { item: 'iOS and Android layout, images, failure recovery and package size', status: 'requires physical-device acceptance' },
-  { item: 'Automatic collection and actual subscription delivery', status: 'separate checks: verify automatic observations; enable messages only with real template, credentials and user authorization' }
+  { item: 'Automatic collection and actual subscription delivery', status: 'separate checks: verify automatic observations; enable messages only with real template, credentials and user authorization' },
+  { item: 'Virtual payment callback, production credentials and real-device payment/refund', status: 'requires cloud gateway, credential and real-order verification; local mocks never prove a payment succeeded' }
 ] };
 report.monitorBundle = monitorBundle;
 const outputAt = process.argv.indexOf('--out');

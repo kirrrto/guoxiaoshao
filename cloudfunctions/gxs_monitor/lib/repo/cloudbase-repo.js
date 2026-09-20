@@ -269,12 +269,15 @@ function createCloudbaseRepo(db) {
     async getOrderByOutTradeNo(outTradeNo) {
       return readOne(col(COLLECTIONS.orders).where({ outTradeNo }));
     },
-    async listReconcileOrders(limit = 100) {
-      const cutoff = new Date(Date.now() - 30 * 86400000).toISOString();
-      const where = _.or([{ status: _.in(['created', 'paid']) }, { status: 'fulfilled', providerAcknowledgedAt: _.eq(null) }, { status: 'fulfilled', providerAcknowledgedAt: _.exists(false) }, { status: 'fulfilled', fulfilledAt: _.gte(cutoff) }]);
-      const rows = await readAll(col(COLLECTIONS.orders).where(where).orderBy('createdAt', 'asc').orderBy('_id', 'asc'));
-      rows.sort((a, b) => String(a.lastReconciledAt || '').localeCompare(String(b.lastReconciledAt || '')) || a.createdAt.localeCompare(b.createdAt) || a._id.localeCompare(b._id));
-      return rows.slice(0, Math.max(1, Math.min(1000, limit)));
+    async listReconcileOrders(options = {}) {
+      const { limit = 10, nowIso = new Date().toISOString() } = typeof options === 'number' ? { limit: options } : options;
+      const cap = Number.isInteger(limit) ? Math.max(1, Math.min(25, limit)) : 10;
+      const cutoff = new Date(Date.parse(nowIso) - 30 * 86400000).toISOString();
+      const where = _.and([{ provider: 'wechat_virtual_payment', status: _.in(['created', 'paid', 'fulfilled', 'partially_refunded']) },
+        _.or([{ status: _.in(['created', 'paid']) }, { providerAcknowledgedAt: _.eq(null) }, { providerAcknowledgedAt: _.exists(false) }, { fulfilledAt: _.gte(cutoff) }])]);
+      // Sort and limit in the database: never load all pending / historical
+      // orders just to select a small compensation batch in process memory.
+      return readAll(col(COLLECTIONS.orders).where(where).orderBy('lastReconciledAt', 'asc').orderBy('_id', 'asc'), cap);
     },
     async saveOrder(order) {
       const { _id, ...data } = order;

@@ -1,0 +1,35 @@
+{
+  "checkedAt": "2026-09-20T06:39:11.759Z",
+  "url": "https://flowermean-6gjaxfqhf6c13e88-1397722981.ap-shanghai.app.tcloudbase.com/payment/callback",
+  "function": "gxs_api",
+  "scope": "WeChat message-push URL verification GET only. No encrypted payment POST and no real purchase.",
+  "warmupUnsignedGet": {
+    "at": "2026-09-20T06:37:40.951Z",
+    "requestId": "c7280a7f-b4bd-11f1-9c6a-525400631ae4",
+    "requestSource": "TCB_GW",
+    "httpStatus": 403,
+    "body": "forbidden"
+  },
+  "wechatUrlChallenge": {
+    "at": "2026-09-20T06:39:11.759Z",
+    "requestId": "fd4e6902-b4bd-11f1-9c6a-525400631ae4",
+    "requestSource": "TCB_GW",
+    "durationMs": 34,
+    "httpStatus": 200,
+    "contentType": "text/plain; charset=utf-8",
+    "echoBodyShape": "decimal_digits",
+    "echoBodyLength": 18,
+    "verificationFailedLogPresent": false
+  },
+  "reconcileTimer": {
+    "at": "2026-09-20T06:35:00.982Z",
+    "requestId": "620bff7f-8fdd-43b5-a1f0-cebbaf6e9208",
+    "requestSource": "TRIGGER_TIMER",
+    "state": "completed",
+    "scanned": 0,
+    "reconciled": 0,
+    "failed": 0
+  },
+  "purchaseEnabled": false,
+  "passed": true
+}

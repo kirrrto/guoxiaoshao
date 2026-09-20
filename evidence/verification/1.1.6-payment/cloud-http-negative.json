@@ -1,0 +1,40 @@
+{
+  "checkedAt": "2026-09-20T04:39:34.860233+00:00",
+  "url": "https://flowermean-6gjaxfqhf6c13e88-1397722981.ap-shanghai.app.tcloudbase.com/payment/callback",
+  "scope": "Unauthenticated rejection only. No signed callback or real payment tested.",
+  "cases": [
+    {
+      "case": "unsigned_get",
+      "method": "GET",
+      "status": 403,
+      "expected": 403,
+      "body": "forbidden",
+      "passed": true
+    },
+    {
+      "case": "unsigned_admin_action",
+      "method": "POST",
+      "status": 403,
+      "expected": 403,
+      "body": "forbidden",
+      "passed": true
+    },
+    {
+      "case": "nested_path",
+      "method": "GET",
+      "status": 403,
+      "expected": 403,
+      "body": "forbidden",
+      "passed": true
+    },
+    {
+      "case": "unsupported_method",
+      "method": "PUT",
+      "status": 405,
+      "expected": 405,
+      "body": "method not allowed",
+      "passed": true
+    }
+  ],
+  "passed": true
+}

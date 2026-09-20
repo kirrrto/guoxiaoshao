@@ -22,8 +22,8 @@
     },
     {
       "path": "collections.js",
-      "bytes": 3743,
-      "sha256": "c9f33339d2a748046ee2d31481a9de782bae6893f5c9f01aacf31b7753c5694f"
+      "bytes": 3923,
+      "sha256": "0f1fd5394fe092392b8f895f01803c83a263f8dbbc90e5a1263c72506072babf"
     },
     {
       "path": "config-audit.js",
@@ -32,8 +32,8 @@
     },
     {
       "path": "config.js",
-      "bytes": 8902,
-      "sha256": "3d81afdd007b97f203074d213b5d66bdc188b77443d897d4584de94cd1ea3620"
+      "bytes": 9815,
+      "sha256": "e02e57ae929946dd8d3152979ae4c0d631944f119dd032024374d2bb9a320d37"
     },
     {
       "path": "connection.js",
@@ -107,13 +107,13 @@
     },
     {
       "path": "repo/atomic-ops.js",
-      "bytes": 34063,
-      "sha256": "f1582ab1e48391790fa74dcf9dd2bc2c9e3c7580933f48e52489518408fbf49a"
+      "bytes": 38826,
+      "sha256": "184665109a34779698c4f2436f9c2993a0fc40fe02939d973fc5888460f50772"
     },
     {
       "path": "repo/cloudbase-repo.js",
-      "bytes": 17954,
-      "sha256": "34ae567279659734d72217c85d6b7424bbbd294ae42f2f95f2090a3e128a95a8"
+      "bytes": 18143,
+      "sha256": "c828ae65dd4d891a2a7a704a90fcd59103bc3fedb9bb38d2d1d78036d01ac49b"
     },
     {
       "path": "repo/subscription-credit-ledger.js",
@@ -129,6 +129,11 @@
       "path": "rules/access.js",
       "bytes": 2351,
       "sha256": "fe8e23d3b3413526fcdf5a3f7d2e1308c09f6e30a2840a30071d078e199c4388"
+    },
+    {
+      "path": "rules/membership-entitlements.js",
+      "bytes": 4842,
+      "sha256": "832045214cf9a538b5b5d17c284765728a195b31ccbefbbfcd899f72b6543563"
     },
     {
       "path": "rules/membership.js",

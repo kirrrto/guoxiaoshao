@@ -6,6 +6,7 @@ const { COLLECTIONS } = require('../collections');
 const catalog = require('./catalog');
 const { fulfilOrder } = require('./member');
 const { assertConfigEditor, logConfigAuthorizationDenial } = require('../config-audit');
+const { paymentProviderFor, paymentProduct } = require('../payment/service');
 
 const ID_PATTERN = /^[A-Za-z0-9_-]{4,64}$/;
 
@@ -19,6 +20,12 @@ function requireAdmin(ctx, diagnosticStage) {
 async function getConfig(ctx) {
   requireAdmin(ctx);
   return { config: ctx.config };
+}
+
+async function paymentStatus(ctx) {
+  requireAdmin(ctx);
+  // Pure configuration inspection: no token probe, order creation or payment.
+  return { payment: paymentProviderFor(ctx).getReadiness(), product: paymentProduct(ctx) };
 }
 
 async function updateConfig(ctx, payload) {
@@ -87,4 +94,4 @@ async function lookupUser(ctx, payload) {
   return { user: { userKey: user._id, createdAt: user.createdAt, lastSeenAt: user.lastSeenAt, membership: user.membership, quota: user.quota, settings: user.settings, subscriptions: user.subscriptions }, follows };
 }
 
-module.exports = { getConfig, updateConfig, seedCatalog, grantMembership, grantCredits, stats, lookupUser };
+module.exports = { getConfig, paymentStatus, updateConfig, seedCatalog, grantMembership, grantCredits, stats, lookupUser };

@@ -13,13 +13,14 @@ const DEFAULTS = Object.freeze({
     { id: 'view_history', title: '浏览一次历史记录', reward: 1 },
   ],
   memberProduct: {
-    id: 'member_30d',
-    title: '果小哨会员 · 30 天',
-    days: 30,
-    priceFen: 900,
+    id: 'vip666',
+    title: '果小哨会员 · 7 天',
+    days: 7,
+    priceFen: 700,
     enabled: false,
-    note: '会员可关注 3 个具体配置，每个配置最多 3 家门店；实时查询与历史不限次数。提醒需完成微信授权，当前会员购买暂未开放。',
+    note: '该产品为一次性虚拟服务，一经售出不予退款。一次购买 7 天，已有会员按剩余有效期顺延，不自动续费。',
   },
+  virtualPayment: { offerId: '1450655203', productId: 'vip666', iosEnabled: true },
   memberRedemption: { enabled: true },
   newProductWindows: [],
   notifications: {
@@ -54,7 +55,7 @@ const DEFAULTS = Object.freeze({
   announcement: null,
 });
 
-const EDITABLE = new Set(['quota', 'tasks', 'memberProduct', 'memberRedemption', 'newProductWindows', 'notifications', 'collector', 'query', 'adminUserKeys', 'announcement']);
+const EDITABLE = new Set(['quota', 'tasks', 'memberProduct', 'virtualPayment', 'memberRedemption', 'newProductWindows', 'notifications', 'collector', 'query', 'adminUserKeys', 'announcement']);
 
 // A template library number is not an ID. Do not guess a fixed ID length.
 function isValidTemplateId(value) {
@@ -93,15 +94,20 @@ function patchConfig(stored, patch) {
 function validateConfig(config) {
   const invalid = (field) => { throw new ApiError('invalid_config', `配置项无效：${field}`); };
   const integer = (value, min, max, field) => { if (!Number.isSafeInteger(value) || value < min || value > max) invalid(field); };
-  for (const key of ['quota', 'memberProduct', 'memberRedemption', 'notifications', 'collector', 'query']) {
+  for (const key of ['quota', 'memberProduct', 'virtualPayment', 'memberRedemption', 'notifications', 'collector', 'query']) {
     if (!config[key] || typeof config[key] !== 'object' || Array.isArray(config[key])) invalid(key);
   }
   for (const key of ['signinReward', 'taskReward', 'dailyGrantCap', 'balanceCap', 'queryCost', 'historyCost']) integer(config.quota[key], 0, 10000, `quota.${key}`);
   for (const key of ['memberProduct', 'memberRedemption', 'notifications', 'collector']) if (typeof config[key].enabled !== 'boolean') invalid(`${key}.enabled`);
   if (Object.keys(config.memberRedemption).some(key => key !== 'enabled')) invalid('memberRedemption');
-  if (config.memberProduct.enabled) throw new ApiError('payment_deferred', '会员购买暂未开放，请在主体备案、认证及支付接入完成后再启用');
   integer(config.memberProduct.days, 1, 3650, 'memberProduct.days');
   integer(config.memberProduct.priceFen, 1, 10000000, 'memberProduct.priceFen');
+  if (typeof config.memberProduct.note !== 'string' || !config.memberProduct.note.trim() || config.memberProduct.note.length > 200 || /[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/.test(config.memberProduct.note)) invalid('memberProduct.note');
+  if (Object.keys(config.virtualPayment).some(key => !['offerId', 'productId', 'iosEnabled'].includes(key))) invalid('virtualPayment');
+  if (typeof config.virtualPayment.offerId !== 'string' || !/^\d{1,20}$/.test(config.virtualPayment.offerId)) invalid('virtualPayment.offerId');
+  if (typeof config.virtualPayment.productId !== 'string' || !/^[A-Za-z0-9_-]{1,128}$/.test(config.virtualPayment.productId)) invalid('virtualPayment.productId');
+  if (typeof config.virtualPayment.iosEnabled !== 'boolean') invalid('virtualPayment.iosEnabled');
+  if (config.memberProduct.enabled && (config.memberProduct.days !== 7 || config.memberProduct.priceFen !== 700 || config.memberProduct.id !== config.virtualPayment.productId)) invalid('memberProduct');
   integer(config.query.maxStores, 1, 3, 'query.maxStores');
   integer(config.query.upstreamTimeoutMs, 1000, 10000, 'query.upstreamTimeoutMs');
   integer(config.query.maxRequestsPerUserMinute, 1, 60, 'query.maxRequestsPerUserMinute');

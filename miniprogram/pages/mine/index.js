@@ -1,8 +1,9 @@
-const { call, showError, toast } = require('../../utils/api');
+const { call, showError, toast, newId } = require('../../utils/api');
 const { getBootstrap, invalidateBootstrap, invalidateFollows, publishQuota, subscribeQuota } = require('../../utils/store');
 const fmt = require('../../utils/format');
 const { syncTabBar } = require('../../utils/tab-bar');
 const { notificationAdvice } = require('../../utils/reminder-readiness');
+const { paymentAvailability, createPaymentController, purchaseNotice } = require('../../utils/member-payment');
 
 const LEDGER_TEXT = {
   signin_reward: '每日签到',
@@ -59,7 +60,7 @@ function notificationReasonText(reason, status) {
   return '发送结果暂时无法确认';
 }
 
-const ORDER_STATUS = { created: '待支付', paid: '开通确认中', fulfilled: '已开通', refunded: '已退款', cancelled: '已取消', failed: '支付失败' };
+const ORDER_STATUS = { created: '待支付', paid: '开通确认中', fulfilled: '已开通', partially_refunded: '部分退款', refunded: '已退款', cancelled: '已取消', failed: '支付失败' };
 const SECONDARY_CACHE_MS = 30000;
 const presentTasks = (tasks, quota) => (tasks || []).map(task => ({ ...task,
   done: quota.tasksDoneToday.includes(task.id),
@@ -86,6 +87,7 @@ function presentOrder(order) {
   const redeemed = order.source === 'redemption_code' || order.type === 'membership_redemption';
   const sourceLabel = redeemed ? '兑换码开通' : ['admin', 'admin_grant'].includes(order.source) || order.productId === 'admin_grant' ? '平台发放' : order.amountFen > 0 ? '付费开通' : '会员开通';
   return { ...order, sourceLabel, amountText: order.amountFen > 0 ? fmt.fen(order.amountFen) : '',
+    refundText: order.refundFen > 0 ? `已退款 ${fmt.fen(order.refundFen)}` : '',
     statusLabel: ORDER_STATUS[order.status] || '状态待确认', timeText: fmt.fmtDateTime(order.fulfilledAt || order.paidAt || order.createdAt) };
 }
 
@@ -137,6 +139,12 @@ Page({
     redeeming: false,
     redemptionError: null,
     redemptionResult: null,
+    paymentBusy: false,
+    paymentChecking: false,
+    paymentPendingId: '',
+    paymentCanRetry: false,
+    paymentMessage: '',
+    paymentError: '',
   },
 
   async onLoad(options = {}) {
@@ -149,6 +157,7 @@ Page({
     });
     this.setData({ redemptionOpen: options.openRedemption === '1' });
     await this.refresh();
+    if (!this.pageRetired && this.pageVisible && !this.data.redeeming && this.paymentController) this.paymentController.show();
   },
 
   async onShow() {
@@ -157,17 +166,19 @@ Page({
     this.pageVisible = true;
     this.consumePendingSection();
     if (this.data.ready) await this.refresh({ quiet: true });
+    if (!this.pageRetired && this.pageVisible && !this.data.redeeming && this.paymentController) this.paymentController.show();
   },
 
   onUnload() {
     this.retirePage();
   },
 
-  onHide() { this.pageVisible = false; },
+  onHide() { this.pageVisible = false; if (this.paymentController) this.paymentController.hide(); },
 
   retirePage() {
     this.pageRetired = true;
     this.pageVisible = false;
+    if (this.paymentController) this.paymentController.dispose();
     this.ledgerGeneration = (this.ledgerGeneration || 0) + 1;
     if (this.unsubscribeQuota) { this.unsubscribeQuota(); this.unsubscribeQuota = null; }
     this.pageSession = (this.pageSession || 0) + 1;
@@ -189,7 +200,7 @@ Page({
   },
 
   async refresh({ quiet, force = false, skipOrders = false } = {}) {
-    if (this.pageRetired || this.data.redeeming) return;
+    if (this.pageRetired || this.data.redeeming || this.data.paymentBusy) return;
     if (this.refreshing) return this.refreshing;
     const pending = this.refreshAccount({ quiet, force, skipOrders, generation: this.accountGeneration || 0 });
     this.refreshing = pending;
@@ -235,8 +246,7 @@ Page({
   applyBoot(boot) {
     const membership = boot.membership;
     const settings = boot.settings || { dnd: { enabled: false, startMinute: 23 * 60, endMinute: 8 * 60 }, notifyEnabled: true };
-    const paymentReady = false;
-    const paymentReason = fmt.reasonText(boot.memberProduct.paymentReason) || '会员购买暂未开放。';
+    const availability = paymentAvailability(boot.memberProduct, wx);
     this.setData({
       boot: {
         identity: boot.identity,
@@ -245,8 +255,9 @@ Page({
         collector: { ...boot.collector, ...fmt.collectorMeta(boot.collector.state) },
         followCount: boot.followCount,
         limits: boot.limits,
-        paymentReady,
-        paymentReason,
+        paymentReady: availability.ready,
+        paymentReason: availability.reason,
+        purchaseNotice: purchaseNotice(boot.memberProduct),
       },
       membership: presentMembership(membership),
       quota: boot.quota,
@@ -255,10 +266,53 @@ Page({
       dndStart: minuteToTime(settings.dnd.startMinute),
       dndEnd: minuteToTime(settings.dnd.endMinute),
     });
+    this.ensurePaymentController().sync(boot.identity, boot.memberProduct);
+  },
+
+  ensurePaymentController() {
+    if (!this.paymentController) {
+      this.paymentController = createPaymentController({ wx, call, makeId: typeof newId === 'function' ? () => newId('member') : undefined,
+      onUpdate: patch => { if (!this.pageRetired) this.setData(patch); },
+      onResolved: async ({ membership }) => {
+        if (this.pageRetired) return;
+        this.accountGeneration = (this.accountGeneration || 0) + 1;
+        this.ordersGeneration = (this.ordersGeneration || 0) + 1;
+        this.refreshing = null;
+        invalidateBootstrap(); invalidateFollows(); this.ordersLoadedAt = 0;
+        this.setData({ membership: presentMembership(membership), showOrders: true });
+        await this.loadOrders({ force: true });
+      },
+      });
+      if (this.pageVisible) this.paymentController.show();
+    }
+    return this.paymentController;
+  },
+
+  async onBuyMembership() {
+    if (this.pageRetired || this.data.redeeming || !this.data.ready || !this.data.boot || !this.data.boot.paymentReady) return;
+    const notice = this.data.boot.purchaseNotice;
+    const confirmed = await new Promise(resolve => {
+      if (typeof wx.showModal !== 'function') { resolve(false); return; }
+      wx.showModal({
+        title: '购买须知',
+        content: `${notice}\n\n确认即表示已阅读并同意上述说明。`,
+        confirmText: '同意购买',
+        cancelText: '取消',
+        success: result => resolve(Boolean(result.confirm)),
+        fail: () => resolve(false),
+      });
+    });
+    if (!confirmed || this.pageRetired || this.data.redeeming) return;
+    return this.ensurePaymentController().buy();
+  },
+
+  onCheckPayment() {
+    if (this.pageRetired || this.data.redeeming) return;
+    return this.ensurePaymentController().check();
   },
 
   onOpenRedemption() {
-    if (this.pageRetired || this.data.redeeming) return;
+    if (this.pageRetired || this.data.redeeming || this.data.paymentBusy || this.data.paymentChecking) return;
     this.setData({ redemptionOpen: !this.data.redemptionOpen, redemptionCode: '', redemptionError: null, redemptionResult: null });
   },
 
@@ -268,9 +322,11 @@ Page({
   },
 
   async onRedeemCode() {
-    if (this.pageRetired || this.data.redeeming) return;
+    if (this.pageRetired || this.data.redeeming || this.data.paymentBusy || this.data.paymentChecking) return;
     const code = this.data.redemptionCode.trim();
     if (!code) { this.setData({ redemptionError: '请输入兑换码。' }); return; }
+    // Suspend order polling while another server-side membership change runs.
+    if (this.paymentController) this.paymentController.hide();
     this.accountGeneration = (this.accountGeneration || 0) + 1;
     const generation = this.accountGeneration;
     this.refreshing = null;
@@ -297,6 +353,7 @@ Page({
     }
     // A failed account/record refresh never undoes the server-confirmed result.
     if (confirmed) await Promise.all([this.refresh({ quiet: true, force: true, skipOrders: true }), this.loadOrders({ force: true })]);
+    if (!this.pageRetired && this.pageVisible && this.paymentController) this.paymentController.show();
   },
 
   invalidateNotificationRead() {
@@ -583,7 +640,7 @@ Page({
   onHelp() {
     wx.showModal({
       title: '使用说明',
-      content: `1. 查询：选择具体配置与门店，免费查询消耗 ${this.data.quota.queryCost} 次，接口失败按服务端规则返还。\n2. 次数：每日签到和体验任务可获取次数，每日最多 ${this.data.quota.dailyGrantCap} 次，累计上限 ${this.data.quota.balanceCap} 次。\n3. 会员：查询不扣次数，可关注 3 个具体配置，每配置最多 3 家门店；颜色或容量不同分别占用名额。\n4. 提醒：需要额外授权微信订阅消息，开通会员不等于无限接收提醒。\n5. 新品：受限新品开售 30 天内，免费用户不可实时查询，只能看昨天及更早历史。`,
+      content: `1. 查询：选择具体配置与门店，免费查询消耗 ${this.data.quota.queryCost} 次，接口失败按服务端规则返还。\n2. 次数：每日签到和体验任务可获取次数，每日最多 ${this.data.quota.dailyGrantCap} 次，累计上限 ${this.data.quota.balanceCap} 次。\n3. 会员：查询不扣次数，可关注 3 个具体配置，每配置最多 3 家门店；颜色或容量不同分别占用名额。该产品为一次性虚拟服务，一经售出不予退款。\n4. 提醒：需要额外授权微信订阅消息，开通会员不等于无限接收提醒。\n5. 新品：受限新品开售 30 天内，免费用户不可实时查询，只能看昨天及更早历史。`,
       showCancel: false,
     });
   },

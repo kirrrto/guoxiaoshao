@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 
 const project = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const adminPreview = process.argv.includes('--admin-only');
-if (adminPreview && process.argv.some(arg => /^--(?:reminders|stock|redemption|monitoring|history-task|history-data)-only$/.test(arg))) throw Error('--admin-only cannot be combined with consumer scenarios');
+if (adminPreview && process.argv.some(arg => /^--(?:reminders|stock|redemption|payment|monitoring|history-task|history-data)-only$/.test(arg))) throw Error('--admin-only cannot be combined with consumer scenarios');
 const mini = path.join(project, adminPreview ? 'tools/admin-miniprogram/miniprogram' : 'miniprogram');
 const appConfig = JSON.parse(fs.readFileSync(path.join(mini, 'app.json'), 'utf8'));
 appConfig.tabBar = appConfig.tabBar || { custom: false, list: [] };
@@ -22,11 +22,16 @@ class PreviewDate extends Date {
 const copy = value => JSON.parse(JSON.stringify(value));
 const html = value => String(value ?? '').replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;');
 
-function sandbox(handler) {
+function sandbox(handler, { paymentScenario } = {}) {
   const modules = new Map(), storage = new Map(); let captured, seq = 0;
   const app = { globalData: {} };
   const api = { call: handler, newId: p => `${p}-preview-${++seq}`, toast() {}, showError() {} };
-  const wx = { getStorageSync: k => storage.get(k), setStorageSync: (k, v) => storage.set(k, v), removeStorageSync: k => storage.delete(k), nextTick: fn => queueMicrotask(fn), showToast() {}, showModal() {}, stopPullDownRefresh() {} };
+  const wx = { getStorageSync: k => storage.get(k), setStorageSync: (k, v) => storage.set(k, v), removeStorageSync: k => storage.delete(k), nextTick: fn => queueMicrotask(fn), showToast() {}, showModal: options => { if (options && typeof options.success === 'function') options.success({ confirm: true, cancel: false }); }, stopPullDownRefresh() {} };
+  // These functions are local preview stubs, never connected to WeChat.
+  Object.assign(wx, { getDeviceInfo: () => ({ platform: 'ios', system: paymentScenario === 'payment-old-ios' ? 'iOS 14.8' : 'iOS 18.0' }),
+    getAppBaseInfo: () => ({ SDKVersion: '3.10.0', version: '8.0.68' }), canIUse: () => true,
+    login: options => options.success({ code: 'offline-preview-login' }),
+    requestVirtualPayment: options => paymentScenario === 'payment-cancelled' ? options.fail({ errMsg: 'requestVirtualPayment:fail cancel' }) : options.success({ errMsg: 'requestVirtualPayment:ok' }) });
   function load(filename) {
     if (filename === path.join(mini, 'utils/api.js')) return api;
     if (!allowRemoteImages && filename === path.join(mini, 'config/product-images.js')) return {};
@@ -134,12 +139,14 @@ if (!sample) throw Error('Requested SKU does not exist in the catalog');
 const reminderPreview = process.argv.includes('--reminders-only');
 const stockPreview = process.argv.includes('--stock-only');
 const redemptionPreview = process.argv.includes('--redemption-only');
+const paymentPreview = process.argv.includes('--payment-only');
 const monitoringPreview = process.argv.includes('--monitoring-only');
 const historyTaskPreview = process.argv.includes('--history-task-only');
 const historyDataPreview = process.argv.includes('--history-data-only');
 const widths = [320, 375, 430], scenarios = adminPreview ? ['operator-ready', 'operator-denied', 'operator-loading', 'operator-error', 'operator-longcontent', 'operator-saving'] : historyTaskPreview ? ['history-member-reward', 'history-free-first', 'history-read-error', 'history-balance-cap', 'history-completed', 'history-longcontent', 'history-loading'] : monitoringPreview ? ['monitor-template-missing', 'monitor-ready-authorized', 'monitor-needs-authorization', 'monitor-stale', 'monitor-disabled', 'monitor-expired-paused'] : redemptionPreview ? ['redemption-input', 'redemption-loading', 'redemption-error', 'redemption-success', 'redemption-used', 'redemption-limited', 'redemption-empty'] : stockPreview ? ['stock-fresh', 'stock-old', 'stock-unknown', 'stock-missing', 'stock-restricted'] : reminderPreview ? ['reminders', 'reminder-empty', 'reminder-loading', 'reminder-deleting', 'reminder-clearing', 'reminder-error', 'reminder-more-error', 'longcontent'] : ['free', 'member', 'expired', 'empty', 'error', 'longcontent'];
 if (historyDataPreview) scenarios.splice(0, scenarios.length, 'history-no-data', 'history-unknown-only', 'history-observed-no-events', 'history-events-only', 'history-observed-events', 'history-partial-stores');
-const names = adminPreview ? { admin: '运营工具' } : historyDataPreview ? { history: '历史' } : historyTaskPreview ? { history: '历史', mine: '我的' } : stockPreview || monitoringPreview ? { follow: '小哨提醒' } : reminderPreview || redemptionPreview ? { mine: '我的' } : { query: '查询', follow: '小哨提醒', history: '历史', mine: '我的' };
+if (paymentPreview) scenarios.splice(0, scenarios.length, 'payment-ready', 'payment-renew', 'payment-blocked', 'payment-old-ios', 'payment-pending', 'payment-cancelled', 'payment-error', 'payment-fulfilled', 'payment-partial-refund');
+const names = adminPreview ? { admin: '运营工具' } : paymentPreview ? { mine: '我的' } : historyDataPreview ? { history: '历史' } : historyTaskPreview ? { history: '历史', mine: '我的' } : stockPreview || monitoringPreview ? { follow: '小哨提醒' } : reminderPreview || redemptionPreview ? { mine: '我的' } : { query: '查询', follow: '小哨提醒', history: '历史', mine: '我的' };
 if (monitoringPreview) scenarios.push('monitor-no-follows', 'monitor-all-paused', 'monitor-user-disabled', 'monitor-dnd');
 fs.mkdirSync(out, { recursive: true });
 const manifest = [];
@@ -150,10 +157,16 @@ for (const scenario of scenarios) {
   const p = products.find(p => p.partNumber === sample.partNumber), member = historyTaskPreview ? ['history-member-reward', 'history-longcontent'].includes(scenario) : monitoringPreview ? scenario !== 'monitor-expired-paused' : stockPreview ? scenario !== 'stock-restricted' : ['member', 'longcontent'].includes(scenario), expired = scenario === 'expired' || scenario === 'monitor-expired-paused';
   const bootstrap = { identity: { userKey: 'preview:offline-user', openidMasked: 'preview…0001', isAdmin: true }, membership: { active: member, remainingMs: member ? 18 * 86400000 : 0, expiresAt: member ? '2026-10-03T07:00:00Z' : expired ? '2026-09-10T07:00:00Z' : null },
     quota: { balance: member ? 5 : 0, revision: 0, grantedToday: 0, dailyGrantCap: 2, balanceCap: 10, queryCost: 1, historyCost: 1, signedInToday: false, tasksDoneToday: [], tasksViewedToday: [] }, tasks: [{ id: 'view_history', title: '浏览一次历史记录', reward: 1 }],
-    collector: { state: scenario === 'expired' ? 'stale' : 'not_deployed' }, memberProduct: { title: '30 天会员', days: 30, priceFen: 900, enabled: false, paymentReady: false, paymentReason: '购买开放后可在此开通会员。' },
+    collector: { state: scenario === 'expired' ? 'stale' : 'not_deployed' }, memberProduct: { id: 'vip666', title: '7 天会员', days: 7, priceFen: 700, enabled: paymentPreview && scenario !== 'payment-blocked', paymentReady: paymentPreview && scenario !== 'payment-blocked', iosEnabled: true, note: '该产品为一次性虚拟服务，一经售出不予退款。一次购买 7 天，已有会员按剩余有效期顺延，不自动续费。', paymentReason: '购买开放后可在此开通会员。' },
     notifications: { enabled: false, templateIds: {} }, subscriptions: {}, settings: { notifyEnabled: true, dnd: { enabled: true, startMinute: 1380, endMinute: 480 } },
     limits: { maxFollows: 3, maxStoresPerFollow: 3, queryMaxStores: 3 }, followCount: scenario === 'empty' ? 0 : 1, catalogVersion: 'offline-preview' };
   if (scenario === 'history-balance-cap') bootstrap.quota.balance = 10;
+  if (scenario === 'payment-renew') bootstrap.membership = { active: true, remainingMs: 18 * 86400000, expiresAt: '2026-10-03T07:00:00Z' };
+  const previewOrder = { orderId: '', productId: 'vip666', source: 'virtual_payment', type: 'membership', amountFen: 700, days: 7, createdAt: now.toISOString(),
+    status: scenario === 'payment-partial-refund' ? 'partially_refunded' : scenario === 'payment-fulfilled' ? 'fulfilled' : 'created',
+    paymentPending: scenario === 'payment-pending', fulfilledAt: ['payment-partial-refund', 'payment-fulfilled'].includes(scenario) ? now.toISOString() : null,
+    refundFen: scenario === 'payment-partial-refund' ? 350 : 0 };
+  const paidMembership = { active: true, expiresAt: scenario === 'payment-partial-refund' ? '2026-09-18T19:00:00Z' : '2026-09-22T07:00:00Z', remainingMs: (scenario === 'payment-partial-refund' ? 3.5 : 7) * 86400000 };
   if (scenario === 'history-completed') Object.assign(bootstrap.quota, { balance: 1, revision: 1, grantedToday: 1, tasksDoneToday: ['view_history'], tasksViewedToday: ['view_history'] });
   const ledgerEntries = scenario === 'history-completed' ? [{ id: 'preview-task-ledger', type: 'task_reward', delta: 1, createdAt: now.toISOString() }] : [];
   const completeHistoryTask = () => {
@@ -229,14 +242,20 @@ for (const scenario of scenarios) {
     }
     if (action === 'quota.completeTask') return completeHistoryTask();
     if (action === 'quota.ledger') return { balance: bootstrap.quota.balance, entries: copy(ledgerEntries) };
-    if (action === 'member.status') return { orders: [] };
+    if (action === 'member.status') return { orders: previewOrder.orderId ? [copy(previewOrder)] : [] };
+    if (action === 'member.createOrder') {
+      previewOrder.orderId = payload.orderId;
+      if (scenario === 'payment-error') throw Object.assign(Error('offline mock timeout'), { code: 'call_failed' });
+      return { ok: true, order: copy(previewOrder), payment: { mode: 'short_series_goods', signData: '{"offlinePreview":true}', paySig: 'offline-preview', signature: 'offline-preview' } };
+    }
+    if (action === 'member.checkOrder') return { order: copy(previewOrder), membership: previewOrder.fulfilledAt ? copy(paidMembership) : copy(bootstrap.membership) };
     if (action === 'notify.list') return { notifications: reminderRecords, hasMore: reminderPreview && ['reminders','reminder-more-error'].includes(scenario), nextCursor: 'preview-next-cursor', clearBefore: 'preview-opaque-clear-token' };
     if (action === 'admin.stats' && scenario === 'operator-denied') throw Object.assign(Error('需要管理员权限'), { code: 'forbidden' });
     if (action === 'admin.stats' && scenario === 'operator-error') throw Error('连接中断');
     if (action === 'admin.stats') return { users: 128, activeFollows: 32, events: 1024, queries: 2086, serverTime: now.toISOString() };
     if (action === 'admin.getConfig') return { config: { announcement: '离线模拟预览', quota: { balanceCap: 10 }, notifications: { enabled: false }, memberProduct: { enabled: false } } };
     return {};
-  });
+  }, { paymentScenario: paymentPreview ? scenario : '' });
   const catalog = adminPreview ? null : await rt.load('utils/store.js').getCatalog({ force: true });
   for (const pageName of Object.keys(names)) {
     const page = rt.instantiate(`pages/${pageName}/index.js`);
@@ -245,6 +264,7 @@ for (const scenario of scenarios) {
     if (scenario === 'operator-longcontent') page.setData({ lookup: { user: true }, lookupText: JSON.stringify({ userKey: 'wxe96ad9e77b602f1b:long-user-identity-0123456789abcdefghijklmnopqrstuvwxyz', note: '运营查询长文本换行验收' }, null, 2), configText: JSON.stringify({ announcement: '运行配置说明需要在小屏完整换行且不遮挡操作按钮。'.repeat(5) }, null, 2) });
     if (pageName === 'history' && scenario !== 'history-loading' && page.browsePending) await page.browsePending;
     if (pageName === 'mine' && historyTaskPreview) await page.onToggleLedger();
+    if (paymentPreview && ['payment-pending', 'payment-cancelled', 'payment-error', 'payment-fulfilled', 'payment-partial-refund'].includes(scenario)) await page.onBuyMembership();
     if (redemptionPreview) {
       page.setData({ redemptionOpen: true, redemptionCode: 'SAMPLE-CODE' });
       if (scenario === 'redemption-loading') page.setData({ redeeming: true });
@@ -315,8 +335,14 @@ for (const scenario of scenarios) {
         'monitor-all-paused': ['你的关注全部已暂停', '查看并开启关注'],
         'monitor-user-disabled': ['你的消息提醒已关闭', '前往提醒设置'],
         'monitor-dnd': ['当前处于免打扰时段', '查看免打扰设置'],
-      }[scenario]] : redemptionPreview ? ['兑换会员', '付费购买（暂未开放）', { 'redemption-input': '确认兑换', 'redemption-loading': '兑换中，请稍候', 'redemption-error': '兑换码无效', 'redemption-success': '兑换成功', 'redemption-used': '此账号已兑换过', 'redemption-limited': '15 分钟后再试', 'redemption-empty': '确认兑换' }[scenario]] : stockPreview ? [p.title, { 'stock-fresh': '本次状态刚记录', 'stock-old': '待更新', 'stock-unknown': '状态待确认', 'stock-missing': '等待首次观测', 'stock-restricted': '会员权益受限' }[scenario]] : scenario === 'error' ? [pageName === 'admin' ? '模拟错误：网络连接中断' : '模拟错误：云环境连接超时']
-        : pageName === 'mine' ? ['30 天会员', '¥9.00', '付费购买（暂未开放）', '提醒记录', ...(reminderRecords.length ? ['删除记录', scenario === 'reminder-clearing' ? '清空中' : '清空'] : [])]
+      }[scenario]] : paymentPreview ? ['7 天会员', '¥7.00 / 7 天', '兑换码开通', ...{
+        'payment-ready': ['购买会员', '购买须知', '一次性虚拟服务', '一经售出不予退款', '一次购买 7 天'], 'payment-renew': ['续费会员', '购买须知', '按剩余有效期顺延'],
+        'payment-blocked': ['付费购买暂未开放'], 'payment-old-ios': ['iOS 15'],
+        'payment-pending': ['支付正在确认中', '查询支付结果'], 'payment-cancelled': ['已取消本次支付', '请查询订单状态', '查询支付结果'],
+        'payment-error': ['支付结果暂未确认', '查询支付结果'], 'payment-fulfilled': ['支付已确认，会员已开通', '已开通'],
+        'payment-partial-refund': ['订单已部分退款', '部分退款', '已退款 ¥3.50'],
+      }[scenario]] : redemptionPreview ? ['兑换会员', '付费购买暂未开放', { 'redemption-input': '确认兑换', 'redemption-loading': '兑换中，请稍候', 'redemption-error': '兑换码无效', 'redemption-success': '兑换成功', 'redemption-used': '此账号已兑换过', 'redemption-limited': '15 分钟后再试', 'redemption-empty': '确认兑换' }[scenario]] : stockPreview ? [p.title, { 'stock-fresh': '本次状态刚记录', 'stock-old': '待更新', 'stock-unknown': '状态待确认', 'stock-missing': '等待首次观测', 'stock-restricted': '会员权益受限' }[scenario]] : scenario === 'error' ? [pageName === 'admin' ? '模拟错误：网络连接中断' : '模拟错误：云环境连接超时']
+        : pageName === 'mine' ? ['7 天会员', '¥7.00', '付费购买暂未开放', '提醒记录', ...(reminderRecords.length ? ['删除记录', scenario === 'reminder-clearing' ? '清空中' : '清空'] : [])]
         : pageName === 'follow' && follows.length ? [p.title, stores[0].name]
         : pageName === 'follow' ? ['给心仪的配置留个小哨']
         : pageName === 'admin' ? ['运行统计', '128'] : [p.partNumber, p.title];

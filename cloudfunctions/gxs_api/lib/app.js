@@ -23,6 +23,7 @@ const notify = require('./services/notify');
 const admin = require('./services/admin');
 
 const { version: VERSION } = require('../package.json');
+const defaultClock = () => new Date();
 
 /** action → [handler, requiresUser] */
 const ACTIONS = {
@@ -44,12 +45,14 @@ const ACTIONS = {
   'follow.remove': [follows.remove, true],
   'member.status': [member.status, true],
   'member.createOrder': [member.createOrder, true],
+  'member.checkOrder': [member.checkOrder, true],
   'member.redeemCode': [member.redeemCode, true],
   'notify.recordSubscription': [notify.recordSubscription, true],
   'notify.list': [notify.list, true],
   'notify.delete': [notify.remove, true],
   'notify.clear': [notify.clear, true],
   'admin.getConfig': [admin.getConfig, false],
+  'admin.paymentStatus': [admin.paymentStatus, false],
   'admin.updateConfig': [admin.updateConfig, false],
   'admin.seedCatalog': [admin.seedCatalog, false],
   'admin.grantMembership': [admin.grantMembership, false],
@@ -58,7 +61,7 @@ const ACTIONS = {
   'admin.lookupUser': [admin.lookupUser, false],
 };
 
-function createHandler({ repo, fetchImpl, clock = () => new Date(), log = console, allowedAppids = connection.allowedAppids, requestIdOf = () => null }) {
+function createHandler({ repo, fetchImpl, clock = defaultClock, log = console, allowedAppids = connection.allowedAppids, requestIdOf = () => null, paymentEnv, paymentProvider }) {
   return async function handle(event, wxContext) {
     const now = clock();
     const nowIso = now.toISOString();
@@ -76,7 +79,8 @@ function createHandler({ repo, fetchImpl, clock = () => new Date(), log = consol
       if (!identity.appAllowed) throw new ApiError('app_not_allowed', '该小程序未被允许访问');
       const [handler, requiresUser] = entry;
       if (requiresUser && !identity.userKey) throw new ApiError('user_required', '该操作需要小程序用户身份');
-      const ctx = { repo, config, identity, now, nowIso, clock, fetchImpl, log, requestId };
+      const ctx = { repo, config, identity, now, nowIso, clock, fetchImpl, log, requestId, paymentEnv, paymentProvider,
+        paymentCacheAllowed: clock === defaultClock };
       const data = await handler(ctx, payload);
       return envelope({ ok: true, data });
     } catch (error) {

@@ -52,6 +52,8 @@ const INDEX_PLAN = Object.freeze({
   ],
   [COLLECTIONS.orders]: [
     { name: 'user_created', keys: { userKey: 1, createdAt: -1 }, unique: false },
+    { name: 'payment_out_trade_no', keys: { outTradeNo: 1 }, unique: false },
+    { name: 'payment_reconcile', keys: { provider: 1, lastReconciledAt: 1, _id: 1 }, unique: false },
   ],
   [COLLECTIONS.notifications]: [
     { name: 'user_created', keys: { userKey: 1, createdAt: -1 }, unique: false },

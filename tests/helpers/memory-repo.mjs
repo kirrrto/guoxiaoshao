@@ -138,9 +138,13 @@ export function createMemoryRepo(seed = {}) {
     async getUsers(userKeys) { return userKeys.map(k => get(COLLECTIONS.users, k)).filter(Boolean); },
     async getOrder(id) { return get(COLLECTIONS.orders, id); },
     async getOrderByOutTradeNo(outTradeNo) { return all(COLLECTIONS.orders).find(order => order.outTradeNo === outTradeNo) || null; },
-    async listReconcileOrders(limit = 100) {
-      const cutoff = new Date(Date.now() - 30 * 86400000).toISOString();
-      return all(COLLECTIONS.orders).filter(o => ['created', 'paid'].includes(o.status) || o.status === 'fulfilled' && (!o.providerAcknowledgedAt || o.fulfilledAt >= cutoff)).sort((a, b) => String(a.lastReconciledAt || '').localeCompare(String(b.lastReconciledAt || '')) || a.createdAt.localeCompare(b.createdAt) || a._id.localeCompare(b._id)).slice(0, limit);
+    async listReconcileOrders(options = {}) {
+      const { limit = 10, nowIso = new Date().toISOString() } = typeof options === 'number' ? { limit: options } : options;
+      const cap = Number.isInteger(limit) ? Math.max(1, Math.min(25, limit)) : 10;
+      const cutoff = new Date(Date.parse(nowIso) - 30 * 86400000).toISOString();
+      return all(COLLECTIONS.orders).filter(o => o.provider === 'wechat_virtual_payment' && ['created', 'paid', 'fulfilled', 'partially_refunded'].includes(o.status)
+        && (['created', 'paid'].includes(o.status) || !o.providerAcknowledgedAt || o.fulfilledAt >= cutoff))
+        .sort((a, b) => String(a.lastReconciledAt || '').localeCompare(String(b.lastReconciledAt || '')) || a._id.localeCompare(b._id)).slice(0, cap);
     },
     async saveOrder(order) { put(COLLECTIONS.orders, order); },
     async listOrders(userKey, limit) { return all(COLLECTIONS.orders).filter(o => o.userKey === userKey).sort(byDesc('createdAt')).slice(0, limit || 20); },

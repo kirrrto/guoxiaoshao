@@ -7,7 +7,8 @@ const { ApiError } = require('../errors');
 const { dayKey } = require('../time');
 const { decideLiveQuery, decideHistoryQuery } = require('../rules/access');
 const { grantableAmount, ledgerIds } = require('../rules/quota');
-const { isMember, extendMembership, validateFollowLimits } = require('../rules/membership');
+const { isMember, validateFollowLimits } = require('../rules/membership');
+const membershipEntitlements = require('../rules/membership-entitlements');
 const { applyObservation, targetKeyOf } = require('../engine/events');
 const { observationDayId, appendObservationDay } = require('../engine/observation-day');
 const { viewId, newView, decodeToken } = require('../notification-view');
@@ -39,14 +40,50 @@ async function applyLedgerIn(tx, entry) {
 }
 
 async function fulfilMembershipIn(tx, user, order, source, nowIso) {
-  if (order.status === 'fulfilled') return { order, applied: false, expiresAt: user.membership.expiresAt };
-  if (order.status !== 'paid') throw new ApiError('order_not_paid', '订单尚未确认支付');
-  const expiresAt = extendMembership(user, order.days || order.durationDays, new Date(nowIso)).toISOString();
-  user.membership = { expiresAt, source, updatedAt: nowIso, lastOrderId: order.orderId };
-  const fulfilled = { ...order, status: 'fulfilled', fulfilledAt: nowIso };
+  if (order.fulfilledAt || order.entitlementFulfilled === true || order.status === 'fulfilled') return { order, applied: false, expiresAt: user.membership && user.membership.expiresAt };
+  if (order.status === 'refunded') throw new ApiError('order_refunded', '订单已全额退款，不能再发放会员');
+  if (order.status !== 'paid' && !(order.status === 'partially_refunded' && Number.isFinite(Date.parse(order.paidAt)))) throw new ApiError('order_not_paid', '订单尚未确认支付');
+  const refundFen = order.refundFen || 0;
+  const refundedMs = refundFen ? membershipEntitlements.refundDurationMs(order, refundFen) : 0;
+  const grantedMs = membershipEntitlements.durationMs(order) - refundedMs;
+  if (grantedMs <= 0) throw new ApiError('order_refunded', '订单已全额退款，不能再发放会员');
+  user.membership = { ...membershipEntitlements.grant(user.membership || {}, { orderId: order._id, source, milliseconds: grantedMs, nowIso }), lastOrderId: order.orderId };
+  const expiresAt = user.membership.expiresAt;
+  const fulfilled = { ...order, status: refundFen > 0 ? 'partially_refunded' : 'fulfilled', fulfilledAt: user.membership.entitlements.settledAt, entitlementFulfilled: true, entitlementGrantedMs: grantedMs, entitlementSourceId: order._id };
   await tx.put(C.users, user);
   await tx.put(C.orders, fulfilled);
   return { order: fulfilled, applied: true, expiresAt };
+}
+
+async function refundMembershipIn(tx, { orderId, nowIso, refundFen, providerData }) {
+  const order = await tx.get(C.orders, orderId);
+  if (!order) throw new ApiError('unknown_order', '订单不存在');
+  if (!['created', 'paid', 'fulfilled', 'partially_refunded', 'refunded'].includes(order.status)) throw new ApiError('invalid_order_status', '当前订单无法确认退款');
+  // refundFen is the provider-confirmed cumulative amount, never a callback's
+  // individual refund delta. Omission retains the legacy full-refund contract.
+  const cumulative = refundFen === undefined ? order.amountFen : refundFen;
+  const targetMs = membershipEntitlements.refundDurationMs(order, cumulative);
+  const previousFen = order.refundFen || (order.status === 'refunded' ? order.amountFen : 0);
+  if (cumulative <= previousFen) return { order, applied: false, revokedMs: 0 };
+  const previousMs = membershipEntitlements.refundDurationMs(order, previousFen);
+  const user = await tx.get(C.users, order.userKey);
+  // Old fulfilled orders may lack fulfilledAt. Preserve that fact when status
+  // becomes partially_refunded without fabricating a historical timestamp.
+  const wasFulfilled = Boolean(order.fulfilledAt || order.entitlementFulfilled === true || order.status === 'fulfilled');
+  if (!user && wasFulfilled) throw new ApiError('user_missing', '用户不存在');
+  let removedMs = 0;
+  if (user) {
+    const result = membershipEntitlements.revoke(user.membership || {}, { orderId: order._id, milliseconds: targetMs - previousMs, nowIso });
+    user.membership = result.membership;
+    removedMs = result.removedMs;
+    await tx.put(C.users, user);
+  }
+  const complete = cumulative === order.amountFen;
+  const refunded = { ...order, status: complete ? 'refunded' : 'partially_refunded', refundFen: cumulative,
+    refundedAt: complete ? nowIso : order.refundedAt || null, refundUpdatedAt: nowIso, refund: providerData || null,
+    entitlementFulfilled: wasFulfilled, entitlementRefundTargetMs: targetMs, entitlementRevokedMs: (order.entitlementRevokedMs || 0) + removedMs };
+  await tx.put(C.orders, refunded);
+  return { order: refunded, applied: true, revokedMs: removedMs, expiresAt: user && user.membership.expiresAt };
 }
 
 function atomicMethods(run) {
@@ -344,22 +381,33 @@ function atomicMethods(run) {
       return updated;
     }),
 
-    markOrderRefunded: ({ orderId, nowIso, providerData }) => run(async tx => {
+    markOrderRefunded: args => run(tx => refundMembershipIn(tx, args)),
+    refundMembershipOrder: args => run(tx => refundMembershipIn(tx, args)),
+
+    confirmPaymentRefundCallback: ({ orderId, refundId, refundFen, nowIso }) => run(async tx => {
       const order = await tx.get(C.orders, orderId);
-      if (!order) throw new ApiError('unknown_order', '订单不存在');
-      if (order.status === 'refunded') return { order, applied: false };
-      if (order.status === 'fulfilled') {
-        const user = await tx.get(C.users, order.userKey);
-        if (!user) throw new ApiError('user_missing', '用户不存在');
-        const expiry = Date.parse(user.membership && user.membership.expiresAt) || Date.parse(nowIso);
-        const days = order.days || order.durationDays;
-        if (!Number.isInteger(days) || days <= 0) throw new ApiError('invalid_order', '会员天数无效');
-        user.membership = { ...user.membership, expiresAt: new Date(Math.max(Date.parse(nowIso), expiry - days * 86400000)).toISOString(), updatedAt: nowIso, source: 'refund' };
-        await tx.put(C.users, user);
+      if (!order || order.provider !== 'wechat_virtual_payment') throw new ApiError('unknown_order', '订单不存在');
+      if (!Number.isSafeInteger(order.amountFen) || order.amountFen <= 0) throw new ApiError('invalid_refund_callback', '退款通知信息无效');
+      if (typeof refundId !== 'string' || !refundId || refundId.length > 256 || /[\u0000-\u001f\u007f]/.test(refundId)
+        || !Number.isSafeInteger(refundFen) || refundFen <= 0 || refundFen > order.amountFen) throw new ApiError('invalid_refund_callback', '退款通知信息无效');
+      const receipts = order.refundCallbacks || [];
+      const seen = new Set(); let covered = 0, existing;
+      if (!Array.isArray(receipts) || receipts.length > Math.min(700, order.amountFen)) throw new ApiError('payment_refund_callback_conflict', '退款通知记录待核对');
+      for (const receipt of receipts) {
+        if (!receipt || typeof receipt.refundId !== 'string' || !receipt.refundId || receipt.refundId.length > 256 || seen.has(receipt.refundId) || !Number.isSafeInteger(receipt.amountFen) || receipt.amountFen <= 0) throw new ApiError('payment_refund_callback_conflict', '退款通知记录待核对');
+        seen.add(receipt.refundId); covered += receipt.amountFen;
+        if (receipt.refundId === refundId) existing = receipt;
       }
-      const refunded = { ...order, status: 'refunded', refundedAt: nowIso, refund: providerData || null };
-      await tx.put(C.orders, refunded);
-      return { order: refunded, applied: true };
+      if (!Number.isSafeInteger(covered) || covered > order.amountFen || existing && existing.amountFen !== refundFen) throw new ApiError('payment_refund_callback_conflict', '退款通知记录待核对');
+      const confirmedFen = order.status === 'refunded' ? order.amountFen : order.refundFen || 0;
+      if (!Number.isSafeInteger(confirmedFen) || confirmedFen < 0 || confirmedFen > order.amountFen) throw new ApiError('payment_refund_callback_conflict', '退款通知记录待核对');
+      if (confirmedFen < covered + (existing ? 0 : refundFen)) return { confirmed: false, reason: 'refund_not_reconciled' };
+      if (existing) return { confirmed: true, replayed: true };
+      if (receipts.length >= 700) throw new ApiError('payment_refund_callback_conflict', '退款通知记录待核对');
+      // Assign each authenticated refund ID a distinct portion of the verified
+      // cumulative refund. Two callbacks cannot acknowledge the same 350 fen.
+      await tx.put(C.orders, { ...order, refundCallbacks: [...receipts, { refundId, amountFen: refundFen, confirmedAt: nowIso }] });
+      return { confirmed: true, replayed: false };
     }),
 
     markOrderPaid: ({ orderId, transactionId, nowIso, providerData }) => run(async tx => {
@@ -371,8 +419,8 @@ function atomicMethods(run) {
       if (receipt && receipt.orderId !== orderId) throw new ApiError('payment_already_used', '该支付交易已绑定其他订单');
       if (order.transactionId && order.transactionId !== transactionId) throw new ApiError('payment_conflict', '订单已绑定其他支付交易');
       if (providerData && providerData.amountFen !== undefined && providerData.amountFen !== order.amountFen) throw new ApiError('payment_amount_mismatch', '支付金额与订单不一致');
-      if (!['created', 'paid', 'fulfilled'].includes(order.status)) throw new ApiError('invalid_order_status', '当前订单无法确认支付');
-      const paid = { ...order, status: order.status === 'fulfilled' ? 'fulfilled' : 'paid', paidAt: order.paidAt || nowIso, transactionId, payment: { ...order.payment, providerData } };
+      if (!['created', 'paid', 'fulfilled', 'partially_refunded'].includes(order.status)) throw new ApiError('invalid_order_status', '当前订单无法确认支付');
+      const paid = { ...order, status: ['fulfilled', 'partially_refunded'].includes(order.status) ? order.status : 'paid', paidAt: order.paidAt || nowIso, transactionId, payment: { ...order.payment, providerData } };
       await tx.put(C.config, { _id: receiptId, orderId, transactionId, createdAt: nowIso, kind: 'payment_receipt' });
       await tx.put(C.orders, paid);
       return { order: paid, applied: !receipt };

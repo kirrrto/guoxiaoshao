@@ -1,0 +1,372 @@
+{
+  "generatedAt": "2026-09-20T06:45:51.853Z",
+  "source": "C:\\Users\\Administrator\\WeChatProjects\\miniprogram-6\\miniprogram",
+  "renderer": "offline WXML/WXSS approximation",
+  "remoteImages": false,
+  "expressionErrors": 0,
+  "snapshots": [
+    {
+      "page": "mine",
+      "scenario": "payment-ready",
+      "width": 320,
+      "file": "mine-payment-ready-320.html",
+      "expectedText": [
+        "7 天会员",
+        "¥7.00 / 7 天",
+        "兑换码开通",
+        "购买会员",
+        "购买须知",
+        "一次性虚拟服务",
+        "一经售出不予退款",
+        "一次购买 7 天"
+      ]
+    },
+    {
+      "page": "mine",
+      "scenario": "payment-ready",
+      "width": 375,
+      "file": "mine-payment-ready-375.html",
+      "expectedText": [
+        "7 天会员",
+        "¥7.00 / 7 天",
+        "兑换码开通",
+        "购买会员",
+        "购买须知",
+        "一次性虚拟服务",
+        "一经售出不予退款",
+        "一次购买 7 天"
+      ]
+    },
+    {
+      "page": "mine",
+      "scenario": "payment-ready",
+      "width": 430,
+      "file": "mine-payment-ready-430.html",
+      "expectedText": [
+        "7 天会员",
+        "¥7.00 / 7 天",
+        "兑换码开通",
+        "购买会员",
+        "购买须知",
+        "一次性虚拟服务",
+        "一经售出不予退款",
+        "一次购买 7 天"
+      ]
+    },
+    {
+      "page": "mine",
+      "scenario": "payment-renew",
+      "width": 320,
+      "file": "mine-payment-renew-320.html",
+      "expectedText": [
+        "7 天会员",
+        "¥7.00 / 7 天",
+        "兑换码开通",
+        "续费会员",
+        "购买须知",
+        "按剩余有效期顺延"
+      ]
+    },
+    {
+      "page": "mine",
+      "scenario": "payment-renew",
+      "width": 375,
+      "file": "mine-payment-renew-375.html",
+      "expectedText": [
+        "7 天会员",
+        "¥7.00 / 7 天",
+        "兑换码开通",
+        "续费会员",
+        "购买须知",
+        "按剩余有效期顺延"
+      ]
+    },
+    {
+      "page": "mine",
+      "scenario": "payment-renew",
+      "width": 430,
+      "file": "mine-payment-renew-430.html",
+      "expectedText": [
+        "7 天会员",
+        "¥7.00 / 7 天",
+        "兑换码开通",
+        "续费会员",
+        "购买须知",
+        "按剩余有效期顺延"
+      ]
+    },
+    {
+      "page": "mine",
+      "scenario": "payment-blocked",
+      "width": 320,
+      "file": "mine-payment-blocked-320.html",
+      "expectedText": [
+        "7 天会员",
+        "¥7.00 / 7 天",
+        "兑换码开通",
+        "付费购买暂未开放"
+      ]
+    },
+    {
+      "page": "mine",
+      "scenario": "payment-blocked",
+      "width": 375,
+      "file": "mine-payment-blocked-375.html",
+      "expectedText": [
+        "7 天会员",
+        "¥7.00 / 7 天",
+        "兑换码开通",
+        "付费购买暂未开放"
+      ]
+    },
+    {
+      "page": "mine",
+      "scenario": "payment-blocked",
+      "width": 430,
+      "file": "mine-payment-blocked-430.html",
+      "expectedText": [
+        "7 天会员",
+        "¥7.00 / 7 天",
+        "兑换码开通",
+        "付费购买暂未开放"
+      ]
+    },
+    {
+      "page": "mine",
+      "scenario": "payment-old-ios",
+      "width": 320,
+      "file": "mine-payment-old-ios-320.html",
+      "expectedText": [
+        "7 天会员",
+        "¥7.00 / 7 天",
+        "兑换码开通",
+        "iOS 15"
+      ]
+    },
+    {
+      "page": "mine",
+      "scenario": "payment-old-ios",
+      "width": 375,
+      "file": "mine-payment-old-ios-375.html",
+      "expectedText": [
+        "7 天会员",
+        "¥7.00 / 7 天",
+        "兑换码开通",
+        "iOS 15"
+      ]
+    },
+    {
+      "page": "mine",
+      "scenario": "payment-old-ios",
+      "width": 430,
+      "file": "mine-payment-old-ios-430.html",
+      "expectedText": [
+        "7 天会员",
+        "¥7.00 / 7 天",
+        "兑换码开通",
+        "iOS 15"
+      ]
+    },
+    {
+      "page": "mine",
+      "scenario": "payment-pending",
+      "width": 320,
+      "file": "mine-payment-pending-320.html",
+      "expectedText": [
+        "7 天会员",
+        "¥7.00 / 7 天",
+        "兑换码开通",
+        "支付正在确认中",
+        "查询支付结果"
+      ]
+    },
+    {
+      "page": "mine",
+      "scenario": "payment-pending",
+      "width": 375,
+      "file": "mine-payment-pending-375.html",
+      "expectedText": [
+        "7 天会员",
+        "¥7.00 / 7 天",
+        "兑换码开通",
+        "支付正在确认中",
+        "查询支付结果"
+      ]
+    },
+    {
+      "page": "mine",
+      "scenario": "payment-pending",
+      "width": 430,
+      "file": "mine-payment-pending-430.html",
+      "expectedText": [
+        "7 天会员",
+        "¥7.00 / 7 天",
+        "兑换码开通",
+        "支付正在确认中",
+        "查询支付结果"
+      ]
+    },
+    {
+      "page": "mine",
+      "scenario": "payment-cancelled",
+      "width": 320,
+      "file": "mine-payment-cancelled-320.html",
+      "expectedText": [
+        "7 天会员",
+        "¥7.00 / 7 天",
+        "兑换码开通",
+        "已取消本次支付",
+        "请查询订单状态",
+        "查询支付结果"
+      ]
+    },
+    {
+      "page": "mine",
+      "scenario": "payment-cancelled",
+      "width": 375,
+      "file": "mine-payment-cancelled-375.html",
+      "expectedText": [
+        "7 天会员",
+        "¥7.00 / 7 天",
+        "兑换码开通",
+        "已取消本次支付",
+        "请查询订单状态",
+        "查询支付结果"
+      ]
+    },
+    {
+      "page": "mine",
+      "scenario": "payment-cancelled",
+      "width": 430,
+      "file": "mine-payment-cancelled-430.html",
+      "expectedText": [
+        "7 天会员",
+        "¥7.00 / 7 天",
+        "兑换码开通",
+        "已取消本次支付",
+        "请查询订单状态",
+        "查询支付结果"
+      ]
+    },
+    {
+      "page": "mine",
+      "scenario": "payment-error",
+      "width": 320,
+      "file": "mine-payment-error-320.html",
+      "expectedText": [
+        "7 天会员",
+        "¥7.00 / 7 天",
+        "兑换码开通",
+        "支付结果暂未确认",
+        "查询支付结果"
+      ]
+    },
+    {
+      "page": "mine",
+      "scenario": "payment-error",
+      "width": 375,
+      "file": "mine-payment-error-375.html",
+      "expectedText": [
+        "7 天会员",
+        "¥7.00 / 7 天",
+        "兑换码开通",
+        "支付结果暂未确认",
+        "查询支付结果"
+      ]
+    },
+    {
+      "page": "mine",
+      "scenario": "payment-error",
+      "width": 430,
+      "file": "mine-payment-error-430.html",
+      "expectedText": [
+        "7 天会员",
+        "¥7.00 / 7 天",
+        "兑换码开通",
+        "支付结果暂未确认",
+        "查询支付结果"
+      ]
+    },
+    {
+      "page": "mine",
+      "scenario": "payment-fulfilled",
+      "width": 320,
+      "file": "mine-payment-fulfilled-320.html",
+      "expectedText": [
+        "7 天会员",
+        "¥7.00 / 7 天",
+        "兑换码开通",
+        "支付已确认，会员已开通",
+        "已开通"
+      ]
+    },
+    {
+      "page": "mine",
+      "scenario": "payment-fulfilled",
+      "width": 375,
+      "file": "mine-payment-fulfilled-375.html",
+      "expectedText": [
+        "7 天会员",
+        "¥7.00 / 7 天",
+        "兑换码开通",
+        "支付已确认，会员已开通",
+        "已开通"
+      ]
+    },
+    {
+      "page": "mine",
+      "scenario": "payment-fulfilled",
+      "width": 430,
+      "file": "mine-payment-fulfilled-430.html",
+      "expectedText": [
+        "7 天会员",
+        "¥7.00 / 7 天",
+        "兑换码开通",
+        "支付已确认，会员已开通",
+        "已开通"
+      ]
+    },
+    {
+      "page": "mine",
+      "scenario": "payment-partial-refund",
+      "width": 320,
+      "file": "mine-payment-partial-refund-320.html",
+      "expectedText": [
+        "7 天会员",
+        "¥7.00 / 7 天",
+        "兑换码开通",
+        "订单已部分退款",
+        "部分退款",
+        "已退款 ¥3.50"
+      ]
+    },
+    {
+      "page": "mine",
+      "scenario": "payment-partial-refund",
+      "width": 375,
+      "file": "mine-payment-partial-refund-375.html",
+      "expectedText": [
+        "7 天会员",
+        "¥7.00 / 7 天",
+        "兑换码开通",
+        "订单已部分退款",
+        "部分退款",
+        "已退款 ¥3.50"
+      ]
+    },
+    {
+      "page": "mine",
+      "scenario": "payment-partial-refund",
+      "width": 430,
+      "file": "mine-payment-partial-refund-430.html",
+      "expectedText": [
+        "7 天会员",
+        "¥7.00 / 7 天",
+        "兑换码开通",
+        "订单已部分退款",
+        "部分退款",
+        "已退款 ¥3.50"
+      ]
+    }
+  ]
+}

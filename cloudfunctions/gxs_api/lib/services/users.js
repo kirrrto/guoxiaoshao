@@ -5,6 +5,7 @@ const { membershipSnapshot, LIMITS } = require('../rules/membership');
 const { resolveConfig } = require('../rules/quota');
 const { maskOpenid } = require('../identity');
 const { monitoringSnapshot } = require('../monitor-readiness');
+const { paymentProduct } = require('../payment/service');
 
 function newUser(identity, nowIso) {
   return {
@@ -91,7 +92,7 @@ async function bootstrap(ctx) {
     quota,
     tasks: ctx.config.tasks,
     followCount: follows.filter(f => f.status === 'active' || f.status === 'paused').length,
-    memberProduct: { ...ctx.config.memberProduct, paymentReady: false, paymentReason: 'payment_not_enabled' },
+    memberProduct: paymentProduct(ctx),
     newProductWindows: ctx.config.newProductWindows,
     limits: { queryMaxStores: ctx.config.query.maxStores, maxFollows: LIMITS.maxFollows, maxStoresPerFollow: LIMITS.maxStoresPerFollow },
     notifications: monitoring.notifications,

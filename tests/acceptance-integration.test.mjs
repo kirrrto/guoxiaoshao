@@ -51,5 +51,5 @@ test('upload directory contains neither the retired page nor a sandbox execution
     assert.doesNotMatch(source,/功能验收|pages\/acceptance|acceptance\.(?:handle|isEnabled|configure)/,file);
   }
   const mine=fs.readFileSync(new URL('pages/mine/index.wxml',mini),'utf8');
-  assert.match(mine,/兑换码开通/); assert.match(mine,/付费购买（暂未开放）/);
+  assert.match(mine,/兑换码开通/);
 });

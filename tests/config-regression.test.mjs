@@ -66,7 +66,7 @@ test('invalid or failed atomic config patches leave the complete runtime unchang
   assert.deepEqual(await f.repo.getConfig(), before);
 });
 
-test('deferred payment cannot be enabled by a runtime flag or a direct client order call', async () => {
+test('the runtime payment flag cannot enable checkout without server credentials and valid fixed product terms', async () => {
   const f = createFixture({ config: { memberProduct: { enabled: true } } });
   const status = await f.call('member.status');
   assert.equal(status.data.product.paymentReady, false);
@@ -78,5 +78,17 @@ test('deferred payment cannot be enabled by a runtime flag or a direct client or
   assert.equal(after.data.membership.active, false);
   assert.equal(after.data.orders.length, 0);
   const configure = await f.call('admin.updateConfig', { patch: { memberProduct: { enabled: true } } }, operatorContext());
-  assert.equal(configure.error.code, 'payment_deferred');
+  assert.equal(configure.ok, true);
+  assert.equal((await f.call('member.status')).data.product.paymentReady, false);
+  for (const patch of [
+    { memberProduct: { enabled: true, priceFen: 1 } },
+    { memberProduct: { enabled: true, days: 9999 } },
+    { memberProduct: { enabled: true, id: 'wrong-product' } },
+    { memberProduct: { note: '' } },
+    { memberProduct: { note: 'x'.repeat(201) } },
+    { virtualPayment: { offerId: 1450655203 } },
+    { virtualPayment: { appKey: 'must-not-store-secrets-in-runtime' } },
+  ]) {
+    assert.equal((await f.call('admin.updateConfig', { patch }, operatorContext())).error.code, 'invalid_config');
+  }
 });
