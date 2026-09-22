@@ -1,6 +1,7 @@
 /**
  * Shared WeChat share payload for consumer pages.
- * Landing page is always the public query tab; no account state in the path.
+ * Share card: first followed product image when present; otherwise omit
+ * imageUrl so WeChat captures the current page screenshot.
  */
 const IMAGE = '/images/brand/logo-mint-144.png';
 const DEFAULT_TITLE = '果小哨 · 苹果直营店取货供应监测';
@@ -12,32 +13,50 @@ const PAGE_META = {
   '/pages/mine/index': { title: '果小哨 · 取货信息查询与关注', query: 'from=share_mine' },
 };
 
+function firstFollowImage(pageData) {
+  const list = pageData && pageData.followTargets && pageData.followTargets.length
+    ? pageData.followTargets
+    : pageData && Array.isArray(pageData.follows) ? pageData.follows : [];
+  for (const item of list) {
+    if (item && item.imageUrl) return item.imageUrl;
+  }
+  return null;
+}
+
 function shareTitleFor(route, pageData) {
   const base = PAGE_META[route] && PAGE_META[route].title || DEFAULT_TITLE;
-  if (route === '/pages/query/index' && pageData) {
-    const product = pageData.selection && pageData.selection.product
-      || pageData.result && pageData.result.product
-      || null;
-    const name = product && (product.title || product.model);
+  if (pageData) {
+    const product = (pageData.selection && pageData.selection.product)
+      || (pageData.result && pageData.result.product)
+      || ((pageData.follows && pageData.follows[0]) || (pageData.followTargets && pageData.followTargets[0]) || null);
+    const name = product && (product.productTitle || product.title || product.model);
     if (name) return `果小哨 · ${name} 取货查询`;
   }
   return base;
 }
 
 function shareAppMessage(route, pageData) {
-  return {
+  const payload = {
     title: shareTitleFor(route, pageData),
     path: `/pages/query/index?${(PAGE_META[route] && PAGE_META[route].query) || 'from=share'}`,
-    imageUrl: IMAGE,
   };
+  const followImage = firstFollowImage(pageData);
+  if (followImage) payload.imageUrl = followImage;
+  else if (route === '/pages/query/index' && pageData && pageData.selection && pageData.selection.product && pageData.selection.product.imageUrl) {
+    payload.imageUrl = pageData.selection.product.imageUrl;
+  }
+  // No imageUrl: WeChat uses the current page screenshot as the share card.
+  return payload;
 }
 
 function shareTimeline(route, pageData) {
-  return {
+  const payload = {
     title: shareTitleFor(route, pageData),
     query: (PAGE_META[route] && PAGE_META[route].query) || 'from=share',
-    imageUrl: IMAGE,
   };
+  const followImage = firstFollowImage(pageData);
+  if (followImage) payload.imageUrl = followImage;
+  return payload;
 }
 
-module.exports = { IMAGE, DEFAULT_TITLE, PAGE_META, shareTitleFor, shareAppMessage, shareTimeline };
+module.exports = { IMAGE, DEFAULT_TITLE, PAGE_META, shareTitleFor, firstFollowImage, shareAppMessage, shareTimeline };

@@ -510,7 +510,10 @@ function atomicMethods(run) {
         const result = results[templateId];
         if (!['accept', 'reject', 'ban', 'filter'].includes(result)) continue;
         const current = subscriptions[templateId] || { credits: 0, accepted: 0, rejected: 0 };
-        const credited = result === 'accept' ? subscriptionCredits.writeLedger(current, subscriptionCredits.grantCredit(current), now) : current;
+        // Members get a standing pool after first accept so they need not
+        // re-tap authorize for every restock (WeChat one-time grants still apply).
+        const memberPool = isMember(user, new Date(now)) ? 365 : 1;
+        const credited = result === 'accept' ? subscriptionCredits.writeLedger(current, subscriptionCredits.grantCredit(current, memberPool), now) : current;
         subscriptions[templateId] = { ...credited, accepted: (current.accepted || 0) + (result === 'accept' ? 1 : 0), rejected: (current.rejected || 0) + (result === 'reject' ? 1 : 0), ...(result === 'accept' ? { needsReauthorization: false } : {}), lastResult: result, updatedAt: now };
         if (result === 'accept') accepted.push(templateId);
       }
