@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#F0FBF6" />
+  <title>果小哨 · 发版检查 1.1.6</title>
+  <style>
+    :root {
+      --bg: #F0FBF6;
+      --card: #FFFFFF;
+      --ink: #163028;
+      --muted: #6C8179;
+      --line: #D8EBE2;
+      --mint: #00C375;
+      --mint-soft: #E6F8F0;
+      --ok: #00A862;
+      --warn: #C47B00;
+      --warn-soft: #FFF6E5;
+      --bad: #C0392B;
+      --bad-soft: #FDECEA;
+      --info: #2B6CB0;
+      --info-soft: #EBF3FB;
+      --shadow: 0 8px 24px rgba(18, 48, 40, 0.06);
+      --radius: 16px;
+      --safe-b: env(safe-area-inset-bottom, 0px);
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+      font-size: 15px;
+      line-height: 1.55;
+    }
+    body { min-height: 100vh; }
+    .app {
+      max-width: 430px;
+      margin: 0 auto;
+      min-height: 100vh;
+      padding: 0 0 calc(28px + var(--safe-b));
+    }
+    .hero {
+      padding: 22px 18px 18px;
+      background: linear-gradient(180deg, #D9F5E9 0%, var(--bg) 100%);
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .logo {
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      background: var(--mint);
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 0.5px;
+    }
+    .brand h1 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 700;
+    }
+    .brand p {
+      margin: 2px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .verdict {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 16px;
+      border: 1px solid var(--line);
+    }
+    .verdict-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+    .verdict-title {
+      margin: 0;
+      font-size: 17px;
+      font-weight: 700;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .badge.ok { background: var(--mint-soft); color: var(--ok); }
+    .badge.warn { background: var(--warn-soft); color: var(--warn); }
+    .badge.bad { background: var(--bad-soft); color: var(--bad); }
+    .badge.info { background: var(--info-soft); color: var(--info); }
+    .verdict p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .score-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-top: 14px;
+    }
+    .score-cell {
+      background: var(--mint-soft);
+      border-radius: 12px;
+      padding: 10px 6px;
+      text-align: center;
+    }
+    .score-cell strong {
+      display: block;
+      font-size: 16px;
+      color: var(--ok);
+    }
+    .score-cell span {
+      font-size: 11px;
+      color: var(--muted);
+    }
+    .tabs {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      padding: 10px 14px;
+      background: rgba(240, 251, 246, 0.92);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--line);
+    }
+    .tab {
+      border: 0;
+      background: transparent;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 8px 4px;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    .tab.active {
+      background: var(--card);
+      color: var(--ok);
+      box-shadow: var(--shadow);
+    }
+    .section { display: none; padding: 14px 14px 0; }
+    .section.active { display: block; }
+    .section h2 {
+      margin: 4px 0 12px;
+      font-size: 15px;
+      font-weight: 700;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+    .card-head {
+      padding: 12px 14px 8px;
+      font-weight: 700;
+      font-size: 13px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+    .item {
+      display: grid;
+      grid-template-columns: 22px 1fr auto;
+      gap: 10px;
+      align-items: start;
+      padding: 11px 14px;
+      border-top: 1px solid var(--line);
+    }
+    .item:first-of-type { border-top: 0; }
+    .dot {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      margin-top: 2px;
+      display: grid;
+      place-items: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: #fff;
+    }
+    .dot.ok { background: var(--ok); }
+    .dot.warn { background: var(--warn); }
+    .dot.bad { background: var(--bad); }
+    .dot.info { background: var(--info); }
+    .item h3 {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .item p {
+      margin: 2px 0 0;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .item .side {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted);
+      white-space: nowrap;
+      margin-top: 2px;
+    }
+    .meta {
+      padding: 12px 14px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .meta code {
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+      font-size: 11px;
+      background: var(--mint-soft);
+      color: var(--ok);
+      padding: 1px 5px;
+      border-radius: 6px;
+    }
+    .note {
+      margin: 0 0 12px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+    .note.warn { background: var(--warn-soft); color: #7A4D00; }
+    .note.ok { background: var(--mint-soft); color: #0B5C3C; }
+    .note.info { background: var(--info-soft); color: #1A4A7A; }
+    .steps {
+      margin: 0;
+      padding: 0 18px 8px 32px;
+      font-size: 13px;
+      color: var(--ink);
+    }
+    .steps li { margin-bottom: 8px; }
+    .footer {
+      margin-top: 8px;
+      padding: 0 18px;
+      color: var(--muted);
+      font-size: 11px;
+      text-align: center;
+    }
+    @media (min-width: 430px) {
+      body { padding: 18px 0 32px; }
+      .app {
+        border-radius: 24px;
+        background: var(--bg);
+        box-shadow: 0 16px 40px rgba(18,48,40,.08);
+        overflow: hidden;
+        border: 1px solid var(--line);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app" id="app">
+    <header class="hero">
+      <div class="brand">
+        <div class="logo">哨</div>
+        <div>
+          <h1>发版检查</h1>
+          <p>果小哨 · Apple 取货监测 · v1.1.6</p>
+        </div>
+      </div>
+      <div class="verdict">
+        <div class="verdict-head">
+          <div>
+            <h2 class="verdict-title">工程门禁已就绪</h2>
+            <p style="margin-top:4px">本地源码可作为正式发版候选；付费购买仍差真机验收。</p>
+          </div>
+          <span class="badge warn">有条件放行</span>
+        </div>
+        <div class="score-row">
+          <div class="score-cell"><strong>529</strong><span>测试通过</span></div>
+          <div class="score-cell"><strong>30</strong><span>发布检查</span></div>
+          <div class="score-cell"><strong>0</strong><span>源码错误</span></div>
+          <div class="score-cell"><strong>v1.1.6</strong><span>Git 标签</span></div>
+        </div>
+      </div>
+    </header>
+
+    <nav class="tabs" role="tablist">
+      <button class="tab active" data-tab="local" type="button">本地</button>
+      <button class="tab" data-tab="cloud" type="button">云端</button>
+      <button class="tab" data-tab="pay" type="button">支付</button>
+      <button class="tab" data-tab="go" type="button">发版清单</button>
+    </nav>
+
+    <section class="section active" data-section="local">
+      <h2>本地源码门禁</h2>
+      <div class="note ok">检查时间：2026-09-20 07:10 UTC 之后刚跑一遍。工作区干净，HEAD 即 tag <code style="color:#0B5C3C">v1.1.6</code>。</div>
+
+      <div class="card">
+        <div class="card-head">质量与一致性 <span class="badge ok">全部通过</span></div>
+        <div class="item"><div class="dot ok">✓</div><div><h3>离线回归测试</h3><p>529 / 529 通过，0 失败、0 跳过</p></div><div class="side">npm test</div></div>
+        <div class="item"><div class="dot ok">✓</div><div><h3>源码检查</h3><p>281 文件，185 JS，4 消费者页 + 1 运营页，0 错误</p></div><div class="side">npm run check</div></div>
+        <div class="item"><div class="dot ok">✓</div><div><h3>发布预检</h3><p>30 项全部通过（版本、身份、支付默认关闭、回调路径等）</p></div><div class="side">release/check</div></div>
+        <div class="item"><div class="dot ok">✓</div><div><h3>监测函数依赖闭包</h3><p>28 文件哈希一致，与 gxs_api 生成源一致</p></div><div class="side">build-monitor</div></div>
+        <div class="item"><div class="dot ok">✓</div><div><h3>Git 基线</h3><p>提交 f099f29，标签 v1.1.6，工作树 clean，未推送远程</p></div><div class="side">git</div></div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">包与架构约束</div>
+        <div class="item"><div class="dot ok">✓</div><div><h3>消费者包仅 4 页</h3><p>查询 / 小哨 / 历史 / 我的；管理页独立运营工程</p></div><div class="side">app.json</div></div>
+        <div class="item"><div class="dot ok">✓</div><div><h3>AppID 与共享环境一致</h3><p>消费者 wxe96ad9e77b602f1b，资源环境 flowermean-…e88</p></div><div class="side">connection</div></div>
+        <div class="item"><div class="dot ok">✓</div><div><h3>云函数 SDK 锁定</h3><p>三函数 package/lock 均为 1.1.6 + wx-server-sdk 4.0.2</p></div><div class="side">release</div></div>
+        <div class="item"><div class="dot ok">✓</div><div><h3>支付代码默认关闭</h3><p>源码默认 memberProduct.enabled=false，防未配置误开</p></div><div class="side">defaults</div></div>
+        <div class="item"><div class="dot ok">✓</div><div><h3>商品条款固定</h3><p>vip666 · 700 分 · 7 天；须知含一次性虚拟服务、不退款</p></div><div class="side">config</div></div>
+      </div>
+
+      <div class="meta">前端源文件约 <code>52</code> · 源码体积 <code>~581 KB</code>（非微信上传包大小）</div>
+    </section>
+
+    <section class="section" data-section="cloud">
+      <h2>云端与部署证据</h2>
+      <div class="note info">以下依据仓库内 1.1.6 证据文件，不是本次对生产环境的实时探针。</div>
+
+      <div class="card">
+        <div class="card-head">云函数 <span class="badge ok">Active</span></div>
+        <div class="item"><div class="dot ok">✓</div><div><h3>gxs_api</h3><p>版本探针 1.1.6；支付入口与业务 API 同函数</p></div><div class="side">14:00</div></div>
+        <div class="item"><div class="dot ok">✓</div><div><h3>gxs_monitor</h3><p>分钟监测 Active；定时扫描曾返回 running / 2 目标</p></div><div class="side">12:27</div></div>
+        <div class="item"><div class="dot ok">✓</div><div><h3>cloudbase_auth</h3><p>仅放行消费者 AppID</p></div><div class="side">12:27</div></div>
+        <div class="item"><div class="dot ok">✓</div><div><h3>代码一致性</h3><p>云端归档与本地非依赖源码逐文件核对一致</p></div><div class="side">证据</div></div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">支付基础设施</div>
+        <div class="item"><div class="dot ok">✓</div><div><h3>HTTP 回调路由</h3><p>/payment/callback 透传到 gxs_api；未签名请求 403</p></div><div class="side">已建</div></div>
+        <div class="item"><div class="dot ok">✓</div><div><h3>消息推送 URL 校验</h3><p>2026-09-20 14:39 GET 回显 echostr，HTTP 200 / 34ms</p></div><div class="side">已过</div></div>
+        <div class="item"><div class="dot ok">✓</div><div><h3>对账定时器</h3><p>gxs-payment-reconcile-five-minutes，开启后真实触发 completed</p></div><div class="side">5 分钟</div></div>
+        <div class="item"><div class="dot warn">!</div><div><h3>安全模式 POST 发货/退款</h3><p>尚未用真实加密报文验收（回调路径已拒非法请求）</p></div><div class="side">待真机</div></div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">运行开关（证据快照）</div>
+        <div class="item"><div class="dot ok">✓</div><div><h3>购买开关 runtime</h3><p>memberProduct.enabled=true，configRevision=4</p></div><div class="side">已开</div></div>
+        <div class="item"><div class="dot ok">✓</div><div><h3>支付 readiness</h3><p>证据显示 ready/configured=true（值不入文档）</p></div><div class="side">已配</div></div>
+        <div class="item"><div class="dot warn">!</div><div><h3>订阅消息</h3><p>配置与鉴权侧已推进；真实用户送达仍须授权后事件验收</p></div><div class="side">待验</div></div>
+        <div class="item"><div class="dot warn">!</div><div><h3>自动采集</h3><p>定时任务可运行；覆盖范围仅有效会员关注目标</p></div><div class="side">按需</div></div>
+      </div>
+    </section>
+
+    <section class="section" data-section="pay">
+      <h2>虚拟支付验收</h2>
+      <div class="note warn">你要正式发版且开放购买：当前最大缺口是<strong>真机 7 元支付未验收</strong>（realPurchaseVerified=false）。</div>
+
+      <div class="card">
+        <div class="card-head">商品与体验 <span class="badge ok">已锁定</span></div>
+        <div class="item"><div class="dot ok">✓</div><div><h3>vip666 · 7 元 / 7 天</h3><p>OfferID 1450655203；iOS IAP 模式 short_series_goods</p></div><div class="side">700 分</div></div>
+        <div class="item"><div class="dot ok">✓</div><div><h3>购买须知</h3><p>一次性虚拟服务，一经售出不予退款；有效会员顺延</p></div><div class="side">前端</div></div>
+        <div class="item"><div class="dot ok">✓</div><div><h3>权益账本</h3><p>按订单结算，退款只撤本单未用时长，不误扣兑换</p></div><div class="side">1.1.6</div></div>
+        <div class="item"><div class="dot ok">✓</div><div><h3>布局预览</h3><p>支付 9 状态 × 3 宽度 = 27 场景，无溢出/缺字</p></div><div class="side">离线</div></div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">未闭环项 <span class="badge warn">发版前必读</span></div>
+        <div class="item"><div class="dot warn">!</div><div><h3>微信后台道具 vip666</h3><p>需确认已正式发布且单价 700 分（代码无法自证发布态）</p></div><div class="side">控制台</div></div>
+        <div class="item"><div class="dot bad">×</div><div><h3>真机 7 元付款</h3><p>无本版扣款、IAP、退款完成结论；平台/订单/+7 天须人工对账</p></div><div class="side">阻断付费</div></div>
+        <div class="item"><div class="dot warn">!</div><div><h3>Android / iOS 双端</h3><p>取消、重进查单、结果未知、重复回调都要真机点一遍</p></div><div class="side">待做</div></div>
+        <div class="item"><div class="dot warn">!</div><div><h3>退款链路</h3><p>部分/全额退款与回调重放尚未真实验收</p></div><div class="side">待做</div></div>
+      </div>
+
+      <div class="note info">
+        密钥只放在云函数环境变量与微信后台：<code>GXS_CONSUMER_APPID/APPSECRET</code>、
+        <code>GXS_VIRTUAL_PAYMENT_APPKEY</code>、回调 Token / EncodingAESKey。不要贴进聊天或源码。
+      </div>
+    </section>
+
+    <section class="section" data-section="go">
+      <h2>正式发版清单</h2>
+
+      <div class="card">
+        <div class="card-head">结论</div>
+        <div class="meta" style="color:var(--ink);font-size:13px;padding-top:0">
+          <strong>本地工程：可以作为正式发版候选。</strong><br />
+          若正式版<strong>开放付费</strong>，请先完成真机支付与道具发布确认；否则建议发版策略中购买保持关闭，或先只发兑换/免费能力。
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">提交审核前建议勾选</div>
+        <div class="item"><div class="dot info">1</div><div><h3>账号资格</h3><p>主体、备案、类目、隐私指引、用户协议在微信后台核对</p></div><div class="side">控制台</div></div>
+        <div class="item"><div class="dot info">2</div><div><h3>上传正式版</h3><p>开发者工具上传 miniprogram/；确认包内无运营/验收页</p></div><div class="side">工具</div></div>
+        <div class="item"><div class="dot info">3</div><div><h3>云端版本对齐</h3><p>三函数 Active 且 ping=1.1.6；索引与 ADMINONLY 规则确认</p></div><div class="side">云开发</div></div>
+        <div class="item"><div class="dot info">4</div><div><h3>真机主路径</h3><p>查询、签到、历史任务、兑换、提醒记录删除/清空</p></div><div class="side">手机</p></div>
+        <div class="item"><div class="dot warn">5</div><div><h3>若开放购买</h3><p>vip666 已发布 + 一笔 7 元真单 + 取消/重进/退款各验一次</p></div><div class="side">必做</div></div>
+        <div class="item"><div class="dot info">6</div><div><h3>若开放到货提醒</h3><p>模板 ID、用户订阅授权、真实补货事件收信</p></div><div class="side">选做</div></div>
+        <div class="item"><div class="dot info">7</div><div><h3>回滚预案</h3><p>新版权益账本兼容；异常先关购买，勿用旧版覆盖 expiresAt</p></div><div class="side">文档</div></div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">本地命令（可再跑）</div>
+        <ol class="steps">
+          <li><code style="font-family:ui-monospace,Consolas,monospace;font-size:12px">npm test</code></li>
+          <li><code style="font-family:ui-monospace,Consolas,monospace;font-size:12px">npm run check</code></li>
+          <li><code style="font-family:ui-monospace,Consolas,monospace;font-size:12px">node tools/release/check.mjs</code></li>
+          <li><code style="font-family:ui-monospace,Consolas,monospace;font-size:12px">node tools/build-monitor.mjs --check</code></li>
+        </ol>
+        <div class="meta">详细说明：<code>docs/RELEASE_1.1.6.md</code> · <code>docs/VIRTUAL_PAYMENT_SETUP.md</code></div>
+      </div>
+
+      <div class="footer">果小哨 Release Check · 离线本地门禁 + 仓库证据摘要 · 不代表微信审核或真机支付结论</div>
+    </section>
+  </div>
+  <script>
+    (function () {
+      var tabs = document.querySelectorAll('.tab');
+      var sections = document.querySelectorAll('.section');
+      tabs.forEach(function (tab) {
+        tab.addEventListener('click', function () {
+          var id = tab.getAttribute('data-tab');
+          tabs.forEach(function (t) { t.classList.toggle('active', t === tab); });
+          sections.forEach(function (s) {
+            s.classList.toggle('active', s.getAttribute('data-section') === id);
+          });
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

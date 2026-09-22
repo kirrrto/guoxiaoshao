@@ -4,6 +4,7 @@ const fmt = require('../../utils/format');
 const { localKey } = require('../../utils/local-key');
 const { syncTabBar } = require('../../utils/tab-bar');
 const { restockSubscription, reminderReadiness } = require('../../utils/reminder-readiness');
+const { shareAppMessage, shareTimeline } = require('../../utils/share');
 const SUBSCRIPTION_PENDING_KEY = 'gxs_subscription_pending_v1';
 
 const FOLLOW_STATUS = {
@@ -136,6 +137,15 @@ Page({
 
   onHide() { this.visible = false; this.stopPolling(); },
   onUnload() { this.visible = false; this.stopPolling(); if (this.unsubscribeCatalog) this.unsubscribeCatalog(); },
+
+  onShareAppMessage() {
+    return shareAppMessage('/pages/follow/index', this.data);
+  },
+
+  onShareTimeline() {
+    return shareTimeline('/pages/follow/index', this.data);
+  },
+
   stopPolling() { this.pollEpoch = (this.pollEpoch || 0) + 1; if (this.pollTimer) clearTimeout(this.pollTimer); this.pollTimer = null; },
   startPolling() {
     this.stopPolling();

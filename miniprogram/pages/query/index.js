@@ -4,6 +4,7 @@ const fmt = require('../../utils/format');
 const { localKey } = require('../../utils/local-key');
 const operation = require('../../utils/operation');
 const { syncTabBar } = require('../../utils/tab-bar');
+const { shareAppMessage, shareTimeline } = require('../../utils/share');
 
 const SELECTION_KEY = 'gxs_query_selection_v1';
 const RESULT_KEY = 'gxs_query_result_v1';
@@ -164,6 +165,14 @@ Page({
     this.visibilityEpoch = (this.visibilityEpoch || 0) + 1;
     this.stopFollowPolling();
     if (this.unsubscribeCatalog) this.unsubscribeCatalog();
+  },
+
+  onShareAppMessage() {
+    return shareAppMessage('/pages/query/index', this.data);
+  },
+
+  onShareTimeline() {
+    return shareTimeline('/pages/query/index', this.data);
   },
 
   refreshQuerySnapshot() {

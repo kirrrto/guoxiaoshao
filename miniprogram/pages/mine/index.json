@@ -1,5 +1,6 @@
 {
   "navigationBarTitleText": "果小哨 · 我的",
   "enablePullDownRefresh": true,
+  "menus": ["shareAppMessage", "shareTimeline"],
   "usingComponents": {}
 }

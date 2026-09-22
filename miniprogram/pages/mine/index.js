@@ -3,6 +3,7 @@ const { getBootstrap, invalidateBootstrap, invalidateFollows, publishQuota, subs
 const fmt = require('../../utils/format');
 const { syncTabBar } = require('../../utils/tab-bar');
 const { notificationAdvice } = require('../../utils/reminder-readiness');
+const { shareAppMessage, shareTimeline } = require('../../utils/share');
 const { paymentAvailability, createPaymentController, purchaseNotice } = require('../../utils/member-payment');
 
 const LEDGER_TEXT = {
@@ -171,6 +172,14 @@ Page({
 
   onUnload() {
     this.retirePage();
+  },
+
+  onShareAppMessage() {
+    return shareAppMessage('/pages/mine/index', this.data);
+  },
+
+  onShareTimeline() {
+    return shareTimeline('/pages/mine/index', this.data);
   },
 
   onHide() { this.pageVisible = false; if (this.paymentController) this.paymentController.hide(); },

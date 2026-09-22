@@ -4,6 +4,7 @@ const fmt = require('../../utils/format');
 const { localKey } = require('../../utils/local-key');
 const operation = require('../../utils/operation');
 const { syncTabBar } = require('../../utils/tab-bar');
+const { shareAppMessage, shareTimeline } = require('../../utils/share');
 
 const SELECTION_KEY = 'gxs_history_selection_v1';
 const SOURCE_TEXT = { auto: '自动监测', manual: '手动查询' };
@@ -132,6 +133,14 @@ Page({
   },
 
   onUnload() { this.pageRetired = true; if (this.unsubscribeCatalog) this.unsubscribeCatalog(); },
+
+  onShareAppMessage() {
+    return shareAppMessage('/pages/history/index', this.data);
+  },
+
+  onShareTimeline() {
+    return shareTimeline('/pages/history/index', this.data);
+  },
 
   applyCatalog(catalog) {
     this.catalog = catalog;
