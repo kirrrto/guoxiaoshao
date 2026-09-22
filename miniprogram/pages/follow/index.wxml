@@ -9,43 +9,41 @@
   </block>
 
   <block wx:else>
-    <view class="page-heading whistle-heading"><view class="whistle-mark"><image class="whistle-heading-image" src="/images/brand/whistle-green.png" mode="aspectFit" aria-hidden="true" /></view><view class="whistle-heading-copy"><view class="page-title">小哨提醒</view><view class="page-subtitle">为心仪配置留个哨，取货变化及时留意</view></view></view>
+    <view class="page-heading whistle-heading"><view class="whistle-mark"><image class="whistle-heading-image" src="/images/brand/whistle-green.png" mode="aspectFit" aria-hidden="true" /></view><view class="whistle-heading-copy"><view class="page-title">小哨</view><view class="page-subtitle">关注配置，取货有变化再提醒</view></view></view>
     <view wx:if="{{refreshError}}" class="banner banner-warn">{{refreshError}}</view>
     <view id="reminder-health" class="card monitor-panel">
       <view class="card-title monitor-heading">
-        <text>我的提醒体检</text>
-        <button class="btn btn-ghost btn-sm compact-action" loading="{{refreshing}}" disabled="{{refreshing}}" bindtap="onRefreshStatus">{{refreshing ? '刷新中' : '刷新状态'}}</button>
+        <text class="monitor-title">{{readiness.title}}</text>
+        <button class="btn btn-ghost btn-sm compact-action" loading="{{refreshing}}" disabled="{{refreshing}}" bindtap="onRefreshStatus">{{refreshing ? '刷新中' : '刷新'}}</button>
       </view>
       <view class="readiness-summary readiness-{{readiness.tone}}" aria-live="polite">
-        <view class="readiness-title">{{readiness.title}}</view>
         <view class="readiness-detail">{{readiness.detail}}</view>
         <button wx:if="{{readiness.action}}" class="btn btn-primary readiness-action" disabled="{{subscribing || refreshing || saving}}" bindtap="onReadinessAction">{{subscribing && readiness.action === 'subscribe' ? '处理中…' : readiness.actionLabel}}</button>
       </view>
-      <view class="readiness-metrics">
-        <view class="readiness-metric"><text class="readiness-value">{{followsLoaded ? readiness.activeCount : '—'}}</text><text class="readiness-caption">已开启配置</text></view>
-        <view class="readiness-metric"><text class="readiness-value">{{followsLoaded ? readiness.storeCount : '—'}}</text><text class="readiness-caption">覆盖门店</text></view>
-        <view class="readiness-metric"><text class="readiness-value">{{subscription.templateCount ? subscription.credits : '—'}}</text><text class="readiness-caption">补货提醒授权</text></view>
+      <view class="status-footer">
+        <text class="tiny muted">{{followsLoaded ? readiness.activeCount + ' 配置 · ' + readiness.storeCount + ' 店' : ''}}{{subscription.templateCount ? ' · 授权 ' + subscription.credits : ''}} · {{boot.member ? '会员至 ' + boot.expiresText : (boot.expired ? '会员已到期' : '免费用户')}}</text>
+        <text class="service-link" bindtap="onToggleServiceDetails">{{showServiceDetails ? '收起详情 ▴' : '详情 ▾'}}</text>
       </view>
-      <view class="member-summary">
-        <text class="small text-2">
-          {{boot.member ? '会员有效至 ' + boot.expiresText : (boot.expired ? '会员已到期，自动监测和提醒已停止' : '当前为免费用户，关注提醒需开通会员')}}
-        </text>
-        <text wx:if="{{!boot.member}}" class="small" style="color: var(--green-dark);" bindtap="onGoMine">了解会员 ›</text>
-      </view>
-      <view class="service-row">
-        <view class="service-heading"><text class="service-title">后台检测</text><view class="pill pill-dot pill-{{collector.cls}}">{{collector.label}}</view></view>
-        <view class="service-detail">{{collector.detail}}</view>
-      </view>
-      <view class="service-row">
-        <view class="service-heading"><text class="service-title">消息发送</text><view class="pill pill-dot pill-{{delivery.cls}}">{{delivery.label}}</view></view>
-        <view class="service-detail">{{delivery.detail}}</view>
-      </view>
-      <view class="service-row authorization-row">
-        <view class="authorization-copy"><view class="service-title">微信授权</view><view class="service-detail">{{subscription.templateCount ? '剩余 ' + subscription.credits + ' 条提醒授权' : '待消息模板配置完成'}}</view><view wx:if="{{boot.templateTitle}}" class="service-detail">微信授权卡片名称：{{boot.templateTitle}}</view></view>
-        <button class="btn btn-ghost btn-sm compact-action" disabled="{{subscribing}}" bindtap="onSubscribe">{{subscribing ? '处理中' : (subscriptionPending ? '同步授权' : (subscription.templateCount ? '授权提醒' : '查看原因'))}}</button>
-      </view>
-      <view class="status-footer"><text class="tiny muted">{{refreshedText ? '最近读取 ' + refreshedText : '正在读取状态'}}</text><text class="service-link" bindtap="onServiceDetails">服务详情 ›</text></view>
-      <view class="tiny muted subscription-rule">小哨通过微信订阅消息提醒，声音遵循微信与手机设置。每次同意授权并同步后记录一次；发送需服务就绪，免打扰时段不发送。</view>
+      <block wx:if="{{showServiceDetails}}">
+        <view class="service-row">
+          <view class="service-heading"><text class="service-title">后台检测</text><view class="pill pill-dot pill-{{collector.cls}}">{{collector.label}}</view></view>
+          <view class="service-detail">{{collector.detail}}</view>
+        </view>
+        <view class="service-row">
+          <view class="service-heading"><text class="service-title">消息发送</text><view class="pill pill-dot pill-{{delivery.cls}}">{{delivery.label}}</view></view>
+          <view class="service-detail">{{delivery.detail}}</view>
+        </view>
+        <view class="service-row authorization-row">
+          <view class="authorization-copy"><view class="service-title">微信授权</view><view class="service-detail">{{subscription.templateCount ? '剩余 ' + subscription.credits + ' 条' : (boot.templateTitle ? boot.templateTitle : '待模板配置')}}</view></view>
+          <button class="btn btn-ghost btn-sm compact-action" disabled="{{subscribing}}" bindtap="onSubscribe">{{subscribing ? '处理中' : (subscriptionPending ? '同步授权' : (subscription.templateCount ? '授权提醒' : '查看原因'))}}</button>
+        </view>
+        <view class="status-footer"><text class="tiny muted">{{refreshedText ? '最近读取 ' + refreshedText : ''}}</text><text class="service-link" bindtap="onServiceDetails">服务详情 ›</text></view>
+        <view class="tiny muted subscription-rule">订阅消息声音跟随微信设置；免打扰时段不发送。</view>
+        <view wx:if="{{!boot.member}}" class="member-summary">
+          <text class="small text-2">{{boot.expired ? '会员已到期，监测与提醒已停' : '免费用户不自动提醒'}}</text>
+          <text class="small" style="color: var(--green-dark);" bindtap="onGoMine">了解会员 ›</text>
+        </view>
+      </block>
     </view>
 
     <!-- 编辑器 -->

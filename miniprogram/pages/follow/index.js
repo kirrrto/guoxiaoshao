@@ -89,6 +89,7 @@ Page({
     delivery: { label: '正在确认', cls: 'muted', detail: '' },
     settings: { notifyEnabled: true },
     notice: '',
+    showServiceDetails: false,
     readiness: { code: 'loading', title: '正在检查提醒条件', detail: '正在读取账户与关注状态。', tone: 'muted', action: '', actionLabel: '', activeCount: 0, storeCount: 0, ready: false },
     refreshing: false,
     subscribing: false,
@@ -272,6 +273,10 @@ Page({
     try { this.applyBoot(await getBootstrap({ force: true })); await this.loadFollows({ force: true }); }
     catch (error) { this.setData({ refreshError: '刷新失败，已保留上次状态。请稍后重试。' }); showError(error); }
     finally { this.setData({ refreshing: false }); }
+  },
+
+  onToggleServiceDetails() {
+    if (!this.pageRetired) this.setData({ showServiceDetails: !this.data.showServiceDetails });
   },
 
   onServiceDetails() {
