@@ -21,7 +21,7 @@
         <button wx:if="{{readiness.action}}" class="btn btn-primary readiness-action" disabled="{{subscribing || refreshing || saving}}" bindtap="onReadinessAction">{{subscribing && readiness.action === 'subscribe' ? '处理中…' : readiness.actionLabel}}</button>
       </view>
       <view class="status-footer">
-        <text class="tiny muted">{{followsLoaded ? readiness.activeCount + ' 配置 · ' + readiness.storeCount + ' 店' : ''}}{{subscription.templateCount ? ' · 授权 ' + subscription.credits : ''}} · {{boot.member ? '会员至 ' + boot.expiresText : (boot.expired ? '会员已到期' : '免费用户')}}</text>
+        <text class="tiny muted">{{followsLoaded ? readiness.activeCount + ' 配置 · ' + readiness.storeCount + ' 店' : ''}}{{subscription.templateCount ? (boot.member ? ' · 已授权' : ' · 授权 ' + subscription.credits) : ''}} · {{boot.member ? '会员至 ' + boot.expiresText : (boot.expired ? '会员已到期' : '免费用户')}}</text>
         <text class="service-link" bindtap="onToggleServiceDetails">{{showServiceDetails ? '收起详情 ▴' : '详情 ▾'}}</text>
       </view>
       <block wx:if="{{showServiceDetails}}">
@@ -34,7 +34,7 @@
           <view class="service-detail">{{delivery.detail}}</view>
         </view>
         <view class="service-row authorization-row">
-          <view class="authorization-copy"><view class="service-title">微信授权</view><view class="service-detail">{{subscription.templateCount ? (subscription.credits > 30 ? '已开启到货提醒' : '剩余 ' + subscription.credits + ' 条') : (boot.templateTitle ? boot.templateTitle : '待模板配置')}}</view></view>
+          <view class="authorization-copy"><view class="service-title">微信授权</view><view class="service-detail">{{subscription.templateCount ? (boot.member ? '已开启到货提醒' : '剩余 ' + subscription.credits + ' 条') : (boot.templateTitle ? boot.templateTitle : '待模板配置')}}</view></view>
           <button class="btn btn-ghost btn-sm compact-action" disabled="{{subscribing}}" bindtap="onSubscribe">{{subscribing ? '处理中' : (subscriptionPending ? '同步授权' : (subscription.templateCount ? '授权提醒' : '查看原因'))}}</button>
         </view>
         <view class="status-footer"><text class="tiny muted">{{refreshedText ? '最近读取 ' + refreshedText : ''}}</text><text class="service-link" bindtap="onServiceDetails">服务详情 ›</text></view>
