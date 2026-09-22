@@ -74,8 +74,8 @@
 .plan-head, .plan-row { display: flex; align-items: stretch; }
 .plan-head { background: rgba(232, 248, 239, 0.9); }
 .plan-row { border-top: 1rpx solid var(--line); background: rgba(255,255,255,0.55); }
-.plan-feature { flex: 1.1; min-width: 0; padding: 16rpx 14rpx; font-size: 23rpx; font-weight: 600; color: var(--text); }
-.plan-col { flex: 1; min-width: 0; padding: 16rpx 10rpx; font-size: 22rpx; line-height: 1.45; text-align: center; color: var(--text-2); }
+.plan-feature { flex: 1.15; min-width: 0; padding: 14rpx 12rpx; font-size: 23rpx; font-weight: 600; color: var(--text); }
+.plan-col { flex: 1; min-width: 0; padding: 14rpx 8rpx; font-size: 21rpx; line-height: 1.4; text-align: center; color: var(--text-2); white-space: nowrap; }
 .plan-head .plan-col { font-weight: 700; color: var(--text-2); }
 .plan-col.plan-member { color: var(--green-dark); background: rgba(0, 195, 117, 0.08); font-weight: 600; }
 .plan-head .plan-col.plan-member { color: var(--green-dark); background: rgba(0, 195, 117, 0.14); }

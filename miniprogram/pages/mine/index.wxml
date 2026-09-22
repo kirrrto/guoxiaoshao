@@ -48,26 +48,26 @@
           <view class="plan-row">
             <text class="plan-feature">实时查库存</text>
             <text class="plan-col">扣次数</text>
-            <text class="plan-col plan-member">不限次 · 不扣次数</text>
+            <text class="plan-col plan-member">不限次</text>
           </view>
           <view class="plan-row">
             <text class="plan-feature">补货历史</text>
             <text class="plan-col">扣次数</text>
-            <text class="plan-col plan-member">不限次 · 不扣次数</text>
+            <text class="plan-col plan-member">不限次</text>
           </view>
           <view class="plan-row">
             <text class="plan-feature">到货提醒</text>
             <text class="plan-col">不支持</text>
-            <text class="plan-col plan-member">关注 {{boot.limits.maxFollows}} 配置 × {{boot.limits.maxStoresPerFollow}} 店</text>
+            <text class="plan-col plan-member">关注可提醒</text>
           </view>
           <view class="plan-row">
             <text class="plan-feature">后台盯货</text>
             <text class="plan-col">—</text>
-            <text class="plan-col plan-member">自动监测补货</text>
+            <text class="plan-col plan-member">自动监测</text>
           </view>
           <view class="plan-row">
-            <text class="plan-feature">新品 30 天内</text>
-            <text class="plan-col">不能实时查</text>
+            <text class="plan-feature">新品 30 天</text>
+            <text class="plan-col">不可实时查</text>
             <text class="plan-col plan-member">可查</text>
           </view>
         </view>
