@@ -27,39 +27,7 @@
         <text>{{membership.active ? '会员生效中' : (membership.expired ? '会员已到期' : '开通会员')}}</text>
         <text class="sub">{{membership.active ? '至 ' + membership.expiresText + ' · 余 ' + membership.daysLeft + ' 天' : boot.priceText + ' / ' + boot.memberProduct.days + ' 天'}}</text>
       </view>
-      <view class="plan-compare">
-        <view class="plan-head">
-          <text class="plan-feature">权益</text>
-          <text class="plan-col">免费</text>
-          <text class="plan-col plan-member">会员</text>
-        </view>
-        <view class="plan-row">
-          <text class="plan-feature">实时查库存</text>
-          <text class="plan-col">扣次数</text>
-          <text class="plan-col plan-member">不限次 · 不扣次数</text>
-        </view>
-        <view class="plan-row">
-          <text class="plan-feature">补货历史</text>
-          <text class="plan-col">扣次数</text>
-          <text class="plan-col plan-member">不限次 · 不扣次数</text>
-        </view>
-        <view class="plan-row">
-          <text class="plan-feature">到货提醒</text>
-          <text class="plan-col">不支持</text>
-          <text class="plan-col plan-member">关注 {{boot.limits.maxFollows}} 配置 × {{boot.limits.maxStoresPerFollow}} 店</text>
-        </view>
-        <view class="plan-row">
-          <text class="plan-feature">后台盯货</text>
-          <text class="plan-col">—</text>
-          <text class="plan-col plan-member">自动监测补货</text>
-        </view>
-        <view class="plan-row">
-          <text class="plan-feature">新品 30 天内</text>
-          <text class="plan-col">不能实时查</text>
-          <text class="plan-col plan-member">可查</text>
-        </view>
-      </view>
-      <view class="plan-why">会员：查询不扣次数、到货自动提醒，不用一直盯手机。</view>
+      <view class="plan-why">会员：查询不扣次数、到货自动提醒。</view>
       <block wx:if="{{membership.active}}">
         <view class="tiny muted mt">续费顺延剩余天数，不自动续费。</view>
       </block>
@@ -67,10 +35,42 @@
         <view wx:if="{{membership.expired}}" class="banner banner-warn small">已于 {{membership.expiresText}} 到期，监测与提醒停止；关注配置与次数仍保留。</view>
       </block>
       <view class="row-between mt" bindtap="onToggleMembershipRules">
-        <text class="small muted">购买须知</text>
+        <text class="small muted">权益对比 · 购买须知</text>
         <text class="small muted">{{showMembershipRules ? '收起 ▴' : '展开 ▾'}}</text>
       </view>
       <block wx:if="{{showMembershipRules}}">
+        <view class="plan-compare">
+          <view class="plan-head">
+            <text class="plan-feature">权益</text>
+            <text class="plan-col">免费</text>
+            <text class="plan-col plan-member">会员</text>
+          </view>
+          <view class="plan-row">
+            <text class="plan-feature">实时查库存</text>
+            <text class="plan-col">扣次数</text>
+            <text class="plan-col plan-member">不限次 · 不扣次数</text>
+          </view>
+          <view class="plan-row">
+            <text class="plan-feature">补货历史</text>
+            <text class="plan-col">扣次数</text>
+            <text class="plan-col plan-member">不限次 · 不扣次数</text>
+          </view>
+          <view class="plan-row">
+            <text class="plan-feature">到货提醒</text>
+            <text class="plan-col">不支持</text>
+            <text class="plan-col plan-member">关注 {{boot.limits.maxFollows}} 配置 × {{boot.limits.maxStoresPerFollow}} 店</text>
+          </view>
+          <view class="plan-row">
+            <text class="plan-feature">后台盯货</text>
+            <text class="plan-col">—</text>
+            <text class="plan-col plan-member">自动监测补货</text>
+          </view>
+          <view class="plan-row">
+            <text class="plan-feature">新品 30 天内</text>
+            <text class="plan-col">不能实时查</text>
+            <text class="plan-col plan-member">可查</text>
+          </view>
+        </view>
         <view class="benefit-list mt">
           <view>{{boot.purchaseNotice || '一次性虚拟服务，一经售出不予退款。'}}</view>
           <view>容量/颜色分占关注名额；暂停仍占，删除才释放。</view>
