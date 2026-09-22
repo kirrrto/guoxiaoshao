@@ -70,6 +70,16 @@
 .membership-card { background-color: rgba(250, 255, 252, 0.82); background-image: linear-gradient(125deg, rgba(199, 246, 220, 0.50), rgba(255, 255, 255, 0.58) 52%, rgba(230, 252, 240, 0.42)); }
 .membership-card > .card-title { padding-bottom: 20rpx; border-bottom: 1rpx solid var(--line); }
 .membership-card > .benefit-list { background: rgba(255,255,255,0.42); border: 1rpx solid rgba(255,255,255,0.8); border-radius: 22rpx; padding: 4rpx 20rpx; }
+.plan-compare { margin-top: 16rpx; border: 1rpx solid var(--line); border-radius: 22rpx; overflow: hidden; }
+.plan-head, .plan-row { display: flex; align-items: stretch; }
+.plan-head { background: rgba(232, 248, 239, 0.9); }
+.plan-row { border-top: 1rpx solid var(--line); background: rgba(255,255,255,0.55); }
+.plan-feature { flex: 1.1; min-width: 0; padding: 16rpx 14rpx; font-size: 23rpx; font-weight: 600; color: var(--text); }
+.plan-col { flex: 1; min-width: 0; padding: 16rpx 10rpx; font-size: 22rpx; line-height: 1.45; text-align: center; color: var(--text-2); }
+.plan-head .plan-col { font-weight: 700; color: var(--text-2); }
+.plan-col.plan-member { color: var(--green-dark); background: rgba(0, 195, 117, 0.08); font-weight: 600; }
+.plan-head .plan-col.plan-member { color: var(--green-dark); background: rgba(0, 195, 117, 0.14); }
+.plan-why { margin: 14rpx 0 4rpx; font-size: 24rpx; font-weight: 600; color: var(--green-dark); line-height: 1.55; }
 .quota-card .task { padding: 18rpx 0; }
 .notification-heading { flex-wrap: wrap; }
 .notification-heading-copy { flex-basis: 240rpx; }
