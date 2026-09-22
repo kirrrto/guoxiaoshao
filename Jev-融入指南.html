@@ -1,0 +1,392 @@
+<!-- AI生成 -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#F0FBF6" />
+  <title>果小哨 · Jev 落地指南</title>
+  <style>
+    :root {
+      --bg: #F0FBF6;
+      --card: #FFFFFF;
+      --ink: #163028;
+      --muted: #6C8179;
+      --line: #D8EBE2;
+      --mint: #00C375;
+      --mint-soft: #E6F8F0;
+      --ok: #00A862;
+      --warn: #C47B00;
+      --warn-soft: #FFF6E5;
+      --bad: #C0392B;
+      --bad-soft: #FDECEA;
+      --info: #2B6CB0;
+      --info-soft: #EBF3FB;
+      --shadow: 0 8px 24px rgba(18, 48, 40, 0.06);
+      --radius: 16px;
+      --safe-b: env(safe-area-inset-bottom, 0px);
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0; padding: 0;
+      background: var(--bg); color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+      font-size: 15px; line-height: 1.55;
+    }
+    .app { max-width: 430px; margin: 0 auto; min-height: 100vh; padding-bottom: calc(24px + var(--safe-b)); }
+    .hero {
+      padding: 22px 18px 16px;
+      background: linear-gradient(180deg, #D9F5E9 0%, var(--bg) 100%);
+    }
+    .brand { display: flex; gap: 10px; align-items: center; margin-bottom: 14px; }
+    .logo {
+      width: 36px; height: 36px; border-radius: 12px;
+      background: var(--mint); color: #fff; display: grid; place-items: center;
+      font-weight: 700; font-size: 13px;
+    }
+    .brand h1 { margin: 0; font-size: 20px; font-weight: 700; }
+    .brand p { margin: 2px 0 0; color: var(--muted); font-size: 12px; }
+    .verdict {
+      background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+      box-shadow: var(--shadow); padding: 16px;
+    }
+    .verdict h2 { margin: 0 0 6px; font-size: 17px; }
+    .verdict p { margin: 0; color: var(--muted); font-size: 13px; }
+    .badge {
+      display: inline-flex; padding: 4px 10px; border-radius: 999px;
+      font-size: 12px; font-weight: 700; background: var(--mint-soft); color: var(--ok);
+    }
+    .score-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 14px; }
+    .score-cell {
+      background: var(--mint-soft); border-radius: 12px; padding: 10px 6px; text-align: center;
+    }
+    .score-cell strong { display: block; font-size: 15px; color: var(--ok); }
+    .score-cell span { font-size: 11px; color: var(--muted); }
+    .tabs {
+      position: sticky; top: 0; z-index: 5;
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px;
+      padding: 10px 14px; background: rgba(240, 251, 246, 0.94);
+      backdrop-filter: blur(10px); border-bottom: 1px solid var(--line);
+    }
+    .tab {
+      border: 0; background: transparent; color: var(--muted);
+      font-size: 12px; font-weight: 600; padding: 8px 4px; border-radius: 10px; cursor: pointer;
+    }
+    .tab.active { background: var(--card); color: var(--ok); box-shadow: var(--shadow); }
+    .section { display: none; padding: 14px 14px 0; }
+    .section.active { display: block; }
+    .section h2 { margin: 4px 0 12px; font-size: 15px; font-weight: 700; }
+    .card {
+      background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+      box-shadow: var(--shadow); overflow: hidden; margin-bottom: 12px;
+    }
+    .card-head {
+      padding: 12px 14px 8px; font-weight: 700; font-size: 13px;
+      display: flex; justify-content: space-between; gap: 8px; align-items: center;
+    }
+    .item {
+      display: grid; grid-template-columns: 22px 1fr; gap: 10px;
+      padding: 11px 14px; border-top: 1px solid var(--line);
+    }
+    .item:first-of-type { border-top: 0; }
+    .dot {
+      width: 18px; height: 18px; border-radius: 50%; margin-top: 2px;
+      display: grid; place-items: center; font-size: 11px; font-weight: 700; color: #fff;
+    }
+    .dot.ok { background: var(--ok); }
+    .dot.warn { background: var(--warn); }
+    .dot.bad { background: var(--bad); }
+    .dot.info { background: var(--info); }
+    .item h3 { margin: 0; font-size: 14px; font-weight: 600; }
+    .item p { margin: 2px 0 0; font-size: 12px; color: var(--muted); }
+    .item em { font-style: normal; color: var(--ok); font-weight: 600; }
+    .note {
+      margin: 0 0 12px; padding: 12px 14px; border-radius: 14px;
+      font-size: 12px; line-height: 1.6;
+    }
+    .note.warn { background: var(--warn-soft); color: #7A4D00; }
+    .note.ok { background: var(--mint-soft); color: #0B5C3C; }
+    .note.info { background: var(--info-soft); color: #1A4A7A; }
+    .steps { margin: 0; padding: 0 18px 10px 32px; font-size: 13px; }
+    .steps li { margin-bottom: 8px; }
+    .path {
+      display: block; width: 100%; text-align: left; border: 0;
+      background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+      box-shadow: var(--shadow); padding: 14px; margin-bottom: 10px; cursor: pointer;
+    }
+    .path.sel { outline: 2px solid var(--mint); }
+    .path strong { display: block; font-size: 14px; margin-bottom: 4px; }
+    .path span { display: block; font-size: 12px; color: var(--muted); }
+    .path .tagline { margin-top: 8px; display: inline-flex; background: var(--mint-soft); color: var(--ok); border-radius: 999px; padding: 3px 8px; font-size: 11px; font-weight: 700; }
+    .picker-result {
+      background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 14px;
+      margin-top: 4px;
+    }
+    .picker-result h3 { margin: 0 0 8px; font-size: 14px; }
+    .pill {
+      display: inline-block; margin: 2px 4px 2px 0; padding: 4px 8px; border-radius: 8px;
+      background: var(--mint-soft); color: var(--ok); font-size: 11px; font-weight: 600;
+    }
+    .pill.warn { background: var(--warn-soft); color: var(--warn); }
+    .pill.bad { background: var(--bad-soft); color: var(--bad); }
+    .meta {
+      padding: 12px 14px; color: var(--muted); font-size: 12px;
+    }
+    .meta code {
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 11px;
+      background: var(--mint-soft); color: var(--ok); padding: 1px 5px; border-radius: 6px;
+    }
+    .footer { margin-top: 8px; padding: 0 18px; color: var(--muted); font-size: 11px; text-align: center; }
+    .kv { display: grid; grid-template-columns: 88px 1fr; gap: 6px 10px; font-size: 12px; padding: 12px 14px; border-top: 1px solid var(--line); }
+    .kv b { color: var(--muted); font-weight: 600; }
+    @media (min-width: 430px) {
+      body { padding: 18px 0 32px; }
+      .app { border-radius: 24px; box-shadow: 0 16px 40px rgba(18,48,40,.08); overflow: hidden; border: 1px solid var(--line); }
+    }
+  </style>
+</head>
+<body>
+<p data-aigc-mark="1" style="margin:0 0 8px;font-size:10px;line-height:1.3;color:#6b6560;font-weight:400;">AI生成</p>
+
+  <div class="app">
+    <header class="hero">
+      <div class="brand">
+        <div class="logo">Jev</div>
+        <div>
+          <h1>Jev 怎么融入</h1>
+          <p>果小哨工作流 · 小程序体验 · 效率收益</p>
+        </div>
+      </div>
+      <div class="verdict">
+        <h2>核心结论</h2>
+        <p>Jev 不替代你的代码规则，也不改库存/扣次/权限。它帮你把「该先说什么、先点哪」这类反复决策自动化，让你少盯细节、少写死文案。</p>
+        <div class="score-row">
+          <div class="score-cell"><strong>省心</strong><span>发布/工单不用凭感觉排</span></div>
+          <div class="score-cell"><strong>省事</strong><span>文案与引导可枚举复用</span></div>
+          <div class="score-cell"><strong>可回退</strong><span>失败就用固定文案</span></div>
+        </div>
+      </div>
+    </header>
+
+    <nav class="tabs">
+      <button class="tab active" data-tab="gain" type="button">带来什么</button>
+      <button class="tab" data-tab="where" type="button">用在哪</button>
+      <button class="tab" data-tab="how" type="button">怎么接</button>
+      <button class="tab" data-tab="plan" type="button">落地路线</button>
+    </nav>
+
+    <section class="section active" data-section="gain">
+      <h2>你能得到什么</h2>
+      <div class="note ok">对你（运营/开发）效率更高；对用户（小程序）更少「点错、看不懂、不知道下一步」。</div>
+
+      <div class="card">
+        <div class="card-head">对你自己 <span class="badge">省时间</span></div>
+        <div class="item"><div class="dot ok">1</div><div><h3>发版检查不用全靠临场回忆</h3><p>把待办丢给 Jev 做 Choice/Score，得到<em>带置信度的优先序</em>；你只核对，不从零盘。</p></div></div>
+        <div class="item"><div class="dot ok">2</div><div><h3>重复判断变成可复用模板</h3><p>「下一步做什么」「这是哪类问题」用同一套 criteria，不用每次重写 prompt。</p></div></div>
+        <div class="item"><div class="dot ok">3</div><div><h3>减少来回改文案</h3><p>主按钮、空态提示先用 Jev 选枚举，你只维护少量规则，不用给每个状态手写一版。</p></div></div>
+        <div class="item"><div class="dot ok">4</div><div><h3>客服/反馈初分更省心</h3><p>反馈先归类（查询/提醒/支付/误操作），再决定回不回、怎么回。</p></div></div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">对小程序用户 <span class="badge">更好用</span></div>
+        <div class="item"><div class="dot ok">1</div><div><h3>空态不再只有一个灰按钮</h3><p>未选门店、余额 0、上游暂停时，主 CTA 变成<em>真正能点的动作</em>。</p></div></div>
+        <div class="item"><div class="dot ok">2</div><div><h3>少点错、少焦虑</h3><p>可取货时引导「关注」，过期时说清是否值得花次数重查。</p></div></div>
+        <div class="item"><div class="dot ok">3</div><div><h3>分享落地更好懂</h3><p>从分享进来的人第一句就知道这是什么、先点哪里。</p></div></div>
+      </div>
+
+      <div class="note warn">
+        <b>不会带来的：</b>不会让库存更准、不会自动帮你收支付密钥、不能代替真机验收。Jev 只优化「判断与表达」。
+      </div>
+    </section>
+
+    <section class="section" data-section="where">
+      <h2>用在哪（点击看说明）</h2>
+      <div class="note info">规则：精确账务、权限、库存结论走代码；Jev 只做「语义选择题」。</div>
+
+      <button class="path sel" data-key="work_release" type="button">
+        <strong>工作流 · 发版/巡检优先级</strong>
+        <span>把待办、风险、证据缺口一次问完，得到下一步动作</span>
+        <span class="tagline">省心最高 · 已在 v1.1.6 用过</span>
+      </button>
+      <button class="path" data-key="work_triage" type="button">
+        <strong>工作流 · 工单/反馈分流</strong>
+        <span>先分类再处理，减少「人人问一遍」</span>
+        <span class="tagline">省时间</span>
+      </button>
+      <button class="path" data-key="app_cta" type="button">
+        <strong>小程序 · 查询页主按钮</strong>
+        <span>空态/异常时选「先点哪个」，而不是文案长文</span>
+        <span class="tagline">体验收益最高</span>
+      </button>
+      <button class="path" data-key="app_error" type="button">
+        <strong>小程序 · 错误恢复动作</strong>
+        <span>额度不足、上游暂停、账户未连上 → 下一步动作</span>
+        <span class="tagline">减少挫败</span>
+      </button>
+      <button class="path" data-key="app_follow" type="button">
+        <strong>小程序 · 关注列表排序</strong>
+        <span>哪条配置更值得看（近事件/同城/已选完）</span>
+        <span class="tagline">可先用规则</span>
+      </button>
+      <button class="path" data-key="app_share" type="button">
+        <strong>小程序 · 分享落地说明</strong>
+        <span>好友进来时的开场一句</span>
+        <span class="tagline">轻量</span>
+      </button>
+
+      <div class="picker-result" id="whereDetail"></div>
+
+      <div class="card" style="margin-top:12px">
+        <div class="card-head">明确不要用 Jev</div>
+        <div class="item"><div class="dot bad">×</div><div><h3>库存 / 待更新 / 观测中断</h3><p>必须与服务端语义一致</p></div></div>
+        <div class="item"><div class="dot bad">×</div><div><h3>余额、会员是否有效、能否查询</h3><p>权限与账务</p></div></div>
+        <div class="item"><div class="dot bad">×</div><div><h3>价格、天数、退款金额</h3><p>产品条款锁死</p></div></div>
+      </div>
+    </section>
+
+    <section class="section" data-section="how">
+      <h2>怎么接才省心</h2>
+      <div class="note ok">目标：Jev 只输出<b>枚举</b>；失败可降级；不挡查询/支付主路径。</div>
+
+      <div class="card">
+        <div class="card-head">推荐数据契约（示意）</div>
+        <div class="kv"><b>输入 state</b><span>选择完整度、结果状态枚举、额度、会员布尔、错误码、来源</span></div>
+        <div class="kv"><b>questions</b><span>primary_cta（choice）· can_query_now（noul）· reason（choice）</span></div>
+        <div class="kv"><b>输出</b><span>uiHint = primary / secondary / reasonCode / confidence</span></div>
+        <div class="kv"><b>前端策略</b><span>confidence≥0.65 且 reasonCode 合法才换按钮，否则固定文案</span></div>
+        <div class="kv"><b>调用位置</b><span>服务端附加字段，或开发/运营侧工具；同步链路可不等 Jev</span></div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">两步降级</div>
+        <div class="item"><div class="dot ok">1</div><div><h3>先规则表</h3><p>用 if/枚举模拟 Jev（你现在就能上，零依赖）</p></div></div>
+        <div class="item"><div class="dot info">2</div><div><h3>再换真 Jev</h3><p>同一套 uiHint 接口，只换「谁来算」；key 在云端/工具环境变量</p></div></div>
+        <div class="item"><div class="dot warn">3</div><div><h3>永远可回退</h3><p>超时、低置信、无 key → 固定文案；用户体验不因 Jev 挂掉而坏</p></div></div>
+      </div>
+
+      <div class="note info">
+        已具备：本机 <code>TYPESAFE_API_KEY</code>、skill <code>typesafe-ai</code>、示例请求可在
+        <code>evidence/verification/</code> 复现。密钥不要进小程序包。
+      </div>
+    </section>
+
+    <section class="section" data-section="plan">
+      <h2>落地路线（推荐）</h2>
+
+      <div class="card">
+        <div class="card-head">本周 · 工作流侧（不改小程序）</div>
+        <ol class="steps">
+          <li>固定「发版检查」用 Jev 问 3 题：下一步动作、最大风险闸门、支付是否可开</li>
+          <li>反馈/备注需要归类时，用同一套 criteria（查询/提醒/支付/误操作/其他）</li>
+          <li>把请求 JSON 存进 <code>evidence/</code>，便于复盘</li>
+        </ol>
+      </div>
+
+      <div class="card">
+        <div class="card-head">下个小版本 · 小程序只加 CTA</div>
+        <ol class="steps">
+          <li>定义 <code>uiHint</code> 枚举（6 个主动作足够）</li>
+          <li>服务端或预生成映射表写入返回（先规则表）</li>
+          <li>查询页空态/异常切主按钮；其余页面暂不动</li>
+          <li>埋点看点击率与「重复点失败」是否下降</li>
+        </ol>
+      </div>
+
+      <div class="card">
+        <div class="card-head">再往后（可选）</div>
+        <ol class="steps">
+          <li>错误恢复动作、关注排序、分享落地文案</li>
+          <li>反馈自动初分</li>
+          <li>稳定后再考虑真 Jev 异步生成 uiHint</li>
+        </ol>
+      </div>
+
+      <div class="note warn">
+        <b>成功标准：</b>用户少点无效按钮、你少改文案、发版前少纠结优先级。不是「模型参与度」越高越好。
+      </div>
+      <div class="footer">Jev 融入指南 · 概念 App · 不连接生产 API</div>
+    </section>
+  </div>
+
+  <script>
+    (function () {
+      var tabs = document.querySelectorAll('.tab');
+      var sections = document.querySelectorAll('.section');
+      tabs.forEach(function (tab) {
+        tab.addEventListener('click', function () {
+          var id = tab.getAttribute('data-tab');
+          tabs.forEach(function (t) { t.classList.toggle('active', t === tab); });
+          sections.forEach(function (s) {
+            s.classList.toggle('active', s.getAttribute('data-section') === id);
+          });
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+      });
+
+      var DETAILS = {
+        work_release: {
+          title: '发版 / 巡检优先级',
+          gain: '省心最高：把「下一步做什么」变成可复核结论',
+          do: 'Choice：先提交基线 / 先部署 / 先验支付…；Score：风险严重度；Noul：支付是否就绪',
+          save: '你不用每次从零口述项目状态；决策有置信度，方便别人复核',
+          risk: '低 · 工作流工具，不进小程序包'
+        },
+        work_triage: {
+          title: '工单 / 反馈分流',
+          gain: '省时间：先分类再回复',
+          do: 'Choice：查询/提醒/支付/误操作/非本产品',
+          save: '减少反复问用户；重点件优先',
+          risk: '低 · 注意勿把用户原文含敏感信息存进公共日志'
+        },
+        app_cta: {
+          title: '查询页主按钮',
+          gain: '体验收益最高：空态也有明确下一步',
+          do: 'Choice primary_cta + Noul can_query_now → uiHint',
+          save: '少写 6×N 套按钮文案；少一次「点了没用」的转化损失',
+          risk: '中 · 必须异步/可降级，不能挡查询'
+        },
+        app_error: {
+          title: '错误恢复动作',
+          gain: '减少挫败与重复点击',
+          do: '按错误码+上下文选：等重试/去签到/查订单/看历史',
+          save: '错误文案中心化；运营可改映射不必改死字符串',
+          risk: '中 · 错误码仍由代码解析'
+        },
+        app_follow: {
+          title: '关注列表排序',
+          gain: '更快找到值得看的配置',
+          do: 'Score：展示优先级（事件新鲜度、同城、配置完整）',
+          save: '列表不乱序打扰；减少「关掉提醒」',
+          risk: '中 · 不改变是否发送（发送仍走规则）'
+        },
+        app_share: {
+          title: '分享落地说明',
+          gain: '好友进来第一眼就懂',
+          do: 'Choice：开场一句（是什么/先点哪）',
+          save: '分享转化略升；实现最简单',
+          risk: '低'
+        }
+      };
+
+      function paintDetail(key) {
+        var d = DETAILS[key] || DETAILS.work_release;
+        document.getElementById('whereDetail').innerHTML =
+          '<h3>' + d.title + '</h3>' +
+          '<p><span class="pill">收益</span>' + d.gain + '</p>' +
+          '<p><span class="pill">怎么做</span>' + d.do + '</p>' +
+          '<p><span class="pill">省什么</span>' + d.save + '</p>' +
+          '<p><span class="pill warn">风险</span>' + d.risk + '</p>';
+      }
+
+      var paths = document.querySelectorAll('.path');
+      paths.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          paths.forEach(function (b) { b.classList.toggle('sel', b === btn); });
+          paintDetail(btn.getAttribute('data-key'));
+        });
+      });
+      paintDetail('work_release');
+    })();
+  </script>
+</body>
+</html>
