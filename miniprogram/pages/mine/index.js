@@ -117,6 +117,10 @@ Page({
     ledger: [],
     orders: [],
     showOrders: false,
+    showMembershipRules: false,
+    showQuotaDetails: false,
+    showReminderSettings: false,
+    showNotifications: false,
     ordersLoading: false,
     ordersError: null,
     notifications: [],
@@ -548,10 +552,36 @@ Page({
     wx.switchTab({ url: '/pages/history/index' });
   },
 
+  onToggleMembershipRules() {
+    if (!this.pageRetired) this.setData({ showMembershipRules: !this.data.showMembershipRules });
+  },
+
+  onToggleQuotaDetails() {
+    if (!this.pageRetired) this.setData({ showQuotaDetails: !this.data.showQuotaDetails });
+  },
+
+  onToggleReminderSettings() {
+    if (!this.pageRetired) this.setData({ showReminderSettings: !this.data.showReminderSettings });
+  },
+
+  async onToggleNotifications() {
+    if (this.pageRetired || this.data.notificationActionBusy || this.data.notificationConfirming) return;
+    const showNotifications = !this.data.showNotifications;
+    this.setData({ showNotifications });
+    if (showNotifications) await this.loadNotifications();
+  },
+
   consumePendingSection() {
     if (this.pageRetired || !this.pageVisible || !this.data.ready || this.data.loadError || typeof getApp !== 'function') return;
     const section = getApp().globalData.pendingMineSection;
-    if (!['reminder-settings', 'membership-card'].includes(section)) return;
+    if (!['reminder-settings', 'membership-card', 'quota-card', 'notification-records'].includes(section)) return;
+    if (section === 'reminder-settings') this.setData({ showReminderSettings: true });
+    if (section === 'membership-card') this.setData({ showMembershipRules: true });
+    if (section === 'quota-card') this.setData({ showQuotaDetails: true });
+    if (section === 'notification-records') {
+      this.setData({ showNotifications: true });
+      this.loadNotifications();
+    }
     const nextTick = wx.nextTick || (fn => fn());
     nextTick(() => {
       if (this.pageRetired || !this.pageVisible || getApp().globalData.pendingMineSection !== section) return;
