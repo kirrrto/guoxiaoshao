@@ -49,14 +49,13 @@ function shareAppMessage(route, pageData) {
   return payload;
 }
 
-function shareTimeline(route, pageData) {
-  const payload = {
-    title: shareTitleFor(route, pageData),
-    query: (PAGE_META[route] && PAGE_META[route].query) || 'from=share',
+function shareTimeline() {
+  // Moments is a product intro card: brand logo, not device or page art.
+  return {
+    title: '果小哨 · 查苹果直营店取货与到货提醒',
+    query: 'from=share_timeline',
+    imageUrl: IMAGE,
   };
-  const followImage = firstFollowImage(pageData);
-  if (followImage) payload.imageUrl = followImage;
-  return payload;
 }
 
 module.exports = { IMAGE, DEFAULT_TITLE, PAGE_META, shareTitleFor, firstFollowImage, shareAppMessage, shareTimeline };

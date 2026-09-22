@@ -10,14 +10,21 @@ const require = createRequire(import.meta.url);
 const share = require('../miniprogram/utils/share.js');
 const miniprogramRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../miniprogram');
 
-test('share payloads use brand image and public query landing path', () => {
-  const payload = share.shareAppMessage('/pages/query/index', {});
-  assert.equal(payload.imageUrl, '/images/brand/logo-mint-144.png');
-  assert.ok(payload.path.startsWith('/pages/query/index?'));
-  assert.ok(payload.title.includes('果小哨'));
-  const timeline = share.shareTimeline('/pages/follow/index', {});
-  assert.ok(timeline.query.includes('share'));
+test('moments share is product intro with logo; friend share can use device art', () => {
+  const timeline = share.shareTimeline();
   assert.equal(timeline.imageUrl, share.IMAGE);
+  assert.ok(timeline.title.includes('果小哨'));
+  assert.ok(timeline.query.includes('share'));
+
+  const empty = share.shareAppMessage('/pages/query/index', {});
+  assert.ok(!empty.imageUrl || empty.imageUrl.endsWith('.png'));
+  assert.ok(empty.path.startsWith('/pages/query/index?'));
+  assert.ok(empty.title.includes('果小哨'));
+
+  const withProduct = share.shareAppMessage('/pages/query/index', {
+    selection: { product: { title: 'iPhone 18', imageUrl: 'https://img.example/p.png' } },
+  });
+  assert.equal(withProduct.imageUrl, 'https://img.example/p.png');
 });
 
 test('query share title reflects selected product when present', () => {
@@ -35,9 +42,8 @@ test('every consumer tab page exposes onShareAppMessage and onShareTimeline', ()
     assert.equal(typeof page.onShareTimeline, 'function', route);
     const appShare = page.onShareAppMessage();
     assert.ok(appShare && appShare.path.includes('/pages/query/index'));
-    assert.ok(appShare.imageUrl);
     const timeline = page.onShareTimeline();
-    assert.ok(timeline && typeof timeline.title === 'string' && timeline.title.length > 0);
+    assert.equal(timeline.imageUrl, share.IMAGE);
   }
 });
 
