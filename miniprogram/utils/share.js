@@ -3,7 +3,7 @@
  * Share card: first followed product image when present; otherwise omit
  * imageUrl so WeChat captures the current page screenshot.
  */
-const IMAGE = '/images/brand/logo-mint-144.png';
+const IMAGE = 'images/brand/logo-mint-144.png';
 const DEFAULT_TITLE = '果小哨 · 苹果直营店取货供应监测';
 
 const PAGE_META = {
