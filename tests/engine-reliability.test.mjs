@@ -176,6 +176,7 @@ test('cooldown applies atomically per user and target; explicit rejection releas
 test('subscription grants enforce template whitelist and idempotency under concurrent retries', async () => {
   const f = createFixture({ config });
   await f.call('user.bootstrap');
+  await f.repo.updateUser(userKeyOf(), { membership: { expiresAt: '2026-10-15T00:00:00Z' } });
   const payload = { requestId: 'grant-00001', results: { TPL: 'accept' } };
   const results = await Promise.all([f.call('notify.recordSubscription', payload), f.call('notify.recordSubscription', payload)]);
   assert.ok(results.every(r => r.ok));

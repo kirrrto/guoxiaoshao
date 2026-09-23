@@ -21,7 +21,9 @@ const DEFAULTS = Object.freeze({
     note: '该产品为一次性虚拟服务，一经售出不予退款。一次购买 7 天，已有会员按剩余有效期顺延，不自动续费。',
   },
   virtualPayment: { offerId: '1450655203', productId: 'vip666', iosEnabled: true },
-  memberRedemption: { enabled: true },
+  // maxClaims counts every account that has redeemed this campaign, including
+  // redemptions granted before the cap existed.
+  memberRedemption: { enabled: true, maxClaims: 20 },
   newProductWindows: [],
   notifications: {
     enabled: false,
@@ -99,7 +101,8 @@ function validateConfig(config) {
   }
   for (const key of ['signinReward', 'taskReward', 'dailyGrantCap', 'balanceCap', 'queryCost', 'historyCost']) integer(config.quota[key], 0, 10000, `quota.${key}`);
   for (const key of ['memberProduct', 'memberRedemption', 'notifications', 'collector']) if (typeof config[key].enabled !== 'boolean') invalid(`${key}.enabled`);
-  if (Object.keys(config.memberRedemption).some(key => key !== 'enabled')) invalid('memberRedemption');
+  if (Object.keys(config.memberRedemption).some(key => !['enabled', 'maxClaims'].includes(key))) invalid('memberRedemption');
+  integer(config.memberRedemption.maxClaims, 0, 100000, 'memberRedemption.maxClaims');
   integer(config.memberProduct.days, 1, 3650, 'memberProduct.days');
   integer(config.memberProduct.priceFen, 1, 10000000, 'memberProduct.priceFen');
   if (typeof config.memberProduct.note !== 'string' || !config.memberProduct.note.trim() || config.memberProduct.note.length > 200 || /[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/.test(config.memberProduct.note)) invalid('memberProduct.note');

@@ -46,6 +46,7 @@ const ACTIONS = {
   'member.status': [member.status, true],
   'member.createOrder': [member.createOrder, true],
   'member.checkOrder': [member.checkOrder, true],
+  'member.abandonOrder': [member.abandonOrder, true],
   'member.redeemCode': [member.redeemCode, true],
   'notify.recordSubscription': [notify.recordSubscription, true],
   'notify.list': [notify.list, true],

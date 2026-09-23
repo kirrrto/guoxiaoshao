@@ -1,6 +1,7 @@
 'use strict';
 const crypto = require('node:crypto');
 const { createCollector } = require('./collector');
+const { runRetentionIfDue } = require('./retention');
 
 const TRIGGER_NAME = 'gxs-monitor-minute';
 
@@ -65,6 +66,10 @@ async function runScheduled({ repo, fetchImpl, sendImpl, clock = () => new Date(
     // Pending events are read from the durable outbox on every invocation,
     // including when no target is due or all user follows have been paused.
     if (shouldContinue()) await collector.drainNotifications();
+    // Once per Beijing day: purge expired history inside this lease and time budget.
+    if (shouldContinue() && collector.lease.isHeld() && await collector.lease.renew()) {
+      await runRetentionIfDue({ repo, now: clock(), log, remainingMs: () => Math.max(0, deadline - clock().getTime()) });
+    }
     const status = collector.lease.isHeld() ? await collector.publishStatus() : null;
     return { state: status ? status.state : 'lease_lost', scanned: collector.stats.batches,
       observations: collector.stats.observations, events: collector.stats.events, sent: collector.stats.sent,

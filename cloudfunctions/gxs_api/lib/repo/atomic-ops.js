@@ -14,7 +14,7 @@ const { observationDayId, appendObservationDay } = require('../engine/observatio
 const { viewId, newView, decodeToken } = require('../notification-view');
 const { mergeConfig, patchConfig } = require('../config');
 const { assertConfigEditor, makeConfigAudit } = require('../config-audit');
-const { CAMPAIGN, MAX_FAILURES, LOCK_MS, matchesCodeHash, attemptsId } = require('../member-redemption');
+const { CAMPAIGN, MAX_FAILURES, LOCK_MS, CLAIMS_ID, matchesCodeHash, attemptsId } = require('../member-redemption');
 const { upstreamGuardMethods, reserveAccountQuery, releaseAccountQuery } = require('./upstream-guard');
 const subscriptionCredits = require('./subscription-credit-ledger');
 
@@ -340,7 +340,8 @@ function atomicMethods(run) {
 
     redeemMembershipCode: ({ userKey, codeHash, nowIso }) => run(async tx => {
       const runtime = await tx.get(C.config, 'runtime');
-      if (mergeConfig(runtime).memberRedemption.enabled !== true) return { error: { code: 'redemption_disabled', message: '会员兑换暂未开放，请稍后再试' } };
+      const settings = mergeConfig(runtime).memberRedemption;
+      if (settings.enabled !== true) return { error: { code: 'redemption_disabled', message: '会员兑换暂未开放，请稍后再试' } };
       const user = await tx.get(C.users, userKey);
       if (!user) throw new ApiError('user_missing', '用户不存在');
       const id = attemptsId(userKey), nowMs = Date.parse(nowIso);
@@ -353,14 +354,29 @@ function atomicMethods(run) {
         await tx.put(C.config, { _id: id, kind: 'member_redemption_attempts', userKey, failures, lockedUntil, updatedAt: nowIso });
         return lockedUntil ? rateLimited(lockedUntil) : { error: { code: 'invalid_redemption_code', message: '兑换码无效，请检查后重试', details: { remainingAttempts: MAX_FAILURES - failures } } };
       }
+      // Transactions cannot count orders. The service seeds this counter from the
+      // existing redemption orders first; no redemption commits while it is absent.
+      // Checked before any write so this early return commits nothing.
+      const claims = await tx.get(C.config, CLAIMS_ID);
+      if (!claims) return { seedClaims: true };
       const orderId = `redeem_${CAMPAIGN.id}`, recordId = `${userKey}|${orderId}`;
       const existing = await tx.get(C.orders, recordId);
       if (existing && (existing.userKey !== userKey || existing.campaignId !== CAMPAIGN.id || existing.type !== 'membership_redemption' || existing.status !== 'fulfilled')) throw new ApiError('redemption_conflict', '兑换记录状态异常，请联系客服核对');
       if (attempts && (attempts.failures || attempts.lockedUntil)) await tx.put(C.config, { ...attempts, failures: 0, lockedUntil: null, updatedAt: nowIso });
       if (existing) return { alreadyRedeemed: true, user };
+      if (claims.claimed >= settings.maxClaims) return { error: { code: 'redemption_sold_out', message: '本期兑换名额已发完', details: { maxClaims: settings.maxClaims } } };
       const order = { _id: recordId, orderId, userKey, productId: CAMPAIGN.productId, type: 'membership_redemption', source: 'redemption_code', campaignId: CAMPAIGN.id, days: CAMPAIGN.days, amountFen: 0, status: 'paid', createdAt: nowIso, paidAt: null, fulfilledAt: null };
       await fulfilMembershipIn(tx, user, order, 'redemption_code', nowIso);
+      await tx.put(C.config, { ...claims, claimed: claims.claimed + 1, updatedAt: nowIso });
       return { alreadyRedeemed: false, user };
+    }),
+
+    seedRedemptionClaims: ({ claimed, nowIso }) => run(async tx => {
+      const existing = await tx.get(C.config, CLAIMS_ID);
+      if (existing) return existing;
+      const claims = { _id: CLAIMS_ID, kind: 'member_redemption_claims', campaignId: CAMPAIGN.id, claimed, seededAt: nowIso, updatedAt: nowIso };
+      await tx.put(C.config, claims);
+      return claims;
     }),
 
     createOrderIfAbsent: order => run(async tx => {
@@ -498,6 +514,27 @@ function atomicMethods(run) {
       return { invalidated: true, credits };
     }),
 
+    /**
+     * One-time repair for ledgers inflated by the 2026-09-22 build, which issued
+     * 365 tickets per member "allow" although WeChat grants one send. Reissues at
+     * most (lifetime accepts - accepted sends), never more than the current count.
+     */
+    repairInflatedCredits: ({ userKey, templateId, sends, now }) => run(async tx => {
+      const user = await tx.get(C.users, userKey);
+      const current = user && user.subscriptions && user.subscriptions[templateId];
+      if (!current || current.poolRepairedAt || !current.creditLedger) return { repaired: false };
+      const ledger = subscriptionCredits.readLedger(current);
+      const accepted = Number.isSafeInteger(current.accepted) ? current.accepted : 0;
+      if (ledger.sequence <= accepted) return { repaired: false };
+      const credits = Math.min(subscriptionCredits.balance(ledger), Math.max(0, accepted - sends));
+      // Void every issued ticket (in-flight reservations cannot be refunded),
+      // then issue only the sends WeChat can still honour.
+      let repaired = subscriptionCredits.writeLedger(current, { ...ledger, legacyCredits: 0, legacyInvalidated: true, invalidatedThrough: ledger.sequence, available: [] }, now);
+      for (let i = 0; i < credits; i += 1) repaired = subscriptionCredits.writeLedger(repaired, subscriptionCredits.grantCredit(repaired), now);
+      await tx.put(C.users, { ...user, subscriptions: { ...user.subscriptions, [templateId]: { ...repaired, needsReauthorization: credits === 0, poolRepairedAt: now } } });
+      return { repaired: true, credits };
+    }),
+
     recordSubscriptionGrant: ({ userKey, requestId, templateIds, results, now }) => run(async tx => {
       const id = `subscription_${createHash('sha256').update(`${userKey}|${requestId}`).digest('hex')}`;
       const existing = await tx.get(C.config, id);
@@ -510,10 +547,9 @@ function atomicMethods(run) {
         const result = results[templateId];
         if (!['accept', 'reject', 'ban', 'filter'].includes(result)) continue;
         const current = subscriptions[templateId] || { credits: 0, accepted: 0, rejected: 0 };
-        // Members get a standing pool after first accept so they need not
-        // re-tap authorize for every restock (WeChat one-time grants still apply).
-        const memberPool = isMember(user, new Date(now)) ? 365 : 1;
-        const credited = result === 'accept' ? subscriptionCredits.writeLedger(current, subscriptionCredits.grantCredit(current, memberPool), now) : current;
+        // One WeChat "allow" is exactly one send. Credits accumulate across taps;
+        // recording more than WeChat granted only fails later with 43101.
+        const credited = result === 'accept' ? subscriptionCredits.writeLedger(current, subscriptionCredits.grantCredit(current), now) : current;
         subscriptions[templateId] = { ...credited, accepted: (current.accepted || 0) + (result === 'accept' ? 1 : 0), rejected: (current.rejected || 0) + (result === 'reject' ? 1 : 0), ...(result === 'accept' ? { needsReauthorization: false } : {}), lastResult: result, updatedAt: now };
         if (result === 'accept') accepted.push(templateId);
       }

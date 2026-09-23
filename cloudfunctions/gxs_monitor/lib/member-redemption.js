@@ -16,5 +16,7 @@ function matchesCodeHash(hash) {
   return typeof hash === 'string' && /^[a-f0-9]{64}$/.test(hash) && timingSafeEqual(Buffer.from(hash, 'hex'), EXPECTED_HASH);
 }
 function attemptsId(userKey) { return `member_redemption_attempts_${createHash('sha256').update(userKey).digest('hex')}`; }
+// Campaign-wide claim counter in gxs_config, incremented in the redemption transaction.
+const CLAIMS_ID = `member_redemption_claims_${CAMPAIGN.id}`;
 
-module.exports = { CAMPAIGN, MAX_FAILURES, LOCK_MS, hashCode, matchesCodeHash, attemptsId };
+module.exports = { CAMPAIGN, MAX_FAILURES, LOCK_MS, CLAIMS_ID, hashCode, matchesCodeHash, attemptsId };

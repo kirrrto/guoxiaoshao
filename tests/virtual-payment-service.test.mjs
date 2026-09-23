@@ -235,3 +235,27 @@ test('admin.paymentStatus is operator-only, redacted, and performs no token prob
   assert.doesNotMatch(JSON.stringify(inspected), /fake-secret|fake-appkey|TestCallbackToken|access_token|session_key/);
   assert.equal(f.calls.length, 0); assert.equal((await f.repo.listOrders(userKeyOf(), 20)).length, 0);
 });
+
+test('an unpaid order stuck at platform status 1 can be abandoned; a new purchase is then allowed', async () => {
+  const f = await fixture(); ok(await f.create()); f.setRemote('purchase-0001', { status: 1, paid_fee: 0, left_fee: 0 });
+  assert.equal(ok(await f.check()).order.paymentPending, true);
+  const abandoned = ok(await f.call('member.abandonOrder', { orderId: 'purchase-0001' }));
+  assert.equal(abandoned.order.status, 'created'); assert.equal(abandoned.order.abandoned, true); assert.equal(abandoned.order.paymentPending, false);
+  assert.equal((await f.user()).membership.expiresAt, null);
+  assert.equal(ok(await f.call('member.status')).orders.find(o => o.orderId === 'purchase-0001').abandoned, true);
+  const next = ok(await f.create('purchase-0002'));
+  assert.equal(next.ok, true); assert.ok(next.payment);
+  // A late payment of the abandoned order is still honoured, never lost.
+  f.setRemote('purchase-0001');
+  const late = ok(await f.check());
+  assert.equal(late.order.status, 'fulfilled'); assert.equal(late.order.abandoned, false);
+  assert.ok(Date.parse((await f.user()).membership.expiresAt) > f.state.now.getTime());
+});
+
+test('abandoning asks the platform first: a paid order is fulfilled instead of abandoned', async () => {
+  const f = await fixture(); ok(await f.create()); f.setRemote('purchase-0001');
+  const result = ok(await f.call('member.abandonOrder', { orderId: 'purchase-0001' }));
+  assert.equal(result.order.status, 'fulfilled'); assert.equal(result.order.abandoned, false);
+  assert.equal(result.membership.active, true);
+  assert.equal((await f.call('member.abandonOrder', { orderId: 'someone-else-01' })).error.code, 'unknown_order');
+});

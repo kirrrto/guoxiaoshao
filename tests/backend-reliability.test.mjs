@@ -378,6 +378,9 @@ test('real wx-server-sdk 4.0.2 adapter preserves transaction results, null/objec
     assert.equal(wrongCode.error.code, 'invalid_redemption_code');
     assert.equal(committed[C.config][attemptsId('user')].failures, 1, 'failed guesses commit instead of rolling back');
     const beforeRedemption = committed[C.users].user.membership.expiresAt;
+    assert.equal((await repo.redeemMembershipCode({ userKey: 'user', codeHash: hashCode('hbw666'), nowIso })).seedClaims, true, 'an unseeded campaign counter commits nothing');
+    assert.equal((await repo.seedRedemptionClaims({ claimed: 0, nowIso })).claimed, 0);
+    assert.equal((await repo.seedRedemptionClaims({ claimed: 7, nowIso })).claimed, 0, 'a second seeder keeps the first counter');
     failWrite = true;
     await assert.rejects(repo.redeemMembershipCode({ userKey: 'user', codeHash: hashCode('hbw666'), nowIso }));
     assert.equal(committed[C.users].user.membership.expiresAt, beforeRedemption);

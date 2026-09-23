@@ -275,12 +275,15 @@ test('admin: config patches are whitelisted and non-admins are rejected', async 
 
 test('subscription results are counted per template; only accepts add send credits', async () => {
   const f = createFixture({ config: { notifications: { templateIds: { restock: 'TPL_A', other: 'TPL_B', third: 'TPL_C' } } } });
+  failWith(await f.call('notify.recordSubscription', { requestId: 'subscription-0000', results: { TPL_A: 'accept' } }), 'membership_required');
+  await f.repo.updateUser(userKeyOf(), { membership: { expiresAt: '2026-10-15T00:00:00Z' } });
   const data = ok(await f.call('notify.recordSubscription', { requestId: 'subscription-0001', results: { TPL_A: 'accept', TPL_B: 'reject', TPL_C: 'ban' } }));
   assert.deepEqual(data.accepted, ['TPL_A']);
   assert.equal(data.subscriptions.TPL_A.credits, 1);
   assert.equal(data.subscriptions.TPL_B.credits, 0);
   const again = ok(await f.call('notify.recordSubscription', { requestId: 'subscription-0002', results: { TPL_A: 'accept' } }));
   assert.equal(again.subscriptions.TPL_A.credits, 2);
+  assert.equal(ok(await f.call('notify.recordSubscription', { requestId: 'subscription-0003', results: { TPL_A: 'accept' } })).subscriptions.TPL_A.credits, 3, 'each allow adds exactly one send');
   failWith(await f.call('notify.recordSubscription', {}), 'invalid_payload');
 });
 

@@ -3,10 +3,12 @@ const { ApiError } = require('../errors');
 const { ensureUser } = require('./users');
 const { encodeToken, decodeToken } = require('../notification-view');
 const { isValidTemplateId } = require('../config');
+const { isMember } = require('../rules/membership');
 
 /**
  * Record the outcome of wx.requestSubscribeMessage. Each accepted one-time
- * template grants exactly one send; the collector's notifier consumes them.
+ * template grants exactly one send and sends accumulate across requests; the
+ * collector's notifier consumes them. Members only.
  */
 async function recordSubscription(ctx, payload) {
   const user = await ensureUser(ctx);
@@ -18,6 +20,8 @@ async function recordSubscription(ctx, payload) {
   if (!entries.length || entries.length > 3 || entries.some(([id, result]) => !templateIds.includes(id) || !['accept', 'reject', 'ban'].includes(result))) {
     throw new ApiError('invalid_subscription_result', '只接受当前配置模板的 accept、reject 或 ban 结果');
   }
+  // Restock reminders are a member benefit; the notifier also skips non-members when sending.
+  if (!isMember(user, ctx.now)) throw new ApiError('membership_required', '到货提醒为会员专属，开通会员后可增加提醒次数');
   return ctx.repo.recordSubscriptionGrant({ userKey: user._id, requestId: payload.requestId, templateIds, results, now: ctx.nowIso });
 }
 

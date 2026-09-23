@@ -9,7 +9,7 @@ const require = createRequire(import.meta.url);
 const { COLLECTIONS } = require('../../cloudfunctions/gxs_api/lib/collections.js');
 const { atomicMethods } = require('../../cloudfunctions/gxs_api/lib/repo/atomic-ops.js');
 const { NOTIFIABLE_TYPES } = require('../../cloudfunctions/gxs_api/lib/engine/events.js');
-const { dayKey: beijingDayKey } = require('../../cloudfunctions/gxs_api/lib/time.js');
+const { dayKey: beijingDayKey, startOfDay, addDays } = require('../../cloudfunctions/gxs_api/lib/time.js');
 
 const clone = value => (value === undefined ? undefined : JSON.parse(JSON.stringify(value)));
 const byDesc = field => (a, b) => (a[field] < b[field] ? 1 : a[field] > b[field] ? -1 : 0);
@@ -109,9 +109,10 @@ export function createMemoryRepo(seed = {}) {
         .filter(e => e.partNumber === partNumber && e.dayKey === dayKey && (!storeNumbers || !storeNumbers.length || storeNumbers.includes(e.storeNumber)))
         .sort(byDesc('detectedAt')).slice(0, limit || 100);
     },
-    async getEventHistory({ partNumber, storeNumbers, dayKey, cursor, limit = 100, snapshotAt }) {
+    async getEventHistory({ partNumber, storeNumbers, dayKey, cursor, limit = 100, snapshotAt, includeCounts = true }) {
       const rows = all(COLLECTIONS.events).filter(e => e.partNumber === partNumber && e.dayKey === dayKey && (!storeNumbers.length || storeNumbers.includes(e.storeNumber)) && e.detectedAt <= snapshotAt).sort((a, b) => byDesc('detectedAt')(a, b) || byDesc('_id')(a, b));
       const page = rows.filter(e => !cursor || e.detectedAt < cursor.detectedAt || (e.detectedAt === cursor.detectedAt && e._id < cursor.id));
+      if (!includeCounts) return { events: page.slice(0, limit), hasMore: page.length > limit, total: null, summary: null };
       const types = { first_seen_available: 'available', restock_confirmed: 'restocks', recovered_available: 'recoveries', became_unavailable: 'ended' };
       const summary = { available: 0, restocks: 0, recoveries: 0, ended: 0, lastHourRestocks: 0 };
       for (const event of rows) if (types[event.type]) summary[types[event.type]]++;
@@ -170,7 +171,26 @@ export function createMemoryRepo(seed = {}) {
       if (current && current.ownerId === ownerId) current.expiresAt = '1970-01-01T00:00:00.000Z';
     },
     async getCollectorStatus() { return get(COLLECTIONS.config, 'collector_status'); },
-    async saveHealth(records) { for (const record of records) put(COLLECTIONS.health, record); },
+    async getRetentionStatus() { return get(COLLECTIONS.config, 'retention_status'); },
+    async saveRetentionStatus(status) { put(COLLECTIONS.config, status); },
+    async purgeExpiredData({ firstDay, cutoffIso }) {
+      const removed = {};
+      const drop = (name, collection, expired) => {
+        removed[name] = 0;
+        for (const [id, doc] of table(collection)) if (expired(doc)) { table(collection).delete(id); removed[name] += 1; }
+      };
+      drop('events', COLLECTIONS.events, doc => doc.dayKey < firstDay);
+      drop('observationDays', COLLECTIONS.observationDays, doc => doc.dayKey < firstDay);
+      drop('queries', COLLECTIONS.queries, doc => doc.createdAt < cutoffIso && doc.status !== 'pending');
+      drop('notifications', COLLECTIONS.notifications, doc => doc.createdAt < cutoffIso && !['pending', 'sending'].includes(doc.status));
+      drop('targetHealth', COLLECTIONS.health, doc => doc.recordedAt < cutoffIso);
+      drop('subscriptionGrants', COLLECTIONS.config, doc => doc.kind === 'subscription_grant' && doc.createdAt < cutoffIso);
+      drop('queryGuards', COLLECTIONS.config, doc => doc.kind === 'query_guard' && doc.updatedAt < cutoffIso);
+      // Same 60-day _id window as the CloudBase implementation.
+      const oldestBudget = beijingDayKey(addDays(startOfDay(firstDay), -60));
+      drop('budgets', COLLECTIONS.config, doc => /^collector_budget_\d{4}-\d{2}-\d{2}$/.test(doc._id) && doc._id.slice(-10) < firstDay && doc._id.slice(-10) >= oldestBudget);
+      return { removed, errors: {} };
+    },
     async count(collection, where) {
       return all(collection).filter(doc => !where || Object.entries(where).every(([k, v]) => doc[k] === v)).length;
     },

@@ -157,10 +157,10 @@ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = cons
       ...(mode === 'scheduled' ? { scheduler: scheduler.checkpoint(), nextRunAt: new Date(Math.floor(now.getTime() / 60000) * 60000 + 60000).toISOString() } : {}),
       ...(extra || {}),
     };
+    // Per-target health stays in the scheduler (persisted by the scheduled
+    // checkpoint above). Nothing read the per-minute gxs_target_health documents.
     const saved = await repo.saveCollectorStatus(status, { ownerId, nowIso: clock().toISOString() });
     if (saved && saved.saved === false) return null;
-    const bucket = now.toISOString().slice(0, 16);
-    await repo.saveHealth(snap.targets.map(t => ({ _id: `${t.key}|${bucket}`, targetKey: t.key, storeNumber: t.storeNumber, partNumbers: t.partNumbers, bucket, ...t.health, recordedAt: now.toISOString() })));
     lastStatusAt = now.getTime();
     return status;
   }

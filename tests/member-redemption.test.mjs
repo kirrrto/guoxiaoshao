@@ -4,7 +4,7 @@ import { createRequire } from 'node:module';
 import { createFixture, userContext, userKeyOf, operatorContext, RESOURCE_APPID } from './helpers/fixture.mjs';
 const require = createRequire(import.meta.url);
 const { COLLECTIONS: C } = require('../cloudfunctions/gxs_api/lib/collections.js');
-const { attemptsId, CAMPAIGN } = require('../cloudfunctions/gxs_api/lib/member-redemption.js');
+const { attemptsId, CAMPAIGN, CLAIMS_ID } = require('../cloudfunctions/gxs_api/lib/member-redemption.js');
 const ok = result => { assert.equal(result.ok, true, JSON.stringify(result.error)); return result.data; };
 const redeem = (f, code = 'hbw666', extra = {}, context) => f.call('member.redeemCode', { code, ...extra }, context);
 const attempts = f => f.repo.tables.get(C.config).get(attemptsId(userKeyOf()));
@@ -131,4 +131,29 @@ test('failed order persistence rolls back membership and failed-attempt reset so
   assert.equal(ok(await redeem(f)).alreadyRedeemed, true);
   const [order] = await f.repo.listOrders(userKeyOf());
   assert.equal(order.campaignId, CAMPAIGN.id); assert.equal(order.fulfilledAt, f.state.now.toISOString());
+});
+
+test('the campaign closes after 20 accounts in total, counting redemptions granted before the cap existed', async () => {
+  const f = createFixture();
+  const account = i => userContext(`oCAP${String(i).padStart(22, '0')}`);
+  for (let i = 0; i < 5; i++) ok(await redeem(f, 'hbw666', {}, account(i)));
+  // Earlier deployments redeemed without a counter; the next claim must seed from those orders.
+  f.repo.tables.get(C.config).delete(CLAIMS_ID);
+  for (let i = 5; i < 20; i++) assert.equal(ok(await redeem(f, 'hbw666', {}, account(i))).alreadyRedeemed, false);
+  assert.equal(f.repo.tables.get(C.config).get(CLAIMS_ID).claimed, 20);
+  const soldOut = await redeem(f, 'hbw666', {}, account(20));
+  assert.equal(soldOut.error.code, 'redemption_sold_out');
+  assert.equal(await f.repo.count(C.orders, { type: 'membership_redemption' }), 20);
+  assert.equal(ok(await redeem(f, 'hbw666', {}, account(3))).alreadyRedeemed, true, 'an account that already redeemed keeps its answer');
+  assert.equal((await redeem(f, 'wrong-code', {}, account(21))).error.code, 'invalid_redemption_code', 'the code is still checked before the cap');
+});
+
+test('concurrent claims never exceed an operator-set cap', async () => {
+  const f = createFixture();
+  ok(await f.call('admin.updateConfig', { patch: { memberRedemption: { maxClaims: 3 } } }, operatorContext()));
+  const results = await Promise.all(Array.from({ length: 8 }, (_, i) => redeem(f, 'hbw666', {}, userContext(`oRACE${String(i).padStart(21, '0')}`))));
+  assert.equal(results.filter(r => r.ok).length, 3);
+  assert.ok(results.filter(r => !r.ok).every(r => r.error.code === 'redemption_sold_out'));
+  assert.equal(f.repo.tables.get(C.config).get(CLAIMS_ID).claimed, 3);
+  for (const maxClaims of [-1, 1.5, '20']) assert.equal((await f.call('admin.updateConfig', { patch: { memberRedemption: { maxClaims } } }, operatorContext())).error.code, 'invalid_config');
 });

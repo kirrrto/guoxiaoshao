@@ -14,7 +14,7 @@ const { COLLECTIONS } = require('../collections');
 const { isDuplicateKeyError } = require('../errors');
 const { atomicMethods } = require('./atomic-ops');
 const { NOTIFIABLE_TYPES } = require('../engine/events');
-const { dayKey: beijingDayKey } = require('../time');
+const { dayKey: beijingDayKey, startOfDay, addDays } = require('../time');
 const { observationDayId } = require('../engine/observation-day');
 
 const CHUNK = 20;
@@ -195,17 +195,23 @@ function createCloudbaseRepo(db) {
       if (storeNumbers && storeNumbers.length) where.storeNumber = _.in(storeNumbers);
       return readAll(col(COLLECTIONS.events).where(where).orderBy('detectedAt', 'desc').orderBy('_id', 'desc'), limit || 100);
     },
-    async getEventHistory({ partNumber, storeNumbers, dayKey, cursor, limit = 100, snapshotAt }) {
+    async getEventHistory({ partNumber, storeNumbers, dayKey, cursor, limit = 100, snapshotAt, includeCounts = true }) {
       const base = { partNumber, dayKey, detectedAt: _.lte(snapshotAt) };
       if (storeNumbers.length) base.storeNumber = _.in(storeNumbers);
       const where = cursor ? _.and([base, _.or([{ detectedAt: _.lt(cursor.detectedAt) }, { detectedAt: cursor.detectedAt, _id: _.lt(cursor.id) }])]) : base;
+      const read = readAll(col(COLLECTIONS.events).where(where).orderBy('detectedAt', 'desc').orderBy('_id', 'desc'), limit + 1);
+      // Later pages reuse the first page's frozen total and summary; skip the 6–7 count queries.
+      if (!includeCounts) {
+        const rows = await read;
+        return { events: rows.slice(0, limit), hasMore: rows.length > limit, total: null, summary: null };
+      }
       const hourStart = new Date(Date.parse(snapshotAt) - 3600000).toISOString();
       // Today's rolling hour may cross Beijing midnight. Count both date
       // partitions while preserving SKU/store filters and the snapshot cutoff.
       // Older-day queries must not expose today's restricted product activity.
       const hourDays = dayKey === beijingDayKey(snapshotAt) ? [...new Set([beijingDayKey(hourStart), dayKey])] : [];
       const [rows, total, ...counts] = await Promise.all([
-        readAll(col(COLLECTIONS.events).where(where).orderBy('detectedAt', 'desc').orderBy('_id', 'desc'), limit + 1),
+        read,
         col(COLLECTIONS.events).where(base).count(),
         ...['first_seen_available', 'restock_confirmed', 'recovered_available', 'became_unavailable'].map(type => col(COLLECTIONS.events).where({ ...base, type }).count()),
         Promise.all(hourDays.map(hourDay => col(COLLECTIONS.events).where(_.and([{ ...base, dayKey: hourDay, type: 'restock_confirmed' }, { detectedAt: _.gte(hourStart) }])).count()))
@@ -334,13 +340,43 @@ function createCloudbaseRepo(db) {
     async getCollectorStatus() {
       return readOne(col(COLLECTIONS.config).where({ _id: 'collector_status' }));
     },
-    async saveHealth(records) {
-      for (let i = 0; i < records.length; i += CHUNK) {
-        await Promise.all(records.slice(i, i + CHUNK).map(record => {
-          const { _id, ...data } = record;
-          return col(COLLECTIONS.health).doc(_id).set({ data });
-        }));
+
+    // ---- retention (engine/retention.js) ----------------------------------
+    async getRetentionStatus() {
+      return readOne(col(COLLECTIONS.config).where({ _id: 'retention_status' }));
+    },
+    async saveRetentionStatus(status) {
+      const { _id, ...data } = status;
+      await col(COLLECTIONS.config).doc('retention_status').set({ data });
+    },
+    /** Remove history data older than firstDay; each target is removed independently. */
+    async purgeExpiredData({ firstDay, cutoffIso }) {
+      // Budget documents are keyed by Beijing day. The 60 days before the window
+      // cover any backlog by _id instead of scanning gxs_config with a pattern.
+      const budgetIds = Array.from({ length: 60 }, (_, i) => `collector_budget_${beijingDayKey(addDays(startOfDay(firstDay), -(i + 1)))}`);
+      const byIds = (collection, ids) => Array.from({ length: Math.ceil(ids.length / CHUNK) }, (_, i) => col(collection).where({ _id: _.in(ids.slice(i * CHUNK, (i + 1) * CHUNK)) }));
+      const targets = {
+        events: [col(COLLECTIONS.events).where({ dayKey: _.lt(firstDay) })],
+        observationDays: [col(COLLECTIONS.observationDays).where({ dayKey: _.lt(firstDay) })],
+        // A pending query may still owe its refund on the user's next bootstrap.
+        queries: [col(COLLECTIONS.queries).where({ createdAt: _.lt(cutoffIso), status: _.neq('pending') })],
+        notifications: [col(COLLECTIONS.notifications).where({ createdAt: _.lt(cutoffIso), status: _.nin(['pending', 'sending']) })],
+        targetHealth: [col(COLLECTIONS.health).where({ recordedAt: _.lt(cutoffIso) })],
+        subscriptionGrants: [col(COLLECTIONS.config).where({ kind: 'subscription_grant', createdAt: _.lt(cutoffIso) })],
+        queryGuards: [col(COLLECTIONS.config).where({ kind: 'query_guard', updatedAt: _.lt(cutoffIso) })],
+        budgets: byIds(COLLECTIONS.config, budgetIds),
+      };
+      const removed = {}, errors = {};
+      for (const [name, queries] of Object.entries(targets)) {
+        try {
+          removed[name] = 0;
+          for (const query of queries) {
+            const result = await query.remove();
+            removed[name] += result && result.stats ? result.stats.removed || 0 : 0;
+          }
+        } catch (error) { errors[name] = String(error && (error.errMsg || error.message) || error); }
       }
+      return { removed, errors };
     },
 
     // ---- stats ----------------------------------------------------------

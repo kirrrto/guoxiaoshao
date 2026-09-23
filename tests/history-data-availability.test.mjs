@@ -137,6 +137,8 @@ test('pagination freezes original totals, summary, billing and independently tim
     f.advance(1500);
     return result;
   };
+  const readEvents = f.repo.getEventHistory.bind(f.repo), counted = [];
+  f.repo.getEventHistory = async args => { counted.push(args.includeCounts); return readEvents(args); };
   const first = await history(f, { limit: 1 });
   assert.equal(first.observationCoverage.checkedAt, '2026-09-16T01:00:01.500Z');
   assert.equal(first.pagination.snapshotAt, start);
@@ -156,6 +158,7 @@ test('pagination freezes original totals, summary, billing and independently tim
   assert.equal(second.refunded, 0);
   assert.equal(second.balance, 0);
   assert.equal(reads, 1);
+  assert.deepEqual(counted, [true, false], 'later pages reuse the frozen counts instead of re-running count queries');
   assert.equal(rows(f, C.ledger).filter(entry => entry.type === 'history_debit').length, 1);
   assert.equal(rows(f, C.ledger).filter(entry => entry.type === 'query_refund').length, 0);
 });

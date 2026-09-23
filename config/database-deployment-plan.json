@@ -18,14 +18,6 @@
       },
       "indexes": [
         {
-          "name": "user_day",
-          "keys": {
-            "userKey": 1,
-            "dayKey": 1
-          },
-          "unique": false
-        },
-        {
           "name": "user_day_created_id",
           "keys": {
             "userKey": 1,
@@ -53,14 +45,6 @@
         "write": false
       },
       "indexes": [
-        {
-          "name": "user_created",
-          "keys": {
-            "userKey": 1,
-            "createdAt": -1
-          },
-          "unique": false
-        },
         {
           "name": "user_created_id",
           "keys": {
@@ -178,15 +162,6 @@
           "unique": false
         },
         {
-          "name": "part_day_detected",
-          "keys": {
-            "partNumber": 1,
-            "dayKey": 1,
-            "detectedAt": -1
-          },
-          "unique": false
-        },
-        {
           "name": "part_day_detected_id",
           "keys": {
             "partNumber": 1,
@@ -298,14 +273,6 @@
       },
       "indexes": [
         {
-          "name": "user_created",
-          "keys": {
-            "userKey": 1,
-            "createdAt": -1
-          },
-          "unique": false
-        },
-        {
           "name": "user_created_id_view",
           "keys": {
             "userKey": 1,
@@ -321,14 +288,6 @@
           "keys": {
             "userKey": 1,
             "viewSequence": 1
-          },
-          "unique": false
-        },
-        {
-          "name": "status_created",
-          "keys": {
-            "status": 1,
-            "createdAt": 1
           },
           "unique": false
         },

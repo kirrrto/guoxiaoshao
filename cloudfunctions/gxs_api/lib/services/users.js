@@ -6,6 +6,7 @@ const { resolveConfig } = require('../rules/quota');
 const { maskOpenid } = require('../identity');
 const { monitoringSnapshot } = require('../monitor-readiness');
 const { paymentProduct } = require('../payment/service');
+const { COLLECTIONS } = require('../collections');
 
 function newUser(identity, nowIso) {
   return {
@@ -68,6 +69,17 @@ async function quotaSnapshot(ctx, user) {
   };
 }
 
+/** Ledgers from the 2026-09-22 build issued more tickets than accepts; see repairInflatedCredits. */
+async function repairInflatedSubscriptions(ctx, user) {
+  const inflated = Object.entries(user.subscriptions || {}).filter(([, sub]) => sub && sub.creditLedger && !sub.poolRepairedAt
+    && Number(sub.creditLedger.sequence) > (Number.isSafeInteger(sub.accepted) ? sub.accepted : 0));
+  for (const [templateId] of inflated) {
+    const sends = await ctx.repo.count(COLLECTIONS.notifications, { userKey: user._id, templateId, status: 'accepted' });
+    await ctx.repo.repairInflatedCredits({ userKey: user._id, templateId, sends, now: ctx.nowIso });
+  }
+  return inflated.length > 0;
+}
+
 async function bootstrap(ctx) {
   const staleBefore = new Date(ctx.now.getTime() - 120000).toISOString();
   let [user, abandoned, metadata] = await Promise.all([
@@ -77,6 +89,7 @@ async function bootstrap(ctx) {
   ]);
   for (const query of abandoned) await ctx.repo.expireQuery({ id: query._id, userKey: user._id, nowIso: ctx.nowIso, staleBefore });
   if (abandoned.length) user = await ctx.repo.getUser(user._id);
+  if (await repairInflatedSubscriptions(ctx, user)) user = await ctx.repo.getUser(user._id);
   const [quota, follows] = await Promise.all([
     quotaSnapshot(ctx, user),
     Array.isArray(user.followIndex) ? user.followIndex : ctx.repo.listFollows(user._id),

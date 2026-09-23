@@ -19,12 +19,10 @@ const COLLECTIONS = Object.freeze({
 /** Index plan used by tools/db/create-collections and documented in docs/DATA_MODEL.md. */
 const INDEX_PLAN = Object.freeze({
   [COLLECTIONS.ledger]: [
-    { name: 'user_day', keys: { userKey: 1, dayKey: 1 }, unique: false },
     { name: 'user_day_created_id', keys: { userKey: 1, dayKey: 1, createdAt: -1, _id: -1 }, unique: false },
     { name: 'user_created_id', keys: { userKey: 1, createdAt: -1, _id: -1 }, unique: false },
   ],
   [COLLECTIONS.queries]: [
-    { name: 'user_created', keys: { userKey: 1, createdAt: -1 }, unique: false },
     { name: 'user_created_id', keys: { userKey: 1, createdAt: -1, _id: -1 }, unique: false },
     { name: 'user_status_lease_id', keys: { userKey: 1, status: 1, leaseUntil: 1, _id: 1 }, unique: false },
     { name: 'user_history_finished_id', keys: { userKey: 1, kind: 1, status: 1, finishedAt: -1, _id: -1 }, unique: false },
@@ -37,7 +35,6 @@ const INDEX_PLAN = Object.freeze({
   ],
   [COLLECTIONS.events]: [
     { name: 'target_detected', keys: { targetKey: 1, detectedAt: -1 }, unique: false },
-    { name: 'part_day_detected', keys: { partNumber: 1, dayKey: 1, detectedAt: -1 }, unique: false },
     { name: 'part_day_detected_id', keys: { partNumber: 1, dayKey: 1, detectedAt: -1, _id: -1 }, unique: false },
     { name: 'part_day_store_detected_id', keys: { partNumber: 1, dayKey: 1, storeNumber: 1, detectedAt: -1, _id: -1 }, unique: false },
     { name: 'part_day_type_detected', keys: { partNumber: 1, dayKey: 1, type: 1, detectedAt: -1 }, unique: false },
@@ -56,10 +53,8 @@ const INDEX_PLAN = Object.freeze({
     { name: 'payment_reconcile', keys: { provider: 1, lastReconciledAt: 1, _id: 1 }, unique: false },
   ],
   [COLLECTIONS.notifications]: [
-    { name: 'user_created', keys: { userKey: 1, createdAt: -1 }, unique: false },
     { name: 'user_created_id_view', keys: { userKey: 1, createdAt: -1, _id: -1, userHiddenAt: 1, viewSequence: 1 }, unique: false },
     { name: 'user_view_sequence', keys: { userKey: 1, viewSequence: 1 }, unique: false },
-    { name: 'status_created', keys: { status: 1, createdAt: 1 }, unique: false },
     { name: 'status_created_id', keys: { status: 1, createdAt: 1, _id: 1 }, unique: false },
     { name: 'status_lease', keys: { status: 1, leaseUntil: 1 }, unique: false },
   ],

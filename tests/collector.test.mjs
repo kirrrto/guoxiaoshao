@@ -106,9 +106,10 @@ test('collector runs the loop: observations → events → deduped notification 
   // The heartbeat taken at step start only includes completed requests. Publish
   // after drain to inspect this round's actual network calls (not dispatches).
   await s.collector.publishStatus();
-  const health = [...s.repo.tables.get(COLLECTIONS.health).values()];
-  assert.ok(health.length >= 2);
-  assert.equal(health.find(h => h.storeNumber === 'R577').requests, 3);
+  const targets = s.collector.scheduler.snapshot().targets;
+  assert.ok(targets.length >= 2);
+  assert.equal(targets.find(t => t.storeNumber === 'R577').health.requests, 3);
+  assert.equal((s.repo.tables.get(COLLECTIONS.health) || new Map()).size, 0, 'status publishing no longer writes one health document per target per minute');
 });
 
 test('a second collector cannot take the lease while the first renews it; it takes over after expiry', async () => {

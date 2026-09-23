@@ -5,6 +5,7 @@ const { dayKey } = require('../time');
 const { isMember } = require('../rules/membership');
 const { isLiveRestricted, isHistoryRestricted } = require('../rules/new-product');
 const { targetKeyOf } = require('../engine/events');
+const { RETENTION_DAYS, retentionStart } = require('../engine/retention');
 const { ensureUser } = require('./users');
 const { completeTask } = require('./quota');
 const ID_PATTERN = /^[A-Za-z0-9_-]{8,64}$/;
@@ -25,8 +26,9 @@ function presentEvent(e) {
 async function browse(ctx) {
   const user = await ensureUser(ctx);
   const queries = await ctx.repo.listRecentHistoryViews(user._id, 20);
-  const seen = new Set();
+  const seen = new Set(), firstDay = retentionStart(ctx.now);
   const recentViews = queries.filter(query => {
+    if (query.dayKey < firstDay) return false;
     const key = JSON.stringify([query.partNumber, query.dayKey, query.storeNumbers]);
     if (seen.has(key)) return false;
     seen.add(key); return true;
@@ -49,6 +51,7 @@ async function list(ctx, payload) {
   const requestedDay = payload.dayKey === undefined ? dayKey(ctx.now) : payload.dayKey;
   const parsedDay = typeof requestedDay === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(requestedDay) ? new Date(`${requestedDay}T00:00:00Z`) : new Date(NaN);
   if (!Number.isFinite(parsedDay.getTime()) || parsedDay.toISOString().slice(0, 10) !== requestedDay || requestedDay > dayKey(ctx.now)) throw new ApiError('invalid_day', '请选择有效的历史日期');
+  if (requestedDay < retentionStart(ctx.now)) throw new ApiError('history_day_expired', `历史记录只保留最近 ${RETENTION_DAYS} 天，请选择更近的日期`);
   const storeNumbers = Array.isArray(payload.storeNumbers) ? [...new Set(payload.storeNumbers.filter(s => typeof s === 'string' && /^R\d{3}$/.test(s)))] : [];
   if (storeNumbers.length > 10) throw new ApiError('too_many_stores', '历史查询最多选择 10 家门店');
   const limit = Math.min(200, Math.max(1, Math.floor(Number(payload.limit) || 100)));
@@ -69,7 +72,7 @@ async function list(ctx, payload) {
   if (begun.replayed && (!cursor || begun.record.response.pagination && begun.record.response.pagination.total === 0)) return { ...begun.record.response, latest: exposeLatest ? presentLatest(begun.record.response.latest || [], ctx) : [], latestRestricted: !exposeLatest, replayed: true };
   if (begun.replayed && begun.record.status === 'failed') return { ...begun.record.response, replayed: true };
   try {
-    const page = await ctx.repo.getEventHistory({ partNumber, storeNumbers, dayKey: requestedDay, cursor, limit, snapshotAt: begun.record.createdAt });
+    const page = await ctx.repo.getEventHistory({ partNumber, storeNumbers, dayKey: requestedDay, cursor, limit, snapshotAt: begun.record.createdAt, includeCounts: !begun.replayed });
     const original = begun.replayed ? begun.record.response : null;
     const total = original ? original.pagination.total : page.total;
     let observationCoverage = original && original.observationCoverage;

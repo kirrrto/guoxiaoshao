@@ -47,13 +47,10 @@ function addTicket(ledger, ticket) {
   return true;
 }
 
-function grantCredit(subscription, tickets = 1) {
+function grantCredit(subscription) {
   const ledger = readLedger(subscription);
-  const times = Number.isSafeInteger(tickets) && tickets > 0 ? tickets : 1;
-  for (let i = 0; i < times; i += 1) {
-    if (ledger.sequence === Number.MAX_SAFE_INTEGER) invalid();
-    addTicket(ledger, ++ledger.sequence);
-  }
+  if (ledger.sequence === Number.MAX_SAFE_INTEGER) invalid();
+  addTicket(ledger, ++ledger.sequence);
   return ledger;
 }
 
