@@ -1,5 +1,5 @@
 const { call, showError, toast } = require('../../utils/api');
-const { getBootstrap, getCatalog, invalidateBootstrap, publishQuota, getQuotaGeneration, toViewCatalog, subscribeCatalog } = require('../../utils/store');
+const { getBootstrap, getCatalog, invalidateBootstrap, publishQuota, getQuotaGeneration, subscribeCatalog } = require('../../utils/store');
 const fmt = require('../../utils/format');
 const { localKey } = require('../../utils/local-key');
 const operation = require('../../utils/operation');
@@ -85,12 +85,13 @@ Page({
     accountReady: false,
     accountError: null,
     loadError: null,
-    catalog: null,
+    catalogVersion: '',
     boot: null,
     pickerValue: null,
     selection: { partNumber: null, product: null, storeNumbers: [], stores: [] },
     dayKey: fmt.todayKey(),
     today: fmt.todayKey(),
+    earliestDay: fmt.retentionStartKey(),
     querying: false,
     result: null,
     restriction: null,
@@ -117,7 +118,7 @@ Page({
       const account = getBootstrap(); account.catch(() => {});
       const initialCatalog = await getCatalog();
       const catalog = getApp().globalData.catalog || initialCatalog; this.catalog = catalog;
-      this.setData({ catalog: toViewCatalog(catalog), ready: true, pickerValue, loadError: null });
+      this.setData({ catalogVersion: catalog.version, ready: true, pickerValue, loadError: null });
       try { this.applyBoot(await account); this.applyCatalog(await getCatalog()); this.loadBrowse(); }
       catch (error) { this.setData({ accountReady: false, accountError: '账户连接暂未完成，可以先选择历史查询条件。' }); }
     } catch (error) {
@@ -144,7 +145,7 @@ Page({
 
   applyCatalog(catalog) {
     this.catalog = catalog;
-    if (this.data.ready && (!this.data.catalog || this.data.catalog.version !== catalog.version)) this.setData({ catalog: toViewCatalog(catalog) });
+    if (this.data.ready && this.data.catalogVersion !== catalog.version) this.setData({ catalogVersion: catalog.version });
   },
 
   async onRetryAccount() {
@@ -156,7 +157,7 @@ Page({
   },
 
   refreshObservationSnapshot() {
-    if (this.historySnapshot) this.setData({ result: presentHistory(this.historySnapshot, this.catalog || this.data.catalog) });
+    if (this.historySnapshot) this.setData({ result: presentHistory(this.historySnapshot, this.catalog) });
   },
 
   onPullDownRefresh() {
@@ -178,6 +179,8 @@ Page({
       },
       collector: { ...boot.collector, ...fmt.collectorMeta(boot.collector.state) },
       today: fmt.todayKey(),
+      earliestDay: fmt.retentionStartKey(),
+      ...(this.data.dayKey < fmt.retentionStartKey() ? { dayKey: fmt.retentionStartKey() } : {}),
     });
   },
 
@@ -226,7 +229,7 @@ Page({
     const index = Number(e.currentTarget.dataset.index);
     const item = Number.isInteger(index) && this.data.browse && this.data.browse.recentViews[index];
     if (!item) return;
-    const catalog = this.catalog || this.data.catalog || {};
+    const catalog = this.catalog || {};
     const product = catalog.productByPart && Object.prototype.hasOwnProperty.call(catalog.productByPart, item.partNumber) ? catalog.productByPart[item.partNumber] : null;
     const reject = reason => {
       this.restoredSelection = null;
@@ -235,6 +238,7 @@ Page({
     if (!product) return reject('原配置已从当前目录移除，请重新选择。');
     const parsedDate = typeof item.dayKey === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(item.dayKey) ? new Date(`${item.dayKey}T00:00:00Z`) : new Date(NaN);
     if (!Number.isFinite(parsedDate.getTime()) || parsedDate.toISOString().slice(0, 10) !== item.dayKey || item.dayKey > fmt.todayKey()) return reject('原记录日期无效，请重新选择日期。');
+    if (item.dayKey < fmt.retentionStartKey()) return reject(`原记录日期已超出 ${fmt.RETENTION_DAYS} 天保留期，请重新选择日期。`);
     if (!Array.isArray(item.storeNumbers) || item.storeNumbers.length > 10 || item.storeNumbers.some(number => typeof number !== 'string' || !/^R\d{3}$/.test(number))) return reject('原记录门店条件无效，请重新选择门店。');
     const storeNumbers = [...new Set(item.storeNumbers)];
     const stores = storeNumbers.map(number => catalog.storeByNumber && Object.prototype.hasOwnProperty.call(catalog.storeByNumber, number) ? catalog.storeByNumber[number] : null);
@@ -299,7 +303,7 @@ Page({
       }
       this.historyRequest = { historyQueryId, ...payload };
       this.historySnapshot = response;
-      this.setData({ result: presentHistory(response, this.catalog || this.data.catalog), 'boot.balance': response.balance, moreError: null });
+      this.setData({ result: presentHistory(response, this.catalog), 'boot.balance': response.balance, moreError: null });
       if (boot.taskAvailable) this.completeTask();
     } catch (error) {
       if (!operation.uncertain(error)) operation.finish('h');
@@ -319,7 +323,7 @@ Page({
       const events = [...this.historySnapshot.events, ...response.events];
       const seen = new Set();
       this.historySnapshot = { ...response, events: events.filter(e => { if (seen.has(e.id)) return false; seen.add(e.id); return true; }) };
-      this.setData({ result: presentHistory(this.historySnapshot, this.catalog || this.data.catalog) });
+      this.setData({ result: presentHistory(this.historySnapshot, this.catalog) });
     } catch (error) { this.setData({ moreError: error.message || '加载失败，请重试。' }); }
     finally { this.setData({ loadingMore: false }); }
   },
@@ -335,9 +339,12 @@ Page({
   },
 
   onExplain() {
+    // The link is visible before the account connects; boot is null until then.
+    const boot = this.data.boot;
+    const costText = boot && Number.isFinite(boot.historyCost) ? `需有 ${boot.historyCost} 次余额` : '需有足够余额';
     wx.showModal({
       title: '数据说明',
-      content: `历史来自本小程序的实际查询和会员关注监测，并非可追溯任意日期的完整数据库。未采集的过去记录不能补查；没有事件不代表没有货。\n\n观测摘要从启用记录后积累，首末观测之间不代表连续覆盖。首次可取货和中断后恢复不等同于确认补货。\n\n免费用户查询需有 ${this.data.boot.historyCost} 次余额；未查到事件会自动退还，同一查询分页不额外扣次。受限新品开售 30 天内，仅会员可看今天。时间均为北京时间。`,
+      content: `历史来自本小程序的实际查询和会员关注监测，只保留最近 ${fmt.RETENTION_DAYS} 天，并非可追溯任意日期的完整数据库。未采集的过去记录不能补查；没有事件不代表没有货。\n\n观测摘要从启用记录后积累，首末观测之间不代表连续覆盖。首次可取货和中断后恢复不等同于确认补货。\n\n免费用户查询${costText}；未查到事件会自动退还，同一查询分页不额外扣次。受限新品开售 30 天内，仅会员可看今天。时间均为北京时间。`,
       showCancel: false,
     });
   },

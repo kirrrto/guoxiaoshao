@@ -1,0 +1,22 @@
+{
+  "light": {
+    "navBackground": "#F0FBF6",
+    "navTextStyle": "black",
+    "pageBackground": "#F0FBF6",
+    "pullTextStyle": "dark",
+    "tabColor": "#6C8179",
+    "tabSelectedColor": "#007A49",
+    "tabBackground": "#F8FCFA",
+    "tabBorderStyle": "white"
+  },
+  "dark": {
+    "navBackground": "#0E1714",
+    "navTextStyle": "white",
+    "pageBackground": "#0E1714",
+    "pullTextStyle": "light",
+    "tabColor": "#A3B6AC",
+    "tabSelectedColor": "#3DDC97",
+    "tabBackground": "#16211D",
+    "tabBorderStyle": "black"
+  }
+}

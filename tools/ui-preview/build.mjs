@@ -11,6 +11,10 @@ if (adminPreview && process.argv.some(arg => /^--(?:reminders|stock|redemption|p
 const mini = path.join(project, adminPreview ? 'tools/admin-miniprogram/miniprogram' : 'miniprogram');
 const appConfig = JSON.parse(fs.readFileSync(path.join(mini, 'app.json'), 'utf8'));
 appConfig.tabBar = appConfig.tabBar || { custom: false, list: [] };
+// app.json colors may be theme.json variables (darkmode); resolve them per theme.
+const theme = appConfig.themeLocation ? JSON.parse(fs.readFileSync(path.join(mini, appConfig.themeLocation), 'utf8')) : null;
+const themed = (value, mode = 'light') => theme && typeof value === 'string' && value.startsWith('@') ? theme[mode][value.slice(1)] : value;
+const navCss = mode => `.native-nav{background:${themed(appConfig.window.navigationBarBackgroundColor, mode)};color:${themed(appConfig.window.navigationBarTextStyle, mode) === 'black' ? '#203932' : '#fff'}}`;
 const outputAt = process.argv.indexOf('--out');
 const out = path.resolve(outputAt >= 0 ? process.argv[outputAt + 1] : path.join(os.tmpdir(), 'guoxiaoshao-ui-preview'));
 const allowRemoteImages = process.argv.includes('--remote-images');
@@ -99,8 +103,8 @@ function renderNode(node, scope, context) {
   if (node.name === 'block') return renderChildren(node.children, scope, context);
   const attrs = node.attrs;
   if (node.name === 'target-picker') {
-    const p = context.rt.instantiate('components/target-picker/index.js', { catalog: evaluate(attrs.catalog, scope), value: evaluate(attrs.value || '', scope), maxStores: Number(evaluate(attrs['max-stores'] || '3', scope)), storesOptional: truth(attrs['stores-optional'] || '', scope), supportedOnly: truth(attrs['supported-only'] || '', scope) });
-    p.onCatalog(p.data.catalog); if (p.data.value) p.onValue(p.data.value);
+    const p = context.rt.instantiate('components/target-picker/index.js', { catalogVersion: evaluate(attrs['catalog-version'] || '', scope), value: evaluate(attrs.value || '', scope), maxStores: Number(evaluate(attrs['max-stores'] || '3', scope)), storesOptional: truth(attrs['stores-optional'] || '', scope), supportedOnly: truth(attrs['supported-only'] || '', scope) });
+    p.loadCatalog(); if (p.data.value) p.onValue(p.data.value);
     return `<div class="component-target-picker">${renderNode(pickerAst, p.data, context)}</div>`;
   }
   const tags = { view: 'div', text: 'span', 'scroll-view': 'div', picker: 'div', image: 'img', switch: 'input', input: 'input', textarea: 'textarea', button: 'button' };
@@ -276,6 +280,8 @@ for (const scenario of scenarios) {
         page.setData({ redemptionCode: '', redemptionResult: { kind: 'ok', title: scenario === 'redemption-success' ? '兑换成功' : '此账号已兑换过', detail: '会员有效期已更新，请查看上方会员状态。' } });
       }
     }
+    // Service rows sit in the collapsible details block; show them for the monitoring audit.
+    if (pageName === 'follow' && monitoringPreview) page.setData({ showServiceDetails: true });
     if (pageName === 'mine' && reminderPreview) {
       if (scenario === 'reminder-loading') page.setData({ notificationsLoading: true });
       if (scenario === 'reminder-deleting') page.setData({ notificationActionBusy: 'delete', notificationDeletingId: reminderRecords[0].id });
@@ -285,7 +291,7 @@ for (const scenario of scenarios) {
     }
     const selected = { partNumber: p.partNumber, product: p, storeNumbers: stores.slice(0, 2).map(s => s.storeNumber), stores: stores.slice(0, 2) };
     if (pageName === 'query' || pageName === 'history') {
-      page.setData({ pickerValue: { partNumber: p.partNumber, storeNumbers: selected.storeNumbers }, selection: selected, dayKey: '2026-09-15', catalog });
+      page.setData({ pickerValue: { partNumber: p.partNumber, storeNumbers: selected.storeNumbers }, selection: selected, dayKey: '2026-09-15' });
       if (pageName === 'query') {
         page.onPickerChange({ detail: selected });
         if (['member', 'longcontent', 'expired'].includes(scenario)) page.onDoneSelection();
@@ -295,7 +301,7 @@ for (const scenario of scenarios) {
     if (scenario === 'error') { if (pageName === 'admin') page.setData({ allowed: false, checked: true, accessError: '模拟错误：网络连接中断，无法完成权限校验。请检查网络后重新加载。' }); else page.setData({ loadError: '模拟错误：云环境连接超时。请检查网络或稍后重试。request-id-abcdefghijklmnopqrstuvwxyz0123456789' }); }
     const ast = parse(fs.readFileSync(path.join(mini, `pages/${pageName}/index.wxml`), 'utf8'));
     const rendered = renderNode(ast, page.data, { rt });
-    const componentCss = adminPreview ? '' : cssFile('components/target-picker/index.wxss').replace(/\/\*[\s\S]*?\*\//g, '').replace(/([^{}]+)\{/g, (_, selectors) => selectors.split(',').map(selector => `.component-target-picker ${selector.trim()}`).join(',') + '{');
+    const componentCss = adminPreview ? '' : cssFile('components/target-picker/index.wxss').replace(/\/\*[\s\S]*?\*\//g, '').replace(/([^{}]+)\{/g, (_, selectors) => selectors.trim().startsWith('@') ? `${selectors}{` : selectors.split(',').map(selector => `.component-target-picker ${selector.trim()}`).join(',') + '{');
     const tabIndex = appConfig.tabBar.list.findIndex(tab => tab.pagePath === `pages/${pageName}/index`);
     let renderedTabs = '', tabCss = '';
     if (appConfig.tabBar.custom && tabIndex >= 0) {
@@ -313,7 +319,7 @@ for (const scenario of scenarios) {
         const icon = fs.readFileSync(path.join(mini, selected ? tab.selectedIconPath : tab.iconPath)).toString('base64');
         return `<span style="display:flex;align-items:center;flex-direction:column;color:${selected ? appConfig.tabBar.selectedColor : appConfig.tabBar.color}"><img src="data:image/png;base64,${icon}" alt="" style="width:26px;height:26px;margin-bottom:5px">${html(tab.text)}</span>`;
       }).join('') + '</div>';
-      const body = `<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${names[pageName]} · ${scenario} · ${width}px 离线预览</title><style>html{width:${width}px;max-width:100%;margin:0 auto}body{margin:0}button,input,textarea{font:inherit}button{cursor:default}img{display:block}input[type=checkbox]{width:36px;height:22px;flex:none;accent-color:#1ba35a}.simulation{position:sticky;top:0;z-index:10;padding:8px 12px;background:#fff2ce;color:#705000;font:11px/1.5 sans-serif;border-bottom:1px solid #ead49c}.native-nav{background:${appConfig.window.navigationBarBackgroundColor};color:${appConfig.window.navigationBarTextStyle === 'black' ? '#203932' : '#fff'};text-align:center;padding:16px;font:600 15px sans-serif}.preview-tabbar{display:flex;justify-content:space-around;gap:6px;background:white;padding:15px 8px;border-top:1px solid #ddd;font-size:12px;color:#65776c}${css}</style><div class="simulation">离线模拟 · ${width}px · ${scenario} · 使用实际 WXML/WXSS；不代表微信实测或实时库存</div><div class="native-nav">果小哨 · ${names[pageName]}</div>${rendered}${tabbar}<script>window.previewAudit=()=>({width:innerWidth,scrollWidth:document.documentElement.scrollWidth,overflow:[...document.querySelectorAll('body *')].filter(e=>{const r=e.getBoundingClientRect();return r.width&&r.right>document.documentElement.clientWidth+1&&getComputedStyle(e.parentElement).overflowX!=='auto'}).map(e=>({tag:e.tagName,class:e.className,right:e.getBoundingClientRect().right,text:e.textContent.slice(0,60)}))});</script></html>`;
+      const body = `<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${names[pageName]} · ${scenario} · ${width}px 离线预览</title><style>html{width:${width}px;max-width:100%;margin:0 auto}body{margin:0}button,input,textarea{font:inherit}button{cursor:default}img{display:block}input[type=checkbox]{width:36px;height:22px;flex:none;accent-color:#1ba35a}.simulation{position:sticky;top:0;z-index:10;padding:8px 12px;background:#fff2ce;color:#705000;font:11px/1.5 sans-serif;border-bottom:1px solid #ead49c}.native-nav{text-align:center;padding:16px;font:600 15px sans-serif}${navCss('light')}${theme ? `@media (prefers-color-scheme: dark){${navCss('dark')}}` : ''}.preview-tabbar{display:flex;justify-content:space-around;gap:6px;background:white;padding:15px 8px;border-top:1px solid #ddd;font-size:12px;color:#65776c}${css}</style><div class="simulation">离线模拟 · ${width}px · ${scenario} · 使用实际 WXML/WXSS；不代表微信实测或实时库存</div><div class="native-nav">果小哨 · ${names[pageName]}</div>${rendered}${tabbar}<script>window.previewAudit=()=>({width:innerWidth,scrollWidth:document.documentElement.scrollWidth,overflow:[...document.querySelectorAll('body *')].filter(e=>{const r=e.getBoundingClientRect();return r.width&&r.right>document.documentElement.clientWidth+1&&getComputedStyle(e.parentElement).overflowX!=='auto'}).map(e=>({tag:e.tagName,class:e.className,right:e.getBoundingClientRect().right,text:e.textContent.slice(0,60)}))});</script></html>`;
       fs.writeFileSync(path.join(out, filename), body, 'utf8');
       const expectedText = adminPreview ? { 'operator-ready': ['运行统计', '128'], 'operator-denied': ['当前账号没有管理权限', '重新检查'], 'operator-loading': ['校验权限'], 'operator-error': ['权限检查失败', '重新检查'], 'operator-longcontent': ['运行统计', '查询结果', '运营查询长文本换行验收'], 'operator-saving': ['已修改', '保存配置'] }[scenario] : historyTaskPreview ? pageName === 'history' ? ['最近浏览', '浏览不扣次数', p.title, ...{
         'history-member-reward': ['今日浏览任务完成，+1 次', '已计入次数明细'],
@@ -324,13 +330,13 @@ for (const scenario of scenarios) {
         'history-longcontent': ['各地门店已有记录', '3 家门店', '今日浏览任务完成，+1 次'],
         'history-loading': ['正在加载浏览记录'],
       }[scenario]] : ['每日体验任务', '次数明细', '浏览一次历史记录', ...(scenario === 'history-balance-cap' ? ['已浏览·待领取', '暂无记录'] : ['history-read-error', 'history-loading'].includes(scenario) ? ['去完成', '暂无记录'] : ['已完成', '体验任务', '+1'])]
-          : monitoringPreview ? [...(follows.length ? [p.title] : []), '后台检测', '消息发送', '微信授权', ...{
+          : monitoringPreview ? [...(follows.length ? [p.title] : []), '后台检测', '消息发送', '提醒次数', ...{
         'monitor-template-missing': ['监测服务运行中', '模板尚未配置', '关注已开启', '查看原因'],
-        'monitor-ready-authorized': ['监测服务运行中', '发送服务已就绪', '剩余 1 条提醒授权', '关注已开启'],
-        'monitor-needs-authorization': ['监测服务运行中', '发送服务已就绪', '剩余 0 条提醒授权', '请授权微信提醒'],
+        'monitor-ready-authorized': ['监测服务运行中', '发送服务已就绪', '提醒次数只剩 1 次', '增加提醒次数', '关注已开启'],
+        'monitor-needs-authorization': ['监测服务运行中', '发送服务已就绪', '还没有提醒次数', '增加提醒次数'],
         'monitor-stale': ['后台状态已过期', '发送服务未就绪', '关注已开启'],
         'monitor-disabled': ['后台检测尚未开放', '发送服务未就绪', '关注已开启'],
-        'monitor-expired-paused': ['会员已到期', '会员到期，已暂停', '了解会员'],
+        'monitor-expired-paused': ['会员已到期', '会员到期，已暂停', '到货提醒为会员专属', '了解会员'],
         'monitor-no-follows': ['先给心仪配置留个哨', '添加关注'],
         'monitor-all-paused': ['你的关注全部已暂停', '查看并开启关注'],
         'monitor-user-disabled': ['你的消息提醒已关闭', '前往提醒设置'],

@@ -28,7 +28,7 @@
         <view class="selection-summary-stores">{{selectionSummary.storeLabel}}</view>
       </view>
       <view class="selection-editor" style="display: {{selectionExpanded ? 'block' : 'none'}};" bindtouchstart="onSelectionInteraction">
-        <target-picker catalog="{{catalog}}" value="{{pickerValue}}" max-stores="{{boot ? boot.maxStores : 3}}" bindchange="onPickerChange" />
+        <target-picker catalog-version="{{catalogVersion}}" value="{{pickerValue}}" max-stores="{{boot ? boot.maxStores : 3}}" bindchange="onPickerChange" />
         <button class="btn btn-ghost btn-block mt selection-done" disabled="{{!selectionCanCollapse}}" bindtap="onDoneSelection">完成选择 · 收起</button>
       </view>
       <view wx:if="{{restriction}}" class="banner banner-warn mt">{{restriction}}</view>
@@ -106,7 +106,7 @@
         </view>
         <view class="pill pill-dot pill-{{item.statusCls}} tiny">{{item.statusLabel}}</view>
       </view>
-      <view class="tiny muted mt">显示后台记录的观测时间。页面每 15 秒读取一次，读取列表不会产生新观测。</view>
+      <view class="tiny muted mt">显示后台记录的观测时间。页面约每分钟读取一次，跟随后台检测节奏；读取列表不会产生新观测。</view>
     </view>
 
     <view class="card">

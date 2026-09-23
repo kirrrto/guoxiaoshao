@@ -6,18 +6,18 @@
     "pages/mine/index"
   ],
   "window": {
-    "backgroundColor": "#F0FBF6",
-    "backgroundTextStyle": "dark",
-    "navigationBarBackgroundColor": "#F0FBF6",
+    "backgroundColor": "@pageBackground",
+    "backgroundTextStyle": "@pullTextStyle",
+    "navigationBarBackgroundColor": "@navBackground",
     "navigationBarTitleText": "果小哨",
-    "navigationBarTextStyle": "black"
+    "navigationBarTextStyle": "@navTextStyle"
   },
   "tabBar": {
     "custom": true,
-    "color": "#6C8179",
-    "selectedColor": "#007A49",
-    "backgroundColor": "#F8FCFA",
-    "borderStyle": "white",
+    "color": "@tabColor",
+    "selectedColor": "@tabSelectedColor",
+    "backgroundColor": "@tabBackground",
+    "borderStyle": "@tabBorderStyle",
     "list": [
       { "pagePath": "pages/query/index", "text": "查询", "iconPath": "images/tab/query.png", "selectedIconPath": "images/tab/query-active.png" },
       { "pagePath": "pages/follow/index", "text": "小哨", "iconPath": "images/tab/follow.png", "selectedIconPath": "images/tab/follow-active.png" },
@@ -26,6 +26,8 @@
     ]
   },
   "sitemapLocation": "sitemap.json",
+  "darkmode": true,
+  "themeLocation": "theme.json",
   "style": "v2",
   "lazyCodeLoading": "requiredComponents"
 }

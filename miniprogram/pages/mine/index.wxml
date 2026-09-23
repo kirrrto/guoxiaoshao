@@ -89,8 +89,9 @@
         <view wx:if="{{paymentPendingId}}" class="payment-actions">
           <button class="member-entry payment-check" disabled="{{paymentBusy || paymentChecking || redeeming}}" bindtap="onCheckPayment">{{paymentChecking ? '正在查询支付结果…' : '查询支付结果'}}</button>
           <button wx:if="{{paymentCanRetry && boot.paymentReady}}" class="member-entry payment-check" disabled="{{paymentBusy || paymentChecking || redeeming}}" bindtap="onBuyMembership">继续支付这笔订单</button>
+          <button class="member-entry payment-abandon" disabled="{{paymentBusy || paymentChecking || redeeming}}" bindtap="onAbandonPayment">放弃这笔订单</button>
         </view>
-        <view wx:if="{{paymentPendingId}}" class="payment-note">订单会为当前账号保留。退出后可回到这里查询，系统不会自动再次扣款。</view>
+        <view wx:if="{{paymentPendingId}}" class="payment-note">订单会为当前账号保留，系统不会自动再次扣款。付款没有完成时，可以放弃这笔订单后重新购买。</view>
       </view>
       <view wx:if="{{redemptionOpen}}" class="redemption-panel">
         <view class="redemption-title">兑换会员</view>
@@ -212,7 +213,7 @@
         <text class="small muted">{{showNotifications ? '收起 ▴' : '展开 ▾'}}</text>
       </view>
       <block wx:if="{{showNotifications}}">
-      <view class="tiny muted notification-scope">只影响本列表，不取消关注、不撤回微信消息、不删库存历史。</view>
+      <view class="tiny muted notification-scope">提醒记录保留最近 10 天。删除和清空只影响本列表，不取消关注、不撤回微信消息、不删库存历史。</view>
       <view wx:if="{{notificationsLoading && !notifications.length}}" class="loading-line">正在加载提醒记录…</view>
       <view wx:elif="{{notificationsLoading}}" class="loading-line">正在更新提醒记录…</view>
       <view wx:if="{{notificationsError}}" class="record-error"><text>{{notificationsError}}</text><button class="notification-button notification-retry" disabled="{{notificationsLoading || notificationActionBusy || notificationConfirming}}" bindtap="onRetryNotifications">重试加载</button></view>

@@ -95,4 +95,24 @@
 .member-entry.payment-check { box-sizing: border-box; display: flex; justify-content: center; align-items: center; width: 100%; max-width: 100%; min-width: 0; height: auto; min-height: 82rpx; margin: 0; padding: 18rpx 22rpx; border: 1rpx solid var(--line); border-radius: 22rpx; background: var(--green-soft); color: var(--green-dark); font-size: 25rpx; line-height: 1.5; font-weight: 500; white-space: normal; overflow-wrap: anywhere; }
 .member-entry.payment-check::after { display: none; border: 0; }
 .member-entry.payment-check[disabled] { opacity: .6; }
+.member-entry.payment-abandon { box-sizing: border-box; display: flex; justify-content: center; align-items: center; width: 100%; max-width: 100%; min-width: 0; height: auto; min-height: 82rpx; margin: 0; padding: 18rpx 22rpx; border: 1rpx solid var(--line); border-radius: 22rpx; background: transparent; color: var(--text-2); font-size: 25rpx; line-height: 1.5; font-weight: 400; white-space: normal; overflow-wrap: anywhere; }
+.member-entry.payment-abandon::after { display: none; border: 0; }
+.member-entry.payment-abandon[disabled] { opacity: .6; }
 .membership-card .ledger-row > view { overflow-wrap: anywhere; }
+
+@media (prefers-color-scheme: dark) {
+  .notification-button.notification-delete { color: var(--bad); border-color: rgba(242, 155, 147, 0.28); background: var(--bad-soft); }
+  /* var(--green-dark) turns light in dark mode; keep the deep fill under white text. */
+  .member-entry.payment-entry { background: #007A49; }
+  .member-entry.payment-entry[disabled], .member-entry.redemption-entry[disabled] { background: #22322B; color: #7F958A; }
+  .redemption-panel { background: rgba(0, 195, 117, 0.08); }
+  .redemption-input { border-color: rgba(255, 255, 255, 0.12); background: rgba(255, 255, 255, 0.05); }
+  .redemption-placeholder { color: #7F958A; }
+  .redemption-hint { color: var(--text-3); }
+  .redemption-message-error { background: var(--bad-soft); color: var(--bad); }
+  .payment-error { color: var(--bad); }
+  .membership-card { background-color: var(--card); background-image: linear-gradient(125deg, rgba(0, 195, 117, 0.14), rgba(255, 255, 255, 0.02) 52%, rgba(0, 195, 117, 0.06)); }
+  .membership-card > .benefit-list { background: rgba(255, 255, 255, 0.04); border-color: rgba(255, 255, 255, 0.06); }
+  .plan-head { background: rgba(0, 195, 117, 0.10); }
+  .plan-row { background: rgba(255, 255, 255, 0.03); }
+}

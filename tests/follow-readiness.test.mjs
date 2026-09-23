@@ -47,7 +47,7 @@ test('configuration enabled alone never claims that delivery is running', () => 
   assert.equal(page.data.delivery.cls, 'warn');
   assert.match(page.data.notice, /消息发送服务尚未就绪/);
   page.onServiceDetails(); assert.equal(rt.calls.length, 0);
-  assert.match(rt.messages.at(-1).content, /每 15 秒读取已有观测/);
+  assert.match(rt.messages.at(-1).content, /约每分钟读取一次已有观测/);
 });
 
 test('sender and credential faults are presented in plain language, never as a user pause', () => {
@@ -75,7 +75,7 @@ test('ready service still requires the personal message switch, valid credits an
   page.applyBoot(boot({ settings: { notifyEnabled: false } })); assert.match(page.data.readiness.title, /消息提醒已关闭/);
   page.applyBoot(boot({ settings: { notifyEnabled: true, dnd: { enabled: true, startMinute: 1380, endMinute: 480 } } }));
   assert.equal(page.data.dndActive, true); assert.match(page.data.readiness.title, /免打扰时段/);
-  page.applyBoot(boot({ subscriptions: {} })); assert.match(page.data.notice, /请授权微信提醒/);
+  page.applyBoot(boot({ subscriptions: {} })); assert.match(page.data.notice, /每点一次「允许」增加 1 次到货提醒/);
   page.applyBoot(boot()); assert.equal(page.data.notice, '');
 });
 

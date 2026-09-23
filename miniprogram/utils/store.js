@@ -20,6 +20,7 @@ let catalogGeneration = 0;
 let catalogCheckedAt = 0;
 const catalogListeners = new Set();
 const quotaListeners = new Set();
+const subscriptionListeners = new Set();
 const BOOTSTRAP_TTL_MS = 30000;
 const CATALOG_TTL_MS = 5 * 60000;
 let followSnapshot = null;
@@ -85,6 +86,19 @@ function publishQuota(quota) {
   if (app.globalData.bootstrap) app.globalData.bootstrap = { ...app.globalData.bootstrap, quota };
   for (const listener of quotaListeners) { try { listener(quota); } catch (e) { console.error('[gxs] quota listener', e); } }
   return true;
+}
+
+/** Apply confirmed reminder credits to the cached account and open pages without a refetch. */
+function publishSubscriptions(subscriptions) {
+  if (!subscriptions || typeof subscriptions !== 'object') return;
+  const app = getApp();
+  if (app.globalData.bootstrap) app.globalData.bootstrap = { ...app.globalData.bootstrap, subscriptions };
+  for (const listener of subscriptionListeners) { try { listener(subscriptions); } catch (e) { console.error('[gxs] subscription listener', e); } }
+}
+
+function subscribeSubscriptions(listener) {
+  subscriptionListeners.add(listener);
+  return () => subscriptionListeners.delete(listener);
 }
 
 function getQuotaGeneration() { return bootstrapGeneration; }
@@ -161,10 +175,12 @@ function indexCatalog(raw) {
 
 function validCatalog(raw) { return raw && Array.isArray(raw.products) && Array.isArray(raw.stores); }
 
-// One copy of products and stores crosses the native render bridge.
-// Lookup indexes remain in JavaScript memory, never bound into page data.
-function toViewCatalog(catalog) {
-  return { version: catalog.version, categories: catalog.categories || [], cities: catalog.cities || [] };
+// The indexed catalog lives only in JavaScript memory. Pages bind its version
+// and target-picker reads it here, so products never cross the render bridge.
+function currentCatalog() {
+  const app = getApp();
+  if (!app.globalData.catalog) app.globalData.catalog = indexCatalog(cachedCatalog() || CATALOG_SEED);
+  return app.globalData.catalog;
 }
 
 function subscribeCatalog(listener) {
@@ -208,14 +224,14 @@ async function refreshCatalog({ force = false } = {}) {
 
 async function getCatalog({ force = false } = {}) {
   const app = getApp();
-  if (!app.globalData.catalog) app.globalData.catalog = indexCatalog(cachedCatalog() || CATALOG_SEED);
+  const catalog = currentCatalog();
   if (force) return refreshCatalog({ force: true });
   const expected = app.globalData.bootstrap && app.globalData.bootstrap.catalogVersion;
-  if ((expected && expected !== app.globalData.catalog.version) || Date.now() - catalogCheckedAt >= CATALOG_TTL_MS) {
+  if ((expected && expected !== catalog.version) || Date.now() - catalogCheckedAt >= CATALOG_TTL_MS) {
     // Browse immediately; the server still validates supported SKU and limits.
     refreshCatalog().catch(() => {});
   }
-  return app.globalData.catalog;
+  return catalog;
 }
 
-module.exports = { getBootstrap, refreshBootstrap, invalidateBootstrap, publishQuota, subscribeQuota, getQuotaGeneration, getCatalog, refreshCatalog, toViewCatalog, subscribeCatalog, getFollows, invalidateFollows, resetSession, CATEGORY_NAME };
+module.exports = { getBootstrap, refreshBootstrap, invalidateBootstrap, publishQuota, subscribeQuota, publishSubscriptions, subscribeSubscriptions, getQuotaGeneration, getCatalog, refreshCatalog, currentCatalog, subscribeCatalog, getFollows, invalidateFollows, resetSession, CATEGORY_NAME };

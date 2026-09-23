@@ -1,13 +1,18 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { runtime } from './helpers/miniprogram-runtime.mjs';
+
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../miniprogram');
 
 async function present(overrides = {}) {
   const response = { ok: true, product: { title: '测试配置' }, dayKey: '2026-09-14', balance: 1,
     latest: [{ storeNumber: 'R577', status: 'unavailable', observedAt: '2026-09-16T10:00:00.000Z' }],
     events: [], summary: { available: 0, restocks: 0, recoveries: 0, ended: 0 }, pagination: { total: 0, hasMore: false }, ...overrides };
   const rt = runtime(async () => response), page = rt.instance('pages/history/index.js');
-  Object.assign(page.data, { boot: { member: false }, catalog: { storeByNumber: { R577: { name: '天环广场' } } }, selection: { partNumber: 'MXXX1CH/A', storeNumbers: ['R577'] } });
+  page.catalog = { storeByNumber: { R577: { name: '天环广场' } } }; Object.assign(page.data, { boot: { member: false }, selection: { partNumber: 'MXXX1CH/A', storeNumbers: ['R577'] } });
   await page.onQuery();
   return page.data.result;
 }
@@ -47,4 +52,20 @@ test('member empty result describes no charge only when server confirms the bill
   const result = await present({ refunded: 0, billing: { reason: 'empty_history_no_charge' } });
   assert.equal(result.billingText, '本次未查到历史事件，未扣次数。');
   assert.equal((await present()).billingText, '', 'legacy cached results must not claim a new refund');
+});
+
+test('data explanation opens before the account connects and uses the live cost once connected', () => {
+  const rt = runtime(), page = rt.instance('pages/history/index.js');
+  assert.equal(page.data.boot, null);
+  page.onExplain();
+  assert.match(rt.messages.at(-1).content, /免费用户查询需有足够余额/);
+  page.data.boot = { historyCost: 2 };
+  page.onExplain();
+  assert.match(rt.messages.at(-1).content, /免费用户查询需有 2 次余额/);
+});
+
+test('load more sits after the loaded events, not above them', () => {
+  const markup = fs.readFileSync(path.join(root, 'pages/history/index.wxml'), 'utf8');
+  const list = markup.indexOf('wx:for="{{result.events}}"'), more = markup.indexOf('bindtap="onLoadMore"'), moreError = markup.indexOf('{{moreError}}');
+  assert.ok(list > 0 && more > list && moreError > list, 'the pagination control and its error follow the event list');
 });

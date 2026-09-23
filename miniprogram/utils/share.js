@@ -49,12 +49,28 @@ function shareAppMessage(route, pageData) {
   return payload;
 }
 
+// iOS WeChat left the Moments card blank for a code-package path that Android
+// showed. A copied user-data file is an ordinary local file on both platforms.
+const TIMELINE_FILE = 'gxs-share-logo-v1.png';
+let timelineImage = '';
+
+function timelineImagePath() {
+  if (timelineImage) return timelineImage;
+  try {
+    const target = `${wx.env.USER_DATA_PATH}/${TIMELINE_FILE}`;
+    const fs = wx.getFileSystemManager();
+    try { fs.accessSync(target); } catch (_) { fs.copyFileSync(`/${IMAGE}`, target); }
+    timelineImage = target;
+  } catch (_) { return IMAGE; }
+  return timelineImage;
+}
+
 function shareTimeline() {
   // Moments is a product intro card: brand logo, not device or page art.
   return {
     title: '果小哨 · 查苹果直营店取货与到货提醒',
     query: 'from=share_timeline',
-    imageUrl: IMAGE,
+    imageUrl: timelineImagePath(),
   };
 }
 

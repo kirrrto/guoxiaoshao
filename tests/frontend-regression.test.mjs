@@ -44,7 +44,7 @@ test('cloud initialization recovers after a transient failure and shares an in-f
 
 test('result-card requery retains its displayed SKU and stores after picker changes', async () => {
   const rt = runtime(async (action, payload) => queryResponse(payload)); const page = rt.instance('pages/query/index.js');
-  Object.assign(page.data, { boot: { member: true }, catalog: catalog(), selection: selection('SKU-A') });
+  Object.assign(page.data, { boot: { member: true }, selection: selection('SKU-A') }); page.catalog = catalog();
   await page.onQuery(); page.onPickerChange({ detail: selection('SKU-B') }); await page.onRequery();
   assert.deepEqual(rt.calls.map(c => c.payload.partNumber), ['SKU-A', 'SKU-A']);
 });
@@ -52,7 +52,7 @@ test('result-card requery retains its displayed SKU and stores after picker chan
 test('uncertain query retries reuse request ID; completed queries start a new ID', async () => {
   let count = 0;
   const rt = runtime(async (action, payload) => { if (++count === 1) throw Object.assign(Error('timeout'), { code: 'call_failed' }); return queryResponse(payload); });
-  const page = rt.instance('pages/query/index.js'); Object.assign(page.data, { boot: { member: true }, catalog: catalog(), selection: selection('SKU-A') });
+  const page = rt.instance('pages/query/index.js'); Object.assign(page.data, { boot: { member: true }, selection: selection('SKU-A') }); page.catalog = catalog();
   await page.onQuery(); await page.onQuery(); await page.onQuery();
   assert.equal(rt.calls[0].payload.queryId, rt.calls[1].payload.queryId);
   assert.notEqual(rt.calls[1].payload.queryId, rt.calls[2].payload.queryId);
@@ -61,14 +61,14 @@ test('uncertain query retries reuse request ID; completed queries start a new ID
 test('query guard prevents double taps from starting two paid operations', async () => {
   let resolve;
   const rt = runtime((action, payload) => new Promise(r => { resolve = () => r(queryResponse(payload)); }));
-  const page = rt.instance('pages/query/index.js'); Object.assign(page.data, { boot: { member: true }, catalog: catalog(), selection: selection('SKU-A') });
+  const page = rt.instance('pages/query/index.js'); Object.assign(page.data, { boot: { member: true }, selection: selection('SKU-A') }); page.catalog = catalog();
   const first = page.onQuery(); await page.onQuery(); assert.equal(rt.calls.length, 1); resolve(); await first;
 });
 
 test('zero-balance recovery and store reordering retain the original uncertain query ID', async () => {
   let n = 0;
   const rt = runtime(async (action, payload) => { if (++n === 1) throw Object.assign(Error('lost response after debit'), { code: 'call_failed' }); return queryResponse(payload); });
-  const page = rt.instance('pages/query/index.js'); Object.assign(page.data, { boot: { member: false, balance: 1, queryCost: 1 }, catalog: catalog(), selection: { ...selection('SKU-A'), storeNumbers: ['R002', 'R001'] } });
+  const page = rt.instance('pages/query/index.js'); page.catalog = catalog(); Object.assign(page.data, { boot: { member: false, balance: 1, queryCost: 1 }, selection: { ...selection('SKU-A'), storeNumbers: ['R002', 'R001'] } });
   await page.onQuery(); page.data.boot.balance = 0; page.data.selection.storeNumbers = ['R001', 'R002']; await page.onQuery();
   assert.equal(rt.calls.length, 2); assert.equal(rt.calls[0].payload.queryId, rt.calls[1].payload.queryId);
 });
@@ -77,7 +77,7 @@ test('history pagination retains the original request and merges unique events',
   const response = (payload, next) => ({ ok: true, product: product(payload.partNumber), balance: 4, dayKey: payload.dayKey, latest: [], summary: { available: 2, restocks: 0, recoveries: 0, ended: 0 },
     events: [{ id: next ? 'e2' : 'e1', type: 'first_seen_available', detectedAt: new Date().toISOString(), storeNumber: 'R001' }], pagination: { nextCursor: next ? null : 'cursor1', hasMore: !next, total: 2 } });
   const rt = runtime(async (action, payload) => action === 'history.list' ? response(payload, Boolean(payload.cursor)) : {});
-  const page = rt.instance('pages/history/index.js'); Object.assign(page.data, { boot: { member: true }, catalog: catalog(), selection: selection('SKU-A') });
+  const page = rt.instance('pages/history/index.js'); Object.assign(page.data, { boot: { member: true }, selection: selection('SKU-A') }); page.catalog = catalog();
   await page.onQuery(); page.onPickerChange({ detail: selection('SKU-B') }); await page.onLoadMore();
   const calls = rt.calls.filter(c => c.action === 'history.list');
   assert.equal(calls[0].payload.historyQueryId, calls[1].payload.historyQueryId); assert.equal(calls[1].payload.partNumber, 'SKU-A');
@@ -102,7 +102,7 @@ test('subscription retry reuses authorization request ID without prompting WeCha
   let n = 0, prompts = 0;
   const rt = runtime(async action => { if (action === 'notify.recordSubscription') { if (++n === 1) throw Error('lost response'); return { accepted: ['template-A'], subscriptions: { 'template-A': { credits: 1 } } }; } return boot(); });
   rt.wx.requestSubscribeMessage = async () => { prompts++; return { 'template-A': 'accept' }; };
-  const page = rt.instance('pages/follow/index.js'); page.data.boot = { templateIds: ['template-A'] };
+  const page = rt.instance('pages/follow/index.js'); page.data.boot = { member: true, templateIds: ['template-A'] };
   await page.onSubscribe(); await page.onSubscribe();
   const calls = rt.calls.filter(c => c.action === 'notify.recordSubscription');
   assert.equal(prompts, 1); assert.equal(calls[0].payload.requestId, calls[1].payload.requestId); assert.equal(page.data.subscriptionPending, false);
@@ -120,7 +120,7 @@ test('a permanently rejected old subscription is cleared and a new template can 
   });
   rt.storage.set('gxs_subscription_pending_v1', { requestId: 'old-request-001', results: { 'template-old': 'accept' } });
   rt.wx.requestSubscribeMessage = async ({ tmplIds }) => { prompts++; assert.deepEqual(copy(tmplIds), ['template-new']); return { 'template-new': 'accept' }; };
-  const page = rt.instance('pages/follow/index.js'); page.data.boot = { templateIds: ['template-old'] };
+  const page = rt.instance('pages/follow/index.js'); page.data.boot = { member: true, templateIds: ['template-old'] };
   await page.onSubscribe();
   assert.equal(prompts, 0); assert.equal(page.data.subscriptionPending, false); assert.equal(rt.storage.has('gxs_subscription_pending_v1'), false);
   await page.onSubscribe();
@@ -146,13 +146,13 @@ test('payment is intentionally unavailable and no checkout/query-order API is re
 
 test('abandoned refunded query response clears pending request without requiring a product', async () => {
   const rt = runtime(async () => ({ ok: false, reason: 'query_expired', refunded: 1, balance: 1 }));
-  const page = rt.instance('pages/query/index.js'); Object.assign(page.data, { boot: { member: false, balance: 0 }, catalog: catalog(), selection: selection('SKU-A') });
+  const page = rt.instance('pages/query/index.js'); Object.assign(page.data, { boot: { member: false, balance: 0 }, selection: selection('SKU-A') }); page.catalog = catalog();
   await page.onQuery(); assert.match(page.data.restriction, /返还/); assert.equal(rt.storage.has('gxs_pending_q_v1'), false); assert.equal(page.data.querying, false);
 });
 
 test('history uses server full-result last-hour count when only one page is loaded', async () => {
   const rt = runtime(async () => ({ ok: true, product: product(), balance: 1, dayKey: rt.load('utils/format.js').todayKey(), events: [], latest: [], summary: { lastHourRestocks: 123 }, pagination: { total: 500, hasMore: true, nextCursor: 'next' } }));
-  const page = rt.instance('pages/history/index.js'); Object.assign(page.data, { boot: { member: true }, catalog: catalog(), selection: selection('SKU-A') });
+  const page = rt.instance('pages/history/index.js'); Object.assign(page.data, { boot: { member: true }, selection: selection('SKU-A') }); page.catalog = catalog();
   await page.onQuery(); assert.equal(page.data.result.lastHour, 123); assert.equal(page.data.result.lastHourComplete, true);
 });
 
@@ -176,7 +176,7 @@ test('first-visit pending follow editor receives catalog and ready state before 
   rt.storage.set('gxs_catalog_v1', { products: [], stores: [], version: 'ready-catalog' });
   const page = rt.instance('pages/follow/index.js'), open = page.openEditor;
   let opened = false;
-  page.openEditor = function (value) { assert.equal(this.data.ready, true); assert.equal(this.data.catalog.version, 'ready-catalog'); opened = true; return open.call(this, value); };
+  page.openEditor = function (value) { assert.equal(this.data.ready, true); assert.equal(this.data.catalogVersion, 'ready-catalog'); opened = true; return open.call(this, value); };
   const loading = page.onLoad(); await page.onShow(); await loading;
   assert.equal(opened, true); assert.deepEqual(copy(page.data.editor.pickerValue), pending); page.onHide();
 });
@@ -188,20 +188,35 @@ test('bundled image fallback exactly matches every current catalog SKU and prese
   assert.equal(Object.keys(images).length, products.filter(p => p.imageUrl).length);
 });
 
-test('complete image-enabled catalog stays safely below the WeChat setData payload limit', async () => {
+test('complete image-enabled catalog never crosses the render bridge; a saved selection restores in one small update', async () => {
   const built = require('../cloudfunctions/gxs_api/lib/services/catalog.js').buildFromBundled();
   const rt = runtime(async () => ({ ...built.meta, stores: built.stores, products: built.products }));
   const store = rt.load('utils/store.js');
   const catalog = await store.getCatalog({ force: true });
-  const bytes = Buffer.byteLength(JSON.stringify({ catalog: store.toViewCatalog(catalog) }));
-  assert.ok(bytes < 350 * 1024, `catalog payload ${bytes} bytes must avoid duplicate render indexes`);
   assert.equal(catalog.products.length, built.products.length);
+  const picker = rt.instance('components/target-picker/index.js', { catalogVersion: catalog.version, maxStores: 3 });
+  const updates = [], apply = picker.setData;
+  picker.setData = patch => { updates.push(patch); apply(patch); };
+  const saved = catalog.products.find(p => p.supported), storeNumber = catalog.stores[0].storeNumber;
+  picker.onValue({ partNumber: saved.partNumber, storeNumbers: [storeNumber] });
+  picker.onCatalogVersion(catalog.version);
+  assert.equal(updates.length, 1, 'catalog load and saved-selection restore render once');
+  assert.equal(picker.data.product.partNumber, saved.partNumber);
+  assert.deepEqual(copy(picker.data.selectedStores.map(s => s.storeNumber)), [storeNumber]);
+  const bytes = Buffer.byteLength(JSON.stringify(updates[0]));
+  assert.ok(bytes < 30 * 1024, `picker update ${bytes} bytes must not carry the catalog`);
+  picker.onCatalogVersion(catalog.version);
+  assert.equal(updates.length, 1, 'the same catalog object is not re-applied');
 });
 
 test('isolated picker styles contain only class selectors and no imported global selectors', () => {
   const css = fs.readFileSync(path.join(root, 'components/target-picker/index.wxss'), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
   assert.doesNotMatch(css, /@import/);
-  for (const match of css.matchAll(/([^{}]+)\{/g)) for (const selector of match[1].split(',')) { assert.match(selector.trim(), /^\./); assert.doesNotMatch(selector, /\[|#/); }
+  for (const match of css.matchAll(/([^{}]+)\{/g)) {
+    // The dark-mode media query is an at-rule prelude, not a selector.
+    if (match[1].trim() === '@media (prefers-color-scheme: dark)') continue;
+    for (const selector of match[1].split(',')) { assert.match(selector.trim(), /^\./); assert.doesNotMatch(selector, /\[|#/); }
+  }
 });
 
 test('all page event handlers exist; WXML expressions have no XML entity operators; UTF-8 is valid', () => {

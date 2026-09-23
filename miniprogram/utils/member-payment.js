@@ -53,6 +53,15 @@ function paymentErrorText(error) {
   return '支付结果暂未确认。请查询这笔订单的结果，勿重复下单。';
 }
 
+/** The cashier failed without a cancel. On iPhone this is usually a non-mainland Apple ID. */
+function cashierFailureText(wxApi) {
+  let platform = '';
+  try { platform = (wxApi.getDeviceInfo ? wxApi.getDeviceInfo() : wxApi.getSystemInfoSync()).platform; } catch (_) { /* Use the general wording. */ }
+  return platform === 'ios'
+    ? '微信支付未能完成。iPhone 需要使用中国大陆地区的 Apple ID 才能付款；如果没有扣款，可以放弃这笔订单，改用安卓手机购买或使用兑换码。'
+    : '微信支付未能完成。如果没有扣款，可以放弃这笔订单后重新购买。';
+}
+
 function membershipValid(value) {
   return value && typeof value.active === 'boolean' && Number.isFinite(value.remainingMs) && value.remainingMs >= 0 && (!value.active || value.remainingMs > 0)
     && (Number.isFinite(Date.parse(value.expiresAt)) || (!value.active && value.expiresAt === null));
@@ -95,9 +104,9 @@ function createPaymentController({ wx: wxApi, call, onUpdate, onResolved, setTim
         emit({ paymentMessage: activated ? order.status === 'partially_refunded' ? '订单已部分退款，会员有效期已按服务端结果更新。' : '支付已确认，会员已开通。' : '这笔订单已处理，当前会员未生效或已到期。', paymentError: '' });
         outcome = 'resolved';
         await onResolved({ order, membership, activated });
-      } else if (['refunded', 'cancelled', 'failed'].includes(order.status)) {
+      } else if (['refunded', 'cancelled', 'failed'].includes(order.status) || order.abandoned === true) {
         forget();
-        emit({ paymentMessage: order.status === 'refunded' ? '这笔订单已退款，会员状态以当前账户为准。' : order.status === 'cancelled' ? '这笔订单已关闭，可重新购买。' : '这笔订单支付失败，可重新购买。', paymentError: '' });
+        emit({ paymentMessage: order.status === 'refunded' ? '这笔订单已退款，会员状态以当前账户为准。' : order.abandoned === true ? '这笔订单已放弃，可重新购买。' : order.status === 'cancelled' ? '这笔订单已关闭，可重新购买。' : '这笔订单支付失败，可重新购买。', paymentError: '' });
         outcome = 'terminal';
         if (order.status === 'refunded' && membershipValid(membership)) await onResolved({ order, membership, activated: false });
       } else {
@@ -163,7 +172,7 @@ function createPaymentController({ wx: wxApi, call, onUpdate, onResolved, setTim
       emit({ paymentMessage: '请在微信支付窗口确认。' });
       await new Promise((resolve, reject) => {
         wxApi.requestVirtualPayment({ mode: payment.mode, signData: payment.signData, paySig: payment.paySig, signature: payment.signature,
-          success: resolve, fail: reject });
+          success: resolve, fail: error => reject({ ...error, cashier: true }) });
       });
       if (current(version)) emit({ paymentMessage: '微信已返回支付结果，正在等待服务端确认…' });
     } catch (error) {
@@ -171,6 +180,7 @@ function createPaymentController({ wx: wxApi, call, onUpdate, onResolved, setTim
       const message = error && error.errMsg || '';
       if (/cancel/i.test(message) || (error && error.errCode === -2)) { confirmAfter = false; emit({ paymentMessage: '已取消本次支付，请查询订单状态。订单号已保留。', paymentError: '', paymentCanRetry: false }); }
       else if (/not support|unsupported|not available|低版本|不支持/i.test(message)) emit({ paymentError: paymentErrorText({ code: 'payment_runtime_unsupported' }), paymentCanRetry: false });
+      else if (error && error.cashier) emit({ paymentError: cashierFailureText(wxApi), paymentCanRetry: false });
       else emit({ paymentError: paymentErrorText(error), paymentCanRetry: false });
     } finally {
       if (current(version)) {
@@ -179,6 +189,34 @@ function createPaymentController({ wx: wxApi, call, onUpdate, onResolved, setTim
         // membership, and no lifecycle path is allowed to invoke the cashier.
         if (confirmAfter && visible && pendingId && !state.paymentError && !state.paymentCanRetry) await check({ automatic: true });
       }
+    }
+  }
+
+  /** Give up an unpaid order. The server checks the platform first and keeps a late payment fulfillable. */
+  async function abandon() {
+    if (disposed || !account || !pendingId || busy || checking) return;
+    const version = generation, orderId = pendingId;
+    stopPolling();
+    busy = true; emit({ paymentBusy: true, paymentError: '', paymentCanRetry: false, paymentMessage: '正在向微信核对这笔订单…' });
+    try {
+      const result = await call('member.abandonOrder', { orderId });
+      if (!current(version) || orderId !== pendingId) return;
+      const order = result && result.order, membership = result && result.membership;
+      if (!order || order.orderId !== orderId) throw { code: 'payment_check_pending' };
+      if (['fulfilled', 'partially_refunded'].includes(order.status) && membershipValid(membership)) {
+        forget();
+        emit({ paymentMessage: '这笔订单已付款，会员已开通。', paymentError: '' });
+        await onResolved({ order, membership, activated: membership.active });
+      } else if (order.status === 'paid') {
+        emit({ paymentMessage: '这笔订单已付款，正在开通会员，请稍后查询。', paymentError: '' });
+      } else {
+        forget();
+        emit({ paymentMessage: '已放弃这笔订单，可以重新购买。如果之后确认已付款，会员会自动开通。', paymentError: '' });
+      }
+    } catch (error) {
+      if (current(version)) emit({ paymentError: '暂时无法放弃这笔订单，请检查网络后重试。' });
+    } finally {
+      if (current(version)) { busy = false; emit({ paymentBusy: false }); }
     }
   }
 
@@ -198,6 +236,7 @@ function createPaymentController({ wx: wxApi, call, onUpdate, onResolved, setTim
     hide() { visible = false; stopPolling(); },
     dispose() { visible = false; stopPolling(); disposed = true; generation++; },
     buy,
+    abandon,
     check() { if (disposed || busy || checking) return; stopPolling(); return check({ automatic: true }); },
     getState() { return { ...state }; },
   };

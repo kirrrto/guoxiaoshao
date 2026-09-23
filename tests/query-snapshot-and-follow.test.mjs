@@ -17,7 +17,7 @@ const copy = value => JSON.parse(JSON.stringify(value));
 async function queriedPage(handler) {
   const rt = runtime(async (action, payload) => action === 'query.pickup' ? response() : handler ? handler(action, payload) : boot());
   const page = rt.instance('pages/query/index.js');
-  Object.assign(page.data, { ready: true, boot: { member: false, followCount: 0 }, catalog: catalog(), selection: selection() });
+  Object.assign(page.data, { ready: true, boot: { member: false, followCount: 0 }, selection: selection() }); page.catalog = catalog();
   page.catalog = catalog();
   await page.onQuery();
   return { rt, page };
@@ -84,7 +84,7 @@ test('a manual query with missing or unknown observations cannot show a positive
     { storeNumber: 'R002', status: 'unknown', observedAt, lastKnownStatus: 'available', isStale: true },
   ]));
   const page = rt.instance('pages/query/index.js');
-  Object.assign(page.data, { boot: { member: true }, catalog: catalog(), selection: selection() });
+  Object.assign(page.data, { boot: { member: true }, selection: selection() }); page.catalog = catalog();
   await page.onQuery();
   const [missing, unknown] = page.data.result.results;
   assert.equal(missing.statusLabel, '等待首次观测');

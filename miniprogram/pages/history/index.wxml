@@ -28,10 +28,10 @@
         <text>选择机型、门店与日期</text>
         <text class="sub" bindtap="onExplain">数据说明 ›</text>
       </view>
-      <target-picker catalog="{{catalog}}" value="{{pickerValue}}" max-stores="{{10}}" stores-optional="{{true}}" bindchange="onPickerChange" />
+      <target-picker catalog-version="{{catalogVersion}}" value="{{pickerValue}}" max-stores="{{10}}" stores-optional="{{true}}" bindchange="onPickerChange" />
       <view wx:if="{{accountReady && !boot.member}}" class="banner banner-info small mt">受限新品开售 30 天内，免费用户仅可看昨天及更早记录。余额不足可前往「我的」签到。</view>
 
-      <picker mode="date" value="{{dayKey}}" start="2026-01-01" end="{{today}}" bindchange="onDateChange">
+      <picker mode="date" value="{{dayKey}}" start="{{earliestDay}}" end="{{today}}" bindchange="onDateChange">
         <view class="field date-field">
           <text class="label">日期（北京时间）</text>
           <view class="row">
@@ -47,7 +47,7 @@
       <button class="btn btn-primary btn-block mt {{querying ? 'disabled' : ''}}" disabled="{{querying || !accountReady}}" bindtap="onQuery">
         {{!accountReady ? '正在连接账户…' : (querying ? '加载中…' : (boot.member ? '查看历史' : '查看历史（消耗 ' + boot.historyCost + ' 次，余 ' + boot.balance + ' 次）'))}}
       </button>
-      <view class="footer-note history-scope-note">仅查询本小程序已积累的历史；未采集的过去记录无法补查。不选门店时，展示各地已有记录，不代表全国覆盖。</view>
+      <view class="footer-note history-scope-note">仅查询本小程序最近 10 天积累的历史；更早或未采集的记录无法补查。不选门店时，展示各地已有记录，不代表全国覆盖。</view>
       <view wx:if="{{!boot.member}}" class="tiny muted history-scope-note">查询需有足够余额；未查到历史事件，次数自动退还。</view>
     </view>
 
@@ -85,8 +85,6 @@
 
       <view wx:if="{{result.latestRestricted}}" class="banner banner-info small mt">当前配置处于免费用户新品限制期，本页仅提供所选日期历史，不显示当前库存。</view>
       <view wx:if="{{result.hasEventRecords}}" class="section-label">事件记录 · 已加载 {{result.events.length}} / {{result.pagination.total}}</view>
-      <view wx:if="{{moreError}}" class="banner banner-warn small mt">{{moreError}}</view>
-      <button wx:if="{{result.pagination.hasMore}}" class="btn btn-ghost btn-block mt" disabled="{{loadingMore}}" bindtap="onLoadMore">{{loadingMore ? '加载中…' : '加载更多（不额外扣次）'}}</button>
       <view wx:for="{{result.events}}" wx:key="id" class="event">
         <view class="event-time mono">{{item.timeText}}</view>
         <view class="event-body">
@@ -99,6 +97,8 @@
           <view class="tiny muted">来源：{{item.sourceText}}</view>
         </view>
       </view>
+      <view wx:if="{{moreError}}" class="banner banner-warn small mt">{{moreError}}</view>
+      <button wx:if="{{result.pagination.hasMore}}" class="btn btn-ghost btn-block mt" disabled="{{loadingMore}}" bindtap="onLoadMore">{{loadingMore ? '加载中…' : '加载更多（不额外扣次）'}}</button>
     </view>
 
     <view wx:if="{{result && result.latest.length}}" class="card history-latest-card">

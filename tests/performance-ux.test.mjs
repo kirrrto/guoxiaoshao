@@ -67,7 +67,7 @@ test('query page paints selectable public catalog before slow account authentica
   const page = rt.instance('pages/query/index.js'); const pending = page.onLoad();
   for (let i = 0; i < 10; i++) await Promise.resolve();
   assert.equal(page.data.ready, true); assert.equal(page.data.accountReady, false);
-  assert.ok(page.data.catalog.categories.length); assert.equal(page.data.catalog.productByPart, undefined);
+  assert.ok(page.catalog.categories.length); assert.equal(page.data.catalogVersion, page.catalog.version); assert.equal(page.data.catalog, undefined);
   resolveBoot(boot()); await pending; assert.equal(page.data.accountReady, true);
 });
 
@@ -84,4 +84,43 @@ test('query and follow tabs reuse recent follows but a mutation invalidates the 
   const rt = runtime(async () => ({ follows: [] })); const store = rt.load('utils/store.js');
   await Promise.all([store.getFollows(), store.getFollows()]); await store.getFollows();
   assert.equal(rt.calls.length, 1); store.invalidateFollows(); await store.getFollows(); assert.equal(rt.calls.length, 2);
+});
+
+test('visible pages poll once per monitor minute, shortly after the recorded next run', () => {
+  const { monitorPollDelay } = runtime().load('utils/poll.js');
+  const now = Date.parse('2026-09-23T04:00:30.000Z');
+  assert.equal(monitorPollDelay({ nextRunAt: '2026-09-23T04:01:00.000Z' }, now), 50000);
+  assert.equal(monitorPollDelay({ nextRunAt: '2026-09-23T04:00:00.000Z' }, now), 50000, 'a passed run keeps the minute phase');
+  assert.equal(monitorPollDelay({ nextRunAt: '2026-09-23T03:00:00.000Z' }, now), 50000);
+  assert.equal(monitorPollDelay({ nextRunAt: '2026-09-23T05:00:00.000Z' }, now), 80000, 'clock skew never stretches past one period plus settle time');
+  assert.equal(monitorPollDelay({ state: 'running' }, now), 60000);
+  assert.equal(monitorPollDelay(null, now), 60000);
+});
+
+test('follow and query pages schedule refreshes from the monitor cadence instead of every 15 seconds', t => {
+  t.mock.method(Date, 'now', () => Date.parse('2026-09-23T04:00:30.000Z'));
+  const collector = { state: 'running', nextRunAt: '2026-09-23T04:01:00.000Z' };
+  const followRt = runtime(), follow = followRt.instance('pages/follow/index.js');
+  follow.data.collector = collector; follow.visible = true; follow.startPolling();
+  assert.deepEqual([...followRt.timers.values()].map(timer => timer.ms), [50000]);
+  follow.onHide(); assert.equal(followRt.timers.size, 0);
+  const queryRt = runtime(), query = queryRt.instance('pages/query/index.js');
+  query.data.collector = collector; query.visible = true; query.startFollowPolling();
+  assert.deepEqual([...queryRt.timers.values()].map(timer => timer.ms), [50000]);
+  query.onHide(); assert.equal(queryRt.timers.size, 0);
+});
+
+test('a downloaded new version offers a restart and uncaught errors reach the realtime log', () => {
+  const rt = runtime(); let ready, applied = 0; const logged = [];
+  rt.wx.getUpdateManager = () => ({ onUpdateReady: fn => { ready = fn; }, applyUpdate: () => { applied++; } });
+  rt.wx.getRealtimeLogManager = () => ({ error: (...args) => logged.push(args) });
+  rt.wx.showModal = options => options.success({ confirm: true });
+  rt.load('app.js'); const app = rt.app;
+  app.ensureCloud = () => Promise.resolve(null);
+  app.onLaunch(); ready();
+  assert.equal(applied, 1);
+  app.onError('TypeError: boom\n    at page');
+  app.onUnhandledRejection({ reason: new Error('lost') });
+  assert.deepEqual(logged.map(entry => entry[0]), ['[gxs] error', '[gxs] unhandledrejection']);
+  assert.match(logged[0][1], /TypeError: boom/);
 });

@@ -27,6 +27,12 @@ function todayKey() {
   return fmtDate(Date.now());
 }
 
+// History and reminder records keep the latest 10 Beijing days (server: engine/retention.js).
+const RETENTION_DAYS = 10;
+function retentionStartKey(now = Date.now()) {
+  return fmtDate(now - (RETENTION_DAYS - 1) * 86400000);
+}
+
 function relative(iso, now = Date.now()) {
   const ms = Date.parse(iso);
   if (!Number.isFinite(ms)) return '—';
@@ -144,4 +150,4 @@ function stockObservation(record = {}, now = Date.now(), options = {}) {
     observationNote: Number.isFinite(elapsed) && elapsed >= 0 && elapsed < 1000 ? '本次状态刚记录，时长待后续观测确认。' : null };
 }
 
-module.exports = { fmtTime, fmtDate, fmtDateTime, todayKey, relative, duration, statusMeta, eventMeta, reasonText, collectorMeta, fen, observation, stockObservation };
+module.exports = { fmtTime, fmtDate, fmtDateTime, todayKey, RETENTION_DAYS, retentionStartKey, relative, duration, statusMeta, eventMeta, reasonText, collectorMeta, fen, observation, stockObservation };

@@ -113,7 +113,7 @@ test('real observation coverage gaps survive history serialization and become qu
   const ended = response.events.filter(e => e.type === 'became_unavailable');
   assert.deepEqual(ended.map(e => e.coverageGap), [null, false, true]);
   const rt = runtime(async () => response), page = rt.instance('pages/history/index.js');
-  Object.assign(page.data, { boot: { member: true }, catalog: { storeByNumber: {} }, selection: { partNumber, storeNumbers: ['R577'] } });
+  page.catalog = { storeByNumber: {} }; Object.assign(page.data, { boot: { member: true }, selection: { partNumber, storeNumbers: ['R577'] } });
   await page.onQuery();
   const views = page.data.result.events.filter(e => e.type === 'became_unavailable');
   assert.match(views[0].detailText, /连续性未确认/);
@@ -126,7 +126,7 @@ test('frontend names the fixed rolling-hour cutoff and explicitly identifies the
   t.mock.method(Date, 'now', () => Date.parse(cutoff));
   const rt = runtime(async () => ({ ok: true, product: { partNumber, title: '真实数据测试配置' }, dayKey: '2026-09-16', balance: 0, latest: [], events: [], summary: { available: 0, restocks: 2, recoveries: 0, ended: 0, lastHourRestocks: 4 }, pagination: { snapshotAt: cutoff, total: 2, hasMore: true } }));
   const page = rt.instance('pages/history/index.js');
-  Object.assign(page.data, { boot: { member: true }, catalog: { storeByNumber: {} }, selection: { partNumber, storeNumbers: ['R577'] } });
+  page.catalog = { storeByNumber: {} }; Object.assign(page.data, { boot: { member: true }, selection: { partNumber, storeNumbers: ['R577'] } });
   await page.onQuery();
   assert.equal(page.data.result.lastHour, 4);
   assert.equal(page.data.result.lastHourComplete, true);

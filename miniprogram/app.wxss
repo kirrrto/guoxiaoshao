@@ -31,3 +31,31 @@ page {
   line-height: 1.5;
   font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", Helvetica, sans-serif;
 }
+
+/* Dark mode follows the phone's system theme (app.json darkmode + theme.json).
+   Only colors change. Each stylesheet keeps its dark overrides in one block at
+   its end, so the light theme above stays exactly as designed. */
+@media (prefers-color-scheme: dark) {
+  page {
+    --green-dark: #3DDC97;
+    --green-soft: rgba(0, 195, 117, 0.16);
+    --green-mist: #0E1714;
+    --text: #E3EEE8;
+    --text-2: #A9BDB3;
+    --text-3: #889B91;
+    --line: rgba(163, 224, 194, 0.12);
+    --card: rgba(24, 36, 31, 0.94);
+    --surface-soft: rgba(255, 255, 255, 0.05);
+    --glass-line: rgba(255, 255, 255, 0.07);
+    --shadow-soft: 0 12rpx 34rpx rgba(0, 0, 0, 0.32);
+    --warn: #E8B15C;
+    --warn-soft: rgba(232, 177, 92, 0.14);
+    --bad: #F29B93;
+    --bad-soft: rgba(242, 155, 147, 0.14);
+    --info-soft: rgba(0, 195, 117, 0.10);
+    /* Product photos are shot for light backgrounds: a dimmed light tile keeps
+       dark devices on transparent images visible without a glaring white box. */
+    --image-tile: #DCE3DF;
+    background-image: radial-gradient(ellipse at 0% 0%, rgba(0, 195, 117, 0.10) 0%, rgba(0, 195, 117, 0) 58%), radial-gradient(ellipse at 100% 24%, rgba(0, 150, 95, 0.07) 0%, rgba(0, 150, 95, 0) 58%), linear-gradient(160deg, #0F1916 0%, #0D1613 48%, #0E1714 100%);
+  }
+}

@@ -21,7 +21,7 @@
         <button wx:if="{{readiness.action}}" class="btn btn-primary readiness-action" disabled="{{subscribing || refreshing || saving}}" bindtap="onReadinessAction">{{subscribing && readiness.action === 'subscribe' ? '处理中…' : readiness.actionLabel}}</button>
       </view>
       <view class="status-footer">
-        <text class="tiny muted">{{followsLoaded ? readiness.activeCount + ' 配置 · ' + readiness.storeCount + ' 店' : ''}}{{subscription.templateCount ? (boot.member ? ' · 已授权' : ' · 授权 ' + subscription.credits) : ''}} · {{boot.member ? '会员至 ' + boot.expiresText : (boot.expired ? '会员已到期' : '免费用户')}}</text>
+        <text class="tiny muted">{{followsLoaded ? readiness.activeCount + ' 配置 · ' + readiness.storeCount + ' 店' : ''}}{{subscription.templateCount && boot.member ? ' · 剩余提醒 ' + subscription.credits + ' 次' : ''}} · {{boot.member ? '会员至 ' + boot.expiresText : (boot.expired ? '会员已到期' : '免费用户')}}</text>
         <text class="service-link" bindtap="onToggleServiceDetails">{{showServiceDetails ? '收起详情 ▴' : '详情 ▾'}}</text>
       </view>
       <block wx:if="{{showServiceDetails}}">
@@ -34,8 +34,8 @@
           <view class="service-detail">{{delivery.detail}}</view>
         </view>
         <view class="service-row authorization-row">
-          <view class="authorization-copy"><view class="service-title">微信授权</view><view class="service-detail">{{subscription.templateCount ? (boot.member ? '已开启到货提醒' : '剩余 ' + subscription.credits + ' 条') : (boot.templateTitle ? boot.templateTitle : '待模板配置')}}</view></view>
-          <button class="btn btn-ghost btn-sm compact-action" disabled="{{subscribing}}" bindtap="onSubscribe">{{subscribing ? '处理中' : (subscriptionPending ? '同步授权' : (subscription.templateCount ? '授权提醒' : '查看原因'))}}</button>
+          <view class="authorization-copy"><view class="service-title">提醒次数</view><view class="service-detail">{{!subscription.templateCount ? (boot.templateTitle ? boot.templateTitle : '待模板配置') : (boot.member ? '剩余 ' + subscription.credits + ' 次，每次补货提醒消耗 1 次，可连续点击累加' : '到货提醒为会员专属')}}</view></view>
+          <button class="btn btn-ghost btn-sm compact-action" disabled="{{subscribing}}" bindtap="onSubscribe">{{subscribing ? '处理中' : (subscriptionPending ? '同步授权' : (!subscription.templateCount ? '查看原因' : (boot.member ? '增加提醒次数' : '了解会员')))}}</button>
         </view>
         <view class="status-footer"><text class="tiny muted">{{refreshedText ? '最近读取 ' + refreshedText : ''}}</text><text class="service-link" bindtap="onServiceDetails">服务详情 ›</text></view>
         <view class="tiny muted subscription-rule">订阅消息声音跟随微信设置；免打扰时段不发送。</view>
@@ -52,7 +52,7 @@
         <text>{{editor.isNew ? '添加关注' : '编辑关注'}}</text>
         <text class="sub">每机型最多 {{limits.maxStoresPerFollow}} 家门店</text>
       </view>
-      <target-picker catalog="{{catalog}}" value="{{editor.pickerValue}}" max-stores="{{limits.maxStoresPerFollow}}" supported-only="{{true}}" bindchange="onEditorChange" />
+      <target-picker catalog-version="{{catalogVersion}}" value="{{editor.pickerValue}}" max-stores="{{limits.maxStoresPerFollow}}" supported-only="{{true}}" bindchange="onEditorChange" />
       <view class="btn-row">
         <button class="btn btn-outline" bindtap="onCancelEdit">取消</button>
         <button class="btn btn-primary {{saving ? 'disabled' : ''}}" disabled="{{saving}}" bindtap="onSave">{{saving ? '保存中…' : '保存'}}</button>
@@ -105,6 +105,6 @@
       </view>
     </view>
 
-    <view class="footer-note"><view>每个配置最多 {{limits.maxStoresPerFollow}} 家门店。不同容量或颜色各占一个名额。</view><view>页面每 15 秒读取已有观测，自动检测由后台服务执行。</view></view>
+    <view class="footer-note"><view>每个配置最多 {{limits.maxStoresPerFollow}} 家门店。不同容量或颜色各占一个名额。</view><view>页面约每分钟读取一次已有观测，自动检测由后台服务执行。</view></view>
   </block>
 </view>

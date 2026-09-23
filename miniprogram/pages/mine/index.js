@@ -1,5 +1,6 @@
 const { call, showError, toast, newId } = require('../../utils/api');
 const { getBootstrap, invalidateBootstrap, invalidateFollows, publishQuota, subscribeQuota } = require('../../utils/store');
+const { topUpReminderCredit } = require('../../utils/reminder-credits');
 const fmt = require('../../utils/format');
 const { syncTabBar } = require('../../utils/tab-bar');
 const { notificationAdvice } = require('../../utils/reminder-readiness');
@@ -79,6 +80,7 @@ function redemptionErrorText(error) {
     return wait > 0 ? `尝试次数较多，请约 ${Math.ceil(wait / 60)} 分钟后再试。` : '尝试次数较多，请稍后再试。';
   }
   if (code === 'redemption_disabled') return '兑换码开通暂未开放，请稍后再试。';
+  if (code === 'redemption_sold_out') return '本期兑换名额已发完，可选择购买会员。';
   if (code === 'redemption_conflict') return '兑换记录状态异常，请通过意见反馈联系支持。';
   if (code === 'user_required') return '账号尚未连接，请刷新账户后再试。';
   if (code === 'app_not_allowed' || code === 'unknown_action') return '兑换服务暂不可用，请稍后再试。';
@@ -89,7 +91,7 @@ function presentOrder(order) {
   const sourceLabel = redeemed ? '兑换码开通' : ['admin', 'admin_grant'].includes(order.source) || order.productId === 'admin_grant' ? '平台发放' : order.amountFen > 0 ? '付费开通' : '会员开通';
   return { ...order, sourceLabel, amountText: order.amountFen > 0 ? fmt.fen(order.amountFen) : '',
     refundText: order.refundFen > 0 ? `已退款 ${fmt.fen(order.refundFen)}` : '',
-    statusLabel: ORDER_STATUS[order.status] || '状态待确认', timeText: fmt.fmtDateTime(order.fulfilledAt || order.paidAt || order.createdAt) };
+    statusLabel: order.abandoned ? '已放弃' : ORDER_STATUS[order.status] || '状态待确认', timeText: fmt.fmtDateTime(order.fulfilledAt || order.paidAt || order.createdAt) };
 }
 
 const minuteToTime = m => `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;
@@ -324,6 +326,23 @@ Page({
     return this.ensurePaymentController().check();
   },
 
+  async onAbandonPayment() {
+    if (this.pageRetired || this.data.redeeming || this.data.paymentBusy || this.data.paymentChecking) return;
+    const confirmed = await new Promise(resolve => {
+      if (typeof wx.showModal !== 'function') { resolve(false); return; }
+      wx.showModal({
+        title: '放弃这笔订单',
+        content: '放弃前会先向微信核对一次：已付款会直接开通会员，确认没有付款才会放弃，之后可以重新购买。',
+        confirmText: '确认放弃',
+        cancelText: '再等等',
+        success: result => resolve(Boolean(result.confirm)),
+        fail: () => resolve(false),
+      });
+    });
+    if (!confirmed || this.pageRetired || this.data.redeeming) return;
+    return this.ensurePaymentController().abandon();
+  },
+
   onOpenRedemption() {
     if (this.pageRetired || this.data.redeeming || this.data.paymentBusy || this.data.paymentChecking) return;
     this.setData({ redemptionOpen: !this.data.redemptionOpen, redemptionCode: '', redemptionError: null, redemptionResult: null });
@@ -530,6 +549,7 @@ Page({
 
   async onSignin() {
     if (this.pageRetired || this.data.signing) return;
+    topUpReminderCredit();
     const session = this.pageSession || 0;
     this.setData({ signing: true });
     try {

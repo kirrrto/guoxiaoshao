@@ -313,3 +313,46 @@ test('cancelling the purchase notice never creates an order or opens the cashier
   assert.equal(page.data.paymentBusy, false);
   assert.equal(page.data.paymentPendingId, '');
 });
+
+test('an iPhone cashier failure explains the Apple ID requirement and the order can then be abandoned', async () => {
+  let abandoned = false;
+  const handler = async (action, payload) => {
+    if (action === 'member.createOrder') return { ok: true, order: { orderId: payload.orderId, status: 'created' }, payment: signed };
+    if (action === 'member.abandonOrder') { abandoned = true; return { order: { orderId: payload.orderId, status: 'created', abandoned: true }, membership: free }; }
+    return { order: { orderId: payload.orderId, status: 'created', paymentPending: true, providerStatus: 1 }, membership: free };
+  };
+  const rt = runtime({ platform: 'ios', handler, cashier: options => options.fail({ errMsg: 'requestVirtualPayment:fail system error', errCode: -1 }) });
+  await rt.controller.show(); await rt.controller.buy();
+  assert.match(rt.state().paymentError, /中国大陆地区的 Apple ID/);
+  assert.match(rt.state().paymentError, /放弃这笔订单/);
+  assert.equal(rt.state().paymentPendingId, 'pay-test-order-1');
+  await rt.controller.abandon();
+  assert.equal(abandoned, true);
+  assert.equal(rt.state().paymentPendingId, '', 'purchase is unlocked again');
+  assert.equal(rt.storage.size, 0);
+  assert.match(rt.state().paymentMessage, /已放弃这笔订单，可以重新购买/);
+});
+
+test('abandoning a paid order activates membership instead, and a network failure keeps the order', async () => {
+  const fulfilled = { status: 'fulfilled', fulfilledAt: '2026-09-20T00:00:00Z' };
+  const paidRt = runtime({ handler: async (action, payload) => ({ order: { orderId: payload.orderId, ...fulfilled }, membership: member }) });
+  paidRt.storage.set(STORAGE_PREFIX + encodeURIComponent('wx-app:account-a'), { orderId: 'pay-existing-001' });
+  paidRt.controller.sync({ userKey: 'wx-app:account-b' }, product); paidRt.controller.sync({ userKey: 'wx-app:account-a' }, product);
+  await paidRt.controller.abandon();
+  assert.equal(paidRt.resolved.length, 1); assert.equal(paidRt.state().paymentPendingId, '');
+  assert.match(paidRt.state().paymentMessage, /已付款，会员已开通/);
+  const offline = runtime({ handler: async () => { throw { code: 'call_failed' }; } });
+  offline.storage.set(STORAGE_PREFIX + encodeURIComponent('wx-app:account-a'), { orderId: 'pay-existing-002' });
+  offline.controller.sync({ userKey: 'wx-app:account-b' }, product); offline.controller.sync({ userKey: 'wx-app:account-a' }, product);
+  await offline.controller.abandon();
+  assert.equal(offline.state().paymentPendingId, 'pay-existing-002');
+  assert.match(offline.state().paymentError, /暂时无法放弃/);
+});
+
+test('a previously abandoned order found on another device is treated as closed', async () => {
+  const rt = runtime({ handler: async (action, payload) => ({ order: { orderId: payload.orderId, status: 'created', abandoned: true }, membership: free }) });
+  rt.storage.set(STORAGE_PREFIX + encodeURIComponent('wx-app:account-a'), { orderId: 'pay-existing-003' });
+  rt.controller.sync({ userKey: 'wx-app:account-b' }, product); rt.controller.sync({ userKey: 'wx-app:account-a' }, product);
+  await rt.controller.show();
+  assert.equal(rt.state().paymentPendingId, ''); assert.match(rt.state().paymentMessage, /已放弃，可重新购买/);
+});

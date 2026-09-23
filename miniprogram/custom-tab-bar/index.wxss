@@ -97,3 +97,15 @@
 .floating-tab-pressed { opacity: 0.68; }
 .floating-tab-icon { display: block; flex: none; width: 25px; height: 25px; }
 .floating-tab-label { display: block; font-size: 12px; line-height: 16px; white-space: nowrap; text-shadow: 0 1px 2px rgba(255, 255, 255, 0.85); }
+
+@media (prefers-color-scheme: dark) {
+  .floating-tab-glass { border-color: rgba(255, 255, 255, 0.08); background: rgba(22, 33, 29, 0.92); box-shadow: 0 3px 16px rgba(0, 0, 0, 0.36), 0 1px 3px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.05); }
+  .floating-tab-edge-left { background: linear-gradient(90deg, rgba(14, 23, 20, 0.45), rgba(14, 23, 20, 0.15) 45%, rgba(14, 23, 20, 0) 100%); box-shadow: inset 1px 0 0 rgba(255, 255, 255, 0.06); }
+  .floating-tab-edge-right { background: linear-gradient(270deg, rgba(14, 23, 20, 0.45), rgba(14, 23, 20, 0.15) 45%, rgba(14, 23, 20, 0) 100%); box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.06); }
+  .floating-tab-item { color: #A3B6AC; }
+  .floating-tab-item.is-selected { background: rgba(0, 195, 117, 0.16); border-color: rgba(255, 255, 255, 0.06); box-shadow: none; color: #3DDC97; }
+  /* The generated inactive icons are grey-green; lift them on the dark plate. */
+  .floating-tab-icon { filter: brightness(1.5); }
+  .is-selected .floating-tab-icon { filter: none; }
+  .floating-tab-label { text-shadow: none; }
+}

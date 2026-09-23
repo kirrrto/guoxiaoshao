@@ -1,11 +1,11 @@
 const { call, newId, showError, toast } = require('../../utils/api');
-const { getBootstrap, getCatalog, refreshBootstrap, invalidateBootstrap, toViewCatalog, subscribeCatalog, getFollows, invalidateFollows } = require('../../utils/store');
+const { getBootstrap, getCatalog, refreshBootstrap, invalidateBootstrap, subscribeCatalog, getFollows, invalidateFollows, publishSubscriptions, subscribeSubscriptions } = require('../../utils/store');
 const fmt = require('../../utils/format');
-const { localKey } = require('../../utils/local-key');
 const { syncTabBar } = require('../../utils/tab-bar');
 const { restockSubscription, reminderReadiness } = require('../../utils/reminder-readiness');
 const { shareAppMessage, shareTimeline } = require('../../utils/share');
-const SUBSCRIPTION_PENDING_KEY = 'gxs_subscription_pending_v1';
+const { monitorPollDelay } = require('../../utils/poll');
+const { FINAL_ERRORS, readPending, savePending, clearPending, refreshConsentSetting, topUpReminderCredit } = require('../../utils/reminder-credits');
 
 const FOLLOW_STATUS = {
   active: { label: '关注已开启', cls: 'ok' },
@@ -76,7 +76,7 @@ Page({
   data: {
     ready: false,
     loadError: null,
-    catalog: null,
+    catalogVersion: '',
     boot: null,
     collector: null,
     follows: [],
@@ -101,14 +101,15 @@ Page({
   async onLoad() {
     if (this.loadingBoot) return;
     this.loadingBoot = true;
-    if (!this.unsubscribeCatalog) this.unsubscribeCatalog = subscribeCatalog(catalog => { this.catalog = catalog; if (this.data.ready && this.data.catalog.version !== catalog.version) this.setData({ catalog: toViewCatalog(catalog) }); });
+    if (!this.unsubscribeCatalog) this.unsubscribeCatalog = subscribeCatalog(catalog => { this.catalog = catalog; if (this.data.ready && this.data.catalogVersion !== catalog.version) this.setData({ catalogVersion: catalog.version }); });
     try {
-      try { this.setData({ subscriptionPending: Boolean(wx.getStorageSync(localKey(SUBSCRIPTION_PENDING_KEY))) }); } catch (e) { /* ignore */ }
+      if (!this.unsubscribeCredits) this.unsubscribeCredits = subscribeSubscriptions(subscriptions => this.applyCredits(subscriptions));
+      this.setData({ subscriptionPending: Boolean(readPending()) });
       const results = await Promise.all([getBootstrap(), getCatalog()]);
       const boot = results[0], initialCatalog = results[1];
       const catalog = getApp().globalData.catalog || initialCatalog;
       this.catalog = catalog;
-      this.applyBoot(boot, { catalog: toViewCatalog(catalog), ready: true, loadError: null });
+      this.applyBoot(boot, { catalogVersion: catalog.version, ready: true, loadError: null });
       await this.loadFollows();
       if (this.visible) this.startPolling();
     } catch (error) {
@@ -137,7 +138,7 @@ Page({
   },
 
   onHide() { this.visible = false; this.stopPolling(); },
-  onUnload() { this.visible = false; this.stopPolling(); if (this.unsubscribeCatalog) this.unsubscribeCatalog(); },
+  onUnload() { this.visible = false; this.stopPolling(); if (this.unsubscribeCatalog) this.unsubscribeCatalog(); if (this.unsubscribeCredits) this.unsubscribeCredits(); },
 
   onShareAppMessage() {
     return shareAppMessage('/pages/follow/index', this.data);
@@ -153,15 +154,17 @@ Page({
     const epoch = this.pollEpoch;
     const tick = async () => {
       if (!this.visible || epoch !== this.pollEpoch) return;
-      this.refreshFollowPresentation();
       try {
         const boot = await getBootstrap();
         if (!this.visible || epoch !== this.pollEpoch) return;
         this.applyBoot(boot); await this.loadFollows({ force: true });
-      } catch (e) { if (this.visible) this.setData({ refreshError: '刷新失败，以下保留上次观测，请下拉重试。' }); }
-      if (this.visible && epoch === this.pollEpoch) this.pollTimer = setTimeout(tick, 15000);
+      } catch (e) {
+        // Still age the kept observations so stale results read as stale.
+        if (this.visible) { this.refreshFollowPresentation(); this.setData({ refreshError: '刷新失败，以下保留上次观测，请下拉重试。' }); }
+      }
+      if (this.visible && epoch === this.pollEpoch) this.pollTimer = setTimeout(tick, monitorPollDelay(this.data.collector));
     };
-    this.pollTimer = setTimeout(tick, 15000);
+    this.pollTimer = setTimeout(tick, monitorPollDelay(this.data.collector));
   },
 
   async onPullDownRefresh() {
@@ -169,7 +172,7 @@ Page({
       const results = await Promise.all([getBootstrap({ force: true }), getCatalog({ force: true })]);
       const boot = results[0], catalog = results[1];
       this.catalog = catalog;
-      this.applyBoot(boot, { catalog: toViewCatalog(catalog), ready: true, loadError: null });
+      this.applyBoot(boot, { catalogVersion: catalog.version, ready: true, loadError: null });
       await this.loadFollows({ force: true });
     } catch (error) { showError(error); }
     finally { wx.stopPullDownRefresh(); }
@@ -201,7 +204,6 @@ Page({
       subscription,
       ...pageData,
     });
-    this.refreshReadiness();
     this.refreshFollowPresentation();
     if (this.pendingAfterReady) {
       const pending = this.pendingAfterReady;
@@ -215,7 +217,7 @@ Page({
     const generation = this.followReadGeneration || 0;
     const pending = getFollows(options).then(data => {
       if (generation !== (this.followReadGeneration || 0)) return;
-      this.setData({ follows: data.follows.filter(f => f.status !== 'removed').map(f => presentFollow(f, this.data.boot || {}, this.catalog || this.data.catalog, this.data.collector)), followsLoaded: true, limits: data.limits, loadError: null, refreshError: null, refreshedText: fmt.fmtTime(Date.now()) });
+      this.setData({ follows: data.follows.filter(f => f.status !== 'removed').map(f => presentFollow(f, this.data.boot || {}, this.catalog, this.data.collector)), followsLoaded: true, limits: data.limits, loadError: null, refreshError: null, refreshedText: fmt.fmtTime(Date.now()) });
       this.refreshReadiness();
       this.consumePendingFocus();
     });
@@ -232,7 +234,7 @@ Page({
   refreshFollowPresentation() {
     this.refreshReadiness();
     if (!this.data.follows.length) return;
-    this.setData({ follows: this.data.follows.map(f => presentFollow(f, this.data.boot || {}, this.catalog || this.data.catalog, this.data.collector)) });
+    this.setData({ follows: this.data.follows.map(f => presentFollow(f, this.data.boot || {}, this.catalog, this.data.collector)) });
   },
 
   refreshReadiness() {
@@ -269,6 +271,7 @@ Page({
 
   async onRefreshStatus() {
     if (this.data.refreshing) return;
+    topUpReminderCredit();
     this.setData({ refreshing: true });
     try { this.applyBoot(await getBootstrap({ force: true })); await this.loadFollows({ force: true }); }
     catch (error) { this.setData({ refreshError: '刷新失败，已保留上次状态。请稍后重试。' }); showError(error); }
@@ -281,7 +284,7 @@ Page({
 
   onServiceDetails() {
     const { collector, delivery } = this.data;
-    wx.showModal({ title: '检测与消息服务', content: `${collector.label}\n${collector.detail}${collector.updatedText ? '\n最近状态：' + collector.updatedText : ''}${collector.batchText ? '\n最近检测：' + collector.batchText : ''}\n\n${delivery.label}\n${delivery.detail}\n\n页面每 15 秒读取已有观测，不代表后台每 15 秒检测库存。`, showCancel: false });
+    wx.showModal({ title: '检测与消息服务', content: `${collector.label}\n${collector.detail}${collector.updatedText ? '\n最近状态：' + collector.updatedText : ''}${collector.batchText ? '\n最近检测：' + collector.batchText : ''}\n\n${delivery.label}\n${delivery.detail}\n\n页面约每分钟读取一次已有观测，跟随后台检测节奏；读取本身不会检测库存。`, showCancel: false });
   },
 
   openEditor({ followId, pickerValue, isNew }) {
@@ -295,8 +298,8 @@ Page({
   showMemberModal() {
     const product = this.data.boot.memberProduct || {};
     wx.showModal({
-      title: '关注提醒为会员功能',
-      content: `会员可关注 3 个具体配置，每个配置最多 3 家门店。不同容量或颜色分别占用一个关注名额。${product.paymentReady ? '' : '\n\n会员购买暂未开放，可在「我的」查看状态。'}`,
+      title: '关注与到货提醒为会员专属',
+      content: `会员可关注 3 个具体配置，每个配置最多 3 家门店，并可累加到货提醒次数。不同容量或颜色分别占用一个关注名额。${product.paymentReady ? '' : '\n\n会员购买暂未开放，可在「我的」查看状态。'}`,
       confirmText: '前往我的',
       success: r => { if (r.confirm) wx.switchTab({ url: '/pages/mine/index' }); },
     });
@@ -328,6 +331,7 @@ Page({
     if (!selection || !selection.partNumber) return toast('请选择具体配置');
     if (!selection.product || !selection.product.supported) return toast('此配置暂未开放监测');
     if (!selection.storeNumbers.length) return toast('请至少选择一家门店');
+    const toppedUp = topUpReminderCredit();
     this.setData({ saving: true });
     try {
       await call('follow.upsert', { followId: editor.followId, partNumber: selection.partNumber, storeNumbers: selection.storeNumbers });
@@ -337,7 +341,7 @@ Page({
       invalidateBootstrap();
       refreshBootstrap().catch(() => {});
       toast(editor.isNew ? '已加入关注' : '已更新', 'success');
-      if (editor.isNew && this.data.subscription.credits === 0) this.promptSubscribe();
+      if (editor.isNew && !toppedUp && this.data.subscription.credits === 0) this.promptSubscribe();
     } catch (error) {
       showError(error);
     } finally {
@@ -349,8 +353,8 @@ Page({
     if (!this.data.boot.templateIds.length || this.data.delivery.cls !== 'ok') return;
     wx.showModal({
       title: '开启补货提醒',
-      content: '微信订阅消息每授权一次只能发送一条提醒。建议现在授权，收到提醒后再次授权即可继续接收。',
-      confirmText: '去授权',
+      content: '每点一次「允许」增加 1 次到货提醒，可以连续授权多次累加；勾选「总是保持以上选择」后，平时点查询、刷新时会自动补充。',
+      confirmText: '增加提醒次数',
       success: r => { if (r.confirm) this.onSubscribe(); },
     });
   },
@@ -358,14 +362,15 @@ Page({
   async onSubscribe() {
     if (this.data.subscribing) return;
     if (!this.data.boot) return toast('正在读取账户，请稍后再试');
-    let saved;
-    try { saved = wx.getStorageSync(localKey(SUBSCRIPTION_PENDING_KEY)); } catch (e) { /* ignore */ }
-    if (saved) return this.flushSubscription(saved);
     const tmplIds = this.data.boot.templateIds;
     if (!tmplIds.length) {
-      wx.showModal({ title: '提醒暂未开放', content: this.data.boot.notificationReason || '尚未配置可用的订阅消息模板。可在关注页查看已有观测，页面可见时每 15 秒刷新。', showCancel: false });
+      wx.showModal({ title: '提醒暂未开放', content: this.data.boot.notificationReason || '尚未配置可用的订阅消息模板。可在关注页查看已有观测，页面可见时约每分钟刷新。', showCancel: false });
       return;
     }
+    // Reminders are member-only; a saved request waits until membership is active.
+    if (!this.data.boot.member) return this.showMemberModal();
+    const saved = readPending();
+    if (saved) return this.flushSubscription(saved);
     // User consent can be recorded before the sending service is ready. The
     // separate readiness status still gates actual delivery on the server.
     let res;
@@ -382,7 +387,7 @@ Page({
     const results = {};
     for (const id of tmplIds) if (res[id]) results[id] = res[id];
     const pending = { requestId, results };
-    try { wx.setStorageSync(localKey(SUBSCRIPTION_PENDING_KEY), pending); } catch (e) { /* kept in local call */ }
+    savePending(pending);
     this.setData({ subscriptionPending: true });
     this.refreshReadiness();
     return this.flushSubscription(pending);
@@ -394,32 +399,42 @@ Page({
       const data = await call('notify.recordSubscription', pending);
       const restockId = this.data.boot.templateIds[0];
       const credits = restockSubscription({ templateIds: { restock: restockId } }, data.subscriptions).credits;
-      try { wx.removeStorageSync(localKey(SUBSCRIPTION_PENDING_KEY)); } catch (e) { /* ignore */ }
+      clearPending();
       this.setData({ 'subscription.credits': credits, subscriptionPending: false });
+      publishSubscriptions(data.subscriptions);
       this.refreshReadiness();
       const result = pending.results && pending.results[restockId];
       if (result === 'accept') {
-        toast(this.data.delivery.cls === 'ok' ? `授权已同步，剩余 ${credits} 次` : `已记录 ${credits} 次授权，服务准备中`);
+        toast(this.data.delivery.cls === 'ok' ? `提醒次数 +1，剩余 ${credits} 次` : `已记录，剩余 ${credits} 次提醒，服务准备中`);
       } else {
         toast(result === 'ban' ? '微信授权已关闭，本次未增加' : '本次未授权，次数未增加');
       }
       refreshBootstrap().catch(() => {});
     } catch (error) {
-      if (['invalid_subscription_result', 'invalid_request_id', 'invalid_payload'].includes(error.code)) {
+      if (FINAL_ERRORS.includes(error.code)) {
         // A template may change while a previously authorized result is queued.
         // Only a definitive rejection releases the pending request; uncertain
         // network failures must retain its ID to avoid double crediting.
-        try { wx.removeStorageSync(localKey(SUBSCRIPTION_PENDING_KEY)); } catch (e) { /* ignore */ }
+        clearPending();
         this.setData({ subscriptionPending: false });
         try { this.applyBoot(await getBootstrap({ force: true })); } catch (e) { /* retry on the next refresh */ }
-        toast('授权记录已失效，请重新点击授权');
+        if (error.code === 'membership_required') this.showMemberModal();
+        else toast('授权记录已失效，请重新点击授权');
         return;
       }
       showError(error);
     } finally {
       this.setData({ subscribing: false });
       this.refreshReadiness();
+      // The prompt may have just set "总是保持以上选择", which enables silent top-ups.
+      refreshConsentSetting();
     }
+  },
+
+  applyCredits(subscriptions) {
+    if (!this.data.boot || !this.data.boot.templateIds.length) return;
+    const credits = restockSubscription({ templateIds: { restock: this.data.boot.templateIds[0] } }, subscriptions).credits;
+    if (credits !== this.data.subscription.credits) { this.setData({ 'subscription.credits': credits }); this.refreshReadiness(); }
   },
 
   async onToggle(e) {

@@ -1,7 +1,6 @@
 {
   "navigationBarTitleText": "果小哨 · 实时查询",
   "enablePullDownRefresh": true,
-  "menus": ["shareAppMessage", "shareTimeline"],
   "usingComponents": {
     "target-picker": "/components/target-picker/index"
   }

@@ -26,7 +26,7 @@ test('a configured template can be authorized by a tap before sending is enabled
     rt.wx.requestSubscribeMessage = async options => { prompts++; assert.deepEqual(copy(options.tmplIds), ['restock-A']); return { 'restock-A': 'accept' }; };
     const page = pageFor(rt, data);
     assert.equal(prompts, 0); assert.equal(rt.calls.length, 0);
-    assert.match(page.data.readiness.detail, /可先点击下方「授权提醒」/);
+    assert.match(page.data.readiness.detail, /可先点击下方「增加提醒次数」/);
     await page.onSubscribe();
     assert.equal(prompts, 1, reason);
     const requests = rt.calls.filter(call => call.action === 'notify.recordSubscription');
@@ -37,8 +37,8 @@ test('a configured template can be authorized by a tap before sending is enabled
     assert.equal(page.data.delivery.cls, 'warn');
     assert.equal(page.data.readiness.code, 'delivery_unready');
     assert.equal(page.data.readiness.ready, false);
-    assert.match(page.data.readiness.detail, /已记录的授权会保留/);
-    assert.equal(rt.messages.at(-1), '已记录 1 次授权，服务准备中');
+    assert.match(page.data.readiness.detail, /已记录的 1 次提醒会保留/);
+    assert.equal(rt.messages.at(-1), '已记录，剩余 1 次提醒，服务准备中');
   }
 });
 
@@ -48,7 +48,7 @@ test('a ready sender confirms recorded authorization without promising delivery'
   const page = pageFor(rt, data);
   await page.onSubscribe();
   assert.equal(page.data.subscription.credits, 1);
-  assert.equal(rt.messages.at(-1), '授权已同步，剩余 1 次');
+  assert.equal(rt.messages.at(-1), '提醒次数 +1，剩余 1 次');
   assert.doesNotMatch(rt.messages.at(-1), /可接收|送达|已发送/);
 });
 
@@ -72,7 +72,7 @@ test('declining or banning the current prompt never claims that existing credits
     assert.equal(page.data.subscriptionPending, false);
     assert.equal(rt.calls.find(call => call.action === 'notify.recordSubscription').payload.results['restock-A'], result);
     assert.match(rt.messages.at(-1), /本次未|次数未增加/);
-    assert.doesNotMatch(rt.messages.at(-1), /授权已同步|已记录|可接收/);
+    assert.doesNotMatch(rt.messages.at(-1), /提醒次数 +1|已记录|可接收/);
   }
 });
 

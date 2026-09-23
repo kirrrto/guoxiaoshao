@@ -198,3 +198,19 @@ view, text, button, input, textarea, image, scroll-view, picker { box-sizing: bo
 .benefit-list > view { padding: 12rpx 0; border-bottom: 1rpx solid var(--line); }
 .benefit-list > view:last-child { border-bottom: 0; }
 .onboarding { background: rgba(231, 248, 238, 0.82); }
+
+/* Dark mode: color-only overrides for the light surfaces above. */
+@media (prefers-color-scheme: dark) {
+  .card { background-image: linear-gradient(145deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0)); box-shadow: inset 0 1rpx 0 rgba(255, 255, 255, 0.05), var(--shadow-soft); }
+  .btn-outline { background: rgba(255, 255, 255, 0.04); }
+  .btn-ghost, .chip.on, .empty-symbol { box-shadow: none; }
+  .btn-primary.disabled, .btn-primary[disabled], .btn[disabled] { background: #22322B; color: #7F958A; }
+  .pill-muted, .pill-unknown, .chip, .segments, .scroll-tabs .tab { background: rgba(255, 255, 255, 0.07); }
+  .pill-unknown { color: var(--text-2); }
+  .segment.on { background: #22322B; }
+  .banner { border-color: rgba(255, 255, 255, 0.06); }
+  .banner-warn, .stale-note { color: var(--warn); }
+  .product-image-box, .follow-image, .result-image { background: var(--image-tile); }
+  .result-image { border-radius: 20rpx; }
+  .result-image-wrap, .onboarding { background: var(--surface-soft); }
+}

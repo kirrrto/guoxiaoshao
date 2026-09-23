@@ -1,10 +1,12 @@
 const { call, newId, showError, toast } = require('../../utils/api');
-const { getBootstrap, getCatalog, invalidateBootstrap, toViewCatalog, subscribeCatalog, getFollows } = require('../../utils/store');
+const { getBootstrap, getCatalog, invalidateBootstrap, subscribeCatalog, getFollows } = require('../../utils/store');
 const fmt = require('../../utils/format');
 const { localKey } = require('../../utils/local-key');
 const operation = require('../../utils/operation');
 const { syncTabBar } = require('../../utils/tab-bar');
 const { shareAppMessage, shareTimeline } = require('../../utils/share');
+const { monitorPollDelay } = require('../../utils/poll');
+const { topUpReminderCredit } = require('../../utils/reminder-credits');
 
 const SELECTION_KEY = 'gxs_query_selection_v1';
 const RESULT_KEY = 'gxs_query_result_v1';
@@ -55,8 +57,6 @@ function presentResults(response, catalog) {
   });
 }
 
-const FOLLOW_POLL_MS = 15000;
-
 function presentFollowTargets(follows) {
   const now = Date.now();
   return follows
@@ -78,7 +78,7 @@ Page({
     accountReady: false,
     accountError: null,
     loadError: null,
-    catalog: null,
+    catalogVersion: '',
     boot: null,
     pickerValue: null,
     selection: { partNumber: null, product: null, storeNumbers: [], stores: [] },
@@ -117,7 +117,7 @@ Page({
       const restored = selectionDetails(pickerValue, catalog, 3);
       const result = cached && cached.product ? { ...cached, product: { ...cached.product, ...(catalog.productByPart[cached.product.partNumber] || {}) }, results: presentResults(cached, catalog), queriedText: fmt.fmtDateTime(cached.queriedAt) } : null;
       this.setData({
-        catalog: toViewCatalog(catalog),
+        catalogVersion: catalog.version,
         ready: true,
         pickerValue,
         selection,
@@ -179,7 +179,7 @@ Page({
     // Re-evaluate a saved observation locally. Reading it must never perform
     // another charged query or replace its original observation timestamp.
     if (this.querySnapshot && this.data.result) {
-      this.setData({ 'result.results': presentResults(this.querySnapshot, this.catalog || this.data.catalog) });
+      this.setData({ 'result.results': presentResults(this.querySnapshot, this.catalog) });
     }
   },
 
@@ -194,7 +194,7 @@ Page({
       if (!boot || !boot.member || !boot.followCount) {
         this.followSnapshot = null;
         if (this.data.followTargets.length) this.setData({ followTargets: [] });
-        this.followTimer = setTimeout(tick, FOLLOW_POLL_MS);
+        this.followTimer = setTimeout(tick, monitorPollDelay(this.data.collector));
         return;
       }
       if (this.followSnapshot) this.setData({ followTargets: presentFollowTargets(this.followSnapshot) });
@@ -205,7 +205,7 @@ Page({
           this.setData({ followTargets: presentFollowTargets(data.follows), followRefreshedText: fmt.fmtTime(Date.now()), followRefreshError: false });
         }
       } catch (e) { if (this.visible && epoch === this.followEpoch) this.setData({ followRefreshError: true }); }
-      if (this.visible && epoch === this.followEpoch) this.followTimer = setTimeout(tick, FOLLOW_POLL_MS);
+      if (this.visible && epoch === this.followEpoch) this.followTimer = setTimeout(tick, monitorPollDelay(this.data.collector));
     };
     tick();
   },
@@ -248,7 +248,7 @@ Page({
     this.catalog = catalog;
     if (!this.data.ready) return;
     const patch = this.selectionView(this.data.selection);
-    if (!this.data.catalog || this.data.catalog.version !== catalog.version) patch.catalog = toViewCatalog(catalog);
+    if (this.data.catalogVersion !== catalog.version) patch.catalogVersion = catalog.version;
     this.setData(patch);
   },
 
@@ -269,7 +269,7 @@ Page({
   },
 
   selectionView(selection, maxStores = this.data.boot ? this.data.boot.maxStores : 3) {
-    const details = selectionDetails(selection, this.catalog || this.data.catalog, maxStores || 3);
+    const details = selectionDetails(selection, this.catalog, maxStores || 3);
     return {
       selectionCanCollapse: details.valid,
       selectionSummary: details.summary,
@@ -318,12 +318,15 @@ Page({
   },
 
   async onQuery() {
+    // Must run inside the tap, before any await (WeChat gesture rule).
+    topUpReminderCredit();
     return this.performQuery(this.data.selection);
   },
 
   onRequery() {
     const result = this.data.result;
     if (!result) return;
+    topUpReminderCredit();
     return this.performQuery({ partNumber: result.product.partNumber, product: result.product, storeNumbers: result.results.map(r => r.storeNumber) });
   },
 
@@ -350,7 +353,7 @@ Page({
         this.setData({ restriction: fmt.reasonText(response.reason), 'boot.balance': response.balance });
         return;
       }
-      const catalog = this.catalog || this.data.catalog;
+      const catalog = this.catalog;
       const product = { ...(selection.product || {}), ...(response.product || {}), ...((catalog.productByPart || {})[response.product ? response.product.partNumber : selection.partNumber] || {}) };
       const result = { ...response, product, results: presentResults(response, catalog), queriedText: fmt.fmtDateTime(response.queriedAt) };
       this.querySnapshot = response;

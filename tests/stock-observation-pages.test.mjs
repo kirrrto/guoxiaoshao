@@ -27,7 +27,7 @@ async function historyLatest(latest, extra = {}, handler) {
       pagination: { total: 0, hasMore: false, nextCursor: null }, ...extra };
   });
   const page = rt.instance('pages/history/index.js');
-  Object.assign(page.data, { ready: true, boot: { member: true }, catalog: { storeByNumber: {} },
+  page.catalog = { storeByNumber: {} }; Object.assign(page.data, { ready: true, boot: { member: true },
     selection: { partNumber: 'SKU-A', storeNumbers: ['R001'] } });
   await page.onQuery();
   assert.ok(page.data.result, 'history query must complete');
