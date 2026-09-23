@@ -132,9 +132,16 @@ function validateConfig(config) {
   if (config.notifications.enabled && !templates.restock) invalid('notifications.templateIds.restock');
   if (typeof config.notifications.templateTitle !== 'string' || config.notifications.templateTitle.length > 50 || /[\x00-\x1f\x7f]/.test(config.notifications.templateTitle)) invalid('notifications.templateTitle');
   if (!['stock_status', 'watch_item'].includes(config.notifications.contentMode)) invalid('notifications.contentMode');
+  // Product, store and time are required; status and quantity are optional (null omits them).
   const fields = config.notifications.templateFields;
-  if (!fields || ['product', 'store'].some(key => !/^thing\d+$/.test(fields[key])) || !/^(thing|phrase)\d+$/.test(fields.status) || !/^time\d+$/.test(fields.time) || new Set(Object.values(fields)).size !== 4) invalid('notifications.templateFields');
-  if (config.notifications.contentMode === 'watch_item' && !/^thing\d+$/.test(fields.status)) invalid('notifications.templateFields.status');
+  const optional = (key, pattern) => fields[key] === null || fields[key] === undefined || pattern.test(fields[key]);
+  const used = fields ? Object.values(fields).filter(Boolean) : [];
+  if (!fields || Object.keys(fields).some(key => !['product', 'store', 'time', 'status', 'quantity'].includes(key))
+    || ['product', 'store'].some(key => !/^thing\d+$/.test(fields[key])) || !/^(time|date)\d+$/.test(fields.time)
+    || !optional('status', /^(thing|phrase)\d+$/) || new Set(used).size !== used.length) invalid('notifications.templateFields');
+  // Apple publishes availability, not quantities: only a text field can say "in stock" truthfully.
+  if (!optional('quantity', /^(thing|phrase)\d+$/)) invalid('notifications.templateFields.quantity');
+  if (config.notifications.contentMode === 'watch_item' && fields.status && !/^thing\d+$/.test(fields.status)) invalid('notifications.templateFields.status');
   if (!Array.isArray(config.tasks) || config.tasks.length > 20 || new Set(config.tasks.map(t => t && t.id)).size !== config.tasks.length) invalid('tasks');
   for (const task of config.tasks) {
     if (!task || task.id !== 'view_history') invalid('tasks.id');

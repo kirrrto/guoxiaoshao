@@ -81,18 +81,23 @@ function buildMessage(task, config) {
   const wording = { first_seen_available: '发现可取货', restock_confirmed: '确认补货', recovered_available: '恢复可取货' }[task.eventType] || '可取货';
   const fields = { product: 'thing1', store: 'thing2', time: 'time3', status: 'thing4', ...(config.notifications.templateFields || {}) };
   const page = config.notifications.page || 'pages/follow/index';
+  const values = {
+    product: compactProduct(task),
+    store: clip(task.storeName || task.storeNumber, 20),
+    time: `${beijing.getUTCFullYear()}年${beijing.getUTCMonth() + 1}月${beijing.getUTCDate()}日 ${hh}:${mm}:${ss}`,
+    // Template 524 calls this slot "预约项目". Describe the real watch item,
+    // without fabricating an order, reservation or a successful purchase.
+    status: config.notifications.contentMode === 'watch_item' ? '商品到货关注' : wording,
+    // "到货数量": Apple shows that a store can hand one over today, never how many.
+    quantity: fields.quantity && fields.quantity.startsWith('phrase') ? '有现货' : '有现货，具体数量以门店为准',
+  };
+  const data = {};
+  for (const [slot, key] of Object.entries(fields)) if (key) data[key] = { value: values[slot] };
   return {
     templateId: task.templateId,
     // The follow page reads this alert back by event ID, scoped to the account that opens it.
     page: task.eventId ? `${page}${page.includes('?') ? '&' : '?'}eid=${encodeURIComponent(task.eventId)}` : page,
-    data: {
-      [fields.product]: { value: compactProduct(task) },
-      [fields.store]: { value: clip(task.storeName || task.storeNumber, 20) },
-      [fields.time]: { value: `${beijing.getUTCFullYear()}年${beijing.getUTCMonth() + 1}月${beijing.getUTCDate()}日 ${hh}:${mm}:${ss}` },
-      // Template 524 calls this slot "预约项目". Describe the real watch item,
-      // without fabricating an order, reservation or a successful purchase.
-      [fields.status]: { value: config.notifications.contentMode === 'watch_item' ? '商品到货关注' : wording },
-    },
+    data,
   };
 }
 

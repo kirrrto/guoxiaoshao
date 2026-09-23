@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
-import { createFixture, userKeyOf } from './helpers/fixture.mjs';
+import { createFixture, userKeyOf, operatorContext } from './helpers/fixture.mjs';
 
 const require = createRequire(import.meta.url);
 const { mergeConfig, validateConfig, isValidTemplateId } = require('../cloudfunctions/gxs_api/lib/config');
@@ -100,4 +100,32 @@ test('delayed refusal preserves concurrent new consent and never restores an inv
   await s.invalidate('new');
   await s.invalidate('b');
   assert.equal((await s.subscription()).credits, 1);
+});
+
+test('a 商品到货提醒 template says "in stock" for 到货数量 and drops the unused status slot', async () => {
+  const ARRIVAL = 'qcfmYZuvfallzFUAVrEaRlmop3kvhoM4Bl4ewpAqjag';
+  // Field numbers here are examples; the real ones come from the template's 详情 page.
+  const fields = { product: 'thing1', time: 'time2', quantity: 'thing3', store: 'thing4', status: null };
+  const arrival = mergeConfig({ notifications: { enabled: true, templateIds: { restock: ARRIVAL }, templateTitle: '商品到货提醒', templateFields: fields } });
+  validateConfig(arrival);
+  const message = buildMessage({ templateId: ARRIVAL, productTitle: 'iPhone 18 Pro Max 512GB 冰川蓝色', storeName: '天环广场', eventType: 'restock_confirmed', detectedAt: '2026-09-19T16:00:01Z' }, arrival);
+  assert.deepEqual(Object.keys(message.data).sort(), ['thing1', 'thing3', 'thing4', 'time2']);
+  assert.equal(message.data.thing3.value, '有现货，具体数量以门店为准');
+  assert.equal(message.data.thing4.value, '天环广场');
+  const phrase = mergeConfig({ notifications: { templateFields: { ...fields, quantity: 'phrase3' } } });
+  validateConfig(phrase);
+  assert.equal(buildMessage({ detectedAt: '2026-09-19T16:00:01Z' }, phrase).data.phrase3.value, '有现货');
+  validateConfig(mergeConfig({ notifications: { templateFields: { ...fields, time: 'date2' } } }));
+  // Apple never publishes a count, so a numeric 到货数量 cannot be filled truthfully.
+  for (const quantity of ['number3', 'character_string3', 'amount3']) {
+    assert.throws(() => validateConfig(mergeConfig({ notifications: { templateFields: { ...fields, quantity } } })), /templateFields\.quantity/);
+  }
+  assert.throws(() => validateConfig(mergeConfig({ notifications: { templateFields: { ...fields, remark: 'thing5' } } })), /templateFields/);
+  assert.throws(() => validateConfig(mergeConfig({ notifications: { templateFields: { ...fields, quantity: 'thing1' } } })), /templateFields/);
+
+  // Switching from template 524 on a stored runtime clears its old status field.
+  const f = createFixture({ config });
+  const saved = await f.call('admin.updateConfig', { patch: { notifications: { templateIds: { restock: ARRIVAL }, templateTitle: '商品到货提醒', contentMode: 'stock_status', templateFields: fields } } }, operatorContext());
+  assert.equal(saved.ok, true, JSON.stringify(saved.error));
+  assert.deepEqual(mergeConfig(await f.repo.getConfig()).notifications.templateFields, fields);
 });

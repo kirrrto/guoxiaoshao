@@ -32,8 +32,8 @@
     },
     {
       "path": "config.js",
-      "bytes": 10067,
-      "sha256": "226f048907bedaa6b761a64aa12e2305e0b2485a9f2b7c8c772ea82e05ec594e"
+      "bytes": 10676,
+      "sha256": "d707ea01893af89fc29b7d9208b8bd49d9cae6de8ff11e7f1985dc2e176e3b77"
     },
     {
       "path": "connection.js",
@@ -62,8 +62,8 @@
     },
     {
       "path": "engine/notifier.js",
-      "bytes": 10725,
-      "sha256": "23414c8525b4709a09ca78e8aaf9321412dccc3e61458ea8d05c55f48ef15eee"
+      "bytes": 10983,
+      "sha256": "0801f99463d66f96ae9fcec2f87db2c62db1f5e71db3ca96ff9e0912af5db18e"
     },
     {
       "path": "engine/observation-day.js",
