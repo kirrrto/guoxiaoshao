@@ -48,14 +48,34 @@ function membershipSnapshot(user, now) {
  * existing follows (excluding the one being edited), `candidate` is the new
  * or edited follow. Returns { ok, reason }.
  */
-function validateFollowLimits(follows, candidate) {
+function validateFollowLimits(follows, candidate, maxFollows = LIMITS.maxFollows) {
   const stores = Array.isArray(candidate.storeNumbers) ? [...new Set(candidate.storeNumbers)] : [];
   if (stores.length === 0) return { ok: false, reason: 'no_stores' };
   if (stores.length > LIMITS.maxStoresPerFollow) return { ok: false, reason: 'too_many_stores' };
   if (!candidate.partNumber) return { ok: false, reason: 'no_part_number' };
   if (follows.some(follow => follow.partNumber === candidate.partNumber)) return { ok: false, reason: 'duplicate_part_number' };
-  if (follows.length >= LIMITS.maxFollows) return { ok: false, reason: 'too_many_follows' };
+  if (follows.length >= maxFollows) return { ok: false, reason: 'too_many_follows' };
   return { ok: true, reason: null, storeNumbers: stores };
 }
 
-module.exports = { LIMITS, isMember, extendMembership, membershipSnapshot, membershipExpiresAt, validateFollowLimits };
+/**
+ * Every account gets one free restock alert. It is used up by the first alert
+ * ever sent to the account, as a member or not, so it is a new-user benefit.
+ * A trial account may keep one follow.
+ */
+const FREE_REMINDER_FOLLOWS = 1;
+function hasFreeReminder(user, now) {
+  return Boolean(user) && !isMember(user, now) && !user.firstReminderSentAt;
+}
+
+/** Members and accounts with their free alert unused may follow and be alerted. */
+function canUseReminders(user, now) {
+  return isMember(user, now) || hasFreeReminder(user, now);
+}
+
+/** Why an account cannot be alerted: an expired membership or a used free alert. */
+function reminderBlockReason(user) {
+  return user && user.membership && user.membership.expiresAt ? 'member_expired' : 'free_reminder_used';
+}
+
+module.exports = { LIMITS, FREE_REMINDER_FOLLOWS, isMember, hasFreeReminder, canUseReminders, reminderBlockReason, extendMembership, membershipSnapshot, membershipExpiresAt, validateFollowLimits };

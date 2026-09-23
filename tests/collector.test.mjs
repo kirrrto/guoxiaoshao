@@ -27,7 +27,8 @@ function setup({ collectorEnabled = true, notificationsEnabled = true } = {}) {
       member('B', 'openid-B'),
       member('C', 'openid-C', { settings: { notifyEnabled: true, dnd: { enabled: true, startMinute: 9 * 60, endMinute: 11 * 60 } } }),
       member('D', 'openid-D', { subscriptions: {} }),
-      member('E', 'openid-E', { membership: { expiresAt: '2026-09-01T00:00:00.000Z' } }),
+      // Expired and already alerted once, so the free alert does not apply.
+      member('E', 'openid-E', { membership: { expiresAt: '2026-09-01T00:00:00.000Z' }, firstReminderSentAt: '2026-08-20T00:00:00.000Z' }),
     ],
     [COLLECTIONS.follows]: [
       follow('f1', 'A', 'MJYH4CH/A', ['R577', 'R639']),
@@ -139,7 +140,7 @@ test('collector switch off empties the target set without touching follows', asy
 
 test('notifier explains every skipped delivery and never sends when notifications are disabled', () => {
   const now = new Date(T0);
-  const users = new Map([['A', member('A', 'openid-A')], ['E', member('E', 'openid-E', { membership: { expiresAt: '2026-09-01T00:00:00.000Z' } })]]);
+  const users = new Map([['A', member('A', 'openid-A')], ['E', member('E', 'openid-E', { membership: { expiresAt: '2026-09-01T00:00:00.000Z' }, firstReminderSentAt: '2026-08-20T00:00:00.000Z' })]]);
   const follows = [follow('f1', 'A', 'MJYH4CH/A', ['R577']), follow('f1b', 'A', 'MJYH4CH/A', ['R577', 'R639']), follow('f7', 'E', 'MJYH4CH/A', ['R577'])];
   const event = { _id: 'R577|MJYH4CH/A|restock_confirmed|' + T0, type: 'restock_confirmed', partNumber: 'MJYH4CH/A', storeNumber: 'R577', storeName: '天环广场', productTitle: 'iPhone 18 Pro Max 1TB 勃艮第酒红色', detectedAt: T0 };
   const config = { notifications: { enabled: true, templateIds: { restock: 'TPL_RESTOCK' } } };

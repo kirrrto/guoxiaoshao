@@ -11,7 +11,7 @@
  * the worker passes the sender authenticated for the consumer mini program.
  */
 const { NOTIFIABLE_TYPES } = require('./events');
-const { isMember } = require('../rules/membership');
+const { canUseReminders, reminderBlockReason } = require('../rules/membership');
 const { inMinuteWindow } = require('../time');
 const { isValidTemplateId } = require('../config');
 
@@ -46,7 +46,7 @@ function buildTasks({ events, follows, users, config, now }) {
       if (!config.notifications.enabled) { skip('notifications_disabled'); continue; }
       if (!isValidTemplateId(templateId)) { skip('template_missing'); continue; }
       if (!user) { skip('user_missing'); continue; }
-      if (!isMember(user, now)) { skip('member_expired'); continue; }
+      if (!canUseReminders(user, now)) { skip(reminderBlockReason(user)); continue; }
       if (follow.status !== 'active') { skip('follow_not_active'); continue; }
       if (user.settings && user.settings.notifyEnabled === false) { skip('user_disabled'); continue; }
       const dnd = user.settings && user.settings.dnd;
@@ -80,9 +80,11 @@ function buildMessage(task, config) {
   const ss = String(beijing.getUTCSeconds()).padStart(2, '0');
   const wording = { first_seen_available: '发现可取货', restock_confirmed: '确认补货', recovered_available: '恢复可取货' }[task.eventType] || '可取货';
   const fields = { product: 'thing1', store: 'thing2', time: 'time3', status: 'thing4', ...(config.notifications.templateFields || {}) };
+  const page = config.notifications.page || 'pages/follow/index';
   return {
     templateId: task.templateId,
-    page: (config.notifications.page || 'pages/follow/index'),
+    // The follow page reads this alert back by event ID, scoped to the account that opens it.
+    page: task.eventId ? `${page}${page.includes('?') ? '&' : '?'}eid=${encodeURIComponent(task.eventId)}` : page,
     data: {
       [fields.product]: { value: compactProduct(task) },
       [fields.store]: { value: clip(task.storeName || task.storeNumber, 20) },
@@ -105,7 +107,8 @@ function skipReason({ task, user, follow, config, now, senderAppid }) {
   const settings = user && user.settings;
   if (!config.notifications.enabled) return 'notifications_disabled';
   if (!isValidTemplateId(task.templateId) || config.notifications.templateIds.restock !== task.templateId) return 'template_changed';
-  if (!user || !isMember(user, now)) return 'member_expired';
+  if (!user) return 'member_expired';
+  if (!canUseReminders(user, now)) return reminderBlockReason(user);
   if (senderAppid && user.appid !== senderAppid) return 'consumer_appid_mismatch';
   if (!user.openid) return 'openid_missing';
   if (!follow || follow.status !== 'active' || follow.userKey !== task.userKey || follow.partNumber !== task.partNumber || !follow.storeNumbers.includes(task.storeNumber)) return 'follow_not_active';
@@ -148,6 +151,8 @@ async function sendTask({ task, config, sendImpl, repo, now, ownerId = 'notifier
     // adapter explicitly proving the send never started can release the credit.
     outcome = { status: error && error.definitelyNotSent ? TASK_STATUS.failed : TASK_STATUS.uncertain, reason: error && error.code || 'send_transport_error' };
   }
+  // A possibly delivered alert counts as the account's first; a failure frees the trial lock.
+  await repo.settleFirstReminder({ userKey: task.userKey, taskId: task._id, sent: outcome.status !== TASK_STATUS.failed, now: clock().toISOString() });
   if (outcome.status === TASK_STATUS.failed) {
     const creditAction = outcome.reason === 'subscription_authorization_expired' ? repo.invalidateSubscriptionCredit : repo.releaseSubscriptionCredit;
     await creditAction({ userKey: task.userKey, templateId: task.templateId, taskId: task._id, now: clock().toISOString() });

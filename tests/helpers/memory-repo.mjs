@@ -149,6 +149,8 @@ export function createMemoryRepo(seed = {}) {
     },
     async saveOrder(order) { put(COLLECTIONS.orders, order); },
     async listOrders(userKey, limit) { return all(COLLECTIONS.orders).filter(o => o.userKey === userKey).sort(byDesc('createdAt')).slice(0, limit || 20); },
+    async getNotification(id) { return get(COLLECTIONS.notifications, id); },
+    async listSince(collection, field, since, limit = Infinity) { return all(collection).filter(doc => doc[field] >= since).sort(byDesc(field)).slice(0, limit); },
     async updateNotification(id, patch) {
       const current = table(COLLECTIONS.notifications).get(id);
       if (!current) throw new Error('notification_missing');
@@ -180,7 +182,6 @@ export function createMemoryRepo(seed = {}) {
         for (const [id, doc] of table(collection)) if (expired(doc)) { table(collection).delete(id); removed[name] += 1; }
       };
       drop('events', COLLECTIONS.events, doc => doc.dayKey < firstDay);
-      drop('observationDays', COLLECTIONS.observationDays, doc => doc.dayKey < firstDay);
       drop('queries', COLLECTIONS.queries, doc => doc.createdAt < cutoffIso && doc.status !== 'pending');
       drop('notifications', COLLECTIONS.notifications, doc => doc.createdAt < cutoffIso && !['pending', 'sending'].includes(doc.status));
       drop('targetHealth', COLLECTIONS.health, doc => doc.recordedAt < cutoffIso);

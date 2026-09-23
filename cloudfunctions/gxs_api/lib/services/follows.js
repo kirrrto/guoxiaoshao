@@ -1,49 +1,58 @@
 'use strict';
 const { ApiError } = require('../errors');
-const { isMember, validateFollowLimits, LIMITS } = require('../rules/membership');
+const { isMember, canUseReminders, hasFreeReminder, validateFollowLimits, LIMITS, FREE_REMINDER_FOLLOWS } = require('../rules/membership');
 const { isLiveRestricted } = require('../rules/new-product');
 const { targetKeyOf } = require('../engine/events');
 const { ensureUser } = require('./users');
 
 const ID_PATTERN = /^[A-Za-z0-9_-]{8,64}$/;
 
-function present(follow, latestByKey, storesByNumber, product, ctx, member = true) {
+// `member` gates restricted live inventory; `active` (member or unused free alert) decides monitoring.
+function present(follow, latestByKey, storesByNumber, product, ctx, member = true, active = member) {
   const latestRestricted = !member && isLiveRestricted(product || { partNumber: follow.partNumber }, ctx.config.newProductWindows, ctx.now).restricted;
   return {
     followId: follow._id,
     partNumber: follow.partNumber,
     productTitle: product ? product.title : follow.productTitle || follow.partNumber,
     familyName: product ? product.familyName : null,
-    status: !member && follow.status === 'active' ? 'expired' : follow.status,
+    status: !active && follow.status === 'active' ? 'expired' : follow.status,
     savedStatus: follow.status,
-    statusReason: !member && follow.status === 'active' ? 'membership_expired' : follow.statusReason || null,
+    statusReason: !active && follow.status === 'active' ? 'membership_expired' : follow.statusReason || null,
     createdAt: follow.createdAt,
     updatedAt: follow.updatedAt,
     latestRestricted,
     stores: follow.storeNumbers.map(storeNumber => {
       // Saved follow configuration survives expiry; restricted live inventory
       // must not bypass the same rule enforced by query.pickup/history.list.
-      const latest = latestRestricted ? null : latestByKey.get(targetKeyOf(storeNumber, follow.partNumber)) || null;
+      const latest = latestByKey.get(targetKeyOf(storeNumber, follow.partNumber)) || null;
       const store = storesByNumber.get(storeNumber) || null;
-      const sampleAge = latest ? ctx.now.getTime() - Date.parse(latest.knownAt || latest.observedAt) : NaN;
-      const stale = latest && (latest.unknownSince || !Number.isFinite(sampleAge) || sampleAge > ctx.config.collector.continuityGapMs);
       return {
         storeNumber,
-        storeName: store ? store.name : (latest && latest.storeName) || storeNumber,
+        storeName: store ? store.name : (!latestRestricted && latest && latest.storeName) || storeNumber,
         city: store ? store.city : null,
-        status: latestRestricted || stale ? 'unknown' : latest ? latest.status : null,
-        isStale: Boolean(stale),
-        lastKnownStatus: latest ? latest.status : null,
-        statusSince: latest ? latest.statusSince : null,
-        observedAt: latest ? latest.observedAt : null,
-        unknownSince: latest ? latest.unknownSince : null,
-        quote: latest ? latest.quote : null,
+        ...presentLatest(latest, ctx, latestRestricted),
       };
     }),
   };
 }
 
-async function decorate(ctx, follows, member = true) {
+/** One target's latest observation as pages show it; restricted or stale samples read as unknown. */
+function presentLatest(sample, ctx, restricted = false) {
+  const latest = restricted ? null : sample;
+  const sampleAge = latest ? ctx.now.getTime() - Date.parse(latest.knownAt || latest.observedAt) : NaN;
+  const stale = latest && (latest.unknownSince || !Number.isFinite(sampleAge) || sampleAge > ctx.config.collector.continuityGapMs);
+  return {
+    status: restricted || stale ? 'unknown' : latest ? latest.status : null,
+    isStale: Boolean(stale),
+    lastKnownStatus: latest ? latest.status : null,
+    statusSince: latest ? latest.statusSince : null,
+    observedAt: latest ? latest.observedAt : null,
+    unknownSince: latest ? latest.unknownSince : null,
+    quote: latest ? latest.quote : null,
+  };
+}
+
+async function decorate(ctx, follows, member = true, active = member) {
   const keys = follows.flatMap(f => f.storeNumbers.map(s => targetKeyOf(s, f.partNumber)));
   const storeNumbers = [...new Set(follows.flatMap(f => f.storeNumbers))];
   const [latest, stores, products] = await Promise.all([
@@ -54,20 +63,26 @@ async function decorate(ctx, follows, member = true) {
   const latestByKey = new Map(latest.map(l => [l._id, l]));
   const storesByNumber = new Map(stores.map(s => [s.storeNumber, s]));
   const productByPart = new Map(products.filter(Boolean).map(p => [p.partNumber, p]));
-  return follows.map(f => present(f, latestByKey, storesByNumber, productByPart.get(f.partNumber), ctx, member));
+  return follows.map(f => present(f, latestByKey, storesByNumber, productByPart.get(f.partNumber), ctx, member, active));
 }
 
 async function list(ctx) {
   const user = await ensureUser(ctx);
   const follows = await ctx.repo.listFollows(user._id);
-  const member = isMember(user, ctx.now);
-  return { member, limits: LIMITS, follows: await decorate(ctx, follows, member) };
+  const member = isMember(user, ctx.now), freeReminder = hasFreeReminder(user, ctx.now);
+  return { member, freeReminder, limits: followLimits(member), follows: await decorate(ctx, follows, member, member || freeReminder) };
 }
 
-/** Create or edit a follow. Members only; enforces 3 SKUs × 3 stores. */
+/** Members may keep 3 configurations; a free-trial account keeps 1 for its free alert. */
+function followLimits(member) {
+  return member ? LIMITS : { ...LIMITS, maxFollows: FREE_REMINDER_FOLLOWS };
+}
+
+/** Create or edit a follow. Members, or accounts with their free alert unused; 3 stores each. */
 async function upsert(ctx, payload) {
   const user = await ensureUser(ctx);
-  if (!isMember(user, ctx.now)) throw new ApiError('member_required', '关注提醒为会员功能');
+  if (!canUseReminders(user, ctx.now)) throw new ApiError('member_required', '免费体验提醒已用完，开通会员后可继续关注');
+  const member = isMember(user, ctx.now);
   const partNumber = typeof payload.partNumber === 'string' ? payload.partNumber.trim() : '';
   if (!/^[A-Z0-9]{5}CH\/A$/.test(partNumber)) throw new ApiError('invalid_part_number', '商品编号格式无效');
   const storeNumbers = Array.isArray(payload.storeNumbers) ? payload.storeNumbers.filter(s => typeof s === 'string' && /^R\d{3}$/.test(s)) : [];
@@ -83,8 +98,8 @@ async function upsert(ctx, payload) {
   const recordId = `${user._id}|${followId}`;
   const existing = follows.find(f => f._id === recordId) || null;
   const others = follows.filter(f => f._id !== recordId && f.status !== 'removed');
-  const check = validateFollowLimits(others, { partNumber, storeNumbers });
-  if (!check.ok) throw new ApiError(check.reason, followLimitMessage(check.reason));
+  const check = validateFollowLimits(others, { partNumber, storeNumbers }, followLimits(member).maxFollows);
+  if (!check.ok) throw new ApiError(check.reason, followLimitMessage(check.reason, member));
 
   const follow = {
     _id: recordId,
@@ -100,17 +115,17 @@ async function upsert(ctx, payload) {
     lastEventAt: existing ? existing.lastEventAt || null : null,
   };
   const saved = await ctx.repo.mutateFollow({ userKey: user._id, follow, nowIso: ctx.nowIso, knownFollows: follows });
-  const [decorated] = await decorate(ctx, [saved]);
+  const [decorated] = await decorate(ctx, [saved], member, true);
   return { follow: decorated };
 }
 
-function followLimitMessage(reason) {
+function followLimitMessage(reason, member = true) {
   return {
     no_stores: '请至少选择一家门店',
     too_many_stores: `每个机型最多关注 ${LIMITS.maxStoresPerFollow} 家门店`,
     no_part_number: '请选择商品',
     duplicate_part_number: '该机型已在关注列表中',
-    too_many_follows: `最多同时关注 ${LIMITS.maxFollows} 个机型`,
+    too_many_follows: member ? `最多同时关注 ${LIMITS.maxFollows} 个机型` : `免费体验可关注 ${FREE_REMINDER_FOLLOWS} 个机型，开通会员可关注 ${LIMITS.maxFollows} 个`,
   }[reason] || '关注设置无效';
 }
 
@@ -120,14 +135,15 @@ async function setStatus(ctx, payload, status) {
   const recordId = followId.startsWith(`${user._id}|`) ? followId : `${user._id}|${followId}`;
   const follow = await ctx.repo.getFollow(recordId);
   if (!follow || follow.userKey !== user._id || follow.status === 'removed') throw new ApiError('unknown_follow', '关注不存在');
-  if (status === 'active' && !isMember(user, ctx.now)) throw new ApiError('member_required', '会员到期后无法恢复监测');
+  if (status === 'active' && !canUseReminders(user, ctx.now)) throw new ApiError('member_required', '开通会员后可恢复监测');
   const updated = await ctx.repo.mutateFollow({ userKey: user._id, followId: recordId, status, nowIso: ctx.nowIso, knownFollows: await ctx.repo.listFollows(user._id) });
   if (status === 'removed') return { removed: true, followId };
-  const [decorated] = await decorate(ctx, [updated], isMember(user, ctx.now));
+  const [decorated] = await decorate(ctx, [updated], isMember(user, ctx.now), canUseReminders(user, ctx.now));
   return { follow: decorated };
 }
 
 module.exports = {
+  presentLatest,
   list,
   upsert,
   pause: (ctx, payload) => setStatus(ctx, payload, 'paused'),

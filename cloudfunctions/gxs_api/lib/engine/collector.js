@@ -8,7 +8,7 @@
  * a fake clock and a simulated upstream; `run()` is the production loop.
  */
 const { mergeConfig } = require('../config');
-const { isMember } = require('../rules/membership');
+const { canUseReminders } = require('../rules/membership');
 const { guardedPickup } = require('./guarded-pickup');
 const { createScheduler, buildGroups } = require('./scheduler');
 const { createLeaseKeeper } = require('./lease');
@@ -103,7 +103,7 @@ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = cons
     const follows = await repo.listActiveFollows();
     const users = new Map((await repo.getUsers([...new Set(follows.map(f => f.userKey))])).map(u => [u._id, u]));
     const now = clock();
-    const eligible = follows.filter(f => users.has(f.userKey) && isMember(users.get(f.userKey), now));
+    const eligible = follows.filter(f => users.has(f.userKey) && canUseReminders(users.get(f.userKey), now));
     const groups = config.collector.enabled ? buildGroups(eligible, config.collector.maxPartsPerRequest || 20) : [];
     scheduler.configure({ intervalMs: Math.max(minimumIntervalMs, config.collector.intervalSeconds * 1000), maxConcurrency: config.collector.maxConcurrency, timeoutMs: config.query.upstreamTimeoutMs });
     scheduler.setTargets(groups);

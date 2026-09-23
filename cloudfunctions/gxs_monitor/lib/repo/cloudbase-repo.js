@@ -292,7 +292,14 @@ function createCloudbaseRepo(db) {
     async listOrders(userKey, limit) {
       return readAll(col(COLLECTIONS.orders).where({ userKey }).orderBy('createdAt', 'desc'), limit || 20);
     },
+    /** Operator insights: newest documents with `field` >= `since` (events by dayKey, notifications by createdAt). */
+    async listSince(collection, field, since, limit) {
+      return readAll(col(collection).where({ [field]: _.gte(since) }).orderBy(field, 'desc'), limit);
+    },
     // Insertion and per-user view sequence are attached via atomicMethods.
+    async getNotification(id) {
+      return readOne(col(COLLECTIONS.notifications).where({ _id: id }));
+    },
     async updateNotification(id, patch) {
       await col(COLLECTIONS.notifications).doc(id).update({ data: patch });
     },
@@ -357,7 +364,6 @@ function createCloudbaseRepo(db) {
       const byIds = (collection, ids) => Array.from({ length: Math.ceil(ids.length / CHUNK) }, (_, i) => col(collection).where({ _id: _.in(ids.slice(i * CHUNK, (i + 1) * CHUNK)) }));
       const targets = {
         events: [col(COLLECTIONS.events).where({ dayKey: _.lt(firstDay) })],
-        observationDays: [col(COLLECTIONS.observationDays).where({ dayKey: _.lt(firstDay) })],
         // A pending query may still owe its refund on the user's next bootstrap.
         queries: [col(COLLECTIONS.queries).where({ createdAt: _.lt(cutoffIso), status: _.neq('pending') })],
         notifications: [col(COLLECTIONS.notifications).where({ createdAt: _.lt(cutoffIso), status: _.nin(['pending', 'sending']) })],

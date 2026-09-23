@@ -25,6 +25,9 @@ test('daily summaries distinguish known, unknown and manual/automatic samples wi
     sampleCount: 7, knownCount: 5, unknownCount: 2, manualCount: 3, autoCount: 4,
     firstObservedAt: '2026-09-16T02:00:00.000Z', lastObservedAt: '2026-09-16T02:06:00.000Z',
     firstKnownAt: '2026-09-16T02:01:00.000Z', lastKnownAt: '2026-09-16T02:06:00.000Z',
+    // Long-term event counters; availability windows only come from became_unavailable.
+    eventCounts: { status_changed: 2, restock_confirmed: 1 }, firstAvailableAt: '2026-09-16T02:06:00.000Z',
+    availableWindows: { count: 0, totalMs: 0, maxMs: 0, minMs: null },
   });
   assert.ok(!('coverageDurationMs' in daily));
   assert.ok(!('continuous' in daily));

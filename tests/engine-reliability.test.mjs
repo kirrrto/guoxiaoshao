@@ -132,7 +132,7 @@ test('two workers claim one task once and spend one subscription credit', async 
 
 test('send-time membership, follow, DND and user switch are rechecked after planning', async () => {
   const mutations = [
-    [async s => s.f.repo.updateUser(userKeyOf(), { membership: { expiresAt: '2020-01-01T00:00:00Z' } }), 'member_expired'],
+    [async s => s.f.repo.updateUser(userKeyOf(), { membership: { expiresAt: '2020-01-01T00:00:00Z' }, firstReminderSentAt: '2026-08-20T00:00:00.000Z' }), 'member_expired'],
     [async s => s.f.repo.saveFollow({ ...await s.f.repo.getFollow('F'), status: 'paused' }), 'follow_not_active'],
     [async s => s.f.repo.updateUser(userKeyOf(), { settings: { notifyEnabled: false } }), 'user_disabled'],
     [async s => s.f.repo.updateUser(userKeyOf(), { settings: { dnd: { enabled: true, startMinute: 540, endMinute: 660 } } }), 'dnd'],

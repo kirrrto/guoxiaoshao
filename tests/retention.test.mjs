@@ -38,13 +38,13 @@ test('retention keeps the latest 10 Beijing days and never touches accounts, mon
   const status = await runRetentionIfDue({ repo, now, log });
   assert.equal(status.lastRunDay, '2026-09-24'); assert.equal(status.firstDay, '2026-09-15');
   assert.deepEqual(ids(repo, C.events), ['kept-event']);
-  assert.deepEqual(ids(repo, C.observationDays), ['kept-day']);
+  assert.deepEqual(ids(repo, C.observationDays), ['kept-day', 'old-day'], 'daily summaries are the long-term record');
   assert.deepEqual(ids(repo, C.queries), ['kept-query', 'old-pending'], 'a pending query may still owe a refund');
   assert.deepEqual(ids(repo, C.notifications), ['kept-sent', 'old-sending'], 'in-flight reminders stay');
   assert.deepEqual(ids(repo, C.health), []);
   assert.deepEqual(ids(repo, C.config), ['collector_budget_2026-09-15', 'collector_lease', 'collector_status', 'kept-grant', 'member_redemption_claims_launch_30d_v1', 'payment_receipt-x', 'retention_status', 'runtime']);
   for (const collection of [C.ledger, C.orders, C.users, C.follows, C.latest]) assert.equal(repo.tables.get(collection).size, 1, collection);
-  assert.deepEqual(status.removed, { events: 1, observationDays: 1, queries: 1, notifications: 1, targetHealth: 1, subscriptionGrants: 1, queryGuards: 1, budgets: 1 });
+  assert.deepEqual(status.removed, { events: 1, queries: 1, notifications: 1, targetHealth: 1, subscriptionGrants: 1, queryGuards: 1, budgets: 1 });
 });
 
 test('retention runs once per Beijing day, only after 04:00, and never fails the monitor', async () => {
@@ -81,4 +81,18 @@ test('history refuses purged days before charging and hides expired recent views
   assert.equal([...f.repo.tables.get(C.ledger).values()].filter(entry => entry.type === 'history_debit').length, 0);
   f.repo.tables.get(C.queries).set(`${userKeyOf()}|history|old-view`, { _id: `${userKeyOf()}|history|old-view`, userKey: userKeyOf(), kind: 'history', status: 'success', partNumber: 'MJYH4CH/A', dayKey: '2026-09-14', storeNumbers: [], createdAt: kept, finishedAt: kept });
   assert.deepEqual(ok(await f.call('history.browse')).recentViews, []);
+});
+
+test('daily summaries count events, the first availability and how long stock stayed available', () => {
+  const { appendObservationDay } = require('../cloudfunctions/gxs_api/lib/engine/observation-day.js');
+  const sample = at => ({ storeNumber: 'R577', partNumber: 'MJYH4CH/A', observedAt: at, status: 'available', source: 'auto' });
+  let day = appendObservationDay(null, sample('2026-09-15T02:00:00.000Z'), [{ type: 'first_seen_available', detectedAt: '2026-09-15T02:00:00.000Z' }]);
+  day = appendObservationDay(day, sample('2026-09-15T02:02:00.000Z'), [{ type: 'became_unavailable', detectedAt: '2026-09-15T02:02:00.000Z', availableDurationMs: 120000 }]);
+  day = appendObservationDay(day, sample('2026-09-15T03:00:00.000Z'), [{ type: 'restock_confirmed', detectedAt: '2026-09-15T03:00:00.000Z' }]);
+  day = appendObservationDay(day, sample('2026-09-15T03:00:30.000Z'), [{ type: 'became_unavailable', detectedAt: '2026-09-15T03:00:30.000Z', availableDurationMs: 30000 }]);
+  day = appendObservationDay(day, sample('2026-09-15T03:01:00.000Z'));
+  assert.deepEqual(day.eventCounts, { first_seen_available: 1, became_unavailable: 2, restock_confirmed: 1 });
+  assert.equal(day.firstAvailableAt, '2026-09-15T02:00:00.000Z');
+  assert.deepEqual(day.availableWindows, { count: 2, totalMs: 150000, maxMs: 120000, minMs: 30000 });
+  assert.equal(day.sampleCount, 5);
 });

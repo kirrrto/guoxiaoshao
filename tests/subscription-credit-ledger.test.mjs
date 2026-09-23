@@ -7,7 +7,7 @@ const { COLLECTIONS: C } = require('../cloudfunctions/gxs_api/lib/collections');
 
 async function setup(initial = { credits: 3, accepted: 3 }) {
   const f = createFixture(); await f.call('user.bootstrap');
-  await f.repo.updateUser(userKeyOf(), { subscriptions: { TPL: initial, OTHER: { credits: 7 } } });
+  await f.repo.updateUser(userKeyOf(), { membership: { expiresAt: '2026-10-15T00:00:00Z' }, subscriptions: { TPL: initial, OTHER: { credits: 7 } } });
   const userBefore = await f.repo.getUser(userKeyOf());
   const now = f.state.now.toISOString();
   const args = id => ({ userKey: userKeyOf(), templateId: 'TPL', taskId: id, now });

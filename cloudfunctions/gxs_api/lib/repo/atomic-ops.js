@@ -7,7 +7,7 @@ const { ApiError } = require('../errors');
 const { dayKey } = require('../time');
 const { decideLiveQuery, decideHistoryQuery } = require('../rules/access');
 const { grantableAmount, ledgerIds } = require('../rules/quota');
-const { isMember, validateFollowLimits } = require('../rules/membership');
+const { LIMITS, FREE_REMINDER_FOLLOWS, isMember, hasFreeReminder, canUseReminders, validateFollowLimits } = require('../rules/membership');
 const membershipEntitlements = require('../rules/membership-entitlements');
 const { applyObservation, targetKeyOf } = require('../engine/events');
 const { observationDayId, appendObservationDay } = require('../engine/observation-day');
@@ -301,7 +301,7 @@ function atomicMethods(run) {
         const previousDay = await tx.get(C.observationDays, summaryId);
         await tx.put(C.latest, result.latest);
         for (const event of result.events) await tx.put(C.events, { ...event, dayKey: dayKey(event.detectedAt), notificationPlannedAt: null });
-        await tx.put(C.observationDays, appendObservationDay(previousDay, observation));
+        await tx.put(C.observationDays, appendObservationDay(previousDay, observation, result.events));
       }
       return { ...result, observation };
     }),
@@ -313,10 +313,11 @@ function atomicMethods(run) {
       const id = follow ? follow._id : followId;
       const existing = await tx.get(C.follows, id);
       const index = user.followIndex || knownFollows.filter(f => f.status !== 'removed').map(f => ({ _id: f._id, partNumber: f.partNumber, status: f.status }));
-      if ((follow || status === 'active') && !isMember(user, new Date(nowIso))) throw new ApiError('member_required', '会员到期后无法新增或恢复监测');
+      const at = new Date(nowIso);
+      if ((follow || status === 'active') && !canUseReminders(user, at)) throw new ApiError('member_required', '开通会员后可新增或恢复关注');
       let next;
       if (follow) {
-        const check = validateFollowLimits(index.filter(f => f._id !== id && f.status !== 'removed'), follow);
+        const check = validateFollowLimits(index.filter(f => f._id !== id && f.status !== 'removed'), follow, isMember(user, at) ? LIMITS.maxFollows : FREE_REMINDER_FOLLOWS);
         if (!check.ok) throw new ApiError(check.reason, '关注设置超过限制：最多 3 个机型，每个机型最多 3 家门店');
         next = { ...follow, storeNumbers: check.storeNumbers, createdAt: existing ? existing.createdAt : follow.createdAt };
       } else {
@@ -462,6 +463,20 @@ function atomicMethods(run) {
         const invalidated = task.subscriptionInvalidated || subscriptionCredits.reservationInvalid(subscriptionCredits.readLedger(subscription), task);
         return { reserved: !task.subscriptionReleased && !invalidated, reason: invalidated ? 'subscription_authorization_expired' : task.subscriptionReleased ? 'credit_released' : null, replayed: true };
       }
+      // The one free alert is locked to a single task so concurrent events cannot send two.
+      const free = !isMember(user, new Date(now));
+      if (free && !hasFreeReminder(user, new Date(now))) return { reserved: false, reason: 'free_reminder_used' };
+      if (free && user.freeReminderTaskId && user.freeReminderTaskId !== taskId) {
+        const locked = await tx.get(C.notifications, user.freeReminderTaskId);
+        if (locked && ['pending', 'sending'].includes(locked.status)) return { reserved: false, reason: 'free_reminder_in_use' };
+        // A worker that died after reserving never settled the lock. A possibly
+        // delivered alert still uses up the free one; anything else unlocks it.
+        if (locked && ['accepted', 'uncertain'].includes(locked.status)) {
+          await tx.put(C.users, { ...user, freeReminderTaskId: null, firstReminderSentAt: locked.sentAt || locked.finishedAt || now });
+          return { reserved: false, reason: 'free_reminder_used' };
+        }
+        user.freeReminderTaskId = null;
+      }
       const credit = subscriptionCredits.reserveCredit(subscription);
       if (!credit.reserved) return { reserved: false, reason: 'no_subscription_credit' };
       const cooldownId = targetKey ? `notify_cooldown_${createHash('sha256').update(`${userKey}|${targetKey}`).digest('hex')}` : null;
@@ -471,9 +486,23 @@ function atomicMethods(run) {
         await tx.put(C.config, { _id: cooldownId, taskId, lastReservedAt: now });
       }
       user.subscriptions[templateId] = subscriptionCredits.writeLedger(subscription, credit.ledger, now);
+      if (free) user.freeReminderTaskId = taskId;
       await tx.put(C.users, user);
       await tx.put(C.notifications, { ...task, subscriptionReserved: true, subscriptionTemplateId: templateId, subscriptionReservedAt: now, subscriptionCreditSequence: credit.ticket, subscriptionCreditHighWater: credit.highWater, cooldownId });
       return { reserved: true, reason: null };
+    }),
+
+    /**
+     * After a send attempt: an accepted or possibly delivered alert marks the
+     * account's first alert (using up the free one); any outcome unlocks it.
+     */
+    settleFirstReminder: ({ userKey, taskId, sent, now }) => run(async tx => {
+      const user = await tx.get(C.users, userKey);
+      if (!user) return { settled: false };
+      const lockHeld = user.freeReminderTaskId === taskId;
+      if (!lockHeld && (!sent || user.firstReminderSentAt)) return { settled: false };
+      await tx.put(C.users, { ...user, freeReminderTaskId: lockHeld ? null : user.freeReminderTaskId || null, firstReminderSentAt: user.firstReminderSentAt || (sent ? now : null) });
+      return { settled: true };
     }),
 
     releaseSubscriptionCredit: ({ userKey, templateId, taskId, now }) => run(async tx => {

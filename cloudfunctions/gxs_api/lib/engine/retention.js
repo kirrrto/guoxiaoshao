@@ -1,9 +1,10 @@
 'use strict';
 /**
- * Data retention: keep the most recent RETENTION_DAYS Beijing days of history
- * data (events, daily observation summaries, finished queries, settled
- * reminders and short-lived bookkeeping). Users, the quota ledger, orders,
- * follows, current observations and runtime configuration are never purged.
+ * Data retention: keep the most recent RETENTION_DAYS Beijing days of raw
+ * history (events, finished queries, settled reminders and short-lived
+ * bookkeeping). Daily observation summaries, which also count each day's
+ * events and availability windows, are kept long term, as are users, the
+ * quota ledger, orders, follows, current observations and configuration.
  *
  * The scheduled monitor calls this every minute; it runs at most once per
  * Beijing day, after the overnight quiet hour, inside the monitor's lease.

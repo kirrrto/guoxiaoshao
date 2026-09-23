@@ -168,6 +168,7 @@ test('concurrent follows cannot exceed three SKUs; expiry and stale health are r
   assert.equal(attempts.find(r => !r.ok).error.code, 'too_many_follows');
   await f.repo.saveCollectorStatus({ state: 'running', intervalMs: 8000, updatedAt: f.state.now.toISOString() });
   f.advance(86400001);
+  await f.repo.updateUser(userKeyOf(), { firstReminderSentAt: '2026-08-20T00:00:00.000Z' });
   const follows = ok(await f.call('follow.list'));
   assert.ok(follows.follows.every(follow => follow.status === 'expired'));
   assert.equal(ok(await f.call('user.bootstrap')).collector.state, 'stale');
@@ -179,6 +180,7 @@ test('expired follows cannot expose restricted new-product inventory through any
   ok(await f.call('admin.grantMembership', { userKey: userKeyOf(), grantId: 'expiry-inventory-member', days: 1 }, operatorContext()));
   for (const [i, partNumber] of ['MJYH4CH/A', 'MXXX1CH/A'].entries()) ok(await f.call('follow.upsert', { followId: `expiry-inventory-${i}`, partNumber, storeNumbers: ['R577'] }));
   f.advance(2 * 86400000);
+  await f.repo.updateUser(userKeyOf(), { firstReminderSentAt: '2026-08-20T00:00:00.000Z' });
   const writeLatest = async partNumber => f.repo.saveLatest({ _id: `R577|${partNumber}`, partNumber, storeNumber: 'R577', status: 'available', statusSince: f.state.now.toISOString(), observedAt: f.state.now.toISOString(), knownAt: f.state.now.toISOString(), quote: 'fresh protected supply' });
   await Promise.all(['MJYH4CH/A', 'MXXX1CH/A'].map(writeLatest));
   assert.equal(ok(await f.call('query.pickup', { queryId: 'expiry-inventory-query', partNumber: 'MJYH4CH/A', storeNumbers: ['R577'] })).reason, 'new_product_restricted');

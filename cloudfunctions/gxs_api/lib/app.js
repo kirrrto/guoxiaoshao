@@ -50,6 +50,8 @@ const ACTIONS = {
   'member.redeemCode': [member.redeemCode, true],
   'notify.recordSubscription': [notify.recordSubscription, true],
   'notify.list': [notify.list, true],
+  'notify.detail': [notify.detail, true],
+  'notify.feedback': [notify.feedback, true],
   'notify.delete': [notify.remove, true],
   'notify.clear': [notify.clear, true],
   'admin.getConfig': [admin.getConfig, false],
@@ -59,6 +61,7 @@ const ACTIONS = {
   'admin.grantMembership': [admin.grantMembership, false],
   'admin.grantCredits': [admin.grantCredits, false],
   'admin.stats': [admin.stats, false],
+  'admin.insights': [admin.insights, false],
   'admin.lookupUser': [admin.lookupUser, false],
 };
 

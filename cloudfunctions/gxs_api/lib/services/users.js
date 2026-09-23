@@ -1,7 +1,7 @@
 'use strict';
 const { ApiError } = require('../errors');
 const { dayKey } = require('../time');
-const { membershipSnapshot, LIMITS } = require('../rules/membership');
+const { membershipSnapshot, isMember, hasFreeReminder, LIMITS, FREE_REMINDER_FOLLOWS } = require('../rules/membership');
 const { resolveConfig } = require('../rules/quota');
 const { maskOpenid } = require('../identity');
 const { monitoringSnapshot } = require('../monitor-readiness');
@@ -107,7 +107,9 @@ async function bootstrap(ctx) {
     followCount: follows.filter(f => f.status === 'active' || f.status === 'paused').length,
     memberProduct: paymentProduct(ctx),
     newProductWindows: ctx.config.newProductWindows,
-    limits: { queryMaxStores: ctx.config.query.maxStores, maxFollows: LIMITS.maxFollows, maxStoresPerFollow: LIMITS.maxStoresPerFollow },
+    // One free restock alert for accounts that have never received one.
+    freeReminder: hasFreeReminder(user, ctx.now),
+    limits: { queryMaxStores: ctx.config.query.maxStores, maxFollows: isMember(user, ctx.now) ? LIMITS.maxFollows : FREE_REMINDER_FOLLOWS, maxStoresPerFollow: LIMITS.maxStoresPerFollow },
     notifications: monitoring.notifications,
     settings: user.settings,
     subscriptions: user.subscriptions || {},

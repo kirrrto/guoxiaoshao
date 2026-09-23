@@ -84,6 +84,63 @@ async function stats(ctx) {
   return { users, activeFollows: follows, events, queries, fulfilledOrders: orders, serverTime: ctx.nowIso };
 }
 
+const INSIGHT_LIMIT = 2000;
+const WINDOW_BUCKETS = [[60000, '1 分钟内'], [5 * 60000, '1–5 分钟'], [15 * 60000, '5–15 分钟'], [60 * 60000, '15–60 分钟'], [Infinity, '1 小时以上']];
+
+function percentile(sorted, p) {
+  return sorted.length ? sorted[Math.min(sorted.length - 1, Math.ceil(p * sorted.length) - 1)] : null;
+}
+
+function spread(values) {
+  const sorted = values.slice().sort((a, b) => a - b);
+  return { count: sorted.length, p50Ms: percentile(sorted, 0.5), p90Ms: percentile(sorted, 0.9), maxMs: sorted.length ? sorted[sorted.length - 1] : null };
+}
+
+function countBy(items, key) {
+  const counts = {};
+  for (const item of items) { const k = key(item); counts[k] = (counts[k] || 0) + 1; }
+  return counts;
+}
+
+/**
+ * Operator view of whether alerts arrive in time to buy: how long stores stay
+ * available, how often alerts are skipped for lack of authorisations, how late
+ * accepted alerts leave, and what users answered on the alert page.
+ */
+async function insights(ctx, payload) {
+  requireAdmin(ctx);
+  const days = Math.min(10, Math.max(1, Math.floor(Number(payload.days) || 7)));
+  const since = new Date(ctx.now.getTime() - days * 86400000);
+  const [events, notifications] = await Promise.all([
+    ctx.repo.listSince(COLLECTIONS.events, 'dayKey', dayKey(since), INSIGHT_LIMIT),
+    ctx.repo.listSince(COLLECTIONS.notifications, 'createdAt', since.toISOString(), INSIGHT_LIMIT),
+  ]);
+  const windows = events.filter(e => e.type === 'became_unavailable' && Number.isFinite(e.availableDurationMs) && e.availableDurationMs >= 0).map(e => e.availableDurationMs);
+  const delays = notifications.filter(n => n.status === 'accepted' && n.sentAt && n.detectedAt)
+    .map(n => Date.parse(n.sentAt) - Date.parse(n.detectedAt)).filter(ms => Number.isFinite(ms) && ms >= 0);
+  const skipReasons = countBy(notifications.filter(n => n.status === 'skipped'), n => n.reason || 'unknown');
+  const feedback = countBy(notifications.filter(n => n.feedback && n.feedback.outcome), n => n.feedback.outcome);
+  const answered = Object.values(feedback).reduce((sum, n) => sum + n, 0);
+  let lower = 0;
+  return {
+    days,
+    since: since.toISOString(),
+    truncated: events.length >= INSIGHT_LIMIT || notifications.length >= INSIGHT_LIMIT,
+    availability: { ...spread(windows), buckets: WINDOW_BUCKETS.map(([upper, label]) => {
+      const count = windows.filter(ms => ms >= lower && ms < upper).length; lower = upper; return { label, count };
+    }) },
+    alerts: {
+      total: notifications.length,
+      byStatus: countBy(notifications, n => n.status),
+      skipReasons,
+      noCreditShare: notifications.length ? (skipReasons.no_subscription_credit || 0) / notifications.length : null,
+      sendDelay: spread(delays),
+    },
+    feedback: { answered, ...feedback, boughtShare: answered ? (feedback.bought || 0) / answered : null },
+    serverTime: ctx.nowIso,
+  };
+}
+
 async function lookupUser(ctx, payload) {
   requireAdmin(ctx);
   const userKey = typeof payload.userKey === 'string' ? payload.userKey : null;
@@ -94,4 +151,4 @@ async function lookupUser(ctx, payload) {
   return { user: { userKey: user._id, createdAt: user.createdAt, lastSeenAt: user.lastSeenAt, membership: user.membership, quota: user.quota, settings: user.settings, subscriptions: user.subscriptions }, follows };
 }
 
-module.exports = { getConfig, paymentStatus, updateConfig, seedCatalog, grantMembership, grantCredits, stats, lookupUser };
+module.exports = { getConfig, paymentStatus, updateConfig, seedCatalog, grantMembership, grantCredits, stats, insights, lookupUser };

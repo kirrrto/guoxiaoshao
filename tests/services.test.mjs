@@ -206,8 +206,9 @@ test('history: today of a restricted new product is closed to free users, yester
   assert.equal(yesterday.charged, 1);
 });
 
-test('follows: members only, 3 SKUs × 3 stores, no duplicate SKU, pause/resume/remove', async () => {
+test('follows: members only once the free alert is used, 3 SKUs × 3 stores, no duplicate SKU, pause/resume/remove', async () => {
   const f = createFixture();
+  ok(await f.call('user.bootstrap')); await f.repo.updateUser(userKeyOf(), { firstReminderSentAt: '2026-08-20T00:00:00.000Z' });
   failWith(await f.call('follow.upsert', { followId: 'f-0001-aaaa', partNumber: 'MJYH4CH/A', storeNumbers: ['R577'] }), 'member_required');
   ok(await f.call('admin.grantMembership', { userKey: userKeyOf(), days: 30, grantId: 'grant-0001' }, operatorContext()));
 
@@ -251,6 +252,7 @@ test('membership expiry closes follow resume; renewals extend from the current e
   assert.equal(status.membership.active, false);
   assert.equal(status.orders.length, 2);
   ok(await f.call('follow.pause', { followId: 'f-0001-aaaa' }));
+  await f.repo.updateUser(userKeyOf(), { firstReminderSentAt: '2026-08-20T00:00:00.000Z' });
   failWith(await f.call('follow.resume', { followId: 'f-0001-aaaa' }), 'member_required');
   const order = ok(await f.call('member.createOrder', { orderId: 'o-0001-aaaa' }));
   assert.equal(order.ok, false);
@@ -275,6 +277,7 @@ test('admin: config patches are whitelisted and non-admins are rejected', async 
 
 test('subscription results are counted per template; only accepts add send credits', async () => {
   const f = createFixture({ config: { notifications: { templateIds: { restock: 'TPL_A', other: 'TPL_B', third: 'TPL_C' } } } });
+  ok(await f.call('user.bootstrap')); await f.repo.updateUser(userKeyOf(), { firstReminderSentAt: '2026-08-20T00:00:00.000Z' });
   failWith(await f.call('notify.recordSubscription', { requestId: 'subscription-0000', results: { TPL_A: 'accept' } }), 'membership_required');
   await f.repo.updateUser(userKeyOf(), { membership: { expiresAt: '2026-10-15T00:00:00Z' } });
   const data = ok(await f.call('notify.recordSubscription', { requestId: 'subscription-0001', results: { TPL_A: 'accept', TPL_B: 'reject', TPL_C: 'ban' } }));
