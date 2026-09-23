@@ -18,14 +18,14 @@ const boot = (membership = inactive) => ({ identity: { userKey: 'real:user', ope
 const redeemedOrder = { orderId: 'redemption-record-001', type: 'membership_redemption', source: 'redemption_code', days: 30, amountFen: 0, status: 'fulfilled', fulfilledAt: '2026-09-15T00:00:00Z' };
 const deferred = () => { let resolve, reject; const promise = new Promise((a, b) => { resolve = a; reject = b; }); return { promise, resolve, reject }; };
 
-function runtime({ handler = async action => action === 'member.status' ? { orders: [redeemedOrder] } : { notifications: [] }, getBoot = async () => boot(active) } = {}) {
+function runtime({ handler = async action => action === 'member.status' ? { orders: [redeemedOrder] } : { notifications: [] }, getBoot = async () => boot(active), app, wxExtra = {} } = {}) {
   let definition;
   const calls = [], invalidated = [], bootstrapCalls = [], toasts = [], errors = [];
   const api = { call: async (action, payload = {}) => { calls.push({ action, payload: clone(payload) }); return handler(action, payload); }, showError: value => errors.push(value), toast: value => toasts.push(value) };
   const store = { getBootstrap: async options => { bootstrapCalls.push(options); return getBoot(options); },
     invalidateBootstrap: () => invalidated.push('bootstrap'), invalidateFollows: () => invalidated.push('follows'), publishQuota() {}, subscribeQuota: () => () => {} };
-  const wx = { stopPullDownRefresh() {} };
-  vm.runInNewContext(fs.readFileSync(path.join(root, 'pages/mine/index.js'), 'utf8'), { console, Date, Promise, Map, Set, wx, Page: value => { definition = value; },
+  const wx = { stopPullDownRefresh() {}, ...wxExtra };
+  vm.runInNewContext(fs.readFileSync(path.join(root, 'pages/mine/index.js'), 'utf8'), { console, Date, Promise, Map, Set, wx, getApp: app ? () => app : undefined, Page: value => { definition = value; },
     require: name => name.endsWith('/api') ? api : name.endsWith('/store') ? store : name.endsWith('/reminder-credits') ? { topUpReminderCredit: () => false } : require(path.resolve(root, 'pages/mine', name)) });
   const page = { ...definition, data: clone(definition.data) };
   page.setData = patch => { for (const [key, value] of Object.entries(clone(patch))) { const parts = key.split('.'); let target = page.data; for (const part of parts.slice(0, -1)) target = target[part] || (target[part] = {}); target[parts.at(-1)] = value; } };
@@ -207,4 +207,26 @@ test('an already-used response with no current membership preserves the inactive
   assert.equal(rt.page.data.membership.expiresAt, null);
   assert.equal(rt.page.data.redemptionResult.title, '此账号已兑换过');
   assert.match(rt.page.data.redemptionResult.detail, /没有生效/);
+});
+
+test('a new membership offers to continue the configuration a free user tried to follow', async () => {
+  const app = { globalData: { pendingMemberFollow: { partNumber: 'MJYH4CH/A', storeNumbers: ['R577'], title: 'iPhone 18 Pro Max 1TB' } } };
+  const modals = [], tabs = [];
+  const rt = runtime({ app, wxExtra: { showModal: options => modals.push(options), switchTab: options => tabs.push(options.url) },
+    handler: async action => action === 'member.redeemCode' ? { redeemed: true, alreadyRedeemed: false, membership: active } : action === 'member.status' ? { orders: [redeemedOrder] } : { notifications: [] } });
+  enter(rt.page); await rt.page.onRedeemCode();
+  assert.equal(modals.at(-1).title, '会员已开通');
+  assert.match(modals.at(-1).content, /iPhone 18 Pro Max 1TB/);
+  assert.equal(app.globalData.pendingMemberFollow, null, 'offered once');
+  modals.at(-1).success({ confirm: true });
+  assert.deepEqual(clone(app.globalData.pendingFollow), { partNumber: 'MJYH4CH/A', storeNumbers: ['R577'] });
+  assert.deepEqual(tabs, ['/pages/follow/index']);
+  // An already-used code activates nothing, so the kept target stays for a later purchase.
+  const kept = { globalData: { pendingMemberFollow: { partNumber: 'MJYH4CH/A', storeNumbers: ['R577'], title: 'x' } } };
+  const again = runtime({ app: kept, wxExtra: { showModal: options => modals.push(options) },
+    handler: async action => action === 'member.redeemCode' ? { redeemed: true, alreadyRedeemed: true, membership: active } : action === 'member.status' ? { orders: [] } : { notifications: [] } });
+  const before = modals.length;
+  enter(again.page); await again.page.onRedeemCode();
+  assert.equal(modals.length, before);
+  assert.equal(kept.globalData.pendingMemberFollow.partNumber, 'MJYH4CH/A');
 });

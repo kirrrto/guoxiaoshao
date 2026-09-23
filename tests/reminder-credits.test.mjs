@@ -113,3 +113,47 @@ test('reminders are member-only: non-members get the membership prompt and nothi
   assert.equal(stale.data.subscriptionPending, false);
   assert.equal(expired.rt.messages.at(-1).title, '关注与到货提醒为会员专属');
 });
+
+test('a new account on its free alert follows one configuration and authorizes once; afterwards membership is required', async () => {
+  const trial = patch => boot({ membership: { active: false, expiresAt: null }, freeReminder: true, limits: { maxFollows: 1, maxStoresPerFollow: 3 }, ...patch });
+  const s = setup({ member: false, always: null });
+  const page = s.rt.instance('pages/follow/index.js');
+  page.setData({ followsLoaded: true, follows: [] });
+  page.applyBoot(trial());
+  assert.equal(page.data.readiness.code, 'no_follows');
+  assert.match(page.data.readiness.detail, /免费体验：可关注 1 个配置/);
+  page.onAdd();
+  assert.equal(page.data.editing, true, 'the free trial may open the editor');
+  page.setData({ editing: false, follows: [{ followId: 'f1', partNumber: 'SKU-A', status: 'active', stores: [] }] });
+  page.onAdd();
+  assert.equal(s.rt.messages.at(-1).title, '免费体验可关注 1 个配置');
+  page.refreshReadiness();
+  assert.equal(page.data.readiness.code, 'no_credit');
+  assert.equal(page.data.readiness.actionLabel, '授权免费提醒');
+  await page.onSubscribe();
+  assert.equal(s.prompts(), 1);
+  assert.equal(s.records().length, 1);
+  assert.equal(page.data.readiness.code, 'ready');
+  assert.equal(page.data.readiness.action, '', 'no point asking a trial account for more sends');
+
+  page.applyBoot(trial({ freeReminder: false }));
+  assert.equal(page.data.readiness.code, 'membership');
+  assert.equal(page.data.readiness.title, '免费体验提醒已用完');
+  assert.match(page.data.follows[0].monitoringText, /免费提醒已用完/);
+  await page.onSubscribe();
+  assert.equal(s.prompts(), 1);
+  assert.equal(s.rt.messages.at(-1).title, '免费体验提醒已用完');
+});
+
+test('silent top-up gives a free-trial account only the one send it needs', async () => {
+  const s = setup({ member: false });
+  s.rt.app.globalData.bootstrap = boot({ membership: { active: false, expiresAt: null }, freeReminder: true });
+  assert.equal(s.credits.topUpReminderCredit(), true);
+  await settle();
+  assert.equal(s.records().length, 1);
+  assert.equal(s.credits.topUpReminderCredit(), false, 'already has a send');
+  const used = setup({ member: false });
+  used.rt.app.globalData.bootstrap = boot({ membership: { active: false, expiresAt: null }, freeReminder: false });
+  assert.equal(used.credits.topUpReminderCredit(), false);
+  assert.equal(used.prompts(), 0);
+});

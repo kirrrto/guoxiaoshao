@@ -24,6 +24,14 @@
     </view>
 
     <view class="card">
+      <view class="card-title"><text>提醒效果（近 7 天）</text><text class="sub">{{insights ? '自 ' + insights.sinceText : ''}}</text></view>
+      <view wx:for="{{insights.lines}}" wx:key="*this" class="small">{{item}}</view>
+      <view class="btn-row wrap">
+        <button class="btn btn-ghost btn-sm" disabled="{{busy === 'insights'}}" bindtap="onLoadInsights">{{busy === 'insights' ? '读取中…' : (insights ? '刷新' : '读取')}}</button>
+      </view>
+    </view>
+
+    <view class="card">
       <view class="card-title"><text>用户操作</text></view>
       <view class="input-row">
         <input class="input" value="{{grant.userKey}}" placeholder="userKey（appid:openid）" data-field="userKey" bindinput="onGrantInput" />

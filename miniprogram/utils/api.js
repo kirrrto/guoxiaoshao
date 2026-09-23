@@ -11,6 +11,7 @@ class ApiError extends Error {
 /** Call one gxs_api action. Resolves with `data`; rejects with ApiError. */
 async function call(action, payload = {}) {
   const app = getApp();
+  if (app.globalData && app.globalData.singlePage) throw new ApiError('single_page_mode', '朋友圈中只能预览。点击屏幕下方「前往小程序」即可查询和关注。');
   let cloud;
   try {
     cloud = await (app.ensureCloud ? app.ensureCloud() : app.cloudReady);

@@ -53,7 +53,7 @@ function sandbox(handler, { paymentScenario } = {}) {
     p.triggerEvent = () => {};
     return p;
   }
-  return { load: relative => load(path.join(mini, relative)), instantiate };
+  return { load: relative => load(path.join(mini, relative)), instantiate, app };
 }
 
 function parse(source) {
@@ -151,14 +151,14 @@ const widths = [320, 375, 430], scenarios = adminPreview ? ['operator-ready', 'o
 if (historyDataPreview) scenarios.splice(0, scenarios.length, 'history-no-data', 'history-unknown-only', 'history-observed-no-events', 'history-events-only', 'history-observed-events', 'history-partial-stores');
 if (paymentPreview) scenarios.splice(0, scenarios.length, 'payment-ready', 'payment-renew', 'payment-blocked', 'payment-old-ios', 'payment-pending', 'payment-cancelled', 'payment-error', 'payment-fulfilled', 'payment-partial-refund');
 const names = adminPreview ? { admin: '运营工具' } : paymentPreview ? { mine: '我的' } : historyDataPreview ? { history: '历史' } : historyTaskPreview ? { history: '历史', mine: '我的' } : stockPreview || monitoringPreview ? { follow: '小哨提醒' } : reminderPreview || redemptionPreview ? { mine: '我的' } : { query: '查询', follow: '小哨提醒', history: '历史', mine: '我的' };
-if (monitoringPreview) scenarios.push('monitor-no-follows', 'monitor-all-paused', 'monitor-user-disabled', 'monitor-dnd');
+if (monitoringPreview) scenarios.push('monitor-no-follows', 'monitor-all-paused', 'monitor-user-disabled', 'monitor-dnd', 'monitor-free-trial', 'monitor-alert');
 fs.mkdirSync(out, { recursive: true });
 const manifest = [];
 
 for (const scenario of scenarios) {
   const products = copy(baseProducts);
   if (scenario === 'longcontent' || scenario === 'history-longcontent') { const p = products.find(p => p.partNumber === sample.partNumber); p.title += ' · 超长商品名称与配置说明用于检查换行及小屏布局 ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; }
-  const p = products.find(p => p.partNumber === sample.partNumber), member = historyTaskPreview ? ['history-member-reward', 'history-longcontent'].includes(scenario) : monitoringPreview ? scenario !== 'monitor-expired-paused' : stockPreview ? scenario !== 'stock-restricted' : ['member', 'longcontent'].includes(scenario), expired = scenario === 'expired' || scenario === 'monitor-expired-paused';
+  const p = products.find(p => p.partNumber === sample.partNumber), member = historyTaskPreview ? ['history-member-reward', 'history-longcontent'].includes(scenario) : monitoringPreview ? !['monitor-expired-paused', 'monitor-free-trial'].includes(scenario) : stockPreview ? scenario !== 'stock-restricted' : ['member', 'longcontent'].includes(scenario), expired = scenario === 'expired' || scenario === 'monitor-expired-paused';
   const bootstrap = { identity: { userKey: 'preview:offline-user', openidMasked: 'preview…0001', isAdmin: true }, membership: { active: member, remainingMs: member ? 18 * 86400000 : 0, expiresAt: member ? '2026-10-03T07:00:00Z' : expired ? '2026-09-10T07:00:00Z' : null },
     quota: { balance: member ? 5 : 0, revision: 0, grantedToday: 0, dailyGrantCap: 2, balanceCap: 10, queryCost: 1, historyCost: 1, signedInToday: false, tasksDoneToday: [], tasksViewedToday: [] }, tasks: [{ id: 'view_history', title: '浏览一次历史记录', reward: 1 }],
     collector: { state: scenario === 'expired' ? 'stale' : 'not_deployed' }, memberProduct: { id: 'vip666', title: '7 天会员', days: 7, priceFen: 700, enabled: paymentPreview && scenario !== 'payment-blocked', paymentReady: paymentPreview && scenario !== 'payment-blocked', iosEnabled: true, note: '该产品为一次性虚拟服务，一经售出不予退款。一次购买 7 天，已有会员按剩余有效期顺延，不自动续费。', paymentReason: '购买开放后可在此开通会员。' },
@@ -221,6 +221,7 @@ for (const scenario of scenarios) {
     if (scenario === 'monitor-no-follows') { follows.length = 0; bootstrap.followCount = 0; }
     if (scenario === 'monitor-user-disabled') bootstrap.settings.notifyEnabled = false;
     if (scenario === 'monitor-dnd') bootstrap.settings.dnd = { enabled: true, startMinute: 480, endMinute: 1080 };
+    if (scenario === 'monitor-free-trial') Object.assign(bootstrap, { freeReminder: true, subscriptions: {}, limits: { ...bootstrap.limits, maxFollows: 1 } });
   }
   if (stockPreview) {
     bootstrap.collector = { state: 'running' };
@@ -253,6 +254,8 @@ for (const scenario of scenarios) {
       return { ok: true, order: copy(previewOrder), payment: { mode: 'short_series_goods', signData: '{"offlinePreview":true}', paySig: 'offline-preview', signature: 'offline-preview' } };
     }
     if (action === 'member.checkOrder') return { order: copy(previewOrder), membership: previewOrder.fulfilledAt ? copy(paidMembership) : copy(bootstrap.membership) };
+    if (action === 'notify.detail') return { notification: { eventId: 'preview-event', status: 'accepted', eventType: 'restock_confirmed', partNumber: p.partNumber, storeNumber: stores[0].storeNumber, storeName: stores[0].name, productTitle: p.title, detectedAt: new Date(now.getTime() - 120000).toISOString(), feedback: null },
+      latest: { restricted: false, status: 'available', isStale: false, lastKnownStatus: 'available', statusSince: new Date(now.getTime() - 120000).toISOString(), observedAt: new Date(now.getTime() - 15000).toISOString(), unknownSince: null }, follow: { followId: 'f-preview', status: 'active' } };
     if (action === 'notify.list') return { notifications: reminderRecords, hasMore: reminderPreview && ['reminders','reminder-more-error'].includes(scenario), nextCursor: 'preview-next-cursor', clearBefore: 'preview-opaque-clear-token' };
     if (action === 'admin.stats' && scenario === 'operator-denied') throw Object.assign(Error('需要管理员权限'), { code: 'forbidden' });
     if (action === 'admin.stats' && scenario === 'operator-error') throw Error('连接中断');
@@ -263,7 +266,9 @@ for (const scenario of scenarios) {
   const catalog = adminPreview ? null : await rt.load('utils/store.js').getCatalog({ force: true });
   for (const pageName of Object.keys(names)) {
     const page = rt.instantiate(`pages/${pageName}/index.js`);
+    if (pageName === 'follow' && scenario === 'monitor-alert') Object.assign(rt.app.globalData, { pendingAlert: 'preview-event', handledAlerts: [] });
     if (scenario !== 'operator-loading') await page.onLoad();
+    if (scenario === 'monitor-alert') await new Promise(resolve => setImmediate(resolve));
     if (scenario === 'operator-saving') page.setData({ saving: true, configDirty: true });
     if (scenario === 'operator-longcontent') page.setData({ lookup: { user: true }, lookupText: JSON.stringify({ userKey: 'wxe96ad9e77b602f1b:long-user-identity-0123456789abcdefghijklmnopqrstuvwxyz', note: '运营查询长文本换行验收' }, null, 2), configText: JSON.stringify({ announcement: '运行配置说明需要在小屏完整换行且不遮挡操作按钮。'.repeat(5) }, null, 2) });
     if (pageName === 'history' && scenario !== 'history-loading' && page.browsePending) await page.browsePending;
@@ -341,6 +346,8 @@ for (const scenario of scenarios) {
         'monitor-all-paused': ['你的关注全部已暂停', '查看并开启关注'],
         'monitor-user-disabled': ['你的消息提醒已关闭', '前往提醒设置'],
         'monitor-dnd': ['当前处于免打扰时段', '查看免打扰设置'],
+        'monitor-free-trial': ['新用户免费体验', '授权后可收到 1 条免费提醒', '授权免费提醒', '免费体验中'],
+        'monitor-alert': ['到货提醒', '确认补货', '2 分钟前', '可取货', '复制型号和门店', '再加一次提醒', '买到了吗？'],
       }[scenario]] : paymentPreview ? ['7 天会员', '¥7.00 / 7 天', '兑换码开通', ...{
         'payment-ready': ['购买会员', '购买须知', '一次性虚拟服务', '一经售出不予退款', '一次购买 7 天'], 'payment-renew': ['续费会员', '购买须知', '按剩余有效期顺延'],
         'payment-blocked': ['付费购买暂未开放'], 'payment-old-ios': ['iOS 15'],

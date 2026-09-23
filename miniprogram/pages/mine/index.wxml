@@ -33,6 +33,7 @@
       </block>
       <block wx:else>
         <view wx:if="{{membership.expired}}" class="banner banner-warn small">已于 {{membership.expiresText}} 到期，监测与提醒停止；关注配置与次数仍保留。</view>
+        <view wx:elif="{{boot.freeReminder}}" class="banner banner-ok small">新用户免费体验：可关注 1 个配置，并收到 1 条到货提醒，去「关注」页添加。</view>
       </block>
       <view class="row-between mt" bindtap="onToggleMembershipRules">
         <text class="small muted">权益对比 · 购买须知</text>
@@ -57,12 +58,12 @@
           </view>
           <view class="plan-row">
             <text class="plan-feature">到货提醒</text>
-            <text class="plan-col">不支持</text>
+            <text class="plan-col">体验 1 条</text>
             <text class="plan-col plan-member">关注可提醒</text>
           </view>
           <view class="plan-row">
             <text class="plan-feature">后台盯货</text>
-            <text class="plan-col">—</text>
+            <text class="plan-col">体验 1 个</text>
             <text class="plan-col plan-member">自动监测</text>
           </view>
           <view class="plan-row">

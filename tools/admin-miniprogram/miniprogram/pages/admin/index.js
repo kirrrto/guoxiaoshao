@@ -2,6 +2,23 @@ const { call, showError, toast } = require('../../utils/api');
 const fmt = require('../../utils/format');
 const operation = require('../../utils/operation');
 
+const minutes = ms => (Number.isFinite(ms) ? (ms < 60000 ? `${Math.round(ms / 1000)} 秒` : `${Math.round(ms / 6000) / 10} 分钟`) : '—');
+const percent = share => (Number.isFinite(share) ? `${Math.round(share * 1000) / 10}%` : '—');
+
+/** admin.insights as short lines: can alerts reach users while stock is still there? */
+function insightLines(data) {
+  const a = data.availability, alerts = data.alerts, fb = data.feedback;
+  return [
+    `可取货时长：${a.count} 次，中位 ${minutes(a.p50Ms)}，P90 ${minutes(a.p90Ms)}`,
+    ...a.buckets.map(b => `  ${b.label}：${b.count}`),
+    `提醒任务：${alerts.total} 条，已受理 ${alerts.byStatus.accepted || 0}，未发送 ${alerts.byStatus.skipped || 0}`,
+    `因没有授权次数未发送：${percent(alerts.noCreditShare)}`,
+    `发现到发出：中位 ${minutes(alerts.sendDelay.p50Ms)}，P90 ${minutes(alerts.sendDelay.p90Ms)}`,
+    `「买到了吗」：${fb.answered} 人回答，买到 ${fb.bought || 0}（${percent(fb.boughtShare)}），没抢到 ${fb.missed || 0}，没去买 ${fb.skipped || 0}`,
+    ...(data.truncated ? ['数据较多，仅统计了最近 2000 条。'] : []),
+  ];
+}
+
 const EDITABLE_KEYS = ['quota', 'tasks', 'memberProduct', 'memberRedemption', 'newProductWindows', 'notifications', 'collector', 'query', 'announcement'];
 
 Page({
@@ -9,6 +26,7 @@ Page({
     allowed: false,
     checked: false,
     stats: null,
+    insights: null,
     configText: '',
     configDirty: false,
     saving: false,
@@ -44,7 +62,7 @@ Page({
 
   clearAccess(error) {
     const denied = error && ['forbidden', 'user_required', 'app_not_allowed'].includes(error.code);
-    this.setData({ allowed: false, checked: Boolean(error), stats: null, configText: '', configDirty: false, lookup: null, lookupText: '', grant: { userKey: '', days: '30', amount: '5', note: '' }, accessError: error ? (denied ? '当前账号没有管理权限，请由项目所有者在云端配置授权。' : '权限检查失败，请稍后重试。') : null });
+    this.setData({ allowed: false, checked: Boolean(error), stats: null, insights: null, configText: '', configDirty: false, lookup: null, lookupText: '', grant: { userKey: '', days: '30', amount: '5', note: '' }, accessError: error ? (denied ? '当前账号没有管理权限，请由项目所有者在云端配置授权。' : '权限检查失败，请稍后重试。') : null });
   },
 
   async callAdmin(action, payload) {
@@ -63,6 +81,16 @@ Page({
   async loadStats() {
     if (!this.data.allowed) return;
     try { const stats = await this.callAdmin('admin.stats'); this.setData({ stats: { ...stats, serverTimeText: fmt.fmtDateTime(stats.serverTime) } }); } catch (error) { showError(error); }
+  },
+
+  async onLoadInsights() {
+    if (!this.data.allowed || this.data.busy) return;
+    this.setData({ busy: 'insights' });
+    try {
+      const data = await this.callAdmin('admin.insights', { days: 7 });
+      this.setData({ insights: { lines: insightLines(data), sinceText: fmt.fmtDateTime(data.since) } });
+    } catch (error) { showError(error); }
+    finally { this.setData({ busy: '' }); }
   },
 
   async loadConfig() {

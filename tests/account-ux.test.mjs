@@ -183,3 +183,19 @@ test('operator cloud connection requires the existing resource app and never gra
     }
   }
 });
+
+test('operators read the seven-day alert insights as plain lines', async () => {
+  const insights = { days: 7, since: '2026-09-08T00:00:00Z', truncated: false,
+    availability: { count: 4, p50Ms: 240000, p90Ms: 7200000, maxMs: 7200000, buckets: [{ label: '1 分钟内', count: 1 }] },
+    alerts: { total: 2, byStatus: { accepted: 1, skipped: 1 }, skipReasons: { no_subscription_credit: 1 }, noCreditShare: 0.5, sendDelay: { count: 1, p50Ms: 9000, p90Ms: 9000, maxMs: 9000 } },
+    feedback: { answered: 1, bought: 1, boughtShare: 1 } };
+  const rt = runtime('admin', async action => action === 'admin.stats' ? { users: 1, serverTime: '2026-09-15T00:00:00Z' } : action === 'admin.insights' ? insights : { config: {} });
+  await rt.page.onLoad();
+  await rt.page.onLoadInsights();
+  assert.deepEqual(clone(rt.calls.at(-1)), { action: 'admin.insights', payload: { days: 7 } });
+  const text = rt.page.data.insights.lines.join('\n');
+  assert.match(text, /可取货时长：4 次，中位 4 分钟/);
+  assert.match(text, /因没有授权次数未发送：50%/);
+  assert.match(text, /发现到发出：中位 9 秒/);
+  assert.match(text, /买到 1（100%）/);
+});

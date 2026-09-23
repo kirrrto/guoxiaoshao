@@ -34,6 +34,8 @@ const SKIP_REASON = {
   template_changed: '提醒配置已更新，本次未发送',
   user_disabled: '已关闭提醒',
   member_expired: '会员已到期',
+  free_reminder_used: '免费体验提醒已用完',
+  free_reminder_in_use: '免费提醒已用于另一条补货',
   follow_not_active: '关注已暂停',
   user_missing: '账号信息暂时无法确认',
   consumer_appid_mismatch: '当前账号暂时无法接收提醒',
@@ -269,6 +271,7 @@ Page({
         priceText: fmt.fen(boot.memberProduct.priceFen),
         collector: { ...boot.collector, ...fmt.collectorMeta(boot.collector.state) },
         followCount: boot.followCount,
+        freeReminder: !membership.active && boot.freeReminder === true,
         limits: boot.limits,
         paymentReady: availability.ready,
         paymentReason: availability.reason,
@@ -295,6 +298,7 @@ Page({
         this.refreshing = null;
         invalidateBootstrap(); invalidateFollows(); this.ordersLoadedAt = 0;
         this.setData({ membership: presentMembership(membership), showOrders: true });
+        this.resumeMemberFollow(membership);
         await this.loadOrders({ force: true });
       },
       });
@@ -306,11 +310,12 @@ Page({
   async onBuyMembership() {
     if (this.pageRetired || this.data.redeeming || !this.data.ready || !this.data.boot || !this.data.boot.paymentReady) return;
     const notice = this.data.boot.purchaseNotice;
+    const intent = typeof getApp === 'function' ? getApp().globalData.pendingMemberFollow : null;
     const confirmed = await new Promise(resolve => {
       if (typeof wx.showModal !== 'function') { resolve(false); return; }
       wx.showModal({
         title: '购买须知',
-        content: `${notice}\n\n确认即表示已阅读并同意上述说明。`,
+        content: `${notice}${intent ? '\n\n开通后继续为你关注：' + intent.title : ''}\n\n确认即表示已阅读并同意上述说明。`,
         confirmText: '同意购买',
         cancelText: '取消',
         success: result => resolve(Boolean(result.confirm)),
@@ -378,6 +383,7 @@ Page({
           detail: already ? (membership.active ? '本次未重复增加时间，当前会员有效期见上方。' : membership.expiresAt ? '本次未重新开通，当前会员已到期。' : '本次未重新开通，当前账号没有生效的会员。') : '会员有效期已更新，现在可以使用会员权益。',
           kind: already ? 'info' : 'ok' } });
       confirmed = true;
+      if (!already) this.resumeMemberFollow(membership);
     } catch (error) {
       if (!this.pageRetired && generation === this.accountGeneration) this.setData({ redemptionError: redemptionErrorText(error) });
     } finally {
@@ -386,6 +392,25 @@ Page({
     // A failed account/record refresh never undoes the server-confirmed result.
     if (confirmed) await Promise.all([this.refresh({ quiet: true, force: true, skipOrders: true }), this.loadOrders({ force: true })]);
     if (!this.pageRetired && this.pageVisible && this.paymentController) this.paymentController.show();
+  },
+
+  /** Offer the configuration a non-member tried to follow on the query page. */
+  resumeMemberFollow(membership) {
+    if (typeof getApp !== 'function') return;
+    const app = getApp(), intent = app.globalData.pendingMemberFollow;
+    if (!intent || !membership || !membership.active || this.pageRetired) return;
+    app.globalData.pendingMemberFollow = null;
+    wx.showModal({
+      title: '会员已开通',
+      content: `继续关注「${intent.title}」？可在关注页确认门店后保存。`,
+      confirmText: '去关注',
+      cancelText: '稍后',
+      success: r => {
+        if (!r.confirm) return;
+        app.globalData.pendingFollow = { partNumber: intent.partNumber, storeNumbers: intent.storeNumbers.slice() };
+        wx.switchTab({ url: '/pages/follow/index' });
+      },
+    });
   },
 
   invalidateNotificationRead() {
@@ -699,7 +724,7 @@ Page({
   onHelp() {
     wx.showModal({
       title: '使用说明',
-      content: `1. 查询：选择具体配置与门店，免费查询消耗 ${this.data.quota.queryCost} 次，接口失败按服务端规则返还。\n2. 次数：每日签到和体验任务可获取次数，每日最多 ${this.data.quota.dailyGrantCap} 次，累计上限 ${this.data.quota.balanceCap} 次。\n3. 会员：查询不扣次数，可关注 3 个具体配置，每配置最多 3 家门店；颜色或容量不同分别占用名额。该产品为一次性虚拟服务，一经售出不予退款。\n4. 提醒：需要额外授权微信订阅消息，开通会员不等于无限接收提醒。\n5. 新品：受限新品开售 30 天内，免费用户不可实时查询，只能看昨天及更早历史。`,
+      content: `1. 查询：选择具体配置与门店，免费查询消耗 ${this.data.quota.queryCost} 次，接口失败按服务端规则返还。\n2. 次数：每日签到和体验任务可获取次数，每日最多 ${this.data.quota.dailyGrantCap} 次，累计上限 ${this.data.quota.balanceCap} 次。\n3. 会员：查询不扣次数，可关注 3 个具体配置，每配置最多 3 家门店；颜色或容量不同分别占用名额。该产品为一次性虚拟服务，一经售出不予退款。\n4. 提醒：新用户可免费关注 1 个配置并收到 1 条到货提醒，之后为会员功能。提醒需要授权微信订阅消息，每次「允许」增加 1 次，开通会员不等于无限接收提醒。\n5. 新品：受限新品开售 30 天内，免费用户不可实时查询，只能看昨天及更早历史。`,
       showCancel: false,
     });
   },
@@ -728,7 +753,7 @@ Page({
 
   onCopyId() {
     const id = this.data.boot.identity.userKey || this.data.boot.identity.openidMasked;
-    wx.setClipboardData({ data: id, success: () => toast('已复制用户标识') });
+    wx.setClipboardData({ data: id, success: () => toast('已复制用户标识'), fail: () => toast('复制失败，请长按用户标识手动复制') });
   },
 
   onRetryLoad() {

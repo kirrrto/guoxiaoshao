@@ -8,17 +8,34 @@ App({
     bootstrap: null,
     catalog: null,
     pendingFollow: null,
+    pendingAlert: null,
+    handledAlerts: [],
+    singlePage: false,
     lastQuery: null,
   },
 
-  onLaunch() {
-    this.cloudReady = this.ensureCloud();
-    this.cloudReady.catch(() => {});
+  onLaunch(options) {
+    // Opened from a Moments share (scene 1154): a preview without cloud access.
+    this.globalData.singlePage = Boolean(options && options.scene === 1154);
+    this.captureAlert(options);
+    if (!this.globalData.singlePage) {
+      this.cloudReady = this.ensureCloud();
+      this.cloudReady.catch(() => {});
+    }
     this.watchForUpdate();
   },
 
   // Users can change "总是保持以上选择" in WeChat settings while the app is hidden.
-  onShow() { refreshConsentSetting(); },
+  onShow(options) { this.captureAlert(options); refreshConsentSetting(); },
+
+  /** A restock message opens pages/follow/index?eid=…; the follow page shows that alert once. */
+  captureAlert(options) {
+    const raw = options && options.query && options.query.eid;
+    if (typeof raw !== 'string' || !raw) return;
+    let eventId = raw;
+    try { eventId = decodeURIComponent(raw); } catch (e) { /* already decoded */ }
+    if (!this.globalData.handledAlerts.includes(eventId)) this.globalData.pendingAlert = eventId;
+  },
 
   /** A newly released package downloads in the background; offer a restart instead of running the old one. */
   watchForUpdate() {

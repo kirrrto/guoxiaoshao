@@ -11,6 +11,34 @@
   <block wx:else>
     <view class="page-heading whistle-heading"><view class="whistle-mark"><image class="whistle-heading-image" src="/images/brand/whistle-green.png" mode="aspectFit" aria-hidden="true" /></view><view class="whistle-heading-copy"><view class="page-title">小哨</view><view class="page-subtitle">关注配置，取货有变化再提醒</view></view></view>
     <view wx:if="{{refreshError}}" class="banner banner-warn">{{refreshError}}</view>
+    <view wx:if="{{boot.freeReminder}}" class="banner banner-ok">新用户免费体验：可关注 1 个配置，并收到 1 条到货提醒。</view>
+    <view wx:if="{{alert}}" id="restock-alert" class="card alert-card">
+      <view class="card-title">
+        <text>到货提醒</text>
+        <text class="service-link" bindtap="onCloseAlert">关闭</text>
+      </view>
+      <view wx:if="{{alert.loading}}" class="loading-line">正在读取这条提醒…</view>
+      <view wx:elif="{{alert.error}}" class="small text-2">{{alert.error}}</view>
+      <block wx:else>
+        <text class="bold alert-product" user-select>{{alert.productTitle}}</text>
+        <text class="tiny muted mono alert-meta" user-select>{{alert.partNumber}} · Apple {{alert.storeName}}</text>
+        <view class="alert-row"><text class="small text-2">{{alert.eventLabel}}</text><text class="small">{{alert.foundText}}（{{alert.agoText}}）</text></view>
+        <view class="alert-row"><text class="small text-2">现在</text><view class="pill pill-dot pill-{{alert.nowCls}}">{{alert.nowLabel}}</view></view>
+        <view class="tiny muted">{{alert.nowText}}。门店库存变化很快，请尽快在 Apple Store App 或官网确认下单。</view>
+        <view class="btn-row">
+          <button class="btn btn-primary btn-sm" bindtap="onCopyAlert">复制型号和门店</button>
+          <button wx:if="{{boot.member && alert.followActive}}" class="btn btn-outline btn-sm" disabled="{{subscribing}}" bindtap="onSubscribe">再加一次提醒</button>
+        </view>
+        <view class="alert-feedback">
+          <text class="small text-2">{{alert.feedback === 'bought' ? '已买到，祝使用愉快' : (alert.feedback ? '已记录你的反馈' : '买到了吗？')}}</text>
+          <view wx:if="{{alert.feedback !== 'bought'}}" class="alert-feedback-actions">
+            <button class="btn btn-ghost btn-sm" data-outcome="bought" disabled="{{alertBusy}}" bindtap="onAlertFeedback">买到了</button>
+            <button class="btn btn-ghost btn-sm" data-outcome="missed" disabled="{{alertBusy}}" bindtap="onAlertFeedback">没抢到</button>
+            <button class="btn btn-ghost btn-sm" data-outcome="skipped" disabled="{{alertBusy}}" bindtap="onAlertFeedback">没去买</button>
+          </view>
+        </view>
+      </block>
+    </view>
     <view id="reminder-health" class="card monitor-panel">
       <view class="card-title monitor-heading">
         <text class="monitor-title">{{readiness.title}}</text>
@@ -21,7 +49,7 @@
         <button wx:if="{{readiness.action}}" class="btn btn-primary readiness-action" disabled="{{subscribing || refreshing || saving}}" bindtap="onReadinessAction">{{subscribing && readiness.action === 'subscribe' ? '处理中…' : readiness.actionLabel}}</button>
       </view>
       <view class="status-footer">
-        <text class="tiny muted">{{followsLoaded ? readiness.activeCount + ' 配置 · ' + readiness.storeCount + ' 店' : ''}}{{subscription.templateCount && boot.member ? ' · 剩余提醒 ' + subscription.credits + ' 次' : ''}} · {{boot.member ? '会员至 ' + boot.expiresText : (boot.expired ? '会员已到期' : '免费用户')}}</text>
+        <text class="tiny muted">{{followsLoaded ? readiness.activeCount + ' 配置 · ' + readiness.storeCount + ' 店' : ''}}{{subscription.templateCount && boot.member ? ' · 剩余提醒 ' + subscription.credits + ' 次' : ''}} · {{boot.member ? '会员至 ' + boot.expiresText : (boot.expired ? '会员已到期' : (boot.freeReminder ? '免费体验中' : '免费用户'))}}</text>
         <text class="service-link" bindtap="onToggleServiceDetails">{{showServiceDetails ? '收起详情 ▴' : '详情 ▾'}}</text>
       </view>
       <block wx:if="{{showServiceDetails}}">
@@ -34,13 +62,13 @@
           <view class="service-detail">{{delivery.detail}}</view>
         </view>
         <view class="service-row authorization-row">
-          <view class="authorization-copy"><view class="service-title">提醒次数</view><view class="service-detail">{{!subscription.templateCount ? (boot.templateTitle ? boot.templateTitle : '待模板配置') : (boot.member ? '剩余 ' + subscription.credits + ' 次，每次补货提醒消耗 1 次，可连续点击累加' : '到货提醒为会员专属')}}</view></view>
-          <button class="btn btn-ghost btn-sm compact-action" disabled="{{subscribing}}" bindtap="onSubscribe">{{subscribing ? '处理中' : (subscriptionPending ? '同步授权' : (!subscription.templateCount ? '查看原因' : (boot.member ? '增加提醒次数' : '了解会员')))}}</button>
+          <view class="authorization-copy"><view class="service-title">提醒次数</view><view class="service-detail">{{!subscription.templateCount ? (boot.templateTitle ? boot.templateTitle : '待模板配置') : (boot.member ? '剩余 ' + subscription.credits + ' 次，每次补货提醒消耗 1 次，可连续点击累加' : (boot.freeReminder ? (subscription.credits ? '已授权，补货时免费提醒 1 次' : '免费体验 1 条到货提醒，需授权 1 次') : '到货提醒为会员专属'))}}</view></view>
+          <button class="btn btn-ghost btn-sm compact-action" disabled="{{subscribing}}" bindtap="onSubscribe">{{subscribing ? '处理中' : (subscriptionPending ? '同步授权' : (!subscription.templateCount ? '查看原因' : (boot.member ? '增加提醒次数' : (boot.freeReminder ? '授权提醒' : '了解会员'))))}}</button>
         </view>
         <view class="status-footer"><text class="tiny muted">{{refreshedText ? '最近读取 ' + refreshedText : ''}}</text><text class="service-link" bindtap="onServiceDetails">服务详情 ›</text></view>
         <view class="tiny muted subscription-rule">订阅消息声音跟随微信设置；免打扰时段不发送。</view>
         <view wx:if="{{!boot.member}}" class="member-summary">
-          <text class="small text-2">{{boot.expired ? '会员已到期，监测与提醒已停' : '免费用户不自动提醒'}}</text>
+          <text class="small text-2">{{boot.expired ? '会员已到期，监测与提醒已停' : (boot.freeReminder ? '免费体验：1 个配置、1 条提醒' : (boot.freeReminderUsed ? '免费体验提醒已用完' : '免费用户不自动提醒'))}}</text>
           <text class="small" style="color: var(--green-dark);" bindtap="onGoMine">了解会员 ›</text>
         </view>
       </block>
@@ -69,7 +97,7 @@
       <view wx:if="{{!follows.length}}" class="empty">
         <view class="empty-symbol"><image class="empty-whistle" src="/images/brand/whistle-green.png" mode="aspectFit" aria-hidden="true" /></view>
         <view>给心仪的配置留个小哨</view>
-        <view class="tiny mt">{{boot.member ? '点击添加，选择型号、容量、颜色和门店' : '会员可添加关注；购买开放情况见「我的」'}}</view>
+        <view class="tiny mt">{{boot.member || boot.freeReminder ? '点击添加，选择型号、容量、颜色和门店' : '会员可添加关注；购买开放情况见「我的」'}}</view>
       </view>
 
       <view wx:for="{{follows}}" wx:key="followId" id="follow-entry-{{index}}" class="follow">
@@ -99,7 +127,7 @@
         </view>
         <view class="btn-row follow-actions">
           <button class="btn btn-ghost btn-sm" data-id="{{item.followId}}" bindtap="onEdit">编辑</button>
-          <button wx:if="{{boot.member}}" class="btn btn-outline btn-sm" data-id="{{item.followId}}" data-status="{{item.status}}" bindtap="onToggle">{{item.status === 'active' ? '暂停关注' : '开启关注'}}</button>
+          <button wx:if="{{boot.member || boot.freeReminder}}" class="btn btn-outline btn-sm" data-id="{{item.followId}}" data-status="{{item.status}}" bindtap="onToggle">{{item.status === 'active' ? '暂停关注' : '开启关注'}}</button>
           <button class="btn btn-danger btn-sm" data-id="{{item.followId}}" bindtap="onRemove">删除</button>
         </view>
       </view>

@@ -2,7 +2,7 @@ const { call, newId, showError, toast } = require('../../utils/api');
 const { getBootstrap, getCatalog, refreshBootstrap, invalidateBootstrap, subscribeCatalog, getFollows, invalidateFollows, publishSubscriptions, subscribeSubscriptions } = require('../../utils/store');
 const fmt = require('../../utils/format');
 const { syncTabBar } = require('../../utils/tab-bar');
-const { restockSubscription, reminderReadiness } = require('../../utils/reminder-readiness');
+const { restockSubscription, reminderReadiness, canRemind } = require('../../utils/reminder-readiness');
 const { shareAppMessage, shareTimeline } = require('../../utils/share');
 const { monitorPollDelay } = require('../../utils/poll');
 const { FINAL_ERRORS, readPending, savePending, clearPending, refreshConsentSetting, topUpReminderCredit } = require('../../utils/reminder-credits');
@@ -51,13 +51,35 @@ function deliveryView(notifications, templateIds) {
   return { label: '发送服务已就绪', cls: 'ok', detail: '检测到符合条件的补货后，将使用你的有效授权发送提醒。' };
 }
 
+const FEEDBACK_TOAST = { bought: '恭喜买到！', missed: '已记录，继续为你盯着', skipped: '已记录，继续为你盯着' };
+
+/** The alert a WeChat message opened: when it was found and what the store shows now. */
+function presentAlert({ notification: n, latest, follow }, now = Date.now()) {
+  const current = fmt.stockObservation(latest || {}, now, { restricted: Boolean(latest && latest.restricted) });
+  return {
+    eventId: n.eventId,
+    productTitle: n.productTitle,
+    partNumber: n.partNumber,
+    storeName: n.storeName || n.storeNumber,
+    eventLabel: fmt.eventMeta(n.eventType).label,
+    foundText: fmt.fmtDateTime(n.detectedAt),
+    agoText: fmt.relative(n.detectedAt, now),
+    nowLabel: current.statusLabel,
+    nowCls: current.statusCls,
+    nowText: current.observationState === 'fresh' ? '最近观测 ' + current.observedText : current.freshnessText,
+    feedback: n.feedback || null,
+    followActive: Boolean(follow && follow.status === 'active'),
+  };
+}
+
 function presentFollow(follow, boot, catalog, collector) {
   const now = Date.now();
   const status = { ...(FOLLOW_STATUS[follow.status] || { label: follow.status, cls: 'muted' }) };
   if (follow.status === 'paused' && ['member_expired', 'membership_expired'].includes(follow.statusReason)) status.label = '会员到期，已暂停';
+  if (follow.status === 'expired' && boot.freeReminderUsed) status.label = '免费提醒已用完，监测已停止';
   let monitoringText = '';
   if (follow.status === 'active') {
-    if (!boot.member) { status.cls = 'warn'; monitoringText = '会员未生效，当前不参与自动检测'; }
+    if (!canRemind(boot)) { status.cls = 'warn'; monitoringText = boot.freeReminderUsed ? '免费提醒已用完，开通会员后恢复自动检测' : '会员未生效，当前不参与自动检测'; }
     else if (!collector || collector.state !== 'running') monitoringText = '关注已保存，后台检测情况见上方';
   }
   const product = catalog && catalog.productByPart && catalog.productByPart[follow.partNumber];
@@ -96,9 +118,12 @@ Page({
     subscriptionPending: false,
     refreshError: null,
     refreshedText: null,
+    alert: null,
+    alertBusy: false,
   },
 
-  async onLoad() {
+  async onLoad(options) {
+    if (options && options.eid) getApp().captureAlert({ query: { eid: options.eid } });
     if (this.loadingBoot) return;
     this.loadingBoot = true;
     if (!this.unsubscribeCatalog) this.unsubscribeCatalog = subscribeCatalog(catalog => { this.catalog = catalog; if (this.data.ready && this.data.catalogVersion !== catalog.version) this.setData({ catalogVersion: catalog.version }); });
@@ -111,6 +136,7 @@ Page({
       this.catalog = catalog;
       this.applyBoot(boot, { catalogVersion: catalog.version, ready: true, loadError: null });
       await this.loadFollows();
+      this.consumePendingAlert();
       if (this.visible) this.startPolling();
     } catch (error) {
       this.setData({ loadError: error.message || String(error) });
@@ -134,6 +160,7 @@ Page({
     } catch (e) { /* keep previous data */ }
     this.consumePending();
     this.consumePendingFocus();
+    this.consumePendingAlert();
     this.startPolling();
   },
 
@@ -178,6 +205,49 @@ Page({
     finally { wx.stopPullDownRefresh(); }
   },
 
+  async consumePendingAlert() {
+    const app = getApp(), eventId = app.globalData.pendingAlert;
+    if (!eventId || !this.data.ready) return;
+    app.globalData.pendingAlert = null;
+    app.globalData.handledAlerts.push(eventId);
+    this.setData({ alert: { eventId, loading: true } });
+    if (typeof wx.pageScrollTo === 'function') wx.pageScrollTo({ scrollTop: 0, duration: 0 });
+    try {
+      const data = await call('notify.detail', { eventId });
+      if (this.data.alert && this.data.alert.eventId === eventId) this.setData({ alert: presentAlert(data) });
+    } catch (error) {
+      if (this.data.alert && this.data.alert.eventId === eventId) this.setData({ alert: { eventId, error: error.message || '提醒详情暂时无法读取' } });
+    }
+  },
+
+  onCloseAlert() { this.setData({ alert: null }); },
+
+  onCopyAlert() {
+    const alert = this.data.alert;
+    if (!alert || !alert.partNumber) return;
+    wx.setClipboardData({
+      data: `${alert.productTitle}\n型号：${alert.partNumber}\n门店：Apple ${alert.storeName}`,
+      success: () => toast('已复制，可到 Apple Store App 下单'),
+      fail: () => toast('复制失败，请长按文字手动复制'),
+    });
+  },
+
+  async onAlertFeedback(e) {
+    const alert = this.data.alert, outcome = e.currentTarget.dataset.outcome;
+    if (!alert || this.data.alertBusy) return;
+    this.setData({ alertBusy: true });
+    try {
+      const result = await call('notify.feedback', { eventId: alert.eventId, outcome });
+      this.setData({ 'alert.feedback': result.outcome, 'alert.followActive': alert.followActive && !result.paused });
+      toast(result.paused ? '恭喜买到！已暂停这条关注' : FEEDBACK_TOAST[outcome]);
+      if (result.paused) { this.invalidateFollowRead(); await this.loadFollows(); }
+    } catch (error) {
+      showError(error);
+    } finally {
+      this.setData({ alertBusy: false });
+    }
+  },
+
   consumePending() {
     const pending = getApp().globalData.pendingFollow;
     if (!pending) return;
@@ -195,8 +265,10 @@ Page({
     const templateIds = subscription.templateIds;
     const collector = boot.collector || { state: 'not_deployed' };
     const delivery = deliveryView(notifications, templateIds);
+    const member = boot.membership.active, expired = !member && Boolean(boot.membership.expiresAt);
     this.setData({
-      boot: { member: boot.membership.active, expired: !boot.membership.active && Boolean(boot.membership.expiresAt), expiresAt: boot.membership.expiresAt, expiresText: boot.membership.expiresAt ? fmt.fmtDate(boot.membership.expiresAt) : null, notificationsEnabled: notifications.enabled, notificationReason: delivery.detail, templateIds, templateTitle: typeof notifications.templateTitle === 'string' ? notifications.templateTitle.trim() : '', memberProduct: boot.memberProduct },
+      // freeReminder: a new account's one free alert; freeReminderUsed: it was sent and there is no membership.
+      boot: { member, expired, freeReminder: !member && boot.freeReminder === true, freeReminderUsed: !member && !expired && boot.freeReminder === false, expiresAt: boot.membership.expiresAt, expiresText: boot.membership.expiresAt ? fmt.fmtDate(boot.membership.expiresAt) : null, notificationsEnabled: notifications.enabled, notificationReason: delivery.detail, templateIds, templateTitle: typeof notifications.templateTitle === 'string' ? notifications.templateTitle.trim() : '', memberProduct: boot.memberProduct },
       collector: { ...collector, ...fmt.collectorMeta(collector.state), detail: DETECTION_DETAIL[collector.state] || '暂未取得后台检测状态，请稍后刷新。', updatedText: collector.updatedAt ? fmt.fmtDateTime(collector.updatedAt) : null, batchText: collector.lastBatchAt ? fmt.fmtDateTime(collector.lastBatchAt) : null },
       delivery,
       settings: boot.settings || { notifyEnabled: true },
@@ -288,7 +360,7 @@ Page({
   },
 
   openEditor({ followId, pickerValue, isNew }) {
-    if (!this.data.boot.member) {
+    if (!canRemind(this.data.boot)) {
       this.showMemberModal();
       return;
     }
@@ -297,16 +369,20 @@ Page({
 
   showMemberModal() {
     const product = this.data.boot.memberProduct || {};
+    const used = this.data.boot.freeReminderUsed;
     wx.showModal({
-      title: '关注与到货提醒为会员专属',
-      content: `会员可关注 3 个具体配置，每个配置最多 3 家门店，并可累加到货提醒次数。不同容量或颜色分别占用一个关注名额。${product.paymentReady ? '' : '\n\n会员购买暂未开放，可在「我的」查看状态。'}`,
+      title: used ? '免费体验提醒已用完' : '关注与到货提醒为会员专属',
+      content: `${used ? '你的 1 条免费到货提醒已经发送。' : ''}会员可关注 3 个具体配置，每个配置最多 3 家门店，并可累加到货提醒次数。不同容量或颜色分别占用一个关注名额。${product.paymentReady ? '' : '\n\n会员购买暂未开放，可在「我的」查看状态。'}`,
       confirmText: '前往我的',
       success: r => { if (r.confirm) wx.switchTab({ url: '/pages/mine/index' }); },
     });
   },
 
   onAdd() {
-    if (this.data.follows.length >= this.data.limits.maxFollows) return toast(`最多同时关注 ${this.data.limits.maxFollows} 个机型`);
+    if (this.data.follows.length >= this.data.limits.maxFollows) {
+      if (!this.data.boot.freeReminder) return toast(`最多同时关注 ${this.data.limits.maxFollows} 个机型`);
+      return wx.showModal({ title: '免费体验可关注 1 个配置', content: '开通会员可关注 3 个具体配置，每个配置最多 3 家门店，并可累加到货提醒次数。', confirmText: '前往我的', success: r => { if (r.confirm) this.onGoMine(); } });
+    }
     this.openEditor({ followId: newId('f'), pickerValue: null, isNew: true });
   },
 
@@ -351,6 +427,10 @@ Page({
 
   promptSubscribe() {
     if (!this.data.boot.templateIds.length || this.data.delivery.cls !== 'ok') return;
+    if (this.data.boot.freeReminder) {
+      wx.showModal({ title: '开启免费到货提醒', content: '点「允许」授权 1 次，补货时就通过微信免费提醒你。', confirmText: '去授权', success: r => { if (r.confirm) this.onSubscribe(); } });
+      return;
+    }
     wx.showModal({
       title: '开启补货提醒',
       content: '每点一次「允许」增加 1 次到货提醒，可以连续授权多次累加；勾选「总是保持以上选择」后，平时点查询、刷新时会自动补充。',
@@ -367,8 +447,8 @@ Page({
       wx.showModal({ title: '提醒暂未开放', content: this.data.boot.notificationReason || '尚未配置可用的订阅消息模板。可在关注页查看已有观测，页面可见时约每分钟刷新。', showCancel: false });
       return;
     }
-    // Reminders are member-only; a saved request waits until membership is active.
-    if (!this.data.boot.member) return this.showMemberModal();
+    // Reminders are for members and a new account's free alert.
+    if (!canRemind(this.data.boot)) return this.showMemberModal();
     const saved = readPending();
     if (saved) return this.flushSubscription(saved);
     // User consent can be recorded before the sending service is ready. The
@@ -439,7 +519,7 @@ Page({
 
   async onToggle(e) {
     if (this.toggling) return;
-    if (!this.data.boot.member) { this.showMemberModal(); return; }
+    if (!canRemind(this.data.boot)) { this.showMemberModal(); return; }
     this.toggling = true;
     const { id, status } = e.currentTarget.dataset;
     try {

@@ -183,7 +183,7 @@ Page({
     }
   },
 
-  /** Age local snapshots while visible; only members with follows fetch monitored targets. */
+  /** Age local snapshots while visible; only accounts that can be alerted and have follows fetch monitored targets. */
   startFollowPolling() {
     this.stopFollowPolling();
     const epoch = this.followEpoch;
@@ -191,7 +191,7 @@ Page({
       if (!this.visible || epoch !== this.followEpoch) return;
       this.refreshQuerySnapshot();
       const boot = this.data.boot;
-      if (!boot || !boot.member || !boot.followCount) {
+      if (!boot || !(boot.member || boot.freeReminder) || !boot.followCount) {
         this.followSnapshot = null;
         if (this.data.followTargets.length) this.setData({ followTargets: [] });
         this.followTimer = setTimeout(tick, monitorPollDelay(this.data.collector));
@@ -233,6 +233,7 @@ Page({
       accountError: null,
       boot: {
         member: boot.membership.active,
+        freeReminder: !boot.membership.active && boot.freeReminder === true,
         balance: boot.quota.balance,
         queryCost: boot.quota.queryCost,
         maxStores,
@@ -379,20 +380,24 @@ Page({
     if (!selection.partNumber) return toast('请先选择具体配置');
     if (!selection.storeNumbers.length) return toast('请至少选择一家门店');
     if (!selection.product || !selection.product.supported) return toast('该配置暂不支持关注');
-    this.navigateToFollow({ partNumber: selection.partNumber, storeNumbers: selection.storeNumbers });
+    this.navigateToFollow({ partNumber: selection.partNumber, storeNumbers: selection.storeNumbers, title: selection.product.title });
   },
 
   onAddFollow() {
     const { result } = this.data;
     if (!result) return;
-    this.navigateToFollow({ partNumber: result.product.partNumber, storeNumbers: result.results.map(r => r.storeNumber) });
+    this.navigateToFollow({ partNumber: result.product.partNumber, storeNumbers: result.results.map(r => r.storeNumber), title: result.product.title });
   },
 
   navigateToFollow(target) {
     const boot = this.data.boot;
     if (!boot) return toast('账户正在连接，请稍后再试');
-    if (!boot.member) {
-      wx.showModal({ title: '会员功能', content: '会员可关注 3 个具体配置，每个配置最多 3 家门店。补货提醒还需要微信订阅授权。会员状态与开放情况见「我的」。', confirmText: '去看看', success: r => { if (r.confirm) wx.switchTab({ url: '/pages/mine/index' }); } });
+    if (!boot.member && !boot.freeReminder) {
+      // Keep the intent: 「我的」 offers to continue with it once membership is active.
+      const app = getApp();
+      app.globalData.pendingMemberFollow = { partNumber: target.partNumber, storeNumbers: target.storeNumbers.slice(), title: target.title || target.partNumber };
+      wx.showModal({ title: '关注与到货提醒为会员专属', content: '会员可关注 3 个具体配置，每个配置最多 3 家门店，并可累加到货提醒次数。开通后会继续为你关注这个配置。', confirmText: '去开通',
+        success: r => { if (r.confirm) wx.switchTab({ url: '/pages/mine/index' }); else app.globalData.pendingMemberFollow = null; } });
       return;
     }
     getApp().globalData.pendingFollow = { partNumber: target.partNumber, storeNumbers: target.storeNumbers.slice() };

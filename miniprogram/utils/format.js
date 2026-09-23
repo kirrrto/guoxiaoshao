@@ -90,7 +90,7 @@ const REASON_TEXT = {
   query_in_progress: '原请求仍在处理中，请稍后重试',
   query_failed: '原请求执行失败，已按服务端规则处理次数，请重新查询',
   query_expired: '上次未完成查询已过期，次数已返还，请重新查询',
-  member_required: '该功能仅会员可用',
+  member_required: '开通会员后可继续关注和接收提醒',
 };
 
 function reasonText(code) {
@@ -100,7 +100,7 @@ function reasonText(code) {
 const COLLECTOR_TEXT = {
   not_deployed: { label: '自动监测尚未上线', cls: 'muted' },
   no_lease: { label: '监测服务未持有租约', cls: 'warn' },
-  idle: { label: '监测空闲（无会员关注）', cls: 'muted' },
+  idle: { label: '监测空闲（暂无开启的关注）', cls: 'muted' },
   running: { label: '监测服务运行中', cls: 'ok' },
   throttled: { label: '接口限流，已降速/暂停', cls: 'bad' },
   probing: { label: '限流恢复探测中', cls: 'warn' },

@@ -41,7 +41,7 @@
           <text class="selection-rule-label">关注提醒</text>
           <view class="selection-rule-copy">
             <view>直接关注，无需先查询。</view>
-            <view class="selection-rule-detail">需会员、微信授权及服务就绪。</view>
+            <view class="selection-rule-detail">{{boot.freeReminder ? '新用户可免费关注 1 个配置、收 1 条到货提醒，需微信授权。' : '需会员、微信授权及服务就绪。'}}</view>
           </view>
         </view>
         <view class="selection-rule">
