@@ -39,3 +39,6 @@ evidence/raw/
 # Reproducible payment preview pages and full measurements stay in local artifacts.
 evidence/verification/virtual-payment-2026-09-20/**/*.html
 evidence/verification/virtual-payment-2026-09-20/**/layout-metrics.json
+
+# Agent tool output
+Claude outputs/
