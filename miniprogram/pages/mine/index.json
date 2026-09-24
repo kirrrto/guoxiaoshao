@@ -1,5 +1,6 @@
 {
   "navigationBarTitleText": "果小哨 · 我的",
   "enablePullDownRefresh": true,
-  "usingComponents": {}
+  "usingComponents": {},
+  "pureDataPattern": "^notificationsNextCursor$"
 }

@@ -17,7 +17,7 @@
 
   <block wx:else>
     <view class="page-heading"><view class="page-title">门店取货查询</view><view class="page-subtitle">选择具体配置，查看苹果直营店最近的取货信息</view></view>
-    <view wx:if="{{addTipVisible}}" class="banner banner-ok add-tip"><text class="add-tip-text">点右上角「···」选「添加到我的小程序」，下次在微信首页下拉就能打开。</text><text class="add-tip-close" bindtap="onDismissAddTip" aria-role="button" aria-label="关闭提示">×</text></view>
+    <view wx:if="{{addTipVisible}}" class="banner banner-ok add-tip"><text class="add-tip-text">点右上角「···」选「添加到我的小程序」，下次在微信首页下拉就能打开。</text><text class="add-tip-close tap-target" bindtap="onDismissAddTip" aria-role="button" aria-label="关闭提示">×</text></view>
     <view wx:if="{{announcement}}" class="banner banner-info">{{announcement}}</view>
     <view wx:if="{{!accountReady}}" class="banner banner-info small">{{accountError || '正在连接微信账户，你可以先选择商品和门店。'}}<button wx:if="{{accountError}}" class="btn btn-outline btn-sm mt" bindtap="onRetryAccount">重试账户连接</button></view>
     <view wx:if="{{boot && !boot.member && boot.balance < boot.queryCost}}" class="card onboarding"><view class="bold">先领取免费查询次数</view><view class="small text-2 mt">新用户从「我的」签到开始，再选择容量、颜色和门店。</view><button class="btn btn-primary btn-block mt" bindtap="onGoMine">去签到 / 查看次数</button></view>

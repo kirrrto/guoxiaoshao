@@ -150,6 +150,10 @@ view, text { box-sizing: border-box; }
 .skeleton-bar { height: 88rpx; border-radius: 999rpx; margin-top: 30rpx; }
 @keyframes skeleton-shine { from { background-position: 100% 0; } to { background-position: 0 0; } }
 
+/* 文字按钮与「展开」行：可点区域扩到约 40px 高，文字位置不变 */
+.tap-target { display: inline-block; padding: 20rpx 16rpx; margin: -20rpx -16rpx; }
+.row-between.tap-row { padding: 20rpx 0; margin: -4rpx 0 -20rpx; }
+
 /* 加载失败 */
 .load-error-title { font-size: 32rpx; font-weight: 600; color: var(--text); }
 .load-error-detail { margin-top: 12rpx; font-size: 26rpx; color: var(--text-2); line-height: 1.6; overflow-wrap: anywhere; }

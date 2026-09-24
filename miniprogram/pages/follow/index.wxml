@@ -22,7 +22,7 @@
     <view wx:if="{{alert}}" id="restock-alert" class="card alert-card">
       <view class="card-title">
         <text>到货提醒</text>
-        <text class="service-link" bindtap="onCloseAlert">关闭</text>
+        <text class="service-link tap-target" bindtap="onCloseAlert">关闭</text>
       </view>
       <view wx:if="{{alert.loading}}" class="loading-line">正在读取这条提醒…</view>
       <view wx:elif="{{alert.error}}" class="small text-2">{{alert.error}}</view>
@@ -57,7 +57,7 @@
       </view>
       <view class="status-footer">
         <text class="tiny muted">{{followsLoaded ? readiness.activeCount + ' 配置 · ' + readiness.storeCount + ' 店' : ''}}{{subscription.templateCount && boot.member ? ' · 剩余提醒 ' + subscription.credits + ' 次' : ''}} · {{boot.member ? '会员至 ' + boot.expiresText : (boot.expired ? '会员已到期' : (boot.freeReminder ? '免费体验中' : '免费用户'))}}</text>
-        <text class="service-link" bindtap="onToggleServiceDetails">{{showServiceDetails ? '收起详情 ▴' : '详情 ▾'}}</text>
+        <text class="service-link tap-target" bindtap="onToggleServiceDetails">{{showServiceDetails ? '收起详情 ▴' : '详情 ▾'}}</text>
       </view>
       <block wx:if="{{showServiceDetails}}">
         <view class="service-row">
@@ -72,11 +72,11 @@
           <view class="authorization-copy"><view class="service-title">提醒次数</view><view class="service-detail">{{!subscription.templateCount ? (boot.templateTitle ? boot.templateTitle : '待模板配置') : (boot.member ? '剩余 ' + subscription.credits + ' 次，每次补货提醒消耗 1 次，可连续点击累加' : (boot.freeReminder ? (subscription.credits ? '已授权，补货时免费提醒 1 次' : '免费体验 1 条到货提醒，需授权 1 次') : '到货提醒为会员专属'))}}</view></view>
           <button class="btn btn-ghost btn-sm compact-action" disabled="{{subscribing}}" bindtap="onSubscribe">{{subscribing ? '处理中' : (subscriptionPending ? '同步授权' : (!subscription.templateCount ? '查看原因' : (boot.member ? '增加提醒次数' : (boot.freeReminder ? '授权提醒' : '了解会员'))))}}</button>
         </view>
-        <view class="status-footer"><text class="tiny muted">{{refreshedText ? '最近读取 ' + refreshedText : ''}}</text><text class="service-link" bindtap="onServiceDetails">服务详情 ›</text></view>
+        <view class="status-footer"><text class="tiny muted">{{refreshedText ? '最近读取 ' + refreshedText : ''}}</text><text class="service-link tap-target" bindtap="onServiceDetails">服务详情 ›</text></view>
         <view class="tiny muted subscription-rule">订阅消息声音跟随微信设置；免打扰时段不发送。</view>
         <view wx:if="{{!boot.member}}" class="member-summary">
           <text class="small text-2">{{boot.expired ? '会员已到期，监测与提醒已停' : (boot.freeReminder ? '免费体验：1 个配置、1 条提醒' : (boot.freeReminderUsed ? '免费体验提醒已用完' : '免费用户不自动提醒'))}}</text>
-          <text class="small" style="color: var(--green-dark);" bindtap="onGoMine">了解会员 ›</text>
+          <text class="small tap-target" style="color: var(--green-dark);" bindtap="onGoMine">了解会员 ›</text>
         </view>
       </block>
     </view>

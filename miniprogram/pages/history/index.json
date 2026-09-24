@@ -3,5 +3,6 @@
   "enablePullDownRefresh": true,
   "usingComponents": {
     "target-picker": "/components/target-picker/index"
-  }
+  },
+  "pureDataPattern": "^selection$"
 }

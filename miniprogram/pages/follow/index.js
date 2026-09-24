@@ -111,7 +111,6 @@ Page({
     subscription: { templateCount: 0, credits: 0 },
     delivery: { label: '正在确认', cls: 'muted', detail: '' },
     settings: { notifyEnabled: true },
-    notice: '',
     showServiceDetails: false,
     readiness: { code: 'loading', title: '正在检查提醒条件', detail: '正在读取账户与关注状态。', tone: 'muted', action: '', actionLabel: '', activeCount: 0, storeCount: 0, ready: false },
     refreshing: false,
@@ -324,7 +323,7 @@ Page({
 
   refreshReadiness() {
     const readiness = reminderReadiness(this.data);
-    this.setData({ readiness, notice: readiness.ready ? '' : readiness.detail, dndActive: readiness.dndActive });
+    this.setData({ readiness });
   },
 
   onReadinessAction() {

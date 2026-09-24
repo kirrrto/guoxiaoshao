@@ -24,7 +24,7 @@ test('turning on a follow is distinct from the actual background collector state
     assert.equal(page.data.follows[0].statusLabel, '关注已开启', state);
     assert.equal(page.data.follows[0].status, 'active');
     if (state !== 'running') {
-      assert.match(page.data.notice, state === 'idle' ? /下一轮检测/ : /后台恢复后/);
+      assert.match(page.data.readiness.detail, state === 'idle' ? /下一轮检测/ : /后台恢复后/);
       assert.match(page.data.follows[0].monitoringText, /后台检测情况/);
     }
   }
@@ -45,7 +45,7 @@ test('configuration enabled alone never claims that delivery is running', () => 
   const rt = runtime(); const page = followPage(rt);
   page.applyBoot(boot({ notifications: { enabled: true, templateIds: { restock: 'template-A' } } }));
   assert.equal(page.data.delivery.cls, 'warn');
-  assert.match(page.data.notice, /消息发送服务尚未就绪/);
+  assert.match(page.data.readiness.detail, /消息发送服务尚未就绪/);
   page.onServiceDetails(); assert.equal(rt.calls.length, 0);
   assert.match(rt.messages.at(-1).content, /约每分钟读取一次已有观测/);
 });
@@ -66,7 +66,7 @@ test('authorization counts the current restock template and excludes obsolete cr
     subscriptions: { 'template-A': { credits: 2 }, 'old-template': { credits: 20 } } }));
   assert.equal(page.data.subscription.credits, 2);
   assert.equal(page.data.subscription.templateCount, 1);
-  assert.equal(page.data.notice, '');
+  assert.equal(page.data.readiness.ready, true);
 });
 
 test('ready service still requires the personal message switch, valid credits and a permitted time', t => {
@@ -74,9 +74,9 @@ test('ready service still requires the personal message switch, valid credits an
   const rt = runtime(); const page = followPage(rt);
   page.applyBoot(boot({ settings: { notifyEnabled: false } })); assert.match(page.data.readiness.title, /消息提醒已关闭/);
   page.applyBoot(boot({ settings: { notifyEnabled: true, dnd: { enabled: true, startMinute: 1380, endMinute: 480 } } }));
-  assert.equal(page.data.dndActive, true); assert.match(page.data.readiness.title, /免打扰时段/);
-  page.applyBoot(boot({ subscriptions: {} })); assert.match(page.data.notice, /每点一次「允许」增加 1 次到货提醒/);
-  page.applyBoot(boot()); assert.equal(page.data.notice, '');
+  assert.equal(page.data.readiness.dndActive, true); assert.match(page.data.readiness.title, /免打扰时段/);
+  page.applyBoot(boot({ subscriptions: {} })); assert.match(page.data.readiness.detail, /每点一次「允许」增加 1 次到货提醒/);
+  page.applyBoot(boot()); assert.equal(page.data.readiness.ready, true);
 });
 
 test('paused follows stay paused while a collector is running, and resume uses the real API', async () => {

@@ -22,7 +22,7 @@
       <view class="hero-text">
         <view class="hero-name">果小哨</view>
         <view class="hero-tagline">你的个人选购小助手</view>
-        <view class="hero-sub" bindtap="onCopyId">用户 {{boot.identity.openidMasked}} · 点击复制</view>
+        <view class="hero-sub copy-id" bindtap="onCopyId">用户 {{boot.identity.openidMasked}} · 点击复制</view>
       </view>
       <text class="pill {{membership.active ? 'pill-ok' : 'pill-muted'}}">{{membership.active ? '会员' : (membership.expired ? '会员已到期' : '免费用户')}}</text>
     </view>
@@ -41,7 +41,7 @@
         <view wx:if="{{membership.expired}}" class="banner banner-warn small">已于 {{membership.expiresText}} 到期，监测与提醒停止；关注配置与次数仍保留。</view>
         <view wx:elif="{{boot.freeReminder}}" class="banner banner-ok small">新用户免费体验：可关注 1 个配置，并收到 1 条到货提醒，去「关注」页添加。</view>
       </block>
-      <view class="row-between mt" bindtap="onToggleMembershipRules">
+      <view class="row-between mt tap-row" bindtap="onToggleMembershipRules">
         <text class="small muted">权益对比 · 购买须知</text>
         <text class="small muted">{{showMembershipRules ? '收起 ▴' : '展开 ▾'}}</text>
       </view>
@@ -109,13 +109,13 @@
         <view wx:if="{{redemptionError}}" class="redemption-message redemption-message-error">{{redemptionError}}</view>
         <view wx:if="{{redemptionResult}}" class="redemption-message redemption-message-{{redemptionResult.kind}}"><view class="bold">{{redemptionResult.title}}</view><view class="mt">{{redemptionResult.detail}}</view></view>
       </view>
-      <view class="row-between mt" bindtap="onToggleOrders">
+      <view class="row-between mt tap-row" bindtap="onToggleOrders">
         <text class="small muted">会员记录</text>
         <text class="small muted">{{showOrders ? '收起 ▴' : '展开 ▾'}}</text>
       </view>
       <block wx:if="{{showOrders}}">
         <view wx:if="{{ordersLoading && !orders.length}}" class="loading-line">正在加载会员记录…</view>
-        <view wx:elif="{{ordersError}}" class="record-error"><text>{{ordersError}}</text><text class="retry-link" bindtap="onRetryOrders">重试</text></view>
+        <view wx:elif="{{ordersError}}" class="record-error"><text>{{ordersError}}</text><text class="retry-link tap-target" bindtap="onRetryOrders">重试</text></view>
         <view wx:elif="{{!orders.length}}" class="empty small">暂无会员记录</view>
         <view wx:for="{{orders}}" wx:key="orderId" class="row-between ledger-row">
           <view>
@@ -146,7 +146,7 @@
       </view>
       <view wx:if="{{!membership.active && !quota.signedInToday && quota.balance < quota.queryCost}}" class="banner banner-ok small mt">第一次用？先签到领次数，再去查询页选机型和门店。</view>
 
-      <view class="row-between mt" bindtap="onToggleQuotaDetails">
+      <view class="row-between mt tap-row" bindtap="onToggleQuotaDetails">
         <text class="small muted">次数任务与明细</text>
         <text class="small muted">{{showQuotaDetails ? '收起 ▴' : '展开 ▾'}}</text>
       </view>
@@ -158,10 +158,10 @@
           <text class="tiny muted"> +{{item.reward}} 次</text>
         </view>
         <text wx:if="{{item.done}}" class="pill pill-ok tiny">已完成</text>
-        <text wx:else class="small" style="color: var(--green-dark);" bindtap="onGoHistory">{{item.pendingLabel || '去完成'}} ›</text>
+        <text wx:else class="small tap-target" style="color: var(--green-dark);" bindtap="onGoHistory">{{item.pendingLabel || '去完成'}} ›</text>
       </view>
 
-      <view class="row-between mt" bindtap="onToggleLedger">
+      <view class="row-between mt tap-row" bindtap="onToggleLedger">
         <text class="small muted">次数明细</text>
         <text class="small muted">{{showLedger ? '收起 ▴' : '展开 ▾'}}</text>
       </view>
@@ -184,7 +184,7 @@
         <view class="whistle-section-title"><image class="section-whistle" src="/images/brand/whistle-green.png" mode="aspectFit" aria-hidden="true" /><text>小哨提醒</text></view>
         <view class="pill pill-dot pill-{{boot.collector.cls}} tiny">{{boot.collector.label}}</view>
       </view>
-      <view class="row-between mt" bindtap="onToggleReminderSettings">
+      <view class="row-between mt tap-row" bindtap="onToggleReminderSettings">
         <text class="small muted">通知与免打扰</text>
         <text class="small muted">{{showReminderSettings ? '收起 ▴' : '展开设置 ▾'}}</text>
       </view>
@@ -215,7 +215,7 @@
         <view class="notification-heading-copy"><view class="notification-heading-title whistle-section-title"><image class="section-whistle" src="/images/brand/whistle-green.png" mode="aspectFit" aria-hidden="true" /><text>小哨提醒记录</text></view><view class="tiny muted">{{notifications.length ? '已显示 ' + notifications.length + ' 条' : '个人提醒记录'}}</view></view>
         <button wx:if="{{showNotifications && notifications.length}}" class="notification-button notification-clear" disabled="{{notificationActionBusy || notificationConfirming || !notificationsClearBefore}}" bindtap="onClearNotifications">{{notificationActionBusy === 'clear' ? '清空中…' : '清空'}}</button>
       </view>
-      <view class="row-between mt" bindtap="onToggleNotifications">
+      <view class="row-between mt tap-row" bindtap="onToggleNotifications">
         <text class="small muted">查看记录</text>
         <text class="small muted">{{showNotifications ? '收起 ▴' : '展开 ▾'}}</text>
       </view>

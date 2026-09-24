@@ -4,6 +4,7 @@
 .hero-name { font-size: 42rpx; font-weight: 700; letter-spacing: -0.5rpx; }
 .hero-tagline { font-size: 23rpx; color: var(--text-2); margin-top: 4rpx; line-height: 1.5; }
 .hero-sub { font-size: 22rpx; color: var(--text-3); margin-top: 4rpx; }
+.hero-sub.copy-id { padding: 16rpx 0; margin: -12rpx 0 -16rpx; }
 .balance { font-size: 64rpx; font-weight: 700; color: var(--green-dark); letter-spacing: -2rpx; font-variant-numeric: tabular-nums; }
 .task { padding: 12rpx 0; }
 .ledger-row { padding: 14rpx 0; border-bottom: 2rpx solid var(--line); }
@@ -21,7 +22,7 @@
 .action-row-hover { opacity: 0.65; }
 .record-error { display: flex; align-items: center; flex-wrap: wrap; gap: 16rpx; padding: 24rpx 0; color: var(--text-2); font-size: 24rpx; }
 .record-error > text:first-child { flex: 1 1 220rpx; min-width: 0; }
-.retry-link { color: var(--green-dark); padding: 12rpx; }
+.retry-link { color: var(--green-dark); }
 .hero { flex-wrap: wrap; }
 .hero-text { flex-basis: 240rpx; }
 .hero-sub { word-break: break-all; }
