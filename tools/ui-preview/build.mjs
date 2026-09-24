@@ -147,7 +147,7 @@ const paymentPreview = process.argv.includes('--payment-only');
 const monitoringPreview = process.argv.includes('--monitoring-only');
 const historyTaskPreview = process.argv.includes('--history-task-only');
 const historyDataPreview = process.argv.includes('--history-data-only');
-const widths = [320, 375, 430], scenarios = adminPreview ? ['operator-ready', 'operator-denied', 'operator-loading', 'operator-error', 'operator-longcontent', 'operator-saving'] : historyTaskPreview ? ['history-member-reward', 'history-free-first', 'history-read-error', 'history-balance-cap', 'history-completed', 'history-longcontent', 'history-loading'] : monitoringPreview ? ['monitor-template-missing', 'monitor-ready-authorized', 'monitor-needs-authorization', 'monitor-stale', 'monitor-disabled', 'monitor-expired-paused'] : redemptionPreview ? ['redemption-input', 'redemption-loading', 'redemption-error', 'redemption-success', 'redemption-used', 'redemption-limited', 'redemption-empty'] : stockPreview ? ['stock-fresh', 'stock-old', 'stock-unknown', 'stock-missing', 'stock-restricted'] : reminderPreview ? ['reminders', 'reminder-empty', 'reminder-loading', 'reminder-deleting', 'reminder-clearing', 'reminder-error', 'reminder-more-error', 'longcontent'] : ['free', 'member', 'expired', 'empty', 'error', 'longcontent'];
+const widths = [320, 375, 430], scenarios = adminPreview ? ['operator-ready', 'operator-denied', 'operator-loading', 'operator-error', 'operator-longcontent', 'operator-saving'] : historyTaskPreview ? ['history-member-reward', 'history-free-first', 'history-read-error', 'history-balance-cap', 'history-completed', 'history-longcontent', 'history-loading'] : monitoringPreview ? ['monitor-template-missing', 'monitor-ready-authorized', 'monitor-needs-authorization', 'monitor-stale', 'monitor-disabled', 'monitor-expired-paused'] : redemptionPreview ? ['redemption-input', 'redemption-loading', 'redemption-error', 'redemption-success', 'redemption-used', 'redemption-limited', 'redemption-empty'] : stockPreview ? ['stock-fresh', 'stock-old', 'stock-unknown', 'stock-missing', 'stock-restricted'] : reminderPreview ? ['reminders', 'reminder-empty', 'reminder-loading', 'reminder-deleting', 'reminder-clearing', 'reminder-error', 'reminder-more-error', 'longcontent'] : ['free', 'member', 'expired', 'empty', 'error', 'loading', 'longcontent'];
 if (historyDataPreview) scenarios.splice(0, scenarios.length, 'history-no-data', 'history-unknown-only', 'history-observed-no-events', 'history-events-only', 'history-observed-events', 'history-partial-stores');
 if (paymentPreview) scenarios.splice(0, scenarios.length, 'payment-ready', 'payment-renew', 'payment-blocked', 'payment-old-ios', 'payment-pending', 'payment-cancelled', 'payment-error', 'payment-fulfilled', 'payment-partial-refund');
 const names = adminPreview ? { admin: '运营工具' } : paymentPreview ? { mine: '我的' } : historyDataPreview ? { history: '历史' } : historyTaskPreview ? { history: '历史', mine: '我的' } : stockPreview || monitoringPreview ? { follow: '小哨提醒' } : reminderPreview || redemptionPreview ? { mine: '我的' } : { query: '查询', follow: '小哨提醒', history: '历史', mine: '我的' };
@@ -267,12 +267,16 @@ for (const scenario of scenarios) {
   for (const pageName of Object.keys(names)) {
     const page = rt.instantiate(`pages/${pageName}/index.js`);
     if (pageName === 'follow' && scenario === 'monitor-alert') Object.assign(rt.app.globalData, { pendingAlert: 'preview-event', handledAlerts: [] });
-    if (scenario !== 'operator-loading') await page.onLoad();
+    // 'loading' shows the skeleton a page renders before its first data arrives.
+    if (!['operator-loading', 'loading'].includes(scenario)) await page.onLoad();
     if (scenario === 'monitor-alert') await new Promise(resolve => setImmediate(resolve));
     if (scenario === 'operator-saving') page.setData({ saving: true, configDirty: true });
     if (scenario === 'operator-longcontent') page.setData({ lookup: { user: true }, lookupText: JSON.stringify({ userKey: 'wxe96ad9e77b602f1b:long-user-identity-0123456789abcdefghijklmnopqrstuvwxyz', note: '运营查询长文本换行验收' }, null, 2), configText: JSON.stringify({ announcement: '运行配置说明需要在小屏完整换行且不遮挡操作按钮。'.repeat(5) }, null, 2) });
     if (pageName === 'history' && scenario !== 'history-loading' && page.browsePending) await page.browsePending;
-    if (pageName === 'mine' && historyTaskPreview) await page.onToggleLedger();
+    // Mine sections are collapsed by default; open the ones each audit checks.
+    if (pageName === 'mine' && historyTaskPreview) { page.setData({ showQuotaDetails: true }); await page.onToggleLedger(); }
+    if (pageName === 'mine' && paymentPreview) page.setData({ showMembershipRules: true });
+    if (pageName === 'mine' && reminderPreview) page.setData({ showNotifications: true });
     if (paymentPreview && ['payment-pending', 'payment-cancelled', 'payment-error', 'payment-fulfilled', 'payment-partial-refund'].includes(scenario)) await page.onBuyMembership();
     if (redemptionPreview) {
       page.setData({ redemptionOpen: true, redemptionCode: 'SAMPLE-CODE' });
@@ -295,7 +299,7 @@ for (const scenario of scenarios) {
       if (scenario === 'reminder-more-error') page.setData({ notificationsMoreError: '更早的提醒加载失败，请重试。' });
     }
     const selected = { partNumber: p.partNumber, product: p, storeNumbers: stores.slice(0, 2).map(s => s.storeNumber), stores: stores.slice(0, 2) };
-    if (pageName === 'query' || pageName === 'history') {
+    if ((pageName === 'query' || pageName === 'history') && scenario !== 'loading') {
       page.setData({ pickerValue: { partNumber: p.partNumber, storeNumbers: selected.storeNumbers }, selection: selected, dayKey: '2026-09-15' });
       if (pageName === 'query') {
         page.onPickerChange({ detail: selected });
@@ -348,14 +352,15 @@ for (const scenario of scenarios) {
         'monitor-dnd': ['当前处于免打扰时段', '查看免打扰设置'],
         'monitor-free-trial': ['新用户免费体验', '授权后可收到 1 条免费提醒', '授权免费提醒', '免费体验中'],
         'monitor-alert': ['到货提醒', '确认补货', '2 分钟前', '可取货', '复制型号和门店', '再加一次提醒', '买到了吗？'],
-      }[scenario]] : paymentPreview ? ['7 天会员', '¥7.00 / 7 天', '兑换码开通', ...{
-        'payment-ready': ['购买会员', '购买须知', '一次性虚拟服务', '一经售出不予退款', '一次购买 7 天'], 'payment-renew': ['续费会员', '购买须知', '按剩余有效期顺延'],
+      }[scenario]] : paymentPreview ? ['¥7.00', '兑换码开通', ...{
+        'payment-ready': ['立即开通', '购买须知', '一次性虚拟服务', '一经售出不予退款', '一次购买 7 天'], 'payment-renew': ['续费会员', '购买须知', '按剩余有效期顺延'],
         'payment-blocked': ['付费购买暂未开放'], 'payment-old-ios': ['iOS 15'],
         'payment-pending': ['支付正在确认中', '查询支付结果'], 'payment-cancelled': ['已取消本次支付', '请查询订单状态', '查询支付结果'],
         'payment-error': ['支付结果暂未确认', '查询支付结果'], 'payment-fulfilled': ['支付已确认，会员已开通', '已开通'],
         'payment-partial-refund': ['订单已部分退款', '部分退款', '已退款 ¥3.50'],
-      }[scenario]] : redemptionPreview ? ['兑换会员', '付费购买暂未开放', { 'redemption-input': '确认兑换', 'redemption-loading': '兑换中，请稍候', 'redemption-error': '兑换码无效', 'redemption-success': '兑换成功', 'redemption-used': '此账号已兑换过', 'redemption-limited': '15 分钟后再试', 'redemption-empty': '确认兑换' }[scenario]] : stockPreview ? [p.title, { 'stock-fresh': '本次状态刚记录', 'stock-old': '待更新', 'stock-unknown': '状态待确认', 'stock-missing': '等待首次观测', 'stock-restricted': '会员权益受限' }[scenario]] : scenario === 'error' ? [pageName === 'admin' ? '模拟错误：网络连接中断' : '模拟错误：云环境连接超时']
-        : pageName === 'mine' ? ['7 天会员', '¥7.00', '付费购买暂未开放', '提醒记录', ...(reminderRecords.length ? ['删除记录', scenario === 'reminder-clearing' ? '清空中' : '清空'] : [])]
+      }[scenario]] : redemptionPreview ? ['兑换会员', '付费购买暂未开放', { 'redemption-input': '确认兑换', 'redemption-loading': '兑换中，请稍候', 'redemption-error': '兑换码无效', 'redemption-success': '兑换成功', 'redemption-used': '此账号已兑换过', 'redemption-limited': '15 分钟后再试', 'redemption-empty': '确认兑换' }[scenario]] : stockPreview ? [p.title, { 'stock-fresh': '本次状态刚记录', 'stock-old': '待更新', 'stock-unknown': '状态待确认', 'stock-missing': '等待首次观测', 'stock-restricted': '会员权益受限' }[scenario]] : scenario === 'loading' ? [{ query: '正在加载商品目录', follow: '正在读取你的关注', history: '正在加载商品目录', mine: '正在读取账户信息' }[pageName]]
+        : scenario === 'error' ? [pageName === 'admin' ? '模拟错误：网络连接中断' : '模拟错误：云环境连接超时', '暂时没有连上', '重试']
+        : pageName === 'mine' ? [member ? '会员生效中' : expired ? '会员已到期' : '开通会员', '¥7.00', '付费购买暂未开放', '提醒记录', ...(reminderPreview && reminderRecords.length ? ['删除记录', scenario === 'reminder-clearing' ? '清空中' : '清空'] : [])]
         : pageName === 'follow' && follows.length ? [p.title, stores[0].name]
         : pageName === 'follow' ? ['给心仪的配置留个小哨']
         : pageName === 'admin' ? ['运行统计', '128'] : [p.partNumber, p.title];
