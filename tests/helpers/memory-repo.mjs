@@ -8,7 +8,7 @@ import { createRequire } from 'node:module';
 const require = createRequire(import.meta.url);
 const { COLLECTIONS } = require('../../cloudfunctions/gxs_api/lib/collections.js');
 const { atomicMethods } = require('../../cloudfunctions/gxs_api/lib/repo/atomic-ops.js');
-const { NOTIFIABLE_TYPES } = require('../../cloudfunctions/gxs_api/lib/engine/events.js');
+const { ALERT_TYPES } = require('../../cloudfunctions/gxs_api/lib/engine/events.js');
 const { dayKey: beijingDayKey, startOfDay, addDays } = require('../../cloudfunctions/gxs_api/lib/time.js');
 
 const clone = value => (value === undefined ? undefined : JSON.parse(JSON.stringify(value)));
@@ -164,7 +164,8 @@ export function createMemoryRepo(seed = {}) {
         .sort((a, b) => byDesc('createdAt')(a, b) || byDesc('_id')(a, b));
       return { items: rows.slice(0, limit), hasMore: rows.length > limit };
     },
-    async listUnprocessedEvents({ limit = 100 } = {}) { return all(COLLECTIONS.events).filter(e => NOTIFIABLE_TYPES.has(e.type) && !e.notificationPlannedAt).sort((a, b) => byAsc('detectedAt')(a, b) || byAsc('_id')(a, b)).slice(0, limit); },
+    async listUnprocessedEvents({ limit = 100, since = null } = {}) { return all(COLLECTIONS.events).filter(e => ALERT_TYPES.has(e.type) && !e.notificationPlannedAt && (!since || e.detectedAt >= since)).sort((a, b) => byAsc('detectedAt')(a, b) || byAsc('_id')(a, b)).slice(0, limit); },
+    async getEvent(id) { return get(COLLECTIONS.events, id); },
     async markEventPlanned(id, nowIso) { const event = get(COLLECTIONS.events, id); if (event) put(COLLECTIONS.events, { ...event, notificationPlannedAt: nowIso }); },
     async listPendingNotifications({ limit = 100 } = {}) { return all(COLLECTIONS.notifications).filter(t => t.status === 'pending').sort((a, b) => byAsc('createdAt')(a, b) || byAsc('_id')(a, b)).slice(0, limit); },
     async reconcileExpiredNotifications({ now }) { let reconciled = 0; for (const task of all(COLLECTIONS.notifications)) { if (task.status === 'sending' && task.leaseUntil <= now) { put(COLLECTIONS.notifications, { ...task, status: 'uncertain', reason: 'worker_expired_after_claim', finishedAt: now }); reconciled++; } } return { reconciled }; },

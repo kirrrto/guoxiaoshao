@@ -124,5 +124,7 @@ function applyObservation(previous, observation, options) {
 
 /** Event types that mean "you can go buy it now"; the notifier decides wording per type. */
 const NOTIFIABLE_TYPES = new Set(['first_seen_available', 'restock_confirmed', 'recovered_available']);
+// Events the notifier plans: restocks, plus sell-outs (sent only with a sold-out template).
+const ALERT_TYPES = new Set([...NOTIFIABLE_TYPES, 'became_unavailable']);
 
-module.exports = { KNOWN_STATUSES: KNOWN, DEFAULT_OPTIONS, NOTIFIABLE_TYPES, targetKeyOf, applyObservation };
+module.exports = { KNOWN_STATUSES: KNOWN, DEFAULT_OPTIONS, NOTIFIABLE_TYPES, ALERT_TYPES, targetKeyOf, applyObservation };

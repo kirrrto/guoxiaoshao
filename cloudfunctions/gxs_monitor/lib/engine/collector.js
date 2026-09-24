@@ -13,7 +13,8 @@ const { guardedPickup } = require('./guarded-pickup');
 const { createScheduler, buildGroups } = require('./scheduler');
 const { createLeaseKeeper } = require('./lease');
 const { recordObservations } = require('./observations');
-const { buildTasks, sendTask, TASK_STATUS } = require('./notifier');
+const { buildTasks, sendTask, TASK_STATUS, alertKind } = require('./notifier');
+const { targetKeyOf } = require('./events');
 
 function createCollector({ repo, fetchImpl, clock = () => new Date(), log = console, sendImpl = null, ownerId = `collector-${process.pid}-${Date.now()}`, sleep = ms => new Promise(resolve => setTimeout(resolve, ms)), refreshEveryMs = 10000, statusEveryMs = 5000, mode = 'resident', minimumIntervalMs = 0, statusTtlMs = 0, shouldContinue = () => true, remainingMs = () => Infinity }) {
   let config = mergeConfig(null);
@@ -57,17 +58,50 @@ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = cons
     stats.batches += 1;
     stats.observations += observations.length;
     stats.lastBatchAt = clock().toISOString();
-    stats.events += recorded.flatMap(r => r.events).length;
+    const events = recorded.flatMap(r => r.events).length;
+    stats.events += events;
     await drainNotifications();
+    // Any status change puts this store on the fast cadence (see scheduler burst mode).
+    return { changed: events > 0 };
+  }
+
+  /**
+   * An alert waits for the next sample to repeat the new status, so one noisy
+   * sample cannot send "restocked" and "sold out" in turn. It is also dropped
+   * when it only undoes a blip: availability seen once (never confirmed, so
+   * never alerted) cannot be "sold out", and "available → sold out for one
+   * sample → available" is not a new restock. Returns 'confirmed', 'noise' or 'waiting'.
+   */
+  async function confirmation(event, latest) {
+    if (event.type === 'became_unavailable' && event.availableSince && event.previousKnownAt === event.availableSince) return 'noise';
+    if (event.type === 'restock_confirmed' && event.nonAvailableSince && event.previousKnownAt === event.nonAvailableSince
+      && await repo.getEvent(`${targetKeyOf(event.storeNumber, event.partNumber)}|became_unavailable|${event.nonAvailableSince}`)) return 'noise';
+    if (!latest || latest.statusSince !== event.detectedAt || latest.status !== event.status) return latest ? 'noise' : 'waiting';
+    // knownAt moves only on a known status, so a failed sample never confirms anything.
+    return Date.parse(latest.knownAt) > Date.parse(event.detectedAt) ? 'confirmed' : 'waiting';
   }
 
   async function planEvents(events) {
     const follows = await repo.listActiveFollows();
     const users = new Map((await repo.getUsers([...new Set(follows.map(f => f.userKey))])).map(u => [u._id, u]));
+    const alerting = events.filter(e => alertKind(e.type));
+    const latestByKey = new Map((alerting.length ? await repo.getLatest([...new Set(alerting.map(e => targetKeyOf(e.storeNumber, e.partNumber)))]) : []).map(l => [l._id, l]));
     const now = clock();
+    const maxAgeMs = (config.notifications.maxEventAgeSeconds || 120) * 1000;
     for (const event of events) {
       if (!shouldContinue()) break;
-      const tasks = buildTasks({ events: [event], follows, users, config, now });
+      let planned = [event];
+      if (alertKind(event.type)) {
+        const state = await confirmation(event, latestByKey.get(targetKeyOf(event.storeNumber, event.partNumber)));
+        const expired = now.getTime() - Date.parse(event.detectedAt) > maxAgeMs;
+        if (state === 'waiting' && !expired) {
+          // Check this store right away; the next drain plans the event once confirmed.
+          scheduler.hurry(event.storeNumber);
+          continue;
+        }
+        if (state !== 'confirmed') planned = [];
+      }
+      const tasks = buildTasks({ events: planned, follows, users, config, now });
       for (const task of tasks) {
         if (!shouldContinue()) return;
         if (await repo.saveNotification(task)) stats.tasks += 1;
@@ -83,7 +117,9 @@ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = cons
       if (stopping || !lease.isHeld() || !shouldContinue()) return;
       config = mergeConfig(await repo.getConfig());
       await repo.reconcileExpiredNotifications({ now: clock().toISOString() });
-      const events = await repo.listUnprocessedEvents({ limit: 50 });
+      // Ten minutes is well past the send window, so an old backlog never delays new alerts.
+      const since = new Date(clock().getTime() - Math.max(600, config.notifications.maxEventAgeSeconds || 120) * 1000).toISOString();
+      const events = await repo.listUnprocessedEvents({ limit: 50, since });
       if (events.length) await planEvents(events);
       if (!sendImpl || sendImpl.enabled === false) return;
       if (typeof sendImpl.getHealth === 'function' && !sendImpl.getHealth().authReady) return;
@@ -105,7 +141,8 @@ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = cons
     const now = clock();
     const eligible = follows.filter(f => users.has(f.userKey) && canUseReminders(users.get(f.userKey), now));
     const groups = config.collector.enabled ? buildGroups(eligible, config.collector.maxPartsPerRequest || 20) : [];
-    scheduler.configure({ intervalMs: Math.max(minimumIntervalMs, config.collector.intervalSeconds * 1000), maxConcurrency: config.collector.maxConcurrency, timeoutMs: config.query.upstreamTimeoutMs });
+    scheduler.configure({ intervalMs: Math.max(minimumIntervalMs, config.collector.intervalSeconds * 1000), maxConcurrency: config.collector.maxConcurrency, timeoutMs: config.query.upstreamTimeoutMs,
+      burstIntervalMs: config.collector.burstIntervalSeconds * 1000, burstQuietMs: config.collector.burstQuietSeconds * 1000 });
     scheduler.setTargets(groups);
     lastRefreshAt = now.getTime();
     return { follows: follows.length, eligible: eligible.length, groups: groups.length, enabled: config.collector.enabled };

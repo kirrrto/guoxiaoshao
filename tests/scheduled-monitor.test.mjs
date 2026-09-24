@@ -20,7 +20,8 @@ async function setup(extra = {}) {
   await f.repo.saveFollow({ _id: 'F', userKey: userKeyOf(), partNumber: 'MJYH4CH/A', storeNumbers: ['R577', 'R639'], status: 'active' });
   const sends = [];
   const sendImpl = async message => { sends.push(message); return { errcode: 0 }; };
-  const run = more => runScheduled({ repo: f.repo, fetchImpl: upstream, sendImpl, clock: () => new Date(f.state.now), log, ...more });
+  // Waiting inside a run advances the fake clock, as real time would.
+  const run = more => runScheduled({ repo: f.repo, fetchImpl: upstream, sendImpl, clock: () => new Date(f.state.now), log, sleep: async ms => f.advance(ms), ...more });
   return { f, upstream, run, sends, available: () => { display = 'available'; } };
 }
 
@@ -50,14 +51,19 @@ test('request-scoped SCF environment overrides warm-instance markers and exposes
   assert.equal(isTrustedTimer(event, {}, readTimerRuntime({ environment: '{bad' }, env)), false);
 });
 
-test('minute scans keep real availability state across invocations and deliver one restock', async () => {
+test('minute scans keep real availability state; a restock is re-checked every 2s and sent once confirmed', async () => {
   const s = await setup();
   assert.equal((await s.run()).scanned, 2);
   assert.equal((await s.run()).scanned, 0, 'duplicate trigger cannot bypass due times');
   assert.equal((await s.f.repo.getCollectorStatus()).stats.lastBatchAt, s.f.state.now.toISOString(), 'a duplicate heartbeat retains the last actual batch time');
   s.f.advance(60000); s.available();
+  const started = s.f.state.now.getTime();
   const next = await s.run();
-  assert.equal(next.scanned, 2); assert.equal(s.sends.length, 2);
+  // Both stores change, are re-checked 2 s later (confirming, so both alerts go out),
+  // then stay on the 2 s cadence until 20 s pass without another change.
+  assert.equal(s.sends.length, 2);
+  assert.ok(next.scanned >= 20, `fast re-checks while the stores are hot: ${next.scanned}`);
+  assert.ok(s.f.state.now.getTime() - started >= 20000 && s.f.state.now.getTime() - started <= 30000, 'the fast cadence stops after 20 quiet seconds');
   assert.equal((await s.f.repo.getUser(userKeyOf())).subscriptions.TPL.credits, 1);
   const status = await s.f.repo.getCollectorStatus();
   assert.equal(status.state, 'running'); assert.equal(status.mode, 'scheduled'); assert.equal(status.intervalMs, 60000);
@@ -113,14 +119,14 @@ test('a persisted 429 Retry-After survives the next function cold start', async 
   assert.equal((await s.f.repo.getCollectorStatus()).state, 'throttled');
 });
 
-test('deadline and old outbox are respected without another Apple request', async () => {
+test('deadline is respected, and a manual-query restock is confirmed by one prompt re-check before sending', async () => {
   const s = await setup();
   const exhausted = await s.run({ maxRunMs: 0 });
   assert.equal(exhausted.scanned, 0); assert.equal(exhausted.deadlineReached, true);
   await s.run(); s.f.advance(1000); s.available();
   await s.f.call('query.pickup', { queryId: 'scheduled-manual-1', partNumber: 'MJYH4CH/A', storeNumbers: ['R577'] });
   assert.equal(s.sends.length, 0);
-  const result = await s.run(); assert.equal(result.scanned, 0); assert.equal(s.sends.length, 1);
+  const result = await s.run(); assert.ok(result.scanned >= 1, 'the store is re-checked to confirm'); assert.equal(s.sends.length, 1);
 });
 
 test('another active lease prevents timer traffic and heartbeat clobbering', async () => {

@@ -2,7 +2,7 @@
 const cloud = require('wx-server-sdk');
 const { createCloudbaseRepo } = require('./lib/repo/cloudbase-repo');
 const { createWechatSender } = require('./lib/engine/wechat-sender');
-const { readTimerRuntime, isTrustedTimer, runScheduled } = require('./lib/engine/scheduled');
+const { readTimerRuntime, isTrustedTimer, runBudgetMs, runScheduled } = require('./lib/engine/scheduled');
 const connection = require('./lib/connection');
 
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV, timeout: 8000 });
@@ -30,6 +30,6 @@ exports.main = async (event, context) => {
   if (process.env.GXS_ENABLE_SCHEDULED_MONITOR !== 'true') return { ok: true, state: 'process_disabled', source: trustedContext.SOURCE, triggerSource: trustedRuntime.TRIGGER_SRC || null, runEnvironment: trustedRuntime.TENCENTCLOUD_RUNENV || null };
   const sender = createWechatSender({ appid: process.env.GXS_CONSUMER_APPID || '', appSecret: process.env.GXS_CONSUMER_APPSECRET || '',
     expectedAppid: connection.consumerAppid, fetchImpl: globalThis.fetch, timeoutMs: 5000 });
-  const result = await runScheduled({ repo: createCloudbaseRepo(cloud.database()), fetchImpl: globalThis.fetch, sendImpl: sender });
+  const result = await runScheduled({ repo: createCloudbaseRepo(cloud.database()), fetchImpl: globalThis.fetch, sendImpl: sender, maxRunMs: runBudgetMs(context) });
   return { ok: true, ...result };
 };

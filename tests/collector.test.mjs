@@ -73,6 +73,9 @@ test('collector runs the loop: observations → events → deduped notification 
   s.advance(1000);
   s.state.display = 'available';
   await s.run();
+  assert.equal(s.sends.length, 0, 'a new status waits for one confirming re-check');
+  s.advance(1000);
+  await s.run();
   const events = [...s.repo.tables.get(COLLECTIONS.events).values()];
   assert.deepEqual(events.map(e => [e.storeNumber, e.partNumber, e.type]).sort(), [
     ['R577', 'MJYH4CH/A', 'restock_confirmed'], ['R577', 'MXXX1CH/A', 'restock_confirmed'], ['R639', 'MJYH4CH/A', 'restock_confirmed'],
@@ -101,7 +104,7 @@ test('collector runs the loop: observations → events → deduped notification 
   const status = await s.repo.getCollectorStatus();
   assert.equal(status.state, 'running');
   assert.equal(status.groupCount, 2);
-  assert.equal(s.collector.stats.batches, 6);
+  assert.equal(s.collector.stats.batches, 8, 'four runs over two stores, including the confirming re-check');
   assert.ok(status.stats.batches >= 4, 'status is published at the start of a step, before that step\'s batches land');
   assert.equal(status.stats.sent, 2);
   // The heartbeat taken at step start only includes completed requests. Publish
@@ -109,7 +112,7 @@ test('collector runs the loop: observations → events → deduped notification 
   await s.collector.publishStatus();
   const targets = s.collector.scheduler.snapshot().targets;
   assert.ok(targets.length >= 2);
-  assert.equal(targets.find(t => t.storeNumber === 'R577').health.requests, 3);
+  assert.equal(targets.find(t => t.storeNumber === 'R577').health.requests, 4);
   assert.equal((s.repo.tables.get(COLLECTIONS.health) || new Map()).size, 0, 'status publishing no longer writes one health document per target per minute');
 });
 

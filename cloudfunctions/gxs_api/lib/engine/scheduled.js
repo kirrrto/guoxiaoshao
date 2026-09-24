@@ -39,7 +39,17 @@ function isTrustedTimer(event, wxContext, trustedRuntime = {}) {
 }
 
 /** A bounded scan shares the resident collector's lease, quotas and outbox. */
-async function runScheduled({ repo, fetchImpl, sendImpl, clock = () => new Date(), log = console, maxRunMs = 35000, ownerId = `timer-${crypto.randomUUID()}` }) {
+/**
+ * How long one timer run may work. A run normally ends after one scan; while a
+ * store is on the fast cadence it keeps polling until the function's own time
+ * limit (from the platform context) leaves a safety margin.
+ */
+function runBudgetMs(context, fallbackMs = 35000) {
+  const remaining = context && typeof context.getRemainingTimeInMillis === 'function' ? Number(context.getRemainingTimeInMillis()) : NaN;
+  return Number.isFinite(remaining) && remaining > 0 ? Math.max(5000, Math.min(55000, remaining - 5000)) : fallbackMs;
+}
+
+async function runScheduled({ repo, fetchImpl, sendImpl, clock = () => new Date(), log = console, maxRunMs = 35000, ownerId = `timer-${crypto.randomUUID()}`, sleep = ms => new Promise(resolve => setTimeout(resolve, ms)) }) {
   const deadline = clock().getTime() + maxRunMs;
   const shouldContinue = () => clock().getTime() < deadline;
   const collector = createCollector({ repo, fetchImpl, sendImpl, clock, log, ownerId,
@@ -62,6 +72,15 @@ async function runScheduled({ repo, fetchImpl, sendImpl, clock = () => new Date(
       await Promise.all(result.started);
       if (collector.lease.isHeld()) await collector.publishStatus();
       if (!result.started.length) break;
+    }
+    // Fast cadence: keep checking stores that just changed until they settle or time runs out.
+    while (shouldContinue() && collector.lease.isHeld() && collector.scheduler.bursting()) {
+      const waitMs = collector.scheduler.nextDueInMs();
+      if (clock().getTime() + waitMs >= deadline) break;
+      if (waitMs > 0) await sleep(Math.min(waitMs, 1000));
+      const result = await collector.step();
+      if (!result.held) return { state: 'standby', scanned: collector.stats.batches };
+      await Promise.all(result.started);
     }
     // Pending events are read from the durable outbox on every invocation,
     // including when no target is due or all user follows have been paused.
@@ -87,4 +106,4 @@ async function runScheduled({ repo, fetchImpl, sendImpl, clock = () => new Date(
   }
 }
 
-module.exports = { TRIGGER_NAME, readTimerRuntime, isTrustedTimer, runScheduled };
+module.exports = { TRIGGER_NAME, readTimerRuntime, isTrustedTimer, runBudgetMs, runScheduled };

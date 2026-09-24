@@ -11,7 +11,7 @@
  * the worker passes the sender authenticated for the consumer mini program.
  */
 const { NOTIFIABLE_TYPES } = require('./events');
-const { canUseReminders, reminderBlockReason } = require('../rules/membership');
+const { canUseReminders, reminderBlockReason, isMember } = require('../rules/membership');
 const { inMinuteWindow } = require('../time');
 const { isValidTemplateId } = require('../config');
 
@@ -21,6 +21,20 @@ function taskId(userKey, eventId) {
   return `${userKey}|${eventId}`;
 }
 
+/** The alert an event sends: 'restock', 'soldout' (needs its own template) or null. */
+function alertKind(type) {
+  if (NOTIFIABLE_TYPES.has(type)) return 'restock';
+  if (type === 'became_unavailable') return 'soldout';
+  return null;
+}
+
+function templateIdFor(kind, config) {
+  const ids = config.notifications.templateIds || {};
+  return ids[kind] || null;
+}
+
+const DEFAULT_FIELDS = Object.freeze({ product: 'thing1', store: 'thing2', time: 'time3', status: 'thing4' });
+
 /**
  * Build tasks for one batch of events. `follows` are active follows (any user),
  * `users` a Map userKey → user. Returns tasks including skipped ones with reasons,
@@ -28,15 +42,20 @@ function taskId(userKey, eventId) {
  */
 function buildTasks({ events, follows, users, config, now }) {
   const tasks = [];
-  const templateId = config.notifications.templateIds && config.notifications.templateIds.restock;
   for (const event of events) {
-    if (!NOTIFIABLE_TYPES.has(event.type)) continue;
+    const kind = alertKind(event.type);
+    if (!kind) continue;
+    const templateId = templateIdFor(kind, config);
+    // Sold-out alerts are optional: without their own template none are planned.
+    if (kind === 'soldout' && !isValidTemplateId(templateId)) continue;
     const matching = follows.filter(f => f.partNumber === event.partNumber && f.storeNumbers.includes(event.storeNumber));
     const seen = new Set();
     for (const follow of matching) {
       if (seen.has(follow.userKey)) continue;
       seen.add(follow.userKey);
       const user = users.get(follow.userKey);
+      // The free alert is a restock alert; sold-out alerts are a member feature.
+      if (kind === 'soldout' && user && !isMember(user, now)) continue;
       const base = {
         _id: taskId(follow.userKey, event._id), userKey: follow.userKey, followId: follow._id, eventId: event._id, eventType: event.type,
         partNumber: event.partNumber, storeNumber: event.storeNumber, storeName: event.storeName || null, productTitle: event.productTitle || follow.productTitle || null,
@@ -79,7 +98,8 @@ function buildMessage(task, config) {
   const mm = String(beijing.getUTCMinutes()).padStart(2, '0');
   const ss = String(beijing.getUTCSeconds()).padStart(2, '0');
   const wording = { first_seen_available: '发现可取货', restock_confirmed: '确认补货', recovered_available: '恢复可取货' }[task.eventType] || '可取货';
-  const fields = { product: 'thing1', store: 'thing2', time: 'time3', status: 'thing4', ...(config.notifications.templateFields || {}) };
+  const soldOut = alertKind(task.eventType) === 'soldout';
+  const fields = { ...DEFAULT_FIELDS, ...((soldOut ? config.notifications.soldoutFields : config.notifications.templateFields) || {}) };
   const page = config.notifications.page || 'pages/follow/index';
   const values = {
     product: compactProduct(task),
@@ -87,9 +107,12 @@ function buildMessage(task, config) {
     time: `${beijing.getUTCFullYear()}年${beijing.getUTCMonth() + 1}月${beijing.getUTCDate()}日 ${hh}:${mm}:${ss}`,
     // Template 524 calls this slot "预约项目". Describe the real watch item,
     // without fabricating an order, reservation or a successful purchase.
-    status: config.notifications.contentMode === 'watch_item' ? '商品到货关注' : wording,
+    status: soldOut ? (fields.status && fields.status.startsWith('phrase') ? '已断货' : '已断货，本轮补货结束')
+      : config.notifications.contentMode === 'watch_item' ? '商品到货关注' : wording,
     // "到货数量": Apple shows that a store can hand one over today, never how many.
-    quantity: fields.quantity && fields.quantity.startsWith('phrase') ? '有现货' : '有现货，具体数量以门店为准',
+    // Sold out: nothing left for pickup, which a number field states as 0.
+    quantity: soldOut ? (!fields.quantity ? null : fields.quantity.startsWith('number') ? '0' : fields.quantity.startsWith('phrase') ? '无货' : '暂无现货')
+      : fields.quantity && fields.quantity.startsWith('phrase') ? '有现货' : '有现货，具体数量以门店为准',
   };
   const data = {};
   for (const [slot, key] of Object.entries(fields)) if (key) data[key] = { value: values[slot] };
@@ -111,9 +134,11 @@ function buildMessage(task, config) {
 function skipReason({ task, user, follow, config, now, senderAppid }) {
   const settings = user && user.settings;
   if (!config.notifications.enabled) return 'notifications_disabled';
-  if (!isValidTemplateId(task.templateId) || config.notifications.templateIds.restock !== task.templateId) return 'template_changed';
+  const kind = alertKind(task.eventType) || 'restock';
+  if (!isValidTemplateId(task.templateId) || templateIdFor(kind, config) !== task.templateId) return 'template_changed';
   if (!user) return 'member_expired';
   if (!canUseReminders(user, now)) return reminderBlockReason(user);
+  if (kind === 'soldout' && !isMember(user, now)) return 'member_expired';
   if (senderAppid && user.appid !== senderAppid) return 'consumer_appid_mismatch';
   if (!user.openid) return 'openid_missing';
   if (!follow || follow.status !== 'active' || follow.userKey !== task.userKey || follow.partNumber !== task.partNumber || !follow.storeNumbers.includes(task.storeNumber)) return 'follow_not_active';
@@ -142,7 +167,9 @@ async function sendTask({ task, config, sendImpl, repo, now, ownerId = 'notifier
   const reason = skipReason({ task, user, follow, config, now, senderAppid: sendImpl.appid || config.notifications.consumerAppId });
   if (reason) return finish({ status: TASK_STATUS.skipped, reason, sentAt: null });
   if (!await beforeSend()) return finish({ status: TASK_STATUS.skipped, reason: 'lease_lost', sentAt: null });
-  const reservation = await repo.reserveSubscriptionCredit({ userKey: task.userKey, templateId: task.templateId, taskId: task._id, now: now.toISOString(), targetKey: `${task.storeNumber}|${task.partNumber}`, cooldownMinutes: config.notifications.cooldownMinutes || 0 });
+  // Restock and sold-out alerts cool down separately, so one never blocks the other.
+  const targetKey = `${alertKind(task.eventType) === 'soldout' ? 'soldout|' : ''}${task.storeNumber}|${task.partNumber}`;
+  const reservation = await repo.reserveSubscriptionCredit({ userKey: task.userKey, templateId: task.templateId, taskId: task._id, now: now.toISOString(), targetKey, cooldownMinutes: config.notifications.cooldownMinutes || 0 });
   if (!reservation.reserved) return finish({ status: TASK_STATUS.skipped, reason: reservation.reason || 'no_subscription_credit', sentAt: null });
   let outcome;
   try {
@@ -165,4 +192,4 @@ async function sendTask({ task, config, sendImpl, repo, now, ownerId = 'notifier
   return finish({ ...outcome, attempts: (task.attempts || 0) + 1, sentAt: clock().toISOString() });
 }
 
-module.exports = { TASK_STATUS, taskId, buildTasks, buildMessage, compactProduct, sendTask, skipReason };
+module.exports = { TASK_STATUS, taskId, alertKind, buildTasks, buildMessage, compactProduct, sendTask, skipReason };

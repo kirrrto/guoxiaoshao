@@ -116,7 +116,10 @@ test('a temporary notification insert failure is recovered from the persisted ev
   const save = s.f.repo.saveNotification.bind(s.f.repo); let failed = false;
   s.f.repo.saveNotification = async t => { if (!failed) { failed = true; throw new Error('temporary storage outage'); } return save(t); };
   await s.run();
-  assert.equal(s.sends.length, 0);
+  assert.equal(s.sends.length, 0, 'the restock waits for a confirming re-check');
+  assert.equal((await s.f.repo.listUnprocessedEvents()).length, 1);
+  s.f.advance(1000); await s.run();
+  assert.equal(s.sends.length, 0, 'confirmed, but the notification insert failed');
   assert.equal((await s.f.repo.listUnprocessedEvents()).length, 1);
   s.f.advance(1000); await s.run();
   assert.equal(s.sends.length, 1);

@@ -13,7 +13,7 @@
 const { COLLECTIONS } = require('../collections');
 const { isDuplicateKeyError } = require('../errors');
 const { atomicMethods } = require('./atomic-ops');
-const { NOTIFIABLE_TYPES } = require('../engine/events');
+const { ALERT_TYPES } = require('../engine/events');
 const { dayKey: beijingDayKey, startOfDay, addDays } = require('../time');
 const { observationDayId } = require('../engine/observation-day');
 
@@ -326,8 +326,14 @@ function createCloudbaseRepo(db) {
       const extra = await query([...filters, older({ createdAt: last.createdAt, id: last._id })]).limit(1).get();
       return { items, hasMore: Boolean(extra.data && extra.data.length) };
     },
-    async listUnprocessedEvents({ limit = 100 } = {}) {
-      return readAll(col(COLLECTIONS.events).where(_.and([{ type: _.in([...NOTIFIABLE_TYPES]) }, _.or([{ notificationPlannedAt: _.eq(null) }, { notificationPlannedAt: _.exists(false) }])])).orderBy('detectedAt', 'asc').orderBy('_id', 'asc'), limit);
+    /** Alert events not yet planned; `since` skips a backlog too old to alert about. */
+    async listUnprocessedEvents({ limit = 100, since = null } = {}) {
+      const where = [{ type: _.in([...ALERT_TYPES]) }, _.or([{ notificationPlannedAt: _.eq(null) }, { notificationPlannedAt: _.exists(false) }])];
+      if (since) where.push({ detectedAt: _.gte(since) });
+      return readAll(col(COLLECTIONS.events).where(_.and(where)).orderBy('detectedAt', 'asc').orderBy('_id', 'asc'), limit);
+    },
+    async getEvent(id) {
+      return readOne(col(COLLECTIONS.events).where({ _id: id }));
     },
     async markEventPlanned(eventId, nowIso) {
       await col(COLLECTIONS.events).doc(eventId).update({ data: { notificationPlannedAt: nowIso } });

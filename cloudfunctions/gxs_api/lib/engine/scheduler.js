@@ -10,12 +10,16 @@
  *  - exponential backoff after failures, reset on the first success;
  *  - a global concurrency cap;
  *  - a global circuit breaker that opens on bursts of failures or on 429/503,
- *    honours Retry-After, then half-opens with one probe before closing.
+ *    honours Retry-After, then half-opens with one probe before closing;
+ *  - burst mode: when a batch reports a status change, that group is checked
+ *    every `burstIntervalMs` until `burstQuietMs` pass without another change.
  * Per-group health counters record real request/success intervals so the UI
  * can show measured coverage instead of a countdown.
  */
 const DEFAULTS = Object.freeze({
   intervalMs: 1000,
+  burstIntervalMs: 0, // 0 disables burst mode
+  burstQuietMs: 20000,
   maxConcurrency: 2,
   timeoutMs: 8000,
   backoff: { baseMs: 2000, factor: 2, maxMs: 60000 },
@@ -82,7 +86,15 @@ function createScheduler(options) {
     return align > 0 ? Math.floor(nowMs / align) * align + Math.ceil(opts.intervalMs / align) * align : nowMs + opts.intervalMs;
   }
 
-  function configure({ intervalMs, maxConcurrency, timeoutMs } = {}) {
+  function configure({ intervalMs, maxConcurrency, timeoutMs, burstIntervalMs, burstQuietMs } = {}) {
+    if (burstIntervalMs !== undefined) {
+      if (!Number.isFinite(burstIntervalMs) || burstIntervalMs < 0 || burstIntervalMs > 60000) throw new TypeError('invalid burst interval');
+      opts.burstIntervalMs = burstIntervalMs;
+    }
+    if (burstQuietMs !== undefined) {
+      if (!Number.isFinite(burstQuietMs) || burstQuietMs < 0 || burstQuietMs > 600000) throw new TypeError('invalid burst quiet period');
+      opts.burstQuietMs = burstQuietMs;
+    }
     if (intervalMs !== undefined) {
       if (!Number.isFinite(intervalMs) || intervalMs < 1000 || intervalMs > 3600000) throw new TypeError('invalid collector interval');
       opts.intervalMs = intervalMs;
@@ -103,7 +115,7 @@ function createScheduler(options) {
     for (const group of nextGroups) {
       keep.add(group.key);
       if (!groups.has(group.key)) {
-        groups.set(group.key, { group, nextDueAt: 0, inFlight: false, failures: 0, health: emptyHealth() });
+        groups.set(group.key, { group, nextDueAt: 0, inFlight: false, failures: 0, burstUntil: 0, health: emptyHealth() });
       }
     }
     for (const key of [...groups.keys()]) if (!keep.has(key)) groups.delete(key);
@@ -208,9 +220,13 @@ function createScheduler(options) {
       noteFailure(finishedMs, record);
     }
     try {
-      await onBatch({ group, record, observations, succeeded, finishedAt: new Date(finishedMs).toISOString() });
+      const outcome = await onBatch({ group, record, observations, succeeded, finishedAt: new Date(finishedMs).toISOString() });
       health.persistenceFailed = false;
       health.lastPersistedAt = clock().getTime();
+      // A status change keeps this store on the fast cadence until it stays quiet.
+      if (outcome && outcome.changed && opts.burstIntervalMs > 0) entry.burstUntil = finishedMs + opts.burstQuietMs;
+      // Burst mode only ever brings the next check forward, never later than the normal cadence.
+      if (succeeded && opts.burstIntervalMs > 0 && entry.burstUntil > finishedMs) entry.nextDueAt = Math.min(entry.nextDueAt, Math.max(nowMs + opts.burstIntervalMs, finishedMs));
     } catch (error) {
       health.persistenceFailed = true;
       health.persistenceFailures += 1;
@@ -221,6 +237,28 @@ function createScheduler(options) {
     } finally {
       entry.inFlight = false;
     }
+  }
+
+  /** Check a store's groups now and keep them fast for a while (e.g. a restock seen by a manual query). */
+  function hurry(storeNumber) {
+    if (!(opts.burstIntervalMs > 0)) return 0;
+    const nowMs = clock().getTime();
+    let count = 0;
+    for (const entry of groups.values()) {
+      if (entry.group.storeNumber !== storeNumber) continue;
+      entry.burstUntil = Math.max(entry.burstUntil || 0, nowMs + opts.burstQuietMs);
+      // Never closer than the burst interval to this store's previous request.
+      const earliest = entry.health.lastRequestAt === null ? nowMs : entry.health.lastRequestAt + opts.burstIntervalMs;
+      if (!entry.failures) entry.nextDueAt = Math.min(entry.nextDueAt, Math.max(nowMs, earliest));
+      count += 1;
+    }
+    return count;
+  }
+
+  /** True while any group is still on the fast cadence. */
+  function bursting() {
+    const nowMs = clock().getTime();
+    return [...groups.values()].some(e => e.burstUntil > nowMs);
   }
 
   /** Dispatch every due group within the concurrency cap. Returns the in-flight promises started by this tick. */
@@ -248,17 +286,17 @@ function createScheduler(options) {
     const nowMs = clock().getTime();
     const targets = [...groups.values()].map(e => ({
       key: e.group.key, storeNumber: e.group.storeNumber, partNumbers: e.group.partNumbers,
-      inFlight: e.inFlight, dueInMs: Math.max(0, e.nextDueAt - nowMs), failures: e.failures, health: e.health,
+      inFlight: e.inFlight, dueInMs: Math.max(0, e.nextDueAt - nowMs), failures: e.failures, bursting: e.burstUntil > nowMs, health: e.health,
     }));
     const state = paused ? 'paused' : breaker.state === 'open' ? 'throttled' : breaker.state === 'half_open' ? 'probing' : targets.some(t => t.health.persistenceFailed) ? 'error' : targets.length ? 'running' : 'idle';
-    return { state, breaker: { ...breaker, failures: breaker.failures.length }, groupCount: targets.length, inFlight: pending.size, intervalMs: opts.intervalMs, maxConcurrency: opts.maxConcurrency, targets };
+    return { state, breaker: { ...breaker, failures: breaker.failures.length }, groupCount: targets.length, inFlight: pending.size, intervalMs: opts.intervalMs, burstIntervalMs: opts.burstIntervalMs, maxConcurrency: opts.maxConcurrency, targets };
   }
 
   // Persist due times and the global breaker across scheduled function cold
   // starts. Otherwise each minute would bypass Retry-After and start again at
   // the first target, starving later stores when a scan reaches its deadline.
   function checkpoint() {
-    return { version: 1, breaker: { ...breaker, failures: [...breaker.failures], probeInFlight: false }, targets: [...groups.values()].map(e => ({ key: e.group.key, nextDueAt: e.nextDueAt, failures: e.failures, health: e.health })) };
+    return { version: 1, breaker: { ...breaker, failures: [...breaker.failures], probeInFlight: false }, targets: [...groups.values()].map(e => ({ key: e.group.key, nextDueAt: e.nextDueAt, failures: e.failures, burstUntil: e.burstUntil || 0, health: e.health })) };
   }
 
   function restore(saved) {
@@ -268,6 +306,7 @@ function createScheduler(options) {
       if (!entry || !Number.isFinite(item.nextDueAt)) continue;
       entry.nextDueAt = item.nextDueAt;
       entry.failures = Math.max(0, Number(item.failures) || 0);
+      entry.burstUntil = Number.isFinite(item.burstUntil) ? item.burstUntil : 0;
       if (item.health && typeof item.health === 'object') entry.health = { ...emptyHealth(), ...item.health };
     }
     if (saved.breaker && ['closed', 'open', 'half_open'].includes(saved.breaker.state)) {
@@ -280,6 +319,8 @@ function createScheduler(options) {
     configure,
     drain: () => Promise.allSettled([...pending]),
     tick,
+    hurry,
+    bursting,
     snapshot,
     checkpoint,
     restore,

@@ -36,10 +36,16 @@ const DEFAULTS = Object.freeze({
     miniprogramState: 'formal',
     consumerAppId: 'wxe96ad9e77b602f1b',
     templateFields: { product: 'thing1', store: 'thing2', time: 'time3', status: 'thing4' },
+    // Sold-out alerts use templateIds.soldout with their own field numbers.
+    soldoutFields: { product: 'thing1', store: 'thing2', time: 'time3', status: 'thing4' },
   },
   collector: {
     enabled: false,
     intervalSeconds: 8,
+    // After a status change, check that store every burstIntervalSeconds until it
+    // has been quiet for burstQuietSeconds (0 disables).
+    burstIntervalSeconds: 2,
+    burstQuietSeconds: 20,
     maxConcurrency: 2,
     continuityGapMs: 5 * 60 * 1000,
     maxRequestsPerMinute: 60,
@@ -73,7 +79,9 @@ function mergeConfig(stored) {
       ? { ...DEFAULTS[key], ...value }
       : value;
   }
-  merged.notifications = { ...merged.notifications, templateFields: { ...DEFAULTS.notifications.templateFields, ...(merged.notifications.templateFields || {}) } };
+  merged.notifications = { ...merged.notifications,
+    templateFields: { ...DEFAULTS.notifications.templateFields, ...(merged.notifications.templateFields || {}) },
+    soldoutFields: { ...DEFAULTS.notifications.soldoutFields, ...(merged.notifications.soldoutFields || {}) } };
   return merged;
 }
 
@@ -86,6 +94,7 @@ function patchConfig(stored, patch) {
     if (value && typeof value === 'object' && !Array.isArray(value) && next[key] && typeof next[key] === 'object' && !Array.isArray(next[key])) {
       next[key] = { ...next[key], ...value };
       if (key === 'notifications' && value.templateFields) next[key].templateFields = { ...(stored.notifications && stored.notifications.templateFields || {}), ...value.templateFields };
+      if (key === 'notifications' && value.soldoutFields) next[key].soldoutFields = { ...(stored.notifications && stored.notifications.soldoutFields || {}), ...value.soldoutFields };
     } else next[key] = value;
   }
   validateConfig(mergeConfig(next));
@@ -116,6 +125,8 @@ function validateConfig(config) {
   integer(config.query.maxRequestsPerUserMinute, 1, 60, 'query.maxRequestsPerUserMinute');
   integer(config.query.maxConcurrentPerUser, 1, 3, 'query.maxConcurrentPerUser');
   integer(config.collector.intervalSeconds, 1, 3600, 'collector.intervalSeconds');
+  integer(config.collector.burstIntervalSeconds, 0, 60, 'collector.burstIntervalSeconds');
+  integer(config.collector.burstQuietSeconds, 0, 600, 'collector.burstQuietSeconds');
   integer(config.collector.maxConcurrency, 1, 10, 'collector.maxConcurrency');
   integer(config.collector.continuityGapMs, 1000, 86400000, 'collector.continuityGapMs');
   integer(config.collector.maxRequestsPerMinute, 1, 600, 'collector.maxRequestsPerMinute');
@@ -133,14 +144,19 @@ function validateConfig(config) {
   if (typeof config.notifications.templateTitle !== 'string' || config.notifications.templateTitle.length > 50 || /[\x00-\x1f\x7f]/.test(config.notifications.templateTitle)) invalid('notifications.templateTitle');
   if (!['stock_status', 'watch_item'].includes(config.notifications.contentMode)) invalid('notifications.contentMode');
   // Product, store and time are required; status and quantity are optional (null omits them).
+  const validateFields = (fields, path, quantityPattern) => {
+    const optional = (key, pattern) => fields[key] === null || fields[key] === undefined || pattern.test(fields[key]);
+    const used = fields ? Object.values(fields).filter(Boolean) : [];
+    if (!fields || Object.keys(fields).some(key => !['product', 'store', 'time', 'status', 'quantity'].includes(key))
+      || ['product', 'store'].some(key => !/^thing\d+$/.test(fields[key])) || !/^(time|date)\d+$/.test(fields.time)
+      || !optional('status', /^(thing|phrase)\d+$/) || new Set(used).size !== used.length) invalid(path);
+    if (!optional('quantity', quantityPattern)) invalid(`${path}.quantity`);
+  };
   const fields = config.notifications.templateFields;
-  const optional = (key, pattern) => fields[key] === null || fields[key] === undefined || pattern.test(fields[key]);
-  const used = fields ? Object.values(fields).filter(Boolean) : [];
-  if (!fields || Object.keys(fields).some(key => !['product', 'store', 'time', 'status', 'quantity'].includes(key))
-    || ['product', 'store'].some(key => !/^thing\d+$/.test(fields[key])) || !/^(time|date)\d+$/.test(fields.time)
-    || !optional('status', /^(thing|phrase)\d+$/) || new Set(used).size !== used.length) invalid('notifications.templateFields');
-  // Apple publishes availability, not quantities: only a text field can say "in stock" truthfully.
-  if (!optional('quantity', /^(thing|phrase)\d+$/)) invalid('notifications.templateFields.quantity');
+  // Apple publishes availability, never a count: a restock can only say "in stock" in words,
+  // while a sold-out store truthfully has 0 left for pickup, so that number is allowed.
+  validateFields(fields, 'notifications.templateFields', /^(thing|phrase)\d+$/);
+  validateFields(config.notifications.soldoutFields, 'notifications.soldoutFields', /^(thing|phrase|number)\d+$/);
   if (config.notifications.contentMode === 'watch_item' && fields.status && !/^thing\d+$/.test(fields.status)) invalid('notifications.templateFields.status');
   if (!Array.isArray(config.tasks) || config.tasks.length > 20 || new Set(config.tasks.map(t => t && t.id)).size !== config.tasks.length) invalid('tasks');
   for (const task of config.tasks) {
