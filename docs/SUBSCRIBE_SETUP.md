@@ -16,18 +16,24 @@
 门店名称：thing7
 ```
 
-2026-09-23 核对详情后确认：「到货数量」是数字类型 `number5`，无法如实填写（见下文），所以**这个模板不能直接使用**。做法是在公共模板库里再选用一次 61831，只勾「商品名称」「时间」「门店名称」，不勾「到货数量」。同一公共模板的关键词编号固定，新模板仍是 `thing1`、`time2`、`thing7`，只有模板 ID 不同。
+2026-09-23 核对详情后确认：「到货数量」是数字类型 `number5`，无法如实填写（见下文），所以**这个模板不使用**。管理员已在公共模板库再次选用 61831，只勾选三个关键词，这是实际使用的模板：
+
+```text
+模板 ID：qcfmYZuvfallzFUAVrEaRsWw4vtnwpucYMaao65OzCw
+关键词：商品名称 thing1、时间 time2、门店名称 thing7（同一公共模板的关键词编号固定）
+场景说明：关注的配置在门店可取货时提醒
+```
 
 四个关键词对应配置里的四个槽位：商品名称 → `product`，门店名称 → `store`，时间 → `time`，到货数量 → `quantity`。这个模板没有状态类关键词，`status` 要设为 `null`，否则会继续带上旧模板的字段。
 
 **到货数量如实填写**：苹果取货接口只说明门店今天能否取货，从不公布件数。字段为文字类型（`thing`）时填「有现货，具体数量以门店为准」，短语类型（`phrase`）时填「有现货」。数字类（`number`、`character_string`、`amount` 等）无法如实填写，配置会被拒绝；遇到这种情况请另外添加一个不含到货数量的到货类模板。
 
-切换用的 patch（`新模板ID` 换成不含到货数量的那个模板的 ID）：
+切换用的 patch：
 
 ```json
 {
   "notifications": {
-    "templateIds": {"restock": "新模板ID"},
+    "templateIds": {"restock": "qcfmYZuvfallzFUAVrEaRsWw4vtnwpucYMaao65OzCw"},
     "templateTitle": "商品到货提醒",
     "contentMode": "stock_status",
     "templateFields": {"product": "thing1", "time": "time2", "store": "thing7", "status": null, "quantity": null}
