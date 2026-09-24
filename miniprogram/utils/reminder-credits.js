@@ -46,13 +46,19 @@ function topUpReminderCredit() {
   const sub = boot && boot.subscriptions && boot.subscriptions[templateId];
   const trialNeedsOne = !member && Boolean(boot) && boot.freeReminder === true && !(sub && Number(sub.credits) > 0);
   if (topUpPending || typeof templateId !== 'string' || !templateId || !(member || trialNeedsOne)
-    || !alwaysAccepts(templateId) || readPending() || typeof wx.requestSubscribeMessage !== 'function') return false;
+    || readPending() || typeof wx.requestSubscribeMessage !== 'function') return false;
+  // Members also top up sell-out alerts; only templates set to "always" can be requested silently.
+  const soldoutId = member && boot.notifications.templateIds.soldout;
+  const tmplIds = [templateId, ...(typeof soldoutId === 'string' && soldoutId ? [soldoutId] : [])].filter(alwaysAccepts);
+  if (!tmplIds.length) return false;
   let request;
-  try { request = wx.requestSubscribeMessage({ tmplIds: [templateId] }); } catch (e) { return false; }
+  try { request = wx.requestSubscribeMessage({ tmplIds }); } catch (e) { return false; }
   topUpPending = true;
   Promise.resolve(request).then(res => {
-    if (!res || res[templateId] !== 'accept') return null;
-    const pending = { requestId: newId('ns'), results: { [templateId]: 'accept' } };
+    const results = {};
+    for (const id of tmplIds) if (res && res[id] === 'accept') results[id] = 'accept';
+    if (!Object.keys(results).length) return null;
+    const pending = { requestId: newId('ns'), results };
     savePending(pending);
     return call('notify.recordSubscription', pending).then(data => { clearPending(); publishSubscriptions(data.subscriptions); },
       error => { if (FINAL_ERRORS.includes(error && error.code)) clearPending(); });

@@ -157,3 +157,32 @@ test('silent top-up gives a free-trial account only the one send it needs', asyn
   assert.equal(used.credits.topUpReminderCredit(), false);
   assert.equal(used.prompts(), 0);
 });
+
+test('members authorize restock and sell-out alerts in one prompt; a new account only restock', async () => {
+  const both = { enabled: true, deliveryReady: true, templateIds: { restock: 'restock-A', soldout: 'soldout-B' } };
+  const requested = [];
+  const s = setup({ always: null, handler: async (action, payload) => action === 'notify.recordSubscription'
+    ? { accepted: Object.keys(payload.results), subscriptions: { 'restock-A': { credits: 3 }, 'soldout-B': { credits: 2 } } } : {} });
+  s.rt.wx.requestSubscribeMessage = async ({ tmplIds }) => { requested.push(tmplIds); return Object.fromEntries(tmplIds.map(id => [id, 'accept'])); };
+  const page = s.rt.instance('pages/follow/index.js');
+  page.setData({ followsLoaded: true, follows: [{ followId: 'f1', partNumber: 'SKU-A', status: 'active', stores: [] }] });
+  page.applyBoot(boot({ notifications: both }));
+  await page.onSubscribe();
+  assert.deepEqual(JSON.parse(JSON.stringify(requested.at(-1))), ['restock-A', 'soldout-B']);
+  assert.deepEqual(JSON.parse(JSON.stringify(s.records().at(-1).payload.results)), { 'restock-A': 'accept', 'soldout-B': 'accept' });
+  assert.equal(page.data.subscription.credits, 3);
+  assert.equal(page.data.subscription.soldoutCredits, 2);
+  page.applyBoot(boot({ notifications: both, membership: { active: false, expiresAt: null }, freeReminder: true }));
+  await page.onSubscribe();
+  assert.deepEqual(JSON.parse(JSON.stringify(requested.at(-1))), ['restock-A'], 'the free alert is a restock alert only');
+});
+
+test('silent top-up asks only for the templates the member set to "always"', async () => {
+  const s = setup();
+  s.rt.app.globalData.bootstrap = boot({ notifications: { enabled: true, deliveryReady: true, templateIds: { restock: 'restock-A', soldout: 'soldout-B' } } });
+  const asked = [];
+  s.rt.wx.requestSubscribeMessage = async ({ tmplIds }) => { asked.push(tmplIds); return Object.fromEntries(tmplIds.map(id => [id, 'accept'])); };
+  assert.equal(s.credits.topUpReminderCredit(), true);
+  await settle();
+  assert.deepEqual(JSON.parse(JSON.stringify(asked)), [['restock-A']], 'sell-out was never set to "always", so it is not requested silently');
+});

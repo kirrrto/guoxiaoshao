@@ -2,7 +2,7 @@ const { call, newId, showError, toast } = require('../../utils/api');
 const { getBootstrap, getCatalog, refreshBootstrap, invalidateBootstrap, subscribeCatalog, getFollows, invalidateFollows, publishSubscriptions, subscribeSubscriptions } = require('../../utils/store');
 const fmt = require('../../utils/format');
 const { syncTabBar } = require('../../utils/tab-bar');
-const { restockSubscription, reminderReadiness, canRemind } = require('../../utils/reminder-readiness');
+const { restockSubscription, soldoutSubscription, reminderReadiness, canRemind } = require('../../utils/reminder-readiness');
 const { shareAppMessage, shareTimeline } = require('../../utils/share');
 const { monitorPollDelay } = require('../../utils/poll');
 const { FINAL_ERRORS, readPending, savePending, clearPending, refreshConsentSetting, topUpReminderCredit } = require('../../utils/reminder-credits');
@@ -63,6 +63,7 @@ function presentAlert({ notification: n, latest, follow }, now = Date.now()) {
     partNumber: n.partNumber,
     storeName: n.storeName || n.storeNumber,
     eventLabel: fmt.eventMeta(n.eventType).label,
+    soldOut: n.eventType === 'became_unavailable',
     foundText: fmt.fmtDateTime(n.detectedAt),
     agoText: fmt.relative(n.detectedAt, now),
     nowLabel: current.statusLabel,
@@ -278,14 +279,16 @@ Page({
     const collector = boot.collector || { state: 'not_deployed' };
     const delivery = deliveryView(notifications, templateIds);
     const member = boot.membership.active, expired = !member && Boolean(boot.membership.expiresAt);
+    // Sell-out alerts are a member feature on their own template, requested in the same prompt.
+    const soldout = member && templateIds.length ? soldoutSubscription(notifications, boot.subscriptions) : { templateId: null, credits: 0 };
     this.setData({
       // freeReminder: a new account's one free alert; freeReminderUsed: it was sent and there is no membership.
-      boot: { member, expired, freeReminder: !member && boot.freeReminder === true, freeReminderUsed: !member && !expired && boot.freeReminder === false, expiresAt: boot.membership.expiresAt, expiresText: boot.membership.expiresAt ? fmt.fmtDate(boot.membership.expiresAt) : null, notificationsEnabled: notifications.enabled, notificationReason: delivery.detail, templateIds, templateTitle: typeof notifications.templateTitle === 'string' ? notifications.templateTitle.trim() : '', memberProduct: boot.memberProduct },
+      boot: { member, expired, freeReminder: !member && boot.freeReminder === true, freeReminderUsed: !member && !expired && boot.freeReminder === false, expiresAt: boot.membership.expiresAt, expiresText: boot.membership.expiresAt ? fmt.fmtDate(boot.membership.expiresAt) : null, notificationsEnabled: notifications.enabled, notificationReason: delivery.detail, templateIds, soldoutId: soldout.templateId, requestIds: soldout.templateId ? [...templateIds, soldout.templateId] : templateIds, templateTitle: typeof notifications.templateTitle === 'string' ? notifications.templateTitle.trim() : '', memberProduct: boot.memberProduct },
       collector: { ...collector, ...fmt.collectorMeta(collector.state), detail: DETECTION_DETAIL[collector.state] || '暂未取得后台检测状态，请稍后刷新。', updatedText: collector.updatedAt ? fmt.fmtDateTime(collector.updatedAt) : null, batchText: collector.lastBatchAt ? fmt.fmtDateTime(collector.lastBatchAt) : null },
       delivery,
       settings: boot.settings || { notifyEnabled: true },
       limits: boot.limits || this.data.limits,
-      subscription,
+      subscription: { ...subscription, soldoutEnabled: Boolean(soldout.templateId), soldoutCredits: soldout.credits },
       ...pageData,
     });
     this.refreshFollowPresentation();
@@ -455,7 +458,7 @@ Page({
   async onSubscribe() {
     if (this.data.subscribing) return;
     if (!this.data.boot) return toast('正在读取账户，请稍后再试');
-    const tmplIds = this.data.boot.templateIds;
+    const tmplIds = this.data.boot.requestIds || this.data.boot.templateIds;
     if (!tmplIds.length) {
       wx.showModal({ title: '提醒暂未开放', content: this.data.boot.notificationReason || '尚未配置可用的订阅消息模板。可在关注页查看已有观测，页面可见时约每分钟刷新。', showCancel: false });
       return;
@@ -493,7 +496,7 @@ Page({
       const restockId = this.data.boot.templateIds[0];
       const credits = restockSubscription({ templateIds: { restock: restockId } }, data.subscriptions).credits;
       clearPending();
-      this.setData({ 'subscription.credits': credits, subscriptionPending: false });
+      this.setData({ 'subscription.credits': credits, 'subscription.soldoutCredits': soldoutSubscription({ templateIds: { soldout: this.data.boot.soldoutId } }, data.subscriptions).credits, subscriptionPending: false });
       publishSubscriptions(data.subscriptions);
       this.refreshReadiness();
       const result = pending.results && pending.results[restockId];
@@ -528,6 +531,8 @@ Page({
   applyCredits(subscriptions) {
     if (!this.data.boot || !this.data.boot.templateIds.length) return;
     const credits = restockSubscription({ templateIds: { restock: this.data.boot.templateIds[0] } }, subscriptions).credits;
+    const soldoutCredits = soldoutSubscription({ templateIds: { soldout: this.data.boot.soldoutId } }, subscriptions).credits;
+    if (soldoutCredits !== this.data.subscription.soldoutCredits) this.setData({ 'subscription.soldoutCredits': soldoutCredits });
     if (credits !== this.data.subscription.credits) { this.setData({ 'subscription.credits': credits }); this.refreshReadiness(); }
   },
 

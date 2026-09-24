@@ -53,6 +53,37 @@
 
 **真实送达记录**：管理员手机于 2026-09-22 收到一条真实补货提醒（旧模板「订单状态提醒」）：商品名称「18 ProMax 512G 冰川蓝色」、预约项目「商品到货关注」、更新时间「2026年9月22日 21:12:04」、商家名称「天环广场」。这证明发送链路、消费者账号凭据、字段映射和带秒的时间格式都被微信接受。新模板沿用同一时间格式。
 
+## 断货提醒：「库存不足提醒」（1.1.8 起）
+
+```text
+模板 ID：0km1cSmh23x-cHRGw4UXzx6aTFLInWjQMoXhHuywK5M
+模板编号：22691　类目：信息查询　场景说明：断货时提醒
+库存信息：thing1　→「已断货，本轮补货结束」
+发生时间：time2　→ 断货时间
+商品名称：thing12
+剩余数量：number6　→「0」（断货时可取货数量就是 0，不是编的数字）
+所属门店：thing19
+```
+
+断货提醒只发给会员，只在「有货」经过复查确认之后又断货、且断货也经过复查确认时发送。会员授权时同一个弹窗里勾选到货和断货两个模板。部署 1.1.8 的 `gxs_api`、`gxs_monitor` 后，对 `gxs_api` 执行云端测试：
+
+```json
+{
+  "action": "admin.updateConfig",
+  "payload": {
+    "patch": {
+      "notifications": {
+        "cooldownMinutes": 0,
+        "templateIds": { "restock": "qcfmYZuvfallzFUAVrEaRsWw4vtnwpucYMaao65OzCw", "soldout": "0km1cSmh23x-cHRGw4UXzx6aTFLInWjQMoXhHuywK5M" },
+        "soldoutFields": { "status": "thing1", "time": "time2", "product": "thing12", "quantity": "number6", "store": "thing19" }
+      }
+    }
+  }
+}
+```
+
+`templateIds` 会整体替换，所以要同时写上到货模板。`cooldownMinutes: 0` 让每一波新补货、每一次断货都提醒（补货和断货分开冷却）。`soldoutFields` 的数量栏允许数字类型，因为断货时的 0 是如实的；到货模板的数量栏仍只接受文字类型。
+
 ## 此前使用的模板（2026-09-20 至 2026-09-23）
 
 管理员已提供后台截图，并于 2026-09-20 以文字确认完整 ID：

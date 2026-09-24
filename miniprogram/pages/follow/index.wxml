@@ -21,7 +21,7 @@
     <view wx:if="{{boot.freeReminder}}" class="banner banner-ok">新用户免费体验：可关注 1 个配置，并收到 1 条到货提醒。</view>
     <view wx:if="{{alert}}" id="restock-alert" class="card alert-card">
       <view class="card-title">
-        <text>到货提醒</text>
+        <text>{{alert.soldOut ? '断货提醒' : '到货提醒'}}</text>
         <text class="service-link tap-target" bindtap="onCloseAlert">关闭</text>
       </view>
       <view wx:if="{{alert.loading}}" class="loading-line">正在读取这条提醒…</view>
@@ -31,12 +31,12 @@
         <text class="tiny muted mono alert-meta" user-select>{{alert.partNumber}} · Apple {{alert.storeName}}</text>
         <view class="alert-row"><text class="small text-2">{{alert.eventLabel}}</text><text class="small">{{alert.foundText}}（{{alert.agoText}}）</text></view>
         <view class="alert-row"><text class="small text-2">现在</text><view class="pill pill-dot pill-{{alert.nowCls}}">{{alert.nowLabel}}</view></view>
-        <view class="tiny muted">{{alert.nowText}}。门店库存变化很快，请尽快在 Apple Store App 或官网确认下单。</view>
+        <view class="tiny muted">{{alert.nowText}}。{{alert.soldOut ? '这轮补货已结束，后台会继续盯着，再到货时提醒你。' : '门店库存变化很快，请尽快在 Apple Store App 或官网确认下单。'}}</view>
         <view class="btn-row">
           <button class="btn btn-primary btn-sm" bindtap="onCopyAlert">复制型号和门店</button>
           <button wx:if="{{boot.member && alert.followActive}}" class="btn btn-outline btn-sm" disabled="{{subscribing}}" bindtap="onSubscribe">再加一次提醒</button>
         </view>
-        <view class="alert-feedback">
+        <view wx:if="{{!alert.soldOut}}" class="alert-feedback">
           <text class="small text-2">{{alert.feedback === 'bought' ? '已买到，祝使用愉快' : (alert.feedback ? '已记录你的反馈' : '买到了吗？')}}</text>
           <view wx:if="{{alert.feedback !== 'bought'}}" class="alert-feedback-actions">
             <button class="btn btn-ghost btn-sm" data-outcome="bought" disabled="{{alertBusy}}" bindtap="onAlertFeedback">买到了</button>
@@ -69,7 +69,7 @@
           <view class="service-detail">{{delivery.detail}}</view>
         </view>
         <view class="service-row authorization-row">
-          <view class="authorization-copy"><view class="service-title">提醒次数</view><view class="service-detail">{{!subscription.templateCount ? (boot.templateTitle ? boot.templateTitle : '待模板配置') : (boot.member ? '剩余 ' + subscription.credits + ' 次，每次补货提醒消耗 1 次，可连续点击累加' : (boot.freeReminder ? (subscription.credits ? '已授权，补货时免费提醒 1 次' : '免费体验 1 条到货提醒，需授权 1 次') : '到货提醒为会员专属'))}}</view></view>
+          <view class="authorization-copy"><view class="service-title">提醒次数</view><view class="service-detail">{{!subscription.templateCount ? (boot.templateTitle ? boot.templateTitle : '待模板配置') : (boot.member ? (subscription.soldoutEnabled ? '到货剩余 ' + subscription.credits + ' 次，断货剩余 ' + subscription.soldoutCredits + ' 次；每条提醒消耗 1 次，可连续点击累加' : '剩余 ' + subscription.credits + ' 次，每次补货提醒消耗 1 次，可连续点击累加') : (boot.freeReminder ? (subscription.credits ? '已授权，补货时免费提醒 1 次' : '免费体验 1 条到货提醒，需授权 1 次') : '到货提醒为会员专属'))}}</view></view>
           <button class="btn btn-ghost btn-sm compact-action" disabled="{{subscribing}}" bindtap="onSubscribe">{{subscribing ? '处理中' : (subscriptionPending ? '同步授权' : (!subscription.templateCount ? '查看原因' : (boot.member ? '增加提醒次数' : (boot.freeReminder ? '授权提醒' : '了解会员'))))}}</button>
         </view>
         <view class="status-footer"><text class="tiny muted">{{refreshedText ? '最近读取 ' + refreshedText : ''}}</text><text class="service-link tap-target" bindtap="onServiceDetails">服务详情 ›</text></view>
@@ -140,6 +140,6 @@
       </view>
     </view>
 
-    <view class="footer-note"><view>每个配置最多 {{limits.maxStoresPerFollow}} 家门店。不同容量或颜色各占一个名额。</view><view>页面约每分钟读取一次已有观测，自动检测由后台服务执行。</view></view>
+    <view class="footer-note"><view>每个配置最多 {{limits.maxStoresPerFollow}} 家门店。不同容量或颜色各占一个名额。</view><view>后台每分钟检测一次；发现变化后每 2 秒复查，确认后才提醒。页面约每分钟刷新一次。</view></view>
   </block>
 </view>

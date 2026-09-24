@@ -8,6 +8,14 @@ function restockSubscription(notifications = {}, subscriptions = {}) {
   return { templateIds, templateCount: templateIds.length, credits: Number.isFinite(rawCredits) ? Math.max(0, Math.floor(rawCredits)) : 0 };
 }
 
+/** The sold-out template, when configured. Members subscribe to it along with restock alerts. */
+function soldoutSubscription(notifications = {}, subscriptions = {}) {
+  const id = notifications.templateIds && notifications.templateIds.soldout;
+  if (typeof id !== 'string' || !id.trim()) return { templateId: null, credits: 0 };
+  const raw = subscriptions && subscriptions[id] && Number(subscriptions[id].credits);
+  return { templateId: id, credits: Number.isFinite(raw) ? Math.max(0, Math.floor(raw)) : 0 };
+}
+
 function activeDnd(settings, now = Date.now()) {
   const dnd = settings && settings.dnd;
   if (!dnd || !dnd.enabled || !Number.isInteger(dnd.startMinute) || !Number.isInteger(dnd.endMinute)) return false;
@@ -70,4 +78,4 @@ function notificationAdvice(notification) {
   return { action: 'service', actionLabel: '查看提醒体检' };
 }
 
-module.exports = { LOW_CREDITS, restockSubscription, activeDnd, canRemind, reminderReadiness, notificationAdvice };
+module.exports = { LOW_CREDITS, restockSubscription, soldoutSubscription, activeDnd, canRemind, reminderReadiness, notificationAdvice };
