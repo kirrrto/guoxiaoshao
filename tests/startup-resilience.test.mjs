@@ -1,4 +1,5 @@
 import test from 'node:test';
+import fs from 'node:fs';
 import assert from 'node:assert/strict';
 import { runtime } from './helpers/miniprogram-runtime.mjs';
 
@@ -131,4 +132,16 @@ test('from the second launch the home page suggests adding the app until the tip
   await reopened.onLoad();
   assert.equal(reopened.data.addTipVisible, false, 'closing the tip is remembered');
   assert.equal(again.onAddToFavorites().title, '果小哨 · 门店取货查询');
+});
+
+test('the Mine page shows the release version and names trial or develop builds', () => {
+  const { version: VERSION } = JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
+  for (const [envVersion, label] of [['release', `v${VERSION}`], ['trial', `v${VERSION} · 体验版`], ['develop', `v${VERSION} · 开发版`]]) {
+    const rt = runtime();
+    rt.wx.getAccountInfoSync = () => ({ miniProgram: { appId: 'consumer', envVersion } });
+    assert.equal(rt.instance('pages/mine/index.js').data.versionLabel, label);
+  }
+  const old = runtime();
+  old.wx.getAccountInfoSync = () => { throw Error('unsupported'); };
+  assert.equal(old.instance('pages/mine/index.js').data.versionLabel, `v${VERSION}`);
 });

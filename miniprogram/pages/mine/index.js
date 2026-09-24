@@ -2,6 +2,14 @@ const { call, showError, toast, newId } = require('../../utils/api');
 const { getBootstrap, invalidateBootstrap, invalidateFollows, publishQuota, subscribeQuota } = require('../../utils/store');
 const { topUpReminderCredit } = require('../../utils/reminder-credits');
 const { confirmTap } = require('../../utils/haptic');
+const { VERSION } = require('../../config/version');
+
+/** "v1.1.7", plus the build channel when this is not the released version. */
+function versionLabel() {
+  let env = 'release';
+  try { env = wx.getAccountInfoSync().miniProgram.envVersion || 'release'; } catch (e) { /* older clients */ }
+  return `v${VERSION}${{ develop: ' · 开发版', trial: ' · 体验版' }[env] || ''}`;
+}
 const fmt = require('../../utils/format');
 const { syncTabBar } = require('../../utils/tab-bar');
 const { notificationAdvice } = require('../../utils/reminder-readiness');
@@ -111,6 +119,7 @@ Page({
   data: {
     ready: false,
     loadError: null,
+    versionLabel: versionLabel(),
     boot: null,
     membership: null,
     quota: null,

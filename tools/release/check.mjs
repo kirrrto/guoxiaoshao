@@ -25,6 +25,7 @@ for (const name of ['gxs_api', 'cloudbase_auth', 'gxs_monitor']) {
   catch { check(`${name}: SDK entry points installed (run npm ci)`, false); }
 }
 check('system.ping uses the release version', require(path.join(root, 'cloudfunctions/gxs_api/lib/app.js')).VERSION === project.version);
+check('Mine page version label uses the release version', require(path.join(root, 'miniprogram/config/version.js')).VERSION === project.version);
 const timer = json('cloudfunctions/gxs_monitor/config.json').triggers;
 check('scheduled monitor has the expected minute trigger', timer.length === 1 && timer[0].name === 'gxs-monitor-minute' && timer[0].type === 'timer' && timer[0].config === '0 * * * * * *');
 const { isTrustedTimer } = require(path.join(root, 'cloudfunctions/gxs_monitor/lib/engine/scheduled.js'));

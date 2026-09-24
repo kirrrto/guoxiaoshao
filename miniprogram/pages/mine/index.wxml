@@ -247,6 +247,6 @@
       <button class="action-row feedback" open-type="feedback" hover-class="action-row-hover"><text class="action-label">意见反馈</text><text class="action-arrow">›</text></button>
     </view>
 
-    <view class="footer-note">果小哨 · 为心仪好物留个哨</view>
+    <view class="footer-note">果小哨 {{versionLabel}} · 为心仪好物留个哨</view>
   </block>
 </view>
