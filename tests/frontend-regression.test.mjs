@@ -44,7 +44,7 @@ test('cloud initialization recovers after a transient failure and shares an in-f
 
 test('result-card requery retains its displayed SKU and stores after picker changes', async () => {
   const rt = runtime(async (action, payload) => queryResponse(payload)); const page = rt.instance('pages/query/index.js');
-  Object.assign(page.data, { boot: { member: true }, selection: selection('SKU-A') }); page.catalog = catalog();
+  Object.assign(page.data, { boot: { member: true } }); page.selection = selection('SKU-A'); page.catalog = catalog();
   await page.onQuery(); page.onPickerChange({ detail: selection('SKU-B') }); await page.onRequery();
   assert.deepEqual(rt.calls.map(c => c.payload.partNumber), ['SKU-A', 'SKU-A']);
 });
@@ -52,7 +52,7 @@ test('result-card requery retains its displayed SKU and stores after picker chan
 test('uncertain query retries reuse request ID; completed queries start a new ID', async () => {
   let count = 0;
   const rt = runtime(async (action, payload) => { if (++count === 1) throw Object.assign(Error('timeout'), { code: 'call_failed' }); return queryResponse(payload); });
-  const page = rt.instance('pages/query/index.js'); Object.assign(page.data, { boot: { member: true }, selection: selection('SKU-A') }); page.catalog = catalog();
+  const page = rt.instance('pages/query/index.js'); Object.assign(page.data, { boot: { member: true } }); page.selection = selection('SKU-A'); page.catalog = catalog();
   await page.onQuery(); await page.onQuery(); await page.onQuery();
   assert.equal(rt.calls[0].payload.queryId, rt.calls[1].payload.queryId);
   assert.notEqual(rt.calls[1].payload.queryId, rt.calls[2].payload.queryId);
@@ -61,15 +61,15 @@ test('uncertain query retries reuse request ID; completed queries start a new ID
 test('query guard prevents double taps from starting two paid operations', async () => {
   let resolve;
   const rt = runtime((action, payload) => new Promise(r => { resolve = () => r(queryResponse(payload)); }));
-  const page = rt.instance('pages/query/index.js'); Object.assign(page.data, { boot: { member: true }, selection: selection('SKU-A') }); page.catalog = catalog();
+  const page = rt.instance('pages/query/index.js'); Object.assign(page.data, { boot: { member: true } }); page.selection = selection('SKU-A'); page.catalog = catalog();
   const first = page.onQuery(); await page.onQuery(); assert.equal(rt.calls.length, 1); resolve(); await first;
 });
 
 test('zero-balance recovery and store reordering retain the original uncertain query ID', async () => {
   let n = 0;
   const rt = runtime(async (action, payload) => { if (++n === 1) throw Object.assign(Error('lost response after debit'), { code: 'call_failed' }); return queryResponse(payload); });
-  const page = rt.instance('pages/query/index.js'); page.catalog = catalog(); Object.assign(page.data, { boot: { member: false, balance: 1, queryCost: 1 }, selection: { ...selection('SKU-A'), storeNumbers: ['R002', 'R001'] } });
-  await page.onQuery(); page.data.boot.balance = 0; page.data.selection.storeNumbers = ['R001', 'R002']; await page.onQuery();
+  const page = rt.instance('pages/query/index.js'); page.catalog = catalog(); Object.assign(page.data, { boot: { member: false, balance: 1, queryCost: 1 } }); page.selection = { ...selection('SKU-A'), storeNumbers: ['R002', 'R001'] };
+  await page.onQuery(); page.data.boot.balance = 0; page.selection.storeNumbers = ['R001', 'R002']; await page.onQuery();
   assert.equal(rt.calls.length, 2); assert.equal(rt.calls[0].payload.queryId, rt.calls[1].payload.queryId);
 });
 
@@ -77,7 +77,7 @@ test('history pagination retains the original request and merges unique events',
   const response = (payload, next) => ({ ok: true, product: product(payload.partNumber), balance: 4, dayKey: payload.dayKey, latest: [], summary: { available: 2, restocks: 0, recoveries: 0, ended: 0 },
     events: [{ id: next ? 'e2' : 'e1', type: 'first_seen_available', detectedAt: new Date().toISOString(), storeNumber: 'R001' }], pagination: { nextCursor: next ? null : 'cursor1', hasMore: !next, total: 2 } });
   const rt = runtime(async (action, payload) => action === 'history.list' ? response(payload, Boolean(payload.cursor)) : {});
-  const page = rt.instance('pages/history/index.js'); Object.assign(page.data, { boot: { member: true }, selection: selection('SKU-A') }); page.catalog = catalog();
+  const page = rt.instance('pages/history/index.js'); Object.assign(page.data, { boot: { member: true } }); page.selection = selection('SKU-A'); page.catalog = catalog();
   await page.onQuery(); page.onPickerChange({ detail: selection('SKU-B') }); await page.onLoadMore();
   const calls = rt.calls.filter(c => c.action === 'history.list');
   assert.equal(calls[0].payload.historyQueryId, calls[1].payload.historyQueryId); assert.equal(calls[1].payload.partNumber, 'SKU-A');
@@ -146,13 +146,13 @@ test('payment is intentionally unavailable and no checkout/query-order API is re
 
 test('abandoned refunded query response clears pending request without requiring a product', async () => {
   const rt = runtime(async () => ({ ok: false, reason: 'query_expired', refunded: 1, balance: 1 }));
-  const page = rt.instance('pages/query/index.js'); Object.assign(page.data, { boot: { member: false, balance: 0 }, selection: selection('SKU-A') }); page.catalog = catalog();
+  const page = rt.instance('pages/query/index.js'); Object.assign(page.data, { boot: { member: false, balance: 0 } }); page.selection = selection('SKU-A'); page.catalog = catalog();
   await page.onQuery(); assert.match(page.data.restriction, /返还/); assert.equal(rt.storage.has('gxs_pending_q_v1'), false); assert.equal(page.data.querying, false);
 });
 
 test('history uses server full-result last-hour count when only one page is loaded', async () => {
   const rt = runtime(async () => ({ ok: true, product: product(), balance: 1, dayKey: rt.load('utils/format.js').todayKey(), events: [], latest: [], summary: { lastHourRestocks: 123 }, pagination: { total: 500, hasMore: true, nextCursor: 'next' } }));
-  const page = rt.instance('pages/history/index.js'); Object.assign(page.data, { boot: { member: true }, selection: selection('SKU-A') }); page.catalog = catalog();
+  const page = rt.instance('pages/history/index.js'); Object.assign(page.data, { boot: { member: true } }); page.selection = selection('SKU-A'); page.catalog = catalog();
   await page.onQuery(); assert.equal(page.data.result.lastHour, 123); assert.equal(page.data.result.lastHourComplete, true);
 });
 

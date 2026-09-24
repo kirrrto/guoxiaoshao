@@ -53,7 +53,7 @@ test('loading-more failure keeps visible rows and cursor so the same page can be
   });
   await rt.page.loadNotifications(); await rt.page.onLoadMoreNotifications();
   assert.deepEqual(rt.page.data.notifications.map(n => n.id), ['a', 'b']);
-  assert.equal(rt.page.data.notificationsNextCursor, 'cursor-older');
+  assert.equal(rt.page.notificationsNextCursor, 'cursor-older');
   assert.match(rt.page.data.notificationsMoreError, /失败/);
   assert.equal(rt.page.data.notificationsLoadingMore, false);
   await rt.page.onLoadMoreNotifications();

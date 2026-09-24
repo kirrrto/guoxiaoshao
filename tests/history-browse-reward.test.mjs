@@ -165,7 +165,7 @@ test('failed history landing visibly offers retry and does not mark the task com
 test('restock detail labels an observation gap without calling it unavailable duration', async () => {
   const rt = runtime(async () => ({ ok: true, dayKey: '2026-09-15', balance: 0, latest: [], summary: {}, events: [{ id: 'event', type: 'restock_confirmed', gapMs: 60000, detectedAt: '2026-09-15T00:00:00Z' }] }));
   const page = rt.instance('pages/history/index.js');
-  page.data.boot = { taskAvailable: false }; page.data.selection = { partNumber: 'MXXX1CH/A', storeNumbers: [] };
+  page.data.boot = { taskAvailable: false }; page.selection = { partNumber: 'MXXX1CH/A', storeNumbers: [] };
   await page.onQuery();
   assert.equal(page.data.result.events[0].detailText, '距上次有效检测 1 分 0 秒');
 });
@@ -185,7 +185,7 @@ test('delayed browse reward cannot restore credits after a newer explicit paid h
   const browsing = history.loadBrowse();
   while (!browseResult) await new Promise(resolve => setImmediate(resolve));
   assert.equal(browseResult.task.quota.balance, 1);
-  history.data.selection = { partNumber: 'MXXX1CH/A', storeNumbers: [] };
+  history.selection = { partNumber: 'MXXX1CH/A', storeNumbers: [] };
   history.data.dayKey = '2026-09-14';
   await history.onQuery();
   await history.completeTask();
@@ -237,7 +237,7 @@ test('history hour totals name their original snapshot cutoff after the page rem
   const today = new Date(Date.now() + 8 * 3600000).toISOString().slice(0, 10);
   const snapshotAt = `${today}T01:23:45.000Z`;
   const rt = runtime(async () => ({ ok: true, dayKey: today, balance: 0, latest: [], summary: { lastHourRestocks: 2 }, events: [], pagination: { snapshotAt, total: 0, hasMore: false } }));
-  const history = rt.instance('pages/history/index.js'); history.data.boot = { taskAvailable: false }; history.data.selection = { partNumber: 'MXXX1CH/A', storeNumbers: [] };
+  const history = rt.instance('pages/history/index.js'); history.data.boot = { taskAvailable: false }; history.selection = { partNumber: 'MXXX1CH/A', storeNumbers: [] };
   await history.onQuery(); history.refreshObservationSnapshot();
   assert.equal(history.data.result.lastHour, 2);
   assert.equal(history.data.result.lastHourWindowText, '截至 09:23:45 的近一小时');

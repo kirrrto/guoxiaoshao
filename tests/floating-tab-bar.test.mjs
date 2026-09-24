@@ -62,7 +62,7 @@ test('cached pages recover selection after real programmatic query, history and 
     page.getTabBar = () => bars[index];
     return page;
   });
-  pages[0].setData({ boot: { member: true }, selection: { partNumber: 'SKU-A', product: { supported: true }, storeNumbers: ['R001'] } });
+  pages[0].setData({ boot: { member: true } }); pages[0].selection = { partNumber: 'SKU-A', product: { supported: true }, storeNumbers: ['R001'] };
   pages[0].onFollowSelection();
   assert.equal(h.switches.at(-1).url, '/pages/follow/index');
   assert.deepEqual(copy(h.rt.app.globalData.pendingFollow), { partNumber: 'SKU-A', storeNumbers: ['R001'] });

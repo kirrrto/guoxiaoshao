@@ -12,6 +12,7 @@ const { confirmTap } = require('../../utils/haptic');
 const SELECTION_KEY = 'gxs_query_selection_v1';
 const RESULT_KEY = 'gxs_query_result_v1';
 const ADD_TIP_KEY = 'gxs_add_tip_dismissed_v1';
+const EMPTY_SELECTION = { partNumber: null, product: null, storeNumbers: [], stores: [] };
 
 /** From the second launch on, suggest pinning the app until the user closes the tip. */
 function shouldShowAddTip() {
@@ -82,6 +83,9 @@ function presentFollowTargets(follows) {
 }
 
 Page({
+  // The picker's current choice. Only logic reads it, so it stays off setData.
+  selection: EMPTY_SELECTION,
+
   data: {
     ready: false,
     accountReady: false,
@@ -90,7 +94,6 @@ Page({
     catalogVersion: '',
     boot: null,
     pickerValue: null,
-    selection: { partNumber: null, product: null, storeNumbers: [], stores: [] },
     selectionExpanded: true,
     selectionCanCollapse: false,
     selectionSummary: null,
@@ -126,11 +129,11 @@ Page({
       const selection = savedSelection(pickerValue, catalog);
       const restored = selectionDetails(pickerValue, catalog, 3);
       const result = cached && cached.product ? { ...cached, product: { ...cached.product, ...(catalog.productByPart[cached.product.partNumber] || {}) }, results: presentResults(cached, catalog), queriedText: fmt.fmtDateTime(cached.queriedAt) } : null;
+      this.selection = selection;
       this.setData({
         catalogVersion: catalog.version,
         ready: true,
         pickerValue,
-        selection,
         selectionExpanded: !restored.valid,
         selectionCanCollapse: restored.valid,
         selectionSummary: restored.summary,
@@ -179,11 +182,11 @@ Page({
   },
 
   onShareAppMessage() {
-    return shareAppMessage('/pages/query/index', this.data);
+    return shareAppMessage('/pages/query/index', { ...this.data, selection: this.selection });
   },
 
   onShareTimeline() {
-    return shareTimeline('/pages/query/index', this.data);
+    return shareTimeline('/pages/query/index', { ...this.data, selection: this.selection });
   },
 
   onAddToFavorites() {
@@ -252,7 +255,7 @@ Page({
 
   applyBoot(boot) {
     const maxStores = boot.limits ? boot.limits.queryMaxStores : 3;
-    const summary = this.selectionView(this.data.selection, maxStores);
+    const summary = this.selectionView(this.selection, maxStores);
     this.setData({
       ...summary,
       accountReady: true,
@@ -274,7 +277,7 @@ Page({
   applyCatalog(catalog) {
     this.catalog = catalog;
     if (!this.data.ready) return;
-    const patch = this.selectionView(this.data.selection);
+    const patch = this.selectionView(this.selection);
     if (this.data.catalogVersion !== catalog.version) patch.catalogVersion = catalog.version;
     this.setData(patch);
   },
@@ -290,8 +293,9 @@ Page({
 
   onPickerChange(e) {
     const selection = e.detail;
-    if (targetKey(selection) !== targetKey(this.data.selection)) this.onSelectionInteraction();
-    this.setData({ selection, restriction: null, ...this.selectionView(selection) });
+    if (targetKey(selection) !== targetKey(this.selection)) this.onSelectionInteraction();
+    this.selection = selection;
+    this.setData({ restriction: null, ...this.selectionView(selection) });
     try { wx.setStorageSync(localKey(SELECTION_KEY), { partNumber: selection.partNumber, storeNumbers: selection.storeNumbers }); } catch (err) { /* ignore */ }
   },
 
@@ -314,7 +318,7 @@ Page({
   },
 
   onDoneSelection() {
-    const patch = this.selectionView(this.data.selection);
+    const patch = this.selectionView(this.selection);
     if (!patch.selectionCanCollapse) return toast('请选择可查询的配置及有效门店');
     this.onSelectionInteraction();
     this.setData({ ...patch, selectionExpanded: false });
@@ -347,7 +351,7 @@ Page({
   async onQuery() {
     // Must run inside the tap, before any await (WeChat gesture rule).
     topUpReminderCredit();
-    return this.performQuery(this.data.selection);
+    return this.performQuery(this.selection);
   },
 
   onRequery() {
@@ -385,7 +389,7 @@ Page({
       const result = { ...response, product, results: presentResults(response, catalog), queriedText: fmt.fmtDateTime(response.queriedAt) };
       this.querySnapshot = response;
       const retryHint = response.retryAfterMs > 0 ? ` 建议 ${Math.ceil(response.retryAfterMs / 1000)} 秒后重试。` : '';
-      this.setData({ result, resultIsCache: false, resultTargetDifferent: resultHasDifferentTarget(result, this.data.selection), 'boot.balance': response.balance, restriction: response.ok ? (response.partial ? '部分门店暂未查询成功，请查看各店状态。' + retryHint : null) : fmt.reasonText(response.reason) + retryHint });
+      this.setData({ result, resultIsCache: false, resultTargetDifferent: resultHasDifferentTarget(result, this.selection), 'boot.balance': response.balance, restriction: response.ok ? (response.partial ? '部分门店暂未查询成功，请查看各店状态。' + retryHint : null) : fmt.reasonText(response.reason) + retryHint });
       try { wx.setStorageSync(localKey(RESULT_KEY), response); } catch (err) { /* ignore */ }
       if (response.refunded) toast('本次未取得有效结果，已返还次数');
       if (response.ok && result.results.length) { confirmTap(); this.focusQueryResult(focus); }
@@ -401,7 +405,7 @@ Page({
   onResultImageError() { this.setData({ 'result.product.imageUrl': '' }); },
 
   onFollowSelection() {
-    const { selection, boot } = this.data;
+    const { boot } = this.data, selection = this.selection;
     if (!boot) return toast('账户正在连接，请稍后再试');
     if (!selection.partNumber) return toast('请先选择具体配置');
     if (!selection.storeNumbers.length) return toast('请至少选择一家门店');

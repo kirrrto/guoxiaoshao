@@ -17,7 +17,7 @@ const copy = value => JSON.parse(JSON.stringify(value));
 async function queriedPage(handler) {
   const rt = runtime(async (action, payload) => action === 'query.pickup' ? response() : handler ? handler(action, payload) : boot());
   const page = rt.instance('pages/query/index.js');
-  Object.assign(page.data, { ready: true, boot: { member: false, followCount: 0 }, selection: selection() }); page.catalog = catalog();
+  Object.assign(page.data, { ready: true, boot: { member: false, followCount: 0 } }); page.selection = selection(); page.catalog = catalog();
   page.catalog = catalog();
   await page.onQuery();
   return { rt, page };
@@ -84,7 +84,7 @@ test('a manual query with missing or unknown observations cannot show a positive
     { storeNumber: 'R002', status: 'unknown', observedAt, lastKnownStatus: 'available', isStale: true },
   ]));
   const page = rt.instance('pages/query/index.js');
-  Object.assign(page.data, { boot: { member: true }, selection: selection() }); page.catalog = catalog();
+  Object.assign(page.data, { boot: { member: true } }); page.selection = selection(); page.catalog = catalog();
   await page.onQuery();
   const [missing, unknown] = page.data.result.results;
   assert.equal(missing.statusLabel, '等待首次观测');
@@ -96,10 +96,10 @@ test('a manual query with missing or unknown observations cannot show a positive
 test('selected-target follow uses current selection while result-card follow keeps its original query target', () => {
   const rt = runtime(), page = rt.instance('pages/query/index.js'), navigations = [];
   rt.wx.switchTab = value => navigations.push(value.url);
-  Object.assign(page.data, { boot: { member: true }, selection: selection('SKU-B', ['R002']), result: response() });
+  Object.assign(page.data, { boot: { member: true }, result: response() }); page.selection = selection('SKU-B', ['R002']);
   page.onFollowSelection();
   assert.deepEqual(copy(rt.app.globalData.pendingFollow), { partNumber: 'SKU-B', storeNumbers: ['R002'] });
-  page.data.selection.storeNumbers.push('R003');
+  page.selection.storeNumbers.push('R003');
   assert.deepEqual(copy(rt.app.globalData.pendingFollow.storeNumbers), ['R002'], 'the editor receives a copy of the selected stores');
   page.onAddFollow();
   assert.deepEqual(copy(rt.app.globalData.pendingFollow), { partNumber: 'SKU-A', storeNumbers: ['R001'] });
@@ -110,7 +110,7 @@ test('selected-target follow uses current selection while result-card follow kee
 test('free users without the free alert are guided to membership, keeping the target for after activation', () => {
   const rt = runtime(), page = rt.instance('pages/query/index.js'), navigations = [];
   rt.wx.switchTab = value => navigations.push(value.url);
-  Object.assign(page.data, { boot: { member: false }, selection: selection() });
+  Object.assign(page.data, { boot: { member: false } }); page.selection = selection();
   page.onFollowSelection();
   assert.equal(rt.app.globalData.pendingFollow, null);
   assert.equal(rt.messages[0].title, '关注与到货提醒为会员专属');
@@ -137,7 +137,7 @@ test('incomplete or unsupported selections do not navigate to the follow editor'
   ]) {
     const rt = runtime(), page = rt.instance('pages/query/index.js'), navigations = [];
     rt.wx.switchTab = value => navigations.push(value.url);
-    Object.assign(page.data, { boot: { member: true }, selection: current });
+    Object.assign(page.data, { boot: { member: true } }); page.selection = current;
     page.onFollowSelection();
     assert.equal(navigations.length, 0);
     assert.equal(rt.app.globalData.pendingFollow, null);

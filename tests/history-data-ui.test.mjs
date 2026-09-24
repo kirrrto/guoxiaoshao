@@ -12,7 +12,7 @@ async function present(overrides = {}) {
     latest: [{ storeNumber: 'R577', status: 'unavailable', observedAt: '2026-09-16T10:00:00.000Z' }],
     events: [], summary: { available: 0, restocks: 0, recoveries: 0, ended: 0 }, pagination: { total: 0, hasMore: false }, ...overrides };
   const rt = runtime(async () => response), page = rt.instance('pages/history/index.js');
-  page.catalog = { storeByNumber: { R577: { name: '天环广场' } } }; Object.assign(page.data, { boot: { member: false }, selection: { partNumber: 'MXXX1CH/A', storeNumbers: ['R577'] } });
+  page.catalog = { storeByNumber: { R577: { name: '天环广场' } } }; Object.assign(page.data, { boot: { member: false } }); page.selection = { partNumber: 'MXXX1CH/A', storeNumbers: ['R577'] };
   await page.onQuery();
   return page.data.result;
 }

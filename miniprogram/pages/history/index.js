@@ -80,6 +80,9 @@ function presentHistory(response, catalog) {
 }
 
 Page({
+  // The picker's current choice. Only logic reads it, so it stays off setData.
+  selection: { partNumber: null, product: null, storeNumbers: [], stores: [] },
+
   data: {
     ready: false,
     accountReady: false,
@@ -88,7 +91,6 @@ Page({
     catalogVersion: '',
     boot: null,
     pickerValue: null,
-    selection: { partNumber: null, product: null, storeNumbers: [], stores: [] },
     dayKey: fmt.todayKey(),
     today: fmt.todayKey(),
     earliestDay: fmt.retentionStartKey(),
@@ -136,11 +138,11 @@ Page({
   onUnload() { this.pageRetired = true; if (this.unsubscribeCatalog) this.unsubscribeCatalog(); },
 
   onShareAppMessage() {
-    return shareAppMessage('/pages/history/index', this.data);
+    return shareAppMessage('/pages/history/index', { ...this.data, selection: this.selection });
   },
 
   onShareTimeline() {
-    return shareTimeline('/pages/history/index', this.data);
+    return shareTimeline('/pages/history/index', { ...this.data, selection: this.selection });
   },
 
   applyCatalog(catalog) {
@@ -247,7 +249,8 @@ Page({
     this.restoredSelection = pickerValue;
     this.historyRequest = null;
     this.historySnapshot = null;
-    this.setData({ pickerValue, selection: { ...pickerValue, product, stores }, dayKey: item.dayKey,
+    this.selection = { ...pickerValue, product, stores };
+    this.setData({ pickerValue, dayKey: item.dayKey,
       result: null, moreError: null, restriction: null, restoreWarning: false,
       restoreNotice: '查询条件已恢复，尚未查询，也未扣次。请核对后点击「查看历史」，查询时按账户规则计次。' });
     try { wx.setStorageSync(localKey(SELECTION_KEY), pickerValue); } catch (error) { /* the restored form remains usable */ }
@@ -268,7 +271,8 @@ Page({
   },
 
   onPickerChange(e) {
-    this.setData({ selection: e.detail, restriction: null });
+    this.selection = e.detail;
+    this.setData({ restriction: null });
     const restored = this.restoredSelection;
     if (!restored || restored.partNumber !== e.detail.partNumber || JSON.stringify(restored.storeNumbers.slice().sort()) !== JSON.stringify((e.detail.storeNumbers || []).slice().sort())) {
       this.restoredSelection = null;
@@ -285,7 +289,7 @@ Page({
   async onQuery() {
     if (this.data.querying || this.data.loadingMore) return;
     if (!this.data.boot) return toast('账户正在连接，请稍后再试');
-    const { selection, boot, dayKey } = this.data;
+    const { boot, dayKey } = this.data, selection = this.selection;
     if (!selection.partNumber) return toast('请先选择具体配置');
     // Let the server distinguish insufficient funds from an already-debited
     // retry of this request. Do not block recovery using a stale local balance.

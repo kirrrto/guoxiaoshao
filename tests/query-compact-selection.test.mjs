@@ -36,8 +36,8 @@ test('valid saved selection opens as a compact exact-product and store summary w
   const { rt, page, scrolls } = await opened();
   assert.equal(page.data.selectionExpanded, false);
   assert.equal(page.data.selectionCanCollapse, true);
-  assert.equal(page.data.selection.partNumber, product.partNumber);
-  assert.deepEqual(copy(page.data.selection.storeNumbers), ['R577', 'R639']);
+  assert.equal(page.selection.partNumber, product.partNumber);
+  assert.deepEqual(copy(page.selection.storeNumbers), ['R577', 'R639']);
   assert.equal(page.data.selectionSummary.title, product.title);
   assert.ok(page.data.selectionSummary.imageUrl);
   assert.equal(page.data.selectionSummary.cityLabel, '广州 · 2 家门店');
@@ -69,7 +69,7 @@ test('explicit editing retains the mounted picker value and catalog refresh neve
   select(page);
   page.applyCatalog({ ...page.catalog, version: `${page.catalog.version}-refresh` });
   assert.equal(page.data.selectionExpanded, true);
-  assert.equal(page.data.selection.partNumber, otherProduct.partNumber);
+  assert.equal(page.selection.partNumber, otherProduct.partNumber);
   assert.deepEqual(copy(page.data.pickerValue), pickerValue, 'opening and closing must not reapply the original picker value');
   page.onDoneSelection();
   assert.equal(page.data.selectionExpanded, false);
@@ -110,7 +110,7 @@ test('old results are marked separately and their requery and follow retain thei
   const call = rt.calls.find(call => call.action === 'query.pickup');
   assert.equal(call.payload.partNumber, original.partNumber);
   assert.deepEqual(call.payload.storeNumbers, original.storeNumbers);
-  assert.equal(page.data.selection.partNumber, otherProduct.partNumber);
+  assert.equal(page.selection.partNumber, otherProduct.partNumber);
   assert.equal(page.data.resultTargetDifferent, true);
   page.onUnload();
 });
@@ -146,7 +146,7 @@ test('editing while a query is pending preserves the new selection and cancels l
   await pending;
   ticks.splice(0).forEach(callback => callback());
   assert.equal(scrolls.length, 0);
-  assert.equal(page.data.selection.partNumber, otherProduct.partNumber);
+  assert.equal(page.selection.partNumber, otherProduct.partNumber);
   assert.equal(page.data.selectionExpanded, false);
   assert.equal(page.data.result.product.partNumber, product.partNumber);
   assert.equal(page.data.resultTargetDifferent, true);

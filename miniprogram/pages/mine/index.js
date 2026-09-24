@@ -133,7 +133,6 @@ Page({
     notificationsError: null,
     notificationsLoadingMore: false,
     notificationsMoreError: null,
-    notificationsNextCursor: null,
     notificationsHasMore: false,
     notificationsPaginationKnown: false,
     notificationsClearBefore: null,
@@ -457,7 +456,8 @@ Page({
           paginationKnown = typeof data.hasMore === 'boolean' && (!data.hasMore || hasMore);
           if (cursor) cursors.add(cursor);
         } while (hasMore && fetchedPages < Math.ceil(wanted / 20));
-        this.setData({ notifications, notificationsNextCursor: cursor, notificationsHasMore: hasMore, notificationsPaginationKnown: paginationKnown, notificationsClearBefore: clearBefore });
+        this.notificationsNextCursor = cursor;
+        this.setData({ notifications, notificationsHasMore: hasMore, notificationsPaginationKnown: paginationKnown, notificationsClearBefore: clearBefore });
         this.notificationsLoadedAt = Date.now();
       } catch (e) {
         if (!this.notificationUnloaded && generation === this.notificationGeneration) this.setData({ notificationsError: afterChange ? '提醒记录已清理，但列表刷新失败。请重试加载最新记录。' : '提醒记录暂时加载失败，已显示的记录会保留，请重试。' });
@@ -471,10 +471,10 @@ Page({
   },
 
   async onLoadMoreNotifications() {
-    if (this.notificationUnloaded || this.data.notificationActionBusy || this.notificationReadPromise || !this.data.notificationsHasMore || !this.data.notificationsNextCursor) return;
+    if (this.notificationUnloaded || this.data.notificationActionBusy || this.notificationReadPromise || !this.data.notificationsHasMore || !this.notificationsNextCursor) return;
     const generation = (this.notificationGeneration || 0) + 1;
     this.notificationGeneration = generation;
-    const cursor = this.data.notificationsNextCursor;
+    const cursor = this.notificationsNextCursor;
     const clearBefore = this.data.notificationsClearBefore;
     this.setData({ notificationsLoadingMore: true, notificationsMoreError: null });
     const pending = (async () => {
@@ -484,7 +484,8 @@ Page({
         this.rememberNotificationSnapshot(data.notifications || [], clearBefore);
         const seen = new Set(this.data.notifications.map(item => item.id));
         const additional = (data.notifications || []).filter(item => { if (seen.has(item.id)) return false; seen.add(item.id); return true; }).map(presentNotification);
-        this.setData({ notifications: [...this.data.notifications, ...additional], notificationsNextCursor: data.nextCursor || null,
+        this.notificationsNextCursor = data.nextCursor || null;
+        this.setData({ notifications: [...this.data.notifications, ...additional],
           notificationsHasMore: Boolean(data.hasMore && data.nextCursor && data.nextCursor !== cursor),
           notificationsPaginationKnown: typeof data.hasMore === 'boolean' && (!data.hasMore || Boolean(data.nextCursor && data.nextCursor !== cursor)) });
       } catch (e) {

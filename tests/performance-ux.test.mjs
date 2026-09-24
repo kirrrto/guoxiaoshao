@@ -76,8 +76,8 @@ test('failed account connection keeps catalog visible and can retry without clea
   const rt = runtime(async action => { if (action === 'catalog.get') return { unchanged: true }; if (fail) throw Error('network'); return boot(); });
   const page = rt.instance('pages/query/index.js'); await page.onLoad();
   assert.equal(page.data.ready, true); assert.match(page.data.accountError, /连接/); assert.equal(page.data.loadError, null);
-  page.data.selection = { partNumber: 'retained' }; fail = false; await page.onRetryAccount();
-  assert.equal(page.data.accountReady, true); assert.equal(page.data.selection.partNumber, 'retained');
+  page.selection = { partNumber: 'retained' }; fail = false; await page.onRetryAccount();
+  assert.equal(page.data.accountReady, true); assert.equal(page.selection.partNumber, 'retained');
 });
 
 test('query and follow tabs reuse recent follows but a mutation invalidates the shared snapshot', async () => {
