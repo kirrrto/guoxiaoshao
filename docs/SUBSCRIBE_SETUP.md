@@ -8,26 +8,34 @@
 
 ```text
 模板 ID：qcfmYZuvfallzFUAVrEaRlmop3kvhoM4Bl4ewpAqjag
-关键词：商品名称、时间、到货数量、门店名称
-字段编号：以后台「我的模板 → 详情」中的 {{xxx.DATA}} 为准
+模板编号：61831（公共模板库编号，不能当模板 ID 用）
+类目：信息查询
+商品名称：thing1
+时间：time2
+到货数量：number5（数字类型）
+门店名称：thing7
 ```
+
+2026-09-23 核对详情后确认：「到货数量」是数字类型 `number5`，无法如实填写（见下文），所以**这个模板不能直接使用**。做法是在公共模板库里再选用一次 61831，只勾「商品名称」「时间」「门店名称」，不勾「到货数量」。同一公共模板的关键词编号固定，新模板仍是 `thing1`、`time2`、`thing7`，只有模板 ID 不同。
 
 四个关键词对应配置里的四个槽位：商品名称 → `product`，门店名称 → `store`，时间 → `time`，到货数量 → `quantity`。这个模板没有状态类关键词，`status` 要设为 `null`，否则会继续带上旧模板的字段。
 
 **到货数量如实填写**：苹果取货接口只说明门店今天能否取货，从不公布件数。字段为文字类型（`thing`）时填「有现货，具体数量以门店为准」，短语类型（`phrase`）时填「有现货」。数字类（`number`、`character_string`、`amount` 等）无法如实填写，配置会被拒绝；遇到这种情况请另外添加一个不含到货数量的到货类模板。
 
-切换用的 patch（把 `?` 换成详情里的实际编号）：
+切换用的 patch（`新模板ID` 换成不含到货数量的那个模板的 ID）：
 
 ```json
 {
   "notifications": {
-    "templateIds": {"restock": "qcfmYZuvfallzFUAVrEaRlmop3kvhoM4Bl4ewpAqjag"},
+    "templateIds": {"restock": "新模板ID"},
     "templateTitle": "商品到货提醒",
     "contentMode": "stock_status",
-    "templateFields": {"product": "thing?", "store": "thing?", "time": "time?", "quantity": "thing?", "status": null}
+    "templateFields": {"product": "thing1", "time": "time2", "store": "thing7", "status": null, "quantity": null}
   }
 }
 ```
+
+如果以后选用的到货模板带有文字类型的「到货数量」（`thing`/`phrase`），可以把 `quantity` 填上它的编号，消息会显示「有现货，具体数量以门店为准」。
 
 切换后的影响：
 

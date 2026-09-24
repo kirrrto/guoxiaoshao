@@ -129,3 +129,16 @@ test('a 商品到货提醒 template says "in stock" for 到货数量 and drops t
   assert.equal(saved.ok, true, JSON.stringify(saved.error));
   assert.deepEqual(mergeConfig(await f.repo.getConfig()).notifications.templateFields, fields);
 });
+
+test('template 61831 as configured: numeric 到货数量 is refused, the three-keyword version validates', () => {
+  // Real field numbers from the 商品到货提醒 details page (2026-09-23).
+  const fields = { product: 'thing1', time: 'time2', store: 'thing7', status: null, quantity: null };
+  const base = { enabled: true, templateIds: { restock: 'qcfmYZuvfallzFUAVrEaRlmop3kvhoM4Bl4ewpAqjag' }, templateTitle: '商品到货提醒' };
+  assert.throws(() => validateConfig(mergeConfig({ notifications: { ...base, templateFields: { ...fields, quantity: 'number5' } } })), /templateFields\.quantity/);
+  const threeKeywords = mergeConfig({ notifications: { ...base, templateFields: fields } });
+  validateConfig(threeKeywords);
+  const message = buildMessage({ productTitle: 'iPhone 18 Pro Max 1TB 勃艮第酒红色', storeName: '天环广场', detectedAt: '2026-09-23T02:00:00Z', eventType: 'restock_confirmed' }, threeKeywords);
+  assert.deepEqual(Object.keys(message.data).sort(), ['thing1', 'thing7', 'time2']);
+  assert.equal(message.data.thing7.value, '天环广场');
+  assert.equal(message.data.time2.value, '2026年9月23日 10:00:00');
+});
