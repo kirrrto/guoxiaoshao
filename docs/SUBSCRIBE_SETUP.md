@@ -24,6 +24,8 @@
 场景说明：关注的配置在门店可取货时提醒
 ```
 
+**已切换（2026-09-24 17:42 北京时间）**：维护者部署 1.1.7 的 `gxs_api`、`gxs_monitor` 后，在开发者工具对 `gxs_api` 执行云端测试 `admin.updateConfig`（下文 patch），返回 `ok: true`，请求 ID `09bab758-5bb5-4baf-bea9-7d9fc36bd8ab`。返回配置显示模板 ID、标题、`contentMode=stock_status`、字段 `thing1`/`time2`/`thing7`，`status`、`quantity` 为 `null`；发送开关、冷却 30 分钟、会员商品、兑换名额与采集设置保持不变。新模板的真实送达尚待下一次补货确认。
+
 四个关键词对应配置里的四个槽位：商品名称 → `product`，门店名称 → `store`，时间 → `time`，到货数量 → `quantity`。这个模板没有状态类关键词，`status` 要设为 `null`，否则会继续带上旧模板的字段。
 
 **到货数量如实填写**：苹果取货接口只说明门店今天能否取货，从不公布件数。字段为文字类型（`thing`）时填「有现货，具体数量以门店为准」，短语类型（`phrase`）时填「有现货」。数字类（`number`、`character_string`、`amount` 等）无法如实填写，配置会被拒绝；遇到这种情况请另外添加一个不含到货数量的到货类模板。
