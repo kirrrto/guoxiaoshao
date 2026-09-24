@@ -1,11 +1,18 @@
 <view class="page tab-page history-page">
-  <view wx:if="{{loadError}}" class="card">
-    <view class="banner banner-bad">加载失败：{{loadError}}</view>
-    <button class="btn btn-outline btn-block" bindtap="onRetryLoad">重试</button>
+  <view wx:if="{{loadError}}" class="card load-error" role="alert">
+    <view class="load-error-title">暂时没有连上</view>
+    <view class="load-error-detail">{{loadError}}</view>
+    <view class="load-error-hint">检查网络后点重试；网络恢复时也会自动重新加载。</view>
+    <button class="btn btn-primary btn-block" bindtap="onRetryLoad">重试</button>
   </view>
 
   <block wx:elif="{{!ready}}">
-    <view class="card"><view class="loading-line">正在加载目录…</view></view>
+    <view class="page-heading"><view class="page-title">供应变化历史</view><view class="page-subtitle">按配置、日期与门店查看已有观测记录</view></view>
+    <view class="skeleton" aria-busy="true">
+      <view class="skeleton-card"><view class="skeleton-line skeleton-title"></view><view class="skeleton-line"></view><view class="skeleton-line skeleton-short"></view><view class="skeleton-bar"></view></view>
+      <view class="skeleton-card"><view class="skeleton-line skeleton-title"></view><view class="skeleton-line"></view><view class="skeleton-line skeleton-short"></view></view>
+      <view class="loading-line">正在加载商品目录…</view>
+    </view>
   </block>
 
   <block wx:else>

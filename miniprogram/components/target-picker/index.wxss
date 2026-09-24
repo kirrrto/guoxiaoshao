@@ -51,6 +51,9 @@
 .selected { padding: 18rpx 20rpx; border: 1rpx solid var(--glass-line); border-radius: 24rpx; background: rgba(244,250,246,0.72); }
 
 /* Dark mode: page color variables inherit into this isolated component. */
+/* 按下反馈 */
+.tab.is-pressed, .chip.is-pressed, .store-result.is-pressed { opacity: 0.66; transform: scale(0.97); }
+
 @media (prefers-color-scheme: dark) {
   .tab, .chip { background: rgba(255, 255, 255, 0.07); border-color: rgba(255, 255, 255, 0.06); }
   .chip.on { box-shadow: none; }

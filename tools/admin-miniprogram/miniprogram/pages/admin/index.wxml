@@ -25,7 +25,8 @@
 
     <view class="card">
       <view class="card-title"><text>提醒效果（近 7 天）</text><text class="sub">{{insights ? '自 ' + insights.sinceText : ''}}</text></view>
-      <view wx:for="{{insights.lines}}" wx:key="*this" class="small">{{item}}</view>
+      <block wx:if="{{insights}}"><view wx:for="{{insights.lines}}" wx:key="*this" class="small">{{item}}</view></block>
+      <view wx:else class="small muted">读取近 7 天的可取货时长、未发送原因、发送延迟和「买到了吗」回答。</view>
       <view class="btn-row wrap">
         <button class="btn btn-ghost btn-sm" disabled="{{busy === 'insights'}}" bindtap="onLoadInsights">{{busy === 'insights' ? '读取中…' : (insights ? '刷新' : '读取')}}</button>
       </view>

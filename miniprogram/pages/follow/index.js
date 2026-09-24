@@ -6,6 +6,7 @@ const { restockSubscription, reminderReadiness, canRemind } = require('../../uti
 const { shareAppMessage, shareTimeline } = require('../../utils/share');
 const { monitorPollDelay } = require('../../utils/poll');
 const { FINAL_ERRORS, readPending, savePending, clearPending, refreshConsentSetting, topUpReminderCredit } = require('../../utils/reminder-credits');
+const { confirmTap } = require('../../utils/haptic');
 
 const FOLLOW_STATUS = {
   active: { label: '关注已开启', cls: 'ok' },
@@ -175,6 +176,17 @@ Page({
     return shareTimeline('/pages/follow/index', this.data);
   },
 
+  onAddToFavorites() {
+    return { title: '果小哨 · 我的到货提醒' };
+  },
+
+  /** Called by the tab bar when the phone reconnects. */
+  onNetworkRestored() {
+    if (this.data.loadError) return this.onRetryLoad();
+    if (!this.data.ready) return;
+    getBootstrap({ force: true }).then(boot => { this.applyBoot(boot); return this.loadFollows({ force: true }); }).catch(() => {});
+  },
+
   stopPolling() { this.pollEpoch = (this.pollEpoch || 0) + 1; if (this.pollTimer) clearTimeout(this.pollTimer); this.pollTimer = null; },
   startPolling() {
     this.stopPolling();
@@ -239,6 +251,7 @@ Page({
     try {
       const result = await call('notify.feedback', { eventId: alert.eventId, outcome });
       this.setData({ 'alert.feedback': result.outcome, 'alert.followActive': alert.followActive && !result.paused });
+      if (outcome === 'bought') confirmTap();
       toast(result.paused ? '恭喜买到！已暂停这条关注' : FEEDBACK_TOAST[outcome]);
       if (result.paused) { this.invalidateFollowRead(); await this.loadFollows(); }
     } catch (error) {
@@ -416,6 +429,7 @@ Page({
       await this.loadFollows();
       invalidateBootstrap();
       refreshBootstrap().catch(() => {});
+      confirmTap();
       toast(editor.isNew ? '已加入关注' : '已更新', 'success');
       if (editor.isNew && !toppedUp && this.data.subscription.credits === 0) this.promptSubscribe();
     } catch (error) {
@@ -485,6 +499,7 @@ Page({
       this.refreshReadiness();
       const result = pending.results && pending.results[restockId];
       if (result === 'accept') {
+        confirmTap();
         toast(this.data.delivery.cls === 'ok' ? `提醒次数 +1，剩余 ${credits} 次` : `已记录，剩余 ${credits} 次提醒，服务准备中`);
       } else {
         toast(result === 'ban' ? '微信授权已关闭，本次未增加' : '本次未授权，次数未增加');

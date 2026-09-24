@@ -137,6 +137,24 @@ view, text { box-sizing: border-box; }
 /* 加载 */
 .loading-line { text-align: center; color: var(--text-3); font-size: 24rpx; padding: 20rpx 0; }
 
+/* 骨架屏：首屏数据回来之前占位，不留空白 */
+.skeleton-card { background: var(--card); border-radius: 34rpx; padding: 30rpx; margin-bottom: 26rpx; box-shadow: var(--shadow-soft); }
+.skeleton-line, .skeleton-bar {
+  background: linear-gradient(90deg, var(--skeleton-base) 25%, var(--skeleton-shine) 50%, var(--skeleton-base) 75%);
+  background-size: 400% 100%;
+  animation: skeleton-shine 1.4s ease-in-out infinite;
+}
+.skeleton-line { height: 26rpx; border-radius: 13rpx; margin-top: 22rpx; }
+.skeleton-title { width: 42%; height: 34rpx; margin-top: 0; }
+.skeleton-short { width: 64%; }
+.skeleton-bar { height: 88rpx; border-radius: 999rpx; margin-top: 30rpx; }
+@keyframes skeleton-shine { from { background-position: 100% 0; } to { background-position: 0 0; } }
+
+/* 加载失败 */
+.load-error-title { font-size: 32rpx; font-weight: 600; color: var(--text); }
+.load-error-detail { margin-top: 12rpx; font-size: 26rpx; color: var(--text-2); line-height: 1.6; overflow-wrap: anywhere; }
+.load-error-hint { margin: 12rpx 0 28rpx; font-size: 23rpx; color: var(--text-3); line-height: 1.6; }
+
 /* Shared responsive contract: every row can shrink or wrap at 320px. */
 view, text, button, input, textarea, image, scroll-view, picker { box-sizing: border-box; }
 .page { width: 100%; max-width: 1000rpx; margin: 0 auto; padding: 30rpx 24rpx calc(40rpx + env(safe-area-inset-bottom)); overflow-wrap: anywhere; }

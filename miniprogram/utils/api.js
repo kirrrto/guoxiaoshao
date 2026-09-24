@@ -8,15 +8,30 @@ class ApiError extends Error {
   }
 }
 
+// Reads that are safe to repeat: a dropped connection retries once before the page sees it.
+const RETRYABLE_READS = new Set(['system.ping', 'user.bootstrap', 'catalog.get', 'follow.list', 'notify.list', 'notify.detail', 'member.status', 'quota.ledger', 'query.recent']);
+const RETRY_DELAY_MS = 800;
+
 /** Call one gxs_api action. Resolves with `data`; rejects with ApiError. */
 async function call(action, payload = {}) {
+  try {
+    return await callOnce(action, payload);
+  } catch (error) {
+    if (!RETRYABLE_READS.has(action) || !['call_failed', 'cloud_init_failed'].includes(error && error.code)) throw error;
+    await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS));
+    return callOnce(action, payload);
+  }
+}
+
+async function callOnce(action, payload) {
   const app = getApp();
   if (app.globalData && app.globalData.singlePage) throw new ApiError('single_page_mode', '朋友圈中只能预览。点击屏幕下方「前往小程序」即可查询和关注。');
   let cloud;
   try {
     cloud = await (app.ensureCloud ? app.ensureCloud() : app.cloudReady);
   } catch (error) {
-    throw new ApiError('cloud_init_failed', `云环境初始化失败：${app.globalData.cloudError || ''}`);
+    const reason = app.globalData.cloudError || '';
+    throw new ApiError('cloud_init_failed', /超时|timeout|network|request:fail/i.test(reason) ? '网络不太稳定，暂时连不上服务，请检查网络后重试' : `云环境初始化失败：${reason}`);
   }
   let response;
   try {
@@ -39,6 +54,7 @@ function friendlyCallError(error) {
   if (/-601022|-601023/.test(msg)) return '资源方 cloudbase_auth 调用失败，请检查其部署';
   if (/-404006|empty poll result base resp/i.test(msg)) return '连接暂时中断，结果尚未确认，请重试。';
   if (/timeout|timed out/i.test(msg)) return '请求超时，请稍后重试';
+  if (/request:fail|network|ERR_INTERNET|ERR_NAME|ERR_CONNECTION|offline/i.test(msg)) return '网络连接不稳定，请检查网络后重试';
   return `调用失败：${msg}`;
 }
 

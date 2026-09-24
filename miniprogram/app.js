@@ -1,6 +1,11 @@
 const cloudConfig = require('./config/cloud');
 const { refreshConsentSetting } = require('./utils/reminder-credits');
 
+// The shared environment's auth hook can stall on a weak network. Give up after
+// this long so pages show a retry instead of waiting forever; the next call retries.
+const CLOUD_INIT_TIMEOUT_MS = 10000;
+const LAUNCH_COUNT_KEY = 'gxs_launch_count_v1';
+
 App({
   globalData: {
     cloud: null,
@@ -11,18 +16,33 @@ App({
     pendingAlert: null,
     handledAlerts: [],
     singlePage: false,
+    launchCount: 0,
     lastQuery: null,
   },
 
   onLaunch(options) {
     // Opened from a Moments share (scene 1154): a preview without cloud access.
     this.globalData.singlePage = Boolean(options && options.scene === 1154);
+    this.globalData.launchCount = this.countLaunch();
     this.captureAlert(options);
     if (!this.globalData.singlePage) {
       this.cloudReady = this.ensureCloud();
       this.cloudReady.catch(() => {});
     }
     this.watchForUpdate();
+  },
+
+  /** An old shared link may name a page that no longer exists: open the home tab instead. */
+  onPageNotFound() {
+    wx.reLaunch({ url: '/pages/query/index' });
+  },
+
+  countLaunch() {
+    try {
+      const count = (Number(wx.getStorageSync(LAUNCH_COUNT_KEY)) || 0) + 1;
+      wx.setStorageSync(LAUNCH_COUNT_KEY, count);
+      return count;
+    } catch (e) { return 1; }
   },
 
   // Users can change "总是保持以上选择" in WeChat settings while the app is hidden.
@@ -66,7 +86,16 @@ App({
   ensureCloud() {
     if (this.globalData.cloud) return Promise.resolve(this.globalData.cloud);
     if (this.cloudInitPromise) return this.cloudInitPromise;
-    const pending = this.initCloud();
+    const init = this.initCloud();
+    init.catch(() => {});
+    // A late success still stores the cloud for the next call (initCloud sets it).
+    const pending = new Promise((resolve, reject) => {
+      const timer = setTimeout(() => {
+        this.globalData.cloudError = '连接云环境超时，请检查网络后重试';
+        reject(new Error('cloud_init_timeout'));
+      }, CLOUD_INIT_TIMEOUT_MS);
+      init.then(cloud => { clearTimeout(timer); resolve(cloud); }, error => { clearTimeout(timer); reject(error); });
+    });
     this.cloudInitPromise = pending;
     pending.then(() => { if (this.cloudInitPromise === pending) this.cloudInitPromise = null; }, () => {
       if (this.cloudInitPromise === pending) this.cloudInitPromise = null;

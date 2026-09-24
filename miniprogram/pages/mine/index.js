@@ -1,6 +1,7 @@
 const { call, showError, toast, newId } = require('../../utils/api');
 const { getBootstrap, invalidateBootstrap, invalidateFollows, publishQuota, subscribeQuota } = require('../../utils/store');
 const { topUpReminderCredit } = require('../../utils/reminder-credits');
+const { confirmTap } = require('../../utils/haptic');
 const fmt = require('../../utils/format');
 const { syncTabBar } = require('../../utils/tab-bar');
 const { notificationAdvice } = require('../../utils/reminder-readiness');
@@ -383,7 +384,7 @@ Page({
           detail: already ? (membership.active ? '本次未重复增加时间，当前会员有效期见上方。' : membership.expiresAt ? '本次未重新开通，当前会员已到期。' : '本次未重新开通，当前账号没有生效的会员。') : '会员有效期已更新，现在可以使用会员权益。',
           kind: already ? 'info' : 'ok' } });
       confirmed = true;
-      if (!already) this.resumeMemberFollow(membership);
+      if (!already) { confirmTap(); this.resumeMemberFollow(membership); }
     } catch (error) {
       if (!this.pageRetired && generation === this.accountGeneration) this.setData({ redemptionError: redemptionErrorText(error) });
     } finally {
@@ -580,7 +581,7 @@ Page({
     try {
       const data = await call('quota.signin');
       if (!this.isCurrentSession(session)) return;
-      if (data.granted > 0) toast(`签到成功 +${data.granted} 次`, 'success');
+      if (data.granted > 0) { confirmTap(); toast(`签到成功 +${data.granted} 次`, 'success'); }
       else if (data.reason === 'already_signed_in') toast('今天已签到');
       else if (data.reason === 'daily_cap_reached') toast('今日获取次数已达上限');
       else if (data.reason === 'balance_cap_reached') toast(`余额已达上限 ${data.quota.balanceCap} 次`);
@@ -759,5 +760,11 @@ Page({
   onRetryLoad() {
     this.setData({ loadError: null });
     this.refresh();
+  },
+
+  /** Called by the tab bar when the phone reconnects. */
+  onNetworkRestored() {
+    if (this.data.loadError) return this.onRetryLoad();
+    if (this.data.ready) this.refresh({ quiet: true, force: true });
   },
 });

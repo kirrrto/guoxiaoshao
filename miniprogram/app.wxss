@@ -21,6 +21,8 @@ page {
   --bad: #B54848;
   --bad-soft: #FCECED;
   --info-soft: #EAF7F1;
+  --skeleton-base: rgba(0, 145, 87, 0.07);
+  --skeleton-shine: rgba(0, 145, 87, 0.14);
   /* Static light and translucent surfaces keep scrolling inexpensive on phones.
      No full-page filters, animated gradients, or backdrop-filter dependency. */
   background-color: var(--green-mist);
@@ -53,6 +55,8 @@ page {
     --bad: #F29B93;
     --bad-soft: rgba(242, 155, 147, 0.14);
     --info-soft: rgba(0, 195, 117, 0.10);
+    --skeleton-base: rgba(255, 255, 255, 0.05);
+    --skeleton-shine: rgba(255, 255, 255, 0.11);
     /* Product photos are shot for light backgrounds: a dimmed light tile keeps
        dark devices on transparent images visible without a glaring white box. */
     --image-tile: #DCE3DF;

@@ -7,9 +7,18 @@ const { syncTabBar } = require('../../utils/tab-bar');
 const { shareAppMessage, shareTimeline } = require('../../utils/share');
 const { monitorPollDelay } = require('../../utils/poll');
 const { topUpReminderCredit } = require('../../utils/reminder-credits');
+const { confirmTap } = require('../../utils/haptic');
 
 const SELECTION_KEY = 'gxs_query_selection_v1';
 const RESULT_KEY = 'gxs_query_result_v1';
+const ADD_TIP_KEY = 'gxs_add_tip_dismissed_v1';
+
+/** From the second launch on, suggest pinning the app until the user closes the tip. */
+function shouldShowAddTip() {
+  const app = getApp();
+  if (!app || app.globalData.singlePage || (app.globalData.launchCount || 0) < 2) return false;
+  try { return !wx.getStorageSync(ADD_TIP_KEY); } catch (e) { return false; }
+}
 
 function targetKey(target) {
   const numbers = Array.isArray(target && target.storeNumbers) ? target.storeNumbers : [];
@@ -96,6 +105,7 @@ Page({
     followTargets: [],
     followRefreshedText: null,
     followRefreshError: false,
+    addTipVisible: false,
   },
 
   async onLoad() {
@@ -129,6 +139,7 @@ Page({
         result,
         resultIsCache: Boolean(cached),
         resultTargetDifferent: resultHasDifferentTarget(result, selection),
+        addTipVisible: shouldShowAddTip(),
       });
       try { this.applyBoot(await account); this.applyCatalog(await getCatalog()); }
       catch (error) { this.setData({ accountReady: false, accountError: '账户连接暂未完成，可以先选商品和门店，再点击重试。' }); }
@@ -173,6 +184,21 @@ Page({
 
   onShareTimeline() {
     return shareTimeline('/pages/query/index', this.data);
+  },
+
+  onAddToFavorites() {
+    return { title: '果小哨 · 门店取货查询' };
+  },
+
+  onDismissAddTip() {
+    this.setData({ addTipVisible: false });
+    try { wx.setStorageSync(ADD_TIP_KEY, true); } catch (e) { /* shown again next launch */ }
+  },
+
+  /** Called by the tab bar when the phone reconnects. */
+  onNetworkRestored() {
+    if (this.data.loadError) return this.onRetryLoad();
+    if (this.data.ready && !this.data.accountReady) return this.onRetryAccount();
   },
 
   refreshQuerySnapshot() {
@@ -362,7 +388,7 @@ Page({
       this.setData({ result, resultIsCache: false, resultTargetDifferent: resultHasDifferentTarget(result, this.data.selection), 'boot.balance': response.balance, restriction: response.ok ? (response.partial ? '部分门店暂未查询成功，请查看各店状态。' + retryHint : null) : fmt.reasonText(response.reason) + retryHint });
       try { wx.setStorageSync(localKey(RESULT_KEY), response); } catch (err) { /* ignore */ }
       if (response.refunded) toast('本次未取得有效结果，已返还次数');
-      if (response.ok && result.results.length) this.focusQueryResult(focus);
+      if (response.ok && result.results.length) { confirmTap(); this.focusQueryResult(focus); }
     } catch (error) {
       if (!operation.uncertain(error)) operation.finish('q');
       if (operation.uncertain(error)) this.setData({ restriction: '本次结果尚未确认。再次查询相同目标会恢复原请求，不重复扣次。' });

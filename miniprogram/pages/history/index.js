@@ -353,4 +353,10 @@ Page({
     this.setData({ loadError: null });
     this.onLoad();
   },
+
+  /** Called by the tab bar when the phone reconnects. */
+  onNetworkRestored() {
+    if (this.data.loadError) return this.onRetryLoad();
+    if (this.data.ready && !this.data.accountReady) return this.onRetryAccount();
+  },
 });

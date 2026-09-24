@@ -36,6 +36,11 @@
 .result-target-note { margin-bottom: 20rpx; padding: 14rpx 18rpx; border-radius: 16rpx; background: var(--surface-soft); color: var(--text-2); font-size: 23rpx; line-height: 1.55; overflow-wrap: anywhere; }
 .result-target-different { background: var(--warn-soft); color: var(--warn); }
 
+/* 首页提示：添加到我的小程序 */
+.banner.add-tip { display: flex; align-items: flex-start; gap: 16rpx; }
+.add-tip-text { flex: 1; min-width: 0; }
+.add-tip-close { flex: none; padding: 0 6rpx; font-size: 34rpx; line-height: 1.1; color: var(--text-3); }
+
 @media (prefers-color-scheme: dark) {
   .selection-summary-image-box { background: var(--image-tile); }
 }
