@@ -1,0 +1,80 @@
+{
+  "version": "1.4.1",
+  "checkedAt": "2026-09-28T02:21:50.171429+00:00",
+  "scope": "Official local WeChat WXML/WXSS syntax compilation, not phone acceptance",
+  "checks": [
+    {
+      "kind": "wxml",
+      "fileCount": 6,
+      "exitCode": 0,
+      "stderr": "",
+      "sources": [
+        {
+          "path": "components/target-picker/index.wxml",
+          "sha256": "0b9af13159b3dd567544be243a01ff3b6ff86440f1e83ffc75e55685181811e7"
+        },
+        {
+          "path": "custom-tab-bar/index.wxml",
+          "sha256": "681f3f0528fe270f419a395866b106ea3895384fc9d20000782ccd9339afe079"
+        },
+        {
+          "path": "pages/follow/index.wxml",
+          "sha256": "8c5f2efa1aa6c00d2c7bdcf0c4daca893e5b1c28f418441ee5b59052500bff59"
+        },
+        {
+          "path": "pages/history/index.wxml",
+          "sha256": "e54bf19ef2b9abfba31b2a4a52fbce7be36a2425b39a2976f55f09b8bdf02b38"
+        },
+        {
+          "path": "pages/mine/index.wxml",
+          "sha256": "e50b46ae5e834766e1b36f4acb61af044d688bef8b7e14021cb3b3d5b88eb4ef"
+        },
+        {
+          "path": "pages/query/index.wxml",
+          "sha256": "aaaf57dabdec7056a74093a7f2a9294c9d8e81f983b4caf8a2a69d06a988e136"
+        }
+      ]
+    },
+    {
+      "kind": "wxss",
+      "fileCount": 8,
+      "exitCode": 0,
+      "stderr": "",
+      "sources": [
+        {
+          "path": "app.wxss",
+          "sha256": "41d1ec9f9cfa20049ca421af65f16c701736f4d92123b38641287851b9bf9681"
+        },
+        {
+          "path": "components/target-picker/index.wxss",
+          "sha256": "89faaf611c63876c453d613199a87807dd328d7c39ad1c254577a3a320f08acb"
+        },
+        {
+          "path": "custom-tab-bar/index.wxss",
+          "sha256": "efc672f3d68c53111e5a679fc27aaab7abbe8c8e14417f60bf3e519105fd07e0"
+        },
+        {
+          "path": "pages/follow/index.wxss",
+          "sha256": "57a41c78b961e346aa5fb2d15f89030b315593f8d7f75fecafb85a3ec714b4fc"
+        },
+        {
+          "path": "pages/history/index.wxss",
+          "sha256": "3dd2a405a379afb13dd5988ddaa41e0d307323cb991f2339807f4f65352925d6"
+        },
+        {
+          "path": "pages/mine/index.wxss",
+          "sha256": "5be59712f02c78c99d03c563bfbcaeea681a47ec7e7a2c0cff080aaae949be21"
+        },
+        {
+          "path": "pages/query/index.wxss",
+          "sha256": "218ba98df8b6fedb415da3ddd4cf31d5ac9637c584c78d6116e67b2eb1a392e7"
+        },
+        {
+          "path": "styles/common.wxss",
+          "sha256": "8caafddbb745066bac1af1b9b197835645c59c6faf561c6129846b1a62ae6e37"
+        }
+      ]
+    }
+  ],
+  "passed": true
+}

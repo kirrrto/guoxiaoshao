@@ -10,6 +10,12 @@ const json = file => JSON.parse(fs.readFileSync(path.join(root, file), 'utf8'));
 const checks = [];
 function check(name, passed) { checks.push({ name, passed: Boolean(passed) }); }
 const project = json('package.json');
+const rootLock = json('package-lock.json');
+check('root package and lock versions match the release', rootLock.version === project.version && rootLock.packages?.['']?.version === project.version);
+const readme = fs.readFileSync(path.join(root, 'README.md'), 'utf8');
+const releaseNote = `docs/RELEASE_${project.version}.md`;
+check('README identifies and links the current release', readme.split(/\r?\n/)[0] === `# 果小哨 · v${project.version}` && readme.includes(`](${releaseNote})`));
+check('current release note identifies the same version', fs.existsSync(path.join(root, releaseNote)) && fs.readFileSync(path.join(root, releaseNote), 'utf8').split(/\r?\n/)[0] === `# 果小哨 v${project.version} 发布说明`);
 check('release development config validates request domains', json('project.config.json').setting.urlCheck === true);
 const privateConfigPath = path.join(root, 'project.private.config.json');
 check('local private config does not bypass domain validation', !fs.existsSync(privateConfigPath) || json('project.private.config.json').setting?.urlCheck !== false);

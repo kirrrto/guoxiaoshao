@@ -1,0 +1,117 @@
+{
+  "version": "1.4.1",
+  "changeScope": "Code-only updates of gxs_api, gxs_monitor and cloudbase_auth. No environment/configuration writes.",
+  "before": [
+    {
+      "functionName": "gxs_api",
+      "status": "Active",
+      "runtime": "Nodejs18.15",
+      "timeoutSeconds": 30,
+      "modifiedAt": "2026-09-24 18:27:48",
+      "environmentVariableKeys": [
+        "GXS_CONSUMER_APPID",
+        "GXS_CONSUMER_APPSECRET",
+        "GXS_ENABLE_PAYMENT_RECONCILE",
+        "GXS_PAYMENT_CALLBACK_AES_KEY",
+        "GXS_PAYMENT_CALLBACK_TOKEN",
+        "GXS_VIRTUAL_PAYMENT_APPKEY"
+      ],
+      "triggers": [
+        {
+          "name": "gxs-payment-reconcile-five-minutes",
+          "type": "timer",
+          "config": "{\"cron\":\"0 */5 * * * * *\"}"
+        }
+      ]
+    },
+    {
+      "functionName": "gxs_monitor",
+      "status": "Active",
+      "runtime": "Nodejs20.19",
+      "timeoutSeconds": 60,
+      "modifiedAt": "2026-09-28 09:41:57",
+      "environmentVariableKeys": [
+        "GXS_CONSUMER_APPID",
+        "GXS_CONSUMER_APPSECRET",
+        "GXS_ENABLE_SCHEDULED_MONITOR"
+      ],
+      "triggers": [
+        {
+          "name": "gxs-monitor-minute",
+          "type": "timer",
+          "config": "{\"cron\":\"0 * * * * * *\"}"
+        }
+      ]
+    },
+    {
+      "functionName": "cloudbase_auth",
+      "status": "Active",
+      "runtime": "Nodejs18.15",
+      "timeoutSeconds": 5,
+      "modifiedAt": "2026-09-20 12:27:48",
+      "environmentVariableKeys": [],
+      "triggers": []
+    }
+  ],
+  "after": [
+    {
+      "functionName": "gxs_api",
+      "status": "Active",
+      "runtime": "Nodejs18.15",
+      "timeoutSeconds": 30,
+      "modifiedAt": "2026-09-28 10:29:49",
+      "environmentVariableKeys": [
+        "GXS_CONSUMER_APPID",
+        "GXS_CONSUMER_APPSECRET",
+        "GXS_ENABLE_PAYMENT_RECONCILE",
+        "GXS_PAYMENT_CALLBACK_AES_KEY",
+        "GXS_PAYMENT_CALLBACK_TOKEN",
+        "GXS_VIRTUAL_PAYMENT_APPKEY"
+      ],
+      "triggers": [
+        {
+          "name": "gxs-payment-reconcile-five-minutes",
+          "type": "timer",
+          "config": "{\"cron\":\"0 */5 * * * * *\"}"
+        }
+      ]
+    },
+    {
+      "functionName": "gxs_monitor",
+      "status": "Active",
+      "runtime": "Nodejs20.19",
+      "timeoutSeconds": 60,
+      "modifiedAt": "2026-09-28 10:29:56",
+      "environmentVariableKeys": [
+        "GXS_CONSUMER_APPID",
+        "GXS_CONSUMER_APPSECRET",
+        "GXS_ENABLE_SCHEDULED_MONITOR"
+      ],
+      "triggers": [
+        {
+          "name": "gxs-monitor-minute",
+          "type": "timer",
+          "config": "{\"cron\":\"0 * * * * * *\"}"
+        }
+      ]
+    },
+    {
+      "functionName": "cloudbase_auth",
+      "status": "Active",
+      "runtime": "Nodejs18.15",
+      "timeoutSeconds": 5,
+      "modifiedAt": "2026-09-28 10:25:17",
+      "environmentVariableKeys": [],
+      "triggers": []
+    }
+  ],
+  "versionProbe": {
+    "functionName": "gxs_api",
+    "action": "system.ping",
+    "ok": true,
+    "version": "1.4.1",
+    "requestId": "842f702c-9d4d-4e29-a145-524079f2c6e2",
+    "serverTime": "2026-09-28T02:30:13.931Z"
+  },
+  "configurationPreserved": true
+}

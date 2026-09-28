@@ -1,0 +1,35 @@
+{
+  "version": "1.4.1",
+  "checkedAt": "2026-09-28T02:32:00.643089+00:00",
+  "tests": {
+    "total": 644,
+    "passed": 644,
+    "failed": 0,
+    "newComparedWith616Baseline": 28
+  },
+  "sourceCheck": {
+    "files": 309,
+    "javaScript": 208,
+    "json": 38,
+    "pages": 4,
+    "operatorPages": 1,
+    "errors": []
+  },
+  "layout": {
+    "total": 36,
+    "expressionErrors": 0,
+    "missingText": 0,
+    "horizontalOverflow": 0,
+    "clippedText": 0,
+    "failedImages": 0
+  },
+  "scope": "Offline tests, official local compilers and browser approximation. Not device acceptance.",
+  "testLogSha256": "0aeb5b25a7fe8a2691bc99004d43c0946414bf868a081ec8c59a488226b03c9e",
+  "realPhoneAcceptance": {
+    "existingPurchaseActivation": "User confirmed on 2026-09-23; not rerun here",
+    "release141IOSAndroidPayment": "pending",
+    "refund": "pending",
+    "currentRestockAndSoldoutTemplateDelivery": "pending",
+    "frontendWechatUploadReviewPublish": "not performed"
+  }
+}
