@@ -27,13 +27,17 @@ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = cons
   const stats = { batches: 0, observations: 0, events: 0, tasks: 0, sent: 0, lastBatchAt: null };
 
   const lease = createLeaseKeeper({ repo, ownerId, ttlMs: 15000, clock, log });
+  // Renewal transactions can consume part of their own TTL. Bound external
+  // work by the lease actually returned, not its nominal 15-second duration.
+  const remainingWorkMs = () => lease.isHeld()
+    ? Math.max(0, Math.min(remainingMs(), Date.parse(lease.expiresAt()) - clock().getTime())) : 0;
   const scheduler = createScheduler({
     clock,
     log,
     alignIntervalMs: mode === 'scheduled' ? 60000 : 0,
     fetchPickup: async ({ storeNumber, partNumbers, timeoutMs }) => {
       if (stopping || !lease.isHeld()) return { record: { httpStatus: null, error: { message: 'lease_lost' } }, observations: [] };
-      return guardedPickup({ repo, config, clock, fetchImpl, storeNumber, partNumbers, timeoutMs: Math.min(timeoutMs, 14000), remainingMs,
+      return guardedPickup({ repo, config, clock, fetchImpl, storeNumber, partNumbers, timeoutMs, remainingMs: remainingWorkMs,
         onBudget: value => { budget = value; }, beforeRequest: async () => !stopping && shouldContinue() && await lease.renew() && lease.isHeld() && shouldContinue() });
     },
     onBatch: handleBatch,
@@ -130,7 +134,7 @@ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = cons
       for (const task of await repo.listPendingNotifications({ limit: 20 })) {
         if (stopping || !shouldContinue() || !await lease.renew()) break;
         if (typeof sendImpl.getHealth === 'function' && !sendImpl.getHealth().authReady) break;
-        const result = await sendTask({ task, config, sendImpl, repo, now: clock(), clock, ownerId, remainingMs,
+        const result = await sendTask({ task, config, sendImpl, repo, now: clock(), clock, ownerId, remainingMs: remainingWorkMs,
           beforeSend: async () => !stopping && shouldContinue() && await lease.renew() && lease.isHeld() && shouldContinue() });
         if (result.status === TASK_STATUS.accepted) stats.sent += 1;
       }
@@ -158,7 +162,7 @@ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = cons
     // A scheduled invocation reserves time to persist status and release its
     // lease. The bounded token-only request also stays below the lease TTL.
     if (remainingMs() <= 1000 || !await lease.renew() || !shouldContinue()) return;
-    const timeoutMs = Math.min(3000, Math.floor(remainingMs()) - 1000);
+    const timeoutMs = Math.min(3000, Math.floor(remainingWorkMs()) - 1000);
     if (timeoutMs < 1) return;
     lastSenderProbeAt = clock().getTime();
     await sendImpl.probe({ timeoutMs });

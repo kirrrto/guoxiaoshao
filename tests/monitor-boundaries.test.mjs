@@ -208,3 +208,59 @@ test('slow database admission cannot compress actual same-store HTTP starts belo
   assert.equal(result.scanned, 2);
   assert.ok(calls[1] - calls[0] >= 2000, `actual HTTP start gap was ${calls[1] - calls[0]}ms`);
 });
+
+async function slowLeaseFixture(delayMs) {
+  const s = await collectorFixture();
+  await s.collector.lease.release();
+  const acquire = s.f.repo.acquireLease;
+  s.f.repo.acquireLease = async args => {
+    const result = await acquire(args);
+    s.f.advance(delayMs);
+    return result;
+  };
+  const deadline = s.f.state.now.getTime() + 120000;
+  return { ...s, options: { repo: s.f.repo, clock: () => new Date(s.f.state.now), log,
+    remainingMs: () => deadline - s.f.state.now.getTime(), fetchImpl: fakeFetch(() => ({ display: 'unavailable' })) } };
+}
+
+test('pickup timeout uses the actual lease time left after a slow renewal', async t => {
+  const s = await slowLeaseFixture(10000);
+  const timeouts = [];
+  const nativeTimeout = AbortSignal.timeout;
+  t.mock.method(AbortSignal, 'timeout', ms => { timeouts.push(ms); return nativeTimeout(ms); });
+  const collector = createCollector(s.options);
+  const result = await collector.step();
+  await Promise.all(result.started);
+  assert.ok(s.options.remainingMs() > 15000, 'the invocation deadline is not the limiting budget');
+  assert.deepEqual(timeouts, [4000], 'the returned 15-second lease has only 5 seconds left after its 10-second renewal');
+});
+
+test('message timeout uses the actual lease time left after the final renewal', async () => {
+  const s = await slowLeaseFixture(10000);
+  const attempts = [];
+  const collector = createCollector({ ...s.options, sendImpl: async (message, options) => {
+    attempts.push({ timeoutMs: options.timeoutMs, leaseRemainingMs: Date.parse(collector.lease.expiresAt()) - s.f.state.now.getTime() });
+    return { errcode: 0 };
+  } });
+  await collector.lease.acquire();
+  await collector.refreshTargets();
+  await s.f.repo.saveNotification({ _id: 'slow-lease-task', userKey: userKeyOf(), followId: 'F', eventId: 'event-slow-lease',
+    eventType: 'restock_confirmed', partNumber: 'MJYH4CH/A', storeNumber: 'R577', templateId: 'TPL', status: 'pending', attempts: 0,
+    createdAt: s.f.state.now.toISOString(), detectedAt: s.f.state.now.toISOString() });
+  await collector.drainNotifications();
+  assert.ok(s.options.remainingMs() > 15000, 'the invocation still has ample time');
+  assert.deepEqual(attempts, [{ timeoutMs: 4000, leaseRemainingMs: 5000 }]);
+  assert.equal((await s.f.repo.getNotification('slow-lease-task')).status, 'accepted');
+});
+
+test('token probe timeout also reserves time inside the actual remaining lease', async () => {
+  const s = await slowLeaseFixture(13000);
+  const probes = [];
+  const sender = async () => ({ errcode: 0 });
+  sender.probe = async options => { probes.push(options.timeoutMs); };
+  const collector = createCollector({ ...s.options, sendImpl: sender });
+  const result = await collector.step();
+  await Promise.all(result.started);
+  assert.ok(s.options.remainingMs() > 15000);
+  assert.deepEqual(probes, [1000], '2 seconds remain after renewal, including 1 second reserved for persistence');
+});
