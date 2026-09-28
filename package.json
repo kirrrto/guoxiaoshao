@@ -1,6 +1,7 @@
 {
   "name": "guoxiaoshao",
   "version": "1.4.1",
+  "license": "MIT",
   "private": true,
   "description": "果小哨 —— Apple 直营店取货供应监测小程序（云开发共享环境）",
   "scripts": {
