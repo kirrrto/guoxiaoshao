@@ -87,10 +87,11 @@
         <text>{{editor.isNew ? '添加关注' : '编辑关注'}}</text>
         <text class="sub">每机型最多 {{limits.maxStoresPerFollow}} 家门店</text>
       </view>
-      <target-picker catalog-version="{{catalogVersion}}" value="{{editor.pickerValue}}" max-stores="{{limits.maxStoresPerFollow}}" supported-only="{{true}}" bindchange="onEditorChange" />
+      <target-picker id="follow-target-picker" catalog-version="{{catalogVersion}}" value="{{editor.pickerValue}}" max-stores="{{limits.maxStoresPerFollow}}" supported-only="{{true}}" bindchange="onEditorChange" />
+      <view wx:if="{{saveError}}" class="banner banner-warn small mt" role="alert">{{saveError}}</view>
       <view class="btn-row">
         <button class="btn btn-outline" bindtap="onCancelEdit">取消</button>
-        <button class="btn btn-primary {{saving ? 'disabled' : ''}}" disabled="{{saving}}" bindtap="onSave">{{saving ? '保存中…' : '保存'}}</button>
+        <button class="btn btn-primary {{saving || !editorCanSave ? 'disabled' : ''}}" disabled="{{saving || !editorCanSave}}" bindtap="onSave">{{saving ? '保存中…' : '保存'}}</button>
       </view>
     </view>
 

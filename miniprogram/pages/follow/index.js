@@ -96,6 +96,14 @@ function presentFollow(follow, boot, catalog, collector) {
   };
 }
 
+function confirmsSavedFollow(follow, payload) {
+  if (!follow || typeof follow.followId !== 'string' || follow.partNumber !== payload.partNumber || follow.status !== 'active' || !Array.isArray(follow.stores)) return false;
+  if (follow.followId !== payload.followId && !follow.followId.endsWith('|' + payload.followId)) return false;
+  const actual = [...new Set(follow.stores.map(store => store.storeNumber))].sort();
+  const expected = [...new Set(payload.storeNumbers)].sort();
+  return actual.length === expected.length && actual.every((number, index) => number === expected[index]);
+}
+
 Page({
   data: {
     ready: false,
@@ -107,7 +115,9 @@ Page({
     followsLoaded: false,
     limits: { maxFollows: 3, maxStoresPerFollow: 3 },
     editing: false,
-    editor: { followId: null, pickerValue: null, selection: null, isNew: true },
+    editor: { followId: null, pickerValue: null, isNew: true },
+    editorCanSave: false,
+    saveError: '',
     saving: false,
     subscription: { templateCount: 0, credits: 0 },
     delivery: { label: '正在确认', cls: 'muted', detail: '' },
@@ -166,7 +176,7 @@ Page({
   },
 
   onHide() { this.visible = false; this.stopPolling(); },
-  onUnload() { this.visible = false; this.stopPolling(); if (this.unsubscribeCatalog) this.unsubscribeCatalog(); if (this.unsubscribeCredits) this.unsubscribeCredits(); },
+  onUnload() { this.pageRetired = true; this.visible = false; this.stopPolling(); if (this.unsubscribeCatalog) this.unsubscribeCatalog(); if (this.unsubscribeCredits) this.unsubscribeCredits(); },
 
   onShareAppMessage() {
     return shareAppMessage('/pages/follow/index', this.data);
@@ -303,7 +313,7 @@ Page({
     if (this.followsPromise) return this.followsPromise;
     const generation = this.followReadGeneration || 0;
     const pending = getFollows(options).then(data => {
-      if (generation !== (this.followReadGeneration || 0)) return;
+      if (this.pageRetired || generation !== (this.followReadGeneration || 0)) return;
       this.setData({ follows: data.follows.filter(f => f.status !== 'removed').map(f => presentFollow(f, this.data.boot || {}, this.catalog, this.data.collector)), followsLoaded: true, limits: data.limits, loadError: null, refreshError: null, refreshedText: fmt.fmtTime(Date.now()) });
       this.refreshReadiness();
       this.consumePendingFocus();
@@ -375,11 +385,14 @@ Page({
   },
 
   openEditor({ followId, pickerValue, isNew }) {
+    if (this.pageRetired) return;
     if (!canRemind(this.data.boot)) {
       this.showMemberModal();
       return;
     }
-    this.setData({ editing: true, editor: { followId, pickerValue, selection: null, isNew } });
+    this.editorEpoch = (this.editorEpoch || 0) + 1;
+    this.editorSelection = null;
+    this.setData({ editing: true, editor: { followId, pickerValue, isNew }, editorCanSave: false, saveError: '' });
   },
 
   showMemberModal() {
@@ -408,36 +421,63 @@ Page({
   },
 
   onCancelEdit() {
-    this.setData({ editing: false });
+    this.editorEpoch = (this.editorEpoch || 0) + 1;
+    this.editorSelection = null;
+    this.setData({ editing: false, editorCanSave: false, saveError: '' });
   },
 
   onEditorChange(e) {
-    this.setData({ 'editor.selection': e.detail });
+    if (this.pageRetired || !this.data.editing) return;
+    // The selection is logic state; only its validity needs the render bridge.
+    const selection = this.editorSelection = e.detail;
+    this.setData({ editorCanSave: Boolean(selection && selection.partNumber && selection.product && selection.product.supported && Array.isArray(selection.storeNumbers) && selection.storeNumbers.length), saveError: '' });
   },
 
   async onSave() {
-    if (this.data.saving) return;
+    if (this.pageRetired || !this.data.editing || this.data.saving) return;
     const { editor } = this.data;
-    const selection = editor.selection;
+    const epoch = this.editorEpoch;
+    // A picker's change event is deferred by nextTick. Read its current state
+    // at the tap so a fast save cannot submit the previous configuration.
+    const picker = typeof this.selectComponent === 'function' && this.selectComponent('#follow-target-picker');
+    const selection = picker && typeof picker.getSelection === 'function' ? picker.getSelection() : this.editorSelection;
     if (!selection || !selection.partNumber) return toast('请选择具体配置');
     if (!selection.product || !selection.product.supported) return toast('此配置暂未开放监测');
-    if (!selection.storeNumbers.length) return toast('请至少选择一家门店');
+    if (!Array.isArray(selection.storeNumbers) || !selection.storeNumbers.length) return toast('请至少选择一家门店');
+    const payload = { followId: editor.followId, partNumber: selection.partNumber, storeNumbers: selection.storeNumbers.slice() };
     const toppedUp = topUpReminderCredit();
-    this.setData({ saving: true });
+    this.setData({ saving: true, saveError: '' });
     try {
-      await call('follow.upsert', { followId: editor.followId, partNumber: selection.partNumber, storeNumbers: selection.storeNumbers });
+      const result = await call('follow.upsert', payload);
       this.invalidateFollowRead();
-      this.setData({ editing: false });
-      await this.loadFollows();
       invalidateBootstrap();
-      refreshBootstrap().catch(() => {});
-      confirmTap();
-      toast(editor.isNew ? '已加入关注' : '已更新', 'success');
-      if (editor.isNew && !toppedUp && this.data.subscription.credits === 0) this.promptSubscribe();
+      if (!confirmsSavedFollow(result && result.follow, payload)) throw Object.assign(new Error('保存结果尚未确认，请重试。'), { code: 'bad_response' });
+      if (this.pageRetired) return;
+      const follow = presentFollow(result.follow, this.data.boot || {}, this.catalog, this.data.collector);
+      const follows = this.data.follows.filter(item => item.followId !== follow.followId && item.followId !== payload.followId);
+      follows.push(follow);
+      const sameEditor = epoch === this.editorEpoch;
+      this.setData({ follows, ...(sameEditor ? { editing: false, editorCanSave: false } : {}) });
+      this.refreshReadiness();
+      if (sameEditor && this.visible !== false) {
+        confirmTap();
+        toast(editor.isNew ? '已加入关注' : '已更新', 'success');
+        if (editor.isNew && !toppedUp && this.data.subscription.credits === 0) this.promptSubscribe();
+      }
+      if (this.visible !== false) {
+        refreshBootstrap().catch(() => {});
+        // A failed read cannot undo the server's confirmed save or report it as
+        // a failed write. Keep the acknowledged row until a later refresh.
+        try { await this.loadFollows(); }
+        catch (error) { if (!this.pageRetired) this.setData({ refreshError: '关注已保存，列表状态刷新失败，请下拉刷新。' }); }
+      }
     } catch (error) {
-      showError(error);
+      if (!this.pageRetired && epoch === this.editorEpoch) {
+        this.setData({ saveError: error.message || '保存未完成，请重试。' });
+        if (this.visible !== false) showError(error);
+      }
     } finally {
-      this.setData({ saving: false });
+      if (!this.pageRetired) this.setData({ saving: false });
     }
   },
 

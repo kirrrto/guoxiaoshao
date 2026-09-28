@@ -86,12 +86,13 @@ App({
   ensureCloud() {
     if (this.globalData.cloud) return Promise.resolve(this.globalData.cloud);
     if (this.cloudInitPromise) return this.cloudInitPromise;
-    const init = this.initCloud();
+    const generation = this.cloudInitGeneration = (this.cloudInitGeneration || 0) + 1;
+    const init = this.initCloud(generation);
     init.catch(() => {});
     // A late success still stores the cloud for the next call (initCloud sets it).
     const pending = new Promise((resolve, reject) => {
       const timer = setTimeout(() => {
-        this.globalData.cloudError = '连接云环境超时，请检查网络后重试';
+        if (generation === this.cloudInitGeneration) this.globalData.cloudError = '连接云环境超时，请检查网络后重试';
         reject(new Error('cloud_init_timeout'));
       }, CLOUD_INIT_TIMEOUT_MS);
       init.then(cloud => { clearTimeout(timer); resolve(cloud); }, error => { clearTimeout(timer); reject(error); });
@@ -110,7 +111,7 @@ App({
    * owner's cloudbase_auth hook. When this code runs inside the owner's own
    * app (console testing), the plain wx.cloud.init path is used instead.
    */
-  async initCloud() {
+  async initCloud(generation) {
     if (!wx.cloud) {
       this.globalData.cloudError = '请使用 2.23.0 或以上的基础库';
       throw new Error(this.globalData.cloudError);
@@ -126,11 +127,15 @@ App({
         cloud = new wx.cloud.Cloud({ resourceAppid: cloudConfig.resourceAppid, resourceEnv: cloudConfig.resourceEnv });
         await cloud.init();
       }
-      this.globalData.cloud = cloud;
-      this.globalData.cloudError = null;
+      // A timed-out init can finish after its replacement. Only the newest
+      // attempt may publish state; a late success without a replacement is useful.
+      if (generation === this.cloudInitGeneration) {
+        this.globalData.cloud = cloud;
+        this.globalData.cloudError = null;
+      }
       return cloud;
     } catch (error) {
-      this.globalData.cloudError = (error && (error.errMsg || error.message)) || String(error);
+      if (generation === this.cloudInitGeneration) this.globalData.cloudError = (error && (error.errMsg || error.message)) || String(error);
       console.error('[gxs] cloud init failed', error);
       throw error;
     }

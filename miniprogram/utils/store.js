@@ -18,6 +18,7 @@ let latestQuota = null;
 let catalogPromise = null;
 let catalogGeneration = 0;
 let catalogCheckedAt = 0;
+let catalogRetryAt = 0;
 const catalogListeners = new Set();
 const quotaListeners = new Set();
 const subscriptionListeners = new Set();
@@ -32,7 +33,7 @@ function invalidateFollows() { followGeneration += 1; followSnapshot = null; fol
 function resetSession() {
   invalidateBootstrap(); invalidateFollows();
   latestQuota = null;
-  bootstrapFetchedAt = 0; catalogCheckedAt = 0; catalogPromise = null; catalogGeneration += 1;
+  bootstrapFetchedAt = 0; catalogCheckedAt = 0; catalogRetryAt = 0; catalogPromise = null; catalogGeneration += 1;
   const app = getApp(); app.globalData.catalog = null; app.globalData.lastQuery = null; app.globalData.pendingFollow = null;
 }
 async function getFollows({ force = false } = {}) {
@@ -204,9 +205,10 @@ async function refreshCatalog({ force = false } = {}) {
     // An earlier request may finish after this session has been invalidated.
     // Its result must not publish, persist or reset the new session's timers.
     if (generation !== catalogGeneration) return app.globalData.catalog || indexCatalog(cachedCatalog() || CATALOG_SEED);
+    if (!response || (!response.unchanged && !validCatalog(response))) throw new Error('商品目录暂时不可用，请稍后刷新');
     catalogCheckedAt = Date.now();
+    catalogRetryAt = 0;
     if (response.unchanged) return app.globalData.catalog || indexCatalog(raw);
-    if (!validCatalog(response)) throw new Error('商品目录暂时不可用，请稍后刷新');
     const indexed = indexCatalog(response);
     app.globalData.catalog = indexed;
     if (typeof wx.setStorage === 'function') wx.setStorage({ key: CATALOG_KEY, data: response, fail() {} });
@@ -218,7 +220,7 @@ async function refreshCatalog({ force = false } = {}) {
   });
   catalogPromise = pending;
   try { return await pending; }
-  catch (error) { if (generation === catalogGeneration) catalogCheckedAt = Date.now() - CATALOG_TTL_MS + 30000; throw error; }
+  catch (error) { if (generation === catalogGeneration) catalogRetryAt = Date.now() + 30000; throw error; }
   finally { if (catalogPromise === pending) catalogPromise = null; }
 }
 
@@ -227,7 +229,8 @@ async function getCatalog({ force = false } = {}) {
   const catalog = currentCatalog();
   if (force) return refreshCatalog({ force: true });
   const expected = app.globalData.bootstrap && app.globalData.bootstrap.catalogVersion;
-  if ((expected && expected !== catalog.version) || Date.now() - catalogCheckedAt >= CATALOG_TTL_MS) {
+  const now = Date.now();
+  if (now >= catalogRetryAt && (catalogRetryAt > 0 || (expected && expected !== catalog.version) || now - catalogCheckedAt >= CATALOG_TTL_MS)) {
     // Browse immediately; the server still validates supported SKU and limits.
     refreshCatalog().catch(() => {});
   }

@@ -3,6 +3,12 @@ import assert from 'node:assert/strict';
 import { runtime } from './helpers/miniprogram-runtime.mjs';
 import { createFixture, PRODUCTS, STORES } from './helpers/fixture.mjs';
 
+// The saved examples below belong to this ten-day retention window. Keep the
+// clock fixed so the same valid-restore cases do not expire with the calendar.
+test.beforeEach(t => {
+  t.mock.method(Date, 'now', () => Date.parse('2026-09-16T02:00:00Z'));
+});
+
 const copy = value => JSON.parse(JSON.stringify(value));
 const product = PRODUCTS[1];
 const saved = extra => ({ partNumber: product.partNumber, dayKey: '2026-09-15', storeNumbers: ['R577', 'R639'], ...extra });
@@ -59,7 +65,7 @@ test('a removed SKU or store refuses the entire restore without silently replaci
 
 test('invalid calendar dates, future days and malformed store data cannot restore an unqueryable form', t => {
   t.mock.method(Date, 'now', () => Date.parse('2026-09-16T02:00:00Z'));
-  for (const extra of [{ dayKey: '2026-02-30' }, { dayKey: '2026-9-15' }, { dayKey: '2026-09-17' }, { storeNumbers: null }, { storeNumbers: ['__proto__'] }, { storeNumbers: ['R577', {}] }]) {
+  for (const extra of [{ dayKey: '2026-02-30' }, { dayKey: '2026-9-15' }, { dayKey: '2026-09-01' }, { dayKey: '2026-09-17' }, { storeNumbers: null }, { storeNumbers: ['__proto__'] }, { storeNumbers: ['R577', {}] }]) {
     const { rt, page } = pageWith(saved(extra));
     page.onRestoreBrowse(tap);
     assert.equal(page.selection.partNumber, PRODUCTS[2].partNumber);

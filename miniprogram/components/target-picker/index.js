@@ -19,6 +19,7 @@ Component({
   lifetimes: {
     // Observers fire only for non-default values; load even if no version is bound.
     attached() { if (!this.sourceCatalog) this.loadCatalog(); },
+    detached() { this.emitEpoch = (this.emitEpoch || 0) + 1; },
   },
   methods: {
     // One cascade (catalog, restore, filter or store change) becomes one setData.
@@ -171,14 +172,17 @@ Component({
       this.batch(() => { this.stage({ selectedStores: selected }); this.selectCity(this.data.cityIndex); this.updateSearchResults(); this.emit(); });
     },
     onRemoveStore(e) { this.onStoreTap(e); },
+    getSelection() {
+      const product = this.read('product'), stores = this.read('selectedStores');
+      return { partNumber: product ? product.partNumber : null, product, storeNumbers: stores.map(s => s.storeNumber), stores };
+    },
     emit() {
       // Property observers run inside the parent's update. Notify after that
       // update settles, coalescing catalog/value observers into one event.
       const epoch = this.emitEpoch = (this.emitEpoch || 0) + 1;
       const notify = () => {
         if (epoch !== this.emitEpoch) return;
-        const product = this.read('product'), stores = this.read('selectedStores');
-        this.triggerEvent('change', { partNumber: product ? product.partNumber : null, product, storeNumbers: stores.map(s => s.storeNumber), stores });
+        this.triggerEvent('change', this.getSelection());
       };
       if (typeof wx.nextTick === 'function') wx.nextTick(notify); else setTimeout(notify, 0);
     },
