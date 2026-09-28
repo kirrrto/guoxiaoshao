@@ -1,15 +1,36 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import vm from 'node:vm';
 import { createRequire } from 'node:module';
 import { createFixture, fakeFetch, userKeyOf } from './helpers/fixture.mjs';
 
 const require = createRequire(import.meta.url);
-const { readTimerRuntime, isTrustedTimer, runScheduled, TRIGGER_NAME } = require('../cloudfunctions/gxs_api/lib/engine/scheduled');
+const { readTimerRuntime, isTrustedTimer, runBudgetMs, runScheduled, TRIGGER_NAME } = require('../cloudfunctions/gxs_api/lib/engine/scheduled');
 const { monitoringSnapshot } = require('../cloudfunctions/gxs_api/lib/monitor-readiness');
 const { mergeConfig, validateConfig } = require('../cloudfunctions/gxs_api/lib/config');
 const { buildMessage } = require('../cloudfunctions/gxs_api/lib/engine/notifier');
 const log = { info() {}, warn() {}, error() {} };
 const event = { Type: 'Timer', TriggerName: TRIGGER_NAME };
+
+test('scheduled budget survives the SCF Node.js 20 remaining-time helper failure', () => {
+  const context = { getRemainingTimeInMillis() { throw new TypeError('client.ms_elapsed is not a function'); } };
+  assert.equal(runBudgetMs(context), 35000);
+  assert.equal(runBudgetMs(context, 12000), 12000);
+  assert.equal(runBudgetMs({}), 35000);
+  assert.equal(runBudgetMs(null), 35000);
+  assert.equal(runBudgetMs({ getRemainingTimeInMillis: () => NaN }), 35000);
+});
+
+test('scheduled budget preserves the platform method receiver and reserves cleanup time', () => {
+  const context = { remaining: 17000, getRemainingTimeInMillis() { return this.remaining; } };
+  assert.equal(runBudgetMs(context), 12000);
+  assert.equal(runBudgetMs({ getRemainingTimeInMillis: () => 90000 }), 55000);
+  assert.equal(runBudgetMs({ getRemainingTimeInMillis: () => 5500 }), 500);
+  for (const remaining of [5000, 1000, 0, -1]) {
+    assert.equal(runBudgetMs({ getRemainingTimeInMillis: () => remaining }), 0, `${remaining}ms must not start more work`);
+  }
+});
 
 async function setup(extra = {}) {
   let display = 'unavailable';
@@ -24,6 +45,37 @@ async function setup(extra = {}) {
   const run = more => runScheduled({ repo: f.repo, fetchImpl: upstream, sendImpl, clock: () => new Date(f.state.now), log, sleep: async ms => f.advance(ms), ...more });
   return { f, upstream, run, sends, available: () => { display = 'available'; } };
 }
+
+test('production monitor entry publishes a fresh heartbeat when the platform time helper throws', async () => {
+  const s = await setup();
+  const entry = fs.readFileSync(new URL('../cloudfunctions/gxs_monitor/index.js', import.meta.url), 'utf8');
+  const exported = {};
+  let databaseCalls = 0;
+  const scheduled = require('../cloudfunctions/gxs_monitor/lib/engine/scheduled');
+  const imports = {
+    'wx-server-sdk': { init() {}, getWXContext: () => ({}), database: () => { databaseCalls++; return {}; } },
+    './lib/repo/cloudbase-repo': { createCloudbaseRepo: () => s.f.repo },
+    './lib/engine/wechat-sender': { createWechatSender: () => null },
+    './lib/engine/scheduled': { ...scheduled, runScheduled: options => scheduled.runScheduled({
+      ...options, clock: () => new Date(s.f.state.now), log, sleep: async ms => s.f.advance(ms),
+    }) },
+    './lib/connection': { consumerAppid: 'test-consumer' },
+  };
+  vm.runInNewContext(entry, {
+    exports: exported, require: name => { assert.ok(Object.hasOwn(imports, name), name); return imports[name]; },
+    process: { env: { GXS_ENABLE_SCHEDULED_MONITOR: 'true', TRIGGER_SRC: 'timer', TENCENTCLOUD_RUNENV: 'SCF' } },
+    fetch: s.upstream,
+  });
+  const result = await exported.main(event, { getRemainingTimeInMillis() { throw new TypeError('client.ms_elapsed is not a function'); } });
+  assert.equal(result.ok, true);
+  assert.equal(result.state, 'running');
+  assert.equal(result.scanned, 2);
+  assert.equal(databaseCalls, 1);
+  const status = await s.f.repo.getCollectorStatus();
+  assert.equal(status.updatedAt, s.f.state.now.toISOString());
+  assert.equal(status.stats.lastBatchAt, s.f.state.now.toISOString());
+  assert.equal(status.mode, 'scheduled');
+});
 
 test('scheduled function trusts platform SOURCE and rejects all forged client Timer events', () => {
   assert.equal(isTrustedTimer(event, { SOURCE: 'wx_trigger' }), true);

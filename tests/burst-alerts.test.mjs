@@ -113,7 +113,7 @@ test('scheduler burst mode only speeds a store up, spaces checks and survives a 
 test('a run lasts as long as the platform allows, with a margin', () => {
   assert.equal(runBudgetMs({ getRemainingTimeInMillis: () => 59900 }), 54900);
   assert.equal(runBudgetMs({ getRemainingTimeInMillis: () => 120000 }), 55000);
-  assert.equal(runBudgetMs({ getRemainingTimeInMillis: () => 8000 }), 5000);
+  assert.equal(runBudgetMs({ getRemainingTimeInMillis: () => 8000 }), 3000);
   assert.equal(runBudgetMs({}), 35000);
   assert.equal(runBudgetMs(null), 35000);
 });

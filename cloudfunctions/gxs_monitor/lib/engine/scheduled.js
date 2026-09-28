@@ -45,8 +45,15 @@ function isTrustedTimer(event, wxContext, trustedRuntime = {}) {
  * limit (from the platform context) leaves a safety margin.
  */
 function runBudgetMs(context, fallbackMs = 35000) {
-  const remaining = context && typeof context.getRemainingTimeInMillis === 'function' ? Number(context.getRemainingTimeInMillis()) : NaN;
-  return Number.isFinite(remaining) && remaining > 0 ? Math.max(5000, Math.min(55000, remaining - 5000)) : fallbackMs;
+  let remaining = NaN;
+  try {
+    // Some SCF Node.js 20 runtimes expose this method but throw internally
+    // (client.ms_elapsed is not a function). Keep the bounded fallback so a
+    // broken platform helper cannot prevent every timer heartbeat and scan.
+    if (context && typeof context.getRemainingTimeInMillis === 'function') remaining = Number(context.getRemainingTimeInMillis());
+  } catch { /* The platform time helper is optional; use the bounded fallback. */ }
+  // Never turn an almost-expired invocation into another five seconds of work.
+  return Number.isFinite(remaining) ? Math.max(0, Math.min(55000, remaining - 5000)) : fallbackMs;
 }
 
 async function runScheduled({ repo, fetchImpl, sendImpl, clock = () => new Date(), log = console, maxRunMs = 35000, ownerId = `timer-${crypto.randomUUID()}`, sleep = ms => new Promise(resolve => setTimeout(resolve, ms)) }) {
