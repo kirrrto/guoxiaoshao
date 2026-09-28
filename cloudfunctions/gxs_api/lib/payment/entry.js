@@ -145,7 +145,11 @@ function createPaymentEntry({ repo, fetchImpl = globalThis.fetch, clock = defaul
     if (path !== CALLBACK_PATH || rawPath && rawPath !== CALLBACK_PATH) return response(403, 'forbidden');
     const method = String(event.httpMethod || event.requestContext && event.requestContext.http && event.requestContext.http.method || '').toUpperCase();
     if (!['GET', 'POST'].includes(method)) return response(405, 'method not allowed');
-    const queryMeta = callbackQuery(event);
+    let queryMeta;
+    // Raw HTTP query strings are untrusted. Invalid percent encoding must be
+    // rejected at this boundary, before decoding can escape the HTTP handler.
+    try { queryMeta = callbackQuery(event); }
+    catch { return response(403, 'forbidden'); }
     let stage = 'configuration';
     try {
       const ctx = await contextFor(invocationEnv), provider = providerFor(ctx);

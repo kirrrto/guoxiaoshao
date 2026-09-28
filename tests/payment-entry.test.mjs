@@ -53,6 +53,22 @@ async function harness(options = {}) {
   return { ...f, entry, order, calls, actions, logs, provider };
 }
 
+test('malformed raw query encoding returns a denied HTTP response without touching orders or ordinary actions', async () => {
+  const f = await harness();
+  for (const field of ['queryStringParameters', 'queryString', 'query', 'multiValueQueryStringParameters']) {
+    for (const httpMethod of ['GET', 'POST']) {
+      for (const query of ['signature=%', 'nonce=%E0%A4%A', '%=x']) {
+        const result = await f.entry({ path: '/payment/callback', httpMethod, [field]: query });
+        assert.equal(result.statusCode, 403);
+        assert.equal(result.body, 'forbidden');
+      }
+    }
+  }
+  assert.equal(f.calls.length, 0);
+  assert.equal(f.actions.length, 0);
+  assert.equal((await f.repo.getOrder(OUT)).status, 'created');
+});
+
 test('HTTP only exposes the exact callback path and never routes action/body fields to admin or user handlers', async () => {
   const f = await harness();
   for (const event of [
