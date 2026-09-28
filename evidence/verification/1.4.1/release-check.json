@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-09-28T02:29:38.071Z",
+  "checkedAt": "2026-09-28T02:49:51.157Z",
   "version": "1.4.1",
   "scope": "Local source candidate only; no cloud deployment, account-console inspection or submission",
   "passed": true,
@@ -143,7 +143,7 @@
   ],
   "frontend": {
     "files": 59,
-    "sourceBytes": 652720,
+    "sourceBytes": 655870,
     "note": "Source bytes, not the WeChat upload package size"
   },
   "externalReleaseChecks": [

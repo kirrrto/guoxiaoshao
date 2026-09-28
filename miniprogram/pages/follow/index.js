@@ -49,7 +49,7 @@ function deliveryView(notifications, templateIds) {
   if (!templateIds.length) return { label: '暂不能发送', cls: 'warn', detail: DELIVERY_REASON.template_missing };
   if (!notifications.enabled) return { label: '尚未开放', cls: 'warn', detail: DELIVERY_REASON.notifications_disabled };
   if (notifications.deliveryReady !== true) return { label: '发送服务未就绪', cls: 'warn', detail };
-  return { label: '发送服务已就绪', cls: 'ok', detail: '检测到符合条件的补货后，将使用你的有效授权发送提醒。' };
+  return { label: '发送服务已就绪', cls: 'ok', detail: '检测到符合条件的库存变化后，将使用对应的有效授权发送提醒。' };
 }
 
 const FEEDBACK_TOAST = { bought: '恭喜买到！', missed: '已记录，继续为你盯着', skipped: '已记录，继续为你盯着' };
@@ -473,7 +473,7 @@ Page({
       if (sameEditor && this.visible !== false) {
         confirmTap();
         toast(editor.isNew ? '已加入关注' : '已更新', 'success');
-        if (editor.isNew && !toppedUp && this.data.subscription.credits === 0) this.promptSubscribe();
+        if (editor.isNew && !toppedUp && (!this.data.subscription.credits || (this.data.subscription.soldoutEnabled && !this.data.subscription.soldoutCredits))) this.promptSubscribe();
       }
       if (this.visible !== false) {
         refreshBootstrap().catch(() => {});
@@ -499,8 +499,8 @@ Page({
       return;
     }
     wx.showModal({
-      title: '开启补货提醒',
-      content: '每点一次「允许」增加 1 次到货提醒，可以连续授权多次累加；勾选「总是保持以上选择」后，平时点查询、刷新时会自动补充。',
+      title: this.data.subscription.soldoutEnabled ? '开启到货和断货提醒' : '开启补货提醒',
+      content: this.data.subscription.soldoutEnabled ? '一个按钮同时申请到货和断货提醒；两项都选择「允许」，各增加 1 次。也可以只允许其中一项。' : '每点一次「允许」增加 1 次到货提醒，可以连续授权多次累加；勾选「总是保持以上选择」后，平时点查询、刷新时会自动补充。',
       confirmText: '增加提醒次数',
       success: r => { if (r.confirm) this.onSubscribe(); },
     });
@@ -554,7 +554,15 @@ Page({
       publishSubscriptions(data.subscriptions);
       this.refreshReadiness();
       const result = pending.results && pending.results[restockId];
-      if (result === 'accept') {
+      const soldoutId = this.data.boot.soldoutId;
+      if (data.replayed) {
+        toast('已有授权已同步，未重复增加次数');
+      } else if (soldoutId) {
+        const accepted = Array.isArray(data.accepted) ? data.accepted : [];
+        const outcome = (label, id) => accepted.includes(id) ? `${label} +1` : pending.results && pending.results[id] === 'ban' ? `${label}授权已关闭` : `${label}未授权`;
+        if (accepted.includes(restockId) || accepted.includes(soldoutId)) confirmTap();
+        toast(`${outcome('到货', restockId)}，${outcome('断货', soldoutId)}`);
+      } else if (result === 'accept') {
         confirmTap();
         toast(this.data.delivery.cls === 'ok' ? `提醒次数 +1，剩余 ${credits} 次` : `已记录，剩余 ${credits} 次提醒，服务准备中`);
       } else {
@@ -586,8 +594,10 @@ Page({
     if (!this.data.boot || !this.data.boot.templateIds.length) return;
     const credits = restockSubscription({ templateIds: { restock: this.data.boot.templateIds[0] } }, subscriptions).credits;
     const soldoutCredits = soldoutSubscription({ templateIds: { soldout: this.data.boot.soldoutId } }, subscriptions).credits;
-    if (soldoutCredits !== this.data.subscription.soldoutCredits) this.setData({ 'subscription.soldoutCredits': soldoutCredits });
-    if (credits !== this.data.subscription.credits) { this.setData({ 'subscription.credits': credits }); this.refreshReadiness(); }
+    if (credits !== this.data.subscription.credits || soldoutCredits !== this.data.subscription.soldoutCredits) {
+      this.setData({ 'subscription.credits': credits, 'subscription.soldoutCredits': soldoutCredits });
+      this.refreshReadiness();
+    }
   },
 
   async onToggle(e) {

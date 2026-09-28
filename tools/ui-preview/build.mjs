@@ -151,7 +151,7 @@ const widths = [320, 375, 430], scenarios = adminPreview ? ['operator-ready', 'o
 if (historyDataPreview) scenarios.splice(0, scenarios.length, 'history-no-data', 'history-unknown-only', 'history-observed-no-events', 'history-events-only', 'history-observed-events', 'history-partial-stores');
 if (paymentPreview) scenarios.splice(0, scenarios.length, 'payment-ready', 'payment-renew', 'payment-blocked', 'payment-old-ios', 'payment-pending', 'payment-cancelled', 'payment-error', 'payment-fulfilled', 'payment-partial-refund');
 const names = adminPreview ? { admin: '运营工具' } : paymentPreview ? { mine: '我的' } : historyDataPreview ? { history: '历史' } : historyTaskPreview ? { history: '历史', mine: '我的' } : stockPreview || monitoringPreview ? { follow: '小哨提醒' } : reminderPreview || redemptionPreview ? { mine: '我的' } : { query: '查询', follow: '小哨提醒', history: '历史', mine: '我的' };
-if (monitoringPreview) scenarios.push('monitor-no-follows', 'monitor-all-paused', 'monitor-user-disabled', 'monitor-dnd', 'monitor-free-trial', 'monitor-alert');
+if (monitoringPreview) scenarios.push('monitor-no-follows', 'monitor-all-paused', 'monitor-user-disabled', 'monitor-dnd', 'monitor-free-trial', 'monitor-alert', 'monitor-dual-ready', 'monitor-dual-soldout-empty', 'monitor-dual-restock-empty', 'monitor-dual-soldout-low', 'monitor-dual-pending');
 fs.mkdirSync(out, { recursive: true });
 const manifest = [];
 
@@ -212,6 +212,13 @@ for (const scenario of scenarios) {
       ? { enabled: false, deliveryReady: false, reason: 'template_missing', templateIds: {} }
       : { enabled: true, deliveryReady: ready, reason: collectorState === 'stale' ? 'collector_stale' : collectorState === 'disabled' ? 'collector_stopped' : '', templateIds: { restock: templateId } };
     bootstrap.subscriptions = scenario === 'monitor-needs-authorization' ? {} : { [templateId]: { credits: 1 } };
+    if (scenario.startsWith('monitor-dual-')) {
+      bootstrap.notifications.templateIds.soldout = 'offline-soldout-template';
+      bootstrap.subscriptions = {
+        [templateId]: { credits: scenario === 'monitor-dual-restock-empty' ? 0 : 8 },
+        'offline-soldout-template': { credits: scenario === 'monitor-dual-soldout-empty' ? 0 : scenario === 'monitor-dual-soldout-low' ? 1 : 5 },
+      };
+    }
     bootstrap.settings = { notifyEnabled: true, dnd: { enabled: false, startMinute: 1380, endMinute: 480 } };
     if (expired) { follows[0].status = 'paused'; follows[0].statusReason = 'membership_expired'; }
     const observedAt = new Date(now.getTime() - (collectorState === 'running' ? 15000 : 360000)).toISOString();
@@ -289,8 +296,11 @@ for (const scenario of scenarios) {
         page.setData({ redemptionCode: '', redemptionResult: { kind: 'ok', title: scenario === 'redemption-success' ? '兑换成功' : '此账号已兑换过', detail: '会员有效期已更新，请查看上方会员状态。' } });
       }
     }
-    // Service rows sit in the collapsible details block; show them for the monitoring audit.
-    if (pageName === 'follow' && monitoringPreview) page.setData({ showServiceDetails: true });
+    // Combined authorization must remain visible with service details collapsed.
+    if (pageName === 'follow' && monitoringPreview) {
+      page.setData({ showServiceDetails: !scenario.startsWith('monitor-dual-'), subscriptionPending: scenario === 'monitor-dual-pending' });
+      page.refreshReadiness();
+    }
     if (pageName === 'mine' && reminderPreview) {
       if (scenario === 'reminder-loading') page.setData({ notificationsLoading: true });
       if (scenario === 'reminder-deleting') page.setData({ notificationActionBusy: 'delete', notificationDeletingId: reminderRecords[0].id });
@@ -339,7 +349,7 @@ for (const scenario of scenarios) {
         'history-longcontent': ['各地门店已有记录', '3 家门店', '今日浏览任务完成，+1 次'],
         'history-loading': ['正在加载浏览记录'],
       }[scenario]] : ['每日体验任务', '次数明细', '浏览一次历史记录', ...(scenario === 'history-balance-cap' ? ['已浏览·待领取', '暂无记录'] : ['history-read-error', 'history-loading'].includes(scenario) ? ['去完成', '暂无记录'] : ['已完成', '体验任务', '+1'])]
-          : monitoringPreview ? [...(follows.length ? [p.title] : []), '后台检测', '消息发送', '提醒次数', ...{
+          : monitoringPreview ? [...(follows.length ? [p.title] : []), ...(scenario.startsWith('monitor-dual-') ? ['到货提醒', '断货提醒'] : ['后台检测', '消息发送']), '提醒次数', ...{
         'monitor-template-missing': ['监测服务运行中', '模板尚未配置', '关注已开启', '查看原因'],
         'monitor-ready-authorized': ['监测服务运行中', '发送服务已就绪', '提醒次数只剩 1 次', '增加提醒次数', '关注已开启'],
         'monitor-needs-authorization': ['监测服务运行中', '发送服务已就绪', '还没有提醒次数', '增加提醒次数'],
@@ -351,7 +361,12 @@ for (const scenario of scenarios) {
         'monitor-user-disabled': ['你的消息提醒已关闭', '前往提醒设置'],
         'monitor-dnd': ['当前处于免打扰时段', '查看免打扰设置'],
         'monitor-free-trial': ['新用户免费体验', '授权后可收到 1 条免费提醒', '授权免费提醒', '免费体验中'],
-        'monitor-alert': ['到货提醒', '确认补货', '2 分钟前', '可取货', '复制型号和门店', '再加一次提醒', '买到了吗？'],
+        'monitor-alert': ['到货提醒', '确认补货', '2 分钟前', '可取货', '复制型号和门店', '增加提醒次数', '买到了吗？'],
+        'monitor-dual-ready': ['到货、断货提醒已就绪', '增加提醒次数', '两项都允许'],
+        'monitor-dual-soldout-empty': ['断货提醒暂无次数', '到货提醒还可发送 8 次', '增加提醒次数'],
+        'monitor-dual-restock-empty': ['到货提醒暂无次数', '断货提醒还可发送 5 次', '增加提醒次数'],
+        'monitor-dual-soldout-low': ['断货提醒只剩 1 次', '增加提醒次数'],
+        'monitor-dual-pending': ['授权记录等待同步', '同步授权'],
       }[scenario]] : paymentPreview ? ['¥7.00', '兑换码开通', ...{
         'payment-ready': ['立即开通', '购买须知', '一次性虚拟服务', '一经售出不予退款', '一次购买 7 天'], 'payment-renew': ['续费会员', '购买须知', '按剩余有效期顺延'],
         'payment-blocked': ['付费购买暂未开放'], 'payment-old-ios': ['iOS 15'],

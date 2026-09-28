@@ -1,22 +1,23 @@
 {
   "version": "1.4.1",
-  "checkedAt": "2026-09-28T02:32:00.643089+00:00",
+  "checkedAt": "2026-09-28T02:50:57.513Z",
   "tests": {
-    "total": 644,
-    "passed": 644,
+    "total": 671,
+    "passed": 671,
     "failed": 0,
-    "newComparedWith616Baseline": 28
+    "newComparedWith616Baseline": 55,
+    "combinedAuthorizationRegressionTests": 27
   },
   "sourceCheck": {
-    "files": 309,
-    "javaScript": 208,
+    "files": 310,
+    "javaScript": 209,
     "json": 38,
     "pages": 4,
     "operatorPages": 1,
     "errors": []
   },
   "layout": {
-    "total": 36,
+    "total": 51,
     "expressionErrors": 0,
     "missingText": 0,
     "horizontalOverflow": 0,
@@ -24,12 +25,27 @@
     "failedImages": 0
   },
   "scope": "Offline tests, official local compilers and browser approximation. Not device acceptance.",
-  "testLogSha256": "0aeb5b25a7fe8a2691bc99004d43c0946414bf868a081ec8c59a488226b03c9e",
+  "testLogSha256": "073a1a6d76dabb6145a7ad9a8f5c9aa5f8d9df7a392b465dd32e7310797edf45",
   "realPhoneAcceptance": {
     "existingPurchaseActivation": "User confirmed on 2026-09-23; not rerun here",
     "release141IOSAndroidPayment": "pending",
     "refund": "pending",
     "currentRestockAndSoldoutTemplateDelivery": "pending",
-    "frontendWechatUploadReviewPublish": "not performed"
+    "frontendWechatUploadReviewPublish": "not performed",
+    "combinedTemplateAuthorization": "pending; local frontend has not been uploaded"
+  },
+  "combinedAuthorizationLayout": {
+    "cases": 18,
+    "passed": true,
+    "colorSchemes": [
+      "light",
+      "dark"
+    ],
+    "detailsCollapsed": true,
+    "widths": [
+      320,
+      375,
+      430
+    ]
   }
 }

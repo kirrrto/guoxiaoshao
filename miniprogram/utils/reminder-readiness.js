@@ -1,4 +1,4 @@
-/** Personal readiness uses the same restock template as the server sender. */
+/** Personal readiness follows the configured sender templates and their separate credits. */
 // At or below this many sends, members are asked to top up before alerts stop.
 const LOW_CREDITS = 2;
 function restockSubscription(notifications = {}, subscriptions = {}) {
@@ -60,6 +60,19 @@ function reminderReadiness({ boot, follows = [], followsLoaded = false, collecto
   if (subscriptionPending) return state('subscription_pending', '授权记录等待同步', '上次微信授权的记录尚未确认。同步已有记录即可，无需再次向微信授权。', 'subscribe', '同步授权记录');
   if (trial && !subscription.credits) return state('no_credit', '授权后可收到 1 条免费提醒', '点下方按钮并选择「允许」，补货时就通过微信免费提醒你 1 次。', 'subscribe', '授权免费提醒');
   if (trial) return { ...state('ready', '已准备接收免费提醒', '补货时会发送 1 条免费到货提醒。之后开通会员可关注 3 个配置，并累加提醒次数。', '', '', 'ok'), ready: true };
+  if (subscription.soldoutEnabled) {
+    const restock = subscription.credits || 0, soldout = subscription.soldoutCredits || 0;
+    if (!restock && !soldout) return state('no_credit', '到货、断货提醒暂无次数', '点击「增加提醒次数」，可一起授权到货和断货提醒。两项都允许，各增加 1 次。', 'subscribe', '增加提醒次数');
+    if (!restock || !soldout) {
+      const missing = restock ? '断货' : '到货', available = restock ? '到货' : '断货', remaining = restock || soldout;
+      return state('partial_credit', `${missing}提醒暂无次数`, `${available}提醒还可发送 ${remaining} 次；${missing}提醒暂无次数。点击下方按钮，可一起补充两种提醒。`, 'subscribe', '增加提醒次数');
+    }
+    if (restock <= LOW_CREDITS || soldout <= LOW_CREDITS) {
+      const title = restock <= LOW_CREDITS && soldout <= LOW_CREDITS ? '到货、断货提醒次数较少' : restock <= LOW_CREDITS ? `到货提醒只剩 ${restock} 次` : `断货提醒只剩 ${soldout} 次`;
+      return { ...state('low_credit', title, '每条消息消耗对应类型的 1 次授权。可用下方同一个按钮补充，用完的类型将暂停发送。', 'subscribe', '增加提醒次数'), ready: true };
+    }
+    return { ...state('ready', '到货、断货提醒已就绪', '确认到货或断货后，通过微信提醒你。每条消息消耗对应类型的 1 次授权。', 'subscribe', '增加提醒次数', 'ok'), ready: true };
+  }
   if (!subscription.credits) return state('no_credit', '还没有提醒次数', '每点一次「允许」增加 1 次到货提醒，可连续点击累加；每次补货提醒消耗 1 次。勾选「总是保持以上选择」后，点查询、刷新时会自动补充。', 'subscribe', '增加提醒次数');
   if (subscription.credits <= LOW_CREDITS) return { ...state('low_credit', `提醒次数只剩 ${subscription.credits} 次`, '每次补货提醒消耗 1 次，用完后将收不到提醒。点下方按钮可连续累加。', 'subscribe', '增加提醒次数'), ready: true };
   return { ...state('ready', '已准备接收补货提醒', `剩余 ${subscription.credits} 次提醒，每次补货提醒消耗 1 次。微信受理后，实际接收与声音仍遵循微信和手机设置。`, 'subscribe', '增加提醒次数', 'ok'), ready: true };

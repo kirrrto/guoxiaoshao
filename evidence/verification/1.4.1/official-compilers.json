@@ -1,6 +1,6 @@
 {
   "version": "1.4.1",
-  "checkedAt": "2026-09-28T02:21:50.171429+00:00",
+  "checkedAt": "2026-09-28T02:50:57.513Z",
   "scope": "Official local WeChat WXML/WXSS syntax compilation, not phone acceptance",
   "checks": [
     {
@@ -19,7 +19,7 @@
         },
         {
           "path": "pages/follow/index.wxml",
-          "sha256": "8c5f2efa1aa6c00d2c7bdcf0c4daca893e5b1c28f418441ee5b59052500bff59"
+          "sha256": "af10081a4ab82641f9c3ec326cf45f6bd3c57efe719c141418bf52c8e5ff39a2"
         },
         {
           "path": "pages/history/index.wxml",
@@ -55,7 +55,7 @@
         },
         {
           "path": "pages/follow/index.wxss",
-          "sha256": "57a41c78b961e346aa5fb2d15f89030b315593f8d7f75fecafb85a3ec714b4fc"
+          "sha256": "064b92a5a24bc88cd35c114d4a6490508683a6915e755d4e3d07a452cf3e5ce9"
         },
         {
           "path": "pages/history/index.wxss",

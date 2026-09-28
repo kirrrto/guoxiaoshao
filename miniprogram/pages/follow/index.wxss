@@ -24,8 +24,14 @@
 .service-title { font-size: 26rpx; font-weight: 600; color: var(--text); }
 .service-heading .pill { font-size: 22rpx; padding: 5rpx 14rpx; }
 .service-detail { font-size: 23rpx; color: var(--text-2); line-height: 1.6; margin-top: 8rpx; overflow-wrap: anywhere; }
-.authorization-row { display: flex; align-items: center; flex-wrap: wrap; gap: 14rpx; }
-.authorization-copy { flex: 1 1 220rpx; min-width: 0; }
+.reminder-credits-panel { padding-top: 8rpx; }
+.reminder-balances { display: flex; gap: 16rpx; margin: 16rpx 0; }
+.reminder-balance { display: flex; flex: 1 1 0%; min-width: 0; flex-direction: column; gap: 6rpx; padding: 18rpx 22rpx; border-radius: 20rpx; background: var(--surface-soft); }
+.reminder-balance-label { font-size: 24rpx; color: var(--text-2); }
+.reminder-balance-value { font-size: 36rpx; line-height: 1.4; font-weight: 700; color: var(--green-dark); overflow-wrap: anywhere; }
+.reminder-balance-unit { font-size: 22rpx; font-weight: 400; }
+.reminder-credits-panel > .btn { margin-top: 16rpx; }
+.authorization-hint { margin-top: 14rpx; line-height: 1.6; text-align: center; }
 .readiness-note { border-radius: 20rpx; padding: 18rpx 20rpx; background: rgba(231,249,239,.86); color: #315E4C; font-size: 23rpx; line-height: 1.65; }
 .settings-link, .service-link { color: var(--green-dark); font-size: 23rpx; }
 .settings-link { padding-top: 16rpx; }
