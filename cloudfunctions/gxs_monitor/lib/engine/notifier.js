@@ -187,10 +187,15 @@ async function sendTask({ task, config, sendImpl, repo, now, ownerId = 'notifier
   let outcome;
   try {
     const response = await sendImpl({ touser: user.openid, appid: user.appid, ...buildMessage(task, config), miniprogramState: config.notifications.miniprogramState || 'formal', lang: 'zh_CN' }, { timeoutMs });
-    const code = response && (response.errCode ?? response.errcode);
-    if (code === undefined || !Number.isFinite(Number(code))) outcome = { status: TASK_STATUS.uncertain, reason: 'invalid_platform_response' };
-    else if (Number(code) === 0) outcome = { status: TASK_STATUS.accepted, reason: null };
-    else outcome = { status: TASK_STATUS.failed, reason: Number(code) === 43101 ? 'subscription_authorization_expired' : `wx_${Number(code)}` };
+    const rawCode = response && typeof response === 'object' && !Array.isArray(response)
+      ? (response.errCode ?? response.errcode) : undefined;
+    // Keep decimal integer strings compatible with existing sender adapters.
+    // Never coerce missing values, booleans or containers into a success code.
+    const code = typeof rawCode === 'number' ? rawCode
+      : typeof rawCode === 'string' && /^-?\d+$/.test(rawCode) ? Number(rawCode) : NaN;
+    if (!Number.isSafeInteger(code)) outcome = { status: TASK_STATUS.uncertain, reason: 'invalid_platform_response' };
+    else if (code === 0) outcome = { status: TASK_STATUS.accepted, reason: null };
+    else outcome = { status: TASK_STATUS.failed, reason: code === 43101 ? 'subscription_authorization_expired' : `wx_${code}` };
   } catch (error) {
     // Unknown exceptions after handing off may already have delivered. Only an
     // adapter explicitly proving the send never started can release the credit.

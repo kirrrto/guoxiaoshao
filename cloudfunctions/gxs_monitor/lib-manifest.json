@@ -62,8 +62,8 @@
     },
     {
       "path": "engine/notifier.js",
-      "bytes": 13462,
-      "sha256": "c0cf4a007b6f81a7c06e7b9b7cc247d2155550a7c99bf11b280e6b9fbee47a74"
+      "bytes": 13794,
+      "sha256": "465ee62272a52d5c4f6141a0cf447bd0186a697b3d2aab7138fed78b349b116b"
     },
     {
       "path": "engine/observation-day.js",
