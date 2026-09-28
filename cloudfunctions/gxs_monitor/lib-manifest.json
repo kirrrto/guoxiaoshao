@@ -42,18 +42,18 @@
     },
     {
       "path": "engine/collector.js",
-      "bytes": 13337,
-      "sha256": "c89c570a5e027c67d57c9e1a9c25eec8416f11c15bba2d3b01e175b61070b999"
+      "bytes": 13823,
+      "sha256": "42b156d39696240ea242d34946bdaa4fe6c6f98d2336f91b362cccfe8fd7567f"
     },
     {
       "path": "engine/events.js",
-      "bytes": 5603,
-      "sha256": "e1cdfe94cd0f48bcd2b05833e2f650787e1075362a24f63ead435c8fe030e58b"
+      "bytes": 6585,
+      "sha256": "cee533de46f50fbda90bd741881a514859146c797789c2a4051e74dae724ecf6"
     },
     {
       "path": "engine/guarded-pickup.js",
-      "bytes": 2143,
-      "sha256": "13388ca934cda169421e718104fa74c221dcb9dab3381ec704ee32b89919978f"
+      "bytes": 2572,
+      "sha256": "87d377465ba6ec6c72b6d80528cbf3afb60024e11a9f24c2ef78348ddf96caaa"
     },
     {
       "path": "engine/lease.js",
@@ -62,8 +62,8 @@
     },
     {
       "path": "engine/notifier.js",
-      "bytes": 12447,
-      "sha256": "615f10374c1dce4382cdc5a09a198fc9c5f5481bf4111e2888b8239606782e88"
+      "bytes": 13462,
+      "sha256": "c0cf4a007b6f81a7c06e7b9b7cc247d2155550a7c99bf11b280e6b9fbee47a74"
     },
     {
       "path": "engine/observation-day.js",
@@ -82,18 +82,18 @@
     },
     {
       "path": "engine/scheduled.js",
-      "bytes": 6605,
-      "sha256": "101aa9ff2c8fca2f37fe4736c617f8bb079c7be4293201985f091e9987686af5"
+      "bytes": 7201,
+      "sha256": "cf82f426f4eb6542374bb10cb7d6d1383ebc51e67a3e4fd45816a4754e1e2100"
     },
     {
       "path": "engine/scheduler.js",
-      "bytes": 15768,
-      "sha256": "279978715fea8883a97c629f182f5a279e23c924f37e99ad15879f4d4c24f5b6"
+      "bytes": 18193,
+      "sha256": "060795273878175f4ca349dd330d113cfb57b6249c68275918b62b61032eb509"
     },
     {
       "path": "engine/wechat-sender.js",
-      "bytes": 5290,
-      "sha256": "5af0d4f666b4ee00661ed6002e45e39b3225fc70e67ce441d9244e4826357f45"
+      "bytes": 5693,
+      "sha256": "b511e7f41b16a8e5c3f88f4b4b3780ac41662c6a24f2ec5b51a00e363640bb76"
     },
     {
       "path": "errors.js",

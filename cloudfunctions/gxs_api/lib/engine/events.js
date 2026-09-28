@@ -28,8 +28,10 @@ function emptyLatest(observation) {
     partNumber: observation.partNumber,
     status: null,
     statusSince: null,
+    statusConfirmed: false,
     observedAt: null,
     knownAt: null,
+    knownStreakSince: null,
     unknownSince: null,
     unknownCount: 0,
     lastReason: null,
@@ -53,6 +55,7 @@ function makeEvent(latest, observation, type, extra) {
     status: observation.status,
     previousStatus: latest.status,
     previousKnownAt: latest.knownAt,
+    previousStatusConfirmed: typeof latest.statusConfirmed === 'boolean' ? latest.statusConfirmed : null,
     quote: observation.quote || null,
     productTitle: observation.productTitle || latest.productTitle || null,
     storeName: observation.storeName || latest.storeName || null,
@@ -71,6 +74,12 @@ function applyObservation(previous, observation, options) {
   if (observedMs < lastMs) return { latest: previous, events: [], outcome: 'stale' };
   if (observedMs === lastMs) return { latest: previous, events: [], outcome: 'duplicate' };
 
+  // Old records predate the explicit flag. Preserve the old confirmation
+  // evidence before updating timestamps or resetting a post-gap streak.
+  if (typeof latest.statusConfirmed !== 'boolean') {
+    latest.statusConfirmed = Date.parse(latest.knownAt) > Date.parse(latest.statusSince);
+  }
+
   latest.observedAt = observation.observedAt;
   latest.sampleCount = (latest.sampleCount || 0) + 1;
   latest.source = observation.source || latest.source || null;
@@ -78,6 +87,7 @@ function applyObservation(previous, observation, options) {
   if (observation.productTitle) latest.productTitle = observation.productTitle;
 
   if (!KNOWN.has(observation.status)) {
+    latest.knownStreakSince = null;
     latest.unknownSince = latest.unknownSince || observation.observedAt;
     latest.unknownCount = (latest.unknownCount || 0) + 1;
     latest.lastReason = observation.reason || { code: 'unknown', message: null };
@@ -112,6 +122,12 @@ function applyObservation(previous, observation, options) {
     latest.statusSince = observation.observedAt;
   }
 
+  // Confirmation needs consecutive known samples, so a failed query or a
+  // coverage gap starts a fresh streak even if the last known status matches.
+  latest.knownStreakSince = previousStatus === observation.status && !hadGap
+    ? latest.knownStreakSince || latest.knownAt || observation.observedAt : observation.observedAt;
+  latest.statusConfirmed = (previousStatus === observation.status && latest.statusConfirmed === true)
+    || observedMs > Date.parse(latest.knownStreakSince);
   latest.status = observation.status;
   latest.knownAt = observation.observedAt;
   latest.pickupDisplay = observation.pickupDisplay || null;

@@ -149,8 +149,9 @@ function skipReason({ task, user, follow, config, now, senderAppid }) {
 }
 
 /** A claimed task is never replayed after an ambiguous send or worker crash. */
-async function sendTask({ task, config, sendImpl, repo, now, ownerId = 'notifier', clock = () => now, beforeSend = async () => true }) {
+async function sendTask({ task, config, sendImpl, repo, now, ownerId = 'notifier', clock = () => now, beforeSend = async () => true, remainingMs = () => Infinity }) {
   if (!sendImpl || sendImpl.enabled === false) return { ...task, deliveryDisabled: sendImpl ? sendImpl.disabledReason : 'sender_missing' };
+  if (remainingMs() <= 1000) return task;
   const claim = await repo.claimNotification({ id: task._id, ownerId, now: now.toISOString(), leaseUntil: new Date(now.getTime() + 60000).toISOString() });
   if (!claim.claimed) return claim.task || task;
   task = claim.task;
@@ -158,6 +159,10 @@ async function sendTask({ task, config, sendImpl, repo, now, ownerId = 'notifier
     await repo.updateNotification(task._id, patch);
     return { ...task, ...patch };
   };
+  const canStart = async () => remainingMs() > 1000 && await beforeSend() && remainingMs() > 1000;
+  const defer = () => finish({ status: TASK_STATUS.pending, reason: 'send_deferred', ownerId: null, leaseUntil: null, sentAt: null,
+    subscriptionReserved: false, subscriptionReleased: false, subscriptionInvalidated: false, subscriptionTemplateId: null,
+    subscriptionCreditSequence: null, subscriptionCreditHighWater: null, cooldownId: null });
   // Read after the claim, rather than trusting task-planning snapshots.
   const user = await repo.getUser(task.userKey);
   const follow = await repo.getFollow(task.followId);
@@ -166,14 +171,22 @@ async function sendTask({ task, config, sendImpl, repo, now, ownerId = 'notifier
   now = clock();
   const reason = skipReason({ task, user, follow, config, now, senderAppid: sendImpl.appid || config.notifications.consumerAppId });
   if (reason) return finish({ status: TASK_STATUS.skipped, reason, sentAt: null });
-  if (!await beforeSend()) return finish({ status: TASK_STATUS.skipped, reason: 'lease_lost', sentAt: null });
+  if (!await canStart()) return defer();
   // Restock and sold-out alerts cool down separately, so one never blocks the other.
   const targetKey = `${alertKind(task.eventType) === 'soldout' ? 'soldout|' : ''}${task.storeNumber}|${task.partNumber}`;
   const reservation = await repo.reserveSubscriptionCredit({ userKey: task.userKey, templateId: task.templateId, taskId: task._id, now: now.toISOString(), targetKey, cooldownMinutes: config.notifications.cooldownMinutes || 0 });
   if (!reservation.reserved) return finish({ status: TASK_STATUS.skipped, reason: reservation.reason || 'no_subscription_credit', sentAt: null });
+  // A reservation transaction may outlast the worker's deadline or lease.
+  // No message endpoint has been called yet, so refund and defer safely.
+  if (!await canStart()) {
+    await repo.releaseSubscriptionCredit({ userKey: task.userKey, templateId: task.templateId, taskId: task._id, now: clock().toISOString() });
+    await repo.settleFirstReminder({ userKey: task.userKey, taskId: task._id, sent: false, now: clock().toISOString() });
+    return defer();
+  }
+  const timeoutMs = Math.max(1, Math.min(8000, Math.floor(remainingMs()) - 1000));
   let outcome;
   try {
-    const response = await sendImpl({ touser: user.openid, appid: user.appid, ...buildMessage(task, config), miniprogramState: config.notifications.miniprogramState || 'formal', lang: 'zh_CN' });
+    const response = await sendImpl({ touser: user.openid, appid: user.appid, ...buildMessage(task, config), miniprogramState: config.notifications.miniprogramState || 'formal', lang: 'zh_CN' }, { timeoutMs });
     const code = response && (response.errCode ?? response.errcode);
     if (code === undefined || !Number.isFinite(Number(code))) outcome = { status: TASK_STATUS.uncertain, reason: 'invalid_platform_response' };
     else if (Number(code) === 0) outcome = { status: TASK_STATUS.accepted, reason: null };

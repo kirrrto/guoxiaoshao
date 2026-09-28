@@ -57,13 +57,17 @@ function createWechatSender({ appid, appSecret, expectedAppid, fetchImpl = globa
     return tokenRequest;
   }
 
-  const send = async message => {
+  const send = async (message, { timeoutMs: requestedTimeout = timeoutMs } = {}) => {
     if (disabledReason) throw notSent(disabledReason);
     if (message.appid !== appid) throw notSent('consumer_appid_mismatch');
-    const accessToken = await getToken();
+    const boundedTimeout = Math.max(1, Math.min(timeoutMs, Number.isFinite(requestedTimeout) ? Math.floor(requestedTimeout) : timeoutMs));
+    const deadline = clock().getTime() + boundedTimeout;
+    const accessToken = await getToken(boundedTimeout);
+    const messageTimeout = Math.floor(deadline - clock().getTime());
+    if (messageTimeout < 1) throw notSent('wechat_send_deadline');
     try {
       const response = await fetchImpl(`https://api.weixin.qq.com/cgi-bin/message/subscribe/send?access_token=${encodeURIComponent(accessToken)}`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' }, redirect: 'error', signal: AbortSignal.timeout(timeoutMs),
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, redirect: 'error', signal: AbortSignal.timeout(messageTimeout),
         body: JSON.stringify({ touser: message.touser, template_id: message.templateId, page: message.page,
           data: message.data, miniprogram_state: message.miniprogramState || 'formal', lang: message.lang || 'zh_CN' }),
       });

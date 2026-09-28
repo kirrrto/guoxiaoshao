@@ -72,13 +72,25 @@ async function runScheduled({ repo, fetchImpl, sendImpl, clock = () => new Date(
       collector.stats.lastBatchAt = previous.stats && previous.stats.lastBatchAt || null;
     }
     const snap = collector.scheduler.snapshot();
-    const maxWaves = Math.max(1, Math.ceil(snap.groupCount / snap.maxConcurrency));
+    // Same-store SKU batches cannot occupy concurrent slots. Allow one wave
+    // per group and wait briefly for store spacing so later batches are still
+    // scanned during this invocation instead of alternating across minutes.
+    const maxWaves = Math.max(1, snap.groupCount);
     for (let wave = 0; wave < maxWaves && shouldContinue(); wave++) {
       const result = await collector.step();
       if (!result.held) return { state: 'standby', scanned: collector.stats.batches };
       await Promise.all(result.started);
       if (collector.lease.isHeld()) await collector.publishStatus();
-      if (!result.started.length) break;
+      if (!result.started.length) {
+        const waitMs = collector.scheduler.nextDueInMs();
+        const storeDelayed = collector.scheduler.snapshot().targets.some(target => target.storeDelayed);
+        if (storeDelayed && waitMs > 0 && waitMs <= snap.burstIntervalMs && clock().getTime() + waitMs < deadline) {
+          await sleep(Math.min(waitMs, 1000));
+          wave -= 1;
+          continue;
+        }
+        break;
+      }
     }
     // Fast cadence: keep checking stores that just changed until they settle or time runs out.
     while (shouldContinue() && collector.lease.isHeld() && collector.scheduler.bursting()) {

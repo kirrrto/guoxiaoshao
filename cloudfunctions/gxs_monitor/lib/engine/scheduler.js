@@ -78,12 +78,20 @@ function createScheduler(options) {
 
   const groups = new Map(); // key → { group, nextDueAt, inFlight, failures, health }
   const pending = new Set(); // includes removed/replaced target groups until their work settles
+  const activeStores = new Set();
+  const storeLastRequestAt = new Map();
   const breaker = { state: 'closed', openedAt: null, until: null, failures: [], trips: 0, probeInFlight: false, reason: null };
   let paused = false;
 
   function nextInterval(nowMs) {
     const align = opts.alignIntervalMs || 0;
     return align > 0 ? Math.floor(nowMs / align) * align + Math.ceil(opts.intervalMs / align) * align : nowMs + opts.intervalMs;
+  }
+
+  function dueAt(entry) {
+    const previous = storeLastRequestAt.get(entry.group.storeNumber);
+    const spacing = opts.burstIntervalMs > 0 ? Math.min(opts.intervalMs, opts.burstIntervalMs) : 0;
+    return Math.max(entry.nextDueAt, previous === undefined ? 0 : previous + spacing);
   }
 
   function configure({ intervalMs, maxConcurrency, timeoutMs, burstIntervalMs, burstQuietMs } = {}) {
@@ -98,7 +106,11 @@ function createScheduler(options) {
     if (intervalMs !== undefined) {
       if (!Number.isFinite(intervalMs) || intervalMs < 1000 || intervalMs > 3600000) throw new TypeError('invalid collector interval');
       opts.intervalMs = intervalMs;
-      for (const e of groups.values()) if (!e.failures && e.health.lastRequestAt !== null) e.nextDueAt = nextInterval(e.health.lastRequestAt);
+      for (const e of groups.values()) if (!e.failures && e.health.lastRequestAt !== null) {
+        const normalDue = nextInterval(e.health.lastRequestAt);
+        e.nextDueAt = opts.burstIntervalMs > 0 && e.burstUntil > clock().getTime()
+          ? Math.min(normalDue, e.health.lastRequestAt + opts.burstIntervalMs) : normalDue;
+      }
     }
     if (maxConcurrency !== undefined) {
       if (!Number.isInteger(maxConcurrency) || maxConcurrency < 1 || maxConcurrency > 10) throw new TypeError('invalid collector concurrency');
@@ -197,6 +209,10 @@ function createScheduler(options) {
       if (wasProbe && generation === breaker.trips) breaker.probeInFlight = false;
       return;
     }
+    // Admission/lease transactions can delay the real HTTP start after tick().
+    // Completion is a conservative bound for it, so no later batch or cold
+    // start can squeeze the actual store requests below the required spacing.
+    storeLastRequestAt.set(group.storeNumber, Math.max(storeLastRequestAt.get(group.storeNumber) ?? -Infinity, finishedMs));
     if (health.lastRequestAt !== null) addSample(health.requestInterval, nowMs - health.lastRequestAt);
     health.lastRequestAt = nowMs;
     health.requests += 1;
@@ -240,13 +256,17 @@ function createScheduler(options) {
   }
 
   /** Check a store's groups now and keep them fast for a while (e.g. a restock seen by a manual query). */
-  function hurry(storeNumber) {
+  function hurry(storeNumber, changedAt = clock().getTime()) {
     if (!(opts.burstIntervalMs > 0)) return 0;
     const nowMs = clock().getTime();
+    const burstUntil = changedAt + opts.burstQuietMs;
+    // Durable events can be read repeatedly while confirmation is pending.
+    // Their original change time, not each read, starts the quiet window.
+    if (!Number.isFinite(burstUntil) || burstUntil <= nowMs) return 0;
     let count = 0;
     for (const entry of groups.values()) {
       if (entry.group.storeNumber !== storeNumber) continue;
-      entry.burstUntil = Math.max(entry.burstUntil || 0, nowMs + opts.burstQuietMs);
+      entry.burstUntil = Math.max(entry.burstUntil || 0, burstUntil);
       // Never closer than the burst interval to this store's previous request.
       const earliest = entry.health.lastRequestAt === null ? nowMs : entry.health.lastRequestAt + opts.burstIntervalMs;
       if (!entry.failures) entry.nextDueAt = Math.min(entry.nextDueAt, Math.max(nowMs, earliest));
@@ -268,14 +288,20 @@ function createScheduler(options) {
     const inFlight = pending.size;
     let slots = Math.max(0, opts.maxConcurrency - inFlight);
     const started = [];
-    const due = [...groups.values()].filter(e => !e.inFlight && e.nextDueAt <= nowMs).sort((a, b) => a.nextDueAt - b.nextDueAt || a.group.key.localeCompare(b.group.key));
+    const due = [...groups.values()].filter(e => !e.inFlight && dueAt(e) <= nowMs).sort((a, b) => a.nextDueAt - b.nextDueAt || a.group.key.localeCompare(b.group.key));
     for (const entry of due) {
       if (slots <= 0) break;
+      // A store may have multiple SKU batches or a changed group key after a
+      // follow refresh. They share one request cadence and never overlap.
+      const storeNumber = entry.group.storeNumber;
+      if (activeStores.has(storeNumber) || dueAt(entry) > nowMs) continue;
       if (!breakerAllows(nowMs)) break;
       slots -= 1;
+      activeStores.add(storeNumber);
+      storeLastRequestAt.set(storeNumber, nowMs);
       const work = dispatch(entry, nowMs);
       pending.add(work);
-      work.finally(() => pending.delete(work)).catch(error => { if (log) log.error('[scheduler] dispatch failed', error.message); });
+      work.finally(() => { pending.delete(work); activeStores.delete(storeNumber); }).catch(error => { if (log) log.error('[scheduler] dispatch failed', error.message); });
       started.push(work);
       if (breaker.state === 'half_open') break; // one probe at a time
     }
@@ -286,7 +312,8 @@ function createScheduler(options) {
     const nowMs = clock().getTime();
     const targets = [...groups.values()].map(e => ({
       key: e.group.key, storeNumber: e.group.storeNumber, partNumbers: e.group.partNumbers,
-      inFlight: e.inFlight, dueInMs: Math.max(0, e.nextDueAt - nowMs), failures: e.failures, bursting: e.burstUntil > nowMs, health: e.health,
+      inFlight: e.inFlight, dueInMs: Math.max(0, dueAt(e) - nowMs), storeDelayed: e.nextDueAt <= nowMs && dueAt(e) > nowMs,
+      failures: e.failures, bursting: e.burstUntil > nowMs, health: e.health,
     }));
     const state = paused ? 'paused' : breaker.state === 'open' ? 'throttled' : breaker.state === 'half_open' ? 'probing' : targets.some(t => t.health.persistenceFailed) ? 'error' : targets.length ? 'running' : 'idle';
     return { state, breaker: { ...breaker, failures: breaker.failures.length }, groupCount: targets.length, inFlight: pending.size, intervalMs: opts.intervalMs, burstIntervalMs: opts.burstIntervalMs, maxConcurrency: opts.maxConcurrency, targets };
@@ -296,12 +323,21 @@ function createScheduler(options) {
   // starts. Otherwise each minute would bypass Retry-After and start again at
   // the first target, starving later stores when a scan reaches its deadline.
   function checkpoint() {
-    return { version: 1, breaker: { ...breaker, failures: [...breaker.failures], probeInFlight: false }, targets: [...groups.values()].map(e => ({ key: e.group.key, nextDueAt: e.nextDueAt, failures: e.failures, burstUntil: e.burstUntil || 0, health: e.health })) };
+    return { version: 1, breaker: { ...breaker, failures: [...breaker.failures], probeInFlight: false }, storeLastRequestAt: [...storeLastRequestAt], targets: [...groups.values()].map(e => ({ key: e.group.key, nextDueAt: e.nextDueAt, failures: e.failures, burstUntil: e.burstUntil || 0, health: e.health })) };
   }
 
   function restore(saved) {
     if (!saved || saved.version !== 1) return;
+    for (const item of Array.isArray(saved.storeLastRequestAt) ? saved.storeLastRequestAt : []) {
+      if (Array.isArray(item) && typeof item[0] === 'string' && Number.isFinite(item[1])) storeLastRequestAt.set(item[0], item[1]);
+    }
     for (const item of Array.isArray(saved.targets) ? saved.targets : []) {
+      // Older checkpoints lack the store-level field; group health still
+      // proves the last request, including a group no longer followed.
+      if (typeof item.key === 'string' && item.health && Number.isFinite(item.health.lastRequestAt)) {
+        const storeNumber = item.key.split('|')[0];
+        storeLastRequestAt.set(storeNumber, Math.max(storeLastRequestAt.get(storeNumber) ?? -Infinity, item.health.lastRequestAt));
+      }
       const entry = groups.get(item.key);
       if (!entry || !Number.isFinite(item.nextDueAt)) continue;
       entry.nextDueAt = item.nextDueAt;
@@ -328,7 +364,7 @@ function createScheduler(options) {
     resume: () => { paused = false; },
     nextDueInMs: () => {
       const nowMs = clock().getTime();
-      const pending = [...groups.values()].filter(e => !e.inFlight).map(e => e.nextDueAt);
+      const pending = [...groups.values()].filter(e => !e.inFlight && !activeStores.has(e.group.storeNumber)).map(dueAt);
       if (breaker.state === 'open') return Math.max(0, breaker.until - nowMs);
       return pending.length ? Math.max(0, Math.min(...pending) - nowMs) : opts.intervalMs;
     },

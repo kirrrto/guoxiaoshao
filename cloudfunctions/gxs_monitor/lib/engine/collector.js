@@ -33,8 +33,8 @@ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = cons
     alignIntervalMs: mode === 'scheduled' ? 60000 : 0,
     fetchPickup: async ({ storeNumber, partNumbers, timeoutMs }) => {
       if (stopping || !lease.isHeld()) return { record: { httpStatus: null, error: { message: 'lease_lost' } }, observations: [] };
-      return guardedPickup({ repo, config, clock, fetchImpl, storeNumber, partNumbers, timeoutMs,
-        onBudget: value => { budget = value; }, beforeRequest: async () => !stopping && shouldContinue() && await lease.renew() });
+      return guardedPickup({ repo, config, clock, fetchImpl, storeNumber, partNumbers, timeoutMs: Math.min(timeoutMs, 14000), remainingMs,
+        onBudget: value => { budget = value; }, beforeRequest: async () => !stopping && shouldContinue() && await lease.renew() && lease.isHeld() && shouldContinue() });
     },
     onBatch: handleBatch,
   });
@@ -73,12 +73,16 @@ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = cons
    * sample → available" is not a new restock. Returns 'confirmed', 'noise' or 'waiting'.
    */
   async function confirmation(event, latest) {
-    if (event.type === 'became_unavailable' && event.availableSince && event.previousKnownAt === event.availableSince) return 'noise';
-    if (event.type === 'restock_confirmed' && event.nonAvailableSince && event.previousKnownAt === event.nonAvailableSince
+    const previousWasUnconfirmed = since => event.previousStatusConfirmed === false
+      || (event.previousStatusConfirmed == null && since && event.previousKnownAt === since);
+    if (event.type === 'became_unavailable' && previousWasUnconfirmed(event.availableSince)) return 'noise';
+    if (['restock_confirmed', 'recovered_available'].includes(event.type) && event.nonAvailableSince && previousWasUnconfirmed(event.nonAvailableSince)
       && await repo.getEvent(`${targetKeyOf(event.storeNumber, event.partNumber)}|became_unavailable|${event.nonAvailableSince}`)) return 'noise';
     if (!latest || latest.statusSince !== event.detectedAt || latest.status !== event.status) return latest ? 'noise' : 'waiting';
-    // knownAt moves only on a known status, so a failed sample never confirms anything.
-    return Date.parse(latest.knownAt) > Date.parse(event.detectedAt) ? 'confirmed' : 'waiting';
+    // Two valid samples must be consecutive. An unknown result interrupts the
+    // streak; merely recovering the same last-known status is not confirmation.
+    if (latest.unknownSince) return 'waiting';
+    return Date.parse(latest.knownAt) > Date.parse(latest.knownStreakSince || event.detectedAt) ? 'confirmed' : 'waiting';
   }
 
   async function planEvents(events) {
@@ -96,7 +100,7 @@ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = cons
         const expired = now.getTime() - Date.parse(event.detectedAt) > maxAgeMs;
         if (state === 'waiting' && !expired) {
           // Check this store right away; the next drain plans the event once confirmed.
-          scheduler.hurry(event.storeNumber);
+          scheduler.hurry(event.storeNumber, Date.parse(event.detectedAt));
           continue;
         }
         if (state !== 'confirmed') planned = [];
@@ -126,8 +130,8 @@ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = cons
       for (const task of await repo.listPendingNotifications({ limit: 20 })) {
         if (stopping || !shouldContinue() || !await lease.renew()) break;
         if (typeof sendImpl.getHealth === 'function' && !sendImpl.getHealth().authReady) break;
-        const result = await sendTask({ task, config, sendImpl, repo, now: clock(), clock, ownerId,
-          beforeSend: async () => !stopping && shouldContinue() && await lease.renew() });
+        const result = await sendTask({ task, config, sendImpl, repo, now: clock(), clock, ownerId, remainingMs,
+          beforeSend: async () => !stopping && shouldContinue() && await lease.renew() && lease.isHeld() && shouldContinue() });
         if (result.status === TASK_STATUS.accepted) stats.sent += 1;
       }
     });
