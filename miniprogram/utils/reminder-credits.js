@@ -15,7 +15,16 @@ const PENDING_KEY = 'gxs_subscription_pending_v1';
 const FINAL_ERRORS = ['invalid_subscription_result', 'invalid_request_id', 'invalid_payload', 'membership_required'];
 
 let consentSetting = null;
-let topUpPending = false;
+let subscriptionBusy = false;
+
+// Explicit authorization and silent top-ups share one persisted pending slot.
+// Hold it from the native prompt until recording finishes, across all pages.
+function beginSubscription() {
+  if (subscriptionBusy) return false;
+  subscriptionBusy = true;
+  return true;
+}
+function endSubscription() { subscriptionBusy = false; }
 
 /** Cache the "总是保持以上选择" answers; refreshed on app show and after each prompt. */
 function refreshConsentSetting() {
@@ -32,7 +41,13 @@ function alwaysAccepts(templateId) {
 
 function readPending() { try { return wx.getStorageSync(localKey(PENDING_KEY)) || null; } catch (e) { return null; } }
 function savePending(pending) { try { wx.setStorageSync(localKey(PENDING_KEY), pending); } catch (e) { /* the in-flight call still carries its ID */ } }
-function clearPending() { try { wx.removeStorageSync(localKey(PENDING_KEY)); } catch (e) { /* ignore */ } }
+function clearPending(pending) {
+  try {
+    const key = localKey(PENDING_KEY), saved = wx.getStorageSync(key);
+    if (pending && saved && saved.requestId !== pending.requestId) return;
+    wx.removeStorageSync(key);
+  } catch (e) { /* ignore */ }
+}
 
 /**
  * Silent top-up for members. Call synchronously at the start of a tap handler,
@@ -45,26 +60,26 @@ function topUpReminderCredit() {
   const member = Boolean(boot && boot.membership && boot.membership.active);
   const sub = boot && boot.subscriptions && boot.subscriptions[templateId];
   const trialNeedsOne = !member && Boolean(boot) && boot.freeReminder === true && !(sub && Number(sub.credits) > 0);
-  if (topUpPending || typeof templateId !== 'string' || !templateId || !(member || trialNeedsOne)
+  if (subscriptionBusy || typeof templateId !== 'string' || !templateId || !(member || trialNeedsOne)
     || readPending() || typeof wx.requestSubscribeMessage !== 'function') return false;
   // Members also top up sell-out alerts; only templates set to "always" can be requested silently.
   const soldoutId = member && boot.notifications.templateIds.soldout;
   const tmplIds = [templateId, ...(typeof soldoutId === 'string' && soldoutId ? [soldoutId] : [])].filter(alwaysAccepts);
   if (!tmplIds.length) return false;
+  if (!beginSubscription()) return false;
   let request;
-  try { request = wx.requestSubscribeMessage({ tmplIds }); } catch (e) { return false; }
-  topUpPending = true;
+  try { request = wx.requestSubscribeMessage({ tmplIds }); } catch (e) { endSubscription(); return false; }
   Promise.resolve(request).then(res => {
     const results = {};
     for (const id of tmplIds) if (res && res[id] === 'accept') results[id] = 'accept';
     if (!Object.keys(results).length) return null;
     const pending = { requestId: newId('ns'), results };
     savePending(pending);
-    return call('notify.recordSubscription', pending).then(data => { clearPending(); publishSubscriptions(data.subscriptions); },
-      error => { if (FINAL_ERRORS.includes(error && error.code)) clearPending(); });
+    return call('notify.recordSubscription', pending).then(data => { clearPending(pending); publishSubscriptions(data.subscriptions); },
+      error => { if (FINAL_ERRORS.includes(error && error.code)) clearPending(pending); });
   }).catch(() => { /* a declined or failed silent request changes nothing */ })
-    .then(() => { topUpPending = false; refreshConsentSetting(); });
+    .then(() => { endSubscription(); refreshConsentSetting(); });
   return true;
 }
 
-module.exports = { PENDING_KEY, FINAL_ERRORS, refreshConsentSetting, alwaysAccepts, readPending, savePending, clearPending, topUpReminderCredit };
+module.exports = { PENDING_KEY, FINAL_ERRORS, refreshConsentSetting, alwaysAccepts, readPending, savePending, clearPending, beginSubscription, endSubscription, topUpReminderCredit };

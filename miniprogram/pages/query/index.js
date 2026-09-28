@@ -318,6 +318,7 @@ Page({
   },
 
   onDoneSelection() {
+    this.readPickerSelection();
     const patch = this.selectionView(this.selection);
     if (!patch.selectionCanCollapse) return toast('请选择可查询的配置及有效门店');
     this.onSelectionInteraction();
@@ -325,6 +326,14 @@ Page({
   },
 
   onSelectionImageError() { this.setData({ selectionImageFailed: true }); },
+
+  readPickerSelection() {
+    // The component coalesces change events until nextTick. A tap must use
+    // its current choice, including the last SKU/store edit still queued.
+    const picker = typeof this.selectComponent === 'function' && this.selectComponent('#query-target-picker');
+    if (picker && typeof picker.getSelection === 'function') this.onPickerChange({ detail: picker.getSelection() });
+    return this.selection;
+  },
 
   focusQueryResult(context) {
     if (typeof wx.nextTick !== 'function' || typeof wx.pageScrollTo !== 'function') return;
@@ -351,7 +360,7 @@ Page({
   async onQuery() {
     // Must run inside the tap, before any await (WeChat gesture rule).
     topUpReminderCredit();
-    return this.performQuery(this.selection);
+    return this.performQuery(this.readPickerSelection());
   },
 
   onRequery() {
@@ -405,7 +414,7 @@ Page({
   onResultImageError() { this.setData({ 'result.product.imageUrl': '' }); },
 
   onFollowSelection() {
-    const { boot } = this.data, selection = this.selection;
+    const { boot } = this.data, selection = this.readPickerSelection();
     if (!boot) return toast('账户正在连接，请稍后再试');
     if (!selection.partNumber) return toast('请先选择具体配置');
     if (!selection.storeNumbers.length) return toast('请至少选择一家门店');

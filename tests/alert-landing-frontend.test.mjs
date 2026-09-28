@@ -83,3 +83,26 @@ test('a sell-out message opens a sell-out card without the purchase question', a
   assert.equal(page.data.alert.eventLabel, '供应结束');
   assert.equal(page.data.alert.nowLabel, '暂无供应');
 });
+
+for (const change of ['close', 'replace', 'unload']) {
+  test(`a late purchase feedback cannot repaint an alert after ${change}`, async () => {
+    let resolveFeedback;
+    const rt = runtime(async action => action === 'notify.feedback'
+      ? new Promise(resolve => { resolveFeedback = resolve; })
+      : { follows: [], limits: { maxFollows: 3, maxStoresPerFollow: 3 } });
+    const page = rt.instance('pages/follow/index.js');
+    page.visible = true;
+    page.applyBoot(boot());
+    page.setData({ alert: { eventId: EVENT, followActive: true, feedback: null } });
+    const pending = page.onAlertFeedback({ currentTarget: { dataset: { outcome: 'bought' } } });
+    if (change === 'close') page.onCloseAlert();
+    else if (change === 'replace') page.setData({ alert: { eventId: 'different-event', followActive: true, feedback: null } });
+    else page.onUnload();
+    const alert = JSON.parse(JSON.stringify(page.data.alert));
+    resolveFeedback({ outcome: 'bought', paused: true });
+    await pending;
+    assert.deepEqual(JSON.parse(JSON.stringify(page.data.alert)), alert);
+    assert.equal(rt.messages.length, 0, 'the old card cannot announce over another view');
+    assert.equal(rt.calls.filter(c => c.action === 'follow.list').length, change === 'unload' ? 0 : 1);
+  });
+}

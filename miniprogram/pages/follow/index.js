@@ -5,7 +5,7 @@ const { syncTabBar } = require('../../utils/tab-bar');
 const { restockSubscription, soldoutSubscription, reminderReadiness, canRemind } = require('../../utils/reminder-readiness');
 const { shareAppMessage, shareTimeline } = require('../../utils/share');
 const { monitorPollDelay } = require('../../utils/poll');
-const { FINAL_ERRORS, readPending, savePending, clearPending, refreshConsentSetting, topUpReminderCredit } = require('../../utils/reminder-credits');
+const { FINAL_ERRORS, readPending, savePending, clearPending, beginSubscription, endSubscription, refreshConsentSetting, topUpReminderCredit } = require('../../utils/reminder-credits');
 const { confirmTap } = require('../../utils/haptic');
 
 const FOLLOW_STATUS = {
@@ -256,18 +256,29 @@ Page({
 
   async onAlertFeedback(e) {
     const alert = this.data.alert, outcome = e.currentTarget.dataset.outcome;
-    if (!alert || this.data.alertBusy) return;
+    if (this.pageRetired || !alert || !alert.eventId || this.data.alertBusy) return;
+    const isCurrentAlert = () => !this.pageRetired && this.data.alert && this.data.alert.eventId === alert.eventId;
     this.setData({ alertBusy: true });
     try {
       const result = await call('notify.feedback', { eventId: alert.eventId, outcome });
-      this.setData({ 'alert.feedback': result.outcome, 'alert.followActive': alert.followActive && !result.paused });
-      if (outcome === 'bought') confirmTap();
-      toast(result.paused ? '恭喜买到！已暂停这条关注' : FEEDBACK_TOAST[outcome]);
-      if (result.paused) { this.invalidateFollowRead(); await this.loadFollows(); }
+      if (result.paused) this.invalidateFollowRead();
+      if (this.pageRetired) return;
+      // Closing or replacing the card must survive a late feedback response.
+      if (isCurrentAlert()) {
+        this.setData({ 'alert.feedback': result.outcome, 'alert.followActive': alert.followActive && !result.paused });
+        if (this.visible !== false) {
+          if (outcome === 'bought') confirmTap();
+          toast(result.paused ? '恭喜买到！已暂停这条关注' : FEEDBACK_TOAST[outcome]);
+        }
+      }
+      if (result.paused && this.visible !== false) {
+        try { await this.loadFollows(); }
+        catch (error) { if (!this.pageRetired) this.setData({ refreshError: '反馈已记录，关注列表刷新失败，请下拉刷新。' }); }
+      }
     } catch (error) {
-      showError(error);
+      if (isCurrentAlert() && this.visible !== false) showError(error);
     } finally {
-      this.setData({ alertBusy: false });
+      if (!this.pageRetired) this.setData({ alertBusy: false });
     }
   },
 
@@ -505,28 +516,31 @@ Page({
     }
     // Reminders are for members and a new account's free alert.
     if (!canRemind(this.data.boot)) return this.showMemberModal();
-    const saved = readPending();
-    if (saved) return this.flushSubscription(saved);
-    // User consent can be recorded before the sending service is ready. The
-    // separate readiness status still gates actual delivery on the server.
-    let res;
-    const requestId = newId('ns');
-    this.setData({ subscribing: true });
+    if (!beginSubscription()) return toast('授权正在同步，请稍后再试');
     try {
-      res = await wx.requestSubscribeMessage({ tmplIds });
-    } catch (error) {
-      this.setData({ subscribing: false });
-      const msg = (error && error.errMsg) || '';
-      if (/20004/.test(msg)) return toast('你已关闭订阅消息总开关，请在设置中开启');
-      return toast('授权未完成');
-    }
-    const results = {};
-    for (const id of tmplIds) if (res[id]) results[id] = res[id];
-    const pending = { requestId, results };
-    savePending(pending);
-    this.setData({ subscriptionPending: true });
-    this.refreshReadiness();
-    return this.flushSubscription(pending);
+      const saved = readPending();
+      if (saved) return await this.flushSubscription(saved);
+      // User consent can be recorded before the sending service is ready. The
+      // separate readiness status still gates actual delivery on the server.
+      let res;
+      const requestId = newId('ns');
+      this.setData({ subscribing: true });
+      try {
+        res = await wx.requestSubscribeMessage({ tmplIds });
+      } catch (error) {
+        this.setData({ subscribing: false });
+        const msg = (error && error.errMsg) || '';
+        if (/20004/.test(msg)) return toast('你已关闭订阅消息总开关，请在设置中开启');
+        return toast('授权未完成');
+      }
+      const results = {};
+      for (const id of tmplIds) if (res[id]) results[id] = res[id];
+      const pending = { requestId, results };
+      savePending(pending);
+      this.setData({ subscriptionPending: true });
+      this.refreshReadiness();
+      return await this.flushSubscription(pending);
+    } finally { endSubscription(); }
   },
 
   async flushSubscription(pending) {
@@ -535,7 +549,7 @@ Page({
       const data = await call('notify.recordSubscription', pending);
       const restockId = this.data.boot.templateIds[0];
       const credits = restockSubscription({ templateIds: { restock: restockId } }, data.subscriptions).credits;
-      clearPending();
+      clearPending(pending);
       this.setData({ 'subscription.credits': credits, 'subscription.soldoutCredits': soldoutSubscription({ templateIds: { soldout: this.data.boot.soldoutId } }, data.subscriptions).credits, subscriptionPending: false });
       publishSubscriptions(data.subscriptions);
       this.refreshReadiness();
@@ -552,7 +566,7 @@ Page({
         // A template may change while a previously authorized result is queued.
         // Only a definitive rejection releases the pending request; uncertain
         // network failures must retain its ID to avoid double crediting.
-        clearPending();
+        clearPending(pending);
         this.setData({ subscriptionPending: false });
         try { this.applyBoot(await getBootstrap({ force: true })); } catch (e) { /* retry on the next refresh */ }
         if (error.code === 'membership_required') this.showMemberModal();

@@ -289,6 +289,8 @@ Page({
   async onQuery() {
     if (this.data.querying || this.data.loadingMore) return;
     if (!this.data.boot) return toast('账户正在连接，请稍后再试');
+    const picker = typeof this.selectComponent === 'function' && this.selectComponent('#history-target-picker');
+    if (picker && typeof picker.getSelection === 'function') this.onPickerChange({ detail: picker.getSelection() });
     const { boot, dayKey } = this.data, selection = this.selection;
     if (!selection.partNumber) return toast('请先选择具体配置');
     // Let the server distinguish insufficient funds from an already-debited

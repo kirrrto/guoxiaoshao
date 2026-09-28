@@ -36,7 +36,7 @@
         <view class="selection-summary-stores">{{selectionSummary.storeLabel}}</view>
       </view>
       <view class="selection-editor" style="display: {{selectionExpanded ? 'block' : 'none'}};" bindtouchstart="onSelectionInteraction">
-        <target-picker catalog-version="{{catalogVersion}}" value="{{pickerValue}}" max-stores="{{boot ? boot.maxStores : 3}}" bindchange="onPickerChange" />
+        <target-picker id="query-target-picker" catalog-version="{{catalogVersion}}" value="{{pickerValue}}" max-stores="{{boot ? boot.maxStores : 3}}" bindchange="onPickerChange" />
         <button class="btn btn-ghost btn-block mt selection-done" disabled="{{!selectionCanCollapse}}" bindtap="onDoneSelection">完成选择 · 收起</button>
       </view>
       <view wx:if="{{restriction}}" class="banner banner-warn mt">{{restriction}}</view>

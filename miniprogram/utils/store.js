@@ -92,6 +92,10 @@ function publishQuota(quota) {
 /** Apply confirmed reminder credits to the cached account and open pages without a refetch. */
 function publishSubscriptions(subscriptions) {
   if (!subscriptions || typeof subscriptions !== 'object') return;
+  // An account read begun before this confirmed grant may still be in flight.
+  // Retire it so its callers receive the updated cache or a new server read.
+  bootstrapGeneration += 1;
+  bootstrapPromise = null;
   const app = getApp();
   if (app.globalData.bootstrap) app.globalData.bootstrap = { ...app.globalData.bootstrap, subscriptions };
   for (const listener of subscriptionListeners) { try { listener(subscriptions); } catch (e) { console.error('[gxs] subscription listener', e); } }

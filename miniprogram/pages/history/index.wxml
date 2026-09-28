@@ -35,7 +35,7 @@
         <text>选择机型、门店与日期</text>
         <text class="sub tap-target" bindtap="onExplain">数据说明 ›</text>
       </view>
-      <target-picker catalog-version="{{catalogVersion}}" value="{{pickerValue}}" max-stores="{{10}}" stores-optional="{{true}}" bindchange="onPickerChange" />
+      <target-picker id="history-target-picker" catalog-version="{{catalogVersion}}" value="{{pickerValue}}" max-stores="{{10}}" stores-optional="{{true}}" bindchange="onPickerChange" />
       <view wx:if="{{accountReady && !boot.member}}" class="banner banner-info small mt">受限新品开售 30 天内，免费用户仅可看昨天及更早记录。余额不足可前往「我的」签到。</view>
 
       <picker mode="date" value="{{dayKey}}" start="{{earliestDay}}" end="{{today}}" bindchange="onDateChange">
