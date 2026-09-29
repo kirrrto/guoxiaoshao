@@ -1,6 +1,6 @@
 {
   "name": "cloudbase_auth",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "license": "MIT",
   "private": true,
   "description": "云开发环境共享鉴权钩子：仅放行果小哨 AppID",

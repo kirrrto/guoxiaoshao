@@ -86,7 +86,6 @@
       </block>
       <view class="membership-entry-list">
         <button class="member-entry payment-entry" disabled="{{!boot.paymentReady || redeeming || paymentBusy || paymentChecking || paymentPendingId}}" bindtap="onBuyMembership">{{paymentBusy ? '正在处理支付…' : membership.active ? '续费会员' : '立即开通'}} · {{boot.priceText}}</button>
-        <button class="member-entry redemption-entry" disabled="{{redeeming || paymentBusy || paymentChecking}}" bindtap="onOpenRedemption">{{redemptionOpen ? '收起兑换码窗口' : '兑换码开通'}}</button>
       </view>
       <view wx:if="{{!boot.paymentReady}}" class="payment-note">{{boot.paymentReason}}</view>
       <view wx:if="{{paymentPendingId || paymentMessage || paymentError}}" class="payment-panel">
@@ -241,6 +240,7 @@
 
     <!-- 其他 -->
     <view class="card">
+      <view class="action-row" bindtap="onOpenRedemption"><text class="action-label">{{redemptionOpen ? '收起兑换码' : '兑换码开通'}}</text><text class="action-arrow">›</text></view>
       <view class="action-row" bindtap="onHelp"><text class="action-label">使用说明</text><text class="action-arrow">›</text></view>
       <view class="action-row" bindtap="onPrivacy"><text class="action-label">隐私说明</text><text class="action-arrow">›</text></view>
       <view class="action-row" bindtap="onDisclaimer"><text class="action-label">免责声明</text><text class="action-arrow">›</text></view>
