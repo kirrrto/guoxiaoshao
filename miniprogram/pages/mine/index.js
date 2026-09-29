@@ -199,7 +199,14 @@ Page({
     return shareTimeline('/pages/mine/index', this.data);
   },
 
-  onHide() { this.pageVisible = false; if (this.paymentController) this.paymentController.hide(); },
+  onHide() {
+    this.pageVisible = false;
+    if (this.data.redemptionOpen) {
+      this.setData({ redemptionOpen: false });
+      this.setTabBarOverlay(false);
+    }
+    if (this.paymentController) this.paymentController.hide();
+  },
 
   retirePage() {
     this.pageRetired = true;
@@ -357,9 +364,18 @@ Page({
     return this.ensurePaymentController().abandon();
   },
 
+  noop() {},
+
   onOpenRedemption() {
     if (this.pageRetired || this.data.redeeming || this.data.paymentBusy || this.data.paymentChecking) return;
-    this.setData({ redemptionOpen: !this.data.redemptionOpen, redemptionCode: '', redemptionError: null, redemptionResult: null });
+    const open = !this.data.redemptionOpen;
+    this.setData({ redemptionOpen: open, redemptionCode: '', redemptionError: null, redemptionResult: null });
+    this.setTabBarOverlay(open);
+  },
+
+  setTabBarOverlay(hidden) {
+    const bar = typeof this.getTabBar === 'function' ? this.getTabBar() : null;
+    if (bar && bar.setData) bar.setData({ keyboardHidden: Boolean(hidden) });
   },
 
   onRedemptionInput(e) {

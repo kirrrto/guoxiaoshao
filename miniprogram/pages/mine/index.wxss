@@ -59,6 +59,9 @@
 .member-entry.payment-entry[disabled] { background: rgba(229, 239, 233, 0.80); color: #607669; box-shadow: none; }
 .member-entry.redemption-entry[disabled] { background: #DBF1E5; color: #587664; }
 .redemption-panel { margin-top: 22rpx; padding: 24rpx; background: rgba(230, 250, 239, 0.76); border: 1rpx solid var(--glass-line); border-radius: 26rpx; min-width: 0; }
+.redemption-mask { position: fixed; left: 0; top: 0; right: 0; bottom: 0; z-index: 1000; background: rgba(12, 28, 22, 0.42); display: flex; align-items: center; justify-content: center; padding: 32rpx; }
+.redemption-modal { width: 100%; max-width: 640rpx; background: #fff; border-radius: 28rpx; padding: 32rpx 28rpx 24rpx; box-sizing: border-box; }
+.redemption-close { margin-top: 12rpx; text-align: center; color: var(--text-2); font-size: 26rpx; padding: 16rpx; }
 .redemption-title { color: var(--text); font-size: 28rpx; font-weight: 600; line-height: 1.5; }
 .redemption-description { margin: 12rpx 0 20rpx; font-size: 24rpx; line-height: 1.65; color: var(--text-2); overflow-wrap: anywhere; }
 .redemption-input { box-sizing: border-box; display: block; width: 100%; min-width: 0; max-width: 100%; height: 92rpx; padding: 20rpx; margin-bottom: 20rpx; border: 1rpx solid #CBDED3; border-radius: 20rpx; background: rgba(255,255,255,0.9); color: var(--text); font-size: 30rpx; line-height: 1.5; }

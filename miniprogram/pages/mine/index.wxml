@@ -99,14 +99,17 @@
         </view>
         <view wx:if="{{paymentPendingId}}" class="payment-note">订单会为当前账号保留，系统不会自动再次扣款。付款没有完成时，可以放弃这笔订单后重新购买。</view>
       </view>
-      <view wx:if="{{redemptionOpen}}" class="redemption-panel">
-        <view class="redemption-title">兑换会员</view>
-        <view class="redemption-description">输入你收到的兑换码，为当前微信账号开通会员。兑换权益与有效期以确认结果为准。</view>
-        <input class="redemption-input" type="text" value="{{redemptionCode}}" placeholder="请输入兑换码" placeholder-class="redemption-placeholder" maxlength="64" disabled="{{redeeming}}" confirm-type="done" adjust-position="{{true}}" cursor-spacing="24" bindinput="onRedemptionInput" bindconfirm="onRedeemCode" />
-        <button class="member-entry redemption-entry" disabled="{{redeeming || paymentBusy || paymentChecking || !redemptionCode}}" bindtap="onRedeemCode">{{redeeming ? '兑换中，请稍候…' : '确认兑换'}}</button>
-        <view class="redemption-hint">兑换成功后立即更新会员状态，同一账号重复提交不会重复增加会员时间。</view>
-        <view wx:if="{{redemptionError}}" class="redemption-message redemption-message-error">{{redemptionError}}</view>
-        <view wx:if="{{redemptionResult}}" class="redemption-message redemption-message-{{redemptionResult.kind}}"><view class="bold">{{redemptionResult.title}}</view><view class="mt">{{redemptionResult.detail}}</view></view>
+      <view wx:if="{{redemptionOpen}}" class="redemption-mask" catchtap="onOpenRedemption">
+        <view class="redemption-modal" catchtap="noop">
+          <view class="redemption-title">兑换会员</view>
+          <view class="redemption-description">输入你收到的兑换码，为当前微信账号开通会员。</view>
+          <input class="redemption-input" type="text" value="{{redemptionCode}}" placeholder="请输入兑换码" placeholder-class="redemption-placeholder" maxlength="64" disabled="{{redeeming}}" confirm-type="done" adjust-position="{{true}}" cursor-spacing="24" bindinput="onRedemptionInput" bindconfirm="onRedeemCode" focus="{{redemptionOpen}}" />
+          <button class="member-entry redemption-entry" disabled="{{redeeming || paymentBusy || paymentChecking || !redemptionCode}}" bindtap="onRedeemCode">{{redeeming ? '兑换中，请稍候…' : '确认兑换'}}</button>
+          <view class="redemption-hint">同一账号重复提交不会重复增加会员时间。</view>
+          <view wx:if="{{redemptionError}}" class="redemption-message redemption-message-error">{{redemptionError}}</view>
+          <view wx:if="{{redemptionResult}}" class="redemption-message redemption-message-{{redemptionResult.kind}}"><view class="bold">{{redemptionResult.title}}</view><view class="mt">{{redemptionResult.detail}}</view></view>
+          <view class="redemption-close" bindtap="onOpenRedemption">关闭</view>
+        </view>
       </view>
       <view class="row-between mt tap-row" bindtap="onToggleOrders">
         <text class="small muted">会员记录</text>
@@ -240,7 +243,7 @@
 
     <!-- 其他 -->
     <view class="card">
-      <view class="action-row" bindtap="onOpenRedemption"><text class="action-label">{{redemptionOpen ? '收起兑换码' : '兑换码开通'}}</text><text class="action-arrow">›</text></view>
+      <view class="action-row" bindtap="onOpenRedemption"><text class="action-label">兑换码开通</text><text class="action-arrow">›</text></view>
       <view class="action-row" bindtap="onHelp"><text class="action-label">使用说明</text><text class="action-arrow">›</text></view>
       <view class="action-row" bindtap="onPrivacy"><text class="action-label">隐私说明</text><text class="action-arrow">›</text></view>
       <view class="action-row" bindtap="onDisclaimer"><text class="action-label">免责声明</text><text class="action-arrow">›</text></view>
