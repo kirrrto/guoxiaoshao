@@ -102,8 +102,8 @@
     },
     {
       "path": "member-redemption.js",
-      "bytes": 1209,
-      "sha256": "dea18743d669f72fa4cda2531b8c78f0117c2ea2803e19470030eac52772b8be"
+      "bytes": 1289,
+      "sha256": "b056fd588e6ccc40436d552523d9ab798e49b176feabe1d7b285491b737a6505"
     },
     {
       "path": "notification-view.js",
