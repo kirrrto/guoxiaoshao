@@ -22,27 +22,27 @@
     <view class="card history-selection-card">
       <view class="card-title">
         <text>查询条件</text>
-        <text class="sub tap-target" bindtap="onExplain">数据说明 ›</text>
+        <button class="ui-action ui-action--neutral history-explain" hover-class="ui-control-pressed" bindtap="onExplain"><text class="ui-action-label">数据说明</text><view class="ui-chevron" aria-hidden="true"></view></button>
       </view>
       <view wx:if="{{selectionSummary}}" class="history-config-summary">
         <view class="history-config-copy"><view class="history-config-title">{{selectionSummary.title}}</view><view class="small text-2 mt">{{selectionSummary.scopeText}}</view></view>
-        <button class="btn btn-outline btn-sm" disabled="{{querying || loadingMore}}" bindtap="onEditSelection">修改</button>
+        <button class="ui-action history-edit" hover-class="ui-control-pressed" disabled="{{querying || loadingMore}}" bindtap="onEditSelection"><text class="ui-action-label">修改</text><view class="ui-chevron" aria-hidden="true"></view></button>
       </view>
-      <view wx:else class="history-config-empty"><view class="small text-2">选一个配置，查看已积累的供应变化。</view><button class="btn btn-outline btn-block mt" bindtap="onEditSelection">选择配置与门店</button></view>
+      <view wx:else class="history-config-empty"><view class="small text-2">选一个配置，查看已积累的供应变化。</view><button class="ui-action ui-action--block mt" hover-class="ui-control-pressed" bindtap="onEditSelection"><text class="ui-action-label">选择配置与门店</text><view class="ui-chevron" aria-hidden="true"></view></button></view>
       <view wx:if="{{accountReady && !boot.member}}" class="small text-2 mt">受限新品仅可查询昨天及更早记录。</view>
 
       <picker disabled="{{querying || loadingMore}}" mode="date" value="{{dayKey}}" start="{{earliestDay}}" end="{{today}}" bindchange="onDateChange">
-        <view class="field date-field">
-          <text class="label">日期（北京时间）</text>
-          <view class="row">
-            <text class="value">{{dayKey === today ? '今天 ' + dayKey : dayKey}}</text>
-            <text class="arrow">›</text>
+        <view class="history-date-control {{querying || loadingMore ? 'history-date-control--disabled' : ''}}" hover-class="ui-control-pressed" role="button" aria-label="选择日期，当前{{dayKey}}" aria-disabled="{{querying || loadingMore}}">
+          <view class="history-date-copy">
+            <text class="history-date-label">日期（北京时间）</text>
+            <text class="history-date-value">{{dayKey === today ? '今天 ' + dayKey : dayKey}}</text>
           </view>
+          <view class="ui-chevron ui-chevron--down" aria-hidden="true"></view>
         </view>
       </picker>
 
       <view wx:if="{{restriction}}" class="banner banner-warn mt">{{restriction}}</view>
-      <button wx:if="{{!boot.member && boot.balance < boot.historyCost}}" class="btn btn-ghost btn-sm mb" bindtap="onGoMine">去签到 / 查看次数</button>
+      <button wx:if="{{!boot.member && boot.balance < boot.historyCost}}" class="ui-action ui-action--block mb" hover-class="ui-control-pressed" bindtap="onGoMine"><text class="ui-action-label">去签到 / 查看次数</text><view class="ui-chevron" aria-hidden="true"></view></button>
 
       <button class="btn btn-primary btn-block mt {{querying ? 'disabled' : ''}}" disabled="{{querying || loadingMore || !accountReady || !selectionSummary || !selectionSummary.valid}}" bindtap="onQuery">
         {{!accountReady ? '正在连接账户…' : (querying ? '加载中…' : (boot.member ? '查看历史' : '查看历史（消耗 ' + boot.historyCost + ' 次，余 ' + boot.balance + ' 次）'))}}
@@ -76,7 +76,7 @@
       </view>
       <view wx:if="{{result.hasEventRecords && result.lastHour !== null}}" class="small text-2 mt">{{(result.lastHourComplete ? '' : '已加载记录中，') + result.lastHourWindowText + '记录到确认补货 ' + result.lastHour + ' 次'}}</view>
 
-      <button class="disclosure-row" bindtap="onToggleCoverage" aria-expanded="{{coverageExpanded}}"><text>当天观测凭据</text><text>{{coverageExpanded ? '收起 −' : '展开 +'}}</text></button>
+      <button class="ui-disclosure history-disclosure" hover-class="ui-control-pressed" bindtap="onToggleCoverage" aria-expanded="{{coverageExpanded}}"><text class="ui-disclosure-label">当天观测凭据</text><view class="ui-disclosure-meta"><text>{{coverageExpanded ? '收起' : '展开'}}</text><view class="ui-chevron {{coverageExpanded ? 'ui-chevron--up' : 'ui-chevron--down'}}" aria-hidden="true"></view></view></button>
       <view class="small text-2">{{result.coverageSummary}}</view>
       <block wx:if="{{coverageExpanded}}">
       <view wx:if="{{result.hasEventRecords}}" class="tiny muted mt">上方四项按事件类型分别计数，其他状态变化只列入下方事件记录，因此四项之和可能小于事件总数。</view>
@@ -125,12 +125,12 @@
         </view>
     </view>
     <view class="card history-browse-card">
-      <button class="disclosure-row" bindtap="onToggleBrowse" aria-expanded="{{browseExpanded}}"><text>恢复最近浏览条件</text><text>{{browseExpanded ? '收起 −' : '展开 +'}}</text></button>
+      <button class="ui-disclosure" hover-class="ui-control-pressed" bindtap="onToggleBrowse" aria-expanded="{{browseExpanded}}"><text class="ui-disclosure-label">恢复最近浏览条件</text><view class="ui-disclosure-meta"><text>{{browseExpanded ? '收起' : '展开'}}</text><view class="ui-chevron {{browseExpanded ? 'ui-chevron--up' : 'ui-chevron--down'}}" aria-hidden="true"></view></view></button>
       <block wx:if="{{browseExpanded}}">
       <view wx:if="{{browseLoading && !browse}}" class="small muted mt">正在加载浏览记录…</view>
       <view wx:if="{{browse}}" class="small text-2 mt">
         <view wx:if="{{!browse.recentViews.length}}">还没有浏览记录。可在上方选择配置、门店与日期查看供应变化。</view>
-        <view wx:for="{{browse.recentViews}}" wx:key="index" class="history-recent mt"><view class="history-recent-copy"><view>{{item.title}}</view><view class="tiny muted">{{item.dayKey}} · {{item.scopeText}}</view></view><button class="btn btn-outline btn-sm history-restore" data-index="{{index}}" disabled="{{querying || loadingMore}}" bindtap="onRestoreBrowse">恢复条件</button></view>
+        <view wx:for="{{browse.recentViews}}" wx:key="index" class="history-recent mt"><view class="history-recent-copy"><view>{{item.title}}</view><view class="tiny muted">{{item.dayKey}} · {{item.scopeText}}</view></view><button class="ui-action ui-action--neutral history-restore" hover-class="ui-control-pressed" data-index="{{index}}" disabled="{{querying || loadingMore}}" bindtap="onRestoreBrowse"><text class="ui-action-label">恢复条件</text><view class="ui-chevron" aria-hidden="true"></view></button></view>
       </view>
       <view wx:if="{{browseError}}" class="banner banner-warn small mt">{{browseError}}<button class="btn btn-outline btn-sm mt" disabled="{{browseLoading}}" bindtap="onRetryBrowse">重新加载</button></view>
       <view class="small muted mt">浏览不扣次数；成功加载可完成每日浏览任务，查询另按账户规则计次。</view>

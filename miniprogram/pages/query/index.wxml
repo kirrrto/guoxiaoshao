@@ -30,11 +30,10 @@
       </view>
       <view wx:if="{{selectionSummary}}" class="selection-summary">
         <view class="selection-summary-product">
-          <view class="selection-summary-image-box"><image wx:if="{{selectionSummary.imageUrl && !selectionImageFailed}}" class="selection-summary-image" src="{{selectionSummary.imageUrl}}" mode="aspectFit" aria-label="{{selectionSummary.imageAlt}}" binderror="onSelectionImageError" /><view wx:else class="selection-summary-image-placeholder">商品</view></view>
+          <view class="selection-summary-image-box"><image wx:if="{{selectionSummary.imageUrl && !selectionImageFailed}}" class="selection-summary-image {{selectionSummary.imageFitClass}}" src="{{selectionSummary.imageUrl}}" mode="aspectFit" aria-label="{{selectionSummary.imageAlt}}" binderror="onSelectionImageError" /><view wx:else class="selection-summary-image-placeholder">商品</view></view>
           <view class="selection-summary-copy"><view class="selection-summary-title">{{selectionSummary.title}}</view><view class="selection-summary-city">{{selectionSummary.cityLabel}}</view></view>
-          <button class="btn btn-outline btn-sm selection-summary-change" bindtap="onEditSelection">修改</button>
         </view>
-        <view class="selection-summary-stores">{{selectionSummary.storeLabel}}</view>
+        <view class="selection-summary-footer"><view class="selection-summary-stores">{{selectionSummary.storeLabel}}</view><button class="ui-action selection-summary-change" hover-class="ui-control-pressed" bindtap="onEditSelection"><text class="ui-action-label">修改</text><text class="ui-chevron" aria-hidden="true"></text></button></view>
       </view>
       <view wx:if="{{!selectionSummary}}" class="selection-empty">
         <view class="selection-empty-title">想关注哪一款？</view>
@@ -49,7 +48,7 @@
       </button>
       <button wx:if="{{selectionSummary}}" class="btn btn-outline btn-block mt selection-follow-action" disabled="{{!accountReady || querying || !selectionCanCollapse}}" bindtap="onFollowSelection"><image class="selection-whistle" src="/images/brand/whistle-green.png" mode="aspectFit" aria-hidden="true" /><text>{{boot.freeReminder ? '免费关注此配置' : '关注此配置 · 小哨提醒'}}</text></button>
       <view wx:if="{{accountReady}}" class="selection-access-note">{{boot.freeReminder ? '可免费体验 1 个配置、1 条到货提醒，需微信授权。' : '直接关注无需先查询；微信提醒需会员及授权。'}}</view>
-      <button class="disclosure-row" bindtap="onToggleRules" aria-expanded="{{rulesExpanded}}"><text>查询与提醒规则</text><text>{{rulesExpanded ? '收起 −' : '展开 +'}}</text></button>
+      <button class="ui-disclosure" hover-class="ui-control-pressed" bindtap="onToggleRules" aria-expanded="{{rulesExpanded}}"><text class="ui-disclosure-label">查询与提醒规则</text><view class="ui-disclosure-meta"><text>{{rulesExpanded ? '收起' : '展开'}}</text><text class="ui-chevron {{rulesExpanded ? 'ui-chevron--up' : 'ui-chevron--down'}}" aria-hidden="true"></text></view></button>
       <view wx:if="{{accountReady && rulesExpanded}}" class="selection-rules">
         <view class="selection-rule">
           <text class="selection-rule-label">关注提醒</text>
@@ -71,12 +70,17 @@
 
     <view wx:if="{{result}}" id="query-result" class="card query-result-card">
       <view class="result-target-note {{resultTargetDifferent ? 'result-target-different' : ''}}">{{resultTargetDifferent ? '与当前选择不同 · 下方保留原查询结果' : '对应当前所选配置与门店'}}</view>
-      <view class="card-title">
-        <text>{{result.product.title}}</text>
-        <text class="pill pill-muted">{{resultIsCache ? '本地缓存' : '查询快照'}}</text>
+      <view class="result-product-row">
+        <view class="result-product-media">
+          <image wx:if="{{result.product.imageUrl}}" class="result-product-image {{result.product.imageFitClass}}" src="{{result.product.imageUrl}}" mode="aspectFit" aria-label="{{result.product.imageAlt || result.product.title}}" binderror="onResultImageError" />
+          <view wx:else class="result-product-placeholder">暂无图片</view>
+        </view>
+        <view class="result-product-copy">
+          <view class="result-product-title">{{result.product.title}}</view>
+          <view class="result-product-meta"><text class="pill pill-muted">{{resultIsCache ? '本地缓存' : '查询快照'}}</text><text class="result-product-part">{{result.product.partNumber}}</text></view>
+          <view class="result-product-time">查询时间 {{result.queriedText}}</view>
+        </view>
       </view>
-      <view wx:if="{{result.product.imageUrl}}" class="result-image-wrap"><image class="result-image" src="{{result.product.imageUrl}}" mode="aspectFit" aria-label="{{result.product.imageAlt || result.product.title}}" binderror="onResultImageError" /></view>
-      <view class="small muted mb">查询时间 {{result.queriedText}} · {{result.product.partNumber}}</view>
       <view wx:for="{{result.results}}" wx:key="storeNumber" class="list-item">
         <view class="row-between">
           <view>

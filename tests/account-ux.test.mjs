@@ -124,7 +124,9 @@ test('consumer account page contains no admin route or catalog timestamp', () =>
   const markup = fs.readFileSync(path.join(root, 'pages/mine/index.wxml'), 'utf8');
   assert.doesNotMatch(source, /pages\/admin|onAdmin|catalogVersion/);
   assert.doesNotMatch(markup, /管理后台|onAdmin|catalogVersion|目录版本/);
-  assert.match(markup, /class="action-row feedback"[^>]+open-type="feedback"/);
+  const feedbackButton = markup.match(/<button\b[^>]*\bopen-type="feedback"[^>]*>[\s\S]*?<\/button>/)?.[0];
+  assert.ok(feedbackButton, 'feedback remains a native WeChat button');
+  assert.match(feedbackButton.replace(/<[^>]+>/g, ''), /意见反馈/);
 });
 
 test('operator configuration cannot send administrator-list edits and malformed JSON values', async () => {

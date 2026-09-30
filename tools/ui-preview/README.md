@@ -108,6 +108,8 @@ node tools/ui-preview/check-layout.mjs "<监测状态预览目录>"
 
 ## 配置面板与深色模式
 
+`--release-notes-only` 使用页面实际展开事件展示“我的 → 更新公告”，覆盖免费、会员和长内容三种状态 × 三种宽度，共 9 个快照。可配合 `check-layout.mjs` 的浅色与 `--dark` 检查全部版本条目和换行。
+
 `--sheets-only` 生成查询、小哨、历史三个入口的配置面板，覆盖编辑、模拟键盘、长内容和保存中四种状态 × 三种宽度，共 36 个快照。使用实际 `config-sheet`、`target-picker` 的 WXML/WXSS 和选项数据；支持默认与具名 slot 的布局近似。原生返回拦截、输入法、slot 实例查找及触摸行为仍需真机检查。
 
 ```powershell

@@ -17,15 +17,16 @@
 
   <block wx:else>
     <view wx:if="{{refreshError}}" class="banner banner-warn">{{refreshError}}</view>
-    <!-- 头部 -->
-    <view class="hero">
-      <image class="logo" src="/images/brand/logo-mint-144.png" mode="aspectFit" />
-      <view class="hero-text">
-        <view class="hero-name">我的</view>
-        <view class="hero-tagline">管理权益与提醒</view>
-        <view class="hero-sub copy-id" bindtap="onCopyId">用户 {{boot.identity.openidMasked}} · 点击复制</view>
+    <!-- 账户名片 -->
+    <view class="account-header">
+      <image class="account-logo" src="/images/brand/logo-mint-144.png" mode="aspectFit" aria-hidden="true" />
+      <view class="account-header-content">
+        <view class="account-header-heading">
+          <text class="account-brand">果小哨</text>
+          <text class="pill account-status {{membership.active ? 'pill-ok' : 'pill-muted'}}">{{membership.active ? '会员' : (membership.expired ? '会员已到期' : '免费用户')}}</text>
+        </view>
+        <button class="ui-action ui-action--neutral identity-copy" hover-class="ui-control-pressed" bindtap="onCopyId" aria-label="复制用户编号"><text class="ui-action-label">用户 {{boot.identity.openidMasked}}</text><text class="identity-copy-label">复制</text></button>
       </view>
-      <text class="pill {{membership.active ? 'pill-ok' : 'pill-muted'}}">{{membership.active ? '会员' : (membership.expired ? '会员已到期' : '免费用户')}}</text>
     </view>
 
     <!-- 会员 -->
@@ -49,10 +50,7 @@
         <view wx:elif="{{boot.freeReminder}}" class="small text-2 mt">可先到「小哨」免费体验：关注 1 个配置、1 条到货提醒。</view>
       </block>
       <view class="member-authorization">微信提醒需逐次授权；到货、断货次数分别使用。</view>
-      <view class="row-between mt tap-row" bindtap="onToggleMembershipRules" role="button" aria-label="权益与购买须知，{{showMembershipRules ? '收起' : '展开'}}">
-        <text class="small muted">权益与购买须知</text>
-        <text class="small muted">{{showMembershipRules ? '收起 ▴' : '展开 ▾'}}</text>
-      </view>
+      <button class="ui-disclosure mt" hover-class="ui-control-pressed" bindtap="onToggleMembershipRules" aria-expanded="{{showMembershipRules}}"><text class="ui-disclosure-label">权益与购买须知</text><view class="ui-disclosure-meta"><text>{{showMembershipRules ? '收起' : '展开'}}</text><view class="ui-chevron {{showMembershipRules ? 'ui-chevron--up' : 'ui-chevron--down'}}" aria-hidden="true"></view></view></button>
       <block wx:if="{{showMembershipRules}}">
         <view class="plan-compare">
           <view class="plan-head">
@@ -116,16 +114,13 @@
           <view class="redemption-hint">同一账号重复提交不会重复增加会员时间。</view>
           <view wx:if="{{redemptionError}}" class="redemption-message redemption-message-error">{{redemptionError}}</view>
           <view wx:if="{{redemptionResult}}" class="redemption-message redemption-message-{{redemptionResult.kind}}"><view class="bold">{{redemptionResult.title}}</view><view class="mt">{{redemptionResult.detail}}</view></view>
-          <view class="redemption-close" bindtap="onOpenRedemption">关闭</view>
+          <button class="ui-action ui-action--neutral ui-action--block redemption-close" hover-class="ui-control-pressed" disabled="{{redeeming}}" bindtap="onOpenRedemption">关闭</button>
         </view>
       </view>
-      <view class="row-between mt tap-row" bindtap="onToggleOrders">
-        <text class="small muted">会员记录</text>
-        <text class="small muted">{{showOrders ? '收起 ▴' : '展开 ▾'}}</text>
-      </view>
+      <button class="ui-disclosure mt" hover-class="ui-control-pressed" bindtap="onToggleOrders" aria-expanded="{{showOrders}}"><text class="ui-disclosure-label">会员记录</text><view class="ui-disclosure-meta"><text>{{showOrders ? '收起' : '展开'}}</text><view class="ui-chevron {{showOrders ? 'ui-chevron--up' : 'ui-chevron--down'}}" aria-hidden="true"></view></view></button>
       <block wx:if="{{showOrders}}">
         <view wx:if="{{ordersLoading && !orders.length}}" class="loading-line">正在加载会员记录…</view>
-        <view wx:elif="{{ordersError}}" class="record-error"><text>{{ordersError}}</text><text class="retry-link tap-target" bindtap="onRetryOrders">重试</text></view>
+        <view wx:elif="{{ordersError}}" class="record-error"><text>{{ordersError}}</text><button class="ui-action" hover-class="ui-control-pressed" bindtap="onRetryOrders">重试</button></view>
         <view wx:elif="{{!orders.length}}" class="empty small">暂无会员记录</view>
         <view wx:for="{{orders}}" wx:key="orderId" class="row-between ledger-row">
           <view>
@@ -156,10 +151,7 @@
       </view>
       <view wx:if="{{!membership.active && !quota.signedInToday && quota.balance < quota.queryCost}}" class="banner banner-ok small mt">第一次用？先签到领次数，再去查询页选机型和门店。</view>
 
-      <view class="row-between mt tap-row" bindtap="onToggleQuotaDetails">
-        <text class="small muted">次数任务与明细</text>
-        <text class="small muted">{{showQuotaDetails ? '收起 ▴' : '展开 ▾'}}</text>
-      </view>
+      <button class="ui-disclosure mt" hover-class="ui-control-pressed" bindtap="onToggleQuotaDetails" aria-expanded="{{showQuotaDetails}}"><text class="ui-disclosure-label">次数任务与明细</text><view class="ui-disclosure-meta"><text>{{showQuotaDetails ? '收起' : '展开'}}</text><view class="ui-chevron {{showQuotaDetails ? 'ui-chevron--up' : 'ui-chevron--down'}}" aria-hidden="true"></view></view></button>
       <block wx:if="{{showQuotaDetails}}">
       <view class="section-label">每日体验任务</view>
       <view wx:for="{{tasks}}" wx:key="id" class="row-between task">
@@ -168,13 +160,10 @@
           <text class="tiny muted"> +{{item.reward}} 次</text>
         </view>
         <text wx:if="{{item.done}}" class="pill pill-ok tiny">已完成</text>
-        <text wx:else class="small tap-target" style="color: var(--green-dark);" bindtap="onGoHistory">{{item.pendingLabel || '去完成'}} ›</text>
+        <button wx:else class="ui-action" hover-class="ui-control-pressed" bindtap="onGoHistory"><text class="ui-action-label">{{item.pendingLabel || '去完成'}}</text><view class="ui-chevron" aria-hidden="true"></view></button>
       </view>
 
-      <view class="row-between mt tap-row" bindtap="onToggleLedger">
-        <text class="small muted">次数明细</text>
-        <text class="small muted">{{showLedger ? '收起 ▴' : '展开 ▾'}}</text>
-      </view>
+      <button class="ui-disclosure mt" hover-class="ui-control-pressed" bindtap="onToggleLedger" aria-expanded="{{showLedger}}"><text class="ui-disclosure-label">次数明细</text><view class="ui-disclosure-meta"><text>{{showLedger ? '收起' : '展开'}}</text><view class="ui-chevron {{showLedger ? 'ui-chevron--up' : 'ui-chevron--down'}}" aria-hidden="true"></view></view></button>
       <block wx:if="{{showLedger}}">
         <view wx:if="{{!ledger.length}}" class="empty small">暂无记录</view>
         <view wx:for="{{ledger}}" wx:key="id" class="row-between ledger-row">
@@ -194,10 +183,7 @@
         <view class="whistle-section-title"><image class="section-whistle" src="/images/brand/whistle-green.png" mode="aspectFit" aria-hidden="true" /><text>小哨提醒</text></view>
         <view class="pill pill-dot pill-{{boot.collector.cls}} tiny">{{boot.collector.label}}</view>
       </view>
-      <view class="row-between mt tap-row" bindtap="onToggleReminderSettings">
-        <text class="small muted">通知与免打扰</text>
-        <text class="small muted">{{showReminderSettings ? '收起 ▴' : '展开设置 ▾'}}</text>
-      </view>
+      <button class="ui-disclosure mt" hover-class="ui-control-pressed" bindtap="onToggleReminderSettings" aria-expanded="{{showReminderSettings}}"><text class="ui-disclosure-label">通知与免打扰</text><view class="ui-disclosure-meta"><text>{{showReminderSettings ? '收起' : '展开'}}</text><view class="ui-chevron {{showReminderSettings ? 'ui-chevron--up' : 'ui-chevron--down'}}" aria-hidden="true"></view></view></button>
       <block wx:if="{{showReminderSettings}}">
       <view class="field">
         <text class="label">接收补货提醒</text>
@@ -209,10 +195,10 @@
       </view>
       <block wx:if="{{settings.dnd.enabled}}">
         <picker mode="time" value="{{dndStart}}" disabled="{{savingSettings}}" bindchange="onDndStart">
-          <view class="field"><text class="label">开始</text><view class="row"><text class="value">{{dndStart}}</text><text class="arrow">›</text></view></view>
+          <view class="field"><text class="label">开始</text><view class="row"><text class="value">{{dndStart}}</text><view class="ui-chevron" aria-hidden="true"></view></view></view>
         </picker>
         <picker mode="time" value="{{dndEnd}}" disabled="{{savingSettings}}" bindchange="onDndEnd">
-          <view class="field"><text class="label">结束</text><view class="row"><text class="value">{{dndEnd}}</text><text class="arrow">›</text></view></view>
+          <view class="field"><text class="label">结束</text><view class="row"><text class="value">{{dndEnd}}</text><view class="ui-chevron" aria-hidden="true"></view></view></view>
         </picker>
       </block>
       <view class="tiny muted mt">免打扰时不推送，监测与历史继续。起止相同＝全天。</view>
@@ -223,39 +209,46 @@
     <view class="card notification-card">
       <view class="notification-heading">
         <view class="notification-heading-copy"><view class="notification-heading-title whistle-section-title"><image class="section-whistle" src="/images/brand/whistle-green.png" mode="aspectFit" aria-hidden="true" /><text>小哨提醒记录</text></view><view class="tiny muted">{{notifications.length ? '已显示 ' + notifications.length + ' 条' : '个人提醒记录'}}</view></view>
-        <button wx:if="{{showNotifications && notifications.length}}" class="notification-button notification-clear" disabled="{{notificationActionBusy || notificationConfirming || !notificationsClearBefore}}" bindtap="onClearNotifications">{{notificationActionBusy === 'clear' ? '清空中…' : '清空'}}</button>
+        <button wx:if="{{showNotifications && notifications.length}}" class="ui-action ui-action--neutral notification-button notification-clear" hover-class="ui-control-pressed" disabled="{{notificationActionBusy || notificationConfirming || !notificationsClearBefore}}" bindtap="onClearNotifications">{{notificationActionBusy === 'clear' ? '清空中…' : '清空'}}</button>
       </view>
-      <view class="row-between mt tap-row" bindtap="onToggleNotifications">
-        <text class="small muted">查看记录</text>
-        <text class="small muted">{{showNotifications ? '收起 ▴' : '展开 ▾'}}</text>
-      </view>
+      <button class="ui-disclosure mt" hover-class="ui-control-pressed" bindtap="onToggleNotifications" aria-expanded="{{showNotifications}}"><text class="ui-disclosure-label">查看记录</text><view class="ui-disclosure-meta"><text>{{showNotifications ? '收起' : '展开'}}</text><view class="ui-chevron {{showNotifications ? 'ui-chevron--up' : 'ui-chevron--down'}}" aria-hidden="true"></view></view></button>
       <block wx:if="{{showNotifications}}">
       <view class="tiny muted notification-scope">提醒记录保留最近 10 天。删除和清空只影响本列表，不取消关注、不撤回微信消息、不删库存历史。</view>
       <view wx:if="{{notificationsLoading && !notifications.length}}" class="loading-line">正在加载提醒记录…</view>
       <view wx:elif="{{notificationsLoading}}" class="loading-line">正在更新提醒记录…</view>
-      <view wx:if="{{notificationsError}}" class="record-error"><text>{{notificationsError}}</text><button class="notification-button notification-retry" disabled="{{notificationsLoading || notificationActionBusy || notificationConfirming}}" bindtap="onRetryNotifications">重试加载</button></view>
-      <view wx:if="{{notificationsActionError}}" class="record-error"><text>{{notificationsActionError}}</text><button class="notification-button notification-retry" disabled="{{notificationActionBusy || notificationConfirming}}" bindtap="onRetryNotificationAction">重试操作</button></view>
+      <view wx:if="{{notificationsError}}" class="record-error"><text>{{notificationsError}}</text><button class="ui-action notification-button notification-retry" hover-class="ui-control-pressed" disabled="{{notificationsLoading || notificationActionBusy || notificationConfirming}}" bindtap="onRetryNotifications">重试加载</button></view>
+      <view wx:if="{{notificationsActionError}}" class="record-error"><text>{{notificationsActionError}}</text><button class="ui-action notification-button notification-retry" hover-class="ui-control-pressed" disabled="{{notificationActionBusy || notificationConfirming}}" bindtap="onRetryNotificationAction">重试操作</button></view>
       <view wx:if="{{!notificationsLoading && !notificationsError && !notificationsActionError && !notifications.length}}" class="empty small"><image class="record-empty-whistle" src="/images/brand/whistle-green.png" mode="aspectFit" aria-hidden="true" /><view>小哨还没有提醒记录</view></view>
       <view wx:for="{{notifications}}" wx:key="id" class="notification-item">
         <view class="notification-product">{{item.productTitle || item.partNumber}}</view>
         <view class="notification-meta"><text class="pill pill-{{item.statusCls}} tiny">{{item.statusLabel}}</text><text class="tiny muted">{{item.timeText}}</text></view>
         <view class="notification-detail">{{item.storeName || item.storeNumber}} · {{item.eventLabel}}</view>
         <view wx:if="{{item.reasonText}}" class="notification-reason">{{item.reasonText}}</view>
-        <view class="notification-actions"><button wx:if="{{item.action}}" class="notification-button notification-retry" data-id="{{item.id}}" disabled="{{notificationActionBusy || notificationConfirming}}" bindtap="onNotificationAction">{{item.actionLabel}}</button><button class="notification-button notification-delete" data-id="{{item.id}}" disabled="{{notificationActionBusy || notificationConfirming}}" bindtap="onDeleteNotification">{{notificationDeletingId === item.id ? '删除中…' : '删除记录'}}</button></view>
+        <view class="notification-actions"><button wx:if="{{item.action}}" class="ui-action notification-button notification-retry" hover-class="ui-control-pressed" data-id="{{item.id}}" disabled="{{notificationActionBusy || notificationConfirming}}" bindtap="onNotificationAction">{{item.actionLabel}}</button><button class="ui-action ui-action--neutral notification-button notification-delete" hover-class="ui-control-pressed" data-id="{{item.id}}" disabled="{{notificationActionBusy || notificationConfirming}}" bindtap="onDeleteNotification">{{notificationDeletingId === item.id ? '删除中…' : '删除记录'}}</button></view>
       </view>
-      <view wx:if="{{notificationsMoreError}}" class="record-error"><text>{{notificationsMoreError}}</text><button class="notification-button notification-retry" disabled="{{notificationsLoadingMore || notificationsLoading || notificationActionBusy || notificationConfirming}}" bindtap="onLoadMoreNotifications">重试加载</button></view>
-      <button wx:elif="{{notificationsHasMore}}" class="notification-button notification-more" disabled="{{notificationsLoadingMore || notificationsLoading || notificationActionBusy || notificationConfirming}}" bindtap="onLoadMoreNotifications">{{notificationsLoadingMore ? '正在加载…' : '加载更早提醒'}}</button>
+      <view wx:if="{{notificationsMoreError}}" class="record-error"><text>{{notificationsMoreError}}</text><button class="ui-action notification-button notification-retry" hover-class="ui-control-pressed" disabled="{{notificationsLoadingMore || notificationsLoading || notificationActionBusy || notificationConfirming}}" bindtap="onLoadMoreNotifications">重试加载</button></view>
+      <button wx:elif="{{notificationsHasMore}}" class="ui-action ui-action--block notification-button notification-more" hover-class="ui-control-pressed" disabled="{{notificationsLoadingMore || notificationsLoading || notificationActionBusy || notificationConfirming}}" bindtap="onLoadMoreNotifications">{{notificationsLoadingMore ? '正在加载…' : '加载更早提醒'}}</button>
       <view wx:elif="{{notifications.length && notificationsPaginationKnown && !notificationsLoading && !notificationsError}}" class="tiny muted notification-end">已显示全部提醒记录</view>
       </block>
     </view>
 
     <!-- 其他 -->
     <view class="card">
-      <view class="action-row" bindtap="onOpenRedemption"><text class="action-label">兑换码开通</text><text class="action-arrow">›</text></view>
-      <view class="action-row" bindtap="onHelp"><text class="action-label">使用说明</text><text class="action-arrow">›</text></view>
-      <view class="action-row" bindtap="onPrivacy"><text class="action-label">隐私说明</text><text class="action-arrow">›</text></view>
-      <view class="action-row" bindtap="onDisclaimer"><text class="action-label">免责声明</text><text class="action-arrow">›</text></view>
-      <button class="action-row feedback" open-type="feedback" hover-class="action-row-hover"><text class="action-label">意见反馈</text><text class="action-arrow">›</text></button>
+      <button class="ui-disclosure account-link" hover-class="ui-control-pressed" bindtap="onToggleReleaseNotes" aria-expanded="{{showReleaseNotes}}"><text class="ui-disclosure-label">更新公告</text><view class="ui-disclosure-meta"><text>{{showReleaseNotes ? '收起' : '查看'}}</text><view class="ui-chevron {{showReleaseNotes ? 'ui-chevron--up' : 'ui-chevron--down'}}" aria-hidden="true"></view></view></button>
+      <view wx:if="{{showReleaseNotes}}" class="release-notes">
+        <view wx:for="{{releaseNotes}}" wx:key="version" class="release-note">
+          <view class="release-note-heading"><text class="release-note-version">v{{item.version}}</text><text wx:if="{{item.version === version}}" class="pill pill-ok release-note-current">当前版本</text></view>
+          <view class="release-note-title">{{item.title}}</view>
+          <view wx:if="{{item.dateText}}" class="release-note-date">{{item.dateText}}</view>
+          <view wx:for="{{item.highlights}}" wx:for-item="highlight" wx:key="*this" class="release-note-highlight"><view class="release-note-dot" aria-hidden="true"></view><text>{{highlight}}</text></view>
+          <view wx:if="{{item.note}}" class="release-note-caption">{{item.note}}</view>
+        </view>
+      </view>
+      <button class="ui-disclosure account-link" hover-class="ui-control-pressed" bindtap="onOpenRedemption"><text class="ui-disclosure-label">兑换码开通</text><view class="ui-chevron" aria-hidden="true"></view></button>
+      <button class="ui-disclosure account-link" hover-class="ui-control-pressed" bindtap="onHelp"><text class="ui-disclosure-label">使用说明</text><view class="ui-chevron" aria-hidden="true"></view></button>
+      <button class="ui-disclosure account-link" hover-class="ui-control-pressed" bindtap="onPrivacy"><text class="ui-disclosure-label">隐私说明</text><view class="ui-chevron" aria-hidden="true"></view></button>
+      <button class="ui-disclosure account-link" hover-class="ui-control-pressed" bindtap="onDisclaimer"><text class="ui-disclosure-label">免责声明</text><view class="ui-chevron" aria-hidden="true"></view></button>
+      <button class="ui-disclosure account-link feedback" open-type="feedback" hover-class="ui-control-pressed"><text class="ui-disclosure-label">意见反馈</text><view class="ui-chevron" aria-hidden="true"></view></button>
     </view>
 
     <view class="footer-note">果小哨 {{versionLabel}} · 为心仪好物留个哨</view>

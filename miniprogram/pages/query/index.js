@@ -9,6 +9,7 @@ const { shareAppMessage, shareTimeline } = require('../../utils/share');
 const { monitorPollDelay } = require('../../utils/poll');
 const { topUpReminderCredit } = require('../../utils/reminder-credits');
 const { confirmTap } = require('../../utils/haptic');
+const { productImageFit, withImageFit } = require('../../utils/product-image-fit');
 
 const SELECTION_KEY = 'gxs_query_selection_v1';
 const RESULT_KEY = 'gxs_query_result_v1';
@@ -51,6 +52,7 @@ function selectionDetails(selection, catalog, maxStores) {
   return { valid, summary: product ? {
     title: product.title || product.model || product.partNumber,
     imageUrl: product.imageUrl || '', imageAlt: product.imageAlt || product.title || '',
+    imageFitClass: productImageFit(product.imageUrl),
     cityLabel: `${cities.join('、') || '已选'} · ${stores.length} 家门店`,
     storeLabel: numbers.length !== stores.length || new Set(numbers).size !== numbers.length || numbers.length > maxStores
       ? '已保存门店信息发生变化，请修改后查询'
@@ -141,7 +143,7 @@ Page({
       this.catalog = catalog;
       const selection = savedSelection(pickerValue, catalog);
       const restored = selectionDetails(pickerValue, catalog, 3);
-      const result = cached && cached.product ? { ...cached, product: { ...cached.product, ...(catalog.productByPart[cached.product.partNumber] || {}) }, results: presentResults(cached, catalog), queriedText: fmt.fmtDateTime(cached.queriedAt) } : null;
+      const result = cached && cached.product ? { ...cached, product: withImageFit({ ...cached.product, ...(catalog.productByPart[cached.product.partNumber] || {}) }), results: presentResults(cached, catalog), queriedText: fmt.fmtDateTime(cached.queriedAt) } : null;
       this.selection = selection;
       this.setData({
         catalogVersion: catalog.version,
@@ -445,7 +447,7 @@ Page({
         return;
       }
       const catalog = this.catalog;
-      const product = { ...(selection.product || {}), ...(response.product || {}), ...((catalog.productByPart || {})[response.product ? response.product.partNumber : selection.partNumber] || {}) };
+      const product = withImageFit({ ...(selection.product || {}), ...(response.product || {}), ...((catalog.productByPart || {})[response.product ? response.product.partNumber : selection.partNumber] || {}) });
       const result = { ...response, product, results: presentResults(response, catalog), queriedText: fmt.fmtDateTime(response.queriedAt) };
       this.querySnapshot = response;
       const retryHint = response.retryAfterMs > 0 ? ` 建议 ${Math.ceil(response.retryAfterMs / 1000)} 秒后重试。` : '';

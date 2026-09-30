@@ -150,7 +150,45 @@ view, text { box-sizing: border-box; }
 .skeleton-bar { height: 88rpx; border-radius: 999rpx; margin-top: 30rpx; }
 @keyframes skeleton-shine { from { background-position: 100% 0; } to { background-position: 0 0; } }
 
-/* 文字按钮与「展开」行：可点区域扩到约 40px 高，文字位置不变 */
+/* Visible secondary controls share surfaces, borders and directional icons. */
+.ui-action.ui-action, .ui-disclosure.ui-disclosure {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12rpx;
+  width: auto;
+  max-width: 100%;
+  min-width: 44px;
+  min-height: 44px;
+  margin: 0;
+  padding: 16rpx 22rpx;
+  border: 1px solid var(--control-line);
+  border-radius: var(--radius-action);
+  background: var(--control-fill);
+  color: var(--green-dark);
+  font-size: 25rpx;
+  font-size: max(12px, 25rpx);
+  font-weight: 600;
+  line-height: 1.45;
+  text-align: center;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.ui-action::after, .ui-disclosure::after { border: none; }
+.ui-action.ui-action--neutral { background: var(--surface-soft); border-color: var(--line); color: var(--text-2); }
+.ui-action.ui-action--block { display: flex; width: 100%; }
+.ui-action-label, .ui-disclosure-label { min-width: 0; overflow-wrap: anywhere; }
+.ui-disclosure.ui-disclosure { display: flex; justify-content: space-between; width: 100%; margin-top: 20rpx; padding: 20rpx 22rpx; background: var(--surface-soft); border-color: var(--line); color: var(--text); text-align: left; }
+.ui-disclosure-label { flex: 1 1 0; font-weight: 500; }
+.ui-disclosure-meta { display: inline-flex; flex: 0 0 auto; align-items: center; gap: 14rpx; color: var(--green-dark); font-size: 24rpx; font-size: max(12px, 24rpx); font-weight: 600; }
+.ui-chevron { display: inline-block; flex: 0 0 auto; width: 12rpx; height: 12rpx; margin: 0 4rpx; border-right: 2rpx solid currentColor; border-top: 2rpx solid currentColor; transform: rotate(45deg); }
+.ui-chevron--down { transform: rotate(135deg); }
+.ui-chevron--up { transform: rotate(-45deg); }
+.ui-action.ui-control-pressed, .ui-disclosure.ui-control-pressed { background: var(--control-pressed); border-color: var(--green-dark); }
+.ui-action[disabled], .ui-disclosure[disabled] { background: var(--surface-soft); border-color: var(--line); color: var(--text-3); opacity: .65; }
+
+/* Compact close targets retain their own visual treatment. */
 .tap-target { display: inline-block; padding: 20rpx 16rpx; margin: -20rpx -16rpx; }
 .row-between.tap-row { padding: 20rpx 0; margin: -4rpx 0 -20rpx; }
 
@@ -213,8 +251,6 @@ view, text, button, input, textarea, image, scroll-view, picker { box-sizing: bo
 .product-image { width: 164rpx; height: 164rpx; display: block; }
 .product-copy { flex: 1; min-width: 0; overflow-wrap: anywhere; }
 .image-placeholder { width: 100%; height: 100%; padding: 16rpx; display: flex; align-items: center; justify-content: center; text-align: center; color: #6b7c72; font-size: 22rpx; }
-.result-image-wrap { width: 100%; height: 260rpx; text-align: center; margin: 8rpx 0 22rpx; padding: 10rpx; background: linear-gradient(135deg, rgba(224, 250, 235, 0.72), rgba(247, 253, 249, 0.72)); border: 1rpx solid var(--glass-line); border-radius: 26rpx; }
-.result-image { width: 240rpx; height: 240rpx; display: block; margin: 0 auto; }
 .follow-image { width: 140rpx; height: 140rpx; display: block; margin: 0 0 16rpx; border-radius: 16rpx; background: #f8faf9; }
 .benefit-list { color: var(--text-2); font-size: 24rpx; line-height: 1.7; }
 .benefit-list > view { padding: 12rpx 0; border-bottom: 1rpx solid var(--line); }
@@ -236,7 +272,6 @@ view, text, button, input, textarea, image, scroll-view, picker { box-sizing: bo
   .segment.on { background: #22322B; }
   .banner { border-color: rgba(255, 255, 255, 0.06); }
   .banner-warn, .stale-note { color: var(--warn); }
-  .product-image-box, .follow-image, .result-image { background: var(--image-tile); }
-  .result-image { border-radius: 20rpx; }
-  .result-image-wrap, .onboarding { background: var(--surface-soft); }
+  .product-image-box, .follow-image { background: var(--image-tile); }
+  .onboarding { background: var(--surface-soft); }
 }

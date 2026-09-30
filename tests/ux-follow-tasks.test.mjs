@@ -20,6 +20,60 @@ function pageFor(rt, follows = []) {
   return page;
 }
 
+test('opening reminder details focuses the rendered section and collapse cancels a queued focus', () => {
+  const rt = runtime(), page = pageFor(rt), ticks = [], scrolls = [];
+  rt.wx.nextTick = callback => ticks.push(callback);
+  rt.wx.pageScrollTo = options => scrolls.push(options);
+  page.onToggleServiceDetails();
+  assert.equal(page.data.showServiceDetails, true);
+  assert.equal(scrolls.length, 0, 'wait for the expanded section to render');
+  ticks.shift()();
+  assert.equal(scrolls[0].selector, '#reminder-service-details');
+  assert.equal(scrolls[0].duration, 220);
+  page.onToggleServiceDetails();
+  assert.equal(ticks.length, 0, 'collapsing does not schedule a scroll');
+  page.onToggleServiceDetails();
+  page.onToggleServiceDetails();
+  page.onToggleServiceDetails();
+  ticks.shift()();
+  assert.equal(scrolls.length, 1, 'a stale expansion cannot take over a newer interaction');
+  ticks.shift()();
+  assert.equal(scrolls.length, 2);
+  assert.equal(rt.calls.length, 0);
+});
+
+test('leaving the follow page cancels reminder focus even if the page becomes visible again', () => {
+  for (const action of ['onHide', 'onUnload']) {
+    const rt = runtime(), page = pageFor(rt);
+    let afterRender, scrolls = 0;
+    rt.wx.nextTick = callback => { afterRender = callback; };
+    rt.wx.pageScrollTo = () => { scrolls += 1; };
+    page.onToggleServiceDetails();
+    page[action]();
+    page.visible = true;
+    afterRender();
+    assert.equal(scrolls, 0, action);
+    if (action === 'onUnload') {
+      page.onToggleServiceDetails();
+      assert.equal(page.data.showServiceDetails, true, 'retired pages cannot change the rendered state');
+    }
+  }
+});
+
+test('unavailable or failed scroll APIs never prevent opening reminder details', () => {
+  for (const mode of ['missing', 'failed', 'throws', 'nextTickThrows']) {
+    const rt = runtime(), page = pageFor(rt);
+    rt.wx.nextTick = callback => { if (mode === 'nextTickThrows') throw Error('unsupported'); callback(); };
+    if (mode !== 'missing') rt.wx.pageScrollTo = options => {
+      if (mode === 'throws') throw Error('unavailable');
+      options.fail({ errMsg: 'selector unavailable' });
+    };
+    assert.doesNotThrow(() => page.onToggleServiceDetails(), mode);
+    assert.equal(page.data.showServiceDetails, true, mode);
+    assert.equal(rt.messages.length, 0, mode);
+  }
+});
+
 test('automatic follow refresh updates observations without reordering existing cards or closing details', async () => {
   const time = new Date(Date.now() - 15000).toISOString();
   const rt = runtime(async () => ({ follows: [follow('c'), follow('b', { stores: [{ storeNumber: 'R575', status: 'unavailable', observedAt: time }] }), follow('a')], limits: boot().limits }));

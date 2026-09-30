@@ -220,8 +220,8 @@ Page({
     this.startPolling();
   },
 
-  onHide() { this.visible = false; this.stopPolling(); },
-  onUnload() { this.pageRetired = true; this.visible = false; this.stopPolling(); if (this.unsubscribeCatalog) this.unsubscribeCatalog(); if (this.unsubscribeCredits) this.unsubscribeCredits(); },
+  onHide() { this.visible = false; this.serviceDetailsFocusEpoch = (this.serviceDetailsFocusEpoch || 0) + 1; this.stopPolling(); },
+  onUnload() { this.pageRetired = true; this.visible = false; this.serviceDetailsFocusEpoch = (this.serviceDetailsFocusEpoch || 0) + 1; this.stopPolling(); if (this.unsubscribeCatalog) this.unsubscribeCatalog(); if (this.unsubscribeCredits) this.unsubscribeCredits(); },
 
   onShareAppMessage() {
     return shareAppMessage('/pages/follow/index', this.data);
@@ -436,7 +436,19 @@ Page({
   },
 
   onToggleServiceDetails() {
-    if (!this.pageRetired) this.setData({ showServiceDetails: !this.data.showServiceDetails });
+    if (this.pageRetired) return;
+    const showServiceDetails = !this.data.showServiceDetails;
+    const epoch = this.serviceDetailsFocusEpoch = (this.serviceDetailsFocusEpoch || 0) + 1;
+    this.setData({ showServiceDetails });
+    if (!showServiceDetails || typeof wx.nextTick !== 'function' || typeof wx.pageScrollTo !== 'function') return;
+    const canFocus = () => !this.pageRetired && this.visible && this.data.showServiceDetails && this.serviceDetailsFocusEpoch === epoch;
+    if (!canFocus()) return;
+    try {
+      wx.nextTick(() => {
+        if (!canFocus()) return;
+        try { wx.pageScrollTo({ selector: '#reminder-service-details', duration: 220, fail() {} }); } catch (e) { /* scrolling is optional; keep the details open */ }
+      });
+    } catch (e) { /* older runtimes retain the current scroll position */ }
   },
 
   onServiceDetails() {

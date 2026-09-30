@@ -18,8 +18,11 @@ page {
   --shadow-soft: 0 4rpx 16rpx rgba(24, 42, 35, 0.025);
   --action-fill: #007A49;
   --action-text: #FFFFFF;
+  --control-fill: #F0F8F4;
+  --control-line: #C6DFD2;
+  --control-pressed: #DCEFE4;
   --radius-card: 28rpx;
-  --radius-action: 16rpx;
+  --radius-action: 24rpx;
   --warn: #895806;
   --warn-soft: #FFF2D5;
   --bad: #A83E3E;
@@ -53,6 +56,9 @@ page {
     --card: #1B251F;
     --action-fill: #68DF9D;
     --action-text: #142C20;
+    --control-fill: #22392D;
+    --control-line: #41624D;
+    --control-pressed: #2D4A39;
     --surface-soft: rgba(255, 255, 255, 0.05);
     --glass-line: rgba(255, 255, 255, 0.07);
     --shadow-soft: 0 12rpx 34rpx rgba(0, 0, 0, 0.32);

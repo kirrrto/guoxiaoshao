@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 
 const project = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const adminPreview = process.argv.includes('--admin-only');
-if (adminPreview && process.argv.some(arg => /^--(?:reminders|stock|redemption|payment|monitoring|history-task|history-data)-only$/.test(arg))) throw Error('--admin-only cannot be combined with consumer scenarios');
+if (adminPreview && process.argv.some(arg => /^--(?:reminders|stock|redemption|payment|monitoring|history-task|history-data|sheets|release-notes)-only$/.test(arg))) throw Error('--admin-only cannot be combined with consumer scenarios');
 const mini = path.join(project, adminPreview ? 'tools/admin-miniprogram/miniprogram' : 'miniprogram');
 const appConfig = JSON.parse(fs.readFileSync(path.join(mini, 'app.json'), 'utf8'));
 appConfig.tabBar = appConfig.tabBar || { custom: false, list: [] };
@@ -168,11 +168,13 @@ const monitoringPreview = process.argv.includes('--monitoring-only');
 const historyTaskPreview = process.argv.includes('--history-task-only');
 const historyDataPreview = process.argv.includes('--history-data-only');
 const sheetPreview = process.argv.includes('--sheets-only');
+const releaseNotesPreview = process.argv.includes('--release-notes-only');
 const widths = [320, 375, 430], scenarios = adminPreview ? ['operator-ready', 'operator-denied', 'operator-loading', 'operator-error', 'operator-longcontent', 'operator-saving'] : historyTaskPreview ? ['history-member-reward', 'history-free-first', 'history-read-error', 'history-balance-cap', 'history-completed', 'history-longcontent', 'history-loading'] : monitoringPreview ? ['monitor-template-missing', 'monitor-ready-authorized', 'monitor-needs-authorization', 'monitor-stale', 'monitor-disabled', 'monitor-expired-paused'] : redemptionPreview ? ['redemption-input', 'redemption-loading', 'redemption-error', 'redemption-success', 'redemption-used', 'redemption-limited', 'redemption-empty'] : stockPreview ? ['stock-fresh', 'stock-old', 'stock-unknown', 'stock-missing', 'stock-restricted'] : reminderPreview ? ['reminders', 'reminder-empty', 'reminder-loading', 'reminder-deleting', 'reminder-clearing', 'reminder-error', 'reminder-more-error', 'longcontent'] : ['free', 'member', 'expired', 'empty', 'error', 'loading', 'longcontent'];
 if (historyDataPreview) scenarios.splice(0, scenarios.length, 'history-no-data', 'history-unknown-only', 'history-observed-no-events', 'history-events-only', 'history-observed-events', 'history-partial-stores');
 if (paymentPreview) scenarios.splice(0, scenarios.length, 'payment-ready', 'payment-renew', 'payment-blocked', 'payment-old-ios', 'payment-pending', 'payment-cancelled', 'payment-error', 'payment-fulfilled', 'payment-partial-refund');
 if (sheetPreview) scenarios.splice(0, scenarios.length, 'sheet-edit', 'sheet-keyboard', 'sheet-longcontent', 'sheet-saving');
-const names = adminPreview ? { admin: '运营工具' } : paymentPreview ? { mine: '我的' } : historyDataPreview ? { history: '历史' } : historyTaskPreview ? { history: '历史', mine: '我的' } : stockPreview || monitoringPreview ? { follow: '小哨提醒' } : reminderPreview || redemptionPreview ? { mine: '我的' } : { query: '查询', follow: '小哨提醒', history: '历史', mine: '我的' };
+if (releaseNotesPreview) scenarios.splice(0, scenarios.length, 'free', 'member', 'longcontent');
+const names = adminPreview ? { admin: '运营工具' } : paymentPreview ? { mine: '我的' } : historyDataPreview ? { history: '历史' } : historyTaskPreview ? { history: '历史', mine: '我的' } : stockPreview || monitoringPreview ? { follow: '小哨提醒' } : reminderPreview || redemptionPreview || releaseNotesPreview ? { mine: '我的' } : { query: '查询', follow: '小哨提醒', history: '历史', mine: '我的' };
 if (sheetPreview) delete names.mine;
 if (monitoringPreview) scenarios.push('monitor-no-follows', 'monitor-all-paused', 'monitor-user-disabled', 'monitor-dnd', 'monitor-free-trial', 'monitor-alert', 'monitor-dual-ready', 'monitor-dual-soldout-empty', 'monitor-dual-restock-empty', 'monitor-dual-soldout-low', 'monitor-dual-pending');
 fs.mkdirSync(out, { recursive: true });
@@ -308,6 +310,7 @@ for (const scenario of scenarios) {
     if (pageName === 'mine' && historyTaskPreview) { page.setData({ showQuotaDetails: true }); await page.onToggleLedger(); }
     if (pageName === 'mine' && paymentPreview) page.setData({ showMembershipRules: true });
     if (pageName === 'mine' && reminderPreview) page.setData({ showNotifications: true });
+    if (pageName === 'mine' && releaseNotesPreview) page.onToggleReleaseNotes();
     if (paymentPreview && ['payment-pending', 'payment-cancelled', 'payment-error', 'payment-fulfilled', 'payment-partial-refund'].includes(scenario)) await page.onBuyMembership();
     if (redemptionPreview) {
       page.setData({ redemptionOpen: true, redemptionCode: 'SAMPLE-CODE' });
@@ -426,6 +429,7 @@ for (const scenario of scenarios) {
         : pageName === 'follow' && follows.length ? [p.title, stores[0].name, ...(sheetPreview ? ['调整关注', '产品配置', '选择门店', '已选门店', p.title + ' · 2 家门店', scenario === 'sheet-saving' ? '正在保存' : '保存关注'] : [])]
         : pageName === 'follow' ? ['给心仪的配置留个小哨']
         : pageName === 'admin' ? ['运行统计', '128'] : [p.title, ...(sheetPreview ? ['产品配置', '选择门店', '已选门店'] : [])];
+      if (releaseNotesPreview) expectedText.push('更新公告', '当前版本', ...page.data.releaseNotes.map(entry => `v${entry.version}`));
       manifest.push({ page: pageName, scenario, width, file: filename, expectedText });
     }
   }

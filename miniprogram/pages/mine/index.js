@@ -3,6 +3,7 @@ const { getBootstrap, invalidateBootstrap, invalidateFollows, publishQuota, subs
 const { topUpReminderCredit } = require('../../utils/reminder-credits');
 const { confirmTap } = require('../../utils/haptic');
 const { VERSION } = require('../../config/version');
+const { RELEASE_NOTES } = require('../../config/release-notes');
 const { storeLabel } = require('../../utils/store-label');
 
 /** Show the shared release version plus its non-production build channel. */
@@ -121,6 +122,9 @@ Page({
     ready: false,
     loadError: null,
     versionLabel: versionLabel(),
+    version: VERSION,
+    releaseNotes: RELEASE_NOTES,
+    showReleaseNotes: false,
     boot: null,
     membership: null,
     quota: null,
@@ -629,6 +633,10 @@ Page({
 
   onToggleMembershipRules() {
     if (!this.pageRetired) this.setData({ showMembershipRules: !this.data.showMembershipRules });
+  },
+
+  onToggleReleaseNotes() {
+    if (!this.pageRetired) this.setData({ showReleaseNotes: !this.data.showReleaseNotes });
   },
 
   onToggleQuotaDetails() {
