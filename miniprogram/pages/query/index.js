@@ -1,6 +1,7 @@
 const { call, newId, showError, toast } = require('../../utils/api');
 const { getBootstrap, getCatalog, invalidateBootstrap, subscribeCatalog, getFollows } = require('../../utils/store');
 const fmt = require('../../utils/format');
+const { storeLabel, storeLabelWithCity } = require('../../utils/store-label');
 const { localKey } = require('../../utils/local-key');
 const operation = require('../../utils/operation');
 const { syncTabBar } = require('../../utils/tab-bar');
@@ -49,7 +50,7 @@ function selectionDetails(selection, catalog, maxStores) {
     title: product.title || product.model || product.partNumber,
     imageUrl: product.imageUrl || '', imageAlt: product.imageAlt || product.title || '',
     cityLabel: `${cities.join('、') || '已选'} · ${stores.length} 家门店`,
-    storeLabel: stores.map(s => `${cities.length > 1 && s.city ? s.city + ' · ' : ''}${s.name || s.storeNumber}`).join('、'),
+    storeLabel: stores.map(s => cities.length > 1 ? storeLabelWithCity(s.storeNumber, s.name, s.city) : storeLabel(s.storeNumber, s.name)).join('、'),
   } : null };
 }
 
@@ -59,7 +60,7 @@ function presentResults(response, catalog) {
     const store = catalog && catalog.storeByNumber[r.storeNumber];
     return {
       ...r,
-      storeName: r.storeName || (store && store.name) || r.storeNumber,
+      storeName: storeLabel(r.storeNumber, r.storeName || (store && store.name)),
       city: store ? store.city : '',
       ...fmt.stockObservation(r, now),
       events: (r.events || []).map(e => ({ ...e, ...fmt.eventMeta(e.type) })),
@@ -75,7 +76,8 @@ function presentFollowTargets(follows) {
       return {
         key: `${f.followId}|${s.storeNumber}`,
         productTitle: f.productTitle,
-        storeName: s.storeName,
+        storeName: storeLabel(s.storeNumber, s.storeName),
+        storeLabel: storeLabelWithCity(s.storeNumber, s.storeName, s.city),
         city: s.city,
         ...fmt.stockObservation(s, now, { restricted: Boolean(f.latestRestricted) }),
       };

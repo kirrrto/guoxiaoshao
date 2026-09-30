@@ -28,5 +28,5 @@
     <picker mode="selector" range="{{cities}}" value="{{cityIndex}}" bindchange="onCityChange"><view class="field"><text class="label">城市</text><text class="value">{{cities[cityIndex] || '暂无门店'}} ›</text></view></picker>
     <view class="chips mt"><view wx:for="{{cityStores}}" wx:key="storeNumber" class="chip {{item.on ? 'on' : ''}}" data-store="{{item.storeNumber}}" hover-class="is-pressed" hover-stay-time="60" bindtap="onStoreTap">{{item.name}}</view></view>
   </block>
-  <view wx:if="{{selectedStores.length}}" class="selected mt"><view class="tiny muted">已选门店（点击移除）</view><view class="chips mt"><view wx:for="{{selectedStores}}" wx:key="storeNumber" class="chip on" data-store="{{item.storeNumber}}" hover-class="is-pressed" hover-stay-time="60" bindtap="onRemoveStore">{{item.city}} · {{item.name}} ×</view></view></view>
+  <view wx:if="{{selectedStores.length}}" class="selected mt"><view class="tiny muted">已选门店（点击移除）</view><view class="chips mt"><view wx:for="{{selectedStores}}" wx:key="storeNumber" class="chip on" data-store="{{item.storeNumber}}" hover-class="is-pressed" hover-stay-time="60" bindtap="onRemoveStore">{{item.label}} ×</view></view></view>
 </view>

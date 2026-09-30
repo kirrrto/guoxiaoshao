@@ -1,6 +1,7 @@
 const { call, newId, showError, toast } = require('../../utils/api');
 const { getBootstrap, getCatalog, refreshBootstrap, invalidateBootstrap, subscribeCatalog, getFollows, invalidateFollows, publishSubscriptions, subscribeSubscriptions } = require('../../utils/store');
 const fmt = require('../../utils/format');
+const { storeLabel, storeLabelWithCity } = require('../../utils/store-label');
 const { syncTabBar } = require('../../utils/tab-bar');
 const { restockSubscription, soldoutSubscription, reminderReadiness, canRemind } = require('../../utils/reminder-readiness');
 const { shareAppMessage, shareTimeline } = require('../../utils/share');
@@ -61,7 +62,7 @@ function presentAlert({ notification: n, latest, follow }, now = Date.now()) {
     eventId: n.eventId,
     productTitle: n.productTitle,
     partNumber: n.partNumber,
-    storeName: n.storeName || n.storeNumber,
+    storeName: storeLabel(n.storeNumber, n.storeName),
     eventLabel: fmt.eventMeta(n.eventType).label,
     soldOut: n.eventType === 'became_unavailable',
     foundText: fmt.fmtDateTime(n.detectedAt),
@@ -92,7 +93,7 @@ function presentFollow(follow, boot, catalog, collector) {
     statusLabel: status.label,
     statusCls: status.cls,
     monitoringText,
-    stores: (follow.stores || []).map(s => ({ ...s, ...fmt.stockObservation(s, now, { restricted: follow.latestRestricted }) })),
+    stores: (follow.stores || []).map(s => ({ ...s, storeName: storeLabel(s.storeNumber, s.storeName), storeLabel: storeLabelWithCity(s.storeNumber, s.storeName, s.city), ...fmt.stockObservation(s, now, { restricted: follow.latestRestricted }) })),
   };
 }
 

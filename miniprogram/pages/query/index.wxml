@@ -107,7 +107,7 @@
       <view wx:for="{{followTargets}}" wx:key="key" class="row-between target-row">
         <view class="target-text">
           <text class="small bold">{{item.productTitle}}</text>
-          <view class="tiny muted">{{item.city ? item.city + ' · ' : ''}}{{item.storeName}}</view>
+          <view class="tiny muted">{{item.storeLabel}}</view>
           <view wx:if="{{item.observedText}}" class="tiny muted">{{item.observedText}}</view>
           <view wx:if="{{item.lastKnownText}}" class="tiny muted">{{item.lastKnownText}}</view>
           <view wx:if="{{item.freshnessText}}" class="tiny {{item.observationState === 'fresh' ? 'muted' : 'stale-note'}}">{{item.freshnessText}}</view>

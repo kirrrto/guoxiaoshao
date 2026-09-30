@@ -1,6 +1,7 @@
 /** Cascading filters use only model/attributes supplied by the catalog. */
 const { sortFamilies, sortModels, compareCapacities, storeMatches } = require('../../utils/catalog-order');
 const { currentCatalog } = require('../../utils/store');
+const { presentStore, storeLabelWithCity } = require('../../utils/store-label');
 const unique = items => [...new Set(items.filter(Boolean))];
 const capacityOf = p => (p.attributes || {}).capacity || '标准配置';
 const colorOf = p => (p.attributes || {}).color || '标准外观';
@@ -56,7 +57,9 @@ Component({
             ? families.map(f => ({ ...f, products: (f.products || []).filter(p => p.supported), supported: true })).filter(f => f.products.length)
             : families };
         }).filter(c => c.families.length);
-        this.catalogCities = catalog.cities || [];
+        this.catalogCities = (catalog.cities || []).map(city => ({ ...city,
+          stores: city.stores.map(s => presentStore({ ...s, city: s.city || city.city, province: s.province || city.province || '' })),
+        }));
         this.productByPart = {}; this.storeByNumber = {}; this.allStores = [];
         for (const category of this.catalogCategories) for (const family of category.families) for (const p of family.products) this.productByPart[p.partNumber] = p;
         for (const city of this.catalogCities) for (const s of city.stores) {
@@ -99,7 +102,7 @@ Component({
       }
       if (!this.catalogCategories.length) note += this.emptyCatalogNote();
       const numbers = unique(Array.isArray(value.storeNumbers) ? value.storeNumbers : []);
-      const selectedStores = numbers.map(n => this.storeByNumber[n]).filter(Boolean).slice(0, this.data.maxStores).map(s => ({ storeNumber: s.storeNumber, name: s.name, city: s.city }));
+      const selectedStores = numbers.map(n => this.storeByNumber[n]).filter(Boolean).slice(0, this.data.maxStores).map(s => ({ storeNumber: s.storeNumber, name: s.name, city: s.city, label: storeLabelWithCity(s.storeNumber, s.name, s.city) }));
       if (selectedStores.length !== numbers.length) note += '已按当前目录和门店上限更新选择，请核对。';
       this.stage({ selectedStores, selectionNote: note });
       this.selectCity(Math.max(0, this.catalogCities.findIndex(c => selectedStores.length && c.city === selectedStores[0].city)));
@@ -167,7 +170,7 @@ Component({
       const selected = this.data.selectedStores.slice(); const index = selected.findIndex(s => s.storeNumber === store.storeNumber);
       if (index >= 0) selected.splice(index, 1); else {
         if (selected.length >= this.data.maxStores) { wx.showToast({ title: `最多选择 ${this.data.maxStores} 家门店`, icon: 'none' }); return; }
-        selected.push({ storeNumber: store.storeNumber, name: store.name, city: store.city });
+        selected.push({ storeNumber: store.storeNumber, name: store.name, city: store.city, label: storeLabelWithCity(store.storeNumber, store.name, store.city) });
       }
       this.batch(() => { this.stage({ selectedStores: selected }); this.selectCity(this.data.cityIndex); this.updateSearchResults(); this.emit(); });
     },

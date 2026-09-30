@@ -3,6 +3,7 @@ const { getBootstrap, invalidateBootstrap, invalidateFollows, publishQuota, subs
 const { topUpReminderCredit } = require('../../utils/reminder-credits');
 const { confirmTap } = require('../../utils/haptic');
 const { VERSION } = require('../../config/version');
+const { storeLabel } = require('../../utils/store-label');
 
 /** "v1.1.7", plus the build channel when this is not the released version. */
 function versionLabel() {
@@ -110,7 +111,7 @@ const timeToMinute = t => { const parts = t.split(':').map(Number); return parts
 const presentNotification = notification => {
   const meta = hasKey(NOTIFY_STATUS, notification.status) ? NOTIFY_STATUS[notification.status] : { label: '状态待确认', cls: 'muted' };
   const eventKnown = ['first_seen_available', 'restock_confirmed', 'recovered_available', 'became_unavailable', 'status_changed'].includes(notification.eventType);
-  return { ...notification, ...notificationAdvice(notification), statusLabel: meta.label, statusCls: meta.cls,
+  return { ...notification, storeName: storeLabel(notification.storeNumber, notification.storeName), ...notificationAdvice(notification), statusLabel: meta.label, statusCls: meta.cls,
     reasonText: notificationReasonText(notification.reason, notification.status),
     timeText: fmt.fmtDateTime(notification.sentAt || notification.createdAt), eventLabel: eventKnown ? fmt.eventMeta(notification.eventType).label : '补货提醒' };
 };

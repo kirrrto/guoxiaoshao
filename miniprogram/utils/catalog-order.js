@@ -126,7 +126,7 @@ const normalizeSearch = value => text(value).toLowerCase().replace(/[\s\u3000·'
 function storeMatches(store, query) {
   const terms = text(query).toLowerCase().split(/\s+/).map(normalizeSearch).filter(Boolean);
   if (!terms.length) return true;
-  const fields = [store.city, store.province, store.name, store.storeNumber].map(normalizeSearch);
+  const fields = [store.city, store.province, store.name, store.officialName, store.address, store.storeNumber].map(normalizeSearch);
   const aliases = CITY_ALIASES[store.city] || [];
   return terms.every(term => fields.some(field => field.includes(term)) || aliases.some(alias => term.length <= 2 ? alias === term : alias.startsWith(term)) || (term.length > 2 && normalizeSearch(store.slug).includes(term)));
 }

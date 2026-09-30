@@ -132,7 +132,7 @@
         <view wx:if="{{item.monitoringText}}" class="tiny muted follow-note">{{item.monitoringText}}</view>
         <view wx:for="{{item.stores}}" wx:for-item="s" wx:key="storeNumber" class="store-row">
           <view class="store-heading">
-            <text class="small store-name">{{s.city ? s.city + ' · ' : ''}}{{s.storeName}}</text>
+            <text class="small store-name">{{s.storeLabel}}</text>
             <view class="pill pill-dot pill-{{s.statusCls}} tiny">{{s.statusLabel}}</view>
           </view>
           <view class="tiny muted">

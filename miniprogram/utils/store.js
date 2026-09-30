@@ -6,6 +6,7 @@ const { call } = require('./api');
 const PRODUCT_IMAGES = require('../config/product-images');
 const CATALOG_SEED = require('../config/catalog-seed');
 const { sortFamilies } = require('./catalog-order');
+const { presentStore } = require('./store-label');
 
 const CATALOG_KEY = 'gxs_catalog_v1';
 const CATEGORY_ORDER = ['iphone', 'ipad', 'mac', 'watch', 'airpods', 'vision', 'homepod'];
@@ -127,7 +128,7 @@ async function getBootstrap({ force = false } = {}) {
 }
 
 function indexCatalog(raw) {
-  const stores = raw.stores || [];
+  const stores = (raw.stores || []).map(presentStore);
   const familyNames = Object.fromEntries((raw.families || []).map(f => [f.familyKey, f.displayName || f.name || f.familyKey]));
   const familyMetadata = Object.fromEntries((raw.families || []).map((f, catalogOrder) => [f.familyKey, { ...f, catalogOrder }]));
   const products = (raw.products || []).map(source => {

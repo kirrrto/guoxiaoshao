@@ -1,6 +1,7 @@
 const { call, showError, toast } = require('../../utils/api');
 const { getBootstrap, getCatalog, invalidateBootstrap, publishQuota, getQuotaGeneration, subscribeCatalog } = require('../../utils/store');
 const fmt = require('../../utils/format');
+const { storeLabel } = require('../../utils/store-label');
 const { localKey } = require('../../utils/local-key');
 const operation = require('../../utils/operation');
 const { syncTabBar } = require('../../utils/tab-bar');
@@ -11,7 +12,7 @@ const SOURCE_TEXT = { auto: '自动监测', manual: '手动查询' };
 
 function presentHistory(response, catalog) {
   const now = Date.now();
-  const storeName = n => (catalog && catalog.storeByNumber[n] ? catalog.storeByNumber[n].name : n);
+  const storeName = (n, fallback) => storeLabel(n, fallback || (catalog && catalog.storeByNumber[n] ? catalog.storeByNumber[n].name : n));
   const sorted = response.events.slice().sort((a, b) => Date.parse(b.detectedAt) - Date.parse(a.detectedAt));
   const snapshotAt = response.pagination && response.pagination.snapshotAt || response.latestSnapshotAt;
   const snapshotTime = Date.parse(snapshotAt);
@@ -64,7 +65,7 @@ function presentHistory(response, catalog) {
         label: meta.label,
         cls: meta.cls,
         timeText: fmt.fmtTime(e.detectedAt),
-        storeName: e.storeName || storeName(e.storeNumber),
+        storeName: storeName(e.storeNumber, e.storeName),
         sourceText: SOURCE_TEXT[e.source] || e.source || '',
         detailText: details.join(' · '),
       };
@@ -72,7 +73,7 @@ function presentHistory(response, catalog) {
     latest: response.latest.map(l => {
       return {
         ...l,
-        storeName: l.storeName || storeName(l.storeNumber),
+        storeName: storeName(l.storeNumber, l.storeName),
         ...fmt.stockObservation(l, now, { restricted: Boolean(response.latestRestricted) }),
       };
     }),
