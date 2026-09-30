@@ -14,7 +14,6 @@ const { productImageFit, withImageFit } = require('../../utils/product-image-fit
 const SELECTION_KEY = 'gxs_query_selection_v1';
 const RESULT_KEY = 'gxs_query_result_v1';
 const ADD_TIP_KEY = 'gxs_add_tip_dismissed_v1';
-const EMPTY_SELECTION = { partNumber: null, product: null, storeNumbers: [], stores: [] };
 
 /** From the second launch on, suggest pinning the app until the user closes the tip. */
 function shouldShowAddTip() {
@@ -91,9 +90,6 @@ function presentFollowTargets(follows) {
 }
 
 Page({
-  // The picker's current choice. Only logic reads it, so it stays off setData.
-  selection: EMPTY_SELECTION,
-
   data: {
     ready: false,
     accountReady: false,
@@ -128,6 +124,9 @@ Page({
 
   async onLoad() {
     if (this.loadingBoot) return;
+    // Create mutable logic state per instance before any asynchronous startup.
+    // Keeping it out of the Page definition also avoids free-data cloning.
+    if (!this.selection) this.selection = { partNumber: null, product: null, storeNumbers: [], stores: [] };
     this.loadingBoot = true;
     if (!this.unsubscribeCatalog) this.unsubscribeCatalog = subscribeCatalog(catalog => this.applyCatalog(catalog));
     let pickerValue = null;

@@ -96,9 +96,6 @@ function presentHistory(response, catalog) {
 }
 
 Page({
-  // The picker's current choice. Only logic reads it, so it stays off setData.
-  selection: { partNumber: null, product: null, storeNumbers: [], stores: [] },
-
   data: {
     ready: false,
     accountReady: false,
@@ -136,6 +133,8 @@ Page({
 
   async onLoad() {
     if (this.loadingBoot) return;
+    // Create mutable logic state per instance; it is not rendered via setData.
+    if (!this.selection) this.selection = { partNumber: null, product: null, storeNumbers: [], stores: [] };
     this.loadingBoot = true;
     this.pageRetired = false;
     if (!this.unsubscribeCatalog) this.unsubscribeCatalog = subscribeCatalog(catalog => this.applyCatalog(catalog));
