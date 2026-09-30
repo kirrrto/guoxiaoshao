@@ -48,7 +48,9 @@ function sandbox(handler, { paymentScenario } = {}) {
   }
   function instantiate(relative, props = {}) {
     const filename = path.join(mini, relative); modules.delete(filename); load(filename);
-    const definition = captured, p = { ...definition, ...(definition.methods || {}), data: { ...copy(definition.data || {}), ...props } };
+    const definition = captured;
+    const defaults = Object.fromEntries(Object.entries(definition.properties || {}).map(([key, value]) => [key, value && Object.hasOwn(value, 'value') ? value.value : undefined]));
+    const p = { ...definition, ...(definition.methods || {}), data: { ...defaults, ...copy(definition.data || {}), ...props } };
     p.setData = patch => { for (const [key, value] of Object.entries(patch)) { const parts = key.replace(/\[(\d+)\]/g, '.$1').split('.'); let target = p.data; for (const part of parts.slice(0, -1)) target = target[part] || (target[part] = {}); target[parts.at(-1)] = value; } };
     p.triggerEvent = () => {};
     return p;
@@ -82,6 +84,7 @@ const evaluate = (value, scope) => {
 };
 const truth = (value, scope) => Boolean(evaluate(value, scope));
 const pickerAst = adminPreview ? null : parse(fs.readFileSync(path.join(mini, 'components/target-picker/index.wxml'), 'utf8'));
+const sheetAst = adminPreview ? null : parse(fs.readFileSync(path.join(mini, 'components/config-sheet/index.wxml'), 'utf8'));
 
 function renderChildren(children, scope, context) {
   let previousIf = null, result = '';
@@ -101,7 +104,24 @@ function renderChildren(children, scope, context) {
 }
 function renderNode(node, scope, context) {
   if (node.name === 'block') return renderChildren(node.children, scope, context);
+  if (node.name === 'page-meta') return '';
   const attrs = node.attrs;
+  if (node.name === 'slot') return context.slots && context.slots[attrs.name || 'default'] || '';
+  if (node.name === 'config-sheet') {
+    const props = {};
+    for (const [key, value] of Object.entries(attrs)) {
+      if (['id', 'wx:if'].includes(key) || key.startsWith('bind')) continue;
+      props[key.replace(/-([a-z])/g, (_, c) => c.toUpperCase())] = evaluate(value, scope);
+    }
+    const sheet = context.rt.instantiate('components/config-sheet/index.js', { ...props, keyboardHeight: context.keyboardHeight || 0 });
+    const slots = {};
+    for (const child of node.children) {
+      const slot = child.attrs && child.attrs.slot || 'default';
+      (slots[slot] ||= []).push(child);
+    }
+    for (const name of Object.keys(slots)) slots[name] = renderChildren(slots[name], scope, context);
+    return `<div class="component-config-sheet">${renderNode(sheetAst, sheet.data, { ...context, slots })}</div>`;
+  }
   if (node.name === 'target-picker') {
     const p = context.rt.instantiate('components/target-picker/index.js', { catalogVersion: evaluate(attrs['catalog-version'] || '', scope), value: evaluate(attrs.value || '', scope), maxStores: Number(evaluate(attrs['max-stores'] || '3', scope)), storesOptional: truth(attrs['stores-optional'] || '', scope), supportedOnly: truth(attrs['supported-only'] || '', scope) });
     p.loadCatalog(); if (p.data.value) p.onValue(p.data.value);
@@ -147,17 +167,20 @@ const paymentPreview = process.argv.includes('--payment-only');
 const monitoringPreview = process.argv.includes('--monitoring-only');
 const historyTaskPreview = process.argv.includes('--history-task-only');
 const historyDataPreview = process.argv.includes('--history-data-only');
+const sheetPreview = process.argv.includes('--sheets-only');
 const widths = [320, 375, 430], scenarios = adminPreview ? ['operator-ready', 'operator-denied', 'operator-loading', 'operator-error', 'operator-longcontent', 'operator-saving'] : historyTaskPreview ? ['history-member-reward', 'history-free-first', 'history-read-error', 'history-balance-cap', 'history-completed', 'history-longcontent', 'history-loading'] : monitoringPreview ? ['monitor-template-missing', 'monitor-ready-authorized', 'monitor-needs-authorization', 'monitor-stale', 'monitor-disabled', 'monitor-expired-paused'] : redemptionPreview ? ['redemption-input', 'redemption-loading', 'redemption-error', 'redemption-success', 'redemption-used', 'redemption-limited', 'redemption-empty'] : stockPreview ? ['stock-fresh', 'stock-old', 'stock-unknown', 'stock-missing', 'stock-restricted'] : reminderPreview ? ['reminders', 'reminder-empty', 'reminder-loading', 'reminder-deleting', 'reminder-clearing', 'reminder-error', 'reminder-more-error', 'longcontent'] : ['free', 'member', 'expired', 'empty', 'error', 'loading', 'longcontent'];
 if (historyDataPreview) scenarios.splice(0, scenarios.length, 'history-no-data', 'history-unknown-only', 'history-observed-no-events', 'history-events-only', 'history-observed-events', 'history-partial-stores');
 if (paymentPreview) scenarios.splice(0, scenarios.length, 'payment-ready', 'payment-renew', 'payment-blocked', 'payment-old-ios', 'payment-pending', 'payment-cancelled', 'payment-error', 'payment-fulfilled', 'payment-partial-refund');
+if (sheetPreview) scenarios.splice(0, scenarios.length, 'sheet-edit', 'sheet-keyboard', 'sheet-longcontent', 'sheet-saving');
 const names = adminPreview ? { admin: '运营工具' } : paymentPreview ? { mine: '我的' } : historyDataPreview ? { history: '历史' } : historyTaskPreview ? { history: '历史', mine: '我的' } : stockPreview || monitoringPreview ? { follow: '小哨提醒' } : reminderPreview || redemptionPreview ? { mine: '我的' } : { query: '查询', follow: '小哨提醒', history: '历史', mine: '我的' };
+if (sheetPreview) delete names.mine;
 if (monitoringPreview) scenarios.push('monitor-no-follows', 'monitor-all-paused', 'monitor-user-disabled', 'monitor-dnd', 'monitor-free-trial', 'monitor-alert', 'monitor-dual-ready', 'monitor-dual-soldout-empty', 'monitor-dual-restock-empty', 'monitor-dual-soldout-low', 'monitor-dual-pending');
 fs.mkdirSync(out, { recursive: true });
 const manifest = [];
 
 for (const scenario of scenarios) {
   const products = copy(baseProducts);
-  if (scenario === 'longcontent' || scenario === 'history-longcontent') { const p = products.find(p => p.partNumber === sample.partNumber); p.title += ' · 超长商品名称与配置说明用于检查换行及小屏布局 ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; }
+  if (['longcontent', 'history-longcontent', 'sheet-longcontent'].includes(scenario)) { const p = products.find(p => p.partNumber === sample.partNumber); p.title += ' · 超长商品名称与配置说明用于检查换行及小屏布局 ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; }
   const p = products.find(p => p.partNumber === sample.partNumber), member = historyTaskPreview ? ['history-member-reward', 'history-longcontent'].includes(scenario) : monitoringPreview ? !['monitor-expired-paused', 'monitor-free-trial'].includes(scenario) : stockPreview ? scenario !== 'stock-restricted' : ['member', 'longcontent'].includes(scenario), expired = scenario === 'expired' || scenario === 'monitor-expired-paused';
   const bootstrap = { identity: { userKey: 'preview:offline-user', openidMasked: 'preview…0001', isAdmin: true }, membership: { active: member, remainingMs: member ? 18 * 86400000 : 0, expiresAt: member ? '2026-10-03T07:00:00Z' : expired ? '2026-09-10T07:00:00Z' : null },
     quota: { balance: member ? 5 : 0, revision: 0, grantedToday: 0, dailyGrantCap: 2, balanceCap: 10, queryCost: 1, historyCost: 1, signedInToday: false, tasksDoneToday: [], tasksViewedToday: [] }, tasks: [{ id: 'view_history', title: '浏览一次历史记录', reward: 1 }],
@@ -165,6 +188,7 @@ for (const scenario of scenarios) {
     notifications: { enabled: false, templateIds: {} }, subscriptions: {}, settings: { notifyEnabled: true, dnd: { enabled: true, startMinute: 1380, endMinute: 480 } },
     limits: { maxFollows: 3, maxStoresPerFollow: 3, queryMaxStores: 3 }, followCount: scenario === 'empty' ? 0 : 1, catalogVersion: 'offline-preview' };
   if (scenario === 'history-balance-cap') bootstrap.quota.balance = 10;
+  if (sheetPreview) bootstrap.membership = { active: true, expiresAt: '2026-09-22T07:00:00Z', remainingMs: 7 * 86400000 };
   if (scenario === 'payment-renew') bootstrap.membership = { active: true, remainingMs: 18 * 86400000, expiresAt: '2026-10-03T07:00:00Z' };
   const previewOrder = { orderId: '', productId: 'vip666', source: 'virtual_payment', type: 'membership', amountFen: 700, days: 7, createdAt: now.toISOString(),
     status: scenario === 'payment-partial-refund' ? 'partially_refunded' : scenario === 'payment-fulfilled' ? 'fulfilled' : 'created',
@@ -301,6 +325,11 @@ for (const scenario of scenarios) {
       page.setData({ showServiceDetails: !scenario.startsWith('monitor-dual-'), subscriptionPending: scenario === 'monitor-dual-pending' });
       page.refreshReadiness();
     }
+    // Stock audits deliberately open per-card details to verify retained
+    // historical explanations. Ordinary page scenarios keep their default fold.
+    if (pageName === 'follow' && stockPreview) {
+      for (const follow of page.data.follows) page.onToggleFollowDetails({ currentTarget: { dataset: { id: follow.followId } } });
+    }
     if (pageName === 'mine' && reminderPreview) {
       if (scenario === 'reminder-loading') page.setData({ notificationsLoading: true });
       if (scenario === 'reminder-deleting') page.setData({ notificationActionBusy: 'delete', notificationDeletingId: reminderRecords[0].id });
@@ -310,26 +339,38 @@ for (const scenario of scenarios) {
     }
     const selected = { partNumber: p.partNumber, product: p, storeNumbers: stores.slice(0, 2).map(s => s.storeNumber), stores: stores.slice(0, 2) };
     if ((pageName === 'query' || pageName === 'history') && scenario !== 'loading') {
-      page.setData({ pickerValue: { partNumber: p.partNumber, storeNumbers: selected.storeNumbers }, selection: selected, dayKey: '2026-09-15' });
+      page.setData({ pickerValue: { partNumber: p.partNumber, storeNumbers: selected.storeNumbers }, dayKey: '2026-09-15' });
+      page.onPickerChange({ detail: selected });
       if (pageName === 'query') {
-        page.onPickerChange({ detail: selected });
         if (['member', 'longcontent', 'expired'].includes(scenario)) page.onDoneSelection();
       }
       if (historyDataPreview || ['member', 'longcontent', 'expired', 'empty'].includes(scenario)) await page.onQuery();
     }
     if (scenario === 'error') { if (pageName === 'admin') page.setData({ allowed: false, checked: true, accessError: '模拟错误：网络连接中断，无法完成权限校验。请检查网络后重新加载。' }); else page.setData({ loadError: '模拟错误：云环境连接超时。请检查网络或稍后重试。request-id-abcdefghijklmnopqrstuvwxyz0123456789' }); }
+    if (sheetPreview) {
+      if (pageName === 'follow') {
+        page.onEdit({ currentTarget: { dataset: { id: follows[0].followId } } });
+        // Rendering a slotted component alone does not deliver its native
+        // change event. Resolve the actual picker before the sheet snapshot.
+        const picker = rt.instantiate('components/target-picker/index.js', { value: page.data.editor.pickerValue, maxStores: page.data.limits.maxStoresPerFollow, supportedOnly: true, inSheet: true });
+        picker.onCatalog(catalog);
+        page.onEditorChange({ detail: picker.getSelection() });
+      }
+      else page.onEditSelection();
+      if (scenario === 'sheet-saving' && pageName === 'follow') page.setData({ saving: true });
+    }
     const ast = parse(fs.readFileSync(path.join(mini, `pages/${pageName}/index.wxml`), 'utf8'));
-    const rendered = renderNode(ast, page.data, { rt });
+    const rendered = renderNode(ast, page.data, { rt, keyboardHeight: scenario === 'sheet-keyboard' ? 280 : 0 });
     const componentCss = adminPreview ? '' : cssFile('components/target-picker/index.wxss').replace(/\/\*[\s\S]*?\*\//g, '').replace(/([^{}]+)\{/g, (_, selectors) => selectors.trim().startsWith('@') ? `${selectors}{` : selectors.split(',').map(selector => `.component-target-picker ${selector.trim()}`).join(',') + '{');
     const tabIndex = appConfig.tabBar.list.findIndex(tab => tab.pagePath === `pages/${pageName}/index`);
     let renderedTabs = '', tabCss = '';
     if (appConfig.tabBar.custom && tabIndex >= 0) {
-      const tabComponent = rt.instantiate('custom-tab-bar/index.js', { selected: tabIndex });
+      const tabComponent = rt.instantiate('custom-tab-bar/index.js', { selected: tabIndex, sheetHidden: Boolean(page.data.sheetVisible || page.data.editing || page.data.redemptionOpen) });
       const tabAst = parse(fs.readFileSync(path.join(mini, 'custom-tab-bar/index.wxml'), 'utf8'));
       renderedTabs = renderNode(tabAst, tabComponent.data, { rt });
       tabCss = cssFile('custom-tab-bar/index.wxss');
     }
-    const rawCss = `${cssFile('app.wxss')}\n${cssFile(`pages/${pageName}/index.wxss`)}\n${componentCss}\n${tabCss}`;
+    const rawCss = `${cssFile('app.wxss')}\n${cssFile(`pages/${pageName}/index.wxss`)}\n${componentCss}\n${adminPreview ? '' : cssFile('components/config-sheet/index.wxss')}\n${tabCss}`;
     for (const width of widths) {
       const css = rawCss.replace(/(-?[\d.]+)rpx/g, (_, value) => `${Number(value) * width / 750}px`).replace(/(^|[}\n])\s*page\s*\{/g, '$1 body {').replace(/(^|[}\n])\s*view, text\s*\{/g, '$1 div, span {');
       const filename = `${pageName}-${scenario}-${width}.html`;
@@ -349,7 +390,7 @@ for (const scenario of scenarios) {
         'history-longcontent': ['各地门店已有记录', '3 家门店', '今日浏览任务完成，+1 次'],
         'history-loading': ['正在加载浏览记录'],
       }[scenario]] : ['每日体验任务', '次数明细', '浏览一次历史记录', ...(scenario === 'history-balance-cap' ? ['已浏览·待领取', '暂无记录'] : ['history-read-error', 'history-loading'].includes(scenario) ? ['去完成', '暂无记录'] : ['已完成', '体验任务', '+1'])]
-          : monitoringPreview ? [...(follows.length ? [p.title] : []), ...(scenario.startsWith('monitor-dual-') ? ['到货提醒', '断货提醒'] : ['后台检测', '消息发送']), '提醒次数', ...{
+          : monitoringPreview ? [...(follows.length ? [p.title, '调整', '详情与管理'] : []), ...(scenario.startsWith('monitor-dual-') ? ['到货', '断货'] : ['后台检测', '消息发送']), '微信提醒', ...{
         'monitor-template-missing': ['监测服务运行中', '模板尚未配置', '关注已开启', '查看原因'],
         'monitor-ready-authorized': ['监测服务运行中', '发送服务已就绪', '提醒次数只剩 1 次', '增加提醒次数', '关注已开启'],
         'monitor-needs-authorization': ['监测服务运行中', '发送服务已就绪', '还没有提醒次数', '增加提醒次数'],
@@ -357,12 +398,12 @@ for (const scenario of scenarios) {
         'monitor-disabled': ['后台检测尚未开放', '发送服务未就绪', '关注已开启'],
         'monitor-expired-paused': ['会员已到期', '会员到期，已暂停', '到货提醒为会员专属', '了解会员'],
         'monitor-no-follows': ['先给心仪配置留个哨', '添加关注'],
-        'monitor-all-paused': ['你的关注全部已暂停', '查看并开启关注'],
+        'monitor-all-paused': ['你的关注全部已暂停', '暂停仍占一个配置名额', '恢复'],
         'monitor-user-disabled': ['你的消息提醒已关闭', '前往提醒设置'],
         'monitor-dnd': ['当前处于免打扰时段', '查看免打扰设置'],
-        'monitor-free-trial': ['新用户免费体验', '授权后可收到 1 条免费提醒', '授权免费提醒', '免费体验中'],
+        'monitor-free-trial': ['免费体验 1 条到货提醒', '授权后可收到 1 条免费提醒', '授权免费提醒', '免费体验中'],
         'monitor-alert': ['到货提醒', '确认补货', '2 分钟前', '可取货', '复制型号和门店', '增加提醒次数', '买到了吗？'],
-        'monitor-dual-ready': ['到货、断货提醒已就绪', '增加提醒次数', '两项都允许'],
+        'monitor-dual-ready': ['提醒条件已就绪', '到货 8 次', '断货 5 次', '增加提醒次数', '两项都允许'],
         'monitor-dual-soldout-empty': ['断货提醒暂无次数', '到货提醒还可发送 8 次', '增加提醒次数'],
         'monitor-dual-restock-empty': ['到货提醒暂无次数', '断货提醒还可发送 5 次', '增加提醒次数'],
         'monitor-dual-soldout-low': ['断货提醒只剩 1 次', '增加提醒次数'],
@@ -373,12 +414,18 @@ for (const scenario of scenarios) {
         'payment-pending': ['支付正在确认中', '查询支付结果'], 'payment-cancelled': ['已取消本次支付', '请查询订单状态', '查询支付结果'],
         'payment-error': ['支付结果暂未确认', '查询支付结果'], 'payment-fulfilled': ['支付已确认，会员已开通', '已开通'],
         'payment-partial-refund': ['订单已部分退款', '部分退款', '已退款 ¥3.50'],
-      }[scenario]] : redemptionPreview ? ['兑换会员', '付费购买暂未开放', { 'redemption-input': '确认兑换', 'redemption-loading': '兑换中，请稍候', 'redemption-error': '兑换码无效', 'redemption-success': '兑换成功', 'redemption-used': '此账号已兑换过', 'redemption-limited': '15 分钟后再试', 'redemption-empty': '确认兑换' }[scenario]] : stockPreview ? [p.title, { 'stock-fresh': '本次状态刚记录', 'stock-old': '待更新', 'stock-unknown': '状态待确认', 'stock-missing': '等待首次观测', 'stock-restricted': '会员权益受限' }[scenario]] : scenario === 'loading' ? [{ query: '正在加载商品目录', follow: '正在读取你的关注', history: '正在加载商品目录', mine: '正在读取账户信息' }[pageName]]
+      }[scenario]] : redemptionPreview ? ['兑换会员', '付费购买暂未开放', { 'redemption-input': '确认兑换', 'redemption-loading': '兑换中，请稍候', 'redemption-error': '兑换码无效', 'redemption-success': '兑换成功', 'redemption-used': '此账号已兑换过', 'redemption-limited': '15 分钟后再试', 'redemption-empty': '确认兑换' }[scenario]] : stockPreview ? [p.title, '收起详情', '删除关注', ...{
+        'stock-fresh': ['暂无供应', '本次状态刚记录', '观测 2026-09-15 15:00:00'],
+        'stock-old': ['待更新', '观测已过期', '上次有效结果：暂无供应（仅供参考）', '上次检查 2026-09-15 14:57:00'],
+        'stock-unknown': ['状态待确认', '最近一次检查未取得有效库存', '上次有效结果：暂无供应（仅供参考）'],
+        'stock-missing': ['等待首次观测', '尚无观测', '还没有有效观测'],
+        'stock-restricted': ['会员权益受限', '未展示实时库存', '当前账号暂不能查看该新品的实时库存'],
+      }[scenario]] : scenario === 'loading' ? [{ query: '正在加载商品目录', follow: '正在读取你的关注', history: '正在加载商品目录', mine: '正在读取账户信息' }[pageName]]
         : scenario === 'error' ? [pageName === 'admin' ? '模拟错误：网络连接中断' : '模拟错误：云环境连接超时', '暂时没有连上', '重试']
-        : pageName === 'mine' ? [member ? '会员生效中' : expired ? '会员已到期' : '开通会员', '¥7.00', '付费购买暂未开放', '提醒记录', ...(reminderPreview && reminderRecords.length ? ['删除记录', scenario === 'reminder-clearing' ? '清空中' : '清空'] : [])]
-        : pageName === 'follow' && follows.length ? [p.title, stores[0].name]
+        : pageName === 'mine' ? [member ? '果小哨会员' : expired ? '会员已到期' : '让小哨持续帮你留意', '¥7.00', '付费购买暂未开放', '提醒记录', '不自动续费', ...(reminderPreview && reminderRecords.length ? ['删除记录', scenario === 'reminder-clearing' ? '清空中' : '清空'] : [])]
+        : pageName === 'follow' && follows.length ? [p.title, stores[0].name, ...(sheetPreview ? ['调整关注', '产品配置', '选择门店', '已选门店', p.title + ' · 2 家门店', scenario === 'sheet-saving' ? '正在保存' : '保存关注'] : [])]
         : pageName === 'follow' ? ['给心仪的配置留个小哨']
-        : pageName === 'admin' ? ['运行统计', '128'] : [p.partNumber, p.title];
+        : pageName === 'admin' ? ['运行统计', '128'] : [p.title, ...(sheetPreview ? ['产品配置', '选择门店', '已选门店'] : [])];
       manifest.push({ page: pageName, scenario, width, file: filename, expectedText });
     }
   }

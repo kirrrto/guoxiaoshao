@@ -26,6 +26,13 @@
 .hero { flex-wrap: wrap; }
 .hero-text { flex-basis: 240rpx; }
 .hero-sub { word-break: break-all; }
+.member-badge { flex: none; padding: 6rpx 16rpx; border-radius: 10rpx; background: #F4ECD9; color: #72521C; font-size: 24rpx; font-weight: 600; }
+.member-overview { margin: 12rpx 0 20rpx; }
+.member-duration { display: flex; align-items: baseline; gap: 10rpx; color: var(--text-2); font-size: 26rpx; }
+.member-number { color: var(--text); font-size: 60rpx; font-weight: 700; letter-spacing: -1rpx; line-height: 1.2; font-variant-numeric: tabular-nums; }
+.member-renewal { margin-top: 10rpx; font-size: max(12px, 24rpx); color: var(--text-2); }
+.member-allowance { display: flex; flex-wrap: wrap; gap: 8rpx 24rpx; margin-top: 14rpx; font-size: max(12px, 24rpx); color: var(--text-2); }
+.member-authorization { margin-top: 16rpx; color: var(--text-2); font-size: max(12px, 24rpx); line-height: 1.65; }
 
 .notification-heading { display: flex; align-items: center; justify-content: space-between; gap: 20rpx; min-width: 0; }
 .notification-heading-copy { flex: 1 1 0; min-width: 0; }
@@ -60,7 +67,7 @@
 .member-entry.redemption-entry[disabled] { background: #DBF1E5; color: #587664; }
 .redemption-panel { margin-top: 22rpx; padding: 24rpx; background: rgba(230, 250, 239, 0.76); border: 1rpx solid var(--glass-line); border-radius: 26rpx; min-width: 0; }
 .redemption-mask { position: fixed; left: 0; top: 0; right: 0; bottom: 0; z-index: 1000; background: rgba(12, 28, 22, 0.42); display: flex; align-items: center; justify-content: center; padding: 32rpx; }
-.redemption-modal { width: 100%; max-width: 640rpx; background: #fff; border-radius: 28rpx; padding: 32rpx 28rpx 24rpx; box-sizing: border-box; }
+.redemption-modal { width: 100%; max-width: 640rpx; max-height: 80vh; overflow-y: auto; background: var(--card); border-radius: 28rpx; padding: 32rpx 28rpx 24rpx; box-sizing: border-box; }
 .redemption-close { margin-top: 12rpx; text-align: center; color: var(--text-2); font-size: 26rpx; padding: 16rpx; }
 .redemption-title { color: var(--text); font-size: 28rpx; font-weight: 600; line-height: 1.5; }
 .redemption-description { margin: 12rpx 0 20rpx; font-size: 24rpx; line-height: 1.65; color: var(--text-2); overflow-wrap: anywhere; }
@@ -71,15 +78,15 @@
 .redemption-message-error { background: #FFF0EE; color: #B03E35; }
 .redemption-message-ok { background: var(--green-soft); color: var(--green-dark); }
 .redemption-message-info { background: var(--info-soft); color: var(--green-dark); }
-.membership-card { background-color: rgba(250, 255, 252, 0.82); background-image: linear-gradient(125deg, rgba(199, 246, 220, 0.50), rgba(255, 255, 255, 0.58) 52%, rgba(230, 252, 240, 0.42)); }
-.membership-card > .card-title { padding-bottom: 20rpx; border-bottom: 1rpx solid var(--line); }
+.membership-card { background: var(--card); }
+.membership-card > .card-title { margin-bottom: 16rpx; }
 .membership-card > .benefit-list { background: rgba(255,255,255,0.42); border: 1rpx solid rgba(255,255,255,0.8); border-radius: 22rpx; padding: 4rpx 20rpx; }
 .plan-compare { margin-top: 16rpx; border: 1rpx solid var(--line); border-radius: 22rpx; overflow: hidden; }
 .plan-head, .plan-row { display: flex; align-items: stretch; }
 .plan-head { background: rgba(232, 248, 239, 0.9); }
 .plan-row { border-top: 1rpx solid var(--line); background: rgba(255,255,255,0.55); }
 .plan-feature { flex: 1.15; min-width: 0; padding: 14rpx 12rpx; font-size: 23rpx; font-weight: 600; color: var(--text); }
-.plan-col { flex: 1; min-width: 0; padding: 14rpx 8rpx; font-size: 21rpx; line-height: 1.4; text-align: center; color: var(--text-2); white-space: nowrap; }
+.plan-col { flex: 1; min-width: 0; padding: 14rpx 8rpx; font-size: max(12px, 24rpx); line-height: 1.5; text-align: center; color: var(--text-2); white-space: normal; }
 .plan-head .plan-col { font-weight: 700; color: var(--text-2); }
 .plan-col.plan-member { color: var(--green-dark); background: rgba(0, 195, 117, 0.08); font-weight: 600; }
 .plan-head .plan-col.plan-member { color: var(--green-dark); background: rgba(0, 195, 117, 0.14); }
@@ -103,11 +110,17 @@
 .member-entry.payment-abandon::after { display: none; border: 0; }
 .member-entry.payment-abandon[disabled] { opacity: .6; }
 .membership-card .ledger-row > view { overflow-wrap: anywhere; }
+.member-entry.payment-entry, .member-entry.redemption-entry { min-height: 44px; border-radius: var(--radius-action); background: var(--action-fill); color: var(--action-text); box-shadow: none; }
+.membership-entry-secondary { align-items: flex-start; }
+.membership-entry-secondary .member-entry.payment-entry { width: auto; padding: 14rpx 24rpx; background: var(--surface-soft); color: var(--green-dark); border: 1rpx solid var(--line); }
+.action-row, .action-row.feedback, .notification-button.notification-clear, .notification-button.notification-delete, .notification-button.notification-more, .notification-button.notification-retry, .redemption-close { min-height: 44px; }
 
 @media (prefers-color-scheme: dark) {
   .notification-button.notification-delete { color: var(--bad); border-color: rgba(242, 155, 147, 0.28); background: var(--bad-soft); }
   /* var(--green-dark) turns light in dark mode; keep the deep fill under white text. */
-  .member-entry.payment-entry { background: #007A49; }
+  .member-entry.payment-entry, .member-entry.redemption-entry { background: var(--action-fill); color: var(--action-text); }
+  .membership-entry-secondary .member-entry.payment-entry { background: var(--surface-soft); color: var(--green-dark); }
+  .member-badge { color: #E6CA86; background: #383121; }
   .member-entry.payment-entry[disabled], .member-entry.redemption-entry[disabled] { background: #22322B; color: #7F958A; }
   .redemption-panel { background: rgba(0, 195, 117, 0.08); }
   .redemption-input { border-color: rgba(255, 255, 255, 0.12); background: rgba(255, 255, 255, 0.05); }
@@ -115,7 +128,7 @@
   .redemption-hint { color: var(--text-3); }
   .redemption-message-error { background: var(--bad-soft); color: var(--bad); }
   .payment-error { color: var(--bad); }
-  .membership-card { background-color: var(--card); background-image: linear-gradient(125deg, rgba(0, 195, 117, 0.14), rgba(255, 255, 255, 0.02) 52%, rgba(0, 195, 117, 0.06)); }
+  .membership-card { background: var(--card); }
   .membership-card > .benefit-list { background: rgba(255, 255, 255, 0.04); border-color: rgba(255, 255, 255, 0.06); }
   .plan-head { background: rgba(0, 195, 117, 0.10); }
   .plan-row { background: rgba(255, 255, 255, 0.03); }

@@ -50,6 +50,22 @@
 .picker-count { margin-left: auto; color: var(--text-2); font-size: 24rpx; font-weight: 400; }
 .selected { padding: 18rpx 20rpx; border: 1rpx solid var(--glass-line); border-radius: 24rpx; background: rgba(244,250,246,0.72); }
 
+/* The sheet keeps actions fixed; choices stay compact and easy to tap. */
+.tab, .chip { min-height: 44px; min-height: max(44px, 88rpx); padding: 20rpx 24rpx; border-radius: 16rpx; background: var(--surface-soft); border-color: var(--line); }
+.tab.on { background: var(--green-soft); color: var(--green-dark); border-color: var(--green-dark); box-shadow: none; }
+.chip.on { border-color: var(--green-dark); box-shadow: none; }
+.choice-check { font-weight: 700; }
+.product-preview { background: var(--surface-soft); border-color: var(--line); border-radius: 20rpx; }
+.product-image-box, .product-image { width: 112rpx; height: 112rpx; }
+.product-image-box { flex-basis: 112rpx; }
+.picker-section-heading { margin-top: 0; font-size: 30rpx; }
+.picker-store-heading { margin-top: 28rpx; }
+.search-hint, .search-summary, .store-result-city, .tiny { font-size: 24rpx; }
+.store-search, .selected { background: var(--surface-soft); border-color: var(--line); }
+.search-hint, .search-summary, .muted, .store-result-city { color: var(--text-2); }
+.store-result-name { color: var(--text); }
+.search-clear { min-height: 44px; }
+
 /* Dark mode: page color variables inherit into this isolated component. */
 /* 按下反馈 */
 .tab.is-pressed, .chip.is-pressed, .store-result.is-pressed { opacity: 0.66; transform: scale(0.97); }

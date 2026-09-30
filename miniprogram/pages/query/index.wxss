@@ -32,6 +32,15 @@
 .selection-summary-change.btn { flex: 0 0 auto; width: auto; min-width: 44px; min-width: max(44px, 92rpx); min-height: 44px; min-height: max(44px, 88rpx); padding: 12rpx 16rpx; font-size: 25rpx; }
 .selection-summary-stores { margin-top: 18rpx; padding-top: 16rpx; border-top: 1rpx solid var(--line); color: var(--text-2); font-size: 24rpx; line-height: 1.6; overflow-wrap: anywhere; }
 .selection-done.btn { margin-top: 24rpx; }
+.selection-empty { padding: 28rpx 0 8rpx; }
+.selection-empty-title { font-size: 36rpx; font-weight: 600; margin-bottom: 12rpx; }
+.selection-access-note { margin-top: 20rpx; font-size: 25rpx; line-height: 1.6; color: var(--text-2); }
+.disclosure-row { display: flex; align-items: center; justify-content: space-between; gap: 20rpx; width: 100%; min-height: 44px; margin: 14rpx 0 0; padding: 16rpx 0; background: transparent; border: none; border-radius: 0; color: var(--text-2); font-size: 25rpx; line-height: 1.5; text-align: left; }
+.disclosure-row::after { border: none; }
+.disclosure-row > text:last-child { flex: none; color: var(--green-dark); }
+.selection-rules { margin-top: 0; padding-top: 16rpx; }
+.selection-summary-title { font-size: 32rpx; }
+.selection-summary-city, .selection-summary-stores { font-size: 25rpx; }
 .selection-card > .btn, .selection-done.btn { min-height: 44px; min-height: max(44px, 88rpx); }
 .result-target-note { margin-bottom: 20rpx; padding: 14rpx 18rpx; border-radius: 16rpx; background: var(--surface-soft); color: var(--text-2); font-size: 23rpx; line-height: 1.55; overflow-wrap: anywhere; }
 .result-target-different { background: var(--warn-soft); color: var(--warn); }

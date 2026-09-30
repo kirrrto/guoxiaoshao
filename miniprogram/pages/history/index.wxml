@@ -1,3 +1,4 @@
+<page-meta page-style="{{sheetVisible ? 'overflow:hidden;' : ''}}" />
 <view class="page tab-page history-page">
   <view wx:if="{{loadError}}" class="card load-error" role="alert">
     <view class="load-error-title">暂时没有连上</view>
@@ -18,27 +19,19 @@
   <block wx:else>
     <view wx:if="{{!accountReady}}" class="banner banner-info small">{{accountError || '正在连接微信账户，你可以先选择查询条件。'}}<button wx:if="{{accountError}}" class="btn btn-outline btn-sm mt" bindtap="onRetryAccount">重试账户连接</button></view>
     <view class="page-heading"><view class="page-title">供应变化历史</view><view class="page-subtitle">按配置、日期与门店查看已有观测记录</view></view>
-    <view class="card history-browse-card">
-      <view class="card-title"><text>最近浏览</text><text class="sub">浏览不扣次数</text></view>
-      <view wx:if="{{browseLoading && !browse}}" class="small muted mt">正在加载浏览记录…</view>
-      <view wx:if="{{browse}}" class="small text-2 mt">
-        <view wx:if="{{!browse.recentViews.length}}">还没有浏览记录。可在下方选择配置、门店与日期查看供应变化。</view>
-        <view wx:for="{{browse.recentViews}}" wx:key="index" class="history-recent mt"><view class="history-recent-copy"><view>{{item.title}}</view><view class="tiny muted">{{item.dayKey}} · {{item.scopeText}}</view></view><button class="btn btn-outline btn-sm history-restore" data-index="{{index}}" disabled="{{querying || loadingMore}}" bindtap="onRestoreBrowse">恢复条件</button></view>
-      </view>
-      <view wx:if="{{restoreNotice}}" class="banner {{restoreWarning ? 'banner-warn' : 'banner-info'}} small mt">{{restoreNotice}}</view>
-      <view wx:if="{{taskMessage}}" class="banner {{taskWarning ? 'banner-warn' : 'banner-ok'}} small mt">{{taskMessage}}</view>
-      <view wx:if="{{browseError}}" class="banner banner-warn small mt">{{browseError}}<button class="btn btn-outline btn-sm mt" disabled="{{browseLoading}}" bindtap="onRetryBrowse">重新加载</button></view>
-      <view class="tiny muted mt">进入本页并成功加载即可完成每日浏览任务；下方库存历史查询另按账户规则计次。</view>
-    </view>
     <view class="card history-selection-card">
       <view class="card-title">
-        <text>选择机型、门店与日期</text>
+        <text>查询条件</text>
         <text class="sub tap-target" bindtap="onExplain">数据说明 ›</text>
       </view>
-      <target-picker id="history-target-picker" catalog-version="{{catalogVersion}}" value="{{pickerValue}}" max-stores="{{10}}" stores-optional="{{true}}" bindchange="onPickerChange" />
-      <view wx:if="{{accountReady && !boot.member}}" class="banner banner-info small mt">受限新品开售 30 天内，免费用户仅可看昨天及更早记录。余额不足可前往「我的」签到。</view>
+      <view wx:if="{{selectionSummary}}" class="history-config-summary">
+        <view class="history-config-copy"><view class="history-config-title">{{selectionSummary.title}}</view><view class="small text-2 mt">{{selectionSummary.scopeText}}</view></view>
+        <button class="btn btn-outline btn-sm" disabled="{{querying || loadingMore}}" bindtap="onEditSelection">修改</button>
+      </view>
+      <view wx:else class="history-config-empty"><view class="small text-2">选一个配置，查看已积累的供应变化。</view><button class="btn btn-outline btn-block mt" bindtap="onEditSelection">选择配置与门店</button></view>
+      <view wx:if="{{accountReady && !boot.member}}" class="small text-2 mt">受限新品仅可查询昨天及更早记录。</view>
 
-      <picker mode="date" value="{{dayKey}}" start="{{earliestDay}}" end="{{today}}" bindchange="onDateChange">
+      <picker disabled="{{querying || loadingMore}}" mode="date" value="{{dayKey}}" start="{{earliestDay}}" end="{{today}}" bindchange="onDateChange">
         <view class="field date-field">
           <text class="label">日期（北京时间）</text>
           <view class="row">
@@ -51,14 +44,18 @@
       <view wx:if="{{restriction}}" class="banner banner-warn mt">{{restriction}}</view>
       <button wx:if="{{!boot.member && boot.balance < boot.historyCost}}" class="btn btn-ghost btn-sm mb" bindtap="onGoMine">去签到 / 查看次数</button>
 
-      <button class="btn btn-primary btn-block mt {{querying ? 'disabled' : ''}}" disabled="{{querying || !accountReady}}" bindtap="onQuery">
+      <button class="btn btn-primary btn-block mt {{querying ? 'disabled' : ''}}" disabled="{{querying || loadingMore || !accountReady || !selectionSummary || !selectionSummary.valid}}" bindtap="onQuery">
         {{!accountReady ? '正在连接账户…' : (querying ? '加载中…' : (boot.member ? '查看历史' : '查看历史（消耗 ' + boot.historyCost + ' 次，余 ' + boot.balance + ' 次）'))}}
       </button>
-      <view class="footer-note history-scope-note">仅查询本小程序最近 10 天积累的历史；更早或未采集的记录无法补查。不选门店时，展示各地已有记录，不代表全国覆盖。</view>
+      <view class="footer-note history-scope-note">最近 10 天的已记录变化；无记录不代表无货，也不代表全国覆盖。</view>
       <view wx:if="{{!boot.member}}" class="tiny muted history-scope-note">查询需有足够余额；未查到历史事件，次数自动退还。</view>
     </view>
 
+    <view wx:if="{{restoreNotice}}" class="banner {{restoreWarning ? 'banner-warn' : 'banner-info'}} small">{{restoreNotice}}</view>
+    <view wx:if="{{taskMessage}}" class="small muted history-task-note">{{taskMessage}}</view>
+    <view wx:if="{{browseError && !browseExpanded}}" class="banner banner-warn small">{{browseError}}<button class="btn btn-outline btn-sm mt" disabled="{{browseLoading}}" bindtap="onRetryBrowse">重新加载浏览记录</button></view>
     <view wx:if="{{result}}" class="card history-result-card">
+      <view wx:if="{{resultTargetDifferent}}" class="banner banner-info small mb">下方为上次查询结果，当前条件尚未查询。</view>
       <view class="card-title">
         <text class="ellipsis">{{result.product.title}}</text>
         <text class="sub">{{result.dayText}}</text>
@@ -77,11 +74,13 @@
         <view class="stat"><view class="num">{{result.summary.recoveries}}</view><view class="lbl">恢复</view></view>
         <view class="stat"><view class="num">{{result.summary.ended}}</view><view class="lbl">供应结束</view></view>
       </view>
-      <view wx:if="{{result.hasEventRecords}}" class="tiny muted mt">上方四项按事件类型分别计数，其他状态变化只列入下方事件记录，因此四项之和可能小于事件总数。</view>
       <view wx:if="{{result.hasEventRecords && result.lastHour !== null}}" class="small text-2 mt">{{(result.lastHourComplete ? '' : '已加载记录中，') + result.lastHourWindowText + '记录到确认补货 ' + result.lastHour + ' 次'}}</view>
 
-      <view class="section-label">当天观测凭据</view>
+      <button class="disclosure-row" bindtap="onToggleCoverage" aria-expanded="{{coverageExpanded}}"><text>当天观测凭据</text><text>{{coverageExpanded ? '收起 −' : '展开 +'}}</text></button>
       <view class="small text-2">{{result.coverageSummary}}</view>
+      <block wx:if="{{coverageExpanded}}">
+      <view wx:if="{{result.hasEventRecords}}" class="tiny muted mt">上方四项按事件类型分别计数，其他状态变化只列入下方事件记录，因此四项之和可能小于事件总数。</view>
+
       <view wx:if="{{result.coverageCheckedText}}" class="tiny muted mt">采样摘要单独更新于 {{result.coverageCheckedText}}</view>
       <view wx:for="{{result.coverageStores}}" wx:key="storeNumber" class="history-coverage-row">
         <view class="small bold">{{item.storeName}}</view>
@@ -89,6 +88,8 @@
         <view class="tiny muted">首末观测 {{item.rangeText}}</view>
       </view>
       <view class="tiny muted mt">凭据从启用记录后积累；首末观测之间不代表持续监测，较早的数据可能没有采样摘要。</view>
+
+      </block>
 
       <view wx:if="{{result.latestRestricted}}" class="banner banner-info small mt">当前配置处于免费用户新品限制期，本页仅提供所选日期历史，不显示当前库存。</view>
       <view wx:if="{{result.hasEventRecords}}" class="section-label">事件记录 · 已加载 {{result.events.length}} / {{result.pagination.total}}</view>
@@ -123,5 +124,21 @@
           <view class="pill pill-dot pill-{{item.statusCls}} tiny">{{item.statusLabel}}</view>
         </view>
     </view>
+    <view class="card history-browse-card">
+      <button class="disclosure-row" bindtap="onToggleBrowse" aria-expanded="{{browseExpanded}}"><text>恢复最近浏览条件</text><text>{{browseExpanded ? '收起 −' : '展开 +'}}</text></button>
+      <block wx:if="{{browseExpanded}}">
+      <view wx:if="{{browseLoading && !browse}}" class="small muted mt">正在加载浏览记录…</view>
+      <view wx:if="{{browse}}" class="small text-2 mt">
+        <view wx:if="{{!browse.recentViews.length}}">还没有浏览记录。可在上方选择配置、门店与日期查看供应变化。</view>
+        <view wx:for="{{browse.recentViews}}" wx:key="index" class="history-recent mt"><view class="history-recent-copy"><view>{{item.title}}</view><view class="tiny muted">{{item.dayKey}} · {{item.scopeText}}</view></view><button class="btn btn-outline btn-sm history-restore" data-index="{{index}}" disabled="{{querying || loadingMore}}" bindtap="onRestoreBrowse">恢复条件</button></view>
+      </view>
+      <view wx:if="{{browseError}}" class="banner banner-warn small mt">{{browseError}}<button class="btn btn-outline btn-sm mt" disabled="{{browseLoading}}" bindtap="onRetryBrowse">重新加载</button></view>
+      <view class="small muted mt">浏览不扣次数；成功加载可完成每日浏览任务，查询另按账户规则计次。</view>
+      </block>
+    </view>
   </block>
 </view>
+
+<config-sheet id="history-config-sheet" visible="{{sheetVisible}}" title="选择历史查询条件" subtitle="可不选门店；保存选择不会查询或扣次" confirm-text="保存选择" summary="{{draftSummary}}" dirty="{{draftDirty}}" external-close="{{true}}" bindconfirm="onDoneSelection" bindrequestclose="onRequestCloseSelection" bindclose="onCloseSelection">
+  <target-picker wx:if="{{sheetVisible}}" id="history-target-picker" catalog-version="{{catalogVersion}}" value="{{draftValue}}" max-stores="{{10}}" stores-optional="{{true}}" in-sheet="{{true}}" bindchange="onDraftChange" />
+</config-sheet>

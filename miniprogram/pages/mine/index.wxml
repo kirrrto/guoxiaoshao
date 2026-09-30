@@ -1,3 +1,4 @@
+<page-meta page-style="{{redemptionOpen ? 'overflow:hidden;' : ''}}" />
 <view class="page tab-page mine-page">
   <view wx:if="{{loadError}}" class="card load-error" role="alert">
     <view class="load-error-title">暂时没有连上</view>
@@ -20,29 +21,36 @@
     <view class="hero">
       <image class="logo" src="/images/brand/logo-mint-144.png" mode="aspectFit" />
       <view class="hero-text">
-        <view class="hero-name">果小哨</view>
-        <view class="hero-tagline">你的个人选购小助手</view>
+        <view class="hero-name">我的</view>
+        <view class="hero-tagline">管理权益与提醒</view>
         <view class="hero-sub copy-id" bindtap="onCopyId">用户 {{boot.identity.openidMasked}} · 点击复制</view>
       </view>
       <text class="pill {{membership.active ? 'pill-ok' : 'pill-muted'}}">{{membership.active ? '会员' : (membership.expired ? '会员已到期' : '免费用户')}}</text>
     </view>
 
     <!-- 会员 -->
-    <view id="membership-card" class="card membership-card">
+    <view id="membership-card" class="card membership-card {{membership.active ? 'membership-active' : ''}}">
       <view class="card-title">
-        <text>{{membership.active ? '会员生效中' : (membership.expired ? '会员已到期' : '开通会员')}}</text>
-        <text class="sub">{{membership.active ? '至 ' + membership.expiresText + ' · 余 ' + membership.daysLeft + ' 天' : boot.priceText + ' / ' + boot.memberProduct.days + ' 天'}}</text>
+        <text>{{membership.active ? '果小哨会员' : (membership.expired ? '会员已到期' : '让小哨持续帮你留意')}}</text>
+        <text wx:if="{{membership.active}}" class="member-badge">已开通</text>
       </view>
-      <view class="plan-why">会员：查询不扣次数、到货自动提醒。</view>
+      <view class="member-overview">
+        <view wx:if="{{membership.active}}" class="member-duration"><text class="member-number">{{membership.daysLeft}}</text><text>天剩余</text></view>
+        <view wx:else class="member-duration"><text class="member-number">{{boot.priceText}}</text><text>/ {{boot.memberProduct.days}} 天</text></view>
+        <view class="member-renewal">{{membership.active ? '到期 ' + membership.expiresText : '单次购买 · 不自动续费'}}</view>
+      </view>
+      <view class="plan-why">查询不扣次数 · 关注取货变化</view>
       <block wx:if="{{membership.active}}">
+        <view class="member-allowance"><text>已关注 {{boot.followCount}} / {{boot.limits.maxFollows}} 个配置</text><text>每配置最多 {{boot.limits.maxStoresPerFollow}} 家门店</text></view>
         <view class="tiny muted mt">续费顺延剩余天数，不自动续费。</view>
       </block>
       <block wx:else>
         <view wx:if="{{membership.expired}}" class="banner banner-warn small">已于 {{membership.expiresText}} 到期，监测与提醒停止；关注配置与次数仍保留。</view>
-        <view wx:elif="{{boot.freeReminder}}" class="banner banner-ok small">新用户免费体验：可关注 1 个配置，并收到 1 条到货提醒，去「关注」页添加。</view>
+        <view wx:elif="{{boot.freeReminder}}" class="small text-2 mt">可先到「小哨」免费体验：关注 1 个配置、1 条到货提醒。</view>
       </block>
-      <view class="row-between mt tap-row" bindtap="onToggleMembershipRules">
-        <text class="small muted">权益对比 · 购买须知</text>
+      <view class="member-authorization">微信提醒需逐次授权；到货、断货次数分别使用。</view>
+      <view class="row-between mt tap-row" bindtap="onToggleMembershipRules" role="button" aria-label="权益与购买须知，{{showMembershipRules ? '收起' : '展开'}}">
+        <text class="small muted">权益与购买须知</text>
         <text class="small muted">{{showMembershipRules ? '收起 ▴' : '展开 ▾'}}</text>
       </view>
       <block wx:if="{{showMembershipRules}}">
@@ -53,7 +61,7 @@
             <text class="plan-col plan-member">会员</text>
           </view>
           <view class="plan-row">
-            <text class="plan-feature">实时查库存</text>
+            <text class="plan-feature">取货查询</text>
             <text class="plan-col">扣次数</text>
             <text class="plan-col plan-member">不限次</text>
           </view>
@@ -68,7 +76,7 @@
             <text class="plan-col plan-member">关注可提醒</text>
           </view>
           <view class="plan-row">
-            <text class="plan-feature">后台盯货</text>
+            <text class="plan-feature">持续关注</text>
             <text class="plan-col">体验 1 个</text>
             <text class="plan-col plan-member">自动监测</text>
           </view>
@@ -84,7 +92,7 @@
           <view>提醒需微信订阅授权，免打扰时段不发送。</view>
         </view>
       </block>
-      <view class="membership-entry-list">
+      <view class="membership-entry-list {{membership.active ? 'membership-entry-secondary' : ''}}">
         <button class="member-entry payment-entry" disabled="{{!boot.paymentReady || redeeming || paymentBusy || paymentChecking || paymentPendingId}}" bindtap="onBuyMembership">{{paymentBusy ? '正在处理支付…' : membership.active ? '续费会员' : '立即开通'}} · {{boot.priceText}}</button>
       </view>
       <view wx:if="{{!boot.paymentReady}}" class="payment-note">{{boot.paymentReason}}</view>
@@ -99,7 +107,7 @@
         </view>
         <view wx:if="{{paymentPendingId}}" class="payment-note">订单会为当前账号保留，系统不会自动再次扣款。付款没有完成时，可以放弃这笔订单后重新购买。</view>
       </view>
-      <view wx:if="{{redemptionOpen}}" class="redemption-mask" catchtap="onOpenRedemption">
+      <view wx:if="{{redemptionOpen}}" class="redemption-mask" catchtap="onOpenRedemption" catchtouchmove="noop">
         <view class="redemption-modal" catchtap="noop">
           <view class="redemption-title">兑换会员</view>
           <view class="redemption-description">输入你收到的兑换码，为当前微信账号开通会员。</view>
@@ -133,7 +141,7 @@
     <!-- 次数 -->
     <view class="card quota-card">
       <view class="card-title">
-        <text>查询次数</text>
+        <text>查询余额</text>
         <text class="sub">今日已获 {{quota.grantedToday}}/{{quota.dailyGrantCap}} · 上限 {{quota.balanceCap}}</text>
       </view>
       <view class="row-between">

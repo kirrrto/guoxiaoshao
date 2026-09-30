@@ -6,11 +6,12 @@ import { createRequire } from 'node:module';
 import { pathToFileURL } from 'node:url';
 const require = createRequire(import.meta.url);
 const args = process.argv.slice(2), directory = path.resolve(args[0] || path.join(os.tmpdir(), 'guoxiaoshao-ui-preview'));
+const colorScheme = args.includes('--dark') ? 'dark' : 'light';
 let playwright;
 try { playwright = require('playwright'); }
 catch { playwright = require(path.join(os.homedir(), '.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright')); }
 const manifest = JSON.parse(fs.readFileSync(path.join(directory, 'manifest.json'), 'utf8'));
-const screenshots = path.join(directory, 'screenshots'); fs.mkdirSync(screenshots, { recursive: true });
+const screenshots = path.join(directory, colorScheme === 'dark' ? 'screenshots-dark' : 'screenshots'); fs.mkdirSync(screenshots, { recursive: true });
 let browser;
 try { browser = await playwright.chromium.launch({ headless: true }); }
 catch (error) {
@@ -19,7 +20,8 @@ catch (error) {
   browser = await playwright.chromium.launch({ headless: true, executablePath: executable });
 }
 const report = { renderer: 'headless Chromium rendering generated WXML/WXSS approximation; not WeChat', generatedAt: new Date().toISOString(), snapshots: [], screenshotDirectory: screenshots };
-const context = await browser.newContext({ deviceScaleFactor: 1 });
+const context = await browser.newContext({ deviceScaleFactor: 1, colorScheme });
+report.colorScheme = colorScheme;
 if (!manifest.remoteImages) await context.route(/^https?:/, route => route.abort());
 try {
   const page = await context.newPage();
@@ -41,7 +43,7 @@ try {
     const bodyText = await page.locator('body').innerText();
     const missingText = (item.expectedText || []).filter(text => !bodyText.replace(/\s+/g, '').includes(text.replace(/\s+/g, '')));
     const record = { ...item, ...metrics, missingText }; report.snapshots.push(record);
-    const representative = item.width === 320 && ['longcontent', 'history-longcontent', 'history-balance-cap', 'operator-longcontent'].includes(item.scenario) || item.width === 375 && ['mine', 'follow'].includes(item.page) && item.scenario === 'expired' || item.width === 430 && item.page === 'query' && item.scenario === 'member' || item.width === 375 && item.scenario.startsWith('monitor-') || item.width === 375 && item.scenario.startsWith('history-') && (item.page === 'history' || item.scenario === 'history-free-first');
+    const representative = item.width === 375 && ['member', 'free'].includes(item.scenario) || item.scenario.startsWith('sheet-') || item.width === 320 && ['longcontent', 'history-longcontent', 'history-balance-cap', 'operator-longcontent'].includes(item.scenario) || item.width === 375 && ['mine', 'follow'].includes(item.page) && item.scenario === 'expired' || item.width === 430 && item.page === 'query' && item.scenario === 'member' || item.width === 375 && item.scenario.startsWith('monitor-') || item.width === 375 && item.scenario.startsWith('history-') && (item.page === 'history' || item.scenario === 'history-free-first');
     if (representative) { const name = item.file.replace('.html', '.png'); await page.screenshot({ path: path.join(screenshots, name), fullPage: true }); record.screenshot = name; }
     if (item.width === 375 && item.scenario === 'monitor-template-missing') {
       await page.setViewportSize({ width: 375, height: 850 });
@@ -52,6 +54,6 @@ try {
   }
 } finally { await context.close(); await browser.close(); }
 report.summary = { total: report.snapshots.length, expressionErrors: manifest.expressionErrors || 0, missingText: report.snapshots.filter(x => x.missingText.length).length, horizontalOverflow: report.snapshots.filter(x => x.scrollWidth > x.width + 1 || x.overflow.length).length, clippedText: report.snapshots.filter(x => x.clippedText.length).length, failedImages: report.snapshots.flatMap(x => x.images).filter(x => !x.loaded).length };
-fs.writeFileSync(path.join(directory, 'layout-metrics.json'), JSON.stringify(report, null, 2));
+fs.writeFileSync(path.join(directory, colorScheme === 'dark' ? 'layout-metrics-dark.json' : 'layout-metrics.json'), JSON.stringify(report, null, 2));
 console.log(JSON.stringify(report.summary));
 if (report.summary.expressionErrors || report.summary.missingText || report.summary.horizontalOverflow || report.summary.clippedText || report.summary.failedImages) process.exitCode = 1;

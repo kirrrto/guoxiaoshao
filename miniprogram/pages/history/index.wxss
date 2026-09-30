@@ -26,3 +26,15 @@
 .history-coverage-row:last-of-type { border-bottom: none; }
 .history-latest-card .latest-row > view:first-child { flex: 1; min-width: 0; }
 .history-data-notice, .history-coverage-row, .history-latest-card { overflow-wrap: anywhere; }
+.history-config-summary { display: flex; gap: 24rpx; align-items: center; padding: 24rpx 0 8rpx; }
+.history-config-copy { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.history-config-title { font-size: 32rpx; font-weight: 600; line-height: 1.5; }
+.history-config-summary .btn { flex: none; min-width: 44px; min-height: 44px; }
+.history-config-empty { padding: 24rpx 0 8rpx; }
+.history-task-note { margin: 0 12rpx 24rpx; }
+.disclosure-row { display: flex; align-items: center; justify-content: space-between; gap: 20rpx; width: 100%; min-height: 44px; margin: 8rpx 0 0; padding: 16rpx 0; background: transparent; border: none; border-radius: 0; color: var(--text-2); font-size: 25rpx; line-height: 1.5; text-align: left; }
+.disclosure-row::after { border: none; }
+.disclosure-row > text:last-child { flex: none; color: var(--green-dark); }
+.history-browse-card { background: var(--surface-soft); }
+.history-result-card .history-data-notice { padding: 20rpx; }
+.history-selection-card .date-field { min-height: 44px; }

@@ -33,16 +33,18 @@ function resultHasDifferentTarget(result, selection) {
 }
 
 function savedSelection(value, catalog) {
-  const product = value && catalog.productByPart && catalog.productByPart[value.partNumber];
-  const numbers = Array.isArray(value && value.storeNumbers) ? Array.from(new Set(value.storeNumbers)) : [];
-  const stores = numbers.map(n => catalog.storeByNumber && catalog.storeByNumber[n]).filter(Boolean);
-  return { partNumber: product ? product.partNumber : null, product: product || null, storeNumbers: stores.map(s => s.storeNumber), stores };
+  const product = value && catalog.productByPart && Object.prototype.hasOwnProperty.call(catalog.productByPart, value.partNumber) ? catalog.productByPart[value.partNumber] : null;
+  const numbers = Array.isArray(value && value.storeNumbers) ? value.storeNumbers.slice() : [];
+  const stores = numbers.map(n => typeof n === 'string' && /^R\d{3}$/.test(n) && catalog.storeByNumber && Object.prototype.hasOwnProperty.call(catalog.storeByNumber, n) ? catalog.storeByNumber[n] : null).filter(Boolean);
+  // Keep an invalid saved scope visible for explicit repair. Silently dropping
+  // removed stores would turn the old intent into a different paid query.
+  return { partNumber: value && value.partNumber || null, product: product || null, storeNumbers: numbers, stores };
 }
 
 function selectionDetails(selection, catalog, maxStores) {
-  const product = selection && catalog && catalog.productByPart && catalog.productByPart[selection.partNumber];
+  const product = selection && catalog && catalog.productByPart && Object.prototype.hasOwnProperty.call(catalog.productByPart, selection.partNumber) ? catalog.productByPart[selection.partNumber] : null;
   const numbers = Array.isArray(selection && selection.storeNumbers) ? selection.storeNumbers : [];
-  const stores = numbers.map(n => catalog && catalog.storeByNumber && catalog.storeByNumber[n]).filter(Boolean);
+  const stores = numbers.map(n => typeof n === 'string' && /^R\d{3}$/.test(n) && catalog && catalog.storeByNumber && Object.prototype.hasOwnProperty.call(catalog.storeByNumber, n) ? catalog.storeByNumber[n] : null).filter(Boolean);
   const valid = Boolean(product && product.supported && numbers.length && numbers.length <= maxStores
     && new Set(numbers).size === numbers.length && stores.length === numbers.length);
   const cities = Array.from(new Set(stores.map(s => s.city).filter(Boolean)));
@@ -50,7 +52,9 @@ function selectionDetails(selection, catalog, maxStores) {
     title: product.title || product.model || product.partNumber,
     imageUrl: product.imageUrl || '', imageAlt: product.imageAlt || product.title || '',
     cityLabel: `${cities.join('、') || '已选'} · ${stores.length} 家门店`,
-    storeLabel: stores.map(s => cities.length > 1 ? storeLabelWithCity(s.storeNumber, s.name, s.city) : storeLabel(s.storeNumber, s.name)).join('、'),
+    storeLabel: numbers.length !== stores.length || new Set(numbers).size !== numbers.length || numbers.length > maxStores
+      ? '已保存门店信息发生变化，请修改后查询'
+      : stores.map(s => cities.length > 1 ? storeLabelWithCity(s.storeNumber, s.name, s.city) : storeLabel(s.storeNumber, s.name)).join('、'),
   } : null };
 }
 
@@ -98,13 +102,20 @@ Page({
     pickerValue: null,
     selectionExpanded: true,
     selectionCanCollapse: false,
+    selectionNeedsReview: false,
     selectionSummary: null,
     selectionImageFailed: false,
+    sheetVisible: false,
+    draftValue: null,
+    draftDirty: false,
+    draftSummary: '',
+    rulesExpanded: false,
     querying: false,
     result: null,
     resultIsCache: false,
     resultTargetDifferent: false,
     restriction: null,
+    restrictionReason: null,
     collector: null,
     announcement: null,
     followTargets: [],
@@ -262,6 +273,7 @@ Page({
       ...summary,
       accountReady: true,
       accountError: null,
+      ...(boot.membership.active ? { restrictionReason: null } : {}),
       boot: {
         member: boot.membership.active,
         freeReminder: !boot.membership.active && boot.freeReminder === true,
@@ -297,7 +309,7 @@ Page({
     const selection = e.detail;
     if (targetKey(selection) !== targetKey(this.selection)) this.onSelectionInteraction();
     this.selection = selection;
-    this.setData({ restriction: null, ...this.selectionView(selection) });
+    this.setData({ restriction: null, restrictionReason: null, ...this.selectionView(selection) });
     try { wx.setStorageSync(localKey(SELECTION_KEY), { partNumber: selection.partNumber, storeNumbers: selection.storeNumbers }); } catch (err) { /* ignore */ }
   },
 
@@ -305,6 +317,7 @@ Page({
     const details = selectionDetails(selection, this.catalog, maxStores || 3);
     return {
       selectionCanCollapse: details.valid,
+      selectionNeedsReview: Boolean(selection && (selection.partNumber || selection.storeNumbers && selection.storeNumbers.length) && !details.valid),
       selectionSummary: details.summary,
       selectionExpanded: this.data.selectionExpanded || !details.valid,
       selectionImageFailed: details.summary && this.data.selectionSummary && details.summary.imageUrl === this.data.selectionSummary.imageUrl ? this.data.selectionImageFailed : false,
@@ -316,16 +329,47 @@ Page({
 
   onEditSelection() {
     this.onSelectionInteraction();
-    this.setData({ selectionExpanded: true });
+    this.draftSelection = null;
+    this.draftBaseline = targetKey(this.selection);
+    this.setData({ selectionExpanded: true, sheetVisible: true, draftDirty: false,
+      draftValue: { partNumber: this.selection.partNumber, storeNumbers: this.selection.storeNumbers.slice() },
+      draftSummary: this.data.selectionSummary ? this.data.selectionSummary.title : '选好配置与门店后保存，不会立即查询' });
+  },
+
+  onDraftChange(e) {
+    if (!this.data.sheetVisible) return;
+    this.draftSelection = e.detail;
+    const product = e.detail.product;
+    this.setData({ draftDirty: targetKey(e.detail) !== this.draftBaseline,
+      draftSummary: product ? `${product.title} · ${e.detail.storeNumbers.length} 家门店` : '请选择具体配置' });
+  },
+
+  readDraftSelection() {
+    const picker = typeof this.selectComponent === 'function' && this.selectComponent('#query-target-picker');
+    return picker && typeof picker.getSelection === 'function' ? picker.getSelection() : this.draftSelection || this.selection;
+  },
+
+  onRequestCloseSelection() {
+    const sheet = typeof this.selectComponent === 'function' && this.selectComponent('#query-config-sheet');
+    if (sheet && typeof sheet.requestClose === 'function') sheet.requestClose(targetKey(this.readDraftSelection()) !== this.draftBaseline);
+  },
+
+  onCloseSelection() {
+    this.draftSelection = null;
+    this.setData({ sheetVisible: false, draftValue: null, draftDirty: false, selectionExpanded: !this.data.selectionCanCollapse });
   },
 
   onDoneSelection() {
-    this.readPickerSelection();
-    const patch = this.selectionView(this.selection);
+    const selection = this.readDraftSelection();
+    const patch = this.selectionView(selection);
     if (!patch.selectionCanCollapse) return toast('请选择可查询的配置及有效门店');
+    this.onPickerChange({ detail: selection });
     this.onSelectionInteraction();
-    this.setData({ ...patch, selectionExpanded: false });
+    this.draftSelection = null;
+    this.setData({ ...patch, selectionExpanded: false, sheetVisible: false, draftValue: null, draftDirty: false });
   },
+
+  onToggleRules() { this.setData({ rulesExpanded: !this.data.rulesExpanded }); },
 
   onSelectionImageError() { this.setData({ selectionImageFailed: true }); },
 
@@ -360,9 +404,12 @@ Page({
   },
 
   async onQuery() {
+    if (this.data.sheetVisible) return;
+    const selection = this.readPickerSelection();
+    if (this.data.selectionNeedsReview) return toast('请先修改并核对已保存的配置与门店');
     // Must run inside the tap, before any await (WeChat gesture rule).
     topUpReminderCredit();
-    return this.performQuery(this.readPickerSelection());
+    return this.performQuery(selection);
   },
 
   onRequery() {
@@ -381,7 +428,7 @@ Page({
     if (selection.product && !selection.product.supported) return toast('该配置暂不支持查询');
     // Server balance is authoritative. A zero balance may be the debit from
     // the same uncertain request, which must still be allowed to resume.
-    this.setData({ querying: true, restriction: null });
+    this.setData({ querying: true, restriction: null, restrictionReason: null });
     const focus = { visible: Boolean(this.visible), visibilityEpoch: this.visibilityEpoch || 0,
       interactionEpoch: this.selectionInteractionEpoch || 0, queryEpoch: this.queryFocusEpoch = (this.queryFocusEpoch || 0) + 1 };
     const payload = { partNumber: selection.partNumber, storeNumbers: selection.storeNumbers.slice() };
@@ -392,7 +439,9 @@ Page({
       operation.finish('q');
       invalidateBootstrap();
       if (response.ok === false && !response.results) {
-        this.setData({ restriction: fmt.reasonText(response.reason), 'boot.balance': response.balance });
+        const sameTarget = targetKey(selection) === targetKey(this.selection);
+        this.setData({ restriction: (sameTarget ? '' : '上次查询：') + fmt.reasonText(response.reason),
+          restrictionReason: sameTarget ? response.reason : null, 'boot.balance': response.balance });
         return;
       }
       const catalog = this.catalog;

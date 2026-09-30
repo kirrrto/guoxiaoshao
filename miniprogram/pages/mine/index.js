@@ -5,7 +5,7 @@ const { confirmTap } = require('../../utils/haptic');
 const { VERSION } = require('../../config/version');
 const { storeLabel } = require('../../utils/store-label');
 
-/** "v1.1.7", plus the build channel when this is not the released version. */
+/** Show the shared release version plus its non-production build channel. */
 function versionLabel() {
   let env = 'release';
   try { env = wx.getAccountInfoSync().miniProgram.envVersion || 'release'; } catch (e) { /* older clients */ }
@@ -182,6 +182,7 @@ Page({
   async onShow() {
     syncTabBar(this, '/pages/mine/index');
     if (this.pageRetired) return;
+    this.setTabBarOverlay(this.data.redemptionOpen);
     this.pageVisible = true;
     this.consumePendingSection();
     if (this.data.ready) await this.refresh({ quiet: true });
@@ -210,6 +211,7 @@ Page({
   },
 
   retirePage() {
+    this.setTabBarOverlay(false);
     this.pageRetired = true;
     this.pageVisible = false;
     if (this.paymentController) this.paymentController.dispose();
@@ -376,7 +378,7 @@ Page({
 
   setTabBarOverlay(hidden) {
     const bar = typeof this.getTabBar === 'function' ? this.getTabBar() : null;
-    if (bar && bar.setData) bar.setData({ keyboardHidden: Boolean(hidden) });
+    if (bar && bar.setData) bar.setData({ sheetHidden: Boolean(hidden) });
   },
 
   onRedemptionInput(e) {

@@ -2,8 +2,8 @@
 
 运行 `node tools/ui-preview/build.mjs --out <输出目录>`，打开生成的 `index.html`。
 
-- 从项目当前的实际 WXML、WXSS 与页面 JS 派生消费者 4 页 × 6 种状态 × 3 种宽度，共 72 个独立 HTML。管理页已移入独立运营项目，默认预览不再包含它。
-- 状态为 `free`、`member`、`expired`、`empty`、`error`、`longcontent`；宽度为 320、375、430 像素。
+- 从项目当前的实际 WXML、WXSS 与页面 JS 派生消费者 4 页 × 7 种状态 × 3 种宽度，共 84 个独立 HTML。管理页已移入独立运营项目，默认预览不再包含它。
+- 状态为 `free`、`member`、`expired`、`empty`、`error`、`loading`、`longcontent`；宽度为 320、375、430 像素。
 - 数据明确是模拟的，不调用云函数、不扣次数、不支付、不发送消息。默认不加载远程产品图片；加 `--remote-images` 可读取目录中精确 SKU 的官方图片 URL。
 - HTML 可离线打开。浏览器不是微信原生渲染器；原生组件、选择器弹层、平台字体及安全区域需以开发者工具和真机验证。
 - 独立快照提供 `window.previewAudit()`，供浏览器脚本检查横向溢出。横向品类滚动区域允许超宽内容。
@@ -68,14 +68,14 @@ node tools/ui-preview/check-layout.mjs "<兑换预览输出目录>"
 
 每个场景同时展示会员兑换及「付费购买（暂未开放）」入口。快照使用模拟响应，不包含正确兑换码、不调用真实兑换或支付，也不证明任何账号已经获得会员。输入键盘、原生提示和真实响应更新需在微信环境按 [真实兑换验收](../../docs/MEMBERSHIP_ACCEPTANCE.md) 检查。
 
-## 监测、消息服务与个人提醒体检：30 个场景
+## 监测、消息服务与个人提醒体检：51 个场景
 
 ```powershell
 node tools/ui-preview/build.mjs --monitoring-only --part-number "MJYE4CH/A" --out "<监测状态预览目录>"
 node tools/ui-preview/check-layout.mjs "<监测状态预览目录>"
 ```
 
-此专项使用当前关注页的实际 JS、WXML 和 WXSS，在离线沙箱内生成 10 种状态 × 320、375、430 像素，共 30 个页面：
+此专项使用当前关注页的实际 JS、WXML 和 WXSS，在离线沙箱内生成 17 种状态 × 320、375、430 像素，共 51 个页面：
 
 - 后台运行、订阅模板缺失。
 - 后台运行、发送服务就绪且有 1 条授权。
@@ -87,6 +87,8 @@ node tools/ui-preview/check-layout.mjs "<监测状态预览目录>"
 - 所有关注均已暂停。
 - 个人消息提醒开关关闭。
 - 当前处于免打扰时段。
+- 免费体验及消息落地页。
+- 到货和断货双模板均有次数、断货次数空、到货次数空、断货次数低和补授权待同步。
 
 默认完全离线，无远程图片请求；不会查询云端、调用微信授权、发送消息或改变账号状态。页面中的库存、会员日期、服务状态和授权次数均为样例，不构成真实服务运行或消息送达证据。
 
@@ -96,10 +98,24 @@ node tools/ui-preview/check-layout.mjs "<监测状态预览目录>"
 
 新增历史浏览奖励专项：`--history-task-only`，覆盖历史页及我的页的会员领取、免费首次浏览、读取失败、余额上限、当天已完成、长条件和加载中，共 42 个快照。命令及场景定义见 [历史浏览任务专项预览](HISTORY_TASK_QA.md)。
 
-运行 `node tools/ui-preview/check-layout.mjs <输出目录>`，通过独立无界面的 Chromium 检查该目录清单内的场景（默认 72 个；提醒专项 24 个；新鲜度专项 15 个；兑换专项 21 个），并生成 `layout-metrics.json` 和代表截图 `screenshots/`。不打开或操作用户的桌面窗口。
+运行 `node tools/ui-preview/check-layout.mjs <输出目录>`，通过独立无界面的 Chromium 检查该目录清单内的场景（默认 84 个；提醒专项 24 个；新鲜度专项 15 个；兑换专项 21 个），并生成 `layout-metrics.json` 和代表截图 `screenshots/`。不打开或操作用户的桌面窗口。
 
 - 检查横向溢出、被裁切的文本、缺失的关键商品/门店/价格文案与图片加载状态。
 - 表达式求值失败会写入 `evaluation-errors.json` 并让构建失败，不会默默把文案清空。
 - 检查脚本优先使用项目的 Playwright，未安装时使用 Codex 已提供的工作区依赖；不自动安装软件。
 - 需要产品颜色图片证据时：构建添加 `--remote-images --part-number <目录中的准确SKU>`，检查添加 `--images-only`。这会读取官方图片网址，但仍不会调用业务云函数或执行支付、提醒操作。
 - 截图和测量只能证明这些模拟状态下的浏览器布局。原生小程序组件、权限和真实接口仍需在微信环境验收。
+
+## 配置面板与深色模式
+
+`--sheets-only` 生成查询、小哨、历史三个入口的配置面板，覆盖编辑、模拟键盘、长内容和保存中四种状态 × 三种宽度，共 36 个快照。使用实际 `config-sheet`、`target-picker` 的 WXML/WXSS 和选项数据；支持默认与具名 slot 的布局近似。原生返回拦截、输入法、slot 实例查找及触摸行为仍需真机检查。
+
+```powershell
+node tools/ui-preview/build.mjs --sheets-only --out output/ux-r1/sheets
+node tools/ui-preview/check-layout.mjs output/ux-r1/sheets
+node tools/ui-preview/check-layout.mjs output/ux-r1/sheets --dark
+node tools/ui-preview/check-theme-colors.mjs output/ux-r1/pages output/ux-r1
+node tools/ui-preview/check-theme-colors.mjs output/ux-r1/pages output/ux-r1 --dark
+```
+
+布局检查的 `--dark` 使用浏览器深色配色偏好，另存 `layout-metrics-dark.json` 与 `screenshots-dark/`。对比度脚本在 375 像素的会员/免费页面抽样可见控件，不是完整无障碍认证；须查看报告中的失败数量。

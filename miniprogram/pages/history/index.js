@@ -10,6 +10,21 @@ const { shareAppMessage, shareTimeline } = require('../../utils/share');
 const SELECTION_KEY = 'gxs_history_selection_v1';
 const SOURCE_TEXT = { auto: '自动监测', manual: '手动查询' };
 
+function selectionKey(value) {
+  return `${value && value.partNumber || ''}|${[...new Set(value && value.storeNumbers || [])].sort().join(',')}`;
+}
+
+function selectionSummary(selection, catalog) {
+  const product = selection && catalog && catalog.productByPart && Object.prototype.hasOwnProperty.call(catalog.productByPart, selection.partNumber) ? catalog.productByPart[selection.partNumber] : null;
+  if (!product) return null;
+  const numbers = selection.storeNumbers || [];
+  const stores = numbers.map(number => typeof number === 'string' && /^R\d{3}$/.test(number) && Object.prototype.hasOwnProperty.call(catalog.storeByNumber, number) ? catalog.storeByNumber[number] : null).filter(Boolean);
+  const valid = !selection.invalidStoredScope && numbers.length <= 10 && new Set(numbers).size === numbers.length && stores.length === numbers.length;
+  return { title: product.title, imageUrl: product.imageUrl || '', valid,
+    scopeText: !valid ? '已保存门店信息发生变化，请修改后查询'
+      : stores.length ? stores.map(store => storeLabel(store.storeNumber, store.name)).join('、') : '各地已有记录 · 未限定门店' };
+}
+
 function presentHistory(response, catalog) {
   const now = Date.now();
   const storeName = (n, fallback) => storeLabel(n, fallback || (catalog && catalog.storeByNumber[n] ? catalog.storeByNumber[n].name : n));
@@ -92,6 +107,15 @@ Page({
     catalogVersion: '',
     boot: null,
     pickerValue: null,
+    selectionSummary: null,
+    selectionNeedsReview: false,
+    sheetVisible: false,
+    draftValue: null,
+    draftDirty: false,
+    draftSummary: '',
+    browseExpanded: false,
+    coverageExpanded: false,
+    resultTargetDifferent: false,
     dayKey: fmt.todayKey(),
     today: fmt.todayKey(),
     earliestDay: fmt.retentionStartKey(),
@@ -121,7 +145,14 @@ Page({
       const account = getBootstrap(); account.catch(() => {});
       const initialCatalog = await getCatalog();
       const catalog = getApp().globalData.catalog || initialCatalog; this.catalog = catalog;
-      this.setData({ catalogVersion: catalog.version, ready: true, pickerValue, loadError: null });
+      const product = pickerValue && Object.prototype.hasOwnProperty.call(catalog.productByPart, pickerValue.partNumber) ? catalog.productByPart[pickerValue.partNumber] : null;
+      const storeNumbers = pickerValue && Array.isArray(pickerValue.storeNumbers) ? pickerValue.storeNumbers.slice() : [];
+      this.selection = { partNumber: pickerValue && pickerValue.partNumber || null, product: product || null,
+        invalidStoredScope: Boolean(pickerValue && !Array.isArray(pickerValue.storeNumbers)),
+        storeNumbers, stores: storeNumbers.map(number => catalog.storeByNumber[number]).filter(Boolean) };
+      const summary = selectionSummary(this.selection, catalog);
+      this.setData({ catalogVersion: catalog.version, ready: true, pickerValue, loadError: null, selectionSummary: summary,
+        selectionNeedsReview: Boolean(pickerValue && (!summary || !summary.valid)) });
       try { this.applyBoot(await account); this.applyCatalog(await getCatalog()); this.loadBrowse(); }
       catch (error) { this.setData({ accountReady: false, accountError: '账户连接暂未完成，可以先选择历史查询条件。' }); }
     } catch (error) {
@@ -148,7 +179,11 @@ Page({
 
   applyCatalog(catalog) {
     this.catalog = catalog;
-    if (this.data.ready && this.data.catalogVersion !== catalog.version) this.setData({ catalogVersion: catalog.version });
+    if (this.data.ready) {
+      const summary = selectionSummary(this.selection, catalog);
+      this.setData({ catalogVersion: catalog.version, selectionSummary: summary,
+        selectionNeedsReview: Boolean(this.selection.partNumber && (!summary || !summary.valid)) });
+    }
   },
 
   async onRetryAccount() {
@@ -251,7 +286,7 @@ Page({
     this.historyRequest = null;
     this.historySnapshot = null;
     this.selection = { ...pickerValue, product, stores };
-    this.setData({ pickerValue, dayKey: item.dayKey,
+    this.setData({ pickerValue, dayKey: item.dayKey, selectionSummary: selectionSummary(this.selection, catalog), selectionNeedsReview: false, resultTargetDifferent: false,
       result: null, moreError: null, restriction: null, restoreWarning: false,
       restoreNotice: '查询条件已恢复，尚未查询，也未扣次。请核对后点击「查看历史」，查询时按账户规则计次。' });
     try { wx.setStorageSync(localKey(SELECTION_KEY), pickerValue); } catch (error) { /* the restored form remains usable */ }
@@ -273,7 +308,8 @@ Page({
 
   onPickerChange(e) {
     this.selection = e.detail;
-    this.setData({ restriction: null });
+    const summary = selectionSummary(e.detail, this.catalog);
+    this.setData({ restriction: null, selectionSummary: summary, selectionNeedsReview: Boolean(e.detail.partNumber && (!summary || !summary.valid)), resultTargetDifferent: this.hasDifferentResult(e.detail) });
     const restored = this.restoredSelection;
     if (!restored || restored.partNumber !== e.detail.partNumber || JSON.stringify(restored.storeNumbers.slice().sort()) !== JSON.stringify((e.detail.storeNumbers || []).slice().sort())) {
       this.restoredSelection = null;
@@ -284,14 +320,64 @@ Page({
 
   onDateChange(e) {
     this.restoredSelection = null;
-    this.setData({ dayKey: e.detail.value, restriction: null, restoreNotice: null, restoreWarning: false });
+    this.setData({ dayKey: e.detail.value, restriction: null, restoreNotice: null, restoreWarning: false, resultTargetDifferent: this.hasDifferentResult(this.selection, e.detail.value) });
   },
 
+  hasDifferentResult(selection = this.selection, dayKey = this.data.dayKey) {
+    return Boolean(this.historyRequest && (this.historyRequest.dayKey !== dayKey || selectionKey(this.historyRequest) !== selectionKey(selection)));
+  },
+
+  onEditSelection() {
+    if (this.data.querying || this.data.loadingMore) return;
+    this.draftBaseline = selectionKey(this.selection);
+    this.draftSelection = null;
+    this.setData({ sheetVisible: true, draftDirty: false,
+      draftValue: { partNumber: this.selection.partNumber, storeNumbers: this.selection.storeNumbers.slice() },
+      draftSummary: this.data.selectionSummary ? this.data.selectionSummary.title : '门店可不选，展示该配置各地已有记录' });
+  },
+
+  onDraftChange(e) {
+    if (!this.data.sheetVisible) return;
+    this.draftSelection = e.detail;
+    this.setData({ draftDirty: selectionKey(e.detail) !== this.draftBaseline,
+      draftSummary: e.detail.product ? `${e.detail.product.title} · ${e.detail.storeNumbers.length ? e.detail.storeNumbers.length + ' 家门店' : '各地已有记录'}` : '请选择具体配置' });
+  },
+
+  readDraftSelection() {
+    const picker = typeof this.selectComponent === 'function' && this.selectComponent('#history-target-picker');
+    return picker && typeof picker.getSelection === 'function' ? picker.getSelection() : this.draftSelection || this.selection;
+  },
+
+  onRequestCloseSelection() {
+    const sheet = typeof this.selectComponent === 'function' && this.selectComponent('#history-config-sheet');
+    if (sheet && typeof sheet.requestClose === 'function') sheet.requestClose(selectionKey(this.readDraftSelection()) !== this.draftBaseline);
+  },
+
+  onCloseSelection() {
+    this.draftSelection = null;
+    this.setData({ sheetVisible: false, draftValue: null, draftDirty: false });
+  },
+
+  onDoneSelection() {
+    if (this.data.querying || this.data.loadingMore) return;
+    const draft = this.readDraftSelection();
+    const summary = selectionSummary(draft, this.catalog);
+    if (!summary) return toast('请先选择有效配置');
+    if (!summary.valid) return toast('请核对门店后重试');
+    this.onPickerChange({ detail: draft });
+    this.onCloseSelection();
+  },
+
+  onToggleBrowse() { this.setData({ browseExpanded: !this.data.browseExpanded }); },
+  onToggleCoverage() { this.setData({ coverageExpanded: !this.data.coverageExpanded }); },
+
   async onQuery() {
+    if (this.data.sheetVisible) return;
     if (this.data.querying || this.data.loadingMore) return;
     if (!this.data.boot) return toast('账户正在连接，请稍后再试');
     const picker = typeof this.selectComponent === 'function' && this.selectComponent('#history-target-picker');
     if (picker && typeof picker.getSelection === 'function') this.onPickerChange({ detail: picker.getSelection() });
+    if (this.data.selectionNeedsReview) return toast('请先修改并核对已保存的配置与门店');
     const { boot, dayKey } = this.data, selection = this.selection;
     if (!selection.partNumber) return toast('请先选择具体配置');
     // Let the server distinguish insufficient funds from an already-debited
@@ -310,7 +396,7 @@ Page({
       }
       this.historyRequest = { historyQueryId, ...payload };
       this.historySnapshot = response;
-      this.setData({ result: presentHistory(response, this.catalog), 'boot.balance': response.balance, moreError: null });
+      this.setData({ result: presentHistory(response, this.catalog), 'boot.balance': response.balance, moreError: null, coverageExpanded: false, resultTargetDifferent: this.hasDifferentResult() });
       if (boot.taskAvailable) this.completeTask();
     } catch (error) {
       if (!operation.uncertain(error)) operation.finish('h');
