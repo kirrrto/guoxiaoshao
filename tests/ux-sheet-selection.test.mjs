@@ -178,7 +178,7 @@ for (const kind of ['query', 'history']) {
       rt.storage.set(`gxs_${kind}_selection_v1`, saved);
       const page = rt.instance(`pages/${kind}/index.js`);
       await page.onLoad();
-      assert.equal(page.data.selectionNeedsReview, true, `${kind}: ${JSON.stringify(storeNumbers)}`);
+      assert.equal(page.selectionNeedsReview, true, `${kind}: ${JSON.stringify(storeNumbers)}`);
       if (Array.isArray(storeNumbers)) assert.deepEqual(copy(page.selection.storeNumbers), storeNumbers, 'invalid scopes stay intact until explicitly repaired');
       assert.deepEqual(rt.storage.get(`gxs_${kind}_selection_v1`), saved);
       await page.onQuery();

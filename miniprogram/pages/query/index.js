@@ -59,6 +59,10 @@ function selectionDetails(selection, catalog, maxStores) {
   } : null };
 }
 
+function selectionNeedsReview(selection, valid) {
+  return Boolean(selection && (selection.partNumber || selection.storeNumbers && selection.storeNumbers.length) && !valid);
+}
+
 function presentResults(response, catalog) {
   const now = Date.now();
   return (response.results || []).map(r => {
@@ -97,10 +101,7 @@ Page({
     loadError: null,
     catalogVersion: '',
     boot: null,
-    pickerValue: null,
-    selectionExpanded: true,
     selectionCanCollapse: false,
-    selectionNeedsReview: false,
     selectionSummary: null,
     selectionImageFailed: false,
     sheetVisible: false,
@@ -144,11 +145,10 @@ Page({
       const restored = selectionDetails(pickerValue, catalog, 3);
       const result = cached && cached.product ? { ...cached, product: withImageFit({ ...cached.product, ...(catalog.productByPart[cached.product.partNumber] || {}) }), results: presentResults(cached, catalog), queriedText: fmt.fmtDateTime(cached.queriedAt) } : null;
       this.selection = selection;
+      this.selectionNeedsReview = selectionNeedsReview(selection, restored.valid);
       this.setData({
         catalogVersion: catalog.version,
         ready: true,
-        pickerValue,
-        selectionExpanded: !restored.valid,
         selectionCanCollapse: restored.valid,
         selectionSummary: restored.summary,
         selectionImageFailed: false,
@@ -270,6 +270,7 @@ Page({
   applyBoot(boot) {
     const maxStores = boot.limits ? boot.limits.queryMaxStores : 3;
     const summary = this.selectionView(this.selection, maxStores);
+    this.selectionNeedsReview = selectionNeedsReview(this.selection, summary.selectionCanCollapse);
     this.setData({
       ...summary,
       accountReady: true,
@@ -293,6 +294,7 @@ Page({
     this.catalog = catalog;
     if (!this.data.ready) return;
     const patch = this.selectionView(this.selection);
+    this.selectionNeedsReview = selectionNeedsReview(this.selection, patch.selectionCanCollapse);
     if (this.data.catalogVersion !== catalog.version) patch.catalogVersion = catalog.version;
     this.setData(patch);
   },
@@ -310,7 +312,9 @@ Page({
     const selection = e.detail;
     if (targetKey(selection) !== targetKey(this.selection)) this.onSelectionInteraction();
     this.selection = selection;
-    this.setData({ restriction: null, restrictionReason: null, ...this.selectionView(selection) });
+    const view = this.selectionView(selection);
+    this.selectionNeedsReview = selectionNeedsReview(selection, view.selectionCanCollapse);
+    this.setData({ restriction: null, restrictionReason: null, ...view });
     try { wx.setStorageSync(localKey(SELECTION_KEY), { partNumber: selection.partNumber, storeNumbers: selection.storeNumbers }); } catch (err) { /* ignore */ }
   },
 
@@ -318,9 +322,7 @@ Page({
     const details = selectionDetails(selection, this.catalog, maxStores || 3);
     return {
       selectionCanCollapse: details.valid,
-      selectionNeedsReview: Boolean(selection && (selection.partNumber || selection.storeNumbers && selection.storeNumbers.length) && !details.valid),
       selectionSummary: details.summary,
-      selectionExpanded: this.data.selectionExpanded || !details.valid,
       selectionImageFailed: details.summary && this.data.selectionSummary && details.summary.imageUrl === this.data.selectionSummary.imageUrl ? this.data.selectionImageFailed : false,
       resultTargetDifferent: resultHasDifferentTarget(this.data.result, selection),
     };
@@ -332,7 +334,7 @@ Page({
     this.onSelectionInteraction();
     this.draftSelection = null;
     this.draftBaseline = targetKey(this.selection);
-    this.setData({ selectionExpanded: true, sheetVisible: true, draftDirty: false,
+    this.setData({ sheetVisible: true, draftDirty: false,
       draftValue: { partNumber: this.selection.partNumber, storeNumbers: this.selection.storeNumbers.slice() },
       draftSummary: this.data.selectionSummary ? this.data.selectionSummary.title : '选好配置与门店后保存，不会立即查询' });
   },
@@ -357,7 +359,7 @@ Page({
 
   onCloseSelection() {
     this.draftSelection = null;
-    this.setData({ sheetVisible: false, draftValue: null, draftDirty: false, selectionExpanded: !this.data.selectionCanCollapse });
+    this.setData({ sheetVisible: false, draftValue: null, draftDirty: false });
   },
 
   onDoneSelection() {
@@ -367,7 +369,7 @@ Page({
     this.onPickerChange({ detail: selection });
     this.onSelectionInteraction();
     this.draftSelection = null;
-    this.setData({ ...patch, selectionExpanded: false, sheetVisible: false, draftValue: null, draftDirty: false });
+    this.setData({ ...patch, sheetVisible: false, draftValue: null, draftDirty: false });
   },
 
   onToggleRules() { this.setData({ rulesExpanded: !this.data.rulesExpanded }); },
@@ -407,7 +409,7 @@ Page({
   async onQuery() {
     if (this.data.sheetVisible) return;
     const selection = this.readPickerSelection();
-    if (this.data.selectionNeedsReview) return toast('请先修改并核对已保存的配置与门店');
+    if (this.selectionNeedsReview) return toast('请先修改并核对已保存的配置与门店');
     // Must run inside the tap, before any await (WeChat gesture rule).
     topUpReminderCredit();
     return this.performQuery(selection);

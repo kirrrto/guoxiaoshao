@@ -162,7 +162,6 @@ Page({
     saving: false,
     subscription: { templateCount: 0, credits: 0 },
     delivery: { label: '正在确认', cls: 'muted', detail: '' },
-    settings: { notifyEnabled: true },
     showServiceDetails: false,
     readiness: { code: 'loading', title: '正在检查提醒条件', detail: '正在读取账户与关注状态。', tone: 'muted', action: '', actionLabel: '', activeCount: 0, storeCount: 0, ready: false },
     refreshing: false,
@@ -348,12 +347,12 @@ Page({
     const member = boot.membership.active, expired = !member && Boolean(boot.membership.expiresAt);
     // Sell-out alerts are a member feature on their own template, requested in the same prompt.
     const soldout = member && templateIds.length ? soldoutSubscription(notifications, boot.subscriptions) : { templateId: null, credits: 0 };
+    this.settings = boot.settings || { notifyEnabled: true };
     this.setData({
       // freeReminder: a new account's one free alert; freeReminderUsed: it was sent and there is no membership.
       boot: { member, expired, freeReminder: !member && boot.freeReminder === true, freeReminderUsed: !member && !expired && boot.freeReminder === false, expiresAt: boot.membership.expiresAt, expiresText: boot.membership.expiresAt ? fmt.fmtDate(boot.membership.expiresAt) : null, notificationsEnabled: notifications.enabled, notificationReason: delivery.detail, templateIds, soldoutId: soldout.templateId, requestIds: soldout.templateId ? [...templateIds, soldout.templateId] : templateIds, templateTitle: typeof notifications.templateTitle === 'string' ? notifications.templateTitle.trim() : '', memberProduct: boot.memberProduct },
       collector: { ...collector, ...fmt.collectorMeta(collector.state), detail: DETECTION_DETAIL[collector.state] || '暂未取得后台检测状态，请稍后刷新。', updatedText: collector.updatedAt ? fmt.fmtDateTime(collector.updatedAt) : null, batchText: collector.lastBatchAt ? fmt.fmtDateTime(collector.lastBatchAt) : null },
       delivery,
-      settings: boot.settings || { notifyEnabled: true },
       limits: boot.limits || this.data.limits,
       subscription: { ...subscription, soldoutEnabled: Boolean(soldout.templateId), soldoutCredits: soldout.credits },
       ...pageData,
@@ -395,7 +394,7 @@ Page({
 
   refreshReadiness() {
     if (this.pageRetired) return;
-    const readiness = reminderReadiness(this.data);
+    const readiness = reminderReadiness({ ...this.data, settings: this.settings });
     this.setData({ readiness, readinessTaskDetail: readinessTaskDetail(readiness) });
   },
 

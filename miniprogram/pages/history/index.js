@@ -103,9 +103,7 @@ Page({
     loadError: null,
     catalogVersion: '',
     boot: null,
-    pickerValue: null,
     selectionSummary: null,
-    selectionNeedsReview: false,
     sheetVisible: false,
     draftValue: null,
     draftDirty: false,
@@ -126,7 +124,6 @@ Page({
     browseError: null,
     browse: null,
     taskMessage: null,
-    taskWarning: false,
     restoreNotice: null,
     restoreWarning: false,
   },
@@ -150,8 +147,8 @@ Page({
         invalidStoredScope: Boolean(pickerValue && !Array.isArray(pickerValue.storeNumbers)),
         storeNumbers, stores: storeNumbers.map(number => catalog.storeByNumber[number]).filter(Boolean) };
       const summary = selectionSummary(this.selection, catalog);
-      this.setData({ catalogVersion: catalog.version, ready: true, pickerValue, loadError: null, selectionSummary: summary,
-        selectionNeedsReview: Boolean(pickerValue && (!summary || !summary.valid)) });
+      this.selectionNeedsReview = Boolean(pickerValue && (!summary || !summary.valid));
+      this.setData({ catalogVersion: catalog.version, ready: true, loadError: null, selectionSummary: summary });
       try { this.applyBoot(await account); this.applyCatalog(await getCatalog()); this.loadBrowse(); }
       catch (error) { this.setData({ accountReady: false, accountError: '账户连接暂未完成，可以先选择历史查询条件。' }); }
     } catch (error) {
@@ -180,8 +177,8 @@ Page({
     this.catalog = catalog;
     if (this.data.ready) {
       const summary = selectionSummary(this.selection, catalog);
-      this.setData({ catalogVersion: catalog.version, selectionSummary: summary,
-        selectionNeedsReview: Boolean(this.selection.partNumber && (!summary || !summary.valid)) });
+      this.selectionNeedsReview = Boolean(this.selection.partNumber && (!summary || !summary.valid));
+      this.setData({ catalogVersion: catalog.version, selectionSummary: summary });
     }
   },
 
@@ -285,7 +282,8 @@ Page({
     this.historyRequest = null;
     this.historySnapshot = null;
     this.selection = { ...pickerValue, product, stores };
-    this.setData({ pickerValue, dayKey: item.dayKey, selectionSummary: selectionSummary(this.selection, catalog), selectionNeedsReview: false, resultTargetDifferent: false,
+    this.selectionNeedsReview = false;
+    this.setData({ dayKey: item.dayKey, selectionSummary: selectionSummary(this.selection, catalog), resultTargetDifferent: false,
       result: null, moreError: null, restriction: null, restoreWarning: false,
       restoreNotice: '查询条件已恢复，尚未查询，也未扣次。请核对后点击「查看历史」，查询时按账户规则计次。' });
     try { wx.setStorageSync(localKey(SELECTION_KEY), pickerValue); } catch (error) { /* the restored form remains usable */ }
@@ -300,15 +298,15 @@ Page({
       reward_disabled: '浏览已完成，当前体验任务奖励暂未开放。',
     };
     this.setData({ 'boot.taskAvailable': !done && result.reason !== 'reward_disabled', 'boot.balance': result.quota.balance,
-      taskMessage: result.granted > 0 ? `今日浏览任务完成，+${result.granted} 次，已计入次数明细。` : messages[result.reason] || (done ? messages.already_completed : '奖励暂未确认，请重试。'),
-      taskWarning: !done });
+      taskMessage: result.granted > 0 ? `今日浏览任务完成，+${result.granted} 次，已计入次数明细。` : messages[result.reason] || (done ? messages.already_completed : '奖励暂未确认，请重试。') });
     if (result.granted > 0) toast(`体验任务完成，+${result.granted} 次`, 'success');
   },
 
   onPickerChange(e) {
     this.selection = e.detail;
     const summary = selectionSummary(e.detail, this.catalog);
-    this.setData({ restriction: null, selectionSummary: summary, selectionNeedsReview: Boolean(e.detail.partNumber && (!summary || !summary.valid)), resultTargetDifferent: this.hasDifferentResult(e.detail) });
+    this.selectionNeedsReview = Boolean(e.detail.partNumber && (!summary || !summary.valid));
+    this.setData({ restriction: null, selectionSummary: summary, resultTargetDifferent: this.hasDifferentResult(e.detail) });
     const restored = this.restoredSelection;
     if (!restored || restored.partNumber !== e.detail.partNumber || JSON.stringify(restored.storeNumbers.slice().sort()) !== JSON.stringify((e.detail.storeNumbers || []).slice().sort())) {
       this.restoredSelection = null;
@@ -376,7 +374,7 @@ Page({
     if (!this.data.boot) return toast('账户正在连接，请稍后再试');
     const picker = typeof this.selectComponent === 'function' && this.selectComponent('#history-target-picker');
     if (picker && typeof picker.getSelection === 'function') this.onPickerChange({ detail: picker.getSelection() });
-    if (this.data.selectionNeedsReview) return toast('请先修改并核对已保存的配置与门店');
+    if (this.selectionNeedsReview) return toast('请先修改并核对已保存的配置与门店');
     const { boot, dayKey } = this.data, selection = this.selection;
     if (!selection.partNumber) return toast('请先选择具体配置');
     // Let the server distinguish insufficient funds from an already-debited
