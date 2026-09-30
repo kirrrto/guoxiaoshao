@@ -23,7 +23,7 @@
       <view class="account-header-content">
         <view class="account-header-heading">
           <text class="account-brand">果小哨</text>
-          <text class="pill account-status {{membership.active ? 'pill-ok' : 'pill-muted'}}">{{membership.active ? '会员' : (membership.expired ? '会员已到期' : '免费用户')}}</text>
+          <text class="account-status {{membership.active ? 'member-badge' : 'pill pill-muted'}}">{{membership.active ? '会员' : (membership.expired ? '会员已到期' : '免费用户')}}</text>
         </view>
         <button class="ui-action ui-action--neutral identity-copy" hover-class="ui-control-pressed" bindtap="onCopyId" aria-label="复制用户编号"><text class="ui-action-label">用户 {{boot.identity.openidMasked}}</text><text class="identity-copy-label">复制</text></button>
       </view>
