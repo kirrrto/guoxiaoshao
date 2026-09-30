@@ -4,6 +4,30 @@ import { runtime } from './helpers/miniprogram-runtime.mjs';
 
 const boot = () => ({ identity: { isAdmin: false }, membership: { active: false }, quota: { balance: 1, queryCost: 1, historyCost: 1, tasksDoneToday: [] }, limits: { queryMaxStores: 3, maxFollows: 3, maxStoresPerFollow: 3 }, collector: { state: 'not_deployed' }, notifications: { templateIds: {} }, tasks: [], memberProduct: {} });
 
+for (const name of ['query', 'history']) {
+  test(`${name} owns independent selection state before asynchronous startup`, async () => {
+    const rt = runtime(async action => {
+      if (action === 'catalog.get') return { unchanged: true };
+      throw Error('account offline');
+    });
+    const first = rt.instance(`pages/${name}/index.js`);
+    const second = rt.instance(`pages/${name}/index.js`);
+    const firstLoad = first.onLoad();
+    const secondLoad = second.onLoad();
+    assert.ok(first.selection && second.selection, 'logic state is ready before the first asynchronous result');
+    assert.notEqual(first.selection, second.selection);
+    assert.notEqual(first.selection.storeNumbers, second.selection.storeNumbers);
+    assert.notEqual(first.selection.stores, second.selection.stores);
+    first.selection.storeNumbers.push('R577');
+    assert.equal(second.selection.storeNumbers.length, 0);
+    assert.equal(Object.hasOwn(first.data, 'selection'), false, 'logic state stays off the rendering bridge');
+    await Promise.all([firstLoad, secondLoad]);
+    assert.equal(first.data.ready, true, 'the public catalog remains usable while the account is offline');
+    assert.ok(first.data.accountError);
+    first.onUnload(); second.onUnload();
+  });
+}
+
 test('cold catalog is usable while cloud is unresolved and concurrent callers share one refresh', async () => {
   let resolve;
   const rt = runtime(() => new Promise(r => { resolve = r; }));

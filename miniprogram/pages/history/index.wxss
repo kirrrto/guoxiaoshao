@@ -6,18 +6,20 @@
 .event-time { width: 160rpx; flex: none; color: var(--text-2); font-size: 23rpx; padding-top: 4rpx; font-variant-numeric: tabular-nums; white-space: nowrap; word-break: normal; }
 .event-body { flex: 1; min-width: 0; }
 .history-selection-card > .card-title { padding-bottom: 20rpx; border-bottom: 1rpx solid var(--line); margin-bottom: 8rpx; }
-.history-selection-card > .card-title .sub { padding: 7rpx 16rpx; background: var(--surface-soft); color: var(--green-dark); border-radius: 999rpx; }
+.history-selection-card > .card-title { align-items: center; }
+.history-explain { flex: 0 0 auto; }
 .history-result-card > .section-label { font-weight: 600; color: var(--text-2); margin-top: 28rpx; }
 .latest-row { padding: 20rpx 0; }
 .event-body .row-between { gap: 10rpx; }
 .event-body .row-between > text:first-child { flex-basis: 120rpx; }
-.date-field { flex-wrap: wrap; gap: 12rpx; }
-.date-field .label { flex: 1 1 100%; max-width: 100%; font-size: 24rpx; }
-.date-field .row { flex: 1 1 100%; justify-content: space-between; }
-.date-field .value { max-width: 100%; text-align: left; font-variant-numeric: tabular-nums; }
+.history-date-control { display: flex; align-items: center; justify-content: space-between; gap: 24rpx; min-height: 44px; box-sizing: border-box; margin-top: 24rpx; padding: 20rpx 24rpx; border: 1rpx solid var(--line); border-radius: 12px; background: var(--surface-soft); color: var(--text-2); }
+.history-date-copy { display: flex; flex-direction: column; gap: 8rpx; flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.history-date-label { font-size: 24rpx; line-height: 1.5; }
+.history-date-value { color: var(--text); font-size: 28rpx; font-weight: 600; line-height: 1.5; font-variant-numeric: tabular-nums; }
+.history-date-control--disabled { opacity: .55; }
 .history-recent { display: flex; align-items: center; gap: 16rpx; }
 .history-recent-copy { flex: 1; min-width: 0; overflow-wrap: anywhere; }
-.history-restore.btn { flex: 0 0 auto; min-width: 76px; min-height: 44px; max-width: 42%; }
+.history-restore { flex: 0 0 auto; min-width: 76px; max-width: 44%; }
 .history-scope-note { text-align: left; line-height: 1.7; }
 .history-data-notice { margin-top: 24rpx; padding: 24rpx; background: var(--surface-soft); border: 1rpx solid var(--line); border-radius: 24rpx; }
 .history-data-title { font-size: 30rpx; font-weight: 600; line-height: 1.5; color: var(--text); }
@@ -26,3 +28,11 @@
 .history-coverage-row:last-of-type { border-bottom: none; }
 .history-latest-card .latest-row > view:first-child { flex: 1; min-width: 0; }
 .history-data-notice, .history-coverage-row, .history-latest-card { overflow-wrap: anywhere; }
+.history-config-summary { display: flex; gap: 24rpx; align-items: center; padding: 24rpx 0 8rpx; }
+.history-config-copy { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.history-config-title { font-size: 32rpx; font-weight: 600; line-height: 1.5; }
+.history-edit { flex: none; min-width: 68px; }
+.history-config-empty { padding: 24rpx 0 8rpx; }
+.history-task-note { margin: 0 12rpx 24rpx; }
+.history-disclosure { margin: 24rpx 0 16rpx; }
+.history-result-card .history-data-notice { padding: 20rpx; }

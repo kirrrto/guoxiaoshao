@@ -62,8 +62,8 @@
     },
     {
       "path": "engine/notifier.js",
-      "bytes": 13462,
-      "sha256": "c0cf4a007b6f81a7c06e7b9b7cc247d2155550a7c99bf11b280e6b9fbee47a74"
+      "bytes": 13572,
+      "sha256": "82d053774f9b718b8828104164c40694365b747ffd1494165f142a700c09359a"
     },
     {
       "path": "engine/observation-day.js",
@@ -106,14 +106,19 @@
       "sha256": "b056fd588e6ccc40436d552523d9ab798e49b176feabe1d7b285491b737a6505"
     },
     {
+      "path": "notification-target.js",
+      "bytes": 1617,
+      "sha256": "6b3fa390471f3dce27cfd7b695c204e9b1d2e946b86321b64991c8653117eff7"
+    },
+    {
       "path": "notification-view.js",
       "bytes": 2521,
       "sha256": "d5745dcd17f16dc9dd10fb9b08d2e5eabd1eb75da0480a0358a3ef1755a575d6"
     },
     {
       "path": "repo/atomic-ops.js",
-      "bytes": 43598,
-      "sha256": "3b41c05a09dd9fa10aacac51bde0ee4e7bf0ab3c01393988d1c25af9c107e942"
+      "bytes": 45183,
+      "sha256": "cfd974cd64da06a297ea725f280cfd276dbce31fd93e0cac6bb9f12d4f7f5230"
     },
     {
       "path": "repo/cloudbase-repo.js",

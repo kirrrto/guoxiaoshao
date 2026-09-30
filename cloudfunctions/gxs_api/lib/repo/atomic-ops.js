@@ -17,6 +17,7 @@ const { assertConfigEditor, makeConfigAudit } = require('../config-audit');
 const { CAMPAIGN, MAX_FAILURES, LOCK_MS, CLAIMS_ID, matchesCodeHash, attemptsId } = require('../member-redemption');
 const { upstreamGuardMethods, reserveAccountQuery, releaseAccountQuery } = require('./upstream-guard');
 const subscriptionCredits = require('./subscription-credit-ledger');
+const { matchesNotificationTarget, nextFollowUpdatedAt } = require('../notification-target');
 
 async function applyLedgerIn(tx, entry) {
   const user = await tx.get(C.users, entry.userKey);
@@ -324,11 +325,30 @@ function atomicMethods(run) {
         if (!existing || existing.userKey !== userKey || existing.status === 'removed') throw new ApiError('unknown_follow', '关注不存在');
         next = { ...existing, status, statusReason: status === 'active' ? null : 'user', updatedAt: nowIso };
       }
+      next.updatedAt = nextFollowUpdatedAt(existing, nowIso);
       user.followIndex = index.filter(f => f._id !== id);
       if (next.status !== 'removed') user.followIndex.push({ _id: id, partNumber: next.partNumber, status: next.status });
       await tx.put(C.users, user);
       await tx.put(C.follows, next);
       return next;
+    }),
+
+    recordNotificationFeedback: ({ userKey, taskId, outcome, nowIso, knownFollows = [] }) => run(async tx => {
+      const task = await tx.get(C.notifications, taskId);
+      if (!task || task.userKey !== userKey || task.userHiddenAt) throw new ApiError('notification_not_found', '这条提醒已过期或已删除');
+      if (!['bought', 'missed', 'skipped'].includes(outcome)) throw new ApiError('invalid_feedback', '请选择有效的反馈');
+      const follow = outcome === 'bought' && task.followId ? await tx.get(C.follows, task.followId) : null;
+      const paused = Boolean(follow && follow.status === 'active' && matchesNotificationTarget(task, follow));
+      if (paused) {
+        const user = await tx.get(C.users, userKey);
+        if (!user) throw new ApiError('user_missing', '用户不存在');
+        const index = user.followIndex || knownFollows.filter(f => f.status !== 'removed').map(f => ({ _id: f._id, partNumber: f.partNumber, status: f.status }));
+        user.followIndex = [...index.filter(f => f._id !== follow._id), { _id: follow._id, partNumber: follow.partNumber, status: 'paused' }];
+        await tx.put(C.users, user);
+        await tx.put(C.follows, { ...follow, status: 'paused', statusReason: 'user', updatedAt: nextFollowUpdatedAt(follow, nowIso) });
+      }
+      await tx.put(C.notifications, { ...task, feedback: { outcome, at: nowIso } });
+      return { outcome, paused };
     }),
 
     fulfilMembershipOrder: ({ orderId, source, nowIso }) => run(async tx => {

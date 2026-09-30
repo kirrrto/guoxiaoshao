@@ -1,0 +1,16 @@
+<page-container wx:if="{{nativeGuardSupported}}" show="{{nativeGuardShow}}" overlay="{{false}}" duration="{{0}}" position="bottom" close-on-slide-down="{{false}}" custom-style="height:1px;min-height:0;background:transparent;pointer-events:none;" bindafterleave="onNativeLeave" aria-hidden="true" />
+<view wx:if="{{visible}}" class="config-sheet-root">
+  <view class="config-sheet-scrim" catchtap="onCloseTap" catchtouchmove="stopTouch" aria-hidden="true"></view>
+  <view class="config-sheet-panel" style="bottom: {{keyboardHeight}}px; max-height: calc(100vh - {{keyboardHeight}}px - 64px);" role="dialog" aria-modal="true" aria-label="{{title}}">
+    <view class="config-sheet-header">
+      <view class="config-sheet-heading"><view class="config-sheet-title">{{title}}</view><view wx:if="{{subtitle}}" class="config-sheet-subtitle">{{subtitle}}</view></view>
+      <button class="config-sheet-close" disabled="{{busy}}" bindtap="onCloseTap" aria-label="关闭配置面板">×</button>
+    </view>
+    <scroll-view class="config-sheet-body" scroll-y enhanced show-scrollbar="{{true}}"><view class="config-sheet-content"><slot /></view></scroll-view>
+    <view class="config-sheet-footer {{keyboardHeight ? 'config-sheet-keyboard' : ''}}">
+      <view wx:if="{{summary}}" class="config-sheet-summary">{{summary}}</view>
+      <slot name="notice" />
+      <button class="btn btn-primary btn-block config-sheet-confirm" disabled="{{busy || disabled}}" loading="{{busy}}" bindtap="onConfirm">{{busy ? '正在保存…' : confirmText}}</button>
+    </view>
+  </view>
+</view>

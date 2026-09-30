@@ -34,7 +34,7 @@ function select(page, partNumber = otherProduct.partNumber, storeNumbers = ['R57
 
 test('valid saved selection opens as a compact exact-product and store summary without querying', async () => {
   const { rt, page, scrolls } = await opened();
-  assert.equal(page.data.selectionExpanded, false);
+  assert.equal(page.data.sheetVisible, false);
   assert.equal(page.data.selectionCanCollapse, true);
   assert.equal(page.selection.partNumber, product.partNumber);
   assert.deepEqual(copy(page.selection.storeNumbers), ['R577', 'R639']);
@@ -47,7 +47,7 @@ test('valid saved selection opens as a compact exact-product and store summary w
   page.onUnload();
 });
 
-test('first visit and invalid or incomplete saved selections stay expanded for review', async () => {
+test('first visit and invalid or incomplete saved selections require explicit repair before querying', async () => {
   const unsupported = seed.products.find(p => !p.supported);
   for (const value of [null, { partNumber: 'REMOVED', storeNumbers: ['R577'] },
     { partNumber: unsupported.partNumber, storeNumbers: ['R577'] },
@@ -55,39 +55,42 @@ test('first visit and invalid or incomplete saved selections stay expanded for r
     { partNumber: product.partNumber, storeNumbers: ['REMOVED'] },
     { partNumber: product.partNumber, storeNumbers: ['R577', 'REMOVED'] }]) {
     const { rt, page } = await opened({ value });
-    assert.equal(page.data.selectionExpanded, true, JSON.stringify(value));
+    assert.equal(page.data.selectionCanCollapse, false, JSON.stringify(value));
+    assert.equal(page.data.sheetVisible, false, 'loading a saved scope does not open an editor');
+    await page.onQuery();
     assert.equal(rt.calls.filter(call => call.action === 'query.pickup').length, 0);
     page.onUnload();
   }
 });
 
-test('explicit editing retains the mounted picker value and catalog refresh never closes it', async () => {
+test('explicit editing retains the draft picker value and catalog refresh never closes it', async () => {
   const { rt, page } = await opened();
-  const pickerValue = copy(page.data.pickerValue);
   page.onEditSelection();
-  assert.equal(page.data.selectionExpanded, true);
+  const pickerValue = copy(page.data.draftValue);
+  assert.equal(page.data.sheetVisible, true);
   select(page);
   page.applyCatalog({ ...page.catalog, version: `${page.catalog.version}-refresh` });
-  assert.equal(page.data.selectionExpanded, true);
+  assert.equal(page.data.sheetVisible, true);
   assert.equal(page.selection.partNumber, otherProduct.partNumber);
-  assert.deepEqual(copy(page.data.pickerValue), pickerValue, 'opening and closing must not reapply the original picker value');
+  assert.deepEqual(copy(page.data.draftValue), pickerValue, 'catalog refresh must not reset the mounted picker value');
   page.onDoneSelection();
-  assert.equal(page.data.selectionExpanded, false);
+  assert.equal(page.data.sheetVisible, false);
   assert.equal(page.data.selectionSummary.title, otherProduct.title);
   assert.deepEqual(rt.storage.get('gxs_query_selection_v1'), { partNumber: otherProduct.partNumber, storeNumbers: ['R577'] });
   assert.equal(rt.calls.filter(call => call.action === 'query.pickup').length, 0);
   page.onUnload();
 });
 
-test('a disappeared catalog SKU expands its summary and cannot be silently confirmed', async () => {
+test('a disappeared catalog SKU requires review and cannot be silently confirmed', async () => {
   const { page, rt } = await opened();
   const productByPart = { ...page.catalog.productByPart };
   delete productByPart[product.partNumber];
   page.applyCatalog({ ...page.catalog, productByPart, version: 'removed-sku' });
-  assert.equal(page.data.selectionExpanded, true);
+  assert.equal(page.selectionNeedsReview, true);
   assert.equal(page.data.selectionCanCollapse, false);
+  page.onEditSelection();
   page.onDoneSelection();
-  assert.equal(page.data.selectionExpanded, true);
+  assert.equal(page.data.sheetVisible, true);
   assert.match(rt.messages.at(-1), /有效门店/);
   assert.equal(rt.calls.filter(call => call.action === 'query.pickup').length, 0);
   page.onUnload();
@@ -147,7 +150,7 @@ test('editing while a query is pending preserves the new selection and cancels l
   ticks.splice(0).forEach(callback => callback());
   assert.equal(scrolls.length, 0);
   assert.equal(page.selection.partNumber, otherProduct.partNumber);
-  assert.equal(page.data.selectionExpanded, false);
+  assert.equal(page.data.sheetVisible, false);
   assert.equal(page.data.result.product.partNumber, product.partNumber);
   assert.equal(page.data.resultTargetDifferent, true);
   page.onUnload();

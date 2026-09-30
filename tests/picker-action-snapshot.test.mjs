@@ -35,10 +35,11 @@ test('follow-from-query transfers the current picker selection before its deferr
   assert.deepEqual(copy(rt.app.globalData.pendingFollow), { partNumber: 'MFHE4CH/A', storeNumbers: ['R765'] });
 });
 
-test('collapsing the query picker confirms its latest selection', () => {
+test('saving the query sheet confirms its latest selection', () => {
   const { page } = setup('pages/query/index.js');
+  page.onEditSelection();
   page.onDoneSelection();
   assert.equal(page.selection.partNumber, 'MFHE4CH/A');
   assert.deepEqual(copy(page.selection.storeNumbers), ['R765']);
-  assert.equal(page.data.selectionExpanded, false);
+  assert.equal(page.data.sheetVisible, false);
 });

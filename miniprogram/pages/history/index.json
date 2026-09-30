@@ -2,6 +2,7 @@
   "navigationBarTitleText": "果小哨 · 历史记录",
   "enablePullDownRefresh": true,
   "usingComponents": {
-    "target-picker": "/components/target-picker/index"
+    "target-picker": "/components/target-picker/index",
+    "config-sheet": "/components/config-sheet/index"
   }
 }

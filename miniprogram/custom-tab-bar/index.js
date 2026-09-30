@@ -5,6 +5,7 @@ Component({
   data: {
     selected: 0,
     keyboardHidden: false,
+    sheetHidden: false,
     offline: false,
     tabs: TABS,
   },
@@ -14,6 +15,7 @@ Component({
       this._tabAttached = true;
       this._tabVisible = true;
       this.syncRoute(getCurrentTabPath());
+      this.syncOverlay();
       // Show an offline notice; the visible page reloads when the phone reconnects.
       this._unsubscribeNetwork = subscribeNetwork((online, restored) => {
         if (!this._tabAttached) return;
@@ -46,11 +48,21 @@ Component({
     show() {
       this._tabVisible = true;
       this.syncRoute(getCurrentTabPath());
+      this.syncOverlay();
     },
     hide() { this._tabVisible = false; },
   },
 
   methods: {
+    syncOverlay() {
+      // A tab bar can attach after its page already opened an editor. Derive the
+      // current overlay state instead of relying on an earlier setData callback.
+      const pages = typeof getCurrentPages === 'function' ? getCurrentPages() : [];
+      const page = pages[pages.length - 1];
+      const state = page && page.data || {};
+      const sheetHidden = Boolean(state.sheetVisible || state.editing || state.redemptionOpen);
+      if (sheetHidden !== this.data.sheetHidden) this.setData({ sheetHidden });
+    },
     syncRoute(pagePath) {
       const selected = tabIndex(pagePath);
       if (selected < 0) return;
@@ -62,6 +74,7 @@ Component({
       if (page && typeof page.onNetworkRestored === 'function') page.onNetworkRestored();
     },
     onTabTap(event) {
+      if (this.data.sheetHidden) return false;
       return navigateToTab(this, event.currentTarget.dataset.index);
     },
   },

@@ -86,6 +86,7 @@ function presentFollow(follow, boot, catalog, collector) {
     else if (!collector || collector.state !== 'running') monitoringText = '关注已保存，后台检测情况见上方';
   }
   const product = catalog && catalog.productByPart && catalog.productByPart[follow.partNumber];
+  const stores = (follow.stores || []).map(s => ({ ...s, storeName: storeLabel(s.storeNumber, s.storeName), storeLabel: storeLabelWithCity(s.storeNumber, s.storeName, s.city), ...fmt.stockObservation(s, now, { restricted: follow.latestRestricted }) }));
   return {
     ...follow,
     imageUrl: product && product.imageUrl || '',
@@ -93,8 +94,45 @@ function presentFollow(follow, boot, catalog, collector) {
     statusLabel: status.label,
     statusCls: status.cls,
     monitoringText,
-    stores: (follow.stores || []).map(s => ({ ...s, storeName: storeLabel(s.storeNumber, s.storeName), storeLabel: storeLabelWithCity(s.storeNumber, s.storeName, s.city), ...fmt.stockObservation(s, now, { restricted: follow.latestRestricted }) })),
+    hasAvailable: stores.some(s => s.observationState === 'fresh' && s.status === 'available'),
+    detailsExpanded: follow.detailsExpanded === true,
+    stores,
   };
+}
+
+// A refresh changes content, not where the user was looking. New rows are appended.
+function retainFollowOrder(incoming, previous) {
+  const byId = new Map(incoming.map(follow => [follow.followId, follow]));
+  const ordered = [];
+  for (const old of previous) {
+    const follow = byId.get(old.followId);
+    if (!follow) continue;
+    ordered.push({ ...follow, detailsExpanded: old.detailsExpanded === true });
+    byId.delete(old.followId);
+  }
+  return ordered.concat([...byId.values()]);
+}
+
+function selectionKey(selection) {
+  return JSON.stringify([selection && selection.partNumber || '', [...new Set(selection && selection.storeNumbers || [])].sort()]);
+}
+
+function readinessTaskDetail(readiness) {
+  return {
+    membership: '关注配置和剩余提醒次数会保留，可在「我的」查看会员。',
+    collector_idle: '关注已保存，等待后台下一轮检测，无需重复添加。',
+    collector_unready: '关注已保存；后台恢复后继续检测，无需重复添加。',
+    delivery_unready: '后台仍在检测，消息发送恢复前暂时收不到微信提醒。',
+    template_missing: '关注会保留，服务配置完成后才能授权和发送微信提醒。',
+    user_disabled: '后台检测继续，开启消息开关后才能收到提醒。',
+    dnd: '后台检测继续；免打扰期间不发消息，也不补发旧提醒。',
+  }[readiness.code] || readiness.detail;
+}
+
+function followActionError(error, action) {
+  // Transport errors have no trustworthy write result; business rejections do.
+  if (error && error.code && !['call_failed', 'bad_response', 'timeout', 'request_timeout'].includes(error.code)) return error.message || `${action}未完成，请稍后重试。`;
+  return `${action}结果尚未确认，请刷新状态后再试。`;
 }
 
 function confirmsSavedFollow(follow, payload) {
@@ -118,11 +156,12 @@ Page({
     editing: false,
     editor: { followId: null, pickerValue: null, isNew: true },
     editorCanSave: false,
+    editorDirty: false,
+    editorSummary: '',
     saveError: '',
     saving: false,
     subscription: { templateCount: 0, credits: 0 },
     delivery: { label: '正在确认', cls: 'muted', detail: '' },
-    settings: { notifyEnabled: true },
     showServiceDetails: false,
     readiness: { code: 'loading', title: '正在检查提醒条件', detail: '正在读取账户与关注状态。', tone: 'muted', action: '', actionLabel: '', activeCount: 0, storeCount: 0, ready: false },
     refreshing: false,
@@ -132,6 +171,10 @@ Page({
     refreshedText: null,
     alert: null,
     alertBusy: false,
+    followBusyId: '',
+    followActionError: '',
+    followActionId: '',
+    readinessTaskDetail: '',
   },
 
   async onLoad(options) {
@@ -176,8 +219,8 @@ Page({
     this.startPolling();
   },
 
-  onHide() { this.visible = false; this.stopPolling(); },
-  onUnload() { this.pageRetired = true; this.visible = false; this.stopPolling(); if (this.unsubscribeCatalog) this.unsubscribeCatalog(); if (this.unsubscribeCredits) this.unsubscribeCredits(); },
+  onHide() { this.visible = false; this.serviceDetailsFocusEpoch = (this.serviceDetailsFocusEpoch || 0) + 1; this.stopPolling(); },
+  onUnload() { this.pageRetired = true; this.visible = false; this.serviceDetailsFocusEpoch = (this.serviceDetailsFocusEpoch || 0) + 1; this.stopPolling(); if (this.unsubscribeCatalog) this.unsubscribeCatalog(); if (this.unsubscribeCredits) this.unsubscribeCredits(); },
 
   onShareAppMessage() {
     return shareAppMessage('/pages/follow/index', this.data);
@@ -269,7 +312,7 @@ Page({
         this.setData({ 'alert.feedback': result.outcome, 'alert.followActive': alert.followActive && !result.paused });
         if (this.visible !== false) {
           if (outcome === 'bought') confirmTap();
-          toast(result.paused ? '恭喜买到！已暂停这条关注' : FEEDBACK_TOAST[outcome]);
+          toast(result.paused ? '恭喜买到！已暂停这条关注' : outcome === 'bought' ? '已记录买到反馈，当前关注未暂停' : FEEDBACK_TOAST[outcome]);
         }
       }
       if (result.paused && this.visible !== false) {
@@ -295,6 +338,7 @@ Page({
   },
 
   applyBoot(boot, pageData = {}) {
+    if (this.pageRetired) return;
     const notifications = boot.notifications || {};
     const subscription = restockSubscription(notifications, boot.subscriptions);
     const templateIds = subscription.templateIds;
@@ -303,12 +347,12 @@ Page({
     const member = boot.membership.active, expired = !member && Boolean(boot.membership.expiresAt);
     // Sell-out alerts are a member feature on their own template, requested in the same prompt.
     const soldout = member && templateIds.length ? soldoutSubscription(notifications, boot.subscriptions) : { templateId: null, credits: 0 };
+    this.settings = boot.settings || { notifyEnabled: true };
     this.setData({
       // freeReminder: a new account's one free alert; freeReminderUsed: it was sent and there is no membership.
       boot: { member, expired, freeReminder: !member && boot.freeReminder === true, freeReminderUsed: !member && !expired && boot.freeReminder === false, expiresAt: boot.membership.expiresAt, expiresText: boot.membership.expiresAt ? fmt.fmtDate(boot.membership.expiresAt) : null, notificationsEnabled: notifications.enabled, notificationReason: delivery.detail, templateIds, soldoutId: soldout.templateId, requestIds: soldout.templateId ? [...templateIds, soldout.templateId] : templateIds, templateTitle: typeof notifications.templateTitle === 'string' ? notifications.templateTitle.trim() : '', memberProduct: boot.memberProduct },
       collector: { ...collector, ...fmt.collectorMeta(collector.state), detail: DETECTION_DETAIL[collector.state] || '暂未取得后台检测状态，请稍后刷新。', updatedText: collector.updatedAt ? fmt.fmtDateTime(collector.updatedAt) : null, batchText: collector.lastBatchAt ? fmt.fmtDateTime(collector.lastBatchAt) : null },
       delivery,
-      settings: boot.settings || { notifyEnabled: true },
       limits: boot.limits || this.data.limits,
       subscription: { ...subscription, soldoutEnabled: Boolean(soldout.templateId), soldoutCredits: soldout.credits },
       ...pageData,
@@ -326,7 +370,8 @@ Page({
     const generation = this.followReadGeneration || 0;
     const pending = getFollows(options).then(data => {
       if (this.pageRetired || generation !== (this.followReadGeneration || 0)) return;
-      this.setData({ follows: data.follows.filter(f => f.status !== 'removed').map(f => presentFollow(f, this.data.boot || {}, this.catalog, this.data.collector)), followsLoaded: true, limits: data.limits, loadError: null, refreshError: null, refreshedText: fmt.fmtTime(Date.now()) });
+      const incoming = data.follows.filter(f => f.status !== 'removed').map(f => presentFollow(f, this.data.boot || {}, this.catalog, this.data.collector));
+      this.setData({ follows: retainFollowOrder(incoming, this.data.follows), followsLoaded: true, limits: data.limits, loadError: null, refreshError: null, followActionError: '', followActionId: '', refreshedText: fmt.fmtTime(Date.now()) });
       this.refreshReadiness();
       this.consumePendingFocus();
     });
@@ -341,14 +386,16 @@ Page({
   },
 
   refreshFollowPresentation() {
+    if (this.pageRetired) return;
     this.refreshReadiness();
     if (!this.data.follows.length) return;
     this.setData({ follows: this.data.follows.map(f => presentFollow(f, this.data.boot || {}, this.catalog, this.data.collector)) });
   },
 
   refreshReadiness() {
-    const readiness = reminderReadiness(this.data);
-    this.setData({ readiness });
+    if (this.pageRetired) return;
+    const readiness = reminderReadiness({ ...this.data, settings: this.settings });
+    this.setData({ readiness, readinessTaskDetail: readinessTaskDetail(readiness) });
   },
 
   onReadinessAction() {
@@ -379,16 +426,28 @@ Page({
   },
 
   async onRefreshStatus() {
-    if (this.data.refreshing) return;
+    if (this.pageRetired || this.data.refreshing) return;
     topUpReminderCredit();
     this.setData({ refreshing: true });
-    try { this.applyBoot(await getBootstrap({ force: true })); await this.loadFollows({ force: true }); }
-    catch (error) { this.setData({ refreshError: '刷新失败，已保留上次状态。请稍后重试。' }); showError(error); }
-    finally { this.setData({ refreshing: false }); }
+    try { this.applyBoot(await getBootstrap({ force: true })); if (!this.pageRetired) await this.loadFollows({ force: true }); }
+    catch (error) { if (!this.pageRetired) { this.setData({ refreshError: '刷新失败，已保留上次状态。请稍后重试。' }); showError(error); } }
+    finally { if (!this.pageRetired) this.setData({ refreshing: false }); }
   },
 
   onToggleServiceDetails() {
-    if (!this.pageRetired) this.setData({ showServiceDetails: !this.data.showServiceDetails });
+    if (this.pageRetired) return;
+    const showServiceDetails = !this.data.showServiceDetails;
+    const epoch = this.serviceDetailsFocusEpoch = (this.serviceDetailsFocusEpoch || 0) + 1;
+    this.setData({ showServiceDetails });
+    if (!showServiceDetails || typeof wx.nextTick !== 'function' || typeof wx.pageScrollTo !== 'function') return;
+    const canFocus = () => !this.pageRetired && this.visible && this.data.showServiceDetails && this.serviceDetailsFocusEpoch === epoch;
+    if (!canFocus()) return;
+    try {
+      wx.nextTick(() => {
+        if (!canFocus()) return;
+        try { wx.pageScrollTo({ selector: '#reminder-service-details', duration: 220, fail() {} }); } catch (e) { /* scrolling is optional; keep the details open */ }
+      });
+    } catch (e) { /* older runtimes retain the current scroll position */ }
   },
 
   onServiceDetails() {
@@ -404,7 +463,9 @@ Page({
     }
     this.editorEpoch = (this.editorEpoch || 0) + 1;
     this.editorSelection = null;
-    this.setData({ editing: true, editor: { followId, pickerValue, isNew }, editorCanSave: false, saveError: '' });
+    this.editorBaseline = pickerValue ? selectionKey(pickerValue) : null;
+    const value = pickerValue ? { partNumber: pickerValue.partNumber, storeNumbers: (pickerValue.storeNumbers || []).slice() } : null;
+    this.setData({ editing: true, editor: { followId, pickerValue: value, isNew }, editorCanSave: false, editorDirty: false, editorSummary: '', saveError: '' });
   },
 
   showMemberModal() {
@@ -419,6 +480,7 @@ Page({
   },
 
   onAdd() {
+    if (this.data.saving || this.data.followBusyId) return;
     if (this.data.follows.length >= this.data.limits.maxFollows) {
       if (!this.data.boot.freeReminder) return toast(`最多同时关注 ${this.data.limits.maxFollows} 个机型`);
       return wx.showModal({ title: '免费体验可关注 1 个配置', content: '开通会员可关注 3 个具体配置，每个配置最多 3 家门店，并可累加到货提醒次数。', confirmText: '前往我的', success: r => { if (r.confirm) this.onGoMine(); } });
@@ -427,22 +489,42 @@ Page({
   },
 
   onEdit(e) {
+    if (this.data.saving || this.data.followBusyId) return;
     const follow = this.data.follows.find(f => f.followId === e.currentTarget.dataset.id);
     if (!follow) return;
     this.openEditor({ followId: follow.followId, pickerValue: { partNumber: follow.partNumber, storeNumbers: follow.stores.map(s => s.storeNumber) }, isNew: false });
   },
 
   onCancelEdit() {
+    if (this.data.saving || this.pageRetired) return;
     this.editorEpoch = (this.editorEpoch || 0) + 1;
     this.editorSelection = null;
-    this.setData({ editing: false, editorCanSave: false, saveError: '' });
+    this.editorBaseline = null;
+    this.setData({ editing: false, editorCanSave: false, editorDirty: false, editorSummary: '', saveError: '' });
+  },
+
+  onRequestCloseEditor() {
+    if (this.pageRetired || this.data.saving || !this.data.editing) return;
+    const sheet = typeof this.selectComponent === 'function' && this.selectComponent('#follow-config-sheet');
+    const picker = typeof this.selectComponent === 'function' && this.selectComponent('#follow-target-picker');
+    const current = picker && typeof picker.getSelection === 'function' ? picker.getSelection() : this.editorSelection;
+    const dirty = this.editorBaseline === null ? Boolean(current && current.storeNumbers && current.storeNumbers.length) : selectionKey(current) !== this.editorBaseline;
+    if (sheet && typeof sheet.requestClose === 'function') return sheet.requestClose(dirty);
+    if (!dirty) return this.onCancelEdit();
+    const epoch = this.editorEpoch;
+    wx.showModal({ title: '放弃这次修改？', content: '已保存的关注不会改变。', confirmText: '放弃修改', cancelText: '继续编辑', success: result => { if (result.confirm && epoch === this.editorEpoch) this.onCancelEdit(); } });
   },
 
   onEditorChange(e) {
     if (this.pageRetired || !this.data.editing) return;
     // The selection is logic state; only its validity needs the render bridge.
     const selection = this.editorSelection = e.detail;
-    this.setData({ editorCanSave: Boolean(selection && selection.partNumber && selection.product && selection.product.supported && Array.isArray(selection.storeNumbers) && selection.storeNumbers.length), saveError: '' });
+    // New pickers choose a default product, but never choose stores themselves.
+    // A coalesced first event may already contain the user's first store tap.
+    if (this.editorBaseline === null) this.editorBaseline = selectionKey({ ...selection, storeNumbers: [] });
+    const title = selection && selection.product && selection.product.title || '请选择具体配置';
+    const count = selection && Array.isArray(selection.storeNumbers) ? selection.storeNumbers.length : 0;
+    this.setData({ editorCanSave: Boolean(selection && selection.partNumber && selection.product && selection.product.supported && count), editorDirty: selectionKey(selection) !== this.editorBaseline, editorSummary: `${title} · ${count} 家门店`, saveError: '' });
   },
 
   async onSave() {
@@ -466,10 +548,13 @@ Page({
       if (!confirmsSavedFollow(result && result.follow, payload)) throw Object.assign(new Error('保存结果尚未确认，请重试。'), { code: 'bad_response' });
       if (this.pageRetired) return;
       const follow = presentFollow(result.follow, this.data.boot || {}, this.catalog, this.data.collector);
-      const follows = this.data.follows.filter(item => item.followId !== follow.followId && item.followId !== payload.followId);
-      follows.push(follow);
+      const follows = this.data.follows.slice();
+      const savedIndex = follows.findIndex(item => item.followId === follow.followId || item.followId === payload.followId);
+      if (savedIndex >= 0) follows[savedIndex] = { ...follow, detailsExpanded: follows[savedIndex].detailsExpanded === true };
+      else follows.push(follow);
       const sameEditor = epoch === this.editorEpoch;
-      this.setData({ follows, ...(sameEditor ? { editing: false, editorCanSave: false } : {}) });
+      if (sameEditor) { this.editorSelection = null; this.editorBaseline = null; }
+      this.setData({ follows, ...(sameEditor ? { editing: false, editorCanSave: false, editorDirty: false } : {}) });
       this.refreshReadiness();
       if (sameEditor && this.visible !== false) {
         confirmTap();
@@ -602,41 +687,102 @@ Page({
   },
 
   async onToggle(e) {
-    if (this.toggling) return;
+    if (this.toggling || this.pageRetired || this.data.saving || this.data.followBusyId) return;
     if (!canRemind(this.data.boot)) { this.showMemberModal(); return; }
-    this.toggling = true;
     const { id, status } = e.currentTarget.dataset;
+    const existing = this.data.follows.find(follow => follow.followId === id);
+    if (!existing) return;
+    this.toggling = true;
+    const nextStatus = (existing.status || status) === 'active' ? 'paused' : 'active';
+    this.setData({ followBusyId: id, followActionId: '', followActionError: '' });
     try {
-      await call(status === 'active' ? 'follow.pause' : 'follow.resume', { followId: id });
+      const result = await call(nextStatus === 'paused' ? 'follow.pause' : 'follow.resume', { followId: id });
       this.invalidateFollowRead();
-      await this.loadFollows();
+      if (this.pageRetired) return;
+      const acknowledged = result && result.follow && result.follow.followId === id && result.follow.status === nextStatus;
+      if (acknowledged) {
+        this.setData({ follows: this.data.follows.map(follow => follow.followId === id ? presentFollow({ ...result.follow, detailsExpanded: follow.detailsExpanded }, this.data.boot, this.catalog, this.data.collector) : follow) });
+        this.refreshReadiness();
+      }
+      if (this.visible === false) return;
+      try { await this.loadFollows(); }
+      catch (error) {
+        if (!this.pageRetired) this.setData({ refreshError: acknowledged ? `${nextStatus === 'paused' ? '已暂停' : '已恢复'}关注，最新观测读取失败，请刷新确认。` : '操作已提交，当前状态待确认，请刷新查看。' });
+      }
     } catch (error) {
-      showError(error);
-    } finally { this.toggling = false; }
+      this.invalidateFollowRead();
+      if (!this.pageRetired) {
+        this.setData({ followActionId: id, followActionError: followActionError(error, '操作') });
+        if (this.visible !== false) showError(error);
+      }
+    } finally { this.toggling = false; if (!this.pageRetired) this.setData({ followBusyId: '' }); }
   },
 
   onRemove(e) {
+    if (this.pageRetired || this.data.saving || this.data.followBusyId || this.removing) return;
     const id = e.currentTarget.dataset.id;
+    if (!this.data.follows.some(follow => follow.followId === id)) return;
+    this.removing = true;
     wx.showModal({
       title: '删除关注',
-      content: '删除后将停止监测该机型，已产生的历史记录会保留。',
+      content: '删除后停止这条关注并释放名额，已产生的历史记录会保留。',
       confirmColor: '#D64545',
       success: async r => {
-        if (!r.confirm) return;
+        if (!r.confirm || this.pageRetired) { this.removing = false; return; }
+        this.setData({ followBusyId: id, followActionId: '', followActionError: '' });
         try {
-          await call('follow.remove', { followId: id });
+          const result = await call('follow.remove', { followId: id });
           this.invalidateFollowRead();
-          await this.loadFollows();
+          if (this.pageRetired) return;
+          const acknowledged = result && result.removed === true && result.followId === id;
+          if (acknowledged) {
+            this.setData({ follows: this.data.follows.filter(follow => follow.followId !== id) });
+            this.refreshReadiness();
+          }
           refreshBootstrap().catch(() => {});
+          if (this.visible === false) return;
+          try { await this.loadFollows(); }
+          catch (error) { if (!this.pageRetired) this.setData({ refreshError: acknowledged ? '关注已删除，列表刷新失败，请下拉刷新。' : '删除操作已提交，结果待确认，请刷新查看。' }); }
         } catch (error) {
-          showError(error);
+          this.invalidateFollowRead();
+          if (!this.pageRetired) {
+            this.setData({ followActionId: id, followActionError: followActionError(error, '删除') });
+            if (this.visible !== false) showError(error);
+          }
+        } finally {
+          this.removing = false;
+          if (!this.pageRetired) this.setData({ followBusyId: '' });
         }
       },
+      fail: () => { this.removing = false; },
     });
+  },
+
+  onToggleFollowDetails(e) {
+    const index = this.data.follows.findIndex(follow => follow.followId === e.currentTarget.dataset.id);
+    if (index >= 0) this.setData({ [`follows[${index}].detailsExpanded`]: !this.data.follows[index].detailsExpanded });
+  },
+
+  onPickupInfo(e) {
+    if (this.pageRetired) return;
+    const follow = this.data.follows.find(item => item.followId === e.currentTarget.dataset.id);
+    if (!follow) return;
+    const current = presentFollow(follow, this.data.boot || {}, this.catalog, this.data.collector);
+    const stores = current.stores.filter(store => store.observationState === 'fresh' && store.status === 'available');
+    this.refreshFollowPresentation();
+    if (!stores.length) return toast('观测已过期，请刷新后再确认');
+    wx.showModal({ title: '最近观测可取货', content: `${follow.productTitle}\n${stores.map(store => `${store.storeLabel}\n观测 ${store.observedText}${typeof store.quote === 'string' && store.quote ? '\n' + store.quote : ''}`).join('\n\n')}\n\n库存可能变化，请在 Apple Store App 或官网确认。`, confirmText: '复制配置', cancelText: '返回', success: result => {
+      if (result.confirm && !this.pageRetired) wx.setClipboardData({ data: `${follow.productTitle}\n型号：${follow.partNumber}\n门店：${stores.map(store => store.storeLabel).join('、')}`, success: () => toast('已复制型号和门店'), fail: () => toast('复制失败，请重试') });
+    } });
   },
 
   onGoMine() {
     wx.switchTab({ url: '/pages/mine/index' });
+  },
+
+  onGoReminderSettings() {
+    getApp().globalData.pendingMineSection = 'reminder-settings';
+    this.onGoMine();
   },
 
   onFollowImageError(e) { const index = Number(e.currentTarget.dataset.index); this.setData({ [`follows[${index}].imageUrl`]: '' }); },

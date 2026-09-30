@@ -15,10 +15,11 @@ async function alerted() {
   const f = createFixture({ config });
   ok(await f.call('user.bootstrap'));
   await f.repo.updateUser(userKeyOf(), { membership: { expiresAt: '2026-10-15T00:00:00.000Z' }, subscriptions: { TPL: { credits: 2 } } });
-  await f.repo.saveFollow({ _id: FOLLOW, userKey: userKeyOf(), partNumber: 'MJYH4CH/A', storeNumbers: ['R577'], status: 'active' });
+  await f.repo.saveFollow({ _id: FOLLOW, userKey: userKeyOf(), partNumber: 'MJYH4CH/A', storeNumbers: ['R577'], status: 'active', updatedAt: f.state.now.toISOString() });
   await f.repo.recordObservation({ observation: { storeNumber: 'R577', partNumber: 'MJYH4CH/A', status: 'available', observedAt: f.state.now.toISOString(), source: 'auto', quote: '今天可取货' } });
   const task = { _id: `${userKeyOf()}|${EVENT}`, userKey: userKeyOf(), followId: FOLLOW, eventId: EVENT, eventType: 'restock_confirmed', partNumber: 'MJYH4CH/A',
-    storeNumber: 'R577', storeName: '天环广场', templateId: 'TPL', status: 'pending', attempts: 0, createdAt: f.state.now.toISOString(), detectedAt: f.state.now.toISOString() };
+    storeNumber: 'R577', storeName: '天环广场', templateId: 'TPL', status: 'pending', attempts: 0, createdAt: f.state.now.toISOString(), detectedAt: f.state.now.toISOString(),
+    targetSnapshot: { partNumber: 'MJYH4CH/A', storeNumbers: ['R577'], updatedAt: f.state.now.toISOString() } };
   await f.repo.saveNotification(task);
   const sends = [];
   const sender = async m => { sends.push(m); return { errcode: 0 }; };
