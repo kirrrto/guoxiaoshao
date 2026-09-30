@@ -14,6 +14,7 @@ const { NOTIFIABLE_TYPES } = require('./events');
 const { canUseReminders, reminderBlockReason, isMember } = require('../rules/membership');
 const { inMinuteWindow } = require('../time');
 const { isValidTemplateId } = require('../config');
+const { targetSnapshot } = require('../notification-target');
 
 const TASK_STATUS = Object.freeze({ pending: 'pending', sending: 'sending', accepted: 'accepted', failed: 'failed', uncertain: 'uncertain', skipped: 'skipped' });
 
@@ -59,6 +60,7 @@ function buildTasks({ events, follows, users, config, now }) {
       const base = {
         _id: taskId(follow.userKey, event._id), userKey: follow.userKey, followId: follow._id, eventId: event._id, eventType: event.type,
         partNumber: event.partNumber, storeNumber: event.storeNumber, storeName: event.storeName || null, productTitle: event.productTitle || follow.productTitle || null,
+        targetSnapshot: targetSnapshot(follow),
         detectedAt: event.detectedAt, createdAt: now.toISOString(), templateId: templateId || null, status: TASK_STATUS.pending, reason: null, sentAt: null, attempts: 0,
       };
       const skip = reason => tasks.push({ ...base, status: TASK_STATUS.skipped, reason });
