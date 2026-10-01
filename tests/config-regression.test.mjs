@@ -4,6 +4,7 @@ import { createFixture, operatorContext } from './helpers/fixture.mjs';
 
 test('invalid runtime values cannot corrupt quota, collector limits or notification mappings', async () => {
   const f = createFixture();
+  const before = await f.repo.getConfig();
   for (const patch of [
     { quota: { queryCost: -1 } }, { quota: { balanceCap: '10' } },
     { collector: { intervalSeconds: 0 } }, { collector: { maxConcurrency: 999 } },
@@ -16,7 +17,7 @@ test('invalid runtime values cannot corrupt quota, collector limits or notificat
   ]) {
     const result = await f.call('admin.updateConfig', { patch }, operatorContext());
     assert.equal(result.ok, false, JSON.stringify(patch));
-    assert.equal(await f.repo.getConfig(), null, 'invalid changes never persist');
+    assert.deepEqual(await f.repo.getConfig(), before, 'invalid changes never persist');
   }
 });
 
@@ -48,7 +49,7 @@ test('concurrent unrelated config patches cannot reopen redemption or erase each
     const config = await f.repo.getConfig();
     assert.equal(config.memberRedemption.enabled, false);
     assert.equal(config.announcement, '更新公告');
-    assert.deepEqual(config.collector, { intervalSeconds: 12, maxConcurrency: 3 });
+    assert.deepEqual(config.collector, { ...staleRouterConfig.collector, intervalSeconds: 12, maxConcurrency: 3 });
     assert.equal((await f.call('member.redeemCode', { code: 'hbw666' })).error.code, 'redemption_disabled');
   }
 });

@@ -376,6 +376,7 @@ function createCloudbaseRepo(db) {
         targetHealth: [col(COLLECTIONS.health).where({ recordedAt: _.lt(cutoffIso) })],
         subscriptionGrants: [col(COLLECTIONS.config).where({ kind: 'subscription_grant', createdAt: _.lt(cutoffIso) })],
         queryGuards: [col(COLLECTIONS.config).where({ kind: 'query_guard', updatedAt: _.lt(cutoffIso) })],
+        queryTargets: [col(COLLECTIONS.config).where({ kind: 'query_target', updatedAt: _.lt(cutoffIso) })],
         budgets: byIds(COLLECTIONS.config, budgetIds),
       };
       const removed = {}, errors = {};

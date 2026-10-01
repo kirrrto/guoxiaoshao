@@ -1,12 +1,15 @@
 'use strict';
 const { ApiError } = require('../errors');
-const { dayKey } = require('../time');
+const { dayKey, startOfDay } = require('../time');
 const { ledgerIds } = require('../rules/quota');
 const { COLLECTIONS } = require('../collections');
 const catalog = require('./catalog');
 const { fulfilOrder } = require('./member');
 const { assertConfigEditor, logConfigAuthorizationDenial } = require('../config-audit');
 const { paymentProviderFor, paymentProduct } = require('../payment/service');
+const { AUTO_SHARE } = require('../engine/capacity-budget');
+const { KNOWN_STATUSES } = require('../engine/events');
+const { monitoringSnapshot } = require('../monitor-readiness');
 
 const ID_PATTERN = /^[A-Za-z0-9_-]{4,64}$/;
 
@@ -87,6 +90,68 @@ async function stats(ctx) {
 const INSIGHT_LIMIT = 2000;
 const WINDOW_BUCKETS = [[60000, '1 分钟内'], [5 * 60000, '1–5 分钟'], [15 * 60000, '5–15 分钟'], [60 * 60000, '15–60 分钟'], [Infinity, '1 小时以上']];
 
+/** Operational snapshot only: no reservations, probes, user creation or refill. */
+async function capacity(ctx) {
+  requireAdmin(ctx);
+  const today = dayKey(ctx.now);
+  const since = startOfDay(today).toISOString();
+  const [snapshot, queries] = await Promise.all([
+    ctx.repo.getUpstreamCapacity({ now: ctx.nowIso }),
+    ctx.repo.listSince(COLLECTIONS.queries, 'createdAt', since, INSIGHT_LIMIT),
+  ]);
+  const finite = value => Number.isFinite(value) && value >= 0 ? value : null;
+  const count = value => Number.isSafeInteger(value) && value >= 0 ? value : 0;
+  const { day, collector, capacity: stored } = snapshot;
+  const total = count(day && day.dayCount);
+  const auto = count(day && day.autoCount);
+  const manual = count(day && day.manualCount);
+  const unclassified = Math.max(0, total - auto - manual);
+  const sourceSplitComplete = unclassified === 0 && auto + manual === total;
+  const uniqueGroups = collector && Number.isSafeInteger(collector.groupCount) && collector.groupCount >= 0 ? collector.groupCount : null;
+  const monitorMode = collector && ['scheduled', 'resident'].includes(collector.mode) ? collector.mode : null;
+  const collectorUpdatedAtMs = collector && Date.parse(collector.updatedAt);
+  const collectorStatusUpdatedAt = Number.isFinite(collectorUpdatedAtMs) ? new Date(collectorUpdatedAtMs).toISOString() : null;
+  const collectorStatusStale = monitoringSnapshot(ctx.config, collector, ctx.now).collector.stale;
+  const normalCadenceSeconds = monitorMode ? Math.max(monitorMode === 'scheduled' ? 60 : 1, ctx.config.collector.intervalSeconds) : null;
+  const configuredNormalRequestsPerDay = uniqueGroups !== null && normalCadenceSeconds
+    ? Math.ceil(uniqueGroups * 86400 / normalCadenceSeconds) : null;
+  const autoRequestsPerDay = ctx.config.collector.budgetMode === 'daily'
+    ? Math.max(1, Math.floor(ctx.config.collector.maxRequestsPerDay * AUTO_SHARE)) : ctx.config.collector.maxRequestsPerDay * AUTO_SHARE;
+  const recordedAtMs = stored && finite(stored.updatedAtMs);
+  const recordedAt = recordedAtMs !== null && stored && Number.isFinite(new Date(recordedAtMs).getTime()) ? new Date(recordedAtMs).toISOString() : null;
+  const lanes = (values, factor = 1) => Object.fromEntries(['shared', 'auto', 'manual'].map(lane => {
+    const value = values && finite(values[lane]);
+    return [lane, value == null ? null : finite(value * factor)];
+  }));
+  const completed = queries.filter(query => query.createdAt <= ctx.nowIso && query.kind === 'live' && ['success', 'failed'].includes(query.status));
+  const reuse = { completedLiveQueries: completed.length, freshTargets: 0, reusedTargets: 0, unclassifiedTargets: 0, unknownTargets: 0 };
+  for (const query of completed) {
+    const results = query.response && Array.isArray(query.response.results) ? query.response.results : [];
+    for (const result of results) {
+      if (!result || !KNOWN_STATUSES.has(result.status)) reuse.unknownTargets++;
+      else if (result.reused === true) reuse.reusedTargets++;
+      else if (result.reused === false) reuse.freshTargets++;
+      else reuse.unclassifiedTargets++;
+    }
+  }
+  const classified = reuse.freshTargets + reuse.reusedTargets;
+  return {
+    mode: ctx.config.collector.budgetMode,
+    maxRequestsPerMinute: ctx.config.collector.maxRequestsPerMinute,
+    sustainedDailyTarget: ctx.config.collector.maxRequestsPerDay,
+    ...(ctx.config.collector.budgetMode === 'daily' ? { hardDailyLimit: ctx.config.collector.maxRequestsPerDay } : {}),
+    collectorEnabled: ctx.config.collector.enabled, monitorMode, uniqueGroups, collectorStatusUpdatedAt, collectorStatusStale,
+    plannedIntervalSeconds: collector && finite(collector.intervalMs) !== null ? collector.intervalMs / 1000 : null,
+    normalCadenceSeconds, configuredNormalRequestsPerDay, autoRequestsPerDay,
+    aboveAutoCapacity: configuredNormalRequestsPerDay === null ? null : configuredNormalRequestsPerDay > autoRequestsPerDay,
+    todayReservations: { date: today, available: Boolean(day), total, auto, manual, unclassified, sourceSplitComplete },
+    tokenSnapshot: stored ? { recordedAt, tokens: lanes(stored.tokens), burstCapacity: lanes(stored.capacities), refillPerSecond: lanes(stored.rates, 1000) } : null,
+    recentQueryReuse: { since, sampleLimit: INSIGHT_LIMIT, sampledRecords: queries.length, truncated: queries.length >= INSIGHT_LIMIT,
+      ...reuse, reuseShareOfClassifiedTargets: classified ? reuse.reusedTargets / classified : null, attributionComplete: reuse.unclassifiedTargets === 0 },
+    serverTime: ctx.nowIso,
+  };
+}
+
 function percentile(sorted, p) {
   return sorted.length ? sorted[Math.min(sorted.length - 1, Math.ceil(p * sorted.length) - 1)] : null;
 }
@@ -151,4 +216,4 @@ async function lookupUser(ctx, payload) {
   return { user: { userKey: user._id, createdAt: user.createdAt, lastSeenAt: user.lastSeenAt, membership: user.membership, quota: user.quota, settings: user.settings, subscriptions: user.subscriptions }, follows };
 }
 
-module.exports = { getConfig, paymentStatus, updateConfig, seedCatalog, grantMembership, grantCredits, stats, insights, lookupUser };
+module.exports = { getConfig, paymentStatus, updateConfig, seedCatalog, grantMembership, grantCredits, stats, capacity, insights, lookupUser };

@@ -3,6 +3,7 @@
 const { createHash, randomUUID } = require('node:crypto');
 const { COLLECTIONS: C } = require('../collections');
 const { dayKey, endOfDay } = require('../time');
+const { CAPACITY_ID, AUTO_SHARE, reserveCapacity } = require('../engine/capacity-budget');
 
 const accountId = userKey => `query_guard_${createHash('sha256').update(userKey).digest('hex')}`;
 async function reserveAccountQuery(tx, { record, ownerId, nowIso, leaseMs, config }) {
@@ -34,8 +35,14 @@ function retryAfterMs(value, now) {
 }
 function upstreamGuardMethods(run) {
   return {
+    getUpstreamCapacity: ({ now }) => run(async tx => ({
+      day: await tx.get(C.config, `collector_budget_${dayKey(now)}`),
+      capacity: await tx.get(C.config, CAPACITY_ID),
+      collector: await tx.get(C.config, 'collector_status'),
+    })),
     // Legacy method name retained; this is now the shared manual + auto budget.
-    consumeCollectorBudget: ({ now, maxRequestsPerMinute, maxRequestsPerDay, source = 'manual' }) => run(async tx => {
+    consumeCollectorBudget: ({ now, maxRequestsPerMinute, maxRequestsPerDay, budgetMode = 'continuous', source = 'manual' }) => run(async tx => {
+      source = source === 'auto' ? 'auto' : 'manual';
       const nowMs = Date.parse(now);
       const breaker = await tx.get(C.config, 'upstream_breaker') || { _id: 'upstream_breaker', generation: 0, trips: 0 };
       if (breaker.until > nowMs) return { allowed: false, reason: 'upstream_paused', retryAt: breaker.until };
@@ -45,20 +52,36 @@ function upstreamGuardMethods(run) {
       const minuteKey = new Date(now).toISOString().slice(0, 16);
       const current = await tx.get(C.config, id) || { _id: id, dayCount: 0 };
       const minuteCount = current.minuteKey === minuteKey ? current.minuteCount || 0 : 0;
-      // Automatic monitoring may use at most 80% of the shared daily budget.
-      // Manual queries still obey the global cap and the shared circuit breaker.
-      const autoLimit = Math.max(1, Math.floor(maxRequestsPerDay * 0.8));
-      if (source === 'auto' && current.dayCount >= autoLimit && current.dayCount < maxRequestsPerDay) {
-        return { allowed: false, reason: 'auto_budget_reserved', retryAt: endOfDay(date).getTime(), minuteCount, dayCount: current.dayCount };
+      const sourceCounts = { auto: current.autoCount || 0, manual: current.manualCount || 0 };
+      let detail = { budgetMode, source, sourceCounts };
+      if (budgetMode === 'daily') {
+        // Explicit compatibility/cost-control mode. This is the only mode that
+        // can stop all queries until the next Beijing calendar day.
+        const autoLimit = Math.max(1, Math.floor(maxRequestsPerDay * AUTO_SHARE));
+        if (source === 'auto' && current.dayCount >= autoLimit && current.dayCount < maxRequestsPerDay) {
+          return { allowed: false, reason: 'auto_budget_reserved', retryAt: endOfDay(date).getTime(), minuteCount, dayCount: current.dayCount, ...detail };
+        }
+        if (current.dayCount >= maxRequestsPerDay) {
+          return { allowed: false, reason: 'daily_budget', retryAt: endOfDay(date).getTime(), minuteCount, dayCount: current.dayCount, ...detail };
+        }
+      } else {
+        const capacity = reserveCapacity(await tx.get(C.config, CAPACITY_ID), { nowMs, maxRequestsPerMinute, maxRequestsPerDay, source,
+          legacyDayCount: current.dayCount, consume: minuteCount < maxRequestsPerMinute });
+        await tx.put(C.config, capacity.state);
+        detail = { ...capacity.detail, sourceCounts };
+        if (!capacity.allowed && minuteCount < maxRequestsPerMinute) {
+          return { allowed: false, reason: 'capacity_wait', retryAt: capacity.retryAt, minuteCount, dayCount: current.dayCount, ...detail };
+        }
       }
-      if (minuteCount >= maxRequestsPerMinute || current.dayCount >= maxRequestsPerDay) {
-        const daily = current.dayCount >= maxRequestsPerDay;
-        return { allowed: false, reason: daily ? 'daily_budget' : 'minute_budget', retryAt: daily ? endOfDay(date).getTime() : Math.floor(nowMs / 60000) * 60000 + 60000, minuteCount, dayCount: current.dayCount };
+      if (minuteCount >= maxRequestsPerMinute) {
+        return { allowed: false, reason: 'minute_budget', retryAt: Math.floor(nowMs / 60000) * 60000 + 60000, minuteCount, dayCount: current.dayCount, ...detail };
       }
       const token = { id: randomUUID(), generation: breaker.generation || 0, probe: Boolean(breaker.until), expiresAt: nowMs + 30000 };
       if (token.probe) await tx.put(C.config, { ...breaker, probeId: token.id, probeUntil: nowMs + 30000, updatedAt: now });
-      await tx.put(C.config, { ...current, minuteKey, minuteCount: minuteCount + 1, dayCount: current.dayCount + 1, updatedAt: now, expiresAt: new Date(nowMs + 7 * 86400000).toISOString() });
-      return { allowed: true, reason: null, minuteCount: minuteCount + 1, dayCount: current.dayCount + 1, token };
+      sourceCounts[source] += 1;
+      await tx.put(C.config, { ...current, minuteKey, minuteCount: minuteCount + 1, dayCount: current.dayCount + 1,
+        autoCount: sourceCounts.auto, manualCount: sourceCounts.manual, updatedAt: now, expiresAt: new Date(nowMs + 7 * 86400000).toISOString() });
+      return { allowed: true, reason: null, minuteCount: minuteCount + 1, dayCount: current.dayCount + 1, ...detail, token };
     }),
     recordUpstreamOutcome: ({ token, record, success, now }) => run(async tx => {
       const state = await tx.get(C.config, 'upstream_breaker') || { _id: 'upstream_breaker', generation: 0, trips: 0 };

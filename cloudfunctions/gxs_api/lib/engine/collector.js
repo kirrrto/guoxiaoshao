@@ -15,6 +15,7 @@ const { createLeaseKeeper } = require('./lease');
 const { recordObservations } = require('./observations');
 const { buildTasks, sendTask, TASK_STATUS, alertKind } = require('./notifier');
 const { targetKeyOf } = require('./events');
+const { AUTO_SHARE, DAY_MS } = require('./capacity-budget');
 
 function createCollector({ repo, fetchImpl, clock = () => new Date(), log = console, sendImpl = null, ownerId = `collector-${process.pid}-${Date.now()}`, sleep = ms => new Promise(resolve => setTimeout(resolve, ms)), refreshEveryMs = 10000, statusEveryMs = 5000, mode = 'resident', minimumIntervalMs = 0, statusTtlMs = 0, shouldContinue = () => true, remainingMs = () => Infinity }) {
   let config = mergeConfig(null);
@@ -149,11 +150,14 @@ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = cons
     const now = clock();
     const eligible = follows.filter(f => users.has(f.userKey) && canUseReminders(users.get(f.userKey), now));
     const groups = config.collector.enabled ? buildGroups(eligible, config.collector.maxPartsPerRequest || 20) : [];
-    // Scheduled scans should last throughout the day as the target count changes.
-    // Resident mode keeps its configured cadence; the guard still reserves capacity.
-    const autoLimit = Math.max(1, Math.floor(config.collector.maxRequestsPerDay * 0.8));
-    const budgetIntervalMs = mode === 'scheduled' ? Math.ceil(groups.length * 86400000 / autoLimit) : 0;
-    scheduler.configure({ intervalMs: Math.min(3600000, Math.max(minimumIntervalMs, config.collector.intervalSeconds * 1000, budgetIntervalMs)), maxConcurrency: config.collector.maxConcurrency, timeoutMs: config.query.upstreamTimeoutMs,
+    // Continuous monitoring in both modes fits the sustainable automatic lane,
+    // independent of user count. Bursts still pass the shared admission guard.
+    // Explicit daily mode retains the previous resident-mode cadence.
+    const autoLimit = config.collector.budgetMode === 'daily'
+      ? Math.max(1, Math.floor(config.collector.maxRequestsPerDay * AUTO_SHARE))
+      : config.collector.maxRequestsPerDay * AUTO_SHARE;
+    const budgetIntervalMs = config.collector.budgetMode === 'daily' && mode !== 'scheduled' ? 0 : Math.ceil(groups.length * DAY_MS / autoLimit);
+    scheduler.configure({ intervalMs: Math.max(minimumIntervalMs, config.collector.intervalSeconds * 1000, budgetIntervalMs), maxConcurrency: config.collector.maxConcurrency, timeoutMs: config.query.upstreamTimeoutMs,
       burstIntervalMs: config.collector.burstIntervalSeconds * 1000, burstQuietMs: config.collector.burstQuietSeconds * 1000 });
     scheduler.setTargets(groups);
     lastRefreshAt = now.getTime();
@@ -198,7 +202,7 @@ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = cons
       inFlight: snap.inFlight,
       intervalMs: snap.intervalMs,
       maxConcurrency: snap.maxConcurrency,
-      budget: { ...budget, maxRequestsPerMinute: config.collector.maxRequestsPerMinute || 60, maxRequestsPerDay: config.collector.maxRequestsPerDay || 10000 },
+      budget: { ...budget, budgetMode: config.collector.budgetMode, maxRequestsPerMinute: config.collector.maxRequestsPerMinute || 60, maxRequestsPerDay: config.collector.maxRequestsPerDay || 10000 },
       notifications: notificationStatus(),
       stats,
       updatedAt: now.toISOString(),

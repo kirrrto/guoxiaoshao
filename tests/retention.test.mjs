@@ -22,7 +22,7 @@ function seeded() {
   put(C.notifications, { _id: 'old-sent', createdAt: old, status: 'accepted' }); put(C.notifications, { _id: 'old-sending', createdAt: old, status: 'sending' }); put(C.notifications, { _id: 'kept-sent', createdAt: kept, status: 'accepted' });
   put(C.health, { _id: 'old-health', recordedAt: old });
   for (const doc of [{ _id: 'old-grant', kind: 'subscription_grant', createdAt: old }, { _id: 'kept-grant', kind: 'subscription_grant', createdAt: kept },
-    { _id: 'old-guard', kind: 'query_guard', updatedAt: old }, { _id: 'collector_budget_2026-09-10', dayCount: 3 }, { _id: 'collector_budget_2026-09-15', dayCount: 3 },
+    { _id: 'old-guard', kind: 'query_guard', updatedAt: old }, { _id: 'old-shared-target', kind: 'query_target', updatedAt: old }, { _id: 'collector_budget_2026-09-10', dayCount: 3 }, { _id: 'collector_budget_2026-09-15', dayCount: 3 },
     { _id: 'runtime', updatedAt: old }, { _id: 'collector_status', updatedAt: old, expiresAt: old }, { _id: 'collector_lease', expiresAt: old },
     { _id: 'payment_receipt-x', kind: 'payment_receipt', createdAt: old }, { _id: 'member_redemption_claims_launch_30d_v1', claimed: 3, updatedAt: old }]) put(C.config, doc);
   put(C.ledger, { _id: 'old-ledger', createdAt: old }); put(C.orders, { _id: 'old-order', createdAt: old });
@@ -44,7 +44,7 @@ test('retention keeps the latest 10 Beijing days and never touches accounts, mon
   assert.deepEqual(ids(repo, C.health), []);
   assert.deepEqual(ids(repo, C.config), ['collector_budget_2026-09-15', 'collector_lease', 'collector_status', 'kept-grant', 'member_redemption_claims_launch_30d_v1', 'payment_receipt-x', 'retention_status', 'runtime']);
   for (const collection of [C.ledger, C.orders, C.users, C.follows, C.latest]) assert.equal(repo.tables.get(collection).size, 1, collection);
-  assert.deepEqual(status.removed, { events: 1, queries: 1, notifications: 1, targetHealth: 1, subscriptionGrants: 1, queryGuards: 1, budgets: 1 });
+  assert.deepEqual(status.removed, { events: 1, queries: 1, notifications: 1, targetHealth: 1, subscriptionGrants: 1, queryGuards: 1, queryTargets: 1, budgets: 1 });
 });
 
 test('retention runs once per Beijing day, only after 04:00, and never fails the monitor', async () => {

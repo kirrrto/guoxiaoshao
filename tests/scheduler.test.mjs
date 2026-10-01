@@ -41,6 +41,76 @@ const follows = [
   { userKey: 'u2', partNumber: 'BBBBBCH/A', storeNumbers: ['R577'] },
 ];
 
+test('capacity recovery time survives cadence changes, hurry and scheduler cold starts', async () => {
+  let nowMs = base, calls = 0;
+  const group = buildGroups([{ partNumber: 'AAAAACH/A', storeNumbers: ['R577'] }]);
+  const create = () => createScheduler({ clock: () => new Date(nowMs), intervalMs: 1000, burstIntervalMs: 2000,
+    fetchPickup: async () => {
+      calls++;
+      return calls === 2 ? { record: { budgetDenied: true, retryAt: base + 60000 }, observations: [] }
+        : { record: { httpStatus: 200 }, observations: [{ storeNumber: 'R577', partNumber: 'AAAAACH/A', status: 'available', observedAt: new Date(nowMs).toISOString() }] };
+    }, onBatch: async () => {}, log: { error() {}, warn() {} } });
+  const first = create(); first.setTargets(group); await Promise.all(first.tick());
+  nowMs += 2000; await Promise.all(first.tick());
+  const restarted = create(); restarted.setTargets(group); restarted.restore(first.checkpoint());
+  restarted.configure({ intervalMs: 1000 }); restarted.hurry('R577');
+  nowMs += 3000; await Promise.all(restarted.tick());
+  assert.equal(calls, 2);
+  assert.equal(restarted.nextDueInMs(), 55000);
+  nowMs = base + 60000; await Promise.all(restarted.tick());
+  assert.equal(calls, 3);
+});
+
+test('one shared admission deficit stops every group and survives target changes and cold starts', async () => {
+  let nowMs = base, calls = 0, denied = true;
+  const groups = buildGroups([{ partNumber: 'AAAAACH/A', storeNumbers: Array.from({ length: 400 }, (_, i) => `R${String(i).padStart(3, '0')}`) }]);
+  const create = () => createScheduler({ clock: () => new Date(nowMs), intervalMs: 1000, maxConcurrency: 3, burstIntervalMs: 2000,
+    fetchPickup: async ({ storeNumber, partNumbers }) => {
+      calls++;
+      return denied ? { record: { budgetDenied: true, retryAt: base + 60000, error: { message: 'capacity_wait' } }, observations: [] }
+        : { record: { httpStatus: 200 }, observations: [{ storeNumber, partNumber: partNumbers[0], status: 'available', observedAt: new Date(nowMs).toISOString() }] };
+    }, onBatch: async () => {}, log: { error() {}, warn() {} } });
+  const first = create(); first.setTargets(groups); await Promise.all(first.tick());
+  for (let wave = 0; wave < groups.length; wave++) assert.equal(first.tick().length, 0);
+  assert.equal(calls, 3, 'only the already-dispatched concurrency wave checks the shared database gate');
+  const saved = first.checkpoint();
+  assert.equal(saved.admissionUntil, base + 60000);
+  const restarted = create();
+  restarted.setTargets([...groups, ...buildGroups([{ partNumber: 'BBBBBCH/A', storeNumbers: ['R999'] }])]);
+  restarted.restore(saved);
+  restarted.configure({ intervalMs: 1000 }); restarted.hurry('R999');
+  nowMs += 5000;
+  assert.equal(restarted.tick().length, 0, 'a newly followed target cannot bypass the shared pause');
+  assert.equal(restarted.nextDueInMs(), 55000);
+  assert.equal(restarted.snapshot().state, 'budget_limited');
+  assert.ok(restarted.snapshot().targets.every(target => !target.storeDelayed), 'capacity waits are not short store-spacing waits');
+  denied = false; nowMs = base + 60000;
+  await Promise.all(restarted.tick());
+  assert.equal(calls, 6);
+  assert.equal(restarted.checkpoint().admissionUntil, 0, 'time passing releases the shared pause');
+});
+
+test('daily admission migration preserves source pauses and unfinished failure backoff', () => {
+  const h = harness();
+  h.scheduler.setTargets(buildGroups([{ partNumber: 'AAAAACH/A', storeNumbers: ['R577', 'R639'] }]));
+  const saved = h.scheduler.checkpoint();
+  saved.admissionUntil = base + 3600000; saved.admissionReason = 'daily_budget';
+  saved.breaker = { state: 'open', openedAt: base, until: base + 30000, failures: [], trips: 1, probeInFlight: false, reason: 'http_429' };
+  Object.assign(saved.targets[0], { nextDueAt: base + 3600000, guardUntil: base + 3600000, guardReason: 'daily_budget', failures: 2 });
+  Object.assign(saved.targets[0].health, { lastFailureAt: base, lastRequestAt: base });
+  Object.assign(saved.targets[1], { nextDueAt: base + 3600000, guardUntil: base + 3600000, guardReason: 'upstream_paused' });
+  h.scheduler.restore(saved); h.advance(500);
+  h.scheduler.resetDailyAdmission(base + 3600000);
+  const migrated = h.scheduler.checkpoint();
+  assert.equal(migrated.admissionUntil, 0);
+  assert.equal(migrated.targets[0].nextDueAt, base + 4000, 'the genuine two-failure backoff is retained');
+  assert.equal(migrated.targets[0].guardUntil, 0);
+  assert.equal(migrated.targets[1].guardUntil, base + 3600000, 'an explicit source pause with the same timestamp is retained');
+  assert.deepEqual(migrated.breaker, saved.breaker);
+  assert.equal(h.scheduler.tick().length, 0);
+  assert.equal(h.scheduler.nextDueInMs(), 29500);
+});
+
 test('follows collapse into one request per store with deduped SKUs', () => {
   const groups = buildGroups(follows);
   assert.deepEqual(groups.map(g => [g.storeNumber, g.partNumbers]), [['R577', ['AAAAACH/A', 'BBBBBCH/A']], ['R639', ['AAAAACH/A']]]);

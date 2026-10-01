@@ -27,6 +27,8 @@ const DEFAULTS = Object.freeze({
 });
 
 const groupKeyOf = (storeNumber, partNumbers) => `${storeNumber}|${[...partNumbers].sort().join(',')}`;
+const ADMISSION_REASONS = new Set(['capacity_wait', 'minute_budget', 'daily_budget', 'auto_budget_reserved', 'upstream_paused']);
+const DAILY_REASONS = new Set(['daily_budget', 'auto_budget_reserved']);
 
 /** Merge follows into store-level request groups; identical targets are collapsed. */
 function buildGroups(follows, maxPartsPerRequest = 20) {
@@ -82,6 +84,8 @@ function createScheduler(options) {
   const storeLastRequestAt = new Map();
   const breaker = { state: 'closed', openedAt: null, until: null, failures: [], trips: 0, probeInFlight: false, reason: null };
   let paused = false;
+  let admissionUntil = 0;
+  let admissionReason = null;
 
   function nextInterval(nowMs) {
     const align = opts.alignIntervalMs || 0;
@@ -91,7 +95,7 @@ function createScheduler(options) {
   function dueAt(entry) {
     const previous = storeLastRequestAt.get(entry.group.storeNumber);
     const spacing = opts.burstIntervalMs > 0 ? Math.min(opts.intervalMs, opts.burstIntervalMs) : 0;
-    return Math.max(entry.nextDueAt, previous === undefined ? 0 : previous + spacing);
+    return Math.max(entry.nextDueAt, entry.guardUntil || 0, admissionUntil, previous === undefined ? 0 : previous + spacing);
   }
 
   function configure({ intervalMs, maxConcurrency, timeoutMs, burstIntervalMs, burstQuietMs } = {}) {
@@ -104,7 +108,7 @@ function createScheduler(options) {
       opts.burstQuietMs = burstQuietMs;
     }
     if (intervalMs !== undefined) {
-      if (!Number.isFinite(intervalMs) || intervalMs < 1000 || intervalMs > 3600000) throw new TypeError('invalid collector interval');
+      if (!Number.isSafeInteger(intervalMs) || intervalMs < 1000) throw new TypeError('invalid collector interval');
       opts.intervalMs = intervalMs;
       for (const e of groups.values()) if (!e.failures && e.health.lastRequestAt !== null) {
         const normalDue = nextInterval(e.health.lastRequestAt);
@@ -205,10 +209,20 @@ function createScheduler(options) {
     const { record, observations } = result;
     if (record.budgetDenied) {
       entry.nextDueAt = record.retryAt || finishedMs + 60000;
+      entry.guardUntil = entry.nextDueAt;
+      entry.guardReason = record.error && record.error.message || null;
+      // The automatic lane is shared by every store. Once it is exhausted,
+      // polling other groups only repeats the same database admission check.
+      if (ADMISSION_REASONS.has(entry.guardReason) && entry.guardUntil >= admissionUntil) {
+        admissionUntil = entry.guardUntil;
+        admissionReason = entry.guardReason;
+      }
       entry.inFlight = false;
       if (wasProbe && generation === breaker.trips) breaker.probeInFlight = false;
       return;
     }
+    entry.guardUntil = 0;
+    entry.guardReason = null;
     // Admission/lease transactions can delay the real HTTP start after tick().
     // Completion is a conservative bound for it, so no later batch or cold
     // start can squeeze the actual store requests below the required spacing.
@@ -284,7 +298,9 @@ function createScheduler(options) {
   /** Dispatch every due group within the concurrency cap. Returns the in-flight promises started by this tick. */
   function tick() {
     const nowMs = clock().getTime();
-    if (paused) return [];
+    if (paused || admissionUntil > nowMs) return [];
+    admissionUntil = 0;
+    admissionReason = null;
     const inFlight = pending.size;
     let slots = Math.max(0, opts.maxConcurrency - inFlight);
     const started = [];
@@ -312,22 +328,24 @@ function createScheduler(options) {
     const nowMs = clock().getTime();
     const targets = [...groups.values()].map(e => ({
       key: e.group.key, storeNumber: e.group.storeNumber, partNumbers: e.group.partNumbers,
-      inFlight: e.inFlight, dueInMs: Math.max(0, dueAt(e) - nowMs), storeDelayed: e.nextDueAt <= nowMs && dueAt(e) > nowMs,
+      inFlight: e.inFlight, dueInMs: Math.max(0, dueAt(e) - nowMs), storeDelayed: admissionUntil <= nowMs && e.nextDueAt <= nowMs && (e.guardUntil || 0) <= nowMs && dueAt(e) > nowMs,
       failures: e.failures, bursting: e.burstUntil > nowMs, health: e.health,
     }));
-    const state = paused ? 'paused' : breaker.state === 'open' ? 'throttled' : breaker.state === 'half_open' ? 'probing' : targets.some(t => t.health.persistenceFailed) ? 'error' : targets.length ? 'running' : 'idle';
-    return { state, breaker: { ...breaker, failures: breaker.failures.length }, groupCount: targets.length, inFlight: pending.size, intervalMs: opts.intervalMs, burstIntervalMs: opts.burstIntervalMs, maxConcurrency: opts.maxConcurrency, targets };
+    const state = paused ? 'paused' : breaker.state === 'open' ? 'throttled' : admissionUntil > nowMs ? (admissionReason === 'upstream_paused' ? 'throttled' : 'budget_limited') : breaker.state === 'half_open' ? 'probing' : targets.some(t => t.health.persistenceFailed) ? 'error' : targets.length ? 'running' : 'idle';
+    return { state, breaker: { ...breaker, failures: breaker.failures.length }, admissionUntil, admissionReason, groupCount: targets.length, inFlight: pending.size, intervalMs: opts.intervalMs, burstIntervalMs: opts.burstIntervalMs, maxConcurrency: opts.maxConcurrency, targets };
   }
 
   // Persist due times and the global breaker across scheduled function cold
   // starts. Otherwise each minute would bypass Retry-After and start again at
   // the first target, starving later stores when a scan reaches its deadline.
   function checkpoint() {
-    return { version: 1, breaker: { ...breaker, failures: [...breaker.failures], probeInFlight: false }, storeLastRequestAt: [...storeLastRequestAt], targets: [...groups.values()].map(e => ({ key: e.group.key, nextDueAt: e.nextDueAt, failures: e.failures, burstUntil: e.burstUntil || 0, health: e.health })) };
+    return { version: 1, breaker: { ...breaker, failures: [...breaker.failures], probeInFlight: false }, admissionUntil, admissionReason, storeLastRequestAt: [...storeLastRequestAt], targets: [...groups.values()].map(e => ({ key: e.group.key, nextDueAt: e.nextDueAt, guardUntil: e.guardUntil || 0, guardReason: e.guardReason || null, failures: e.failures, burstUntil: e.burstUntil || 0, health: e.health })) };
   }
 
   function restore(saved) {
     if (!saved || saved.version !== 1) return;
+    admissionUntil = Number.isFinite(saved.admissionUntil) ? saved.admissionUntil : 0;
+    admissionReason = ADMISSION_REASONS.has(saved.admissionReason) ? saved.admissionReason : null;
     for (const item of Array.isArray(saved.storeLastRequestAt) ? saved.storeLastRequestAt : []) {
       if (Array.isArray(item) && typeof item[0] === 'string' && Number.isFinite(item[1])) storeLastRequestAt.set(item[0], item[1]);
     }
@@ -341,12 +359,35 @@ function createScheduler(options) {
       const entry = groups.get(item.key);
       if (!entry || !Number.isFinite(item.nextDueAt)) continue;
       entry.nextDueAt = item.nextDueAt;
+      entry.guardUntil = Number.isFinite(item.guardUntil) ? item.guardUntil : 0;
+      entry.guardReason = typeof item.guardReason === 'string' ? item.guardReason : null;
       entry.failures = Math.max(0, Number(item.failures) || 0);
       entry.burstUntil = Number.isFinite(item.burstUntil) ? item.burstUntil : 0;
       if (item.health && typeof item.health === 'object') entry.health = { ...emptyHealth(), ...item.health };
     }
     if (saved.breaker && ['closed', 'open', 'half_open'].includes(saved.breaker.state)) {
       Object.assign(breaker, saved.breaker, { failures: Array.isArray(saved.breaker.failures) ? saved.breaker.failures : [], probeInFlight: false });
+    }
+  }
+
+  /** Remove a retired calendar-day admission stop without clearing source protection. */
+  function resetDailyAdmission(retryAt) {
+    const nowMs = clock().getTime();
+    const dailyDeferral = (reason, until) => DAILY_REASONS.has(reason)
+      || (!reason && Number.isFinite(retryAt) && until === retryAt);
+    if (dailyDeferral(admissionReason, admissionUntil)) {
+      admissionUntil = 0;
+      admissionReason = null;
+    }
+    for (const entry of groups.values()) {
+      if (!dailyDeferral(entry.guardReason, entry.guardUntil || entry.nextDueAt)) continue;
+      entry.guardUntil = 0;
+      entry.guardReason = null;
+      // Old checkpoints have only nextDueAt. A daily denial replaced that
+      // value, so recover any real failure backoff from its health timestamp.
+      const lastFailureAt = Math.max(entry.health.lastFailureAt || 0,
+        entry.health.persistenceFailed ? entry.health.lastRequestAt || 0 : 0);
+      entry.nextDueAt = Math.max(nowMs, entry.failures ? lastFailureAt + backoffMs(entry.failures) : 0);
     }
   }
 
@@ -360,13 +401,14 @@ function createScheduler(options) {
     snapshot,
     checkpoint,
     restore,
+    resetDailyAdmission,
     pause: () => { paused = true; },
     resume: () => { paused = false; },
     nextDueInMs: () => {
       const nowMs = clock().getTime();
       const pending = [...groups.values()].filter(e => !e.inFlight && !activeStores.has(e.group.storeNumber)).map(dueAt);
-      if (breaker.state === 'open') return Math.max(0, breaker.until - nowMs);
-      return pending.length ? Math.max(0, Math.min(...pending) - nowMs) : opts.intervalMs;
+      const nextTargetAt = pending.length ? Math.min(...pending) : nowMs + opts.intervalMs;
+      return Math.max(0, Math.max(nextTargetAt, admissionUntil, breaker.state === 'open' ? breaker.until || 0 : 0) - nowMs);
     },
   };
 }

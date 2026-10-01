@@ -32,8 +32,8 @@
     },
     {
       "path": "config.js",
-      "bytes": 11822,
-      "sha256": "a77bd70aa50e18e27f73116dca394438b710c1d5cb75d9cf238f10efe0b85a93"
+      "bytes": 12230,
+      "sha256": "a521de9616fad4edaa9dee61ee82d6a5768f6a5d05e48bafb94aa8052a4a62e0"
     },
     {
       "path": "connection.js",
@@ -41,9 +41,14 @@
       "sha256": "8099a99c0454283891b5ca93e14c59e58f0b524d7a59d9543accf765fc57e694"
     },
     {
+      "path": "engine/capacity-budget.js",
+      "bytes": 3805,
+      "sha256": "823dd1458b83e691e34842b6aac7d129aecd30d14bbe7029b819896582789913"
+    },
+    {
       "path": "engine/collector.js",
-      "bytes": 14549,
-      "sha256": "f6f5e04102f8909ca38a20d367bc83d8a0303362a4924ea407be404875b5ec79"
+      "bytes": 14846,
+      "sha256": "27bf4fe4158e9f1c51b198a645fa7b63121fcb48423139a859654f3242e31c09"
     },
     {
       "path": "engine/events.js",
@@ -52,8 +57,8 @@
     },
     {
       "path": "engine/guarded-pickup.js",
-      "bytes": 2599,
-      "sha256": "db94fc0e51a990b1e4703fdb0f5433456fe09fec1024c43fe4b13e937a4fac18"
+      "bytes": 2640,
+      "sha256": "752ce3ae887838c2b00718d774fea1c8a9505546e8c4e011f2b0a86afe410a4b"
     },
     {
       "path": "engine/lease.js",
@@ -72,8 +77,8 @@
     },
     {
       "path": "engine/observations.js",
-      "bytes": 820,
-      "sha256": "2ccb8859660acc1cc40c3d02155798e8a0cc5bbba13bfc597c640b763576ca02"
+      "bytes": 989,
+      "sha256": "1c9c93877a0d53e448f7eb3a25054da6da26292c435b030c6affa06ff0b85b46"
     },
     {
       "path": "engine/retention.js",
@@ -82,13 +87,13 @@
     },
     {
       "path": "engine/scheduled.js",
-      "bytes": 7201,
-      "sha256": "cf82f426f4eb6542374bb10cb7d6d1383ebc51e67a3e4fd45816a4754e1e2100"
+      "bytes": 7663,
+      "sha256": "5b1bdbc42798a5943d59d95cdd66db929af5ca4fcae0b5db1521801bfdf0a2eb"
     },
     {
       "path": "engine/scheduler.js",
-      "bytes": 18193,
-      "sha256": "060795273878175f4ca349dd330d113cfb57b6249c68275918b62b61032eb509"
+      "bytes": 20826,
+      "sha256": "7b5aff49c1dc9c8bdd4e048dec75a4df3e9ba1ad127fc76ceae2a50760d8ff82"
     },
     {
       "path": "engine/wechat-sender.js",
@@ -112,13 +117,18 @@
     },
     {
       "path": "repo/atomic-ops.js",
-      "bytes": 43598,
-      "sha256": "3b41c05a09dd9fa10aacac51bde0ee4e7bf0ab3c01393988d1c25af9c107e942"
+      "bytes": 44020,
+      "sha256": "16c699487341ed87662af550f631bf520e278e07e4cefb4aaa5893ba2dbfb30d"
     },
     {
       "path": "repo/cloudbase-repo.js",
-      "bytes": 21147,
-      "sha256": "a3639ae1828aaa6fcce9572c40ba860a63e90a3edd25ea9beaab0917b95bc05b"
+      "bytes": 21256,
+      "sha256": "a6c2f2f266e4d288e48821d2a54abc11e88518bb0e000a442fd643517951b47b"
+    },
+    {
+      "path": "repo/query-target.js",
+      "bytes": 2086,
+      "sha256": "6a0dadeee3b48b0489dbb2160fcd691009938de62713ad93ef61664dc7a1dd6e"
     },
     {
       "path": "repo/subscription-credit-ledger.js",
@@ -127,8 +137,8 @@
     },
     {
       "path": "repo/upstream-guard.js",
-      "bytes": 6442,
-      "sha256": "8f33b3af0d44187404a48731cc014201dbd22c1f4920c0721181840058258d67"
+      "bytes": 7819,
+      "sha256": "90767d8b9454bbeeb2b210e1664590447cf158b9855f59cfdd5afabf3f93078e"
     },
     {
       "path": "rules/access.js",

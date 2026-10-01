@@ -54,7 +54,7 @@
         </view>
         <view class="selection-rule">
           <text class="selection-rule-label">查询规则</text>
-          <view class="selection-rule-copy">{{boot.member ? '会员查询不扣次数。' : '每次扣 ' + boot.queryCost + ' 次；全部门店查询失败，自动返还。'}}</view>
+          <view class="selection-rule-copy">{{boot.member ? '会员查询不扣次数。' : '获取新的有效结果扣 ' + boot.queryCost + ' 次；未取得新的有效结果则返还，复用最近结果不扣次数。'}}</view>
         </view>
         <view wx:if="{{!boot.member}}" class="selection-rule">
           <text class="selection-rule-label">新品限制</text>

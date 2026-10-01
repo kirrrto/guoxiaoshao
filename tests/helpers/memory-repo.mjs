@@ -188,6 +188,7 @@ export function createMemoryRepo(seed = {}) {
       drop('targetHealth', COLLECTIONS.health, doc => doc.recordedAt < cutoffIso);
       drop('subscriptionGrants', COLLECTIONS.config, doc => doc.kind === 'subscription_grant' && doc.createdAt < cutoffIso);
       drop('queryGuards', COLLECTIONS.config, doc => doc.kind === 'query_guard' && doc.updatedAt < cutoffIso);
+      drop('queryTargets', COLLECTIONS.config, doc => doc.kind === 'query_target' && doc.updatedAt < cutoffIso);
       // Same 60-day _id window as the CloudBase implementation.
       const oldestBudget = beijingDayKey(addDays(startOfDay(firstDay), -60));
       drop('budgets', COLLECTIONS.config, doc => /^collector_budget_\d{4}-\d{2}-\d{2}$/.test(doc._id) && doc._id.slice(-10) < firstDay && doc._id.slice(-10) >= oldestBudget);

@@ -66,7 +66,7 @@ test('automatic scans and manual calls compete for the same budget, including co
 
 test('automatic scans leave daily capacity for manual queries while the shared cap remains enforced', async () => {
   const f = createFixture({ config: { collector: { maxRequestsPerDay: 10 } }, fetchImpl: fakeFetch({ R577: { display: 'available' } }) });
-  const limits = { maxRequestsPerMinute: 60, maxRequestsPerDay: 10 };
+  const limits = { maxRequestsPerMinute: 60, maxRequestsPerDay: 10, budgetMode: 'daily' };
   const take = source => f.repo.consumeCollectorBudget({ now: f.state.now.toISOString(), ...limits, source });
   for (let i = 0; i < 8; i++) assert.equal((await take('auto')).allowed, true);
   const held = await take('auto');

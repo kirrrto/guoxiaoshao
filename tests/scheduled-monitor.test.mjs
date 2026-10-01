@@ -10,6 +10,7 @@ const { readTimerRuntime, isTrustedTimer, runBudgetMs, runScheduled, TRIGGER_NAM
 const { monitoringSnapshot } = require('../cloudfunctions/gxs_api/lib/monitor-readiness');
 const { mergeConfig, validateConfig } = require('../cloudfunctions/gxs_api/lib/config');
 const { buildMessage } = require('../cloudfunctions/gxs_api/lib/engine/notifier');
+const { COLLECTIONS: C } = require('../cloudfunctions/gxs_api/lib/collections');
 const log = { info() {}, warn() {}, error() {} };
 const event = { Type: 'Timer', TriggerName: TRIGGER_NAME };
 
@@ -169,6 +170,67 @@ test('a persisted 429 Retry-After survives the next function cold start', async 
   assert.equal(calls, 2);
   s.f.advance(60000); await s.run({ fetchImpl: upstream }); assert.equal(calls, 2);
   assert.equal((await s.f.repo.getCollectorStatus()).state, 'throttled');
+});
+
+test('a shared capacity pause bounds admission checks across hundreds of stores and cold starts', async () => {
+  const s = await setup({ collector: { enabled: true, budgetMode: 'continuous', intervalSeconds: 60, maxConcurrency: 2 } });
+  await s.f.repo.saveFollow({ _id: 'F', userKey: userKeyOf(), partNumber: 'MJYH4CH/A', storeNumbers: Array.from({ length: 400 }, (_, i) => `R${String(i).padStart(3, '0')}`), status: 'active' });
+  let checks = 0;
+  const retryAt = s.f.state.now.getTime() + 120000;
+  s.f.repo.consumeCollectorBudget = async () => { checks++; return { allowed: false, reason: 'capacity_wait', retryAt, budgetMode: 'continuous' }; };
+  assert.equal((await s.run()).scanned, 0);
+  assert.equal(checks, 2, 'one concurrent wave is sufficient to learn the shared deficit');
+  assert.equal((await s.f.repo.getCollectorStatus()).scheduler.admissionUntil, retryAt);
+  s.f.advance(60000);
+  assert.equal((await s.run()).scanned, 0);
+  assert.equal(checks, 2, 'a cold start restores the global admission pause');
+  assert.equal(s.upstream.calls.length, 0);
+  assert.equal((await s.f.repo.getCollectorStatus()).state, 'budget_limited');
+});
+
+test('continuous mode migrates legacy daily checkpoints and resumes the same day', async () => {
+  for (const reason of ['daily_budget', 'auto_budget_reserved']) {
+    const s = await setup();
+    s.f.repo.tables.get(C.config).set('collector_budget_2026-09-15', { _id: 'collector_budget_2026-09-15', dayCount: reason === 'daily_budget' ? 10000 : 8000 });
+    assert.equal((await s.run()).scanned, 0);
+    const oldStatus = await s.f.repo.getCollectorStatus();
+    assert.equal(oldStatus.budget.reason, reason);
+    // Reproduce the deployed checkpoint shape before global/per-target
+    // admission fields and an explicit budget mode were introduced.
+    delete oldStatus.budget.budgetMode;
+    delete oldStatus.scheduler.admissionUntil; delete oldStatus.scheduler.admissionReason;
+    for (const target of oldStatus.scheduler.targets) { delete target.guardUntil; delete target.guardReason; }
+    await s.f.repo.saveCollectorStatus(oldStatus);
+    const config = await s.f.repo.getConfig();
+    await s.f.repo.saveConfig({ ...config, collector: { ...config.collector, budgetMode: 'continuous' } });
+    s.f.advance(60000);
+    await s.run();
+    const migrated = await s.f.repo.getCollectorStatus();
+    assert.equal(migrated.budget.budgetMode, 'continuous');
+    assert.equal(migrated.budget.reason, 'capacity_wait');
+    assert.ok(migrated.scheduler.admissionUntil < oldStatus.budget.retryAt, 'recovery no longer waits for midnight');
+    s.f.advance(60000);
+    assert.ok((await s.run()).scanned > 0, 'continuous refill resumes within the same day');
+    assert.ok(s.upstream.calls.length > 0);
+    assert.ok(s.f.state.now.getTime() < oldStatus.budget.retryAt);
+  }
+});
+
+test('daily checkpoint migration leaves an existing source 429 pause intact', async () => {
+  const s = await setup();
+  s.f.repo.tables.get(C.config).set('collector_budget_2026-09-15', { _id: 'collector_budget_2026-09-15', dayCount: 10000 });
+  await s.run();
+  const oldStatus = await s.f.repo.getCollectorStatus();
+  const nowMs = s.f.state.now.getTime();
+  oldStatus.scheduler.breaker = { state: 'open', openedAt: nowMs, until: nowMs + 180000, failures: [], trips: 1, probeInFlight: false, reason: 'http_429' };
+  await s.f.repo.saveCollectorStatus(oldStatus);
+  const config = await s.f.repo.getConfig();
+  await s.f.repo.saveConfig({ ...config, collector: { ...config.collector, budgetMode: 'continuous' } });
+  s.f.advance(60000);
+  const result = await s.run();
+  assert.equal(result.scanned, 0); assert.equal(result.state, 'throttled');
+  assert.equal(s.upstream.calls.length, 0);
+  assert.deepEqual((await s.f.repo.getCollectorStatus()).scheduler.breaker, oldStatus.scheduler.breaker);
 });
 
 test('deadline is respected, and a manual-query restock is confirmed by one prompt re-check before sending', async () => {

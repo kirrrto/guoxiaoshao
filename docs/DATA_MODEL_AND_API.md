@@ -1,6 +1,6 @@
 # 数据模型与接口约定
 
-版本 1.1.6，更新于 2026-09-20。本文描述当前源码契约，不由文档版本推断部署、真单或微信审核成功。会员兑换与虚拟支付购买共用会员权益；7 元／7 天商品为 `vip666`，购买默认关闭，开放与验收见 [虚拟支付配置](VIRTUAL_PAYMENT_SETUP.md)。
+当前源码契约，更新于 2026-10-01。不由文档日期推断部署、真单或微信审核成功；本次查询容量修复尚未读取实际云端 runtime 或部署。会员兑换与虚拟支付购买共用会员权益；7 元／7 天商品为 `vip666`，购买默认关闭，开放与验收见 [虚拟支付配置](VIRTUAL_PAYMENT_SETUP.md)。
 
 ## 1. 数据与身份边界
 
@@ -28,7 +28,7 @@
 - `gxs_orders`：兑换与管理员发放保留原主键。虚拟支付订单主键及平台单号为 `G + SHA256(userKey|orderId)前31位`，保存服务器固定的商品、买家、700 分及 7 天快照。兑换订单继续使用 `redeem_launch_30d_v1`、`type=membership_redemption`、`source=redemption_code`、`days=30`、`amountFen=0`。用户会员发放与订单 `fulfilled` 同事务完成；新增 `membership.entitlements` 按订单记录剩余时长，累计退款只撤销所属订单未用权益。
 - `gxs_notifications`：主键 userKey|eventId。保存 pending、sending、accepted、failed、uncertain 或 skipped 状态，发送租约、模板、原因及授权预占信息。用户在提醒落地卡片回答后写入 `feedback: { outcome: bought|missed|skipped, at }`。
 - `gxs_observation_days`：主键 storeNumber|partNumber|dayKey，每个目标每天一条观测摘要：样本数、已知/未知/手动/自动计数、首末观测时间，以及 `eventCounts`（当天各类事件数）、`firstAvailableAt`（当天首次可取货）、`availableWindows`（可取货窗口的次数、总时长、最长、最短，毫秒）。与 latest、事件同事务更新。
-- `gxs_config`：runtime、catalog、collector_lease、collector_status，以及预算计数、订阅操作去重、提醒冷却等文档。兑换错误计数保存在 `member_redemption_attempts_<用户哈希>`，包括 userKey、failures、lockedUntil、updatedAt；正确码及输入明文不入库。不能对整个集合无条件启用 TTL 删除。
+- `gxs_config`：runtime、catalog、collector_lease、collector_status，以及容量状态、请求计数、订阅操作去重、提醒冷却等文档。`upstream_capacity` 保存连续容量的 version、tokens、capacities、rates、lastDemandAt、updatedAtMs；跨日和冷启动不重置，不按日清理。`collector_budget_<北京时间日期>` 保存 dayCount、minuteKey、minuteCount、autoCount、manualCount；continuous 模式每日计数只用于核对消耗。`query_target_<门店与 SKU 的哈希>` 保存跨实例手动刷新租约与短时失败等待状态。兑换错误计数保存在 `member_redemption_attempts_<用户哈希>`，包括 userKey、failures、lockedUntil、updatedAt；正确码及输入明文不入库。不能对整个集合无条件启用 TTL 删除。
 - `gxs_catalog_stores`：门店主键 R###，保存名称、城市、省份、地址。
 - `gxs_catalog_products`：商品主键 partNumber，保存品类、系列、型号、标题、属性、价格、供应接口支持状态和精确产品图片来源。图片映射不能替代供应接口验证。
 
@@ -41,6 +41,8 @@
 相同 ID 和相同参数重放不会重复扣次、退款或发放。相同 ID 改变参数返回冲突，客户端应为新操作创建新 ID。签到按用户与北京时间日去重，任务再加入 taskId；查询扣次/退款以用户、queryId、操作类型确定账本 ID。免费次数每日奖励上限和余额上限在同一用户事务内检查，并发点击不能越限。
 
 查询执行租约为 25 秒；存活执行者失去租约后不能覆盖接管者的结果。异常中断可沿用原 ID 恢复。用户重新 bootstrap 时会清算租约过期超过 2 分钟的 pending 记录，每次最多 20 条，退回已扣次数并标记 query_expired。
+
+不同用户/查询 ID 的相同门店与 SKU 还可共享近期有效样本。`query.sharedFreshnessSeconds` 默认 10 秒，允许 0–30 秒；0 关闭复用。通过已有权限和次数门槛后，先读有效样本，缺失时通过目标租约合并手动刷新。样本必须为已知状态、没有 unknownSince、时间不在未来且严格小于有效期；自动采集产生的样本也可复用。复用不写回观测，不增加 sampleCount，不触发新事件或复查确认，保留原 observedAt。没有取得新的有效结果时退回已扣次数；有复用结果但没有新的有效结果时以 `billingReason: 'shared_result_no_charge'` 区分全部失败。
 
 ## 4. 库存事件语义
 
@@ -67,7 +69,7 @@
 
 幂等 ID 使用 8–64 位字母、数字、下划线或连字符。前端 utils/api.js 的 newId 负责生成；网络结果不确定时保留原 ID 重试。
 
-主要业务原因包括 insufficient_credits、query_in_progress、query_expired、query_failed、new_product_restricted、new_product_history_restricted、upstream_unavailable、payment_not_enabled。客户端不能把外层 ok=true 一概当作业务成功。
+主要业务原因包括 insufficient_credits、query_in_progress、query_expired、query_failed、new_product_restricted、new_product_history_restricted、upstream_unavailable、upstream_budget_limited、query_refresh_pending、payment_not_enabled。客户端不能把外层 ok=true 一概当作业务成功。
 
 ## 6. 动作
 
@@ -82,9 +84,23 @@
 
 ### 实时与历史
 
-- `query.pickup`：{ queryId, partNumber, storeNumbers }，最多 3 家店；非会员按配置扣次，会员不限次数。全部上游未知则退款，部分成功保留有效结果。返回查询时的商品与门店，不受后来选择变化影响。
+- `query.pickup`：{ queryId, partNumber, storeNumbers }，默认最多 3 家店；非会员取得新的有效结果时按配置扣次，会员不扣次数。全部失败、全部复用，或仅复用成功而其余门店失败时退回预扣次数。返回查询时的商品与门店，不受后来选择变化影响。
 - `query.recent`：最近手动查询记录。
 - `history.list`：{ historyQueryId, partNumber, storeNumbers?, dayKey?, cursor?, limit? }。最多 10 家店，默认每页 100 条、最大 200 条。后续页沿用同一查询 ID 和筛选条件，不重复扣次。
+
+实时查询响应补充字段：
+
+| 字段 | 契约 |
+|---|---|
+| `sharedResult` | 至少一个结果复用了有效样本。 |
+| `allShared` | 所有返回结果都复用有效样本；包含失败门店时不能仅因成功门店都复用就设为 true。 |
+| `results[].reused` | 该门店结果来自已有样本，`observedAt` 为真实原始采集时间；`queriedAt` 仅是本次查询时间。 |
+| `billingReason` | `shared_result_no_charge` 表示展示了已有有效样本，但本次没有取得新的有效结果，不收取查询次数。 |
+| `charged` / `refunded` / `balance` | 由服务端账本确定；免费用户复用时可能先扣后返，净扣次为 0。客户端不自行计算退款。 |
+| `reason` / `budgetScope` | 容量暂缺映射为 `upstream_budget_limited` / `continuous`；分钟上限为 `minute`；显式旧模式日上限为 `daily`。其他实例仍在刷新为 `query_refresh_pending`。 |
+| `retryAfterMs` | 预计可重试的等待毫秒数，不保证等待结束后一定取得结果。只有 `daily` 可提示北京时间次日 00:00，continuous 不提示等至午夜。 |
+
+有效复用结果仍是带采集时间的快照；未知或过期不能伪装成实时结果。客户端手动重试，不自动循环发起可能扣次的查询。
 
 历史返回 pagination.nextCursor/hasMore/total/snapshotAt，以发现时间和事件 ID 双字段稳定排序。summary 按全日数据计算，lastHourRestocks 相对首轮 snapshotAt 统计，不只计算当前页。当前库存另有 latestSnapshotAt/isStale/lastKnownStatus；受新品限制的非会员查旧历史时 latestRestricted=true，不泄露当前库存。
 
@@ -115,10 +131,21 @@
 - `admin.seedCatalog`：将函数包内目录写入云端，属于实际数据操作，不在本轮本地验收中执行。
 - `admin.grantMembership/grantCredits`：传目标 userKey、days 或 amount、grantId、可选 note；幂等且校验冲突参数。
 - `admin.stats/lookupUser`：运行统计、用户与关注查询。
+- `admin.capacity`：`{}`。经现有 `gxs_api` 管理员鉴权只读查询容量配置、最近监测状态、当天预占计数和查询复用抽样；不预占/补充容量、不探测上游、不创建用户，不返回用户身份或目标列表。`mode/maxRequestsPerMinute/sustainedDailyTarget` 来自配置，`hardDailyLimit` 只在 daily 模式返回。`uniqueGroups/plannedIntervalSeconds` 来自最近 collector_status，必须结合 `collectorStatusUpdatedAt/collectorStatusStale` 判断是否仍可用。`normalCadenceSeconds` 为配置常规间隔与运行模式下限的较大值，`configuredNormalRequestsPerDay` 为该间隔下的估计采集需求，`autoRequestsPerDay` 为自动来源份额；`aboveAutoCapacity=true` 表示配置期望的常规采集需求超过自动份额，需要接受调度降速或验证后扩容，不表示已发生超额 HTTP。
 - `admin.insights`：`{ days? }`（1–10，默认 7）。统计最近事件与提醒（各最多 2000 条，超过时 `truncated=true`）：`availability` 为 became_unavailable 事件的可取货时长（count、p50Ms、p90Ms、maxMs、分段 buckets）；`alerts` 为提醒任务总数、按状态与未发送原因计数、`noCreditShare`（因没有授权次数未发送的占比）、`sendDelay`（已受理提醒从发现到发出的延迟）；`feedback` 为「买到了吗」回答数与买到占比。
+
+管理员容量读数通过 `{ action: 'admin.capacity', payload: {} }` 调用，补充字段如下；实际读数解释和发布核对见 [查询容量](QUERY_CAPACITY.md)。
+
+| 字段 | 读取边界 |
+|---|---|
+| `todayReservations` | date、available、total、auto、manual、unclassified、sourceSplitComplete。计数为预占次数，不是精确已完成 HTTP 数；available=false 表示当天计数文档缺失，不能等同于已确认零请求。旧记录可能没有来源字段。 |
+| `tokenSnapshot` | recordedAt、tokens、burstCapacity、refillPerSecond（均按 shared/auto/manual）。值为最后持久化时的快照，接口不按当前时间推算剩余容量或进行 refill；没有状态时为 null。 |
+| `recentQueryReuse` | 从北京时间当天起创建的最新最多 2000 条查询文档抽样，仅已完成的 live 查询参与目标计数。包含 sampledRecords、sampleLimit、truncated、completedLiveQueries、freshTargets、reusedTargets、unclassifiedTargets、unknownTargets、reuseShareOfClassifiedTargets、attributionComplete。恰好达到上限也标记 truncated。 |
+
+复用比例只在明确归类的 fresh/reused 目标中计算，不是全部查询或 HTTP 的命中率；旧记录缺少 reused 标记时归为 unclassified，不能当作新采集。unknown 单独统计。监测状态已过期、来源归类不完整或抽样被截断时，不能把估算推广为完整线上容量结论；提高速率前应验证上游、云函数、数据库与真实覆盖间隔。
 
 ## 7. 默认配置与运行条件
 
 lib/config.js 是默认值与校验的唯一来源。主要默认值：签到 +1，历史体验任务 +1，每日最多奖励 2 次，余额最多 10 次，实时和历史每次各消耗 1 次；付费会员为 7 元／7 天，购买默认关闭，兑换活动仍为 30 天。`memberRedemption.enabled` 默认为 true，可经管理员关闭；兑换事务再次读取开关，不接受客户端自报活动、天数或会员有效期。新品窗口为空，需录入真实开售资料后才启用对应限制。
 
-自动采集默认关闭，目标间隔 8 秒、并发 2、每请求最多 20 SKU、每分钟最多 60 次、每天最多 10,000 次。订阅通知默认关闭；须配置消费者小程序的真实模板和服务端凭证。监测和消息的部署、预算及状态语义详见 [采集运行手册](COLLECTOR_OPERATIONS.md)。
+自动采集默认关闭，配置目标间隔 8 秒、并发 2、每请求最多 20 SKU。`collector.budgetMode` 默认 `continuous`：每分钟硬上限 60，`maxRequestsPerDay=10000` 表示全天持续补充速率目标，并允许不超过分钟容量的有界突发；实际常规间隔会根据独立请求组数拉长。自动与手动来源持续速率占比 80% / 20%，支持有界空闲借用。显式 `daily` 才保留北京时间自然日硬上限及次日恢复。配置、迁移、观测指标与测试边界见 [查询容量](QUERY_CAPACITY.md)。订阅通知默认关闭；须配置消费者小程序的真实模板和服务端凭证。监测和消息部署见 [采集运行手册](COLLECTOR_OPERATIONS.md)。

@@ -221,7 +221,7 @@ test('refunded upstream failures without a product keep the requested identity a
     assert.equal(page.data.boot.balance, 4);
     assert.equal(page.data.querying, false);
     assert.equal(rt.storage.has('gxs_pending_q_v1'), false, 'confirmed failed requests must not remain uncertain');
-    assert.match(page.data.restriction, /2 秒后重试/);
+    assert.match(page.data.restriction, /2 秒后可重试/);
     assert.doesNotMatch(page.data.restriction, /结果尚未确认/);
     assert.deepEqual(rt.messages, ['本次未取得有效结果，已返还次数']);
     assert.equal(ticks.length, 0, 'failed requests do not scroll as a success');
@@ -235,9 +235,103 @@ test('daily source budget explains midnight recovery to members without raw seco
     results: [], balance: 4, charged: 0, refunded: 0, retryAfterMs: 17657000, queriedAt: new Date().toISOString() }) });
   page.setData({ 'boot.membership.active': true });
   await page.onQuery();
-  assert.match(page.data.restriction, /服务今日请求预算已达上限/);
-  assert.match(page.data.restriction, /北京时间次日 00:00 恢复/);
-  assert.doesNotMatch(page.data.restriction, /17657|会员次数已用完/);
+  assert.match(page.data.restriction, /今日实时查询暂时不可用/);
+  assert.match(page.data.restriction, /北京时间次日 00:00 可重试/);
+  assert.doesNotMatch(page.data.restriction, /17657|会员次数已用完|预算/);
+  page.onUnload();
+});
+
+test('continuous request pacing explains a short estimated retry without a daily shutdown or automatic query', async () => {
+  for (const results of [undefined, []]) {
+    const { page, rt } = await opened({ query: async () => ({ ok: false, reason: 'upstream_budget_limited',
+      budgetScope: 'continuous', results, balance: 4, charged: 0, refunded: 0, retryAfterMs: 1501 }) });
+    await page.onQuery();
+    assert.match(page.data.restriction, /查询请求较多/);
+    assert.match(page.data.restriction, /预计约 2 秒后可重试/);
+    assert.doesNotMatch(page.data.restriction, /预算|额度|00:00|次日|用完/);
+    assert.equal(page.data.boot.balance, 4);
+    assert.equal(rt.calls.filter(call => call.action === 'query.pickup').length, 1);
+    assert.equal(rt.timers.size, 0);
+    page.onUnload();
+  }
+});
+
+test('a shared refresh already in flight explains a retry without presenting it as user credit exhaustion', async () => {
+  const { page, rt } = await opened({ query: async () => ({ ok: false, reason: 'query_refresh_pending',
+    balance: 4, charged: 0, refunded: 0, retryAfterMs: 1000 }) });
+  await page.onQuery();
+  assert.match(page.data.restriction, /该配置的查询正在更新/);
+  assert.match(page.data.restriction, /预计约 1 秒后可重试/);
+  assert.doesNotMatch(page.data.restriction, /query_refresh_pending|次数不足|预算|00:00/);
+  assert.equal(page.data.result, null);
+  assert.equal(rt.calls.filter(call => call.action === 'query.pickup').length, 1);
+  assert.equal(rt.timers.size, 0);
+  page.onUnload();
+});
+
+test('shared valid observations preserve their actual sampling time and refund notice acknowledges valid results', async () => {
+  const sampledAt = new Date(Date.now() - 10000).toISOString();
+  const queriedAt = new Date().toISOString();
+  const { page, rt } = await opened({ query: async payload => ({ ...response(payload), queriedAt,
+    sharedResult: true, allShared: true, balance: 4, charged: 1, refunded: 1,
+    results: payload.storeNumbers.map(storeNumber => ({ storeNumber, status: 'available', observedAt: sampledAt, reused: true })) }) });
+  await page.onQuery();
+  assert.match(page.data.restriction, /最近核实的结果，采集时间见各门店/);
+  assert.deepEqual(rt.messages, ['已展示最近核实的结果，本次未扣次']);
+  assert.equal(page.data.boot.balance, 4);
+  for (const row of page.data.result.results) {
+    assert.equal(row.observedAt, sampledAt);
+    assert.notEqual(row.observedAt, queriedAt);
+    assert.equal(row.observationState, 'fresh');
+    assert.equal(row.reused, true);
+  }
+  page.refreshQuerySnapshot();
+  assert.ok(page.data.result.results.every(row => row.observedAt === sampledAt));
+  const cached = rt.storage.get('gxs_query_result_v1');
+  assert.ok(cached.results.every(row => row.observedAt === sampledAt));
+  assert.equal(rt.calls.filter(call => call.action === 'query.pickup').length, 1);
+  page.onUnload();
+
+  const reopened = await opened({ cache: cached });
+  assert.ok(reopened.page.data.result.results.every(row => row.observedAt === sampledAt));
+  assert.equal(reopened.page.data.resultIsCache, true);
+  assert.equal(reopened.rt.calls.filter(call => call.action === 'query.pickup').length, 0);
+  reopened.page.onUnload();
+});
+
+test('mixed shared and newly collected results retain per-store times without claiming a refund', async () => {
+  const sampledAt = new Date(Date.now() - 10000).toISOString();
+  const collectedAt = new Date().toISOString();
+  const { page, rt } = await opened({ query: async payload => ({ ...response(payload), sharedResult: true,
+    allShared: false, balance: 3, charged: 1, refunded: 0, results: [
+      { storeNumber: 'R577', status: 'available', observedAt: sampledAt, reused: true },
+      { storeNumber: 'R639', status: 'unavailable', observedAt: collectedAt },
+    ] }) });
+  await page.onQuery();
+  assert.match(page.data.restriction, /采集时间见各门店/);
+  assert.doesNotMatch(page.data.restriction, /未扣次|返还/);
+  assert.equal(page.data.result.results[0].observedAt, sampledAt);
+  assert.equal(page.data.result.results[1].observedAt, collectedAt);
+  assert.equal(page.data.boot.balance, 3);
+  assert.equal(rt.messages.length, 0);
+  page.onUnload();
+});
+
+test('a reused result plus a failed store returns credits without claiming all results failed', async () => {
+  const sampledAt = new Date(Date.now() - 10000).toISOString();
+  const { page, rt } = await opened({ query: async payload => ({ ...response(payload), sharedResult: true,
+    allShared: false, partial: true, billingReason: 'shared_result_no_charge', balance: 4, charged: 1, refunded: 1,
+    budgetScope: 'continuous', retryAfterMs: 1000, results: [
+      { storeNumber: 'R577', status: 'available', observedAt: sampledAt, reused: true },
+      { storeNumber: 'R639', status: 'unknown', reason: { code: 'capacity_wait' } },
+    ] }) });
+  await page.onQuery();
+  assert.match(page.data.restriction, /部分门店暂未查询成功/);
+  assert.match(page.data.restriction, /最近核实的结果，采集时间见各门店/);
+  assert.equal(page.data.result.results[0].observedAt, sampledAt);
+  assert.equal(page.data.boot.balance, 4);
+  assert.deepEqual(rt.messages, ['已展示最近核实的结果，本次未扣次']);
+  assert.equal(rt.calls.filter(call => call.action === 'query.pickup').length, 1);
   page.onUnload();
 });
 
@@ -251,7 +345,7 @@ test('a partially guarded response retains both store states and explains the re
   assert.equal(page.data.result.ok, true);
   assert.deepEqual(page.data.result.results.map(row => row.status), ['available', 'unknown']);
   assert.match(page.data.restriction, /部分门店暂未查询成功/);
-  assert.match(page.data.restriction, /10 秒后重试/);
+  assert.match(page.data.restriction, /10 秒后可重试/);
   assert.equal(page.data.boot.balance, 3);
   assert.equal(page.data.querying, false);
   assert.equal(rt.storage.has('gxs_pending_q_v1'), false);

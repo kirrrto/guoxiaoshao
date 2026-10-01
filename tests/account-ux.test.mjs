@@ -111,12 +111,13 @@ test('admin access rechecks on returning and removes previously loaded data if r
 
 test('ordinary users cannot call administrative APIs directly regardless of client flags', async () => {
   const f = createFixture();
+  const before = await f.repo.getConfig();
   for (const action of ['admin.stats', 'admin.getConfig', 'admin.updateConfig', 'admin.seedCatalog', 'admin.grantMembership', 'admin.grantCredits', 'admin.lookupUser']) {
     const result = await f.call(action, { isAdmin: true, userKey: 'someone-else', patch: { adminUserKeys: ['consumer:user'] } });
     assert.equal(result.ok, false, action);
     assert.equal(result.error.code, 'forbidden', action);
   }
-  assert.equal(await f.repo.getConfig(), null);
+  assert.deepEqual(await f.repo.getConfig(), before);
 });
 
 test('consumer account page contains no admin route or catalog timestamp', () => {

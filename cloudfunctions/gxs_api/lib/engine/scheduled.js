@@ -69,6 +69,12 @@ async function runScheduled({ repo, fetchImpl, sendImpl, clock = () => new Date(
     await collector.refreshTargets();
     if (previous && previous.mode === 'scheduled') {
       collector.scheduler.restore(previous.scheduler);
+      if (collector.currentConfig().collector.budgetMode === 'continuous' && previous.budget
+        && previous.budget.budgetMode !== 'continuous' && ['daily_budget', 'auto_budget_reserved'].includes(previous.budget.reason)) {
+        // Legacy daily exhaustion parked targets until midnight. Re-admit
+        // them under continuous refill while retaining 429/503 and backoff.
+        collector.scheduler.resetDailyAdmission(previous.budget.retryAt);
+      }
       collector.stats.lastBatchAt = previous.stats && previous.stats.lastBatchAt || null;
     }
     const snap = collector.scheduler.snapshot();

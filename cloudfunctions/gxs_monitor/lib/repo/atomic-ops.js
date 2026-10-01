@@ -16,6 +16,7 @@ const { mergeConfig, patchConfig } = require('../config');
 const { assertConfigEditor, makeConfigAudit } = require('../config-audit');
 const { CAMPAIGN, MAX_FAILURES, LOCK_MS, CLAIMS_ID, matchesCodeHash, attemptsId } = require('../member-redemption');
 const { upstreamGuardMethods, reserveAccountQuery, releaseAccountQuery } = require('./upstream-guard');
+const { queryTargetMethods } = require('./query-target');
 const subscriptionCredits = require('./subscription-credit-ledger');
 
 async function applyLedgerIn(tx, entry) {
@@ -289,10 +290,14 @@ function atomicMethods(run) {
       return { expired: true, refunded };
     }),
 
-    recordObservation: ({ observation, continuityGapMs, collectorLease }) => run(async tx => {
+    recordObservation: ({ observation, continuityGapMs, collectorLease, queryTargetLease }) => run(async tx => {
       if (collectorLease) {
         const lease = await tx.get(C.config, 'collector_lease');
         if (!lease || lease.ownerId !== collectorLease.ownerId || lease.expiresAt <= collectorLease.nowIso) throw new ApiError('collector_lease_lost', '采集执行权已转移');
+      }
+      if (queryTargetLease) {
+        const lease = await tx.get(C.config, queryTargetLease.id);
+        if (!lease || lease.ownerId !== queryTargetLease.ownerId || lease.leaseUntil <= Date.parse(queryTargetLease.nowIso)) throw new ApiError('query_target_lease_lost', '该目标由新的查询更新中');
       }
       const previous = await tx.get(C.latest, targetKeyOf(observation.storeNumber, observation.partNumber));
       const result = applyObservation(previous, observation, Number.isFinite(continuityGapMs) ? { continuityGapMs } : undefined);
@@ -444,6 +449,7 @@ function atomicMethods(run) {
     }),
 
     ...upstreamGuardMethods(run),
+    ...queryTargetMethods(run),
 
     claimNotification: ({ id, ownerId, now, leaseUntil }) => run(async tx => {
       const task = await tx.get(C.notifications, id);
