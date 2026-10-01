@@ -2,6 +2,8 @@
 const crypto = require('node:crypto');
 const { createCollector } = require('./collector');
 const { runRetentionIfDue } = require('./retention');
+const { dayKey, endOfDay } = require('../time');
+const { AUTO_SHARE } = require('./capacity-budget');
 
 const TRIGGER_NAME = 'gxs-monitor-minute';
 
@@ -69,11 +71,28 @@ async function runScheduled({ repo, fetchImpl, sendImpl, clock = () => new Date(
     await collector.refreshTargets();
     if (previous && previous.mode === 'scheduled') {
       collector.scheduler.restore(previous.scheduler);
-      if (collector.currentConfig().collector.budgetMode === 'continuous' && previous.budget
-        && previous.budget.budgetMode !== 'continuous' && ['daily_budget', 'auto_budget_reserved'].includes(previous.budget.reason)) {
+      const current = collector.currentConfig().collector;
+      if (current.budgetMode === 'continuous') {
+        const oldBudget = previous.budget || {};
+        let retiredRetryAt = oldBudget.budgetMode !== 'continuous'
+          && ['daily_budget', 'auto_budget_reserved'].includes(oldBudget.reason) ? oldBudget.retryAt : undefined;
+        // Old idle invocations overwrote budget.reason with an allowed/zero
+        // heartbeat, while retaining every target's midnight nextDueAt.
+        // Confirm that unlabelled wait against the persisted day's consumption;
+        // ordinary future schedules and continuous-mode waits are not evidence.
+        const midnight = endOfDay(dayKey(clock())).getTime();
+        const saved = previous.scheduler;
+        const hasUnlabelledMidnight = saved && saved.version === 1 && Array.isArray(saved.targets)
+          && saved.targets.some(target => target.nextDueAt === midnight && !target.guardReason && !target.guardUntil);
+        if (!Number.isFinite(retiredRetryAt) && oldBudget.budgetMode !== 'continuous' && hasUnlabelledMidnight) {
+          const snapshot = await repo.getUpstreamCapacity({ now: clock().toISOString() });
+          const oldDailyLimit = Number.isSafeInteger(oldBudget.maxRequestsPerDay) && oldBudget.maxRequestsPerDay > 0
+            ? oldBudget.maxRequestsPerDay : current.maxRequestsPerDay;
+          if (snapshot.day && snapshot.day.dayCount >= Math.max(1, Math.floor(oldDailyLimit * AUTO_SHARE))) retiredRetryAt = midnight;
+        }
         // Legacy daily exhaustion parked targets until midnight. Re-admit
         // them under continuous refill while retaining 429/503 and backoff.
-        collector.scheduler.resetDailyAdmission(previous.budget.retryAt);
+        collector.scheduler.resetDailyAdmission(retiredRetryAt);
       }
       collector.stats.lastBatchAt = previous.stats && previous.stats.lastBatchAt || null;
     }

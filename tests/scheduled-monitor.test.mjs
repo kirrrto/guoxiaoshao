@@ -233,6 +233,69 @@ test('daily checkpoint migration leaves an existing source 429 pause intact', as
   assert.deepEqual((await s.f.repo.getCollectorStatus()).scheduler.breaker, oldStatus.scheduler.breaker);
 });
 
+async function legacyHeartbeatCheckpoint({ dayCount = 10000, groups = 17 } = {}) {
+  const s = await setup({ collector: { enabled: true, budgetMode: 'continuous', intervalSeconds: 60, statusStaleAfterSeconds: 150 } });
+  s.f.state.now = new Date('2026-10-01T13:58:04.585Z');
+  const midnight = Date.parse('2026-10-01T16:00:00.000Z');
+  const stores = Array.from({ length: groups }, (_, i) => `R${300 + i}`);
+  await s.f.repo.saveFollow({ _id: 'F', userKey: userKeyOf(), partNumber: 'MJYH4CH/A', storeNumbers: stores, status: 'active' });
+  const previous = { _id: 'collector_status', mode: 'scheduled', state: 'running',
+    updatedAt: s.f.state.now.toISOString(), groupCount: groups,
+    // A later cold-start heartbeat replaced the original daily denial. This
+    // is the shape observed in the production incident, not its first denial.
+    budget: { allowed: true, reason: null, dayCount: 0, minuteCount: 0, maxRequestsPerDay: 10000, maxRequestsPerMinute: 60 },
+    stats: { lastBatchAt: '2026-10-01T04:08:11.855Z' },
+    scheduler: { version: 1, breaker: { state: 'closed', until: null, failures: [], trips: 0, reason: null, probeInFlight: false },
+      storeLastRequestAt: [], targets: stores.map(store => ({ key: `${store}|MJYH4CH/A`, nextDueAt: midnight, failures: 0, burstUntil: 0 })) } };
+  await s.f.repo.saveCollectorStatus(previous);
+  s.f.repo.tables.get(C.config).set('collector_budget_2026-10-01', { _id: 'collector_budget_2026-10-01', dayCount });
+  return { ...s, previous, midnight, stores };
+}
+
+test('continuous migration recovers all 17 legacy midnight targets after idle heartbeats lost the daily reason', async () => {
+  const s = await legacyHeartbeatCheckpoint();
+  assert.equal((await s.run()).scanned, 0, 'exhausted legacy capacity must refill before HTTP');
+  const migrated = await s.f.repo.getCollectorStatus();
+  assert.equal(migrated.budget.reason, 'capacity_wait');
+  assert.ok(migrated.scheduler.targets.every(target => target.nextDueAt < s.midnight));
+  assert.equal(s.f.repo.tables.get(C.config).get('collector_budget_2026-10-01').dayCount, 10000);
+  for (let minute = 0; minute < 6 && new Set(s.upstream.calls.map(call => call.storeNumber)).size < 17; minute++) {
+    s.f.advance(60000);
+    await s.run();
+  }
+  assert.equal(new Set(s.upstream.calls.map(call => call.storeNumber)).size, 17, 'no old target remains stranded until midnight');
+  assert.ok(s.f.state.now.getTime() < s.midnight);
+  assert.ok(Date.parse((await s.f.repo.getCollectorStatus()).stats.lastBatchAt) > Date.parse(s.previous.stats.lastBatchAt));
+});
+
+test('legacy midnight migration needs persisted exhaustion and does not reset ordinary future targets', async () => {
+  for (const variant of ['no-exhaustion', 'not-midnight', 'already-continuous']) {
+    const s = await legacyHeartbeatCheckpoint({ dayCount: variant === 'no-exhaustion' ? 1 : 10000, groups: 1 });
+    if (variant === 'not-midnight') s.previous.scheduler.targets[0].nextDueAt = s.midnight - 1000;
+    if (variant === 'already-continuous') s.previous.budget.budgetMode = 'continuous';
+    await s.f.repo.saveCollectorStatus(s.previous);
+    assert.equal((await s.run()).scanned, 0, variant);
+    assert.equal(s.upstream.calls.length, 0, variant);
+    assert.equal((await s.f.repo.getCollectorStatus()).scheduler.targets[0].nextDueAt, s.previous.scheduler.targets[0].nextDueAt, variant);
+  }
+});
+
+test('legacy idle-heartbeat migration preserves the real source pause and reconstructed failure backoff', async () => {
+  const s = await legacyHeartbeatCheckpoint({ groups: 1 });
+  const nowMs = s.f.state.now.getTime();
+  const breaker = { state: 'open', openedAt: nowMs, until: nowMs + 180000, failures: [], trips: 1, probeInFlight: false, reason: 'http_429' };
+  s.previous.scheduler.breaker = breaker;
+  s.previous.scheduler.targets[0].failures = 6;
+  s.previous.scheduler.targets[0].health = { lastFailureAt: nowMs, lastRequestAt: nowMs - 1000 };
+  await s.f.repo.saveCollectorStatus(s.previous);
+  assert.equal((await s.run()).scanned, 0);
+  const migrated = await s.f.repo.getCollectorStatus();
+  assert.equal(s.upstream.calls.length, 0);
+  assert.deepEqual(migrated.scheduler.breaker, breaker);
+  assert.equal(migrated.scheduler.targets[0].nextDueAt, nowMs + 60000);
+  assert.equal(migrated.scheduler.targets[0].failures, 6);
+});
+
 test('deadline is respected, and a manual-query restock is confirmed by one prompt re-check before sending', async () => {
   const s = await setup();
   const exhausted = await s.run({ maxRunMs: 0 });
