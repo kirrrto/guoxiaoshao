@@ -1,6 +1,6 @@
 {
   "version": "1.5.1",
-  "generatedAt": "2026-10-01T15:47:05.966Z",
+  "generatedAt": "2026-10-01T15:40:00.000Z",
   "localChecksPassed": true,
   "publicationReady": false,
   "productionDeploymentPerformed": false,
@@ -26,12 +26,13 @@
   "knownDependencyRisk": "All four SDK packages retain the lodash.set advisory chain. The current application does not use realtime watch; this does not constitute zero dependency risk.",
   "maintainerDecision": "Proceed with formal release while keeping capacity gaps explicit. productionAcceptancePassed stays false until the 300/60s/3s standards are measured in the intended deployment.",
   "candidate": {
-    "commit": "6a7cdb36d357e6f931a18db6c2bd25ffbe070d7a",
-    "tree": "b17ad336f836f8e646cc204d94a30b913bc3c5d3",
-    "archive": "output/release-1.5.1/guoxiaoshao-1.5.1-candidate-6a7cdb3.zip",
-    "archiveSha256": "ebba06d89c41f7943e66188963e7bbc5d70b66b6e143534f88c38920fc58d3d5",
+    "commit": "ca5d9434e0f63f489fb8f5400a74e8fb15b3e0d0",
+    "tree": "d2e6433875889edb3757269598277f9d543e65ef",
+    "archive": "output/release-1.5.1/guoxiaoshao-1.5.1-candidate-ca5d943.zip",
+    "archiveSha256": "54920a7fe6101be20452ec57e255bfb04771ba9d45ed4803d8ca305ed720a6e2",
     "checkedCodeFiles": 325,
     "localTests": 866,
     "localPreflightChecks": 45
-  }
+  },
+  "githubSync": "deferred by maintainer; local commit ca5d943 not pushed"
 }

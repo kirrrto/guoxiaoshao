@@ -1,11 +1,12 @@
 {
   "version": "1.5.1",
-  "baselineCommit": "6a7cdb36d357e6f931a18db6c2bd25ffbe070d7a",
+  "baselineCommit": "ca5d9434e0f63f489fb8f5400a74e8fb15b3e0d0",
   "hash": "SHA-256 of candidate Git blob bytes, verified against the source archive; local CRLF is not a runtime content change. This is not downloaded production content.",
   "files": {
     ".github/workflows/verify.yml": "7a26a699fa7bc654970e5890b2908aebe5ed4d9b4b0f1913a95eff0540166947",
     ".gitignore": "140ce064d73075a8d3247e27220d39036f40ea12cbc7f51a438b514657421fd3",
-    "发版检查-1.1.6.html": "62342d4d42c3920a68d9b1194bb3ca6af763133486c0bf71556960f950a7a966",
+    "Jev-融入指南.html": "7ec2424259197129289f2ed5f4845ec1d41afff9977b494baa60b3b8c3e8fd61",
+    "LICENSE": "f7b012bea48373643eec732a275ae653c8195e840157e04c2d1c3af9653b6cf3",
     "catalog/products.json": "0273e07bd8767bb824488499fb2f51b471555d7998f7ed82422e9664e2b0d8fd",
     "catalog/stores.json": "ff62ad48138c04eac7fd6f4ad93895bacc260e0f87b881cc433a0501a6b2d5c6",
     "cloudfunctions/cloudbase_auth/authorize.js": "7bc9a3d5c860c6791cad8e712dc9b6d080afc477f71f8c890784190215a45357",
@@ -116,8 +117,6 @@
     "config/database-deployment-plan.json": "d373727985032351ae63ebad9c5dfc406a1478d38f57452dba31c13753ff8cff",
     "config/database.security-rules.json": "2723eb87f02d294bc7458379205e3ad8f21abf3893f335a4591cff4e4b42a576",
     "config/delivery-targets.json": "129428848258dcdc3f8b961d6b2730999a2f6a7fbe546a17c246d07d2975ea15",
-    "Jev-融入指南.html": "7ec2424259197129289f2ed5f4845ec1d41afff9977b494baa60b3b8c3e8fd61",
-    "LICENSE": "f7b012bea48373643eec732a275ae653c8195e840157e04c2d1c3af9653b6cf3",
     "miniprogram/app.js": "9e54e66f4e036fe91a30c0b62da91fa1fa31a94f7b2c883c5c62ad6d2f2e1187",
     "miniprogram/app.json": "120a98dc0843b554018121e5257abc6eb14c4a285f31b8f9dd807a4ab9974b38",
     "miniprogram/app.wxss": "c76738b6df2caf4070163e2bcfeb2f0daf4bcf4fe5bda16e21185fb038de76a7",
@@ -312,9 +311,9 @@
     "tools/catalog/verify-image-decode.py": "0ac446e403a22febee7007c3dbc436f7e0fe7f9855ac26f23d73852c7492f1de",
     "tools/catalog/verify-images.mjs": "bf0a83808cd3cb768d346784b4c087ca186b11dba2c28928e23148a002e48489",
     "tools/check-source.mjs": "39b459135f7fab7d363e810241fdace0cda8ee7f1d8956ebd36551c2b4994d29",
-    "tools/collector/deployment.example.yaml": "d320729d947bde1c1c10d045864ac85bd57ed902d9b0f07fd252a809a186ba60",
     "tools/collector/Dockerfile": "14e44f10d26c83e823d90bcd7ab0132dc137b88fb449e5ee14a7a0df979d1e96",
     "tools/collector/Dockerfile.dockerignore": "4803f118999afbe9cd8eb107390542d29357f54e899c6a7687a05a31dc5b0e83",
+    "tools/collector/deployment.example.yaml": "d320729d947bde1c1c10d045864ac85bd57ed902d9b0f07fd252a809a186ba60",
     "tools/collector/package-lock.json": "943e38947444f3e19cf34a6612b23168891509d6287279263fb272c5b6ca89dc",
     "tools/collector/package.json": "7c427d2bd34e009e81d7c4d64f5d7990e7ea376b0526813e7761edb1715b4951",
     "tools/collector/runner.js": "7f7e16df3096e0c5b5d76d90f84ae3ad4e7a37c26ed90f9c07782a5627fcb455",
@@ -327,6 +326,7 @@
     "tools/ui-preview/check-floating-tabs.mjs": "a054b72eec4e0040d27914e6d54d108468666643b9f2ef60ae1efe006de81493",
     "tools/ui-preview/check-glass-optics.mjs": "f933a176cd48db55c8aa8ea3ca5db70a8f61a41e1baa0fe46345e1ff8b6868f3",
     "tools/ui-preview/check-layout.mjs": "b9a99fb5a9f17495b2ec9c9e9df5a8dfead674112e02d1a29136c207948a6782",
-    "tools/ui-preview/check-theme-colors.mjs": "8ed5c5b2f5118fac692d132912a37cf4e58cc5851071db465f0fcd477d8b3bac"
+    "tools/ui-preview/check-theme-colors.mjs": "8ed5c5b2f5118fac692d132912a37cf4e58cc5851071db465f0fcd477d8b3bac",
+    "发版检查-1.1.6.html": "62342d4d42c3920a68d9b1194bb3ca6af763133486c0bf71556960f950a7a966"
   }
 }

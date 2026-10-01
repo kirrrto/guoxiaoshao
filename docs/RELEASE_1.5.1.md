@@ -40,14 +40,14 @@
 
 | 项 | 值 |
 |---|---|
-| Git 提交 | `6a7cdb36d357e6f931a18db6c2bd25ffbe070d7a` |
-| Git 树 | `b17ad336f836f8e646cc204d94a30b913bc3c5d3` |
-| 源码包 | `output/release-1.5.1/guoxiaoshao-1.5.1-candidate-6a7cdb3.zip` |
-| 包大小 | 8399181 bytes |
-| SHA-256 | `ebba06d89c41f7943e66188963e7bbc5d70b66b6e143534f88c38920fc58d3d5` |
+| Git 提交 | `ca5d9434e0f63f489fb8f5400a74e8fb15b3e0d0` |
+| Git 树 | 见 `output/release-1.5.1/manifest.json` |
+| 源码包 | `output/release-1.5.1/guoxiaoshao-1.5.1-candidate-ca5d943.zip` |
+| 包大小 | 8400757 bytes |
+| SHA-256 | `54920a7fe6101be20452ec57e255bfb04771ba9d45ed4803d8ca305ed720a6e2` |
 | 内容核对 | 325 个代码文件与 Git blob 哈希一致，0 不匹配、0 不安全条目 |
 
-文件级哈希见 [候选内容哈希](../evidence/verification/1.5.1/candidate-content-hashes.json)。部署后仍须用 `verify-deployment.mjs` 比对实际下载包，不能只凭版本号。
+文件级哈希见 [候选内容哈希](../evidence/verification/1.5.1/candidate-content-hashes.json)。部署后仍须用 `verify-deployment.mjs` 比对实际下载包，不能只凭版本号。GitHub 同步暂缓，本地提交尚未推送。
 
 ## 发布顺序与核对
 
@@ -71,7 +71,7 @@
 
 - [ ] 备份线上三云函数代码、config、触发器和关键配置键
 - [ ] 从本候选部署 `gxs_api` / `gxs_monitor` / `cloudbase_auth`（保留定时器）
-- [ ] 下载云包并运行 `verify-deployment.mjs`，确认与 `6a7cdb3` 内容一致
+- [ ] 下载云包并运行 `verify-deployment.mjs`，确认与 `ca5d943` 内容一致
 - [ ] 核对 `budgetMode=continuous`、SDK overrides、观测时间真实推进
 - [ ] 更新运营小程序并重新加载配置
 - [ ] 上传消费者微信开发版本，记录包大小（预览基线 651017 bytes）
@@ -87,7 +87,7 @@
 - [微信原生预览](../evidence/verification/1.5.1/native-preview.json)：消费者包编译成功，651017 bytes。此处不把预览写成正式上传或手机实测。
 - [独立依赖安装](../evidence/verification/1.5.1/dependency-packages.json)：根目录与四个 SDK 包干净安装成功、锁文件不变、无本地链接。SDK 仍存在一条 `lodash.set` 公告依赖链，共四个 high 包条目；业务未使用 realtime watch，不表示风险消除。
 - [300 人离线指标](../evidence/verification/1.5.1/capacity-300-after.json)、[候选内容哈希](../evidence/verification/1.5.1/candidate-content-hashes.json) 与 [验收状态](../evidence/verification/1.5.1/acceptance-status.json) 分别记录实际边界。
-- 源码候选包：`output/release-1.5.1/guoxiaoshao-1.5.1-candidate-6a7cdb3.zip`，SHA-256 `ebba06d89c41f7943e66188963e7bbc5d70b66b6e143534f88c38920fc58d3d5`；归档核对见同目录 `archive-verification.json`。
+- 源码候选包：`output/release-1.5.1/guoxiaoshao-1.5.1-candidate-ca5d943.zip`，SHA-256 `54920a7fe6101be20452ec57e255bfb04771ba9d45ed4803d8ca305ed720a6e2`；归档核对见同目录 `archive-verification.json`。
 
 ## 回退边界
 
