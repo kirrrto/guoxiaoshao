@@ -6,7 +6,7 @@
   "cancelled": 0,
   "skipped": 0,
   "todo": 0,
-  "duration_ms": 62383.8474,
-  "rawLocalLogSha256": "69f9b9e99d9d90b82abf377fc1c66938454b0a9d72ae7e5d9966a5d0f73c309b",
+  "duration_ms": 39292.2171,
+  "rawLocalLogSha256": "120f6c65186352fcdbfd6e523b06d9a364ea41aff25682d1e3951431f861aa2d",
   "scope": "Offline regression; includes mock payments, source HTTP and in-memory database capacity tests. No real payment, send, production load or deployment."
 }
