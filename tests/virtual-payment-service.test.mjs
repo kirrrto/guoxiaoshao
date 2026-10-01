@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
 import { createHash } from 'node:crypto';
-import { createFixture, userContext, userKeyOf, operatorContext } from './helpers/fixture.mjs';
+import { createFixture, fakeFetch, userContext, userKeyOf, operatorContext } from './helpers/fixture.mjs';
 const require = createRequire(import.meta.url);
 const { createHandler } = require('../cloudfunctions/gxs_api/lib/app');
 const { COLLECTIONS: C } = require('../cloudfunctions/gxs_api/lib/collections');
@@ -130,6 +130,32 @@ test('authoritative paid query grants one seven-day membership and duplicate che
   assert.equal(f.calls.filter(call => call.path === '/sns/jscode2session').length, 1);
 });
 
+test('paid fulfilment makes zero-credit live queries usable, renewals extend access and expired receipts cannot reactivate it', async () => {
+  const f = await fixture();
+  ok(await f.call('admin.updateConfig', { patch: { collector: { budgetMode: 'continuous' }, query: { sharedFreshnessSeconds: 10 } } }, operatorContext()));
+  const pickup = fakeFetch({ R577: { display: 'available' } });
+  const queryHandler = createHandler({ repo: f.repo, fetchImpl: pickup, clock: () => f.state.now, log: { error() {} } });
+  const query = id => queryHandler({ action: 'query.pickup', payload: { queryId: `paid-access-${id}`, partNumber: 'MXXX1CH/A', storeNumbers: ['R577'] } }, userContext());
+  assert.equal(ok(await query('before-payment')).reason, 'insufficient_credits');
+  ok(await f.create()); f.setRemote('purchase-0001'); const first = ok(await f.check());
+  const available = ok(await query('after-payment'));
+  assert.equal(available.ok, true); assert.equal(available.member, true); assert.equal(available.charged, 0); assert.equal(available.balance, 0);
+  f.advance(DAY);
+  ok(await f.create('purchase-0002')); f.setRemote('purchase-0002');
+  const renewed = ok(await f.check('purchase-0002'));
+  assert.equal(Date.parse(renewed.membership.expiresAt), Date.parse(first.membership.expiresAt) + 7 * DAY);
+  f.advance(Date.parse(renewed.membership.expiresAt) - f.state.now.getTime());
+  assert.equal(ok(await query('expired')).reason, 'insufficient_credits');
+  const replayed = ok(await f.check('purchase-0002'));
+  assert.equal(replayed.membership.active, false); assert.equal(replayed.membership.expiresAt, renewed.membership.expiresAt);
+  ok(await f.create('purchase-0003')); f.setRemote('purchase-0003');
+  const restarted = ok(await f.check('purchase-0003'));
+  assert.equal(Date.parse(restarted.membership.expiresAt), f.state.now.getTime() + 7 * DAY);
+  assert.equal(ok(await query('renewed-after-expiry')).ok, true);
+  assert.equal(pickup.calls.length, 2, 'free-user denials never consume actual upstream requests');
+  assert.deepEqual(await f.repo.listLedger(userKeyOf()), [], 'membership queries never consume free-user credits');
+});
+
 test('missing or mismatched payment evidence never grants rights', async () => {
   for (const patch of [
     { order_fee: 1 }, { paid_fee: 699 }, { paid_fee: undefined }, { order_id: 'other-order' },
@@ -183,6 +209,31 @@ test('delivery acknowledgement failure retains confirmed membership and retries 
   const first = ok(await f.check()); assert.equal(first.membership.active, true); assert.equal((await f.order()).providerAcknowledgedAt, null);
   f.behavior.ackFails = false;
   const second = ok(await f.check()); assert.equal(second.membership.expiresAt, first.membership.expiresAt); assert.ok((await f.order()).providerAcknowledgedAt);
+});
+
+test('a lease cleanup failure cannot hide an already committed paid membership', async () => {
+  const f = await fixture(); ok(await f.create()); f.setRemote('purchase-0001');
+  const release = f.repo.releaseLease;
+  f.repo.releaseLease = async () => { throw new Error('lease database temporarily unavailable'); };
+  const paid = ok(await f.check());
+  assert.equal(paid.order.status, 'fulfilled'); assert.equal(paid.membership.active, true);
+  const expiry = paid.membership.expiresAt;
+  assert.equal((await f.order()).fulfilledAt, f.state.now.toISOString());
+  // Cleanup is recoverable through the existing lease expiry, without issuing
+  // another grant or pretending the committed payment remains uncertain.
+  f.repo.releaseLease = release; f.advance(60000);
+  assert.equal(ok(await f.check()).membership.expiresAt, expiry);
+  assert.equal(f.calls.filter(call => call.path === '/xpay/notify_provide_goods').length, 1);
+});
+
+test('lease cleanup does not replace an actionable payment identity rejection', async () => {
+  const f = await fixture(); f.behavior.sessionOpenid = 'another-user';
+  f.repo.releaseLease = async () => { throw new Error('credential-bearing transport detail must not escape'); };
+  const response = await f.create();
+  assert.equal(response.ok, false); assert.equal(response.error.code, 'payment_openid_mismatch');
+  assert.equal((await f.user()).membership.expiresAt, null);
+  assert.equal((await f.order()).paymentPreparedAt, null);
+  assert.doesNotMatch(JSON.stringify(response), /credential-bearing/);
 });
 
 test('closed platform order becomes cancelled and can never be reopened by reuse of its client ID', async () => {

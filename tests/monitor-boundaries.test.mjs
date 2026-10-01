@@ -2,6 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
 import { createFixture, fakeFetch, userKeyOf } from './helpers/fixture.mjs';
+import { seedNotificationObservation } from './helpers/notification-observation.mjs';
 
 const require = createRequire(import.meta.url);
 const { createCollector } = require('../cloudfunctions/gxs_api/lib/engine/collector');
@@ -117,6 +118,7 @@ test('a deadline reached during credit reservation prevents the send and restore
     partNumber: 'MJYH4CH/A', storeNumber: 'R577', templateId: 'TPL', status: 'pending', attempts: 0,
     createdAt: s.f.state.now.toISOString(), detectedAt: s.f.state.now.toISOString() };
   await s.f.repo.saveNotification(task);
+  await seedNotificationObservation(s.f.repo, task);
   let allowed = true;
   const reserve = s.f.repo.reserveSubscriptionCredit;
   s.f.repo.reserveSubscriptionCredit = async args => { const result = await reserve(args); allowed = false; return result; };
@@ -247,6 +249,7 @@ test('message timeout uses the actual lease time left after the final renewal', 
   await s.f.repo.saveNotification({ _id: 'slow-lease-task', userKey: userKeyOf(), followId: 'F', eventId: 'event-slow-lease',
     eventType: 'restock_confirmed', partNumber: 'MJYH4CH/A', storeNumber: 'R577', templateId: 'TPL', status: 'pending', attempts: 0,
     createdAt: s.f.state.now.toISOString(), detectedAt: s.f.state.now.toISOString() });
+  await seedNotificationObservation(s.f.repo, await s.f.repo.getNotification('slow-lease-task'));
   await collector.drainNotifications();
   assert.ok(s.options.remainingMs() > 15000, 'the invocation still has ample time');
   assert.deepEqual(attempts, [{ timeoutMs: 4000, leaseRemainingMs: 5000 }]);

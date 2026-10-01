@@ -1,0 +1,49 @@
+{
+  "kind": "offline-contract-simulation-baseline",
+  "productionRequests": 0,
+  "observedStrategy": "maximum four claims, 200+400+800ms coalescing sleep",
+  "note": "Summaries copied from the original run's tool stdout. The original process was stopped during the oversized sustained simulation because the memory repo deeply clones every stored document per transaction; no sustained baseline or production latency is claimed.",
+  "scenarios": [
+    {
+      "name": "same-target-fast",
+      "clients": 300,
+      "successfulQueries": 300,
+      "busyOrFailedQueries": 0,
+      "upstreamHttp": 1,
+      "netQuotaDebit": 0
+    },
+    {
+      "name": "same-target-slow",
+      "clients": 300,
+      "simulatedUpstreamLatencyMs": 2500,
+      "successfulQueries": 1,
+      "busyOrFailedQueries": 299,
+      "upstreamHttp": 1,
+      "netQuotaDebit": 0
+    },
+    {
+      "name": "same-three-stores",
+      "clients": 300,
+      "successfulQueries": 300,
+      "busyOrFailedQueries": 0,
+      "upstreamHttp": 3,
+      "netQuotaDebit": 0
+    },
+    {
+      "name": "distinct-300-targets",
+      "clients": 300,
+      "successfulQueries": 59,
+      "busyOrFailedQueries": 241,
+      "upstreamHttp": 59,
+      "netQuotaDebit": 0
+    },
+    {
+      "name": "distinct-900-targets",
+      "clients": 300,
+      "successfulQueries": 20,
+      "busyOrFailedQueries": 280,
+      "upstreamHttp": 59,
+      "netQuotaDebit": 0
+    }
+  ]
+}

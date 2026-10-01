@@ -6,7 +6,6 @@ const { resolveConfig } = require('../rules/quota');
 const { maskOpenid } = require('../identity');
 const { monitoringSnapshot } = require('../monitor-readiness');
 const { paymentProduct } = require('../payment/service');
-const { COLLECTIONS } = require('../collections');
 
 function newUser(identity, nowIso) {
   return {
@@ -71,11 +70,21 @@ async function quotaSnapshot(ctx, user) {
 
 /** Ledgers from the 2026-09-22 build issued more tickets than accepts; see repairInflatedCredits. */
 async function repairInflatedSubscriptions(ctx, user) {
-  const inflated = Object.entries(user.subscriptions || {}).filter(([, sub]) => sub && sub.creditLedger && !sub.poolRepairedAt
-    && Number(sub.creditLedger.sequence) > (Number.isSafeInteger(sub.accepted) ? sub.accepted : 0));
-  for (const [templateId] of inflated) {
-    const sends = await ctx.repo.count(COLLECTIONS.notifications, { userKey: user._id, templateId, status: 'accepted' });
-    await ctx.repo.repairInflatedCredits({ userKey: user._id, templateId, sends, now: ctx.nowIso });
+  const needsRepair = sub => sub && sub.creditLedger && !sub.poolRepairedAt
+    && Number(sub.creditLedger.sequence) > (Number.isSafeInteger(sub.accepted) ? sub.accepted : 0);
+  const inflated = Object.entries(user.subscriptions || {}).filter(([, sub]) => needsRepair(sub));
+  for (const [templateId, initial] of inflated) {
+    let subscription = initial;
+    for (let attempt = 0; attempt < 3 && needsRepair(subscription); attempt++) {
+      // Reserved and uncertain sends already occupy permission, even before an
+      // accepted response. The transaction rejects a stale ledger snapshot.
+      const usedCredits = await ctx.repo.countSubscriptionRepairUsage({ userKey: user._id, templateId });
+      const result = await ctx.repo.repairInflatedCredits({ userKey: user._id, templateId, usedCredits,
+        expectedSubscription: subscription, now: ctx.nowIso });
+      if (!result.retry) break;
+      const latest = await ctx.repo.getUser(user._id);
+      subscription = latest && latest.subscriptions && latest.subscriptions[templateId];
+    }
   }
   return inflated.length > 0;
 }

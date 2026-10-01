@@ -1,6 +1,6 @@
 {
   "name": "guoxiaoshao-collector",
-  "version": "0.2.0",
+  "version": "1.5.1",
   "license": "MIT",
   "private": true,
   "type": "commonjs",
@@ -13,5 +13,9 @@
   },
   "dependencies": {
     "wx-server-sdk": "4.0.2"
+  },
+  "overrides": {
+    "axios": "0.34.0",
+    "lodash.unset": "4.18.0"
   }
 }

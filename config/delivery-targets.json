@@ -1,0 +1,10 @@
+{
+  "version": "1.5.1",
+  "purpose": "Acceptance requirements, not deployed runtime configuration or achieved capacity",
+  "simultaneousQueryingMembers": 300,
+  "followNormalDetectionSeconds": 60,
+  "followAvailableRecheckSeconds": 3,
+  "availableRecheckPolicy": "Continue while a durably observed known target remains available; unknown, failures, source limits and worker gaps must be reported, never fabricated as successful samples",
+  "inventoryMeaning": "Store pickup availability; no exact remaining unit count is provided",
+  "productionAcceptancePassed": false
+}

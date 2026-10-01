@@ -101,6 +101,8 @@ async function runScheduled({ repo, fetchImpl, sendImpl, clock = () => new Date(
     // per group and wait briefly for store spacing so later batches are still
     // scanned during this invocation instead of alternating across minutes.
     const maxWaves = Math.max(1, snap.groupCount);
+    const fastIntervals = [snap.burstIntervalMs, snap.availableIntervalMs].filter(interval => interval > 0);
+    const storeSpacingMs = fastIntervals.length ? Math.min(snap.intervalMs, ...fastIntervals) : 0;
     for (let wave = 0; wave < maxWaves && shouldContinue(); wave++) {
       const result = await collector.step();
       if (!result.held) return { state: 'standby', scanned: collector.stats.batches };
@@ -109,7 +111,7 @@ async function runScheduled({ repo, fetchImpl, sendImpl, clock = () => new Date(
       if (!result.started.length) {
         const waitMs = collector.scheduler.nextDueInMs();
         const storeDelayed = collector.scheduler.snapshot().targets.some(target => target.storeDelayed);
-        if (storeDelayed && waitMs > 0 && waitMs <= snap.burstIntervalMs && clock().getTime() + waitMs < deadline) {
+        if (storeDelayed && waitMs > 0 && waitMs <= storeSpacingMs && clock().getTime() + waitMs < deadline) {
           await sleep(Math.min(waitMs, 1000));
           wave -= 1;
           continue;

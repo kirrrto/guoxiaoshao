@@ -1,5 +1,6 @@
 'use strict';
 const { ApiError } = require('../errors');
+const { mergeConfig } = require('../config');
 const { dayKey, startOfDay } = require('../time');
 const { ledgerIds } = require('../rules/quota');
 const { COLLECTIONS } = require('../collections');
@@ -22,7 +23,9 @@ function requireAdmin(ctx, diagnosticStage) {
 
 async function getConfig(ctx) {
   requireAdmin(ctx);
-  return { config: ctx.config };
+  // Content and revision must come from the same read, including legacy documents.
+  const stored = await ctx.repo.getConfig() || {};
+  return { config: mergeConfig(stored), revision: Number.isSafeInteger(stored.configRevision) && stored.configRevision >= 0 ? stored.configRevision : 0 };
 }
 
 async function paymentStatus(ctx) {
@@ -35,7 +38,7 @@ async function updateConfig(ctx, payload) {
   requireAdmin(ctx, 'admin.updateConfig.requireAdmin');
   const patch = payload && payload.patch;
   assertConfigEditor(ctx.config, patch, ctx.identity, 'admin.updateConfig.snapshot');
-  return ctx.repo.patchRuntimeConfig({ patch, updatedAt: ctx.nowIso, actor: ctx.identity, requestId: ctx.requestId });
+  return ctx.repo.patchRuntimeConfig({ patch, expectedRevision: payload && payload.expectedRevision, updatedAt: ctx.nowIso, actor: ctx.identity, requestId: ctx.requestId });
 }
 
 async function seedCatalog(ctx) {

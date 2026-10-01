@@ -72,7 +72,12 @@ async function withOrderLease(ctx, id, work) {
   const lease = await ctx.repo.acquireLease({ id: `pay_order_${id}`, ownerId, now: now.toISOString(), expiresAt: new Date(now.getTime() + 60000).toISOString() });
   if (!lease.acquired) throw new ApiError('payment_pending', '这笔订单正在确认中，请稍后查询');
   try { return await work(); }
-  finally { await ctx.repo.releaseLease({ id: `pay_order_${id}`, ownerId }); }
+  finally {
+    // Cleanup must not replace a durable fulfilment or the actual payment
+    // error. A failed release remains fenced until the existing lease expires.
+    try { await ctx.repo.releaseLease({ id: `pay_order_${id}`, ownerId }); }
+    catch { if (ctx.log && typeof ctx.log.warn === 'function') ctx.log.warn('[payment] order lease cleanup failed'); }
+  }
 }
 
 async function resultOf(ctx, order, providerState, canPrepare = false) {

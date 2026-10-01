@@ -20,6 +20,7 @@ const DELIVERY_REASON = {
   notifications_disabled: '提醒发送服务尚未开启。',
   collector_not_deployed: '后台检测服务尚未启动，暂不能自动发现补货。',
   collector_stale: '后台检测服务状态已过期，正在等待恢复。',
+  collector_observation_stale: '库存观测未及时更新，暂不能确认最新取货状态；关注和提醒次数会保留。',
   collector_stopped: '后台检测服务暂不可用，当前无法自动发送提醒。',
   consumer_credentials_missing: '提醒发送服务尚未完成配置。',
   consumer_appid_mismatch: '提醒发送配置需要修复，暂不能发送消息。',
@@ -40,7 +41,7 @@ const DETECTION_DETAIL = {
   no_lease: '后台检测正在等待恢复，已开启的关注会保留。',
   throttled: '库存接口限制了请求频率，检测暂时降速或暂停。',
   probing: '正在检查库存接口是否已恢复。',
-  budget_limited: '后台检测用量已达上限，需恢复服务额度。',
+  budget_limited: '后台检测请求较多，正在等待更新；已开启的关注会保留。',
   error: '后台检测出现异常，暂不能确认最新库存，请稍后刷新。',
 };
 
@@ -83,7 +84,7 @@ function presentFollow(follow, boot, catalog, collector) {
   let monitoringText = '';
   if (follow.status === 'active') {
     if (!canRemind(boot)) { status.cls = 'warn'; monitoringText = boot.freeReminderUsed ? '免费提醒已用完，开通会员后恢复自动检测' : '会员未生效，当前不参与自动检测'; }
-    else if (!collector || collector.state !== 'running') monitoringText = '关注已保存，后台检测情况见上方';
+    else if (!collector || collector.state !== 'running' || collector.observationStale) monitoringText = '关注已保存，后台检测情况见上方';
   }
   const product = catalog && catalog.productByPart && catalog.productByPart[follow.partNumber];
   const stores = (follow.stores || []).map(s => ({ ...s, storeName: storeLabel(s.storeNumber, s.storeName), storeLabel: storeLabelWithCity(s.storeNumber, s.storeName, s.city), ...fmt.stockObservation(s, now, { restricted: follow.latestRestricted }) }));
@@ -178,6 +179,7 @@ Page({
   },
 
   async onLoad(options) {
+    if (this.pageRetired) return;
     if (options && options.eid) getApp().captureAlert({ query: { eid: options.eid } });
     if (this.loadingBoot) return;
     this.loadingBoot = true;
@@ -186,6 +188,7 @@ Page({
       if (!this.unsubscribeCredits) this.unsubscribeCredits = subscribeSubscriptions(subscriptions => this.applyCredits(subscriptions));
       this.setData({ subscriptionPending: Boolean(readPending()) });
       const results = await Promise.all([getBootstrap(), getCatalog()]);
+      if (this.pageRetired) return;
       const boot = results[0], initialCatalog = results[1];
       const catalog = getApp().globalData.catalog || initialCatalog;
       this.catalog = catalog;
@@ -194,13 +197,14 @@ Page({
       this.consumePendingAlert();
       if (this.visible) this.startPolling();
     } catch (error) {
-      this.setData({ loadError: error.message || String(error) });
+      if (!this.pageRetired) this.setData({ loadError: error.message || String(error) });
     } finally {
       this.loadingBoot = false;
     }
   },
 
   async onShow() {
+    if (this.pageRetired) return;
     syncTabBar(this, '/pages/follow/index');
     this.visible = true;
     if (!this.data.ready) {
@@ -209,7 +213,9 @@ Page({
     }
     this.refreshFollowPresentation();
     try {
-      this.applyBoot(await getBootstrap());
+      const boot = await getBootstrap();
+      if (this.pageRetired) return;
+      this.applyBoot(boot);
       getCatalog();
       await this.loadFollows();
     } catch (e) { /* keep previous data */ }
@@ -236,6 +242,7 @@ Page({
 
   /** Called by the tab bar when the phone reconnects. */
   onNetworkRestored() {
+    if (this.pageRetired) return;
     if (this.data.loadError) return this.onRetryLoad();
     if (!this.data.ready) return;
     getBootstrap({ force: true }).then(boot => { this.applyBoot(boot); return this.loadFollows({ force: true }); }).catch(() => {});
@@ -243,6 +250,7 @@ Page({
 
   stopPolling() { this.pollEpoch = (this.pollEpoch || 0) + 1; if (this.pollTimer) clearTimeout(this.pollTimer); this.pollTimer = null; },
   startPolling() {
+    if (this.pageRetired || !this.visible) return;
     this.stopPolling();
     const epoch = this.pollEpoch;
     const tick = async () => {
@@ -261,17 +269,20 @@ Page({
   },
 
   async onPullDownRefresh() {
+    if (this.pageRetired) return;
     try {
       const results = await Promise.all([getBootstrap({ force: true }), getCatalog({ force: true })]);
+      if (this.pageRetired) return;
       const boot = results[0], catalog = results[1];
       this.catalog = catalog;
       this.applyBoot(boot, { catalogVersion: catalog.version, ready: true, loadError: null });
       await this.loadFollows({ force: true });
-    } catch (error) { showError(error); }
+    } catch (error) { if (!this.pageRetired) showError(error); }
     finally { wx.stopPullDownRefresh(); }
   },
 
   async consumePendingAlert() {
+    if (this.pageRetired) return;
     const app = getApp(), eventId = app.globalData.pendingAlert;
     if (!eventId || !this.data.ready) return;
     app.globalData.pendingAlert = null;
@@ -280,9 +291,9 @@ Page({
     if (typeof wx.pageScrollTo === 'function') wx.pageScrollTo({ scrollTop: 0, duration: 0 });
     try {
       const data = await call('notify.detail', { eventId });
-      if (this.data.alert && this.data.alert.eventId === eventId) this.setData({ alert: presentAlert(data) });
+      if (!this.pageRetired && this.data.alert && this.data.alert.eventId === eventId) this.setData({ alert: presentAlert(data) });
     } catch (error) {
-      if (this.data.alert && this.data.alert.eventId === eventId) this.setData({ alert: { eventId, error: error.message || '提醒详情暂时无法读取' } });
+      if (!this.pageRetired && this.data.alert && this.data.alert.eventId === eventId) this.setData({ alert: { eventId, error: error.message || '提醒详情暂时无法读取' } });
     }
   },
 
@@ -327,6 +338,7 @@ Page({
   },
 
   consumePending() {
+    if (this.pageRetired) return;
     const pending = getApp().globalData.pendingFollow;
     if (!pending) return;
     getApp().globalData.pendingFollow = null;
@@ -351,7 +363,9 @@ Page({
     this.setData({
       // freeReminder: a new account's one free alert; freeReminderUsed: it was sent and there is no membership.
       boot: { member, expired, freeReminder: !member && boot.freeReminder === true, freeReminderUsed: !member && !expired && boot.freeReminder === false, expiresAt: boot.membership.expiresAt, expiresText: boot.membership.expiresAt ? fmt.fmtDate(boot.membership.expiresAt) : null, notificationsEnabled: notifications.enabled, notificationReason: delivery.detail, templateIds, soldoutId: soldout.templateId, requestIds: soldout.templateId ? [...templateIds, soldout.templateId] : templateIds, templateTitle: typeof notifications.templateTitle === 'string' ? notifications.templateTitle.trim() : '', memberProduct: boot.memberProduct },
-      collector: { ...collector, ...fmt.collectorMeta(collector.state), detail: DETECTION_DETAIL[collector.state] || '暂未取得后台检测状态，请稍后刷新。', updatedText: collector.updatedAt ? fmt.fmtDateTime(collector.updatedAt) : null, batchText: collector.lastBatchAt ? fmt.fmtDateTime(collector.lastBatchAt) : null },
+      collector: { ...collector, ...fmt.collectorMeta(collector.state), detail: DETECTION_DETAIL[collector.state] || '暂未取得后台检测状态，请稍后刷新。',
+        ...(collector.observationStale ? { label: '库存观测更新延迟', cls: 'warn', detail: DELIVERY_REASON.collector_observation_stale } : {}),
+        updatedText: collector.updatedAt ? fmt.fmtDateTime(collector.updatedAt) : null, batchText: collector.lastBatchAt ? fmt.fmtDateTime(collector.lastBatchAt) : null },
       delivery,
       limits: boot.limits || this.data.limits,
       subscription: { ...subscription, soldoutEnabled: Boolean(soldout.templateId), soldoutCredits: soldout.credits },
@@ -366,6 +380,7 @@ Page({
   },
 
   async loadFollows(options = {}) {
+    if (this.pageRetired) return;
     if (this.followsPromise) return this.followsPromise;
     const generation = this.followReadGeneration || 0;
     const pending = getFollows(options).then(data => {
@@ -452,7 +467,7 @@ Page({
 
   onServiceDetails() {
     const { collector, delivery } = this.data;
-    wx.showModal({ title: '检测与消息服务', content: `${collector.label}\n${collector.detail}${collector.updatedText ? '\n最近状态：' + collector.updatedText : ''}${collector.batchText ? '\n最近检测：' + collector.batchText : ''}\n\n${delivery.label}\n${delivery.detail}\n\n页面约每分钟读取一次已有观测，跟随后台检测节奏；读取本身不会检测库存。`, showCancel: false });
+    wx.showModal({ title: '检测与消息服务', content: `${collector.label}\n${collector.detail}${collector.updatedText ? '\n最近状态：' + collector.updatedText : ''}${collector.batchText ? '\n最近检测：' + collector.batchText : ''}\n\n${delivery.label}\n${delivery.detail}\n\n页面可见时约每分钟读取一次已有观测。后台更新可能延迟，请查看各门店的观测时间；刷新页面不会立即重新检测。`, showCancel: false });
   },
 
   openEditor({ followId, pickerValue, isNew }) {
@@ -593,7 +608,7 @@ Page({
   },
 
   async onSubscribe() {
-    if (this.data.subscribing) return;
+    if (this.pageRetired || this.data.subscribing) return;
     if (!this.data.boot) return toast('正在读取账户，请稍后再试');
     const tmplIds = this.data.boot.requestIds || this.data.boot.templateIds;
     if (!tmplIds.length) {
@@ -614,6 +629,7 @@ Page({
       try {
         res = await wx.requestSubscribeMessage({ tmplIds });
       } catch (error) {
+        if (this.pageRetired) return;
         this.setData({ subscribing: false });
         const msg = (error && error.errMsg) || '';
         if (/20004/.test(msg)) return toast('你已关闭订阅消息总开关，请在设置中开启');
@@ -623,21 +639,22 @@ Page({
       for (const id of tmplIds) if (res[id]) results[id] = res[id];
       const pending = { requestId, results };
       savePending(pending);
-      this.setData({ subscriptionPending: true });
+      if (!this.pageRetired) this.setData({ subscriptionPending: true });
       this.refreshReadiness();
       return await this.flushSubscription(pending);
     } finally { endSubscription(); }
   },
 
   async flushSubscription(pending) {
-    this.setData({ subscribing: true });
+    if (!this.pageRetired) this.setData({ subscribing: true });
     try {
       const data = await call('notify.recordSubscription', pending);
       const restockId = this.data.boot.templateIds[0];
       const credits = restockSubscription({ templateIds: { restock: restockId } }, data.subscriptions).credits;
       clearPending(pending);
-      this.setData({ 'subscription.credits': credits, 'subscription.soldoutCredits': soldoutSubscription({ templateIds: { soldout: this.data.boot.soldoutId } }, data.subscriptions).credits, subscriptionPending: false });
       publishSubscriptions(data.subscriptions);
+      if (this.pageRetired) return;
+      this.setData({ 'subscription.credits': credits, 'subscription.soldoutCredits': soldoutSubscription({ templateIds: { soldout: this.data.boot.soldoutId } }, data.subscriptions).credits, subscriptionPending: false });
       this.refreshReadiness();
       const result = pending.results && pending.results[restockId];
       const soldoutId = this.data.boot.soldoutId;
@@ -661,15 +678,16 @@ Page({
         // Only a definitive rejection releases the pending request; uncertain
         // network failures must retain its ID to avoid double crediting.
         clearPending(pending);
+        if (this.pageRetired) return;
         this.setData({ subscriptionPending: false });
         try { this.applyBoot(await getBootstrap({ force: true })); } catch (e) { /* retry on the next refresh */ }
         if (error.code === 'membership_required') this.showMemberModal();
         else toast('授权记录已失效，请重新点击授权');
         return;
       }
-      showError(error);
+      if (!this.pageRetired) showError(error);
     } finally {
-      this.setData({ subscribing: false });
+      if (!this.pageRetired) this.setData({ subscribing: false });
       this.refreshReadiness();
       // The prompt may have just set "总是保持以上选择", which enables silent top-ups.
       refreshConsentSetting();
@@ -677,7 +695,7 @@ Page({
   },
 
   applyCredits(subscriptions) {
-    if (!this.data.boot || !this.data.boot.templateIds.length) return;
+    if (this.pageRetired || !this.data.boot || !this.data.boot.templateIds.length) return;
     const credits = restockSubscription({ templateIds: { restock: this.data.boot.templateIds[0] } }, subscriptions).credits;
     const soldoutCredits = soldoutSubscription({ templateIds: { soldout: this.data.boot.soldoutId } }, subscriptions).credits;
     if (credits !== this.data.subscription.credits || soldoutCredits !== this.data.subscription.soldoutCredits) {

@@ -157,6 +157,13 @@ export function createMemoryRepo(seed = {}) {
       Object.assign(current, clone(patch));
     },
     async listNotifications(userKey, limit) { return all(COLLECTIONS.notifications).filter(n => n.userKey === userKey).sort((a, b) => byDesc('createdAt')(a, b) || byDesc('_id')(a, b)).slice(0, limit || 50); },
+    async countSubscriptionRepairUsage({ userKey, templateId }) {
+      return all(COLLECTIONS.notifications).filter(task => task.userKey === userKey && (
+        task.templateId === templateId && task.status === 'accepted'
+        || task.subscriptionTemplateId === templateId && task.subscriptionReserved === true && task.subscriptionCreditRestored !== true
+        || task.templateId === templateId && task.status === 'uncertain' && task.subscriptionCreditRestored !== true
+      )).length;
+    },
     async listVisibleNotifications({ userKey, view, snapshot, cursor, limit }) {
       const rows = all(COLLECTIONS.notifications).filter(n => n.userKey === userKey && !n.userHiddenAt
         && (n.viewSequence != null ? n.viewSequence > (view.clearedThroughSequence || 0) && n.viewSequence <= snapshot.sequence : n.createdAt <= snapshot.at && (!view.legacyClearBefore || n.createdAt > view.legacyClearBefore))

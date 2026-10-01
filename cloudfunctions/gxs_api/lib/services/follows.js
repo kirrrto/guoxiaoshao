@@ -40,7 +40,7 @@ function present(follow, latestByKey, storesByNumber, product, ctx, member = tru
 function presentLatest(sample, ctx, restricted = false) {
   const latest = restricted ? null : sample;
   const sampleAge = latest ? ctx.now.getTime() - Date.parse(latest.knownAt || latest.observedAt) : NaN;
-  const stale = latest && (latest.unknownSince || !Number.isFinite(sampleAge) || sampleAge > ctx.config.collector.continuityGapMs);
+  const stale = latest && (latest.unknownSince || !Number.isFinite(sampleAge) || sampleAge < 0 || sampleAge > ctx.config.collector.continuityGapMs);
   return {
     status: restricted || stale ? 'unknown' : latest ? latest.status : null,
     isStale: Boolean(stale),

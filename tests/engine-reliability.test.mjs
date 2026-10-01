@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
 import net from 'node:net';
 import { createFixture, fakeFetch, userKeyOf, CONSUMER_APPID } from './helpers/fixture.mjs';
+import { seedNotificationObservation } from './helpers/notification-observation.mjs';
 
 const require = createRequire(import.meta.url);
 const { createCollector } = require('../cloudfunctions/gxs_api/lib/engine/collector');
@@ -51,7 +52,7 @@ async function setup(override = {}) {
   const task = id => ({ _id: id, userKey: userKeyOf(), followId: 'F', eventId: `event-${id}`, eventType: 'restock_confirmed',
     partNumber: 'MJYH4CH/A', storeNumber: 'R577', templateId: 'TPL', status: 'pending', attempts: 0,
     createdAt: f.state.now.toISOString(), detectedAt: f.state.now.toISOString() });
-  const send = async (t, impl = sender) => sendTask({ task: t, repo: f.repo, config, sendImpl: impl, now: f.state.now, clock: () => f.state.now, ownerId: 'test-sender' });
+  const send = async (t, impl = sender) => { await seedNotificationObservation(f.repo, t); return sendTask({ task: t, repo: f.repo, config, sendImpl: impl, now: f.state.now, clock: () => f.state.now, ownerId: 'test-sender' }); };
   return { f, upstream, collector, sends, sender, run, task, send, available: () => { display = 'available'; } };
 }
 

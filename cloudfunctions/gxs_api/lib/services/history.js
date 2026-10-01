@@ -109,7 +109,7 @@ async function list(ctx, payload) {
 function presentLatest(latest, ctx) {
   return latest.map(l => {
     const age = ctx.now.getTime() - Date.parse(l.knownAt || l.observedAt);
-    const isStale = Boolean(l.unknownSince) || !Number.isFinite(age) || age > ctx.config.collector.continuityGapMs;
+    const isStale = Boolean(l.unknownSince) || !Number.isFinite(age) || age < 0 || age > ctx.config.collector.continuityGapMs;
     return { storeNumber: l.storeNumber, storeName: l.storeName, status: isStale ? 'unknown' : l.status, lastKnownStatus: l.lastKnownStatus || l.status, isStale, statusSince: l.statusSince, observedAt: l.observedAt, knownAt: l.knownAt, unknownSince: l.unknownSince, quote: l.quote };
   });
 }

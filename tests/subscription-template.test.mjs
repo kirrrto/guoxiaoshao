@@ -2,6 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
 import { createFixture, userKeyOf, operatorContext } from './helpers/fixture.mjs';
+import { seedNotificationObservation } from './helpers/notification-observation.mjs';
 
 const require = createRequire(import.meta.url);
 const { mergeConfig, validateConfig, isValidTemplateId } = require('../cloudfunctions/gxs_api/lib/config');
@@ -67,7 +68,7 @@ async function setup() {
 
 test('WeChat 43101 expires stale local credits and fresh consent enables a later event', async () => {
   const s = await setup(); const t = s.task('denied'); await s.f.repo.saveNotification(t);
-  const send = async (task, sendImpl) => sendTask({ task, sendImpl, config, repo: s.f.repo, now: s.f.state.now, clock: () => s.f.state.now });
+  const send = async (task, sendImpl) => { await seedNotificationObservation(s.f.repo, task); return sendTask({ task, sendImpl, config, repo: s.f.repo, now: s.f.state.now, clock: () => s.f.state.now }); };
   const outcome = await send(t, async () => ({ errcode: 43101, errmsg: 'private upstream details' }));
   assert.equal(outcome.reason, 'subscription_authorization_expired');
   assert.equal(outcome.status, 'failed');

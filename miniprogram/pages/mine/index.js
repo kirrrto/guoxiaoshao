@@ -52,6 +52,9 @@ const SKIP_REASON = {
   consumer_appid_mismatch: '当前账号暂时无法接收提醒',
   openid_missing: '账号信息暂时无法确认',
   event_expired: '补货信息已过时，本次未发送',
+  event_superseded: '库存状态已变化，本次旧提醒未发送',
+  event_unconfirmed: '库存状态尚未重新确认，本次未发送',
+  event_invalid_time: '提醒时间异常，本次未发送',
   lease_lost: '提醒服务暂时中断，本次未发送',
   missing_task_or_user: '提醒或账号信息暂时无法确认',
   credit_released: '本次提醒已取消，授权次数已恢复',
@@ -683,7 +686,10 @@ Page({
       return;
     }
     if (action === 'explain') {
-      const explanations = { cooldown: '短时间内同一配置与门店的重复变化会合并控制提醒频率。本次未发送，之后的新变化仍按有效授权与提醒设置处理。', event_expired: '这次取货变化已经超过发送时限，为避免用旧信息打扰你，本次不发送。可到小哨页查看新的观测。', credit_released: '本次提醒已取消，预留的授权次数已恢复。这条旧提醒不会重新发送。' };
+      const explanations = { cooldown: '短时间内同一配置与门店的重复变化会合并控制提醒频率。本次未发送，之后的新变化仍按有效授权与提醒设置处理。', event_expired: '这次取货变化已经超过发送时限，为避免用旧信息打扰你，本次不发送。可到小哨页查看新的观测。', credit_released: '本次提醒已取消，预留的授权次数已恢复。这条旧提醒不会重新发送。',
+        event_superseded: '发送前再次检查时，库存状态已变化，因此这条旧提醒未发送，未消耗提醒次数。可到小哨页查看新的观测。',
+        event_unconfirmed: '发送前未能再次确认库存状态，因此本次未发送，未消耗提醒次数。后台恢复有效观测后，新的变化仍按当前设置处理。',
+        event_invalid_time: '这条提醒的记录时间异常，无法确认信息是否及时，因此本次未发送，未消耗提醒次数。可到小哨页查看新的观测。' };
       wx.showModal({ title: '本次未发送原因', content: explanations[notification.reason], showCancel: false });
       return;
     }
@@ -762,7 +768,7 @@ Page({
   onHelp() {
     wx.showModal({
       title: '使用说明',
-      content: `1. 查询：选择具体配置与门店，免费查询消耗 ${this.data.quota.queryCost} 次，接口失败按服务端规则返还。\n2. 次数：每日签到和体验任务可获取次数，每日最多 ${this.data.quota.dailyGrantCap} 次，累计上限 ${this.data.quota.balanceCap} 次。\n3. 会员：查询不扣次数，可关注 3 个具体配置，每配置最多 3 家门店；颜色或容量不同分别占用名额。该产品为一次性虚拟服务，一经售出不予退款。\n4. 提醒：新用户可免费关注 1 个配置并收到 1 条到货提醒，之后为会员功能。提醒需要授权微信订阅消息，每次「允许」增加 1 次，开通会员不等于无限接收提醒。\n5. 新品：受限新品开售 30 天内，免费用户不可实时查询，只能看昨天及更早历史。`,
+      content: `1. 查询：选择具体配置与门店，免费查询消耗 ${this.data.quota.queryCost} 次，接口失败按服务端规则返还；请求繁忙或数据源限流时需稍后重试。\n2. 次数：每日签到和体验任务可获取次数，每日最多 ${this.data.quota.dailyGrantCap} 次，累计上限 ${this.data.quota.balanceCap} 次。\n3. 会员：查询不扣次数，可关注 3 个具体配置，每配置最多 3 家门店；颜色或容量不同分别占用名额。该产品为一次性虚拟服务，一经售出不予退款。\n4. 提醒：新用户可免费关注 1 个配置并收到 1 条到货提醒，之后为会员功能。提醒需要授权微信订阅消息，每次「允许」增加 1 次，开通会员不等于无限接收提醒。\n5. 新品：受限新品开售 30 天内，免费用户不可实时查询，只能看昨天及更早历史。`,
       showCancel: false,
     });
   },

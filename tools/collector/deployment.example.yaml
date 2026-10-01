@@ -17,7 +17,7 @@ spec:
       terminationGracePeriodSeconds: 35
       containers:
         - name: collector
-          image: YOUR_REGISTRY/guoxiaoshao-collector:0.2.0
+          image: YOUR_REGISTRY/guoxiaoshao-collector:1.5.1
           ports: [{containerPort: 8080}]
           env:
             - {name: GXS_ENABLE_COLLECTOR_PROCESS, value: "false"}

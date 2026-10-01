@@ -38,7 +38,9 @@ test('429 Retry-After survives new API calls and auto collection using the same 
   const f = createFixture({ config: { collector: { enabled: true } }, fetchImpl: async () => { calls++; return { status: 429, headers: { get: () => '180' }, body: (async function* () { yield Buffer.from('busy'); })() }; } });
   await member(f);
   ok(await f.call('follow.upsert', { followId: 'guard-follow-001', partNumber: 'MXXX1CH/A', storeNumbers: ['R577'] }));
-  assert.equal(ok(await f.call('query.pickup', payload(1))).reason, 'upstream_unavailable');
+  const first = ok(await f.call('query.pickup', payload(1)));
+  assert.equal(first.reason, 'upstream_paused');
+  assert.equal(first.retryAfterMs, 180000);
   for (let i = 2; i <= 5; i++) assert.equal(ok(await f.call('query.pickup', payload(i))).reason, 'upstream_paused');
   const collector = createCollector({ repo: f.repo, fetchImpl: f.state.fetchImpl, clock: () => new Date(f.state.now), ownerId: 'cold-start', log: { info() {}, warn() {}, error() {} } });
   const step = await collector.step(); await Promise.all(step.started);

@@ -46,6 +46,9 @@ const DEFAULTS = Object.freeze({
     // has been quiet for burstQuietSeconds (0 disables).
     burstIntervalSeconds: 2,
     burstQuietSeconds: 20,
+    // Explicit opt-in: keep successfully persisted available groups fast.
+    // Zero preserves the existing quiet-window behaviour and request rate.
+    availableIntervalSeconds: 0,
     maxConcurrency: 2,
     continuityGapMs: 5 * 60 * 1000,
     maxRequestsPerMinute: 60,
@@ -132,6 +135,7 @@ function validateConfig(config) {
   integer(config.collector.intervalSeconds, 1, 3600, 'collector.intervalSeconds');
   integer(config.collector.burstIntervalSeconds, 0, 60, 'collector.burstIntervalSeconds');
   integer(config.collector.burstQuietSeconds, 0, 600, 'collector.burstQuietSeconds');
+  integer(config.collector.availableIntervalSeconds, 0, 60, 'collector.availableIntervalSeconds');
   integer(config.collector.maxConcurrency, 1, 10, 'collector.maxConcurrency');
   integer(config.collector.continuityGapMs, 1000, 86400000, 'collector.continuityGapMs');
   integer(config.collector.maxRequestsPerMinute, 1, 600, 'collector.maxRequestsPerMinute');

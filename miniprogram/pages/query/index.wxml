@@ -26,7 +26,7 @@
     <view class="card selection-card">
       <view class="card-title">
         <text>当前查询配置</text>
-        <text class="sub">{{!accountReady ? '账户连接中' : (boot.member ? '会员 · 不限次数' : '余 ' + boot.balance + ' 次')}}</text>
+        <text class="sub">{{!accountReady ? '账户连接中' : (boot.member ? '会员 · 不扣次数' : '余 ' + boot.balance + ' 次')}}</text>
       </view>
       <view wx:if="{{selectionSummary}}" class="selection-summary">
         <view class="selection-summary-product">
@@ -59,7 +59,7 @@
         </view>
         <view class="selection-rule">
           <text class="selection-rule-label">查询规则</text>
-          <view class="selection-rule-copy">{{boot.member ? '会员查询不扣次数。' : '获取新的有效结果扣 ' + boot.queryCost + ' 次；未取得新的有效结果则返还，复用最近结果不扣次数。'}}</view>
+          <view class="selection-rule-copy">{{boot.member ? '会员查询不扣次数；请求繁忙或数据源限流时，需按页面提示稍后重试。' : '获取新的有效结果扣 ' + boot.queryCost + ' 次；未取得新的有效结果则返还，复用最近结果不扣次数。'}}</view>
         </view>
         <view wx:if="{{!boot.member}}" class="selection-rule">
           <text class="selection-rule-label">新品限制</text>
@@ -124,7 +124,7 @@
         </view>
         <view class="pill pill-dot pill-{{item.statusCls}} tiny">{{item.statusLabel}}</view>
       </view>
-      <view class="tiny muted mt">显示后台记录的观测时间。页面约每分钟读取一次，跟随后台检测节奏；读取列表不会产生新观测。</view>
+      <view class="tiny muted mt">页面可见时约每分钟读取一次已有观测。后台更新可能延迟，请查看各门店的观测时间；读取列表不会立即重新检测。</view>
     </view>
 
     <view class="card">
@@ -132,7 +132,7 @@
         <text class="small text-2">自动监测状态</text>
         <view class="pill pill-dot pill-{{collector.cls}}">{{collector.label}}</view>
       </view>
-      <view class="tiny muted mt">结果是标注时间的观测快照，库存可能随后变化。是否可取货请以苹果官网结算页面为准。</view>
+      <view class="tiny muted mt">仅显示是否可取货，不提供剩余件数。结果对应标注的观测时间，之后可能变化；请以苹果官网结算页面为准。</view>
     </view>
   </block>
 </view>

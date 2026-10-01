@@ -1,5 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { seedNotificationObservation } from './helpers/notification-observation.mjs';
 import { createRequire } from 'node:module';
 import { createFixture, userContext, userKeyOf, CONSUMER_APPID } from './helpers/fixture.mjs';
 const require = createRequire(import.meta.url);
@@ -128,6 +129,7 @@ test('hiding and clearing an in-flight notification do not cancel delivery, refu
   await f.repo.updateUser(userKeyOf(), { membership: { expiresAt: '2026-10-15T00:00:00.000Z' }, subscriptions: { TPL: { credits: 2 } } });
   await f.repo.saveFollow({ _id: 'F', userKey: userKeyOf(), partNumber: 'MXXX1CH/A', storeNumbers: ['R577'], status: 'active' });
   const first = task('in-flight'); await f.repo.saveNotification(first);
+  await seedNotificationObservation(f.repo, first);
   const cutoff = ok(await f.call('notify.list')).clearBefore;
   let release, entered; const gate = new Promise(resolve => { release = resolve; }), started = new Promise(resolve => { entered = resolve; });
   let sends = 0; const sender = async () => { sends++; entered(); await gate; return { errcode: 0 }; }; sender.appid = CONSUMER_APPID;

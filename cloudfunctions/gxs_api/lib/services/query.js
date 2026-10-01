@@ -65,7 +65,8 @@ async function pickup(ctx, payload) {
     const hasNewValidResult = recorded.some(r => !r.reused && r.observation.status !== 'unknown');
     refund = !hasNewValidResult;
     const retryAt = Math.max(0, ...batches.map(batch => Number(batch.record.retryAt) || 0));
-    const guardReason = batches.find(batch => batch.record.budgetDenied)?.record.error.message;
+    const guardReason = batches.find(batch => batch.record.budgetDenied)?.record.error.message
+      || (retryAt > ctx.clock().getTime() ? 'upstream_paused' : null);
     const reason = ['upstream_paused', 'query_refresh_pending', 'upstream_unavailable'].includes(guardReason) ? guardReason
       : ['daily_budget', 'minute_budget', 'capacity_wait'].includes(guardReason) ? 'upstream_budget_limited' : 'upstream_unavailable';
     response = { ok: !allUnknown, reason: allUnknown ? reason : null, queryId,

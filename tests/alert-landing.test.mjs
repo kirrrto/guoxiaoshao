@@ -21,6 +21,8 @@ async function alerted() {
     storeNumber: 'R577', storeName: '天环广场', templateId: 'TPL', status: 'pending', attempts: 0, createdAt: f.state.now.toISOString(), detectedAt: f.state.now.toISOString(),
     targetSnapshot: { partNumber: 'MJYH4CH/A', storeNumbers: ['R577'], updatedAt: f.state.now.toISOString() } };
   await f.repo.saveNotification(task);
+  f.advance(1);
+  await f.repo.recordObservation({ observation: { storeNumber: 'R577', partNumber: 'MJYH4CH/A', status: 'available', observedAt: f.state.now.toISOString(), source: 'auto', quote: '今天可取货' } });
   const sends = [];
   const sender = async m => { sends.push(m); return { errcode: 0 }; };
   sender.appid = CONSUMER_APPID;
@@ -68,7 +70,7 @@ test('operator insights summarise availability windows, skipped alerts, send del
   }
   await f.repo.saveNotification({ _id: 'skip-1', userKey: 'someone', status: 'skipped', reason: 'no_subscription_credit', createdAt: at(1000), detectedAt: at(0) });
   await f.call('notify.feedback', { eventId: EVENT, outcome: 'bought' });
-  await f.repo.updateNotification(`${userKeyOf()}|${EVENT}`, { sentAt: at(9000) });
+  await f.repo.updateNotification(`${userKeyOf()}|${EVENT}`, { sentAt: '2026-09-15T02:00:09.000Z' });
   failWith(await f.call('admin.insights', {}), 'forbidden');
   const data = ok(await f.call('admin.insights', { days: 3 }, operatorContext()));
   assert.equal(data.days, 3);

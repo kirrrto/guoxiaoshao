@@ -41,7 +41,13 @@ async function getFollows({ force = false } = {}) {
   if (!force && followSnapshot && Date.now() - followFetchedAt < 15000) return followSnapshot;
   if (followPromise) return followPromise;
   const generation = followGeneration;
-  const pending = call('follow.list').then(value => { if (generation === followGeneration) { followSnapshot = value; followFetchedAt = Date.now(); } return value; });
+  const pending = call('follow.list').then(value => {
+    if (generation !== followGeneration) return getFollows();
+    followSnapshot = value; followFetchedAt = Date.now(); return value;
+  }, error => {
+    if (generation !== followGeneration) return getFollows();
+    throw error;
+  });
   followPromise = pending;
   try { return await pending; } finally { if (followPromise === pending) followPromise = null; }
 }
@@ -58,6 +64,9 @@ async function refreshBootstrap() {
     }
     app.globalData.bootstrap = data; bootstrapFetchedAt = Date.now();
     return data;
+  }, error => {
+    if (generation !== bootstrapGeneration) return getBootstrap();
+    throw error;
   });
   bootstrapPromise = pending;
   try { return await pending; }

@@ -67,9 +67,15 @@ function makeEvent(latest, observation, type, extra) {
 
 function applyObservation(previous, observation, options) {
   const opts = { ...DEFAULT_OPTIONS, ...(options || {}) };
-  const latest = previous ? { ...previous } : emptyLatest(observation);
   const observedMs = Date.parse(observation.observedAt);
   if (!Number.isFinite(observedMs)) throw new TypeError('observation.observedAt must be a valid ISO timestamp');
+  const futureBoundary = Number.isFinite(opts.nowMs) ? opts.nowMs + 30000 : Infinity;
+  if (observedMs > futureBoundary) throw new TypeError('observation.observedAt is implausibly in the future');
+  // Only trusted server time can prove that an old record is corrupt. A late
+  // input alone must never rewind a legitimate newer sample. Recovery starts
+  // a new unconfirmed baseline and cannot prove a restock or supply duration.
+  const repairedFuture = Boolean(previous && Date.parse(previous.observedAt) > futureBoundary);
+  const latest = previous && !repairedFuture ? { ...previous } : emptyLatest(observation);
   const lastMs = latest.observedAt ? Date.parse(latest.observedAt) : -Infinity;
   if (observedMs < lastMs) return { latest: previous, events: [], outcome: 'stale' };
   if (observedMs === lastMs) return { latest: previous, events: [], outcome: 'duplicate' };
@@ -91,7 +97,7 @@ function applyObservation(previous, observation, options) {
     latest.unknownSince = latest.unknownSince || observation.observedAt;
     latest.unknownCount = (latest.unknownCount || 0) + 1;
     latest.lastReason = observation.reason || { code: 'unknown', message: null };
-    return { latest, events: [], outcome: 'unknown' };
+    return { latest, events: [], outcome: repairedFuture ? 'repaired' : 'unknown' };
   }
 
   const events = [];
@@ -135,7 +141,8 @@ function applyObservation(previous, observation, options) {
   latest.unknownSince = null;
   latest.unknownCount = 0;
   latest.lastReason = null;
-  return { latest, events, outcome: events.length ? 'changed' : (previousStatus === null ? 'initial' : 'unchanged') };
+  return { latest, events: repairedFuture ? [] : events,
+    outcome: repairedFuture ? 'repaired' : events.length ? 'changed' : (previousStatus === null ? 'initial' : 'unchanged') };
 }
 
 /** Event types that mean "you can go buy it now"; the notifier decides wording per type. */

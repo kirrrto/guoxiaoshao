@@ -29,6 +29,22 @@ function runtime(handler) {
 }
 const deleteEvent = id => ({ currentTarget: { dataset: { id } } });
 
+test('discarded stock alerts explain current inventory validation without asking users to repay or authorize', async () => {
+  const reasons = ['event_superseded', 'event_unconfirmed', 'event_invalid_time'];
+  const rt = runtime(async () => ({ notifications: reasons.map((reason, index) => ({ ...item(`new-reason-${index}`), status: 'skipped', reason })), hasMore: false }));
+  await rt.page.loadNotifications();
+  for (const notification of rt.page.data.notifications) {
+    assert.doesNotMatch(notification.reasonText, /原因暂未确认|授权|会员/);
+    assert.equal(notification.action, 'explain');
+    rt.page.onNotificationAction(deleteEvent(notification.id));
+    const modal = rt.modals.at(-1);
+    assert.equal(modal.title, '本次未发送原因');
+    assert.match(modal.content, /未消耗提醒次数/);
+    assert.doesNotMatch(modal.content, /重新授权|开通会员/);
+  }
+  assert.equal(rt.calls.length, 1);
+});
+
 test('reminder pagination loads twenty at a time, deduplicates overlap, and keeps the original clear boundary', async () => {
   const first = Array.from({ length: 20 }, (_, i) => `r${i}`);
   const rt = runtime(async (action, payload) => payload.cursor

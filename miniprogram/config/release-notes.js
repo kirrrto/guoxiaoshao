@@ -6,6 +6,17 @@
 // so neither is listed as an independently verified product version.
 const RELEASE_NOTES = [
   {
+    version: '1.5.1',
+    title: '会员查询与提醒稳定性修复',
+    dateText: '更新记录 · 2026-10-01',
+    highlights: [
+      '修复共享查询额度耗尽后长期无法查询的问题。',
+      '改善会员生效、网络重试和页面切换后的状态同步。',
+      '发送提醒前再次核对库存，完善提醒次数和异常恢复。',
+      '识别后台库存更新延迟，明确繁忙等待与查询权益提示。',
+    ],
+  },
+  {
     version: '1.5.0',
     title: '界面更清晰，操作更顺手',
     dateText: '更新记录 · 2026-09-30',

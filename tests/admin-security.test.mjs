@@ -9,6 +9,11 @@ const { AUDIT_PREFIX } = require('../cloudfunctions/gxs_api/lib/config-audit.js'
 const { resolveIdentity } = require('../cloudfunctions/gxs_api/lib/identity.js');
 const records = f => [...f.repo.tables.get(C.config).values()].filter(row => row.kind === 'runtime_config_audit');
 const fixture = () => createFixture({ config: { adminUserKeys: [userKeyOf()] } });
+const clientUpdate = async (f, patch) => {
+  const loaded = await f.call('admin.getConfig');
+  assert.equal(loaded.ok, true);
+  return f.call('admin.updateConfig', { patch, expectedRevision: loaded.data.revision });
+};
 
 test('listed administrators can edit business settings but cannot appoint, clear or resubmit administrator keys', async () => {
   const f = fixture();
@@ -19,7 +24,7 @@ test('listed administrators can edit business settings but cannot appoint, clear
     assert.equal((await f.repo.getConfig()).announcement, undefined);
   }
   assert.equal(records(f).length, 0);
-  const allowed = await f.call('admin.updateConfig', { patch: { quota: { balanceCap: 25 } } });
+  const allowed = await clientUpdate(f, { quota: { balanceCap: 25 } });
   assert.equal(allowed.ok, true);
   assert.equal(allowed.data.config.quota.balanceCap, 25);
   assert.equal(records(f)[0].actor.type, 'admin_user');
@@ -75,7 +80,7 @@ test('configuration changes append unique revisioned audits with redacted identi
   assert.equal(audit.changes.adminUserKeys.after[0].hash, audit.changes.adminUserKeys.before[0].hash);
   assert.ok(audit._id.startsWith(AUDIT_PREFIX));
   assert.equal(JSON.stringify(result.data).includes('runtime_config_audit'), false, 'no audit contents returned to clients');
-  const second = await f.call('admin.updateConfig', { patch: { collector: { maxConcurrency: 4 } } });
+  const second = await clientUpdate(f, { collector: { maxConcurrency: 4 } });
   assert.equal(second.ok, true);
   const next = records(f)[1];
   assert.equal(next.revision, 2);
@@ -92,16 +97,16 @@ test('audit write failure and runtime write failure each roll back the complete 
     f.repo.transactionWriteHook = async (_collection, doc) => {
       if ((failedTarget === 'runtime' && doc._id === 'runtime') || (failedTarget === 'audit' && doc._id.startsWith(AUDIT_PREFIX))) throw Error('database write failed');
     };
-    const result = await f.call('admin.updateConfig', { patch: { announcement: 'must not persist' } });
+    const result = await clientUpdate(f, { announcement: 'must not persist' });
     assert.equal(result.error.code, 'internal_error');
     assert.deepEqual(await f.repo.getConfig(), before);
     assert.equal(records(f).length, 0);
   }
 });
 
-test('concurrent successful edits preserve every audit and capture committed preceding values', async () => {
+test('concurrent trusted operator edits preserve every audit and capture committed preceding values', async () => {
   const f = fixture();
-  const results = await Promise.all([3, 4, 5].map(maxConcurrency => f.call('admin.updateConfig', { patch: { collector: { maxConcurrency } } })));
+  const results = await Promise.all([3, 4, 5].map(maxConcurrency => f.call('admin.updateConfig', { patch: { collector: { maxConcurrency } } }, operatorContext())));
   assert.ok(results.every(result => result.ok));
   const audits = records(f).sort((a, b) => a.revision - b.revision);
   assert.equal(new Set(audits.map(audit => audit._id)).size, 3);
@@ -119,7 +124,7 @@ test('an existing audit ID cannot be overwritten and invalid changes do not crea
   await assert.rejects(f.repo.patchRuntimeConfig({ ...input, patch: { announcement: 'must not overwrite' } }), error => error.code === 'config_audit_conflict');
   assert.deepEqual(await f.repo.getConfig(), before);
   assert.deepEqual(records(f), auditBefore);
-  const invalid = await f.call('admin.updateConfig', { patch: { collector: { maxConcurrency: 999 } } });
+  const invalid = await clientUpdate(f, { collector: { maxConcurrency: 999 } });
   assert.equal(invalid.error.code, 'invalid_config');
   assert.deepEqual(records(f), auditBefore);
 });

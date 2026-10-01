@@ -39,7 +39,9 @@ test('successful authorized updates produce no denial diagnostics', async t => {
   const lines = [];
   t.mock.method(console, 'warn', (...args) => lines.push(args));
   const f = createFixture({ config: { adminUserKeys: [userKeyOf()] } });
-  const result = await f.call('admin.updateConfig', { patch: { announcement: 'allowed' } });
+  const loaded = await f.call('admin.getConfig');
+  assert.equal(loaded.ok, true);
+  const result = await f.call('admin.updateConfig', { patch: { announcement: 'allowed' }, expectedRevision: loaded.data.revision });
   assert.equal(result.ok, true);
   assert.equal(lines.length, 0);
 });

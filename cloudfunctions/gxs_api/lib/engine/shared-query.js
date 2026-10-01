@@ -23,15 +23,17 @@ async function sharedQueryPickup(ctx, storeNumber, partNumber, deadline) {
   const ownerId = randomUUID();
   let claim;
   if (freshnessMs > 0) {
-    // Bound both latency and database polling. A slow owner keeps its lease;
-    // followers return a short wait instead of launching duplicate HTTP work.
-    for (let attempt = 0; attempt < 4 && Date.now() < deadline; attempt++) {
+    // A valid upstream response may take the configured eight seconds. The
+    // former 1.4-second window rejected almost all simultaneous followers even
+    // when the owner completed normally. Wait within the existing request
+    // deadline, with at most nine admission reads and no extra HTTP request.
+    for (let attempt = 0; attempt < 9 && Date.now() < deadline; attempt++) {
       claim = await ctx.repo.claimQueryTarget({ storeNumber, partNumber, ownerId, nowIso: ctx.clock().toISOString(), maxAgeMs: freshnessMs,
         budgetMode: ctx.config.collector.budgetMode });
       if (claim.latest) return sharedBatch(claim.latest);
       if (claim.deferred) return deferredBatch(ctx, storeNumber, partNumber, claim.reason, claim.retryAt);
       if (claim.acquired) break;
-      if (attempt < 3) await sleep(Math.min(200 * 2 ** attempt, Math.max(0, deadline - Date.now())));
+      if (attempt < 8) await sleep(Math.min(500 * (attempt + 1), 1500, Math.max(0, deadline - Date.now())));
     }
     if (!claim || !claim.acquired) return deferredBatch(ctx, storeNumber, partNumber, 'query_refresh_pending', ctx.clock().getTime() + 1000);
   }
@@ -57,7 +59,16 @@ async function sharedQueryPickup(ctx, storeNumber, partNumber, deadline) {
     const recorded = await recordObservations(recordingContext, batch.observations, 'manual');
     return { ...batch, recorded };
   } finally {
-    if (claim && claim.acquired) await ctx.repo.releaseQueryTarget({ id: claim.id, ownerId, nowIso: ctx.clock().toISOString(), reason: blockedReason, retryAt });
+    if (claim && claim.acquired) {
+      try {
+        await ctx.repo.releaseQueryTarget({ id: claim.id, ownerId, nowIso: ctx.clock().toISOString(), reason: blockedReason, retryAt });
+      } catch {
+        // A persisted observation or the real guard result must survive a
+        // cleanup outage. Ownership still expires at the original lease TTL;
+        // fresh samples remain reusable without acquiring that lease.
+        if (ctx.log && typeof ctx.log.warn === 'function') ctx.log.warn('[query] target lease cleanup deferred to expiry');
+      }
+    }
   }
 }
 

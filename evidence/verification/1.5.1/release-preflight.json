@@ -1,0 +1,252 @@
+{
+  "checkedAt": "2026-10-01T14:55:08.741Z",
+  "version": "1.5.1",
+  "scope": "Local source candidate only; no cloud deployment, account-console inspection or submission",
+  "publicationReady": false,
+  "passed": true,
+  "checks": [
+    {
+      "name": "root package and lock versions match the release",
+      "passed": true
+    },
+    {
+      "name": "release acceptance requirements are explicit and not marked as production-proven",
+      "passed": true
+    },
+    {
+      "name": "README identifies and links the current release",
+      "passed": true
+    },
+    {
+      "name": "current release note identifies the same version",
+      "passed": true
+    },
+    {
+      "name": "release development config validates request domains",
+      "passed": true
+    },
+    {
+      "name": "local private config does not bypass domain validation",
+      "passed": true
+    },
+    {
+      "name": "gxs_api: package and lock versions match release 1.5.1",
+      "passed": true
+    },
+    {
+      "name": "gxs_api: exact SDK version and integrity lock",
+      "passed": true
+    },
+    {
+      "name": "gxs_api: deployable package has no external local links",
+      "passed": true
+    },
+    {
+      "name": "gxs_api: security overrides and locks are consistent",
+      "passed": true
+    },
+    {
+      "name": "gxs_api: SDK entry points installed",
+      "passed": true
+    },
+    {
+      "name": "cloudbase_auth: package and lock versions match release 1.5.1",
+      "passed": true
+    },
+    {
+      "name": "cloudbase_auth: exact SDK version and integrity lock",
+      "passed": true
+    },
+    {
+      "name": "cloudbase_auth: deployable package has no external local links",
+      "passed": true
+    },
+    {
+      "name": "cloudbase_auth: security overrides and locks are consistent",
+      "passed": true
+    },
+    {
+      "name": "cloudbase_auth: SDK entry points installed",
+      "passed": true
+    },
+    {
+      "name": "gxs_monitor: package and lock versions match release 1.5.1",
+      "passed": true
+    },
+    {
+      "name": "gxs_monitor: exact SDK version and integrity lock",
+      "passed": true
+    },
+    {
+      "name": "gxs_monitor: deployable package has no external local links",
+      "passed": true
+    },
+    {
+      "name": "gxs_monitor: security overrides and locks are consistent",
+      "passed": true
+    },
+    {
+      "name": "gxs_monitor: SDK entry points installed",
+      "passed": true
+    },
+    {
+      "name": "system.ping uses the release version",
+      "passed": true
+    },
+    {
+      "name": "Mine page version label uses the release version",
+      "passed": true
+    },
+    {
+      "name": "scheduled monitor has the expected minute trigger",
+      "passed": true
+    },
+    {
+      "name": "monitor rejects client-supplied timer payloads",
+      "passed": true
+    },
+    {
+      "name": "monitor contains exactly its canonical runtime dependency closure",
+      "passed": true
+    },
+    {
+      "name": "consumer AppID matches project and frontend",
+      "passed": true
+    },
+    {
+      "name": "shared resource identifiers match",
+      "passed": true
+    },
+    {
+      "name": "shared auth allows configured consumer and rejects payload spoofing",
+      "passed": true
+    },
+    {
+      "name": "consumer package contains only the four consumer pages",
+      "passed": true
+    },
+    {
+      "name": "operator project is separate and uses the existing resource AppID",
+      "passed": true
+    },
+    {
+      "name": "operator project is excluded from search",
+      "passed": true
+    },
+    {
+      "name": "queries default to persistent continuous capacity rather than a daily stop",
+      "passed": true
+    },
+    {
+      "name": "new sustained-availability polling requires explicit runtime enablement",
+      "passed": true
+    },
+    {
+      "name": "optional collector package and lock identify the same release",
+      "passed": true
+    },
+    {
+      "name": "optional collector dependencies stay inside the deployable package boundary",
+      "passed": true
+    },
+    {
+      "name": "payment stays closed in defaults",
+      "passed": true
+    },
+    {
+      "name": "membership purchase uses the confirmed seven-day product",
+      "passed": true
+    },
+    {
+      "name": "purchase notice states a non-refundable one-time virtual service",
+      "passed": true
+    },
+    {
+      "name": "payment recovery timer is five minutes and rejects client-triggered scans",
+      "passed": true
+    },
+    {
+      "name": "payment HTTP ingress uses its exact callback path",
+      "passed": true
+    },
+    {
+      "name": "acceptance page and mock runtime absent from mini program",
+      "passed": true
+    },
+    {
+      "name": "tab icons and page resources exist",
+      "passed": true
+    },
+    {
+      "name": "floating navigation component is enabled and registered",
+      "passed": true
+    },
+    {
+      "name": "custom navigation matches native tab routes, labels and icons",
+      "passed": true
+    }
+  ],
+  "frontend": {
+    "files": 66,
+    "sourceBytes": 716987,
+    "note": "Source bytes, not the WeChat upload package size"
+  },
+  "externalReleaseChecks": [
+    {
+      "item": "Consumer account eligibility, filing, categories and privacy declaration",
+      "status": "requires account-console verification"
+    },
+    {
+      "item": "Deploy cloudbase_auth, gxs_api and gxs_monitor; verify actual timer invocations",
+      "status": "not checked by this local tool; consult the versioned cloud-deployment evidence"
+    },
+    {
+      "item": "Apply database indexes/rules and seed verified catalog",
+      "status": "not checked by this local tool; consult the versioned cloud-deployment evidence"
+    },
+    {
+      "item": "Real-account signin, quota, history and reminder deletion/clear",
+      "status": "requires deployed-cloud acceptance"
+    },
+    {
+      "item": "iOS and Android layout, images, failure recovery and package size",
+      "status": "requires physical-device acceptance"
+    },
+    {
+      "item": "Automatic collection and actual subscription delivery",
+      "status": "separate checks: verify automatic observations; enable messages only with real template, credentials and user authorization"
+    },
+    {
+      "item": "Virtual payment callback, production credentials and real-device payment/refund",
+      "status": "requires cloud gateway, credential and real-order verification; local mocks never prove a payment succeeded"
+    },
+    {
+      "item": "300 simultaneous querying members, with representative distinct targets and acceptable latency/freshness",
+      "status": "requires real staging-cloud load acceptance; same-target memory tests and server request rates do not prove 300-user capacity"
+    },
+    {
+      "item": "Actual observations across Beijing midnight and business-stall alert delivery/recovery",
+      "status": "requires deployed observation evidence and a tested operator alert rule; a heartbeat or structured log alone is insufficient"
+    },
+    {
+      "item": "CloudBase lodash.set advisory in unused realtime watch dependency",
+      "status": "reviewed upstream dependency risk; no patched lodash.set package is available, no watch path is used by this project; must retain security review and recheck before publication"
+    }
+  ],
+  "monitorBundle": {
+    "passed": true,
+    "files": 33,
+    "sourceBytes": 233064,
+    "issues": []
+  },
+  "deliveryTargets": {
+    "version": "1.5.1",
+    "purpose": "Acceptance requirements, not deployed runtime configuration or achieved capacity",
+    "simultaneousQueryingMembers": 300,
+    "followNormalDetectionSeconds": 60,
+    "followAvailableRecheckSeconds": 3,
+    "availableRecheckPolicy": "Continue while a durably observed known target remains available; unknown, failures, source limits and worker gaps must be reported, never fabricated as successful samples",
+    "inventoryMeaning": "Store pickup availability; no exact remaining unit count is provided",
+    "productionAcceptancePassed": false
+  }
+}

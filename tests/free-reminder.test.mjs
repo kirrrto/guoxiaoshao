@@ -2,6 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
 import { createFixture, userKeyOf, CONSUMER_APPID } from './helpers/fixture.mjs';
+import { seedNotificationObservation } from './helpers/notification-observation.mjs';
 
 const require = createRequire(import.meta.url);
 const { createCollector } = require('../cloudfunctions/gxs_api/lib/engine/collector');
@@ -23,6 +24,7 @@ async function setup({ credits = 3, membership } = {}) {
     partNumber: 'MJYH4CH/A', storeNumber, templateId: 'TPL', status: 'pending', attempts: 0,
     createdAt: f.state.now.toISOString(), detectedAt: f.state.now.toISOString() });
   const send = async (t, impl = sender) => {
+    await seedNotificationObservation(f.repo, t);
     await f.repo.saveNotification(t);
     return sendTask({ task: t, repo: f.repo, config, sendImpl: impl, now: f.state.now, clock: () => f.state.now, ownerId: 'test-sender' });
   };
@@ -54,7 +56,7 @@ test('a new account follows one configuration and receives exactly one free rest
   sender.appid = CONSUMER_APPID;
   const task = (id, storeNumber) => ({ _id: id, userKey: userKeyOf(), followId: `${userKeyOf()}|f-0001-aaaa`, eventId: `event-${id}`, eventType: 'restock_confirmed',
     partNumber: 'MJYH4CH/A', storeNumber, templateId: 'TPL', status: 'pending', attempts: 0, createdAt: f.state.now.toISOString(), detectedAt: f.state.now.toISOString() });
-  const send = async t => { await f.repo.saveNotification(t); return sendTask({ task: t, repo: f.repo, config, sendImpl: sender, now: f.state.now, clock: () => f.state.now }); };
+  const send = async t => { await seedNotificationObservation(f.repo, t); await f.repo.saveNotification(t); return sendTask({ task: t, repo: f.repo, config, sendImpl: sender, now: f.state.now, clock: () => f.state.now }); };
   assert.equal((await send(task('free-a', 'R577'))).status, 'accepted');
   const second2 = await send(task('free-b', 'R639'));
   assert.deepEqual([second2.status, second2.reason], ['skipped', 'free_reminder_used']);

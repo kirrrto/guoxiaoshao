@@ -16,12 +16,15 @@ const { recordObservations } = require('./observations');
 const { buildTasks, sendTask, TASK_STATUS, alertKind } = require('./notifier');
 const { targetKeyOf } = require('./events');
 const { AUTO_SHARE, DAY_MS } = require('./capacity-budget');
+const { observationHealth } = require('./observation-health');
 
 function createCollector({ repo, fetchImpl, clock = () => new Date(), log = console, sendImpl = null, ownerId = `collector-${process.pid}-${Date.now()}`, sleep = ms => new Promise(resolve => setTimeout(resolve, ms)), refreshEveryMs = 10000, statusEveryMs = 5000, mode = 'resident', minimumIntervalMs = 0, statusTtlMs = 0, shouldContinue = () => true, remainingMs = () => Infinity }) {
   let config = mergeConfig(null);
   let lastRefreshAt = -Infinity;
   let lastStatusAt = -Infinity;
   let lastSenderProbeAt = -Infinity;
+  let lastObservationHealthState = null;
+  let lastObservationHealthLogAt = -Infinity;
   let running = false;
   let stopping = false;
   let budget = { allowed: true, reason: null, minuteCount: 0, dayCount: 0 };
@@ -51,6 +54,8 @@ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = cons
 
   // Notification work is serialised: concurrent batches must not both spend a user's single subscription credit.
   let notifyChain = Promise.resolve();
+  let notificationWork = null;
+  let notificationRequested = false;
   function serialised(task) {
     const next = notifyChain.then(task, task);
     notifyChain = next.catch(() => {});
@@ -60,14 +65,17 @@ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = cons
   async function handleBatch({ observations }) {
     if (stopping || !await lease.renew()) throw new Error('collector_lease_lost');
     const recorded = await recordObservations(ctx(), observations, 'auto');
-    stats.batches += 1;
-    stats.observations += observations.length;
-    stats.lastBatchAt = clock().toISOString();
+    const applied = recorded.filter(result => !['stale', 'duplicate'].includes(result.outcome));
+    if (applied.length) {
+      stats.batches += 1;
+      stats.observations += applied.length;
+      stats.lastBatchAt = clock().toISOString();
+    }
     const events = recorded.flatMap(r => r.events).length;
     stats.events += events;
-    await drainNotifications();
+    await flushOrKickNotifications();
     // Any status change puts this store on the fast cadence (see scheduler burst mode).
-    return { changed: events > 0 };
+    return { changed: events > 0, persisted: observations.length > 0 && applied.length === observations.length };
   }
 
   /**
@@ -90,13 +98,13 @@ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = cons
     return Date.parse(latest.knownAt) > Date.parse(latest.knownStreakSince || event.detectedAt) ? 'confirmed' : 'waiting';
   }
 
-  async function planEvents(events) {
+  async function planEvents(events, planningConfig) {
     const follows = await repo.listActiveFollows();
     const users = new Map((await repo.getUsers([...new Set(follows.map(f => f.userKey))])).map(u => [u._id, u]));
     const alerting = events.filter(e => alertKind(e.type));
     const latestByKey = new Map((alerting.length ? await repo.getLatest([...new Set(alerting.map(e => targetKeyOf(e.storeNumber, e.partNumber)))]) : []).map(l => [l._id, l]));
     const now = clock();
-    const maxAgeMs = (config.notifications.maxEventAgeSeconds || 120) * 1000;
+    const maxAgeMs = (planningConfig.notifications.maxEventAgeSeconds || 120) * 1000;
     for (const event of events) {
       if (!shouldContinue()) break;
       let planned = [event];
@@ -110,7 +118,7 @@ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = cons
         }
         if (state !== 'confirmed') planned = [];
       }
-      const tasks = buildTasks({ events: planned, follows, users, config, now });
+      const tasks = buildTasks({ events: planned, follows, users, config: planningConfig, now });
       for (const task of tasks) {
         if (!shouldContinue()) return;
         if (await repo.saveNotification(task)) stats.tasks += 1;
@@ -121,25 +129,55 @@ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = cons
     }
   }
 
+  function concurrentNotifications() {
+    return mode === 'resident' && config.collector.availableIntervalSeconds > 0;
+  }
+
   function drainNotifications() {
-    return serialised(async () => {
+    if (!concurrentNotifications()) return serialised(notificationPass);
+    // One running pass plus one pending bit, regardless of how many batches
+    // ask for delivery while WeChat is slow. No unbounded Promise queue.
+    notificationRequested = true;
+    if (notificationWork) return notificationWork;
+    notificationWork = serialised(async () => {
+      while (notificationRequested && concurrentNotifications() && !stopping && lease.isHeld() && shouldContinue()) {
+        notificationRequested = false;
+        await notificationPass();
+      }
+    }).catch(error => {
+      log.error('[collector] notification pass failed', error && error.message);
+    }).finally(() => {
+      notificationWork = null;
+      // A kick may arrive between the last loop check and this finalizer.
+      if (notificationRequested && concurrentNotifications() && !stopping && lease.isHeld() && shouldContinue()) drainNotifications();
+    });
+    return notificationWork;
+  }
+
+  async function flushOrKickNotifications() {
+    if (concurrentNotifications()) { drainNotifications(); return; }
+    await drainNotifications();
+  }
+
+  async function notificationPass() {
       if (stopping || !lease.isHeld() || !shouldContinue()) return;
-      config = mergeConfig(await repo.getConfig());
+      // Delivery has its own snapshot. A delayed read must not overwrite the
+      // newer configuration already applied to the sampling scheduler.
+      const notificationConfig = mergeConfig(await repo.getConfig());
       await repo.reconcileExpiredNotifications({ now: clock().toISOString() });
       // Ten minutes is well past the send window, so an old backlog never delays new alerts.
-      const since = new Date(clock().getTime() - Math.max(600, config.notifications.maxEventAgeSeconds || 120) * 1000).toISOString();
+      const since = new Date(clock().getTime() - Math.max(600, notificationConfig.notifications.maxEventAgeSeconds || 120) * 1000).toISOString();
       const events = await repo.listUnprocessedEvents({ limit: 50, since });
-      if (events.length) await planEvents(events);
+      if (events.length) await planEvents(events, notificationConfig);
       if (!sendImpl || sendImpl.enabled === false) return;
       if (typeof sendImpl.getHealth === 'function' && !sendImpl.getHealth().authReady) return;
       for (const task of await repo.listPendingNotifications({ limit: 20 })) {
         if (stopping || !shouldContinue() || !await lease.renew()) break;
         if (typeof sendImpl.getHealth === 'function' && !sendImpl.getHealth().authReady) break;
-        const result = await sendTask({ task, config, sendImpl, repo, now: clock(), clock, ownerId, remainingMs: remainingWorkMs,
+        const result = await sendTask({ task, config: notificationConfig, sendImpl, repo, now: clock(), clock, ownerId, remainingMs: remainingWorkMs,
           beforeSend: async () => !stopping && shouldContinue() && await lease.renew() && lease.isHeld() && shouldContinue() });
         if (result.status === TASK_STATUS.accepted) stats.sent += 1;
       }
-    });
   }
 
   async function refreshTargets() {
@@ -158,7 +196,8 @@ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = cons
       : config.collector.maxRequestsPerDay * AUTO_SHARE;
     const budgetIntervalMs = config.collector.budgetMode === 'daily' && mode !== 'scheduled' ? 0 : Math.ceil(groups.length * DAY_MS / autoLimit);
     scheduler.configure({ intervalMs: Math.max(minimumIntervalMs, config.collector.intervalSeconds * 1000, budgetIntervalMs), maxConcurrency: config.collector.maxConcurrency, timeoutMs: config.query.upstreamTimeoutMs,
-      burstIntervalMs: config.collector.burstIntervalSeconds * 1000, burstQuietMs: config.collector.burstQuietSeconds * 1000 });
+      burstIntervalMs: config.collector.burstIntervalSeconds * 1000, burstQuietMs: config.collector.burstQuietSeconds * 1000,
+      availableIntervalMs: config.collector.availableIntervalSeconds * 1000 });
     scheduler.setTargets(groups);
     lastRefreshAt = now.getTime();
     return { follows: follows.length, eligible: eligible.length, groups: groups.length, enabled: config.collector.enabled };
@@ -192,6 +231,7 @@ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = cons
   async function publishStatus(extra) {
     const snap = scheduler.snapshot();
     const now = clock();
+    const health = observationHealth({ targets: snap.targets, intervalMs: snap.intervalMs, mode, nowMs: now.getTime(), timeoutMs: config.query.upstreamTimeoutMs });
     const status = {
       _id: 'collector_status',
       ownerId,
@@ -201,9 +241,11 @@ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = cons
       groupCount: snap.groupCount,
       inFlight: snap.inFlight,
       intervalMs: snap.intervalMs,
+      availableIntervalMs: snap.availableIntervalMs,
       maxConcurrency: snap.maxConcurrency,
       budget: { ...budget, budgetMode: config.collector.budgetMode, maxRequestsPerMinute: config.collector.maxRequestsPerMinute || 60, maxRequestsPerDay: config.collector.maxRequestsPerDay || 10000 },
       notifications: notificationStatus(),
+      observationHealth: health,
       stats,
       updatedAt: now.toISOString(),
       expiresAt: new Date(now.getTime() + Math.max(statusTtlMs, (config.collector.statusStaleAfterSeconds || 30) * 1000)).toISOString(),
@@ -214,6 +256,18 @@ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = cons
     // checkpoint above). Nothing read the per-minute gxs_target_health documents.
     const saved = await repo.saveCollectorStatus(status, { ownerId, nowIso: clock().toISOString() });
     if (saved && saved.saved === false) return null;
+    // One aggregate per invocation/state transition (or five resident minutes),
+    // suitable for a platform log alert. This does not claim alert delivery.
+    if (config.collector.enabled && (health.staleGroups > 0 || ['stalled', 'degraded'].includes(lastObservationHealthState))
+      && (health.state !== lastObservationHealthState || now.getTime() - lastObservationHealthLogAt >= 300000)) {
+      const severity = health.state === 'stalled' ? 'error' : health.staleGroups ? 'warning' : 'info';
+      const emit = severity === 'error' ? log.error : severity === 'warning' ? log.warn : log.info;
+      if (typeof emit === 'function') emit.call(log, JSON.stringify({ event: 'collector_observation_health', severity, state: health.state,
+        mode, groupCount: health.groupCount, staleGroups: health.staleGroups, freshGroups: health.freshGroups,
+        pendingGroups: health.pendingGroups, intervalMs: snap.intervalMs, staleAfterMs: health.staleAfterMs, observedAt: now.toISOString() }));
+      lastObservationHealthLogAt = now.getTime();
+    }
+    lastObservationHealthState = health.state;
     lastStatusAt = now.getTime();
     return status;
   }
@@ -229,7 +283,7 @@ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = cons
     if (nowMs - lastRefreshAt >= refreshEveryMs) await refreshTargets();
     await probeSender();
     if (!lease.isHeld()) return { held: false, started: [] };
-    await drainNotifications();
+    await flushOrKickNotifications();
     const started = shouldContinue() ? scheduler.tick() : [];
     if (nowMs - lastStatusAt >= statusEveryMs) await publishStatus();
     return { held: true, started };
@@ -250,12 +304,13 @@ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = cons
     }
     scheduler.pause();
     await scheduler.drain();
+    await notificationWork;
     await notifyChain;
     if (lease.isHeld()) await publishStatus({ state: 'stopped' });
     await lease.release();
   }
 
-  return { step, run, stop: () => { stopping = true; running = false; scheduler.pause(); }, drainNotifications, refreshTargets, publishStatus, scheduler, lease, stats, ownerId, currentConfig: () => config };
+  return { step, run, stop: () => { stopping = true; running = false; notificationRequested = false; scheduler.pause(); }, drainNotifications, refreshTargets, publishStatus, scheduler, lease, stats, ownerId, currentConfig: () => config };
 }
 
 module.exports = { createCollector };

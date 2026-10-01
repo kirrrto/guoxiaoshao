@@ -33,8 +33,8 @@ node tools/collector/runner.js
 最后一个命令默认仅启动 `http://127.0.0.1:8080/healthz`。没有设置进程开关时不会读写真实数据库，也不会请求 Apple / 微信。
 
 ```powershell
-docker build -f tools/collector/Dockerfile -t guoxiaoshao-collector:0.2.0 .
-docker run --rm -p 8080:8080 guoxiaoshao-collector:0.2.0
+docker build -f tools/collector/Dockerfile -t guoxiaoshao-collector:1.5.1 .
+docker run --rm -p 8080:8080 guoxiaoshao-collector:1.5.1
 ```
 
 镜像命令是供正式部署前执行的构建步骤；本次本机验收未构建或上传镜像。依赖固定为 `wx-server-sdk@4.0.2` 并提交了 lock 文件；云函数与常驻进程使用相同数据库 API 包装。
@@ -89,6 +89,10 @@ GXS_CONSUMER_APPSECRET=<仅通过云托管密钥注入>
 ## 7. 请求量、预算与扩容
 
 **变化时加速（1.4.0）**：`collector.burstIntervalSeconds`（默认 2）与 `collector.burstQuietSeconds`（默认 20）。某门店出现状态变化后尝试每 2 秒复查，持续到连续 20 秒无变化；同一门店两次请求至少间隔 2 秒。定时模式下单次运行在有门店加速时持续到平台剩余时间减 5 秒（最多 55 秒），加速状态随调度检查点带到下一分钟。设为 0 可关闭。加速请求同样要通过共享容量和分钟保护，容量不足或上游限流时不能保证 2 秒复查。
+
+**持续有货复查（1.5.1 候选）**：新增 `collector.availableIntervalSeconds`，默认 0 保持旧行为；显式设为 3 时，完整有效且已持久化的批次存在有货目标，则持续尝试三秒间隔复查，不因状态维持二十秒不变而退出。未知、落库失败不提供有货证明；同店间隔、租约、失败退避、共享容量及 Retry-After 继续有效。工作响应和持久化用时仍会延长实际请求间隔，不能把参数值当成真实覆盖证明。
+
+用户的验收要求已经固定为 300 人同时查询、关注每分钟一轮、有货每三秒复查。候选策略片段为 `collector: { intervalSeconds: 60, burstIntervalSeconds: 3, availableIntervalSeconds: 3, budgetMode: 'continuous' }`；**此片段不是可直接上线且已满足容量的完整配置**。本轮未修改生产速率或启用新模式，分钟定时器本身存在运行空档，须使用常驻采集并完成容量、观测间隔和上游承载验收，详见 [容量与检测频率验收](CAPACITY_ACCEPTANCE_1.5.1.md)。
 
 采集按“门店 × 分片后的 SKU 集合”合并目标，默认每个请求最多 20 个商品。调度默认目标间隔 8 秒、并发 2；实际覆盖间隔可能因目标数、请求延迟、全局预算或上游限流更长。界面应展示真实健康统计与上次观测时间。
 

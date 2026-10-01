@@ -9,6 +9,23 @@ const active = (id = 'f1', stores = ['R001']) => ({ followId: id, partNumber: id
 const boot = patch => ({ membership: { active: true, expiresAt: '2027-01-01T00:00:00Z' }, collector: { state: 'running' }, notifications: { enabled: true, deliveryReady: true, templateIds: { restock: 'A', other: 'B' } }, subscriptions: { A: { credits: 1 }, B: { credits: 9 } }, settings: { notifyEnabled: true, dnd: { enabled: false } }, limits: { maxFollows: 3, maxStoresPerFollow: 3 }, ...patch });
 const state = patch => ({ boot: { member: true }, followsLoaded: true, follows: [active()], collector: { state: 'running' }, delivery: { cls: 'ok' }, settings: { notifyEnabled: true }, subscription: { templateCount: 1, credits: 1 }, ...patch });
 
+test('a live collector heartbeat cannot claim readiness when actual stock observations have stalled', () => {
+  const collector = { state: 'running', observationStale: true, observationHealth: { state: 'stalled', staleGroups: 2, groupCount: 2 } };
+  const readiness = reminderReadiness(state({ collector }));
+  assert.equal(readiness.ready, false);
+  assert.equal(readiness.code, 'collector_observation_stale');
+  assert.equal(readiness.action, 'service');
+  assert.doesNotMatch(readiness.detail, /重新授权|开通会员|正在检测/);
+  const rt = runtime(), page = rt.instance('pages/follow/index.js');
+  page.setData({ followsLoaded: true, follows: [active()] });
+  page.applyBoot(boot({ collector, notifications: { enabled: true, deliveryReady: false, reason: 'collector_observation_stale', templateIds: { restock: 'A' } } }));
+  assert.equal(page.data.readiness.code, 'collector_observation_stale');
+  assert.equal(page.data.collector.cls, 'warn');
+  assert.match(page.data.collector.detail, /观测.*更新/);
+  assert.match(page.data.delivery.detail, /观测.*更新/);
+  assert.match(page.data.follows[0].monitoringText, /后台检测情况见上方/);
+});
+
 test('personal readiness distinguishes loading, no follows and all paused from healthy shared services', () => {
   assert.equal(reminderReadiness(state({ followsLoaded: false, follows: [] })).code, 'checking_follows');
   const empty = reminderReadiness(state({ follows: [] }));

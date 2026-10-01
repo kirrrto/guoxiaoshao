@@ -137,7 +137,7 @@ Page({
   },
 
   async onLoad() {
-    if (this.loadingBoot) return;
+    if (this.pageRetired || this.loadingBoot) return;
     // Create mutable logic state per instance before any asynchronous startup.
     // Keeping it out of the Page definition also avoids free-data cloning.
     if (!this.selection) this.selection = { partNumber: null, product: null, storeNumbers: [], stores: [] };
@@ -152,6 +152,7 @@ Page({
       const account = getBootstrap();
       account.catch(() => {});
       const initialCatalog = await getCatalog();
+      if (this.pageRetired) return;
       const catalog = getApp().globalData.catalog || initialCatalog;
       this.catalog = catalog;
       const selection = savedSelection(pickerValue, catalog);
@@ -171,17 +172,22 @@ Page({
         resultTargetDifferent: resultHasDifferentTarget(result, selection),
         addTipVisible: shouldShowAddTip(),
       });
-      try { this.applyBoot(await account); this.applyCatalog(await getCatalog()); }
-      catch (error) { this.setData({ accountReady: false, accountError: '账户连接暂未完成，可以先选商品和门店，再点击重试。' }); }
+      try {
+        const boot = await account;
+        if (this.pageRetired) return;
+        this.applyBoot(boot); this.applyCatalog(await getCatalog());
+      }
+      catch (error) { if (!this.pageRetired) this.setData({ accountReady: false, accountError: '账户连接暂未完成，可以先选商品和门店，再点击重试。' }); }
       if (this.visible) this.startFollowPolling();
     } catch (error) {
-      this.setData({ loadError: error.message || String(error) });
+      if (!this.pageRetired) this.setData({ loadError: error.message || String(error) });
     } finally {
       this.loadingBoot = false;
     }
   },
 
   async onShow() {
+    if (this.pageRetired) return;
     syncTabBar(this, '/pages/query/index');
     this.visible = true;
     this.visibilityEpoch = (this.visibilityEpoch || 0) + 1;
@@ -189,7 +195,9 @@ Page({
     this.refreshQuerySnapshot();
     if (this.followSnapshot) this.setData({ followTargets: presentFollowTargets(this.followSnapshot) });
     try {
-      this.applyBoot(await getBootstrap());
+      const boot = await getBootstrap();
+      if (this.pageRetired) return;
+      this.applyBoot(boot);
       getCatalog();
     } catch (e) { /* keep the previous snapshot */ }
     this.startFollowPolling();
@@ -202,6 +210,7 @@ Page({
   },
 
   onUnload() {
+    this.pageRetired = true;
     this.visible = false;
     this.visibilityEpoch = (this.visibilityEpoch || 0) + 1;
     this.stopFollowPolling();
@@ -227,6 +236,7 @@ Page({
 
   /** Called by the tab bar when the phone reconnects. */
   onNetworkRestored() {
+    if (this.pageRetired) return;
     if (this.data.loadError) return this.onRetryLoad();
     if (this.data.ready && !this.data.accountReady) return this.onRetryAccount();
   },
@@ -273,14 +283,16 @@ Page({
   },
 
   onPullDownRefresh() {
+    if (this.pageRetired) return;
     this.refreshQuerySnapshot();
     Promise.all([getBootstrap({ force: true }), getCatalog({ force: true })])
-      .then(results => { this.applyBoot(results[0]); this.applyCatalog(results[1]); this.setData({ ready: true, loadError: null }); this.startFollowPolling(); })
-      .catch(showError)
+      .then(results => { if (this.pageRetired) return; this.applyBoot(results[0]); this.applyCatalog(results[1]); this.setData({ ready: true, loadError: null }); this.startFollowPolling(); })
+      .catch(error => { if (!this.pageRetired) showError(error); })
       .finally(() => wx.stopPullDownRefresh());
   },
 
   applyBoot(boot) {
+    if (this.pageRetired) return;
     const maxStores = boot.limits ? boot.limits.queryMaxStores : 3;
     const summary = this.selectionView(this.selection, maxStores);
     const membershipRestoresAccess = boot.membership.active
@@ -306,6 +318,7 @@ Page({
   },
 
   applyCatalog(catalog) {
+    if (this.pageRetired) return;
     this.catalog = catalog;
     if (!this.data.ready) return;
     const patch = this.selectionView(this.selection);
@@ -315,11 +328,11 @@ Page({
   },
 
   async onRetryAccount() {
-    if (this.connectingAccount) return;
+    if (this.pageRetired || this.connectingAccount) return;
     this.connectingAccount = true;
     this.setData({ accountError: null });
-    try { this.applyBoot(await getBootstrap({ force: true })); this.startFollowPolling(); }
-    catch (error) { this.setData({ accountError: '账户连接失败，请检查网络后重试。' }); }
+    try { this.applyBoot(await getBootstrap({ force: true })); if (!this.pageRetired) this.startFollowPolling(); }
+    catch (error) { if (!this.pageRetired) this.setData({ accountError: '账户连接失败，请检查网络后重试。' }); }
     finally { this.connectingAccount = false; }
   },
 
@@ -422,7 +435,7 @@ Page({
   },
 
   async onQuery() {
-    if (this.data.sheetVisible) return;
+    if (this.pageRetired || this.data.sheetVisible) return;
     const selection = this.readPickerSelection();
     if (this.selectionNeedsReview) return toast('请先修改并核对已保存的配置与门店');
     // Must run inside the tap, before any await (WeChat gesture rule).
@@ -431,6 +444,7 @@ Page({
   },
 
   onRequery() {
+    if (this.pageRetired) return;
     const result = this.data.result;
     if (!result) return;
     topUpReminderCredit();
@@ -438,7 +452,7 @@ Page({
   },
 
   async performQuery(selection) {
-    if (this.data.querying) return;
+    if (this.pageRetired || this.data.querying) return;
     if (!this.data.boot) return toast('账户正在连接，请稍后再试');
     const boot = this.data.boot;
     if (!selection.partNumber) return toast('请先选择具体配置');
@@ -453,13 +467,17 @@ Page({
     const queryId = operation.begin('q', payload);
     try {
       const response = await call('query.pickup', { queryId, ...payload });
-      if (response.reason === 'query_in_progress') { this.setData({ restriction: '原查询仍在处理中，请稍后重试；重试不会重复扣次。' }); return; }
-      operation.finish('q');
+      if (response.reason === 'query_in_progress') { if (!this.pageRetired) this.setData({ restriction: '原查询仍在处理中，请稍后重试；重试不会重复扣次。' }); return; }
+      operation.finish('q', queryId);
       invalidateBootstrap();
+      if (this.pageRetired) return;
       if (response.ok === false && !response.results) {
         const sameTarget = targetKey(selection) === targetKey(this.selection);
         this.setData({ restriction: (sameTarget ? '' : '上次查询：') + queryNotice(response),
           restrictionReason: sameTarget ? response.reason : null, 'boot.balance': response.balance });
+        if (boot.member && ['insufficient_credits', 'new_product_restricted'].includes(response.reason)) {
+          try { this.applyBoot(await getBootstrap({ force: true })); } catch (error) { /* keep the confirmed denial until the account reconnects */ }
+        }
         return;
       }
       const catalog = this.catalog;
@@ -471,11 +489,12 @@ Page({
       if (response.refunded) toast(response.ok && (response.allShared || response.billingReason === 'shared_result_no_charge') ? '已展示最近核实的结果，本次未扣次' : '本次未取得有效结果，已返还次数');
       if (response.ok && result.results.length) { confirmTap(); this.focusQueryResult(focus); }
     } catch (error) {
-      if (!operation.uncertain(error)) operation.finish('q');
+      if (!operation.uncertain(error)) operation.finish('q', queryId);
+      if (this.pageRetired) return;
       if (operation.uncertain(error)) this.setData({ restriction: '本次结果尚未确认。再次查询相同目标会恢复原请求，不重复扣次。' });
       showError(error);
     } finally {
-      this.setData({ querying: false });
+      if (!this.pageRetired) this.setData({ querying: false });
     }
   },
 

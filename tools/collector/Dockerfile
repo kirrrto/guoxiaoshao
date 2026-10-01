@@ -1,5 +1,5 @@
 # Build from repository root:
-# docker build -f tools/collector/Dockerfile -t guoxiaoshao-collector:0.2.0 .
+# docker build -f tools/collector/Dockerfile -t guoxiaoshao-collector:1.5.1 .
 FROM node:22-bookworm-slim
 ENV NODE_ENV=production PORT=8080 GXS_ENABLE_COLLECTOR_PROCESS=false
 WORKDIR /app/tools/collector

@@ -85,7 +85,9 @@ test('a corrupt future available sample cannot replace a freshly fetched unavail
   const response = ok(await f.call('query.pickup', payload('future-corrupt')));
   assert.equal(response.results[0].status, 'unavailable');
   assert.equal(response.results[0].observedAt, f.state.now.toISOString());
-  assert.equal(response.results[0].superseded, false); assert.equal(response.results[0].statusSince, null);
+  assert.equal(response.results[0].superseded, false); assert.equal(response.results[0].statusSince, f.state.now.toISOString());
+  const [latest] = await f.repo.getLatest(['R577|MXXX1CH/A']);
+  assert.equal(latest.statusConfirmed, false, 'repair starts a fresh, unconfirmed observation streak');
 });
 
 test('cached valid results plus a failed fresh store do not consume a free query credit', async () => {

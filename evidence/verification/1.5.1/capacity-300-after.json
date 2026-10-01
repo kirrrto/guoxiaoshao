@@ -1,0 +1,430 @@
+{
+  "generatedAt": "2026-10-01T14:36:28.275Z",
+  "kind": "offline-contract-simulation",
+  "productionRequests": 0,
+  "limitations": [
+    "300 simulated distinct membership contexts, not real user identities or real payments",
+    "In-memory transactions serialize; CloudBase conflicts, serverless quotas and real latency are not measured",
+    "HTTP is stubbed. Local wall latency is diagnostic, not a production SLO",
+    "Sustained automatic demand uses the real admission guard under synthetic pressure, not a forecast of scheduler traffic"
+  ],
+  "config": {
+    "enabled": true,
+    "intervalSeconds": 8,
+    "burstIntervalSeconds": 2,
+    "burstQuietSeconds": 20,
+    "maxConcurrency": 2,
+    "continuityGapMs": 300000,
+    "maxRequestsPerMinute": 60,
+    "maxRequestsPerDay": 10000,
+    "budgetMode": "continuous",
+    "maxPartsPerRequest": 20,
+    "statusStaleAfterSeconds": 30
+  },
+  "scenarios": [
+    {
+      "name": "same-target-fast",
+      "clients": 300,
+      "simulatedAt": "2026-10-01T12:00:00.000Z",
+      "requestedTargetReads": 300,
+      "distinctRequestedTargets": 1,
+      "successfulQueries": 300,
+      "fullySuccessfulQueries": 300,
+      "partialQueries": 0,
+      "busyOrFailedQueries": 0,
+      "reasons": {},
+      "knownTargetReads": 300,
+      "reusedTargetReads": 299,
+      "upstreamHttp": 1,
+      "duplicateTargetHttpWithinWave": 0,
+      "targetClaimCalls": 599,
+      "budgetChecks": 1,
+      "netQuotaDebit": 0,
+      "allResponsesConfirmMember": true,
+      "localElapsedMs": 2880,
+      "localLatencyMs": {
+        "p50": 2035,
+        "p95": 2794,
+        "p99": 2867,
+        "max": 2879
+      },
+      "tokens": {
+        "shared": 59,
+        "auto": 48,
+        "manual": 11
+      },
+      "days": [
+        {
+          "date": "2026-10-01",
+          "dayCount": 1,
+          "autoCount": 0,
+          "manualCount": 1,
+          "minuteCount": 1
+        }
+      ],
+      "simulatedUpstreamLatencyMs": 0,
+      "persistedSamples": 1,
+      "falseConfirmationsFromSharedReads": 0,
+      "all300ImmediateResults": true
+    },
+    {
+      "name": "same-target-slow",
+      "clients": 300,
+      "simulatedAt": "2026-10-01T12:00:00.000Z",
+      "requestedTargetReads": 300,
+      "distinctRequestedTargets": 1,
+      "successfulQueries": 300,
+      "fullySuccessfulQueries": 300,
+      "partialQueries": 0,
+      "busyOrFailedQueries": 0,
+      "reasons": {},
+      "knownTargetReads": 300,
+      "reusedTargetReads": 299,
+      "upstreamHttp": 1,
+      "duplicateTargetHttpWithinWave": 0,
+      "targetClaimCalls": 1197,
+      "budgetChecks": 1,
+      "netQuotaDebit": 0,
+      "allResponsesConfirmMember": true,
+      "localElapsedMs": 5378,
+      "localLatencyMs": {
+        "p50": 4537,
+        "p95": 5293,
+        "p99": 5365,
+        "max": 5378
+      },
+      "tokens": {
+        "shared": 59,
+        "auto": 48,
+        "manual": 11
+      },
+      "days": [
+        {
+          "date": "2026-10-01",
+          "dayCount": 1,
+          "autoCount": 0,
+          "manualCount": 1,
+          "minuteCount": 1
+        }
+      ],
+      "simulatedUpstreamLatencyMs": 2500,
+      "persistedSamples": 1,
+      "falseConfirmationsFromSharedReads": 0,
+      "all300ImmediateResults": true
+    },
+    {
+      "name": "same-three-stores",
+      "clients": 300,
+      "simulatedAt": "2026-10-01T12:00:00.000Z",
+      "requestedTargetReads": 900,
+      "distinctRequestedTargets": 3,
+      "successfulQueries": 300,
+      "fullySuccessfulQueries": 300,
+      "partialQueries": 0,
+      "busyOrFailedQueries": 0,
+      "reasons": {},
+      "knownTargetReads": 900,
+      "reusedTargetReads": 897,
+      "upstreamHttp": 3,
+      "duplicateTargetHttpWithinWave": 0,
+      "targetClaimCalls": 1797,
+      "budgetChecks": 3,
+      "netQuotaDebit": 0,
+      "allResponsesConfirmMember": true,
+      "localElapsedMs": 6252,
+      "localLatencyMs": {
+        "p50": 4309,
+        "p95": 6052,
+        "p99": 6222,
+        "max": 6252
+      },
+      "tokens": {
+        "shared": 57,
+        "auto": 48,
+        "manual": 9
+      },
+      "days": [
+        {
+          "date": "2026-10-01",
+          "dayCount": 3,
+          "autoCount": 0,
+          "manualCount": 3,
+          "minuteCount": 3
+        }
+      ],
+      "simulatedUpstreamLatencyMs": 0,
+      "persistedSamples": 3,
+      "falseConfirmationsFromSharedReads": 0,
+      "all300ImmediateResults": true
+    },
+    {
+      "name": "distinct-300-targets",
+      "clients": 300,
+      "simulatedAt": "2026-10-01T12:00:00.000Z",
+      "requestedTargetReads": 300,
+      "distinctRequestedTargets": 300,
+      "successfulQueries": 59,
+      "fullySuccessfulQueries": 59,
+      "partialQueries": 0,
+      "busyOrFailedQueries": 241,
+      "reasons": {
+        "upstream_budget_limited": 241
+      },
+      "knownTargetReads": 59,
+      "reusedTargetReads": 0,
+      "upstreamHttp": 59,
+      "duplicateTargetHttpWithinWave": 0,
+      "targetClaimCalls": 300,
+      "budgetChecks": 300,
+      "netQuotaDebit": 0,
+      "allResponsesConfirmMember": true,
+      "localElapsedMs": 3976,
+      "localLatencyMs": {
+        "p50": 3280,
+        "p95": 3930,
+        "p99": 3973,
+        "max": 3976
+      },
+      "tokens": {
+        "shared": 1,
+        "auto": 1,
+        "manual": 0
+      },
+      "days": [
+        {
+          "date": "2026-10-01",
+          "dayCount": 59,
+          "autoCount": 0,
+          "manualCount": 59,
+          "minuteCount": 59
+        }
+      ],
+      "simulatedUpstreamLatencyMs": 0,
+      "persistedSamples": 59,
+      "falseConfirmationsFromSharedReads": 0,
+      "all300ImmediateResults": false
+    },
+    {
+      "name": "distinct-900-targets",
+      "clients": 300,
+      "simulatedAt": "2026-10-01T12:00:00.000Z",
+      "requestedTargetReads": 900,
+      "distinctRequestedTargets": 900,
+      "successfulQueries": 20,
+      "fullySuccessfulQueries": 19,
+      "partialQueries": 1,
+      "busyOrFailedQueries": 280,
+      "reasons": {
+        "upstream_budget_limited": 280
+      },
+      "knownTargetReads": 59,
+      "reusedTargetReads": 0,
+      "upstreamHttp": 59,
+      "duplicateTargetHttpWithinWave": 0,
+      "targetClaimCalls": 900,
+      "budgetChecks": 900,
+      "netQuotaDebit": 0,
+      "allResponsesConfirmMember": true,
+      "localElapsedMs": 9493,
+      "localLatencyMs": {
+        "p50": 8582,
+        "p95": 9432,
+        "p99": 9488,
+        "max": 9493
+      },
+      "tokens": {
+        "shared": 1,
+        "auto": 1,
+        "manual": 0
+      },
+      "days": [
+        {
+          "date": "2026-10-01",
+          "dayCount": 59,
+          "autoCount": 0,
+          "manualCount": 59,
+          "minuteCount": 59
+        }
+      ],
+      "simulatedUpstreamLatencyMs": 0,
+      "persistedSamples": 59,
+      "falseConfirmationsFromSharedReads": 0,
+      "all300ImmediateResults": false
+    },
+    {
+      "name": "continuous-300-manual-plus-300-auto-every-45s",
+      "clients": 300,
+      "simulatedSeconds": 135,
+      "crossesBeijingMidnight": true,
+      "coldHandlersPerWave": 300,
+      "totalManualQueries": 1200,
+      "totalAutomaticAdmissionAttempts": 1200,
+      "manualSuccess": 4,
+      "manualBusy": 1196,
+      "autoSuccess": 71,
+      "totalHttp": 75,
+      "sharedRefillEnvelope": 75.625,
+      "overRefillEnvelope": false,
+      "invalidTokenBalance": false,
+      "anyMinuteExceeded": false,
+      "netQuotaDebit": 0,
+      "counters": {
+        "targetClaims": 1200,
+        "budgetChecks": 2101,
+        "admitted": {
+          "auto": 71,
+          "manual": 4
+        },
+        "denied": {
+          "capacity_wait": 1426,
+          "minute_budget": 600
+        }
+      },
+      "tokens": {
+        "shared": 0.6250000000000018,
+        "auto": 0.5000000000000009,
+        "manual": 0.12499999999999956
+      },
+      "days": [
+        {
+          "date": "2026-10-01",
+          "dayCount": 60,
+          "autoCount": 59,
+          "manualCount": 1,
+          "minuteCount": 60
+        },
+        {
+          "date": "2026-10-02",
+          "dayCount": 15,
+          "autoCount": 12,
+          "manualCount": 3,
+          "minuteCount": 5
+        }
+      ],
+      "waves": [
+        {
+          "wave": 0,
+          "elapsedSimulatedSeconds": 0,
+          "manualSuccess": 1,
+          "manualBusy": 299,
+          "manualReasons": {
+            "upstream_budget_limited": 299
+          },
+          "autoSuccess": 59,
+          "autoBusy": 241,
+          "netQuotaDebit": 0,
+          "totalUpstreamHttp": 60,
+          "tokens": {
+            "shared": 0,
+            "auto": 0,
+            "manual": 0
+          },
+          "days": [
+            {
+              "date": "2026-10-01",
+              "dayCount": 60,
+              "autoCount": 59,
+              "manualCount": 1,
+              "minuteCount": 60
+            }
+          ]
+        },
+        {
+          "wave": 1,
+          "elapsedSimulatedSeconds": 45,
+          "manualSuccess": 0,
+          "manualBusy": 300,
+          "manualReasons": {
+            "upstream_budget_limited": 300
+          },
+          "autoSuccess": 0,
+          "autoBusy": 300,
+          "netQuotaDebit": 0,
+          "totalUpstreamHttp": 0,
+          "tokens": {
+            "shared": 5.208333333333334,
+            "auto": 4.166666666666667,
+            "manual": 1.0416666666666665
+          },
+          "days": [
+            {
+              "date": "2026-10-01",
+              "dayCount": 60,
+              "autoCount": 59,
+              "manualCount": 1,
+              "minuteCount": 60
+            }
+          ]
+        },
+        {
+          "wave": 2,
+          "elapsedSimulatedSeconds": 90,
+          "manualSuccess": 2,
+          "manualBusy": 298,
+          "manualReasons": {
+            "upstream_budget_limited": 298
+          },
+          "autoSuccess": 8,
+          "autoBusy": 292,
+          "netQuotaDebit": 0,
+          "totalUpstreamHttp": 10,
+          "tokens": {
+            "shared": 0.41666666666666785,
+            "auto": 0.3333333333333339,
+            "manual": 0.08333333333333304
+          },
+          "days": [
+            {
+              "date": "2026-10-01",
+              "dayCount": 60,
+              "autoCount": 59,
+              "manualCount": 1,
+              "minuteCount": 60
+            },
+            {
+              "date": "2026-10-02",
+              "dayCount": 10,
+              "autoCount": 8,
+              "manualCount": 2,
+              "minuteCount": 10
+            }
+          ]
+        },
+        {
+          "wave": 3,
+          "elapsedSimulatedSeconds": 135,
+          "manualSuccess": 1,
+          "manualBusy": 299,
+          "manualReasons": {
+            "upstream_budget_limited": 299
+          },
+          "autoSuccess": 4,
+          "autoBusy": 296,
+          "netQuotaDebit": 0,
+          "totalUpstreamHttp": 5,
+          "tokens": {
+            "shared": 0.6250000000000018,
+            "auto": 0.5000000000000009,
+            "manual": 0.12499999999999956
+          },
+          "days": [
+            {
+              "date": "2026-10-01",
+              "dayCount": 60,
+              "autoCount": 59,
+              "manualCount": 1,
+              "minuteCount": 60
+            },
+            {
+              "date": "2026-10-02",
+              "dayCount": 15,
+              "autoCount": 12,
+              "manualCount": 3,
+              "minuteCount": 5
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

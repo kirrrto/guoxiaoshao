@@ -1,5 +1,6 @@
 'use strict';
 const { isValidTemplateId } = require('./config');
+const { observationHealth } = require('./engine/observation-health');
 
 /** Publish configuration and observed worker health separately. No secrets leave the server. */
 function monitoringSnapshot(config, status, now) {
@@ -12,8 +13,13 @@ function monitoringSnapshot(config, status, now) {
   const scheduledTtl = Number.isFinite(expiry) ? Math.min(150000, expiry - Date.parse(status.updatedAt)) : baseTtl;
   const stale = !Number.isFinite(age) || age < -30000 || age > (mode === 'scheduled' ? Math.max(baseTtl, scheduledTtl) : baseTtl);
   const state = !status ? 'not_deployed' : !config.collector.enabled ? 'disabled' : stale && !['stopped', 'disabled'].includes(status.state) ? 'stale' : status.state;
+  const observed = status && status.scheduler && Array.isArray(status.scheduler.targets)
+    ? observationHealth({ targets: status.scheduler.targets, intervalMs: status.intervalMs, mode, nowMs: now.getTime(), timeoutMs: config.query.upstreamTimeoutMs })
+    : status && status.observationHealth || null;
+  const observationStale = Boolean(observed && observed.staleGroups > 0);
   const collector = {
     enabled: Boolean(config.collector.enabled), state, stale, mode,
+    observationHealth: observed, observationStale,
     breaker: status && status.breaker || null,
     intervalMs: status && status.intervalMs || null,
     groupCount: status && Number.isInteger(status.groupCount) ? status.groupCount : null,
@@ -29,6 +35,7 @@ function monitoringSnapshot(config, status, now) {
   let reason = !templateConfigured ? 'template_missing' : !notifications.enabled ? 'notifications_disabled'
     : !status ? 'collector_not_deployed' : stale ? 'collector_stale'
     : ['stopped', 'no_lease', 'disabled', 'error'].includes(state) || !config.collector.enabled ? 'collector_stopped'
+    : observationStale ? 'collector_observation_stale'
     : !sender ? 'sender_unknown' : sender.reason || (!sender.enabled ? 'sender_missing' : !authReady ? 'consumer_auth_unchecked' : null);
   return { collector, notifications: {
     enabled: Boolean(notifications.enabled), templateIds: notifications.templateIds,

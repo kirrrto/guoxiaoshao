@@ -99,7 +99,8 @@ test('live query: upstream failure on every store refunds the credit and never r
   ok(await f.call('quota.signin'));
   const result = ok(await f.call('query.pickup', { queryId: 'q-fail-0001', partNumber: 'MJYH4CH/A', storeNumbers: ['R577', 'R639'] }));
   assert.equal(result.ok, false);
-  assert.equal(result.reason, 'upstream_unavailable');
+  assert.equal(result.reason, 'upstream_paused');
+  assert.ok(result.retryAfterMs > 0, 'the first 503 already opened the shared breaker');
   assert.equal(result.charged, 1);
   assert.equal(result.refunded, 1);
   assert.equal(result.balance, 1);
