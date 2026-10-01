@@ -157,6 +157,13 @@ export function createMemoryRepo(seed = {}) {
       Object.assign(current, clone(patch));
     },
     async listNotifications(userKey, limit) { return all(COLLECTIONS.notifications).filter(n => n.userKey === userKey).sort((a, b) => byDesc('createdAt')(a, b) || byDesc('_id')(a, b)).slice(0, limit || 50); },
+    async countSubscriptionRepairUsage({ userKey, templateId }) {
+      return all(COLLECTIONS.notifications).filter(task => task.userKey === userKey && (
+        task.templateId === templateId && task.status === 'accepted'
+        || task.subscriptionTemplateId === templateId && task.subscriptionReserved === true && task.subscriptionCreditRestored !== true
+        || task.templateId === templateId && task.status === 'uncertain' && task.subscriptionCreditRestored !== true
+      )).length;
+    },
     async listVisibleNotifications({ userKey, view, snapshot, cursor, limit }) {
       const rows = all(COLLECTIONS.notifications).filter(n => n.userKey === userKey && !n.userHiddenAt
         && (n.viewSequence != null ? n.viewSequence > (view.clearedThroughSequence || 0) && n.viewSequence <= snapshot.sequence : n.createdAt <= snapshot.at && (!view.legacyClearBefore || n.createdAt > view.legacyClearBefore))
@@ -188,6 +195,7 @@ export function createMemoryRepo(seed = {}) {
       drop('targetHealth', COLLECTIONS.health, doc => doc.recordedAt < cutoffIso);
       drop('subscriptionGrants', COLLECTIONS.config, doc => doc.kind === 'subscription_grant' && doc.createdAt < cutoffIso);
       drop('queryGuards', COLLECTIONS.config, doc => doc.kind === 'query_guard' && doc.updatedAt < cutoffIso);
+      drop('queryTargets', COLLECTIONS.config, doc => doc.kind === 'query_target' && doc.updatedAt < cutoffIso);
       // Same 60-day _id window as the CloudBase implementation.
       const oldestBudget = beijingDayKey(addDays(startOfDay(firstDay), -60));
       drop('budgets', COLLECTIONS.config, doc => /^collector_budget_\d{4}-\d{2}-\d{2}$/.test(doc._id) && doc._id.slice(-10) < firstDay && doc._id.slice(-10) >= oldestBudget);

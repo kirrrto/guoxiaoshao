@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
 import net from 'node:net';
 import { createFixture, fakeFetch, userKeyOf, CONSUMER_APPID } from './helpers/fixture.mjs';
+import { seedNotificationObservation } from './helpers/notification-observation.mjs';
 
 const require = createRequire(import.meta.url);
 const { createCollector } = require('../cloudfunctions/gxs_api/lib/engine/collector');
@@ -51,7 +52,7 @@ async function setup(override = {}) {
   const task = id => ({ _id: id, userKey: userKeyOf(), followId: 'F', eventId: `event-${id}`, eventType: 'restock_confirmed',
     partNumber: 'MJYH4CH/A', storeNumber: 'R577', templateId: 'TPL', status: 'pending', attempts: 0,
     createdAt: f.state.now.toISOString(), detectedAt: f.state.now.toISOString() });
-  const send = async (t, impl = sender) => sendTask({ task: t, repo: f.repo, config, sendImpl: impl, now: f.state.now, clock: () => f.state.now, ownerId: 'test-sender' });
+  const send = async (t, impl = sender) => { await seedNotificationObservation(f.repo, t); return sendTask({ task: t, repo: f.repo, config, sendImpl: impl, now: f.state.now, clock: () => f.state.now, ownerId: 'test-sender' }); };
   return { f, upstream, collector, sends, sender, run, task, send, available: () => { display = 'available'; } };
 }
 
@@ -63,7 +64,8 @@ test('runtime 8-second interval and concurrency one are effective and can change
   s.f.advance(1000);
   assert.equal((await s.run()).started.length, 0);
   assert.equal((await s.f.repo.getCollectorStatus()).intervalMs, 8000);
-  await s.f.repo.saveConfig({ ...config, collector: { enabled: true, intervalSeconds: 2, maxConcurrency: 2 } });
+  const runtime = await s.f.repo.getConfig();
+  await s.f.repo.saveConfig({ ...runtime, collector: { ...runtime.collector, enabled: true, intervalSeconds: 2, maxConcurrency: 2 } });
   s.f.advance(1000);
   assert.equal((await s.run()).started.length, 2);
   assert.equal(s.collector.scheduler.snapshot().maxConcurrency, 2);
@@ -190,7 +192,7 @@ test('subscription grants enforce template whitelist and idempotency under concu
 
 test('durable collector budgets survive another collector process and reset by minute/day', async () => {
   const s = await setup();
-  const take = now => s.f.repo.consumeCollectorBudget({ now, maxRequestsPerMinute: 1, maxRequestsPerDay: 2 });
+  const take = now => s.f.repo.consumeCollectorBudget({ now, maxRequestsPerMinute: 1, maxRequestsPerDay: 2, budgetMode: 'daily' });
   assert.equal((await take('2026-09-15T02:00:00Z')).allowed, true);
   assert.equal((await take('2026-09-15T02:00:01Z')).reason, 'minute_budget');
   assert.equal((await take('2026-09-15T02:01:00Z')).allowed, true);

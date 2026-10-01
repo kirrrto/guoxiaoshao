@@ -35,7 +35,7 @@ test('retired test cache never replaces real-account recovery IDs or saved resul
   assert.equal(operation.begin('q',payload),realId);
   const {localKey}=rt.load('utils/local-key.js');
   assert.equal(rt.wx.getStorageSync(localKey('gxs_query_result_v1')).real,true);
-  operation.finish('q');
+  operation.finish('q', realId);
   assert.equal(rt.storage.has('gxs_pending_q_v1'),false);
   assert.equal(rt.storage.get('gxs_query_result_v1').real,true);
 });

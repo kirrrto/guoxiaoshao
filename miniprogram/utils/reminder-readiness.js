@@ -50,6 +50,7 @@ function reminderReadiness({ boot, follows = [], followsLoaded = false, collecto
   if (!saved.length) return state('no_follows', '先给心仪配置留个哨', trial ? '新用户免费体验：可关注 1 个配置，并收到 1 条到货提醒。选择具体型号、容量、颜色和门店即可开始。' : '还没有添加关注。选择具体型号、容量、颜色和门店后，才能参与自动检测。', 'add', trial ? '免费添加关注' : '添加关注', 'muted');
   if (!active.length) return state('all_paused', '你的关注全部已暂停', '后台服务可能仍在运行，但当前没有你的配置参与检测。请在下方开启需要关注的配置。', 'follows', '查看并开启关注');
   if (!subscription.templateCount) return state('template_missing', '微信提醒暂未开放', '订阅消息模板尚未配置，暂不能授权或发送。已开启的关注会保留，无需反复开关或重复授权。', 'service', '查看服务状态');
+  if (collector && collector.observationStale) return state('collector_observation_stale', '库存观测更新延迟', '后台连接仍在，但部分库存观测未及时更新，暂不能确认最新取货状态。关注和提醒次数会保留，等待服务恢复即可。', 'service', '查看服务状态');
   if (!collector || collector.state !== 'running') {
     if (collector && collector.state === 'idle') return state('collector_idle', '等待后台下一轮检测', '关注已保存，等待后台下一轮检测，无需重复操作。', 'refresh', '刷新检测状态');
     return state('collector_unready', '后台检测暂未就绪', '关注已开启时无需重复操作；后台恢复后才会自动检测补货。可查看具体服务状态。', 'service', '查看服务状态');
@@ -87,7 +88,7 @@ function notificationAdvice(notification) {
   if (reason === 'user_disabled' || reason === 'dnd') return { action: 'settings', actionLabel: '查看提醒设置' };
   if (reason === 'follow_not_active') return { action: 'follow', actionLabel: '查看对应关注' };
   if (reason === 'member_expired' || reason === 'free_reminder_used') return { action: 'membership', actionLabel: '查看会员' };
-  if (reason === 'cooldown' || reason === 'event_expired' || reason === 'credit_released') return { action: 'explain', actionLabel: '了解未发送原因' };
+  if (['cooldown', 'event_expired', 'credit_released', 'event_superseded', 'event_unconfirmed', 'event_invalid_time'].includes(reason)) return { action: 'explain', actionLabel: '了解未发送原因' };
   return { action: 'service', actionLabel: '查看提醒体检' };
 }
 

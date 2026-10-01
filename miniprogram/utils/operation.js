@@ -16,8 +16,12 @@ function begin(kind, payload) {
   return id;
 }
 
-function finish(kind) {
-  try { wx.removeStorageSync(localKey(`gxs_pending_${kind}_v1`)); } catch (e) { /* ignore */ }
+function finish(kind, id) {
+  try {
+    const key = localKey(`gxs_pending_${kind}_v1`), saved = wx.getStorageSync(key);
+    // An older page can finish after a new target has created another request.
+    if (saved && saved.id === id) wx.removeStorageSync(key);
+  } catch (e) { /* ignore */ }
 }
 
 function uncertain(error) {

@@ -1,5 +1,5 @@
 {
-  "navigationBarTitleText": "果小哨 · 实时查询",
+  "navigationBarTitleText": "果小哨 · 门店查询",
   "enablePullDownRefresh": true,
   "usingComponents": {
     "target-picker": "/components/target-picker/index",

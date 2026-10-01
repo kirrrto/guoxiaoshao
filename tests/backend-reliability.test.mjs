@@ -412,7 +412,7 @@ test('real wx-server-sdk 4.0.2 adapter preserves transaction results, null/objec
     await assert.rejects(repo.patchRuntimeConfig({ patch: { announcement: 'must roll back with audit failure' }, updatedAt: nowIso, actor: { isOperator: true, userKey: null, source: 'wx_devtools' } }));
     assert.deepEqual(committed[C.config], configBeforeFailure, 'audit insert failure must roll back the preceding runtime write through the actual SDK');
     const guardNow = '2026-09-16T02:00:00.000Z';
-    const guardLimits = { now: guardNow, maxRequestsPerMinute: 1, maxRequestsPerDay: 10 };
+    const guardLimits = { now: guardNow, maxRequestsPerMinute: 1, maxRequestsPerDay: 10, budgetMode: 'daily' };
     conflict = true;
     const budgetStarts = sequence;
     const reserved = await repo.consumeCollectorBudget(guardLimits);

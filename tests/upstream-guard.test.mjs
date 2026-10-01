@@ -38,7 +38,9 @@ test('429 Retry-After survives new API calls and auto collection using the same 
   const f = createFixture({ config: { collector: { enabled: true } }, fetchImpl: async () => { calls++; return { status: 429, headers: { get: () => '180' }, body: (async function* () { yield Buffer.from('busy'); })() }; } });
   await member(f);
   ok(await f.call('follow.upsert', { followId: 'guard-follow-001', partNumber: 'MXXX1CH/A', storeNumbers: ['R577'] }));
-  assert.equal(ok(await f.call('query.pickup', payload(1))).reason, 'upstream_unavailable');
+  const first = ok(await f.call('query.pickup', payload(1)));
+  assert.equal(first.reason, 'upstream_paused');
+  assert.equal(first.retryAfterMs, 180000);
   for (let i = 2; i <= 5; i++) assert.equal(ok(await f.call('query.pickup', payload(i))).reason, 'upstream_paused');
   const collector = createCollector({ repo: f.repo, fetchImpl: f.state.fetchImpl, clock: () => new Date(f.state.now), ownerId: 'cold-start', log: { info() {}, warn() {}, error() {} } });
   const step = await collector.step(); await Promise.all(step.started);
@@ -62,6 +64,30 @@ test('automatic scans and manual calls compete for the same budget, including co
   const responses = await Promise.all([f.call('query.pickup', payload(1)), f.call('query.pickup', payload(2), second)]);
   assert.ok(responses.every(r => ok(r).reason === 'upstream_budget_limited'));
   assert.equal(fetchImpl.calls.length, 1);
+});
+
+test('automatic scans leave daily capacity for manual queries while the shared cap remains enforced', async () => {
+  const f = createFixture({ config: { collector: { maxRequestsPerDay: 10 } }, fetchImpl: fakeFetch({ R577: { display: 'available' } }) });
+  const limits = { maxRequestsPerMinute: 60, maxRequestsPerDay: 10, budgetMode: 'daily' };
+  const take = source => f.repo.consumeCollectorBudget({ now: f.state.now.toISOString(), ...limits, source });
+  for (let i = 0; i < 8; i++) assert.equal((await take('auto')).allowed, true);
+  const held = await take('auto');
+  assert.equal(held.reason, 'auto_budget_reserved');
+  assert.equal(held.retryAt, Date.parse('2026-09-15T16:00:00.000Z'));
+  assert.equal((await take('manual')).allowed, true);
+  assert.equal((await take('manual')).allowed, true);
+  assert.equal((await take('manual')).reason, 'daily_budget');
+  f.advance(14 * 60 * 60 * 1000);
+  assert.equal((await take('auto')).allowed, true, 'Beijing midnight starts a new allocation');
+});
+
+test('scheduled monitoring stretches its scan interval to fit the automatic allocation', async () => {
+  const f = createFixture({ config: { collector: { enabled: true, intervalSeconds: 60, maxRequestsPerDay: 1000 } } });
+  await member(f);
+  ok(await f.call('follow.upsert', { followId: 'budget-cadence-001', partNumber: 'MXXX1CH/A', storeNumbers: ['R577'] }));
+  const collector = createCollector({ repo: f.repo, fetchImpl: f.state.fetchImpl, clock: () => new Date(f.state.now), mode: 'scheduled', log: { info() {}, warn() {}, error() {} } });
+  await collector.refreshTargets();
+  assert.equal(collector.scheduler.snapshot().intervalMs, 108000);
 });
 
 test('distinct IDs cannot overlap for one member, but a finished query releases the account lease', async () => {

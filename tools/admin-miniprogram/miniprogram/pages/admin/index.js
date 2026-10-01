@@ -61,6 +61,7 @@ Page({
   },
 
   clearAccess(error) {
+    this._configRevision = null;
     const denied = error && ['forbidden', 'user_required', 'app_not_allowed'].includes(error.code);
     this.setData({ allowed: false, checked: Boolean(error), stats: null, insights: null, configText: '', configDirty: false, lookup: null, lookupText: '', grant: { userKey: '', days: '30', amount: '5', note: '' }, accessError: error ? (denied ? '当前账号没有管理权限，请由项目所有者在云端配置授权。' : '权限检查失败，请稍后重试。') : null });
   },
@@ -96,9 +97,10 @@ Page({
   async loadConfig() {
     if (!this.data.allowed) return;
     try {
-    const { config } = await this.callAdmin('admin.getConfig');
+    const { config, revision } = await this.callAdmin('admin.getConfig');
     const editable = {};
     for (const key of EDITABLE_KEYS) editable[key] = config[key];
+    this._configRevision = Number.isSafeInteger(revision) && revision >= 0 ? revision : null;
     this.setData({ configText: JSON.stringify(editable, null, 2), configDirty: false });
     } catch (error) { showError(error); }
   },
@@ -117,11 +119,12 @@ Page({
     }
     if (!patch || typeof patch !== 'object' || Array.isArray(patch)) return toast('配置需为 JSON 对象');
     if (Object.keys(patch).some(key => !EDITABLE_KEYS.includes(key))) return toast('含不可编辑项，请重新加载配置');
+    if (!Number.isSafeInteger(this._configRevision) || this._configRevision < 0) return toast('配置版本缺失，请重新加载配置后再保存');
     const filtered = {};
     for (const key of Object.keys(patch)) if (EDITABLE_KEYS.includes(key)) filtered[key] = patch[key];
     this.setData({ saving: true });
     try {
-      await this.callAdmin('admin.updateConfig', { patch: filtered });
+      await this.callAdmin('admin.updateConfig', { patch: filtered, expectedRevision: this._configRevision });
       toast('配置已保存', 'success');
       await this.loadConfig();
     } catch (error) {

@@ -111,12 +111,13 @@ test('admin access rechecks on returning and removes previously loaded data if r
 
 test('ordinary users cannot call administrative APIs directly regardless of client flags', async () => {
   const f = createFixture();
+  const before = await f.repo.getConfig();
   for (const action of ['admin.stats', 'admin.getConfig', 'admin.updateConfig', 'admin.seedCatalog', 'admin.grantMembership', 'admin.grantCredits', 'admin.lookupUser']) {
     const result = await f.call(action, { isAdmin: true, userKey: 'someone-else', patch: { adminUserKeys: ['consumer:user'] } });
     assert.equal(result.ok, false, action);
     assert.equal(result.error.code, 'forbidden', action);
   }
-  assert.equal(await f.repo.getConfig(), null);
+  assert.deepEqual(await f.repo.getConfig(), before);
 });
 
 test('consumer account page contains no admin route or catalog timestamp', () => {
@@ -130,7 +131,7 @@ test('consumer account page contains no admin route or catalog timestamp', () =>
 });
 
 test('operator configuration cannot send administrator-list edits and malformed JSON values', async () => {
-  const rt = runtime('admin', async action => action === 'admin.stats' ? { users: 12 } : { config: {} });
+  const rt = runtime('admin', async action => action === 'admin.stats' ? { users: 12 } : { config: {}, revision: 0 });
   await rt.page.onLoad();
   for (const configText of ['null', '[]', JSON.stringify({ adminUserKeys: ['self:promotion'] })]) {
     rt.page.setData({ configText, configDirty: true });
@@ -140,7 +141,34 @@ test('operator configuration cannot send administrator-list edits and malformed 
   assert.equal(rt.messages.length, 3);
   rt.page.setData({ configText: JSON.stringify({ announcement: '运行公告' }), configDirty: true });
   await rt.page.onSaveConfig();
-  assert.deepEqual(clone(rt.calls.find(c => c.action === 'admin.updateConfig').payload), { patch: { announcement: '运行公告' } });
+  assert.deepEqual(clone(rt.calls.find(c => c.action === 'admin.updateConfig').payload), { patch: { announcement: '运行公告' }, expectedRevision: 0 });
+});
+
+test('an operator editor sends its loaded revision and retains edited text when another administrator already changed config', async () => {
+  const rt = runtime('admin', async action => {
+    if (action === 'admin.stats') return { users: 12 };
+    if (action === 'admin.getConfig') return { config: { collector: { budgetMode: 'daily' }, announcement: 'old notice' }, revision: 7 };
+    throw Object.assign(new Error('配置已更新，请先重新加载最新配置后再合并修改；当前编辑内容已保留。'), { code: 'config_revision_conflict' });
+  });
+  await rt.page.onLoad();
+  const text = JSON.stringify({ collector: { budgetMode: 'daily' }, announcement: 'my unsaved text' });
+  rt.page.onConfigInput({ detail: { value: text } });
+  await rt.page.onSaveConfig();
+  assert.equal(rt.calls.find(call => call.action === 'admin.updateConfig').payload.expectedRevision, 7);
+  assert.equal(rt.page.data.configText, text); assert.equal(rt.page.data.configDirty, true);
+  assert.equal(rt.page.data.saving, false);
+  assert.match(rt.messages.at(-1), /重新加载/);
+  assert.equal(rt.calls.filter(call => call.action === 'admin.getConfig').length, 1, 'conflict never automatically overwrites the pending edit');
+});
+
+test('an operator editor cannot save without a version supplied by the configuration read', async () => {
+  const rt = runtime('admin', async action => action === 'admin.stats' ? { users: 12 } : { config: {} });
+  await rt.page.onLoad();
+  rt.page.onConfigInput({ detail: { value: JSON.stringify({ announcement: 'preserve this' }) } });
+  await rt.page.onSaveConfig();
+  assert.equal(rt.calls.filter(call => call.action === 'admin.updateConfig').length, 0);
+  assert.equal(rt.page.data.configDirty, true);
+  assert.match(rt.messages.at(-1), /重新加载|版本/);
 });
 
 test('operator project is physically outside the consumer upload root and has all local dependencies', () => {

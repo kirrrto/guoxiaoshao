@@ -1,0 +1,312 @@
+{
+  "generatedAt": "2026-10-01T14:48:34.985Z",
+  "kind": "read-only-source-and-saved-evidence-analysis",
+  "productionRequests": 0,
+  "sourceOrConfigWrites": false,
+  "requestedStandard": {
+    "simultaneousQueryUsers": 300,
+    "normalFullCycleSeconds": 60,
+    "continuouslyAvailableFullCycleSeconds": 3
+  },
+  "verdict": "现有分钟定时架构和容量配置不满足该标准；仅将 interval/burst 参数改为60/3不能完成交付。",
+  "savedProductionEvidence": {
+    "source": "output/cloud-backup-2026-10-01/capacity-after-monitor-4.json",
+    "observedAt": "2026-10-01T14:06:03.490Z",
+    "isLiveRead": false,
+    "mode": "scheduled",
+    "groupCount": 18,
+    "distinctStoreCount": 18,
+    "actualStoreSkuTargets": 28,
+    "partsPerGroup": [
+      2,
+      3,
+      2,
+      2,
+      1,
+      2,
+      1,
+      2,
+      1,
+      2,
+      2,
+      1,
+      1,
+      1,
+      1,
+      1,
+      2,
+      1
+    ],
+    "configuredMaxPartsPerRequest": 20,
+    "intervalMs": 194400,
+    "scheduledNormalIntervalMinuteBuckets": 4,
+    "maxRequestsPerMinute": 60,
+    "maxRequestsPerDay": 10000,
+    "functionMetadata": [
+      {
+        "name": "gxs_monitor",
+        "timeoutSeconds": 60,
+        "runtime": "Nodejs20.19"
+      }
+    ],
+    "metadataSource": "output/cloud-backup-2026-10-01/function-info.json.txt.json"
+  },
+  "observedSchedulerSemantics": {
+    "timerPeriodSeconds": 60,
+    "timerExpression": "0 * * * * * *",
+    "platformTimeoutSeconds": 60,
+    "maximumWorkMs": 55000,
+    "fallbackWorkMs": 35000,
+    "nominalUncoveredWindowSecondsAtMaximumWork": 5,
+    "nominalUncoveredWindowSecondsAtFallback": 25,
+    "gapNote": "这些是按准时分钟触发推算的工作窗口空档，实际还受冷启动、调度抖动、数据库/网络延迟、收尾影响。心跳TTL150秒只是存活判断，不会填补采集空档。",
+    "burstStartsOn": "已记录状态变化或待确认事件调用hurry；不是持续available状态",
+    "burstQuietSeconds": 20,
+    "burstDoesNotExtendForUnchangedAvailable": true,
+    "sameStoreSpacing": "dispatch在HTTP完成时将storeLastRequestAt设为完成时刻，dueAt再加burst间隔；设置3s意味着至少完成后再等3s，且同店多个SKU批次不并行。",
+    "lease": {
+      "ttlSeconds": 15,
+      "renewal": "通过collector.step、请求前、写入前和发送前的数据库事务续租；无独立高优先级续租定时器",
+      "implications": [
+        "HTTP超时按实际租约剩余时间收缩；新标准仍必须保留失租停止/写入fence。",
+        "长时间数据库/通知工作会影响调度；增加云函数timeout不会产生连续3秒工作循环。",
+        "两个实例或定时/常驻同时运行仍共享同一collector_lease，增加实例数不会直接增加有效采集并发。"
+      ]
+    },
+    "blockingWork": [
+      "collector.step在scheduler.tick之前await配置/目标刷新、sender probe、drainNotifications。",
+      "handleBatch在释放scheduler inFlight之前await drainNotifications，发送最多20条pending任务且每条最长约8秒；慢微信发送能直接阻塞库存采集。",
+      "resident目标刷新默认10秒一次且与采集同循环await；需测量并限制控制面工作的延迟。"
+    ],
+    "sourceFiles": [
+      "cloudfunctions/gxs_monitor/config.json",
+      "cloudfunctions/gxs_api/lib/engine/scheduled.js",
+      "cloudfunctions/gxs_api/lib/engine/collector.js",
+      "cloudfunctions/gxs_api/lib/engine/scheduler.js",
+      "cloudfunctions/gxs_api/lib/engine/lease.js"
+    ]
+  },
+  "localReproduction": {
+    "productionAccess": false,
+    "continuouslyAvailable": true,
+    "simulatedHttpLatencyMs": 500,
+    "configuredNormalSeconds": 60,
+    "configuredFastSeconds": 3,
+    "configuredQuietSeconds": 20,
+    "startOffsetsMs": [
+      0,
+      3500,
+      7000,
+      10500,
+      14000,
+      17500,
+      21000,
+      60000,
+      120000
+    ],
+    "finishOffsetsMs": [
+      500,
+      4000,
+      7500,
+      11000,
+      14500,
+      18000,
+      21500,
+      60500,
+      120500
+    ],
+    "startGapsMs": [
+      3500,
+      3500,
+      3500,
+      3500,
+      3500,
+      3500,
+      39000,
+      60000
+    ],
+    "maximumStartGapMs": 60000,
+    "runs": [
+      {
+        "triggerOffsetMs": 0,
+        "runEndOffsetMs": 21500,
+        "scanned": 7
+      },
+      {
+        "triggerOffsetMs": 60000,
+        "runEndOffsetMs": 60500,
+        "scanned": 1
+      },
+      {
+        "triggerOffsetMs": 120000,
+        "runEndOffsetMs": 120500,
+        "scanned": 1
+      }
+    ],
+    "conclusion": "即使单目标且给足本地预算，配置3秒仍产生响应耗时+3秒的间隔，并在20秒加速结束后回到分钟级检查。"
+  },
+  "capacity": {
+    "batchingRule": "G = 各门店 ceil(该门店去重后的SKU数 / 20) 的总和；不能跨门店凑成一个HTTP。18个满批最多覆盖360个门店×SKU目标，不等于360个用户。",
+    "mixedFormula": "R_auto = (G-H)/60 + H/3，其中H为必须保持3秒更新的请求组；热组的3秒检查已包含常规检查，不重复加算。",
+    "assumptions": [
+      "每批最多20个SKU且每次HTTP返回该店所需SKU的有效状态。",
+      "一次请求只有一家门店；同目标用户可以共享样本。",
+      "不含429/503、重试、超时、补偿、手动查询、数据库写入和通知的额外开销，均为算术下界。"
+    ],
+    "eighteenGroupCases": [
+      {
+        "activeGroups": 0,
+        "regularGroups": 18,
+        "automaticRequestsPerSecond": 0.3,
+        "automaticRequestsPerMinute": 18,
+        "automaticRequestsPerDay": 25920,
+        "totalRefillPerDayToReserve20PercentForManual": 32400,
+        "totalMinuteCapacityToReserve20PercentForManual": 22.5
+      },
+      {
+        "activeGroups": 1,
+        "regularGroups": 17,
+        "automaticRequestsPerSecond": 0.6166666666666667,
+        "automaticRequestsPerMinute": 37,
+        "automaticRequestsPerDay": 53280,
+        "totalRefillPerDayToReserve20PercentForManual": 66600,
+        "totalMinuteCapacityToReserve20PercentForManual": 46.25
+      },
+      {
+        "activeGroups": 6,
+        "regularGroups": 12,
+        "automaticRequestsPerSecond": 2.2,
+        "automaticRequestsPerMinute": 132,
+        "automaticRequestsPerDay": 190080.00000000003,
+        "totalRefillPerDayToReserve20PercentForManual": 237600.00000000003,
+        "totalMinuteCapacityToReserve20PercentForManual": 165
+      },
+      {
+        "activeGroups": 18,
+        "regularGroups": 0,
+        "automaticRequestsPerSecond": 6,
+        "automaticRequestsPerMinute": 360,
+        "automaticRequestsPerDay": 518400,
+        "totalRefillPerDayToReserve20PercentForManual": 648000,
+        "totalMinuteCapacityToReserve20PercentForManual": 450
+      }
+    ],
+    "currentRates": {
+      "totalRequestsPerSecond": 0.11574074074074074,
+      "automaticRequestsPerSecond": 0.09259259259259259,
+      "manualRequestsPerSecond": 0.023148148148148147,
+      "totalBurst": 60,
+      "maxConcurrency": 2
+    },
+    "configuredValidatorCeilings": {
+      "maxRequestsPerDay": 100000,
+      "maxRequestsPerMinute": 600,
+      "maxConcurrency": 10
+    },
+    "all18AvailableRequiredAutoRps": 6,
+    "all18AvailableRequiredAutoDay": 518400,
+    "all18AvailableRequiredTotalRefillDayWithManualReserve": 648000,
+    "exceedsExistingDayValidator": true,
+    "concurrencyLowerBoundsAt6Rps": [
+      {
+        "endToEndSeconds": 0.333,
+        "requiredConcurrencyAtLeast": 2
+      },
+      {
+        "endToEndSeconds": 0.5,
+        "requiredConcurrencyAtLeast": 3
+      },
+      {
+        "endToEndSeconds": 1,
+        "requiredConcurrencyAtLeast": 6
+      },
+      {
+        "endToEndSeconds": 2.5,
+        "requiredConcurrencyAtLeast": 15
+      },
+      {
+        "endToEndSeconds": 8,
+        "requiredConcurrencyAtLeast": 48
+      }
+    ],
+    "concurrencyNote": "端到端含上游、持久化和调度阻塞。仅加并发不能绕过每店串行及响应完成后spacing，实际需要安全余量和真实测量。",
+    "manualColdBurstInSameMinute": {
+      "note": "仅当300人均需要未缓存的新目标时增加这些HTTP；来自已按频率更新的缓存可共享，不能把所有点击都算成外部请求。",
+      "oneStoreEach": {
+        "extraHttp": 300,
+        "withAllHotAutoMinuteHttpAtLeast": 660,
+        "manualRateWithin14SecondsAtLeast": 21.428571428571427
+      },
+      "threeStoresEach": {
+        "extraHttp": 900,
+        "withAllHotAutoMinuteHttpAtLeast": 1260,
+        "manualRateWithin14SecondsAtLeast": 64.28571428571429
+      },
+      "currentManualPathDoesNotBatchDifferentSkus": true
+    }
+  },
+  "minimumSafeImplementation": [
+    {
+      "priority": 1,
+      "action": "用连续运行且不休眠的常驻采集进程作为3秒调度执行者，复用tools/collector/runner.js作为起点。",
+      "details": [
+        "按现有同库租约安全切换；保留定时任务只能作为不争抢采集租约的存活巡检/兜底设计，不能让分钟函数与常驻进程交替抢锁。",
+        "需要部署并真实验证不会缩容至零、滚动更新和故障接管；现有模板是单副本Recreate，单靠它仍会有重启空档。",
+        "保留15秒失租保护并评估恢复目标。15秒租约接管不能被描述为故障期间也满足3秒；若要求故障无间断，需要另外设计经验证的热备交接/fencing。"
+      ]
+    },
+    {
+      "priority": 2,
+      "action": "把短暂change burst与持续available监测拆成明确策略。",
+      "details": [
+        "正常组60秒；已知且当前有货的组持续3秒，状态持久化并能在重启、关注增删、分组改变后恢复。",
+        "unknown不能当成无货结束热监测，也不能续写成功时间；保留故障退避、上游Retry-After并呈现降级。",
+        "使用真实HTTP开始时间计算每组下一截止，不以完成时间额外再加整个3秒；每店安全请求间隔应与业务刷新频率分开建模。",
+        "多个20SKU批次在同店时必须有容量可行性检查及公平调度；热目标不能饿死常规60秒扫描。"
+      ]
+    },
+    {
+      "priority": 3,
+      "action": "库存采集热循环与通知发送/慢控制面解耦。",
+      "details": [
+        "继续使用现有持久outbox和任务claim防重，但通知网络等待不在采集tick/onBatch的关键路径。",
+        "为配置刷新、目标刷新、租约续期、采集、事件规划设定可测的时限和独立健康指标。"
+      ]
+    },
+    {
+      "priority": 4,
+      "action": "依据经过授权且实测可用的上游能力配置容量，不能仅提高数字宣称达标。",
+      "details": [
+        "18组普通扫描的算术起点为总refill32400/day；18组全热为648000/day并保留20%手动份额，当前validator不接受后者。",
+        "容量/并发/平台配额/数据库交易热点均需真实验证后再调整；如果上游不支持6HTTP/s，则无法承诺18组持续3秒，需要合法稳定的数据源能力或明确约定范围。",
+        "300查询优先读取同一批次的带时间戳结果，冷目标通过有界队列和同店SKU合并；不能把内存300同目标测试当生产CloudBase验收。"
+      ]
+    },
+    {
+      "priority": 5,
+      "action": "把健康阈值与新交付频率对齐。",
+      "details": [
+        "当前observationHealth以2倍规划间隔+容差、至少150秒判停滞，只是事故检测，不能作为3秒/60秒SLO验收。",
+        "独立记录每个目标计划间隔、实际HTTP开始/完成、成功持久化时刻、最大/分位观测间隔及逾期数；告警送达另验。"
+      ]
+    }
+  ],
+  "acceptance": {
+    "offline": [
+      "持续available至少10分钟而非20秒，跨多个原分钟边界，确认不会自动退回60秒。",
+      "18组全热、部分热、全冷及每店超过20SKU的分片，模拟真实延迟/慢DB/慢微信；验证热3秒与所有目标60秒的独立截止及公平性。",
+      "跨午夜、冷启动、失租、重启、两个实例竞争，保证不重置预算、不重复HTTP/提醒、不伪造observedAt或成功确认。",
+      "300独立会员同目标/不同目标/三店/冷缓存，同时叠加全部热组；记录成功/繁忙/队列时延、实际HTTP/复用/净扣次和来源预算。"
+    ],
+    "controlledCloud": [
+      "在与生产同拓扑的受控环境测试真实CloudBase事务和云并发配额；使用测试上游先隔离第三方速率影响，再对获得授权的有限真实目标验证。",
+      "至少包含300同时点击、18组全热持续运行、跨分钟及跨北京午夜；保存每个组的新有效且成功持久化观测时间序列。",
+      "对严格字面标准：正常运行条件下每个常规目标成功观测间隔不大于60秒，每个持续有货目标不大于3秒；若要允许容差必须先明确约定，不能用平均值或心跳替代。",
+      "观察请求数、上游429/503、错误/超时、DB事务冲突、排队、函数/容器CPU和内存；任何限流必须显示降级，不能绕过保护凑成功率。",
+      "故障注入验证重启/失租接管和通知不重复；实际恢复时间单独列示，不把15秒租约或平台中断假装满足3秒。",
+      "300查询结果时效和响应时限必须写入验收口径：热缓存/冷缓存分开，不能将HTTP200但旧数据或繁忙响应记为实时成功。"
+    ],
+    "currentStatus": "上述新标准尚未实现和验收；本报告为只读结论及本地复现，不是已部署声明。"
+  },
+  "scopeNote": "Analysis and reproduction made before the new opt-in sustained-availability mode and resident notification isolation. Capacity and timer architecture constraints remain; the old change-only trace is a baseline, not a run with the new mode enabled."
+}

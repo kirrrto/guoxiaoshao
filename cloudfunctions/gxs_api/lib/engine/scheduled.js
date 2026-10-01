@@ -2,6 +2,8 @@
 const crypto = require('node:crypto');
 const { createCollector } = require('./collector');
 const { runRetentionIfDue } = require('./retention');
+const { dayKey, endOfDay } = require('../time');
+const { AUTO_SHARE } = require('./capacity-budget');
 
 const TRIGGER_NAME = 'gxs-monitor-minute';
 
@@ -69,6 +71,29 @@ async function runScheduled({ repo, fetchImpl, sendImpl, clock = () => new Date(
     await collector.refreshTargets();
     if (previous && previous.mode === 'scheduled') {
       collector.scheduler.restore(previous.scheduler);
+      const current = collector.currentConfig().collector;
+      if (current.budgetMode === 'continuous') {
+        const oldBudget = previous.budget || {};
+        let retiredRetryAt = oldBudget.budgetMode !== 'continuous'
+          && ['daily_budget', 'auto_budget_reserved'].includes(oldBudget.reason) ? oldBudget.retryAt : undefined;
+        // Old idle invocations overwrote budget.reason with an allowed/zero
+        // heartbeat, while retaining every target's midnight nextDueAt.
+        // Confirm that unlabelled wait against the persisted day's consumption;
+        // ordinary future schedules and continuous-mode waits are not evidence.
+        const midnight = endOfDay(dayKey(clock())).getTime();
+        const saved = previous.scheduler;
+        const hasUnlabelledMidnight = saved && saved.version === 1 && Array.isArray(saved.targets)
+          && saved.targets.some(target => target.nextDueAt === midnight && !target.guardReason && !target.guardUntil);
+        if (!Number.isFinite(retiredRetryAt) && oldBudget.budgetMode !== 'continuous' && hasUnlabelledMidnight) {
+          const snapshot = await repo.getUpstreamCapacity({ now: clock().toISOString() });
+          const oldDailyLimit = Number.isSafeInteger(oldBudget.maxRequestsPerDay) && oldBudget.maxRequestsPerDay > 0
+            ? oldBudget.maxRequestsPerDay : current.maxRequestsPerDay;
+          if (snapshot.day && snapshot.day.dayCount >= Math.max(1, Math.floor(oldDailyLimit * AUTO_SHARE))) retiredRetryAt = midnight;
+        }
+        // Legacy daily exhaustion parked targets until midnight. Re-admit
+        // them under continuous refill while retaining 429/503 and backoff.
+        collector.scheduler.resetDailyAdmission(retiredRetryAt);
+      }
       collector.stats.lastBatchAt = previous.stats && previous.stats.lastBatchAt || null;
     }
     const snap = collector.scheduler.snapshot();
@@ -76,6 +101,8 @@ async function runScheduled({ repo, fetchImpl, sendImpl, clock = () => new Date(
     // per group and wait briefly for store spacing so later batches are still
     // scanned during this invocation instead of alternating across minutes.
     const maxWaves = Math.max(1, snap.groupCount);
+    const fastIntervals = [snap.burstIntervalMs, snap.availableIntervalMs].filter(interval => interval > 0);
+    const storeSpacingMs = fastIntervals.length ? Math.min(snap.intervalMs, ...fastIntervals) : 0;
     for (let wave = 0; wave < maxWaves && shouldContinue(); wave++) {
       const result = await collector.step();
       if (!result.held) return { state: 'standby', scanned: collector.stats.batches };
@@ -84,7 +111,7 @@ async function runScheduled({ repo, fetchImpl, sendImpl, clock = () => new Date(
       if (!result.started.length) {
         const waitMs = collector.scheduler.nextDueInMs();
         const storeDelayed = collector.scheduler.snapshot().targets.some(target => target.storeDelayed);
-        if (storeDelayed && waitMs > 0 && waitMs <= snap.burstIntervalMs && clock().getTime() + waitMs < deadline) {
+        if (storeDelayed && waitMs > 0 && waitMs <= storeSpacingMs && clock().getTime() + waitMs < deadline) {
           await sleep(Math.min(waitMs, 1000));
           wave -= 1;
           continue;

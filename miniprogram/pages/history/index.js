@@ -129,7 +129,7 @@ Page({
   },
 
   async onLoad() {
-    if (this.loadingBoot) return;
+    if (this.pageRetired || this.loadingBoot) return;
     // Create mutable logic state per instance; it is not rendered via setData.
     if (!this.selection) this.selection = { partNumber: null, product: null, storeNumbers: [], stores: [] };
     this.loadingBoot = true;
@@ -140,6 +140,7 @@ Page({
     try {
       const account = getBootstrap(); account.catch(() => {});
       const initialCatalog = await getCatalog();
+      if (this.pageRetired) return;
       const catalog = getApp().globalData.catalog || initialCatalog; this.catalog = catalog;
       const product = pickerValue && Object.prototype.hasOwnProperty.call(catalog.productByPart, pickerValue.partNumber) ? catalog.productByPart[pickerValue.partNumber] : null;
       const storeNumbers = pickerValue && Array.isArray(pickerValue.storeNumbers) ? pickerValue.storeNumbers.slice() : [];
@@ -149,18 +150,23 @@ Page({
       const summary = selectionSummary(this.selection, catalog);
       this.selectionNeedsReview = Boolean(pickerValue && (!summary || !summary.valid));
       this.setData({ catalogVersion: catalog.version, ready: true, loadError: null, selectionSummary: summary });
-      try { this.applyBoot(await account); this.applyCatalog(await getCatalog()); this.loadBrowse(); }
-      catch (error) { this.setData({ accountReady: false, accountError: '账户连接暂未完成，可以先选择历史查询条件。' }); }
+      try {
+        const boot = await account;
+        if (this.pageRetired) return;
+        this.applyBoot(boot); this.applyCatalog(await getCatalog()); this.loadBrowse();
+      }
+      catch (error) { if (!this.pageRetired) this.setData({ accountReady: false, accountError: '账户连接暂未完成，可以先选择历史查询条件。' }); }
     } catch (error) {
-      this.setData({ loadError: error.message || String(error) });
+      if (!this.pageRetired) this.setData({ loadError: error.message || String(error) });
     } finally { this.loadingBoot = false; }
   },
 
   async onShow() {
+    if (this.pageRetired) return;
     syncTabBar(this, '/pages/history/index');
     if (!this.data.ready) return;
     this.refreshObservationSnapshot();
-    try { this.applyBoot(await getBootstrap()); getCatalog(); this.loadBrowse(); } catch (e) { /* keep snapshot */ }
+    try { const boot = await getBootstrap(); if (this.pageRetired) return; this.applyBoot(boot); getCatalog(); this.loadBrowse(); } catch (e) { /* keep snapshot */ }
   },
 
   onUnload() { this.pageRetired = true; if (this.unsubscribeCatalog) this.unsubscribeCatalog(); },
@@ -174,6 +180,7 @@ Page({
   },
 
   applyCatalog(catalog) {
+    if (this.pageRetired) return;
     this.catalog = catalog;
     if (this.data.ready) {
       const summary = selectionSummary(this.selection, catalog);
@@ -183,10 +190,10 @@ Page({
   },
 
   async onRetryAccount() {
-    if (this.connectingAccount) return;
+    if (this.pageRetired || this.connectingAccount) return;
     this.connectingAccount = true; this.setData({ accountError: null });
     try { this.applyBoot(await getBootstrap({ force: true })); this.loadBrowse({ force: true }); }
-    catch (error) { this.setData({ accountError: '账户连接失败，请检查网络后重试。' }); }
+    catch (error) { if (!this.pageRetired) this.setData({ accountError: '账户连接失败，请检查网络后重试。' }); }
     finally { this.connectingAccount = false; }
   },
 
@@ -195,15 +202,21 @@ Page({
   },
 
   onPullDownRefresh() {
+    if (this.pageRetired) return;
     this.refreshObservationSnapshot();
-    Promise.all([getBootstrap({ force: true }), getCatalog({ force: true })]).then(results => { this.applyBoot(results[0]); this.applyCatalog(results[1]); this.setData({ ready: true, loadError: null }); return this.loadBrowse({ force: true }); }).catch(showError).finally(() => wx.stopPullDownRefresh());
+    return Promise.all([getBootstrap({ force: true }), getCatalog({ force: true })]).then(results => { if (this.pageRetired) return; this.applyBoot(results[0]); this.applyCatalog(results[1]); this.setData({ ready: true, loadError: null }); return this.loadBrowse({ force: true }); }).catch(error => { if (!this.pageRetired) showError(error); }).finally(() => wx.stopPullDownRefresh());
   },
 
   applyBoot(boot) {
+    if (this.pageRetired) return;
     const task = (boot.tasks || []).find(t => t.id === 'view_history' && t.reward > 0);
+    const membershipRestoresAccess = boot.membership.active
+      && ['insufficient_credits', 'new_product_history_restricted'].includes(this.restrictionReason);
+    if (membershipRestoresAccess) this.restrictionReason = null;
     this.setData({
       accountReady: true,
       accountError: null,
+      ...(membershipRestoresAccess ? { restriction: null } : {}),
       boot: {
         member: boot.membership.active,
         balance: boot.quota.balance,
@@ -283,6 +296,7 @@ Page({
     this.historySnapshot = null;
     this.selection = { ...pickerValue, product, stores };
     this.selectionNeedsReview = false;
+    this.restrictionReason = null;
     this.setData({ dayKey: item.dayKey, selectionSummary: selectionSummary(this.selection, catalog), resultTargetDifferent: false,
       result: null, moreError: null, restriction: null, restoreWarning: false,
       restoreNotice: '查询条件已恢复，尚未查询，也未扣次。请核对后点击「查看历史」，查询时按账户规则计次。' });
@@ -306,6 +320,7 @@ Page({
     this.selection = e.detail;
     const summary = selectionSummary(e.detail, this.catalog);
     this.selectionNeedsReview = Boolean(e.detail.partNumber && (!summary || !summary.valid));
+    this.restrictionReason = null;
     this.setData({ restriction: null, selectionSummary: summary, resultTargetDifferent: this.hasDifferentResult(e.detail) });
     const restored = this.restoredSelection;
     if (!restored || restored.partNumber !== e.detail.partNumber || JSON.stringify(restored.storeNumbers.slice().sort()) !== JSON.stringify((e.detail.storeNumbers || []).slice().sort())) {
@@ -317,6 +332,7 @@ Page({
 
   onDateChange(e) {
     this.restoredSelection = null;
+    this.restrictionReason = null;
     this.setData({ dayKey: e.detail.value, restriction: null, restoreNotice: null, restoreWarning: false, resultTargetDifferent: this.hasDifferentResult(this.selection, e.detail.value) });
   },
 
@@ -369,7 +385,7 @@ Page({
   onToggleCoverage() { this.setData({ coverageExpanded: !this.data.coverageExpanded }); },
 
   async onQuery() {
-    if (this.data.sheetVisible) return;
+    if (this.pageRetired || this.data.sheetVisible) return;
     if (this.data.querying || this.data.loadingMore) return;
     if (!this.data.boot) return toast('账户正在连接，请稍后再试');
     const picker = typeof this.selectComponent === 'function' && this.selectComponent('#history-target-picker');
@@ -379,16 +395,22 @@ Page({
     if (!selection.partNumber) return toast('请先选择具体配置');
     // Let the server distinguish insufficient funds from an already-debited
     // retry of this request. Do not block recovery using a stale local balance.
+    this.restrictionReason = null;
     this.setData({ querying: true, restriction: null, restoreNotice: null, restoreWarning: false });
     const payload = { partNumber: selection.partNumber, storeNumbers: selection.storeNumbers.slice(), dayKey };
     const historyQueryId = operation.begin('h', payload);
     try {
       const response = await call('history.list', { historyQueryId, ...payload });
-      if (response.reason === 'query_in_progress') { this.setData({ restriction: '原请求正在处理中，请稍后重试；重试不会重复扣次。' }); return; }
-      operation.finish('h');
+      if (response.reason === 'query_in_progress') { if (!this.pageRetired) this.setData({ restriction: '原请求正在处理中，请稍后重试；重试不会重复扣次。' }); return; }
+      operation.finish('h', historyQueryId);
       invalidateBootstrap();
+      if (this.pageRetired) return;
       if (!response.ok) {
+        this.restrictionReason = response.reason;
         this.setData({ restriction: fmt.reasonText(response.reason), 'boot.balance': response.balance });
+        if (boot.member && ['insufficient_credits', 'new_product_history_restricted'].includes(response.reason)) {
+          try { this.applyBoot(await getBootstrap({ force: true })); } catch (error) { /* keep the confirmed denial until the account reconnects */ }
+        }
         return;
       }
       this.historyRequest = { historyQueryId, ...payload };
@@ -396,31 +418,34 @@ Page({
       this.setData({ result: presentHistory(response, this.catalog), 'boot.balance': response.balance, moreError: null, coverageExpanded: false, resultTargetDifferent: this.hasDifferentResult() });
       if (boot.taskAvailable) this.completeTask();
     } catch (error) {
-      if (!operation.uncertain(error)) operation.finish('h');
+      if (!operation.uncertain(error)) operation.finish('h', historyQueryId);
+      if (this.pageRetired) return;
       if (operation.uncertain(error)) this.setData({ restriction: '结果尚未确认，再次查询相同条件会恢复原请求，不重复扣次。' });
       showError(error);
     } finally {
-      this.setData({ querying: false });
+      if (!this.pageRetired) this.setData({ querying: false });
     }
   },
 
   async onLoadMore() {
-    if (this.data.loadingMore || this.data.querying || !this.historyRequest || !this.data.result.pagination.hasMore) return;
+    if (this.pageRetired || this.data.loadingMore || this.data.querying || !this.historyRequest || !this.data.result.pagination.hasMore) return;
     this.setData({ loadingMore: true, moreError: null });
     try {
       const response = await call('history.list', { ...this.historyRequest, cursor: this.data.result.pagination.nextCursor });
+      if (this.pageRetired) return;
       if (!response.ok) throw new Error(fmt.reasonText(response.reason));
       const events = [...this.historySnapshot.events, ...response.events];
       const seen = new Set();
       this.historySnapshot = { ...response, events: events.filter(e => { if (seen.has(e.id)) return false; seen.add(e.id); return true; }) };
       this.setData({ result: presentHistory(this.historySnapshot, this.catalog) });
-    } catch (error) { this.setData({ moreError: error.message || '加载失败，请重试。' }); }
-    finally { this.setData({ loadingMore: false }); }
+    } catch (error) { if (!this.pageRetired) this.setData({ moreError: error.message || '加载失败，请重试。' }); }
+    finally { if (!this.pageRetired) this.setData({ loadingMore: false }); }
   },
 
   onGoMine() { wx.switchTab({ url: '/pages/mine/index' }); },
 
   async completeTask() {
+    if (this.pageRetired) return;
     try {
       const data = await call('quota.completeTask', { taskId: 'view_history' });
       const accepted = publishQuota(data.quota);
@@ -440,12 +465,14 @@ Page({
   },
 
   onRetryLoad() {
+    if (this.pageRetired) return;
     this.setData({ loadError: null });
     this.onLoad();
   },
 
   /** Called by the tab bar when the phone reconnects. */
   onNetworkRestored() {
+    if (this.pageRetired) return;
     if (this.data.loadError) return this.onRetryLoad();
     if (this.data.ready && !this.data.accountReady) return this.onRetryAccount();
   },

@@ -1,7 +1,7 @@
 'use strict';
 const { randomUUID } = require('node:crypto');
 const { ApiError } = require('../errors');
-const { guardedPickup } = require('../engine/guarded-pickup');
+const { sharedQueryPickup } = require('../engine/shared-query');
 const { ensureUser } = require('./users');
 const { recordObservations } = require('../engine/observations');
 const ID_PATTERN = /^[A-Za-z0-9_-]{8,64}$/;
@@ -23,21 +23,20 @@ async function mapLimit(items, concurrency, fn) {
   }));
   return result;
 }
-function presentResult({ observation, latest, events, outcome }) {
-  const current = outcome === 'stale' && latest ? { ...observation, status: latest.unknownSince ? 'unknown' : latest.status, quote: latest.quote, observedAt: latest.observedAt, reason: latest.lastReason || null } : observation;
+function presentResult({ observation, latest, events, outcome, reused }, nowMs) {
+  // Corrupt future timestamps cannot overrule a real response obtained now.
+  const validLatest = latest && Number.isFinite(Date.parse(latest.observedAt)) && Date.parse(latest.observedAt) <= nowMs;
+  const superseded = outcome === 'stale' && validLatest;
+  const current = superseded ? { ...observation, status: latest.unknownSince ? 'unknown' : latest.status, quote: latest.quote, observedAt: latest.observedAt, reason: latest.lastReason || null } : observation;
   return {
     storeNumber: observation.storeNumber, storeName: observation.storeName || (latest && latest.storeName) || null,
     partNumber: observation.partNumber, status: current.status, quote: current.quote,
     productTitle: observation.productTitle || (latest && latest.productTitle) || null,
-    observedAt: current.observedAt, reason: current.reason, statusSince: latest ? latest.statusSince : null,
-    superseded: outcome === 'stale',
+    observedAt: current.observedAt, reason: current.reason, statusSince: validLatest ? latest.statusSince : null,
+    superseded: Boolean(superseded),
+    reused: Boolean(reused),
     events: events.map(e => ({ type: e.type, detectedAt: e.detectedAt })),
   };
-}
-async function boundedPickup(ctx, storeNumber, partNumber, deadline) {
-  const remaining = Math.max(1, deadline - Date.now());
-  const timeoutMs = Math.max(1, Math.min(remaining, Number(ctx.config.query.upstreamTimeoutMs) || 8000, 12000));
-  return guardedPickup({ repo: ctx.repo, config: ctx.config, clock: ctx.clock, fetchImpl: ctx.fetchImpl, storeNumber, partNumbers: [partNumber], timeoutMs, beforeRequest: async () => Date.now() < deadline });
 }
 async function pickup(ctx, payload) {
   const startedAt = Date.now();
@@ -55,20 +54,27 @@ async function pickup(ctx, payload) {
   try {
     // Three parallel requests; keep six seconds of the 20-second invocation for persistence.
     const deadline = startedAt + 14000;
-    const batches = await mapLimit(storeNumbers, 3, store => boundedPickup(ctx, store, partNumber, deadline));
+    const batches = await mapLimit(storeNumbers, 3, store => sharedQueryPickup(ctx, store, partNumber, deadline));
     // A denied request is not an upstream observation and must not alter history.
-    const observed = await recordObservations(ctx, batches.filter(batch => !batch.record.budgetDenied).flatMap(batch => batch.observations), 'manual');
     const recorded = batches.flatMap(batch => batch.record.budgetDenied
       ? batch.observations.map(observation => ({ observation, latest: null, events: [], outcome: 'not_sampled' }))
-      : observed.filter(item => item.observation.storeNumber === batch.observations[0]?.storeNumber));
+      : batch.recorded);
     const allUnknown = recorded.length === 0 || recorded.every(r => r.observation.status === 'unknown');
-    refund = allUnknown;
+    const allShared = recorded.length > 0 && recorded.every(r => r.reused);
+    const sharedResult = recorded.some(r => r.reused);
+    const hasNewValidResult = recorded.some(r => !r.reused && r.observation.status !== 'unknown');
+    refund = !hasNewValidResult;
     const retryAt = Math.max(0, ...batches.map(batch => Number(batch.record.retryAt) || 0));
-    const guardReason = batches.find(batch => batch.record.budgetDenied)?.record.error.message;
-    response = { ok: !allUnknown, reason: allUnknown ? (guardReason === 'upstream_paused' ? 'upstream_paused' : guardReason ? 'upstream_budget_limited' : 'upstream_unavailable') : null, queryId,
+    const guardReason = batches.find(batch => batch.record.budgetDenied)?.record.error.message
+      || (retryAt > ctx.clock().getTime() ? 'upstream_paused' : null);
+    const reason = ['upstream_paused', 'query_refresh_pending', 'upstream_unavailable'].includes(guardReason) ? guardReason
+      : ['daily_budget', 'minute_budget', 'capacity_wait'].includes(guardReason) ? 'upstream_budget_limited' : 'upstream_unavailable';
+    response = { ok: !allUnknown, reason: allUnknown ? reason : null, queryId,
+      sharedResult, allShared, billingReason: refund && sharedResult ? 'shared_result_no_charge' : refund ? 'no_valid_result' : null,
+      budgetScope: guardReason === 'daily_budget' ? 'daily' : guardReason === 'minute_budget' ? 'minute' : guardReason === 'capacity_wait' ? 'continuous' : null,
       retryAfterMs: Math.max(0, retryAt - ctx.clock().getTime()), partial: !allUnknown && recorded.some(item => item.observation.status === 'unknown'),
       product: { partNumber: product.partNumber, title: product.title, model: product.model, familyName: product.familyName },
-      results: recorded.map(presentResult), queriedAt: ctx.nowIso,
+      results: recorded.map(item => presentResult(item, ctx.clock().getTime())), queriedAt: ctx.nowIso,
       transport: batches.map((batch, i) => ({ storeNumber: storeNumbers[i], httpStatus: batch.record.httpStatus, elapsedMs: batch.record.elapsedMs, error: batch.record.error ? batch.record.error.message : null })),
     };
   } catch (error) {

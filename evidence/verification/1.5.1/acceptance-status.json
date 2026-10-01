@@ -1,0 +1,27 @@
+{
+  "version": "1.5.1",
+  "generatedAt": "2026-10-01T14:56:19.896Z",
+  "localChecksPassed": true,
+  "publicationReady": false,
+  "productionDeploymentPerformed": false,
+  "formalWeChatPublicationPerformed": false,
+  "targets": {
+    "version": "1.5.1",
+    "purpose": "Acceptance requirements, not deployed runtime configuration or achieved capacity",
+    "simultaneousQueryingMembers": 300,
+    "followNormalDetectionSeconds": 60,
+    "followAvailableRecheckSeconds": 3,
+    "availableRecheckPolicy": "Continue while a durably observed known target remains available; unknown, failures, source limits and worker gaps must be reported, never fabricated as successful samples",
+    "inventoryMeaning": "Store pickup availability; no exact remaining unit count is provided",
+    "productionAcceptancePassed": false
+  },
+  "pending": [
+    "300 distinct-target representative staging-cloud load",
+    "60-second complete coverage and continuous available-state 3-second observations in the intended resident deployment",
+    "Validated upstream capacity and cloud database contention",
+    "New real phone purchase then immediate query use",
+    "Authorized real reminder delivery and business-stall alert delivery/recovery",
+    "Download and compare this candidate deployment; physical-device verification and formal WeChat release"
+  ],
+  "knownDependencyRisk": "All four SDK packages retain the lodash.set advisory chain. The current application does not use realtime watch; this does not constitute zero dependency risk."
+}

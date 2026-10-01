@@ -1,12 +1,14 @@
 # 补货定时监测部署
 
-更新：2026-09-16。`gxs_monitor` 是独立的定时云函数，复用 `gxs_api/lib` 的库存观测、事件、关注、会员、预算和发送逻辑。本文的命令是部署步骤；代码完成及离线测试通过不代表云端已部署或已收到微信消息，线上结果另看本次验收记录。
+更新：2026-10-01。`gxs_monitor` 是独立的定时云函数，复用 `gxs_api/lib` 的库存观测、事件、关注、会员、容量和发送逻辑。本文的命令是部署步骤；本次容量修复的实际生产部署与核验另见 [会员查询故障复核](HOTFIX_MEMBER_QUERY_2026-10-01.md)。云包部署、采集恢复与收到微信消息分别核验，不能相互替代。
 
 ## 运行方式
 
 每分钟触发一次，每次目标最多扫描一轮。单次工作分发截止时间为 35 秒，给正在进行的网络和数据库请求留出云函数收尾时间。部署的函数超时设为 60 秒，内存 256 MB，运行时 Node.js 20.19 或云环境支持的更新 Node.js 版本，入口 `index.main`。
 
-关注仍需是 `active` 且属于有效会员。多个用户同门店同商品合并请求；每分钟 / 每日请求预算继续生效。目标太多、上游异常或预算达到上限时，实际间隔会大于一分钟，页面显示上次实际观测时间。
+关注仍需是 `active`，所属用户有会员权益或可用的新用户免费提醒。多个用户同门店同商品合并请求，同门店 SKU 默认每 20 个分组；组数代表独立采集工作量，不代表用户数。默认 `collector.budgetMode: 'continuous'`，`maxRequestsPerDay=10000` 是持续补充容量的速率目标，`maxRequestsPerMinute=60` 仍是分钟上限。容量不足仅延后更新，跨午夜、冷启动不清空状态；只有显式选择 `daily` 才会在日上限后停至北京时间午夜。
+
+常规间隔会按自动来源的 80% 补充速率与实际组数拉长，再按分钟触发对齐。默认 9 组约每 2 分钟扫描一次；这是容量估算，不能保证每轮准时成功，也不表示只支持 9 个用户。手动来源保留 20% 持续容量，来源空闲至少 60 秒后可有界借用，仍受总容量约束。目标太多、上游异常或容量不足时实际间隔更长，页面显示原始观测时间。细节见 [查询容量](QUERY_CAPACITY.md)。
 
 采集与发送使用同一数据库租约。不要同时启用常驻进程和定时函数；重叠时只有租约持有者运行。库存状态与待处理事件始终保存在数据库；冷启动不会丢失补货事件。调度进度及 HTTP 429 / 503 的 Retry-After 同样持久化，避免重启越过上游限流。心跳有效期为 150 秒，覆盖正常的一分钟调度空档；失去后续触发后会显示过期。
 
@@ -32,11 +34,14 @@ node tools/release/check.mjs
 
 ## 先验证触发身份，再启用采集
 
+部署前先读取并备份线上 runtime、当日请求来源计数、`upstream_capacity`（若存在）及 collector_status。容量修复需同步发布匹配版本的 `gxs_api`、重新生成的 `gxs_monitor` 和小程序前端；下列步骤不表示已完成部署。配置只做局部合并，明确选择 continuous，不能用默认值覆盖会员、支付、通知等现有配置。
+
 1. 部署 `gxs_monitor`，先保持环境变量 `GXS_ENABLE_SCHEDULED_MONITOR=false`。此时符合条件的触发也不会读写业务数据库或请求 Apple / 微信。
 2. 创建 / 上传 `config.json` 中的定时触发器，观察实际云端日志返回：应是 `state: process_disabled`，并带 `source: wx_trigger`，或 SCF 原生触发的 `triggerSource: timer`、`runEnvironment: SCF`。来源仅取自 SDK 可信上下文及平台内置环境变量，不会信任事件负载伪造的来源。环境级函数规则还应禁止客户端调用 `gxs_monitor`。
 3. 如果平台返回 `timer_only`，查看只含来源标记和是否存在用户身份的诊断。不要直接删掉检查，也不要仅依据 `event.Type === 'Timer'` 放行。用户端、HTTP、开发者工具手动调用及未知来源均被拒绝；真正的 timer 触发必须提供平台可信来源。
-4. 确认身份后，设置环境变量 `GXS_ENABLE_SCHEDULED_MONITOR=true`，并合并更新 `gxs_config/runtime.collector`：`enabled: true`、`intervalSeconds: 60`、`statusStaleAfterSeconds: 150`。保留既有管理员、会员、次数等其他配置，以及预算、并发和限流参数，不用整份默认配置覆盖现有 runtime。
+4. 确认身份后，设置环境变量 `GXS_ENABLE_SCHEDULED_MONITOR=true`，并合并更新 `gxs_config/runtime.collector`：`enabled: true`、`intervalSeconds: 60`、`statusStaleAfterSeconds: 150`、`budgetMode: 'continuous'`。核对分钟速率、持续补充目标、并发与 `query.sharedFreshnessSeconds`（默认 10 秒，0–30）。保留既有管理员、会员、次数等其他配置，不用整份默认配置覆盖现有 runtime。
 5. 在两个相邻分钟核实 `gxs_config/collector_status` 的 `mode: scheduled`、`updatedAt`、`stats.lastBatchAt` 确实变化，且目标最新观测的 `source` 为自动采集。不能只凭配置 enabled 宣称已经在监测。
+6. 在负载与跨日观测中核对实际组数、采样间隔、`dayCount/autoCount/manualCount`、capacity_wait、query_refresh_pending、错误率及超时 pending 查询。确认多用户同目标复用保持 `observedAt`、不重复形成观测或提醒；全部复用时免费查询净扣次为 0。仓库的 100 用户同目标模拟测试验证契约，不能代替云端数据库争用与真实请求延迟验收。
 
 ## 订阅消息独立接入
 

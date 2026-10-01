@@ -71,6 +71,10 @@ export function fakeFetch(plan) {
 }
 
 export function createFixture({ config, products = PRODUCTS, stores = STORES, fetchImpl, start = '2026-09-15T02:00:00.000Z' } = {}) {
+  // Existing contract tests deliberately issue separate samples at a frozen
+  // clock. Keep those explicit legacy semantics; capacity/sharing tests opt in
+  // to the production defaults they exercise.
+  config = { ...config, collector: { budgetMode: 'daily', ...config?.collector }, query: { sharedFreshnessSeconds: 0, ...config?.query } };
   const repo = createMemoryRepo({
     [COLLECTIONS.catalogProducts]: products,
     [COLLECTIONS.catalogStores]: stores,

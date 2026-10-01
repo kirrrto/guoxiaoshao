@@ -1,0 +1,12 @@
+{
+  "command": "node --test --test-reporter=tap \"tests/**/*.test.mjs\"",
+  "tests": 866,
+  "pass": 866,
+  "fail": 0,
+  "cancelled": 0,
+  "skipped": 0,
+  "todo": 0,
+  "duration_ms": 62383.8474,
+  "rawLocalLogSha256": "69f9b9e99d9d90b82abf377fc1c66938454b0a9d72ae7e5d9966a5d0f73c309b",
+  "scope": "Offline regression; includes mock payments, source HTTP and in-memory database capacity tests. No real payment, send, production load or deployment."
+}

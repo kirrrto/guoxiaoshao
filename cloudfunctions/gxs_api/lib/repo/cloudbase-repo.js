@@ -306,6 +306,17 @@ function createCloudbaseRepo(db) {
     async listNotifications(userKey, limit) {
       return readAll(col(COLLECTIONS.notifications).where({ userKey }).orderBy('createdAt', 'desc').orderBy('_id', 'desc'), limit || 50);
     },
+    async countSubscriptionRepairUsage({ userKey, templateId }) {
+      // One union query counts each permission once across sending -> accepted.
+      // Actual refunds change the user ledger, which the repair rechecks.
+      const where = _.and([{ userKey }, _.or([
+        { templateId, status: 'accepted' },
+        { subscriptionTemplateId: templateId, subscriptionReserved: true, subscriptionCreditRestored: _.neq(true) },
+        { templateId, status: 'uncertain', subscriptionCreditRestored: _.neq(true) },
+      ])]);
+      const result = await col(COLLECTIONS.notifications).where(where).count();
+      return result.total;
+    },
     async listVisibleNotifications({ userKey, view, snapshot, cursor, limit }) {
       const legacy = [_.or([{ viewSequence: _.exists(false) }, { viewSequence: _.eq(null) }]), { createdAt: _.lte(snapshot.at) }];
       if (view.legacyClearBefore) legacy.push({ createdAt: _.gt(view.legacyClearBefore) });
@@ -376,6 +387,7 @@ function createCloudbaseRepo(db) {
         targetHealth: [col(COLLECTIONS.health).where({ recordedAt: _.lt(cutoffIso) })],
         subscriptionGrants: [col(COLLECTIONS.config).where({ kind: 'subscription_grant', createdAt: _.lt(cutoffIso) })],
         queryGuards: [col(COLLECTIONS.config).where({ kind: 'query_guard', updatedAt: _.lt(cutoffIso) })],
+        queryTargets: [col(COLLECTIONS.config).where({ kind: 'query_target', updatedAt: _.lt(cutoffIso) })],
         budgets: byIds(COLLECTIONS.config, budgetIds),
       };
       const removed = {}, errors = {};

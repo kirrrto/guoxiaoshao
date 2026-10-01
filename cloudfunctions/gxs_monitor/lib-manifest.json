@@ -12,6 +12,7 @@
   ],
   "external": [
     "node:crypto",
+    "node:util",
     "wx-server-sdk"
   ],
   "files": [
@@ -32,8 +33,8 @@
     },
     {
       "path": "config.js",
-      "bytes": 11822,
-      "sha256": "a77bd70aa50e18e27f73116dca394438b710c1d5cb75d9cf238f10efe0b85a93"
+      "bytes": 12513,
+      "sha256": "6284eeff8451229645089f8184a3a82bbf0457f71c927cff74cd9b780913e7c6"
     },
     {
       "path": "connection.js",
@@ -41,19 +42,24 @@
       "sha256": "8099a99c0454283891b5ca93e14c59e58f0b524d7a59d9543accf765fc57e694"
     },
     {
+      "path": "engine/capacity-budget.js",
+      "bytes": 3805,
+      "sha256": "823dd1458b83e691e34842b6aac7d129aecd30d14bbe7029b819896582789913"
+    },
+    {
       "path": "engine/collector.js",
-      "bytes": 14133,
-      "sha256": "3515732d82c164acdbea16cdf02c5f175101e8d0a319fd64f963097c3b122467"
+      "bytes": 18268,
+      "sha256": "3d1e8eaef3ed53257fa7010a7872e13bbaafafa9d35d119b302f97aede8d5722"
     },
     {
       "path": "engine/events.js",
-      "bytes": 6585,
-      "sha256": "cee533de46f50fbda90bd741881a514859146c797789c2a4051e74dae724ecf6"
+      "bytes": 7226,
+      "sha256": "8f48a5845c4593a82f2bbd71ce157c0795885164f43360e9049ede235a85e7d0"
     },
     {
       "path": "engine/guarded-pickup.js",
-      "bytes": 2572,
-      "sha256": "87d377465ba6ec6c72b6d80528cbf3afb60024e11a9f24c2ef78348ddf96caaa"
+      "bytes": 2640,
+      "sha256": "752ce3ae887838c2b00718d774fea1c8a9505546e8c4e011f2b0a86afe410a4b"
     },
     {
       "path": "engine/lease.js",
@@ -62,8 +68,8 @@
     },
     {
       "path": "engine/notifier.js",
-      "bytes": 13572,
-      "sha256": "82d053774f9b718b8828104164c40694365b747ffd1494165f142a700c09359a"
+      "bytes": 16724,
+      "sha256": "2aba20999a8a54b3117906461c4e390fdaf8e7582d2b77fe0b48de06634f6ce6"
     },
     {
       "path": "engine/observation-day.js",
@@ -71,9 +77,14 @@
       "sha256": "c6e93a5be2e61dc27c0c37c8537618e73c883764c2ed94515c3879acdf7838ff"
     },
     {
+      "path": "engine/observation-health.js",
+      "bytes": 2205,
+      "sha256": "f025f0fee56b3436db8195b3b2ce4f2a2ab14cdc32f0dd7128d6dc31e8a31f8f"
+    },
+    {
       "path": "engine/observations.js",
-      "bytes": 820,
-      "sha256": "2ccb8859660acc1cc40c3d02155798e8a0cc5bbba13bfc597c640b763576ca02"
+      "bytes": 1032,
+      "sha256": "4f9bf5a91f4e117c7c9fc5d538216a5b77f6502a3c7ce2fa07138fa87fdaba3d"
     },
     {
       "path": "engine/retention.js",
@@ -82,13 +93,13 @@
     },
     {
       "path": "engine/scheduled.js",
-      "bytes": 7201,
-      "sha256": "cf82f426f4eb6542374bb10cb7d6d1383ebc51e67a3e4fd45816a4754e1e2100"
+      "bytes": 9240,
+      "sha256": "0aaac4a7ff9766724df89d2e5c00d2f84e8e5b81b1e508377290aa10393a65db"
     },
     {
       "path": "engine/scheduler.js",
-      "bytes": 18193,
-      "sha256": "060795273878175f4ca349dd330d113cfb57b6249c68275918b62b61032eb509"
+      "bytes": 24676,
+      "sha256": "22bb1260fa71c90cfd7bdb8f02a9acd29cda0eeba0572fa5d81c19fba86cd2e7"
     },
     {
       "path": "engine/wechat-sender.js",
@@ -117,13 +128,18 @@
     },
     {
       "path": "repo/atomic-ops.js",
-      "bytes": 45183,
-      "sha256": "cfd974cd64da06a297ea725f280cfd276dbce31fd93e0cac6bb9f12d4f7f5230"
+      "bytes": 47601,
+      "sha256": "5719a90ef4ef5afd2aa512ad7ac565f9130c403fb3a3ab6262e816157b7f9809"
     },
     {
       "path": "repo/cloudbase-repo.js",
-      "bytes": 21147,
-      "sha256": "a3639ae1828aaa6fcce9572c40ba860a63e90a3edd25ea9beaab0917b95bc05b"
+      "bytes": 21898,
+      "sha256": "f99944964be67a0400aeca3dfeecde5b72264f8487af0e681b1c24e364ae31bf"
+    },
+    {
+      "path": "repo/query-target.js",
+      "bytes": 2497,
+      "sha256": "34e58a36fdbf0cf4274277fea1cf013106a5ff048620c38c8547e5d71c2a4d65"
     },
     {
       "path": "repo/subscription-credit-ledger.js",
@@ -132,8 +148,8 @@
     },
     {
       "path": "repo/upstream-guard.js",
-      "bytes": 5934,
-      "sha256": "86663a63d680ab8c6556b338a19278d102eea3a0f7757a14d11095eaa48ad6d3"
+      "bytes": 7819,
+      "sha256": "90767d8b9454bbeeb2b210e1664590447cf158b9855f59cfdd5afabf3f93078e"
     },
     {
       "path": "rules/access.js",

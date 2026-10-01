@@ -1,0 +1,15 @@
+{
+  "version": "1.5.1",
+  "command": "WeChat DevTools CLI preview",
+  "succeeded": true,
+  "size": {
+    "total": 651017,
+    "packages": [
+      {
+        "name": "TOTAL",
+        "size": 651017
+      }
+    ]
+  },
+  "scope": "Consumer preview build only; not a development-version upload, backend deployment, real-device payment/reminder acceptance or formal publication."
+}

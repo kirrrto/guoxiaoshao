@@ -10,7 +10,7 @@
  * Sending is injected (`sendImpl`) so this module has no WeChat dependency;
  * the worker passes the sender authenticated for the consumer mini program.
  */
-const { NOTIFIABLE_TYPES } = require('./events');
+const { NOTIFIABLE_TYPES, targetKeyOf } = require('./events');
 const { canUseReminders, reminderBlockReason, isMember } = require('../rules/membership');
 const { inMinuteWindow } = require('../time');
 const { isValidTemplateId } = require('../config');
@@ -146,7 +146,23 @@ function skipReason({ task, user, follow, config, now, senderAppid }) {
   if (!follow || follow.status !== 'active' || follow.userKey !== task.userKey || follow.partNumber !== task.partNumber || !follow.storeNumbers.includes(task.storeNumber)) return 'follow_not_active';
   if (settings && settings.notifyEnabled === false) return 'user_disabled';
   if (settings && settings.dnd && settings.dnd.enabled && inMinuteWindow(now, settings.dnd.startMinute, settings.dnd.endMinute)) return 'dnd';
-  if (now.getTime() - Date.parse(task.detectedAt) > (config.notifications.maxEventAgeSeconds || 120) * 1000) return 'event_expired';
+  const detectedAt = Date.parse(task.detectedAt);
+  if (!Number.isFinite(detectedAt) || detectedAt > now.getTime() + 30000) return 'event_invalid_time';
+  if (now.getTime() - detectedAt > (config.notifications.maxEventAgeSeconds || 120) * 1000) return 'event_expired';
+  return null;
+}
+
+function observationSkipReason(task, latest, now) {
+  if (!latest) return 'event_unconfirmed';
+  const observedAt = Date.parse(latest.observedAt), knownAt = Date.parse(latest.knownAt);
+  const streakSince = Date.parse(latest.knownStreakSince || task.detectedAt);
+  const futureBoundary = now.getTime() + 30000;
+  if (![observedAt, knownAt, streakSince].every(value => Number.isFinite(value) && value <= futureBoundary)
+    || knownAt > observedAt) return 'event_unconfirmed';
+  const matchingStatus = alertKind(task.eventType) === 'soldout'
+    ? ['unavailable', 'ineligible', 'pending'].includes(latest.status) : latest.status === 'available';
+  if (latest.statusSince !== task.detectedAt || !matchingStatus) return 'event_superseded';
+  if (latest.unknownSince || !(knownAt > streakSince)) return 'event_unconfirmed';
   return null;
 }
 
@@ -161,31 +177,61 @@ async function sendTask({ task, config, sendImpl, repo, now, ownerId = 'notifier
     await repo.updateNotification(task._id, patch);
     return { ...task, ...patch };
   };
-  const canStart = async () => remainingMs() > 1000 && await beforeSend() && remainingMs() > 1000;
-  const defer = () => finish({ status: TASK_STATUS.pending, reason: 'send_deferred', ownerId: null, leaseUntil: null, sentAt: null,
+  const claimAlive = () => Number.isFinite(Date.parse(task.leaseUntil)) && Date.parse(task.leaseUntil) > clock().getTime();
+  const sendBudgetMs = () => Math.max(0, Math.min(remainingMs(), Date.parse(task.leaseUntil) - clock().getTime()));
+  const canStart = async () => claimAlive() && sendBudgetMs() > 1000 && await beforeSend() && claimAlive() && sendBudgetMs() > 1000;
+  const defer = async () => !claimAlive() ? await repo.getNotification(task._id) || task : finish({ status: TASK_STATUS.pending, reason: 'send_deferred', ownerId: null, leaseUntil: null, sentAt: null,
     subscriptionReserved: false, subscriptionReleased: false, subscriptionInvalidated: false, subscriptionTemplateId: null,
     subscriptionCreditSequence: null, subscriptionCreditHighWater: null, cooldownId: null });
   // Read after the claim, rather than trusting task-planning snapshots.
-  const user = await repo.getUser(task.userKey);
-  const follow = await repo.getFollow(task.followId);
+  let user = await repo.getUser(task.userKey);
+  let follow = await repo.getFollow(task.followId);
   const { mergeConfig } = require('../config');
   config = mergeConfig(await repo.getConfig());
   now = clock();
   const reason = skipReason({ task, user, follow, config, now, senderAppid: sendImpl.appid || config.notifications.consumerAppId });
+  // Once the claim expires another worker may have reconciled it to uncertain.
+  // The old owner must neither send nor turn that durable barrier into pending.
+  if (!claimAlive()) return await repo.getNotification(task._id) || task;
   if (reason) return finish({ status: TASK_STATUS.skipped, reason, sentAt: null });
+  const [latest] = await repo.getLatest([targetKeyOf(task.storeNumber, task.partNumber)]);
+  if (!claimAlive()) return await repo.getNotification(task._id) || task;
+  const observationReason = observationSkipReason(task, latest, clock());
+  if (observationReason) return finish({ status: TASK_STATUS.skipped, reason: observationReason, sentAt: null });
   if (!await canStart()) return defer();
   // Restock and sold-out alerts cool down separately, so one never blocks the other.
   const targetKey = `${alertKind(task.eventType) === 'soldout' ? 'soldout|' : ''}${task.storeNumber}|${task.partNumber}`;
   const reservation = await repo.reserveSubscriptionCredit({ userKey: task.userKey, templateId: task.templateId, taskId: task._id, now: now.toISOString(), targetKey, cooldownMinutes: config.notifications.cooldownMinutes || 0 });
   if (!reservation.reserved) return finish({ status: TASK_STATUS.skipped, reason: reservation.reason || 'no_subscription_credit', sentAt: null });
+  const release = async () => {
+    await repo.releaseSubscriptionCredit({ userKey: task.userKey, templateId: task.templateId, taskId: task._id, now: clock().toISOString() });
+    await repo.settleFirstReminder({ userKey: task.userKey, taskId: task._id, sent: false, now: clock().toISOString() });
+  };
   // A reservation transaction may outlast the worker's deadline or lease.
   // No message endpoint has been called yet, so refund and defer safely.
   if (!await canStart()) {
-    await repo.releaseSubscriptionCredit({ userKey: task.userKey, templateId: task.templateId, taskId: task._id, now: clock().toISOString() });
-    await repo.settleFirstReminder({ userKey: task.userKey, taskId: task._id, sent: false, now: clock().toISOString() });
+    await release();
+    if (!claimAlive()) return await repo.getNotification(task._id) || task;
     return defer();
   }
-  const timeoutMs = Math.max(1, Math.min(8000, Math.floor(remainingMs()) - 1000));
+  // Planning and credit reservation can take time. A once-confirmed restock
+  // may have reversed or become unknown while the task waited in the outbox.
+  // Renew before rereading policy and stock: awaiting renewal after these
+  // snapshots would allow a newly paused follow or unknown sample to be sent.
+  const leaseReady = await canStart();
+  user = await repo.getUser(task.userKey);
+  follow = await repo.getFollow(task.followId);
+  config = mergeConfig(await repo.getConfig());
+  const [currentLatest] = await repo.getLatest([targetKeyOf(task.storeNumber, task.partNumber)]);
+  const ready = leaseReady && claimAlive() && sendBudgetMs() > 1000;
+  const finalReason = skipReason({ task, user, follow, config, now: clock(), senderAppid: sendImpl.appid || config.notifications.consumerAppId })
+    || observationSkipReason(task, currentLatest, clock());
+  if (!ready || finalReason) {
+    await release();
+    if (!claimAlive()) return await repo.getNotification(task._id) || task;
+    return finalReason ? finish({ status: TASK_STATUS.skipped, reason: finalReason, sentAt: null }) : defer();
+  }
+  const timeoutMs = Math.max(1, Math.min(8000, Math.floor(sendBudgetMs()) - 1000));
   let outcome;
   try {
     const response = await sendImpl({ touser: user.openid, appid: user.appid, ...buildMessage(task, config), miniprogramState: config.notifications.miniprogramState || 'formal', lang: 'zh_CN' }, { timeoutMs });

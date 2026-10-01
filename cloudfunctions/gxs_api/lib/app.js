@@ -61,6 +61,7 @@ const ACTIONS = {
   'admin.grantMembership': [admin.grantMembership, false],
   'admin.grantCredits': [admin.grantCredits, false],
   'admin.stats': [admin.stats, false],
+  'admin.capacity': [admin.capacity, false],
   'admin.insights': [admin.insights, false],
   'admin.lookupUser': [admin.lookupUser, false],
 };

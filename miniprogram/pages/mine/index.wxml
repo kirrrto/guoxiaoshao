@@ -61,12 +61,12 @@
           <view class="plan-row">
             <text class="plan-feature">取货查询</text>
             <text class="plan-col">扣次数</text>
-            <text class="plan-col plan-member">不限次</text>
+            <text class="plan-col plan-member">不扣次数</text>
           </view>
           <view class="plan-row">
             <text class="plan-feature">补货历史</text>
             <text class="plan-col">扣次数</text>
-            <text class="plan-col plan-member">不限次</text>
+            <text class="plan-col plan-member">不扣次数</text>
           </view>
           <view class="plan-row">
             <text class="plan-feature">到货提醒</text>
@@ -86,6 +86,7 @@
         </view>
         <view class="benefit-list mt">
           <view>{{boot.purchaseNotice || '一次性虚拟服务，一经售出不予退款。'}}</view>
+          <view>会员查询不扣次数；请求繁忙或数据源限流时需稍后重试，实际采集时间以结果为准。</view>
           <view>容量/颜色分占关注名额；暂停仍占，删除才释放。</view>
           <view>提醒需微信订阅授权，免打扰时段不发送。</view>
         </view>

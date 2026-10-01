@@ -2,6 +2,7 @@
 // Shared transaction bodies. Both adapters must serialize read/modify/write and
 // roll back every write if the callback fails; services never emulate a transaction.
 const { createHash, randomUUID } = require('node:crypto');
+const { isDeepStrictEqual } = require('node:util');
 const { COLLECTIONS: C } = require('../collections');
 const { ApiError } = require('../errors');
 const { dayKey } = require('../time');
@@ -16,6 +17,7 @@ const { mergeConfig, patchConfig } = require('../config');
 const { assertConfigEditor, makeConfigAudit } = require('../config-audit');
 const { CAMPAIGN, MAX_FAILURES, LOCK_MS, CLAIMS_ID, matchesCodeHash, attemptsId } = require('../member-redemption');
 const { upstreamGuardMethods, reserveAccountQuery, releaseAccountQuery } = require('./upstream-guard');
+const { queryTargetMethods } = require('./query-target');
 const subscriptionCredits = require('./subscription-credit-ledger');
 const { matchesNotificationTarget, nextFollowUpdatedAt } = require('../notification-target');
 
@@ -103,19 +105,27 @@ function atomicMethods(run) {
       await tx.put(C.config, { ...status, _id: 'collector_status' });
       return { saved: true };
     }),
-    patchRuntimeConfig: ({ patch, updatedAt, actor, requestId, auditId = randomUUID() }) => run(async tx => {
+    patchRuntimeConfig: ({ patch, expectedRevision, updatedAt, actor, requestId, auditId = randomUUID() }) => run(async tx => {
       // Merge after acquiring the transaction snapshot; concurrent unrelated
       // edits must not restore a stale enabled flag or overwrite sibling fields.
       const stored = await tx.get(C.config, 'runtime') || {};
       // Revocation must also win against requests authorized before this snapshot.
       assertConfigEditor(stored, patch, actor, 'admin.updateConfig.transaction');
-      const revision = (Number.isSafeInteger(stored.configRevision) ? stored.configRevision : 0) + 1;
+      const currentRevision = Number.isSafeInteger(stored.configRevision) && stored.configRevision >= 0 ? stored.configRevision : 0;
+      // Only trusted server operators retain compatibility with older scripts.
+      // Client administrators must not bypass this guard by using an old editor.
+      if (expectedRevision === undefined && actor.isOperator !== true) throw new ApiError('config_revision_required', '运营页面版本过旧或未加载配置，请更新运营小程序并重新加载最新配置后再保存。');
+      if (expectedRevision !== undefined) {
+        if (!Number.isSafeInteger(expectedRevision) || expectedRevision < 0) throw new ApiError('invalid_config_revision', '配置版本无效，请先重新加载最新配置');
+        if (expectedRevision !== currentRevision) throw new ApiError('config_revision_conflict', '配置已被其他管理员更新，请先重新加载最新配置后再合并修改；当前编辑内容已保留。');
+      }
+      const revision = currentRevision + 1;
       const next = { ...patchConfig(stored, patch), _id: 'runtime', updatedAt, updatedBy: actor.userKey || 'operator', configRevision: revision };
       const audit = makeConfigAudit({ auditId, before: stored, after: next, patch, actor, updatedAt, requestId, revision });
       if (await tx.get(C.config, audit._id)) throw new ApiError('config_audit_conflict', '配置审计编号已存在，请重新发起操作');
       await tx.put(C.config, next);
       await tx.put(C.config, audit);
-      return { config: mergeConfig(next) };
+      return { config: mergeConfig(next), revision };
     }),
 
     getNotificationView: userKey => run(async tx => {
@@ -290,13 +300,20 @@ function atomicMethods(run) {
       return { expired: true, refunded };
     }),
 
-    recordObservation: ({ observation, continuityGapMs, collectorLease }) => run(async tx => {
+    recordObservation: ({ observation, continuityGapMs, collectorLease, queryTargetLease, nowIso }) => run(async tx => {
       if (collectorLease) {
         const lease = await tx.get(C.config, 'collector_lease');
         if (!lease || lease.ownerId !== collectorLease.ownerId || lease.expiresAt <= collectorLease.nowIso) throw new ApiError('collector_lease_lost', '采集执行权已转移');
       }
+      if (queryTargetLease) {
+        const lease = await tx.get(C.config, queryTargetLease.id);
+        if (!lease || lease.ownerId !== queryTargetLease.ownerId || lease.leaseUntil <= Date.parse(queryTargetLease.nowIso)) throw new ApiError('query_target_lease_lost', '该目标由新的查询更新中');
+      }
       const previous = await tx.get(C.latest, targetKeyOf(observation.storeNumber, observation.partNumber));
-      const result = applyObservation(previous, observation, Number.isFinite(continuityGapMs) ? { continuityGapMs } : undefined);
+      const result = applyObservation(previous, observation, {
+        ...(Number.isFinite(continuityGapMs) ? { continuityGapMs } : {}),
+        ...(Number.isFinite(Date.parse(nowIso)) ? { nowMs: Date.parse(nowIso) } : {}),
+      });
       if (result.outcome !== 'stale' && result.outcome !== 'duplicate') {
         const summaryId = observationDayId(observation.storeNumber, observation.partNumber, dayKey(observation.observedAt));
         const previousDay = await tx.get(C.observationDays, summaryId);
@@ -464,6 +481,7 @@ function atomicMethods(run) {
     }),
 
     ...upstreamGuardMethods(run),
+    ...queryTargetMethods(run),
 
     claimNotification: ({ id, ownerId, now, leaseUntil }) => run(async tx => {
       const task = await tx.get(C.notifications, id);
@@ -566,16 +584,25 @@ function atomicMethods(run) {
     /**
      * One-time repair for ledgers inflated by the 2026-09-22 build, which issued
      * 365 tickets per member "allow" although WeChat grants one send. Reissues at
-     * most (lifetime accepts - accepted sends), never more than the current count.
+     * most (lifetime accepts - occupied permissions), never more than the current
+     * count. Occupied includes sends in flight and uncertain deliveries.
      */
-    repairInflatedCredits: ({ userKey, templateId, sends, now }) => run(async tx => {
+    repairInflatedCredits: ({ userKey, templateId, usedCredits, expectedSubscription, now }) => run(async tx => {
       const user = await tx.get(C.users, userKey);
       const current = user && user.subscriptions && user.subscriptions[templateId];
       if (!current || current.poolRepairedAt || !current.creditLedger) return { repaired: false };
+      // A concurrent allow, reservation, refund or old-version write changes
+      // this snapshot. Re-read usage instead of issuing against a stale count.
+      if (!expectedSubscription || !isDeepStrictEqual(current, expectedSubscription)) return { repaired: false, retry: true };
+      if (!Number.isSafeInteger(usedCredits) || usedCredits < 0) throw new ApiError('invalid_subscription_state', '授权记录状态异常，请稍后重试');
       const ledger = subscriptionCredits.readLedger(current);
       const accepted = Number.isSafeInteger(current.accepted) ? current.accepted : 0;
       if (ledger.sequence <= accepted) return { repaired: false };
-      const credits = Math.min(subscriptionCredits.balance(ledger), Math.max(0, accepted - sends));
+      const balance = subscriptionCredits.balance(ledger);
+      // Missing/retained-old notification rows cannot make a spent or reserved
+      // ticket available again. Invalidated generations are not spendable.
+      const unavailableTickets = ledger.sequence - ledger.invalidatedThrough - (balance - ledger.legacyCredits);
+      const credits = Math.min(balance, Math.max(0, accepted - Math.max(usedCredits, unavailableTickets)));
       // Void every issued ticket (in-flight reservations cannot be refunded),
       // then issue only the sends WeChat can still honour.
       let repaired = subscriptionCredits.writeLedger(current, { ...ledger, legacyCredits: 0, legacyInvalidated: true, invalidatedThrough: ledger.sequence, available: [] }, now);

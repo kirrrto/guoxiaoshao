@@ -9,7 +9,11 @@ async function recordObservations(ctx, observations, source) {
       const at = index++;
       result[at] = await ctx.repo.recordObservation({
         observation: { ...observations[at], source },
+        nowIso: ctx.clock().toISOString(),
         continuityGapMs: ctx.config.collector.continuityGapMs,
+        ...(source === 'manual' && ctx.queryTargetLease ? {
+          queryTargetLease: { ...ctx.queryTargetLease, nowIso: ctx.clock().toISOString() },
+        } : {}),
         ...(source === 'auto' && ctx.collectorOwnerId ? {
           collectorLease: { ownerId: ctx.collectorOwnerId, nowIso: ctx.clock().toISOString() },
         } : {}),

@@ -21,7 +21,7 @@ function setup({ collectorEnabled = true, notificationsEnabled = true } = {}) {
   const repo = createMemoryRepo({
     [COLLECTIONS.catalogProducts]: PRODUCTS,
     [COLLECTIONS.catalogStores]: STORES,
-    [COLLECTIONS.config]: [{ _id: 'runtime', collector: { enabled: collectorEnabled, intervalSeconds: 1 }, notifications: { enabled: notificationsEnabled, templateIds: { restock: 'TPL_RESTOCK' } } }],
+    [COLLECTIONS.config]: [{ _id: 'runtime', collector: { enabled: collectorEnabled, intervalSeconds: 1, budgetMode: 'daily' }, notifications: { enabled: notificationsEnabled, templateIds: { restock: 'TPL_RESTOCK' } } }],
     [COLLECTIONS.users]: [
       member('A', 'openid-A'),
       member('B', 'openid-B'),

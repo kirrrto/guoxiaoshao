@@ -18,6 +18,30 @@ const pageFor = (rt, data) => {
   return page;
 };
 
+test('subscription consent finishing after page unload is recorded once without changing retired UI', async () => {
+  for (const stage of ['native', 'record']) {
+    let resolve;
+    const pending = new Promise(done => { resolve = done; });
+    const data = boot();
+    const rt = runtime(async action => action === 'notify.recordSubscription' ? (stage === 'record' ? pending : grant(1)) : data);
+    rt.wx.requestSubscribeMessage = async () => stage === 'native' ? pending : { 'restock-A': 'accept' };
+    const page = pageFor(rt, data), published = [];
+    rt.load('utils/store.js').subscribeSubscriptions(value => published.push(value));
+    const subscribing = page.onSubscribe();
+    for (let i = 0; i < 8; i++) await Promise.resolve();
+    page.onUnload();
+    const snapshot = copy(page.data);
+    resolve(stage === 'native' ? { 'restock-A': 'accept' } : grant(1));
+    await subscribing;
+    assert.deepEqual(copy(page.data), snapshot, stage);
+    assert.deepEqual(rt.messages, []);
+    assert.equal(rt.calls.filter(call => call.action === 'notify.recordSubscription').length, 1);
+    assert.equal(rt.calls.filter(call => call.action === 'user.bootstrap').length, 0);
+    assert.equal(published.at(-1)['restock-A'].credits, 1);
+    assert.equal(rt.storage.has('gxs_subscription_pending_v1'), false);
+  }
+});
+
 test('a configured template can be authorized by a tap before sending is enabled or credentials are ready', async () => {
   for (const reason of ['notifications_disabled', 'consumer_credentials_missing', 'consumer_auth_unchecked', 'consumer_auth_failed', 'sender_missing', 'sender_unknown']) {
     const data = boot({ notifications: { enabled: reason !== 'notifications_disabled', deliveryReady: false, reason, templateIds: { restock: 'restock-A', obsolete: 'other-template' } } });
