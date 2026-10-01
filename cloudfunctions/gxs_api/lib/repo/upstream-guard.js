@@ -35,7 +35,7 @@ function retryAfterMs(value, now) {
 function upstreamGuardMethods(run) {
   return {
     // Legacy method name retained; this is now the shared manual + auto budget.
-    consumeCollectorBudget: ({ now, maxRequestsPerMinute, maxRequestsPerDay }) => run(async tx => {
+    consumeCollectorBudget: ({ now, maxRequestsPerMinute, maxRequestsPerDay, source = 'manual' }) => run(async tx => {
       const nowMs = Date.parse(now);
       const breaker = await tx.get(C.config, 'upstream_breaker') || { _id: 'upstream_breaker', generation: 0, trips: 0 };
       if (breaker.until > nowMs) return { allowed: false, reason: 'upstream_paused', retryAt: breaker.until };
@@ -45,6 +45,12 @@ function upstreamGuardMethods(run) {
       const minuteKey = new Date(now).toISOString().slice(0, 16);
       const current = await tx.get(C.config, id) || { _id: id, dayCount: 0 };
       const minuteCount = current.minuteKey === minuteKey ? current.minuteCount || 0 : 0;
+      // Automatic monitoring may use at most 80% of the shared daily budget.
+      // Manual queries still obey the global cap and the shared circuit breaker.
+      const autoLimit = Math.max(1, Math.floor(maxRequestsPerDay * 0.8));
+      if (source === 'auto' && current.dayCount >= autoLimit && current.dayCount < maxRequestsPerDay) {
+        return { allowed: false, reason: 'auto_budget_reserved', retryAt: endOfDay(date).getTime(), minuteCount, dayCount: current.dayCount };
+      }
       if (minuteCount >= maxRequestsPerMinute || current.dayCount >= maxRequestsPerDay) {
         const daily = current.dayCount >= maxRequestsPerDay;
         return { allowed: false, reason: daily ? 'daily_budget' : 'minute_budget', retryAt: daily ? endOfDay(date).getTime() : Math.floor(nowMs / 60000) * 60000 + 60000, minuteCount, dayCount: current.dayCount };

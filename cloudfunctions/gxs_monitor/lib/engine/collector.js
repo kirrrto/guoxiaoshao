@@ -37,7 +37,7 @@ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = cons
     alignIntervalMs: mode === 'scheduled' ? 60000 : 0,
     fetchPickup: async ({ storeNumber, partNumbers, timeoutMs }) => {
       if (stopping || !lease.isHeld()) return { record: { httpStatus: null, error: { message: 'lease_lost' } }, observations: [] };
-      return guardedPickup({ repo, config, clock, fetchImpl, storeNumber, partNumbers, timeoutMs, remainingMs: remainingWorkMs,
+      return guardedPickup({ repo, config, clock, fetchImpl, storeNumber, partNumbers, timeoutMs, source: 'auto', remainingMs: remainingWorkMs,
         onBudget: value => { budget = value; }, beforeRequest: async () => !stopping && shouldContinue() && await lease.renew() && lease.isHeld() && shouldContinue() });
     },
     onBatch: handleBatch,
@@ -149,7 +149,11 @@ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = cons
     const now = clock();
     const eligible = follows.filter(f => users.has(f.userKey) && canUseReminders(users.get(f.userKey), now));
     const groups = config.collector.enabled ? buildGroups(eligible, config.collector.maxPartsPerRequest || 20) : [];
-    scheduler.configure({ intervalMs: Math.max(minimumIntervalMs, config.collector.intervalSeconds * 1000), maxConcurrency: config.collector.maxConcurrency, timeoutMs: config.query.upstreamTimeoutMs,
+    // Scheduled scans should last throughout the day as the target count changes.
+    // Resident mode keeps its configured cadence; the guard still reserves capacity.
+    const autoLimit = Math.max(1, Math.floor(config.collector.maxRequestsPerDay * 0.8));
+    const budgetIntervalMs = mode === 'scheduled' ? Math.ceil(groups.length * 86400000 / autoLimit) : 0;
+    scheduler.configure({ intervalMs: Math.min(3600000, Math.max(minimumIntervalMs, config.collector.intervalSeconds * 1000, budgetIntervalMs)), maxConcurrency: config.collector.maxConcurrency, timeoutMs: config.query.upstreamTimeoutMs,
       burstIntervalMs: config.collector.burstIntervalSeconds * 1000, burstQuietMs: config.collector.burstQuietSeconds * 1000 });
     scheduler.setTargets(groups);
     lastRefreshAt = now.getTime();

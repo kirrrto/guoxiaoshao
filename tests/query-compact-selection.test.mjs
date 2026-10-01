@@ -230,6 +230,17 @@ test('refunded upstream failures without a product keep the requested identity a
   }
 });
 
+test('daily source budget explains midnight recovery to members without raw seconds or credit confusion', async () => {
+  const { page } = await opened({ query: async () => ({ ok: false, reason: 'upstream_budget_limited', budgetScope: 'daily',
+    results: [], balance: 4, charged: 0, refunded: 0, retryAfterMs: 17657000, queriedAt: new Date().toISOString() }) });
+  page.setData({ 'boot.membership.active': true });
+  await page.onQuery();
+  assert.match(page.data.restriction, /服务今日请求预算已达上限/);
+  assert.match(page.data.restriction, /北京时间次日 00:00 恢复/);
+  assert.doesNotMatch(page.data.restriction, /17657|会员次数已用完/);
+  page.onUnload();
+});
+
 test('a partially guarded response retains both store states and explains the retry delay without auto-querying', async () => {
   const { page, rt } = await opened({ query: async payload => ({ ...response(payload), partial: true, retryAfterMs: 9991,
     charged: 1, refunded: 0, results: [

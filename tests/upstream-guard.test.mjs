@@ -64,6 +64,30 @@ test('automatic scans and manual calls compete for the same budget, including co
   assert.equal(fetchImpl.calls.length, 1);
 });
 
+test('automatic scans leave daily capacity for manual queries while the shared cap remains enforced', async () => {
+  const f = createFixture({ config: { collector: { maxRequestsPerDay: 10 } }, fetchImpl: fakeFetch({ R577: { display: 'available' } }) });
+  const limits = { maxRequestsPerMinute: 60, maxRequestsPerDay: 10 };
+  const take = source => f.repo.consumeCollectorBudget({ now: f.state.now.toISOString(), ...limits, source });
+  for (let i = 0; i < 8; i++) assert.equal((await take('auto')).allowed, true);
+  const held = await take('auto');
+  assert.equal(held.reason, 'auto_budget_reserved');
+  assert.equal(held.retryAt, Date.parse('2026-09-15T16:00:00.000Z'));
+  assert.equal((await take('manual')).allowed, true);
+  assert.equal((await take('manual')).allowed, true);
+  assert.equal((await take('manual')).reason, 'daily_budget');
+  f.advance(14 * 60 * 60 * 1000);
+  assert.equal((await take('auto')).allowed, true, 'Beijing midnight starts a new allocation');
+});
+
+test('scheduled monitoring stretches its scan interval to fit the automatic allocation', async () => {
+  const f = createFixture({ config: { collector: { enabled: true, intervalSeconds: 60, maxRequestsPerDay: 1000 } } });
+  await member(f);
+  ok(await f.call('follow.upsert', { followId: 'budget-cadence-001', partNumber: 'MXXX1CH/A', storeNumbers: ['R577'] }));
+  const collector = createCollector({ repo: f.repo, fetchImpl: f.state.fetchImpl, clock: () => new Date(f.state.now), mode: 'scheduled', log: { info() {}, warn() {}, error() {} } });
+  await collector.refreshTargets();
+  assert.equal(collector.scheduler.snapshot().intervalMs, 108000);
+});
+
 test('distinct IDs cannot overlap for one member, but a finished query releases the account lease', async () => {
   let entered; let release;
   const began = new Promise(r => { entered = r; }); const gate = new Promise(r => { release = r; });

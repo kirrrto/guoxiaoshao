@@ -66,6 +66,7 @@ async function pickup(ctx, payload) {
     const retryAt = Math.max(0, ...batches.map(batch => Number(batch.record.retryAt) || 0));
     const guardReason = batches.find(batch => batch.record.budgetDenied)?.record.error.message;
     response = { ok: !allUnknown, reason: allUnknown ? (guardReason === 'upstream_paused' ? 'upstream_paused' : guardReason ? 'upstream_budget_limited' : 'upstream_unavailable') : null, queryId,
+      budgetScope: guardReason === 'daily_budget' ? 'daily' : guardReason === 'minute_budget' ? 'minute' : null,
       retryAfterMs: Math.max(0, retryAt - ctx.clock().getTime()), partial: !allUnknown && recorded.some(item => item.observation.status === 'unknown'),
       product: { partNumber: product.partNumber, title: product.title, model: product.model, familyName: product.familyName },
       results: recorded.map(presentResult), queriedAt: ctx.nowIso,

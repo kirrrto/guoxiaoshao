@@ -399,8 +399,11 @@ Page({
       const product = { ...(selection.product || {}), ...(response.product || {}), ...((catalog.productByPart || {})[response.product ? response.product.partNumber : selection.partNumber] || {}) };
       const result = { ...response, product, results: presentResults(response, catalog), queriedText: fmt.fmtDateTime(response.queriedAt) };
       this.querySnapshot = response;
-      const retryHint = response.retryAfterMs > 0 ? ` 建议 ${Math.ceil(response.retryAfterMs / 1000)} 秒后重试。` : '';
-      this.setData({ result, resultIsCache: false, resultTargetDifferent: resultHasDifferentTarget(result, this.selection), 'boot.balance': response.balance, restriction: response.ok ? (response.partial ? '部分门店暂未查询成功，请查看各店状态。' + retryHint : null) : fmt.reasonText(response.reason) + retryHint });
+      const dailyBudget = response.reason === 'upstream_budget_limited' && response.budgetScope === 'daily';
+      const retryHint = dailyBudget ? ' 预计北京时间次日 00:00 恢复。' : response.retryAfterMs > 0
+        ? ` 约 ${response.retryAfterMs >= 60000 ? Math.ceil(response.retryAfterMs / 60000) + ' 分钟' : Math.ceil(response.retryAfterMs / 1000) + ' 秒'}后重试。` : '';
+      const reasonText = dailyBudget ? '服务今日请求预算已达上限，本次未扣次。' : fmt.reasonText(response.reason);
+      this.setData({ result, resultIsCache: false, resultTargetDifferent: resultHasDifferentTarget(result, this.selection), 'boot.balance': response.balance, restriction: response.ok ? (response.partial ? '部分门店暂未查询成功，请查看各店状态。' + retryHint : null) : reasonText + retryHint });
       try { wx.setStorageSync(localKey(RESULT_KEY), response); } catch (err) { /* ignore */ }
       if (response.refunded) toast('本次未取得有效结果，已返还次数');
       if (response.ok && result.results.length) { confirmTap(); this.focusQueryResult(focus); }

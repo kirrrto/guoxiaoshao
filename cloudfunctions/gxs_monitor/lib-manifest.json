@@ -42,8 +42,8 @@
     },
     {
       "path": "engine/collector.js",
-      "bytes": 14133,
-      "sha256": "3515732d82c164acdbea16cdf02c5f175101e8d0a319fd64f963097c3b122467"
+      "bytes": 14549,
+      "sha256": "f6f5e04102f8909ca38a20d367bc83d8a0303362a4924ea407be404875b5ec79"
     },
     {
       "path": "engine/events.js",
@@ -52,8 +52,8 @@
     },
     {
       "path": "engine/guarded-pickup.js",
-      "bytes": 2572,
-      "sha256": "87d377465ba6ec6c72b6d80528cbf3afb60024e11a9f24c2ef78348ddf96caaa"
+      "bytes": 2599,
+      "sha256": "db94fc0e51a990b1e4703fdb0f5433456fe09fec1024c43fe4b13e937a4fac18"
     },
     {
       "path": "engine/lease.js",
@@ -127,8 +127,8 @@
     },
     {
       "path": "repo/upstream-guard.js",
-      "bytes": 5934,
-      "sha256": "86663a63d680ab8c6556b338a19278d102eea3a0f7757a14d11095eaa48ad6d3"
+      "bytes": 6442,
+      "sha256": "8f33b3af0d44187404a48731cc014201dbd22c1f4920c0721181840058258d67"
     },
     {
       "path": "rules/access.js",

@@ -82,7 +82,7 @@ const REASON_TEXT = {
   unsupported_product: '该配置暂未通过取货接口验证，不能作为监测选项',
   upstream_unavailable: '苹果接口暂时不可用，本次未扣次',
   upstream_paused: '取货数据源暂时限流，查询已暂停，本次未扣次，请稍后重试',
-  upstream_budget_limited: '当前查询额度已用完，本次未扣次，请稍后重试',
+  upstream_budget_limited: '数据源请求暂时达到服务保护上限，本次未扣次',
   query_rate_limited: '查询过于频繁，本次未扣次，请稍后重试',
   query_concurrency_limited: '你还有一笔查询正在处理，请等待结果后再试，本次未扣次',
   payment_not_enabled: '会员购买暂未开放',
