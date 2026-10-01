@@ -132,8 +132,8 @@
     },
     {
       "path": "repo/query-target.js",
-      "bytes": 2086,
-      "sha256": "6a0dadeee3b48b0489dbb2160fcd691009938de62713ad93ef61664dc7a1dd6e"
+      "bytes": 2497,
+      "sha256": "34e58a36fdbf0cf4274277fea1cf013106a5ff048620c38c8547e5d71c2a4d65"
     },
     {
       "path": "repo/subscription-credit-ledger.js",

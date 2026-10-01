@@ -124,6 +124,75 @@ test('a recent valid snapshot remains readable when legacy daily HTTP budget is 
   assert.equal(denied.ok, false); assert.equal(denied.budgetScope, 'daily');
 });
 
+test('switching to continuous capacity releases a member target held until midnight by the old daily cap', async () => {
+  const fetchImpl = fakeFetch({ R577: { display: 'available' } });
+  const f = createFixture({ start: '2026-10-01T11:05:43.000Z', fetchImpl,
+    config: { ...config, collector: { budgetMode: 'daily', maxRequestsPerDay: 10000 } } });
+  await member(f);
+  const dayId = 'collector_budget_2026-10-01';
+  f.repo.tables.get(C.config).set(dayId, { _id: dayId, dayCount: 10000 });
+  const denied = ok(await f.call('query.pickup', payload('migration-before')));
+  assert.equal(denied.member, true); assert.equal(denied.budgetScope, 'daily');
+  assert.equal(denied.retryAfterMs, 17657000, 'the incident wait was exactly the remaining time to Beijing midnight');
+  ok(await f.call('admin.updateConfig', { patch: { collector: { budgetMode: 'continuous' } } }, operatorContext()));
+  const recovering = ok(await f.call('query.pickup', payload('migration-refill')));
+  assert.equal(recovering.budgetScope, 'continuous', 'a saved target wait must not retain the retired daily hard stop');
+  assert.ok(recovering.retryAfterMs > 0 && recovering.retryAfterMs <= 43201);
+  assert.equal(fetchImpl.calls.length, 0, 'migration must still wait for continuously replenished capacity');
+  assert.equal(f.repo.tables.get(C.config).get(dayId).dayCount, 10000);
+  f.advance(recovering.retryAfterMs);
+  const recovered = ok(await f.call('query.pickup', payload('migration-recovered')));
+  assert.equal(recovered.ok, true); assert.equal(recovered.member, true); assert.equal(recovered.charged, 0);
+  assert.equal(fetchImpl.calls.length, 1);
+  assert.equal(f.repo.tables.get(C.config).get(dayId).dayCount, 10001, 'the historical count is retained as accounting');
+});
+
+test('continuous migration preserves minute waits and real upstream failures while daily mode retains its cap', async () => {
+  for (const [budgetMode, reason] of [
+    ['daily', 'daily_budget'], ['daily', 'auto_budget_reserved'],
+    ['continuous', 'minute_budget'], ['continuous', 'capacity_wait'],
+    ['continuous', 'upstream_paused'], ['continuous', 'upstream_unavailable'],
+  ]) {
+    const fetchImpl = fakeFetch({ R577: { display: 'available' } });
+    const f = createFixture({ config: { ...config, collector: { budgetMode } }, fetchImpl }); await member(f);
+    const id = queryTargetId('R577', 'MXXX1CH/A');
+    const target = { _id: id, ownerId: null, leaseUntil: 0, reason, deferUntil: f.state.now.getTime() + 60000 };
+    f.repo.tables.get(C.config).set(id, target);
+    const response = ok(await f.call('query.pickup', payload(`preserve-${budgetMode}-${reason}`)));
+    assert.equal(response.ok, false, `${budgetMode}: ${reason}`);
+    assert.equal(response.transport[0].error, reason);
+    assert.equal(response.retryAfterMs, 60000); assert.equal(fetchImpl.calls.length, 0);
+    assert.deepEqual(f.repo.tables.get(C.config).get(id), target, 'a current wait is retained without mutation');
+  }
+});
+
+test('retiring a saved daily target wait still honors the shared upstream circuit breaker', async () => {
+  const fetchImpl = fakeFetch({ R577: { display: 'available' } });
+  const f = createFixture({ config, fetchImpl }); await member(f);
+  const id = queryTargetId('R577', 'MXXX1CH/A');
+  const until = f.state.now.getTime() + 60000;
+  f.repo.tables.get(C.config).set(id, { _id: id, ownerId: null, leaseUntil: 0, reason: 'daily_budget', deferUntil: until + 3600000 });
+  const breaker = { _id: 'upstream_breaker', generation: 1, trips: 1, until, reason: 'http_429' };
+  f.repo.tables.get(C.config).set('upstream_breaker', breaker);
+  const response = ok(await f.call('query.pickup', payload('migration-paused')));
+  assert.equal(response.reason, 'upstream_paused'); assert.equal(response.retryAfterMs, 60000);
+  assert.equal(fetchImpl.calls.length, 0);
+  assert.deepEqual(f.repo.tables.get(C.config).get('upstream_breaker'), breaker);
+});
+
+test('continuous migration can retire an old automatic reservation wait without taking an active target lease', async () => {
+  const f = createFixture({ config });
+  const id = queryTargetId('R577', 'MXXX1CH/A');
+  const input = { storeNumber: 'R577', partNumber: 'MXXX1CH/A', ownerId: 'replacement', nowIso: f.state.now.toISOString(), maxAgeMs: 10000, budgetMode: 'continuous' };
+  const target = { _id: id, ownerId: 'active-owner', leaseUntil: f.state.now.getTime() + 25000,
+    reason: 'auto_budget_reserved', deferUntil: f.state.now.getTime() + 3600000 };
+  f.repo.tables.get(C.config).set(id, target);
+  assert.equal((await f.repo.claimQueryTarget(input)).busy, true);
+  assert.deepEqual(f.repo.tables.get(C.config).get(id), target);
+  f.advance(25000);
+  assert.equal((await f.repo.claimQueryTarget({ ...input, nowIso: f.state.now.toISOString() })).acquired, true);
+});
+
 test('expired shared refresh ownership fences late sample writes and lease releases', async () => {
   const f = createFixture({ config });
   const input = { storeNumber: 'R577', partNumber: 'MXXX1CH/A', maxAgeMs: 10000, nowIso: f.state.now.toISOString() };

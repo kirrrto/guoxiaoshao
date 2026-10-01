@@ -14,8 +14,8 @@ const copy = value => JSON.parse(JSON.stringify(value));
 const response = payload => ({ ok: true, product: seed.products.find(p => p.partNumber === payload.partNumber), balance: 3,
   queriedAt: new Date().toISOString(), results: payload.storeNumbers.map(storeNumber => ({ storeNumber, status: 'available', observedAt: new Date().toISOString() })) });
 
-async function opened({ value = saved(), cache, query = async payload => response(payload), getCurrentPages } = {}) {
-  const rt = runtime(async (action, payload) => action === 'user.bootstrap' ? boot()
+async function opened({ value = saved(), cache, query = async payload => response(payload), getCurrentPages, getBoot = boot } = {}) {
+  const rt = runtime(async (action, payload) => action === 'user.bootstrap' ? getBoot()
     : action === 'catalog.get' ? { unchanged: true } : action === 'query.pickup' ? query(payload) : {}, { getCurrentPages });
   if (value) rt.storage.set('gxs_query_selection_v1', value);
   if (cache) rt.storage.set('gxs_query_result_v1', cache);
@@ -212,6 +212,45 @@ test('denied queries never schedule focus or create a successful result', async 
   page.onUnload();
 });
 
+test('returning after membership activation clears obsolete free-user query restrictions', async () => {
+  for (const reason of ['insufficient_credits', 'new_product_restricted']) {
+    let active = false;
+    const { page, rt } = await opened({ getBoot: () => ({ ...boot(), membership: { active } }),
+      query: async () => ({ ok: false, reason, balance: 0 }) });
+    await page.onQuery();
+    assert.equal(page.data.boot.member, false);
+    assert.equal(page.data.restrictionReason, reason);
+    assert.ok(page.data.restriction);
+    page.onHide();
+    active = true;
+    rt.load('utils/store.js').invalidateBootstrap();
+    await page.onShow();
+    assert.equal(page.data.boot.member, true, 'the refreshed server membership is applied');
+    assert.equal(page.data.restriction, null, reason);
+    assert.equal(page.data.restrictionReason, null, reason);
+    assert.equal(rt.calls.filter(call => call.action === 'query.pickup').length, 1, 'activation never starts a query');
+    page.onUnload();
+  }
+});
+
+test('membership activation preserves genuine upstream query failures and pacing notices', async () => {
+  for (const reason of ['upstream_unavailable', 'upstream_paused', 'upstream_budget_limited', 'query_refresh_pending', 'query_rate_limited']) {
+    let active = false;
+    const { page, rt } = await opened({ getBoot: () => ({ ...boot(), membership: { active } }),
+      query: async () => ({ ok: false, reason, balance: 4, retryAfterMs: 2000 }) });
+    await page.onQuery();
+    const restriction = page.data.restriction;
+    page.onHide();
+    active = true;
+    rt.load('utils/store.js').invalidateBootstrap();
+    await page.onShow();
+    assert.equal(page.data.boot.member, true);
+    assert.equal(page.data.restriction, restriction, reason);
+    assert.equal(page.data.restrictionReason, reason);
+    page.onUnload();
+  }
+});
+
 test('refunded upstream failures without a product keep the requested identity and show the real failure', async () => {
   for (const reason of ['query_failed', 'upstream_paused', 'upstream_budget_limited']) {
     const { page, rt, ticks } = await opened({ query: async () => ({ ok: false, reason, results: [],
@@ -234,9 +273,9 @@ test('refunded upstream failures without a product keep the requested identity a
 });
 
 test('daily source budget explains midnight recovery to members without raw seconds or credit confusion', async () => {
-  const { page } = await opened({ query: async () => ({ ok: false, reason: 'upstream_budget_limited', budgetScope: 'daily',
+  const { page } = await opened({ getBoot: () => ({ ...boot(), membership: { active: true } }), query: async () => ({ ok: false, reason: 'upstream_budget_limited', budgetScope: 'daily',
     results: [], balance: 4, charged: 0, refunded: 0, retryAfterMs: 17657000, queriedAt: new Date().toISOString() }) });
-  page.setData({ 'boot.membership.active': true });
+  assert.equal(page.data.boot.member, true);
   await page.onQuery();
   assert.match(page.data.restriction, /今日实时查询暂时不可用/);
   assert.match(page.data.restriction, /北京时间次日 00:00 可重试/);

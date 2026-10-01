@@ -283,12 +283,14 @@ Page({
   applyBoot(boot) {
     const maxStores = boot.limits ? boot.limits.queryMaxStores : 3;
     const summary = this.selectionView(this.selection, maxStores);
+    const membershipRestoresAccess = boot.membership.active
+      && ['insufficient_credits', 'new_product_restricted'].includes(this.data.restrictionReason);
     this.selectionNeedsReview = selectionNeedsReview(this.selection, summary.selectionCanCollapse);
     this.setData({
       ...summary,
       accountReady: true,
       accountError: null,
-      ...(boot.membership.active ? { restrictionReason: null } : {}),
+      ...(membershipRestoresAccess ? { restriction: null, restrictionReason: null } : {}),
       boot: {
         member: boot.membership.active,
         freeReminder: !boot.membership.active && boot.freeReminder === true,

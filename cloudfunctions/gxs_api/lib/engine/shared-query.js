@@ -26,7 +26,8 @@ async function sharedQueryPickup(ctx, storeNumber, partNumber, deadline) {
     // Bound both latency and database polling. A slow owner keeps its lease;
     // followers return a short wait instead of launching duplicate HTTP work.
     for (let attempt = 0; attempt < 4 && Date.now() < deadline; attempt++) {
-      claim = await ctx.repo.claimQueryTarget({ storeNumber, partNumber, ownerId, nowIso: ctx.clock().toISOString(), maxAgeMs: freshnessMs });
+      claim = await ctx.repo.claimQueryTarget({ storeNumber, partNumber, ownerId, nowIso: ctx.clock().toISOString(), maxAgeMs: freshnessMs,
+        budgetMode: ctx.config.collector.budgetMode });
       if (claim.latest) return sharedBatch(claim.latest);
       if (claim.deferred) return deferredBatch(ctx, storeNumber, partNumber, claim.reason, claim.retryAt);
       if (claim.acquired) break;
