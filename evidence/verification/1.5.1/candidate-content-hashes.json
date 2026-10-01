@@ -1,7 +1,7 @@
 {
   "version": "1.5.1",
   "baselineCommit": "f992d29caebf656b915237b96bb5b7b82b67853b",
-  "hash": "SHA-256 of raw local bytes; source candidate, not downloaded production content",
+  "hash": "SHA-256 of candidate Git blob bytes, verified against the source archive; local CRLF is not a runtime content change. This is not downloaded production content.",
   "files": {
     ".github/workflows/verify.yml": "7a26a699fa7bc654970e5890b2908aebe5ed4d9b4b0f1913a95eff0540166947",
     ".gitignore": "140ce064d73075a8d3247e27220d39036f40ea12cbc7f51a438b514657421fd3",
@@ -185,7 +185,7 @@
     "miniprogram/utils/tab-bar.js": "67357ea6b66589e40f576c1d220d4abbb4dcf47da2132bef82c1590280328f5a",
     "package-lock.json": "2fb93ac512e8bc4a1e041f485289d13048996071376b8bc68b9cad5a4620bdb8",
     "package.json": "97703f76f27bf879d7269097489eb4eb307ce9b42e9be606abf81927a6701dcf",
-    "project.config.json": "27d56443e699a0a58949251ab6da15f854c7704ef7835565677da2568523dbd1",
+    "project.config.json": "ca624cb1fe23b594d5018e010e22e77a4cb7ac4293a654fba3747acb3a791dad",
     "tests/acceptance-integration.test.mjs": "63cb2a01d9e8f64fdd4ab56e9d5c940f92a49fcf4e2f7820bc6cbef4ed74e79d",
     "tests/acceptance.test.mjs": "a0cc26db4bd926fdcdd97686e28c889935bac189824221ddf57f863fe54d6713",
     "tests/account-bootstrap.test.mjs": "2e576785639013df7017cde1b41ea63c66372dde565742bd2697dcd4adce6442",
