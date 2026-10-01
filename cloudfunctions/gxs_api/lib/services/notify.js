@@ -8,6 +8,7 @@ const { isLiveRestricted } = require('../rules/new-product');
 const { targetKeyOf } = require('../engine/events');
 const { RETENTION_DAYS } = require('../engine/retention');
 const follows = require('./follows');
+const { matchesNotificationTarget } = require('../notification-target');
 
 const FEEDBACK = ['bought', 'missed', 'skipped'];
 
@@ -85,19 +86,16 @@ async function detail(ctx, payload) {
       storeName: task.storeName || null, productTitle: product ? product.title : task.productTitle || task.partNumber,
       detectedAt: task.detectedAt, sentAt: task.sentAt || null, feedback: task.feedback ? task.feedback.outcome : null },
     latest: { restricted, ...follows.presentLatest(latest[0] || null, ctx, restricted) },
-    follow: follow && follow.userKey === user._id && follow.status !== 'removed' ? { followId: follow._id, status: follow.status } : null,
+    follow: matchesNotificationTarget(task, follow) ? { followId: follow._id, status: follow.status } : null,
   };
 }
 
-/** Did the alert help? "bought" also pauses the follow so no more alerts are spent on it. */
+/** Only the unchanged follow opened by this alert may be paused with the feedback. */
 async function feedback(ctx, payload) {
   const { user, task } = await ownAlert(ctx, payload);
   if (!FEEDBACK.includes(payload.outcome)) throw new ApiError('invalid_feedback', '请选择有效的反馈');
-  await ctx.repo.updateNotification(task._id, { feedback: { outcome: payload.outcome, at: ctx.nowIso } });
-  const follow = payload.outcome === 'bought' && task.followId ? await ctx.repo.getFollow(task.followId) : null;
-  const pause = Boolean(follow && follow.userKey === user._id && follow.status === 'active');
-  if (pause) await follows.pause(ctx, { followId: follow._id });
-  return { outcome: payload.outcome, paused: pause };
+  return ctx.repo.recordNotificationFeedback({ userKey: user._id, taskId: task._id, outcome: payload.outcome, nowIso: ctx.nowIso,
+    knownFollows: payload.outcome === 'bought' ? await ctx.repo.listFollows(user._id) : [] });
 }
 
 module.exports = { recordSubscription, list, remove, clear, detail, feedback };

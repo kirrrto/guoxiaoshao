@@ -15,7 +15,7 @@ test('window and tab colors follow the system theme through complete theme.json 
   const used = JSON.stringify({ window: app.window, tabBar: tabColors }).match(/"@\w+"/g).map(value => value.slice(2, -1));
   assert.ok(used.length >= 8);
   for (const mode of ['light', 'dark']) for (const name of used) assert.ok(theme[mode][name], `${mode}.${name} is defined`);
-  assert.equal(theme.light.navBackground, '#F0FBF6', 'light theme keeps the existing colors');
+  assert.equal(theme.light.navBackground, '#F6F8F7', 'native navigation matches the neutral light page surface');
   assert.equal(theme.dark.navTextStyle, 'white');
 });
 
@@ -27,5 +27,5 @@ test('every stylesheet with light surfaces carries a dark-mode block at its end'
     const after = source.slice(at).split(/\r?\n/).slice(1);
     assert.ok(after.every(line => !line || /^\s/.test(line) || line === '}'), `${file} keeps its dark block last so it overrides the light rules`);
   }
-  assert.match(read('app.wxss'), /@media \(prefers-color-scheme: dark\) \{\s*page \{[^}]*--text: #E3EEE8;/);
+  assert.match(read('app.wxss'), /@media \(prefers-color-scheme: dark\) \{\s*page \{[^}]*--text: #E7EFE9;/);
 });

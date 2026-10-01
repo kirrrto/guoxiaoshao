@@ -17,7 +17,7 @@ function pageWith(record, handler = async () => { throw Error('Restoring must no
   const rt = runtime(handler), page = rt.instance('pages/history/index.js');
   page.catalog = { productByPart: Object.fromEntries(PRODUCTS.map(p => [p.partNumber, p])), storeByNumber: Object.fromEntries(STORES.map(s => [s.storeNumber, s])) };
   Object.assign(page.data, { ready: true, boot: { member: false, balance: 1, historyCost: 1 }, dayKey: '2026-09-14',
-    browse: { recentViews: [record] }, pickerValue: { partNumber: PRODUCTS[2].partNumber, storeNumbers: ['R320'] },
+    browse: { recentViews: [record] },
     result: { product: PRODUCTS[2] }, restriction: 'earlier response', moreError: 'earlier page error' }); page.selection = { partNumber: PRODUCTS[2].partNumber, product: PRODUCTS[2], storeNumbers: ['R320'], stores: [STORES[2]] };
   page.historyRequest = { historyQueryId: 'old-page-request' }; page.historySnapshot = { events: [] };
   return { rt, page };
@@ -26,9 +26,9 @@ function pageWith(record, handler = async () => { throw Error('Restoring must no
 test('recent history restores the exact SKU, day and stores without any request or debit', () => {
   const { rt, page } = pageWith(saved());
   page.onRestoreBrowse(tap);
-  assert.deepEqual(copy(page.data.pickerValue), { partNumber: product.partNumber, storeNumbers: ['R577', 'R639'] });
   assert.equal(page.selection.partNumber, product.partNumber);
   assert.equal(page.selection.product.title, product.title);
+  assert.deepEqual(copy(page.selection.storeNumbers), ['R577', 'R639']);
   assert.deepEqual(copy(page.selection.stores.map(s => s.storeNumber)), ['R577', 'R639']);
   assert.equal(page.data.dayKey, '2026-09-15');
   assert.equal(page.data.boot.balance, 1);
@@ -37,7 +37,10 @@ test('recent history restores the exact SKU, day and stores without any request 
   assert.match(page.data.restoreNotice, /点击「查看历史」/);
   assert.equal(rt.calls.length, 0);
   const key = rt.load('utils/local-key.js').localKey('gxs_history_selection_v1');
-  assert.deepEqual(copy(rt.storage.get(key)), copy(page.data.pickerValue));
+  assert.deepEqual(copy(rt.storage.get(key)), { partNumber: product.partNumber, storeNumbers: ['R577', 'R639'] });
+  page.onEditSelection();
+  assert.deepEqual(copy(page.data.draftValue), { partNumber: product.partNumber, storeNumbers: ['R577', 'R639'] });
+  assert.equal(rt.calls.length, 0, 'opening the restored selection does not query');
 });
 
 test('picker synchronization retains the restore hint, while an explicit later filter change clears it', () => {
@@ -54,9 +57,9 @@ test('picker synchronization retains the restore hint, while an explicit later f
 
 test('a removed SKU or store refuses the entire restore without silently replacing product or widening scope', () => {
   for (const record of [saved({ partNumber: 'REMOVED' }), saved({ storeNumbers: ['R577', 'R999'] }), saved({ storeNumbers: ['R999'] })]) {
-    const { rt, page } = pageWith(record), before = copy({ pickerValue: page.data.pickerValue, selection: page.selection, dayKey: page.data.dayKey });
+    const { rt, page } = pageWith(record), before = copy({ selection: page.selection, dayKey: page.data.dayKey });
     page.onRestoreBrowse(tap);
-    assert.deepEqual(copy({ pickerValue: page.data.pickerValue, selection: page.selection, dayKey: page.data.dayKey }), before);
+    assert.deepEqual(copy({ selection: page.selection, dayKey: page.data.dayKey }), before);
     assert.equal(page.data.restoreWarning, true);
     assert.match(page.data.restoreNotice, /未恢复，当前查询条件未改变/);
     assert.equal(rt.calls.length, 0); assert.equal(rt.storage.size, 0);

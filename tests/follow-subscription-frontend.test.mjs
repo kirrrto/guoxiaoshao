@@ -134,7 +134,7 @@ test('authorization does not change membership, resume a follow or turn on the p
   const page = pageFor(rt, data);
   page.setData({ follows: [{ followId: 'f1', status: 'paused', stores: [] }] });
   await page.onSubscribe();
-  assert.equal(page.data.boot.member, false); assert.equal(page.data.settings.notifyEnabled, false);
+  assert.equal(page.data.boot.member, false); assert.equal(page.settings.notifyEnabled, false);
   assert.equal(page.data.follows[0].status, 'paused'); assert.equal(page.data.readiness.code, 'membership');
   page.onAdd(); assert.equal(page.data.editing, false);
   assert.ok(rt.calls.every(call => ['notify.recordSubscription', 'user.bootstrap'].includes(call.action)));

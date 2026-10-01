@@ -3,9 +3,10 @@ const { getBootstrap, invalidateBootstrap, invalidateFollows, publishQuota, subs
 const { topUpReminderCredit } = require('../../utils/reminder-credits');
 const { confirmTap } = require('../../utils/haptic');
 const { VERSION } = require('../../config/version');
+const { RELEASE_NOTES } = require('../../config/release-notes');
 const { storeLabel } = require('../../utils/store-label');
 
-/** "v1.1.7", plus the build channel when this is not the released version. */
+/** Show the shared release version plus its non-production build channel. */
 function versionLabel() {
   let env = 'release';
   try { env = wx.getAccountInfoSync().miniProgram.envVersion || 'release'; } catch (e) { /* older clients */ }
@@ -121,6 +122,9 @@ Page({
     ready: false,
     loadError: null,
     versionLabel: versionLabel(),
+    version: VERSION,
+    releaseNotes: RELEASE_NOTES,
+    showReleaseNotes: false,
     boot: null,
     membership: null,
     quota: null,
@@ -182,6 +186,7 @@ Page({
   async onShow() {
     syncTabBar(this, '/pages/mine/index');
     if (this.pageRetired) return;
+    this.setTabBarOverlay(this.data.redemptionOpen);
     this.pageVisible = true;
     this.consumePendingSection();
     if (this.data.ready) await this.refresh({ quiet: true });
@@ -210,6 +215,7 @@ Page({
   },
 
   retirePage() {
+    this.setTabBarOverlay(false);
     this.pageRetired = true;
     this.pageVisible = false;
     if (this.paymentController) this.paymentController.dispose();
@@ -376,7 +382,7 @@ Page({
 
   setTabBarOverlay(hidden) {
     const bar = typeof this.getTabBar === 'function' ? this.getTabBar() : null;
-    if (bar && bar.setData) bar.setData({ keyboardHidden: Boolean(hidden) });
+    if (bar && bar.setData) bar.setData({ sheetHidden: Boolean(hidden) });
   },
 
   onRedemptionInput(e) {
@@ -627,6 +633,10 @@ Page({
 
   onToggleMembershipRules() {
     if (!this.pageRetired) this.setData({ showMembershipRules: !this.data.showMembershipRules });
+  },
+
+  onToggleReleaseNotes() {
+    if (!this.pageRetired) this.setData({ showReleaseNotes: !this.data.showReleaseNotes });
   },
 
   onToggleQuotaDetails() {

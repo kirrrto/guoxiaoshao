@@ -70,11 +70,18 @@ test('authorization counts the current restock template and excludes obsolete cr
 });
 
 test('ready service still requires the personal message switch, valid credits and a permitted time', t => {
-  t.mock.method(Date, 'now', () => Date.parse('2026-09-16T15:30:00Z'));
+  let now = Date.parse('2026-09-16T15:30:00Z');
+  t.mock.method(Date, 'now', () => now);
   const rt = runtime(); const page = followPage(rt);
   page.applyBoot(boot({ settings: { notifyEnabled: false } })); assert.match(page.data.readiness.title, /消息提醒已关闭/);
   page.applyBoot(boot({ settings: { notifyEnabled: true, dnd: { enabled: true, startMinute: 1380, endMinute: 480 } } }));
   assert.equal(page.data.readiness.dndActive, true); assert.match(page.data.readiness.title, /免打扰时段/);
+  page.refreshReadiness();
+  assert.equal(page.data.readiness.ready, false, 'refresh keeps the saved overnight quiet period');
+  now = Date.parse('2026-09-17T00:00:00Z');
+  page.refreshReadiness();
+  assert.equal(page.data.readiness.dndActive, false, 'the quiet period ends at 08:00 Beijing time');
+  assert.equal(page.data.readiness.ready, true);
   page.applyBoot(boot({ subscriptions: {} })); assert.match(page.data.readiness.detail, /每点一次「允许」增加 1 次到货提醒/);
   page.applyBoot(boot()); assert.equal(page.data.readiness.ready, true);
 });

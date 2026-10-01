@@ -6,11 +6,13 @@ const unique = items => [...new Set(items.filter(Boolean))];
 const capacityOf = p => (p.attributes || {}).capacity || '标准配置';
 const colorOf = p => (p.attributes || {}).color || '标准外观';
 const modelOf = p => p.model || p.familyName || p.familyKey;
+const own = (source, key) => Object.prototype.hasOwnProperty.call(source, key);
 Component({
   properties: {
     // Pages bind only the catalog version. The indexed catalog is read from the
     // session store, so the full product list never crosses the render bridge.
     catalogVersion: { type: String, value: '', observer: 'onCatalogVersion' }, value: { type: Object, value: null, observer: 'onValue' },
+    inSheet: { type: Boolean, value: false },
     maxStores: { type: Number, value: 3 }, supportedOnly: { type: Boolean, value: false, observer: 'onSupportedOnlyChange' }, storesOptional: { type: Boolean, value: false },
   },
   data: { categories: [], categoryIndex: 0, families: [], familyNames: [], familyIndex: 0,
@@ -85,7 +87,7 @@ Component({
     emptyCatalogNote() { return this.data.supportedOnly ? '当前暂无可关注配置，请稍后刷新。' : '产品目录尚未就绪，请稍后刷新。'; },
     applyValue(value) {
       this.pendingValue = null;
-      const p = this.productByPart[value.partNumber];
+      const p = own(this.productByPart, value.partNumber) ? this.productByPart[value.partNumber] : null;
       let note = '';
       if (p) {
         this.selectCategory(Math.max(0, this.catalogCategories.findIndex(c => c.key === p.category)), true);
@@ -97,12 +99,12 @@ Component({
         // must never turn into the first selectable product without user input.
         this.unavailablePartNumber = value.partNumber;
         this.stage({ product: null });
-        note = this.data.supportedOnly && this.sourceProductByPart[value.partNumber]
+        note = this.data.supportedOnly && own(this.sourceProductByPart, value.partNumber)
           ? '原配置暂未开放关注，请重新选择可用配置。' : '原配置已从目录移除，请重新选择。';
       }
       if (!this.catalogCategories.length) note += this.emptyCatalogNote();
       const numbers = unique(Array.isArray(value.storeNumbers) ? value.storeNumbers : []);
-      const selectedStores = numbers.map(n => this.storeByNumber[n]).filter(Boolean).slice(0, this.data.maxStores).map(s => ({ storeNumber: s.storeNumber, name: s.name, city: s.city, label: storeLabelWithCity(s.storeNumber, s.name, s.city) }));
+      const selectedStores = numbers.map(n => typeof n === 'string' && /^R\d{3}$/.test(n) && own(this.storeByNumber, n) ? this.storeByNumber[n] : null).filter(Boolean).slice(0, this.data.maxStores).map(s => ({ storeNumber: s.storeNumber, name: s.name, city: s.city, label: storeLabelWithCity(s.storeNumber, s.name, s.city) }));
       if (selectedStores.length !== numbers.length) note += '已按当前目录和门店上限更新选择，请核对。';
       this.stage({ selectedStores, selectionNote: note });
       this.selectCity(Math.max(0, this.catalogCities.findIndex(c => selectedStores.length && c.city === selectedStores[0].city)));
@@ -147,7 +149,17 @@ Component({
         this.emit();
       });
     },
-    onCapacityChange(e) { this.batch(() => { this.updateFilters({ model: this.data.models[this.data.modelIndex], capacity: this.data.capacities[Number(e.detail.value)], color: this.data.colors[this.data.colorIndex] }); this.stage({ selectionNote: '' }); this.emit(); }); },
+    onCapacityChange(e) {
+      const capacity = this.data.capacities[Number(e.detail.value)]; if (!capacity) return;
+      const color = this.data.colors[this.data.colorIndex];
+      this.batch(() => {
+        this.updateFilters({ model: this.data.models[this.data.modelIndex], capacity, color });
+        const product = this.read('product');
+        this.stage({ selectionNote: product && colorOf(product) !== color ? `该容量没有原先的 ${color}，已调整为 ${colorOf(product)}，请核对。` : '' });
+        this.emit();
+      });
+    },
+    onCapacityTap(e) { this.onCapacityChange({ detail: { value: e.currentTarget.dataset.index } }); },
     onColorTap(e) { this.batch(() => { this.updateFilters({ model: this.data.models[this.data.modelIndex], capacity: this.data.capacities[this.data.capacityIndex], color: this.data.colors[Number(e.currentTarget.dataset.index)] }); this.stage({ selectionNote: '' }); this.emit(); }); },
     onProductChange(e) { const p = this.currentCandidates[Number(e.detail.value)]; if (!p) return; this.unavailablePartNumber = null; this.setData({ productIndex: Number(e.detail.value), product: this.publicProduct(p), imageFailed: false, selectionNote: '' }); this.emit(); },
     onImageError() { this.setData({ imageFailed: true }); },
@@ -166,7 +178,8 @@ Component({
       this.stage({ searchActive, searchResults });
     },
     onStoreTap(e) {
-      const store = this.storeByNumber[e.currentTarget.dataset.store]; if (!store) return;
+      const number = e.currentTarget.dataset.store;
+      const store = typeof number === 'string' && own(this.storeByNumber, number) ? this.storeByNumber[number] : null; if (!store) return;
       const selected = this.data.selectedStores.slice(); const index = selected.findIndex(s => s.storeNumber === store.storeNumber);
       if (index >= 0) selected.splice(index, 1); else {
         if (selected.length >= this.data.maxStores) { wx.showToast({ title: `最多选择 ${this.data.maxStores} 家门店`, icon: 'none' }); return; }

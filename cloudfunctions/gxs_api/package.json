@@ -1,6 +1,6 @@
 {
   "name": "gxs_api",
-  "version": "1.4.2",
+  "version": "1.5.0",
   "license": "MIT",
   "private": true,
   "description": "果小哨业务云函数：身份、目录、实时查询、次数账本、关注、会员、历史与管理",
