@@ -18,6 +18,7 @@ const { notificationAdvice } = require('../../utils/reminder-readiness');
 const { shareAppMessage, shareTimeline } = require('../../utils/share');
 const { paymentAvailability, createPaymentController, purchaseNotice } = require('../../utils/member-payment');
 const { memberProducts, planId, renewalPreview } = require('../../utils/member-products');
+const { productBenefit } = require('../../utils/member-limits');
 
 const LEDGER_TEXT = {
   signin_reward: '每日签到',
@@ -51,6 +52,7 @@ const SKIP_REASON = {
   free_reminder_used: '免费体验提醒已用完',
   free_reminder_in_use: '免费提醒已用于另一条补货',
   follow_not_active: '关注已暂停',
+  plan_limit: '超出当前会员套餐名额，关注已保留',
   user_missing: '账号信息暂时无法确认',
   consumer_appid_mismatch: '当前账号暂时无法接收提醒',
   openid_missing: '账号信息暂时无法确认',
@@ -90,6 +92,7 @@ const presentTasks = (tasks, quota) => (tasks || []).map(task => ({ ...task,
 }));
 const presentMembership = membership => ({ ...membership, expired: !membership.active && Boolean(membership.expiresAt),
   daysLeft: membership.active ? Math.ceil(membership.remainingMs / 86400000) : 0,
+  enhancedExpiresText: membership.enhancedExpiresAt ? fmt.fmtDateTime(membership.enhancedExpiresAt) : '',
   expiresText: membership.expiresAt ? fmt.fmtDateTime(membership.expiresAt) : null });
 function redemptionErrorText(error) {
   const code = error && error.code, details = error && error.details || {};
@@ -423,6 +426,8 @@ Page({
     const membership = boot.membership;
     const settings = boot.settings || { dnd: { enabled: false, startMinute: 23 * 60, endMinute: 8 * 60 }, notifyEnabled: true };
     const products = memberProducts(boot).map(item => ({ ...item, priceText: fmt.fen(item.priceFen),
+      benefitText: productBenefit(item),
+      benefitShort: `${item.limits && item.limits.maxFollows || 3} 配置 × ${item.limits && item.limits.maxStoresPerFollow || 3} 门店`,
       nameText: item.days === 365 ? '年卡' : item.days === 30 ? '月卡' : item.days === 7 ? '周卡' : '会员',
       durationText: `${item.days} 天`,
       available: paymentAvailability(item, wx).ready }));
@@ -1002,7 +1007,7 @@ Page({
   onHelp() {
     wx.showModal({
       title: '使用说明',
-      content: `1. 查询：选择具体配置与门店，免费查询消耗 ${this.data.quota.queryCost} 次，接口失败按服务端规则返还；请求繁忙或数据源限流时需稍后重试。\n2. 次数：每日签到和体验任务可获取次数，每日最多 ${this.data.quota.dailyGrantCap} 次，累计上限 ${this.data.quota.balanceCap} 次。\n3. 会员：查询不扣次数，可关注 3 个具体配置，每配置最多 3 家门店；颜色或容量不同分别占用名额。关注与到货、断货提醒均为会员专属。该产品为一次性虚拟服务，一经售出不予退款。\n4. 提醒：会员可累加提醒次数，需授权微信订阅消息，每次「允许」增加 1 次，开通会员不等于无限接收提醒。\n5. 新品：受限新品开售 30 天内，免费用户不可实时查询，只能看昨天及更早历史。`,
+      content: `1. 查询：选择具体配置与门店，免费查询消耗 ${this.data.quota.queryCost} 次，接口失败按服务端规则返还；请求繁忙或数据源限流时需稍后重试。\n2. 次数：每日签到和体验任务可获取次数，每日最多 ${this.data.quota.dailyGrantCap} 次，累计上限 ${this.data.quota.balanceCap} 次。\n3. 会员：查询不扣次数，周卡可关注 3 个配置，每配置 3 家门店；月卡、年卡为 4 个配置，每配置 4 家门店；颜色或容量不同分别占用名额。关注与到货、断货提醒均为会员专属。该产品为一次性虚拟服务，一经售出不予退款。\n4. 提醒：会员可累加提醒次数，需授权微信订阅消息，每次「允许」增加 1 次，开通会员不等于无限接收提醒。\n5. 新品：受限新品开售 30 天内，免费用户不可实时查询，只能看昨天及更早历史。`,
       showCancel: false,
     });
   },

@@ -125,11 +125,13 @@
       <view wx:if="{{alternativeColorChoices.length && alternativeStoreChoices.length}}" class="observed-store-choices alternative-panel">
         <view class="alternative-heading">换个颜色或门店，继续找货</view>
         <view class="alternative-caption">同机型、同容量。勾选不扣次，点查询才会查询。</view>
-        <view class="alternative-section-title"><text>可接受的颜色</text><text class="alternative-count">{{alternativeParts.length}} / 3</text></view>
+        <view class="alternative-section-title"><text>可接受的颜色</text><text class="alternative-count">{{alternativeParts.length}} / {{boot ? boot.alternativeMaxColors : 3}}</text></view>
         <view class="alternative-colors">
-          <button wx:for="{{alternativeColorChoices}}" wx:key="partNumber" class="alternative-chip {{item.selected ? 'alternative-chip--selected' : ''}}" hover-class="ui-control-pressed" data-kind="part" data-value="{{item.partNumber}}" aria-pressed="{{item.selected}}" disabled="{{alternativeLoading || querying || signing || sheetVisible}}" bindtap="onToggleAlternative">
-            <text class="alternative-chip-label">{{item.label}}<text wx:if="{{item.current}}" class="alternative-current">当前颜色</text></text><text class="alternative-check" aria-hidden="true">{{item.selected ? '✓' : '+'}}</text>
-          </button>
+          <view wx:for="{{alternativeColorChoices}}" wx:key="partNumber" class="alternative-color-column">
+            <button class="alternative-chip {{item.selected ? 'alternative-chip--selected' : ''}}" hover-class="ui-control-pressed" data-kind="part" data-value="{{item.partNumber}}" aria-pressed="{{item.selected}}" disabled="{{alternativeLoading || querying || signing || sheetVisible}}" bindtap="onToggleAlternative">
+              <text class="alternative-chip-label">{{item.label}}<text wx:if="{{item.current}}" class="alternative-current">当前颜色</text></text><text class="alternative-check" aria-hidden="true">{{item.selected ? '✓' : '+'}}</text>
+            </button>
+          </view>
         </view>
         <view class="alternative-section-title"><text>可接受的门店</text><text class="alternative-count">{{alternativeStores.length}} / {{boot ? boot.maxStores : 3}}</text></view>
         <view class="alternative-stores">
@@ -140,8 +142,8 @@
         <view class="alternative-summary" aria-live="polite">{{alternativeSelectionSummary}}</view>
         <view wx:if="{{alternativeSelectedColors.length}}" class="alternative-query-list">
           <view wx:for="{{alternativeSelectedColors}}" wx:key="partNumber" class="alternative-query-row">
-            <text class="alternative-query-color">{{item.label}}</text>
-            <button class="alternative-query-button" hover-class="ui-control-pressed" data-part="{{item.partNumber}}" disabled="{{!alternativeStores.length || !accountReady || alternativeLoading || querying || signing || sheetVisible}}" loading="{{querying && alternativeQueryPart === item.partNumber}}" bindtap="onQueryAlternative">{{querying && alternativeQueryPart === item.partNumber ? '查询中…' : (!accountReady ? '账户连接中' : (boot.member ? '查询 · 会员不扣次' : '查询 · 消耗 ' + boot.queryCost + ' 次'))}}</button>
+            <view class="alternative-query-copy"><text class="alternative-query-color">{{item.label}}</text><text class="alternative-query-hint">{{!accountReady ? '账户连接中' : (boot.member ? '会员不扣次' : '消耗 ' + boot.queryCost + ' 次')}}</text></view>
+            <button class="alternative-query-button" hover-class="ui-control-pressed" data-part="{{item.partNumber}}" aria-label="{{'查询' + item.label + '，' + (!accountReady ? '账户连接中' : (boot.member ? '会员不扣次' : '消耗 ' + boot.queryCost + ' 次'))}}" disabled="{{!alternativeStores.length || !accountReady || alternativeLoading || querying || signing || sheetVisible}}" loading="{{querying && alternativeQueryPart === item.partNumber}}" bindtap="onQueryAlternative">{{querying && alternativeQueryPart === item.partNumber ? '查询中' : '查询'}}</button>
           </view>
         </view>
         <view wx:if="{{alternativeQueryNote}}" class="alternative-empty" role="status">{{alternativeQueryNote}}</view>
@@ -198,3 +200,5 @@
 <config-sheet id="query-config-sheet" visible="{{sheetVisible}}" title="选择配置与门店" subtitle="保存后返回首页，再选择查询或关注" confirm-text="保存选择" summary="{{draftSummary}}" dirty="{{draftDirty}}" external-close="{{true}}" bindconfirm="onDoneSelection" bindrequestclose="onRequestCloseSelection" bindclose="onCloseSelection">
   <target-picker wx:if="{{sheetVisible}}" id="query-target-picker" catalog-version="{{catalogVersion}}" value="{{draftValue}}" max-stores="{{boot ? boot.maxStores : 3}}" in-sheet="{{true}}" bindchange="onDraftChange" />
 </config-sheet>
+
+<reminder-nudge enabled="{{ready}}" blocked="{{!accountReady || querying || signing || sheetVisible || alternativeLoading}}" />

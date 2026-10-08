@@ -24,6 +24,8 @@ function beginSubscription() {
   return true;
 }
 function endSubscription() { subscriptionBusy = false; }
+function isSubscriptionBusy() { return subscriptionBusy; }
+function getConsentSetting() { return consentSetting; }
 
 /** Cache the "总是保持以上选择" answers; refreshed on app show and after each prompt. */
 function refreshConsentSetting() {
@@ -46,6 +48,65 @@ function clearPending(pending) {
     if (pending && saved && saved.requestId !== pending.requestId) return;
     wx.removeStorageSync(key);
   } catch (e) { /* ignore */ }
+}
+
+/** A filtered template must not discard another template's accepted grant. */
+function normalizeSubscriptionResults(tmplIds, response) {
+  const results = {}, filtered = [];
+  for (const id of tmplIds) {
+    const value = response && response[id];
+    if (['accept', 'reject', 'ban'].includes(value)) results[id] = value;
+    else if (value === 'filter') filtered.push(id);
+  }
+  return { results, filtered };
+}
+
+function normalizePendingAuthorization(pending) {
+  const normalized = normalizeSubscriptionResults(Object.keys(pending.results || {}), pending.results);
+  const filtered = [...new Set([...(Array.isArray(pending.filtered) ? pending.filtered : []), ...normalized.filtered])];
+  return { requestId: pending.requestId, results: normalized.results, ...(filtered.length ? { filtered } : {}) };
+}
+
+async function recordPending(pending) {
+  pending = normalizePendingAuthorization(pending);
+  if (!Object.keys(pending.results).length) {
+    clearPending(pending);
+    return { accepted: [], results: {}, filtered: pending.filtered || [], skipped: true };
+  }
+  savePending(pending);
+  try {
+    const data = await call('notify.recordSubscription', { requestId: pending.requestId, results: pending.results });
+    clearPending(pending);
+    publishSubscriptions(data.subscriptions);
+    return { ...data, results: pending.results, filtered: pending.filtered || [] };
+  } catch (error) {
+    if (FINAL_ERRORS.includes(error && error.code)) clearPending(pending);
+    throw error;
+  }
+}
+
+/** Resume the original grant after a restart without showing WeChat again. */
+async function syncPendingAuthorization() {
+  const pending = readPending();
+  if (!pending || !beginSubscription()) return null;
+  try { return await recordPending(pending); }
+  finally { endSubscription(); }
+}
+
+/** Called directly by a user tap; no await occurs before the native request. */
+async function requestReminderAuthorization(tmplIds) {
+  if (!beginSubscription()) throw Object.assign(new Error('授权正在同步，请稍后再试'), { code: 'subscription_busy' });
+  try {
+    const pending = readPending();
+    if (pending) return await recordPending(pending);
+    const requestId = newId('ns');
+    const response = await wx.requestSubscribeMessage({ tmplIds });
+    const normalized = normalizeSubscriptionResults(tmplIds, response);
+    if (!Object.keys(normalized.results).length) return { ...normalized, accepted: [], skipped: true };
+    const saved = { requestId, ...normalized };
+    savePending(saved);
+    return await recordPending(saved);
+  } finally { endSubscription(); refreshConsentSetting(); }
 }
 
 /**
@@ -79,4 +140,6 @@ function topUpReminderCredit() {
   return true;
 }
 
-module.exports = { PENDING_KEY, FINAL_ERRORS, refreshConsentSetting, alwaysAccepts, readPending, savePending, clearPending, beginSubscription, endSubscription, topUpReminderCredit };
+module.exports = { PENDING_KEY, FINAL_ERRORS, refreshConsentSetting, alwaysAccepts, getConsentSetting, isSubscriptionBusy,
+  readPending, savePending, clearPending, beginSubscription, endSubscription, normalizeSubscriptionResults,
+  normalizePendingAuthorization, requestReminderAuthorization, syncPendingAuthorization, topUpReminderCredit };

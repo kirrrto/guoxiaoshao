@@ -3,14 +3,15 @@ const { randomUUID } = require('node:crypto');
 const { ApiError } = require('../errors');
 const { sharedQueryPickup } = require('../engine/shared-query');
 const { ensureUser } = require('./users');
+const { accountLimits } = require('../rules/membership');
 const { recordObservations } = require('../engine/observations');
 const ID_PATTERN = /^[A-Za-z0-9_-]{8,64}$/;
-function validatePayload(ctx, payload) {
+function validatePayload(ctx, payload, user) {
   const queryId = typeof payload.queryId === 'string' && ID_PATTERN.test(payload.queryId) ? payload.queryId : null;
   if (!queryId) throw new ApiError('invalid_query_id', 'queryId 需为 8–64 位字母数字标识');
   const partNumber = typeof payload.partNumber === 'string' ? payload.partNumber.trim() : '';
   if (!/^[A-Z0-9]{5}CH\/A$/.test(partNumber)) throw new ApiError('invalid_part_number', '商品编号格式无效');
-  const maxStores = Math.min(10, Math.max(1, Number(ctx.config.query.maxStores) || 3));
+  const maxStores = accountLimits(user, ctx.now, ctx.config).queryMaxStores;
   const storeNumbers = Array.isArray(payload.storeNumbers) ? [...new Set(payload.storeNumbers.filter(s => typeof s === 'string' && /^R\d{3}$/.test(s)))] : [];
   if (storeNumbers.length === 0) throw new ApiError('no_stores', '请至少选择一家门店');
   if (storeNumbers.length > maxStores) throw new ApiError('too_many_stores', `单次最多查询 ${maxStores} 家门店`);
@@ -40,8 +41,8 @@ function presentResult({ observation, latest, events, outcome, reused }, nowMs) 
 }
 async function pickup(ctx, payload) {
   const startedAt = Date.now();
-  const { queryId, partNumber, storeNumbers } = validatePayload(ctx, payload);
   const user = await ensureUser(ctx);
+  const { queryId, partNumber, storeNumbers } = validatePayload(ctx, payload, user);
   const [product, stores] = await Promise.all([ctx.repo.getProduct(partNumber), ctx.repo.getStores(storeNumbers)]);
   if (!product) throw new ApiError('unknown_product', '该商品不在目录中');
   if (stores.length !== storeNumbers.length) throw new ApiError('unknown_store', '存在未知门店编号');

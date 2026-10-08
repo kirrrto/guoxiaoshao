@@ -156,3 +156,5 @@
 <config-sheet id="history-config-sheet" visible="{{sheetVisible}}" title="选择历史查询条件" subtitle="可不选门店；保存选择不会查询或扣次" confirm-text="保存选择" summary="{{draftSummary}}" dirty="{{draftDirty}}" external-close="{{true}}" bindconfirm="onDoneSelection" bindrequestclose="onRequestCloseSelection" bindclose="onCloseSelection">
   <target-picker wx:if="{{sheetVisible}}" id="history-target-picker" catalog-version="{{catalogVersion}}" value="{{draftValue}}" max-stores="{{10}}" stores-optional="{{true}}" in-sheet="{{true}}" bindchange="onDraftChange" />
 </config-sheet>
+
+<reminder-nudge enabled="{{ready}}" blocked="{{loadingMore || querying || sheetVisible}}" />

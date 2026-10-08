@@ -1,7 +1,8 @@
 'use strict';
 const { ApiError } = require('../errors');
 const { dayKey } = require('../time');
-const { membershipSnapshot, isMember, LIMITS, FREE_REMINDER_FOLLOWS } = require('../rules/membership');
+const { membershipSnapshot, accountLimits } = require('../rules/membership');
+const { ensurePlanMetadata } = require('../rules/member-plan');
 const { resolveConfig } = require('../rules/quota');
 const { maskOpenid } = require('../identity');
 const { monitoringSnapshot } = require('../monitor-readiness');
@@ -28,7 +29,7 @@ async function ensureUser(ctx) {
   if (!ctx.identity.userKey) throw new ApiError('user_required', '该操作需要小程序用户身份');
   let user = await ctx.repo.getUser(ctx.identity.userKey);
   if (!user) user = await ctx.repo.createUser(newUser(ctx.identity, ctx.nowIso));
-  return user;
+  return ensurePlanMetadata(ctx.repo, user);
 }
 
 async function touchUser(ctx, user) {
@@ -127,7 +128,7 @@ async function bootstrap(ctx) {
     newProductWindows: ctx.config.newProductWindows,
     // Follow and WeChat reminders are member-only; free accounts only get query credits.
     freeReminder: false,
-    limits: { queryMaxStores: ctx.config.query.maxStores, maxFollows: isMember(user, ctx.now) ? LIMITS.maxFollows : FREE_REMINDER_FOLLOWS, maxStoresPerFollow: LIMITS.maxStoresPerFollow },
+    limits: accountLimits(user, ctx.now, ctx.config),
     notifications: monitoring.notifications,
     settings: user.settings,
     subscriptions: user.subscriptions || {},

@@ -1,0 +1,101 @@
+{
+  "version": "1.6.1",
+  "recordedAt": "2026-10-08T04:30:22.843Z",
+  "tests": {
+    "passed": 1152,
+    "failed": 0
+  },
+  "source": {
+    "files": 425,
+    "errors": 0
+  },
+  "monitorFiles": 38,
+  "releaseChecks": {
+    "passed": 45,
+    "total": 45
+  },
+  "previewPackageBytes": 763017,
+  "ui": [
+    {
+      "file": "output/alternative-layout-20261008/after-rounding/layout-metrics.json",
+      "total": 30,
+      "expressionErrors": 0,
+      "missingText": 0,
+      "horizontalOverflow": 0,
+      "clippedText": 0,
+      "failedImages": 0,
+      "alternativeLayoutFailures": 0
+    },
+    {
+      "file": "output/alternative-layout-20261008/after-rounding/layout-metrics-dark.json",
+      "total": 30,
+      "expressionErrors": 0,
+      "missingText": 0,
+      "horizontalOverflow": 0,
+      "clippedText": 0,
+      "failedImages": 0,
+      "alternativeLayoutFailures": 0
+    },
+    {
+      "file": "output/1.6.1-payment-ui/layout-metrics.json",
+      "total": 51,
+      "expressionErrors": 0,
+      "missingText": 0,
+      "horizontalOverflow": 0,
+      "clippedText": 0,
+      "failedImages": 0,
+      "alternativeLayoutFailures": 0
+    },
+    {
+      "file": "output/1.6.1-payment-ui/layout-metrics-dark.json",
+      "total": 51,
+      "expressionErrors": 0,
+      "missingText": 0,
+      "horizontalOverflow": 0,
+      "clippedText": 0,
+      "failedImages": 0,
+      "alternativeLayoutFailures": 0
+    },
+    {
+      "file": "output/1.6.1-nudge-ui/layout-metrics.json",
+      "total": 9,
+      "expressionErrors": 0,
+      "missingText": 0,
+      "horizontalOverflow": 0,
+      "clippedText": 0,
+      "failedImages": 0,
+      "alternativeLayoutFailures": 0
+    },
+    {
+      "file": "output/1.6.1-nudge-ui/layout-metrics-dark.json",
+      "total": 9,
+      "expressionErrors": 0,
+      "missingText": 0,
+      "horizontalOverflow": 0,
+      "clippedText": 0,
+      "failedImages": 0,
+      "alternativeLayoutFailures": 0
+    },
+    {
+      "file": "output/alternative-layout-20261008/after/layout-metrics.json",
+      "total": 30,
+      "expressionErrors": 0,
+      "missingText": 0,
+      "horizontalOverflow": 0,
+      "clippedText": 0,
+      "failedImages": 0,
+      "alternativeLayoutFailures": 0
+    },
+    {
+      "file": "output/alternative-layout-20261008/after/layout-metrics-dark.json",
+      "total": 30,
+      "expressionErrors": 0,
+      "missingText": 0,
+      "horizontalOverflow": 0,
+      "clippedText": 0,
+      "failedImages": 0,
+      "alternativeLayoutFailures": 0
+    }
+  ],
+  "scope": "Local test, browser layout and WeChat preview compilation only. No claim of device acceptance or formal publication."
+}

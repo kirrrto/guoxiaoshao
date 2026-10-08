@@ -104,8 +104,11 @@ Component({
       }
       if (!this.catalogCategories.length) note += this.emptyCatalogNote();
       const numbers = unique(Array.isArray(value.storeNumbers) ? value.storeNumbers : []);
-      const selectedStores = numbers.map(n => typeof n === 'string' && /^R\d{3}$/.test(n) && own(this.storeByNumber, n) ? this.storeByNumber[n] : null).filter(Boolean).slice(0, this.data.maxStores).map(s => ({ storeNumber: s.storeNumber, name: s.name, city: s.city, label: storeLabelWithCity(s.storeNumber, s.name, s.city) }));
-      if (selectedStores.length !== numbers.length) note += '已按当前目录和门店上限更新选择，请核对。';
+      // A plan downgrade must not silently drop the fourth saved store. Keep
+      // it visible until the user explicitly removes it before saving.
+      const selectedStores = numbers.map(n => typeof n === 'string' && /^R\d{3}$/.test(n) && own(this.storeByNumber, n) ? this.storeByNumber[n] : null).filter(Boolean).map(s => ({ storeNumber: s.storeNumber, name: s.name, city: s.city, label: storeLabelWithCity(s.storeNumber, s.name, s.city) }));
+      if (selectedStores.length !== numbers.length) note += '已按当前门店目录更新选择，请核对。';
+      if (selectedStores.length > this.data.maxStores) note += `已保留原门店，当前最多 ${this.data.maxStores} 家，请手动移除超出部分后保存。`;
       this.stage({ selectedStores, selectionNote: note });
       this.selectCity(Math.max(0, this.catalogCities.findIndex(c => selectedStores.length && c.city === selectedStores[0].city)));
       this.updateSearchResults();

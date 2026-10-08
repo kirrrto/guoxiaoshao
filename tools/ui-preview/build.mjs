@@ -18,6 +18,10 @@ const navCss = mode => `.native-nav{background:${themed(appConfig.window.navigat
 const outputAt = process.argv.indexOf('--out');
 const out = path.resolve(outputAt >= 0 ? process.argv[outputAt + 1] : path.join(os.tmpdir(), 'guoxiaoshao-ui-preview'));
 const allowRemoteImages = process.argv.includes('--remote-images');
+// Stress rpx rounding independently from the browser's subpixel layout. This
+// is not a claim about any particular WeChat renderer's conversion rules.
+const roundRpx = process.argv.includes('--round-rpx');
+const rpxRoundingProfile = roundRpx ? 'whole CSS pixel rounding stress; not a WeChat renderer implementation' : null;
 const now = new Date('2026-09-15T07:00:00.000Z');
 class PreviewDate extends Date {
   constructor(...args) { super(...(args.length ? args : [now.getTime()])); }
@@ -85,6 +89,7 @@ const evaluate = (value, scope) => {
 const truth = (value, scope) => Boolean(evaluate(value, scope));
 const pickerAst = adminPreview ? null : parse(fs.readFileSync(path.join(mini, 'components/target-picker/index.wxml'), 'utf8'));
 const sheetAst = adminPreview ? null : parse(fs.readFileSync(path.join(mini, 'components/config-sheet/index.wxml'), 'utf8'));
+const nudgeAst = adminPreview ? null : parse(fs.readFileSync(path.join(mini, 'components/reminder-nudge/index.wxml'), 'utf8'));
 
 function renderChildren(children, scope, context) {
   let previousIf = null, result = '';
@@ -106,6 +111,12 @@ function renderNode(node, scope, context) {
   if (node.name === 'block') return renderChildren(node.children, scope, context);
   if (node.name === 'page-meta') return '';
   const attrs = node.attrs;
+  if (node.name === 'reminder-nudge') {
+    // Controlled presentation fixture. Prompt eligibility, persistence and
+    // native gesture behavior are exercised by reminder-nudge.test.mjs.
+    if (!context.nudge) return '';
+    return renderNode(nudgeAst, { open: true, submitting: false, prompt: context.nudge }, context);
+  }
   if (node.name === 'slot') return context.slots && context.slots[attrs.name || 'default'] || '';
   if (node.name === 'config-sheet') {
     const props = {};
@@ -174,6 +185,7 @@ const releaseNotesPreview = process.argv.includes('--release-notes-only');
 const onboardingPreview = process.argv.includes('--onboarding-only');
 const notificationTestPreview = process.argv.includes('--notification-test-only');
 const alternativesPreview = process.argv.includes('--alternatives-only');
+const nudgePreview = process.argv.includes('--nudge-only');
 // Targeted cascade stress from the device-reported fixed-width button failure.
 // :where keeps the same specificity as button:not([size=mini]); this deliberately
 // is not a complete implementation of WeChat's native component stylesheet.
@@ -187,8 +199,9 @@ if (sheetPreview) scenarios.splice(0, scenarios.length, 'sheet-edit', 'sheet-key
 if (releaseNotesPreview) scenarios.splice(0, scenarios.length, 'free', 'member', 'longcontent');
 if (onboardingPreview) scenarios.splice(0, scenarios.length, 'onboarding-first', 'onboarding-signing', 'onboarding-error', 'onboarding-signed', 'onboarding-shared', 'onboarding-share-pending', 'onboarding-share-catalog', 'onboarding-share-error');
 if (notificationTestPreview) scenarios.splice(0, scenarios.length, 'notification-test-ready', 'notification-test-no-quota', 'notification-test-accepted', 'notification-test-uncertain', 'notification-test-failed', 'notification-test-received', 'notification-test-not-received');
-if (alternativesPreview) scenarios.splice(0, scenarios.length, 'alternatives-default', 'alternatives-selection', 'alternatives-free', 'alternatives-match', 'alternatives-prepared', 'alternatives-empty', 'alternatives-error', 'alternatives-expired', 'alternatives-cached');
-const names = alternativesPreview ? { query: '查询' } : notificationTestPreview ? { 'notification-test': '通知测试' } : adminPreview ? { admin: '运营工具' } : onboardingPreview ? { query: '查询' } : paymentPreview || orderRecordsPreview ? { mine: '我的' } : historyDataPreview ? { history: '历史' } : historyTaskPreview ? { history: '历史', mine: '我的' } : stockPreview || monitoringPreview ? { follow: '小哨提醒' } : reminderPreview || redemptionPreview || releaseNotesPreview ? { mine: '我的' } : { query: '查询', follow: '小哨提醒', history: '历史', mine: '我的' };
+if (alternativesPreview) scenarios.splice(0, scenarios.length, 'alternatives-default', 'alternatives-selection', 'alternatives-premium', 'alternatives-free', 'alternatives-match', 'alternatives-prepared', 'alternatives-empty', 'alternatives-error', 'alternatives-expired', 'alternatives-cached');
+if (nudgePreview) scenarios.splice(0, scenarios.length, 'nudge-restock', 'nudge-both', 'nudge-one');
+const names = nudgePreview ? { mine: '我的' } : alternativesPreview ? { query: '查询' } : notificationTestPreview ? { 'notification-test': '通知测试' } : adminPreview ? { admin: '运营工具' } : onboardingPreview ? { query: '查询' } : paymentPreview || orderRecordsPreview ? { mine: '我的' } : historyDataPreview ? { history: '历史' } : historyTaskPreview ? { history: '历史', mine: '我的' } : stockPreview || monitoringPreview ? { follow: '小哨提醒' } : reminderPreview || redemptionPreview || releaseNotesPreview ? { mine: '我的' } : { query: '查询', follow: '小哨提醒', history: '历史', mine: '我的' };
 if (sheetPreview) delete names.mine;
 if (monitoringPreview) scenarios.push('monitor-no-follows', 'monitor-all-paused', 'monitor-user-disabled', 'monitor-dnd', 'monitor-free-account', 'monitor-alert', 'monitor-dual-ready', 'monitor-dual-soldout-empty', 'monitor-dual-restock-empty', 'monitor-dual-soldout-low', 'monitor-dual-pending');
 fs.mkdirSync(out, { recursive: true });
@@ -197,18 +210,19 @@ const manifest = [];
 for (const scenario of scenarios) {
   const products = copy(baseProducts);
   if (['longcontent', 'history-longcontent', 'sheet-longcontent'].includes(scenario)) { const p = products.find(p => p.partNumber === sample.partNumber); p.title += ' · 超长商品名称与配置说明用于检查换行及小屏布局 ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; }
-  const p = products.find(p => p.partNumber === sample.partNumber), member = alternativesPreview ? scenario !== 'alternatives-free' : historyTaskPreview ? ['history-member-reward', 'history-longcontent'].includes(scenario) : monitoringPreview ? !['monitor-expired-paused', 'monitor-free-account'].includes(scenario) : stockPreview ? scenario !== 'stock-restricted' : ['member', 'longcontent'].includes(scenario), expired = scenario === 'expired' || scenario === 'monitor-expired-paused';
+  const p = products.find(p => p.partNumber === sample.partNumber), member = nudgePreview ? true : alternativesPreview ? scenario !== 'alternatives-free' : historyTaskPreview ? ['history-member-reward', 'history-longcontent'].includes(scenario) : monitoringPreview ? !['monitor-expired-paused', 'monitor-free-account'].includes(scenario) : stockPreview ? scenario !== 'stock-restricted' : ['member', 'longcontent'].includes(scenario), expired = scenario === 'expired' || scenario === 'monitor-expired-paused';
   const bootstrap = { identity: { userKey: 'preview:offline-user', openidMasked: 'preview…0001', isAdmin: true }, membership: { active: member, remainingMs: member ? 18 * 86400000 : 0, expiresAt: member ? '2026-10-03T07:00:00Z' : expired ? '2026-09-10T07:00:00Z' : null },
     quota: { balance: member ? 5 : 0, revision: 0, grantedToday: 0, dailyGrantCap: 2, balanceCap: 10, queryCost: 1, historyCost: 1, signedInToday: false, tasksDoneToday: [], tasksViewedToday: [] }, tasks: [{ id: 'view_history', title: '浏览一次历史记录', reward: 1 }],
     collector: { state: scenario === 'expired' ? 'stale' : 'not_deployed' }, memberProduct: { id: 'vip666', title: '7 天会员', days: 7, priceFen: 700, enabled: paymentPreview && scenario !== 'payment-blocked', paymentReady: paymentPreview && scenario !== 'payment-blocked', iosEnabled: true, note: '该产品为一次性虚拟服务，一经售出不予退款。一次购买 7 天，已有会员按剩余有效期顺延，不自动续费。', paymentReason: '购买开放后可在此开通会员。' },
     notifications: { enabled: false, templateIds: {} }, subscriptions: {}, settings: { notifyEnabled: true, dnd: { enabled: true, startMinute: 1380, endMinute: 480 } },
     limits: { maxFollows: 3, maxStoresPerFollow: 3, queryMaxStores: 3 }, followCount: scenario === 'empty' ? 0 : 1, catalogVersion: 'offline-preview' };
   if (paymentPreview) bootstrap.memberProducts = [
-    { ...bootstrap.memberProduct, planId: 'member_7d' },
-    { ...bootstrap.memberProduct, id: 'member_30d', planId: 'member_30d', title: '30 天会员', days: 30, priceFen: 1990, note: '' },
-    { ...bootstrap.memberProduct, id: 'member_365d', planId: 'member_365d', title: '365 天会员', days: 365, priceFen: 20000, note: '' },
+    { ...bootstrap.memberProduct, planId: 'member_7d', limits: { maxFollows: 3, maxStoresPerFollow: 3 } },
+    { ...bootstrap.memberProduct, id: 'member_30d', planId: 'member_30d', limits: { maxFollows: 4, maxStoresPerFollow: 4 }, title: '30 天会员', days: 30, priceFen: 1990, note: '' },
+    { ...bootstrap.memberProduct, id: 'member_365d', planId: 'member_365d', limits: { maxFollows: 4, maxStoresPerFollow: 4 }, title: '365 天会员', days: 365, priceFen: 20000, note: '' },
   ];
   if (notificationTestPreview) bootstrap.quota.balance = scenario === 'notification-test-no-quota' ? 0 : 2;
+  if (scenario === 'alternatives-premium') Object.assign(bootstrap.limits, { queryMaxStores: 4, alternativeMaxColors: 4 });
   if (scenario === 'history-balance-cap') bootstrap.quota.balance = 10;
   if (sheetPreview) bootstrap.membership = { active: true, expiresAt: '2026-09-22T07:00:00Z', remainingMs: 7 * 86400000 };
   if (['payment-renew', 'payment-member', 'payment-upgrade-monthly', 'payment-upgrade-annual', 'payment-member-pending-monthly'].includes(scenario)) bootstrap.membership = { active: true, remainingMs: 18 * 86400000, expiresAt: '2026-10-03T07:00:00Z' };
@@ -477,7 +491,16 @@ for (const scenario of scenarios) {
         page.onToggleAlternative({ currentTarget: { dataset: { kind: 'part', value: otherColor.partNumber } } });
         page.onToggleAlternative({ currentTarget: { dataset: { kind: 'store', value: otherStore.storeNumber } } });
         if (page.selection.partNumber !== p.partNumber || page.selection.storeNumbers.join() !== selected.storeNumbers.join()) throw Error('Selecting alternatives changed the active query without explicit preparation');
-        if (!['alternatives-selection', 'alternatives-free', 'alternatives-expired', 'alternatives-cached'].includes(scenario)) await page.onReadAlternatives();
+        if (scenario === 'alternatives-premium') {
+          for (const color of page.data.alternativeColorChoices.slice(0, 4)) {
+            if (!page.data.alternativeParts.includes(color.partNumber)) page.onToggleAlternative({ currentTarget: { dataset: { kind: 'part', value: color.partNumber } } });
+          }
+          for (const store of page.data.alternativeStoreChoices.slice(0, 4)) {
+            if (!page.data.alternativeStores.includes(store.storeNumber)) page.onToggleAlternative({ currentTarget: { dataset: { kind: 'store', value: store.storeNumber } } });
+          }
+          if (page.data.alternativeParts.length !== 4 || page.data.alternativeStores.length !== 4) throw Error('Premium layout fixture must select four colors and four stores through the page handlers');
+        }
+        if (!['alternatives-selection', 'alternatives-premium', 'alternatives-free', 'alternatives-expired', 'alternatives-cached'].includes(scenario)) await page.onReadAlternatives();
         if (['alternatives-match', 'alternatives-prepared'].includes(scenario) && page.data.alternativeMatches.length !== 1) throw Error('Expected one fresh alternate-color, outside-original-store observation');
         if (scenario === 'alternatives-prepared') {
           await page.onPrepareAlternative({ currentTarget: { dataset: { key: page.data.alternativeMatches[0].key } } });
@@ -487,7 +510,7 @@ for (const scenario of scenarios) {
         if (!page.data.alternativeSelectedColors.length) throw Error('Selected colors did not create an explicit manual query action');
       }
       if (['alternatives-cached', 'alternatives-expired'].includes(scenario) && (page.data.alternativeCanRead || page.data.alternativeMatches.length)) throw Error('Expired/cached observations remained accessible');
-      const expectedReads = ['alternatives-default', 'alternatives-selection', 'alternatives-free', 'alternatives-expired', 'alternatives-cached'].includes(scenario) ? 0 : scenario === 'alternatives-prepared' ? 2 : 1;
+      const expectedReads = ['alternatives-default', 'alternatives-selection', 'alternatives-premium', 'alternatives-free', 'alternatives-expired', 'alternatives-cached'].includes(scenario) ? 0 : scenario === 'alternatives-prepared' ? 2 : 1;
       if (previewCalls.filter(item => item.action === 'query.pickup').length !== 1 || previewCalls.filter(item => item.action === 'query.alternatives').length !== expectedReads) throw Error('Alternative UI started an unexpected sampling/read request');
     }
     if (onboardingPreview) page.setData({
@@ -513,7 +536,8 @@ for (const scenario of scenarios) {
       if (scenario === 'sheet-saving' && pageName === 'follow') page.setData({ saving: true });
     }
     const ast = parse(fs.readFileSync(path.join(mini, `pages/${pageName}/index.wxml`), 'utf8'));
-    const rendered = renderNode(ast, page.data, { rt, keyboardHeight: scenario === 'sheet-keyboard' ? 280 : 0 });
+    const nudge = nudgePreview ? { title: scenario === 'nudge-both' ? '补充到货和断货提醒次数' : '补充到货提醒次数', restockCount: 1, soldoutCount: scenario === 'nudge-both' ? 0 : 15, soldoutEnabled: scenario !== 'nudge-one', detail: '已有次数会保留。每项选择「允许」增加 1 次，消息发送后消耗对应次数。' } : null;
+    const rendered = renderNode(ast, page.data, { rt, nudge, keyboardHeight: scenario === 'sheet-keyboard' ? 280 : 0 });
     if (alternativesPreview && !rendered.includes('换个颜色或门店，继续找货')) throw Error('Manual alternative choices were hidden');
     const componentCss = adminPreview ? '' : cssFile('components/target-picker/index.wxss').replace(/\/\*[\s\S]*?\*\//g, '').replace(/([^{}]+)\{/g, (_, selectors) => selectors.trim().startsWith('@') ? `${selectors}{` : selectors.split(',').map(selector => `.component-target-picker ${selector.trim()}`).join(',') + '{');
     const tabIndex = appConfig.tabBar.list.findIndex(tab => tab.pagePath === `pages/${pageName}/index`);
@@ -524,9 +548,9 @@ for (const scenario of scenarios) {
       renderedTabs = renderNode(tabAst, tabComponent.data, { rt });
       tabCss = cssFile('custom-tab-bar/index.wxss');
     }
-    const rawCss = `${buttonConstraintCss}\n${cssFile('app.wxss')}\n${cssFile(`pages/${pageName}/index.wxss`)}\n${componentCss}\n${adminPreview ? '' : cssFile('components/config-sheet/index.wxss')}\n${tabCss}`;
+    const rawCss = `${buttonConstraintCss}\n${cssFile('app.wxss')}\n${cssFile(`pages/${pageName}/index.wxss`)}\n${componentCss}\n${adminPreview ? '' : cssFile('components/config-sheet/index.wxss') + cssFile('components/reminder-nudge/index.wxss')}\n${tabCss}`;
     for (const width of widths) {
-      const css = rawCss.replace(/(-?[\d.]+)rpx/g, (_, value) => `${Number(value) * width / 750}px`).replace(/(^|[}\n])\s*page\s*\{/g, '$1 body {').replace(/(^|[}\n])\s*view, text\s*\{/g, '$1 div, span {');
+      const css = rawCss.replace(/(-?[\d.]+)rpx/g, (_, value) => { const pixels = Number(value) * width / 750; return `${roundRpx ? Math.round(pixels) : pixels}px`; }).replace(/(^|[}\n])\s*page\s*\{/g, '$1 body {').replace(/(^|[}\n])\s*view, text\s*\{/g, '$1 div, span {');
       const filename = `${pageName}-${scenario}-${width}.html`;
       const tabbar = appConfig.tabBar.custom ? renderedTabs : tabIndex < 0 ? '' : '<div class="preview-tabbar">' + appConfig.tabBar.list.map(tab => {
         const selected = tab.pagePath === `pages/${pageName}/index`;
@@ -539,14 +563,15 @@ for (const scenario of scenarios) {
         '换个颜色或门店，继续找货', '同机型、同容量', '同城门店', '勾选不扣次',
         ...{
           'alternatives-default': ['先选可接受的颜色', '本次查询门店'],
-          'alternatives-selection': ['查看近期有货记录', '查询 · 会员不扣次'],
-          'alternatives-free': ['查询 · 消耗 1 次'],
+          'alternatives-selection': ['查看近期有货记录', '会员不扣次', '查询'],
+          'alternatives-premium': ['4 / 4', '4 家门店', '会员不扣次', '查询'],
+          'alternatives-free': ['消耗 1 次', '查询'],
           'alternatives-match': ['观测可取货', '准备这个配置和门店', '15 秒前'],
           'alternatives-prepared': ['已准备所选配置和门店，尚未查询或扣次', '库存以官网下单页为准'],
-          'alternatives-empty': ['暂无近期有货记录', '不代表无货', '查询 · 会员不扣次'],
+          'alternatives-empty': ['暂无近期有货记录', '不代表无货', '会员不扣次', '查询'],
           'alternatives-error': ['已有观测暂未读取成功', '请检查网络后重试'],
-          'alternatives-expired': ['近期记录已不可用', '查询 · 会员不扣次'],
-          'alternatives-cached': ['近期记录已不可用', '查询 · 会员不扣次'],
+          'alternatives-expired': ['近期记录已不可用', '会员不扣次', '查询'],
+          'alternatives-cached': ['近期记录已不可用', '会员不扣次', '查询'],
         }[scenario],
       ] : notificationTestPreview ? ['先试收一条通知', '消耗 1 次签到／任务额度', '查看原测试结果', '微信受理不保证手机弹出横幅', ...{
         'notification-test-ready': ['授权并发送测试 · 1 次', '当前 2 次'],
@@ -583,7 +608,7 @@ for (const scenario of scenarios) {
         'monitor-dual-restock-empty': ['到货提醒暂无次数', '断货提醒还可发送 5 次', '增加提醒次数'],
         'monitor-dual-soldout-low': ['断货提醒只剩 1 次', '增加提醒次数'],
         'monitor-dual-pending': ['授权记录等待同步', '同步授权'],
-      }[scenario]] : paymentPreview ? ['各套餐权益相同', '兑换码开通', ...(!page.data.membership.active || page.data.membershipUpgradeOpen || page.data.paymentPendingId ? ['周卡', '月卡', '年卡', '¥7.00', '¥19.90', '¥200.00'] : ['升级长期套餐', '续费会员']), ...{
+      }[scenario]] : paymentPreview ? ['兑换码开通', ...(!page.data.membership.active || page.data.membershipUpgradeOpen || page.data.paymentPendingId ? ['周卡', '月卡', '年卡', '¥7.00', '¥19.90', '¥200.00'] : ['升级长期套餐', '续费会员']), ...{
         'payment-ready': ['立即开通', '选择会员时长', '付款确认后生效'], 'payment-renew': ['续费会员', '确认续费', '在原到期时间后增加 7 天', '剩余有效期继续保留'],
         'payment-blocked': ['付费购买暂未开放'], 'payment-old-ios': ['iOS 15'],
         'payment-pending': ['支付正在确认中', '查询支付结果'], 'payment-cancelled': ['已取消本次支付', '请查询订单状态', '查询支付结果'],
@@ -593,7 +618,7 @@ for (const scenario of scenarios) {
         'payment-annual': ['立即开通 · ¥200.00', '365 天'],
         'payment-pending-monthly': ['30 天会员 · ¥19.90', 'offline-original-monthly-order', '支付正在确认中', '查询支付结果'],
         'payment-member': ['18', '天剩余', '到期 2026-10-03', '升级长期套餐', '续费会员'],
-        'payment-upgrade-monthly': ['续费可选', '确认升级 · ¥19.90', '在原到期时间后增加 30 天', '预计到期 2026-11-02', '按所选套餐全价购买', '不抵扣差价'],
+        'payment-upgrade-monthly': ['续费可选', '确认升级 · ¥19.90', '在原到期时间后增加 30 天', '预计到期 2026-11-02', '按全价购买', '不抵扣差价'],
         'payment-upgrade-annual': ['续费可选', '确认升级 · ¥200.00', '在原到期时间后增加 365 天', '预计到期 2027-10-03', '按所选套餐全价购买', '不抵扣差价'],
         'payment-member-pending-monthly': ['30 天会员 · ¥19.90', 'offline-original-monthly-order', '套餐已按原订单锁定', '查询支付结果'],
         'payment-rules': ['一次性虚拟服务', '一经售出不予退款', '一次购买 7 天', '权益与购买须知'],
@@ -610,6 +635,7 @@ for (const scenario of scenarios) {
         : pageName === 'follow' ? ['给心仪的配置留个小哨']
         : pageName === 'admin' ? ['运行统计', '128'] : [p.title, ...(sheetPreview ? ['产品配置', '选择门店', '已选门店'] : [])];
       if (adminPreview && ['operator-ready', 'operator-longcontent'].includes(scenario)) expectedText.push('成功查询 56', '查看提醒详情 12', '测试通知：28 条／20 人', '各行为分别计数', ...(scenario === 'operator-longcontent' ? ['以上不是完整统计'] : []));
+      if (nudgePreview) expectedText.push('补充提醒次数', '稍后再说', '24 小时内不再主动提示');
       if (releaseNotesPreview) expectedText.push('更新公告', '当前版本', ...(page.data.visibleReleaseNotes || page.data.releaseNotes).map(entry => `v${entry.version}`),
         ...(page.data.olderReleaseNotesCount ? [scenario === 'longcontent' ? '收起更早版本' : '展开更早版本'] : []));
       if (orderRecordsPreview) expectedText.push('会员记录', ...{
@@ -631,11 +657,12 @@ for (const scenario of scenarios) {
         'onboarding-share-catalog': ['分享的配置暂未在商品目录中确认', '刷新目录并重试'],
         'onboarding-share-error': ['商品目录刷新失败', '当前选择已保留', '刷新目录并重试'],
       }[scenario]);
-      manifest.push({ page: pageName, scenario, width, file: filename, expectedText });
+      const expectedAlternativeCounts = alternativesPreview ? { colors: page.data.alternativeColorChoices.length, stores: page.data.alternativeStoreChoices.length, queries: page.data.alternativeSelectedColors.length } : undefined;
+      manifest.push({ page: pageName, scenario, width, file: filename, expectedText, expectedAlternativeCounts });
     }
   }
 }
-fs.writeFileSync(path.join(out, 'manifest.json'), JSON.stringify({ generatedAt: new Date().toISOString(), source: mini, renderer: 'offline WXML/WXSS approximation', buttonConstraintProfile, remoteImages: allowRemoteImages, expressionErrors: evaluationErrors.length, snapshots: manifest }, null, 2));
+fs.writeFileSync(path.join(out, 'manifest.json'), JSON.stringify({ generatedAt: new Date().toISOString(), source: mini, renderer: 'offline WXML/WXSS approximation', buttonConstraintProfile, rpxRoundingProfile, remoteImages: allowRemoteImages, expressionErrors: evaluationErrors.length, snapshots: manifest }, null, 2));
 fs.writeFileSync(path.join(out, 'evaluation-errors.json'), JSON.stringify(evaluationErrors, null, 2));
 fs.writeFileSync(path.join(out, 'index.html'), `<!doctype html><html lang="zh-CN"><meta charset="utf-8"><title>果小哨 · 离线排版检查</title><style>body{font:15px/1.7 sans-serif;background:#eef5f0;color:#263d30;margin:20px}select,button{font:inherit;padding:6px;margin:4px}iframe{display:block;border:1px solid #bacabd;background:white;height:900px}p{max-width:900px}</style><h1>果小哨 · 离线排版检查</h1><p>使用当前源代码中的 WXML、WXSS 和页面格式化逻辑，模拟会员、免费、到期、空内容、错误及长文本。此工具不会调用云函数、付款或发送消息；浏览器排版不是微信渲染，最终以微信开发者工具及真机验证为准。</p><select id="page">${Object.entries(names).map(([key,value])=>`<option value="${key}">${value}</option>`).join('')}</select><select id="scenario">${scenarios.map(s=>`<option>${s}</option>`).join('')}</select><select id="width">${widths.map(w=>`<option>${w}</option>`).join('')}</select><iframe id="frame"></iframe><script>const controls=[document.querySelector('#page'),document.querySelector('#scenario'),document.querySelector('#width')];function update(){const [p,s,w]=controls.map(x=>x.value);frame.style.width=w+'px';frame.src=p+'-'+s+'-'+w+'.html';}controls.forEach(x=>x.onchange=update);update();</script></html>`);
 console.log(JSON.stringify({ output: out, snapshots: manifest.length, pages: Object.keys(names), scenarios, widths, remoteImages: allowRemoteImages, expressionErrors: evaluationErrors.length }, null, 2));

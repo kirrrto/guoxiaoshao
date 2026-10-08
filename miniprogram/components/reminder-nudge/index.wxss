@@ -1,0 +1,14 @@
+.reminder-overlay { position: fixed; inset: 0; z-index: 1300; display: flex; align-items: center; justify-content: center; padding: 36rpx; box-sizing: border-box; background: rgba(10, 24, 17, .42); }
+.reminder-dialog { width: 100%; max-width: 640rpx; box-sizing: border-box; padding: 36rpx; border: 1rpx solid var(--line, #E2E9E5); border-radius: 28rpx; background: var(--card, #FFFFFF); color: var(--text, #182A23); }
+.reminder-eyebrow { font-size: 24rpx; color: var(--text-2, #52665B); margin-bottom: 12rpx; }
+.reminder-title { font-size: 36rpx; line-height: 1.4; font-weight: 700; }
+.reminder-counts { display: flex; gap: 16rpx; margin-top: 28rpx; }
+.reminder-count { flex: 1; display: flex; justify-content: space-between; align-items: center; padding: 18rpx; border-radius: 16rpx; background: var(--surface-soft, #F2F6F4); font-size: 26rpx; color: var(--text-2, #52665B); }
+.reminder-number { font-size: 36rpx; font-weight: 700; color: var(--text, #182A23); }
+.reminder-unit { font-size: 24rpx; font-weight: 400; }
+.reminder-detail { margin: 24rpx 0; font-size: 26rpx; line-height: 1.6; color: var(--text-2, #52665B); }
+.reminder-allow, .reminder-later { border: 0; min-width: 0; max-width: 100%; width: 100%; margin: 0; min-height: 88rpx; display: flex; align-items: center; justify-content: center; padding: 16rpx 24rpx; box-sizing: border-box; border-radius: 20rpx; font-size: 28rpx; line-height: 1.5; font-weight: 600; }
+.reminder-allow { color: var(--green-ink, #073C2C); background: var(--green, #00C375); }
+.reminder-later { margin-top: 16rpx; color: var(--text-2, #52665B); background: var(--surface-soft, #F2F6F4); }
+.reminder-allow::after, .reminder-later::after { border: none; }
+.reminder-footnote { margin-top: 18rpx; text-align: center; font-size: 22rpx; color: var(--text-3, #5C6E65); }

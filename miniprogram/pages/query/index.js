@@ -96,7 +96,7 @@ function presentFollowTargets(follows) {
   const now = Date.now();
   return follows
     .filter(f => f.status === 'active')
-    .reduce((targets, f) => targets.concat(f.stores.map(s => {
+    .reduce((targets, f) => targets.concat(f.stores.filter(s => !s.limitPaused).map(s => {
       return {
         key: `${f.followId}|${s.storeNumber}`,
         productTitle: f.productTitle,
@@ -329,7 +329,7 @@ Page({
 
   applyBoot(boot) {
     if (this.pageRetired) return;
-    this.alternativeAccount = { membership: boot.membership, newProductWindows: boot.newProductWindows };
+    this.alternativeAccount = { membership: boot.membership, newProductWindows: boot.newProductWindows, limits: boot.limits };
     const maxStores = boot.limits ? boot.limits.queryMaxStores : 3;
     const summary = this.selectionView(this.selection, maxStores);
     const membershipRestoresAccess = boot.membership.active
@@ -346,6 +346,7 @@ Page({
         balance: boot.quota.balance,
         queryCost: boot.quota.queryCost,
         maxStores,
+        alternativeMaxColors: boot.limits && boot.limits.alternativeMaxColors || 3,
         followCount: boot.followCount || 0,
         signedInToday: boot.quota.signedInToday,
       },
@@ -381,10 +382,10 @@ Page({
     const choiceKey = this.querySnapshot && `${this.querySnapshot.queryId || this.querySnapshot.queriedAt || ''}|${this.querySnapshot.product && this.querySnapshot.product.partNumber}`;
     if (choices.colors.length && this.alternativeChoiceKey !== choiceKey) {
       this.alternativeChoiceKey = choiceKey;
-      this.setData({ alternativeParts: [], alternativeStores: choices.stores.filter(item => item.relation === 'original').slice(0, Math.min(3, this.data.boot && this.data.boot.maxStores || 3)).map(item => item.storeNumber) });
+      this.setData({ alternativeParts: [], alternativeStores: choices.stores.filter(item => item.relation === 'original').slice(0, this.data.boot && this.data.boot.maxStores || 3).map(item => item.storeNumber) });
     }
-    const parts = this.data.alternativeParts.filter(part => choices.colors.some(item => item.partNumber === part));
-    const stores = this.data.alternativeStores.filter(number => choices.stores.some(item => item.storeNumber === number)).slice(0, Math.min(3, this.data.boot && this.data.boot.maxStores || 3));
+    const parts = this.data.alternativeParts.filter(part => choices.colors.some(item => item.partNumber === part)).slice(0, this.data.boot && this.data.boot.alternativeMaxColors || 3);
+    const stores = this.data.alternativeStores.filter(number => choices.stores.some(item => item.storeNumber === number)).slice(0, this.data.boot && this.data.boot.maxStores || 3);
     const selectedColors = choices.colors.filter(item => parts.includes(item.partNumber));
     const canRead = !this.data.resultIsCache && choices.canRead;
     this.setData({ alternativeColorChoices: choices.colors.map(item => ({ ...item, selected: parts.includes(item.partNumber) })),
@@ -404,7 +405,7 @@ Page({
     if (!field || !choices.some(item => (kind === 'part' ? item.partNumber : item.storeNumber) === value)) return toast('配置或门店已更新，请重新选择');
     const selected = this.data[field].slice(), index = selected.indexOf(value);
     if (index >= 0) selected.splice(index, 1);
-    else { if (selected.length >= (kind === 'store' ? Math.min(3, this.data.boot && this.data.boot.maxStores || 3) : 3)) return toast('已达到可选数量上限'); selected.push(value); }
+    else { if (selected.length >= (kind === 'store' ? this.data.boot && this.data.boot.maxStores || 3 : this.data.boot && this.data.boot.alternativeMaxColors || 3)) return toast('已达到可选数量上限'); selected.push(value); }
     this.alternativeResponse = null;
     this.setData({ [field]: selected, alternativeRead: false, alternativeError: '', alternativePreparedNotice: '', alternativeQueryNote: '' });
     this.refreshAlternativeChoices();
@@ -439,7 +440,7 @@ Page({
     if (!storeNumbers.length) return toast('请至少选择一家门店');
     const selection = { partNumber, product: this.catalog.productByPart[partNumber], storeNumbers,
       stores: storeNumbers.map(number => this.catalog.storeByNumber[number]) };
-    if (!selectionDetails(selection, this.catalog, Math.min(3, this.data.boot.maxStores || 3)).valid) return toast('配置或门店已更新，请重新选择');
+    if (!selectionDetails(selection, this.catalog, this.data.boot.maxStores || 3).valid) return toast('配置或门店已更新，请重新选择');
     this.onPickerChange({ detail: selection });
     this.setData({ alternativeQueryPart: partNumber, alternativeQueryNote: '' });
     // This button is the explicit charged query gesture; checking boxes and
@@ -799,7 +800,7 @@ Page({
       // Keep the intent: 「我的」 offers to continue with it once membership is active.
       const app = getApp();
       app.globalData.pendingMemberFollow = { partNumber: target.partNumber, storeNumbers: target.storeNumbers.slice(), title: target.title || target.partNumber };
-      wx.showModal({ title: '关注与到货提醒为会员专属', content: '会员可关注 3 个具体配置，每个配置最多 3 家门店，并可累加到货提醒次数。开通后会继续为你关注这个配置。', confirmText: '去开通',
+      wx.showModal({ title: '关注与到货提醒为会员专属', content: '周卡可关注 3 个配置，每配置 3 家门店；月卡、年卡可关注 4 个配置，每配置 4 家门店。提醒需微信授权。开通后会继续为你关注这个配置。', confirmText: '去开通',
         success: r => { if (r.confirm) wx.switchTab({ url: '/pages/mine/index' }); else app.globalData.pendingMemberFollow = null; } });
       return;
     }

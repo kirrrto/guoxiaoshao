@@ -24,6 +24,7 @@ const report = { renderer: 'headless Chromium rendering generated WXML/WXSS appr
 const context = await browser.newContext({ deviceScaleFactor: 1, colorScheme });
 report.colorScheme = colorScheme;
 report.buttonConstraintProfile = manifest.buttonConstraintProfile || null;
+report.rpxRoundingProfile = manifest.rpxRoundingProfile || null;
 if (!manifest.remoteImages) await context.route(/^https?:/, route => route.abort());
 try {
   const page = await context.newPage();
@@ -41,7 +42,7 @@ try {
       const clippedText = elements.filter(element => { const s = getComputedStyle(element); return !['INPUT', 'TEXTAREA', 'SCRIPT', 'STYLE', 'IMG'].includes(element.tagName) && element.children.length === 0 && element.textContent.trim() && s.overflowX === 'hidden' && element.scrollWidth > element.clientWidth + 1; }).map(element => ({ class: element.className, text: element.textContent.slice(0, 80) }));
       const images = [...document.images].map(image => ({ src: image.src, complete: image.complete, naturalWidth: image.naturalWidth, loaded: image.complete && image.naturalWidth > 0 }));
       const alternativeGeometry = [], alternativeLayoutErrors = [];
-      const bounds = element => { const r = element.getBoundingClientRect(); return { x: r.x, y: r.y, width: r.width, height: r.height, right: r.right }; };
+      const bounds = element => { const r = element.getBoundingClientRect(); return { x: r.x, y: r.y, width: r.width, height: r.height, right: r.right, bottom: r.bottom }; };
       const contentBounds = element => {
         const r = element.getBoundingClientRect(), s = getComputedStyle(element);
         const left = r.left + parseFloat(s.borderLeftWidth) + parseFloat(s.paddingLeft);
@@ -50,18 +51,30 @@ try {
       };
       for (const panel of document.querySelectorAll('.alternative-panel')) {
         const colors = panel.querySelector('.alternative-colors'), chips = [...panel.querySelectorAll('.alternative-chip')];
+        const columns = [...panel.querySelectorAll('.alternative-color-column')];
         const stores = panel.querySelector('.alternative-stores'), rows = [...panel.querySelectorAll('.alternative-store')];
         const grid = colors && contentBounds(colors), gap = colors && (parseFloat(getComputedStyle(colors).columnGap) || 0);
-        const chipsBounds = chips.map(bounds), storeBounds = rows.map(bounds);
-        alternativeGeometry.push({ colors: grid, colorGap: gap, chips: chipsBounds, stores: stores && contentBounds(stores), storeRows: storeBounds });
+        const chipsBounds = chips.map(bounds), columnBounds = columns.map(bounds), storeBounds = rows.map(bounds);
+        const geometry = { colors: grid, colorGap: gap, columns: columnBounds, chips: chipsBounds, stores: stores && contentBounds(stores), storeRows: storeBounds, queryRows: [] };
+        alternativeGeometry.push(geometry);
         const close = (a, b) => Math.abs(a - b) <= 1.5;
         if (grid && chips.length) {
           const expectedWidth = (grid.width - gap) / 2;
-          chipsBounds.forEach((r, index) => {
-            if (!close(r.width, expectedWidth)) alternativeLayoutErrors.push(`Color ${index + 1} width ${r.width.toFixed(1)}; expected half-width ${expectedWidth.toFixed(1)}`);
+          // Check the columns and the button inside each column separately.
+          // Keep the direct-button path so pre-fix snapshots still detect the
+          // original second-column wrap under integer rpx conversion stress.
+          const cells = columns.length ? columnBounds : chipsBounds;
+          if (columns.length && columns.length !== chips.length) alternativeLayoutErrors.push('Color columns and buttons have different counts');
+          cells.forEach((r, index) => {
+            if (!close(r.width, expectedWidth)) alternativeLayoutErrors.push(`Color column ${index + 1} width ${r.width.toFixed(1)}; expected ${expectedWidth.toFixed(1)}`);
             const expectedLeft = grid.left + index % 2 * (expectedWidth + gap);
             if (!close(r.x, expectedLeft)) alternativeLayoutErrors.push(`Color ${index + 1} is not in its expected column`);
-            if (index % 2 && !close(r.y, chipsBounds[index - 1].y)) alternativeLayoutErrors.push(`Colors ${index} and ${index + 1} are not on the same row`);
+            if (index % 2 && !close(r.y, cells[index - 1].y)) alternativeLayoutErrors.push(`Colors ${index} and ${index + 1} are not on the same row`);
+            if (columns.length && chipsBounds[index]) {
+              const content = contentBounds(columns[index]), chip = chipsBounds[index];
+              if (!close(chip.x, content.left) || !close(chip.right, content.right)) alternativeLayoutErrors.push(`Color ${index + 1} does not fill its column content`);
+            }
+            if (index % 2 && chipsBounds[index - 1].right >= chipsBounds[index].x) alternativeLayoutErrors.push(`Colors ${index} and ${index + 1} have no horizontal separation`);
           });
         }
         if (stores) {
@@ -74,15 +87,40 @@ try {
           const expected = contentBounds(readButton.parentElement), r = bounds(readButton);
           if (!close(r.x, expected.left) || !close(r.right, expected.right)) alternativeLayoutErrors.push('Read-records action does not fill its row');
         }
+        for (const row of panel.querySelectorAll('.alternative-query-row')) {
+          const button = row.querySelector('.alternative-query-button');
+          const copy = row.querySelector('.alternative-query-copy') || row.querySelector('.alternative-query-color');
+          if (!button || !copy) { alternativeLayoutErrors.push('Query row is missing its copy or action'); continue; }
+          const expected = contentBounds(row), action = bounds(button), label = bounds(copy);
+          geometry.queryRows.push({ row: expected, button: action, copy: label, hint: row.querySelector('.alternative-query-hint')?.textContent || '' });
+          if (action.width > expected.width / 2 + 1.5) alternativeLayoutErrors.push('Query action occupies more than half of its row');
+          if (!close(action.right, expected.right)) alternativeLayoutErrors.push('Query action is not aligned with the right edge');
+          if (label.right > action.x - 1) alternativeLayoutErrors.push('Query copy overlaps its action');
+          if (button.scrollWidth > button.clientWidth + 1) alternativeLayoutErrors.push('Query action label is clipped');
+        }
       }
       return { viewport: width, scrollWidth: document.documentElement.scrollWidth, bodyHeight: document.body.scrollHeight, overflow, clippedText, images, alternativeGeometry, alternativeLayoutErrors };
     });
     const bodyText = await page.locator('body').innerText();
     const missingText = (item.expectedText || []).filter(text => !bodyText.replace(/\s+/g, '').includes(text.replace(/\s+/g, '')));
     if (item.scenario.startsWith('alternatives-') && !metrics.alternativeGeometry.length) metrics.alternativeLayoutErrors.push('Alternative controls are missing from this scenario');
+    if (item.expectedAlternativeCounts) {
+      const actual = await page.evaluate(() => ({ colors: document.querySelectorAll('.alternative-chip').length, stores: document.querySelectorAll('.alternative-store').length, queries: document.querySelectorAll('.alternative-query-button').length }));
+      for (const [key, expected] of Object.entries(item.expectedAlternativeCounts)) {
+        if (actual[key] !== expected) metrics.alternativeLayoutErrors.push(`Expected ${expected} ${key} controls, received ${actual[key]}`);
+      }
+    }
     const record = { ...item, ...metrics, missingText }; report.snapshots.push(record);
     const representative = item.width === 375 && ['member', 'free'].includes(item.scenario) || item.scenario.startsWith('sheet-') || item.width === 320 && ['longcontent', 'history-longcontent', 'history-balance-cap', 'operator-longcontent'].includes(item.scenario) || item.width === 375 && ['mine', 'follow'].includes(item.page) && item.scenario === 'expired' || item.width === 430 && item.page === 'query' && item.scenario === 'member' || item.width === 375 && item.scenario.startsWith('monitor-') || item.width === 375 && item.scenario.startsWith('history-') && (item.page === 'history' || item.scenario === 'history-free-first');
-    if (representative || item.scenario.startsWith('onboarding-') && item.width === 375 || /^(?:payment|notification-test|alternatives|orders)-/.test(item.scenario)) { const name = item.file.replace('.html', '.png'); await page.screenshot({ path: path.join(screenshots, name), fullPage: true }); record.screenshot = name; }
+    if (representative || item.scenario.startsWith('onboarding-') && item.width === 375 || /^(?:payment|notification-test|alternatives|orders|nudge)-/.test(item.scenario)) { const name = item.file.replace('.html', '.png'); await page.screenshot({ path: path.join(screenshots, name), fullPage: true }); record.screenshot = name; }
+    if (item.scenario === 'alternatives-premium' || item.scenario === 'alternatives-free' && item.width === 320) {
+      const panel = page.locator('.alternative-panel'), panelBounds = await panel.boundingBox();
+      await page.setViewportSize({ width: item.width, height: Math.ceil(panelBounds.height) + 180 });
+      await panel.evaluate(element => window.scrollTo(0, window.scrollY + element.getBoundingClientRect().top - 40));
+      const name = item.file.replace('.html', '-panel.png');
+      await panel.screenshot({ path: path.join(screenshots, name) });
+      record.panelScreenshot = name;
+    }
     if (item.width === 375 && ['orders-single', 'orders-pending', 'orders-error'].includes(item.scenario)) {
       // A full-page capture pins the floating tab bar at the first viewport's
       // bottom. Also inspect the records at a real scroll position.

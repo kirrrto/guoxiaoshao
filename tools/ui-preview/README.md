@@ -2,6 +2,8 @@
 
 运行 `node tools/ui-preview/build.mjs --out <输出目录>`，打开生成的 `index.html`。
 
+`--nudge-only` 生成提醒补充弹窗的三种模拟内容，配合 `check-layout.mjs <目录>` 和 `--dark` 检查。这里只呈现弹窗；是否触发、24 小时节流、待同步恢复与用户手势由 `tests/reminder-nudge.test.mjs` 验证，不调用真实微信授权。
+
 - 从项目当前的实际 WXML、WXSS 与页面 JS 派生消费者 4 页 × 7 种状态 × 3 种宽度，共 84 个独立 HTML。管理页已移入独立运营项目，默认预览不再包含它。
 - 状态为 `free`、`member`、`expired`、`empty`、`error`、`loading`、`longcontent`；宽度为 320、375、430 像素。
 - 数据明确是模拟的，不调用云函数、不扣次数、不支付、不发送消息。默认不加载远程产品图片；加 `--remote-images` 可读取目录中精确 SKU 的官方图片 URL。
@@ -110,6 +112,19 @@ node tools/ui-preview/check-layout.mjs "<监测状态预览目录>"
 - 截图和测量只能证明这些模拟状态下的浏览器布局。原生小程序组件、权限和真实接口仍需在微信环境验收。
 
 ## 配置面板与深色模式
+
+备选颜色与门店专项使用 `--alternatives-only`，覆盖默认、勾选、月／年会员四颜色四门店、免费查询、已有记录、准备配置、空记录、错误、过期和缓存共 10 种状态，分别检查 320、375、430 像素。检查包含两列的位置、按钮填满列内容、门店整行宽度、查询按钮右对齐且不超过半行、文案不重叠及控件数量。
+
+```powershell
+node tools/ui-preview/build.mjs --alternatives-only --out output/alternatives
+node tools/ui-preview/check-layout.mjs output/alternatives
+node tools/ui-preview/check-layout.mjs output/alternatives --dark
+node tools/ui-preview/build.mjs --alternatives-only --round-rpx --out output/alternatives-rounded
+node tools/ui-preview/check-layout.mjs output/alternatives-rounded
+node tools/ui-preview/check-layout.mjs output/alternatives-rounded --dark
+```
+
+`--round-rpx` 将 rpx 的转换结果四舍五入到整数 CSS 像素，用于发现半宽 `calc()` 与独立间距相加时造成的换行。这是额外的舍入压力场景，**不是微信引擎实现，也不证明某台手机使用这种舍入规则**；报告保留 `rpxRoundingProfile`。默认仍按小数像素构建，两个模式均需检查，最终以微信真机显示为准。
 
 `--release-notes-only` 使用页面实际展开事件展示“我的 → 更新公告”，覆盖免费、会员和长内容三种状态 × 三种宽度，共 9 个快照。可配合 `check-layout.mjs` 的浅色与 `--dark` 检查全部版本条目和换行。
 

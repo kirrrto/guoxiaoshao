@@ -23,6 +23,34 @@ function pageFor(rt, data = boot()) {
 }
 const feedback = rt => rt.messages.filter(message => typeof message === 'string').at(-1);
 
+test('an accepted template is recorded even when WeChat filters the other template', async () => {
+  const rt = runtime(async (action, payload) => {
+    if (action !== 'notify.recordSubscription') return boot(6, 3);
+    assert.deepEqual(copy(payload.results), { [RESTOCK]: 'accept' });
+    return { accepted: [RESTOCK], subscriptions: subscriptions(6, 3) };
+  });
+  rt.wx.requestSubscribeMessage = async () => ({ [RESTOCK]: 'accept', [SOLDOUT]: 'filter' });
+  const page = pageFor(rt);
+  await page.onSubscribe();
+  assert.equal(page.data.subscription.credits, 6);
+  assert.equal(page.data.subscription.soldoutCredits, 3);
+  assert.match(feedback(rt), /到货 \+1，断货模板被过滤/);
+  assert.equal(rt.load('utils/reminder-credits.js').readPending(), null);
+});
+
+test('all filtered templates do not create an empty pending authorization or lose existing credits', async () => {
+  const rt = runtime();
+  rt.wx.requestSubscribeMessage = async () => ({ [RESTOCK]: 'filter', [SOLDOUT]: 'filter' });
+  const page = pageFor(rt, boot(15, 15));
+  await page.onSubscribe();
+  assert.equal(page.data.subscription.credits, 15);
+  assert.equal(page.data.subscription.soldoutCredits, 15);
+  assert.equal(page.data.subscribing, false);
+  assert.equal(rt.calls.length, 0);
+  assert.equal(rt.load('utils/reminder-credits.js').readPending(), null);
+  assert.match(feedback(rt), /模板被微信过滤/);
+});
+
 for (const [restockResult, soldoutResult, expected] of [
   ['accept', 'accept', ['到货 +1', '断货 +1']],
   ['reject', 'accept', ['断货 +1', '到货未授权']],

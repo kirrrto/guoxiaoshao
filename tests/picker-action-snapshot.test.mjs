@@ -43,3 +43,13 @@ test('saving the query sheet confirms its latest selection', () => {
   assert.deepEqual(copy(page.selection.storeNumbers), ['R765']);
   assert.equal(page.data.sheetVisible, false);
 });
+
+test('a downgraded picker preserves the fourth saved store until the user removes it', () => {
+  const rt = runtime(), catalog = rt.load('utils/store.js').currentCatalog();
+  const numbers = Object.keys(catalog.storeByNumber).slice(0, 4);
+  const picker = rt.instance('components/target-picker/index.js', { maxStores: 3 });
+  picker.onCatalog(catalog);
+  picker.onValue({ partNumber: 'MFHE4CH/A', storeNumbers: numbers });
+  assert.deepEqual(copy(picker.getSelection().storeNumbers), numbers);
+  assert.match(picker.data.selectionNote, /已保留原门店.*最多 3 家.*手动移除/);
+});

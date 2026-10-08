@@ -8,7 +8,8 @@
  * a fake clock and a simulated upstream; `run()` is the production loop.
  */
 const { mergeConfig } = require('../config');
-const { canUseReminders } = require('../rules/membership');
+const { canUseReminders, followAllowance } = require('../rules/membership');
+const { loadFollowUsers } = require('../rules/follow-access');
 const { guardedPickup } = require('./guarded-pickup');
 const { createScheduler, buildGroups } = require('./scheduler');
 const { createLeaseKeeper } = require('./lease');
@@ -100,7 +101,7 @@ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = cons
 
   async function planEvents(events, planningConfig) {
     const follows = await repo.listActiveFollows();
-    const users = new Map((await repo.getUsers([...new Set(follows.map(f => f.userKey))])).map(u => [u._id, u]));
+    const users = await loadFollowUsers(repo, follows, clock());
     const alerting = events.filter(e => alertKind(e.type));
     const latestByKey = new Map((alerting.length ? await repo.getLatest([...new Set(alerting.map(e => targetKeyOf(e.storeNumber, e.partNumber)))]) : []).map(l => [l._id, l]));
     const now = clock();
@@ -184,9 +185,14 @@ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = cons
     const stored = await repo.getConfig();
     config = mergeConfig(stored);
     const follows = await repo.listActiveFollows();
-    const users = new Map((await repo.getUsers([...new Set(follows.map(f => f.userKey))])).map(u => [u._id, u]));
+    const users = await loadFollowUsers(repo, follows, clock());
     const now = clock();
-    const eligible = follows.filter(f => users.has(f.userKey) && canUseReminders(users.get(f.userKey), now));
+    const eligible = follows.flatMap(follow => {
+      const user = users.get(follow.userKey);
+      if (!user || !canUseReminders(user, now)) return [];
+      const allowance = followAllowance(user, follow, follows, now);
+      return allowance.eligibleStoreNumbers.length ? [{ ...follow, storeNumbers: allowance.eligibleStoreNumbers }] : [];
+    });
     const groups = config.collector.enabled ? buildGroups(eligible, config.collector.maxPartsPerRequest || 20) : [];
     // Continuous monitoring in both modes fits the sustainable automatic lane,
     // independent of user count. Bursts still pass the shared admission guard.

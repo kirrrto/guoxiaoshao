@@ -52,14 +52,14 @@ function reminderReadiness({ boot, follows = [], followsLoaded = false, collecto
   const saved = follows.filter(f => f.status !== 'removed');
   const active = saved.filter(f => f.status === 'active');
   const stores = new Set();
-  for (const follow of active) for (const store of follow.stores || []) if (store.storeNumber) stores.add(store.storeNumber);
+  for (const follow of active) for (const store of follow.stores || []) if (store.storeNumber && !store.limitPaused) stores.add(store.storeNumber);
   const dndActive = activeDnd(settings, now);
   const result = { activeCount: active.length, storeCount: stores.size, dndActive, ready: false };
   const state = (code, title, detail, action, actionLabel, tone = 'warn') => ({ ...result, code, title, detail, action, actionLabel, tone });
   if (!boot) return state('loading', '正在检查提醒条件', '正在读取账户与关注状态。', '', '', 'muted');
   if (!canRemind(boot)) {
     if (boot.expired) return state('membership', '会员已到期，提醒已停止', '关注配置和剩余提醒次数会保留，续费会员后可继续使用。', 'membership', '查看会员');
-    return state('membership', '关注与到货提醒为会员专属', '会员可关注 3 个具体配置，每个配置最多 3 家门店，并可累加到货和断货提醒次数；免费用户可用查询次数实时看货。可到「我的」开通会员。', 'membership', '查看会员');
+    return state('membership', '关注与到货提醒为会员专属', '周卡可关注 3 个配置、每配置 3 家门店；月卡、年卡为 4 个配置、每配置 4 家门店，并可累加提醒次数；免费用户可用查询次数实时看货。可到「我的」开通会员。', 'membership', '查看会员');
   }
   if (!followsLoaded) return state('checking_follows', '正在确认你的关注', '读取完成后会检查是否有已开启的配置。', '', '', 'muted');
   if (!saved.length) return state('no_follows', '先给心仪配置留个哨', '还没有添加关注。选择具体型号、容量、颜色和门店后，才能参与自动检测。', 'add', '添加关注', 'muted');

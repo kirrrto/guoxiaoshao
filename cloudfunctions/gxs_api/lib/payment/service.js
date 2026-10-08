@@ -1,7 +1,7 @@
 'use strict';
 const { createHash, randomUUID } = require('node:crypto');
 const { ApiError } = require('../errors');
-const { membershipSnapshot } = require('../rules/membership');
+const { membershipSnapshot, LIMITS, ENHANCED_LIMITS } = require('../rules/membership');
 const { createVirtualPaymentProvider, PaymentProtocolError } = require('./virtual-payment');
 const { PLANS, DEFAULT_PLAN_ID, findPlan, planForTerms, planIdOfOrder } = require('./plans');
 
@@ -54,7 +54,10 @@ function presentProduct(ctx, planId) {
   const matches = configured.priceFen === plan.priceFen && configured.days === plan.days
     && (planId !== DEFAULT_PLAN_ID || ctx.config.memberProduct.id === configured.productId);
   const ready = configured.enabled === true && payment.ready === true && matches;
+  const limits = planId === DEFAULT_PLAN_ID ? LIMITS : ENHANCED_LIMITS;
   return { id: planId, planId, productId: configured.productId, title: configured.title, priceFen: configured.priceFen, days: configured.days,
+    limits: { maxFollows: limits.maxFollows, maxStoresPerFollow: limits.maxStoresPerFollow },
+    benefitText: `${limits.maxFollows} 个配置 · 每配置 ${limits.maxStoresPerFollow} 家门店`,
     note: configured.note, enabled: ready, paymentReady: ready,
     paymentReason: ready ? null : !matches ? 'payment_product_terms_mismatch' : !configured.productId ? 'payment_product_id_missing'
       : planId !== DEFAULT_PLAN_ID && configured.enabled !== true ? 'payment_plan_disabled' : payment.reason || 'payment_not_enabled',

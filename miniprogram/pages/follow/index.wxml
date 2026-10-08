@@ -77,7 +77,7 @@
           <view wx:for="{{item.stores}}" wx:for-item="s" wx:key="storeNumber" class="store-row">
             <view class="store-heading"><text class="store-name">{{s.storeLabel}}</text><view class="pill pill-dot pill-{{s.observationState === 'fresh' && s.status === 'unavailable' ? 'muted' : s.statusCls}}">{{s.statusLabel}}</view></view>
             <view class="store-observation">{{s.observationState === 'fresh' ? '观测 ' : (s.observationState === 'stale' || s.observationState === 'unknown' ? '上次检查 ' : '')}}{{s.observedText}}</view>
-            <view wx:if="{{s.observationState !== 'fresh'}}" class="observation-warning">{{s.freshnessText}}</view>
+            <view wx:if="{{s.limitPaused || s.observationState !== 'fresh'}}" class="observation-warning">{{s.freshnessText}}</view>
             <block wx:if="{{item.detailsExpanded}}">
               <view wx:if="{{s.lastKnownText}}" class="small text-2 mt">{{s.lastKnownText}}</view>
               <view wx:if="{{s.sinceText}}" class="small text-2 mt">距本轮首次记录 {{s.sinceText}}</view>
@@ -88,7 +88,8 @@
           <view class="btn-row follow-actions">
             <button wx:if="{{item.hasAvailable}}" class="btn btn-primary" data-id="{{item.followId}}" bindtap="onPickupInfo">取货信息</button>
             <button class="btn btn-outline" disabled="{{saving || followBusyId}}" data-id="{{item.followId}}" bindtap="onEdit">调整</button>
-            <button wx:if="{{boot.member}}" class="btn btn-ghost" loading="{{followBusyId === item.followId}}" disabled="{{saving || followBusyId}}" data-id="{{item.followId}}" data-status="{{item.status}}" bindtap="onToggle">{{item.status === 'active' ? '暂停' : '恢复'}}</button>
+            <button wx:if="{{item.limitPaused}}" class="btn btn-ghost" disabled="{{saving || followBusyId}}" bindtap="showMemberModal">查看套餐</button>
+            <button wx:elif="{{boot.member}}" class="btn btn-ghost" loading="{{followBusyId === item.followId}}" disabled="{{saving || followBusyId}}" data-id="{{item.followId}}" data-status="{{item.status}}" bindtap="onToggle">{{item.status === 'active' ? '暂停' : '恢复'}}</button>
           </view>
           <view class="follow-secondary"><text class="small text-2">{{item.stores.length}} 家门店 · 一个配置名额</text><button class="ui-action" hover-class="ui-control-pressed" aria-expanded="{{item.detailsExpanded}}" data-id="{{item.followId}}" bindtap="onToggleFollowDetails"><text class="ui-action-label">{{item.detailsExpanded ? '收起详情' : '详情与管理'}}</text><view class="ui-chevron {{item.detailsExpanded ? 'ui-chevron--up' : 'ui-chevron--down'}}" aria-hidden="true"></view></button></view>
           <view wx:if="{{item.detailsExpanded}}" class="follow-management"><text class="small text-2 mono" user-select>{{item.partNumber}}</text><button class="ui-action ui-action--neutral danger-action" hover-class="ui-control-pressed" disabled="{{saving || followBusyId}}" data-id="{{item.followId}}" bindtap="onRemove">删除关注</button></view>
@@ -125,3 +126,5 @@
   <target-picker id="follow-target-picker" catalog-version="{{catalogVersion}}" value="{{editor.pickerValue}}" max-stores="{{limits.maxStoresPerFollow}}" supported-only="{{true}}" in-sheet="{{true}}" bindchange="onEditorChange" />
   <view slot="notice" wx:if="{{saveError}}" class="banner banner-warn small" role="alert">{{saveError}}</view>
 </config-sheet>
+
+<reminder-nudge enabled="{{ready && followsLoaded}}" blocked="{{editing || saving || subscribing || refreshing || alert || followBusyId}}" />

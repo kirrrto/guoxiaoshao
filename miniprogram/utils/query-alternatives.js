@@ -2,6 +2,7 @@ const { sameVariant, storeChoices, freshAvailable, WINDOW_MS } = require('./alte
 const { canOfferLiveChoices } = require('./observation-insights');
 const { storeLabelWithCity } = require('./store-label');
 const fmt = require('./format');
+const { selectionLimits } = require('./member-limits');
 const own = (map, key) => map && Object.prototype.hasOwnProperty.call(map, key) ? map[key] : null;
 function options(snapshot, catalog = {}, account, now = Date.now()) {
   const base = snapshot && snapshot.product && own(catalog.productByPart, snapshot.product.partNumber);
@@ -17,7 +18,7 @@ function options(snapshot, catalog = {}, account, now = Date.now()) {
     .sort((a, b) => (b.partNumber === base.partNumber) - (a.partNumber === base.partNumber) || a.partNumber.localeCompare(b.partNumber))
     .map(product => ({ partNumber: product.partNumber, label: product.attributes && product.attributes.color || '本次配置', current: product.partNumber === base.partNumber }));
   const original = [...new Set((snapshot.results || []).map(row => row.storeNumber))];
-  const stores = storeChoices(Object.values(catalog.storeByNumber || {}), original).map(choice => {
+  const stores = storeChoices(Object.values(catalog.storeByNumber || {}), original, selectionLimits(account).stores).map(choice => {
     const store = own(catalog.storeByNumber, choice.storeNumber), anchor = own(catalog.storeByNumber, choice.anchorStoreNumber);
     return { ...choice, label: storeLabelWithCity(store.storeNumber, store.name, store.city),
       relationText: choice.relation === 'original' ? '本次查询门店' : choice.relation === 'nearby'
@@ -27,8 +28,9 @@ function options(snapshot, catalog = {}, account, now = Date.now()) {
 }
 function matches(response, snapshot, catalog, account, now = Date.now()) {
   const available = options(snapshot, catalog, account, now);
+  const limits = selectionLimits(account);
   if (!available.canRead || !response || !snapshot || !snapshot.product || response.queryId !== snapshot.queryId || response.basePartNumber !== snapshot.product.partNumber
-    || !Array.isArray(response.partNumbers) || !Array.isArray(response.storeNumbers) || response.partNumbers.length > 3 || response.storeNumbers.length > 3
+    || !Array.isArray(response.partNumbers) || !Array.isArray(response.storeNumbers) || response.partNumbers.length > limits.colors || response.storeNumbers.length > limits.stores
     || Date.parse(response.expiresAt) !== Date.parse(snapshot.alternativesExpiresAt) || !Number.isFinite(Date.parse(response.readAt)) || Date.parse(response.readAt) > now) return [];
   return (response.results || []).filter(row => available.colors.some(item => item.partNumber === row.partNumber)
     && available.stores.some(item => item.storeNumber === row.storeNumber) && response.partNumbers.includes(row.partNumber) && response.storeNumbers.includes(row.storeNumber) && freshAvailable(row, now)
