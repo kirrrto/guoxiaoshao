@@ -6,13 +6,14 @@ const { syncTabBar } = require('../../utils/tab-bar');
 const { restockSubscription, soldoutSubscription, reminderReadiness, canRemind, creditBoostTip } = require('../../utils/reminder-readiness');
 const { shareAppMessage, shareTimeline } = require('../../utils/share');
 const { monitorPollDelay } = require('../../utils/poll');
-const { FINAL_ERRORS, readPending, savePending, clearPending, beginSubscription, endSubscription, refreshConsentSetting, topUpReminderCredit } = require('../../utils/reminder-credits');
+const { FINAL_ERRORS, readPending, savePending, clearPending, beginSubscription, endSubscription, refreshConsentSetting, topUpReminderCredit, normalizeSubscriptionResults, normalizePendingAuthorization } = require('../../utils/reminder-credits');
 const { confirmTap } = require('../../utils/haptic');
 
 const FOLLOW_STATUS = {
   active: { label: '关注已开启', cls: 'ok' },
   paused: { label: '关注已暂停', cls: 'muted' },
   expired: { label: '会员已到期，监测已停止', cls: 'warn' },
+  limit_paused: { label: '超出当前套餐名额', cls: 'muted' },
 };
 
 const DELIVERY_REASON = {
@@ -81,13 +82,15 @@ function presentFollow(follow, boot, catalog, collector) {
   const status = { ...(FOLLOW_STATUS[follow.status] || { label: follow.status, cls: 'muted' }) };
   if (follow.status === 'paused' && ['member_expired', 'membership_expired'].includes(follow.statusReason)) status.label = '会员到期，已暂停';
   if (follow.status === 'expired') status.label = '会员已到期，监测已停止';
-  let monitoringText = '';
+  let monitoringText = follow.status === 'limit_paused' ? '配置已保留，月卡／年卡可恢复第 4 个名额' : '';
   if (follow.status === 'active') {
     if (!canRemind(boot)) { status.cls = 'warn'; monitoringText = '会员未生效，当前不参与自动检测'; }
     else if (!collector || collector.state !== 'running' || collector.observationStale) monitoringText = '关注已保存，后台检测情况见上方';
   }
   const product = catalog && catalog.productByPart && catalog.productByPart[follow.partNumber];
-  const stores = (follow.stores || []).map(s => ({ ...s, storeName: storeLabel(s.storeNumber, s.storeName), storeLabel: storeLabelWithCity(s.storeNumber, s.storeName, s.city), ...fmt.stockObservation(s, now, { restricted: follow.latestRestricted }) }));
+  const stores = (follow.stores || []).map(s => ({ ...s, storeName: storeLabel(s.storeNumber, s.storeName), storeLabel: storeLabelWithCity(s.storeNumber, s.storeName, s.city), ...fmt.stockObservation(s, now, { restricted: follow.latestRestricted }),
+    ...(s.limitPaused ? { statusLabel: follow.limitPaused ? '配置超出套餐名额' : '超出套餐门店上限', statusCls: 'muted',
+      freshnessText: follow.limitPaused ? '配置和门店已保留，恢复配置名额后继续检测。' : '门店已保留，当前暂停检测；月卡／年卡可恢复第 4 家门店。' } : {}) }));
   return {
     ...follow,
     imageUrl: product && product.imageUrl || '',
@@ -95,7 +98,7 @@ function presentFollow(follow, boot, catalog, collector) {
     statusLabel: status.label,
     statusCls: status.cls,
     monitoringText,
-    hasAvailable: stores.some(s => s.observationState === 'fresh' && s.status === 'available'),
+    hasAvailable: follow.status !== 'limit_paused' && stores.some(s => !s.limitPaused && s.observationState === 'fresh' && s.status === 'available'),
     detailsExpanded: follow.detailsExpanded === true,
     stores,
   };
@@ -527,7 +530,7 @@ Page({
     const product = this.data.boot.memberProduct || {};
     wx.showModal({
       title: '关注与到货提醒为会员专属',
-      content: `会员可关注 3 个具体配置，每个配置最多 3 家门店，并可累加到货和断货提醒次数。免费用户可用查询次数实时看货。${product.paymentReady ? '' : '\n\n会员购买暂未开放，可在「我的」查看状态。'}`,
+      content: `周卡可关注 3 个具体配置，每个配置最多 3 家门店；月卡和年卡增加至 4 个配置、每个配置 4 家门店。会员可累加到货和断货提醒次数。免费用户可用查询次数实时看货。${product.paymentReady ? '' : '\n\n会员购买暂未开放，可在「我的」查看状态。'}`,
       confirmText: '前往我的',
       success: r => { if (r.confirm) wx.switchTab({ url: '/pages/mine/index' }); },
     });
@@ -578,7 +581,7 @@ Page({
     if (this.editorBaseline === null) this.editorBaseline = selectionKey({ ...selection, storeNumbers: [] });
     const title = selection && selection.product && selection.product.title || '请选择具体配置';
     const count = selection && Array.isArray(selection.storeNumbers) ? selection.storeNumbers.length : 0;
-    this.setData({ editorCanSave: Boolean(selection && selection.partNumber && selection.product && selection.product.supported && count), editorDirty: selectionKey(selection) !== this.editorBaseline, editorSummary: `${title} · ${count} 家门店`, saveError: '' });
+    this.setData({ editorCanSave: Boolean(selection && selection.partNumber && selection.product && selection.product.supported && count && count <= this.data.limits.maxStoresPerFollow), editorDirty: selectionKey(selection) !== this.editorBaseline, editorSummary: `${title} · ${count} 家门店`, saveError: '' });
   },
 
   async onSave() {
@@ -592,6 +595,7 @@ Page({
     if (!selection || !selection.partNumber) return toast('请选择具体配置');
     if (!selection.product || !selection.product.supported) return toast('此配置暂未开放监测');
     if (!Array.isArray(selection.storeNumbers) || !selection.storeNumbers.length) return toast('请至少选择一家门店');
+    if (selection.storeNumbers.length > this.data.limits.maxStoresPerFollow) return toast(`当前套餐每个配置最多 ${this.data.limits.maxStoresPerFollow} 家门店，请手动移除超出的门店后保存`);
     const payload = { followId: editor.followId, partNumber: selection.partNumber, storeNumbers: selection.storeNumbers.slice() };
     const toppedUp = topUpReminderCredit();
     this.setData({ saving: true, saveError: '' });
@@ -670,9 +674,16 @@ Page({
         if (/20004/.test(msg)) return toast('你已关闭订阅消息总开关，请在设置中开启');
         return toast('授权未完成');
       }
-      const results = {};
-      for (const id of tmplIds) if (res[id]) results[id] = res[id];
-      const pending = { requestId, results };
+      const { results, filtered } = normalizeSubscriptionResults(tmplIds, res);
+      if (!Object.keys(results).length) {
+        if (!this.pageRetired) {
+          this.setData({ subscribing: false });
+          toast(filtered.length ? '提醒模板被微信过滤，请稍后重试；已有次数保留' : '本次未授权，已有次数保留');
+        }
+        refreshConsentSetting();
+        return;
+      }
+      const pending = { requestId, results, ...(filtered.length ? { filtered } : {}) };
       savePending(pending);
       if (!this.pageRetired) this.setData({ subscriptionPending: true });
       this.refreshReadiness();
@@ -683,7 +694,17 @@ Page({
   async flushSubscription(pending) {
     if (!this.pageRetired) this.setData({ subscribing: true });
     try {
-      const data = await call('notify.recordSubscription', pending);
+      pending = normalizePendingAuthorization(pending);
+      if (!Object.keys(pending.results).length) {
+        clearPending(pending);
+        if (!this.pageRetired) {
+          this.setData({ subscriptionPending: false });
+          toast(pending.filtered && pending.filtered.length ? '提醒模板被微信过滤，已有次数保留' : '本次未授权，已有次数保留');
+        }
+        return;
+      }
+      savePending(pending);
+      const data = await call('notify.recordSubscription', { requestId: pending.requestId, results: pending.results });
       const restockId = this.data.boot.templateIds[0];
       const credits = restockSubscription({ templateIds: { restock: restockId } }, data.subscriptions).credits;
       clearPending(pending);
@@ -697,7 +718,7 @@ Page({
         toast('已有授权已同步，未重复增加次数');
       } else if (soldoutId) {
         const accepted = Array.isArray(data.accepted) ? data.accepted : [];
-        const outcome = (label, id) => accepted.includes(id) ? `${label} +1` : pending.results && pending.results[id] === 'ban' ? `${label}授权已关闭` : `${label}未授权`;
+        const outcome = (label, id) => accepted.includes(id) ? `${label} +1` : (pending.filtered || []).includes(id) ? `${label}模板被过滤` : pending.results && pending.results[id] === 'ban' ? `${label}授权已关闭` : `${label}未授权`;
         if (accepted.includes(restockId) || accepted.includes(soldoutId)) confirmTap();
         toast(`${outcome('到货', restockId)}，${outcome('断货', soldoutId)}`);
       } else if (result === 'accept') {
@@ -822,7 +843,8 @@ Page({
     const follow = this.data.follows.find(item => item.followId === e.currentTarget.dataset.id);
     if (!follow) return;
     const current = presentFollow(follow, this.data.boot || {}, this.catalog, this.data.collector);
-    const stores = current.stores.filter(store => store.observationState === 'fresh' && store.status === 'available');
+    if (follow.status === 'limit_paused') return toast('当前套餐名额不足，配置已保留；可升级月卡或年卡恢复');
+    const stores = current.stores.filter(store => !store.limitPaused && store.observationState === 'fresh' && store.status === 'available');
     this.refreshFollowPresentation();
     if (!stores.length) return toast('观测已过期，请刷新后再确认');
     wx.showModal({ title: '最近观测可取货', content: `${follow.productTitle}\n${stores.map(store => `${store.storeLabel}\n观测 ${store.observedText}${typeof store.quote === 'string' && store.quote ? '\n' + store.quote : ''}`).join('\n\n')}\n\n库存可能变化，请在 Apple Store App 或官网确认。`, confirmText: '复制配置', cancelText: '返回', success: result => {

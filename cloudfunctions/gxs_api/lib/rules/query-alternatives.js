@@ -27,7 +27,7 @@ function distanceKm(a, b) {
   const h = Math.sin(lat / 2) ** 2 + Math.cos(a[0] * rad) * Math.cos(b[0] * rad) * Math.sin(lng / 2) ** 2;
   return 6371 * 2 * Math.asin(Math.min(1, Math.sqrt(h)));
 }
-function storeChoices(stores, originalNumbers) {
+function storeChoices(stores, originalNumbers, maxChoices = MAX_CHOICES) {
   const valid = stores.filter(store => store && /^R\d{3}$/.test(store.storeNumber));
   const anchors = originalNumbers.map(number => valid.find(store => store.storeNumber === number)).filter(Boolean);
   const original = anchors.map(store => ({ storeNumber: store.storeNumber, relation: 'original', anchorStoreNumber: store.storeNumber, distanceKm: null }));
@@ -43,7 +43,7 @@ function storeChoices(stores, originalNumbers) {
     }).sort((a, b) => (a.distanceKm === null) - (b.distanceKm === null) || (a.distanceKm || 0) - (b.distanceKm || 0));
     return relationships.length ? [{ storeNumber: store.storeNumber, ...relationships[0] }] : [];
   }).sort((a, b) => (a.distanceKm === null) - (b.distanceKm === null) || (a.distanceKm || 0) - (b.distanceKm || 0) || a.storeNumber.localeCompare(b.storeNumber));
-  return [...original, ...others.slice(0, MAX_CHOICES)];
+  return [...original, ...others.slice(0, maxChoices)];
 }
 function freshAvailable(row, now) {
   const observed = Date.parse(row && row.observedAt), known = row && row.knownAt ? Date.parse(row.knownAt) : observed;

@@ -56,16 +56,16 @@ function settle(membership = {}, nowIso) {
       const remainingMs = segment.remainingMs - consumed;
       if (remainingMs) segments.push({ ...segment, remainingMs });
     }
-    ledger = { version: 1, settledAt: iso(at), segments };
+    ledger = { ...saved, version: 1, settledAt: iso(at), segments };
   }
   return materialize(membership, ledger);
 }
 
-function grant(membership, { orderId, source, milliseconds, nowIso }) {
+function grant(membership, { orderId, source, milliseconds, nowIso, planId }) {
   if (typeof orderId !== 'string' || !orderId || !nonnegative(milliseconds) || milliseconds === 0) invalid();
   const settled = settle(membership, nowIso), ledger = settled.entitlements;
   if (ledger.segments.some(segment => segment.orderId === orderId)) throw new ApiError('membership_entitlement_conflict', '该订单的会员权益已存在，请联系客服核对');
-  ledger.segments.push({ orderId, source: source || 'membership_order', remainingMs: milliseconds });
+  ledger.segments.push({ orderId, source: source || 'membership_order', remainingMs: milliseconds, ...(planId ? { planId } : {}) });
   return { ...materialize(settled, ledger), source: source || 'membership_order' };
 }
 

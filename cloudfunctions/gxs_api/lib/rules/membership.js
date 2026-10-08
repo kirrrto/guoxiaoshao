@@ -1,5 +1,6 @@
 'use strict';
 const { toDate, addDays } = require('../time');
+const { settle } = require('./membership-entitlements');
 
 /** Product limits for paid members: 3 SKUs × up to 3 stores each. */
 const LIMITS = Object.freeze({
@@ -7,6 +8,45 @@ const LIMITS = Object.freeze({
   maxStoresPerFollow: 3,
   defaultMemberDays: 30,
 });
+const ENHANCED_LIMITS = Object.freeze({ ...LIMITS, maxFollows: 4, maxStoresPerFollow: 4 });
+
+function planSnapshot(user, now) {
+  if (!isMember(user, now)) return { planId: null, enhanced: false, enhancedExpiresAt: null };
+  const membership = settle(user.membership, toDate(now).toISOString());
+  let cursor = Date.parse(membership.entitlements.settledAt), enhancedUntil = null, planId = null;
+  for (const segment of membership.entitlements.segments) {
+    cursor += segment.remainingMs;
+    if (segment.source !== 'virtual_payment') continue;
+    if (segment.planId === 'member_7d' && !planId) planId = segment.planId;
+    if (['member_30d', 'member_365d'].includes(segment.planId)) {
+      enhancedUntil = cursor;
+      if (planId !== 'member_365d') planId = segment.planId;
+    }
+  }
+  return { planId, enhanced: enhancedUntil !== null, enhancedExpiresAt: enhancedUntil === null ? null : new Date(enhancedUntil).toISOString() };
+}
+
+function memberLimits(user, now) {
+  const limits = planSnapshot(user, now).enhanced ? ENHANCED_LIMITS : LIMITS;
+  return isMember(user, now) ? limits : { ...limits, maxFollows: 0 };
+}
+
+function accountLimits(user, now, config) {
+  const limits = memberLimits(user, now);
+  const base = Math.min(3, Math.max(1, Number(config && config.query && config.query.maxStores) || 3));
+  return { ...limits, queryMaxStores: base < 3 ? base : limits.maxStoresPerFollow, alternativeMaxColors: limits.maxStoresPerFollow };
+}
+
+/** Saved slots have stable ownership even if the user pauses or edits a follow. */
+function followAllowance(user, follow, follows, now) {
+  const limits = memberLimits(user, now);
+  const sorted = (user && user._followPolicy || follows || []).filter(item => item.userKey === follow.userKey && item.status !== 'removed')
+    .slice().sort((a, b) => String(a.createdAt || '').localeCompare(String(b.createdAt || '')) || a._id.localeCompare(b._id));
+  const position = sorted.findIndex(item => item._id === follow._id);
+  const allowed = position >= 0 && position < limits.maxFollows;
+  return { limitPaused: isMember(user, now) && !allowed,
+    eligibleStoreNumbers: allowed ? follow.storeNumbers.slice(0, limits.maxStoresPerFollow) : [] };
+}
 
 function membershipExpiresAt(user) {
   const value = user && user.membership && user.membership.expiresAt;
@@ -39,7 +79,8 @@ function membershipSnapshot(user, now) {
     active,
     expiresAt: expiresAt ? expiresAt.toISOString() : null,
     remainingMs: active ? expiresAt.getTime() - toDate(now).getTime() : 0,
-    limits: LIMITS,
+    ...planSnapshot(user, now),
+    limits: memberLimits(user, now),
   };
 }
 
@@ -48,10 +89,10 @@ function membershipSnapshot(user, now) {
  * existing follows (excluding the one being edited), `candidate` is the new
  * or edited follow. Returns { ok, reason }.
  */
-function validateFollowLimits(follows, candidate, maxFollows = LIMITS.maxFollows) {
+function validateFollowLimits(follows, candidate, maxFollows = LIMITS.maxFollows, maxStores = LIMITS.maxStoresPerFollow) {
   const stores = Array.isArray(candidate.storeNumbers) ? [...new Set(candidate.storeNumbers)] : [];
   if (stores.length === 0) return { ok: false, reason: 'no_stores' };
-  if (stores.length > LIMITS.maxStoresPerFollow) return { ok: false, reason: 'too_many_stores' };
+  if (stores.length > maxStores) return { ok: false, reason: 'too_many_stores' };
   if (!candidate.partNumber) return { ok: false, reason: 'no_part_number' };
   if (follows.some(follow => follow.partNumber === candidate.partNumber)) return { ok: false, reason: 'duplicate_part_number' };
   if (follows.length >= maxFollows) return { ok: false, reason: 'too_many_follows' };
@@ -77,4 +118,4 @@ function reminderBlockReason(user) {
   return user && user.membership && user.membership.expiresAt ? 'member_expired' : 'membership_required';
 }
 
-module.exports = { LIMITS, FREE_REMINDER_FOLLOWS, isMember, hasFreeReminder, canUseReminders, reminderBlockReason, extendMembership, membershipSnapshot, membershipExpiresAt, validateFollowLimits };
+module.exports = { LIMITS, ENHANCED_LIMITS, FREE_REMINDER_FOLLOWS, isMember, hasFreeReminder, canUseReminders, reminderBlockReason, extendMembership, membershipSnapshot, membershipExpiresAt, validateFollowLimits, planSnapshot, memberLimits, accountLimits, followAllowance };

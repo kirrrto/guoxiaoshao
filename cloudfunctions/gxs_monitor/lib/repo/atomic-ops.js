@@ -8,7 +8,8 @@ const { ApiError } = require('../errors');
 const { dayKey } = require('../time');
 const { decideLiveQuery, decideHistoryQuery } = require('../rules/access');
 const { grantableAmount, ledgerIds } = require('../rules/quota');
-const { LIMITS, FREE_REMINDER_FOLLOWS, isMember, hasFreeReminder, canUseReminders, validateFollowLimits } = require('../rules/membership');
+const { isMember, hasFreeReminder, canUseReminders, validateFollowLimits, memberLimits, accountLimits, followAllowance } = require('../rules/membership');
+const { purchasedPlan, needsPlanMetadata, resolvePlanMetadata } = require('../rules/member-plan');
 const membershipEntitlements = require('../rules/membership-entitlements');
 const { applyObservation, targetKeyOf } = require('../engine/events');
 const { observationDayId, appendObservationDay } = require('../engine/observation-day');
@@ -25,6 +26,12 @@ const { matchesNotificationTarget, nextFollowUpdatedAt } = require('../notificat
 
 const quotaBalance = user => ({ balance: user.quota.balance,
   quotaRevision: Number.isInteger(user.quota.revision) ? user.quota.revision : 0 });
+
+async function hydrateMemberPlansIn(tx, user) {
+  if (!needsPlanMetadata(user)) return false;
+  user.membership = (await resolvePlanMetadata(user, id => tx.get(C.orders, id))).membership;
+  return true;
+}
 
 async function applyLedgerIn(tx, entry) {
   const user = await tx.get(C.users, entry.userKey);
@@ -55,7 +62,10 @@ async function fulfilMembershipIn(tx, user, order, source, nowIso) {
   const refundedMs = refundFen ? membershipEntitlements.refundDurationMs(order, refundFen) : 0;
   const grantedMs = membershipEntitlements.durationMs(order) - refundedMs;
   if (grantedMs <= 0) throw new ApiError('order_refunded', '订单已全额退款，不能再发放会员');
-  user.membership = { ...membershipEntitlements.grant(user.membership || {}, { orderId: order._id, source, milliseconds: grantedMs, nowIso }), lastOrderId: order.orderId };
+  await hydrateMemberPlansIn(tx, user);
+  const planId = source === 'virtual_payment' ? purchasedPlan(order, user, true) : null;
+  user.membership = { ...membershipEntitlements.grant(user.membership || {}, { orderId: order._id, source, milliseconds: grantedMs, nowIso, planId }), lastOrderId: order.orderId };
+  user.membership.entitlements.planMetadataVersion = 1;
   const expiresAt = user.membership.expiresAt;
   const fulfilled = { ...order, status: refundFen > 0 ? 'partially_refunded' : 'fulfilled', fulfilledAt: user.membership.entitlements.settledAt, entitlementFulfilled: true, entitlementGrantedMs: grantedMs, entitlementSourceId: order._id };
   await tx.put(C.users, user);
@@ -96,6 +106,11 @@ async function refundMembershipIn(tx, { orderId, nowIso, refundFen, providerData
 
 function atomicMethods(run) {
   return {
+    ensureMemberPlanMetadata: ({ userKey }) => run(async tx => {
+      const user = await tx.get(C.users, userKey);
+      if (user && await hydrateMemberPlansIn(tx, user)) await tx.put(C.users, user);
+      return user;
+    }),
     ...notificationTestMethods(run, applyLedgerIn),
     ...memberRecordMethods(run),
     acquireLease: ({ id, ownerId, now, expiresAt }) => run(async tx => {
@@ -252,6 +267,11 @@ function atomicMethods(run) {
         await tx.put(C.queries, resumed);
         return { record: resumed, ...quotaBalance(user), recovered: true };
       }
+      if (record.kind === 'live') {
+        if (await hydrateMemberPlansIn(tx, user)) await tx.put(C.users, user);
+        const maxStores = accountLimits(user, new Date(nowIso), config).queryMaxStores;
+        if (record.storeNumbers.length > maxStores) throw new ApiError('too_many_stores', `单次最多查询 ${maxStores} 家门店`);
+      }
       const decision = record.kind === 'history'
         ? decideHistoryQuery({ user, product, requestedDayKey: record.dayKey, now: new Date(nowIso), config })
         : decideLiveQuery({ user, product, now: new Date(nowIso), config });
@@ -340,23 +360,31 @@ function atomicMethods(run) {
       const { userKey, follow, followId, status, nowIso, knownFollows = [] } = args;
       const user = await tx.get(C.users, userKey);
       if (!user) throw new ApiError('user_missing', '用户不存在');
+      await hydrateMemberPlansIn(tx, user);
       const id = follow ? follow._id : followId;
       const existing = await tx.get(C.follows, id);
-      const index = user.followIndex || knownFollows.filter(f => f.status !== 'removed').map(f => ({ _id: f._id, partNumber: f.partNumber, status: f.status }));
+      const knownIndex = [...new Map([...knownFollows, ...(user.followIndex || [])].map(f => [f._id, f])).values()];
       const at = new Date(nowIso);
+      const limits = memberLimits(user, at);
+      const savedFollows = (await Promise.all(knownIndex.map(item => tx.get(C.follows, item._id))))
+        .filter(f => f && f.userKey === userKey && f.status !== 'removed');
+      const index = savedFollows.map(f => ({ _id: f._id, partNumber: f.partNumber, status: f.status, createdAt: f.createdAt }));
       if ((follow || status === 'active') && !canUseReminders(user, at)) throw new ApiError('member_required', '关注与到货提醒为会员专属，开通会员后可新增或恢复关注');
       let next;
       if (follow) {
-        const check = validateFollowLimits(index.filter(f => f._id !== id && f.status !== 'removed'), follow, isMember(user, at) ? LIMITS.maxFollows : FREE_REMINDER_FOLLOWS);
-        if (!check.ok) throw new ApiError(check.reason, '关注设置超过限制：最多 3 个机型，每个机型最多 3 家门店');
+        if (existing && existing.status !== 'removed' && followAllowance(user, existing, savedFollows, at).limitPaused) throw new ApiError('plan_limit', '该配置超出当前套餐名额，请先移除其他配置或升级月卡、年卡');
+        const others = index.filter(f => f._id !== id && f.status !== 'removed');
+        const check = validateFollowLimits(others, follow, existing && existing.status !== 'removed' ? Math.max(limits.maxFollows, others.length + 1) : limits.maxFollows, limits.maxStoresPerFollow);
+        if (!check.ok) throw new ApiError(check.reason, `关注设置超过限制：最多 ${limits.maxFollows} 个配置，每个配置最多 ${limits.maxStoresPerFollow} 家门店`);
         next = { ...follow, storeNumbers: check.storeNumbers, createdAt: existing ? existing.createdAt : follow.createdAt };
       } else {
         if (!existing || existing.userKey !== userKey || existing.status === 'removed') throw new ApiError('unknown_follow', '关注不存在');
+        if (status === 'active' && followAllowance(user, existing, savedFollows, at).limitPaused) throw new ApiError('plan_limit', '该配置超出当前套餐名额，请先移除其他配置或升级月卡、年卡');
         next = { ...existing, status, statusReason: status === 'active' ? null : 'user', updatedAt: nowIso };
       }
       next.updatedAt = nextFollowUpdatedAt(existing, nowIso);
       user.followIndex = index.filter(f => f._id !== id);
-      if (next.status !== 'removed') user.followIndex.push({ _id: id, partNumber: next.partNumber, status: next.status });
+      if (next.status !== 'removed') user.followIndex.push({ _id: id, partNumber: next.partNumber, status: next.status, createdAt: next.createdAt });
       await tx.put(C.users, user);
       await tx.put(C.follows, next);
       return next;
@@ -383,7 +411,7 @@ function atomicMethods(run) {
         const user = await tx.get(C.users, userKey);
         if (!user) throw new ApiError('user_missing', '用户不存在');
         const index = user.followIndex || knownFollows.filter(f => f.status !== 'removed').map(f => ({ _id: f._id, partNumber: f.partNumber, status: f.status }));
-        user.followIndex = [...index.filter(f => f._id !== follow._id), { _id: follow._id, partNumber: follow.partNumber, status: 'paused' }];
+        user.followIndex = [...index.filter(f => f._id !== follow._id), { _id: follow._id, partNumber: follow.partNumber, status: 'paused', createdAt: follow.createdAt }];
         await tx.put(C.users, user);
         await tx.put(C.follows, { ...follow, status: 'paused', statusReason: 'user', updatedAt: nextFollowUpdatedAt(follow, nowIso) });
       }

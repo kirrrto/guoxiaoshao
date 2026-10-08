@@ -38,6 +38,16 @@ test('expired membership starts at confirmation-time estimate rather than extend
   assert.equal(value.extensionText, '本次开通 30 天');
 });
 
+test('member purchase cards describe server-issued limits without inferring rights from duration', () => {
+  const { page, boot } = account();
+  boot.memberProducts = products.map((p, index) => ({ ...p, limits: { maxFollows: index ? 4 : 3, maxStoresPerFollow: index ? 4 : 3 } }));
+  page.applyBoot(boot);
+  assert.deepEqual(JSON.parse(JSON.stringify(page.data.boot.memberProducts.map(p => p.benefitShort))), ['3 配置 × 3 门店', '4 配置 × 4 门店', '4 配置 × 4 门店']);
+  page.onOpenMembershipUpgrade();
+  assert.match(page.data.membershipUpgradePreview.description, /4 个配置.*4 家门店/);
+  assert.match(renewalPreview(products[2], boot.membership).description, /3 个配置.*3 家门店/, 'legacy server snapshots cannot be upgraded solely by a 365-day label');
+});
+
 test('paid member upgrade selects a long-term package at full price without ordering or changing existing membership', () => {
   const { rt, page } = account();
   const originalExpiry = page.data.membership.expiresAt;

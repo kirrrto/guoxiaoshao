@@ -158,6 +158,10 @@
 .order-record-actions > text { flex: 1; }
 .order-record-note { margin: 16rpx 0; line-height: 1.6; color: var(--text); }
 
+
+.member-enhanced { margin-top:12rpx; color:var(--warn); font-size:22rpx; line-height:1.6; }
+.membership-package-benefit { display:block; margin:8rpx 0; color:var(--text-2); font-size:20rpx; line-height:1.5; white-space:normal; }
+
 @media (prefers-color-scheme: dark) {
   .notification-button.notification-delete { color: var(--bad); border-color: rgba(242, 155, 147, 0.28); background: var(--bad-soft); }
   /* Keep the same brand fill and readable foreground in both themes. */

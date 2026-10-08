@@ -1,5 +1,6 @@
 const PLAN_IDS = ['member_7d', 'member_30d', 'member_365d'];
 const fmt = require('./format');
+const { productBenefit } = require('./member-limits');
 
 function planId(product) {
   if (product && PLAN_IDS.includes(product.planId)) return product.planId;
@@ -23,7 +24,7 @@ function renewalPreview(product, membership, now = Date.now()) {
   const end = Number.isInteger(days) && days > 0 ? (active ? expires : now) + days * 86400000 : NaN;
   return {
     title: active ? '剩余有效期继续保留' : '付款确认后开通',
-    description: '按所选套餐全价购买，权益相同，不抵扣差价，不自动续费。',
+    description: `本套餐：${productBenefit(product)}。按全价购买，不抵扣差价，不自动续费。月／年卡额外名额在已购月／年卡时长尚未用完时有效。`,
     extensionText: Number.isInteger(days) && days > 0 ? `${active ? '在原到期时间后增加' : '本次开通'} ${days} 天` : '',
     expiresAtText: Number.isFinite(end) && Number.isFinite(new Date(end).getTime()) ? fmt.fmtDateTime(end) : '',
   };

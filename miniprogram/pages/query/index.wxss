@@ -72,11 +72,16 @@
 .alternative-caption { margin-top: 8rpx; font-size: 22rpx; line-height: 1.55; color: var(--text-3); }
 .alternative-section-title { display: flex; align-items: center; justify-content: space-between; gap: 16rpx; margin-top: 24rpx; margin-bottom: 12rpx; color: var(--text-2); font-size: 24rpx; font-weight: 500; }
 .alternative-count { flex: none; color: var(--text-3); font-size: 22rpx; font-weight: 400; }
-.alternative-colors { display: flex; flex-wrap: wrap; align-items: stretch; gap: 12rpx; width: 100%; }
+.alternative-colors { display: flex; flex-wrap: wrap; align-items: stretch; width: 100%; margin-bottom: -12rpx; }
+/* The view owns each 50% column; spacing stays inside it. Separate rpx
+   rounding of a calc width and gap must not push the second button to a new row. */
+.alternative-color-column { box-sizing: border-box; display: flex; flex: 0 0 50%; width: 50%; max-width: 50%; min-width: 0; padding-bottom: 12rpx; }
+.alternative-color-column:nth-child(odd) { padding-right: 6rpx; }
+.alternative-color-column:nth-child(even) { padding-left: 6rpx; }
 /* Scoped selectors override native button sizing and centering without changing other controls. */
-.alternative-panel .alternative-chip, .alternative-panel .alternative-store, .alternative-panel .alternative-query-button, .alternative-panel .alternative-read-button { box-sizing: border-box; margin: 0; min-width: 0; min-height: 44px; min-height: max(44px, 80rpx); padding: 14rpx 18rpx; font-size: 24rpx; line-height: 1.4; color: var(--text); white-space: normal; border: 1rpx solid var(--line); border-radius: 14rpx; background: var(--surface-soft); }
+.alternative-panel .alternative-chip, .alternative-panel .alternative-store, .alternative-panel .alternative-query-button, .alternative-panel .alternative-read-button { box-sizing: border-box; margin: 0; min-width: 0; height: auto; min-height: 44px; min-height: max(44px, 80rpx); padding: 14rpx 18rpx; font-size: 24rpx; line-height: 1.4; color: var(--text); white-space: normal; border: 1rpx solid var(--line); border-radius: 14rpx; background: var(--surface-soft); }
 .alternative-chip::after, .alternative-store::after, .alternative-query-button::after, .alternative-read-button::after { border: none; }
-.alternative-panel .alternative-colors .alternative-chip { display: flex; flex: 0 0 calc(50% - 6rpx); align-items: center; justify-content: space-between; gap: 8rpx; width: calc(50% - 6rpx); max-width: calc(50% - 6rpx); text-align: left; }
+.alternative-panel .alternative-colors .alternative-chip { display: flex; flex: 1 1 auto; align-items: center; justify-content: space-between; gap: 8rpx; width: 100%; max-width: 100%; text-align: left; }
 .alternative-chip-label { flex: 1; min-width: 0; overflow-wrap: anywhere; }
 .alternative-current { display: block; margin-top: 2rpx; font-size: 21rpx; color: var(--text-3); }
 .alternative-check { display: flex; align-items: center; justify-content: center; flex: 0 0 30rpx; height: 30rpx; border: 1rpx solid var(--line); border-radius: 8rpx; font-size: 22rpx; color: var(--text-3); background: var(--surface); }
@@ -89,9 +94,11 @@
 .alternative-store-relation { font-size: 21rpx; color: var(--text-3); overflow-wrap: anywhere; }
 .alternative-summary { margin-top: 20rpx; font-size: 23rpx; line-height: 1.55; color: var(--green-dark); overflow-wrap: anywhere; }
 .alternative-query-list { margin-top: 12rpx; }
-.alternative-query-row { display: flex; align-items: center; justify-content: space-between; gap: 12rpx; padding: 8rpx 0; }
-.alternative-query-color { flex: 1; min-width: 0; font-size: 24rpx; font-weight: 500; overflow-wrap: anywhere; }
-.alternative-panel .alternative-query-button { flex: 0 0 65%; width: 65%; max-width: 65%; padding: 14rpx 16rpx; background: var(--green); border-color: var(--green); color: var(--green-ink); font-size: 23rpx; font-weight: 600; }
+.alternative-query-row { display: flex; align-items: center; justify-content: space-between; gap: 16rpx; padding: 10rpx 0; }
+.alternative-query-copy { flex: 1; min-width: 0; }
+.alternative-query-color { display: block; font-size: 24rpx; font-weight: 500; overflow-wrap: anywhere; }
+.alternative-query-hint { display: block; margin-top: 4rpx; color: var(--text-3); font-size: 21rpx; line-height: 1.45; }
+.alternative-panel .alternative-query-button { flex: none; width: 152rpx; min-width: 76px; max-width: 50%; padding: 12rpx; background: var(--green); border-color: var(--green); color: var(--green-ink); font-size: 23rpx; font-weight: 600; white-space: nowrap; }
 .alternative-observations { margin-top: 20rpx; padding-top: 20rpx; border-top: 1rpx solid var(--line); }
 .alternative-panel .alternative-read-button { width: 100%; max-width: 100%; color: var(--text-2); background: var(--surface-soft); }
 .alternative-empty { margin-top: 16rpx; padding: 16rpx; border-radius: 12rpx; background: var(--surface-soft); font-size: 23rpx; line-height: 1.6; color: var(--text-2); }

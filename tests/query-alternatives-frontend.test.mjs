@@ -6,6 +6,34 @@ import { userKeyOf } from './helpers/fixture.mjs';
 const copy = value => JSON.parse(JSON.stringify(value));
 const event = (kind, value) => ({ currentTarget: { dataset: { kind, value } } });
 const deferred = () => { let resolve; const promise = new Promise(done => { resolve = done; }); return { promise, resolve }; };
+
+test('monthly limits reach actual four-color/four-store selection and observation results; a downgrade trims only the unsaved alternative draft', async t => {
+  const { f, rt, page } = await queried(t, null, { member: true });
+  const base = await f.repo.getProduct(BASE), fourth = 'MXXX9CH/A';
+  await f.repo.replaceCatalog({ products: [{ ...base, _id: fourth, partNumber: fourth, attributes: { ...base.attributes, color: '橙色' } }], stores: [], meta: { version: 'four-color-test' } });
+  page.applyCatalog(await rt.load('utils/store.js').getCatalog({ force: true }));
+  const serverBoot = await rt.load('utils/store.js').getBootstrap();
+  page.applyBoot({ ...serverBoot, limits: { ...serverBoot.limits, queryMaxStores: 4, alternativeMaxColors: 4 } });
+  for (const part of [BASE, SILVER, BLACK, fourth]) page.onToggleAlternative(event('part', part));
+  for (const number of ['R578', 'R579', 'R580']) page.onToggleAlternative(event('store', number));
+  assert.equal(page.data.alternativeParts.length, 4);
+  assert.equal(page.data.alternativeStores.length, 4);
+  for (const part of [BASE, SILVER, BLACK, fourth]) for (const number of page.data.alternativeStores) await f.observe(part, number);
+  // Verify rendering accepts the 16 valid rows from a server response rather
+  // than silently discarding it through the old hardcoded length-of-three guard.
+  page.alternativeResponse = { queryId: page.querySnapshot.queryId, basePartNumber: BASE, partNumbers: [BASE, SILVER, BLACK, fourth],
+    storeNumbers: page.data.alternativeStores.slice(), readAt: f.state.now.toISOString(), expiresAt: page.querySnapshot.alternativesExpiresAt,
+    results: [BASE, SILVER, BLACK, fourth].flatMap(partNumber => page.data.alternativeStores.map(storeNumber => ({ partNumber, storeNumber,
+      status: 'available', observedAt: f.state.now.toISOString(), expiresAt: page.querySnapshot.alternativesExpiresAt }))) };
+  page.refreshAlternativeChoices();
+  assert.equal(page.data.alternativeMatches.length, 16);
+  page.applyBoot(serverBoot);
+  assert.equal(page.data.alternativeParts.length, 3);
+  assert.equal(page.data.alternativeStores.length, 3);
+  assert.equal(page.data.alternativeMatches.length, 0);
+  assert.equal(rt.calls.filter(call => call.action === 'follow.upsert').length, 0);
+  page.onUnload();
+});
 async function queried(t, intercept, fixtureOptions = {}) {
   const f = await alternativesFixture({ query: false, ...fixtureOptions });
   t.mock.method(Date, 'now', () => f.state.now.getTime());

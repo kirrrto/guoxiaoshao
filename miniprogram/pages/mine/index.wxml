@@ -43,6 +43,7 @@
       <view class="plan-why">查询不扣次数 · 关注取货变化</view>
       <block wx:if="{{membership.active}}">
         <view class="member-allowance"><text>已关注 {{boot.followCount}} / {{boot.limits.maxFollows}} 个配置</text><text>每配置最多 {{boot.limits.maxStoresPerFollow}} 家门店</text></view>
+        <view wx:if="{{membership.enhanced}}" class="member-enhanced">月／年卡专享 · 多关注一个配置、多选一家门店</view>
 
       </block>
       <block wx:else>
@@ -54,18 +55,19 @@
         <button class="membership-manage membership-manage-primary" hover-class="ui-control-pressed" disabled="{{redeeming || paymentBusy || paymentChecking || paymentConfirming}}" bindtap="onOpenMembershipUpgrade">升级长期套餐</button>
         <button class="membership-manage" hover-class="ui-control-pressed" disabled="{{redeeming || paymentBusy || paymentChecking || paymentConfirming}}" bindtap="onOpenMembershipRenew">续费会员</button>
       </view>
-      <view wx:if="{{membership.active && !membershipUpgradeOpen && !paymentPendingId}}" class="membership-caption">各套餐权益相同，升级与续费均延长使用时长。</view>
+      <view wx:if="{{membership.active && !membershipUpgradeOpen && !paymentPendingId}}" class="membership-caption">{{membership.enhanced ? '额外名额有效至 ' + membership.enhancedExpiresText : '月卡、年卡可关注 4 个配置，每配置 4 家门店。'}}</view>
       <view wx:if="{{!membership.active || membershipUpgradeOpen || paymentPendingId}}" class="membership-shop">
         <view class="membership-shop-heading">
           <text class="membership-shop-title">{{membership.active ? (purchaseMode === 'upgrade' ? '选择长期套餐' : '续费会员') : '选择会员时长'}}</text>
           <button wx:if="{{membership.active && !paymentPendingId}}" class="membership-shop-close" hover-class="ui-control-pressed" disabled="{{redeeming || paymentBusy || paymentChecking || paymentConfirming}}" bindtap="onCloseMembershipUpgrade">收起</button>
         </view>
-        <view class="membership-caption">各套餐权益相同 · 一次购买 · 不自动续费</view>
+        <view class="membership-caption">月卡／年卡增加关注名额 · 不自动续费</view>
         <view class="membership-packages" aria-label="选择会员套餐">
           <button wx:for="{{boot.memberProducts}}" wx:key="planId" class="membership-package {{selectedPlanId === item.planId ? 'membership-package-selected' : ''}}" data-plan-id="{{item.planId}}" disabled="{{redeeming || paymentBusy || paymentChecking || paymentPendingId || paymentConfirming || (membership.active && purchaseMode === 'upgrade' && item.days < 30)}}" bindtap="onSelectMemberProduct" aria-label="{{item.nameText + '，' + item.durationText + '，' + item.priceText + (selectedPlanId === item.planId ? '，已选' : '')}}">
             <text class="membership-package-name">{{item.nameText}}</text>
             <text class="membership-package-duration">{{item.durationText}}</text>
             <text class="membership-package-price">{{item.priceText}}</text>
+            <text class="membership-package-benefit">{{item.benefitShort}}</text>
             <view class="membership-package-choice"><view class="membership-package-radio" aria-hidden="true"></view><text>{{membership.active && purchaseMode === 'upgrade' && item.days < 30 ? '续费可选' : (selectedPlanId === item.planId ? '已选择' : '选择')}}</text></view>
           </button>
         </view>
@@ -132,6 +134,8 @@
           <view>{{boot.purchaseNotice || '一次性虚拟服务，一经售出不予退款。'}}</view>
           <view>会员查询不扣次数；请求繁忙或数据源限流时需稍后重试，实际采集时间以结果为准。</view>
           <view>容量/颜色分占关注名额；暂停仍占，删除才释放。</view>
+          <view>周卡：3 个配置 × 每配置 3 家门店。月卡、年卡：4 个配置 × 每配置 4 家门店。</view>
+          <view>月／年卡时长尚未用完时享额外名额；续购周卡不延长该权益。超额配置与门店会保留，按保存顺序暂停超额部分，升级后恢复。</view>
           <view>提醒需微信订阅授权，免打扰时段不发送。</view>
         </view>
       </block>
@@ -300,3 +304,5 @@
     <view class="footer-note">果小哨 {{versionLabel}} · 为心仪好物留个哨</view>
   </block>
 </view>
+
+<reminder-nudge enabled="{{ready}}" blocked="{{redemptionOpen || redeeming || paymentBusy || paymentChecking || paymentPendingId || paymentConfirming || orderConfirming}}" />

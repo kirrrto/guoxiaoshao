@@ -11,7 +11,8 @@
  * the worker passes the sender authenticated for the consumer mini program.
  */
 const { NOTIFIABLE_TYPES, targetKeyOf } = require('./events');
-const { canUseReminders, reminderBlockReason, isMember } = require('../rules/membership');
+const { canUseReminders, reminderBlockReason, isMember, followAllowance } = require('../rules/membership');
+const { loadFollowPolicy } = require('../rules/follow-access');
 const { inMinuteWindow } = require('../time');
 const { isValidTemplateId } = require('../config');
 const { targetSnapshot } = require('../notification-target');
@@ -69,6 +70,7 @@ function buildTasks({ events, follows, users, config, now }) {
       if (!user) { skip('user_missing'); continue; }
       if (!canUseReminders(user, now)) { skip(reminderBlockReason(user)); continue; }
       if (follow.status !== 'active') { skip('follow_not_active'); continue; }
+      if (!followAllowance(user, follow, follows, now).eligibleStoreNumbers.includes(event.storeNumber)) { skip('plan_limit'); continue; }
       if (user.settings && user.settings.notifyEnabled === false) { skip('user_disabled'); continue; }
       const dnd = user.settings && user.settings.dnd;
       if (dnd && dnd.enabled && inMinuteWindow(now, dnd.startMinute, dnd.endMinute)) { skip('dnd'); continue; }
@@ -144,6 +146,7 @@ function skipReason({ task, user, follow, config, now, senderAppid }) {
   if (senderAppid && user.appid !== senderAppid) return 'consumer_appid_mismatch';
   if (!user.openid) return 'openid_missing';
   if (!follow || follow.status !== 'active' || follow.userKey !== task.userKey || follow.partNumber !== task.partNumber || !follow.storeNumbers.includes(task.storeNumber)) return 'follow_not_active';
+  if (!followAllowance(user, follow, [follow], now).eligibleStoreNumbers.includes(task.storeNumber)) return 'plan_limit';
   if (settings && settings.notifyEnabled === false) return 'user_disabled';
   if (settings && settings.dnd && settings.dnd.enabled && inMinuteWindow(now, settings.dnd.startMinute, settings.dnd.endMinute)) return 'dnd';
   const detectedAt = Date.parse(task.detectedAt);
@@ -186,6 +189,7 @@ async function sendTask({ task, config, sendImpl, repo, now, ownerId = 'notifier
   // Read after the claim, rather than trusting task-planning snapshots.
   let user = await repo.getUser(task.userKey);
   let follow = await repo.getFollow(task.followId);
+  user = await loadFollowPolicy(repo, user, follow ? [follow] : [], clock());
   const { mergeConfig } = require('../config');
   config = mergeConfig(await repo.getConfig());
   now = clock();
@@ -221,6 +225,7 @@ async function sendTask({ task, config, sendImpl, repo, now, ownerId = 'notifier
   const leaseReady = await canStart();
   user = await repo.getUser(task.userKey);
   follow = await repo.getFollow(task.followId);
+  user = await loadFollowPolicy(repo, user, follow ? [follow] : [], clock());
   config = mergeConfig(await repo.getConfig());
   const [currentLatest] = await repo.getLatest([targetKeyOf(task.storeNumber, task.partNumber)]);
   const ready = leaseReady && claimAlive() && sendBudgetMs() > 1000;

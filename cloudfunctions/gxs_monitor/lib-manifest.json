@@ -48,8 +48,8 @@
     },
     {
       "path": "engine/collector.js",
-      "bytes": 18268,
-      "sha256": "3d1e8eaef3ed53257fa7010a7872e13bbaafafa9d35d119b302f97aede8d5722"
+      "bytes": 18492,
+      "sha256": "8316774a2d6232012d8900f3b54357a78f9e07f7586d9c9ebe364228722365e6"
     },
     {
       "path": "engine/events.js",
@@ -68,8 +68,8 @@
     },
     {
       "path": "engine/notifier.js",
-      "bytes": 16724,
-      "sha256": "2aba20999a8a54b3117906461c4e390fdaf8e7582d2b77fe0b48de06634f6ce6"
+      "bytes": 17222,
+      "sha256": "0379ce2c52d05999d2a501f1a1dcdbfbd4e72d29738a893dcfcb291d95510968"
     },
     {
       "path": "engine/observation-day.js",
@@ -127,9 +127,14 @@
       "sha256": "d5745dcd17f16dc9dd10fb9b08d2e5eabd1eb75da0480a0358a3ef1755a575d6"
     },
     {
+      "path": "payment/plans.js",
+      "bytes": 1005,
+      "sha256": "2f5d5056c1cb5673cb64941623f458f88f30e5f03bb04d2633bf4bb830629af2"
+    },
+    {
       "path": "repo/atomic-ops.js",
-      "bytes": 49322,
-      "sha256": "6a097913afde3339e5bbc45ca27844d1f428ea62cbd57a84b6a1bd58a83e666d"
+      "bytes": 51430,
+      "sha256": "ec8bfdf5cff76c68d760b613b5776f5b3e941cb74f05a711419493352a653d70"
     },
     {
       "path": "repo/cloudbase-repo.js",
@@ -167,14 +172,24 @@
       "sha256": "fe8e23d3b3413526fcdf5a3f7d2e1308c09f6e30a2840a30071d078e199c4388"
     },
     {
+      "path": "rules/follow-access.js",
+      "bytes": 1508,
+      "sha256": "b466c721ade7726d64e29e4dceb6d6adf5381796032febcd87fe9580800af191"
+    },
+    {
+      "path": "rules/member-plan.js",
+      "bytes": 2414,
+      "sha256": "4017d2bc65af995567467ad25894fbd86adaa131cf060571a3250a48d010cedd"
+    },
+    {
       "path": "rules/membership-entitlements.js",
-      "bytes": 4842,
-      "sha256": "832045214cf9a538b5b5d17c284765728a195b31ccbefbbfcd899f72b6543563"
+      "bytes": 4891,
+      "sha256": "4d78a35bff81f81fe335eec645dccbafdd62d488094bc18d2aabee6e7bf034e7"
     },
     {
       "path": "rules/membership.js",
-      "bytes": 3199,
-      "sha256": "db4a1c74d936fbbc9531a23c04099052fbcb91e0f48c85a201d3d2ffe635171b"
+      "bytes": 5597,
+      "sha256": "2283e66543368878b7fdcfd3594e221175e12be68810f2d2c068431164db12fb"
     },
     {
       "path": "rules/new-product.js",

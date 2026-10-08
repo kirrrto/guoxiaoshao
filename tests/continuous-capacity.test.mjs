@@ -173,7 +173,15 @@ test('both collector modes scale with deduplicated request groups beyond nine us
   const f = createFixture({ config: { collector: { budgetMode: 'continuous', enabled: true, maxRequestsPerDay: 10000 } } });
   ok(await f.call('user.bootstrap'));
   ok(await f.call('admin.grantMembership', { userKey: userKeyOf(), days: 30, grantId: 'capacity-growth-member' }, operatorContext()));
-  f.repo.listActiveFollows = async () => Array.from({ length: 400 }, (_, i) => ({ userKey: userKeyOf(), partNumber: 'MXXX1CH/A', storeNumbers: [`R${String(i).padStart(3, '0')}`] }));
+  // Preserve the 400 independent request groups while assigning each to a
+  // real fixture account within its plan allowance (not 400 follows on one).
+  const seed = await f.repo.getUser(userKeyOf());
+  for (let i = 0; i < 400; i++) {
+    const userKey = `capacity-member-${i}`;
+    await f.repo.createUser({ ...seed, _id: userKey, followIndex: [] });
+    await f.repo.saveFollow({ _id: `${userKey}|follow`, userKey, partNumber: 'MXXX1CH/A',
+      storeNumbers: [`R${String(i).padStart(3, '0')}`], status: 'active', createdAt: f.state.now.toISOString() });
+  }
   for (const mode of ['scheduled', 'resident']) {
     const collector = createCollector({ repo: f.repo, fetchImpl: f.state.fetchImpl, clock: () => new Date(f.state.now), mode, log: quiet });
     await collector.refreshTargets();

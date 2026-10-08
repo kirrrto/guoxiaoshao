@@ -47,6 +47,20 @@ async function setup(extra = {}) {
   return { f, upstream, run, sends, available: () => { display = 'available'; } };
 }
 
+// Scheduler fixtures span many stores, but each account still obeys the real
+// three-store allowance. Preserve target counts and scheduling assertions.
+async function distributeStores(f, stores) {
+  const seed = await f.repo.getUser(userKeyOf());
+  const original = await f.repo.getFollow('F');
+  await f.repo.saveFollow({ ...original, status: 'removed' });
+  for (let i = 0; i < stores.length; i += 3) {
+    const userKey = `scheduler-member-${i}`;
+    await f.repo.createUser({ ...seed, _id: userKey, followIndex: [] });
+    await f.repo.saveFollow({ _id: `${userKey}|follow`, userKey, partNumber: 'MJYH4CH/A',
+      storeNumbers: stores.slice(i, i + 3), status: 'active', createdAt: f.state.now.toISOString() });
+  }
+}
+
 test('production monitor entry publishes a fresh heartbeat when the platform time helper throws', async () => {
   const s = await setup();
   const entry = fs.readFileSync(new URL('../cloudfunctions/gxs_monitor/index.js', import.meta.url), 'utf8');
@@ -134,7 +148,7 @@ test('cold-start jitter does not skip a new minute or duplicate the same minute'
 
 test('deadline carries unfinished stores before recently scanned stores into the next minute', async () => {
   const s = await setup({ collector: { enabled: true, intervalSeconds: 60, maxConcurrency: 1 } });
-  await s.f.repo.saveFollow({ _id: 'F', userKey: userKeyOf(), partNumber: 'MJYH4CH/A', storeNumbers: ['R577', 'R639', 'R320', 'R448'], status: 'active' });
+  await distributeStores(s.f, ['R577', 'R639', 'R320', 'R448']);
   const original = s.upstream;
   const slow = async (...args) => { const result = await original(...args); s.f.advance(6000); return result; };
   await s.run({ fetchImpl: slow, maxRunMs: 10000 });
@@ -238,7 +252,7 @@ async function legacyHeartbeatCheckpoint({ dayCount = 10000, groups = 17 } = {})
   s.f.state.now = new Date('2026-10-01T13:58:04.585Z');
   const midnight = Date.parse('2026-10-01T16:00:00.000Z');
   const stores = Array.from({ length: groups }, (_, i) => `R${300 + i}`);
-  await s.f.repo.saveFollow({ _id: 'F', userKey: userKeyOf(), partNumber: 'MJYH4CH/A', storeNumbers: stores, status: 'active' });
+  await distributeStores(s.f, stores);
   const previous = { _id: 'collector_status', mode: 'scheduled', state: 'running',
     updatedAt: s.f.state.now.toISOString(), groupCount: groups,
     // A later cold-start heartbeat replaced the original daily denial. This

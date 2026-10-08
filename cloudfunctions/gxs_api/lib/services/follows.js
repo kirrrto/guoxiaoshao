@@ -1,6 +1,6 @@
 'use strict';
 const { ApiError } = require('../errors');
-const { isMember, canUseReminders, validateFollowLimits, LIMITS, FREE_REMINDER_FOLLOWS } = require('../rules/membership');
+const { isMember, canUseReminders, validateFollowLimits, memberLimits, followAllowance } = require('../rules/membership');
 const { isLiveRestricted } = require('../rules/new-product');
 const { targetKeyOf } = require('../engine/events');
 const { ensureUser } = require('./users');
@@ -70,15 +70,16 @@ async function list(ctx) {
   const user = await ensureUser(ctx);
   const follows = await ctx.repo.listFollows(user._id);
   const member = isMember(user, ctx.now);
-  return { member, freeReminder: false, limits: followLimits(member), follows: await decorate(ctx, follows, member, member) };
+  const presented = await decorate(ctx, follows, member, member);
+  return { member, freeReminder: false, limits: memberLimits(user, ctx.now), follows: presented.map((row, i) => {
+    const allowance = followAllowance(user, follows[i], follows, ctx.now);
+    return { ...row, ...allowance,
+      ...(allowance.limitPaused ? { status: 'limit_paused', statusReason: 'plan_limit' } : {}),
+      stores: row.stores.map(store => ({ ...store, limitPaused: member && !allowance.eligibleStoreNumbers.includes(store.storeNumber) })) };
+  }) };
 }
 
-/** Only members may keep follows; free accounts have no follow quota. */
-function followLimits(member) {
-  return member ? LIMITS : { ...LIMITS, maxFollows: FREE_REMINDER_FOLLOWS };
-}
-
-/** Create or edit a follow. Members only; 3 SKUs × up to 3 stores each. */
+/** Create or edit a follow using this account's current paid-plan allowance. */
 async function upsert(ctx, payload) {
   const user = await ensureUser(ctx);
   if (!canUseReminders(user, ctx.now)) throw new ApiError('member_required', '关注与到货提醒为会员专属，开通会员后可关注并接收微信提醒');
@@ -98,8 +99,10 @@ async function upsert(ctx, payload) {
   const recordId = `${user._id}|${followId}`;
   const existing = follows.find(f => f._id === recordId) || null;
   const others = follows.filter(f => f._id !== recordId && f.status !== 'removed');
-  const check = validateFollowLimits(others, { partNumber, storeNumbers }, followLimits(member).maxFollows);
-  if (!check.ok) throw new ApiError(check.reason, followLimitMessage(check.reason, member));
+  const limits = memberLimits(user, ctx.now);
+  if (existing && followAllowance(user, existing, follows, ctx.now).limitPaused) throw new ApiError('plan_limit', '该配置超出当前套餐名额，请先移除其他配置或升级月卡、年卡');
+  const check = validateFollowLimits(others, { partNumber, storeNumbers }, existing ? Math.max(limits.maxFollows, others.length + 1) : limits.maxFollows, limits.maxStoresPerFollow);
+  if (!check.ok) throw new ApiError(check.reason, followLimitMessage(check.reason, limits));
 
   const follow = {
     _id: recordId,
@@ -119,13 +122,13 @@ async function upsert(ctx, payload) {
   return { follow: decorated };
 }
 
-function followLimitMessage(reason, member = true) {
+function followLimitMessage(reason, limits) {
   return {
     no_stores: '请至少选择一家门店',
-    too_many_stores: `每个机型最多关注 ${LIMITS.maxStoresPerFollow} 家门店`,
+    too_many_stores: `每个配置最多关注 ${limits.maxStoresPerFollow} 家门店`,
     no_part_number: '请选择商品',
     duplicate_part_number: '该机型已在关注列表中',
-    too_many_follows: member ? `最多同时关注 ${LIMITS.maxFollows} 个机型` : '关注为会员专属，开通会员后可关注配置',
+    too_many_follows: `最多同时关注 ${limits.maxFollows} 个配置`,
   }[reason] || '关注设置无效';
 }
 
