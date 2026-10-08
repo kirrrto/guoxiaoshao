@@ -11,6 +11,24 @@ class ApiError extends Error {
 // Reads that are safe to repeat: a dropped connection retries once before the page sees it.
 const RETRYABLE_READS = new Set(['system.ping', 'user.bootstrap', 'catalog.get', 'follow.list', 'notify.list', 'notify.detail', 'member.status', 'quota.ledger', 'query.recent']);
 const RETRY_DELAY_MS = 800;
+// A platform request can lose both callbacks. Without our own deadline every
+// caller shares a permanently pending account/catalog promise, including Retry.
+// Reads can recover quickly; writes allow the deployed 30 s function to finish
+// and remain uncertain on timeout so their existing operation ID is retained.
+const READ_TIMEOUT_MS = 12000;
+const WRITE_TIMEOUT_MS = 35000;
+
+function callWithDeadline(cloud, action, payload) {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error('cloud.callFunction timeout')),
+      RETRYABLE_READS.has(action) ? READ_TIMEOUT_MS : WRITE_TIMEOUT_MS);
+    let request;
+    try { request = cloud.callFunction({ name: cloudConfig.apiFunction, data: { action, payload } }); }
+    catch (error) { clearTimeout(timer); reject(error); return; }
+    Promise.resolve(request)
+      .then(value => { clearTimeout(timer); resolve(value); }, error => { clearTimeout(timer); reject(error); });
+  });
+}
 
 /** Call one gxs_api action. Resolves with `data`; rejects with ApiError. */
 async function call(action, payload = {}) {
@@ -38,7 +56,7 @@ async function callOnce(action, payload, attempt) {
   let response;
   startedAt = Date.now();
   try {
-    response = await cloud.callFunction({ name: cloudConfig.apiFunction, data: { action, payload } });
+    response = await callWithDeadline(cloud, action, payload);
   } catch (error) {
     throw transportError('call_failed', friendlyCallError(error), error, { action, phase: 'call_function', attempt, startedAt });
   }

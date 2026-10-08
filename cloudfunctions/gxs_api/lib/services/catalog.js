@@ -2,6 +2,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const { ApiError } = require('../errors');
+const { coordinates } = require('../rules/query-alternatives');
 
 const BUNDLED_DIR = path.resolve(__dirname, '..', '..', 'catalog');
 
@@ -48,6 +49,7 @@ function toStoreDoc(store) {
     address: store.address,
     phone: store.phone,
     slug: store.slug,
+    ...(coordinates(store) ? { latitude: store.latitude, longitude: store.longitude } : {}),
   };
 }
 

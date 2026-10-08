@@ -64,11 +64,11 @@ test('sell-out alerts need their own template and are for members only', async (
   await unconfigured.run(); unconfigured.f.advance(60000); await unconfigured.run();
   assert.deepEqual(unconfigured.kinds(), ['restock']);
   assert.equal([...unconfigured.f.repo.tables.get('gxs_notifications').values()].filter(t => t.eventType === 'became_unavailable').length, 0, 'no sell-out tasks without a template');
-  // A new account's one free alert is the restock; it never receives sell-outs.
+  // Free accounts no longer receive follow alerts; only members are monitored.
   const trial = await monitored(['unavailable', 'available', 'available', 'unavailable', 'unavailable'], { member: false });
   await trial.run(); trial.f.advance(60000); await trial.run();
-  assert.deepEqual(trial.kinds(), ['restock']);
-  assert.ok((await trial.f.repo.getUser(userKeyOf())).firstReminderSentAt);
+  assert.deepEqual(trial.kinds(), [], 'non-member follows are not monitored or sent');
+  assert.equal((await trial.f.repo.getUser(userKeyOf())).firstReminderSentAt || null, null);
 });
 
 test('with no cooldown every new restock and sell-out is sent; the fast cadence ends 20s after the last change', async () => {

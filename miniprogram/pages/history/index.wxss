@@ -36,3 +36,6 @@
 .history-task-note { margin: 0 12rpx 24rpx; }
 .history-disclosure { margin: 24rpx 0 16rpx; }
 .history-result-card .history-data-notice { padding: 20rpx; }
+.history-insights { margin-top: 24rpx; padding: 24rpx; background: var(--surface-soft); border: 1rpx solid var(--line); border-radius: 20rpx; line-height: 1.6; overflow-wrap: anywhere; }
+.history-time-bands { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12rpx; margin-top: 18rpx; }
+.history-time-band { display: flex; flex-direction: column; gap: 4rpx; padding: 14rpx; border: 1rpx solid var(--line); border-radius: 12rpx; }

@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 
 const project = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const adminPreview = process.argv.includes('--admin-only');
-if (adminPreview && process.argv.some(arg => /^--(?:reminders|stock|redemption|payment|monitoring|history-task|history-data|sheets|release-notes)-only$/.test(arg))) throw Error('--admin-only cannot be combined with consumer scenarios');
+if (adminPreview && process.argv.some(arg => /^--(?:reminders|stock|redemption|payment|orders|monitoring|history-task|history-data|sheets|release-notes|onboarding|notification-test|alternatives)-only$/.test(arg))) throw Error('--admin-only cannot be combined with consumer scenarios');
 const mini = path.join(project, adminPreview ? 'tools/admin-miniprogram/miniprogram' : 'miniprogram');
 const appConfig = JSON.parse(fs.readFileSync(path.join(mini, 'app.json'), 'utf8'));
 appConfig.tabBar = appConfig.tabBar || { custom: false, list: [] };
@@ -55,7 +55,7 @@ function sandbox(handler, { paymentScenario } = {}) {
     p.triggerEvent = () => {};
     return p;
   }
-  return { load: relative => load(path.join(mini, relative)), instantiate, app };
+  return { load: relative => load(path.join(mini, relative)), instantiate, app, storage };
 }
 
 function parse(source) {
@@ -144,6 +144,7 @@ function renderNode(node, scope, context) {
   if (node.name === 'switch') renderedAttrs += ` type="checkbox" ${truth(attrs.checked || '', scope) ? 'checked' : ''}`;
   if (node.name === 'input') renderedAttrs += ` value="${html(evaluate(attrs.value || '', scope))}" placeholder="${html(evaluate(attrs.placeholder || '', scope))}"`;
   if (node.name === 'button' && truth(attrs.disabled || '', scope)) renderedAttrs += ' disabled';
+  if (node.name === 'button' && attrs.size) renderedAttrs += ` size="${html(evaluate(attrs.size, scope))}"`;
   if (node.name === 'textarea') return `<textarea${renderedAttrs}>${html(evaluate(attrs.value || '', scope))}</textarea>`;
   if (['img', 'input'].includes(tag)) return `<${tag}${renderedAttrs}>`;
   return `<${tag}${renderedAttrs}>${renderChildren(node.children, scope, context)}</${tag}>`;
@@ -164,38 +165,66 @@ const reminderPreview = process.argv.includes('--reminders-only');
 const stockPreview = process.argv.includes('--stock-only');
 const redemptionPreview = process.argv.includes('--redemption-only');
 const paymentPreview = process.argv.includes('--payment-only');
+const orderRecordsPreview = process.argv.includes('--orders-only');
 const monitoringPreview = process.argv.includes('--monitoring-only');
 const historyTaskPreview = process.argv.includes('--history-task-only');
 const historyDataPreview = process.argv.includes('--history-data-only');
 const sheetPreview = process.argv.includes('--sheets-only');
 const releaseNotesPreview = process.argv.includes('--release-notes-only');
+const onboardingPreview = process.argv.includes('--onboarding-only');
+const notificationTestPreview = process.argv.includes('--notification-test-only');
+const alternativesPreview = process.argv.includes('--alternatives-only');
+// Targeted cascade stress from the device-reported fixed-width button failure.
+// :where keeps the same specificity as button:not([size=mini]); this deliberately
+// is not a complete implementation of WeChat's native component stylesheet.
+const buttonConstraintProfile = alternativesPreview ? 'regression stress only: alternative-panel button:not([size=mini]) fixed 184px, min-width:min-content, auto inline margins; not verified WeChat implementation' : null;
+const buttonConstraintCss = buttonConstraintProfile ? ':where(.alternative-panel) button:not([size=mini]){width:184px;min-width:min-content;margin-left:auto;margin-right:auto;}' : '';
 const widths = [320, 375, 430], scenarios = adminPreview ? ['operator-ready', 'operator-denied', 'operator-loading', 'operator-error', 'operator-longcontent', 'operator-saving'] : historyTaskPreview ? ['history-member-reward', 'history-free-first', 'history-read-error', 'history-balance-cap', 'history-completed', 'history-longcontent', 'history-loading'] : monitoringPreview ? ['monitor-template-missing', 'monitor-ready-authorized', 'monitor-needs-authorization', 'monitor-stale', 'monitor-disabled', 'monitor-expired-paused'] : redemptionPreview ? ['redemption-input', 'redemption-loading', 'redemption-error', 'redemption-success', 'redemption-used', 'redemption-limited', 'redemption-empty'] : stockPreview ? ['stock-fresh', 'stock-old', 'stock-unknown', 'stock-missing', 'stock-restricted'] : reminderPreview ? ['reminders', 'reminder-empty', 'reminder-loading', 'reminder-deleting', 'reminder-clearing', 'reminder-error', 'reminder-more-error', 'longcontent'] : ['free', 'member', 'expired', 'empty', 'error', 'loading', 'longcontent'];
 if (historyDataPreview) scenarios.splice(0, scenarios.length, 'history-no-data', 'history-unknown-only', 'history-observed-no-events', 'history-events-only', 'history-observed-events', 'history-partial-stores');
-if (paymentPreview) scenarios.splice(0, scenarios.length, 'payment-ready', 'payment-renew', 'payment-blocked', 'payment-old-ios', 'payment-pending', 'payment-cancelled', 'payment-error', 'payment-fulfilled', 'payment-partial-refund');
+if (paymentPreview) scenarios.splice(0, scenarios.length, 'payment-ready', 'payment-renew', 'payment-blocked', 'payment-old-ios', 'payment-pending', 'payment-cancelled', 'payment-error', 'payment-fulfilled', 'payment-partial-refund', 'payment-monthly', 'payment-annual', 'payment-pending-monthly', 'payment-member', 'payment-upgrade-monthly', 'payment-upgrade-annual', 'payment-member-pending-monthly', 'payment-rules');
+if (orderRecordsPreview) scenarios.splice(0, scenarios.length, 'orders-single', 'orders-deleting', 'orders-clearing', 'orders-error', 'orders-pending', 'orders-empty', 'orders-legacy');
 if (sheetPreview) scenarios.splice(0, scenarios.length, 'sheet-edit', 'sheet-keyboard', 'sheet-longcontent', 'sheet-saving');
 if (releaseNotesPreview) scenarios.splice(0, scenarios.length, 'free', 'member', 'longcontent');
-const names = adminPreview ? { admin: '运营工具' } : paymentPreview ? { mine: '我的' } : historyDataPreview ? { history: '历史' } : historyTaskPreview ? { history: '历史', mine: '我的' } : stockPreview || monitoringPreview ? { follow: '小哨提醒' } : reminderPreview || redemptionPreview || releaseNotesPreview ? { mine: '我的' } : { query: '查询', follow: '小哨提醒', history: '历史', mine: '我的' };
+if (onboardingPreview) scenarios.splice(0, scenarios.length, 'onboarding-first', 'onboarding-signing', 'onboarding-error', 'onboarding-signed', 'onboarding-shared', 'onboarding-share-pending', 'onboarding-share-catalog', 'onboarding-share-error');
+if (notificationTestPreview) scenarios.splice(0, scenarios.length, 'notification-test-ready', 'notification-test-no-quota', 'notification-test-accepted', 'notification-test-uncertain', 'notification-test-failed', 'notification-test-received', 'notification-test-not-received');
+if (alternativesPreview) scenarios.splice(0, scenarios.length, 'alternatives-default', 'alternatives-selection', 'alternatives-free', 'alternatives-match', 'alternatives-prepared', 'alternatives-empty', 'alternatives-error', 'alternatives-expired', 'alternatives-cached');
+const names = alternativesPreview ? { query: '查询' } : notificationTestPreview ? { 'notification-test': '通知测试' } : adminPreview ? { admin: '运营工具' } : onboardingPreview ? { query: '查询' } : paymentPreview || orderRecordsPreview ? { mine: '我的' } : historyDataPreview ? { history: '历史' } : historyTaskPreview ? { history: '历史', mine: '我的' } : stockPreview || monitoringPreview ? { follow: '小哨提醒' } : reminderPreview || redemptionPreview || releaseNotesPreview ? { mine: '我的' } : { query: '查询', follow: '小哨提醒', history: '历史', mine: '我的' };
 if (sheetPreview) delete names.mine;
-if (monitoringPreview) scenarios.push('monitor-no-follows', 'monitor-all-paused', 'monitor-user-disabled', 'monitor-dnd', 'monitor-free-trial', 'monitor-alert', 'monitor-dual-ready', 'monitor-dual-soldout-empty', 'monitor-dual-restock-empty', 'monitor-dual-soldout-low', 'monitor-dual-pending');
+if (monitoringPreview) scenarios.push('monitor-no-follows', 'monitor-all-paused', 'monitor-user-disabled', 'monitor-dnd', 'monitor-free-account', 'monitor-alert', 'monitor-dual-ready', 'monitor-dual-soldout-empty', 'monitor-dual-restock-empty', 'monitor-dual-soldout-low', 'monitor-dual-pending');
 fs.mkdirSync(out, { recursive: true });
 const manifest = [];
 
 for (const scenario of scenarios) {
   const products = copy(baseProducts);
   if (['longcontent', 'history-longcontent', 'sheet-longcontent'].includes(scenario)) { const p = products.find(p => p.partNumber === sample.partNumber); p.title += ' · 超长商品名称与配置说明用于检查换行及小屏布局 ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; }
-  const p = products.find(p => p.partNumber === sample.partNumber), member = historyTaskPreview ? ['history-member-reward', 'history-longcontent'].includes(scenario) : monitoringPreview ? !['monitor-expired-paused', 'monitor-free-trial'].includes(scenario) : stockPreview ? scenario !== 'stock-restricted' : ['member', 'longcontent'].includes(scenario), expired = scenario === 'expired' || scenario === 'monitor-expired-paused';
+  const p = products.find(p => p.partNumber === sample.partNumber), member = alternativesPreview ? scenario !== 'alternatives-free' : historyTaskPreview ? ['history-member-reward', 'history-longcontent'].includes(scenario) : monitoringPreview ? !['monitor-expired-paused', 'monitor-free-account'].includes(scenario) : stockPreview ? scenario !== 'stock-restricted' : ['member', 'longcontent'].includes(scenario), expired = scenario === 'expired' || scenario === 'monitor-expired-paused';
   const bootstrap = { identity: { userKey: 'preview:offline-user', openidMasked: 'preview…0001', isAdmin: true }, membership: { active: member, remainingMs: member ? 18 * 86400000 : 0, expiresAt: member ? '2026-10-03T07:00:00Z' : expired ? '2026-09-10T07:00:00Z' : null },
     quota: { balance: member ? 5 : 0, revision: 0, grantedToday: 0, dailyGrantCap: 2, balanceCap: 10, queryCost: 1, historyCost: 1, signedInToday: false, tasksDoneToday: [], tasksViewedToday: [] }, tasks: [{ id: 'view_history', title: '浏览一次历史记录', reward: 1 }],
     collector: { state: scenario === 'expired' ? 'stale' : 'not_deployed' }, memberProduct: { id: 'vip666', title: '7 天会员', days: 7, priceFen: 700, enabled: paymentPreview && scenario !== 'payment-blocked', paymentReady: paymentPreview && scenario !== 'payment-blocked', iosEnabled: true, note: '该产品为一次性虚拟服务，一经售出不予退款。一次购买 7 天，已有会员按剩余有效期顺延，不自动续费。', paymentReason: '购买开放后可在此开通会员。' },
     notifications: { enabled: false, templateIds: {} }, subscriptions: {}, settings: { notifyEnabled: true, dnd: { enabled: true, startMinute: 1380, endMinute: 480 } },
     limits: { maxFollows: 3, maxStoresPerFollow: 3, queryMaxStores: 3 }, followCount: scenario === 'empty' ? 0 : 1, catalogVersion: 'offline-preview' };
+  if (paymentPreview) bootstrap.memberProducts = [
+    { ...bootstrap.memberProduct, planId: 'member_7d' },
+    { ...bootstrap.memberProduct, id: 'member_30d', planId: 'member_30d', title: '30 天会员', days: 30, priceFen: 1990, note: '' },
+    { ...bootstrap.memberProduct, id: 'member_365d', planId: 'member_365d', title: '365 天会员', days: 365, priceFen: 20000, note: '' },
+  ];
+  if (notificationTestPreview) bootstrap.quota.balance = scenario === 'notification-test-no-quota' ? 0 : 2;
   if (scenario === 'history-balance-cap') bootstrap.quota.balance = 10;
   if (sheetPreview) bootstrap.membership = { active: true, expiresAt: '2026-09-22T07:00:00Z', remainingMs: 7 * 86400000 };
-  if (scenario === 'payment-renew') bootstrap.membership = { active: true, remainingMs: 18 * 86400000, expiresAt: '2026-10-03T07:00:00Z' };
+  if (['payment-renew', 'payment-member', 'payment-upgrade-monthly', 'payment-upgrade-annual', 'payment-member-pending-monthly'].includes(scenario)) bootstrap.membership = { active: true, remainingMs: 18 * 86400000, expiresAt: '2026-10-03T07:00:00Z' };
   const previewOrder = { orderId: '', productId: 'vip666', source: 'virtual_payment', type: 'membership', amountFen: 700, days: 7, createdAt: now.toISOString(),
     status: scenario === 'payment-partial-refund' ? 'partially_refunded' : scenario === 'payment-fulfilled' ? 'fulfilled' : 'created',
     paymentPending: scenario === 'payment-pending', fulfilledAt: ['payment-partial-refund', 'payment-fulfilled'].includes(scenario) ? now.toISOString() : null,
     refundFen: scenario === 'payment-partial-refund' ? 350 : 0 };
+  if (['payment-pending-monthly', 'payment-member-pending-monthly'].includes(scenario)) Object.assign(previewOrder, {
+    orderId: 'offline-original-monthly-order', productId: 'offline-monthly-goods', planId: 'member_30d', days: 30, amountFen: 1990, paymentPending: true,
+  });
+  const notificationTest = ['notification-test-ready', 'notification-test-no-quota'].includes(scenario) ? null : {
+    requestId: 'offline-notification-test', status: scenario === 'notification-test-failed' ? 'failed' : scenario === 'notification-test-uncertain' ? 'uncertain' : 'accepted',
+    charged: 1, refunded: scenario === 'notification-test-failed' ? 1 : 0, feedback: null,
+  };
+  const notificationResult = () => ({ userKey: bootstrap.identity.userKey, ready: true, templateId: 'offline-notification-template',
+    balance: bootstrap.quota.balance, quotaRevision: bootstrap.quota.revision, quota: copy(bootstrap.quota), test: copy(notificationTest) });
   const paidMembership = { active: true, expiresAt: scenario === 'payment-partial-refund' ? '2026-09-18T19:00:00Z' : '2026-09-22T07:00:00Z', remainingMs: (scenario === 'payment-partial-refund' ? 3.5 : 7) * 86400000 };
   if (scenario === 'history-completed') Object.assign(bootstrap.quota, { balance: 1, revision: 1, grantedToday: 1, tasksDoneToday: ['view_history'], tasksViewedToday: ['view_history'] });
   const ledgerEntries = scenario === 'history-completed' ? [{ id: 'preview-task-ledger', type: 'task_reward', delta: 1, createdAt: now.toISOString() }] : [];
@@ -220,6 +249,16 @@ for (const scenario of scenarios) {
   const response = { ok: true, product: p, balance: 4, dayKey: '2026-09-15', queriedAt: now.toISOString(), latest: [],
     results: stores.slice(0, 2).map(s => ({ storeNumber: s.storeNumber, storeName: s.name, status: 'unknown', observedAt: now.toISOString(), quote: '模拟观测数据，非实时库存' })),
     events: scenario === 'empty' ? [] : [event, { ...event, id: 'e2', type: 'became_unavailable' }], summary: { available: 1, restocks: 1, recoveries: 0, ended: 1, lastHourRestocks: 1 }, pagination: { total: scenario === 'empty' ? 0 : 2, hasMore: false } };
+  if (alternativesPreview) {
+    if (!member) { bootstrap.quota.balance = 2; bootstrap.newProductWindows = []; }
+    const offset = scenario === 'alternatives-expired' ? -121000 : 0;
+    Object.assign(response, { queryId: 'query-alternative-preview', member, charged: member ? 0 : 1, refunded: 0,
+      balance: bootstrap.quota.balance, quotaRevision: bootstrap.quota.revision,
+      queriedAt: new Date(now.getTime() + offset).toISOString(), finishedAt: new Date(now.getTime() + offset).toISOString(),
+      alternativesExpiresAt: new Date(now.getTime() + offset + 120000).toISOString(),
+      results: response.results.map(row => ({ ...row, status: 'unavailable', observedAt: new Date(now.getTime() + offset).toISOString(), quote: '离线模拟：当前门店暂无供应' })),
+    });
+  }
   if (historyDataPreview) {
     const hasEvents = ['history-events-only', 'history-observed-events', 'history-partial-stores'].includes(scenario);
     response.summary.available = 0;
@@ -254,7 +293,7 @@ for (const scenario of scenarios) {
     if (scenario === 'monitor-no-follows') { follows.length = 0; bootstrap.followCount = 0; }
     if (scenario === 'monitor-user-disabled') bootstrap.settings.notifyEnabled = false;
     if (scenario === 'monitor-dnd') bootstrap.settings.dnd = { enabled: true, startMinute: 480, endMinute: 1080 };
-    if (scenario === 'monitor-free-trial') Object.assign(bootstrap, { freeReminder: true, subscriptions: {}, limits: { ...bootstrap.limits, maxFollows: 1 } });
+    if (scenario === 'monitor-free-account') { follows.length = 0; Object.assign(bootstrap, { freeReminder: false, followCount: 0, subscriptions: {} }); }
   }
   if (stockPreview) {
     bootstrap.collector = { state: 'running' };
@@ -268,11 +307,33 @@ for (const scenario of scenarios) {
     ? ['accepted', 'simulated', 'failed', 'uncertain', 'skipped', 'pending', 'sending'].map((status, i) => ({ id: `reminder-preview-${i}`, productTitle: p.title, partNumber: p.partNumber,
       storeNumber: stores[i % stores.length].storeNumber, storeName: scenario === 'longcontent' ? '广州天环广场门店 · 超长门店与购物中心位置说明' : stores[i % stores.length].name,
       status, reason: status === 'skipped' ? 'dnd' : status === 'failed' ? 'wx_43101:user refused' : status === 'uncertain' ? 'send_transport_error' : null, eventType: 'restock_confirmed', createdAt: now.toISOString() })) : [];
+  bootstrap.limits.maxFollows = bootstrap.membership.active ? 3 : 0;
+  const previewCalls = [];
+  let recordOrders = orderRecordsPreview ? [
+    { orderId: 'grant_' + '0123456789abcdef'.repeat(4), source: 'admin_grant', days: 30, amountFen: 0, status: 'fulfilled', canClearRecord: true, fulfilledAt: now.toISOString() },
+    { orderId: 'offline-paid-monthly', days: 30, amountFen: 1990, status: 'fulfilled', canClearRecord: true, fulfilledAt: now.toISOString() },
+    { orderId: 'offline-payment-unconfirmed', days: 365, amountFen: 20000, status: 'paid', canClearRecord: false, clearRecordReason: 'payment_unconfirmed', paidAt: now.toISOString() },
+  ] : [];
+  if (scenario === 'orders-single') recordOrders = recordOrders.slice(0, 1);
+  if (scenario === 'orders-empty') recordOrders = recordOrders.slice(0, 2);
+  if (scenario === 'orders-pending') recordOrders = recordOrders.slice(1);
+  if (scenario === 'orders-legacy') recordOrders.forEach(item => { delete item.canClearRecord; delete item.clearRecordReason; });
   const rt = sandbox(async (action, payload) => {
+    previewCalls.push({ action, payload });
     if (action === 'user.bootstrap') return copy(bootstrap);
     if (action === 'catalog.get') return raw;
     if (action === 'follow.list') return { follows, limits: bootstrap.limits };
     if (action === 'history.list' || action === 'query.pickup') return response;
+    if (action === 'query.alternatives') {
+      if (scenario === 'alternatives-error') throw Error('已有观测暂未读取成功，请检查网络后重试。');
+      const observedAt = new Date(now.getTime() - 15000).toISOString();
+      return { queryId: payload.queryId, basePartNumber: p.partNumber, partNumbers: payload.partNumbers, storeNumbers: payload.storeNumbers,
+        finishedAt: response.finishedAt, expiresAt: response.alternativesExpiresAt, readAt: now.toISOString(),
+        results: scenario === 'alternatives-empty' ? [] : payload.partNumbers.flatMap(partNumber => payload.storeNumbers.filter(storeNumber => !response.results.some(row => row.storeNumber === storeNumber)).map(storeNumber => ({
+          partNumber, storeNumber, status: 'available', observedAt, knownAt: observedAt, expiresAt: new Date(now.getTime() + 105000).toISOString(),
+        }))),
+      };
+    }
     if (action === 'history.browse') {
       if (scenario === 'history-read-error') throw Error('offline history browse response failed');
       if (scenario === 'history-loading') return new Promise(() => {});
@@ -280,37 +341,94 @@ for (const scenario of scenarios) {
     }
     if (action === 'quota.completeTask') return completeHistoryTask();
     if (action === 'quota.ledger') return { balance: bootstrap.quota.balance, entries: copy(ledgerEntries) };
-    if (action === 'member.status') return { orders: previewOrder.orderId ? [copy(previewOrder)] : [] };
+    if (action === 'member.status') return { orders: orderRecordsPreview ? copy(recordOrders) : previewOrder.orderId ? [copy(previewOrder)] : [] };
+    if (action === 'member.deleteRecord' || action === 'member.clearRecords') {
+      if (scenario === 'orders-error') throw Error('offline preview timeout');
+      const hiddenOrderIds = payload.orderIds || [payload.orderId];
+      recordOrders = recordOrders.filter(item => !hiddenOrderIds.includes(item.orderId));
+      return { hiddenOrderIds, retained: [] };
+    }
     if (action === 'member.createOrder') {
       previewOrder.orderId = payload.orderId;
       if (scenario === 'payment-error') throw Object.assign(Error('offline mock timeout'), { code: 'call_failed' });
       return { ok: true, order: copy(previewOrder), payment: { mode: 'short_series_goods', signData: '{"offlinePreview":true}', paySig: 'offline-preview', signature: 'offline-preview' } };
     }
     if (action === 'member.checkOrder') return { order: copy(previewOrder), membership: previewOrder.fulfilledAt ? copy(paidMembership) : copy(bootstrap.membership) };
+    if (action === 'notificationTest.status') return notificationResult();
+    if (action === 'notificationTest.feedback') {
+      if (!notificationTest || !['received', 'not_received'].includes(payload.outcome)) throw Error('Invalid offline test feedback');
+      notificationTest.feedback = payload.outcome;
+      return notificationResult();
+    }
     if (action === 'notify.detail') return { notification: { eventId: 'preview-event', status: 'accepted', eventType: 'restock_confirmed', partNumber: p.partNumber, storeNumber: stores[0].storeNumber, storeName: stores[0].name, productTitle: p.title, detectedAt: new Date(now.getTime() - 120000).toISOString(), feedback: null },
       latest: { restricted: false, status: 'available', isStale: false, lastKnownStatus: 'available', statusSince: new Date(now.getTime() - 120000).toISOString(), observedAt: new Date(now.getTime() - 15000).toISOString(), unknownSince: null }, follow: { followId: 'f-preview', status: 'active' } };
     if (action === 'notify.list') return { notifications: reminderRecords, hasMore: reminderPreview && ['reminders','reminder-more-error'].includes(scenario), nextCursor: 'preview-next-cursor', clearBefore: 'preview-opaque-clear-token' };
     if (action === 'admin.stats' && scenario === 'operator-denied') throw Object.assign(Error('需要管理员权限'), { code: 'forbidden' });
     if (action === 'admin.stats' && scenario === 'operator-error') throw Error('连接中断');
     if (action === 'admin.stats') return { users: 128, activeFollows: 32, events: 1024, queries: 2086, serverTime: now.toISOString() };
+    if (action === 'admin.insights') return { since: '2026-09-08T07:00:00Z', truncated: scenario === 'operator-longcontent',
+      availability: { count: 42, p50Ms: 90000, p90Ms: 600000, buckets: [{ label: '不足 1 分钟', count: 16 }, { label: '1 至 5 分钟', count: 18 }, { label: '超过 5 分钟', count: 8 }] },
+      alerts: { total: 80, byStatus: { accepted: 60, skipped: 20 }, noCreditShare: 0.125, sendDelay: { p50Ms: 10000, p90Ms: 45000 } },
+      feedback: { answered: 18, bought: 10, missed: 6, skipped: 2, boughtShare: 10 / 18 },
+      activity: { successfulQueryUsers: 56, followUsers: 24, acceptedAlertUsers: 18, openedAlertUsers: 12, boughtUsers: 8 },
+      notificationTests: { total: 28, users: 20, byStatus: { accepted: 24, failed: 2, uncertain: 2 }, feedback: { received: 15, not_received: 3 } },
+    };
     if (action === 'admin.getConfig') return { config: { announcement: '离线模拟预览', quota: { balanceCap: 10 }, notifications: { enabled: false }, memberProduct: { enabled: false } } };
     return {};
   }, { paymentScenario: paymentPreview ? scenario : '' });
-  const catalog = adminPreview ? null : await rt.load('utils/store.js').getCatalog({ force: true });
+  if (['payment-pending-monthly', 'payment-member-pending-monthly'].includes(scenario)) rt.storage.set(`gxs_member_payment_v1:${encodeURIComponent(bootstrap.identity.userKey)}`, {
+    orderId: previewOrder.orderId, planId: 'member_30d',
+  });
+  const catalog = adminPreview || notificationTestPreview ? null : await rt.load('utils/store.js').getCatalog({ force: true });
   for (const pageName of Object.keys(names)) {
     const page = rt.instantiate(`pages/${pageName}/index.js`);
+    if (['payment-pending-monthly', 'payment-member-pending-monthly'].includes(scenario)) page.setData({ selectedPlanId: 'member_365d' });
     if (pageName === 'follow' && scenario === 'monitor-alert') Object.assign(rt.app.globalData, { pendingAlert: 'preview-event', handledAlerts: [] });
     // 'loading' shows the skeleton a page renders before its first data arrives.
     if (!['operator-loading', 'loading'].includes(scenario)) await page.onLoad();
+    // Notification feedback requires a visible page, just like an actual tap
+    // in WeChat. onLoad alone now intentionally represents a hidden preload.
+    if (alternativesPreview || notificationTestPreview) await page.onShow();
     if (scenario === 'monitor-alert') await new Promise(resolve => setImmediate(resolve));
+    if (adminPreview && ['operator-ready', 'operator-longcontent'].includes(scenario)) await page.onLoadInsights();
     if (scenario === 'operator-saving') page.setData({ saving: true, configDirty: true });
     if (scenario === 'operator-longcontent') page.setData({ lookup: { user: true }, lookupText: JSON.stringify({ userKey: 'wxe96ad9e77b602f1b:long-user-identity-0123456789abcdefghijklmnopqrstuvwxyz', note: '运营查询长文本换行验收' }, null, 2), configText: JSON.stringify({ announcement: '运行配置说明需要在小屏完整换行且不遮挡操作按钮。'.repeat(5) }, null, 2) });
     if (pageName === 'history' && scenario !== 'history-loading' && page.browsePending) await page.browsePending;
     // Mine sections are collapsed by default; open the ones each audit checks.
     if (pageName === 'mine' && historyTaskPreview) { page.setData({ showQuotaDetails: true }); await page.onToggleLedger(); }
-    if (pageName === 'mine' && paymentPreview) page.setData({ showMembershipRules: true });
+    if (pageName === 'mine' && orderRecordsPreview) {
+      await page.onToggleOrders();
+      if (scenario === 'orders-pending') {
+        page.setData({ paymentPendingId: 'offline-paid-monthly', paymentMessage: '支付结果待核对，请先查询原订单。' });
+        page.setOrderRecords(page.data.orders);
+      }
+      if (scenario === 'orders-deleting') page.setData({ orderActionBusy: 'delete', orderDeletingId: recordOrders[0].orderId });
+      if (scenario === 'orders-clearing') page.setData({ orderActionBusy: 'clear' });
+      if (['orders-error', 'orders-empty'].includes(scenario)) await page.onClearOrders();
+    }
+    if (pageName === 'mine' && paymentPreview) {
+      if (scenario === 'payment-rules') page.setData({ showMembershipRules: true });
+      if (scenario === 'payment-renew') page.onOpenMembershipRenew();
+      if (['payment-upgrade-monthly', 'payment-upgrade-annual'].includes(scenario)) {
+        page.onOpenMembershipUpgrade();
+        if (scenario === 'payment-upgrade-annual') page.onSelectMemberProduct({ currentTarget: { dataset: { planId: 'member_365d' } } });
+      }
+      if (['payment-monthly', 'payment-annual'].includes(scenario)) page.onSelectMemberProduct({ currentTarget: { dataset: { planId: scenario === 'payment-monthly' ? 'member_30d' : 'member_365d' } } });
+      if (['payment-pending-monthly', 'payment-member-pending-monthly'].includes(scenario)) {
+        await page.onCheckPayment();
+        if (page.data.selectedPlanId !== 'member_30d' || page.data.paymentPendingId !== previewOrder.orderId) throw Error('Original monthly order was not retained in offline preview');
+      }
+    }
+    if (notificationTestPreview && ['notification-test-received', 'notification-test-not-received'].includes(scenario)) {
+      const outcome = scenario === 'notification-test-received' ? 'received' : 'not_received';
+      await page.onFeedback({ currentTarget: { dataset: { outcome } } });
+      if (page.data.test.feedback !== outcome || !page.data.feedbackNote) throw Error('Visible offline test feedback was not recorded');
+    }
     if (pageName === 'mine' && reminderPreview) page.setData({ showNotifications: true });
-    if (pageName === 'mine' && releaseNotesPreview) page.onToggleReleaseNotes();
+    if (pageName === 'mine' && releaseNotesPreview) {
+      page.onToggleReleaseNotes();
+      if (scenario === 'longcontent') page.onToggleOlderReleaseNotes();
+    }
     if (paymentPreview && ['payment-pending', 'payment-cancelled', 'payment-error', 'payment-fulfilled', 'payment-partial-refund'].includes(scenario)) await page.onBuyMembership();
     if (redemptionPreview) {
       page.setData({ redemptionOpen: true, redemptionCode: 'SAMPLE-CODE' });
@@ -345,10 +463,42 @@ for (const scenario of scenarios) {
       page.setData({ pickerValue: { partNumber: p.partNumber, storeNumbers: selected.storeNumbers }, dayKey: '2026-09-15' });
       page.onPickerChange({ detail: selected });
       if (pageName === 'query') {
-        if (['member', 'longcontent', 'expired'].includes(scenario)) page.onDoneSelection();
+        if (alternativesPreview || ['member', 'longcontent', 'expired'].includes(scenario)) page.onDoneSelection();
       }
-      if (historyDataPreview || ['member', 'longcontent', 'expired', 'empty'].includes(scenario)) await page.onQuery();
+      if (alternativesPreview || historyDataPreview || ['member', 'longcontent', 'expired', 'empty'].includes(scenario)) await page.onQuery();
     }
+    if (alternativesPreview) {
+      if (scenario === 'alternatives-cached') { page.setData({ resultIsCache: true }); page.refreshStoreChoices(); }
+      if (!page.data.alternativeStoreChoices.some(item => item.selected && selected.storeNumbers.includes(item.storeNumber))) throw Error('Original stores were not selected by default');
+      if (scenario !== 'alternatives-default') {
+        const otherColor = page.data.alternativeColorChoices.find(item => item.partNumber !== p.partNumber);
+        const otherStore = page.data.alternativeStoreChoices.find(item => !selected.storeNumbers.includes(item.storeNumber));
+        if (!otherColor || !otherStore) throw Error('Catalog fixture needs another permitted color and same-city/nearby store outside the original query');
+        page.onToggleAlternative({ currentTarget: { dataset: { kind: 'part', value: otherColor.partNumber } } });
+        page.onToggleAlternative({ currentTarget: { dataset: { kind: 'store', value: otherStore.storeNumber } } });
+        if (page.selection.partNumber !== p.partNumber || page.selection.storeNumbers.join() !== selected.storeNumbers.join()) throw Error('Selecting alternatives changed the active query without explicit preparation');
+        if (!['alternatives-selection', 'alternatives-free', 'alternatives-expired', 'alternatives-cached'].includes(scenario)) await page.onReadAlternatives();
+        if (['alternatives-match', 'alternatives-prepared'].includes(scenario) && page.data.alternativeMatches.length !== 1) throw Error('Expected one fresh alternate-color, outside-original-store observation');
+        if (scenario === 'alternatives-prepared') {
+          await page.onPrepareAlternative({ currentTarget: { dataset: { key: page.data.alternativeMatches[0].key } } });
+          if (page.selection.partNumber !== otherColor.partNumber || page.selection.storeNumbers.join() !== otherStore.storeNumber) throw Error('Explicit preparation did not retain the user-selected alternative');
+        }
+        if (scenario === 'alternatives-empty' && page.data.alternativeMatches.length) throw Error('Empty observation response created a stock match');
+        if (!page.data.alternativeSelectedColors.length) throw Error('Selected colors did not create an explicit manual query action');
+      }
+      if (['alternatives-cached', 'alternatives-expired'].includes(scenario) && (page.data.alternativeCanRead || page.data.alternativeMatches.length)) throw Error('Expired/cached observations remained accessible');
+      const expectedReads = ['alternatives-default', 'alternatives-selection', 'alternatives-free', 'alternatives-expired', 'alternatives-cached'].includes(scenario) ? 0 : scenario === 'alternatives-prepared' ? 2 : 1;
+      if (previewCalls.filter(item => item.action === 'query.pickup').length !== 1 || previewCalls.filter(item => item.action === 'query.alternatives').length !== expectedReads) throw Error('Alternative UI started an unexpected sampling/read request');
+    }
+    if (onboardingPreview) page.setData({
+      signing: scenario === 'onboarding-signing',
+      signinError: scenario === 'onboarding-error' ? '签到暂未确认，请重试；同一天不会重复领取。' : null,
+      'boot.signedInToday': scenario === 'onboarding-signed',
+      sharedSelection: scenario === 'onboarding-shared',
+      sharedTargetPending: scenario.startsWith('onboarding-share-'),
+      sharedTargetReady: scenario === 'onboarding-share-pending',
+      sharedTargetError: scenario === 'onboarding-share-error' ? '商品目录刷新失败，可稍后重试，当前选择已保留。' : null,
+    });
     if (scenario === 'error') { if (pageName === 'admin') page.setData({ allowed: false, checked: true, accessError: '模拟错误：网络连接中断，无法完成权限校验。请检查网络后重新加载。' }); else page.setData({ loadError: '模拟错误：云环境连接超时。请检查网络或稍后重试。request-id-abcdefghijklmnopqrstuvwxyz0123456789' }); }
     if (sheetPreview) {
       if (pageName === 'follow') {
@@ -364,6 +514,7 @@ for (const scenario of scenarios) {
     }
     const ast = parse(fs.readFileSync(path.join(mini, `pages/${pageName}/index.wxml`), 'utf8'));
     const rendered = renderNode(ast, page.data, { rt, keyboardHeight: scenario === 'sheet-keyboard' ? 280 : 0 });
+    if (alternativesPreview && !rendered.includes('换个颜色或门店，继续找货')) throw Error('Manual alternative choices were hidden');
     const componentCss = adminPreview ? '' : cssFile('components/target-picker/index.wxss').replace(/\/\*[\s\S]*?\*\//g, '').replace(/([^{}]+)\{/g, (_, selectors) => selectors.trim().startsWith('@') ? `${selectors}{` : selectors.split(',').map(selector => `.component-target-picker ${selector.trim()}`).join(',') + '{');
     const tabIndex = appConfig.tabBar.list.findIndex(tab => tab.pagePath === `pages/${pageName}/index`);
     let renderedTabs = '', tabCss = '';
@@ -373,7 +524,7 @@ for (const scenario of scenarios) {
       renderedTabs = renderNode(tabAst, tabComponent.data, { rt });
       tabCss = cssFile('custom-tab-bar/index.wxss');
     }
-    const rawCss = `${cssFile('app.wxss')}\n${cssFile(`pages/${pageName}/index.wxss`)}\n${componentCss}\n${adminPreview ? '' : cssFile('components/config-sheet/index.wxss')}\n${tabCss}`;
+    const rawCss = `${buttonConstraintCss}\n${cssFile('app.wxss')}\n${cssFile(`pages/${pageName}/index.wxss`)}\n${componentCss}\n${adminPreview ? '' : cssFile('components/config-sheet/index.wxss')}\n${tabCss}`;
     for (const width of widths) {
       const css = rawCss.replace(/(-?[\d.]+)rpx/g, (_, value) => `${Number(value) * width / 750}px`).replace(/(^|[}\n])\s*page\s*\{/g, '$1 body {').replace(/(^|[}\n])\s*view, text\s*\{/g, '$1 div, span {');
       const filename = `${pageName}-${scenario}-${width}.html`;
@@ -384,7 +535,28 @@ for (const scenario of scenarios) {
       }).join('') + '</div>';
       const body = `<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${names[pageName]} · ${scenario} · ${width}px 离线预览</title><style>html{width:${width}px;max-width:100%;margin:0 auto}body{margin:0}button,input,textarea{font:inherit}button{cursor:default}img{display:block}input[type=checkbox]{width:36px;height:22px;flex:none;accent-color:#1ba35a}.simulation{position:sticky;top:0;z-index:10;padding:8px 12px;background:#fff2ce;color:#705000;font:11px/1.5 sans-serif;border-bottom:1px solid #ead49c}.native-nav{text-align:center;padding:16px;font:600 15px sans-serif}${navCss('light')}${theme ? `@media (prefers-color-scheme: dark){${navCss('dark')}}` : ''}.preview-tabbar{display:flex;justify-content:space-around;gap:6px;background:white;padding:15px 8px;border-top:1px solid #ddd;font-size:12px;color:#65776c}${css}</style><div class="simulation">离线模拟 · ${width}px · ${scenario} · 使用实际 WXML/WXSS；不代表微信实测或实时库存</div><div class="native-nav">果小哨 · ${names[pageName]}</div>${rendered}${tabbar}<script>window.previewAudit=()=>({width:innerWidth,scrollWidth:document.documentElement.scrollWidth,overflow:[...document.querySelectorAll('body *')].filter(e=>{const r=e.getBoundingClientRect();return r.width&&r.right>document.documentElement.clientWidth+1&&getComputedStyle(e.parentElement).overflowX!=='auto'}).map(e=>({tag:e.tagName,class:e.className,right:e.getBoundingClientRect().right,text:e.textContent.slice(0,60)}))});</script></html>`;
       fs.writeFileSync(path.join(out, filename), body, 'utf8');
-      const expectedText = adminPreview ? { 'operator-ready': ['运行统计', '128'], 'operator-denied': ['当前账号没有管理权限', '重新检查'], 'operator-loading': ['校验权限'], 'operator-error': ['权限检查失败', '重新检查'], 'operator-longcontent': ['运行统计', '查询结果', '运营查询长文本换行验收'], 'operator-saving': ['已修改', '保存配置'] }[scenario] : historyTaskPreview ? pageName === 'history' ? ['最近浏览', '浏览不扣次数', p.title, ...{
+      const expectedText = alternativesPreview ? [p.title,
+        '换个颜色或门店，继续找货', '同机型、同容量', '同城门店', '勾选不扣次',
+        ...{
+          'alternatives-default': ['先选可接受的颜色', '本次查询门店'],
+          'alternatives-selection': ['查看近期有货记录', '查询 · 会员不扣次'],
+          'alternatives-free': ['查询 · 消耗 1 次'],
+          'alternatives-match': ['观测可取货', '准备这个配置和门店', '15 秒前'],
+          'alternatives-prepared': ['已准备所选配置和门店，尚未查询或扣次', '库存以官网下单页为准'],
+          'alternatives-empty': ['暂无近期有货记录', '不代表无货', '查询 · 会员不扣次'],
+          'alternatives-error': ['已有观测暂未读取成功', '请检查网络后重试'],
+          'alternatives-expired': ['近期记录已不可用', '查询 · 会员不扣次'],
+          'alternatives-cached': ['近期记录已不可用', '查询 · 会员不扣次'],
+        }[scenario],
+      ] : notificationTestPreview ? ['先试收一条通知', '消耗 1 次签到／任务额度', '查看原测试结果', '微信受理不保证手机弹出横幅', ...{
+        'notification-test-ready': ['授权并发送测试 · 1 次', '当前 2 次'],
+        'notification-test-no-quota': ['当前 0 次', '去「我的」签到获取次数'],
+        'notification-test-accepted': ['微信已受理', '受理不代表已送达', '我收到了', '暂时没收到'],
+        'notification-test-uncertain': ['结果尚未确认', '本次暂不退次数，也不会重复发送', '我收到了', '暂时没收到'],
+        'notification-test-failed': ['明确发送失败，次数已退回', '本次扣除 1 次 · 已退回 1 次'],
+        'notification-test-received': ['已记录：你确认收到了测试消息', '正式到货监测仍需会员与有效授权'],
+        'notification-test-not-received': ['已记录：暂未收到', '请检查微信服务通知、订阅消息设置及手机通知权限'],
+      }[scenario]] : adminPreview ? { 'operator-ready': ['运行统计', '128'], 'operator-denied': ['当前账号没有管理权限', '重新检查'], 'operator-loading': ['校验权限'], 'operator-error': ['权限检查失败', '重新检查'], 'operator-longcontent': ['运行统计', '查询结果', '运营查询长文本换行验收'], 'operator-saving': ['已修改', '保存配置'] }[scenario] : historyTaskPreview ? pageName === 'history' ? ['最近浏览', '浏览不扣次数', p.title, ...{
         'history-member-reward': ['今日浏览任务完成，+1 次', '已计入次数明细'],
         'history-free-first': ['还没有浏览记录', '今日浏览任务完成，+1 次', '余 1 次'],
         'history-read-error': ['浏览记录加载或奖励确认未完成', '重新加载'],
@@ -404,19 +576,27 @@ for (const scenario of scenarios) {
         'monitor-all-paused': ['你的关注全部已暂停', '暂停仍占一个配置名额', '恢复'],
         'monitor-user-disabled': ['你的消息提醒已关闭', '前往提醒设置'],
         'monitor-dnd': ['当前处于免打扰时段', '查看免打扰设置'],
-        'monitor-free-trial': ['免费体验 1 条到货提醒', '授权后可收到 1 条免费提醒', '授权免费提醒', '免费体验中'],
+        'monitor-free-account': ['关注与到货提醒为会员专属', '了解会员', '免费用户'],
         'monitor-alert': ['到货提醒', '确认补货', '2 分钟前', '可取货', '复制型号和门店', '增加提醒次数', '买到了吗？'],
         'monitor-dual-ready': ['提醒条件已就绪', '到货 8 次', '断货 5 次', '增加提醒次数', '两项都允许'],
         'monitor-dual-soldout-empty': ['断货提醒暂无次数', '到货提醒还可发送 8 次', '增加提醒次数'],
         'monitor-dual-restock-empty': ['到货提醒暂无次数', '断货提醒还可发送 5 次', '增加提醒次数'],
         'monitor-dual-soldout-low': ['断货提醒只剩 1 次', '增加提醒次数'],
         'monitor-dual-pending': ['授权记录等待同步', '同步授权'],
-      }[scenario]] : paymentPreview ? ['¥7.00', '兑换码开通', ...{
-        'payment-ready': ['立即开通', '购买须知', '一次性虚拟服务', '一经售出不予退款', '一次购买 7 天'], 'payment-renew': ['续费会员', '购买须知', '按剩余有效期顺延'],
+      }[scenario]] : paymentPreview ? ['各套餐权益相同', '兑换码开通', ...(!page.data.membership.active || page.data.membershipUpgradeOpen || page.data.paymentPendingId ? ['周卡', '月卡', '年卡', '¥7.00', '¥19.90', '¥200.00'] : ['升级长期套餐', '续费会员']), ...{
+        'payment-ready': ['立即开通', '选择会员时长', '付款确认后生效'], 'payment-renew': ['续费会员', '确认续费', '在原到期时间后增加 7 天', '剩余有效期继续保留'],
         'payment-blocked': ['付费购买暂未开放'], 'payment-old-ios': ['iOS 15'],
         'payment-pending': ['支付正在确认中', '查询支付结果'], 'payment-cancelled': ['已取消本次支付', '请查询订单状态', '查询支付结果'],
         'payment-error': ['支付结果暂未确认', '查询支付结果'], 'payment-fulfilled': ['支付已确认，会员已开通', '已开通'],
         'payment-partial-refund': ['订单已部分退款', '部分退款', '已退款 ¥3.50'],
+        'payment-monthly': ['立即开通 · ¥19.90', '30 天'],
+        'payment-annual': ['立即开通 · ¥200.00', '365 天'],
+        'payment-pending-monthly': ['30 天会员 · ¥19.90', 'offline-original-monthly-order', '支付正在确认中', '查询支付结果'],
+        'payment-member': ['18', '天剩余', '到期 2026-10-03', '升级长期套餐', '续费会员'],
+        'payment-upgrade-monthly': ['续费可选', '确认升级 · ¥19.90', '在原到期时间后增加 30 天', '预计到期 2026-11-02', '按所选套餐全价购买', '不抵扣差价'],
+        'payment-upgrade-annual': ['续费可选', '确认升级 · ¥200.00', '在原到期时间后增加 365 天', '预计到期 2027-10-03', '按所选套餐全价购买', '不抵扣差价'],
+        'payment-member-pending-monthly': ['30 天会员 · ¥19.90', 'offline-original-monthly-order', '套餐已按原订单锁定', '查询支付结果'],
+        'payment-rules': ['一次性虚拟服务', '一经售出不予退款', '一次购买 7 天', '权益与购买须知'],
       }[scenario]] : redemptionPreview ? ['兑换会员', '付费购买暂未开放', { 'redemption-input': '确认兑换', 'redemption-loading': '兑换中，请稍候', 'redemption-error': '兑换码无效', 'redemption-success': '兑换成功', 'redemption-used': '此账号已兑换过', 'redemption-limited': '15 分钟后再试', 'redemption-empty': '确认兑换' }[scenario]] : stockPreview ? [p.title, '收起详情', '删除关注', ...{
         'stock-fresh': ['暂无供应', '本次状态刚记录', '观测 2026-09-15 15:00:00'],
         'stock-old': ['待更新', '观测已过期', '上次有效结果：暂无供应（仅供参考）', '上次检查 2026-09-15 14:57:00'],
@@ -425,16 +605,37 @@ for (const scenario of scenarios) {
         'stock-restricted': ['会员权益受限', '未展示实时库存', '当前账号暂不能查看该新品的实时库存'],
       }[scenario]] : scenario === 'loading' ? [{ query: '正在加载商品目录', follow: '正在读取你的关注', history: '正在加载商品目录', mine: '正在读取账户信息' }[pageName]]
         : scenario === 'error' ? [pageName === 'admin' ? '模拟错误：网络连接中断' : '模拟错误：云环境连接超时', '暂时没有连上', '重试']
-        : pageName === 'mine' ? [member ? '果小哨会员' : expired ? '会员已到期' : '让小哨持续帮你留意', '¥7.00', '付费购买暂未开放', '提醒记录', '不自动续费', ...(reminderPreview && reminderRecords.length ? ['删除记录', scenario === 'reminder-clearing' ? '清空中' : '清空'] : [])]
+        : pageName === 'mine' ? [member ? '果小哨会员' : expired ? '会员已到期' : '让小哨持续帮你留意', ...(page.data.membership.active ? ['升级长期套餐', '续费会员'] : ['¥7.00', '付费购买暂未开放', '不自动续费']), '提醒记录', ...(reminderPreview && reminderRecords.length ? ['删除记录', scenario === 'reminder-clearing' ? '清空中' : '清空'] : [])]
         : pageName === 'follow' && follows.length ? [p.title, stores[0].name, ...(sheetPreview ? ['调整关注', '产品配置', '选择门店', '已选门店', p.title + ' · 2 家门店', scenario === 'sheet-saving' ? '正在保存' : '保存关注'] : [])]
         : pageName === 'follow' ? ['给心仪的配置留个小哨']
         : pageName === 'admin' ? ['运行统计', '128'] : [p.title, ...(sheetPreview ? ['产品配置', '选择门店', '已选门店'] : [])];
-      if (releaseNotesPreview) expectedText.push('更新公告', '当前版本', ...page.data.releaseNotes.map(entry => `v${entry.version}`));
+      if (adminPreview && ['operator-ready', 'operator-longcontent'].includes(scenario)) expectedText.push('成功查询 56', '查看提醒详情 12', '测试通知：28 条／20 人', '各行为分别计数', ...(scenario === 'operator-longcontent' ? ['以上不是完整统计'] : []));
+      if (releaseNotesPreview) expectedText.push('更新公告', '当前版本', ...(page.data.visibleReleaseNotes || page.data.releaseNotes).map(entry => `v${entry.version}`),
+        ...(page.data.olderReleaseNotesCount ? [scenario === 'longcontent' ? '收起更早版本' : '展开更早版本'] : []));
+      if (orderRecordsPreview) expectedText.push('会员记录', ...{
+        'orders-single': ['订单号：grant_', '删除记录', '清空当前显示的记录'],
+        'orders-deleting': ['删除中…', '支付状态待确认，暂不可清理'],
+        'orders-clearing': ['清空中…', '支付状态待确认，暂不可清理'],
+        'orders-error': ['清理结果暂未确认', '重试操作'],
+        'orders-pending': ['请先处理上方待确认订单', '支付状态待确认，暂不可清理', '查询支付结果'],
+        'orders-empty': ['暂无会员记录', '已清理 2 条记录'],
+        'orders-legacy': ['记录清理需新版服务支持', '部分记录需要新版服务支持清理'],
+      }[scenario]);
+      if (onboardingPreview) expectedText.push(...{
+        'onboarding-first': ['签到领取查询次数'],
+        'onboarding-signing': ['签到中'],
+        'onboarding-error': ['签到暂未确认', '同一天不会重复领取'],
+        'onboarding-signed': ['查看任务 / 查询次数'],
+        'onboarding-shared': ['已载入朋友分享的配置与门店'],
+        'onboarding-share-pending': ['朋友分享的配置已保留', '载入分享配置', '忽略这次分享'],
+        'onboarding-share-catalog': ['分享的配置暂未在商品目录中确认', '刷新目录并重试'],
+        'onboarding-share-error': ['商品目录刷新失败', '当前选择已保留', '刷新目录并重试'],
+      }[scenario]);
       manifest.push({ page: pageName, scenario, width, file: filename, expectedText });
     }
   }
 }
-fs.writeFileSync(path.join(out, 'manifest.json'), JSON.stringify({ generatedAt: new Date().toISOString(), source: mini, renderer: 'offline WXML/WXSS approximation', remoteImages: allowRemoteImages, expressionErrors: evaluationErrors.length, snapshots: manifest }, null, 2));
+fs.writeFileSync(path.join(out, 'manifest.json'), JSON.stringify({ generatedAt: new Date().toISOString(), source: mini, renderer: 'offline WXML/WXSS approximation', buttonConstraintProfile, remoteImages: allowRemoteImages, expressionErrors: evaluationErrors.length, snapshots: manifest }, null, 2));
 fs.writeFileSync(path.join(out, 'evaluation-errors.json'), JSON.stringify(evaluationErrors, null, 2));
 fs.writeFileSync(path.join(out, 'index.html'), `<!doctype html><html lang="zh-CN"><meta charset="utf-8"><title>果小哨 · 离线排版检查</title><style>body{font:15px/1.7 sans-serif;background:#eef5f0;color:#263d30;margin:20px}select,button{font:inherit;padding:6px;margin:4px}iframe{display:block;border:1px solid #bacabd;background:white;height:900px}p{max-width:900px}</style><h1>果小哨 · 离线排版检查</h1><p>使用当前源代码中的 WXML、WXSS 和页面格式化逻辑，模拟会员、免费、到期、空内容、错误及长文本。此工具不会调用云函数、付款或发送消息；浏览器排版不是微信渲染，最终以微信开发者工具及真机验证为准。</p><select id="page">${Object.entries(names).map(([key,value])=>`<option value="${key}">${value}</option>`).join('')}</select><select id="scenario">${scenarios.map(s=>`<option>${s}</option>`).join('')}</select><select id="width">${widths.map(w=>`<option>${w}</option>`).join('')}</select><iframe id="frame"></iframe><script>const controls=[document.querySelector('#page'),document.querySelector('#scenario'),document.querySelector('#width')];function update(){const [p,s,w]=controls.map(x=>x.value);frame.style.width=w+'px';frame.src=p+'-'+s+'-'+w+'.html';}controls.forEach(x=>x.onchange=update);update();</script></html>`);
 console.log(JSON.stringify({ output: out, snapshots: manifest.length, pages: Object.keys(names), scenarios, widths, remoteImages: allowRemoteImages, expressionErrors: evaluationErrors.length }, null, 2));

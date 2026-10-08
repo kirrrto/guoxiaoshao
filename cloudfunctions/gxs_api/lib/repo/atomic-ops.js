@@ -18,8 +18,13 @@ const { assertConfigEditor, makeConfigAudit } = require('../config-audit');
 const { CAMPAIGN, MAX_FAILURES, LOCK_MS, CLAIMS_ID, matchesCodeHash, attemptsId } = require('../member-redemption');
 const { upstreamGuardMethods, reserveAccountQuery, releaseAccountQuery } = require('./upstream-guard');
 const { queryTargetMethods } = require('./query-target');
+const { notificationTestMethods } = require('./notification-test');
+const { memberRecordMethods } = require('./member-records');
 const subscriptionCredits = require('./subscription-credit-ledger');
 const { matchesNotificationTarget, nextFollowUpdatedAt } = require('../notification-target');
+
+const quotaBalance = user => ({ balance: user.quota.balance,
+  quotaRevision: Number.isInteger(user.quota.revision) ? user.quota.revision : 0 });
 
 async function applyLedgerIn(tx, entry) {
   const user = await tx.get(C.users, entry.userKey);
@@ -36,7 +41,7 @@ async function applyLedgerIn(tx, entry) {
   user.quota = { ...user.quota, balance: after, revision: (Number.isInteger(user.quota.revision) ? user.quota.revision : 0) + 1, updatedAt: entry.createdAt };
   // Any reward ledger writer invalidates the cached daily summary first.
   // grantReward restores a complete summary in this same transaction.
-  if (entry.delta > 0 && !['query_refund', 'admin_grant'].includes(entry.type)) user.quota.dailyRewardSnapshot = null;
+  if (entry.delta > 0 && !['query_refund', 'notification_test_refund', 'admin_grant'].includes(entry.type)) user.quota.dailyRewardSnapshot = null;
   await tx.put(C.ledger, stored);
   await tx.put(C.users, user);
   return { applied: true, entry: stored, balance: after, user };
@@ -91,6 +96,8 @@ async function refundMembershipIn(tx, { orderId, nowIso, refundFen, providerData
 
 function atomicMethods(run) {
   return {
+    ...notificationTestMethods(run, applyLedgerIn),
+    ...memberRecordMethods(run),
     acquireLease: ({ id, ownerId, now, expiresAt }) => run(async tx => {
       const current = await tx.get(C.config, id);
       if (current && current.ownerId !== ownerId && current.expiresAt > now) return { acquired: false, holder: current.ownerId, expiresAt: current.expiresAt };
@@ -225,44 +232,47 @@ function atomicMethods(run) {
 
     beginQuery: args => run(async tx => {
       const { record, product, config, ownerId, nowIso, leaseMs = 25000 } = args;
-      const user = await tx.get(C.users, record.userKey);
+      let user = await tx.get(C.users, record.userKey);
       if (!user) throw new ApiError('user_missing', '用户不存在');
       const existing = await tx.get(C.queries, record._id);
       if (existing) {
         // Legacy records are bound by their actual request fields as well.
         const signature = q => JSON.stringify([q.kind, q.partNumber, [...q.storeNumbers].sort(), q.kind === 'history' ? q.dayKey : null]);
         if (signature(existing) !== signature(record)) throw new ApiError('query_id_conflict', '该查询编号已用于其他条件，请重新查询');
-        if (existing.status !== 'pending' && existing.response) return { replayed: true, record: existing, balance: user.quota.balance };
-        if (existing.leaseUntil && existing.leaseUntil > nowIso) return { busy: true, record: existing, retryAfterMs: Date.parse(existing.leaseUntil) - Date.parse(nowIso), balance: user.quota.balance };
+        if (existing.status !== 'pending' && existing.response) return { replayed: true, record: existing, ...quotaBalance(user) };
+        if (existing.leaseUntil && existing.leaseUntil > nowIso) return { busy: true, record: existing, retryAfterMs: Date.parse(existing.leaseUntil) - Date.parse(nowIso), ...quotaBalance(user) };
         // A crashed worker is fenced out. Its debit belongs to this same request;
         // recovery is allowed even when the debit used the user's last credit.
         const resumed = { ...existing, status: 'pending', ownerId, leaseUntil: new Date(Date.parse(nowIso) + leaseMs).toISOString(), attempts: (existing.attempts || 1) + 1 };
         const guarded = await reserveAccountQuery(tx, { record, ownerId, nowIso, leaseMs, config });
-        if (guarded) return { denied: guarded, balance: user.quota.balance };
+        // Admission can delay recovery but cannot settle the debit already
+        // attached to this ID. Keep clients on the original pending intent.
+        if (guarded) return { busy: true, record: existing, retryAfterMs: guarded.retryAfterMs,
+          guardReason: guarded.reason, ...quotaBalance(user) };
         await tx.put(C.queries, resumed);
-        return { record: resumed, balance: user.quota.balance, recovered: true };
+        return { record: resumed, ...quotaBalance(user), recovered: true };
       }
       const decision = record.kind === 'history'
         ? decideHistoryQuery({ user, product, requestedDayKey: record.dayKey, now: new Date(nowIso), config })
         : decideLiveQuery({ user, product, now: new Date(nowIso), config });
-      if (!decision.allowed) return { denied: decision, balance: user.quota.balance };
+      if (!decision.allowed) return { denied: decision, ...quotaBalance(user) };
       const guarded = await reserveAccountQuery(tx, { record, ownerId, nowIso, leaseMs, config });
-      if (guarded) return { denied: guarded, balance: user.quota.balance };
-      let balance = user.quota.balance;
+      if (guarded) return { denied: guarded, ...quotaBalance(user) };
       if (decision.cost > 0) {
         const id = record.kind === 'history' ? ledgerIds.historyDebit(user._id, record.queryId) : ledgerIds.queryDebit(user._id, record.queryId);
-        balance = (await applyLedgerIn(tx, { _id: id, userKey: user._id, type: record.kind === 'history' ? 'history_debit' : 'query_debit', delta: -decision.cost, dayKey: dayKey(nowIso), createdAt: nowIso, refId: record.queryId, partNumber: record.partNumber })).balance;
+        user = (await applyLedgerIn(tx, { _id: id, userKey: user._id, type: record.kind === 'history' ? 'history_debit' : 'query_debit', delta: -decision.cost, dayKey: dayKey(nowIso), createdAt: nowIso, refId: record.queryId, partNumber: record.partNumber })).user;
       }
       const pending = { ...record, charged: decision.cost, member: decision.member, status: 'pending', ownerId, leaseUntil: new Date(Date.parse(nowIso) + leaseMs).toISOString(), attempts: 1, createdAt: nowIso, finishedAt: null, response: null };
       await tx.put(C.queries, pending);
-      return { record: pending, balance };
+      return { record: pending, ...quotaBalance(user) };
     }),
 
     finishQuery: args => run(async tx => {
       const { id, ownerId, response, refund, nowIso } = args;
       const record = await tx.get(C.queries, id);
       if (!record) throw new ApiError('unknown_query', '查询记录不存在');
-      if (record.status !== 'pending') return { completed: false, record, response: record.response };
+      if (record.status !== 'pending') return { completed: false, record, response: record.response && {
+        ...record.response, quotaRevision: Number.isInteger(record.response.quotaRevision) ? record.response.quotaRevision : 0 } };
       if (record.ownerId !== ownerId) return { completed: false, stale: true, record };
       await releaseAccountQuery(tx, record, ownerId, nowIso);
       let user = await tx.get(C.users, record.userKey);
@@ -272,7 +282,9 @@ function atomicMethods(run) {
         user = result.user;
         refunded = record.charged;
       }
-      const final = { ...response, charged: record.charged, refunded, balance: user.quota.balance, member: record.member };
+      const final = { ...response, charged: record.charged, refunded, ...quotaBalance(user), member: record.member,
+        ...(record.kind === 'live' ? { finishedAt: nowIso,
+          alternativesExpiresAt: response.ok && (record.member || record.charged > refunded) ? new Date(Date.parse(nowIso) + 120000).toISOString() : null } : {}) };
       const completed = { ...record, status: final.ok ? 'success' : 'failed', response: final, finishedAt: nowIso, leaseUntil: null };
       if (completed.kind === 'history' && completed.status === 'success') {
         const previous = user.taskEvidence && user.taskEvidence.view_history;
@@ -295,9 +307,9 @@ function atomicMethods(run) {
         user = result.user;
         refunded = record.charged;
       }
-      const response = { ok: false, reason: 'query_expired', queryId: record.queryId, historyQueryId: record.kind === 'history' ? record.queryId : null, results: [], events: [], latest: [], charged: record.charged, refunded, balance: user.quota.balance, member: record.member, queriedAt: record.createdAt };
+      const response = { ok: false, reason: 'query_expired', queryId: record.queryId, historyQueryId: record.kind === 'history' ? record.queryId : null, results: [], events: [], latest: [], charged: record.charged, refunded, ...quotaBalance(user), member: record.member, queriedAt: record.createdAt };
       await tx.put(C.queries, { ...record, status: 'failed', finishedAt: nowIso, leaseUntil: null, response });
-      return { expired: true, refunded };
+      return { expired: true, refunded, ...quotaBalance(user) };
     }),
 
     recordObservation: ({ observation, continuityGapMs, collectorLease, queryTargetLease, nowIso }) => run(async tx => {
@@ -332,7 +344,7 @@ function atomicMethods(run) {
       const existing = await tx.get(C.follows, id);
       const index = user.followIndex || knownFollows.filter(f => f.status !== 'removed').map(f => ({ _id: f._id, partNumber: f.partNumber, status: f.status }));
       const at = new Date(nowIso);
-      if ((follow || status === 'active') && !canUseReminders(user, at)) throw new ApiError('member_required', '开通会员后可新增或恢复关注');
+      if ((follow || status === 'active') && !canUseReminders(user, at)) throw new ApiError('member_required', '关注与到货提醒为会员专属，开通会员后可新增或恢复关注');
       let next;
       if (follow) {
         const check = validateFollowLimits(index.filter(f => f._id !== id && f.status !== 'removed'), follow, isMember(user, at) ? LIMITS.maxFollows : FREE_REMINDER_FOLLOWS);
@@ -348,6 +360,17 @@ function atomicMethods(run) {
       await tx.put(C.users, user);
       await tx.put(C.follows, next);
       return next;
+    }),
+
+    recordNotificationOpen: ({ userKey, taskId, nowIso }) => run(async tx => {
+      const task = await tx.get(C.notifications, taskId);
+      if (!task || task.userKey !== userKey || task.userHiddenAt) return { recorded: false };
+      if (task.firstPresentedAt) return { recorded: false, firstOpenedAt: task.firstOpenedAt, firstPresentedAt: task.firstPresentedAt };
+      // Preserve legacy read-time telemetry separately. 1.6.0 only records a
+      // presentation when a visible page acknowledges successful rendering.
+      const firstOpenedAt = task.firstOpenedAt || nowIso;
+      await tx.put(C.notifications, { ...task, firstOpenedAt, firstPresentedAt: nowIso });
+      return { recorded: true, firstOpenedAt, firstPresentedAt: nowIso };
     }),
 
     recordNotificationFeedback: ({ userKey, taskId, outcome, nowIso, knownFollows = [] }) => run(async tx => {

@@ -311,6 +311,31 @@
       ]
     },
     {
+      "collectionName": "gxs_notification_tests",
+      "rules": {
+        "read": false,
+        "write": false
+      },
+      "indexes": [
+        {
+          "name": "user_created",
+          "keys": {
+            "userKey": 1,
+            "createdAt": -1
+          },
+          "unique": false
+        },
+        {
+          "name": "status_created",
+          "keys": {
+            "status": 1,
+            "createdAt": -1
+          },
+          "unique": false
+        }
+      ]
+    },
+    {
       "collectionName": "gxs_config",
       "rules": {
         "read": false,

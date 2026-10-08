@@ -2,11 +2,12 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
 import { createHash } from 'node:crypto';
+import fs from 'node:fs';
 import { createFixture, fakeFetch, userContext, userKeyOf, operatorContext } from './helpers/fixture.mjs';
 const require = createRequire(import.meta.url);
 const { createHandler } = require('../cloudfunctions/gxs_api/lib/app');
 const { COLLECTIONS: C } = require('../cloudfunctions/gxs_api/lib/collections');
-const { orderKey, paymentProviderFor } = require('../cloudfunctions/gxs_api/lib/payment/service');
+const { orderKey, paymentProviderFor, paymentProducts } = require('../cloudfunctions/gxs_api/lib/payment/service');
 const { mergeConfig } = require('../cloudfunctions/gxs_api/lib/config');
 const APPID = 'wxe96ad9e77b602f1b';
 const OPENID = 'oUSER000000000000000000001';
@@ -16,8 +17,8 @@ const env = { GXS_CONSUMER_APPID: APPID, GXS_CONSUMER_APPSECRET: 'fake-secret', 
 const json = data => new Response(JSON.stringify(data), { status: 200 });
 const ok = result => { assert.equal(result.ok, true, JSON.stringify(result.error)); return result.data; };
 
-async function fixture({ enabled = true } = {}) {
-  const f = createFixture({ config: { memberProduct: { enabled } } });
+async function fixture({ enabled = true, memberPlans, warn } = {}) {
+  const f = createFixture({ config: { memberProduct: { enabled }, ...(memberPlans ? { memberPlans } : {}) } });
   const calls = [], remote = new Map();
   const behavior = { ackFails: false, sessionOpenid: OPENID, sessionFails: false };
   const fetchImpl = async (url, options) => {
@@ -32,7 +33,7 @@ async function fixture({ enabled = true } = {}) {
     if (parsed.pathname === '/xpay/notify_provide_goods') return behavior.ackFails ? json({ errcode: -1, errmsg: 'temporary' }) : new Response('');
     throw Error('unexpected business network endpoint');
   };
-  const handler = createHandler({ repo: f.repo, fetchImpl, clock: () => f.state.now, paymentEnv: env, log: { error: (...args) => { f.logs.push(args); } } });
+  const handler = createHandler({ repo: f.repo, fetchImpl, clock: () => f.state.now, paymentEnv: env, log: { error: (...args) => { f.logs.push(args); }, ...(warn ? { warn } : {}) } });
   const call = (action, payload = {}, identity = userContext()) => handler({ action, payload }, identity);
   ok(await call('user.bootstrap'));
   function setRemote(id, patch = {}) {
@@ -55,6 +56,147 @@ test('disabled purchases expose seven-day product but create no order and perfor
   assert.equal(boot.memberProduct.paymentReady, false); assert.equal(boot.memberProduct.enabled, false);
   assert.equal(ok(await f.create()).reason, 'payment_not_enabled');
   assert.equal(await f.order(), null); assert.equal(f.calls.length, 0);
+});
+
+const newPlans = { member_30d: { productId: 'test-published-month', enabled: true }, member_365d: { productId: 'test-published-year', enabled: true } };
+
+test('all three published goods are mapped and purchasable once payment credentials are ready', async () => {
+  const f = await fixture();
+  const boot = ok(await f.call('user.bootstrap'));
+  assert.equal(boot.memberProduct.id, 'vip666');
+  assert.equal(boot.memberProduct.planId, 'member_7d');
+  assert.deepEqual(boot.memberProducts.map(plan => [plan.id, plan.planId, plan.days, plan.priceFen]), [
+    ['member_7d', 'member_7d', 7, 700], ['member_30d', 'member_30d', 30, 1990], ['member_365d', 'member_365d', 365, 20000],
+  ]);
+  assert.equal(boot.memberProducts[0].productId, 'vip666');
+  assert.deepEqual(boot.memberProducts.map(plan => plan.productId), ['vip666', 'vip777', 'vip888']);
+  for (const plan of boot.memberProducts) {
+    assert.equal(plan.paymentReady, true, plan.id);
+    assert.match(plan.note, /不自动续费/);
+  }
+  const status = ok(await f.call('member.status'));
+  assert.deepEqual(status.products, boot.memberProducts);
+  assert.equal(status.product.id, 'vip666');
+  assert.equal((await f.create('invalid-plan-001', { planId: 'invented-plan' })).error.code, 'invalid_member_plan');
+});
+
+test('reviewable runtime patch signs the published goods and leaves disabled weekly purchases closed', async () => {
+  const patch = JSON.parse(fs.readFileSync(new URL('../config/member-plans.runtime-patch.json', import.meta.url), 'utf8'));
+  const f = await fixture({ enabled: false });
+  ok(await f.call('admin.updateConfig', { patch }, operatorContext()));
+  assert.equal(ok(await f.create('week-still-disabled')).ok, false);
+  for (const [planId, productId, amount, days] of [['member_30d', 'vip777', 1990, 30], ['member_365d', 'vip888', 20000, 365]]) {
+    const result = ok(await f.create(`published-${days}-001`, { planId }));
+    const sign = JSON.parse(result.payment.signData);
+    assert.equal(sign.productId, productId); assert.equal(sign.goodsPrice, amount);
+    assert.equal(result.order.amountFen, amount); assert.equal(result.order.days, days);
+    assert.equal((await f.order(`published-${days}-001`)).productId, productId);
+  }
+});
+
+test('an explicit blank merchant mapping remains unavailable and never creates an order', async () => {
+  const f = await fixture({ memberPlans: { member_30d: { productId: '', enabled: false } } });
+  const rejected = ok(await f.create('blank-month-001', { planId: 'member_30d' }));
+  assert.equal(rejected.product.paymentReason, 'payment_product_id_missing');
+  assert.equal(await f.order('blank-month-001'), null); assert.equal(f.calls.length, 0);
+});
+
+for (const [planId, days, amount] of [['member_30d', 30, 1990], ['member_365d', 365, 20000]]) {
+  test(`${planId} signs mapped goods at the fixed price and fulfils its immutable duration once`, async () => {
+    const f = await fixture({ memberPlans: newPlans });
+    const id = `plan-purchase-${days}`;
+    const created = ok(await f.create(id, { planId, days: 9999, priceFen: 1, productId: 'forged-merchant-goods' }));
+    assert.equal(created.ok, true); assert.equal(created.order.planId, planId);
+    assert.equal(created.order.days, days); assert.equal(created.order.amountFen, amount);
+    const signed = JSON.parse(created.payment.signData), stored = await f.order(id);
+    assert.equal(signed.productId, newPlans[planId].productId); assert.equal(signed.goodsPrice, amount); assert.equal(signed.buyQuantity, 1);
+    assert.equal(stored.paymentSnapshot.version, 2); assert.equal(stored.paymentSnapshot.planId, planId);
+    assert.equal(stored.paymentSnapshot.priceFen, amount); assert.equal(stored.paymentSnapshot.days, days);
+    f.setRemote(id, { order_fee: amount, paid_fee: amount, left_fee: amount });
+    const checked = ok(await f.check(id));
+    assert.equal(checked.membership.expiresAt, new Date(f.state.now.getTime() + days * DAY).toISOString());
+    assert.equal(ok(await f.check(id)).membership.expiresAt, checked.membership.expiresAt);
+    assert.equal((await f.repo.listOrders(userKeyOf(), 20)).length, 1);
+  });
+}
+
+test('mixed plan renewals stack and cumulative refunds remove only their own remaining entitlement', async () => {
+  const f = await fixture({ memberPlans: newPlans });
+  let previousExpiry = f.state.now.getTime();
+  for (const [id, planId, amount, days] of [['week-old-001', 'member_7d', 700, 7], ['month-new-001', 'member_30d', 1990, 30], ['year-new-001', 'member_365d', 20000, 365]]) {
+    const created = ok(await f.create(id, { planId }));
+    assert.equal(JSON.parse(created.payment.signData).goodsPrice, amount, 'upgrading charges the full selected fee');
+    assert.equal(created.order.amountFen, amount);
+    f.setRemote(id, { order_fee: amount, paid_fee: amount, left_fee: amount });
+    const activated = ok(await f.check(id));
+    previousExpiry += days * DAY;
+    assert.equal(activated.membership.expiresAt, new Date(previousExpiry).toISOString(), 'each package extends the existing expiry by its full duration');
+  }
+  assert.equal((await f.user()).membership.expiresAt, new Date(f.state.now.getTime() + 402 * DAY).toISOString());
+  f.setRemote('month-new-001', { order_fee: 1990, paid_fee: 1990, left_fee: 995, status: 5 });
+  assert.equal(ok(await f.check('month-new-001')).membership.expiresAt, new Date(f.state.now.getTime() + 387 * DAY).toISOString());
+  assert.equal(ok(await f.check('month-new-001')).membership.expiresAt, new Date(f.state.now.getTime() + 387 * DAY).toISOString());
+  f.setRemote('month-new-001', { order_fee: 1990, paid_fee: 1990, left_fee: 0, status: 5 });
+  assert.equal(ok(await f.check('month-new-001')).membership.expiresAt, new Date(f.state.now.getTime() + 372 * DAY).toISOString());
+  assert.equal((await f.order('year-new-001')).status, 'fulfilled');
+  f.setRemote('year-new-001', { order_fee: 20000, paid_fee: 20000, left_fee: 0, status: 5 });
+  const annualRefund = ok(await f.check('year-new-001'));
+  assert.equal(annualRefund.membership.expiresAt, new Date(f.state.now.getTime() + 7 * DAY).toISOString());
+  assert.equal((await f.order('week-old-001')).status, 'fulfilled');
+  assert.equal(ok(await f.check('year-new-001')).membership.expiresAt, annualRefund.membership.expiresAt, 'annual refund replay cannot consume the weekly balance');
+});
+
+test('changing selection or disabling current goods cannot change or strand an existing paid plan', async () => {
+  const f = await fixture({ memberPlans: newPlans });
+  ok(await f.create('immutable-month-001', { planId: 'member_30d' }));
+  const original = await f.order('immutable-month-001');
+  f.setRemote('immutable-month-001', { order_fee: 1990, paid_fee: 0, left_fee: 0, status: 1 });
+  const pending = ok(await f.create('immutable-month-001', { planId: 'member_365d' }));
+  assert.equal(pending.order.planId, 'member_30d'); assert.equal(pending.order.amountFen, 1990); assert.equal(pending.payment, null);
+  ok(await f.call('admin.updateConfig', { patch: { memberPlans: { member_30d: { enabled: false, productId: 'test-month-replacement' } }, memberProduct: { enabled: false } } }, operatorContext()));
+  f.setRemote('immutable-month-001', { order_fee: 1990, paid_fee: 1990, left_fee: 1990 });
+  assert.equal(ok(await f.create('immutable-month-001', { planId: 'member_365d' })).membership.expiresAt, new Date(f.state.now.getTime() + 30 * DAY).toISOString());
+  assert.deepEqual((await f.order('immutable-month-001')).paymentSnapshot, original.paymentSnapshot);
+  const disabled = ok(await f.create('disabled-month-001', { planId: 'member_30d' }));
+  assert.equal(disabled.reason, 'payment_not_enabled');
+  assert.equal(disabled.product.paymentReason, 'payment_plan_disabled');
+});
+
+test('legacy seven-day orders without logical plan metadata remain reconcilable after additional plans are enabled', async () => {
+  const f = await fixture({ memberPlans: newPlans });
+  ok(await f.create('legacy-seven-001'));
+  const original = await f.order('legacy-seven-001');
+  delete original.planId;
+  f.repo.tables.get(C.orders).set(original._id, original);
+  f.setRemote('legacy-seven-001');
+  const result = ok(await f.create('legacy-seven-001', { planId: 'member_365d' }));
+  assert.equal(result.order.planId, 'member_7d'); assert.equal(result.order.amountFen, 700);
+  assert.equal(result.membership.expiresAt, new Date(f.state.now.getTime() + 7 * DAY).toISOString());
+});
+
+test('an unprepared monthly intent keeps its original plan when retried after the selection changes', async () => {
+  const f = await fixture({ memberPlans: newPlans });
+  f.behavior.sessionFails = true;
+  assert.equal((await f.create('unprepared-month-001', { planId: 'member_30d' })).ok, false);
+  assert.equal((await f.order('unprepared-month-001')).paymentPreparedAt, null);
+  f.behavior.sessionFails = false;
+  const retried = ok(await f.create('unprepared-month-001', { planId: 'member_365d' }));
+  assert.equal(retried.order.planId, 'member_30d');
+  assert.equal(JSON.parse(retried.payment.signData).goodsPrice, 1990);
+  assert.equal(JSON.parse(retried.payment.signData).productId, newPlans.member_30d.productId);
+});
+
+test('unsupported or crossed plan price-duration snapshots never grant membership', async () => {
+  for (const patch of [{ amountFen: 700, paymentSnapshot: { priceFen: 700 } }, { days: 365, paymentSnapshot: { days: 365 } }, { planId: 'member_365d', paymentSnapshot: { planId: 'member_365d' } }]) {
+    const f = await fixture({ memberPlans: newPlans });
+    ok(await f.create('tampered-month-001', { planId: 'member_30d' }));
+    const order = await f.order('tampered-month-001');
+    f.repo.tables.get(C.orders).set(order._id, { ...order, ...patch, paymentSnapshot: { ...order.paymentSnapshot, ...patch.paymentSnapshot } });
+    f.setRemote('tampered-month-001', { order_fee: 1990, paid_fee: 1990, left_fee: 1990 });
+    const refused = await f.check('tampered-month-001');
+    assert.equal(refused.error.code, 'payment_evidence_mismatch');
+    assert.equal((await f.user()).membership.expiresAt, null);
+  }
 });
 
 test('create persists trusted immutable product/account snapshot before exposing exact signed payment data', async () => {
@@ -236,6 +378,20 @@ test('lease cleanup does not replace an actionable payment identity rejection', 
   assert.doesNotMatch(JSON.stringify(response), /credential-bearing/);
 });
 
+test('a throwing cleanup logger preserves paid success and the original identity rejection', async () => {
+  const warnings = [];
+  const f = await fixture({ warn: text => { warnings.push(text); throw Error('logger failed'); } });
+  ok(await f.create()); f.setRemote('purchase-0001');
+  f.repo.releaseLease = async () => { throw Error('private transport details'); };
+  const paid = ok(await f.check());
+  assert.equal(paid.order.status, 'fulfilled'); assert.equal(paid.membership.active, true);
+  f.behavior.sessionOpenid = 'another-user';
+  const rejected = await f.create('other-intent-001');
+  assert.equal(rejected.ok, false); assert.equal(rejected.error.code, 'payment_openid_mismatch');
+  assert.deepEqual(warnings, ['[payment] order lease cleanup failed', '[payment] order lease cleanup failed']);
+  assert.doesNotMatch(JSON.stringify(rejected), /private transport|logger failed/);
+});
+
 test('closed platform order becomes cancelled and can never be reopened by reuse of its client ID', async () => {
   const f = await fixture(); ok(await f.create()); f.setRemote('purchase-0001', { status: 6, paid_fee: 0, left_fee: 0 });
   assert.equal(ok(await f.check()).order.status, 'cancelled');
@@ -259,6 +415,8 @@ test('production contexts share only the latest credential/config provider while
     const context = () => ({ config: mergeConfig({ memberProduct: { enabled: true } }), fetchImpl: globalThis.fetch, paymentCacheAllowed: true });
     const first = paymentProviderFor(context());
     assert.equal(paymentProviderFor(context()), first);
+    paymentProducts(context());
+    assert.equal(paymentProviderFor(context()), first, 'listing the other plans preserves the default provider and its token cache');
     process.env.GXS_VIRTUAL_PAYMENT_APPKEY = 'rotated-fake-key';
     const rotated = paymentProviderFor(context()); assert.notEqual(rotated, first);
     assert.equal(paymentProviderFor(context()), rotated);
@@ -308,5 +466,111 @@ test('abandoning asks the platform first: a paid order is fulfilled instead of a
   const result = ok(await f.call('member.abandonOrder', { orderId: 'purchase-0001' }));
   assert.equal(result.order.status, 'fulfilled'); assert.equal(result.order.abandoned, false);
   assert.equal(result.membership.active, true);
-  assert.equal((await f.call('member.abandonOrder', { orderId: 'someone-else-01' })).error.code, 'unknown_order');
+  const other = ok(await f.call('member.abandonOrder', { orderId: 'purchase-0001' }, userContext('other-user')));
+  assert.equal(other.order.status, 'cancelled');
+  assert.equal((await f.order()).status, 'fulfilled', 'same client ID for another account never modifies this order');
+});
+
+test('failed or contradictory payment verification cannot abandon an issued checkout', async () => {
+  for (const reason of ['unavailable', 'mismatched_amount']) {
+    const f = await fixture(); ok(await f.create());
+    if (reason === 'mismatched_amount') f.setRemote('purchase-0001', { order_fee: 1990 });
+    const result = await f.call('member.abandonOrder', { orderId: 'purchase-0001' });
+    assert.equal(result.ok, false, reason);
+    assert.equal(Boolean((await f.order()).abandonedAt), false, reason);
+    assert.equal((await f.order()).status, 'created');
+  }
+});
+
+test('abandon cannot bypass another in-flight payment reconciliation lease', async () => {
+  const f = await fixture(); ok(await f.create());
+  const order = await f.order();
+  await f.repo.acquireLease({ id: `pay_order_${order._id}`, ownerId: 'payment-callback', now: f.state.now.toISOString(), expiresAt: new Date(f.state.now.getTime() + 60000).toISOString() });
+  const result = await f.call('member.abandonOrder', { orderId: 'purchase-0001' });
+  assert.equal(result.ok, false);
+  assert.equal(result.error.code, 'payment_pending');
+  assert.equal(Boolean((await f.order()).abandonedAt), false);
+});
+
+test('cancelling an intent before backend creation is durable and fences delayed creates', async () => {
+  const f = await fixture();
+  const cancelled = ok(await f.call('member.abandonOrder', { orderId: 'before-login-001' }));
+  assert.equal(cancelled.order.status, 'cancelled');
+  assert.equal(cancelled.order.type, 'membership_cancelled_intent');
+  assert.equal(cancelled.order.amountFen, 0);
+  assert.equal(cancelled.membership.active, false);
+  assert.equal(f.calls.length, 0, 'no signature was ever issued so no platform request is required');
+  assert.equal(ok(await f.check('before-login-001')).order.status, 'cancelled');
+  assert.equal(ok(await f.call('member.abandonOrder', { orderId: 'before-login-001' })).order.status, 'cancelled');
+  const replay = ok(await f.create('before-login-001', { planId: 'member_365d' }));
+  assert.equal(replay.order.status, 'cancelled');
+  assert.equal(replay.payment, null);
+  assert.equal(f.calls.length, 0);
+  assert.equal((await f.repo.listReconcileOrders({ nowIso: f.state.now.toISOString() })).length, 0);
+  assert.equal(ok(await f.create('replacement-intent')).ok, true);
+});
+
+test('cancelling an intent with failed login after backend creation keeps its original plan', async () => {
+  const f = await fixture(); f.behavior.sessionFails = true;
+  assert.equal((await f.create('failed-session-001', { planId: 'member_30d' })).ok, false);
+  const cancelled = ok(await f.call('member.abandonOrder', { orderId: 'failed-session-001' }));
+  assert.equal(cancelled.order.abandoned, true);
+  assert.equal(cancelled.order.days, 30);
+  assert.equal(cancelled.order.amountFen, 1990);
+  assert.equal(cancelled.membership.active, false);
+  f.behavior.sessionFails = false;
+  const replay = ok(await f.create('failed-session-001'));
+  assert.equal(replay.payment, null);
+  assert.equal(replay.order.abandoned, true);
+  assert.equal(f.calls.filter(call => call.path === '/sns/jscode2session').length, 1, 'an abandoned intent never issues a new signature');
+});
+
+test('internal cancellation fences stay recoverable but never appear as zero-day memberships', async () => {
+  const f = await fixture();
+  ok(await f.call('member.abandonOrder', { orderId: 'hidden-intent-001' }));
+  assert.deepEqual(ok(await f.call('member.status')).orders, []);
+  assert.equal((await f.order('hidden-intent-001')).type, 'membership_cancelled_intent');
+  assert.equal(ok(await f.check('hidden-intent-001')).order.status, 'cancelled');
+  const replay = ok(await f.create('hidden-intent-001'));
+  assert.equal(replay.order.status, 'cancelled');
+  assert.equal(replay.payment, null);
+  assert.equal(f.calls.length, 0);
+});
+
+test('membership history retains actual purchases beside hidden cancellation fences', async () => {
+  const f = await fixture();
+  ok(await f.create('real-purchase-001'));
+  f.setRemote('real-purchase-001');
+  ok(await f.check('real-purchase-001'));
+  ok(await f.call('member.abandonOrder', { orderId: 'hidden-intent-002' }));
+  const status = ok(await f.call('member.status'));
+  assert.deepEqual(status.orders.map(order => order.orderId), ['real-purchase-001']);
+  assert.equal(status.orders[0].days, 7);
+  assert.equal(status.orders[0].status, 'fulfilled');
+  assert.equal(status.membership.active, true);
+});
+
+test('concurrent cancellation and delayed create cannot reopen a cancelled client intent', async () => {
+  const f = await fixture();
+  const originalCreate = f.repo.createOrderIfAbsent;
+  let releaseCancellation, reachedCancellation;
+  const entered = new Promise(resolve => { reachedCancellation = resolve; });
+  const persist = new Promise(resolve => { releaseCancellation = resolve; });
+  f.repo.createOrderIfAbsent = async order => {
+    if (order.type === 'membership_cancelled_intent') { reachedCancellation(); await persist; }
+    return originalCreate(order);
+  };
+  const abandoning = f.call('member.abandonOrder', { orderId: 'concurrent-intent-001' });
+  await entered;
+  const creating = await f.create('concurrent-intent-001');
+  assert.equal(creating.ok, false);
+  assert.equal(creating.error.code, 'payment_pending');
+  assert.equal(f.calls.length, 0);
+  releaseCancellation();
+  assert.equal(ok(await abandoning).order.status, 'cancelled');
+  const retry = ok(await f.create('concurrent-intent-001'));
+  assert.equal(retry.payment, null);
+  assert.equal(retry.order.status, 'cancelled');
+  assert.equal(f.calls.length, 0);
+  assert.equal((await f.user()).membership.expiresAt, null);
 });

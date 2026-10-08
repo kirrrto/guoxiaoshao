@@ -67,6 +67,20 @@
         <view wx:if="{{result.billingText}}" class="small history-billing-note mt">{{result.billingText}}</view>
       </view>
 
+      <view class="history-insights">
+        <view class="small bold">当天记录速览</view>
+        <view class="tiny text-2 mt">{{result.insights.scopeText}}</view>
+        <view class="small mt">{{result.insights.recordedText}}</view>
+        <view class="tiny muted mt">{{result.insights.pageText}}</view>
+        <view wx:if="{{result.insights.timeBands.length}}" class="history-time-bands">
+          <view wx:for="{{result.insights.timeBands}}" wx:key="label" class="history-time-band"><text class="bold">{{item.count}} 条</text><text class="tiny muted">{{item.label}}</text></view>
+        </view>
+        <view wx:if="{{result.insights.noRestockText}}" class="tiny muted mt">{{result.insights.noRestockText}}</view>
+        <view wx:if="{{result.insights.lastRestockText}}" class="small text-2 mt">{{result.insights.lastRestockText}}</view>
+        <view class="tiny muted mt">{{result.insights.sampleWindowText}}</view>
+        <view class="tiny muted mt">时间为北京时间，仅供回看已记录变化，不预测下一次补货。</view>
+      </view>
+
       <view wx:if="{{result.hasEventRecords}}" class="section-label">已记录事件统计</view>
       <view wx:if="{{result.hasEventRecords}}" class="stat-row">
         <view class="stat"><view class="num">{{result.summary.available}}</view><view class="lbl">首次可取货</view></view>

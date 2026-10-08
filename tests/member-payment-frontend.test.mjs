@@ -123,6 +123,80 @@ test('closing and reopening restores the same account order and queries it witho
   assert.equal(next.logins.length, 0); assert.equal(next.payments.length, 0);
 });
 
+test('monthly intent survives a lost response, restart and a changed selected plan', async () => {
+  const monthly = { ...product, id: 'member_30d', planId: 'member_30d', days: 30, priceFen: 1990 };
+  const first = runtime({ nextProduct: monthly, handler: () => { throw { code: 'call_failed' }; } });
+  await first.controller.show(); await first.controller.buy();
+  assert.equal(first.calls[0].payload.planId, 'member_30d');
+  assert.deepEqual([...first.storage.values()][0], { orderId: 'pay-test-order-1', planId: 'member_30d' });
+  first.controller.dispose();
+  const next = runtime({ storage: first.storage, nextProduct: { ...product, id: 'member_365d', planId: 'member_365d', days: 365, priceFen: 20000 },
+    handler: (action, payload) => {
+      if (action === 'member.checkOrder') throw { code: 'unknown_order' };
+      return { ok: true, order: { orderId: payload.orderId, planId: 'member_30d', days: 30, amountFen: 1990 }, payment: signed };
+    }, cashier: options => options.fail({ errMsg: 'cancel' }) });
+  await next.controller.show();
+  assert.equal(next.payments.length, 0);
+  await next.controller.buy();
+  const retry = next.calls.find(item => item.action === 'member.createOrder');
+  assert.equal(retry.payload.orderId, 'pay-test-order-1');
+  assert.equal(retry.payload.planId, 'member_30d');
+  assert.equal(next.state().paymentPendingPlanId, 'member_30d');
+  assert.equal(next.state().paymentOrderSummary, '30 天会员 · ¥19.90');
+});
+
+test('checked original order overrides a restored plan hint before reopening the cashier', async () => {
+  const storage = new Map([[STORAGE_PREFIX + encodeURIComponent('wx-app:account-a'), { orderId: 'original-plan-order', planId: 'member_365d' }]]);
+  const rt = runtime({ storage, handler: (action, payload) => {
+    const order = { orderId: payload.orderId, planId: 'member_30d', status: 'created', days: 30, amountFen: 1990 };
+    return action === 'member.createOrder' ? { ok: true, order, payment: signed } : { order, membership: free };
+  }, cashier: options => options.fail({ errMsg: 'cancel' }) });
+  await rt.controller.show(); await rt.controller.buy();
+  assert.equal(rt.calls.find(item => item.action === 'member.createOrder').payload.planId, 'member_30d');
+  assert.equal(rt.state().paymentPendingPlanId, 'member_30d');
+});
+
+test('annual intent uses 365 days in fallback purchase notice and never stores credentials', async () => {
+  const annual = { ...product, id: 'member_365d', planId: 'member_365d', days: 365, priceFen: 20000 };
+  assert.match(purchaseNotice(annual), /一次购买 365 天/);
+  const rt = runtime({ nextProduct: annual, cashier: options => options.fail({ errMsg: 'cancel' }) });
+  await rt.controller.show(); await rt.controller.buy();
+  assert.equal(rt.calls[0].payload.planId, 'member_365d');
+  assert.deepEqual(Object.keys([...rt.storage.values()][0]).sort(), ['orderId', 'planId']);
+});
+
+test('a plan corrected by the retry lookup requires a fresh explicit purchase confirmation', async () => {
+  let lookups = 0;
+  const storage = new Map([[STORAGE_PREFIX + encodeURIComponent('wx-app:account-a'), { orderId: 'corrected-plan-order', planId: 'member_365d' }]]);
+  const rt = runtime({ storage, handler: (action, payload) => {
+    if (action === 'member.checkOrder' && ++lookups === 1) throw { code: 'call_failed' };
+    const order = { orderId: payload.orderId, planId: 'member_30d', status: 'created', days: 30, amountFen: 1990 };
+    return action === 'member.createOrder' ? { ok: true, order, payment: signed } : { order, membership: free };
+  }, cashier: options => options.fail({ errMsg: 'cancel' }) });
+  await rt.controller.show(); await rt.controller.buy();
+  assert.equal(rt.payments.length, 0);
+  assert.equal(rt.logins.length, 0);
+  assert.match(rt.state().paymentMessage, /重新确认/);
+  assert.equal(rt.state().paymentOrderSummary, '30 天会员 · ¥19.90');
+  await rt.controller.buy();
+  assert.equal(rt.payments.length, 1);
+  assert.equal(rt.calls.find(item => item.action === 'member.createOrder').payload.planId, 'member_30d');
+});
+
+test('a create response that first reveals another original plan cannot open that cashier without reconfirming', async () => {
+  const storage = new Map([[STORAGE_PREFIX + encodeURIComponent('wx-app:account-a'), { orderId: 'corrected-create-order', planId: 'member_30d' }]]);
+  const rt = runtime({ storage, handler: (action, payload) => {
+    if (action === 'member.checkOrder') throw { code: 'unknown_order' };
+    return { ok: true, order: { orderId: payload.orderId, planId: 'member_365d', status: 'created', days: 365, amountFen: 20000 }, payment: signed };
+  } });
+  await rt.controller.show(); await rt.controller.buy();
+  assert.equal(rt.payments.length, 0);
+  assert.equal(rt.state().paymentPendingPlanId, 'member_365d');
+  assert.equal(rt.state().paymentOrderSummary, '365 天会员 · ¥200.00');
+  assert.equal(rt.state().paymentCanRetry, true);
+  assert.match(rt.state().paymentMessage, /重新确认/);
+});
+
 test('another account cannot restore or receive the first account pending order or late confirmation', async () => {
   const result = deferred();
   const storage = new Map([[STORAGE_PREFIX + encodeURIComponent('wx-app:account-a'), { orderId: 'account-a-order' }]]);
@@ -314,6 +388,30 @@ test('cancelling the purchase notice never creates an order or opens the cashier
   assert.equal(page.data.paymentPendingId, '');
 });
 
+test('purchase confirmation cannot move to another account, hidden page or a replacement order', async () => {
+  for (const change of ['account', 'hide', 'order']) {
+    let definition, modal;
+    const calls = [];
+    const wx = { getDeviceInfo: () => ({ platform: 'android' }), requestVirtualPayment() {}, canIUse: () => true,
+      getStorageSync() {}, showModal: options => { modal = options; } };
+    const source = path.resolve('miniprogram/pages/mine/index.js');
+    vm.runInNewContext(fs.readFileSync(source, 'utf8'), { wx, Page: value => { definition = value; },
+      require: name => name.endsWith('/api') ? { call: async (...args) => calls.push(args) }
+        : name.endsWith('/store') ? { invalidateBootstrap() {}, invalidateFollows() {}, publishQuota() {}, subscribeQuota: () => () => {} }
+        : require(path.resolve(path.dirname(source), name)) });
+    const page = { ...definition, pageVisible: true, data: structuredClone(definition.data), setData(patch) { Object.assign(this.data, patch); } };
+    const boot = { identity: { userKey: 'account-a' }, membership: free, memberProduct: product, collector: { state: 'not_deployed' }, quota: { tasksDoneToday: [] }, limits: {}, tasks: [], followCount: 0 };
+    page.applyBoot(boot); page.data.ready = true;
+    const purchase = page.onBuyMembership();
+    if (change === 'account') { page.applyBoot({ ...boot, identity: { userKey: 'account-b' } }); page.applyBoot(boot); }
+    if (change === 'hide') page.onHide();
+    if (change === 'order') page.data.paymentPendingId = 'another-order-id';
+    modal.success({ confirm: true }); await purchase;
+    assert.equal(calls.length, 0, change);
+    assert.equal(page.data.paymentBusy, false, change);
+  }
+});
+
 test('an iPhone cashier failure explains the Apple ID requirement and the order can then be abandoned', async () => {
   let abandoned = false;
   const handler = async (action, payload) => {
@@ -346,7 +444,7 @@ test('abandoning a paid order activates membership instead, and a network failur
   offline.controller.sync({ userKey: 'wx-app:account-b' }, product); offline.controller.sync({ userKey: 'wx-app:account-a' }, product);
   await offline.controller.abandon();
   assert.equal(offline.state().paymentPendingId, 'pay-existing-002');
-  assert.match(offline.state().paymentError, /暂时无法放弃/);
+  assert.match(offline.state().paymentError, /暂时无法确认.*订单号已保留/);
 });
 
 test('a previously abandoned order found on another device is treated as closed', async () => {
@@ -355,4 +453,51 @@ test('a previously abandoned order found on another device is treated as closed'
   rt.controller.sync({ userKey: 'wx-app:account-b' }, product); rt.controller.sync({ userKey: 'wx-app:account-a' }, product);
   await rt.controller.show();
   assert.equal(rt.state().paymentPendingId, ''); assert.match(rt.state().paymentMessage, /已放弃，可重新购买/);
+});
+
+test('abandon retains recovery for unresolved or malformed server results', async () => {
+  for (const fields of [{ status: 'created' }, { status: 'created', paymentPending: true }, { status: 'unknown' }, { status: 'fulfilled' }]) {
+    const storage = new Map([[STORAGE_PREFIX + encodeURIComponent('wx-app:account-a'), { orderId: 'pending-abandon-order' }]]);
+    const rt = runtime({ storage, handler: (action, payload) => ({ order: { orderId: payload.orderId, ...fields }, membership: free }) });
+    await rt.controller.abandon();
+    assert.equal(rt.state().paymentPendingId, 'pending-abandon-order', fields.status);
+    assert.equal(storage.size, 1, fields.status);
+    assert.equal(rt.resolved.length, 0, fields.status);
+    assert.doesNotMatch(rt.state().paymentMessage, /已放弃|会员已开通/);
+  }
+});
+
+test('abandon handles confirmed refunds and expired fulfilment without claiming new activation', async () => {
+  for (const status of ['refunded', 'fulfilled']) {
+    const storage = new Map([[STORAGE_PREFIX + encodeURIComponent('wx-app:account-a'), { orderId: 'terminal-abandon-order' }]]);
+    const rt = runtime({ storage, handler: (action, payload) => ({ order: { orderId: payload.orderId, status, fulfilledAt: '2026-09-20T00:00:00Z' }, membership: free }) });
+    await rt.controller.abandon();
+    assert.equal(rt.state().paymentPendingId, '');
+    assert.doesNotMatch(rt.state().paymentMessage, /会员已开通|已放弃/);
+    assert.equal(rt.resolved.length, 1);
+    assert.equal(rt.resolved[0].activated, false);
+  }
+});
+
+test('login failure can cancel its uncreated intent and then buy a different plan with a new identifier', async () => {
+  let logins = 0;
+  const rt = runtime({ login: options => ++logins === 1 ? options.fail({}) : options.success({ code: 'fresh-login' }),
+    handler: (action, payload) => action === 'member.abandonOrder'
+      ? { order: { orderId: payload.orderId, status: 'cancelled', type: 'membership_cancelled_intent', amountFen: 0, days: 0 }, membership: free }
+      : { ok: true, order: { orderId: payload.orderId, planId: 'member_365d', days: 365, amountFen: 20000, status: 'created' }, payment: signed },
+    cashier: options => options.fail({ errMsg: 'cancel' }) });
+  await rt.controller.show(); await rt.controller.buy();
+  const cancelledId = rt.state().paymentPendingId;
+  assert.equal(rt.calls.length, 0);
+  assert.ok(cancelledId);
+  await rt.controller.abandon();
+  assert.equal(rt.state().paymentPendingId, '');
+  assert.equal(rt.state().paymentOrderSummary, '');
+  assert.equal(rt.storage.size, 0);
+  rt.controller.sync({ userKey: 'wx-app:account-a' }, { ...product, id: 'member_365d', planId: 'member_365d', days: 365, priceFen: 20000 });
+  await rt.controller.buy();
+  const created = rt.calls.find(call => call.action === 'member.createOrder');
+  assert.notEqual(created.payload.orderId, cancelledId);
+  assert.equal(created.payload.planId, 'member_365d');
+  assert.equal(rt.payments.length, 1);
 });

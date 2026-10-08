@@ -16,6 +16,9 @@ let bootstrapPromise = null;
 let bootstrapGeneration = 0;
 let bootstrapFetchedAt = 0;
 let latestQuota = null;
+// A query returns only balance + revision, not signin/task metadata. Track it
+// separately so a later-arriving full quota can still fill that metadata in.
+let latestBalance = null;
 let catalogPromise = null;
 let catalogGeneration = 0;
 let catalogCheckedAt = 0;
@@ -33,7 +36,7 @@ let followGeneration = 0;
 function invalidateFollows() { followGeneration += 1; followSnapshot = null; followPromise = null; }
 function resetSession() {
   invalidateBootstrap(); invalidateFollows();
-  latestQuota = null;
+  latestQuota = null; latestBalance = null;
   bootstrapFetchedAt = 0; catalogCheckedAt = 0; catalogRetryAt = 0; catalogPromise = null; catalogGeneration += 1;
   const app = getApp(); app.globalData.catalog = null; app.globalData.lastQuery = null; app.globalData.pendingFollow = null;
 }
@@ -59,8 +62,8 @@ async function refreshBootstrap() {
   const pending = call('user.bootstrap').then(data => {
     if (generation !== bootstrapGeneration) return getBootstrap();
     if (data.quota) {
-      if (isOlderQuota(data.quota)) data = { ...data, quota: latestQuota };
-      else latestQuota = data.quota;
+      if (!isOlderQuota(data.quota)) rememberQuota(data.quota);
+      data = { ...data, quota: currentQuota() };
     }
     app.globalData.bootstrap = data; bootstrapFetchedAt = Date.now();
     return data;
@@ -86,17 +89,59 @@ function isOlderQuota(quota) {
   return revision < latestRevision || (revision === latestRevision && quota.dayKey && latestQuota.dayKey && quota.dayKey < latestQuota.dayKey);
 }
 
+const validBalance = value => Number.isSafeInteger(value) && value >= 0;
+const validRevision = value => Number.isSafeInteger(value) && value >= 0;
+
+function rememberBalance(balance, revision) {
+  if (!validBalance(balance) || !validRevision(revision) || latestBalance && revision < latestBalance.revision) return false;
+  latestBalance = { balance, revision };
+  return true;
+}
+
+function rememberQuota(quota) {
+  latestQuota = { ...quota };
+  rememberBalance(quota.balance, validRevision(quota.revision) ? quota.revision : 0);
+}
+
+/** Latest full quota metadata with the newest confirmed balance projected onto it. */
+function currentQuota() {
+  return latestQuota ? { ...latestQuota, ...(latestBalance ? { balance: latestBalance.balance } : {}) } : null;
+}
+
+function broadcastQuota(quota) {
+  if (!quota) return;
+  const app = getApp();
+  if (app.globalData.bootstrap) app.globalData.bootstrap = { ...app.globalData.bootstrap, quota };
+  for (const listener of quotaListeners) { try { listener(quota); } catch (e) { console.error('[gxs] quota listener', e); } }
+}
+
 function publishQuota(quota) {
   if (isOlderQuota(quota)) return false;
-  latestQuota = quota;
+  rememberQuota(quota);
   // Cancel older account reads so returning to Mine cannot repaint a pre-reward
   // balance. Broadcast even when no complete bootstrap is currently cached.
   bootstrapGeneration += 1;
   bootstrapPromise = null;
-  const app = getApp();
-  if (app.globalData.bootstrap) app.globalData.bootstrap = { ...app.globalData.bootstrap, quota };
-  for (const listener of quotaListeners) { try { listener(quota); } catch (e) { console.error('[gxs] quota listener', e); } }
+  broadcastQuota(currentQuota());
   return true;
+}
+
+/** Publish a query's atomic balance snapshot without inventing full quota metadata. */
+function publishQueryBalance(response) {
+  const versioned = response && validBalance(response.balance) && validRevision(response.quotaRevision);
+  if (!versioned) {
+    // Old deployed functions cannot establish ordering. Preserve observed quota
+    // and ask the caller for one safe account refresh; query results stay usable.
+    invalidateBootstrap();
+    return { balance: latestBalance ? latestBalance.balance : null, accepted: false, needsRefresh: true };
+  }
+  const accepted = rememberBalance(response.balance, response.quotaRevision);
+  if (accepted) {
+    bootstrapGeneration += 1;
+    bootstrapPromise = null;
+    broadcastQuota(currentQuota());
+  }
+  return { balance: latestBalance.balance, accepted, needsRefresh: false };
 }
 
 /** Apply confirmed reminder credits to the cached account and open pages without a refetch. */
@@ -138,8 +183,13 @@ async function getBootstrap({ force = false } = {}) {
 
 function indexCatalog(raw) {
   const stores = (raw.stores || []).map(presentStore);
-  const familyNames = Object.fromEntries((raw.families || []).map(f => [f.familyKey, f.displayName || f.name || f.familyKey]));
-  const familyMetadata = Object.fromEntries((raw.families || []).map((f, catalogOrder) => [f.familyKey, { ...f, catalogOrder }]));
+  // Static ES2019 helpers are not guaranteed by syntax transpilation. Build
+  // these maps directly so an older JS engine can still show the offline seed.
+  const familyNames = Object.create(null), familyMetadata = Object.create(null);
+  (raw.families || []).forEach((family, catalogOrder) => {
+    familyNames[family.familyKey] = family.displayName || family.name || family.familyKey;
+    familyMetadata[family.familyKey] = { ...family, catalogOrder };
+  });
   const products = (raw.products || []).map(source => {
     // Only send fields used by the UI through setData. Indexed lookup maps
     // repeat each product, so provenance/unused upstream metadata can exceed
@@ -251,4 +301,4 @@ async function getCatalog({ force = false } = {}) {
   return catalog;
 }
 
-module.exports = { getBootstrap, refreshBootstrap, invalidateBootstrap, publishQuota, subscribeQuota, publishSubscriptions, subscribeSubscriptions, getQuotaGeneration, getCatalog, refreshCatalog, currentCatalog, subscribeCatalog, getFollows, invalidateFollows, resetSession, CATEGORY_NAME };
+module.exports = { getBootstrap, refreshBootstrap, invalidateBootstrap, publishQuota, publishQueryBalance, currentQuota, subscribeQuota, publishSubscriptions, subscribeSubscriptions, getQuotaGeneration, getCatalog, refreshCatalog, currentCatalog, subscribeCatalog, getFollows, invalidateFollows, resetSession, CATEGORY_NAME };

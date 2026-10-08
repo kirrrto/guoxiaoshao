@@ -1,11 +1,12 @@
 const { call, showError, toast } = require('../../utils/api');
-const { getBootstrap, getCatalog, invalidateBootstrap, publishQuota, getQuotaGeneration, subscribeCatalog } = require('../../utils/store');
+const { getBootstrap, getCatalog, invalidateBootstrap, publishQuota, getQuotaGeneration, subscribeCatalog, subscribeQuota, currentQuota, publishQueryBalance } = require('../../utils/store');
 const fmt = require('../../utils/format');
 const { storeLabel } = require('../../utils/store-label');
 const { localKey } = require('../../utils/local-key');
 const operation = require('../../utils/operation');
 const { syncTabBar } = require('../../utils/tab-bar');
 const { shareAppMessage, shareTimeline } = require('../../utils/share');
+const { historyInsights } = require('../../utils/observation-insights');
 
 const SELECTION_KEY = 'gxs_history_selection_v1';
 const SOURCE_TEXT = { auto: '自动监测', manual: '手动查询' };
@@ -25,7 +26,7 @@ function selectionSummary(selection, catalog) {
       : stores.length ? stores.map(store => storeLabel(store.storeNumber, store.name)).join('、') : '各地已有记录 · 未限定门店' };
 }
 
-function presentHistory(response, catalog) {
+function presentHistory(response, catalog, request) {
   const now = Date.now();
   const storeName = (n, fallback) => storeLabel(n, fallback || (catalog && catalog.storeByNumber[n] ? catalog.storeByNumber[n].name : n));
   const sorted = response.events.slice().sort((a, b) => Date.parse(b.detectedAt) - Date.parse(a.detectedAt));
@@ -49,6 +50,7 @@ function presentHistory(response, catalog) {
     : '未查到该条件的历史事件或当日观测凭据，无法判断当天供应情况。';
   return {
     ...response,
+    insights: historyInsights(response, request, catalog),
     dayText: response.dayKey,
     hasEventRecords: eventCount > 0,
     coverageTitle,
@@ -130,11 +132,18 @@ Page({
 
   async onLoad() {
     if (this.pageRetired || this.loadingBoot) return;
+    if (!this.dateInitialized) {
+      this.dateInitialized = true;
+      this.setData({ dayKey: fmt.todayKey(), today: fmt.todayKey(), earliestDay: fmt.retentionStartKey() });
+    }
     // Create mutable logic state per instance; it is not rendered via setData.
     if (!this.selection) this.selection = { partNumber: null, product: null, storeNumbers: [], stores: [] };
     this.loadingBoot = true;
     this.pageRetired = false;
     if (!this.unsubscribeCatalog) this.unsubscribeCatalog = subscribeCatalog(catalog => this.applyCatalog(catalog));
+    if (!this.unsubscribeQuota) this.unsubscribeQuota = subscribeQuota(quota => {
+      if (!this.pageRetired && this.data.boot) this.setData({ 'boot.balance': quota.balance });
+    });
     let pickerValue = null;
     try { pickerValue = wx.getStorageSync(localKey(SELECTION_KEY)) || null; } catch (e) { pickerValue = null; }
     try {
@@ -164,12 +173,13 @@ Page({
   async onShow() {
     if (this.pageRetired) return;
     syncTabBar(this, '/pages/history/index');
+    this.refreshDateWindow();
     if (!this.data.ready) return;
     this.refreshObservationSnapshot();
     try { const boot = await getBootstrap(); if (this.pageRetired) return; this.applyBoot(boot); getCatalog(); this.loadBrowse(); } catch (e) { /* keep snapshot */ }
   },
 
-  onUnload() { this.pageRetired = true; if (this.unsubscribeCatalog) this.unsubscribeCatalog(); },
+  onUnload() { this.pageRetired = true; if (this.unsubscribeCatalog) this.unsubscribeCatalog(); if (this.unsubscribeQuota) this.unsubscribeQuota(); },
 
   onShareAppMessage() {
     return shareAppMessage('/pages/history/index', { ...this.data, selection: this.selection });
@@ -198,7 +208,7 @@ Page({
   },
 
   refreshObservationSnapshot() {
-    if (this.historySnapshot) this.setData({ result: presentHistory(this.historySnapshot, this.catalog) });
+    if (this.historySnapshot) this.setData({ result: presentHistory(this.historySnapshot, this.catalog, this.historyRequest) });
   },
 
   onPullDownRefresh() {
@@ -209,6 +219,7 @@ Page({
 
   applyBoot(boot) {
     if (this.pageRetired) return;
+    this.refreshDateWindow();
     const task = (boot.tasks || []).find(t => t.id === 'view_history' && t.reward > 0);
     const membershipRestoresAccess = boot.membership.active
       && ['insufficient_credits', 'new_product_history_restricted'].includes(this.restrictionReason);
@@ -225,10 +236,17 @@ Page({
         taskReward: task ? task.reward : 0,
       },
       collector: { ...boot.collector, ...fmt.collectorMeta(boot.collector.state) },
-      today: fmt.todayKey(),
-      earliestDay: fmt.retentionStartKey(),
-      ...(this.data.dayKey < fmt.retentionStartKey() ? { dayKey: fmt.retentionStartKey() } : {}),
     });
+  },
+
+  refreshDateWindow() {
+    const today = fmt.todayKey(), earliestDay = fmt.retentionStartKey();
+    const dayKey = !this.dateExplicit && this.data.dayKey === this.data.today ? today : this.data.dayKey;
+    const expired = dayKey < earliestDay || dayKey > today;
+    // Do not silently replace an explicitly selected date with the oldest
+    // retained date. That would change the intent of the next charged query.
+    this.setData({ today, earliestDay, dayKey, resultTargetDifferent: this.hasDifferentResult(this.selection, dayKey),
+      ...(expired ? { restoreWarning: true, restoreNotice: `所选日期已超出最近 ${fmt.RETENTION_DAYS} 天范围，请重新选择日期；当前条件未自动更改。` } : {}) });
   },
 
   async loadBrowse({ force = false } = {}) {
@@ -263,7 +281,7 @@ Page({
         title: products[item.partNumber] ? products[item.partNumber].title : item.partNumber,
         scopeText: item.storeNumbers.length ? `${item.storeNumbers.length} 家门店` : '各地门店已有记录',
       })) } });
-      if (reward && accepted) this.applyTaskReward(reward);
+      if (reward && accepted) this.applyTaskReward({ ...reward, quota: currentQuota() || reward.quota });
     } catch (error) {
       if (!this.pageRetired) this.setData({ browseError: '浏览记录加载或奖励确认未完成，请重试；重复加载不会重复发奖。' });
     } finally { if (!this.pageRetired) this.setData({ browseLoading: false }); }
@@ -291,6 +309,7 @@ Page({
     const stores = storeNumbers.map(number => catalog.storeByNumber && Object.prototype.hasOwnProperty.call(catalog.storeByNumber, number) ? catalog.storeByNumber[number] : null);
     if (stores.some(store => !store)) return reject('原记录中有门店已从目录移除，请重新核对门店。');
     const pickerValue = { partNumber: product.partNumber, storeNumbers };
+    this.dateExplicit = true;
     this.restoredSelection = pickerValue;
     this.historyRequest = null;
     this.historySnapshot = null;
@@ -331,6 +350,7 @@ Page({
   },
 
   onDateChange(e) {
+    this.dateExplicit = true;
     this.restoredSelection = null;
     this.restrictionReason = null;
     this.setData({ dayKey: e.detail.value, restriction: null, restoreNotice: null, restoreWarning: false, resultTargetDifferent: this.hasDifferentResult(this.selection, e.detail.value) });
@@ -393,6 +413,7 @@ Page({
     if (this.selectionNeedsReview) return toast('请先修改并核对已保存的配置与门店');
     const { boot, dayKey } = this.data, selection = this.selection;
     if (!selection.partNumber) return toast('请先选择具体配置');
+    if (dayKey < fmt.retentionStartKey() || dayKey > fmt.todayKey()) return toast('所选日期已超出保留范围，请重新选择日期');
     // Let the server distinguish insufficient funds from an already-debited
     // retry of this request. Do not block recovery using a stale local balance.
     this.restrictionReason = null;
@@ -404,10 +425,13 @@ Page({
       if (response.reason === 'query_in_progress') { if (!this.pageRetired) this.setData({ restriction: '原请求正在处理中，请稍后重试；重试不会重复扣次。' }); return; }
       operation.finish('h', historyQueryId);
       invalidateBootstrap();
+      const quota = publishQueryBalance(response);
+      if (quota.needsRefresh) getBootstrap({ force: true }).then(boot => this.applyBoot(boot)).catch(() => {});
       if (this.pageRetired) return;
+      const balancePatch = quota.balance === null ? {} : { 'boot.balance': quota.balance };
       if (!response.ok) {
         this.restrictionReason = response.reason;
-        this.setData({ restriction: fmt.reasonText(response.reason), 'boot.balance': response.balance });
+        this.setData({ restriction: fmt.reasonText(response.reason), ...balancePatch });
         if (boot.member && ['insufficient_credits', 'new_product_history_restricted'].includes(response.reason)) {
           try { this.applyBoot(await getBootstrap({ force: true })); } catch (error) { /* keep the confirmed denial until the account reconnects */ }
         }
@@ -415,7 +439,7 @@ Page({
       }
       this.historyRequest = { historyQueryId, ...payload };
       this.historySnapshot = response;
-      this.setData({ result: presentHistory(response, this.catalog), 'boot.balance': response.balance, moreError: null, coverageExpanded: false, resultTargetDifferent: this.hasDifferentResult() });
+      this.setData({ result: presentHistory(response, this.catalog, this.historyRequest), ...balancePatch, moreError: null, coverageExpanded: false, resultTargetDifferent: this.hasDifferentResult() });
       if (boot.taskAvailable) this.completeTask();
     } catch (error) {
       if (!operation.uncertain(error)) operation.finish('h', historyQueryId);
@@ -437,7 +461,7 @@ Page({
       const events = [...this.historySnapshot.events, ...response.events];
       const seen = new Set();
       this.historySnapshot = { ...response, events: events.filter(e => { if (seen.has(e.id)) return false; seen.add(e.id); return true; }) };
-      this.setData({ result: presentHistory(this.historySnapshot, this.catalog) });
+      this.setData({ result: presentHistory(this.historySnapshot, this.catalog, this.historyRequest) });
     } catch (error) { if (!this.pageRetired) this.setData({ moreError: error.message || '加载失败，请重试。' }); }
     finally { if (!this.pageRetired) this.setData({ loadingMore: false }); }
   },
@@ -449,7 +473,7 @@ Page({
     try {
       const data = await call('quota.completeTask', { taskId: 'view_history' });
       const accepted = publishQuota(data.quota);
-      if (!this.pageRetired && accepted) this.applyTaskReward(data);
+      if (!this.pageRetired && accepted) this.applyTaskReward({ ...data, quota: currentQuota() || data.quota });
     } catch (e) { if (!this.pageRetired) this.setData({ browseError: '历史查询成功，奖励暂未确认，请重试；不会重复发奖。' }); }
   },
 

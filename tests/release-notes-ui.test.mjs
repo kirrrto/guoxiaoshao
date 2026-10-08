@@ -25,11 +25,14 @@ test('release notes identify the build version without confusing its development
   rt.wx.getAccountInfoSync = () => ({ miniProgram: { envVersion: 'trial' } });
   const mine = rt.instance('pages/mine/index.js');
   const { VERSION } = rt.load('config/version.js');
+  const { RELEASE_NOTES } = rt.load('config/release-notes.js');
   assert.equal(mine.data.version, VERSION);
   assert.match(mine.data.versionLabel, /体验版/);
-  const current = mine.data.releaseNotes.filter(entry => entry.version === mine.data.version);
+  const current = mine.data.visibleReleaseNotes.filter(entry => entry.version === mine.data.version);
   assert.equal(current.length, 1, 'the current build must have exactly one matching change record');
   assert.ok(current[0].title);
   assert.ok(current[0].highlights.length > 0);
-  assert.equal(new Set(mine.data.releaseNotes.map(entry => entry.version)).size, mine.data.releaseNotes.length);
+  assert.equal(new Set(RELEASE_NOTES.map(entry => entry.version)).size, RELEASE_NOTES.length);
+  assert.deepEqual(mine.data.visibleReleaseNotes.map(entry => entry.version), Array.from(RELEASE_NOTES.slice(0, 2), entry => entry.version));
+  assert.equal(mine.data.olderReleaseNotesCount, RELEASE_NOTES.length - mine.data.visibleReleaseNotes.length);
 });

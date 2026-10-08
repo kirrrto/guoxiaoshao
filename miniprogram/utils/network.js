@@ -18,9 +18,17 @@ function update(next) {
 function watch() {
   if (watching) return;
   watching = true;
+  let receivedChange = false;
   try {
-    if (typeof wx.getNetworkType === 'function') wx.getNetworkType({ success: res => update(res.networkType !== 'none'), fail() {} });
-    if (typeof wx.onNetworkStatusChange === 'function') wx.onNetworkStatusChange(res => update(Boolean(res && res.isConnected)));
+    if (typeof wx.getNetworkType === 'function') wx.getNetworkType({ success: res => {
+      // The initial read can finish after a live reconnect/disconnect event.
+      // Never let that older snapshot leave the app stuck in the wrong state.
+      if (!receivedChange) update(res.networkType !== 'none');
+    }, fail() {} });
+    if (typeof wx.onNetworkStatusChange === 'function') wx.onNetworkStatusChange(res => {
+      receivedChange = true;
+      update(Boolean(res && res.isConnected));
+    });
   } catch (e) { /* Older clients: treat the network as available. */ }
 }
 

@@ -3,7 +3,6 @@
  * send, and sends accumulate. Members add more by tapping repeatedly. Once a
  * member ticks "总是保持以上选择", WeChat answers later requests without a
  * popup, so key taps (查询、刷新、保存关注、签到) top up one send silently.
- * A new account on its free alert only needs one, so it tops up from zero.
  */
 const { call, newId } = require('./api');
 const { localKey } = require('./local-key');
@@ -58,9 +57,7 @@ function topUpReminderCredit() {
   const app = getApp(), boot = app && app.globalData.bootstrap;
   const templateId = boot && boot.notifications && boot.notifications.templateIds && boot.notifications.templateIds.restock;
   const member = Boolean(boot && boot.membership && boot.membership.active);
-  const sub = boot && boot.subscriptions && boot.subscriptions[templateId];
-  const trialNeedsOne = !member && Boolean(boot) && boot.freeReminder === true && !(sub && Number(sub.credits) > 0);
-  if (subscriptionBusy || typeof templateId !== 'string' || !templateId || !(member || trialNeedsOne)
+  if (subscriptionBusy || typeof templateId !== 'string' || !templateId || !member
     || readPending() || typeof wx.requestSubscribeMessage !== 'function') return false;
   // Members also top up sell-out alerts; only templates set to "always" can be requested silently.
   const soldoutId = member && boot.notifications.templateIds.soldout;

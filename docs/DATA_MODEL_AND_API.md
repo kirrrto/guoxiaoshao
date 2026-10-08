@@ -1,8 +1,20 @@
 # 数据模型与接口约定
 
-当前源码契约，更新于 2026-10-01。不由文档日期推断部署、真单或微信审核成功；本次查询容量修复尚未读取实际云端 runtime 或部署。会员兑换与虚拟支付购买共用会员权益；7 元／7 天商品为 `vip666`，购买默认关闭，开放与验收见 [虚拟支付配置](VIRTUAL_PAYMENT_SETUP.md)。
+当前源码契约，更新于 2026-10-05。不由文档日期推断部署、真单或微信审核成功；本次本地修改尚未部署。会员兑换与虚拟支付购买共用会员权益；7 元／7 天 `vip666`、19.90 元／30 天 `vip777`、200 元／365 天 `vip888` 均已按用户提供的道具截图映射，月卡/年卡默认开启购买，开放与验收见 [虚拟支付配置](VIRTUAL_PAYMENT_SETUP.md)。
 
 ## 1. 数据与身份边界
+
+### 2026-10-05 测试通知与多套餐补充
+
+- 不额外赠送首次查询次数。所有账号（含会员）主动发送测试通知消耗现有有限余额 1 次；原签到与任务奖励规则保持不变。`notification_test_debit` / `notification_test_refund` 是独立账本类型，失败退回不计入当日奖励。
+- `gxs_notification_tests` 为仅服务端可访问的新集合，索引见 `lib/collections.js` 的 `INDEX_PLAN`。记录主键由用户主键与 requestId 哈希得到；保存授权、发送租约、扣次、退次与 received/not_received 反馈。记录保留作为幂等屏障，不能按真实提醒的 10 天清理任务直接删除。首次查看详情保存 `firstOpenedAt`，不表示微信已送达。
+- `notificationTest.status` 读取本账号测试与就绪状态、当前余额；指定 `requestId, opened:true` 可记录消息落地页查看。`.authorize` 接收本次微信授权结果（requestId/templateId/result）；`.send` 只处理已授权的同一请求；`.feedback` 接收 requestId/outcome。身份只来自服务端微信上下文，客户端不能指定收件人。
+- 测试授权只用于该测试，不增加正式监测的授权账本。首次发送与扣 1 次同事务取得执行权；重试只查看原结果。微信明确拒绝／确定未发出时原子退回一次，结果不明则保留扣次和原记录，不自动重发或假装成功。反馈确认后用户可以主动授权另一条新测试，另扣 1 次，原结果保持原样。
+- 测试内容始终有【测试】标识，不写入库存事件/观测/正式提醒列表，不启动监测。正式关注与真实提醒仍为会员权益。
+- `user.bootstrap.memberProducts[]`、`member.status.products[]` 提供三种套餐，旧单商品字段保留；`member.createOrder` 可提交 `planId`，缺省仍为原 7 天。套餐 `member_30d` 固定 1990 分/30 天，`member_365d` 固定 20000 分/365 天。真实微信商品映射配置与开放条件见 [支付配置](VIRTUAL_PAYMENT_SETUP.md)。
+- 已购会员的升级复用上述全价订单与权益发放流程，不增加差价商品、不折算旧订单金额，也不以累计剩余天数推断会员等级。客户端区分「升级长期套餐」（30/365 天）和「续费」（全部套餐），显示原到期时间与顺延预估，最终到期时间仍以服务器支付核实/权益结果为准。
+- `admin.insights` 增加期间去重行为人数（成功查询、建立关注、微信受理、查看详情、反馈买到）与独立测试通知统计；各阶段分别统计，不伪称严格顺序转化漏斗。每类最多读取 2000 条，超限标注不完整。查看详情从本版开始积累，历史缺少记录不等同于没人查看。
+- 历史速览只基于当前单日响应及其分页/采样覆盖；其他颜色／附近门店备选基于本人有效查询，用户主动选择后只读已有新鲜观测。严格同型号、同容量及其他配置，不推测库存；不额外采集、扣次或自动关注。
 
 ### 1.1.4 历史数据补充（2026-09-16）
 
@@ -25,11 +37,11 @@
 - `gxs_latest`：主键 storeNumber|partNumber。保存 status/statusSince/observedAt/knownAt/unknownSince/quote/sampleCount 等。latest 和对应状态事件同事务提交；旧观测不能覆盖新观测。
 - `gxs_events`：确定性状态迁移 ID，保存目标、事件类型、北京时间业务日、发现时间、前后状态和原始取货说明。notificationPlannedAt 用于持久提醒消费者去重规划。
 - `gxs_target_health`：旧版按目标与分钟桶写入的健康数据，没有任何接口读取；当前代码已不再写入，各目标健康数据保存在 `collector_status` 的调度检查点中。云端已有文档可在控制台删除。
-- `gxs_orders`：兑换与管理员发放保留原主键。虚拟支付订单主键及平台单号为 `G + SHA256(userKey|orderId)前31位`，保存服务器固定的商品、买家、700 分及 7 天快照。兑换订单继续使用 `redeem_launch_30d_v1`、`type=membership_redemption`、`source=redemption_code`、`days=30`、`amountFen=0`。用户会员发放与订单 `fulfilled` 同事务完成；新增 `membership.entitlements` 按订单记录剩余时长，累计退款只撤销所属订单未用权益。
+- `gxs_orders`：兑换与管理员发放保留原主键。虚拟支付订单主键及平台单号为 `G + SHA256(userKey|orderId)前31位`，保存服务器固定的商品、买家与套餐快照：700 分/7 天、1990 分/30 天或 20000 分/365 天。兑换订单继续使用 `redeem_launch_30d_v1`、`type=membership_redemption`、`source=redemption_code`、`days=30`、`amountFen=0`。用户会员发放与订单 `fulfilled` 同事务完成；`membership.entitlements` 按订单记录剩余时长，累计退款只撤销所属订单未用权益。
 - `gxs_notifications`：主键 userKey|eventId。保存 pending、sending、accepted、failed、uncertain 或 skipped 状态，发送租约、模板、原因及授权预占信息。用户在提醒落地卡片回答后写入 `feedback: { outcome: bought|missed|skipped, at }`。
 - `gxs_observation_days`：主键 storeNumber|partNumber|dayKey，每个目标每天一条观测摘要：样本数、已知/未知/手动/自动计数、首末观测时间，以及 `eventCounts`（当天各类事件数）、`firstAvailableAt`（当天首次可取货）、`availableWindows`（可取货窗口的次数、总时长、最长、最短，毫秒）。与 latest、事件同事务更新。
 - `gxs_config`：runtime、catalog、collector_lease、collector_status，以及容量状态、请求计数、订阅操作去重、提醒冷却等文档。`upstream_capacity` 保存连续容量的 version、tokens、capacities、rates、lastDemandAt、updatedAtMs；跨日和冷启动不重置，不按日清理。`collector_budget_<北京时间日期>` 保存 dayCount、minuteKey、minuteCount、autoCount、manualCount；continuous 模式每日计数只用于核对消耗。`query_target_<门店与 SKU 的哈希>` 保存跨实例手动刷新租约与短时失败等待状态。兑换错误计数保存在 `member_redemption_attempts_<用户哈希>`，包括 userKey、failures、lockedUntil、updatedAt；正确码及输入明文不入库。不能对整个集合无条件启用 TTL 删除。
-- `gxs_catalog_stores`：门店主键 R###，保存名称、城市、省份、地址。
+- `gxs_catalog_stores`：门店主键 R###，保存名称、城市、省份、地址及来源明确且有效的可选 latitude/longitude；不从地址推测坐标。
 - `gxs_catalog_products`：商品主键 partNumber，保存品类、系列、型号、标题、属性、价格、供应接口支持状态和精确产品图片来源。图片映射不能替代供应接口验证。
 
 索引唯一来源为 `cloudfunctions/gxs_api/lib/collections.js` 的 INDEX_PLAN。运行 `node tools/db/export-plan.mjs` 导出 `config/database-deployment-plan.json`。2026-09-23 起计划不再包含 5 个前缀冗余索引：`gxs_quota_ledger.user_day`、`gxs_queries.user_created`、`gxs_events.part_day_detected`、`gxs_notifications.user_created`、`gxs_notifications.status_created`，它们的字段和方向与同集合更长索引的开头完全相同，查询可由更长索引承担；云端这 5 个已于 2026-09-23 在控制台删除。
@@ -39,6 +51,8 @@
 ## 3. 次数与查询幂等
 
 相同 ID 和相同参数重放不会重复扣次、退款或发放。相同 ID 改变参数返回冲突，客户端应为新操作创建新 ID。签到按用户与北京时间日去重，任务再加入 taskId；查询扣次/退款以用户、queryId、操作类型确定账本 ID。免费次数每日奖励上限和余额上限在同一用户事务内检查，并发点击不能越限。
+
+实时／历史查询中带余额的响应同时返回 `quotaRevision`，与 `balance` 来自同一事务用户快照。重放保留原库存结果、采集时间、`charged` 与 `refunded`，余额及其修订号返回当前值。客户端分别维护余额修订号与完整额度信息修订号，允许迟到的签到／任务元数据补齐，同时避免旧余额覆盖新余额。兼容旧云函数无此字段的响应时，保留结果并重新读取账户确认次数。
 
 查询执行租约为 25 秒；存活执行者失去租约后不能覆盖接管者的结果。异常中断可沿用原 ID 恢复。用户重新 bootstrap 时会清算租约过期超过 2 分钟的 pending 记录，每次最多 20 条，退回已扣次数并标记 query_expired。
 
@@ -85,6 +99,7 @@
 ### 实时与历史
 
 - `query.pickup`：{ queryId, partNumber, storeNumbers }，默认最多 3 家店；非会员取得新的有效结果时按配置扣次，会员不扣次数。全部失败、全部复用，或仅复用成功而其余门店失败时退回预扣次数。返回查询时的商品与门店，不受后来选择变化影响。
+- `query.alternatives`：`{ queryId, partNumbers, storeNumbers }`。只读本人已完成且成功的实时查询；原记录须为会员查询或净扣次大于零，查看窗口固定为服务端 `finishedAt + 120 秒`。颜色和门店各 1–3 项，不允许重复；颜色须同型号、同容量且其他属性相同。门店限原查询范围及服务端从目录列出的最多 3 家备选：有坐标时距原门店 50 公里以内，缺坐标时仅同省同城，不使用用户定位。当前新品限制与会员过期在读取前后重新校验。最多读取 9 个 latest 目标，不写用户、账本、历史、监测队列或容量预占，不调用上游。仅返回 120 秒内明确 available 且时间一致的样本；未知、过期、未来、受限样本剔除。返回原查询、所选范围、finishedAt/expiresAt/readAt 及 results（商品、门店、观测时间与最早失效时间）；空 results 表示无有效已有观测，不表示没货。重复读取或重放原查询不会延长窗口；准备条件前客户端再执行一次只读确认，之后由用户显式发起查询。
 - `query.recent`：最近手动查询记录。
 - `history.list`：{ historyQueryId, partNumber, storeNumbers?, dayKey?, cursor?, limit? }。最多 10 家店，默认每页 100 条、最大 200 条。后续页沿用同一查询 ID 和筛选条件，不重复扣次。
 
@@ -92,6 +107,7 @@
 
 | 字段 | 契约 |
 |---|---|
+| `finishedAt` / `alternativesExpiresAt` | 服务端完成时间及固定备选查看截止时间。仅成功会员或净扣次查询获得截止时间；幂等重放保留原值。旧服务端缺失时不开放扩展备选入口。 |
 | `sharedResult` | 至少一个结果复用了有效样本。 |
 | `allShared` | 所有返回结果都复用有效样本；包含失败门店时不能仅因成功门店都复用就设为 true。 |
 | `results[].reused` | 该门店结果来自已有样本，`observedAt` 为真实原始采集时间；`queriedAt` 仅是本次查询时间。 |
@@ -106,15 +122,17 @@
 
 ### 关注、会员和提醒
 
-- `follow.list/upsert/pause/resume/remove`：有效会员最多关注 3 个具体 SKU，每个 SKU 最多 3 家店；有免费提醒的新用户最多 1 个。不同容量/颜色分别占用名额。upsert 传 followId、partNumber、storeNumbers；会员到期或免费提醒用完后不能新增或恢复监测（`member_required`）。list 同时返回 `freeReminder` 与对应的 `limits`。
+- `follow.list/upsert/pause/resume/remove`：有效会员最多关注 3 个具体 SKU，每个 SKU 最多 3 家店。不同容量/颜色分别占用名额。upsert 传 followId、partNumber、storeNumbers；非会员不能新增或恢复监测（`member_required`）。**1.5.2 起关注与微信提醒为会员专属**，免费用户仅保留查询次数，不再赠送免费关注/到货提醒试用。
 
-新用户免费提醒：从未收到过到货提醒（没有 `firstReminderSentAt`）的非会员账号可以关注、记录授权并被监测，直到第一条提醒发出。第一条提醒无论是否会员发出都会写入 `firstReminderSentAt`，所以会员到期后不会重新获得免费提醒。发送端在预占授权次数时把免费提醒锁定到一个任务，并发事件得到 `free_reminder_in_use`；微信明确拒绝则解锁，可用于下一次补货；已受理或结果未知记为已用，之后的任务为 `free_reminder_used`。发送服务崩溃遗留的锁在下一次预占时按原任务结果处理。
+**1.5.2 权限边界**：关注与微信到货/断货提醒均为会员专属。免费用户仅使用查询次数实时查询是否有货。历史数据中的 `freeReminder` / `freeReminderTaskId` / `firstReminderSentAt` 字段保留以便兼容读取，但不再授予关注或提醒能力。
 - `member.status`：真实会员状态、商品、支付关闭原因及最近会员记录；记录增加 type、source、campaignId，区分兑换与其他会员发放来源。
+- 1.6.0 的 `member.status.orders` 增加 `canClearRecord`、`clearRecordReason`；仅在原始最近 10 条内过滤 `userHiddenAt` 和内部取消意图，因此返回可能少于 10 条，不代表完整历史。
+- `member.deleteRecord`：`{ orderId }`；`member.clearRecords`：`{ orderIds }`，显式提交当前显示的 1–10 个原始订单编号。先在同一事务校验全部归属，再为已确认记录添加 `userHiddenAt`；任一编号不存在或不属于本人则整批失败。待确认支付保留，返回 `{ hiddenOrderIds, hiddenCount, newlyHiddenCount, retained, retainedCount }`，每个 retained 含 `orderId/status/reason`。已隐藏编号可幂等重试；不物理删除订单，不更改支付、退款或会员权益，不需新增集合或索引。
 - `member.redeemCode`：`{ code, requestId? }`，返回 `{ redeemed: true, alreadyRedeemed, membership }`，membership 与 bootstrap 使用同一结构。活动码忽略大小写及首尾空白（明文不写入文档）；每个可信账号仅领取一次 30 天，有效会员顺延。全活动名额由 `memberRedemption.maxClaims` 控制（默认 20，含上线前已兑换账号），计数保存在 `gxs_config/member_redemption_claims_launch_30d_v1` 并与兑换同事务递增；名额用完返回 `redemption_sold_out`。重复兑换及到期后重试返回 alreadyRedeemed=true，不增加天数；幂等依据账号与活动，不依赖客户端 requestId。正式版和体验版均调用真实后端，开发模拟必须先退出。
 - `member.createOrder`：`{ orderId, loginCode }`，以可信账号创建幂等订单，商品与金额来自服务端配置，返回 `{ ok, order, payment }`；未就绪返回 `payment_not_enabled`。`payment` 为服务器签名的微信收银参数，已进入平台的订单不会盲目再次拉起收银台。
 - `member.abandonOrder`：`{ orderId }`，仅本人订单。先向微信核对一次：已付款正常开通；仍为未付款的 `created` 订单写入 `abandonedAt`，返回 `order.abandoned=true`、`paymentPending=false`。已放弃的订单继续参与查单和支付回调，之后付款仍会开通。
 - `member.checkOrder`：`{ orderId }`，仅查询本人订单，返回 `{ order, membership }`。服务端核验微信订单后事务发放权益，支付结果不确定为 `payment_check_pending`；不存在或非本人订单统一 `unknown_order`。前端付款回调不能替代该核验。
-- `notify.recordSubscription`：{ requestId, results: { templateId: 'accept'|'reject'|'ban' } }。有效会员或仍有免费提醒的账号可记录，否则返回 `membership_required`；只接受已配置模板。每个 accept 记 1 次提醒并累加，原 requestId 重试不重复增加；微信平台最终决定能否发送。
+- `notify.recordSubscription`：{ requestId, results: { templateId: 'accept'|'reject'|'ban' } }。有效会员可记录，否则返回 `membership_required`；只接受已配置模板。每个 accept 记 1 次提醒并累加，原 requestId 重试不重复增加；微信平台最终决定能否发送。
 - `notify.list`：`{ limit?, cursor? }`，默认 20 条、最多 100 条；返回 `{ notifications, nextCursor, hasMore, clearBefore }`。按创建时间与 ID 稳定分页，后续页保持首轮快照。accepted 只表示平台受理，uncertain 不自动重发。
 - `notify.detail`：`{ eventId }`，到货提醒落地页使用。消息卡片跳转 `pages/follow/index?eid=<encodeURIComponent(eventId)>`；服务端用 `当前 userKey|eventId` 读取，只能读到自己的提醒。返回 `{ notification, latest, follow }`：提醒的商品、门店、发现时间、发送状态与已有反馈；目标当前观测（字段同关注列表门店，受限新品对非会员 `restricted=true`）；对应关注的 ID 与状态。超过保留期或已删除为 `notification_not_found`。
 - `notify.feedback`：`{ eventId, outcome: 'bought'|'missed'|'skipped' }`，记录「买到了吗」，可改答。`bought` 且关注仍开启时暂停该关注，返回 `{ outcome, paused }`。
@@ -146,6 +164,6 @@
 
 ## 7. 默认配置与运行条件
 
-lib/config.js 是默认值与校验的唯一来源。主要默认值：签到 +1，历史体验任务 +1，每日最多奖励 2 次，余额最多 10 次，实时和历史每次各消耗 1 次；付费会员为 7 元／7 天，购买默认关闭，兑换活动仍为 30 天。`memberRedemption.enabled` 默认为 true，可经管理员关闭；兑换事务再次读取开关，不接受客户端自报活动、天数或会员有效期。新品窗口为空，需录入真实开售资料后才启用对应限制。
+lib/config.js 是默认值与校验的唯一来源。主要默认值：签到 +1，历史体验任务 +1，每日最多奖励 2 次，余额最多 10 次，实时和历史每次各消耗 1 次；付费会员为 7 元／7 天、19.90 元／30 天、200 元／365 天，购买默认关闭，兑换活动仍为 30 天。`memberRedemption.enabled` 默认为 true，可经管理员关闭；兑换事务再次读取开关，不接受客户端自报活动、天数或会员有效期。新品窗口为空，需录入真实开售资料后才启用对应限制。
 
 自动采集默认关闭，配置目标间隔 8 秒、并发 2、每请求最多 20 SKU。`collector.budgetMode` 默认 `continuous`：每分钟硬上限 60，`maxRequestsPerDay=10000` 表示全天持续补充速率目标，并允许不超过分钟容量的有界突发；实际常规间隔会根据独立请求组数拉长。自动与手动来源持续速率占比 80% / 20%，支持有界空闲借用。显式 `daily` 才保留北京时间自然日硬上限及次日恢复。配置、迁移、观测指标与测试边界见 [查询容量](QUERY_CAPACITY.md)。订阅通知默认关闭；须配置消费者小程序的真实模板和服务端凭证。监测和消息部署见 [采集运行手册](COLLECTOR_OPERATIONS.md)。

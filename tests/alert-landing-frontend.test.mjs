@@ -106,3 +106,54 @@ for (const change of ['close', 'replace', 'unload']) {
     assert.equal(rt.calls.filter(c => c.action === 'follow.list').length, change === 'unload' ? 0 : 1);
   });
 }
+
+const simpleDetail = eventId => ({ notification: { eventId, eventType: 'restock_confirmed', partNumber: 'SKU', storeNumber: 'R577',
+  productTitle: 'test product', detectedAt: new Date().toISOString() }, latest: { status: 'available', observedAt: new Date().toISOString() }, follow: null });
+
+test('a failed alert read has an explicit retry, and only a visible successful render acknowledges opening', async () => {
+  let offline = true;
+  const rt = runtime(async action => {
+    if (action === 'notify.detail') { if (offline) throw Error('offline'); return simpleDetail(EVENT); }
+    return {};
+  });
+  rt.load('app.js'); rt.app.captureAlert({ query: { eid: EVENT } });
+  const page = rt.instance('pages/follow/index.js'); page.visible = true; page.setData({ ready: true });
+  await page.consumePendingAlert();
+  assert.equal(page.data.alert.retryable, true); assert.equal(rt.app.globalData.handledAlerts.includes(EVENT), false);
+  assert.equal(rt.calls.filter(item => item.action === 'notify.open').length, 0);
+  offline = false; await page.onRetryAlert(); await new Promise(setImmediate);
+  assert.equal(page.data.alert.productTitle, 'test product'); assert.equal(rt.app.globalData.handledAlerts.includes(EVENT), true);
+  assert.equal(rt.calls.filter(item => item.action === 'notify.open').length, 1);
+  page.recordAlertOpen(); await new Promise(setImmediate);
+  assert.equal(rt.calls.filter(item => item.action === 'notify.open').length, 1, 'a duplicate view is not repeatedly acknowledged');
+});
+
+test('late details while hidden count only after a visible visit, and failed analytics retries without reloading stock', async () => {
+  let resolveRead, failOpen = true;
+  const rt = runtime(async action => {
+    if (action === 'notify.detail') return new Promise(resolve => { resolveRead = resolve; });
+    if (action === 'notify.open' && failOpen) throw Error('analytics offline');
+    return {};
+  });
+  rt.load('app.js'); rt.app.captureAlert({ query: { eid: EVENT } });
+  const page = rt.instance('pages/follow/index.js'); page.visible = true; page.setData({ ready: true });
+  const read = page.consumePendingAlert(); page.onHide(); resolveRead(simpleDetail(EVENT)); await read; await new Promise(setImmediate);
+  assert.equal(rt.calls.filter(item => item.action === 'notify.open').length, 0);
+  assert.equal(page.data.alert.productTitle, 'test product');
+  page.visible = true; page.recordAlertOpen(); await new Promise(setImmediate);
+  assert.equal(rt.calls.filter(item => item.action === 'notify.open').length, 1);
+  assert.equal(page.data.alert.error, undefined);
+  failOpen = false; page.recordAlertOpen(); await new Promise(setImmediate);
+  assert.equal(rt.calls.filter(item => item.action === 'notify.open').length, 2);
+  assert.equal(rt.calls.filter(item => item.action === 'notify.detail').length, 1);
+});
+
+test('closing an alert invalidates late detail reads without recording a presentation', async () => {
+  let resolveRead;
+  const rt = runtime(async () => new Promise(resolve => { resolveRead = resolve; }));
+  rt.load('app.js'); rt.app.captureAlert({ query: { eid: EVENT } });
+  const page = rt.instance('pages/follow/index.js'); page.visible = true; page.setData({ ready: true });
+  const read = page.consumePendingAlert(); page.onCloseAlert(); resolveRead(simpleDetail(EVENT)); await read; await new Promise(setImmediate);
+  assert.equal(page.data.alert, null); assert.equal(rt.app.globalData.handledAlerts.includes(EVENT), false);
+  assert.equal(rt.calls.filter(item => item.action === 'notify.open').length, 0);
+});

@@ -45,15 +45,22 @@ async function pickup(ctx, payload) {
   const [product, stores] = await Promise.all([ctx.repo.getProduct(partNumber), ctx.repo.getStores(storeNumbers)]);
   if (!product) throw new ApiError('unknown_product', '该商品不在目录中');
   if (stores.length !== storeNumbers.length) throw new ApiError('unknown_store', '存在未知门店编号');
+  const remaining = () => typeof ctx.remainingMs === 'function' ? ctx.remainingMs() : Infinity;
+  // Slow configuration/account/catalog reads used to be followed by another
+  // full 14-second fetch window, exceeding the invocation limit after debit.
+  // 1.5.3 clients only preserve uncertain IDs for known error codes. This may
+  // be a retry of an already-debited query, so retain that recovery contract.
+  if (remaining() <= 7000) throw new ApiError('query_in_progress', '连接耗时较长，本次未继续查询；原编号已保留，请重试确认原结果',
+    { reason: 'request_budget_exhausted' });
   const ownerId = randomUUID(); const recordId = `${user._id}|${queryId}`;
   const begun = await ctx.repo.beginQuery({ record: { _id: recordId, userKey: user._id, queryId, kind: 'live', partNumber, storeNumbers }, product, config: ctx.config, ownerId, nowIso: ctx.nowIso });
-  if (begun.replayed) return { ...begun.record.response, replayed: true };
-  if (begun.busy) return { ok: false, reason: 'query_in_progress', queryId, retryAfterMs: begun.retryAfterMs, balance: begun.balance };
-  if (begun.denied) return { ok: false, reason: begun.denied.reason, retryAfterMs: begun.denied.retryAfterMs || null, restrictionEndsAt: begun.denied.restrictionEndsAt || null, cost: begun.denied.cost, balance: begun.balance };
+  if (begun.replayed) return { ...begun.record.response, balance: begun.balance, quotaRevision: begun.quotaRevision, replayed: true };
+  if (begun.busy) return { ok: false, reason: 'query_in_progress', queryId, retryAfterMs: begun.retryAfterMs, balance: begun.balance, quotaRevision: begun.quotaRevision };
+  if (begun.denied) return { ok: false, reason: begun.denied.reason, retryAfterMs: begun.denied.retryAfterMs || null, restrictionEndsAt: begun.denied.restrictionEndsAt || null, cost: begun.denied.cost, balance: begun.balance, quotaRevision: begun.quotaRevision };
   let response; let refund = false;
   try {
-    // Three parallel requests; keep six seconds of the 20-second invocation for persistence.
-    const deadline = startedAt + 14000;
+    // Keep six seconds for recording/refund even after slow admission reads.
+    const deadline = Math.min(startedAt + 14000, Date.now() + Math.max(0, remaining() - 6000));
     const batches = await mapLimit(storeNumbers, 3, store => sharedQueryPickup(ctx, store, partNumber, deadline));
     // A denied request is not an upstream observation and must not alter history.
     const recorded = batches.flatMap(batch => batch.record.budgetDenied

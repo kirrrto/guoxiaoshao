@@ -99,10 +99,10 @@
 }
 .floating-tab-item::after { border: 0; }
 .floating-tab-item.is-selected {
-  background: rgba(89, 130, 111, 0.10);
+  background: rgba(0, 195, 117, 0.10);
   border-color: rgba(255, 255, 255, 0.34);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.30);
-  color: #007A49;
+  color: var(--green, #00C375);
   font-weight: 600;
 }
 .floating-tab-pressed { opacity: 0.68; }
@@ -115,7 +115,7 @@
   .floating-tab-edge-left { background: linear-gradient(90deg, rgba(14, 23, 20, 0.45), rgba(14, 23, 20, 0.15) 45%, rgba(14, 23, 20, 0) 100%); box-shadow: inset 1px 0 0 rgba(255, 255, 255, 0.06); }
   .floating-tab-edge-right { background: linear-gradient(270deg, rgba(14, 23, 20, 0.45), rgba(14, 23, 20, 0.15) 45%, rgba(14, 23, 20, 0) 100%); box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.06); }
   .floating-tab-item { color: #A3B6AC; }
-  .floating-tab-item.is-selected { background: rgba(0, 195, 117, 0.16); border-color: rgba(255, 255, 255, 0.06); box-shadow: none; color: #3DDC97; }
+  .floating-tab-item.is-selected { background: rgba(0, 195, 117, 0.16); border-color: rgba(255, 255, 255, 0.06); box-shadow: none; }
   /* The generated inactive icons are grey-green; lift them on the dark plate. */
   .floating-tab-icon { filter: brightness(1.5); }
   .is-selected .floating-tab-icon { filter: none; }

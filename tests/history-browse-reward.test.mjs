@@ -170,8 +170,9 @@ test('restock detail labels an observation gap without calling it unavailable du
   assert.equal(page.data.result.events[0].detailText, '距上次有效检测 1 分 0 秒');
 });
 
-test('delayed browse reward cannot restore credits after a newer explicit paid history query', async () => {
+test('delayed browse reward cannot restore credits after a newer explicit paid history query', async t => {
   const f = createFixture(), api = apiOf(f), late = deferred();
+  t.mock.method(Date, 'now', () => f.state.now.getTime());
   // A paid lookup needs an actual saved event; empty histories are refunded.
   await f.repo.saveEvents([{ _id: 'paid-history-race-event', partNumber: 'MXXX1CH/A', storeNumber: 'R577', dayKey: '2026-09-14', detectedAt: '2026-09-14T01:00:00.000Z', type: 'restock_confirmed' }]);
   let browseResult;

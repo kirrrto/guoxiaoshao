@@ -7,7 +7,7 @@ const { COLLECTIONS } = require('../collections');
 const catalog = require('./catalog');
 const { fulfilOrder } = require('./member');
 const { assertConfigEditor, logConfigAuthorizationDenial } = require('../config-audit');
-const { paymentProviderFor, paymentProduct } = require('../payment/service');
+const { paymentProviderFor, paymentProduct, paymentProducts } = require('../payment/service');
 const { AUTO_SHARE } = require('../engine/capacity-budget');
 const { KNOWN_STATUSES } = require('../engine/events');
 const { monitoringSnapshot } = require('../monitor-readiness');
@@ -31,7 +31,7 @@ async function getConfig(ctx) {
 async function paymentStatus(ctx) {
   requireAdmin(ctx);
   // Pure configuration inspection: no token probe, order creation or payment.
-  return { payment: paymentProviderFor(ctx).getReadiness(), product: paymentProduct(ctx) };
+  return { payment: paymentProviderFor(ctx).getReadiness(), product: paymentProduct(ctx), products: paymentProducts(ctx) };
 }
 
 async function updateConfig(ctx, payload) {
@@ -179,10 +179,22 @@ async function insights(ctx, payload) {
   requireAdmin(ctx);
   const days = Math.min(10, Math.max(1, Math.floor(Number(payload.days) || 7)));
   const since = new Date(ctx.now.getTime() - days * 86400000);
-  const [events, notifications] = await Promise.all([
+  const [eventRows, notificationRows, queryRows, followRows, testRows] = await Promise.all([
     ctx.repo.listSince(COLLECTIONS.events, 'dayKey', dayKey(since), INSIGHT_LIMIT),
     ctx.repo.listSince(COLLECTIONS.notifications, 'createdAt', since.toISOString(), INSIGHT_LIMIT),
+    ctx.repo.listSince(COLLECTIONS.queries, 'createdAt', since.toISOString(), INSIGHT_LIMIT),
+    ctx.repo.listSince(COLLECTIONS.follows, 'createdAt', since.toISOString(), INSIGHT_LIMIT),
+    ctx.repo.listSince(COLLECTIONS.notificationTests, 'createdAt', since.toISOString(), INSIGHT_LIMIT),
   ]);
+  const inWindow = (item, field = 'createdAt') => Number.isFinite(Date.parse(item[field]))
+    && Date.parse(item[field]) >= since.getTime() && Date.parse(item[field]) <= ctx.now.getTime();
+  const events = eventRows.filter(item => inWindow(item, 'detectedAt'));
+  const notifications = notificationRows.filter(item => inWindow(item) && item.kind !== 'test');
+  const queries = queryRows.filter(item => inWindow(item));
+  const follows = followRows.filter(item => inWindow(item));
+  const tests = testRows.filter(item => inWindow(item));
+  const usersIn = records => new Set(records.map(item => item.userKey).filter(Boolean));
+  const uniqueUsers = records => usersIn(records).size;
   const windows = events.filter(e => e.type === 'became_unavailable' && Number.isFinite(e.availableDurationMs) && e.availableDurationMs >= 0).map(e => e.availableDurationMs);
   const delays = notifications.filter(n => n.status === 'accepted' && n.sentAt && n.detectedAt)
     .map(n => Date.parse(n.sentAt) - Date.parse(n.detectedAt)).filter(ms => Number.isFinite(ms) && ms >= 0);
@@ -193,7 +205,26 @@ async function insights(ctx, payload) {
   return {
     days,
     since: since.toISOString(),
-    truncated: events.length >= INSIGHT_LIMIT || notifications.length >= INSIGHT_LIMIT,
+    truncated: [eventRows, notificationRows, queryRows, followRows, testRows].some(rows => rows.length >= INSIGHT_LIMIT),
+    activity: {
+      // Each source is selected by createdAt, so these are cohorts of new
+      // records, not all user activity occurring inside the reporting window.
+      scope: 'created_in_window_cohort_not_sequential_funnel',
+      successfulQueryUsers: uniqueUsers(queries.filter(item => item.kind === 'live' && item.status === 'success' && item.response && item.response.ok === true)),
+      followUsers: uniqueUsers(follows),
+      acceptedAlertUsers: uniqueUsers(notifications.filter(item => item.status === 'accepted')),
+      openedAlertUsers: uniqueUsers(notifications.filter(item => inWindow(item, 'firstPresentedAt'))),
+      legacyOpenedAlertUsers: uniqueUsers(notifications.filter(item => !item.firstPresentedAt && inWindow(item, 'firstOpenedAt'))),
+      boughtUsers: uniqueUsers(notifications.filter(item => item.feedback && item.feedback.outcome === 'bought')),
+    },
+    notificationTests: {
+      total: tests.length,
+      users: uniqueUsers(tests),
+      byStatus: countBy(tests, item => item.status || 'unknown'),
+      feedback: countBy(tests.filter(item => item.feedback && item.feedback.outcome), item => item.feedback.outcome),
+      opened: tests.filter(item => inWindow(item, 'firstPresentedAt')).length,
+      legacyOpened: tests.filter(item => !item.firstPresentedAt && inWindow(item, 'firstOpenedAt')).length,
+    },
     availability: { ...spread(windows), buckets: WINDOW_BUCKETS.map(([upper, label]) => {
       const count = windows.filter(ms => ms >= lower && ms < upper).length; lower = upper; return { label, count };
     }) },

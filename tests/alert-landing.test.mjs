@@ -71,6 +71,7 @@ test('operator insights summarise availability windows, skipped alerts, send del
   await f.repo.saveNotification({ _id: 'skip-1', userKey: 'someone', status: 'skipped', reason: 'no_subscription_credit', createdAt: at(1000), detectedAt: at(0) });
   await f.call('notify.feedback', { eventId: EVENT, outcome: 'bought' });
   await f.repo.updateNotification(`${userKeyOf()}|${EVENT}`, { sentAt: '2026-09-15T02:00:09.000Z' });
+  f.advance(10000);
   failWith(await f.call('admin.insights', {}), 'forbidden');
   const data = ok(await f.call('admin.insights', { days: 3 }, operatorContext()));
   assert.equal(data.days, 3);
@@ -83,4 +84,65 @@ test('operator insights summarise availability windows, skipped alerts, send del
   assert.deepEqual(data.alerts.sendDelay, { count: 1, p50Ms: 9000, p90Ms: 9000, maxMs: 9000 });
   assert.deepEqual(data.feedback, { answered: 1, bought: 1, boughtShare: 1 });
   assert.equal(data.truncated, false);
+});
+
+test('only an explicit rendered-view acknowledgment records a view; detail reads remain available on metric failure', async () => {
+  const { f } = await alerted();
+  const taskId = `${userKeyOf()}|${EVENT}`;
+  assert.equal((await f.repo.getNotification(taskId)).firstOpenedAt, undefined);
+  ok(await f.call('notify.detail', { eventId: EVENT }));
+  assert.equal((await f.repo.getNotification(taskId)).firstOpenedAt, undefined, 'reads and preloading are not rendered views');
+  ok(await f.call('notify.open', { eventId: EVENT }));
+  const first = (await f.repo.getNotification(taskId)).firstOpenedAt;
+  f.advance(1000);
+  ok(await f.call('notify.open', { eventId: EVENT }));
+  assert.equal((await f.repo.getNotification(taskId)).firstOpenedAt, first);
+  f.repo.recordNotificationOpen = async () => { throw Error('write unavailable'); };
+  assert.equal(ok(await f.call('notify.detail', { eventId: EVENT })).latest.status, 'available');
+});
+
+test('activity counts distinct users and separates trial receipts from real inventory and bought feedback', async () => {
+  const { f } = await alerted();
+  const { COLLECTIONS: C } = require('../cloudfunctions/gxs_api/lib/collections');
+  const createdAt = f.state.now.toISOString();
+  for (const [id, kind, status] of [['q1', 'live', 'success'], ['q2', 'live', 'success'], ['q3', 'history', 'success'], ['q4', 'live', 'failed']]) {
+    f.repo.tables.get(C.queries).set(id, { _id: id, userKey: userKeyOf(), kind, status, response: { ok: status === 'success' }, createdAt });
+  }
+  f.repo.tables.get(C.notificationTests).set('t1', { _id: 't1', userKey: userKeyOf(), status: 'accepted', createdAt, firstOpenedAt: createdAt, firstPresentedAt: createdAt, feedback: { outcome: 'received', updatedAt: createdAt } });
+  f.repo.tables.get(C.notificationTests).set('t2', { _id: 't2', userKey: userKeyOf(), status: 'failed', createdAt, refunded: true });
+  ok(await f.call('notify.detail', { eventId: EVENT }));
+  ok(await f.call('notify.open', { eventId: EVENT }));
+  ok(await f.call('notify.feedback', { eventId: EVENT, outcome: 'bought' }));
+  const data = ok(await f.call('admin.insights', {}, operatorContext()));
+  assert.equal(data.activity.successfulQueryUsers, 1);
+  assert.equal(data.activity.acceptedAlertUsers, 1);
+  assert.equal(data.activity.openedAlertUsers, 1);
+  assert.equal(data.activity.boughtUsers, 1);
+  assert.equal(data.alerts.total, 1);
+  assert.equal(data.feedback.answered, 1);
+  assert.deepEqual(data.notificationTests, { total: 2, users: 1, byStatus: { accepted: 1, failed: 1 }, feedback: { received: 1 }, opened: 1, legacyOpened: 0 });
+});
+
+test('failed detail reads never invent an opening and explicit presentation remains account scoped', async () => {
+  const { f } = await alerted();
+  f.repo.getLatest = async () => { throw Error('offline'); };
+  assert.equal((await f.call('notify.detail', { eventId: EVENT })).ok, false);
+  assert.equal((await f.repo.getNotification(`${userKeyOf()}|${EVENT}`)).firstOpenedAt, undefined);
+  failWith(await f.call('notify.open', { eventId: EVENT }, userContext('oOTHER00000000000000000001')), 'notification_not_found');
+  await f.repo.updateNotification(`${userKeyOf()}|${EVENT}`, { userHiddenAt: f.state.now.toISOString() });
+  failWith(await f.call('notify.open', { eventId: EVENT }), 'notification_not_found');
+});
+
+test('legacy read telemetry is preserved but never reported as a 1.6.0 rendered presentation', async () => {
+  const { f } = await alerted();
+  const taskId = `${userKeyOf()}|${EVENT}`, legacyAt = f.state.now.toISOString();
+  await f.repo.updateNotification(taskId, { firstOpenedAt: legacyAt });
+  let data = ok(await f.call('admin.insights', {}, operatorContext()));
+  assert.equal(data.activity.openedAlertUsers, 0); assert.equal(data.activity.legacyOpenedAlertUsers, 1);
+  assert.equal(data.activity.scope, 'created_in_window_cohort_not_sequential_funnel');
+  f.advance(1000); ok(await f.call('notify.open', { eventId: EVENT }));
+  const record = await f.repo.getNotification(taskId);
+  assert.equal(record.firstOpenedAt, legacyAt); assert.equal(record.firstPresentedAt, f.state.now.toISOString());
+  data = ok(await f.call('admin.insights', {}, operatorContext()));
+  assert.equal(data.activity.openedAlertUsers, 1); assert.equal(data.activity.legacyOpenedAlertUsers, 0);
 });

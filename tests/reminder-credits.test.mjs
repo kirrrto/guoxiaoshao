@@ -95,6 +95,18 @@ test('members accumulate reminders by tapping repeatedly; each tap is its own re
   assert.match(page.data.readiness.title, /只剩 2 次/);
 });
 
+test('members are nudged to keep at least 10 reminder credits and the tip clears once stocked', () => {
+  const s = setup({ always: null });
+  const page = s.rt.instance('pages/follow/index.js');
+  page.setData({ followsLoaded: true, follows: [{ followId: 'f1', partNumber: 'SKU-A', status: 'active', stores: [] }] });
+  page.applyBoot(boot({ subscriptions: { 'restock-A': { credits: 3 } } }));
+  assert.match(page.data.creditBoostTip, /低于 10 次/);
+  assert.match(page.data.readiness.detail, /10 次/);
+  page.applyBoot(boot({ subscriptions: { 'restock-A': { credits: 10 } } }));
+  assert.equal(page.data.creditBoostTip, '');
+  assert.doesNotMatch(page.data.readiness.detail, /低于 10/);
+});
+
 test('reminders are member-only: non-members get the membership prompt and nothing is requested or recorded', async () => {
   const s = setup({ member: false });
   const page = s.rt.instance('pages/follow/index.js');
@@ -114,51 +126,31 @@ test('reminders are member-only: non-members get the membership prompt and nothi
   assert.equal(expired.rt.messages.at(-1).title, '关注与到货提醒为会员专属');
 });
 
-test('a new account on its free alert follows one configuration and authorizes once; afterwards membership is required', async () => {
-  const trial = patch => boot({ membership: { active: false, expiresAt: null }, freeReminder: true, limits: { maxFollows: 1, maxStoresPerFollow: 3 }, ...patch });
+test('a free account cannot follow or authorize; membership is required', async () => {
+  const free = patch => boot({ membership: { active: false, expiresAt: null }, freeReminder: false, limits: { maxFollows: 0, maxStoresPerFollow: 3 }, ...patch });
   const s = setup({ member: false, always: null });
   const page = s.rt.instance('pages/follow/index.js');
   page.setData({ followsLoaded: true, follows: [] });
-  page.applyBoot(trial());
-  assert.equal(page.data.readiness.code, 'no_follows');
-  assert.match(page.data.readiness.detail, /免费体验：可关注 1 个配置/);
-  page.onAdd();
-  assert.equal(page.data.editing, true, 'the free trial may open the editor');
-  page.setData({ editing: false, follows: [{ followId: 'f1', partNumber: 'SKU-A', status: 'active', stores: [] }] });
-  page.onAdd();
-  assert.equal(s.rt.messages.at(-1).title, '免费体验可关注 1 个配置');
-  page.refreshReadiness();
-  assert.equal(page.data.readiness.code, 'no_credit');
-  assert.equal(page.data.readiness.actionLabel, '授权免费提醒');
-  await page.onSubscribe();
-  assert.equal(s.prompts(), 1);
-  assert.equal(s.records().length, 1);
-  assert.equal(page.data.readiness.code, 'ready');
-  assert.equal(page.data.readiness.action, '', 'no point asking a trial account for more sends');
-
-  page.applyBoot(trial({ freeReminder: false }));
+  page.applyBoot(free());
   assert.equal(page.data.readiness.code, 'membership');
-  assert.equal(page.data.readiness.title, '免费体验提醒已用完');
-  assert.match(page.data.follows[0].monitoringText, /免费提醒已用完/);
+  assert.match(page.data.readiness.title, /会员专属/);
+  page.onAdd();
+  assert.equal(page.data.editing, false, 'free accounts cannot open the follow editor');
+  assert.equal(s.rt.messages.at(-1).title, '关注与到货提醒为会员专属');
   await page.onSubscribe();
-  assert.equal(s.prompts(), 1);
-  assert.equal(s.rt.messages.at(-1).title, '免费体验提醒已用完');
+  assert.equal(s.prompts(), 0);
+  assert.equal(s.rt.messages.at(-1).title, '关注与到货提醒为会员专属');
 });
 
-test('silent top-up gives a free-trial account only the one send it needs', async () => {
+test('silent top-up never prompts free accounts', async () => {
   const s = setup({ member: false });
-  s.rt.app.globalData.bootstrap = boot({ membership: { active: false, expiresAt: null }, freeReminder: true });
-  assert.equal(s.credits.topUpReminderCredit(), true);
-  await settle();
-  assert.equal(s.records().length, 1);
-  assert.equal(s.credits.topUpReminderCredit(), false, 'already has a send');
-  const used = setup({ member: false });
-  used.rt.app.globalData.bootstrap = boot({ membership: { active: false, expiresAt: null }, freeReminder: false });
-  assert.equal(used.credits.topUpReminderCredit(), false);
-  assert.equal(used.prompts(), 0);
+  s.rt.app.globalData.bootstrap = boot({ membership: { active: false, expiresAt: null }, freeReminder: false });
+  assert.equal(s.credits.topUpReminderCredit(), false);
+  assert.equal(s.prompts(), 0);
+  assert.equal(s.records().length, 0);
 });
 
-test('members authorize restock and sell-out alerts in one prompt; a new account only restock', async () => {
+test('members authorize restock and sell-out alerts in one prompt', async () => {
   const both = { enabled: true, deliveryReady: true, templateIds: { restock: 'restock-A', soldout: 'soldout-B' } };
   const requested = [];
   const s = setup({ always: null, handler: async (action, payload) => action === 'notify.recordSubscription'
@@ -172,9 +164,6 @@ test('members authorize restock and sell-out alerts in one prompt; a new account
   assert.deepEqual(JSON.parse(JSON.stringify(s.records().at(-1).payload.results)), { 'restock-A': 'accept', 'soldout-B': 'accept' });
   assert.equal(page.data.subscription.credits, 3);
   assert.equal(page.data.subscription.soldoutCredits, 2);
-  page.applyBoot(boot({ notifications: both, membership: { active: false, expiresAt: null }, freeReminder: true }));
-  await page.onSubscribe();
-  assert.deepEqual(JSON.parse(JSON.stringify(requested.at(-1))), ['restock-A'], 'the free alert is a restock alert only');
 });
 
 test('silent top-up asks only for the templates the member set to "always"', async () => {

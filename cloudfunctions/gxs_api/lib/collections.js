@@ -11,6 +11,7 @@ const COLLECTIONS = Object.freeze({
   health: 'gxs_target_health',
   orders: 'gxs_orders',
   notifications: 'gxs_notifications',
+  notificationTests: 'gxs_notification_tests',
   config: 'gxs_config',
   catalogStores: 'gxs_catalog_stores',
   catalogProducts: 'gxs_catalog_products',
@@ -18,6 +19,10 @@ const COLLECTIONS = Object.freeze({
 
 /** Index plan used by tools/db/create-collections and documented in docs/DATA_MODEL.md. */
 const INDEX_PLAN = Object.freeze({
+  [COLLECTIONS.notificationTests]: [
+    { name: 'user_created', keys: { userKey: 1, createdAt: -1 }, unique: false },
+    { name: 'status_created', keys: { status: 1, createdAt: -1 }, unique: false },
+  ],
   [COLLECTIONS.ledger]: [
     { name: 'user_day_created_id', keys: { userKey: 1, dayKey: 1, createdAt: -1, _id: -1 }, unique: false },
     { name: 'user_created_id', keys: { userKey: 1, createdAt: -1, _id: -1 }, unique: false },

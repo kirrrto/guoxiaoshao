@@ -4,7 +4,7 @@
 .section-label { color: var(--text-2); font-size: 24rpx; margin: 22rpx 0 14rpx; }
 .scroll-tabs { white-space: nowrap; margin-bottom: 8rpx; }
 .tab { display: inline-block; padding: 14rpx 28rpx; border: 1rpx solid rgba(255,255,255,0.84); border-radius: 999rpx; margin-right: 12rpx; background: rgba(232,249,239,0.72); color: var(--text-2); font-size: 26rpx; }
-.tab.on { background: linear-gradient(145deg, #1ED58A, #00C375); color: var(--green-ink); font-weight: 600; box-shadow: inset 0 1rpx 0 rgba(255,255,255,0.34); }
+.tab.on { background: var(--green); color: var(--green-ink); font-weight: 600; box-shadow: inset 0 1rpx 0 rgba(255,255,255,0.34); }
 .field { display: flex; gap: 16rpx; align-items: center; justify-content: space-between; padding: 25rpx 0; border-bottom: 1rpx solid var(--line); min-width: 0; }
 .label { color: var(--text-2); font-size: 28rpx; flex: 0 0 auto; max-width: 30%; }
 .value { color: var(--text); font-size: 28rpx; text-align: right; flex: 1; min-width: 0; max-width: 76%; white-space: normal; overflow-wrap: anywhere; }

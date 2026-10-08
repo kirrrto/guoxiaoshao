@@ -5,7 +5,7 @@
     "pageBackground": "#F6F8F7",
     "pullTextStyle": "dark",
     "tabColor": "#6C8179",
-    "tabSelectedColor": "#007A49",
+    "tabSelectedColor": "#00C375",
     "tabBackground": "#F8FCFA",
     "tabBorderStyle": "white"
   },
@@ -15,7 +15,7 @@
     "pageBackground": "#101713",
     "pullTextStyle": "light",
     "tabColor": "#A3B6AC",
-    "tabSelectedColor": "#68DF9D",
+    "tabSelectedColor": "#00C375",
     "tabBackground": "#16211D",
     "tabBorderStyle": "black"
   }

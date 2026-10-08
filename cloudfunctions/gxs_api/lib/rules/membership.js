@@ -59,23 +59,22 @@ function validateFollowLimits(follows, candidate, maxFollows = LIMITS.maxFollows
 }
 
 /**
- * Every account gets one free restock alert. It is used up by the first alert
- * ever sent to the account, as a member or not, so it is a new-user benefit.
- * A trial account may keep one follow.
+ * Follow and WeChat reminders are member-only. Free accounts only receive
+ * query trial credits; there is no free follow or free restock alert.
  */
-const FREE_REMINDER_FOLLOWS = 1;
-function hasFreeReminder(user, now) {
-  return Boolean(user) && !isMember(user, now) && !user.firstReminderSentAt;
+const FREE_REMINDER_FOLLOWS = 0;
+function hasFreeReminder() {
+  return false;
 }
 
-/** Members and accounts with their free alert unused may follow and be alerted. */
+/** Only members may follow products or receive WeChat restock/sold-out alerts. */
 function canUseReminders(user, now) {
-  return isMember(user, now) || hasFreeReminder(user, now);
+  return isMember(user, now);
 }
 
-/** Why an account cannot be alerted: an expired membership or a used free alert. */
+/** Why an account cannot be alerted: follow and reminders require an active membership. */
 function reminderBlockReason(user) {
-  return user && user.membership && user.membership.expiresAt ? 'member_expired' : 'free_reminder_used';
+  return user && user.membership && user.membership.expiresAt ? 'member_expired' : 'membership_required';
 }
 
 module.exports = { LIMITS, FREE_REMINDER_FOLLOWS, isMember, hasFreeReminder, canUseReminders, reminderBlockReason, extendMembership, membershipSnapshot, membershipExpiresAt, validateFollowLimits };

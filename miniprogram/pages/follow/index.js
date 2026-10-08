@@ -3,7 +3,7 @@ const { getBootstrap, getCatalog, refreshBootstrap, invalidateBootstrap, subscri
 const fmt = require('../../utils/format');
 const { storeLabel, storeLabelWithCity } = require('../../utils/store-label');
 const { syncTabBar } = require('../../utils/tab-bar');
-const { restockSubscription, soldoutSubscription, reminderReadiness, canRemind } = require('../../utils/reminder-readiness');
+const { restockSubscription, soldoutSubscription, reminderReadiness, canRemind, creditBoostTip } = require('../../utils/reminder-readiness');
 const { shareAppMessage, shareTimeline } = require('../../utils/share');
 const { monitorPollDelay } = require('../../utils/poll');
 const { FINAL_ERRORS, readPending, savePending, clearPending, beginSubscription, endSubscription, refreshConsentSetting, topUpReminderCredit } = require('../../utils/reminder-credits');
@@ -80,10 +80,10 @@ function presentFollow(follow, boot, catalog, collector) {
   const now = Date.now();
   const status = { ...(FOLLOW_STATUS[follow.status] || { label: follow.status, cls: 'muted' }) };
   if (follow.status === 'paused' && ['member_expired', 'membership_expired'].includes(follow.statusReason)) status.label = '会员到期，已暂停';
-  if (follow.status === 'expired' && boot.freeReminderUsed) status.label = '免费提醒已用完，监测已停止';
+  if (follow.status === 'expired') status.label = '会员已到期，监测已停止';
   let monitoringText = '';
   if (follow.status === 'active') {
-    if (!canRemind(boot)) { status.cls = 'warn'; monitoringText = boot.freeReminderUsed ? '免费提醒已用完，开通会员后恢复自动检测' : '会员未生效，当前不参与自动检测'; }
+    if (!canRemind(boot)) { status.cls = 'warn'; monitoringText = '会员未生效，当前不参与自动检测'; }
     else if (!collector || collector.state !== 'running' || collector.observationStale) monitoringText = '关注已保存，后台检测情况见上方';
   }
   const product = catalog && catalog.productByPart && catalog.productByPart[follow.partNumber];
@@ -165,6 +165,7 @@ Page({
     delivery: { label: '正在确认', cls: 'muted', detail: '' },
     showServiceDetails: false,
     readiness: { code: 'loading', title: '正在检查提醒条件', detail: '正在读取账户与关注状态。', tone: 'muted', action: '', actionLabel: '', activeCount: 0, storeCount: 0, ready: false },
+    creditBoostTip: '',
     refreshing: false,
     subscribing: false,
     subscriptionPending: false,
@@ -207,8 +208,11 @@ Page({
     if (this.pageRetired) return;
     syncTabBar(this, '/pages/follow/index');
     this.visible = true;
+    this.recordAlertOpen();
+    this.setData({ subscriptionPending: Boolean(readPending()) });
     if (!this.data.ready) {
       this.consumePending();
+      if (this.data.loadError) return this.onRetryLoad();
       return;
     }
     this.refreshFollowPresentation();
@@ -245,7 +249,7 @@ Page({
     if (this.pageRetired) return;
     if (this.data.loadError) return this.onRetryLoad();
     if (!this.data.ready) return;
-    getBootstrap({ force: true }).then(boot => { this.applyBoot(boot); return this.loadFollows({ force: true }); }).catch(() => {});
+    return getBootstrap({ force: true }).then(boot => { this.applyBoot(boot); return this.loadFollows({ force: true }); }).catch(() => {});
   },
 
   stopPolling() { this.pollEpoch = (this.pollEpoch || 0) + 1; if (this.pollTimer) clearTimeout(this.pollTimer); this.pollTimer = null; },
@@ -286,18 +290,50 @@ Page({
     const app = getApp(), eventId = app.globalData.pendingAlert;
     if (!eventId || !this.data.ready) return;
     app.globalData.pendingAlert = null;
-    app.globalData.handledAlerts.push(eventId);
+    return this.loadAlert(eventId);
+  },
+
+  async loadAlert(eventId) {
+    if (this.pageRetired || this.data.alert && this.data.alert.eventId === eventId && this.data.alert.loading) return;
+    const epoch = this.alertReadEpoch = (this.alertReadEpoch || 0) + 1;
     this.setData({ alert: { eventId, loading: true } });
     if (typeof wx.pageScrollTo === 'function') wx.pageScrollTo({ scrollTop: 0, duration: 0 });
     try {
       const data = await call('notify.detail', { eventId });
-      if (!this.pageRetired && this.data.alert && this.data.alert.eventId === eventId) this.setData({ alert: presentAlert(data) });
+      if (!this.pageRetired && epoch === this.alertReadEpoch && this.data.alert && this.data.alert.eventId === eventId) {
+        this.setData({ alert: presentAlert(data) }, () => {
+          if (this.pageRetired || epoch !== this.alertReadEpoch || !this.data.alert || this.data.alert.eventId !== eventId) return;
+          const app = getApp();
+          if (!app.globalData.handledAlerts.includes(eventId)) app.globalData.handledAlerts.push(eventId);
+          this.presentedAlertId = eventId;
+          this.recordAlertOpen();
+        });
+      }
     } catch (error) {
-      if (!this.pageRetired && this.data.alert && this.data.alert.eventId === eventId) this.setData({ alert: { eventId, error: error.message || '提醒详情暂时无法读取' } });
+      if (!this.pageRetired && epoch === this.alertReadEpoch && this.data.alert && this.data.alert.eventId === eventId) this.setData({ alert: { eventId,
+        error: error.message || '提醒详情暂时无法读取', retryable: error.code !== 'notification_not_found' && error.code !== 'invalid_notification_id' } });
     }
   },
 
-  onCloseAlert() { this.setData({ alert: null }); },
+  onRetryAlert() {
+    const alert = this.data.alert;
+    if (!alert || !alert.retryable || alert.loading) return;
+    return this.loadAlert(alert.eventId);
+  },
+
+  recordAlertOpen() {
+    const alert = this.data.alert, eventId = this.presentedAlertId;
+    if (this.pageRetired || this.visible !== true || !eventId || !alert || alert.eventId !== eventId || alert.loading || alert.error) return;
+    if (!this.acknowledgedAlerts) this.acknowledgedAlerts = new Set();
+    if (this.acknowledgedAlerts.has(eventId) || this.alertOpenInFlight === eventId) return;
+    this.alertOpenInFlight = eventId;
+    // Analytics is independent of displaying stock or recording feedback. A
+    // failed acknowledgment can retry on the next visible visit, never in a loop.
+    Promise.resolve().then(() => call('notify.open', { eventId })).then(() => this.acknowledgedAlerts.add(eventId)).catch(() => {})
+      .finally(() => { if (this.alertOpenInFlight === eventId) this.alertOpenInFlight = null; });
+  },
+
+  onCloseAlert() { this.alertReadEpoch = (this.alertReadEpoch || 0) + 1; this.presentedAlertId = null; this.setData({ alert: null }); },
 
   onCopyAlert() {
     const alert = this.data.alert;
@@ -361,14 +397,15 @@ Page({
     const soldout = member && templateIds.length ? soldoutSubscription(notifications, boot.subscriptions) : { templateId: null, credits: 0 };
     this.settings = boot.settings || { notifyEnabled: true };
     this.setData({
-      // freeReminder: a new account's one free alert; freeReminderUsed: it was sent and there is no membership.
-      boot: { member, expired, freeReminder: !member && boot.freeReminder === true, freeReminderUsed: !member && !expired && boot.freeReminder === false, expiresAt: boot.membership.expiresAt, expiresText: boot.membership.expiresAt ? fmt.fmtDate(boot.membership.expiresAt) : null, notificationsEnabled: notifications.enabled, notificationReason: delivery.detail, templateIds, soldoutId: soldout.templateId, requestIds: soldout.templateId ? [...templateIds, soldout.templateId] : templateIds, templateTitle: typeof notifications.templateTitle === 'string' ? notifications.templateTitle.trim() : '', memberProduct: boot.memberProduct },
+      // Follow and WeChat reminders are member-only; free accounts only get query credits.
+      boot: { member, expired, freeReminder: false, freeReminderUsed: false, expiresAt: boot.membership.expiresAt, expiresText: boot.membership.expiresAt ? fmt.fmtDate(boot.membership.expiresAt) : null, notificationsEnabled: notifications.enabled, notificationReason: delivery.detail, templateIds, soldoutId: soldout.templateId, requestIds: soldout.templateId ? [...templateIds, soldout.templateId] : templateIds, templateTitle: typeof notifications.templateTitle === 'string' ? notifications.templateTitle.trim() : '', memberProduct: boot.memberProduct },
       collector: { ...collector, ...fmt.collectorMeta(collector.state), detail: DETECTION_DETAIL[collector.state] || '暂未取得后台检测状态，请稍后刷新。',
         ...(collector.observationStale ? { label: '库存观测更新延迟', cls: 'warn', detail: DELIVERY_REASON.collector_observation_stale } : {}),
         updatedText: collector.updatedAt ? fmt.fmtDateTime(collector.updatedAt) : null, batchText: collector.lastBatchAt ? fmt.fmtDateTime(collector.lastBatchAt) : null },
       delivery,
       limits: boot.limits || this.data.limits,
       subscription: { ...subscription, soldoutEnabled: Boolean(soldout.templateId), soldoutCredits: soldout.credits },
+      subscriptionPending: Boolean(readPending()),
       ...pageData,
     });
     this.refreshFollowPresentation();
@@ -410,7 +447,10 @@ Page({
   refreshReadiness() {
     if (this.pageRetired) return;
     const readiness = reminderReadiness({ ...this.data, settings: this.settings });
-    this.setData({ readiness, readinessTaskDetail: readinessTaskDetail(readiness) });
+    // Other credit states already include this guidance in the notice. Service
+    // failures and pending records need recovery, not more authorizations.
+    const tip = readiness.code === 'ready' ? creditBoostTip(this.data.subscription || {}) : '';
+    this.setData({ readiness, readinessTaskDetail: readinessTaskDetail(readiness), creditBoostTip: tip });
   },
 
   onReadinessAction() {
@@ -485,10 +525,9 @@ Page({
 
   showMemberModal() {
     const product = this.data.boot.memberProduct || {};
-    const used = this.data.boot.freeReminderUsed;
     wx.showModal({
-      title: used ? '免费体验提醒已用完' : '关注与到货提醒为会员专属',
-      content: `${used ? '你的 1 条免费到货提醒已经发送。' : ''}会员可关注 3 个具体配置，每个配置最多 3 家门店，并可累加到货提醒次数。不同容量或颜色分别占用一个关注名额。${product.paymentReady ? '' : '\n\n会员购买暂未开放，可在「我的」查看状态。'}`,
+      title: '关注与到货提醒为会员专属',
+      content: `会员可关注 3 个具体配置，每个配置最多 3 家门店，并可累加到货和断货提醒次数。免费用户可用查询次数实时看货。${product.paymentReady ? '' : '\n\n会员购买暂未开放，可在「我的」查看状态。'}`,
       confirmText: '前往我的',
       success: r => { if (r.confirm) wx.switchTab({ url: '/pages/mine/index' }); },
     });
@@ -496,10 +535,10 @@ Page({
 
   onAdd() {
     if (this.data.saving || this.data.followBusyId) return;
-    if (this.data.follows.length >= this.data.limits.maxFollows) {
-      if (!this.data.boot.freeReminder) return toast(`最多同时关注 ${this.data.limits.maxFollows} 个机型`);
-      return wx.showModal({ title: '免费体验可关注 1 个配置', content: '开通会员可关注 3 个具体配置，每个配置最多 3 家门店，并可累加到货提醒次数。', confirmText: '前往我的', success: r => { if (r.confirm) this.onGoMine(); } });
-    }
+    if (!this.data.boot) return toast('正在读取账户，请稍后再试');
+    if (!this.data.boot.member) return this.showMemberModal();
+    if (!this.data.followsLoaded) return toast('正在确认已有关注，请稍后再试');
+    if (this.data.follows.length >= this.data.limits.maxFollows) return toast(`最多同时关注 ${this.data.limits.maxFollows} 个机型`);
     this.openEditor({ followId: newId('f'), pickerValue: null, isNew: true });
   },
 
@@ -574,7 +613,7 @@ Page({
       if (sameEditor && this.visible !== false) {
         confirmTap();
         toast(editor.isNew ? '已加入关注' : '已更新', 'success');
-        if (editor.isNew && !toppedUp && (!this.data.subscription.credits || (this.data.subscription.soldoutEnabled && !this.data.subscription.soldoutCredits))) this.promptSubscribe();
+        if (editor.isNew && !toppedUp && !this.data.subscription.credits) this.promptSubscribe();
       }
       if (this.visible !== false) {
         refreshBootstrap().catch(() => {});
@@ -595,13 +634,9 @@ Page({
 
   promptSubscribe() {
     if (!this.data.boot.templateIds.length || this.data.delivery.cls !== 'ok') return;
-    if (this.data.boot.freeReminder) {
-      wx.showModal({ title: '开启免费到货提醒', content: '点「允许」授权 1 次，补货时就通过微信免费提醒你。', confirmText: '去授权', success: r => { if (r.confirm) this.onSubscribe(); } });
-      return;
-    }
     wx.showModal({
       title: this.data.subscription.soldoutEnabled ? '开启到货和断货提醒' : '开启补货提醒',
-      content: this.data.subscription.soldoutEnabled ? '一个按钮同时申请到货和断货提醒；两项都选择「允许」，各增加 1 次。也可以只允许其中一项。' : '每点一次「允许」增加 1 次到货提醒，可以连续授权多次累加；勾选「总是保持以上选择」后，平时点查询、刷新时会自动补充。',
+      content: this.data.subscription.soldoutEnabled ? '一个按钮同时申请到货和断货提醒；两项都选择「允许」，各增加 1 次。也可以只允许其中一项。建议连续授权累加到 10 次以上，避免到货或断货时收不到提醒。' : '每点一次「允许」增加 1 次到货提醒，可以连续授权多次累加；建议累加到 10 次以上，避免补货时收不到提醒。勾选「总是保持以上选择」后，平时点查询、刷新时会自动补充。',
       confirmText: '增加提醒次数',
       success: r => { if (r.confirm) this.onSubscribe(); },
     });
@@ -615,7 +650,7 @@ Page({
       wx.showModal({ title: '提醒暂未开放', content: this.data.boot.notificationReason || '尚未配置可用的订阅消息模板。可在关注页查看已有观测，页面可见时约每分钟刷新。', showCancel: false });
       return;
     }
-    // Reminders are for members and a new account's free alert.
+    // WeChat reminders are member-only.
     if (!canRemind(this.data.boot)) return this.showMemberModal();
     if (!beginSubscription()) return toast('授权正在同步，请稍后再试');
     try {
@@ -698,8 +733,9 @@ Page({
     if (this.pageRetired || !this.data.boot || !this.data.boot.templateIds.length) return;
     const credits = restockSubscription({ templateIds: { restock: this.data.boot.templateIds[0] } }, subscriptions).credits;
     const soldoutCredits = soldoutSubscription({ templateIds: { soldout: this.data.boot.soldoutId } }, subscriptions).credits;
-    if (credits !== this.data.subscription.credits || soldoutCredits !== this.data.subscription.soldoutCredits) {
-      this.setData({ 'subscription.credits': credits, 'subscription.soldoutCredits': soldoutCredits });
+    const subscriptionPending = Boolean(readPending());
+    if (credits !== this.data.subscription.credits || soldoutCredits !== this.data.subscription.soldoutCredits || subscriptionPending !== this.data.subscriptionPending) {
+      this.setData({ 'subscription.credits': credits, 'subscription.soldoutCredits': soldoutCredits, subscriptionPending });
       this.refreshReadiness();
     }
   },
@@ -806,7 +842,8 @@ Page({
   onFollowImageError(e) { const index = Number(e.currentTarget.dataset.index); this.setData({ [`follows[${index}].imageUrl`]: '' }); },
 
   onRetryLoad() {
+    if (this.pageRetired) return;
     this.setData({ loadError: null });
-    this.onLoad();
+    return this.onLoad();
   },
 });

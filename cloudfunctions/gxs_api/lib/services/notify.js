@@ -15,8 +15,7 @@ const FEEDBACK = ['bought', 'missed', 'skipped'];
 /**
  * Record the outcome of wx.requestSubscribeMessage. Each accepted one-time
  * template grants exactly one send and sends accumulate across requests; the
- * collector's notifier consumes them. Members, and accounts with their one free
- * alert unused, may record grants.
+ * collector's notifier consumes them. Members only.
  */
 async function recordSubscription(ctx, payload) {
   const user = await ensureUser(ctx);
@@ -28,8 +27,8 @@ async function recordSubscription(ctx, payload) {
   if (!entries.length || entries.length > 3 || entries.some(([id, result]) => !templateIds.includes(id) || !['accept', 'reject', 'ban'].includes(result))) {
     throw new ApiError('invalid_subscription_result', '只接受当前配置模板的 accept、reject 或 ban 结果');
   }
-  // Reminders are for members and for an account's one free alert; the notifier enforces the same rule.
-  if (!canUseReminders(user, ctx.now)) throw new ApiError('membership_required', '免费体验提醒已用完，开通会员后可继续接收到货提醒');
+  // WeChat reminders are member-only; the notifier enforces the same rule.
+  if (!canUseReminders(user, ctx.now)) throw new ApiError('membership_required', '微信提醒为会员专属，开通会员并授权后可接收到货和断货提醒');
   return ctx.repo.recordSubscriptionGrant({ userKey: user._id, requestId: payload.requestId, templateIds, results, now: ctx.nowIso });
 }
 
@@ -90,6 +89,12 @@ async function detail(ctx, payload) {
   };
 }
 
+/** A visible client confirms it rendered the detail; reads alone are not views. */
+async function open(ctx, payload) {
+  const { user, task } = await ownAlert(ctx, payload);
+  return ctx.repo.recordNotificationOpen({ userKey: user._id, taskId: task._id, nowIso: ctx.nowIso });
+}
+
 /** Only the unchanged follow opened by this alert may be paused with the feedback. */
 async function feedback(ctx, payload) {
   const { user, task } = await ownAlert(ctx, payload);
@@ -98,4 +103,4 @@ async function feedback(ctx, payload) {
     knownFollows: payload.outcome === 'bought' ? await ctx.repo.listFollows(user._id) : [] });
 }
 
-module.exports = { recordSubscription, list, remove, clear, detail, feedback };
+module.exports = { recordSubscription, list, remove, clear, detail, open, feedback };

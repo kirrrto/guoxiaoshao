@@ -1,4 +1,4 @@
-page { --green-mist: #F0FBF6; --green-dark: #007A49; background: #F0FBF6; color: #183C2D; font: 28rpx/1.6 -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif; }
+page { --green-mist: #F0FBF6; --green: #00C375; --green-dark: var(--green); background: #F0FBF6; color: #183C2D; font: 28rpx/1.6 -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif; }
 view, text { box-sizing: border-box; }
 button, input, textarea, scroll-view { box-sizing: border-box; }
 .page { width: 100%; max-width: 1000rpx; padding: 24rpx 24rpx calc(40rpx + env(safe-area-inset-bottom)); margin: auto; overflow-wrap: anywhere; }
@@ -12,15 +12,15 @@ button, input, textarea, scroll-view { box-sizing: border-box; }
 .btn { display: flex; align-items: center; justify-content: center; min-width: 0; max-width: 100%; min-height: 44px; padding: 18rpx 22rpx; margin: 0; border: 0; border-radius: 18rpx; font-size: 26rpx; line-height: 1.5; white-space: normal; overflow-wrap: anywhere; }
 .btn::after { border: 0; }
 .btn-block { width: 100%; }
-.btn-primary { color: #073C2C; background: #00C375; }
-.btn-outline { color: #007A49; background: white; border: 1rpx solid #00C375; }
-.btn-ghost { color: #007A49; background: #E5F6ED; }
+.btn-primary { color: #073C2C; background: var(--green); }
+.btn-outline { color: var(--green); background: white; border: 1rpx solid var(--green); }
+.btn-ghost { color: var(--green); background: rgba(0, 195, 117, 0.10); }
 .btn[disabled] { color: #65776C; background: #EAF1ED; }
 .btn-row { display: flex; flex-wrap: wrap; gap: 14rpx; margin-top: 20rpx; }
 .btn-row .btn { flex: 1 1 150rpx; }
 .stat-row { display: flex; flex-wrap: wrap; gap: 12rpx; margin-bottom: 22rpx; }
 .stat { flex: 1 1 110rpx; padding: 18rpx 12rpx; border-radius: 14rpx; background: #F0FBF6; text-align: center; }
-.stat .num { font-size: 36rpx; font-weight: 700; color: #007A49; }
+.stat .num { font-size: 36rpx; font-weight: 700; color: var(--green); }
 .stat .lbl { font-size: 22rpx; color: #47685A; }
 .small { font-size: 24rpx; }
 .tiny { font-size: 22rpx; }

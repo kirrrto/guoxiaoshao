@@ -111,9 +111,8 @@ test('scheduled pickup timeout fits the remaining budget and retains time to per
   assert.deepEqual(timeouts, [500], 'an 8-second request must not start with only 1.5 seconds left');
 });
 
-test('a deadline reached during credit reservation prevents the send and restores the trial and subscription credit', async () => {
+test('a deadline reached during credit reservation prevents the send and restores the subscription credit', async () => {
   const s = await collectorFixture();
-  await s.f.repo.updateUser(userKeyOf(), { membership: null });
   const task = { _id: 'deadline-task', userKey: userKeyOf(), followId: 'F', eventId: 'event-deadline', eventType: 'restock_confirmed',
     partNumber: 'MJYH4CH/A', storeNumber: 'R577', templateId: 'TPL', status: 'pending', attempts: 0,
     createdAt: s.f.state.now.toISOString(), detectedAt: s.f.state.now.toISOString() };
@@ -128,7 +127,6 @@ test('a deadline reached during credit reservation prevents the send and restore
   assert.equal(result.status, 'pending');
   const user = await s.f.repo.getUser(userKeyOf());
   assert.equal(user.subscriptions.TPL.credits, 5);
-  assert.equal(user.firstReminderSentAt || null, null);
   assert.equal(user.freeReminderTaskId || null, null);
   allowed = true;
   s.f.repo.reserveSubscriptionCredit = reserve;

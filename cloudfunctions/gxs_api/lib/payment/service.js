@@ -3,47 +3,65 @@ const { createHash, randomUUID } = require('node:crypto');
 const { ApiError } = require('../errors');
 const { membershipSnapshot } = require('../rules/membership');
 const { createVirtualPaymentProvider, PaymentProtocolError } = require('./virtual-payment');
+const { PLANS, DEFAULT_PLAN_ID, findPlan, planForTerms, planIdOfOrder } = require('./plans');
 
 const PROVIDER = 'wechat_virtual_payment';
-let sharedProvider = null;
+let sharedProviders = new Map();
 let sharedProviderKey = null;
 const nowOf = ctx => typeof ctx.clock === 'function' ? ctx.clock() : ctx.now || new Date();
 const orderKey = (userKey, clientId) => `G${createHash('sha256').update(`${userKey}|${clientId}`).digest('hex').slice(0, 31)}`;
 const conflict = () => { throw new ApiError('payment_evidence_mismatch', '支付凭证与订单不一致，请联系客服核对'); };
 
-function paymentProviderFor(ctx) {
+function configuredProduct(ctx, planId = DEFAULT_PLAN_ID) {
+  const plan = findPlan(planId);
+  if (!plan) throw new ApiError('invalid_member_plan', '请选择有效的会员套餐');
+  if (planId === DEFAULT_PLAN_ID) return { ...ctx.config.memberProduct, id: planId, planId, productId: ctx.config.virtualPayment.productId };
+  const mapping = ctx.config.memberPlans && ctx.config.memberPlans[planId] || {};
+  return { ...plan, planId, productId: mapping.productId || '', enabled: mapping.enabled === true,
+    note: `一次购买 ${plan.days} 天，已有会员按剩余有效期顺延，不自动续费。` };
+}
+
+function paymentProviderFor(ctx, planId = DEFAULT_PLAN_ID) {
   if (ctx.paymentProvider) return ctx.paymentProvider;
-  if (ctx._paymentProvider) return ctx._paymentProvider;
+  if (ctx._paymentProviders && ctx._paymentProviders.has(planId)) return ctx._paymentProviders.get(planId);
+  const product = configuredProduct(ctx, planId);
   const env = ctx.paymentEnv || process.env;
-  const config = { ...ctx.config.virtualPayment, priceFen: ctx.config.memberProduct.priceFen,
-    days: ctx.config.memberProduct.days, enabled: ctx.config.memberProduct.enabled };
+  const config = { ...ctx.config.virtualPayment, productId: product.productId, priceFen: product.priceFen,
+    days: product.days, enabled: product.enabled };
   const expectedAppid = ctx.config.notifications.consumerAppId;
   const useShared = ctx.paymentCacheAllowed === true && env === process.env && ctx.fetchImpl === globalThis.fetch;
-  // Single-entry, process-local cache. This key contains credentials and is
-  // deliberately never exposed, persisted or logged. Rotation replaces it.
-  const key = useShared ? JSON.stringify([config, expectedAppid, ...[
+  // Bounded by the three plans. Credential/config rotation replaces the cache.
+  // This key contains secrets and is never exposed, persisted or logged.
+  const key = useShared ? JSON.stringify([ctx.config.virtualPayment, ctx.config.memberProduct, ctx.config.memberPlans, expectedAppid, ...[
     'GXS_CONSUMER_APPID', 'GXS_CONSUMER_APPSECRET', 'GXS_VIRTUAL_PAYMENT_APPKEY',
     'GXS_PAYMENT_CALLBACK_TOKEN', 'GXS_PAYMENT_CALLBACK_AES_KEY', 'GXS_CONSUMER_ORIGINAL_ID',
   ].map(name => env[name] || null)]) : null;
-  if (useShared && sharedProvider && key === sharedProviderKey) ctx._paymentProvider = sharedProvider;
-  else {
-    ctx._paymentProvider = createVirtualPaymentProvider({ config, expectedAppid, env,
+  if (useShared && key !== sharedProviderKey) { sharedProviderKey = key; sharedProviders = new Map(); }
+  let provider = useShared && sharedProviders.get(planId);
+  if (!provider) {
+    provider = createVirtualPaymentProvider({ config, expectedAppid, env,
       fetchImpl: ctx.fetchImpl, clock: useShared ? () => new Date() : ctx.clock });
-    if (useShared) { sharedProviderKey = key; sharedProvider = ctx._paymentProvider; }
+    if (useShared) sharedProviders.set(planId, provider);
   }
-  return ctx._paymentProvider;
+  if (!ctx._paymentProviders) ctx._paymentProviders = new Map();
+  ctx._paymentProviders.set(planId, provider);
+  return provider;
 }
 
-function paymentProduct(ctx) {
-  const configured = ctx.config.memberProduct;
-  const payment = paymentProviderFor(ctx).getReadiness();
-  const matches = configured.id === ctx.config.virtualPayment.productId && configured.priceFen === 700 && configured.days === 7;
+function presentProduct(ctx, planId) {
+  const configured = configuredProduct(ctx, planId), plan = findPlan(planId);
+  const payment = paymentProviderFor(ctx, planId).getReadiness();
+  const matches = configured.priceFen === plan.priceFen && configured.days === plan.days
+    && (planId !== DEFAULT_PLAN_ID || ctx.config.memberProduct.id === configured.productId);
   const ready = configured.enabled === true && payment.ready === true && matches;
-  return { id: configured.id, title: configured.title, priceFen: configured.priceFen, days: configured.days,
+  return { id: planId, planId, productId: configured.productId, title: configured.title, priceFen: configured.priceFen, days: configured.days,
     note: configured.note, enabled: ready, paymentReady: ready,
-    paymentReason: ready ? null : !matches ? 'payment_product_terms_mismatch' : payment.reason || 'payment_not_enabled',
+    paymentReason: ready ? null : !matches ? 'payment_product_terms_mismatch' : !configured.productId ? 'payment_product_id_missing'
+      : planId !== DEFAULT_PLAN_ID && configured.enabled !== true ? 'payment_plan_disabled' : payment.reason || 'payment_not_enabled',
     iosEnabled: ctx.config.virtualPayment.iosEnabled === true };
 }
+function paymentProducts(ctx) { return PLANS.map(plan => presentProduct(ctx, plan.id)); }
+function paymentProduct(ctx) { return { ...presentProduct(ctx, DEFAULT_PLAN_ID), id: ctx.config.memberProduct.id }; }
 
 function protocolError(error) {
   if (error instanceof ApiError) return error;
@@ -57,14 +75,29 @@ function protocolError(error) {
 }
 
 function validateOrder(ctx, order) {
+  if (cancelledIntent(ctx, order)) return;
   const s = order && order.paymentSnapshot;
-  if (!order || order.provider !== PROVIDER || !s || s.version !== 1 || s.provider !== PROVIDER
+  const plan = order && planForTerms(order.days, order.amountFen);
+  if (!order || order.provider !== PROVIDER || !s || ![1, 2].includes(s.version) || s.provider !== PROVIDER
     || order.appid !== ctx.config.notifications.consumerAppId || s.appid !== order.appid
     || order.userKey !== `${order.appid}:${order.openid}` || order._id !== order.outTradeNo
     || order.outTradeNo !== orderKey(order.userKey, order.orderId)
     || s.productId !== order.productId || s.priceFen !== order.amountFen || s.days !== order.days
     || s.env !== 0 || s.currency !== 'CNY' || s.buyQuantity !== 1
-    || order.amountFen !== 700 || order.days !== 7 || typeof s.offerId !== 'string') conflict();
+    || !plan || planIdOfOrder(order) !== plan.id
+    || (s.version === 1 ? plan.id !== DEFAULT_PLAN_ID : s.planId !== plan.id || order.planId !== plan.id)
+    || typeof s.productId !== 'string' || !/^[A-Za-z0-9_-]{1,128}$/.test(s.productId)
+    || typeof s.offerId !== 'string' || !/^\d{1,20}$/.test(s.offerId)) conflict();
+}
+
+// A user may cancel after local persistence but before login/create completed.
+// This terminal record fences a delayed create of that same client intent.
+function cancelledIntent(ctx, order) {
+  return Boolean(order && order.type === 'membership_cancelled_intent' && order.status === 'cancelled'
+    && order.provider === PROVIDER && order.appid === ctx.config.notifications.consumerAppId
+    && order.userKey === `${order.appid}:${order.openid}` && order._id === order.outTradeNo
+    && order._id === orderKey(order.userKey, order.orderId) && order.amountFen === 0 && order.days === 0
+    && order.paymentSnapshot === null && order.paymentPreparedAt === null && !order.transactionId && !order.fulfilledAt);
 }
 
 async function withOrderLease(ctx, id, work) {
@@ -76,7 +109,10 @@ async function withOrderLease(ctx, id, work) {
     // Cleanup must not replace a durable fulfilment or the actual payment
     // error. A failed release remains fenced until the existing lease expires.
     try { await ctx.repo.releaseLease({ id: `pay_order_${id}`, ownerId }); }
-    catch { if (ctx.log && typeof ctx.log.warn === 'function') ctx.log.warn('[payment] order lease cleanup failed'); }
+    catch {
+      try { if (ctx.log && typeof ctx.log.warn === 'function') ctx.log.warn('[payment] order lease cleanup failed'); }
+      catch { /* Logging is also noncritical after the order work completes. */ }
+    }
   }
 }
 
@@ -89,6 +125,7 @@ async function resultOf(ctx, order, providerState, canPrepare = false) {
 async function reconcileLocked(ctx, inputOrder, { acknowledge = true, permitUnprepared = false } = {}) {
   let order = await ctx.repo.getOrder(inputOrder._id);
   validateOrder(ctx, order);
+  if (cancelledIntent(ctx, order)) return resultOf(ctx, order, 'cancelled');
   const provider = paymentProviderFor(ctx);
   let evidence;
   try { evidence = await provider.queryOrder({ openid: order.openid, outTradeNo: order.outTradeNo }); }
@@ -151,7 +188,36 @@ async function reconcileOrder(ctx, order, options = {}) {
   catch (error) { throw protocolError(error); }
 }
 
-async function createPurchase(ctx, user, clientId, loginCode) {
+/** Checking and abandoning share the same fence as payment callbacks. */
+async function abandonPurchase(ctx, user, clientId) {
+  const id = orderKey(user._id, clientId);
+  try {
+    return await withOrderLease(ctx, id, async () => {
+      const existing = await ctx.repo.getOrder(id);
+      if (!existing) {
+        const nowIso = nowOf(ctx).toISOString();
+        const result = await ctx.repo.createOrderIfAbsent({ _id: id, outTradeNo: id, orderId: clientId,
+          userKey: user._id, appid: user.appid, openid: user.openid, type: 'membership_cancelled_intent',
+          provider: PROVIDER, productId: null, amountFen: 0, days: 0, status: 'cancelled',
+          paymentSnapshot: null, paymentPreparedAt: null, paidAt: null, fulfilledAt: null,
+          createdAt: nowIso, cancelledAt: nowIso, lastReconciledAt: nowIso });
+        validateOrder(ctx, result.order);
+        return resultOf(ctx, result.order, 'cancelled');
+      }
+      if (existing.userKey !== user._id || existing.orderId !== clientId) conflict();
+      const result = await reconcileLocked(ctx, existing, { permitUnprepared: true });
+      let order = result.order;
+      // A failed query is not proof that nothing was paid. Only a successful
+      // reconciliation (or an intent that never issued signatures) gets here.
+      if (order.status === 'created' && !order.transactionId && !order.abandonedAt) {
+        order = await ctx.repo.updateOrder(order._id, { abandonedAt: nowOf(ctx).toISOString() });
+      }
+      return resultOf(ctx, order, result.providerState);
+    });
+  } catch (error) { throw protocolError(error); }
+}
+
+async function createPurchase(ctx, user, clientId, loginCode, requestedPlanId) {
   const id = orderKey(user._id, clientId);
   try {
     return await withOrderLease(ctx, id, async () => {
@@ -160,27 +226,32 @@ async function createPurchase(ctx, user, clientId, loginCode) {
         if (order.userKey !== user._id || order.orderId !== clientId) conflict();
         const reconciled = await reconcileLocked(ctx, order, { acknowledge: true, permitUnprepared: true });
         order = reconciled.order;
-        if (!reconciled.canPrepare) return { ...reconciled, payment: null, pending: ['created', 'pending'].includes(reconciled.providerState) };
+        if (!reconciled.canPrepare || order.abandonedAt) return { ...reconciled, payment: null,
+          pending: !order.abandonedAt && ['created', 'pending'].includes(reconciled.providerState) };
       }
-      const product = paymentProduct(ctx);
+      // Reusing an existing intent always retains its immutable plan, even if
+      // the caller selected another plan since opening the original checkout.
+      const planId = order ? planIdOfOrder(order) : requestedPlanId === undefined ? DEFAULT_PLAN_ID : requestedPlanId;
+      const product = presentProduct(ctx, planId);
       if (!product.paymentReady) return { disabled: true, product };
       if (!order) {
         const nowIso = nowOf(ctx).toISOString();
         const vp = ctx.config.virtualPayment;
-        const snapshot = { version: 1, provider: PROVIDER, appid: user.appid, offerId: vp.offerId,
-          productId: vp.productId, priceFen: 700, days: 7, currency: 'CNY', env: 0, buyQuantity: 1 };
+        const snapshot = { version: planId === DEFAULT_PLAN_ID ? 1 : 2,
+          ...(planId === DEFAULT_PLAN_ID ? {} : { planId }), provider: PROVIDER, appid: user.appid, offerId: vp.offerId,
+          productId: product.productId, priceFen: product.priceFen, days: product.days, currency: 'CNY', env: 0, buyQuantity: 1 };
         const created = await ctx.repo.createOrderIfAbsent({ _id: id, outTradeNo: id, orderId: clientId,
-          userKey: user._id, appid: user.appid, openid: user.openid, productId: vp.productId,
+          userKey: user._id, appid: user.appid, openid: user.openid, productId: product.productId, planId,
           type: 'membership_order', provider: PROVIDER, source: 'virtual_payment',
-          amountFen: 700, days: 7, paymentSnapshot: snapshot, status: 'created', createdAt: nowIso,
+          amountFen: product.priceFen, days: product.days, paymentSnapshot: snapshot, status: 'created', createdAt: nowIso,
           paidAt: null, fulfilledAt: null, providerStatus: null, paymentPreparedAt: null,
           lastReconciledAt: '1970-01-01T00:00:00.000Z', providerAcknowledgedAt: null });
         order = created.order;
       }
       validateOrder(ctx, order);
       // Existing snapshots cannot silently change into a different product.
-      if (order.paymentSnapshot.offerId !== ctx.config.virtualPayment.offerId || order.productId !== product.id) conflict();
-      const payment = await paymentProviderFor(ctx).preparePayment({ outTradeNo: order.outTradeNo, openid: order.openid, appid: order.appid, loginCode });
+      if (order.paymentSnapshot.offerId !== ctx.config.virtualPayment.offerId || order.productId !== product.productId) conflict();
+      const payment = await paymentProviderFor(ctx, planId).preparePayment({ outTradeNo: order.outTradeNo, openid: order.openid, appid: order.appid, loginCode });
       // Persist BEFORE returning any usable payment signature to the client.
       order = await ctx.repo.updateOrder(order._id, { paymentPreparedAt: nowOf(ctx).toISOString() });
       return { ...(await resultOf(ctx, order, 'prepared')), payment, pending: false };
@@ -188,4 +259,4 @@ async function createPurchase(ctx, user, clientId, loginCode) {
   } catch (error) { throw protocolError(error); }
 }
 
-module.exports = { paymentProviderFor, paymentProduct, reconcileOrder, createPurchase, orderKey, protocolError, PROVIDER };
+module.exports = { paymentProviderFor, paymentProduct, paymentProducts, reconcileOrder, abandonPurchase, createPurchase, orderKey, protocolError, PROVIDER, planIdOfOrder };

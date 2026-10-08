@@ -3,6 +3,7 @@ const { createHmac } = require('node:crypto');
 const { fail, PaymentProtocolError } = require('./errors');
 const { requestJson, withDeadline, createAccessTokenProvider } = require('./transport');
 const { createCallbackVerifier, callbackSuccess } = require('./callback');
+const { planForTerms } = require('./plans');
 
 // Protocol checked 2026-09-20 against these primary sources:
 // /miniprogram/dev/platform-capabilities/business-capabilities/virtual-payment/person.html
@@ -59,8 +60,7 @@ function createVirtualPaymentProvider({ config = {}, expectedAppid, env = proces
   function productReason() {
     if (typeof settings.offerId !== 'string' || !/^\d{1,20}$/.test(settings.offerId)) return 'payment_offer_id_missing';
     if (!stringValue(settings.productId)) return 'payment_product_id_missing';
-    // This integration is the explicitly agreed fixed, one-time 7-day product.
-    if (settings.priceFen !== 700 || settings.days !== 7) return 'payment_product_terms_mismatch';
+    if (!planForTerms(settings.days, settings.priceFen)) return 'payment_product_terms_mismatch';
     return null;
   }
   function getReadiness() {
@@ -68,7 +68,7 @@ function createVirtualPaymentProvider({ config = {}, expectedAppid, env = proces
     return { ready: !reason, configured: !credentialReason() && !productReason() && !callbacks.reason(),
       verified: false, reason, provider: 'wechat_virtual_payment', mode: 'short_series_goods',
       offerId: settings.offerId || null, productId: settings.productId || null,
-      priceFen: 700, days: 7, currency: 'CNY', env: 0 };
+      priceFen: settings.priceFen, days: settings.days, currency: 'CNY', env: 0 };
   }
   function requireCredentials() { const reason = credentialReason(); if (reason) fail(reason); }
   function checkOrderInput(openid, outTradeNo) {
@@ -88,7 +88,7 @@ function createVirtualPaymentProvider({ config = {}, expectedAppid, env = proces
       if (typeof session.session_key !== 'string' || !/^[A-Za-z0-9+/]{22}==$/.test(session.session_key)
           || Buffer.from(session.session_key, 'base64').length !== 16) fail('payment_invalid_session');
       const signData = JSON.stringify({ offerId: settings.offerId, buyQuantity: 1, env: 0, currencyType: 'CNY',
-        productId: settings.productId, goodsPrice: 700, outTradeNo, attach: outTradeNo });
+        productId: settings.productId, goodsPrice: settings.priceFen, outTradeNo, attach: outTradeNo });
       return { mode: 'short_series_goods', signData,
         paySig: signPayment(appKey, 'requestVirtualPayment', signData), signature: signUser(session.session_key, signData) };
     });

@@ -19,7 +19,7 @@ import { runtime } from './helpers/miniprogram-runtime.mjs';
 
 const product = (partNumber = 'SKU-A', extra = {}) => ({ partNumber, title: partNumber, supported: true, ...extra });
 const catalog = () => ({ storeByNumber: { R001: { storeNumber: 'R001', name: '门店一', city: '上海' } }, productByPart: { 'SKU-A': product() } });
-const queryResponse = payload => ({ ok: true, product: product(payload.partNumber), balance: 4, queriedAt: new Date().toISOString(), results: payload.storeNumbers.map(storeNumber => ({ storeNumber, status: 'available', observedAt: new Date().toISOString() })) });
+const queryResponse = payload => ({ ok: true, product: product(payload.partNumber), balance: 4, quotaRevision: 1, queriedAt: new Date().toISOString(), results: payload.storeNumbers.map(storeNumber => ({ storeNumber, status: 'available', observedAt: new Date().toISOString() })) });
 const selection = partNumber => ({ partNumber, product: product(partNumber), storeNumbers: ['R001'], stores: [] });
 
 test('bootstrap transient failure can retry and explicit invalidation fetches fresh data', async () => {

@@ -52,7 +52,7 @@ check('shared resource identifiers match', miniConnection.resourceEnv === connec
 const { authorize } = require(path.join(root, 'cloudfunctions/cloudbase_auth/authorize.js'));
 check('shared auth allows configured consumer and rejects payload spoofing', authorize({ FROM_APPID: connection.consumerAppid }, {}).allowed && !authorize({}, { fromAppid: connection.consumerAppid }).allowed);
 const consumerPages = json('miniprogram/app.json').pages;
-check('consumer package contains only the four consumer pages', consumerPages.length === 4 && ['query', 'follow', 'history', 'mine'].every(name => consumerPages.includes(`pages/${name}/index`)) && !fs.existsSync(path.join(root, 'miniprogram/pages/admin')));
+check('consumer package contains the four main pages and the notification test page', consumerPages.length === 5 && ['query', 'follow', 'history', 'mine', 'notification-test'].every(name => consumerPages.includes(`pages/${name}/index`)) && !fs.existsSync(path.join(root, 'miniprogram/pages/admin')));
 const adminProject = json('tools/admin-miniprogram/project.config.json');
 const adminApp = json('tools/admin-miniprogram/miniprogram/app.json');
 check('operator project is separate and uses the existing resource AppID', adminProject.appid === connection.resourceAppid && adminProject.miniprogramRoot === 'miniprogram/' && adminProject.setting.urlCheck === true && adminApp.pages.length === 1 && adminApp.pages[0] === 'pages/admin/index');

@@ -5,8 +5,12 @@ const { ensureUser } = require('./users');
 const { COLLECTIONS } = require('../collections');
 const { CAMPAIGN, hashCode } = require('../member-redemption');
 const paymentService = require('../payment/service');
+const { canClearRecord } = require('../repo/member-records');
 
 const ID_PATTERN = /^[A-Za-z0-9_-]{8,64}$/;
+// Admin grants use grant_ + a 4–64 character grantId. Their persisted receipt
+// IDs can be 70 characters; payment creation/check IDs remain capped at 64.
+const RECORD_ID_PATTERN = /^[A-Za-z0-9_-]{8,70}$/;
 
 async function status(ctx) {
   const user = await ensureUser(ctx);
@@ -14,8 +18,11 @@ async function status(ctx) {
   return {
     membership: membershipSnapshot(user, ctx.now),
     product: paymentService.paymentProduct(ctx),
+    products: paymentService.paymentProducts(ctx),
     payment: paymentService.paymentProviderFor(ctx).getReadiness(),
-    orders: orders.map(publicOrder),
+    // Cancellation fences are recovery state, not purchases. Keep them stored
+    // and addressable by ID without showing a zero-day membership to clients.
+    orders: orders.filter(order => !order.userHiddenAt && order.type !== 'membership_cancelled_intent').map(publicOrder),
   };
 }
 
@@ -23,7 +30,7 @@ async function createOrder(ctx, payload) {
   const user = await ensureUser(ctx);
   const orderId = typeof payload.orderId === 'string' && ID_PATTERN.test(payload.orderId) ? payload.orderId : null;
   if (!orderId) throw new ApiError('invalid_order_id', 'orderId 需为 8–64 位字母数字标识');
-  const result = await paymentService.createPurchase(ctx, user, orderId, payload.loginCode);
+  const result = await paymentService.createPurchase(ctx, user, orderId, payload.loginCode, payload.planId);
   if (result.disabled) return { ok: false, reason: 'payment_not_enabled', product: result.product };
   return { ok: !result.pending, reason: result.pending ? 'payment_pending' : null,
     order: publicOrder(result.order), payment: result.payment, membership: result.membership };
@@ -49,16 +56,29 @@ async function abandonOrder(ctx, payload) {
   const user = await ensureUser(ctx);
   const orderId = typeof payload.orderId === 'string' && ID_PATTERN.test(payload.orderId) ? payload.orderId : null;
   if (!orderId) throw new ApiError('invalid_order_id', '订单编号无效');
-  let order = await ctx.repo.getOrder(paymentService.orderKey(user._id, orderId));
-  if (!order || order.userKey !== user._id || order.orderId !== orderId) throw new ApiError('unknown_order', '订单不存在');
-  try { order = (await paymentService.reconcileOrder(ctx, order, { permitUnprepared: true })).order; }
-  catch { order = await ctx.repo.getOrder(order._id); /* Unreachable platform: reconciliation continues after abandoning. */ }
-  if (order.status === 'created' && !order.transactionId && !order.abandonedAt) order = await ctx.repo.updateOrder(order._id, { abandonedAt: ctx.nowIso });
-  return { order: publicOrder(order), membership: membershipSnapshot(await ctx.repo.getUser(user._id), ctx.now) };
+  const result = await paymentService.abandonPurchase(ctx, user, orderId);
+  return { order: publicOrder(result.order), membership: result.membership };
+}
+
+async function clearRecords(ctx, payload) {
+  const user = await ensureUser(ctx);
+  const ids = payload.orderIds;
+  if (!Array.isArray(ids) || ids.length < 1 || ids.length > 10 || ids.some(id => typeof id !== 'string' || !RECORD_ID_PATTERN.test(id))) {
+    throw new ApiError('invalid_order_ids', '请选择 1 至 10 条有效订单记录');
+  }
+  const records = [...new Set(ids)].map(orderId => ({ orderId, keys: [paymentService.orderKey(user._id, orderId), `${user._id}|${orderId}`] }));
+  return ctx.repo.hideMemberRecords({ userKey: user._id, records, nowIso: ctx.nowIso });
+}
+
+async function deleteRecord(ctx, payload) {
+  if (typeof payload.orderId !== 'string' || !RECORD_ID_PATTERN.test(payload.orderId)) throw new ApiError('invalid_order_id', '订单编号无效');
+  return clearRecords(ctx, { orderIds: [payload.orderId] });
 }
 
 function publicOrder(order) {
-  return { orderId: order.orderId, status: order.status, amountFen: order.amountFen, days: order.days, createdAt: order.createdAt, paidAt: order.paidAt || null, fulfilledAt: order.fulfilledAt || null,
+  const clearable = canClearRecord(order);
+  return { orderId: order.orderId, planId: order.provider === paymentService.PROVIDER ? paymentService.planIdOfOrder(order) : null, status: order.status, amountFen: order.amountFen, days: order.days, createdAt: order.createdAt, paidAt: order.paidAt || null, fulfilledAt: order.fulfilledAt || null,
+    canClearRecord: clearable, clearRecordReason: clearable ? null : 'payment_unconfirmed',
     refundFen: Number.isSafeInteger(order.refundFen) ? order.refundFen : 0,
     providerStatus: Number.isInteger(order.providerStatus) ? order.providerStatus : null,
     paymentPending: order.provider === paymentService.PROVIDER && order.status === 'created' && !order.abandonedAt && [0, 1].includes(order.providerStatus),
@@ -94,4 +114,4 @@ async function fulfilOrder(ctx, order, source) {
   return ctx.repo.fulfilMembershipOrder({ orderId: order._id, source, nowIso: ctx.nowIso });
 }
 
-module.exports = { status, createOrder, checkOrder, abandonOrder, redeemCode, fulfilOrder, publicOrder };
+module.exports = { status, createOrder, checkOrder, abandonOrder, deleteRecord, clearRecords, redeemCode, fulfilOrder, publicOrder };

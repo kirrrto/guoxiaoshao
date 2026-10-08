@@ -21,7 +21,18 @@
     <view wx:if="{{addTipVisible}}" class="banner banner-ok add-tip"><text class="add-tip-text">点右上角「···」选「添加到我的小程序」，下次在微信首页下拉就能打开。</text><text class="add-tip-close tap-target" bindtap="onDismissAddTip" aria-role="button" aria-label="关闭提示">×</text></view>
     <view wx:if="{{announcement}}" class="banner banner-info">{{announcement}}</view>
     <view wx:if="{{!accountReady}}" class="banner banner-info small">{{accountError || '正在连接微信账户，你可以先选择商品和门店。'}}<button wx:if="{{accountError}}" class="btn btn-outline btn-sm mt" bindtap="onRetryAccount">重试账户连接</button></view>
-    <view wx:if="{{boot && !boot.member && boot.balance < boot.queryCost}}" class="banner banner-info onboarding"><view class="small">暂无可用查询次数，可在「我的」签到领取。</view><button class="btn btn-outline btn-sm mt" bindtap="onGoMine">去签到 / 查看次数</button></view>
+    <view wx:if="{{boot && !boot.member && boot.balance < boot.queryCost}}" class="banner banner-info onboarding">
+      <view class="small">{{boot.signedInToday ? '查询次数暂时用完了，可在「我的」查看今日任务和次数。' : '还没有查询次数？先签到领取，再查询已选配置。'}}</view>
+      <button wx:if="{{!boot.signedInToday}}" class="btn btn-outline btn-sm mt" loading="{{signing}}" disabled="{{signing || querying || !accountReady}}" bindtap="onSignin">{{signing ? '签到中…' : '签到领取查询次数'}}</button>
+      <button wx:else class="btn btn-outline btn-sm mt" bindtap="onGoMine">查看任务 / 查询次数</button>
+      <view wx:if="{{signinError}}" class="small mt" role="alert">{{signinError}}</view>
+    </view>
+    <view wx:if="{{sharedSelection}}" class="banner banner-info small">已载入朋友分享的配置与门店。点击查询，获取当前取货信息。</view>
+    <view wx:if="{{sharedTargetPending}}" class="banner banner-info small">
+      <view>{{sharedTargetError || (sharedTargetReady ? '朋友分享的配置已保留，可在当前操作结束后切换。' : '分享的配置暂未在商品目录中确认，当前选择已保留。')}}</view>
+      <button class="btn btn-outline btn-sm mt" loading="{{loadingSharedTarget}}" disabled="{{sheetVisible || querying || signing || loadingSharedTarget}}" bindtap="onLoadSharedTarget">{{loadingSharedTarget ? '正在确认…' : (sharedTargetReady ? '载入分享配置' : '刷新目录并重试')}}</button>
+      <button class="ui-action mt" bindtap="onDismissSharedTarget">忽略这次分享</button>
+    </view>
 
     <view class="card selection-card">
       <view class="card-title">
@@ -36,25 +47,25 @@
         <view class="selection-summary-footer"><view class="selection-summary-stores">{{selectionSummary.storeLabel}}</view><button class="ui-action selection-summary-change" hover-class="ui-control-pressed" bindtap="onEditSelection"><text class="ui-action-label">修改</text><text class="ui-chevron" aria-hidden="true"></text></button></view>
       </view>
       <view wx:if="{{!selectionSummary}}" class="selection-empty">
-        <view class="selection-empty-title">想关注哪一款？</view>
+        <view class="selection-empty-title">想查哪一款？</view>
         <view class="small text-2">选择型号、容量和门店，即可查询或关注。</view>
         <button class="btn btn-primary btn-block mt" bindtap="onEditSelection">选择配置与门店</button>
       </view>
       <view wx:elif="{{!selectionCanCollapse}}" class="banner banner-warn small mt">请补全或核对配置与门店后查询。</view>
       <view wx:if="{{restriction}}" class="banner banner-warn mt">{{restriction}}</view>
       <button wx:if="{{restrictionReason === 'new_product_restricted'}}" class="btn btn-primary btn-block mt" bindtap="onEditSelection">改查其他配置</button>
-      <button wx:elif="{{selectionSummary}}" class="btn btn-primary btn-block mt {{querying ? 'disabled' : ''}}" disabled="{{querying || !accountReady || !selectionCanCollapse}}" bindtap="onQuery">
+      <button wx:elif="{{selectionSummary}}" class="btn btn-primary btn-block mt {{querying || signing ? 'disabled' : ''}}" disabled="{{querying || signing || !accountReady || !selectionCanCollapse}}" bindtap="onQuery">
         {{!accountReady ? '正在连接账户…' : (querying ? '查询中…' : (boot.member ? '立即查询' : '立即查询（消耗 ' + boot.queryCost + ' 次）'))}}
       </button>
-      <button wx:if="{{selectionSummary}}" class="btn btn-outline btn-block mt selection-follow-action" disabled="{{!accountReady || querying || !selectionCanCollapse}}" bindtap="onFollowSelection"><image class="selection-whistle" src="/images/brand/whistle-green.png" mode="aspectFit" aria-hidden="true" /><text>{{boot.freeReminder ? '免费关注此配置' : '关注此配置 · 小哨提醒'}}</text></button>
-      <view wx:if="{{accountReady}}" class="selection-access-note">{{boot.freeReminder ? '可免费体验 1 个配置、1 条到货提醒，需微信授权。' : '直接关注无需先查询；微信提醒需会员及授权。'}}</view>
+      <button wx:if="{{selectionSummary}}" class="btn btn-outline btn-block mt selection-follow-action" disabled="{{!accountReady || querying || !selectionCanCollapse}}" bindtap="onFollowSelection"><image class="selection-whistle" src="/images/brand/whistle-green.png" mode="aspectFit" aria-hidden="true" /><text>{{boot.member ? '关注此配置 · 小哨提醒' : '了解会员 · 关注与提醒'}}</text></button>
+      <view wx:if="{{accountReady}}" class="selection-access-note">{{boot.member ? '关注后后台帮你留意变化；微信提醒需授权。' : '关注与到货提醒为会员专属。免费用户可用查询次数实时看货。'}}</view>
       <button class="ui-disclosure" hover-class="ui-control-pressed" bindtap="onToggleRules" aria-expanded="{{rulesExpanded}}"><text class="ui-disclosure-label">查询与提醒规则</text><view class="ui-disclosure-meta"><text>{{rulesExpanded ? '收起' : '展开'}}</text><text class="ui-chevron {{rulesExpanded ? 'ui-chevron--up' : 'ui-chevron--down'}}" aria-hidden="true"></text></view></button>
       <view wx:if="{{accountReady && rulesExpanded}}" class="selection-rules">
         <view class="selection-rule">
           <text class="selection-rule-label">关注提醒</text>
           <view class="selection-rule-copy">
             <view>直接关注，无需先查询。</view>
-            <view class="selection-rule-detail">{{boot.freeReminder ? '新用户可免费关注 1 个配置、收 1 条到货提醒，需微信授权。' : '需会员、微信授权及服务就绪。'}}</view>
+            <view class="selection-rule-detail">{{boot.member ? '需微信授权及服务就绪。' : '关注与到货提醒为会员专属；免费用户可用查询次数实时看货。'}}</view>
           </view>
         </view>
         <view class="selection-rule">
@@ -102,9 +113,56 @@
           <text wx:for="{{item.events}}" wx:for-item="ev" wx:key="type" class="pill pill-{{ev.cls}} tiny">{{ev.label}}</text>
         </view>
       </view>
+      <view wx:if="{{storeChoices.length && !alternativeColorChoices.length}}" class="observed-store-choices">
+        <view class="small bold">同一配置，可考虑的门店</view>
+        <view class="tiny muted mt">仅列出这次结果中最近观测可取货的门店。勾选你能接受的门店后，仍需重新确认；不会自动查询或添加关注。</view>
+        <button wx:for="{{storeChoices}}" wx:key="storeNumber" class="observed-store-choice {{item.selected ? 'observed-store-choice--selected' : ''}}" data-store="{{item.storeNumber}}" aria-pressed="{{item.selected}}" disabled="{{querying || signing || sheetVisible}}" bindtap="onToggleAcceptableStore">
+          <view class="observed-store-choice-copy"><text>{{item.label}}</text><text class="tiny muted">观测 {{item.observedText}} · {{item.ageText}}</text></view><text class="small">{{item.selected ? '已勾选' : '可接受'}}</text>
+        </button>
+        <button class="btn btn-outline btn-block mt" disabled="{{!acceptedStoreNumbers.length || querying || signing || sheetVisible}}" bindtap="onUseAcceptableStores">用勾选门店准备查询</button>
+        <view wx:if="{{alternativeNotice}}" class="small text-2 mt" role="status">{{alternativeNotice}}</view>
+      </view>
+      <view wx:if="{{alternativeColorChoices.length && alternativeStoreChoices.length}}" class="observed-store-choices alternative-panel">
+        <view class="alternative-heading">换个颜色或门店，继续找货</view>
+        <view class="alternative-caption">同机型、同容量。勾选不扣次，点查询才会查询。</view>
+        <view class="alternative-section-title"><text>可接受的颜色</text><text class="alternative-count">{{alternativeParts.length}} / 3</text></view>
+        <view class="alternative-colors">
+          <button wx:for="{{alternativeColorChoices}}" wx:key="partNumber" class="alternative-chip {{item.selected ? 'alternative-chip--selected' : ''}}" hover-class="ui-control-pressed" data-kind="part" data-value="{{item.partNumber}}" aria-pressed="{{item.selected}}" disabled="{{alternativeLoading || querying || signing || sheetVisible}}" bindtap="onToggleAlternative">
+            <text class="alternative-chip-label">{{item.label}}<text wx:if="{{item.current}}" class="alternative-current">当前颜色</text></text><text class="alternative-check" aria-hidden="true">{{item.selected ? '✓' : '+'}}</text>
+          </button>
+        </view>
+        <view class="alternative-section-title"><text>可接受的门店</text><text class="alternative-count">{{alternativeStores.length}} / {{boot ? boot.maxStores : 3}}</text></view>
+        <view class="alternative-stores">
+          <button wx:for="{{alternativeStoreChoices}}" wx:key="storeNumber" class="alternative-store {{item.selected ? 'alternative-store--selected' : ''}}" hover-class="ui-control-pressed" data-kind="store" data-value="{{item.storeNumber}}" aria-pressed="{{item.selected}}" disabled="{{alternativeLoading || querying || signing || sheetVisible}}" bindtap="onToggleAlternative">
+            <view class="alternative-store-copy"><text class="alternative-store-label">{{item.label}}</text><text class="alternative-store-relation">{{item.relationText}}</text></view><text class="alternative-check" aria-hidden="true">{{item.selected ? '✓' : '+'}}</text>
+          </button>
+        </view>
+        <view class="alternative-summary" aria-live="polite">{{alternativeSelectionSummary}}</view>
+        <view wx:if="{{alternativeSelectedColors.length}}" class="alternative-query-list">
+          <view wx:for="{{alternativeSelectedColors}}" wx:key="partNumber" class="alternative-query-row">
+            <text class="alternative-query-color">{{item.label}}</text>
+            <button class="alternative-query-button" hover-class="ui-control-pressed" data-part="{{item.partNumber}}" disabled="{{!alternativeStores.length || !accountReady || alternativeLoading || querying || signing || sheetVisible}}" loading="{{querying && alternativeQueryPart === item.partNumber}}" bindtap="onQueryAlternative">{{querying && alternativeQueryPart === item.partNumber ? '查询中…' : (!accountReady ? '账户连接中' : (boot.member ? '查询 · 会员不扣次' : '查询 · 消耗 ' + boot.queryCost + ' 次'))}}</button>
+          </view>
+        </view>
+        <view wx:if="{{alternativeQueryNote}}" class="alternative-empty" role="status">{{alternativeQueryNote}}</view>
+        <view wx:if="{{alternativeCanRead}}" class="alternative-observations">
+          <button class="alternative-read-button" hover-class="ui-control-pressed" disabled="{{!alternativeParts.length || !alternativeStores.length || alternativeLoading || querying || signing || sheetVisible}}" loading="{{alternativeLoading}}" bindtap="onReadAlternatives">查看近期有货记录 · 免费</button>
+          <view class="alternative-caption">只读近 2 分钟已有记录；有效至 {{alternativeExpiresText}}。</view>
+        </view>
+        <view wx:else class="alternative-caption mt">近期记录已不可用，仍可查询上方所选条件。</view>
+        <view wx:if="{{alternativeError}}" class="small text-bad mt" role="status">{{alternativeError}} 可直接查询上方所选条件。</view>
+        <view wx:if="{{alternativeCanRead && alternativeRead && !alternativeMatches.length && !alternativeError}}" class="alternative-empty" role="status">暂无近期有货记录，不代表无货。可点上方「查询」确认。</view>
+        <view wx:for="{{alternativeMatches}}" wx:key="key" class="alternative-match">
+          <view class="small bold">{{item.productTitle}}</view>
+          <view class="small mt">{{item.storeLabel}}</view>
+          <view class="tiny muted mt">观测可取货 · {{item.observedText}} · {{item.ageText}}</view>
+          <button class="btn btn-ghost btn-block mt" data-key="{{item.key}}" disabled="{{alternativeLoading || querying || signing || sheetVisible}}" bindtap="onPrepareAlternative">准备这个配置和门店</button>
+        </view>
+        <view wx:if="{{alternativePreparedNotice}}" class="small text-2 mt" role="status">{{alternativePreparedNotice}}</view>
+      </view>
       <view class="btn-row result-actions">
         <button class="btn btn-ghost btn-sm" bindtap="onAddFollow">加入关注</button>
-        <button class="btn btn-outline btn-sm {{querying ? 'disabled' : ''}}" disabled="{{querying || !accountReady}}" bindtap="onRequery" aria-label="重新查询此结果的配置与门店">{{querying ? '查询中…' : '重新查询'}}</button>
+        <button class="btn btn-outline btn-sm {{querying || signing ? 'disabled' : ''}}" disabled="{{querying || signing || !accountReady}}" bindtap="onRequery" aria-label="重新查询此结果的配置与门店">{{querying ? '查询中…' : '重新查询'}}</button>
       </view>
     </view>
 

@@ -1,10 +1,29 @@
 const cloudConfig = require('./config/cloud');
 const { refreshConsentSetting } = require('./utils/reminder-credits');
+const { readSharedSelection } = require('./utils/share');
 
 // The shared environment's auth hook can stall on a weak network. Give up after
 // this long so pages show a retry instead of waiting forever; the next call retries.
 const CLOUD_INIT_TIMEOUT_MS = 10000;
 const LAUNCH_COUNT_KEY = 'gxs_launch_count_v1';
+
+function errorText(detail) {
+  return String(detail && (detail.stack || detail.errMsg || detail.message) || detail);
+}
+
+// Only known platform timeouts with an entirely SDK-owned stack are downgraded.
+// Other runtime failures, unknown frames and app.js itself must remain actionable.
+const BASE_LIB_FRAME = /(?:^|[/\\])(?:WACloud|WAServiceMainContext|WAWebview|WAServiceContext|appservice|webview|app-config)\.js:\d+(?::\d+)?\)?\s*$/i;
+const APP_FRAME = /(?:^|[/\\(\s])(?:app\.js\b|(?:pages|utils|components|config|custom-tab-bar)[/\\])|miniprogram/i;
+
+function isSdkTimeout(detail, text) {
+  if (APP_FRAME.test(text)) return false;
+  const knownTimeout = Number(detail && detail.errCode) === -601008
+    || /(?:^|[^\d])-601008(?!\d)|server-side request timed\s*out/i.test(text);
+  if (!knownTimeout) return false;
+  const frames = text.split(/\r?\n/).filter(line => /(?:^\s*at\s|@|\.js:\d+)/.test(line));
+  return frames.length > 0 && frames.every(line => BASE_LIB_FRAME.test(line));
+}
 
 App({
   globalData: {
@@ -13,6 +32,7 @@ App({
     bootstrap: null,
     catalog: null,
     pendingFollow: null,
+    pendingSharedTarget: null,
     pendingAlert: null,
     handledAlerts: [],
     singlePage: false,
@@ -25,6 +45,7 @@ App({
     this.globalData.singlePage = Boolean(options && options.scene === 1154);
     this.globalData.launchCount = this.countLaunch();
     this.captureAlert(options);
+    this.captureSharedTarget(options);
     if (!this.globalData.singlePage) {
       this.cloudReady = this.ensureCloud();
       this.cloudReady.catch(() => {});
@@ -46,15 +67,36 @@ App({
   },
 
   // Users can change "总是保持以上选择" in WeChat settings while the app is hidden.
-  onShow(options) { this.captureAlert(options); refreshConsentSetting(); },
+  onShow(options) {
+    // A warm entry from the Moments preview must regain normal cloud access.
+    // Do not infer a transition from missing options (ordinary native returns).
+    if (this.globalData.singlePage && options && Number.isInteger(options.scene) && options.scene !== 1154) {
+      this.globalData.singlePage = false;
+      this.cloudReady = this.ensureCloud();
+      this.cloudReady.catch(() => {});
+    }
+    this.captureAlert(options); this.captureSharedTarget(options); refreshConsentSetting();
+  },
+
+  /** Existing tab pages receive warm launch parameters through App.onShow. */
+  captureSharedTarget(options) {
+    if (!options || (options.path && (typeof options.path !== 'string' || options.path.replace(/^\//, '') !== 'pages/query/index'))) return;
+    const target = readSharedSelection(options.query);
+    if (target) this.globalData.pendingSharedTarget = target;
+  },
 
   /** A restock message opens pages/follow/index?eid=…; the follow page shows that alert once. */
   captureAlert(options) {
+    if (options && options.path && (typeof options.path !== 'string' || options.path.replace(/^\//, '') !== 'pages/follow/index')) return;
     const raw = options && options.query && options.query.eid;
     if (typeof raw !== 'string' || !raw) return;
     let eventId = raw;
     try { eventId = decodeURIComponent(raw); } catch (e) { /* already decoded */ }
-    if (!this.globalData.handledAlerts.includes(eventId)) this.globalData.pendingAlert = eventId;
+    // These documented scenes indicate entry from a subscription message.
+    // A prior successful display must not permanently disable the message link;
+    // ordinary resume/page onLoad options still keep the handled-event guard.
+    const messageEntry = options && [1014, 1107].includes(options.scene);
+    if (messageEntry || !this.globalData.handledAlerts.includes(eventId)) this.globalData.pendingAlert = eventId;
   },
 
   /** A newly released package downloads in the background; offer a restart instead of running the old one. */
@@ -71,16 +113,26 @@ App({
     });
   },
 
-  // Uncaught errors go to the WeChat realtime log (小程序后台 → 实时日志) as well as the console.
+  // Both runtime hooks may receive a cloud SDK timeout. Keep those warnings in
+  // our realtime log; this does not change the platform's own error collection.
   onError(message) { this.reportError('error', message); },
-  onUnhandledRejection(event) { this.reportError('unhandledrejection', event && event.reason); },
+  onUnhandledRejection(event) {
+    this.reportError('unhandledrejection', event && event.reason);
+  },
   reportError(kind, detail) {
-    const text = String(detail && (detail.stack || detail.errMsg || detail.message) || detail).slice(0, 2000);
+    const text = errorText(detail);
+    if (isSdkTimeout(detail, text)) {
+      try {
+        const log = typeof wx.getRealtimeLogManager === 'function' ? wx.getRealtimeLogManager() : null;
+        if (log && typeof log.warn === 'function') log.warn('[gxs] sdk_timeout', { kind, detail: text.slice(0, 500) });
+      } catch (e) { /* Diagnostics must never raise another error. */ }
+      return;
+    }
     try {
       const log = typeof wx.getRealtimeLogManager === 'function' ? wx.getRealtimeLogManager() : null;
-      if (log) log.error(`[gxs] ${kind}`, text);
+      if (log && typeof log.error === 'function') log.error(`[gxs] ${kind}`, text.slice(0, 2000));
     } catch (e) { /* Reporting must never raise another error. */ }
-    console.error(`[gxs] ${kind}`, text);
+    console.error(`[gxs] ${kind}`, text.slice(0, 2000));
   },
 
   ensureCloud() {

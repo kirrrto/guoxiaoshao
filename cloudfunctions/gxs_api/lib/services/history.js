@@ -62,15 +62,16 @@ async function list(ctx, payload) {
   if (stores.length !== storeNumbers.length) throw new ApiError('unknown_store', '存在未知门店编号');
   const member = isMember(user, ctx.now);
   const restriction = isHistoryRestricted(product, ctx.config.newProductWindows, requestedDay, ctx.now);
-  if (!member && restriction.restricted) return { ok: false, reason: 'new_product_history_restricted', restrictionEndsAt: restriction.endsAt, cost: 0, balance: user.quota.balance };
+  if (!member && restriction.restricted) return { ok: false, reason: 'new_product_history_restricted', restrictionEndsAt: restriction.endsAt, cost: 0, balance: user.quota.balance,
+    quotaRevision: Number.isInteger(user.quota.revision) ? user.quota.revision : 0 };
   const exposeLatest = member || !isLiveRestricted(product, ctx.config.newProductWindows, ctx.now).restricted;
   const recordId = `${user._id}|history|${historyQueryId}`;
   const ownerId = randomUUID();
   const begun = await ctx.repo.beginQuery({ record: { _id: recordId, userKey: user._id, queryId: historyQueryId, kind: 'history', partNumber, storeNumbers, dayKey: requestedDay }, product, config: ctx.config, ownerId, nowIso: ctx.nowIso });
-  if (begun.busy) return { ok: false, reason: 'query_in_progress', historyQueryId, retryAfterMs: begun.retryAfterMs };
-  if (begun.denied) return { ok: false, reason: begun.denied.reason, restrictionEndsAt: begun.denied.restrictionEndsAt || null, cost: begun.denied.cost, balance: begun.balance };
-  if (begun.replayed && (!cursor || begun.record.response.pagination && begun.record.response.pagination.total === 0)) return { ...begun.record.response, latest: exposeLatest ? presentLatest(begun.record.response.latest || [], ctx) : [], latestRestricted: !exposeLatest, replayed: true };
-  if (begun.replayed && begun.record.status === 'failed') return { ...begun.record.response, replayed: true };
+  if (begun.busy) return { ok: false, reason: 'query_in_progress', historyQueryId, retryAfterMs: begun.retryAfterMs, balance: begun.balance, quotaRevision: begun.quotaRevision };
+  if (begun.denied) return { ok: false, reason: begun.denied.reason, restrictionEndsAt: begun.denied.restrictionEndsAt || null, cost: begun.denied.cost, balance: begun.balance, quotaRevision: begun.quotaRevision };
+  if (begun.replayed && (!cursor || begun.record.response.pagination && begun.record.response.pagination.total === 0)) return { ...begun.record.response, balance: begun.balance, quotaRevision: begun.quotaRevision, latest: exposeLatest ? presentLatest(begun.record.response.latest || [], ctx) : [], latestRestricted: !exposeLatest, replayed: true };
+  if (begun.replayed && begun.record.status === 'failed') return { ...begun.record.response, balance: begun.balance, quotaRevision: begun.quotaRevision, replayed: true };
   try {
     const page = await ctx.repo.getEventHistory({ partNumber, storeNumbers, dayKey: requestedDay, cursor, limit, snapshotAt: begun.record.createdAt, includeCounts: !begun.replayed });
     const original = begun.replayed ? begun.record.response : null;
@@ -87,7 +88,7 @@ async function list(ctx, payload) {
     const latest = begun.replayed ? begun.record.response.latest || [] : exposeLatest && storeNumbers.length ? await ctx.repo.getLatest(storeNumbers.map(s => targetKeyOf(s, partNumber))) : [];
     const last = page.events.at(-1);
     const response = { ok: true, historyQueryId, product: { partNumber: product.partNumber, title: product.title, model: product.model, familyName: product.familyName }, dayKey: requestedDay,
-      charged: begun.record.charged, balance: begun.balance, member: begun.record.member, summary: original ? original.summary : page.summary, events: page.events.map(presentEvent),
+      charged: begun.record.charged, balance: begun.balance, quotaRevision: begun.quotaRevision, member: begun.record.member, summary: original ? original.summary : page.summary, events: page.events.map(presentEvent),
       dataAvailability, billing, ...(observationCoverage ? { observationCoverage } : {}),
       latest: exposeLatest ? presentLatest(latest, ctx) : [], latestRestricted: !exposeLatest,
       latestSnapshotAt: begun.replayed ? begun.record.response.latestSnapshotAt : ctx.clock().toISOString(),

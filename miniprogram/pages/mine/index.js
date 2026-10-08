@@ -1,5 +1,5 @@
 const { call, showError, toast, newId } = require('../../utils/api');
-const { getBootstrap, invalidateBootstrap, invalidateFollows, publishQuota, subscribeQuota } = require('../../utils/store');
+const { getBootstrap, invalidateBootstrap, invalidateFollows, publishQuota, subscribeQuota, currentQuota } = require('../../utils/store');
 const { topUpReminderCredit } = require('../../utils/reminder-credits');
 const { confirmTap } = require('../../utils/haptic');
 const { VERSION } = require('../../config/version');
@@ -17,6 +17,7 @@ const { syncTabBar } = require('../../utils/tab-bar');
 const { notificationAdvice } = require('../../utils/reminder-readiness');
 const { shareAppMessage, shareTimeline } = require('../../utils/share');
 const { paymentAvailability, createPaymentController, purchaseNotice } = require('../../utils/member-payment');
+const { memberProducts, planId, renewalPreview } = require('../../utils/member-products');
 
 const LEDGER_TEXT = {
   signin_reward: '每日签到',
@@ -24,6 +25,8 @@ const LEDGER_TEXT = {
   query_debit: '实时查询',
   query_refund: '查询次数返还',
   history_debit: '查看历史',
+  notification_test_debit: '测试通知',
+  notification_test_refund: '测试通知次数返还',
   admin_grant: '平台发放',
 };
 
@@ -105,7 +108,7 @@ function redemptionErrorText(error) {
 function presentOrder(order) {
   const redeemed = order.source === 'redemption_code' || order.type === 'membership_redemption';
   const sourceLabel = redeemed ? '兑换码开通' : ['admin', 'admin_grant'].includes(order.source) || order.productId === 'admin_grant' ? '平台发放' : order.amountFen > 0 ? '付费开通' : '会员开通';
-  return { ...order, sourceLabel, amountText: order.amountFen > 0 ? fmt.fen(order.amountFen) : '',
+  return { ...order, sourceLabel, titleText: order.type === 'membership_cancelled_intent' ? '购买前已取消' : `${order.days} 天会员 · ${sourceLabel}`, amountText: order.amountFen > 0 ? fmt.fen(order.amountFen) : '',
     refundText: order.refundFen > 0 ? `已退款 ${fmt.fen(order.refundFen)}` : '',
     statusLabel: order.abandoned ? '已放弃' : ORDER_STATUS[order.status] || '状态待确认', timeText: fmt.fmtDateTime(order.fulfilledAt || order.paidAt || order.createdAt) };
 }
@@ -126,7 +129,9 @@ Page({
     loadError: null,
     versionLabel: versionLabel(),
     version: VERSION,
-    releaseNotes: RELEASE_NOTES,
+    visibleReleaseNotes: RELEASE_NOTES.slice(0, 2),
+    olderReleaseNotesCount: Math.max(0, RELEASE_NOTES.length - 2),
+    showOlderReleaseNotes: false,
     showReleaseNotes: false,
     boot: null,
     membership: null,
@@ -140,11 +145,21 @@ Page({
     orders: [],
     showOrders: false,
     showMembershipRules: false,
+    membershipUpgradeOpen: false,
+    purchaseMode: 'purchase',
+    membershipUpgradePreview: null,
     showQuotaDetails: false,
     showReminderSettings: false,
     showNotifications: false,
     ordersLoading: false,
     ordersError: null,
+    ordersClearableCount: 0,
+    ordersClearUnavailable: false,
+    orderActionBusy: '',
+    orderDeletingId: '',
+    orderConfirming: false,
+    ordersActionError: null,
+    ordersActionNote: '',
     notifications: [],
     notificationsLoading: false,
     notificationsError: null,
@@ -168,6 +183,9 @@ Page({
     paymentBusy: false,
     paymentChecking: false,
     paymentPendingId: '',
+    paymentOrderSummary: '',
+    selectedPlanId: 'member_7d',
+    paymentConfirming: false,
     paymentCanRetry: false,
     paymentMessage: '',
     paymentError: '',
@@ -192,7 +210,7 @@ Page({
     this.setTabBarOverlay(this.data.redemptionOpen);
     this.pageVisible = true;
     this.consumePendingSection();
-    if (this.data.ready) await this.refresh({ quiet: true });
+    if (this.data.ready || this.data.loadError) await this.refresh({ quiet: this.data.ready, force: Boolean(this.data.loadError) });
     if (!this.pageRetired && this.pageVisible && !this.data.redeeming && this.paymentController) this.paymentController.show();
   },
 
@@ -209,6 +227,8 @@ Page({
   },
 
   onHide() {
+    this.orderConsentGeneration = (this.orderConsentGeneration || 0) + 1;
+    this.paymentConsentGeneration = (this.paymentConsentGeneration || 0) + 1;
     this.pageVisible = false;
     if (this.data.redemptionOpen) {
       this.setData({ redemptionOpen: false });
@@ -227,6 +247,7 @@ Page({
     this.pageSession = (this.pageSession || 0) + 1;
     this.accountGeneration = (this.accountGeneration || 0) + 1;
     this.ordersGeneration = (this.ordersGeneration || 0) + 1;
+    this.failedOrderAction = null;
     this.refreshing = null;
     this.notificationUnloaded = true;
     this.failedNotificationAction = null;
@@ -269,39 +290,161 @@ Page({
     }
   },
 
-  async loadOrders({ force = false } = {}) {
-    if (this.pageRetired) return;
+  async loadOrders({ force = false, afterChange = false } = {}) {
+    if (this.pageRetired || this.data.orderActionBusy) return;
     if (!force && (this.data.ordersLoading || (this.ordersLoadedAt && Date.now() - this.ordersLoadedAt < SECONDARY_CACHE_MS))) return;
     const generation = (this.ordersGeneration || 0) + 1;
+    const account = this.orderAccount();
     this.ordersGeneration = generation;
     this.setData({ ordersLoading: true, ordersError: null });
     try {
       const data = await call('member.status');
-      if (this.pageRetired || generation !== this.ordersGeneration) return;
-      this.setData({
-        orders: data.orders.map(presentOrder),
-      });
+      if (this.pageRetired || generation !== this.ordersGeneration || account !== this.orderAccount()) return;
+      this.setOrderRecords(data.orders);
       this.ordersLoadedAt = Date.now();
-    } catch (e) { if (!this.pageRetired && generation === this.ordersGeneration) this.setData({ ordersError: '会员记录暂时加载失败，请重试。' }); }
+    } catch (e) { if (!this.pageRetired && generation === this.ordersGeneration && account === this.orderAccount()) this.setData({ ordersError: afterChange ? '记录已清理，最新列表暂未加载成功。请重试加载。' : '会员记录暂时加载失败，请重试。' }); }
     finally { if (!this.pageRetired && generation === this.ordersGeneration) this.setData({ ordersLoading: false }); }
   },
 
+  orderAccount() {
+    return this.data.boot && this.data.boot.identity && this.data.boot.identity.userKey;
+  },
+
+  canClearOrder(order) {
+    return order && order.canClearRecord === true && Boolean(order.orderId)
+      && order.orderId !== this.data.paymentPendingId;
+  },
+
+  setOrderRecords(records) {
+    const hidden = this.hiddenOrderIds || new Set();
+    const orders = (records || []).filter(order => !hidden.has(order.orderId)).map(order => ({ ...presentOrder(order), canClear: this.canClearOrder(order),
+      clearNote: order.orderId === this.data.paymentPendingId ? '请先处理上方待确认订单'
+        : typeof order.canClearRecord !== 'boolean' ? '记录清理需新版服务支持'
+          : this.canClearOrder(order) ? '' : '支付状态待确认，暂不可清理' }));
+    this.setData({ orders, ordersClearableCount: Math.min(10, orders.filter(order => order.canClear).length),
+      ordersClearUnavailable: orders.some(order => typeof order.canClearRecord !== 'boolean') });
+  },
+
+  isCurrentOrderAction(action) {
+    return this.isCurrentSession(action.session) && action.account === this.orderAccount()
+      && action.accountGeneration === (this.orderAccountGeneration || 0);
+  },
+
+  async confirmOrderAction(type, ids) {
+    if (this.pageRetired || this.pageVisible === false || !this.orderAccount() || this.data.orderActionBusy || this.data.orderConfirming || !ids.length) return;
+    const action = { type, ids: ids.slice(0, 10), account: this.orderAccount(), session: this.pageSession || 0,
+      accountGeneration: this.orderAccountGeneration || 0 };
+    const consent = this.orderConsentGeneration || 0;
+    this.setData({ orderConfirming: true });
+    let confirmed = false;
+    try {
+      confirmed = await new Promise(resolve => {
+        if (typeof wx.showModal !== 'function') return resolve(false);
+        wx.showModal({ title: type === 'clear' ? '清空当前显示的记录' : '删除这条会员记录',
+          content: type === 'clear'
+            ? `将移除当前显示的 ${action.ids.length} 条可清理记录。待确认订单和其他记录会保留。仅隐藏个人记录，不影响会员权益、支付核对或后台账务。`
+            : '仅从你的会员记录中隐藏这一条，不影响会员权益、支付核对或后台账务。',
+          confirmText: type === 'clear' ? '确认清空' : '确认删除', confirmColor: '#00C375', cancelText: '取消',
+          success: result => resolve(Boolean(result.confirm)), fail: () => resolve(false) });
+      });
+    } finally {
+      if (this.isCurrentOrderAction(action)) this.setData({ orderConfirming: false });
+    }
+    if (confirmed && this.isCurrentOrderAction(action) && consent === (this.orderConsentGeneration || 0) && this.pageVisible !== false) return this.applyOrderAction(action);
+  },
+
+  onDeleteOrder(e) {
+    const order = this.data.orders.find(item => item.orderId === e.currentTarget.dataset.id);
+    if (this.canClearOrder(order)) return this.confirmOrderAction('delete', [order.orderId]);
+  },
+
+  onClearOrders() {
+    return this.confirmOrderAction('clear', this.data.orders.filter(order => this.canClearOrder(order)).map(order => order.orderId));
+  },
+
+  async applyOrderAction(action) {
+    if (!this.isCurrentOrderAction(action) || this.data.orderActionBusy || this.data.orderConfirming) return;
+    // Keep the consent snapshot, but protect any order now requiring payment recovery.
+    const ids = action.ids.filter(id => id !== this.data.paymentPendingId && !this.data.orders.some(order => order.orderId === id && !this.canClearOrder(order)));
+    if (!ids.length) {
+      this.failedOrderAction = null;
+      this.setData({ ordersActionError: null, ordersActionNote: '这些订单的状态已变化，待确认记录会保留。' });
+      this.setOrderRecords(this.data.orders);
+      return;
+    }
+    this.ordersGeneration = (this.ordersGeneration || 0) + 1;
+    this.ordersLoadedAt = 0;
+    this.setData({ orderActionBusy: action.type, orderDeletingId: action.type === 'delete' ? ids[0] : '', ordersLoading: false,
+      ordersError: null, ordersActionError: null, ordersActionNote: '' });
+    let applied = false;
+    try {
+      const response = await call(action.type === 'clear' ? 'member.clearRecords' : 'member.deleteRecord', action.type === 'clear' ? { orderIds: ids } : { orderId: ids[0] });
+      if (!this.isCurrentOrderAction(action)) return;
+      if (!response || !Array.isArray(response.hiddenOrderIds) || !Array.isArray(response.retained)) throw new Error('清理结果尚未确认');
+      const hidden = new Set(response.hiddenOrderIds), retained = new Map(response.retained.map(item => [item.orderId, item]));
+      if ([...hidden, ...retained.keys()].some(id => !ids.includes(id)) || ids.some(id => hidden.has(id) === retained.has(id))) throw new Error('清理结果尚未确认');
+      if (!this.hiddenOrderIds) this.hiddenOrderIds = new Set();
+      for (const id of hidden) this.hiddenOrderIds.add(id);
+      this.setOrderRecords(this.data.orders.map(order => retained.has(order.orderId)
+        ? { ...order, status: retained.get(order.orderId).status || order.status, canClearRecord: false, clearRecordReason: 'payment_unconfirmed' } : order));
+      this.failedOrderAction = null;
+      this.setData({ ordersActionNote: hidden.size ? `已清理 ${hidden.size} 条记录${retained.size ? `，${retained.size} 条待确认记录已保留` : ''}。` : '订单状态尚未确认，记录已保留，请先核对支付结果。' });
+      if (hidden.size) toast('会员记录已清理', 'success');
+      applied = true;
+    } catch (error) {
+      if (this.isCurrentOrderAction(action)) {
+        this.failedOrderAction = { ...action, ids };
+        this.setData({ ordersActionError: error && error.code === 'unknown_action' ? '记录清理服务尚未更新，请稍后重试。当前记录已保留。'
+          : '清理结果暂未确认，记录已保留。可重试本次操作，不会清理后来显示的其他记录。' });
+      }
+    } finally {
+      if (this.isCurrentOrderAction(action)) this.setData({ orderActionBusy: '', orderDeletingId: '' });
+    }
+    if (applied && this.isCurrentOrderAction(action)) return this.loadOrders({ force: true, afterChange: true });
+  },
+
+  onRetryOrderAction() {
+    if (this.failedOrderAction) return this.applyOrderAction(this.failedOrderAction);
+  },
+
   applyBoot(boot) {
+    const accountChanged = !this.data.boot || this.data.boot.identity.userKey !== boot.identity.userKey;
+    if (accountChanged) this.paymentConsentGeneration = (this.paymentConsentGeneration || 0) + 1;
+    if (accountChanged) {
+      this.orderAccountGeneration = (this.orderAccountGeneration || 0) + 1;
+      this.orderConsentGeneration = (this.orderConsentGeneration || 0) + 1;
+      this.ordersGeneration = (this.ordersGeneration || 0) + 1;
+      this.ordersLoadedAt = 0;
+      this.hiddenOrderIds = new Set();
+      this.failedOrderAction = null;
+      this.setData({ orders: [], ordersClearableCount: 0, ordersClearUnavailable: false, orderActionBusy: '', orderDeletingId: '', orderConfirming: false,
+        ordersLoading: false, ordersError: null, ordersActionError: null, ordersActionNote: '' });
+    }
     const membership = boot.membership;
     const settings = boot.settings || { dnd: { enabled: false, startMinute: 23 * 60, endMinute: 8 * 60 }, notifyEnabled: true };
-    const availability = paymentAvailability(boot.memberProduct, wx);
+    const products = memberProducts(boot).map(item => ({ ...item, priceText: fmt.fen(item.priceFen),
+      nameText: item.days === 365 ? '年卡' : item.days === 30 ? '月卡' : item.days === 7 ? '周卡' : '会员',
+      durationText: `${item.days} 天`,
+      available: paymentAvailability(item, wx).ready }));
+    const selected = products.find(item => item.planId === (this.paymentPendingPlanId || this.data.selectedPlanId)) || products[0] || boot.memberProduct;
+    const availability = paymentAvailability(selected, wx);
     this.setData({
+      selectedPlanId: planId(selected),
+      membershipUpgradeOpen: !accountChanged && membership.active && this.data.membershipUpgradeOpen,
+      purchaseMode: membership.active ? !accountChanged && this.data.purchaseMode === 'upgrade' ? 'upgrade' : 'renew' : 'purchase',
+      membershipUpgradePreview: renewalPreview(selected, membership),
       boot: {
         identity: boot.identity,
-        memberProduct: boot.memberProduct,
-        priceText: fmt.fen(boot.memberProduct.priceFen),
+        memberProducts: products,
+        memberProduct: selected,
+        priceText: fmt.fen(selected.priceFen),
         collector: { ...boot.collector, ...fmt.collectorMeta(boot.collector.state) },
         followCount: boot.followCount,
-        freeReminder: !membership.active && boot.freeReminder === true,
+        freeReminder: false,
         limits: boot.limits,
         paymentReady: availability.ready,
         paymentReason: availability.reason,
-        purchaseNotice: purchaseNotice(boot.memberProduct),
+        purchaseNotice: purchaseNotice(selected),
       },
       membership: presentMembership(membership),
       quota: boot.quota,
@@ -310,13 +453,70 @@ Page({
       dndStart: minuteToTime(settings.dnd.startMinute),
       dndEnd: minuteToTime(settings.dnd.endMinute),
     });
-    this.ensurePaymentController().sync(boot.identity, boot.memberProduct);
+    this.ensurePaymentController().sync(boot.identity, selected);
+  },
+
+  selectMemberProduct(id) {
+    const boot = this.data.boot;
+    const selected = boot && (boot.memberProducts || []).find(item => item.planId === id);
+    if (!selected) return;
+    const availability = paymentAvailability(selected, wx);
+    this.setData({ selectedPlanId: selected.planId, boot: { ...boot, memberProduct: selected,
+      priceText: fmt.fen(selected.priceFen), purchaseNotice: purchaseNotice(selected),
+      paymentReady: availability.ready, paymentReason: availability.reason },
+      membershipUpgradePreview: renewalPreview(selected, this.data.membership) });
+    if (this.paymentController) this.paymentController.sync(boot.identity, selected);
+  },
+
+  onSelectMemberProduct(event) {
+    if (this.pageRetired || this.data.redeeming || this.data.paymentBusy || this.data.paymentChecking || this.data.paymentPendingId || this.data.paymentConfirming) return;
+    const candidate = this.data.boot && (this.data.boot.memberProducts || []).find(item => item.planId === event.currentTarget.dataset.planId);
+    if (this.data.purchaseMode === 'upgrade' && this.data.membership && this.data.membership.active && (!candidate || candidate.days < 30)) return;
+    this.selectMemberProduct(event.currentTarget.dataset.planId);
+  },
+
+  canChangeMembershipPurchase() {
+    return !this.pageRetired && this.data.ready && this.data.boot && this.data.membership && this.data.membership.active
+      && !this.data.redeeming && !this.data.paymentBusy && !this.data.paymentChecking && !this.data.paymentPendingId && !this.data.paymentConfirming;
+  },
+
+  onOpenMembershipUpgrade() {
+    if (!this.canChangeMembershipPurchase()) return;
+    const products = this.data.boot.memberProducts || [];
+    const selected = products.find(item => item.planId === this.data.selectedPlanId && item.days >= 30)
+      || products.find(item => item.days === 30) || products.find(item => item.days === 365);
+    if (!selected) return toast('长期套餐暂未加载，请刷新账户后重试');
+    this.setData({ membershipUpgradeOpen: true, purchaseMode: 'upgrade' });
+    this.selectMemberProduct(selected.planId);
+  },
+
+  onOpenMembershipRenew() {
+    if (!this.canChangeMembershipPurchase()) return;
+    this.setData({ membershipUpgradeOpen: true, purchaseMode: 'renew' });
+    this.selectMemberProduct(this.data.selectedPlanId);
+  },
+
+  onCloseMembershipUpgrade() {
+    if (!this.canChangeMembershipPurchase()) return;
+    this.setData({ membershipUpgradeOpen: false });
+  },
+
+  onTestNotification() {
+    if (this.pageRetired) return;
+    wx.navigateTo({ url: '/pages/notification-test/index' });
   },
 
   ensurePaymentController() {
     if (!this.paymentController) {
       this.paymentController = createPaymentController({ wx, call, makeId: typeof newId === 'function' ? () => newId('member') : undefined,
-      onUpdate: patch => { if (!this.pageRetired) this.setData(patch); },
+      onUpdate: patch => {
+        if (this.pageRetired) return;
+        const { paymentPendingPlanId, ...view } = patch;
+        this.paymentPendingPlanId = paymentPendingPlanId;
+        this.setData(view);
+        if (hasKey(view, 'paymentPendingId')) this.setOrderRecords(this.data.orders);
+        if (paymentPendingPlanId && paymentPendingPlanId !== this.data.selectedPlanId) this.selectMemberProduct(paymentPendingPlanId);
+      },
       onResolved: async ({ membership }) => {
         if (this.pageRetired) return;
         this.accountGeneration = (this.accountGeneration || 0) + 1;
@@ -324,6 +524,8 @@ Page({
         this.refreshing = null;
         invalidateBootstrap(); invalidateFollows(); this.ordersLoadedAt = 0;
         this.setData({ membership: presentMembership(membership), showOrders: true });
+        this.setData({ membershipUpgradeOpen: false, purchaseMode: membership.active ? 'renew' : 'purchase',
+          membershipUpgradePreview: renewalPreview(this.data.boot.memberProduct, membership) });
         this.resumeMemberFollow(membership);
         await this.loadOrders({ force: true });
       },
@@ -334,31 +536,49 @@ Page({
   },
 
   async onBuyMembership() {
-    if (this.pageRetired || this.data.redeeming || !this.data.ready || !this.data.boot || !this.data.boot.paymentReady) return;
+    if (this.pageRetired || this.data.redeeming || this.data.paymentBusy || this.data.paymentChecking || this.data.paymentConfirming || !this.data.ready || !this.data.boot || (!this.data.paymentPendingId && !this.data.boot.paymentReady)) return;
     const notice = this.data.boot.purchaseNotice;
+    const selectedPlanId = this.data.selectedPlanId;
+    const consentGeneration = this.paymentConsentGeneration || 0;
+    const consentAccount = this.data.boot.identity.userKey;
+    const consentOrder = this.data.paymentPendingId;
+    const packageText = this.data.paymentOrderSummary || `${this.data.boot.memberProduct.days} 天会员 · ${this.data.boot.priceText}`;
+    const extension = renewalPreview(this.data.boot.memberProduct, this.data.membership);
+    const extensionNotice = this.data.membership && this.data.membership.active
+      ? `\n\n${extension.extensionText}，剩余有效期保留，不抵扣差价。${extension.expiresAtText ? '\n预计到期：' + extension.expiresAtText + '，以支付确认后的账户为准。' : ''}` : '';
+    this.setData({ paymentConfirming: true });
     const intent = typeof getApp === 'function' ? getApp().globalData.pendingMemberFollow : null;
     const confirmed = await new Promise(resolve => {
       if (typeof wx.showModal !== 'function') { resolve(false); return; }
       wx.showModal({
         title: '购买须知',
-        content: `${notice}${intent ? '\n\n开通后继续为你关注：' + intent.title : ''}\n\n确认即表示已阅读并同意上述说明。`,
+        content: `${packageText}\n\n${notice}${extensionNotice}${intent ? '\n\n开通后继续为你关注：' + intent.title : ''}\n\n确认即表示已阅读并同意上述说明。`,
         confirmText: '同意购买',
         cancelText: '取消',
         success: result => resolve(Boolean(result.confirm)),
         fail: () => resolve(false),
       });
     });
-    if (!confirmed || this.pageRetired || this.data.redeeming) return;
+    if (this.pageRetired) return;
+    this.setData({ paymentConfirming: false });
+    if (!confirmed || this.pageVisible === false || this.data.redeeming || selectedPlanId !== this.data.selectedPlanId
+      || consentGeneration !== (this.paymentConsentGeneration || 0) || consentAccount !== this.data.boot.identity.userKey
+      || consentOrder !== this.data.paymentPendingId) return;
     return this.ensurePaymentController().buy();
   },
 
   onCheckPayment() {
-    if (this.pageRetired || this.data.redeeming) return;
+    if (this.pageRetired || this.data.redeeming || this.data.paymentConfirming) return;
     return this.ensurePaymentController().check();
   },
 
   async onAbandonPayment() {
-    if (this.pageRetired || this.data.redeeming || this.data.paymentBusy || this.data.paymentChecking) return;
+    if (this.pageRetired || this.data.redeeming || this.data.paymentBusy || this.data.paymentChecking || this.data.paymentConfirming
+      || !this.data.paymentPendingId || !this.data.boot) return;
+    const consentGeneration = this.paymentConsentGeneration || 0;
+    const consentAccount = this.data.boot.identity.userKey;
+    const consentOrder = this.data.paymentPendingId;
+    this.setData({ paymentConfirming: true });
     const confirmed = await new Promise(resolve => {
       if (typeof wx.showModal !== 'function') { resolve(false); return; }
       wx.showModal({
@@ -370,14 +590,18 @@ Page({
         fail: () => resolve(false),
       });
     });
-    if (!confirmed || this.pageRetired || this.data.redeeming) return;
+    if (this.pageRetired) return;
+    this.setData({ paymentConfirming: false });
+    if (!confirmed || this.pageVisible === false || this.data.redeeming
+      || consentGeneration !== (this.paymentConsentGeneration || 0) || consentAccount !== this.data.boot.identity.userKey
+      || consentOrder !== this.data.paymentPendingId) return;
     return this.ensurePaymentController().abandon();
   },
 
   noop() {},
 
   onOpenRedemption() {
-    if (this.pageRetired || this.data.redeeming || this.data.paymentBusy || this.data.paymentChecking) return;
+    if (this.pageRetired || this.data.redeeming || this.data.paymentBusy || this.data.paymentChecking || this.data.paymentConfirming) return;
     const open = !this.data.redemptionOpen;
     this.setData({ redemptionOpen: open, redemptionCode: '', redemptionError: null, redemptionResult: null });
     this.setTabBarOverlay(open);
@@ -394,7 +618,7 @@ Page({
   },
 
   async onRedeemCode() {
-    if (this.pageRetired || this.data.redeeming || this.data.paymentBusy || this.data.paymentChecking) return;
+    if (this.pageRetired || this.data.redeeming || this.data.paymentBusy || this.data.paymentChecking || this.data.paymentConfirming) return;
     const code = this.data.redemptionCode.trim();
     if (!code) { this.setData({ redemptionError: '请输入兑换码。' }); return; }
     // Suspend order polling while another server-side membership change runs.
@@ -414,6 +638,8 @@ Page({
       this.ordersLoadedAt = 0;
       const already = result.alreadyRedeemed === true;
       this.setData({ membership: presentMembership(membership), redemptionCode: '', showOrders: true,
+        membershipUpgradeOpen: false, purchaseMode: membership.active ? 'renew' : 'purchase',
+        membershipUpgradePreview: renewalPreview(this.data.boot && this.data.boot.memberProduct, membership),
         redemptionResult: { title: already ? '此账号已兑换过' : '兑换成功',
           detail: already ? (membership.active ? '本次未重复增加时间，当前会员有效期见上方。' : membership.expiresAt ? '本次未重新开通，当前会员已到期。' : '本次未重新开通，当前账号没有生效的会员。') : '会员有效期已更新，现在可以使用会员权益。',
           kind: already ? 'info' : 'ok' } });
@@ -622,7 +848,7 @@ Page({
       else if (data.reason === 'daily_cap_reached') toast('今日获取次数已达上限');
       else if (data.reason === 'balance_cap_reached') toast(`余额已达上限 ${data.quota.balanceCap} 次`);
       invalidateBootstrap();
-      if (publishQuota(data.quota) !== false) this.setData({ quota: data.quota });
+      if (publishQuota(data.quota) !== false) this.setData({ quota: currentQuota() || data.quota });
     } catch (error) {
       if (this.isCurrentSession(session)) showError(error);
     } finally {
@@ -639,7 +865,15 @@ Page({
   },
 
   onToggleReleaseNotes() {
-    if (!this.pageRetired) this.setData({ showReleaseNotes: !this.data.showReleaseNotes });
+    if (this.pageRetired) return;
+    this.setData({ showReleaseNotes: !this.data.showReleaseNotes,
+      ...(this.data.showOlderReleaseNotes ? { showOlderReleaseNotes: false, visibleReleaseNotes: RELEASE_NOTES.slice(0, 2) } : {}) });
+  },
+
+  onToggleOlderReleaseNotes() {
+    if (this.pageRetired || !this.data.showReleaseNotes || !this.data.olderReleaseNotesCount) return;
+    const showOlderReleaseNotes = !this.data.showOlderReleaseNotes;
+    this.setData({ showOlderReleaseNotes, visibleReleaseNotes: showOlderReleaseNotes ? RELEASE_NOTES : RELEASE_NOTES.slice(0, 2) });
   },
 
   onToggleQuotaDetails() {
@@ -768,7 +1002,7 @@ Page({
   onHelp() {
     wx.showModal({
       title: '使用说明',
-      content: `1. 查询：选择具体配置与门店，免费查询消耗 ${this.data.quota.queryCost} 次，接口失败按服务端规则返还；请求繁忙或数据源限流时需稍后重试。\n2. 次数：每日签到和体验任务可获取次数，每日最多 ${this.data.quota.dailyGrantCap} 次，累计上限 ${this.data.quota.balanceCap} 次。\n3. 会员：查询不扣次数，可关注 3 个具体配置，每配置最多 3 家门店；颜色或容量不同分别占用名额。该产品为一次性虚拟服务，一经售出不予退款。\n4. 提醒：新用户可免费关注 1 个配置并收到 1 条到货提醒，之后为会员功能。提醒需要授权微信订阅消息，每次「允许」增加 1 次，开通会员不等于无限接收提醒。\n5. 新品：受限新品开售 30 天内，免费用户不可实时查询，只能看昨天及更早历史。`,
+      content: `1. 查询：选择具体配置与门店，免费查询消耗 ${this.data.quota.queryCost} 次，接口失败按服务端规则返还；请求繁忙或数据源限流时需稍后重试。\n2. 次数：每日签到和体验任务可获取次数，每日最多 ${this.data.quota.dailyGrantCap} 次，累计上限 ${this.data.quota.balanceCap} 次。\n3. 会员：查询不扣次数，可关注 3 个具体配置，每配置最多 3 家门店；颜色或容量不同分别占用名额。关注与到货、断货提醒均为会员专属。该产品为一次性虚拟服务，一经售出不予退款。\n4. 提醒：会员可累加提醒次数，需授权微信订阅消息，每次「允许」增加 1 次，开通会员不等于无限接收提醒。\n5. 新品：受限新品开售 30 天内，免费用户不可实时查询，只能看昨天及更早历史。`,
       showCancel: false,
     });
   },
@@ -801,13 +1035,15 @@ Page({
   },
 
   onRetryLoad() {
+    if (this.pageRetired) return;
     this.setData({ loadError: null });
-    this.refresh();
+    return this.refresh({ force: true });
   },
 
   /** Called by the tab bar when the phone reconnects. */
   onNetworkRestored() {
+    if (this.pageRetired || this.pageVisible === false) return;
     if (this.data.loadError) return this.onRetryLoad();
-    if (this.data.ready) this.refresh({ quiet: true, force: true });
+    if (this.data.ready) return this.refresh({ quiet: true, force: true });
   },
 });

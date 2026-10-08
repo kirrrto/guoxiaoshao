@@ -148,3 +148,35 @@ test('a downloaded new version offers a restart and uncaught errors reach the re
   assert.deepEqual(logged.map(entry => entry[0]), ['[gxs] error', '[gxs] unhandledrejection']);
   assert.match(logged[0][1], /TypeError: boom/);
 });
+
+test('known SDK-only timeouts are warnings while unknown and app rejections still report', () => {
+  const rt = runtime(); const errors = [], warns = [];
+  rt.wx.getRealtimeLogManager = () => ({
+    error: (...args) => errors.push(args),
+    warn: (...args) => warns.push(args),
+  });
+  rt.load('app.js'); const app = rt.app;
+
+  // Exact shape of the WACloud.js rejection after a -601008 init timeout.
+  const sdkError = Object.assign(new Error('errCode: -601008 server-side request timedout | errMsg: 请求超时'), {
+    stack: 'errCode: -601008 server-side request timedout | errMsg: 请求超时\n'
+      + 'success@https://lib/WACloud.js:1:266619\n'
+      + 'p@https://lib/WAServiceMainContext.js:1:177155\n'
+      + 'u@https://lib/WAServiceMainContext.js:1:1334349',
+  });
+  app.onUnhandledRejection({ reason: sdkError });
+  app.onUnhandledRejection({ reason: 'server-side request timedout' });
+  app.onUnhandledRejection({ reason: undefined });
+  assert.equal(errors.length, 2, 'missing stacks cannot establish that a rejection is SDK-only');
+  assert.equal(warns.length, 1);
+  assert.equal(warns[0][0], '[gxs] sdk_timeout');
+  assert.match(warns[0][1].detail, /WACloud\.js/);
+
+  const appError = Object.assign(new Error('follow load failed'), {
+    stack: 'Error: follow load failed\n    at loadFollows (pages/follow/index.js:400:5)',
+  });
+  app.onUnhandledRejection({ reason: appError });
+  assert.equal(errors.length, 3);
+  assert.equal(errors[2][0], '[gxs] unhandledrejection');
+  assert.match(errors[2][1], /follow load failed/);
+});

@@ -14,12 +14,22 @@ function insightLines(data) {
     `提醒任务：${alerts.total} 条，已受理 ${alerts.byStatus.accepted || 0}，未发送 ${alerts.byStatus.skipped || 0}`,
     `因没有授权次数未发送：${percent(alerts.noCreditShare)}`,
     `发现到发出：中位 ${minutes(alerts.sendDelay.p50Ms)}，P90 ${minutes(alerts.sendDelay.p90Ms)}`,
-    `「买到了吗」：${fb.answered} 人回答，买到 ${fb.bought || 0}（${percent(fb.boughtShare)}），没抢到 ${fb.missed || 0}，没去买 ${fb.skipped || 0}`,
-    ...(data.truncated ? ['数据较多，仅统计了最近 2000 条。'] : []),
+    `「买到了吗」：${fb.answered} 条反馈，买到 ${fb.bought || 0}（${percent(fb.boughtShare)}），没抢到 ${fb.missed || 0}，没去买 ${fb.skipped || 0}`,
+    ...(data.activity ? [
+      `本期新增记录中的去重用户：成功查询 ${data.activity.successfulQueryUsers}，建立关注 ${data.activity.followUsers}，微信受理提醒 ${data.activity.acceptedAlertUsers}，已确认呈现详情 ${data.activity.openedAlertUsers}，反馈买到 ${data.activity.boughtUsers}`,
+      '各行为分别计数，并非同一批用户的逐步转化率。本期之前的提醒今日打开不在此批记录内。',
+      `详情呈现由 1.6.0 可见页面确认；旧客户端可能漏报，不能当作真实通知打开率。历史读取记录 ${data.activity.legacyOpenedAlertUsers || 0} 人单列。`,
+    ] : []),
+    ...(data.notificationTests ? [
+      `测试通知：${data.notificationTests.total} 条／${data.notificationTests.users} 人；微信受理 ${data.notificationTests.byStatus.accepted || 0}，明确失败 ${data.notificationTests.byStatus.failed || 0}，结果未知 ${data.notificationTests.byStatus.uncertain || 0}`,
+      `测试反馈：收到 ${data.notificationTests.feedback.received || 0}，未收到 ${data.notificationTests.feedback.not_received || 0}。测试消息不计入真实放货与买到数据。`,
+      `测试详情：已确认呈现 ${data.notificationTests.opened || 0} 条，历史读取记录 ${data.notificationTests.legacyOpened || 0} 条；呈现详情不等于用户确认收到。`,
+    ] : []),
+    ...(data.truncated ? ['数据较多，每类最多读取最近 2000 条；以上不是完整统计。'] : []),
   ];
 }
 
-const EDITABLE_KEYS = ['quota', 'tasks', 'memberProduct', 'memberRedemption', 'newProductWindows', 'notifications', 'collector', 'query', 'announcement'];
+const EDITABLE_KEYS = ['quota', 'tasks', 'memberProduct', 'memberPlans', 'memberRedemption', 'newProductWindows', 'notifications', 'collector', 'query', 'announcement'];
 
 Page({
   data: {

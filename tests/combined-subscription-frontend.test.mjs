@@ -68,33 +68,27 @@ for (const banned of ['restock', 'soldout']) {
   });
 }
 
-test('the free trial requests only restock and remains ready without sold-out credits', async () => {
-  const trial = boot(0, 0, { membership: { active: false, expiresAt: null }, freeReminder: true, limits: { maxFollows: 1, maxStoresPerFollow: 3 } });
-  const rt = runtime(async action => action === 'notify.recordSubscription'
-    ? { accepted: [RESTOCK], subscriptions: subscriptions(1, 0) } : { ...trial, subscriptions: subscriptions(1, 0) });
-  const requests = [];
-  rt.wx.requestSubscribeMessage = async options => { requests.push(copy(options)); return { [RESTOCK]: 'accept' }; };
+test('a free account is blocked from authorization and asked to become a member', async () => {
+  const trial = boot(0, 0, { membership: { active: false, expiresAt: null }, freeReminder: false, limits: { maxFollows: 0, maxStoresPerFollow: 3 } });
+  const rt = runtime();
   const page = pageFor(rt, trial);
   await page.onSubscribe();
-  assert.equal(requests.length, 1);
-  assert.deepEqual(requests[0].tmplIds, [RESTOCK]);
-  assert.deepEqual(rt.calls.find(call => call.action === 'notify.recordSubscription').payload.results, { [RESTOCK]: 'accept' });
-  assert.equal(page.data.subscription.soldoutEnabled, false);
-  assert.equal(page.data.readiness.code, 'ready');
-  assert.equal(page.data.readiness.ready, true);
-  assert.doesNotMatch(page.data.readiness.title + page.data.readiness.detail, /断货/);
+  assert.equal(rt.calls.filter(call => call.action === 'notify.recordSubscription').length, 0);
+  assert.equal(page.data.readiness.code, 'membership');
+  assert.match(page.data.readiness.title, /会员专属/);
 });
 
 for (const [restock, soldout, missingLabel, usableLabel] of [[5, 0, '断货', '到货'], [0, 5, '到货', '断货']]) {
   test(`the shared reminder status distinguishes missing ${missingLabel} credits from available ${usableLabel} credits`, () => {
     const rt = runtime(), page = pageFor(rt, boot(restock, soldout)), status = page.data.readiness;
-    assert.equal(status.code, 'partial_credit');
-    assert.equal(status.ready, false);
-    assert.equal(status.tone, 'warn');
+    assert.equal(status.code, restock ? 'restock_ready' : 'partial_credit');
+    assert.equal(status.ready, Boolean(restock));
+    assert.equal(status.tone, restock ? 'ok' : 'warn');
     assert.equal(status.action, 'subscribe');
     assert.equal(status.actionLabel, '增加提醒次数');
-    assert.ok(status.title.includes(missingLabel), status.title);
-    assert.match(status.title, /未授权|没有|用完|暂无/);
+    assert.ok(status.title.includes(restock ? '到货' : missingLabel), status.title);
+    assert.match(status.title, restock ? /已就绪/ : /未授权|没有|用完|暂无/);
+    if (restock) assert.match(status.detail, /断货提醒为可选项/);
     assert.ok(status.detail.includes(usableLabel), status.detail);
     assert.match(status.detail, /5/);
   });
@@ -106,6 +100,31 @@ test('zero credits for both templates ask for one combined authorization', () =>
   assert.equal(page.data.readiness.ready, false);
   assert.equal(page.data.readiness.action, 'subscribe');
   assert.equal(page.data.readiness.actionLabel, '增加提醒次数');
+});
+
+test('accepting only restock enables reminders without requiring optional sold-out consent', async () => {
+  const rt = runtime(async action => action === 'notify.recordSubscription'
+    ? { accepted: [RESTOCK], subscriptions: subscriptions(1, 0) } : boot(1, 0));
+  let prompts = 0;
+  rt.wx.requestSubscribeMessage = async ({ tmplIds }) => {
+    prompts++; assert.deepEqual(copy(tmplIds), [RESTOCK, SOLDOUT]);
+    return { [RESTOCK]: 'accept', [SOLDOUT]: 'reject' };
+  };
+  const page = pageFor(rt, boot(0, 0));
+  await page.onSubscribe();
+  assert.equal(prompts, 1);
+  assert.equal(page.data.readiness.ready, true);
+  assert.equal(page.data.readiness.code, 'low_credit');
+  assert.match(page.data.readiness.title, /到货.*1 次/);
+  assert.match(page.data.readiness.detail, /断货提醒为可选项/);
+  assert.doesNotMatch(page.data.creditBoostTip, /各 10|断货/);
+  page.applyCredits(subscriptions(10, 0));
+  assert.equal(page.data.readiness.ready, true);
+  assert.equal(page.data.creditBoostTip, '');
+  page.applyCredits(subscriptions(0, 0));
+  assert.equal(page.data.readiness.ready, false);
+  assert.equal(page.data.readiness.code, 'no_credit');
+  assert.equal(prompts, 1, 'readiness changes never request new consent automatically');
 });
 
 for (const [restock, soldout, lowLabel] of [[5, 1, '断货'], [5, 2, '断货'], [1, 5, '到货'], [2, 5, '到货']]) {
@@ -128,12 +147,28 @@ test('both sufficient balances describe both configured reminder types as ready'
   assert.equal(page.data.subscription.soldoutCredits, 8);
 });
 
-test('sold-out-only credit broadcasts recompute partial, low and ready status without an account fetch', () => {
+test('members below the recommended buffer are nudged to stockpile at least 10 sends of each type', () => {
+  const under = pageFor(runtime(), boot(3, 3));
+  assert.match(under.data.creditBoostTip, /低于 10 次/);
+  assert.match(under.data.creditBoostTip, /连点「增加提醒次数」/);
+  assert.match(under.data.readiness.detail, /10 次/);
+
+  const oneSide = pageFor(runtime(), boot(12, 4));
+  assert.match(oneSide.data.creditBoostTip, /低于 10 次/);
+  assert.match(oneSide.data.readiness.detail, /10 次/);
+
+  const stocked = pageFor(runtime(), boot(10, 10));
+  assert.equal(stocked.data.creditBoostTip, '');
+  assert.doesNotMatch(stocked.data.readiness.detail, /低于 10/);
+});
+
+test('sold-out credit broadcasts retain restock readiness and recompute optional type availability without an account fetch', () => {
   const rt = runtime(), page = pageFor(rt, boot(5, 5));
   page.applyCredits(subscriptions(5, 0));
   assert.equal(page.data.subscription.credits, 5);
   assert.equal(page.data.subscription.soldoutCredits, 0);
-  assert.equal(page.data.readiness.code, 'partial_credit');
+  assert.equal(page.data.readiness.code, 'restock_ready');
+  assert.equal(page.data.readiness.ready, true);
   page.applyCredits(subscriptions(5, 1));
   assert.equal(page.data.readiness.code, 'low_credit');
   assert.match(page.data.readiness.title, /断货/);
@@ -227,7 +262,8 @@ test('a queued restock-only silent grant keeps its ID and explains that sold-out
   assert.deepEqual(rt.calls.find(call => call.action === 'notify.recordSubscription').payload, saved);
   assert.equal(page.data.subscription.credits, 6);
   assert.equal(page.data.subscription.soldoutCredits, 0);
-  assert.equal(page.data.readiness.code, 'partial_credit');
+  assert.equal(page.data.readiness.code, 'restock_ready');
+  assert.equal(page.data.readiness.ready, true);
   assert.match(feedback(rt), /到货 \+1/);
   assert.match(feedback(rt), /断货(?:[^，。；]*)(?:未授权|未增加|未返回)/);
 });

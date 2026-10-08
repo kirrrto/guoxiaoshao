@@ -21,6 +21,11 @@ const DEFAULTS = Object.freeze({
     note: '该产品为一次性虚拟服务，一经售出不予退款。一次购买 7 天，已有会员按剩余有效期顺延，不自动续费。',
   },
   virtualPayment: { offerId: '1450655203', productId: 'vip666', iosEnabled: true },
+  // Merchant goods IDs confirmed from the user's published goods on 2026-10-05.
+  // Month and year plans ship enabled so deploying gxs_api opens all three
+  // purchase options; operators can still set enabled:false to pause a plan.
+  // The seven-day plan keeps its existing memberProduct/virtualPayment fields.
+  memberPlans: { member_30d: { productId: 'vip777', enabled: true }, member_365d: { productId: 'vip888', enabled: true } },
   // maxClaims counts every account that has redeemed this campaign, including
   // redemptions granted before the cap existed.
   memberRedemption: { enabled: true, maxClaims: 20 },
@@ -70,7 +75,7 @@ const DEFAULTS = Object.freeze({
   announcement: null,
 });
 
-const EDITABLE = new Set(['quota', 'tasks', 'memberProduct', 'virtualPayment', 'memberRedemption', 'newProductWindows', 'notifications', 'collector', 'query', 'adminUserKeys', 'announcement']);
+const EDITABLE = new Set(['quota', 'tasks', 'memberProduct', 'memberPlans', 'virtualPayment', 'memberRedemption', 'newProductWindows', 'notifications', 'collector', 'query', 'adminUserKeys', 'announcement']);
 
 // A template library number is not an ID. Do not guess a fixed ID length.
 function isValidTemplateId(value) {
@@ -89,6 +94,13 @@ function mergeConfig(stored) {
   merged.notifications = { ...merged.notifications,
     templateFields: { ...DEFAULTS.notifications.templateFields, ...(merged.notifications.templateFields || {}) },
     soldoutFields: { ...DEFAULTS.notifications.soldoutFields, ...(merged.notifications.soldoutFields || {}) } };
+  if (merged.memberPlans && typeof merged.memberPlans === 'object' && !Array.isArray(merged.memberPlans)) {
+    merged.memberPlans = { ...merged.memberPlans };
+    for (const id of Object.keys(DEFAULTS.memberPlans)) {
+      const plan = merged.memberPlans[id];
+      if (plan && typeof plan === 'object' && !Array.isArray(plan)) merged.memberPlans[id] = { ...DEFAULTS.memberPlans[id], ...plan };
+    }
+  }
   return merged;
 }
 
@@ -102,6 +114,9 @@ function patchConfig(stored, patch) {
       next[key] = { ...next[key], ...value };
       if (key === 'notifications' && value.templateFields) next[key].templateFields = { ...(stored.notifications && stored.notifications.templateFields || {}), ...value.templateFields };
       if (key === 'notifications' && value.soldoutFields) next[key].soldoutFields = { ...(stored.notifications && stored.notifications.soldoutFields || {}), ...value.soldoutFields };
+      if (key === 'memberPlans') for (const [id, mapping] of Object.entries(value)) {
+        if (mapping && typeof mapping === 'object' && !Array.isArray(mapping)) next[key][id] = { ...(stored.memberPlans && stored.memberPlans[id] || {}), ...mapping };
+      }
     } else next[key] = value;
   }
   validateConfig(mergeConfig(next));
@@ -112,7 +127,7 @@ function patchConfig(stored, patch) {
 function validateConfig(config) {
   const invalid = (field) => { throw new ApiError('invalid_config', `配置项无效：${field}`); };
   const integer = (value, min, max, field) => { if (!Number.isSafeInteger(value) || value < min || value > max) invalid(field); };
-  for (const key of ['quota', 'memberProduct', 'virtualPayment', 'memberRedemption', 'notifications', 'collector', 'query']) {
+  for (const key of ['quota', 'memberProduct', 'memberPlans', 'virtualPayment', 'memberRedemption', 'notifications', 'collector', 'query']) {
     if (!config[key] || typeof config[key] !== 'object' || Array.isArray(config[key])) invalid(key);
   }
   for (const key of ['signinReward', 'taskReward', 'dailyGrantCap', 'balanceCap', 'queryCost', 'historyCost']) integer(config.quota[key], 0, 10000, `quota.${key}`);
@@ -127,6 +142,16 @@ function validateConfig(config) {
   if (typeof config.virtualPayment.productId !== 'string' || !/^[A-Za-z0-9_-]{1,128}$/.test(config.virtualPayment.productId)) invalid('virtualPayment.productId');
   if (typeof config.virtualPayment.iosEnabled !== 'boolean') invalid('virtualPayment.iosEnabled');
   if (config.memberProduct.enabled && (config.memberProduct.days !== 7 || config.memberProduct.priceFen !== 700 || config.memberProduct.id !== config.virtualPayment.productId)) invalid('memberProduct');
+  if (Object.keys(config.memberPlans).some(id => !Object.hasOwn(DEFAULTS.memberPlans, id))) invalid('memberPlans');
+  const goodsIds = new Set([config.virtualPayment.productId]);
+  for (const id of Object.keys(DEFAULTS.memberPlans)) {
+    const plan = config.memberPlans[id];
+    if (!plan || typeof plan !== 'object' || Array.isArray(plan) || Object.keys(plan).some(key => !['productId', 'enabled'].includes(key))) invalid(`memberPlans.${id}`);
+    if (typeof plan.enabled !== 'boolean') invalid(`memberPlans.${id}.enabled`);
+    if (typeof plan.productId !== 'string' || (plan.productId !== '' && !/^[A-Za-z0-9_-]{1,128}$/.test(plan.productId)) || (plan.enabled && !plan.productId)) invalid(`memberPlans.${id}.productId`);
+    if (plan.productId && goodsIds.has(plan.productId)) invalid(`memberPlans.${id}.productId`);
+    if (plan.productId) goodsIds.add(plan.productId);
+  }
   integer(config.query.maxStores, 1, 3, 'query.maxStores');
   integer(config.query.upstreamTimeoutMs, 1000, 10000, 'query.upstreamTimeoutMs');
   integer(config.query.maxRequestsPerUserMinute, 1, 60, 'query.maxRequestsPerUserMinute');

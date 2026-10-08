@@ -21,6 +21,39 @@
 .member-renewal { margin-top: 10rpx; font-size: max(12px, 24rpx); color: var(--text-2); }
 .member-allowance { display: flex; flex-wrap: wrap; gap: 8rpx 24rpx; margin-top: 14rpx; font-size: max(12px, 24rpx); color: var(--text-2); }
 .member-authorization { margin-top: 16rpx; color: var(--text-2); font-size: max(12px, 24rpx); line-height: 1.65; }
+/* Membership selection stays above detailed rules and remains legible on 320px screens. */
+.membership-member-actions { display: flex; gap: 16rpx; margin-top: 28rpx; min-width: 0; }
+.membership-manage { box-sizing: border-box; display: flex; align-items: center; justify-content: center; flex: 1 1 0; min-width: 0; min-height: 44px; margin: 0; padding: 18rpx 14rpx; border: 1rpx solid var(--line); border-radius: var(--radius-action); background: var(--surface-soft); color: var(--green-dark); font-size: max(13px, 26rpx); font-weight: 600; line-height: 1.5; white-space: normal; }
+.membership-manage-primary { flex-grow: 1.35; color: var(--action-text); background: var(--action-fill); border-color: transparent; }
+.membership-manage::after, .membership-shop-close::after { border: 0; }
+.membership-manage[disabled], .membership-shop-close[disabled] { opacity: .55; }
+.membership-caption { margin-top: 14rpx; color: var(--text-3); font-size: max(12px, 23rpx); line-height: 1.65; overflow-wrap: anywhere; }
+.membership-shop { margin-top: 28rpx; padding-top: 26rpx; border-top: 1rpx solid var(--line); }
+.membership-shop-heading { display: flex; align-items: center; justify-content: space-between; gap: 16rpx; min-width: 0; }
+.membership-shop-title { font-size: 29rpx; font-weight: 650; color: var(--text); }
+.membership-shop-close { flex: none; display: flex; align-items: center; justify-content: center; min-height: 40px; margin: -10rpx 0; padding: 10rpx 14rpx; border: 0; border-radius: 14rpx; background: transparent; color: var(--green-dark); font-size: max(12px, 24rpx); line-height: 1.5; }
+.membership-shop-heading + .membership-caption { margin-top: 8rpx; }
+.membership-packages { display: flex; gap: 12rpx; margin-top: 24rpx; min-width: 0; }
+.membership-package { box-sizing: border-box; display: flex; flex: 1 1 0; flex-direction: column; justify-content: center; align-items: center; min-width: 0; margin: 0; padding: 24rpx 8rpx 18rpx; border: 2rpx solid var(--line); border-radius: 22rpx; background: var(--surface-soft); color: var(--text); line-height: 1.4; }
+.membership-package::after { border: 0; }
+.membership-package-selected { border-color: var(--green-dark); background: var(--green-soft); }
+.membership-package[disabled] { color: var(--text-2); }
+.membership-package-name { font-size: max(14px, 29rpx); font-weight: 650; }
+.membership-package-duration { margin-top: 6rpx; color: var(--text-3); font-size: max(12px, 23rpx); white-space: normal; }
+.membership-package-price { max-width: 100%; margin-top: 16rpx; font-size: max(16px, 34rpx); font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.membership-package-choice { display: flex; align-items: center; justify-content: center; gap: 8rpx; margin-top: 18rpx; color: var(--text-3); font-size: max(12px, 22rpx); white-space: nowrap; }
+.membership-package-radio { box-sizing: border-box; flex: none; width: 24rpx; height: 24rpx; border: 2rpx solid var(--line); border-radius: 50%; background: var(--card); }
+.membership-package-selected .membership-package-choice { color: var(--green-dark); }
+.membership-package-selected .membership-package-radio { border: 7rpx solid var(--green-dark); }
+.membership-pending-caption { color: var(--text-2); }
+.membership-extension { margin-top: 24rpx; padding: 22rpx 24rpx; border-radius: 20rpx; background: var(--green-soft); }
+.membership-extension-label { color: var(--green-dark); font-size: max(13px, 25rpx); font-weight: 600; line-height: 1.6; }
+.membership-extension-detail { margin-top: 10rpx; font-size: max(13px, 26rpx); line-height: 1.6; color: var(--text); }
+.membership-extension-date { margin-top: 8rpx; font-size: max(12px, 24rpx); line-height: 1.6; font-weight: 600; color: var(--text); }
+.membership-extension-note { margin-top: 10rpx; color: var(--text-2); font-size: max(12px, 23rpx); line-height: 1.65; overflow-wrap: anywhere; }
+.membership-checkout-note { text-align: center; }
+.notification-test-copy { display: flex; flex: 1; flex-direction: column; align-items: flex-start; gap: 6rpx; min-width: 0; text-align: left; }
+.notification-test-copy > text { white-space: normal; overflow-wrap: anywhere; }
 
 .notification-heading { display: flex; align-items: center; justify-content: space-between; gap: 20rpx; min-width: 0; }
 .notification-heading-copy { flex: 1 1 0; min-width: 0; }
@@ -43,9 +76,8 @@
 .notification-end { margin-top: 22rpx; text-align: center; }
 
 .membership-entry-list { display: flex; flex-direction: column; gap: 16rpx; margin-top: 24rpx; min-width: 0; }
-.member-entry.redemption-entry, .member-entry.payment-entry { box-sizing: border-box; display: flex; align-items: center; justify-content: center; width: 100%; max-width: 100%; min-width: 0; min-height: 88rpx; height: auto; margin: 0; padding: 20rpx 24rpx; border: 0; border-radius: 999rpx; color: var(--green-ink); background: linear-gradient(155deg, #1ED58A, #00C375); box-shadow: inset 0 2rpx 0 rgba(255,255,255,0.34), 0 6rpx 16rpx rgba(0,195,117,0.13); font-size: 28rpx; font-weight: 600; line-height: 1.5; white-space: normal; overflow-wrap: anywhere; text-align: center; }
+.member-entry.redemption-entry, .member-entry.payment-entry { box-sizing: border-box; display: flex; align-items: center; justify-content: center; width: 100%; max-width: 100%; min-width: 0; min-height: 88rpx; height: auto; margin: 0; padding: 20rpx 24rpx; border: 0; border-radius: 999rpx; color: var(--action-text); background: var(--action-fill); box-shadow: inset 0 2rpx 0 rgba(255,255,255,0.34), 0 6rpx 16rpx rgba(0,195,117,0.13); font-size: 28rpx; font-weight: 600; line-height: 1.5; white-space: normal; overflow-wrap: anywhere; text-align: center; }
 .member-entry.redemption-entry::after, .member-entry.payment-entry::after { display: none; border: 0; }
-.member-entry.payment-entry { background: var(--green-dark); color: #fff; }
 .member-entry.payment-entry[disabled] { background: rgba(229, 239, 233, 0.80); color: #607669; box-shadow: none; }
 .member-entry.redemption-entry[disabled] { background: #DBF1E5; color: #587664; }
 .redemption-panel { margin-top: 22rpx; padding: 24rpx; background: rgba(230, 250, 239, 0.76); border: 1rpx solid var(--glass-line); border-radius: 26rpx; min-width: 0; }
@@ -93,8 +125,6 @@
 .member-entry.payment-abandon[disabled] { opacity: .6; }
 .membership-card .ledger-row > view { overflow-wrap: anywhere; }
 .member-entry.payment-entry, .member-entry.redemption-entry { min-height: 44px; border-radius: var(--radius-action); background: var(--action-fill); color: var(--action-text); box-shadow: none; }
-.membership-entry-secondary { align-items: flex-start; }
-.membership-entry-secondary .member-entry.payment-entry { width: auto; padding: 14rpx 24rpx; background: var(--surface-soft); color: var(--green-dark); border: 1rpx solid var(--line); }
 
 
 .identity-copy.ui-action { display: flex; justify-content: space-between; width: 100%; max-width: 100%; margin-top: 12rpx; padding: 10rpx 16rpx; font-size: max(12px, 24rpx); }
@@ -114,13 +144,24 @@
 .release-note-dot { flex: 0 0 6rpx; width: 6rpx; height: 6rpx; margin-top: 18rpx; border-radius: 50%; background: var(--green-dark); }
 .release-note-highlight > text { flex: 1; min-width: 0; overflow-wrap: anywhere; }
 .release-note-caption { margin-top: 16rpx; font-size: max(12px, 24rpx); line-height: 1.6; color: var(--text-3); overflow-wrap: anywhere; }
+.release-notes-more.ui-action { margin-top: 20rpx; min-height: 76rpx; font-size: 26rpx; }
 .redemption-close.ui-action { margin-top: 16rpx; }
+
+.order-record-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12rpx; padding: 20rpx 0 8rpx; }
+.order-record-toolbar > text { flex: 1 1 180rpx; }
+.order-record-button { width: auto; min-height: 64rpx; margin: 0; padding: 10rpx 20rpx; font-size: 23rpx; line-height: 1.5; white-space: normal; }
+.order-record-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 16rpx; margin-bottom: 8rpx; }
+.order-record-heading > .small { flex: 1; min-width: 0; }
+.order-record-heading > .pill { flex-shrink: 0; }
+.order-record-id { overflow-wrap: anywhere; word-break: break-all; }
+.order-record-actions { display: flex; justify-content: flex-end; margin-top: 12rpx; }
+.order-record-actions > text { flex: 1; }
+.order-record-note { margin: 16rpx 0; line-height: 1.6; color: var(--text); }
 
 @media (prefers-color-scheme: dark) {
   .notification-button.notification-delete { color: var(--bad); border-color: rgba(242, 155, 147, 0.28); background: var(--bad-soft); }
-  /* var(--green-dark) turns light in dark mode; keep the deep fill under white text. */
+  /* Keep the same brand fill and readable foreground in both themes. */
   .member-entry.payment-entry, .member-entry.redemption-entry { background: var(--action-fill); color: var(--action-text); }
-  .membership-entry-secondary .member-entry.payment-entry { background: var(--surface-soft); color: var(--green-dark); }
   .member-badge { color: #E6CA86; background: #383121; }
   .member-entry.payment-entry[disabled], .member-entry.redemption-entry[disabled] { background: #22322B; color: #7F958A; }
   .redemption-panel { background: rgba(0, 195, 117, 0.08); }

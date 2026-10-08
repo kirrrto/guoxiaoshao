@@ -11,7 +11,7 @@
  *  - the ledger + balance change happens inside one transaction.
  */
 const { COLLECTIONS } = require('../collections');
-const { isDuplicateKeyError } = require('../errors');
+const { isDuplicateKeyError, isMissingCollectionError } = require('../errors');
 const { atomicMethods } = require('./atomic-ops');
 const { ALERT_TYPES } = require('../engine/events');
 const { dayKey: beijingDayKey, startOfDay, addDays } = require('../time');
@@ -51,7 +51,8 @@ async function transactionGet(transaction, collection, id) {
     const result = await transaction.collection(collection).doc(id).get();
     return result && result.data ? result.data : null;
   } catch (error) {
-    if (/not exist|not found|-502004|DOCUMENT_NOT_FOUND/i.test(String(error.errMsg || error.message || error.errCode))) return null;
+    if (isMissingCollectionError(error)) throw error;
+    if (/DOCUMENT_NOT_FOUND|(?:document|record).*?(?:not exist|not found|does not exist)|文档不存在/i.test(String(error.errMsg || error.message || error.code))) return null;
     throw error;
   }
 }

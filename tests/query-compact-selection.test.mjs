@@ -11,7 +11,7 @@ const saved = () => ({ partNumber: product.partNumber, storeNumbers: ['R577', 'R
 const boot = () => ({ membership: { active: false }, quota: { balance: 4, queryCost: 1, signedInToday: true },
   limits: { queryMaxStores: 3 }, collector: { state: 'running' }, followCount: 0 });
 const copy = value => JSON.parse(JSON.stringify(value));
-const response = payload => ({ ok: true, product: seed.products.find(p => p.partNumber === payload.partNumber), balance: 3,
+const response = payload => ({ ok: true, product: seed.products.find(p => p.partNumber === payload.partNumber), balance: 3, quotaRevision: 1,
   queriedAt: new Date().toISOString(), results: payload.storeNumbers.map(storeNumber => ({ storeNumber, status: 'available', observedAt: new Date().toISOString() })) });
 
 async function opened({ value = saved(), cache, query = async payload => response(payload), getCurrentPages, getBoot = boot } = {}) {

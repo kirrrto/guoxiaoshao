@@ -107,7 +107,7 @@ test('selected-target follow uses current selection while result-card follow kee
   assert.equal(rt.calls.length, 0, 'adding a follow must not first perform a charged stock query');
 });
 
-test('free users without the free alert are guided to membership, keeping the target for after activation', () => {
+test('free users are guided to membership without opening the follow editor', () => {
   const rt = runtime(), page = rt.instance('pages/query/index.js'), navigations = [];
   rt.wx.switchTab = value => navigations.push(value.url);
   Object.assign(page.data, { boot: { member: false } }); page.selection = selection();
@@ -119,13 +119,9 @@ test('free users without the free alert are guided to membership, keeping the ta
   rt.messages[0].success({ confirm: true });
   assert.deepEqual(navigations, ['/pages/mine/index']);
   assert.equal(rt.calls.length, 0);
-  // Declining drops the kept target; a new account on its free alert goes straight to the editor.
+  // Declining drops the kept target.
   page.onFollowSelection(); rt.messages.at(-1).success({ confirm: false });
   assert.equal(rt.app.globalData.pendingMemberFollow, null);
-  Object.assign(page.data, { boot: { member: false, freeReminder: true } });
-  page.onFollowSelection();
-  assert.deepEqual(copy(rt.app.globalData.pendingFollow), { partNumber: 'SKU-A', storeNumbers: ['R001'] });
-  assert.deepEqual(navigations.at(-1), '/pages/follow/index');
 });
 
 test('incomplete or unsupported selections do not navigate to the follow editor', () => {

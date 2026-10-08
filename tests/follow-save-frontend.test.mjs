@@ -46,6 +46,20 @@ test('a confirmed save remains visibly saved when its subsequent list refresh fa
   assert.match(page.data.refreshError, /已保存.*刷新/);
 });
 
+test('saving a follow does not prompt again solely because optional sold-out consent was declined', async () => {
+  for (const restock of [0, 5]) {
+    const rt = runtime(async (action, payload) => action === 'follow.upsert' ? saved(payload)
+      : action === 'follow.list' ? { follows: [], limits: boot().limits } : boot());
+    const page = editor(rt);
+    page.setData({ subscription: { templateCount: 1, credits: restock, soldoutEnabled: true, soldoutCredits: 0 } });
+    let prompts = 0;
+    page.promptSubscribe = () => { prompts++; };
+    await page.onSave();
+    assert.equal(rt.calls.filter(call => call.action === 'follow.upsert').length, 1);
+    assert.equal(prompts, restock ? 0 : 1);
+  }
+});
+
 test('save reads the current picker state even while its coalesced change is waiting', async () => {
   const rt = runtime(async (action, payload) => action === 'follow.upsert' ? saved(payload) : action === 'follow.list' ? { follows: [], limits: boot().limits } : boot());
   const page = editor(rt), queued = [];

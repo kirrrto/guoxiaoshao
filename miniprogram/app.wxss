@@ -2,11 +2,12 @@
 @import "styles/common.wxss";
 
 page {
-  /* Brand green follows the supplied reference; ink stays dark for legibility. */
+  /* Logo base hue (docs/brand/logo-generation.md). Keep every active green
+     on this hue in both themes; dark ink makes filled controls legible. */
   --green: #00C375;
-  --green-dark: #007A49;
+  --green-dark: var(--green);
   --green-ink: #073C2C;
-  --green-soft: rgba(217, 249, 233, 0.85);
+  --green-soft: rgba(0, 195, 117, 0.12);
   --green-mist: #F6F8F7;
   --text: #182A23;
   --text-2: #52665B;
@@ -16,20 +17,20 @@ page {
   --surface-soft: #F2F6F4;
   --glass-line: #E2E9E5;
   --shadow-soft: 0 4rpx 16rpx rgba(24, 42, 35, 0.025);
-  --action-fill: #007A49;
-  --action-text: #FFFFFF;
-  --control-fill: #F0F8F4;
-  --control-line: #C6DFD2;
-  --control-pressed: #DCEFE4;
+  --action-fill: var(--green);
+  --action-text: var(--green-ink);
+  --control-fill: rgba(0, 195, 117, 0.06);
+  --control-line: rgba(0, 195, 117, 0.24);
+  --control-pressed: rgba(0, 195, 117, 0.16);
   --radius-card: 28rpx;
   --radius-action: 24rpx;
   --warn: #895806;
   --warn-soft: #FFF2D5;
   --bad: #A83E3E;
   --bad-soft: #FCECED;
-  --info-soft: #EAF7F1;
-  --skeleton-base: rgba(0, 145, 87, 0.07);
-  --skeleton-shine: rgba(0, 145, 87, 0.14);
+  --info-soft: rgba(0, 195, 117, 0.08);
+  --skeleton-base: rgba(0, 195, 117, 0.07);
+  --skeleton-shine: rgba(0, 195, 117, 0.14);
   /* Static light and translucent surfaces keep scrolling inexpensive on phones.
      No full-page filters, animated gradients, or backdrop-filter dependency. */
   background-color: var(--green-mist);
@@ -46,7 +47,6 @@ page {
    its end, so the light theme above stays exactly as designed. */
 @media (prefers-color-scheme: dark) {
   page {
-    --green-dark: #68DF9D;
     --green-soft: rgba(0, 195, 117, 0.16);
     --green-mist: #101713;
     --text: #E7EFE9;
@@ -54,11 +54,9 @@ page {
     --text-3: #A8B8AE;
     --line: rgba(163, 224, 194, 0.12);
     --card: #1B251F;
-    --action-fill: #68DF9D;
-    --action-text: #142C20;
-    --control-fill: #22392D;
-    --control-line: #41624D;
-    --control-pressed: #2D4A39;
+    --control-fill: rgba(0, 195, 117, 0.10);
+    --control-line: rgba(0, 195, 117, 0.32);
+    --control-pressed: rgba(0, 195, 117, 0.22);
     --surface-soft: rgba(255, 255, 255, 0.05);
     --glass-line: rgba(255, 255, 255, 0.07);
     --shadow-soft: 0 12rpx 34rpx rgba(0, 0, 0, 0.32);

@@ -1,6 +1,6 @@
 'use strict';
 const { ApiError } = require('../errors');
-const { isMember, canUseReminders, hasFreeReminder, validateFollowLimits, LIMITS, FREE_REMINDER_FOLLOWS } = require('../rules/membership');
+const { isMember, canUseReminders, validateFollowLimits, LIMITS, FREE_REMINDER_FOLLOWS } = require('../rules/membership');
 const { isLiveRestricted } = require('../rules/new-product');
 const { targetKeyOf } = require('../engine/events');
 const { ensureUser } = require('./users');
@@ -69,19 +69,19 @@ async function decorate(ctx, follows, member = true, active = member) {
 async function list(ctx) {
   const user = await ensureUser(ctx);
   const follows = await ctx.repo.listFollows(user._id);
-  const member = isMember(user, ctx.now), freeReminder = hasFreeReminder(user, ctx.now);
-  return { member, freeReminder, limits: followLimits(member), follows: await decorate(ctx, follows, member, member || freeReminder) };
+  const member = isMember(user, ctx.now);
+  return { member, freeReminder: false, limits: followLimits(member), follows: await decorate(ctx, follows, member, member) };
 }
 
-/** Members may keep 3 configurations; a free-trial account keeps 1 for its free alert. */
+/** Only members may keep follows; free accounts have no follow quota. */
 function followLimits(member) {
   return member ? LIMITS : { ...LIMITS, maxFollows: FREE_REMINDER_FOLLOWS };
 }
 
-/** Create or edit a follow. Members, or accounts with their free alert unused; 3 stores each. */
+/** Create or edit a follow. Members only; 3 SKUs × up to 3 stores each. */
 async function upsert(ctx, payload) {
   const user = await ensureUser(ctx);
-  if (!canUseReminders(user, ctx.now)) throw new ApiError('member_required', '免费体验提醒已用完，开通会员后可继续关注');
+  if (!canUseReminders(user, ctx.now)) throw new ApiError('member_required', '关注与到货提醒为会员专属，开通会员后可关注并接收微信提醒');
   const member = isMember(user, ctx.now);
   const partNumber = typeof payload.partNumber === 'string' ? payload.partNumber.trim() : '';
   if (!/^[A-Z0-9]{5}CH\/A$/.test(partNumber)) throw new ApiError('invalid_part_number', '商品编号格式无效');
@@ -125,7 +125,7 @@ function followLimitMessage(reason, member = true) {
     too_many_stores: `每个机型最多关注 ${LIMITS.maxStoresPerFollow} 家门店`,
     no_part_number: '请选择商品',
     duplicate_part_number: '该机型已在关注列表中',
-    too_many_follows: member ? `最多同时关注 ${LIMITS.maxFollows} 个机型` : `免费体验可关注 ${FREE_REMINDER_FOLLOWS} 个机型，开通会员可关注 ${LIMITS.maxFollows} 个`,
+    too_many_follows: member ? `最多同时关注 ${LIMITS.maxFollows} 个机型` : '关注为会员专属，开通会员后可关注配置',
   }[reason] || '关注设置无效';
 }
 
@@ -135,7 +135,7 @@ async function setStatus(ctx, payload, status) {
   const recordId = followId.startsWith(`${user._id}|`) ? followId : `${user._id}|${followId}`;
   const follow = await ctx.repo.getFollow(recordId);
   if (!follow || follow.userKey !== user._id || follow.status === 'removed') throw new ApiError('unknown_follow', '关注不存在');
-  if (status === 'active' && !canUseReminders(user, ctx.now)) throw new ApiError('member_required', '开通会员后可恢复监测');
+  if (status === 'active' && !canUseReminders(user, ctx.now)) throw new ApiError('member_required', '关注与到货提醒为会员专属，开通会员后可恢复监测');
   const updated = await ctx.repo.mutateFollow({ userKey: user._id, followId: recordId, status, nowIso: ctx.nowIso, knownFollows: await ctx.repo.listFollows(user._id) });
   if (status === 'removed') return { removed: true, followId };
   const [decorated] = await decorate(ctx, [updated], isMember(user, ctx.now), canUseReminders(user, ctx.now));

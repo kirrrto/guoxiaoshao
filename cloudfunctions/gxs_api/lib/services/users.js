@@ -1,11 +1,11 @@
 'use strict';
 const { ApiError } = require('../errors');
 const { dayKey } = require('../time');
-const { membershipSnapshot, isMember, hasFreeReminder, LIMITS, FREE_REMINDER_FOLLOWS } = require('../rules/membership');
+const { membershipSnapshot, isMember, LIMITS, FREE_REMINDER_FOLLOWS } = require('../rules/membership');
 const { resolveConfig } = require('../rules/quota');
 const { maskOpenid } = require('../identity');
 const { monitoringSnapshot } = require('../monitor-readiness');
-const { paymentProduct } = require('../payment/service');
+const { paymentProduct, paymentProducts } = require('../payment/service');
 
 function newUser(identity, nowIso) {
   return {
@@ -34,7 +34,15 @@ async function ensureUser(ctx) {
 async function touchUser(ctx, user) {
   const last = user.lastSeenAt ? Date.parse(user.lastSeenAt) : 0;
   if (ctx.now.getTime() - last > 10 * 60 * 1000) {
-    await ctx.repo.updateUser(user._id, { lastSeenAt: ctx.nowIso });
+    try {
+      await ctx.repo.updateUser(user._id, { lastSeenAt: ctx.nowIso });
+    } catch {
+      // This timestamp is for operator visibility, not account authorization.
+      // Keep required account reads strict and retry the touch on a later visit.
+      try {
+        if (ctx.log && typeof ctx.log.warn === 'function') ctx.log.warn('[bootstrap] last-seen update deferred');
+      } catch { /* Logging cannot make this optional timestamp mandatory. */ }
+    }
   }
 }
 
@@ -48,7 +56,7 @@ async function quotaSnapshot(ctx, user) {
   if (!summary) {
     const entries = await ctx.repo.listLedger(user._id, { dayKey: today, limit: Infinity });
     summary = {
-      grantedToday: entries.filter(e => e.delta > 0 && e.type !== 'query_refund' && e.type !== 'admin_grant').reduce((sum, e) => sum + e.delta, 0),
+      grantedToday: entries.filter(e => e.delta > 0 && !['query_refund', 'notification_test_refund', 'admin_grant'].includes(e.type)).reduce((sum, e) => sum + e.delta, 0),
       signedInToday: entries.some(e => e.type === 'signin_reward'),
       tasksDoneToday: [...new Set(entries.filter(e => e.type === 'task_reward').map(e => e.taskId))],
     };
@@ -115,9 +123,10 @@ async function bootstrap(ctx) {
     tasks: ctx.config.tasks,
     followCount: follows.filter(f => f.status === 'active' || f.status === 'paused').length,
     memberProduct: paymentProduct(ctx),
+    memberProducts: paymentProducts(ctx),
     newProductWindows: ctx.config.newProductWindows,
-    // One free restock alert for accounts that have never received one.
-    freeReminder: hasFreeReminder(user, ctx.now),
+    // Follow and WeChat reminders are member-only; free accounts only get query credits.
+    freeReminder: false,
     limits: { queryMaxStores: ctx.config.query.maxStores, maxFollows: isMember(user, ctx.now) ? LIMITS.maxFollows : FREE_REMINDER_FOLLOWS, maxStoresPerFollow: LIMITS.maxStoresPerFollow },
     notifications: monitoring.notifications,
     settings: user.settings,

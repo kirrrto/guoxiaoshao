@@ -31,7 +31,7 @@ export function runtime(handler = async () => ({}), options = {}) {
   const instance = (rel, properties = {}) => {
     load(rel); const definition = captured;
     const object = { ...definition, ...(definition.methods || {}), data: { ...copy(definition.data || {}), ...properties } };
-    object.setData = patch => { for (const [key, value] of Object.entries(patch)) { const parts = key.replace(/\[(\d+)\]/g, '.$1').split('.'); let target = object.data; for (const part of parts.slice(0, -1)) target = target[part] || (target[part] = {}); target[parts.at(-1)] = value; } };
+    object.setData = (patch, callback) => { for (const [key, value] of Object.entries(patch)) { const parts = key.replace(/\[(\d+)\]/g, '.$1').split('.'); let target = object.data; for (const part of parts.slice(0, -1)) target = target[part] || (target[part] = {}); target[parts.at(-1)] = value; } if (callback) callback(); };
     object.triggerEvent = (name, detail) => { object.lastEvent = { name, detail }; };
     return object;
   };

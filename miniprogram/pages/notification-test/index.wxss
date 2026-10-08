@@ -1,0 +1,15 @@
+.test-page { padding: 28rpx 24rpx 72rpx; }
+.test-card { background: var(--card); border: 1rpx solid var(--line); border-radius: 28rpx; padding: 32rpx; margin-bottom: 24rpx; }
+.test-tag { color: var(--green-dark); font-size: 24rpx; font-weight: 600; }
+.test-title { font-size: 42rpx; font-weight: 700; margin: 14rpx 0 20rpx; }
+.test-heading { font-size: 30rpx; font-weight: 600; margin-bottom: 16rpx; }
+.test-copy { color: var(--text-2); font-size: 26rpx; line-height: 1.7; margin: 16rpx 0; }
+.test-cost { padding: 24rpx; background: var(--green-soft); border-radius: 18rpx; font-weight: 600; margin: 24rpx 0; }
+.test-primary { background: var(--action-fill); color: var(--action-text); border-radius: 22rpx; margin-top: 28rpx; font-size: 28rpx; }
+.test-secondary { background: var(--surface-soft); color: var(--text); border-radius: 22rpx; margin-top: 18rpx; font-size: 26rpx; }
+.test-primary, .test-secondary { display: flex; align-items: center; justify-content: center; width: 100%; min-height: 88rpx; padding: 16rpx 20rpx; box-sizing: border-box; border: 0; line-height: 1.45; }
+.test-primary::after, .test-secondary::after { border: 0; }
+.test-error { color: var(--bad); font-size: 26rpx; line-height: 1.7; }
+.test-link { color: var(--green-dark); text-align: center; padding-top: 28rpx; }
+.test-feedback { border-top: 1rpx solid var(--line); margin-top: 28rpx; padding-top: 28rpx; }
+.test-tip { color: var(--text-3); font-size: 24rpx; line-height: 1.8; padding: 0 14rpx; }

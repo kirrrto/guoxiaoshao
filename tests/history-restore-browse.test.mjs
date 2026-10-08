@@ -79,7 +79,7 @@ test('invalid calendar dates, future days and malformed store data cannot restor
 
 test('empty saved store scope remains intentional and queries only after a separate user action', async () => {
   const calls = [];
-  const { rt, page } = pageWith(saved({ storeNumbers: [] }), async (action, payload) => { calls.push({ action, payload }); return { ok: true, product, dayKey: payload.dayKey, balance: 0, events: [], latest: [], summary: {}, pagination: { hasMore: false, total: 0 } }; });
+  const { rt, page } = pageWith(saved({ storeNumbers: [] }), async (action, payload) => { calls.push({ action, payload }); return { ok: true, product, dayKey: payload.dayKey, balance: 0, quotaRevision: 1, events: [], latest: [], summary: {}, pagination: { hasMore: false, total: 0 } }; });
   page.onRestoreBrowse(tap);
   assert.deepEqual(copy(page.selection.storeNumbers), []);
   assert.equal(rt.calls.length, 0);

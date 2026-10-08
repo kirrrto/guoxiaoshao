@@ -40,6 +40,13 @@ function shareAppMessage(route, pageData) {
     title: shareTitleFor(route, pageData),
     path: `/pages/query/index?${(PAGE_META[route] && PAGE_META[route].query) || 'from=share'}`,
   };
+  if (route === '/pages/query/index') {
+    const selection = pageData && pageData.selection;
+    const target = selection && readSharedSelection({ gxsPart: selection.partNumber,
+      gxsStores: Array.isArray(selection.storeNumbers) ? selection.storeNumbers.join(',') : null });
+    // Share only the public target. Never carry account, balance or stock snapshots.
+    if (target) payload.path += `&gxsPart=${encodeURIComponent(target.partNumber)}&gxsStores=${encodeURIComponent(target.storeNumbers.join(','))}`;
+  }
   const followImage = firstFollowImage(pageData);
   if (followImage) payload.imageUrl = followImage;
   else if (route === '/pages/query/index' && pageData && pageData.selection && pageData.selection.product && pageData.selection.product.imageUrl) {
@@ -47,6 +54,19 @@ function shareAppMessage(route, pageData) {
   }
   // No imageUrl: WeChat uses the current page screenshot as the share card.
   return payload;
+}
+
+/** Route parameters are untrusted; the landing page also checks its current catalog. */
+function readSharedSelection(options) {
+  if (!options || typeof options.gxsPart !== 'string' || options.gxsPart.length > 80
+    || typeof options.gxsStores !== 'string' || options.gxsStores.length > 40) return null;
+  try {
+    const partNumber = decodeURIComponent(options.gxsPart);
+    const storeNumbers = decodeURIComponent(options.gxsStores).split(',');
+    if (!/^[A-Za-z0-9/_-]{1,64}$/.test(partNumber) || storeNumbers.length < 1 || storeNumbers.length > 3
+      || !storeNumbers.every(number => /^R\d{3}$/.test(number)) || new Set(storeNumbers).size !== storeNumbers.length) return null;
+    return { partNumber, storeNumbers };
+  } catch (e) { return null; }
 }
 
 // iOS WeChat left the Moments card blank for a code-package path that Android
@@ -74,4 +94,4 @@ function shareTimeline() {
   };
 }
 
-module.exports = { IMAGE, DEFAULT_TITLE, PAGE_META, shareTitleFor, firstFollowImage, shareAppMessage, shareTimeline };
+module.exports = { IMAGE, DEFAULT_TITLE, PAGE_META, shareTitleFor, firstFollowImage, shareAppMessage, shareTimeline, readSharedSelection };

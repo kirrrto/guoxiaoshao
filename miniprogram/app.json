@@ -3,7 +3,8 @@
     "pages/query/index",
     "pages/follow/index",
     "pages/history/index",
-    "pages/mine/index"
+    "pages/mine/index",
+    "pages/notification-test/index"
   ],
   "window": {
     "backgroundColor": "@pageBackground",

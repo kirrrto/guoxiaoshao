@@ -104,6 +104,58 @@ test('bootstrap uses server summaries without skipping fresh identity, status or
   assert.deepEqual(nextDay.quota.tasksDoneToday, []);
 });
 
+test('a failed last-seen write keeps the verified account usable and retries on the next visit', async () => {
+  const f = createFixture();
+  ok(await f.call('quota.signin'));
+  const membership = { expiresAt: '2026-10-15T00:00:00.000Z' };
+  await f.repo.updateUser(userKeyOf(), { membership });
+  const before = await f.repo.getUser(userKeyOf());
+  f.advance(11 * 60 * 1000);
+  const update = f.repo.updateUser;
+  let attempts = 0;
+  const warnings = [], errors = [];
+  const { createHandler } = require('../cloudfunctions/gxs_api/lib/app.js');
+  const handle = createHandler({ repo: f.repo, clock: () => new Date(f.state.now),
+    log: { warn: (...args) => warnings.push(args), error: (...args) => errors.push(args) } });
+  f.repo.updateUser = async (id, patch) => {
+    assert.equal(id, userKeyOf());
+    assert.deepEqual(patch, { lastSeenAt: f.state.now.toISOString() });
+    attempts++;
+    throw new Error(`last-seen write unavailable for ${id}`);
+  };
+  const boot = ok(await handle({ action: 'user.bootstrap' }, userContext()));
+  assert.equal(boot.membership.active, true);
+  assert.equal(boot.membership.expiresAt, membership.expiresAt);
+  assert.equal(boot.quota.balance, before.quota.balance);
+  assert.equal(boot.quota.signedInToday, true);
+  assert.equal(boot.identity.userKey, userKeyOf());
+  assert.equal(attempts, 1);
+  assert.equal(warnings.length, 1);
+  assert.match(warnings[0][0], /last-seen/);
+  assert.equal(JSON.stringify(warnings).includes(userKeyOf()), false, 'diagnostics contain no account identifiers');
+  assert.deepEqual(errors, []);
+  const brokenLogger = createHandler({ repo: f.repo, clock: () => new Date(f.state.now),
+    log: { warn() { throw new Error('logger unavailable'); }, error: (...args) => errors.push(args) } });
+  assert.equal(ok(await brokenLogger({ action: 'user.bootstrap' }, userContext())).quota.balance, before.quota.balance);
+  assert.deepEqual(errors, [], 'a telemetry logger failure cannot reject a verified account');
+  assert.deepEqual(await f.repo.getUser(userKeyOf()), before, 'failed telemetry cannot change account state');
+  f.repo.updateUser = update;
+  ok(await f.call('user.bootstrap'));
+  assert.equal((await f.repo.getUser(userKeyOf())).lastSeenAt, f.state.now.toISOString());
+});
+
+test('required account and configuration read failures still reject bootstrap', async () => {
+  for (const method of ['getUser', 'getConfig']) {
+    const f = createFixture();
+    ok(await f.call('user.bootstrap'));
+    f.repo[method] = async () => { throw new Error('required read unavailable'); };
+    const result = await f.call('user.bootstrap');
+    assert.equal(result.ok, false, method);
+    assert.equal(result.error.code, 'internal_error', method);
+    assert.equal(result.data, undefined, 'a failed required read cannot return default entitlements');
+  }
+});
+
 test('legacy bootstrap scans the full day and legacy follow documents; reward commit upgrades its summary', async () => {
   const f = createFixture();
   ok(await f.call('user.bootstrap'));
@@ -124,6 +176,19 @@ test('legacy bootstrap scans the full day and legacy follow documents; reward co
   assert.deepEqual(signin.quota.tasksDoneToday, ['view_history']);
   f.repo.listLedger = async () => { throw new Error('the upgraded reward summary should be used'); };
   assert.equal(ok(await f.call('user.bootstrap')).quota.grantedToday, 2);
+});
+
+test('a notification-test refund restores spent balance without consuming the daily reward allowance', async () => {
+  const f = createFixture();
+  ok(await f.call('quota.signin'));
+  const user = await f.repo.getUser(userKeyOf());
+  delete user.quota.dailyRewardSnapshot;
+  f.repo.tables.get(C.users).set(user._id, user);
+  f.repo.insert(C.ledger, { _id: 'notification-test-refund-001', userKey: user._id, type: 'notification_test_refund',
+    delta: 1, dayKey: '2026-09-15', createdAt: f.state.now.toISOString() });
+  const quota = ok(await f.call('user.bootstrap')).quota;
+  assert.equal(quota.grantedToday, 1);
+  assert.equal(quota.signedInToday, true);
 });
 
 test('independent settings updates merge atomically, are isolated by account and roll back on error', async () => {
