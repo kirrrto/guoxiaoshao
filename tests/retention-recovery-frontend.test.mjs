@@ -78,11 +78,11 @@ test('a lost silent authorization response appears as pending on return and retr
   assert.equal(credits.topUpReminderCredit(), true);
   await settle();
   const pendingId = credits.readPending().requestId;
-  await page.onShow();
   assert.equal(page.data.subscriptionPending, true);
-  assert.equal(page.data.readiness.code, 'subscription_pending');
-  assert.equal(page.data.creditBoostTip, '', 'sync the existing record before suggesting additional authorization');
-  await page.onSubscribe();
+  assert.equal(page.data.readiness.ready, true, 'previously confirmed credits remain usable while another grant is pending');
+  assert.equal(page.data.authorization.pendingRestock, 1, 'the unsynced grant is visible separately from the three usable credits');
+  assert.equal(page.data.authorization.syncing, false, 'a failed write waits for recovery instead of looping');
+  await page.onShow(); await settle();
   assert.equal(prompts, 1);
   assert.equal(recordCalls, 2);
   assert.equal(rt.calls.filter(call => call.action === 'notify.recordSubscription')[1].payload.requestId, pendingId);
@@ -113,7 +113,8 @@ test('a confirmed credit broadcast clears a pending-sync notice even when the cr
   const pending = { requestId: 'accepted-000001', results: { A: 'accept' } };
   credits.savePending(pending);
   page.applyBoot(boot());
-  assert.equal(page.data.readiness.code, 'subscription_pending');
+  assert.equal(page.data.subscriptionPending, true);
+  assert.equal(page.data.readiness.ready, true);
   credits.clearPending(pending);
   rt.load('utils/store.js').publishSubscriptions(boot().subscriptions);
   assert.equal(page.data.subscriptionPending, false);

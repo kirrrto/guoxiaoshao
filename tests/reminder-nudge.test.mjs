@@ -59,6 +59,7 @@ function mounted({ data = boot(), pending, handler } = {}) {
     : action === 'follow.list' ? { follows }
       : action === 'notify.recordSubscription' ? { accepted: ['R', 'S'], subscriptions: { R: { credits: 2 }, S: { credits: 16 } } } : {}));
   rt.wx.requestSubscribeMessage = async () => { nativeCalls++; return { R: 'accept', S: 'accept' }; };
+  rt.app.globalData.bootstrap = data;
   if (pending) rt.load('utils/reminder-credits.js').savePending(pending);
   const component = rt.instance('components/reminder-nudge/index.js', { enabled: true, blocked: false });
   component.lifetimes.attached.call(component);
@@ -126,6 +127,7 @@ test('hidden and blocked pages cannot display a late account-read prompt', async
 
 test('a package update preserves saved authorization and never clears server credits on the next launch', async () => {
   const first = runtime();
+  first.app.globalData.bootstrap = boot();
   const saved = { requestId: 'before-package-update', results: { R: 'accept' } };
   first.load('utils/reminder-credits.js').savePending(saved);
   let ready, applied = 0;

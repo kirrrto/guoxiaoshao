@@ -66,6 +66,25 @@ async function setup() {
   return { f, task, grant, reserve, invalidate, subscription, now };
 }
 
+test('queued consent must match the authenticated account; legacy clients and same-ID retries remain compatible', async () => {
+  const s = await setup();
+  const request = { requestId: 'account-bound-grant-01', results: { [ID]: 'accept' } };
+  for (const expectedUserKey of [userKeyOf('another-user'), '', null, 123]) {
+    const rejected = await s.f.call('notify.recordSubscription', { ...request, expectedUserKey });
+    assert.equal(rejected.error.code, 'subscription_account_changed');
+    assert.equal((await s.subscription()).credits, 3);
+  }
+  const accepted = await s.f.call('notify.recordSubscription', { ...request, expectedUserKey: userKeyOf() });
+  assert.equal(accepted.ok, true);
+  assert.equal((await s.subscription()).credits, 4);
+  const replay = await s.f.call('notify.recordSubscription', { ...request, expectedUserKey: userKeyOf() });
+  assert.equal(replay.data.replayed, true);
+  assert.equal((await s.subscription()).credits, 4);
+  const legacy = await s.f.call('notify.recordSubscription', { ...request, requestId: 'legacy-grant-02' });
+  assert.equal(legacy.ok, true);
+  assert.equal((await s.subscription()).credits, 5);
+});
+
 test('WeChat 43101 expires stale local credits and fresh consent enables a later event', async () => {
   const s = await setup(); const t = s.task('denied'); await s.f.repo.saveNotification(t);
   const send = async (task, sendImpl) => { await seedNotificationObservation(s.f.repo, task); return sendTask({ task, sendImpl, config, repo: s.f.repo, now: s.f.state.now, clock: () => s.f.state.now }); };

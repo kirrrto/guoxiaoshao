@@ -1,6 +1,6 @@
 const { getBootstrap, getFollows, subscribeSubscriptions } = require('../../utils/store');
 const { nudgeFor, claimNudge } = require('../../utils/reminder-nudge');
-const { readPending, isSubscriptionBusy, getConsentSetting, syncPendingAuthorization, requestReminderAuthorization } = require('../../utils/reminder-credits');
+const { readPending, isSubscriptionBusy, getConsentSetting, getAuthorizationState, syncPendingAuthorization, requestReminderAuthorization } = require('../../utils/reminder-credits');
 const { toast } = require('../../utils/api');
 
 Component({
@@ -87,7 +87,9 @@ Component({
       } catch (error) {
         if (!this.attachedToPage || !this.pageVisible) return;
         const text = String(error && (error.errMsg || error.message) || '');
-        toast(readPending() ? '授权已保存，联网后会继续同步' : /20004/.test(text) ? '订阅消息总开关已关闭，可在微信设置中开启' : '本次授权未完成，已有次数保留');
+        const state = getAuthorizationState();
+        toast(state.storageBlocked ? '授权尚未保存，请保持小程序开启并重试同步'
+          : readPending() ? '授权已保存，联网后会继续同步' : /20004/.test(text) ? '订阅消息总开关已关闭，可在微信设置中开启' : '本次授权未完成，已有次数保留');
       } finally {
         if (this.attachedToPage) this.setData({ open: false, submitting: false });
       }

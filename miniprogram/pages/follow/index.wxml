@@ -53,7 +53,7 @@
       <button class="btn btn-outline readiness-action" disabled="{{refreshing || saving}}" bindtap="onReadinessAction">{{readiness.actionLabel}}</button>
     </view>
 
-    <view class="follow-content {{readiness.action === 'subscribe' && !readiness.ready ? 'needs-authorization' : ''}}">
+    <view class="follow-content {{(authorizationSession ? authorizationPanelFirst : (readiness.action === 'subscribe' && !readiness.ready)) ? 'needs-authorization' : ''}}">
       <view id="follow-configurations" class="follow-configurations">
         <view class="section-heading">
           <view><text class="section-title">关注配置</text><text class="follow-count">{{boot.member ? follows.length + ' / ' + limits.maxFollows : (follows.length ? '已保存 ' + follows.length + ' 个' : '会员专属')}}</text></view>
@@ -98,16 +98,18 @@
 
       <view id="reminder-health" class="card monitor-panel">
         <view class="section-heading"><text class="section-title">微信提醒</text><button class="ui-action" hover-class="ui-control-pressed" aria-expanded="{{showServiceDetails}}" bindtap="onToggleServiceDetails"><text class="ui-action-label">{{showServiceDetails ? '收起详情' : '设置与状态'}}</text><view class="ui-chevron {{showServiceDetails ? 'ui-chevron--up' : 'ui-chevron--down'}}" aria-hidden="true"></view></button></view>
-        <view wx:if="{{readiness.action === 'subscribe' && readiness.code !== 'ready'}}" class="credit-notice"><text class="bold">{{readiness.title}}</text><view class="small text-2 mt">{{readiness.detail}}</view></view>
         <view id="reminder-authorization" class="reminder-credits-panel">
           <view wx:if="{{subscription.templateCount && boot.member}}" class="reminder-balances">
-            <view class="reminder-balance"><text class="reminder-balance-label">到货</text><text class="reminder-balance-value">{{subscription.credits}}<text class="reminder-balance-unit"> 次</text></text></view>
-            <view wx:if="{{subscription.soldoutEnabled}}" class="reminder-balance"><text class="reminder-balance-label">断货</text><text class="reminder-balance-value">{{subscription.soldoutCredits}}<text class="reminder-balance-unit"> 次</text></text></view>
+            <view class="reminder-balance"><view class="reminder-balance-main"><text class="reminder-balance-label">到货</text><text class="reminder-balance-value">{{subscription.credits}}<text class="reminder-balance-unit"> 次</text></text></view><text class="reminder-balance-pending">{{authorization.pendingRestock ? '待同步 +' + authorization.pendingRestock : '已同步可用'}}</text></view>
+            <view wx:if="{{subscription.soldoutEnabled}}" class="reminder-balance"><view class="reminder-balance-main"><text class="reminder-balance-label">断货</text><text class="reminder-balance-value">{{subscription.soldoutCredits}}<text class="reminder-balance-unit"> 次</text></text></view><text class="reminder-balance-pending">{{authorization.pendingSoldout ? '待同步 +' + authorization.pendingSoldout : '已同步可用'}}</text></view>
           </view>
-          <button id="increase-reminders" class="btn {{readiness.action === 'subscribe' && !readiness.ready ? 'btn-primary' : 'btn-outline'}} btn-block" disabled="{{subscribing}}" loading="{{subscribing}}" bindtap="onSubscribe">{{subscribing ? '处理中…' : (subscriptionPending ? '同步授权' : (!subscription.templateCount ? '查看原因' : (boot.member ? '增加提醒次数' : '了解会员')))}}</button>
-          <view class="small text-2 authorization-hint">{{subscriptionPending ? '仅同步已有授权，不会重复增加次数。' : (!subscription.templateCount ? (boot.templateTitle || '待模板配置') : (boot.member ? (subscription.soldoutEnabled ? '两项都允许，到货和断货各 +1。建议保持各 10 次以上，避免错过提醒。' : '每次允许，到货提醒 +1。建议保持 10 次以上，避免错过提醒。') : '关注与到货提醒为会员专属'))}}</view>
+          <button id="increase-reminders" class="btn btn-primary btn-block" disabled="{{subscribing || authorization.storageBlocked}}" loading="{{subscribing}}" bindtap="onSubscribe">{{subscribing ? '等待微信授权…' : (!subscription.templateCount ? '查看原因' : (boot.member ? '增加提醒次数' : '了解会员'))}}</button>
+          <view class="authorization-feedback small" aria-live="polite">{{authorizationFeedback || (subscriptionPending ? '微信授权记录待同步，可继续点击。' : (boot.member && subscription.templateCount ? '微信允许后可继续点击，无需等待同步。' : ''))}}</view>
+          <view wx:if="{{authorization.errorMessage}}" class="authorization-sync-error" role="alert"><text>{{authorization.errorMessage}}</text><button wx:if="{{authorization.pendingCount || authorization.storageBlocked}}" class="ui-action" hover-class="ui-control-pressed" loading="{{authorization.syncing}}" disabled="{{authorization.syncing}}" bindtap="onRetryAuthorizationSync">重试同步</button></view>
+          <view class="small text-2 authorization-hint">{{!subscription.templateCount ? (boot.templateTitle || '待模板配置') : (boot.member ? (subscription.soldoutEnabled ? '每次允许，到货、断货各 +1；也可只允许其中一项。' : '每次允许，到货提醒 +1。') : '关注与到货提醒为会员专属')}}</view>
           <view wx:if="{{creditBoostTip}}" class="small credit-boost-tip">{{creditBoostTip}}</view>
         </view>
+        <view wx:if="{{readiness.action === 'subscribe' && readiness.code !== 'ready'}}" class="credit-notice"><text class="bold">{{readiness.title}}</text><view class="small text-2 mt">{{readiness.detail}}</view></view>
         <view class="health-summary"><view class="pill pill-{{readiness.tone}}">{{readiness.ready ? '提醒条件已就绪' : readiness.title}}</view><text class="small text-2">{{collector.state === 'running' ? '后台已连接，观测时间见配置卡' : '后台：' + collector.label}}</text></view>
         <block wx:if="{{showServiceDetails}}">
           <view id="reminder-service-details" class="service-row"><view class="service-heading"><text class="service-title">后台检测</text><view class="pill pill-dot pill-{{collector.cls}}">{{collector.label}}</view></view><view class="service-detail">{{collector.detail}}</view></view>

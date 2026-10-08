@@ -9,7 +9,8 @@ import { createRequire } from 'node:module';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../miniprogram');
 const require = createRequire(import.meta.url);
 const copy = value => JSON.parse(JSON.stringify(value));
-const boot = () => ({ identity: { isAdmin: false }, membership: { active: true, remainingMs: 86400000, expiresAt: '2027-01-01T00:00:00Z' },
+const settle = async () => { for (let i = 0; i < 8; i++) await new Promise(resolve => setImmediate(resolve)); };
+const boot = () => ({ identity: { isAdmin: false, userKey: 'consumer:frontend-regression' }, membership: { active: true, remainingMs: 86400000, expiresAt: '2027-01-01T00:00:00Z' },
   quota: { balance: 5, queryCost: 1, historyCost: 1, tasksDoneToday: [], dailyGrantCap: 2, balanceCap: 10, signedInToday: false },
   tasks: [], notifications: { enabled: true, deliveryReady: true, templateIds: { restock: 'template-A' } }, subscriptions: {}, collector: { state: 'running' },
   memberProduct: { enabled: false, paymentReady: false, paymentReason: '会员购买暂未开放', priceFen: 900, days: 30 },
@@ -102,8 +103,9 @@ test('subscription retry reuses authorization request ID without prompting WeCha
   let n = 0, prompts = 0;
   const rt = runtime(async action => { if (action === 'notify.recordSubscription') { if (++n === 1) throw Error('lost response'); return { accepted: ['template-A'], subscriptions: { 'template-A': { credits: 1 } } }; } return boot(); });
   rt.wx.requestSubscribeMessage = async () => { prompts++; return { 'template-A': 'accept' }; };
+  rt.app.globalData.bootstrap = boot();
   const page = rt.instance('pages/follow/index.js'); page.data.boot = { member: true, templateIds: ['template-A'] };
-  await page.onSubscribe(); await page.onSubscribe();
+  await page.onSubscribe(); await settle(); await page.onRetryAuthorizationSync(); await settle();
   const calls = rt.calls.filter(c => c.action === 'notify.recordSubscription');
   assert.equal(prompts, 1); assert.equal(calls[0].payload.requestId, calls[1].payload.requestId); assert.equal(page.data.subscriptionPending, false);
 });
@@ -118,12 +120,13 @@ test('a permanently rejected old subscription is cleared and a new template can 
     }
     return b;
   });
-  rt.storage.set('gxs_subscription_pending_v1', { requestId: 'old-request-001', results: { 'template-old': 'accept' } });
+  rt.app.globalData.bootstrap = b;
+  rt.storage.set('gxs_subscription_pending_v1', { requestId: 'old-request-001', userKey: b.identity.userKey, createdAt: new Date().toISOString(), results: { 'template-old': 'accept' } });
   rt.wx.requestSubscribeMessage = async ({ tmplIds }) => { prompts++; assert.deepEqual(copy(tmplIds), ['template-new']); return { 'template-new': 'accept' }; };
-  const page = rt.instance('pages/follow/index.js'); page.data.boot = { member: true, templateIds: ['template-old'] };
-  await page.onSubscribe();
+  const page = rt.instance('pages/follow/index.js'); page.applyBoot(b);
+  await page.onRetryAuthorizationSync(); await settle();
   assert.equal(prompts, 0); assert.equal(page.data.subscriptionPending, false); assert.equal(rt.storage.has('gxs_subscription_pending_v1'), false);
-  await page.onSubscribe();
+  await page.onSubscribe(); await settle();
   assert.equal(prompts, 1); assert.equal(page.data.subscription.credits, 1);
 });
 

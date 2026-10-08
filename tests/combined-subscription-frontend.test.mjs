@@ -5,9 +5,11 @@ import vm from 'node:vm';
 import { runtime } from './helpers/miniprogram-runtime.mjs';
 
 const RESTOCK = 'restock-A', SOLDOUT = 'soldout-B';
+const settle = async () => { for (let i = 0; i < 40; i++) await Promise.resolve(); };
 const copy = value => JSON.parse(JSON.stringify(value));
 const subscriptions = (restock, soldout) => ({ [RESTOCK]: { credits: restock }, [SOLDOUT]: { credits: soldout } });
 const boot = (restock = 5, soldout = 5, patch = {}) => ({
+  identity: { userKey: 'consumer:user-a' },
   membership: { active: true, expiresAt: '2027-01-01T00:00:00Z' },
   notifications: { enabled: true, deliveryReady: true, templateIds: { restock: RESTOCK, soldout: SOLDOUT } },
   subscriptions: subscriptions(restock, soldout), collector: { state: 'running' },
@@ -15,13 +17,15 @@ const boot = (restock = 5, soldout = 5, patch = {}) => ({
   limits: { maxFollows: 3, maxStoresPerFollow: 3 }, ...patch,
 });
 function pageFor(rt, data = boot()) {
+  rt.app.globalData.bootstrap = data;
   const page = rt.instance('pages/follow/index.js');
   page.visible = true;
   page.setData({ ready: true, followsLoaded: true, follows: [{ followId: 'f1', partNumber: 'SKU-A', status: 'active', stores: [{ storeNumber: 'R001' }] }] });
   page.applyBoot(data);
+  rt.currentPage = page;
   return page;
 }
-const feedback = rt => rt.messages.filter(message => typeof message === 'string').at(-1);
+const feedback = rt => rt.currentPage.data.authorizationFeedback;
 
 test('an accepted template is recorded even when WeChat filters the other template', async () => {
   const rt = runtime(async (action, payload) => {
@@ -31,7 +35,7 @@ test('an accepted template is recorded even when WeChat filters the other templa
   });
   rt.wx.requestSubscribeMessage = async () => ({ [RESTOCK]: 'accept', [SOLDOUT]: 'filter' });
   const page = pageFor(rt);
-  await page.onSubscribe();
+  await page.onSubscribe(); await settle();
   assert.equal(page.data.subscription.credits, 6);
   assert.equal(page.data.subscription.soldoutCredits, 3);
   assert.match(feedback(rt), /到货 \+1，断货模板被过滤/);
@@ -42,7 +46,7 @@ test('all filtered templates do not create an empty pending authorization or los
   const rt = runtime();
   rt.wx.requestSubscribeMessage = async () => ({ [RESTOCK]: 'filter', [SOLDOUT]: 'filter' });
   const page = pageFor(rt, boot(15, 15));
-  await page.onSubscribe();
+  await page.onSubscribe(); await settle();
   assert.equal(page.data.subscription.credits, 15);
   assert.equal(page.data.subscription.soldoutCredits, 15);
   assert.equal(page.data.subscribing, false);
@@ -65,7 +69,7 @@ for (const [restockResult, soldoutResult, expected] of [
     const requests = [];
     rt.wx.requestSubscribeMessage = async options => { requests.push(copy(options)); return results; };
     const page = pageFor(rt, boot(5, 3));
-    await page.onSubscribe();
+    await page.onSubscribe(); await settle();
     assert.equal(requests.length, 1);
     assert.deepEqual(requests[0].tmplIds, [RESTOCK, SOLDOUT]);
     const records = rt.calls.filter(call => call.action === 'notify.recordSubscription');
@@ -87,7 +91,7 @@ for (const banned of ['restock', 'soldout']) {
       : boot(8, 7));
     rt.wx.requestSubscribeMessage = async () => results;
     const page = pageFor(rt);
-    await page.onSubscribe();
+    await page.onSubscribe(); await settle();
     const text = feedback(rt), bannedLabel = banned === 'restock' ? '到货' : '断货', acceptedLabel = banned === 'restock' ? '断货' : '到货';
     assert.match(text, new RegExp(`${bannedLabel}(?:[^，。；]*)(?:未授权|关闭|未增加)`));
     assert.ok(text.includes(`${acceptedLabel} +1`), text);
@@ -100,7 +104,7 @@ test('a free account is blocked from authorization and asked to become a member'
   const trial = boot(0, 0, { membership: { active: false, expiresAt: null }, freeReminder: false, limits: { maxFollows: 0, maxStoresPerFollow: 3 } });
   const rt = runtime();
   const page = pageFor(rt, trial);
-  await page.onSubscribe();
+  await page.onSubscribe(); await settle();
   assert.equal(rt.calls.filter(call => call.action === 'notify.recordSubscription').length, 0);
   assert.equal(page.data.readiness.code, 'membership');
   assert.match(page.data.readiness.title, /会员专属/);
@@ -139,7 +143,7 @@ test('accepting only restock enables reminders without requiring optional sold-o
     return { [RESTOCK]: 'accept', [SOLDOUT]: 'reject' };
   };
   const page = pageFor(rt, boot(0, 0));
-  await page.onSubscribe();
+  await page.onSubscribe(); await settle();
   assert.equal(prompts, 1);
   assert.equal(page.data.readiness.ready, true);
   assert.equal(page.data.readiness.code, 'low_credit');
@@ -223,13 +227,13 @@ test('uncertain dual-template synchronization retries the same record without a 
   });
   rt.wx.requestSubscribeMessage = async () => { prompts++; return { [RESTOCK]: 'accept', [SOLDOUT]: 'accept' }; };
   const page = pageFor(rt, boot(5, 3));
-  await page.onSubscribe();
+  await page.onSubscribe(); await settle();
   assert.equal(page.data.subscriptionPending, true);
   assert.equal(page.data.subscription.credits, 5);
   assert.equal(page.data.subscription.soldoutCredits, 3);
   const saved = rt.load('utils/reminder-credits.js').readPending();
   assert.deepEqual(copy(saved.results), { [RESTOCK]: 'accept', [SOLDOUT]: 'accept' });
-  await page.onSubscribe();
+  await page.onRetryAuthorizationSync(); await settle();
   const records = rt.calls.filter(call => call.action === 'notify.recordSubscription');
   assert.equal(prompts, 1);
   assert.equal(records.length, 2);
@@ -248,12 +252,12 @@ test('rapid taps of the combined button share one native prompt and one dual-tem
     ? { accepted: [RESTOCK, SOLDOUT], subscriptions: subscriptions(6, 6) } : boot(6, 6));
   rt.wx.requestSubscribeMessage = options => { requested.push(copy(options)); return new Promise(resolve => { resolveConsent = resolve; }); };
   const page = pageFor(rt), pending = page.onSubscribe();
-  await page.onSubscribe();
+  await page.onSubscribe(); await settle();
   assert.equal(requested.length, 1);
   assert.deepEqual(requested[0].tmplIds, [RESTOCK, SOLDOUT]);
   assert.equal(rt.calls.length, 0);
   resolveConsent({ [RESTOCK]: 'accept', [SOLDOUT]: 'accept' });
-  await pending;
+  await pending; await settle();
   assert.equal(rt.calls.filter(call => call.action === 'notify.recordSubscription').length, 1);
   assert.equal(page.data.subscribing, false);
 });
@@ -267,7 +271,7 @@ for (const accepted of ['restock', 'soldout']) {
       ? { accepted: [id], subscriptions: balances } : boot(balances[RESTOCK].credits, balances[SOLDOUT].credits));
     rt.wx.requestSubscribeMessage = async () => results;
     const page = pageFor(rt, boot(5, 3));
-    await page.onSubscribe();
+    await page.onSubscribe(); await settle();
     assert.deepEqual(rt.calls.find(call => call.action === 'notify.recordSubscription').payload.results, results);
     assert.equal(page.data.subscription.credits, balances[RESTOCK].credits);
     assert.equal(page.data.subscription.soldoutCredits, balances[SOLDOUT].credits);
@@ -281,29 +285,32 @@ test('a queued restock-only silent grant keeps its ID and explains that sold-out
   const rt = runtime(async action => action === 'notify.recordSubscription'
     ? { accepted: [RESTOCK], subscriptions: subscriptions(6, 0) } : boot(6, 0));
   const saved = { requestId: 'ns-pending-restock-only', results: { [RESTOCK]: 'accept' } };
+  rt.app.globalData.bootstrap = boot(5, 0);
   rt.load('utils/reminder-credits.js').savePending(saved);
   let prompts = 0;
   rt.wx.requestSubscribeMessage = async () => { prompts++; return {}; };
   const page = pageFor(rt, boot(5, 0));
-  await page.onSubscribe();
+  await page.onRetryAuthorizationSync(); await settle();
   assert.equal(prompts, 0);
-  assert.deepEqual(rt.calls.find(call => call.action === 'notify.recordSubscription').payload, saved);
+  assert.deepEqual(rt.calls.find(call => call.action === 'notify.recordSubscription').payload.results, saved.results);
+  assert.equal(rt.calls.find(call => call.action === 'notify.recordSubscription').payload.requestId, saved.requestId);
   assert.equal(page.data.subscription.credits, 6);
   assert.equal(page.data.subscription.soldoutCredits, 0);
   assert.equal(page.data.readiness.code, 'restock_ready');
   assert.equal(page.data.readiness.ready, true);
-  assert.match(feedback(rt), /到货 \+1/);
-  assert.match(feedback(rt), /断货(?:[^，。；]*)(?:未授权|未增加|未返回)/);
+  assert.match(feedback(rt), /已同步/);
+  assert.doesNotMatch(feedback(rt), /\+1/);
 });
 
 test('replayed authorization uses the current server balances even when both original grants have already been consumed', async () => {
   const rt = runtime(async action => action === 'notify.recordSubscription'
     ? { accepted: [], replayed: true, subscriptions: subscriptions(0, 0) } : boot(0, 0));
+  rt.app.globalData.bootstrap = boot(5, 3);
   rt.load('utils/reminder-credits.js').savePending({ requestId: 'ns-pending-already-used', results: { [RESTOCK]: 'accept', [SOLDOUT]: 'accept' } });
   let prompts = 0;
   rt.wx.requestSubscribeMessage = async () => { prompts++; return {}; };
   const page = pageFor(rt, boot(5, 3));
-  await page.onSubscribe();
+  await page.onRetryAuthorizationSync(); await settle();
   assert.equal(prompts, 0);
   assert.equal(page.data.subscription.credits, 0);
   assert.equal(page.data.subscription.soldoutCredits, 0);
@@ -319,7 +326,7 @@ test('rejecting or banning both choices preserves the confirmed balances and nev
     ? { accepted: [], subscriptions: subscriptions(5, 3) } : boot(5, 3));
   rt.wx.requestSubscribeMessage = async () => results;
   const page = pageFor(rt, boot(5, 3));
-  await page.onSubscribe();
+  await page.onSubscribe(); await settle();
   assert.equal(page.data.subscription.credits, 5);
   assert.equal(page.data.subscription.soldoutCredits, 3);
   assert.deepEqual(rt.calls.find(call => call.action === 'notify.recordSubscription').payload.results, results);
@@ -329,17 +336,15 @@ test('rejecting or banning both choices preserves the confirmed balances and nev
 });
 
 for (const accepted of [[RESTOCK], [SOLDOUT], []]) {
-  test(`only server-confirmed template grants are announced when the client accepted both: ${accepted.join(',') || 'none'}`, async () => {
+  test(`the balance uses server confirmation while inline feedback labels the native consent: ${accepted.join(',') || 'none'}`, async () => {
     const balances = subscriptions(accepted.includes(RESTOCK) ? 6 : 5, accepted.includes(SOLDOUT) ? 4 : 3);
     const rt = runtime(async action => action === 'notify.recordSubscription'
       ? { accepted, subscriptions: balances } : boot(balances[RESTOCK].credits, balances[SOLDOUT].credits));
     rt.wx.requestSubscribeMessage = async () => ({ [RESTOCK]: 'accept', [SOLDOUT]: 'accept' });
     const page = pageFor(rt, boot(5, 3));
-    await page.onSubscribe();
+    await page.onSubscribe(); await settle();
     const text = feedback(rt);
-    for (const [id, label] of [[RESTOCK, '到货'], [SOLDOUT, '断货']]) {
-      assert.equal(text.includes(`${label} +1`), accepted.includes(id), text);
-    }
+    assert.match(text, /微信已允许：到货 \+1，断货 \+1/);
     assert.equal(page.data.subscription.credits, balances[RESTOCK].credits);
     assert.equal(page.data.subscription.soldoutCredits, balances[SOLDOUT].credits);
   });

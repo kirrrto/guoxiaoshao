@@ -1,0 +1,357 @@
+{
+  "recordedAt": "2026-10-08T09:49:30.515Z",
+  "version": "1.6.1",
+  "baseCommit": "6fdb9afd01df7d7baa99878ce59324f14136c329",
+  "change": "Separate native consent from queued server recording; keep balances authoritative and use the shared primary green button",
+  "files": {
+    "cloudfunctions/gxs_api/lib/services/notify.js": "5a70b5b17a714a0973179e872c364a2b76ee7a537b0c6738e16eea5d1dfac8c6",
+    "miniprogram/components/reminder-nudge/index.js": "e3c32d76f099d2c3486e24c18c1452fc145b70e9104731cdd1494b82afba09bc",
+    "miniprogram/config/release-notes.js": "3c122ec8b7a5fe145c66017527a100c83457e6f452832d705e1e855afe6eb81b",
+    "miniprogram/pages/follow/index.js": "3f87edf8a56adc6f31b4cabdc1507cb8d289642d4d0cdc16940d328d195ba272",
+    "miniprogram/pages/follow/index.wxml": "e85d0b60a6b20c69d50c21ace32e7385f5f537613e052cef841e0b2feb647b5b",
+    "miniprogram/pages/follow/index.wxss": "fc2f441a0ee1b556d6da2396eee43842a8aa67d112c9efbcbf193f5341a82b15",
+    "miniprogram/utils/reminder-credits.js": "a5917858ddc8b3bf38346b3907c3181f1f6333463f46e017117c8b39ca7a3e0b",
+    "miniprogram/utils/reminder-readiness.js": "3ae5e7f702247b9d54bc34873d33ca61befebeffd7a12393216ec751fd17e65f"
+  },
+  "tests": {
+    "total": 1188,
+    "passed": 1188,
+    "failed": 0,
+    "finalButtonRelatedTests": 40
+  },
+  "source": {
+    "files": 427,
+    "errors": 0
+  },
+  "release": {
+    "passed": true,
+    "passedChecks": 45,
+    "totalChecks": 45,
+    "monitorFiles": 38
+  },
+  "layouts": {
+    "light": {
+      "total": 60,
+      "expressionErrors": 0,
+      "missingText": 0,
+      "horizontalOverflow": 0,
+      "clippedText": 0,
+      "failedImages": 0,
+      "alternativeLayoutFailures": 0
+    },
+    "dark": {
+      "total": 60,
+      "expressionErrors": 0,
+      "missingText": 0,
+      "horizontalOverflow": 0,
+      "clippedText": 0,
+      "failedImages": 0,
+      "alternativeLayoutFailures": 0
+    },
+    "buttonPosition": {
+      "renderer": "Offline WXML/WXSS approximation; not a WeChat physical-device performance measurement",
+      "passed": true,
+      "rows": [
+        {
+          "colorScheme": "light",
+          "width": 320,
+          "positions": [
+            {
+              "count": 0,
+              "top": 306.484375,
+              "height": 44
+            },
+            {
+              "count": 1,
+              "top": 306.484375,
+              "height": 44
+            },
+            {
+              "count": 9,
+              "top": 306.484375,
+              "height": 44
+            },
+            {
+              "count": 10,
+              "top": 306.484375,
+              "height": 44
+            },
+            {
+              "count": 99,
+              "top": 306.484375,
+              "height": 44
+            },
+            {
+              "count": 100,
+              "top": 306.484375,
+              "height": 44
+            }
+          ],
+          "delta": 0,
+          "passed": true
+        },
+        {
+          "colorScheme": "light",
+          "width": 375,
+          "positions": [
+            {
+              "count": 0,
+              "top": 333.5,
+              "height": 48
+            },
+            {
+              "count": 1,
+              "top": 333.5,
+              "height": 48
+            },
+            {
+              "count": 9,
+              "top": 333.5,
+              "height": 48
+            },
+            {
+              "count": 10,
+              "top": 333.5,
+              "height": 48
+            },
+            {
+              "count": 99,
+              "top": 333.5,
+              "height": 48
+            },
+            {
+              "count": 100,
+              "top": 333.5,
+              "height": 48
+            }
+          ],
+          "delta": 0,
+          "passed": true
+        },
+        {
+          "colorScheme": "light",
+          "width": 430,
+          "positions": [
+            {
+              "count": 0,
+              "top": 360.78125,
+              "height": 55.03125
+            },
+            {
+              "count": 1,
+              "top": 360.78125,
+              "height": 55.03125
+            },
+            {
+              "count": 9,
+              "top": 360.78125,
+              "height": 55.03125
+            },
+            {
+              "count": 10,
+              "top": 360.78125,
+              "height": 55.03125
+            },
+            {
+              "count": 99,
+              "top": 360.78125,
+              "height": 55.03125
+            },
+            {
+              "count": 100,
+              "top": 360.78125,
+              "height": 55.03125
+            }
+          ],
+          "delta": 0,
+          "passed": true
+        },
+        {
+          "colorScheme": "dark",
+          "width": 320,
+          "positions": [
+            {
+              "count": 0,
+              "top": 306.484375,
+              "height": 44
+            },
+            {
+              "count": 1,
+              "top": 306.484375,
+              "height": 44
+            },
+            {
+              "count": 9,
+              "top": 306.484375,
+              "height": 44
+            },
+            {
+              "count": 10,
+              "top": 306.484375,
+              "height": 44
+            },
+            {
+              "count": 99,
+              "top": 306.484375,
+              "height": 44
+            },
+            {
+              "count": 100,
+              "top": 306.484375,
+              "height": 44
+            }
+          ],
+          "delta": 0,
+          "passed": true
+        },
+        {
+          "colorScheme": "dark",
+          "width": 375,
+          "positions": [
+            {
+              "count": 0,
+              "top": 333.5,
+              "height": 48
+            },
+            {
+              "count": 1,
+              "top": 333.5,
+              "height": 48
+            },
+            {
+              "count": 9,
+              "top": 333.5,
+              "height": 48
+            },
+            {
+              "count": 10,
+              "top": 333.5,
+              "height": 48
+            },
+            {
+              "count": 99,
+              "top": 333.5,
+              "height": 48
+            },
+            {
+              "count": 100,
+              "top": 333.5,
+              "height": 48
+            }
+          ],
+          "delta": 0,
+          "passed": true
+        },
+        {
+          "colorScheme": "dark",
+          "width": 430,
+          "positions": [
+            {
+              "count": 0,
+              "top": 360.78125,
+              "height": 55.03125
+            },
+            {
+              "count": 1,
+              "top": 360.78125,
+              "height": 55.03125
+            },
+            {
+              "count": 9,
+              "top": 360.78125,
+              "height": 55.03125
+            },
+            {
+              "count": 10,
+              "top": 360.78125,
+              "height": 55.03125
+            },
+            {
+              "count": 99,
+              "top": 360.78125,
+              "height": 55.03125
+            },
+            {
+              "count": 100,
+              "top": 360.78125,
+              "height": 55.03125
+            }
+          ],
+          "delta": 0,
+          "passed": true
+        }
+      ]
+    }
+  },
+  "cloud": {
+    "deployed": true,
+    "changedFunction": "gxs_api",
+    "changedFiles": [
+      "lib/services/notify.js"
+    ],
+    "verified": true,
+    "checkedAt": "2026-10-08T09:48:20.198Z",
+    "functions": [
+      {
+        "name": "gxs_api",
+        "passed": true,
+        "comparedFiles": 68,
+        "installedSdk": "4.0.2",
+        "freshness": "fresh post-deploy API download"
+      },
+      {
+        "name": "gxs_monitor",
+        "passed": true,
+        "comparedFiles": 41,
+        "installedSdk": "4.0.2",
+        "freshness": "reused earlier slow-query post-deploy backup; not a fresh download for this change"
+      },
+      {
+        "name": "cloudbase_auth",
+        "passed": true,
+        "comparedFiles": 3,
+        "installedSdk": "4.0.2",
+        "freshness": "reused earlier slow-query post-deploy backup; not a fresh download for this change"
+      }
+    ],
+    "metadata": {
+      "verified": true,
+      "checks": {
+        "FunctionName": true,
+        "Namespace": true,
+        "Runtime": true,
+        "Handler": true,
+        "Timeout": true,
+        "MemorySize": true,
+        "Type": true,
+        "InstallDependency": true,
+        "Layers": true,
+        "InstanceConcurrencyConfig": true,
+        "VpcConfig": true,
+        "PublicNetConfig": true,
+        "environmentNamesAndLengths": true,
+        "triggers": true,
+        "active": true
+      },
+      "scope": "Configuration fields, triggers, and environment names/value lengths only. Secret values were not requested or compared."
+    },
+    "beforeBackupZipSha256": "7de0677ac1fdb4e94bfcdf9a54316a117ad24cfe76062c1974142cbfe08aba92",
+    "scope": "Only API was changed and freshly downloaded; monitor/auth code comparisons reuse the earlier slow-query download."
+  },
+  "client": {
+    "appid": "wxe96ad9e77b602f1b",
+    "previewSucceeded": true,
+    "previewPackageBytes": 772027,
+    "previewScope": "Native preview completed before the final primary-button class change; final code was compiled in the successful upload.",
+    "uploadSucceeded": true,
+    "uploadedAt": "2026-10-08T09:47:40.770Z",
+    "packageBytes": 771958,
+    "reviewSubmitted": false,
+    "formallyPublished": false
+  },
+  "limits": [
+    "Each grant requires a real WeChat authorization result; there is no native authorization loop or +10/+100 quantity multiplier.",
+    "Pending queue is capped at 100 records and expires after 7 days, within the existing server receipt retention window.",
+    "No physical-device latency, actual message delivery, review approval or production-publication acceptance is claimed."
+  ]
+}

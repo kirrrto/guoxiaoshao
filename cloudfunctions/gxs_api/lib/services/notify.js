@@ -19,6 +19,11 @@ const FEEDBACK = ['bought', 'missed', 'skipped'];
  */
 async function recordSubscription(ctx, payload) {
   const user = await ensureUser(ctx);
+  // A persisted grant belongs to the account that saw the native consent.
+  // Older clients omit this field; new queues must never cross accounts.
+  if (payload && Object.prototype.hasOwnProperty.call(payload, 'expectedUserKey') && payload.expectedUserKey !== user._id) {
+    throw new ApiError('subscription_account_changed', '账户已变化，请切回原账户同步提醒授权');
+  }
   const results = payload && payload.results && typeof payload.results === 'object' ? payload.results : null;
   if (!results || Array.isArray(results)) throw new ApiError('invalid_payload', 'results 需为模板ID→结果 映射');
   if (!/^[A-Za-z0-9_-]{8,64}$/.test(payload.requestId || '')) throw new ApiError('invalid_request_id', '授权请求需要有效 requestId');

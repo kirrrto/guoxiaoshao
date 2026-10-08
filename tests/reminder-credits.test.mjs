@@ -5,6 +5,7 @@ import { runtime } from './helpers/miniprogram-runtime.mjs';
 const settle = async () => { for (let i = 0; i < 5; i++) await new Promise(resolve => setImmediate(resolve)); };
 const PENDING = 'gxs_subscription_pending_v1';
 const boot = (patch = {}) => ({
+  identity: { userKey: 'consumer:reminder-tests' },
   membership: { active: true, expiresAt: '2027-01-01T00:00:00Z' },
   notifications: { enabled: true, deliveryReady: true, templateIds: { restock: 'restock-A' } },
   collector: { state: 'running' }, subscriptions: {}, settings: { notifyEnabled: true, dnd: { enabled: false } },
@@ -48,7 +49,7 @@ test('silent top-up never prompts non-members, users without "always keep", or w
     assert.equal(s.prompts(), 0);
   }
   const s = setup();
-  s.rt.storage.set(PENDING, { requestId: 'waiting-000001', results: { 'restock-A': 'accept' } });
+  s.credits.savePending({ requestId: 'waiting-000001', results: { 'restock-A': 'accept' } });
   assert.equal(s.credits.topUpReminderCredit(), false);
   assert.equal(s.prompts(), 0);
 });
@@ -84,6 +85,7 @@ test('members accumulate reminders by tapping repeatedly; each tap is its own re
   page.setData({ followsLoaded: true, follows: [{ followId: 'f1', partNumber: 'SKU-A', status: 'active', stores: [] }] });
   page.applyBoot(boot());
   for (let i = 0; i < 3; i++) await page.onSubscribe();
+  await settle();
   assert.equal(s.prompts(), 3);
   assert.equal(new Set(s.records().map(call => call.payload.requestId)).size, 3);
   assert.equal(page.data.subscription.credits, 3);
@@ -117,13 +119,14 @@ test('reminders are member-only: non-members get the membership prompt and nothi
   assert.equal(page.data.readiness.code, 'membership');
   // A saved request from before expiry is refused by the server and released.
   const expired = setup({ handler: async action => { if (action === 'notify.recordSubscription') throw Object.assign(Error('member only'), { code: 'membership_required' }); return boot({ membership: { active: false, expiresAt: '2026-09-01T00:00:00Z' } }); } });
-  expired.rt.storage.set(PENDING, { requestId: 'before-expiry-01', results: { 'restock-A': 'accept' } });
+  expired.credits.savePending({ requestId: 'before-expiry-01', results: { 'restock-A': 'accept' } });
   const stale = expired.rt.instance('pages/follow/index.js');
   stale.applyBoot(boot());
-  await stale.onSubscribe();
+  stale.observeAuthorization();
+  await stale.onRetryAuthorizationSync();
   assert.equal(expired.prompts(), 0); assert.equal(expired.rt.storage.has(PENDING), false);
   assert.equal(stale.data.subscriptionPending, false);
-  assert.equal(expired.rt.messages.at(-1).title, '关注与到货提醒为会员专属');
+  assert.match(stale.data.authorization.errorMessage, /member only/);
 });
 
 test('a free account cannot follow or authorize; membership is required', async () => {
@@ -160,6 +163,7 @@ test('members authorize restock and sell-out alerts in one prompt', async () => 
   page.setData({ followsLoaded: true, follows: [{ followId: 'f1', partNumber: 'SKU-A', status: 'active', stores: [] }] });
   page.applyBoot(boot({ notifications: both }));
   await page.onSubscribe();
+  await settle();
   assert.deepEqual(JSON.parse(JSON.stringify(requested.at(-1))), ['restock-A', 'soldout-B']);
   assert.deepEqual(JSON.parse(JSON.stringify(s.records().at(-1).payload.results)), { 'restock-A': 'accept', 'soldout-B': 'accept' });
   assert.equal(page.data.subscription.credits, 3);

@@ -203,7 +203,7 @@ if (alternativesPreview) scenarios.splice(0, scenarios.length, 'alternatives-def
 if (nudgePreview) scenarios.splice(0, scenarios.length, 'nudge-restock', 'nudge-both', 'nudge-one');
 const names = nudgePreview ? { mine: '我的' } : alternativesPreview ? { query: '查询' } : notificationTestPreview ? { 'notification-test': '通知测试' } : adminPreview ? { admin: '运营工具' } : onboardingPreview ? { query: '查询' } : paymentPreview || orderRecordsPreview ? { mine: '我的' } : historyDataPreview ? { history: '历史' } : historyTaskPreview ? { history: '历史', mine: '我的' } : stockPreview || monitoringPreview ? { follow: '小哨提醒' } : reminderPreview || redemptionPreview || releaseNotesPreview ? { mine: '我的' } : { query: '查询', follow: '小哨提醒', history: '历史', mine: '我的' };
 if (sheetPreview) delete names.mine;
-if (monitoringPreview) scenarios.push('monitor-no-follows', 'monitor-all-paused', 'monitor-user-disabled', 'monitor-dnd', 'monitor-free-account', 'monitor-alert', 'monitor-dual-ready', 'monitor-dual-soldout-empty', 'monitor-dual-restock-empty', 'monitor-dual-soldout-low', 'monitor-dual-pending');
+if (monitoringPreview) scenarios.push('monitor-no-follows', 'monitor-all-paused', 'monitor-user-disabled', 'monitor-dnd', 'monitor-free-account', 'monitor-alert', 'monitor-dual-ready', 'monitor-dual-soldout-empty', 'monitor-dual-restock-empty', 'monitor-dual-soldout-low', 'monitor-dual-pending', 'monitor-dual-native', 'monitor-dual-sync-error', 'monitor-dual-storage-error');
 fs.mkdirSync(out, { recursive: true });
 const manifest = [];
 
@@ -457,7 +457,17 @@ for (const scenario of scenarios) {
     }
     // Combined authorization must remain visible with service details collapsed.
     if (pageName === 'follow' && monitoringPreview) {
-      page.setData({ showServiceDetails: !scenario.startsWith('monitor-dual-'), subscriptionPending: scenario === 'monitor-dual-pending' });
+      page.setData({ showServiceDetails: !scenario.startsWith('monitor-dual-') });
+      if (['monitor-dual-pending', 'monitor-dual-native', 'monitor-dual-sync-error', 'monitor-dual-storage-error'].includes(scenario)) {
+        page.setData({ authorizationSession: true, authorizationPanelFirst: true, authorizationFeedback: '微信已允许：到货 +1，断货 +1' });
+        page.applyAuthorizationState({
+          nativeBusy: scenario === 'monitor-dual-native', syncing: scenario === 'monitor-dual-pending', pendingCount: 100,
+          acceptedByTemplate: { 'offline-template-example': 100, 'offline-soldout-template': 99 },
+          error: scenario === 'monitor-dual-sync-error' ? { code: 'timeout', message: '网络较慢，授权记录尚未同步。' }
+            : scenario === 'monitor-dual-storage-error' ? { code: 'subscription_storage_failed', message: '授权尚未保存，请保持小程序开启并重试同步。' } : null,
+          storageBlocked: scenario === 'monitor-dual-storage-error',
+        });
+      }
       page.refreshReadiness();
     }
     // Stock audits deliberately open per-card details to verify retained
@@ -603,11 +613,14 @@ for (const scenario of scenarios) {
         'monitor-dnd': ['当前处于免打扰时段', '查看免打扰设置'],
         'monitor-free-account': ['关注与到货提醒为会员专属', '了解会员', '免费用户'],
         'monitor-alert': ['到货提醒', '确认补货', '2 分钟前', '可取货', '复制型号和门店', '增加提醒次数', '买到了吗？'],
-        'monitor-dual-ready': ['提醒条件已就绪', '到货 8 次', '断货 5 次', '增加提醒次数', '两项都允许'],
-        'monitor-dual-soldout-empty': ['断货提醒暂无次数', '到货提醒还可发送 8 次', '增加提醒次数'],
+        'monitor-dual-ready': ['提醒条件已就绪', '到货 8 次', '断货 5 次', '增加提醒次数', '每次允许'],
+        'monitor-dual-soldout-empty': ['断货提醒为可选项', '到货提醒还可发送 8 次', '增加提醒次数'],
         'monitor-dual-restock-empty': ['到货提醒暂无次数', '断货提醒还可发送 5 次', '增加提醒次数'],
         'monitor-dual-soldout-low': ['断货提醒只剩 1 次', '增加提醒次数'],
-        'monitor-dual-pending': ['授权记录等待同步', '同步授权'],
+        'monitor-dual-pending': ['待同步', '增加提醒次数', '到货 8 次', '断货 5 次'],
+        'monitor-dual-native': ['待同步', '到货 8 次', '断货 5 次'],
+        'monitor-dual-sync-error': ['待同步', '重试同步', '增加提醒次数'],
+        'monitor-dual-storage-error': ['授权暂存在本次运行', '重试同步'],
       }[scenario]] : paymentPreview ? ['兑换码开通', ...(!page.data.membership.active || page.data.membershipUpgradeOpen || page.data.paymentPendingId ? ['周卡', '月卡', '年卡', '¥7.00', '¥19.90', '¥200.00'] : ['升级长期套餐', '续费会员']), ...{
         'payment-ready': ['立即开通', '选择会员时长', '付款确认后生效'], 'payment-renew': ['续费会员', '确认续费', '在原到期时间后增加 7 天', '剩余有效期继续保留'],
         'payment-blocked': ['付费购买暂未开放'], 'payment-old-ios': ['iOS 15'],

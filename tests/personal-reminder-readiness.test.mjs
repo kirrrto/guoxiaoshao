@@ -6,7 +6,7 @@ const require = createRequire(import.meta.url);
 const { reminderReadiness, restockSubscription, notificationAdvice } = require('../miniprogram/utils/reminder-readiness.js');
 const copy = value => JSON.parse(JSON.stringify(value));
 const active = (id = 'f1', stores = ['R001']) => ({ followId: id, partNumber: id, status: 'active', stores: stores.map(storeNumber => ({ storeNumber })) });
-const boot = patch => ({ membership: { active: true, expiresAt: '2027-01-01T00:00:00Z' }, collector: { state: 'running' }, notifications: { enabled: true, deliveryReady: true, templateIds: { restock: 'A', other: 'B' } }, subscriptions: { A: { credits: 1 }, B: { credits: 9 } }, settings: { notifyEnabled: true, dnd: { enabled: false } }, limits: { maxFollows: 3, maxStoresPerFollow: 3 }, ...patch });
+const boot = patch => ({ identity: { userKey: 'consumer:readiness' }, membership: { active: true, expiresAt: '2027-01-01T00:00:00Z' }, collector: { state: 'running' }, notifications: { enabled: true, deliveryReady: true, templateIds: { restock: 'A', other: 'B' } }, subscriptions: { A: { credits: 1 }, B: { credits: 9 } }, settings: { notifyEnabled: true, dnd: { enabled: false } }, limits: { maxFollows: 3, maxStoresPerFollow: 3 }, ...patch });
 const state = patch => ({ boot: { member: true }, followsLoaded: true, follows: [active()], collector: { state: 'running' }, delivery: { cls: 'ok' }, settings: { notifyEnabled: true }, subscription: { templateCount: 1, credits: 1 }, ...patch });
 
 test('a live collector heartbeat cannot claim readiness when actual stock observations have stalled', () => {
@@ -39,12 +39,14 @@ test('personal readiness distinguishes loading, no follows and all paused from h
 test('other-template credits cannot make restock delivery ready or appear in requested template IDs', async () => {
   assert.deepEqual(restockSubscription({ templateIds: { restock: 'A', other: 'B' } }, { A: { credits: 0 }, B: { credits: 50 } }), { templateIds: ['A'], templateCount: 1, credits: 0 });
   const rt = runtime(async action => action === 'notify.recordSubscription' ? { accepted: ['A'], subscriptions: { A: { credits: 1 }, B: { credits: 50 } } } : boot());
+  rt.app.globalData.bootstrap = boot();
   const page = rt.instance('pages/follow/index.js'); page.setData({ followsLoaded: true, follows: [active()] });
   page.applyBoot(boot({ subscriptions: { A: { credits: 0 }, B: { credits: 50 } } }));
   assert.equal(page.data.readiness.code, 'no_credit'); assert.equal(page.data.subscription.credits, 0);
   let requested;
   rt.wx.requestSubscribeMessage = async value => { requested = copy(value); return { A: 'accept' }; };
   await page.onReadinessAction();
+  for (let i = 0; i < 8; i++) await new Promise(resolve => setImmediate(resolve));
   assert.deepEqual(requested.tmplIds, ['A']); assert.equal(page.data.subscription.credits, 1); assert.equal(page.data.readiness.ready, true);
 });
 
@@ -53,7 +55,9 @@ test('template and sender blockers explain service configuration instead of aski
     const result = reminderReadiness(state(patch));
     assert.equal(result.ready, false); assert.equal(result.action, 'service'); assert.notEqual(result.action, 'subscribe');
   }
-  assert.equal(reminderReadiness(state({ subscriptionPending: true })).actionLabel, '同步授权记录');
+  const pending = reminderReadiness(state({ subscriptionPending: true, subscription: { templateCount: 1, credits: 0 } }));
+  assert.equal(pending.actionLabel, '增加提醒次数');
+  assert.match(pending.detail, /重试同步/);
 });
 
 test('personal switch, expiry and Beijing overnight DND retain their separate next steps', () => {

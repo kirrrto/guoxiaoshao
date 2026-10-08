@@ -2,10 +2,10 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { runtime } from './helpers/miniprogram-runtime.mjs';
 
-const settle = async () => { for (let i = 0; i < 8; i++) await Promise.resolve(); };
+const settle = async () => { for (let i = 0; i < 40; i++) await Promise.resolve(); };
 const deferred = () => { let resolve, reject; const promise = new Promise((yes, no) => { resolve = yes; reject = no; }); return { promise, resolve, reject }; };
 const subscriptions = credits => ({ 'restock-A': { credits } });
-const boot = credits => ({ membership: { active: true, expiresAt: '2027-01-01T00:00:00Z' },
+const boot = credits => ({ identity: { userKey: 'consumer:user-a' }, membership: { active: true, expiresAt: '2027-01-01T00:00:00Z' },
   subscriptions: subscriptions(credits), notifications: { enabled: true, deliveryReady: true, templateIds: { restock: 'restock-A' } },
   collector: { state: 'running' }, limits: { maxFollows: 3, maxStoresPerFollow: 3 } });
 
@@ -21,7 +21,7 @@ test('a pre-authorization account response cannot overwrite confirmed reminder c
   assert.equal(rt.app.globalData.bootstrap.subscriptions['restock-A'].credits, 2);
 });
 
-test('explicit authorization waits for an in-flight silent credit sync instead of replaying it concurrently', async () => {
+test('explicit authorization can queue behind an in-flight sync without replaying the earlier request concurrently', async () => {
   const sync = deferred();
   const rt = runtime(async action => action === 'notify.recordSubscription' ? sync.promise : boot(2));
   rt.app.globalData.bootstrap = boot(1);
@@ -34,6 +34,8 @@ test('explicit authorization waits for an in-flight silent credit sync instead o
   const explicit = page.onSubscribe();
   await settle();
   assert.equal(rt.calls.filter(c => c.action === 'notify.recordSubscription').length, 1);
+  assert.equal(credits.getAuthorizationState().pendingCount, 2);
+  assert.equal(page.data.subscribing, false);
   sync.resolve({ subscriptions: subscriptions(2) });
   await explicit; await settle();
   assert.equal(credits.readPending(), null);
@@ -68,7 +70,7 @@ test('a lost silent sync releases the shared operation and explicit retry retain
   credits.topUpReminderCredit(); await settle();
   const pending = credits.readPending();
   assert.ok(pending);
-  await page.onSubscribe();
+  await page.onRetryAuthorizationSync(); await settle();
   const requests = rt.calls.filter(c => c.action === 'notify.recordSubscription');
   assert.equal(prompts, 1);
   assert.equal(requests.length, 2);
@@ -78,12 +80,14 @@ test('a lost silent sync releases the shared operation and explicit retry retain
 });
 
 test('a completion can clear only the authorization request that it recorded', () => {
-  const rt = runtime(), credits = rt.load('utils/reminder-credits.js');
+  const rt = runtime(); rt.app.globalData.bootstrap = boot(1);
+  const credits = rt.load('utils/reminder-credits.js');
   const older = { requestId: 'ns-older', results: { 'restock-A': 'accept' } };
   const newer = { requestId: 'ns-newer', results: { 'restock-A': 'accept' } };
   credits.savePending(newer);
   credits.clearPending(older);
-  assert.deepEqual(credits.readPending(), newer);
+  assert.equal(credits.readPending().requestId, newer.requestId);
+  assert.deepEqual(JSON.parse(JSON.stringify(credits.readPending().results)), newer.results);
   credits.clearPending(newer);
   assert.equal(credits.readPending(), null);
 });
