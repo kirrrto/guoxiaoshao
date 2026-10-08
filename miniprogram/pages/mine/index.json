@@ -1,5 +1,7 @@
 {
   "navigationBarTitleText": "果小哨 · 我的",
   "enablePullDownRefresh": true,
-  "usingComponents": {}
+  "usingComponents": {
+    "reminder-nudge": "/components/reminder-nudge/index"
+  }
 }

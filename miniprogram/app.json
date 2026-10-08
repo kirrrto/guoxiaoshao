@@ -27,9 +27,6 @@
     ]
   },
   "sitemapLocation": "sitemap.json",
-  "usingComponents": {
-    "reminder-nudge": "/components/reminder-nudge/index"
-  },
   "darkmode": true,
   "themeLocation": "theme.json",
   "style": "v2",

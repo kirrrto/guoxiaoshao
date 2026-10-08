@@ -3,6 +3,7 @@
   "enablePullDownRefresh": true,
   "usingComponents": {
     "target-picker": "/components/target-picker/index",
-    "config-sheet": "/components/config-sheet/index"
+    "config-sheet": "/components/config-sheet/index",
+    "reminder-nudge": "/components/reminder-nudge/index"
   }
 }
