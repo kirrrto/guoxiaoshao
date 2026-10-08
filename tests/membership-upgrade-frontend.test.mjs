@@ -48,6 +48,56 @@ test('member purchase cards describe server-issued limits without inferring righ
   assert.match(renewalPreview(products[2], boot.membership).description, /3 个配置.*3 家门店/, 'legacy server snapshots cannot be upgraded solely by a 365-day label');
 });
 
+test('concise benefit cards group equal advertised allowances while the current account keeps its own actual limit', () => {
+  const { page, boot } = account();
+  boot.memberProducts = products.map((product, index) => ({ ...product, limits: { maxFollows: index ? 4 : 3, maxStoresPerFollow: index ? 4 : 3 } }));
+  boot.limits = { maxFollows: 3, maxStoresPerFollow: 3 };
+  boot.membership.remainingMs = 365 * 86400000;
+  page.applyBoot(boot);
+  assert.deepEqual(JSON.parse(JSON.stringify(page.data.membershipBenefitPlans)), [
+    { key: '3:3', label: '周卡', configs: 3, stores: 3, enhanced: false },
+    { key: '4:4', label: '月卡 / 年卡', configs: 4, stores: 4, enhanced: true },
+  ]);
+  assert.equal(page.data.boot.limits.maxFollows, 3, 'gifted or accumulated membership days do not grant paid-plan slots');
+  const original = page.data.membership.expiresAt;
+  page.onToggleMembershipRules(); page.onTogglePurchaseRules();
+  assert.equal(page.data.showMembershipRules, true);
+  assert.equal(page.data.showPurchaseRules, true);
+  page.onToggleMembershipRules();
+  assert.equal(page.data.showMembershipRules, false);
+  assert.equal(page.data.showPurchaseRules, true, 'purchase terms have their own disclosure');
+  assert.equal(page.data.membership.expiresAt, original);
+});
+
+test('legacy product snapshots never advertise enhanced slots based only on a long duration', () => {
+  const { page } = account();
+  assert.equal(page.data.membershipBenefitPlans.length, 1);
+  const card = page.data.membershipBenefitPlans[0];
+  assert.equal(card.label, '周卡 / 月卡 / 年卡');
+  assert.equal(card.configs, 3); assert.equal(card.stores, 3); assert.equal(card.enhanced, false);
+});
+
+test('collapsed purchase details do not bypass the selected product notice and final consent', async () => {
+  const { rt, page, boot } = account(false);
+  const note = '月卡测试说明：一次性虚拟服务，一经售出不予退款。';
+  boot.memberProducts = products.map(product => product.days === 30 ? { ...product, priceFen: 2290, note } : product);
+  page.applyBoot(boot);
+  page.onSelectMemberProduct({ currentTarget: { dataset: { planId: 'member_30d' } } });
+  assert.equal(page.data.showPurchaseRules, false);
+  assert.equal(page.data.boot.priceText, '¥22.90');
+  let modal, purchases = 0;
+  rt.wx.showModal = options => { modal = options; };
+  page.paymentController.buy = async () => { purchases++; };
+  const buying = page.onBuyMembership();
+  assert.equal(purchases, 0);
+  assert.equal(modal.title, '购买须知');
+  assert.match(modal.content, /30 天会员 · ¥22\.90/);
+  assert.ok(modal.content.includes(note));
+  modal.success({ confirm: false }); await buying;
+  assert.equal(purchases, 0);
+  assert.equal(rt.calls.length, 0);
+});
+
 test('paid member upgrade selects a long-term package at full price without ordering or changing existing membership', () => {
   const { rt, page } = account();
   const originalExpiry = page.data.membership.expiresAt;

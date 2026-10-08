@@ -40,7 +40,10 @@
         <view wx:else class="member-duration"><text class="member-number">{{boot.priceText}}</text><text>/ {{boot.memberProduct.days}} 天</text></view>
         <view class="member-renewal">{{membership.active ? '到期 ' + membership.expiresText : '单次购买 · 不自动续费'}}</view>
       </view>
-      <view class="plan-why">查询不扣次数 · 关注取货变化</view>
+      <view class="member-core-benefits" aria-label="会员核心权益">
+        <view class="member-core-benefit"><text class="member-core-label">查询与历史</text><text class="member-core-value">不扣次数</text></view>
+        <view class="member-core-benefit"><text class="member-core-label">关注取货变化</text><text class="member-core-value">微信提醒</text></view>
+      </view>
       <block wx:if="{{membership.active}}">
         <view class="member-allowance"><text>已关注 {{boot.followCount}} / {{boot.limits.maxFollows}} 个配置</text><text>每配置最多 {{boot.limits.maxStoresPerFollow}} 家门店</text></view>
         <view wx:if="{{membership.enhanced}}" class="member-enhanced">月／年卡专享 · 多关注一个配置、多选一家门店</view>
@@ -59,7 +62,7 @@
       <view wx:if="{{!membership.active || membershipUpgradeOpen || paymentPendingId}}" class="membership-shop">
         <view class="membership-shop-heading">
           <text class="membership-shop-title">{{membership.active ? (purchaseMode === 'upgrade' ? '选择长期套餐' : '续费会员') : '选择会员时长'}}</text>
-          <button wx:if="{{membership.active && !paymentPendingId}}" class="membership-shop-close" hover-class="ui-control-pressed" disabled="{{redeeming || paymentBusy || paymentChecking || paymentConfirming}}" bindtap="onCloseMembershipUpgrade">收起</button>
+          <button wx:if="{{membership.active && !paymentPendingId}}" class="ui-action membership-shop-close" hover-class="ui-control-pressed" disabled="{{redeeming || paymentBusy || paymentChecking || paymentConfirming}}" bindtap="onCloseMembershipUpgrade">收起</button>
         </view>
         <view class="membership-caption">月卡／年卡增加关注名额 · 不自动续费</view>
         <view class="membership-packages" aria-label="选择会员套餐">
@@ -96,47 +99,23 @@
         </view>
         <view wx:if="{{paymentPendingId}}" class="payment-note">订单会为当前账号保留，系统不会自动再次扣款。付款没有完成时，可以放弃这笔订单后重新购买。</view>
       </view>
-      <button class="ui-disclosure mt" hover-class="ui-control-pressed" bindtap="onToggleMembershipRules" aria-expanded="{{showMembershipRules}}"><text class="ui-disclosure-label">权益与购买须知</text><view class="ui-disclosure-meta"><text>{{showMembershipRules ? '收起' : '展开'}}</text><view class="ui-chevron {{showMembershipRules ? 'ui-chevron--up' : 'ui-chevron--down'}}" aria-hidden="true"></view></view></button>
+      <button class="ui-disclosure mt" hover-class="ui-control-pressed" bindtap="onToggleMembershipRules" aria-expanded="{{showMembershipRules}}"><text class="ui-disclosure-label">会员权益</text><view class="ui-disclosure-meta"><text>{{showMembershipRules ? '收起' : '查看'}}</text><view class="ui-chevron {{showMembershipRules ? 'ui-chevron--up' : 'ui-chevron--down'}}" aria-hidden="true"></view></view></button>
       <block wx:if="{{showMembershipRules}}">
-        <view class="plan-compare">
-          <view class="plan-head">
-            <text class="plan-feature">权益</text>
-            <text class="plan-col">免费</text>
-            <text class="plan-col plan-member">会员</text>
-          </view>
-          <view class="plan-row">
-            <text class="plan-feature">取货查询</text>
-            <text class="plan-col">扣次数</text>
-            <text class="plan-col plan-member">不扣次数</text>
-          </view>
-          <view class="plan-row">
-            <text class="plan-feature">补货历史</text>
-            <text class="plan-col">扣次数</text>
-            <text class="plan-col plan-member">不扣次数</text>
-          </view>
-          <view class="plan-row">
-            <text class="plan-feature">到货提醒</text>
-            <text class="plan-col">会员专属</text>
-            <text class="plan-col plan-member">关注可提醒</text>
-          </view>
-          <view class="plan-row">
-            <text class="plan-feature">持续关注</text>
-            <text class="plan-col">会员专属</text>
-            <text class="plan-col plan-member">自动监测</text>
-          </view>
-          <view class="plan-row">
-            <text class="plan-feature">新品 30 天</text>
-            <text class="plan-col">不可实时查</text>
-            <text class="plan-col plan-member">可查</text>
+        <view class="member-benefit-plans" aria-label="各套餐的关注名额">
+          <view wx:for="{{membershipBenefitPlans}}" wx:key="key" class="member-benefit-plan {{item.enhanced ? 'member-benefit-plan-enhanced' : ''}}">
+            <text class="member-benefit-plan-label">{{item.label}}</text>
+            <view class="member-benefit-plan-amount"><text>{{item.configs}}</text><text class="member-benefit-plan-unit"> 个配置</text></view>
+            <text class="member-benefit-plan-detail">每配置 {{item.stores}} 家门店</text>
           </view>
         </view>
-        <view class="benefit-list mt">
-          <view>{{boot.purchaseNotice || '一次性虚拟服务，一经售出不予退款。'}}</view>
-          <view>会员查询不扣次数；请求繁忙或数据源限流时需稍后重试，实际采集时间以结果为准。</view>
-          <view>容量/颜色分占关注名额；暂停仍占，删除才释放。</view>
-          <view>周卡：3 个配置 × 每配置 3 家门店。月卡、年卡：4 个配置 × 每配置 4 家门店。</view>
-          <view>月／年卡时长尚未用完时享额外名额；续购周卡不延长该权益。超额配置与门店会保留，按保存顺序暂停超额部分，升级后恢复。</view>
-          <view>提醒需微信订阅授权，免打扰时段不发送。</view>
+        <view class="member-benefit-note"><text class="member-benefit-note-title">新品也能查</text><text>新品开售 30 天内，会员可实时查询。</text></view>
+      </block>
+      <button class="ui-disclosure mt" hover-class="ui-control-pressed" bindtap="onTogglePurchaseRules" aria-expanded="{{showPurchaseRules}}"><text class="ui-disclosure-label">购买说明</text><view class="ui-disclosure-meta"><text>{{showPurchaseRules ? '收起' : '查看'}}</text><view class="ui-chevron {{showPurchaseRules ? 'ui-chevron--up' : 'ui-chevron--down'}}" aria-hidden="true"></view></view></button>
+      <block wx:if="{{showPurchaseRules}}">
+        <view class="membership-rules">
+          <view class="membership-rule"><text class="membership-rule-title">付款与续费</text><text class="membership-rule-copy">{{boot.purchaseNotice || '一次性虚拟服务，一经售出不予退款。'}}</text><text class="membership-rule-copy">按所选套餐全价购买，剩余有效期顺延，不抵扣差价，不自动续费。</text></view>
+          <view class="membership-rule"><text class="membership-rule-title">关注名额</text><text class="membership-rule-copy">不同容量或颜色各占一个配置；暂停仍占名额，删除后释放。</text><text class="membership-rule-copy">月／年卡额外名额仅在其有效期内可用，续购周卡不延长。到期后保留配置与门店，按保存顺序暂停超额部分；升级后恢复。</text></view>
+          <view class="membership-rule"><text class="membership-rule-title">提醒与查询</text><text class="membership-rule-copy">每条提醒消耗对应类型的 1 次微信授权；免打扰期间不发送。</text><text class="membership-rule-copy">请求繁忙或数据源限流时需稍后重试，库存以结果采集时间为准。</text></view>
         </view>
       </block>
       <view wx:if="{{redemptionOpen}}" class="redemption-mask" catchtap="onOpenRedemption" catchtouchmove="noop">
@@ -285,6 +264,11 @@
     <view class="card">
       <button class="ui-disclosure account-link" hover-class="ui-control-pressed" bindtap="onToggleReleaseNotes" aria-expanded="{{showReleaseNotes}}"><text class="ui-disclosure-label">更新公告</text><view class="ui-disclosure-meta"><text>{{showReleaseNotes ? '收起' : '查看'}}</text><view class="ui-chevron {{showReleaseNotes ? 'ui-chevron--up' : 'ui-chevron--down'}}" aria-hidden="true"></view></view></button>
       <view wx:if="{{showReleaseNotes}}" class="release-notes">
+        <view class="release-pagination" aria-label="更新公告翻页">
+          <button class="ui-action release-page-button" hover-class="ui-control-pressed" disabled="{{releaseNotesPage <= 1}}" bindtap="onPreviousReleaseNotes">上一页</button>
+          <text class="release-page-count" aria-live="polite">{{releaseNotesPage}} / {{releaseNotesPageCount}}</text>
+          <button class="ui-action release-page-button" hover-class="ui-control-pressed" disabled="{{releaseNotesPage >= releaseNotesPageCount}}" bindtap="onNextReleaseNotes">下一页</button>
+        </view>
         <view wx:for="{{visibleReleaseNotes}}" wx:key="version" class="release-note">
           <view class="release-note-heading"><text class="release-note-version">v{{item.version}}</text><text wx:if="{{item.version === version}}" class="pill pill-ok release-note-current">当前版本</text></view>
           <view class="release-note-title">{{item.title}}</view>
@@ -292,7 +276,7 @@
           <view wx:for="{{item.highlights}}" wx:for-item="highlight" wx:key="*this" class="release-note-highlight"><view class="release-note-dot" aria-hidden="true"></view><text>{{highlight}}</text></view>
           <view wx:if="{{item.note}}" class="release-note-caption">{{item.note}}</view>
         </view>
-        <button wx:if="{{olderReleaseNotesCount}}" class="ui-action ui-action--block release-notes-more" hover-class="ui-control-pressed" bindtap="onToggleOlderReleaseNotes" aria-expanded="{{showOlderReleaseNotes}}">{{showOlderReleaseNotes ? '收起更早版本' : '展开更早版本（' + olderReleaseNotesCount + '）'}}</button>
+        <button class="ui-action ui-action--neutral ui-action--block release-notes-collapse" hover-class="ui-control-pressed" bindtap="onToggleReleaseNotes" aria-expanded="{{showReleaseNotes}}">收起更新公告<view class="ui-chevron ui-chevron--up" aria-hidden="true"></view></button>
       </view>
       <button class="ui-disclosure account-link" hover-class="ui-control-pressed" bindtap="onOpenRedemption"><text class="ui-disclosure-label">兑换码开通</text><view class="ui-chevron" aria-hidden="true"></view></button>
       <button class="ui-disclosure account-link" hover-class="ui-control-pressed" bindtap="onHelp"><text class="ui-disclosure-label">使用说明</text><view class="ui-chevron" aria-hidden="true"></view></button>

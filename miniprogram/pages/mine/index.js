@@ -19,6 +19,27 @@ const { shareAppMessage, shareTimeline } = require('../../utils/share');
 const { paymentAvailability, createPaymentController, purchaseNotice } = require('../../utils/member-payment');
 const { memberProducts, planId, renewalPreview } = require('../../utils/member-products');
 const { productBenefit } = require('../../utils/member-limits');
+const RELEASE_NOTES_PAGE_SIZE = 3;
+const RELEASE_NOTES_PAGE_COUNT = Math.max(1, Math.ceil(RELEASE_NOTES.length / RELEASE_NOTES_PAGE_SIZE));
+
+function releaseNotesPage(page = 1) {
+  const bounded = Math.min(RELEASE_NOTES_PAGE_COUNT, Math.max(1, page));
+  return { releaseNotesPage: bounded, visibleReleaseNotes: RELEASE_NOTES.slice((bounded - 1) * RELEASE_NOTES_PAGE_SIZE, bounded * RELEASE_NOTES_PAGE_SIZE) };
+}
+
+/** Group only equal server-advertised allowances, without inferring a user's plan. */
+function membershipBenefitPlans(products) {
+  const groups = [];
+  const bounded = value => Number.isInteger(value) && value >= 1 && value <= 4 ? value : 3;
+  for (const product of products) {
+    const limits = product.limits || {}, configs = bounded(limits.maxFollows), stores = bounded(limits.maxStoresPerFollow);
+    const key = `${configs}:${stores}`, existing = groups.find(group => group.key === key);
+    if (existing) {
+      if (!existing.names.includes(product.nameText)) existing.names.push(product.nameText);
+    } else groups.push({ key, names: [product.nameText], configs, stores, enhanced: configs > 3 || stores > 3 });
+  }
+  return groups.map(({ names, ...group }) => ({ ...group, label: names.join(' / ') }));
+}
 
 const LEDGER_TEXT = {
   signin_reward: '每日签到',
@@ -132,9 +153,8 @@ Page({
     loadError: null,
     versionLabel: versionLabel(),
     version: VERSION,
-    visibleReleaseNotes: RELEASE_NOTES.slice(0, 2),
-    olderReleaseNotesCount: Math.max(0, RELEASE_NOTES.length - 2),
-    showOlderReleaseNotes: false,
+    ...releaseNotesPage(),
+    releaseNotesPageCount: RELEASE_NOTES_PAGE_COUNT,
     showReleaseNotes: false,
     boot: null,
     membership: null,
@@ -148,6 +168,8 @@ Page({
     orders: [],
     showOrders: false,
     showMembershipRules: false,
+    showPurchaseRules: false,
+    membershipBenefitPlans: [],
     membershipUpgradeOpen: false,
     purchaseMode: 'purchase',
     membershipUpgradePreview: null,
@@ -438,6 +460,7 @@ Page({
       membershipUpgradeOpen: !accountChanged && membership.active && this.data.membershipUpgradeOpen,
       purchaseMode: membership.active ? !accountChanged && this.data.purchaseMode === 'upgrade' ? 'upgrade' : 'renew' : 'purchase',
       membershipUpgradePreview: renewalPreview(selected, membership),
+      membershipBenefitPlans: membershipBenefitPlans(products),
       boot: {
         identity: boot.identity,
         memberProducts: products,
@@ -869,16 +892,23 @@ Page({
     if (!this.pageRetired) this.setData({ showMembershipRules: !this.data.showMembershipRules });
   },
 
-  onToggleReleaseNotes() {
-    if (this.pageRetired) return;
-    this.setData({ showReleaseNotes: !this.data.showReleaseNotes,
-      ...(this.data.showOlderReleaseNotes ? { showOlderReleaseNotes: false, visibleReleaseNotes: RELEASE_NOTES.slice(0, 2) } : {}) });
+  onTogglePurchaseRules() {
+    if (!this.pageRetired) this.setData({ showPurchaseRules: !this.data.showPurchaseRules });
   },
 
-  onToggleOlderReleaseNotes() {
-    if (this.pageRetired || !this.data.showReleaseNotes || !this.data.olderReleaseNotesCount) return;
-    const showOlderReleaseNotes = !this.data.showOlderReleaseNotes;
-    this.setData({ showOlderReleaseNotes, visibleReleaseNotes: showOlderReleaseNotes ? RELEASE_NOTES : RELEASE_NOTES.slice(0, 2) });
+  onToggleReleaseNotes() {
+    if (this.pageRetired) return;
+    this.setData({ showReleaseNotes: !this.data.showReleaseNotes, ...releaseNotesPage() });
+  },
+
+  onPreviousReleaseNotes() {
+    if (this.pageRetired || !this.data.showReleaseNotes || this.data.releaseNotesPage <= 1) return;
+    this.setData(releaseNotesPage(this.data.releaseNotesPage - 1));
+  },
+
+  onNextReleaseNotes() {
+    if (this.pageRetired || !this.data.showReleaseNotes || this.data.releaseNotesPage >= RELEASE_NOTES_PAGE_COUNT) return;
+    this.setData(releaseNotesPage(this.data.releaseNotesPage + 1));
   },
 
   onToggleQuotaDetails() {

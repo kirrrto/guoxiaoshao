@@ -193,10 +193,10 @@ const buttonConstraintProfile = alternativesPreview ? 'regression stress only: a
 const buttonConstraintCss = buttonConstraintProfile ? ':where(.alternative-panel) button:not([size=mini]){width:184px;min-width:min-content;margin-left:auto;margin-right:auto;}' : '';
 const widths = [320, 375, 430], scenarios = adminPreview ? ['operator-ready', 'operator-denied', 'operator-loading', 'operator-error', 'operator-longcontent', 'operator-saving'] : historyTaskPreview ? ['history-member-reward', 'history-free-first', 'history-read-error', 'history-balance-cap', 'history-completed', 'history-longcontent', 'history-loading'] : monitoringPreview ? ['monitor-template-missing', 'monitor-ready-authorized', 'monitor-needs-authorization', 'monitor-stale', 'monitor-disabled', 'monitor-expired-paused'] : redemptionPreview ? ['redemption-input', 'redemption-loading', 'redemption-error', 'redemption-success', 'redemption-used', 'redemption-limited', 'redemption-empty'] : stockPreview ? ['stock-fresh', 'stock-old', 'stock-unknown', 'stock-missing', 'stock-restricted'] : reminderPreview ? ['reminders', 'reminder-empty', 'reminder-loading', 'reminder-deleting', 'reminder-clearing', 'reminder-error', 'reminder-more-error', 'longcontent'] : ['free', 'member', 'expired', 'empty', 'error', 'loading', 'longcontent'];
 if (historyDataPreview) scenarios.splice(0, scenarios.length, 'history-no-data', 'history-unknown-only', 'history-observed-no-events', 'history-events-only', 'history-observed-events', 'history-partial-stores');
-if (paymentPreview) scenarios.splice(0, scenarios.length, 'payment-ready', 'payment-renew', 'payment-blocked', 'payment-old-ios', 'payment-pending', 'payment-cancelled', 'payment-error', 'payment-fulfilled', 'payment-partial-refund', 'payment-monthly', 'payment-annual', 'payment-pending-monthly', 'payment-member', 'payment-upgrade-monthly', 'payment-upgrade-annual', 'payment-member-pending-monthly', 'payment-rules');
+if (paymentPreview) scenarios.splice(0, scenarios.length, 'payment-ready', 'payment-renew', 'payment-blocked', 'payment-old-ios', 'payment-pending', 'payment-cancelled', 'payment-error', 'payment-fulfilled', 'payment-partial-refund', 'payment-monthly', 'payment-annual', 'payment-pending-monthly', 'payment-member', 'payment-upgrade-monthly', 'payment-upgrade-annual', 'payment-member-pending-monthly', 'payment-benefits', 'payment-rules');
 if (orderRecordsPreview) scenarios.splice(0, scenarios.length, 'orders-single', 'orders-deleting', 'orders-clearing', 'orders-error', 'orders-pending', 'orders-empty', 'orders-legacy');
 if (sheetPreview) scenarios.splice(0, scenarios.length, 'sheet-edit', 'sheet-keyboard', 'sheet-longcontent', 'sheet-saving');
-if (releaseNotesPreview) scenarios.splice(0, scenarios.length, 'free', 'member', 'longcontent');
+if (releaseNotesPreview) scenarios.splice(0, scenarios.length, 'free', 'member', 'release-middle', 'release-last', 'release-collapsed', 'longcontent');
 if (onboardingPreview) scenarios.splice(0, scenarios.length, 'onboarding-first', 'onboarding-signing', 'onboarding-error', 'onboarding-signed', 'onboarding-shared', 'onboarding-share-pending', 'onboarding-share-catalog', 'onboarding-share-error');
 if (notificationTestPreview) scenarios.splice(0, scenarios.length, 'notification-test-ready', 'notification-test-no-quota', 'notification-test-accepted', 'notification-test-uncertain', 'notification-test-failed', 'notification-test-received', 'notification-test-not-received');
 if (alternativesPreview) scenarios.splice(0, scenarios.length, 'alternatives-default', 'alternatives-selection', 'alternatives-premium', 'alternatives-free', 'alternatives-match', 'alternatives-prepared', 'alternatives-empty', 'alternatives-error', 'alternatives-expired', 'alternatives-cached');
@@ -421,7 +421,8 @@ for (const scenario of scenarios) {
       if (['orders-error', 'orders-empty'].includes(scenario)) await page.onClearOrders();
     }
     if (pageName === 'mine' && paymentPreview) {
-      if (scenario === 'payment-rules') page.setData({ showMembershipRules: true });
+      if (scenario === 'payment-benefits') page.onToggleMembershipRules();
+      if (scenario === 'payment-rules') page.onTogglePurchaseRules();
       if (scenario === 'payment-renew') page.onOpenMembershipRenew();
       if (['payment-upgrade-monthly', 'payment-upgrade-annual'].includes(scenario)) {
         page.onOpenMembershipUpgrade();
@@ -441,7 +442,9 @@ for (const scenario of scenarios) {
     if (pageName === 'mine' && reminderPreview) page.setData({ showNotifications: true });
     if (pageName === 'mine' && releaseNotesPreview) {
       page.onToggleReleaseNotes();
-      if (scenario === 'longcontent') page.onToggleOlderReleaseNotes();
+      if (scenario === 'release-middle') page.onNextReleaseNotes();
+      if (scenario === 'release-last') for (let i = 1; i < page.data.releaseNotesPageCount; i++) page.onNextReleaseNotes();
+      if (scenario === 'release-collapsed') page.onToggleReleaseNotes();
     }
     if (paymentPreview && ['payment-pending', 'payment-cancelled', 'payment-error', 'payment-fulfilled', 'payment-partial-refund'].includes(scenario)) await page.onBuyMembership();
     if (redemptionPreview) {
@@ -634,7 +637,8 @@ for (const scenario of scenarios) {
         'payment-upgrade-monthly': ['续费可选', '确认升级 · ¥19.90', '在原到期时间后增加 30 天', '预计到期 2026-11-02', '按全价购买', '不抵扣差价'],
         'payment-upgrade-annual': ['续费可选', '确认升级 · ¥200.00', '在原到期时间后增加 365 天', '预计到期 2027-10-03', '按所选套餐全价购买', '不抵扣差价'],
         'payment-member-pending-monthly': ['30 天会员 · ¥19.90', 'offline-original-monthly-order', '套餐已按原订单锁定', '查询支付结果'],
-        'payment-rules': ['一次性虚拟服务', '一经售出不予退款', '一次购买 7 天', '权益与购买须知'],
+        'payment-benefits': ['会员权益', '周卡', '月卡', '年卡', '新品'],
+        'payment-rules': ['一次性虚拟服务', '一经售出不予退款', '一次购买 7 天', '购买说明'],
       }[scenario]] : redemptionPreview ? ['兑换会员', '付费购买暂未开放', { 'redemption-input': '确认兑换', 'redemption-loading': '兑换中，请稍候', 'redemption-error': '兑换码无效', 'redemption-success': '兑换成功', 'redemption-used': '此账号已兑换过', 'redemption-limited': '15 分钟后再试', 'redemption-empty': '确认兑换' }[scenario]] : stockPreview ? [p.title, '收起详情', '删除关注', ...{
         'stock-fresh': ['暂无供应', '本次状态刚记录', '观测 2026-09-15 15:00:00'],
         'stock-old': ['待更新', '观测已过期', '上次有效结果：暂无供应（仅供参考）', '上次检查 2026-09-15 14:57:00'],
@@ -649,8 +653,10 @@ for (const scenario of scenarios) {
         : pageName === 'admin' ? ['运行统计', '128'] : [p.title, ...(sheetPreview ? ['产品配置', '选择门店', '已选门店'] : [])];
       if (adminPreview && ['operator-ready', 'operator-longcontent'].includes(scenario)) expectedText.push('成功查询 56', '查看提醒详情 12', '测试通知：28 条／20 人', '各行为分别计数', ...(scenario === 'operator-longcontent' ? ['以上不是完整统计'] : []));
       if (nudgePreview) expectedText.push('补充提醒次数', '稍后再说', '24 小时内不再主动提示');
-      if (releaseNotesPreview) expectedText.push('更新公告', '当前版本', ...(page.data.visibleReleaseNotes || page.data.releaseNotes).map(entry => `v${entry.version}`),
-        ...(page.data.olderReleaseNotesCount ? [scenario === 'longcontent' ? '收起更早版本' : '展开更早版本'] : []));
+      if (releaseNotesPreview) expectedText.push('更新公告', ...(page.data.showReleaseNotes ? [
+        ...page.data.visibleReleaseNotes.map(entry => `v${entry.version}`), '上一页', '下一页', '收起',
+        ...(page.data.releaseNotesPage === 1 ? ['当前版本'] : []),
+      ] : ['查看']));
       if (orderRecordsPreview) expectedText.push('会员记录', ...{
         'orders-single': ['订单号：grant_', '删除记录', '清空当前显示的记录'],
         'orders-deleting': ['删除中…', '支付状态待确认，暂不可清理'],
@@ -671,7 +677,8 @@ for (const scenario of scenarios) {
         'onboarding-share-error': ['商品目录刷新失败', '当前选择已保留', '刷新目录并重试'],
       }[scenario]);
       const expectedAlternativeCounts = alternativesPreview ? { colors: page.data.alternativeColorChoices.length, stores: page.data.alternativeStoreChoices.length, queries: page.data.alternativeSelectedColors.length } : undefined;
-      manifest.push({ page: pageName, scenario, width, file: filename, expectedText, expectedAlternativeCounts });
+      const expectedReleaseNoteCount = releaseNotesPreview ? (page.data.showReleaseNotes ? page.data.visibleReleaseNotes.length : 0) : undefined;
+      manifest.push({ page: pageName, scenario, width, file: filename, expectedText, expectedAlternativeCounts, expectedReleaseNoteCount });
     }
   }
 }

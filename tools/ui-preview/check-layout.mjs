@@ -111,6 +111,20 @@ try {
       }
     }
     const record = { ...item, ...metrics, missingText }; report.snapshots.push(record);
+    if (item.expectedReleaseNoteCount !== undefined) {
+      record.releaseNoteCount = await page.locator('.release-note').count();
+      if (record.releaseNoteCount !== item.expectedReleaseNoteCount || record.releaseNoteCount > 3) throw Error(`Release pagination rendered ${record.releaseNoteCount} versions; expected ${item.expectedReleaseNoteCount}: ${item.file}`);
+      if (record.releaseNoteCount && item.width === 375) {
+        const name = item.file.replace('.html', '-notes.png');
+        await page.locator('.release-notes').screenshot({ path: path.join(screenshots, name) });
+        record.notesScreenshot = name;
+      }
+    }
+    if (item.width === 375 && ['payment-ready', 'payment-member', 'payment-benefits', 'payment-rules'].includes(item.scenario)) {
+      const name = item.file.replace('.html', '-membership.png');
+      await page.locator('.membership-card').screenshot({ path: path.join(screenshots, name) });
+      record.membershipScreenshot = name;
+    }
     const representative = item.width === 375 && ['member', 'free'].includes(item.scenario) || item.scenario.startsWith('sheet-') || item.width === 320 && ['longcontent', 'history-longcontent', 'history-balance-cap', 'operator-longcontent'].includes(item.scenario) || item.width === 375 && ['mine', 'follow'].includes(item.page) && item.scenario === 'expired' || item.width === 430 && item.page === 'query' && item.scenario === 'member' || item.width === 375 && item.scenario.startsWith('monitor-') || item.width === 375 && item.scenario.startsWith('history-') && (item.page === 'history' || item.scenario === 'history-free-first');
     if (representative || item.scenario.startsWith('onboarding-') && item.width === 375 || /^(?:payment|notification-test|alternatives|orders|nudge)-/.test(item.scenario)) { const name = item.file.replace('.html', '.png'); await page.screenshot({ path: path.join(screenshots, name), fullPage: true }); record.screenshot = name; }
     if (item.scenario === 'alternatives-premium' || item.scenario === 'alternatives-free' && item.width === 320) {

@@ -21,6 +21,25 @@
 .member-renewal { margin-top: 10rpx; font-size: max(12px, 24rpx); color: var(--text-2); }
 .member-allowance { display: flex; flex-wrap: wrap; gap: 8rpx 24rpx; margin-top: 14rpx; font-size: max(12px, 24rpx); color: var(--text-2); }
 .member-authorization { margin-top: 16rpx; color: var(--text-2); font-size: max(12px, 24rpx); line-height: 1.65; }
+.member-core-benefits { display: flex; gap: 16rpx; margin-top: 20rpx; padding: 20rpx; border: 1rpx solid var(--line); border-radius: 20rpx; background: var(--surface-soft); }
+.member-core-benefit { display: flex; flex: 1 1 0%; flex-direction: column; gap: 8rpx; min-width: 0; line-height: 1.5; }
+.member-core-benefit + .member-core-benefit { padding-left: 20rpx; border-left: 1rpx solid var(--line); }
+.member-core-label { color: var(--text-2); font-size: max(12px, 24rpx); overflow-wrap: anywhere; }
+.member-core-value { color: var(--green-dark); font-size: max(14px, 28rpx); font-weight: 650; }
+.member-benefit-plans { display: flex; flex-wrap: wrap; gap: 16rpx; margin-top: 20rpx; }
+.member-benefit-plan { box-sizing: border-box; display: flex; flex: 1 1 180rpx; flex-direction: column; gap: 8rpx; min-width: 0; padding: 20rpx; border: 1rpx solid var(--line); border-radius: 20rpx; background: var(--surface-soft); }
+.member-benefit-plan-enhanced { border-color: var(--green-dark); background: var(--green-soft); }
+.member-benefit-plan-label { color: var(--text-2); font-size: max(12px, 24rpx); font-weight: 600; line-height: 1.5; overflow-wrap: anywhere; }
+.member-benefit-plan-amount { font-size: 44rpx; font-weight: 700; color: var(--text); line-height: 1.4; }
+.member-benefit-plan-unit { font-size: max(12px, 24rpx); font-weight: 400; color: var(--text-2); }
+.member-benefit-plan-detail { font-size: max(12px, 24rpx); color: var(--text-2); line-height: 1.6; }
+.member-benefit-note { display: flex; flex-direction: column; gap: 6rpx; padding: 18rpx 4rpx 2rpx; font-size: max(12px, 24rpx); line-height: 1.6; color: var(--text-2); }
+.member-benefit-note-title { font-weight: 600; color: var(--text); }
+.membership-rules { margin-top: 18rpx; }
+.membership-rule { display: flex; flex-direction: column; gap: 10rpx; padding: 20rpx; border-radius: 18rpx; background: var(--surface-soft); }
+.membership-rule + .membership-rule { margin-top: 14rpx; }
+.membership-rule-title { color: var(--text); font-size: max(13px, 26rpx); font-weight: 600; line-height: 1.5; }
+.membership-rule-copy { color: var(--text-2); font-size: max(12px, 24rpx); line-height: 1.7; overflow-wrap: anywhere; }
 /* Membership selection stays above detailed rules and remains legible on 320px screens. */
 .membership-member-actions { display: flex; gap: 16rpx; margin-top: 28rpx; min-width: 0; }
 .membership-manage { box-sizing: border-box; display: flex; align-items: center; justify-content: center; flex: 1 1 0; min-width: 0; min-height: 44px; margin: 0; padding: 18rpx 14rpx; border: 1rpx solid var(--line); border-radius: var(--radius-action); background: var(--surface-soft); color: var(--green-dark); font-size: max(13px, 26rpx); font-weight: 600; line-height: 1.5; white-space: normal; }
@@ -31,7 +50,7 @@
 .membership-shop { margin-top: 28rpx; padding-top: 26rpx; border-top: 1rpx solid var(--line); }
 .membership-shop-heading { display: flex; align-items: center; justify-content: space-between; gap: 16rpx; min-width: 0; }
 .membership-shop-title { font-size: 29rpx; font-weight: 650; color: var(--text); }
-.membership-shop-close { flex: none; display: flex; align-items: center; justify-content: center; min-height: 40px; margin: -10rpx 0; padding: 10rpx 14rpx; border: 0; border-radius: 14rpx; background: transparent; color: var(--green-dark); font-size: max(12px, 24rpx); line-height: 1.5; }
+.membership-shop-close.ui-action { flex: none; min-height: 40px; margin: -10rpx 0; padding: 10rpx 20rpx; font-size: max(12px, 24rpx); line-height: 1.5; }
 .membership-shop-heading + .membership-caption { margin-top: 8rpx; }
 .membership-packages { display: flex; gap: 12rpx; margin-top: 24rpx; min-width: 0; }
 .membership-package { box-sizing: border-box; display: flex; flex: 1 1 0; flex-direction: column; justify-content: center; align-items: center; min-width: 0; margin: 0; padding: 24rpx 8rpx 18rpx; border: 2rpx solid var(--line); border-radius: 22rpx; background: var(--surface-soft); color: var(--text); line-height: 1.4; }
@@ -94,17 +113,6 @@
 .redemption-message-info { background: var(--info-soft); color: var(--green-dark); }
 .membership-card { background: var(--card); }
 .membership-card > .card-title { margin-bottom: 16rpx; }
-.membership-card > .benefit-list { background: rgba(255,255,255,0.42); border: 1rpx solid rgba(255,255,255,0.8); border-radius: 22rpx; padding: 4rpx 20rpx; }
-.plan-compare { margin-top: 16rpx; border: 1rpx solid var(--line); border-radius: 22rpx; overflow: hidden; }
-.plan-head, .plan-row { display: flex; align-items: stretch; }
-.plan-head { background: rgba(232, 248, 239, 0.9); }
-.plan-row { border-top: 1rpx solid var(--line); background: rgba(255,255,255,0.55); }
-.plan-feature { flex: 1.15; min-width: 0; padding: 14rpx 12rpx; font-size: 23rpx; font-weight: 600; color: var(--text); }
-.plan-col { flex: 1; min-width: 0; padding: 14rpx 8rpx; font-size: max(12px, 24rpx); line-height: 1.5; text-align: center; color: var(--text-2); white-space: normal; }
-.plan-head .plan-col { font-weight: 700; color: var(--text-2); }
-.plan-col.plan-member { color: var(--green-dark); background: rgba(0, 195, 117, 0.08); font-weight: 600; }
-.plan-head .plan-col.plan-member { color: var(--green-dark); background: rgba(0, 195, 117, 0.14); }
-.plan-why { margin: 14rpx 0 4rpx; font-size: 24rpx; font-weight: 600; color: var(--green-dark); line-height: 1.55; }
 .quota-card .task { padding: 18rpx 0; }
 .notification-heading { flex-wrap: wrap; }
 .notification-heading-copy { flex-basis: 240rpx; }
@@ -133,7 +141,7 @@
 .account-link + .account-link { margin-top: 12rpx; }
 .release-notes { margin: 20rpx 0; padding: 0 8rpx; }
 .release-note { padding: 22rpx 0; border-bottom: 1rpx solid var(--line); min-width: 0; }
-.release-note:first-child { padding-top: 0; }
+.release-pagination + .release-note { padding-top: 0; }
 .release-note:last-child { border-bottom: 0; padding-bottom: 0; }
 .release-note-heading { display: flex; align-items: center; flex-wrap: wrap; gap: 12rpx; }
 .release-note-version { font-size: 30rpx; font-weight: 650; color: var(--text); }
@@ -144,7 +152,10 @@
 .release-note-dot { flex: 0 0 6rpx; width: 6rpx; height: 6rpx; margin-top: 18rpx; border-radius: 50%; background: var(--green-dark); }
 .release-note-highlight > text { flex: 1; min-width: 0; overflow-wrap: anywhere; }
 .release-note-caption { margin-top: 16rpx; font-size: max(12px, 24rpx); line-height: 1.6; color: var(--text-3); overflow-wrap: anywhere; }
-.release-notes-more.ui-action { margin-top: 20rpx; min-height: 76rpx; font-size: 26rpx; }
+.release-pagination { display: flex; align-items: center; justify-content: space-between; gap: 16rpx; margin-bottom: 24rpx; }
+.release-page-button.ui-action { flex: 1 1 0%; min-width: 0; min-height: 40px; padding: 12rpx; font-size: max(12px, 24rpx); }
+.release-page-count { flex: none; min-width: 72rpx; color: var(--text-2); text-align: center; font-size: max(12px, 24rpx); font-variant-numeric: tabular-nums; }
+.release-notes-collapse.ui-action { margin-top: 20rpx; min-height: 44px; font-size: 26rpx; }
 .redemption-close.ui-action { margin-top: 16rpx; }
 
 .order-record-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12rpx; padding: 20rpx 0 8rpx; }
@@ -175,7 +186,4 @@
   .redemption-message-error { background: var(--bad-soft); color: var(--bad); }
   .payment-error { color: var(--bad); }
   .membership-card { background: var(--card); }
-  .membership-card > .benefit-list { background: rgba(255, 255, 255, 0.04); border-color: rgba(255, 255, 255, 0.06); }
-  .plan-head { background: rgba(0, 195, 117, 0.10); }
-  .plan-row { background: rgba(255, 255, 255, 0.03); }
 }
