@@ -19,11 +19,14 @@ const { targetKeyOf } = require('./events');
 const { AUTO_SHARE, DAY_MS } = require('./capacity-budget');
 const { observationHealth } = require('./observation-health');
 
+const NOTIFICATION_RECONCILE_INTERVAL_MS = 30000;
+
 function createCollector({ repo, fetchImpl, clock = () => new Date(), log = console, sendImpl = null, ownerId = `collector-${process.pid}-${Date.now()}`, sleep = ms => new Promise(resolve => setTimeout(resolve, ms)), refreshEveryMs = 10000, statusEveryMs = 5000, mode = 'resident', minimumIntervalMs = 0, statusTtlMs = 0, shouldContinue = () => true, remainingMs = () => Infinity }) {
   let config = mergeConfig(null);
   let lastRefreshAt = -Infinity;
   let lastStatusAt = -Infinity;
   let lastSenderProbeAt = -Infinity;
+  let lastNotificationReconcileAt = -Infinity;
   let lastObservationHealthState = null;
   let lastObservationHealthLogAt = -Infinity;
   let running = false;
@@ -165,7 +168,14 @@ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = cons
       // Delivery has its own snapshot. A delayed read must not overwrite the
       // newer configuration already applied to the sampling scheduler.
       const notificationConfig = mergeConfig(await repo.getConfig());
-      await repo.reconcileExpiredNotifications({ now: clock().toISOString() });
+      const reconcileAt = clock();
+      if (reconcileAt.getTime() - lastNotificationReconcileAt >= NOTIFICATION_RECONCILE_INTERVAL_MS) {
+        // Passes already run serially. Reconcile once at startup, then avoid an
+        // identical expiry update after every batch. Only success advances the
+        // window; anchor it to the query time so a slow update adds no delay.
+        await repo.reconcileExpiredNotifications({ now: reconcileAt.toISOString() });
+        lastNotificationReconcileAt = reconcileAt.getTime();
+      }
       // Ten minutes is well past the send window, so an old backlog never delays new alerts.
       const since = new Date(clock().getTime() - Math.max(600, notificationConfig.notifications.maxEventAgeSeconds || 120) * 1000).toISOString();
       const events = await repo.listUnprocessedEvents({ limit: 50, since });

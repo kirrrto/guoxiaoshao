@@ -56,6 +56,85 @@ async function setup(override = {}) {
   return { f, upstream, collector, sends, sender, run, task, send, available: () => { display = 'available'; } };
 }
 
+test('notification expiry reconciliation starts immediately and repeats at the 30-second boundary', async () => {
+  const s = await setup({ collector: { enabled: false } });
+  let reconciles = 0;
+  const reconcile = s.f.repo.reconcileExpiredNotifications.bind(s.f.repo);
+  s.f.repo.reconcileExpiredNotifications = async args => { reconciles++; return reconcile(args); };
+  const expired = s.task('already-expired');
+  await s.f.repo.saveNotification(expired);
+  await s.f.repo.claimNotification({ id: expired._id, ownerId: 'dead', now: s.f.state.now.toISOString(),
+    leaseUntil: new Date(s.f.state.now.getTime() - 1).toISOString() });
+  await s.collector.lease.acquire();
+  await Promise.all([s.collector.drainNotifications(), s.collector.drainNotifications()]);
+  assert.equal(reconciles, 1, 'queued passes share the successful reconciliation window');
+  assert.equal((await s.f.repo.getNotification(expired._id)).status, 'uncertain');
+
+  const later = s.task('expires-during-window');
+  await s.f.repo.saveNotification(later);
+  await s.f.repo.claimNotification({ id: later._id, ownerId: 'dead', now: s.f.state.now.toISOString(),
+    leaseUntil: new Date(s.f.state.now.getTime() + 1000).toISOString() });
+  s.f.advance(29999);
+  await s.run();
+  assert.equal(reconciles, 1);
+  assert.equal((await s.f.repo.getNotification(later._id)).status, 'sending');
+  s.f.advance(1);
+  await s.run();
+  assert.equal(reconciles, 2);
+  const reconciled = await s.f.repo.getNotification(later._id);
+  assert.equal(reconciled.status, 'uncertain');
+  assert.equal(reconciled.reason, 'worker_expired_after_claim');
+  assert.equal(s.sends.length, 0, 'expired sending claims must not be replayed');
+});
+
+test('a slow successful expiry update does not postpone the next reconciliation window', async () => {
+  const s = await setup({ collector: { enabled: false } });
+  let reconciles = 0;
+  const reconcile = s.f.repo.reconcileExpiredNotifications.bind(s.f.repo);
+  s.f.repo.reconcileExpiredNotifications = async args => {
+    reconciles++;
+    if (reconciles === 1) s.f.advance(5000);
+    return reconcile(args);
+  };
+  await s.run();
+  s.f.advance(24999);
+  await s.run();
+  assert.equal(reconciles, 1);
+  s.f.advance(1);
+  await s.run();
+  assert.equal(reconciles, 2, '30 seconds since query start, not since its completion');
+});
+
+test('a failed expiry update remains eligible for retry on the next notification pass', async () => {
+  const s = await setup({ collector: { enabled: false } });
+  let reconciles = 0;
+  const reconcile = s.f.repo.reconcileExpiredNotifications.bind(s.f.repo);
+  s.f.repo.reconcileExpiredNotifications = async args => {
+    reconciles++;
+    if (reconciles === 1) throw new Error('temporary expiry update failure');
+    return reconcile(args);
+  };
+  await assert.rejects(s.run(), /temporary expiry update failure/);
+  await s.run();
+  assert.equal(reconciles, 2, 'retry succeeds without advancing the clock');
+  await s.run();
+  assert.equal(reconciles, 2, 'only the successful retry starts the window');
+});
+
+test('a replacement collector reconciles immediately even within the previous instance window', async () => {
+  const s = await setup({ collector: { enabled: false } });
+  let reconciles = 0;
+  const reconcile = s.f.repo.reconcileExpiredNotifications.bind(s.f.repo);
+  s.f.repo.reconcileExpiredNotifications = async args => { reconciles++; return reconcile(args); };
+  await s.run();
+  await s.collector.lease.release();
+  const replacement = createCollector({ repo: s.f.repo, fetchImpl: s.upstream, clock: () => new Date(s.f.state.now),
+    sendImpl: s.sender, log, mode: 'scheduled', ownerId: 'replacement-worker' });
+  assert.equal(await replacement.lease.acquire(), true);
+  await replacement.drainNotifications();
+  assert.equal(reconciles, 2);
+});
+
 test('runtime 8-second interval and concurrency one are effective and can change without restart', async () => {
   const s = await setup({ collector: { enabled: true, intervalSeconds: 8, maxConcurrency: 1 } });
   await s.f.repo.saveFollow({ _id: 'F', userKey: userKeyOf(), partNumber: 'MJYH4CH/A', storeNumbers: ['R577', 'R639'], status: 'active' });
@@ -104,6 +183,9 @@ test('replacing a target retains the in-flight request in the global concurrency
 
 test('a manual query restock creates exactly one durable subscription notification', async () => {
   const s = await setup();
+  let reconciles = 0;
+  const reconcile = s.f.repo.reconcileExpiredNotifications.bind(s.f.repo);
+  s.f.repo.reconcileExpiredNotifications = async args => { reconciles++; return reconcile(args); };
   await s.run(); s.f.advance(500); s.available();
   const result = await s.f.call('query.pickup', { queryId: 'manual-00001', partNumber: 'MJYH4CH/A', storeNumbers: ['R577'] });
   assert.equal(result.ok, true);
@@ -111,6 +193,7 @@ test('a manual query restock creates exactly one durable subscription notificati
   s.f.advance(500); await s.run(); s.f.advance(1000); await s.run();
   assert.equal(s.sends.length, 1);
   assert.equal(await s.f.repo.count(C.notifications), 1);
+  assert.equal(reconciles, 1, 'event planning and confirmed delivery continue during the reconciliation window');
 });
 
 test('a temporary notification insert failure is recovered from the persisted event', async () => {

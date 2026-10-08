@@ -48,8 +48,8 @@
     },
     {
       "path": "engine/collector.js",
-      "bytes": 18492,
-      "sha256": "8316774a2d6232012d8900f3b54357a78f9e07f7586d9c9ebe364228722365e6"
+      "bytes": 19043,
+      "sha256": "90e3f994c1eee6f9f1cd9a217d107763e3a3f2794f97fb81da4c131e5ea9e5fe"
     },
     {
       "path": "engine/events.js",
