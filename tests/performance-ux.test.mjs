@@ -149,6 +149,19 @@ test('a downloaded new version offers a restart and uncaught errors reach the re
   assert.match(logged[0][1], /TypeError: boom/);
 });
 
+test('a missing or empty update manager never throws during launch', () => {
+  for (const getUpdateManager of [undefined, () => undefined, () => null, () => ({}), () => {
+    throw Error('not available');
+  }]) {
+    const rt = runtime();
+    if (getUpdateManager !== undefined) rt.wx.getUpdateManager = getUpdateManager;
+    rt.load('app.js'); const app = rt.app;
+    app.ensureCloud = () => Promise.resolve(null);
+    assert.doesNotThrow(() => app.onLaunch());
+    assert.doesNotThrow(() => app.watchForUpdate());
+  }
+});
+
 test('known SDK-only timeouts are warnings while unknown and app rejections still report', () => {
   const rt = runtime(); const errors = [], warns = [];
   rt.wx.getRealtimeLogManager = () => ({

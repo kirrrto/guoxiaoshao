@@ -120,14 +120,17 @@ App({
 
   /** A newly released package downloads in the background; offer a restart instead of running the old one. */
   watchForUpdate() {
+    // Some clients expose the factory but return no manager (older libs, previews).
     if (typeof wx.getUpdateManager !== 'function') return;
-    const manager = wx.getUpdateManager();
+    let manager = null;
+    try { manager = wx.getUpdateManager(); } catch (e) { return; }
+    if (!manager || typeof manager.onUpdateReady !== 'function') return;
     manager.onUpdateReady(() => {
       wx.showModal({
         title: '发现新版本',
         content: '新版本已下载完成，重启小程序即可使用。',
         confirmText: '立即重启',
-        success: result => { if (result.confirm) manager.applyUpdate(); },
+        success: result => { if (result.confirm && typeof manager.applyUpdate === 'function') manager.applyUpdate(); },
       });
     });
   },
