@@ -1,4 +1,4 @@
-﻿/* Shared launch calendar + opening poster. Imported by query and guide pages. */
+/* Shared launch calendar + opening poster. Imported by query and guide pages. */
 .calendar-heading { display: flex; align-items: center; justify-content: space-between; gap: 16rpx; flex-wrap: wrap; }
 /* Product title stays above milestone dates in the type scale. */
 .calendar-title { font-size: 48rpx; font-weight: 750; letter-spacing: -1rpx; line-height: 1.2; }
