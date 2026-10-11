@@ -30,43 +30,7 @@
 .opening-calendar-heading { flex: 1 1 0; min-width: 0; }
 .opening-calendar-mask { position: fixed; inset: 0; z-index: 1100; display: flex; align-items: center; justify-content: center; padding: 32rpx; background: rgba(9, 24, 18, .6); }
 .opening-calendar-panel { width: 100%; max-width: 440px; max-height: calc(100vh - 64rpx - env(safe-area-inset-top) - env(safe-area-inset-bottom)); display: flex; flex-direction: column; border-radius: 32rpx; background: var(--card); box-shadow: 0 20rpx 80rpx rgba(0, 0, 0, .22); overflow: hidden; }
-
-/* Poster hero: product title is the dominant type; dates stay secondary. */
-.poster-hero {
-  position: relative;
-  flex: none;
-  min-height: 360rpx;
-  padding: 28rpx 30rpx 36rpx;
-  overflow: hidden;
-  background: linear-gradient(145deg, #dfe9e4 0%, #b7c9c2 42%, #eef3f0 100%);
-}
-.poster-hero-image {
-  position: absolute;
-  right: -20rpx;
-  top: 36rpx;
-  width: 58%;
-  height: 300rpx;
-  opacity: 0.92;
-  pointer-events: none;
-}
-.poster-hero-fade {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 120rpx;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0), var(--card));
-  pointer-events: none;
-}
-.poster-hero-top {
-  position: relative;
-  z-index: 2;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16rpx;
-}
-.opening-calendar-brand { font-size: 23rpx; color: var(--green-dark); font-weight: 600; }
+/* Poster chrome shared via styles/launch-calendar.wxss; only modal chrome below. */
 .opening-calendar-close {
   box-sizing: border-box;
   display: flex;
@@ -84,79 +48,6 @@
 }
 .opening-calendar-close text { font-size: 34rpx; line-height: 1; font-weight: 300; }
 .opening-calendar-close.ui-control-pressed { background: var(--control-pressed); color: var(--green-dark); }
-.poster-hero-copy { position: relative; z-index: 2; margin-top: 28rpx; max-width: 62%; }
-.poster-title {
-  font-size: 56rpx;
-  font-weight: 750;
-  line-height: 1.15;
-  letter-spacing: -1.5rpx;
-  color: var(--text);
-}
-.poster-subtitle { margin-top: 12rpx; font-size: 26rpx; font-weight: 600; color: var(--text-2); }
-.poster-tags { display: flex; flex-wrap: wrap; gap: 10rpx; margin-top: 18rpx; }
-.poster-tag {
-  padding: 8rpx 16rpx;
-  border-radius: 999rpx;
-  background: rgba(255, 255, 255, 0.72);
-  border: 1rpx solid rgba(24, 42, 35, 0.08);
-  color: var(--text-2);
-  font-size: 21rpx;
-  font-weight: 600;
-}
-.poster-slogan {
-  position: absolute;
-  right: 28rpx;
-  bottom: 48rpx;
-  z-index: 2;
-  color: var(--green-dark);
-  font-size: 22rpx;
-  font-weight: 700;
-  line-height: 1.45;
-  text-align: right;
-  opacity: 0.85;
-  transform: rotate(-6deg);
-}
-.poster-countdown {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 16rpx;
-  margin: 8rpx 0 18rpx;
-  padding: 18rpx 22rpx;
-  border-radius: 18rpx;
-  background: var(--green-soft);
-}
-.poster-countdown-label { font-size: 24rpx; font-weight: 600; color: var(--green-dark); }
-.poster-countdown-value { font-size: 30rpx; font-weight: 750; color: var(--green-dark); font-variant-numeric: tabular-nums; }
-.poster-milestones { display: flex; gap: 20rpx; padding: 8rpx 0 18rpx; }
-.poster-milestone {
-  display: flex;
-  align-items: center;
-  gap: 14rpx;
-  flex: 1;
-  min-width: 0;
-  padding: 18rpx;
-  border-radius: 20rpx;
-  background: var(--surface-soft);
-}
-.poster-milestone-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex: none;
-  width: 72rpx;
-  height: 72rpx;
-  border-radius: 50%;
-  background: var(--green-soft);
-  font-size: 32rpx;
-}
-.poster-milestone-date {
-  display: block;
-  font-size: 40rpx;
-  font-weight: 750;
-  line-height: 1.15;
-  color: var(--green-dark);
-}
 .opening-calendar-scroll { flex: 1; min-height: 0; height: 320px; max-height: 42vh; }
 .opening-calendar-content { padding: 0 30rpx 18rpx; }
 .opening-calendar-actions { flex: none; padding: 8rpx 30rpx 26rpx; }
@@ -166,23 +57,8 @@
 @media (min-width: 600px) {
   .opening-calendar-mask { padding: 24px; }
   .opening-calendar-panel { max-height: calc(100vh - 48px); border-radius: 24px; }
-  .poster-hero { min-height: 220px; padding: 18px 22px 24px; }
-  .poster-hero-image { height: 190px; top: 24px; }
-  .poster-hero-copy { max-width: 58%; margin-top: 18px; }
-  .poster-title { font-size: 34px; letter-spacing: -.6px; }
-  .poster-subtitle { font-size: 15px; margin-top: 8px; }
-  .poster-tag { font-size: 12px; padding: 5px 10px; }
-  .poster-slogan { right: 22px; bottom: 28px; font-size: 13px; }
-  .opening-calendar-brand { font-size: 13px; }
   .opening-calendar-close { width: 36px; height: 36px; }
   .opening-calendar-close text { font-size: 22px; }
-  .poster-countdown { padding: 12px 16px; margin: 6px 0 12px; }
-  .poster-countdown-label { font-size: 14px; }
-  .poster-countdown-value { font-size: 18px; }
-  .poster-milestone { padding: 12px; border-radius: 14px; }
-  .poster-milestone-icon { width: 42px; height: 42px; font-size: 18px; }
-  .poster-milestone-date { font-size: 26px; }
-  .opening-calendar-image { height: 180px; }
   .opening-calendar-content { padding: 0 24px 12px; }
   .opening-calendar-actions { padding: 8px 24px 20px; }
   .opening-calendar-actions .btn { padding: 12px; }
