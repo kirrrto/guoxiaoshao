@@ -1,0 +1,16 @@
+{
+  "name": "cloudbase_auth",
+  "version": "2.0.0",
+  "license": "MIT",
+  "private": true,
+  "description": "云开发环境共享鉴权钩子：仅放行果小哨 AppID",
+  "main": "index.js",
+  "type": "commonjs",
+  "dependencies": {
+    "wx-server-sdk": "4.0.2"
+  },
+  "overrides": {
+    "axios": "0.34.0",
+    "lodash.unset": "4.18.0"
+  }
+}

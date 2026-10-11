@@ -1,0 +1,282 @@
+.account-header { display: flex; align-items: center; gap: 24rpx; min-width: 0; padding: 28rpx; margin-bottom: 24rpx; border: 1rpx solid var(--glass-line); border-radius: 28rpx; background: linear-gradient(120deg, var(--green-soft), var(--card) 76%); }
+.account-logo { display: block; flex: 0 0 104rpx; width: 104rpx; height: 104rpx; border-radius: 28rpx; box-shadow: 0 6rpx 18rpx rgba(46, 90, 75, 0.08); }
+.account-header-content { flex: 1 1 0; min-width: 0; }
+.account-header-heading { display: flex; align-items: center; flex-wrap: wrap; gap: 8rpx 16rpx; min-width: 0; }
+.account-brand { color: var(--text); font-size: 36rpx; font-weight: 700; line-height: 1.35; letter-spacing: -0.5rpx; }
+.account-status { font-size: max(12px, 24rpx); }
+.balance { font-size: 64rpx; font-weight: 700; color: var(--green-dark); letter-spacing: -2rpx; font-variant-numeric: tabular-nums; }
+.task { padding: 12rpx 0; flex-wrap: wrap; gap: 12rpx; }
+.task > view { flex: 1 1 230rpx; min-width: 0; }
+.ledger-row { padding: 14rpx 0; border-bottom: 2rpx solid var(--line); }
+.ledger-row:last-child { border-bottom: none; }
+.plus { color: var(--green-dark); }
+.minus { color: var(--text-2); }
+.ellipsis { flex: 1; min-width: 0; margin-right: 16rpx; white-space: normal; overflow-wrap: anywhere; }
+.record-error { display: flex; align-items: center; flex-wrap: wrap; gap: 16rpx; padding: 24rpx 0; color: var(--text-2); font-size: 24rpx; }
+.record-error > text:first-child { flex: 1 1 220rpx; min-width: 0; }
+.member-badge { flex: none; padding: 6rpx 16rpx; border-radius: 10rpx; background: #F4ECD9; color: #72521C; font-size: 24rpx; font-weight: 600; }
+/* Keep title, status badge and purchase-record control on one clean row. */
+.member-card-title.member-card-title { align-items: center; flex-wrap: nowrap; gap: 12rpx 16rpx; }
+.member-card-title > .member-card-heading { flex: 1 1 0; min-width: 0; white-space: normal; overflow-wrap: anywhere; }
+.member-card-actions {
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10rpx 12rpx;
+  max-width: 100%;
+}
+.member-overview { margin: 12rpx 0 20rpx; }
+.member-duration { display: flex; align-items: baseline; gap: 10rpx; color: var(--text-2); font-size: 26rpx; }
+.member-number { color: var(--text); font-size: 60rpx; font-weight: 700; letter-spacing: -1rpx; line-height: 1.2; font-variant-numeric: tabular-nums; }
+.member-renewal { margin-top: 10rpx; font-size: max(12px, 24rpx); color: var(--text-2); }
+.member-allowance { display: flex; flex-wrap: wrap; gap: 8rpx 24rpx; margin-top: 14rpx; font-size: max(12px, 24rpx); color: var(--text-2); }
+.member-authorization { margin-top: 16rpx; color: var(--text-2); font-size: max(12px, 24rpx); line-height: 1.65; }
+.member-core-benefits { display: flex; gap: 16rpx; margin-top: 20rpx; padding: 20rpx; border: 1rpx solid var(--line); border-radius: 20rpx; background: var(--surface-soft); }
+.member-core-benefit { display: flex; flex: 1 1 0%; flex-direction: column; gap: 8rpx; min-width: 0; line-height: 1.5; }
+.member-core-benefit + .member-core-benefit { padding-left: 20rpx; border-left: 1rpx solid var(--line); }
+.member-core-label { color: var(--text-2); font-size: max(12px, 24rpx); overflow-wrap: anywhere; }
+.member-core-value { color: var(--green-dark); font-size: max(14px, 28rpx); font-weight: 650; }
+.member-benefit-plans { display: flex; flex-wrap: wrap; gap: 16rpx; margin-top: 20rpx; }
+.member-benefit-plan { box-sizing: border-box; display: flex; flex: 1 1 180rpx; flex-direction: column; gap: 8rpx; min-width: 0; padding: 20rpx; border: 1rpx solid var(--line); border-radius: 20rpx; background: var(--surface-soft); }
+.member-benefit-plan-enhanced { border-color: var(--green-dark); background: var(--green-soft); }
+.member-benefit-plan-label { color: var(--text-2); font-size: max(12px, 24rpx); font-weight: 600; line-height: 1.5; overflow-wrap: anywhere; }
+.member-benefit-plan-amount { font-size: 44rpx; font-weight: 700; color: var(--text); line-height: 1.4; }
+.member-benefit-plan-unit { font-size: max(12px, 24rpx); font-weight: 400; color: var(--text-2); }
+.member-benefit-plan-detail { font-size: max(12px, 24rpx); color: var(--text-2); line-height: 1.6; }
+.member-benefit-note { display: flex; flex-direction: column; gap: 6rpx; padding: 18rpx 4rpx 2rpx; font-size: max(12px, 24rpx); line-height: 1.6; color: var(--text-2); }
+.member-benefit-note-title { font-weight: 600; color: var(--text); }
+.membership-rules { margin-top: 18rpx; }
+.membership-rule { display: flex; flex-direction: column; gap: 10rpx; padding: 20rpx; border-radius: 18rpx; background: var(--surface-soft); }
+.membership-rule + .membership-rule { margin-top: 14rpx; }
+.membership-rule-title { color: var(--text); font-size: max(13px, 26rpx); font-weight: 600; line-height: 1.5; }
+.membership-rule-copy { color: var(--text-2); font-size: max(12px, 24rpx); line-height: 1.7; overflow-wrap: anywhere; }
+/* Membership selection stays above detailed rules and remains legible on 320px screens. */
+.membership-member-actions { display: flex; gap: 16rpx; margin-top: 28rpx; min-width: 0; }
+.membership-manage { box-sizing: border-box; display: flex; align-items: center; justify-content: center; flex: 1 1 0; min-width: 0; min-height: 44px; margin: 0; padding: 18rpx 14rpx; border: 1rpx solid var(--line); border-radius: var(--radius-action); background: var(--surface-soft); color: var(--green-dark); font-size: max(13px, 26rpx); font-weight: 600; line-height: 1.5; white-space: normal; }
+.membership-manage-primary { flex-grow: 1.35; color: var(--action-text); background: var(--action-fill); border-color: transparent; }
+.membership-manage::after, .membership-shop-close::after { border: 0; }
+.membership-manage[disabled], .membership-shop-close[disabled] { opacity: .55; }
+.membership-caption { margin-top: 14rpx; color: var(--text-3); font-size: max(12px, 23rpx); line-height: 1.65; overflow-wrap: anywhere; }
+.membership-shop { margin-top: 28rpx; padding-top: 26rpx; border-top: 1rpx solid var(--line); }
+.membership-shop-heading { display: flex; align-items: center; justify-content: space-between; gap: 16rpx; min-width: 0; }
+.membership-shop-title { font-size: 29rpx; font-weight: 650; color: var(--text); }
+.membership-shop-close.ui-action { flex: none; min-height: 40px; margin: -10rpx 0; padding: 10rpx 20rpx; font-size: max(12px, 24rpx); line-height: 1.5; }
+.membership-shop-heading + .membership-caption { margin-top: 8rpx; }
+.membership-packages { display: flex; flex-wrap: wrap; gap: 16rpx; margin-top: 24rpx; min-width: 0; }
+.membership-package { box-sizing: border-box; display: flex; flex: 1 1 42%; flex-direction: column; justify-content: center; align-items: center; min-width: 0; margin: 0; padding: 24rpx 12rpx 18rpx; border: 2rpx solid var(--line); border-radius: 22rpx; background: var(--surface-soft); color: var(--text); line-height: 1.4; }
+.membership-package::after { border: 0; }
+.membership-package-selected { border-color: var(--green-dark); background: var(--green-soft); }
+.membership-package[disabled] { color: var(--text-2); }
+.membership-package-name { font-size: max(14px, 29rpx); font-weight: 650; }
+.membership-package-duration { display: block; margin-top: 6rpx; color: var(--text-3); font-size: max(12px, 23rpx); white-space: normal; }
+.membership-package-price { max-width: 100%; margin-top: 16rpx; font-size: max(16px, 34rpx); font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.membership-package-choice { display: flex; align-items: center; justify-content: center; gap: 8rpx; margin-top: 18rpx; color: var(--text-3); font-size: max(12px, 22rpx); white-space: nowrap; }
+.membership-package-radio { box-sizing: border-box; flex: none; width: 24rpx; height: 24rpx; border: 2rpx solid var(--line); border-radius: 50%; background: var(--card); }
+.membership-package-selected .membership-package-choice { color: var(--green-dark); }
+.membership-package-selected .membership-package-radio { border: 7rpx solid var(--green-dark); }
+.membership-package-heading { min-width: 0; }
+.membership-package-pricing { display: flex; flex-wrap: wrap; justify-content: center; align-items: baseline; column-gap: 10rpx; min-width: 0; }
+.membership-standard-price { color: var(--text-3); text-decoration: line-through; font-size: max(12px, 24rpx); white-space: nowrap; }
+.membership-promotion-tag { display: inline-block; margin-top: 12rpx; padding: 4rpx 14rpx; border-radius: 999rpx; font-size: max(12px, 22rpx); color: var(--green-dark); background: var(--green-soft); }
+.membership-daily-price { margin-top: 8rpx; color: var(--text-2); font-size: max(12px, 23rpx); white-space: normal; }
+.membership-promotion-deadline { margin-top: 18rpx; color: var(--green-dark); font-size: max(12px, 24rpx); line-height: 1.65; }
+.membership-package.membership-package-short { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; column-gap: 16rpx; row-gap: 4rpx; flex: 1 1 100%; order: 2; padding: 18rpx 22rpx; text-align: left; }
+.membership-package-short .membership-package-heading { grid-column: 1; grid-row: 1; }
+.membership-package-short .membership-package-pricing { grid-column: 2; grid-row: 1; justify-content: flex-end; }
+.membership-package-short .membership-package-price { margin-top: 0; }
+.membership-package-short .membership-daily-price { grid-column: 2; grid-row: 2; margin-top: 0; text-align: right; }
+.membership-package-short .membership-package-benefit { grid-column: 1; grid-row: 2; margin: 4rpx 0; }
+.membership-package-short .membership-package-choice { grid-column: 1 / 3; margin-top: 8rpx; justify-content: flex-end; }
+.member-record-shortcut.ui-action { flex: none; margin: 0; min-height: 36px; padding: 8rpx 14rpx; font-size: max(12px, 24rpx); }
+.membership-pending-caption { color: var(--text-2); }
+.membership-extension { margin-top: 24rpx; padding: 22rpx 24rpx; border-radius: 20rpx; background: var(--green-soft); }
+.membership-extension-label { color: var(--green-dark); font-size: max(13px, 25rpx); font-weight: 600; line-height: 1.6; }
+.membership-extension-detail { margin-top: 10rpx; font-size: max(13px, 26rpx); line-height: 1.6; color: var(--text); }
+.membership-extension-date { margin-top: 8rpx; font-size: max(12px, 24rpx); line-height: 1.6; font-weight: 600; color: var(--text); }
+.membership-extension-note { margin-top: 10rpx; color: var(--text-2); font-size: max(12px, 23rpx); line-height: 1.65; overflow-wrap: anywhere; }
+.membership-checkout-note { text-align: center; }
+.notification-test-copy { display: flex; flex: 1; flex-direction: column; align-items: flex-start; gap: 6rpx; min-width: 0; text-align: left; }
+.notification-test-copy > text { white-space: normal; overflow-wrap: anywhere; }
+
+.notification-heading { display: flex; align-items: center; justify-content: space-between; gap: 20rpx; min-width: 0; }
+.notification-heading-copy { flex: 1 1 0; min-width: 0; }
+.notification-heading-title { font-size: 32rpx; line-height: 1.5; font-weight: 600; margin-bottom: 6rpx; }
+.whistle-section-title { display: flex; align-items: center; gap: 12rpx; min-width: 0; }
+.card-title > .whistle-section-title { flex: 1 1 280rpx; }
+.whistle-section-title > text { min-width: 0; overflow-wrap: anywhere; }
+.section-whistle { display: block; flex: 0 0 34rpx; width: 34rpx; height: 34rpx; }
+.record-empty-whistle { display: block; width: 60rpx; height: 60rpx; margin: 0 auto 16rpx; opacity: .65; }
+.notification-scope { margin-top: 18rpx; line-height: 1.6; }
+.notification-item { padding: 24rpx; margin-top: 20rpx; border: 1rpx solid var(--glass-line); border-radius: 24rpx; background: var(--surface-soft); min-width: 0; }
+.notification-product { font-size: 26rpx; font-weight: 600; line-height: 1.55; word-break: break-word; overflow-wrap: anywhere; }
+.notification-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 12rpx 16rpx; margin-top: 14rpx; min-width: 0; }
+.notification-meta > text { max-width: 100%; min-width: 0; }
+.notification-detail, .notification-reason { font-size: 24rpx; line-height: 1.6; color: var(--text-2); overflow-wrap: anywhere; margin-top: 12rpx; }
+.notification-reason { color: var(--text-3); }
+.notification-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 12rpx; margin-top: 16rpx; }
+.notification-button.notification-delete { color: var(--bad); border-color: var(--line); background: var(--bad-soft); }
+.notification-button.notification-more { margin-top: 22rpx; }
+.notification-end { margin-top: 22rpx; text-align: center; }
+
+.membership-entry-list { display: flex; flex-direction: column; gap: 16rpx; margin-top: 24rpx; min-width: 0; }
+.member-entry.redemption-entry, .member-entry.payment-entry { box-sizing: border-box; display: flex; align-items: center; justify-content: center; width: 100%; max-width: 100%; min-width: 0; min-height: 88rpx; height: auto; margin: 0; padding: 20rpx 24rpx; border: 0; border-radius: 999rpx; color: var(--action-text); background: var(--action-fill); box-shadow: inset 0 2rpx 0 rgba(255,255,255,0.34), 0 6rpx 16rpx rgba(0,195,117,0.13); font-size: 28rpx; font-weight: 600; line-height: 1.5; white-space: normal; overflow-wrap: anywhere; text-align: center; }
+.member-entry.redemption-entry::after, .member-entry.payment-entry::after { display: none; border: 0; }
+.member-entry.payment-entry[disabled] { background: rgba(229, 239, 233, 0.80); color: #607669; box-shadow: none; }
+.member-entry.redemption-entry[disabled] { background: #DBF1E5; color: #587664; }
+.redemption-panel { margin-top: 22rpx; padding: 24rpx; background: rgba(230, 250, 239, 0.76); border: 1rpx solid var(--glass-line); border-radius: 26rpx; min-width: 0; }
+.redemption-mask { position: fixed; left: 0; top: 0; right: 0; bottom: 0; z-index: 1000; background: rgba(12, 28, 22, 0.42); display: flex; align-items: center; justify-content: center; padding: 32rpx; }
+.redemption-modal { width: 100%; max-width: 640rpx; max-height: 80vh; overflow-y: auto; background: var(--card); border-radius: 28rpx; padding: 32rpx 28rpx 24rpx; box-sizing: border-box; }
+.redemption-title { color: var(--text); font-size: 28rpx; font-weight: 600; line-height: 1.5; }
+.redemption-description { margin: 12rpx 0 20rpx; font-size: 24rpx; line-height: 1.65; color: var(--text-2); overflow-wrap: anywhere; }
+.redemption-input { box-sizing: border-box; display: block; width: 100%; min-width: 0; max-width: 100%; height: 92rpx; padding: 20rpx; margin-bottom: 20rpx; border: 1rpx solid #CBDED3; border-radius: 20rpx; background: rgba(255,255,255,0.9); color: var(--text); font-size: 30rpx; line-height: 1.5; }
+.redemption-placeholder { color: #708478; font-size: 26rpx; }
+.redemption-hint { margin-top: 18rpx; color: #65776C; font-size: 22rpx; line-height: 1.6; overflow-wrap: anywhere; }
+.redemption-message { margin-top: 18rpx; padding: 18rpx; border-radius: 14rpx; font-size: 24rpx; line-height: 1.65; overflow-wrap: anywhere; }
+.redemption-message-error { background: #FFF0EE; color: #B03E35; }
+.redemption-message-ok { background: var(--green-soft); color: var(--green-dark); }
+.redemption-message-info { background: var(--info-soft); color: var(--green-dark); }
+.membership-card { background: var(--card); }
+.membership-card > .card-title { margin-bottom: 16rpx; }
+.quota-card .task { padding: 18rpx 0; }
+.notification-heading { flex-wrap: wrap; }
+.notification-heading-copy { flex-basis: 240rpx; }
+.payment-note { margin-top: 16rpx; font-size: 23rpx; line-height: 1.65; color: var(--text-2); overflow-wrap: anywhere; }
+.purchase-notice { margin-top: 16rpx; }
+.purchase-notice-title { font-size: 24rpx; font-weight: 600; color: var(--text-1); }
+.purchase-notice .payment-note { margin-top: 8rpx; }
+.payment-panel { margin-top: 22rpx; padding: 24rpx; min-width: 0; border: 1rpx solid var(--glass-line); border-radius: 24rpx; background: var(--surface-soft); }
+.payment-status, .payment-error { font-size: 25rpx; line-height: 1.65; overflow-wrap: anywhere; }
+.payment-error { color: #A63A35; margin-top: 12rpx; }
+.payment-order-id { margin-top: 14rpx; font-size: 22rpx; color: var(--text-3); word-break: break-all; }
+.payment-actions { display: flex; flex-direction: column; gap: 14rpx; margin-top: 20rpx; min-width: 0; }
+.member-entry.payment-check { box-sizing: border-box; display: flex; justify-content: center; align-items: center; width: 100%; max-width: 100%; min-width: 0; height: auto; min-height: 82rpx; margin: 0; padding: 18rpx 22rpx; border: 1rpx solid var(--line); border-radius: 22rpx; background: var(--green-soft); color: var(--green-dark); font-size: 25rpx; line-height: 1.5; font-weight: 500; white-space: normal; overflow-wrap: anywhere; }
+.member-entry.payment-check::after { display: none; border: 0; }
+.member-entry.payment-check[disabled] { opacity: .6; }
+.member-entry.payment-abandon { box-sizing: border-box; display: flex; justify-content: center; align-items: center; width: 100%; max-width: 100%; min-width: 0; height: auto; min-height: 82rpx; margin: 0; padding: 18rpx 22rpx; border: 1rpx solid var(--line); border-radius: 22rpx; background: transparent; color: var(--text-2); font-size: 25rpx; line-height: 1.5; font-weight: 400; white-space: normal; overflow-wrap: anywhere; }
+.member-entry.payment-abandon::after { display: none; border: 0; }
+.member-entry.payment-abandon[disabled] { opacity: .6; }
+.membership-card .ledger-row > view { overflow-wrap: anywhere; }
+.member-entry.payment-entry, .member-entry.redemption-entry { min-height: 44px; border-radius: var(--radius-action); background: var(--action-fill); color: var(--action-text); box-shadow: none; }
+
+
+.identity-copy.ui-action { display: flex; justify-content: space-between; width: 100%; max-width: 100%; margin-top: 12rpx; padding: 10rpx 16rpx; font-size: max(12px, 24rpx); }
+.identity-copy .ui-action-label { flex: 1 1 auto; min-width: 0; word-break: break-all; text-align: left; }
+.identity-copy-label { flex: none; font-weight: 600; color: var(--green-dark); }
+.account-link + .account-link { margin-top: 12rpx; }
+.release-notes { margin: 20rpx 0; padding: 0 8rpx; }
+.release-note { padding: 22rpx 0; border-bottom: 1rpx solid var(--line); min-width: 0; }
+.release-pagination + .release-note { padding-top: 0; }
+.release-note:last-child { border-bottom: 0; padding-bottom: 0; }
+.release-note-heading { display: flex; align-items: center; flex-wrap: wrap; gap: 12rpx; }
+.release-note-version { font-size: 30rpx; font-weight: 650; color: var(--text); }
+.release-note-current { font-size: max(12px, 24rpx); }
+.release-note-title { margin-top: 10rpx; font-size: 28rpx; font-weight: 550; line-height: 1.55; color: var(--text); overflow-wrap: anywhere; }
+.release-note-date { margin-top: 6rpx; font-size: max(12px, 24rpx); line-height: 1.55; color: var(--text-3); }
+.release-note-highlight { display: flex; align-items: flex-start; gap: 12rpx; margin-top: 12rpx; font-size: max(13px, 26rpx); line-height: 1.65; color: var(--text-2); }
+.release-note-dot { flex: 0 0 6rpx; width: 6rpx; height: 6rpx; margin-top: 18rpx; border-radius: 50%; background: var(--green-dark); }
+.release-note-highlight > text { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.release-note-caption { margin-top: 16rpx; font-size: max(12px, 24rpx); line-height: 1.6; color: var(--text-3); overflow-wrap: anywhere; }
+.release-pagination { display: flex; align-items: center; justify-content: space-between; gap: 16rpx; margin-bottom: 24rpx; }
+.release-page-button.ui-action { flex: 1 1 0%; min-width: 0; min-height: 40px; padding: 12rpx; font-size: max(12px, 24rpx); }
+.release-page-count { flex: none; min-width: 72rpx; color: var(--text-2); text-align: center; font-size: max(12px, 24rpx); font-variant-numeric: tabular-nums; }
+.release-notes-collapse.ui-action { margin-top: 20rpx; min-height: 44px; font-size: 26rpx; }
+.redemption-close.ui-action { margin-top: 16rpx; }
+
+.order-record-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12rpx; padding: 20rpx 0 8rpx; }
+.order-record-toolbar > text { flex: 1 1 180rpx; }
+.order-record-button { width: auto; min-height: 64rpx; margin: 0; padding: 10rpx 20rpx; font-size: 23rpx; line-height: 1.5; white-space: normal; }
+.order-record-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 16rpx; margin-bottom: 8rpx; }
+.order-record-heading > .small { flex: 1; min-width: 0; }
+.order-record-heading > .pill { flex-shrink: 0; }
+.order-record-id { overflow-wrap: anywhere; word-break: break-all; }
+.order-record-actions { display: flex; justify-content: flex-end; margin-top: 12rpx; }
+.order-record-actions > text { flex: 1; }
+.order-record-note { margin: 16rpx 0; line-height: 1.6; color: var(--text); }
+
+
+.member-enhanced { margin-top:12rpx; color:var(--warn); font-size:22rpx; line-height:1.6; }
+.membership-package-benefit { display:block; margin:8rpx 0; color:var(--text-2); font-size:20rpx; line-height:1.5; white-space:normal; }
+
+/* Contextual checkout reuses the account surface, theme and payment controller. */
+.checkout-context { margin-top: 24rpx; padding: 24rpx; border: 1rpx solid var(--green-dark); border-radius: 22rpx; background: var(--green-soft); }
+.checkout-eyebrow { color: var(--green-dark); font-size: max(13px, 26rpx); font-weight: 650; line-height: 1.5; }
+.checkout-target { display: flex; align-items: center; gap: 20rpx; margin-top: 18rpx; min-width: 0; }
+.checkout-image { flex: none; width: 104rpx; height: 112rpx; border-radius: 16rpx; background: #fff; }
+.checkout-target-copy { flex: 1; min-width: 0; }
+.checkout-target-title { color: var(--text); font-size: max(16px, 32rpx); font-weight: 650; line-height: 1.5; overflow-wrap: anywhere; }
+.checkout-stores { margin-top: 8rpx; font-size: max(13px, 26rpx); line-height: 1.65; color: var(--text-2); overflow-wrap: anywhere; }
+.checkout-explanation, .checkout-terms { margin-top: 18rpx; color: var(--text-2); font-size: max(13px, 25rpx); line-height: 1.75; overflow-wrap: anywhere; }
+.checkout-problem { margin-top: 12rpx; color: var(--text); font-size: max(14px, 28rpx); line-height: 1.7; }
+.checkout-secondary, .checkout-feedback { display: flex; flex-wrap: wrap; gap: 14rpx; margin-top: 20rpx; }
+.checkout-secondary .ui-action, .checkout-feedback .ui-action { min-height: 44px; margin: 0; }
+.membership-task-label { display: block; margin-bottom: 12rpx; color: var(--green-dark); font-size: max(12px, 24rpx); line-height: 1.5; }
+.membership-packages-context { flex-wrap: wrap; }
+.membership-packages-context .membership-package { min-width: 0; }
+.membership-packages-context .membership-package-primary { border-color: var(--green-dark); }
+.membership-packages-context .membership-package-benefit { font-size: max(12px, 24rpx); }
+.membership-package-price-duration { font-size: max(12px, 23rpx); font-weight: 400; color: var(--text-2); }
+.membership-contextual .checkout-context { margin-top: 0; padding: 18rpx 20rpx; }
+.membership-contextual .checkout-target { margin-top: 10rpx; }
+.membership-contextual .checkout-explanation { margin-top: 10rpx; line-height: 1.6; }
+.membership-contextual .member-overview { margin-top: 22rpx; margin-bottom: 12rpx; }
+.checkout-core-benefits { color: var(--text-2); font-size: max(13px, 26rpx); line-height: 1.6; }
+.membership-contextual .member-authorization { margin-top: 8rpx; }
+.membership-contextual .membership-shop { margin-top: 18rpx; padding-top: 18rpx; }
+.membership-contextual .membership-packages { margin-top: 16rpx; }
+.membership-packages-context .membership-package { padding: 18rpx 8rpx 14rpx; }
+.membership-packages-context .membership-task-label { margin-bottom: 0; }
+.membership-packages-context .membership-package-price { margin-top: 8rpx; }
+.membership-packages-context .membership-package-choice { margin-top: 8rpx; }
+.membership-contextual .checkout-terms { margin-top: 14rpx; line-height: 1.6; }
+.checkout-identity.identity-copy { margin-top: 24rpx; }
+.member-pending-overview { font-size: max(32rpx, 16px); font-weight: 700; line-height: 1.5; }
+/* Keep account and pricing controls at readable physical sizes on tablets. */
+@media (min-width: 600px) {
+  .page.mine-page .account-header { box-sizing: border-box; max-width: 560px; margin: 0 auto 18px; gap: 16px; padding: 18px; border-radius: 20px; }
+  .page.mine-page .account-logo { flex-basis: 56px; width: 56px; height: 56px; border-radius: 16px; }
+  .page.mine-page .account-header-heading { gap: 8px 12px; }
+  .page.mine-page .account-brand { font-size: 22px; letter-spacing: -.3px; }
+  .page.mine-page .account-status, .page.mine-page .member-badge { font-size: 12px; }
+  .page.mine-page .identity-copy.ui-action { min-height: 36px; margin-top: 8px; padding: 7px 12px; font-size: 13px; }
+  .page.mine-page .identity-copy-label { font-size: 13px; }
+  .page.mine-page .member-record-shortcut.ui-action { min-height: 36px; padding: 7px 12px; font-size: 13px; }
+  .page.mine-page .member-card-title { flex-wrap: wrap; }
+  .page.mine-page .member-card-actions { gap: 8px; }
+  .page.mine-page .member-overview { margin: 8px 0 14px; }
+  .page.mine-page .member-pending-overview { font-size: 18px; }
+  .page.mine-page .member-core-benefits { gap: 14px; margin-top: 14px; padding: 14px; border-radius: 14px; }
+  .page.mine-page .member-core-benefit { gap: 6px; }
+  .page.mine-page .member-core-benefit + .member-core-benefit { padding-left: 14px; }
+  .page.mine-page .member-authorization { margin-top: 12px; }
+  .page.mine-page .membership-shop { margin-top: 18px; padding-top: 16px; }
+  .page.mine-page .membership-packages { margin-top: 14px; gap: 12px; }
+  .page.mine-page .membership-package { padding: 16px 10px 12px; border-radius: 14px; }
+  .page.mine-page .membership-package.membership-package-short { flex-basis: 100%; padding: 12px 16px; column-gap: 12px; row-gap: 4px; }
+  .page.mine-page .membership-standard-price, .page.mine-page .membership-promotion-tag, .page.mine-page .membership-daily-price { font-size: 13px; }
+  .page.mine-page .membership-promotion-tag { margin-top: 8px; padding: 3px 10px; }
+  .page.mine-page .membership-daily-price { margin-top: 6px; }
+  .page.mine-page .membership-promotion-deadline { margin-top: 12px; font-size: 13px; }
+  .page.mine-page .membership-extension { margin-top: 16px; padding: 14px 16px; border-radius: 14px; }
+  .page.mine-page .membership-extension-label, .page.mine-page .membership-extension-detail { font-size: 14px; }
+  .page.mine-page .membership-extension-date, .page.mine-page .membership-extension-note { font-size: 13px; }
+}
+@media (min-width: 720px) {
+  .membership-card { max-width: 560px; margin-left: auto; margin-right: auto; }
+}
+
+@media (prefers-color-scheme: dark) {
+  .notification-button.notification-delete { color: var(--bad); border-color: rgba(242, 155, 147, 0.28); background: var(--bad-soft); }
+  /* Keep the same brand fill and readable foreground in both themes. */
+  .member-entry.payment-entry, .member-entry.redemption-entry { background: var(--action-fill); color: var(--action-text); }
+  .member-badge { color: #E6CA86; background: #383121; }
+  .member-entry.payment-entry[disabled], .member-entry.redemption-entry[disabled] { background: #22322B; color: #7F958A; }
+  .redemption-panel { background: rgba(0, 195, 117, 0.08); }
+  .redemption-input { border-color: rgba(255, 255, 255, 0.12); background: rgba(255, 255, 255, 0.05); }
+  .redemption-placeholder { color: #7F958A; }
+  .redemption-hint { color: var(--text-3); }
+  .redemption-message-error { background: var(--bad-soft); color: var(--bad); }
+  .payment-error { color: var(--bad); }
+  .membership-card { background: var(--card); }
+}

@@ -1,0 +1,26 @@
+{
+  "recordDate": "2026-09-30",
+  "baseVersion": "1.5.0",
+  "scope": "Post-release frontend corrections; not uploaded or published to WeChat",
+  "tests": { "passed": 732, "failed": 0, "skipped": 0 },
+  "sourceCheck": { "files": 330, "errors": 0 },
+  "releasePreflight": { "passed": 34, "failed": 0 },
+  "monitorBundle": { "passed": true, "files": 30, "sourceBytes": 202082, "changed": false },
+  "viewDataCoverage": [
+    "All four consumer pages: initial data roots must be referenced by WXML expressions",
+    "Query and history: setData patches during startup, draft edits and catalog invalidation contain only bound roots",
+    "Invalid saved scope protection, cancelled drafts, restored history scopes and reminder quiet hours remain covered"
+  ],
+  "placeholderContrast": {
+    "method": "Offline rendering of actual WXML/WXSS with native placeholder-class mapped in memory to CSS ::placeholder; sRGB luminance against composited ancestor backgrounds",
+    "light": { "color": "#52665B", "background": "#F2F6F4", "minimumRatio": 5.6486589665541045, "previousMinimumRatio": 3.2674563005773556 },
+    "dark": { "color": "#B7C8BD", "background": "5% white composited over #1B251F", "minimumRatio": 7.804725162013276, "previousMinimumRatio": 4.268478969539379 },
+    "scenariosPassed": 72,
+    "inputWithinContainer": true,
+    "opacity": 1,
+    "wechatOfficialRescoringPerformed": false
+  },
+  "deploymentPerformed": false,
+  "wechatUploadPerformed": false,
+  "wechatPublicationPerformed": false
+}

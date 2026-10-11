@@ -1,0 +1,161 @@
+{
+  "checkedAt": "2026-09-20T06:07:56.281Z",
+  "version": "1.1.6",
+  "environment": "flowermean-6gjaxfqhf6c13e88",
+  "functions": [
+    {
+      "function": "gxs_api",
+      "status": "Active",
+      "modifiedAt": "2026-09-20 14:00:06",
+      "environmentVariableNames": [
+        "GXS_CONSUMER_APPID"
+      ]
+    },
+    {
+      "function": "gxs_monitor",
+      "status": "Active",
+      "modifiedAt": "2026-09-20 12:27:45",
+      "environmentVariableNames": [
+        "GXS_CONSUMER_APPID",
+        "GXS_CONSUMER_APPSECRET",
+        "GXS_ENABLE_SCHEDULED_MONITOR"
+      ]
+    },
+    {
+      "function": "cloudbase_auth",
+      "status": "Active",
+      "modifiedAt": "2026-09-20 12:27:48",
+      "environmentVariableNames": []
+    }
+  ],
+  "ping": {
+    "ok": true,
+    "data": {
+      "version": "1.1.6",
+      "env": "flowermean-6gjaxfqhf6c13e88",
+      "appid": "wxe96ad9e77b602f1b",
+      "crossAccount": true,
+      "hasUser": true,
+      "isAdmin": true
+    },
+    "serverTime": "2026-09-20T04:28:12.263Z",
+    "requestId": "2abc97f1-1c99-43b4-82e3-6a304632954b"
+  },
+  "paymentReadiness": {
+    "ok": true,
+    "data": {
+      "payment": {
+        "ready": false,
+        "configured": false,
+        "verified": false,
+        "reason": "payment_consumer_appid_mismatch",
+        "provider": "wechat_virtual_payment",
+        "mode": "short_series_goods",
+        "offerId": "1450655203",
+        "productId": "vip666",
+        "priceFen": 700,
+        "days": 7,
+        "currency": "CNY",
+        "env": 0
+      },
+      "product": {
+        "id": "vip666",
+        "title": "果小哨会员 · 7 天",
+        "priceFen": 700,
+        "days": 7,
+        "note": "一次购买 7 天，已有会员按剩余有效期顺延，不自动续费。会员查询不扣次数，可关注 3 个配置，每配置最多 3 家门店；微信提醒需额外订阅授权。",
+        "enabled": false,
+        "paymentReady": false,
+        "paymentReason": "payment_consumer_appid_mismatch",
+        "iosEnabled": true
+      }
+    },
+    "serverTime": "2026-09-20T04:28:18.988Z",
+    "requestId": "785f0b0e-a676-4d3c-9443-ea881e5df593",
+    "note": "This live admin.paymentStatus result predates writing GXS_CONSUMER_APPID. A console API invoke is not an operator identity, so it was not re-queried. With the public AppID present, the next credential reason is payment_consumer_secret_missing."
+  },
+  "route": {
+    "url": "https://flowermean-6gjaxfqhf6c13e88-1397722981.ap-shanghai.app.tcloudbase.com/payment/callback",
+    "path": "/payment/callback",
+    "target": "gxs_api",
+    "enabled": true,
+    "enablePathTransmission": true
+  },
+  "triggers": [
+    {
+      "name": "gxs-payment-reconcile-five-minutes",
+      "type": "timer",
+      "enabled": 1,
+      "cron": "0 */5 * * * * *"
+    }
+  ],
+  "forgedTimerRejection": {
+    "ok": false,
+    "reason": "timer_only",
+    "requestId": "436860cb-bce6-4e38-a457-0fd41fd77d7b",
+    "time": "2026-09-20 14:05+",
+    "diagnostics": {
+      "invocationScoped": false,
+      "environmentKeys": [],
+      "triggerSource": "timer",
+      "runEnvironment": "SCF"
+    },
+    "note": "Issued immediately after a real TRIGGER_TIMER in a warm mixed-use process. process.env still carried TRIGGER_SRC=timer, but trust requires this invocation's platform context."
+  },
+  "monitor": [
+    {
+      "time": "2026-09-20 12:33:06.299",
+      "requestId": "a252e9dc-8194-41c2-af53-79da71793e54",
+      "source": "TRIGGER_TIMER",
+      "result": {
+        "ok": true,
+        "state": "running",
+        "scanned": 2,
+        "observations": 2,
+        "events": 0,
+        "sent": 0,
+        "deadlineReached": false
+      }
+    }
+  ],
+  "paymentTimer": [
+    {
+      "time": "2026-09-20 12:35:01.036",
+      "requestId": "a27652c1-f9b8-4bad-9a13-cfd3b97baec4",
+      "source": "TRIGGER_TIMER",
+      "result": {
+        "ok": false,
+        "reason": "timer_only"
+      },
+      "note": "Pre-fix: mixed-use container still carried a previous developer-tools identity."
+    },
+    {
+      "time": "2026-09-20 14:00:32.542",
+      "requestId": "f5dced41-3f8c-4deb-86c8-418a041d23b8",
+      "source": "TRIGGER_TIMER",
+      "result": {
+        "ok": true,
+        "state": "process_disabled",
+        "scanned": 0
+      }
+    },
+    {
+      "time": "2026-09-20 14:05:05.125",
+      "requestId": "d04153dd-36d7-452d-8df1-df1fc8d998ae",
+      "source": "TRIGGER_TIMER",
+      "result": {
+        "ok": true,
+        "state": "process_disabled",
+        "scanned": 0
+      }
+    }
+  ],
+  "boundaries": [
+    "Purchasing remains disabled",
+    "API private credentials not yet configured",
+    "WeChat callback URL save verification not performed",
+    "Payment reconcile switch GXS_ENABLE_PAYMENT_RECONCILE is not true",
+    "No real purchase, iOS IAP, refund or membership delivery validated",
+    "Consumer front-end not uploaded or published"
+  ]
+}

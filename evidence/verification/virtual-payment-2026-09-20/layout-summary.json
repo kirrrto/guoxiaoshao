@@ -1,0 +1,30 @@
+[
+  {
+    "path": "layout-metrics.json",
+    "sha256": "63D1212739AFC2BC775CC2FB24F6C649DB6BFF2E1204567C75F0C3957EA68D50",
+    "generatedAt": "2026-09-20T04:23:47.484Z",
+    "renderer": "headless Chromium rendering generated WXML/WXSS approximation; not WeChat",
+    "summary": {
+      "total": 27,
+      "expressionErrors": 0,
+      "missingText": 0,
+      "horizontalOverflow": 0,
+      "clippedText": 0,
+      "failedImages": 0
+    }
+  },
+  {
+    "path": "redemption\\layout-metrics.json",
+    "sha256": "22FB5D200FDBFCEF033F2A94AA08FFF4A65D1938FEBC51F3D3DA46270963899F",
+    "generatedAt": "2026-09-20T04:18:14.151Z",
+    "renderer": "headless Chromium rendering generated WXML/WXSS approximation; not WeChat",
+    "summary": {
+      "total": 21,
+      "expressionErrors": 0,
+      "missingText": 0,
+      "horizontalOverflow": 0,
+      "clippedText": 0,
+      "failedImages": 0
+    }
+  }
+]

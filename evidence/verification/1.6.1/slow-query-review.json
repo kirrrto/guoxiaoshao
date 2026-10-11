@@ -1,0 +1,128 @@
+{
+  "version": "1.6.1",
+  "window": {
+    "start": "2026-10-06T00:00:00+08:00",
+    "end": "2026-10-08T17:10:00+08:00",
+    "completeLogResult": true,
+    "slowRecords": 5
+  },
+  "groups": [
+    {
+      "operation": "payment lease release",
+      "collection": "gxs_config",
+      "count": 2,
+      "durationsMs": [
+        3482,
+        1090
+      ],
+      "existingIndex": "_id_"
+    },
+    {
+      "operation": "unplanned notification events",
+      "collection": "gxs_events",
+      "count": 2,
+      "durationsMs": [
+        1561,
+        1194
+      ],
+      "existingIndex": "notify_planning"
+    },
+    {
+      "operation": "expired sending state reconciliation",
+      "collection": "gxs_notifications",
+      "count": 1,
+      "durationsMs": [
+        1230
+      ],
+      "existingIndex": "status_lease"
+    }
+  ],
+  "interpretation": "Existing indexes and repeated cross-collection latency; execution plans and scanned document counts were unavailable. No established single root cause. Slow logs are not payment failure counts.",
+  "change": {
+    "reconciliationIntervalMs": 30000,
+    "firstPassImmediate": true,
+    "failedPassCanRetryImmediately": true,
+    "intervalAnchoredAt": "successful query start",
+    "eventPlanningAndSendingCadenceUnchanged": true,
+    "paymentLeaseOwnerCheckUnchanged": true
+  },
+  "localVerification": {
+    "tests": 1156,
+    "passed": 1156,
+    "sourceFiles": 425,
+    "sourceErrors": 0,
+    "monitorFiles": 38,
+    "releaseChecks": 45,
+    "releaseChecksPassed": 45,
+    "threeStoreFixture": {
+      "expiryUpdatesBefore": 7,
+      "expiryUpdatesAfter": 1,
+      "eventQueriesBefore": 7,
+      "eventQueriesAfter": 7,
+      "pendingQueriesBefore": 7,
+      "pendingQueriesAfter": 7,
+      "storeScansBefore": 3,
+      "storeScansAfter": 3
+    }
+  },
+  "deployment": {
+    "method": "WeChat CLI incremental code upload",
+    "functions": [
+      {
+        "name": "gxs_api",
+        "files": 1,
+        "modifiedAt": "2026-10-08T17:20:40+08:00",
+        "status": "Active",
+        "configUnchanged": true,
+        "fields": [
+          "Runtime",
+          "Timeout",
+          "Handler",
+          "MemorySize",
+          "Environment",
+          "Triggers",
+          "Role",
+          "InstallDependency"
+        ]
+      },
+      {
+        "name": "gxs_monitor",
+        "files": 2,
+        "modifiedAt": "2026-10-08T17:21:09+08:00",
+        "status": "Active",
+        "configUnchanged": true,
+        "fields": [
+          "Runtime",
+          "Timeout",
+          "Handler",
+          "MemorySize",
+          "Environment",
+          "Triggers",
+          "Role",
+          "InstallDependency"
+        ]
+      }
+    ],
+    "downloadedRuntimeFilesVerified": 112,
+    "installedWxServerSdk": "4.0.2",
+    "frontendChanged": false,
+    "frontendReuploaded": false
+  },
+  "observedCollector": {
+    "state": "running",
+    "updatedAt": "2026-10-08T09:22:15.109Z",
+    "lastBatchAt": "2026-10-08T09:22:13.020Z",
+    "observations": 3,
+    "events": 0,
+    "sent": 0,
+    "observationHealth": "healthy",
+    "senderAuthReady": true
+  },
+  "limits": [
+    "No production latency improvement or elimination of future warnings is established.",
+    "Collector status is not proof of a real notification being delivered.",
+    "Environment metrics reported no FunctionError or FunctionTimeout in the three sampled 20-minute windows; application-level errors and end-user delays remain possible.",
+    "No database indexes, membership data, order data, instance tier or frontend version were changed."
+  ],
+  "privateEvidence": "Raw function archives and local tool receipts remain under ignored output/slow-query-20261008; no order IDs, owner IDs, credentials or signed download URLs are included here."
+}

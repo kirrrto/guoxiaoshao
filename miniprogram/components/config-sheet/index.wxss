@@ -1,0 +1,16 @@
+.config-sheet-root { position: fixed; inset: 0; z-index: 1000; color: var(--text); }
+.config-sheet-scrim { position: absolute; inset: 0; background: rgba(10, 24, 17, .42); }
+.config-sheet-panel { position: absolute; left: 0; right: 0; display: flex; flex-direction: column; height: 88vh; background: var(--card, #fff); border-radius: 32rpx 32rpx 0 0; overflow: hidden; box-shadow: 0 -12rpx 64rpx rgba(0, 0, 0, .13); }
+.config-sheet-header { display: flex; flex: none; align-items: center; gap: 24rpx; padding: 28rpx 32rpx 20rpx; border-bottom: 1rpx solid var(--line); }
+.config-sheet-heading { flex: 1; min-width: 0; }
+.config-sheet-title { font-size: 34rpx; line-height: 1.4; font-weight: 600; }
+.config-sheet-subtitle { margin-top: 8rpx; color: var(--text-2); font-size: 25rpx; line-height: 1.5; }
+.config-sheet-close { display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; flex: 0 0 44px; margin: 0; padding: 0; border: none; border-radius: 50%; background: var(--surface-soft); color: var(--text-2); font-size: 42rpx; line-height: 1; }
+.config-sheet-close::after { border: none; }
+.config-sheet-body { flex: 1; height: 0; min-height: 0; }
+.config-sheet-content { padding: 24rpx 32rpx 32rpx; }
+.config-sheet-footer { flex: none; padding: 20rpx 32rpx calc(20rpx + env(safe-area-inset-bottom)); border-top: 1rpx solid var(--line); background: var(--card, #fff); }
+.config-sheet-keyboard { padding-bottom: 16rpx; }
+.config-sheet-summary { font-size: 25rpx; color: var(--text-2); line-height: 1.5; margin-bottom: 16rpx; overflow-wrap: anywhere; }
+.config-sheet-confirm { min-height: 44px; min-height: max(44px, 96rpx); }
+@media (prefers-color-scheme: dark) { .config-sheet-panel, .config-sheet-footer { background: var(--card, #1B251F); } }

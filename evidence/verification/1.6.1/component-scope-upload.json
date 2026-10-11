@@ -1,0 +1,34 @@
+{
+  "recordedAt": "2026-10-08T04:57:56.150Z",
+  "version": "1.6.1",
+  "appid": "wxe96ad9e77b602f1b",
+  "baseCommit": "fb8cfbc702f65de8c2e01496bdda576c09717c6c",
+  "change": "Move reminder-nudge registration from app.json to four consuming pages",
+  "fileHashes": {
+    "miniprogram/app.json": "b7165b5a494dc4ff9606f8223d8ca3ef43d45dff893a8128c3c34d660e9ee474",
+    "miniprogram/pages/query/index.json": "67108279324325e9c1569a999518d8243e2aa6b279859b4913b2eb3ce373d196",
+    "miniprogram/pages/follow/index.json": "68dfa96fbbbbd860ca2cbbd298f14e9aef5179693ac71afd5c5a5d8b1c585bbf",
+    "miniprogram/pages/history/index.json": "ee4f867f0bcef8f1ecd2a10f91d8e52c3ccb58d7ae284be5c84026762b589d4b",
+    "miniprogram/pages/mine/index.json": "f5a68e138a9accc1c7658207edab5711841fdd705c45ccac59dcbbaab20dd961"
+  },
+  "targetedTests": {
+    "passed": 39,
+    "failed": 0
+  },
+  "sourceCheck": {
+    "files": 425,
+    "errors": 0
+  },
+  "releaseChecks": {
+    "passed": 45,
+    "total": 45
+  },
+  "previewSucceeded": true,
+  "uploadSucceeded": true,
+  "packageBytes": 763152,
+  "cloudFunctionsChanged": false,
+  "reviewSubmitted": false,
+  "formallyPublished": false,
+  "runtimeWarningAbsenceVerified": false,
+  "scope": "Source, existing regression tests, release preflight and actual WeChat DevTools preview/upload. No claimed measured startup speed improvement or production publication."
+}

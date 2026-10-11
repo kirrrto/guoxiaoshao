@@ -1,0 +1,140 @@
+{
+  "renderer": "Offline browser fixtures, not WeChat or a real payment. Membership card crop; tall viewport keeps floating navigation outside crop. Layout metrics separately use 900px height.",
+  "captures": [
+    {
+      "scenario": "payment-ready",
+      "width": 320,
+      "file": "screenshots/mine-payment-ready-320.png"
+    },
+    {
+      "scenario": "payment-ready",
+      "width": 375,
+      "file": "screenshots/mine-payment-ready-375.png"
+    },
+    {
+      "scenario": "payment-ready",
+      "width": 430,
+      "file": "screenshots/mine-payment-ready-430.png"
+    },
+    {
+      "scenario": "payment-renew",
+      "width": 320,
+      "file": "screenshots/mine-payment-renew-320.png"
+    },
+    {
+      "scenario": "payment-renew",
+      "width": 375,
+      "file": "screenshots/mine-payment-renew-375.png"
+    },
+    {
+      "scenario": "payment-renew",
+      "width": 430,
+      "file": "screenshots/mine-payment-renew-430.png"
+    },
+    {
+      "scenario": "payment-blocked",
+      "width": 320,
+      "file": "screenshots/mine-payment-blocked-320.png"
+    },
+    {
+      "scenario": "payment-blocked",
+      "width": 375,
+      "file": "screenshots/mine-payment-blocked-375.png"
+    },
+    {
+      "scenario": "payment-blocked",
+      "width": 430,
+      "file": "screenshots/mine-payment-blocked-430.png"
+    },
+    {
+      "scenario": "payment-old-ios",
+      "width": 320,
+      "file": "screenshots/mine-payment-old-ios-320.png"
+    },
+    {
+      "scenario": "payment-old-ios",
+      "width": 375,
+      "file": "screenshots/mine-payment-old-ios-375.png"
+    },
+    {
+      "scenario": "payment-old-ios",
+      "width": 430,
+      "file": "screenshots/mine-payment-old-ios-430.png"
+    },
+    {
+      "scenario": "payment-pending",
+      "width": 320,
+      "file": "screenshots/mine-payment-pending-320.png"
+    },
+    {
+      "scenario": "payment-pending",
+      "width": 375,
+      "file": "screenshots/mine-payment-pending-375.png"
+    },
+    {
+      "scenario": "payment-pending",
+      "width": 430,
+      "file": "screenshots/mine-payment-pending-430.png"
+    },
+    {
+      "scenario": "payment-cancelled",
+      "width": 320,
+      "file": "screenshots/mine-payment-cancelled-320.png"
+    },
+    {
+      "scenario": "payment-cancelled",
+      "width": 375,
+      "file": "screenshots/mine-payment-cancelled-375.png"
+    },
+    {
+      "scenario": "payment-cancelled",
+      "width": 430,
+      "file": "screenshots/mine-payment-cancelled-430.png"
+    },
+    {
+      "scenario": "payment-error",
+      "width": 320,
+      "file": "screenshots/mine-payment-error-320.png"
+    },
+    {
+      "scenario": "payment-error",
+      "width": 375,
+      "file": "screenshots/mine-payment-error-375.png"
+    },
+    {
+      "scenario": "payment-error",
+      "width": 430,
+      "file": "screenshots/mine-payment-error-430.png"
+    },
+    {
+      "scenario": "payment-fulfilled",
+      "width": 320,
+      "file": "screenshots/mine-payment-fulfilled-320.png"
+    },
+    {
+      "scenario": "payment-fulfilled",
+      "width": 375,
+      "file": "screenshots/mine-payment-fulfilled-375.png"
+    },
+    {
+      "scenario": "payment-fulfilled",
+      "width": 430,
+      "file": "screenshots/mine-payment-fulfilled-430.png"
+    },
+    {
+      "scenario": "payment-partial-refund",
+      "width": 320,
+      "file": "screenshots/mine-payment-partial-refund-320.png"
+    },
+    {
+      "scenario": "payment-partial-refund",
+      "width": 375,
+      "file": "screenshots/mine-payment-partial-refund-375.png"
+    },
+    {
+      "scenario": "payment-partial-refund",
+      "width": 430,
+      "file": "screenshots/mine-payment-partial-refund-430.png"
+    }
+  ]
+}

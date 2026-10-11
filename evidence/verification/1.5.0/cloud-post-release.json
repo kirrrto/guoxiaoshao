@@ -1,0 +1,36 @@
+{
+  "recordDate": "2026-09-30",
+  "timezone": "Asia/Shanghai",
+  "releaseVersion": "1.5.0",
+  "frontend": {
+    "status": "published",
+    "evidence": "Maintainer confirmed publication in this conversation",
+    "verifiedLocalSourceCommit": "4f2d5d9e1afeb7d2f9e663a95446d3f16ccf89fc",
+    "uploadedSourceCommitIndependentlyVerified": false
+  },
+  "api": {
+    "functionName": "gxs_api",
+    "action": "system.ping",
+    "version": "1.5.0",
+    "serverTime": "2026-09-30T10:43:19.210Z",
+    "ok": true
+  },
+  "monitor": {
+    "functionName": "gxs_monitor",
+    "status": "Active",
+    "modifiedAtAsReturned": "2026-09-30 18:40:53",
+    "runtime": "Nodejs20.19",
+    "timeoutSeconds": 60,
+    "trigger": { "name": "gxs-monitor-minute", "type": "timer", "cron": "0 * * * * * *" },
+    "collectorState": "running",
+    "collectorUpdatedAt": "2026-09-30T10:43:12.872Z",
+    "nextRunAt": "2026-09-30T10:44:00.000Z"
+  },
+  "verificationScope": {
+    "readOnlyCloudCheck": true,
+    "cloudCodeBundleCompared": false,
+    "currentBuildRealMessageDeliveryVerified": false,
+    "currentBuildPaymentAndRefundVerified": false,
+    "agentPerformedDeploymentOrPublication": false
+  }
+}

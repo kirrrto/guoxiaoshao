@@ -1,0 +1,12 @@
+{
+  "memberPlans": {
+    "member_30d": {
+      "productId": "vip777",
+      "enabled": true
+    },
+    "member_365d": {
+      "productId": "vip888",
+      "enabled": true
+    }
+  }
+}

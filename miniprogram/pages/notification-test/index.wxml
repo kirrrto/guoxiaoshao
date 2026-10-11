@@ -1,0 +1,32 @@
+<view class="test-page">
+  <view class="test-card">
+    <text class="test-tag">【测试】微信服务通知</text>
+    <view class="test-title">先试收一条通知</view>
+    <view class="test-copy">主动点击并允许微信授权后，发送一条明确标注【测试】的消息。不会查询库存，也不会创建到货监测。</view>
+    <view class="test-cost">消耗 1 次签到／任务额度 · 当前 {{balance}} 次</view>
+    <view class="test-copy">会员测试也消耗这 1 次有限额度。明确发送失败自动退回；结果不明时暂不退回，不会重复发送。</view>
+    <view wx:if="{{error}}" class="test-error">{{error}}</view>
+    <view wx:if="{{operationNote}}" class="test-copy" aria-live="polite">{{operationNote}}</view>
+    <view wx:if="{{checkNote}}" class="test-copy" aria-live="polite">{{checkNote}}</view>
+    <view wx:if="{{test && test.status === 'uncertain' && test.feedback}}" class="test-copy">旧测试结果仍未知，原扣次与记录保留。你可以主动重新授权一条新测试，再消耗 1 次；不会重发旧消息。</view>
+    <button wx:if="{{!blocked && !canContinue && !pendingOther}}" class="test-primary" bindtap="onStart" disabled="{{busy || loading || !ready || balance < 1}}" loading="{{busy}}">{{test && test.status === 'uncertain' ? '重新授权新测试 · 1 次' : (test && test.status === 'accepted' ? '再发一条测试 · 1 次' : '授权并发送测试 · 1 次')}}</button>
+    <view wx:if="{{pendingOther}}" class="test-copy">另有一条未确认的测试编号已保留。请先查看它，避免覆盖原请求。</view>
+    <button wx:if="{{pendingOther}}" class="test-secondary" bindtap="onViewPending" disabled="{{busy || loading}}">查看另一个待确认测试</button>
+    <button wx:if="{{canContinue}}" class="test-primary" bindtap="onContinue" disabled="{{busy || loading || !ready || blocked}}" loading="{{busy}}">继续原测试 · 本次最多 1 次</button>
+    <button class="test-secondary" bindtap="onCheck" disabled="{{busy || loading}}">{{loading ? '读取中…' : '查看原测试结果'}}</button>
+    <view wx:if="{{ready && balance < 1}}" class="test-link" bindtap="onGoMine">去「我的」签到获取次数</view>
+  </view>
+  <view wx:if="{{test}}" class="test-card">
+    <view class="test-heading">{{statusTitle}}</view>
+    <view class="test-copy">{{statusNote}}</view>
+    <view class="test-copy">本次扣除 {{test.charged}} 次 · 已退回 {{test.refunded}} 次</view>
+    <view wx:if="{{test.status === 'accepted' || test.status === 'uncertain'}}" class="test-feedback">
+      <view class="test-heading">在微信「服务通知」中收到了吗？</view>
+      <button class="test-secondary" bindtap="onFeedback" data-outcome="received" disabled="{{busy || loading}}">我收到了</button>
+      <button class="test-secondary" bindtap="onFeedback" data-outcome="not_received" disabled="{{busy || loading}}">暂时没收到</button>
+    </view>
+    <view wx:if="{{feedbackNote}}" class="test-copy">{{feedbackNote}}</view>
+    <view wx:if="{{test && test.feedback === 'not_received'}}" class="test-copy">查看路径：返回微信聊天列表，搜索「服务通知」并打开；再检查小程序右上角「…」中的设置与订阅消息选项、微信通知设置和手机系统中的微信通知权限。入口可能随版本不同，开启后也不保证及时弹出锁屏提醒。</view>
+  </view>
+  <view class="test-tip">授权次数与查询额度是两回事。测试仅用于检查通知链路，微信受理不保证手机弹出横幅；正式到货和断货提醒仍需会员、有效关注与微信授权。</view>
+</view>

@@ -1,0 +1,26 @@
+{
+  "packagedAt": "2026-09-16T03:58:44.438Z",
+  "method": "Original PNG copied unchanged; derivatives only resized using Lanczos3 and lossless PNG compression",
+  "master": {
+    "width": 1254,
+    "height": 1254,
+    "hasAlpha": false
+  },
+  "files": [
+    {
+      "path": "docs/brand/logo-mint-master.png",
+      "bytes": 1068176,
+      "sha256": "f14feab7ada69cddef2ac81ad17e0d418c4c82eb2ddf768262cc21c43aabbc9b"
+    },
+    {
+      "path": "miniprogram/images/brand/logo-mint-144.png",
+      "bytes": 22992,
+      "sha256": "959b2f848f03466a2e04a1940f54fba1790b10e44775716be73bb7cab580e360"
+    },
+    {
+      "path": "docs/brand/logo-mint-512.png",
+      "bytes": 247245,
+      "sha256": "2d63be9ddb7c674a1acb67d7d807c48300fbef35a664a5ffa5fd0a9f5b58407b"
+    }
+  ]
+}

@@ -1,0 +1,8083 @@
+{
+  "checkedAt": "2026-09-16T03:59:47.087Z",
+  "previewGeneratedAt": "2026-09-16T03:58:45.460Z",
+  "sources": [
+    {
+      "file": "miniprogram/app.wxss",
+      "sha256": "665a60577aa895632dec08502942b7a6aa13eaf40142500e7827e42c806bb469"
+    },
+    {
+      "file": "miniprogram/styles/common.wxss",
+      "sha256": "ac5faef31d5cea649fb509bdb04f280658ee5ffc88b887491765b4e059fcbb22"
+    },
+    {
+      "file": "miniprogram/custom-tab-bar/index.wxss",
+      "sha256": "14ac5fcdaca05c2ef6a950d56f965bccca155ce4f8179d121f0f5654e9516047"
+    },
+    {
+      "file": "miniprogram/pages/query/index.wxss",
+      "sha256": "549c9ad451cff9ff593c23d265eb6608e87426e96c8b44331a8b8774f040daf2"
+    },
+    {
+      "file": "miniprogram/pages/follow/index.wxss",
+      "sha256": "f3eecf3a3c53d03956253692523f92cb6703366fb2a9d14ce07708e3c56be2b3"
+    },
+    {
+      "file": "miniprogram/pages/history/index.wxss",
+      "sha256": "2920728beb9542fd73b4a3e14c73fd774400040f38bc413dec72b3be8bf4a84c"
+    },
+    {
+      "file": "miniprogram/pages/mine/index.wxss",
+      "sha256": "cd5bd2e9a72f0d809427e3398ed6b8366fe4e845d4ce53be6b351843e8afff12"
+    }
+  ],
+  "renderer": "Offline Chromium / Edge using actual page CSS and markup",
+  "scope": "375px member and free pages; primary/secondary buttons, green action links, selected chips and navigation labels. This is a limited readability check, not a whole-screen WCAG certification.",
+  "method": "Nine rendered background samples per control, removing glyphs and images without changing layout. Contrast uses computed foreground and sampled gradient/composited surface. Does not count text shadow. Disabled controls are reported but exempt from failures.",
+  "limitations": "Transparent bar content changes while scrolling. Removing background glyphs isolates intended surface colors; overlapping moving text and device-specific blur require visual/device review. Icon shape and icon contrast are not part of this test.",
+  "summary": {
+    "total": 82,
+    "active": 80,
+    "belowTarget": 0,
+    "primaryMinimum": 5.709250972007772,
+    "selectedNavMinimum": 4.534808627135748
+  },
+  "records": [
+    {
+      "page": "query",
+      "scenario": "free",
+      "index": 0,
+      "label": "去签到 / 查看次数",
+      "className": "btn btn-primary btn-block mt",
+      "color": "rgb(7, 60, 44)",
+      "fontSize": 15,
+      "fontWeight": 600,
+      "disabled": false,
+      "selectedNav": false,
+      "nav": false,
+      "ownBackground": "rgba(0, 0, 0, 0)",
+      "ownGradient": "linear-gradient(155deg, rgb(30, 213, 138), rgb(0, 195, 117))",
+      "foreground": [
+        7,
+        60,
+        44
+      ],
+      "minRatio": 5.709250972007772,
+      "maxRatio": 6.07369610731565,
+      "samples": [
+        {
+          "background": [
+            19,
+            207,
+            130
+          ],
+          "ratio": 6.07369610731565
+        },
+        {
+          "background": [
+            19,
+            206,
+            130
+          ],
+          "ratio": 6.0165913825359265
+        },
+        {
+          "background": [
+            18,
+            206,
+            130
+          ],
+          "ratio": 6.015427040888083
+        },
+        {
+          "background": [
+            15,
+            204,
+            128
+          ],
+          "ratio": 5.8928182842268235
+        },
+        {
+          "background": [
+            15,
+            204,
+            127
+          ],
+          "ratio": 5.889720098149051
+        },
+        {
+          "background": [
+            15,
+            204,
+            127
+          ],
+          "ratio": 5.889720098149051
+        },
+        {
+          "background": [
+            11,
+            202,
+            125
+          ],
+          "ratio": 5.768340274853127
+        },
+        {
+          "background": [
+            11,
+            201,
+            124
+          ],
+          "ratio": 5.7100333007838415
+        },
+        {
+          "background": [
+            10,
+            201,
+            124
+          ],
+          "ratio": 5.709250972007772
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "query",
+      "scenario": "free",
+      "index": 1,
+      "label": "iPhone",
+      "className": "tab on",
+      "color": "rgb(7, 60, 44)",
+      "fontSize": 13,
+      "fontWeight": 600,
+      "disabled": false,
+      "selectedNav": false,
+      "nav": false,
+      "ownBackground": "rgba(0, 0, 0, 0)",
+      "ownGradient": "linear-gradient(145deg, rgb(30, 213, 138), rgb(0, 195, 117))",
+      "foreground": [
+        7,
+        60,
+        44
+      ],
+      "minRatio": 5.709250972007772,
+      "maxRatio": 6.0165913825359265,
+      "samples": [
+        {
+          "background": [
+            19,
+            206,
+            130
+          ],
+          "ratio": 6.0165913825359265
+        },
+        {
+          "background": [
+            18,
+            206,
+            129
+          ],
+          "ratio": 6.012267386122061
+        },
+        {
+          "background": [
+            16,
+            205,
+            128
+          ],
+          "ratio": 5.950216089981444
+        },
+        {
+          "background": [
+            16,
+            204,
+            128
+          ],
+          "ratio": 5.893835104319044
+        },
+        {
+          "background": [
+            14,
+            203,
+            127
+          ],
+          "ratio": 5.832731055399154
+        },
+        {
+          "background": [
+            13,
+            203,
+            126
+          ],
+          "ratio": 5.828741755508742
+        },
+        {
+          "background": [
+            13,
+            203,
+            126
+          ],
+          "ratio": 5.828741755508742
+        },
+        {
+          "background": [
+            11,
+            202,
+            125
+          ],
+          "ratio": 5.768340274853127
+        },
+        {
+          "background": [
+            10,
+            201,
+            124
+          ],
+          "ratio": 5.709250972007772
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "query",
+      "scenario": "free",
+      "index": 2,
+      "label": "勃艮第酒红色",
+      "className": "chip on",
+      "color": "rgb(0, 122, 73)",
+      "fontSize": 13,
+      "fontWeight": 600,
+      "disabled": false,
+      "selectedNav": false,
+      "nav": false,
+      "ownBackground": "rgba(217, 249, 233, 0.85)",
+      "ownGradient": "none",
+      "foreground": [
+        0,
+        122,
+        73
+      ],
+      "minRatio": 4.902824545303801,
+      "maxRatio": 4.902824545303801,
+      "samples": [
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "query",
+      "scenario": "free",
+      "index": 3,
+      "label": "合肥万象城",
+      "className": "chip on",
+      "color": "rgb(0, 122, 73)",
+      "fontSize": 13,
+      "fontWeight": 600,
+      "disabled": false,
+      "selectedNav": false,
+      "nav": false,
+      "ownBackground": "rgba(217, 249, 233, 0.85)",
+      "ownGradient": "none",
+      "foreground": [
+        0,
+        122,
+        73
+      ],
+      "minRatio": 4.902824545303801,
+      "maxRatio": 4.902824545303801,
+      "samples": [
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "query",
+      "scenario": "free",
+      "index": 4,
+      "label": "合肥 · 合肥万象城 ×",
+      "className": "chip on",
+      "color": "rgb(0, 122, 73)",
+      "fontSize": 13,
+      "fontWeight": 600,
+      "disabled": false,
+      "selectedNav": false,
+      "nav": false,
+      "ownBackground": "rgba(217, 249, 233, 0.85)",
+      "ownGradient": "none",
+      "foreground": [
+        0,
+        122,
+        73
+      ],
+      "minRatio": 4.859721636181432,
+      "maxRatio": 4.859721636181432,
+      "samples": [
+        {
+          "background": [
+            222,
+            249,
+            235
+          ],
+          "ratio": 4.859721636181432
+        },
+        {
+          "background": [
+            222,
+            249,
+            235
+          ],
+          "ratio": 4.859721636181432
+        },
+        {
+          "background": [
+            222,
+            249,
+            235
+          ],
+          "ratio": 4.859721636181432
+        },
+        {
+          "background": [
+            222,
+            249,
+            235
+          ],
+          "ratio": 4.859721636181432
+        },
+        {
+          "background": [
+            222,
+            249,
+            235
+          ],
+          "ratio": 4.859721636181432
+        },
+        {
+          "background": [
+            222,
+            249,
+            235
+          ],
+          "ratio": 4.859721636181432
+        },
+        {
+          "background": [
+            222,
+            249,
+            235
+          ],
+          "ratio": 4.859721636181432
+        },
+        {
+          "background": [
+            222,
+            249,
+            235
+          ],
+          "ratio": 4.859721636181432
+        },
+        {
+          "background": [
+            222,
+            249,
+            235
+          ],
+          "ratio": 4.859721636181432
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "query",
+      "scenario": "free",
+      "index": 5,
+      "label": "北京 · 三里屯 ×",
+      "className": "chip on",
+      "color": "rgb(0, 122, 73)",
+      "fontSize": 13,
+      "fontWeight": 600,
+      "disabled": false,
+      "selectedNav": false,
+      "nav": false,
+      "ownBackground": "rgba(217, 249, 233, 0.85)",
+      "ownGradient": "none",
+      "foreground": [
+        0,
+        122,
+        73
+      ],
+      "minRatio": 4.859721636181432,
+      "maxRatio": 4.859721636181432,
+      "samples": [
+        {
+          "background": [
+            222,
+            249,
+            235
+          ],
+          "ratio": 4.859721636181432
+        },
+        {
+          "background": [
+            222,
+            249,
+            235
+          ],
+          "ratio": 4.859721636181432
+        },
+        {
+          "background": [
+            222,
+            249,
+            235
+          ],
+          "ratio": 4.859721636181432
+        },
+        {
+          "background": [
+            222,
+            249,
+            235
+          ],
+          "ratio": 4.859721636181432
+        },
+        {
+          "background": [
+            222,
+            249,
+            235
+          ],
+          "ratio": 4.859721636181432
+        },
+        {
+          "background": [
+            222,
+            249,
+            235
+          ],
+          "ratio": 4.859721636181432
+        },
+        {
+          "background": [
+            222,
+            249,
+            235
+          ],
+          "ratio": 4.859721636181432
+        },
+        {
+          "background": [
+            222,
+            249,
+            235
+          ],
+          "ratio": 4.859721636181432
+        },
+        {
+          "background": [
+            222,
+            249,
+            235
+          ],
+          "ratio": 4.859721636181432
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "query",
+      "scenario": "free",
+      "index": 6,
+      "label": "立即查询（消耗 1 次）",
+      "className": "btn btn-primary btn-block mt ",
+      "color": "rgb(7, 60, 44)",
+      "fontSize": 15,
+      "fontWeight": 600,
+      "disabled": false,
+      "selectedNav": false,
+      "nav": false,
+      "ownBackground": "rgba(0, 0, 0, 0)",
+      "ownGradient": "linear-gradient(155deg, rgb(30, 213, 138), rgb(0, 195, 117))",
+      "foreground": [
+        7,
+        60,
+        44
+      ],
+      "minRatio": 5.709250972007772,
+      "maxRatio": 6.078101389535088,
+      "samples": [
+        {
+          "background": [
+            20,
+            207,
+            131
+          ],
+          "ratio": 6.078101389535088
+        },
+        {
+          "background": [
+            19,
+            207,
+            131
+          ],
+          "ratio": 6.07688662545084
+        },
+        {
+          "background": [
+            18,
+            206,
+            129
+          ],
+          "ratio": 6.012267386122061
+        },
+        {
+          "background": [
+            16,
+            205,
+            128
+          ],
+          "ratio": 5.950216089981444
+        },
+        {
+          "background": [
+            15,
+            204,
+            128
+          ],
+          "ratio": 5.8928182842268235
+        },
+        {
+          "background": [
+            14,
+            203,
+            127
+          ],
+          "ratio": 5.832731055399154
+        },
+        {
+          "background": [
+            12,
+            202,
+            125
+          ],
+          "ratio": 5.769169617942834
+        },
+        {
+          "background": [
+            11,
+            202,
+            125
+          ],
+          "ratio": 5.768340274853127
+        },
+        {
+          "background": [
+            10,
+            201,
+            124
+          ],
+          "ratio": 5.709250972007772
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "query",
+      "scenario": "free",
+      "index": 7,
+      "label": "关注此配置 · 小哨提醒",
+      "className": "btn btn-outline btn-block mt selection-follow-action",
+      "color": "rgb(0, 122, 73)",
+      "fontSize": 15,
+      "fontWeight": 600,
+      "disabled": false,
+      "selectedNav": false,
+      "nav": false,
+      "ownBackground": "rgba(255, 255, 255, 0.78)",
+      "ownGradient": "none",
+      "foreground": [
+        0,
+        122,
+        73
+      ],
+      "minRatio": 5.412341419097402,
+      "maxRatio": 5.412341419097402,
+      "samples": [
+        {
+          "background": [
+            255,
+            255,
+            255
+          ],
+          "ratio": 5.412341419097402
+        },
+        {
+          "background": [
+            255,
+            255,
+            255
+          ],
+          "ratio": 5.412341419097402
+        },
+        {
+          "background": [
+            255,
+            255,
+            255
+          ],
+          "ratio": 5.412341419097402
+        },
+        {
+          "background": [
+            255,
+            255,
+            255
+          ],
+          "ratio": 5.412341419097402
+        },
+        {
+          "background": [
+            255,
+            255,
+            255
+          ],
+          "ratio": 5.412341419097402
+        },
+        {
+          "background": [
+            255,
+            255,
+            255
+          ],
+          "ratio": 5.412341419097402
+        },
+        {
+          "background": [
+            255,
+            255,
+            255
+          ],
+          "ratio": 5.412341419097402
+        },
+        {
+          "background": [
+            255,
+            255,
+            255
+          ],
+          "ratio": 5.412341419097402
+        },
+        {
+          "background": [
+            255,
+            255,
+            255
+          ],
+          "ratio": 5.412341419097402
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "query",
+      "scenario": "free",
+      "index": 8,
+      "label": "查询",
+      "className": "floating-tab-label",
+      "color": "rgb(0, 122, 73)",
+      "fontSize": 12,
+      "fontWeight": 600,
+      "disabled": false,
+      "selectedNav": true,
+      "nav": true,
+      "ownBackground": "rgba(0, 0, 0, 0)",
+      "ownGradient": "none",
+      "foreground": [
+        0,
+        122,
+        73
+      ],
+      "minRatio": 4.534808627135748,
+      "maxRatio": 4.740976852258831,
+      "samples": [
+        {
+          "background": [
+            222,
+            239,
+            230
+          ],
+          "ratio": 4.534808627135748
+        },
+        {
+          "background": [
+            236,
+            241,
+            239
+          ],
+          "ratio": 4.740976852258831
+        },
+        {
+          "background": [
+            236,
+            241,
+            239
+          ],
+          "ratio": 4.740976852258831
+        },
+        {
+          "background": [
+            222,
+            239,
+            230
+          ],
+          "ratio": 4.534808627135748
+        },
+        {
+          "background": [
+            236,
+            241,
+            239
+          ],
+          "ratio": 4.740976852258831
+        },
+        {
+          "background": [
+            236,
+            241,
+            239
+          ],
+          "ratio": 4.740976852258831
+        },
+        {
+          "background": [
+            222,
+            239,
+            230
+          ],
+          "ratio": 4.534808627135748
+        },
+        {
+          "background": [
+            236,
+            241,
+            239
+          ],
+          "ratio": 4.740976852258831
+        },
+        {
+          "background": [
+            235,
+            240,
+            238
+          ],
+          "ratio": 4.698705676079997
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "query",
+      "scenario": "free",
+      "index": 9,
+      "label": "小哨",
+      "className": "floating-tab-label",
+      "color": "rgb(93, 111, 102)",
+      "fontSize": 12,
+      "fontWeight": 500,
+      "disabled": false,
+      "selectedNav": false,
+      "nav": true,
+      "ownBackground": "rgba(0, 0, 0, 0)",
+      "ownGradient": "none",
+      "foreground": [
+        93,
+        111,
+        102
+      ],
+      "minRatio": 5.042506342317667,
+      "maxRatio": 5.28721475923223,
+      "samples": [
+        {
+          "background": [
+            240,
+            252,
+            246
+          ],
+          "ratio": 5.077494051008337
+        },
+        {
+          "background": [
+            252,
+            253,
+            253
+          ],
+          "ratio": 5.242231033086625
+        },
+        {
+          "background": [
+            252,
+            254,
+            253
+          ],
+          "ratio": 5.274439201006639
+        },
+        {
+          "background": [
+            240,
+            251,
+            245
+          ],
+          "ratio": 5.042506342317667
+        },
+        {
+          "background": [
+            252,
+            253,
+            252
+          ],
+          "ratio": 5.238996595869029
+        },
+        {
+          "background": [
+            253,
+            254,
+            254
+          ],
+          "ratio": 5.28721475923223
+        },
+        {
+          "background": [
+            240,
+            252,
+            245
+          ],
+          "ratio": 5.074377914459205
+        },
+        {
+          "background": [
+            253,
+            254,
+            253
+          ],
+          "ratio": 5.28396331946178
+        },
+        {
+          "background": [
+            253,
+            254,
+            253
+          ],
+          "ratio": 5.28396331946178
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "query",
+      "scenario": "free",
+      "index": 10,
+      "label": "历史",
+      "className": "floating-tab-label",
+      "color": "rgb(93, 111, 102)",
+      "fontSize": 12,
+      "fontWeight": 500,
+      "disabled": false,
+      "selectedNav": false,
+      "nav": true,
+      "ownBackground": "rgba(0, 0, 0, 0)",
+      "ownGradient": "none",
+      "foreground": [
+        93,
+        111,
+        102
+      ],
+      "minRatio": 5.151828733115997,
+      "maxRatio": 5.319591603347002,
+      "samples": [
+        {
+          "background": [
+            244,
+            253,
+            248
+          ],
+          "ratio": 5.151828733115997
+        },
+        {
+          "background": [
+            253,
+            254,
+            254
+          ],
+          "ratio": 5.28721475923223
+        },
+        {
+          "background": [
+            253,
+            254,
+            254
+          ],
+          "ratio": 5.28721475923223
+        },
+        {
+          "background": [
+            244,
+            253,
+            248
+          ],
+          "ratio": 5.151828733115997
+        },
+        {
+          "background": [
+            253,
+            255,
+            254
+          ],
+          "ratio": 5.319591603347002
+        },
+        {
+          "background": [
+            252,
+            254,
+            253
+          ],
+          "ratio": 5.274439201006639
+        },
+        {
+          "background": [
+            244,
+            253,
+            248
+          ],
+          "ratio": 5.151828733115997
+        },
+        {
+          "background": [
+            253,
+            254,
+            254
+          ],
+          "ratio": 5.28721475923223
+        },
+        {
+          "background": [
+            253,
+            254,
+            254
+          ],
+          "ratio": 5.28721475923223
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "query",
+      "scenario": "free",
+      "index": 11,
+      "label": "我的",
+      "className": "floating-tab-label",
+      "color": "rgb(93, 111, 102)",
+      "fontSize": 12,
+      "fontWeight": 500,
+      "disabled": false,
+      "selectedNav": false,
+      "nav": true,
+      "ownBackground": "rgba(0, 0, 0, 0)",
+      "ownGradient": "none",
+      "foreground": [
+        93,
+        111,
+        102
+      ],
+      "minRatio": 5.182522803483906,
+      "maxRatio": 5.28721475923223,
+      "samples": [
+        {
+          "background": [
+            247,
+            253,
+            249
+          ],
+          "ratio": 5.182522803483906
+        },
+        {
+          "background": [
+            252,
+            253,
+            252
+          ],
+          "ratio": 5.238996595869029
+        },
+        {
+          "background": [
+            253,
+            254,
+            253
+          ],
+          "ratio": 5.28396331946178
+        },
+        {
+          "background": [
+            247,
+            254,
+            250
+          ],
+          "ratio": 5.217914554183485
+        },
+        {
+          "background": [
+            253,
+            254,
+            253
+          ],
+          "ratio": 5.28396331946178
+        },
+        {
+          "background": [
+            253,
+            254,
+            254
+          ],
+          "ratio": 5.28721475923223
+        },
+        {
+          "background": [
+            247,
+            254,
+            250
+          ],
+          "ratio": 5.217914554183485
+        },
+        {
+          "background": [
+            253,
+            254,
+            254
+          ],
+          "ratio": 5.28721475923223
+        },
+        {
+          "background": [
+            252,
+            254,
+            253
+          ],
+          "ratio": 5.274439201006639
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "follow",
+      "scenario": "free",
+      "index": 0,
+      "label": "刷新状态",
+      "className": "btn btn-ghost btn-sm compact-action",
+      "color": "rgb(0, 122, 73)",
+      "fontSize": 13,
+      "fontWeight": 600,
+      "disabled": false,
+      "selectedNav": false,
+      "nav": false,
+      "ownBackground": "rgba(217, 249, 233, 0.85)",
+      "ownGradient": "none",
+      "foreground": [
+        0,
+        122,
+        73
+      ],
+      "minRatio": 4.891672528662612,
+      "maxRatio": 4.891672528662612,
+      "samples": [
+        {
+          "background": [
+            222,
+            250,
+            235
+          ],
+          "ratio": 4.891672528662612
+        },
+        {
+          "background": [
+            222,
+            250,
+            235
+          ],
+          "ratio": 4.891672528662612
+        },
+        {
+          "background": [
+            222,
+            250,
+            235
+          ],
+          "ratio": 4.891672528662612
+        },
+        {
+          "background": [
+            222,
+            250,
+            235
+          ],
+          "ratio": 4.891672528662612
+        },
+        {
+          "background": [
+            222,
+            250,
+            235
+          ],
+          "ratio": 4.891672528662612
+        },
+        {
+          "background": [
+            222,
+            250,
+            235
+          ],
+          "ratio": 4.891672528662612
+        },
+        {
+          "background": [
+            222,
+            250,
+            235
+          ],
+          "ratio": 4.891672528662612
+        },
+        {
+          "background": [
+            222,
+            250,
+            235
+          ],
+          "ratio": 4.891672528662612
+        },
+        {
+          "background": [
+            222,
+            250,
+            235
+          ],
+          "ratio": 4.891672528662612
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "follow",
+      "scenario": "free",
+      "index": 1,
+      "label": "了解会员 ›",
+      "className": "small",
+      "color": "rgb(0, 122, 73)",
+      "fontSize": 12,
+      "fontWeight": 400,
+      "disabled": false,
+      "selectedNav": false,
+      "nav": false,
+      "ownBackground": "rgba(0, 0, 0, 0)",
+      "ownGradient": "none",
+      "foreground": [
+        0,
+        122,
+        73
+      ],
+      "minRatio": 5.299203652742699,
+      "maxRatio": 5.33200646308215,
+      "samples": [
+        {
+          "background": [
+            248,
+            255,
+            251
+          ],
+          "ratio": 5.33200646308215
+        },
+        {
+          "background": [
+            248,
+            255,
+            251
+          ],
+          "ratio": 5.33200646308215
+        },
+        {
+          "background": [
+            248,
+            255,
+            251
+          ],
+          "ratio": 5.33200646308215
+        },
+        {
+          "background": [
+            248,
+            255,
+            251
+          ],
+          "ratio": 5.33200646308215
+        },
+        {
+          "background": [
+            248,
+            254,
+            251
+          ],
+          "ratio": 5.299203652742699
+        },
+        {
+          "background": [
+            248,
+            255,
+            251
+          ],
+          "ratio": 5.33200646308215
+        },
+        {
+          "background": [
+            248,
+            255,
+            251
+          ],
+          "ratio": 5.33200646308215
+        },
+        {
+          "background": [
+            248,
+            255,
+            251
+          ],
+          "ratio": 5.33200646308215
+        },
+        {
+          "background": [
+            248,
+            255,
+            251
+          ],
+          "ratio": 5.33200646308215
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "follow",
+      "scenario": "free",
+      "index": 2,
+      "label": "查看原因",
+      "className": "btn btn-ghost btn-sm compact-action",
+      "color": "rgb(0, 122, 73)",
+      "fontSize": 13,
+      "fontWeight": 600,
+      "disabled": false,
+      "selectedNav": false,
+      "nav": false,
+      "ownBackground": "rgba(217, 249, 233, 0.85)",
+      "ownGradient": "none",
+      "foreground": [
+        0,
+        122,
+        73
+      ],
+      "minRatio": 4.883556939536482,
+      "maxRatio": 4.891672528662612,
+      "samples": [
+        {
+          "background": [
+            222,
+            250,
+            235
+          ],
+          "ratio": 4.891672528662612
+        },
+        {
+          "background": [
+            221,
+            250,
+            235
+          ],
+          "ratio": 4.883556939536482
+        },
+        {
+          "background": [
+            221,
+            250,
+            235
+          ],
+          "ratio": 4.883556939536482
+        },
+        {
+          "background": [
+            221,
+            250,
+            235
+          ],
+          "ratio": 4.883556939536482
+        },
+        {
+          "background": [
+            221,
+            250,
+            235
+          ],
+          "ratio": 4.883556939536482
+        },
+        {
+          "background": [
+            221,
+            250,
+            235
+          ],
+          "ratio": 4.883556939536482
+        },
+        {
+          "background": [
+            221,
+            250,
+            235
+          ],
+          "ratio": 4.883556939536482
+        },
+        {
+          "background": [
+            221,
+            250,
+            235
+          ],
+          "ratio": 4.883556939536482
+        },
+        {
+          "background": [
+            221,
+            250,
+            235
+          ],
+          "ratio": 4.883556939536482
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "follow",
+      "scenario": "free",
+      "index": 3,
+      "label": "服务详情 ›",
+      "className": "service-link",
+      "color": "rgb(0, 122, 73)",
+      "fontSize": 11.5,
+      "fontWeight": 400,
+      "disabled": false,
+      "selectedNav": false,
+      "nav": false,
+      "ownBackground": "rgba(0, 0, 0, 0)",
+      "ownGradient": "none",
+      "foreground": [
+        0,
+        122,
+        73
+      ],
+      "minRatio": 5.141139010604067,
+      "maxRatio": 5.198074824511902,
+      "samples": [
+        {
+          "background": [
+            242,
+            252,
+            246
+          ],
+          "ratio": 5.162439371411916
+        },
+        {
+          "background": [
+            242,
+            252,
+            246
+          ],
+          "ratio": 5.162439371411916
+        },
+        {
+          "background": [
+            242,
+            253,
+            246
+          ],
+          "ratio": 5.194900646312615
+        },
+        {
+          "background": [
+            241,
+            253,
+            246
+          ],
+          "ratio": 5.185804132938184
+        },
+        {
+          "background": [
+            241,
+            253,
+            246
+          ],
+          "ratio": 5.185804132938184
+        },
+        {
+          "background": [
+            242,
+            253,
+            247
+          ],
+          "ratio": 5.198074824511902
+        },
+        {
+          "background": [
+            240,
+            252,
+            245
+          ],
+          "ratio": 5.141139010604067
+        },
+        {
+          "background": [
+            240,
+            252,
+            245
+          ],
+          "ratio": 5.141139010604067
+        },
+        {
+          "background": [
+            242,
+            252,
+            247
+          ],
+          "ratio": 5.165613549611204
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "follow",
+      "scenario": "free",
+      "index": 4,
+      "label": "＋ 添加",
+      "className": "btn btn-primary btn-sm compact-action",
+      "color": "rgb(7, 60, 44)",
+      "fontSize": 13,
+      "fontWeight": 600,
+      "disabled": false,
+      "selectedNav": false,
+      "nav": false,
+      "ownBackground": "rgba(0, 0, 0, 0)",
+      "ownGradient": "linear-gradient(155deg, rgb(30, 213, 138), rgb(0, 195, 117))",
+      "foreground": [
+        7,
+        60,
+        44
+      ],
+      "minRatio": 5.768340274853127,
+      "maxRatio": 6.0165913825359265,
+      "samples": [
+        {
+          "background": [
+            19,
+            206,
+            130
+          ],
+          "ratio": 6.0165913825359265
+        },
+        {
+          "background": [
+            18,
+            206,
+            130
+          ],
+          "ratio": 6.015427040888083
+        },
+        {
+          "background": [
+            16,
+            205,
+            128
+          ],
+          "ratio": 5.950216089981444
+        },
+        {
+          "background": [
+            16,
+            204,
+            128
+          ],
+          "ratio": 5.893835104319044
+        },
+        {
+          "background": [
+            15,
+            204,
+            128
+          ],
+          "ratio": 5.8928182842268235
+        },
+        {
+          "background": [
+            13,
+            203,
+            126
+          ],
+          "ratio": 5.828741755508742
+        },
+        {
+          "background": [
+            14,
+            203,
+            127
+          ],
+          "ratio": 5.832731055399154
+        },
+        {
+          "background": [
+            13,
+            203,
+            126
+          ],
+          "ratio": 5.828741755508742
+        },
+        {
+          "background": [
+            11,
+            202,
+            125
+          ],
+          "ratio": 5.768340274853127
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "follow",
+      "scenario": "free",
+      "index": 5,
+      "label": "查询",
+      "className": "floating-tab-label",
+      "color": "rgb(93, 111, 102)",
+      "fontSize": 12,
+      "fontWeight": 500,
+      "disabled": false,
+      "selectedNav": false,
+      "nav": true,
+      "ownBackground": "rgba(0, 0, 0, 0)",
+      "ownGradient": "none",
+      "foreground": [
+        93,
+        111,
+        102
+      ],
+      "minRatio": 5.251755151541766,
+      "maxRatio": 5.296788943376238,
+      "samples": [
+        {
+          "background": [
+            254,
+            254,
+            254
+          ],
+          "ratio": 5.296788943376238
+        },
+        {
+          "background": [
+            254,
+            254,
+            254
+          ],
+          "ratio": 5.296788943376238
+        },
+        {
+          "background": [
+            254,
+            254,
+            254
+          ],
+          "ratio": 5.296788943376238
+        },
+        {
+          "background": [
+            254,
+            254,
+            254
+          ],
+          "ratio": 5.296788943376238
+        },
+        {
+          "background": [
+            254,
+            254,
+            254
+          ],
+          "ratio": 5.296788943376238
+        },
+        {
+          "background": [
+            253,
+            253,
+            253
+          ],
+          "ratio": 5.251755151541766
+        },
+        {
+          "background": [
+            253,
+            253,
+            253
+          ],
+          "ratio": 5.251755151541766
+        },
+        {
+          "background": [
+            254,
+            254,
+            254
+          ],
+          "ratio": 5.296788943376238
+        },
+        {
+          "background": [
+            253,
+            253,
+            253
+          ],
+          "ratio": 5.251755151541766
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "follow",
+      "scenario": "free",
+      "index": 6,
+      "label": "小哨",
+      "className": "floating-tab-label",
+      "color": "rgb(0, 122, 73)",
+      "fontSize": 12,
+      "fontWeight": 600,
+      "disabled": false,
+      "selectedNav": true,
+      "nav": true,
+      "ownBackground": "rgba(0, 0, 0, 0)",
+      "ownGradient": "none",
+      "foreground": [
+        0,
+        122,
+        73
+      ],
+      "minRatio": 4.698705676079997,
+      "maxRatio": 4.740976852258831,
+      "samples": [
+        {
+          "background": [
+            235,
+            240,
+            238
+          ],
+          "ratio": 4.698705676079997
+        },
+        {
+          "background": [
+            236,
+            241,
+            239
+          ],
+          "ratio": 4.740976852258831
+        },
+        {
+          "background": [
+            236,
+            241,
+            239
+          ],
+          "ratio": 4.740976852258831
+        },
+        {
+          "background": [
+            235,
+            240,
+            238
+          ],
+          "ratio": 4.698705676079997
+        },
+        {
+          "background": [
+            236,
+            241,
+            239
+          ],
+          "ratio": 4.740976852258831
+        },
+        {
+          "background": [
+            235,
+            240,
+            238
+          ],
+          "ratio": 4.698705676079997
+        },
+        {
+          "background": [
+            236,
+            241,
+            239
+          ],
+          "ratio": 4.740976852258831
+        },
+        {
+          "background": [
+            236,
+            241,
+            239
+          ],
+          "ratio": 4.740976852258831
+        },
+        {
+          "background": [
+            236,
+            241,
+            239
+          ],
+          "ratio": 4.740976852258831
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "follow",
+      "scenario": "free",
+      "index": 7,
+      "label": "历史",
+      "className": "floating-tab-label",
+      "color": "rgb(93, 111, 102)",
+      "fontSize": 12,
+      "fontWeight": 500,
+      "disabled": false,
+      "selectedNav": false,
+      "nav": true,
+      "ownBackground": "rgba(0, 0, 0, 0)",
+      "ownGradient": "none",
+      "foreground": [
+        93,
+        111,
+        102
+      ],
+      "minRatio": 5.242231033086625,
+      "maxRatio": 5.28721475923223,
+      "samples": [
+        {
+          "background": [
+            252,
+            253,
+            253
+          ],
+          "ratio": 5.242231033086625
+        },
+        {
+          "background": [
+            253,
+            254,
+            254
+          ],
+          "ratio": 5.28721475923223
+        },
+        {
+          "background": [
+            252,
+            253,
+            253
+          ],
+          "ratio": 5.242231033086625
+        },
+        {
+          "background": [
+            253,
+            254,
+            254
+          ],
+          "ratio": 5.28721475923223
+        },
+        {
+          "background": [
+            252,
+            253,
+            253
+          ],
+          "ratio": 5.242231033086625
+        },
+        {
+          "background": [
+            253,
+            254,
+            254
+          ],
+          "ratio": 5.28721475923223
+        },
+        {
+          "background": [
+            253,
+            254,
+            254
+          ],
+          "ratio": 5.28721475923223
+        },
+        {
+          "background": [
+            253,
+            254,
+            254
+          ],
+          "ratio": 5.28721475923223
+        },
+        {
+          "background": [
+            253,
+            254,
+            254
+          ],
+          "ratio": 5.28721475923223
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "follow",
+      "scenario": "free",
+      "index": 8,
+      "label": "我的",
+      "className": "floating-tab-label",
+      "color": "rgb(93, 111, 102)",
+      "fontSize": 12,
+      "fontWeight": 500,
+      "disabled": false,
+      "selectedNav": false,
+      "nav": true,
+      "ownBackground": "rgba(0, 0, 0, 0)",
+      "ownGradient": "none",
+      "foreground": [
+        93,
+        111,
+        102
+      ],
+      "minRatio": 5.238996595869029,
+      "maxRatio": 5.28721475923223,
+      "samples": [
+        {
+          "background": [
+            253,
+            254,
+            254
+          ],
+          "ratio": 5.28721475923223
+        },
+        {
+          "background": [
+            253,
+            254,
+            254
+          ],
+          "ratio": 5.28721475923223
+        },
+        {
+          "background": [
+            253,
+            254,
+            254
+          ],
+          "ratio": 5.28721475923223
+        },
+        {
+          "background": [
+            253,
+            254,
+            253
+          ],
+          "ratio": 5.28396331946178
+        },
+        {
+          "background": [
+            253,
+            254,
+            254
+          ],
+          "ratio": 5.28721475923223
+        },
+        {
+          "background": [
+            253,
+            254,
+            254
+          ],
+          "ratio": 5.28721475923223
+        },
+        {
+          "background": [
+            253,
+            254,
+            254
+          ],
+          "ratio": 5.28721475923223
+        },
+        {
+          "background": [
+            252,
+            253,
+            252
+          ],
+          "ratio": 5.238996595869029
+        },
+        {
+          "background": [
+            253,
+            254,
+            254
+          ],
+          "ratio": 5.28721475923223
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "history",
+      "scenario": "free",
+      "index": 0,
+      "label": "iPhone",
+      "className": "tab on",
+      "color": "rgb(7, 60, 44)",
+      "fontSize": 13,
+      "fontWeight": 600,
+      "disabled": false,
+      "selectedNav": false,
+      "nav": false,
+      "ownBackground": "rgba(0, 0, 0, 0)",
+      "ownGradient": "linear-gradient(145deg, rgb(30, 213, 138), rgb(0, 195, 117))",
+      "foreground": [
+        7,
+        60,
+        44
+      ],
+      "minRatio": 5.709250972007772,
+      "maxRatio": 6.078101389535088,
+      "samples": [
+        {
+          "background": [
+            20,
+            207,
+            131
+          ],
+          "ratio": 6.078101389535088
+        },
+        {
+          "background": [
+            18,
+            206,
+            130
+          ],
+          "ratio": 6.015427040888083
+        },
+        {
+          "background": [
+            17,
+            205,
+            129
+          ],
+          "ratio": 5.954410324959359
+        },
+        {
+          "background": [
+            16,
+            205,
+            128
+          ],
+          "ratio": 5.950216089981444
+        },
+        {
+          "background": [
+            15,
+            204,
+            127
+          ],
+          "ratio": 5.889720098149051
+        },
+        {
+          "background": [
+            13,
+            203,
+            126
+          ],
+          "ratio": 5.828741755508742
+        },
+        {
+          "background": [
+            13,
+            203,
+            126
+          ],
+          "ratio": 5.828741755508742
+        },
+        {
+          "background": [
+            12,
+            202,
+            125
+          ],
+          "ratio": 5.769169617942834
+        },
+        {
+          "background": [
+            10,
+            201,
+            124
+          ],
+          "ratio": 5.709250972007772
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "history",
+      "scenario": "free",
+      "index": 1,
+      "label": "勃艮第酒红色",
+      "className": "chip on",
+      "color": "rgb(0, 122, 73)",
+      "fontSize": 13,
+      "fontWeight": 600,
+      "disabled": false,
+      "selectedNav": false,
+      "nav": false,
+      "ownBackground": "rgba(217, 249, 233, 0.85)",
+      "ownGradient": "none",
+      "foreground": [
+        0,
+        122,
+        73
+      ],
+      "minRatio": 4.902824545303801,
+      "maxRatio": 4.902824545303801,
+      "samples": [
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "history",
+      "scenario": "free",
+      "index": 2,
+      "label": "合肥万象城",
+      "className": "chip on",
+      "color": "rgb(0, 122, 73)",
+      "fontSize": 13,
+      "fontWeight": 600,
+      "disabled": false,
+      "selectedNav": false,
+      "nav": false,
+      "ownBackground": "rgba(217, 249, 233, 0.85)",
+      "ownGradient": "none",
+      "foreground": [
+        0,
+        122,
+        73
+      ],
+      "minRatio": 4.902824545303801,
+      "maxRatio": 4.902824545303801,
+      "samples": [
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "history",
+      "scenario": "free",
+      "index": 3,
+      "label": "合肥 · 合肥万象城 ×",
+      "className": "chip on",
+      "color": "rgb(0, 122, 73)",
+      "fontSize": 13,
+      "fontWeight": 600,
+      "disabled": false,
+      "selectedNav": false,
+      "nav": false,
+      "ownBackground": "rgba(217, 249, 233, 0.85)",
+      "ownGradient": "none",
+      "foreground": [
+        0,
+        122,
+        73
+      ],
+      "minRatio": 4.859721636181432,
+      "maxRatio": 4.859721636181432,
+      "samples": [
+        {
+          "background": [
+            222,
+            249,
+            235
+          ],
+          "ratio": 4.859721636181432
+        },
+        {
+          "background": [
+            222,
+            249,
+            235
+          ],
+          "ratio": 4.859721636181432
+        },
+        {
+          "background": [
+            222,
+            249,
+            235
+          ],
+          "ratio": 4.859721636181432
+        },
+        {
+          "background": [
+            222,
+            249,
+            235
+          ],
+          "ratio": 4.859721636181432
+        },
+        {
+          "background": [
+            222,
+            249,
+            235
+          ],
+          "ratio": 4.859721636181432
+        },
+        {
+          "background": [
+            222,
+            249,
+            235
+          ],
+          "ratio": 4.859721636181432
+        },
+        {
+          "background": [
+            222,
+            249,
+            235
+          ],
+          "ratio": 4.859721636181432
+        },
+        {
+          "background": [
+            222,
+            249,
+            235
+          ],
+          "ratio": 4.859721636181432
+        },
+        {
+          "background": [
+            222,
+            249,
+            235
+          ],
+          "ratio": 4.859721636181432
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "history",
+      "scenario": "free",
+      "index": 4,
+      "label": "北京 · 三里屯 ×",
+      "className": "chip on",
+      "color": "rgb(0, 122, 73)",
+      "fontSize": 13,
+      "fontWeight": 600,
+      "disabled": false,
+      "selectedNav": false,
+      "nav": false,
+      "ownBackground": "rgba(217, 249, 233, 0.85)",
+      "ownGradient": "none",
+      "foreground": [
+        0,
+        122,
+        73
+      ],
+      "minRatio": 4.859721636181432,
+      "maxRatio": 4.859721636181432,
+      "samples": [
+        {
+          "background": [
+            222,
+            249,
+            235
+          ],
+          "ratio": 4.859721636181432
+        },
+        {
+          "background": [
+            222,
+            249,
+            235
+          ],
+          "ratio": 4.859721636181432
+        },
+        {
+          "background": [
+            222,
+            249,
+            235
+          ],
+          "ratio": 4.859721636181432
+        },
+        {
+          "background": [
+            222,
+            249,
+            235
+          ],
+          "ratio": 4.859721636181432
+        },
+        {
+          "background": [
+            222,
+            249,
+            235
+          ],
+          "ratio": 4.859721636181432
+        },
+        {
+          "background": [
+            222,
+            249,
+            235
+          ],
+          "ratio": 4.859721636181432
+        },
+        {
+          "background": [
+            222,
+            249,
+            235
+          ],
+          "ratio": 4.859721636181432
+        },
+        {
+          "background": [
+            222,
+            249,
+            235
+          ],
+          "ratio": 4.859721636181432
+        },
+        {
+          "background": [
+            222,
+            249,
+            235
+          ],
+          "ratio": 4.859721636181432
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "history",
+      "scenario": "free",
+      "index": 5,
+      "label": "查看历史（消耗 1 次，余 1 次）",
+      "className": "btn btn-primary btn-block mt ",
+      "color": "rgb(7, 60, 44)",
+      "fontSize": 15,
+      "fontWeight": 600,
+      "disabled": false,
+      "selectedNav": false,
+      "nav": false,
+      "ownBackground": "rgba(0, 0, 0, 0)",
+      "ownGradient": "linear-gradient(155deg, rgb(30, 213, 138), rgb(0, 195, 117))",
+      "foreground": [
+        7,
+        60,
+        44
+      ],
+      "minRatio": 5.709250972007772,
+      "maxRatio": 6.0165913825359265,
+      "samples": [
+        {
+          "background": [
+            19,
+            206,
+            130
+          ],
+          "ratio": 6.0165913825359265
+        },
+        {
+          "background": [
+            19,
+            206,
+            130
+          ],
+          "ratio": 6.0165913825359265
+        },
+        {
+          "background": [
+            18,
+            206,
+            130
+          ],
+          "ratio": 6.015427040888083
+        },
+        {
+          "background": [
+            15,
+            204,
+            128
+          ],
+          "ratio": 5.8928182842268235
+        },
+        {
+          "background": [
+            15,
+            204,
+            127
+          ],
+          "ratio": 5.889720098149051
+        },
+        {
+          "background": [
+            14,
+            204,
+            127
+          ],
+          "ratio": 5.888751162367597
+        },
+        {
+          "background": [
+            11,
+            201,
+            125
+          ],
+          "ratio": 5.7130399344326515
+        },
+        {
+          "background": [
+            10,
+            201,
+            124
+          ],
+          "ratio": 5.709250972007772
+        },
+        {
+          "background": [
+            10,
+            201,
+            124
+          ],
+          "ratio": 5.709250972007772
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "history",
+      "scenario": "free",
+      "index": 6,
+      "label": "查询",
+      "className": "floating-tab-label",
+      "color": "rgb(93, 111, 102)",
+      "fontSize": 12,
+      "fontWeight": 500,
+      "disabled": false,
+      "selectedNav": false,
+      "nav": true,
+      "ownBackground": "rgba(0, 0, 0, 0)",
+      "ownGradient": "none",
+      "foreground": [
+        93,
+        111,
+        102
+      ],
+      "minRatio": 5.274439201006639,
+      "maxRatio": 5.306816045121411,
+      "samples": [
+        {
+          "background": [
+            252,
+            254,
+            253
+          ],
+          "ratio": 5.274439201006639
+        },
+        {
+          "background": [
+            252,
+            255,
+            253
+          ],
+          "ratio": 5.306816045121411
+        },
+        {
+          "background": [
+            252,
+            255,
+            253
+          ],
+          "ratio": 5.306816045121411
+        },
+        {
+          "background": [
+            252,
+            255,
+            253
+          ],
+          "ratio": 5.306816045121411
+        },
+        {
+          "background": [
+            252,
+            255,
+            253
+          ],
+          "ratio": 5.306816045121411
+        },
+        {
+          "background": [
+            252,
+            255,
+            253
+          ],
+          "ratio": 5.306816045121411
+        },
+        {
+          "background": [
+            252,
+            254,
+            253
+          ],
+          "ratio": 5.274439201006639
+        },
+        {
+          "background": [
+            252,
+            254,
+            253
+          ],
+          "ratio": 5.274439201006639
+        },
+        {
+          "background": [
+            252,
+            254,
+            253
+          ],
+          "ratio": 5.274439201006639
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "history",
+      "scenario": "free",
+      "index": 7,
+      "label": "小哨",
+      "className": "floating-tab-label",
+      "color": "rgb(93, 111, 102)",
+      "fontSize": 12,
+      "fontWeight": 500,
+      "disabled": false,
+      "selectedNav": false,
+      "nav": true,
+      "ownBackground": "rgba(0, 0, 0, 0)",
+      "ownGradient": "none",
+      "foreground": [
+        93,
+        111,
+        102
+      ],
+      "minRatio": 5.012913442091986,
+      "maxRatio": 5.065497754714024,
+      "samples": [
+        {
+          "background": [
+            237,
+            251,
+            244
+          ],
+          "ratio": 5.012913442091986
+        },
+        {
+          "background": [
+            238,
+            252,
+            245
+          ],
+          "ratio": 5.056666593694614
+        },
+        {
+          "background": [
+            238,
+            252,
+            245
+          ],
+          "ratio": 5.056666593694614
+        },
+        {
+          "background": [
+            238,
+            252,
+            245
+          ],
+          "ratio": 5.056666593694614
+        },
+        {
+          "background": [
+            238,
+            252,
+            245
+          ],
+          "ratio": 5.056666593694614
+        },
+        {
+          "background": [
+            238,
+            252,
+            245
+          ],
+          "ratio": 5.056666593694614
+        },
+        {
+          "background": [
+            238,
+            252,
+            245
+          ],
+          "ratio": 5.056666593694614
+        },
+        {
+          "background": [
+            239,
+            252,
+            245
+          ],
+          "ratio": 5.065497754714024
+        },
+        {
+          "background": [
+            238,
+            252,
+            245
+          ],
+          "ratio": 5.056666593694614
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "history",
+      "scenario": "free",
+      "index": 8,
+      "label": "历史",
+      "className": "floating-tab-label",
+      "color": "rgb(0, 122, 73)",
+      "fontSize": 12,
+      "fontWeight": 600,
+      "disabled": false,
+      "selectedNav": true,
+      "nav": true,
+      "ownBackground": "rgba(0, 0, 0, 0)",
+      "ownGradient": "none",
+      "foreground": [
+        0,
+        122,
+        73
+      ],
+      "minRatio": 4.565271365327339,
+      "maxRatio": 4.603847024651931,
+      "samples": [
+        {
+          "background": [
+            225,
+            239,
+            232
+          ],
+          "ratio": 4.565271365327339
+        },
+        {
+          "background": [
+            225,
+            240,
+            232
+          ],
+          "ratio": 4.595537820748714
+        },
+        {
+          "background": [
+            225,
+            240,
+            232
+          ],
+          "ratio": 4.595537820748714
+        },
+        {
+          "background": [
+            225,
+            240,
+            232
+          ],
+          "ratio": 4.595537820748714
+        },
+        {
+          "background": [
+            225,
+            240,
+            232
+          ],
+          "ratio": 4.595537820748714
+        },
+        {
+          "background": [
+            225,
+            239,
+            232
+          ],
+          "ratio": 4.565271365327339
+        },
+        {
+          "background": [
+            225,
+            240,
+            232
+          ],
+          "ratio": 4.595537820748714
+        },
+        {
+          "background": [
+            226,
+            240,
+            232
+          ],
+          "ratio": 4.603847024651931
+        },
+        {
+          "background": [
+            226,
+            240,
+            232
+          ],
+          "ratio": 4.603847024651931
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "history",
+      "scenario": "free",
+      "index": 9,
+      "label": "我的",
+      "className": "floating-tab-label",
+      "color": "rgb(93, 111, 102)",
+      "fontSize": 12,
+      "fontWeight": 500,
+      "disabled": false,
+      "selectedNav": false,
+      "nav": true,
+      "ownBackground": "rgba(0, 0, 0, 0)",
+      "ownGradient": "none",
+      "foreground": [
+        93,
+        111,
+        102
+      ],
+      "minRatio": 5.151828733115997,
+      "maxRatio": 5.205505664384128,
+      "samples": [
+        {
+          "background": [
+            244,
+            253,
+            248
+          ],
+          "ratio": 5.151828733115997
+        },
+        {
+          "background": [
+            245,
+            254,
+            249
+          ],
+          "ratio": 5.196329893880731
+        },
+        {
+          "background": [
+            245,
+            253,
+            249
+          ],
+          "ratio": 5.164121725960718
+        },
+        {
+          "background": [
+            245,
+            253,
+            248
+          ],
+          "ratio": 5.16095504339391
+        },
+        {
+          "background": [
+            246,
+            254,
+            249
+          ],
+          "ratio": 5.205505664384128
+        },
+        {
+          "background": [
+            245,
+            253,
+            249
+          ],
+          "ratio": 5.164121725960718
+        },
+        {
+          "background": [
+            245,
+            253,
+            248
+          ],
+          "ratio": 5.16095504339391
+        },
+        {
+          "background": [
+            245,
+            253,
+            248
+          ],
+          "ratio": 5.16095504339391
+        },
+        {
+          "background": [
+            245,
+            253,
+            248
+          ],
+          "ratio": 5.16095504339391
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "mine",
+      "scenario": "free",
+      "index": 0,
+      "label": "兑换码开通",
+      "className": "member-entry redemption-entry",
+      "color": "rgb(7, 60, 44)",
+      "fontSize": 14,
+      "fontWeight": 600,
+      "disabled": false,
+      "selectedNav": false,
+      "nav": false,
+      "ownBackground": "rgba(0, 0, 0, 0)",
+      "ownGradient": "linear-gradient(155deg, rgb(30, 213, 138), rgb(0, 195, 117))",
+      "foreground": [
+        7,
+        60,
+        44
+      ],
+      "minRatio": 5.709250972007772,
+      "maxRatio": 6.07369610731565,
+      "samples": [
+        {
+          "background": [
+            19,
+            207,
+            130
+          ],
+          "ratio": 6.07369610731565
+        },
+        {
+          "background": [
+            19,
+            206,
+            130
+          ],
+          "ratio": 6.0165913825359265
+        },
+        {
+          "background": [
+            19,
+            206,
+            130
+          ],
+          "ratio": 6.0165913825359265
+        },
+        {
+          "background": [
+            16,
+            204,
+            128
+          ],
+          "ratio": 5.893835104319044
+        },
+        {
+          "background": [
+            15,
+            204,
+            127
+          ],
+          "ratio": 5.889720098149051
+        },
+        {
+          "background": [
+            15,
+            204,
+            127
+          ],
+          "ratio": 5.889720098149051
+        },
+        {
+          "background": [
+            11,
+            202,
+            125
+          ],
+          "ratio": 5.768340274853127
+        },
+        {
+          "background": [
+            11,
+            201,
+            124
+          ],
+          "ratio": 5.7100333007838415
+        },
+        {
+          "background": [
+            10,
+            201,
+            124
+          ],
+          "ratio": 5.709250972007772
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "mine",
+      "scenario": "free",
+      "index": 1,
+      "label": "付费购买（暂未开放）",
+      "className": "member-entry payment-entry",
+      "color": "rgb(96, 118, 105)",
+      "fontSize": 14,
+      "fontWeight": 600,
+      "disabled": true,
+      "selectedNav": false,
+      "nav": false,
+      "ownBackground": "rgba(229, 239, 233, 0.8)",
+      "ownGradient": "none",
+      "foreground": [
+        96,
+        118,
+        105
+      ],
+      "minRatio": 4.273107175162713,
+      "maxRatio": 4.283642647377805,
+      "samples": [
+        {
+          "background": [
+            233,
+            242,
+            237
+          ],
+          "ratio": 4.283642647377805
+        },
+        {
+          "background": [
+            233,
+            242,
+            237
+          ],
+          "ratio": 4.283642647377805
+        },
+        {
+          "background": [
+            233,
+            242,
+            236
+          ],
+          "ratio": 4.280926611396046
+        },
+        {
+          "background": [
+            233,
+            242,
+            236
+          ],
+          "ratio": 4.280926611396046
+        },
+        {
+          "background": [
+            233,
+            242,
+            236
+          ],
+          "ratio": 4.280926611396046
+        },
+        {
+          "background": [
+            233,
+            242,
+            236
+          ],
+          "ratio": 4.280926611396046
+        },
+        {
+          "background": [
+            232,
+            242,
+            236
+          ],
+          "ratio": 4.273107175162713
+        },
+        {
+          "background": [
+            232,
+            242,
+            236
+          ],
+          "ratio": 4.273107175162713
+        },
+        {
+          "background": [
+            232,
+            242,
+            236
+          ],
+          "ratio": 4.273107175162713
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "mine",
+      "scenario": "free",
+      "index": 2,
+      "label": "每日签到",
+      "className": "btn btn-primary btn-sm ",
+      "color": "rgb(7, 60, 44)",
+      "fontSize": 13,
+      "fontWeight": 600,
+      "disabled": false,
+      "selectedNav": false,
+      "nav": false,
+      "ownBackground": "rgba(0, 0, 0, 0)",
+      "ownGradient": "linear-gradient(155deg, rgb(30, 213, 138), rgb(0, 195, 117))",
+      "foreground": [
+        7,
+        60,
+        44
+      ],
+      "minRatio": 5.7100333007838415,
+      "maxRatio": 6.015427040888083,
+      "samples": [
+        {
+          "background": [
+            18,
+            206,
+            130
+          ],
+          "ratio": 6.015427040888083
+        },
+        {
+          "background": [
+            18,
+            206,
+            129
+          ],
+          "ratio": 6.012267386122061
+        },
+        {
+          "background": [
+            16,
+            204,
+            128
+          ],
+          "ratio": 5.893835104319044
+        },
+        {
+          "background": [
+            16,
+            204,
+            128
+          ],
+          "ratio": 5.893835104319044
+        },
+        {
+          "background": [
+            15,
+            204,
+            127
+          ],
+          "ratio": 5.889720098149051
+        },
+        {
+          "background": [
+            13,
+            203,
+            126
+          ],
+          "ratio": 5.828741755508742
+        },
+        {
+          "background": [
+            13,
+            203,
+            126
+          ],
+          "ratio": 5.828741755508742
+        },
+        {
+          "background": [
+            12,
+            203,
+            126
+          ],
+          "ratio": 5.82786657310293
+        },
+        {
+          "background": [
+            11,
+            201,
+            124
+          ],
+          "ratio": 5.7100333007838415
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "mine",
+      "scenario": "free",
+      "index": 3,
+      "label": "意见反馈›",
+      "className": "action-row feedback",
+      "color": "rgb(71, 104, 90)",
+      "fontSize": 14,
+      "fontWeight": 400,
+      "disabled": false,
+      "selectedNav": false,
+      "nav": false,
+      "ownBackground": "rgba(0, 0, 0, 0)",
+      "ownGradient": "none",
+      "foreground": [
+        71,
+        104,
+        90
+      ],
+      "minRatio": 6.079784318389279,
+      "maxRatio": 6.12083474068656,
+      "samples": [
+        {
+          "background": [
+            253,
+            254,
+            254
+          ],
+          "ratio": 6.12083474068656
+        },
+        {
+          "background": [
+            253,
+            253,
+            253
+          ],
+          "ratio": 6.079784318389279
+        },
+        {
+          "background": [
+            253,
+            254,
+            254
+          ],
+          "ratio": 6.12083474068656
+        },
+        {
+          "background": [
+            253,
+            254,
+            254
+          ],
+          "ratio": 6.12083474068656
+        },
+        {
+          "background": [
+            252,
+            254,
+            253
+          ],
+          "ratio": 6.106044896850103
+        },
+        {
+          "background": [
+            253,
+            254,
+            254
+          ],
+          "ratio": 6.12083474068656
+        },
+        {
+          "background": [
+            253,
+            254,
+            254
+          ],
+          "ratio": 6.12083474068656
+        },
+        {
+          "background": [
+            253,
+            254,
+            254
+          ],
+          "ratio": 6.12083474068656
+        },
+        {
+          "background": [
+            253,
+            254,
+            254
+          ],
+          "ratio": 6.12083474068656
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "mine",
+      "scenario": "free",
+      "index": 4,
+      "label": "查询",
+      "className": "floating-tab-label",
+      "color": "rgb(93, 111, 102)",
+      "fontSize": 12,
+      "fontWeight": 500,
+      "disabled": false,
+      "selectedNav": false,
+      "nav": true,
+      "ownBackground": "rgba(0, 0, 0, 0)",
+      "ownGradient": "none",
+      "foreground": [
+        93,
+        111,
+        102
+      ],
+      "minRatio": 5.274439201006639,
+      "maxRatio": 5.28396331946178,
+      "samples": [
+        {
+          "background": [
+            253,
+            254,
+            253
+          ],
+          "ratio": 5.28396331946178
+        },
+        {
+          "background": [
+            252,
+            254,
+            253
+          ],
+          "ratio": 5.274439201006639
+        },
+        {
+          "background": [
+            253,
+            254,
+            253
+          ],
+          "ratio": 5.28396331946178
+        },
+        {
+          "background": [
+            252,
+            254,
+            253
+          ],
+          "ratio": 5.274439201006639
+        },
+        {
+          "background": [
+            252,
+            254,
+            253
+          ],
+          "ratio": 5.274439201006639
+        },
+        {
+          "background": [
+            253,
+            254,
+            253
+          ],
+          "ratio": 5.28396331946178
+        },
+        {
+          "background": [
+            253,
+            254,
+            253
+          ],
+          "ratio": 5.28396331946178
+        },
+        {
+          "background": [
+            253,
+            254,
+            253
+          ],
+          "ratio": 5.28396331946178
+        },
+        {
+          "background": [
+            253,
+            254,
+            253
+          ],
+          "ratio": 5.28396331946178
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "mine",
+      "scenario": "free",
+      "index": 5,
+      "label": "小哨",
+      "className": "floating-tab-label",
+      "color": "rgb(93, 111, 102)",
+      "fontSize": 12,
+      "fontWeight": 500,
+      "disabled": false,
+      "selectedNav": false,
+      "nav": true,
+      "ownBackground": "rgba(0, 0, 0, 0)",
+      "ownGradient": "none",
+      "foreground": [
+        93,
+        111,
+        102
+      ],
+      "minRatio": 5.274439201006639,
+      "maxRatio": 5.316340163576552,
+      "samples": [
+        {
+          "background": [
+            252,
+            254,
+            253
+          ],
+          "ratio": 5.274439201006639
+        },
+        {
+          "background": [
+            252,
+            254,
+            253
+          ],
+          "ratio": 5.274439201006639
+        },
+        {
+          "background": [
+            253,
+            255,
+            253
+          ],
+          "ratio": 5.316340163576552
+        },
+        {
+          "background": [
+            253,
+            254,
+            253
+          ],
+          "ratio": 5.28396331946178
+        },
+        {
+          "background": [
+            252,
+            254,
+            253
+          ],
+          "ratio": 5.274439201006639
+        },
+        {
+          "background": [
+            252,
+            254,
+            253
+          ],
+          "ratio": 5.274439201006639
+        },
+        {
+          "background": [
+            252,
+            254,
+            253
+          ],
+          "ratio": 5.274439201006639
+        },
+        {
+          "background": [
+            253,
+            254,
+            253
+          ],
+          "ratio": 5.28396331946178
+        },
+        {
+          "background": [
+            253,
+            254,
+            253
+          ],
+          "ratio": 5.28396331946178
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "mine",
+      "scenario": "free",
+      "index": 6,
+      "label": "历史",
+      "className": "floating-tab-label",
+      "color": "rgb(93, 111, 102)",
+      "fontSize": 12,
+      "fontWeight": 500,
+      "disabled": false,
+      "selectedNav": false,
+      "nav": true,
+      "ownBackground": "rgba(0, 0, 0, 0)",
+      "ownGradient": "none",
+      "foreground": [
+        93,
+        111,
+        102
+      ],
+      "minRatio": 5.274439201006639,
+      "maxRatio": 5.28396331946178,
+      "samples": [
+        {
+          "background": [
+            253,
+            254,
+            253
+          ],
+          "ratio": 5.28396331946178
+        },
+        {
+          "background": [
+            253,
+            254,
+            253
+          ],
+          "ratio": 5.28396331946178
+        },
+        {
+          "background": [
+            253,
+            254,
+            253
+          ],
+          "ratio": 5.28396331946178
+        },
+        {
+          "background": [
+            253,
+            254,
+            253
+          ],
+          "ratio": 5.28396331946178
+        },
+        {
+          "background": [
+            253,
+            254,
+            253
+          ],
+          "ratio": 5.28396331946178
+        },
+        {
+          "background": [
+            253,
+            254,
+            253
+          ],
+          "ratio": 5.28396331946178
+        },
+        {
+          "background": [
+            253,
+            254,
+            253
+          ],
+          "ratio": 5.28396331946178
+        },
+        {
+          "background": [
+            252,
+            254,
+            253
+          ],
+          "ratio": 5.274439201006639
+        },
+        {
+          "background": [
+            253,
+            254,
+            253
+          ],
+          "ratio": 5.28396331946178
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "mine",
+      "scenario": "free",
+      "index": 7,
+      "label": "我的",
+      "className": "floating-tab-label",
+      "color": "rgb(0, 122, 73)",
+      "fontSize": 12,
+      "fontWeight": 600,
+      "disabled": false,
+      "selectedNav": true,
+      "nav": true,
+      "ownBackground": "rgba(0, 0, 0, 0)",
+      "ownGradient": "none",
+      "foreground": [
+        0,
+        122,
+        73
+      ],
+      "minRatio": 4.729139398699491,
+      "maxRatio": 4.729139398699491,
+      "samples": [
+        {
+          "background": [
+            235,
+            241,
+            238
+          ],
+          "ratio": 4.729139398699491
+        },
+        {
+          "background": [
+            235,
+            241,
+            238
+          ],
+          "ratio": 4.729139398699491
+        },
+        {
+          "background": [
+            235,
+            241,
+            238
+          ],
+          "ratio": 4.729139398699491
+        },
+        {
+          "background": [
+            235,
+            241,
+            238
+          ],
+          "ratio": 4.729139398699491
+        },
+        {
+          "background": [
+            235,
+            241,
+            238
+          ],
+          "ratio": 4.729139398699491
+        },
+        {
+          "background": [
+            235,
+            241,
+            238
+          ],
+          "ratio": 4.729139398699491
+        },
+        {
+          "background": [
+            235,
+            241,
+            238
+          ],
+          "ratio": 4.729139398699491
+        },
+        {
+          "background": [
+            235,
+            241,
+            238
+          ],
+          "ratio": 4.729139398699491
+        },
+        {
+          "background": [
+            235,
+            241,
+            238
+          ],
+          "ratio": 4.729139398699491
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "query",
+      "scenario": "member",
+      "index": 0,
+      "label": "iPhone",
+      "className": "tab on",
+      "color": "rgb(7, 60, 44)",
+      "fontSize": 13,
+      "fontWeight": 600,
+      "disabled": false,
+      "selectedNav": false,
+      "nav": false,
+      "ownBackground": "rgba(0, 0, 0, 0)",
+      "ownGradient": "linear-gradient(145deg, rgb(30, 213, 138), rgb(0, 195, 117))",
+      "foreground": [
+        7,
+        60,
+        44
+      ],
+      "minRatio": 5.709250972007772,
+      "maxRatio": 6.0165913825359265,
+      "samples": [
+        {
+          "background": [
+            19,
+            206,
+            130
+          ],
+          "ratio": 6.0165913825359265
+        },
+        {
+          "background": [
+            18,
+            206,
+            129
+          ],
+          "ratio": 6.012267386122061
+        },
+        {
+          "background": [
+            16,
+            205,
+            128
+          ],
+          "ratio": 5.950216089981444
+        },
+        {
+          "background": [
+            16,
+            204,
+            128
+          ],
+          "ratio": 5.893835104319044
+        },
+        {
+          "background": [
+            14,
+            203,
+            127
+          ],
+          "ratio": 5.832731055399154
+        },
+        {
+          "background": [
+            13,
+            203,
+            126
+          ],
+          "ratio": 5.828741755508742
+        },
+        {
+          "background": [
+            13,
+            203,
+            126
+          ],
+          "ratio": 5.828741755508742
+        },
+        {
+          "background": [
+            11,
+            202,
+            125
+          ],
+          "ratio": 5.768340274853127
+        },
+        {
+          "background": [
+            10,
+            201,
+            124
+          ],
+          "ratio": 5.709250972007772
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "query",
+      "scenario": "member",
+      "index": 1,
+      "label": "勃艮第酒红色",
+      "className": "chip on",
+      "color": "rgb(0, 122, 73)",
+      "fontSize": 13,
+      "fontWeight": 600,
+      "disabled": false,
+      "selectedNav": false,
+      "nav": false,
+      "ownBackground": "rgba(217, 249, 233, 0.85)",
+      "ownGradient": "none",
+      "foreground": [
+        0,
+        122,
+        73
+      ],
+      "minRatio": 4.902824545303801,
+      "maxRatio": 4.902824545303801,
+      "samples": [
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "query",
+      "scenario": "member",
+      "index": 2,
+      "label": "合肥万象城",
+      "className": "chip on",
+      "color": "rgb(0, 122, 73)",
+      "fontSize": 13,
+      "fontWeight": 600,
+      "disabled": false,
+      "selectedNav": false,
+      "nav": false,
+      "ownBackground": "rgba(217, 249, 233, 0.85)",
+      "ownGradient": "none",
+      "foreground": [
+        0,
+        122,
+        73
+      ],
+      "minRatio": 4.902824545303801,
+      "maxRatio": 4.902824545303801,
+      "samples": [
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "query",
+      "scenario": "member",
+      "index": 3,
+      "label": "合肥 · 合肥万象城 ×",
+      "className": "chip on",
+      "color": "rgb(0, 122, 73)",
+      "fontSize": 13,
+      "fontWeight": 600,
+      "disabled": false,
+      "selectedNav": false,
+      "nav": false,
+      "ownBackground": "rgba(217, 249, 233, 0.85)",
+      "ownGradient": "none",
+      "foreground": [
+        0,
+        122,
+        73
+      ],
+      "minRatio": 4.859721636181432,
+      "maxRatio": 4.859721636181432,
+      "samples": [
+        {
+          "background": [
+            222,
+            249,
+            235
+          ],
+          "ratio": 4.859721636181432
+        },
+        {
+          "background": [
+            222,
+            249,
+            235
+          ],
+          "ratio": 4.859721636181432
+        },
+        {
+          "background": [
+            222,
+            249,
+            235
+          ],
+          "ratio": 4.859721636181432
+        },
+        {
+          "background": [
+            222,
+            249,
+            235
+          ],
+          "ratio": 4.859721636181432
+        },
+        {
+          "background": [
+            222,
+            249,
+            235
+          ],
+          "ratio": 4.859721636181432
+        },
+        {
+          "background": [
+            222,
+            249,
+            235
+          ],
+          "ratio": 4.859721636181432
+        },
+        {
+          "background": [
+            222,
+            249,
+            235
+          ],
+          "ratio": 4.859721636181432
+        },
+        {
+          "background": [
+            222,
+            249,
+            235
+          ],
+          "ratio": 4.859721636181432
+        },
+        {
+          "background": [
+            222,
+            249,
+            235
+          ],
+          "ratio": 4.859721636181432
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "query",
+      "scenario": "member",
+      "index": 4,
+      "label": "北京 · 三里屯 ×",
+      "className": "chip on",
+      "color": "rgb(0, 122, 73)",
+      "fontSize": 13,
+      "fontWeight": 600,
+      "disabled": false,
+      "selectedNav": false,
+      "nav": false,
+      "ownBackground": "rgba(217, 249, 233, 0.85)",
+      "ownGradient": "none",
+      "foreground": [
+        0,
+        122,
+        73
+      ],
+      "minRatio": 4.859721636181432,
+      "maxRatio": 4.859721636181432,
+      "samples": [
+        {
+          "background": [
+            222,
+            249,
+            235
+          ],
+          "ratio": 4.859721636181432
+        },
+        {
+          "background": [
+            222,
+            249,
+            235
+          ],
+          "ratio": 4.859721636181432
+        },
+        {
+          "background": [
+            222,
+            249,
+            235
+          ],
+          "ratio": 4.859721636181432
+        },
+        {
+          "background": [
+            222,
+            249,
+            235
+          ],
+          "ratio": 4.859721636181432
+        },
+        {
+          "background": [
+            222,
+            249,
+            235
+          ],
+          "ratio": 4.859721636181432
+        },
+        {
+          "background": [
+            222,
+            249,
+            235
+          ],
+          "ratio": 4.859721636181432
+        },
+        {
+          "background": [
+            222,
+            249,
+            235
+          ],
+          "ratio": 4.859721636181432
+        },
+        {
+          "background": [
+            222,
+            249,
+            235
+          ],
+          "ratio": 4.859721636181432
+        },
+        {
+          "background": [
+            222,
+            249,
+            235
+          ],
+          "ratio": 4.859721636181432
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "query",
+      "scenario": "member",
+      "index": 5,
+      "label": "立即查询",
+      "className": "btn btn-primary btn-block mt ",
+      "color": "rgb(7, 60, 44)",
+      "fontSize": 15,
+      "fontWeight": 600,
+      "disabled": false,
+      "selectedNav": false,
+      "nav": false,
+      "ownBackground": "rgba(0, 0, 0, 0)",
+      "ownGradient": "linear-gradient(155deg, rgb(30, 213, 138), rgb(0, 195, 117))",
+      "foreground": [
+        7,
+        60,
+        44
+      ],
+      "minRatio": 5.709250972007772,
+      "maxRatio": 6.078101389535088,
+      "samples": [
+        {
+          "background": [
+            20,
+            207,
+            131
+          ],
+          "ratio": 6.078101389535088
+        },
+        {
+          "background": [
+            19,
+            207,
+            130
+          ],
+          "ratio": 6.07369610731565
+        },
+        {
+          "background": [
+            18,
+            206,
+            130
+          ],
+          "ratio": 6.015427040888083
+        },
+        {
+          "background": [
+            16,
+            205,
+            128
+          ],
+          "ratio": 5.950216089981444
+        },
+        {
+          "background": [
+            15,
+            204,
+            128
+          ],
+          "ratio": 5.8928182842268235
+        },
+        {
+          "background": [
+            14,
+            203,
+            127
+          ],
+          "ratio": 5.832731055399154
+        },
+        {
+          "background": [
+            12,
+            202,
+            125
+          ],
+          "ratio": 5.769169617942834
+        },
+        {
+          "background": [
+            11,
+            202,
+            125
+          ],
+          "ratio": 5.768340274853127
+        },
+        {
+          "background": [
+            10,
+            201,
+            124
+          ],
+          "ratio": 5.709250972007772
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "query",
+      "scenario": "member",
+      "index": 6,
+      "label": "关注此配置 · 小哨提醒",
+      "className": "btn btn-outline btn-block mt selection-follow-action",
+      "color": "rgb(0, 122, 73)",
+      "fontSize": 15,
+      "fontWeight": 600,
+      "disabled": false,
+      "selectedNav": false,
+      "nav": false,
+      "ownBackground": "rgba(255, 255, 255, 0.78)",
+      "ownGradient": "none",
+      "foreground": [
+        0,
+        122,
+        73
+      ],
+      "minRatio": 5.399279002452162,
+      "maxRatio": 5.412341419097402,
+      "samples": [
+        {
+          "background": [
+            255,
+            255,
+            255
+          ],
+          "ratio": 5.412341419097402
+        },
+        {
+          "background": [
+            255,
+            255,
+            255
+          ],
+          "ratio": 5.412341419097402
+        },
+        {
+          "background": [
+            254,
+            255,
+            254
+          ],
+          "ratio": 5.399279002452162
+        },
+        {
+          "background": [
+            255,
+            255,
+            255
+          ],
+          "ratio": 5.412341419097402
+        },
+        {
+          "background": [
+            255,
+            255,
+            255
+          ],
+          "ratio": 5.412341419097402
+        },
+        {
+          "background": [
+            254,
+            255,
+            254
+          ],
+          "ratio": 5.399279002452162
+        },
+        {
+          "background": [
+            255,
+            255,
+            255
+          ],
+          "ratio": 5.412341419097402
+        },
+        {
+          "background": [
+            255,
+            255,
+            255
+          ],
+          "ratio": 5.412341419097402
+        },
+        {
+          "background": [
+            255,
+            255,
+            255
+          ],
+          "ratio": 5.412341419097402
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "query",
+      "scenario": "member",
+      "index": 7,
+      "label": "加入关注",
+      "className": "btn btn-ghost btn-sm",
+      "color": "rgb(0, 122, 73)",
+      "fontSize": 13,
+      "fontWeight": 600,
+      "disabled": false,
+      "selectedNav": false,
+      "nav": false,
+      "ownBackground": "rgba(217, 249, 233, 0.85)",
+      "ownGradient": "none",
+      "foreground": [
+        0,
+        122,
+        73
+      ],
+      "minRatio": 4.902824545303801,
+      "maxRatio": 4.902824545303801,
+      "samples": [
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "query",
+      "scenario": "member",
+      "index": 8,
+      "label": "重查此结果的配置与门店",
+      "className": "btn btn-outline btn-sm ",
+      "color": "rgb(0, 122, 73)",
+      "fontSize": 13,
+      "fontWeight": 600,
+      "disabled": false,
+      "selectedNav": false,
+      "nav": false,
+      "ownBackground": "rgba(255, 255, 255, 0.78)",
+      "ownGradient": "none",
+      "foreground": [
+        0,
+        122,
+        73
+      ],
+      "minRatio": 5.412341419097402,
+      "maxRatio": 5.412341419097402,
+      "samples": [
+        {
+          "background": [
+            255,
+            255,
+            255
+          ],
+          "ratio": 5.412341419097402
+        },
+        {
+          "background": [
+            255,
+            255,
+            255
+          ],
+          "ratio": 5.412341419097402
+        },
+        {
+          "background": [
+            255,
+            255,
+            255
+          ],
+          "ratio": 5.412341419097402
+        },
+        {
+          "background": [
+            255,
+            255,
+            255
+          ],
+          "ratio": 5.412341419097402
+        },
+        {
+          "background": [
+            255,
+            255,
+            255
+          ],
+          "ratio": 5.412341419097402
+        },
+        {
+          "background": [
+            255,
+            255,
+            255
+          ],
+          "ratio": 5.412341419097402
+        },
+        {
+          "background": [
+            255,
+            255,
+            255
+          ],
+          "ratio": 5.412341419097402
+        },
+        {
+          "background": [
+            255,
+            255,
+            255
+          ],
+          "ratio": 5.412341419097402
+        },
+        {
+          "background": [
+            255,
+            255,
+            255
+          ],
+          "ratio": 5.412341419097402
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "query",
+      "scenario": "member",
+      "index": 9,
+      "label": "查询",
+      "className": "floating-tab-label",
+      "color": "rgb(0, 122, 73)",
+      "fontSize": 12,
+      "fontWeight": 600,
+      "disabled": false,
+      "selectedNav": true,
+      "nav": true,
+      "ownBackground": "rgba(0, 0, 0, 0)",
+      "ownGradient": "none",
+      "foreground": [
+        0,
+        122,
+        73
+      ],
+      "minRatio": 4.686934382927559,
+      "maxRatio": 4.737938289019465,
+      "samples": [
+        {
+          "background": [
+            235,
+            241,
+            238
+          ],
+          "ratio": 4.729139398699491
+        },
+        {
+          "background": [
+            235,
+            241,
+            238
+          ],
+          "ratio": 4.729139398699491
+        },
+        {
+          "background": [
+            235,
+            241,
+            238
+          ],
+          "ratio": 4.729139398699491
+        },
+        {
+          "background": [
+            234,
+            240,
+            237
+          ],
+          "ratio": 4.686934382927559
+        },
+        {
+          "background": [
+            235,
+            241,
+            238
+          ],
+          "ratio": 4.729139398699491
+        },
+        {
+          "background": [
+            235,
+            241,
+            238
+          ],
+          "ratio": 4.729139398699491
+        },
+        {
+          "background": [
+            236,
+            241,
+            238
+          ],
+          "ratio": 4.737938289019465
+        },
+        {
+          "background": [
+            236,
+            241,
+            238
+          ],
+          "ratio": 4.737938289019465
+        },
+        {
+          "background": [
+            235,
+            240,
+            237
+          ],
+          "ratio": 4.695683945290788
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "query",
+      "scenario": "member",
+      "index": 10,
+      "label": "小哨",
+      "className": "floating-tab-label",
+      "color": "rgb(93, 111, 102)",
+      "fontSize": 12,
+      "fontWeight": 500,
+      "disabled": false,
+      "selectedNav": false,
+      "nav": true,
+      "ownBackground": "rgba(0, 0, 0, 0)",
+      "ownGradient": "none",
+      "foreground": [
+        93,
+        111,
+        102
+      ],
+      "minRatio": 5.238996595869029,
+      "maxRatio": 5.28396331946178,
+      "samples": [
+        {
+          "background": [
+            252,
+            253,
+            252
+          ],
+          "ratio": 5.238996595869029
+        },
+        {
+          "background": [
+            252,
+            253,
+            252
+          ],
+          "ratio": 5.238996595869029
+        },
+        {
+          "background": [
+            253,
+            254,
+            253
+          ],
+          "ratio": 5.28396331946178
+        },
+        {
+          "background": [
+            252,
+            253,
+            252
+          ],
+          "ratio": 5.238996595869029
+        },
+        {
+          "background": [
+            253,
+            254,
+            253
+          ],
+          "ratio": 5.28396331946178
+        },
+        {
+          "background": [
+            253,
+            254,
+            253
+          ],
+          "ratio": 5.28396331946178
+        },
+        {
+          "background": [
+            253,
+            254,
+            253
+          ],
+          "ratio": 5.28396331946178
+        },
+        {
+          "background": [
+            252,
+            254,
+            253
+          ],
+          "ratio": 5.274439201006639
+        },
+        {
+          "background": [
+            253,
+            254,
+            253
+          ],
+          "ratio": 5.28396331946178
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "query",
+      "scenario": "member",
+      "index": 11,
+      "label": "历史",
+      "className": "floating-tab-label",
+      "color": "rgb(93, 111, 102)",
+      "fontSize": 12,
+      "fontWeight": 500,
+      "disabled": false,
+      "selectedNav": false,
+      "nav": true,
+      "ownBackground": "rgba(0, 0, 0, 0)",
+      "ownGradient": "none",
+      "foreground": [
+        93,
+        111,
+        102
+      ],
+      "minRatio": 5.238996595869029,
+      "maxRatio": 5.28396331946178,
+      "samples": [
+        {
+          "background": [
+            252,
+            254,
+            253
+          ],
+          "ratio": 5.274439201006639
+        },
+        {
+          "background": [
+            252,
+            254,
+            253
+          ],
+          "ratio": 5.274439201006639
+        },
+        {
+          "background": [
+            252,
+            254,
+            253
+          ],
+          "ratio": 5.274439201006639
+        },
+        {
+          "background": [
+            252,
+            253,
+            252
+          ],
+          "ratio": 5.238996595869029
+        },
+        {
+          "background": [
+            253,
+            254,
+            253
+          ],
+          "ratio": 5.28396331946178
+        },
+        {
+          "background": [
+            253,
+            254,
+            253
+          ],
+          "ratio": 5.28396331946178
+        },
+        {
+          "background": [
+            253,
+            254,
+            253
+          ],
+          "ratio": 5.28396331946178
+        },
+        {
+          "background": [
+            253,
+            254,
+            253
+          ],
+          "ratio": 5.28396331946178
+        },
+        {
+          "background": [
+            253,
+            254,
+            253
+          ],
+          "ratio": 5.28396331946178
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "query",
+      "scenario": "member",
+      "index": 12,
+      "label": "我的",
+      "className": "floating-tab-label",
+      "color": "rgb(93, 111, 102)",
+      "fontSize": 12,
+      "fontWeight": 500,
+      "disabled": false,
+      "selectedNav": false,
+      "nav": true,
+      "ownBackground": "rgba(0, 0, 0, 0)",
+      "ownGradient": "none",
+      "foreground": [
+        93,
+        111,
+        102
+      ],
+      "minRatio": 5.238996595869029,
+      "maxRatio": 5.316340163576552,
+      "samples": [
+        {
+          "background": [
+            252,
+            254,
+            253
+          ],
+          "ratio": 5.274439201006639
+        },
+        {
+          "background": [
+            252,
+            254,
+            253
+          ],
+          "ratio": 5.274439201006639
+        },
+        {
+          "background": [
+            252,
+            254,
+            252
+          ],
+          "ratio": 5.271204763789043
+        },
+        {
+          "background": [
+            252,
+            253,
+            252
+          ],
+          "ratio": 5.238996595869029
+        },
+        {
+          "background": [
+            253,
+            254,
+            253
+          ],
+          "ratio": 5.28396331946178
+        },
+        {
+          "background": [
+            253,
+            254,
+            253
+          ],
+          "ratio": 5.28396331946178
+        },
+        {
+          "background": [
+            252,
+            254,
+            253
+          ],
+          "ratio": 5.274439201006639
+        },
+        {
+          "background": [
+            253,
+            255,
+            253
+          ],
+          "ratio": 5.316340163576552
+        },
+        {
+          "background": [
+            252,
+            254,
+            252
+          ],
+          "ratio": 5.271204763789043
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "follow",
+      "scenario": "member",
+      "index": 0,
+      "label": "刷新状态",
+      "className": "btn btn-ghost btn-sm compact-action",
+      "color": "rgb(0, 122, 73)",
+      "fontSize": 13,
+      "fontWeight": 600,
+      "disabled": false,
+      "selectedNav": false,
+      "nav": false,
+      "ownBackground": "rgba(217, 249, 233, 0.85)",
+      "ownGradient": "none",
+      "foreground": [
+        0,
+        122,
+        73
+      ],
+      "minRatio": 4.891672528662612,
+      "maxRatio": 4.891672528662612,
+      "samples": [
+        {
+          "background": [
+            222,
+            250,
+            235
+          ],
+          "ratio": 4.891672528662612
+        },
+        {
+          "background": [
+            222,
+            250,
+            235
+          ],
+          "ratio": 4.891672528662612
+        },
+        {
+          "background": [
+            222,
+            250,
+            235
+          ],
+          "ratio": 4.891672528662612
+        },
+        {
+          "background": [
+            222,
+            250,
+            235
+          ],
+          "ratio": 4.891672528662612
+        },
+        {
+          "background": [
+            222,
+            250,
+            235
+          ],
+          "ratio": 4.891672528662612
+        },
+        {
+          "background": [
+            222,
+            250,
+            235
+          ],
+          "ratio": 4.891672528662612
+        },
+        {
+          "background": [
+            222,
+            250,
+            235
+          ],
+          "ratio": 4.891672528662612
+        },
+        {
+          "background": [
+            222,
+            250,
+            235
+          ],
+          "ratio": 4.891672528662612
+        },
+        {
+          "background": [
+            222,
+            250,
+            235
+          ],
+          "ratio": 4.891672528662612
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "follow",
+      "scenario": "member",
+      "index": 1,
+      "label": "查看原因",
+      "className": "btn btn-ghost btn-sm compact-action",
+      "color": "rgb(0, 122, 73)",
+      "fontSize": 13,
+      "fontWeight": 600,
+      "disabled": false,
+      "selectedNav": false,
+      "nav": false,
+      "ownBackground": "rgba(217, 249, 233, 0.85)",
+      "ownGradient": "none",
+      "foreground": [
+        0,
+        122,
+        73
+      ],
+      "minRatio": 4.883556939536482,
+      "maxRatio": 4.883556939536482,
+      "samples": [
+        {
+          "background": [
+            221,
+            250,
+            235
+          ],
+          "ratio": 4.883556939536482
+        },
+        {
+          "background": [
+            221,
+            250,
+            235
+          ],
+          "ratio": 4.883556939536482
+        },
+        {
+          "background": [
+            221,
+            250,
+            235
+          ],
+          "ratio": 4.883556939536482
+        },
+        {
+          "background": [
+            221,
+            250,
+            235
+          ],
+          "ratio": 4.883556939536482
+        },
+        {
+          "background": [
+            221,
+            250,
+            235
+          ],
+          "ratio": 4.883556939536482
+        },
+        {
+          "background": [
+            221,
+            250,
+            235
+          ],
+          "ratio": 4.883556939536482
+        },
+        {
+          "background": [
+            221,
+            250,
+            235
+          ],
+          "ratio": 4.883556939536482
+        },
+        {
+          "background": [
+            221,
+            250,
+            235
+          ],
+          "ratio": 4.883556939536482
+        },
+        {
+          "background": [
+            221,
+            250,
+            235
+          ],
+          "ratio": 4.883556939536482
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "follow",
+      "scenario": "member",
+      "index": 2,
+      "label": "服务详情 ›",
+      "className": "service-link",
+      "color": "rgb(0, 122, 73)",
+      "fontSize": 11.5,
+      "fontWeight": 400,
+      "disabled": false,
+      "selectedNav": false,
+      "nav": false,
+      "ownBackground": "rgba(0, 0, 0, 0)",
+      "ownGradient": "none",
+      "foreground": [
+        0,
+        122,
+        73
+      ],
+      "minRatio": 5.141139010604067,
+      "maxRatio": 5.198074824511902,
+      "samples": [
+        {
+          "background": [
+            241,
+            253,
+            246
+          ],
+          "ratio": 5.185804132938184
+        },
+        {
+          "background": [
+            242,
+            253,
+            247
+          ],
+          "ratio": 5.198074824511902
+        },
+        {
+          "background": [
+            241,
+            253,
+            247
+          ],
+          "ratio": 5.188978311137472
+        },
+        {
+          "background": [
+            242,
+            253,
+            247
+          ],
+          "ratio": 5.198074824511902
+        },
+        {
+          "background": [
+            241,
+            253,
+            246
+          ],
+          "ratio": 5.185804132938184
+        },
+        {
+          "background": [
+            241,
+            253,
+            246
+          ],
+          "ratio": 5.185804132938184
+        },
+        {
+          "background": [
+            241,
+            252,
+            246
+          ],
+          "ratio": 5.153342858037488
+        },
+        {
+          "background": [
+            240,
+            252,
+            246
+          ],
+          "ratio": 5.144296144630183
+        },
+        {
+          "background": [
+            240,
+            252,
+            245
+          ],
+          "ratio": 5.141139010604067
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "follow",
+      "scenario": "member",
+      "index": 3,
+      "label": "＋ 添加",
+      "className": "btn btn-primary btn-sm compact-action",
+      "color": "rgb(7, 60, 44)",
+      "fontSize": 13,
+      "fontWeight": 600,
+      "disabled": false,
+      "selectedNav": false,
+      "nav": false,
+      "ownBackground": "rgba(0, 0, 0, 0)",
+      "ownGradient": "linear-gradient(155deg, rgb(30, 213, 138), rgb(0, 195, 117))",
+      "foreground": [
+        7,
+        60,
+        44
+      ],
+      "minRatio": 5.768340274853127,
+      "maxRatio": 6.07688662545084,
+      "samples": [
+        {
+          "background": [
+            19,
+            207,
+            131
+          ],
+          "ratio": 6.07688662545084
+        },
+        {
+          "background": [
+            17,
+            205,
+            129
+          ],
+          "ratio": 5.954410324959359
+        },
+        {
+          "background": [
+            16,
+            204,
+            128
+          ],
+          "ratio": 5.893835104319044
+        },
+        {
+          "background": [
+            17,
+            205,
+            129
+          ],
+          "ratio": 5.954410324959359
+        },
+        {
+          "background": [
+            15,
+            204,
+            127
+          ],
+          "ratio": 5.889720098149051
+        },
+        {
+          "background": [
+            13,
+            203,
+            126
+          ],
+          "ratio": 5.828741755508742
+        },
+        {
+          "background": [
+            15,
+            204,
+            127
+          ],
+          "ratio": 5.889720098149051
+        },
+        {
+          "background": [
+            13,
+            203,
+            126
+          ],
+          "ratio": 5.828741755508742
+        },
+        {
+          "background": [
+            11,
+            202,
+            125
+          ],
+          "ratio": 5.768340274853127
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "follow",
+      "scenario": "member",
+      "index": 4,
+      "label": "编辑",
+      "className": "btn btn-ghost btn-sm",
+      "color": "rgb(0, 122, 73)",
+      "fontSize": 12,
+      "fontWeight": 600,
+      "disabled": false,
+      "selectedNav": false,
+      "nav": false,
+      "ownBackground": "rgba(217, 249, 233, 0.85)",
+      "ownGradient": "none",
+      "foreground": [
+        0,
+        122,
+        73
+      ],
+      "minRatio": 4.902824545303801,
+      "maxRatio": 4.902824545303801,
+      "samples": [
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "follow",
+      "scenario": "member",
+      "index": 5,
+      "label": "暂停关注",
+      "className": "btn btn-outline btn-sm",
+      "color": "rgb(0, 122, 73)",
+      "fontSize": 12,
+      "fontWeight": 600,
+      "disabled": false,
+      "selectedNav": false,
+      "nav": false,
+      "ownBackground": "rgba(255, 255, 255, 0.78)",
+      "ownGradient": "none",
+      "foreground": [
+        0,
+        122,
+        73
+      ],
+      "minRatio": 5.412341419097402,
+      "maxRatio": 5.412341419097402,
+      "samples": [
+        {
+          "background": [
+            255,
+            255,
+            255
+          ],
+          "ratio": 5.412341419097402
+        },
+        {
+          "background": [
+            255,
+            255,
+            255
+          ],
+          "ratio": 5.412341419097402
+        },
+        {
+          "background": [
+            255,
+            255,
+            255
+          ],
+          "ratio": 5.412341419097402
+        },
+        {
+          "background": [
+            255,
+            255,
+            255
+          ],
+          "ratio": 5.412341419097402
+        },
+        {
+          "background": [
+            255,
+            255,
+            255
+          ],
+          "ratio": 5.412341419097402
+        },
+        {
+          "background": [
+            255,
+            255,
+            255
+          ],
+          "ratio": 5.412341419097402
+        },
+        {
+          "background": [
+            255,
+            255,
+            255
+          ],
+          "ratio": 5.412341419097402
+        },
+        {
+          "background": [
+            255,
+            255,
+            255
+          ],
+          "ratio": 5.412341419097402
+        },
+        {
+          "background": [
+            255,
+            255,
+            255
+          ],
+          "ratio": 5.412341419097402
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "follow",
+      "scenario": "member",
+      "index": 6,
+      "label": "删除",
+      "className": "btn btn-danger btn-sm",
+      "color": "rgb(181, 72, 72)",
+      "fontSize": 12,
+      "fontWeight": 600,
+      "disabled": false,
+      "selectedNav": false,
+      "nav": false,
+      "ownBackground": "rgb(252, 236, 237)",
+      "ownGradient": "none",
+      "foreground": [
+        181,
+        72,
+        72
+      ],
+      "minRatio": 4.607000386121838,
+      "maxRatio": 4.607000386121838,
+      "samples": [
+        {
+          "background": [
+            252,
+            236,
+            237
+          ],
+          "ratio": 4.607000386121838
+        },
+        {
+          "background": [
+            252,
+            236,
+            237
+          ],
+          "ratio": 4.607000386121838
+        },
+        {
+          "background": [
+            252,
+            236,
+            237
+          ],
+          "ratio": 4.607000386121838
+        },
+        {
+          "background": [
+            252,
+            236,
+            237
+          ],
+          "ratio": 4.607000386121838
+        },
+        {
+          "background": [
+            252,
+            236,
+            237
+          ],
+          "ratio": 4.607000386121838
+        },
+        {
+          "background": [
+            252,
+            236,
+            237
+          ],
+          "ratio": 4.607000386121838
+        },
+        {
+          "background": [
+            252,
+            236,
+            237
+          ],
+          "ratio": 4.607000386121838
+        },
+        {
+          "background": [
+            252,
+            236,
+            237
+          ],
+          "ratio": 4.607000386121838
+        },
+        {
+          "background": [
+            252,
+            236,
+            237
+          ],
+          "ratio": 4.607000386121838
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "follow",
+      "scenario": "member",
+      "index": 7,
+      "label": "查询",
+      "className": "floating-tab-label",
+      "color": "rgb(93, 111, 102)",
+      "fontSize": 12,
+      "fontWeight": 500,
+      "disabled": false,
+      "selectedNav": false,
+      "nav": true,
+      "ownBackground": "rgba(0, 0, 0, 0)",
+      "ownGradient": "none",
+      "foreground": [
+        93,
+        111,
+        102
+      ],
+      "minRatio": 5.125765491569182,
+      "maxRatio": 5.125765491569182,
+      "samples": [
+        {
+          "background": [
+            245,
+            252,
+            247
+          ],
+          "ratio": 5.125765491569182
+        },
+        {
+          "background": [
+            245,
+            252,
+            247
+          ],
+          "ratio": 5.125765491569182
+        },
+        {
+          "background": [
+            245,
+            252,
+            247
+          ],
+          "ratio": 5.125765491569182
+        },
+        {
+          "background": [
+            245,
+            252,
+            247
+          ],
+          "ratio": 5.125765491569182
+        },
+        {
+          "background": [
+            245,
+            252,
+            247
+          ],
+          "ratio": 5.125765491569182
+        },
+        {
+          "background": [
+            245,
+            252,
+            247
+          ],
+          "ratio": 5.125765491569182
+        },
+        {
+          "background": [
+            245,
+            252,
+            247
+          ],
+          "ratio": 5.125765491569182
+        },
+        {
+          "background": [
+            245,
+            252,
+            247
+          ],
+          "ratio": 5.125765491569182
+        },
+        {
+          "background": [
+            245,
+            252,
+            247
+          ],
+          "ratio": 5.125765491569182
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "follow",
+      "scenario": "member",
+      "index": 8,
+      "label": "小哨",
+      "className": "floating-tab-label",
+      "color": "rgb(0, 122, 73)",
+      "fontSize": 12,
+      "fontWeight": 600,
+      "disabled": false,
+      "selectedNav": true,
+      "nav": true,
+      "ownBackground": "rgba(0, 0, 0, 0)",
+      "ownGradient": "none",
+      "foreground": [
+        0,
+        122,
+        73
+      ],
+      "minRatio": 4.601738117189972,
+      "maxRatio": 4.601738117189972,
+      "samples": [
+        {
+          "background": [
+            229,
+            239,
+            233
+          ],
+          "ratio": 4.601738117189972
+        },
+        {
+          "background": [
+            229,
+            239,
+            233
+          ],
+          "ratio": 4.601738117189972
+        },
+        {
+          "background": [
+            229,
+            239,
+            233
+          ],
+          "ratio": 4.601738117189972
+        },
+        {
+          "background": [
+            229,
+            239,
+            233
+          ],
+          "ratio": 4.601738117189972
+        },
+        {
+          "background": [
+            229,
+            239,
+            233
+          ],
+          "ratio": 4.601738117189972
+        },
+        {
+          "background": [
+            229,
+            239,
+            233
+          ],
+          "ratio": 4.601738117189972
+        },
+        {
+          "background": [
+            229,
+            239,
+            233
+          ],
+          "ratio": 4.601738117189972
+        },
+        {
+          "background": [
+            229,
+            239,
+            233
+          ],
+          "ratio": 4.601738117189972
+        },
+        {
+          "background": [
+            229,
+            239,
+            233
+          ],
+          "ratio": 4.601738117189972
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "follow",
+      "scenario": "member",
+      "index": 9,
+      "label": "历史",
+      "className": "floating-tab-label",
+      "color": "rgb(93, 111, 102)",
+      "fontSize": 12,
+      "fontWeight": 500,
+      "disabled": false,
+      "selectedNav": false,
+      "nav": true,
+      "ownBackground": "rgba(0, 0, 0, 0)",
+      "ownGradient": "none",
+      "foreground": [
+        93,
+        111,
+        102
+      ],
+      "minRatio": 5.125765491569182,
+      "maxRatio": 5.125765491569182,
+      "samples": [
+        {
+          "background": [
+            245,
+            252,
+            247
+          ],
+          "ratio": 5.125765491569182
+        },
+        {
+          "background": [
+            245,
+            252,
+            247
+          ],
+          "ratio": 5.125765491569182
+        },
+        {
+          "background": [
+            245,
+            252,
+            247
+          ],
+          "ratio": 5.125765491569182
+        },
+        {
+          "background": [
+            245,
+            252,
+            247
+          ],
+          "ratio": 5.125765491569182
+        },
+        {
+          "background": [
+            245,
+            252,
+            247
+          ],
+          "ratio": 5.125765491569182
+        },
+        {
+          "background": [
+            245,
+            252,
+            247
+          ],
+          "ratio": 5.125765491569182
+        },
+        {
+          "background": [
+            245,
+            252,
+            247
+          ],
+          "ratio": 5.125765491569182
+        },
+        {
+          "background": [
+            245,
+            252,
+            247
+          ],
+          "ratio": 5.125765491569182
+        },
+        {
+          "background": [
+            245,
+            252,
+            247
+          ],
+          "ratio": 5.125765491569182
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "follow",
+      "scenario": "member",
+      "index": 10,
+      "label": "我的",
+      "className": "floating-tab-label",
+      "color": "rgb(93, 111, 102)",
+      "fontSize": 12,
+      "fontWeight": 500,
+      "disabled": false,
+      "selectedNav": false,
+      "nav": true,
+      "ownBackground": "rgba(0, 0, 0, 0)",
+      "ownGradient": "none",
+      "foreground": [
+        93,
+        111,
+        102
+      ],
+      "minRatio": 4.724397556478541,
+      "maxRatio": 4.724397556478541,
+      "samples": [
+        {
+          "background": [
+            237,
+            242,
+            241
+          ],
+          "ratio": 4.724397556478541
+        },
+        {
+          "background": [
+            237,
+            242,
+            241
+          ],
+          "ratio": 4.724397556478541
+        },
+        {
+          "background": [
+            237,
+            242,
+            241
+          ],
+          "ratio": 4.724397556478541
+        },
+        {
+          "background": [
+            237,
+            242,
+            241
+          ],
+          "ratio": 4.724397556478541
+        },
+        {
+          "background": [
+            237,
+            242,
+            241
+          ],
+          "ratio": 4.724397556478541
+        },
+        {
+          "background": [
+            237,
+            242,
+            241
+          ],
+          "ratio": 4.724397556478541
+        },
+        {
+          "background": [
+            237,
+            242,
+            241
+          ],
+          "ratio": 4.724397556478541
+        },
+        {
+          "background": [
+            237,
+            242,
+            241
+          ],
+          "ratio": 4.724397556478541
+        },
+        {
+          "background": [
+            237,
+            242,
+            241
+          ],
+          "ratio": 4.724397556478541
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "history",
+      "scenario": "member",
+      "index": 0,
+      "label": "iPhone",
+      "className": "tab on",
+      "color": "rgb(7, 60, 44)",
+      "fontSize": 13,
+      "fontWeight": 600,
+      "disabled": false,
+      "selectedNav": false,
+      "nav": false,
+      "ownBackground": "rgba(0, 0, 0, 0)",
+      "ownGradient": "linear-gradient(145deg, rgb(30, 213, 138), rgb(0, 195, 117))",
+      "foreground": [
+        7,
+        60,
+        44
+      ],
+      "minRatio": 5.709250972007772,
+      "maxRatio": 6.078101389535088,
+      "samples": [
+        {
+          "background": [
+            20,
+            207,
+            131
+          ],
+          "ratio": 6.078101389535088
+        },
+        {
+          "background": [
+            18,
+            206,
+            130
+          ],
+          "ratio": 6.015427040888083
+        },
+        {
+          "background": [
+            17,
+            205,
+            129
+          ],
+          "ratio": 5.954410324959359
+        },
+        {
+          "background": [
+            16,
+            205,
+            128
+          ],
+          "ratio": 5.950216089981444
+        },
+        {
+          "background": [
+            15,
+            204,
+            127
+          ],
+          "ratio": 5.889720098149051
+        },
+        {
+          "background": [
+            13,
+            203,
+            126
+          ],
+          "ratio": 5.828741755508742
+        },
+        {
+          "background": [
+            13,
+            203,
+            126
+          ],
+          "ratio": 5.828741755508742
+        },
+        {
+          "background": [
+            12,
+            202,
+            125
+          ],
+          "ratio": 5.769169617942834
+        },
+        {
+          "background": [
+            10,
+            201,
+            124
+          ],
+          "ratio": 5.709250972007772
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "history",
+      "scenario": "member",
+      "index": 1,
+      "label": "勃艮第酒红色",
+      "className": "chip on",
+      "color": "rgb(0, 122, 73)",
+      "fontSize": 13,
+      "fontWeight": 600,
+      "disabled": false,
+      "selectedNav": false,
+      "nav": false,
+      "ownBackground": "rgba(217, 249, 233, 0.85)",
+      "ownGradient": "none",
+      "foreground": [
+        0,
+        122,
+        73
+      ],
+      "minRatio": 4.902824545303801,
+      "maxRatio": 4.902824545303801,
+      "samples": [
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "history",
+      "scenario": "member",
+      "index": 2,
+      "label": "合肥万象城",
+      "className": "chip on",
+      "color": "rgb(0, 122, 73)",
+      "fontSize": 13,
+      "fontWeight": 600,
+      "disabled": false,
+      "selectedNav": false,
+      "nav": false,
+      "ownBackground": "rgba(217, 249, 233, 0.85)",
+      "ownGradient": "none",
+      "foreground": [
+        0,
+        122,
+        73
+      ],
+      "minRatio": 4.902824545303801,
+      "maxRatio": 4.902824545303801,
+      "samples": [
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        },
+        {
+          "background": [
+            223,
+            250,
+            236
+          ],
+          "ratio": 4.902824545303801
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "history",
+      "scenario": "member",
+      "index": 3,
+      "label": "合肥 · 合肥万象城 ×",
+      "className": "chip on",
+      "color": "rgb(0, 122, 73)",
+      "fontSize": 13,
+      "fontWeight": 600,
+      "disabled": false,
+      "selectedNav": false,
+      "nav": false,
+      "ownBackground": "rgba(217, 249, 233, 0.85)",
+      "ownGradient": "none",
+      "foreground": [
+        0,
+        122,
+        73
+      ],
+      "minRatio": 4.859721636181432,
+      "maxRatio": 4.859721636181432,
+      "samples": [
+        {
+          "background": [
+            222,
+            249,
+            235
+          ],
+          "ratio": 4.859721636181432
+        },
+        {
+          "background": [
+            222,
+            249,
+            235
+          ],
+          "ratio": 4.859721636181432
+        },
+        {
+          "background": [
+            222,
+            249,
+            235
+          ],
+          "ratio": 4.859721636181432
+        },
+        {
+          "background": [
+            222,
+            249,
+            235
+          ],
+          "ratio": 4.859721636181432
+        },
+        {
+          "background": [
+            222,
+            249,
+            235
+          ],
+          "ratio": 4.859721636181432
+        },
+        {
+          "background": [
+            222,
+            249,
+            235
+          ],
+          "ratio": 4.859721636181432
+        },
+        {
+          "background": [
+            222,
+            249,
+            235
+          ],
+          "ratio": 4.859721636181432
+        },
+        {
+          "background": [
+            222,
+            249,
+            235
+          ],
+          "ratio": 4.859721636181432
+        },
+        {
+          "background": [
+            222,
+            249,
+            235
+          ],
+          "ratio": 4.859721636181432
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "history",
+      "scenario": "member",
+      "index": 4,
+      "label": "北京 · 三里屯 ×",
+      "className": "chip on",
+      "color": "rgb(0, 122, 73)",
+      "fontSize": 13,
+      "fontWeight": 600,
+      "disabled": false,
+      "selectedNav": false,
+      "nav": false,
+      "ownBackground": "rgba(217, 249, 233, 0.85)",
+      "ownGradient": "none",
+      "foreground": [
+        0,
+        122,
+        73
+      ],
+      "minRatio": 4.859721636181432,
+      "maxRatio": 4.859721636181432,
+      "samples": [
+        {
+          "background": [
+            222,
+            249,
+            235
+          ],
+          "ratio": 4.859721636181432
+        },
+        {
+          "background": [
+            222,
+            249,
+            235
+          ],
+          "ratio": 4.859721636181432
+        },
+        {
+          "background": [
+            222,
+            249,
+            235
+          ],
+          "ratio": 4.859721636181432
+        },
+        {
+          "background": [
+            222,
+            249,
+            235
+          ],
+          "ratio": 4.859721636181432
+        },
+        {
+          "background": [
+            222,
+            249,
+            235
+          ],
+          "ratio": 4.859721636181432
+        },
+        {
+          "background": [
+            222,
+            249,
+            235
+          ],
+          "ratio": 4.859721636181432
+        },
+        {
+          "background": [
+            222,
+            249,
+            235
+          ],
+          "ratio": 4.859721636181432
+        },
+        {
+          "background": [
+            222,
+            249,
+            235
+          ],
+          "ratio": 4.859721636181432
+        },
+        {
+          "background": [
+            222,
+            249,
+            235
+          ],
+          "ratio": 4.859721636181432
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "history",
+      "scenario": "member",
+      "index": 5,
+      "label": "查看历史",
+      "className": "btn btn-primary btn-block mt ",
+      "color": "rgb(7, 60, 44)",
+      "fontSize": 15,
+      "fontWeight": 600,
+      "disabled": false,
+      "selectedNav": false,
+      "nav": false,
+      "ownBackground": "rgba(0, 0, 0, 0)",
+      "ownGradient": "linear-gradient(155deg, rgb(30, 213, 138), rgb(0, 195, 117))",
+      "foreground": [
+        7,
+        60,
+        44
+      ],
+      "minRatio": 5.709250972007772,
+      "maxRatio": 6.078101389535088,
+      "samples": [
+        {
+          "background": [
+            20,
+            207,
+            131
+          ],
+          "ratio": 6.078101389535088
+        },
+        {
+          "background": [
+            19,
+            206,
+            130
+          ],
+          "ratio": 6.0165913825359265
+        },
+        {
+          "background": [
+            19,
+            206,
+            130
+          ],
+          "ratio": 6.0165913825359265
+        },
+        {
+          "background": [
+            16,
+            204,
+            128
+          ],
+          "ratio": 5.893835104319044
+        },
+        {
+          "background": [
+            15,
+            204,
+            128
+          ],
+          "ratio": 5.8928182842268235
+        },
+        {
+          "background": [
+            15,
+            204,
+            127
+          ],
+          "ratio": 5.889720098149051
+        },
+        {
+          "background": [
+            11,
+            202,
+            125
+          ],
+          "ratio": 5.768340274853127
+        },
+        {
+          "background": [
+            11,
+            201,
+            124
+          ],
+          "ratio": 5.7100333007838415
+        },
+        {
+          "background": [
+            10,
+            201,
+            124
+          ],
+          "ratio": 5.709250972007772
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "history",
+      "scenario": "member",
+      "index": 6,
+      "label": "查询",
+      "className": "floating-tab-label",
+      "color": "rgb(93, 111, 102)",
+      "fontSize": 12,
+      "fontWeight": 500,
+      "disabled": false,
+      "selectedNav": false,
+      "nav": true,
+      "ownBackground": "rgba(0, 0, 0, 0)",
+      "ownGradient": "none",
+      "foreground": [
+        93,
+        111,
+        102
+      ],
+      "minRatio": 5.274439201006639,
+      "maxRatio": 5.306816045121411,
+      "samples": [
+        {
+          "background": [
+            252,
+            254,
+            253
+          ],
+          "ratio": 5.274439201006639
+        },
+        {
+          "background": [
+            252,
+            255,
+            253
+          ],
+          "ratio": 5.306816045121411
+        },
+        {
+          "background": [
+            252,
+            255,
+            253
+          ],
+          "ratio": 5.306816045121411
+        },
+        {
+          "background": [
+            252,
+            255,
+            253
+          ],
+          "ratio": 5.306816045121411
+        },
+        {
+          "background": [
+            252,
+            255,
+            253
+          ],
+          "ratio": 5.306816045121411
+        },
+        {
+          "background": [
+            252,
+            255,
+            253
+          ],
+          "ratio": 5.306816045121411
+        },
+        {
+          "background": [
+            252,
+            254,
+            253
+          ],
+          "ratio": 5.274439201006639
+        },
+        {
+          "background": [
+            252,
+            254,
+            253
+          ],
+          "ratio": 5.274439201006639
+        },
+        {
+          "background": [
+            252,
+            254,
+            253
+          ],
+          "ratio": 5.274439201006639
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "history",
+      "scenario": "member",
+      "index": 7,
+      "label": "小哨",
+      "className": "floating-tab-label",
+      "color": "rgb(93, 111, 102)",
+      "fontSize": 12,
+      "fontWeight": 500,
+      "disabled": false,
+      "selectedNav": false,
+      "nav": true,
+      "ownBackground": "rgba(0, 0, 0, 0)",
+      "ownGradient": "none",
+      "foreground": [
+        93,
+        111,
+        102
+      ],
+      "minRatio": 5.012913442091986,
+      "maxRatio": 5.065497754714024,
+      "samples": [
+        {
+          "background": [
+            237,
+            251,
+            244
+          ],
+          "ratio": 5.012913442091986
+        },
+        {
+          "background": [
+            238,
+            252,
+            245
+          ],
+          "ratio": 5.056666593694614
+        },
+        {
+          "background": [
+            238,
+            252,
+            245
+          ],
+          "ratio": 5.056666593694614
+        },
+        {
+          "background": [
+            238,
+            252,
+            245
+          ],
+          "ratio": 5.056666593694614
+        },
+        {
+          "background": [
+            238,
+            252,
+            245
+          ],
+          "ratio": 5.056666593694614
+        },
+        {
+          "background": [
+            238,
+            252,
+            245
+          ],
+          "ratio": 5.056666593694614
+        },
+        {
+          "background": [
+            238,
+            252,
+            245
+          ],
+          "ratio": 5.056666593694614
+        },
+        {
+          "background": [
+            239,
+            252,
+            245
+          ],
+          "ratio": 5.065497754714024
+        },
+        {
+          "background": [
+            238,
+            252,
+            245
+          ],
+          "ratio": 5.056666593694614
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "history",
+      "scenario": "member",
+      "index": 8,
+      "label": "历史",
+      "className": "floating-tab-label",
+      "color": "rgb(0, 122, 73)",
+      "fontSize": 12,
+      "fontWeight": 600,
+      "disabled": false,
+      "selectedNav": true,
+      "nav": true,
+      "ownBackground": "rgba(0, 0, 0, 0)",
+      "ownGradient": "none",
+      "foreground": [
+        0,
+        122,
+        73
+      ],
+      "minRatio": 4.562350065288178,
+      "maxRatio": 4.603847024651931,
+      "samples": [
+        {
+          "background": [
+            225,
+            239,
+            231
+          ],
+          "ratio": 4.562350065288178
+        },
+        {
+          "background": [
+            225,
+            240,
+            232
+          ],
+          "ratio": 4.595537820748714
+        },
+        {
+          "background": [
+            225,
+            240,
+            232
+          ],
+          "ratio": 4.595537820748714
+        },
+        {
+          "background": [
+            225,
+            240,
+            232
+          ],
+          "ratio": 4.595537820748714
+        },
+        {
+          "background": [
+            225,
+            240,
+            232
+          ],
+          "ratio": 4.595537820748714
+        },
+        {
+          "background": [
+            225,
+            239,
+            232
+          ],
+          "ratio": 4.565271365327339
+        },
+        {
+          "background": [
+            225,
+            240,
+            232
+          ],
+          "ratio": 4.595537820748714
+        },
+        {
+          "background": [
+            226,
+            240,
+            232
+          ],
+          "ratio": 4.603847024651931
+        },
+        {
+          "background": [
+            226,
+            240,
+            232
+          ],
+          "ratio": 4.603847024651931
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "history",
+      "scenario": "member",
+      "index": 9,
+      "label": "我的",
+      "className": "floating-tab-label",
+      "color": "rgb(93, 111, 102)",
+      "fontSize": 12,
+      "fontWeight": 500,
+      "disabled": false,
+      "selectedNav": false,
+      "nav": true,
+      "ownBackground": "rgba(0, 0, 0, 0)",
+      "ownGradient": "none",
+      "foreground": [
+        93,
+        111,
+        102
+      ],
+      "minRatio": 5.148678925031233,
+      "maxRatio": 5.202338981817322,
+      "samples": [
+        {
+          "background": [
+            244,
+            253,
+            247
+          ],
+          "ratio": 5.148678925031233
+        },
+        {
+          "background": [
+            245,
+            254,
+            248
+          ],
+          "ratio": 5.193163211313924
+        },
+        {
+          "background": [
+            245,
+            253,
+            249
+          ],
+          "ratio": 5.164121725960718
+        },
+        {
+          "background": [
+            245,
+            253,
+            248
+          ],
+          "ratio": 5.16095504339391
+        },
+        {
+          "background": [
+            246,
+            254,
+            248
+          ],
+          "ratio": 5.202338981817322
+        },
+        {
+          "background": [
+            245,
+            253,
+            248
+          ],
+          "ratio": 5.16095504339391
+        },
+        {
+          "background": [
+            245,
+            253,
+            247
+          ],
+          "ratio": 5.157805235309146
+        },
+        {
+          "background": [
+            245,
+            253,
+            247
+          ],
+          "ratio": 5.157805235309146
+        },
+        {
+          "background": [
+            245,
+            253,
+            248
+          ],
+          "ratio": 5.16095504339391
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "mine",
+      "scenario": "member",
+      "index": 0,
+      "label": "18 天",
+      "className": "bold",
+      "color": "rgb(0, 122, 73)",
+      "fontSize": 14,
+      "fontWeight": 600,
+      "disabled": false,
+      "selectedNav": false,
+      "nav": false,
+      "ownBackground": "rgba(0, 0, 0, 0)",
+      "ownGradient": "none",
+      "foreground": [
+        0,
+        122,
+        73
+      ],
+      "minRatio": 5.321408437531761,
+      "maxRatio": 5.367036441215093,
+      "samples": [
+        {
+          "background": [
+            250,
+            254,
+            252
+          ],
+          "ratio": 5.321408437531761
+        },
+        {
+          "background": [
+            251,
+            255,
+            253
+          ],
+          "ratio": 5.367036441215093
+        },
+        {
+          "background": [
+            251,
+            255,
+            253
+          ],
+          "ratio": 5.367036441215093
+        },
+        {
+          "background": [
+            250,
+            254,
+            252
+          ],
+          "ratio": 5.321408437531761
+        },
+        {
+          "background": [
+            250,
+            255,
+            252
+          ],
+          "ratio": 5.354211247871212
+        },
+        {
+          "background": [
+            250,
+            255,
+            253
+          ],
+          "ratio": 5.357488238989543
+        },
+        {
+          "background": [
+            250,
+            255,
+            252
+          ],
+          "ratio": 5.354211247871212
+        },
+        {
+          "background": [
+            251,
+            255,
+            252
+          ],
+          "ratio": 5.363759450096762
+        },
+        {
+          "background": [
+            250,
+            255,
+            252
+          ],
+          "ratio": 5.354211247871212
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "mine",
+      "scenario": "member",
+      "index": 1,
+      "label": "兑换码开通",
+      "className": "member-entry redemption-entry",
+      "color": "rgb(7, 60, 44)",
+      "fontSize": 14,
+      "fontWeight": 600,
+      "disabled": false,
+      "selectedNav": false,
+      "nav": false,
+      "ownBackground": "rgba(0, 0, 0, 0)",
+      "ownGradient": "linear-gradient(155deg, rgb(30, 213, 138), rgb(0, 195, 117))",
+      "foreground": [
+        7,
+        60,
+        44
+      ],
+      "minRatio": 5.709250972007772,
+      "maxRatio": 6.07369610731565,
+      "samples": [
+        {
+          "background": [
+            19,
+            207,
+            130
+          ],
+          "ratio": 6.07369610731565
+        },
+        {
+          "background": [
+            19,
+            206,
+            130
+          ],
+          "ratio": 6.0165913825359265
+        },
+        {
+          "background": [
+            18,
+            206,
+            130
+          ],
+          "ratio": 6.015427040888083
+        },
+        {
+          "background": [
+            15,
+            204,
+            128
+          ],
+          "ratio": 5.8928182842268235
+        },
+        {
+          "background": [
+            15,
+            204,
+            127
+          ],
+          "ratio": 5.889720098149051
+        },
+        {
+          "background": [
+            15,
+            204,
+            127
+          ],
+          "ratio": 5.889720098149051
+        },
+        {
+          "background": [
+            11,
+            202,
+            125
+          ],
+          "ratio": 5.768340274853127
+        },
+        {
+          "background": [
+            11,
+            201,
+            124
+          ],
+          "ratio": 5.7100333007838415
+        },
+        {
+          "background": [
+            10,
+            201,
+            124
+          ],
+          "ratio": 5.709250972007772
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "mine",
+      "scenario": "member",
+      "index": 2,
+      "label": "付费购买（暂未开放）",
+      "className": "member-entry payment-entry",
+      "color": "rgb(96, 118, 105)",
+      "fontSize": 14,
+      "fontWeight": 600,
+      "disabled": true,
+      "selectedNav": false,
+      "nav": false,
+      "ownBackground": "rgba(229, 239, 233, 0.8)",
+      "ownGradient": "none",
+      "foreground": [
+        96,
+        118,
+        105
+      ],
+      "minRatio": 4.273107175162713,
+      "maxRatio": 4.283642647377805,
+      "samples": [
+        {
+          "background": [
+            233,
+            242,
+            236
+          ],
+          "ratio": 4.280926611396046
+        },
+        {
+          "background": [
+            233,
+            242,
+            237
+          ],
+          "ratio": 4.283642647377805
+        },
+        {
+          "background": [
+            233,
+            242,
+            236
+          ],
+          "ratio": 4.280926611396046
+        },
+        {
+          "background": [
+            233,
+            242,
+            236
+          ],
+          "ratio": 4.280926611396046
+        },
+        {
+          "background": [
+            233,
+            242,
+            236
+          ],
+          "ratio": 4.280926611396046
+        },
+        {
+          "background": [
+            233,
+            242,
+            236
+          ],
+          "ratio": 4.280926611396046
+        },
+        {
+          "background": [
+            232,
+            242,
+            236
+          ],
+          "ratio": 4.273107175162713
+        },
+        {
+          "background": [
+            232,
+            242,
+            236
+          ],
+          "ratio": 4.273107175162713
+        },
+        {
+          "background": [
+            232,
+            242,
+            236
+          ],
+          "ratio": 4.273107175162713
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "mine",
+      "scenario": "member",
+      "index": 3,
+      "label": "每日签到",
+      "className": "btn btn-primary btn-sm ",
+      "color": "rgb(7, 60, 44)",
+      "fontSize": 13,
+      "fontWeight": 600,
+      "disabled": false,
+      "selectedNav": false,
+      "nav": false,
+      "ownBackground": "rgba(0, 0, 0, 0)",
+      "ownGradient": "linear-gradient(155deg, rgb(30, 213, 138), rgb(0, 195, 117))",
+      "foreground": [
+        7,
+        60,
+        44
+      ],
+      "minRatio": 5.7100333007838415,
+      "maxRatio": 6.07688662545084,
+      "samples": [
+        {
+          "background": [
+            19,
+            207,
+            131
+          ],
+          "ratio": 6.07688662545084
+        },
+        {
+          "background": [
+            17,
+            205,
+            129
+          ],
+          "ratio": 5.954410324959359
+        },
+        {
+          "background": [
+            16,
+            204,
+            128
+          ],
+          "ratio": 5.893835104319044
+        },
+        {
+          "background": [
+            17,
+            205,
+            129
+          ],
+          "ratio": 5.954410324959359
+        },
+        {
+          "background": [
+            15,
+            204,
+            127
+          ],
+          "ratio": 5.889720098149051
+        },
+        {
+          "background": [
+            13,
+            203,
+            126
+          ],
+          "ratio": 5.828741755508742
+        },
+        {
+          "background": [
+            14,
+            204,
+            127
+          ],
+          "ratio": 5.888751162367597
+        },
+        {
+          "background": [
+            12,
+            202,
+            125
+          ],
+          "ratio": 5.769169617942834
+        },
+        {
+          "background": [
+            11,
+            201,
+            124
+          ],
+          "ratio": 5.7100333007838415
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "mine",
+      "scenario": "member",
+      "index": 4,
+      "label": "意见反馈›",
+      "className": "action-row feedback",
+      "color": "rgb(71, 104, 90)",
+      "fontSize": 14,
+      "fontWeight": 400,
+      "disabled": false,
+      "selectedNav": false,
+      "nav": false,
+      "ownBackground": "rgba(0, 0, 0, 0)",
+      "ownGradient": "none",
+      "foreground": [
+        71,
+        104,
+        90
+      ],
+      "minRatio": 6.106044896850103,
+      "maxRatio": 6.158316348919979,
+      "samples": [
+        {
+          "background": [
+            254,
+            254,
+            254
+          ],
+          "ratio": 6.1319184589751075
+        },
+        {
+          "background": [
+            253,
+            254,
+            254
+          ],
+          "ratio": 6.12083474068656
+        },
+        {
+          "background": [
+            253,
+            254,
+            254
+          ],
+          "ratio": 6.12083474068656
+        },
+        {
+          "background": [
+            253,
+            255,
+            254
+          ],
+          "ratio": 6.158316348919979
+        },
+        {
+          "background": [
+            253,
+            254,
+            254
+          ],
+          "ratio": 6.12083474068656
+        },
+        {
+          "background": [
+            252,
+            254,
+            253
+          ],
+          "ratio": 6.106044896850103
+        },
+        {
+          "background": [
+            253,
+            254,
+            254
+          ],
+          "ratio": 6.12083474068656
+        },
+        {
+          "background": [
+            253,
+            254,
+            254
+          ],
+          "ratio": 6.12083474068656
+        },
+        {
+          "background": [
+            253,
+            254,
+            254
+          ],
+          "ratio": 6.12083474068656
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "mine",
+      "scenario": "member",
+      "index": 5,
+      "label": "查询",
+      "className": "floating-tab-label",
+      "color": "rgb(93, 111, 102)",
+      "fontSize": 12,
+      "fontWeight": 500,
+      "disabled": false,
+      "selectedNav": false,
+      "nav": true,
+      "ownBackground": "rgba(0, 0, 0, 0)",
+      "ownGradient": "none",
+      "foreground": [
+        93,
+        111,
+        102
+      ],
+      "minRatio": 5.242231033086625,
+      "maxRatio": 5.28721475923223,
+      "samples": [
+        {
+          "background": [
+            253,
+            254,
+            254
+          ],
+          "ratio": 5.28721475923223
+        },
+        {
+          "background": [
+            253,
+            254,
+            253
+          ],
+          "ratio": 5.28396331946178
+        },
+        {
+          "background": [
+            253,
+            254,
+            254
+          ],
+          "ratio": 5.28721475923223
+        },
+        {
+          "background": [
+            253,
+            254,
+            254
+          ],
+          "ratio": 5.28721475923223
+        },
+        {
+          "background": [
+            253,
+            254,
+            253
+          ],
+          "ratio": 5.28396331946178
+        },
+        {
+          "background": [
+            253,
+            254,
+            254
+          ],
+          "ratio": 5.28721475923223
+        },
+        {
+          "background": [
+            252,
+            253,
+            253
+          ],
+          "ratio": 5.242231033086625
+        },
+        {
+          "background": [
+            253,
+            254,
+            254
+          ],
+          "ratio": 5.28721475923223
+        },
+        {
+          "background": [
+            252,
+            253,
+            253
+          ],
+          "ratio": 5.242231033086625
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "mine",
+      "scenario": "member",
+      "index": 6,
+      "label": "小哨",
+      "className": "floating-tab-label",
+      "color": "rgb(93, 111, 102)",
+      "fontSize": 12,
+      "fontWeight": 500,
+      "disabled": false,
+      "selectedNav": false,
+      "nav": true,
+      "ownBackground": "rgba(0, 0, 0, 0)",
+      "ownGradient": "none",
+      "foreground": [
+        93,
+        111,
+        102
+      ],
+      "minRatio": 5.238996595869029,
+      "maxRatio": 5.28396331946178,
+      "samples": [
+        {
+          "background": [
+            252,
+            253,
+            252
+          ],
+          "ratio": 5.238996595869029
+        },
+        {
+          "background": [
+            253,
+            254,
+            253
+          ],
+          "ratio": 5.28396331946178
+        },
+        {
+          "background": [
+            252,
+            253,
+            252
+          ],
+          "ratio": 5.238996595869029
+        },
+        {
+          "background": [
+            253,
+            254,
+            253
+          ],
+          "ratio": 5.28396331946178
+        },
+        {
+          "background": [
+            252,
+            253,
+            252
+          ],
+          "ratio": 5.238996595869029
+        },
+        {
+          "background": [
+            253,
+            254,
+            253
+          ],
+          "ratio": 5.28396331946178
+        },
+        {
+          "background": [
+            253,
+            254,
+            253
+          ],
+          "ratio": 5.28396331946178
+        },
+        {
+          "background": [
+            253,
+            254,
+            253
+          ],
+          "ratio": 5.28396331946178
+        },
+        {
+          "background": [
+            253,
+            254,
+            253
+          ],
+          "ratio": 5.28396331946178
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "mine",
+      "scenario": "member",
+      "index": 7,
+      "label": "历史",
+      "className": "floating-tab-label",
+      "color": "rgb(93, 111, 102)",
+      "fontSize": 12,
+      "fontWeight": 500,
+      "disabled": false,
+      "selectedNav": false,
+      "nav": true,
+      "ownBackground": "rgba(0, 0, 0, 0)",
+      "ownGradient": "none",
+      "foreground": [
+        93,
+        111,
+        102
+      ],
+      "minRatio": 5.238996595869029,
+      "maxRatio": 5.319591603347002,
+      "samples": [
+        {
+          "background": [
+            252,
+            253,
+            252
+          ],
+          "ratio": 5.238996595869029
+        },
+        {
+          "background": [
+            253,
+            255,
+            254
+          ],
+          "ratio": 5.319591603347002
+        },
+        {
+          "background": [
+            252,
+            254,
+            253
+          ],
+          "ratio": 5.274439201006639
+        },
+        {
+          "background": [
+            252,
+            254,
+            253
+          ],
+          "ratio": 5.274439201006639
+        },
+        {
+          "background": [
+            253,
+            254,
+            253
+          ],
+          "ratio": 5.28396331946178
+        },
+        {
+          "background": [
+            252,
+            254,
+            253
+          ],
+          "ratio": 5.274439201006639
+        },
+        {
+          "background": [
+            253,
+            254,
+            253
+          ],
+          "ratio": 5.28396331946178
+        },
+        {
+          "background": [
+            252,
+            254,
+            253
+          ],
+          "ratio": 5.274439201006639
+        },
+        {
+          "background": [
+            253,
+            254,
+            253
+          ],
+          "ratio": 5.28396331946178
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    },
+    {
+      "page": "mine",
+      "scenario": "member",
+      "index": 8,
+      "label": "我的",
+      "className": "floating-tab-label",
+      "color": "rgb(0, 122, 73)",
+      "fontSize": 12,
+      "fontWeight": 600,
+      "disabled": false,
+      "selectedNav": true,
+      "nav": true,
+      "ownBackground": "rgba(0, 0, 0, 0)",
+      "ownGradient": "none",
+      "foreground": [
+        0,
+        122,
+        73
+      ],
+      "minRatio": 4.686934382927559,
+      "maxRatio": 4.729139398699491,
+      "samples": [
+        {
+          "background": [
+            235,
+            241,
+            238
+          ],
+          "ratio": 4.729139398699491
+        },
+        {
+          "background": [
+            234,
+            240,
+            237
+          ],
+          "ratio": 4.686934382927559
+        },
+        {
+          "background": [
+            235,
+            241,
+            238
+          ],
+          "ratio": 4.729139398699491
+        },
+        {
+          "background": [
+            235,
+            241,
+            238
+          ],
+          "ratio": 4.729139398699491
+        },
+        {
+          "background": [
+            235,
+            241,
+            238
+          ],
+          "ratio": 4.729139398699491
+        },
+        {
+          "background": [
+            235,
+            241,
+            238
+          ],
+          "ratio": 4.729139398699491
+        },
+        {
+          "background": [
+            235,
+            241,
+            238
+          ],
+          "ratio": 4.729139398699491
+        },
+        {
+          "background": [
+            235,
+            241,
+            238
+          ],
+          "ratio": 4.729139398699491
+        },
+        {
+          "background": [
+            235,
+            241,
+            238
+          ],
+          "ratio": 4.729139398699491
+        }
+      ],
+      "threshold": 4.5,
+      "belowTarget": false
+    }
+  ]
+}

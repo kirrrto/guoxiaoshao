@@ -1,0 +1,32 @@
+{
+  "checkedAt": "2026-09-20T06:45:45.907Z",
+  "configRevision": 4,
+  "memberProduct": {
+    "enabled": true,
+    "id": "vip666",
+    "days": 7,
+    "priceFen": 700,
+    "note": "该产品为一次性虚拟服务，一经售出不予退款。一次购买 7 天，已有会员按剩余有效期顺延，不自动续费。"
+  },
+  "paymentStatus": {
+    "ready": true,
+    "configured": true,
+    "verified": false,
+    "productEnabled": true,
+    "paymentReady": true,
+    "requestId": "058bf079-7bcd-46bf-b8c0-e718ba2049d9"
+  },
+  "frontend": {
+    "purchaseNoticeOnMinePage": true,
+    "confirmModalBeforeCheckout": true,
+    "defaultsRemainClosed": true
+  },
+  "layoutPreview": {
+    "snapshots": 27,
+    "expressionErrors": 0,
+    "missingText": 0,
+    "horizontalOverflow": 0,
+    "clippedText": 0
+  },
+  "realPurchaseVerified": false
+}

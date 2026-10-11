@@ -1,0 +1,5 @@
+{
+  "triggers": [
+    { "name": "gxs-payment-reconcile-five-minutes", "type": "timer", "config": "0 */5 * * * * *" }
+  ]
+}

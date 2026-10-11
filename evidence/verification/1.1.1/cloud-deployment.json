@@ -1,0 +1,100 @@
+{
+  "recordedAt": "2026-09-16T02:37:39.704Z",
+  "environment": "flowermean-6gjaxfqhf6c13e88",
+  "version": "1.1.1",
+  "functions": [
+    {
+      "name": "gxs_api",
+      "status": "Active",
+      "modifiedAtBeijing": "2026-09-16 10:29:40",
+      "runtime": "Nodejs18.15",
+      "timeoutSeconds": 30,
+      "environmentVariableNames": []
+    },
+    {
+      "name": "gxs_monitor",
+      "status": "Active",
+      "modifiedAtBeijing": "2026-09-16 10:29:51",
+      "runtime": "Nodejs20.19",
+      "timeoutSeconds": 60,
+      "environmentVariableNames": [
+        "GXS_CONSUMER_APPID",
+        "GXS_ENABLE_SCHEDULED_MONITOR"
+      ]
+    },
+    {
+      "name": "cloudbase_auth",
+      "status": "Active",
+      "modifiedAtBeijing": "2026-09-16 10:30:03",
+      "runtime": "Nodejs18.15",
+      "timeoutSeconds": 5,
+      "environmentVariableNames": []
+    }
+  ],
+  "versionProbe": {
+    "ok": true,
+    "data": {
+      "version": "1.1.1",
+      "env": "flowermean-6gjaxfqhf6c13e88",
+      "appid": "wxe96ad9e77b602f1b",
+      "crossAccount": true,
+      "hasUser": true,
+      "isAdmin": true
+    },
+    "serverTime": "2026-09-16T02:36:14.686Z",
+    "requestId": "27aa0417-3365-4f83-9665-3d3d7e911cdb"
+  },
+  "realTimerRuns": [
+    {
+      "timeBeijing": "2026-09-16 10:36:04.320",
+      "requestId": "4979c19e-9182-44f2-8cc7-d8f96b4daa78",
+      "source": "TRIGGER_TIMER",
+      "statusCode": "200",
+      "result": {
+        "ok": true,
+        "state": "running",
+        "scanned": 2,
+        "observations": 2,
+        "events": 0,
+        "sent": 0,
+        "deadlineReached": false
+      }
+    },
+    {
+      "timeBeijing": "2026-09-16 10:35:04.388",
+      "requestId": "2476a411-fa28-476f-a2e5-53b1aa82748e",
+      "source": "TRIGGER_TIMER",
+      "statusCode": "200",
+      "result": {
+        "ok": true,
+        "state": "running",
+        "scanned": 2,
+        "observations": 2,
+        "events": 0,
+        "sent": 0,
+        "deadlineReached": false
+      }
+    }
+  ],
+  "realRewardFirstRead": [
+    {
+      "balanceAfter": 2,
+      "createdAt": "2026-09-16T02:35:26.354Z",
+      "dayKey": "2026-09-16",
+      "delta": 1,
+      "taskId": "view_history",
+      "type": "task_reward"
+    }
+  ],
+  "realRewardAfterRepeat": [
+    {
+      "balanceAfter": 2,
+      "createdAt": "2026-09-16T02:35:26.354Z",
+      "dayKey": "2026-09-16",
+      "delta": 1,
+      "taskId": "view_history",
+      "type": "task_reward"
+    }
+  ],
+  "scope": "Actual cloud code deployed and native WeChat DevTools real-account reward verified. No consumer mini-program upload, review submission, payment enabling or WeChat delivery."
+}

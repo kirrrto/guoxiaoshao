@@ -1,0 +1,26 @@
+.calendar-heading { display: flex; align-items: center; justify-content: space-between; gap: 16rpx; flex-wrap: wrap; }
+/* Product title stays above milestone dates in the type scale. */
+.calendar-title { font-size: 48rpx; font-weight: 750; letter-spacing: -1rpx; line-height: 1.2; }
+.calendar-milestones { display: flex; gap: 24rpx; padding: 26rpx 0; }
+.calendar-milestones > view { flex: 1; min-width: 0; }
+.calendar-milestones > view + view { padding-left: 24rpx; border-left: 1rpx solid var(--line); }
+.calendar-date { display: block; font-size: 40rpx; font-weight: 700; line-height: 1.2; color: var(--green-dark); }
+.calendar-month { margin-bottom: 14rpx; font-size: 25rpx; font-weight: 600; }
+.calendar-grid { display: flex; flex-wrap: wrap; }
+.calendar-weekday, .calendar-cell { width: 14.2857%; text-align: center; }
+.calendar-weekday { font-size: 22rpx; color: var(--text-3); padding-bottom: 8rpx; }
+.calendar-cell { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 58rpx; border: 2rpx solid transparent; border-radius: 12rpx; font-size: 24rpx; line-height: 1.3; }
+.calendar-event { font-size: 18rpx; min-height: 22rpx; }
+.calendar-cell--event { background: var(--green-soft); color: var(--green-dark); font-weight: 650; }
+.calendar-cell--today { border-color: var(--green); }
+@media (min-width: 600px) {
+  .calendar-heading { gap: 10px; }
+  .calendar-title { font-size: 30px; letter-spacing: -.4px; }
+  .calendar-milestones { gap: 16px; padding: 18px 0; }
+  .calendar-milestones > view + view { padding-left: 16px; }
+  .calendar-date { font-size: 26px; }
+  .calendar-month { font-size: 14px; margin-bottom: 10px; }
+  .calendar-weekday { font-size: 12px; padding-bottom: 6px; }
+  .calendar-cell { min-height: 34px; font-size: 14px; border-radius: 6px; }
+  .calendar-event { font-size: 11px; min-height: 13px; }
+}

@@ -1,0 +1,79 @@
+<view class="page">
+  <view wx:if="{{!checked}}" class="card"><view class="loading-line">校验权限…</view></view>
+
+  <view wx:elif="{{!allowed}}" class="card">
+    <view class="banner banner-bad">{{accessError || '当前账号没有管理权限。请联系项目管理员。'}}</view>
+    <button class="btn btn-ghost btn-block mt" bindtap="onRetryAccess">重新检查</button>
+    <view class="small muted">这是独立运营工具，请使用获授权的开发者账号。普通小程序账号不会因打开此工具获得权限。</view>
+  </view>
+
+  <block wx:else>
+    <view class="page-heading"><view class="page-title">果小哨运营</view><view class="page-subtitle">独立运营工具 · 操作连接真实云环境</view></view>
+    <view class="card">
+      <view class="card-title"><text>运行统计</text><text class="sub">{{stats ? stats.serverTimeText : ''}}</text></view>
+      <view wx:if="{{stats}}" class="stat-row">
+        <view class="stat"><view class="num">{{stats.users}}</view><view class="lbl">用户</view></view>
+        <view class="stat"><view class="num">{{stats.activeFollows}}</view><view class="lbl">有效关注</view></view>
+        <view class="stat"><view class="num">{{stats.events}}</view><view class="lbl">事件</view></view>
+        <view class="stat"><view class="num">{{stats.queries}}</view><view class="lbl">查询</view></view>
+      </view>
+      <view class="btn-row wrap">
+        <button class="btn btn-ghost btn-sm" bindtap="loadStats">刷新</button>
+        <button class="btn btn-outline btn-sm {{busy === 'seed' ? 'disabled' : ''}}" disabled="{{busy === 'seed'}}" bindtap="onSeedCatalog">重新导入目录</button>
+      </view>
+    </view>
+
+    <view class="card">
+      <view class="card-title"><text>提醒效果（近 7 天）</text><text class="sub">{{insights ? '自 ' + insights.sinceText : ''}}</text></view>
+      <block wx:if="{{insights}}"><view wx:for="{{insights.lines}}" wx:key="*this" class="small">{{item}}</view></block>
+      <view wx:else class="small muted">读取近 7 天的可取货时长、未发送原因、发送延迟和「买到了吗」回答。</view>
+      <view class="btn-row wrap">
+        <button class="btn btn-ghost btn-sm" disabled="{{busy === 'insights'}}" bindtap="onLoadInsights">{{busy === 'insights' ? '读取中…' : (insights ? '刷新' : '读取')}}</button>
+      </view>
+    </view>
+
+    <view class="card">
+      <view class="card-title"><text>真实付费与首付队列（近 30 天）</text></view>
+      <view wx:if="{{!growth}}" class="small muted">按真实订单证据、首个有效目标和成熟观察期核对；仅按需读取，不影响用户查询。</view>
+      <view wx:for="{{growth.lines}}" wx:key="*this" class="small">{{item}}</view>
+      <view class="btn-row wrap"><button class="btn btn-ghost btn-sm" disabled="{{!!busy}}" bindtap="onLoadGrowth">{{busy === 'growth' ? '读取中…' : '读取增长报表'}}</button></view>
+    </view>
+
+    <view class="card">
+      <view class="card-title"><text>用户操作</text></view>
+      <view class="input-row">
+        <input class="input" value="{{grant.userKey}}" placeholder="userKey（appid:openid）" data-field="userKey" bindinput="onGrantInput" />
+      </view>
+      <view class="input-row">
+        <input class="input" type="number" value="{{grant.days}}" placeholder="会员天数" data-field="days" bindinput="onGrantInput" />
+        <input class="input" type="digit" value="{{grant.amount}}" placeholder="次数（可负）" data-field="amount" bindinput="onGrantInput" />
+      </view>
+      <input class="input" value="{{grant.note}}" placeholder="备注（可选）" data-field="note" bindinput="onGrantInput" />
+      <view class="btn-row wrap">
+        <button class="btn btn-primary btn-sm {{busy === 'membership' ? 'disabled' : ''}}" disabled="{{busy === 'membership'}}" bindtap="onGrantMembership">发放会员</button>
+        <button class="btn btn-ghost btn-sm {{busy === 'credits' ? 'disabled' : ''}}" disabled="{{busy === 'credits'}}" bindtap="onGrantCredits">发放次数</button>
+        <button class="btn btn-outline btn-sm {{busy === 'lookup' ? 'disabled' : ''}}" disabled="{{busy === 'lookup'}}" bindtap="onLookup">查用户</button>
+      </view>
+      <block wx:if="{{lookup}}">
+        <view class="row-between mt">
+          <text class="small muted">查询结果</text>
+          <text class="small link" bindtap="onCopyLookup">复制</text>
+        </view>
+        <scroll-view scroll-y class="json-box"><text class="mono tiny" user-select>{{lookupText}}</text></scroll-view>
+      </block>
+    </view>
+
+    <view class="card">
+      <view class="card-title">
+        <text>运行配置</text>
+        <text class="sub">{{configDirty ? '已修改' : '与云端一致'}}</text>
+      </view>
+      <textarea class="config-editor mono" value="{{configText}}" maxlength="-1" bindinput="onConfigInput" auto-height></textarea>
+      <view class="btn-row">
+        <button class="btn btn-outline btn-sm" bindtap="loadConfig">重新加载</button>
+        <button class="btn btn-primary btn-sm {{saving || !configDirty ? 'disabled' : ''}}" disabled="{{saving || !configDirty}}" bindtap="onSaveConfig">保存配置</button>
+      </view>
+      <view class="tiny muted mt">可编辑：quota / tasks / memberProduct / memberPlans / memberRedemption / newProductWindows / notifications / collector / query / announcement / features / growthExperiment。保存后立即生效。2.0 新入口与采集默认关闭；实验需先完成 A/A 核验，最多一个主链路实验。管理员名单仅由云端配置管理。</view>
+    </view>
+  </block>
+</view>

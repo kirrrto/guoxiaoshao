@@ -1,0 +1,111 @@
+{
+  "version": "2.0.0",
+  "createdAt": "2026-10-11T06:02:41.286259+00:00",
+  "scope": "Local source candidate; no deployment, real payment/refund, notification delivery or physical-device performance acceptance",
+  "publicationReady": false,
+  "tests": {
+    "tests": 1303,
+    "pass": 1303,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "sourceCheck": {
+    "files": 466,
+    "javaScript": 327,
+    "json": 46,
+    "pages": 6,
+    "operatorPages": 1,
+    "errors": []
+  },
+  "releaseCheck": {
+    "passed": true,
+    "total": 45,
+    "monitorBundle": {
+      "passed": true,
+      "files": 40,
+      "sourceBytes": 271587,
+      "issues": []
+    }
+  },
+  "offlineUi": {
+    "layout-metrics.json": {
+      "total": 198,
+      "indexNavigationFailures": 0,
+      "expressionErrors": 0,
+      "missingText": 0,
+      "forbiddenText": 0,
+      "horizontalOverflow": 0,
+      "clippedText": 0,
+      "failedImages": 0,
+      "alternativeLayoutFailures": 0,
+      "calendarLayoutFailures": 0
+    },
+    "layout-metrics-dark.json": {
+      "total": 198,
+      "indexNavigationFailures": 0,
+      "expressionErrors": 0,
+      "missingText": 0,
+      "forbiddenText": 0,
+      "horizontalOverflow": 0,
+      "clippedText": 0,
+      "failedImages": 0,
+      "alternativeLayoutFailures": 0,
+      "calendarLayoutFailures": 0
+    },
+    "floating-tab-metrics.json": {
+      "total": 720,
+      "failed": 0
+    },
+    "htmlSnapshots": 198,
+    "expressionErrors": 0
+  },
+  "offlineNotificationUi": {
+    "layout-metrics.json": {
+      "total": 21,
+      "indexNavigationFailures": 0,
+      "expressionErrors": 0,
+      "missingText": 0,
+      "forbiddenText": 0,
+      "horizontalOverflow": 0,
+      "clippedText": 0,
+      "failedImages": 0,
+      "alternativeLayoutFailures": 0,
+      "calendarLayoutFailures": 0
+    },
+    "layout-metrics-dark.json": {
+      "total": 21,
+      "indexNavigationFailures": 0,
+      "expressionErrors": 0,
+      "missingText": 0,
+      "forbiddenText": 0,
+      "horizontalOverflow": 0,
+      "clippedText": 0,
+      "failedImages": 0,
+      "alternativeLayoutFailures": 0,
+      "calendarLayoutFailures": 0
+    }
+  },
+  "uiSourceHashesVerified": true,
+  "sourceChanges": {
+    "added": 39,
+    "modified": 80,
+    "removed": 0
+  },
+  "launchReadinessReport": "launch-readiness.json",
+  "defaultExperimentalFeaturesEnabled": false,
+  "alwaysOnNewFeatures": [
+    "openingCalendar",
+    "usageGuide",
+    "serverTimedMembershipPricing"
+  ],
+  "notVerified": [
+    "WeChat physical devices and real payments/refunds",
+    "Message delivery",
+    "Post-change performance sampling",
+    "Production load and pickup freshness",
+    "iPhone Duo upstream pickup readiness"
+  ],
+  "sourceManifestSha256": "341388090b26d8a3c0375b62c50fb6043f8dd3dfaac6e74bd7b39dcc8c1378c3"
+}

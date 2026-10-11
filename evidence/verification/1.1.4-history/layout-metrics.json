@@ -1,0 +1,777 @@
+{
+  "renderer": "headless Chromium rendering generated WXML/WXSS approximation; not WeChat",
+  "generatedAt": "2026-09-16T10:45:07.256Z",
+  "snapshots": [
+    {
+      "page": "history",
+      "scenario": "history-no-data",
+      "width": 320,
+      "file": "history-history-no-data-320.html",
+      "expectedText": [
+        "MJYH4CH/A",
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色"
+      ],
+      "viewport": 320,
+      "scrollWidth": 320,
+      "bodyHeight": 1863,
+      "overflow": [],
+      "clippedText": [],
+      "images": [
+        {
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFEAAABRCAYAAACqj0o2AAACF0lEQVR42u3cy43DIBAG4JTgUijBJVCCC+DgKzdTgUtICS7BJaQEl5ASnI3EXiLvZvyAGYb/MFKkPBx/CgOBgZsL/oY4F0AAIhCBiAAiEIEIRAQQgQhEICaM1gVvfx4PH2Hjc0DcCOOCH13wDxf8SoxHfI+pHbFzwS874P6KJX5WVYj2IrwtTKsdsXHBTwnwPmOK11KH+M5dzwyAv/Hkzpcpct/KFJ0GxO5gbps3hjjzwVzalYxodsINxCZo4mv3gJoSERtiDny/pj9xnX7HdZrSECm98HzRjTXxsyi9djGIlnBD9wRf/E64ri0FcWEApEIuJSB2hCac+gZmCb11ql9hruT+rVNbJCN+G9L0GRN7zz3kOfrGUUIuIraKUSrif/OBAwPi8GU+UiSiqH8MhPQiDrEV1pQpTbqVhmiZhzVHhjtWGuIgLB+yfy8gAhGIVSOiY8EQB4NtNYNt/O3DBASmwlRNhWFSVsHygCGuMopfHuBaqKLW+hSxUMW1ZEqtNitmyZRj8X7VtngvsYwke7mdxoKm7JDaSutYIDUVebJBaig3ZofUUPjO3tlo2IJhuCG1bAZihdS0LY0NUtsGSRZIjVtns0Nq3YOcFVLzZu5skNp3xWeBrOF4geSQtZzTkBSypgMvkkHWdnLIHsgJiNdAAvECSCCehERzPgmJjuVkNcWEIQ4OXAMiEBFABCIQEUAEIhD1xAsVdusUYGo5wwAAAABJRU5ErkJggg==",
+          "complete": true,
+          "naturalWidth": 81,
+          "loaded": true
+        },
+        {
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFEAAABRCAYAAACqj0o2AAAC+klEQVR42u2czXHDIBCFUwIlqARKoASXoAJ88NU3uQKVoBJcAiVQgkugBGUyQ2Y0jOUIWJaHsoe9xI6Fv7Ds2x/ydX3cv8TKTCAIRIEoEMUEokAksvH6uPtgo0DMsx94azAvENPtsgEoEDPtGUGce4GowtmzXB93G32JNfzs5zXDsI742Rod4hDgrAfNVl7PLXqeQ47OKrjJmmi+MkQXPe+GClG/WWyK1VxX/CyFCFFH8gEJYuwZT0SxTQHQM2nDNUgdKIiq0IU5AkuuwP6Y3dR0lVybwFK96S9PoZQxK5FpEEGudqRZNYgLEUALBNDtAKzizopwFxoAgHvB0e95CdU5QwFwBiqPrW+yGlUzOlO4sisQvUPIOlxYiyKUQOuRz6SAaBsBHN9UY34/TxNBnLh04lzowikATdgZRwT9jUkCkUVnk7gjbUIQGcKOeGX8kZ4UuXGLtG8KkOLswIbXdELtkSIDetWO+ohl+yUD0hKgD+EzPGcmxAnIbHapI9SW71xW7QQdW8O9OYTrQlDZOVL5uezsbH/wvZBFWVsZXOmunFEhKsJqTumuHDaNsdcHjTogQdTEZx0ndIgJCM1w7tW2phDPALApxLMAbAZRdXoGQkGcTwSwCUR9MoBNIFqBWAaxZBcuGyG8LXVdCJtdOc0xww1xyUzHhoO1wycTvIUiW8mFmCppxobNr6rwciEaBoA1QPpQhlMI9cQp0YWpx4Kh4OVCTInKFC4zFLQERq6Cc+mU6adzp9WIygv9MtDRL3Ih7rugDImyQqSMfsN/hUi9UIEoEPMCS0t3dugQbQeBxaJDnDqQOBM6RNOB2DboEFMKEC3SPs8NkKMUxl2AWHqBqIFLYboXiDntAY6ibLPrG9yNqprtAd0bRLSWadPrG2do3juOuewzj5F4hLuAPQ80eZTLlL2O1nmg26hdDnk6JIA9jhvPrYNIz4PvFm339XIFw4ffhYWHeBnIba6uGXRw8g/XBKJAFIhiAlEgCkSBKCYQBaJA/Df2DcE6o28EdLdcAAAAAElFTkSuQmCC",
+          "complete": true,
+          "naturalWidth": 81,
+          "loaded": true
+        },
+        {
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFEAAABRCAYAAACqj0o2AAACzUlEQVR42u2cwZGkMAxFHQIhEAIhEAIhEAIX7s7AIRDChjAHAiCECcEhzNZWeav6MI2NLX0b+h90otuGh4QkW7Ix+2oohUIIhEiIhEghREIkREKkEOKzIQ5mXxezr87s65fZ18Ps688vcoTrLvx++HSIk9nXzeyrfwMsVXwYZ/oUiH3QolJwZ0BdmOdxEPugLT9A2WAwAZNYRc1L0Ux7Z4jDiYNAy6HqhJQGnitq35lWzneB6Aq0xQYvO74ZewzXbYGWu9Yhbhng/mlHlzlfF/5/ZDidJiFeAfh1om25MoZx8SDBJvx9Ad6rY7riGMYwD860hZxI6pvvLsSV/hfH0F8w81TLmGtDHBK98NUbXd6Msyi8YF8c/hRCPJTetH0zllWylKMWRKtoKpIQU0FaNMQ+wYxnhRdkFb/dPjvXVgpnNoF8Wxqi3n1namEsjOkahdglhD89AmIsJhyFVn40IP6PI2Vjx4yb8JFMxDQO0UQyG68NcQJoIQJiTBsnTYibWqyFhRiLcTdNiF41fcJCnMVM+mKKd2YC3c0gdpHnGTQgLiBTRkGMmfSiAdGppEx1IVqRUEcoLJhuCnESCdeEVH+8KcRR5BN1YcKzj7ABQdwU5ip/rptB1Nif+UiI0jAfC3EC7hw+FmLOHvafzEVVKESkd35Nzb4Vq8Hg3hkZJ0rAdC3GiciMRapMz7WWsSBz59jCQSpM31rujFzFkYLpW1vFQa4nXoXpMkyyynoicmW7pC7cvxTAN7myjdpj0Zaqeyyo3T5tqbrbh9p3rqmFkH1nRAWEphNqogICUYtjKuXjsFocRFWYVurYVFWYdn0iGmCV+kTtSlk0wGqVspo120iA1Wu2tboHJLzwbboHNPtYSuLA2/WxsKOKvX3sMn1klyn7ndl5zzMgHnkGBE8j4bk4PKGJZ4XxrDCeWkchREIkREKkECIhEiKFEKXkL3Putty8SBdtAAAAAElFTkSuQmCC",
+          "complete": true,
+          "naturalWidth": 81,
+          "loaded": true
+        },
+        {
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFEAAABRCAYAAACqj0o2AAABs0lEQVR42u3au5GDMBSFYZegEiiBElSCS1ABCpwqQ5VQAiWoBEpQCS6BDVbMMMw+7F090R+cxMYOvkHi6l5u2pob+V9AABFEEAmIIIIIIgERRBBBJCB2hyi0NUpbM2trVm3NdsgaPlfhOhC/wJu0Nc8T3Hd5husFiJ+R2hr/It45Pvy+a0T1R7xzVK+IsQCLQ5YCHN7Y/7Y39smhJ0QXGXCP6wVRJgLcI3tAXBIjLj0gbhlyaUSZCVFeGfGRCfFxZcQpE+IEIogsZx4slDh9lDgU2xz7aEDQCqMVRlOW8QCDKkamjEwZ3hMQQQQRRNI6ogxly/LD2dqF76ca6sNaEO8RWmNL+J+uEPfC2kc+O/tSBXiJO88n7if63HdmzrvPZRoNHPdPcRXEMUHv8J0e49g6oiqEl7VV1gNgcsiUD5CtwtxbQSy5BxbZI1M8hddKAY99SVEz4lQ5YJIXnmKPQbeGMtSI6BpDdLUhjo0B7hlrQpwbRZxrQRQVlzSvlDyiBkTVKGC0k0zPSznako6B6BtH9KURReOAewTTPqZ9IBIQQQQRRAIiiCCCSEAEEUQQya/5AAVK9gqvpkxgAAAAAElFTkSuQmCC",
+          "complete": true,
+          "naturalWidth": 81,
+          "loaded": true
+        }
+      ],
+      "missingText": []
+    },
+    {
+      "page": "history",
+      "scenario": "history-no-data",
+      "width": 375,
+      "file": "history-history-no-data-375.html",
+      "expectedText": [
+        "MJYH4CH/A",
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色"
+      ],
+      "viewport": 375,
+      "scrollWidth": 375,
+      "bodyHeight": 2137,
+      "overflow": [],
+      "clippedText": [],
+      "images": [
+        {
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFEAAABRCAYAAACqj0o2AAACF0lEQVR42u3cy43DIBAG4JTgUijBJVCCC+DgKzdTgUtICS7BJaQEl5ASnI3EXiLvZvyAGYb/MFKkPBx/CgOBgZsL/oY4F0AAIhCBiAAiEIEIRAQQgQhEICaM1gVvfx4PH2Hjc0DcCOOCH13wDxf8SoxHfI+pHbFzwS874P6KJX5WVYj2IrwtTKsdsXHBTwnwPmOK11KH+M5dzwyAv/Hkzpcpct/KFJ0GxO5gbps3hjjzwVzalYxodsINxCZo4mv3gJoSERtiDny/pj9xnX7HdZrSECm98HzRjTXxsyi9djGIlnBD9wRf/E64ri0FcWEApEIuJSB2hCac+gZmCb11ql9hruT+rVNbJCN+G9L0GRN7zz3kOfrGUUIuIraKUSrif/OBAwPi8GU+UiSiqH8MhPQiDrEV1pQpTbqVhmiZhzVHhjtWGuIgLB+yfy8gAhGIVSOiY8EQB4NtNYNt/O3DBASmwlRNhWFSVsHygCGuMopfHuBaqKLW+hSxUMW1ZEqtNitmyZRj8X7VtngvsYwke7mdxoKm7JDaSutYIDUVebJBaig3ZofUUPjO3tlo2IJhuCG1bAZihdS0LY0NUtsGSRZIjVtns0Nq3YOcFVLzZu5skNp3xWeBrOF4geSQtZzTkBSypgMvkkHWdnLIHsgJiNdAAvECSCCehERzPgmJjuVkNcWEIQ4OXAMiEBFABCIQEUAEIhD1xAsVdusUYGo5wwAAAABJRU5ErkJggg==",
+          "complete": true,
+          "naturalWidth": 81,
+          "loaded": true
+        },
+        {
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFEAAABRCAYAAACqj0o2AAAC+klEQVR42u2czXHDIBCFUwIlqARKoASXoAJ88NU3uQKVoBJcAiVQgkugBGUyQ2Y0jOUIWJaHsoe9xI6Fv7Ds2x/ydX3cv8TKTCAIRIEoEMUEokAksvH6uPtgo0DMsx94azAvENPtsgEoEDPtGUGce4GowtmzXB93G32JNfzs5zXDsI742Rod4hDgrAfNVl7PLXqeQ47OKrjJmmi+MkQXPe+GClG/WWyK1VxX/CyFCFFH8gEJYuwZT0SxTQHQM2nDNUgdKIiq0IU5AkuuwP6Y3dR0lVybwFK96S9PoZQxK5FpEEGudqRZNYgLEUALBNDtAKzizopwFxoAgHvB0e95CdU5QwFwBiqPrW+yGlUzOlO4sisQvUPIOlxYiyKUQOuRz6SAaBsBHN9UY34/TxNBnLh04lzowikATdgZRwT9jUkCkUVnk7gjbUIQGcKOeGX8kZ4UuXGLtG8KkOLswIbXdELtkSIDetWO+ohl+yUD0hKgD+EzPGcmxAnIbHapI9SW71xW7QQdW8O9OYTrQlDZOVL5uezsbH/wvZBFWVsZXOmunFEhKsJqTumuHDaNsdcHjTogQdTEZx0ndIgJCM1w7tW2phDPALApxLMAbAZRdXoGQkGcTwSwCUR9MoBNIFqBWAaxZBcuGyG8LXVdCJtdOc0xww1xyUzHhoO1wycTvIUiW8mFmCppxobNr6rwciEaBoA1QPpQhlMI9cQp0YWpx4Kh4OVCTInKFC4zFLQERq6Cc+mU6adzp9WIygv9MtDRL3Ih7rugDImyQqSMfsN/hUi9UIEoEPMCS0t3dugQbQeBxaJDnDqQOBM6RNOB2DboEFMKEC3SPs8NkKMUxl2AWHqBqIFLYboXiDntAY6ibLPrG9yNqprtAd0bRLSWadPrG2do3juOuewzj5F4hLuAPQ80eZTLlL2O1nmg26hdDnk6JIA9jhvPrYNIz4PvFm339XIFw4ffhYWHeBnIba6uGXRw8g/XBKJAFIhiAlEgCkSBKCYQBaJA/Df2DcE6o28EdLdcAAAAAElFTkSuQmCC",
+          "complete": true,
+          "naturalWidth": 81,
+          "loaded": true
+        },
+        {
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFEAAABRCAYAAACqj0o2AAACzUlEQVR42u2cwZGkMAxFHQIhEAIhEAIhEAIX7s7AIRDChjAHAiCECcEhzNZWeav6MI2NLX0b+h90otuGh4QkW7Ix+2oohUIIhEiIhEghREIkREKkEOKzIQ5mXxezr87s65fZ18Ps688vcoTrLvx++HSIk9nXzeyrfwMsVXwYZ/oUiH3QolJwZ0BdmOdxEPugLT9A2WAwAZNYRc1L0Ux7Z4jDiYNAy6HqhJQGnitq35lWzneB6Aq0xQYvO74ZewzXbYGWu9Yhbhng/mlHlzlfF/5/ZDidJiFeAfh1om25MoZx8SDBJvx9Ad6rY7riGMYwD860hZxI6pvvLsSV/hfH0F8w81TLmGtDHBK98NUbXd6Msyi8YF8c/hRCPJTetH0zllWylKMWRKtoKpIQU0FaNMQ+wYxnhRdkFb/dPjvXVgpnNoF8Wxqi3n1namEsjOkahdglhD89AmIsJhyFVn40IP6PI2Vjx4yb8JFMxDQO0UQyG68NcQJoIQJiTBsnTYibWqyFhRiLcTdNiF41fcJCnMVM+mKKd2YC3c0gdpHnGTQgLiBTRkGMmfSiAdGppEx1IVqRUEcoLJhuCnESCdeEVH+8KcRR5BN1YcKzj7ABQdwU5ip/rptB1Nif+UiI0jAfC3EC7hw+FmLOHvafzEVVKESkd35Nzb4Vq8Hg3hkZJ0rAdC3GiciMRapMz7WWsSBz59jCQSpM31rujFzFkYLpW1vFQa4nXoXpMkyyynoicmW7pC7cvxTAN7myjdpj0Zaqeyyo3T5tqbrbh9p3rqmFkH1nRAWEphNqogICUYtjKuXjsFocRFWYVurYVFWYdn0iGmCV+kTtSlk0wGqVspo120iA1Wu2tboHJLzwbboHNPtYSuLA2/WxsKOKvX3sMn1klyn7ndl5zzMgHnkGBE8j4bk4PKGJZ4XxrDCeWkchREIkREKkECIhEiKFEKXkL3Putty8SBdtAAAAAElFTkSuQmCC",
+          "complete": true,
+          "naturalWidth": 81,
+          "loaded": true
+        },
+        {
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFEAAABRCAYAAACqj0o2AAABs0lEQVR42u3au5GDMBSFYZegEiiBElSCS1ABCpwqQ5VQAiWoBEpQCS6BDVbMMMw+7F090R+cxMYOvkHi6l5u2pob+V9AABFEEAmIIIIIIgERRBBBJCB2hyi0NUpbM2trVm3NdsgaPlfhOhC/wJu0Nc8T3Hd5husFiJ+R2hr/It45Pvy+a0T1R7xzVK+IsQCLQ5YCHN7Y/7Y39smhJ0QXGXCP6wVRJgLcI3tAXBIjLj0gbhlyaUSZCVFeGfGRCfFxZcQpE+IEIogsZx4slDh9lDgU2xz7aEDQCqMVRlOW8QCDKkamjEwZ3hMQQQQRRNI6ogxly/LD2dqF76ca6sNaEO8RWmNL+J+uEPfC2kc+O/tSBXiJO88n7if63HdmzrvPZRoNHPdPcRXEMUHv8J0e49g6oiqEl7VV1gNgcsiUD5CtwtxbQSy5BxbZI1M8hddKAY99SVEz4lQ5YJIXnmKPQbeGMtSI6BpDdLUhjo0B7hlrQpwbRZxrQRQVlzSvlDyiBkTVKGC0k0zPSznako6B6BtH9KURReOAewTTPqZ9IBIQQQQRRAIiiCCCSEAEEUQQya/5AAVK9gqvpkxgAAAAAElFTkSuQmCC",
+          "complete": true,
+          "naturalWidth": 81,
+          "loaded": true
+        }
+      ],
+      "missingText": [],
+      "screenshot": "history-history-no-data-375.png"
+    },
+    {
+      "page": "history",
+      "scenario": "history-no-data",
+      "width": 430,
+      "file": "history-history-no-data-430.html",
+      "expectedText": [
+        "MJYH4CH/A",
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色"
+      ],
+      "viewport": 430,
+      "scrollWidth": 430,
+      "bodyHeight": 2409,
+      "overflow": [],
+      "clippedText": [],
+      "images": [
+        {
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFEAAABRCAYAAACqj0o2AAACF0lEQVR42u3cy43DIBAG4JTgUijBJVCCC+DgKzdTgUtICS7BJaQEl5ASnI3EXiLvZvyAGYb/MFKkPBx/CgOBgZsL/oY4F0AAIhCBiAAiEIEIRAQQgQhEICaM1gVvfx4PH2Hjc0DcCOOCH13wDxf8SoxHfI+pHbFzwS874P6KJX5WVYj2IrwtTKsdsXHBTwnwPmOK11KH+M5dzwyAv/Hkzpcpct/KFJ0GxO5gbps3hjjzwVzalYxodsINxCZo4mv3gJoSERtiDny/pj9xnX7HdZrSECm98HzRjTXxsyi9djGIlnBD9wRf/E64ri0FcWEApEIuJSB2hCac+gZmCb11ql9hruT+rVNbJCN+G9L0GRN7zz3kOfrGUUIuIraKUSrif/OBAwPi8GU+UiSiqH8MhPQiDrEV1pQpTbqVhmiZhzVHhjtWGuIgLB+yfy8gAhGIVSOiY8EQB4NtNYNt/O3DBASmwlRNhWFSVsHygCGuMopfHuBaqKLW+hSxUMW1ZEqtNitmyZRj8X7VtngvsYwke7mdxoKm7JDaSutYIDUVebJBaig3ZofUUPjO3tlo2IJhuCG1bAZihdS0LY0NUtsGSRZIjVtns0Nq3YOcFVLzZu5skNp3xWeBrOF4geSQtZzTkBSypgMvkkHWdnLIHsgJiNdAAvECSCCehERzPgmJjuVkNcWEIQ4OXAMiEBFABCIQEUAEIhD1xAsVdusUYGo5wwAAAABJRU5ErkJggg==",
+          "complete": true,
+          "naturalWidth": 81,
+          "loaded": true
+        },
+        {
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFEAAABRCAYAAACqj0o2AAAC+klEQVR42u2czXHDIBCFUwIlqARKoASXoAJ88NU3uQKVoBJcAiVQgkugBGUyQ2Y0jOUIWJaHsoe9xI6Fv7Ds2x/ydX3cv8TKTCAIRIEoEMUEokAksvH6uPtgo0DMsx94azAvENPtsgEoEDPtGUGce4GowtmzXB93G32JNfzs5zXDsI742Rod4hDgrAfNVl7PLXqeQ47OKrjJmmi+MkQXPe+GClG/WWyK1VxX/CyFCFFH8gEJYuwZT0SxTQHQM2nDNUgdKIiq0IU5AkuuwP6Y3dR0lVybwFK96S9PoZQxK5FpEEGudqRZNYgLEUALBNDtAKzizopwFxoAgHvB0e95CdU5QwFwBiqPrW+yGlUzOlO4sisQvUPIOlxYiyKUQOuRz6SAaBsBHN9UY34/TxNBnLh04lzowikATdgZRwT9jUkCkUVnk7gjbUIQGcKOeGX8kZ4UuXGLtG8KkOLswIbXdELtkSIDetWO+ohl+yUD0hKgD+EzPGcmxAnIbHapI9SW71xW7QQdW8O9OYTrQlDZOVL5uezsbH/wvZBFWVsZXOmunFEhKsJqTumuHDaNsdcHjTogQdTEZx0ndIgJCM1w7tW2phDPALApxLMAbAZRdXoGQkGcTwSwCUR9MoBNIFqBWAaxZBcuGyG8LXVdCJtdOc0xww1xyUzHhoO1wycTvIUiW8mFmCppxobNr6rwciEaBoA1QPpQhlMI9cQp0YWpx4Kh4OVCTInKFC4zFLQERq6Cc+mU6adzp9WIygv9MtDRL3Ih7rugDImyQqSMfsN/hUi9UIEoEPMCS0t3dugQbQeBxaJDnDqQOBM6RNOB2DboEFMKEC3SPs8NkKMUxl2AWHqBqIFLYboXiDntAY6ibLPrG9yNqprtAd0bRLSWadPrG2do3juOuewzj5F4hLuAPQ80eZTLlL2O1nmg26hdDnk6JIA9jhvPrYNIz4PvFm339XIFw4ffhYWHeBnIba6uGXRw8g/XBKJAFIhiAlEgCkSBKCYQBaJA/Df2DcE6o28EdLdcAAAAAElFTkSuQmCC",
+          "complete": true,
+          "naturalWidth": 81,
+          "loaded": true
+        },
+        {
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFEAAABRCAYAAACqj0o2AAACzUlEQVR42u2cwZGkMAxFHQIhEAIhEAIhEAIX7s7AIRDChjAHAiCECcEhzNZWeav6MI2NLX0b+h90otuGh4QkW7Ix+2oohUIIhEiIhEghREIkREKkEOKzIQ5mXxezr87s65fZ18Ps688vcoTrLvx++HSIk9nXzeyrfwMsVXwYZ/oUiH3QolJwZ0BdmOdxEPugLT9A2WAwAZNYRc1L0Ux7Z4jDiYNAy6HqhJQGnitq35lWzneB6Aq0xQYvO74ZewzXbYGWu9Yhbhng/mlHlzlfF/5/ZDidJiFeAfh1om25MoZx8SDBJvx9Ad6rY7riGMYwD860hZxI6pvvLsSV/hfH0F8w81TLmGtDHBK98NUbXd6Msyi8YF8c/hRCPJTetH0zllWylKMWRKtoKpIQU0FaNMQ+wYxnhRdkFb/dPjvXVgpnNoF8Wxqi3n1namEsjOkahdglhD89AmIsJhyFVn40IP6PI2Vjx4yb8JFMxDQO0UQyG68NcQJoIQJiTBsnTYibWqyFhRiLcTdNiF41fcJCnMVM+mKKd2YC3c0gdpHnGTQgLiBTRkGMmfSiAdGppEx1IVqRUEcoLJhuCnESCdeEVH+8KcRR5BN1YcKzj7ABQdwU5ip/rptB1Nif+UiI0jAfC3EC7hw+FmLOHvafzEVVKESkd35Nzb4Vq8Hg3hkZJ0rAdC3GiciMRapMz7WWsSBz59jCQSpM31rujFzFkYLpW1vFQa4nXoXpMkyyynoicmW7pC7cvxTAN7myjdpj0Zaqeyyo3T5tqbrbh9p3rqmFkH1nRAWEphNqogICUYtjKuXjsFocRFWYVurYVFWYdn0iGmCV+kTtSlk0wGqVspo120iA1Wu2tboHJLzwbboHNPtYSuLA2/WxsKOKvX3sMn1klyn7ndl5zzMgHnkGBE8j4bk4PKGJZ4XxrDCeWkchREIkREKkECIhEiKFEKXkL3Putty8SBdtAAAAAElFTkSuQmCC",
+          "complete": true,
+          "naturalWidth": 81,
+          "loaded": true
+        },
+        {
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFEAAABRCAYAAACqj0o2AAABs0lEQVR42u3au5GDMBSFYZegEiiBElSCS1ABCpwqQ5VQAiWoBEpQCS6BDVbMMMw+7F090R+cxMYOvkHi6l5u2pob+V9AABFEEAmIIIIIIgERRBBBJCB2hyi0NUpbM2trVm3NdsgaPlfhOhC/wJu0Nc8T3Hd5husFiJ+R2hr/It45Pvy+a0T1R7xzVK+IsQCLQ5YCHN7Y/7Y39smhJ0QXGXCP6wVRJgLcI3tAXBIjLj0gbhlyaUSZCVFeGfGRCfFxZcQpE+IEIogsZx4slDh9lDgU2xz7aEDQCqMVRlOW8QCDKkamjEwZ3hMQQQQRRNI6ogxly/LD2dqF76ca6sNaEO8RWmNL+J+uEPfC2kc+O/tSBXiJO88n7if63HdmzrvPZRoNHPdPcRXEMUHv8J0e49g6oiqEl7VV1gNgcsiUD5CtwtxbQSy5BxbZI1M8hddKAY99SVEz4lQ5YJIXnmKPQbeGMtSI6BpDdLUhjo0B7hlrQpwbRZxrQRQVlzSvlDyiBkTVKGC0k0zPSznako6B6BtH9KURReOAewTTPqZ9IBIQQQQRRAIiiCCCSEAEEUQQya/5AAVK9gqvpkxgAAAAAElFTkSuQmCC",
+          "complete": true,
+          "naturalWidth": 81,
+          "loaded": true
+        }
+      ],
+      "missingText": []
+    },
+    {
+      "page": "history",
+      "scenario": "history-unknown-only",
+      "width": 320,
+      "file": "history-history-unknown-only-320.html",
+      "expectedText": [
+        "MJYH4CH/A",
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色"
+      ],
+      "viewport": 320,
+      "scrollWidth": 320,
+      "bodyHeight": 2010,
+      "overflow": [],
+      "clippedText": [],
+      "images": [
+        {
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFEAAABRCAYAAACqj0o2AAACF0lEQVR42u3cy43DIBAG4JTgUijBJVCCC+DgKzdTgUtICS7BJaQEl5ASnI3EXiLvZvyAGYb/MFKkPBx/CgOBgZsL/oY4F0AAIhCBiAAiEIEIRAQQgQhEICaM1gVvfx4PH2Hjc0DcCOOCH13wDxf8SoxHfI+pHbFzwS874P6KJX5WVYj2IrwtTKsdsXHBTwnwPmOK11KH+M5dzwyAv/Hkzpcpct/KFJ0GxO5gbps3hjjzwVzalYxodsINxCZo4mv3gJoSERtiDny/pj9xnX7HdZrSECm98HzRjTXxsyi9djGIlnBD9wRf/E64ri0FcWEApEIuJSB2hCac+gZmCb11ql9hruT+rVNbJCN+G9L0GRN7zz3kOfrGUUIuIraKUSrif/OBAwPi8GU+UiSiqH8MhPQiDrEV1pQpTbqVhmiZhzVHhjtWGuIgLB+yfy8gAhGIVSOiY8EQB4NtNYNt/O3DBASmwlRNhWFSVsHygCGuMopfHuBaqKLW+hSxUMW1ZEqtNitmyZRj8X7VtngvsYwke7mdxoKm7JDaSutYIDUVebJBaig3ZofUUPjO3tlo2IJhuCG1bAZihdS0LY0NUtsGSRZIjVtns0Nq3YOcFVLzZu5skNp3xWeBrOF4geSQtZzTkBSypgMvkkHWdnLIHsgJiNdAAvECSCCehERzPgmJjuVkNcWEIQ4OXAMiEBFABCIQEUAEIhD1xAsVdusUYGo5wwAAAABJRU5ErkJggg==",
+          "complete": true,
+          "naturalWidth": 81,
+          "loaded": true
+        },
+        {
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFEAAABRCAYAAACqj0o2AAAC+klEQVR42u2czXHDIBCFUwIlqARKoASXoAJ88NU3uQKVoBJcAiVQgkugBGUyQ2Y0jOUIWJaHsoe9xI6Fv7Ds2x/ydX3cv8TKTCAIRIEoEMUEokAksvH6uPtgo0DMsx94azAvENPtsgEoEDPtGUGce4GowtmzXB93G32JNfzs5zXDsI742Rod4hDgrAfNVl7PLXqeQ47OKrjJmmi+MkQXPe+GClG/WWyK1VxX/CyFCFFH8gEJYuwZT0SxTQHQM2nDNUgdKIiq0IU5AkuuwP6Y3dR0lVybwFK96S9PoZQxK5FpEEGudqRZNYgLEUALBNDtAKzizopwFxoAgHvB0e95CdU5QwFwBiqPrW+yGlUzOlO4sisQvUPIOlxYiyKUQOuRz6SAaBsBHN9UY34/TxNBnLh04lzowikATdgZRwT9jUkCkUVnk7gjbUIQGcKOeGX8kZ4UuXGLtG8KkOLswIbXdELtkSIDetWO+ohl+yUD0hKgD+EzPGcmxAnIbHapI9SW71xW7QQdW8O9OYTrQlDZOVL5uezsbH/wvZBFWVsZXOmunFEhKsJqTumuHDaNsdcHjTogQdTEZx0ndIgJCM1w7tW2phDPALApxLMAbAZRdXoGQkGcTwSwCUR9MoBNIFqBWAaxZBcuGyG8LXVdCJtdOc0xww1xyUzHhoO1wycTvIUiW8mFmCppxobNr6rwciEaBoA1QPpQhlMI9cQp0YWpx4Kh4OVCTInKFC4zFLQERq6Cc+mU6adzp9WIygv9MtDRL3Ih7rugDImyQqSMfsN/hUi9UIEoEPMCS0t3dugQbQeBxaJDnDqQOBM6RNOB2DboEFMKEC3SPs8NkKMUxl2AWHqBqIFLYboXiDntAY6ibLPrG9yNqprtAd0bRLSWadPrG2do3juOuewzj5F4hLuAPQ80eZTLlL2O1nmg26hdDnk6JIA9jhvPrYNIz4PvFm339XIFw4ffhYWHeBnIba6uGXRw8g/XBKJAFIhiAlEgCkSBKCYQBaJA/Df2DcE6o28EdLdcAAAAAElFTkSuQmCC",
+          "complete": true,
+          "naturalWidth": 81,
+          "loaded": true
+        },
+        {
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFEAAABRCAYAAACqj0o2AAACzUlEQVR42u2cwZGkMAxFHQIhEAIhEAIhEAIX7s7AIRDChjAHAiCECcEhzNZWeav6MI2NLX0b+h90otuGh4QkW7Ix+2oohUIIhEiIhEghREIkREKkEOKzIQ5mXxezr87s65fZ18Ps688vcoTrLvx++HSIk9nXzeyrfwMsVXwYZ/oUiH3QolJwZ0BdmOdxEPugLT9A2WAwAZNYRc1L0Ux7Z4jDiYNAy6HqhJQGnitq35lWzneB6Aq0xQYvO74ZewzXbYGWu9Yhbhng/mlHlzlfF/5/ZDidJiFeAfh1om25MoZx8SDBJvx9Ad6rY7riGMYwD860hZxI6pvvLsSV/hfH0F8w81TLmGtDHBK98NUbXd6Msyi8YF8c/hRCPJTetH0zllWylKMWRKtoKpIQU0FaNMQ+wYxnhRdkFb/dPjvXVgpnNoF8Wxqi3n1namEsjOkahdglhD89AmIsJhyFVn40IP6PI2Vjx4yb8JFMxDQO0UQyG68NcQJoIQJiTBsnTYibWqyFhRiLcTdNiF41fcJCnMVM+mKKd2YC3c0gdpHnGTQgLiBTRkGMmfSiAdGppEx1IVqRUEcoLJhuCnESCdeEVH+8KcRR5BN1YcKzj7ABQdwU5ip/rptB1Nif+UiI0jAfC3EC7hw+FmLOHvafzEVVKESkd35Nzb4Vq8Hg3hkZJ0rAdC3GiciMRapMz7WWsSBz59jCQSpM31rujFzFkYLpW1vFQa4nXoXpMkyyynoicmW7pC7cvxTAN7myjdpj0Zaqeyyo3T5tqbrbh9p3rqmFkH1nRAWEphNqogICUYtjKuXjsFocRFWYVurYVFWYdn0iGmCV+kTtSlk0wGqVspo120iA1Wu2tboHJLzwbboHNPtYSuLA2/WxsKOKvX3sMn1klyn7ndl5zzMgHnkGBE8j4bk4PKGJZ4XxrDCeWkchREIkREKkECIhEiKFEKXkL3Putty8SBdtAAAAAElFTkSuQmCC",
+          "complete": true,
+          "naturalWidth": 81,
+          "loaded": true
+        },
+        {
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFEAAABRCAYAAACqj0o2AAABs0lEQVR42u3au5GDMBSFYZegEiiBElSCS1ABCpwqQ5VQAiWoBEpQCS6BDVbMMMw+7F090R+cxMYOvkHi6l5u2pob+V9AABFEEAmIIIIIIgERRBBBJCB2hyi0NUpbM2trVm3NdsgaPlfhOhC/wJu0Nc8T3Hd5husFiJ+R2hr/It45Pvy+a0T1R7xzVK+IsQCLQ5YCHN7Y/7Y39smhJ0QXGXCP6wVRJgLcI3tAXBIjLj0gbhlyaUSZCVFeGfGRCfFxZcQpE+IEIogsZx4slDh9lDgU2xz7aEDQCqMVRlOW8QCDKkamjEwZ3hMQQQQRRNI6ogxly/LD2dqF76ca6sNaEO8RWmNL+J+uEPfC2kc+O/tSBXiJO88n7if63HdmzrvPZRoNHPdPcRXEMUHv8J0e49g6oiqEl7VV1gNgcsiUD5CtwtxbQSy5BxbZI1M8hddKAY99SVEz4lQ5YJIXnmKPQbeGMtSI6BpDdLUhjo0B7hlrQpwbRZxrQRQVlzSvlDyiBkTVKGC0k0zPSznako6B6BtH9KURReOAewTTPqZ9IBIQQQQRRAIiiCCCSEAEEUQQya/5AAVK9gqvpkxgAAAAAElFTkSuQmCC",
+          "complete": true,
+          "naturalWidth": 81,
+          "loaded": true
+        }
+      ],
+      "missingText": []
+    },
+    {
+      "page": "history",
+      "scenario": "history-unknown-only",
+      "width": 375,
+      "file": "history-history-unknown-only-375.html",
+      "expectedText": [
+        "MJYH4CH/A",
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色"
+      ],
+      "viewport": 375,
+      "scrollWidth": 375,
+      "bodyHeight": 2308,
+      "overflow": [],
+      "clippedText": [],
+      "images": [
+        {
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFEAAABRCAYAAACqj0o2AAACF0lEQVR42u3cy43DIBAG4JTgUijBJVCCC+DgKzdTgUtICS7BJaQEl5ASnI3EXiLvZvyAGYb/MFKkPBx/CgOBgZsL/oY4F0AAIhCBiAAiEIEIRAQQgQhEICaM1gVvfx4PH2Hjc0DcCOOCH13wDxf8SoxHfI+pHbFzwS874P6KJX5WVYj2IrwtTKsdsXHBTwnwPmOK11KH+M5dzwyAv/Hkzpcpct/KFJ0GxO5gbps3hjjzwVzalYxodsINxCZo4mv3gJoSERtiDny/pj9xnX7HdZrSECm98HzRjTXxsyi9djGIlnBD9wRf/E64ri0FcWEApEIuJSB2hCac+gZmCb11ql9hruT+rVNbJCN+G9L0GRN7zz3kOfrGUUIuIraKUSrif/OBAwPi8GU+UiSiqH8MhPQiDrEV1pQpTbqVhmiZhzVHhjtWGuIgLB+yfy8gAhGIVSOiY8EQB4NtNYNt/O3DBASmwlRNhWFSVsHygCGuMopfHuBaqKLW+hSxUMW1ZEqtNitmyZRj8X7VtngvsYwke7mdxoKm7JDaSutYIDUVebJBaig3ZofUUPjO3tlo2IJhuCG1bAZihdS0LY0NUtsGSRZIjVtns0Nq3YOcFVLzZu5skNp3xWeBrOF4geSQtZzTkBSypgMvkkHWdnLIHsgJiNdAAvECSCCehERzPgmJjuVkNcWEIQ4OXAMiEBFABCIQEUAEIhD1xAsVdusUYGo5wwAAAABJRU5ErkJggg==",
+          "complete": true,
+          "naturalWidth": 81,
+          "loaded": true
+        },
+        {
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFEAAABRCAYAAACqj0o2AAAC+klEQVR42u2czXHDIBCFUwIlqARKoASXoAJ88NU3uQKVoBJcAiVQgkugBGUyQ2Y0jOUIWJaHsoe9xI6Fv7Ds2x/ydX3cv8TKTCAIRIEoEMUEokAksvH6uPtgo0DMsx94azAvENPtsgEoEDPtGUGce4GowtmzXB93G32JNfzs5zXDsI742Rod4hDgrAfNVl7PLXqeQ47OKrjJmmi+MkQXPe+GClG/WWyK1VxX/CyFCFFH8gEJYuwZT0SxTQHQM2nDNUgdKIiq0IU5AkuuwP6Y3dR0lVybwFK96S9PoZQxK5FpEEGudqRZNYgLEUALBNDtAKzizopwFxoAgHvB0e95CdU5QwFwBiqPrW+yGlUzOlO4sisQvUPIOlxYiyKUQOuRz6SAaBsBHN9UY34/TxNBnLh04lzowikATdgZRwT9jUkCkUVnk7gjbUIQGcKOeGX8kZ4UuXGLtG8KkOLswIbXdELtkSIDetWO+ohl+yUD0hKgD+EzPGcmxAnIbHapI9SW71xW7QQdW8O9OYTrQlDZOVL5uezsbH/wvZBFWVsZXOmunFEhKsJqTumuHDaNsdcHjTogQdTEZx0ndIgJCM1w7tW2phDPALApxLMAbAZRdXoGQkGcTwSwCUR9MoBNIFqBWAaxZBcuGyG8LXVdCJtdOc0xww1xyUzHhoO1wycTvIUiW8mFmCppxobNr6rwciEaBoA1QPpQhlMI9cQp0YWpx4Kh4OVCTInKFC4zFLQERq6Cc+mU6adzp9WIygv9MtDRL3Ih7rugDImyQqSMfsN/hUi9UIEoEPMCS0t3dugQbQeBxaJDnDqQOBM6RNOB2DboEFMKEC3SPs8NkKMUxl2AWHqBqIFLYboXiDntAY6ibLPrG9yNqprtAd0bRLSWadPrG2do3juOuewzj5F4hLuAPQ80eZTLlL2O1nmg26hdDnk6JIA9jhvPrYNIz4PvFm339XIFw4ffhYWHeBnIba6uGXRw8g/XBKJAFIhiAlEgCkSBKCYQBaJA/Df2DcE6o28EdLdcAAAAAElFTkSuQmCC",
+          "complete": true,
+          "naturalWidth": 81,
+          "loaded": true
+        },
+        {
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFEAAABRCAYAAACqj0o2AAACzUlEQVR42u2cwZGkMAxFHQIhEAIhEAIhEAIX7s7AIRDChjAHAiCECcEhzNZWeav6MI2NLX0b+h90otuGh4QkW7Ix+2oohUIIhEiIhEghREIkREKkEOKzIQ5mXxezr87s65fZ18Ps688vcoTrLvx++HSIk9nXzeyrfwMsVXwYZ/oUiH3QolJwZ0BdmOdxEPugLT9A2WAwAZNYRc1L0Ux7Z4jDiYNAy6HqhJQGnitq35lWzneB6Aq0xQYvO74ZewzXbYGWu9Yhbhng/mlHlzlfF/5/ZDidJiFeAfh1om25MoZx8SDBJvx9Ad6rY7riGMYwD860hZxI6pvvLsSV/hfH0F8w81TLmGtDHBK98NUbXd6Msyi8YF8c/hRCPJTetH0zllWylKMWRKtoKpIQU0FaNMQ+wYxnhRdkFb/dPjvXVgpnNoF8Wxqi3n1namEsjOkahdglhD89AmIsJhyFVn40IP6PI2Vjx4yb8JFMxDQO0UQyG68NcQJoIQJiTBsnTYibWqyFhRiLcTdNiF41fcJCnMVM+mKKd2YC3c0gdpHnGTQgLiBTRkGMmfSiAdGppEx1IVqRUEcoLJhuCnESCdeEVH+8KcRR5BN1YcKzj7ABQdwU5ip/rptB1Nif+UiI0jAfC3EC7hw+FmLOHvafzEVVKESkd35Nzb4Vq8Hg3hkZJ0rAdC3GiciMRapMz7WWsSBz59jCQSpM31rujFzFkYLpW1vFQa4nXoXpMkyyynoicmW7pC7cvxTAN7myjdpj0Zaqeyyo3T5tqbrbh9p3rqmFkH1nRAWEphNqogICUYtjKuXjsFocRFWYVurYVFWYdn0iGmCV+kTtSlk0wGqVspo120iA1Wu2tboHJLzwbboHNPtYSuLA2/WxsKOKvX3sMn1klyn7ndl5zzMgHnkGBE8j4bk4PKGJZ4XxrDCeWkchREIkREKkECIhEiKFEKXkL3Putty8SBdtAAAAAElFTkSuQmCC",
+          "complete": true,
+          "naturalWidth": 81,
+          "loaded": true
+        },
+        {
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFEAAABRCAYAAACqj0o2AAABs0lEQVR42u3au5GDMBSFYZegEiiBElSCS1ABCpwqQ5VQAiWoBEpQCS6BDVbMMMw+7F090R+cxMYOvkHi6l5u2pob+V9AABFEEAmIIIIIIgERRBBBJCB2hyi0NUpbM2trVm3NdsgaPlfhOhC/wJu0Nc8T3Hd5husFiJ+R2hr/It45Pvy+a0T1R7xzVK+IsQCLQ5YCHN7Y/7Y39smhJ0QXGXCP6wVRJgLcI3tAXBIjLj0gbhlyaUSZCVFeGfGRCfFxZcQpE+IEIogsZx4slDh9lDgU2xz7aEDQCqMVRlOW8QCDKkamjEwZ3hMQQQQRRNI6ogxly/LD2dqF76ca6sNaEO8RWmNL+J+uEPfC2kc+O/tSBXiJO88n7if63HdmzrvPZRoNHPdPcRXEMUHv8J0e49g6oiqEl7VV1gNgcsiUD5CtwtxbQSy5BxbZI1M8hddKAY99SVEz4lQ5YJIXnmKPQbeGMtSI6BpDdLUhjo0B7hlrQpwbRZxrQRQVlzSvlDyiBkTVKGC0k0zPSznako6B6BtH9KURReOAewTTPqZ9IBIQQQQRRAIiiCCCSEAEEUQQya/5AAVK9gqvpkxgAAAAAElFTkSuQmCC",
+          "complete": true,
+          "naturalWidth": 81,
+          "loaded": true
+        }
+      ],
+      "missingText": [],
+      "screenshot": "history-history-unknown-only-375.png"
+    },
+    {
+      "page": "history",
+      "scenario": "history-unknown-only",
+      "width": 430,
+      "file": "history-history-unknown-only-430.html",
+      "expectedText": [
+        "MJYH4CH/A",
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色"
+      ],
+      "viewport": 430,
+      "scrollWidth": 430,
+      "bodyHeight": 2605,
+      "overflow": [],
+      "clippedText": [],
+      "images": [
+        {
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFEAAABRCAYAAACqj0o2AAACF0lEQVR42u3cy43DIBAG4JTgUijBJVCCC+DgKzdTgUtICS7BJaQEl5ASnI3EXiLvZvyAGYb/MFKkPBx/CgOBgZsL/oY4F0AAIhCBiAAiEIEIRAQQgQhEICaM1gVvfx4PH2Hjc0DcCOOCH13wDxf8SoxHfI+pHbFzwS874P6KJX5WVYj2IrwtTKsdsXHBTwnwPmOK11KH+M5dzwyAv/Hkzpcpct/KFJ0GxO5gbps3hjjzwVzalYxodsINxCZo4mv3gJoSERtiDny/pj9xnX7HdZrSECm98HzRjTXxsyi9djGIlnBD9wRf/E64ri0FcWEApEIuJSB2hCac+gZmCb11ql9hruT+rVNbJCN+G9L0GRN7zz3kOfrGUUIuIraKUSrif/OBAwPi8GU+UiSiqH8MhPQiDrEV1pQpTbqVhmiZhzVHhjtWGuIgLB+yfy8gAhGIVSOiY8EQB4NtNYNt/O3DBASmwlRNhWFSVsHygCGuMopfHuBaqKLW+hSxUMW1ZEqtNitmyZRj8X7VtngvsYwke7mdxoKm7JDaSutYIDUVebJBaig3ZofUUPjO3tlo2IJhuCG1bAZihdS0LY0NUtsGSRZIjVtns0Nq3YOcFVLzZu5skNp3xWeBrOF4geSQtZzTkBSypgMvkkHWdnLIHsgJiNdAAvECSCCehERzPgmJjuVkNcWEIQ4OXAMiEBFABCIQEUAEIhD1xAsVdusUYGo5wwAAAABJRU5ErkJggg==",
+          "complete": true,
+          "naturalWidth": 81,
+          "loaded": true
+        },
+        {
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFEAAABRCAYAAACqj0o2AAAC+klEQVR42u2czXHDIBCFUwIlqARKoASXoAJ88NU3uQKVoBJcAiVQgkugBGUyQ2Y0jOUIWJaHsoe9xI6Fv7Ds2x/ydX3cv8TKTCAIRIEoEMUEokAksvH6uPtgo0DMsx94azAvENPtsgEoEDPtGUGce4GowtmzXB93G32JNfzs5zXDsI742Rod4hDgrAfNVl7PLXqeQ47OKrjJmmi+MkQXPe+GClG/WWyK1VxX/CyFCFFH8gEJYuwZT0SxTQHQM2nDNUgdKIiq0IU5AkuuwP6Y3dR0lVybwFK96S9PoZQxK5FpEEGudqRZNYgLEUALBNDtAKzizopwFxoAgHvB0e95CdU5QwFwBiqPrW+yGlUzOlO4sisQvUPIOlxYiyKUQOuRz6SAaBsBHN9UY34/TxNBnLh04lzowikATdgZRwT9jUkCkUVnk7gjbUIQGcKOeGX8kZ4UuXGLtG8KkOLswIbXdELtkSIDetWO+ohl+yUD0hKgD+EzPGcmxAnIbHapI9SW71xW7QQdW8O9OYTrQlDZOVL5uezsbH/wvZBFWVsZXOmunFEhKsJqTumuHDaNsdcHjTogQdTEZx0ndIgJCM1w7tW2phDPALApxLMAbAZRdXoGQkGcTwSwCUR9MoBNIFqBWAaxZBcuGyG8LXVdCJtdOc0xww1xyUzHhoO1wycTvIUiW8mFmCppxobNr6rwciEaBoA1QPpQhlMI9cQp0YWpx4Kh4OVCTInKFC4zFLQERq6Cc+mU6adzp9WIygv9MtDRL3Ih7rugDImyQqSMfsN/hUi9UIEoEPMCS0t3dugQbQeBxaJDnDqQOBM6RNOB2DboEFMKEC3SPs8NkKMUxl2AWHqBqIFLYboXiDntAY6ibLPrG9yNqprtAd0bRLSWadPrG2do3juOuewzj5F4hLuAPQ80eZTLlL2O1nmg26hdDnk6JIA9jhvPrYNIz4PvFm339XIFw4ffhYWHeBnIba6uGXRw8g/XBKJAFIhiAlEgCkSBKCYQBaJA/Df2DcE6o28EdLdcAAAAAElFTkSuQmCC",
+          "complete": true,
+          "naturalWidth": 81,
+          "loaded": true
+        },
+        {
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFEAAABRCAYAAACqj0o2AAACzUlEQVR42u2cwZGkMAxFHQIhEAIhEAIhEAIX7s7AIRDChjAHAiCECcEhzNZWeav6MI2NLX0b+h90otuGh4QkW7Ix+2oohUIIhEiIhEghREIkREKkEOKzIQ5mXxezr87s65fZ18Ps688vcoTrLvx++HSIk9nXzeyrfwMsVXwYZ/oUiH3QolJwZ0BdmOdxEPugLT9A2WAwAZNYRc1L0Ux7Z4jDiYNAy6HqhJQGnitq35lWzneB6Aq0xQYvO74ZewzXbYGWu9Yhbhng/mlHlzlfF/5/ZDidJiFeAfh1om25MoZx8SDBJvx9Ad6rY7riGMYwD860hZxI6pvvLsSV/hfH0F8w81TLmGtDHBK98NUbXd6Msyi8YF8c/hRCPJTetH0zllWylKMWRKtoKpIQU0FaNMQ+wYxnhRdkFb/dPjvXVgpnNoF8Wxqi3n1namEsjOkahdglhD89AmIsJhyFVn40IP6PI2Vjx4yb8JFMxDQO0UQyG68NcQJoIQJiTBsnTYibWqyFhRiLcTdNiF41fcJCnMVM+mKKd2YC3c0gdpHnGTQgLiBTRkGMmfSiAdGppEx1IVqRUEcoLJhuCnESCdeEVH+8KcRR5BN1YcKzj7ABQdwU5ip/rptB1Nif+UiI0jAfC3EC7hw+FmLOHvafzEVVKESkd35Nzb4Vq8Hg3hkZJ0rAdC3GiciMRapMz7WWsSBz59jCQSpM31rujFzFkYLpW1vFQa4nXoXpMkyyynoicmW7pC7cvxTAN7myjdpj0Zaqeyyo3T5tqbrbh9p3rqmFkH1nRAWEphNqogICUYtjKuXjsFocRFWYVurYVFWYdn0iGmCV+kTtSlk0wGqVspo120iA1Wu2tboHJLzwbboHNPtYSuLA2/WxsKOKvX3sMn1klyn7ndl5zzMgHnkGBE8j4bk4PKGJZ4XxrDCeWkchREIkREKkECIhEiKFEKXkL3Putty8SBdtAAAAAElFTkSuQmCC",
+          "complete": true,
+          "naturalWidth": 81,
+          "loaded": true
+        },
+        {
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFEAAABRCAYAAACqj0o2AAABs0lEQVR42u3au5GDMBSFYZegEiiBElSCS1ABCpwqQ5VQAiWoBEpQCS6BDVbMMMw+7F090R+cxMYOvkHi6l5u2pob+V9AABFEEAmIIIIIIgERRBBBJCB2hyi0NUpbM2trVm3NdsgaPlfhOhC/wJu0Nc8T3Hd5husFiJ+R2hr/It45Pvy+a0T1R7xzVK+IsQCLQ5YCHN7Y/7Y39smhJ0QXGXCP6wVRJgLcI3tAXBIjLj0gbhlyaUSZCVFeGfGRCfFxZcQpE+IEIogsZx4slDh9lDgU2xz7aEDQCqMVRlOW8QCDKkamjEwZ3hMQQQQRRNI6ogxly/LD2dqF76ca6sNaEO8RWmNL+J+uEPfC2kc+O/tSBXiJO88n7if63HdmzrvPZRoNHPdPcRXEMUHv8J0e49g6oiqEl7VV1gNgcsiUD5CtwtxbQSy5BxbZI1M8hddKAY99SVEz4lQ5YJIXnmKPQbeGMtSI6BpDdLUhjo0B7hlrQpwbRZxrQRQVlzSvlDyiBkTVKGC0k0zPSznako6B6BtH9KURReOAewTTPqZ9IBIQQQQRRAIiiCCCSEAEEUQQya/5AAVK9gqvpkxgAAAAAElFTkSuQmCC",
+          "complete": true,
+          "naturalWidth": 81,
+          "loaded": true
+        }
+      ],
+      "missingText": []
+    },
+    {
+      "page": "history",
+      "scenario": "history-observed-no-events",
+      "width": 320,
+      "file": "history-history-observed-no-events-320.html",
+      "expectedText": [
+        "MJYH4CH/A",
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色"
+      ],
+      "viewport": 320,
+      "scrollWidth": 320,
+      "bodyHeight": 2010,
+      "overflow": [],
+      "clippedText": [],
+      "images": [
+        {
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFEAAABRCAYAAACqj0o2AAACF0lEQVR42u3cy43DIBAG4JTgUijBJVCCC+DgKzdTgUtICS7BJaQEl5ASnI3EXiLvZvyAGYb/MFKkPBx/CgOBgZsL/oY4F0AAIhCBiAAiEIEIRAQQgQhEICaM1gVvfx4PH2Hjc0DcCOOCH13wDxf8SoxHfI+pHbFzwS874P6KJX5WVYj2IrwtTKsdsXHBTwnwPmOK11KH+M5dzwyAv/Hkzpcpct/KFJ0GxO5gbps3hjjzwVzalYxodsINxCZo4mv3gJoSERtiDny/pj9xnX7HdZrSECm98HzRjTXxsyi9djGIlnBD9wRf/E64ri0FcWEApEIuJSB2hCac+gZmCb11ql9hruT+rVNbJCN+G9L0GRN7zz3kOfrGUUIuIraKUSrif/OBAwPi8GU+UiSiqH8MhPQiDrEV1pQpTbqVhmiZhzVHhjtWGuIgLB+yfy8gAhGIVSOiY8EQB4NtNYNt/O3DBASmwlRNhWFSVsHygCGuMopfHuBaqKLW+hSxUMW1ZEqtNitmyZRj8X7VtngvsYwke7mdxoKm7JDaSutYIDUVebJBaig3ZofUUPjO3tlo2IJhuCG1bAZihdS0LY0NUtsGSRZIjVtns0Nq3YOcFVLzZu5skNp3xWeBrOF4geSQtZzTkBSypgMvkkHWdnLIHsgJiNdAAvECSCCehERzPgmJjuVkNcWEIQ4OXAMiEBFABCIQEUAEIhD1xAsVdusUYGo5wwAAAABJRU5ErkJggg==",
+          "complete": true,
+          "naturalWidth": 81,
+          "loaded": true
+        },
+        {
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFEAAABRCAYAAACqj0o2AAAC+klEQVR42u2czXHDIBCFUwIlqARKoASXoAJ88NU3uQKVoBJcAiVQgkugBGUyQ2Y0jOUIWJaHsoe9xI6Fv7Ds2x/ydX3cv8TKTCAIRIEoEMUEokAksvH6uPtgo0DMsx94azAvENPtsgEoEDPtGUGce4GowtmzXB93G32JNfzs5zXDsI742Rod4hDgrAfNVl7PLXqeQ47OKrjJmmi+MkQXPe+GClG/WWyK1VxX/CyFCFFH8gEJYuwZT0SxTQHQM2nDNUgdKIiq0IU5AkuuwP6Y3dR0lVybwFK96S9PoZQxK5FpEEGudqRZNYgLEUALBNDtAKzizopwFxoAgHvB0e95CdU5QwFwBiqPrW+yGlUzOlO4sisQvUPIOlxYiyKUQOuRz6SAaBsBHN9UY34/TxNBnLh04lzowikATdgZRwT9jUkCkUVnk7gjbUIQGcKOeGX8kZ4UuXGLtG8KkOLswIbXdELtkSIDetWO+ohl+yUD0hKgD+EzPGcmxAnIbHapI9SW71xW7QQdW8O9OYTrQlDZOVL5uezsbH/wvZBFWVsZXOmunFEhKsJqTumuHDaNsdcHjTogQdTEZx0ndIgJCM1w7tW2phDPALApxLMAbAZRdXoGQkGcTwSwCUR9MoBNIFqBWAaxZBcuGyG8LXVdCJtdOc0xww1xyUzHhoO1wycTvIUiW8mFmCppxobNr6rwciEaBoA1QPpQhlMI9cQp0YWpx4Kh4OVCTInKFC4zFLQERq6Cc+mU6adzp9WIygv9MtDRL3Ih7rugDImyQqSMfsN/hUi9UIEoEPMCS0t3dugQbQeBxaJDnDqQOBM6RNOB2DboEFMKEC3SPs8NkKMUxl2AWHqBqIFLYboXiDntAY6ibLPrG9yNqprtAd0bRLSWadPrG2do3juOuewzj5F4hLuAPQ80eZTLlL2O1nmg26hdDnk6JIA9jhvPrYNIz4PvFm339XIFw4ffhYWHeBnIba6uGXRw8g/XBKJAFIhiAlEgCkSBKCYQBaJA/Df2DcE6o28EdLdcAAAAAElFTkSuQmCC",
+          "complete": true,
+          "naturalWidth": 81,
+          "loaded": true
+        },
+        {
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFEAAABRCAYAAACqj0o2AAACzUlEQVR42u2cwZGkMAxFHQIhEAIhEAIhEAIX7s7AIRDChjAHAiCECcEhzNZWeav6MI2NLX0b+h90otuGh4QkW7Ix+2oohUIIhEiIhEghREIkREKkEOKzIQ5mXxezr87s65fZ18Ps688vcoTrLvx++HSIk9nXzeyrfwMsVXwYZ/oUiH3QolJwZ0BdmOdxEPugLT9A2WAwAZNYRc1L0Ux7Z4jDiYNAy6HqhJQGnitq35lWzneB6Aq0xQYvO74ZewzXbYGWu9Yhbhng/mlHlzlfF/5/ZDidJiFeAfh1om25MoZx8SDBJvx9Ad6rY7riGMYwD860hZxI6pvvLsSV/hfH0F8w81TLmGtDHBK98NUbXd6Msyi8YF8c/hRCPJTetH0zllWylKMWRKtoKpIQU0FaNMQ+wYxnhRdkFb/dPjvXVgpnNoF8Wxqi3n1namEsjOkahdglhD89AmIsJhyFVn40IP6PI2Vjx4yb8JFMxDQO0UQyG68NcQJoIQJiTBsnTYibWqyFhRiLcTdNiF41fcJCnMVM+mKKd2YC3c0gdpHnGTQgLiBTRkGMmfSiAdGppEx1IVqRUEcoLJhuCnESCdeEVH+8KcRR5BN1YcKzj7ABQdwU5ip/rptB1Nif+UiI0jAfC3EC7hw+FmLOHvafzEVVKESkd35Nzb4Vq8Hg3hkZJ0rAdC3GiciMRapMz7WWsSBz59jCQSpM31rujFzFkYLpW1vFQa4nXoXpMkyyynoicmW7pC7cvxTAN7myjdpj0Zaqeyyo3T5tqbrbh9p3rqmFkH1nRAWEphNqogICUYtjKuXjsFocRFWYVurYVFWYdn0iGmCV+kTtSlk0wGqVspo120iA1Wu2tboHJLzwbboHNPtYSuLA2/WxsKOKvX3sMn1klyn7ndl5zzMgHnkGBE8j4bk4PKGJZ4XxrDCeWkchREIkREKkECIhEiKFEKXkL3Putty8SBdtAAAAAElFTkSuQmCC",
+          "complete": true,
+          "naturalWidth": 81,
+          "loaded": true
+        },
+        {
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFEAAABRCAYAAACqj0o2AAABs0lEQVR42u3au5GDMBSFYZegEiiBElSCS1ABCpwqQ5VQAiWoBEpQCS6BDVbMMMw+7F090R+cxMYOvkHi6l5u2pob+V9AABFEEAmIIIIIIgERRBBBJCB2hyi0NUpbM2trVm3NdsgaPlfhOhC/wJu0Nc8T3Hd5husFiJ+R2hr/It45Pvy+a0T1R7xzVK+IsQCLQ5YCHN7Y/7Y39smhJ0QXGXCP6wVRJgLcI3tAXBIjLj0gbhlyaUSZCVFeGfGRCfFxZcQpE+IEIogsZx4slDh9lDgU2xz7aEDQCqMVRlOW8QCDKkamjEwZ3hMQQQQRRNI6ogxly/LD2dqF76ca6sNaEO8RWmNL+J+uEPfC2kc+O/tSBXiJO88n7if63HdmzrvPZRoNHPdPcRXEMUHv8J0e49g6oiqEl7VV1gNgcsiUD5CtwtxbQSy5BxbZI1M8hddKAY99SVEz4lQ5YJIXnmKPQbeGMtSI6BpDdLUhjo0B7hlrQpwbRZxrQRQVlzSvlDyiBkTVKGC0k0zPSznako6B6BtH9KURReOAewTTPqZ9IBIQQQQRRAIiiCCCSEAEEUQQya/5AAVK9gqvpkxgAAAAAElFTkSuQmCC",
+          "complete": true,
+          "naturalWidth": 81,
+          "loaded": true
+        }
+      ],
+      "missingText": []
+    },
+    {
+      "page": "history",
+      "scenario": "history-observed-no-events",
+      "width": 375,
+      "file": "history-history-observed-no-events-375.html",
+      "expectedText": [
+        "MJYH4CH/A",
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色"
+      ],
+      "viewport": 375,
+      "scrollWidth": 375,
+      "bodyHeight": 2308,
+      "overflow": [],
+      "clippedText": [],
+      "images": [
+        {
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFEAAABRCAYAAACqj0o2AAACF0lEQVR42u3cy43DIBAG4JTgUijBJVCCC+DgKzdTgUtICS7BJaQEl5ASnI3EXiLvZvyAGYb/MFKkPBx/CgOBgZsL/oY4F0AAIhCBiAAiEIEIRAQQgQhEICaM1gVvfx4PH2Hjc0DcCOOCH13wDxf8SoxHfI+pHbFzwS874P6KJX5WVYj2IrwtTKsdsXHBTwnwPmOK11KH+M5dzwyAv/Hkzpcpct/KFJ0GxO5gbps3hjjzwVzalYxodsINxCZo4mv3gJoSERtiDny/pj9xnX7HdZrSECm98HzRjTXxsyi9djGIlnBD9wRf/E64ri0FcWEApEIuJSB2hCac+gZmCb11ql9hruT+rVNbJCN+G9L0GRN7zz3kOfrGUUIuIraKUSrif/OBAwPi8GU+UiSiqH8MhPQiDrEV1pQpTbqVhmiZhzVHhjtWGuIgLB+yfy8gAhGIVSOiY8EQB4NtNYNt/O3DBASmwlRNhWFSVsHygCGuMopfHuBaqKLW+hSxUMW1ZEqtNitmyZRj8X7VtngvsYwke7mdxoKm7JDaSutYIDUVebJBaig3ZofUUPjO3tlo2IJhuCG1bAZihdS0LY0NUtsGSRZIjVtns0Nq3YOcFVLzZu5skNp3xWeBrOF4geSQtZzTkBSypgMvkkHWdnLIHsgJiNdAAvECSCCehERzPgmJjuVkNcWEIQ4OXAMiEBFABCIQEUAEIhD1xAsVdusUYGo5wwAAAABJRU5ErkJggg==",
+          "complete": true,
+          "naturalWidth": 81,
+          "loaded": true
+        },
+        {
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFEAAABRCAYAAACqj0o2AAAC+klEQVR42u2czXHDIBCFUwIlqARKoASXoAJ88NU3uQKVoBJcAiVQgkugBGUyQ2Y0jOUIWJaHsoe9xI6Fv7Ds2x/ydX3cv8TKTCAIRIEoEMUEokAksvH6uPtgo0DMsx94azAvENPtsgEoEDPtGUGce4GowtmzXB93G32JNfzs5zXDsI742Rod4hDgrAfNVl7PLXqeQ47OKrjJmmi+MkQXPe+GClG/WWyK1VxX/CyFCFFH8gEJYuwZT0SxTQHQM2nDNUgdKIiq0IU5AkuuwP6Y3dR0lVybwFK96S9PoZQxK5FpEEGudqRZNYgLEUALBNDtAKzizopwFxoAgHvB0e95CdU5QwFwBiqPrW+yGlUzOlO4sisQvUPIOlxYiyKUQOuRz6SAaBsBHN9UY34/TxNBnLh04lzowikATdgZRwT9jUkCkUVnk7gjbUIQGcKOeGX8kZ4UuXGLtG8KkOLswIbXdELtkSIDetWO+ohl+yUD0hKgD+EzPGcmxAnIbHapI9SW71xW7QQdW8O9OYTrQlDZOVL5uezsbH/wvZBFWVsZXOmunFEhKsJqTumuHDaNsdcHjTogQdTEZx0ndIgJCM1w7tW2phDPALApxLMAbAZRdXoGQkGcTwSwCUR9MoBNIFqBWAaxZBcuGyG8LXVdCJtdOc0xww1xyUzHhoO1wycTvIUiW8mFmCppxobNr6rwciEaBoA1QPpQhlMI9cQp0YWpx4Kh4OVCTInKFC4zFLQERq6Cc+mU6adzp9WIygv9MtDRL3Ih7rugDImyQqSMfsN/hUi9UIEoEPMCS0t3dugQbQeBxaJDnDqQOBM6RNOB2DboEFMKEC3SPs8NkKMUxl2AWHqBqIFLYboXiDntAY6ibLPrG9yNqprtAd0bRLSWadPrG2do3juOuewzj5F4hLuAPQ80eZTLlL2O1nmg26hdDnk6JIA9jhvPrYNIz4PvFm339XIFw4ffhYWHeBnIba6uGXRw8g/XBKJAFIhiAlEgCkSBKCYQBaJA/Df2DcE6o28EdLdcAAAAAElFTkSuQmCC",
+          "complete": true,
+          "naturalWidth": 81,
+          "loaded": true
+        },
+        {
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFEAAABRCAYAAACqj0o2AAACzUlEQVR42u2cwZGkMAxFHQIhEAIhEAIhEAIX7s7AIRDChjAHAiCECcEhzNZWeav6MI2NLX0b+h90otuGh4QkW7Ix+2oohUIIhEiIhEghREIkREKkEOKzIQ5mXxezr87s65fZ18Ps688vcoTrLvx++HSIk9nXzeyrfwMsVXwYZ/oUiH3QolJwZ0BdmOdxEPugLT9A2WAwAZNYRc1L0Ux7Z4jDiYNAy6HqhJQGnitq35lWzneB6Aq0xQYvO74ZewzXbYGWu9Yhbhng/mlHlzlfF/5/ZDidJiFeAfh1om25MoZx8SDBJvx9Ad6rY7riGMYwD860hZxI6pvvLsSV/hfH0F8w81TLmGtDHBK98NUbXd6Msyi8YF8c/hRCPJTetH0zllWylKMWRKtoKpIQU0FaNMQ+wYxnhRdkFb/dPjvXVgpnNoF8Wxqi3n1namEsjOkahdglhD89AmIsJhyFVn40IP6PI2Vjx4yb8JFMxDQO0UQyG68NcQJoIQJiTBsnTYibWqyFhRiLcTdNiF41fcJCnMVM+mKKd2YC3c0gdpHnGTQgLiBTRkGMmfSiAdGppEx1IVqRUEcoLJhuCnESCdeEVH+8KcRR5BN1YcKzj7ABQdwU5ip/rptB1Nif+UiI0jAfC3EC7hw+FmLOHvafzEVVKESkd35Nzb4Vq8Hg3hkZJ0rAdC3GiciMRapMz7WWsSBz59jCQSpM31rujFzFkYLpW1vFQa4nXoXpMkyyynoicmW7pC7cvxTAN7myjdpj0Zaqeyyo3T5tqbrbh9p3rqmFkH1nRAWEphNqogICUYtjKuXjsFocRFWYVurYVFWYdn0iGmCV+kTtSlk0wGqVspo120iA1Wu2tboHJLzwbboHNPtYSuLA2/WxsKOKvX3sMn1klyn7ndl5zzMgHnkGBE8j4bk4PKGJZ4XxrDCeWkchREIkREKkECIhEiKFEKXkL3Putty8SBdtAAAAAElFTkSuQmCC",
+          "complete": true,
+          "naturalWidth": 81,
+          "loaded": true
+        },
+        {
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFEAAABRCAYAAACqj0o2AAABs0lEQVR42u3au5GDMBSFYZegEiiBElSCS1ABCpwqQ5VQAiWoBEpQCS6BDVbMMMw+7F090R+cxMYOvkHi6l5u2pob+V9AABFEEAmIIIIIIgERRBBBJCB2hyi0NUpbM2trVm3NdsgaPlfhOhC/wJu0Nc8T3Hd5husFiJ+R2hr/It45Pvy+a0T1R7xzVK+IsQCLQ5YCHN7Y/7Y39smhJ0QXGXCP6wVRJgLcI3tAXBIjLj0gbhlyaUSZCVFeGfGRCfFxZcQpE+IEIogsZx4slDh9lDgU2xz7aEDQCqMVRlOW8QCDKkamjEwZ3hMQQQQRRNI6ogxly/LD2dqF76ca6sNaEO8RWmNL+J+uEPfC2kc+O/tSBXiJO88n7if63HdmzrvPZRoNHPdPcRXEMUHv8J0e49g6oiqEl7VV1gNgcsiUD5CtwtxbQSy5BxbZI1M8hddKAY99SVEz4lQ5YJIXnmKPQbeGMtSI6BpDdLUhjo0B7hlrQpwbRZxrQRQVlzSvlDyiBkTVKGC0k0zPSznako6B6BtH9KURReOAewTTPqZ9IBIQQQQRRAIiiCCCSEAEEUQQya/5AAVK9gqvpkxgAAAAAElFTkSuQmCC",
+          "complete": true,
+          "naturalWidth": 81,
+          "loaded": true
+        }
+      ],
+      "missingText": [],
+      "screenshot": "history-history-observed-no-events-375.png"
+    },
+    {
+      "page": "history",
+      "scenario": "history-observed-no-events",
+      "width": 430,
+      "file": "history-history-observed-no-events-430.html",
+      "expectedText": [
+        "MJYH4CH/A",
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色"
+      ],
+      "viewport": 430,
+      "scrollWidth": 430,
+      "bodyHeight": 2605,
+      "overflow": [],
+      "clippedText": [],
+      "images": [
+        {
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFEAAABRCAYAAACqj0o2AAACF0lEQVR42u3cy43DIBAG4JTgUijBJVCCC+DgKzdTgUtICS7BJaQEl5ASnI3EXiLvZvyAGYb/MFKkPBx/CgOBgZsL/oY4F0AAIhCBiAAiEIEIRAQQgQhEICaM1gVvfx4PH2Hjc0DcCOOCH13wDxf8SoxHfI+pHbFzwS874P6KJX5WVYj2IrwtTKsdsXHBTwnwPmOK11KH+M5dzwyAv/Hkzpcpct/KFJ0GxO5gbps3hjjzwVzalYxodsINxCZo4mv3gJoSERtiDny/pj9xnX7HdZrSECm98HzRjTXxsyi9djGIlnBD9wRf/E64ri0FcWEApEIuJSB2hCac+gZmCb11ql9hruT+rVNbJCN+G9L0GRN7zz3kOfrGUUIuIraKUSrif/OBAwPi8GU+UiSiqH8MhPQiDrEV1pQpTbqVhmiZhzVHhjtWGuIgLB+yfy8gAhGIVSOiY8EQB4NtNYNt/O3DBASmwlRNhWFSVsHygCGuMopfHuBaqKLW+hSxUMW1ZEqtNitmyZRj8X7VtngvsYwke7mdxoKm7JDaSutYIDUVebJBaig3ZofUUPjO3tlo2IJhuCG1bAZihdS0LY0NUtsGSRZIjVtns0Nq3YOcFVLzZu5skNp3xWeBrOF4geSQtZzTkBSypgMvkkHWdnLIHsgJiNdAAvECSCCehERzPgmJjuVkNcWEIQ4OXAMiEBFABCIQEUAEIhD1xAsVdusUYGo5wwAAAABJRU5ErkJggg==",
+          "complete": true,
+          "naturalWidth": 81,
+          "loaded": true
+        },
+        {
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFEAAABRCAYAAACqj0o2AAAC+klEQVR42u2czXHDIBCFUwIlqARKoASXoAJ88NU3uQKVoBJcAiVQgkugBGUyQ2Y0jOUIWJaHsoe9xI6Fv7Ds2x/ydX3cv8TKTCAIRIEoEMUEokAksvH6uPtgo0DMsx94azAvENPtsgEoEDPtGUGce4GowtmzXB93G32JNfzs5zXDsI742Rod4hDgrAfNVl7PLXqeQ47OKrjJmmi+MkQXPe+GClG/WWyK1VxX/CyFCFFH8gEJYuwZT0SxTQHQM2nDNUgdKIiq0IU5AkuuwP6Y3dR0lVybwFK96S9PoZQxK5FpEEGudqRZNYgLEUALBNDtAKzizopwFxoAgHvB0e95CdU5QwFwBiqPrW+yGlUzOlO4sisQvUPIOlxYiyKUQOuRz6SAaBsBHN9UY34/TxNBnLh04lzowikATdgZRwT9jUkCkUVnk7gjbUIQGcKOeGX8kZ4UuXGLtG8KkOLswIbXdELtkSIDetWO+ohl+yUD0hKgD+EzPGcmxAnIbHapI9SW71xW7QQdW8O9OYTrQlDZOVL5uezsbH/wvZBFWVsZXOmunFEhKsJqTumuHDaNsdcHjTogQdTEZx0ndIgJCM1w7tW2phDPALApxLMAbAZRdXoGQkGcTwSwCUR9MoBNIFqBWAaxZBcuGyG8LXVdCJtdOc0xww1xyUzHhoO1wycTvIUiW8mFmCppxobNr6rwciEaBoA1QPpQhlMI9cQp0YWpx4Kh4OVCTInKFC4zFLQERq6Cc+mU6adzp9WIygv9MtDRL3Ih7rugDImyQqSMfsN/hUi9UIEoEPMCS0t3dugQbQeBxaJDnDqQOBM6RNOB2DboEFMKEC3SPs8NkKMUxl2AWHqBqIFLYboXiDntAY6ibLPrG9yNqprtAd0bRLSWadPrG2do3juOuewzj5F4hLuAPQ80eZTLlL2O1nmg26hdDnk6JIA9jhvPrYNIz4PvFm339XIFw4ffhYWHeBnIba6uGXRw8g/XBKJAFIhiAlEgCkSBKCYQBaJA/Df2DcE6o28EdLdcAAAAAElFTkSuQmCC",
+          "complete": true,
+          "naturalWidth": 81,
+          "loaded": true
+        },
+        {
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFEAAABRCAYAAACqj0o2AAACzUlEQVR42u2cwZGkMAxFHQIhEAIhEAIhEAIX7s7AIRDChjAHAiCECcEhzNZWeav6MI2NLX0b+h90otuGh4QkW7Ix+2oohUIIhEiIhEghREIkREKkEOKzIQ5mXxezr87s65fZ18Ps688vcoTrLvx++HSIk9nXzeyrfwMsVXwYZ/oUiH3QolJwZ0BdmOdxEPugLT9A2WAwAZNYRc1L0Ux7Z4jDiYNAy6HqhJQGnitq35lWzneB6Aq0xQYvO74ZewzXbYGWu9Yhbhng/mlHlzlfF/5/ZDidJiFeAfh1om25MoZx8SDBJvx9Ad6rY7riGMYwD860hZxI6pvvLsSV/hfH0F8w81TLmGtDHBK98NUbXd6Msyi8YF8c/hRCPJTetH0zllWylKMWRKtoKpIQU0FaNMQ+wYxnhRdkFb/dPjvXVgpnNoF8Wxqi3n1namEsjOkahdglhD89AmIsJhyFVn40IP6PI2Vjx4yb8JFMxDQO0UQyG68NcQJoIQJiTBsnTYibWqyFhRiLcTdNiF41fcJCnMVM+mKKd2YC3c0gdpHnGTQgLiBTRkGMmfSiAdGppEx1IVqRUEcoLJhuCnESCdeEVH+8KcRR5BN1YcKzj7ABQdwU5ip/rptB1Nif+UiI0jAfC3EC7hw+FmLOHvafzEVVKESkd35Nzb4Vq8Hg3hkZJ0rAdC3GiciMRapMz7WWsSBz59jCQSpM31rujFzFkYLpW1vFQa4nXoXpMkyyynoicmW7pC7cvxTAN7myjdpj0Zaqeyyo3T5tqbrbh9p3rqmFkH1nRAWEphNqogICUYtjKuXjsFocRFWYVurYVFWYdn0iGmCV+kTtSlk0wGqVspo120iA1Wu2tboHJLzwbboHNPtYSuLA2/WxsKOKvX3sMn1klyn7ndl5zzMgHnkGBE8j4bk4PKGJZ4XxrDCeWkchREIkREKkECIhEiKFEKXkL3Putty8SBdtAAAAAElFTkSuQmCC",
+          "complete": true,
+          "naturalWidth": 81,
+          "loaded": true
+        },
+        {
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFEAAABRCAYAAACqj0o2AAABs0lEQVR42u3au5GDMBSFYZegEiiBElSCS1ABCpwqQ5VQAiWoBEpQCS6BDVbMMMw+7F090R+cxMYOvkHi6l5u2pob+V9AABFEEAmIIIIIIgERRBBBJCB2hyi0NUpbM2trVm3NdsgaPlfhOhC/wJu0Nc8T3Hd5husFiJ+R2hr/It45Pvy+a0T1R7xzVK+IsQCLQ5YCHN7Y/7Y39smhJ0QXGXCP6wVRJgLcI3tAXBIjLj0gbhlyaUSZCVFeGfGRCfFxZcQpE+IEIogsZx4slDh9lDgU2xz7aEDQCqMVRlOW8QCDKkamjEwZ3hMQQQQRRNI6ogxly/LD2dqF76ca6sNaEO8RWmNL+J+uEPfC2kc+O/tSBXiJO88n7if63HdmzrvPZRoNHPdPcRXEMUHv8J0e49g6oiqEl7VV1gNgcsiUD5CtwtxbQSy5BxbZI1M8hddKAY99SVEz4lQ5YJIXnmKPQbeGMtSI6BpDdLUhjo0B7hlrQpwbRZxrQRQVlzSvlDyiBkTVKGC0k0zPSznako6B6BtH9KURReOAewTTPqZ9IBIQQQQRRAIiiCCCSEAEEUQQya/5AAVK9gqvpkxgAAAAAElFTkSuQmCC",
+          "complete": true,
+          "naturalWidth": 81,
+          "loaded": true
+        }
+      ],
+      "missingText": []
+    },
+    {
+      "page": "history",
+      "scenario": "history-events-only",
+      "width": 320,
+      "file": "history-history-events-only-320.html",
+      "expectedText": [
+        "MJYH4CH/A",
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色"
+      ],
+      "viewport": 320,
+      "scrollWidth": 320,
+      "bodyHeight": 2223,
+      "overflow": [],
+      "clippedText": [],
+      "images": [
+        {
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFEAAABRCAYAAACqj0o2AAACF0lEQVR42u3cy43DIBAG4JTgUijBJVCCC+DgKzdTgUtICS7BJaQEl5ASnI3EXiLvZvyAGYb/MFKkPBx/CgOBgZsL/oY4F0AAIhCBiAAiEIEIRAQQgQhEICaM1gVvfx4PH2Hjc0DcCOOCH13wDxf8SoxHfI+pHbFzwS874P6KJX5WVYj2IrwtTKsdsXHBTwnwPmOK11KH+M5dzwyAv/Hkzpcpct/KFJ0GxO5gbps3hjjzwVzalYxodsINxCZo4mv3gJoSERtiDny/pj9xnX7HdZrSECm98HzRjTXxsyi9djGIlnBD9wRf/E64ri0FcWEApEIuJSB2hCac+gZmCb11ql9hruT+rVNbJCN+G9L0GRN7zz3kOfrGUUIuIraKUSrif/OBAwPi8GU+UiSiqH8MhPQiDrEV1pQpTbqVhmiZhzVHhjtWGuIgLB+yfy8gAhGIVSOiY8EQB4NtNYNt/O3DBASmwlRNhWFSVsHygCGuMopfHuBaqKLW+hSxUMW1ZEqtNitmyZRj8X7VtngvsYwke7mdxoKm7JDaSutYIDUVebJBaig3ZofUUPjO3tlo2IJhuCG1bAZihdS0LY0NUtsGSRZIjVtns0Nq3YOcFVLzZu5skNp3xWeBrOF4geSQtZzTkBSypgMvkkHWdnLIHsgJiNdAAvECSCCehERzPgmJjuVkNcWEIQ4OXAMiEBFABCIQEUAEIhD1xAsVdusUYGo5wwAAAABJRU5ErkJggg==",
+          "complete": true,
+          "naturalWidth": 81,
+          "loaded": true
+        },
+        {
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFEAAABRCAYAAACqj0o2AAAC+klEQVR42u2czXHDIBCFUwIlqARKoASXoAJ88NU3uQKVoBJcAiVQgkugBGUyQ2Y0jOUIWJaHsoe9xI6Fv7Ds2x/ydX3cv8TKTCAIRIEoEMUEokAksvH6uPtgo0DMsx94azAvENPtsgEoEDPtGUGce4GowtmzXB93G32JNfzs5zXDsI742Rod4hDgrAfNVl7PLXqeQ47OKrjJmmi+MkQXPe+GClG/WWyK1VxX/CyFCFFH8gEJYuwZT0SxTQHQM2nDNUgdKIiq0IU5AkuuwP6Y3dR0lVybwFK96S9PoZQxK5FpEEGudqRZNYgLEUALBNDtAKzizopwFxoAgHvB0e95CdU5QwFwBiqPrW+yGlUzOlO4sisQvUPIOlxYiyKUQOuRz6SAaBsBHN9UY34/TxNBnLh04lzowikATdgZRwT9jUkCkUVnk7gjbUIQGcKOeGX8kZ4UuXGLtG8KkOLswIbXdELtkSIDetWO+ohl+yUD0hKgD+EzPGcmxAnIbHapI9SW71xW7QQdW8O9OYTrQlDZOVL5uezsbH/wvZBFWVsZXOmunFEhKsJqTumuHDaNsdcHjTogQdTEZx0ndIgJCM1w7tW2phDPALApxLMAbAZRdXoGQkGcTwSwCUR9MoBNIFqBWAaxZBcuGyG8LXVdCJtdOc0xww1xyUzHhoO1wycTvIUiW8mFmCppxobNr6rwciEaBoA1QPpQhlMI9cQp0YWpx4Kh4OVCTInKFC4zFLQERq6Cc+mU6adzp9WIygv9MtDRL3Ih7rugDImyQqSMfsN/hUi9UIEoEPMCS0t3dugQbQeBxaJDnDqQOBM6RNOB2DboEFMKEC3SPs8NkKMUxl2AWHqBqIFLYboXiDntAY6ibLPrG9yNqprtAd0bRLSWadPrG2do3juOuewzj5F4hLuAPQ80eZTLlL2O1nmg26hdDnk6JIA9jhvPrYNIz4PvFm339XIFw4ffhYWHeBnIba6uGXRw8g/XBKJAFIhiAlEgCkSBKCYQBaJA/Df2DcE6o28EdLdcAAAAAElFTkSuQmCC",
+          "complete": true,
+          "naturalWidth": 81,
+          "loaded": true
+        },
+        {
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFEAAABRCAYAAACqj0o2AAACzUlEQVR42u2cwZGkMAxFHQIhEAIhEAIhEAIX7s7AIRDChjAHAiCECcEhzNZWeav6MI2NLX0b+h90otuGh4QkW7Ix+2oohUIIhEiIhEghREIkREKkEOKzIQ5mXxezr87s65fZ18Ps688vcoTrLvx++HSIk9nXzeyrfwMsVXwYZ/oUiH3QolJwZ0BdmOdxEPugLT9A2WAwAZNYRc1L0Ux7Z4jDiYNAy6HqhJQGnitq35lWzneB6Aq0xQYvO74ZewzXbYGWu9Yhbhng/mlHlzlfF/5/ZDidJiFeAfh1om25MoZx8SDBJvx9Ad6rY7riGMYwD860hZxI6pvvLsSV/hfH0F8w81TLmGtDHBK98NUbXd6Msyi8YF8c/hRCPJTetH0zllWylKMWRKtoKpIQU0FaNMQ+wYxnhRdkFb/dPjvXVgpnNoF8Wxqi3n1namEsjOkahdglhD89AmIsJhyFVn40IP6PI2Vjx4yb8JFMxDQO0UQyG68NcQJoIQJiTBsnTYibWqyFhRiLcTdNiF41fcJCnMVM+mKKd2YC3c0gdpHnGTQgLiBTRkGMmfSiAdGppEx1IVqRUEcoLJhuCnESCdeEVH+8KcRR5BN1YcKzj7ABQdwU5ip/rptB1Nif+UiI0jAfC3EC7hw+FmLOHvafzEVVKESkd35Nzb4Vq8Hg3hkZJ0rAdC3GiciMRapMz7WWsSBz59jCQSpM31rujFzFkYLpW1vFQa4nXoXpMkyyynoicmW7pC7cvxTAN7myjdpj0Zaqeyyo3T5tqbrbh9p3rqmFkH1nRAWEphNqogICUYtjKuXjsFocRFWYVurYVFWYdn0iGmCV+kTtSlk0wGqVspo120iA1Wu2tboHJLzwbboHNPtYSuLA2/WxsKOKvX3sMn1klyn7ndl5zzMgHnkGBE8j4bk4PKGJZ4XxrDCeWkchREIkREKkECIhEiKFEKXkL3Putty8SBdtAAAAAElFTkSuQmCC",
+          "complete": true,
+          "naturalWidth": 81,
+          "loaded": true
+        },
+        {
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFEAAABRCAYAAACqj0o2AAABs0lEQVR42u3au5GDMBSFYZegEiiBElSCS1ABCpwqQ5VQAiWoBEpQCS6BDVbMMMw+7F090R+cxMYOvkHi6l5u2pob+V9AABFEEAmIIIIIIgERRBBBJCB2hyi0NUpbM2trVm3NdsgaPlfhOhC/wJu0Nc8T3Hd5husFiJ+R2hr/It45Pvy+a0T1R7xzVK+IsQCLQ5YCHN7Y/7Y39smhJ0QXGXCP6wVRJgLcI3tAXBIjLj0gbhlyaUSZCVFeGfGRCfFxZcQpE+IEIogsZx4slDh9lDgU2xz7aEDQCqMVRlOW8QCDKkamjEwZ3hMQQQQRRNI6ogxly/LD2dqF76ca6sNaEO8RWmNL+J+uEPfC2kc+O/tSBXiJO88n7if63HdmzrvPZRoNHPdPcRXEMUHv8J0e49g6oiqEl7VV1gNgcsiUD5CtwtxbQSy5BxbZI1M8hddKAY99SVEz4lQ5YJIXnmKPQbeGMtSI6BpDdLUhjo0B7hlrQpwbRZxrQRQVlzSvlDyiBkTVKGC0k0zPSznako6B6BtH9KURReOAewTTPqZ9IBIQQQQRRAIiiCCCSEAEEUQQya/5AAVK9gqvpkxgAAAAAElFTkSuQmCC",
+          "complete": true,
+          "naturalWidth": 81,
+          "loaded": true
+        }
+      ],
+      "missingText": []
+    },
+    {
+      "page": "history",
+      "scenario": "history-events-only",
+      "width": 375,
+      "file": "history-history-events-only-375.html",
+      "expectedText": [
+        "MJYH4CH/A",
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色"
+      ],
+      "viewport": 375,
+      "scrollWidth": 375,
+      "bodyHeight": 2558,
+      "overflow": [],
+      "clippedText": [],
+      "images": [
+        {
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFEAAABRCAYAAACqj0o2AAACF0lEQVR42u3cy43DIBAG4JTgUijBJVCCC+DgKzdTgUtICS7BJaQEl5ASnI3EXiLvZvyAGYb/MFKkPBx/CgOBgZsL/oY4F0AAIhCBiAAiEIEIRAQQgQhEICaM1gVvfx4PH2Hjc0DcCOOCH13wDxf8SoxHfI+pHbFzwS874P6KJX5WVYj2IrwtTKsdsXHBTwnwPmOK11KH+M5dzwyAv/Hkzpcpct/KFJ0GxO5gbps3hjjzwVzalYxodsINxCZo4mv3gJoSERtiDny/pj9xnX7HdZrSECm98HzRjTXxsyi9djGIlnBD9wRf/E64ri0FcWEApEIuJSB2hCac+gZmCb11ql9hruT+rVNbJCN+G9L0GRN7zz3kOfrGUUIuIraKUSrif/OBAwPi8GU+UiSiqH8MhPQiDrEV1pQpTbqVhmiZhzVHhjtWGuIgLB+yfy8gAhGIVSOiY8EQB4NtNYNt/O3DBASmwlRNhWFSVsHygCGuMopfHuBaqKLW+hSxUMW1ZEqtNitmyZRj8X7VtngvsYwke7mdxoKm7JDaSutYIDUVebJBaig3ZofUUPjO3tlo2IJhuCG1bAZihdS0LY0NUtsGSRZIjVtns0Nq3YOcFVLzZu5skNp3xWeBrOF4geSQtZzTkBSypgMvkkHWdnLIHsgJiNdAAvECSCCehERzPgmJjuVkNcWEIQ4OXAMiEBFABCIQEUAEIhD1xAsVdusUYGo5wwAAAABJRU5ErkJggg==",
+          "complete": true,
+          "naturalWidth": 81,
+          "loaded": true
+        },
+        {
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFEAAABRCAYAAACqj0o2AAAC+klEQVR42u2czXHDIBCFUwIlqARKoASXoAJ88NU3uQKVoBJcAiVQgkugBGUyQ2Y0jOUIWJaHsoe9xI6Fv7Ds2x/ydX3cv8TKTCAIRIEoEMUEokAksvH6uPtgo0DMsx94azAvENPtsgEoEDPtGUGce4GowtmzXB93G32JNfzs5zXDsI742Rod4hDgrAfNVl7PLXqeQ47OKrjJmmi+MkQXPe+GClG/WWyK1VxX/CyFCFFH8gEJYuwZT0SxTQHQM2nDNUgdKIiq0IU5AkuuwP6Y3dR0lVybwFK96S9PoZQxK5FpEEGudqRZNYgLEUALBNDtAKzizopwFxoAgHvB0e95CdU5QwFwBiqPrW+yGlUzOlO4sisQvUPIOlxYiyKUQOuRz6SAaBsBHN9UY34/TxNBnLh04lzowikATdgZRwT9jUkCkUVnk7gjbUIQGcKOeGX8kZ4UuXGLtG8KkOLswIbXdELtkSIDetWO+ohl+yUD0hKgD+EzPGcmxAnIbHapI9SW71xW7QQdW8O9OYTrQlDZOVL5uezsbH/wvZBFWVsZXOmunFEhKsJqTumuHDaNsdcHjTogQdTEZx0ndIgJCM1w7tW2phDPALApxLMAbAZRdXoGQkGcTwSwCUR9MoBNIFqBWAaxZBcuGyG8LXVdCJtdOc0xww1xyUzHhoO1wycTvIUiW8mFmCppxobNr6rwciEaBoA1QPpQhlMI9cQp0YWpx4Kh4OVCTInKFC4zFLQERq6Cc+mU6adzp9WIygv9MtDRL3Ih7rugDImyQqSMfsN/hUi9UIEoEPMCS0t3dugQbQeBxaJDnDqQOBM6RNOB2DboEFMKEC3SPs8NkKMUxl2AWHqBqIFLYboXiDntAY6ibLPrG9yNqprtAd0bRLSWadPrG2do3juOuewzj5F4hLuAPQ80eZTLlL2O1nmg26hdDnk6JIA9jhvPrYNIz4PvFm339XIFw4ffhYWHeBnIba6uGXRw8g/XBKJAFIhiAlEgCkSBKCYQBaJA/Df2DcE6o28EdLdcAAAAAElFTkSuQmCC",
+          "complete": true,
+          "naturalWidth": 81,
+          "loaded": true
+        },
+        {
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFEAAABRCAYAAACqj0o2AAACzUlEQVR42u2cwZGkMAxFHQIhEAIhEAIhEAIX7s7AIRDChjAHAiCECcEhzNZWeav6MI2NLX0b+h90otuGh4QkW7Ix+2oohUIIhEiIhEghREIkREKkEOKzIQ5mXxezr87s65fZ18Ps688vcoTrLvx++HSIk9nXzeyrfwMsVXwYZ/oUiH3QolJwZ0BdmOdxEPugLT9A2WAwAZNYRc1L0Ux7Z4jDiYNAy6HqhJQGnitq35lWzneB6Aq0xQYvO74ZewzXbYGWu9Yhbhng/mlHlzlfF/5/ZDidJiFeAfh1om25MoZx8SDBJvx9Ad6rY7riGMYwD860hZxI6pvvLsSV/hfH0F8w81TLmGtDHBK98NUbXd6Msyi8YF8c/hRCPJTetH0zllWylKMWRKtoKpIQU0FaNMQ+wYxnhRdkFb/dPjvXVgpnNoF8Wxqi3n1namEsjOkahdglhD89AmIsJhyFVn40IP6PI2Vjx4yb8JFMxDQO0UQyG68NcQJoIQJiTBsnTYibWqyFhRiLcTdNiF41fcJCnMVM+mKKd2YC3c0gdpHnGTQgLiBTRkGMmfSiAdGppEx1IVqRUEcoLJhuCnESCdeEVH+8KcRR5BN1YcKzj7ABQdwU5ip/rptB1Nif+UiI0jAfC3EC7hw+FmLOHvafzEVVKESkd35Nzb4Vq8Hg3hkZJ0rAdC3GiciMRapMz7WWsSBz59jCQSpM31rujFzFkYLpW1vFQa4nXoXpMkyyynoicmW7pC7cvxTAN7myjdpj0Zaqeyyo3T5tqbrbh9p3rqmFkH1nRAWEphNqogICUYtjKuXjsFocRFWYVurYVFWYdn0iGmCV+kTtSlk0wGqVspo120iA1Wu2tboHJLzwbboHNPtYSuLA2/WxsKOKvX3sMn1klyn7ndl5zzMgHnkGBE8j4bk4PKGJZ4XxrDCeWkchREIkREKkECIhEiKFEKXkL3Putty8SBdtAAAAAElFTkSuQmCC",
+          "complete": true,
+          "naturalWidth": 81,
+          "loaded": true
+        },
+        {
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFEAAABRCAYAAACqj0o2AAABs0lEQVR42u3au5GDMBSFYZegEiiBElSCS1ABCpwqQ5VQAiWoBEpQCS6BDVbMMMw+7F090R+cxMYOvkHi6l5u2pob+V9AABFEEAmIIIIIIgERRBBBJCB2hyi0NUpbM2trVm3NdsgaPlfhOhC/wJu0Nc8T3Hd5husFiJ+R2hr/It45Pvy+a0T1R7xzVK+IsQCLQ5YCHN7Y/7Y39smhJ0QXGXCP6wVRJgLcI3tAXBIjLj0gbhlyaUSZCVFeGfGRCfFxZcQpE+IEIogsZx4slDh9lDgU2xz7aEDQCqMVRlOW8QCDKkamjEwZ3hMQQQQRRNI6ogxly/LD2dqF76ca6sNaEO8RWmNL+J+uEPfC2kc+O/tSBXiJO88n7if63HdmzrvPZRoNHPdPcRXEMUHv8J0e49g6oiqEl7VV1gNgcsiUD5CtwtxbQSy5BxbZI1M8hddKAY99SVEz4lQ5YJIXnmKPQbeGMtSI6BpDdLUhjo0B7hlrQpwbRZxrQRQVlzSvlDyiBkTVKGC0k0zPSznako6B6BtH9KURReOAewTTPqZ9IBIQQQQRRAIiiCCCSEAEEUQQya/5AAVK9gqvpkxgAAAAAElFTkSuQmCC",
+          "complete": true,
+          "naturalWidth": 81,
+          "loaded": true
+        }
+      ],
+      "missingText": [],
+      "screenshot": "history-history-events-only-375.png"
+    },
+    {
+      "page": "history",
+      "scenario": "history-events-only",
+      "width": 430,
+      "file": "history-history-events-only-430.html",
+      "expectedText": [
+        "MJYH4CH/A",
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色"
+      ],
+      "viewport": 430,
+      "scrollWidth": 430,
+      "bodyHeight": 2890,
+      "overflow": [],
+      "clippedText": [],
+      "images": [
+        {
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFEAAABRCAYAAACqj0o2AAACF0lEQVR42u3cy43DIBAG4JTgUijBJVCCC+DgKzdTgUtICS7BJaQEl5ASnI3EXiLvZvyAGYb/MFKkPBx/CgOBgZsL/oY4F0AAIhCBiAAiEIEIRAQQgQhEICaM1gVvfx4PH2Hjc0DcCOOCH13wDxf8SoxHfI+pHbFzwS874P6KJX5WVYj2IrwtTKsdsXHBTwnwPmOK11KH+M5dzwyAv/Hkzpcpct/KFJ0GxO5gbps3hjjzwVzalYxodsINxCZo4mv3gJoSERtiDny/pj9xnX7HdZrSECm98HzRjTXxsyi9djGIlnBD9wRf/E64ri0FcWEApEIuJSB2hCac+gZmCb11ql9hruT+rVNbJCN+G9L0GRN7zz3kOfrGUUIuIraKUSrif/OBAwPi8GU+UiSiqH8MhPQiDrEV1pQpTbqVhmiZhzVHhjtWGuIgLB+yfy8gAhGIVSOiY8EQB4NtNYNt/O3DBASmwlRNhWFSVsHygCGuMopfHuBaqKLW+hSxUMW1ZEqtNitmyZRj8X7VtngvsYwke7mdxoKm7JDaSutYIDUVebJBaig3ZofUUPjO3tlo2IJhuCG1bAZihdS0LY0NUtsGSRZIjVtns0Nq3YOcFVLzZu5skNp3xWeBrOF4geSQtZzTkBSypgMvkkHWdnLIHsgJiNdAAvECSCCehERzPgmJjuVkNcWEIQ4OXAMiEBFABCIQEUAEIhD1xAsVdusUYGo5wwAAAABJRU5ErkJggg==",
+          "complete": true,
+          "naturalWidth": 81,
+          "loaded": true
+        },
+        {
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFEAAABRCAYAAACqj0o2AAAC+klEQVR42u2czXHDIBCFUwIlqARKoASXoAJ88NU3uQKVoBJcAiVQgkugBGUyQ2Y0jOUIWJaHsoe9xI6Fv7Ds2x/ydX3cv8TKTCAIRIEoEMUEokAksvH6uPtgo0DMsx94azAvENPtsgEoEDPtGUGce4GowtmzXB93G32JNfzs5zXDsI742Rod4hDgrAfNVl7PLXqeQ47OKrjJmmi+MkQXPe+GClG/WWyK1VxX/CyFCFFH8gEJYuwZT0SxTQHQM2nDNUgdKIiq0IU5AkuuwP6Y3dR0lVybwFK96S9PoZQxK5FpEEGudqRZNYgLEUALBNDtAKzizopwFxoAgHvB0e95CdU5QwFwBiqPrW+yGlUzOlO4sisQvUPIOlxYiyKUQOuRz6SAaBsBHN9UY34/TxNBnLh04lzowikATdgZRwT9jUkCkUVnk7gjbUIQGcKOeGX8kZ4UuXGLtG8KkOLswIbXdELtkSIDetWO+ohl+yUD0hKgD+EzPGcmxAnIbHapI9SW71xW7QQdW8O9OYTrQlDZOVL5uezsbH/wvZBFWVsZXOmunFEhKsJqTumuHDaNsdcHjTogQdTEZx0ndIgJCM1w7tW2phDPALApxLMAbAZRdXoGQkGcTwSwCUR9MoBNIFqBWAaxZBcuGyG8LXVdCJtdOc0xww1xyUzHhoO1wycTvIUiW8mFmCppxobNr6rwciEaBoA1QPpQhlMI9cQp0YWpx4Kh4OVCTInKFC4zFLQERq6Cc+mU6adzp9WIygv9MtDRL3Ih7rugDImyQqSMfsN/hUi9UIEoEPMCS0t3dugQbQeBxaJDnDqQOBM6RNOB2DboEFMKEC3SPs8NkKMUxl2AWHqBqIFLYboXiDntAY6ibLPrG9yNqprtAd0bRLSWadPrG2do3juOuewzj5F4hLuAPQ80eZTLlL2O1nmg26hdDnk6JIA9jhvPrYNIz4PvFm339XIFw4ffhYWHeBnIba6uGXRw8g/XBKJAFIhiAlEgCkSBKCYQBaJA/Df2DcE6o28EdLdcAAAAAElFTkSuQmCC",
+          "complete": true,
+          "naturalWidth": 81,
+          "loaded": true
+        },
+        {
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFEAAABRCAYAAACqj0o2AAACzUlEQVR42u2cwZGkMAxFHQIhEAIhEAIhEAIX7s7AIRDChjAHAiCECcEhzNZWeav6MI2NLX0b+h90otuGh4QkW7Ix+2oohUIIhEiIhEghREIkREKkEOKzIQ5mXxezr87s65fZ18Ps688vcoTrLvx++HSIk9nXzeyrfwMsVXwYZ/oUiH3QolJwZ0BdmOdxEPugLT9A2WAwAZNYRc1L0Ux7Z4jDiYNAy6HqhJQGnitq35lWzneB6Aq0xQYvO74ZewzXbYGWu9Yhbhng/mlHlzlfF/5/ZDidJiFeAfh1om25MoZx8SDBJvx9Ad6rY7riGMYwD860hZxI6pvvLsSV/hfH0F8w81TLmGtDHBK98NUbXd6Msyi8YF8c/hRCPJTetH0zllWylKMWRKtoKpIQU0FaNMQ+wYxnhRdkFb/dPjvXVgpnNoF8Wxqi3n1namEsjOkahdglhD89AmIsJhyFVn40IP6PI2Vjx4yb8JFMxDQO0UQyG68NcQJoIQJiTBsnTYibWqyFhRiLcTdNiF41fcJCnMVM+mKKd2YC3c0gdpHnGTQgLiBTRkGMmfSiAdGppEx1IVqRUEcoLJhuCnESCdeEVH+8KcRR5BN1YcKzj7ABQdwU5ip/rptB1Nif+UiI0jAfC3EC7hw+FmLOHvafzEVVKESkd35Nzb4Vq8Hg3hkZJ0rAdC3GiciMRapMz7WWsSBz59jCQSpM31rujFzFkYLpW1vFQa4nXoXpMkyyynoicmW7pC7cvxTAN7myjdpj0Zaqeyyo3T5tqbrbh9p3rqmFkH1nRAWEphNqogICUYtjKuXjsFocRFWYVurYVFWYdn0iGmCV+kTtSlk0wGqVspo120iA1Wu2tboHJLzwbboHNPtYSuLA2/WxsKOKvX3sMn1klyn7ndl5zzMgHnkGBE8j4bk4PKGJZ4XxrDCeWkchREIkREKkECIhEiKFEKXkL3Putty8SBdtAAAAAElFTkSuQmCC",
+          "complete": true,
+          "naturalWidth": 81,
+          "loaded": true
+        },
+        {
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFEAAABRCAYAAACqj0o2AAABs0lEQVR42u3au5GDMBSFYZegEiiBElSCS1ABCpwqQ5VQAiWoBEpQCS6BDVbMMMw+7F090R+cxMYOvkHi6l5u2pob+V9AABFEEAmIIIIIIgERRBBBJCB2hyi0NUpbM2trVm3NdsgaPlfhOhC/wJu0Nc8T3Hd5husFiJ+R2hr/It45Pvy+a0T1R7xzVK+IsQCLQ5YCHN7Y/7Y39smhJ0QXGXCP6wVRJgLcI3tAXBIjLj0gbhlyaUSZCVFeGfGRCfFxZcQpE+IEIogsZx4slDh9lDgU2xz7aEDQCqMVRlOW8QCDKkamjEwZ3hMQQQQRRNI6ogxly/LD2dqF76ca6sNaEO8RWmNL+J+uEPfC2kc+O/tSBXiJO88n7if63HdmzrvPZRoNHPdPcRXEMUHv8J0e49g6oiqEl7VV1gNgcsiUD5CtwtxbQSy5BxbZI1M8hddKAY99SVEz4lQ5YJIXnmKPQbeGMtSI6BpDdLUhjo0B7hlrQpwbRZxrQRQVlzSvlDyiBkTVKGC0k0zPSznako6B6BtH9KURReOAewTTPqZ9IBIQQQQRRAIiiCCCSEAEEUQQya/5AAVK9gqvpkxgAAAAAElFTkSuQmCC",
+          "complete": true,
+          "naturalWidth": 81,
+          "loaded": true
+        }
+      ],
+      "missingText": []
+    },
+    {
+      "page": "history",
+      "scenario": "history-observed-events",
+      "width": 320,
+      "file": "history-history-observed-events-320.html",
+      "expectedText": [
+        "MJYH4CH/A",
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色"
+      ],
+      "viewport": 320,
+      "scrollWidth": 320,
+      "bodyHeight": 2369,
+      "overflow": [],
+      "clippedText": [],
+      "images": [
+        {
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFEAAABRCAYAAACqj0o2AAACF0lEQVR42u3cy43DIBAG4JTgUijBJVCCC+DgKzdTgUtICS7BJaQEl5ASnI3EXiLvZvyAGYb/MFKkPBx/CgOBgZsL/oY4F0AAIhCBiAAiEIEIRAQQgQhEICaM1gVvfx4PH2Hjc0DcCOOCH13wDxf8SoxHfI+pHbFzwS874P6KJX5WVYj2IrwtTKsdsXHBTwnwPmOK11KH+M5dzwyAv/Hkzpcpct/KFJ0GxO5gbps3hjjzwVzalYxodsINxCZo4mv3gJoSERtiDny/pj9xnX7HdZrSECm98HzRjTXxsyi9djGIlnBD9wRf/E64ri0FcWEApEIuJSB2hCac+gZmCb11ql9hruT+rVNbJCN+G9L0GRN7zz3kOfrGUUIuIraKUSrif/OBAwPi8GU+UiSiqH8MhPQiDrEV1pQpTbqVhmiZhzVHhjtWGuIgLB+yfy8gAhGIVSOiY8EQB4NtNYNt/O3DBASmwlRNhWFSVsHygCGuMopfHuBaqKLW+hSxUMW1ZEqtNitmyZRj8X7VtngvsYwke7mdxoKm7JDaSutYIDUVebJBaig3ZofUUPjO3tlo2IJhuCG1bAZihdS0LY0NUtsGSRZIjVtns0Nq3YOcFVLzZu5skNp3xWeBrOF4geSQtZzTkBSypgMvkkHWdnLIHsgJiNdAAvECSCCehERzPgmJjuVkNcWEIQ4OXAMiEBFABCIQEUAEIhD1xAsVdusUYGo5wwAAAABJRU5ErkJggg==",
+          "complete": true,
+          "naturalWidth": 81,
+          "loaded": true
+        },
+        {
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFEAAABRCAYAAACqj0o2AAAC+klEQVR42u2czXHDIBCFUwIlqARKoASXoAJ88NU3uQKVoBJcAiVQgkugBGUyQ2Y0jOUIWJaHsoe9xI6Fv7Ds2x/ydX3cv8TKTCAIRIEoEMUEokAksvH6uPtgo0DMsx94azAvENPtsgEoEDPtGUGce4GowtmzXB93G32JNfzs5zXDsI742Rod4hDgrAfNVl7PLXqeQ47OKrjJmmi+MkQXPe+GClG/WWyK1VxX/CyFCFFH8gEJYuwZT0SxTQHQM2nDNUgdKIiq0IU5AkuuwP6Y3dR0lVybwFK96S9PoZQxK5FpEEGudqRZNYgLEUALBNDtAKzizopwFxoAgHvB0e95CdU5QwFwBiqPrW+yGlUzOlO4sisQvUPIOlxYiyKUQOuRz6SAaBsBHN9UY34/TxNBnLh04lzowikATdgZRwT9jUkCkUVnk7gjbUIQGcKOeGX8kZ4UuXGLtG8KkOLswIbXdELtkSIDetWO+ohl+yUD0hKgD+EzPGcmxAnIbHapI9SW71xW7QQdW8O9OYTrQlDZOVL5uezsbH/wvZBFWVsZXOmunFEhKsJqTumuHDaNsdcHjTogQdTEZx0ndIgJCM1w7tW2phDPALApxLMAbAZRdXoGQkGcTwSwCUR9MoBNIFqBWAaxZBcuGyG8LXVdCJtdOc0xww1xyUzHhoO1wycTvIUiW8mFmCppxobNr6rwciEaBoA1QPpQhlMI9cQp0YWpx4Kh4OVCTInKFC4zFLQERq6Cc+mU6adzp9WIygv9MtDRL3Ih7rugDImyQqSMfsN/hUi9UIEoEPMCS0t3dugQbQeBxaJDnDqQOBM6RNOB2DboEFMKEC3SPs8NkKMUxl2AWHqBqIFLYboXiDntAY6ibLPrG9yNqprtAd0bRLSWadPrG2do3juOuewzj5F4hLuAPQ80eZTLlL2O1nmg26hdDnk6JIA9jhvPrYNIz4PvFm339XIFw4ffhYWHeBnIba6uGXRw8g/XBKJAFIhiAlEgCkSBKCYQBaJA/Df2DcE6o28EdLdcAAAAAElFTkSuQmCC",
+          "complete": true,
+          "naturalWidth": 81,
+          "loaded": true
+        },
+        {
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFEAAABRCAYAAACqj0o2AAACzUlEQVR42u2cwZGkMAxFHQIhEAIhEAIhEAIX7s7AIRDChjAHAiCECcEhzNZWeav6MI2NLX0b+h90otuGh4QkW7Ix+2oohUIIhEiIhEghREIkREKkEOKzIQ5mXxezr87s65fZ18Ps688vcoTrLvx++HSIk9nXzeyrfwMsVXwYZ/oUiH3QolJwZ0BdmOdxEPugLT9A2WAwAZNYRc1L0Ux7Z4jDiYNAy6HqhJQGnitq35lWzneB6Aq0xQYvO74ZewzXbYGWu9Yhbhng/mlHlzlfF/5/ZDidJiFeAfh1om25MoZx8SDBJvx9Ad6rY7riGMYwD860hZxI6pvvLsSV/hfH0F8w81TLmGtDHBK98NUbXd6Msyi8YF8c/hRCPJTetH0zllWylKMWRKtoKpIQU0FaNMQ+wYxnhRdkFb/dPjvXVgpnNoF8Wxqi3n1namEsjOkahdglhD89AmIsJhyFVn40IP6PI2Vjx4yb8JFMxDQO0UQyG68NcQJoIQJiTBsnTYibWqyFhRiLcTdNiF41fcJCnMVM+mKKd2YC3c0gdpHnGTQgLiBTRkGMmfSiAdGppEx1IVqRUEcoLJhuCnESCdeEVH+8KcRR5BN1YcKzj7ABQdwU5ip/rptB1Nif+UiI0jAfC3EC7hw+FmLOHvafzEVVKESkd35Nzb4Vq8Hg3hkZJ0rAdC3GiciMRapMz7WWsSBz59jCQSpM31rujFzFkYLpW1vFQa4nXoXpMkyyynoicmW7pC7cvxTAN7myjdpj0Zaqeyyo3T5tqbrbh9p3rqmFkH1nRAWEphNqogICUYtjKuXjsFocRFWYVurYVFWYdn0iGmCV+kTtSlk0wGqVspo120iA1Wu2tboHJLzwbboHNPtYSuLA2/WxsKOKvX3sMn1klyn7ndl5zzMgHnkGBE8j4bk4PKGJZ4XxrDCeWkchREIkREKkECIhEiKFEKXkL3Putty8SBdtAAAAAElFTkSuQmCC",
+          "complete": true,
+          "naturalWidth": 81,
+          "loaded": true
+        },
+        {
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFEAAABRCAYAAACqj0o2AAABs0lEQVR42u3au5GDMBSFYZegEiiBElSCS1ABCpwqQ5VQAiWoBEpQCS6BDVbMMMw+7F090R+cxMYOvkHi6l5u2pob+V9AABFEEAmIIIIIIgERRBBBJCB2hyi0NUpbM2trVm3NdsgaPlfhOhC/wJu0Nc8T3Hd5husFiJ+R2hr/It45Pvy+a0T1R7xzVK+IsQCLQ5YCHN7Y/7Y39smhJ0QXGXCP6wVRJgLcI3tAXBIjLj0gbhlyaUSZCVFeGfGRCfFxZcQpE+IEIogsZx4slDh9lDgU2xz7aEDQCqMVRlOW8QCDKkamjEwZ3hMQQQQRRNI6ogxly/LD2dqF76ca6sNaEO8RWmNL+J+uEPfC2kc+O/tSBXiJO88n7if63HdmzrvPZRoNHPdPcRXEMUHv8J0e49g6oiqEl7VV1gNgcsiUD5CtwtxbQSy5BxbZI1M8hddKAY99SVEz4lQ5YJIXnmKPQbeGMtSI6BpDdLUhjo0B7hlrQpwbRZxrQRQVlzSvlDyiBkTVKGC0k0zPSznako6B6BtH9KURReOAewTTPqZ9IBIQQQQRRAIiiCCCSEAEEUQQya/5AAVK9gqvpkxgAAAAAElFTkSuQmCC",
+          "complete": true,
+          "naturalWidth": 81,
+          "loaded": true
+        }
+      ],
+      "missingText": []
+    },
+    {
+      "page": "history",
+      "scenario": "history-observed-events",
+      "width": 375,
+      "file": "history-history-observed-events-375.html",
+      "expectedText": [
+        "MJYH4CH/A",
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色"
+      ],
+      "viewport": 375,
+      "scrollWidth": 375,
+      "bodyHeight": 2729,
+      "overflow": [],
+      "clippedText": [],
+      "images": [
+        {
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFEAAABRCAYAAACqj0o2AAACF0lEQVR42u3cy43DIBAG4JTgUijBJVCCC+DgKzdTgUtICS7BJaQEl5ASnI3EXiLvZvyAGYb/MFKkPBx/CgOBgZsL/oY4F0AAIhCBiAAiEIEIRAQQgQhEICaM1gVvfx4PH2Hjc0DcCOOCH13wDxf8SoxHfI+pHbFzwS874P6KJX5WVYj2IrwtTKsdsXHBTwnwPmOK11KH+M5dzwyAv/Hkzpcpct/KFJ0GxO5gbps3hjjzwVzalYxodsINxCZo4mv3gJoSERtiDny/pj9xnX7HdZrSECm98HzRjTXxsyi9djGIlnBD9wRf/E64ri0FcWEApEIuJSB2hCac+gZmCb11ql9hruT+rVNbJCN+G9L0GRN7zz3kOfrGUUIuIraKUSrif/OBAwPi8GU+UiSiqH8MhPQiDrEV1pQpTbqVhmiZhzVHhjtWGuIgLB+yfy8gAhGIVSOiY8EQB4NtNYNt/O3DBASmwlRNhWFSVsHygCGuMopfHuBaqKLW+hSxUMW1ZEqtNitmyZRj8X7VtngvsYwke7mdxoKm7JDaSutYIDUVebJBaig3ZofUUPjO3tlo2IJhuCG1bAZihdS0LY0NUtsGSRZIjVtns0Nq3YOcFVLzZu5skNp3xWeBrOF4geSQtZzTkBSypgMvkkHWdnLIHsgJiNdAAvECSCCehERzPgmJjuVkNcWEIQ4OXAMiEBFABCIQEUAEIhD1xAsVdusUYGo5wwAAAABJRU5ErkJggg==",
+          "complete": true,
+          "naturalWidth": 81,
+          "loaded": true
+        },
+        {
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFEAAABRCAYAAACqj0o2AAAC+klEQVR42u2czXHDIBCFUwIlqARKoASXoAJ88NU3uQKVoBJcAiVQgkugBGUyQ2Y0jOUIWJaHsoe9xI6Fv7Ds2x/ydX3cv8TKTCAIRIEoEMUEokAksvH6uPtgo0DMsx94azAvENPtsgEoEDPtGUGce4GowtmzXB93G32JNfzs5zXDsI742Rod4hDgrAfNVl7PLXqeQ47OKrjJmmi+MkQXPe+GClG/WWyK1VxX/CyFCFFH8gEJYuwZT0SxTQHQM2nDNUgdKIiq0IU5AkuuwP6Y3dR0lVybwFK96S9PoZQxK5FpEEGudqRZNYgLEUALBNDtAKzizopwFxoAgHvB0e95CdU5QwFwBiqPrW+yGlUzOlO4sisQvUPIOlxYiyKUQOuRz6SAaBsBHN9UY34/TxNBnLh04lzowikATdgZRwT9jUkCkUVnk7gjbUIQGcKOeGX8kZ4UuXGLtG8KkOLswIbXdELtkSIDetWO+ohl+yUD0hKgD+EzPGcmxAnIbHapI9SW71xW7QQdW8O9OYTrQlDZOVL5uezsbH/wvZBFWVsZXOmunFEhKsJqTumuHDaNsdcHjTogQdTEZx0ndIgJCM1w7tW2phDPALApxLMAbAZRdXoGQkGcTwSwCUR9MoBNIFqBWAaxZBcuGyG8LXVdCJtdOc0xww1xyUzHhoO1wycTvIUiW8mFmCppxobNr6rwciEaBoA1QPpQhlMI9cQp0YWpx4Kh4OVCTInKFC4zFLQERq6Cc+mU6adzp9WIygv9MtDRL3Ih7rugDImyQqSMfsN/hUi9UIEoEPMCS0t3dugQbQeBxaJDnDqQOBM6RNOB2DboEFMKEC3SPs8NkKMUxl2AWHqBqIFLYboXiDntAY6ibLPrG9yNqprtAd0bRLSWadPrG2do3juOuewzj5F4hLuAPQ80eZTLlL2O1nmg26hdDnk6JIA9jhvPrYNIz4PvFm339XIFw4ffhYWHeBnIba6uGXRw8g/XBKJAFIhiAlEgCkSBKCYQBaJA/Df2DcE6o28EdLdcAAAAAElFTkSuQmCC",
+          "complete": true,
+          "naturalWidth": 81,
+          "loaded": true
+        },
+        {
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFEAAABRCAYAAACqj0o2AAACzUlEQVR42u2cwZGkMAxFHQIhEAIhEAIhEAIX7s7AIRDChjAHAiCECcEhzNZWeav6MI2NLX0b+h90otuGh4QkW7Ix+2oohUIIhEiIhEghREIkREKkEOKzIQ5mXxezr87s65fZ18Ps688vcoTrLvx++HSIk9nXzeyrfwMsVXwYZ/oUiH3QolJwZ0BdmOdxEPugLT9A2WAwAZNYRc1L0Ux7Z4jDiYNAy6HqhJQGnitq35lWzneB6Aq0xQYvO74ZewzXbYGWu9Yhbhng/mlHlzlfF/5/ZDidJiFeAfh1om25MoZx8SDBJvx9Ad6rY7riGMYwD860hZxI6pvvLsSV/hfH0F8w81TLmGtDHBK98NUbXd6Msyi8YF8c/hRCPJTetH0zllWylKMWRKtoKpIQU0FaNMQ+wYxnhRdkFb/dPjvXVgpnNoF8Wxqi3n1namEsjOkahdglhD89AmIsJhyFVn40IP6PI2Vjx4yb8JFMxDQO0UQyG68NcQJoIQJiTBsnTYibWqyFhRiLcTdNiF41fcJCnMVM+mKKd2YC3c0gdpHnGTQgLiBTRkGMmfSiAdGppEx1IVqRUEcoLJhuCnESCdeEVH+8KcRR5BN1YcKzj7ABQdwU5ip/rptB1Nif+UiI0jAfC3EC7hw+FmLOHvafzEVVKESkd35Nzb4Vq8Hg3hkZJ0rAdC3GiciMRapMz7WWsSBz59jCQSpM31rujFzFkYLpW1vFQa4nXoXpMkyyynoicmW7pC7cvxTAN7myjdpj0Zaqeyyo3T5tqbrbh9p3rqmFkH1nRAWEphNqogICUYtjKuXjsFocRFWYVurYVFWYdn0iGmCV+kTtSlk0wGqVspo120iA1Wu2tboHJLzwbboHNPtYSuLA2/WxsKOKvX3sMn1klyn7ndl5zzMgHnkGBE8j4bk4PKGJZ4XxrDCeWkchREIkREKkECIhEiKFEKXkL3Putty8SBdtAAAAAElFTkSuQmCC",
+          "complete": true,
+          "naturalWidth": 81,
+          "loaded": true
+        },
+        {
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFEAAABRCAYAAACqj0o2AAABs0lEQVR42u3au5GDMBSFYZegEiiBElSCS1ABCpwqQ5VQAiWoBEpQCS6BDVbMMMw+7F090R+cxMYOvkHi6l5u2pob+V9AABFEEAmIIIIIIgERRBBBJCB2hyi0NUpbM2trVm3NdsgaPlfhOhC/wJu0Nc8T3Hd5husFiJ+R2hr/It45Pvy+a0T1R7xzVK+IsQCLQ5YCHN7Y/7Y39smhJ0QXGXCP6wVRJgLcI3tAXBIjLj0gbhlyaUSZCVFeGfGRCfFxZcQpE+IEIogsZx4slDh9lDgU2xz7aEDQCqMVRlOW8QCDKkamjEwZ3hMQQQQRRNI6ogxly/LD2dqF76ca6sNaEO8RWmNL+J+uEPfC2kc+O/tSBXiJO88n7if63HdmzrvPZRoNHPdPcRXEMUHv8J0e49g6oiqEl7VV1gNgcsiUD5CtwtxbQSy5BxbZI1M8hddKAY99SVEz4lQ5YJIXnmKPQbeGMtSI6BpDdLUhjo0B7hlrQpwbRZxrQRQVlzSvlDyiBkTVKGC0k0zPSznako6B6BtH9KURReOAewTTPqZ9IBIQQQQRRAIiiCCCSEAEEUQQya/5AAVK9gqvpkxgAAAAAElFTkSuQmCC",
+          "complete": true,
+          "naturalWidth": 81,
+          "loaded": true
+        }
+      ],
+      "missingText": [],
+      "screenshot": "history-history-observed-events-375.png"
+    },
+    {
+      "page": "history",
+      "scenario": "history-observed-events",
+      "width": 430,
+      "file": "history-history-observed-events-430.html",
+      "expectedText": [
+        "MJYH4CH/A",
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色"
+      ],
+      "viewport": 430,
+      "scrollWidth": 430,
+      "bodyHeight": 3087,
+      "overflow": [],
+      "clippedText": [],
+      "images": [
+        {
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFEAAABRCAYAAACqj0o2AAACF0lEQVR42u3cy43DIBAG4JTgUijBJVCCC+DgKzdTgUtICS7BJaQEl5ASnI3EXiLvZvyAGYb/MFKkPBx/CgOBgZsL/oY4F0AAIhCBiAAiEIEIRAQQgQhEICaM1gVvfx4PH2Hjc0DcCOOCH13wDxf8SoxHfI+pHbFzwS874P6KJX5WVYj2IrwtTKsdsXHBTwnwPmOK11KH+M5dzwyAv/Hkzpcpct/KFJ0GxO5gbps3hjjzwVzalYxodsINxCZo4mv3gJoSERtiDny/pj9xnX7HdZrSECm98HzRjTXxsyi9djGIlnBD9wRf/E64ri0FcWEApEIuJSB2hCac+gZmCb11ql9hruT+rVNbJCN+G9L0GRN7zz3kOfrGUUIuIraKUSrif/OBAwPi8GU+UiSiqH8MhPQiDrEV1pQpTbqVhmiZhzVHhjtWGuIgLB+yfy8gAhGIVSOiY8EQB4NtNYNt/O3DBASmwlRNhWFSVsHygCGuMopfHuBaqKLW+hSxUMW1ZEqtNitmyZRj8X7VtngvsYwke7mdxoKm7JDaSutYIDUVebJBaig3ZofUUPjO3tlo2IJhuCG1bAZihdS0LY0NUtsGSRZIjVtns0Nq3YOcFVLzZu5skNp3xWeBrOF4geSQtZzTkBSypgMvkkHWdnLIHsgJiNdAAvECSCCehERzPgmJjuVkNcWEIQ4OXAMiEBFABCIQEUAEIhD1xAsVdusUYGo5wwAAAABJRU5ErkJggg==",
+          "complete": true,
+          "naturalWidth": 81,
+          "loaded": true
+        },
+        {
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFEAAABRCAYAAACqj0o2AAAC+klEQVR42u2czXHDIBCFUwIlqARKoASXoAJ88NU3uQKVoBJcAiVQgkugBGUyQ2Y0jOUIWJaHsoe9xI6Fv7Ds2x/ydX3cv8TKTCAIRIEoEMUEokAksvH6uPtgo0DMsx94azAvENPtsgEoEDPtGUGce4GowtmzXB93G32JNfzs5zXDsI742Rod4hDgrAfNVl7PLXqeQ47OKrjJmmi+MkQXPe+GClG/WWyK1VxX/CyFCFFH8gEJYuwZT0SxTQHQM2nDNUgdKIiq0IU5AkuuwP6Y3dR0lVybwFK96S9PoZQxK5FpEEGudqRZNYgLEUALBNDtAKzizopwFxoAgHvB0e95CdU5QwFwBiqPrW+yGlUzOlO4sisQvUPIOlxYiyKUQOuRz6SAaBsBHN9UY34/TxNBnLh04lzowikATdgZRwT9jUkCkUVnk7gjbUIQGcKOeGX8kZ4UuXGLtG8KkOLswIbXdELtkSIDetWO+ohl+yUD0hKgD+EzPGcmxAnIbHapI9SW71xW7QQdW8O9OYTrQlDZOVL5uezsbH/wvZBFWVsZXOmunFEhKsJqTumuHDaNsdcHjTogQdTEZx0ndIgJCM1w7tW2phDPALApxLMAbAZRdXoGQkGcTwSwCUR9MoBNIFqBWAaxZBcuGyG8LXVdCJtdOc0xww1xyUzHhoO1wycTvIUiW8mFmCppxobNr6rwciEaBoA1QPpQhlMI9cQp0YWpx4Kh4OVCTInKFC4zFLQERq6Cc+mU6adzp9WIygv9MtDRL3Ih7rugDImyQqSMfsN/hUi9UIEoEPMCS0t3dugQbQeBxaJDnDqQOBM6RNOB2DboEFMKEC3SPs8NkKMUxl2AWHqBqIFLYboXiDntAY6ibLPrG9yNqprtAd0bRLSWadPrG2do3juOuewzj5F4hLuAPQ80eZTLlL2O1nmg26hdDnk6JIA9jhvPrYNIz4PvFm339XIFw4ffhYWHeBnIba6uGXRw8g/XBKJAFIhiAlEgCkSBKCYQBaJA/Df2DcE6o28EdLdcAAAAAElFTkSuQmCC",
+          "complete": true,
+          "naturalWidth": 81,
+          "loaded": true
+        },
+        {
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFEAAABRCAYAAACqj0o2AAACzUlEQVR42u2cwZGkMAxFHQIhEAIhEAIhEAIX7s7AIRDChjAHAiCECcEhzNZWeav6MI2NLX0b+h90otuGh4QkW7Ix+2oohUIIhEiIhEghREIkREKkEOKzIQ5mXxezr87s65fZ18Ps688vcoTrLvx++HSIk9nXzeyrfwMsVXwYZ/oUiH3QolJwZ0BdmOdxEPugLT9A2WAwAZNYRc1L0Ux7Z4jDiYNAy6HqhJQGnitq35lWzneB6Aq0xQYvO74ZewzXbYGWu9Yhbhng/mlHlzlfF/5/ZDidJiFeAfh1om25MoZx8SDBJvx9Ad6rY7riGMYwD860hZxI6pvvLsSV/hfH0F8w81TLmGtDHBK98NUbXd6Msyi8YF8c/hRCPJTetH0zllWylKMWRKtoKpIQU0FaNMQ+wYxnhRdkFb/dPjvXVgpnNoF8Wxqi3n1namEsjOkahdglhD89AmIsJhyFVn40IP6PI2Vjx4yb8JFMxDQO0UQyG68NcQJoIQJiTBsnTYibWqyFhRiLcTdNiF41fcJCnMVM+mKKd2YC3c0gdpHnGTQgLiBTRkGMmfSiAdGppEx1IVqRUEcoLJhuCnESCdeEVH+8KcRR5BN1YcKzj7ABQdwU5ip/rptB1Nif+UiI0jAfC3EC7hw+FmLOHvafzEVVKESkd35Nzb4Vq8Hg3hkZJ0rAdC3GiciMRapMz7WWsSBz59jCQSpM31rujFzFkYLpW1vFQa4nXoXpMkyyynoicmW7pC7cvxTAN7myjdpj0Zaqeyyo3T5tqbrbh9p3rqmFkH1nRAWEphNqogICUYtjKuXjsFocRFWYVurYVFWYdn0iGmCV+kTtSlk0wGqVspo120iA1Wu2tboHJLzwbboHNPtYSuLA2/WxsKOKvX3sMn1klyn7ndl5zzMgHnkGBE8j4bk4PKGJZ4XxrDCeWkchREIkREKkECIhEiKFEKXkL3Putty8SBdtAAAAAElFTkSuQmCC",
+          "complete": true,
+          "naturalWidth": 81,
+          "loaded": true
+        },
+        {
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFEAAABRCAYAAACqj0o2AAABs0lEQVR42u3au5GDMBSFYZegEiiBElSCS1ABCpwqQ5VQAiWoBEpQCS6BDVbMMMw+7F090R+cxMYOvkHi6l5u2pob+V9AABFEEAmIIIIIIgERRBBBJCB2hyi0NUpbM2trVm3NdsgaPlfhOhC/wJu0Nc8T3Hd5husFiJ+R2hr/It45Pvy+a0T1R7xzVK+IsQCLQ5YCHN7Y/7Y39smhJ0QXGXCP6wVRJgLcI3tAXBIjLj0gbhlyaUSZCVFeGfGRCfFxZcQpE+IEIogsZx4slDh9lDgU2xz7aEDQCqMVRlOW8QCDKkamjEwZ3hMQQQQRRNI6ogxly/LD2dqF76ca6sNaEO8RWmNL+J+uEPfC2kc+O/tSBXiJO88n7if63HdmzrvPZRoNHPdPcRXEMUHv8J0e49g6oiqEl7VV1gNgcsiUD5CtwtxbQSy5BxbZI1M8hddKAY99SVEz4lQ5YJIXnmKPQbeGMtSI6BpDdLUhjo0B7hlrQpwbRZxrQRQVlzSvlDyiBkTVKGC0k0zPSznako6B6BtH9KURReOAewTTPqZ9IBIQQQQRRAIiiCCCSEAEEUQQya/5AAVK9gqvpkxgAAAAAElFTkSuQmCC",
+          "complete": true,
+          "naturalWidth": 81,
+          "loaded": true
+        }
+      ],
+      "missingText": []
+    },
+    {
+      "page": "history",
+      "scenario": "history-partial-stores",
+      "width": 320,
+      "file": "history-history-partial-stores-320.html",
+      "expectedText": [
+        "MJYH4CH/A",
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色"
+      ],
+      "viewport": 320,
+      "scrollWidth": 320,
+      "bodyHeight": 2304,
+      "overflow": [],
+      "clippedText": [],
+      "images": [
+        {
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFEAAABRCAYAAACqj0o2AAACF0lEQVR42u3cy43DIBAG4JTgUijBJVCCC+DgKzdTgUtICS7BJaQEl5ASnI3EXiLvZvyAGYb/MFKkPBx/CgOBgZsL/oY4F0AAIhCBiAAiEIEIRAQQgQhEICaM1gVvfx4PH2Hjc0DcCOOCH13wDxf8SoxHfI+pHbFzwS874P6KJX5WVYj2IrwtTKsdsXHBTwnwPmOK11KH+M5dzwyAv/Hkzpcpct/KFJ0GxO5gbps3hjjzwVzalYxodsINxCZo4mv3gJoSERtiDny/pj9xnX7HdZrSECm98HzRjTXxsyi9djGIlnBD9wRf/E64ri0FcWEApEIuJSB2hCac+gZmCb11ql9hruT+rVNbJCN+G9L0GRN7zz3kOfrGUUIuIraKUSrif/OBAwPi8GU+UiSiqH8MhPQiDrEV1pQpTbqVhmiZhzVHhjtWGuIgLB+yfy8gAhGIVSOiY8EQB4NtNYNt/O3DBASmwlRNhWFSVsHygCGuMopfHuBaqKLW+hSxUMW1ZEqtNitmyZRj8X7VtngvsYwke7mdxoKm7JDaSutYIDUVebJBaig3ZofUUPjO3tlo2IJhuCG1bAZihdS0LY0NUtsGSRZIjVtns0Nq3YOcFVLzZu5skNp3xWeBrOF4geSQtZzTkBSypgMvkkHWdnLIHsgJiNdAAvECSCCehERzPgmJjuVkNcWEIQ4OXAMiEBFABCIQEUAEIhD1xAsVdusUYGo5wwAAAABJRU5ErkJggg==",
+          "complete": true,
+          "naturalWidth": 81,
+          "loaded": true
+        },
+        {
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFEAAABRCAYAAACqj0o2AAAC+klEQVR42u2czXHDIBCFUwIlqARKoASXoAJ88NU3uQKVoBJcAiVQgkugBGUyQ2Y0jOUIWJaHsoe9xI6Fv7Ds2x/ydX3cv8TKTCAIRIEoEMUEokAksvH6uPtgo0DMsx94azAvENPtsgEoEDPtGUGce4GowtmzXB93G32JNfzs5zXDsI742Rod4hDgrAfNVl7PLXqeQ47OKrjJmmi+MkQXPe+GClG/WWyK1VxX/CyFCFFH8gEJYuwZT0SxTQHQM2nDNUgdKIiq0IU5AkuuwP6Y3dR0lVybwFK96S9PoZQxK5FpEEGudqRZNYgLEUALBNDtAKzizopwFxoAgHvB0e95CdU5QwFwBiqPrW+yGlUzOlO4sisQvUPIOlxYiyKUQOuRz6SAaBsBHN9UY34/TxNBnLh04lzowikATdgZRwT9jUkCkUVnk7gjbUIQGcKOeGX8kZ4UuXGLtG8KkOLswIbXdELtkSIDetWO+ohl+yUD0hKgD+EzPGcmxAnIbHapI9SW71xW7QQdW8O9OYTrQlDZOVL5uezsbH/wvZBFWVsZXOmunFEhKsJqTumuHDaNsdcHjTogQdTEZx0ndIgJCM1w7tW2phDPALApxLMAbAZRdXoGQkGcTwSwCUR9MoBNIFqBWAaxZBcuGyG8LXVdCJtdOc0xww1xyUzHhoO1wycTvIUiW8mFmCppxobNr6rwciEaBoA1QPpQhlMI9cQp0YWpx4Kh4OVCTInKFC4zFLQERq6Cc+mU6adzp9WIygv9MtDRL3Ih7rugDImyQqSMfsN/hUi9UIEoEPMCS0t3dugQbQeBxaJDnDqQOBM6RNOB2DboEFMKEC3SPs8NkKMUxl2AWHqBqIFLYboXiDntAY6ibLPrG9yNqprtAd0bRLSWadPrG2do3juOuewzj5F4hLuAPQ80eZTLlL2O1nmg26hdDnk6JIA9jhvPrYNIz4PvFm339XIFw4ffhYWHeBnIba6uGXRw8g/XBKJAFIhiAlEgCkSBKCYQBaJA/Df2DcE6o28EdLdcAAAAAElFTkSuQmCC",
+          "complete": true,
+          "naturalWidth": 81,
+          "loaded": true
+        },
+        {
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFEAAABRCAYAAACqj0o2AAACzUlEQVR42u2cwZGkMAxFHQIhEAIhEAIhEAIX7s7AIRDChjAHAiCECcEhzNZWeav6MI2NLX0b+h90otuGh4QkW7Ix+2oohUIIhEiIhEghREIkREKkEOKzIQ5mXxezr87s65fZ18Ps688vcoTrLvx++HSIk9nXzeyrfwMsVXwYZ/oUiH3QolJwZ0BdmOdxEPugLT9A2WAwAZNYRc1L0Ux7Z4jDiYNAy6HqhJQGnitq35lWzneB6Aq0xQYvO74ZewzXbYGWu9Yhbhng/mlHlzlfF/5/ZDidJiFeAfh1om25MoZx8SDBJvx9Ad6rY7riGMYwD860hZxI6pvvLsSV/hfH0F8w81TLmGtDHBK98NUbXd6Msyi8YF8c/hRCPJTetH0zllWylKMWRKtoKpIQU0FaNMQ+wYxnhRdkFb/dPjvXVgpnNoF8Wxqi3n1namEsjOkahdglhD89AmIsJhyFVn40IP6PI2Vjx4yb8JFMxDQO0UQyG68NcQJoIQJiTBsnTYibWqyFhRiLcTdNiF41fcJCnMVM+mKKd2YC3c0gdpHnGTQgLiBTRkGMmfSiAdGppEx1IVqRUEcoLJhuCnESCdeEVH+8KcRR5BN1YcKzj7ABQdwU5ip/rptB1Nif+UiI0jAfC3EC7hw+FmLOHvafzEVVKESkd35Nzb4Vq8Hg3hkZJ0rAdC3GiciMRapMz7WWsSBz59jCQSpM31rujFzFkYLpW1vFQa4nXoXpMkyyynoicmW7pC7cvxTAN7myjdpj0Zaqeyyo3T5tqbrbh9p3rqmFkH1nRAWEphNqogICUYtjKuXjsFocRFWYVurYVFWYdn0iGmCV+kTtSlk0wGqVspo120iA1Wu2tboHJLzwbboHNPtYSuLA2/WxsKOKvX3sMn1klyn7ndl5zzMgHnkGBE8j4bk4PKGJZ4XxrDCeWkchREIkREKkECIhEiKFEKXkL3Putty8SBdtAAAAAElFTkSuQmCC",
+          "complete": true,
+          "naturalWidth": 81,
+          "loaded": true
+        },
+        {
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFEAAABRCAYAAACqj0o2AAABs0lEQVR42u3au5GDMBSFYZegEiiBElSCS1ABCpwqQ5VQAiWoBEpQCS6BDVbMMMw+7F090R+cxMYOvkHi6l5u2pob+V9AABFEEAmIIIIIIgERRBBBJCB2hyi0NUpbM2trVm3NdsgaPlfhOhC/wJu0Nc8T3Hd5husFiJ+R2hr/It45Pvy+a0T1R7xzVK+IsQCLQ5YCHN7Y/7Y39smhJ0QXGXCP6wVRJgLcI3tAXBIjLj0gbhlyaUSZCVFeGfGRCfFxZcQpE+IEIogsZx4slDh9lDgU2xz7aEDQCqMVRlOW8QCDKkamjEwZ3hMQQQQRRNI6ogxly/LD2dqF76ca6sNaEO8RWmNL+J+uEPfC2kc+O/tSBXiJO88n7if63HdmzrvPZRoNHPdPcRXEMUHv8J0e49g6oiqEl7VV1gNgcsiUD5CtwtxbQSy5BxbZI1M8hddKAY99SVEz4lQ5YJIXnmKPQbeGMtSI6BpDdLUhjo0B7hlrQpwbRZxrQRQVlzSvlDyiBkTVKGC0k0zPSznako6B6BtH9KURReOAewTTPqZ9IBIQQQQRRAIiiCCCSEAEEUQQya/5AAVK9gqvpkxgAAAAAElFTkSuQmCC",
+          "complete": true,
+          "naturalWidth": 81,
+          "loaded": true
+        }
+      ],
+      "missingText": []
+    },
+    {
+      "page": "history",
+      "scenario": "history-partial-stores",
+      "width": 375,
+      "file": "history-history-partial-stores-375.html",
+      "expectedText": [
+        "MJYH4CH/A",
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色"
+      ],
+      "viewport": 375,
+      "scrollWidth": 375,
+      "bodyHeight": 2652,
+      "overflow": [],
+      "clippedText": [],
+      "images": [
+        {
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFEAAABRCAYAAACqj0o2AAACF0lEQVR42u3cy43DIBAG4JTgUijBJVCCC+DgKzdTgUtICS7BJaQEl5ASnI3EXiLvZvyAGYb/MFKkPBx/CgOBgZsL/oY4F0AAIhCBiAAiEIEIRAQQgQhEICaM1gVvfx4PH2Hjc0DcCOOCH13wDxf8SoxHfI+pHbFzwS874P6KJX5WVYj2IrwtTKsdsXHBTwnwPmOK11KH+M5dzwyAv/Hkzpcpct/KFJ0GxO5gbps3hjjzwVzalYxodsINxCZo4mv3gJoSERtiDny/pj9xnX7HdZrSECm98HzRjTXxsyi9djGIlnBD9wRf/E64ri0FcWEApEIuJSB2hCac+gZmCb11ql9hruT+rVNbJCN+G9L0GRN7zz3kOfrGUUIuIraKUSrif/OBAwPi8GU+UiSiqH8MhPQiDrEV1pQpTbqVhmiZhzVHhjtWGuIgLB+yfy8gAhGIVSOiY8EQB4NtNYNt/O3DBASmwlRNhWFSVsHygCGuMopfHuBaqKLW+hSxUMW1ZEqtNitmyZRj8X7VtngvsYwke7mdxoKm7JDaSutYIDUVebJBaig3ZofUUPjO3tlo2IJhuCG1bAZihdS0LY0NUtsGSRZIjVtns0Nq3YOcFVLzZu5skNp3xWeBrOF4geSQtZzTkBSypgMvkkHWdnLIHsgJiNdAAvECSCCehERzPgmJjuVkNcWEIQ4OXAMiEBFABCIQEUAEIhD1xAsVdusUYGo5wwAAAABJRU5ErkJggg==",
+          "complete": true,
+          "naturalWidth": 81,
+          "loaded": true
+        },
+        {
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFEAAABRCAYAAACqj0o2AAAC+klEQVR42u2czXHDIBCFUwIlqARKoASXoAJ88NU3uQKVoBJcAiVQgkugBGUyQ2Y0jOUIWJaHsoe9xI6Fv7Ds2x/ydX3cv8TKTCAIRIEoEMUEokAksvH6uPtgo0DMsx94azAvENPtsgEoEDPtGUGce4GowtmzXB93G32JNfzs5zXDsI742Rod4hDgrAfNVl7PLXqeQ47OKrjJmmi+MkQXPe+GClG/WWyK1VxX/CyFCFFH8gEJYuwZT0SxTQHQM2nDNUgdKIiq0IU5AkuuwP6Y3dR0lVybwFK96S9PoZQxK5FpEEGudqRZNYgLEUALBNDtAKzizopwFxoAgHvB0e95CdU5QwFwBiqPrW+yGlUzOlO4sisQvUPIOlxYiyKUQOuRz6SAaBsBHN9UY34/TxNBnLh04lzowikATdgZRwT9jUkCkUVnk7gjbUIQGcKOeGX8kZ4UuXGLtG8KkOLswIbXdELtkSIDetWO+ohl+yUD0hKgD+EzPGcmxAnIbHapI9SW71xW7QQdW8O9OYTrQlDZOVL5uezsbH/wvZBFWVsZXOmunFEhKsJqTumuHDaNsdcHjTogQdTEZx0ndIgJCM1w7tW2phDPALApxLMAbAZRdXoGQkGcTwSwCUR9MoBNIFqBWAaxZBcuGyG8LXVdCJtdOc0xww1xyUzHhoO1wycTvIUiW8mFmCppxobNr6rwciEaBoA1QPpQhlMI9cQp0YWpx4Kh4OVCTInKFC4zFLQERq6Cc+mU6adzp9WIygv9MtDRL3Ih7rugDImyQqSMfsN/hUi9UIEoEPMCS0t3dugQbQeBxaJDnDqQOBM6RNOB2DboEFMKEC3SPs8NkKMUxl2AWHqBqIFLYboXiDntAY6ibLPrG9yNqprtAd0bRLSWadPrG2do3juOuewzj5F4hLuAPQ80eZTLlL2O1nmg26hdDnk6JIA9jhvPrYNIz4PvFm339XIFw4ffhYWHeBnIba6uGXRw8g/XBKJAFIhiAlEgCkSBKCYQBaJA/Df2DcE6o28EdLdcAAAAAElFTkSuQmCC",
+          "complete": true,
+          "naturalWidth": 81,
+          "loaded": true
+        },
+        {
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFEAAABRCAYAAACqj0o2AAACzUlEQVR42u2cwZGkMAxFHQIhEAIhEAIhEAIX7s7AIRDChjAHAiCECcEhzNZWeav6MI2NLX0b+h90otuGh4QkW7Ix+2oohUIIhEiIhEghREIkREKkEOKzIQ5mXxezr87s65fZ18Ps688vcoTrLvx++HSIk9nXzeyrfwMsVXwYZ/oUiH3QolJwZ0BdmOdxEPugLT9A2WAwAZNYRc1L0Ux7Z4jDiYNAy6HqhJQGnitq35lWzneB6Aq0xQYvO74ZewzXbYGWu9Yhbhng/mlHlzlfF/5/ZDidJiFeAfh1om25MoZx8SDBJvx9Ad6rY7riGMYwD860hZxI6pvvLsSV/hfH0F8w81TLmGtDHBK98NUbXd6Msyi8YF8c/hRCPJTetH0zllWylKMWRKtoKpIQU0FaNMQ+wYxnhRdkFb/dPjvXVgpnNoF8Wxqi3n1namEsjOkahdglhD89AmIsJhyFVn40IP6PI2Vjx4yb8JFMxDQO0UQyG68NcQJoIQJiTBsnTYibWqyFhRiLcTdNiF41fcJCnMVM+mKKd2YC3c0gdpHnGTQgLiBTRkGMmfSiAdGppEx1IVqRUEcoLJhuCnESCdeEVH+8KcRR5BN1YcKzj7ABQdwU5ip/rptB1Nif+UiI0jAfC3EC7hw+FmLOHvafzEVVKESkd35Nzb4Vq8Hg3hkZJ0rAdC3GiciMRapMz7WWsSBz59jCQSpM31rujFzFkYLpW1vFQa4nXoXpMkyyynoicmW7pC7cvxTAN7myjdpj0Zaqeyyo3T5tqbrbh9p3rqmFkH1nRAWEphNqogICUYtjKuXjsFocRFWYVurYVFWYdn0iGmCV+kTtSlk0wGqVspo120iA1Wu2tboHJLzwbboHNPtYSuLA2/WxsKOKvX3sMn1klyn7ndl5zzMgHnkGBE8j4bk4PKGJZ4XxrDCeWkchREIkREKkECIhEiKFEKXkL3Putty8SBdtAAAAAElFTkSuQmCC",
+          "complete": true,
+          "naturalWidth": 81,
+          "loaded": true
+        },
+        {
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFEAAABRCAYAAACqj0o2AAABs0lEQVR42u3au5GDMBSFYZegEiiBElSCS1ABCpwqQ5VQAiWoBEpQCS6BDVbMMMw+7F090R+cxMYOvkHi6l5u2pob+V9AABFEEAmIIIIIIgERRBBBJCB2hyi0NUpbM2trVm3NdsgaPlfhOhC/wJu0Nc8T3Hd5husFiJ+R2hr/It45Pvy+a0T1R7xzVK+IsQCLQ5YCHN7Y/7Y39smhJ0QXGXCP6wVRJgLcI3tAXBIjLj0gbhlyaUSZCVFeGfGRCfFxZcQpE+IEIogsZx4slDh9lDgU2xz7aEDQCqMVRlOW8QCDKkamjEwZ3hMQQQQRRNI6ogxly/LD2dqF76ca6sNaEO8RWmNL+J+uEPfC2kc+O/tSBXiJO88n7if63HdmzrvPZRoNHPdPcRXEMUHv8J0e49g6oiqEl7VV1gNgcsiUD5CtwtxbQSy5BxbZI1M8hddKAY99SVEz4lQ5YJIXnmKPQbeGMtSI6BpDdLUhjo0B7hlrQpwbRZxrQRQVlzSvlDyiBkTVKGC0k0zPSznako6B6BtH9KURReOAewTTPqZ9IBIQQQQRRAIiiCCCSEAEEUQQya/5AAVK9gqvpkxgAAAAAElFTkSuQmCC",
+          "complete": true,
+          "naturalWidth": 81,
+          "loaded": true
+        }
+      ],
+      "missingText": [],
+      "screenshot": "history-history-partial-stores-375.png"
+    },
+    {
+      "page": "history",
+      "scenario": "history-partial-stores",
+      "width": 430,
+      "file": "history-history-partial-stores-430.html",
+      "expectedText": [
+        "MJYH4CH/A",
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色"
+      ],
+      "viewport": 430,
+      "scrollWidth": 430,
+      "bodyHeight": 2999,
+      "overflow": [],
+      "clippedText": [],
+      "images": [
+        {
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFEAAABRCAYAAACqj0o2AAACF0lEQVR42u3cy43DIBAG4JTgUijBJVCCC+DgKzdTgUtICS7BJaQEl5ASnI3EXiLvZvyAGYb/MFKkPBx/CgOBgZsL/oY4F0AAIhCBiAAiEIEIRAQQgQhEICaM1gVvfx4PH2Hjc0DcCOOCH13wDxf8SoxHfI+pHbFzwS874P6KJX5WVYj2IrwtTKsdsXHBTwnwPmOK11KH+M5dzwyAv/Hkzpcpct/KFJ0GxO5gbps3hjjzwVzalYxodsINxCZo4mv3gJoSERtiDny/pj9xnX7HdZrSECm98HzRjTXxsyi9djGIlnBD9wRf/E64ri0FcWEApEIuJSB2hCac+gZmCb11ql9hruT+rVNbJCN+G9L0GRN7zz3kOfrGUUIuIraKUSrif/OBAwPi8GU+UiSiqH8MhPQiDrEV1pQpTbqVhmiZhzVHhjtWGuIgLB+yfy8gAhGIVSOiY8EQB4NtNYNt/O3DBASmwlRNhWFSVsHygCGuMopfHuBaqKLW+hSxUMW1ZEqtNitmyZRj8X7VtngvsYwke7mdxoKm7JDaSutYIDUVebJBaig3ZofUUPjO3tlo2IJhuCG1bAZihdS0LY0NUtsGSRZIjVtns0Nq3YOcFVLzZu5skNp3xWeBrOF4geSQtZzTkBSypgMvkkHWdnLIHsgJiNdAAvECSCCehERzPgmJjuVkNcWEIQ4OXAMiEBFABCIQEUAEIhD1xAsVdusUYGo5wwAAAABJRU5ErkJggg==",
+          "complete": true,
+          "naturalWidth": 81,
+          "loaded": true
+        },
+        {
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFEAAABRCAYAAACqj0o2AAAC+klEQVR42u2czXHDIBCFUwIlqARKoASXoAJ88NU3uQKVoBJcAiVQgkugBGUyQ2Y0jOUIWJaHsoe9xI6Fv7Ds2x/ydX3cv8TKTCAIRIEoEMUEokAksvH6uPtgo0DMsx94azAvENPtsgEoEDPtGUGce4GowtmzXB93G32JNfzs5zXDsI742Rod4hDgrAfNVl7PLXqeQ47OKrjJmmi+MkQXPe+GClG/WWyK1VxX/CyFCFFH8gEJYuwZT0SxTQHQM2nDNUgdKIiq0IU5AkuuwP6Y3dR0lVybwFK96S9PoZQxK5FpEEGudqRZNYgLEUALBNDtAKzizopwFxoAgHvB0e95CdU5QwFwBiqPrW+yGlUzOlO4sisQvUPIOlxYiyKUQOuRz6SAaBsBHN9UY34/TxNBnLh04lzowikATdgZRwT9jUkCkUVnk7gjbUIQGcKOeGX8kZ4UuXGLtG8KkOLswIbXdELtkSIDetWO+ohl+yUD0hKgD+EzPGcmxAnIbHapI9SW71xW7QQdW8O9OYTrQlDZOVL5uezsbH/wvZBFWVsZXOmunFEhKsJqTumuHDaNsdcHjTogQdTEZx0ndIgJCM1w7tW2phDPALApxLMAbAZRdXoGQkGcTwSwCUR9MoBNIFqBWAaxZBcuGyG8LXVdCJtdOc0xww1xyUzHhoO1wycTvIUiW8mFmCppxobNr6rwciEaBoA1QPpQhlMI9cQp0YWpx4Kh4OVCTInKFC4zFLQERq6Cc+mU6adzp9WIygv9MtDRL3Ih7rugDImyQqSMfsN/hUi9UIEoEPMCS0t3dugQbQeBxaJDnDqQOBM6RNOB2DboEFMKEC3SPs8NkKMUxl2AWHqBqIFLYboXiDntAY6ibLPrG9yNqprtAd0bRLSWadPrG2do3juOuewzj5F4hLuAPQ80eZTLlL2O1nmg26hdDnk6JIA9jhvPrYNIz4PvFm339XIFw4ffhYWHeBnIba6uGXRw8g/XBKJAFIhiAlEgCkSBKCYQBaJA/Df2DcE6o28EdLdcAAAAAElFTkSuQmCC",
+          "complete": true,
+          "naturalWidth": 81,
+          "loaded": true
+        },
+        {
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFEAAABRCAYAAACqj0o2AAACzUlEQVR42u2cwZGkMAxFHQIhEAIhEAIhEAIX7s7AIRDChjAHAiCECcEhzNZWeav6MI2NLX0b+h90otuGh4QkW7Ix+2oohUIIhEiIhEghREIkREKkEOKzIQ5mXxezr87s65fZ18Ps688vcoTrLvx++HSIk9nXzeyrfwMsVXwYZ/oUiH3QolJwZ0BdmOdxEPugLT9A2WAwAZNYRc1L0Ux7Z4jDiYNAy6HqhJQGnitq35lWzneB6Aq0xQYvO74ZewzXbYGWu9Yhbhng/mlHlzlfF/5/ZDidJiFeAfh1om25MoZx8SDBJvx9Ad6rY7riGMYwD860hZxI6pvvLsSV/hfH0F8w81TLmGtDHBK98NUbXd6Msyi8YF8c/hRCPJTetH0zllWylKMWRKtoKpIQU0FaNMQ+wYxnhRdkFb/dPjvXVgpnNoF8Wxqi3n1namEsjOkahdglhD89AmIsJhyFVn40IP6PI2Vjx4yb8JFMxDQO0UQyG68NcQJoIQJiTBsnTYibWqyFhRiLcTdNiF41fcJCnMVM+mKKd2YC3c0gdpHnGTQgLiBTRkGMmfSiAdGppEx1IVqRUEcoLJhuCnESCdeEVH+8KcRR5BN1YcKzj7ABQdwU5ip/rptB1Nif+UiI0jAfC3EC7hw+FmLOHvafzEVVKESkd35Nzb4Vq8Hg3hkZJ0rAdC3GiciMRapMz7WWsSBz59jCQSpM31rujFzFkYLpW1vFQa4nXoXpMkyyynoicmW7pC7cvxTAN7myjdpj0Zaqeyyo3T5tqbrbh9p3rqmFkH1nRAWEphNqogICUYtjKuXjsFocRFWYVurYVFWYdn0iGmCV+kTtSlk0wGqVspo120iA1Wu2tboHJLzwbboHNPtYSuLA2/WxsKOKvX3sMn1klyn7ndl5zzMgHnkGBE8j4bk4PKGJZ4XxrDCeWkchREIkREKkECIhEiKFEKXkL3Putty8SBdtAAAAAElFTkSuQmCC",
+          "complete": true,
+          "naturalWidth": 81,
+          "loaded": true
+        },
+        {
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFEAAABRCAYAAACqj0o2AAABs0lEQVR42u3au5GDMBSFYZegEiiBElSCS1ABCpwqQ5VQAiWoBEpQCS6BDVbMMMw+7F090R+cxMYOvkHi6l5u2pob+V9AABFEEAmIIIIIIgERRBBBJCB2hyi0NUpbM2trVm3NdsgaPlfhOhC/wJu0Nc8T3Hd5husFiJ+R2hr/It45Pvy+a0T1R7xzVK+IsQCLQ5YCHN7Y/7Y39smhJ0QXGXCP6wVRJgLcI3tAXBIjLj0gbhlyaUSZCVFeGfGRCfFxZcQpE+IEIogsZx4slDh9lDgU2xz7aEDQCqMVRlOW8QCDKkamjEwZ3hMQQQQRRNI6ogxly/LD2dqF76ca6sNaEO8RWmNL+J+uEPfC2kc+O/tSBXiJO88n7if63HdmzrvPZRoNHPdPcRXEMUHv8J0e49g6oiqEl7VV1gNgcsiUD5CtwtxbQSy5BxbZI1M8hddKAY99SVEz4lQ5YJIXnmKPQbeGMtSI6BpDdLUhjo0B7hlrQpwbRZxrQRQVlzSvlDyiBkTVKGC0k0zPSznako6B6BtH9KURReOAewTTPqZ9IBIQQQQRRAIiiCCCSEAEEUQQya/5AAVK9gqvpkxgAAAAAElFTkSuQmCC",
+          "complete": true,
+          "naturalWidth": 81,
+          "loaded": true
+        }
+      ],
+      "missingText": []
+    }
+  ],
+  "screenshotDirectory": "C:\\Users\\Administrator\\WeChatProjects\\miniprogram-6\\output\\history-data-layout\\screenshots",
+  "summary": {
+    "total": 18,
+    "expressionErrors": 0,
+    "missingText": 0,
+    "horizontalOverflow": 0,
+    "clippedText": 0,
+    "failedImages": 0
+  }
+}

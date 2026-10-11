@@ -1,0 +1,17 @@
+{
+  "version": "1.6.1",
+  "appid": "wxe96ad9e77b602f1b",
+  "uploadedAt": "2026-10-08T04:47:00Z",
+  "timePrecision": "minute",
+  "method": "WeChat DevTools CLI upload",
+  "successMarker": "upload",
+  "packageBytes": 763017,
+  "sourceCommit": "56ad3ea91ff2e5668e4dee3db486a35009560fb9",
+  "runtimeSourceCommit": "3cedb9e9b76b171b38ecab9820753af31de4bb32",
+  "cloudDeployed": true,
+  "cloudComparedFiles": 112,
+  "deviceAcceptanceConfirmed": false,
+  "reviewSubmittedConfirmed": false,
+  "formallyPublishedConfirmed": false,
+  "scope": "CLI upload receipt and downloaded cloud runtime source verification; no claim of device acceptance, review or formal publication."
+}

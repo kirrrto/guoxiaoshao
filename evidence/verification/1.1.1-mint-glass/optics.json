@@ -1,0 +1,1538 @@
+{
+  "checkedAt": "2026-09-16T03:59:12.345Z",
+  "previewGeneratedAt": "2026-09-16T03:59:02.974Z",
+  "renderer": "Headless Chromium (Edge), real component from offline WXML/WXSS preview; not WeChat or a physical device",
+  "method": "Fine-line contrast uses 1px black/white vertical stripes beneath the real surface. Tab controls are hidden only for the optical sample; all are present for text screenshots and tap checks. Fallback removes positive feature-support blocks to exercise actual base CSS.",
+  "limitations": "Tests clarity and localized blur. Does not verify optical refraction, lens warping, native GPU behavior, or device-specific accessibility settings.",
+  "sources": [
+    {
+      "file": "miniprogram/custom-tab-bar/index.wxml",
+      "sha256": "0815bf08a7d475376855437e6448b7699ec0eed38b4a207a0b8fb626243b21a4"
+    },
+    {
+      "file": "miniprogram/custom-tab-bar/index.wxss",
+      "sha256": "14ac5fcdaca05c2ef6a950d56f965bccca155ce4f8179d121f0f5654e9516047"
+    }
+  ],
+  "summary": {
+    "total": 9,
+    "failed": 0
+  },
+  "records": [
+    {
+      "width": 320,
+      "mode": "supported",
+      "previewFile": "query-member-320.html",
+      "previewSha256": "2a58b59f951ecfe533f5d53ea30b82dcb8191e4cec2b20a1b3b992b4a6ab8787",
+      "removedSupportRules": [],
+      "bounds": {
+        "left": 12,
+        "top": 742,
+        "right": 308,
+        "bottom": 808,
+        "width": 296,
+        "height": 66
+      },
+      "mainSurface": {
+        "backdropFilter": "none",
+        "filter": "none",
+        "pointerEvents": "auto",
+        "maskImage": "none",
+        "backgroundColor": "rgba(255, 255, 255, 0.055)",
+        "backgroundImage": "none"
+      },
+      "effects": [
+        {
+          "className": "floating-tab-glass",
+          "bounds": {
+            "left": 12,
+            "top": 742,
+            "right": 308,
+            "bottom": 808,
+            "width": 296,
+            "height": 66
+          },
+          "backdropFilter": "none",
+          "filter": "none",
+          "pointerEvents": "auto",
+          "maskImage": "none",
+          "backgroundColor": "rgba(255, 255, 255, 0.055)",
+          "backgroundImage": "none"
+        },
+        {
+          "className": "floating-tab-edge floating-tab-edge-left",
+          "bounds": {
+            "left": 13,
+            "top": 743,
+            "right": 49,
+            "bottom": 807,
+            "width": 36,
+            "height": 64
+          },
+          "backdropFilter": "blur(7px) saturate(1.08)",
+          "filter": "none",
+          "pointerEvents": "none",
+          "maskImage": "linear-gradient(90deg, rgb(0, 0, 0), rgba(0, 0, 0, 0.6) 38%, rgba(0, 0, 0, 0))",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "backgroundImage": "linear-gradient(90deg, rgba(255, 255, 255, 0.36), rgba(255, 255, 255, 0.13) 35%, rgba(255, 255, 255, 0) 100%)"
+        },
+        {
+          "className": "floating-tab-edge floating-tab-edge-right",
+          "bounds": {
+            "left": 271,
+            "top": 743,
+            "right": 307,
+            "bottom": 807,
+            "width": 36,
+            "height": 64
+          },
+          "backdropFilter": "blur(7px) saturate(1.08)",
+          "filter": "none",
+          "pointerEvents": "none",
+          "maskImage": "linear-gradient(270deg, rgb(0, 0, 0), rgba(0, 0, 0, 0.6) 38%, rgba(0, 0, 0, 0))",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "backgroundImage": "linear-gradient(270deg, rgba(255, 255, 255, 0.36), rgba(255, 255, 255, 0.13) 35%, rgba(255, 255, 255, 0) 100%)"
+        }
+      ],
+      "buttons": [
+        {
+          "bounds": {
+            "left": 18,
+            "top": 748,
+            "right": 89,
+            "bottom": 802,
+            "width": 71,
+            "height": 54
+          },
+          "hit": true,
+          "label": "查询"
+        },
+        {
+          "bounds": {
+            "left": 89,
+            "top": 748,
+            "right": 160,
+            "bottom": 802,
+            "width": 71,
+            "height": 54
+          },
+          "hit": true,
+          "label": "小哨"
+        },
+        {
+          "bounds": {
+            "left": 160,
+            "top": 748,
+            "right": 231,
+            "bottom": 802,
+            "width": 71,
+            "height": 54
+          },
+          "hit": true,
+          "label": "历史"
+        },
+        {
+          "bounds": {
+            "left": 231,
+            "top": 748,
+            "right": 302,
+            "bottom": 802,
+            "width": 71,
+            "height": 54
+          },
+          "hit": true,
+          "label": "我的"
+        }
+      ],
+      "issues": [],
+      "optical": {
+        "center": {
+          "roi": {
+            "left": 128,
+            "right": 192,
+            "top": 769,
+            "bottom": 781
+          },
+          "baselineContrast": 255,
+          "renderedContrast": 241,
+          "retainedContrast": 0.9450980392156862
+        },
+        "leftEdge": {
+          "roi": {
+            "left": 20,
+            "right": 32,
+            "top": 769,
+            "bottom": 781
+          },
+          "baselineContrast": 255,
+          "renderedContrast": 90.39393939393939,
+          "retainedContrast": 0.354486036838978
+        },
+        "rightEdge": {
+          "roi": {
+            "left": 288,
+            "right": 300,
+            "top": 769,
+            "bottom": 781
+          },
+          "baselineContrast": 255,
+          "renderedContrast": 91.3409090909091,
+          "retainedContrast": 0.35819964349376116
+        }
+      },
+      "screenshots": [
+        "optics/320-supported-text.png",
+        "optics/320-supported-text-detail.png",
+        "optics/320-supported-fine-lines.png"
+      ]
+    },
+    {
+      "width": 320,
+      "mode": "no-mask",
+      "previewFile": "query-member-320.html",
+      "previewSha256": "2a58b59f951ecfe533f5d53ea30b82dcb8191e4cec2b20a1b3b992b4a6ab8787",
+      "removedSupportRules": [
+        "((-webkit-mask-image: linear-gradient(black, transparent)) or (mask-image: linear-gradient(black, transparent)))"
+      ],
+      "bounds": {
+        "left": 12,
+        "top": 742,
+        "right": 308,
+        "bottom": 808,
+        "width": 296,
+        "height": 66
+      },
+      "mainSurface": {
+        "backdropFilter": "none",
+        "filter": "none",
+        "pointerEvents": "auto",
+        "maskImage": "none",
+        "backgroundColor": "rgba(255, 255, 255, 0.055)",
+        "backgroundImage": "none"
+      },
+      "effects": [
+        {
+          "className": "floating-tab-glass",
+          "bounds": {
+            "left": 12,
+            "top": 742,
+            "right": 308,
+            "bottom": 808,
+            "width": 296,
+            "height": 66
+          },
+          "backdropFilter": "none",
+          "filter": "none",
+          "pointerEvents": "auto",
+          "maskImage": "none",
+          "backgroundColor": "rgba(255, 255, 255, 0.055)",
+          "backgroundImage": "none"
+        },
+        {
+          "className": "floating-tab-edge floating-tab-edge-left",
+          "bounds": {
+            "left": 13,
+            "top": 743,
+            "right": 49,
+            "bottom": 807,
+            "width": 36,
+            "height": 64
+          },
+          "backdropFilter": "none",
+          "filter": "none",
+          "pointerEvents": "none",
+          "maskImage": "none",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "backgroundImage": "linear-gradient(90deg, rgba(255, 255, 255, 0.36), rgba(255, 255, 255, 0.13) 35%, rgba(255, 255, 255, 0) 100%)"
+        },
+        {
+          "className": "floating-tab-edge floating-tab-edge-right",
+          "bounds": {
+            "left": 271,
+            "top": 743,
+            "right": 307,
+            "bottom": 807,
+            "width": 36,
+            "height": 64
+          },
+          "backdropFilter": "none",
+          "filter": "none",
+          "pointerEvents": "none",
+          "maskImage": "none",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "backgroundImage": "linear-gradient(270deg, rgba(255, 255, 255, 0.36), rgba(255, 255, 255, 0.13) 35%, rgba(255, 255, 255, 0) 100%)"
+        }
+      ],
+      "buttons": [
+        {
+          "bounds": {
+            "left": 18,
+            "top": 748,
+            "right": 89,
+            "bottom": 802,
+            "width": 71,
+            "height": 54
+          },
+          "hit": true,
+          "label": "查询"
+        },
+        {
+          "bounds": {
+            "left": 89,
+            "top": 748,
+            "right": 160,
+            "bottom": 802,
+            "width": 71,
+            "height": 54
+          },
+          "hit": true,
+          "label": "小哨"
+        },
+        {
+          "bounds": {
+            "left": 160,
+            "top": 748,
+            "right": 231,
+            "bottom": 802,
+            "width": 71,
+            "height": 54
+          },
+          "hit": true,
+          "label": "历史"
+        },
+        {
+          "bounds": {
+            "left": 231,
+            "top": 748,
+            "right": 302,
+            "bottom": 802,
+            "width": 71,
+            "height": 54
+          },
+          "hit": true,
+          "label": "我的"
+        }
+      ],
+      "issues": [],
+      "optical": {
+        "center": {
+          "roi": {
+            "left": 128,
+            "right": 192,
+            "top": 769,
+            "bottom": 781
+          },
+          "baselineContrast": 255,
+          "renderedContrast": 241,
+          "retainedContrast": 0.9450980392156862
+        },
+        "leftEdge": {
+          "roi": {
+            "left": 20,
+            "right": 32,
+            "top": 769,
+            "bottom": 781
+          },
+          "baselineContrast": 255,
+          "renderedContrast": 206.68939393939394,
+          "retainedContrast": 0.8105466428995841
+        },
+        "rightEdge": {
+          "roi": {
+            "left": 288,
+            "right": 300,
+            "top": 769,
+            "bottom": 781
+          },
+          "baselineContrast": 255,
+          "renderedContrast": 207,
+          "retainedContrast": 0.8117647058823529
+        }
+      },
+      "screenshots": [
+        "optics/320-no-mask-text.png",
+        "optics/320-no-mask-text-detail.png",
+        "optics/320-no-mask-fine-lines.png"
+      ]
+    },
+    {
+      "width": 320,
+      "mode": "no-blur",
+      "previewFile": "query-member-320.html",
+      "previewSha256": "2a58b59f951ecfe533f5d53ea30b82dcb8191e4cec2b20a1b3b992b4a6ab8787",
+      "removedSupportRules": [
+        "((-webkit-backdrop-filter: blur(7px)) or (backdrop-filter: blur(7px)))"
+      ],
+      "bounds": {
+        "left": 12,
+        "top": 742,
+        "right": 308,
+        "bottom": 808,
+        "width": 296,
+        "height": 66
+      },
+      "mainSurface": {
+        "backdropFilter": "none",
+        "filter": "none",
+        "pointerEvents": "auto",
+        "maskImage": "none",
+        "backgroundColor": "rgba(255, 255, 255, 0.055)",
+        "backgroundImage": "none"
+      },
+      "effects": [
+        {
+          "className": "floating-tab-glass",
+          "bounds": {
+            "left": 12,
+            "top": 742,
+            "right": 308,
+            "bottom": 808,
+            "width": 296,
+            "height": 66
+          },
+          "backdropFilter": "none",
+          "filter": "none",
+          "pointerEvents": "auto",
+          "maskImage": "none",
+          "backgroundColor": "rgba(255, 255, 255, 0.055)",
+          "backgroundImage": "none"
+        },
+        {
+          "className": "floating-tab-edge floating-tab-edge-left",
+          "bounds": {
+            "left": 13,
+            "top": 743,
+            "right": 49,
+            "bottom": 807,
+            "width": 36,
+            "height": 64
+          },
+          "backdropFilter": "none",
+          "filter": "none",
+          "pointerEvents": "none",
+          "maskImage": "none",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "backgroundImage": "linear-gradient(90deg, rgba(255, 255, 255, 0.36), rgba(255, 255, 255, 0.13) 35%, rgba(255, 255, 255, 0) 100%)"
+        },
+        {
+          "className": "floating-tab-edge floating-tab-edge-right",
+          "bounds": {
+            "left": 271,
+            "top": 743,
+            "right": 307,
+            "bottom": 807,
+            "width": 36,
+            "height": 64
+          },
+          "backdropFilter": "none",
+          "filter": "none",
+          "pointerEvents": "none",
+          "maskImage": "none",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "backgroundImage": "linear-gradient(270deg, rgba(255, 255, 255, 0.36), rgba(255, 255, 255, 0.13) 35%, rgba(255, 255, 255, 0) 100%)"
+        }
+      ],
+      "buttons": [
+        {
+          "bounds": {
+            "left": 18,
+            "top": 748,
+            "right": 89,
+            "bottom": 802,
+            "width": 71,
+            "height": 54
+          },
+          "hit": true,
+          "label": "查询"
+        },
+        {
+          "bounds": {
+            "left": 89,
+            "top": 748,
+            "right": 160,
+            "bottom": 802,
+            "width": 71,
+            "height": 54
+          },
+          "hit": true,
+          "label": "小哨"
+        },
+        {
+          "bounds": {
+            "left": 160,
+            "top": 748,
+            "right": 231,
+            "bottom": 802,
+            "width": 71,
+            "height": 54
+          },
+          "hit": true,
+          "label": "历史"
+        },
+        {
+          "bounds": {
+            "left": 231,
+            "top": 748,
+            "right": 302,
+            "bottom": 802,
+            "width": 71,
+            "height": 54
+          },
+          "hit": true,
+          "label": "我的"
+        }
+      ],
+      "issues": [],
+      "optical": {
+        "center": {
+          "roi": {
+            "left": 128,
+            "right": 192,
+            "top": 769,
+            "bottom": 781
+          },
+          "baselineContrast": 255,
+          "renderedContrast": 241,
+          "retainedContrast": 0.9450980392156862
+        },
+        "leftEdge": {
+          "roi": {
+            "left": 20,
+            "right": 32,
+            "top": 769,
+            "bottom": 781
+          },
+          "baselineContrast": 255,
+          "renderedContrast": 206.68939393939394,
+          "retainedContrast": 0.8105466428995841
+        },
+        "rightEdge": {
+          "roi": {
+            "left": 288,
+            "right": 300,
+            "top": 769,
+            "bottom": 781
+          },
+          "baselineContrast": 255,
+          "renderedContrast": 207,
+          "retainedContrast": 0.8117647058823529
+        }
+      },
+      "screenshots": [
+        "optics/320-no-blur-text.png",
+        "optics/320-no-blur-text-detail.png",
+        "optics/320-no-blur-fine-lines.png"
+      ]
+    },
+    {
+      "width": 375,
+      "mode": "supported",
+      "previewFile": "query-member-375.html",
+      "previewSha256": "929d5cae469a3bf3c3a5fe9d294ae6c5113d8430f1f55094dc0162bc35fae0a4",
+      "removedSupportRules": [],
+      "bounds": {
+        "left": 12,
+        "top": 742,
+        "right": 363,
+        "bottom": 808,
+        "width": 351,
+        "height": 66
+      },
+      "mainSurface": {
+        "backdropFilter": "none",
+        "filter": "none",
+        "pointerEvents": "auto",
+        "maskImage": "none",
+        "backgroundColor": "rgba(255, 255, 255, 0.055)",
+        "backgroundImage": "none"
+      },
+      "effects": [
+        {
+          "className": "floating-tab-glass",
+          "bounds": {
+            "left": 12,
+            "top": 742,
+            "right": 363,
+            "bottom": 808,
+            "width": 351,
+            "height": 66
+          },
+          "backdropFilter": "none",
+          "filter": "none",
+          "pointerEvents": "auto",
+          "maskImage": "none",
+          "backgroundColor": "rgba(255, 255, 255, 0.055)",
+          "backgroundImage": "none"
+        },
+        {
+          "className": "floating-tab-edge floating-tab-edge-left",
+          "bounds": {
+            "left": 13,
+            "top": 743,
+            "right": 49,
+            "bottom": 807,
+            "width": 36,
+            "height": 64
+          },
+          "backdropFilter": "blur(7px) saturate(1.08)",
+          "filter": "none",
+          "pointerEvents": "none",
+          "maskImage": "linear-gradient(90deg, rgb(0, 0, 0), rgba(0, 0, 0, 0.6) 38%, rgba(0, 0, 0, 0))",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "backgroundImage": "linear-gradient(90deg, rgba(255, 255, 255, 0.36), rgba(255, 255, 255, 0.13) 35%, rgba(255, 255, 255, 0) 100%)"
+        },
+        {
+          "className": "floating-tab-edge floating-tab-edge-right",
+          "bounds": {
+            "left": 326,
+            "top": 743,
+            "right": 362,
+            "bottom": 807,
+            "width": 36,
+            "height": 64
+          },
+          "backdropFilter": "blur(7px) saturate(1.08)",
+          "filter": "none",
+          "pointerEvents": "none",
+          "maskImage": "linear-gradient(270deg, rgb(0, 0, 0), rgba(0, 0, 0, 0.6) 38%, rgba(0, 0, 0, 0))",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "backgroundImage": "linear-gradient(270deg, rgba(255, 255, 255, 0.36), rgba(255, 255, 255, 0.13) 35%, rgba(255, 255, 255, 0) 100%)"
+        }
+      ],
+      "buttons": [
+        {
+          "bounds": {
+            "left": 18,
+            "top": 748,
+            "right": 102.75,
+            "bottom": 802,
+            "width": 84.75,
+            "height": 54
+          },
+          "hit": true,
+          "label": "查询"
+        },
+        {
+          "bounds": {
+            "left": 102.75,
+            "top": 748,
+            "right": 187.5,
+            "bottom": 802,
+            "width": 84.75,
+            "height": 54
+          },
+          "hit": true,
+          "label": "小哨"
+        },
+        {
+          "bounds": {
+            "left": 187.5,
+            "top": 748,
+            "right": 272.25,
+            "bottom": 802,
+            "width": 84.75,
+            "height": 54
+          },
+          "hit": true,
+          "label": "历史"
+        },
+        {
+          "bounds": {
+            "left": 272.25,
+            "top": 748,
+            "right": 357,
+            "bottom": 802,
+            "width": 84.75,
+            "height": 54
+          },
+          "hit": true,
+          "label": "我的"
+        }
+      ],
+      "issues": [],
+      "optical": {
+        "center": {
+          "roi": {
+            "left": 156,
+            "right": 220,
+            "top": 769,
+            "bottom": 781
+          },
+          "baselineContrast": 255,
+          "renderedContrast": 241,
+          "retainedContrast": 0.9450980392156862
+        },
+        "leftEdge": {
+          "roi": {
+            "left": 20,
+            "right": 32,
+            "top": 769,
+            "bottom": 781
+          },
+          "baselineContrast": 255,
+          "renderedContrast": 90.39393939393939,
+          "retainedContrast": 0.354486036838978
+        },
+        "rightEdge": {
+          "roi": {
+            "left": 343,
+            "right": 355,
+            "top": 769,
+            "bottom": 781
+          },
+          "baselineContrast": 255,
+          "renderedContrast": 90.60606060606061,
+          "retainedContrast": 0.3553178847296494
+        }
+      },
+      "screenshots": [
+        "optics/375-supported-text.png",
+        "optics/375-supported-text-detail.png",
+        "optics/375-supported-fine-lines.png"
+      ]
+    },
+    {
+      "width": 375,
+      "mode": "no-mask",
+      "previewFile": "query-member-375.html",
+      "previewSha256": "929d5cae469a3bf3c3a5fe9d294ae6c5113d8430f1f55094dc0162bc35fae0a4",
+      "removedSupportRules": [
+        "((-webkit-mask-image: linear-gradient(black, transparent)) or (mask-image: linear-gradient(black, transparent)))"
+      ],
+      "bounds": {
+        "left": 12,
+        "top": 742,
+        "right": 363,
+        "bottom": 808,
+        "width": 351,
+        "height": 66
+      },
+      "mainSurface": {
+        "backdropFilter": "none",
+        "filter": "none",
+        "pointerEvents": "auto",
+        "maskImage": "none",
+        "backgroundColor": "rgba(255, 255, 255, 0.055)",
+        "backgroundImage": "none"
+      },
+      "effects": [
+        {
+          "className": "floating-tab-glass",
+          "bounds": {
+            "left": 12,
+            "top": 742,
+            "right": 363,
+            "bottom": 808,
+            "width": 351,
+            "height": 66
+          },
+          "backdropFilter": "none",
+          "filter": "none",
+          "pointerEvents": "auto",
+          "maskImage": "none",
+          "backgroundColor": "rgba(255, 255, 255, 0.055)",
+          "backgroundImage": "none"
+        },
+        {
+          "className": "floating-tab-edge floating-tab-edge-left",
+          "bounds": {
+            "left": 13,
+            "top": 743,
+            "right": 49,
+            "bottom": 807,
+            "width": 36,
+            "height": 64
+          },
+          "backdropFilter": "none",
+          "filter": "none",
+          "pointerEvents": "none",
+          "maskImage": "none",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "backgroundImage": "linear-gradient(90deg, rgba(255, 255, 255, 0.36), rgba(255, 255, 255, 0.13) 35%, rgba(255, 255, 255, 0) 100%)"
+        },
+        {
+          "className": "floating-tab-edge floating-tab-edge-right",
+          "bounds": {
+            "left": 326,
+            "top": 743,
+            "right": 362,
+            "bottom": 807,
+            "width": 36,
+            "height": 64
+          },
+          "backdropFilter": "none",
+          "filter": "none",
+          "pointerEvents": "none",
+          "maskImage": "none",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "backgroundImage": "linear-gradient(270deg, rgba(255, 255, 255, 0.36), rgba(255, 255, 255, 0.13) 35%, rgba(255, 255, 255, 0) 100%)"
+        }
+      ],
+      "buttons": [
+        {
+          "bounds": {
+            "left": 18,
+            "top": 748,
+            "right": 102.75,
+            "bottom": 802,
+            "width": 84.75,
+            "height": 54
+          },
+          "hit": true,
+          "label": "查询"
+        },
+        {
+          "bounds": {
+            "left": 102.75,
+            "top": 748,
+            "right": 187.5,
+            "bottom": 802,
+            "width": 84.75,
+            "height": 54
+          },
+          "hit": true,
+          "label": "小哨"
+        },
+        {
+          "bounds": {
+            "left": 187.5,
+            "top": 748,
+            "right": 272.25,
+            "bottom": 802,
+            "width": 84.75,
+            "height": 54
+          },
+          "hit": true,
+          "label": "历史"
+        },
+        {
+          "bounds": {
+            "left": 272.25,
+            "top": 748,
+            "right": 357,
+            "bottom": 802,
+            "width": 84.75,
+            "height": 54
+          },
+          "hit": true,
+          "label": "我的"
+        }
+      ],
+      "issues": [],
+      "optical": {
+        "center": {
+          "roi": {
+            "left": 156,
+            "right": 220,
+            "top": 769,
+            "bottom": 781
+          },
+          "baselineContrast": 255,
+          "renderedContrast": 241,
+          "retainedContrast": 0.9450980392156862
+        },
+        "leftEdge": {
+          "roi": {
+            "left": 20,
+            "right": 32,
+            "top": 769,
+            "bottom": 781
+          },
+          "baselineContrast": 255,
+          "renderedContrast": 206.68939393939394,
+          "retainedContrast": 0.8105466428995841
+        },
+        "rightEdge": {
+          "roi": {
+            "left": 343,
+            "right": 355,
+            "top": 769,
+            "bottom": 781
+          },
+          "baselineContrast": 255,
+          "renderedContrast": 206.6818181818182,
+          "retainedContrast": 0.8105169340463458
+        }
+      },
+      "screenshots": [
+        "optics/375-no-mask-text.png",
+        "optics/375-no-mask-text-detail.png",
+        "optics/375-no-mask-fine-lines.png"
+      ]
+    },
+    {
+      "width": 375,
+      "mode": "no-blur",
+      "previewFile": "query-member-375.html",
+      "previewSha256": "929d5cae469a3bf3c3a5fe9d294ae6c5113d8430f1f55094dc0162bc35fae0a4",
+      "removedSupportRules": [
+        "((-webkit-backdrop-filter: blur(7px)) or (backdrop-filter: blur(7px)))"
+      ],
+      "bounds": {
+        "left": 12,
+        "top": 742,
+        "right": 363,
+        "bottom": 808,
+        "width": 351,
+        "height": 66
+      },
+      "mainSurface": {
+        "backdropFilter": "none",
+        "filter": "none",
+        "pointerEvents": "auto",
+        "maskImage": "none",
+        "backgroundColor": "rgba(255, 255, 255, 0.055)",
+        "backgroundImage": "none"
+      },
+      "effects": [
+        {
+          "className": "floating-tab-glass",
+          "bounds": {
+            "left": 12,
+            "top": 742,
+            "right": 363,
+            "bottom": 808,
+            "width": 351,
+            "height": 66
+          },
+          "backdropFilter": "none",
+          "filter": "none",
+          "pointerEvents": "auto",
+          "maskImage": "none",
+          "backgroundColor": "rgba(255, 255, 255, 0.055)",
+          "backgroundImage": "none"
+        },
+        {
+          "className": "floating-tab-edge floating-tab-edge-left",
+          "bounds": {
+            "left": 13,
+            "top": 743,
+            "right": 49,
+            "bottom": 807,
+            "width": 36,
+            "height": 64
+          },
+          "backdropFilter": "none",
+          "filter": "none",
+          "pointerEvents": "none",
+          "maskImage": "none",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "backgroundImage": "linear-gradient(90deg, rgba(255, 255, 255, 0.36), rgba(255, 255, 255, 0.13) 35%, rgba(255, 255, 255, 0) 100%)"
+        },
+        {
+          "className": "floating-tab-edge floating-tab-edge-right",
+          "bounds": {
+            "left": 326,
+            "top": 743,
+            "right": 362,
+            "bottom": 807,
+            "width": 36,
+            "height": 64
+          },
+          "backdropFilter": "none",
+          "filter": "none",
+          "pointerEvents": "none",
+          "maskImage": "none",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "backgroundImage": "linear-gradient(270deg, rgba(255, 255, 255, 0.36), rgba(255, 255, 255, 0.13) 35%, rgba(255, 255, 255, 0) 100%)"
+        }
+      ],
+      "buttons": [
+        {
+          "bounds": {
+            "left": 18,
+            "top": 748,
+            "right": 102.75,
+            "bottom": 802,
+            "width": 84.75,
+            "height": 54
+          },
+          "hit": true,
+          "label": "查询"
+        },
+        {
+          "bounds": {
+            "left": 102.75,
+            "top": 748,
+            "right": 187.5,
+            "bottom": 802,
+            "width": 84.75,
+            "height": 54
+          },
+          "hit": true,
+          "label": "小哨"
+        },
+        {
+          "bounds": {
+            "left": 187.5,
+            "top": 748,
+            "right": 272.25,
+            "bottom": 802,
+            "width": 84.75,
+            "height": 54
+          },
+          "hit": true,
+          "label": "历史"
+        },
+        {
+          "bounds": {
+            "left": 272.25,
+            "top": 748,
+            "right": 357,
+            "bottom": 802,
+            "width": 84.75,
+            "height": 54
+          },
+          "hit": true,
+          "label": "我的"
+        }
+      ],
+      "issues": [],
+      "optical": {
+        "center": {
+          "roi": {
+            "left": 156,
+            "right": 220,
+            "top": 769,
+            "bottom": 781
+          },
+          "baselineContrast": 255,
+          "renderedContrast": 241,
+          "retainedContrast": 0.9450980392156862
+        },
+        "leftEdge": {
+          "roi": {
+            "left": 20,
+            "right": 32,
+            "top": 769,
+            "bottom": 781
+          },
+          "baselineContrast": 255,
+          "renderedContrast": 206.68939393939394,
+          "retainedContrast": 0.8105466428995841
+        },
+        "rightEdge": {
+          "roi": {
+            "left": 343,
+            "right": 355,
+            "top": 769,
+            "bottom": 781
+          },
+          "baselineContrast": 255,
+          "renderedContrast": 206.6818181818182,
+          "retainedContrast": 0.8105169340463458
+        }
+      },
+      "screenshots": [
+        "optics/375-no-blur-text.png",
+        "optics/375-no-blur-text-detail.png",
+        "optics/375-no-blur-fine-lines.png"
+      ]
+    },
+    {
+      "width": 430,
+      "mode": "supported",
+      "previewFile": "query-member-430.html",
+      "previewSha256": "f35c588dbce797118bfdb238296f57a5c4822c21276c864a4041a3f71170d260",
+      "removedSupportRules": [],
+      "bounds": {
+        "left": 12,
+        "top": 742,
+        "right": 418,
+        "bottom": 808,
+        "width": 406,
+        "height": 66
+      },
+      "mainSurface": {
+        "backdropFilter": "none",
+        "filter": "none",
+        "pointerEvents": "auto",
+        "maskImage": "none",
+        "backgroundColor": "rgba(255, 255, 255, 0.055)",
+        "backgroundImage": "none"
+      },
+      "effects": [
+        {
+          "className": "floating-tab-glass",
+          "bounds": {
+            "left": 12,
+            "top": 742,
+            "right": 418,
+            "bottom": 808,
+            "width": 406,
+            "height": 66
+          },
+          "backdropFilter": "none",
+          "filter": "none",
+          "pointerEvents": "auto",
+          "maskImage": "none",
+          "backgroundColor": "rgba(255, 255, 255, 0.055)",
+          "backgroundImage": "none"
+        },
+        {
+          "className": "floating-tab-edge floating-tab-edge-left",
+          "bounds": {
+            "left": 13,
+            "top": 743,
+            "right": 49,
+            "bottom": 807,
+            "width": 36,
+            "height": 64
+          },
+          "backdropFilter": "blur(7px) saturate(1.08)",
+          "filter": "none",
+          "pointerEvents": "none",
+          "maskImage": "linear-gradient(90deg, rgb(0, 0, 0), rgba(0, 0, 0, 0.6) 38%, rgba(0, 0, 0, 0))",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "backgroundImage": "linear-gradient(90deg, rgba(255, 255, 255, 0.36), rgba(255, 255, 255, 0.13) 35%, rgba(255, 255, 255, 0) 100%)"
+        },
+        {
+          "className": "floating-tab-edge floating-tab-edge-right",
+          "bounds": {
+            "left": 381,
+            "top": 743,
+            "right": 417,
+            "bottom": 807,
+            "width": 36,
+            "height": 64
+          },
+          "backdropFilter": "blur(7px) saturate(1.08)",
+          "filter": "none",
+          "pointerEvents": "none",
+          "maskImage": "linear-gradient(270deg, rgb(0, 0, 0), rgba(0, 0, 0, 0.6) 38%, rgba(0, 0, 0, 0))",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "backgroundImage": "linear-gradient(270deg, rgba(255, 255, 255, 0.36), rgba(255, 255, 255, 0.13) 35%, rgba(255, 255, 255, 0) 100%)"
+        }
+      ],
+      "buttons": [
+        {
+          "bounds": {
+            "left": 18,
+            "top": 748,
+            "right": 116.5,
+            "bottom": 802,
+            "width": 98.5,
+            "height": 54
+          },
+          "hit": true,
+          "label": "查询"
+        },
+        {
+          "bounds": {
+            "left": 116.5,
+            "top": 748,
+            "right": 215,
+            "bottom": 802,
+            "width": 98.5,
+            "height": 54
+          },
+          "hit": true,
+          "label": "小哨"
+        },
+        {
+          "bounds": {
+            "left": 215,
+            "top": 748,
+            "right": 313.5,
+            "bottom": 802,
+            "width": 98.5,
+            "height": 54
+          },
+          "hit": true,
+          "label": "历史"
+        },
+        {
+          "bounds": {
+            "left": 313.5,
+            "top": 748,
+            "right": 412,
+            "bottom": 802,
+            "width": 98.5,
+            "height": 54
+          },
+          "hit": true,
+          "label": "我的"
+        }
+      ],
+      "issues": [],
+      "optical": {
+        "center": {
+          "roi": {
+            "left": 183,
+            "right": 247,
+            "top": 769,
+            "bottom": 781
+          },
+          "baselineContrast": 255,
+          "renderedContrast": 241,
+          "retainedContrast": 0.9450980392156862
+        },
+        "leftEdge": {
+          "roi": {
+            "left": 20,
+            "right": 32,
+            "top": 769,
+            "bottom": 781
+          },
+          "baselineContrast": 255,
+          "renderedContrast": 90.39393939393939,
+          "retainedContrast": 0.354486036838978
+        },
+        "rightEdge": {
+          "roi": {
+            "left": 398,
+            "right": 410,
+            "top": 769,
+            "bottom": 781
+          },
+          "baselineContrast": 255,
+          "renderedContrast": 91.32070707070707,
+          "retainedContrast": 0.3581204198851258
+        }
+      },
+      "screenshots": [
+        "optics/430-supported-text.png",
+        "optics/430-supported-text-detail.png",
+        "optics/430-supported-fine-lines.png"
+      ]
+    },
+    {
+      "width": 430,
+      "mode": "no-mask",
+      "previewFile": "query-member-430.html",
+      "previewSha256": "f35c588dbce797118bfdb238296f57a5c4822c21276c864a4041a3f71170d260",
+      "removedSupportRules": [
+        "((-webkit-mask-image: linear-gradient(black, transparent)) or (mask-image: linear-gradient(black, transparent)))"
+      ],
+      "bounds": {
+        "left": 12,
+        "top": 742,
+        "right": 418,
+        "bottom": 808,
+        "width": 406,
+        "height": 66
+      },
+      "mainSurface": {
+        "backdropFilter": "none",
+        "filter": "none",
+        "pointerEvents": "auto",
+        "maskImage": "none",
+        "backgroundColor": "rgba(255, 255, 255, 0.055)",
+        "backgroundImage": "none"
+      },
+      "effects": [
+        {
+          "className": "floating-tab-glass",
+          "bounds": {
+            "left": 12,
+            "top": 742,
+            "right": 418,
+            "bottom": 808,
+            "width": 406,
+            "height": 66
+          },
+          "backdropFilter": "none",
+          "filter": "none",
+          "pointerEvents": "auto",
+          "maskImage": "none",
+          "backgroundColor": "rgba(255, 255, 255, 0.055)",
+          "backgroundImage": "none"
+        },
+        {
+          "className": "floating-tab-edge floating-tab-edge-left",
+          "bounds": {
+            "left": 13,
+            "top": 743,
+            "right": 49,
+            "bottom": 807,
+            "width": 36,
+            "height": 64
+          },
+          "backdropFilter": "none",
+          "filter": "none",
+          "pointerEvents": "none",
+          "maskImage": "none",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "backgroundImage": "linear-gradient(90deg, rgba(255, 255, 255, 0.36), rgba(255, 255, 255, 0.13) 35%, rgba(255, 255, 255, 0) 100%)"
+        },
+        {
+          "className": "floating-tab-edge floating-tab-edge-right",
+          "bounds": {
+            "left": 381,
+            "top": 743,
+            "right": 417,
+            "bottom": 807,
+            "width": 36,
+            "height": 64
+          },
+          "backdropFilter": "none",
+          "filter": "none",
+          "pointerEvents": "none",
+          "maskImage": "none",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "backgroundImage": "linear-gradient(270deg, rgba(255, 255, 255, 0.36), rgba(255, 255, 255, 0.13) 35%, rgba(255, 255, 255, 0) 100%)"
+        }
+      ],
+      "buttons": [
+        {
+          "bounds": {
+            "left": 18,
+            "top": 748,
+            "right": 116.5,
+            "bottom": 802,
+            "width": 98.5,
+            "height": 54
+          },
+          "hit": true,
+          "label": "查询"
+        },
+        {
+          "bounds": {
+            "left": 116.5,
+            "top": 748,
+            "right": 215,
+            "bottom": 802,
+            "width": 98.5,
+            "height": 54
+          },
+          "hit": true,
+          "label": "小哨"
+        },
+        {
+          "bounds": {
+            "left": 215,
+            "top": 748,
+            "right": 313.5,
+            "bottom": 802,
+            "width": 98.5,
+            "height": 54
+          },
+          "hit": true,
+          "label": "历史"
+        },
+        {
+          "bounds": {
+            "left": 313.5,
+            "top": 748,
+            "right": 412,
+            "bottom": 802,
+            "width": 98.5,
+            "height": 54
+          },
+          "hit": true,
+          "label": "我的"
+        }
+      ],
+      "issues": [],
+      "optical": {
+        "center": {
+          "roi": {
+            "left": 183,
+            "right": 247,
+            "top": 769,
+            "bottom": 781
+          },
+          "baselineContrast": 255,
+          "renderedContrast": 241,
+          "retainedContrast": 0.9450980392156862
+        },
+        "leftEdge": {
+          "roi": {
+            "left": 20,
+            "right": 32,
+            "top": 769,
+            "bottom": 781
+          },
+          "baselineContrast": 255,
+          "renderedContrast": 206.68939393939394,
+          "retainedContrast": 0.8105466428995841
+        },
+        "rightEdge": {
+          "roi": {
+            "left": 398,
+            "right": 410,
+            "top": 769,
+            "bottom": 781
+          },
+          "baselineContrast": 255,
+          "renderedContrast": 207,
+          "retainedContrast": 0.8117647058823529
+        }
+      },
+      "screenshots": [
+        "optics/430-no-mask-text.png",
+        "optics/430-no-mask-text-detail.png",
+        "optics/430-no-mask-fine-lines.png"
+      ]
+    },
+    {
+      "width": 430,
+      "mode": "no-blur",
+      "previewFile": "query-member-430.html",
+      "previewSha256": "f35c588dbce797118bfdb238296f57a5c4822c21276c864a4041a3f71170d260",
+      "removedSupportRules": [
+        "((-webkit-backdrop-filter: blur(7px)) or (backdrop-filter: blur(7px)))"
+      ],
+      "bounds": {
+        "left": 12,
+        "top": 742,
+        "right": 418,
+        "bottom": 808,
+        "width": 406,
+        "height": 66
+      },
+      "mainSurface": {
+        "backdropFilter": "none",
+        "filter": "none",
+        "pointerEvents": "auto",
+        "maskImage": "none",
+        "backgroundColor": "rgba(255, 255, 255, 0.055)",
+        "backgroundImage": "none"
+      },
+      "effects": [
+        {
+          "className": "floating-tab-glass",
+          "bounds": {
+            "left": 12,
+            "top": 742,
+            "right": 418,
+            "bottom": 808,
+            "width": 406,
+            "height": 66
+          },
+          "backdropFilter": "none",
+          "filter": "none",
+          "pointerEvents": "auto",
+          "maskImage": "none",
+          "backgroundColor": "rgba(255, 255, 255, 0.055)",
+          "backgroundImage": "none"
+        },
+        {
+          "className": "floating-tab-edge floating-tab-edge-left",
+          "bounds": {
+            "left": 13,
+            "top": 743,
+            "right": 49,
+            "bottom": 807,
+            "width": 36,
+            "height": 64
+          },
+          "backdropFilter": "none",
+          "filter": "none",
+          "pointerEvents": "none",
+          "maskImage": "none",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "backgroundImage": "linear-gradient(90deg, rgba(255, 255, 255, 0.36), rgba(255, 255, 255, 0.13) 35%, rgba(255, 255, 255, 0) 100%)"
+        },
+        {
+          "className": "floating-tab-edge floating-tab-edge-right",
+          "bounds": {
+            "left": 381,
+            "top": 743,
+            "right": 417,
+            "bottom": 807,
+            "width": 36,
+            "height": 64
+          },
+          "backdropFilter": "none",
+          "filter": "none",
+          "pointerEvents": "none",
+          "maskImage": "none",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "backgroundImage": "linear-gradient(270deg, rgba(255, 255, 255, 0.36), rgba(255, 255, 255, 0.13) 35%, rgba(255, 255, 255, 0) 100%)"
+        }
+      ],
+      "buttons": [
+        {
+          "bounds": {
+            "left": 18,
+            "top": 748,
+            "right": 116.5,
+            "bottom": 802,
+            "width": 98.5,
+            "height": 54
+          },
+          "hit": true,
+          "label": "查询"
+        },
+        {
+          "bounds": {
+            "left": 116.5,
+            "top": 748,
+            "right": 215,
+            "bottom": 802,
+            "width": 98.5,
+            "height": 54
+          },
+          "hit": true,
+          "label": "小哨"
+        },
+        {
+          "bounds": {
+            "left": 215,
+            "top": 748,
+            "right": 313.5,
+            "bottom": 802,
+            "width": 98.5,
+            "height": 54
+          },
+          "hit": true,
+          "label": "历史"
+        },
+        {
+          "bounds": {
+            "left": 313.5,
+            "top": 748,
+            "right": 412,
+            "bottom": 802,
+            "width": 98.5,
+            "height": 54
+          },
+          "hit": true,
+          "label": "我的"
+        }
+      ],
+      "issues": [],
+      "optical": {
+        "center": {
+          "roi": {
+            "left": 183,
+            "right": 247,
+            "top": 769,
+            "bottom": 781
+          },
+          "baselineContrast": 255,
+          "renderedContrast": 241,
+          "retainedContrast": 0.9450980392156862
+        },
+        "leftEdge": {
+          "roi": {
+            "left": 20,
+            "right": 32,
+            "top": 769,
+            "bottom": 781
+          },
+          "baselineContrast": 255,
+          "renderedContrast": 206.68939393939394,
+          "retainedContrast": 0.8105466428995841
+        },
+        "rightEdge": {
+          "roi": {
+            "left": 398,
+            "right": 410,
+            "top": 769,
+            "bottom": 781
+          },
+          "baselineContrast": 255,
+          "renderedContrast": 207,
+          "retainedContrast": 0.8117647058823529
+        }
+      },
+      "screenshots": [
+        "optics/430-no-blur-text.png",
+        "optics/430-no-blur-text-detail.png",
+        "optics/430-no-blur-fine-lines.png"
+      ]
+    }
+  ]
+}

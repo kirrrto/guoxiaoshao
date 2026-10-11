@@ -1,0 +1,927 @@
+const { call, newId, showError, toast } = require('../../utils/api');
+const { getBootstrap, getCatalog, refreshBootstrap, invalidateBootstrap, subscribeCatalog, getFollows, invalidateFollows, subscribeSubscriptions } = require('../../utils/store');
+const fmt = require('../../utils/format');
+const { storeLabel, storeLabelWithCity } = require('../../utils/store-label');
+const { syncTabBar } = require('../../utils/tab-bar');
+const { restockSubscription, soldoutSubscription, reminderReadiness, canRemind, creditBoostTip } = require('../../utils/reminder-readiness');
+const { shareAppMessage, shareTimeline } = require('../../utils/share');
+const { monitorPollDelay } = require('../../utils/poll');
+const { getAuthorizationState, subscribeAuthorizationState, requestReminderAuthorization, syncPendingAuthorization, topUpReminderCredit } = require('../../utils/reminder-credits');
+const { confirmTap } = require('../../utils/haptic');
+const { createCheckoutContext } = require('../../utils/checkout-context');
+const { activationStatus } = require('../../utils/activation-status');
+const { targetSignature } = require('../../utils/result-next-action');
+const conversion = require('../../utils/conversion-events');
+
+const FOLLOW_STATUS = {
+  active: { label: '关注已开启', cls: 'ok' },
+  paused: { label: '关注已暂停', cls: 'muted' },
+  expired: { label: '会员已到期，监测已停止', cls: 'warn' },
+  limit_paused: { label: '超出当前套餐名额', cls: 'muted' },
+};
+
+const DELIVERY_REASON = {
+  template_missing: '订阅消息模板尚未配置，暂不能授权或发送提醒。',
+  notifications_disabled: '提醒发送服务尚未开启。',
+  collector_not_deployed: '后台检测服务尚未启动，暂不能自动发现补货。',
+  collector_stale: '后台检测服务状态已过期，正在等待恢复。',
+  collector_observation_stale: '库存观测未及时更新，暂不能确认最新取货状态；关注和提醒次数会保留。',
+  collector_stopped: '后台检测服务暂不可用，当前无法自动发送提醒。',
+  consumer_credentials_missing: '提醒发送服务尚未完成配置。',
+  consumer_appid_mismatch: '提醒发送配置需要修复，暂不能发送消息。',
+  consumer_auth_unchecked: '提醒发送服务的连接状态尚未验证。',
+  consumer_auth_failed: '提醒发送服务验证未通过，暂不能发送消息。',
+  sender_missing: '提醒发送服务尚未接入。',
+  sender_unknown: '提醒发送服务状态尚未确认。',
+};
+
+const DETECTION_DETAIL = {
+  not_deployed: '后台检测服务尚未启动，已开启的关注会保留，无需重复操作。',
+  disabled: '后台检测尚未开放，已开启的关注会保留。',
+  idle: '后台服务已连接，当前尚未执行检测任务。',
+  running: '后台持续检测已开启关注的门店，离开小程序后仍由后台运行。',
+  stale: '后台状态已过期，当前无法确认是否仍在检测。',
+  stopped: '后台检测服务已停止，需恢复服务后才能自动发现补货。',
+  paused: '后台检测暂时暂停，已开启的关注会保留。',
+  no_lease: '后台检测正在等待恢复，已开启的关注会保留。',
+  throttled: '库存接口限制了请求频率，检测暂时降速或暂停。',
+  probing: '正在检查库存接口是否已恢复。',
+  budget_limited: '后台检测请求较多，正在等待更新；已开启的关注会保留。',
+  error: '后台检测出现异常，暂不能确认最新库存，请稍后刷新。',
+};
+
+function deliveryView(notifications, templateIds) {
+  const reason = notifications.reason || notifications.disabledReason || '';
+  const detail = DELIVERY_REASON[reason] || (/[^\x00-\x7F]/.test(reason) ? reason : '消息服务尚未就绪，请稍后刷新状态。');
+  if (!templateIds.length) return { label: '暂不能发送', cls: 'warn', detail: DELIVERY_REASON.template_missing };
+  if (!notifications.enabled) return { label: '尚未开放', cls: 'warn', detail: DELIVERY_REASON.notifications_disabled };
+  if (notifications.deliveryReady !== true) return { label: '发送服务未就绪', cls: 'warn', detail };
+  return { label: '发送服务已就绪', cls: 'ok', detail: '检测到符合条件的库存变化后，将使用对应的有效授权发送提醒。' };
+}
+
+const FEEDBACK_TOAST = { bought: '恭喜买到！', missed: '已记录，继续为你盯着', skipped: '已记录，继续为你盯着' };
+
+/** The alert a WeChat message opened: when it was found and what the store shows now. */
+function presentAlert({ notification: n, latest, follow }, now = Date.now()) {
+  const current = fmt.stockObservation(latest || {}, now, { restricted: Boolean(latest && latest.restricted) });
+  return {
+    eventId: n.eventId,
+    productTitle: n.productTitle,
+    partNumber: n.partNumber,
+    storeName: storeLabel(n.storeNumber, n.storeName),
+    eventLabel: fmt.eventMeta(n.eventType).label,
+    soldOut: n.eventType === 'became_unavailable',
+    foundText: fmt.fmtDateTime(n.detectedAt),
+    agoText: fmt.relative(n.detectedAt, now),
+    nowLabel: current.statusLabel,
+    nowCls: current.statusCls,
+    nowText: current.observationState === 'fresh' ? '最近观测 ' + current.observedText : current.freshnessText,
+    feedback: n.feedback || null,
+    followActive: Boolean(follow && follow.status === 'active'),
+  };
+}
+
+function presentFollow(follow, boot, catalog, collector) {
+  const now = Date.now();
+  const status = { ...(FOLLOW_STATUS[follow.status] || { label: follow.status, cls: 'muted' }) };
+  if (follow.status === 'paused' && ['member_expired', 'membership_expired'].includes(follow.statusReason)) status.label = '会员到期，已暂停';
+  if (follow.status === 'expired') status.label = '会员已到期，监测已停止';
+  let monitoringText = follow.status === 'limit_paused' ? '配置已保留，月卡／年卡可恢复第 4 个名额' : '';
+  if (follow.status === 'active') {
+    if (!canRemind(boot)) { status.cls = 'warn'; monitoringText = '会员未生效，当前不参与自动检测'; }
+    else if (!collector || collector.state !== 'running' || collector.observationStale) monitoringText = '关注已保存，后台检测情况见上方';
+  }
+  const product = catalog && catalog.productByPart && catalog.productByPart[follow.partNumber];
+  const stores = (follow.stores || []).map(s => ({ ...s, storeName: storeLabel(s.storeNumber, s.storeName), storeLabel: storeLabelWithCity(s.storeNumber, s.storeName, s.city), ...fmt.stockObservation(s, now, { restricted: follow.latestRestricted }),
+    ...(s.limitPaused ? { statusLabel: follow.limitPaused ? '配置超出套餐名额' : '超出套餐门店上限', statusCls: 'muted',
+      freshnessText: follow.limitPaused ? '配置和门店已保留，恢复配置名额后继续检测。' : '门店已保留，当前暂停检测；月卡／年卡可恢复第 4 家门店。' } : {}) }));
+  return {
+    ...follow,
+    imageUrl: product && product.imageUrl || '',
+    imageAlt: product && product.imageAlt || follow.productTitle,
+    statusLabel: status.label,
+    statusCls: status.cls,
+    monitoringText,
+    hasAvailable: follow.status !== 'limit_paused' && stores.some(s => !s.limitPaused && s.observationState === 'fresh' && s.status === 'available'),
+    detailsExpanded: follow.detailsExpanded === true,
+    stores,
+  };
+}
+
+// A refresh changes content, not where the user was looking. New rows are appended.
+function retainFollowOrder(incoming, previous) {
+  const byId = new Map(incoming.map(follow => [follow.followId, follow]));
+  const ordered = [];
+  for (const old of previous) {
+    const follow = byId.get(old.followId);
+    if (!follow) continue;
+    ordered.push({ ...follow, detailsExpanded: old.detailsExpanded === true });
+    byId.delete(old.followId);
+  }
+  return ordered.concat([...byId.values()]);
+}
+
+function selectionKey(selection) {
+  return JSON.stringify([selection && selection.partNumber || '', [...new Set(selection && selection.storeNumbers || [])].sort()]);
+}
+
+function readinessTaskDetail(readiness) {
+  return {
+    membership: '关注配置和剩余提醒次数会保留，可在「我的」查看会员。',
+    collector_idle: '关注已保存，等待后台下一轮检测，无需重复添加。',
+    collector_unready: '关注已保存；后台恢复后继续检测，无需重复添加。',
+    delivery_unready: '后台仍在检测，消息发送恢复前暂时收不到微信提醒。',
+    template_missing: '关注会保留，服务配置完成后才能授权和发送微信提醒。',
+    user_disabled: '后台检测继续，开启消息开关后才能收到提醒。',
+    dnd: '后台检测继续；免打扰期间不发消息，也不补发旧提醒。',
+  }[readiness.code] || readiness.detail;
+}
+
+function followActionError(error, action) {
+  // Transport errors have no trustworthy write result; business rejections do.
+  if (error && error.code && !['call_failed', 'bad_response', 'timeout', 'request_timeout'].includes(error.code)) return error.message || `${action}未完成，请稍后重试。`;
+  return `${action}结果尚未确认，请刷新状态后再试。`;
+}
+
+function confirmsSavedFollow(follow, payload) {
+  if (!follow || typeof follow.followId !== 'string' || follow.partNumber !== payload.partNumber || follow.status !== 'active' || !Array.isArray(follow.stores)) return false;
+  if (follow.followId !== payload.followId && !follow.followId.endsWith('|' + payload.followId)) return false;
+  const actual = [...new Set(follow.stores.map(store => store.storeNumber))].sort();
+  const expected = [...new Set(payload.storeNumbers)].sort();
+  return actual.length === expected.length && actual.every((number, index) => number === expected[index]);
+}
+
+Page({
+  data: {
+    ready: false,
+    loadError: null,
+    catalogVersion: '',
+    boot: null,
+    collector: null,
+    follows: [],
+    followsLoaded: false,
+    limits: { maxFollows: 3, maxStoresPerFollow: 3 },
+    editing: false,
+    editor: { followId: null, pickerValue: null, isNew: true },
+    editorCanSave: false,
+    editorDirty: false,
+    editorSummary: '',
+    saveError: '',
+    saving: false,
+    subscription: { templateCount: 0, credits: 0 },
+    delivery: { label: '正在确认', cls: 'muted', detail: '' },
+    showServiceDetails: false,
+    readiness: { code: 'loading', title: '正在检查提醒条件', detail: '正在读取账户与关注状态。', tone: 'muted', action: '', actionLabel: '', activeCount: 0, storeCount: 0, ready: false },
+    creditBoostTip: '',
+    refreshing: false,
+    subscribing: false,
+    subscriptionPending: false,
+    authorization: { pendingRestock: 0, pendingSoldout: 0, pendingCount: 0, syncing: false, errorMessage: '', storageBlocked: false },
+    authorizationFeedback: '',
+    authorizationSession: false,
+    authorizationPanelFirst: false,
+    refreshError: null,
+    refreshedText: null,
+    alert: null,
+    alertBusy: false,
+    followBusyId: '',
+    followActionError: '',
+    followActionId: '',
+    readinessTaskDetail: '',
+    activation: null,
+  },
+
+  async onLoad(options) {
+    if (this.pageRetired) return;
+    if (options && options.eid) getApp().captureAlert({ query: { eid: options.eid } });
+    if (this.loadingBoot) return;
+    this.loadingBoot = true;
+    if (!this.unsubscribeCatalog) this.unsubscribeCatalog = subscribeCatalog(catalog => { this.catalog = catalog; if (this.data.ready && this.data.catalogVersion !== catalog.version) this.setData({ catalogVersion: catalog.version }); });
+    try {
+      this.observeAuthorization();
+      const results = await Promise.all([getBootstrap(), getCatalog()]);
+      if (this.pageRetired) return;
+      const boot = results[0], initialCatalog = results[1];
+      const catalog = getApp().globalData.catalog || initialCatalog;
+      this.catalog = catalog;
+      this.applyBoot(boot, { catalogVersion: catalog.version, ready: true, loadError: null });
+      this.resumeAuthorizationSync();
+      await this.loadFollows();
+      this.consumePendingAlert();
+      if (this.visible) this.startPolling();
+    } catch (error) {
+      if (!this.pageRetired) this.setData({ loadError: error.message || String(error) });
+    } finally {
+      this.loadingBoot = false;
+    }
+  },
+
+  async onShow() {
+    if (this.pageRetired) return;
+    syncTabBar(this, '/pages/follow/index');
+    this.visible = true;
+    this.recordAlertOpen();
+    this.observeAuthorization();
+    this.applyAuthorizationState(getAuthorizationState());
+    this.resumeAuthorizationSync();
+    // Returning from the native permission sheet is not a new page visit.
+    // Preserve the card position and avoid a full follow/account render here.
+    const nativeReturn = this.nativePromptHiddenAt && Date.now() - this.nativePromptHiddenAt < 60000;
+    this.nativePromptHiddenAt = 0;
+    if (nativeReturn && this.data.ready) { this.startPolling(); return; }
+    if (!this.data.ready) {
+      this.consumePending();
+      if (this.data.loadError) return this.onRetryLoad();
+      return;
+    }
+    this.refreshFollowPresentation();
+    try {
+      const boot = await getBootstrap();
+      if (this.pageRetired) return;
+      this.applyBoot(boot);
+      getCatalog();
+      await this.loadFollows();
+    } catch (e) { /* keep previous data */ }
+    this.consumePending();
+    this.consumePendingFocus();
+    this.consumePendingAlert();
+    this.startPolling();
+  },
+
+  onHide() { this.nativePromptHiddenAt = getAuthorizationState().nativeBusy ? Date.now() : 0; this.visible = false; this.serviceDetailsFocusEpoch = (this.serviceDetailsFocusEpoch || 0) + 1; this.stopPolling(); },
+  onUnload() { this.pageRetired = true; this.visible = false; this.serviceDetailsFocusEpoch = (this.serviceDetailsFocusEpoch || 0) + 1; this.stopPolling(); if (this.unsubscribeCatalog) this.unsubscribeCatalog(); if (this.unsubscribeCredits) this.unsubscribeCredits(); if (this.unsubscribeAuthorization) this.unsubscribeAuthorization(); },
+
+  onShareAppMessage() {
+    return shareAppMessage('/pages/follow/index', this.data);
+  },
+
+  onShareTimeline() {
+    return shareTimeline('/pages/follow/index', this.data);
+  },
+
+  onAddToFavorites() {
+    return { title: '果小哨 · 我的到货提醒' };
+  },
+
+  /** Called by the tab bar when the phone reconnects. */
+  onNetworkRestored() {
+    if (this.pageRetired) return;
+    this.resumeAuthorizationSync();
+    if (this.data.loadError) return this.onRetryLoad();
+    if (!this.data.ready) return;
+    return getBootstrap({ force: true }).then(boot => { this.applyBoot(boot); return this.loadFollows({ force: true }); }).catch(() => {});
+  },
+
+  stopPolling() { this.pollEpoch = (this.pollEpoch || 0) + 1; if (this.pollTimer) clearTimeout(this.pollTimer); this.pollTimer = null; },
+  startPolling() {
+    if (this.pageRetired || !this.visible) return;
+    this.stopPolling();
+    const epoch = this.pollEpoch;
+    const tick = async () => {
+      if (!this.visible || epoch !== this.pollEpoch) return;
+      try {
+        const boot = await getBootstrap();
+        if (!this.visible || epoch !== this.pollEpoch) return;
+        this.applyBoot(boot); await this.loadFollows({ force: true });
+      } catch (e) {
+        // Still age the kept observations so stale results read as stale.
+        if (this.visible) { this.refreshFollowPresentation(); this.setData({ refreshError: '刷新失败，以下保留上次观测，请下拉重试。' }); }
+      }
+      if (this.visible && epoch === this.pollEpoch) this.pollTimer = setTimeout(tick, monitorPollDelay(this.data.collector));
+    };
+    this.pollTimer = setTimeout(tick, monitorPollDelay(this.data.collector));
+  },
+
+  async onPullDownRefresh() {
+    if (this.pageRetired) return;
+    try {
+      const results = await Promise.all([getBootstrap({ force: true }), getCatalog({ force: true })]);
+      if (this.pageRetired) return;
+      const boot = results[0], catalog = results[1];
+      this.catalog = catalog;
+      this.applyBoot(boot, { catalogVersion: catalog.version, ready: true, loadError: null });
+      await this.loadFollows({ force: true });
+    } catch (error) { if (!this.pageRetired) showError(error); }
+    finally { wx.stopPullDownRefresh(); }
+  },
+
+  async consumePendingAlert() {
+    if (this.pageRetired) return;
+    const app = getApp(), eventId = app.globalData.pendingAlert;
+    if (!eventId || !this.data.ready) return;
+    app.globalData.pendingAlert = null;
+    return this.loadAlert(eventId);
+  },
+
+  async loadAlert(eventId) {
+    if (this.pageRetired || this.data.alert && this.data.alert.eventId === eventId && this.data.alert.loading) return;
+    const epoch = this.alertReadEpoch = (this.alertReadEpoch || 0) + 1;
+    this.setData({ alert: { eventId, loading: true } });
+    if (typeof wx.pageScrollTo === 'function') wx.pageScrollTo({ scrollTop: 0, duration: 0 });
+    try {
+      const data = await call('notify.detail', { eventId });
+      if (!this.pageRetired && epoch === this.alertReadEpoch && this.data.alert && this.data.alert.eventId === eventId) {
+        this.setData({ alert: presentAlert(data) }, () => {
+          if (this.pageRetired || epoch !== this.alertReadEpoch || !this.data.alert || this.data.alert.eventId !== eventId) return;
+          const app = getApp();
+          if (!app.globalData.handledAlerts.includes(eventId)) app.globalData.handledAlerts.push(eventId);
+          this.presentedAlertId = eventId;
+          this.recordAlertOpen();
+        });
+      }
+    } catch (error) {
+      if (!this.pageRetired && epoch === this.alertReadEpoch && this.data.alert && this.data.alert.eventId === eventId) this.setData({ alert: { eventId,
+        error: error.message || '提醒详情暂时无法读取', retryable: error.code !== 'notification_not_found' && error.code !== 'invalid_notification_id' } });
+    }
+  },
+
+  onRetryAlert() {
+    const alert = this.data.alert;
+    if (!alert || !alert.retryable || alert.loading) return;
+    return this.loadAlert(alert.eventId);
+  },
+
+  recordAlertOpen() {
+    const alert = this.data.alert, eventId = this.presentedAlertId;
+    if (this.pageRetired || this.visible !== true || !eventId || !alert || alert.eventId !== eventId || alert.loading || alert.error) return;
+    if (!this.acknowledgedAlerts) this.acknowledgedAlerts = new Set();
+    if (this.acknowledgedAlerts.has(eventId) || this.alertOpenInFlight === eventId) return;
+    this.alertOpenInFlight = eventId;
+    // Analytics is independent of displaying stock or recording feedback. A
+    // failed acknowledgment can retry on the next visible visit, never in a loop.
+    Promise.resolve().then(() => call('notify.open', { eventId })).then(() => this.acknowledgedAlerts.add(eventId)).catch(() => {})
+      .finally(() => { if (this.alertOpenInFlight === eventId) this.alertOpenInFlight = null; });
+  },
+
+  onCloseAlert() { this.alertReadEpoch = (this.alertReadEpoch || 0) + 1; this.presentedAlertId = null; this.setData({ alert: null }); },
+
+  onCopyAlert() {
+    const alert = this.data.alert;
+    if (!alert || !alert.partNumber) return;
+    wx.setClipboardData({
+      data: `${alert.productTitle}\n型号：${alert.partNumber}\n门店：Apple ${alert.storeName}`,
+      success: () => toast('已复制，可到 Apple Store App 下单'),
+      fail: () => toast('复制失败，请长按文字手动复制'),
+    });
+  },
+
+  async onAlertFeedback(e) {
+    const alert = this.data.alert, outcome = e.currentTarget.dataset.outcome;
+    if (this.pageRetired || !alert || !alert.eventId || this.data.alertBusy) return;
+    const isCurrentAlert = () => !this.pageRetired && this.data.alert && this.data.alert.eventId === alert.eventId;
+    this.setData({ alertBusy: true });
+    try {
+      const result = await call('notify.feedback', { eventId: alert.eventId, outcome });
+      if (result.paused) this.invalidateFollowRead();
+      if (this.pageRetired) return;
+      // Closing or replacing the card must survive a late feedback response.
+      if (isCurrentAlert()) {
+        this.setData({ 'alert.feedback': result.outcome, 'alert.followActive': alert.followActive && !result.paused });
+        if (this.visible !== false) {
+          if (outcome === 'bought') confirmTap();
+          toast(result.paused ? '恭喜买到！已暂停这条关注' : outcome === 'bought' ? '已记录买到反馈，当前关注未暂停' : FEEDBACK_TOAST[outcome]);
+        }
+      }
+      if (result.paused && this.visible !== false) {
+        try { await this.loadFollows(); }
+        catch (error) { if (!this.pageRetired) this.setData({ refreshError: '反馈已记录，关注列表刷新失败，请下拉刷新。' }); }
+      }
+    } catch (error) {
+      if (isCurrentAlert() && this.visible !== false) showError(error);
+    } finally {
+      if (!this.pageRetired) this.setData({ alertBusy: false });
+    }
+  },
+
+  consumePending() {
+    if (this.pageRetired) return;
+    const pending = getApp().globalData.pendingFollow;
+    if (!pending) return;
+    getApp().globalData.pendingFollow = null;
+    if (!this.data.ready) {
+      this.pendingAfterReady = pending;
+      return;
+    }
+    this.openPendingEditor(pending);
+  },
+
+  openPendingEditor(pending) {
+    if (pending.checkoutRevision) {
+      const identity = this.accountSnapshot && this.accountSnapshot.identity;
+      const restored = this.checkoutStore().restore(identity, this.catalog);
+      if (restored.status !== 'ready' || restored.context.revision !== pending.checkoutRevision
+        || restored.context.targetSignature !== pending.checkoutSignature || restored.context.targetSignature !== targetSignature(pending)) {
+        this.refreshActivation();
+        return toast('原选择已变化或过期，请重新确认配置与门店');
+      }
+    }
+    this.openEditor({ followId: newId('f'), pickerValue: pending, isNew: true });
+  },
+
+  applyBoot(boot, pageData = {}) {
+    if (this.pageRetired) return;
+    const previousIdentity = this.accountSnapshot && this.accountSnapshot.identity;
+    if (previousIdentity && boot.identity && previousIdentity.userKey !== boot.identity.userKey) {
+      this.accountEpoch = (this.accountEpoch || 0) + 1;
+      this.editorEpoch = (this.editorEpoch || 0) + 1;
+      this.invalidateFollowRead();
+      this.editorSelection = null;
+      this.setData({ follows: [], followsLoaded: false, editing: false, saving: false, activation: null });
+    }
+    this.accountSnapshot = boot;
+    this.features = boot.features || {};
+    const notifications = boot.notifications || {};
+    const subscription = restockSubscription(notifications, boot.subscriptions);
+    const templateIds = subscription.templateIds;
+    const collector = boot.collector || { state: 'not_deployed' };
+    const delivery = deliveryView(notifications, templateIds);
+    const member = boot.membership.active, expired = !member && Boolean(boot.membership.expiresAt);
+    // Sell-out alerts are a member feature on their own template, requested in the same prompt.
+    const soldout = member && templateIds.length ? soldoutSubscription(notifications, boot.subscriptions) : { templateId: null, credits: 0 };
+    this.settings = boot.settings || { notifyEnabled: true };
+    this.setData({
+      // Follow and WeChat reminders are member-only; free accounts only get query credits.
+      boot: { member, expired, freeReminder: false, freeReminderUsed: false, expiresAt: boot.membership.expiresAt, expiresText: boot.membership.expiresAt ? fmt.fmtDate(boot.membership.expiresAt) : null, notificationsEnabled: notifications.enabled, notificationReason: delivery.detail, templateIds, soldoutId: soldout.templateId, requestIds: soldout.templateId ? [...templateIds, soldout.templateId] : templateIds, templateTitle: typeof notifications.templateTitle === 'string' ? notifications.templateTitle.trim() : '', memberProduct: boot.memberProduct },
+      collector: { ...collector, ...fmt.collectorMeta(collector.state), detail: DETECTION_DETAIL[collector.state] || '暂未取得后台检测状态，请稍后刷新。',
+        ...(collector.observationStale ? { label: '库存观测更新延迟', cls: 'warn', detail: DELIVERY_REASON.collector_observation_stale } : {}),
+        updatedText: collector.updatedAt ? fmt.fmtDateTime(collector.updatedAt) : null, batchText: collector.lastBatchAt ? fmt.fmtDateTime(collector.lastBatchAt) : null },
+      delivery,
+      limits: boot.limits || this.data.limits,
+      subscription: { ...subscription, soldoutEnabled: Boolean(soldout.templateId), soldoutCredits: soldout.credits },
+      subscriptionPending: getAuthorizationState().pendingCount > 0,
+      ...pageData,
+    });
+    this.observeAuthorization();
+    this.applyAuthorizationState(getAuthorizationState());
+    this.refreshFollowPresentation();
+    if (this.pendingAfterReady) {
+      const pending = this.pendingAfterReady;
+      this.pendingAfterReady = null;
+      this.openPendingEditor(pending);
+    }
+  },
+
+  async loadFollows(options = {}) {
+    if (this.pageRetired) return;
+    if (this.followsPromise) return this.followsPromise;
+    const generation = this.followReadGeneration || 0;
+    const pending = getFollows(options).then(data => {
+      if (this.pageRetired || generation !== (this.followReadGeneration || 0)) return;
+      const incoming = data.follows.filter(f => f.status !== 'removed').map(f => presentFollow(f, this.data.boot || {}, this.catalog, this.data.collector));
+      this.setData({ follows: retainFollowOrder(incoming, this.data.follows), followsLoaded: true, limits: data.limits, loadError: null, refreshError: null, followActionError: '', followActionId: '', refreshedText: fmt.fmtTime(Date.now()) });
+      this.refreshReadiness();
+      this.consumePendingFocus();
+    });
+    this.followsPromise = pending;
+    try { return await pending; } finally { if (this.followsPromise === pending) this.followsPromise = null; }
+  },
+
+  invalidateFollowRead() {
+    this.followReadGeneration = (this.followReadGeneration || 0) + 1;
+    this.followsPromise = null;
+    invalidateFollows();
+  },
+
+  refreshFollowPresentation() {
+    if (this.pageRetired) return;
+    this.refreshReadiness();
+    if (!this.data.follows.length) return;
+    this.setData({ follows: this.data.follows.map(f => presentFollow(f, this.data.boot || {}, this.catalog, this.data.collector)) });
+  },
+
+  refreshReadiness() {
+    if (this.pageRetired) return;
+    const readiness = reminderReadiness({ ...this.data, settings: this.settings });
+    // Other credit states already include this guidance in the notice. Service
+    // failures and pending records need recovery, not more authorizations.
+    const tip = readiness.code === 'ready' ? creditBoostTip(this.data.subscription || {}) : '';
+    this.setData({ readiness, readinessTaskDetail: readinessTaskDetail(readiness), creditBoostTip: tip });
+    this.refreshActivation();
+  },
+
+  checkoutStore() {
+    if (!this.checkoutContext) this.checkoutContext = createCheckoutContext({ wx });
+    return this.checkoutContext;
+  },
+
+  refreshActivation() {
+    if (this.pageRetired) return;
+    const account = this.accountSnapshot;
+    if (!this.features || !this.features.activationJourney || !account || !account.membership.active) {
+      if (this.data.activation) this.setData({ activation: null });
+      return;
+    }
+    const restored = this.checkoutStore().restore(account.identity, this.catalog);
+    this.activationContext = restored.status === 'ready' ? restored.context : null;
+    this.setData({ activation: activationStatus({ member: true, context: this.activationContext, contextStatus: restored.status,
+      follows: this.data.follows, followsLoaded: this.data.followsLoaded, readiness: this.data.readiness }) });
+    if (this.visible && this.data.activation && this.activationEventKey !== this.data.activation.title) {
+      this.activationEventKey = this.data.activation.title;
+      conversion.track('activation_viewed', { entryPoint: 'follow', resultState: this.data.readiness.code });
+    }
+  },
+
+  onActivationAction() {
+    if (this.pageRetired || this.data.saving || this.data.editing) return;
+    this.refreshActivation();
+    const action = this.data.activation && this.data.activation.action;
+    if (action === 'continue' && this.activationContext) {
+      const context = this.activationContext;
+      return this.openPendingEditor({ partNumber: context.partNumber, storeNumbers: context.storeNumbers.slice(),
+        checkoutRevision: context.revision, checkoutSignature: context.targetSignature });
+    }
+    if (action === 'choose' || action === 'continue') return this.onAdd();
+    if (action === 'conditions' && this.data.readiness.action) return this.onReadinessAction();
+    if (typeof wx.pageScrollTo === 'function') wx.pageScrollTo({ selector: '#follow-configurations', duration: 220 });
+  },
+
+  onReadinessAction() {
+    const action = this.data.readiness.action;
+    if (action === 'add') return this.onAdd();
+    if (action === 'membership') return this.onGoMine();
+    if (action === 'settings') {
+      getApp().globalData.pendingMineSection = 'reminder-settings';
+      return this.onGoMine();
+    }
+    if (action === 'follows') return wx.pageScrollTo({ selector: '#follow-configurations', duration: 240 });
+    if (action === 'subscribe') return this.onSubscribe();
+    if (action === 'refresh') return this.onRefreshStatus();
+    if (action === 'service') return this.onServiceDetails();
+  },
+
+  consumePendingFocus() {
+    if (!this.visible || !this.data.ready || !this.data.followsLoaded) return;
+    const pending = getApp().globalData.pendingFollowFocus;
+    if (!pending || !['reminder-health', 'follow-configurations'].includes(pending.section)) return;
+    const nextTick = wx.nextTick || (fn => fn());
+    nextTick(() => {
+      if (!this.visible || getApp().globalData.pendingFollowFocus !== pending) return;
+      getApp().globalData.pendingFollowFocus = null;
+      const index = pending.partNumber ? this.data.follows.findIndex(f => f.partNumber === pending.partNumber) : -1;
+      wx.pageScrollTo({ selector: index >= 0 ? '#follow-entry-' + index : '#' + pending.section, duration: 240 });
+    });
+  },
+
+  async onRefreshStatus() {
+    if (this.pageRetired || this.data.refreshing) return;
+    topUpReminderCredit();
+    this.setData({ refreshing: true });
+    try { this.applyBoot(await getBootstrap({ force: true })); if (!this.pageRetired) await this.loadFollows({ force: true }); }
+    catch (error) { if (!this.pageRetired) { this.setData({ refreshError: '刷新失败，已保留上次状态。请稍后重试。' }); showError(error); } }
+    finally { if (!this.pageRetired) this.setData({ refreshing: false }); }
+  },
+
+  onToggleServiceDetails() {
+    if (this.pageRetired) return;
+    const showServiceDetails = !this.data.showServiceDetails;
+    const epoch = this.serviceDetailsFocusEpoch = (this.serviceDetailsFocusEpoch || 0) + 1;
+    this.setData({ showServiceDetails });
+    if (!showServiceDetails || typeof wx.nextTick !== 'function' || typeof wx.pageScrollTo !== 'function') return;
+    const canFocus = () => !this.pageRetired && this.visible && this.data.showServiceDetails && this.serviceDetailsFocusEpoch === epoch;
+    if (!canFocus()) return;
+    try {
+      wx.nextTick(() => {
+        if (!canFocus()) return;
+        try { wx.pageScrollTo({ selector: '#reminder-service-details', duration: 220, fail() {} }); } catch (e) { /* scrolling is optional; keep the details open */ }
+      });
+    } catch (e) { /* older runtimes retain the current scroll position */ }
+  },
+
+  onServiceDetails() {
+    const { collector, delivery } = this.data;
+    wx.showModal({ title: '检测与消息服务', content: `${collector.label}\n${collector.detail}${collector.updatedText ? '\n最近状态：' + collector.updatedText : ''}${collector.batchText ? '\n最近检测：' + collector.batchText : ''}\n\n${delivery.label}\n${delivery.detail}\n\n页面可见时约每分钟读取一次已有观测。后台更新可能延迟，请查看各门店的观测时间；刷新页面不会立即重新检测。`, showCancel: false });
+  },
+
+  openEditor({ followId, pickerValue, isNew }) {
+    if (this.pageRetired) return;
+    if (!canRemind(this.data.boot)) {
+      this.showMemberModal();
+      return;
+    }
+    this.editorEpoch = (this.editorEpoch || 0) + 1;
+    this.editorSelection = null;
+    this.editorBaseline = pickerValue ? selectionKey(pickerValue) : null;
+    const value = pickerValue ? { partNumber: pickerValue.partNumber, storeNumbers: (pickerValue.storeNumbers || []).slice() } : null;
+    this.setData({ editing: true, editor: { followId, pickerValue: value, isNew }, editorCanSave: false, editorDirty: false, editorSummary: '', saveError: '' });
+  },
+
+  showMemberModal() {
+    const product = this.data.boot.memberProduct || {};
+    wx.showModal({
+      title: '关注与到货提醒为会员专属',
+      content: `周卡可关注 3 个具体配置，每个配置最多 3 家门店；月卡和年卡增加至 4 个配置、每个配置 4 家门店。会员可累加到货和断货提醒次数。免费用户可用查询次数实时看货。${product.paymentReady ? '' : '\n\n会员购买暂未开放，可在「我的」查看状态。'}`,
+      confirmText: '前往我的',
+      success: r => { if (r.confirm) wx.switchTab({ url: '/pages/mine/index' }); },
+    });
+  },
+
+  onAdd() {
+    if (this.data.saving || this.data.followBusyId) return;
+    if (!this.data.boot) return toast('正在读取账户，请稍后再试');
+    if (!this.data.boot.member) return this.showMemberModal();
+    if (!this.data.followsLoaded) return toast('正在确认已有关注，请稍后再试');
+    if (this.data.follows.length >= this.data.limits.maxFollows) return toast(`最多同时关注 ${this.data.limits.maxFollows} 个机型`);
+    this.openEditor({ followId: newId('f'), pickerValue: null, isNew: true });
+  },
+
+  onEdit(e) {
+    if (this.data.saving || this.data.followBusyId) return;
+    const follow = this.data.follows.find(f => f.followId === e.currentTarget.dataset.id);
+    if (!follow) return;
+    this.openEditor({ followId: follow.followId, pickerValue: { partNumber: follow.partNumber, storeNumbers: follow.stores.map(s => s.storeNumber) }, isNew: false });
+  },
+
+  onCancelEdit() {
+    if (this.data.saving || this.pageRetired) return;
+    this.editorEpoch = (this.editorEpoch || 0) + 1;
+    this.editorSelection = null;
+    this.editorBaseline = null;
+    this.setData({ editing: false, editorCanSave: false, editorDirty: false, editorSummary: '', saveError: '' });
+  },
+
+  onRequestCloseEditor() {
+    if (this.pageRetired || this.data.saving || !this.data.editing) return;
+    const sheet = typeof this.selectComponent === 'function' && this.selectComponent('#follow-config-sheet');
+    const picker = typeof this.selectComponent === 'function' && this.selectComponent('#follow-target-picker');
+    const current = picker && typeof picker.getSelection === 'function' ? picker.getSelection() : this.editorSelection;
+    const dirty = this.editorBaseline === null ? Boolean(current && current.storeNumbers && current.storeNumbers.length) : selectionKey(current) !== this.editorBaseline;
+    if (sheet && typeof sheet.requestClose === 'function') return sheet.requestClose(dirty);
+    if (!dirty) return this.onCancelEdit();
+    const epoch = this.editorEpoch;
+    wx.showModal({ title: '放弃这次修改？', content: '已保存的关注不会改变。', confirmText: '放弃修改', cancelText: '继续编辑', success: result => { if (result.confirm && epoch === this.editorEpoch) this.onCancelEdit(); } });
+  },
+
+  onEditorChange(e) {
+    if (this.pageRetired || !this.data.editing) return;
+    // The selection is logic state; only its validity needs the render bridge.
+    const selection = this.editorSelection = e.detail;
+    // New pickers choose a default product, but never choose stores themselves.
+    // A coalesced first event may already contain the user's first store tap.
+    if (this.editorBaseline === null) this.editorBaseline = selectionKey({ ...selection, storeNumbers: [] });
+    const title = selection && selection.product && selection.product.title || '请选择具体配置';
+    const count = selection && Array.isArray(selection.storeNumbers) ? selection.storeNumbers.length : 0;
+    this.setData({ editorCanSave: Boolean(selection && selection.partNumber && selection.product && selection.product.supported && count && count <= this.data.limits.maxStoresPerFollow), editorDirty: selectionKey(selection) !== this.editorBaseline, editorSummary: `${title} · ${count} 家门店`, saveError: '' });
+  },
+
+  async onSave() {
+    const accountEpoch = this.accountEpoch || 0;
+    if (this.pageRetired || !this.data.editing || this.data.saving) return;
+    const { editor } = this.data;
+    const epoch = this.editorEpoch;
+    // A picker's change event is deferred by nextTick. Read its current state
+    // at the tap so a fast save cannot submit the previous configuration.
+    const picker = typeof this.selectComponent === 'function' && this.selectComponent('#follow-target-picker');
+    const selection = picker && typeof picker.getSelection === 'function' ? picker.getSelection() : this.editorSelection;
+    if (!selection || !selection.partNumber) return toast('请选择具体配置');
+    if (!selection.product || !selection.product.supported) return toast('此配置暂未开放监测');
+    if (!Array.isArray(selection.storeNumbers) || !selection.storeNumbers.length) return toast('请至少选择一家门店');
+    if (selection.storeNumbers.length > this.data.limits.maxStoresPerFollow) return toast(`当前套餐每个配置最多 ${this.data.limits.maxStoresPerFollow} 家门店，请手动移除超出的门店后保存`);
+    const payload = { followId: editor.followId, partNumber: selection.partNumber, storeNumbers: selection.storeNumbers.slice() };
+    const savedIdentity = this.accountSnapshot && this.accountSnapshot.identity;
+    const intentAtSave = savedIdentity ? this.checkoutStore().restore(savedIdentity, this.catalog) : null;
+    const toppedUp = topUpReminderCredit();
+    this.setData({ saving: true, saveError: '' });
+    try {
+      const result = await call('follow.upsert', payload);
+      if (!confirmsSavedFollow(result && result.follow, payload)) throw Object.assign(new Error('保存结果尚未确认，请重试。'), { code: 'bad_response' });
+      if (intentAtSave && intentAtSave.status === 'ready' && intentAtSave.context.targetSignature === targetSignature(payload)) {
+        this.checkoutStore().clear(savedIdentity, intentAtSave.context.revision);
+        const legacy = getApp().globalData.pendingMemberFollow;
+        if (legacy && legacy.userKey === savedIdentity.userKey && targetSignature(legacy) === targetSignature(payload)) getApp().globalData.pendingMemberFollow = null;
+      }
+      if (accountEpoch !== (this.accountEpoch || 0)) return;
+      this.invalidateFollowRead();
+      invalidateBootstrap();
+      if (this.pageRetired) return;
+      const follow = presentFollow(result.follow, this.data.boot || {}, this.catalog, this.data.collector);
+      const follows = this.data.follows.slice();
+      const savedIndex = follows.findIndex(item => item.followId === follow.followId || item.followId === payload.followId);
+      if (savedIndex >= 0) follows[savedIndex] = { ...follow, detailsExpanded: follows[savedIndex].detailsExpanded === true };
+      else follows.push(follow);
+      const sameEditor = epoch === this.editorEpoch;
+      if (sameEditor) { this.editorSelection = null; this.editorBaseline = null; }
+      this.setData({ follows, ...(sameEditor ? { editing: false, editorCanSave: false, editorDirty: false } : {}) });
+      this.refreshReadiness();
+      if (sameEditor && this.visible !== false) {
+        confirmTap();
+        toast(editor.isNew ? '已加入关注' : '已更新', 'success');
+        if (editor.isNew && !toppedUp && !this.data.subscription.credits) this.promptSubscribe();
+      }
+      if (this.visible !== false) {
+        refreshBootstrap().catch(() => {});
+        // A failed read cannot undo the server's confirmed save or report it as
+        // a failed write. Keep the acknowledged row until a later refresh.
+        try { await this.loadFollows(); }
+        catch (error) { if (!this.pageRetired) this.setData({ refreshError: '关注已保存，列表状态刷新失败，请下拉刷新。' }); }
+      }
+    } catch (error) {
+      if (!this.pageRetired && accountEpoch === (this.accountEpoch || 0) && epoch === this.editorEpoch) {
+        this.setData({ saveError: error.message || '保存未完成，请重试。' });
+        if (this.visible !== false) showError(error);
+      }
+    } finally {
+      if (!this.pageRetired && accountEpoch === (this.accountEpoch || 0)) this.setData({ saving: false });
+    }
+  },
+
+  promptSubscribe() {
+    if (!this.data.boot.templateIds.length || this.data.delivery.cls !== 'ok') return;
+    wx.showModal({
+      title: this.data.subscription.soldoutEnabled ? '开启到货和断货提醒' : '开启补货提醒',
+      content: this.data.subscription.soldoutEnabled ? '一个按钮同时申请到货和断货提醒；两项都选择「允许」，各增加 1 次。也可以只允许其中一项。建议连续授权累加到 10 次以上，避免到货或断货时收不到提醒。' : '每点一次「允许」增加 1 次到货提醒，可以连续授权多次累加；建议累加到 10 次以上，避免补货时收不到提醒。勾选「总是保持以上选择」后，平时点查询、刷新时会自动补充。',
+      confirmText: '增加提醒次数',
+      success: r => { if (r.confirm) this.onSubscribe(); },
+    });
+  },
+
+  observeAuthorization() {
+    if (this.pageRetired) return;
+    if (!this.unsubscribeCredits) this.unsubscribeCredits = subscribeSubscriptions(subscriptions => this.applyCredits(subscriptions));
+    if (!this.unsubscribeAuthorization) this.unsubscribeAuthorization = subscribeAuthorizationState(state => this.applyAuthorizationState(state));
+  },
+
+  applyAuthorizationState(state) {
+    if (this.pageRetired) return;
+    const boot = this.data.boot || {}, accepted = state.acceptedByTemplate || {};
+    const authorization = {
+      pendingRestock: accepted[boot.templateIds && boot.templateIds[0]] || 0,
+      pendingSoldout: accepted[boot.soldoutId] || 0,
+      pendingCount: state.pendingCount,
+      syncing: state.syncing,
+      errorMessage: state.storageBlocked ? (state.pendingCount ? '授权暂存在本次运行，存储失败，请重试同步。' : '无法读取本地授权记录，请重试同步后再授权。') : state.error && state.error.message || '',
+      storageBlocked: state.storageBlocked,
+    };
+    const patch = {};
+    if (JSON.stringify(this.data.authorization) !== JSON.stringify(authorization)) patch.authorization = authorization;
+    if (this.data.subscribing !== state.nativeBusy) patch.subscribing = state.nativeBusy;
+    const pendingChanged = this.data.subscriptionPending !== (state.pendingCount > 0);
+    if (pendingChanged) patch.subscriptionPending = state.pendingCount > 0;
+    if (Object.keys(patch).length) this.setData(patch);
+    if (pendingChanged) this.refreshReadiness();
+  },
+
+  resumeAuthorizationSync() {
+    const state = getAuthorizationState();
+    if (this.pageRetired || (!state.pendingCount && !state.storageBlocked)) return;
+    // The queue owns retries and survives page hide/unload; no native prompt.
+    return syncPendingAuthorization().catch(() => {});
+  },
+
+  async onRetryAuthorizationSync() {
+    if (this.pageRetired || this.data.authorization.syncing) return;
+    await this.resumeAuthorizationSync();
+    if (!this.pageRetired && this.visible !== false && !getAuthorizationState().pendingCount && !getAuthorizationState().error) this.setData({ authorizationFeedback: '已有授权已同步，未重复申请微信授权' });
+  },
+
+  async onSubscribe() {
+    if (this.pageRetired || this.data.subscribing) return;
+    if (!this.data.boot) return toast('正在读取账户，请稍后再试');
+    const tmplIds = this.data.boot.requestIds || this.data.boot.templateIds;
+    if (!tmplIds.length) {
+      wx.showModal({ title: '提醒暂未开放', content: this.data.boot.notificationReason || '尚未配置可用的订阅消息模板。可在关注页查看已有观测，页面可见时约每分钟刷新。', showCancel: false });
+      return;
+    }
+    if (!canRemind(this.data.boot)) return this.showMemberModal();
+    this.observeAuthorization();
+    if (this.data.authorization.storageBlocked) return;
+    if (!this.data.authorizationSession) this.setData({ authorizationSession: true, authorizationPanelFirst: this.data.readiness.action === 'subscribe' && !this.data.readiness.ready });
+    try {
+      // Call in the tap stack. Only WeChat's response blocks the next tap;
+      // persistence and server reconciliation continue in the shared queue.
+      const result = await requestReminderAuthorization(tmplIds, { deferSync: true });
+      if (this.pageRetired || this.visible === false) return;
+      const accepted = result.accepted || [], filtered = result.filtered || [];
+      const outcome = (label, id) => accepted.includes(id) ? label + ' +1' : filtered.includes(id) ? label + '模板被过滤' : result.results && result.results[id] === 'ban' ? label + '授权已关闭' : label + '未授权';
+      let feedback;
+      if (!Object.keys(result.results || {}).length) feedback = filtered.length ? '提醒模板被微信过滤，已有次数保留' : '本次未授权，已有次数保留';
+      else if (this.data.boot.soldoutId) feedback = (accepted.length ? '微信已允许：' : '') + outcome('到货', tmplIds[0]) + '，' + outcome('断货', this.data.boot.soldoutId);
+      else feedback = accepted.length ? '微信已允许到货 +1，可继续点击增加' : result.results[tmplIds[0]] === 'ban' ? '微信授权已关闭，本次未增加' : '本次未授权，次数未增加';
+      this.setData({ authorizationFeedback: feedback });
+      if (accepted.length) confirmTap();
+    } catch (error) {
+      if (this.pageRetired || this.visible === false || error && error.code === 'subscription_busy') return;
+      const message = error && (error.errMsg || error.message) || '';
+      const feedback = /20004/.test(message) ? '你已关闭订阅消息总开关，请在设置中开启'
+        : error && ['subscription_storage_failed', 'subscription_queue_full', 'subscription_identity_required'].includes(error.code) ? message : '授权未完成，已有次数保留';
+      this.setData({ authorizationFeedback: feedback });
+    }
+  },
+
+  applyCredits(subscriptions) {
+    if (this.pageRetired || !this.data.boot || !this.data.boot.templateIds.length) return;
+    const credits = restockSubscription({ templateIds: { restock: this.data.boot.templateIds[0] } }, subscriptions).credits;
+    const soldoutCredits = soldoutSubscription({ templateIds: { soldout: this.data.boot.soldoutId } }, subscriptions).credits;
+    if (credits !== this.data.subscription.credits || soldoutCredits !== this.data.subscription.soldoutCredits) {
+      this.setData({ 'subscription.credits': credits, 'subscription.soldoutCredits': soldoutCredits });
+      this.refreshReadiness();
+    }
+  },
+
+  async onToggle(e) {
+    if (this.toggling || this.pageRetired || this.data.saving || this.data.followBusyId) return;
+    if (!canRemind(this.data.boot)) { this.showMemberModal(); return; }
+    const { id, status } = e.currentTarget.dataset;
+    const existing = this.data.follows.find(follow => follow.followId === id);
+    if (!existing) return;
+    this.toggling = true;
+    const nextStatus = (existing.status || status) === 'active' ? 'paused' : 'active';
+    this.setData({ followBusyId: id, followActionId: '', followActionError: '' });
+    try {
+      const result = await call(nextStatus === 'paused' ? 'follow.pause' : 'follow.resume', { followId: id });
+      this.invalidateFollowRead();
+      if (this.pageRetired) return;
+      const acknowledged = result && result.follow && result.follow.followId === id && result.follow.status === nextStatus;
+      if (acknowledged) {
+        this.setData({ follows: this.data.follows.map(follow => follow.followId === id ? presentFollow({ ...result.follow, detailsExpanded: follow.detailsExpanded }, this.data.boot, this.catalog, this.data.collector) : follow) });
+        this.refreshReadiness();
+      }
+      if (this.visible === false) return;
+      try { await this.loadFollows(); }
+      catch (error) {
+        if (!this.pageRetired) this.setData({ refreshError: acknowledged ? `${nextStatus === 'paused' ? '已暂停' : '已恢复'}关注，最新观测读取失败，请刷新确认。` : '操作已提交，当前状态待确认，请刷新查看。' });
+      }
+    } catch (error) {
+      this.invalidateFollowRead();
+      if (!this.pageRetired) {
+        this.setData({ followActionId: id, followActionError: followActionError(error, '操作') });
+        if (this.visible !== false) showError(error);
+      }
+    } finally { this.toggling = false; if (!this.pageRetired) this.setData({ followBusyId: '' }); }
+  },
+
+  onRemove(e) {
+    if (this.pageRetired || this.data.saving || this.data.followBusyId || this.removing) return;
+    const id = e.currentTarget.dataset.id;
+    if (!this.data.follows.some(follow => follow.followId === id)) return;
+    this.removing = true;
+    wx.showModal({
+      title: '删除关注',
+      content: '删除后停止这条关注并释放名额，已产生的历史记录会保留。',
+      confirmColor: '#D64545',
+      success: async r => {
+        if (!r.confirm || this.pageRetired) { this.removing = false; return; }
+        this.setData({ followBusyId: id, followActionId: '', followActionError: '' });
+        try {
+          const result = await call('follow.remove', { followId: id });
+          this.invalidateFollowRead();
+          if (this.pageRetired) return;
+          const acknowledged = result && result.removed === true && result.followId === id;
+          if (acknowledged) {
+            this.setData({ follows: this.data.follows.filter(follow => follow.followId !== id) });
+            this.refreshReadiness();
+          }
+          refreshBootstrap().catch(() => {});
+          if (this.visible === false) return;
+          try { await this.loadFollows(); }
+          catch (error) { if (!this.pageRetired) this.setData({ refreshError: acknowledged ? '关注已删除，列表刷新失败，请下拉刷新。' : '删除操作已提交，结果待确认，请刷新查看。' }); }
+        } catch (error) {
+          this.invalidateFollowRead();
+          if (!this.pageRetired) {
+            this.setData({ followActionId: id, followActionError: followActionError(error, '删除') });
+            if (this.visible !== false) showError(error);
+          }
+        } finally {
+          this.removing = false;
+          if (!this.pageRetired) this.setData({ followBusyId: '' });
+        }
+      },
+      fail: () => { this.removing = false; },
+    });
+  },
+
+  onToggleFollowDetails(e) {
+    const index = this.data.follows.findIndex(follow => follow.followId === e.currentTarget.dataset.id);
+    if (index >= 0) this.setData({ [`follows[${index}].detailsExpanded`]: !this.data.follows[index].detailsExpanded });
+  },
+
+  onPickupInfo(e) {
+    if (this.pageRetired) return;
+    const follow = this.data.follows.find(item => item.followId === e.currentTarget.dataset.id);
+    if (!follow) return;
+    const current = presentFollow(follow, this.data.boot || {}, this.catalog, this.data.collector);
+    if (follow.status === 'limit_paused') return toast('当前套餐名额不足，配置已保留；可升级月卡或年卡恢复');
+    const stores = current.stores.filter(store => !store.limitPaused && store.observationState === 'fresh' && store.status === 'available');
+    this.refreshFollowPresentation();
+    if (!stores.length) return toast('观测已过期，请刷新后再确认');
+    wx.showModal({ title: '最近观测可取货', content: `${follow.productTitle}\n${stores.map(store => `${store.storeLabel}\n观测 ${store.observedText}${typeof store.quote === 'string' && store.quote ? '\n' + store.quote : ''}`).join('\n\n')}\n\n库存可能变化，请在 Apple Store App 或官网确认。`, confirmText: '复制配置', cancelText: '返回', success: result => {
+      if (result.confirm && !this.pageRetired) wx.setClipboardData({ data: `${follow.productTitle}\n型号：${follow.partNumber}\n门店：${stores.map(store => store.storeLabel).join('、')}`, success: () => toast('已复制型号和门店'), fail: () => toast('复制失败，请重试') });
+    } });
+  },
+
+  onGoMine() {
+    wx.switchTab({ url: '/pages/mine/index' });
+  },
+
+  onGoReminderSettings() {
+    getApp().globalData.pendingMineSection = 'reminder-settings';
+    this.onGoMine();
+  },
+
+  onFollowImageError(e) { const index = Number(e.currentTarget.dataset.index); this.setData({ [`follows[${index}].imageUrl`]: '' }); },
+
+  onRetryLoad() {
+    if (this.pageRetired) return;
+    this.setData({ loadError: null });
+    return this.onLoad();
+  },
+});
