@@ -27,7 +27,7 @@ function callbackRequest({ overrides = {}, innerAppid = APPID, refund = false, i
   const pay = ios ? '' : '<WeChatPayInfo><MchOrderNo>platform-order-001</MchOrderNo><TransactionId>wxpay-001</TransactionId></WeChatPayInfo>';
   const xml = refund
     ? `<xml><MsgType>event</MsgType><Event>xpay_refund_notify</Event><OpenId>${fields.openid}</OpenId><MchOrderId>${fields.outTradeNo}</MchOrderId><WxOrderId>platform-order-001</WxOrderId><WxRefundId>${fields.refundId}</WxRefundId><RefundFee>${fields.refundAmount}</RefundFee><RetCode>${fields.refundResult}</RetCode></xml>`
-    : `<xml><MsgType>event</MsgType><Event>xpay_goods_deliver_notify</Event><OpenId>${fields.openid}</OpenId><OutTradeNo>${fields.outTradeNo}</OutTradeNo><Env>${fields.env}</Env>${pay}<GoodsInfo><ProductId>${fields.product}</ProductId><OrigPrice>${fields.amount}</OrigPrice><ActualPrice>${fields.amount}</ActualPrice><Quantity>${fields.quantity}</Quantity><Attach>${fields.attach}</Attach></GoodsInfo></xml>`;
+    : `<xml><MsgType>event</MsgType><Event>xpay_goods_deliver_notify</Event><OpenId>${fields.openid}</OpenId><OutTradeNo>${fields.outTradeNo}</OutTradeNo><Env>${fields.env}</Env>${pay}<GoodsInfo><ProductId>${fields.product}</ProductId><OrigPrice>${fields.amount}</OrigPrice><ActualPrice>${fields.actualAmount ?? fields.amount}</ActualPrice><Quantity>${fields.quantity}</Quantity><Attach>${fields.attach}</Attach></GoodsInfo></xml>`;
   const key = Buffer.from(`${AES}=`, 'base64'), payload = Buffer.from(xml), length = Buffer.alloc(4); length.writeUInt32BE(payload.length);
   const raw = Buffer.concat([Buffer.alloc(16, 23), length, payload, Buffer.from(innerAppid)]), padding = 32 - raw.length % 32;
   const encryptor = createCipheriv('aes-256-cbc', key, key.subarray(0, 16)); encryptor.setAutoPadding(false);
@@ -124,6 +124,35 @@ test('an authentic safe-mode delivery calls authoritative reconciliation and ack
   assert.equal((await f.repo.getUser(userKeyOf())).membership.expiresAt, '2026-09-22T02:00:00.000Z');
   assert.equal(f.provider.getReadiness().ready, false, 'disabling checkout does not disable in-flight notifications');
 });
+
+for (const [planId, days, amount, standard] of [['member_30d', 30, 1499, 3000], ['member_365d', 365, 12900, 36000]]) {
+  test(`v3 ${planId} callbacks bind standard goods and actual paid price separately before authoritative reconciliation`, async () => {
+    const f = await harness(); const productId = `new-standard-${days}`;
+    await f.repo.saveOrder({ ...f.order, planId, amountFen: amount, days, productId,
+      quoteExpiresAt: new Date(f.state.now.getTime() + 600000).toISOString(), paymentPreparedAt: f.state.now.toISOString(),
+      paymentSnapshot: { ...f.order.paymentSnapshot, version: 3, planId, priceFen: amount, goodsPrice: standard,
+        activitySellingPrice: amount, promotionEndsAt: '2026-11-30T16:00:00.000Z', days, productId } });
+    let queries = 0;
+    const entry = createPaymentEntry({ repo: f.repo, env, clock: () => new Date(f.state.now),
+      fetchImpl: async url => {
+        if (url.includes('/cgi-bin/stable_token')) return new Response(JSON.stringify({ access_token: 'mock-token', expires_in: 7200 }));
+        assert.ok(url.includes('/xpay/query_order')); queries++;
+        return new Response(JSON.stringify({ errcode: 0, order: { order_id: OUT, wx_order_id: 'platform-order-001', status: 2,
+          order_type: 0, env_type: 1, order_fee: amount, paid_fee: amount, left_fee: amount } }));
+      }, log: { warn() {} }, handleAction: async () => { throw new Error('unexpected user action'); } });
+    for (const overrides of [{ amount: amount, actualAmount: amount }, { amount: standard, actualAmount: standard }]) {
+      assert.equal((await entry(callbackRequest({ overrides: { product: productId, ...overrides } }))).statusCode, 403);
+    }
+    assert.equal(queries, 0);
+    const request = callbackRequest({ overrides: { product: productId, amount: standard, actualAmount: amount } });
+    assert.equal((await entry(request)).body, 'success');
+    assert.equal((await entry(request)).body, 'success');
+    assert.equal(queries, 2);
+    const user = await f.repo.getUser(userKeyOf());
+    assert.equal(user.membership.expiresAt, new Date(f.state.now.getTime() + days * 86400000).toISOString());
+    assert.equal(user.membership.entitlements.segments[0].planId, planId);
+  });
+}
 
 for (const [planId, days, amount] of [['member_30d', 30, 1990], ['member_365d', 365, 20000]]) {
   test(`authenticated callbacks fulfil ${planId} from its immutable snapshot even when checkout is disabled`, async () => {

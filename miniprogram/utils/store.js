@@ -7,6 +7,7 @@ const PRODUCT_IMAGES = require('../config/product-images');
 const CATALOG_SEED = require('../config/catalog-seed');
 const { sortFamilies } = require('./catalog-order');
 const { presentStore } = require('./store-label');
+const { readSession, writeSession } = require('./session');
 
 const CATALOG_KEY = 'gxs_catalog_v1';
 const CATEGORY_ORDER = ['iphone', 'ipad', 'mac', 'watch', 'airpods', 'vision', 'homepod'];
@@ -23,6 +24,9 @@ let catalogPromise = null;
 let catalogGeneration = 0;
 let catalogCheckedAt = 0;
 let catalogRetryAt = 0;
+let catalogRaw = null;
+let catalogStorageRead = false;
+let catalogStoragePromise = null;
 const catalogListeners = new Set();
 const quotaListeners = new Set();
 const subscriptionListeners = new Set();
@@ -36,6 +40,8 @@ let followGeneration = 0;
 function invalidateFollows() { followGeneration += 1; followSnapshot = null; followPromise = null; }
 function resetSession() {
   invalidateBootstrap(); invalidateFollows();
+  try { require('./conversion-events').configure(null); }
+  catch (error) { console.error('[gxs] conversion configuration', error); }
   latestQuota = null; latestBalance = null;
   bootstrapFetchedAt = 0; catalogCheckedAt = 0; catalogRetryAt = 0; catalogPromise = null; catalogGeneration += 1;
   const app = getApp(); app.globalData.catalog = null; app.globalData.lastQuery = null; app.globalData.pendingFollow = null;
@@ -66,6 +72,8 @@ async function refreshBootstrap() {
       data = { ...data, quota: currentQuota() };
     }
     app.globalData.bootstrap = data; bootstrapFetchedAt = Date.now();
+    try { require('./conversion-events').configure(data); }
+    catch (error) { console.error('[gxs] conversion configuration', error); }
     return data;
   }, error => {
     if (generation !== bootstrapGeneration) return getBootstrap();
@@ -254,34 +262,57 @@ function subscribeCatalog(listener) {
 }
 
 function cachedCatalog() {
-  try { const value = wx.getStorageSync(CATALOG_KEY); return validCatalog(value) ? value : null; }
-  catch (e) { return null; }
+  if (!catalogStorageRead && typeof wx.getStorage !== 'function') {
+    catalogStorageRead = true;
+    try { const value = wx.getStorageSync(CATALOG_KEY); catalogRaw = validCatalog(value) ? value : null; }
+    catch (e) { catalogRaw = null; }
+  }
+  return catalogRaw;
+}
+
+function loadCatalogCache() {
+  if (catalogStorageRead) return Promise.resolve(catalogRaw);
+  if (catalogStoragePromise) return catalogStoragePromise;
+  catalogStoragePromise = readSession(CATALOG_KEY).then(value => {
+    catalogStorageRead = true;
+    catalogRaw = validCatalog(value) ? value : null;
+    return catalogRaw;
+  });
+  return catalogStoragePromise;
 }
 
 async function refreshCatalog({ force = false } = {}) {
   if (catalogPromise) return catalogPromise;
   const generation = catalogGeneration;
   const app = getApp();
-  const current = app.globalData.catalog;
-  const raw = cachedCatalog() || CATALOG_SEED;
-  const version = current ? current.version : raw.version;
-  const pending = call('catalog.get', version ? { ifVersion: version } : {}).then(response => {
-    // An earlier request may finish after this session has been invalidated.
-    // Its result must not publish, persist or reset the new session's timers.
-    if (generation !== catalogGeneration) return app.globalData.catalog || indexCatalog(cachedCatalog() || CATALOG_SEED);
-    if (!response || (!response.unchanged && !validCatalog(response))) throw new Error('商品目录暂时不可用，请稍后刷新');
-    catalogCheckedAt = Date.now();
-    catalogRetryAt = 0;
-    if (response.unchanged) return app.globalData.catalog || indexCatalog(raw);
-    const indexed = indexCatalog(response);
-    app.globalData.catalog = indexed;
-    if (typeof wx.setStorage === 'function') wx.setStorage({ key: CATALOG_KEY, data: response, fail() {} });
-    else { try { wx.setStorageSync(CATALOG_KEY, response); } catch (e) { /* in-memory catalog remains usable */ } }
-    if (!current || current.version !== indexed.version) {
-      for (const listener of catalogListeners) { try { listener(indexed); } catch (e) { console.error('[gxs] catalog listener', e); } }
-    }
-    return indexed;
-  });
+  const request = () => {
+    // Read the persisted snapshot before choosing ifVersion. A seed created by
+    // a picker during startup must not cause an avoidable full catalog reply.
+    const raw = cachedCatalog() || CATALOG_SEED;
+    const current = app.globalData.catalog;
+    const version = current && current.version !== CATALOG_SEED.version ? current.version : raw.version;
+    return call('catalog.get', version ? { ifVersion: version } : {}).then(response => {
+      // An earlier request may finish after this session has been invalidated.
+      // Its result must not publish, persist or reset the new session's timers.
+      if (generation !== catalogGeneration) return app.globalData.catalog || indexCatalog(cachedCatalog() || CATALOG_SEED);
+      if (!response || (!response.unchanged && !validCatalog(response))) throw new Error('商品目录暂时不可用，请稍后刷新');
+      catalogCheckedAt = Date.now();
+      catalogRetryAt = 0;
+      if (response.unchanged) {
+        if (!app.globalData.catalog || app.globalData.catalog.version !== version) app.globalData.catalog = indexCatalog(raw);
+        return app.globalData.catalog;
+      }
+      const indexed = indexCatalog(response);
+      app.globalData.catalog = indexed;
+      catalogRaw = response;
+      writeSession(CATALOG_KEY, response);
+      if (!current || current.version !== indexed.version) {
+        for (const listener of catalogListeners) { try { listener(indexed); } catch (e) { console.error('[gxs] catalog listener', e); } }
+      }
+      return indexed;
+    });
+  };
+  const pending = typeof wx.getStorage === 'function' ? loadCatalogCache().then(request) : request();
   catalogPromise = pending;
   try { return await pending; }
   catch (error) { if (generation === catalogGeneration) catalogRetryAt = Date.now() + 30000; throw error; }
@@ -290,6 +321,17 @@ async function refreshCatalog({ force = false } = {}) {
 
 async function getCatalog({ force = false } = {}) {
   const app = getApp();
+  if (typeof wx.getStorage === 'function' && !catalogStorageRead) {
+    const generation = catalogGeneration;
+    const cached = await loadCatalogCache();
+    if (generation === catalogGeneration && cached && (!app.globalData.catalog || app.globalData.catalog.version === CATALOG_SEED.version && app.globalData.catalog.version !== cached.version)) {
+      const previous = app.globalData.catalog;
+      app.globalData.catalog = indexCatalog(cached);
+      if (previous && previous.version !== cached.version) {
+        for (const listener of catalogListeners) { try { listener(app.globalData.catalog); } catch (e) { console.error('[gxs] catalog listener', e); } }
+      }
+    }
+  }
   const catalog = currentCatalog();
   if (force) return refreshCatalog({ force: true });
   const expected = app.globalData.bootstrap && app.globalData.bootstrap.catalogVersion;

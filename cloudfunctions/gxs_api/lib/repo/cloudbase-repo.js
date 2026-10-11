@@ -293,6 +293,22 @@ function createCloudbaseRepo(db) {
     async listOrders(userKey, limit) {
       return readAll(col(COLLECTIONS.orders).where({ userKey }).orderBy('createdAt', 'desc'), limit || 20);
     },
+    /** Bounded keyset scan for explicit admin reports; never called by bootstrap. */
+    async scanGrowthReport(collection, limit, { remainingMs = () => Infinity } = {}) {
+      if (![COLLECTIONS.orders, COLLECTIONS.growthAccounts, COLLECTIONS.growthEvents].includes(collection)) throw new Error('invalid_growth_collection');
+      const rows = [];
+      let after = null;
+      while (rows.length < limit) {
+        if (remainingMs() < 3000) return { rows, complete: false };
+        const query = after ? col(collection).where({ _id: _.gt(after) }) : col(collection);
+        const size = Math.min(100, limit - rows.length);
+        const { data = [] } = await query.orderBy('_id', 'asc').limit(size).get();
+        rows.push(...data);
+        if (data.length < size) return { rows, complete: true };
+        after = data[data.length - 1]._id;
+      }
+      return { rows, complete: false };
+    },
     /** Operator insights: newest documents with `field` >= `since` (events by dayKey, notifications by createdAt). */
     async listSince(collection, field, since, limit) {
       return readAll(col(collection).where({ [field]: _.gte(since) }).orderBy(field, 'desc'), limit);
@@ -373,6 +389,23 @@ function createCloudbaseRepo(db) {
     async saveRetentionStatus(status) {
       const { _id, ...data } = status;
       await col(COLLECTIONS.config).doc('retention_status').set({ data });
+    },
+    /** Delete only disposable UI telemetry; preserve cash and first-intent identity. */
+    async purgeGrowthData({ eventCutoff, detailCutoff }) {
+      const result = { eventCutoff, detailCutoff, removedEvents: 0, removedGuards: 0, compactedIntents: 0, errors: {} };
+      const runCleanup = async (name, operation) => {
+        try { const response = await operation(); result[name] = response && response.stats ? response.stats.removed || response.stats.updated || 0 : 0; }
+        catch (error) {
+          // Default-off deployments may not have created the new collections.
+          if (!isMissingCollectionError(error)) result.errors[name] = String(error && (error.errMsg || error.message) || error);
+        }
+      };
+      await runCleanup('removedEvents', () => col(COLLECTIONS.growthEvents).where({ receivedAt: _.lt(eventCutoff) }).remove());
+      await runCleanup('removedGuards', () => col(COLLECTIONS.growthAccounts).where({ firstIntent: _.eq(null), updatedAt: _.lt(eventCutoff) }).remove());
+      await runCleanup('compactedIntents', () => col(COLLECTIONS.growthAccounts)
+        .where({ 'firstIntent.at': _.lt(detailCutoff), 'firstIntent.compacted': _.neq(true) })
+        .update({ data: { 'firstIntent.target': null, 'firstIntent.experiment': null, 'firstIntent.platform': null, 'firstIntent.compacted': true } }));
+      return result;
     },
     /** Remove history data older than firstDay; each target is removed independently. */
     async purgeExpiredData({ firstDay, cutoffIso }) {

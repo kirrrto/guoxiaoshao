@@ -29,7 +29,31 @@ function insightLines(data) {
   ];
 }
 
-const EDITABLE_KEYS = ['quota', 'tasks', 'memberProduct', 'memberPlans', 'memberRedemption', 'newProductWindows', 'notifications', 'collector', 'query', 'announcement'];
+const EDITABLE_KEYS = ['quota', 'tasks', 'memberProduct', 'memberPlans', 'memberRedemption', 'newProductWindows', 'notifications', 'collector', 'query', 'announcement', 'features', 'growthExperiment'];
+
+function growthLines(data) {
+  const f = data.finance, c = data.cohort, coverage = data.coverage;
+  const money = fen => Number.isSafeInteger(fen) ? `¥${(fen / 100).toFixed(2)}` : '待核实';
+  return [
+    `范围：${fmt.fmtDateTime(data.since)} 至 ${fmt.fmtDateTime(data.until)}（北京时间）。`,
+    coverage.complete ? '所扫描集合未达到上限；前端事件仍可能漏报，不代表所有访问。' : `扫描已截断，每集合最多 ${coverage.scanLimit} 条；以下仅样本，不能当全站总量。D7 比率停止计算。`,
+    `有付款证据：${f.cashOrders} 单／${f.payingAccounts} 个账户；其中用户隐藏记录 ${f.hiddenCashOrders} 单仍计入。`,
+    `本期付款订单毛额 ${money(f.grossFen)}；这些订单截至读取时累计已核实退款 ${money(f.refundsFen)}；已核实净额 ${money(f.netFen)}。手续费未知。`,
+    `全历史扫描中的赠送／兑换／测试 ${f.nonCashOrders} 单；付款证据不足 ${f.unknownPaymentOrders} 单；本期未知退款 ${f.unknownRefundOrders} 单；重复交易 ${f.duplicateTransactions} 单。`,
+    ...Object.entries(f.byPlan).map(([id, plan]) => `${id}：${plan.orders} 单，首付 ${plan.firstPayments}／复购 ${plan.repeatPayments}，毛额 ${money(plan.grossFen)}、已核实退款 ${money(plan.refundsFen)}。`),
+    ...(!f.firstPaymentClassificationComplete ? ['历史付款证据或扫描范围不完整，套餐首付／复购分类仅供核对，不能视为完整结论。'] : []),
+    `首个有效目标队列：合格 ${c.eligible} 人，满 7×24 小时 ${c.mature} 人，仍观察 ${c.pending} 人；D7 首付 ${c.firstPaidD7} 人，率 ${percent(c.rate)}。`,
+    `已有真实付费 ${c.existingPayers} 人另列；历史未知 ${c.unknownHistory} 人待核对。付款时间以服务端首次核实为准。`,
+    ...Object.entries(c.byExperiment).map(([id, group]) => `实验 ${id}：成熟 ${group.mature} 人，D7 首付 ${group.firstPaidD7} 人，率 ${percent(group.rate)}。样本充分性与显著性未评定。`),
+    `采集到的已识别账户 ${data.traffic.identifiedAccounts}，会话 ${data.traffic.sessions}；匿名访问未知。采集开关${data.traffic.collectionEnabled ? '已开' : '已关'}。`,
+    `已看到方案 ${data.checkout.offerAccounts} 人，其中支付受阻 ${data.checkout.blockedOfferAccounts} 人（${percent(data.checkout.rate)}）。`,
+    ...Object.entries(data.checkout.reasons).map(([code, count]) => `受阻事件 ${code}：${count} 次。`),
+    ...Object.entries(data.feedback.responses).map(([code, count]) => `自愿反馈 ${code}：${count} 次；非总体比例。`),
+    '付款后 24 小时激活率：暂不可计算。历史未完整保存逐时授权就绪状态，现有关注数不能代替。',
+    '收入按本期付款订单归属及累计退款展示，不是本期退款现金流；以上为分批读取快照，可能存在写入延迟。',
+    `前端原始事件保留最近 ${coverage.eventRetentionDays} 个北京时间自然日；意向目标与实验详情保留 ${coverage.intentDetailRetentionDays} 天，之后只保留首次时间防止重复入组。`,
+  ];
+}
 
 Page({
   data: {
@@ -37,6 +61,7 @@ Page({
     checked: false,
     stats: null,
     insights: null,
+    growth: null,
     configText: '',
     configDirty: false,
     saving: false,
@@ -73,7 +98,7 @@ Page({
   clearAccess(error) {
     this._configRevision = null;
     const denied = error && ['forbidden', 'user_required', 'app_not_allowed'].includes(error.code);
-    this.setData({ allowed: false, checked: Boolean(error), stats: null, insights: null, configText: '', configDirty: false, lookup: null, lookupText: '', grant: { userKey: '', days: '30', amount: '5', note: '' }, accessError: error ? (denied ? '当前账号没有管理权限，请由项目所有者在云端配置授权。' : '权限检查失败，请稍后重试。') : null });
+    this.setData({ allowed: false, checked: Boolean(error), stats: null, insights: null, growth: null, configText: '', configDirty: false, lookup: null, lookupText: '', grant: { userKey: '', days: '30', amount: '5', note: '' }, accessError: error ? (denied ? '当前账号没有管理权限，请由项目所有者在云端配置授权。' : '权限检查失败，请稍后重试。') : null });
   },
 
   async callAdmin(action, payload) {
@@ -113,6 +138,16 @@ Page({
     this._configRevision = Number.isSafeInteger(revision) && revision >= 0 ? revision : null;
     this.setData({ configText: JSON.stringify(editable, null, 2), configDirty: false });
     } catch (error) { showError(error); }
+  },
+
+  async onLoadGrowth() {
+    if (!this.data.allowed || this.data.busy) return;
+    this.setData({ busy: 'growth' });
+    try {
+      const data = await this.callAdmin('admin.growth', { days: 30 });
+      this.setData({ growth: { lines: growthLines(data) } });
+    } catch (error) { showError(error); }
+    finally { this.setData({ busy: '' }); }
   },
 
   onConfigInput(e) {

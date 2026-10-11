@@ -3,7 +3,7 @@ const { createHash, randomUUID } = require('node:crypto');
 const { ApiError } = require('../errors');
 const { membershipSnapshot, LIMITS, ENHANCED_LIMITS } = require('../rules/membership');
 const { createVirtualPaymentProvider, PaymentProtocolError } = require('./virtual-payment');
-const { PLANS, DEFAULT_PLAN_ID, findPlan, planForTerms, planIdOfOrder } = require('./plans');
+const { PLANS, DEFAULT_PLAN_ID, findPlan, pricedPlan, planForTerms, planIdOfOrder, snapshotTermsValid, QUOTE_TTL_MS } = require('./plans');
 
 const PROVIDER = 'wechat_virtual_payment';
 let sharedProviders = new Map();
@@ -13,21 +13,28 @@ const orderKey = (userKey, clientId) => `G${createHash('sha256').update(`${userK
 const conflict = () => { throw new ApiError('payment_evidence_mismatch', '支付凭证与订单不一致，请联系客服核对'); };
 
 function configuredProduct(ctx, planId = DEFAULT_PLAN_ID) {
-  const plan = findPlan(planId);
+  const plan = pricedPlan(planId, nowOf(ctx));
   if (!plan) throw new ApiError('invalid_member_plan', '请选择有效的会员套餐');
-  if (planId === DEFAULT_PLAN_ID) return { ...ctx.config.memberProduct, id: planId, planId, productId: ctx.config.virtualPayment.productId };
+  if (planId === DEFAULT_PLAN_ID) return { ...ctx.config.memberProduct, standardPriceFen: plan.standardPriceFen, promotion: null,
+    id: planId, planId, productId: ctx.config.virtualPayment.productId };
   const mapping = ctx.config.memberPlans && ctx.config.memberPlans[planId] || {};
   return { ...plan, planId, productId: mapping.productId || '', enabled: mapping.enabled === true,
-    note: `一次购买 ${plan.days} 天，已有会员按剩余有效期顺延，不自动续费。` };
+    note: `一次性虚拟服务，一经售出不予退款。一次购买 ${plan.days} 天，已有会员按剩余有效期顺延，不自动续费。` };
 }
 
 function paymentProviderFor(ctx, planId = DEFAULT_PLAN_ID) {
   if (ctx.paymentProvider) return ctx.paymentProvider;
-  if (ctx._paymentProviders && ctx._paymentProviders.has(planId)) return ctx._paymentProviders.get(planId);
   const product = configuredProduct(ctx, planId);
   const env = ctx.paymentEnv || process.env;
   const config = { ...ctx.config.virtualPayment, productId: product.productId, priceFen: product.priceFen,
+    goodsPrice: product.standardPriceFen,
+    activitySellingPrice: product.promotion && product.promotion.active ? product.priceFen : null,
     days: product.days, enabled: product.enabled };
+  // Include effective terms so a warm invocation cannot retain the promotion
+  // across its deadline. At most one cached provider per logical plan.
+  const termsKey = JSON.stringify(config);
+  const local = ctx._paymentProviders && ctx._paymentProviders.get(planId);
+  if (local && local.termsKey === termsKey) return local.provider;
   const expectedAppid = ctx.config.notifications.consumerAppId;
   const useShared = ctx.paymentCacheAllowed === true && env === process.env && ctx.fetchImpl === globalThis.fetch;
   // Bounded by the three plans. Credential/config rotation replaces the cache.
@@ -37,25 +44,28 @@ function paymentProviderFor(ctx, planId = DEFAULT_PLAN_ID) {
     'GXS_PAYMENT_CALLBACK_TOKEN', 'GXS_PAYMENT_CALLBACK_AES_KEY', 'GXS_CONSUMER_ORIGINAL_ID',
   ].map(name => env[name] || null)]) : null;
   if (useShared && key !== sharedProviderKey) { sharedProviderKey = key; sharedProviders = new Map(); }
-  let provider = useShared && sharedProviders.get(planId);
+  const shared = useShared && sharedProviders.get(planId);
+  let provider = shared && shared.termsKey === termsKey && shared.provider;
   if (!provider) {
     provider = createVirtualPaymentProvider({ config, expectedAppid, env,
       fetchImpl: ctx.fetchImpl, clock: useShared ? () => new Date() : ctx.clock });
-    if (useShared) sharedProviders.set(planId, provider);
+    if (useShared) sharedProviders.set(planId, { termsKey, provider });
   }
   if (!ctx._paymentProviders) ctx._paymentProviders = new Map();
-  ctx._paymentProviders.set(planId, provider);
+  ctx._paymentProviders.set(planId, { termsKey, provider });
   return provider;
 }
 
 function presentProduct(ctx, planId) {
   const configured = configuredProduct(ctx, planId), plan = findPlan(planId);
   const payment = paymentProviderFor(ctx, planId).getReadiness();
-  const matches = configured.priceFen === plan.priceFen && configured.days === plan.days
+  const matches = configured.standardPriceFen === plan.priceFen && configured.days === plan.days
+    && (planId !== DEFAULT_PLAN_ID || configured.priceFen === plan.priceFen)
     && (planId !== DEFAULT_PLAN_ID || ctx.config.memberProduct.id === configured.productId);
   const ready = configured.enabled === true && payment.ready === true && matches;
   const limits = planId === DEFAULT_PLAN_ID ? LIMITS : ENHANCED_LIMITS;
-  return { id: planId, planId, productId: configured.productId, title: configured.title, priceFen: configured.priceFen, days: configured.days,
+  return { id: planId, planId, productId: configured.productId, title: configured.title, priceFen: configured.priceFen,
+    standardPriceFen: configured.standardPriceFen, promotion: configured.promotion, days: configured.days,
     limits: { maxFollows: limits.maxFollows, maxStoresPerFollow: limits.maxStoresPerFollow },
     benefitText: `${limits.maxFollows} 个配置 · 每配置 ${limits.maxStoresPerFollow} 家门店`,
     note: configured.note, enabled: ready, paymentReady: ready,
@@ -81,7 +91,7 @@ function validateOrder(ctx, order) {
   if (cancelledIntent(ctx, order)) return;
   const s = order && order.paymentSnapshot;
   const plan = order && planForTerms(order.days, order.amountFen);
-  if (!order || order.provider !== PROVIDER || !s || ![1, 2].includes(s.version) || s.provider !== PROVIDER
+  if (!order || order.provider !== PROVIDER || !s || !snapshotTermsValid(order) || s.provider !== PROVIDER
     || order.appid !== ctx.config.notifications.consumerAppId || s.appid !== order.appid
     || order.userKey !== `${order.appid}:${order.openid}` || order._id !== order.outTradeNo
     || order.outTradeNo !== orderKey(order.userKey, order.orderId)
@@ -101,6 +111,28 @@ function cancelledIntent(ctx, order) {
     && order.userKey === `${order.appid}:${order.openid}` && order._id === order.outTradeNo
     && order._id === orderKey(order.userKey, order.orderId) && order.amountFen === 0 && order.days === 0
     && order.paymentSnapshot === null && order.paymentPreparedAt === null && !order.transactionId && !order.fulfilledAt);
+}
+
+const unpreparedQuote = order => Boolean(order && order.status === 'created' && !order.paymentPreparedAt
+  && !order.transactionId && !order.fulfilledAt && order.providerStatus == null);
+const cancelledQuote = order => Boolean(order && order.status === 'cancelled' && order.quoteCancelledAt
+  && !order.paymentPreparedAt && !order.transactionId && !order.fulfilledAt);
+function quoteIssue(order, product, expectedPriceFen, now) {
+  if (order && order.quoteExpiresAt && now.getTime() >= Date.parse(order.quoteExpiresAt)) return 'quote_expired';
+  if (order && order.amountFen !== product.priceFen) return 'price_changed';
+  if (expectedPriceFen === undefined && product.planId === DEFAULT_PLAN_ID) return null;
+  if (!Number.isSafeInteger(expectedPriceFen)) return 'confirmation_required';
+  return expectedPriceFen === product.priceFen ? null : 'price_changed';
+}
+async function rejectQuote(ctx, order, clientId, product, reason) {
+  // Caller holds the lease and has proved that no signature has escaped. A
+  // durable cancellation fences delayed retries of this same client intent.
+  if (order) {
+    const nowIso = nowOf(ctx).toISOString();
+    await ctx.repo.updateOrder(order._id, { status: 'cancelled', cancelledAt: nowIso, quoteCancelledAt: nowIso, paymentPreparedAt: null });
+  }
+  throw new ApiError('payment_price_changed', '价格或报价有效期已更新，请确认后重新购买',
+    { product, orderId: clientId, canDiscardIntent: true, reason });
 }
 
 async function withOrderLease(ctx, id, work) {
@@ -128,7 +160,12 @@ async function resultOf(ctx, order, providerState, canPrepare = false) {
 async function reconcileLocked(ctx, inputOrder, { acknowledge = true, permitUnprepared = false } = {}) {
   let order = await ctx.repo.getOrder(inputOrder._id);
   validateOrder(ctx, order);
-  if (cancelledIntent(ctx, order)) return resultOf(ctx, order, 'cancelled');
+  if (cancelledIntent(ctx, order) || cancelledQuote(order)) return resultOf(ctx, order, 'cancelled');
+  if (unpreparedQuote(order) && order.quoteExpiresAt && nowOf(ctx).getTime() >= Date.parse(order.quoteExpiresAt)) {
+    const nowIso = nowOf(ctx).toISOString();
+    order = await ctx.repo.updateOrder(order._id, { status: 'cancelled', cancelledAt: nowIso, quoteCancelledAt: nowIso });
+    return resultOf(ctx, order, 'cancelled');
+  }
   const provider = paymentProviderFor(ctx);
   let evidence;
   try { evidence = await provider.queryOrder({ openid: order.openid, outTradeNo: order.outTradeNo }); }
@@ -220,13 +257,19 @@ async function abandonPurchase(ctx, user, clientId) {
   } catch (error) { throw protocolError(error); }
 }
 
-async function createPurchase(ctx, user, clientId, loginCode, requestedPlanId) {
+async function createPurchase(ctx, user, clientId, loginCode, requestedPlanId, expectedPriceFen) {
   const id = orderKey(user._id, clientId);
   try {
     return await withOrderLease(ctx, id, async () => {
       let order = await ctx.repo.getOrder(id);
       if (order) {
         if (order.userKey !== user._id || order.orderId !== clientId) conflict();
+        validateOrder(ctx, order);
+        if (unpreparedQuote(order)) {
+          const product = presentProduct(ctx, planIdOfOrder(order));
+          const reason = quoteIssue(order, product, expectedPriceFen, nowOf(ctx));
+          if (reason) await rejectQuote(ctx, order, clientId, product, reason);
+        }
         const reconciled = await reconcileLocked(ctx, order, { acknowledge: true, permitUnprepared: true });
         order = reconciled.order;
         if (!reconciled.canPrepare || order.abandonedAt) return { ...reconciled, payment: null,
@@ -237,16 +280,23 @@ async function createPurchase(ctx, user, clientId, loginCode, requestedPlanId) {
       const planId = order ? planIdOfOrder(order) : requestedPlanId === undefined ? DEFAULT_PLAN_ID : requestedPlanId;
       const product = presentProduct(ctx, planId);
       if (!product.paymentReady) return { disabled: true, product };
+      const reason = quoteIssue(order, product, expectedPriceFen, nowOf(ctx));
+      if (reason) await rejectQuote(ctx, order, clientId, product, reason);
       if (!order) {
         const nowIso = nowOf(ctx).toISOString();
         const vp = ctx.config.virtualPayment;
-        const snapshot = { version: planId === DEFAULT_PLAN_ID ? 1 : 2,
+        const snapshot = { version: planId === DEFAULT_PLAN_ID ? 1 : 3,
           ...(planId === DEFAULT_PLAN_ID ? {} : { planId }), provider: PROVIDER, appid: user.appid, offerId: vp.offerId,
-          productId: product.productId, priceFen: product.priceFen, days: product.days, currency: 'CNY', env: 0, buyQuantity: 1 };
+          productId: product.productId, priceFen: product.priceFen, days: product.days, currency: 'CNY', env: 0, buyQuantity: 1,
+          ...(planId === DEFAULT_PLAN_ID ? {} : { goodsPrice: product.standardPriceFen,
+            activitySellingPrice: product.promotion.active ? product.priceFen : null,
+            promotionEndsAt: product.promotion.active ? product.promotion.endsAt : null }) };
+        const quoteExpiresAt = new Date(Math.min(Date.parse(nowIso) + QUOTE_TTL_MS,
+          product.promotion && product.promotion.active ? Date.parse(product.promotion.endsAt) : Infinity)).toISOString();
         const created = await ctx.repo.createOrderIfAbsent({ _id: id, outTradeNo: id, orderId: clientId,
           userKey: user._id, appid: user.appid, openid: user.openid, productId: product.productId, planId,
           type: 'membership_order', provider: PROVIDER, source: 'virtual_payment',
-          amountFen: product.priceFen, days: product.days, paymentSnapshot: snapshot, status: 'created', createdAt: nowIso,
+          amountFen: product.priceFen, days: product.days, paymentSnapshot: snapshot, status: 'created', createdAt: nowIso, quoteExpiresAt,
           paidAt: null, fulfilledAt: null, providerStatus: null, paymentPreparedAt: null,
           lastReconciledAt: '1970-01-01T00:00:00.000Z', providerAcknowledgedAt: null });
         order = created.order;
@@ -255,9 +305,18 @@ async function createPurchase(ctx, user, clientId, loginCode, requestedPlanId) {
       // Existing snapshots cannot silently change into a different product.
       if (order.paymentSnapshot.offerId !== ctx.config.virtualPayment.offerId || order.productId !== product.productId) conflict();
       const payment = await paymentProviderFor(ctx, planId).preparePayment({ outTradeNo: order.outTradeNo, openid: order.openid, appid: order.appid, loginCode });
+      // code2Session may cross the quote/promotion boundary. Never return the
+      // now-stale signature, even if it was valid before that network wait.
+      const current = presentProduct(ctx, planId);
+      const changed = quoteIssue(order, current, expectedPriceFen, nowOf(ctx));
+      if (changed) await rejectQuote(ctx, order, clientId, current, changed);
       // Persist BEFORE returning any usable payment signature to the client.
       order = await ctx.repo.updateOrder(order._id, { paymentPreparedAt: nowOf(ctx).toISOString() });
-      return { ...(await resultOf(ctx, order, 'prepared')), payment, pending: false };
+      const prepared = await resultOf(ctx, order, 'prepared');
+      const latest = presentProduct(ctx, planId);
+      const expiredWhilePersisting = quoteIssue(order, latest, expectedPriceFen, nowOf(ctx));
+      if (expiredWhilePersisting) await rejectQuote(ctx, order, clientId, latest, expiredWhilePersisting);
+      return { ...prepared, payment, pending: false };
     });
   } catch (error) { throw protocolError(error); }
 }

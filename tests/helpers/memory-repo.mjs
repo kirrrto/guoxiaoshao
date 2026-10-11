@@ -53,6 +53,7 @@ export function createMemoryRepo(seed = {}) {
   const repo = {
     tables,
     async getUser(userKey) { return get(COLLECTIONS.users, userKey); },
+    async scanGrowthReport(collection, limit) { const rows = all(collection).sort(byAsc('_id')); return { rows: rows.slice(0, limit), complete: rows.length < limit }; },
     async createUser(user) {
       if (table(COLLECTIONS.users).has(user._id)) return get(COLLECTIONS.users, user._id);
       put(COLLECTIONS.users, user);
@@ -183,6 +184,18 @@ export function createMemoryRepo(seed = {}) {
     async getCollectorStatus() { return get(COLLECTIONS.config, 'collector_status'); },
     async getRetentionStatus() { return get(COLLECTIONS.config, 'retention_status'); },
     async saveRetentionStatus(status) { put(COLLECTIONS.config, status); },
+    async purgeGrowthData({ eventCutoff, detailCutoff }) {
+      const result = { eventCutoff, detailCutoff, removedEvents: 0, removedGuards: 0, compactedIntents: 0, errors: {} };
+      for (const event of all(COLLECTIONS.growthEvents)) if (event.receivedAt < eventCutoff) { table(COLLECTIONS.growthEvents).delete(event._id); result.removedEvents++; }
+      for (const account of all(COLLECTIONS.growthAccounts)) {
+        if (!account.firstIntent && account.updatedAt < eventCutoff) { table(COLLECTIONS.growthAccounts).delete(account._id); result.removedGuards++; }
+        else if (account.firstIntent && account.firstIntent.at < detailCutoff && account.firstIntent.compacted !== true) {
+          put(COLLECTIONS.growthAccounts, { ...account, firstIntent: { ...account.firstIntent, target: null, experiment: null, platform: null, compacted: true } });
+          result.compactedIntents++;
+        }
+      }
+      return result;
+    },
     async purgeExpiredData({ firstDay, cutoffIso }) {
       const removed = {};
       const drop = (name, collection, expired) => {

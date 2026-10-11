@@ -1,10 +1,13 @@
-<view wx:if="{{!keyboardHidden && !sheetHidden}}" class="floating-tab-shell">
+<view hidden="{{keyboardHidden || sheetHidden}}" class="floating-tab-shell">
   <view wx:if="{{offline}}" class="network-notice" role="status" aria-live="polite">网络已断开，恢复后自动刷新</view>
   <view class="floating-tab-glass" aria-role="navigation" aria-label="主导航">
     <view class="floating-tab-edge floating-tab-edge-left" aria-hidden="true"></view>
     <view class="floating-tab-edge floating-tab-edge-right" aria-hidden="true"></view>
     <button wx:for="{{tabs}}" wx:key="pagePath" class="floating-tab-item {{selected === index ? 'is-selected' : ''}}" data-index="{{index}}" bindtap="onTabTap" hover-class="floating-tab-pressed" hover-stay-time="70" aria-label="{{item.text}}，{{selected === index ? '当前页面' : '切换页面'}}">
-      <image class="floating-tab-icon" src="{{selected === index ? item.selectedIconPath : item.iconPath}}" mode="aspectFit" aria-hidden="true" />
+      <view class="floating-tab-icon-slot" aria-hidden="true">
+        <image class="floating-tab-icon floating-tab-icon-idle" src="{{item.iconPath}}" mode="aspectFit" />
+        <image class="floating-tab-icon floating-tab-icon-active" src="{{item.selectedIconPath}}" mode="aspectFit" />
+      </view>
       <text class="floating-tab-label">{{item.text}}</text>
     </button>
   </view>

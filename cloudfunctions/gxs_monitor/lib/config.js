@@ -6,6 +6,7 @@
  */
 const { DEFAULT_CONFIG: QUOTA_DEFAULTS } = require('./rules/quota');
 const { ApiError } = require('./errors');
+const { FEATURE_KEYS, UI_FEATURES } = require('./growth-policy');
 
 const DEFAULTS = Object.freeze({
   quota: { ...QUOTA_DEFAULTS },
@@ -30,6 +31,8 @@ const DEFAULTS = Object.freeze({
   // redemptions granted before the cap existed.
   memberRedemption: { enabled: true, maxClaims: 20 },
   newProductWindows: [],
+  features: Object.fromEntries(FEATURE_KEYS.map(key => [key, false])),
+  growthExperiment: { id: 'contextual-checkout', assignmentVersion: 1, mode: 'off', feature: 'contextualCheckout', allocationPercent: 0 },
   notifications: {
     enabled: false,
     templateIds: {},
@@ -75,7 +78,7 @@ const DEFAULTS = Object.freeze({
   announcement: null,
 });
 
-const EDITABLE = new Set(['quota', 'tasks', 'memberProduct', 'memberPlans', 'virtualPayment', 'memberRedemption', 'newProductWindows', 'notifications', 'collector', 'query', 'adminUserKeys', 'announcement']);
+const EDITABLE = new Set(['quota', 'tasks', 'memberProduct', 'memberPlans', 'virtualPayment', 'memberRedemption', 'newProductWindows', 'notifications', 'collector', 'query', 'adminUserKeys', 'announcement', 'features', 'growthExperiment']);
 
 // A template library number is not an ID. Do not guess a fixed ID length.
 function isValidTemplateId(value) {
@@ -127,6 +130,19 @@ function patchConfig(stored, patch) {
 function validateConfig(config) {
   const invalid = (field) => { throw new ApiError('invalid_config', `配置项无效：${field}`); };
   const integer = (value, min, max, field) => { if (!Number.isSafeInteger(value) || value < min || value > max) invalid(field); };
+  if (!config.features || typeof config.features !== 'object' || Array.isArray(config.features)
+    || Object.keys(config.features).some(key => !FEATURE_KEYS.includes(key))) invalid('features');
+  for (const key of FEATURE_KEYS) if (typeof config.features[key] !== 'boolean') invalid(`features.${key}`);
+  const experiment = config.growthExperiment;
+  if (!experiment || typeof experiment !== 'object' || Array.isArray(experiment)
+    || Object.keys(experiment).some(key => !['id', 'assignmentVersion', 'mode', 'feature', 'allocationPercent'].includes(key))) invalid('growthExperiment');
+  if (typeof experiment.id !== 'string' || !/^[A-Za-z0-9_-]{1,40}$/.test(experiment.id)) invalid('growthExperiment.id');
+  if (!['off', 'aa', 'ab'].includes(experiment.mode)) invalid('growthExperiment.mode');
+  if (!UI_FEATURES.includes(experiment.feature)) invalid('growthExperiment.feature');
+  integer(experiment.assignmentVersion, 1, 10000, 'growthExperiment.assignmentVersion');
+  integer(experiment.allocationPercent, 0, 100, 'growthExperiment.allocationPercent');
+  // Either master switch may be shut off by itself for safe rollback. runtimeFor
+  // suppresses experimental UI when assignments or measurement is disabled.
   for (const key of ['quota', 'memberProduct', 'memberPlans', 'virtualPayment', 'memberRedemption', 'notifications', 'collector', 'query']) {
     if (!config[key] || typeof config[key] !== 'object' || Array.isArray(config[key])) invalid(key);
   }

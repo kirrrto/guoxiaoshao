@@ -4,6 +4,7 @@ const { mergeConfig } = require('../config');
 const connection = require('../connection');
 const { paymentTimerIdentity } = require('./timer-context');
 const { PaymentProtocolError } = require('./errors');
+const { snapshotTermsValid } = require('./plans');
 
 const CALLBACK_PATH = '/payment/callback';
 const TRIGGER_NAME = 'gxs-payment-reconcile-five-minutes';
@@ -112,14 +113,15 @@ function isTrustedPaymentTimer(event, wxContext = {}, runtime = {}) {
 function callbackMatchesOrder(event, order) {
   if (!order || typeof order._id !== 'string' || !order._id || order.provider !== 'wechat_virtual_payment' || order.type !== 'membership_order') return false;
   const snapshot = order.paymentSnapshot;
-  if (!snapshot || snapshot.provider !== 'wechat_virtual_payment' || snapshot.appid !== connection.consumerAppid || order.appid !== snapshot.appid || event.authenticatedAppid !== order.appid) return false;
+  if (!snapshot || !snapshotTermsValid(order) || snapshot.provider !== 'wechat_virtual_payment' || snapshot.appid !== connection.consumerAppid || order.appid !== snapshot.appid || event.authenticatedAppid !== order.appid) return false;
   if (typeof order.openid !== 'string' || !order.openid || event.openid !== order.openid || order.userKey !== `${order.appid}:${order.openid}` || event.outTradeNo !== order.outTradeNo) return false;
   if (snapshot.productId !== order.productId || snapshot.priceFen !== order.amountFen || snapshot.days !== order.days || snapshot.buyQuantity !== 1 || snapshot.currency !== 'CNY' || snapshot.env !== 0) return false;
   // Some official iOS / refund events omit goods or transaction fields. Missing
   // fields require the authoritative query below; present contradictions fail.
   if (event.productId !== null && event.productId !== order.productId) return false;
   if (event.quantity !== null && event.quantity !== snapshot.buyQuantity) return false;
-  if (event.amountFen !== null && event.amountFen !== order.amountFen) return false;
+  if (event.amountFen !== null && event.amountFen !== (snapshot.version === 3 ? snapshot.goodsPrice : order.amountFen)) return false;
+  if (event.paidAmountFen !== null && event.paidAmountFen !== order.amountFen) return false;
   if (event.env !== null && event.env !== snapshot.env) return false;
   if (event.transactionId && order.transactionId && event.transactionId !== order.transactionId) return false;
   if (event.attach !== null && event.attach !== order.outTradeNo) return false;

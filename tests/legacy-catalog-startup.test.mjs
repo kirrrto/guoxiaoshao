@@ -35,6 +35,8 @@ test('follow summaries and alternative stores work without Array.prototype.flatM
   const rt = runtime(async () => ({ follows }));
   const page = rt.instance('pages/query/index.js');
   page.data.boot = { member: true, followCount: 1 }; page.visible = true;
+  page.data.accountReady = true;
+  page.accountSnapshot = { identity: { userKey: 'legacy-test' }, membership: { active: true } };
   page.startFollowPolling();
   for (let i = 0; i < 16; i++) await Promise.resolve();
   assert.equal(page.data.followTargets.length, 1);

@@ -1,6 +1,6 @@
 const cloudConfig = require('./config/cloud');
-const { refreshConsentSetting } = require('./utils/reminder-credits');
 const { readSharedSelection } = require('./utils/share');
+const { readSession, writeSession } = require('./utils/session');
 
 // The shared environment's auth hook can stall on a weak network. Give up after
 // this long so pages show a retry instead of waiting forever; the next call retries.
@@ -43,7 +43,7 @@ App({
   onLaunch(options) {
     // Opened from a Moments share (scene 1154): a preview without cloud access.
     this.globalData.singlePage = Boolean(options && options.scene === 1154);
-    this.globalData.launchCount = this.countLaunch();
+    this.launchCountReady = this.countLaunch();
     this.captureAlert(options);
     this.captureSharedTarget(options);
     if (!this.globalData.singlePage) {
@@ -59,11 +59,17 @@ App({
   },
 
   countLaunch() {
-    try {
-      const count = (Number(wx.getStorageSync(LAUNCH_COUNT_KEY)) || 0) + 1;
-      wx.setStorageSync(LAUNCH_COUNT_KEY, count);
+    const remember = value => {
+      const count = (Number(value) || 0) + 1;
+      this.globalData.launchCount = count;
+      writeSession(LAUNCH_COUNT_KEY, count);
       return count;
-    } catch (e) { return 1; }
+    };
+    if (typeof wx.getStorage === 'function') return readSession(LAUNCH_COUNT_KEY).then(remember);
+    // Compatibility fallback only; supported WeChat clients use the async API.
+    try {
+      return Promise.resolve(remember(wx.getStorageSync(LAUNCH_COUNT_KEY)));
+    } catch (e) { this.globalData.launchCount = 1; return Promise.resolve(1); }
   },
 
   // Users can change "总是保持以上选择" in WeChat settings while the app is hidden.
@@ -75,7 +81,20 @@ App({
       this.cloudReady = this.ensureCloud();
       this.cloudReady.catch(() => {});
     }
-    this.captureAlert(options); this.captureSharedTarget(options); refreshConsentSetting();
+    this.captureAlert(options); this.captureSharedTarget(options); this.refreshConsentLater();
+  },
+
+  refreshConsentLater() {
+    if (this.consentRefreshScheduled) return;
+    this.consentRefreshScheduled = true;
+    const refresh = () => {
+      this.consentRefreshScheduled = false;
+      // The reminder module also imports the product catalog. Defer loading it
+      // until after the current render task instead of making App pay for it.
+      require('./utils/reminder-credits').refreshConsentSetting();
+    };
+    if (typeof wx.nextTick === 'function') wx.nextTick(refresh);
+    else refresh();
   },
 
   /** Existing tab pages receive warm launch parameters through App.onShow. */
@@ -101,14 +120,17 @@ App({
 
   /** A newly released package downloads in the background; offer a restart instead of running the old one. */
   watchForUpdate() {
+    // Some clients expose the factory but return no manager (older libs, previews).
     if (typeof wx.getUpdateManager !== 'function') return;
-    const manager = wx.getUpdateManager();
+    let manager = null;
+    try { manager = wx.getUpdateManager(); } catch (e) { return; }
+    if (!manager || typeof manager.onUpdateReady !== 'function') return;
     manager.onUpdateReady(() => {
       wx.showModal({
         title: '发现新版本',
         content: '新版本已下载完成，重启小程序即可使用。',
         confirmText: '立即重启',
-        success: result => { if (result.confirm) manager.applyUpdate(); },
+        success: result => { if (result.confirm && typeof manager.applyUpdate === 'function') manager.applyUpdate(); },
       });
     });
   },
@@ -139,7 +161,12 @@ App({
     if (this.globalData.cloud) return Promise.resolve(this.globalData.cloud);
     if (this.cloudInitPromise) return this.cloudInitPromise;
     const generation = this.cloudInitGeneration = (this.cloudInitGeneration || 0) + 1;
-    const init = this.initCloud(generation);
+    // Cloud construction/auth can do synchronous SDK work before init returns
+    // its promise. Let the initial page render task finish before paying that
+    // cost. Every page still shares this same connection and retry deadline.
+    const init = typeof wx.nextTick === 'function'
+      ? new Promise(resolve => wx.nextTick(resolve)).then(() => this.initCloud(generation))
+      : this.initCloud(generation);
     init.catch(() => {});
     // A late success still stores the cloud for the next call (initCloud sets it).
     const pending = new Promise((resolve, reject) => {

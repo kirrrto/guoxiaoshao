@@ -60,7 +60,11 @@ function createVirtualPaymentProvider({ config = {}, expectedAppid, env = proces
   function productReason() {
     if (typeof settings.offerId !== 'string' || !/^\d{1,20}$/.test(settings.offerId)) return 'payment_offer_id_missing';
     if (!stringValue(settings.productId)) return 'payment_product_id_missing';
-    if (!planForTerms(settings.days, settings.priceFen)) return 'payment_product_terms_mismatch';
+    const actualPlan = planForTerms(settings.days, settings.priceFen);
+    const goodsPrice = settings.goodsPrice === undefined ? settings.priceFen : settings.goodsPrice;
+    if (!actualPlan || !planForTerms(settings.days, goodsPrice)
+      || goodsPrice < settings.priceFen || (goodsPrice !== settings.priceFen && settings.activitySellingPrice !== settings.priceFen)
+      || (settings.activitySellingPrice != null && settings.activitySellingPrice !== settings.priceFen)) return 'payment_product_terms_mismatch';
     return null;
   }
   function getReadiness() {
@@ -88,7 +92,8 @@ function createVirtualPaymentProvider({ config = {}, expectedAppid, env = proces
       if (typeof session.session_key !== 'string' || !/^[A-Za-z0-9+/]{22}==$/.test(session.session_key)
           || Buffer.from(session.session_key, 'base64').length !== 16) fail('payment_invalid_session');
       const signData = JSON.stringify({ offerId: settings.offerId, buyQuantity: 1, env: 0, currencyType: 'CNY',
-        productId: settings.productId, goodsPrice: settings.priceFen, outTradeNo, attach: outTradeNo });
+        productId: settings.productId, goodsPrice: settings.goodsPrice === undefined ? settings.priceFen : settings.goodsPrice,
+        ...(settings.activitySellingPrice == null ? {} : { activitySellingPrice: settings.activitySellingPrice }), outTradeNo, attach: outTradeNo });
       return { mode: 'short_series_goods', signData,
         paySig: signPayment(appKey, 'requestVirtualPayment', signData), signature: signUser(session.session_key, signData) };
     });

@@ -1,17 +1,39 @@
 # 数据模型与接口约定
 
-当前源码契约，更新于 2026-10-05。不由文档日期推断部署、真单或微信审核成功；本次本地修改尚未部署。会员兑换与虚拟支付购买共用会员权益；7 元／7 天 `vip666`、19.90 元／30 天 `vip777`、200 元／365 天 `vip888` 均已按用户提供的道具截图映射，月卡/年卡默认开启购买，开放与验收见 [虚拟支付配置](VIRTUAL_PAYMENT_SETUP.md)。
+当前源码契约，更新于 2026-10-11。不由文档日期推断部署、真单或微信审核成功；本次本地修改尚未部署。会员兑换与虚拟支付购买共用会员权益。会员当前定价、限时优惠及旧订单兼容以本页 2.0.0 补充为准；此前 `vip777`／`vip888` 截图仅证明旧价商品，不能证明新标准价已在微信后台发布。
 
 ## 1. 数据与身份边界
+
+### 2.0.0 定价与报价确认（2026-10-11，本地代码）
+
+| 套餐 | 时长 | 标准价（分） | 截止前优惠价（分） |
+| --- | --- | --- | --- |
+| `member_7d` | 7 天 | 700 | 无，仍为 700 |
+| `member_30d` | 30 天 | 3000 | 1499 |
+| `member_365d` | 365 天 | 36000 | 12900 |
+
+优惠截止北京时间 **2026-11-30 23:59**，代码使用排他截止时刻 `2026-12-01T00:00:00+08:00`（UTC `2026-11-30T16:00:00.000Z`）。服务器当前时间严格早于该时刻使用优惠价，从该时刻起自动恢复标准价；无须到期人工改 runtime。客户端时间及传入金额不能改变服务端价格。均为单次购买，不自动续费；原权益时长与按订单退款规则不变。
+
+- `memberProducts[]` / `member.status.products[]` 的 `priceFen` 是服务器当前实际应付价，`standardPriceFen` 是标准价。月卡/年卡新增 `promotion: { active, endsAt, timezone:'Asia/Shanghai' }`，截止后 `active:false`；周卡该字段为 `null`。会员时长来自 `days`，不得由价格折算。
+- `member.createOrder` 接收 `{orderId, loginCode, planId, expectedPriceFen}`。新月卡/年卡或尚未签发的月卡/年卡必须显式传安全整数 `expectedPriceFen`；它只证明用户确认的报价，不能指定价格。周卡旧客户端可省略，提供时仍须匹配。旧版月卡/年卡客户端缺字段会收到重新确认要求，不能静默用新金额扣款。
+- 新报价保留 10 分钟，优惠报价另以优惠截止时刻为上限，订单响应增加 `quoteExpiresAt`。过期判断仅控制新签发，不能据此判断已付款或已取消。未签发订单报价过期、金额变化或缺少确认，返回 `payment_price_changed`，`details={product,orderId,canDiscardIntent:true,reason:'price_changed'|'quote_expired'|'confirmation_required'}`。此错误仅在没有建单，或已确定从未向客户端返回签名且持久取消该订单后返回。客户端可清理该次意向，展示 `details.product`，由用户重新确认并生成新 `orderId`；不能自动再调收银台。
+- 首次签名前、登录交换完成后及写库后均核对报价；跨截止不返回旧优惠签名。租约与永久取消记录防止迟到请求复用被取消的订单号。没有签发且过期的订单在查单时也可转为 `cancelled`。已经签发的订单保持原金额，只查单并返回 `payment:null`，不以当前标准价重签，不返回可丢弃意向的价格错误。查单不确定仍保留原订单。`quoteExpiresAt` **不是微信收银参数的远端失效时间**；已发出的优惠参数可能在截止后支付成功，此时仍按原实付价补单，不能擅自多收差额。
+- 新月卡/年卡使用 `paymentSnapshot.version=3`：保存 `planId,priceFen`（实际价）、`goodsPrice`（标准商品价）、`activitySellingPrice`（优惠实际价或 null）、`promotionEndsAt`（优惠截止或 null），以及原有商品/买家/数量/币种/环境/时长字段。账户、快照价格、报价生成时间与截止组合均参与验证。旧 version 1 周卡、version 2 月卡 1990／年卡 20000 分继续验证、补单、发放 4×4 权益和按原金额退款；不得批量替换历史金额、快照或账本。
+- 微信 `short_series_goods` 签名始终使用标准商品价 `goodsPrice=3000/36000`，优惠期额外传 `activitySellingPrice=1499/12900`；到期省略活动价。[微信官方 SignData 类型定义](https://github.com/wechat-miniprogram/api-typings/blob/master/types/wx/lib.wx.api.d.ts) 明确标准价校验后台道具价格，活动价是实际下单价格。当前本地回调约定分别核对 `OrigPrice` 与冻结的商品标准价、`ActualPrice` 与冻结的实付价，随后仍须权威查单；`query_order.order_fee`、`paid_fee` 严格匹配订单实际金额，`left_fee` 才用于累计退款。不会把标准价当实付收入，也不会猜测放行不一致金额。
+
+**商户配置与实单验收边界：** 既有 runtime 的 `{productId,enabled}` 格式保持兼容，不新增到期人工切换的字段或永久未就绪开关。`vip777` / `vip888` 原映射保留，但部署前必须确认所映射道具标准价已分别为 3000 / 36000 分；可发布新的标准价商品并修改映射，以免重定价影响旧商品。提供 [新标准商品映射样例](../config/member-plans-2.0.runtime-patch.example.json)，其中商品 ID 为待替换占位符，`enabled:false`；发布并核对实际商品后再启用。周卡、支付密钥与回调配置不变。新映射不参与历史订单价格重写，也不影响仅凭原冻结订单和远端订单证据进行查单。
+
+本地测试覆盖促销与标准签名、服务器截止边界、登录/持久化中跨期、明确价格确认、未签发取消、旧实付单补单/退款、回调金额区分及重复事件。这些均为 mock，不证明微信后台商品已经更新或真实优惠付款成功。本轮可读取官方 SignData，但 `query_order` 官方网页不可访问；上线验收必须核对一次真实促销订单与到期标准价订单的 `order_fee/paid_fee/left_fee` 及发货回调金额语义，确认退款净权益。若平台金额语义不同，现实现保持拒绝错误证据和待核实状态，不会凭猜测发会员。
 
 ### 2026-10-05 测试通知与多套餐补充
 
 - 不额外赠送首次查询次数。所有账号（含会员）主动发送测试通知消耗现有有限余额 1 次；原签到与任务奖励规则保持不变。`notification_test_debit` / `notification_test_refund` 是独立账本类型，失败退回不计入当日奖励。
 - `gxs_notification_tests` 为仅服务端可访问的新集合，索引见 `lib/collections.js` 的 `INDEX_PLAN`。记录主键由用户主键与 requestId 哈希得到；保存授权、发送租约、扣次、退次与 received/not_received 反馈。记录保留作为幂等屏障，不能按真实提醒的 10 天清理任务直接删除。首次查看详情保存 `firstOpenedAt`，不表示微信已送达。
 - `notificationTest.status` 读取本账号测试与就绪状态、当前余额；指定 `requestId, opened:true` 可记录消息落地页查看。`.authorize` 接收本次微信授权结果（requestId/templateId/result）；`.send` 只处理已授权的同一请求；`.feedback` 接收 requestId/outcome。身份只来自服务端微信上下文，客户端不能指定收件人。
+- 这四个通知测试入口均支持 `expectedUserKey`，用于核对发起本次操作时的账户。字段存在时须与 SDK 可信身份严格一致；失配返回 `notification_test_account_changed`，在 `ensureUser`、账户迁移、测试状态读取/修复、授权、扣次、发送和反馈之前拒绝。它不是授权身份，不能指定其他账户。四个入口成功响应均返回可信 `userKey`，供前端拒绝迟到或错号结果。旧客户端完全省略该字段时继续按实际 SDK 账户执行，保留原兼容语义；要获得整段原生授权等待期间的账户一致性保护，必须更新前端并传入该字段。
 - 测试授权只用于该测试，不增加正式监测的授权账本。首次发送与扣 1 次同事务取得执行权；重试只查看原结果。微信明确拒绝／确定未发出时原子退回一次，结果不明则保留扣次和原记录，不自动重发或假装成功。反馈确认后用户可以主动授权另一条新测试，另扣 1 次，原结果保持原样。
 - 测试内容始终有【测试】标识，不写入库存事件/观测/正式提醒列表，不启动监测。正式关注与真实提醒仍为会员权益。
-- `user.bootstrap.memberProducts[]`、`member.status.products[]` 提供三种套餐，旧单商品字段保留；`member.createOrder` 可提交 `planId`，缺省仍为原 7 天。套餐 `member_30d` 固定 1990 分/30 天，`member_365d` 固定 20000 分/365 天。真实微信商品映射配置与开放条件见 [支付配置](VIRTUAL_PAYMENT_SETUP.md)。
+- `user.bootstrap.memberProducts[]`、`member.status.products[]` 提供三种套餐，旧单商品字段保留；`member.createOrder` 可提交 `planId`，缺省仍为原 7 天。此前 `member_30d` 的 1990 分/30 天及 `member_365d` 的 20000 分/365 天属于历史订单价；当前价格与新单确认字段以上述 2.0.0 补充为准。
 - 已购会员的升级复用上述全价订单与权益发放流程，不增加差价商品、不折算旧订单金额，也不以累计剩余天数推断会员等级。客户端区分「升级长期套餐」（30/365 天）和「续费」（全部套餐），显示原到期时间与顺延预估，最终到期时间仍以服务器支付核实/权益结果为准。
 - `admin.insights` 增加期间去重行为人数（成功查询、建立关注、微信受理、查看详情、反馈买到）与独立测试通知统计；各阶段分别统计，不伪称严格顺序转化漏斗。每类最多读取 2000 条，超限标注不完整。查看详情从本版开始积累，历史缺少记录不等同于没人查看。
 - 历史速览只基于当前单日响应及其分页/采样覆盖；其他颜色／附近门店备选基于本人有效查询，用户主动选择后只读已有新鲜观测。严格同型号、同容量及其他配置，不推测库存；不额外采集、扣次或自动关注。
@@ -37,7 +59,7 @@
 - `gxs_latest`：主键 storeNumber|partNumber。保存 status/statusSince/observedAt/knownAt/unknownSince/quote/sampleCount 等。latest 和对应状态事件同事务提交；旧观测不能覆盖新观测。
 - `gxs_events`：确定性状态迁移 ID，保存目标、事件类型、北京时间业务日、发现时间、前后状态和原始取货说明。notificationPlannedAt 用于持久提醒消费者去重规划。
 - `gxs_target_health`：旧版按目标与分钟桶写入的健康数据，没有任何接口读取；当前代码已不再写入，各目标健康数据保存在 `collector_status` 的调度检查点中。云端已有文档可在控制台删除。
-- `gxs_orders`：兑换与管理员发放保留原主键。虚拟支付订单主键及平台单号为 `G + SHA256(userKey|orderId)前31位`，保存服务器固定的商品、买家与套餐快照：700 分/7 天、1990 分/30 天或 20000 分/365 天。兑换订单继续使用 `redeem_launch_30d_v1`、`type=membership_redemption`、`source=redemption_code`、`days=30`、`amountFen=0`。用户会员发放与订单 `fulfilled` 同事务完成；`membership.entitlements` 按订单记录剩余时长，累计退款只撤销所属订单未用权益。
+- `gxs_orders`：兑换与管理员发放保留原主键。虚拟支付订单主键及平台单号为 `G + SHA256(userKey|orderId)前31位`，保存服务器固定的商品、买家与套餐快照，金额为下单时实际价。2.0.0 新月/年卡 version 3 另冻结标准商品价、活动实际价及报价截止，历史 1990 分/30 天、20000 分/365 天不重写。`quoteCancelledAt` 标记未发签名的报价取消，仍保留订单号屏障。兑换订单继续使用 `redeem_launch_30d_v1`、`type=membership_redemption`、`source=redemption_code`、`days=30`、`amountFen=0`。用户会员发放与订单 `fulfilled` 同事务完成；`membership.entitlements` 按订单记录剩余时长，累计退款只撤销所属订单未用权益。
 - `gxs_notifications`：主键 userKey|eventId。保存 pending、sending、accepted、failed、uncertain 或 skipped 状态，发送租约、模板、原因及授权预占信息。用户在提醒落地卡片回答后写入 `feedback: { outcome: bought|missed|skipped, at }`。
 - `gxs_observation_days`：主键 storeNumber|partNumber|dayKey，每个目标每天一条观测摘要：样本数、已知/未知/手动/自动计数、首末观测时间，以及 `eventCounts`（当天各类事件数）、`firstAvailableAt`（当天首次可取货）、`availableWindows`（可取货窗口的次数、总时长、最长、最短，毫秒）。与 latest、事件同事务更新。
 - `gxs_config`：runtime、catalog、collector_lease、collector_status，以及容量状态、请求计数、订阅操作去重、提醒冷却等文档。`upstream_capacity` 保存连续容量的 version、tokens、capacities、rates、lastDemandAt、updatedAtMs；跨日和冷启动不重置，不按日清理。`collector_budget_<北京时间日期>` 保存 dayCount、minuteKey、minuteCount、autoCount、manualCount；continuous 模式每日计数只用于核对消耗。`query_target_<门店与 SKU 的哈希>` 保存跨实例手动刷新租约与短时失败等待状态。兑换错误计数保存在 `member_redemption_attempts_<用户哈希>`，包括 userKey、failures、lockedUntil、updatedAt；正确码及输入明文不入库。不能对整个集合无条件启用 TTL 删除。
@@ -122,14 +144,14 @@
 
 ### 关注、会员和提醒
 
-- `follow.list/upsert/pause/resume/remove`：有效会员最多关注 3 个具体 SKU，每个 SKU 最多 3 家店。不同容量/颜色分别占用名额。upsert 传 followId、partNumber、storeNumbers；非会员不能新增或恢复监测（`member_required`）。**1.5.2 起关注与微信提醒为会员专属**，免费用户仅保留查询次数，不再赠送免费关注/到货提醒试用。
+- `follow.list/upsert/pause/resume/remove`：周卡或普通赠送会员最多关注 3 个具体 SKU，每个 SKU 最多 3 家店；真实付费月卡／年卡尚有有效长期权益时为 4×4，以服务端实际 limits 为准。不同容量/颜色分别占用名额。upsert 传 followId、partNumber、storeNumbers；非会员不能新增或恢复监测（`member_required`）。**1.5.2 起关注与微信提醒为会员专属**，免费用户仅保留查询次数，不再赠送免费关注/到货提醒试用。
 
 **1.5.2 权限边界**：关注与微信到货/断货提醒均为会员专属。免费用户仅使用查询次数实时查询是否有货。历史数据中的 `freeReminder` / `freeReminderTaskId` / `firstReminderSentAt` 字段保留以便兼容读取，但不再授予关注或提醒能力。
 - `member.status`：真实会员状态、商品、支付关闭原因及最近会员记录；记录增加 type、source、campaignId，区分兑换与其他会员发放来源。
 - 1.6.0 的 `member.status.orders` 增加 `canClearRecord`、`clearRecordReason`；仅在原始最近 10 条内过滤 `userHiddenAt` 和内部取消意图，因此返回可能少于 10 条，不代表完整历史。
 - `member.deleteRecord`：`{ orderId }`；`member.clearRecords`：`{ orderIds }`，显式提交当前显示的 1–10 个原始订单编号。先在同一事务校验全部归属，再为已确认记录添加 `userHiddenAt`；任一编号不存在或不属于本人则整批失败。待确认支付保留，返回 `{ hiddenOrderIds, hiddenCount, newlyHiddenCount, retained, retainedCount }`，每个 retained 含 `orderId/status/reason`。已隐藏编号可幂等重试；不物理删除订单，不更改支付、退款或会员权益，不需新增集合或索引。
 - `member.redeemCode`：`{ code, requestId? }`，返回 `{ redeemed: true, alreadyRedeemed, membership }`，membership 与 bootstrap 使用同一结构。活动码忽略大小写及首尾空白（明文不写入文档）；每个可信账号仅领取一次 30 天，有效会员顺延。全活动名额由 `memberRedemption.maxClaims` 控制（默认 20，含上线前已兑换账号），计数保存在 `gxs_config/member_redemption_claims_launch_30d_v1` 并与兑换同事务递增；名额用完返回 `redemption_sold_out`。重复兑换及到期后重试返回 alreadyRedeemed=true，不增加天数；幂等依据账号与活动，不依赖客户端 requestId。正式版和体验版均调用真实后端，开发模拟必须先退出。
-- `member.createOrder`：`{ orderId, loginCode }`，以可信账号创建幂等订单，商品与金额来自服务端配置，返回 `{ ok, order, payment }`；未就绪返回 `payment_not_enabled`。`payment` 为服务器签名的微信收银参数，已进入平台的订单不会盲目再次拉起收银台。
+- `member.createOrder`：`{ orderId, loginCode, planId?, expectedPriceFen? }`，以可信账号创建幂等订单，商品与金额来自服务端规则，返回 `{ ok, order, payment }`；月/年新单强制报价确认，详见本页 2.0.0 补充。未就绪返回 `payment_not_enabled`。`payment` 为服务器签名的微信收银参数，已签发订单只核实，不再次签发。
 - `member.abandonOrder`：`{ orderId }`，仅本人订单。先向微信核对一次：已付款正常开通；仍为未付款的 `created` 订单写入 `abandonedAt`，返回 `order.abandoned=true`、`paymentPending=false`。已放弃的订单继续参与查单和支付回调，之后付款仍会开通。
 - `member.checkOrder`：`{ orderId }`，仅查询本人订单，返回 `{ order, membership }`。服务端核验微信订单后事务发放权益，支付结果不确定为 `payment_check_pending`；不存在或非本人订单统一 `unknown_order`。前端付款回调不能替代该核验。
 - `notify.recordSubscription`：{ requestId, results: { templateId: 'accept'|'reject'|'ban' } }。有效会员可记录，否则返回 `membership_required`；只接受已配置模板。每个 accept 记 1 次提醒并累加，原 requestId 重试不重复增加；微信平台最终决定能否发送。
@@ -164,6 +186,6 @@
 
 ## 7. 默认配置与运行条件
 
-lib/config.js 是默认值与校验的唯一来源。主要默认值：签到 +1，历史体验任务 +1，每日最多奖励 2 次，余额最多 10 次，实时和历史每次各消耗 1 次；付费会员为 7 元／7 天、19.90 元／30 天、200 元／365 天，购买默认关闭，兑换活动仍为 30 天。`memberRedemption.enabled` 默认为 true，可经管理员关闭；兑换事务再次读取开关，不接受客户端自报活动、天数或会员有效期。新品窗口为空，需录入真实开售资料后才启用对应限制。
+lib/config.js 是运行配置默认值与校验来源，套餐标准价及活动时间由 lib/payment/plans.js 管理。主要默认值：签到 +1，历史体验任务 +1，每日最多奖励 2 次，余额最多 10 次，实时和历史每次各消耗 1 次；2.0.0 周卡为 7 元／7 天，月卡标准 30 元／30 天、活动 14.99 元，年卡标准 360 元／365 天、活动 129 元。优惠截止 2026-11-30 23:59 北京时间，之后新单恢复标准价。周卡购买默认关闭，长期套餐继承既有 enabled 默认值，但仍需真实商户新标准价、凭据与客户端就绪；配置完整不代表支付已验收。兑换活动仍为 30 天。`memberRedemption.enabled` 默认为 true，可经管理员关闭；兑换事务再次读取开关，不接受客户端自报活动、天数或会员有效期。新品窗口为空，需录入真实开售资料后才启用对应限制。
 
 自动采集默认关闭，配置目标间隔 8 秒、并发 2、每请求最多 20 SKU。`collector.budgetMode` 默认 `continuous`：每分钟硬上限 60，`maxRequestsPerDay=10000` 表示全天持续补充速率目标，并允许不超过分钟容量的有界突发；实际常规间隔会根据独立请求组数拉长。自动与手动来源持续速率占比 80% / 20%，支持有界空闲借用。显式 `daily` 才保留北京时间自然日硬上限及次日恢复。配置、迁移、观测指标与测试边界见 [查询容量](QUERY_CAPACITY.md)。订阅通知默认关闭；须配置消费者小程序的真实模板和服务端凭证。监测和消息部署见 [采集运行手册](COLLECTOR_OPERATIONS.md)。

@@ -10,6 +10,7 @@
  * Beijing day, after the overnight quiet hour, inside the monitor's lease.
  */
 const { dayKey, startOfDay, addDays, minutesOfDay } = require('../time');
+const { EVENT_RETENTION_DAYS, INTENT_DETAIL_DAYS } = require('../growth-policy');
 
 const RETENTION_DAYS = 10;
 const RUN_AFTER_MINUTE = 4 * 60;
@@ -28,9 +29,15 @@ async function runRetentionIfDue({ repo, now, log = console, remainingMs = () =>
     if (previous && previous.lastRunDay === today) return null;
     const firstDay = retentionStart(now);
     const { removed, errors } = await repo.purgeExpiredData({ firstDay, cutoffIso: startOfDay(firstDay).toISOString() });
+    // UI telemetry has a separate, finite window. The first-intent anchor must
+    // survive detail expiry so an old account cannot re-enter the first cohort.
+    const growth = typeof repo.purgeGrowthData === 'function' && remainingMs() >= 3000
+      ? await repo.purgeGrowthData({ eventCutoff: startOfDay(dayKey(addDays(now, -(EVENT_RETENTION_DAYS - 1)))).toISOString(),
+        detailCutoff: startOfDay(dayKey(addDays(now, -(INTENT_DETAIL_DAYS - 1)))).toISOString() }) : null;
     if (Object.keys(errors).length) log.error('[retention] some collections were not purged', errors);
+    if (growth && Object.keys(growth.errors).length) log.error('[retention] growth telemetry cleanup incomplete', growth.errors);
     // Record the day even after a partial failure: retry tomorrow, not every minute.
-    const status = { _id: 'retention_status', lastRunDay: today, lastRunAt: now.toISOString(), firstDay, removed, errors };
+    const status = { _id: 'retention_status', lastRunDay: today, lastRunAt: now.toISOString(), firstDay, removed, errors, growth };
     await repo.saveRetentionStatus(status);
     return status;
   } catch (error) {

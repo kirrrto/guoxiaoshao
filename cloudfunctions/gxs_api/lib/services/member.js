@@ -30,7 +30,7 @@ async function createOrder(ctx, payload) {
   const user = await ensureUser(ctx);
   const orderId = typeof payload.orderId === 'string' && ID_PATTERN.test(payload.orderId) ? payload.orderId : null;
   if (!orderId) throw new ApiError('invalid_order_id', 'orderId 需为 8–64 位字母数字标识');
-  const result = await paymentService.createPurchase(ctx, user, orderId, payload.loginCode, payload.planId);
+  const result = await paymentService.createPurchase(ctx, user, orderId, payload.loginCode, payload.planId, payload.expectedPriceFen);
   if (result.disabled) return { ok: false, reason: 'payment_not_enabled', product: result.product };
   return { ok: !result.pending, reason: result.pending ? 'payment_pending' : null,
     order: publicOrder(result.order), payment: result.payment, membership: result.membership };
@@ -78,6 +78,7 @@ async function deleteRecord(ctx, payload) {
 function publicOrder(order) {
   const clearable = canClearRecord(order);
   return { orderId: order.orderId, planId: order.provider === paymentService.PROVIDER ? paymentService.planIdOfOrder(order) : null, status: order.status, amountFen: order.amountFen, days: order.days, createdAt: order.createdAt, paidAt: order.paidAt || null, fulfilledAt: order.fulfilledAt || null,
+    quoteExpiresAt: order.quoteExpiresAt || null,
     canClearRecord: clearable, clearRecordReason: clearable ? null : 'payment_unconfirmed',
     refundFen: Number.isSafeInteger(order.refundFen) ? order.refundFen : 0,
     providerStatus: Number.isInteger(order.providerStatus) ? order.providerStatus : null,

@@ -23,8 +23,8 @@
     },
     {
       "path": "collections.js",
-      "bytes": 3755,
-      "sha256": "dc121637d6c0ef1ddba98ef2625336efb0ac7975230f99246bf72a7ce389881c"
+      "bytes": 4294,
+      "sha256": "4afd5d1bd8beb303be0a518ddfe5d9d9ac3715179fcab354c285c6f68a9fcb5f"
     },
     {
       "path": "config-audit.js",
@@ -33,8 +33,8 @@
     },
     {
       "path": "config.js",
-      "bytes": 14529,
-      "sha256": "fd8a267a2f5624ceb0e6ad86c9ace9f437673c9f00074bd34d55ae24fab274d6"
+      "bytes": 16055,
+      "sha256": "d4c4fda17397b826da09b1c22bf1b2d168f39fb9812acfa1c09fc89cffc85d3d"
     },
     {
       "path": "connection.js",
@@ -88,8 +88,8 @@
     },
     {
       "path": "engine/retention.js",
-      "bytes": 2031,
-      "sha256": "fa865bd0719b747808fedb4b2031816a8630b45b06d82360833a9bc4fc7b8f91"
+      "bytes": 2733,
+      "sha256": "e2a25d50062e50894e9fcfb1092543a3ad8d2b56721275dac5da1c696a22706c"
     },
     {
       "path": "engine/scheduled.js",
@@ -112,6 +112,11 @@
       "sha256": "4aa02f042bf7cd7e68b71c0ff475ec1cf0c8177769758f8a5f3fb8d08ac5e90a"
     },
     {
+      "path": "growth-policy.js",
+      "bytes": 2766,
+      "sha256": "59efd44968a2aebb3d11d5e4c49b2d7e0c7d6e8354951b7689c512b39277806a"
+    },
+    {
       "path": "member-redemption.js",
       "bytes": 1289,
       "sha256": "b056fd588e6ccc40436d552523d9ab798e49b176feabe1d7b285491b737a6505"
@@ -128,18 +133,23 @@
     },
     {
       "path": "payment/plans.js",
-      "bytes": 1005,
-      "sha256": "2f5d5056c1cb5673cb64941623f458f88f30e5f03bb04d2633bf4bb830629af2"
+      "bytes": 3053,
+      "sha256": "19ff483f5f3206670300078cf7e3b16babe88a502c2853b18d08513c99f24761"
     },
     {
       "path": "repo/atomic-ops.js",
-      "bytes": 51430,
-      "sha256": "ec8bfdf5cff76c68d760b613b5776f5b3e941cb74f05a711419493352a653d70"
+      "bytes": 51504,
+      "sha256": "07036de8a72fd7683a0e18e72794188e7012cad585269079ed768184cb144565"
     },
     {
       "path": "repo/cloudbase-repo.js",
-      "bytes": 22024,
-      "sha256": "42e1cf0a81bc85794048bfa8802c617057072b06a8673d5a9a3b9f5d1e466e4f"
+      "bytes": 24294,
+      "sha256": "4ffa5ef9c497698787cc0339db34cf67ece031c5c77aba26a7103f3d1d057a96"
+    },
+    {
+      "path": "repo/growth.js",
+      "bytes": 1793,
+      "sha256": "ddcf61ba2d350a30d2894c0e0fd639da94c8a3e353e7bc7d2aaf9497526dbb0a"
     },
     {
       "path": "repo/member-records.js",
@@ -178,8 +188,8 @@
     },
     {
       "path": "rules/member-plan.js",
-      "bytes": 2414,
-      "sha256": "4017d2bc65af995567467ad25894fbd86adaa131cf060571a3250a48d010cedd"
+      "bytes": 2433,
+      "sha256": "cb07f5bbe1756d7ea1288c07ba2c2ed9bf31c57d38167ffb608ff3a45be3b814"
     },
     {
       "path": "rules/membership-entitlements.js",

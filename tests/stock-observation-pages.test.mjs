@@ -7,6 +7,9 @@ const at = offset => new Date(baseTime + offset).toISOString();
 const flush = () => new Promise(resolve => setImmediate(resolve));
 const follow = (stores, extra = {}) => ({ followId: 'stock-view-follow', partNumber: 'SKU-A', productTitle: '验收配置', status: 'active', stores, ...extra });
 const observation = (extra = {}) => ({ storeNumber: 'R001', storeName: '天环广场', city: '广州', status: 'unavailable', observedAt: at(0), statusSince: at(0), ...extra });
+const verifiedAccount = () => ({ identity: { userKey: 'stock-view:alice' }, membership: { active: true },
+  quota: { balance: 4, queryCost: 1, signedInToday: true }, limits: { queryMaxStores: 3 },
+  followCount: 1, collector: { state: 'running' }, newProductWindows: [], features: {} });
 
 async function querySummary(stores, extra = {}) {
   const rt = runtime(async action => {
@@ -14,7 +17,7 @@ async function querySummary(stores, extra = {}) {
     return { follows: [follow(stores, extra)] };
   });
   const page = rt.instance('pages/query/index.js');
-  page.data.boot = { member: true, followCount: 1 }; page.visible = true;
+  page.applyBoot(verifiedAccount()); page.visible = true;
   page.startFollowPolling(); await flush();
   return { page, rt };
 }
@@ -64,7 +67,7 @@ test('query summary ages the retained sample before a failed refresh and preserv
   t.mock.method(Date, 'now', () => now);
   const rt = runtime(async () => { if (fail) throw Error('offline'); return { follows: [follow([observation()])] }; });
   const page = rt.instance('pages/query/index.js');
-  page.data.boot = { member: true, followCount: 1 }; page.visible = true; page.startFollowPolling(); await flush();
+  page.applyBoot(verifiedAccount()); page.visible = true; page.startFollowPolling(); await flush();
   assert.equal(page.data.followTargets[0].statusLabel, '暂无供应');
   now += 180000; fail = true; await rt.nextTimer();
   assert.equal(page.data.followRefreshError, true); assert.equal(page.data.followTargets[0].statusLabel, '待更新');
@@ -84,21 +87,28 @@ test('history latest uses the same stale, missing and unknown semantics as monit
   assert.equal(unknown.statusLabel, '状态待确认'); assert.match(unknown.lastKnownText, /可取货/); assert.equal(unknown.sinceText, null);
 });
 
-test('query return-to-page ages the snapshot before a pending account request completes', async t => {
-  let now = baseTime, rejectAccount;
+test('query return-to-page hides pending-account observations then shows their original timestamps and recalculated age after verification', async t => {
+  let now = baseTime, resolveAccount;
   t.mock.method(Date, 'now', () => now);
   const rt = runtime(async action => {
-    if (action === 'user.bootstrap') return new Promise((resolve, reject) => { rejectAccount = reject; });
+    if (action === 'user.bootstrap') return new Promise(resolve => { resolveAccount = resolve; });
     return { follows: [follow([observation({ status: 'available' })])] };
   });
   const page = rt.instance('pages/query/index.js');
-  page.data.ready = true; page.data.boot = { member: true, followCount: 1 }; page.visible = true;
+  page.data.ready = true; page.applyBoot(verifiedAccount()); page.visible = true;
   page.startFollowPolling(); await flush(); page.onHide();
   assert.equal(page.data.followTargets[0].statusLabel, '可取货');
   now += 180000; const showing = page.onShow();
-  assert.equal(page.data.followTargets[0].statusLabel, '待更新', 'age is recalculated before the account request settles');
-  rejectAccount(Error('offline')); await showing; await flush(); page.onHide();
+  assert.equal(page.data.accountReady, false);
+  assert.equal(page.data.followTargets.length, 0, 'prior member observations remain hidden while current-account verification is pending');
+  assert.equal(page.followSnapshot[0].stores[0].observedAt, at(0), 'the retained source observation is not replaced or restamped');
+  resolveAccount(verifiedAccount()); await showing; await flush(); page.onHide();
+  assert.equal(page.data.accountReady, true);
+  assert.equal(page.data.followTargets[0].statusLabel, '待更新', 'verified observations use their current age, not the formerly fresh label');
+  assert.equal(page.data.followTargets[0].observationState, 'stale');
+  assert.match(page.data.followTargets[0].lastKnownText, /上次有效结果：可取货/);
   assert.equal(page.data.followTargets[0].observedText, '2026-09-15 18:35:06');
+  assert.equal(rt.calls.some(call => call.action === 'query.pickup'), false, 'revisiting and verifying the account does not run a charged query');
 });
 
 test('history latest omits zero duration and restricted historical values', async t => {

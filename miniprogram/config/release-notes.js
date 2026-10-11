@@ -8,6 +8,16 @@
 // Keep technical details and complete acceptance records in release documents.
 const RELEASE_NOTES = [
   {
+    version: '2.0.0',
+    title: '选购与关注体验升级',
+    dateText: '候选更新 · 2026-10-11',
+    highlights: [
+      '开屏与攻略统一为 iPhone Duo 海报，预购倒计时与日历置顶更醒目。',
+      '月卡与年卡限时优惠，套餐价格、权益和购买记录一目了然。',
+      '保留配置继续开通，改善启动、切页与付款结果提示。',
+    ],
+  },
+  {
     version: '1.6.1',
     title: '提醒补充与会员权益优化',
     dateText: '更新记录 · 2026-10-08',

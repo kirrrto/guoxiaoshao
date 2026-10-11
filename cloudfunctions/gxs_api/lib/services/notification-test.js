@@ -11,6 +11,13 @@ function requestId(payload) {
   if (!validId(payload.requestId)) throw new ApiError('invalid_request_id', '测试需要有效的请求编号');
   return payload.requestId;
 }
+/** Optional old-client-compatible guard; identity comes only from the SDK context. */
+function assertExpectedAccount(ctx, payload) {
+  if (Object.prototype.hasOwnProperty.call(payload, 'expectedUserKey')
+    && (typeof payload.expectedUserKey !== 'string' || payload.expectedUserKey !== ctx.identity.userKey)) {
+    throw new ApiError('notification_test_account_changed', '微信账号已变化，请刷新账户后继续原测试');
+  }
+}
 function senderFor(ctx) {
   if (ctx.notificationTestSender) return ctx.notificationTestSender;
   const env = ctx.notificationEnv || process.env;
@@ -23,14 +30,15 @@ function readiness(ctx, sender) {
     : sender.enabled === false ? sender.disabledReason || 'sender_missing' : null;
   return { ready: !reason, reason, templateId: isValidTemplateId(templateId) ? templateId : null };
 }
-function present(value) {
+function present(value, userKey) {
   const r = value.record;
-  return { balance: value.balance, quotaRevision: value.quotaRevision, test: r ? {
+  return { userKey, balance: value.balance, quotaRevision: value.quotaRevision, test: r ? {
     requestId: r.requestId, status: r.status, reason: r.reason, charged: r.charged, refunded: r.refunded,
     createdAt: r.createdAt, settledAt: r.settledAt || null, firstOpenedAt: r.firstOpenedAt || null, firstPresentedAt: r.firstPresentedAt || null, feedback: r.feedback && r.feedback.outcome || null,
   } : null };
 }
 async function status(ctx, payload) {
+  assertExpectedAccount(ctx, payload);
   const user = await ensureUser(ctx);
   if (payload.requestId !== undefined) requestId(payload);
   let value = (payload.opened === true || payload.presented === true) && payload.requestId
@@ -41,14 +49,15 @@ async function status(ctx, payload) {
     value = await ctx.repo.retireNotificationTestAuthorization({ userKey: user._id, requestId: value.record.requestId, nowIso: ctx.nowIso });
   }
   const current = await ctx.repo.getUser(user._id);
-  return { ...present(value), ...ready, cost: 1, userKey: user._id, quota: await quotaSnapshot(ctx, current) };
+  return { ...present(value, user._id), ...ready, cost: 1, quota: await quotaSnapshot(ctx, current) };
 }
 async function authorize(ctx, payload) {
+  assertExpectedAccount(ctx, payload);
   const user = await ensureUser(ctx), id = requestId(payload);
   const ready = readiness(ctx, senderFor(ctx));
   if (!ready.ready) throw new ApiError('test_unavailable', '微信通知测试暂未开放，请稍后再试');
   if (!['accept', 'reject', 'ban'].includes(payload.result) || payload.templateId !== ready.templateId) throw new ApiError('invalid_subscription_result', '请使用当前测试模板完成微信授权');
-  return present(await ctx.repo.authorizeNotificationTest({ userKey: user._id, requestId: id, templateId: ready.templateId, result: payload.result, nowIso: ctx.nowIso }));
+  return present(await ctx.repo.authorizeNotificationTest({ userKey: user._id, requestId: id, templateId: ready.templateId, result: payload.result, nowIso: ctx.nowIso }), user._id);
 }
 function testMessage(record, config) {
   const message = buildMessage({ templateId: record.templateId, detectedAt: record.createdAt, productTitle: '【测试】通知体验', storeName: '【测试】服务通知' }, config);
@@ -60,10 +69,11 @@ function testMessage(record, config) {
   return { ...message, page: `${PAGE}?requestId=${encodeURIComponent(record.requestId)}` };
 }
 async function send(ctx, payload) {
+  assertExpectedAccount(ctx, payload);
   const user = await ensureUser(ctx), id = requestId(payload), sender = senderFor(ctx), ready = readiness(ctx, sender);
   // Replays remain readable even if sending was disabled after the first call.
   const previous = await ctx.repo.getNotificationTest({ userKey: user._id, requestId: id, nowIso: ctx.nowIso });
-  if (previous.record && previous.record.status !== 'authorized') return present(previous);
+  if (previous.record && previous.record.status !== 'authorized') return present(previous, user._id);
   if (!ready.ready) throw new ApiError('test_unavailable', '微信通知测试暂未开放，本次未扣次');
   const remaining = () => typeof ctx.remainingMs === 'function' ? ctx.remainingMs() : Infinity;
   // A fresh debit needs time for admission, the message request, and durable
@@ -71,7 +81,7 @@ async function send(ctx, payload) {
   if (remaining() <= 9000) throw new ApiError('request_budget_exhausted', '连接耗时较长，本次尚未发起发送或扣次，请继续原测试');
   const ownerId = randomUUID();
   const begun = await ctx.repo.beginNotificationTest({ userKey: user._id, requestId: id, templateId: ready.templateId, ownerId, nowIso: ctx.clock().toISOString() });
-  if (!begun.acquired) return present(begun);
+  if (!begun.acquired) return present(begun, user._id);
   let outcome;
   try {
     // Reserve six seconds for settlement/refund even when preceding database
@@ -91,11 +101,12 @@ async function send(ctx, payload) {
   const finish = () => ctx.repo.finishNotificationTest({ userKey: user._id, requestId: id, ownerId, ...outcome, nowIso: ctx.clock().toISOString() });
   let finished;
   try { finished = await finish(); } catch { finished = await finish(); } // Idempotent settlement may retry; sending never does.
-  return present(finished);
+  return present(finished, user._id);
 }
 async function feedback(ctx, payload) {
+  assertExpectedAccount(ctx, payload);
   const user = await ensureUser(ctx), id = requestId(payload);
   if (!['received', 'not_received'].includes(payload.outcome)) throw new ApiError('invalid_feedback', '请选择收到或没收到');
-  return present(await ctx.repo.feedbackNotificationTest({ userKey: user._id, requestId: id, outcome: payload.outcome, nowIso: ctx.nowIso }));
+  return present(await ctx.repo.feedbackNotificationTest({ userKey: user._id, requestId: id, outcome: payload.outcome, nowIso: ctx.nowIso }), user._id);
 }
 module.exports = { status, authorize, send, feedback, testMessage };

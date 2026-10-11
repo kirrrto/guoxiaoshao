@@ -33,6 +33,13 @@
     </view>
 
     <view class="card">
+      <view class="card-title"><text>真实付费与首付队列（近 30 天）</text></view>
+      <view wx:if="{{!growth}}" class="small muted">按真实订单证据、首个有效目标和成熟观察期核对；仅按需读取，不影响用户查询。</view>
+      <view wx:for="{{growth.lines}}" wx:key="*this" class="small">{{item}}</view>
+      <view class="btn-row wrap"><button class="btn btn-ghost btn-sm" disabled="{{!!busy}}" bindtap="onLoadGrowth">{{busy === 'growth' ? '读取中…' : '读取增长报表'}}</button></view>
+    </view>
+
+    <view class="card">
       <view class="card-title"><text>用户操作</text></view>
       <view class="input-row">
         <input class="input" value="{{grant.userKey}}" placeholder="userKey（appid:openid）" data-field="userKey" bindinput="onGrantInput" />
@@ -66,7 +73,7 @@
         <button class="btn btn-outline btn-sm" bindtap="loadConfig">重新加载</button>
         <button class="btn btn-primary btn-sm {{saving || !configDirty ? 'disabled' : ''}}" disabled="{{saving || !configDirty}}" bindtap="onSaveConfig">保存配置</button>
       </view>
-      <view class="tiny muted mt">可编辑：quota / tasks / memberProduct / memberRedemption / newProductWindows / notifications / collector / query / announcement。保存后立即生效。管理员名单仅由云端配置管理。</view>
+      <view class="tiny muted mt">可编辑：quota / tasks / memberProduct / memberPlans / memberRedemption / newProductWindows / notifications / collector / query / announcement / features / growthExperiment。保存后立即生效。2.0 新入口与采集默认关闭；实验需先完成 A/A 核验，最多一个主链路实验。管理员名单仅由云端配置管理。</view>
     </view>
   </block>
 </view>

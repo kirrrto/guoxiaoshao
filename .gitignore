@@ -13,6 +13,7 @@ $RECYCLE.BIN/
 # Node.js
 node_modules/
 output/
+tmp/
 
 # Machine configuration and credentials stay local.
 project.private.config.json

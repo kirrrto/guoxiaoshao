@@ -21,6 +21,7 @@ const { upstreamGuardMethods, reserveAccountQuery, releaseAccountQuery } = requi
 const { queryTargetMethods } = require('./query-target');
 const { notificationTestMethods } = require('./notification-test');
 const { memberRecordMethods } = require('./member-records');
+const { growthMethods } = require('./growth');
 const subscriptionCredits = require('./subscription-credit-ledger');
 const { matchesNotificationTarget, nextFollowUpdatedAt } = require('../notification-target');
 
@@ -532,6 +533,7 @@ function atomicMethods(run) {
     }),
 
     ...upstreamGuardMethods(run),
+    ...growthMethods(run),
     ...queryTargetMethods(run),
 
     claimNotification: ({ id, ownerId, now, leaseUntil }) => run(async tx => {

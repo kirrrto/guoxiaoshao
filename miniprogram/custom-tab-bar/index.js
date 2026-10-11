@@ -3,7 +3,9 @@ const { subscribeNetwork, isOnline } = require('../utils/network');
 
 Component({
   data: {
-    selected: 0,
+    // A new tab instance must not briefly paint Query as selected before its
+    // owning route is known. attached/onShow synchronizes the actual route.
+    selected: -1,
     keyboardHidden: false,
     sheetHidden: false,
     offline: false,
@@ -60,7 +62,7 @@ Component({
       const pages = typeof getCurrentPages === 'function' ? getCurrentPages() : [];
       const page = pages[pages.length - 1];
       const state = page && page.data || {};
-      const sheetHidden = Boolean(state.sheetVisible || state.editing || state.redemptionOpen);
+      const sheetHidden = Boolean(state.sheetVisible || state.editing || state.redemptionOpen || state.calendarOpen);
       if (sheetHidden !== this.data.sheetHidden) this.setData({ sheetHidden });
     },
     syncRoute(pagePath) {

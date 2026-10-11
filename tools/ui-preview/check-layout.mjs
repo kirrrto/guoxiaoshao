@@ -2,6 +2,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
+import crypto from 'node:crypto';
 import { createRequire } from 'node:module';
 import { pathToFileURL } from 'node:url';
 const require = createRequire(import.meta.url);
@@ -11,6 +12,13 @@ let playwright;
 try { playwright = require('playwright'); }
 catch { playwright = require(path.join(os.homedir(), '.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright')); }
 const manifest = JSON.parse(fs.readFileSync(path.join(directory, 'manifest.json'), 'utf8'));
+function verifyPreviewSources() {
+  for (const source of manifest.sourceHashes || []) {
+    const current = crypto.createHash('sha256').update(fs.readFileSync(path.join(manifest.source, source.file))).digest('hex');
+    if (current !== source.sha256) throw Error(`Preview source changed: ${source.file}. Re-run build.mjs before layout verification.`);
+  }
+}
+verifyPreviewSources();
 const screenshots = path.join(directory, colorScheme === 'dark' ? 'screenshots-dark' : 'screenshots'); fs.mkdirSync(screenshots, { recursive: true });
 let browser;
 const configuredExecutable = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH;
@@ -23,11 +31,32 @@ catch (error) {
 const report = { renderer: 'headless Chromium rendering generated WXML/WXSS approximation; not WeChat', generatedAt: new Date().toISOString(), snapshots: [], screenshotDirectory: screenshots };
 const context = await browser.newContext({ deviceScaleFactor: 1, colorScheme });
 report.colorScheme = colorScheme;
+report.sourceHashes = manifest.sourceHashes || [];
 report.buttonConstraintProfile = manifest.buttonConstraintProfile || null;
 report.rpxRoundingProfile = manifest.rpxRoundingProfile || null;
 if (!manifest.remoteImages) await context.route(/^https?:/, route => route.abort());
 try {
   const page = await context.newPage();
+  await page.goto(pathToFileURL(path.join(directory, 'index.html')).href);
+  const indexTargets = await page.evaluate(() => {
+    const pageSelect = document.querySelector('#page'), scenarioSelect = document.querySelector('#scenario'), widthSelect = document.querySelector('#width');
+    const values = control => [...control.options].map(option => option.value), choose = (control, value) => { control.value = value; control.dispatchEvent(new Event('change')); };
+    const targets = [];
+    for (const pageName of values(pageSelect)) {
+      choose(pageSelect, pageName);
+      for (const scenario of values(scenarioSelect)) {
+        choose(scenarioSelect, scenario);
+        for (const width of values(widthSelect)) {
+          choose(widthSelect, width);
+          targets.push({ page: pageName, scenario, width: Number(width), file: document.querySelector('#frame').getAttribute('src') });
+        }
+      }
+    }
+    return targets;
+  });
+  const invalidTargets = indexTargets.filter(target => !manifest.snapshots.some(item => item.page === target.page && item.scenario === target.scenario && item.width === target.width && item.file === target.file) || !fs.existsSync(path.join(directory, target.file)));
+  const missingTargets = manifest.snapshots.filter(item => !indexTargets.some(target => target.file === item.file));
+  report.indexNavigation = { total: indexTargets.length, invalidTargets, missingTargets };
   const selected = args.includes('--images-only') ? manifest.snapshots.filter(item => item.page === 'query' && ['member', 'longcontent'].includes(item.scenario)) : manifest.snapshots;
   for (const item of selected) {
     await page.setViewportSize({ width: item.width, height: 900 });
@@ -99,10 +128,22 @@ try {
           if (button.scrollWidth > button.clientWidth + 1) alternativeLayoutErrors.push('Query action label is clipped');
         }
       }
-      return { viewport: width, scrollWidth: document.documentElement.scrollWidth, bodyHeight: document.body.scrollHeight, overflow, clippedText, images, alternativeGeometry, alternativeLayoutErrors };
+      const calendarLayoutErrors = [];
+      for (const grid of document.querySelectorAll('.calendar-grid')) {
+        const cells = [...grid.children], firstWeek = cells.slice(0, 7).map(bounds);
+        if (cells.length % 7 || firstWeek.length !== 7) calendarLayoutErrors.push('Calendar grid is not grouped into seven columns');
+        if (firstWeek.some((cell, index) => cell.width <= 0 || Math.abs(cell.y - firstWeek[0].y) > 1 || index > 0 && cell.x < firstWeek[index - 1].right - 1)) calendarLayoutErrors.push('Calendar weekday columns wrap or overlap');
+      }
+      const dialog = document.querySelector('.opening-calendar-panel');
+      if (dialog) {
+        const r = bounds(dialog);
+        if (r.x < 0 || r.right > width + 1 || r.y < 0 || r.bottom > innerHeight + 1) calendarLayoutErrors.push('Opening calendar dialog exceeds the viewport');
+      }
+      return { viewport: width, scrollWidth: document.documentElement.scrollWidth, bodyHeight: document.body.scrollHeight, overflow, clippedText, images, alternativeGeometry, alternativeLayoutErrors, calendarLayoutErrors };
     });
     const bodyText = await page.locator('body').innerText();
     const missingText = (item.expectedText || []).filter(text => !bodyText.replace(/\s+/g, '').includes(text.replace(/\s+/g, '')));
+    const forbiddenTextFound = (item.forbiddenText || []).filter(text => bodyText.replace(/\s+/g, '').includes(text.replace(/\s+/g, '')));
     if (item.scenario.startsWith('alternatives-') && !metrics.alternativeGeometry.length) metrics.alternativeLayoutErrors.push('Alternative controls are missing from this scenario');
     if (item.expectedAlternativeCounts) {
       const actual = await page.evaluate(() => ({ colors: document.querySelectorAll('.alternative-chip').length, stores: document.querySelectorAll('.alternative-store').length, queries: document.querySelectorAll('.alternative-query-button').length }));
@@ -110,7 +151,7 @@ try {
         if (actual[key] !== expected) metrics.alternativeLayoutErrors.push(`Expected ${expected} ${key} controls, received ${actual[key]}`);
       }
     }
-    const record = { ...item, ...metrics, missingText }; report.snapshots.push(record);
+    const record = { ...item, ...metrics, missingText, forbiddenTextFound }; report.snapshots.push(record);
     if (item.expectedReleaseNoteCount !== undefined) {
       record.releaseNoteCount = await page.locator('.release-note').count();
       if (record.releaseNoteCount !== item.expectedReleaseNoteCount || record.releaseNoteCount > 3) throw Error(`Release pagination rendered ${record.releaseNoteCount} versions; expected ${item.expectedReleaseNoteCount}: ${item.file}`);
@@ -127,6 +168,22 @@ try {
     }
     const representative = item.width === 375 && ['member', 'free'].includes(item.scenario) || item.scenario.startsWith('sheet-') || item.width === 320 && ['longcontent', 'history-longcontent', 'history-balance-cap', 'operator-longcontent'].includes(item.scenario) || item.width === 375 && ['mine', 'follow'].includes(item.page) && item.scenario === 'expired' || item.width === 430 && item.page === 'query' && item.scenario === 'member' || item.width === 375 && item.scenario.startsWith('monitor-') || item.width === 375 && item.scenario.startsWith('history-') && (item.page === 'history' || item.scenario === 'history-free-first');
     if (representative || item.scenario.startsWith('onboarding-') && item.width === 375 || /^(?:payment|notification-test|alternatives|orders|nudge)-/.test(item.scenario)) { const name = item.file.replace('.html', '.png'); await page.screenshot({ path: path.join(screenshots, name), fullPage: true }); record.screenshot = name; }
+    if (item.scenario.startsWith('v2-') && (item.width === 375 || [320, 1024].includes(item.width) && (item.page === 'guide' || item.scenario.startsWith('v2-promotion-') || item.scenario === 'v2-calendar-modal') || item.width === 320 && ['v2-longcontent', 'v2-context-checkout'].includes(item.scenario) || item.width === 1024 && ['v2-member', 'v2-context-checkout'].includes(item.scenario))) {
+      const name = item.file.replace('.html', '.png');
+      await page.screenshot({ path: path.join(screenshots, name), fullPage: true }); record.screenshot = name;
+      const firstScreen = item.file.replace('.html', '-first-screen.png');
+      await page.screenshot({ path: path.join(screenshots, firstScreen), fullPage: false }); record.firstScreenScreenshot = firstScreen;
+      if (item.page === 'query' && await page.locator('.result-next-action').count()) {
+        const actionScreenshot = item.file.replace('.html', '-action.png');
+        await page.locator('.result-next-action').evaluate(element => window.scrollTo(0, window.scrollY + element.getBoundingClientRect().top - 150));
+        await page.locator('.result-next-action').screenshot({ path: path.join(screenshots, actionScreenshot) }); record.actionScreenshot = actionScreenshot;
+      }
+      if (item.page === 'mine' && await page.locator('.membership-shop').count()) {
+        const offerScreenshot = item.file.replace('.html', '-offer.png');
+        await page.locator('.membership-shop').evaluate(element => window.scrollTo(0, window.scrollY + element.getBoundingClientRect().top - 100));
+        await page.locator('.membership-shop').screenshot({ path: path.join(screenshots, offerScreenshot) }); record.offerScreenshot = offerScreenshot;
+      }
+    }
     if (item.scenario === 'alternatives-premium' || item.scenario === 'alternatives-free' && item.width === 320) {
       const panel = page.locator('.alternative-panel'), panelBounds = await panel.boundingBox();
       await page.setViewportSize({ width: item.width, height: Math.ceil(panelBounds.height) + 180 });
@@ -151,7 +208,8 @@ try {
     }
   }
 } finally { await context.close(); await browser.close(); }
-report.summary = { total: report.snapshots.length, expressionErrors: manifest.expressionErrors || 0, missingText: report.snapshots.filter(x => x.missingText.length).length, horizontalOverflow: report.snapshots.filter(x => x.scrollWidth > x.width + 1 || x.overflow.length).length, clippedText: report.snapshots.filter(x => x.clippedText.length).length, failedImages: report.snapshots.flatMap(x => x.images).filter(x => !x.loaded).length, alternativeLayoutFailures: report.snapshots.filter(x => x.alternativeLayoutErrors.length).length };
+verifyPreviewSources();
+report.summary = { total: report.snapshots.length, indexNavigationFailures: report.indexNavigation.invalidTargets.length + report.indexNavigation.missingTargets.length, expressionErrors: manifest.expressionErrors || 0, missingText: report.snapshots.filter(x => x.missingText.length).length, forbiddenText: report.snapshots.filter(x => x.forbiddenTextFound.length).length, horizontalOverflow: report.snapshots.filter(x => x.scrollWidth > x.width + 1 || x.overflow.length).length, clippedText: report.snapshots.filter(x => x.clippedText.length).length, failedImages: report.snapshots.flatMap(x => x.images).filter(x => !x.loaded).length, alternativeLayoutFailures: report.snapshots.filter(x => x.alternativeLayoutErrors.length).length, calendarLayoutFailures: report.snapshots.filter(x => x.calendarLayoutErrors.length).length };
 fs.writeFileSync(path.join(directory, colorScheme === 'dark' ? 'layout-metrics-dark.json' : 'layout-metrics.json'), JSON.stringify(report, null, 2));
 console.log(JSON.stringify(report.summary));
-if (report.summary.expressionErrors || report.summary.missingText || report.summary.horizontalOverflow || report.summary.clippedText || report.summary.failedImages || report.summary.alternativeLayoutFailures) process.exitCode = 1;
+if (report.summary.indexNavigationFailures || report.summary.expressionErrors || report.summary.missingText || report.summary.forbiddenText || report.summary.horizontalOverflow || report.summary.clippedText || report.summary.failedImages || report.summary.alternativeLayoutFailures || report.summary.calendarLayoutFailures) process.exitCode = 1;

@@ -3,6 +3,7 @@ const { getBootstrap, getCatalog, invalidateBootstrap, publishQuota, getQuotaGen
 const fmt = require('../../utils/format');
 const { storeLabel } = require('../../utils/store-label');
 const { localKey } = require('../../utils/local-key');
+const { readSession, writeSession } = require('../../utils/session');
 const operation = require('../../utils/operation');
 const { syncTabBar } = require('../../utils/tab-bar');
 const { shareAppMessage, shareTimeline } = require('../../utils/share');
@@ -144,11 +145,10 @@ Page({
     if (!this.unsubscribeQuota) this.unsubscribeQuota = subscribeQuota(quota => {
       if (!this.pageRetired && this.data.boot) this.setData({ 'boot.balance': quota.balance });
     });
-    let pickerValue = null;
-    try { pickerValue = wx.getStorageSync(localKey(SELECTION_KEY)) || null; } catch (e) { pickerValue = null; }
+    const restoredSelection = readSession(localKey(SELECTION_KEY));
     try {
       const account = getBootstrap(); account.catch(() => {});
-      const initialCatalog = await getCatalog();
+      const [initialCatalog, pickerValue] = await Promise.all([getCatalog(), restoredSelection]);
       if (this.pageRetired) return;
       const catalog = getApp().globalData.catalog || initialCatalog; this.catalog = catalog;
       const product = pickerValue && Object.prototype.hasOwnProperty.call(catalog.productByPart, pickerValue.partNumber) ? catalog.productByPart[pickerValue.partNumber] : null;
@@ -319,7 +319,7 @@ Page({
     this.setData({ dayKey: item.dayKey, selectionSummary: selectionSummary(this.selection, catalog), resultTargetDifferent: false,
       result: null, moreError: null, restriction: null, restoreWarning: false,
       restoreNotice: '查询条件已恢复，尚未查询，也未扣次。请核对后点击「查看历史」，查询时按账户规则计次。' });
-    try { wx.setStorageSync(localKey(SELECTION_KEY), pickerValue); } catch (error) { /* the restored form remains usable */ }
+    writeSession(localKey(SELECTION_KEY), pickerValue);
   },
 
   applyTaskReward(result) {
@@ -346,7 +346,7 @@ Page({
       this.restoredSelection = null;
       this.setData({ restoreNotice: null, restoreWarning: false });
     }
-    try { wx.setStorageSync(localKey(SELECTION_KEY), { partNumber: e.detail.partNumber, storeNumbers: e.detail.storeNumbers }); } catch (err) { /* ignore */ }
+    writeSession(localKey(SELECTION_KEY), { partNumber: e.detail.partNumber, storeNumbers: e.detail.storeNumbers });
   },
 
   onDateChange(e) {

@@ -10,6 +10,8 @@ const COLLECTIONS = Object.freeze({
   events: 'gxs_events',
   health: 'gxs_target_health',
   orders: 'gxs_orders',
+  growthEvents: 'gxs_growth_events',
+  growthAccounts: 'gxs_growth_accounts',
   notifications: 'gxs_notifications',
   notificationTests: 'gxs_notification_tests',
   config: 'gxs_config',
@@ -19,6 +21,14 @@ const COLLECTIONS = Object.freeze({
 
 /** Index plan used by tools/db/create-collections and documented in docs/DATA_MODEL.md. */
 const INDEX_PLAN = Object.freeze({
+  [COLLECTIONS.growthEvents]: [
+    { name: 'received_id', keys: { receivedAt: -1, _id: -1 }, unique: false },
+    { name: 'account_received_id', keys: { accountKey: 1, receivedAt: -1, _id: -1 }, unique: false },
+  ],
+  [COLLECTIONS.growthAccounts]: [
+    { name: 'empty_intent_updated', keys: { firstIntent: 1, updatedAt: 1 }, unique: false },
+    { name: 'intent_compacted_at', keys: { 'firstIntent.compacted': 1, 'firstIntent.at': 1 }, unique: false },
+  ],
   [COLLECTIONS.notificationTests]: [
     { name: 'user_created', keys: { userKey: 1, createdAt: -1 }, unique: false },
     { name: 'status_created', keys: { status: 1, createdAt: -1 }, unique: false },

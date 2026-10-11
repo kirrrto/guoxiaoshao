@@ -7,6 +7,7 @@ const { resolveConfig } = require('../rules/quota');
 const { maskOpenid } = require('../identity');
 const { monitoringSnapshot } = require('../monitor-readiness');
 const { paymentProduct, paymentProducts } = require('../payment/service');
+const { runtimeFor } = require('../growth-policy');
 
 function newUser(identity, nowIso) {
   return {
@@ -134,6 +135,7 @@ async function bootstrap(ctx) {
     subscriptions: user.subscriptions || {},
     catalogVersion: catalogMeta ? catalogMeta.version : null,
     announcement: ctx.config.announcement,
+    ...runtimeFor(ctx.config, user._id),
   };
 }
 

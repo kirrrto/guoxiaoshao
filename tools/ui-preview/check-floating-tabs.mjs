@@ -2,6 +2,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
+import crypto from 'node:crypto';
 import { createRequire } from 'node:module';
 import { pathToFileURL } from 'node:url';
 const require = createRequire(import.meta.url);
@@ -10,6 +11,13 @@ try { playwright = require('playwright'); }
 catch { playwright = require(path.join(os.homedir(), '.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright')); }
 const directory = path.resolve(process.argv[2]);
 const manifest = JSON.parse(fs.readFileSync(path.join(directory, 'manifest.json'), 'utf8'));
+function verifyPreviewSources() {
+  for (const source of manifest.sourceHashes || []) {
+    const actual = crypto.createHash('sha256').update(fs.readFileSync(path.join(manifest.source, source.file))).digest('hex');
+    if (actual !== source.sha256) throw Error(`Preview source changed: ${source.file}. Re-run build.mjs before navigation verification.`);
+  }
+}
+verifyPreviewSources();
 const executablePath = ['C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe', 'C:/Program Files/Google/Chrome/Application/chrome.exe'].find(file => fs.existsSync(file));
 const browser = await playwright.chromium.launch({ headless: true, ...(executablePath ? { executablePath } : {}) });
 const records = [], screenshots = path.join(directory, 'floating-tab-screenshots');
@@ -20,8 +28,12 @@ try {
   for (const item of manifest.snapshots) {
     await page.setViewportSize({ width: item.width, height: 850 });
     await page.goto(pathToFileURL(path.join(directory, item.file)).href);
-    if (item.page === 'admin') {
-      records.push({ ...item, issues: await page.locator('.floating-tab-shell').count() ? ['admin unexpectedly shows tab navigation'] : [] });
+    if (item.tabPage === false || item.tabPage === undefined && item.page === 'admin') {
+      records.push({ ...item, issues: await page.locator('.floating-tab-shell').count() ? ['non-tab page unexpectedly shows tab navigation'] : [] });
+      continue;
+    }
+    if (item.navigationHidden) {
+      records.push({ ...item, issues: await page.locator('.floating-tab-shell').isVisible() ? ['modal does not hide tab navigation'] : [] });
       continue;
     }
     for (const fontScale of [1, 1.3]) for (const simulatedSafeArea of [0, 34]) {
@@ -63,7 +75,9 @@ try {
     }
   }
 } finally { await browser.close(); }
-const report = { checkedAt: new Date().toISOString(), renderer: 'Offline Chromium approximation, real component markup and styles; 34px safe area is simulated, not a physical-device measurement', summary: { total: records.length, failed: records.filter(r => r.issues.length).length }, records };
+verifyPreviewSources();
+const tabCases = records.filter(record => record.fontScale !== undefined).length;
+const report = { checkedAt: new Date().toISOString(), renderer: 'Offline Chromium approximation, real component markup and styles; 34px safe area is simulated, not a physical-device measurement', sourceHashes: manifest.sourceHashes || [], coverage: { tabCases, nonTabPages: records.filter(record => record.tabPage === false || record.page === 'admin').length, hiddenTabPages: records.filter(record => record.tabPage && record.navigationHidden).length }, summary: { total: records.length, failed: records.filter(r => r.issues.length).length }, records };
 fs.writeFileSync(path.join(directory, 'floating-tab-metrics.json'), JSON.stringify(report, null, 2));
 console.log(JSON.stringify(report.summary));
 if (report.summary.failed) { console.log(JSON.stringify(records.filter(r => r.issues.length).slice(0, 8), null, 2)); process.exitCode = 1; }

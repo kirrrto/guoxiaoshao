@@ -1,0 +1,70 @@
+<view class="page guide-page">
+  <view class="guide-hero">
+    <view class="guide-title">果小哨 · 选购指南</view>
+    <view class="guide-subtitle">选好心仪配置，下一步更清楚。</view>
+    <view class="small text-2">从选购准备、开启提醒，到官方下单与取货。</view>
+  </view>
+
+  <view wx:if="{{calendars.length}}" class="card">
+    <button class="ui-disclosure" hover-class="ui-control-pressed" bindtap="onToggleCalendar" aria-expanded="{{calendarExpanded}}"><view><text class="ui-disclosure-label">新品发售日历</text><view class="tiny muted">{{calendars[0].title}} · {{calendars[0].preorderText}}</view></view><view class="ui-chevron {{calendarExpanded ? 'ui-chevron--up' : 'ui-chevron--down'}}"></view></button>
+    <block wx:if="{{calendarExpanded}}">
+      <view wx:for="{{calendars}}" wx:for-item="calendar" wx:key="id" class="guide-calendar">
+        <view class="poster-hero">
+          <image wx:if="{{calendar.imageUrl}}" class="poster-hero-image" src="{{calendar.imageUrl}}" mode="aspectFit" aria-label="{{calendar.imageAlt || calendar.title}}" binderror="onCalendarImageError" data-index="{{index}}" />
+          <view class="poster-hero-fade"></view>
+          <view class="poster-hero-top">
+            <text class="opening-calendar-brand">果小哨 · 新品日历</text>
+            <text class="pill pill-ok">{{calendar.phase}}</text>
+          </view>
+          <view class="poster-hero-copy">
+            <view class="poster-title">{{calendar.title}}</view>
+            <view class="poster-subtitle">折叠新形态 · 即将开启预购</view>
+            <view class="poster-tags">
+              <text class="poster-tag">折叠大屏</text>
+              <text class="poster-tag">旗舰芯片</text>
+              <text class="poster-tag">专业影像</text>
+            </view>
+          </view>
+          <view class="poster-slogan">更大的世界<br/>从此展开</view>
+        </view>
+        <view class="poster-countdown" aria-live="polite">
+          <view class="poster-countdown-label">{{calendar.countdown.label}}</view>
+          <view class="poster-countdown-value">{{calendar.countdown.text}}</view>
+        </view>
+        <view class="poster-milestones">
+          <view class="poster-milestone">
+            <view class="poster-milestone-icon" aria-hidden="true">🛒</view>
+            <view>
+              <text class="poster-milestone-date">{{calendar.preorderDateText}}</text>
+              <view class="small">{{calendar.preorderText}}</view>
+            </view>
+          </view>
+          <view class="poster-milestone">
+            <view class="poster-milestone-icon" aria-hidden="true">🎁</view>
+            <view>
+              <text class="poster-milestone-date">{{calendar.releaseDateText}}</text>
+              <view class="small">正式发售</view>
+            </view>
+          </view>
+        </view>
+        <view class="calendar-month">{{calendar.monthText}} · 北京时间</view>
+        <view class="calendar-grid"><view wx:for="{{calendar.weekdays}}" wx:key="*this" class="calendar-weekday">{{item}}</view></view>
+        <view class="calendar-grid"><view wx:for="{{calendar.cells}}" wx:key="key" class="calendar-cell {{item.label ? 'calendar-cell--event' : ''}} {{item.today ? 'calendar-cell--today' : ''}}"><text>{{item.day}}</text><text class="calendar-event">{{item.label}}</text></view></view>
+        <view class="tiny text-2 mt">发售时间不等于取货查询开放时间，具体以可选配置和 Apple 官方页面为准。</view>
+        <button class="btn btn-outline btn-block mt" data-id="{{calendar.id}}" bindtap="onCalendarOfficial">复制官方购买链接</button>
+        <view class="tiny muted mt">来源：Apple 中国大陆 · 核对于 {{calendar.verifiedOn}}</view>
+      </view>
+    </block>
+  </view>
+
+  <view class="guide-stages" aria-label="选购阶段"><button wx:for="{{stages}}" wx:key="id" class="guide-stage {{stageId === item.id ? 'guide-stage--on' : ''}}" hover-class="ui-control-pressed" aria-pressed="{{stageId === item.id}}" data-id="{{item.id}}" bindtap="onSelectStage"><text class="guide-stage-number">0{{index + 1}}</text>{{item.label}}</button></view>
+  <view class="card guide-steps">
+    <view class="guide-section-title">{{stage.title}}</view><view class="small text-2 mt">{{stage.note}}</view>
+    <view wx:for="{{stage.steps}}" wx:key="title" class="guide-step"><view class="guide-step-number">{{index + 1}}</view><view class="guide-step-copy"><view class="guide-step-title">{{item.title}}</view><view class="small text-2 mt">{{item.text}}</view></view></view>
+    <button class="btn btn-primary btn-block" bindtap="onStageAction">{{stage.actionText}}</button>
+  </view>
+
+  <view class="card"><view class="guide-section-title">常见问题</view><view wx:for="{{faqs}}" wx:key="id" class="guide-faq"><button class="ui-disclosure" hover-class="ui-control-pressed" aria-expanded="{{faqOpen === item.id}}" data-id="{{item.id}}" bindtap="onToggleFaq"><text class="ui-disclosure-label">{{item.title}}</text><view class="ui-chevron {{faqOpen === item.id ? 'ui-chevron--up' : 'ui-chevron--down'}}"></view></button><view wx:if="{{faqOpen === item.id}}" class="guide-answer small text-2">{{item.text}}</view></view></view>
+  <view class="card guide-shortcuts"><button class="ui-disclosure" hover-class="ui-control-pressed" bindtap="onTestNotification"><view><text class="ui-disclosure-label">先试收一条测试通知</text><view class="tiny muted">主动授权后发送 · 消耗 1 次额度</view></view><view class="ui-chevron"></view></button><button class="ui-disclosure mt" hover-class="ui-control-pressed" bindtap="onGoMine"><text class="ui-disclosure-label">查看会员权益与购买记录</text><view class="ui-chevron"></view></button></view>
+  <view class="footer-note"><view>果小哨提供库存参考与提醒，购买请在 Apple 官方渠道完成。</view><view>官方取货帮助核对于 {{checkedOn}}。</view></view>
+</view>

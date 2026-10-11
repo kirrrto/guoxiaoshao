@@ -1,0 +1,32 @@
+{
+  "createdAt": "2026-10-11T06:02:41.286259+00:00",
+  "generatedAt": "2026-10-11T06:01:12.323Z",
+  "sourceHashesVerified": true,
+  "results": {
+    "layout-metrics.json": {
+      "total": 21,
+      "indexNavigationFailures": 0,
+      "expressionErrors": 0,
+      "missingText": 0,
+      "forbiddenText": 0,
+      "horizontalOverflow": 0,
+      "clippedText": 0,
+      "failedImages": 0,
+      "alternativeLayoutFailures": 0,
+      "calendarLayoutFailures": 0
+    },
+    "layout-metrics-dark.json": {
+      "total": 21,
+      "indexNavigationFailures": 0,
+      "expressionErrors": 0,
+      "missingText": 0,
+      "forbiddenText": 0,
+      "horizontalOverflow": 0,
+      "clippedText": 0,
+      "failedImages": 0,
+      "alternativeLayoutFailures": 0,
+      "calendarLayoutFailures": 0
+    }
+  },
+  "preview": "tmp/ui-preview-notification-test-v2/index.html"
+}

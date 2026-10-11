@@ -1,5 +1,5 @@
 const { call, newId, showError } = require('../../utils/api');
-const { publishQuota, publishQueryBalance } = require('../../utils/store');
+const { publishQuota, publishQueryBalance, resetSession } = require('../../utils/store');
 const ID = /^[A-Za-z0-9_-]{8,64}$/;
 const CALL_TIMEOUT_MS = 20000;
 function callTest(action, payload) {
@@ -11,6 +11,7 @@ function callTest(action, payload) {
 }
 function errorText(error, stage) {
   const code = error && error.code;
+  if (code === 'notification_test_account_changed') return '微信账号已变化，本次操作已停止。请刷新后重新确认测试。';
   if (code === 'unknown_action') return '测试通知服务尚未更新完成，请稍后再试。原测试编号已保留。';
   if (code === 'test_storage_unavailable') return '测试通知服务尚未准备好，请稍后点击「查看原测试结果」重试。';
   if (['call_failed', 'cloud_init_failed', 'test_request_timeout', 'bad_response'].includes(code)) return stage === 'status'
@@ -36,14 +37,52 @@ Page({
   async onLoad(options = {}) {
     this.retired = false;
     this.visible = false;
+    this.accountEpoch = 0;
     this.routeRequestId = ID.test(options.requestId || '') ? options.requestId : null;
     this.openedFromMessage = Boolean(this.routeRequestId);
     await this.loadStatus();
   },
-  onShow() { this.visible = true; return this.loadStatus(); },
+  onShow() {
+    this.visible = true;
+    const bootstrapOwner = this.bootstrapOwner();
+    if (bootstrapOwner && this.userKey && bootstrapOwner !== this.userKey) this.stopChangedAccount();
+    return this.loadStatus();
+  },
   onHide() { this.visible = false; },
-  onUnload() { this.retired = true; this.visible = false; },
-  applyResult(result) {
+  onUnload() { this.retired = true; this.visible = false; this.accountEpoch += 1; },
+  bootstrapOwner() { const boot = getApp().globalData.bootstrap; return boot && boot.identity && boot.identity.userKey || null; },
+  accountContext() { return { owner: this.userKey, epoch: this.accountEpoch }; },
+  contextCurrent(context) {
+    const bootstrapOwner = this.bootstrapOwner();
+    return !this.retired && context && context.owner === this.userKey && context.epoch === this.accountEpoch
+      && (!bootstrapOwner || bootstrapOwner === context.owner);
+  },
+  bindAccount(userKey) {
+    if (!userKey) throw Error('暂时无法确认微信账号，请刷新后重试。');
+    if (this.userKey !== userKey) {
+      // Quota revisions and pending IDs belong to one account. Keep another
+      // account's durable intent in its own cache for an explicit later return.
+      if ((this.quotaOwner || this.userKey) && (this.quotaOwner || this.userKey) !== userKey && this.bootstrapOwner() !== userKey) resetSession();
+      this.accountEpoch += 1; this.userKey = userKey; this.pending = null; this.openedRecorded = false;
+      this.setData({ canContinue: false, pendingOther: false, test: null, balance: 0, blocked: false, statusTitle: '', statusNote: '', feedbackNote: '' });
+    }
+    this.quotaOwner = userKey;
+    this.storageKey = `gxs_notification_test_v1:${encodeURIComponent(userKey)}`;
+  },
+  finishOperation(context) {
+    if (this.retired || context.owner !== this.userKey || context.epoch !== this.accountEpoch) return;
+    this.setData({ busy: false, operationNote: '', ...(!this.contextCurrent(context)
+      ? { ready: false, error: errorText({ code: 'notification_test_account_changed' }) } : {}) });
+  },
+  stopChangedAccount() {
+    this.accountEpoch += 1; this.statusReadEpoch = (this.statusReadEpoch || 0) + 1;
+    this.userKey = null; this.pending = null; this.storageKey = null; this.statusLoading = false;
+    this.setData({ busy: false, ready: false, canContinue: false, pendingOther: false,
+      test: null, balance: 0, blocked: false, statusTitle: '', statusNote: '', feedbackNote: '', operationNote: '',
+      error: errorText({ code: 'notification_test_account_changed' }) });
+  },
+  applyResult(result, context = this.accountContext()) {
+    if (!this.contextCurrent(context) || result.userKey && result.userKey !== context.owner) return false;
     if (result.quota) publishQuota(result.quota);
     const balance = publishQueryBalance(result).balance;
     if (this.retired) return;
@@ -59,26 +98,36 @@ Page({
       balance: balance === null ? this.data.balance : balance, blocked, canContinue, pendingOther,
       feedbackNote: test && test.feedback === 'received' ? '已记录：你确认收到了测试消息。正式到货监测仍需会员与有效授权。'
         : test && test.feedback === 'not_received' ? '已记录：暂未收到。请检查微信服务通知、订阅消息设置及手机通知权限；系统设置可能影响展示。' : '' }, () => this.recordTestOpen());
-    if (test && matching && ['accepted', 'failed', 'needs_authorization'].includes(test.status)) this.clearPending();
+    if (test && matching && ['accepted', 'failed', 'needs_authorization'].includes(test.status)) this.clearPending(context);
+    return true;
   },
   async loadStatus({ manual = false } = {}) {
     if (this.retired || this.statusLoading || this.data.busy) return;
+    const readEpoch = this.statusReadEpoch = (this.statusReadEpoch || 0) + 1;
+    const bootstrapOwner = this.bootstrapOwner();
     this.statusLoading = true; this.setData({ loading: true, error: null, checkNote: '', operationNote: '正在读取原测试结果…' });
     try {
       let result = await callTest('notificationTest.status', this.routeRequestId ? { requestId: this.routeRequestId } : {});
-      if (this.retired) return;
-      this.storageKey = `gxs_notification_test_v1:${encodeURIComponent(result.userKey)}`;
+      if (this.retired || readEpoch !== this.statusReadEpoch || this.bootstrapOwner() !== bootstrapOwner) return;
+      this.bindAccount(result.userKey);
+      let context = this.accountContext();
       if (!this.pending) {
         try {
           const saved = wx.getStorageSync(this.storageKey);
-          if (saved && ID.test(saved.requestId) && saved.templateId === result.templateId) this.pending = saved;
+          if (saved && ID.test(saved.requestId) && saved.templateId === result.templateId
+            && (!saved.ownerUserKey || saved.ownerUserKey === this.userKey)) this.pending = { ...saved, ownerUserKey: this.userKey };
         } catch (e) { /* a new test requires verified durable storage below */ }
       }
       const unresolvedLatest = result.test && (result.test.status === 'sending' || result.test.status === 'uncertain' && !result.test.feedback);
       if (!this.routeRequestId && this.pending && !unresolvedLatest && (!result.test || result.test.requestId !== this.pending.requestId)) {
-        result = { ...result, ...await callTest('notificationTest.status', { requestId: this.pending.requestId }) };
+        const pendingResult = await callTest('notificationTest.status', { requestId: this.pending.requestId, expectedUserKey: context.owner });
+        if (!this.contextCurrent(context)) return;
+        if (pendingResult.userKey !== context.owner) {
+          this.bindAccount(pendingResult.userKey); context = this.accountContext(); result = pendingResult;
+        } else result = { ...result, ...pendingResult };
       }
-      if (this.retired) return;
+      if (readEpoch !== this.statusReadEpoch) return;
+      if (!this.contextCurrent(context)) throw Object.assign(Error('账号已变化'), { code: 'notification_test_account_changed' });
       this.templateId = result.templateId;
       // A durable server authorization remains recoverable after local cache
       // loss or moving to another device. It still requires an explicit tap.
@@ -86,31 +135,34 @@ Page({
         this.savePending({ requestId: result.test.requestId, templateId: result.templateId, decision: 'accept' });
       }
       this.setData({ ready: result.ready, error: result.ready ? null : '微信通知测试暂未开放，请稍后再试。' });
-      this.applyResult(result);
+      this.applyResult(result, context);
       if (manual) this.setData({ checkNote: result.test ? `已刷新：${this.data.statusTitle}。`
         : this.pending && this.pending.decision === 'accept' ? '尚未查到这次测试记录。原编号已保留；可点击「继续原测试」提交已授权的测试。'
           : '尚无测试记录。点击「授权并发送测试」开始。' });
-    } catch (error) { if (!this.retired) this.setData({ ready: false, error: errorText(error, 'status') }); }
-    finally { this.statusLoading = false; if (!this.retired) this.setData({ loading: false, operationNote: '' }); }
+    } catch (error) { if (!this.retired && readEpoch === this.statusReadEpoch) this.setData({ ready: false, error: errorText(error, 'status') }); }
+    finally { if (readEpoch === this.statusReadEpoch) { this.statusLoading = false; if (!this.retired) this.setData({ loading: false, operationNote: '' }); } }
   },
   recordTestOpen() {
     const test = this.data.test;
     if (this.retired || !this.visible || !this.openedFromMessage || this.openedRecorded || this.openRecording || !test
       || test.requestId !== this.routeRequestId || !['sending', 'accepted', 'uncertain'].includes(test.status)) return;
     const requestId = test.requestId;
+    const context = this.accountContext();
     this.openRecording = true;
     Promise.resolve().then(() => {
-      if (this.retired || !this.visible || this.routeRequestId !== requestId) return null;
-      return callTest('notificationTest.status', { requestId, presented: true });
+      if (!this.contextCurrent(context) || !this.visible || this.routeRequestId !== requestId) return null;
+      return callTest('notificationTest.status', { requestId, presented: true, expectedUserKey: context.owner });
     }).then(result => {
-      if (!result || !result.test || !result.test.firstPresentedAt) return;
+      if (!this.contextCurrent(context) || !result || result.userKey !== context.owner || !result.test || !result.test.firstPresentedAt) return;
       if (this.routeRequestId === requestId) this.openedRecorded = true;
       if (!this.retired && this.data.test && this.data.test.requestId === requestId) this.setData({
         'test.firstOpenedAt': result.test.firstOpenedAt, 'test.firstPresentedAt': result.test.firstPresentedAt,
       });
     }).catch(() => {}).finally(() => { this.openRecording = false; });
   },
-  savePending(value) {
+  savePending(value, context = this.accountContext()) {
+    if (!this.contextCurrent(context)) return false;
+    value = { ...value, ownerUserKey: context.owner };
     this.pending = value;
     try {
       if (!this.storageKey) throw Error('account not ready');
@@ -118,8 +170,10 @@ Page({
       const saved = wx.getStorageSync(this.storageKey);
       if (!saved || saved.requestId !== value.requestId || saved.decision !== value.decision) throw Error('not persisted');
     } catch (e) { throw Error('无法保存测试编号，本次未发起发送。请检查手机存储后重试。'); }
+    return true;
   },
-  clearPending() {
+  clearPending(context = this.accountContext()) {
+    if (!this.contextCurrent(context)) return;
     this.pending = null;
     try { if (this.storageKey) wx.removeStorageSync(this.storageKey); } catch (e) { /* a restored finished ID only reads/replays its result */ }
     if (!this.retired) this.setData({ canContinue: false, pendingOther: false });
@@ -129,38 +183,50 @@ Page({
     if (this.data.balance < 1) return showError(Error('测试需要 1 次额度，请先到「我的」签到或完成任务。'));
     this.setData({ busy: true, error: null, checkNote: '', operationNote: '请在微信提示中确认授权…' });
     this.pendingStage = 'authorize';
+    const context = this.accountContext();
     try {
       this.routeRequestId = null;
       const pending = { requestId: newId('test'), templateId: this.templateId, decision: null };
-      this.savePending(pending);
+      if (!this.savePending(pending, context)) return;
       // Native subscription prompt stays in the user's tap, before any await.
       const result = await wx.requestSubscribeMessage({ tmplIds: [this.templateId] });
-      if (this.retired) return;
+      if (!this.contextCurrent(context)) return;
       const decision = result && result[this.templateId];
       if (!['accept', 'reject', 'ban'].includes(decision)) throw Error('微信授权尚未确认，本次未扣次数。');
-      this.savePending({ ...pending, decision });
+      this.savePending({ ...pending, decision }, context);
       if (!this.visible) { this.setData({ canContinue: decision === 'accept', error: '操作已暂停，返回后可继续原测试；尚未发送。' }); return; }
-      await this.submitPending();
-    } catch (error) { if (!this.retired) { this.setData({ error: errorText(error, this.pendingStage), canContinue: Boolean(this.pending && this.pending.decision === 'accept') }); } }
-    finally { if (!this.retired) this.setData({ busy: false, operationNote: '' }); }
+      await this.submitPending(context);
+    } catch (error) { if (this.contextCurrent(context)) {
+      if (error && error.code === 'notification_test_account_changed') {
+        // A new native answer whose account was rejected is not confirmed
+        // consent for the old owner. Existing intents resumed by onContinue
+        // remain recoverable; this newly created one must be authorized anew.
+        this.clearPending(context); this.stopChangedAccount();
+      }
+      else this.setData({ error: errorText(error, this.pendingStage), canContinue: Boolean(this.pending && this.pending.decision === 'accept') });
+    } }
+    finally { this.finishOperation(context); }
   },
-  async submitPending() {
+  async submitPending(context = this.accountContext()) {
     const pending = this.pending;
-    if (!pending) return;
+    if (!pending || !this.contextCurrent(context) || pending.ownerUserKey !== context.owner) return;
     this.pendingStage = 'authorize'; this.setData({ operationNote: '正在保存微信授权…' });
-    const authorized = await callTest('notificationTest.authorize', { requestId: pending.requestId, templateId: pending.templateId, result: pending.decision });
-    this.applyResult(authorized);
-    if (pending.decision !== 'accept' || this.retired || !this.visible) return;
+    const authorized = await callTest('notificationTest.authorize', { requestId: pending.requestId, templateId: pending.templateId, result: pending.decision, expectedUserKey: context.owner });
+    if (!this.applyResult(authorized, context) || pending.decision !== 'accept' || !this.visible) return;
     // A retry reuses the exact ID. The server never resends a claimed request.
     this.pendingStage = 'send'; this.setData({ operationNote: '正在发送并确认测试消息…' });
-    this.applyResult(await callTest('notificationTest.send', { requestId: pending.requestId }));
+    this.applyResult(await callTest('notificationTest.send', { requestId: pending.requestId, expectedUserKey: context.owner }), context);
   },
   async onContinue() {
     if (this.retired || !this.visible || this.data.busy || this.data.loading || !this.data.ready || this.data.blocked || !this.data.canContinue) return;
     this.setData({ busy: true, error: null, checkNote: '' });
-    try { await this.submitPending(); }
-    catch (error) { if (!this.retired) this.setData({ error: errorText(error, this.pendingStage) }); }
-    finally { if (!this.retired) this.setData({ busy: false, operationNote: '' }); }
+    const context = this.accountContext();
+    try { await this.submitPending(context); }
+    catch (error) { if (this.contextCurrent(context)) {
+      if (error && error.code === 'notification_test_account_changed') this.stopChangedAccount();
+      else this.setData({ error: errorText(error, this.pendingStage) });
+    } }
+    finally { this.finishOperation(context); }
   },
   onCheck() { return this.loadStatus({ manual: true }); },
   onViewPending() {
@@ -172,9 +238,13 @@ Page({
     const outcome = event.currentTarget.dataset.outcome;
     if (this.retired || !this.visible || this.data.busy || this.data.loading || !this.data.test || !['received', 'not_received'].includes(outcome)) return;
     this.setData({ busy: true });
-    try { this.applyResult(await callTest('notificationTest.feedback', { requestId: this.data.test.requestId, outcome })); }
-    catch (error) { if (!this.retired) showError(error); }
-    finally { if (!this.retired) this.setData({ busy: false }); }
+    const context = this.accountContext();
+    try { this.applyResult(await callTest('notificationTest.feedback', { requestId: this.data.test.requestId, outcome, expectedUserKey: context.owner }), context); }
+    catch (error) { if (this.contextCurrent(context)) {
+      if (error && error.code === 'notification_test_account_changed') this.stopChangedAccount();
+      else showError(error);
+    } }
+    finally { this.finishOperation(context); }
   },
   onGoMine() { wx.switchTab({ url: '/pages/mine/index' }); },
 });

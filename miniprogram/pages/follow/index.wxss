@@ -73,6 +73,13 @@
 .alert-feedback { display: flex; align-items: flex-start; flex-direction: column; gap: 12rpx; margin-top: 20rpx; padding-top: 18rpx; border-top: 1rpx solid var(--line); }
 .alert-feedback-actions { display: flex; flex-wrap: wrap; gap: 10rpx; }
 .alert-feedback-actions .btn { flex: none; width: auto; min-height: 44px; height: auto; padding: 10rpx 18rpx; white-space: normal; line-height: 1.45; }
+.activation-card { border: 1rpx solid var(--control-line); }
+.activation-title { font-size: 32rpx; font-weight: 650; line-height: 1.45; }
+.activation-steps { display: flex; flex-wrap: wrap; gap: 14rpx 22rpx; margin: 24rpx 0; }
+.activation-step { display: flex; align-items: center; gap: 10rpx; font-size: 24rpx; color: var(--text-2); }
+.activation-dot { display: flex; align-items: center; justify-content: center; width: 34rpx; height: 34rpx; border: 1rpx solid var(--line); border-radius: 50%; }
+.activation-step--done .activation-dot { color: var(--green-ink); background: var(--green); border-color: var(--green); }
+
 @media (prefers-color-scheme: dark) {
   .follow-product .follow-image { background: var(--image-tile); }
   .readiness-task.card { background: var(--warn-soft); }

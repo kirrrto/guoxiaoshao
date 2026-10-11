@@ -23,6 +23,7 @@ const member = require('./services/member');
 const notify = require('./services/notify');
 const notificationTest = require('./services/notification-test');
 const admin = require('./services/admin');
+const growth = require('./services/growth');
 
 const { version: VERSION } = require('../package.json');
 const defaultClock = () => new Date();
@@ -31,6 +32,7 @@ const defaultClock = () => new Date();
 const ACTIONS = {
   'system.ping': [async ctx => ({ version: VERSION, env: ctx.identity.env, appid: ctx.identity.appid, crossAccount: ctx.identity.crossAccount, hasUser: Boolean(ctx.identity.userKey), isAdmin: ctx.identity.isAdmin }), false],
   'user.bootstrap': [users.bootstrap, true],
+  'growth.ingest': [growth.ingest, true],
   'user.updateSettings': [users.updateSettings, true],
   'catalog.get': [catalog.get, false],
   'quota.signin': [quota.signin, true],
@@ -73,6 +75,7 @@ const ACTIONS = {
   'admin.stats': [admin.stats, false],
   'admin.capacity': [admin.capacity, false],
   'admin.insights': [admin.insights, false],
+  'admin.growth': [growth.report, false],
   'admin.lookupUser': [admin.lookupUser, false],
 };
 

@@ -1,4 +1,76 @@
 /* 查询页专用样式（公共样式见 app.wxss） */
+@import '../../styles/launch-calendar.wxss';
+/* Pinned launch calendar + purchase guide: first actionable card after the heading. */
+.query-guide-entry.query-guide-entry {
+  margin: 0 0 26rpx;
+  padding: 22rpx 24rpx;
+  border: 2rpx solid var(--green);
+  border-radius: var(--radius-card);
+  background: var(--green-soft);
+  color: var(--green-dark);
+  box-shadow: inset 0 2rpx 0 rgba(255, 255, 255, 0.55);
+}
+.query-guide-copy { flex: 1 1 0; min-width: 0; text-align: left; }
+.query-guide-title { display: flex; align-items: center; gap: 10rpx; min-width: 0; }
+.query-guide-title .ui-disclosure-label { flex: 1 1 auto; color: var(--green-dark); font-weight: 700; }
+.query-guide-entry .tiny.muted { color: var(--green-dark); opacity: 0.85; }
+.query-guide-entry .ui-chevron { color: var(--green-dark); }
+.query-guide-badge {
+  display: inline-flex;
+  align-items: center;
+  margin-right: 10rpx;
+  padding: 2rpx 12rpx;
+  border-radius: 999rpx;
+  background: var(--green);
+  color: var(--green-ink);
+  font-size: 20rpx;
+  font-weight: 700;
+  line-height: 1.5;
+}
+.opening-calendar-heading { flex: 1 1 0; min-width: 0; }
+.opening-calendar-mask { position: fixed; inset: 0; z-index: 1100; display: flex; align-items: center; justify-content: center; padding: 32rpx; background: rgba(9, 24, 18, .6); }
+.opening-calendar-panel { width: 100%; max-width: 440px; max-height: calc(100vh - 64rpx - env(safe-area-inset-top) - env(safe-area-inset-bottom)); display: flex; flex-direction: column; border-radius: 32rpx; background: var(--card); box-shadow: 0 20rpx 80rpx rgba(0, 0, 0, .22); overflow: hidden; }
+/* Poster chrome shared via styles/launch-calendar.wxss; only modal chrome below. */
+.opening-calendar-close {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 56rpx;
+  height: 56rpx;
+  margin: 0;
+  padding: 0;
+  border: 1rpx solid rgba(24, 42, 35, 0.12);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.88);
+  color: var(--text-2);
+}
+.opening-calendar-close text { font-size: 34rpx; line-height: 1; font-weight: 300; }
+.opening-calendar-close.ui-control-pressed { background: var(--control-pressed); color: var(--green-dark); }
+.opening-calendar-scroll { flex: 1; min-height: 0; height: 320px; max-height: 42vh; }
+.opening-calendar-content { padding: 0 30rpx 18rpx; }
+.opening-calendar-actions { flex: none; padding: 8rpx 30rpx 26rpx; }
+.opening-calendar-actions .btn { height: auto; min-height: 44px; padding: 20rpx; line-height: 1.4; }
+.opening-calendar-mute { display: flex; align-items: center; justify-content: center; min-height: 44px; color: var(--text-2); gap: 8rpx; font-size: 24rpx; margin-top: 8rpx; }
+.opening-calendar-footnote { text-align: center; font-size: 21rpx; line-height: 1.5; }
+@media (min-width: 600px) {
+  .opening-calendar-mask { padding: 24px; }
+  .opening-calendar-panel { max-height: calc(100vh - 48px); border-radius: 24px; }
+  .opening-calendar-close { width: 36px; height: 36px; }
+  .opening-calendar-close text { font-size: 22px; }
+  .opening-calendar-content { padding: 0 24px 12px; }
+  .opening-calendar-actions { padding: 8px 24px 20px; }
+  .opening-calendar-actions .btn { padding: 12px; }
+  .opening-calendar-panel .small { font-size: 14px; line-height: 1.5; }
+  .opening-calendar-panel .tiny { font-size: 12px; line-height: 1.5; }
+  .opening-calendar-panel .btn { font-size: 16px; line-height: 1.5; padding: 12px 16px; }
+  .opening-calendar-panel .mt { margin-top: 10px; }
+  .opening-calendar-mute { font-size: 14px; gap: 6px; margin-top: 8px; }
+  .opening-calendar-footnote { font-size: 12px; }
+  .query-guide-entry.query-guide-entry { padding: 16px 18px; border-radius: 16px; }
+  .query-guide-badge { font-size: 11px; }
+}
 .card-title text:first-child { flex: 1; min-width: 0; white-space: normal; }
 .target-row { padding: 14rpx 0; border-bottom: 2rpx solid var(--line); }
 .target-row:last-of-type { border-bottom: none; }
@@ -103,6 +175,14 @@
 .alternative-panel .alternative-read-button { width: 100%; max-width: 100%; color: var(--text-2); background: var(--surface-soft); }
 .alternative-empty { margin-top: 16rpx; padding: 16rpx; border-radius: 12rpx; background: var(--surface-soft); font-size: 23rpx; line-height: 1.6; color: var(--text-2); }
 .alternative-panel button[disabled] { opacity: .55; }
+
+/* 2.0: lead with a state and one next action; preserve the original result. */
+.journey-title { font-size: 32rpx; font-weight: 650; line-height: 1.45; overflow-wrap: anywhere; }
+.result-next-action { padding: 24rpx; margin-top: 24rpx; border-radius: 20rpx; background: var(--surface-soft); }
+.result-next-action--available, .journey-resume { background: var(--green-soft); }
+.target-evidence { border-top: 1rpx solid var(--line); padding-top: 22rpx; margin-top: 24rpx; }
+.launch-dates { display: flex; flex-wrap: wrap; gap: 12rpx 28rpx; font-size: 30rpx; font-weight: 600; padding: 22rpx 0 14rpx; }
+.launch-card .row-between { flex-wrap: wrap; gap: 12rpx; }
 
 @media (prefers-color-scheme: dark) {
   .selection-summary-image-box, .result-product-media { background: var(--image-tile); }

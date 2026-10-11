@@ -1,0 +1,295 @@
+{
+  "maps": [
+    {
+      "file": "app-service.map.map",
+      "bytes": 1053242,
+      "sha256": "6b5a316540aa13c5716ef203fa180d1c1e17f26a4295623e228d89a11786f245",
+      "sameAsPriorZip": true,
+      "version": 3,
+      "sources": 38,
+      "sourcesContent": 38,
+      "mappingsCharacters": 340939
+    },
+    {
+      "file": "appservice.app.map.map",
+      "bytes": 619378,
+      "sha256": "73aa074d2c41eabdddcb78ee9cfebaa0fdf32b025715e933e58287df53ec04e0",
+      "sameAsPriorZip": true,
+      "version": 3,
+      "sources": 30,
+      "sourcesContent": 30,
+      "mappingsCharacters": 157453
+    },
+    {
+      "file": "chunk_0.appservice.map.map",
+      "bytes": 41016,
+      "sha256": "9624748096ececaeba8b3bdb2ac0d7aadcce697bc5bbd38e60acc8b532d8492d",
+      "sameAsPriorZip": true,
+      "version": 3,
+      "sources": 2,
+      "sourcesContent": 2,
+      "mappingsCharacters": 16163
+    },
+    {
+      "file": "chunk_1.appservice.map.map",
+      "bytes": 10035,
+      "sha256": "38167c2fab213f1f2013f45688745cd0a31da2ae5e7bdbea15e9c2cffb5fb7d5",
+      "sameAsPriorZip": true,
+      "version": 3,
+      "sources": 1,
+      "sourcesContent": 1,
+      "mappingsCharacters": 3826
+    },
+    {
+      "file": "chunk_2.appservice.map.map",
+      "bytes": 92071,
+      "sha256": "1362e088f425e7e7bdc7268c461ae71a09c19cbfb19ebab7a5c6f4c5f8c3c858",
+      "sameAsPriorZip": true,
+      "version": 3,
+      "sources": 1,
+      "sourcesContent": 1,
+      "mappingsCharacters": 35194
+    },
+    {
+      "file": "chunk_3.appservice.map.map",
+      "bytes": 57004,
+      "sha256": "a2b12f93299dc87998024596d9ca7a844e0d628ae8da6beef2277852b5fdd92f",
+      "sameAsPriorZip": true,
+      "version": 3,
+      "sources": 1,
+      "sourcesContent": 1,
+      "mappingsCharacters": 22006
+    },
+    {
+      "file": "chunk_4.appservice.map.map",
+      "bytes": 113155,
+      "sha256": "fdfca27760e7605aa947a74f53ed6cf0b3c62546aa7e9c89d08f61efe9c6ee40",
+      "sameAsPriorZip": true,
+      "version": 3,
+      "sources": 1,
+      "sourcesContent": 1,
+      "mappingsCharacters": 43584
+    },
+    {
+      "file": "chunk_5.appservice.map.map",
+      "bytes": 42635,
+      "sha256": "0d815de964f2065334e38da348aa237d5fe3d63fbb2f54b152c592d690211788",
+      "sameAsPriorZip": true,
+      "version": 3,
+      "sources": 1,
+      "sourcesContent": 1,
+      "mappingsCharacters": 16512
+    },
+    {
+      "file": "chunk_6.appservice.map.map",
+      "bytes": 85152,
+      "sha256": "0d4a5e0c975d85dc3e7c255073577c0faf5d535cef78cbef3a5e68c8adf271a6",
+      "sameAsPriorZip": true,
+      "version": 3,
+      "sources": 1,
+      "sourcesContent": 1,
+      "mappingsCharacters": 33134
+    }
+  ],
+  "uniqueSources": 38,
+  "duplicateContentVariants": [],
+  "sources": [
+    {
+      "source": "config/catalog-seed.js",
+      "lines": 2,
+      "sha256": "0cbf7906f9819608581e5b1f0113765f58bfd16b723d052a32aa9fa87ada6608"
+    },
+    {
+      "source": "config/cloud.js",
+      "lines": 10,
+      "sha256": "6ba9f31ce4a581a33cda1f9bc62514d85a39aa91a3b68d1c4148cfabf05d4c81"
+    },
+    {
+      "source": "config/product-images.js",
+      "lines": 1172,
+      "sha256": "4620405635e68e3ca4c5b49c7e45baab5f4683430b6b84aa47172bbd2818f586"
+    },
+    {
+      "source": "config/release-notes.js",
+      "lines": 227,
+      "sha256": "2db2989e15fae7408ec62672dbaaa2fa3a68c429002c5e0aa14b69cda0e0a9a8"
+    },
+    {
+      "source": "config/version.js",
+      "lines": 1,
+      "sha256": "f8b148baeb8e821d84e355702eba019c656e051b369d2f7a5a39b2b24b2a8b46"
+    },
+    {
+      "source": "utils/alternative-rules.js",
+      "lines": 54,
+      "sha256": "a9e110fdb9a121fb22b24f05f646e3ee20bf84ab57ad25a5637864767e7f6b44"
+    },
+    {
+      "source": "utils/api.js",
+      "lines": 127,
+      "sha256": "12f7dcf422edce74dc28999ca17f43330bf3d1ec95741e510ae5605fc5254d21"
+    },
+    {
+      "source": "utils/catalog-order.js",
+      "lines": 134,
+      "sha256": "3f8249b65daef84af6feaed74565abe4ae18aee07319a228cc3e2b449e038eab"
+    },
+    {
+      "source": "utils/format.js",
+      "lines": 154,
+      "sha256": "502404fbb2e01f7fc4e41632ef8fbfcd1d2e7d90fa2e02179d0db9e51757cbe3"
+    },
+    {
+      "source": "utils/haptic.js",
+      "lines": 8,
+      "sha256": "4c895773aae6faffda4ceeb3a0164416cad31d0c248e3d973dd033a39e06eb6a"
+    },
+    {
+      "source": "utils/local-key.js",
+      "lines": 3,
+      "sha256": "1103dd5137f91e7141267e1ea9a4fd6b282d9d9def8289a83b9d31062590f49e"
+    },
+    {
+      "source": "utils/member-limits.js",
+      "lines": 14,
+      "sha256": "9b83fb64793ab57f165c779860dbb67d6182cfe9ac72bf94738d647f46c7a5ad"
+    },
+    {
+      "source": "utils/member-payment.js",
+      "lines": 280,
+      "sha256": "7c80a0f19b9e070966a35e9d08bd5aaacc7bc9b67ca9d04e16fdf6b74a7c58d9"
+    },
+    {
+      "source": "utils/member-products.js",
+      "lines": 33,
+      "sha256": "2896116aa59a8491cfe82d1a22616cc485eb3aa2aa21f909f55230cc264ac4ef"
+    },
+    {
+      "source": "utils/network.js",
+      "lines": 44,
+      "sha256": "7de0c3955cda050f69c088d1f75818ff118c59dc9703b41b631330bcba5f96d8"
+    },
+    {
+      "source": "utils/notification-permission.js",
+      "lines": 45,
+      "sha256": "5d80bbcd4105fe1206534727238957797cf0d22e7c77fafc19651ee0c3204324"
+    },
+    {
+      "source": "utils/observation-insights.js",
+      "lines": 84,
+      "sha256": "8c15e6f1d314bb77439cb4c47e3a42e7c81ddbd5f18477fedbb76b961deac6f3"
+    },
+    {
+      "source": "utils/operation.js",
+      "lines": 58,
+      "sha256": "142e2612f202fd7f1012e00daa17efe00d1b89e34401f2bdbb7214ab04ffe356"
+    },
+    {
+      "source": "utils/poll.js",
+      "lines": 19,
+      "sha256": "abbc0135bd5e80f40d97af5fa9c238eaa8b8967156d3517c0d4ce10b0b41553c"
+    },
+    {
+      "source": "utils/product-image-fit.js",
+      "lines": 13,
+      "sha256": "39fc914ec08edb1895782b5a38f370fcdd63ae3fa6f29e1da97ad37aff49b65c"
+    },
+    {
+      "source": "utils/query-alternatives.js",
+      "lines": 43,
+      "sha256": "6bdbd38f389f0c1029361dadb3545c6974b66425f128d8564edbc3ed78627473"
+    },
+    {
+      "source": "utils/reminder-credits.js",
+      "lines": 361,
+      "sha256": "a5917858ddc8b3bf38346b3907c3181f1f6333463f46e017117c8b39ca7a3e0b"
+    },
+    {
+      "source": "utils/reminder-nudge.js",
+      "lines": 62,
+      "sha256": "153593fed640d61fb69a8799b454138df35d3a02cbaa3d0c6e8ae86a96127987"
+    },
+    {
+      "source": "utils/reminder-readiness.js",
+      "lines": 112,
+      "sha256": "3ae5e7f702247b9d54bc34873d33ca61befebeffd7a12393216ec751fd17e65f"
+    },
+    {
+      "source": "utils/share.js",
+      "lines": 97,
+      "sha256": "00cb8a129e172095b7c4831eadcad511ca83964ae1d528de65690ad833484bc1"
+    },
+    {
+      "source": "utils/store-label.js",
+      "lines": 32,
+      "sha256": "653cead707aa476534e3e02c2aa683cec2eeb28965ddda78fc8081d49c4639e0"
+    },
+    {
+      "source": "utils/store.js",
+      "lines": 304,
+      "sha256": "30c17bf988dad7509679aa3783605735451b0a60d1f7c7a50ed8d7dea676247a"
+    },
+    {
+      "source": "utils/tab-bar.js",
+      "lines": 62,
+      "sha256": "67357ea6b66589e40f576c1d220d4abbb4dcf47da2132bef82c1590280328f5a"
+    },
+    {
+      "source": "app.js",
+      "lines": 195,
+      "sha256": "5b821a72ec7a3af7dc8b89f962f924deeb70e2d2523bac9d91e5975cd9807380"
+    },
+    {
+      "source": "custom-tab-bar/index.js",
+      "lines": 81,
+      "sha256": "b2c905e8d05a3298d710b22d42a9eaaeb7e7901b680cede2ae8275c5d9749370"
+    },
+    {
+      "source": "components/config-sheet/index.js",
+      "lines": 105,
+      "sha256": "6f1afa97bc58ff5f430f300b725573b32928f868479467636dac9ded57db51dc"
+    },
+    {
+      "source": "components/target-picker/index.js",
+      "lines": 209,
+      "sha256": "6ca438d453d2fec69c6ff7408bfb0a040d12985f8ec45352b9294f0ce2f300eb"
+    },
+    {
+      "source": "components/reminder-nudge/index.js",
+      "lines": 98,
+      "sha256": "e3c32d76f099d2c3486e24c18c1452fc145b70e9104731cdd1494b82afba09bc"
+    },
+    {
+      "source": "pages/follow/index.js",
+      "lines": 853,
+      "sha256": "3f87edf8a56adc6f31b4cabdc1507cb8d289642d4d0cdc16940d328d195ba272"
+    },
+    {
+      "source": "pages/history/index.js",
+      "lines": 503,
+      "sha256": "56ffea86ae92e1bd37c8ef6658c5372ae833c07b0ea93c194285f08940a3b15d"
+    },
+    {
+      "source": "pages/mine/index.js",
+      "lines": 1084,
+      "sha256": "b817d7341c7756f591a81f6dd7778db7bbc8cc0496b62bedbea88c25672ed2c0"
+    },
+    {
+      "source": "pages/notification-test/index.js",
+      "lines": 319,
+      "sha256": "82d52a66d20075008b113e8ee271f0c486c03e6c1d41e767a3ce61fb65abfd82"
+    },
+    {
+      "source": "pages/query/index.js",
+      "lines": 819,
+      "sha256": "f6c18d7b2a757922826ddc0d3231b06a8e5705e771f7cd1c31893777bc795a6d"
+    }
+  ],
+  "syntaxCheck": {
+    "parser": "acorn",
+    "ecmaVersion": 2020,
+    "sources": 38,
+    "failures": []
+  },
+  "note": "Static input verification only; no runtime crash records are included in these maps."
+}

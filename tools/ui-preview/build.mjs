@@ -3,11 +3,14 @@ import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 import vm from 'node:vm';
+import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 
 const project = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const adminPreview = process.argv.includes('--admin-only');
-if (adminPreview && process.argv.some(arg => /^--(?:reminders|stock|redemption|payment|orders|monitoring|history-task|history-data|sheets|release-notes|onboarding|notification-test|alternatives)-only$/.test(arg))) throw Error('--admin-only cannot be combined with consumer scenarios');
+const v2Preview = process.argv.includes('--v2-only');
+if (adminPreview && process.argv.some(arg => /^--(?:v2|reminders|stock|redemption|payment|orders|monitoring|history-task|history-data|sheets|release-notes|onboarding|notification-test|alternatives)-only$/.test(arg))) throw Error('--admin-only cannot be combined with consumer scenarios');
+if (v2Preview && process.argv.some(arg => arg !== '--v2-only' && /^--.*-only$/.test(arg))) throw Error('--v2-only cannot be combined with another scenario group');
 const mini = path.join(project, adminPreview ? 'tools/admin-miniprogram/miniprogram' : 'miniprogram');
 const appConfig = JSON.parse(fs.readFileSync(path.join(mini, 'app.json'), 'utf8'));
 appConfig.tabBar = appConfig.tabBar || { custom: false, list: [] };
@@ -22,7 +25,8 @@ const allowRemoteImages = process.argv.includes('--remote-images');
 // is not a claim about any particular WeChat renderer's conversion rules.
 const roundRpx = process.argv.includes('--round-rpx');
 const rpxRoundingProfile = roundRpx ? 'whole CSS pixel rounding stress; not a WeChat renderer implementation' : null;
-const now = new Date('2026-09-15T07:00:00.000Z');
+const defaultPreviewDate = new Date(v2Preview ? '2026-10-11T07:00:00.000Z' : '2026-09-15T07:00:00.000Z');
+let now = defaultPreviewDate;
 class PreviewDate extends Date {
   constructor(...args) { super(...(args.length ? args : [now.getTime()])); }
   static now() { return now.getTime(); }
@@ -34,7 +38,7 @@ function sandbox(handler, { paymentScenario } = {}) {
   const modules = new Map(), storage = new Map(); let captured, seq = 0;
   const app = { globalData: {} };
   const api = { call: handler, newId: p => `${p}-preview-${++seq}`, toast() {}, showError() {} };
-  const wx = { getStorageSync: k => storage.get(k), setStorageSync: (k, v) => storage.set(k, v), removeStorageSync: k => storage.delete(k), nextTick: fn => queueMicrotask(fn), showToast() {}, showModal: options => { if (options && typeof options.success === 'function') options.success({ confirm: true, cancel: false }); }, stopPullDownRefresh() {} };
+  const wx = { getStorageSync: k => storage.get(k), setStorageSync: (k, v) => storage.set(k, v), removeStorageSync: k => storage.delete(k), nextTick: fn => queueMicrotask(fn), showToast() {}, showModal: options => { if (options && typeof options.success === 'function') options.success({ confirm: true, cancel: false }); }, stopPullDownRefresh() {}, switchTab() {}, pageScrollTo() {} };
   // These functions are local preview stubs, never connected to WeChat.
   Object.assign(wx, { getDeviceInfo: () => ({ platform: 'ios', system: paymentScenario === 'payment-old-ios' ? 'iOS 14.8' : 'iOS 18.0' }),
     getAppBaseInfo: () => ({ SDKVersion: '3.10.0', version: '8.0.68' }), canIUse: () => true,
@@ -55,11 +59,11 @@ function sandbox(handler, { paymentScenario } = {}) {
     const definition = captured;
     const defaults = Object.fromEntries(Object.entries(definition.properties || {}).map(([key, value]) => [key, value && Object.hasOwn(value, 'value') ? value.value : undefined]));
     const p = { ...definition, ...(definition.methods || {}), data: { ...defaults, ...copy(definition.data || {}), ...props } };
-    p.setData = patch => { for (const [key, value] of Object.entries(patch)) { const parts = key.replace(/\[(\d+)\]/g, '.$1').split('.'); let target = p.data; for (const part of parts.slice(0, -1)) target = target[part] || (target[part] = {}); target[parts.at(-1)] = value; } };
+    p.setData = (patch, callback) => { for (const [key, value] of Object.entries(patch)) { const parts = key.replace(/\[(\d+)\]/g, '.$1').split('.'); let target = p.data; for (const part of parts.slice(0, -1)) target = target[part] || (target[part] = {}); target[parts.at(-1)] = value; } if (callback) callback(); };
     p.triggerEvent = () => {};
     return p;
   }
-  return { load: relative => load(path.join(mini, relative)), instantiate, app, storage };
+  return { load: relative => load(path.join(mini, relative)), instantiate, app, storage, wx };
 }
 
 function parse(source) {
@@ -96,6 +100,14 @@ function renderChildren(children, scope, context) {
   for (const node of children) {
     if ('text' in node) { result += html(evaluate(node.text, scope)); continue; }
     const attrs = node.attrs;
+    // WXML evaluates a condition on a looped node in each item's scope.
+    if ('wx:for' in attrs && 'wx:if' in attrs) {
+      const values = evaluate(attrs['wx:for'], scope) || [];
+      const child = { ...node, attrs: { ...attrs } }; delete child.attrs['wx:for'];
+      result += Array.from(values).map((value, index) => renderChildren([child], { ...scope, [attrs['wx:for-item'] || 'item']: value, [attrs['wx:for-index'] || 'index']: index }, context)).join('');
+      previousIf = null;
+      continue;
+    }
     if ('wx:if' in attrs) { previousIf = truth(attrs['wx:if'], scope); if (!previousIf) continue; }
     else if ('wx:elif' in attrs) { if (previousIf) continue; previousIf = truth(attrs['wx:elif'], scope); if (!previousIf) continue; }
     else if ('wx:else' in attrs) { if (previousIf) continue; previousIf = true; }
@@ -138,10 +150,11 @@ function renderNode(node, scope, context) {
     p.loadCatalog(); if (p.data.value) p.onValue(p.data.value);
     return `<div class="component-target-picker">${renderNode(pickerAst, p.data, context)}</div>`;
   }
-  const tags = { view: 'div', text: 'span', 'scroll-view': 'div', picker: 'div', image: 'img', switch: 'input', input: 'input', textarea: 'textarea', button: 'button' };
+  const tags = { view: 'div', text: 'span', 'scroll-view': 'div', picker: 'div', image: 'img', switch: 'input', checkbox: 'input', 'checkbox-group': 'div', label: 'label', input: 'input', textarea: 'textarea', button: 'button' };
   const tag = tags[node.name] || 'div';
   const classes = evaluate(attrs.class || '', scope);
   let renderedAttrs = classes ? ` class="${html(classes)}"` : '';
+  if ('hidden' in attrs && truth(attrs.hidden, scope)) renderedAttrs += ' hidden';
   let style = evaluate(attrs.style || '', scope);
   if (node.name === 'switch' && attrs.color) style += `;accent-color:${evaluate(attrs.color, scope)};`;
   if ('scroll-x' in attrs) style += ';overflow-x:auto;max-width:100%;';
@@ -153,6 +166,7 @@ function renderNode(node, scope, context) {
     renderedAttrs += ` src="${html(src)}" alt="${html(evaluate(attrs['aria-label'] || '', scope))}" style="object-fit:contain"`;
   }
   if (node.name === 'switch') renderedAttrs += ` type="checkbox" ${truth(attrs.checked || '', scope) ? 'checked' : ''}`;
+  if (node.name === 'checkbox') renderedAttrs += ` type="checkbox" value="${html(evaluate(attrs.value || '', scope))}" style="width:20px;height:20px;accent-color:${html(evaluate(attrs.color || '#008D55', scope))}" ${truth(attrs.checked || '', scope) ? 'checked' : ''}`;
   if (node.name === 'input') renderedAttrs += ` value="${html(evaluate(attrs.value || '', scope))}" placeholder="${html(evaluate(attrs.placeholder || '', scope))}"`;
   if (node.name === 'button' && truth(attrs.disabled || '', scope)) renderedAttrs += ' disabled';
   if (node.name === 'button' && attrs.size) renderedAttrs += ` size="${html(evaluate(attrs.size, scope))}"`;
@@ -164,6 +178,10 @@ function renderNode(node, scope, context) {
 function cssFile(relative) {
   const file = path.join(mini, relative);
   return fs.readFileSync(file, 'utf8').replace(/@import\s+["']([^"']+)["'];/g, (_, imported) => cssFile(path.relative(mini, path.resolve(path.dirname(file), imported))));
+}
+function htmlElementSelectors(css) {
+  const tags = { page: 'body', view: 'div', text: 'span', image: 'img', 'scroll-view': 'div', checkbox: 'input[type="checkbox"]' };
+  return css.replace(/([^{}]+)\{/g, (_, selectors) => selectors.replace(/(^|[\s>+~,])(page|view|text|image|scroll-view|checkbox)(?=[\s>+~,.#:[\]]|$)/g, (match, before, tag) => before + tags[tag]) + '{');
 }
 const rawCatalog = JSON.parse(fs.readFileSync(path.join(project, 'catalog/products.json'), 'utf8'));
 const rawStores = JSON.parse(fs.readFileSync(path.join(project, 'catalog/stores.json'), 'utf8'));
@@ -201,25 +219,66 @@ if (onboardingPreview) scenarios.splice(0, scenarios.length, 'onboarding-first',
 if (notificationTestPreview) scenarios.splice(0, scenarios.length, 'notification-test-ready', 'notification-test-no-quota', 'notification-test-accepted', 'notification-test-uncertain', 'notification-test-failed', 'notification-test-received', 'notification-test-not-received');
 if (alternativesPreview) scenarios.splice(0, scenarios.length, 'alternatives-default', 'alternatives-selection', 'alternatives-premium', 'alternatives-free', 'alternatives-match', 'alternatives-prepared', 'alternatives-empty', 'alternatives-error', 'alternatives-expired', 'alternatives-cached');
 if (nudgePreview) scenarios.splice(0, scenarios.length, 'nudge-restock', 'nudge-both', 'nudge-one');
+const v2Pages = {
+  'v2-free': ['query', 'follow', 'history', 'mine'],
+  'v2-member': ['query', 'follow', 'history', 'mine'],
+  'v2-unknown': ['query', 'follow'],
+  'v2-stale': ['query', 'follow'],
+  'v2-restricted': ['query', 'follow'],
+  'v2-service-down': ['query', 'follow'],
+  'v2-paid-unconfigured': ['query', 'follow', 'mine'],
+  'v2-new-product': ['query'],
+  'v2-context-checkout': ['mine'],
+  'v2-longcontent': ['query', 'follow', 'history', 'mine'],
+  'v2-promotion-monthly': ['mine'],
+  'v2-promotion-annual': ['mine'],
+  'v2-promotion-expired-monthly': ['mine'],
+  'v2-promotion-expired-annual': ['mine'],
+  'v2-guide-prepare': ['guide'],
+  'v2-guide-calendar': ['guide'],
+  'v2-guide-faq': ['guide'],
+  'v2-calendar-modal': ['query'],
+};
+if (v2Preview) {
+  scenarios.splice(0, scenarios.length, ...Object.keys(v2Pages));
+  widths.splice(0, widths.length, 320, 375, 390, 430, 768, 1024);
+}
 const names = nudgePreview ? { mine: '我的' } : alternativesPreview ? { query: '查询' } : notificationTestPreview ? { 'notification-test': '通知测试' } : adminPreview ? { admin: '运营工具' } : onboardingPreview ? { query: '查询' } : paymentPreview || orderRecordsPreview ? { mine: '我的' } : historyDataPreview ? { history: '历史' } : historyTaskPreview ? { history: '历史', mine: '我的' } : stockPreview || monitoringPreview ? { follow: '小哨提醒' } : reminderPreview || redemptionPreview || releaseNotesPreview ? { mine: '我的' } : { query: '查询', follow: '小哨提醒', history: '历史', mine: '我的' };
+if (v2Preview) names.guide = '使用攻略';
 if (sheetPreview) delete names.mine;
 if (monitoringPreview) scenarios.push('monitor-no-follows', 'monitor-all-paused', 'monitor-user-disabled', 'monitor-dnd', 'monitor-free-account', 'monitor-alert', 'monitor-dual-ready', 'monitor-dual-soldout-empty', 'monitor-dual-restock-empty', 'monitor-dual-soldout-low', 'monitor-dual-pending', 'monitor-dual-native', 'monitor-dual-sync-error', 'monitor-dual-storage-error');
 fs.mkdirSync(out, { recursive: true });
 const manifest = [];
 
 for (const scenario of scenarios) {
+  now = scenario.startsWith('v2-promotion-expired-') ? new Date('2026-11-30T16:00:00.000Z') : defaultPreviewDate;
   const products = copy(baseProducts);
-  if (['longcontent', 'history-longcontent', 'sheet-longcontent'].includes(scenario)) { const p = products.find(p => p.partNumber === sample.partNumber); p.title += ' · 超长商品名称与配置说明用于检查换行及小屏布局 ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; }
-  const p = products.find(p => p.partNumber === sample.partNumber), member = nudgePreview ? true : alternativesPreview ? scenario !== 'alternatives-free' : historyTaskPreview ? ['history-member-reward', 'history-longcontent'].includes(scenario) : monitoringPreview ? !['monitor-expired-paused', 'monitor-free-account'].includes(scenario) : stockPreview ? scenario !== 'stock-restricted' : ['member', 'longcontent'].includes(scenario), expired = scenario === 'expired' || scenario === 'monitor-expired-paused';
-  const bootstrap = { identity: { userKey: 'preview:offline-user', openidMasked: 'preview…0001', isAdmin: true }, membership: { active: member, remainingMs: member ? 18 * 86400000 : 0, expiresAt: member ? '2026-10-03T07:00:00Z' : expired ? '2026-09-10T07:00:00Z' : null },
+  if (['longcontent', 'history-longcontent', 'sheet-longcontent', 'v2-longcontent'].includes(scenario)) { const p = products.find(p => p.partNumber === sample.partNumber); p.title += ' · 超长商品名称与配置说明用于检查换行及小屏布局 ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; }
+  const p = scenario === 'v2-new-product' ? products.find(item => item.familyKey === 'iphone-duo') : products.find(p => p.partNumber === sample.partNumber), member = v2Preview ? ['v2-member', 'v2-paid-unconfigured', 'v2-longcontent'].includes(scenario) : nudgePreview ? true : alternativesPreview ? scenario !== 'alternatives-free' : historyTaskPreview ? ['history-member-reward', 'history-longcontent'].includes(scenario) : monitoringPreview ? !['monitor-expired-paused', 'monitor-free-account'].includes(scenario) : stockPreview ? scenario !== 'stock-restricted' : ['member', 'longcontent'].includes(scenario), expired = scenario === 'expired' || scenario === 'monitor-expired-paused';
+  if (!p) throw Error(`Missing catalog product for ${scenario}`);
+  if (scenario === 'v2-new-product') Object.assign(p, { supported: false, comingSoon: true });
+  const bootstrap = { identity: { userKey: 'preview:offline-user', openidMasked: 'preview…0001', isAdmin: true }, membership: { active: member, remainingMs: member ? 18 * 86400000 : 0, expiresAt: member ? new Date(now.getTime() + 18 * 86400000).toISOString() : expired ? '2026-09-10T07:00:00Z' : null },
     quota: { balance: member ? 5 : 0, revision: 0, grantedToday: 0, dailyGrantCap: 2, balanceCap: 10, queryCost: 1, historyCost: 1, signedInToday: false, tasksDoneToday: [], tasksViewedToday: [] }, tasks: [{ id: 'view_history', title: '浏览一次历史记录', reward: 1 }],
     collector: { state: scenario === 'expired' ? 'stale' : 'not_deployed' }, memberProduct: { id: 'vip666', title: '7 天会员', days: 7, priceFen: 700, enabled: paymentPreview && scenario !== 'payment-blocked', paymentReady: paymentPreview && scenario !== 'payment-blocked', iosEnabled: true, note: '该产品为一次性虚拟服务，一经售出不予退款。一次购买 7 天，已有会员按剩余有效期顺延，不自动续费。', paymentReason: '购买开放后可在此开通会员。' },
     notifications: { enabled: false, templateIds: {} }, subscriptions: {}, settings: { notifyEnabled: true, dnd: { enabled: true, startMinute: 1380, endMinute: 480 } },
     limits: { maxFollows: 3, maxStoresPerFollow: 3, queryMaxStores: 3 }, followCount: scenario === 'empty' ? 0 : 1, catalogVersion: 'offline-preview' };
-  if (paymentPreview) bootstrap.memberProducts = [
+  if (v2Preview) {
+    bootstrap.features = { contextualCheckout: true, resultNextAction: true, activationJourney: true, targetEvidence: true, growthEvents: false, experimentAssignments: true, launchGuide: true };
+    bootstrap.quota.balance = 3;
+    bootstrap.quota.signedInToday = true;
+    bootstrap.newProductWindows = scenario === 'v2-restricted' ? [{ familyKey: p.familyKey, releaseAt: new Date(now.getTime() - 5 * 86400000).toISOString() }] : [];
+    bootstrap.collector = { state: scenario === 'v2-service-down' ? 'stale' : 'running', updatedAt: now.toISOString(), lastBatchAt: now.toISOString() };
+    bootstrap.notifications = { enabled: true, deliveryReady: scenario !== 'v2-service-down', reason: scenario === 'v2-service-down' ? 'collector_stale' : '', templateIds: { restock: 'offline-restock-v2', soldout: 'offline-soldout-v2' } };
+    bootstrap.subscriptions = scenario === 'v2-paid-unconfigured' ? {} : { 'offline-restock-v2': { credits: 3 }, 'offline-soldout-v2': { credits: 2 } };
+    bootstrap.settings.dnd.enabled = false;
+    Object.assign(bootstrap.memberProduct, { enabled: true, paymentReady: true, paymentReason: '' });
+  }
+  const promotionActive = !scenario.startsWith('v2-promotion-expired-');
+  const promotion = { active: promotionActive, endsAt: '2026-11-30T16:00:00.000Z', timezone: 'Asia/Shanghai' };
+  if (paymentPreview || v2Preview) bootstrap.memberProducts = [
     { ...bootstrap.memberProduct, planId: 'member_7d', limits: { maxFollows: 3, maxStoresPerFollow: 3 } },
-    { ...bootstrap.memberProduct, id: 'member_30d', planId: 'member_30d', limits: { maxFollows: 4, maxStoresPerFollow: 4 }, title: '30 天会员', days: 30, priceFen: 1990, note: '' },
-    { ...bootstrap.memberProduct, id: 'member_365d', planId: 'member_365d', limits: { maxFollows: 4, maxStoresPerFollow: 4 }, title: '365 天会员', days: 365, priceFen: 20000, note: '' },
+    { ...bootstrap.memberProduct, id: 'vip777', planId: 'member_30d', limits: { maxFollows: 4, maxStoresPerFollow: 4 }, title: '30 天会员', days: 30, priceFen: promotionActive ? 1499 : 3000, standardPriceFen: 3000, promotion, note: '一次性虚拟服务，一经售出不予退款。一次购买 30 天，已有会员按剩余有效期顺延，不自动续费。' },
+    { ...bootstrap.memberProduct, id: 'vip888', planId: 'member_365d', limits: { maxFollows: 4, maxStoresPerFollow: 4 }, title: '365 天会员', days: 365, priceFen: promotionActive ? 12900 : 36000, standardPriceFen: 36000, promotion, note: '一次性虚拟服务，一经售出不予退款。一次购买 365 天，已有会员按剩余有效期顺延，不自动续费。' },
   ];
   if (notificationTestPreview) bootstrap.quota.balance = scenario === 'notification-test-no-quota' ? 0 : 2;
   if (scenario === 'alternatives-premium') Object.assign(bootstrap.limits, { queryMaxStores: 4, alternativeMaxColors: 4 });
@@ -263,6 +322,13 @@ for (const scenario of scenarios) {
   const response = { ok: true, product: p, balance: 4, dayKey: '2026-09-15', queriedAt: now.toISOString(), latest: [],
     results: stores.slice(0, 2).map(s => ({ storeNumber: s.storeNumber, storeName: s.name, status: 'unknown', observedAt: now.toISOString(), quote: '模拟观测数据，非实时库存' })),
     events: scenario === 'empty' ? [] : [event, { ...event, id: 'e2', type: 'became_unavailable' }], summary: { available: 1, restocks: 1, recoveries: 0, ended: 1, lastHourRestocks: 1 }, pagination: { total: scenario === 'empty' ? 0 : 2, hasMore: false } };
+  if (v2Preview) {
+    Object.assign(response, { queryId: `query-${scenario}`, member, charged: member ? 0 : 1, refunded: 0, balance: bootstrap.quota.balance,
+      quotaRevision: bootstrap.quota.revision, dayKey: '2026-10-11', finishedAt: now.toISOString() });
+    response.results = response.results.map(row => ({ ...row, status: scenario === 'v2-unknown' ? 'unknown' : scenario === 'v2-member' ? 'available' : 'unavailable',
+      isStale: scenario === 'v2-stale', observedAt: new Date(now.getTime() - (scenario === 'v2-stale' ? 600000 : 10000)).toISOString(),
+      quote: '离线排版样例，不是真实库存' }));
+  }
   if (alternativesPreview) {
     if (!member) { bootstrap.quota.balance = 2; bootstrap.newProductWindows = []; }
     const offset = scenario === 'alternatives-expired' ? -121000 : 0;
@@ -282,6 +348,11 @@ for (const scenario of scenarios) {
     response.latest = [{ ...response.results[0], status: 'unavailable' }];
   }
   const follows = scenario === 'empty' || scenario === 'free' ? [] : [{ followId: 'f-preview', partNumber: p.partNumber, productTitle: p.title, status: expired ? 'expired' : 'active', statusReason: expired ? 'membership_expired' : null, stores: response.results }];
+  if (v2Preview) {
+    if (['v2-free', 'v2-paid-unconfigured', 'v2-context-checkout', 'v2-new-product'].includes(scenario)) follows.length = 0;
+    bootstrap.followCount = follows.length;
+    if (scenario === 'v2-restricted' && follows[0]) follows[0].latestRestricted = true;
+  }
   if (monitoringPreview) {
     const templateId = 'offline-template-example';
     const collectorState = scenario === 'monitor-stale' ? 'stale' : scenario === 'monitor-disabled' ? 'disabled' : 'running';
@@ -394,15 +465,37 @@ for (const scenario of scenarios) {
     orderId: previewOrder.orderId, planId: 'member_30d',
   });
   const catalog = adminPreview || notificationTestPreview ? null : await rt.load('utils/store.js').getCatalog({ force: true });
+  if (v2Preview && ['v2-paid-unconfigured', 'v2-context-checkout', 'v2-longcontent'].includes(scenario)) {
+    const saved = rt.load('utils/checkout-context.js').createCheckoutContext({ wx: rt.wx, now: () => now.getTime() })
+      .save(bootstrap.identity, { partNumber: p.partNumber, storeNumbers: stores.slice(0, 2).map(store => store.storeNumber) }, catalog, { entryPoint: 'query_result' });
+    if (!saved.ok) throw Error(`Checkout fixture could not preserve its target: ${saved.reason}`);
+  }
   for (const pageName of Object.keys(names)) {
+    if (v2Preview && !v2Pages[scenario].includes(pageName)) continue;
     const page = rt.instantiate(`pages/${pageName}/index.js`);
     if (['payment-pending-monthly', 'payment-member-pending-monthly'].includes(scenario)) page.setData({ selectedPlanId: 'member_365d' });
     if (pageName === 'follow' && scenario === 'monitor-alert') Object.assign(rt.app.globalData, { pendingAlert: 'preview-event', handledAlerts: [] });
     // 'loading' shows the skeleton a page renders before its first data arrives.
-    if (!['operator-loading', 'loading'].includes(scenario)) await page.onLoad();
+    if (!['operator-loading', 'loading'].includes(scenario)) await page.onLoad(pageName === 'guide'
+      ? { stage: 'prepare', ...(scenario === 'v2-guide-calendar' ? { section: 'calendar' } : scenario === 'v2-guide-faq' ? { section: 'faq' } : {}) } : undefined);
     // Notification feedback requires a visible page, just like an actual tap
     // in WeChat. onLoad alone now intentionally represents a hidden preload.
-    if (alternativesPreview || notificationTestPreview) await page.onShow();
+    if ((alternativesPreview || notificationTestPreview || v2Preview) && typeof page.onShow === 'function') await page.onShow();
+    if (v2Preview && pageName === 'mine') await page.restoreCheckoutContext();
+    if (pageName === 'guide' && scenario === 'v2-guide-faq' && page.data.faqOpen !== 'notification') page.onToggleFaq({ currentTarget: { dataset: { id: 'notification' } } });
+    if (scenario === 'v2-calendar-modal') {
+      page.onReady();
+      for (let count = 0; count < 8; count++) await Promise.resolve();
+      await page.maybeOpenCalendar();
+      if (!page.data.calendarOpen || !page.data.openingCalendar) throw Error('First visible ready query page did not open the launch calendar');
+    }
+    if (v2Preview && scenario.startsWith('v2-promotion-')) {
+      const planId = scenario.endsWith('-annual') ? 'member_365d' : 'member_30d';
+      page.onSelectMemberProduct({ currentTarget: { dataset: { planId } } });
+      if (page.data.selectedPlanId !== planId) throw Error(`Promotion fixture failed to select ${planId}`);
+      const expectedPrice = planId === 'member_365d' ? (promotionActive ? 12900 : 36000) : (promotionActive ? 1499 : 3000);
+      if (page.data.boot.memberProduct.priceFen !== expectedPrice) throw Error(`Promotion fixture showed the wrong selected price for ${planId}`);
+    }
     if (scenario === 'monitor-alert') await new Promise(resolve => setImmediate(resolve));
     if (adminPreview && ['operator-ready', 'operator-longcontent'].includes(scenario)) await page.onLoadInsights();
     if (scenario === 'operator-saving') page.setData({ saving: true, configDirty: true });
@@ -486,14 +579,15 @@ for (const scenario of scenarios) {
       if (scenario === 'reminder-more-error') page.setData({ notificationsMoreError: '更早的提醒加载失败，请重试。' });
     }
     const selected = { partNumber: p.partNumber, product: p, storeNumbers: stores.slice(0, 2).map(s => s.storeNumber), stores: stores.slice(0, 2) };
-    if ((pageName === 'query' || pageName === 'history') && scenario !== 'loading') {
-      page.setData({ pickerValue: { partNumber: p.partNumber, storeNumbers: selected.storeNumbers }, dayKey: '2026-09-15' });
+    if ((pageName === 'query' || pageName === 'history') && !['loading', 'v2-calendar-modal'].includes(scenario)) {
+      page.setData({ pickerValue: { partNumber: p.partNumber, storeNumbers: selected.storeNumbers }, dayKey: v2Preview ? '2026-10-11' : '2026-09-15' });
       page.onPickerChange({ detail: selected });
       if (pageName === 'query') {
-        if (alternativesPreview || ['member', 'longcontent', 'expired'].includes(scenario)) page.onDoneSelection();
+        if (alternativesPreview || v2Preview && scenario !== 'v2-new-product' || ['member', 'longcontent', 'expired'].includes(scenario)) page.onDoneSelection();
       }
-      if (alternativesPreview || historyDataPreview || ['member', 'longcontent', 'expired', 'empty'].includes(scenario)) await page.onQuery();
+      if (alternativesPreview || historyDataPreview || v2Preview && !['v2-new-product', 'v2-restricted', 'v2-paid-unconfigured'].includes(scenario) || ['member', 'longcontent', 'expired', 'empty'].includes(scenario)) await page.onQuery();
     }
+    if (v2Preview && pageName === 'query') { page.refreshJourney(); if (scenario === 'v2-new-product') page.onToggleLaunch(); }
     if (alternativesPreview) {
       if (scenario === 'alternatives-cached') { page.setData({ resultIsCache: true }); page.refreshStoreChoices(); }
       if (!page.data.alternativeStoreChoices.some(item => item.selected && selected.storeNumbers.includes(item.storeNumber))) throw Error('Original stores were not selected by default');
@@ -548,22 +642,79 @@ for (const scenario of scenarios) {
       else page.onEditSelection();
       if (scenario === 'sheet-saving' && pageName === 'follow') page.setData({ saving: true });
     }
+    let expectedV2Text = [], forbiddenText = [];
+    if (v2Preview) {
+      if (pageName === 'query') {
+        const action = { 'v2-free': 'offer', 'v2-member': 'official', 'v2-unknown': 'retry', 'v2-stale': 'retry', 'v2-service-down': 'retry', 'v2-longcontent': 'follow' }[scenario];
+        if (action && page.data.nextAction?.action !== action) throw Error(`${scenario}: expected query next action ${action}, got ${page.data.nextAction?.action}`);
+        if (scenario === 'v2-restricted' && !page.data.selectionRestricted) throw Error('Restricted fixture did not retain the access gate');
+        if (scenario === 'v2-paid-unconfigured' && !page.data.resumeSetup) throw Error('Paid fixture lost the unfinished target');
+        if (scenario === 'v2-new-product' && !page.data.launch) throw Error('Future launch card did not render');
+        expectedV2Text = [...(scenario === 'v2-calendar-modal' ? ['新品日历', 'iPhone Duo', '10.16', '10.23', '本次发售不再提醒', '查看选购攻略'] : [p.title]), ...({
+          'v2-free': ['暂时没有可取货观测', '微信提醒需另行授权'],
+          'v2-member': ['2 家门店有可取货观测', '查看官方购买信息'],
+          'v2-unknown': ['当前取货状态待确认', '继续查询原配置'],
+          'v2-stale': ['当前取货状态待确认', '继续查询原配置'],
+          'v2-restricted': ['此配置实时查询需会员', '查看此配置会员权益'],
+          'v2-service-down': ['本次暂无可取货观测', '开通会员不会消除服务异常'],
+          'v2-paid-unconfigured': ['会员已生效，继续完成关注设置', '继续设置'],
+          'v2-new-product': ['iPhone Duo', '10 月 16 日 20:00 预购', '尚未开放取货查询'],
+          'v2-longcontent': ['暂时没有可取货观测', '关注此配置'],
+        }[scenario] || [])];
+        if (['v2-unknown', 'v2-stale', 'v2-service-down'].includes(scenario)) forbiddenText = ['不想反复查？'];
+      } else if (pageName === 'follow') {
+        if (scenario === 'v2-service-down') page.setData({ showServiceDetails: true });
+        if (scenario === 'v2-paid-unconfigured' && page.data.activation?.action !== 'continue') throw Error('Paid member fixture must require an explicit setup action');
+        expectedV2Text = ['关注配置', ...({
+          'v2-free': ['给心仪的配置留个小哨'], 'v2-member': ['关注与提醒条件已就绪'],
+          'v2-unknown': ['状态待确认'], 'v2-stale': ['待更新'], 'v2-restricted': ['会员权益受限'],
+          'v2-service-down': ['后台状态已过期'], 'v2-paid-unconfigured': ['会员已生效，继续设置关注'],
+          'v2-longcontent': [p.title],
+        }[scenario] || [])];
+      } else if (pageName === 'mine') {
+        expectedV2Text = ['会员核心权益', '提醒记录'];
+        // aria-labels are not body text; visible labels express the same contract.
+        expectedV2Text[0] = '查询与历史';
+        if (['v2-context-checkout', 'v2-paid-unconfigured', 'v2-longcontent'].includes(scenario)) {
+          if (!page.data.checkoutTarget) throw Error(`${scenario}: membership page lost checkout context`);
+          expectedV2Text.push(p.title, '保存后持续检测');
+        }
+        expectedV2Text.push(member ? '已开通' : `确认购买 ${page.data.boot.memberProduct.days} 天会员`);
+        if (scenario.startsWith('v2-promotion-')) {
+          expectedV2Text.push('月卡', '年卡', '¥30.00', '¥360.00');
+          if (promotionActive) expectedV2Text.push('¥14.99', '¥129.00', '优惠至 2026-11-30 23:59', '截止后恢复标准价');
+          else forbiddenText.push('¥14.99', '¥129.00', '限时优惠');
+        }
+      } else if (pageName === 'guide') {
+        expectedV2Text = ['选好心仪配置', '新品发售日历', '先选好想要的配置', '常见问题'];
+        if (scenario === 'v2-guide-calendar') {
+          if (!page.data.calendarExpanded || !page.data.calendars.length) throw Error('Guide calendar section did not expand');
+          expectedV2Text.push('2026 年 10 月', '10.16', '10.23', '复制官方购买链接');
+        }
+        if (scenario === 'v2-guide-faq') {
+          if (page.data.faqOpen !== 'notification') throw Error('Guide notification FAQ did not expand');
+          expectedV2Text.push('没有检测到符合条件的变化时也不会发送');
+        }
+      } else expectedV2Text = [p.title, '最近浏览'];
+      if (previewCalls.some(item => item.action === 'growth.ingest')) throw Error('Layout fixtures must keep event ingestion disabled');
+    }
     const ast = parse(fs.readFileSync(path.join(mini, `pages/${pageName}/index.wxml`), 'utf8'));
     const nudge = nudgePreview ? { title: scenario === 'nudge-both' ? '补充到货和断货提醒次数' : '补充到货提醒次数', restockCount: 1, soldoutCount: scenario === 'nudge-both' ? 0 : 15, soldoutEnabled: scenario !== 'nudge-one', detail: '已有次数会保留。每项选择「允许」增加 1 次，消息发送后消耗对应次数。' } : null;
     const rendered = renderNode(ast, page.data, { rt, nudge, keyboardHeight: scenario === 'sheet-keyboard' ? 280 : 0 });
     if (alternativesPreview && !rendered.includes('换个颜色或门店，继续找货')) throw Error('Manual alternative choices were hidden');
     const componentCss = adminPreview ? '' : cssFile('components/target-picker/index.wxss').replace(/\/\*[\s\S]*?\*\//g, '').replace(/([^{}]+)\{/g, (_, selectors) => selectors.trim().startsWith('@') ? `${selectors}{` : selectors.split(',').map(selector => `.component-target-picker ${selector.trim()}`).join(',') + '{');
     const tabIndex = appConfig.tabBar.list.findIndex(tab => tab.pagePath === `pages/${pageName}/index`);
+    const navigationHidden = Boolean(page.data.sheetVisible || page.data.editing || page.data.redemptionOpen || page.data.calendarOpen);
     let renderedTabs = '', tabCss = '';
     if (appConfig.tabBar.custom && tabIndex >= 0) {
-      const tabComponent = rt.instantiate('custom-tab-bar/index.js', { selected: tabIndex, sheetHidden: Boolean(page.data.sheetVisible || page.data.editing || page.data.redemptionOpen) });
+      const tabComponent = rt.instantiate('custom-tab-bar/index.js', { selected: tabIndex, sheetHidden: navigationHidden });
       const tabAst = parse(fs.readFileSync(path.join(mini, 'custom-tab-bar/index.wxml'), 'utf8'));
       renderedTabs = renderNode(tabAst, tabComponent.data, { rt });
       tabCss = cssFile('custom-tab-bar/index.wxss');
     }
     const rawCss = `${buttonConstraintCss}\n${cssFile('app.wxss')}\n${cssFile(`pages/${pageName}/index.wxss`)}\n${componentCss}\n${adminPreview ? '' : cssFile('components/config-sheet/index.wxss') + cssFile('components/reminder-nudge/index.wxss')}\n${tabCss}`;
     for (const width of widths) {
-      const css = rawCss.replace(/(-?[\d.]+)rpx/g, (_, value) => { const pixels = Number(value) * width / 750; return `${roundRpx ? Math.round(pixels) : pixels}px`; }).replace(/(^|[}\n])\s*page\s*\{/g, '$1 body {').replace(/(^|[}\n])\s*view, text\s*\{/g, '$1 div, span {');
+      const css = htmlElementSelectors(rawCss.replace(/(-?[\d.]+)rpx/g, (_, value) => { const pixels = Number(value) * width / 750; return `${roundRpx ? Math.round(pixels) : pixels}px`; }));
       const filename = `${pageName}-${scenario}-${width}.html`;
       const tabbar = appConfig.tabBar.custom ? renderedTabs : tabIndex < 0 ? '' : '<div class="preview-tabbar">' + appConfig.tabBar.list.map(tab => {
         const selected = tab.pagePath === `pages/${pageName}/index`;
@@ -572,7 +723,7 @@ for (const scenario of scenarios) {
       }).join('') + '</div>';
       const body = `<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${names[pageName]} · ${scenario} · ${width}px 离线预览</title><style>html{width:${width}px;max-width:100%;margin:0 auto}body{margin:0}button,input,textarea{font:inherit}button{cursor:default}img{display:block}input[type=checkbox]{width:36px;height:22px;flex:none;accent-color:#1ba35a}.simulation{position:sticky;top:0;z-index:10;padding:8px 12px;background:#fff2ce;color:#705000;font:11px/1.5 sans-serif;border-bottom:1px solid #ead49c}.native-nav{text-align:center;padding:16px;font:600 15px sans-serif}${navCss('light')}${theme ? `@media (prefers-color-scheme: dark){${navCss('dark')}}` : ''}.preview-tabbar{display:flex;justify-content:space-around;gap:6px;background:white;padding:15px 8px;border-top:1px solid #ddd;font-size:12px;color:#65776c}${css}</style><div class="simulation">离线模拟 · ${width}px · ${scenario} · 使用实际 WXML/WXSS；不代表微信实测或实时库存</div><div class="native-nav">果小哨 · ${names[pageName]}</div>${rendered}${tabbar}<script>window.previewAudit=()=>({width:innerWidth,scrollWidth:document.documentElement.scrollWidth,overflow:[...document.querySelectorAll('body *')].filter(e=>{const r=e.getBoundingClientRect();return r.width&&r.right>document.documentElement.clientWidth+1&&getComputedStyle(e.parentElement).overflowX!=='auto'}).map(e=>({tag:e.tagName,class:e.className,right:e.getBoundingClientRect().right,text:e.textContent.slice(0,60)}))});</script></html>`;
       fs.writeFileSync(path.join(out, filename), body, 'utf8');
-      const expectedText = alternativesPreview ? [p.title,
+      const expectedText = v2Preview ? expectedV2Text : alternativesPreview ? [p.title,
         '换个颜色或门店，继续找货', '同机型、同容量', '同城门店', '勾选不扣次',
         ...{
           'alternatives-default': ['先选可接受的颜色', '本次查询门店'],
@@ -624,18 +775,18 @@ for (const scenario of scenarios) {
         'monitor-dual-native': ['待同步', '到货 8 次', '断货 5 次'],
         'monitor-dual-sync-error': ['待同步', '重试同步', '增加提醒次数'],
         'monitor-dual-storage-error': ['授权暂存在本次运行', '重试同步'],
-      }[scenario]] : paymentPreview ? ['兑换码开通', ...(!page.data.membership.active || page.data.membershipUpgradeOpen || page.data.paymentPendingId ? ['周卡', '月卡', '年卡', '¥7.00', '¥19.90', '¥200.00'] : ['升级长期套餐', '续费会员']), ...{
+      }[scenario]] : paymentPreview ? ['兑换码开通', ...(!page.data.membership.active || page.data.membershipUpgradeOpen || page.data.paymentPendingId ? ['周卡', '月卡', '年卡', '¥7.00', '¥14.99', '¥129.00'] : ['升级长期套餐', '续费会员']), ...{
         'payment-ready': ['立即开通', '选择会员时长', '付款确认后生效'], 'payment-renew': ['续费会员', '确认续费', '在原到期时间后增加 7 天', '剩余有效期继续保留'],
         'payment-blocked': ['付费购买暂未开放'], 'payment-old-ios': ['iOS 15'],
         'payment-pending': ['支付正在确认中', '查询支付结果'], 'payment-cancelled': ['已取消本次支付', '请查询订单状态', '查询支付结果'],
         'payment-error': ['支付结果暂未确认', '查询支付结果'], 'payment-fulfilled': ['支付已确认，会员已开通', '已开通'],
         'payment-partial-refund': ['订单已部分退款', '部分退款', '已退款 ¥3.50'],
-        'payment-monthly': ['立即开通 · ¥19.90', '30 天'],
-        'payment-annual': ['立即开通 · ¥200.00', '365 天'],
+        'payment-monthly': ['立即开通 · ¥14.99', '30 天'],
+        'payment-annual': ['立即开通 · ¥129.00', '365 天'],
         'payment-pending-monthly': ['30 天会员 · ¥19.90', 'offline-original-monthly-order', '支付正在确认中', '查询支付结果'],
         'payment-member': ['18', '天剩余', '到期 2026-10-03', '升级长期套餐', '续费会员'],
-        'payment-upgrade-monthly': ['续费可选', '确认升级 · ¥19.90', '在原到期时间后增加 30 天', '预计到期 2026-11-02', '按全价购买', '不抵扣差价'],
-        'payment-upgrade-annual': ['续费可选', '确认升级 · ¥200.00', '在原到期时间后增加 365 天', '预计到期 2027-10-03', '按所选套餐全价购买', '不抵扣差价'],
+        'payment-upgrade-monthly': ['续费可选', '确认升级 · ¥14.99', '在原到期时间后增加 30 天', '预计到期 2026-11-02', '按所选套餐价格购买', '不抵扣差价'],
+        'payment-upgrade-annual': ['续费可选', '确认升级 · ¥129.00', '在原到期时间后增加 365 天', '预计到期 2027-10-03', '按所选套餐价格购买', '不抵扣差价'],
         'payment-member-pending-monthly': ['30 天会员 · ¥19.90', 'offline-original-monthly-order', '套餐已按原订单锁定', '查询支付结果'],
         'payment-benefits': ['会员权益', '周卡', '月卡', '年卡', '新品'],
         'payment-rules': ['一次性虚拟服务', '一经售出不予退款', '一次购买 7 天', '购买说明'],
@@ -678,12 +829,21 @@ for (const scenario of scenarios) {
       }[scenario]);
       const expectedAlternativeCounts = alternativesPreview ? { colors: page.data.alternativeColorChoices.length, stores: page.data.alternativeStoreChoices.length, queries: page.data.alternativeSelectedColors.length } : undefined;
       const expectedReleaseNoteCount = releaseNotesPreview ? (page.data.showReleaseNotes ? page.data.visibleReleaseNotes.length : 0) : undefined;
-      manifest.push({ page: pageName, scenario, width, file: filename, expectedText, expectedAlternativeCounts, expectedReleaseNoteCount });
+      manifest.push({ page: pageName, scenario, width, file: filename, tabPage: tabIndex >= 0, navigationHidden, previewDate: now.toISOString(), expectedText, forbiddenText, expectedAlternativeCounts, expectedReleaseNoteCount });
     }
   }
 }
-fs.writeFileSync(path.join(out, 'manifest.json'), JSON.stringify({ generatedAt: new Date().toISOString(), source: mini, renderer: 'offline WXML/WXSS approximation', buttonConstraintProfile, rpxRoundingProfile, remoteImages: allowRemoteImages, expressionErrors: evaluationErrors.length, snapshots: manifest }, null, 2));
+const sourceHashes = fs.readdirSync(mini, { recursive: true }).filter(file => /\.(?:js|json|wxml|wxss)$/.test(file)).sort()
+  .map(file => ({ file: file.replaceAll('\\', '/'), sha256: crypto.createHash('sha256').update(fs.readFileSync(path.join(mini, file))).digest('hex') }));
+fs.writeFileSync(path.join(out, 'manifest.json'), JSON.stringify({ generatedAt: new Date().toISOString(), source: mini, sourceHashes, renderer: 'offline WXML/WXSS approximation', previewDate: defaultPreviewDate.toISOString(), v2Features: v2Preview ? { contextualCheckout: true, resultNextAction: true, activationJourney: true, targetEvidence: true, growthEvents: false, experimentAssignments: true, launchGuide: true } : null, buttonConstraintProfile, rpxRoundingProfile, remoteImages: allowRemoteImages, expressionErrors: evaluationErrors.length, snapshots: manifest }, null, 2));
 fs.writeFileSync(path.join(out, 'evaluation-errors.json'), JSON.stringify(evaluationErrors, null, 2));
-fs.writeFileSync(path.join(out, 'index.html'), `<!doctype html><html lang="zh-CN"><meta charset="utf-8"><title>果小哨 · 离线排版检查</title><style>body{font:15px/1.7 sans-serif;background:#eef5f0;color:#263d30;margin:20px}select,button{font:inherit;padding:6px;margin:4px}iframe{display:block;border:1px solid #bacabd;background:white;height:900px}p{max-width:900px}</style><h1>果小哨 · 离线排版检查</h1><p>使用当前源代码中的 WXML、WXSS 和页面格式化逻辑，模拟会员、免费、到期、空内容、错误及长文本。此工具不会调用云函数、付款或发送消息；浏览器排版不是微信渲染，最终以微信开发者工具及真机验证为准。</p><select id="page">${Object.entries(names).map(([key,value])=>`<option value="${key}">${value}</option>`).join('')}</select><select id="scenario">${scenarios.map(s=>`<option>${s}</option>`).join('')}</select><select id="width">${widths.map(w=>`<option>${w}</option>`).join('')}</select><iframe id="frame"></iframe><script>const controls=[document.querySelector('#page'),document.querySelector('#scenario'),document.querySelector('#width')];function update(){const [p,s,w]=controls.map(x=>x.value);frame.style.width=w+'px';frame.src=p+'-'+s+'-'+w+'.html';}controls.forEach(x=>x.onchange=update);update();</script></html>`);
+const indexSnapshots = manifest.map(({ page, scenario, width, file }) => ({ page, scenario, width, file }));
+fs.writeFileSync(path.join(out, 'index.html'), `<!doctype html><html lang="zh-CN"><meta charset="utf-8"><title>果小哨 · 离线排版检查</title><style>body{font:15px/1.7 sans-serif;background:#eef5f0;color:#263d30;margin:20px}select,button{font:inherit;padding:6px;margin:4px}iframe{display:block;border:1px solid #bacabd;background:white;height:900px}p{max-width:900px}</style><h1>果小哨 · 离线排版检查</h1><p>使用当前源代码中的 WXML、WXSS 和页面格式化逻辑，模拟账户、库存、服务和长文本等状态。此工具不会调用云函数、付款或发送消息；浏览器排版不是微信渲染，最终以微信开发者工具及真机验证为准。选项根据已生成的页面联动显示。</p><select id="page" aria-label="页面"></select><select id="scenario" aria-label="场景"></select><select id="width" aria-label="宽度"></select><iframe id="frame" title="所选离线页面"></iframe><script>
+const snapshots=${JSON.stringify(indexSnapshots).replaceAll('<', '\\u003c')}, names=${JSON.stringify(names).replaceAll('<', '\\u003c')};
+const controls=[document.querySelector('#page'),document.querySelector('#scenario'),document.querySelector('#width')], frame=document.querySelector('#frame');
+function populate(control, values, labels){const previous=control.value;control.replaceChildren(...values.map(value=>{const option=document.createElement('option');option.value=value;option.textContent=labels?labels[value]:value;return option;}));if(values.map(String).includes(previous))control.value=previous;}
+function update(){const candidates=snapshots.filter(item=>item.page===controls[0].value);populate(controls[1],[...new Set(candidates.map(item=>item.scenario))]);const selected=candidates.filter(item=>item.scenario===controls[1].value);populate(controls[2],[...new Set(selected.map(item=>item.width))]);const target=selected.find(item=>String(item.width)===controls[2].value);frame.style.width=target.width+'px';frame.src=target.file;}
+populate(controls[0],[...new Set(snapshots.map(item=>item.page))],names);controls.forEach(control=>control.onchange=update);update();
+</script></html>`);
 console.log(JSON.stringify({ output: out, snapshots: manifest.length, pages: Object.keys(names), scenarios, widths, remoteImages: allowRemoteImages, expressionErrors: evaluationErrors.length }, null, 2));
 if (evaluationErrors.length) { console.error(JSON.stringify(evaluationErrors.slice(0, 12), null, 2)); process.exitCode = 1; }

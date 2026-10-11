@@ -10,8 +10,8 @@ const products = [
   { id: 'member_365d', planId: 'member_365d', days: 365, priceFen: 20000, productId: 'vip888' },
 ].map(value => ({ ...value, enabled: true, paymentReady: true }));
 
-function account(active = true) {
-  const rt = runtime();
+function account(active = true, handler) {
+  const rt = runtime(handler);
   rt.wx.requestVirtualPayment = () => {};
   const page = rt.instance('pages/mine/index.js');
   const expiresAt = new Date(Date.now() + 7 * 86400000).toISOString();
@@ -27,7 +27,7 @@ test('monthly and annual upgrades add the full duration after the existing expir
   const membership = { active: true, expiresAt: '2026-10-12T00:00:00Z' };
   assert.equal(renewalPreview(products[1], membership, now).expiresAtText, '2026-11-11 08:00:00');
   assert.equal(renewalPreview(products[2], membership, now).expiresAtText, '2027-10-12 08:00:00');
-  assert.match(renewalPreview(products[1], membership, now).description, /全价购买.*不抵扣差价.*不自动续费/);
+  assert.match(renewalPreview(products[1], membership, now).description, /按所选套餐价格购买.*不抵扣差价.*不自动续费/);
   assert.equal(renewalPreview(products[2], { active: true, expiresAt: '2024-02-29T00:00:00Z' }, Date.parse('2024-02-20T00:00:00Z')).expiresAtText, '2025-02-28 08:00:00');
 });
 
@@ -96,6 +96,107 @@ test('collapsed purchase details do not bypass the selected product notice and f
   modal.success({ confirm: false }); await buying;
   assert.equal(purchases, 0);
   assert.equal(rt.calls.length, 0);
+});
+
+const promotion = { active: true, endsAt: '2026-11-30T16:00:00.000Z', timezone: 'Asia/Shanghai' };
+function promotionalProducts(active = true) {
+  return products.map(value => value.days === 7 ? value : { ...value,
+    priceFen: value.days === 30 ? active ? 1499 : 3000 : active ? 12900 : 36000,
+    standardPriceFen: value.days === 30 ? 3000 : 36000, promotion: { ...promotion, active } });
+}
+
+test('monthly and annual offer views use server prices, standard prices, per-day amounts and the Beijing deadline', () => {
+  const { page, boot } = account(false);
+  page.applyBoot({ ...boot, memberProducts: promotionalProducts() });
+  const [week, month, year] = page.data.boot.memberProducts;
+  assert.equal(week.promotionText, ''); assert.equal(week.standardPriceText, '');
+  assert.equal(month.priceText, '¥14.99'); assert.equal(month.standardPriceText, '¥30.00');
+  assert.equal(month.dailyPriceText, '约 ¥0.50 / 天');
+  assert.equal(year.priceText, '¥129.00'); assert.equal(year.standardPriceText, '¥360.00');
+  assert.equal(year.dailyPriceText, '约 ¥0.35 / 天');
+  assert.equal(month.promotionText, '限时优惠');
+  assert.equal(month.promotionDeadlineText, '优惠至 2026-11-30 23:59（北京时间）');
+  page.onSelectMemberProduct({ currentTarget: { dataset: { planId: 'member_365d' } } });
+  assert.equal(page.data.boot.priceText, '¥129.00');
+  assert.equal(page.data.boot.memberProduct.days, 365);
+});
+
+test('a server snapshot after promotion expiry shows standard prices without a stale offer label', () => {
+  const { page, boot } = account(false);
+  page.applyBoot({ ...boot, memberProducts: promotionalProducts() });
+  page.onSelectMemberProduct({ currentTarget: { dataset: { planId: 'member_30d' } } });
+  page.applyBoot({ ...boot, memberProducts: promotionalProducts(false) });
+  assert.equal(page.data.boot.priceText, '¥30.00');
+  for (const value of page.data.boot.memberProducts) {
+    assert.equal(value.standardPriceText, ''); assert.equal(value.promotionText, ''); assert.equal(value.promotionDeadlineText, '');
+  }
+  page.onSelectMemberProduct({ currentTarget: { dataset: { planId: 'member_365d' } } });
+  assert.equal(page.data.boot.priceText, '¥360.00');
+});
+
+test('a safely changed monthly quote updates the actual account page and requires a second modal before paying', async () => {
+  let creates = 0, cashiers = 0;
+  const { rt, page, boot } = account(false, async (action, payload) => {
+    assert.equal(action, 'member.createOrder');
+    if (++creates === 1) throw { code: 'payment_price_changed', details: { product: promotionalProducts(false)[1],
+      orderId: payload.orderId, canDiscardIntent: true, reason: 'quote_expired' } };
+    return { ok: true, order: { orderId: payload.orderId, planId: 'member_30d', days: 30, amountFen: 3000, status: 'created' },
+      payment: { mode: 'short_series_goods', signData: '{"goodsPrice":3000}', paySig: 'test-server-signature', signature: 'test-user-signature' } };
+  });
+  rt.wx.login = options => options.success({ code: 'test-login' });
+  rt.wx.requestVirtualPayment = options => { cashiers++; options.fail({ errMsg: 'cancel' }); };
+  page.pageVisible = true;
+  page.applyBoot({ ...boot, memberProducts: promotionalProducts() });
+  page.onSelectMemberProduct({ currentTarget: { dataset: { planId: 'member_30d' } } });
+  await page.paymentController.show();
+  let modal;
+  rt.wx.showModal = value => { modal = value; };
+  let buying = page.onBuyMembership();
+  assert.match(modal.content, /30 天会员 · ¥14\.99/);
+  assert.match(modal.content, /2026-11-30 23:59（北京时间）/);
+  assert.match(modal.content, /恢复标准价 ¥30\.00/);
+  assert.match(modal.content, /一经售出不予退款/);
+  modal.success({ confirm: true }); await buying;
+  assert.equal(creates, 1); assert.equal(cashiers, 0);
+  assert.equal(page.data.paymentPendingId, ''); assert.equal(page.data.boot.priceText, '¥30.00');
+  assert.match(page.data.paymentError, /重新确认/);
+  buying = page.onBuyMembership();
+  assert.equal(creates, 1, 'price refresh cannot itself create another order');
+  assert.match(modal.content, /30 天会员 · ¥30\.00/); assert.doesNotMatch(modal.content, /14\.99|限时优惠|优惠至/);
+  modal.success({ confirm: true }); await buying;
+  assert.equal(creates, 2); assert.equal(cashiers, 1);
+  assert.deepEqual(rt.calls.map(value => value.payload.expectedPriceFen), [1499, 3000]);
+  assert.notEqual(rt.calls[0].payload.orderId, rt.calls[1].payload.orderId);
+});
+
+test('an open purchase modal cannot approve a refreshed price or inherit an account change', async () => {
+  for (const change of ['price', 'account']) {
+    const { rt, page, boot } = account(false);
+    page.applyBoot({ ...boot, memberProducts: promotionalProducts() });
+    page.onSelectMemberProduct({ currentTarget: { dataset: { planId: 'member_30d' } } });
+    let modal, purchases = 0;
+    rt.wx.showModal = options => { modal = options; };
+    page.paymentController.buy = async () => purchases++;
+    const buying = page.onBuyMembership();
+    if (change === 'price') page.applyPriceChange(promotionalProducts(false)[1]);
+    else page.applyBoot({ ...boot, identity: { userKey: 'another-account' }, memberProducts: promotionalProducts() });
+    modal.success({ confirm: true }); await buying;
+    assert.equal(purchases, 0, change);
+    if (change === 'price') assert.match(page.data.paymentError, /重新确认/);
+  }
+});
+
+test('guide navigation and purchase-record shortcut open their destinations without ordering', async () => {
+  const { rt, page } = account(false, async action => {
+    assert.equal(action, 'member.status'); return { orders: [] };
+  });
+  let destination, scroll;
+  rt.wx.navigateTo = value => { destination = value.url; };
+  rt.wx.pageScrollTo = value => { scroll = value.selector; };
+  page.onHelp(); assert.equal(destination, '/pages/guide/index');
+  await page.onOpenOrders();
+  assert.equal(page.data.showOrders, true); assert.equal(scroll, '#membership-records');
+  assert.deepEqual(rt.calls.map(value => value.action), ['member.status']);
 });
 
 test('paid member upgrade selects a long-term package at full price without ordering or changing existing membership', () => {

@@ -1,5 +1,5 @@
 const { call, showError, toast, newId } = require('../../utils/api');
-const { getBootstrap, invalidateBootstrap, invalidateFollows, publishQuota, subscribeQuota, currentQuota } = require('../../utils/store');
+const { getBootstrap, getCatalog, currentCatalog, invalidateBootstrap, invalidateFollows, publishQuota, subscribeQuota, currentQuota } = require('../../utils/store');
 const { topUpReminderCredit } = require('../../utils/reminder-credits');
 const { confirmTap } = require('../../utils/haptic');
 const { VERSION } = require('../../config/version');
@@ -19,6 +19,15 @@ const { shareAppMessage, shareTimeline } = require('../../utils/share');
 const { paymentAvailability, createPaymentController, purchaseNotice } = require('../../utils/member-payment');
 const { memberProducts, planId, renewalPreview } = require('../../utils/member-products');
 const { productBenefit } = require('../../utils/member-limits');
+const { createCheckoutContext, TTL_MS: CHECKOUT_TTL_MS } = require('../../utils/checkout-context');
+const conversion = require('../../utils/conversion-events');
+const CHECKOUT_MESSAGES = { expired: '上次选择已超过 24 小时，请重新确认配置与门店。', catalog_changed: '商品或门店信息已更新，请重新确认你的选择。',
+  invalid: '上次选择暂时无法恢复，请重新选择配置与门店。', storage_failed: '暂时无法读取上次选择，请重新选择配置与门店。' };
+const PURCHASE_FEEDBACK = [
+  { code: 'feedback_no_need', label: '暂时不需要' }, { code: 'feedback_bought', label: '已经买到了' },
+  { code: 'feedback_price_duration', label: '价格或时长不合适' }, { code: 'feedback_unclear', label: '还没看懂提醒功能' },
+  { code: 'feedback_trust', label: '担心提醒效果' }, { code: 'feedback_payment', label: '付款遇到了问题' }, { code: 'feedback_other', label: '其他原因' },
+];
 const RELEASE_NOTES_PAGE_SIZE = 3;
 const RELEASE_NOTES_PAGE_COUNT = Math.max(1, Math.ceil(RELEASE_NOTES.length / RELEASE_NOTES_PAGE_SIZE));
 
@@ -39,6 +48,22 @@ function membershipBenefitPlans(products) {
     } else groups.push({ key, names: [product.nameText], configs, stores, enhanced: configs > 3 || stores > 3 });
   }
   return groups.map(({ names, ...group }) => ({ ...group, label: names.join(' / ') }));
+}
+
+function presentMemberProduct(item) {
+  const promotion = item.promotion || {}, end = Date.parse(promotion.endsAt);
+  const discounted = promotion.active === true && Number.isSafeInteger(item.standardPriceFen)
+    && item.standardPriceFen > item.priceFen && Number.isFinite(end);
+  return { ...item, priceText: fmt.fen(item.priceFen), standardPriceText: discounted ? fmt.fen(item.standardPriceFen) : '',
+    promotionText: discounted ? '限时优惠' : '',
+    promotionDeadlineText: discounted ? `优惠至 ${fmt.fmtDateTime(end - 1).slice(0, 16)}（北京时间）` : '',
+    dailyPriceText: `约 ¥${(item.priceFen / item.days / 100).toFixed(2)} / 天`,
+    benefitText: productBenefit(item),
+    benefitShort: `${item.limits && item.limits.maxFollows || 3} 配置 × ${item.limits && item.limits.maxStoresPerFollow || 3} 门店`,
+    nameText: item.days === 365 ? '年卡' : item.days === 30 ? '月卡' : item.days === 7 ? '周卡' : '会员',
+    durationText: `${item.days} 天`,
+    taskLabel: item.planId === 'member_7d' ? '短期等货' : item.planId === 'member_30d' ? '持续关注' : '长期使用',
+    available: paymentAvailability(item, wx).ready };
 }
 
 const LEDGER_TEXT = {
@@ -214,6 +239,13 @@ Page({
     paymentCanRetry: false,
     paymentMessage: '',
     paymentError: '',
+    contextualCheckout: false,
+    checkoutTarget: null,
+    checkoutMessage: '',
+    checkoutLoading: false,
+    showPurchaseFeedback: false,
+    purchaseFeedbackSent: false,
+    purchaseFeedbackOptions: PURCHASE_FEEDBACK,
   },
 
   async onLoad(options = {}) {
@@ -252,6 +284,7 @@ Page({
   },
 
   onHide() {
+    this.disconnectOfferObserver();
     this.orderConsentGeneration = (this.orderConsentGeneration || 0) + 1;
     this.paymentConsentGeneration = (this.paymentConsentGeneration || 0) + 1;
     this.pageVisible = false;
@@ -263,6 +296,7 @@ Page({
   },
 
   retirePage() {
+    this.disconnectOfferObserver();
     this.setTabBarOverlay(false);
     this.pageRetired = true;
     this.pageVisible = false;
@@ -302,7 +336,7 @@ Page({
       const boot = await getBootstrap({ force });
       if (this.pageRetired || generation !== (this.accountGeneration || 0)) return;
       this.applyBoot(boot);
-      this.setData({ ready: true, loadError: null, refreshError: null });
+      this.setData({ ready: true, loadError: null, refreshError: null }, () => this.observeMembershipOffer());
       this.consumePendingSection();
       const pending = [this.loadNotifications({ force })];
       if (this.data.showLedger) pending.push(this.loadLedger());
@@ -436,6 +470,9 @@ Page({
     const accountChanged = !this.data.boot || this.data.boot.identity.userKey !== boot.identity.userKey;
     if (accountChanged) this.paymentConsentGeneration = (this.paymentConsentGeneration || 0) + 1;
     if (accountChanged) {
+      this.checkoutGeneration = (this.checkoutGeneration || 0) + 1;
+      this.checkoutContext = null;
+      this.offerSeen = new Set();
       this.orderAccountGeneration = (this.orderAccountGeneration || 0) + 1;
       this.orderConsentGeneration = (this.orderConsentGeneration || 0) + 1;
       this.ordersGeneration = (this.ordersGeneration || 0) + 1;
@@ -443,26 +480,24 @@ Page({
       this.hiddenOrderIds = new Set();
       this.failedOrderAction = null;
       this.setData({ orders: [], ordersClearableCount: 0, ordersClearUnavailable: false, orderActionBusy: '', orderDeletingId: '', orderConfirming: false,
-        ordersLoading: false, ordersError: null, ordersActionError: null, ordersActionNote: '' });
+        ordersLoading: false, ordersError: null, ordersActionError: null, ordersActionNote: '',
+        checkoutTarget: null, checkoutMessage: '', showPurchaseFeedback: false, purchaseFeedbackSent: false });
     }
     const membership = boot.membership;
     const settings = boot.settings || { dnd: { enabled: false, startMinute: 23 * 60, endMinute: 8 * 60 }, notifyEnabled: true };
-    const products = memberProducts(boot).map(item => ({ ...item, priceText: fmt.fen(item.priceFen),
-      benefitText: productBenefit(item),
-      benefitShort: `${item.limits && item.limits.maxFollows || 3} 配置 × ${item.limits && item.limits.maxStoresPerFollow || 3} 门店`,
-      nameText: item.days === 365 ? '年卡' : item.days === 30 ? '月卡' : item.days === 7 ? '周卡' : '会员',
-      durationText: `${item.days} 天`,
-      available: paymentAvailability(item, wx).ready }));
+    const products = memberProducts(boot).map(presentMemberProduct);
     const selected = products.find(item => item.planId === (this.paymentPendingPlanId || this.data.selectedPlanId)) || products[0] || boot.memberProduct;
     const availability = paymentAvailability(selected, wx);
     this.setData({
       selectedPlanId: planId(selected),
+      contextualCheckout: Boolean(boot.features && boot.features.contextualCheckout),
       membershipUpgradeOpen: !accountChanged && membership.active && this.data.membershipUpgradeOpen,
       purchaseMode: membership.active ? !accountChanged && this.data.purchaseMode === 'upgrade' ? 'upgrade' : 'renew' : 'purchase',
       membershipUpgradePreview: renewalPreview(selected, membership),
       membershipBenefitPlans: membershipBenefitPlans(products),
       boot: {
         identity: boot.identity,
+        features: boot.features || {},
         memberProducts: products,
         memberProduct: selected,
         priceText: fmt.fen(selected.priceFen),
@@ -472,6 +507,7 @@ Page({
         limits: boot.limits,
         paymentReady: availability.ready,
         paymentReason: availability.reason,
+        paymentCode: availability.code,
         purchaseNotice: purchaseNotice(selected),
       },
       membership: presentMembership(membership),
@@ -482,6 +518,7 @@ Page({
       dndEnd: minuteToTime(settings.dnd.endMinute),
     });
     this.ensurePaymentController().sync(boot.identity, selected);
+    this.restoreCheckoutContext();
   },
 
   selectMemberProduct(id) {
@@ -491,8 +528,9 @@ Page({
     const availability = paymentAvailability(selected, wx);
     this.setData({ selectedPlanId: selected.planId, boot: { ...boot, memberProduct: selected,
       priceText: fmt.fen(selected.priceFen), purchaseNotice: purchaseNotice(selected),
-      paymentReady: availability.ready, paymentReason: availability.reason },
+      paymentReady: availability.ready, paymentReason: availability.reason, paymentCode: availability.code },
       membershipUpgradePreview: renewalPreview(selected, this.data.membership) });
+    this.observeMembershipOffer();
     if (this.paymentController) this.paymentController.sync(boot.identity, selected);
   },
 
@@ -527,6 +565,110 @@ Page({
   onCloseMembershipUpgrade() {
     if (!this.canChangeMembershipPurchase()) return;
     this.setData({ membershipUpgradeOpen: false });
+    this.disconnectOfferObserver();
+  },
+
+  ensureCheckoutStore() {
+    if (!this.checkoutStore) this.checkoutStore = createCheckoutContext({ wx });
+    return this.checkoutStore;
+  },
+
+  legacyMemberFollow() {
+    if (typeof getApp !== 'function') return null;
+    const app = getApp(), intent = app.globalData.pendingMemberFollow;
+    if (!intent) return null;
+    const identity = this.data.boot && this.data.boot.identity;
+    // Old in-memory hints have no metadata; all newly written hints are bounded.
+    const wrongAccount = intent.userKey && (!identity || intent.userKey !== identity.userKey);
+    const expired = intent.createdAt !== undefined && (!Number.isFinite(intent.createdAt)
+      || intent.createdAt > Date.now() || Date.now() - intent.createdAt >= CHECKOUT_TTL_MS);
+    if (wrongAccount || expired) { app.globalData.pendingMemberFollow = null; return null; }
+    return intent;
+  },
+
+  async restoreCheckoutContext() {
+    const generation = (this.checkoutGeneration || 0) + 1;
+    this.checkoutGeneration = generation;
+    if (!this.data.contextualCheckout || !this.data.boot) {
+      this.checkoutContext = null;
+      this.setData({ checkoutTarget: null, checkoutMessage: '', checkoutLoading: false });
+      return;
+    }
+    const identity = this.data.boot.identity;
+    const stored = this.ensureCheckoutStore().restore(identity, typeof currentCatalog === 'function' ? currentCatalog() : null);
+    if (['empty', 'expired', 'invalid', 'storage_failed'].includes(stored.status)) {
+      this.checkoutContext = null;
+      this.setData({ checkoutTarget: null, checkoutMessage: CHECKOUT_MESSAGES[stored.status] || '', checkoutLoading: false }, () => this.observeMembershipOffer());
+      return;
+    }
+    this.setData({ checkoutLoading: true });
+    try {
+      const catalog = typeof getCatalog === 'function' ? await getCatalog() : typeof currentCatalog === 'function' ? currentCatalog() : null;
+      if (this.pageRetired || generation !== this.checkoutGeneration || identity.userKey !== this.data.boot.identity.userKey) return;
+      this.checkoutCatalog = catalog;
+      const restored = this.ensureCheckoutStore().restore(identity, catalog);
+      this.checkoutContext = restored.context || null;
+      this.setData({ checkoutTarget: restored.context || null, checkoutMessage: CHECKOUT_MESSAGES[restored.status] || '', checkoutLoading: false }, () => this.observeMembershipOffer());
+    } catch (_) {
+      if (!this.pageRetired && generation === this.checkoutGeneration) this.setData({ checkoutTarget: null, checkoutMessage: '暂时无法确认所选配置，请刷新后重试。', checkoutLoading: false }, () => this.observeMembershipOffer());
+    }
+  },
+
+  currentCheckout() {
+    if (!this.data.contextualCheckout || !this.data.boot) return null;
+    const catalog = typeof currentCatalog === 'function' && currentCatalog() || this.checkoutCatalog;
+    const restored = this.ensureCheckoutStore().restore(this.data.boot.identity, catalog);
+    this.checkoutContext = restored.context || null;
+    this.setData({ checkoutTarget: restored.context || null, checkoutMessage: CHECKOUT_MESSAGES[restored.status] || '' });
+    return this.checkoutContext;
+  },
+
+  onContinueCheckout() {
+    if (this.pageRetired || !this.data.membership || !this.data.membership.active) return;
+    const intent = this.currentCheckout();
+    if (!intent || typeof getApp !== 'function') return;
+    getApp().globalData.pendingFollow = { partNumber: intent.partNumber, storeNumbers: intent.storeNumbers.slice(),
+      checkoutRevision: intent.revision, checkoutSignature: intent.targetSignature };
+    wx.switchTab({ url: '/pages/follow/index' });
+  },
+
+  onReturnToQuery() {
+    if (this.pageRetired || this.data.paymentBusy || this.data.paymentConfirming) return;
+    wx.switchTab({ url: '/pages/query/index' });
+  },
+
+  onTogglePurchaseFeedback() { this.setData({ showPurchaseFeedback: !this.data.showPurchaseFeedback }); },
+  onPurchaseFeedback(event) {
+    const code = event.currentTarget.dataset.code;
+    if (this.data.purchaseFeedbackSent || !PURCHASE_FEEDBACK.some(item => item.code === code)) return;
+    this.trackConversion('purchase_feedback', { reasonCode: code });
+    this.setData({ purchaseFeedbackSent: true });
+  },
+
+  trackConversion(eventName, fields = {}) {
+    try { conversion.track(eventName, { entryPoint: this.checkoutContext ? 'checkout' : 'mine', planId: this.data.selectedPlanId, ...fields }); } catch (_) { /* Optional diagnostics must not block purchases. */ }
+  },
+
+  disconnectOfferObserver() {
+    if (this.offerObserver) this.offerObserver.disconnect();
+    this.offerObserver = null;
+  },
+
+  observeMembershipOffer() {
+    this.disconnectOfferObserver();
+    if (this.pageRetired || this.pageVisible === false || !this.data.ready || !this.data.boot || this.data.checkoutLoading || !this.data.boot.features.growthEvents
+      || this.data.membership.active && !this.data.membershipUpgradeOpen && !this.data.paymentPendingId || typeof this.createIntersectionObserver !== 'function') return;
+    // Actual native visibility, never a synthetic exposure at bootstrap time.
+    this.offerObserver = this.createIntersectionObserver({ thresholds: [0, 0.01] });
+    this.offerObserver.relativeToViewport().observe('#membership-offer', result => {
+      if (this.pageRetired || this.pageVisible === false || !result || result.intersectionRatio <= 0) return;
+      const key = `${this.orderAccount()}|${this.data.selectedPlanId}|${this.checkoutContext ? this.checkoutContext.targetSignature : 'mine'}`;
+      if (!this.offerSeen) this.offerSeen = new Set();
+      if (this.offerSeen.has(key)) return;
+      this.offerSeen.add(key);
+      this.trackConversion('offer_viewed');
+      if (!this.data.boot.paymentReady) this.trackConversion('checkout_blocked', { reasonCode: this.data.boot.paymentCode, result: 'blocked' });
+    });
   },
 
   onTestNotification() {
@@ -537,10 +679,13 @@ Page({
   ensurePaymentController() {
     if (!this.paymentController) {
       this.paymentController = createPaymentController({ wx, call, makeId: typeof newId === 'function' ? () => newId('member') : undefined,
+      onDiagnostic: (eventName, fields) => this.trackConversion(eventName, fields),
+      onPriceChanged: product => this.applyPriceChange(product),
       onUpdate: patch => {
         if (this.pageRetired) return;
-        const { paymentPendingPlanId, ...view } = patch;
+        const { paymentPendingPlanId, paymentDiagnosticCode, ...view } = patch;
         this.paymentPendingPlanId = paymentPendingPlanId;
+        this.paymentDiagnosticCode = paymentDiagnosticCode;
         this.setData(view);
         if (hasKey(view, 'paymentPendingId')) this.setOrderRecords(this.data.orders);
         if (paymentPendingPlanId && paymentPendingPlanId !== this.data.selectedPlanId) this.selectMemberProduct(paymentPendingPlanId);
@@ -563,25 +708,45 @@ Page({
     return this.paymentController;
   },
 
+  applyPriceChange(product) {
+    if (this.pageRetired || !this.data.boot || !product || !Number.isSafeInteger(product.priceFen) || product.priceFen <= 0
+      || !Number.isInteger(product.days) || product.days <= 0) return;
+    const id = planId(product), products = this.data.boot.memberProducts.map(item => item.planId === id ? presentMemberProduct({ ...item, ...product }) : item);
+    invalidateBootstrap();
+    this.setData({ boot: { ...this.data.boot, memberProducts: products } });
+    this.selectMemberProduct(id);
+    this.setData({ paymentError: '套餐价格已更新，本次未发起付款。请核对当前金额后重新确认购买。' });
+  },
+
   async onBuyMembership() {
     if (this.pageRetired || this.data.redeeming || this.data.paymentBusy || this.data.paymentChecking || this.data.paymentConfirming || !this.data.ready || !this.data.boot || (!this.data.paymentPendingId && !this.data.boot.paymentReady)) return;
+    const targetRequired = !this.data.membership || !this.data.membership.active;
+    if (!this.data.paymentPendingId && targetRequired && (this.data.checkoutLoading || this.data.checkoutMessage)) return;
+    const checkout = this.currentCheckout();
+    if (!this.data.paymentPendingId && targetRequired && this.data.checkoutMessage) return;
+    const checkoutRevision = checkout && checkout.revision;
     const notice = this.data.boot.purchaseNotice;
     const selectedPlanId = this.data.selectedPlanId;
     const consentGeneration = this.paymentConsentGeneration || 0;
     const consentAccount = this.data.boot.identity.userKey;
     const consentOrder = this.data.paymentPendingId;
     const packageText = this.data.paymentOrderSummary || `${this.data.boot.memberProduct.days} 天会员 · ${this.data.boot.priceText}`;
+    const consentTerms = JSON.stringify({ priceFen: this.data.boot.memberProduct.priceFen, days: this.data.boot.memberProduct.days, notice });
+    const promotionNotice = !consentOrder && this.data.boot.memberProduct.promotionDeadlineText
+      ? `\n${this.data.boot.memberProduct.promotionDeadlineText}，截止后恢复标准价 ${fmt.fen(this.data.boot.memberProduct.standardPriceFen)}。` : '';
     const extension = renewalPreview(this.data.boot.memberProduct, this.data.membership);
     const extensionNotice = this.data.membership && this.data.membership.active
       ? `\n\n${extension.extensionText}，剩余有效期保留，不抵扣差价。${extension.expiresAtText ? '\n预计到期：' + extension.expiresAtText + '，以支付确认后的账户为准。' : ''}` : '';
     this.setData({ paymentConfirming: true });
-    const intent = typeof getApp === 'function' ? getApp().globalData.pendingMemberFollow : null;
+    this.trackConversion('offer_cta_clicked');
+    const intent = checkout || (!this.data.contextualCheckout ? this.legacyMemberFollow() : null);
     const confirmed = await new Promise(resolve => {
       if (typeof wx.showModal !== 'function') { resolve(false); return; }
       wx.showModal({
         title: '购买须知',
-        content: `${packageText}\n\n${notice}${extensionNotice}${intent ? '\n\n开通后继续为你关注：' + intent.title : ''}\n\n确认即表示已阅读并同意上述说明。`,
+        content: `${packageText}${promotionNotice}\n\n${notice}${extensionNotice}${intent ? '\n\n开通后继续设置关注：' + intent.title + (intent.storeText ? '\n门店：' + intent.storeText : '') + '\n提醒需你主动授权，保存前可再次确认。' : ''}\n\n确认即表示已阅读并同意上述说明。`,
         confirmText: '同意购买',
+        confirmColor: '#00C375',
         cancelText: '取消',
         success: result => resolve(Boolean(result.confirm)),
         fail: () => resolve(false),
@@ -592,6 +757,16 @@ Page({
     if (!confirmed || this.pageVisible === false || this.data.redeeming || selectedPlanId !== this.data.selectedPlanId
       || consentGeneration !== (this.paymentConsentGeneration || 0) || consentAccount !== this.data.boot.identity.userKey
       || consentOrder !== this.data.paymentPendingId) return;
+    const latestPackage = this.data.paymentOrderSummary || `${this.data.boot.memberProduct.days} 天会员 · ${this.data.boot.priceText}`;
+    const latestTerms = JSON.stringify({ priceFen: this.data.boot.memberProduct.priceFen, days: this.data.boot.memberProduct.days, notice: this.data.boot.purchaseNotice });
+    if (consentTerms !== latestTerms || packageText !== latestPackage) {
+      this.setData({ paymentError: '套餐金额或说明已更新，请查看当前内容后重新确认购买。' });
+      return;
+    }
+    if (checkoutRevision) {
+      const latest = this.currentCheckout();
+      if (!latest || latest.revision !== checkoutRevision || latest.targetSignature !== checkout.targetSignature) return;
+    }
     return this.ensurePaymentController().buy();
   },
 
@@ -685,9 +860,15 @@ Page({
 
   /** Offer the configuration a non-member tried to follow on the query page. */
   resumeMemberFollow(membership) {
+    if (this.data.contextualCheckout) {
+      if (membership && membership.active && !this.pageRetired) this.currentCheckout();
+      return; // The visible continuation button preserves explicit save/authorization consent.
+    }
     if (typeof getApp !== 'function') return;
-    const app = getApp(), intent = app.globalData.pendingMemberFollow;
+    const app = getApp(), intent = this.legacyMemberFollow();
     if (!intent || !membership || !membership.active || this.pageRetired) return;
+    const account = this.data.boot && this.data.boot.identity && this.data.boot.identity.userKey;
+    const generation = this.paymentConsentGeneration || 0;
     app.globalData.pendingMemberFollow = null;
     wx.showModal({
       title: '会员已开通',
@@ -695,7 +876,8 @@ Page({
       confirmText: '去关注',
       cancelText: '稍后',
       success: r => {
-        if (!r.confirm) return;
+        if (!r.confirm || this.pageRetired || this.pageVisible === false || generation !== (this.paymentConsentGeneration || 0)
+          || account !== (this.data.boot && this.data.boot.identity && this.data.boot.identity.userKey)) return;
         app.globalData.pendingFollow = { partNumber: intent.partNumber, storeNumbers: intent.storeNumbers.slice() };
         wx.switchTab({ url: '/pages/follow/index' });
       },
@@ -1035,11 +1217,15 @@ Page({
   },
 
   onHelp() {
-    wx.showModal({
-      title: '使用说明',
-      content: `1. 查询：选择具体配置与门店，免费查询消耗 ${this.data.quota.queryCost} 次，接口失败按服务端规则返还；请求繁忙或数据源限流时需稍后重试。\n2. 次数：每日签到和体验任务可获取次数，每日最多 ${this.data.quota.dailyGrantCap} 次，累计上限 ${this.data.quota.balanceCap} 次。\n3. 会员：查询不扣次数，周卡可关注 3 个配置，每配置 3 家门店；月卡、年卡为 4 个配置，每配置 4 家门店；颜色或容量不同分别占用名额。关注与到货、断货提醒均为会员专属。该产品为一次性虚拟服务，一经售出不予退款。\n4. 提醒：会员可累加提醒次数，需授权微信订阅消息，每次「允许」增加 1 次，开通会员不等于无限接收提醒。\n5. 新品：受限新品开售 30 天内，免费用户不可实时查询，只能看昨天及更早历史。`,
-      showCancel: false,
+    if (!this.pageRetired) wx.navigateTo({ url: '/pages/guide/index' });
+  },
+
+  onOpenOrders() {
+    if (this.pageRetired) return;
+    this.setData({ showOrders: true }, () => {
+      if (typeof wx.pageScrollTo === 'function') wx.pageScrollTo({ selector: '#membership-records', duration: 200 });
     });
+    return this.loadOrders();
   },
 
   onDisclaimer() {

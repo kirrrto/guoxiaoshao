@@ -22,7 +22,7 @@ test('purchase notice is a non-refundable one-time virtual service and empty not
   assert.equal(purchaseNotice({}), DEFAULT_PURCHASE_NOTICE);
 });
 
-function runtime({ storage = new Map(), handler, platform = 'android', supported = true, login, cashier, nextProduct = product, account = 'wx-app:account-a' } = {}) {
+function runtime({ storage = new Map(), handler, platform = 'android', supported = true, login, cashier, nextProduct = product, account = 'wx-app:account-a', onDiagnostic, onPriceChanged } = {}) {
   const calls = [], logins = [], payments = [], resolved = [], updates = [], timers = new Map(); let sequence = 0, timerId = 0;
   const wx = {
     getDeviceInfo: () => ({ platform }), canIUse: () => supported,
@@ -37,6 +37,7 @@ function runtime({ storage = new Map(), handler, platform = 'android', supported
     return action === 'member.createOrder' ? { ok: true, order, payment: signed } : { order, membership: free };
   };
   const controller = createPaymentController({ wx, call, onUpdate: patch => updates.push(patch), onResolved: value => resolved.push(value),
+    onDiagnostic, onPriceChanged,
     makeId: () => `pay-test-order-${++sequence}`, setTimer: (fn, ms) => { const id = ++timerId; timers.set(id, { fn, ms }); return id; }, clearTimer: id => timers.delete(id) });
   controller.sync({ userKey: account }, nextProduct);
   return { controller, calls, logins, payments, resolved, updates, timers, wx, storage,
@@ -128,7 +129,7 @@ test('monthly intent survives a lost response, restart and a changed selected pl
   const first = runtime({ nextProduct: monthly, handler: () => { throw { code: 'call_failed' }; } });
   await first.controller.show(); await first.controller.buy();
   assert.equal(first.calls[0].payload.planId, 'member_30d');
-  assert.deepEqual([...first.storage.values()][0], { orderId: 'pay-test-order-1', planId: 'member_30d' });
+  assert.deepEqual([...first.storage.values()][0], { orderId: 'pay-test-order-1', planId: 'member_30d', expectedPriceFen: 1990 });
   first.controller.dispose();
   const next = runtime({ storage: first.storage, nextProduct: { ...product, id: 'member_365d', planId: 'member_365d', days: 365, priceFen: 20000 },
     handler: (action, payload) => {
@@ -141,6 +142,7 @@ test('monthly intent survives a lost response, restart and a changed selected pl
   const retry = next.calls.find(item => item.action === 'member.createOrder');
   assert.equal(retry.payload.orderId, 'pay-test-order-1');
   assert.equal(retry.payload.planId, 'member_30d');
+  assert.equal(retry.payload.expectedPriceFen, 1990);
   assert.equal(next.state().paymentPendingPlanId, 'member_30d');
   assert.equal(next.state().paymentOrderSummary, '30 天会员 · ¥19.90');
 });
@@ -159,10 +161,110 @@ test('checked original order overrides a restored plan hint before reopening the
 test('annual intent uses 365 days in fallback purchase notice and never stores credentials', async () => {
   const annual = { ...product, id: 'member_365d', planId: 'member_365d', days: 365, priceFen: 20000 };
   assert.match(purchaseNotice(annual), /一次购买 365 天/);
-  const rt = runtime({ nextProduct: annual, cashier: options => options.fail({ errMsg: 'cancel' }) });
+  const rt = runtime({ nextProduct: annual, handler: (action, payload) => ({ ok: true,
+    order: { orderId: payload.orderId, planId: 'member_365d', days: 365, amountFen: 20000, status: 'created' }, payment: signed }),
+    cashier: options => options.fail({ errMsg: 'cancel' }) });
   await rt.controller.show(); await rt.controller.buy();
   assert.equal(rt.calls[0].payload.planId, 'member_365d');
-  assert.deepEqual(Object.keys([...rt.storage.values()][0]).sort(), ['orderId', 'planId']);
+  assert.equal(rt.calls[0].payload.expectedPriceFen, 20000);
+  assert.equal(rt.payments.length, 1);
+  assert.deepEqual(Object.keys([...rt.storage.values()][0]).sort(), ['expectedPriceFen', 'orderId', 'planId']);
+});
+
+test('a safely cancelled changed quote clears only that intent and needs another explicit buy at the new price', async () => {
+  const monthly = { ...product, id: 'member_30d', planId: 'member_30d', days: 30, priceFen: 1499 };
+  const current = { ...monthly, priceFen: 3000 };
+  let creates = 0, refreshes = 0;
+  const rt = runtime({ nextProduct: monthly,
+    onPriceChanged: value => { refreshes++; assert.equal(value.priceFen, 3000); rt.controller.sync({ userKey: 'wx-app:account-a' }, value); },
+    handler: (action, payload) => {
+      assert.equal(action, 'member.createOrder');
+      if (++creates === 1) throw { code: 'payment_price_changed', details: { product: current, orderId: payload.orderId, canDiscardIntent: true, reason: 'quote_expired' } };
+      return { ok: true, order: { orderId: payload.orderId, planId: 'member_30d', days: 30, amountFen: 3000, status: 'created' }, payment: signed };
+    }, cashier: options => options.fail({ errMsg: 'cancel' }) });
+  await rt.controller.show(); await rt.controller.buy();
+  assert.equal(refreshes, 1); assert.equal(creates, 1); assert.equal(rt.payments.length, 0);
+  assert.equal(rt.storage.size, 0); assert.equal(rt.state().paymentPendingId, '');
+  assert.match(rt.state().paymentError, /未发起付款.*重新确认/);
+  await rt.controller.show(); assert.equal(creates, 1, 'returning to the page cannot purchase automatically');
+  await rt.controller.buy();
+  assert.equal(rt.payments.length, 1);
+  assert.deepEqual(rt.calls.map(value => value.payload.expectedPriceFen), [1499, 3000]);
+  assert.notEqual(rt.calls[0].payload.orderId, rt.calls[1].payload.orderId);
+});
+
+test('price-change errors without matching cancellation evidence retain the recoverable original intent', async () => {
+  for (const details of [{}, { canDiscardIntent: false, orderId: 'pay-test-order-1' }, { canDiscardIntent: true, orderId: 'another-order' }]) {
+    let refreshes = 0;
+    const rt = runtime({ nextProduct: { ...product, id: 'member_30d', planId: 'member_30d', days: 30, priceFen: 1499 },
+      onPriceChanged: () => refreshes++, handler: () => { throw { code: 'payment_price_changed', details }; } });
+    await rt.controller.show(); await rt.controller.buy();
+    assert.equal(rt.storage.size, 1); assert.equal(rt.state().paymentPendingId, 'pay-test-order-1');
+    assert.equal(rt.payments.length, 0); assert.equal(refreshes, 0); assert.equal(rt.calls.length, 1);
+  }
+});
+
+test('a prepared historical monthly order remains at its original amount and can only reconcile after the price changes', async () => {
+  const storage = new Map([[STORAGE_PREFIX + encodeURIComponent('wx-app:account-a'),
+    { orderId: 'historical-monthly-order', planId: 'member_30d', expectedPriceFen: 1990 }]]);
+  const rt = runtime({ storage, nextProduct: { ...product, id: 'member_30d', planId: 'member_30d', days: 30, priceFen: 1499 },
+    handler: (action, payload) => {
+      const order = { orderId: payload.orderId, planId: 'member_30d', days: 30, amountFen: 1990, status: 'created', paymentPreparedAt: '2026-10-01T00:00:00Z' };
+      return action === 'member.createOrder' ? { ok: true, order, payment: null } : { order, membership: free };
+    } });
+  await rt.controller.show(); await rt.controller.buy();
+  assert.equal(rt.calls.find(value => value.action === 'member.createOrder').payload.expectedPriceFen, 1990);
+  assert.equal(rt.payments.length, 0); assert.equal(rt.storage.size, 1);
+  assert.equal(rt.state().paymentOrderSummary, '30 天会员 · ¥19.90');
+});
+
+test('an old unknown monthly intent never borrows the current offer price as previous consent', async () => {
+  const storage = new Map([[STORAGE_PREFIX + encodeURIComponent('wx-app:account-a'), { orderId: 'legacy-monthly-order', planId: 'member_30d' }]]);
+  const rt = runtime({ storage, nextProduct: { ...product, id: 'member_30d', planId: 'member_30d', days: 30, priceFen: 1499 },
+    handler: (action, payload) => {
+      if (action === 'member.checkOrder') throw { code: 'unknown_order' };
+      assert.equal(Object.hasOwn(payload, 'expectedPriceFen'), false);
+      throw { code: 'payment_price_changed', details: { orderId: payload.orderId, canDiscardIntent: true, reason: 'confirmation_required' } };
+    } });
+  await rt.controller.show(); await rt.controller.buy();
+  assert.equal(rt.payments.length, 0); assert.equal(rt.storage.size, 0);
+  assert.match(rt.state().paymentError, /重新确认/);
+});
+
+test('a lookup that first discovers an original amount requires another explicit confirmation before login', async () => {
+  let reads = 0;
+  const storage = new Map([[STORAGE_PREFIX + encodeURIComponent('wx-app:account-a'), { orderId: 'unknown-amount-order', planId: 'member_30d' }]]);
+  const rt = runtime({ storage, nextProduct: { ...product, id: 'member_30d', planId: 'member_30d', days: 30, priceFen: 1499 },
+    handler: () => {
+      if (++reads === 1) throw { code: 'call_failed' };
+      return { order: { orderId: 'unknown-amount-order', planId: 'member_30d', days: 30, amountFen: 1990, status: 'created' }, membership: free };
+    } });
+  await rt.controller.show(); await rt.controller.buy();
+  assert.equal(rt.logins.length, 0); assert.equal(rt.payments.length, 0);
+  assert.equal(rt.state().paymentOrderSummary, '30 天会员 · ¥19.90');
+  assert.match(rt.state().paymentMessage, /重新确认/);
+});
+
+test('a create response with a different amount never opens the cashier under the earlier quote', async () => {
+  const rt = runtime({ nextProduct: { ...product, id: 'member_30d', planId: 'member_30d', days: 30, priceFen: 1499 },
+    handler: (action, payload) => ({ ok: true, order: { orderId: payload.orderId, planId: 'member_30d', days: 30, amountFen: 3000, status: 'created' }, payment: signed }) });
+  await rt.controller.show(); await rt.controller.buy();
+  assert.equal(rt.payments.length, 0); assert.equal(rt.storage.size, 1);
+  assert.equal(rt.state().paymentOrderSummary, '30 天会员 · ¥30.00');
+  assert.match(rt.state().paymentMessage, /金额不同.*重新确认/);
+});
+
+test('a late price-change response from account A cannot refresh B or clear either account intent', async () => {
+  const result = deferred(); let refreshes = 0;
+  const monthly = { ...product, id: 'member_30d', planId: 'member_30d', days: 30, priceFen: 1499 };
+  const rt = runtime({ nextProduct: monthly, handler: () => result.promise, onPriceChanged: () => refreshes++ });
+  await rt.controller.show(); const buying = rt.controller.buy(); await tick();
+  rt.storage.set(STORAGE_PREFIX + encodeURIComponent('wx-app:account-b'), { orderId: 'account-b-existing', planId: 'member_30d', expectedPriceFen: 3000 });
+  rt.controller.sync({ userKey: 'wx-app:account-b' }, { ...monthly, priceFen: 3000 });
+  result.reject({ code: 'payment_price_changed', details: { product: { ...monthly, priceFen: 3000 }, orderId: 'pay-test-order-1', canDiscardIntent: true } });
+  await buying;
+  assert.equal(refreshes, 0); assert.equal(rt.storage.size, 2); assert.equal(rt.payments.length, 0);
+  assert.equal(rt.state().paymentPendingId, 'account-b-existing');
 });
 
 test('a plan corrected by the retry lookup requires a fresh explicit purchase confirmation', async () => {
@@ -261,6 +363,51 @@ test('known old iOS or WeChat versions are blocked before order creation while u
     assert.equal(availability.ready, ready);
     if (!ready) { assert.match(availability.reason, hint); await rt.controller.show(); await rt.controller.buy(); assert.equal(rt.calls.length, 0); }
   }
+});
+
+test('availability exposes stable factual blocking codes and sanitized device capabilities', () => {
+  const android = { getDeviceInfo: () => ({ platform: 'android', system: 'Android 16', model: 'private-model' }),
+    getAppBaseInfo: () => ({ version: '8.0.70', SDKVersion: '3.10.3' }), requestVirtualPayment() {} };
+  const ios = { ...android, getDeviceInfo: () => ({ platform: 'ios', system: 'iOS 18' }) };
+  for (const [selected, api, code] of [
+    [{ ...product, enabled: false }, android, 'payment_not_enabled'],
+    [{ ...product, paymentReady: false }, android, 'payment_server_not_ready'],
+    [{ ...product, paymentReady: false, paymentReason: 'payment_product_id_missing' }, android, 'payment_product_id_missing'],
+    [{ ...product, paymentReady: false, paymentReason: 'payment_plan_disabled' }, android, 'payment_plan_disabled'],
+    [product, { ...android, getDeviceInfo: () => ({ platform: 'devtools' }) }, 'payment_devtools'],
+    [{ ...product, iosEnabled: false }, ios, 'payment_ios_disabled'],
+    [product, { ...ios, getDeviceInfo: () => ({ platform: 'ios', system: 'iOS 14.8' }) }, 'payment_ios_version_low'],
+    [product, { ...ios, getAppBaseInfo: () => ({ version: '8.0.67' }) }, 'payment_wechat_version_low'],
+    [product, { ...android, requestVirtualPayment: undefined }, 'payment_api_unavailable'],
+    [product, { ...android, getDeviceInfo: () => { throw Error('private raw data'); } }, 'payment_capability_unknown'],
+  ]) {
+    const result = paymentAvailability(selected, api); assert.equal(result.ready, false); assert.equal(result.code, code);
+    assert.doesNotMatch(JSON.stringify(result), /private-model|private raw data|Apple ID/);
+  }
+  const ready = paymentAvailability(product, android);
+  assert.deepEqual(ready.capabilities, { platform: 'android', clientVersion: '8.0.70', sdkVersion: '3.10.3', apiAvailable: true, systemVersion: '16' });
+  assert.equal(ready.ready, true);
+});
+
+test('cashier diagnostics carry no raw credentials and telemetry failure cannot interrupt a payment', async () => {
+  const events = [];
+  const rt = runtime({ onDiagnostic: (name, fields) => events.push({ name, fields }),
+    cashier: options => options.fail({ errMsg: 'network not available; secret-token', errCode: -999 }) });
+  await rt.controller.show(); await rt.controller.buy();
+  assert.deepEqual(events.map(item => item.name), ['cashier_invoked', 'cashier_result']);
+  assert.equal(events[1].fields.result, 'unknown'); assert.equal(events[1].fields.reasonCode, 'cashier_result_unknown');
+  assert.doesNotMatch(JSON.stringify(events), /secret|signData|login|orderId/);
+  const noisy = runtime({ onDiagnostic: () => { throw Error('analytics offline'); } });
+  await noisy.controller.show(); await noisy.controller.buy();
+  assert.equal(noisy.payments.length, 1); assert.equal(noisy.resolved.length, 0, 'cashier success is not entitlement evidence');
+});
+
+test('preflight blocked diagnostics occur without persisting an order or starting login', async () => {
+  const events = [];
+  const rt = runtime({ nextProduct: { ...product, paymentReady: false }, onDiagnostic: (name, fields) => events.push({ name, fields }) });
+  await rt.controller.show(); await rt.controller.buy();
+  assert.equal(rt.storage.size, 0); assert.equal(rt.logins.length, 0); assert.equal(rt.calls.length, 0);
+  assert.deepEqual(events, [{ name: 'checkout_blocked', fields: { planId: 'member_7d', reasonCode: 'payment_server_not_ready', result: 'blocked' } }]);
 });
 
 test('disposing during create-order response prevents a late payment window and keeps recovery for a new page', async () => {
@@ -412,7 +559,7 @@ test('purchase confirmation cannot move to another account, hidden page or a rep
   }
 });
 
-test('an iPhone cashier failure explains the Apple ID requirement and the order can then be abandoned', async () => {
+test('an unknown iPhone cashier failure retains the original order without inventing an Apple ID cause', async () => {
   let abandoned = false;
   const handler = async (action, payload) => {
     if (action === 'member.createOrder') return { ok: true, order: { orderId: payload.orderId, status: 'created' }, payment: signed };
@@ -421,8 +568,9 @@ test('an iPhone cashier failure explains the Apple ID requirement and the order 
   };
   const rt = runtime({ platform: 'ios', handler, cashier: options => options.fail({ errMsg: 'requestVirtualPayment:fail system error', errCode: -1 }) });
   await rt.controller.show(); await rt.controller.buy();
-  assert.match(rt.state().paymentError, /中国大陆地区的 Apple ID/);
-  assert.match(rt.state().paymentError, /放弃这笔订单/);
+  assert.doesNotMatch(rt.state().paymentError, /Apple ID|中国大陆|地区/);
+  assert.match(rt.state().paymentError, /尚未确认.*原订单/);
+  assert.equal(rt.state().paymentDiagnosticCode, 'cashier_result_unknown');
   assert.equal(rt.state().paymentPendingId, 'pay-test-order-1');
   await rt.controller.abandon();
   assert.equal(abandoned, true);

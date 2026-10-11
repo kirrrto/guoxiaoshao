@@ -1,10 +1,10 @@
 // The server owns prices, signatures and membership fulfilment. This module
-// persists only an account-scoped order reference, never login codes/signatures.
+// persists an account-scoped order reference and confirmed public quote, never login codes/signatures.
 const STORAGE_PREFIX = 'gxs_member_payment_v1:';
 const { planId } = require('./member-products');
 const ORDER_ID = /^[A-Za-z0-9_-]{8,64}$/;
 const POLL_DELAYS = [1500, 3000, 5000];
-const INITIAL = { paymentBusy: false, paymentChecking: false, paymentPendingId: '', paymentPendingPlanId: '', paymentOrderSummary: '', paymentCanRetry: false, paymentMessage: '', paymentError: '' };
+const INITIAL = { paymentBusy: false, paymentChecking: false, paymentPendingId: '', paymentPendingPlanId: '', paymentOrderSummary: '', paymentCanRetry: false, paymentMessage: '', paymentError: '', paymentDiagnosticCode: '' };
 const DEFAULT_PURCHASE_NOTICE = '该产品为一次性虚拟服务，一经售出不予退款。一次购买 7 天，已有会员按剩余有效期顺延，不自动续费。';
 
 function purchaseNotice(product = {}) {
@@ -23,26 +23,43 @@ function knownVersionBelow(value, minimum) {
 }
 
 function paymentAvailability(product = {}, wxApi = {}) {
-  if (!product.enabled || !product.paymentReady) return { ready: false, reason: ['payment_product_id_missing', 'payment_plan_disabled'].includes(product.paymentReason)
-    ? '此套餐暂未开放购买，请选择其他套餐。' : '会员付费购买暂未开放，兑换码开通仍可使用。' };
-  let info = {};
-  try { info = wxApi.getDeviceInfo ? wxApi.getDeviceInfo() : wxApi.getSystemInfoSync ? wxApi.getSystemInfoSync() : {}; } catch (_) { /* Use capability detection below. */ }
-  if (info.platform === 'devtools') return { ready: false, reason: '请在手机微信中打开小程序购买会员。' };
-  if (info.platform === 'ios' && product.iosEnabled === false) return { ready: false, reason: 'iPhone 购买暂未开放，兑换码开通仍可使用。' };
+  let info = {}, base = {}, capabilityError = false;
+  try {
+    info = (wxApi.getDeviceInfo ? wxApi.getDeviceInfo() : wxApi.getSystemInfoSync ? wxApi.getSystemInfoSync() : {}) || {};
+    base = (wxApi.getAppBaseInfo ? wxApi.getAppBaseInfo() : wxApi.getSystemInfoSync ? wxApi.getSystemInfoSync() : info) || {};
+  } catch (_) { capabilityError = true; }
+  const safeVersion = value => typeof value === 'string' && /^\d+(?:\.\d+){0,3}$/.test(value) ? value : '';
+  const capabilities = { platform: ['ios', 'android', 'windows', 'mac', 'devtools', 'ohos'].includes(info.platform) ? info.platform : 'unknown',
+    clientVersion: safeVersion(base.version), sdkVersion: safeVersion(base.SDKVersion), apiAvailable: typeof wxApi.requestVirtualPayment === 'function' };
+  const systemMatch = String(info.system || '').match(/^(?:iOS|iPhone OS|Android|Windows|macOS|HarmonyOS)\s+(\d+(?:[._]\d+)*)/i);
+  capabilities.systemVersion = systemMatch ? safeVersion(systemMatch[1].replace(/_/g, '.')) : '';
+  const blocked = (code, reason) => ({ ready: false, code, reason, capabilities });
+  if (!product.enabled || !product.paymentReady) {
+    const code = ['payment_product_id_missing', 'payment_plan_disabled'].includes(product.paymentReason) ? product.paymentReason
+      : product.paymentReason === 'payment_not_enabled' || !product.enabled ? 'payment_not_enabled' : 'payment_server_not_ready';
+    return blocked(code, ['payment_product_id_missing', 'payment_plan_disabled'].includes(code)
+      ? '此套餐暂未开放购买，请选择其他套餐。' : '会员付费购买暂未开放，兑换码开通仍可使用。');
+  }
+  if (info.platform === 'devtools') return blocked('payment_devtools', '开发者工具无法验证付款，请在手机微信中打开小程序。');
+  if (info.platform === 'ios' && product.iosEnabled === false) return blocked('payment_ios_disabled', 'iPhone 购买暂未开放，兑换码开通仍可使用。');
+  if (capabilityError) return blocked('payment_capability_unknown', '暂时无法确认当前设备的支付能力，请重新打开小程序后再试。');
   let supported = typeof wxApi.requestVirtualPayment === 'function';
   try {
-    const base = wxApi.getAppBaseInfo ? wxApi.getAppBaseInfo() : wxApi.getSystemInfoSync ? wxApi.getSystemInfoSync() : info;
     if (info.platform === 'ios') {
       const system = String(info.system || '').match(/^(?:iOS|iPhone OS)\s+(\d+(?:[._]\d+)*)/i);
-      if (system && knownVersionBelow(system[1].replace(/_/g, '.'), '15')) return { ready: false, reason: '请将 iPhone 更新到 iOS 15 或更高版本后再购买。' };
-      if (knownVersionBelow(base.version, '8.0.68')) return { ready: false, reason: '请将微信更新到 8.0.68 或更高版本后再购买。' };
+      // Preserve the existing gate until official mini-program documentation and
+      // device acceptance can be verified. Missing versions are not guessed.
+      if (system && knownVersionBelow(system[1].replace(/_/g, '.'), '15')) return blocked('payment_ios_version_low', '请将 iPhone 更新到 iOS 15 或更高版本后再购买。');
+      if (knownVersionBelow(base.version, '8.0.68')) return blocked('payment_wechat_version_low', '请将微信更新到 8.0.68 或更高版本后再购买。');
     }
     const version = String(base.SDKVersion || '').split('.').map(Number);
     const modernSdk = version[0] > 2 || (version[0] === 2 && (version[1] > 19 || (version[1] === 19 && version[2] >= 2)));
     if (!modernSdk && wxApi.canIUse && !wxApi.canIUse('requestVirtualPayment')) supported = false;
-  } catch (_) { supported = false; }
-  if (!supported) return { ready: false, reason: info.platform === 'ios' ? '当前 iPhone 的微信或系统版本暂不支持购买，请更新后重试。' : '当前微信版本暂不支持购买，请更新微信后重试。' };
-  return { ready: true, reason: '' };
+  } catch (_) { return blocked('payment_capability_unknown', '暂时无法确认当前设备的支付能力，请重新打开小程序后再试。'); }
+  if (!supported) return blocked('payment_api_unavailable', ['windows', 'mac'].includes(info.platform)
+    ? '当前电脑微信未提供此付款能力，所选配置可保留；请在手机微信中重新打开小程序确认。'
+    : '当前微信未提供此付款能力，请更新微信后重新打开小程序。');
+  return { ready: true, code: '', reason: '', capabilities };
 }
 
 function paymentErrorText(error) {
@@ -51,18 +68,15 @@ function paymentErrorText(error) {
   if (code === 'payment_storage_failed') return '无法保存订单信息，本次未发起支付。请检查手机存储后重试。';
   if (code === 'payment_login_failed') return '微信身份确认未完成，请重试这笔订单。';
   if (code === 'payment_runtime_unsupported') return '当前微信或系统版本暂不支持购买，请更新后重试。';
+  if (code === 'payment_price_changed') return '套餐价格已更新，本次未发起付款。请核对当前金额后重新确认购买。';
   if (code === 'unknown_order') return '这笔订单尚未查询到，可以继续查询，或点击继续支付重试同一笔订单。';
   if (code === 'payment_check_pending' || code === 'payment_pending') return '支付正在确认中，请稍后查询，勿重复下单。';
   return '支付结果暂未确认。请查询这笔订单的结果，勿重复下单。';
 }
 
-/** The cashier failed without a cancel. On iPhone this is usually a non-mainland Apple ID. */
-function cashierFailureText(wxApi) {
-  let platform = '';
-  try { platform = (wxApi.getDeviceInfo ? wxApi.getDeviceInfo() : wxApi.getSystemInfoSync()).platform; } catch (_) { /* Use the general wording. */ }
-  return platform === 'ios'
-    ? '微信支付未能完成。iPhone 需要使用中国大陆地区的 Apple ID 才能付款；如果没有扣款，可以放弃这笔订单，改用安卓手机购买或使用兑换码。'
-    : '微信支付未能完成。如果没有扣款，可以放弃这笔订单后重新购买。';
+/** A generic callback cannot prove an Apple ID region or the final payment state. */
+function cashierFailureText() {
+  return '付款结果尚未确认，请查询原订单。若已扣款，请勿重复购买；会员状态以服务端核实为准。';
 }
 
 function membershipValid(value) {
@@ -70,22 +84,26 @@ function membershipValid(value) {
     && (Number.isFinite(Date.parse(value.expiresAt)) || (!value.active && value.expiresAt === null));
 }
 
-function createPaymentController({ wx: wxApi, call, onUpdate, onResolved, setTimer = setTimeout, clearTimer = clearTimeout, makeId = () => `pay-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 12)}` }) {
+function createPaymentController({ wx: wxApi, call, onUpdate, onResolved, onDiagnostic = () => {}, onPriceChanged = () => {}, setTimer = setTimeout, clearTimer = clearTimeout, makeId = () => `pay-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 12)}` }) {
   let account = '', pendingId = '', pendingPlanId = '', generation = 0, pollGeneration = 0, disposed = false, visible = false;
+  let pendingPriceFen = null;
   let busy = false, checking = false, timer = null, product = {}, state = { ...INITIAL };
   const emit = patch => { if (!disposed) { state = { ...state, ...patch }; onUpdate({ ...state }); } };
+  const diagnose = (eventName, fields) => { try { onDiagnostic(eventName, fields); } catch (_) { /* Analytics never owns payment. */ } };
   const current = version => !disposed && generation === version;
   const key = () => STORAGE_PREFIX + encodeURIComponent(account);
   const stopPolling = () => { pollGeneration++; if (timer !== null) clearTimer(timer); timer = null; checking = false; emit({ paymentChecking: false }); };
   const forget = () => {
     try { wxApi.removeStorageSync(key()); } catch (_) { /* A restored terminal order is safely checked again. */ }
-    pendingId = ''; pendingPlanId = ''; emit({ paymentPendingId: '', paymentPendingPlanId: '', paymentOrderSummary: '', paymentCanRetry: false });
+    pendingId = ''; pendingPlanId = ''; pendingPriceFen = null; emit({ paymentPendingId: '', paymentPendingPlanId: '', paymentOrderSummary: '', paymentCanRetry: false });
   };
   const save = (orderId, selectedPlanId) => {
     try {
-      wxApi.setStorageSync(key(), { orderId, ...(selectedPlanId !== 'member_7d' ? { planId: selectedPlanId } : {}) });
+      const expectedPriceFen = selectedPlanId !== 'member_7d' && Number.isSafeInteger(product.priceFen) && product.priceFen > 0 ? product.priceFen : null;
+      wxApi.setStorageSync(key(), { orderId, ...(selectedPlanId !== 'member_7d' ? { planId: selectedPlanId, ...(expectedPriceFen ? { expectedPriceFen } : {}) } : {}) });
       const saved = wxApi.getStorageSync(key());
-      if (!saved || saved.orderId !== orderId || (saved.planId || 'member_7d') !== selectedPlanId) throw Error('not_saved');
+      if (!saved || saved.orderId !== orderId || (saved.planId || 'member_7d') !== selectedPlanId || expectedPriceFen && saved.expectedPriceFen !== expectedPriceFen) throw Error('not_saved');
+      pendingPriceFen = expectedPriceFen;
     } catch (_) { throw { code: 'payment_storage_failed' }; }
     pendingId = orderId; pendingPlanId = selectedPlanId;
     emit({ paymentPendingId: orderId, paymentPendingPlanId: selectedPlanId });
@@ -93,7 +111,8 @@ function createPaymentController({ wx: wxApi, call, onUpdate, onResolved, setTim
   const observeOrder = order => {
     // A restored reference is only a hint; the checked server order is authoritative.
     if (order.planId && ['member_7d', 'member_30d', 'member_365d'].includes(order.planId)) pendingPlanId = order.planId;
-    try { wxApi.setStorageSync(key(), { orderId: pendingId, ...(pendingPlanId !== 'member_7d' ? { planId: pendingPlanId } : {}) }); } catch (_) { /* Existing reference still permits a safe server lookup. */ }
+    if (Number.isSafeInteger(order.amountFen) && order.amountFen > 0) pendingPriceFen = order.amountFen;
+    try { wxApi.setStorageSync(key(), { orderId: pendingId, ...(pendingPlanId !== 'member_7d' ? { planId: pendingPlanId, ...(pendingPriceFen ? { expectedPriceFen: pendingPriceFen } : {}) } : {}) }); } catch (_) { /* Existing reference still permits a safe server lookup. */ }
     emit({ paymentPendingPlanId: pendingPlanId, paymentOrderSummary: Number.isInteger(order.days) && order.days > 0 && Number.isInteger(order.amountFen) && order.amountFen > 0
       ? `${order.days} 天会员 · ¥${(order.amountFen / 100).toFixed(2)}` : '' });
   };
@@ -145,20 +164,21 @@ function createPaymentController({ wx: wxApi, call, onUpdate, onResolved, setTim
     const version = generation;
     const selectedPlanId = planId(product);
     const availability = paymentAvailability(pendingId ? { ...product, enabled: true, paymentReady: true } : product, wxApi);
-    if (!availability.ready) { emit({ paymentError: availability.reason }); return; }
+    if (!availability.ready) { emit({ paymentError: availability.reason, paymentDiagnosticCode: availability.code }); diagnose('checkout_blocked', { planId: selectedPlanId, reasonCode: availability.code, result: 'blocked' }); return; }
     stopPolling();
     // A retry always checks the same order first; a paid/unknown-result order
     // must never reopen the cashier or silently become another purchase.
     if (pendingId) {
       const confirmedPlanId = pendingPlanId;
+      const confirmedPriceFen = pendingPriceFen;
       const outcome = await check();
       if (!current(version) || !['created', 'unknown'].includes(outcome) || busy || checking) return;
-      if (pendingPlanId !== confirmedPlanId) {
+      if (pendingPlanId !== confirmedPlanId || pendingPriceFen !== confirmedPriceFen) {
         emit({ paymentMessage: '原订单套餐已核实，请查看上方金额与时长后重新确认继续支付。', paymentCanRetry: true });
         return;
       }
     }
-    busy = true; emit({ paymentBusy: true, paymentError: '', paymentCanRetry: false, paymentMessage: '正在准备订单…' });
+    busy = true; emit({ paymentBusy: true, paymentError: '', paymentDiagnosticCode: '', paymentCanRetry: false, paymentMessage: '正在准备订单…' });
     let confirmAfter = true;
     try {
       if (!pendingId) {
@@ -175,8 +195,9 @@ function createPaymentController({ wx: wxApi, call, onUpdate, onResolved, setTim
       if (!current(version)) return;
       if (!visible) { emit({ paymentMessage: '操作已暂停，订单号已保留。返回后请先查询订单状态。', paymentCanRetry: false }); return; }
       const requestedPlanId = pendingPlanId;
+      const expectedPriceFen = pendingPlanId === 'member_7d' ? null : pendingPriceFen;
       const result = await call('member.createOrder', { orderId, loginCode: login,
-        ...(pendingPlanId !== 'member_7d' ? { planId: pendingPlanId } : {}) });
+        ...(pendingPlanId !== 'member_7d' ? { planId: pendingPlanId, ...(expectedPriceFen ? { expectedPriceFen } : {}) } : {}) });
       if (!current(version)) return;
       if (result && result.ok === false && result.reason === 'payment_pending') {
         emit({ paymentMessage: '支付正在确认中，请查询这笔订单的结果，勿重复下单。', paymentError: '', paymentCanRetry: false });
@@ -194,21 +215,40 @@ function createPaymentController({ wx: wxApi, call, onUpdate, onResolved, setTim
         emit({ paymentMessage: '原订单套餐已核实，请查看上方金额与时长后重新确认继续支付。', paymentCanRetry: true });
         return;
       }
+      if (requestedPlanId !== 'member_7d' && (expectedPriceFen === null || result.order.amountFen !== expectedPriceFen)) {
+        emit({ paymentMessage: '订单金额与刚才确认的金额不同，请核对原订单后重新确认。', paymentCanRetry: true });
+        return;
+      }
       if (!visible) { emit({ paymentMessage: '操作已暂停，订单号已保留。返回后请先查询订单状态。', paymentCanRetry: false }); return; }
       const payment = result.payment;
       if (!payment || ['mode', 'signData', 'paySig', 'signature'].some(name => typeof payment[name] !== 'string' || !payment[name])) throw { code: 'payment_check_pending' };
       emit({ paymentMessage: '请在微信支付窗口确认。' });
+      diagnose('cashier_invoked', { planId: pendingPlanId });
       await new Promise((resolve, reject) => {
         wxApi.requestVirtualPayment({ mode: payment.mode, signData: payment.signData, paySig: payment.paySig, signature: payment.signature,
           success: resolve, fail: error => reject({ ...error, cashier: true }) });
       });
-      if (current(version)) emit({ paymentMessage: '微信已返回支付结果，正在等待服务端确认…' });
+      if (current(version)) { diagnose('cashier_result', { planId: pendingPlanId, result: 'success' }); emit({ paymentMessage: '微信已返回支付结果，正在等待服务端确认…' }); }
     } catch (error) {
       if (!current(version)) return;
+      if (error && error.code === 'payment_price_changed') {
+        confirmAfter = false;
+        const details = error.details || {};
+        if (details.canDiscardIntent === true && details.orderId === pendingId) {
+          forget();
+          if (details.product) { try { onPriceChanged(details.product); } catch (_) { /* Quote refresh cannot resume payment. */ } }
+        }
+        emit({ paymentMessage: '', paymentError: paymentErrorText(error), paymentCanRetry: false });
+        return;
+      }
       const message = error && error.errMsg || '';
-      if (/cancel/i.test(message) || (error && error.errCode === -2)) { confirmAfter = false; emit({ paymentMessage: '已取消本次支付，请查询订单状态。订单号已保留。', paymentError: '', paymentCanRetry: false }); }
-      else if (/not support|unsupported|not available|低版本|不支持/i.test(message)) emit({ paymentError: paymentErrorText({ code: 'payment_runtime_unsupported' }), paymentCanRetry: false });
-      else if (error && error.cashier) emit({ paymentError: cashierFailureText(wxApi), paymentCanRetry: false });
+      const cancelled = /cancel/i.test(message) || (error && error.errCode === -2);
+      const unsupported = /not support|unsupported|低版本|不支持/i.test(message);
+      const reasonCode = cancelled ? 'cashier_cancelled' : unsupported ? 'payment_runtime_unsupported' : 'cashier_result_unknown';
+      if (error && error.cashier) diagnose('cashier_result', { planId: pendingPlanId, reasonCode, result: cancelled ? 'cancel' : unsupported ? 'blocked' : 'unknown' });
+      if (cancelled) { confirmAfter = false; emit({ paymentMessage: '已取消本次支付，请查询订单状态。订单号已保留。', paymentError: '', paymentDiagnosticCode: reasonCode, paymentCanRetry: false }); }
+      else if (unsupported) emit({ paymentError: paymentErrorText({ code: 'payment_runtime_unsupported' }), paymentDiagnosticCode: reasonCode, paymentCanRetry: false });
+      else if (error && error.cashier) emit({ paymentError: cashierFailureText(), paymentDiagnosticCode: reasonCode, paymentCanRetry: false });
       else emit({ paymentError: paymentErrorText(error), paymentCanRetry: false });
     } finally {
       if (current(version)) {
@@ -257,12 +297,13 @@ function createPaymentController({ wx: wxApi, call, onUpdate, onResolved, setTim
       product = nextProduct || {};
       const nextAccount = identity && typeof identity.userKey === 'string' ? identity.userKey : '';
       if (nextAccount === account || disposed) return;
-      stopPolling(); generation++; account = nextAccount; busy = false; pendingId = ''; pendingPlanId = '';
+      stopPolling(); generation++; account = nextAccount; busy = false; pendingId = ''; pendingPlanId = ''; pendingPriceFen = null;
       let stored;
       try { stored = account ? wxApi.getStorageSync(key()) : null; } catch (_) { stored = null; }
       if (stored && ORDER_ID.test(stored.orderId)) {
         pendingId = stored.orderId;
         pendingPlanId = ['member_30d', 'member_365d'].includes(stored.planId) ? stored.planId : 'member_7d';
+        pendingPriceFen = Number.isSafeInteger(stored.expectedPriceFen) && stored.expectedPriceFen > 0 ? stored.expectedPriceFen : null;
       }
       state = { ...INITIAL };
       emit({ paymentPendingId: pendingId, paymentPendingPlanId: pendingPlanId, paymentMessage: pendingId ? '发现一笔待确认订单，可以查询支付结果。' : '' });

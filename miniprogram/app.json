@@ -4,7 +4,8 @@
     "pages/follow/index",
     "pages/history/index",
     "pages/mine/index",
-    "pages/notification-test/index"
+    "pages/notification-test/index",
+    "pages/guide/index"
   ],
   "window": {
     "backgroundColor": "@pageBackground",
@@ -28,6 +29,7 @@
   },
   "sitemapLocation": "sitemap.json",
   "darkmode": true,
+  "resizable": true,
   "themeLocation": "theme.json",
   "style": "v2",
   "lazyCodeLoading": "requiredComponents"

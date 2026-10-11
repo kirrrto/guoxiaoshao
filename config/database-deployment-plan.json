@@ -366,6 +366,57 @@
           "unique": false
         }
       ]
+    },
+    {
+      "collectionName": "gxs_growth_events",
+      "rules": {
+        "read": false,
+        "write": false
+      },
+      "indexes": [
+        {
+          "name": "received_id",
+          "keys": {
+            "receivedAt": -1,
+            "_id": -1
+          },
+          "unique": false
+        },
+        {
+          "name": "account_received_id",
+          "keys": {
+            "accountKey": 1,
+            "receivedAt": -1,
+            "_id": -1
+          },
+          "unique": false
+        }
+      ]
+    },
+    {
+      "collectionName": "gxs_growth_accounts",
+      "rules": {
+        "read": false,
+        "write": false
+      },
+      "indexes": [
+        {
+          "name": "empty_intent_updated",
+          "keys": {
+            "firstIntent": 1,
+            "updatedAt": 1
+          },
+          "unique": false
+        },
+        {
+          "name": "intent_compacted_at",
+          "keys": {
+            "firstIntent.compacted": 1,
+            "firstIntent.at": 1
+          },
+          "unique": false
+        }
+      ]
     }
   ]
 }

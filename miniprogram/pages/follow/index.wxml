@@ -21,6 +21,13 @@
       <button class="btn btn-ghost btn-sm compact-action" loading="{{refreshing}}" disabled="{{refreshing || saving}}" bindtap="onRefreshStatus">刷新</button>
     </view>
     <view wx:if="{{refreshError}}" class="banner banner-warn" role="alert">{{refreshError}}</view>
+    <view wx:if="{{activation}}" class="card activation-card" aria-live="polite">
+      <view class="activation-title">{{activation.title}}</view>
+      <view wx:if="{{activation.targetTitle}}" class="small bold mt">{{activation.targetTitle}}</view>
+      <view class="activation-steps"><view wx:for="{{activation.steps}}" wx:key="id" class="activation-step {{item.done ? 'activation-step--done' : ''}}"><text class="activation-dot">{{item.done ? '✓' : index + 1}}</text><text>{{item.label}}</text></view></view>
+      <view class="small text-2">{{activation.detail}}</view>
+      <button wx:if="{{activation.action}}" class="btn btn-outline btn-block mt" disabled="{{saving || editing || refreshing || subscribing}}" bindtap="onActivationAction">{{activation.actionLabel}}</button>
+    </view>
 
     <view wx:if="{{alert}}" id="restock-alert" class="card alert-card">
       <view class="card-title"><text>{{alert.soldOut ? '断货提醒' : '到货提醒'}}</text><button class="ui-action ui-action--neutral" hover-class="ui-control-pressed" bindtap="onCloseAlert">关闭</button></view>

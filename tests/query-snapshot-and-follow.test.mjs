@@ -23,7 +23,7 @@ async function queriedPage(handler) {
   return { rt, page };
 }
 
-test('cold cached manual query shows expired results as pending update without changing their timestamps', async t => {
+test('legacy cached query keeps target and original timestamps while stock waits for an account-bound requery', async t => {
   t.mock.method(Date, 'now', () => baseTime + 180000);
   const rt = runtime(async action => action === 'user.bootstrap' ? boot() : { unchanged: true });
   rt.storage.set('gxs_query_result_v1', response());
@@ -31,6 +31,9 @@ test('cold cached manual query shows expired results as pending update without c
   await page.onLoad();
   const row = page.data.result.results[0];
   assert.equal(page.data.resultIsCache, true);
+  assert.equal(page.data.liveResultRestricted, true);
+  assert.match(page.data.resultAccessNotice, /重新查询/);
+  assert.equal(page.data.evidenceCard, null);
   assert.equal(row.statusLabel, '待更新');
   assert.equal(row.statusCls, 'unknown');
   assert.equal(row.observationState, 'stale');

@@ -1,0 +1,52 @@
+@import '../../styles/common.wxss';
+@import '../../styles/launch-calendar.wxss';
+.guide-page { max-width: 960px; margin: 0 auto; padding-bottom: calc(40rpx + env(safe-area-inset-bottom)); }
+.guide-hero { padding: 26rpx 12rpx 38rpx; }
+/* Primary page title outranks the slogan beneath it. */
+.guide-title {
+  color: var(--green-dark);
+  font-size: 52rpx;
+  line-height: 1.25;
+  letter-spacing: -1.2rpx;
+  font-weight: 750;
+}
+.guide-subtitle {
+  margin-top: 18rpx;
+  font-size: 36rpx;
+  line-height: 1.35;
+  letter-spacing: -0.6rpx;
+  font-weight: 700;
+  color: var(--text);
+}
+.guide-stages { display: flex; flex-wrap: wrap; gap: 12rpx; margin-bottom: 20rpx; }
+.guide-stage { width: calc(50% - 6rpx); margin: 0; border: 1rpx solid var(--line); border-radius: 20rpx; background: var(--card); color: var(--text-2); min-height: 44px; padding: 14rpx 18rpx; display: flex; align-items: center; gap: 14rpx; font-size: 26rpx; line-height: 1.4; }
+.guide-stage::after { border: none; }
+.guide-stage--on { border-color: var(--green); background: var(--green-soft); color: var(--green-dark); font-weight: 600; }
+.guide-stage-number { opacity: .65; font-size: 22rpx; }
+.guide-section-title { font-size: 32rpx; font-weight: 650; }
+.guide-step { display: flex; align-items: flex-start; gap: 18rpx; margin: 30rpx 0; }
+.guide-step-number { flex: none; display: flex; align-items: center; justify-content: center; width: 42rpx; height: 42rpx; background: var(--green-soft); color: var(--green-dark); border-radius: 50%; font-size: 24rpx; font-weight: 600; }
+.guide-step-copy { flex: 1; min-width: 0; }
+.guide-step-title { font-size: 29rpx; font-weight: 600; }
+.guide-step-copy .small { line-height: 1.75; }
+.guide-calendar { padding-top: 28rpx; }
+.guide-faq { margin-top: 18rpx; }
+.guide-answer { padding: 20rpx 14rpx 8rpx; line-height: 1.75; }
+.guide-page .btn { height: auto; min-height: 44px; line-height: 1.5; padding: 20rpx 26rpx; white-space: normal; }
+.guide-page .footer-note { line-height: 1.7; }
+@media (min-width: 600px) {
+  .guide-hero { padding: 20px 8px 26px; }
+  .guide-title { font-size: 34px; letter-spacing: -.6px; }
+  .guide-subtitle { font-size: 22px; margin-top: 12px; letter-spacing: -.3px; }
+  .guide-stages { gap: 12px; margin-bottom: 16px; }
+  .guide-stage { width: calc(25% - 9px); padding: 12px; gap: 8px; font-size: 15px; border-radius: 12px; }
+  .guide-stage-number { font-size: 12px; }
+  .guide-section-title { font-size: 20px; }
+  .guide-step { gap: 12px; margin: 24px 0; }
+  .guide-step-number { width: 24px; height: 24px; font-size: 14px; }
+  .guide-step-title { font-size: 17px; }
+  .guide-calendar { max-width: 640px; margin: 0 auto; padding-top: 20px; }
+  .guide-faq { margin-top: 12px; }
+  .guide-answer { padding: 14px 10px 4px; }
+  .guide-page .btn { padding: 12px 18px; }
+}

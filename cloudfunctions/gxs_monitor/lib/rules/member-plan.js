@@ -1,5 +1,5 @@
 'use strict';
-const { planForTerms, planIdOfOrder } = require('../payment/plans');
+const { planForTerms, planIdOfOrder, snapshotTermsValid } = require('../payment/plans');
 
 /** Only immutable, server-confirmed purchase terms can grant the extra slots. */
 function purchasedPlan(order, user, granting = false) {
@@ -9,7 +9,7 @@ function purchasedPlan(order, user, granting = false) {
   if (!order || !user || order.userKey !== user._id || order.provider !== 'wechat_virtual_payment'
     || order.type !== 'membership_order' || (!granting && !fulfilled)
     || !['paid', 'fulfilled', 'partially_refunded'].includes(order.status)
-    || !s || ![1, 2].includes(s.version) || s.provider !== order.provider
+    || !s || !snapshotTermsValid(order) || s.provider !== order.provider
     || order.appid !== user.appid || order.openid !== user.openid || s.appid !== order.appid
     || s.productId !== order.productId || s.days !== order.days || s.priceFen !== order.amountFen
     || s.currency !== 'CNY' || s.env !== 0 || s.buyQuantity !== 1 || !plan || planIdOfOrder(order) !== plan.id

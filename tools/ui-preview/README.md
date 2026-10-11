@@ -2,6 +2,27 @@
 
 运行 `node tools/ui-preview/build.mjs --out <输出目录>`，打开生成的 `index.html`。
 
+## 2.0.0 业务与屏宽专项
+
+```powershell
+node tools/ui-preview/build.mjs --v2-only --out tmp/ui-preview-v2
+node tools/ui-preview/check-layout.mjs tmp/ui-preview-v2
+node tools/ui-preview/check-layout.mjs tmp/ui-preview-v2 --dark
+node tools/ui-preview/check-floating-tabs.mjs tmp/ui-preview-v2
+```
+
+`--v2-only` 使用本地模拟的 `bootstrap.features` 打开新界面开关，`growthEvents` 保持关闭，不发送漏斗事件。普通场景时钟为北京时间 2026-10-11 15:00；优惠结束场景为 2026-12-01 00:00，每个快照在清单中记录 `previewDate`。共有 18 种状态，按相关页面组合生成 198 个快照：原有账户／库存／服务状态，以及月卡和年卡的优惠／标准价、攻略准备步骤／日历／FAQ、首次开屏日历。宽度为 320、375、390、430、768、1024 像素；浅/深色各检查 198 个。其余旧专项保持原来的固定时钟和场景。
+
+促销夹具遵守服务端产品契约：月卡当前 14.99 元、标准 30 元；年卡当前 129 元、标准 360 元。`promotion.endsAt` 为 `2026-11-30T16:00:00.000Z`（北京时间 12 月 1 日 00:00，不含该时刻），界面显示优惠至 11 月 30 日 23:59。通过真实套餐选择方法检查当前应付价；到期场景禁止残留优惠价。旧待确认订单仍保留原订单金额，不能被新套餐价格覆盖。
+
+`index.html` 按实际生成清单联动页面、场景和宽度，不提供不存在的组合；布局检查在浏览器中遍历全部可选组合，核对目标文件存在且清单中的页面全部可达。
+
+这些场景执行实际页面的加载、选择、查询格式化和上下文恢复方法，再读取当前 WXML/WXSS；不会调用真实云函数、支付、原生授权或库存采集。结果动作用独立断言验证未知/过期/服务异常不呈现无货转化话术，受限新品保留权限入口，已付费未配置需主动继续。
+
+布局检查输出 `layout-metrics.json`、`layout-metrics-dark.json`、代表整页/首屏/结果动作/套餐区截图。`check-floating-tabs` 对各 tab 页检查 1×/1.3×字体和 0/34px 模拟安全区，并分别验证非 tab 页没有浮动导航、阻断弹窗期间导航隐藏；实际数量见 `floating-tab-metrics.json`。全页长截图的悬浮导航固定在第一个视口位置；判断实际遮挡时须同时看首屏与滚动后的区域截图。
+
+构建清单保存小程序 JS/JSON/WXML/WXSS 的 SHA-256。布局检查开始和结束均对照本地源码；期间若修改业务源码，会要求重新构建，避免旧截图被当成最终结果。浏览器仍是 WXML/WXSS 的近似渲染，不能验证微信原生组件注入顺序、真实支付/授权弹窗、JS 基础库、真机性能或设备安全区。
+
 `--nudge-only` 生成提醒补充弹窗的三种模拟内容，配合 `check-layout.mjs <目录>` 和 `--dark` 检查。这里只呈现弹窗；是否触发、24 小时节流、待同步恢复与用户手势由 `tests/reminder-nudge.test.mjs` 验证，不调用真实微信授权。
 
 - 从项目当前的实际 WXML、WXSS 与页面 JS 派生消费者 4 页 × 7 种状态 × 3 种宽度，共 84 个独立 HTML。管理页已移入独立运营项目，默认预览不再包含它。

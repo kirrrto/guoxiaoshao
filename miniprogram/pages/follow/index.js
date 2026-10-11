@@ -8,6 +8,10 @@ const { shareAppMessage, shareTimeline } = require('../../utils/share');
 const { monitorPollDelay } = require('../../utils/poll');
 const { getAuthorizationState, subscribeAuthorizationState, requestReminderAuthorization, syncPendingAuthorization, topUpReminderCredit } = require('../../utils/reminder-credits');
 const { confirmTap } = require('../../utils/haptic');
+const { createCheckoutContext } = require('../../utils/checkout-context');
+const { activationStatus } = require('../../utils/activation-status');
+const { targetSignature } = require('../../utils/result-next-action');
+const conversion = require('../../utils/conversion-events');
 
 const FOLLOW_STATUS = {
   active: { label: '关注已开启', cls: 'ok' },
@@ -184,6 +188,7 @@ Page({
     followActionError: '',
     followActionId: '',
     readinessTaskDetail: '',
+    activation: null,
   },
 
   async onLoad(options) {
@@ -397,11 +402,34 @@ Page({
       this.pendingAfterReady = pending;
       return;
     }
+    this.openPendingEditor(pending);
+  },
+
+  openPendingEditor(pending) {
+    if (pending.checkoutRevision) {
+      const identity = this.accountSnapshot && this.accountSnapshot.identity;
+      const restored = this.checkoutStore().restore(identity, this.catalog);
+      if (restored.status !== 'ready' || restored.context.revision !== pending.checkoutRevision
+        || restored.context.targetSignature !== pending.checkoutSignature || restored.context.targetSignature !== targetSignature(pending)) {
+        this.refreshActivation();
+        return toast('原选择已变化或过期，请重新确认配置与门店');
+      }
+    }
     this.openEditor({ followId: newId('f'), pickerValue: pending, isNew: true });
   },
 
   applyBoot(boot, pageData = {}) {
     if (this.pageRetired) return;
+    const previousIdentity = this.accountSnapshot && this.accountSnapshot.identity;
+    if (previousIdentity && boot.identity && previousIdentity.userKey !== boot.identity.userKey) {
+      this.accountEpoch = (this.accountEpoch || 0) + 1;
+      this.editorEpoch = (this.editorEpoch || 0) + 1;
+      this.invalidateFollowRead();
+      this.editorSelection = null;
+      this.setData({ follows: [], followsLoaded: false, editing: false, saving: false, activation: null });
+    }
+    this.accountSnapshot = boot;
+    this.features = boot.features || {};
     const notifications = boot.notifications || {};
     const subscription = restockSubscription(notifications, boot.subscriptions);
     const templateIds = subscription.templateIds;
@@ -429,7 +457,7 @@ Page({
     if (this.pendingAfterReady) {
       const pending = this.pendingAfterReady;
       this.pendingAfterReady = null;
-      this.openEditor({ followId: newId('f'), pickerValue: pending, isNew: true });
+      this.openPendingEditor(pending);
     }
   },
 
@@ -468,6 +496,43 @@ Page({
     // failures and pending records need recovery, not more authorizations.
     const tip = readiness.code === 'ready' ? creditBoostTip(this.data.subscription || {}) : '';
     this.setData({ readiness, readinessTaskDetail: readinessTaskDetail(readiness), creditBoostTip: tip });
+    this.refreshActivation();
+  },
+
+  checkoutStore() {
+    if (!this.checkoutContext) this.checkoutContext = createCheckoutContext({ wx });
+    return this.checkoutContext;
+  },
+
+  refreshActivation() {
+    if (this.pageRetired) return;
+    const account = this.accountSnapshot;
+    if (!this.features || !this.features.activationJourney || !account || !account.membership.active) {
+      if (this.data.activation) this.setData({ activation: null });
+      return;
+    }
+    const restored = this.checkoutStore().restore(account.identity, this.catalog);
+    this.activationContext = restored.status === 'ready' ? restored.context : null;
+    this.setData({ activation: activationStatus({ member: true, context: this.activationContext, contextStatus: restored.status,
+      follows: this.data.follows, followsLoaded: this.data.followsLoaded, readiness: this.data.readiness }) });
+    if (this.visible && this.data.activation && this.activationEventKey !== this.data.activation.title) {
+      this.activationEventKey = this.data.activation.title;
+      conversion.track('activation_viewed', { entryPoint: 'follow', resultState: this.data.readiness.code });
+    }
+  },
+
+  onActivationAction() {
+    if (this.pageRetired || this.data.saving || this.data.editing) return;
+    this.refreshActivation();
+    const action = this.data.activation && this.data.activation.action;
+    if (action === 'continue' && this.activationContext) {
+      const context = this.activationContext;
+      return this.openPendingEditor({ partNumber: context.partNumber, storeNumbers: context.storeNumbers.slice(),
+        checkoutRevision: context.revision, checkoutSignature: context.targetSignature });
+    }
+    if (action === 'choose' || action === 'continue') return this.onAdd();
+    if (action === 'conditions' && this.data.readiness.action) return this.onReadinessAction();
+    if (typeof wx.pageScrollTo === 'function') wx.pageScrollTo({ selector: '#follow-configurations', duration: 220 });
   },
 
   onReadinessAction() {
@@ -599,6 +664,7 @@ Page({
   },
 
   async onSave() {
+    const accountEpoch = this.accountEpoch || 0;
     if (this.pageRetired || !this.data.editing || this.data.saving) return;
     const { editor } = this.data;
     const epoch = this.editorEpoch;
@@ -611,13 +677,21 @@ Page({
     if (!Array.isArray(selection.storeNumbers) || !selection.storeNumbers.length) return toast('请至少选择一家门店');
     if (selection.storeNumbers.length > this.data.limits.maxStoresPerFollow) return toast(`当前套餐每个配置最多 ${this.data.limits.maxStoresPerFollow} 家门店，请手动移除超出的门店后保存`);
     const payload = { followId: editor.followId, partNumber: selection.partNumber, storeNumbers: selection.storeNumbers.slice() };
+    const savedIdentity = this.accountSnapshot && this.accountSnapshot.identity;
+    const intentAtSave = savedIdentity ? this.checkoutStore().restore(savedIdentity, this.catalog) : null;
     const toppedUp = topUpReminderCredit();
     this.setData({ saving: true, saveError: '' });
     try {
       const result = await call('follow.upsert', payload);
+      if (!confirmsSavedFollow(result && result.follow, payload)) throw Object.assign(new Error('保存结果尚未确认，请重试。'), { code: 'bad_response' });
+      if (intentAtSave && intentAtSave.status === 'ready' && intentAtSave.context.targetSignature === targetSignature(payload)) {
+        this.checkoutStore().clear(savedIdentity, intentAtSave.context.revision);
+        const legacy = getApp().globalData.pendingMemberFollow;
+        if (legacy && legacy.userKey === savedIdentity.userKey && targetSignature(legacy) === targetSignature(payload)) getApp().globalData.pendingMemberFollow = null;
+      }
+      if (accountEpoch !== (this.accountEpoch || 0)) return;
       this.invalidateFollowRead();
       invalidateBootstrap();
-      if (!confirmsSavedFollow(result && result.follow, payload)) throw Object.assign(new Error('保存结果尚未确认，请重试。'), { code: 'bad_response' });
       if (this.pageRetired) return;
       const follow = presentFollow(result.follow, this.data.boot || {}, this.catalog, this.data.collector);
       const follows = this.data.follows.slice();
@@ -641,12 +715,12 @@ Page({
         catch (error) { if (!this.pageRetired) this.setData({ refreshError: '关注已保存，列表状态刷新失败，请下拉刷新。' }); }
       }
     } catch (error) {
-      if (!this.pageRetired && epoch === this.editorEpoch) {
+      if (!this.pageRetired && accountEpoch === (this.accountEpoch || 0) && epoch === this.editorEpoch) {
         this.setData({ saveError: error.message || '保存未完成，请重试。' });
         if (this.visible !== false) showError(error);
       }
     } finally {
-      if (!this.pageRetired) this.setData({ saving: false });
+      if (!this.pageRetired && accountEpoch === (this.accountEpoch || 0)) this.setData({ saving: false });
     }
   },
 
