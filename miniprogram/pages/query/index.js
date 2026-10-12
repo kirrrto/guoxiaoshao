@@ -14,7 +14,7 @@ const { productImageFit, withImageFit } = require('../../utils/product-image-fit
 const { availableStoreChoices } = require('../../utils/observation-insights');
 const alternatives = require('../../utils/query-alternatives');
 const { resultNextAction, targetEvidence, targetSignature } = require('../../utils/result-next-action');
-const { launchView, officialPurchaseUrl } = require('../../utils/product-launch');
+const { launchView } = require('../../utils/product-launch');
 const { canOfferLiveChoices } = require('../../utils/observation-insights');
 const { createCheckoutContext } = require('../../utils/checkout-context');
 const conversion = require('../../utils/conversion-events');
@@ -544,10 +544,6 @@ Page({
 
   onContinueSetup() { wx.switchTab({ url: '/pages/follow/index' }); },
   onToggleLaunch() { this.setData({ launchExpanded: !this.data.launchExpanded }); },
-  onLaunchOfficial() {
-    if (!this.data.launch || typeof wx.setClipboardData !== 'function') return;
-    wx.setClipboardData({ data: this.data.launch.officialUrl, success: () => toast('已复制 Apple 官方链接，请在浏览器打开') });
-  },
 
   onNextAction() {
     if (this.pageRetired || this.data.querying || this.data.signing || this.data.sheetVisible) return;
@@ -558,12 +554,6 @@ Page({
     if (next.action === 'account') return this.onRetryAccount();
     if (next.action === 'retry') return this.onRequery();
     if (next.action === 'edit') return this.onEditSelection();
-    if (next.action === 'official') {
-      const product = this.data.result && this.data.result.product;
-      wx.showModal({ title: '在 Apple 官方渠道确认', content: '选择相同型号、容量、颜色和门店，核对可取货时段。果小哨的观测不保留库存，也不会替你下单。', confirmText: '复制官网链接',
-        success: result => { if (result.confirm && typeof wx.setClipboardData === 'function') wx.setClipboardData({ data: officialPurchaseUrl(product), success: () => toast('已复制，请在浏览器打开') }); } });
-      return;
-    }
     return this.onAddFollow();
   },
 

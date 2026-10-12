@@ -92,12 +92,12 @@ test('share and single-page entries keep their intended journey without an openi
   }
 });
 
-test('guide actions use fixed destinations without queries, orders or automatic notifications', () => {
+test('guide actions stay inside the mini program', () => {
   const rt = runtime();
-  const navigations = [], copies = [];
+  const navigations = [];
   rt.wx.switchTab = options => navigations.push(options.url);
   rt.wx.navigateTo = options => navigations.push(options.url);
-  rt.wx.setClipboardData = options => copies.push(options.data);
+  rt.wx.setClipboardData = () => { throw new Error('guide must not copy an external link'); };
   const page = rt.instance('pages/guide/index.js');
   page.onLoad({ stage: 'unknown', section: 'faq' });
   assert.equal(page.data.stageId, 'prepare');
@@ -105,11 +105,12 @@ test('guide actions use fixed destinations without queries, orders or automatic 
   page.onStageAction();
   page.onSelectStage({ currentTarget: { dataset: { id: 'monitor' } } });
   page.onStageAction();
+  page.onSelectStage({ currentTarget: { dataset: { id: 'notice' } } });
+  page.onStageAction();
   page.onSelectStage({ currentTarget: { dataset: { id: 'pickup' } } });
   page.onStageAction();
   page.onTestNotification();
-  page.onCalendarOfficial({ currentTarget: { dataset: { id: 'https://untrusted.invalid' } } });
-  assert.deepEqual(navigations, ['/pages/query/index', '/pages/follow/index', '/pages/notification-test/index']);
-  assert.deepEqual(copies, ['https://www.apple.com.cn/shop/help/shipping_delivery']);
+  page.onCalendarPlan();
+  assert.deepEqual(navigations, ['/pages/query/index', '/pages/follow/index', '/pages/follow/index', '/pages/follow/index', '/pages/notification-test/index', '/pages/query/index']);
   assert.equal(rt.calls.length, 0);
 });

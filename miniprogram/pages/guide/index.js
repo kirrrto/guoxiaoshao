@@ -1,6 +1,5 @@
 const guide = require('../../config/usage-guide');
 const { activeCalendars } = require('../../utils/launch-calendar');
-const { toast } = require('../../utils/api');
 
 Page({
   data: { stages: guide.stages, stage: guide.stages[0], stageId: 'prepare', faqs: guide.faqs,
@@ -26,19 +25,11 @@ Page({
       this.setData({ [`calendars[${index}].imageUrl`]: '' });
     }
   },
-  copyLink(url) {
-    if (typeof wx.setClipboardData !== 'function') return toast('当前环境暂不支持复制链接');
-    wx.setClipboardData({ data: url, success: () => toast('链接已复制，请在浏览器打开'), fail: () => toast('复制未完成，请重试') });
-  },
   onStageAction() {
     const action = this.data.stage.action;
     if (action === 'query' || action === 'follow') wx.switchTab({ url: `/pages/${action}/index` });
-    else this.copyLink(action === 'pickupHelp' ? guide.pickupHelpUrl : 'https://www.apple.com.cn/store');
   },
-  onCalendarOfficial(event) {
-    const launch = this.data.calendars.find(item => item.id === event.currentTarget.dataset.id);
-    if (launch) this.copyLink(launch.officialUrl);
-  },
+  onCalendarPlan() { wx.switchTab({ url: '/pages/query/index' }); },
   onTestNotification() { wx.navigateTo({ url: '/pages/notification-test/index' }); },
   onGoMine() { wx.switchTab({ url: '/pages/mine/index' }); },
   onShareAppMessage() { return { title: '果小哨 · 选购与取货攻略', path: '/pages/guide/index' }; },

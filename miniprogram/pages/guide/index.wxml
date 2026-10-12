@@ -51,13 +51,13 @@
         <view class="calendar-grid"><view wx:for="{{calendar.weekdays}}" wx:key="*this" class="calendar-weekday">{{item}}</view></view>
         <view class="calendar-grid"><view wx:for="{{calendar.cells}}" wx:key="key" class="calendar-cell {{item.label ? 'calendar-cell--event' : ''}} {{item.today ? 'calendar-cell--today' : ''}}"><text>{{item.day}}</text><text class="calendar-event">{{item.label}}</text></view></view>
         <view class="tiny text-2 mt">发售时间不等于取货查询开放时间，具体以可选配置和 Apple 官方页面为准。</view>
-        <button class="btn btn-outline btn-block mt" data-id="{{calendar.id}}" bindtap="onCalendarOfficial">复制官方购买链接</button>
+        <button class="btn btn-outline btn-block mt" bindtap="onCalendarPlan">去选择配置与门店</button>
         <view class="tiny muted mt">来源：Apple 中国大陆 · 核对于 {{calendar.verifiedOn}}</view>
       </view>
     </block>
   </view>
 
-  <view class="guide-stages" aria-label="选购阶段"><button wx:for="{{stages}}" wx:key="id" class="guide-stage {{stageId === item.id ? 'guide-stage--on' : ''}}" hover-class="ui-control-pressed" aria-pressed="{{stageId === item.id}}" data-id="{{item.id}}" bindtap="onSelectStage"><text class="guide-stage-number">0{{index + 1}}</text>{{item.label}}</button></view>
+  <view class="guide-stages" aria-label="选购阶段"><button wx:for="{{stages}}" wx:key="id" class="guide-stage {{stageId === item.id ? 'guide-stage--on' : ''}}" hover-class="ui-control-pressed" aria-pressed="{{stageId === item.id}}" data-id="{{item.id}}" bindtap="onSelectStage"><text class="guide-stage-number">0{{index + 1}}</text><text class="guide-stage-label">{{item.label}}</text></button></view>
   <view class="card guide-steps">
     <view class="guide-section-title">{{stage.title}}</view><view class="small text-2 mt">{{stage.note}}</view>
     <view wx:for="{{stage.steps}}" wx:key="title" class="guide-step"><view class="guide-step-number">{{index + 1}}</view><view class="guide-step-copy"><view class="guide-step-title">{{item.title}}</view><view class="small text-2 mt">{{item.text}}</view></view></view>

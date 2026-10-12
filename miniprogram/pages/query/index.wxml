@@ -190,7 +190,7 @@
         <view wx:if="{{alternativePreparedNotice}}" class="small text-2 mt" role="status">{{alternativePreparedNotice}}</view>
       </view>
       <view class="btn-row result-actions">
-        <button wx:if="{{!nextAction || nextAction.action === 'official'}}" class="btn btn-ghost btn-sm" bindtap="onAddFollow">加入关注</button>
+        <button wx:if="{{!nextAction}}" class="btn btn-ghost btn-sm" bindtap="onAddFollow">加入关注</button>
         <button class="btn btn-outline btn-sm {{querying || signing ? 'disabled' : ''}}" disabled="{{querying || signing || !accountReady}}" bindtap="onRequery" aria-label="重新查询此结果的配置与门店">{{querying ? '查询中…' : '重新查询'}}</button>
       </view>
     </view>
@@ -219,7 +219,7 @@
       <view class="launch-dates"><view>{{launch.preorderText}}</view><view>{{launch.releaseText}}</view></view>
       <view class="small text-2">北京时间 · {{launch.availability}}</view>
       <button class="ui-disclosure" hover-class="ui-control-pressed" bindtap="onToggleLaunch" aria-expanded="{{launchExpanded}}"><text class="ui-disclosure-label">选购前准备</text><view class="ui-disclosure-meta"><text>{{launchExpanded ? '收起' : '展开'}}</text><view class="ui-chevron {{launchExpanded ? 'ui-chevron--up' : 'ui-chevron--down'}}"></view></view></button>
-      <block wx:if="{{launchExpanded}}"><view class="small text-2 mt">{{launch.preparation}}</view><view class="small text-2 mt">信息核对于 {{launch.verifiedOn}}，请以 Apple 官方页面最新说明为准。</view><button class="btn btn-outline btn-block mt" bindtap="onLaunchOfficial">复制 Apple 官方购买链接</button></block>
+      <block wx:if="{{launchExpanded}}"><view class="small text-2 mt">{{launch.preparation}}</view><view class="small text-2 mt">信息核对于 {{launch.verifiedOn}}，请以 Apple 官方页面最新说明为准。</view></block>
     </view>
 
     <view class="card">

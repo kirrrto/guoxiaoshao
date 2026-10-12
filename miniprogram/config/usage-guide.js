@@ -1,7 +1,6 @@
 // Original product guidance; external pickup steps checked against Apple China
 // shopping help on 2026-10-11. Do not promise stock reservations or delivery.
 module.exports = {
-  pickupHelpUrl: 'https://www.apple.com.cn/shop/help/shipping_delivery',
   checkedOn: '2026-10-11',
   stages: [
     { id: 'prepare', label: '选购准备', title: '先选好想要的配置', note: '把要买什么、去哪里取，提前想清楚。', action: 'query', actionText: '去选择配置与门店', steps: [
@@ -14,12 +13,12 @@ module.exports = {
       { title: '允许微信提醒', text: '主动点击授权入口并允许接收。微信提醒授权与查询次数分别计算；会员不会自动获得无限条通知。' },
       { title: '检查提醒条件', text: '留意关注是否启用、会员是否有效、授权是否充足以及免打扰设置。可在「我的」发一条测试通知，测试消耗 1 次额度。' },
     ] },
-    { id: 'notice', label: '收到提醒', title: '照着目标，去官方确认', note: '核对配置 → 找到门店 → 确认取货 → 下单。', action: 'official', actionText: '复制 Apple 官方商店链接', steps: [
+    { id: 'notice', label: '收到提醒', title: '照着目标，去官方确认', note: '核对配置 → 找到门店 → 确认取货 → 下单。', action: 'follow', actionText: '去核对关注配置', steps: [
       { title: '先读清楚通知', text: '确认是到货提醒而不是测试消息，核对型号、容量、颜色、门店与提醒时间。供应可能在收到消息后变化。' },
       { title: '查看官方取货选项', text: '到 Apple 官方商店选择同一配置，查看对应门店的供货情况；有取货选项时，再核对可选日期和时段。' },
       { title: '以结账页面完成购买', text: '检查商品、联系人、取货地点和实际付款金额后提交订单。若已无可取货选项，可继续保留小哨关注。' },
     ] },
-    { id: 'pickup', label: '完成取货', title: '等到官方取货通知再出发', note: '果小哨到货提醒与 Apple 订单取货通知不同。', action: 'pickupHelp', actionText: '复制 Apple 官方取货说明', steps: [
+    { id: 'pickup', label: '完成取货', title: '等到官方取货通知再出发', note: '果小哨到货提醒与 Apple 订单取货通知不同。', action: 'follow', actionText: '去整理关注', steps: [
       { title: '确认订单状态', text: '完成支付后，在 Apple 官方订单中确认购买结果；果小哨不会代下单，也不会确认你的 Apple 订单。' },
       { title: '准备取货信息', text: '收到 Apple 的取货通知后，按官方订单要求准备订单号和有效证件，并核对取货联系人及门店。' },
       { title: '买到后整理关注', text: '可以暂停或删除不再需要的关注。删除果小哨关注不会取消 Apple 订单，也不会自动退还会员费用。' },

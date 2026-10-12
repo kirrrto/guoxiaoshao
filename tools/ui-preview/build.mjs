@@ -645,14 +645,14 @@ for (const scenario of scenarios) {
     let expectedV2Text = [], forbiddenText = [];
     if (v2Preview) {
       if (pageName === 'query') {
-        const action = { 'v2-free': 'offer', 'v2-member': 'official', 'v2-unknown': 'retry', 'v2-stale': 'retry', 'v2-service-down': 'retry', 'v2-longcontent': 'follow' }[scenario];
+        const action = { 'v2-free': 'offer', 'v2-member': 'follow', 'v2-unknown': 'retry', 'v2-stale': 'retry', 'v2-service-down': 'retry', 'v2-longcontent': 'follow' }[scenario];
         if (action && page.data.nextAction?.action !== action) throw Error(`${scenario}: expected query next action ${action}, got ${page.data.nextAction?.action}`);
         if (scenario === 'v2-restricted' && !page.data.selectionRestricted) throw Error('Restricted fixture did not retain the access gate');
         if (scenario === 'v2-paid-unconfigured' && !page.data.resumeSetup) throw Error('Paid fixture lost the unfinished target');
         if (scenario === 'v2-new-product' && !page.data.launch) throw Error('Future launch card did not render');
         expectedV2Text = [...(scenario === 'v2-calendar-modal' ? ['新品日历', 'iPhone Duo', '10.16', '10.23', '本次发售不再提醒', '查看选购攻略'] : [p.title]), ...({
           'v2-free': ['暂时没有可取货观测', '微信提醒需另行授权'],
-          'v2-member': ['2 家门店有可取货观测', '查看官方购买信息'],
+          'v2-member': ['2 家门店有可取货观测', '加入关注', '购买请在 Apple 官方渠道完成'],
           'v2-unknown': ['当前取货状态待确认', '继续查询原配置'],
           'v2-stale': ['当前取货状态待确认', '继续查询原配置'],
           'v2-restricted': ['此配置实时查询需会员', '查看此配置会员权益'],
@@ -689,7 +689,7 @@ for (const scenario of scenarios) {
         expectedV2Text = ['选好心仪配置', '新品发售日历', '先选好想要的配置', '常见问题'];
         if (scenario === 'v2-guide-calendar') {
           if (!page.data.calendarExpanded || !page.data.calendars.length) throw Error('Guide calendar section did not expand');
-          expectedV2Text.push('2026 年 10 月', '10.16', '10.23', '复制官方购买链接');
+          expectedV2Text.push('2026 年 10 月', '10.16', '10.23', '去选择配置与门店');
         }
         if (scenario === 'v2-guide-faq') {
           if (page.data.faqOpen !== 'notification') throw Error('Guide notification FAQ did not expand');

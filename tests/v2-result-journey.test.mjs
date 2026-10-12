@@ -17,7 +17,10 @@ const view = (data = {}) => resultNextAction({ snapshot: snapshot(), account, ca
 test('fresh known unavailable and available observations produce different next actions', () => {
   assert.equal(view().action, 'offer');
   assert.match(view().label, /7 天.*¥7.00/);
-  assert.equal(view({ snapshot: snapshot([row('available')]) }).action, 'official');
+  const available = view({ snapshot: snapshot([row('available')]) });
+  assert.equal(available.action, 'follow');
+  assert.equal(available.label, '加入关注');
+  assert.match(available.detail, /Apple 官方渠道/);
   assert.equal(view({ account: { ...account, membership: { active: true } } }).action, 'follow');
 });
 
@@ -57,11 +60,11 @@ test('displayed action is rechecked at click time when an observation has expire
   page.accountSnapshot = account; page.features = { resultNextAction: true };
   page.querySnapshot = snapshot([row('available')]);
   Object.assign(page.data, { boot: { member: false }, result: page.querySnapshot, accountReady: true, collector: { state: 'running' } });
-  page.refreshJourney(); assert.equal(page.data.nextAction.action, 'official');
+  page.refreshJourney(); assert.equal(page.data.nextAction.action, 'follow');
   clock += 121000;
   page.onNextAction();
   assert.equal(page.data.nextAction.action, 'retry');
-  assert.equal(rt.messages.some(message => message.title === '在 Apple 官方渠道确认'), false);
+  assert.equal(rt.messages.some(message => /浏览器|官网链接/.test(JSON.stringify(message))), false);
   assert.equal(rt.calls.length, 0);
 });
 
