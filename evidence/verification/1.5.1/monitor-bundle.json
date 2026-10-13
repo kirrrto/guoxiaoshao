@@ -1,0 +1,9 @@
+{
+  "checked": true,
+  "source": "cloudfunctions/gxs_api/lib",
+  "target": "cloudfunctions/gxs_monitor/lib",
+  "passed": true,
+  "files": 33,
+  "sourceBytes": 233064,
+  "issues": []
+}

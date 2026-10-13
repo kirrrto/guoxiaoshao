@@ -1,0 +1,12 @@
+{
+  "memberPlans": {
+    "member_30d": {
+      "productId": "replace_with_published_3000_fen_goods",
+      "enabled": false
+    },
+    "member_365d": {
+      "productId": "replace_with_published_36000_fen_goods",
+      "enabled": false
+    }
+  }
+}

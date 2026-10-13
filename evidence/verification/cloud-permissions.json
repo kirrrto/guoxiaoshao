@@ -1,0 +1,66 @@
+{
+  "checkedAt": "2026-09-15T07:01:57.258Z",
+  "mode": "read-only",
+  "collections": [
+    {
+      "name": "gxs_users",
+      "permission": "ADMINONLY",
+      "requestId": "3e74a04c-e234-4732-a116-cad0db6aa0ec"
+    },
+    {
+      "name": "gxs_quota_ledger",
+      "permission": "ADMINONLY",
+      "requestId": "eea405ee-64eb-46bd-afdb-9586ed07fd0e"
+    },
+    {
+      "name": "gxs_queries",
+      "permission": "ADMINONLY",
+      "requestId": "856027a6-9bf6-437f-989c-dd75f6c13eb8"
+    },
+    {
+      "name": "gxs_follows",
+      "permission": "ADMINONLY",
+      "requestId": "3dc0c816-fa93-4456-ba5d-4c1c8cc80cd2"
+    },
+    {
+      "name": "gxs_latest",
+      "permission": "ADMINONLY",
+      "requestId": "cea53d1e-ff25-40ba-9acb-8026eb4c214d"
+    },
+    {
+      "name": "gxs_events",
+      "permission": "ADMINONLY",
+      "requestId": "13fdff6e-0b08-4022-bc36-553ca62937a9"
+    },
+    {
+      "name": "gxs_orders",
+      "permission": "ADMINONLY",
+      "requestId": "86c6e0b1-0882-4c87-be8d-da85c2892894"
+    },
+    {
+      "name": "gxs_notifications",
+      "permission": "ADMINONLY",
+      "requestId": "1a7ce986-2c38-452f-b53f-b112c0632237"
+    },
+    {
+      "name": "gxs_config",
+      "permission": "ADMINONLY",
+      "requestId": "1888dabe-40eb-4f8b-ac38-2b4cf48e7d65"
+    },
+    {
+      "name": "gxs_catalog_products",
+      "permission": "ADMINONLY",
+      "requestId": "c5ee09b3-96e8-4983-acf9-ca6b3cafcc32"
+    },
+    {
+      "name": "gxs_catalog_stores",
+      "permission": "ADMINONLY",
+      "requestId": "66cb2ffe-df89-4eb8-8c89-acfd84fed9c5"
+    },
+    {
+      "name": "gxs_target_health",
+      "permission": "ADMINONLY",
+      "requestId": "3018cfeb-5263-4424-b919-1586d46f7693"
+    }
+  ]
+}

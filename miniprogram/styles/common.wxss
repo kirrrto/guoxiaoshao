@@ -1,0 +1,356 @@
+/* 果小哨 · 公共样式（页面与自定义组件共用；颜色变量定义在 app.wxss 的 page 上） */
+view, text { box-sizing: border-box; }
+
+.page { padding: 24rpx 24rpx 48rpx; }
+.page-bottom-space { height: 40rpx; }
+
+/* Decorative symbols always accompany a visible label. Keep PNGs crisp at 20px. */
+.ui-icon { display: block; flex: none; width: 20px; height: 20px; }
+.ui-label-with-icon { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.ui-label-with-icon > text { min-width: 0; }
+.brand-page-heading { display: flex; align-items: center; gap: 12px; }
+.brand-page-logo { display: block; flex: none; width: 44px; height: 44px; border-radius: 12px; }
+.brand-page-copy { flex: 1; min-width: 0; }
+
+/* 卡片 */
+.card {
+  background: var(--card);
+  background-image: none;
+  border-radius: var(--radius-card);
+  padding: 30rpx;
+  margin-bottom: 26rpx;
+  box-shadow: var(--shadow-soft);
+}
+.card-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  margin-bottom: 20rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.card-title .sub { font-size: 24rpx; color: var(--text-3); font-weight: 400; }
+.section-label { font-size: 24rpx; color: var(--text-3); margin: 20rpx 0 12rpx; }
+
+/* 按钮 */
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-action);
+  font-size: 30rpx;
+  font-weight: 600;
+  padding: 0 40rpx;
+  height: 88rpx;
+  line-height: 88rpx;
+  margin: 0;
+  border: none;
+}
+.btn::after { border: none; }
+.btn-primary { background: var(--action-fill); color: var(--action-text); box-shadow: none; }
+.btn-primary.disabled, .btn-primary[disabled] { background: #DBF1E5; color: #587664; }
+.btn-outline { background: rgba(255, 255, 255, 0.78); color: var(--green-dark); border: 2rpx solid rgba(0, 195, 117, 0.44); }
+.btn-ghost { background: var(--green-soft); color: var(--green-dark); box-shadow: inset 0 1rpx 0 rgba(255, 255, 255, 0.88); }
+.btn-danger { background: var(--bad-soft); color: var(--bad); }
+.btn-sm { height: 64rpx; line-height: 64rpx; font-size: 26rpx; padding: 0 28rpx; }
+.btn-block { width: 100%; }
+.btn-row { display: flex; gap: 16rpx; margin-top: 20rpx; }
+.btn-row .btn { flex: 1; }
+
+/* 文本 */
+.muted { color: var(--text-3); }
+.text-2 { color: var(--text-2); }
+.small { font-size: 26rpx; font-size: max(12px, 26rpx); }
+.tiny { font-size: 24rpx; font-size: max(12px, 24rpx); }
+.bold { font-weight: 600; }
+.mono { font-family: Menlo, Consolas, monospace; }
+.row { display: flex; align-items: center; }
+.row-between { display: flex; align-items: center; justify-content: space-between; }
+.wrap { flex-wrap: wrap; }
+.gap { gap: 12rpx; }
+.mt { margin-top: 16rpx; }
+.mb { margin-bottom: 16rpx; }
+
+/* 状态标签 */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999rpx;
+  padding: 4rpx 18rpx;
+  font-size: 24rpx;
+  font-weight: 500;
+  line-height: 1.6;
+  white-space: nowrap;
+}
+.pill-ok { background: var(--green-soft); color: var(--green-dark); }
+.pill-bad { background: var(--bad-soft); color: var(--bad); }
+.pill-warn { background: var(--warn-soft); color: var(--warn); }
+.pill-muted { background: #EEF2F0; color: var(--text-2); }
+.pill-unknown { background: #ECF1F0; color: #5F746C; }
+.pill-dot::before { content: ''; width: 14rpx; height: 14rpx; border-radius: 50%; background: currentColor; margin-right: 10rpx; }
+
+/* 选择芯片 */
+.chips { display: flex; flex-wrap: wrap; gap: 16rpx; }
+.chip {
+  padding: 12rpx 26rpx;
+  border-radius: 999rpx;
+  background: rgba(238, 250, 243, 0.85);
+  color: var(--text-2);
+  font-size: 26rpx;
+  border: 2rpx solid transparent;
+}
+.chip.on { background: var(--green-soft); color: var(--green-dark); border-color: rgba(0, 195, 117, 0.52); font-weight: 600; box-shadow: inset 0 1rpx 0 rgba(255, 255, 255, 0.85); }
+.chip.disabled { opacity: 0.45; }
+
+/* 分段 tab */
+.segments { display: flex; background: rgba(225, 245, 234, 0.76); border: 1rpx solid var(--glass-line); border-radius: 999rpx; padding: 6rpx; }
+.segment { flex: 1; text-align: center; padding: 14rpx 0; border-radius: 999rpx; font-size: 26rpx; color: var(--text-2); }
+.segment.on { background: #fff; color: var(--green-dark); font-weight: 600; box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.06); }
+.scroll-tabs { white-space: nowrap; }
+.scroll-tabs .tab { display: inline-block; padding: 14rpx 28rpx; border-radius: 999rpx; margin-right: 12rpx; background: #F4F7F5; color: var(--text-2); font-size: 26rpx; }
+.scroll-tabs .tab.on { background: var(--green); color: var(--green-ink); font-weight: 600; }
+
+/* 表单行 */
+.field { display: flex; align-items: center; justify-content: space-between; padding: 22rpx 0; border-bottom: 2rpx solid var(--line); }
+.field:last-child { border-bottom: none; }
+.field .label { color: var(--text-2); font-size: 28rpx; }
+.field .value { color: var(--text); font-size: 28rpx; max-width: 62%; text-align: right; }
+.field .value.placeholder { color: var(--text-3); }
+.field .arrow { color: var(--text-3); margin-left: 12rpx; }
+
+/* 提示条 */
+.banner { border-radius: 22rpx; padding: 20rpx 24rpx; border: 1rpx solid rgba(255, 255, 255, 0.68); font-size: 26rpx; margin-bottom: 20rpx; display: flex; align-items: flex-start; gap: 12rpx; }
+.banner-info { background: var(--info-soft); color: var(--green-dark); }
+.banner-ok { background: var(--green-soft); color: var(--green-dark); }
+.banner-warn { background: var(--warn-soft); color: var(--warn); }
+.banner-bad { background: var(--bad-soft); color: var(--bad); }
+
+/* 空状态 */
+.empty { text-align: center; color: var(--text-3); padding: 60rpx 0; font-size: 26rpx; }
+.empty .icon { font-size: 60rpx; margin-bottom: 12rpx; }
+
+/* 列表项 */
+.list-item { padding: 22rpx 0; border-bottom: 2rpx solid var(--line); }
+.list-item:last-child { border-bottom: none; }
+
+/* 数字 */
+.stat-row { display: flex; gap: 16rpx; }
+.stat { flex: 1; background: var(--surface-soft); border: 1rpx solid var(--glass-line); border-radius: 24rpx; padding: 20rpx; text-align: center; }
+.stat .num { font-size: 40rpx; font-weight: 700; color: var(--green-dark); }
+.stat .lbl { font-size: 22rpx; color: var(--text-3); margin-top: 4rpx; }
+
+/* 页脚 */
+.footer-note { text-align: center; color: var(--text-3); font-size: 22rpx; padding: 24rpx 0 0; }
+
+/* 加载 */
+.loading-line { text-align: center; color: var(--text-3); font-size: 24rpx; padding: 20rpx 0; }
+
+/* 骨架屏：首屏数据回来之前占位，不留空白 */
+.skeleton-card { background: var(--card); border-radius: 34rpx; padding: 30rpx; margin-bottom: 26rpx; box-shadow: var(--shadow-soft); }
+.skeleton-line, .skeleton-bar {
+  background: linear-gradient(90deg, var(--skeleton-base) 25%, var(--skeleton-shine) 50%, var(--skeleton-base) 75%);
+  background-size: 400% 100%;
+  animation: skeleton-shine 1.4s ease-in-out infinite;
+}
+.skeleton-line { height: 26rpx; border-radius: 13rpx; margin-top: 22rpx; }
+.skeleton-title { width: 42%; height: 34rpx; margin-top: 0; }
+.skeleton-short { width: 64%; }
+.skeleton-bar { height: 88rpx; border-radius: 999rpx; margin-top: 30rpx; }
+@keyframes skeleton-shine { from { background-position: 100% 0; } to { background-position: 0 0; } }
+
+/* Visible secondary controls share surfaces, borders and directional icons. */
+.ui-action.ui-action, .ui-disclosure.ui-disclosure {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12rpx;
+  width: auto;
+  max-width: 100%;
+  min-width: 44px;
+  min-height: 44px;
+  margin: 0;
+  padding: 16rpx 22rpx;
+  border: 1px solid var(--control-line);
+  border-radius: var(--radius-action);
+  background: var(--control-fill);
+  color: var(--green-dark);
+  font-size: 25rpx;
+  font-size: max(12px, 25rpx);
+  font-weight: 600;
+  line-height: 1.45;
+  text-align: center;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.ui-action::after, .ui-disclosure::after { border: none; }
+.ui-action.ui-action--neutral { background: var(--surface-soft); border-color: var(--line); color: var(--text-2); }
+.ui-action.ui-action--block { display: flex; width: 100%; }
+.ui-action-label, .ui-disclosure-label { min-width: 0; overflow-wrap: anywhere; }
+.ui-disclosure.ui-disclosure { display: flex; justify-content: space-between; width: 100%; margin-top: 20rpx; padding: 20rpx 22rpx; background: var(--surface-soft); border-color: var(--line); color: var(--text); text-align: left; }
+.ui-disclosure-label { flex: 1 1 0; font-weight: 500; }
+.ui-disclosure-meta { display: inline-flex; flex: 0 0 auto; align-items: center; gap: 14rpx; color: var(--green-dark); font-size: 24rpx; font-size: max(12px, 24rpx); font-weight: 600; }
+.ui-chevron { display: inline-block; flex: 0 0 auto; width: 12rpx; height: 12rpx; margin: 0 4rpx; border-right: 2rpx solid currentColor; border-top: 2rpx solid currentColor; transform: rotate(45deg); }
+.ui-chevron--down { transform: rotate(135deg); }
+.ui-chevron--up { transform: rotate(-45deg); }
+.ui-action.ui-control-pressed, .ui-disclosure.ui-control-pressed { background: var(--control-pressed); border-color: var(--green-dark); }
+.ui-action[disabled], .ui-disclosure[disabled] { background: var(--surface-soft); border-color: var(--line); color: var(--text-3); opacity: .65; }
+/* Related rows share one bordered surface; each row keeps its chevron and pressed state. */
+.ui-disclosure-group { margin-top: 20rpx; overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius-action); background: var(--surface-soft); }
+.ui-disclosure-group-item + .ui-disclosure-group-item { border-top: 1px solid var(--line); }
+.ui-disclosure-group .ui-disclosure.ui-disclosure { margin-top: 0; border: 0; border-radius: 0; background: transparent; }
+.ui-disclosure-group .ui-disclosure.ui-control-pressed { background: var(--control-pressed); }
+/* Entry rows: icon, label and an optional regular-weight note inside a disclosure button. */
+.ui-disclosure.ui-entry { gap: 12px; padding: 12px; }
+.ui-entry-main { display: flex; flex: 1 1 0; align-items: flex-start; gap: 10px; min-width: 0; }
+.ui-entry-main > .ui-icon { margin-top: 1px; }
+.ui-entry-copy { display: flex; flex: 1 1 0; flex-direction: column; align-items: flex-start; gap: 2px; min-width: 0; text-align: left; }
+.ui-entry-copy > .ui-disclosure-label { flex: none; font-size: 14px; }
+.ui-entry-note { color: var(--text-2); font-size: 12px; font-weight: 400; line-height: 1.5; white-space: normal; overflow-wrap: anywhere; }
+
+/* Compact close targets retain their own visual treatment. */
+.tap-target { display: inline-block; padding: 20rpx 16rpx; margin: -20rpx -16rpx; }
+.row-between.tap-row { padding: 20rpx 0; margin: -4rpx 0 -20rpx; }
+
+/* 加载失败 */
+.load-error-title { font-size: 32rpx; font-weight: 600; color: var(--text); }
+.load-error-detail { margin-top: 12rpx; font-size: 26rpx; color: var(--text-2); line-height: 1.6; overflow-wrap: anywhere; }
+.load-error-hint { margin: 12rpx 0 28rpx; font-size: 23rpx; color: var(--text-3); line-height: 1.6; }
+
+/* Shared responsive contract: every row can shrink or wrap at 320px. */
+view, text, button, input, textarea, image, scroll-view, picker { box-sizing: border-box; }
+.page { width: 100%; max-width: 1000rpx; margin: 0 auto; padding: 32rpx 32rpx calc(40rpx + env(safe-area-inset-bottom)); overflow-wrap: anywhere; }
+/* Custom navigation floats over the viewport. Keep the last action completely
+   scrollable above its 66px body, 8px offset and the device home indicator. */
+.page.tab-page { padding-bottom: 98px; padding-bottom: calc(98px + constant(safe-area-inset-bottom)); padding-bottom: calc(98px + env(safe-area-inset-bottom)); }
+.page-heading { margin: 8rpx 10rpx 30rpx; }
+.page-title { font-size: 44rpx; font-weight: 700; line-height: 1.3; letter-spacing: -0.5rpx; }
+.page-subtitle { margin-top: 12rpx; color: var(--text-2); font-size: max(12px, 25rpx); line-height: 1.65; }
+.card { min-width: 0; border: 1rpx solid var(--glass-line); }
+.card-title { align-items: flex-start; flex-wrap: wrap; gap: 10rpx 16rpx; line-height: 1.45; }
+.card-title > text:first-child { flex: 1 1 220rpx; min-width: 0; white-space: normal; overflow-wrap: anywhere; }
+.card-title .sub { max-width: 100%; overflow-wrap: anywhere; color: var(--text-2); }
+.row, .row-between { min-width: 0; gap: 12rpx; }
+.row-between { flex-wrap: wrap; }
+.row-between > view, .row-between > text, .row > view, .row > text { min-width: 0; max-width: 100%; }
+.row-between > view:first-child { flex: 1 1 220rpx; }
+.row-between > text:first-child { flex: 1 1 180rpx; }
+.row-between > .pill { flex: 0 1 auto; }
+.btn { min-width: 0; max-width: 100%; min-height: 44px; min-height: max(44px, 96rpx); height: auto; padding: 18rpx 28rpx; line-height: 1.5; white-space: normal; overflow-wrap: anywhere; text-align: center; }
+.btn-sm { min-height: 44px; padding: 12rpx 22rpx; line-height: 1.45; }
+.btn-row { flex-wrap: wrap; align-items: stretch; }
+.btn-row .btn { flex: 1 1 180rpx; }
+/* Native WeChat button defaults have higher specificity than a lone class.
+   Keep full-width actions and flex rows consistent with the actual renderer. */
+.btn.btn { box-sizing: border-box; min-width: 0; max-width: 100%; height: auto; margin: 0; padding: 18rpx 28rpx; line-height: 1.5; font-size: max(14px, 30rpx); font-weight: 600; text-align: center; }
+.btn.btn-sm { padding: 12rpx 22rpx; min-height: 44px; line-height: 1.45; font-size: max(14px, 26rpx); }
+.btn.btn-block { width: 100%; }
+.btn.btn.mt { margin-top: 16rpx; }
+.btn.btn.mb { margin-bottom: 16rpx; }
+.btn-row .btn.btn { width: auto; flex: 1 1 180rpx; }
+.btn[disabled] { background: #E3ECE7; color: #5E7569; border-color: transparent; box-shadow: none; }
+.field { gap: 16rpx; min-width: 0; }
+.field .label { flex: 0 0 auto; max-width: 38%; }
+.field .value { min-width: 0; white-space: normal; overflow-wrap: anywhere; }
+.field .row { flex: 1; justify-content: flex-end; }
+.banner { display: block; overflow-wrap: anywhere; line-height: 1.6; }
+.banner:last-child { margin-bottom: 0; }
+.pill { max-width: 100%; white-space: normal; line-height: 1.5; overflow-wrap: anywhere; }
+.pill-dot::before { flex: none; }
+.chip { max-width: 100%; min-height: 64rpx; overflow-wrap: anywhere; }
+.muted, .section-label, .tiny.muted, .footer-note { color: var(--text-3); }
+.stat-row { flex-wrap: wrap; }
+.stat { flex: 1 1 calc(50% - 16rpx); min-width: 0; padding: 18rpx 12rpx; }
+.stat .num { overflow-wrap: anywhere; }
+.mono { word-break: break-all; }
+.empty { padding: 42rpx 12rpx; }
+.empty-symbol { display: inline-flex; align-items: center; justify-content: center; width: 96rpx; height: 96rpx; margin-bottom: 18rpx; border: 1rpx solid var(--glass-line); border-radius: 30rpx; background: var(--green-soft); color: var(--green-dark); font-size: 26rpx; font-weight: 600; box-shadow: inset 0 2rpx 0 rgba(255, 255, 255, 0.84); }
+.stale-note { color: var(--warn); margin-top: 8rpx; }
+.product-preview { display: flex; gap: 20rpx; padding: 20rpx; border: 1rpx solid var(--glass-line); border-radius: 24rpx; background: var(--surface-soft); align-items: center; min-width: 0; }
+.product-image-box { width: 164rpx; height: 164rpx; flex: 0 0 164rpx; background: #fff; border-radius: 16rpx; overflow: hidden; }
+.product-image { width: 164rpx; height: 164rpx; display: block; }
+.product-copy { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.image-placeholder { width: 100%; height: 100%; padding: 16rpx; display: flex; align-items: center; justify-content: center; text-align: center; color: #6b7c72; font-size: 22rpx; }
+.follow-image { width: 140rpx; height: 140rpx; display: block; margin: 0 0 16rpx; border-radius: 16rpx; background: #f8faf9; }
+.benefit-list { color: var(--text-2); font-size: 24rpx; line-height: 1.7; }
+.benefit-list > view { padding: 12rpx 0; border-bottom: 1rpx solid var(--line); }
+.benefit-list > view:last-child { border-bottom: 0; }
+.onboarding { background: rgba(231, 248, 238, 0.82); }
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-line, .skeleton-bar { animation: none; }
+}
+
+/* Keep large/desktop windows readable without treating an entire tablet as
+   a scaled-up phone. The phone layout and its touch targets stay unchanged. */
+@media (min-width: 600px) {
+  .page { width: 100%; max-width: 960px; margin-left: auto; margin-right: auto; padding: 24px 24px 100px; font-size: 16px; }
+  .page .page-title { font-size: 26px; }
+  .page .page-subtitle, .page .small { font-size: 15px; }
+  .page .tiny, .page .pill, .page .sub, .page .footer-note { font-size: 13px; }
+  .page .card { padding: 24px; border-radius: 18px; margin-bottom: 20px; }
+  .page .card-title, .page .section-title, .page .journey-title, .page .activation-title { font-size: 20px; }
+  .page .btn.btn { min-height: 44px; padding: 12px 20px; font-size: 16px; border-radius: 12px; }
+  .page .ui-action, .page .ui-disclosure { font-size: 14px; padding: 10px 14px; min-height: 44px; }
+  .page .ui-disclosure-label, .page .ui-action-label { font-size: 14px; }
+  .page .ui-disclosure-meta, .page .ui-entry-note { font-size: 13px; }
+  .page .ui-action { gap: 8px; }
+  .page .ui-chevron { width: 8px; height: 8px; border-width: 2px; }
+  .page .selection-summary-change.ui-action { flex: 0 0 auto; width: auto; min-width: 72px; max-width: none; padding: 8px 12px; white-space: nowrap; }
+  .page .selection-summary-change .ui-action-label { flex: none; }
+  .page .selection-whistle { flex: 0 0 20px; width: 20px; height: 20px; }
+  .page .selection-summary-title, .page .result-product-title, .page .follow-title { font-size: 20px; }
+  .page .selection-summary-city, .page .selection-summary-stores, .page .store-name { font-size: 16px; }
+  .page .selection-access-note, .page .result-target-note, .page .result-product-time, .page .store-observation { font-size: 14px; }
+  .page .result-product-part, .page .follow-note, .page .selection-rule-copy, .page .selection-rule-label { font-size: 14px; }
+  .page .selection-summary-image-box, .page .result-product-media { width: 100px; height: 110px; flex-basis: 100px; }
+  .page .selection-summary-image, .page .result-product-image { width: 100%; height: 100%; }
+  .page .follow-image { width: 90px; height: 100px; }
+  .page .launch-dates { font-size: 18px; }
+  .page .activation-step { font-size: 14px; }
+  .page .activation-dot { width: 22px; height: 22px; }
+  .page .membership-card { max-width: 560px; margin-left: auto; margin-right: auto; }
+  .page .member-number { font-size: 36px; }
+  .page .member-duration, .page .membership-shop-title { font-size: 18px; }
+  .page .member-renewal, .page .member-authorization, .page .member-allowance, .page .member-enhanced,
+  .page .member-core-label, .page .member-core-value, .page .membership-caption, .page .membership-manage { font-size: 14px; }
+  .page .membership-packages-context .membership-package { flex-basis: 180px; }
+  .page .membership-package-name { font-size: 18px; }
+  .page .membership-package-price { font-size: 24px; }
+  .page .membership-package-duration, .page .membership-package-benefit, .page .membership-task-label { font-size: 13px; }
+  .page .membership-packages-context .membership-package-benefit { font-size: 13px; margin: 8px 0; }
+  .page .membership-package-price-duration, .page .membership-package-choice { font-size: 13px; }
+  .page .membership-package-choice { gap: 6px; }
+  .page .membership-package-radio { width: 13px; height: 13px; border-width: 1px; }
+  .page .membership-package-selected .membership-package-radio { border-width: 4px; }
+  .page .checkout-core-benefits { font-size: 14px; }
+  .page .membership-contextual .checkout-context { padding: 16px 18px; border-radius: 16px; }
+  .page .membership-contextual .checkout-target, .page .membership-contextual .checkout-explanation { margin-top: 8px; }
+  .page .membership-contextual .member-overview { margin-top: 16px; margin-bottom: 8px; }
+  .page .membership-contextual .member-authorization { margin-top: 8px; }
+  .page .membership-contextual .membership-shop { margin-top: 16px; padding-top: 16px; }
+  .page .membership-contextual .membership-packages { margin-top: 14px; gap: 12px; }
+  .page .membership-packages-context .membership-package { padding: 16px 8px 12px; border-radius: 14px; }
+  .page .membership-packages-context .membership-package-price, .page .membership-packages-context .membership-package-choice { margin-top: 8px; }
+  .page .membership-contextual .checkout-terms { margin-top: 12px; }
+  .page .checkout-target-title { font-size: 18px; }
+  .page .checkout-stores, .page .checkout-explanation, .page .checkout-terms, .page .checkout-problem, .page .checkout-eyebrow { font-size: 14px; }
+  .page .checkout-image { width: 72px; height: 86px; flex-basis: 72px; }
+}
+
+/* Dark mode: color-only overrides for the light surfaces above. */
+@media (prefers-color-scheme: dark) {
+  .card { background-image: none; box-shadow: var(--shadow-soft); }
+  .btn-outline { background: rgba(255, 255, 255, 0.04); }
+  .btn-ghost, .chip.on, .empty-symbol { box-shadow: none; }
+  .btn-primary.disabled, .btn-primary[disabled], .btn[disabled] { background: #22322B; color: #7F958A; }
+  .pill-muted, .pill-unknown, .chip, .segments, .scroll-tabs .tab { background: rgba(255, 255, 255, 0.07); }
+  .pill-unknown { color: var(--text-2); }
+  .segment.on { background: #22322B; }
+  .banner { border-color: rgba(255, 255, 255, 0.06); }
+  .banner-warn, .stale-note { color: var(--warn); }
+  .product-image-box, .follow-image { background: var(--image-tile); }
+  .onboarding { background: var(--surface-soft); }
+  /* Line icons are rendered in the light-theme green; lift them to the dark-theme accent. */
+  .ui-icon { filter: brightness(1.5); }
+}

@@ -1,0 +1,270 @@
+{
+  "renderer": "headless Chromium rendering generated WXML/WXSS approximation; not WeChat",
+  "generatedAt": "2026-09-16T01:15:37.001Z",
+  "snapshots": [
+    {
+      "page": "follow",
+      "scenario": "stock-fresh",
+      "width": 320,
+      "file": "follow-stock-fresh-320.html",
+      "expectedText": [
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色",
+        "本次状态刚记录"
+      ],
+      "viewport": 320,
+      "scrollWidth": 320,
+      "bodyHeight": 1019,
+      "overflow": [],
+      "clippedText": [],
+      "images": [],
+      "missingText": []
+    },
+    {
+      "page": "follow",
+      "scenario": "stock-fresh",
+      "width": 375,
+      "file": "follow-stock-fresh-375.html",
+      "expectedText": [
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色",
+        "本次状态刚记录"
+      ],
+      "viewport": 375,
+      "scrollWidth": 375,
+      "bodyHeight": 1167,
+      "overflow": [],
+      "clippedText": [],
+      "images": [],
+      "missingText": []
+    },
+    {
+      "page": "follow",
+      "scenario": "stock-fresh",
+      "width": 430,
+      "file": "follow-stock-fresh-430.html",
+      "expectedText": [
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色",
+        "本次状态刚记录"
+      ],
+      "viewport": 430,
+      "scrollWidth": 430,
+      "bodyHeight": 1314,
+      "overflow": [],
+      "clippedText": [],
+      "images": [],
+      "missingText": []
+    },
+    {
+      "page": "follow",
+      "scenario": "stock-old",
+      "width": 320,
+      "file": "follow-stock-old-320.html",
+      "expectedText": [
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色",
+        "待更新"
+      ],
+      "viewport": 320,
+      "scrollWidth": 320,
+      "bodyHeight": 1054,
+      "overflow": [],
+      "clippedText": [],
+      "images": [],
+      "missingText": []
+    },
+    {
+      "page": "follow",
+      "scenario": "stock-old",
+      "width": 375,
+      "file": "follow-stock-old-375.html",
+      "expectedText": [
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色",
+        "待更新"
+      ],
+      "viewport": 375,
+      "scrollWidth": 375,
+      "bodyHeight": 1208,
+      "overflow": [],
+      "clippedText": [],
+      "images": [],
+      "missingText": []
+    },
+    {
+      "page": "follow",
+      "scenario": "stock-old",
+      "width": 430,
+      "file": "follow-stock-old-430.html",
+      "expectedText": [
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色",
+        "待更新"
+      ],
+      "viewport": 430,
+      "scrollWidth": 430,
+      "bodyHeight": 1361,
+      "overflow": [],
+      "clippedText": [],
+      "images": [],
+      "missingText": []
+    },
+    {
+      "page": "follow",
+      "scenario": "stock-unknown",
+      "width": 320,
+      "file": "follow-stock-unknown-320.html",
+      "expectedText": [
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色",
+        "状态待确认"
+      ],
+      "viewport": 320,
+      "scrollWidth": 320,
+      "bodyHeight": 1054,
+      "overflow": [],
+      "clippedText": [],
+      "images": [],
+      "missingText": []
+    },
+    {
+      "page": "follow",
+      "scenario": "stock-unknown",
+      "width": 375,
+      "file": "follow-stock-unknown-375.html",
+      "expectedText": [
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色",
+        "状态待确认"
+      ],
+      "viewport": 375,
+      "scrollWidth": 375,
+      "bodyHeight": 1208,
+      "overflow": [],
+      "clippedText": [],
+      "images": [],
+      "missingText": []
+    },
+    {
+      "page": "follow",
+      "scenario": "stock-unknown",
+      "width": 430,
+      "file": "follow-stock-unknown-430.html",
+      "expectedText": [
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色",
+        "状态待确认"
+      ],
+      "viewport": 430,
+      "scrollWidth": 430,
+      "bodyHeight": 1361,
+      "overflow": [],
+      "clippedText": [],
+      "images": [],
+      "missingText": []
+    },
+    {
+      "page": "follow",
+      "scenario": "stock-missing",
+      "width": 320,
+      "file": "follow-stock-missing-320.html",
+      "expectedText": [
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色",
+        "等待首次观测"
+      ],
+      "viewport": 320,
+      "scrollWidth": 320,
+      "bodyHeight": 1013,
+      "overflow": [],
+      "clippedText": [],
+      "images": [],
+      "missingText": []
+    },
+    {
+      "page": "follow",
+      "scenario": "stock-missing",
+      "width": 375,
+      "file": "follow-stock-missing-375.html",
+      "expectedText": [
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色",
+        "等待首次观测"
+      ],
+      "viewport": 375,
+      "scrollWidth": 375,
+      "bodyHeight": 1159,
+      "overflow": [],
+      "clippedText": [],
+      "images": [],
+      "missingText": []
+    },
+    {
+      "page": "follow",
+      "scenario": "stock-missing",
+      "width": 430,
+      "file": "follow-stock-missing-430.html",
+      "expectedText": [
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色",
+        "等待首次观测"
+      ],
+      "viewport": 430,
+      "scrollWidth": 430,
+      "bodyHeight": 1305,
+      "overflow": [],
+      "clippedText": [],
+      "images": [],
+      "missingText": []
+    },
+    {
+      "page": "follow",
+      "scenario": "stock-restricted",
+      "width": 320,
+      "file": "follow-stock-restricted-320.html",
+      "expectedText": [
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色",
+        "会员权益受限"
+      ],
+      "viewport": 320,
+      "scrollWidth": 320,
+      "bodyHeight": 1017,
+      "overflow": [],
+      "clippedText": [],
+      "images": [],
+      "missingText": []
+    },
+    {
+      "page": "follow",
+      "scenario": "stock-restricted",
+      "width": 375,
+      "file": "follow-stock-restricted-375.html",
+      "expectedText": [
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色",
+        "会员权益受限"
+      ],
+      "viewport": 375,
+      "scrollWidth": 375,
+      "bodyHeight": 1165,
+      "overflow": [],
+      "clippedText": [],
+      "images": [],
+      "missingText": []
+    },
+    {
+      "page": "follow",
+      "scenario": "stock-restricted",
+      "width": 430,
+      "file": "follow-stock-restricted-430.html",
+      "expectedText": [
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色",
+        "会员权益受限"
+      ],
+      "viewport": 430,
+      "scrollWidth": 430,
+      "bodyHeight": 1311,
+      "overflow": [],
+      "clippedText": [],
+      "images": [],
+      "missingText": []
+    }
+  ],
+  "screenshotDirectory": "C:\\Users\\Administrator\\Documents\\ChatGPT\\果小哨\\follow-glass-preview-20260916\\screenshots",
+  "summary": {
+    "total": 15,
+    "expressionErrors": 0,
+    "missingText": 0,
+    "horizontalOverflow": 0,
+    "clippedText": 0,
+    "failedImages": 0
+  }
+}

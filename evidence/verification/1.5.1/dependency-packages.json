@@ -1,0 +1,331 @@
+{
+  "generatedAt": "2026-10-01T14:42:33.706Z",
+  "nodeVersion": "v24.19.0",
+  "npmVersion": "10.9.4",
+  "npmVersionExitCode": 0,
+  "npmInvocation": "actual node executable + npm/bin/npm-cli.js; no pnpm wrapper",
+  "scriptsExecuted": false,
+  "expectedSdkVersions": {
+    "wx-server-sdk": "4.0.2",
+    "axios": "0.34.0",
+    "lodash.unset": "4.18.0"
+  },
+  "directories": [
+    {
+      "directory": ".",
+      "packageName": "guoxiaoshao",
+      "packageVersion": "1.5.1",
+      "lockVersion": 3,
+      "packageSha256": "97703f76f27bf879d7269097489eb4eb307ce9b42e9be606abf81927a6701dcf",
+      "lockSha256": "2fb93ac512e8bc4a1e041f485289d13048996071376b8bc68b9cad5a4620bdb8",
+      "localLinkEntries": [],
+      "noLocalLinks": true,
+      "install": {
+        "command": "npm ci --ignore-scripts --no-audit --no-fund",
+        "exitCode": 0,
+        "succeeded": true,
+        "errorCode": null
+      },
+      "audit": {
+        "command": "npm audit --json",
+        "exitCode": 0,
+        "parsed": true,
+        "vulnerabilities": {
+          "info": 0,
+          "low": 0,
+          "moderate": 0,
+          "high": 0,
+          "critical": 0,
+          "total": 0
+        },
+        "vulnerablePackages": [],
+        "residualLeaves": [],
+        "errorCode": null,
+        "note": null
+      },
+      "installedVersions": {
+        "wx-server-sdk": [],
+        "axios": [],
+        "lodash.unset": []
+      },
+      "npmLsExitCode": 1,
+      "expectedSdkVersionsInstalled": null,
+      "packageUnchanged": true,
+      "lockUnchanged": true,
+      "noLocalLinksAfter": true
+    },
+    {
+      "directory": "cloudfunctions/gxs_api",
+      "packageName": "gxs_api",
+      "packageVersion": "1.5.1",
+      "lockVersion": 3,
+      "packageSha256": "f532baef750065ae700490e7c9d6ee7052aaee4db576d9a27de87a0de1b3cac9",
+      "lockSha256": "cf57a8b913d92273cb691134668c750bc6c52f7a62fa50d1574d2bf1c968c4ee",
+      "localLinkEntries": [],
+      "noLocalLinks": true,
+      "install": {
+        "command": "npm ci --ignore-scripts --no-audit --no-fund",
+        "exitCode": 0,
+        "succeeded": true,
+        "errorCode": null
+      },
+      "audit": {
+        "command": "npm audit --omit=dev --json",
+        "exitCode": 1,
+        "parsed": true,
+        "vulnerabilities": {
+          "info": 0,
+          "low": 0,
+          "moderate": 0,
+          "high": 4,
+          "critical": 0,
+          "total": 4
+        },
+        "vulnerablePackages": [
+          "@cloudbase/database",
+          "@cloudbase/node-sdk",
+          "lodash.set",
+          "wx-server-sdk"
+        ],
+        "residualLeaves": [
+          {
+            "name": "lodash.set",
+            "severity": "high",
+            "affectedRange": "*",
+            "advisories": [
+              {
+                "source": 1106906,
+                "title": "Prototype Pollution in lodash",
+                "severity": "high"
+              }
+            ]
+          }
+        ],
+        "errorCode": null,
+        "note": "Audit found vulnerabilities; this is separate from installation success."
+      },
+      "installedVersions": {
+        "wx-server-sdk": [
+          "4.0.2"
+        ],
+        "axios": [
+          "0.34.0"
+        ],
+        "lodash.unset": [
+          "4.18.0"
+        ]
+      },
+      "npmLsExitCode": 0,
+      "expectedSdkVersionsInstalled": true,
+      "packageUnchanged": true,
+      "lockUnchanged": true,
+      "noLocalLinksAfter": true
+    },
+    {
+      "directory": "cloudfunctions/gxs_monitor",
+      "packageName": "gxs_monitor",
+      "packageVersion": "1.5.1",
+      "lockVersion": 3,
+      "packageSha256": "273b6ee0127baa57fc09756e36124142ab84e1d5d2e04eb6709a51555dfce912",
+      "lockSha256": "419abe4ce2a5d90a9c8eb00b8d6e122461c6b08610cc1470753c32e38d8cca82",
+      "localLinkEntries": [],
+      "noLocalLinks": true,
+      "install": {
+        "command": "npm ci --ignore-scripts --no-audit --no-fund",
+        "exitCode": 0,
+        "succeeded": true,
+        "errorCode": null
+      },
+      "audit": {
+        "command": "npm audit --omit=dev --json",
+        "exitCode": 1,
+        "parsed": true,
+        "vulnerabilities": {
+          "info": 0,
+          "low": 0,
+          "moderate": 0,
+          "high": 4,
+          "critical": 0,
+          "total": 4
+        },
+        "vulnerablePackages": [
+          "@cloudbase/database",
+          "@cloudbase/node-sdk",
+          "lodash.set",
+          "wx-server-sdk"
+        ],
+        "residualLeaves": [
+          {
+            "name": "lodash.set",
+            "severity": "high",
+            "affectedRange": "*",
+            "advisories": [
+              {
+                "source": 1106906,
+                "title": "Prototype Pollution in lodash",
+                "severity": "high"
+              }
+            ]
+          }
+        ],
+        "errorCode": null,
+        "note": "Audit found vulnerabilities; this is separate from installation success."
+      },
+      "installedVersions": {
+        "wx-server-sdk": [
+          "4.0.2"
+        ],
+        "axios": [
+          "0.34.0"
+        ],
+        "lodash.unset": [
+          "4.18.0"
+        ]
+      },
+      "npmLsExitCode": 0,
+      "expectedSdkVersionsInstalled": true,
+      "packageUnchanged": true,
+      "lockUnchanged": true,
+      "noLocalLinksAfter": true
+    },
+    {
+      "directory": "cloudfunctions/cloudbase_auth",
+      "packageName": "cloudbase_auth",
+      "packageVersion": "1.5.1",
+      "lockVersion": 3,
+      "packageSha256": "d7ac09242b1c61c1a677dd93958fe6cbf474f0c2f68ca31e5198f263d87c062d",
+      "lockSha256": "778d42d61b7857dba6bebf7cf323784aa8971c1fa6a7cc92ccea8059bd689409",
+      "localLinkEntries": [],
+      "noLocalLinks": true,
+      "install": {
+        "command": "npm ci --ignore-scripts --no-audit --no-fund",
+        "exitCode": 0,
+        "succeeded": true,
+        "errorCode": null
+      },
+      "audit": {
+        "command": "npm audit --omit=dev --json",
+        "exitCode": 1,
+        "parsed": true,
+        "vulnerabilities": {
+          "info": 0,
+          "low": 0,
+          "moderate": 0,
+          "high": 4,
+          "critical": 0,
+          "total": 4
+        },
+        "vulnerablePackages": [
+          "@cloudbase/database",
+          "@cloudbase/node-sdk",
+          "lodash.set",
+          "wx-server-sdk"
+        ],
+        "residualLeaves": [
+          {
+            "name": "lodash.set",
+            "severity": "high",
+            "affectedRange": "*",
+            "advisories": [
+              {
+                "source": 1106906,
+                "title": "Prototype Pollution in lodash",
+                "severity": "high"
+              }
+            ]
+          }
+        ],
+        "errorCode": null,
+        "note": "Audit found vulnerabilities; this is separate from installation success."
+      },
+      "installedVersions": {
+        "wx-server-sdk": [
+          "4.0.2"
+        ],
+        "axios": [
+          "0.34.0"
+        ],
+        "lodash.unset": [
+          "4.18.0"
+        ]
+      },
+      "npmLsExitCode": 0,
+      "expectedSdkVersionsInstalled": true,
+      "packageUnchanged": true,
+      "lockUnchanged": true,
+      "noLocalLinksAfter": true
+    },
+    {
+      "directory": "tools/collector",
+      "packageName": "guoxiaoshao-collector",
+      "packageVersion": "1.5.1",
+      "lockVersion": 3,
+      "packageSha256": "7c427d2bd34e009e81d7c4d64f5d7990e7ea376b0526813e7761edb1715b4951",
+      "lockSha256": "943e38947444f3e19cf34a6612b23168891509d6287279263fb272c5b6ca89dc",
+      "localLinkEntries": [],
+      "noLocalLinks": true,
+      "install": {
+        "command": "npm ci --ignore-scripts --no-audit --no-fund",
+        "exitCode": 0,
+        "succeeded": true,
+        "errorCode": null
+      },
+      "audit": {
+        "command": "npm audit --omit=dev --json",
+        "exitCode": 1,
+        "parsed": true,
+        "vulnerabilities": {
+          "info": 0,
+          "low": 0,
+          "moderate": 0,
+          "high": 4,
+          "critical": 0,
+          "total": 4
+        },
+        "vulnerablePackages": [
+          "@cloudbase/database",
+          "@cloudbase/node-sdk",
+          "lodash.set",
+          "wx-server-sdk"
+        ],
+        "residualLeaves": [
+          {
+            "name": "lodash.set",
+            "severity": "high",
+            "affectedRange": "*",
+            "advisories": [
+              {
+                "source": 1106906,
+                "title": "Prototype Pollution in lodash",
+                "severity": "high"
+              }
+            ]
+          }
+        ],
+        "errorCode": null,
+        "note": "Audit found vulnerabilities; this is separate from installation success."
+      },
+      "installedVersions": {
+        "wx-server-sdk": [
+          "4.0.2"
+        ],
+        "axios": [
+          "0.34.0"
+        ],
+        "lodash.unset": [
+          "4.18.0"
+        ]
+      },
+      "npmLsExitCode": 0,
+      "expectedSdkVersionsInstalled": true,
+      "packageUnchanged": true,
+      "lockUnchanged": true,
+      "noLocalLinksAfter": true
+    }
+  ],
+  "completed": true,
+  "allInstallsSucceeded": true,
+  "allSdkVersionsMatched": true,
+  "allPackageAndLockFilesUnchanged": true,
+  "allLocksWithoutLocalLinks": true
+}

@@ -1,0 +1,21 @@
+{
+  "name": "guoxiaoshao-collector",
+  "version": "2.1.0",
+  "license": "MIT",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "start": "node runner.js",
+    "check": "node --check runner.js"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "wx-server-sdk": "4.0.2"
+  },
+  "overrides": {
+    "axios": "0.34.0",
+    "lodash.unset": "4.18.0"
+  }
+}

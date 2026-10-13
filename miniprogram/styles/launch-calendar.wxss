@@ -1,0 +1,69 @@
+/* Shared launch calendar + opening poster. Imported by query and guide pages. */
+.calendar-heading { display: flex; align-items: center; justify-content: space-between; gap: 16rpx; flex-wrap: wrap; }
+/* Product title stays above milestone dates in the type scale. */
+.calendar-title { font-size: 48rpx; font-weight: 750; letter-spacing: -1rpx; line-height: 1.2; }
+.calendar-milestones { display: flex; gap: 24rpx; padding: 26rpx 0; }
+.calendar-milestones > view { flex: 1; min-width: 0; }
+.calendar-milestones > view + view { padding-left: 24rpx; border-left: 1rpx solid var(--line); }
+.calendar-date { display: block; font-size: 40rpx; font-weight: 700; line-height: 1.2; color: var(--green-dark); }
+.calendar-month { margin-bottom: 14rpx; font-size: 25rpx; font-weight: 600; }
+.calendar-grid { display: flex; flex-wrap: wrap; }
+.calendar-weekday, .calendar-cell { width: 14.2857%; text-align: center; }
+.calendar-weekday { font-size: 22rpx; color: var(--text-3); padding-bottom: 8rpx; }
+.calendar-cell { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 58rpx; border: 2rpx solid transparent; border-radius: 12rpx; font-size: 24rpx; line-height: 1.3; }
+.calendar-event { font-size: 18rpx; min-height: 22rpx; }
+.calendar-cell--event { background: var(--green-soft); color: var(--green-dark); font-weight: 650; }
+.calendar-cell--today { border-color: var(--green); }
+
+/* Launch poster: current stage, product, then two milestone tiles. The next
+   milestone carries the accent; a passed one steps back to a quiet surface. */
+.poster-hero { padding: 24rpx 24rpx 16rpx; border-radius: 24rpx; background: linear-gradient(180deg, var(--green-soft) 0%, rgba(0, 0, 0, 0) 78%), var(--surface-soft); text-align: center; overflow: hidden; }
+.poster-stage { display: inline-flex; align-items: center; gap: 10rpx; max-width: 100%; padding: 6rpx 20rpx; border-radius: 999rpx; background: var(--card); color: var(--green-dark); font-size: max(12px, 24rpx); font-weight: 600; line-height: 1.5; overflow-wrap: anywhere; box-shadow: 0 2rpx 10rpx rgba(0, 92, 56, .08); }
+.poster-stage::before { content: ''; flex: none; width: 12rpx; height: 12rpx; border-radius: 50%; background: currentColor; }
+.poster-stage--released { color: var(--text-2); }
+.poster-title { margin-top: 12rpx; font-size: 56rpx; font-weight: 750; line-height: 1.2; letter-spacing: -1.5rpx; color: var(--text); }
+.poster-hero-media { position: relative; height: 280rpx; margin-top: 8rpx; overflow: hidden; }
+/* Official portrait assets include generous empty margins. Crop that margin,
+   keeping the full device centered and separate from the title and dates. */
+.poster-hero-image { position: absolute; display: block; width: 100%; height: 560rpx; top: 50%; transform: translateY(-50%); pointer-events: none; }
+.opening-calendar-brand { font-size: 14px; color: var(--text-2); font-weight: 500; }
+.poster-milestones { display: flex; gap: 16rpx; margin-top: 20rpx; }
+.poster-milestone { display: flex; flex: 1 1 0; flex-direction: column; align-items: center; gap: 2rpx; min-width: 0; padding: 18rpx 12rpx; border: 1rpx solid var(--line); border-radius: 20rpx; background: var(--card); text-align: center; }
+.poster-milestone--next { border-color: var(--green); background: var(--green-soft); }
+.poster-milestone--done { background: var(--surface-soft); }
+.poster-milestone-label { color: var(--text-2); font-size: max(12px, 24rpx); font-weight: 500; line-height: 1.5; }
+.poster-milestone--next .poster-milestone-label { color: var(--green-dark); font-weight: 600; }
+.poster-milestone-date { font-size: 48rpx; font-weight: 700; line-height: 1.2; color: var(--text); font-variant-numeric: tabular-nums; }
+.poster-milestone--next .poster-milestone-date { color: var(--green-dark); }
+.poster-milestone--done .poster-milestone-date { color: var(--text-2); }
+.poster-milestone-meta { color: var(--text-3); font-size: max(12px, 22rpx); line-height: 1.5; }
+.poster-source { margin-top: 16rpx; text-align: center; font-size: 12px; color: var(--text-3); }
+
+@media (min-width: 600px) {
+  .calendar-heading { gap: 10px; }
+  .calendar-title { font-size: 30px; letter-spacing: -.4px; }
+  .calendar-milestones { gap: 16px; padding: 18px 0; }
+  .calendar-milestones > view + view { padding-left: 16px; }
+  .calendar-date { font-size: 26px; }
+  .calendar-month { font-size: 14px; margin-bottom: 10px; }
+  .calendar-weekday { font-size: 12px; padding-bottom: 6px; }
+  .calendar-cell { min-height: 34px; font-size: 14px; border-radius: 6px; }
+  .calendar-event { font-size: 11px; min-height: 13px; }
+  .poster-hero { padding: 16px 20px 12px; border-radius: 16px; }
+  .poster-stage { gap: 6px; padding: 3px 12px; font-size: 13px; }
+  .poster-stage::before { width: 6px; height: 6px; }
+  .poster-title { margin-top: 8px; font-size: 34px; letter-spacing: -.6px; }
+  .poster-hero-media { height: 180px; margin-top: 6px; }
+  .poster-hero-image { height: 360px; }
+  .poster-milestones { gap: 12px; margin-top: 14px; }
+  .poster-milestone { padding: 12px 8px; border-radius: 14px; }
+  .poster-milestone-label { font-size: 13px; }
+  .poster-milestone-date { font-size: 28px; }
+  .poster-milestone-meta { font-size: 12px; }
+  .poster-source { margin-top: 10px; }
+}
+
+@media (prefers-color-scheme: dark) {
+  .poster-hero { background: linear-gradient(180deg, var(--green-soft) 0%, rgba(0, 0, 0, 0) 78%), var(--surface-soft); }
+  .poster-stage { background: var(--surface-soft); box-shadow: none; }
+}

@@ -1,0 +1,3021 @@
+{
+  "renderer": "Offline Chromium approximation of actual WXML/WXSS; font scaling is computed CSS 130%, not native OS scaling",
+  "cases": [
+    {
+      "scenario": "free",
+      "width": 320,
+      "fontScale": 1,
+      "failures": [],
+      "buttons": [],
+      "rules": [
+        {
+          "label": {
+            "x": 24.03125,
+            "y": 1150.90625,
+            "right": 65,
+            "bottom": 1167.78125,
+            "width": 40.96875,
+            "height": 16.875
+          },
+          "copy": {
+            "x": 73.53125,
+            "y": 1150.90625,
+            "right": 295.96875,
+            "bottom": 1186.359375,
+            "width": 222.4375,
+            "height": 35.453125
+          },
+          "row": {
+            "x": 24.03125,
+            "y": 1150.90625,
+            "right": 295.96875,
+            "bottom": 1186.359375,
+            "width": 271.9375,
+            "height": 35.453125
+          },
+          "clipped": false
+        },
+        {
+          "label": {
+            "x": 24.03125,
+            "y": 1193.171875,
+            "right": 65,
+            "bottom": 1210.046875,
+            "width": 40.96875,
+            "height": 16.875
+          },
+          "copy": {
+            "x": 73.53125,
+            "y": 1193.171875,
+            "right": 295.96875,
+            "bottom": 1210.046875,
+            "width": 222.4375,
+            "height": 16.875
+          },
+          "row": {
+            "x": 24.03125,
+            "y": 1193.171875,
+            "right": 295.96875,
+            "bottom": 1210.046875,
+            "width": 271.9375,
+            "height": 16.875
+          },
+          "clipped": false
+        },
+        {
+          "label": {
+            "x": 24.03125,
+            "y": 1216.859375,
+            "right": 65,
+            "bottom": 1233.734375,
+            "width": 40.96875,
+            "height": 16.875
+          },
+          "copy": {
+            "x": 73.53125,
+            "y": 1216.859375,
+            "right": 295.96875,
+            "bottom": 1250.609375,
+            "width": 222.4375,
+            "height": 33.75
+          },
+          "row": {
+            "x": 24.03125,
+            "y": 1216.859375,
+            "right": 295.96875,
+            "bottom": 1250.609375,
+            "width": 271.9375,
+            "height": 33.75
+          },
+          "clipped": false
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "scenario": "free",
+      "width": 320,
+      "fontScale": 1.3,
+      "failures": [],
+      "buttons": [],
+      "rules": [
+        {
+          "label": {
+            "x": 24.03125,
+            "y": 1414.9375,
+            "right": 77.28125,
+            "bottom": 1436.890625,
+            "width": 53.25,
+            "height": 21.953125
+          },
+          "copy": {
+            "x": 85.8125,
+            "y": 1414.9375,
+            "right": 295.96875,
+            "bottom": 1460.546875,
+            "width": 210.15625,
+            "height": 45.609375
+          },
+          "row": {
+            "x": 24.03125,
+            "y": 1414.9375,
+            "right": 295.96875,
+            "bottom": 1460.546875,
+            "width": 271.9375,
+            "height": 45.609375
+          },
+          "clipped": false
+        },
+        {
+          "label": {
+            "x": 24.03125,
+            "y": 1467.359375,
+            "right": 77.28125,
+            "bottom": 1489.3125,
+            "width": 53.25,
+            "height": 21.953125
+          },
+          "copy": {
+            "x": 85.8125,
+            "y": 1467.359375,
+            "right": 295.96875,
+            "bottom": 1511.265625,
+            "width": 210.15625,
+            "height": 43.90625
+          },
+          "row": {
+            "x": 24.03125,
+            "y": 1467.359375,
+            "right": 295.96875,
+            "bottom": 1511.265625,
+            "width": 271.9375,
+            "height": 43.90625
+          },
+          "clipped": false
+        },
+        {
+          "label": {
+            "x": 24.03125,
+            "y": 1518.078125,
+            "right": 77.28125,
+            "bottom": 1540.03125,
+            "width": 53.25,
+            "height": 21.953125
+          },
+          "copy": {
+            "x": 85.8125,
+            "y": 1518.078125,
+            "right": 295.96875,
+            "bottom": 1583.9375,
+            "width": 210.15625,
+            "height": 65.859375
+          },
+          "row": {
+            "x": 24.03125,
+            "y": 1518.078125,
+            "right": 295.96875,
+            "bottom": 1583.9375,
+            "width": 271.9375,
+            "height": 65.859375
+          },
+          "clipped": false
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "scenario": "free",
+      "width": 375,
+      "fontScale": 1,
+      "failures": [],
+      "buttons": [],
+      "rules": [
+        {
+          "label": {
+            "x": 28,
+            "y": 1305.359375,
+            "right": 76,
+            "bottom": 1325.15625,
+            "width": 48,
+            "height": 19.796875
+          },
+          "copy": {
+            "x": 86,
+            "y": 1305.359375,
+            "right": 347,
+            "bottom": 1346.953125,
+            "width": 261,
+            "height": 41.59375
+          },
+          "row": {
+            "x": 28,
+            "y": 1305.359375,
+            "right": 347,
+            "bottom": 1346.953125,
+            "width": 319,
+            "height": 41.59375
+          },
+          "clipped": false
+        },
+        {
+          "label": {
+            "x": 28,
+            "y": 1354.953125,
+            "right": 76,
+            "bottom": 1374.75,
+            "width": 48,
+            "height": 19.796875
+          },
+          "copy": {
+            "x": 86,
+            "y": 1354.953125,
+            "right": 347,
+            "bottom": 1374.75,
+            "width": 261,
+            "height": 19.796875
+          },
+          "row": {
+            "x": 28,
+            "y": 1354.953125,
+            "right": 347,
+            "bottom": 1374.75,
+            "width": 319,
+            "height": 19.796875
+          },
+          "clipped": false
+        },
+        {
+          "label": {
+            "x": 28,
+            "y": 1382.75,
+            "right": 76,
+            "bottom": 1402.546875,
+            "width": 48,
+            "height": 19.796875
+          },
+          "copy": {
+            "x": 86,
+            "y": 1382.75,
+            "right": 347,
+            "bottom": 1422.34375,
+            "width": 261,
+            "height": 39.59375
+          },
+          "row": {
+            "x": 28,
+            "y": 1382.75,
+            "right": 347,
+            "bottom": 1422.34375,
+            "width": 319,
+            "height": 39.59375
+          },
+          "clipped": false
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "scenario": "free",
+      "width": 375,
+      "fontScale": 1.3,
+      "failures": [],
+      "buttons": [],
+      "rules": [
+        {
+          "label": {
+            "x": 28,
+            "y": 1621.953125,
+            "right": 90.40625,
+            "bottom": 1647.671875,
+            "width": 62.40625,
+            "height": 25.71875
+          },
+          "copy": {
+            "x": 100.40625,
+            "y": 1621.953125,
+            "right": 347,
+            "bottom": 1675.390625,
+            "width": 246.59375,
+            "height": 53.4375
+          },
+          "row": {
+            "x": 28,
+            "y": 1621.953125,
+            "right": 347,
+            "bottom": 1675.390625,
+            "width": 319,
+            "height": 53.4375
+          },
+          "clipped": false
+        },
+        {
+          "label": {
+            "x": 28,
+            "y": 1683.390625,
+            "right": 90.40625,
+            "bottom": 1709.109375,
+            "width": 62.40625,
+            "height": 25.71875
+          },
+          "copy": {
+            "x": 100.40625,
+            "y": 1683.390625,
+            "right": 347,
+            "bottom": 1734.828125,
+            "width": 246.59375,
+            "height": 51.4375
+          },
+          "row": {
+            "x": 28,
+            "y": 1683.390625,
+            "right": 347,
+            "bottom": 1734.828125,
+            "width": 319,
+            "height": 51.4375
+          },
+          "clipped": false
+        },
+        {
+          "label": {
+            "x": 28,
+            "y": 1742.828125,
+            "right": 90.40625,
+            "bottom": 1768.546875,
+            "width": 62.40625,
+            "height": 25.71875
+          },
+          "copy": {
+            "x": 100.40625,
+            "y": 1742.828125,
+            "right": 347,
+            "bottom": 1819.984375,
+            "width": 246.59375,
+            "height": 77.15625
+          },
+          "row": {
+            "x": 28,
+            "y": 1742.828125,
+            "right": 347,
+            "bottom": 1819.984375,
+            "width": 319,
+            "height": 77.15625
+          },
+          "clipped": false
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "scenario": "free",
+      "width": 430,
+      "fontScale": 1,
+      "failures": [],
+      "buttons": [],
+      "rules": [
+        {
+          "label": {
+            "x": 31.9375,
+            "y": 1461.578125,
+            "right": 86.984375,
+            "bottom": 1484.28125,
+            "width": 55.046875,
+            "height": 22.703125
+          },
+          "copy": {
+            "x": 98.4375,
+            "y": 1461.578125,
+            "right": 398.0625,
+            "bottom": 1509.265625,
+            "width": 299.625,
+            "height": 47.6875
+          },
+          "row": {
+            "x": 31.9375,
+            "y": 1461.578125,
+            "right": 398.0625,
+            "bottom": 1509.265625,
+            "width": 366.125,
+            "height": 47.6875
+          },
+          "clipped": false
+        },
+        {
+          "label": {
+            "x": 31.9375,
+            "y": 1518.4375,
+            "right": 86.984375,
+            "bottom": 1541.140625,
+            "width": 55.046875,
+            "height": 22.703125
+          },
+          "copy": {
+            "x": 98.4375,
+            "y": 1518.4375,
+            "right": 398.0625,
+            "bottom": 1541.140625,
+            "width": 299.625,
+            "height": 22.703125
+          },
+          "row": {
+            "x": 31.9375,
+            "y": 1518.4375,
+            "right": 398.0625,
+            "bottom": 1541.140625,
+            "width": 366.125,
+            "height": 22.703125
+          },
+          "clipped": false
+        },
+        {
+          "label": {
+            "x": 31.9375,
+            "y": 1550.3125,
+            "right": 86.984375,
+            "bottom": 1573.015625,
+            "width": 55.046875,
+            "height": 22.703125
+          },
+          "copy": {
+            "x": 98.4375,
+            "y": 1550.3125,
+            "right": 398.0625,
+            "bottom": 1595.71875,
+            "width": 299.625,
+            "height": 45.40625
+          },
+          "row": {
+            "x": 31.9375,
+            "y": 1550.3125,
+            "right": 398.0625,
+            "bottom": 1595.71875,
+            "width": 366.125,
+            "height": 45.40625
+          },
+          "clipped": false
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "scenario": "free",
+      "width": 430,
+      "fontScale": 1.3,
+      "failures": [],
+      "buttons": [],
+      "rules": [
+        {
+          "label": {
+            "x": 31.9375,
+            "y": 1838.96875,
+            "right": 103.484375,
+            "bottom": 1868.484375,
+            "width": 71.546875,
+            "height": 29.515625
+          },
+          "copy": {
+            "x": 114.9375,
+            "y": 1838.96875,
+            "right": 398.0625,
+            "bottom": 1900.28125,
+            "width": 283.125,
+            "height": 61.3125
+          },
+          "row": {
+            "x": 31.9375,
+            "y": 1838.96875,
+            "right": 398.0625,
+            "bottom": 1900.28125,
+            "width": 366.125,
+            "height": 61.3125
+          },
+          "clipped": false
+        },
+        {
+          "label": {
+            "x": 31.9375,
+            "y": 1909.453125,
+            "right": 103.484375,
+            "bottom": 1938.96875,
+            "width": 71.546875,
+            "height": 29.515625
+          },
+          "copy": {
+            "x": 114.9375,
+            "y": 1909.453125,
+            "right": 398.0625,
+            "bottom": 1968.484375,
+            "width": 283.125,
+            "height": 59.03125
+          },
+          "row": {
+            "x": 31.9375,
+            "y": 1909.453125,
+            "right": 398.0625,
+            "bottom": 1968.484375,
+            "width": 366.125,
+            "height": 59.03125
+          },
+          "clipped": false
+        },
+        {
+          "label": {
+            "x": 31.9375,
+            "y": 1977.65625,
+            "right": 103.484375,
+            "bottom": 2007.171875,
+            "width": 71.546875,
+            "height": 29.515625
+          },
+          "copy": {
+            "x": 114.9375,
+            "y": 1977.65625,
+            "right": 398.0625,
+            "bottom": 2066.203125,
+            "width": 283.125,
+            "height": 88.546875
+          },
+          "row": {
+            "x": 31.9375,
+            "y": 1977.65625,
+            "right": 398.0625,
+            "bottom": 2066.203125,
+            "width": 366.125,
+            "height": 88.546875
+          },
+          "clipped": false
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "scenario": "member",
+      "width": 320,
+      "fontScale": 1,
+      "failures": [],
+      "buttons": [
+        {
+          "text": "加入关注",
+          "x": 24.03125,
+          "y": 815.59375,
+          "right": 155.734375,
+          "bottom": 859.59375,
+          "width": 131.703125,
+          "height": 44,
+          "textHeight": 14,
+          "lineHeight": 16.6399
+        },
+        {
+          "text": "重新查询",
+          "x": 164.265625,
+          "y": 815.59375,
+          "right": 295.96875,
+          "bottom": 859.59375,
+          "width": 131.703125,
+          "height": 44,
+          "textHeight": 14,
+          "lineHeight": 16.6399
+        }
+      ],
+      "rules": [
+        {
+          "label": {
+            "x": 24.03125,
+            "y": 439.65625,
+            "right": 65,
+            "bottom": 456.53125,
+            "width": 40.96875,
+            "height": 16.875
+          },
+          "copy": {
+            "x": 73.53125,
+            "y": 439.65625,
+            "right": 295.96875,
+            "bottom": 475.109375,
+            "width": 222.4375,
+            "height": 35.453125
+          },
+          "row": {
+            "x": 24.03125,
+            "y": 439.65625,
+            "right": 295.96875,
+            "bottom": 475.109375,
+            "width": 271.9375,
+            "height": 35.453125
+          },
+          "clipped": false
+        },
+        {
+          "label": {
+            "x": 24.03125,
+            "y": 481.921875,
+            "right": 65,
+            "bottom": 498.796875,
+            "width": 40.96875,
+            "height": 16.875
+          },
+          "copy": {
+            "x": 73.53125,
+            "y": 481.921875,
+            "right": 295.96875,
+            "bottom": 498.796875,
+            "width": 222.4375,
+            "height": 16.875
+          },
+          "row": {
+            "x": 24.03125,
+            "y": 481.921875,
+            "right": 295.96875,
+            "bottom": 498.796875,
+            "width": 271.9375,
+            "height": 16.875
+          },
+          "clipped": false
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "scenario": "member",
+      "width": 320,
+      "fontScale": 1.3,
+      "failures": [],
+      "buttons": [
+        {
+          "text": "加入关注",
+          "x": 24.03125,
+          "y": 979.21875,
+          "right": 155.734375,
+          "bottom": 1023.21875,
+          "width": 131.703125,
+          "height": 44,
+          "textHeight": 17,
+          "lineHeight": 21.6319
+        },
+        {
+          "text": "重新查询",
+          "x": 164.265625,
+          "y": 979.21875,
+          "right": 295.96875,
+          "bottom": 1023.21875,
+          "width": 131.703125,
+          "height": 44,
+          "textHeight": 17,
+          "lineHeight": 21.6319
+        }
+      ],
+      "rules": [
+        {
+          "label": {
+            "x": 24.03125,
+            "y": 516,
+            "right": 77.28125,
+            "bottom": 537.953125,
+            "width": 53.25,
+            "height": 21.953125
+          },
+          "copy": {
+            "x": 85.8125,
+            "y": 516,
+            "right": 295.96875,
+            "bottom": 561.609375,
+            "width": 210.15625,
+            "height": 45.609375
+          },
+          "row": {
+            "x": 24.03125,
+            "y": 516,
+            "right": 295.96875,
+            "bottom": 561.609375,
+            "width": 271.9375,
+            "height": 45.609375
+          },
+          "clipped": false
+        },
+        {
+          "label": {
+            "x": 24.03125,
+            "y": 568.421875,
+            "right": 77.28125,
+            "bottom": 590.375,
+            "width": 53.25,
+            "height": 21.953125
+          },
+          "copy": {
+            "x": 85.8125,
+            "y": 568.421875,
+            "right": 295.96875,
+            "bottom": 590.375,
+            "width": 210.15625,
+            "height": 21.953125
+          },
+          "row": {
+            "x": 24.03125,
+            "y": 568.421875,
+            "right": 295.96875,
+            "bottom": 590.375,
+            "width": 271.9375,
+            "height": 21.953125
+          },
+          "clipped": false
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "scenario": "member",
+      "width": 375,
+      "fontScale": 1,
+      "failures": [],
+      "buttons": [
+        {
+          "text": "加入关注",
+          "x": 28,
+          "y": 922.234375,
+          "right": 182.5,
+          "bottom": 966.234375,
+          "width": 154.5,
+          "height": 44,
+          "textHeight": 16,
+          "lineHeight": 19.5
+        },
+        {
+          "text": "重新查询",
+          "x": 192.5,
+          "y": 922.234375,
+          "right": 347,
+          "bottom": 966.234375,
+          "width": 154.5,
+          "height": 44,
+          "textHeight": 16,
+          "lineHeight": 19.5
+        }
+      ],
+      "rules": [
+        {
+          "label": {
+            "x": 28,
+            "y": 482.046875,
+            "right": 76,
+            "bottom": 501.84375,
+            "width": 48,
+            "height": 19.796875
+          },
+          "copy": {
+            "x": 86,
+            "y": 482.046875,
+            "right": 347,
+            "bottom": 523.640625,
+            "width": 261,
+            "height": 41.59375
+          },
+          "row": {
+            "x": 28,
+            "y": 482.046875,
+            "right": 347,
+            "bottom": 523.640625,
+            "width": 319,
+            "height": 41.59375
+          },
+          "clipped": false
+        },
+        {
+          "label": {
+            "x": 28,
+            "y": 531.640625,
+            "right": 76,
+            "bottom": 551.4375,
+            "width": 48,
+            "height": 19.796875
+          },
+          "copy": {
+            "x": 86,
+            "y": 531.640625,
+            "right": 347,
+            "bottom": 551.4375,
+            "width": 261,
+            "height": 19.796875
+          },
+          "row": {
+            "x": 28,
+            "y": 531.640625,
+            "right": 347,
+            "bottom": 551.4375,
+            "width": 319,
+            "height": 19.796875
+          },
+          "clipped": false
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "scenario": "member",
+      "width": 375,
+      "fontScale": 1.3,
+      "failures": [],
+      "buttons": [
+        {
+          "text": "加入关注",
+          "x": 28,
+          "y": 1119.515625,
+          "right": 182.5,
+          "bottom": 1164.875,
+          "width": 154.5,
+          "height": 45.359375,
+          "textHeight": 20,
+          "lineHeight": 25.35
+        },
+        {
+          "text": "重新查询",
+          "x": 192.5,
+          "y": 1119.515625,
+          "right": 347,
+          "bottom": 1164.875,
+          "width": 154.5,
+          "height": 45.359375,
+          "textHeight": 20,
+          "lineHeight": 25.35
+        }
+      ],
+      "rules": [
+        {
+          "label": {
+            "x": 28,
+            "y": 577.265625,
+            "right": 90.40625,
+            "bottom": 602.984375,
+            "width": 62.40625,
+            "height": 25.71875
+          },
+          "copy": {
+            "x": 100.40625,
+            "y": 577.265625,
+            "right": 347,
+            "bottom": 630.703125,
+            "width": 246.59375,
+            "height": 53.4375
+          },
+          "row": {
+            "x": 28,
+            "y": 577.265625,
+            "right": 347,
+            "bottom": 630.703125,
+            "width": 319,
+            "height": 53.4375
+          },
+          "clipped": false
+        },
+        {
+          "label": {
+            "x": 28,
+            "y": 638.703125,
+            "right": 90.40625,
+            "bottom": 664.421875,
+            "width": 62.40625,
+            "height": 25.71875
+          },
+          "copy": {
+            "x": 100.40625,
+            "y": 638.703125,
+            "right": 347,
+            "bottom": 664.421875,
+            "width": 246.59375,
+            "height": 25.71875
+          },
+          "row": {
+            "x": 28,
+            "y": 638.703125,
+            "right": 347,
+            "bottom": 664.421875,
+            "width": 319,
+            "height": 25.71875
+          },
+          "clipped": false
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "scenario": "member",
+      "width": 430,
+      "fontScale": 1,
+      "failures": [],
+      "buttons": [
+        {
+          "text": "加入关注",
+          "x": 31.9375,
+          "y": 1040.9375,
+          "right": 209.265625,
+          "bottom": 1091.390625,
+          "width": 177.328125,
+          "height": 50.453125,
+          "textHeight": 17,
+          "lineHeight": 22.3601
+        },
+        {
+          "text": "重新查询",
+          "x": 220.71875,
+          "y": 1040.9375,
+          "right": 398.0625,
+          "bottom": 1091.390625,
+          "width": 177.34375,
+          "height": 50.453125,
+          "textHeight": 17,
+          "lineHeight": 22.3601
+        }
+      ],
+      "rules": [
+        {
+          "label": {
+            "x": 31.9375,
+            "y": 537.046875,
+            "right": 86.984375,
+            "bottom": 559.75,
+            "width": 55.046875,
+            "height": 22.703125
+          },
+          "copy": {
+            "x": 98.4375,
+            "y": 537.046875,
+            "right": 398.0625,
+            "bottom": 584.734375,
+            "width": 299.625,
+            "height": 47.6875
+          },
+          "row": {
+            "x": 31.9375,
+            "y": 537.046875,
+            "right": 398.0625,
+            "bottom": 584.734375,
+            "width": 366.125,
+            "height": 47.6875
+          },
+          "clipped": false
+        },
+        {
+          "label": {
+            "x": 31.9375,
+            "y": 593.90625,
+            "right": 86.984375,
+            "bottom": 616.609375,
+            "width": 55.046875,
+            "height": 22.703125
+          },
+          "copy": {
+            "x": 98.4375,
+            "y": 593.90625,
+            "right": 398.0625,
+            "bottom": 616.609375,
+            "width": 299.625,
+            "height": 22.703125
+          },
+          "row": {
+            "x": 31.9375,
+            "y": 593.90625,
+            "right": 398.0625,
+            "bottom": 616.609375,
+            "width": 366.125,
+            "height": 22.703125
+          },
+          "clipped": false
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "scenario": "member",
+      "width": 430,
+      "fontScale": 1.3,
+      "failures": [],
+      "buttons": [
+        {
+          "text": "加入关注",
+          "x": 31.9375,
+          "y": 1266.546875,
+          "right": 209.265625,
+          "bottom": 1318.234375,
+          "width": 177.328125,
+          "height": 51.6875,
+          "textHeight": 23,
+          "lineHeight": 29.0681
+        },
+        {
+          "text": "重新查询",
+          "x": 220.71875,
+          "y": 1266.546875,
+          "right": 398.0625,
+          "bottom": 1318.234375,
+          "width": 177.34375,
+          "height": 51.6875,
+          "textHeight": 23,
+          "lineHeight": 29.0681
+        }
+      ],
+      "rules": [
+        {
+          "label": {
+            "x": 31.9375,
+            "y": 643.65625,
+            "right": 103.484375,
+            "bottom": 673.171875,
+            "width": 71.546875,
+            "height": 29.515625
+          },
+          "copy": {
+            "x": 114.9375,
+            "y": 643.65625,
+            "right": 398.0625,
+            "bottom": 704.96875,
+            "width": 283.125,
+            "height": 61.3125
+          },
+          "row": {
+            "x": 31.9375,
+            "y": 643.65625,
+            "right": 398.0625,
+            "bottom": 704.96875,
+            "width": 366.125,
+            "height": 61.3125
+          },
+          "clipped": false
+        },
+        {
+          "label": {
+            "x": 31.9375,
+            "y": 714.140625,
+            "right": 103.484375,
+            "bottom": 743.65625,
+            "width": 71.546875,
+            "height": 29.515625
+          },
+          "copy": {
+            "x": 114.9375,
+            "y": 714.140625,
+            "right": 398.0625,
+            "bottom": 743.65625,
+            "width": 283.125,
+            "height": 29.515625
+          },
+          "row": {
+            "x": 31.9375,
+            "y": 714.140625,
+            "right": 398.0625,
+            "bottom": 743.65625,
+            "width": 366.125,
+            "height": 29.515625
+          },
+          "clipped": false
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "scenario": "expired",
+      "width": 320,
+      "fontScale": 1,
+      "failures": [],
+      "buttons": [
+        {
+          "text": "加入关注",
+          "x": 24.03125,
+          "y": 856.15625,
+          "right": 155.734375,
+          "bottom": 900.15625,
+          "width": 131.703125,
+          "height": 44,
+          "textHeight": 14,
+          "lineHeight": 16.6399
+        },
+        {
+          "text": "重新查询",
+          "x": 164.265625,
+          "y": 856.15625,
+          "right": 295.96875,
+          "bottom": 900.15625,
+          "width": 131.703125,
+          "height": 44,
+          "textHeight": 14,
+          "lineHeight": 16.6399
+        }
+      ],
+      "rules": [
+        {
+          "label": {
+            "x": 24.03125,
+            "y": 439.65625,
+            "right": 65,
+            "bottom": 456.53125,
+            "width": 40.96875,
+            "height": 16.875
+          },
+          "copy": {
+            "x": 73.53125,
+            "y": 439.65625,
+            "right": 295.96875,
+            "bottom": 475.109375,
+            "width": 222.4375,
+            "height": 35.453125
+          },
+          "row": {
+            "x": 24.03125,
+            "y": 439.65625,
+            "right": 295.96875,
+            "bottom": 475.109375,
+            "width": 271.9375,
+            "height": 35.453125
+          },
+          "clipped": false
+        },
+        {
+          "label": {
+            "x": 24.03125,
+            "y": 481.921875,
+            "right": 65,
+            "bottom": 498.796875,
+            "width": 40.96875,
+            "height": 16.875
+          },
+          "copy": {
+            "x": 73.53125,
+            "y": 481.921875,
+            "right": 295.96875,
+            "bottom": 498.796875,
+            "width": 222.4375,
+            "height": 16.875
+          },
+          "row": {
+            "x": 24.03125,
+            "y": 481.921875,
+            "right": 295.96875,
+            "bottom": 498.796875,
+            "width": 271.9375,
+            "height": 16.875
+          },
+          "clipped": false
+        },
+        {
+          "label": {
+            "x": 24.03125,
+            "y": 505.609375,
+            "right": 65,
+            "bottom": 522.484375,
+            "width": 40.96875,
+            "height": 16.875
+          },
+          "copy": {
+            "x": 73.53125,
+            "y": 505.609375,
+            "right": 295.96875,
+            "bottom": 539.359375,
+            "width": 222.4375,
+            "height": 33.75
+          },
+          "row": {
+            "x": 24.03125,
+            "y": 505.609375,
+            "right": 295.96875,
+            "bottom": 539.359375,
+            "width": 271.9375,
+            "height": 33.75
+          },
+          "clipped": false
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "scenario": "expired",
+      "width": 320,
+      "fontScale": 1.3,
+      "failures": [],
+      "buttons": [
+        {
+          "text": "加入关注",
+          "x": 24.03125,
+          "y": 1073.84375,
+          "right": 155.734375,
+          "bottom": 1117.84375,
+          "width": 131.703125,
+          "height": 44,
+          "textHeight": 17,
+          "lineHeight": 21.6319
+        },
+        {
+          "text": "重新查询",
+          "x": 164.265625,
+          "y": 1073.84375,
+          "right": 295.96875,
+          "bottom": 1117.84375,
+          "width": 131.703125,
+          "height": 44,
+          "textHeight": 17,
+          "lineHeight": 21.6319
+        }
+      ],
+      "rules": [
+        {
+          "label": {
+            "x": 24.03125,
+            "y": 516,
+            "right": 77.28125,
+            "bottom": 537.953125,
+            "width": 53.25,
+            "height": 21.953125
+          },
+          "copy": {
+            "x": 85.8125,
+            "y": 516,
+            "right": 295.96875,
+            "bottom": 561.609375,
+            "width": 210.15625,
+            "height": 45.609375
+          },
+          "row": {
+            "x": 24.03125,
+            "y": 516,
+            "right": 295.96875,
+            "bottom": 561.609375,
+            "width": 271.9375,
+            "height": 45.609375
+          },
+          "clipped": false
+        },
+        {
+          "label": {
+            "x": 24.03125,
+            "y": 568.421875,
+            "right": 77.28125,
+            "bottom": 590.375,
+            "width": 53.25,
+            "height": 21.953125
+          },
+          "copy": {
+            "x": 85.8125,
+            "y": 568.421875,
+            "right": 295.96875,
+            "bottom": 612.328125,
+            "width": 210.15625,
+            "height": 43.90625
+          },
+          "row": {
+            "x": 24.03125,
+            "y": 568.421875,
+            "right": 295.96875,
+            "bottom": 612.328125,
+            "width": 271.9375,
+            "height": 43.90625
+          },
+          "clipped": false
+        },
+        {
+          "label": {
+            "x": 24.03125,
+            "y": 619.140625,
+            "right": 77.28125,
+            "bottom": 641.09375,
+            "width": 53.25,
+            "height": 21.953125
+          },
+          "copy": {
+            "x": 85.8125,
+            "y": 619.140625,
+            "right": 295.96875,
+            "bottom": 685,
+            "width": 210.15625,
+            "height": 65.859375
+          },
+          "row": {
+            "x": 24.03125,
+            "y": 619.140625,
+            "right": 295.96875,
+            "bottom": 685,
+            "width": 271.9375,
+            "height": 65.859375
+          },
+          "clipped": false
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "scenario": "expired",
+      "width": 375,
+      "fontScale": 1,
+      "failures": [],
+      "buttons": [
+        {
+          "text": "加入关注",
+          "x": 28,
+          "y": 969.828125,
+          "right": 182.5,
+          "bottom": 1013.828125,
+          "width": 154.5,
+          "height": 44,
+          "textHeight": 16,
+          "lineHeight": 19.5
+        },
+        {
+          "text": "重新查询",
+          "x": 192.5,
+          "y": 969.828125,
+          "right": 347,
+          "bottom": 1013.828125,
+          "width": 154.5,
+          "height": 44,
+          "textHeight": 16,
+          "lineHeight": 19.5
+        }
+      ],
+      "rules": [
+        {
+          "label": {
+            "x": 28,
+            "y": 482.046875,
+            "right": 76,
+            "bottom": 501.84375,
+            "width": 48,
+            "height": 19.796875
+          },
+          "copy": {
+            "x": 86,
+            "y": 482.046875,
+            "right": 347,
+            "bottom": 523.640625,
+            "width": 261,
+            "height": 41.59375
+          },
+          "row": {
+            "x": 28,
+            "y": 482.046875,
+            "right": 347,
+            "bottom": 523.640625,
+            "width": 319,
+            "height": 41.59375
+          },
+          "clipped": false
+        },
+        {
+          "label": {
+            "x": 28,
+            "y": 531.640625,
+            "right": 76,
+            "bottom": 551.4375,
+            "width": 48,
+            "height": 19.796875
+          },
+          "copy": {
+            "x": 86,
+            "y": 531.640625,
+            "right": 347,
+            "bottom": 551.4375,
+            "width": 261,
+            "height": 19.796875
+          },
+          "row": {
+            "x": 28,
+            "y": 531.640625,
+            "right": 347,
+            "bottom": 551.4375,
+            "width": 319,
+            "height": 19.796875
+          },
+          "clipped": false
+        },
+        {
+          "label": {
+            "x": 28,
+            "y": 559.4375,
+            "right": 76,
+            "bottom": 579.234375,
+            "width": 48,
+            "height": 19.796875
+          },
+          "copy": {
+            "x": 86,
+            "y": 559.4375,
+            "right": 347,
+            "bottom": 599.03125,
+            "width": 261,
+            "height": 39.59375
+          },
+          "row": {
+            "x": 28,
+            "y": 559.4375,
+            "right": 347,
+            "bottom": 599.03125,
+            "width": 319,
+            "height": 39.59375
+          },
+          "clipped": false
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "scenario": "expired",
+      "width": 375,
+      "fontScale": 1.3,
+      "failures": [],
+      "buttons": [
+        {
+          "text": "加入关注",
+          "x": 28,
+          "y": 1230.390625,
+          "right": 182.5,
+          "bottom": 1275.75,
+          "width": 154.5,
+          "height": 45.359375,
+          "textHeight": 20,
+          "lineHeight": 25.35
+        },
+        {
+          "text": "重新查询",
+          "x": 192.5,
+          "y": 1230.390625,
+          "right": 347,
+          "bottom": 1275.75,
+          "width": 154.5,
+          "height": 45.359375,
+          "textHeight": 20,
+          "lineHeight": 25.35
+        }
+      ],
+      "rules": [
+        {
+          "label": {
+            "x": 28,
+            "y": 577.265625,
+            "right": 90.40625,
+            "bottom": 602.984375,
+            "width": 62.40625,
+            "height": 25.71875
+          },
+          "copy": {
+            "x": 100.40625,
+            "y": 577.265625,
+            "right": 347,
+            "bottom": 630.703125,
+            "width": 246.59375,
+            "height": 53.4375
+          },
+          "row": {
+            "x": 28,
+            "y": 577.265625,
+            "right": 347,
+            "bottom": 630.703125,
+            "width": 319,
+            "height": 53.4375
+          },
+          "clipped": false
+        },
+        {
+          "label": {
+            "x": 28,
+            "y": 638.703125,
+            "right": 90.40625,
+            "bottom": 664.421875,
+            "width": 62.40625,
+            "height": 25.71875
+          },
+          "copy": {
+            "x": 100.40625,
+            "y": 638.703125,
+            "right": 347,
+            "bottom": 690.140625,
+            "width": 246.59375,
+            "height": 51.4375
+          },
+          "row": {
+            "x": 28,
+            "y": 638.703125,
+            "right": 347,
+            "bottom": 690.140625,
+            "width": 319,
+            "height": 51.4375
+          },
+          "clipped": false
+        },
+        {
+          "label": {
+            "x": 28,
+            "y": 698.140625,
+            "right": 90.40625,
+            "bottom": 723.859375,
+            "width": 62.40625,
+            "height": 25.71875
+          },
+          "copy": {
+            "x": 100.40625,
+            "y": 698.140625,
+            "right": 347,
+            "bottom": 775.296875,
+            "width": 246.59375,
+            "height": 77.15625
+          },
+          "row": {
+            "x": 28,
+            "y": 698.140625,
+            "right": 347,
+            "bottom": 775.296875,
+            "width": 319,
+            "height": 77.15625
+          },
+          "clipped": false
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "scenario": "expired",
+      "width": 430,
+      "fontScale": 1,
+      "failures": [],
+      "buttons": [
+        {
+          "text": "加入关注",
+          "x": 31.9375,
+          "y": 1079.015625,
+          "right": 209.265625,
+          "bottom": 1129.46875,
+          "width": 177.328125,
+          "height": 50.453125,
+          "textHeight": 17,
+          "lineHeight": 22.3601
+        },
+        {
+          "text": "重新查询",
+          "x": 220.71875,
+          "y": 1079.015625,
+          "right": 398.0625,
+          "bottom": 1129.46875,
+          "width": 177.34375,
+          "height": 50.453125,
+          "textHeight": 17,
+          "lineHeight": 22.3601
+        }
+      ],
+      "rules": [
+        {
+          "label": {
+            "x": 31.9375,
+            "y": 520.546875,
+            "right": 86.984375,
+            "bottom": 543.25,
+            "width": 55.046875,
+            "height": 22.703125
+          },
+          "copy": {
+            "x": 98.4375,
+            "y": 520.546875,
+            "right": 398.0625,
+            "bottom": 568.234375,
+            "width": 299.625,
+            "height": 47.6875
+          },
+          "row": {
+            "x": 31.9375,
+            "y": 520.546875,
+            "right": 398.0625,
+            "bottom": 568.234375,
+            "width": 366.125,
+            "height": 47.6875
+          },
+          "clipped": false
+        },
+        {
+          "label": {
+            "x": 31.9375,
+            "y": 577.40625,
+            "right": 86.984375,
+            "bottom": 600.109375,
+            "width": 55.046875,
+            "height": 22.703125
+          },
+          "copy": {
+            "x": 98.4375,
+            "y": 577.40625,
+            "right": 398.0625,
+            "bottom": 600.109375,
+            "width": 299.625,
+            "height": 22.703125
+          },
+          "row": {
+            "x": 31.9375,
+            "y": 577.40625,
+            "right": 398.0625,
+            "bottom": 600.109375,
+            "width": 366.125,
+            "height": 22.703125
+          },
+          "clipped": false
+        },
+        {
+          "label": {
+            "x": 31.9375,
+            "y": 609.28125,
+            "right": 86.984375,
+            "bottom": 631.984375,
+            "width": 55.046875,
+            "height": 22.703125
+          },
+          "copy": {
+            "x": 98.4375,
+            "y": 609.28125,
+            "right": 398.0625,
+            "bottom": 654.6875,
+            "width": 299.625,
+            "height": 45.40625
+          },
+          "row": {
+            "x": 31.9375,
+            "y": 609.28125,
+            "right": 398.0625,
+            "bottom": 654.6875,
+            "width": 366.125,
+            "height": 45.40625
+          },
+          "clipped": false
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "scenario": "expired",
+      "width": 430,
+      "fontScale": 1.3,
+      "failures": [],
+      "buttons": [
+        {
+          "text": "加入关注",
+          "x": 31.9375,
+          "y": 1393.78125,
+          "right": 209.265625,
+          "bottom": 1445.46875,
+          "width": 177.328125,
+          "height": 51.6875,
+          "textHeight": 23,
+          "lineHeight": 29.0681
+        },
+        {
+          "text": "重新查询",
+          "x": 220.71875,
+          "y": 1393.78125,
+          "right": 398.0625,
+          "bottom": 1445.46875,
+          "width": 177.34375,
+          "height": 51.6875,
+          "textHeight": 23,
+          "lineHeight": 29.0681
+        }
+      ],
+      "rules": [
+        {
+          "label": {
+            "x": 31.9375,
+            "y": 643.65625,
+            "right": 103.484375,
+            "bottom": 673.171875,
+            "width": 71.546875,
+            "height": 29.515625
+          },
+          "copy": {
+            "x": 114.9375,
+            "y": 643.65625,
+            "right": 398.0625,
+            "bottom": 704.96875,
+            "width": 283.125,
+            "height": 61.3125
+          },
+          "row": {
+            "x": 31.9375,
+            "y": 643.65625,
+            "right": 398.0625,
+            "bottom": 704.96875,
+            "width": 366.125,
+            "height": 61.3125
+          },
+          "clipped": false
+        },
+        {
+          "label": {
+            "x": 31.9375,
+            "y": 714.140625,
+            "right": 103.484375,
+            "bottom": 743.65625,
+            "width": 71.546875,
+            "height": 29.515625
+          },
+          "copy": {
+            "x": 114.9375,
+            "y": 714.140625,
+            "right": 398.0625,
+            "bottom": 773.171875,
+            "width": 283.125,
+            "height": 59.03125
+          },
+          "row": {
+            "x": 31.9375,
+            "y": 714.140625,
+            "right": 398.0625,
+            "bottom": 773.171875,
+            "width": 366.125,
+            "height": 59.03125
+          },
+          "clipped": false
+        },
+        {
+          "label": {
+            "x": 31.9375,
+            "y": 782.34375,
+            "right": 103.484375,
+            "bottom": 811.859375,
+            "width": 71.546875,
+            "height": 29.515625
+          },
+          "copy": {
+            "x": 114.9375,
+            "y": 782.34375,
+            "right": 398.0625,
+            "bottom": 870.890625,
+            "width": 283.125,
+            "height": 88.546875
+          },
+          "row": {
+            "x": 31.9375,
+            "y": 782.34375,
+            "right": 398.0625,
+            "bottom": 870.890625,
+            "width": 366.125,
+            "height": 88.546875
+          },
+          "clipped": false
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "scenario": "empty",
+      "width": 320,
+      "fontScale": 1,
+      "failures": [],
+      "buttons": [
+        {
+          "text": "加入关注",
+          "x": 24.03125,
+          "y": 1444.3125,
+          "right": 155.734375,
+          "bottom": 1488.3125,
+          "width": 131.703125,
+          "height": 44,
+          "textHeight": 14,
+          "lineHeight": 16.6399
+        },
+        {
+          "text": "重新查询",
+          "x": 164.265625,
+          "y": 1444.3125,
+          "right": 295.96875,
+          "bottom": 1488.3125,
+          "width": 131.703125,
+          "height": 44,
+          "textHeight": 14,
+          "lineHeight": 16.6399
+        }
+      ],
+      "rules": [
+        {
+          "label": {
+            "x": 24.03125,
+            "y": 1027.8125,
+            "right": 65,
+            "bottom": 1044.6875,
+            "width": 40.96875,
+            "height": 16.875
+          },
+          "copy": {
+            "x": 73.53125,
+            "y": 1027.8125,
+            "right": 295.96875,
+            "bottom": 1063.265625,
+            "width": 222.4375,
+            "height": 35.453125
+          },
+          "row": {
+            "x": 24.03125,
+            "y": 1027.8125,
+            "right": 295.96875,
+            "bottom": 1063.265625,
+            "width": 271.9375,
+            "height": 35.453125
+          },
+          "clipped": false
+        },
+        {
+          "label": {
+            "x": 24.03125,
+            "y": 1070.078125,
+            "right": 65,
+            "bottom": 1086.953125,
+            "width": 40.96875,
+            "height": 16.875
+          },
+          "copy": {
+            "x": 73.53125,
+            "y": 1070.078125,
+            "right": 295.96875,
+            "bottom": 1086.953125,
+            "width": 222.4375,
+            "height": 16.875
+          },
+          "row": {
+            "x": 24.03125,
+            "y": 1070.078125,
+            "right": 295.96875,
+            "bottom": 1086.953125,
+            "width": 271.9375,
+            "height": 16.875
+          },
+          "clipped": false
+        },
+        {
+          "label": {
+            "x": 24.03125,
+            "y": 1093.765625,
+            "right": 65,
+            "bottom": 1110.640625,
+            "width": 40.96875,
+            "height": 16.875
+          },
+          "copy": {
+            "x": 73.53125,
+            "y": 1093.765625,
+            "right": 295.96875,
+            "bottom": 1127.515625,
+            "width": 222.4375,
+            "height": 33.75
+          },
+          "row": {
+            "x": 24.03125,
+            "y": 1093.765625,
+            "right": 295.96875,
+            "bottom": 1127.515625,
+            "width": 271.9375,
+            "height": 33.75
+          },
+          "clipped": false
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "scenario": "empty",
+      "width": 320,
+      "fontScale": 1.3,
+      "failures": [],
+      "buttons": [
+        {
+          "text": "加入关注",
+          "x": 24.03125,
+          "y": 1816.953125,
+          "right": 155.734375,
+          "bottom": 1860.953125,
+          "width": 131.703125,
+          "height": 44,
+          "textHeight": 17,
+          "lineHeight": 21.6319
+        },
+        {
+          "text": "重新查询",
+          "x": 164.265625,
+          "y": 1816.953125,
+          "right": 295.96875,
+          "bottom": 1860.953125,
+          "width": 131.703125,
+          "height": 44,
+          "textHeight": 17,
+          "lineHeight": 21.6319
+        }
+      ],
+      "rules": [
+        {
+          "label": {
+            "x": 24.03125,
+            "y": 1259.109375,
+            "right": 77.28125,
+            "bottom": 1281.0625,
+            "width": 53.25,
+            "height": 21.953125
+          },
+          "copy": {
+            "x": 85.8125,
+            "y": 1259.109375,
+            "right": 295.96875,
+            "bottom": 1304.71875,
+            "width": 210.15625,
+            "height": 45.609375
+          },
+          "row": {
+            "x": 24.03125,
+            "y": 1259.109375,
+            "right": 295.96875,
+            "bottom": 1304.71875,
+            "width": 271.9375,
+            "height": 45.609375
+          },
+          "clipped": false
+        },
+        {
+          "label": {
+            "x": 24.03125,
+            "y": 1311.53125,
+            "right": 77.28125,
+            "bottom": 1333.484375,
+            "width": 53.25,
+            "height": 21.953125
+          },
+          "copy": {
+            "x": 85.8125,
+            "y": 1311.53125,
+            "right": 295.96875,
+            "bottom": 1355.4375,
+            "width": 210.15625,
+            "height": 43.90625
+          },
+          "row": {
+            "x": 24.03125,
+            "y": 1311.53125,
+            "right": 295.96875,
+            "bottom": 1355.4375,
+            "width": 271.9375,
+            "height": 43.90625
+          },
+          "clipped": false
+        },
+        {
+          "label": {
+            "x": 24.03125,
+            "y": 1362.25,
+            "right": 77.28125,
+            "bottom": 1384.203125,
+            "width": 53.25,
+            "height": 21.953125
+          },
+          "copy": {
+            "x": 85.8125,
+            "y": 1362.25,
+            "right": 295.96875,
+            "bottom": 1428.109375,
+            "width": 210.15625,
+            "height": 65.859375
+          },
+          "row": {
+            "x": 24.03125,
+            "y": 1362.25,
+            "right": 295.96875,
+            "bottom": 1428.109375,
+            "width": 271.9375,
+            "height": 65.859375
+          },
+          "clipped": false
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "scenario": "empty",
+      "width": 375,
+      "fontScale": 1,
+      "failures": [],
+      "buttons": [
+        {
+          "text": "加入关注",
+          "x": 28,
+          "y": 1649.140625,
+          "right": 182.5,
+          "bottom": 1693.140625,
+          "width": 154.5,
+          "height": 44,
+          "textHeight": 16,
+          "lineHeight": 19.5
+        },
+        {
+          "text": "重新查询",
+          "x": 192.5,
+          "y": 1649.140625,
+          "right": 347,
+          "bottom": 1693.140625,
+          "width": 154.5,
+          "height": 44,
+          "textHeight": 16,
+          "lineHeight": 19.5
+        }
+      ],
+      "rules": [
+        {
+          "label": {
+            "x": 28,
+            "y": 1161.359375,
+            "right": 76,
+            "bottom": 1181.15625,
+            "width": 48,
+            "height": 19.796875
+          },
+          "copy": {
+            "x": 86,
+            "y": 1161.359375,
+            "right": 347,
+            "bottom": 1202.953125,
+            "width": 261,
+            "height": 41.59375
+          },
+          "row": {
+            "x": 28,
+            "y": 1161.359375,
+            "right": 347,
+            "bottom": 1202.953125,
+            "width": 319,
+            "height": 41.59375
+          },
+          "clipped": false
+        },
+        {
+          "label": {
+            "x": 28,
+            "y": 1210.953125,
+            "right": 76,
+            "bottom": 1230.75,
+            "width": 48,
+            "height": 19.796875
+          },
+          "copy": {
+            "x": 86,
+            "y": 1210.953125,
+            "right": 347,
+            "bottom": 1230.75,
+            "width": 261,
+            "height": 19.796875
+          },
+          "row": {
+            "x": 28,
+            "y": 1210.953125,
+            "right": 347,
+            "bottom": 1230.75,
+            "width": 319,
+            "height": 19.796875
+          },
+          "clipped": false
+        },
+        {
+          "label": {
+            "x": 28,
+            "y": 1238.75,
+            "right": 76,
+            "bottom": 1258.546875,
+            "width": 48,
+            "height": 19.796875
+          },
+          "copy": {
+            "x": 86,
+            "y": 1238.75,
+            "right": 347,
+            "bottom": 1278.34375,
+            "width": 261,
+            "height": 39.59375
+          },
+          "row": {
+            "x": 28,
+            "y": 1238.75,
+            "right": 347,
+            "bottom": 1278.34375,
+            "width": 319,
+            "height": 39.59375
+          },
+          "clipped": false
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "scenario": "empty",
+      "width": 375,
+      "fontScale": 1.3,
+      "failures": [],
+      "buttons": [
+        {
+          "text": "加入关注",
+          "x": 28,
+          "y": 2092.75,
+          "right": 182.5,
+          "bottom": 2138.109375,
+          "width": 154.5,
+          "height": 45.359375,
+          "textHeight": 20,
+          "lineHeight": 25.35
+        },
+        {
+          "text": "重新查询",
+          "x": 192.5,
+          "y": 2092.75,
+          "right": 347,
+          "bottom": 2138.109375,
+          "width": 154.5,
+          "height": 45.359375,
+          "textHeight": 20,
+          "lineHeight": 25.35
+        }
+      ],
+      "rules": [
+        {
+          "label": {
+            "x": 28,
+            "y": 1439.625,
+            "right": 90.40625,
+            "bottom": 1465.34375,
+            "width": 62.40625,
+            "height": 25.71875
+          },
+          "copy": {
+            "x": 100.40625,
+            "y": 1439.625,
+            "right": 347,
+            "bottom": 1493.0625,
+            "width": 246.59375,
+            "height": 53.4375
+          },
+          "row": {
+            "x": 28,
+            "y": 1439.625,
+            "right": 347,
+            "bottom": 1493.0625,
+            "width": 319,
+            "height": 53.4375
+          },
+          "clipped": false
+        },
+        {
+          "label": {
+            "x": 28,
+            "y": 1501.0625,
+            "right": 90.40625,
+            "bottom": 1526.78125,
+            "width": 62.40625,
+            "height": 25.71875
+          },
+          "copy": {
+            "x": 100.40625,
+            "y": 1501.0625,
+            "right": 347,
+            "bottom": 1552.5,
+            "width": 246.59375,
+            "height": 51.4375
+          },
+          "row": {
+            "x": 28,
+            "y": 1501.0625,
+            "right": 347,
+            "bottom": 1552.5,
+            "width": 319,
+            "height": 51.4375
+          },
+          "clipped": false
+        },
+        {
+          "label": {
+            "x": 28,
+            "y": 1560.5,
+            "right": 90.40625,
+            "bottom": 1586.21875,
+            "width": 62.40625,
+            "height": 25.71875
+          },
+          "copy": {
+            "x": 100.40625,
+            "y": 1560.5,
+            "right": 347,
+            "bottom": 1637.65625,
+            "width": 246.59375,
+            "height": 77.15625
+          },
+          "row": {
+            "x": 28,
+            "y": 1560.5,
+            "right": 347,
+            "bottom": 1637.65625,
+            "width": 319,
+            "height": 77.15625
+          },
+          "clipped": false
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "scenario": "empty",
+      "width": 430,
+      "fontScale": 1,
+      "failures": [],
+      "buttons": [
+        {
+          "text": "加入关注",
+          "x": 31.9375,
+          "y": 1855.265625,
+          "right": 209.265625,
+          "bottom": 1905.71875,
+          "width": 177.328125,
+          "height": 50.453125,
+          "textHeight": 17,
+          "lineHeight": 22.3601
+        },
+        {
+          "text": "重新查询",
+          "x": 220.71875,
+          "y": 1855.265625,
+          "right": 398.0625,
+          "bottom": 1905.71875,
+          "width": 177.34375,
+          "height": 50.453125,
+          "textHeight": 17,
+          "lineHeight": 22.3601
+        }
+      ],
+      "rules": [
+        {
+          "label": {
+            "x": 31.9375,
+            "y": 1296.796875,
+            "right": 86.984375,
+            "bottom": 1319.5,
+            "width": 55.046875,
+            "height": 22.703125
+          },
+          "copy": {
+            "x": 98.4375,
+            "y": 1296.796875,
+            "right": 398.0625,
+            "bottom": 1344.484375,
+            "width": 299.625,
+            "height": 47.6875
+          },
+          "row": {
+            "x": 31.9375,
+            "y": 1296.796875,
+            "right": 398.0625,
+            "bottom": 1344.484375,
+            "width": 366.125,
+            "height": 47.6875
+          },
+          "clipped": false
+        },
+        {
+          "label": {
+            "x": 31.9375,
+            "y": 1353.65625,
+            "right": 86.984375,
+            "bottom": 1376.359375,
+            "width": 55.046875,
+            "height": 22.703125
+          },
+          "copy": {
+            "x": 98.4375,
+            "y": 1353.65625,
+            "right": 398.0625,
+            "bottom": 1376.359375,
+            "width": 299.625,
+            "height": 22.703125
+          },
+          "row": {
+            "x": 31.9375,
+            "y": 1353.65625,
+            "right": 398.0625,
+            "bottom": 1376.359375,
+            "width": 366.125,
+            "height": 22.703125
+          },
+          "clipped": false
+        },
+        {
+          "label": {
+            "x": 31.9375,
+            "y": 1385.53125,
+            "right": 86.984375,
+            "bottom": 1408.234375,
+            "width": 55.046875,
+            "height": 22.703125
+          },
+          "copy": {
+            "x": 98.4375,
+            "y": 1385.53125,
+            "right": 398.0625,
+            "bottom": 1430.9375,
+            "width": 299.625,
+            "height": 45.40625
+          },
+          "row": {
+            "x": 31.9375,
+            "y": 1385.53125,
+            "right": 398.0625,
+            "bottom": 1430.9375,
+            "width": 366.125,
+            "height": 45.40625
+          },
+          "clipped": false
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "scenario": "empty",
+      "width": 430,
+      "fontScale": 1.3,
+      "failures": [],
+      "buttons": [
+        {
+          "text": "加入关注",
+          "x": 31.9375,
+          "y": 2380.34375,
+          "right": 209.265625,
+          "bottom": 2432.03125,
+          "width": 177.328125,
+          "height": 51.6875,
+          "textHeight": 23,
+          "lineHeight": 29.0681
+        },
+        {
+          "text": "重新查询",
+          "x": 220.71875,
+          "y": 2380.34375,
+          "right": 398.0625,
+          "bottom": 2432.03125,
+          "width": 177.34375,
+          "height": 51.6875,
+          "textHeight": 23,
+          "lineHeight": 29.0681
+        }
+      ],
+      "rules": [
+        {
+          "label": {
+            "x": 31.9375,
+            "y": 1630.21875,
+            "right": 103.484375,
+            "bottom": 1659.734375,
+            "width": 71.546875,
+            "height": 29.515625
+          },
+          "copy": {
+            "x": 114.9375,
+            "y": 1630.21875,
+            "right": 398.0625,
+            "bottom": 1691.53125,
+            "width": 283.125,
+            "height": 61.3125
+          },
+          "row": {
+            "x": 31.9375,
+            "y": 1630.21875,
+            "right": 398.0625,
+            "bottom": 1691.53125,
+            "width": 366.125,
+            "height": 61.3125
+          },
+          "clipped": false
+        },
+        {
+          "label": {
+            "x": 31.9375,
+            "y": 1700.703125,
+            "right": 103.484375,
+            "bottom": 1730.21875,
+            "width": 71.546875,
+            "height": 29.515625
+          },
+          "copy": {
+            "x": 114.9375,
+            "y": 1700.703125,
+            "right": 398.0625,
+            "bottom": 1759.734375,
+            "width": 283.125,
+            "height": 59.03125
+          },
+          "row": {
+            "x": 31.9375,
+            "y": 1700.703125,
+            "right": 398.0625,
+            "bottom": 1759.734375,
+            "width": 366.125,
+            "height": 59.03125
+          },
+          "clipped": false
+        },
+        {
+          "label": {
+            "x": 31.9375,
+            "y": 1768.90625,
+            "right": 103.484375,
+            "bottom": 1798.421875,
+            "width": 71.546875,
+            "height": 29.515625
+          },
+          "copy": {
+            "x": 114.9375,
+            "y": 1768.90625,
+            "right": 398.0625,
+            "bottom": 1857.453125,
+            "width": 283.125,
+            "height": 88.546875
+          },
+          "row": {
+            "x": 31.9375,
+            "y": 1768.90625,
+            "right": 398.0625,
+            "bottom": 1857.453125,
+            "width": 366.125,
+            "height": 88.546875
+          },
+          "clipped": false
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "scenario": "error",
+      "width": 320,
+      "fontScale": 1,
+      "failures": [],
+      "buttons": [],
+      "rules": [],
+      "overflow": false
+    },
+    {
+      "scenario": "error",
+      "width": 320,
+      "fontScale": 1.3,
+      "failures": [],
+      "buttons": [],
+      "rules": [],
+      "overflow": false
+    },
+    {
+      "scenario": "error",
+      "width": 375,
+      "fontScale": 1,
+      "failures": [],
+      "buttons": [],
+      "rules": [],
+      "overflow": false
+    },
+    {
+      "scenario": "error",
+      "width": 375,
+      "fontScale": 1.3,
+      "failures": [],
+      "buttons": [],
+      "rules": [],
+      "overflow": false
+    },
+    {
+      "scenario": "error",
+      "width": 430,
+      "fontScale": 1,
+      "failures": [],
+      "buttons": [],
+      "rules": [],
+      "overflow": false
+    },
+    {
+      "scenario": "error",
+      "width": 430,
+      "fontScale": 1.3,
+      "failures": [],
+      "buttons": [],
+      "rules": [],
+      "overflow": false
+    },
+    {
+      "scenario": "longcontent",
+      "width": 320,
+      "fontScale": 1,
+      "failures": [],
+      "buttons": [
+        {
+          "text": "加入关注",
+          "x": 24.03125,
+          "y": 948.546875,
+          "right": 155.734375,
+          "bottom": 992.546875,
+          "width": 131.703125,
+          "height": 44,
+          "textHeight": 14,
+          "lineHeight": 16.6399
+        },
+        {
+          "text": "重新查询",
+          "x": 164.265625,
+          "y": 948.546875,
+          "right": 295.96875,
+          "bottom": 992.546875,
+          "width": 131.703125,
+          "height": 44,
+          "textHeight": 14,
+          "lineHeight": 16.6399
+        }
+      ],
+      "rules": [
+        {
+          "label": {
+            "x": 24.03125,
+            "y": 493.421875,
+            "right": 65,
+            "bottom": 510.296875,
+            "width": 40.96875,
+            "height": 16.875
+          },
+          "copy": {
+            "x": 73.53125,
+            "y": 493.421875,
+            "right": 295.96875,
+            "bottom": 528.875,
+            "width": 222.4375,
+            "height": 35.453125
+          },
+          "row": {
+            "x": 24.03125,
+            "y": 493.421875,
+            "right": 295.96875,
+            "bottom": 528.875,
+            "width": 271.9375,
+            "height": 35.453125
+          },
+          "clipped": false
+        },
+        {
+          "label": {
+            "x": 24.03125,
+            "y": 535.6875,
+            "right": 65,
+            "bottom": 552.5625,
+            "width": 40.96875,
+            "height": 16.875
+          },
+          "copy": {
+            "x": 73.53125,
+            "y": 535.6875,
+            "right": 295.96875,
+            "bottom": 552.5625,
+            "width": 222.4375,
+            "height": 16.875
+          },
+          "row": {
+            "x": 24.03125,
+            "y": 535.6875,
+            "right": 295.96875,
+            "bottom": 552.5625,
+            "width": 271.9375,
+            "height": 16.875
+          },
+          "clipped": false
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "scenario": "longcontent",
+      "width": 320,
+      "fontScale": 1.3,
+      "failures": [],
+      "buttons": [
+        {
+          "text": "加入关注",
+          "x": 24.03125,
+          "y": 1196.203125,
+          "right": 155.734375,
+          "bottom": 1240.203125,
+          "width": 131.703125,
+          "height": 44,
+          "textHeight": 17,
+          "lineHeight": 21.6319
+        },
+        {
+          "text": "重新查询",
+          "x": 164.265625,
+          "y": 1196.203125,
+          "right": 295.96875,
+          "bottom": 1240.203125,
+          "width": 131.703125,
+          "height": 44,
+          "textHeight": 17,
+          "lineHeight": 21.6319
+        }
+      ],
+      "rules": [
+        {
+          "label": {
+            "x": 24.03125,
+            "y": 655.78125,
+            "right": 77.28125,
+            "bottom": 677.734375,
+            "width": 53.25,
+            "height": 21.953125
+          },
+          "copy": {
+            "x": 85.8125,
+            "y": 655.78125,
+            "right": 295.96875,
+            "bottom": 701.390625,
+            "width": 210.15625,
+            "height": 45.609375
+          },
+          "row": {
+            "x": 24.03125,
+            "y": 655.78125,
+            "right": 295.96875,
+            "bottom": 701.390625,
+            "width": 271.9375,
+            "height": 45.609375
+          },
+          "clipped": false
+        },
+        {
+          "label": {
+            "x": 24.03125,
+            "y": 708.203125,
+            "right": 77.28125,
+            "bottom": 730.15625,
+            "width": 53.25,
+            "height": 21.953125
+          },
+          "copy": {
+            "x": 85.8125,
+            "y": 708.203125,
+            "right": 295.96875,
+            "bottom": 730.15625,
+            "width": 210.15625,
+            "height": 21.953125
+          },
+          "row": {
+            "x": 24.03125,
+            "y": 708.203125,
+            "right": 295.96875,
+            "bottom": 730.15625,
+            "width": 271.9375,
+            "height": 21.953125
+          },
+          "clipped": false
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "scenario": "longcontent",
+      "width": 375,
+      "fontScale": 1,
+      "failures": [],
+      "buttons": [
+        {
+          "text": "加入关注",
+          "x": 28,
+          "y": 1077.984375,
+          "right": 182.5,
+          "bottom": 1121.984375,
+          "width": 154.5,
+          "height": 44,
+          "textHeight": 16,
+          "lineHeight": 19.5
+        },
+        {
+          "text": "重新查询",
+          "x": 192.5,
+          "y": 1077.984375,
+          "right": 347,
+          "bottom": 1121.984375,
+          "width": 154.5,
+          "height": 44,
+          "textHeight": 16,
+          "lineHeight": 19.5
+        }
+      ],
+      "rules": [
+        {
+          "label": {
+            "x": 28,
+            "y": 545.046875,
+            "right": 76,
+            "bottom": 564.84375,
+            "width": 48,
+            "height": 19.796875
+          },
+          "copy": {
+            "x": 86,
+            "y": 545.046875,
+            "right": 347,
+            "bottom": 586.640625,
+            "width": 261,
+            "height": 41.59375
+          },
+          "row": {
+            "x": 28,
+            "y": 545.046875,
+            "right": 347,
+            "bottom": 586.640625,
+            "width": 319,
+            "height": 41.59375
+          },
+          "clipped": false
+        },
+        {
+          "label": {
+            "x": 28,
+            "y": 594.640625,
+            "right": 76,
+            "bottom": 614.4375,
+            "width": 48,
+            "height": 19.796875
+          },
+          "copy": {
+            "x": 86,
+            "y": 594.640625,
+            "right": 347,
+            "bottom": 614.4375,
+            "width": 261,
+            "height": 19.796875
+          },
+          "row": {
+            "x": 28,
+            "y": 594.640625,
+            "right": 347,
+            "bottom": 614.4375,
+            "width": 319,
+            "height": 19.796875
+          },
+          "clipped": false
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "scenario": "longcontent",
+      "width": 375,
+      "fontScale": 1.3,
+      "failures": [],
+      "buttons": [
+        {
+          "text": "加入关注",
+          "x": 28,
+          "y": 1373.71875,
+          "right": 182.5,
+          "bottom": 1419.078125,
+          "width": 154.5,
+          "height": 45.359375,
+          "textHeight": 20,
+          "lineHeight": 25.35
+        },
+        {
+          "text": "重新查询",
+          "x": 192.5,
+          "y": 1373.71875,
+          "right": 347,
+          "bottom": 1419.078125,
+          "width": 154.5,
+          "height": 45.359375,
+          "textHeight": 20,
+          "lineHeight": 25.35
+        }
+      ],
+      "rules": [
+        {
+          "label": {
+            "x": 28,
+            "y": 741.046875,
+            "right": 90.40625,
+            "bottom": 766.765625,
+            "width": 62.40625,
+            "height": 25.71875
+          },
+          "copy": {
+            "x": 100.40625,
+            "y": 741.046875,
+            "right": 347,
+            "bottom": 794.484375,
+            "width": 246.59375,
+            "height": 53.4375
+          },
+          "row": {
+            "x": 28,
+            "y": 741.046875,
+            "right": 347,
+            "bottom": 794.484375,
+            "width": 319,
+            "height": 53.4375
+          },
+          "clipped": false
+        },
+        {
+          "label": {
+            "x": 28,
+            "y": 802.484375,
+            "right": 90.40625,
+            "bottom": 828.203125,
+            "width": 62.40625,
+            "height": 25.71875
+          },
+          "copy": {
+            "x": 100.40625,
+            "y": 802.484375,
+            "right": 347,
+            "bottom": 828.203125,
+            "width": 246.59375,
+            "height": 25.71875
+          },
+          "row": {
+            "x": 28,
+            "y": 802.484375,
+            "right": 347,
+            "bottom": 828.203125,
+            "width": 319,
+            "height": 25.71875
+          },
+          "clipped": false
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "scenario": "longcontent",
+      "width": 430,
+      "fontScale": 1,
+      "failures": [],
+      "buttons": [
+        {
+          "text": "加入关注",
+          "x": 31.9375,
+          "y": 1219.5,
+          "right": 209.265625,
+          "bottom": 1269.953125,
+          "width": 177.328125,
+          "height": 50.453125,
+          "textHeight": 17,
+          "lineHeight": 22.3601
+        },
+        {
+          "text": "重新查询",
+          "x": 220.71875,
+          "y": 1219.5,
+          "right": 398.0625,
+          "bottom": 1269.953125,
+          "width": 177.34375,
+          "height": 50.453125,
+          "textHeight": 17,
+          "lineHeight": 22.3601
+        }
+      ],
+      "rules": [
+        {
+          "label": {
+            "x": 31.9375,
+            "y": 609.234375,
+            "right": 86.984375,
+            "bottom": 631.9375,
+            "width": 55.046875,
+            "height": 22.703125
+          },
+          "copy": {
+            "x": 98.4375,
+            "y": 609.234375,
+            "right": 398.0625,
+            "bottom": 656.921875,
+            "width": 299.625,
+            "height": 47.6875
+          },
+          "row": {
+            "x": 31.9375,
+            "y": 609.234375,
+            "right": 398.0625,
+            "bottom": 656.921875,
+            "width": 366.125,
+            "height": 47.6875
+          },
+          "clipped": false
+        },
+        {
+          "label": {
+            "x": 31.9375,
+            "y": 666.09375,
+            "right": 86.984375,
+            "bottom": 688.796875,
+            "width": 55.046875,
+            "height": 22.703125
+          },
+          "copy": {
+            "x": 98.4375,
+            "y": 666.09375,
+            "right": 398.0625,
+            "bottom": 688.796875,
+            "width": 299.625,
+            "height": 22.703125
+          },
+          "row": {
+            "x": 31.9375,
+            "y": 666.09375,
+            "right": 398.0625,
+            "bottom": 688.796875,
+            "width": 366.125,
+            "height": 22.703125
+          },
+          "clipped": false
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "scenario": "longcontent",
+      "width": 430,
+      "fontScale": 1.3,
+      "failures": [],
+      "buttons": [
+        {
+          "text": "加入关注",
+          "x": 31.9375,
+          "y": 1558.109375,
+          "right": 209.265625,
+          "bottom": 1609.796875,
+          "width": 177.328125,
+          "height": 51.6875,
+          "textHeight": 23,
+          "lineHeight": 29.0681
+        },
+        {
+          "text": "重新查询",
+          "x": 220.71875,
+          "y": 1558.109375,
+          "right": 398.0625,
+          "bottom": 1609.796875,
+          "width": 177.34375,
+          "height": 51.6875,
+          "textHeight": 23,
+          "lineHeight": 29.0681
+        }
+      ],
+      "rules": [
+        {
+          "label": {
+            "x": 31.9375,
+            "y": 831.53125,
+            "right": 103.484375,
+            "bottom": 861.046875,
+            "width": 71.546875,
+            "height": 29.515625
+          },
+          "copy": {
+            "x": 114.9375,
+            "y": 831.53125,
+            "right": 398.0625,
+            "bottom": 892.84375,
+            "width": 283.125,
+            "height": 61.3125
+          },
+          "row": {
+            "x": 31.9375,
+            "y": 831.53125,
+            "right": 398.0625,
+            "bottom": 892.84375,
+            "width": 366.125,
+            "height": 61.3125
+          },
+          "clipped": false
+        },
+        {
+          "label": {
+            "x": 31.9375,
+            "y": 902.015625,
+            "right": 103.484375,
+            "bottom": 931.53125,
+            "width": 71.546875,
+            "height": 29.515625
+          },
+          "copy": {
+            "x": 114.9375,
+            "y": 902.015625,
+            "right": 398.0625,
+            "bottom": 931.53125,
+            "width": 283.125,
+            "height": 29.515625
+          },
+          "row": {
+            "x": 31.9375,
+            "y": 902.015625,
+            "right": 398.0625,
+            "bottom": 931.53125,
+            "width": 366.125,
+            "height": 29.515625
+          },
+          "clipped": false
+        }
+      ],
+      "overflow": false
+    }
+  ],
+  "summary": {
+    "cases": 36,
+    "failed": 0
+  }
+}

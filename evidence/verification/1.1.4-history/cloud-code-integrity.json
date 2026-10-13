@@ -1,0 +1,32 @@
+{
+  "scope": "Downloaded deployed archives compared against all local function source files; excludes node_modules from source equality",
+  "deployed": [
+    {
+      "function": "gxs_api",
+      "version": "1.1.4",
+      "sdkVersion": "4.0.2",
+      "crcVerified": true,
+      "sourceFilesMatched": 44,
+      "extraSourceFiles": [],
+      "sha256": "a4b2f513671804e50c9b1499c0afe76f0a1c664f9eda21c4294d1141c3b3ce23"
+    },
+    {
+      "function": "gxs_monitor",
+      "version": "1.1.4",
+      "sdkVersion": "4.0.2",
+      "crcVerified": true,
+      "sourceFilesMatched": 31,
+      "extraSourceFiles": [],
+      "sha256": "4bb67513b49e51980d80ca733bf9b9d8dbdeac2909637cd9a33921f93917eea7"
+    },
+    {
+      "function": "cloudbase_auth",
+      "version": "1.1.4",
+      "sdkVersion": "4.0.2",
+      "crcVerified": true,
+      "sourceFilesMatched": 4,
+      "extraSourceFiles": [],
+      "sha256": "f8f0c839ce41204281393f820de783f259a2ebe1a40c799d4a1c01bf5450bdf3"
+    }
+  ]
+}

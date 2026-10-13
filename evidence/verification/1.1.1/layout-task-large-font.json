@@ -1,0 +1,697 @@
+{
+  "renderer": "Offline Chromium approximation; 130% font sizes, not WeChat system font scaling",
+  "cases": [
+    {
+      "page": "history",
+      "scenario": "history-member-reward",
+      "width": 320,
+      "file": "history-history-member-reward-320.html",
+      "expectedText": [
+        "最近浏览",
+        "浏览不扣次数",
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色",
+        "今日浏览任务完成，+1 次",
+        "已计入次数明细"
+      ],
+      "scrollWidth": 320,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "history",
+      "scenario": "history-member-reward",
+      "width": 375,
+      "file": "history-history-member-reward-375.html",
+      "expectedText": [
+        "最近浏览",
+        "浏览不扣次数",
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色",
+        "今日浏览任务完成，+1 次",
+        "已计入次数明细"
+      ],
+      "scrollWidth": 375,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "history",
+      "scenario": "history-member-reward",
+      "width": 430,
+      "file": "history-history-member-reward-430.html",
+      "expectedText": [
+        "最近浏览",
+        "浏览不扣次数",
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色",
+        "今日浏览任务完成，+1 次",
+        "已计入次数明细"
+      ],
+      "scrollWidth": 430,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "mine",
+      "scenario": "history-member-reward",
+      "width": 320,
+      "file": "mine-history-member-reward-320.html",
+      "expectedText": [
+        "每日体验任务",
+        "次数明细",
+        "浏览一次历史记录",
+        "已完成",
+        "体验任务",
+        "+1"
+      ],
+      "scrollWidth": 320,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "mine",
+      "scenario": "history-member-reward",
+      "width": 375,
+      "file": "mine-history-member-reward-375.html",
+      "expectedText": [
+        "每日体验任务",
+        "次数明细",
+        "浏览一次历史记录",
+        "已完成",
+        "体验任务",
+        "+1"
+      ],
+      "scrollWidth": 375,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "mine",
+      "scenario": "history-member-reward",
+      "width": 430,
+      "file": "mine-history-member-reward-430.html",
+      "expectedText": [
+        "每日体验任务",
+        "次数明细",
+        "浏览一次历史记录",
+        "已完成",
+        "体验任务",
+        "+1"
+      ],
+      "scrollWidth": 430,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "history",
+      "scenario": "history-free-first",
+      "width": 320,
+      "file": "history-history-free-first-320.html",
+      "expectedText": [
+        "最近浏览",
+        "浏览不扣次数",
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色",
+        "还没有浏览记录",
+        "今日浏览任务完成，+1 次",
+        "余 1 次"
+      ],
+      "scrollWidth": 320,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "history",
+      "scenario": "history-free-first",
+      "width": 375,
+      "file": "history-history-free-first-375.html",
+      "expectedText": [
+        "最近浏览",
+        "浏览不扣次数",
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色",
+        "还没有浏览记录",
+        "今日浏览任务完成，+1 次",
+        "余 1 次"
+      ],
+      "scrollWidth": 375,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "history",
+      "scenario": "history-free-first",
+      "width": 430,
+      "file": "history-history-free-first-430.html",
+      "expectedText": [
+        "最近浏览",
+        "浏览不扣次数",
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色",
+        "还没有浏览记录",
+        "今日浏览任务完成，+1 次",
+        "余 1 次"
+      ],
+      "scrollWidth": 430,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "mine",
+      "scenario": "history-free-first",
+      "width": 320,
+      "file": "mine-history-free-first-320.html",
+      "expectedText": [
+        "每日体验任务",
+        "次数明细",
+        "浏览一次历史记录",
+        "已完成",
+        "体验任务",
+        "+1"
+      ],
+      "scrollWidth": 320,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "mine",
+      "scenario": "history-free-first",
+      "width": 375,
+      "file": "mine-history-free-first-375.html",
+      "expectedText": [
+        "每日体验任务",
+        "次数明细",
+        "浏览一次历史记录",
+        "已完成",
+        "体验任务",
+        "+1"
+      ],
+      "scrollWidth": 375,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "mine",
+      "scenario": "history-free-first",
+      "width": 430,
+      "file": "mine-history-free-first-430.html",
+      "expectedText": [
+        "每日体验任务",
+        "次数明细",
+        "浏览一次历史记录",
+        "已完成",
+        "体验任务",
+        "+1"
+      ],
+      "scrollWidth": 430,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "history",
+      "scenario": "history-read-error",
+      "width": 320,
+      "file": "history-history-read-error-320.html",
+      "expectedText": [
+        "最近浏览",
+        "浏览不扣次数",
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色",
+        "浏览记录加载或奖励确认未完成",
+        "重新加载"
+      ],
+      "scrollWidth": 320,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "history",
+      "scenario": "history-read-error",
+      "width": 375,
+      "file": "history-history-read-error-375.html",
+      "expectedText": [
+        "最近浏览",
+        "浏览不扣次数",
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色",
+        "浏览记录加载或奖励确认未完成",
+        "重新加载"
+      ],
+      "scrollWidth": 375,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "history",
+      "scenario": "history-read-error",
+      "width": 430,
+      "file": "history-history-read-error-430.html",
+      "expectedText": [
+        "最近浏览",
+        "浏览不扣次数",
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色",
+        "浏览记录加载或奖励确认未完成",
+        "重新加载"
+      ],
+      "scrollWidth": 430,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "mine",
+      "scenario": "history-read-error",
+      "width": 320,
+      "file": "mine-history-read-error-320.html",
+      "expectedText": [
+        "每日体验任务",
+        "次数明细",
+        "浏览一次历史记录",
+        "去完成",
+        "暂无记录"
+      ],
+      "scrollWidth": 320,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "mine",
+      "scenario": "history-read-error",
+      "width": 375,
+      "file": "mine-history-read-error-375.html",
+      "expectedText": [
+        "每日体验任务",
+        "次数明细",
+        "浏览一次历史记录",
+        "去完成",
+        "暂无记录"
+      ],
+      "scrollWidth": 375,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "mine",
+      "scenario": "history-read-error",
+      "width": 430,
+      "file": "mine-history-read-error-430.html",
+      "expectedText": [
+        "每日体验任务",
+        "次数明细",
+        "浏览一次历史记录",
+        "去完成",
+        "暂无记录"
+      ],
+      "scrollWidth": 430,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "history",
+      "scenario": "history-balance-cap",
+      "width": 320,
+      "file": "history-history-balance-cap-320.html",
+      "expectedText": [
+        "最近浏览",
+        "浏览不扣次数",
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色",
+        "余额已达 10 次上限",
+        "使用次数后可返回领取"
+      ],
+      "scrollWidth": 320,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "history",
+      "scenario": "history-balance-cap",
+      "width": 375,
+      "file": "history-history-balance-cap-375.html",
+      "expectedText": [
+        "最近浏览",
+        "浏览不扣次数",
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色",
+        "余额已达 10 次上限",
+        "使用次数后可返回领取"
+      ],
+      "scrollWidth": 375,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "history",
+      "scenario": "history-balance-cap",
+      "width": 430,
+      "file": "history-history-balance-cap-430.html",
+      "expectedText": [
+        "最近浏览",
+        "浏览不扣次数",
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色",
+        "余额已达 10 次上限",
+        "使用次数后可返回领取"
+      ],
+      "scrollWidth": 430,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "mine",
+      "scenario": "history-balance-cap",
+      "width": 320,
+      "file": "mine-history-balance-cap-320.html",
+      "expectedText": [
+        "每日体验任务",
+        "次数明细",
+        "浏览一次历史记录",
+        "已浏览·待领取",
+        "暂无记录"
+      ],
+      "scrollWidth": 320,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "mine",
+      "scenario": "history-balance-cap",
+      "width": 375,
+      "file": "mine-history-balance-cap-375.html",
+      "expectedText": [
+        "每日体验任务",
+        "次数明细",
+        "浏览一次历史记录",
+        "已浏览·待领取",
+        "暂无记录"
+      ],
+      "scrollWidth": 375,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "mine",
+      "scenario": "history-balance-cap",
+      "width": 430,
+      "file": "mine-history-balance-cap-430.html",
+      "expectedText": [
+        "每日体验任务",
+        "次数明细",
+        "浏览一次历史记录",
+        "已浏览·待领取",
+        "暂无记录"
+      ],
+      "scrollWidth": 430,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "history",
+      "scenario": "history-completed",
+      "width": 320,
+      "file": "history-history-completed-320.html",
+      "expectedText": [
+        "最近浏览",
+        "浏览不扣次数",
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色",
+        "今日浏览任务已完成",
+        "奖励已计入次数明细"
+      ],
+      "scrollWidth": 320,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "history",
+      "scenario": "history-completed",
+      "width": 375,
+      "file": "history-history-completed-375.html",
+      "expectedText": [
+        "最近浏览",
+        "浏览不扣次数",
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色",
+        "今日浏览任务已完成",
+        "奖励已计入次数明细"
+      ],
+      "scrollWidth": 375,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "history",
+      "scenario": "history-completed",
+      "width": 430,
+      "file": "history-history-completed-430.html",
+      "expectedText": [
+        "最近浏览",
+        "浏览不扣次数",
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色",
+        "今日浏览任务已完成",
+        "奖励已计入次数明细"
+      ],
+      "scrollWidth": 430,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "mine",
+      "scenario": "history-completed",
+      "width": 320,
+      "file": "mine-history-completed-320.html",
+      "expectedText": [
+        "每日体验任务",
+        "次数明细",
+        "浏览一次历史记录",
+        "已完成",
+        "体验任务",
+        "+1"
+      ],
+      "scrollWidth": 320,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "mine",
+      "scenario": "history-completed",
+      "width": 375,
+      "file": "mine-history-completed-375.html",
+      "expectedText": [
+        "每日体验任务",
+        "次数明细",
+        "浏览一次历史记录",
+        "已完成",
+        "体验任务",
+        "+1"
+      ],
+      "scrollWidth": 375,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "mine",
+      "scenario": "history-completed",
+      "width": 430,
+      "file": "mine-history-completed-430.html",
+      "expectedText": [
+        "每日体验任务",
+        "次数明细",
+        "浏览一次历史记录",
+        "已完成",
+        "体验任务",
+        "+1"
+      ],
+      "scrollWidth": 430,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "history",
+      "scenario": "history-longcontent",
+      "width": 320,
+      "file": "history-history-longcontent-320.html",
+      "expectedText": [
+        "最近浏览",
+        "浏览不扣次数",
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色 · 超长商品名称与配置说明用于检查换行及小屏布局 ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+        "全国门店",
+        "3 家门店",
+        "今日浏览任务完成，+1 次"
+      ],
+      "scrollWidth": 320,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "history",
+      "scenario": "history-longcontent",
+      "width": 375,
+      "file": "history-history-longcontent-375.html",
+      "expectedText": [
+        "最近浏览",
+        "浏览不扣次数",
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色 · 超长商品名称与配置说明用于检查换行及小屏布局 ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+        "全国门店",
+        "3 家门店",
+        "今日浏览任务完成，+1 次"
+      ],
+      "scrollWidth": 375,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "history",
+      "scenario": "history-longcontent",
+      "width": 430,
+      "file": "history-history-longcontent-430.html",
+      "expectedText": [
+        "最近浏览",
+        "浏览不扣次数",
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色 · 超长商品名称与配置说明用于检查换行及小屏布局 ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+        "全国门店",
+        "3 家门店",
+        "今日浏览任务完成，+1 次"
+      ],
+      "scrollWidth": 430,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "mine",
+      "scenario": "history-longcontent",
+      "width": 320,
+      "file": "mine-history-longcontent-320.html",
+      "expectedText": [
+        "每日体验任务",
+        "次数明细",
+        "浏览一次历史记录",
+        "已完成",
+        "体验任务",
+        "+1"
+      ],
+      "scrollWidth": 320,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "mine",
+      "scenario": "history-longcontent",
+      "width": 375,
+      "file": "mine-history-longcontent-375.html",
+      "expectedText": [
+        "每日体验任务",
+        "次数明细",
+        "浏览一次历史记录",
+        "已完成",
+        "体验任务",
+        "+1"
+      ],
+      "scrollWidth": 375,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "mine",
+      "scenario": "history-longcontent",
+      "width": 430,
+      "file": "mine-history-longcontent-430.html",
+      "expectedText": [
+        "每日体验任务",
+        "次数明细",
+        "浏览一次历史记录",
+        "已完成",
+        "体验任务",
+        "+1"
+      ],
+      "scrollWidth": 430,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "history",
+      "scenario": "history-loading",
+      "width": 320,
+      "file": "history-history-loading-320.html",
+      "expectedText": [
+        "最近浏览",
+        "浏览不扣次数",
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色",
+        "正在加载浏览记录"
+      ],
+      "scrollWidth": 320,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "history",
+      "scenario": "history-loading",
+      "width": 375,
+      "file": "history-history-loading-375.html",
+      "expectedText": [
+        "最近浏览",
+        "浏览不扣次数",
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色",
+        "正在加载浏览记录"
+      ],
+      "scrollWidth": 375,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "history",
+      "scenario": "history-loading",
+      "width": 430,
+      "file": "history-history-loading-430.html",
+      "expectedText": [
+        "最近浏览",
+        "浏览不扣次数",
+        "iPhone 18 Pro Max 1TB 勃艮第酒红色",
+        "正在加载浏览记录"
+      ],
+      "scrollWidth": 430,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "mine",
+      "scenario": "history-loading",
+      "width": 320,
+      "file": "mine-history-loading-320.html",
+      "expectedText": [
+        "每日体验任务",
+        "次数明细",
+        "浏览一次历史记录",
+        "去完成",
+        "暂无记录"
+      ],
+      "scrollWidth": 320,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "mine",
+      "scenario": "history-loading",
+      "width": 375,
+      "file": "mine-history-loading-375.html",
+      "expectedText": [
+        "每日体验任务",
+        "次数明细",
+        "浏览一次历史记录",
+        "去完成",
+        "暂无记录"
+      ],
+      "scrollWidth": 375,
+      "overflow": [],
+      "clippedText": []
+    },
+    {
+      "page": "mine",
+      "scenario": "history-loading",
+      "width": 430,
+      "file": "mine-history-loading-430.html",
+      "expectedText": [
+        "每日体验任务",
+        "次数明细",
+        "浏览一次历史记录",
+        "去完成",
+        "暂无记录"
+      ],
+      "scrollWidth": 430,
+      "overflow": [],
+      "clippedText": []
+    }
+  ],
+  "summary": {
+    "total": 42,
+    "horizontalOverflow": 0,
+    "clippedText": 0
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "checkedAt": "2026-09-28T02:32:00.643089+00:00",
+  "passed": true,
+  "functions": [
+    {
+      "functionName": "gxs_api",
+      "sourceFiles": 56,
+      "version": "1.4.1",
+      "sdkVersion": "4.0.2",
+      "archiveSha256": "d45f6ca7c4f188b845de4652e4e3e8e3d360ef8c1c0d31994862f0eec50d1df1",
+      "byteExact": true,
+      "differences": []
+    },
+    {
+      "functionName": "gxs_monitor",
+      "sourceFiles": 34,
+      "version": "1.4.1",
+      "sdkVersion": "4.0.2",
+      "archiveSha256": "a86efef203cb3bb07156b1165256f1c984c48ba7c800aca45ec2e674eb6f3f89",
+      "byteExact": true,
+      "differences": []
+    },
+    {
+      "functionName": "cloudbase_auth",
+      "sourceFiles": 4,
+      "version": "1.4.1",
+      "sdkVersion": "4.0.2",
+      "archiveSha256": "9c8e5164c3078dc5940db9366c8355fe4aee94f9e7e8946ef3e41d0a6515b14b",
+      "byteExact": true,
+      "differences": []
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "checkedAt": "2026-09-16T08:33:03.630Z",
+  "changes": [
+    "Propagate coverageGap and qualify observed availability spans instead of claiming uninterrupted supply",
+    "Count a complete rolling hour across Beijing midnight while keeping old-day queries from exposing current restricted activity"
+  ],
+  "validation": {
+    "command": "node --test tests/history-statistics.test.mjs tests/backend-reliability.test.mjs tests/frontend-regression.test.mjs tests/history-browse-reward.test.mjs tests/stock-observation-pages.test.mjs tests/events.test.mjs",
+    "passed": 74,
+    "failed": 0,
+    "skipped": 0,
+    "newCases": 5,
+    "sharedLibraryFilesMatched": 33
+  },
+  "deployment": {
+    "apiRequired": true,
+    "frontendRequired": true,
+    "monitorSharedLibrarySynchronized": true,
+    "newIndexesRequired": false,
+    "performedByThisAgent": false
+  },
+  "sources": [
+    {
+      "file": "miniprogram/pages/history/index.js",
+      "sha256": "e08261c10f02c927e0dd3165bfbc0cdf5d0a0592086cea6b469e841f09de6165"
+    },
+    {
+      "file": "cloudfunctions/gxs_api/lib/services/history.js",
+      "sha256": "c6f116699ad4a827e7dd925fc51b59cbf4e4da54b7e758c23a2f99359c397208"
+    },
+    {
+      "file": "cloudfunctions/gxs_api/lib/repo/cloudbase-repo.js",
+      "sha256": "ac26d3c4ef6e00ebc34d32eab6c7443af8f2f83dc2463331c69be1b925bc18fa"
+    },
+    {
+      "file": "cloudfunctions/gxs_monitor/lib/services/history.js",
+      "sha256": "c6f116699ad4a827e7dd925fc51b59cbf4e4da54b7e758c23a2f99359c397208"
+    },
+    {
+      "file": "cloudfunctions/gxs_monitor/lib/repo/cloudbase-repo.js",
+      "sha256": "ac26d3c4ef6e00ebc34d32eab6c7443af8f2f83dc2463331c69be1b925bc18fa"
+    },
+    {
+      "file": "tests/helpers/memory-repo.mjs",
+      "sha256": "9a15df1a4a0d3f14e17318f090e57e75315989dd935303f8a7fc71149f2fc305"
+    },
+    {
+      "file": "tests/history-statistics.test.mjs",
+      "sha256": "9ab317b99990c9b9648cbd77cd547cd25781da5421bf575187b314797741d5b5"
+    }
+  ]
+}

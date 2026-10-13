@@ -1,0 +1,490 @@
+{
+  "storeNumber": "R577",
+  "store": "天环广场",
+  "results": [
+    {
+      "category": "iphone",
+      "record": {
+        "storeNumber": "R577",
+        "partNumbers": [
+          "MJYH4CH/A",
+          "MG364CH/A",
+          "MG724CH/A",
+          "MHU64CH/A",
+          "MYEV3CH/A"
+        ],
+        "requestUrl": "https://www.apple.com.cn/shop/retail/pickup-message?pl=true&mts.0=regular&parts.0=MJYH4CH%2FA&parts.1=MG364CH%2FA&parts.2=MG724CH%2FA&parts.3=MHU64CH%2FA&parts.4=MYEV3CH%2FA&store=R577",
+        "startedAt": "2026-09-15T03:02:15.044Z",
+        "httpStatus": 200,
+        "bytes": 9474,
+        "elapsedMs": 2301,
+        "finishedAt": "2026-09-15T03:02:17.345Z",
+        "error": null,
+        "retryAfter": null,
+        "bodyFile": "pickup-iphone-0.body.json"
+      },
+      "observations": [
+        {
+          "storeNumber": "R577",
+          "storeName": "天环广场",
+          "partNumber": "MJYH4CH/A",
+          "status": "unavailable",
+          "pickupDisplay": "unavailable",
+          "quote": "暂无供应",
+          "productTitle": "iPhone 18 Pro Max 1TB 勃艮第酒红色",
+          "observedAt": "2026-09-15T03:02:17.345Z",
+          "reason": null
+        },
+        {
+          "storeNumber": "R577",
+          "storeName": "天环广场",
+          "partNumber": "MG364CH/A",
+          "status": "available",
+          "pickupDisplay": "available",
+          "quote": "今天可取货",
+          "productTitle": "iPhone Air 256GB 天蓝色",
+          "observedAt": "2026-09-15T03:02:17.345Z",
+          "reason": null
+        },
+        {
+          "storeNumber": "R577",
+          "storeName": "天环广场",
+          "partNumber": "MG724CH/A",
+          "status": "unavailable",
+          "pickupDisplay": "unavailable",
+          "quote": "暂无供应",
+          "productTitle": "iPhone 17 512GB 黑色",
+          "observedAt": "2026-09-15T03:02:17.345Z",
+          "reason": null
+        },
+        {
+          "storeNumber": "R577",
+          "storeName": "天环广场",
+          "partNumber": "MHU64CH/A",
+          "status": "unavailable",
+          "pickupDisplay": "unavailable",
+          "quote": "暂无供应",
+          "productTitle": "iPhone 17e 256GB 浅粉色",
+          "observedAt": "2026-09-15T03:02:17.345Z",
+          "reason": null
+        },
+        {
+          "storeNumber": "R577",
+          "storeName": "天环广场",
+          "partNumber": "MYEV3CH/A",
+          "status": "unavailable",
+          "pickupDisplay": "unavailable",
+          "quote": "暂无供应",
+          "productTitle": "iPhone 16 128GB 黑色",
+          "observedAt": "2026-09-15T03:02:17.345Z",
+          "reason": null
+        }
+      ]
+    },
+    {
+      "category": "ipad",
+      "record": {
+        "storeNumber": "R577",
+        "partNumbers": [
+          "MDWU4CH/A",
+          "MH3A4CH/A",
+          "MD4A4CH/A",
+          "MXN93CH/A"
+        ],
+        "requestUrl": "https://www.apple.com.cn/shop/retail/pickup-message?pl=true&mts.0=regular&parts.0=MDWU4CH%2FA&parts.1=MH3A4CH%2FA&parts.2=MD4A4CH%2FA&parts.3=MXN93CH%2FA&store=R577",
+        "startedAt": "2026-09-15T03:02:19.356Z",
+        "httpStatus": 200,
+        "bytes": 8739,
+        "elapsedMs": 853,
+        "finishedAt": "2026-09-15T03:02:20.209Z",
+        "error": null,
+        "retryAfter": null,
+        "bodyFile": "pickup-ipad-1.body.json"
+      },
+      "observations": [
+        {
+          "storeNumber": "R577",
+          "storeName": "天环广场",
+          "partNumber": "MDWU4CH/A",
+          "status": "unavailable",
+          "pickupDisplay": "unavailable",
+          "quote": "暂无供应",
+          "productTitle": "11 英寸 iPad Pro 无线局域网机型 2TB 配标准玻璃面板 - 深空黑色",
+          "observedAt": "2026-09-15T03:02:20.209Z",
+          "reason": null
+        },
+        {
+          "storeNumber": "R577",
+          "storeName": "天环广场",
+          "partNumber": "MH3A4CH/A",
+          "status": "available",
+          "pickupDisplay": "available",
+          "quote": "今天可取货",
+          "productTitle": "11 英寸 iPad Air 无线局域网机型 512GB - 深空灰色",
+          "observedAt": "2026-09-15T03:02:20.209Z",
+          "reason": null
+        },
+        {
+          "storeNumber": "R577",
+          "storeName": "天环广场",
+          "partNumber": "MD4A4CH/A",
+          "status": "available",
+          "pickupDisplay": "available",
+          "quote": "今天可取货",
+          "productTitle": "iPad 无线局域网机型 128GB - 蓝色",
+          "observedAt": "2026-09-15T03:02:20.209Z",
+          "reason": null
+        },
+        {
+          "storeNumber": "R577",
+          "storeName": "天环广场",
+          "partNumber": "MXN93CH/A",
+          "status": "available",
+          "pickupDisplay": "available",
+          "quote": "今天可取货",
+          "productTitle": "iPad mini 无线局域网机型 128GB - 紫色",
+          "observedAt": "2026-09-15T03:02:20.209Z",
+          "reason": null
+        }
+      ]
+    },
+    {
+      "category": "mac",
+      "record": {
+        "storeNumber": "R577",
+        "partNumbers": [
+          "MDVH4CH/A",
+          "MGDR4CH/A",
+          "MHFD4CH/A",
+          "MWUG3CH/A",
+          "MHQK4CH/A",
+          "MHL64CH/A"
+        ],
+        "requestUrl": "https://www.apple.com.cn/shop/retail/pickup-message?pl=true&mts.0=regular&parts.0=MDVH4CH%2FA&parts.1=MGDR4CH%2FA&parts.2=MHFD4CH%2FA&parts.3=MWUG3CH%2FA&parts.4=MHQK4CH%2FA&parts.5=MHL64CH%2FA&store=R577",
+        "startedAt": "2026-09-15T03:02:22.221Z",
+        "httpStatus": 200,
+        "bytes": 9539,
+        "elapsedMs": 969,
+        "finishedAt": "2026-09-15T03:02:23.190Z",
+        "error": null,
+        "retryAfter": null,
+        "bodyFile": "pickup-mac-2.body.json"
+      },
+      "observations": [
+        {
+          "storeNumber": "R577",
+          "storeName": "天环广场",
+          "partNumber": "MDVH4CH/A",
+          "status": "unavailable",
+          "pickupDisplay": "unavailable",
+          "quote": "暂无供应",
+          "productTitle": "15 英寸 MacBook Air - 午夜色",
+          "observedAt": "2026-09-15T03:02:23.190Z",
+          "reason": null
+        },
+        {
+          "storeNumber": "R577",
+          "storeName": "天环广场",
+          "partNumber": "MGDR4CH/A",
+          "status": "available",
+          "pickupDisplay": "available",
+          "quote": "今天可取货",
+          "productTitle": "14 英寸 MacBook Pro - 深空黑色",
+          "observedAt": "2026-09-15T03:02:23.190Z",
+          "reason": null
+        },
+        {
+          "storeNumber": "R577",
+          "storeName": "天环广场",
+          "partNumber": "MHFD4CH/A",
+          "status": "unavailable",
+          "pickupDisplay": "unavailable",
+          "quote": "暂无供应",
+          "productTitle": "13 英寸 MacBook Neo - 柑橘黄色",
+          "observedAt": "2026-09-15T03:02:23.190Z",
+          "reason": null
+        },
+        {
+          "storeNumber": "R577",
+          "storeName": "天环广场",
+          "partNumber": "MWUG3CH/A",
+          "status": "available",
+          "pickupDisplay": "available",
+          "quote": "今天可取货",
+          "productTitle": "粉色 iMac",
+          "observedAt": "2026-09-15T03:02:23.190Z",
+          "reason": null
+        },
+        {
+          "storeNumber": "R577",
+          "storeName": "天环广场",
+          "partNumber": "MHQK4CH/A",
+          "status": "unknown",
+          "pickupDisplay": "default",
+          "quote": "请于 9 月 22 日查看具体供应状况",
+          "productTitle": "Mac mini",
+          "observedAt": "2026-09-15T03:02:23.190Z",
+          "reason": {
+            "code": "unknown_pickup_display",
+            "message": "Missing or unrecognized product pickupDisplay"
+          }
+        },
+        {
+          "storeNumber": "R577",
+          "storeName": "天环广场",
+          "partNumber": "MHL64CH/A",
+          "status": "unknown",
+          "pickupDisplay": "default",
+          "quote": "请于 9 月 22 日查看具体供应状况",
+          "productTitle": "Mac Studio",
+          "observedAt": "2026-09-15T03:02:23.190Z",
+          "reason": {
+            "code": "unknown_pickup_display",
+            "message": "Missing or unrecognized product pickupDisplay"
+          }
+        }
+      ]
+    },
+    {
+      "category": "airpods",
+      "record": {
+        "storeNumber": "R577",
+        "partNumbers": [
+          "MFHP4CH/A",
+          "MKFW4CH/A",
+          "MHWM4CH/A"
+        ],
+        "requestUrl": "https://www.apple.com.cn/shop/retail/pickup-message?pl=true&mts.0=regular&parts.0=MFHP4CH%2FA&parts.1=MKFW4CH%2FA&parts.2=MHWM4CH%2FA&store=R577",
+        "startedAt": "2026-09-15T03:02:25.589Z",
+        "httpStatus": 200,
+        "bytes": 7723,
+        "elapsedMs": 754,
+        "finishedAt": "2026-09-15T03:02:26.343Z",
+        "error": null,
+        "retryAfter": null,
+        "bodyFile": "pickup-airpods-3.body.json"
+      },
+      "observations": [
+        {
+          "storeNumber": "R577",
+          "storeName": "天环广场",
+          "partNumber": "MFHP4CH/A",
+          "status": "unavailable",
+          "pickupDisplay": "unavailable",
+          "quote": "暂无供应",
+          "productTitle": "AirPods Pro 3",
+          "observedAt": "2026-09-15T03:02:26.343Z",
+          "reason": null
+        },
+        {
+          "storeNumber": "R577",
+          "storeName": "天环广场",
+          "partNumber": "MKFW4CH/A",
+          "status": "available",
+          "pickupDisplay": "available",
+          "quote": "星期六 2026/09/19可取货",
+          "productTitle": "AirPods 5",
+          "observedAt": "2026-09-15T03:02:26.343Z",
+          "reason": null
+        },
+        {
+          "storeNumber": "R577",
+          "storeName": "天环广场",
+          "partNumber": "MHWM4CH/A",
+          "status": "available",
+          "pickupDisplay": "available",
+          "quote": "今天可取货",
+          "productTitle": "AirPods Max 2 - 蓝色",
+          "observedAt": "2026-09-15T03:02:26.343Z",
+          "reason": null
+        }
+      ]
+    },
+    {
+      "category": "vision",
+      "record": {
+        "storeNumber": "R577",
+        "partNumbers": [
+          "MFHG4CH/A"
+        ],
+        "requestUrl": "https://www.apple.com.cn/shop/retail/pickup-message?pl=true&mts.0=regular&parts.0=MFHG4CH%2FA&store=R577",
+        "startedAt": "2026-09-15T03:02:39.128Z",
+        "httpStatus": 200,
+        "bytes": 6097,
+        "elapsedMs": 2018,
+        "finishedAt": "2026-09-15T03:02:41.146Z",
+        "error": null,
+        "retryAfter": null,
+        "bodyFile": "pickup-vision-4.body.json"
+      },
+      "observations": [
+        {
+          "storeNumber": "R577",
+          "storeName": "天环广场",
+          "partNumber": "MFHG4CH/A",
+          "status": "available",
+          "pickupDisplay": "available",
+          "quote": "今天可取货",
+          "productTitle": "Apple Vision Pro 1TB",
+          "observedAt": "2026-09-15T03:02:41.146Z",
+          "reason": null
+        }
+      ]
+    },
+    {
+      "category": "homepod",
+      "record": {
+        "storeNumber": "R577",
+        "partNumbers": [
+          "MDEX4CH/A",
+          "MJ2J3CH/A"
+        ],
+        "requestUrl": "https://www.apple.com.cn/shop/retail/pickup-message?pl=true&mts.0=regular&parts.0=MDEX4CH%2FA&parts.1=MJ2J3CH%2FA&store=R577",
+        "startedAt": "2026-09-15T03:02:43.163Z",
+        "httpStatus": 200,
+        "bytes": 6772,
+        "elapsedMs": 2028,
+        "finishedAt": "2026-09-15T03:02:45.191Z",
+        "error": null,
+        "retryAfter": null,
+        "bodyFile": "pickup-homepod-5.body.json"
+      },
+      "observations": [
+        {
+          "storeNumber": "R577",
+          "storeName": "天环广场",
+          "partNumber": "MDEX4CH/A",
+          "status": "unavailable",
+          "pickupDisplay": "unavailable",
+          "quote": "暂无供应",
+          "productTitle": "HomePod - 午夜色",
+          "observedAt": "2026-09-15T03:02:45.191Z",
+          "reason": null
+        },
+        {
+          "storeNumber": "R577",
+          "storeName": "天环广场",
+          "partNumber": "MJ2J3CH/A",
+          "status": "unavailable",
+          "pickupDisplay": "unavailable",
+          "quote": "暂无供应",
+          "productTitle": "HomePod mini - 蓝色",
+          "observedAt": "2026-09-15T03:02:45.191Z",
+          "reason": null
+        }
+      ]
+    }
+  ],
+  "picks": [
+    {
+      "family": "iphone-18-pro",
+      "part": "MJYH4CH/A",
+      "skipped": null
+    },
+    {
+      "family": "iphone-air",
+      "part": "MG364CH/A",
+      "skipped": null
+    },
+    {
+      "family": "iphone-duo",
+      "part": null,
+      "skipped": "all_coming_soon"
+    },
+    {
+      "family": "iphone-17",
+      "part": "MG724CH/A",
+      "skipped": null
+    },
+    {
+      "family": "iphone-17e",
+      "part": "MHU64CH/A",
+      "skipped": null
+    },
+    {
+      "family": "iphone-16",
+      "part": "MYEV3CH/A",
+      "skipped": null
+    },
+    {
+      "family": "ipad-pro",
+      "part": "MDWU4CH/A",
+      "skipped": null
+    },
+    {
+      "family": "ipad-air",
+      "part": "MH3A4CH/A",
+      "skipped": null
+    },
+    {
+      "family": "ipad",
+      "part": "MD4A4CH/A",
+      "skipped": null
+    },
+    {
+      "family": "ipad-mini",
+      "part": "MXN93CH/A",
+      "skipped": null
+    },
+    {
+      "family": "macbook-air",
+      "part": "MDVH4CH/A",
+      "skipped": null
+    },
+    {
+      "family": "macbook-pro",
+      "part": "MGDR4CH/A",
+      "skipped": null
+    },
+    {
+      "family": "macbook-neo",
+      "part": "MHFD4CH/A",
+      "skipped": null
+    },
+    {
+      "family": "imac",
+      "part": "MWUG3CH/A",
+      "skipped": null
+    },
+    {
+      "family": "mac-mini",
+      "part": "MHQK4CH/A",
+      "skipped": null
+    },
+    {
+      "family": "mac-studio",
+      "part": "MHL64CH/A",
+      "skipped": null
+    },
+    {
+      "family": "airpods-pro-3",
+      "part": "MFHP4CH/A",
+      "skipped": null
+    },
+    {
+      "family": "airpods-5",
+      "part": "MKFW4CH/A",
+      "skipped": null
+    },
+    {
+      "family": "airpods-max-2",
+      "part": "MHWM4CH/A",
+      "skipped": null
+    },
+    {
+      "family": "apple-vision-pro",
+      "part": "MFHG4CH/A",
+      "skipped": null
+    },
+    {
+      "family": "homepod",
+      "part": "MDEX4CH/A",
+      "skipped": null
+    },
+    {
+      "family": "homepod-mini",
+      "part": "MJ2J3CH/A",
+      "skipped": null
+    }
+  ]
+}

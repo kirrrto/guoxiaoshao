@@ -1,0 +1,220 @@
+{
+  "schemaVersion": 1,
+  "normalization": "utf8-lf",
+  "source": "cloudfunctions/gxs_api/lib",
+  "entry": "index.js",
+  "entryFiles": [
+    {
+      "path": "index.js",
+      "bytes": 2692,
+      "sha256": "765646e03ab9ee815de663e3ab1d6f0d08ab363541f5af5f0f1c820ad62aa18f"
+    }
+  ],
+  "external": [
+    "node:crypto",
+    "node:util",
+    "wx-server-sdk"
+  ],
+  "files": [
+    {
+      "path": "apple-pickup.js",
+      "bytes": 8259,
+      "sha256": "dbd35fb494a68c82358c3c3a4f4e7e0de141e162d061c5e7f31b29c539a0cfed"
+    },
+    {
+      "path": "collections.js",
+      "bytes": 4294,
+      "sha256": "4afd5d1bd8beb303be0a518ddfe5d9d9ac3715179fcab354c285c6f68a9fcb5f"
+    },
+    {
+      "path": "config-audit.js",
+      "bytes": 4015,
+      "sha256": "acb9be12a9e9d2d1a55bcaa718088f3e5994f02e129321c868e236f77a0b624c"
+    },
+    {
+      "path": "config.js",
+      "bytes": 16055,
+      "sha256": "d4c4fda17397b826da09b1c22bf1b2d168f39fb9812acfa1c09fc89cffc85d3d"
+    },
+    {
+      "path": "connection.js",
+      "bytes": 539,
+      "sha256": "8099a99c0454283891b5ca93e14c59e58f0b524d7a59d9543accf765fc57e694"
+    },
+    {
+      "path": "engine/capacity-budget.js",
+      "bytes": 3805,
+      "sha256": "823dd1458b83e691e34842b6aac7d129aecd30d14bbe7029b819896582789913"
+    },
+    {
+      "path": "engine/collector.js",
+      "bytes": 19043,
+      "sha256": "90e3f994c1eee6f9f1cd9a217d107763e3a3f2794f97fb81da4c131e5ea9e5fe"
+    },
+    {
+      "path": "engine/events.js",
+      "bytes": 7226,
+      "sha256": "8f48a5845c4593a82f2bbd71ce157c0795885164f43360e9049ede235a85e7d0"
+    },
+    {
+      "path": "engine/guarded-pickup.js",
+      "bytes": 2640,
+      "sha256": "752ce3ae887838c2b00718d774fea1c8a9505546e8c4e011f2b0a86afe410a4b"
+    },
+    {
+      "path": "engine/lease.js",
+      "bytes": 1390,
+      "sha256": "863379f4ac898ae6da4f15a21bd88097877edb1f8624faf120875034affa0e63"
+    },
+    {
+      "path": "engine/notifier.js",
+      "bytes": 17222,
+      "sha256": "0379ce2c52d05999d2a501f1a1dcdbfbd4e72d29738a893dcfcb291d95510968"
+    },
+    {
+      "path": "engine/observation-day.js",
+      "bytes": 2853,
+      "sha256": "c6e93a5be2e61dc27c0c37c8537618e73c883764c2ed94515c3879acdf7838ff"
+    },
+    {
+      "path": "engine/observation-health.js",
+      "bytes": 2205,
+      "sha256": "f025f0fee56b3436db8195b3b2ce4f2a2ab14cdc32f0dd7128d6dc31e8a31f8f"
+    },
+    {
+      "path": "engine/observations.js",
+      "bytes": 1032,
+      "sha256": "4f9bf5a91f4e117c7c9fc5d538216a5b77f6502a3c7ce2fa07138fa87fdaba3d"
+    },
+    {
+      "path": "engine/retention.js",
+      "bytes": 2733,
+      "sha256": "e2a25d50062e50894e9fcfb1092543a3ad8d2b56721275dac5da1c696a22706c"
+    },
+    {
+      "path": "engine/scheduled.js",
+      "bytes": 9240,
+      "sha256": "0aaac4a7ff9766724df89d2e5c00d2f84e8e5b81b1e508377290aa10393a65db"
+    },
+    {
+      "path": "engine/scheduler.js",
+      "bytes": 24676,
+      "sha256": "22bb1260fa71c90cfd7bdb8f02a9acd29cda0eeba0572fa5d81c19fba86cd2e7"
+    },
+    {
+      "path": "engine/wechat-sender.js",
+      "bytes": 5693,
+      "sha256": "b511e7f41b16a8e5c3f88f4b4b3780ac41662c6a24f2ec5b51a00e363640bb76"
+    },
+    {
+      "path": "errors.js",
+      "bytes": 1059,
+      "sha256": "4aa02f042bf7cd7e68b71c0ff475ec1cf0c8177769758f8a5f3fb8d08ac5e90a"
+    },
+    {
+      "path": "growth-policy.js",
+      "bytes": 2766,
+      "sha256": "59efd44968a2aebb3d11d5e4c49b2d7e0c7d6e8354951b7689c512b39277806a"
+    },
+    {
+      "path": "member-redemption.js",
+      "bytes": 1289,
+      "sha256": "b056fd588e6ccc40436d552523d9ab798e49b176feabe1d7b285491b737a6505"
+    },
+    {
+      "path": "notification-target.js",
+      "bytes": 1617,
+      "sha256": "6b3fa390471f3dce27cfd7b695c204e9b1d2e946b86321b64991c8653117eff7"
+    },
+    {
+      "path": "notification-view.js",
+      "bytes": 2521,
+      "sha256": "d5745dcd17f16dc9dd10fb9b08d2e5eabd1eb75da0480a0358a3ef1755a575d6"
+    },
+    {
+      "path": "payment/plans.js",
+      "bytes": 3693,
+      "sha256": "d5fc79eaf48ee64529184e6fef748fe4b131f9abca9e3fbb3b7d73d7e88a4a66"
+    },
+    {
+      "path": "repo/atomic-ops.js",
+      "bytes": 51504,
+      "sha256": "07036de8a72fd7683a0e18e72794188e7012cad585269079ed768184cb144565"
+    },
+    {
+      "path": "repo/cloudbase-repo.js",
+      "bytes": 24294,
+      "sha256": "4ffa5ef9c497698787cc0339db34cf67ece031c5c77aba26a7103f3d1d057a96"
+    },
+    {
+      "path": "repo/growth.js",
+      "bytes": 1793,
+      "sha256": "ddcf61ba2d350a30d2894c0e0fd639da94c8a3e353e7bc7d2aaf9497526dbb0a"
+    },
+    {
+      "path": "repo/member-records.js",
+      "bytes": 3367,
+      "sha256": "0557422485ec544e7b5670777a43cc7dbc6579f42f44c76d4fd49f49dc2f14cc"
+    },
+    {
+      "path": "repo/notification-test.js",
+      "bytes": 8364,
+      "sha256": "b35f800ad7ca02fbeb418c5cf834814468d5e6fae8709fef54b5517f8422c716"
+    },
+    {
+      "path": "repo/query-target.js",
+      "bytes": 2497,
+      "sha256": "34e58a36fdbf0cf4274277fea1cf013106a5ff048620c38c8547e5d71c2a4d65"
+    },
+    {
+      "path": "repo/subscription-credit-ledger.js",
+      "bytes": 4760,
+      "sha256": "deb15499543a4fc6aa07bd81ad2d33ed5e8f535f34f21d9690a519581d3d9119"
+    },
+    {
+      "path": "repo/upstream-guard.js",
+      "bytes": 7819,
+      "sha256": "90767d8b9454bbeeb2b210e1664590447cf158b9855f59cfdd5afabf3f93078e"
+    },
+    {
+      "path": "rules/access.js",
+      "bytes": 2351,
+      "sha256": "fe8e23d3b3413526fcdf5a3f7d2e1308c09f6e30a2840a30071d078e199c4388"
+    },
+    {
+      "path": "rules/follow-access.js",
+      "bytes": 1508,
+      "sha256": "b466c721ade7726d64e29e4dceb6d6adf5381796032febcd87fe9580800af191"
+    },
+    {
+      "path": "rules/member-plan.js",
+      "bytes": 2433,
+      "sha256": "cb07f5bbe1756d7ea1288c07ba2c2ed9bf31c57d38167ffb608ff3a45be3b814"
+    },
+    {
+      "path": "rules/membership-entitlements.js",
+      "bytes": 4891,
+      "sha256": "4d78a35bff81f81fe335eec645dccbafdd62d488094bc18d2aabee6e7bf034e7"
+    },
+    {
+      "path": "rules/membership.js",
+      "bytes": 5597,
+      "sha256": "2283e66543368878b7fdcfd3594e221175e12be68810f2d2c068431164db12fb"
+    },
+    {
+      "path": "rules/new-product.js",
+      "bytes": 1870,
+      "sha256": "a5b57d59e52ba1190a4e97ce19903d680f83b8ede1ec7088bcc5bdd840cc490a"
+    },
+    {
+      "path": "rules/quota.js",
+      "bytes": 1704,
+      "sha256": "3d959021c4a34b5d0cd0326a7f696d56cfb0c8e99e6536c05985f2d2fe80c9d3"
+    },
+    {
+      "path": "time.js",
+      "bytes": 1781,
+      "sha256": "6b0e76b43a671ced5f5c68f4826f97c13d53de9078c5c5ab7882721e2c6d9d3f"
+    }
+  ]
+}

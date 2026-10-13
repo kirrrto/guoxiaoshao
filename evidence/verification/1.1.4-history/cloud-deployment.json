@@ -1,0 +1,297 @@
+{
+  "version": "1.1.4",
+  "checkedAt": "2026-09-16 10:43:44 UTC",
+  "functions": [
+    {
+      "functionName": "gxs_api",
+      "status": "Active",
+      "changedTime": "2026-09-16 18:40:06",
+      "versionLocal": "1.1.4",
+      "stableFields": [
+        {
+          "key": "Runtime",
+          "unchanged": true
+        },
+        {
+          "key": "Timeout",
+          "unchanged": true
+        },
+        {
+          "key": "MemorySize",
+          "unchanged": true
+        },
+        {
+          "key": "Environment",
+          "unchanged": true
+        },
+        {
+          "key": "Triggers",
+          "unchanged": true
+        }
+      ]
+    },
+    {
+      "functionName": "gxs_monitor",
+      "status": "Active",
+      "changedTime": "2026-09-16 18:40:19",
+      "versionLocal": "1.1.4",
+      "stableFields": [
+        {
+          "key": "Runtime",
+          "unchanged": true
+        },
+        {
+          "key": "Timeout",
+          "unchanged": true
+        },
+        {
+          "key": "MemorySize",
+          "unchanged": true
+        },
+        {
+          "key": "Environment",
+          "unchanged": true
+        },
+        {
+          "key": "Triggers",
+          "unchanged": true
+        }
+      ]
+    },
+    {
+      "functionName": "cloudbase_auth",
+      "status": "Active",
+      "changedTime": "2026-09-16 18:40:22",
+      "versionLocal": "1.1.4",
+      "stableFields": [
+        {
+          "key": "Runtime",
+          "unchanged": true
+        },
+        {
+          "key": "Timeout",
+          "unchanged": true
+        },
+        {
+          "key": "MemorySize",
+          "unchanged": true
+        },
+        {
+          "key": "Environment",
+          "unchanged": true
+        },
+        {
+          "key": "Triggers",
+          "unchanged": true
+        }
+      ]
+    }
+  ],
+  "dailyCollection": {
+    "name": "gxs_observation_days",
+    "permission": "ADMINONLY",
+    "index": "part_day_store",
+    "indexKeys": [
+      "partNumber",
+      "dayKey",
+      "storeNumber"
+    ]
+  },
+  "sameSelectionCloudQuery": {
+    "ok": true,
+    "data": {
+      "ok": true,
+      "historyQueryId": "history-audit-20260916-empty-001",
+      "product": {
+        "partNumber": "MJTA4CH/A",
+        "title": "iPhone 18 Pro 256GB 冰川蓝色",
+        "model": "iPhone 18 Pro",
+        "familyName": "iPhone 18 Pro / Pro Max"
+      },
+      "dayKey": "2026-09-14",
+      "charged": 0,
+      "balance": 2,
+      "member": true,
+      "summary": {
+        "available": 0,
+        "restocks": 0,
+        "recoveries": 0,
+        "ended": 0,
+        "lastHourRestocks": 0
+      },
+      "events": [],
+      "dataAvailability": {
+        "status": "no_records",
+        "eventCount": 0
+      },
+      "billing": {
+        "reason": "empty_history_no_charge"
+      },
+      "observationCoverage": {
+        "tracking": "daily_samples_v1",
+        "scope": "recorded_samples_only",
+        "checkedAt": "2026-09-16T10:41:29.781Z",
+        "requestedStoreNumbers": [
+          "R577",
+          "R639"
+        ],
+        "stores": []
+      },
+      "latest": [
+        {
+          "storeNumber": "R577",
+          "storeName": "天环广场",
+          "status": "unknown",
+          "lastKnownStatus": "unavailable",
+          "isStale": true,
+          "statusSince": "2026-09-16T10:22:44.666Z",
+          "observedAt": "2026-09-16T10:22:44.666Z",
+          "knownAt": "2026-09-16T10:22:44.666Z",
+          "unknownSince": null,
+          "quote": "暂无供应"
+        },
+        {
+          "storeNumber": "R639",
+          "storeName": "珠江新城",
+          "status": "unknown",
+          "lastKnownStatus": "unavailable",
+          "isStale": true,
+          "statusSince": "2026-09-16T10:22:44.580Z",
+          "observedAt": "2026-09-16T10:22:44.580Z",
+          "knownAt": "2026-09-16T10:22:44.580Z",
+          "unknownSince": null,
+          "quote": "暂无供应"
+        }
+      ],
+      "latestRestricted": false,
+      "latestSnapshotAt": "2026-09-16T10:41:29.823Z",
+      "pagination": {
+        "nextCursor": null,
+        "hasMore": false,
+        "total": 0,
+        "snapshotAt": "2026-09-16T10:41:29.346Z"
+      },
+      "refunded": 0
+    },
+    "serverTime": "2026-09-16T10:41:29.346Z",
+    "requestId": "6db0d07b-25a3-4148-b8e0-edc38fdbc3af"
+  },
+  "observedSelectionCloudQuery": {
+    "ok": true,
+    "data": {
+      "ok": true,
+      "historyQueryId": "history-audit-20260916-current-001",
+      "product": {
+        "partNumber": "MJYE4CH/A",
+        "title": "iPhone 18 Pro Max 512GB 冰川蓝色",
+        "model": "iPhone 18 Pro Max",
+        "familyName": "iPhone 18 Pro / Pro Max"
+      },
+      "dayKey": "2026-09-16",
+      "charged": 0,
+      "balance": 2,
+      "member": true,
+      "summary": {
+        "available": 0,
+        "restocks": 0,
+        "recoveries": 0,
+        "ended": 0,
+        "lastHourRestocks": 0
+      },
+      "events": [],
+      "dataAvailability": {
+        "status": "no_records",
+        "eventCount": 0
+      },
+      "billing": {
+        "reason": "empty_history_no_charge"
+      },
+      "observationCoverage": {
+        "tracking": "daily_samples_v1",
+        "scope": "recorded_samples_only",
+        "checkedAt": "2026-09-16T10:43:43.817Z",
+        "requestedStoreNumbers": [
+          "R577",
+          "R639"
+        ],
+        "stores": [
+          {
+            "_id": "R577|MJYE4CH/A|2026-09-16",
+            "schemaVersion": 1,
+            "storeNumber": "R577",
+            "partNumber": "MJYE4CH/A",
+            "dayKey": "2026-09-16",
+            "sampleCount": 3,
+            "knownCount": 3,
+            "unknownCount": 0,
+            "manualCount": 0,
+            "autoCount": 3,
+            "firstObservedAt": "2026-09-16T10:41:02.443Z",
+            "lastObservedAt": "2026-09-16T10:43:02.599Z",
+            "firstKnownAt": "2026-09-16T10:41:02.443Z",
+            "lastKnownAt": "2026-09-16T10:43:02.599Z"
+          },
+          {
+            "_id": "R639|MJYE4CH/A|2026-09-16",
+            "schemaVersion": 1,
+            "storeNumber": "R639",
+            "partNumber": "MJYE4CH/A",
+            "dayKey": "2026-09-16",
+            "sampleCount": 3,
+            "knownCount": 3,
+            "unknownCount": 0,
+            "manualCount": 0,
+            "autoCount": 3,
+            "firstObservedAt": "2026-09-16T10:41:03.333Z",
+            "lastObservedAt": "2026-09-16T10:43:02.869Z",
+            "firstKnownAt": "2026-09-16T10:41:03.333Z",
+            "lastKnownAt": "2026-09-16T10:43:02.869Z"
+          }
+        ]
+      },
+      "latest": [
+        {
+          "storeNumber": "R577",
+          "storeName": "天环广场",
+          "status": "unavailable",
+          "lastKnownStatus": "unavailable",
+          "isStale": false,
+          "statusSince": "2026-09-15T07:33:06.893Z",
+          "observedAt": "2026-09-16T10:43:02.599Z",
+          "knownAt": "2026-09-16T10:43:02.599Z",
+          "unknownSince": null,
+          "quote": "暂无供应"
+        },
+        {
+          "storeNumber": "R639",
+          "storeName": "珠江新城",
+          "status": "unavailable",
+          "lastKnownStatus": "unavailable",
+          "isStale": false,
+          "statusSince": "2026-09-15T07:33:07.387Z",
+          "observedAt": "2026-09-16T10:43:02.869Z",
+          "knownAt": "2026-09-16T10:43:02.869Z",
+          "unknownSince": null,
+          "quote": "暂无供应"
+        }
+      ],
+      "latestRestricted": false,
+      "latestSnapshotAt": "2026-09-16T10:43:43.871Z",
+      "pagination": {
+        "nextCursor": null,
+        "hasMore": false,
+        "total": 0,
+        "snapshotAt": "2026-09-16T10:43:43.342Z"
+      },
+      "refunded": 0
+    },
+    "serverTime": "2026-09-16T10:43:43.342Z",
+    "requestId": "f0c0dde8-e6bc-48fb-b6e4-567ab48515ac"
+  },
+  "limits": [
+    "Invoked through CloudBase management tooling, not a phone UI acceptance test.",
+    "Queries were under an existing member identity; free-account refund validated by offline transaction tests.",
+    "No historical samples backfilled; sample tracking begins after this deployment.",
+    "Collection scope unchanged at two store/SKU targets."
+  ]
+}

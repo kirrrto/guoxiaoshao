@@ -1,0 +1,844 @@
+{
+  "createdAt": "2026-10-11T06:02:41.286259+00:00",
+  "baselineSha256": "1df0289dffd57a0151b3d98589422e2447aa36cd08a93300ca1a24c3503e8d72",
+  "counts": {
+    "added": 39,
+    "modified": 80,
+    "removed": 0
+  },
+  "files": [
+    {
+      "path": ".gitignore",
+      "change": "modified",
+      "beforeSha256": "140ce064d73075a8d3247e27220d39036f40ea12cbc7f51a438b514657421fd3",
+      "afterSha256": "e68ec1e683a4d422fb469c294bcd9270b85869bcb1c9dc479009c5e34e00e402",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "README.md",
+      "change": "modified",
+      "beforeSha256": "a8b9803dd95c04a9e6bf3847720ac5b35f0f42b88ba0336db4f2a510f12ef4df",
+      "afterSha256": "6365d5e1ff89edbe6c3da83d407f3aa5b68c1eced412465626673a162209fd87",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "cloudfunctions/cloudbase_auth/package-lock.json",
+      "change": "modified",
+      "beforeSha256": "5ddd16b5e5c65a3ff3a4826ea82419c5e80cc95f2626d30d8edbda90092ef438",
+      "afterSha256": "089ce67dc76e69d7cb49a498cda126e59c0d1f8ebe8366183ef74ce14007f4a4",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "cloudfunctions/cloudbase_auth/package.json",
+      "change": "modified",
+      "beforeSha256": "3187766d930e6a6d8128e87e970f806f0f5bf2774b89834ed1e0cf45e6e467be",
+      "afterSha256": "c7b09840672be21206964feb84340524824062711b56eef21160a696a910f7fe",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "cloudfunctions/gxs_api/lib/app.js",
+      "change": "modified",
+      "beforeSha256": "5d556beca81fa353b6bffbdba809cfa4df266a56bbc7b1ee69147c970820ef7a",
+      "afterSha256": "6141eaafc2add3058a23af01e358831f6634c2538187b16ab2c4839594b95a51",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "cloudfunctions/gxs_api/lib/collections.js",
+      "change": "modified",
+      "beforeSha256": "dc121637d6c0ef1ddba98ef2625336efb0ac7975230f99246bf72a7ce389881c",
+      "afterSha256": "4afd5d1bd8beb303be0a518ddfe5d9d9ac3715179fcab354c285c6f68a9fcb5f",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "cloudfunctions/gxs_api/lib/config.js",
+      "change": "modified",
+      "beforeSha256": "fd8a267a2f5624ceb0e6ad86c9ace9f437673c9f00074bd34d55ae24fab274d6",
+      "afterSha256": "d4c4fda17397b826da09b1c22bf1b2d168f39fb9812acfa1c09fc89cffc85d3d",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "cloudfunctions/gxs_api/lib/engine/retention.js",
+      "change": "modified",
+      "beforeSha256": "fa865bd0719b747808fedb4b2031816a8630b45b06d82360833a9bc4fc7b8f91",
+      "afterSha256": "e2a25d50062e50894e9fcfb1092543a3ad8d2b56721275dac5da1c696a22706c",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "cloudfunctions/gxs_api/lib/growth-policy.js",
+      "change": "added",
+      "beforeSha256": null,
+      "afterSha256": "59efd44968a2aebb3d11d5e4c49b2d7e0c7d6e8354951b7689c512b39277806a",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "cloudfunctions/gxs_api/lib/payment/entry.js",
+      "change": "modified",
+      "beforeSha256": "21d4c2132d8dcdff534ea8a9c10bcbcf454dc90d0d61d85432704f1b8b27f5e9",
+      "afterSha256": "c0d46d2a390eadf5ecdd385551286adbbb280bdafb7b409895f56bcd2f435880",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "cloudfunctions/gxs_api/lib/payment/plans.js",
+      "change": "modified",
+      "beforeSha256": "2f5d5056c1cb5673cb64941623f458f88f30e5f03bb04d2633bf4bb830629af2",
+      "afterSha256": "19ff483f5f3206670300078cf7e3b16babe88a502c2853b18d08513c99f24761",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "cloudfunctions/gxs_api/lib/payment/service.js",
+      "change": "modified",
+      "beforeSha256": "cbf4b712f68deed24f62c302700bb43b0fb5f7bf24e4a6649a74de6fc7f1329c",
+      "afterSha256": "e18efa30ee5010fcfb7b8c9f07dcc4d36fd796d2be09878c0abfa7a1be569370",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "cloudfunctions/gxs_api/lib/payment/virtual-payment.js",
+      "change": "modified",
+      "beforeSha256": "57a4e9e23c898485440c73ddf6310edacb5b25d53369a88635d8273d0a7ffb5f",
+      "afterSha256": "a0471359b06445629d1419ce04120a8e968fc55012f2cbc63d422b241ba05f6f",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "cloudfunctions/gxs_api/lib/repo/atomic-ops.js",
+      "change": "modified",
+      "beforeSha256": "ec8bfdf5cff76c68d760b613b5776f5b3e941cb74f05a711419493352a653d70",
+      "afterSha256": "07036de8a72fd7683a0e18e72794188e7012cad585269079ed768184cb144565",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "cloudfunctions/gxs_api/lib/repo/cloudbase-repo.js",
+      "change": "modified",
+      "beforeSha256": "42e1cf0a81bc85794048bfa8802c617057072b06a8673d5a9a3b9f5d1e466e4f",
+      "afterSha256": "4ffa5ef9c497698787cc0339db34cf67ece031c5c77aba26a7103f3d1d057a96",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "cloudfunctions/gxs_api/lib/repo/growth.js",
+      "change": "added",
+      "beforeSha256": null,
+      "afterSha256": "ddcf61ba2d350a30d2894c0e0fd639da94c8a3e353e7bc7d2aaf9497526dbb0a",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "cloudfunctions/gxs_api/lib/rules/member-plan.js",
+      "change": "modified",
+      "beforeSha256": "4017d2bc65af995567467ad25894fbd86adaa131cf060571a3250a48d010cedd",
+      "afterSha256": "cb07f5bbe1756d7ea1288c07ba2c2ed9bf31c57d38167ffb608ff3a45be3b814",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "cloudfunctions/gxs_api/lib/services/growth.js",
+      "change": "added",
+      "beforeSha256": null,
+      "afterSha256": "0ab9856f17de0eb91c4eb4b58d9b5856ed08cd0ec59c3c72901c0c7edb010dc2",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "cloudfunctions/gxs_api/lib/services/member.js",
+      "change": "modified",
+      "beforeSha256": "60f48f0d894e59d435788c2db60cc93bf188f0954e145a3c65e7c571cbb2d7c0",
+      "afterSha256": "d7b099c863b66eec349695f23bbeef251420d4bc4813cd1f7c65ad64f0abd9a7",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "cloudfunctions/gxs_api/lib/services/notification-test.js",
+      "change": "modified",
+      "beforeSha256": "e5d75af336addfe50399efc28441c98521de34972d8b36faf86b52e31b524aaa",
+      "afterSha256": "135039709e471546d5bd1628b783a88460d96052b69af8280462d9e200689806",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "cloudfunctions/gxs_api/lib/services/users.js",
+      "change": "modified",
+      "beforeSha256": "4686c11a6cc638f36921b59df9704270c0fcc676d5003e14694e02fb66557cea",
+      "afterSha256": "9653515f87a8259ee95c1a13002f688d7c2844446ac8d62668fce8ed65dbf889",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "cloudfunctions/gxs_api/package-lock.json",
+      "change": "modified",
+      "beforeSha256": "d42d951531a3eeefa6225ea51e03853868957a143f0733ecc33d6d36f65537bf",
+      "afterSha256": "c32462368d469b3e191cad60c79d60f81be164ee0f205b9ccc2f212c0cab437e",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "cloudfunctions/gxs_api/package.json",
+      "change": "modified",
+      "beforeSha256": "6c5a71169ecc505d1d789dbee9cf91322e19a6437110f18125307e38a5798ec9",
+      "afterSha256": "0da990b3552ad708815d38ccf3a1ad5d14912e277b7d819468b40831ac347a23",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "cloudfunctions/gxs_monitor/lib-manifest.json",
+      "change": "modified",
+      "beforeSha256": "91178913143c684aa9497df6d11a97fabf5ec50e45f51cf3d27a60feca6f7e7c",
+      "afterSha256": "631793711294ee45301a6aec0dabbd82b25a82890fbc44f2ae740c62702b44a1",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "cloudfunctions/gxs_monitor/lib/collections.js",
+      "change": "modified",
+      "beforeSha256": "dc121637d6c0ef1ddba98ef2625336efb0ac7975230f99246bf72a7ce389881c",
+      "afterSha256": "4afd5d1bd8beb303be0a518ddfe5d9d9ac3715179fcab354c285c6f68a9fcb5f",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "cloudfunctions/gxs_monitor/lib/config.js",
+      "change": "modified",
+      "beforeSha256": "fd8a267a2f5624ceb0e6ad86c9ace9f437673c9f00074bd34d55ae24fab274d6",
+      "afterSha256": "d4c4fda17397b826da09b1c22bf1b2d168f39fb9812acfa1c09fc89cffc85d3d",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "cloudfunctions/gxs_monitor/lib/engine/retention.js",
+      "change": "modified",
+      "beforeSha256": "fa865bd0719b747808fedb4b2031816a8630b45b06d82360833a9bc4fc7b8f91",
+      "afterSha256": "e2a25d50062e50894e9fcfb1092543a3ad8d2b56721275dac5da1c696a22706c",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "cloudfunctions/gxs_monitor/lib/growth-policy.js",
+      "change": "added",
+      "beforeSha256": null,
+      "afterSha256": "59efd44968a2aebb3d11d5e4c49b2d7e0c7d6e8354951b7689c512b39277806a",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "cloudfunctions/gxs_monitor/lib/payment/plans.js",
+      "change": "modified",
+      "beforeSha256": "2f5d5056c1cb5673cb64941623f458f88f30e5f03bb04d2633bf4bb830629af2",
+      "afterSha256": "19ff483f5f3206670300078cf7e3b16babe88a502c2853b18d08513c99f24761",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "cloudfunctions/gxs_monitor/lib/repo/atomic-ops.js",
+      "change": "modified",
+      "beforeSha256": "ec8bfdf5cff76c68d760b613b5776f5b3e941cb74f05a711419493352a653d70",
+      "afterSha256": "07036de8a72fd7683a0e18e72794188e7012cad585269079ed768184cb144565",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "cloudfunctions/gxs_monitor/lib/repo/cloudbase-repo.js",
+      "change": "modified",
+      "beforeSha256": "42e1cf0a81bc85794048bfa8802c617057072b06a8673d5a9a3b9f5d1e466e4f",
+      "afterSha256": "4ffa5ef9c497698787cc0339db34cf67ece031c5c77aba26a7103f3d1d057a96",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "cloudfunctions/gxs_monitor/lib/repo/growth.js",
+      "change": "added",
+      "beforeSha256": null,
+      "afterSha256": "ddcf61ba2d350a30d2894c0e0fd639da94c8a3e353e7bc7d2aaf9497526dbb0a",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "cloudfunctions/gxs_monitor/lib/rules/member-plan.js",
+      "change": "modified",
+      "beforeSha256": "4017d2bc65af995567467ad25894fbd86adaa131cf060571a3250a48d010cedd",
+      "afterSha256": "cb07f5bbe1756d7ea1288c07ba2c2ed9bf31c57d38167ffb608ff3a45be3b814",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "cloudfunctions/gxs_monitor/package-lock.json",
+      "change": "modified",
+      "beforeSha256": "175189080afe6aaf4bf0805fdef58d3b5eb5fcd75111cc0414e30c6498f005d7",
+      "afterSha256": "5b0150d38d6266bb24e0ddd9a83980f1e35f1220739c9259c4edf0933ab91ff6",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "cloudfunctions/gxs_monitor/package.json",
+      "change": "modified",
+      "beforeSha256": "1baf7a364a05cd30949533d608f4e2d0c4c096b16997178e897c3ba0ccad40f2",
+      "afterSha256": "55c17dd4b1f0f4ea27a300c73dc5b08ffcaf34e7c3b71c5d5b9d49f05ba75b72",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "config/database-deployment-plan.json",
+      "change": "modified",
+      "beforeSha256": "718cecde040ad967c3b36bbb88172d659b8e528cadb0e850d16230bbe708b36d",
+      "afterSha256": "9ce087a8a50a1d605ec9f5f7e2d189dec097e4d45268f06943ba69e6f20959dc",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "config/delivery-targets.json",
+      "change": "modified",
+      "beforeSha256": "2f2a06d1cf577c7a436b5a18f47c8a4edb16f58bdabff5045f8a7b303a80235d",
+      "afterSha256": "c64eb739fcf5f60c760276c1beb3a33071d2d2fb16359911724d04d1bc218096",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "config/member-plans-2.0.runtime-patch.example.json",
+      "change": "added",
+      "beforeSha256": null,
+      "afterSha256": "652d9652c5a71919460a75f53592cf4f07a1047c2a7369c2c5b35bd8257887a6",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "config/v2-preview.runtime-patch.json",
+      "change": "added",
+      "beforeSha256": null,
+      "afterSha256": "8ab5065cfa8c6170a3fa3a96d8b3a8ed1864b348c193c44ecba365f604250aae",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "docs/DATA_MODEL_AND_API.md",
+      "change": "modified",
+      "beforeSha256": "b64555cdacf9e0d3585f53ecfbb28d56350176ee47818aa19806eca180cae100",
+      "afterSha256": "c7afea3b7f15eeaf11e1b0d70294b74851cc3e43013a86074487a2daa09c6ec4",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "docs/GROWTH_2.0.0.md",
+      "change": "added",
+      "beforeSha256": null,
+      "afterSha256": "eddc826bba894ea8db6ebcd0630ad493be2272ccac8471c01d70065b62588527",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "docs/IMPLEMENTATION_2.0.0.md",
+      "change": "added",
+      "beforeSha256": null,
+      "afterSha256": "fa86c4bc7c34ffd0d8ac307324641610aac8182891f9e329244bd3af249b2992",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "docs/PERFORMANCE_2.0.0.md",
+      "change": "added",
+      "beforeSha256": null,
+      "afterSha256": "978ec1b4b13352a36332fadc9e28e62e2cc4f8ef8ce68939a2a45991ad65cf52",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "docs/RELEASE_2.0.0.md",
+      "change": "added",
+      "beforeSha256": null,
+      "afterSha256": "f7a4897071f5516d05a1c3a2719561cca3ddc75b1bebbde8de848fa3478a563c",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "docs/SOURCEMAP_REVIEW_2.0.0.md",
+      "change": "added",
+      "beforeSha256": null,
+      "afterSha256": "f3bd86d8546b8f8058de2e4f66e4f6c89e6354562c6c502b8a676d7f92f75bba",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "docs/UI_2.0.0.md",
+      "change": "added",
+      "beforeSha256": null,
+      "afterSha256": "911971fe8ce53cdc6cac3ba3923277ebe75f99b85c784aed7c6f730cadbb6358",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "docs/VIRTUAL_PAYMENT_SETUP.md",
+      "change": "modified",
+      "beforeSha256": "448d5494da2b90ea3ca4c92af0e28a83c495ea6a17c90b0cc8fe3db617928b43",
+      "afterSha256": "5454448254ec24f5f95035ccee685517c51ed12667c2bbafc76147ae0a4340f1",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "miniprogram/app.js",
+      "change": "modified",
+      "beforeSha256": "5b821a72ec7a3af7dc8b89f962f924deeb70e2d2523bac9d91e5975cd9807380",
+      "afterSha256": "c60924912dced5fdb0a4f0ff9968517effd7cab1864a22aa49d3dc4a1888f0bb",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "miniprogram/app.json",
+      "change": "modified",
+      "beforeSha256": "b7165b5a494dc4ff9606f8223d8ca3ef43d45dff893a8128c3c34d660e9ee474",
+      "afterSha256": "cb9b076b77f2797a280760063a5a099ae6dd41931083985060b722373ee7dd52",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "miniprogram/config/product-launches.js",
+      "change": "added",
+      "beforeSha256": null,
+      "afterSha256": "eca25d34cd5c7538a564497a8941bf8efa0320370535b6af1447ac7463ef55e4",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "miniprogram/config/release-notes.js",
+      "change": "modified",
+      "beforeSha256": "2db2989e15fae7408ec62672dbaaa2fa3a68c429002c5e0aa14b69cda0e0a9a8",
+      "afterSha256": "430dbff89e7b8ae03362ca272fdf8ffa37f0986ca3a4a3d5409c9d7194c4af1c",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "miniprogram/config/usage-guide.js",
+      "change": "added",
+      "beforeSha256": null,
+      "afterSha256": "1152b97f67c327c629eb19ed154cdd0ab0d32177060dbe576e32ade7c98c2bd7",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "miniprogram/config/version.js",
+      "change": "modified",
+      "beforeSha256": "f8b148baeb8e821d84e355702eba019c656e051b369d2f7a5a39b2b24b2a8b46",
+      "afterSha256": "0a604c81be0ac318c883788162d0c05a619b984a0f84b9f284b7782c18752e24",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "miniprogram/custom-tab-bar/index.js",
+      "change": "modified",
+      "beforeSha256": "b2c905e8d05a3298d710b22d42a9eaaeb7e7901b680cede2ae8275c5d9749370",
+      "afterSha256": "f1fe0bbb041ad423d73cbed63ae33731b2f80f5f2f3fc781e398574f780c8a18",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "miniprogram/custom-tab-bar/index.wxml",
+      "change": "modified",
+      "beforeSha256": "923c3723c5a2a1bea774cb4ba0cbe1da6434aa4f935ee0e90fe4d787e9cad24b",
+      "afterSha256": "ef5d93333136d68a3698be18d90c3718354dc01e9407fed17700d68c472599a5",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "miniprogram/custom-tab-bar/index.wxss",
+      "change": "modified",
+      "beforeSha256": "df0595226a7ee64570b096d8464061392c48841f85ddf14a8cb93070426ace7b",
+      "afterSha256": "5b529ebcc67d7083f44c3527ec95e473aaba36a4232543dc53a7376035b65acd",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "miniprogram/pages/follow/index.js",
+      "change": "modified",
+      "beforeSha256": "3f87edf8a56adc6f31b4cabdc1507cb8d289642d4d0cdc16940d328d195ba272",
+      "afterSha256": "3722f3c02a9a822411a7d66c65f32d2dfff74ac23bf8abc43ab3d2267954862b",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "miniprogram/pages/follow/index.json",
+      "change": "modified",
+      "beforeSha256": "68dfa96fbbbbd860ca2cbbd298f14e9aef5179693ac71afd5c5a5d8b1c585bbf",
+      "afterSha256": "4b60e016374cf708f367bac0ce7ba7bc914e194abf7824ce625698976a7fc8b6",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "miniprogram/pages/follow/index.wxml",
+      "change": "modified",
+      "beforeSha256": "e85d0b60a6b20c69d50c21ace32e7385f5f537613e052cef841e0b2feb647b5b",
+      "afterSha256": "df9dce81cbfb8702055e27c04abaaa8b16ad7ff3f47954ac1c2a372ade9a4376",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "miniprogram/pages/follow/index.wxss",
+      "change": "modified",
+      "beforeSha256": "fc2f441a0ee1b556d6da2396eee43842a8aa67d112c9efbcbf193f5341a82b15",
+      "afterSha256": "dcff75ef5bbcd48d49826d7c07086a48a923860ceccffcfef900d40ee9ac7d17",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "miniprogram/pages/guide/index.js",
+      "change": "added",
+      "beforeSha256": null,
+      "afterSha256": "97db3c8ee0a82710faefea09c32306468de8ddbe2677976a3496a4b9b65ca51a",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "miniprogram/pages/guide/index.json",
+      "change": "added",
+      "beforeSha256": null,
+      "afterSha256": "22d834f80f065887851db8864595f760140198e8ab9ac9ef7418150b759e3952",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "miniprogram/pages/guide/index.wxml",
+      "change": "added",
+      "beforeSha256": null,
+      "afterSha256": "6e695a8eb1c7f5b26b6bebad049d6e6aa1176557f4abf40fab3a5a55a2a1d723",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "miniprogram/pages/guide/index.wxss",
+      "change": "added",
+      "beforeSha256": null,
+      "afterSha256": "4a0fa7e7f66704d74a8bc601225edf9e4f444b0b592f2c6f523f800d687ec497",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "miniprogram/pages/history/index.js",
+      "change": "modified",
+      "beforeSha256": "56ffea86ae92e1bd37c8ef6658c5372ae833c07b0ea93c194285f08940a3b15d",
+      "afterSha256": "ef589376dbaab36bf8c5b63ce5853beb5988f4277c9d11c61ff6e5810fc92855",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "miniprogram/pages/history/index.json",
+      "change": "modified",
+      "beforeSha256": "ee4f867f0bcef8f1ecd2a10f91d8e52c3ccb58d7ae284be5c84026762b589d4b",
+      "afterSha256": "7896937c58d1f8a51a2577583ef12d55bece622eb70a02a41afe64c25b0ae3fc",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "miniprogram/pages/mine/index.js",
+      "change": "modified",
+      "beforeSha256": "b817d7341c7756f591a81f6dd7778db7bbc8cc0496b62bedbea88c25672ed2c0",
+      "afterSha256": "45158a173c04698643a497dc9fe050f9fd956635661088694385e485f456821c",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "miniprogram/pages/mine/index.wxml",
+      "change": "modified",
+      "beforeSha256": "93f9b3361ca55004bd86145458fa0ed04d6124baa92ba35639c93499fff2c3a2",
+      "afterSha256": "8daa07be41a62f6f69f0a8e6bc2b2e6ecdde7ddc59dafcdc53aa402b0316fed8",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "miniprogram/pages/mine/index.wxss",
+      "change": "modified",
+      "beforeSha256": "f2d5bbf7a833e4532bbf8cc4c303f0bc7144eeebdb93963665c72dbdd3c52adb",
+      "afterSha256": "997f2f09a0ae8c361d2af159605ca7f612cd0871a604b7ee3c66df934da71228",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "miniprogram/pages/notification-test/index.js",
+      "change": "modified",
+      "beforeSha256": "73887f83e5b64beb21bb565b9ae988a479c8909fe49db1e35daa6ac6c4dbd724",
+      "afterSha256": "b86bd8148a37e3c2c589ca8fb3c5aeaae1dec25274a30ce1bc45de2ce4c26473",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "miniprogram/pages/query/index.js",
+      "change": "modified",
+      "beforeSha256": "f6c18d7b2a757922826ddc0d3231b06a8e5705e771f7cd1c31893777bc795a6d",
+      "afterSha256": "a3915e607b4d25a350cf0f63199681d8a503e680d1dd7519a4253dba5729397f",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "miniprogram/pages/query/index.json",
+      "change": "modified",
+      "beforeSha256": "67108279324325e9c1569a999518d8243e2aa6b279859b4913b2eb3ce373d196",
+      "afterSha256": "4606da8bdc23edcb9142e8d4ec07c1788c4cbf05a28ca7a0e7d7d1dcbc7b0df7",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "miniprogram/pages/query/index.wxml",
+      "change": "modified",
+      "beforeSha256": "cbfa30284867efb1a57e74705bada4c2db77e75c530c30b2209867c4e08aefb3",
+      "afterSha256": "317aff4f6b68dfdf654112bc5c30a1c0d293988ef98d75467d974a0f473a27ad",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "miniprogram/pages/query/index.wxss",
+      "change": "modified",
+      "beforeSha256": "0994b1dd4d983f6a6fb02569790fcbe93d9801ff6118c96957bb1c55497cddb9",
+      "afterSha256": "9b02575fd0893b1f65d2614d81b2c8e706fdc2019628a72160a14094b32617b4",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "miniprogram/styles/common.wxss",
+      "change": "modified",
+      "beforeSha256": "2c18d3cc4f52812f60f995c68fcc039b90195848be5a993fb439adaa0723f0b0",
+      "afterSha256": "09ebc9e14a0eb0423ebb91795d194a5f687c9d64a125baf7d08da9311996ad27",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "miniprogram/styles/launch-calendar.wxss",
+      "change": "added",
+      "beforeSha256": null,
+      "afterSha256": "cedb099e6a847d1f7c990d2d3a8169fdac056618e801891890c936d5cdeb3f77",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "miniprogram/utils/activation-status.js",
+      "change": "added",
+      "beforeSha256": null,
+      "afterSha256": "60529ccbe43d7794cb40c55cacd572cd01122ce45a4e6d786c03d02c65b3691b",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "miniprogram/utils/checkout-context.js",
+      "change": "added",
+      "beforeSha256": null,
+      "afterSha256": "f04788a3a970f22e4c9f0be029ee77c90dff926d439c976788e1c4f5ca01838e",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "miniprogram/utils/conversion-events.js",
+      "change": "added",
+      "beforeSha256": null,
+      "afterSha256": "cb9e90107d58a7d302c75b0c10ced4bb2fb8ed8a476dc7fcf54e97d028950d07",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "miniprogram/utils/launch-calendar.js",
+      "change": "added",
+      "beforeSha256": null,
+      "afterSha256": "19b4df6ea7d13870a6c665e8cb5f86ffcf0e721241fe366fb21d3840e204b9c8",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "miniprogram/utils/member-payment.js",
+      "change": "modified",
+      "beforeSha256": "7c80a0f19b9e070966a35e9d08bd5aaacc7bc9b67ca9d04e16fdf6b74a7c58d9",
+      "afterSha256": "53106bcb434eb25082d44a2b59585a37dd0c0e5deb4e049bc63e0420f608f0a9",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "miniprogram/utils/member-products.js",
+      "change": "modified",
+      "beforeSha256": "2896116aa59a8491cfe82d1a22616cc485eb3aa2aa21f909f55230cc264ac4ef",
+      "afterSha256": "9b82cbcd102ce0b948a0d04ec571142594c0e408d86e9a217ed823e7f5764998",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "miniprogram/utils/product-launch.js",
+      "change": "added",
+      "beforeSha256": null,
+      "afterSha256": "78de29eaa02a46bd8ca43e0b25c8a9140c86f4f8913c67515a64030a6de7a57e",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "miniprogram/utils/result-next-action.js",
+      "change": "added",
+      "beforeSha256": null,
+      "afterSha256": "fd11fa8524a0db82af4483b8dcbe67e682f9c2a069eabdda9e41f7d8abd3184e",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "miniprogram/utils/session.js",
+      "change": "added",
+      "beforeSha256": null,
+      "afterSha256": "3db4fdbab99b0ccde205391007f9d97936fb51f525e34e2e2bab688c6b71e58d",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "miniprogram/utils/store.js",
+      "change": "modified",
+      "beforeSha256": "30c17bf988dad7509679aa3783605735451b0a60d1f7c7a50ed8d7dea676247a",
+      "afterSha256": "9d618c22ca8bd95262ef624d1063c67dfe2ece8feab23d6c29b3956ff2448d07",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "package-lock.json",
+      "change": "modified",
+      "beforeSha256": "14de60e3f51bd81990f4259d0c6fd3e5c1f32fd6d973535561d6e38d2b150777",
+      "afterSha256": "0b2f19a329aa13eacd02103aed657f6f1a37ff8c61be5ec8bb665f97cda88706",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "package.json",
+      "change": "modified",
+      "beforeSha256": "6d07b8c88ecd905a9f5a0d589fc67f62c272a6357237c81b3992a974d4683f13",
+      "afterSha256": "8223222870a9ee1dbbf9d9587793fd65d1b1dc1f04e67a22297ec5b3cec1ccb3",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "project.config.json",
+      "change": "modified",
+      "beforeSha256": "ca624cb1fe23b594d5018e010e22e77a4cb7ac4293a654fba3747acb3a791dad",
+      "afterSha256": "27d56443e699a0a58949251ab6da15f854c7704ef7835565677da2568523dbd1",
+      "lineEndingsOnly": true
+    },
+    {
+      "path": "tests/account-ux.test.mjs",
+      "change": "modified",
+      "beforeSha256": "0139a7f0376be679acf32aac95496ef76e5e39d3b274ffa1db419a8a3aa067fd",
+      "afterSha256": "2722c90020ec64ffae1d6a44938714f455f34364e96c3a6d1378f462834df1f7",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "tests/checkout-context.test.mjs",
+      "change": "added",
+      "beforeSha256": null,
+      "afterSha256": "096c21eafb6b34949db66cbf6bb8f689e198b978905a424dff1bd8accb4ad07d",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "tests/contextual-checkout-page.test.mjs",
+      "change": "added",
+      "beforeSha256": null,
+      "afterSha256": "6e52a2016b11fe60fa4e788dcf4b43c989aa630833d46cc6afaba1fdae0745db",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "tests/growth.test.mjs",
+      "change": "added",
+      "beforeSha256": null,
+      "afterSha256": "8b19e5e9e7ab4e1a0f3f8b2ed66931d8733a949b84fe70baf0066c4679c3435b",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "tests/helpers/memory-repo.mjs",
+      "change": "modified",
+      "beforeSha256": "f4dbe909b41c983727d19acfd160b0809ff54b63488dd735bcfe7f720d4f3d65",
+      "afterSha256": "33ee8497f3e7595d67ebd8bf3c32e08d60d36e7a4747135969b77c78f2d66c3f",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "tests/launch-calendar-guide.test.mjs",
+      "change": "added",
+      "beforeSha256": null,
+      "afterSha256": "d10c2c2a002992761cb54aad4779a788a9781b71789d2700fbbbbb90453d62e8",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "tests/launch-readiness.test.mjs",
+      "change": "added",
+      "beforeSha256": null,
+      "afterSha256": "4a9445183e3d35869dfac41cc049772eacdf18a315f7f085bc7524c0aced160f",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "tests/legacy-catalog-startup.test.mjs",
+      "change": "modified",
+      "beforeSha256": "41e984666adab1d916cd40c8485b686fe623dc3f71a8c79fb39e48e65f8ce1f9",
+      "afterSha256": "d9e7fc1d90b371e8385bacc5f3a9be9b35ddf907b1af6cc65c9ca280f1307c96",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "tests/member-payment-frontend.test.mjs",
+      "change": "modified",
+      "beforeSha256": "e225c840881f3faa785df1c5d9a0aebb7e30ea4db29ba89855af568616a0ceec",
+      "afterSha256": "b251ec470258c95b3ad1aec06108ffe8120ab34113e29bc5a489f92fe1ecce0e",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "tests/member-price-checkout-integration.test.mjs",
+      "change": "added",
+      "beforeSha256": null,
+      "afterSha256": "b73f96f527fbb9e872cddcad93785040d4b8205a0b0d1be371443b4b175c58b5",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "tests/membership-upgrade-frontend.test.mjs",
+      "change": "modified",
+      "beforeSha256": "5ae69e2de6fe7287a2b6c978d51b6cc3d555e721881b857377d908ec7016ce05",
+      "afterSha256": "f6736e4792242c1cf2c85c77eb3f04571649d4ee463410bf800427f76b1892c4",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "tests/notification-test-account-isolation.test.mjs",
+      "change": "added",
+      "beforeSha256": null,
+      "afterSha256": "4468630a58339f12d025dfcd284aa548e1f55ac18770af588704f89d180b455d",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "tests/notification-test-account.test.mjs",
+      "change": "added",
+      "beforeSha256": null,
+      "afterSha256": "b4a4651eb922fd3af4db78c19eb9ee10472a983084ccfb0a6e1795bb6ebc125b",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "tests/payment-entry.test.mjs",
+      "change": "modified",
+      "beforeSha256": "e83fbb4c8f21a96c49da9d29f204274243f60611a6af751c26a61300bb6d25fb",
+      "afterSha256": "b6590bfe643b6164da89c6e0f1d1f88312f0a605efdce7b5be454b41c4e2b71e",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "tests/query-result-access.test.mjs",
+      "change": "added",
+      "beforeSha256": null,
+      "afterSha256": "ec68e2e344dc812c32d07effbb839edbde42f077548fc6bf073755d642e64c32",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "tests/query-snapshot-and-follow.test.mjs",
+      "change": "modified",
+      "beforeSha256": "6faa9b7a9269525e2d944e7002306c46894bee15057ac1b9e3f68bb80458da3a",
+      "afterSha256": "8a3f2ea833b686e1e1a46f22e25db7ecbcd6a973e82d3719eedb68775bf1038b",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "tests/startup-performance-v2.test.mjs",
+      "change": "added",
+      "beforeSha256": null,
+      "afterSha256": "bf978b2e7e415d49a1482d3575ffb5214a6f95c21d50affe517073d59d67cb2b",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "tests/stock-observation-pages.test.mjs",
+      "change": "modified",
+      "beforeSha256": "2744acde8b5e319aa62a9efc86a8d158849bda363077a6fbcc0b346ecc06498f",
+      "afterSha256": "975756c7119b586b50e604d81677c7d1df4d3cbcd8499b43b470b5fda3759d2f",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "tests/v2-result-journey.test.mjs",
+      "change": "added",
+      "beforeSha256": null,
+      "afterSha256": "096fe8a5ef815fabb96e5f7a895de74101e1100226fb7442674d06a9b16166d9",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "tests/virtual-payment-service.test.mjs",
+      "change": "modified",
+      "beforeSha256": "2917b6f831e3a438c24a8a1c339723f3feb0a5713d02758dbf79fc60a5b3e152",
+      "afterSha256": "7d3429531ffcd210dc23d51c7b31a970c8e7b6c26f26e577325faf44114f1b4b",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "tools/admin-miniprogram/miniprogram/pages/admin/index.js",
+      "change": "modified",
+      "beforeSha256": "c0f47f1e2933007820a0d48cad492d246cab0fded13927029ec29cbc491c7171",
+      "afterSha256": "dbd0eb09060e20cf02025149e448ccc236a5a3a6461800ea01f26ceaf080c497",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "tools/admin-miniprogram/miniprogram/pages/admin/index.wxml",
+      "change": "modified",
+      "beforeSha256": "4ac7aad4ac4357247292087bb6e12a1a8a888373a0e41c29cb30a3e83fe8b3a6",
+      "afterSha256": "70f73bc8aa6ecab6f3db9ce6806be77f588c6fe80e99cf6d9ca901a6f46e11ba",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "tools/catalog/check-launch-readiness.mjs",
+      "change": "added",
+      "beforeSha256": null,
+      "afterSha256": "8251a48c305ae92c723693a415dfa86c1f9b36577a381ac35c6aa8e1fd5ec8c2",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "tools/collector/package-lock.json",
+      "change": "modified",
+      "beforeSha256": "11b437518dc87dcc7e5256c6697c8edbb0a2f5f18401ad1c7e7361b8cb94a8fd",
+      "afterSha256": "cbdf21af7708321b66902fb940f99e9529d42b1eb3c71f3acd3a2ac51a41cef2",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "tools/collector/package.json",
+      "change": "modified",
+      "beforeSha256": "2a23ad373b4f1e63a6949b7428e67f23017e6be7e4cc6c90955682492fa79cc0",
+      "afterSha256": "7478b8f15866f545a835e205377dba5ab31ff6f76aebb69a568769e65bd6dc61",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "tools/release/check.mjs",
+      "change": "modified",
+      "beforeSha256": "23083c1d7370b7455972843bfa4389004b30d82eb15b6a3fa1407a670762163c",
+      "afterSha256": "87aa275fec55f382c9bdfb44f32eb36d8ab23449a199f72c72c1a3d493d66447",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "tools/ui-preview/README.md",
+      "change": "modified",
+      "beforeSha256": "9936ed562fa1febac9ed78dad3c39afc5b00af9667d8642e5ed5b3eb0690ffbc",
+      "afterSha256": "e42cd8ef0cfcf80dc911ef769d9e71471f572ecc377ada655c3e5a69b30d5e9d",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "tools/ui-preview/build.mjs",
+      "change": "modified",
+      "beforeSha256": "53c4c4c0449c1324976230da01d69a6199edb9f98cc2aeb18efd93626640a8c2",
+      "afterSha256": "61af4bbc6a7f6d217ebe12bc86cfee5f2c90aeed04095e15b1ed3400ccd531e1",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "tools/ui-preview/check-floating-tabs.mjs",
+      "change": "modified",
+      "beforeSha256": "a054b72eec4e0040d27914e6d54d108468666643b9f2ef60ae1efe006de81493",
+      "afterSha256": "655b96d89b22c7942f1df03c9e2a52be27aed95f47eb8d9f0014e5bfc233e141",
+      "lineEndingsOnly": false
+    },
+    {
+      "path": "tools/ui-preview/check-layout.mjs",
+      "change": "modified",
+      "beforeSha256": "0142ed11b8e21a13c5d00a72ac3be6ed7713753a9cdc4698d71d031684c08ecd",
+      "afterSha256": "cd40e1cbee8dcc07950c3530ab629ebf736a9c0afd3b8de3b99e0e8c1d4e9539",
+      "lineEndingsOnly": false
+    }
+  ]
+}
