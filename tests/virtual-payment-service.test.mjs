@@ -145,7 +145,7 @@ test('reviewable runtime patch signs the published goods and leaves disabled wee
   for (const [planId, productId, amount, days] of [['member_30d', 'vip777', 1499, 30], ['member_365d', 'vip888', 12900, 365]]) {
     const result = ok(await f.create(`published-${days}-001`, { planId }));
     const sign = JSON.parse(result.payment.signData);
-    assert.equal(sign.productId, productId); assert.equal(sign.goodsPrice, days === 30 ? 3000 : 36000); assert.equal(sign.activitySellingPrice, amount);
+    assert.equal(sign.productId, productId); assert.equal(sign.goodsPrice, amount); assert.equal(Object.hasOwn(sign, 'activitySellingPrice'), false);
     assert.equal(result.order.amountFen, amount); assert.equal(result.order.days, days);
     assert.equal((await f.order(`published-${days}-001`)).productId, productId);
   }
@@ -166,8 +166,8 @@ for (const [planId, days, amount] of [['member_30d', 30, 1499], ['member_365d', 
     assert.equal(created.ok, true); assert.equal(created.order.planId, planId);
     assert.equal(created.order.days, days); assert.equal(created.order.amountFen, amount);
     const signed = JSON.parse(created.payment.signData), stored = await f.order(id);
-    assert.equal(signed.productId, newPlans[planId].productId); assert.equal(signed.goodsPrice, days === 30 ? 3000 : 36000); assert.equal(signed.activitySellingPrice, amount); assert.equal(signed.buyQuantity, 1);
-    assert.equal(stored.paymentSnapshot.version, 3); assert.equal(stored.paymentSnapshot.planId, planId);
+    assert.equal(signed.productId, newPlans[planId].productId); assert.equal(signed.goodsPrice, amount); assert.equal(Object.hasOwn(signed, 'activitySellingPrice'), false); assert.equal(signed.buyQuantity, 1);
+    assert.equal(stored.paymentSnapshot.version, 4); assert.equal(stored.paymentSnapshot.planId, planId);
     assert.equal(stored.paymentSnapshot.priceFen, amount); assert.equal(stored.paymentSnapshot.days, days);
     f.setRemote(id, { order_fee: amount, paid_fee: amount, left_fee: amount });
     const checked = ok(await f.check(id));
@@ -182,7 +182,8 @@ test('mixed plan renewals stack and cumulative refunds remove only their own rem
   let previousExpiry = f.state.now.getTime();
   for (const [id, planId, amount, days] of [['week-old-001', 'member_7d', 700, 7], ['month-new-001', 'member_30d', 1499, 30], ['year-new-001', 'member_365d', 12900, 365]]) {
     const created = ok(await f.create(id, { planId }));
-    assert.equal(JSON.parse(created.payment.signData).activitySellingPrice || JSON.parse(created.payment.signData).goodsPrice, amount, 'upgrading charges the selected actual fee');
+    assert.equal(JSON.parse(created.payment.signData).goodsPrice, amount, 'upgrading charges the selected actual fee');
+    assert.equal(Object.hasOwn(JSON.parse(created.payment.signData), 'activitySellingPrice'), false);
     assert.equal(created.order.amountFen, amount);
     f.setRemote(id, { order_fee: amount, paid_fee: amount, left_fee: amount });
     const activated = ok(await f.check(id));
@@ -239,7 +240,7 @@ test('an unprepared monthly intent keeps its original plan when retried after th
   f.behavior.sessionFails = false;
   const retried = ok(await f.create('unprepared-month-001', { planId: 'member_365d' }));
   assert.equal(retried.order.planId, 'member_30d');
-  assert.equal(JSON.parse(retried.payment.signData).goodsPrice, 3000);
+  assert.equal(JSON.parse(retried.payment.signData).goodsPrice, 1499);
   assert.equal(JSON.parse(retried.payment.signData).productId, newPlans.member_30d.productId);
 });
 
@@ -528,14 +529,23 @@ test('abandoning asks the platform first: a paid order is fulfilled instead of a
   assert.equal((await f.order()).status, 'fulfilled', 'same client ID for another account never modifies this order');
 });
 
-test('failed or contradictory payment verification cannot abandon an issued checkout', async () => {
+test('contradictory payment evidence cannot abandon an issued checkout, but a verification outage can', async () => {
   for (const reason of ['unavailable', 'mismatched_amount']) {
     const f = await fixture(); ok(await f.create());
     if (reason === 'mismatched_amount') f.setRemote('purchase-0001', { order_fee: 1499 });
     const result = await f.call('member.abandonOrder', { orderId: 'purchase-0001' });
-    assert.equal(result.ok, false, reason);
-    assert.equal(Boolean((await f.order()).abandonedAt), false, reason);
-    assert.equal((await f.order()).status, 'created');
+    if (reason === 'mismatched_amount') {
+      assert.equal(result.ok, false, reason);
+      assert.equal(Boolean((await f.order()).abandonedAt), false, reason);
+      assert.equal((await f.order()).status, 'created');
+    } else {
+      // Query outage on an unpaid open checkout must not strand the buyer.
+      // A late payment of the abandoned order is still fulfilled later.
+      assert.equal(result.ok, true, reason);
+      assert.equal(result.data.order.abandoned, true, reason);
+      assert.equal(Boolean((await f.order()).abandonedAt), true, reason);
+      assert.equal((await f.order()).status, 'created');
+    }
   }
 });
 
@@ -632,22 +642,27 @@ test('concurrent cancellation and delayed create cannot reopen a cancelled clien
   assert.equal((await f.user()).membership.expiresAt, null);
 });
 
-test('server clock switches both promotions at the exclusive Beijing deadline without a runtime edit', async () => {
+test('ongoing month and year prices remain unchanged across the former deadline and later dates', async () => {
   const f = await fixture();
   f.state.now = new Date(Date.parse(PROMOTION_ENDS_AT) - 1);
   const before = ok(await f.call('user.bootstrap')).memberProducts;
   assert.deepEqual(before.map(p => [p.priceFen, p.standardPriceFen]), [[700, 700], [1499, 3000], [12900, 36000]]);
-  assert.deepEqual(before[1].promotion, { active: true, endsAt: PROMOTION_ENDS_AT, timezone: 'Asia/Shanghai' });
+  assert.deepEqual(before[1].promotion, { active: true, endsAt: null, timezone: 'Asia/Shanghai' });
   f.advance(1);
   const after = ok(await f.call('member.status')).products;
-  assert.deepEqual(after.map(p => [p.priceFen, p.standardPriceFen]), [[700, 700], [3000, 3000], [36000, 36000]]);
-  assert.equal(after[1].promotion.active, false);
-  for (const [planId, amount, days] of [['member_30d', 3000, 30], ['member_365d', 36000, 365]]) {
+  assert.deepEqual(after.map(p => [p.priceFen, p.standardPriceFen]), [[700, 700], [1499, 3000], [12900, 36000]]);
+  assert.deepEqual(after[1].promotion, before[1].promotion);
+  f.state.now = new Date('2027-12-01T00:00:00.000Z');
+  assert.deepEqual(ok(await f.call('member.status')).products.map(p => p.priceFen), [700, 1499, 12900]);
+  for (const [planId, amount, days] of [['member_30d', 1499, 30], ['member_365d', 12900, 365]]) {
     const id = `after-deadline-${days}`;
     const created = ok(await f.create(id, { planId }));
     const sign = JSON.parse(created.payment.signData);
     assert.equal(sign.goodsPrice, amount); assert.equal(Object.hasOwn(sign, 'activitySellingPrice'), false);
     assert.equal(created.order.amountFen, amount);
+    const stored = await f.order(id);
+    assert.equal(stored.paymentSnapshot.version, 4); assert.equal(stored.paymentSnapshot.promotionEndsAt, null);
+    assert.equal(Date.parse(stored.quoteExpiresAt) - Date.parse(stored.createdAt), QUOTE_TTL_MS);
     f.setRemote(id, { order_fee: amount, paid_fee: amount, left_fee: amount });
     assert.equal(ok(await f.check(id)).membership.enhanced, true);
   }
@@ -685,16 +700,16 @@ test('an unprepared quote expires after ten minutes and cancelling it fences del
   assert.equal(f.calls.filter(x => x.path === '/sns/jscode2session').length, 1);
 });
 
-test('expiry while exchanging the login code never exposes a stale promotional signature', async () => {
+test('quote TTL expiry while exchanging the login code never exposes a stale signature', async () => {
   const f = await fixture();
   f.state.now = new Date(Date.parse(PROMOTION_ENDS_AT) - 2000);
-  f.behavior.onSession = () => f.advance(2000);
+  f.behavior.onSession = () => f.advance(QUOTE_TTL_MS);
   const result = await f.create('login-deadline-001', { planId: 'member_30d', expectedPriceFen: 1499 });
   assert.equal(result.error.code, 'payment_price_changed');
-  assert.equal(result.error.details.reason, 'quote_expired'); assert.equal(result.error.details.product.priceFen, 3000);
+  assert.equal(result.error.details.reason, 'quote_expired'); assert.equal(result.error.details.product.priceFen, 1499);
   const order = await f.order('login-deadline-001');
   assert.equal(order.status, 'cancelled'); assert.equal(order.paymentPreparedAt, null);
-  assert.equal(order.quoteExpiresAt, PROMOTION_ENDS_AT); assert.equal(order.amountFen, 1499);
+  assert.equal(Date.parse(order.quoteExpiresAt) - Date.parse(order.createdAt), QUOTE_TTL_MS); assert.equal(order.amountFen, 1499);
   assert.doesNotMatch(JSON.stringify(result), /paySig|signature|signData/);
 });
 
@@ -704,12 +719,12 @@ test('expiry during durable signature marking cancels before exposing payment pa
   const update = f.repo.updateOrder;
   f.repo.updateOrder = async (id, patch) => {
     const result = await update(id, patch);
-    if (patch.paymentPreparedAt) f.advance(2000);
+    if (patch.paymentPreparedAt) f.advance(QUOTE_TTL_MS);
     return result;
   };
   const result = await f.create('persist-deadline-1', { planId: 'member_365d', expectedPriceFen: 12900 });
   assert.equal(result.error.code, 'payment_price_changed');
-  assert.equal(result.error.details.product.priceFen, 36000);
+  assert.equal(result.error.details.product.priceFen, 12900);
   assert.equal((await f.order('persist-deadline-1')).paymentPreparedAt, null);
   assert.equal((await f.order('persist-deadline-1')).status, 'cancelled');
 });
@@ -717,6 +732,9 @@ test('expiry during durable signature marking cancels before exposing payment pa
 test('an already-issued promotion remains at its original amount after the deadline and is never repriced or reissued', async () => {
   const f = await fixture(); f.state.now = new Date(Date.parse(PROMOTION_ENDS_AT) - 5000);
   ok(await f.create('issued-promo-001', { planId: 'member_30d' }));
+  const original = await f.order('issued-promo-001');
+  await f.repo.saveOrder({ ...original, quoteExpiresAt: PROMOTION_ENDS_AT,
+    paymentSnapshot: { ...original.paymentSnapshot, version: 3, promotionEndsAt: PROMOTION_ENDS_AT } });
   f.advance(10000);
   const failedQuery = await f.create('issued-promo-001', { expectedPriceFen: 3000 });
   assert.equal(failedQuery.error.code, 'payment_check_pending');
@@ -727,6 +745,45 @@ test('an already-issued promotion remains at its original amount after the deadl
   f.setRemote('issued-promo-001', { order_fee: 1499, paid_fee: 1499, left_fee: 1499 });
   assert.equal(ok(await f.check('issued-promo-001')).membership.enhanced, true);
   assert.equal(f.calls.filter(x => x.path === '/sns/jscode2session').length, 1);
+});
+
+for (const [planId, amount, ongoing] of [['member_30d', 3000, 1499], ['member_365d', 36000, 12900]]) {
+  test(`issued v3 ${amount}-fen standard receipt retains its original fee under ongoing pricing`, async () => {
+    const f = await fixture(); f.state.now = new Date(PROMOTION_ENDS_AT);
+    const id = `old-standard-${amount}`;
+    ok(await f.create(id, { planId }));
+    const original = await f.order(id);
+    await f.repo.saveOrder({ ...original, amountFen: amount,
+      paymentSnapshot: { ...original.paymentSnapshot, version: 3, priceFen: amount, goodsPrice: amount, promotionEndsAt: null } });
+    f.advance(QUOTE_TTL_MS + 1);
+    assert.equal(ok(await f.call('member.status')).products.find(p => p.planId === planId).priceFen, ongoing);
+    f.setRemote(id, { order_fee: ongoing, paid_fee: ongoing, left_fee: ongoing });
+    assert.equal((await f.check(id)).error.code, 'payment_evidence_mismatch');
+    assert.equal((await f.user()).membership.expiresAt, null);
+    f.setRemote(id, { order_fee: amount, paid_fee: amount, left_fee: amount });
+    assert.equal(ok(await f.check(id)).membership.enhanced, true);
+    assert.equal((await f.order(id)).amountFen, amount);
+    assert.equal((await f.order(id)).status, 'fulfilled');
+    assert.equal(f.calls.filter(x => x.path === '/sns/jscode2session').length, 1);
+  });
+}
+
+test('historical v3 promotion bounds remain required after ongoing pricing is introduced', async () => {
+  for (const invalid of ['missing_cutoff', 'extended_quote', 'late_creation']) {
+    const f = await fixture(); f.state.now = new Date(Date.parse(PROMOTION_ENDS_AT) - 5000);
+    const id = `old-cutoff-${invalid}`;
+    ok(await f.create(id, { planId: 'member_30d' }));
+    const original = await f.order(id);
+    await f.repo.saveOrder({ ...original,
+      createdAt: invalid === 'late_creation' ? PROMOTION_ENDS_AT : original.createdAt,
+      quoteExpiresAt: invalid === 'extended_quote' || invalid === 'late_creation'
+        ? new Date(Date.parse(PROMOTION_ENDS_AT) + 1000).toISOString() : PROMOTION_ENDS_AT,
+      paymentSnapshot: { ...original.paymentSnapshot, version: 3,
+        promotionEndsAt: invalid === 'missing_cutoff' ? null : PROMOTION_ENDS_AT } });
+    f.setRemote(id, { order_fee: 1499, paid_fee: 1499, left_fee: 1499 });
+    assert.equal((await f.check(id)).error.code, 'payment_evidence_mismatch');
+    assert.equal((await f.user()).membership.expiresAt, null);
+  }
 });
 
 for (const [planId, amount, days] of [['member_30d', 1990, 30], ['member_365d', 20000, 365]]) {
@@ -765,7 +822,7 @@ test('an unsigned historical quote cannot silently become the new price and can 
   assert.equal(f.calls.filter(x => x.path === '/sns/jscode2session').length, 1);
 });
 
-test('provider cache follows current server pricing even within one warm context', () => {
+test('provider cache keeps the ongoing charged price across the former cutoff', () => {
   let now = new Date(Date.parse(PROMOTION_ENDS_AT) - 1);
   const ctx = { config: mergeConfig({}), paymentEnv: env, clock: () => now };
   const before = paymentProviderFor(ctx, 'member_30d');
@@ -773,12 +830,12 @@ test('provider cache follows current server pricing even within one warm context
   assert.equal(paymentProviderFor(ctx, 'member_30d'), before);
   now = new Date(PROMOTION_ENDS_AT);
   const after = paymentProviderFor(ctx, 'member_30d');
-  assert.notEqual(after, before); assert.equal(after.getReadiness().priceFen, 3000);
+  assert.equal(after, before); assert.equal(after.getReadiness().priceFen, 1499);
   assert.equal(ctx._paymentProviders.size, 1);
 });
 
-test('tampered v3 standard, discount, cutoff or quote cannot grant membership', async () => {
-  for (const patch of [{ goodsPrice: 1499 }, { activitySellingPrice: 1 }, { promotionEndsAt: '2027-01-01T00:00:00.000Z' }]) {
+test('tampered v4 charged price, discount, cutoff or quote cannot grant membership', async () => {
+  for (const patch of [{ goodsPrice: 3000 }, { goodsPrice: 1498 }, { activitySellingPrice: 1 }, { promotionEndsAt: '2027-01-01T00:00:00.000Z' }]) {
     const f = await fixture(); ok(await f.create('bad-promotion-01', { planId: 'member_30d' }));
     const order = await f.order('bad-promotion-01');
     await f.repo.saveOrder({ ...order, paymentSnapshot: { ...order.paymentSnapshot, ...patch } });

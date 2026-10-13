@@ -2,6 +2,48 @@
 
 运行 `node tools/ui-preview/build.mjs --out <输出目录>`，打开生成的 `index.html`。
 
+## 会员原生按钮级联专项
+
+```powershell
+node tools/ui-preview/build.mjs --membership-native-only --out tmp/ui-membership-native
+node tools/ui-preview/check-layout.mjs tmp/ui-membership-native
+node tools/ui-preview/check-layout.mjs tmp/ui-membership-native --dark
+node tools/ui-preview/check-floating-tabs.mjs tmp/ui-membership-native
+node tools/ui-preview/check-membership-regression.mjs tmp/ui-membership-native
+node tools/ui-preview/check-layout.mjs tmp/ui-membership-native --membership-fonts-only
+```
+
+独立专项覆盖 12 种免费、会员、已到期、续费、升级、待支付及展开说明状态，宽度为 320、360、375、390、393、414、430、480、768、1024，共 120 个快照。只在该模式的「我的」区域前置 `button:not([size=mini])` 的 `width:184px; margin-left:auto; margin-right:auto` 级联约束，重现套餐被固定宽度挤成居中窄列的缺陷；没有加入 `min-content` 等额外原生假设。普通预览和原有付款专项保持原来的宽度与样式。
+
+这仍是 Chromium 的定向压力测试，**不是微信原生渲染或真机验收证据**。生成页的提示、清单和报告均标记压力模式及实际注入 CSS；真实开发者工具和设备截图仍需另行核验。
+
+检查保留原有全部断言，增加套餐是否铺满容器、主信息可用宽度、内部溢出/重叠、账户与会员状态、六个独立图标加载及入口对齐、免费账户的「体验微信提醒」位置与消耗/授权/测试说明，并限制平板下的异常大字。免费及会员首页在每个宽度另存首屏、账户、会员卡、底部六入口截图。待支付时恢复订单保持优先，体验入口按页面条件隐藏。浮动导航专项另测 1×/1.3×字体、0/34px 模拟安全区，共 480 组。
+
+源码校验包含小程序 JS/JSON/WXML/WXSS 和本地图像资产；检查前后任一文件变化都必须重新构建，避免使用旧图标或旧页面截图。
+
+`check-membership-regression` 在两个正常状态通过后，只在临时浏览器 DOM 中制造六种错误：184px居中套餐、内部窄列、缺失入口图标、提醒体验移错卡片、隐藏消耗说明和主按钮巨字，要求检查器全部拒绝。它不修改源码和生成的 HTML，结果另存 `membership-checker-selftest.json`。
+
+`check-layout --membership-fonts-only` 对 320/375 宽度的免费购买、会员升级、会员到期六案增加 1.3×字号与行高，仍使用全部布局和套餐内部断言；记录在 `membership-font-metrics.json` 和 `screenshots-membership-fonts/`，不覆盖常规快照。可追加 `--dark` 验证深色。这只模拟浏览器字号压力，不能替代微信字体设置实测。
+
+## 微信提醒体验页专项
+
+```powershell
+node tools/ui-preview/build.mjs --notification-test-only --out tmp/ui-notification-test
+node tools/ui-preview/check-layout.mjs tmp/ui-notification-test
+node tools/ui-preview/check-layout.mjs tmp/ui-notification-test --dark
+node tools/ui-preview/check-layout.mjs tmp/ui-notification-test --notification-fonts-only
+node tools/ui-preview/check-layout.mjs tmp/ui-notification-test --notification-fonts-only --dark
+node tools/ui-preview/check-notification-regression.mjs tmp/ui-notification-test
+```
+
+专项保留原有 ready、no-quota、accepted、uncertain、failed、received、not-received 七状态，新增 authorized、authorized-no-quota、sending、pending-other、error、loading、rules、needs-authorization、uncertain-received 九状态。每种覆盖 320、360、375、390、393、414、430、480、768、1024，共 160 个快照。授权完成与另一待确认请求通过页面实际 `loadStatus/applyResult` 还原；展开规则、排查和反馈使用页面实际处理方法。初始加载保留页面默认加载状态。沙箱禁止通知授权及发送调用，也不会连接云函数或微信。
+
+仅在此专项前置 `.test-page` 内 `button:not([size=mini])` 的 184px 宽度和自动左右边距，模拟默认按钮选择器对页面样式的级联压力；它不是微信实机证据。检查全部操作至少 44px 高、铺满所在行，反馈按钮按两列均分；同时检查原请求恢复、未确认结果禁止新发、无额度按钮禁用、字体大小、平板卡宽和原有文本/溢出/图像断言。展开规则场景保留扣次、失败退回、结果未知暂不退、非库存及正式提醒条件的文本断言。
+
+`--notification-fonts-only` 对 320/375 的准备发送、已受理、已授权、其他待确认、未收到排查、规则展开六状态施加 1.3×字号与行高，共 12 案。报告和截图分别保存在 `notification-font-metrics*.json` 与 `screenshots-notification-fonts*`，不覆盖正常字号报告。
+
+检查器自检在正常准备与反馈场景通过后，向临时 DOM 注入固定宽度操作、固定宽度反馈、缺失恢复按钮、零额度可发送、未确认状态可新发及异常大字六种错误，要求全部被拒绝，结果保存在 `notification-checker-selftest.json`。
+
 ## 2.0.0 业务与屏宽专项
 
 ```powershell
@@ -11,9 +53,9 @@ node tools/ui-preview/check-layout.mjs tmp/ui-preview-v2 --dark
 node tools/ui-preview/check-floating-tabs.mjs tmp/ui-preview-v2
 ```
 
-`--v2-only` 使用本地模拟的 `bootstrap.features` 打开新界面开关，`growthEvents` 保持关闭，不发送漏斗事件。普通场景时钟为北京时间 2026-10-11 15:00；优惠结束场景为 2026-12-01 00:00，每个快照在清单中记录 `previewDate`。共有 18 种状态，按相关页面组合生成 198 个快照：原有账户／库存／服务状态，以及月卡和年卡的优惠／标准价、攻略准备步骤／日历／FAQ、首次开屏日历。宽度为 320、375、390、430、768、1024 像素；浅/深色各检查 198 个。其余旧专项保持原来的固定时钟和场景。
+`--v2-only` 使用本地模拟的 `bootstrap.features` 打开新界面开关，`growthEvents` 保持关闭，不发送漏斗事件。普通场景时钟为北京时间 2026-10-11 15:00；未来日期场景为 2026-12-01 00:00，每个快照在清单中记录 `previewDate`。共有 18 种状态，按相关页面组合生成 198 个快照：原有账户／库存／服务状态，以及月卡和年卡的当前／未来日期优惠价、攻略准备步骤／日历／FAQ、首次开屏日历。宽度为 320、375、390、430、768、1024 像素；浅/深色各检查 198 个。其余旧专项保持原来的固定时钟和场景。
 
-促销夹具遵守服务端产品契约：月卡当前 14.99 元、标准 30 元；年卡当前 129 元、标准 360 元。`promotion.endsAt` 为 `2026-11-30T16:00:00.000Z`（北京时间 12 月 1 日 00:00，不含该时刻），界面显示优惠至 11 月 30 日 23:59。通过真实套餐选择方法检查当前应付价；到期场景禁止残留优惠价。旧待确认订单仍保留原订单金额，不能被新套餐价格覆盖。
+优惠夹具遵守服务端产品契约：月卡当前 14.99 元、标准 30 元；年卡当前 129 元、标准 360 元。当前优惠已取消固定截止日，`promotion.endsAt` 为 `null`，标签为「优惠价」。保留名为 `v2-promotion-expired-*` 的历史场景作为未来日期回归，检查跨过已移除的截止日仍为 14.99／129 元，禁止出现「限时优惠」「优惠至」和未来自动恢复价。通过真实套餐选择方法检查应付价；旧待确认订单仍保留原订单金额，不能被新套餐价格覆盖。
 
 `index.html` 按实际生成清单联动页面、场景和宽度，不提供不存在的组合；布局检查在浏览器中遍历全部可选组合，核对目标文件存在且清单中的页面全部可达。
 

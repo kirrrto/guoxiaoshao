@@ -2,7 +2,7 @@
 @import '../../styles/launch-calendar.wxss';
 .guide-page { max-width: 960px; margin: 0 auto; padding-bottom: calc(40rpx + env(safe-area-inset-bottom)); }
 .guide-hero { padding: 26rpx 12rpx 38rpx; }
-/* Primary page title outranks the slogan beneath it. */
+/* Keep the title distinct without repeating the guide's purpose. */
 .guide-title {
   color: var(--green-dark);
   font-size: 52rpx;
@@ -11,12 +11,10 @@
   font-weight: 750;
 }
 .guide-subtitle {
-  margin-top: 18rpx;
-  font-size: 36rpx;
-  line-height: 1.35;
-  letter-spacing: -0.6rpx;
-  font-weight: 700;
-  color: var(--text);
+  margin-top: 14rpx;
+  font-size: 28rpx;
+  line-height: 1.5;
+  color: var(--text-2);
 }
 /* Native button rules outrank a single class and force a full-width stack.
    Two equal columns keep the four stages on one screen at iPhone mini width. */
@@ -40,7 +38,7 @@ button.guide-stage.guide-stage.guide-stage--on { border-color: var(--green); bac
 @media (min-width: 600px) {
   .guide-hero { padding: 20px 8px 26px; }
   .guide-title { font-size: 34px; letter-spacing: -.6px; }
-  .guide-subtitle { font-size: 22px; margin-top: 12px; letter-spacing: -.3px; }
+  .guide-subtitle { font-size: 16px; margin-top: 10px; }
   .guide-stages { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-bottom: 16px; }
   button.guide-stage.guide-stage { padding: 12px; gap: 8px; font-size: 15px; border-radius: 12px; }
   .guide-stage-number { font-size: 12px; }

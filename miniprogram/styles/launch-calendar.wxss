@@ -15,115 +15,20 @@
 .calendar-cell--event { background: var(--green-soft); color: var(--green-dark); font-weight: 650; }
 .calendar-cell--today { border-color: var(--green); }
 
-/* Poster hero: product title is the dominant type; dates stay secondary. */
-.poster-hero {
-  position: relative;
-  overflow: hidden;
-  min-height: 360rpx;
-  padding: 28rpx 30rpx 36rpx;
-  border-radius: 24rpx;
-  background: linear-gradient(145deg, #dfe9e4 0%, #b7c9c2 42%, #eef3f0 100%);
-}
-.poster-hero-image {
-  position: absolute;
-  right: -20rpx;
-  top: 36rpx;
-  width: 58%;
-  height: 300rpx;
-  opacity: 0.92;
-  pointer-events: none;
-}
-.poster-hero-fade {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 120rpx;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0), var(--card));
-  pointer-events: none;
-}
-.poster-hero-top {
-  position: relative;
-  z-index: 2;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16rpx;
-}
-.opening-calendar-brand { font-size: 23rpx; color: var(--green-dark); font-weight: 600; }
-.poster-hero-copy { position: relative; z-index: 2; margin-top: 28rpx; max-width: 62%; }
-.poster-title {
-  font-size: 56rpx;
-  font-weight: 750;
-  line-height: 1.15;
-  letter-spacing: -1.5rpx;
-  color: var(--text);
-}
-.poster-subtitle { margin-top: 12rpx; font-size: 26rpx; font-weight: 600; color: var(--text-2); }
-.poster-tags { display: flex; flex-wrap: wrap; gap: 10rpx; margin-top: 18rpx; }
-.poster-tag {
-  padding: 8rpx 16rpx;
-  border-radius: 999rpx;
-  background: rgba(255, 255, 255, 0.72);
-  border: 1rpx solid rgba(24, 42, 35, 0.08);
-  color: var(--text-2);
-  font-size: 21rpx;
-  font-weight: 600;
-}
-.poster-slogan {
-  position: absolute;
-  right: 28rpx;
-  bottom: 48rpx;
-  z-index: 2;
-  color: var(--green-dark);
-  font-size: 22rpx;
-  font-weight: 700;
-  line-height: 1.45;
-  text-align: right;
-  opacity: 0.85;
-  transform: rotate(-6deg);
-}
-.poster-countdown {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 16rpx;
-  margin: 18rpx 0;
-  padding: 18rpx 22rpx;
-  border-radius: 18rpx;
-  background: var(--green-soft);
-}
-.poster-countdown-label { font-size: 24rpx; font-weight: 600; color: var(--green-dark); }
-.poster-countdown-value { font-size: 30rpx; font-weight: 750; color: var(--green-dark); font-variant-numeric: tabular-nums; }
-.poster-milestones { display: flex; gap: 20rpx; padding: 8rpx 0 18rpx; }
-.poster-milestone {
-  display: flex;
-  align-items: center;
-  gap: 14rpx;
-  flex: 1;
-  min-width: 0;
-  padding: 18rpx;
-  border-radius: 20rpx;
-  background: var(--surface-soft);
-}
-.poster-milestone-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex: none;
-  width: 72rpx;
-  height: 72rpx;
-  border-radius: 50%;
-  background: var(--green-soft);
-  font-size: 32rpx;
-}
-.poster-milestone-date {
-  display: block;
-  font-size: 40rpx;
-  font-weight: 750;
-  line-height: 1.15;
-  color: var(--green-dark);
-}
+/* A single image and two dates give the launch notice one clear reading path. */
+.poster-hero { padding: 28rpx 24rpx 24rpx; border-radius: 24rpx; background: var(--surface-soft); text-align: center; overflow: hidden; }
+.poster-title { font-size: 56rpx; font-weight: 750; line-height: 1.2; letter-spacing: -1.5rpx; color: var(--text); }
+.poster-hero-media { position: relative; height: 320rpx; margin-top: 16rpx; overflow: hidden; border-radius: 16rpx; background: var(--image-tile, #ECF1EF); }
+/* Official portrait assets include generous empty margins. Crop that margin,
+   keeping the full device centered and separate from the title and dates. */
+.poster-hero-image { position: absolute; display: block; width: 100%; height: 620rpx; top: 50%; transform: translateY(-50%); pointer-events: none; }
+.opening-calendar-brand { font-size: 14px; color: var(--text-2); font-weight: 500; }
+.poster-milestones { display: flex; padding: 30rpx 0 24rpx; gap: 24rpx; }
+.poster-milestone { flex: 1; min-width: 0; text-align: center; }
+.poster-milestone + .poster-milestone { border-left: 1rpx solid var(--line); }
+.poster-milestone-date { display: block; font-size: 44rpx; font-weight: 700; line-height: 1.25; color: var(--green-dark); font-variant-numeric: tabular-nums; }
+.poster-milestone-label { margin-top: 8rpx; font-size: 14px; line-height: 1.5; color: var(--text-2); }
+.poster-source { text-align: center; font-size: 12px; color: var(--text-3); }
 
 @media (min-width: 600px) {
   .calendar-heading { gap: 10px; }
@@ -135,18 +40,11 @@
   .calendar-weekday { font-size: 12px; padding-bottom: 6px; }
   .calendar-cell { min-height: 34px; font-size: 14px; border-radius: 6px; }
   .calendar-event { font-size: 11px; min-height: 13px; }
-  .poster-hero { min-height: 220px; padding: 18px 22px 24px; border-radius: 16px; }
-  .poster-hero-image { height: 190px; top: 24px; }
-  .poster-hero-copy { max-width: 58%; margin-top: 18px; }
+  .poster-hero { padding: 20px; border-radius: 16px; }
+  .poster-hero-media { height: 180px; margin-top: 12px; border-radius: 12px; }
+  .poster-hero-image { height: 350px; }
   .poster-title { font-size: 34px; letter-spacing: -.6px; }
-  .poster-subtitle { font-size: 15px; margin-top: 8px; }
-  .poster-tag { font-size: 12px; padding: 5px 10px; }
-  .poster-slogan { right: 22px; bottom: 28px; font-size: 13px; }
-  .opening-calendar-brand { font-size: 13px; }
-  .poster-countdown { padding: 12px 16px; margin: 12px 0; }
-  .poster-countdown-label { font-size: 14px; }
-  .poster-countdown-value { font-size: 18px; }
-  .poster-milestone { padding: 12px; border-radius: 14px; }
-  .poster-milestone-icon { width: 42px; height: 42px; font-size: 18px; }
-  .poster-milestone-date { font-size: 26px; }
+  .poster-milestones { padding: 20px 0 16px; gap: 16px; }
+  .poster-milestone-date { font-size: 28px; }
+  .poster-milestone-label { margin-top: 6px; }
 }

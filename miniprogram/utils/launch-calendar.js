@@ -1,5 +1,5 @@
 const launches = require('../config/product-launches');
-const { fmtDate } = require('./format');
+const { fmtDate, fmtTime } = require('./format');
 
 // Calendar dates are editorial information. They never enable a product or a
 // monitor, and UTC arithmetic keeps weekday placement identical on all devices.
@@ -20,6 +20,7 @@ function calendarView(entry, now = Date.now()) {
   return { ...entry, id: `${entry.familyKey}:${entry.preorderAt}:${entry.releaseDate}`,
     monthText: `${year} 年 ${month} 月`, cells, weekdays: ['一', '二', '三', '四', '五', '六', '日'],
     preorderDateText: preorderDate.slice(5).replace('-', '.'), releaseDateText: entry.releaseDate.slice(5).replace('-', '.'),
+    preorderTimeText: fmtTime(entry.preorderAt).slice(0, 5),
     phase: now < Date.parse(entry.preorderAt) ? '预购准备' : (fmtDate(now) < entry.releaseDate ? '预购已开始' : '已发售'),
     countdown: countdownView(entry, now) };
 }

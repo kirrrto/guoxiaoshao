@@ -5,13 +5,22 @@ import os from 'node:os';
 import crypto from 'node:crypto';
 import { createRequire } from 'node:module';
 import { pathToFileURL } from 'node:url';
+import { inspectMembershipLayout } from './membership-layout.mjs';
+import { inspectNotificationLayout } from './notification-layout.mjs';
 const require = createRequire(import.meta.url);
 const args = process.argv.slice(2), directory = path.resolve(args[0] || path.join(os.tmpdir(), 'guoxiaoshao-ui-preview'));
 const colorScheme = args.includes('--dark') ? 'dark' : 'light';
+const membershipFontPreview = args.includes('--membership-fonts-only');
+const notificationFontPreview = args.includes('--notification-fonts-only');
+const fontPreview = membershipFontPreview || notificationFontPreview;
 let playwright;
 try { playwright = require('playwright'); }
 catch { playwright = require(path.join(os.homedir(), '.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright')); }
 const manifest = JSON.parse(fs.readFileSync(path.join(directory, 'manifest.json'), 'utf8'));
+if (membershipFontPreview && !manifest.membershipNativePreview) throw Error('--membership-fonts-only requires a --membership-native-only build');
+if (membershipFontPreview && args.includes('--images-only')) throw Error('--membership-fonts-only cannot be combined with --images-only');
+if (notificationFontPreview && !manifest.notificationTestPreview) throw Error('--notification-fonts-only requires a --notification-test-only build');
+if (notificationFontPreview && (membershipFontPreview || args.includes('--images-only'))) throw Error('--notification-fonts-only cannot be combined with another filter');
 function verifyPreviewSources() {
   for (const source of manifest.sourceHashes || []) {
     const current = crypto.createHash('sha256').update(fs.readFileSync(path.join(manifest.source, source.file))).digest('hex');
@@ -19,7 +28,8 @@ function verifyPreviewSources() {
   }
 }
 verifyPreviewSources();
-const screenshots = path.join(directory, colorScheme === 'dark' ? 'screenshots-dark' : 'screenshots'); fs.mkdirSync(screenshots, { recursive: true });
+const screenshotBase = membershipFontPreview ? 'screenshots-membership-fonts' : notificationFontPreview ? 'screenshots-notification-fonts' : 'screenshots';
+const screenshots = path.join(directory, colorScheme === 'dark' ? `${screenshotBase}-dark` : screenshotBase); fs.mkdirSync(screenshots, { recursive: true });
 let browser;
 const configuredExecutable = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH;
 try { browser = await playwright.chromium.launch({ headless: true, ...(configuredExecutable ? { executablePath: configuredExecutable } : {}) }); }
@@ -31,8 +41,13 @@ catch (error) {
 const report = { renderer: 'headless Chromium rendering generated WXML/WXSS approximation; not WeChat', generatedAt: new Date().toISOString(), snapshots: [], screenshotDirectory: screenshots };
 const context = await browser.newContext({ deviceScaleFactor: 1, colorScheme });
 report.colorScheme = colorScheme;
+report.fontScale = fontPreview ? 1.3 : 1;
+report.fontScaleProfile = fontPreview ? 'All computed font sizes and line heights scaled 1.3x in Chromium; not native WeChat font scaling evidence' : null;
 report.sourceHashes = manifest.sourceHashes || [];
 report.buttonConstraintProfile = manifest.buttonConstraintProfile || null;
+report.membershipNativePreview = Boolean(manifest.membershipNativePreview);
+report.notificationTestPreview = Boolean(manifest.notificationTestPreview);
+report.buttonConstraintCss = manifest.buttonConstraintCss || '';
 report.rpxRoundingProfile = manifest.rpxRoundingProfile || null;
 if (!manifest.remoteImages) await context.route(/^https?:/, route => route.abort());
 try {
@@ -57,11 +72,27 @@ try {
   const invalidTargets = indexTargets.filter(target => !manifest.snapshots.some(item => item.page === target.page && item.scenario === target.scenario && item.width === target.width && item.file === target.file) || !fs.existsSync(path.join(directory, target.file)));
   const missingTargets = manifest.snapshots.filter(item => !indexTargets.some(target => target.file === item.file));
   report.indexNavigation = { total: indexTargets.length, invalidTargets, missingTargets };
-  const selected = args.includes('--images-only') ? manifest.snapshots.filter(item => item.page === 'query' && ['member', 'longcontent'].includes(item.scenario)) : manifest.snapshots;
+  const selected = membershipFontPreview
+    ? manifest.snapshots.filter(item => [320, 375].includes(item.width) && ['payment-ready', 'payment-upgrade-monthly', 'payment-expired'].includes(item.scenario))
+    : notificationFontPreview ? manifest.snapshots.filter(item => [320, 375].includes(item.width) && ['notification-test-ready', 'notification-test-accepted', 'notification-test-authorized', 'notification-test-pending-other', 'notification-test-not-received', 'notification-test-rules'].includes(item.scenario))
+    : args.includes('--images-only') ? manifest.snapshots.filter(item => item.page === 'query' && ['member', 'longcontent'].includes(item.scenario)) : manifest.snapshots;
+  if (membershipFontPreview && selected.length !== 6) throw Error('Membership font stress requires both widths and all three account states');
+  if (notificationFontPreview && selected.length !== 12) throw Error('Notification font stress requires both widths and all six interaction states');
   for (const item of selected) {
     await page.setViewportSize({ width: item.width, height: 900 });
     await page.goto(pathToFileURL(path.join(directory, item.file)).href);
     await page.evaluate(() => document.fonts.ready);
+    if (fontPreview) await page.evaluate(() => {
+      // Read before writing: inherited sizes must not be multiplied repeatedly.
+      const sizes = [...document.querySelectorAll('body *')].map(element => {
+        const style = getComputedStyle(element);
+        return { element, fontSize: parseFloat(style.fontSize), lineHeight: parseFloat(style.lineHeight) || 0 };
+      });
+      for (const { element, fontSize, lineHeight } of sizes) {
+        element.style.fontSize = fontSize * 1.3 + 'px';
+        if (lineHeight) element.style.lineHeight = lineHeight * 1.3 + 'px';
+      }
+    });
     if (manifest.remoteImages) await page.waitForFunction(() => [...document.images].every(image => image.complete), null, { timeout: 20000 }).catch(() => {});
     const metrics = await page.evaluate(() => {
       const width = document.documentElement.clientWidth;
@@ -141,6 +172,8 @@ try {
       }
       return { viewport: width, scrollWidth: document.documentElement.scrollWidth, bodyHeight: document.body.scrollHeight, overflow, clippedText, images, alternativeGeometry, alternativeLayoutErrors, calendarLayoutErrors };
     });
+    Object.assign(metrics, await page.evaluate(inspectMembershipLayout, item.expectedMembership || null));
+    Object.assign(metrics, await page.evaluate(inspectNotificationLayout, item.expectedNotification || null));
     const bodyText = await page.locator('body').innerText();
     const missingText = (item.expectedText || []).filter(text => !bodyText.replace(/\s+/g, '').includes(text.replace(/\s+/g, '')));
     const forbiddenTextFound = (item.forbiddenText || []).filter(text => bodyText.replace(/\s+/g, '').includes(text.replace(/\s+/g, '')));
@@ -165,6 +198,26 @@ try {
       const name = item.file.replace('.html', '-membership.png');
       await page.locator('.membership-card').screenshot({ path: path.join(screenshots, name) });
       record.membershipScreenshot = name;
+    }
+    if (manifest.membershipNativePreview && (membershipFontPreview || ['payment-ready', 'payment-member', 'payment-expired'].includes(item.scenario))) {
+      await page.evaluate(() => window.scrollTo(0, 0));
+      const firstScreen = item.file.replace('.html', '-first-screen.png');
+      await page.screenshot({ path: path.join(screenshots, firstScreen), fullPage: false });
+      record.firstScreenScreenshot = firstScreen;
+      for (const [selector, suffix] of [['.account-header', 'account'], ['.membership-card', 'membership'], ['.account-link', 'utilities']]) {
+        const region = suffix === 'utilities' ? page.locator(selector).first().locator('..') : page.locator(selector);
+        if (!await region.count()) continue; // Missing regions remain a failing geometry check.
+        const name = item.file.replace('.html', `-${suffix}.png`);
+        await region.screenshot({ path: path.join(screenshots, name) });
+        record[`${suffix}Screenshot`] = name;
+      }
+      await page.evaluate(() => window.scrollTo(0, 0));
+    }
+    if (manifest.notificationTestPreview && (notificationFontPreview || [320, 375, 430, 1024].includes(item.width))) {
+      await page.evaluate(() => window.scrollTo(0, 0));
+      const firstScreen = item.file.replace('.html', '-first-screen.png');
+      await page.screenshot({ path: path.join(screenshots, firstScreen), fullPage: false });
+      record.firstScreenScreenshot = firstScreen;
     }
     const representative = item.width === 375 && ['member', 'free'].includes(item.scenario) || item.scenario.startsWith('sheet-') || item.width === 320 && ['longcontent', 'history-longcontent', 'history-balance-cap', 'operator-longcontent'].includes(item.scenario) || item.width === 375 && ['mine', 'follow'].includes(item.page) && item.scenario === 'expired' || item.width === 430 && item.page === 'query' && item.scenario === 'member' || item.width === 375 && item.scenario.startsWith('monitor-') || item.width === 375 && item.scenario.startsWith('history-') && (item.page === 'history' || item.scenario === 'history-free-first');
     if (representative || item.scenario.startsWith('onboarding-') && item.width === 375 || /^(?:payment|notification-test|alternatives|orders|nudge)-/.test(item.scenario)) { const name = item.file.replace('.html', '.png'); await page.screenshot({ path: path.join(screenshots, name), fullPage: true }); record.screenshot = name; }
@@ -209,7 +262,8 @@ try {
   }
 } finally { await context.close(); await browser.close(); }
 verifyPreviewSources();
-report.summary = { total: report.snapshots.length, indexNavigationFailures: report.indexNavigation.invalidTargets.length + report.indexNavigation.missingTargets.length, expressionErrors: manifest.expressionErrors || 0, missingText: report.snapshots.filter(x => x.missingText.length).length, forbiddenText: report.snapshots.filter(x => x.forbiddenTextFound.length).length, horizontalOverflow: report.snapshots.filter(x => x.scrollWidth > x.width + 1 || x.overflow.length).length, clippedText: report.snapshots.filter(x => x.clippedText.length).length, failedImages: report.snapshots.flatMap(x => x.images).filter(x => !x.loaded).length, alternativeLayoutFailures: report.snapshots.filter(x => x.alternativeLayoutErrors.length).length, calendarLayoutFailures: report.snapshots.filter(x => x.calendarLayoutErrors.length).length };
-fs.writeFileSync(path.join(directory, colorScheme === 'dark' ? 'layout-metrics-dark.json' : 'layout-metrics.json'), JSON.stringify(report, null, 2));
+report.summary = { total: report.snapshots.length, indexNavigationFailures: report.indexNavigation.invalidTargets.length + report.indexNavigation.missingTargets.length, expressionErrors: manifest.expressionErrors || 0, missingText: report.snapshots.filter(x => x.missingText.length).length, forbiddenText: report.snapshots.filter(x => x.forbiddenTextFound.length).length, horizontalOverflow: report.snapshots.filter(x => x.scrollWidth > x.width + 1 || x.overflow.length).length, clippedText: report.snapshots.filter(x => x.clippedText.length).length, failedImages: report.snapshots.flatMap(x => x.images).filter(x => !x.loaded).length, alternativeLayoutFailures: report.snapshots.filter(x => x.alternativeLayoutErrors.length).length, calendarLayoutFailures: report.snapshots.filter(x => x.calendarLayoutErrors.length).length, membershipLayoutFailures: report.snapshots.filter(x => x.membershipLayoutErrors.length).length, notificationLayoutFailures: report.snapshots.filter(x => x.notificationLayoutErrors.length).length };
+const reportBase = membershipFontPreview ? 'membership-font-metrics' : notificationFontPreview ? 'notification-font-metrics' : 'layout-metrics';
+fs.writeFileSync(path.join(directory, `${reportBase}${colorScheme === 'dark' ? '-dark' : ''}.json`), JSON.stringify(report, null, 2));
 console.log(JSON.stringify(report.summary));
-if (report.summary.indexNavigationFailures || report.summary.expressionErrors || report.summary.missingText || report.summary.forbiddenText || report.summary.horizontalOverflow || report.summary.clippedText || report.summary.failedImages || report.summary.alternativeLayoutFailures || report.summary.calendarLayoutFailures) process.exitCode = 1;
+if (report.summary.indexNavigationFailures || report.summary.expressionErrors || report.summary.missingText || report.summary.forbiddenText || report.summary.horizontalOverflow || report.summary.clippedText || report.summary.failedImages || report.summary.alternativeLayoutFailures || report.summary.calendarLayoutFailures || report.summary.membershipLayoutFailures || report.summary.notificationLayoutFailures) process.exitCode = 1;

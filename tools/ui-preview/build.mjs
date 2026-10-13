@@ -9,7 +9,9 @@ import { fileURLToPath } from 'node:url';
 const project = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const adminPreview = process.argv.includes('--admin-only');
 const v2Preview = process.argv.includes('--v2-only');
-if (adminPreview && process.argv.some(arg => /^--(?:v2|reminders|stock|redemption|payment|orders|monitoring|history-task|history-data|sheets|release-notes|onboarding|notification-test|alternatives)-only$/.test(arg))) throw Error('--admin-only cannot be combined with consumer scenarios');
+const membershipNativePreview = process.argv.includes('--membership-native-only');
+if (membershipNativePreview && process.argv.some(arg => arg !== '--membership-native-only' && /^--.*-only$/.test(arg))) throw Error('--membership-native-only cannot be combined with another scenario group');
+if (adminPreview && process.argv.some(arg => /^--(?:v2|reminders|stock|redemption|payment|orders|monitoring|history-task|history-data|sheets|release-notes|onboarding|notification-test|alternatives|membership-native)-only$/.test(arg))) throw Error('--admin-only cannot be combined with consumer scenarios');
 if (v2Preview && process.argv.some(arg => arg !== '--v2-only' && /^--.*-only$/.test(arg))) throw Error('--v2-only cannot be combined with another scenario group');
 const mini = path.join(project, adminPreview ? 'tools/admin-miniprogram/miniprogram' : 'miniprogram');
 const appConfig = JSON.parse(fs.readFileSync(path.join(mini, 'app.json'), 'utf8'));
@@ -52,6 +54,12 @@ function sandbox(handler, { paymentScenario } = {}) {
     vm.runInNewContext(fs.readFileSync(filename, 'utf8'), { module, wx, console, Date: PreviewDate, Set, Map, Promise, getApp: () => app,
       Page: value => { captured = value; }, Component: value => { captured = value; },
       setTimeout: () => 0, clearTimeout() {}, require: id => load(path.resolve(path.dirname(filename), id.endsWith('.js') ? id : id + '.js')) }, { filename });
+    // Static HTML cannot dispatch the WXML image-error handler. Offline launch
+    // fixtures therefore render the page's real no-image fallback up front;
+    // remote-image mode keeps the original URL for a separate network check.
+    if (!allowRemoteImages && filename === path.join(mini, 'config/product-launches.js')) {
+      module.exports = module.exports.map(entry => /^https?:\/\//i.test(entry.imageUrl || '') ? { ...entry, imageUrl: '' } : entry);
+    }
     return module.exports;
   }
   function instantiate(relative, props = {}) {
@@ -170,6 +178,7 @@ function renderNode(node, scope, context) {
   if (node.name === 'input') renderedAttrs += ` value="${html(evaluate(attrs.value || '', scope))}" placeholder="${html(evaluate(attrs.placeholder || '', scope))}"`;
   if (node.name === 'button' && truth(attrs.disabled || '', scope)) renderedAttrs += ' disabled';
   if (node.name === 'button' && attrs.size) renderedAttrs += ` size="${html(evaluate(attrs.size, scope))}"`;
+  if (node.name === 'button' && attrs.bindtap) renderedAttrs += ` data-preview-action="${html(attrs.bindtap)}"`;
   if (node.name === 'textarea') return `<textarea${renderedAttrs}>${html(evaluate(attrs.value || '', scope))}</textarea>`;
   if (['img', 'input'].includes(tag)) return `<${tag}${renderedAttrs}>`;
   return `<${tag}${renderedAttrs}>${renderChildren(node.children, scope, context)}</${tag}>`;
@@ -193,7 +202,7 @@ if (!sample) throw Error('Requested SKU does not exist in the catalog');
 const reminderPreview = process.argv.includes('--reminders-only');
 const stockPreview = process.argv.includes('--stock-only');
 const redemptionPreview = process.argv.includes('--redemption-only');
-const paymentPreview = process.argv.includes('--payment-only');
+const paymentPreview = process.argv.includes('--payment-only') || membershipNativePreview;
 const orderRecordsPreview = process.argv.includes('--orders-only');
 const monitoringPreview = process.argv.includes('--monitoring-only');
 const historyTaskPreview = process.argv.includes('--history-task-only');
@@ -207,16 +216,29 @@ const nudgePreview = process.argv.includes('--nudge-only');
 // Targeted cascade stress from the device-reported fixed-width button failure.
 // :where keeps the same specificity as button:not([size=mini]); this deliberately
 // is not a complete implementation of WeChat's native component stylesheet.
-const buttonConstraintProfile = alternativesPreview ? 'regression stress only: alternative-panel button:not([size=mini]) fixed 184px, min-width:min-content, auto inline margins; not verified WeChat implementation' : null;
-const buttonConstraintCss = buttonConstraintProfile ? ':where(.alternative-panel) button:not([size=mini]){width:184px;min-width:min-content;margin-left:auto;margin-right:auto;}' : '';
+const buttonConstraintProfile = membershipNativePreview
+  ? 'membership cascade regression stress: button:not([size=mini]) fixed 184px and auto inline margins; reproduces selected native-style constraints in Chromium, not WeChat rendering evidence'
+  : notificationTestPreview ? 'notification-test cascade regression stress: button:not([size=mini]) fixed 184px and auto inline margins; reproduces selected native-style constraints in Chromium, not WeChat rendering evidence'
+  : alternativesPreview ? 'regression stress only: alternative-panel button:not([size=mini]) fixed 184px, min-width:min-content, auto inline margins; not verified WeChat implementation' : null;
+const buttonConstraintCss = membershipNativePreview
+  ? ':where(.mine-page) button:not([size=mini]){width:184px;margin-left:auto;margin-right:auto;}'
+  : notificationTestPreview ? ':where(.test-page) button:not([size=mini]){width:184px;margin-left:auto;margin-right:auto;}'
+  : alternativesPreview ? ':where(.alternative-panel) button:not([size=mini]){width:184px;min-width:min-content;margin-left:auto;margin-right:auto;}' : '';
 const widths = [320, 375, 430], scenarios = adminPreview ? ['operator-ready', 'operator-denied', 'operator-loading', 'operator-error', 'operator-longcontent', 'operator-saving'] : historyTaskPreview ? ['history-member-reward', 'history-free-first', 'history-read-error', 'history-balance-cap', 'history-completed', 'history-longcontent', 'history-loading'] : monitoringPreview ? ['monitor-template-missing', 'monitor-ready-authorized', 'monitor-needs-authorization', 'monitor-stale', 'monitor-disabled', 'monitor-expired-paused'] : redemptionPreview ? ['redemption-input', 'redemption-loading', 'redemption-error', 'redemption-success', 'redemption-used', 'redemption-limited', 'redemption-empty'] : stockPreview ? ['stock-fresh', 'stock-old', 'stock-unknown', 'stock-missing', 'stock-restricted'] : reminderPreview ? ['reminders', 'reminder-empty', 'reminder-loading', 'reminder-deleting', 'reminder-clearing', 'reminder-error', 'reminder-more-error', 'longcontent'] : ['free', 'member', 'expired', 'empty', 'error', 'loading', 'longcontent'];
 if (historyDataPreview) scenarios.splice(0, scenarios.length, 'history-no-data', 'history-unknown-only', 'history-observed-no-events', 'history-events-only', 'history-observed-events', 'history-partial-stores');
 if (paymentPreview) scenarios.splice(0, scenarios.length, 'payment-ready', 'payment-renew', 'payment-blocked', 'payment-old-ios', 'payment-pending', 'payment-cancelled', 'payment-error', 'payment-fulfilled', 'payment-partial-refund', 'payment-monthly', 'payment-annual', 'payment-pending-monthly', 'payment-member', 'payment-upgrade-monthly', 'payment-upgrade-annual', 'payment-member-pending-monthly', 'payment-benefits', 'payment-rules');
+if (membershipNativePreview) {
+  scenarios.splice(0, scenarios.length, 'payment-ready', 'payment-monthly', 'payment-annual', 'payment-member', 'payment-expired', 'payment-renew', 'payment-upgrade-monthly', 'payment-upgrade-annual', 'payment-pending-monthly', 'payment-member-pending-monthly', 'payment-benefits', 'payment-rules');
+  widths.splice(0, widths.length, 320, 360, 375, 390, 393, 414, 430, 480, 768, 1024);
+}
 if (orderRecordsPreview) scenarios.splice(0, scenarios.length, 'orders-single', 'orders-deleting', 'orders-clearing', 'orders-error', 'orders-pending', 'orders-empty', 'orders-legacy');
 if (sheetPreview) scenarios.splice(0, scenarios.length, 'sheet-edit', 'sheet-keyboard', 'sheet-longcontent', 'sheet-saving');
 if (releaseNotesPreview) scenarios.splice(0, scenarios.length, 'free', 'member', 'release-middle', 'release-last', 'release-collapsed', 'longcontent');
 if (onboardingPreview) scenarios.splice(0, scenarios.length, 'onboarding-first', 'onboarding-signing', 'onboarding-error', 'onboarding-signed', 'onboarding-shared', 'onboarding-share-pending', 'onboarding-share-catalog', 'onboarding-share-error');
-if (notificationTestPreview) scenarios.splice(0, scenarios.length, 'notification-test-ready', 'notification-test-no-quota', 'notification-test-accepted', 'notification-test-uncertain', 'notification-test-failed', 'notification-test-received', 'notification-test-not-received');
+if (notificationTestPreview) {
+  scenarios.splice(0, scenarios.length, 'notification-test-ready', 'notification-test-no-quota', 'notification-test-accepted', 'notification-test-uncertain', 'notification-test-failed', 'notification-test-received', 'notification-test-not-received', 'notification-test-authorized', 'notification-test-authorized-no-quota', 'notification-test-sending', 'notification-test-pending-other', 'notification-test-error', 'notification-test-loading', 'notification-test-rules', 'notification-test-needs-authorization', 'notification-test-uncertain-received');
+  widths.splice(0, widths.length, 320, 360, 375, 390, 393, 414, 430, 480, 768, 1024);
+}
 if (alternativesPreview) scenarios.splice(0, scenarios.length, 'alternatives-default', 'alternatives-selection', 'alternatives-premium', 'alternatives-free', 'alternatives-match', 'alternatives-prepared', 'alternatives-empty', 'alternatives-error', 'alternatives-expired', 'alternatives-cached');
 if (nudgePreview) scenarios.splice(0, scenarios.length, 'nudge-restock', 'nudge-both', 'nudge-one');
 const v2Pages = {
@@ -243,7 +265,7 @@ if (v2Preview) {
   scenarios.splice(0, scenarios.length, ...Object.keys(v2Pages));
   widths.splice(0, widths.length, 320, 375, 390, 430, 768, 1024);
 }
-const names = nudgePreview ? { mine: '我的' } : alternativesPreview ? { query: '查询' } : notificationTestPreview ? { 'notification-test': '通知测试' } : adminPreview ? { admin: '运营工具' } : onboardingPreview ? { query: '查询' } : paymentPreview || orderRecordsPreview ? { mine: '我的' } : historyDataPreview ? { history: '历史' } : historyTaskPreview ? { history: '历史', mine: '我的' } : stockPreview || monitoringPreview ? { follow: '小哨提醒' } : reminderPreview || redemptionPreview || releaseNotesPreview ? { mine: '我的' } : { query: '查询', follow: '小哨提醒', history: '历史', mine: '我的' };
+const names = nudgePreview ? { mine: '我的' } : alternativesPreview ? { query: '查询' } : notificationTestPreview ? { 'notification-test': '体验微信提醒' } : adminPreview ? { admin: '运营工具' } : onboardingPreview ? { query: '查询' } : paymentPreview || orderRecordsPreview ? { mine: '我的' } : historyDataPreview ? { history: '历史' } : historyTaskPreview ? { history: '历史', mine: '我的' } : stockPreview || monitoringPreview ? { follow: '小哨提醒' } : reminderPreview || redemptionPreview || releaseNotesPreview ? { mine: '我的' } : { query: '查询', follow: '小哨提醒', history: '历史', mine: '我的' };
 if (v2Preview) names.guide = '使用攻略';
 if (sheetPreview) delete names.mine;
 if (monitoringPreview) scenarios.push('monitor-no-follows', 'monitor-all-paused', 'monitor-user-disabled', 'monitor-dnd', 'monitor-free-account', 'monitor-alert', 'monitor-dual-ready', 'monitor-dual-soldout-empty', 'monitor-dual-restock-empty', 'monitor-dual-soldout-low', 'monitor-dual-pending', 'monitor-dual-native', 'monitor-dual-sync-error', 'monitor-dual-storage-error');
@@ -273,14 +295,16 @@ for (const scenario of scenarios) {
     bootstrap.settings.dnd.enabled = false;
     Object.assign(bootstrap.memberProduct, { enabled: true, paymentReady: true, paymentReason: '' });
   }
-  const promotionActive = !scenario.startsWith('v2-promotion-expired-');
-  const promotion = { active: promotionActive, endsAt: '2026-11-30T16:00:00.000Z', timezone: 'Asia/Shanghai' };
+  // Keep the former expiry-time fixtures as a future-date regression: current
+  // discounted prices must no longer revert at the removed deadline.
+  const promotion = { active: true, endsAt: null, timezone: 'Asia/Shanghai' };
   if (paymentPreview || v2Preview) bootstrap.memberProducts = [
     { ...bootstrap.memberProduct, planId: 'member_7d', limits: { maxFollows: 3, maxStoresPerFollow: 3 } },
-    { ...bootstrap.memberProduct, id: 'vip777', planId: 'member_30d', limits: { maxFollows: 4, maxStoresPerFollow: 4 }, title: '30 天会员', days: 30, priceFen: promotionActive ? 1499 : 3000, standardPriceFen: 3000, promotion, note: '一次性虚拟服务，一经售出不予退款。一次购买 30 天，已有会员按剩余有效期顺延，不自动续费。' },
-    { ...bootstrap.memberProduct, id: 'vip888', planId: 'member_365d', limits: { maxFollows: 4, maxStoresPerFollow: 4 }, title: '365 天会员', days: 365, priceFen: promotionActive ? 12900 : 36000, standardPriceFen: 36000, promotion, note: '一次性虚拟服务，一经售出不予退款。一次购买 365 天，已有会员按剩余有效期顺延，不自动续费。' },
+    { ...bootstrap.memberProduct, id: 'vip777', planId: 'member_30d', limits: { maxFollows: 4, maxStoresPerFollow: 4 }, title: '30 天会员', days: 30, priceFen: 1499, standardPriceFen: 3000, promotion, note: '一次性虚拟服务，一经售出不予退款。一次购买 30 天，已有会员按剩余有效期顺延，不自动续费。' },
+    { ...bootstrap.memberProduct, id: 'vip888', planId: 'member_365d', limits: { maxFollows: 4, maxStoresPerFollow: 4 }, title: '365 天会员', days: 365, priceFen: 12900, standardPriceFen: 36000, promotion, note: '一次性虚拟服务，一经售出不予退款。一次购买 365 天，已有会员按剩余有效期顺延，不自动续费。' },
   ];
-  if (notificationTestPreview) bootstrap.quota.balance = scenario === 'notification-test-no-quota' ? 0 : 2;
+  if (notificationTestPreview) bootstrap.quota.balance = ['notification-test-no-quota', 'notification-test-authorized-no-quota'].includes(scenario) ? 0 : 2;
+  if (scenario === 'payment-expired') bootstrap.membership = { active: false, remainingMs: 0, expiresAt: '2026-09-10T07:00:00Z' };
   if (scenario === 'alternatives-premium') Object.assign(bootstrap.limits, { queryMaxStores: 4, alternativeMaxColors: 4 });
   if (scenario === 'history-balance-cap') bootstrap.quota.balance = 10;
   if (sheetPreview) bootstrap.membership = { active: true, expiresAt: '2026-09-22T07:00:00Z', remainingMs: 7 * 86400000 };
@@ -292,9 +316,10 @@ for (const scenario of scenarios) {
   if (['payment-pending-monthly', 'payment-member-pending-monthly'].includes(scenario)) Object.assign(previewOrder, {
     orderId: 'offline-original-monthly-order', productId: 'offline-monthly-goods', planId: 'member_30d', days: 30, amountFen: 1990, paymentPending: true,
   });
-  const notificationTest = ['notification-test-ready', 'notification-test-no-quota'].includes(scenario) ? null : {
-    requestId: 'offline-notification-test', status: scenario === 'notification-test-failed' ? 'failed' : scenario === 'notification-test-uncertain' ? 'uncertain' : 'accepted',
-    charged: 1, refunded: scenario === 'notification-test-failed' ? 1 : 0, feedback: null,
+  const notificationStatus = { 'notification-test-failed': 'failed', 'notification-test-uncertain': 'uncertain', 'notification-test-uncertain-received': 'uncertain', 'notification-test-authorized': 'authorized', 'notification-test-authorized-no-quota': 'authorized', 'notification-test-sending': 'sending', 'notification-test-needs-authorization': 'needs_authorization' }[scenario] || 'accepted';
+  const notificationTest = ['notification-test-ready', 'notification-test-no-quota', 'notification-test-loading', 'notification-test-error', 'notification-test-rules'].includes(scenario) ? null : {
+    requestId: 'offline-notification-test', status: notificationStatus,
+    charged: ['authorized', 'needs_authorization'].includes(notificationStatus) ? 0 : 1, refunded: scenario === 'notification-test-failed' ? 1 : 0, feedback: null,
   };
   const notificationResult = () => ({ userKey: bootstrap.identity.userKey, ready: true, templateId: 'offline-notification-template',
     balance: bootstrap.quota.balance, quotaRevision: bootstrap.quota.revision, quota: copy(bootstrap.quota), test: copy(notificationTest) });
@@ -439,7 +464,11 @@ for (const scenario of scenarios) {
       return { ok: true, order: copy(previewOrder), payment: { mode: 'short_series_goods', signData: '{"offlinePreview":true}', paySig: 'offline-preview', signature: 'offline-preview' } };
     }
     if (action === 'member.checkOrder') return { order: copy(previewOrder), membership: previewOrder.fulfilledAt ? copy(paidMembership) : copy(bootstrap.membership) };
-    if (action === 'notificationTest.status') return notificationResult();
+    if (action === 'notificationTest.status') {
+      if (scenario === 'notification-test-error') throw Object.assign(Error('offline status unavailable'), { code: 'call_failed' });
+      return notificationResult();
+    }
+    if (notificationTestPreview && ['notificationTest.authorize', 'notificationTest.send'].includes(action)) throw Error('Notification layout fixtures must never authorize or send');
     if (action === 'notificationTest.feedback') {
       if (!notificationTest || !['received', 'not_received'].includes(payload.outcome)) throw Error('Invalid offline test feedback');
       notificationTest.feedback = payload.outcome;
@@ -464,6 +493,9 @@ for (const scenario of scenarios) {
   if (['payment-pending-monthly', 'payment-member-pending-monthly'].includes(scenario)) rt.storage.set(`gxs_member_payment_v1:${encodeURIComponent(bootstrap.identity.userKey)}`, {
     orderId: previewOrder.orderId, planId: 'member_30d',
   });
+  if (scenario === 'notification-test-pending-other') rt.storage.set(`gxs_notification_test_v1:${encodeURIComponent(bootstrap.identity.userKey)}`, {
+    requestId: 'offline-pending-test', templateId: 'offline-notification-template', decision: 'accept', ownerUserKey: bootstrap.identity.userKey,
+  });
   const catalog = adminPreview || notificationTestPreview ? null : await rt.load('utils/store.js').getCatalog({ force: true });
   if (v2Preview && ['v2-paid-unconfigured', 'v2-context-checkout', 'v2-longcontent'].includes(scenario)) {
     const saved = rt.load('utils/checkout-context.js').createCheckoutContext({ wx: rt.wx, now: () => now.getTime() })
@@ -476,11 +508,12 @@ for (const scenario of scenarios) {
     if (['payment-pending-monthly', 'payment-member-pending-monthly'].includes(scenario)) page.setData({ selectedPlanId: 'member_365d' });
     if (pageName === 'follow' && scenario === 'monitor-alert') Object.assign(rt.app.globalData, { pendingAlert: 'preview-event', handledAlerts: [] });
     // 'loading' shows the skeleton a page renders before its first data arrives.
-    if (!['operator-loading', 'loading'].includes(scenario)) await page.onLoad(pageName === 'guide'
-      ? { stage: 'prepare', ...(scenario === 'v2-guide-calendar' ? { section: 'calendar' } : scenario === 'v2-guide-faq' ? { section: 'faq' } : {}) } : undefined);
+    if (!['operator-loading', 'loading', 'notification-test-loading'].includes(scenario)) await page.onLoad(pageName === 'guide'
+      ? { stage: 'prepare', ...(scenario === 'v2-guide-calendar' ? { section: 'calendar' } : scenario === 'v2-guide-faq' ? { section: 'faq' } : {}) }
+      : scenario === 'notification-test-pending-other' ? { requestId: notificationTest.requestId } : undefined);
     // Notification feedback requires a visible page, just like an actual tap
     // in WeChat. onLoad alone now intentionally represents a hidden preload.
-    if ((alternativesPreview || notificationTestPreview || v2Preview) && typeof page.onShow === 'function') await page.onShow();
+    if ((alternativesPreview || notificationTestPreview || v2Preview) && scenario !== 'notification-test-loading' && typeof page.onShow === 'function') await page.onShow();
     if (v2Preview && pageName === 'mine') await page.restoreCheckoutContext();
     if (pageName === 'guide' && scenario === 'v2-guide-faq' && page.data.faqOpen !== 'notification') page.onToggleFaq({ currentTarget: { dataset: { id: 'notification' } } });
     if (scenario === 'v2-calendar-modal') {
@@ -493,7 +526,7 @@ for (const scenario of scenarios) {
       const planId = scenario.endsWith('-annual') ? 'member_365d' : 'member_30d';
       page.onSelectMemberProduct({ currentTarget: { dataset: { planId } } });
       if (page.data.selectedPlanId !== planId) throw Error(`Promotion fixture failed to select ${planId}`);
-      const expectedPrice = planId === 'member_365d' ? (promotionActive ? 12900 : 36000) : (promotionActive ? 1499 : 3000);
+      const expectedPrice = planId === 'member_365d' ? 12900 : 1499;
       if (page.data.boot.memberProduct.priceFen !== expectedPrice) throw Error(`Promotion fixture showed the wrong selected price for ${planId}`);
     }
     if (scenario === 'monitor-alert') await new Promise(resolve => setImmediate(resolve));
@@ -527,10 +560,17 @@ for (const scenario of scenarios) {
         if (page.data.selectedPlanId !== 'member_30d' || page.data.paymentPendingId !== previewOrder.orderId) throw Error('Original monthly order was not retained in offline preview');
       }
     }
-    if (notificationTestPreview && ['notification-test-received', 'notification-test-not-received'].includes(scenario)) {
-      const outcome = scenario === 'notification-test-received' ? 'received' : 'not_received';
+    if (notificationTestPreview && ['notification-test-received', 'notification-test-not-received', 'notification-test-uncertain-received'].includes(scenario)) {
+      const outcome = scenario === 'notification-test-not-received' ? 'not_received' : 'received';
       await page.onFeedback({ currentTarget: { dataset: { outcome } } });
       if (page.data.test.feedback !== outcome || !page.data.feedbackNote) throw Error('Visible offline test feedback was not recorded');
+    }
+    if (notificationTestPreview) {
+      if (scenario === 'notification-test-rules') page.onToggleTestRules();
+      if (scenario === 'notification-test-not-received') page.onToggleTroubleshooting();
+      if (scenario.startsWith('notification-test-authorized') && !page.data.canContinue) throw Error('Authorized test fixture lost original request recovery');
+      if (scenario === 'notification-test-pending-other' && !page.data.pendingOther) throw Error('Pending-other fixture lost the saved request');
+      if (scenario === 'notification-test-sending' && !page.data.blocked) throw Error('Sending fixture allows another send');
     }
     if (pageName === 'mine' && reminderPreview) page.setData({ showNotifications: true });
     if (pageName === 'mine' && releaseNotesPreview) {
@@ -650,7 +690,7 @@ for (const scenario of scenarios) {
         if (scenario === 'v2-restricted' && !page.data.selectionRestricted) throw Error('Restricted fixture did not retain the access gate');
         if (scenario === 'v2-paid-unconfigured' && !page.data.resumeSetup) throw Error('Paid fixture lost the unfinished target');
         if (scenario === 'v2-new-product' && !page.data.launch) throw Error('Future launch card did not render');
-        expectedV2Text = [...(scenario === 'v2-calendar-modal' ? ['新品日历', 'iPhone Duo', '10.16', '10.23', '本次发售不再提醒', '查看选购攻略'] : [p.title]), ...({
+        expectedV2Text = [...(scenario === 'v2-calendar-modal' ? ['新品日历', 'iPhone Duo', '10.16', '10.23', '20:00 预购', 'Apple 官方时间', '本次发售不再提醒', '查看选购攻略'] : [p.title]), ...({
           'v2-free': ['暂时没有可取货观测', '微信提醒需另行授权'],
           'v2-member': ['2 家门店有可取货观测', '加入关注', '购买请在 Apple 官方渠道完成'],
           'v2-unknown': ['当前取货状态待确认', '继续查询原配置'],
@@ -662,6 +702,7 @@ for (const scenario of scenarios) {
           'v2-longcontent': ['暂时没有可取货观测', '关注此配置'],
         }[scenario] || [])];
         if (['v2-unknown', 'v2-stale', 'v2-service-down'].includes(scenario)) forbiddenText = ['不想反复查？'];
+        if (scenario === 'v2-calendar-modal') forbiddenText.push('折叠大屏', '更大的世界', '距预购还有');
       } else if (pageName === 'follow') {
         if (scenario === 'v2-service-down') page.setData({ showServiceDetails: true });
         if (scenario === 'v2-paid-unconfigured' && page.data.activation?.action !== 'continue') throw Error('Paid member fixture must require an explicit setup action');
@@ -681,15 +722,15 @@ for (const scenario of scenarios) {
         }
         expectedV2Text.push(member ? '已开通' : `确认购买 ${page.data.boot.memberProduct.days} 天会员`);
         if (scenario.startsWith('v2-promotion-')) {
-          expectedV2Text.push('月卡', '年卡', '¥30.00', '¥360.00');
-          if (promotionActive) expectedV2Text.push('¥14.99', '¥129.00', '优惠至 2026-11-30 23:59', '截止后恢复标准价');
-          else forbiddenText.push('¥14.99', '¥129.00', '限时优惠');
+          expectedV2Text.push('月卡', '年卡');
+          expectedV2Text.push('优惠价', '¥30.00', '¥360.00', '¥14.99', '¥129.00');
+          forbiddenText.push('限时优惠', '优惠至', '之后 ¥30.00', '之后 ¥360.00');
         }
       } else if (pageName === 'guide') {
-        expectedV2Text = ['选好心仪配置', '新品发售日历', '先选好想要的配置', '常见问题'];
+        expectedV2Text = ['从选择配置，到收到提醒后下单', '新品发售日历', '先选好想要的配置', '常见问题'];
         if (scenario === 'v2-guide-calendar') {
           if (!page.data.calendarExpanded || !page.data.calendars.length) throw Error('Guide calendar section did not expand');
-          expectedV2Text.push('2026 年 10 月', '10.16', '10.23', '去选择配置与门店');
+          expectedV2Text.push('2026 年 10 月', '10.16', '10.23', '20:00 预购', '去选择配置与门店');
         }
         if (scenario === 'v2-guide-faq') {
           if (page.data.faqOpen !== 'notification') throw Error('Guide notification FAQ did not expand');
@@ -721,7 +762,7 @@ for (const scenario of scenarios) {
         const icon = fs.readFileSync(path.join(mini, selected ? tab.selectedIconPath : tab.iconPath)).toString('base64');
         return `<span style="display:flex;align-items:center;flex-direction:column;color:${selected ? appConfig.tabBar.selectedColor : appConfig.tabBar.color}"><img src="data:image/png;base64,${icon}" alt="" style="width:26px;height:26px;margin-bottom:5px">${html(tab.text)}</span>`;
       }).join('') + '</div>';
-      const body = `<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${names[pageName]} · ${scenario} · ${width}px 离线预览</title><style>html{width:${width}px;max-width:100%;margin:0 auto}body{margin:0}button,input,textarea{font:inherit}button{cursor:default}img{display:block}input[type=checkbox]{width:36px;height:22px;flex:none;accent-color:#1ba35a}.simulation{position:sticky;top:0;z-index:10;padding:8px 12px;background:#fff2ce;color:#705000;font:11px/1.5 sans-serif;border-bottom:1px solid #ead49c}.native-nav{text-align:center;padding:16px;font:600 15px sans-serif}${navCss('light')}${theme ? `@media (prefers-color-scheme: dark){${navCss('dark')}}` : ''}.preview-tabbar{display:flex;justify-content:space-around;gap:6px;background:white;padding:15px 8px;border-top:1px solid #ddd;font-size:12px;color:#65776c}${css}</style><div class="simulation">离线模拟 · ${width}px · ${scenario} · 使用实际 WXML/WXSS；不代表微信实测或实时库存</div><div class="native-nav">果小哨 · ${names[pageName]}</div>${rendered}${tabbar}<script>window.previewAudit=()=>({width:innerWidth,scrollWidth:document.documentElement.scrollWidth,overflow:[...document.querySelectorAll('body *')].filter(e=>{const r=e.getBoundingClientRect();return r.width&&r.right>document.documentElement.clientWidth+1&&getComputedStyle(e.parentElement).overflowX!=='auto'}).map(e=>({tag:e.tagName,class:e.className,right:e.getBoundingClientRect().right,text:e.textContent.slice(0,60)}))});</script></html>`;
+      const body = `<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${names[pageName]} · ${scenario} · ${width}px 离线预览</title><style>html{width:${width}px;max-width:100%;margin:0 auto}body{margin:0}button,input,textarea{font:inherit}button{cursor:default}img{display:block}input[type=checkbox]{width:36px;height:22px;flex:none;accent-color:#1ba35a}.simulation{position:sticky;top:0;z-index:10;padding:8px 12px;background:#fff2ce;color:#705000;font:11px/1.5 sans-serif;border-bottom:1px solid #ead49c}.native-nav{text-align:center;padding:16px;font:600 15px sans-serif}${navCss('light')}${theme ? `@media (prefers-color-scheme: dark){${navCss('dark')}}` : ''}.preview-tabbar{display:flex;justify-content:space-around;gap:6px;background:white;padding:15px 8px;border-top:1px solid #ddd;font-size:12px;color:#65776c}${css}</style><div class="simulation">离线模拟 · ${width}px · ${scenario}${membershipNativePreview || notificationTestPreview ? ' · 184px按钮级联压力' : ''} · 使用实际 WXML/WXSS；不代表微信实测或实时库存</div><div class="native-nav">果小哨 · ${names[pageName]}</div>${rendered}${tabbar}<script>window.previewAudit=()=>({width:innerWidth,scrollWidth:document.documentElement.scrollWidth,overflow:[...document.querySelectorAll('body *')].filter(e=>{const r=e.getBoundingClientRect();return r.width&&r.right>document.documentElement.clientWidth+1&&getComputedStyle(e.parentElement).overflowX!=='auto'}).map(e=>({tag:e.tagName,class:e.className,right:e.getBoundingClientRect().right,text:e.textContent.slice(0,60)}))});</script></html>`;
       fs.writeFileSync(path.join(out, filename), body, 'utf8');
       const expectedText = v2Preview ? expectedV2Text : alternativesPreview ? [p.title,
         '换个颜色或门店，继续找货', '同机型、同容量', '同城门店', '勾选不扣次',
@@ -737,14 +778,23 @@ for (const scenario of scenarios) {
           'alternatives-expired': ['近期记录已不可用', '会员不扣次', '查询'],
           'alternatives-cached': ['近期记录已不可用', '会员不扣次', '查询'],
         }[scenario],
-      ] : notificationTestPreview ? ['先试收一条通知', '消耗 1 次签到／任务额度', '查看原测试结果', '微信受理不保证手机弹出横幅', ...{
-        'notification-test-ready': ['授权并发送测试 · 1 次', '当前 2 次'],
-        'notification-test-no-quota': ['当前 0 次', '去「我的」签到获取次数'],
+      ] : notificationTestPreview ? ['体验微信提醒', '体验说明', '【测试】非真实放货', ...(page.data.test || page.data.error || !page.data.ready || page.data.canContinue || page.data.pendingOther ? [page.data.loading ? '读取中' : '查看原测试结果'] : []), ...{
+        'notification-test-ready': ['授权并发送测试 · 1 次', '每条消耗1次额度', '可用 2 次', '会员同样消耗 1 次额度'],
+        'notification-test-no-quota': ['可用 0 次', '去「我的」签到获取次数'],
         'notification-test-accepted': ['微信已受理', '受理不代表已送达', '我收到了', '暂时没收到'],
         'notification-test-uncertain': ['结果尚未确认', '本次暂不退次数，也不会重复发送', '我收到了', '暂时没收到'],
         'notification-test-failed': ['明确发送失败，次数已退回', '本次扣除 1 次 · 已退回 1 次'],
-        'notification-test-received': ['已记录：你确认收到了测试消息', '正式到货监测仍需会员与有效授权'],
-        'notification-test-not-received': ['已记录：暂未收到', '请检查微信服务通知、订阅消息设置及手机通知权限'],
+        'notification-test-received': ['已记录：你确认收到了测试消息', '已确认收到', '返回会员区'],
+        'notification-test-not-received': ['已记录：暂未收到', '小程序右上角', '订阅消息选项', '手机系统的微信通知权限', '不保证及时弹出锁屏提醒'],
+        'notification-test-authorized': ['已授权，尚未发送', '继续原测试', '将消耗 1 次额度'],
+        'notification-test-authorized-no-quota': ['已授权，尚未发送', '继续原测试', '无需再次授权'],
+        'notification-test-sending': ['正在确认发送结果', '不要重复发送'],
+        'notification-test-pending-other': ['另有一条待确认测试', '查看另一个待确认测试'],
+        'notification-test-error': ['暂时无法读取测试结果', '原测试编号已保留'],
+        'notification-test-loading': [],
+        'notification-test-rules': ['会员同样扣次', '明确发送失败自动退回', '结果不明时暂不退回', '不会重复发送', '不查询库存或创建监测', '正式到货和断货提醒需要会员、有效关注与微信授权', '微信授权次数与查询额度分开计算', '不保证手机弹出横幅'],
+        'notification-test-needs-authorization': ['尚未获得微信授权', '本次未扣次数'],
+        'notification-test-uncertain-received': ['结果尚未确认', '原测试结果仍未知，扣次记录保留', '再次体验会新建测试，另消耗 1 次', '不会重复发送', '重新授权新测试'],
       }[scenario]] : adminPreview ? { 'operator-ready': ['运行统计', '128'], 'operator-denied': ['当前账号没有管理权限', '重新检查'], 'operator-loading': ['校验权限'], 'operator-error': ['权限检查失败', '重新检查'], 'operator-longcontent': ['运行统计', '查询结果', '运营查询长文本换行验收'], 'operator-saving': ['已修改', '保存配置'] }[scenario] : historyTaskPreview ? pageName === 'history' ? ['最近浏览', '浏览不扣次数', p.title, ...{
         'history-member-reward': ['今日浏览任务完成，+1 次', '已计入次数明细'],
         'history-free-first': ['还没有浏览记录', '今日浏览任务完成，+1 次', '余 1 次'],
@@ -775,8 +825,8 @@ for (const scenario of scenarios) {
         'monitor-dual-native': ['待同步', '到货 8 次', '断货 5 次'],
         'monitor-dual-sync-error': ['待同步', '重试同步', '增加提醒次数'],
         'monitor-dual-storage-error': ['授权暂存在本次运行', '重试同步'],
-      }[scenario]] : paymentPreview ? ['兑换码开通', ...(!page.data.membership.active || page.data.membershipUpgradeOpen || page.data.paymentPendingId ? ['周卡', '月卡', '年卡', '¥7.00', '¥14.99', '¥129.00'] : ['升级长期套餐', '续费会员']), ...{
-        'payment-ready': ['立即开通', '选择会员时长', '付款确认后生效'], 'payment-renew': ['续费会员', '确认续费', '在原到期时间后增加 7 天', '剩余有效期继续保留'],
+      }[scenario]] : paymentPreview ? ['兑换码开通', ...(page.data.paymentPendingId ? ['继续处理原订单', '查询支付结果', '继续支付这笔订单', '放弃这笔订单'] : !page.data.membership.active || page.data.membershipUpgradeOpen ? ['周卡', '月卡', '年卡', '¥7.00', '¥14.99', '¥129.00', '优惠价', '¥30.00', '¥360.00'] : ['延长会员']), ...{
+        'payment-ready': ['立即开通', '选择会员时长', '付款确认后生效'], 'payment-renew': ['延长会员', '确认续费', '在原到期时间后增加 7 天'],
         'payment-blocked': ['付费购买暂未开放'], 'payment-old-ios': ['iOS 15'],
         'payment-pending': ['支付正在确认中', '查询支付结果'], 'payment-cancelled': ['已取消本次支付', '请查询订单状态', '查询支付结果'],
         'payment-error': ['支付结果暂未确认', '查询支付结果'], 'payment-fulfilled': ['支付已确认，会员已开通', '已开通'],
@@ -784,12 +834,13 @@ for (const scenario of scenarios) {
         'payment-monthly': ['立即开通 · ¥14.99', '30 天'],
         'payment-annual': ['立即开通 · ¥129.00', '365 天'],
         'payment-pending-monthly': ['30 天会员 · ¥19.90', 'offline-original-monthly-order', '支付正在确认中', '查询支付结果'],
-        'payment-member': ['18', '天剩余', '到期 2026-10-03', '升级长期套餐', '续费会员'],
-        'payment-upgrade-monthly': ['续费可选', '确认升级 · ¥14.99', '在原到期时间后增加 30 天', '预计到期 2026-11-02', '按所选套餐价格购买', '不抵扣差价'],
-        'payment-upgrade-annual': ['续费可选', '确认升级 · ¥129.00', '在原到期时间后增加 365 天', '预计到期 2027-10-03', '按所选套餐价格购买', '不抵扣差价'],
-        'payment-member-pending-monthly': ['30 天会员 · ¥19.90', 'offline-original-monthly-order', '套餐已按原订单锁定', '查询支付结果'],
+        'payment-member': ['剩余18天', '有效期至2026-10-03 15:00', '延长会员', '升级套餐'],
+        'payment-expired': ['会员已到期', '已于2026-09-10', '监测与提醒停止', '关注配置与次数仍保留', '立即开通'],
+        'payment-upgrade-monthly': ['续费可选', '确认购买 · ¥14.99', '在原到期时间后增加 30 天', '预计到期 2026-11-02', '按所选套餐全价购买', '不抵扣差价'],
+        'payment-upgrade-annual': ['续费可选', '确认购买 · ¥129.00', '在原到期时间后增加 365 天', '预计到期 2027-10-03', '按所选套餐全价购买', '不抵扣差价'],
+        'payment-member-pending-monthly': ['30 天会员 · ¥19.90', 'offline-original-monthly-order', '继续处理原订单', '查询支付结果'],
         'payment-benefits': ['会员权益', '周卡', '月卡', '年卡', '新品'],
-        'payment-rules': ['一次性虚拟服务', '一经售出不予退款', '一次购买 7 天', '购买说明'],
+        'payment-rules': ['一次性虚拟服务', '一经售出不予退款', '一次购买 7 天', '购买与提醒规则'],
       }[scenario]] : redemptionPreview ? ['兑换会员', '付费购买暂未开放', { 'redemption-input': '确认兑换', 'redemption-loading': '兑换中，请稍候', 'redemption-error': '兑换码无效', 'redemption-success': '兑换成功', 'redemption-used': '此账号已兑换过', 'redemption-limited': '15 分钟后再试', 'redemption-empty': '确认兑换' }[scenario]] : stockPreview ? [p.title, '收起详情', '删除关注', ...{
         'stock-fresh': ['暂无供应', '本次状态刚记录', '观测 2026-09-15 15:00:00'],
         'stock-old': ['待更新', '观测已过期', '上次有效结果：暂无供应（仅供参考）', '上次检查 2026-09-15 14:57:00'],
@@ -798,7 +849,7 @@ for (const scenario of scenarios) {
         'stock-restricted': ['会员权益受限', '未展示实时库存', '当前账号暂不能查看该新品的实时库存'],
       }[scenario]] : scenario === 'loading' ? [{ query: '正在加载商品目录', follow: '正在读取你的关注', history: '正在加载商品目录', mine: '正在读取账户信息' }[pageName]]
         : scenario === 'error' ? [pageName === 'admin' ? '模拟错误：网络连接中断' : '模拟错误：云环境连接超时', '暂时没有连上', '重试']
-        : pageName === 'mine' ? [member ? '果小哨会员' : expired ? '会员已到期' : '让小哨持续帮你留意', ...(page.data.membership.active ? ['升级长期套餐', '续费会员'] : ['¥7.00', '付费购买暂未开放', '不自动续费']), '提醒记录', ...(reminderPreview && reminderRecords.length ? ['删除记录', scenario === 'reminder-clearing' ? '清空中' : '清空'] : [])]
+        : pageName === 'mine' ? [member ? '果小哨会员' : expired ? '会员已到期' : '让小哨持续帮你留意', ...(page.data.membership.active ? ['延长会员'] : ['¥7.00', '付费购买暂未开放', '不自动续费']), '提醒记录', ...(reminderPreview && reminderRecords.length ? ['删除记录', scenario === 'reminder-clearing' ? '清空中' : '清空'] : [])]
         : pageName === 'follow' && follows.length ? [p.title, stores[0].name, ...(sheetPreview ? ['调整关注', '产品配置', '选择门店', '已选门店', p.title + ' · 2 家门店', scenario === 'sheet-saving' ? '正在保存' : '保存关注'] : [])]
         : pageName === 'follow' ? ['给心仪的配置留个小哨']
         : pageName === 'admin' ? ['运行统计', '128'] : [p.title, ...(sheetPreview ? ['产品配置', '选择门店', '已选门店'] : [])];
@@ -829,13 +880,29 @@ for (const scenario of scenarios) {
       }[scenario]);
       const expectedAlternativeCounts = alternativesPreview ? { colors: page.data.alternativeColorChoices.length, stores: page.data.alternativeStoreChoices.length, queries: page.data.alternativeSelectedColors.length } : undefined;
       const expectedReleaseNoteCount = releaseNotesPreview ? (page.data.showReleaseNotes ? page.data.visibleReleaseNotes.length : 0) : undefined;
-      manifest.push({ page: pageName, scenario, width, file: filename, tabPage: tabIndex >= 0, navigationHidden, previewDate: now.toISOString(), expectedText, forbiddenText, expectedAlternativeCounts, expectedReleaseNoteCount });
+      const expectedMembership = membershipNativePreview ? {
+        accountHeader: !page.data.contextualCheckout || !page.data.checkoutTarget || page.data.membership.active,
+        active: page.data.membership.active,
+        accountState: page.data.membership.active ? 'member' : page.data.membership.expired ? 'expired' : 'free',
+        packages: !page.data.paymentPendingId && (!page.data.membership.active || page.data.membershipUpgradeOpen) ? page.data.boot.memberProducts.length : 0,
+        utilityLinks: 6,
+        notificationEntryInMembership: !page.data.paymentPendingId,
+      } : undefined;
+      const expectedNotification = notificationTestPreview ? {
+        loading: page.data.loading, ready: page.data.ready, busy: page.data.busy,
+        balance: page.data.balance, blocked: page.data.blocked, canContinue: page.data.canContinue, pendingOther: page.data.pendingOther,
+        status: page.data.test && page.data.test.status, showTestRules: page.data.showTestRules, showTroubleshooting: page.data.showTroubleshooting,
+        feedback: page.data.test && page.data.test.feedback, error: Boolean(page.data.error),
+      } : undefined;
+      manifest.push({ page: pageName, scenario, width, file: filename, tabPage: tabIndex >= 0, navigationHidden, previewDate: now.toISOString(), expectedText, forbiddenText, expectedAlternativeCounts, expectedReleaseNoteCount, expectedMembership, expectedNotification });
     }
   }
 }
-const sourceHashes = fs.readdirSync(mini, { recursive: true }).filter(file => /\.(?:js|json|wxml|wxss)$/.test(file)).sort()
+const sourceHashes = fs.readdirSync(mini, { recursive: true }).filter(file => /\.(?:js|json|wxml|wxss|png|svg|webp|jpe?g|gif)$/i.test(file)).sort()
   .map(file => ({ file: file.replaceAll('\\', '/'), sha256: crypto.createHash('sha256').update(fs.readFileSync(path.join(mini, file))).digest('hex') }));
-fs.writeFileSync(path.join(out, 'manifest.json'), JSON.stringify({ generatedAt: new Date().toISOString(), source: mini, sourceHashes, renderer: 'offline WXML/WXSS approximation', previewDate: defaultPreviewDate.toISOString(), v2Features: v2Preview ? { contextualCheckout: true, resultNextAction: true, activationJourney: true, targetEvidence: true, growthEvents: false, experimentAssignments: true, launchGuide: true } : null, buttonConstraintProfile, rpxRoundingProfile, remoteImages: allowRemoteImages, expressionErrors: evaluationErrors.length, snapshots: manifest }, null, 2));
+fs.writeFileSync(path.join(out, 'manifest.json'), JSON.stringify({ generatedAt: new Date().toISOString(), source: mini, sourceHashes, renderer: 'offline WXML/WXSS approximation', previewDate: defaultPreviewDate.toISOString(), v2Features: v2Preview ? { contextualCheckout: true, resultNextAction: true, activationJourney: true, targetEvidence: true, growthEvents: false, experimentAssignments: true, launchGuide: true } : null, membershipNativePreview, notificationTestPreview, buttonConstraintProfile, buttonConstraintCss, rpxRoundingProfile, remoteImages: allowRemoteImages,
+  launchCalendarImagePolicy: { mode: allowRemoteImages ? 'remote-images-enabled' : 'offline-no-image-fallback', limitation: allowRemoteImages ? 'The build retains remote URLs; only a subsequent image-loading check can report whether they load.' : 'Remote calendar images are removed only from preview fixtures to simulate the real no-image fallback. This offline preview does not verify remote images.' },
+  expressionErrors: evaluationErrors.length, snapshots: manifest }, null, 2));
 fs.writeFileSync(path.join(out, 'evaluation-errors.json'), JSON.stringify(evaluationErrors, null, 2));
 const indexSnapshots = manifest.map(({ page, scenario, width, file }) => ({ page, scenario, width, file }));
 fs.writeFileSync(path.join(out, 'index.html'), `<!doctype html><html lang="zh-CN"><meta charset="utf-8"><title>果小哨 · 离线排版检查</title><style>body{font:15px/1.7 sans-serif;background:#eef5f0;color:#263d30;margin:20px}select,button{font:inherit;padding:6px;margin:4px}iframe{display:block;border:1px solid #bacabd;background:white;height:900px}p{max-width:900px}</style><h1>果小哨 · 离线排版检查</h1><p>使用当前源代码中的 WXML、WXSS 和页面格式化逻辑，模拟账户、库存、服务和长文本等状态。此工具不会调用云函数、付款或发送消息；浏览器排版不是微信渲染，最终以微信开发者工具及真机验证为准。选项根据已生成的页面联动显示。</p><select id="page" aria-label="页面"></select><select id="scenario" aria-label="场景"></select><select id="width" aria-label="宽度"></select><iframe id="frame" title="所选离线页面"></iframe><script>

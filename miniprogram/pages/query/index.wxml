@@ -8,7 +8,7 @@
   </view>
 
   <block wx:elif="{{!ready}}">
-    <view class="page-heading"><view class="page-title">门店取货查询</view><view class="page-subtitle">查门店取货信息，有变化让小哨提醒你</view></view>
+    <view class="page-heading brand-page-heading"><image class="brand-page-logo" src="/images/brand/logo-mint-144.png" mode="aspectFit" aria-hidden="true" /><view class="brand-page-copy"><view class="page-title">门店取货查询</view><view class="page-subtitle">查取货信息，有变化让小哨提醒</view></view></view>
     <view class="skeleton" aria-busy="true">
       <view class="skeleton-card"><view class="skeleton-line skeleton-title"></view><view class="skeleton-line"></view><view class="skeleton-line skeleton-short"></view><view class="skeleton-bar"></view></view>
       <view class="skeleton-card"><view class="skeleton-line skeleton-title"></view><view class="skeleton-line"></view><view class="skeleton-line skeleton-short"></view></view>
@@ -17,7 +17,7 @@
   </block>
 
   <block wx:else>
-    <view class="page-heading"><view class="page-title">门店取货查询</view><view class="page-subtitle">查门店取货信息，有变化让小哨提醒你</view></view>
+    <view class="page-heading brand-page-heading"><image class="brand-page-logo" src="/images/brand/logo-mint-144.png" mode="aspectFit" aria-hidden="true" /><view class="brand-page-copy"><view class="page-title">门店取货查询</view><view class="page-subtitle">查取货信息，有变化让小哨提醒</view></view></view>
     <view wx:if="{{addTipVisible}}" class="banner banner-ok add-tip"><text class="add-tip-text">点右上角「···」选「添加到我的小程序」，下次在微信首页下拉就能打开。</text><text class="add-tip-close tap-target" bindtap="onDismissAddTip" aria-role="button" aria-label="关闭提示">×</text></view>
     <view wx:if="{{announcement}}" class="banner banner-info">{{announcement}}</view>
     <view wx:if="{{!accountReady}}" class="banner banner-info small">{{accountError || '正在连接微信账户，你可以先选择商品和门店。'}}<button wx:if="{{accountError}}" class="btn btn-outline btn-sm mt" bindtap="onRetryAccount">重试账户连接</button></view>
@@ -36,8 +36,8 @@
 
     <button class="ui-disclosure query-guide-entry" hover-class="ui-control-pressed" bindtap="onOpenGuide">
       <view class="query-guide-copy">
-        <view class="query-guide-title"><text class="query-guide-badge">置顶</text><text class="ui-disclosure-label">发售日历与选购攻略</text></view>
-        <view class="tiny muted">从准备配置，到收到提醒后如何下单 · iPhone Duo</view>
+        <view class="query-guide-title"><image class="ui-icon" src="/images/ui/calendar.png" mode="aspectFit" aria-hidden="true" /><text class="ui-disclosure-label">发售日历与选购攻略</text></view>
+        <view class="tiny muted">从选择配置，到收到提醒后下单 · iPhone Duo</view>
       </view>
       <view class="ui-chevron"></view>
     </button>
@@ -60,7 +60,7 @@
         <button class="btn btn-primary btn-block mt" bindtap="onEditSelection">选择配置与门店</button>
       </view>
       <view wx:elif="{{!selectionCanCollapse}}" class="banner banner-warn small mt">{{selectionNotice}}</view>
-      <view wx:if="{{restriction}}" class="banner banner-warn mt">{{restriction}}</view>
+      <view wx:if="{{queryFailureMessage || restriction}}" class="banner banner-warn small mt" role="alert">{{queryFailureMessage || restriction}}</view>
       <view wx:if="{{selectionRestricted}}" class="banner banner-info small mt">此配置实时查询需会员。免费用户仍可按现有规则查看有权限的历史记录。</view>
       <button wx:if="{{selectionRestricted}}" class="btn btn-primary btn-block mt" disabled="{{!accountReady || !selectionCanCollapse}}" bindtap="onFollowSelection">查看此配置会员权益</button>
       <button wx:elif="{{restrictionReason === 'new_product_restricted'}}" class="btn btn-primary btn-block mt" bindtap="onEditSelection">改查其他配置</button>
@@ -89,6 +89,7 @@
       </view>
     </view>
 
+
     <view wx:if="{{resumeSetup}}" class="card journey-resume">
       <view class="journey-title">会员已生效，继续完成关注设置</view>
       <view class="small text-2 mt">你准备关注的配置已保留，保存关注后再确认微信提醒条件。</view>
@@ -96,7 +97,8 @@
     </view>
 
     <view wx:if="{{result}}" id="query-result" class="card query-result-card">
-      <view class="result-target-note {{resultTargetDifferent ? 'result-target-different' : ''}}">{{resultTargetDifferent ? '与当前选择不同 · 下方保留原查询结果' : '对应当前所选配置与门店'}}</view>
+      <view wx:if="{{queryFailureMessage}}" class="banner banner-warn small mb">本次查询未完成，下方保留上次查询结果。</view>
+      <view wx:else class="result-target-note {{resultTargetDifferent ? 'result-target-different' : ''}}">{{resultTargetDifferent ? '与当前选择不同 · 下方保留原查询结果' : '对应当前所选配置与门店'}}</view>
       <view class="result-product-row">
         <view class="result-product-media">
           <image wx:if="{{result.product.imageUrl}}" class="result-product-image {{result.product.imageFitClass}}" src="{{result.product.imageUrl}}" mode="aspectFit" aria-label="{{result.product.imageAlt || result.product.title}}" binderror="onResultImageError" />
@@ -240,53 +242,29 @@
 
 <view wx:if="{{calendarOpen && openingCalendar}}" class="opening-calendar-mask" catchtouchmove="onCalendarTouch">
   <view class="opening-calendar-panel" role="dialog" aria-modal="true" aria-label="新品发售日历">
-    <view class="poster-hero">
-      <image wx:if="{{openingCalendar.imageUrl}}" class="poster-hero-image" src="{{openingCalendar.imageUrl}}" mode="aspectFit" aria-label="{{openingCalendar.imageAlt || openingCalendar.title}}" binderror="onCalendarImageError" />
-      <view class="poster-hero-fade"></view>
-      <view class="poster-hero-top">
-        <text class="opening-calendar-brand">果小哨 · 新品日历</text>
-        <view class="opening-calendar-close" hover-class="ui-control-pressed" aria-role="button" aria-label="关闭发售日历" bindtap="onCloseCalendar"><text>×</text></view>
-      </view>
-      <view class="poster-hero-copy">
-        <view class="poster-title">{{openingCalendar.title}}</view>
-        <view class="poster-subtitle">折叠新形态 · 即将开启预购</view>
-        <view class="poster-tags">
-          <text class="poster-tag">折叠大屏</text>
-          <text class="poster-tag">旗舰芯片</text>
-          <text class="poster-tag">专业影像</text>
-        </view>
-      </view>
-      <view class="poster-slogan">更大的世界<br/>从此展开</view>
+    <view class="opening-calendar-header">
+      <view class="ui-label-with-icon"><image class="opening-calendar-logo" src="/images/brand/logo-mint-144.png" mode="aspectFit" aria-hidden="true" /><text class="opening-calendar-brand">果小哨 · 新品日历</text></view>
+      <button class="opening-calendar-close" hover-class="ui-control-pressed" aria-label="关闭发售日历" bindtap="onCloseCalendar"><text>×</text></button>
     </view>
-
-    <scroll-view scroll-y="{{true}}" class="opening-calendar-scroll">
+    <scroll-view scroll-y="{{true}}" class="opening-calendar-scroll {{openingCalendar.imageUrl ? '' : 'opening-calendar-scroll--compact'}}">
       <view class="opening-calendar-content">
-        <view class="poster-countdown" aria-live="polite">
-          <view class="poster-countdown-label">{{openingCalendar.countdown.label}}</view>
-          <view class="poster-countdown-value">{{openingCalendar.countdown.text}}</view>
+        <view class="poster-hero">
+          <view class="poster-title">{{openingCalendar.title}}</view>
+          <view wx:if="{{openingCalendar.imageUrl}}" class="poster-hero-media"><image class="poster-hero-image" src="{{openingCalendar.imageUrl}}" mode="aspectFit" aria-label="{{openingCalendar.imageAlt || openingCalendar.title}}" binderror="onCalendarImageError" /></view>
         </view>
         <view class="poster-milestones">
           <view class="poster-milestone">
-            <view class="poster-milestone-icon" aria-hidden="true">🛒</view>
-            <view>
-              <text class="poster-milestone-date">{{openingCalendar.preorderDateText}}</text>
-              <view class="small">{{openingCalendar.preorderText}}</view>
-            </view>
+            <text class="poster-milestone-date">{{openingCalendar.preorderDateText}}</text>
+            <view class="poster-milestone-label">{{openingCalendar.preorderTimeText}} 预购</view>
           </view>
           <view class="poster-milestone">
-            <view class="poster-milestone-icon" aria-hidden="true">🎁</view>
-            <view>
-              <text class="poster-milestone-date">{{openingCalendar.releaseDateText}}</text>
-              <view class="small">正式发售</view>
-            </view>
+            <text class="poster-milestone-date">{{openingCalendar.releaseDateText}}</text>
+            <view class="poster-milestone-label">正式发售</view>
           </view>
         </view>
-        <view class="calendar-month">{{openingCalendar.monthText}} · 北京时间</view>
-        <view class="calendar-grid"><view wx:for="{{openingCalendar.weekdays}}" wx:key="*this" class="calendar-weekday">{{item}}</view></view>
-        <view class="calendar-grid"><view wx:for="{{openingCalendar.cells}}" wx:key="key" class="calendar-cell {{item.label ? 'calendar-cell--event' : ''}} {{item.today ? 'calendar-cell--today' : ''}}"><text>{{item.day}}</text><text class="calendar-event">{{item.label}}</text></view></view>
-        <view class="tiny text-2 mt">日期来自 Apple 官方信息。取货查询以开放的配置为准，果小哨不会自动下单或保留库存。</view>
+        <view class="poster-source">Apple 官方时间 · 北京时间</view>
       </view>
     </scroll-view>
-    <view class="opening-calendar-actions"><button class="btn btn-primary btn-block" bindtap="onOpenGuide">查看选购攻略</button><checkbox-group bindchange="onCalendarMute"><label class="opening-calendar-mute"><checkbox value="mute" checked="{{calendarMuted}}" color="#008D55" /><text>本次发售不再提醒</text></label></checkbox-group><view class="tiny muted opening-calendar-footnote">关闭后可在查询页再次查看 · 默认每天展示一次</view></view>
+    <view class="opening-calendar-actions"><button class="btn btn-primary btn-block" bindtap="onOpenGuide">查看选购攻略</button><checkbox-group bindchange="onCalendarMute"><label class="opening-calendar-mute"><checkbox value="mute" checked="{{calendarMuted}}" color="#008D55" /><text>本次发售不再提醒</text></label></checkbox-group><view class="tiny muted opening-calendar-footnote">完整日历与查询开放说明见攻略</view></view>
   </view>
 </view>

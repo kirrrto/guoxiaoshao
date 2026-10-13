@@ -1,15 +1,58 @@
-.test-page { padding: 28rpx 24rpx 72rpx; }
-.test-card { background: var(--card); border: 1rpx solid var(--line); border-radius: 28rpx; padding: 32rpx; margin-bottom: 24rpx; }
-.test-tag { color: var(--green-dark); font-size: 24rpx; font-weight: 600; }
-.test-title { font-size: 42rpx; font-weight: 700; margin: 14rpx 0 20rpx; }
-.test-heading { font-size: 30rpx; font-weight: 600; margin-bottom: 16rpx; }
-.test-copy { color: var(--text-2); font-size: 26rpx; line-height: 1.7; margin: 16rpx 0; }
-.test-cost { padding: 24rpx; background: var(--green-soft); border-radius: 18rpx; font-weight: 600; margin: 24rpx 0; }
-.test-primary { background: var(--action-fill); color: var(--action-text); border-radius: 22rpx; margin-top: 28rpx; font-size: 28rpx; }
-.test-secondary { background: var(--surface-soft); color: var(--text); border-radius: 22rpx; margin-top: 18rpx; font-size: 26rpx; }
-.test-primary, .test-secondary { display: flex; align-items: center; justify-content: center; width: 100%; min-height: 88rpx; padding: 16rpx 20rpx; box-sizing: border-box; border: 0; line-height: 1.45; }
-.test-primary::after, .test-secondary::after { border: 0; }
-.test-error { color: var(--bad); font-size: 26rpx; line-height: 1.7; }
-.test-link { color: var(--green-dark); text-align: center; padding-top: 28rpx; }
-.test-feedback { border-top: 1rpx solid var(--line); margin-top: 28rpx; padding-top: 28rpx; }
-.test-tip { color: var(--text-3); font-size: 24rpx; line-height: 1.8; padding: 0 14rpx; }
+.test-page { box-sizing: border-box; width: 100%; max-width: 600px; margin: 0 auto; padding: 22px 16px calc(28px + env(safe-area-inset-bottom)); }
+.test-hero { display: flex; align-items: center; gap: 14px; margin: 0 2px 20px; min-width: 0; }
+.test-hero-icon { display: flex; align-items: center; justify-content: center; flex: none; width: 52px; height: 52px; background: var(--green-soft); border: 1px solid var(--control-line); border-radius: 16px; }
+.test-hero-art { display: block; width: 28px; height: 28px; }
+.test-hero-copy { min-width: 0; }
+.test-title { font-size: 22px; font-weight: 700; line-height: 1.4; color: var(--text); }
+.test-subtitle { margin-top: 5px; font-size: 13px; line-height: 1.6; color: var(--text-2); }
+.test-card { box-sizing: border-box; background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 20px; margin-bottom: 14px; min-width: 0; }
+.test-heading { font-size: 18px; line-height: 1.5; font-weight: 650; color: var(--text); }
+.test-copy { color: var(--text-2); font-size: 14px; line-height: 1.7; margin-top: 10px; overflow-wrap: anywhere; }
+.test-tag { margin-top: 12px; color: var(--green-dark); font-size: 12px; line-height: 1.6; }
+.test-status-heading { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.test-status-heading .test-heading { flex: 1; min-width: 0; }
+.test-status-dot { flex: none; width: 10px; height: 10px; border-radius: 50%; background: var(--text-2); }
+.test-status-accepted { background: var(--green-dark); }
+.test-status-sending, .test-status-uncertain, .test-status-authorized, .test-status-needs_authorization { background: var(--warn); }
+.test-status-failed { background: var(--bad); }
+.test-receipt { margin-top: 12px; color: var(--text-2); font-size: 12px; line-height: 1.6; }
+.test-actions { margin-top: 18px; }
+.test-actions-after-result { margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--line); }
+.test-cost { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 6px 12px; margin-bottom: 12px; font-size: 13px; line-height: 1.6; color: var(--text-2); }
+.test-cost-number { margin-right: 4px; color: var(--text); font-weight: 650; }
+/* Outrank WeChat button:not([size=mini]) while preserving native tap semantics. */
+.test-page .test-primary, .test-page .test-secondary, .test-page .test-disclosure { box-sizing: border-box; display: flex; align-items: center; justify-content: center; width: 100%; max-width: 100%; min-width: 0; min-height: 46px; height: auto; margin: 0; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; font-size: 14px; font-weight: 600; line-height: 1.5; white-space: normal; overflow-wrap: anywhere; }
+.test-page .test-primary { color: var(--action-text); background: var(--action-fill); border-color: transparent; }
+.test-page .test-secondary { color: var(--text); background: var(--surface-soft); }
+.test-primary::after, .test-secondary::after, .test-disclosure::after { border: 0; }
+.test-page .test-primary[disabled], .test-page .test-secondary[disabled] { opacity: .55; }
+.test-page .test-check, .test-page .test-signin { margin-top: 10px; }
+.test-action-caption { margin: 10px 0; color: var(--text-2); font-size: 12px; line-height: 1.65; }
+.test-error { margin-top: 16px; padding: 12px; color: var(--bad); background: var(--bad-soft); border-radius: 12px; font-size: 14px; line-height: 1.65; overflow-wrap: anywhere; }
+.test-operation { margin-top: 12px; color: var(--text-2); font-size: 13px; line-height: 1.65; overflow-wrap: anywhere; }
+.test-feedback { margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--line); }
+.test-feedback-title { font-size: 14px; line-height: 1.6; font-weight: 600; color: var(--text); }
+.test-feedback-actions { display: flex; gap: 10px; margin-top: 12px; }
+.test-feedback-actions .test-feedback-choice { flex: 1 1 0; width: 0; min-width: 0; padding: 11px 6px; font-size: 14px; }
+.test-page .test-choice-selected { color: var(--green-dark); border-color: var(--green-dark); background: var(--green-soft); }
+.test-feedback-note { margin-top: 10px; color: var(--text-2); font-size: 13px; line-height: 1.65; }
+.test-page .test-return { margin-top: 16px; }
+.test-page .test-disclosure { justify-content: space-between; gap: 12px; background: var(--surface-soft); color: var(--text); font-weight: 500; text-align: left; }
+.test-disclosure-label { flex: 1; min-width: 0; }
+.test-page .test-disclosure .ui-chevron { flex: none; }
+.test-troubleshooting .test-disclosure { margin-top: 12px; font-size: 14px; }
+.test-help-steps { margin-top: 12px; color: var(--text-2); font-size: 13px; line-height: 1.7; }
+.test-help-step + .test-help-step { margin-top: 10px; }
+.test-rules-card { padding: 8px; }
+.test-page .test-rules-toggle { background: transparent; border-color: transparent; }
+.test-disclosure-meta { display: flex; align-items: center; gap: 10px; flex: none; color: var(--green-dark); font-size: 12px; }
+.test-rules { padding: 4px 12px 12px; }
+.test-rule { color: var(--text-2); font-size: 13px; line-height: 1.75; }
+.test-rule + .test-rule { margin-top: 16px; }
+.test-rule-title { margin-bottom: 5px; color: var(--text); font-weight: 600; }
+.test-tip { padding: 0 8px; color: var(--text-2); font-size: 12px; line-height: 1.7; text-align: center; }
+@media (max-width: 359px) {
+  .test-page { padding-left: 12px; padding-right: 12px; }
+  .test-card { padding: 16px; }
+  .test-rules-card { padding: 6px; }
+}

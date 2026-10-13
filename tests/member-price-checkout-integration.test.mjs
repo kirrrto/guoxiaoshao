@@ -6,7 +6,7 @@ import { runtime } from './helpers/miniprogram-runtime.mjs';
 const require = createRequire(import.meta.url);
 const { createHandler } = require('../cloudfunctions/gxs_api/lib/app');
 const { orderKey } = require('../cloudfunctions/gxs_api/lib/payment/service');
-const { PROMOTION_ENDS_AT } = require('../cloudfunctions/gxs_api/lib/payment/plans');
+const { PROMOTION_ENDS_AT, QUOTE_TTL_MS } = require('../cloudfunctions/gxs_api/lib/payment/plans');
 const OPENID = 'oUSER000000000000000000001';
 const json = data => new Response(JSON.stringify(data), { status: 200 });
 
@@ -17,7 +17,7 @@ function checkout({ crossDuringLogin = false, losePreparedResponse = false } = {
     const route = new URL(url).pathname, body = options.body && JSON.parse(options.body);
     network.push(route);
     if (route === '/sns/jscode2session') {
-      if (crossDuringLogin) { f.advance(2000); crossDuringLogin = false; }
+      if (crossDuringLogin) { f.advance(QUOTE_TTL_MS); crossDuringLogin = false; }
       return json({ openid: OPENID, session_key: '9hAb/NEYUlkaMBEsmFgzig==' });
     }
     if (route === '/cgi-bin/stable_token') return json({ access_token: 'fixture-token', expires_in: 7200 });
@@ -64,36 +64,38 @@ test('real server products preserve refund and renewal terms in each actual page
   f.page.onUnload();
 });
 
-test('real page and service discard an unissued expired quote, re-confirm standard price, then pass the exact new server signature', async () => {
+test('real page and service discard an unissued expired quote, re-confirm the ongoing price, then pass the exact new server signature', async () => {
   const f = checkout({ crossDuringLogin: true }); await f.page.onLoad(); f.select('member_30d');
   await f.confirm();
   const first = f.rt.calls.find(value => value.action === 'member.createOrder');
   assert.equal(first.payload.expectedPriceFen, 1499);
   assert.equal(f.cashiers.length, 0); assert.equal(f.page.data.paymentPendingId, '');
-  assert.equal(f.page.data.boot.priceText, '¥30.00'); assert.match(f.page.data.paymentError, /重新确认/);
+  assert.equal(f.page.data.boot.priceText, '¥14.99'); assert.match(f.page.data.paymentError, /重新确认/);
   const cancelled = await f.order(first.payload.orderId);
   assert.equal(cancelled.status, 'cancelled'); assert.equal(cancelled.paymentPreparedAt, null); assert.equal(cancelled.amountFen, 1499);
+  assert.equal(cancelled.paymentSnapshot.version, 4);
+  assert.equal(Date.parse(cancelled.quoteExpiresAt) - Date.parse(cancelled.createdAt), QUOTE_TTL_MS);
   await f.confirm();
   const creates = f.rt.calls.filter(value => value.action === 'member.createOrder');
   assert.equal(creates.length, 2); assert.notEqual(creates[1].payload.orderId, first.payload.orderId);
-  assert.equal(creates[1].payload.expectedPriceFen, 3000);
-  assert.match(f.dialogs.at(-1).content, /30 天会员 · ¥30\.00/);
-  assert.doesNotMatch(f.dialogs.at(-1).content, /14\.99|优惠至/);
+  assert.equal(creates[1].payload.expectedPriceFen, 1499);
+  assert.match(f.dialogs.at(-1).content, /30 天会员 · ¥14\.99/);
+  assert.doesNotMatch(f.dialogs.at(-1).content, /恢复标准价|优惠至/);
   assert.equal(f.cashiers.length, 1);
   const signed = JSON.parse(f.cashiers[0].signData);
-  assert.equal(signed.goodsPrice, 3000); assert.equal(Object.hasOwn(signed, 'activitySellingPrice'), false);
-  assert.equal((await f.order(creates[1].payload.orderId)).amountFen, 3000);
+  assert.equal(signed.goodsPrice, 1499); assert.equal(Object.hasOwn(signed, 'activitySellingPrice'), false);
+  assert.equal((await f.order(creates[1].payload.orderId)).amountFen, 1499);
   f.page.onUnload();
 });
 
-test('a lost already-prepared response stays recoverable after the cutoff and grants only the original confirmed amount', async () => {
+test('a lost already-prepared response stays recoverable after quote expiry and grants only the original confirmed amount', async () => {
   const f = checkout({ losePreparedResponse: true }); await f.page.onLoad(); f.select('member_30d');
   await f.confirm();
   const id = f.page.data.paymentPendingId, created = await f.order(id);
   assert.ok(id); assert.ok(created.paymentPreparedAt); assert.equal(created.amountFen, 1499);
-  assert.equal(created.paymentSnapshot.goodsPrice, 3000); assert.equal(created.paymentSnapshot.activitySellingPrice, 1499);
-  f.advance(3000); await f.page.refresh({ quiet: true, force: true });
-  assert.equal(f.page.data.boot.priceText, '¥30.00');
+  assert.equal(created.paymentSnapshot.goodsPrice, 1499); assert.equal(created.paymentSnapshot.activitySellingPrice, null);
+  f.advance(QUOTE_TTL_MS + 1); await f.page.refresh({ quiet: true, force: true });
+  assert.equal(f.page.data.boot.priceText, '¥14.99');
   await f.page.onCheckPayment();
   assert.equal(f.page.data.paymentPendingId, id); assert.equal(f.cashiers.length, 0);
   assert.equal(f.rt.calls.filter(value => value.action === 'member.createOrder').length, 1);

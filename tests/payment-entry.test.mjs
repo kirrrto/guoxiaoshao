@@ -126,12 +126,14 @@ test('an authentic safe-mode delivery calls authoritative reconciliation and ack
 });
 
 for (const [planId, days, amount, standard] of [['member_30d', 30, 1499, 3000], ['member_365d', 365, 12900, 36000]]) {
-  test(`v3 ${planId} callbacks bind standard goods and actual paid price separately before authoritative reconciliation`, async () => {
+  for (const version of [3, 4]) test(`v${version} ${planId} callbacks bind immutable goods and actual paid price before authoritative reconciliation`, async () => {
     const f = await harness(); const productId = `new-standard-${days}`;
+    const goodsPrice = version === 3 ? standard : amount;
     await f.repo.saveOrder({ ...f.order, planId, amountFen: amount, days, productId,
       quoteExpiresAt: new Date(f.state.now.getTime() + 600000).toISOString(), paymentPreparedAt: f.state.now.toISOString(),
-      paymentSnapshot: { ...f.order.paymentSnapshot, version: 3, planId, priceFen: amount, goodsPrice: standard,
-        activitySellingPrice: amount, promotionEndsAt: '2026-11-30T16:00:00.000Z', days, productId } });
+      paymentSnapshot: { ...f.order.paymentSnapshot, version, planId, priceFen: amount, goodsPrice,
+        activitySellingPrice: version === 3 ? amount : null,
+        promotionEndsAt: version === 3 ? '2026-11-30T16:00:00.000Z' : null, days, productId } });
     let queries = 0;
     const entry = createPaymentEntry({ repo: f.repo, env, clock: () => new Date(f.state.now),
       fetchImpl: async url => {
@@ -140,11 +142,11 @@ for (const [planId, days, amount, standard] of [['member_30d', 30, 1499, 3000], 
         return new Response(JSON.stringify({ errcode: 0, order: { order_id: OUT, wx_order_id: 'platform-order-001', status: 2,
           order_type: 0, env_type: 1, order_fee: amount, paid_fee: amount, left_fee: amount } }));
       }, log: { warn() {} }, handleAction: async () => { throw new Error('unexpected user action'); } });
-    for (const overrides of [{ amount: amount, actualAmount: amount }, { amount: standard, actualAmount: standard }]) {
+    for (const overrides of [{ amount: version === 3 ? amount : standard, actualAmount: amount }, { amount: goodsPrice, actualAmount: standard }]) {
       assert.equal((await entry(callbackRequest({ overrides: { product: productId, ...overrides } }))).statusCode, 403);
     }
     assert.equal(queries, 0);
-    const request = callbackRequest({ overrides: { product: productId, amount: standard, actualAmount: amount } });
+    const request = callbackRequest({ overrides: { product: productId, amount: goodsPrice, actualAmount: amount } });
     assert.equal((await entry(request)).body, 'success');
     assert.equal((await entry(request)).body, 'success');
     assert.equal(queries, 2);

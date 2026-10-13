@@ -4,6 +4,14 @@ view, text { box-sizing: border-box; }
 .page { padding: 24rpx 24rpx 48rpx; }
 .page-bottom-space { height: 40rpx; }
 
+/* Decorative symbols always accompany a visible label. Keep PNGs crisp at 20px. */
+.ui-icon { display: block; flex: none; width: 20px; height: 20px; }
+.ui-label-with-icon { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.ui-label-with-icon > text { min-width: 0; }
+.brand-page-heading { display: flex; align-items: center; gap: 12px; }
+.brand-page-logo { display: block; flex: none; width: 44px; height: 44px; border-radius: 12px; }
+.brand-page-copy { flex: 1; min-width: 0; }
+
 /* 卡片 */
 .card {
   background: var(--card);
@@ -205,7 +213,7 @@ view, text, button, input, textarea, image, scroll-view, picker { box-sizing: bo
 .page.tab-page { padding-bottom: 98px; padding-bottom: calc(98px + constant(safe-area-inset-bottom)); padding-bottom: calc(98px + env(safe-area-inset-bottom)); }
 .page-heading { margin: 8rpx 10rpx 30rpx; }
 .page-title { font-size: 44rpx; font-weight: 700; line-height: 1.3; letter-spacing: -0.5rpx; }
-.page-subtitle { margin-top: 12rpx; color: var(--text-2); font-size: 25rpx; line-height: 1.65; }
+.page-subtitle { margin-top: 12rpx; color: var(--text-2); font-size: max(12px, 25rpx); line-height: 1.65; }
 .card { min-width: 0; border: 1rpx solid var(--glass-line); }
 .card-title { align-items: flex-start; flex-wrap: wrap; gap: 10rpx 16rpx; line-height: 1.45; }
 .card-title > text:first-child { flex: 1 1 220rpx; min-width: 0; white-space: normal; overflow-wrap: anywhere; }
@@ -222,8 +230,8 @@ view, text, button, input, textarea, image, scroll-view, picker { box-sizing: bo
 .btn-row .btn { flex: 1 1 180rpx; }
 /* Native WeChat button defaults have higher specificity than a lone class.
    Keep full-width actions and flex rows consistent with the actual renderer. */
-.btn.btn { box-sizing: border-box; min-width: 0; max-width: 100%; height: auto; margin: 0; padding: 18rpx 28rpx; line-height: 1.5; font-size: 30rpx; font-weight: 600; text-align: center; }
-.btn.btn-sm { padding: 12rpx 22rpx; min-height: 44px; line-height: 1.45; font-size: 26rpx; }
+.btn.btn { box-sizing: border-box; min-width: 0; max-width: 100%; height: auto; margin: 0; padding: 18rpx 28rpx; line-height: 1.5; font-size: max(14px, 30rpx); font-weight: 600; text-align: center; }
+.btn.btn-sm { padding: 12rpx 22rpx; min-height: 44px; line-height: 1.45; font-size: max(14px, 26rpx); }
 .btn.btn-block { width: 100%; }
 .btn.btn.mt { margin-top: 16rpx; }
 .btn.btn.mb { margin-bottom: 16rpx; }

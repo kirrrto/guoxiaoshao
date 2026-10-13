@@ -593,6 +593,19 @@ test('abandoning a paid order activates membership instead, and a network failur
   await offline.controller.abandon();
   assert.equal(offline.state().paymentPendingId, 'pay-existing-002');
   assert.match(offline.state().paymentError, /暂时无法确认.*订单号已保留/);
+  assert.equal(offline.state().paymentCanRetry, true, 'a failed abandon must keep continue-pay available');
+});
+
+test('a failed abandon never strands the buyer without a recovery action', async () => {
+  const rt = runtime({ handler: async () => { throw { code: 'payment_check_pending' }; } });
+  rt.storage.set(STORAGE_PREFIX + encodeURIComponent('wx-app:account-a'), { orderId: 'pay-stuck-001' });
+  rt.controller.sync({ userKey: 'wx-app:account-b' }, product); rt.controller.sync({ userKey: 'wx-app:account-a' }, product);
+  await rt.controller.abandon();
+  assert.equal(rt.state().paymentPendingId, 'pay-stuck-001');
+  assert.equal(rt.state().paymentCanRetry, true);
+  assert.equal(rt.state().paymentBusy, false);
+  assert.equal(rt.state().paymentChecking, false);
+  assert.match(rt.state().paymentError, /继续支付|重试放弃|查询/);
 });
 
 test('a previously abandoned order found on another device is treated as closed', async () => {

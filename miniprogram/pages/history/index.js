@@ -12,6 +12,12 @@ const { historyInsights } = require('../../utils/observation-insights');
 const SELECTION_KEY = 'gxs_history_selection_v1';
 const SOURCE_TEXT = { auto: '自动监测', manual: '手动查询' };
 
+function queryFailureNotice(error) {
+  if (operation.uncertain(error)) return '结果尚未确认，再次查询相同条件会恢复原请求，不重复扣次。';
+  const code = error && error.code, mapped = fmt.reasonText(code);
+  return mapped && mapped !== code ? mapped : '本次历史查询未完成，请稍后重试。';
+}
+
 function selectionKey(value) {
   return `${value && value.partNumber || ''}|${[...new Set(value && value.storeNumbers || [])].sort().join(',')}`;
 }
@@ -120,6 +126,7 @@ Page({
     querying: false,
     result: null,
     restriction: null,
+    queryFailureMessage: '',
     collector: null,
     loadingMore: false,
     moreError: null,
@@ -227,7 +234,7 @@ Page({
     this.setData({
       accountReady: true,
       accountError: null,
-      ...(membershipRestoresAccess ? { restriction: null } : {}),
+      ...(membershipRestoresAccess ? { restriction: null, queryFailureMessage: '' } : {}),
       boot: {
         member: boot.membership.active,
         balance: boot.quota.balance,
@@ -317,7 +324,7 @@ Page({
     this.selectionNeedsReview = false;
     this.restrictionReason = null;
     this.setData({ dayKey: item.dayKey, selectionSummary: selectionSummary(this.selection, catalog), resultTargetDifferent: false,
-      result: null, moreError: null, restriction: null, restoreWarning: false,
+      result: null, moreError: null, restriction: null, queryFailureMessage: '', restoreWarning: false,
       restoreNotice: '查询条件已恢复，尚未查询，也未扣次。请核对后点击「查看历史」，查询时按账户规则计次。' });
     writeSession(localKey(SELECTION_KEY), pickerValue);
   },
@@ -340,7 +347,7 @@ Page({
     const summary = selectionSummary(e.detail, this.catalog);
     this.selectionNeedsReview = Boolean(e.detail.partNumber && (!summary || !summary.valid));
     this.restrictionReason = null;
-    this.setData({ restriction: null, selectionSummary: summary, resultTargetDifferent: this.hasDifferentResult(e.detail) });
+    this.setData({ restriction: null, queryFailureMessage: '', selectionSummary: summary, resultTargetDifferent: this.hasDifferentResult(e.detail) });
     const restored = this.restoredSelection;
     if (!restored || restored.partNumber !== e.detail.partNumber || JSON.stringify(restored.storeNumbers.slice().sort()) !== JSON.stringify((e.detail.storeNumbers || []).slice().sort())) {
       this.restoredSelection = null;
@@ -353,7 +360,7 @@ Page({
     this.dateExplicit = true;
     this.restoredSelection = null;
     this.restrictionReason = null;
-    this.setData({ dayKey: e.detail.value, restriction: null, restoreNotice: null, restoreWarning: false, resultTargetDifferent: this.hasDifferentResult(this.selection, e.detail.value) });
+    this.setData({ dayKey: e.detail.value, restriction: null, queryFailureMessage: '', restoreNotice: null, restoreWarning: false, resultTargetDifferent: this.hasDifferentResult(this.selection, e.detail.value) });
   },
 
   hasDifferentResult(selection = this.selection, dayKey = this.data.dayKey) {
@@ -417,12 +424,18 @@ Page({
     // Let the server distinguish insufficient funds from an already-debited
     // retry of this request. Do not block recovery using a stale local balance.
     this.restrictionReason = null;
-    this.setData({ querying: true, restriction: null, restoreNotice: null, restoreWarning: false });
+    this.setData({ querying: true, restriction: null, queryFailureMessage: '', restoreNotice: null, restoreWarning: false });
     const payload = { partNumber: selection.partNumber, storeNumbers: selection.storeNumbers.slice(), dayKey };
     const historyQueryId = operation.begin('h', payload);
     try {
       const response = await call('history.list', { historyQueryId, ...payload });
-      if (response.reason === 'query_in_progress') { if (!this.pageRetired) this.setData({ restriction: '原请求正在处理中，请稍后重试；重试不会重复扣次。' }); return; }
+      if (response.reason === 'query_in_progress') {
+        if (!this.pageRetired) {
+          const message = '原请求正在处理中，请稍后重试；重试不会重复扣次。';
+          this.setData({ restriction: message, queryFailureMessage: message });
+        }
+        return;
+      }
       operation.finish('h', historyQueryId);
       invalidateBootstrap();
       const quota = publishQueryBalance(response);
@@ -431,7 +444,8 @@ Page({
       const balancePatch = quota.balance === null ? {} : { 'boot.balance': quota.balance };
       if (!response.ok) {
         this.restrictionReason = response.reason;
-        this.setData({ restriction: fmt.reasonText(response.reason), ...balancePatch });
+        const message = queryFailureNotice({ code: response.reason });
+        this.setData({ restriction: message, queryFailureMessage: message, ...balancePatch });
         if (boot.member && ['insufficient_credits', 'new_product_history_restricted'].includes(response.reason)) {
           try { this.applyBoot(await getBootstrap({ force: true })); } catch (error) { /* keep the confirmed denial until the account reconnects */ }
         }
@@ -439,13 +453,13 @@ Page({
       }
       this.historyRequest = { historyQueryId, ...payload };
       this.historySnapshot = response;
-      this.setData({ result: presentHistory(response, this.catalog, this.historyRequest), ...balancePatch, moreError: null, coverageExpanded: false, resultTargetDifferent: this.hasDifferentResult() });
+      this.setData({ result: presentHistory(response, this.catalog, this.historyRequest), ...balancePatch, queryFailureMessage: '', moreError: null, coverageExpanded: false, resultTargetDifferent: this.hasDifferentResult() });
       if (boot.taskAvailable) this.completeTask();
     } catch (error) {
       if (!operation.uncertain(error)) operation.finish('h', historyQueryId);
       if (this.pageRetired) return;
-      if (operation.uncertain(error)) this.setData({ restriction: '结果尚未确认，再次查询相同条件会恢复原请求，不重复扣次。' });
-      showError(error);
+      const message = queryFailureNotice(error);
+      this.setData({ restriction: message, queryFailureMessage: message });
     } finally {
       if (!this.pageRetired) this.setData({ querying: false });
     }

@@ -51,12 +51,11 @@ function membershipBenefitPlans(products) {
 }
 
 function presentMemberProduct(item) {
-  const promotion = item.promotion || {}, end = Date.parse(promotion.endsAt);
+  const promotion = item.promotion || {};
   const discounted = promotion.active === true && Number.isSafeInteger(item.standardPriceFen)
-    && item.standardPriceFen > item.priceFen && Number.isFinite(end);
+    && item.standardPriceFen > item.priceFen;
   return { ...item, priceText: fmt.fen(item.priceFen), standardPriceText: discounted ? fmt.fen(item.standardPriceFen) : '',
-    promotionText: discounted ? '限时优惠' : '',
-    promotionDeadlineText: discounted ? `优惠至 ${fmt.fmtDateTime(end - 1).slice(0, 16)}（北京时间）` : '',
+    promotionText: discounted ? '优惠价' : '',
     dailyPriceText: `约 ¥${(item.priceFen / item.days / 100).toFixed(2)} / 天`,
     benefitText: productBenefit(item),
     benefitShort: `${item.limits && item.limits.maxFollows || 3} 配置 × ${item.limits && item.limits.maxStoresPerFollow || 3} 门店`,
@@ -139,6 +138,7 @@ const presentTasks = (tasks, quota) => (tasks || []).map(task => ({ ...task,
 const presentMembership = membership => ({ ...membership, expired: !membership.active && Boolean(membership.expiresAt),
   daysLeft: membership.active ? Math.ceil(membership.remainingMs / 86400000) : 0,
   enhancedExpiresText: membership.enhancedExpiresAt ? fmt.fmtDateTime(membership.enhancedExpiresAt) : '',
+  expiresShortText: membership.expiresAt ? fmt.fmtDateTime(membership.expiresAt).slice(0, 16) : '',
   expiresText: membership.expiresAt ? fmt.fmtDateTime(membership.expiresAt) : null });
 function redemptionErrorText(error) {
   const code = error && error.code, details = error && error.details || {};
@@ -195,6 +195,7 @@ Page({
     showMembershipRules: false,
     showPurchaseRules: false,
     membershipBenefitPlans: [],
+    membershipCanExpand: false,
     membershipUpgradeOpen: false,
     purchaseMode: 'purchase',
     membershipUpgradePreview: null,
@@ -495,6 +496,9 @@ Page({
       purchaseMode: membership.active ? !accountChanged && this.data.purchaseMode === 'upgrade' ? 'upgrade' : 'renew' : 'purchase',
       membershipUpgradePreview: renewalPreview(selected, membership),
       membershipBenefitPlans: membershipBenefitPlans(products),
+      membershipCanExpand: Boolean(membership.active && products.some(product => product.days >= 30 && product.enabled
+        && product.limits && boot.limits && Number.isInteger(boot.limits.maxFollows) && Number.isInteger(boot.limits.maxStoresPerFollow)
+        && (product.limits.maxFollows > boot.limits.maxFollows || product.limits.maxStoresPerFollow > boot.limits.maxStoresPerFollow))),
       boot: {
         identity: boot.identity,
         features: boot.features || {},
@@ -657,11 +661,13 @@ Page({
   observeMembershipOffer() {
     this.disconnectOfferObserver();
     if (this.pageRetired || this.pageVisible === false || !this.data.ready || !this.data.boot || this.data.checkoutLoading || !this.data.boot.features.growthEvents
-      || this.data.membership.active && !this.data.membershipUpgradeOpen && !this.data.paymentPendingId || typeof this.createIntersectionObserver !== 'function') return;
+      || this.data.paymentPendingId || this.data.membership.active && !this.data.membershipUpgradeOpen || typeof this.createIntersectionObserver !== 'function') return;
     // Actual native visibility, never a synthetic exposure at bootstrap time.
-    this.offerObserver = this.createIntersectionObserver({ thresholds: [0, 0.01] });
-    this.offerObserver.relativeToViewport().observe('#membership-offer', result => {
-      if (this.pageRetired || this.pageVisible === false || !result || result.intersectionRatio <= 0) return;
+    const observer = this.createIntersectionObserver({ thresholds: [0, 0.01] });
+    this.offerObserver = observer;
+    observer.relativeToViewport().observe('#membership-offer', result => {
+      if (this.offerObserver !== observer || this.pageRetired || this.pageVisible === false || this.data.paymentPendingId
+        || this.data.membership.active && !this.data.membershipUpgradeOpen || !result || result.intersectionRatio <= 0) return;
       const key = `${this.orderAccount()}|${this.data.selectedPlanId}|${this.checkoutContext ? this.checkoutContext.targetSignature : 'mine'}`;
       if (!this.offerSeen) this.offerSeen = new Set();
       if (this.offerSeen.has(key)) return;
@@ -686,7 +692,9 @@ Page({
         const { paymentPendingPlanId, paymentDiagnosticCode, ...view } = patch;
         this.paymentPendingPlanId = paymentPendingPlanId;
         this.paymentDiagnosticCode = paymentDiagnosticCode;
-        this.setData(view);
+        const pendingChanged = hasKey(view, 'paymentPendingId') && view.paymentPendingId !== this.data.paymentPendingId;
+        if (pendingChanged) this.disconnectOfferObserver();
+        this.setData(view, () => { if (pendingChanged) this.observeMembershipOffer(); });
         if (hasKey(view, 'paymentPendingId')) this.setOrderRecords(this.data.orders);
         if (paymentPendingPlanId && paymentPendingPlanId !== this.data.selectedPlanId) this.selectMemberProduct(paymentPendingPlanId);
       },
@@ -698,7 +706,7 @@ Page({
         invalidateBootstrap(); invalidateFollows(); this.ordersLoadedAt = 0;
         this.setData({ membership: presentMembership(membership), showOrders: true });
         this.setData({ membershipUpgradeOpen: false, purchaseMode: membership.active ? 'renew' : 'purchase',
-          membershipUpgradePreview: renewalPreview(this.data.boot.memberProduct, membership) });
+          membershipUpgradePreview: renewalPreview(this.data.boot.memberProduct, membership) }, () => this.observeMembershipOffer());
         this.resumeMemberFollow(membership);
         await this.loadOrders({ force: true });
       },
@@ -732,31 +740,40 @@ Page({
     const consentOrder = this.data.paymentPendingId;
     const packageText = this.data.paymentOrderSummary || `${this.data.boot.memberProduct.days} 天会员 · ${this.data.boot.priceText}`;
     const consentTerms = JSON.stringify({ priceFen: this.data.boot.memberProduct.priceFen, days: this.data.boot.memberProduct.days, notice });
-    const promotionNotice = !consentOrder && this.data.boot.memberProduct.promotionDeadlineText
-      ? `\n${this.data.boot.memberProduct.promotionDeadlineText}，截止后恢复标准价 ${fmt.fen(this.data.boot.memberProduct.standardPriceFen)}。` : '';
     const extension = renewalPreview(this.data.boot.memberProduct, this.data.membership);
     const extensionNotice = this.data.membership && this.data.membership.active
       ? `\n\n${extension.extensionText}，剩余有效期保留，不抵扣差价。${extension.expiresAtText ? '\n预计到期：' + extension.expiresAtText + '，以支付确认后的账户为准。' : ''}` : '';
     this.setData({ paymentConfirming: true });
     this.trackConversion('offer_cta_clicked');
     const intent = checkout || (!this.data.contextualCheckout ? this.legacyMemberFollow() : null);
-    const confirmed = await new Promise(resolve => {
-      if (typeof wx.showModal !== 'function') { resolve(false); return; }
-      wx.showModal({
-        title: '购买须知',
-        content: `${packageText}${promotionNotice}\n\n${notice}${extensionNotice}${intent ? '\n\n开通后继续设置关注：' + intent.title + (intent.storeText ? '\n门店：' + intent.storeText : '') + '\n提醒需你主动授权，保存前可再次确认。' : ''}\n\n确认即表示已阅读并同意上述说明。`,
-        confirmText: '同意购买',
-        confirmColor: '#00C375',
-        cancelText: '取消',
-        success: result => resolve(Boolean(result.confirm)),
-        fail: () => resolve(false),
+    let confirmed = false;
+    try {
+      confirmed = await new Promise(resolve => {
+        if (typeof wx.showModal !== 'function') { resolve(false); return; }
+        let settled = false;
+        const settle = value => { if (!settled) { settled = true; resolve(value); } };
+        const canTime = typeof setTimeout === 'function' && typeof clearTimeout === 'function';
+        const timer = canTime ? setTimeout(() => settle(false), 15000) : null;
+        wx.showModal({
+          title: '购买须知',
+          content: `${packageText}\n\n${notice}${extensionNotice}${intent ? '\n\n开通后继续设置关注：' + intent.title + (intent.storeText ? '\n门店：' + intent.storeText : '') + '\n提醒需你主动授权，保存前可再次确认。' : ''}\n\n确认即表示已阅读并同意上述说明。`,
+          confirmText: '同意购买',
+          confirmColor: '#00C375',
+          cancelText: '取消',
+          success: result => { if (canTime) clearTimeout(timer); settle(Boolean(result.confirm)); },
+          fail: () => { if (canTime) clearTimeout(timer); settle(false); },
+        });
       });
-    });
+    } finally {
+      if (!this.pageRetired) this.setData({ paymentConfirming: false });
+    }
     if (this.pageRetired) return;
-    this.setData({ paymentConfirming: false });
     if (!confirmed || this.pageVisible === false || this.data.redeeming || selectedPlanId !== this.data.selectedPlanId
       || consentGeneration !== (this.paymentConsentGeneration || 0) || consentAccount !== this.data.boot.identity.userKey
       || consentOrder !== this.data.paymentPendingId) return;
+    // Keep the controller's product aligned with the card the user just paid for.
+    const latestSelected = (this.data.boot.memberProducts || []).find(item => item.planId === this.data.selectedPlanId) || this.data.boot.memberProduct;
+    if (latestSelected) this.ensurePaymentController().sync(this.data.boot.identity, latestSelected);
     const latestPackage = this.data.paymentOrderSummary || `${this.data.boot.memberProduct.days} 天会员 · ${this.data.boot.priceText}`;
     const latestTerms = JSON.stringify({ priceFen: this.data.boot.memberProduct.priceFen, days: this.data.boot.memberProduct.days, notice: this.data.boot.purchaseNotice });
     if (consentTerms !== latestTerms || packageText !== latestPackage) {
@@ -782,19 +799,27 @@ Page({
     const consentAccount = this.data.boot.identity.userKey;
     const consentOrder = this.data.paymentPendingId;
     this.setData({ paymentConfirming: true });
-    const confirmed = await new Promise(resolve => {
-      if (typeof wx.showModal !== 'function') { resolve(false); return; }
-      wx.showModal({
-        title: '放弃这笔订单',
-        content: '放弃前会先向微信核对一次：已付款会直接开通会员，确认没有付款才会放弃，之后可以重新购买。',
-        confirmText: '确认放弃',
-        cancelText: '再等等',
-        success: result => resolve(Boolean(result.confirm)),
-        fail: () => resolve(false),
+    let confirmed = false;
+    try {
+      confirmed = await new Promise(resolve => {
+        if (typeof wx.showModal !== 'function') { resolve(false); return; }
+        let settled = false;
+        const settle = value => { if (!settled) { settled = true; resolve(value); } };
+        const canTime = typeof setTimeout === 'function' && typeof clearTimeout === 'function';
+        const timer = canTime ? setTimeout(() => settle(false), 15000) : null;
+        wx.showModal({
+          title: '放弃这笔订单',
+          content: '放弃前会先向微信核对一次：已付款会直接开通会员，确认没有付款才会放弃，之后可以重新购买。',
+          confirmText: '确认放弃',
+          cancelText: '再等等',
+          success: result => { if (canTime) clearTimeout(timer); settle(Boolean(result.confirm)); },
+          fail: () => { if (canTime) clearTimeout(timer); settle(false); },
+        });
       });
-    });
+    } finally {
+      if (!this.pageRetired) this.setData({ paymentConfirming: false });
+    }
     if (this.pageRetired) return;
-    this.setData({ paymentConfirming: false });
     if (!confirmed || this.pageVisible === false || this.data.redeeming
       || consentGeneration !== (this.paymentConsentGeneration || 0) || consentAccount !== this.data.boot.identity.userKey
       || consentOrder !== this.data.paymentPendingId) return;

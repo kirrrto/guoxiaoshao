@@ -99,7 +99,7 @@ test('clear skips pending or unknown records and only accepts settled partial re
 test('an abandoned created order with issued parameters and no confirmed unpaid status remains visible', async () => {
   const f = await fixture();
   for (const [i, patch] of [
-    { providerStatus: null, paymentPreparedAt: at }, { providerStatus: 2 }, { providerStatus: '0' },
+    { providerStatus: 2 }, { providerStatus: '0' },
     { providerStatus: 0, transactionId: 'paid-after-abandon' }, { providerStatus: 0, paidAt: at },
     { providerStatus: 0, abandonedAt: null }, { providerStatus: 0, lastReconciledAt: 'invalid' },
   ].entries()) {
@@ -109,6 +109,15 @@ test('an abandoned created order with issued parameters and no confirmed unpaid 
     assert.equal(result.hiddenCount, 0); assert.equal(result.retainedCount, 1);
     assert.equal((await f.repo.getOrder(order._id)).userHiddenAt, undefined);
   }
+});
+
+test('an abandoned checkout that only failed verification can be hidden and still accepts a late payment', async () => {
+  const f = await fixture();
+  const order = await put(f, 'abandoned-unverified-01', { status: 'created', paidAt: null, fulfilledAt: null, transactionId: null,
+    abandonedAt: at, lastReconciledAt: at, providerStatus: null, paymentPreparedAt: at });
+  const result = ok(await f.call('member.deleteRecord', { orderId: order.orderId }));
+  assert.equal(result.hiddenCount, 1); assert.equal(result.retainedCount, 0);
+  assert.ok((await f.repo.getOrder(order._id)).userHiddenAt);
 });
 
 test('contradictory cancellation with a payment or entitlement still requires confirmation', async () => {

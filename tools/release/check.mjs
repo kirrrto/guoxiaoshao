@@ -31,8 +31,12 @@ for (const name of ['gxs_api', 'cloudbase_auth', 'gxs_monitor']) {
   check(`${name}: package and lock versions match release ${project.version}`, pkg.version === project.version && lock.version === project.version && lock.packages[''].version === project.version);
   check(`${name}: exact SDK version and integrity lock`, pkg.dependencies['wx-server-sdk'] === '4.0.2' && lock.packages['node_modules/wx-server-sdk'].version === '4.0.2' && lock.packages['node_modules/wx-server-sdk'].integrity);
   check(`${name}: deployable package has no external local links`, !Object.values(pkg.dependencies).some(value => /^(?:file:|link:|workspace:)/.test(value)) && !Object.values(lock.packages).some(value => value.link));
-  check(`${name}: security overrides and locks are consistent`, pkg.overrides?.axios === '0.34.0' && pkg.overrides?.['lodash.unset'] === '4.18.0'
-    && lock.packages['node_modules/axios']?.version === '0.34.0' && lock.packages['node_modules/lodash.unset']?.version === '4.18.0');
+  check(`${name}: security overrides and locks are consistent`, pkg.overrides?.axios === '0.34.0'
+    && pkg.overrides?.['@cloudbase/database'] === '1.5.1'
+    && lock.packages['node_modules/axios']?.version === '0.34.0'
+    && lock.packages['node_modules/@cloudbase/database']?.version === '1.5.1'
+    && !lock.packages['node_modules/lodash.set']);
+  check(`${name}: no prototype-pollution lodash.set in the deployable tree`, !lock.packages['node_modules/lodash.set'] && !JSON.stringify(lock.packages).includes('"lodash.set"'));
   const sdkRequire = createRequire(path.join(root, `cloudfunctions/${name}/package.json`));
   try { const sdk = sdkRequire('wx-server-sdk'); check(`${name}: SDK entry points installed`, typeof sdk.init === 'function' && typeof sdk.getWXContext === 'function'); }
   catch { check(`${name}: SDK entry points installed (run npm ci)`, false); }
@@ -89,7 +93,7 @@ const report = { checkedAt: new Date().toISOString(), version: project.version, 
   { item: 'Virtual payment callback, production credentials and real-device payment/refund', status: 'requires cloud gateway, credential and real-order verification; local mocks never prove a payment succeeded' },
   { item: '300 simultaneous querying members, with representative distinct targets and acceptable latency/freshness', status: 'requires real staging-cloud load acceptance; same-target memory tests and server request rates do not prove 300-user capacity' },
   { item: 'Actual observations across Beijing midnight and business-stall alert delivery/recovery', status: 'requires deployed observation evidence and a tested operator alert rule; a heartbeat or structured log alone is insufficient' },
-  { item: 'CloudBase lodash.set advisory in unused realtime watch dependency', status: 'reviewed upstream dependency risk; no patched lodash.set package is available, no watch path is used by this project; must retain security review and recheck before publication' }
+  { item: 'CloudBase lodash.set prototype pollution', status: 'removed from the deployable tree by overriding @cloudbase/database to 1.5.1 (bson only); npm audit reports 0 vulnerabilities in all three cloud functions' }
 ] };
 report.monitorBundle = monitorBundle;
 report.deliveryTargets = deliveryTargets;

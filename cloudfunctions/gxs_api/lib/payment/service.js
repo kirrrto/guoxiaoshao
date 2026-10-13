@@ -27,8 +27,10 @@ function paymentProviderFor(ctx, planId = DEFAULT_PLAN_ID) {
   const product = configuredProduct(ctx, planId);
   const env = ctx.paymentEnv || process.env;
   const config = { ...ctx.config.virtualPayment, productId: product.productId, priceFen: product.priceFen,
-    goodsPrice: product.standardPriceFen,
-    activitySellingPrice: product.promotion && product.promotion.active ? product.priceFen : null,
+    // goodsPrice is the actual charged unit price. Strikethrough "standard"
+    // prices are UI-only and must not enter the WeChat signature.
+    goodsPrice: product.priceFen,
+    activitySellingPrice: null,
     days: product.days, enabled: product.enabled };
   // Include effective terms so a warm invocation cannot retain the promotion
   // across its deadline. At most one cached provider per logical plan.
@@ -245,7 +247,24 @@ async function abandonPurchase(ctx, user, clientId) {
         return resultOf(ctx, result.order, 'cancelled');
       }
       if (existing.userKey !== user._id || existing.orderId !== clientId) conflict();
-      const result = await reconcileLocked(ctx, existing, { permitUnprepared: true });
+      let result;
+      try {
+        result = await reconcileLocked(ctx, existing, { permitUnprepared: true });
+      } catch (error) {
+        // Verification outages must not trap an unpaid checkout forever.
+        // Contradictory evidence and in-flight payment leases still block.
+        // A late payment of an abandoned order remains fulfillable.
+        const code = error && error.code;
+        const openUnpaid = existing.status === 'created' && !existing.transactionId && !existing.fulfilledAt && !existing.abandonedAt;
+        const verificationOutage = error instanceof PaymentProtocolError
+          || ['payment_check_pending', 'payment_timeout', 'payment_invalid_order_response', 'payment_transport_unavailable',
+            'payment_consumer_appid_mismatch', 'payment_consumer_secret_missing', 'payment_appkey_missing',
+            'payment_access_token_failed'].includes(code);
+        if (!openUnpaid || !verificationOutage || code === 'payment_evidence_mismatch' || code === 'payment_pending') throw error;
+        const nowIso = nowOf(ctx).toISOString();
+        const order = await ctx.repo.updateOrder(existing._id, { abandonedAt: nowIso, lastReconciledAt: nowIso });
+        return resultOf(ctx, order, 'abandoned_unverified');
+      }
       let order = result.order;
       // A failed query is not proof that nothing was paid. Only a successful
       // reconciliation (or an intent that never issued signatures) gets here.
@@ -272,7 +291,12 @@ async function createPurchase(ctx, user, clientId, loginCode, requestedPlanId, e
         }
         const reconciled = await reconcileLocked(ctx, order, { acknowledge: true, permitUnprepared: true });
         order = reconciled.order;
-        if (!reconciled.canPrepare || order.abandonedAt) return { ...reconciled, payment: null,
+        // Unpaid open checkouts may re-enter the cashier on the same order id
+        // when the platform never confirmed a payment status. Paid, pending
+        // (status 0/1) and abandoned orders never receive a new signature.
+        const reopenCashier = (reconciled.canPrepare || (order.status === 'created' && !order.transactionId
+          && !order.fulfilledAt && order.providerStatus == null)) && !order.abandonedAt;
+        if (!reopenCashier) return { ...reconciled, payment: null,
           pending: !order.abandonedAt && ['created', 'pending'].includes(reconciled.providerState) };
       }
       // Reusing an existing intent always retains its immutable plan, even if
@@ -285,14 +309,17 @@ async function createPurchase(ctx, user, clientId, loginCode, requestedPlanId, e
       if (!order) {
         const nowIso = nowOf(ctx).toISOString();
         const vp = ctx.config.virtualPayment;
-        const snapshot = { version: planId === DEFAULT_PLAN_ID ? 1 : 3,
+        const snapshot = { version: planId === DEFAULT_PLAN_ID ? 1 : 4,
           ...(planId === DEFAULT_PLAN_ID ? {} : { planId }), provider: PROVIDER, appid: user.appid, offerId: vp.offerId,
           productId: product.productId, priceFen: product.priceFen, days: product.days, currency: 'CNY', env: 0, buyQuantity: 1,
-          ...(planId === DEFAULT_PLAN_ID ? {} : { goodsPrice: product.standardPriceFen,
-            activitySellingPrice: product.promotion.active ? product.priceFen : null,
+          // goodsPrice is the charged unit price. Standard/strikethrough prices
+          // stay UI-only and never enter the signed snapshot.
+          ...(planId === DEFAULT_PLAN_ID ? {} : { goodsPrice: product.priceFen,
+            activitySellingPrice: null,
             promotionEndsAt: product.promotion.active ? product.promotion.endsAt : null }) };
+        const promotionEnd = product.promotion && product.promotion.active ? Date.parse(product.promotion.endsAt) : NaN;
         const quoteExpiresAt = new Date(Math.min(Date.parse(nowIso) + QUOTE_TTL_MS,
-          product.promotion && product.promotion.active ? Date.parse(product.promotion.endsAt) : Infinity)).toISOString();
+          Number.isFinite(promotionEnd) ? promotionEnd : Infinity)).toISOString();
         const created = await ctx.repo.createOrderIfAbsent({ _id: id, outTradeNo: id, orderId: clientId,
           userKey: user._id, appid: user.appid, openid: user.openid, productId: product.productId, planId,
           type: 'membership_order', provider: PROVIDER, source: 'virtual_payment',

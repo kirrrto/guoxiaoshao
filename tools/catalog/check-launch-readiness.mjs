@@ -80,7 +80,8 @@ function main() {
   report.catalogSha256 = hash(raw);
   report.cloudBundleMatchesLocal = fs.existsSync(bundleFile) && hash(fs.readFileSync(bundleFile)) === report.catalogSha256;
   if (!report.cloudBundleMatchesLocal) { report.passed = false; report.errors.push('cloud_catalog_bundle_out_of_sync'); }
-  const output = path.join(root, 'evidence/verification/2.0.0/launch-readiness.json');
+  const version = require('../../package.json').version;
+  const output = path.join(root, 'evidence/verification', version, 'launch-readiness.json');
   fs.mkdirSync(path.dirname(output), { recursive: true });
   fs.writeFileSync(output, `${JSON.stringify(report, null, 2)}\n`);
   console.log(JSON.stringify({ passed: report.passed, output, launches: report.launches.map(launch => ({ familyKey: launch.familyKey, products: launch.catalogProductCount, supported: launch.effectiveSupportedCount, blockers: launch.blockers })), errors: report.errors }, null, 2));

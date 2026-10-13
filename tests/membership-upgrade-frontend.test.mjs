@@ -77,6 +77,23 @@ test('legacy product snapshots never advertise enhanced slots based only on a lo
   assert.equal(card.configs, 3); assert.equal(card.stores, 3); assert.equal(card.enhanced, false);
 });
 
+test('the extra-slot entry requires an available product above the current server-issued allowance', () => {
+  const { page, boot } = account();
+  const expandedProducts = products.map((product, index) => ({ ...product,
+    limits: { maxFollows: index ? 4 : 3, maxStoresPerFollow: index ? 4 : 3 } }));
+  for (const [current, offered, active, expected] of [
+    [{ maxFollows: 3, maxStoresPerFollow: 3 }, expandedProducts, true, true],
+    [{ maxFollows: 4, maxStoresPerFollow: 4 }, expandedProducts, true, false],
+    [{ maxFollows: 3, maxStoresPerFollow: 3 }, products, true, false],
+    [{ maxFollows: 3, maxStoresPerFollow: 3 }, expandedProducts.map(product => ({ ...product, enabled: false })), true, false],
+    [{ maxFollows: 3, maxStoresPerFollow: 3 }, expandedProducts, false, false],
+    [{}, expandedProducts, true, false],
+  ]) {
+    page.applyBoot({ ...boot, limits: current, memberProducts: offered, membership: { ...boot.membership, active } });
+    assert.equal(page.data.membershipCanExpand, expected);
+  }
+});
+
 test('collapsed purchase details do not bypass the selected product notice and final consent', async () => {
   const { rt, page, boot } = account(false);
   const note = '月卡测试说明：一次性虚拟服务，一经售出不予退款。';
@@ -98,14 +115,14 @@ test('collapsed purchase details do not bypass the selected product notice and f
   assert.equal(rt.calls.length, 0);
 });
 
-const promotion = { active: true, endsAt: '2026-11-30T16:00:00.000Z', timezone: 'Asia/Shanghai' };
+const promotion = { active: true, endsAt: null, timezone: 'Asia/Shanghai' };
 function promotionalProducts(active = true) {
   return products.map(value => value.days === 7 ? value : { ...value,
     priceFen: value.days === 30 ? active ? 1499 : 3000 : active ? 12900 : 36000,
     standardPriceFen: value.days === 30 ? 3000 : 36000, promotion: { ...promotion, active } });
 }
 
-test('monthly and annual offer views use server prices, standard prices, per-day amounts and the Beijing deadline', () => {
+test('ongoing monthly and annual offers use server prices and do not invent a price-restoration deadline', () => {
   const { page, boot } = account(false);
   page.applyBoot({ ...boot, memberProducts: promotionalProducts() });
   const [week, month, year] = page.data.boot.memberProducts;
@@ -114,21 +131,21 @@ test('monthly and annual offer views use server prices, standard prices, per-day
   assert.equal(month.dailyPriceText, '约 ¥0.50 / 天');
   assert.equal(year.priceText, '¥129.00'); assert.equal(year.standardPriceText, '¥360.00');
   assert.equal(year.dailyPriceText, '约 ¥0.35 / 天');
-  assert.equal(month.promotionText, '限时优惠');
-  assert.equal(month.promotionDeadlineText, '优惠至 2026-11-30 23:59（北京时间）');
+  assert.equal(month.promotionText, '优惠价');
+  assert.equal(month.promotionDeadlineText, undefined);
   page.onSelectMemberProduct({ currentTarget: { dataset: { planId: 'member_365d' } } });
   assert.equal(page.data.boot.priceText, '¥129.00');
   assert.equal(page.data.boot.memberProduct.days, 365);
 });
 
-test('a server snapshot after promotion expiry shows standard prices without a stale offer label', () => {
+test('a changed server snapshot with inactive offers follows its prices without a stale offer label', () => {
   const { page, boot } = account(false);
   page.applyBoot({ ...boot, memberProducts: promotionalProducts() });
   page.onSelectMemberProduct({ currentTarget: { dataset: { planId: 'member_30d' } } });
   page.applyBoot({ ...boot, memberProducts: promotionalProducts(false) });
   assert.equal(page.data.boot.priceText, '¥30.00');
   for (const value of page.data.boot.memberProducts) {
-    assert.equal(value.standardPriceText, ''); assert.equal(value.promotionText, ''); assert.equal(value.promotionDeadlineText, '');
+    assert.equal(value.standardPriceText, ''); assert.equal(value.promotionText, ''); assert.equal(value.promotionDeadlineText, undefined);
   }
   page.onSelectMemberProduct({ currentTarget: { dataset: { planId: 'member_365d' } } });
   assert.equal(page.data.boot.priceText, '¥360.00');
@@ -153,8 +170,7 @@ test('a safely changed monthly quote updates the actual account page and require
   rt.wx.showModal = value => { modal = value; };
   let buying = page.onBuyMembership();
   assert.match(modal.content, /30 天会员 · ¥14\.99/);
-  assert.match(modal.content, /2026-11-30 23:59（北京时间）/);
-  assert.match(modal.content, /恢复标准价 ¥30\.00/);
+  assert.doesNotMatch(modal.content, /优惠至|恢复标准价|2026-11-30/);
   assert.match(modal.content, /一经售出不予退款/);
   modal.success({ confirm: true }); await buying;
   assert.equal(creates, 1); assert.equal(cashiers, 0);

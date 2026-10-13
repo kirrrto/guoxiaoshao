@@ -1,50 +1,25 @@
 <view class="page guide-page">
   <view class="guide-hero">
     <view class="guide-title">果小哨 · 选购指南</view>
-    <view class="guide-subtitle">选好心仪配置，下一步更清楚。</view>
-    <view class="small text-2">从选购准备、开启提醒，到官方下单与取货。</view>
+    <view class="guide-subtitle">从选择配置，到收到提醒后下单。</view>
   </view>
 
   <view wx:if="{{calendars.length}}" class="card">
-    <button class="ui-disclosure" hover-class="ui-control-pressed" bindtap="onToggleCalendar" aria-expanded="{{calendarExpanded}}"><view><text class="ui-disclosure-label">新品发售日历</text><view class="tiny muted">{{calendars[0].title}} · {{calendars[0].preorderText}}</view></view><view class="ui-chevron {{calendarExpanded ? 'ui-chevron--up' : 'ui-chevron--down'}}"></view></button>
+    <button class="ui-disclosure" hover-class="ui-control-pressed" bindtap="onToggleCalendar" aria-expanded="{{calendarExpanded}}"><view><view class="ui-label-with-icon"><image class="ui-icon" src="/images/ui/calendar.png" mode="aspectFit" aria-hidden="true" /><text class="ui-disclosure-label">新品发售日历</text></view><view class="tiny muted">{{calendars[0].title}} · {{calendars[0].preorderText}}</view></view><view class="ui-chevron {{calendarExpanded ? 'ui-chevron--up' : 'ui-chevron--down'}}"></view></button>
     <block wx:if="{{calendarExpanded}}">
       <view wx:for="{{calendars}}" wx:for-item="calendar" wx:key="id" class="guide-calendar">
         <view class="poster-hero">
-          <image wx:if="{{calendar.imageUrl}}" class="poster-hero-image" src="{{calendar.imageUrl}}" mode="aspectFit" aria-label="{{calendar.imageAlt || calendar.title}}" binderror="onCalendarImageError" data-index="{{index}}" />
-          <view class="poster-hero-fade"></view>
-          <view class="poster-hero-top">
-            <text class="opening-calendar-brand">果小哨 · 新品日历</text>
-            <text class="pill pill-ok">{{calendar.phase}}</text>
-          </view>
-          <view class="poster-hero-copy">
-            <view class="poster-title">{{calendar.title}}</view>
-            <view class="poster-subtitle">折叠新形态 · 即将开启预购</view>
-            <view class="poster-tags">
-              <text class="poster-tag">折叠大屏</text>
-              <text class="poster-tag">旗舰芯片</text>
-              <text class="poster-tag">专业影像</text>
-            </view>
-          </view>
-          <view class="poster-slogan">更大的世界<br/>从此展开</view>
-        </view>
-        <view class="poster-countdown" aria-live="polite">
-          <view class="poster-countdown-label">{{calendar.countdown.label}}</view>
-          <view class="poster-countdown-value">{{calendar.countdown.text}}</view>
+          <view class="poster-title">{{calendar.title}}</view>
+          <view wx:if="{{calendar.imageUrl}}" class="poster-hero-media"><image class="poster-hero-image" src="{{calendar.imageUrl}}" mode="aspectFit" aria-label="{{calendar.imageAlt || calendar.title}}" binderror="onCalendarImageError" data-index="{{index}}" /></view>
         </view>
         <view class="poster-milestones">
           <view class="poster-milestone">
-            <view class="poster-milestone-icon" aria-hidden="true">🛒</view>
-            <view>
-              <text class="poster-milestone-date">{{calendar.preorderDateText}}</text>
-              <view class="small">{{calendar.preorderText}}</view>
-            </view>
+            <text class="poster-milestone-date">{{calendar.preorderDateText}}</text>
+            <view class="poster-milestone-label">{{calendar.preorderTimeText}} 预购</view>
           </view>
           <view class="poster-milestone">
-            <view class="poster-milestone-icon" aria-hidden="true">🎁</view>
-            <view>
-              <text class="poster-milestone-date">{{calendar.releaseDateText}}</text>
-              <view class="small">正式发售</view>
-            </view>
+            <text class="poster-milestone-date">{{calendar.releaseDateText}}</text>
+            <view class="poster-milestone-label">正式发售</view>
           </view>
         </view>
         <view class="calendar-month">{{calendar.monthText}} · 北京时间</view>

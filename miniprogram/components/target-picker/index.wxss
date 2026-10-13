@@ -1,4 +1,5 @@
 /* Component styles intentionally use class selectors only (WeChat isolation). */
+.ui-icon { display: block; flex: none; width: 20px; height: 20px; }
 .picker, .field, .label, .value, .chip, .tab, .banner, .product-preview, .product-image-box, .product-image, .product-copy, .image-placeholder { box-sizing: border-box; }
 .picker { width: 100%; min-width: 0; color: var(--text); overflow-wrap: anywhere; }
 .section-label { color: var(--text-2); font-size: 24rpx; margin: 22rpx 0 14rpx; }
@@ -65,6 +66,13 @@
 .search-hint, .search-summary, .muted, .store-result-city { color: var(--text-2); }
 .store-result-name { color: var(--text); }
 .search-clear { min-height: 44px; }
+
+/* Isolated components do not receive page typography. Keep small-phone choices readable. */
+.label, .value, .tab, .chip, .search-input, .search-placeholder, .store-result-name, .store-result-action { font-size: max(14px, 28rpx); }
+.section-label, .small, .tiny, .image-placeholder, .search-clear, .search-hint, .search-summary, .store-result-city, .search-empty, .picker-count { font-size: max(12px, 24rpx); }
+.picker-section-heading { font-size: max(16px, 30rpx); }
+.product-copy { font-size: max(14px, 28rpx); }
+.search-input { min-height: 44px; }
 
 /* Dark mode: page color variables inherit into this isolated component. */
 /* 按下反馈 */

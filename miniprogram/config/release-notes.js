@@ -8,12 +8,22 @@
 // Keep technical details and complete acceptance records in release documents.
 const RELEASE_NOTES = [
   {
+    version: '2.1.0',
+    title: '会员与微信提醒体验升级',
+    dateText: '更新记录 · 2026-10-13',
+    highlights: [
+      '会员标识更醒目，套餐与权益展示更清晰。',
+      '会员区可体验微信提醒，发送结果与收信反馈更直观。',
+      '优化页面排版与购买流程，修复待确认订单卡住的问题。',
+    ],
+  },
+  {
     version: '2.0.0',
     title: '选购与关注体验升级',
-    dateText: '候选更新 · 2026-10-11',
+    dateText: '更新记录 · 2026-10-11',
     highlights: [
       '开屏与攻略统一为 iPhone Duo 海报，预购倒计时与日历置顶更醒目。',
-      '月卡与年卡限时优惠，套餐价格、权益和购买记录一目了然。',
+      '月卡与年卡优惠价，套餐价格、权益和购买记录一目了然。',
       '保留配置继续开通，改善启动、切页与付款结果提示。',
     ],
   },

@@ -15,9 +15,12 @@ function canClearRecord(order) {
   if (order.status !== 'created' || !hasTime(order.abandonedAt) || order.provider !== 'wechat_virtual_payment'
     || order.transactionId || order.paidAt || order.fulfilledAt || order.entitlementFulfilled === true
     || !hasTime(order.lastReconciledAt)) return false;
-  // abandonPurchase confirms an unpaid provider status, or that no payment
-  // parameters were ever issued. A late payment remains reconcilable by ID.
-  return [0, 1].includes(order.providerStatus) || (order.providerStatus == null && !order.paymentPreparedAt);
+  // Explicitly abandoned unpaid checkouts may be hidden even when a signature
+  // was issued and the platform never confirmed status. A late payment still
+  // reconciles by order id. Paid-looking provider status stays visible.
+  if ([0, 1].includes(order.providerStatus)) return true;
+  if (order.providerStatus == null && !order.paymentPreparedAt) return true;
+  return order.providerStatus == null && hasTime(order.abandonedAt);
 }
 
 function memberRecordMethods(transaction) {

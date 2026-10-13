@@ -18,7 +18,7 @@ const { launchView } = require('../../utils/product-launch');
 const { canOfferLiveChoices } = require('../../utils/observation-insights');
 const { createCheckoutContext } = require('../../utils/checkout-context');
 const conversion = require('../../utils/conversion-events');
-const { activeCalendars, shouldOpenCalendar, countdownView } = require('../../utils/launch-calendar');
+const { activeCalendars, shouldOpenCalendar } = require('../../utils/launch-calendar');
 
 const SELECTION_KEY = 'gxs_query_selection_v1';
 const RESULT_KEY = 'gxs_query_result_v1';
@@ -94,12 +94,20 @@ function queryNotice(response) {
   const retryHint = dailyBudget ? ' 预计北京时间次日 00:00 可重试。' : response.retryAfterMs > 0
     ? ` 预计约 ${response.retryAfterMs >= 60000 ? Math.ceil(response.retryAfterMs / 60000) + ' 分钟' : Math.ceil(response.retryAfterMs / 1000) + ' 秒'}后可重试。` : '';
   if (!response.ok) {
-    const reason = dailyBudget ? '今日实时查询暂时不可用，本次未扣次。' : fmt.reasonText(response.reason);
+    const mapped = fmt.reasonText(response.reason);
+    const reason = dailyBudget ? '今日实时查询暂时不可用，本次未扣次。'
+      : mapped && mapped !== response.reason ? mapped : '本次查询未完成，请稍后重试。';
     return reason + retryHint;
   }
   const partial = response.partial ? '部分门店暂未查询成功，请查看各店状态。' : '';
   const shared = response.sharedResult ? '已展示最近核实的结果，采集时间见各门店。' : '';
   return partial || shared ? partial + shared + (response.partial ? retryHint : '') : null;
+}
+
+function queryFailureNotice(error) {
+  if (operation.uncertain(error)) return '本次结果尚未确认。再次查询相同目标会恢复原请求，不重复扣次。';
+  const code = error && error.code, mapped = fmt.reasonText(code);
+  return mapped && mapped !== code ? mapped : '本次查询未完成，请稍后重试。';
 }
 
 function presentFollowTargets(follows) {
@@ -140,6 +148,7 @@ Page({
     resultIsCache: false,
     resultTargetDifferent: false,
     restriction: null,
+    queryFailureMessage: '',
     restrictionReason: null,
     collector: null,
     announcement: null,
@@ -303,32 +312,8 @@ Page({
       this.calendarStorageKey = key;
       this.setData({ openingCalendar: calendar, calendarOpen: true, calendarMuted: false });
       this.syncCalendarOverlay();
-      this.startCalendarCountdown();
       writeSession(key, { id: calendar.id, day: fmt.fmtDate(Date.now()), muted: false });
     } finally { this.calendarReadPending = false; }
-  },
-  startCalendarCountdown() {
-    this.stopCalendarCountdown();
-    this.calendarCountdownEpoch = (this.calendarCountdownEpoch || 0) + 1;
-    const epoch = this.calendarCountdownEpoch;
-    const tick = () => {
-      if (this.pageRetired || epoch !== this.calendarCountdownEpoch || !this.data.calendarOpen) return;
-      const calendar = this.data.openingCalendar;
-      if (!calendar) return;
-      const countdown = countdownView(calendar, Date.now());
-      if (countdown) this.setData({ 'openingCalendar.countdown': countdown });
-      if (!this.pageRetired && epoch === this.calendarCountdownEpoch && this.data.calendarOpen) {
-        this.calendarCountdownTimer = setTimeout(tick, 60000);
-      }
-    };
-    this.calendarCountdownTimer = setTimeout(tick, 60000);
-  },
-  stopCalendarCountdown() {
-    this.calendarCountdownEpoch = (this.calendarCountdownEpoch || 0) + 1;
-    if (this.calendarCountdownTimer) {
-      clearTimeout(this.calendarCountdownTimer);
-      this.calendarCountdownTimer = null;
-    }
   },
   syncCalendarOverlay() {
     const bar = typeof this.getTabBar === 'function' ? this.getTabBar() : null;
@@ -338,7 +323,6 @@ Page({
   onCloseCalendar() {
     if (this.data.openingCalendar && this.calendarStorageKey) writeSession(this.calendarStorageKey,
       { id: this.data.openingCalendar.id, day: fmt.fmtDate(Date.now()), muted: this.data.calendarMuted });
-    this.stopCalendarCountdown();
     this.setData({ calendarOpen: false });
     this.syncCalendarOverlay();
   },
@@ -467,7 +451,7 @@ Page({
       this.alternativeResponse = null;
       this.querySnapshotNeedsRequery = Boolean(this.querySnapshot);
       this.setData({ querying: false, alternativeLoading: false, liveResultRestricted: true, nextAction: null, evidenceCard: null, storeChoices: [], followTargets: [], followRefreshedText: null,
-        alternativeMatches: [], acceptedStoreNumbers: [], restriction: null, restrictionReason: null });
+        alternativeMatches: [], acceptedStoreNumbers: [], restriction: null, queryFailureMessage: '', restrictionReason: null });
     }
     this.accountVerificationPending = false;
     this.accountSnapshot = boot;
@@ -485,7 +469,7 @@ Page({
       liveResultRestricted: true,
       nextAction: null,
       evidenceCard: null,
-      ...(membershipRestoresAccess ? { restriction: null, restrictionReason: null } : {}),
+      ...(membershipRestoresAccess ? { restriction: null, queryFailureMessage: '', restrictionReason: null } : {}),
       boot: {
         member: boot.membership.active,
         freeReminder: false,
@@ -730,7 +714,7 @@ Page({
     this.sharedTargetRequiresTap = false;
     this.onSelectionInteraction();
     this.setData({ ...this.selectionView(this.selection), sharedSelection: true, sharedTargetPending: false,
-      sharedTargetReady: false, sharedTargetError: null, restriction: null, restrictionReason: null });
+      sharedTargetReady: false, sharedTargetError: null, restriction: null, queryFailureMessage: '', restrictionReason: null });
     return true;
   },
 
@@ -763,7 +747,7 @@ Page({
     if (this.pageRetired || !this.data.boot || !quota) return;
     const restored = quota.balance >= quota.queryCost && this.data.restrictionReason === 'insufficient_credits';
     this.setData({ 'boot.balance': quota.balance, 'boot.queryCost': quota.queryCost, 'boot.signedInToday': quota.signedInToday,
-      ...(restored ? { restriction: null, restrictionReason: null } : {}) });
+      ...(restored ? { restriction: null, queryFailureMessage: '', restrictionReason: null } : {}) });
   },
 
   async onSignin() {
@@ -803,7 +787,7 @@ Page({
     this.selection = selection;
     const view = this.selectionView(selection);
     this.selectionNeedsReview = selectionNeedsReview(selection, view.selectionCanCollapse);
-    this.setData({ restriction: null, restrictionReason: null, sharedSelection: false, ...view });
+    this.setData({ restriction: null, queryFailureMessage: '', restrictionReason: null, sharedSelection: false, ...view });
     this.resolveSharedTarget();
     this.refreshJourney();
     writeSession(localKey(SELECTION_KEY), { partNumber: selection.partNumber, storeNumbers: selection.storeNumbers });
@@ -929,7 +913,7 @@ Page({
     // Server balance is authoritative. A zero balance may be the debit from
     // the same uncertain request, which must still be allowed to resume.
     this.onSelectionInteraction();
-    this.setData({ querying: true, restriction: null, restrictionReason: null });
+    this.setData({ querying: true, restriction: null, queryFailureMessage: '', restrictionReason: null });
     const focus = { visible: Boolean(this.visible), visibilityEpoch: this.visibilityEpoch || 0,
       interactionEpoch: this.selectionInteractionEpoch || 0, queryEpoch: this.queryFocusEpoch = (this.queryFocusEpoch || 0) + 1 };
     const payload = { partNumber: selection.partNumber, storeNumbers: selection.storeNumbers.slice() };
@@ -937,7 +921,13 @@ Page({
     try {
       const response = await call('query.pickup', { queryId, ...payload });
       if (accountEpoch !== (this.accountEpoch || 0)) return;
-      if (response.reason === 'query_in_progress') { if (!this.pageRetired) this.setData({ restriction: '原查询仍在处理中，请稍后重试；重试不会重复扣次。' }); return; }
+      if (response.reason === 'query_in_progress') {
+        if (!this.pageRetired) {
+          const message = '原查询仍在处理中，请稍后重试；重试不会重复扣次。';
+          this.setData({ restriction: message, queryFailureMessage: message });
+        }
+        return;
+      }
       operation.finish('q', queryId);
       invalidateBootstrap();
       const quota = publishQueryBalance(response);
@@ -948,7 +938,8 @@ Page({
         this.lastQueryUncertain = true;
         if (response.reason === 'new_product_restricted' && this.querySnapshot && this.querySnapshot.product.partNumber === selection.partNumber) this.querySnapshotPermissionDenied = true;
         const sameTarget = targetKey(selection) === targetKey(this.selection);
-        this.setData({ restriction: (sameTarget ? '' : '上次查询：') + queryNotice(response),
+        const message = (sameTarget ? '' : '上次查询：') + queryNotice(response);
+        this.setData({ restriction: message, queryFailureMessage: message,
           restrictionReason: sameTarget ? response.reason : null, ...balancePatch });
         this.refreshJourney();
         if (boot.member && ['insufficient_credits', 'new_product_restricted'].includes(response.reason)) {
@@ -966,7 +957,7 @@ Page({
       this.lastQueryUncertain = false;
       this.alternativeResponse = null;
       this.setData({ alternativeParts: [], alternativeStores: [], alternativeMatches: [], alternativeRead: false, alternativeError: '', alternativePreparedNotice: '', alternativeQueryNote: '' });
-      this.setData({ result, resultIsCache: false, liveResultRestricted: true, nextAction: null, evidenceCard: null, resultTargetDifferent: resultHasDifferentTarget(result, this.selection), ...balancePatch, restriction: queryNotice(response), acceptedStoreNumbers: [], alternativeNotice: '' });
+      this.setData({ result, resultIsCache: false, liveResultRestricted: true, nextAction: null, evidenceCard: null, resultTargetDifferent: resultHasDifferentTarget(result, this.selection), ...balancePatch, restriction: queryNotice(response), queryFailureMessage: '', acceptedStoreNumbers: [], alternativeNotice: '' });
       this.refreshStoreChoices();
       this.refreshJourney();
       writeSession(localKey(RESULT_KEY), { ...response, accountUserKey: accountUserKey || null });
@@ -977,8 +968,8 @@ Page({
       if (this.pageRetired || accountEpoch !== (this.accountEpoch || 0)) return;
       this.lastQueryUncertain = true;
       this.refreshJourney();
-      if (operation.uncertain(error)) this.setData({ restriction: '本次结果尚未确认。再次查询相同目标会恢复原请求，不重复扣次。' });
-      showError(error);
+      const message = queryFailureNotice(error);
+      this.setData({ restriction: message, queryFailureMessage: message });
     } finally {
       if (!this.pageRetired && accountEpoch === (this.accountEpoch || 0)) this.setData({ querying: false });
     }

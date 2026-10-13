@@ -133,8 +133,8 @@
     },
     {
       "path": "payment/plans.js",
-      "bytes": 3053,
-      "sha256": "19ff483f5f3206670300078cf7e3b16babe88a502c2853b18d08513c99f24761"
+      "bytes": 3693,
+      "sha256": "d5fc79eaf48ee64529184e6fef748fe4b131f9abca9e3fbb3b7d73d7e88a4a66"
     },
     {
       "path": "repo/atomic-ops.js",
@@ -153,8 +153,8 @@
     },
     {
       "path": "repo/member-records.js",
-      "bytes": 3196,
-      "sha256": "5366a06ad334056ce4c052d6c1bd54aeb0d154185a6941e7855831b5d40c5a88"
+      "bytes": 3367,
+      "sha256": "0557422485ec544e7b5670777a43cc7dbc6579f42f44c76d4fd49f49dc2f14cc"
     },
     {
       "path": "repo/notification-test.js",

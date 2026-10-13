@@ -3,7 +3,7 @@
 .latest-row:last-child { border-bottom: none; }
 .event { display: flex; gap: 18rpx; padding: 24rpx 0; border-bottom: 1rpx solid var(--line); }
 .event:last-child { border-bottom: none; }
-.event-time { width: 160rpx; flex: none; color: var(--text-2); font-size: 23rpx; padding-top: 4rpx; font-variant-numeric: tabular-nums; white-space: nowrap; word-break: normal; }
+.event-time { width: 160rpx; flex: none; color: var(--text-2); font-size: max(12px, 23rpx); padding-top: 4rpx; font-variant-numeric: tabular-nums; white-space: nowrap; word-break: normal; }
 .event-body { flex: 1; min-width: 0; }
 .history-selection-card > .card-title { padding-bottom: 20rpx; border-bottom: 1rpx solid var(--line); margin-bottom: 8rpx; }
 .history-selection-card > .card-title { align-items: center; }
@@ -14,8 +14,8 @@
 .event-body .row-between > text:first-child { flex-basis: 120rpx; }
 .history-date-control { display: flex; align-items: center; justify-content: space-between; gap: 24rpx; min-height: 44px; box-sizing: border-box; margin-top: 24rpx; padding: 20rpx 24rpx; border: 1rpx solid var(--line); border-radius: 12px; background: var(--surface-soft); color: var(--text-2); }
 .history-date-copy { display: flex; flex-direction: column; gap: 8rpx; flex: 1; min-width: 0; overflow-wrap: anywhere; }
-.history-date-label { font-size: 24rpx; line-height: 1.5; }
-.history-date-value { color: var(--text); font-size: 28rpx; font-weight: 600; line-height: 1.5; font-variant-numeric: tabular-nums; }
+.history-date-label { font-size: max(12px, 24rpx); line-height: 1.5; }
+.history-date-value { color: var(--text); font-size: max(14px, 28rpx); font-weight: 600; line-height: 1.5; font-variant-numeric: tabular-nums; }
 .history-date-control--disabled { opacity: .55; }
 .history-recent { display: flex; align-items: center; gap: 16rpx; }
 .history-recent-copy { flex: 1; min-width: 0; overflow-wrap: anywhere; }

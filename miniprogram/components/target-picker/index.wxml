@@ -1,5 +1,5 @@
 <view class="picker">
-  <view class="picker-section-heading"><text class="picker-step">01</text><text>产品配置</text></view>
+  <view class="picker-section-heading"><image class="ui-icon" src="/images/ui/device.png" mode="aspectFit" aria-hidden="true" /><text>产品配置</text></view>
   <block wx:if="{{categories.length}}">
   <view class="section-label">产品类别</view>
   <scroll-view scroll-x class="scroll-tabs" enhanced show-scrollbar="{{false}}"><view wx:for="{{categories}}" wx:key="key" class="tab {{index === categoryIndex ? 'on' : ''}}" data-index="{{index}}" hover-class="is-pressed" hover-stay-time="60" bindtap="onCategoryTap">{{item.name}}</view></scroll-view>
@@ -13,7 +13,7 @@
   <view wx:if="{{product && !product.supported}}" class="banner banner-warn small mt">此配置的取货接口尚未通过验证，暂不开放查询和关注。</view>
   </block>
   <view wx:if="{{selectionNote}}" class="banner banner-info small mt">{{selectionNote}}</view>
-  <view class="picker-section-heading picker-store-heading"><text class="picker-step">02</text><text>选择门店{{storesOptional ? '（可选）' : ''}}</text><text class="picker-count">{{selectedStores.length}} / {{maxStores}}</text></view>
+  <view class="picker-section-heading picker-store-heading"><image class="ui-icon" src="/images/ui/store.png" mode="aspectFit" aria-hidden="true" /><text>选择门店{{storesOptional ? '（可选）' : ''}}</text><text class="picker-count">{{selectedStores.length}} / {{maxStores}}</text></view>
   <view class="store-search"><view class="search-glass" aria-hidden="true"></view><input class="search-input" value="{{searchKeyword}}" maxlength="60" placeholder="搜索城市、商场或门店" placeholder-class="search-placeholder" confirm-type="search" adjust-position="{{!inSheet}}" bindinput="onSearchInput" /><view wx:if="{{searchKeyword}}" class="search-clear" bindtap="onClearSearch" role="button" aria-label="清空搜索">清空</view></view>
   <view class="search-hint">支持城市拼音和首字母，如 guangzhou、gz</view>
   <block wx:if="{{searchActive}}">

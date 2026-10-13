@@ -143,8 +143,11 @@ function createPaymentController({ wx: wxApi, call, onUpdate, onResolved, onDiag
         if (order.status === 'refunded' && membershipValid(membership)) await onResolved({ order, membership, activated: false });
       } else {
         const providerPending = order.paymentPending === true || order.providerStatus === 0 || order.providerStatus === 1;
+        // paymentCanRetry means "this local intent can still request a cashier".
+        // Once the platform reports status 0/1 the signature must not be reissued;
+        // the user exits through abandon + a new purchase instead.
         outcome = order.status === 'created' && !providerPending ? 'created' : 'pending';
-        emit({ paymentCanRetry: outcome === 'created', paymentMessage: outcome === 'created' ? '这笔订单尚未确认支付。可查询结果，或继续支付同一笔订单。' : '支付正在确认中，会员开通结果以服务端确认为准。' });
+        emit({ paymentCanRetry: outcome === 'created', paymentMessage: outcome === 'created' ? '这笔订单尚未确认支付。可查询结果，或继续支付同一笔订单。' : '支付正在确认中，会员开通结果以服务端确认为准。若一直未付款，可放弃这笔订单后重新购买。' });
       }
     } catch (error) {
       if (!current(version) || readVersion !== pollGeneration || orderId !== pendingId) return 'stale';
@@ -195,9 +198,11 @@ function createPaymentController({ wx: wxApi, call, onUpdate, onResolved, onDiag
       if (!current(version)) return;
       if (!visible) { emit({ paymentMessage: '操作已暂停，订单号已保留。返回后请先查询订单状态。', paymentCanRetry: false }); return; }
       const requestedPlanId = pendingPlanId;
+      // Month/year checkouts must confirm the exact stored quote. Never invent
+      // expectedPriceFen from the currently displayed offer price.
       const expectedPriceFen = pendingPlanId === 'member_7d' ? null : pendingPriceFen;
       const result = await call('member.createOrder', { orderId, loginCode: login,
-        ...(pendingPlanId !== 'member_7d' ? { planId: pendingPlanId, ...(expectedPriceFen ? { expectedPriceFen } : {}) } : {}) });
+        ...(pendingPlanId !== 'member_7d' ? { planId: pendingPlanId, ...(Number.isSafeInteger(expectedPriceFen) && expectedPriceFen > 0 ? { expectedPriceFen } : {}) } : {}) });
       if (!current(version)) return;
       if (result && result.ok === false && result.reason === 'payment_pending') {
         emit({ paymentMessage: '支付正在确认中，请查询这笔订单的结果，勿重复下单。', paymentError: '', paymentCanRetry: false });
@@ -284,9 +289,16 @@ function createPaymentController({ wx: wxApi, call, onUpdate, onResolved, onDiag
           : order.status === 'cancelled' ? '这笔订单已关闭，可重新购买。' : order.status === 'failed' ? '这笔订单支付失败，可重新购买。'
             : '已放弃这笔订单，可以重新购买。如果之后确认已付款，会员会自动开通。', paymentError: '' });
         if (order.status === 'refunded' && membershipValid(membership)) await onResolved({ order, membership, activated: false });
-      } else throw { code: 'payment_check_pending' };
+      } else {
+        // Keep both recovery paths visible after a non-terminal server answer.
+        emit({ paymentMessage: '这笔订单还未关闭。可继续支付，或稍后再次放弃。', paymentError: '', paymentCanRetry: order.status === 'created' });
+        throw { code: 'payment_check_pending' };
+      }
     } catch (error) {
-      if (current(version)) emit({ paymentMessage: '', paymentError: '暂时无法确认这笔订单，订单号已保留。请稍后查询或重试放弃，勿重复付款。' });
+      if (current(version)) {
+        // Never strand the buyer: keep the order and restore continue-pay.
+        emit({ paymentMessage: '', paymentError: '暂时无法确认这笔订单，订单号已保留。请稍后查询、继续支付或重试放弃，勿重复付款。', paymentCanRetry: true });
+      }
     } finally {
       if (current(version)) { busy = false; emit({ paymentBusy: false }); }
     }

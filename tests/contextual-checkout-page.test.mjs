@@ -13,14 +13,14 @@ const boot = (userKey = 'a', features = { contextualCheckout: true, growthEvents
   membership: { active: false, remainingMs: 0, expiresAt: null }, quota: { balance: 1, tasksDoneToday: [] }, tasks: [],
   collector: { state: 'not_deployed' }, memberProduct: { planId: 'member_7d', priceFen: 700, days: 7, enabled: true, paymentReady: true, note: '原始服务端退款规则。' },
   limits: { maxFollows: 3, maxStoresPerFollow: 3 }, followCount: 0 });
-function runtime({ catalogRead = async () => catalog } = {}) {
+function runtime({ catalogRead = async () => catalog, callRead = async () => ({}) } = {}) {
   const storage = new Map(), modals = [], calls = [], events = [], navigations = [], app = { globalData: {} }; let definition, current = catalog;
   const wx = { getDeviceInfo: () => ({ platform: 'android' }), canIUse: () => true, requestVirtualPayment() {},
     getStorageSync: key => structuredClone(storage.get(key)), setStorageSync: (key, value) => storage.set(key, structuredClone(value)), removeStorageSync: key => storage.delete(key),
     showModal: options => modals.push(options), switchTab: options => navigations.push(options.url) };
   const source = path.resolve('miniprogram/pages/mine/index.js');
   vm.runInNewContext(fs.readFileSync(source, 'utf8'), { wx, getApp: () => app, Page: value => { definition = value; },
-    require: name => name.endsWith('/api') ? { call: async (action, payload) => { calls.push({ action, payload }); return {}; } }
+    require: name => name.endsWith('/api') ? { call: async (action, payload) => { calls.push({ action, payload }); return callRead(action, payload); } }
       : name.endsWith('/store') ? { getCatalog: catalogRead, currentCatalog: () => current, invalidateBootstrap() {}, invalidateFollows() {} }
       : name.endsWith('/conversion-events') ? { track: (name, fields) => events.push({ name, fields }) }
       : require(path.resolve(path.dirname(source), name)) });
@@ -93,6 +93,37 @@ test('offer exposure requires native viewport evidence and is deduplicated; rese
   rt.page.onPurchaseFeedback({ currentTarget: { dataset: { code: 'feedback_no_need' } } });
   rt.page.onPurchaseFeedback({ currentTarget: { dataset: { code: 'feedback_payment' } } });
   assert.equal(rt.events.filter(item => item.name === 'purchase_feedback').length, 1);
+});
+
+test('pending payment removes offer observation and a closed original order restores it without accepting stale visibility', async () => {
+  const rt = runtime({ callRead: async (action, payload) => {
+    assert.equal(action, 'member.abandonOrder');
+    return { order: { orderId: payload.orderId, status: 'cancelled' }, membership: boot().membership };
+  } });
+  rt.page.applyBoot(boot()); rt.page.data.ready = true; await tick();
+  const observations = [];
+  rt.page.createIntersectionObserver = () => {
+    const observation = { disconnected: false, relativeToViewport() { return this; },
+      observe(id, callback) { assert.equal(id, '#membership-offer'); this.callback = callback; observations.push(this); },
+      disconnect() { this.disconnected = true; } };
+    return observation;
+  };
+  rt.page.observeMembershipOffer();
+  const first = observations[0];
+  await rt.page.paymentController.buy(); // Missing login preserves the real pending intent without opening a cashier.
+  assert.ok(rt.page.data.paymentPendingId);
+  assert.equal(first.disconnected, true);
+  assert.equal(rt.page.offerObserver, null);
+  rt.page.observeMembershipOffer(); first.callback({ intersectionRatio: 1 });
+  assert.equal(observations.length, 1, 'recovery state has no offer node to observe');
+  assert.equal(rt.events.filter(item => item.name === 'offer_viewed').length, 0);
+  await rt.page.paymentController.abandon();
+  assert.equal(rt.page.data.paymentPendingId, '');
+  assert.equal(observations.length, 2, 'closed original order restores the purchase surface');
+  first.callback({ intersectionRatio: 1 });
+  assert.equal(rt.events.filter(item => item.name === 'offer_viewed').length, 0, 'a disconnected callback cannot record the restored offer');
+  observations[1].callback({ intersectionRatio: 1 });
+  assert.equal(rt.events.filter(item => item.name === 'offer_viewed').length, 1);
 });
 test('rollback hides the contextual view without deleting intent or a pending payment', async () => {
   const rt = runtime(); rt.context.save(boot().identity, target, catalog); rt.page.applyBoot(boot('a', {})); await tick();

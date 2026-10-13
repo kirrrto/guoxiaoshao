@@ -2,10 +2,9 @@
 @import "styles/common.wxss";
 
 page {
-  /* Logo base hue (docs/brand/logo-generation.md). Keep every active green
-     on this hue in both themes; dark ink makes filled controls legible. */
+  /* Preserve the brand fill; text needs a darker shade on light surfaces. */
   --green: #00C375;
-  --green-dark: var(--green);
+  --green-dark: #007A49;
   --green-ink: #073C2C;
   --green-soft: rgba(0, 195, 117, 0.12);
   --green-mist: #F6F8F7;
@@ -47,6 +46,7 @@ page {
    its end, so the light theme above stays exactly as designed. */
 @media (prefers-color-scheme: dark) {
   page {
+    --green-dark: #56DDA4;
     --green-soft: rgba(0, 195, 117, 0.16);
     --green-mist: #101713;
     --text: #E7EFE9;

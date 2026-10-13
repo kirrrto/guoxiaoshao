@@ -33,7 +33,7 @@ const STATUS = {
 };
 
 Page({
-  data: { loading: true, busy: false, ready: false, balance: 0, test: null, statusTitle: '', statusNote: '', error: null, canContinue: false, pendingOther: false, blocked: false, feedbackNote: '', operationNote: '', checkNote: '' },
+  data: { loading: true, busy: false, ready: false, balance: 0, test: null, statusTitle: '', statusNote: '', error: null, canContinue: false, pendingOther: false, blocked: false, feedbackNote: '', operationNote: '', checkNote: '', showTestRules: false, showTroubleshooting: false },
   async onLoad(options = {}) {
     this.retired = false;
     this.visible = false;
@@ -96,8 +96,8 @@ Page({
     this.setData({ test, statusTitle, statusNote: test && test.reason === 'needs_authorization' ? '微信授权已失效，1 次额度已退回。请重新允许订阅消息后再测试。'
       : test && test.reason === 'authorization_expired' ? '原授权已过期或模板已更新，尚未扣次。请重新授权一条测试。' : statusNote,
       balance: balance === null ? this.data.balance : balance, blocked, canContinue, pendingOther,
-      feedbackNote: test && test.feedback === 'received' ? '已记录：你确认收到了测试消息。正式到货监测仍需会员与有效授权。'
-        : test && test.feedback === 'not_received' ? '已记录：暂未收到。请检查微信服务通知、订阅消息设置及手机通知权限；系统设置可能影响展示。' : '' }, () => this.recordTestOpen());
+      feedbackNote: test && test.feedback === 'received' ? '已记录：你确认收到了测试消息。'
+        : test && test.feedback === 'not_received' ? '已记录：暂未收到。可按下方方法排查。' : '' }, () => this.recordTestOpen());
     if (test && matching && ['accepted', 'failed', 'needs_authorization'].includes(test.status)) this.clearPending(context);
     return true;
   },
@@ -247,4 +247,6 @@ Page({
     finally { this.finishOperation(context); }
   },
   onGoMine() { wx.switchTab({ url: '/pages/mine/index' }); },
+  onToggleTestRules() { this.setData({ showTestRules: !this.data.showTestRules }); },
+  onToggleTroubleshooting() { this.setData({ showTroubleshooting: !this.data.showTroubleshooting }); },
 });
