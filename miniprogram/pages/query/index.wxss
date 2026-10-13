@@ -1,32 +1,22 @@
 /* 查询页专用样式（公共样式见 app.wxss） */
 @import '../../styles/launch-calendar.wxss';
-/* Pinned launch calendar + purchase guide: first actionable card after the heading. */
+/* Launch calendar + purchase guide: a calm entry row below the heading. It stays
+   recognizable as a control without competing with the primary query action. */
 .query-guide-entry.query-guide-entry {
+  gap: 12px;
   margin: 0 0 26rpx;
-  padding: 22rpx 24rpx;
-  border: 2rpx solid var(--green);
+  padding: 12px 14px;
+  border: 1rpx solid var(--glass-line);
   border-radius: var(--radius-card);
-  background: var(--green-soft);
-  color: var(--green-dark);
-  box-shadow: inset 0 2rpx 0 rgba(255, 255, 255, 0.55);
+  background: var(--card);
+  box-shadow: var(--shadow-soft);
+  color: var(--text);
 }
-.query-guide-copy { flex: 1 1 0; min-width: 0; text-align: left; }
-.query-guide-title { display: flex; align-items: center; gap: 10rpx; min-width: 0; }
-.query-guide-title .ui-disclosure-label { flex: 1 1 auto; color: var(--green-dark); font-weight: 700; }
-.query-guide-entry .tiny.muted { color: var(--green-dark); }
+.query-guide-icon { display: flex; flex: none; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 12px; background: var(--green-soft); }
+.query-guide-copy { display: flex; flex: 1 1 0; flex-direction: column; align-items: flex-start; gap: 2px; min-width: 0; text-align: left; }
+.query-guide-title { color: var(--text); font-size: max(15px, 30rpx); font-weight: 600; line-height: 1.45; }
+.query-guide-note { color: var(--text-2); font-size: max(12px, 24rpx); font-weight: 400; line-height: 1.5; white-space: normal; overflow-wrap: anywhere; }
 .query-guide-entry .ui-chevron { color: var(--green-dark); }
-.query-guide-badge {
-  display: inline-flex;
-  align-items: center;
-  margin-right: 10rpx;
-  padding: 2rpx 12rpx;
-  border-radius: 999rpx;
-  background: var(--green);
-  color: var(--green-ink);
-  font-size: 20rpx;
-  font-weight: 700;
-  line-height: 1.5;
-}
 .opening-calendar-heading { flex: 1 1 0; min-width: 0; }
 .opening-calendar-mask { position: fixed; inset: 0; z-index: 1100; display: flex; align-items: center; justify-content: center; padding: 32rpx; background: rgba(9, 24, 18, .6); }
 .opening-calendar-panel { width: 100%; max-width: 440px; max-height: calc(100vh - 64rpx - env(safe-area-inset-top) - env(safe-area-inset-bottom)); display: flex; flex-direction: column; border-radius: 32rpx; background: var(--card); box-shadow: 0 20rpx 80rpx rgba(0, 0, 0, .22); overflow: hidden; }
@@ -74,8 +64,10 @@ button.opening-calendar-close.opening-calendar-close {
   .opening-calendar-panel .mt { margin-top: 10px; }
   .opening-calendar-mute { font-size: 14px; gap: 6px; margin-top: 8px; }
   .opening-calendar-footnote { font-size: 12px; }
-  .query-guide-entry.query-guide-entry { padding: 16px 18px; border-radius: 16px; }
-  .query-guide-badge { font-size: 11px; }
+  .query-guide-entry.query-guide-entry { padding: 14px 18px; border-radius: 18px; }
+  .query-guide-title { font-size: 16px; }
+  .query-guide-note { font-size: 13px; }
+  .page .selection-card--empty > .card-title { font-size: 22px; }
 }
 .card-title text:first-child { flex: 1; min-width: 0; white-space: normal; }
 .target-row { padding: 14rpx 0; border-bottom: 2rpx solid var(--line); }
@@ -111,8 +103,9 @@ button.opening-calendar-close.opening-calendar-close {
 .selection-summary-change.ui-action { flex: 0 0 116rpx; width: 116rpx; min-width: 58px; max-width: 72px; padding: 12rpx 14rpx; gap: 8rpx; }
 .selection-summary-stores { flex: 1 1 0; min-width: 0; color: var(--text-2); font-size: 24rpx; line-height: 1.6; overflow-wrap: anywhere; }
 .selection-done.btn { margin-top: 24rpx; }
-.selection-empty { padding: 28rpx 0 8rpx; }
-.selection-empty-title { font-size: 36rpx; font-weight: 600; margin-bottom: 12rpx; }
+.selection-empty { padding: 0 0 8rpx; }
+/* Without a saved target the question itself is the card heading. */
+.selection-card--empty > .card-title { padding-bottom: 0; border-bottom: 0; margin-bottom: 10rpx; font-size: 36rpx; }
 .selection-access-note { margin-top: 20rpx; font-size: 25rpx; line-height: 1.6; color: var(--text-2); }
 .selection-rules { margin-top: 0; padding-top: 16rpx; }
 .selection-summary-title { font-size: 32rpx; }

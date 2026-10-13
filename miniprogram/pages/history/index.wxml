@@ -139,7 +139,7 @@
             <view wx:if="{{item.lastKnownText}}" class="tiny muted">{{item.lastKnownText}}</view>
             <view wx:if="{{item.freshnessText}}" class="tiny {{item.observationState === 'fresh' ? 'muted' : 'stale-note'}}">{{item.freshnessText}}</view>
           </view>
-          <view class="pill pill-dot pill-{{item.statusCls}} tiny">{{item.statusLabel}}</view>
+          <view class="pill pill-dot pill-{{item.observationState === 'fresh' && item.status === 'unavailable' ? 'muted' : item.statusCls}} tiny">{{item.statusLabel}}</view>
         </view>
     </view>
     <view class="card history-browse-card">

@@ -61,4 +61,13 @@ function shouldOpenCalendar(entry, saved, now = Date.now()) {
   return Boolean(entry && (!saved || saved.id !== entry.id || (!saved.muted && saved.day !== fmtDate(now))));
 }
 
-module.exports = { activeCalendars, calendarView, countdownView, shouldOpenCalendar };
+/** One-line launch status for the guide entry; generic copy outside a launch window. */
+function guideNote(now = Date.now()) {
+  const calendar = activeCalendars(now)[0];
+  if (!calendar) return '从选择配置，到收到提醒后下单';
+  if (now < Date.parse(calendar.preorderAt)) return `${calendar.title} · ${calendar.preorderDateText} ${calendar.preorderTimeText} 开启预购`;
+  if (fmtDate(now) < calendar.releaseDate) return `${calendar.title} · ${calendar.releaseDateText} 正式发售`;
+  return `${calendar.title} 已发售 · 查看取货攻略`;
+}
+
+module.exports = { activeCalendars, calendarView, countdownView, guideNote, shouldOpenCalendar };

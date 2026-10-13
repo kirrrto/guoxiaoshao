@@ -339,4 +339,6 @@ view, text, button, input, textarea, image, scroll-view, picker { box-sizing: bo
   .banner-warn, .stale-note { color: var(--warn); }
   .product-image-box, .follow-image { background: var(--image-tile); }
   .onboarding { background: var(--surface-soft); }
+  /* Line icons are rendered in the light-theme green; lift them to the dark-theme accent. */
+  .ui-icon { filter: brightness(1.5); }
 }

@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
 import { runtime } from './helpers/miniprogram-runtime.mjs';
 const require = createRequire(import.meta.url);
-const { activeCalendars, calendarView, shouldOpenCalendar } = require('../miniprogram/utils/launch-calendar');
+const { activeCalendars, calendarView, guideNote, shouldOpenCalendar } = require('../miniprogram/utils/launch-calendar');
 const entry = require('../miniprogram/config/product-launches')[0];
 const now = Date.parse('2026-10-11T08:00:00Z');
 const calendar = calendarView(entry, now);
@@ -22,6 +22,14 @@ test('opening notice stops after launch day while manual calendar remains availa
   assert.equal(activeCalendars(Date.parse('2026-10-23T16:00:00Z'), true).length, 0);
   assert.equal(activeCalendars(Date.parse('2026-10-24T00:00:00Z')).length, 1);
   assert.equal(activeCalendars(Date.parse(entry.displayUntil)).length, 0);
+});
+
+test('guide entry note follows the launch stage and returns to generic copy after the window', () => {
+  assert.equal(guideNote(now), `${entry.title} · 10.16 20:00 开启预购`);
+  assert.equal(guideNote(Date.parse(entry.preorderAt)), `${entry.title} · 10.23 正式发售`);
+  assert.equal(guideNote(Date.parse('2026-10-22T15:59:59Z')), `${entry.title} · 10.23 正式发售`);
+  assert.equal(guideNote(Date.parse('2026-10-22T16:00:00Z')), `${entry.title} 已发售 · 查看取货攻略`);
+  assert.equal(guideNote(Date.parse(entry.displayUntil)), '从选择配置，到收到提醒后下单');
 });
 
 test('frequency is once per Beijing date and dismissal applies to this launch revision', () => {

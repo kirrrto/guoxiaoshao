@@ -18,7 +18,7 @@ const { launchView } = require('../../utils/product-launch');
 const { canOfferLiveChoices } = require('../../utils/observation-insights');
 const { createCheckoutContext } = require('../../utils/checkout-context');
 const conversion = require('../../utils/conversion-events');
-const { activeCalendars, shouldOpenCalendar } = require('../../utils/launch-calendar');
+const { activeCalendars, guideNote, shouldOpenCalendar } = require('../../utils/launch-calendar');
 
 const SELECTION_KEY = 'gxs_query_selection_v1';
 const RESULT_KEY = 'gxs_query_result_v1';
@@ -121,6 +121,7 @@ function presentFollowTargets(follows) {
         storeName: storeLabel(s.storeNumber, s.storeName),
         storeLabel: storeLabelWithCity(s.storeNumber, s.storeName, s.city),
         city: s.city,
+        status: s.status,
         ...fmt.stockObservation(s, now, { restricted: Boolean(f.latestRestricted) }),
       };
     })), []);
@@ -187,6 +188,7 @@ Page({
     launchExpanded: false,
     openingCalendar: null,
     calendarOpen: false,
+    guideNote: '',
     calendarMuted: false,
     selectionRestricted: false,
     contextualCheckout: false,
@@ -227,6 +229,7 @@ Page({
       this.setData({
         catalogVersion: catalog.version,
         ready: true,
+        guideNote: guideNote(),
         selectionCanCollapse: restored.valid,
         selectionSummary: restored.summary,
         selectionNotice: restored.notice,
@@ -258,6 +261,7 @@ Page({
     if (this.pageRetired) return;
     syncTabBar(this, '/pages/query/index');
     this.visible = true;
+    this.setData({ guideNote: guideNote() });
     if (this.data.calendarOpen) this.syncCalendarOverlay();
     this.maybeOpenCalendar();
     this.visibilityEpoch = (this.visibilityEpoch || 0) + 1;

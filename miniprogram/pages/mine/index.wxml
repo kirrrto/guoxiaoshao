@@ -187,7 +187,7 @@
     </view>
 
     <!-- 次数 -->
-    <view class="card quota-card">
+    <view id="quota-card" class="card quota-card">
       <view class="card-title">
         <text>可用次数</text>
         <text class="sub">今日已获 {{quota.grantedToday}}/{{quota.dailyGrantCap}} · 上限 {{quota.balanceCap}}</text>
@@ -198,9 +198,8 @@
           <text class="small muted"> 次可用</text>
           <view class="tiny muted">{{membership.active ? '会员查询与历史不扣次；测试通知每次扣 1 次' : '查询 ' + quota.queryCost + ' 次 · 历史 ' + quota.historyCost + ' 次 · 测试通知 1 次'}}</view>
         </view>
-        <button class="btn btn-primary btn-sm {{quota.signedInToday || signing ? 'disabled' : ''}}" disabled="{{quota.signedInToday || signing}}" bindtap="onSignin">
-          {{signing ? '签到中…' : (quota.signedInToday ? '今日已签到' : '每日签到')}}
-        </button>
+        <button wx:if="{{!quota.signedInToday}}" class="btn btn-primary btn-sm {{signing ? 'disabled' : ''}}" disabled="{{signing}}" bindtap="onSignin">{{signing ? '签到中…' : '每日签到'}}</button>
+        <view wx:else class="signin-done"><image class="ui-icon signin-done-icon" src="/images/ui/check.png" mode="aspectFit" aria-hidden="true" /><text>今日已签到</text></view>
       </view>
       <view wx:if="{{!membership.active && !quota.signedInToday && quota.balance < quota.queryCost}}" class="banner banner-ok small mt">签到可领次数，用于查询或体验测试通知。</view>
 
@@ -231,13 +230,13 @@
       </block>
     </view>
 
-    <!-- 提醒设置 -->
-    <view id="reminder-settings" class="card">
+    <!-- 小哨提醒：通知设置与个人提醒记录同卡；记录与共享库存历史分开管理 -->
+    <view id="reminder-settings" class="card reminder-card">
       <view class="card-title">
         <view class="whistle-section-title"><image class="section-whistle" src="/images/brand/whistle-green.png" mode="aspectFit" aria-hidden="true" /><text>小哨提醒</text></view>
         <view class="pill pill-dot pill-{{boot.collector.cls}} tiny">{{boot.collector.label}}</view>
       </view>
-      <button class="ui-disclosure mt" hover-class="ui-control-pressed" bindtap="onToggleReminderSettings" aria-expanded="{{showReminderSettings}}"><text class="ui-disclosure-label">通知与免打扰</text><view class="ui-disclosure-meta"><text>{{showReminderSettings ? '收起' : '展开'}}</text><view class="ui-chevron {{showReminderSettings ? 'ui-chevron--up' : 'ui-chevron--down'}}" aria-hidden="true"></view></view></button>
+      <button class="ui-disclosure reminder-row" hover-class="ui-control-pressed" bindtap="onToggleReminderSettings" aria-expanded="{{showReminderSettings}}"><view class="reminder-row-main"><image class="ui-icon" src="/images/ui/notification.png" mode="aspectFit" aria-hidden="true" /><view class="reminder-row-copy"><text class="ui-disclosure-label">通知与免打扰</text><text wx:if="{{settings}}" class="reminder-row-summary">{{settings.notifyEnabled ? '补货提醒已开启' + (settings.dnd.enabled ? ' · 免打扰 ' + (dndStart === dndEnd ? '全天' : dndStart + '–' + dndEnd) : '') : '补货提醒已关闭'}}</text></view></view><view class="ui-disclosure-meta"><text>{{showReminderSettings ? '收起' : '展开'}}</text><view class="ui-chevron {{showReminderSettings ? 'ui-chevron--up' : 'ui-chevron--down'}}" aria-hidden="true"></view></view></button>
       <block wx:if="{{showReminderSettings}}">
       <view class="field">
         <text class="label">接收补货提醒</text>
@@ -257,17 +256,12 @@
       </block>
       <view class="tiny muted mt">免打扰时不推送，监测与历史继续。起止相同＝全天。</view>
       </block>
-    </view>
-
-    <!-- 个人提醒记录；与共享库存历史分开管理 -->
-    <view class="card notification-card">
-      <view class="notification-heading">
-        <view class="notification-heading-copy"><view class="notification-heading-title whistle-section-title"><image class="section-whistle" src="/images/brand/whistle-green.png" mode="aspectFit" aria-hidden="true" /><text>小哨提醒记录</text></view><view class="tiny muted">{{notifications.length ? '已显示 ' + notifications.length + ' 条' : '个人提醒记录'}}</view></view>
-        <button wx:if="{{showNotifications && notifications.length}}" class="ui-action ui-action--neutral notification-button notification-clear" hover-class="ui-control-pressed" disabled="{{notificationActionBusy || notificationConfirming || !notificationsClearBefore}}" bindtap="onClearNotifications">{{notificationActionBusy === 'clear' ? '清空中…' : '清空'}}</button>
-      </view>
-      <button class="ui-disclosure mt" hover-class="ui-control-pressed" bindtap="onToggleNotifications" aria-expanded="{{showNotifications}}"><text class="ui-disclosure-label">查看记录</text><view class="ui-disclosure-meta"><text>{{showNotifications ? '收起' : '展开'}}</text><view class="ui-chevron {{showNotifications ? 'ui-chevron--up' : 'ui-chevron--down'}}" aria-hidden="true"></view></view></button>
+      <button id="notification-records" class="ui-disclosure reminder-row" hover-class="ui-control-pressed" bindtap="onToggleNotifications" aria-expanded="{{showNotifications}}"><view class="reminder-row-main"><image class="ui-icon" src="/images/ui/clock.png" mode="aspectFit" aria-hidden="true" /><view class="reminder-row-copy"><text class="ui-disclosure-label">提醒记录</text><text class="reminder-row-summary">{{notifications.length ? '已显示 ' + notifications.length + ' 条' : '保留最近 10 天'}}</text></view></view><view class="ui-disclosure-meta"><text>{{showNotifications ? '收起' : '展开'}}</text><view class="ui-chevron {{showNotifications ? 'ui-chevron--up' : 'ui-chevron--down'}}" aria-hidden="true"></view></view></button>
       <block wx:if="{{showNotifications}}">
-      <view class="tiny muted notification-scope">提醒记录保留最近 10 天。删除和清空只影响本列表，不取消关注、不撤回微信消息、不删库存历史。</view>
+      <view class="notification-toolbar">
+        <text class="tiny muted notification-scope">提醒记录保留最近 10 天。删除和清空只影响本列表，不取消关注、不撤回微信消息、不删库存历史。</text>
+        <button wx:if="{{notifications.length}}" class="ui-action ui-action--neutral notification-button notification-clear" hover-class="ui-control-pressed" disabled="{{notificationActionBusy || notificationConfirming || !notificationsClearBefore}}" bindtap="onClearNotifications">{{notificationActionBusy === 'clear' ? '清空中…' : '清空'}}</button>
+      </view>
       <view wx:if="{{notificationsLoading && !notifications.length}}" class="loading-line">正在加载提醒记录…</view>
       <view wx:elif="{{notificationsLoading}}" class="loading-line">正在更新提醒记录…</view>
       <view wx:if="{{notificationsError}}" class="record-error"><text>{{notificationsError}}</text><button class="ui-action notification-button notification-retry" hover-class="ui-control-pressed" disabled="{{notificationsLoading || notificationActionBusy || notificationConfirming}}" bindtap="onRetryNotifications">重试加载</button></view>

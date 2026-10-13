@@ -35,16 +35,17 @@
     </view>
 
     <button class="ui-disclosure query-guide-entry" hover-class="ui-control-pressed" bindtap="onOpenGuide">
+      <view class="query-guide-icon" aria-hidden="true"><image class="ui-icon" src="/images/ui/calendar.png" mode="aspectFit" /></view>
       <view class="query-guide-copy">
-        <view class="query-guide-title"><image class="ui-icon" src="/images/ui/calendar.png" mode="aspectFit" aria-hidden="true" /><text class="ui-disclosure-label">发售日历与选购攻略</text></view>
-        <view class="tiny muted">从选择配置，到收到提醒后下单 · iPhone Duo</view>
+        <text class="query-guide-title">发售日历与选购攻略</text>
+        <text class="query-guide-note">{{guideNote || '从选择配置，到收到提醒后下单'}}</text>
       </view>
-      <view class="ui-chevron"></view>
+      <view class="ui-chevron" aria-hidden="true"></view>
     </button>
 
-    <view class="card selection-card">
+    <view class="card selection-card {{selectionSummary ? '' : 'selection-card--empty'}}">
       <view class="card-title">
-        <text>当前查询配置</text>
+        <text>{{selectionSummary ? '当前查询配置' : '想查哪一款？'}}</text>
         <text class="sub">{{!accountReady ? '账户连接中' : (boot.member ? '会员 · 不扣次数' : '余 ' + boot.balance + ' 次')}}</text>
       </view>
       <view wx:if="{{selectionSummary}}" class="selection-summary">
@@ -55,7 +56,6 @@
         <view class="selection-summary-footer"><view class="selection-summary-stores">{{selectionSummary.storeLabel}}</view><button class="ui-action selection-summary-change" hover-class="ui-control-pressed" bindtap="onEditSelection"><text class="ui-action-label">修改</text><text class="ui-chevron" aria-hidden="true"></text></button></view>
       </view>
       <view wx:if="{{!selectionSummary}}" class="selection-empty">
-        <view class="selection-empty-title">想查哪一款？</view>
         <view class="small text-2">选择型号、容量和门店，即可查询或关注。</view>
         <button class="btn btn-primary btn-block mt" bindtap="onEditSelection">选择配置与门店</button>
       </view>
@@ -68,7 +68,7 @@
         {{!accountReady ? '正在连接账户…' : (querying ? '查询中…' : (boot.member ? '立即查询' : '立即查询（消耗 ' + boot.queryCost + ' 次）'))}}
       </button>
       <button wx:if="{{selectionSummary && !selectionRestricted}}" class="btn btn-outline btn-block mt selection-follow-action" disabled="{{!accountReady || querying || !selectionCanCollapse}}" bindtap="onFollowSelection"><image class="selection-whistle" src="/images/brand/whistle-green.png" mode="aspectFit" aria-hidden="true" /><text>{{boot.member ? '关注此配置 · 小哨提醒' : (contextualCheckout ? '为此配置了解关注服务' : '了解会员 · 关注与提醒')}}</text></button>
-      <view wx:if="{{accountReady}}" class="selection-access-note">{{boot.member ? '关注后后台帮你留意变化；微信提醒需授权。' : '关注与到货提醒为会员专属。免费用户可用查询次数实时看货。'}}</view>
+      <view wx:if="{{accountReady}}" class="selection-access-note">{{boot.member ? '关注后，小哨在后台帮你留意变化；微信提醒需授权。' : '关注与到货提醒为会员专属。免费用户可用查询次数实时看货。'}}</view>
       <button class="ui-disclosure" hover-class="ui-control-pressed" bindtap="onToggleRules" aria-expanded="{{rulesExpanded}}"><text class="ui-disclosure-label">查询与提醒规则</text><view class="ui-disclosure-meta"><text>{{rulesExpanded ? '收起' : '展开'}}</text><text class="ui-chevron {{rulesExpanded ? 'ui-chevron--up' : 'ui-chevron--down'}}" aria-hidden="true"></text></view></button>
       <view wx:if="{{accountReady && rulesExpanded}}" class="selection-rules">
         <view class="selection-rule">
@@ -122,7 +122,7 @@
             <text class="bold">{{item.storeName}}</text>
             <text class="small muted"> {{item.city}}</text>
           </view>
-          <view class="pill pill-dot pill-{{item.statusCls}}">{{item.statusLabel}}</view>
+          <view class="pill pill-dot pill-{{item.observationState === 'fresh' && item.status === 'unavailable' ? 'muted' : item.statusCls}}">{{item.statusLabel}}</view>
         </view>
         <view class="small text-2 mt" wx:if="{{item.quote && item.observationState === 'fresh'}}">{{item.quote}}</view>
         <view class="tiny muted mt">
@@ -207,13 +207,13 @@
         <view class="target-text">
           <text class="small bold">{{item.productTitle}}</text>
           <view class="tiny muted">{{item.storeLabel}}</view>
-          <view wx:if="{{item.observedText}}" class="tiny muted">{{item.observedText}}</view>
+          <view wx:if="{{item.observedText}}" class="tiny muted">{{item.observationState === 'restricted' || item.observationState === 'missing' ? item.observedText : '观测 ' + item.observedText}}</view>
           <view wx:if="{{item.lastKnownText}}" class="tiny muted">{{item.lastKnownText}}</view>
-          <view wx:if="{{item.freshnessText}}" class="tiny {{item.observationState === 'fresh' ? 'muted' : 'stale-note'}}">{{item.freshnessText}}</view>
+          <view wx:if="{{item.freshnessText && item.observationState !== 'fresh'}}" class="tiny stale-note">{{item.freshnessText}}</view>
         </view>
-        <view class="pill pill-dot pill-{{item.statusCls}} tiny">{{item.statusLabel}}</view>
+        <view class="pill pill-dot pill-{{item.observationState === 'fresh' && item.status === 'unavailable' ? 'muted' : item.statusCls}} tiny">{{item.statusLabel}}</view>
       </view>
-      <view class="tiny muted mt">页面可见时约每分钟读取一次已有观测。后台更新可能延迟，请查看各门店的观测时间；读取列表不会立即重新检测。</view>
+      <view class="tiny muted mt">页面可见时约每分钟读取一次已有观测，不会立即重新检测；后台更新可能延迟，请以各门店观测时间和官网实际取货为准。</view>
     </view>
 
     <view wx:if="{{launch}}" class="card launch-card">
