@@ -690,7 +690,7 @@ for (const scenario of scenarios) {
         if (scenario === 'v2-restricted' && !page.data.selectionRestricted) throw Error('Restricted fixture did not retain the access gate');
         if (scenario === 'v2-paid-unconfigured' && !page.data.resumeSetup) throw Error('Paid fixture lost the unfinished target');
         if (scenario === 'v2-new-product' && !page.data.launch) throw Error('Future launch card did not render');
-        expectedV2Text = [...(scenario === 'v2-calendar-modal' ? ['新品日历', 'iPhone Duo', '10.16', '10.23', '20:00 预购', 'Apple 官方时间', '本次发售不再提醒', '查看选购攻略'] : [p.title]), ...({
+        expectedV2Text = [...(scenario === 'v2-calendar-modal' ? ['新品日历', 'iPhone Duo', '距预购 5 天 5 小时', '开启预购', '10.16', '周五 20:00', '正式发售', '10.23', 'Apple 官方时间', '日期到来不代表已开放取货查询', '本次发售不再提醒', '查看完整日历与选购攻略'] : [p.title]), ...({
           'v2-free': ['暂时没有可取货观测', '微信提醒需另行授权'],
           'v2-member': ['2 家门店有可取货观测', '加入关注', '购买请在 Apple 官方渠道完成'],
           'v2-unknown': ['当前取货状态待确认', '继续查询原配置'],
@@ -713,7 +713,7 @@ for (const scenario of scenarios) {
           'v2-longcontent': [p.title],
         }[scenario] || [])];
       } else if (pageName === 'mine') {
-        expectedV2Text = ['会员核心权益', '提醒记录'];
+        expectedV2Text = ['会员核心权益', '提醒记录', '联系客服'];
         // aria-labels are not body text; visible labels express the same contract.
         expectedV2Text[0] = '查询与历史';
         if (['v2-context-checkout', 'v2-paid-unconfigured', 'v2-longcontent'].includes(scenario)) {
@@ -727,10 +727,10 @@ for (const scenario of scenarios) {
           forbiddenText.push('限时优惠', '优惠至', '之后 ¥30.00', '之后 ¥360.00');
         }
       } else if (pageName === 'guide') {
-        expectedV2Text = ['从选择配置，到收到提醒后下单', '新品发售日历', '先选好想要的配置', '常见问题'];
+        expectedV2Text = ['从选择配置，到收到提醒后下单', '新品发售日历', '距预购 5 天 5 小时', '先选好想要的配置', '常见问题', '联系客服'];
         if (scenario === 'v2-guide-calendar') {
           if (!page.data.calendarExpanded || !page.data.calendars.length) throw Error('Guide calendar section did not expand');
-          expectedV2Text.push('2026 年 10 月', '10.16', '10.23', '20:00 预购', '去选择配置与门店');
+          expectedV2Text.push('2026 年 10 月日历', '开启预购', '10.16', '周五 20:00', '10.23', '去选择配置与门店');
         }
         if (scenario === 'v2-guide-faq') {
           if (page.data.faqOpen !== 'notification') throw Error('Guide notification FAQ did not expand');
@@ -885,7 +885,7 @@ for (const scenario of scenarios) {
         active: page.data.membership.active,
         accountState: page.data.membership.active ? 'member' : page.data.membership.expired ? 'expired' : 'free',
         packages: !page.data.paymentPendingId && (!page.data.membership.active || page.data.membershipUpgradeOpen) ? page.data.boot.memberProducts.length : 0,
-        utilityLinks: 6,
+        utilityLinks: 7,
         notificationEntryInMembership: !page.data.paymentPendingId,
       } : undefined;
       const expectedNotification = notificationTestPreview ? {

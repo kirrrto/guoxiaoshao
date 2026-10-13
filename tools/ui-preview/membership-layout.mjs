@@ -72,7 +72,7 @@ export function inspectMembershipLayout(expected = null) {
       if (!visible(label) || label.scrollWidth > label.clientWidth + 1.5) errors.push(`Utility link ${index + 1} label is missing or clipped`);
       if (icon && label && overlaps(bounds(icon), bounds(label)) || trailing && label && overlaps(bounds(trailing), bounds(label))) errors.push(`Utility link ${index + 1} label overlaps its icon or trailing control`);
     }
-    if (iconSources.size !== expected.utilityLinks) errors.push('Utility links do not have six distinct icons');
+    if (iconSources.size !== expected.utilityLinks) errors.push(`Utility links do not have ${expected.utilityLinks} distinct icons`);
     if (expected.notificationEntryInMembership) {
       const entries = [...document.querySelectorAll('.notification-test-entry')];
       if (entries.length !== 1 || !visible(entries[0]) || !membership?.contains(entries[0])) errors.push('Reminder experience entry must be visible exactly once inside membership');

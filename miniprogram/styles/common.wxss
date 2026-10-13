@@ -195,6 +195,18 @@ view, text { box-sizing: border-box; }
 .ui-chevron--up { transform: rotate(-45deg); }
 .ui-action.ui-control-pressed, .ui-disclosure.ui-control-pressed { background: var(--control-pressed); border-color: var(--green-dark); }
 .ui-action[disabled], .ui-disclosure[disabled] { background: var(--surface-soft); border-color: var(--line); color: var(--text-3); opacity: .65; }
+/* Related rows share one bordered surface; each row keeps its chevron and pressed state. */
+.ui-disclosure-group { margin-top: 20rpx; overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius-action); background: var(--surface-soft); }
+.ui-disclosure-group-item + .ui-disclosure-group-item { border-top: 1px solid var(--line); }
+.ui-disclosure-group .ui-disclosure.ui-disclosure { margin-top: 0; border: 0; border-radius: 0; background: transparent; }
+.ui-disclosure-group .ui-disclosure.ui-control-pressed { background: var(--control-pressed); }
+/* Entry rows: icon, label and an optional regular-weight note inside a disclosure button. */
+.ui-disclosure.ui-entry { gap: 12px; padding: 12px; }
+.ui-entry-main { display: flex; flex: 1 1 0; align-items: flex-start; gap: 10px; min-width: 0; }
+.ui-entry-main > .ui-icon { margin-top: 1px; }
+.ui-entry-copy { display: flex; flex: 1 1 0; flex-direction: column; align-items: flex-start; gap: 2px; min-width: 0; text-align: left; }
+.ui-entry-copy > .ui-disclosure-label { flex: none; font-size: 14px; }
+.ui-entry-note { color: var(--text-2); font-size: 12px; font-weight: 400; line-height: 1.5; white-space: normal; overflow-wrap: anywhere; }
 
 /* Compact close targets retain their own visual treatment. */
 .tap-target { display: inline-block; padding: 20rpx 16rpx; margin: -20rpx -16rpx; }
@@ -281,7 +293,7 @@ view, text, button, input, textarea, image, scroll-view, picker { box-sizing: bo
   .page .btn.btn { min-height: 44px; padding: 12px 20px; font-size: 16px; border-radius: 12px; }
   .page .ui-action, .page .ui-disclosure { font-size: 14px; padding: 10px 14px; min-height: 44px; }
   .page .ui-disclosure-label, .page .ui-action-label { font-size: 14px; }
-  .page .ui-disclosure-meta { font-size: 13px; }
+  .page .ui-disclosure-meta, .page .ui-entry-note { font-size: 13px; }
   .page .ui-action { gap: 8px; }
   .page .ui-chevron { width: 8px; height: 8px; border-width: 2px; }
   .page .selection-summary-change.ui-action { flex: 0 0 auto; width: auto; min-width: 72px; max-width: none; padding: 8px 12px; white-space: nowrap; }

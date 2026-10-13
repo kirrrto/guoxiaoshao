@@ -124,6 +124,7 @@
           <button class="member-entry payment-abandon" disabled="{{paymentBusy || paymentChecking || redeeming || paymentConfirming}}" bindtap="onAbandonPayment">放弃这笔订单</button>
         </view>
         <view wx:if="{{paymentPendingId}}" class="payment-note">系统不会自动再次扣款。放弃前会核对付款结果。</view>
+        <view wx:if="{{paymentPendingId || paymentError}}" class="payment-support"><text>付款遇到问题？</text><button class="ui-action ui-action--neutral payment-support-button" open-type="contact" session-from="gxs_payment" hover-class="ui-control-pressed">联系客服</button></view>
       </view>
       <button wx:if="{{contextualCheckout && checkoutTarget && !membership.active}}" class="ui-action ui-action--neutral identity-copy checkout-identity" hover-class="ui-control-pressed" bindtap="onCopyId" aria-label="复制用户编号"><text class="ui-action-label">当前账户 {{boot.identity.openidMasked}}</text><text class="identity-copy-label">复制</text></button>
       <button class="ui-disclosure mt" hover-class="ui-control-pressed" bindtap="onToggleMembershipRules" aria-expanded="{{showMembershipRules}}"><view class="ui-label-with-icon"><image class="ui-icon" src="/images/ui/check.png" mode="aspectFit" aria-hidden="true" /><text class="ui-disclosure-label">会员权益</text></view><view class="ui-disclosure-meta"><text>{{showMembershipRules ? '收起' : '查看'}}</text><view class="ui-chevron {{showMembershipRules ? 'ui-chevron--up' : 'ui-chevron--down'}}" aria-hidden="true"></view></view></button>
@@ -236,7 +237,7 @@
         <view class="whistle-section-title"><image class="section-whistle" src="/images/brand/whistle-green.png" mode="aspectFit" aria-hidden="true" /><text>小哨提醒</text></view>
         <view class="pill pill-dot pill-{{boot.collector.cls}} tiny">{{boot.collector.label}}</view>
       </view>
-      <button class="ui-disclosure reminder-row" hover-class="ui-control-pressed" bindtap="onToggleReminderSettings" aria-expanded="{{showReminderSettings}}"><view class="reminder-row-main"><image class="ui-icon" src="/images/ui/notification.png" mode="aspectFit" aria-hidden="true" /><view class="reminder-row-copy"><text class="ui-disclosure-label">通知与免打扰</text><text wx:if="{{settings}}" class="reminder-row-summary">{{settings.notifyEnabled ? '补货提醒已开启' + (settings.dnd.enabled ? ' · 免打扰 ' + (dndStart === dndEnd ? '全天' : dndStart + '–' + dndEnd) : '') : '补货提醒已关闭'}}</text></view></view><view class="ui-disclosure-meta"><text>{{showReminderSettings ? '收起' : '展开'}}</text><view class="ui-chevron {{showReminderSettings ? 'ui-chevron--up' : 'ui-chevron--down'}}" aria-hidden="true"></view></view></button>
+      <button class="ui-disclosure ui-entry reminder-row" hover-class="ui-control-pressed" bindtap="onToggleReminderSettings" aria-expanded="{{showReminderSettings}}"><view class="ui-entry-main"><image class="ui-icon" src="/images/ui/notification.png" mode="aspectFit" aria-hidden="true" /><view class="ui-entry-copy"><text class="ui-disclosure-label">通知与免打扰</text><text wx:if="{{settings}}" class="ui-entry-note">{{settings.notifyEnabled ? '补货提醒已开启' + (settings.dnd.enabled ? ' · 免打扰 ' + (dndStart === dndEnd ? '全天' : dndStart + '–' + dndEnd) : '') : '补货提醒已关闭'}}</text></view></view><view class="ui-disclosure-meta"><text>{{showReminderSettings ? '收起' : '展开'}}</text><view class="ui-chevron {{showReminderSettings ? 'ui-chevron--up' : 'ui-chevron--down'}}" aria-hidden="true"></view></view></button>
       <block wx:if="{{showReminderSettings}}">
       <view class="field">
         <text class="label">接收补货提醒</text>
@@ -256,7 +257,7 @@
       </block>
       <view class="tiny muted mt">免打扰时不推送，监测与历史继续。起止相同＝全天。</view>
       </block>
-      <button id="notification-records" class="ui-disclosure reminder-row" hover-class="ui-control-pressed" bindtap="onToggleNotifications" aria-expanded="{{showNotifications}}"><view class="reminder-row-main"><image class="ui-icon" src="/images/ui/clock.png" mode="aspectFit" aria-hidden="true" /><view class="reminder-row-copy"><text class="ui-disclosure-label">提醒记录</text><text class="reminder-row-summary">{{notifications.length ? '已显示 ' + notifications.length + ' 条' : '保留最近 10 天'}}</text></view></view><view class="ui-disclosure-meta"><text>{{showNotifications ? '收起' : '展开'}}</text><view class="ui-chevron {{showNotifications ? 'ui-chevron--up' : 'ui-chevron--down'}}" aria-hidden="true"></view></view></button>
+      <button id="notification-records" class="ui-disclosure ui-entry reminder-row" hover-class="ui-control-pressed" bindtap="onToggleNotifications" aria-expanded="{{showNotifications}}"><view class="ui-entry-main"><image class="ui-icon" src="/images/ui/clock.png" mode="aspectFit" aria-hidden="true" /><view class="ui-entry-copy"><text class="ui-disclosure-label">提醒记录</text><text class="ui-entry-note">{{notifications.length ? '已显示 ' + notifications.length + ' 条' : '保留最近 10 天'}}</text></view></view><view class="ui-disclosure-meta"><text>{{showNotifications ? '收起' : '展开'}}</text><view class="ui-chevron {{showNotifications ? 'ui-chevron--up' : 'ui-chevron--down'}}" aria-hidden="true"></view></view></button>
       <block wx:if="{{showNotifications}}">
       <view class="notification-toolbar">
         <text class="tiny muted notification-scope">提醒记录保留最近 10 天。删除和清空只影响本列表，不取消关注、不撤回微信消息、不删库存历史。</text>
@@ -282,6 +283,7 @@
 
     <!-- 其他 -->
     <view class="card">
+      <button class="ui-disclosure ui-entry account-link" open-type="contact" session-from="gxs_mine" hover-class="ui-control-pressed"><view class="ui-entry-main"><image class="ui-icon" src="/images/ui/support.png" mode="aspectFit" aria-hidden="true" /><view class="ui-entry-copy"><text class="ui-disclosure-label">联系客服</text><text class="ui-entry-note">会员、支付或提醒问题，可在线咨询</text></view></view><view class="ui-chevron" aria-hidden="true"></view></button>
       <button class="ui-disclosure account-link" hover-class="ui-control-pressed" bindtap="onToggleReleaseNotes" aria-expanded="{{showReleaseNotes}}"><view class="ui-label-with-icon"><image class="ui-icon" src="/images/ui/news.png" mode="aspectFit" aria-hidden="true" /><text class="ui-disclosure-label">更新公告</text></view><view class="ui-disclosure-meta"><text>{{showReleaseNotes ? '收起' : '查看'}}</text><view class="ui-chevron {{showReleaseNotes ? 'ui-chevron--up' : 'ui-chevron--down'}}" aria-hidden="true"></view></view></button>
       <view wx:if="{{showReleaseNotes}}" class="release-notes">
         <view class="release-pagination" aria-label="更新公告翻页">

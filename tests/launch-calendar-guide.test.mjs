@@ -24,6 +24,19 @@ test('opening notice stops after launch day while manual calendar remains availa
   assert.equal(activeCalendars(Date.parse(entry.displayUntil)).length, 0);
 });
 
+test('poster stage, weekdays and milestone states follow Beijing launch times without a timer', () => {
+  assert.equal(calendar.preorderWeekdayText, '周五');
+  assert.equal(calendar.releaseWeekdayText, '周五');
+  assert.deepEqual([calendar.stage, calendar.stageText, calendar.preorderState, calendar.releaseState], ['upcoming', '距预购 5 天 4 小时', 'next', 'later']);
+  const preorderAt = Date.parse(entry.preorderAt);
+  assert.equal(calendarView(entry, preorderAt - 3 * 3600000).stageText, '距预购 3 小时');
+  assert.equal(calendarView(entry, preorderAt - 30 * 60000).stageText, '预购即将开始');
+  const preorder = calendarView(entry, preorderAt);
+  assert.deepEqual([preorder.stage, preorder.stageText, preorder.preorderState, preorder.releaseState], ['preorder', '预购进行中', 'done', 'next']);
+  const released = calendarView(entry, Date.parse('2026-10-22T16:00:00Z'));
+  assert.deepEqual([released.stage, released.stageText, released.preorderState, released.releaseState], ['released', '已正式发售', 'done', 'done']);
+});
+
 test('guide entry note follows the launch stage and returns to generic copy after the window', () => {
   assert.equal(guideNote(now), `${entry.title} · 10.16 20:00 开启预购`);
   assert.equal(guideNote(Date.parse(entry.preorderAt)), `${entry.title} · 10.23 正式发售`);

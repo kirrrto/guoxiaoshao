@@ -249,22 +249,25 @@
     <scroll-view scroll-y="{{true}}" class="opening-calendar-scroll {{openingCalendar.imageUrl ? '' : 'opening-calendar-scroll--compact'}}">
       <view class="opening-calendar-content">
         <view class="poster-hero">
+          <text class="poster-stage poster-stage--{{openingCalendar.stage}}">{{openingCalendar.stageText}}</text>
           <view class="poster-title">{{openingCalendar.title}}</view>
           <view wx:if="{{openingCalendar.imageUrl}}" class="poster-hero-media"><image class="poster-hero-image" src="{{openingCalendar.imageUrl}}" mode="aspectFit" aria-label="{{openingCalendar.imageAlt || openingCalendar.title}}" binderror="onCalendarImageError" /></view>
         </view>
         <view class="poster-milestones">
-          <view class="poster-milestone">
+          <view class="poster-milestone poster-milestone--{{openingCalendar.preorderState}}">
+            <text class="poster-milestone-label">{{openingCalendar.preorderState === 'done' ? '已开启预购' : '开启预购'}}</text>
             <text class="poster-milestone-date">{{openingCalendar.preorderDateText}}</text>
-            <view class="poster-milestone-label">{{openingCalendar.preorderTimeText}} 预购</view>
+            <text class="poster-milestone-meta">{{openingCalendar.preorderWeekdayText}} {{openingCalendar.preorderTimeText}}</text>
           </view>
-          <view class="poster-milestone">
+          <view class="poster-milestone poster-milestone--{{openingCalendar.releaseState}}">
+            <text class="poster-milestone-label">{{openingCalendar.releaseState === 'done' ? '已正式发售' : '正式发售'}}</text>
             <text class="poster-milestone-date">{{openingCalendar.releaseDateText}}</text>
-            <view class="poster-milestone-label">正式发售</view>
+            <text class="poster-milestone-meta">{{openingCalendar.releaseWeekdayText}}</text>
           </view>
         </view>
-        <view class="poster-source">Apple 官方时间 · 北京时间</view>
+        <view class="poster-source"><view>Apple 官方时间 · 北京时间</view><view>日期到来不代表已开放取货查询</view></view>
       </view>
     </scroll-view>
-    <view class="opening-calendar-actions"><button class="btn btn-primary btn-block" bindtap="onOpenGuide">查看选购攻略</button><checkbox-group bindchange="onCalendarMute"><label class="opening-calendar-mute"><checkbox value="mute" checked="{{calendarMuted}}" color="#008D55" /><text>本次发售不再提醒</text></label></checkbox-group><view class="tiny muted opening-calendar-footnote">完整日历与查询开放说明见攻略</view></view>
+    <view class="opening-calendar-actions"><button class="btn btn-primary btn-block" bindtap="onOpenGuide">查看完整日历与选购攻略</button><checkbox-group bindchange="onCalendarMute"><label class="opening-calendar-mute"><checkbox value="mute" checked="{{calendarMuted}}" color="#008D55" /><text>本次发售不再提醒</text></label></checkbox-group></view>
   </view>
 </view>

@@ -17,37 +17,35 @@ function calendarView(entry, now = Date.now()) {
     const label = date === preorderDate ? '预购' : (date === entry.releaseDate ? '发售' : '');
     cells.push({ key: String(index), day: valid ? day : '', label, today: date === fmtDate(now) });
   }
+  const stage = launchStage(entry, now);
   return { ...entry, id: `${entry.familyKey}:${entry.preorderAt}:${entry.releaseDate}`,
     monthText: `${year} 年 ${month} 月`, cells, weekdays: ['一', '二', '三', '四', '五', '六', '日'],
     preorderDateText: preorderDate.slice(5).replace('-', '.'), releaseDateText: entry.releaseDate.slice(5).replace('-', '.'),
     preorderTimeText: fmtTime(entry.preorderAt).slice(0, 5),
-    phase: now < Date.parse(entry.preorderAt) ? '预购准备' : (fmtDate(now) < entry.releaseDate ? '预购已开始' : '已发售'),
-    countdown: countdownView(entry, now) };
+    preorderWeekdayText: weekdayText(preorderDate), releaseWeekdayText: weekdayText(entry.releaseDate),
+    stage, stageText: stageText(entry, stage, now),
+    preorderState: stage === 'upcoming' ? 'next' : 'done',
+    releaseState: stage === 'released' ? 'done' : stage === 'preorder' ? 'next' : 'later' };
 }
 
-/** Live countdown toward preorder or release; editorial only, no side effects. */
-function countdownView(entry, now = Date.now()) {
-  const preorderAt = Date.parse(entry.preorderAt);
-  const releaseAt = Date.parse(`${entry.releaseDate}T00:00:00+08:00`);
-  if (!Number.isFinite(preorderAt)) return null;
-  let targetAt = preorderAt;
-  let label = '距预购还有';
-  if (now >= preorderAt && Number.isFinite(releaseAt) && now < releaseAt) {
-    targetAt = releaseAt;
-    label = '距正式发售还有';
-  } else if (now >= preorderAt && (!Number.isFinite(releaseAt) || now >= releaseAt)) {
-    return { label: '已开启', done: true, days: 0, hours: 0, minutes: 0, text: '已开启' };
-  }
-  const left = Math.max(0, targetAt - now);
-  const totalMinutes = Math.floor(left / 60000);
-  const days = Math.floor(totalMinutes / (60 * 24));
-  const hours = Math.floor((totalMinutes % (60 * 24)) / 60);
-  const minutes = totalMinutes % 60;
-  const parts = [];
-  if (days) parts.push(`${days} 天`);
-  parts.push(`${hours} 小时`);
-  parts.push(`${minutes} 分`);
-  return { label, done: false, days, hours, minutes, text: parts.join(' ') };
+const WEEKDAYS = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+function weekdayText(date) {
+  const [year, month, day] = date.split('-').map(Number);
+  return WEEKDAYS[new Date(Date.UTC(year, month - 1, day)).getUTCDay()];
+}
+
+function launchStage(entry, now) {
+  if (now < Date.parse(entry.preorderAt)) return 'upcoming';
+  return now < Date.parse(`${entry.releaseDate}T00:00:00+08:00`) ? 'preorder' : 'released';
+}
+
+// Hour precision stays accurate while a notice is open without a running timer.
+function stageText(entry, stage, now) {
+  if (stage === 'released') return '已正式发售';
+  if (stage === 'preorder') return '预购进行中';
+  const hours = Math.floor((Date.parse(entry.preorderAt) - now) / 3600000);
+  if (hours < 1) return '预购即将开始';
+  return hours < 24 ? `距预购 ${hours} 小时` : `距预购 ${Math.floor(hours / 24)} 天 ${hours % 24} 小时`;
 }
 
 function activeCalendars(now = Date.now(), opening = false) {
@@ -65,9 +63,9 @@ function shouldOpenCalendar(entry, saved, now = Date.now()) {
 function guideNote(now = Date.now()) {
   const calendar = activeCalendars(now)[0];
   if (!calendar) return '从选择配置，到收到提醒后下单';
-  if (now < Date.parse(calendar.preorderAt)) return `${calendar.title} · ${calendar.preorderDateText} ${calendar.preorderTimeText} 开启预购`;
-  if (fmtDate(now) < calendar.releaseDate) return `${calendar.title} · ${calendar.releaseDateText} 正式发售`;
+  if (calendar.stage === 'upcoming') return `${calendar.title} · ${calendar.preorderDateText} ${calendar.preorderTimeText} 开启预购`;
+  if (calendar.stage === 'preorder') return `${calendar.title} · ${calendar.releaseDateText} 正式发售`;
   return `${calendar.title} 已发售 · 查看取货攻略`;
 }
 
-module.exports = { activeCalendars, calendarView, countdownView, guideNote, shouldOpenCalendar };
+module.exports = { activeCalendars, calendarView, guideNote, shouldOpenCalendar };

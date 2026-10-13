@@ -43,27 +43,26 @@ button.opening-calendar-close.opening-calendar-close {
 .opening-calendar-close text { font-size: 26px; line-height: 1; font-weight: 300; }
 .opening-calendar-close.ui-control-pressed { background: var(--control-pressed); color: var(--green-dark); }
 .opening-calendar-scroll { flex: 0 1 auto; min-height: 0; height: 680rpx; max-height: calc(100vh - 240px - env(safe-area-inset-top) - env(safe-area-inset-bottom)); }
-.opening-calendar-scroll--compact { height: 340rpx; }
+.opening-calendar-scroll--compact { height: 380rpx; }
 .opening-calendar-content { padding: 0 30rpx 18rpx; }
-.opening-calendar-actions { flex: none; padding: 8rpx 30rpx 26rpx; }
+.opening-calendar-content .poster-source { line-height: 1.5; }
+.opening-calendar-actions { flex: none; padding: 16rpx 30rpx 18rpx; border-top: 1rpx solid var(--line); }
 .opening-calendar-actions .btn { height: auto; min-height: 44px; padding: 20rpx; line-height: 1.4; }
-.opening-calendar-mute { display: flex; align-items: center; justify-content: center; min-height: 44px; color: var(--text-2); gap: 8rpx; font-size: 14px; margin-top: 8rpx; }
-.opening-calendar-footnote { text-align: center; font-size: 12px; line-height: 1.5; }
+.opening-calendar-mute { display: flex; align-items: center; justify-content: center; min-height: 44px; color: var(--text-2); gap: 8rpx; font-size: 14px; margin-top: 4rpx; }
 @media (min-width: 600px) {
   .opening-calendar-mask { padding: 24px; }
   .opening-calendar-panel { max-height: calc(100vh - 48px); border-radius: 24px; }
   .opening-calendar-header { padding: 8px 18px 8px 24px; }
-  .opening-calendar-scroll { height: 360px; }
-  .opening-calendar-scroll--compact { height: 180px; }
+  .opening-calendar-scroll { height: 400px; }
+  .opening-calendar-scroll--compact { height: 230px; }
   .opening-calendar-content { padding: 0 24px 12px; }
-  .opening-calendar-actions { padding: 8px 24px 20px; }
+  .opening-calendar-actions { padding: 10px 24px 12px; }
   .opening-calendar-actions .btn { padding: 12px; }
   .opening-calendar-panel .small { font-size: 14px; line-height: 1.5; }
   .opening-calendar-panel .tiny { font-size: 12px; line-height: 1.5; }
   .opening-calendar-panel .btn { font-size: 16px; line-height: 1.5; padding: 12px 16px; }
   .opening-calendar-panel .mt { margin-top: 10px; }
-  .opening-calendar-mute { font-size: 14px; gap: 6px; margin-top: 8px; }
-  .opening-calendar-footnote { font-size: 12px; }
+  .opening-calendar-mute { font-size: 14px; gap: 6px; margin-top: 2px; }
   .query-guide-entry.query-guide-entry { padding: 14px 18px; border-radius: 18px; }
   .query-guide-title { font-size: 16px; }
   .query-guide-note { font-size: 13px; }

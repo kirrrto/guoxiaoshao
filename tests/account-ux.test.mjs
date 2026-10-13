@@ -130,6 +130,19 @@ test('consumer account page contains no admin route or catalog timestamp', () =>
   assert.match(feedbackButton.replace(/<[^>]+>/g, ''), /意见反馈/);
 });
 
+test('customer service opens the native WeChat contact session from the account page and guide', () => {
+  for (const page of ['mine', 'guide']) {
+    const markup = fs.readFileSync(path.join(root, `pages/${page}/index.wxml`), 'utf8');
+    const contactButtons = markup.match(/<button\b[^>]*\bopen-type="contact"[^>]*>[\s\S]*?<\/button>/g) || [];
+    assert.ok(contactButtons.length, `${page} offers a contact button`);
+    for (const button of contactButtons) {
+      assert.match(button, /session-from="gxs_[a-z]+"/, `${page} contact entry identifies its scene`);
+      assert.match(button.replace(/<[^>]+>/g, ''), /联系客服/);
+      assert.doesNotMatch(button, /bindtap=/, 'the native contact session needs no custom navigation');
+    }
+  }
+});
+
 test('operator configuration cannot send administrator-list edits and malformed JSON values', async () => {
   const rt = runtime('admin', async action => action === 'admin.stats' ? { users: 12 } : { config: {}, revision: 0 });
   await rt.page.onLoad();
