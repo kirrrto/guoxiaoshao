@@ -1,0 +1,73 @@
+{
+  "generatedAt": "2026-10-13T15:05:50.341Z",
+  "note": "Offline page data snapshots only; not real WeChat cashier evidence.",
+  "states": [
+    {
+      "label": "payment-available",
+      "showPurchaseShop": true,
+      "displayMemberProducts": [
+        {
+          "planId": "member_7d",
+          "nameText": "周卡",
+          "priceText": "¥7.00",
+          "standardPriceText": "",
+          "available": true
+        },
+        {
+          "planId": "member_30d",
+          "nameText": "月卡",
+          "priceText": "¥14.99",
+          "standardPriceText": "¥30.00",
+          "available": true
+        },
+        {
+          "planId": "member_365d",
+          "nameText": "年卡",
+          "priceText": "¥129.00",
+          "standardPriceText": "¥360.00",
+          "available": true
+        }
+      ],
+      "purchaseUnavailableNote": "",
+      "paymentReady": true,
+      "membershipActive": true,
+      "membershipCanExpand": false,
+      "benefitPlans": 1
+    },
+    {
+      "label": "payment-unavailable",
+      "showPurchaseShop": false,
+      "displayMemberProducts": [],
+      "purchaseUnavailableNote": "会员购买暂不可用，现有会员权益不受影响。",
+      "paymentReady": false,
+      "membershipActive": true,
+      "membershipCanExpand": false,
+      "benefitPlans": 1
+    },
+    {
+      "label": "partial-month-disabled",
+      "showPurchaseShop": true,
+      "displayMemberProducts": [
+        {
+          "planId": "member_7d",
+          "nameText": "周卡",
+          "priceText": "¥7.00",
+          "standardPriceText": "",
+          "available": true
+        },
+        {
+          "planId": "member_365d",
+          "nameText": "年卡",
+          "priceText": "¥129.00",
+          "standardPriceText": "¥360.00",
+          "available": true
+        }
+      ],
+      "purchaseUnavailableNote": "",
+      "paymentReady": true,
+      "membershipActive": true,
+      "membershipCanExpand": false,
+      "benefitPlans": 1
+    }
+  ]
+}

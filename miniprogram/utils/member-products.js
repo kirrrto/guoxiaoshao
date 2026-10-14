@@ -30,4 +30,24 @@ function renewalPreview(product, membership, now = Date.now()) {
   };
 }
 
-module.exports = { planId, memberProducts, renewalPreview };
+/** Keep only plans that may show a purchase entry; empty means hide the shop. */
+function purchasableProducts(products, isPurchasable) {
+  const list = Array.isArray(products) ? products.filter(Boolean) : [];
+  if (typeof isPurchasable !== 'function') return list;
+  return list.filter(item => isPurchasable(item) === true);
+}
+
+/**
+ * Prefer the current selection when it is still purchasable. With a pending
+ * order the chosen plan is frozen and must not auto-switch to another SKU.
+ */
+function choosePurchasablePlan(products, preferredPlanId, options = {}) {
+  const list = Array.isArray(products) ? products.filter(Boolean) : [];
+  const preferred = list.find(item => planId(item) === preferredPlanId);
+  if (options.hasPendingOrder) return preferred || list[0] || null;
+  const purchasable = options.isPurchasable ? list.filter(item => options.isPurchasable(item) === true) : list;
+  if (preferred && purchasable.some(item => planId(item) === planId(preferred))) return preferred;
+  return purchasable[0] || null;
+}
+
+module.exports = { planId, memberProducts, renewalPreview, purchasableProducts, choosePurchasablePlan };

@@ -8,6 +8,16 @@
 // Keep technical details and complete acceptance records in release documents.
 const RELEASE_NOTES = [
   {
+    version: '2.1.1',
+    title: '购买入口更稳妥',
+    dateText: '更新记录 · 2026-10-13',
+    highlights: [
+      '会员购买暂不可用时，不再展示价格与开通入口。',
+      '仅展示当前可购买的套餐，续费与升级同样遵守。',
+      '已有会员权益、购买记录与兑换不受影响。',
+    ],
+  },
+  {
     version: '2.1.0',
     title: '会员与微信提醒体验升级',
     dateText: '更新记录 · 2026-10-13',

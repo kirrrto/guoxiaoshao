@@ -16,8 +16,8 @@ const fmt = require('../../utils/format');
 const { syncTabBar } = require('../../utils/tab-bar');
 const { notificationAdvice } = require('../../utils/reminder-readiness');
 const { shareAppMessage, shareTimeline } = require('../../utils/share');
-const { paymentAvailability, createPaymentController, purchaseNotice } = require('../../utils/member-payment');
-const { memberProducts, planId, renewalPreview } = require('../../utils/member-products');
+const { paymentAvailability, createPaymentController, purchaseNotice, planPurchasable, purchaseGate } = require('../../utils/member-payment');
+const { memberProducts, planId, renewalPreview, choosePurchasablePlan } = require('../../utils/member-products');
 const { productBenefit } = require('../../utils/member-limits');
 const { createCheckoutContext, TTL_MS: CHECKOUT_TTL_MS } = require('../../utils/checkout-context');
 const conversion = require('../../utils/conversion-events');
@@ -197,6 +197,9 @@ Page({
     membershipBenefitPlans: [],
     membershipCanExpand: false,
     membershipUpgradeOpen: false,
+    showPurchaseShop: false,
+    displayMemberProducts: [],
+    purchaseUnavailableNote: '',
     purchaseMode: 'purchase',
     membershipUpgradePreview: null,
     showQuotaDetails: false,
@@ -487,16 +490,26 @@ Page({
     const membership = boot.membership;
     const settings = boot.settings || { dnd: { enabled: false, startMinute: 23 * 60, endMinute: 8 * 60 }, notifyEnabled: true };
     const products = memberProducts(boot).map(presentMemberProduct);
-    const selected = products.find(item => item.planId === (this.paymentPendingPlanId || this.data.selectedPlanId)) || products[0] || boot.memberProduct;
+    const gate = purchaseGate(products, wx);
+    const hasPendingOrder = Boolean(this.paymentPendingPlanId || this.data.paymentPendingId);
+    const selected = choosePurchasablePlan(products, this.paymentPendingPlanId || this.data.selectedPlanId, {
+      hasPendingOrder, isPurchasable: item => item.available === true })
+      || products.find(item => item.planId === (this.paymentPendingPlanId || this.data.selectedPlanId))
+      || products[0] || boot.memberProduct;
     const availability = paymentAvailability(selected, wx);
+    const showPurchaseShop = gate.showShop || hasPendingOrder;
+    const purchasable = gate.showShop ? gate.purchasable : [];
     this.setData({
       selectedPlanId: planId(selected),
+      showPurchaseShop,
+      purchaseUnavailableNote: gate.showShop ? '' : (gate.reason || '会员购买暂不可用，现有会员权益不受影响。'),
+      displayMemberProducts: showPurchaseShop ? (gate.showShop ? purchasable : products.filter(item => item.planId === planId(selected))) : [],
       contextualCheckout: Boolean(boot.features && boot.features.contextualCheckout),
-      membershipUpgradeOpen: !accountChanged && membership.active && this.data.membershipUpgradeOpen,
+      membershipUpgradeOpen: showPurchaseShop && !accountChanged && membership.active && this.data.membershipUpgradeOpen,
       purchaseMode: membership.active ? !accountChanged && this.data.purchaseMode === 'upgrade' ? 'upgrade' : 'renew' : 'purchase',
       membershipUpgradePreview: renewalPreview(selected, membership),
       membershipBenefitPlans: membershipBenefitPlans(products),
-      membershipCanExpand: Boolean(membership.active && products.some(product => product.days >= 30 && product.enabled
+      membershipCanExpand: Boolean(membership.active && gate.showShop && purchasable.some(product => product.days >= 30
         && product.limits && boot.limits && Number.isInteger(boot.limits.maxFollows) && Number.isInteger(boot.limits.maxStoresPerFollow)
         && (product.limits.maxFollows > boot.limits.maxFollows || product.limits.maxStoresPerFollow > boot.limits.maxStoresPerFollow))),
       boot: {
@@ -529,6 +542,10 @@ Page({
     const boot = this.data.boot;
     const selected = boot && (boot.memberProducts || []).find(item => item.planId === id);
     if (!selected) return;
+    if (!this.data.paymentPendingId && !planPurchasable(selected, wx)) {
+      toast('此套餐暂不可用，请选择其他可购买套餐');
+      return;
+    }
     const availability = paymentAvailability(selected, wx);
     this.setData({ selectedPlanId: selected.planId, boot: { ...boot, memberProduct: selected,
       priceText: fmt.fen(selected.priceFen), purchaseNotice: purchaseNotice(selected),
@@ -541,7 +558,8 @@ Page({
   onSelectMemberProduct(event) {
     if (this.pageRetired || this.data.redeeming || this.data.paymentBusy || this.data.paymentChecking || this.data.paymentPendingId || this.data.paymentConfirming) return;
     const candidate = this.data.boot && (this.data.boot.memberProducts || []).find(item => item.planId === event.currentTarget.dataset.planId);
-    if (this.data.purchaseMode === 'upgrade' && this.data.membership && this.data.membership.active && (!candidate || candidate.days < 30)) return;
+    if (!candidate || !candidate.available) return;
+    if (this.data.purchaseMode === 'upgrade' && this.data.membership && this.data.membership.active && candidate.days < 30) return;
     this.selectMemberProduct(event.currentTarget.dataset.planId);
   },
 
@@ -552,18 +570,22 @@ Page({
 
   onOpenMembershipUpgrade() {
     if (!this.canChangeMembershipPurchase()) return;
-    const products = this.data.boot.memberProducts || [];
+    const products = (this.data.boot.memberProducts || []).filter(item => item.available);
+    if (!products.length) return toast('会员购买暂不可用，现有会员权益不受影响。');
     const selected = products.find(item => item.planId === this.data.selectedPlanId && item.days >= 30)
       || products.find(item => item.days === 30) || products.find(item => item.days === 365);
-    if (!selected) return toast('长期套餐暂未加载，请刷新账户后重试');
+    if (!selected) return toast('长期套餐暂未开放购买，请刷新账户后重试');
     this.setData({ membershipUpgradeOpen: true, purchaseMode: 'upgrade' });
     this.selectMemberProduct(selected.planId);
   },
 
   onOpenMembershipRenew() {
     if (!this.canChangeMembershipPurchase()) return;
+    const products = (this.data.boot.memberProducts || []).filter(item => item.available);
+    if (!products.length) return toast('会员购买暂不可用，现有会员权益不受影响。');
+    const preferred = products.find(item => item.planId === this.data.selectedPlanId) || products[0];
     this.setData({ membershipUpgradeOpen: true, purchaseMode: 'renew' });
-    this.selectMemberProduct(this.data.selectedPlanId);
+    this.selectMemberProduct(preferred.planId);
   },
 
   onCloseMembershipUpgrade() {
@@ -727,7 +749,15 @@ Page({
   },
 
   async onBuyMembership() {
-    if (this.pageRetired || this.data.redeeming || this.data.paymentBusy || this.data.paymentChecking || this.data.paymentConfirming || !this.data.ready || !this.data.boot || (!this.data.paymentPendingId && !this.data.boot.paymentReady)) return;
+    if (this.pageRetired || this.data.redeeming || this.data.paymentBusy || this.data.paymentChecking || this.data.paymentConfirming || !this.data.ready || !this.data.boot) return;
+    if (!this.data.paymentPendingId) {
+      if (!this.data.showPurchaseShop || !this.data.boot.paymentReady) return;
+      const selected = (this.data.boot.memberProducts || []).find(item => item.planId === this.data.selectedPlanId) || this.data.boot.memberProduct;
+      if (!selected || !planPurchasable(selected, wx)) {
+        this.setData({ paymentError: '会员购买暂不可用，现有会员权益不受影响。' });
+        return;
+      }
+    }
     const targetRequired = !this.data.membership || !this.data.membership.active;
     if (!this.data.paymentPendingId && targetRequired && (this.data.checkoutLoading || this.data.checkoutMessage)) return;
     const checkout = this.currentCheckout();

@@ -347,7 +347,7 @@ test('old runtime and backend-disabled products remain unavailable while support
   for (const options of [{ supported: false, platform: 'ios' }, { platform: 'devtools' }, { nextProduct: { ...product, paymentReady: false } }, { nextProduct: { ...product, enabled: false } }]) {
     const rt = runtime(options); await rt.controller.show(); await rt.controller.buy();
     assert.equal(rt.calls.length, 0); assert.equal(rt.logins.length, 0); assert.equal(rt.payments.length, 0);
-    assert.match(rt.state().paymentError, /微信|未开放/);
+    assert.match(rt.state().paymentError, /微信|未开放|购买暂不可用/);
   }
 });
 

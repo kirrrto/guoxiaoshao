@@ -1,5 +1,5 @@
 {
-  "version": "2.1.0",
+  "version": "2.1.1",
   "purpose": "Acceptance requirements, not deployed runtime configuration or achieved capacity",
   "simultaneousQueryingMembers": 300,
   "followNormalDetectionSeconds": 60,

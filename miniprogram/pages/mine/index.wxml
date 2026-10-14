@@ -74,17 +74,18 @@
         <button class="ui-disclosure notification-test-entry" hover-class="ui-control-pressed" disabled="{{paymentBusy || paymentChecking || paymentConfirming}}" bindtap="onTestNotification"><image class="ui-icon" src="/images/ui/notification.png" mode="aspectFit" aria-hidden="true" /><view class="notification-test-copy"><text class="ui-disclosure-label">体验微信提醒</text><text class="notification-test-description">{{membership.active ? '给自己发一条测试消息' : '开通前，先体验一条微信消息'}}</text></view><view class="ui-chevron" aria-hidden="true"></view></button>
         <view class="notification-test-note">需授权 · 每条消耗 1 次额度 · 【测试】非真实放货</view>
       </view>
-      <view wx:if="{{membership.active && !membershipUpgradeOpen && !paymentPendingId}}" class="membership-member-actions">
+      <view wx:if="{{showPurchaseShop && membership.active && !membershipUpgradeOpen && !paymentPendingId}}" class="membership-member-actions">
         <button class="membership-manage membership-manage-primary" hover-class="ui-control-pressed" disabled="{{redeeming || paymentBusy || paymentChecking || paymentConfirming}}" bindtap="onOpenMembershipRenew">延长会员</button>
         <button wx:if="{{membershipCanExpand}}" class="membership-manage" hover-class="ui-control-pressed" disabled="{{redeeming || paymentBusy || paymentChecking || paymentConfirming}}" bindtap="onOpenMembershipUpgrade">升级套餐</button>
       </view>
-      <view wx:if="{{!paymentPendingId && (!membership.active || membershipUpgradeOpen)}}" id="membership-offer" class="membership-shop">
+      <view wx:if="{{!showPurchaseShop && !paymentPendingId}}" class="payment-note purchase-unavailable-note">{{purchaseUnavailableNote}}</view>
+      <view wx:if="{{showPurchaseShop && !paymentPendingId && (!membership.active || membershipUpgradeOpen)}}" id="membership-offer" class="membership-shop">
         <view class="membership-shop-heading">
           <text class="membership-shop-title">{{membership.active ? (purchaseMode === 'upgrade' ? '升级套餐' : '延长会员') : '选择会员时长'}}</text>
           <button wx:if="{{membership.active && !paymentPendingId}}" class="ui-action membership-shop-close" hover-class="ui-control-pressed" disabled="{{redeeming || paymentBusy || paymentChecking || paymentConfirming}}" bindtap="onCloseMembershipUpgrade">收起</button>
         </view>
         <view class="membership-packages {{contextualCheckout && !membership.active ? 'membership-packages-context' : ''}}" aria-label="选择会员套餐">
-          <button wx:for="{{boot.memberProducts}}" wx:key="planId" class="membership-package {{selectedPlanId === item.planId ? 'membership-package-selected' : ''}} {{item.planId === 'member_7d' ? 'membership-package-short' : 'membership-package-long'}}" data-plan-id="{{item.planId}}" disabled="{{redeeming || paymentBusy || paymentChecking || paymentPendingId || paymentConfirming || (membership.active && purchaseMode === 'upgrade' && item.days < 30)}}" bindtap="onSelectMemberProduct" aria-label="{{item.nameText + '，' + item.durationText + '，' + item.priceText + (item.standardPriceText ? '，标准价' + item.standardPriceText + '，优惠价' : '') + (selectedPlanId === item.planId ? '，已选' : '')}}">
+          <button wx:for="{{displayMemberProducts}}" wx:key="planId" class="membership-package {{selectedPlanId === item.planId ? 'membership-package-selected' : ''}} {{item.planId === 'member_7d' ? 'membership-package-short' : 'membership-package-long'}}" data-plan-id="{{item.planId}}" disabled="{{redeeming || paymentBusy || paymentChecking || paymentPendingId || paymentConfirming || (membership.active && purchaseMode === 'upgrade' && item.days < 30)}}" bindtap="onSelectMemberProduct" aria-label="{{item.nameText + '，' + item.durationText + '，' + item.priceText + (item.standardPriceText ? '，标准价' + item.standardPriceText + '，优惠价' : '') + (selectedPlanId === item.planId ? '，已选' : '')}}">
             <view class="membership-package-heading"><view class="membership-package-name-line"><text class="membership-package-name">{{item.nameText}}</text><text class="membership-package-duration">{{item.durationText}}</text></view><text wx:if="{{item.promotionText}}" class="membership-promotion-tag">{{item.promotionText}}</text></view>
             <view class="membership-package-pricing"><text class="membership-package-price {{item.promotionText ? 'membership-package-price-promotional' : ''}}">{{item.priceText}}</text><text wx:if="{{item.standardPriceText}}" class="membership-standard-price">{{item.standardPriceText}}</text></view>
             <text class="membership-package-benefit">{{item.benefitShort}}</text>
@@ -94,7 +95,6 @@
         <view class="membership-entry-list">
           <button class="member-entry payment-entry" disabled="{{!boot.paymentReady || redeeming || paymentBusy || paymentChecking || paymentPendingId || paymentConfirming || (!membership.active && (checkoutLoading || checkoutMessage))}}" bindtap="onBuyMembership">{{paymentBusy ? '正在处理支付…' : membership.active ? (purchaseMode === 'upgrade' ? '确认购买' : '确认续费') : contextualCheckout ? '确认购买 ' + boot.memberProduct.days + ' 天会员' : '立即开通'}} · {{boot.priceText}}</button>
         </view>
-        <view wx:if="{{!boot.paymentReady}}" class="payment-note">{{boot.paymentReason}}</view>
         <view wx:if="{{membership.active && membershipUpgradePreview}}" class="membership-extension">
           <view class="membership-extension-detail">{{membershipUpgradePreview.extensionText}}</view>
           <view wx:if="{{membershipUpgradePreview.expiresAtText}}" class="membership-extension-date">预计到期 {{membershipUpgradePreview.expiresAtText}}</view>

@@ -22,7 +22,12 @@ function knownVersionBelow(value, minimum) {
   return false;
 }
 
-function paymentAvailability(product = {}, wxApi = {}) {
+/** Global blocks stop every cashier path, including retrying an existing order. */
+const GLOBAL_PAYMENT_REASON = new Set(['payment_not_enabled', 'payment_server_not_ready']);
+/** Plan-level blocks hide that SKU from new checkout but keep order lookup alive. */
+const PLAN_PAYMENT_REASON = new Set(['payment_product_id_missing', 'payment_plan_disabled', 'payment_product_terms_mismatch', 'payment_ios_disabled']);
+
+function deviceCashierCapability(wxApi = {}) {
   let info = {}, base = {}, capabilityError = false;
   try {
     info = (wxApi.getDeviceInfo ? wxApi.getDeviceInfo() : wxApi.getSystemInfoSync ? wxApi.getSystemInfoSync() : {}) || {};
@@ -34,14 +39,7 @@ function paymentAvailability(product = {}, wxApi = {}) {
   const systemMatch = String(info.system || '').match(/^(?:iOS|iPhone OS|Android|Windows|macOS|HarmonyOS)\s+(\d+(?:[._]\d+)*)/i);
   capabilities.systemVersion = systemMatch ? safeVersion(systemMatch[1].replace(/_/g, '.')) : '';
   const blocked = (code, reason) => ({ ready: false, code, reason, capabilities });
-  if (!product.enabled || !product.paymentReady) {
-    const code = ['payment_product_id_missing', 'payment_plan_disabled'].includes(product.paymentReason) ? product.paymentReason
-      : product.paymentReason === 'payment_not_enabled' || !product.enabled ? 'payment_not_enabled' : 'payment_server_not_ready';
-    return blocked(code, ['payment_product_id_missing', 'payment_plan_disabled'].includes(code)
-      ? '此套餐暂未开放购买，请选择其他套餐。' : '会员付费购买暂未开放，兑换码开通仍可使用。');
-  }
   if (info.platform === 'devtools') return blocked('payment_devtools', '开发者工具无法验证付款，请在手机微信中打开小程序。');
-  if (info.platform === 'ios' && product.iosEnabled === false) return blocked('payment_ios_disabled', 'iPhone 购买暂未开放，兑换码开通仍可使用。');
   if (capabilityError) return blocked('payment_capability_unknown', '暂时无法确认当前设备的支付能力，请重新打开小程序后再试。');
   let supported = typeof wxApi.requestVirtualPayment === 'function';
   try {
@@ -54,12 +52,75 @@ function paymentAvailability(product = {}, wxApi = {}) {
     }
     const version = String(base.SDKVersion || '').split('.').map(Number);
     const modernSdk = version[0] > 2 || (version[0] === 2 && (version[1] > 19 || (version[1] === 19 && version[2] >= 2)));
+    // canIUse only proves the API exists on this client. Merchant/platform
+    // payment rights still require the server product readiness below.
     if (!modernSdk && wxApi.canIUse && !wxApi.canIUse('requestVirtualPayment')) supported = false;
   } catch (_) { return blocked('payment_capability_unknown', '暂时无法确认当前设备的支付能力，请重新打开小程序后再试。'); }
   if (!supported) return blocked('payment_api_unavailable', ['windows', 'mac'].includes(info.platform)
     ? '当前电脑微信未提供此付款能力，所选配置可保留；请在手机微信中重新打开小程序确认。'
     : '当前微信未提供此付款能力，请更新微信后重新打开小程序。');
   return { ready: true, code: '', reason: '', capabilities };
+}
+
+function productPurchaseBlocked(product = {}) {
+  if (product.enabled === false || product.paymentReady === false) {
+    const reason = typeof product.paymentReason === 'string' ? product.paymentReason : '';
+    const code = PLAN_PAYMENT_REASON.has(reason) ? reason
+      : reason === 'payment_not_enabled' || product.enabled === false ? 'payment_not_enabled' : 'payment_server_not_ready';
+    return { ready: false, code,
+      reason: PLAN_PAYMENT_REASON.has(code) ? '此套餐暂未开放购买，请选择其他套餐。' : '会员购买暂不可用，现有会员权益不受影响。' };
+  }
+  return null;
+}
+
+/** Platform/global payment suspension must never open a cashier, even to retry. */
+function platformPaymentSuspended(product = {}) {
+  if (product.paymentReady !== false && product.enabled !== false) return false;
+  const reason = typeof product.paymentReason === 'string' ? product.paymentReason : '';
+  if (GLOBAL_PAYMENT_REASON.has(reason)) return true;
+  if (reason && !PLAN_PAYMENT_REASON.has(reason)) return true;
+  // Legacy payloads without a reason still treat a hard disable as a platform stop.
+  return product.enabled === false && !PLAN_PAYMENT_REASON.has(reason);
+}
+
+/**
+ * mode: 'purchase' (default) — new checkout for this plan.
+ * mode: 'continue' — retry an already-created order. Plan-level disable does not
+ * rewrite frozen order terms, but platform suspension still blocks the cashier.
+ * Order lookup is intentionally independent and must not use this helper.
+ */
+function paymentAvailability(product = {}, wxApi = {}, options = {}) {
+  const mode = options && options.mode === 'continue' ? 'continue' : 'purchase';
+  const device = deviceCashierCapability(wxApi);
+  if (!device.ready) return device;
+  if (mode === 'continue') {
+    if (platformPaymentSuspended(product)) return { ready: false, code: 'payment_not_enabled',
+      reason: '会员购买暂不可用，现有会员权益不受影响。', capabilities: device.capabilities };
+    return device;
+  }
+  const blocked = productPurchaseBlocked(product);
+  if (blocked) return { ...blocked, capabilities: device.capabilities };
+  if (product.iosEnabled === false && device.capabilities.platform === 'ios') {
+    return { ready: false, code: 'payment_ios_disabled', reason: 'iPhone 购买暂未开放，兑换码开通仍可使用。', capabilities: device.capabilities };
+  }
+  return device;
+}
+
+/** True only for plans that may show a new purchase entry on this device. */
+function planPurchasable(product = {}, wxApi = {}) {
+  return paymentAvailability(product, wxApi, { mode: 'purchase' }).ready === true;
+}
+
+/** Purchase UI must list only purchasable plans and disappear when none remain. */
+function purchaseGate(products = [], wxApi = {}) {
+  const list = Array.isArray(products) ? products.filter(Boolean) : [];
+  const purchasable = list.filter(product => planPurchasable(product, wxApi));
+  return {
+    showShop: purchasable.length > 0,
+    purchasable,
+    blockedCount: list.length - purchasable.length,
+    reason: purchasable.length ? '' : '会员购买暂不可用，现有会员权益不受影响。',
+  };
 }
 
 function paymentErrorText(error) {
@@ -166,8 +227,15 @@ function createPaymentController({ wx: wxApi, call, onUpdate, onResolved, onDiag
     if (disposed || !account || busy || checking) return;
     const version = generation;
     const selectedPlanId = planId(product);
-    const availability = paymentAvailability(pendingId ? { ...product, enabled: true, paymentReady: true } : product, wxApi);
-    if (!availability.ready) { emit({ paymentError: availability.reason, paymentDiagnosticCode: availability.code }); diagnose('checkout_blocked', { planId: selectedPlanId, reasonCode: availability.code, result: 'blocked' }); return; }
+    // Existing orders keep their frozen terms. Never fake product readiness:
+    // platform suspension still blocks the cashier, while plan-level disable
+    // does not rewrite a pending order's amount/plan. Order lookup stays open.
+    const availability = paymentAvailability(product, wxApi, { mode: pendingId ? 'continue' : 'purchase' });
+    if (!availability.ready) {
+      emit({ paymentError: availability.reason, paymentDiagnosticCode: availability.code, paymentCanRetry: Boolean(pendingId) && availability.code !== 'payment_not_enabled' });
+      diagnose('checkout_blocked', { planId: selectedPlanId, reasonCode: availability.code, result: 'blocked' });
+      return;
+    }
     stopPolling();
     // A retry always checks the same order first; a paid/unknown-result order
     // must never reopen the cashier or silently become another purchase.
@@ -330,4 +398,7 @@ function createPaymentController({ wx: wxApi, call, onUpdate, onResolved, onDiag
   };
 }
 
-module.exports = { paymentAvailability, paymentErrorText, createPaymentController, purchaseNotice, DEFAULT_PURCHASE_NOTICE, STORAGE_PREFIX };
+module.exports = {
+  paymentAvailability, deviceCashierCapability, planPurchasable, purchaseGate, platformPaymentSuspended,
+  paymentErrorText, createPaymentController, purchaseNotice, DEFAULT_PURCHASE_NOTICE, STORAGE_PREFIX,
+};
