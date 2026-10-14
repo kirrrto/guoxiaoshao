@@ -50,7 +50,7 @@
       </view>
       <view wx:if="{{selectionSummary}}" class="selection-summary">
         <view class="selection-summary-product">
-          <view class="selection-summary-image-box"><image wx:if="{{selectionSummary.imageUrl && !selectionImageFailed}}" class="selection-summary-image {{selectionSummary.imageFitClass}}" src="{{selectionSummary.imageUrl}}" mode="aspectFit" aria-label="{{selectionSummary.imageAlt}}" binderror="onSelectionImageError" /><view wx:else class="selection-summary-image-placeholder">商品</view></view>
+          <view class="selection-summary-image-box"><image wx:if="{{selectionSummary.imageUrl && !selectionImageFailed}}" class="selection-summary-image {{selectionSummary.imageFitClass}}" src="{{selectionSummary.imageDisplayUrl || selectionSummary.imageUrl}}" mode="aspectFit" aria-label="{{selectionSummary.imageAlt}}" binderror="onSelectionImageError" /><view wx:else class="selection-summary-image-placeholder">商品</view></view>
           <view class="selection-summary-copy"><view class="selection-summary-title">{{selectionSummary.title}}</view><view class="selection-summary-city">{{selectionSummary.cityLabel}}</view></view>
         </view>
         <view class="selection-summary-footer"><view class="selection-summary-stores">{{selectionSummary.storeLabel}}</view><button class="ui-action selection-summary-change" hover-class="ui-control-pressed" bindtap="onEditSelection"><text class="ui-action-label">修改</text><text class="ui-chevron" aria-hidden="true"></text></button></view>
@@ -101,7 +101,7 @@
       <view wx:else class="result-target-note {{resultTargetDifferent ? 'result-target-different' : ''}}">{{resultTargetDifferent ? '与当前选择不同 · 下方保留原查询结果' : '对应当前所选配置与门店'}}</view>
       <view class="result-product-row">
         <view class="result-product-media">
-          <image wx:if="{{result.product.imageUrl}}" class="result-product-image {{result.product.imageFitClass}}" src="{{result.product.imageUrl}}" mode="aspectFit" aria-label="{{result.product.imageAlt || result.product.title}}" binderror="onResultImageError" />
+          <image wx:if="{{result.product.imageUrl}}" class="result-product-image {{result.product.imageFitClass}}" src="{{result.product.imageDisplayUrl || result.product.imageUrl}}" mode="aspectFit" aria-label="{{result.product.imageAlt || result.product.title}}" binderror="onResultImageError" />
           <view wx:else class="result-product-placeholder">暂无图片</view>
         </view>
         <view class="result-product-copy">
