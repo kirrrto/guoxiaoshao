@@ -10,7 +10,7 @@ const { shareAppMessage, shareTimeline, readSharedSelection } = require('../../u
 const { monitorPollDelay } = require('../../utils/poll');
 const { topUpReminderCredit } = require('../../utils/reminder-credits');
 const { confirmTap } = require('../../utils/haptic');
-const { productImageFit, withImageFit } = require('../../utils/product-image-fit');
+const { productImageFit, withImageFit, productThumbnailUrl } = require('../../utils/product-image-fit');
 const { availableStoreChoices } = require('../../utils/observation-insights');
 const alternatives = require('../../utils/query-alternatives');
 const { resultNextAction, targetEvidence, targetSignature } = require('../../utils/result-next-action');
@@ -62,7 +62,7 @@ function selectionDetails(selection, catalog, maxStores) {
   const cities = Array.from(new Set(stores.map(s => s.city).filter(Boolean)));
   return { valid, notice: unavailable ? '该商品尚未开放取货查询，可先查看新品信息或选择其他配置。' : '请补全或核对配置与门店后查询。', summary: product ? {
     title: product.title || product.model || product.partNumber,
-    imageUrl: product.imageUrl || '', imageAlt: product.imageAlt || product.title || '',
+    imageUrl: product.imageUrl || '', imageDisplayUrl: productThumbnailUrl(product.imageUrl), imageAlt: product.imageAlt || product.title || '',
     imageFitClass: productImageFit(product.imageUrl),
     cityLabel: `${cities.join('、') || '已选'} · ${stores.length} 家门店`,
     storeLabel: numbers.length !== stores.length || new Set(numbers).size !== numbers.length || numbers.length > maxStores
@@ -855,7 +855,7 @@ Page({
 
   onToggleRules() { this.setData({ rulesExpanded: !this.data.rulesExpanded }); },
 
-  onSelectionImageError() { this.setData({ selectionImageFailed: true }); },
+  onSelectionImageError() { const item = this.data.selectionSummary; if (item && item.imageDisplayUrl && item.imageDisplayUrl !== item.imageUrl) this.setData({ 'selectionSummary.imageDisplayUrl': item.imageUrl }); else this.setData({ selectionImageFailed: true }); },
 
   readPickerSelection() {
     // The component coalesces change events until nextTick. A tap must use
@@ -979,7 +979,7 @@ Page({
     }
   },
 
-  onResultImageError() { this.setData({ 'result.product.imageUrl': '' }); },
+  onResultImageError() { const product = this.data.result && this.data.result.product; if (product && product.imageDisplayUrl && product.imageDisplayUrl !== product.imageUrl) this.setData({ 'result.product.imageDisplayUrl': product.imageUrl }); else this.setData({ 'result.product.imageUrl': '' }); },
 
   onFollowSelection() {
     const { boot } = this.data, selection = this.readPickerSelection();

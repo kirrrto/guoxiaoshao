@@ -1,3 +1,4 @@
+const { productThumbnailUrl } = require('../../utils/product-image-fit');
 const { call, newId, showError, toast } = require('../../utils/api');
 const { getBootstrap, getCatalog, refreshBootstrap, invalidateBootstrap, subscribeCatalog, getFollows, invalidateFollows, subscribeSubscriptions } = require('../../utils/store');
 const fmt = require('../../utils/format');
@@ -98,6 +99,7 @@ function presentFollow(follow, boot, catalog, collector) {
   return {
     ...follow,
     imageUrl: product && product.imageUrl || '',
+    imageDisplayUrl: productThumbnailUrl(product && product.imageUrl),
     imageAlt: product && product.imageAlt || follow.productTitle,
     statusLabel: status.label,
     statusCls: status.cls,
@@ -917,7 +919,7 @@ Page({
     this.onGoMine();
   },
 
-  onFollowImageError(e) { const index = Number(e.currentTarget.dataset.index); this.setData({ [`follows[${index}].imageUrl`]: '' }); },
+  onFollowImageError(e) { const index = Number(e.currentTarget.dataset.index); const item = this.data.follows && this.data.follows[index]; if (!item) return; if (item.imageDisplayUrl && item.imageDisplayUrl !== item.imageUrl) this.setData({ [`follows[${index}].imageDisplayUrl`]: item.imageUrl }); else this.setData({ [`follows[${index}].imageUrl`]: '' }); },
 
   onRetryLoad() {
     if (this.pageRetired) return;
