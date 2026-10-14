@@ -6,24 +6,12 @@ function productImageFit(imageUrl) {
   return match ? (match[1] ? 'product-image-fit-max' : 'product-image-fit-pro') : '';
 }
 
-// Keep the verified Apple CDN asset and its revision/signature parameters.
-// Only request a smaller rendition for the thumbnail-sized mini-program views.
-// The original imageUrl remains authoritative and is retried by image-error handlers.
-const APPLE_IMAGE_PREFIX = 'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/';
-const THUMBNAIL_WIDTH = 420;
-
+// Apple catalog images are verified as full, byte-for-byte CDN URLs.
+// Changing wid/hei created failed image requests in WeChat 3.17.3.
+// Until every smaller rendition is verified end-to-end, fail closed:
+// display the exact original URL without generating unverified dimensions.
 function productThumbnailUrl(imageUrl) {
-  const source = typeof imageUrl === 'string' ? imageUrl : '';
-  if (!source.startsWith(APPLE_IMAGE_PREFIX)) return source;
-  const width = /([?&])wid=(\d+)(?=&|$)/.exec(source);
-  const height = /([?&])hei=(\d+)(?=&|$)/.exec(source);
-  if (!width || !height) return source;
-  const originalWidth = Number(width[2]), originalHeight = Number(height[2]);
-  if (!Number.isSafeInteger(originalWidth) || !Number.isSafeInteger(originalHeight) ||
-      originalWidth <= THUMBNAIL_WIDTH || originalHeight <= 0) return source;
-  const thumbnailHeight = Math.max(1, Math.round(originalHeight * THUMBNAIL_WIDTH / originalWidth));
-  return source.replace(/([?&])wid=\d+(?=&|$)/, '$1wid=' + THUMBNAIL_WIDTH)
-    .replace(/([?&])hei=\d+(?=&|$)/, '$1hei=' + thumbnailHeight);
+  return typeof imageUrl === 'string' ? imageUrl : '';
 }
 
 function withImageFit(product) {

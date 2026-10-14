@@ -22,16 +22,13 @@ test('image framing does not mutate cached product data or reuse an obsolete fra
   assert.equal(output.title, 'Device');
 });
 
-test('Apple CDN thumbnails keep asset identity, query order and revision while bounding image pixels', () => {
-  const original = images['MJYH4CH/A'].imageUrl;
-  const thumb = productThumbnailUrl(original);
-  assert.notEqual(thumb, original);
-  assert.equal(new URL(thumb).searchParams.get('wid'), '420');
-  assert.equal(new URL(thumb).searchParams.get('hei'), '497');
-  assert.equal(new URL(thumb).searchParams.get('fmt'), new URL(original).searchParams.get('fmt'));
-  assert.equal(new URL(thumb).searchParams.get('.v'), new URL(original).searchParams.get('.v'));
-  assert.equal(productImageFit(thumb), 'product-image-fit-max');
-  assert.equal(withImageFit({ imageUrl: original }).imageDisplayUrl, thumb);
+test('Apple CDN display uses the exact verified original URL, including all parameters', () => {
+  for (const sku of ['MJYH4CH/A', 'MJYJ4CH/A', 'MJTA4CH/A']) {
+    const original = images[sku].imageUrl;
+    assert.equal(productThumbnailUrl(original), original);
+    assert.equal(withImageFit({ imageUrl: original }).imageDisplayUrl, original);
+    assert.equal(productImageFit(original), productImageFit(productThumbnailUrl(original)));
+  }
 });
 
 test('unknown, signed non-Apple and already-small URLs remain byte-for-byte unchanged', () => {
