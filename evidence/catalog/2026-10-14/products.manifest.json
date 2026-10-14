@@ -1,0 +1,45 @@
+{
+  "generatedAt": "2026-10-14T13:15:40.409Z",
+  "stopped": false,
+  "offlineReplay": false,
+  "entries": [
+    {
+      "familyKey": "iphone-duo",
+      "category": "iphone",
+      "rawFile": "iphone-duo.html",
+      "record": {
+        "requestUrl": "https://www.apple.com.cn/shop/buy-iphone/iphone-duo",
+        "method": "GET",
+        "startedAt": "2026-10-14T13:15:39.053Z",
+        "retries": 0,
+        "httpStatus": 200,
+        "headers": {
+          "content-type": "text/html;charset=utf-8",
+          "date": "Wed, 14 Oct 2026 13:15:40 GMT",
+          "cache-control": "public, max-age=120, s-maxage=120"
+        },
+        "bytes": 440467,
+        "sha256": "a041b5a0a21702bdedb6d24a939639802cca70351903b01e28d90f3657bcad78",
+        "elapsedMs": 1351,
+        "finishedAt": "2026-10-14T13:15:40.404Z"
+      },
+      "parse": {
+        "supported": true,
+        "reason": null,
+        "layout": "selector",
+        "pageTitle": "iPhone Duo",
+        "dimensions": [
+          "dimensionColor",
+          "dimensionCapacity"
+        ],
+        "productCount": 8,
+        "rejected": []
+      }
+    }
+  ],
+  "images": {
+    "fetched": 0,
+    "evidence": [],
+    "missing": []
+  }
+}

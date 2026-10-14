@@ -36,6 +36,7 @@
     { "category": "vision", "familyKey": "apple-vision-pro", "displayName": "Apple Vision Pro", "url": "https://www.apple.com.cn/shop/buy-vision/apple-vision-pro", "include": true },
 
     { "category": "homepod", "familyKey": "homepod", "displayName": "HomePod", "url": "https://www.apple.com.cn/shop/buy-homepod/homepod", "include": true },
-    { "category": "homepod", "familyKey": "homepod-mini", "displayName": "HomePod mini", "url": "https://www.apple.com.cn/shop/buy-homepod/homepod-mini", "include": true }
+    { "category": "homepod", "familyKey": "homepod-mini", "displayName": "HomePod mini", "url": "https://www.apple.com.cn/shop/buy-homepod/homepod-mini", "include": false, "excludeReason": "官网购买页已切换为 HomePod mini 2；旧款现有目录保留，后续全量采集不再从同一页面重复生成旧款" },
+    { "category": "homepod", "familyKey": "homepod-mini-2", "displayName": "HomePod mini 2", "url": "https://www.apple.com.cn/shop/buy-homepod/homepod-mini", "include": true, "releaseDate": "2026-10-13", "releaseSourceUrl": "https://www.apple.com.cn/newsroom/2026/10/apple-announces-the-next-generation-of-homepod-mini/" }
   ]
 }

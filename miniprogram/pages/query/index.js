@@ -18,7 +18,7 @@ const { launchView } = require('../../utils/product-launch');
 const { canOfferLiveChoices } = require('../../utils/observation-insights');
 const { createCheckoutContext } = require('../../utils/checkout-context');
 const conversion = require('../../utils/conversion-events');
-const { activeCalendars, guideNote, shouldOpenCalendar } = require('../../utils/launch-calendar');
+const { activeCalendars, guideNote, shouldOpenCalendar, withFollowReadiness } = require('../../utils/launch-calendar');
 
 const SELECTION_KEY = 'gxs_query_selection_v1';
 const RESULT_KEY = 'gxs_query_result_v1';
@@ -60,7 +60,7 @@ function selectionDetails(selection, catalog, maxStores) {
   const unavailable = Boolean(validScope && (!product.supported || product.comingSoon));
   const valid = validScope && !unavailable;
   const cities = Array.from(new Set(stores.map(s => s.city).filter(Boolean)));
-  return { valid, notice: unavailable ? '该商品尚未开放取货查询，可先查看新品信息或选择其他配置。' : '请补全或核对配置与门店后查询。', summary: product ? {
+  return { validScope, valid, notice: unavailable ? '配置已保存，取货查询和关注暂未开放。' : '请补全或核对配置与门店后查询。', summary: product ? {
     title: product.title || product.model || product.partNumber,
     imageUrl: product.imageUrl || '', imageDisplayUrl: productThumbnailUrl(product.imageUrl), imageAlt: product.imageAlt || product.title || '',
     imageFitClass: productImageFit(product.imageUrl),
@@ -314,7 +314,7 @@ Page({
       if (!shouldOpenCalendar(calendar, saved) || this.data.sheetVisible || this.data.querying
         || this.data.signing || this.data.alternativeLoading) return;
       this.calendarStorageKey = key;
-      this.setData({ openingCalendar: calendar, calendarOpen: true, calendarMuted: false });
+      this.setData({ openingCalendar: withFollowReadiness(calendar, this.catalog), calendarOpen: true, calendarMuted: false });
       this.syncCalendarOverlay();
       writeSession(key, { id: calendar.id, day: fmt.fmtDate(Date.now()), muted: false });
     } finally { this.calendarReadPending = false; }
@@ -498,6 +498,7 @@ Page({
     const patch = this.selectionView(this.selection);
     this.selectionNeedsReview = selectionNeedsReview(this.selection, patch.selectionCanCollapse);
     if (this.data.catalogVersion !== catalog.version) patch.catalogVersion = catalog.version;
+    if (this.data.openingCalendar) patch.openingCalendar = withFollowReadiness(this.data.openingCalendar, catalog);
     this.setData(patch);
     this.resolveSharedTarget();
     this.refreshStoreChoices();
@@ -844,8 +845,9 @@ Page({
 
   onDoneSelection() {
     const selection = this.readDraftSelection();
+    const details = selectionDetails(selection, this.catalog, this.data.boot ? this.data.boot.maxStores || 3 : 3);
     const patch = this.selectionView(selection);
-    if (!patch.selectionCanCollapse) return toast('请选择可查询的配置及有效门店');
+    if (!details.validScope) return toast('请选择具体配置及有效门店');
     this.onPickerChange({ detail: selection });
     this.onSelectionInteraction();
     this.draftSelection = null;

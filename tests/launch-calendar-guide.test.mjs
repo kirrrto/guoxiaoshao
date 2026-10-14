@@ -3,10 +3,28 @@ import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
 import { runtime } from './helpers/miniprogram-runtime.mjs';
 const require = createRequire(import.meta.url);
-const { activeCalendars, calendarView, guideNote, shouldOpenCalendar } = require('../miniprogram/utils/launch-calendar');
+const { activeCalendars, calendarView, guideNote, shouldOpenCalendar, withFollowReadiness } = require('../miniprogram/utils/launch-calendar');
 const entry = require('../miniprogram/config/product-launches')[0];
 const now = Date.parse('2026-10-11T08:00:00Z');
 const calendar = calendarView(entry, now);
+
+test('save-follow announcement requires current supported configurations even after the preorder date', () => {
+  const catalog = { products: [
+    { familyKey: entry.familyKey, supported: true, comingSoon: false },
+    { familyKey: entry.familyKey, supported: true, comingSoon: false },
+  ] };
+  const notice = withFollowReadiness(calendar, catalog);
+  assert.equal(notice.followNotice, '已支持保存关注');
+  assert.match(notice.followNoticeDetail, /会员.*授权/);
+  assert.equal(notice.stage, 'upcoming');
+  assert.equal(notice.id, calendar.id, 'readiness does not reset the user mute preference');
+  catalog.products[1].comingSoon = true;
+  assert.equal(withFollowReadiness(calendar, catalog).followNotice, '部分配置已支持保存关注');
+  catalog.products[0].supported = false;
+  assert.equal(withFollowReadiness(calendarView(entry, Date.parse('2026-10-24T00:00:00Z')), catalog).followNotice, '');
+  assert.equal(withFollowReadiness(calendar, { products: [{ familyKey: 'homepod-mini-2', supported: true }] }).followNotice, '');
+  assert.equal(withFollowReadiness(calendar, null).followNoticeDetail, '');
+});
 
 test('launch dates use Monday-first Beijing calendar independent of device timezone', () => {
   assert.equal(calendar.monthText, '2026 年 10 月');
@@ -64,6 +82,36 @@ function pageRuntime() {
   page.setData({ ready: true });
   return { rt, page, bar };
 }
+
+test('opening poster announces follow readiness and retracts it when the catalog changes', async () => {
+  const { rt, page } = pageRuntime();
+  const catalog = rt.load('utils/store.js').currentCatalog();
+  page.catalog = catalog;
+  page.calendarViewReady = true;
+  await page.maybeOpenCalendar();
+  assert.equal(page.data.openingCalendar.followNotice, '已支持保存关注');
+  page.applyCatalog({ ...catalog, version: `${catalog.version}-revoked`,
+    products: catalog.products.map(product => product.familyKey === entry.familyKey ? { ...product, supported: false } : product) });
+  assert.equal(page.data.openingCalendar.followNotice, '');
+  assert.equal(rt.calls.length, 0);
+  page.onUnload();
+});
+
+test('guide poster reads the current catalog, follows refreshes and removes its listener on unload', () => {
+  const rt = runtime();
+  rt.load('utils/launch-calendar.js').activeCalendars = () => [calendar];
+  const store = rt.load('utils/store.js');
+  let refresh, removed = false;
+  store.subscribeCatalog = listener => { refresh = listener; return () => { removed = true; }; };
+  const page = rt.instance('pages/guide/index.js');
+  page.onLoad(); page.onShow();
+  assert.equal(page.data.calendars[0].followNotice, '已支持保存关注');
+  refresh({ products: [] });
+  assert.equal(page.data.calendars[0].followNotice, '');
+  page.onUnload();
+  assert.equal(removed, true);
+  assert.equal(rt.calls.length, 0);
+});
 
 test('opening calendar waits for first render, performs no API calls, and releases tab on close', async () => {
   const { rt, page, bar } = pageRuntime();

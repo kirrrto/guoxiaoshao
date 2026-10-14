@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-const V = '2.1.1';
+const V = '2.2.0';
 const root = process.cwd();
 
 function updatePackageJson(file) {

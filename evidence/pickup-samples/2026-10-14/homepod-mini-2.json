@@ -1,0 +1,77 @@
+{
+  "record": {
+    "storeNumber": "R577",
+    "partNumbers": [
+      "MGHK4CH/A",
+      "MGKR4CH/A",
+      "MGHM4CH/A",
+      "MGHL4CH/A",
+      "MGHJ4CH/A"
+    ],
+    "requestUrl": "https://www.apple.com.cn/shop/retail/pickup-message?pl=true&mts.0=regular&parts.0=MGHK4CH%2FA&parts.1=MGKR4CH%2FA&parts.2=MGHM4CH%2FA&parts.3=MGHL4CH%2FA&parts.4=MGHJ4CH%2FA&store=R577",
+    "startedAt": "2026-10-14T13:14:33.527Z",
+    "httpStatus": 200,
+    "bytes": 9635,
+    "elapsedMs": 3516,
+    "finishedAt": "2026-10-14T13:14:37.043Z",
+    "error": null,
+    "retryAfter": null
+  },
+  "observations": [
+    {
+      "storeNumber": "R577",
+      "storeName": "天环广场",
+      "partNumber": "MGHK4CH/A",
+      "status": "pending",
+      "pickupDisplay": "default",
+      "quote": "10 月 30 日可取货",
+      "productTitle": "HomePod mini 2 - 白色",
+      "observedAt": "2026-10-14T13:14:37.043Z",
+      "reason": null
+    },
+    {
+      "storeNumber": "R577",
+      "storeName": "天环广场",
+      "partNumber": "MGKR4CH/A",
+      "status": "pending",
+      "pickupDisplay": "default",
+      "quote": "10 月 30 日可取货",
+      "productTitle": "HomePod mini 2 - 粉色",
+      "observedAt": "2026-10-14T13:14:37.043Z",
+      "reason": null
+    },
+    {
+      "storeNumber": "R577",
+      "storeName": "天环广场",
+      "partNumber": "MGHM4CH/A",
+      "status": "pending",
+      "pickupDisplay": "default",
+      "quote": "10 月 30 日可取货",
+      "productTitle": "HomePod mini 2 - 蓝色",
+      "observedAt": "2026-10-14T13:14:37.043Z",
+      "reason": null
+    },
+    {
+      "storeNumber": "R577",
+      "storeName": "天环广场",
+      "partNumber": "MGHL4CH/A",
+      "status": "pending",
+      "pickupDisplay": "default",
+      "quote": "10 月 30 日可取货",
+      "productTitle": "HomePod mini 2 - 绿色",
+      "observedAt": "2026-10-14T13:14:37.043Z",
+      "reason": null
+    },
+    {
+      "storeNumber": "R577",
+      "storeName": "天环广场",
+      "partNumber": "MGHJ4CH/A",
+      "status": "pending",
+      "pickupDisplay": "default",
+      "quote": "10 月 30 日可取货",
+      "productTitle": "HomePod mini 2 - 午夜色",
+      "observedAt": "2026-10-14T13:14:37.043Z",
+      "reason": null
+    }
+  ]
+}

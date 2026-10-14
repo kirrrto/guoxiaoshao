@@ -22,6 +22,9 @@
 .poster-stage::before { content: ''; flex: none; width: 12rpx; height: 12rpx; border-radius: 50%; background: currentColor; }
 .poster-stage--released { color: var(--text-2); }
 .poster-title { margin-top: 12rpx; font-size: 56rpx; font-weight: 750; line-height: 1.2; letter-spacing: -1.5rpx; color: var(--text); }
+.poster-follow-notice { margin-top: 16rpx; padding: 16rpx 20rpx; border-radius: 16rpx; background: var(--green-soft); text-align: center; }
+.poster-follow-title { color: var(--green-dark); font-size: 15px; line-height: 1.5; font-weight: 650; }
+.poster-follow-detail { margin-top: 4rpx; color: var(--text-2); font-size: 12px; line-height: 1.5; }
 .poster-hero-media { position: relative; height: 280rpx; margin-top: 8rpx; overflow: hidden; }
 /* Official portrait assets include generous empty margins. Crop that margin,
    keeping the full device centered and separate from the title and dates. */

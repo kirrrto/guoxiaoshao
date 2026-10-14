@@ -1168,5 +1168,25 @@ module.exports = {
   "MJ2K3CH/A": {
     "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/homepod-mini-select-orange-202110_FV1?wid=1868&hei=880&fmt=jpeg&qlt=90&.v=K2c3bEwyaWVDeDZkdHpLbHkwcGVSckhndCtsZnAwTnFpWXhSS0Y4SW9oQzB3REtrUExnSnVSelpEdXZEbDh6emh2cmVWZlJxS3lEakdTNUJ0b3RabElLTjQxSElFZVJPbjF4NEwzYXFKTE95SFNiTHNadFZ3VHN2dGIxVHpXci8",
     "imageAlt": "橙色 HomePod mini"
+  },
+  "MGHK4CH/A": {
+    "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/homepod-mini-select-white-202610_FV1?wid=1868&hei=880&fmt=jpeg&qlt=90&.v=K2c3bEwyaWVDeDZkdHpLbHkwcGVScUNNeFgzb01NZmZpZzZSMGM2UHlLYkxCM1gvWjZsdy9IamM4SVJ5RVlRQWk3aEZ4ZFFGenkvaGw2NzRqZXFWbnd0QXVzNitnN1V2S2Y5d3JYSkZKdmE1N1BYU0VVSUxkRXBtTThsd0FWQWE",
+    "imageAlt": "白色 HomePod mini 2 的正面外观，展示小巧的球形设计和无缝式声学织网。外观俯视图，展示平坦的背光触控板，多色灯光亮起。"
+  },
+  "MGKR4CH/A": {
+    "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/homepod-mini-select-pink-202610_FV1?wid=1868&hei=880&fmt=jpeg&qlt=90&.v=K2c3bEwyaWVDeDZkdHpLbHkwcGVScXRRVlBBbThId3VGVjV5R0VkY1BOTmg5UEh1YlAveUJWditPbXN3blRmVi91YlVrZnFCSWZSZ3JZTTVzMlVYL29lZWZNakozTlo4c2tlc21wdGxDT3REUUplZW5Qelh1U3BrZStreHk1SEY",
+    "imageAlt": "粉色 (浅粉色系) HomePod mini 2 的正面外观，展示小巧的球形设计和无缝式声学织网。外观俯视图，展示平坦的背光触控板，多色灯光亮起。"
+  },
+  "MGHM4CH/A": {
+    "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/homepod-mini-select-blue-202610_FV1?wid=1868&hei=880&fmt=jpeg&qlt=90&.v=K2c3bEwyaWVDeDZkdHpLbHkwcGVScXc1YnoxZGlJcWhmYnNWOWJuYkpDUmg5UEh1YlAveUJWditPbXN3blRmVi91YlVrZnFCSWZSZ3JZTTVzMlVYL29lZWZNakozTlo4c2tlc21wdGxDT3RLYXh2a0FSeEQ0SHoxUWtrbWl6dVA",
+    "imageAlt": "蓝色 (深蓝色系) HomePod mini 2 的正面外观，展示小巧的球形设计和无缝式声学织网。外观俯视图，展示平坦的背光触控板，多色灯光亮起。"
+  },
+  "MGHL4CH/A": {
+    "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/homepod-mini-select-green-202610_FV1?wid=1868&hei=880&fmt=jpeg&qlt=90&.v=K2c3bEwyaWVDeDZkdHpLbHkwcGVSazBhY04wdUIvdlZUQk1GWGNzZHR6ekxCM1gvWjZsdy9IamM4SVJ5RVlRQWk3aEZ4ZFFGenkvaGw2NzRqZXFWbnd0QXVzNitnN1V2S2Y5d3JYSkZKdmJRUGVPZFluN3czQ0VSZldlM2VsWnA",
+    "imageAlt": "绿色 (深绿色系) HomePod mini 2 的正面外观，展示小巧的球形设计和无缝式声学织网。外观俯视图，展示平坦的背光触控板，多色灯光亮起。"
+  },
+  "MGHJ4CH/A": {
+    "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/homepod-mini-select-midnight-202610_FV1?wid=1868&hei=880&fmt=jpeg&qlt=90&.v=K2c3bEwyaWVDeDZkdHpLbHkwcGVSaFRaZXZublY0K2p0Ri9sOWcwbVh6amwzc0hqbklCSmJHNTA2MnByUFJuSTN6WWY5a1JiR3h2V2h5Mis1dmgwRVRnQ1lhSmZUdzRUK1crYTlZTFpSRDlhblNYU3dVRzd1b3FleHZaelNicXk",
+    "imageAlt": "午夜色 (黑色系) HomePod mini 2 的正面外观，展示小巧的球形设计和无缝式声学织网。外观俯视图，展示平坦的背光触控板，多色灯光亮起。"
   }
 };

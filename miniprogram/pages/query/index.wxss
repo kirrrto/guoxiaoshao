@@ -44,6 +44,7 @@ button.opening-calendar-close.opening-calendar-close {
 .opening-calendar-close.ui-control-pressed { background: var(--control-pressed); color: var(--green-dark); }
 .opening-calendar-scroll { flex: 0 1 auto; min-height: 0; height: 680rpx; max-height: calc(100vh - 240px - env(safe-area-inset-top) - env(safe-area-inset-bottom)); }
 .opening-calendar-scroll--compact { height: 380rpx; }
+.opening-calendar-scroll--compact.opening-calendar-scroll--follow-ready { height: 340px; }
 .opening-calendar-content { padding: 0 30rpx 18rpx; }
 .opening-calendar-content .poster-source { line-height: 1.5; }
 .opening-calendar-actions { flex: none; padding: 16rpx 30rpx 18rpx; border-top: 1rpx solid var(--line); }

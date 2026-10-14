@@ -1,0 +1,41 @@
+{
+  "record": {
+    "storeNumber": "R577",
+    "partNumbers": [
+      "MK2V4CH/A",
+      "MK2T4CH/A"
+    ],
+    "requestUrl": "https://www.apple.com.cn/shop/retail/pickup-message?pl=true&mts.0=regular&parts.0=MK2V4CH%2FA&parts.1=MK2T4CH%2FA&store=R577",
+    "startedAt": "2026-10-14T13:16:15.061Z",
+    "httpStatus": 200,
+    "bytes": 6220,
+    "elapsedMs": 705,
+    "finishedAt": "2026-10-14T13:16:15.766Z",
+    "error": null,
+    "retryAfter": null
+  },
+  "observations": [
+    {
+      "storeNumber": "R577",
+      "storeName": "天环广场",
+      "partNumber": "MK2V4CH/A",
+      "status": "ineligible",
+      "pickupDisplay": "ineligible",
+      "quote": "暂无供应",
+      "productTitle": "iPhone Duo 2TB 星光白色",
+      "observedAt": "2026-10-14T13:16:15.766Z",
+      "reason": null
+    },
+    {
+      "storeNumber": "R577",
+      "storeName": "天环广场",
+      "partNumber": "MK2T4CH/A",
+      "status": "ineligible",
+      "pickupDisplay": "ineligible",
+      "quote": "暂无供应",
+      "productTitle": "iPhone Duo 1TB 星光白色",
+      "observedAt": "2026-10-14T13:16:15.766Z",
+      "reason": null
+    }
+  ]
+}

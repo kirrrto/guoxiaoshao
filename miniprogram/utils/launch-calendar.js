@@ -59,6 +59,16 @@ function shouldOpenCalendar(entry, saved, now = Date.now()) {
   return Boolean(entry && (!saved || saved.id !== entry.id || (!saved.muted && saved.day !== fmtDate(now))));
 }
 
+// Follow readiness comes from the active catalog, independently of the dates.
+function withFollowReadiness(calendar, catalog) {
+  const products = catalog && catalog.products || [];
+  const family = products.filter(product => product.familyKey === calendar.familyKey);
+  const supported = family.filter(product => product.supported === true && !product.comingSoon);
+  return { ...calendar,
+    followNotice: supported.length ? (supported.length === family.length ? '已支持保存关注' : '部分配置已支持保存关注') : '',
+    followNoticeDetail: supported.length ? '会员可选择配置与门店，授权后接收提醒。' : '' };
+}
+
 /** One-line launch status for the guide entry; generic copy outside a launch window. */
 function guideNote(now = Date.now()) {
   const calendar = activeCalendars(now)[0];
@@ -68,4 +78,4 @@ function guideNote(now = Date.now()) {
   return `${calendar.title} 已发售 · 查看取货攻略`;
 }
 
-module.exports = { activeCalendars, calendarView, guideNote, shouldOpenCalendar };
+module.exports = { activeCalendars, calendarView, guideNote, shouldOpenCalendar, withFollowReadiness };

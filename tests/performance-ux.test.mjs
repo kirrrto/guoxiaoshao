@@ -33,7 +33,9 @@ test('cold catalog is usable while cloud is unresolved and concurrent callers sh
   const rt = runtime(() => new Promise(r => { resolve = r; }));
   const store = rt.load('utils/store.js');
   const catalogs = await Promise.all([store.getCatalog(), store.getCatalog(), store.getCatalog()]);
-  assert.equal(catalogs[0].products.length, 292);
+  const seed = rt.load('config/catalog-seed.js');
+  assert.ok(seed.products.length > 0);
+  assert.equal(catalogs[0].products.length, seed.products.length);
   assert.equal(catalogs[0], catalogs[1]);
   assert.equal(rt.calls.length, 1);
   resolve({ unchanged: true });

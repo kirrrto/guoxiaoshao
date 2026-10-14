@@ -8,6 +8,16 @@
 // Keep technical details and complete acceptance records in release documents.
 const RELEASE_NOTES = [
   {
+    version: '2.2.0',
+    title: '新款 HomePod mini 可选',
+    dateText: '更新记录 · 2026-10-14',
+    highlights: [
+      '新增 HomePod mini 2 五种颜色，可保存选择。',
+      'iPhone Duo 容量与配色已全部开放。',
+      '保存选择后返回再进入，配置可正确恢复。',
+    ],
+  },
+  {
     version: '2.1.1',
     title: '购买入口更稳妥',
     dateText: '更新记录 · 2026-10-13',

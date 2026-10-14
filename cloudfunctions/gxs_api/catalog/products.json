@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "kind": "apple-standard-sku-catalog-cn",
-  "generatedAt": "2026-09-15T03:00:23.487Z",
+  "generatedAt": "2026-10-14T13:16:53.334Z",
   "note": "中国大陆官网在售的标准配置零售 SKU（…CH/A）。不含定制 Mac、镌刻与其他个性化组合。是否支持门店取货监测以抽样验证结果为准，见 pickupVerification 字段。",
   "families": [
     {
@@ -85,15 +85,25 @@
       "models": [
         "iPhone Duo"
       ],
-      "fetchedAt": "2026-09-15T02:52:41.761Z",
-      "sha256": "df0007132e3c29cf48fb9ac449bd2bc92b077a9c7c05bf1f32679db988e7a165",
+      "fetchedAt": "2026-10-14T13:15:40.404Z",
+      "sha256": "a041b5a0a21702bdedb6d24a939639802cca70351903b01e28d90f3657bcad78",
       "pickupVerification": {
-        "checkedAt": "2026-09-15T03:04:32.095Z",
+        "checkedAt": "2026-10-14T13:15:55.129Z",
         "storeNumber": "R577",
-        "sampledPartNumber": null,
-        "status": "all_coming_soon",
+        "sampledPartNumber": "MK2Q4CH/A",
+        "sampledPartNumbers": [
+          "MK2Q4CH/A",
+          "MK2W4CH/A",
+          "MK2P4CH/A",
+          "MK2M4CH/A",
+          "MK2U4CH/A",
+          "MK2N4CH/A",
+          "MK2V4CH/A",
+          "MK2T4CH/A"
+        ],
+        "status": "ineligible",
         "reason": null,
-        "verified": false
+        "verified": true
       }
     },
     {
@@ -692,6 +702,44 @@
         "reason": null,
         "verified": true
       }
+    },
+    {
+      "category": "homepod",
+      "familyKey": "homepod-mini-2",
+      "displayName": "HomePod mini 2",
+      "url": "https://www.apple.com.cn/shop/buy-homepod/homepod-mini",
+      "include": true,
+      "releaseDate": "2026-10-13",
+      "releaseSourceUrl": "https://www.apple.com.cn/newsroom/2026/10/apple-announces-the-next-generation-of-homepod-mini/",
+      "supported": true,
+      "reason": null,
+      "layout": "selector",
+      "pageTitle": "HomePod mini 2",
+      "dimensions": [
+        "dimensionColor"
+      ],
+      "productCount": 5,
+      "ctoOnlyBases": 0,
+      "models": [
+        "HomePod mini 2"
+      ],
+      "fetchedAt": "2026-10-14T13:14:02.781Z",
+      "sha256": "c97fac38786ed796089564d7ec2a789d38734e78394304afa280277817a2ce46",
+      "pickupVerification": {
+        "checkedAt": "2026-10-14T13:14:37.043Z",
+        "storeNumber": "R577",
+        "sampledPartNumber": "MGHK4CH/A",
+        "sampledPartNumbers": [
+          "MGHK4CH/A",
+          "MGKR4CH/A",
+          "MGHM4CH/A",
+          "MGHL4CH/A",
+          "MGHJ4CH/A"
+        ],
+        "status": "pending",
+        "reason": null,
+        "verified": true
+      }
     }
   ],
   "excludedFamilies": [
@@ -745,7 +793,7 @@
       "excludeReason": "特别版本，首版不纳入"
     }
   ],
-  "count": 292,
+  "count": 297,
   "products": [
     {
       "partNumber": "MJYH4CH/A",
@@ -2461,294 +2509,6 @@
       "imageMatchDimensions": {
         "dimensionCapacity": "512gb",
         "dimensionColor": "lightgold"
-      }
-    },
-    {
-      "partNumber": "MK2Q4CH/A",
-      "basePartNumber": "MK2Q4",
-      "category": "iphone",
-      "familyKey": "iphone-duo",
-      "familySlug": "iphone-duo",
-      "model": "iPhone Duo",
-      "title": "iPhone Duo 512GB 夜空色",
-      "titleSource": "page_labels",
-      "englishName": "iPhone Duo 512GB Night Sky",
-      "attributes": {
-        "color": "夜空色",
-        "capacity": "512GB"
-      },
-      "dimensionValues": {
-        "dimensionCapacity": "512gb",
-        "dimensionColor": "nightsky"
-      },
-      "priceCny": 17999,
-      "comingSoon": true,
-      "isCarrierDevice": false,
-      "upstreamContainer": null,
-      "sourceUrl": "https://www.apple.com.cn/shop/buy-iphone/iphone-duo",
-      "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-duo-finish-select-night-sky-202609?wid=940&hei=1112&fmt=png-alpha&.v=L2FnUkNTRm43ZDRCREFsdzlaeThkZ3h0LzRVb3pVcDdFRFlBZW9LdlZnTTY3eU1sRElTUWw3VmkwaFcvWFFZdVQ5NVJ4OStiQklybHZqYkJwOUI0UW54dHNyNHVwMVJTcUJTRDV4amNZM3JXeEN5bXRCTGIyQkNzYVFpWTFyclA",
-      "imageAlt": "夜空色 (深蓝色系) iPhone Duo，呈折叠状态，背面外观，展示机身左上角的融合式双摄系统和机身中央的 Apple 标志；展开的内屏，展示全面屏设计和圆角设计。",
-      "imageWidth": 940,
-      "imageHeight": 1112,
-      "imageKey": "iphone-duo-finish-select-night-sky-202609",
-      "imageSource": "apple-selector",
-      "imageSourceUrl": "https://www.apple.com.cn/shop/buy-iphone/iphone-duo",
-      "imageOriginalUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-duo-finish-select-night-sky-202609?wid=940&hei=1112&fmt=png-alpha&.v=L2FnUkNTRm43ZDRCREFsdzlaeThkZ3h0LzRVb3pVcDdFRFlBZW9LdlZnTTY3eU1sRElTUWw3VmkwaFcvWFFZdVQ5NVJ4OStiQklybHZqYkJwOUI0UW54dHNyNHVwMVJTcUJTRDV4amNZM3JXeEN5bXRCTGIyQkNzYVFpWTFyclA",
-      "imageMatchDimensions": {
-        "dimensionCapacity": "512gb",
-        "dimensionColor": "nightsky"
-      }
-    },
-    {
-      "partNumber": "MK2W4CH/A",
-      "basePartNumber": "MK2W4",
-      "category": "iphone",
-      "familyKey": "iphone-duo",
-      "familySlug": "iphone-duo",
-      "model": "iPhone Duo",
-      "title": "iPhone Duo 2TB 夜空色",
-      "titleSource": "page_labels",
-      "englishName": "iPhone Duo 2TB Night Sky",
-      "attributes": {
-        "color": "夜空色",
-        "capacity": "2TB"
-      },
-      "dimensionValues": {
-        "dimensionCapacity": "2tb",
-        "dimensionColor": "nightsky"
-      },
-      "priceCny": 26499,
-      "comingSoon": true,
-      "isCarrierDevice": false,
-      "upstreamContainer": null,
-      "sourceUrl": "https://www.apple.com.cn/shop/buy-iphone/iphone-duo",
-      "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-duo-finish-select-night-sky-202609?wid=940&hei=1112&fmt=png-alpha&.v=L2FnUkNTRm43ZDRCREFsdzlaeThkZ3h0LzRVb3pVcDdFRFlBZW9LdlZnTTY3eU1sRElTUWw3VmkwaFcvWFFZdVQ5NVJ4OStiQklybHZqYkJwOUI0UW54dHNyNHVwMVJTcUJTRDV4amNZM3JXeEN5bXRCTGIyQkNzYVFpWTFyclA",
-      "imageAlt": "夜空色 (深蓝色系) iPhone Duo，呈折叠状态，背面外观，展示机身左上角的融合式双摄系统和机身中央的 Apple 标志；展开的内屏，展示全面屏设计和圆角设计。",
-      "imageWidth": 940,
-      "imageHeight": 1112,
-      "imageKey": "iphone-duo-finish-select-night-sky-202609",
-      "imageSource": "apple-selector",
-      "imageSourceUrl": "https://www.apple.com.cn/shop/buy-iphone/iphone-duo",
-      "imageOriginalUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-duo-finish-select-night-sky-202609?wid=940&hei=1112&fmt=png-alpha&.v=L2FnUkNTRm43ZDRCREFsdzlaeThkZ3h0LzRVb3pVcDdFRFlBZW9LdlZnTTY3eU1sRElTUWw3VmkwaFcvWFFZdVQ5NVJ4OStiQklybHZqYkJwOUI0UW54dHNyNHVwMVJTcUJTRDV4amNZM3JXeEN5bXRCTGIyQkNzYVFpWTFyclA",
-      "imageMatchDimensions": {
-        "dimensionCapacity": "2tb",
-        "dimensionColor": "nightsky"
-      }
-    },
-    {
-      "partNumber": "MK2P4CH/A",
-      "basePartNumber": "MK2P4",
-      "category": "iphone",
-      "familyKey": "iphone-duo",
-      "familySlug": "iphone-duo",
-      "model": "iPhone Duo",
-      "title": "iPhone Duo 512GB 星光白色",
-      "titleSource": "page_labels",
-      "englishName": "iPhone Duo 512GB Star White",
-      "attributes": {
-        "color": "星光白色",
-        "capacity": "512GB"
-      },
-      "dimensionValues": {
-        "dimensionCapacity": "512gb",
-        "dimensionColor": "starwhite"
-      },
-      "priceCny": 17999,
-      "comingSoon": true,
-      "isCarrierDevice": false,
-      "upstreamContainer": null,
-      "sourceUrl": "https://www.apple.com.cn/shop/buy-iphone/iphone-duo",
-      "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-duo-finish-select-star-white-202609?wid=940&hei=1112&fmt=png-alpha&.v=L2FnUkNTRm43ZDRCREFsdzlaeThka1hsOUZkQmZFRkQ2eEh0dEM0bVFwVjZIYUZiOEZCU1dSYmlzT2FMVUpPY1gyaWxBVG1PRTU2YzhCN2c2emhzWHZ5ZTZTY3RKM0U0VzN2UzRGTGtzQ3F1ZFJUNEY5WjZkU21Ua0dNWEh2Zy8",
-      "imageAlt": "星光白色 iPhone Duo，呈折叠状态，背面外观，展示机身左上角的融合式双摄系统和机身中央的 Apple 标志；展开的内屏，展示全面屏设计和圆角设计。",
-      "imageWidth": 940,
-      "imageHeight": 1112,
-      "imageKey": "iphone-duo-finish-select-star-white-202609",
-      "imageSource": "apple-selector",
-      "imageSourceUrl": "https://www.apple.com.cn/shop/buy-iphone/iphone-duo",
-      "imageOriginalUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-duo-finish-select-star-white-202609?wid=940&hei=1112&fmt=png-alpha&.v=L2FnUkNTRm43ZDRCREFsdzlaeThka1hsOUZkQmZFRkQ2eEh0dEM0bVFwVjZIYUZiOEZCU1dSYmlzT2FMVUpPY1gyaWxBVG1PRTU2YzhCN2c2emhzWHZ5ZTZTY3RKM0U0VzN2UzRGTGtzQ3F1ZFJUNEY5WjZkU21Ua0dNWEh2Zy8",
-      "imageMatchDimensions": {
-        "dimensionCapacity": "512gb",
-        "dimensionColor": "starwhite"
-      }
-    },
-    {
-      "partNumber": "MK2M4CH/A",
-      "basePartNumber": "MK2M4",
-      "category": "iphone",
-      "familyKey": "iphone-duo",
-      "familySlug": "iphone-duo",
-      "model": "iPhone Duo",
-      "title": "iPhone Duo 256GB 星光白色",
-      "titleSource": "page_labels",
-      "englishName": "iPhone Duo 256GB Star White",
-      "attributes": {
-        "color": "星光白色",
-        "capacity": "256GB"
-      },
-      "dimensionValues": {
-        "dimensionCapacity": "256gb",
-        "dimensionColor": "starwhite"
-      },
-      "priceCny": 15999,
-      "comingSoon": true,
-      "isCarrierDevice": false,
-      "upstreamContainer": null,
-      "sourceUrl": "https://www.apple.com.cn/shop/buy-iphone/iphone-duo",
-      "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-duo-finish-select-star-white-202609?wid=940&hei=1112&fmt=png-alpha&.v=L2FnUkNTRm43ZDRCREFsdzlaeThka1hsOUZkQmZFRkQ2eEh0dEM0bVFwVjZIYUZiOEZCU1dSYmlzT2FMVUpPY1gyaWxBVG1PRTU2YzhCN2c2emhzWHZ5ZTZTY3RKM0U0VzN2UzRGTGtzQ3F1ZFJUNEY5WjZkU21Ua0dNWEh2Zy8",
-      "imageAlt": "星光白色 iPhone Duo，呈折叠状态，背面外观，展示机身左上角的融合式双摄系统和机身中央的 Apple 标志；展开的内屏，展示全面屏设计和圆角设计。",
-      "imageWidth": 940,
-      "imageHeight": 1112,
-      "imageKey": "iphone-duo-finish-select-star-white-202609",
-      "imageSource": "apple-selector",
-      "imageSourceUrl": "https://www.apple.com.cn/shop/buy-iphone/iphone-duo",
-      "imageOriginalUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-duo-finish-select-star-white-202609?wid=940&hei=1112&fmt=png-alpha&.v=L2FnUkNTRm43ZDRCREFsdzlaeThka1hsOUZkQmZFRkQ2eEh0dEM0bVFwVjZIYUZiOEZCU1dSYmlzT2FMVUpPY1gyaWxBVG1PRTU2YzhCN2c2emhzWHZ5ZTZTY3RKM0U0VzN2UzRGTGtzQ3F1ZFJUNEY5WjZkU21Ua0dNWEh2Zy8",
-      "imageMatchDimensions": {
-        "dimensionCapacity": "256gb",
-        "dimensionColor": "starwhite"
-      }
-    },
-    {
-      "partNumber": "MK2U4CH/A",
-      "basePartNumber": "MK2U4",
-      "category": "iphone",
-      "familyKey": "iphone-duo",
-      "familySlug": "iphone-duo",
-      "model": "iPhone Duo",
-      "title": "iPhone Duo 1TB 夜空色",
-      "titleSource": "page_labels",
-      "englishName": "iPhone Duo 1TB Night Sky",
-      "attributes": {
-        "color": "夜空色",
-        "capacity": "1TB"
-      },
-      "dimensionValues": {
-        "dimensionCapacity": "1tb",
-        "dimensionColor": "nightsky"
-      },
-      "priceCny": 21499,
-      "comingSoon": true,
-      "isCarrierDevice": false,
-      "upstreamContainer": null,
-      "sourceUrl": "https://www.apple.com.cn/shop/buy-iphone/iphone-duo",
-      "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-duo-finish-select-night-sky-202609?wid=940&hei=1112&fmt=png-alpha&.v=L2FnUkNTRm43ZDRCREFsdzlaeThkZ3h0LzRVb3pVcDdFRFlBZW9LdlZnTTY3eU1sRElTUWw3VmkwaFcvWFFZdVQ5NVJ4OStiQklybHZqYkJwOUI0UW54dHNyNHVwMVJTcUJTRDV4amNZM3JXeEN5bXRCTGIyQkNzYVFpWTFyclA",
-      "imageAlt": "夜空色 (深蓝色系) iPhone Duo，呈折叠状态，背面外观，展示机身左上角的融合式双摄系统和机身中央的 Apple 标志；展开的内屏，展示全面屏设计和圆角设计。",
-      "imageWidth": 940,
-      "imageHeight": 1112,
-      "imageKey": "iphone-duo-finish-select-night-sky-202609",
-      "imageSource": "apple-selector",
-      "imageSourceUrl": "https://www.apple.com.cn/shop/buy-iphone/iphone-duo",
-      "imageOriginalUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-duo-finish-select-night-sky-202609?wid=940&hei=1112&fmt=png-alpha&.v=L2FnUkNTRm43ZDRCREFsdzlaeThkZ3h0LzRVb3pVcDdFRFlBZW9LdlZnTTY3eU1sRElTUWw3VmkwaFcvWFFZdVQ5NVJ4OStiQklybHZqYkJwOUI0UW54dHNyNHVwMVJTcUJTRDV4amNZM3JXeEN5bXRCTGIyQkNzYVFpWTFyclA",
-      "imageMatchDimensions": {
-        "dimensionCapacity": "1tb",
-        "dimensionColor": "nightsky"
-      }
-    },
-    {
-      "partNumber": "MK2N4CH/A",
-      "basePartNumber": "MK2N4",
-      "category": "iphone",
-      "familyKey": "iphone-duo",
-      "familySlug": "iphone-duo",
-      "model": "iPhone Duo",
-      "title": "iPhone Duo 256GB 夜空色",
-      "titleSource": "page_labels",
-      "englishName": "iPhone Duo 256GB Night Sky",
-      "attributes": {
-        "color": "夜空色",
-        "capacity": "256GB"
-      },
-      "dimensionValues": {
-        "dimensionCapacity": "256gb",
-        "dimensionColor": "nightsky"
-      },
-      "priceCny": 15999,
-      "comingSoon": true,
-      "isCarrierDevice": false,
-      "upstreamContainer": null,
-      "sourceUrl": "https://www.apple.com.cn/shop/buy-iphone/iphone-duo",
-      "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-duo-finish-select-night-sky-202609?wid=940&hei=1112&fmt=png-alpha&.v=L2FnUkNTRm43ZDRCREFsdzlaeThkZ3h0LzRVb3pVcDdFRFlBZW9LdlZnTTY3eU1sRElTUWw3VmkwaFcvWFFZdVQ5NVJ4OStiQklybHZqYkJwOUI0UW54dHNyNHVwMVJTcUJTRDV4amNZM3JXeEN5bXRCTGIyQkNzYVFpWTFyclA",
-      "imageAlt": "夜空色 (深蓝色系) iPhone Duo，呈折叠状态，背面外观，展示机身左上角的融合式双摄系统和机身中央的 Apple 标志；展开的内屏，展示全面屏设计和圆角设计。",
-      "imageWidth": 940,
-      "imageHeight": 1112,
-      "imageKey": "iphone-duo-finish-select-night-sky-202609",
-      "imageSource": "apple-selector",
-      "imageSourceUrl": "https://www.apple.com.cn/shop/buy-iphone/iphone-duo",
-      "imageOriginalUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-duo-finish-select-night-sky-202609?wid=940&hei=1112&fmt=png-alpha&.v=L2FnUkNTRm43ZDRCREFsdzlaeThkZ3h0LzRVb3pVcDdFRFlBZW9LdlZnTTY3eU1sRElTUWw3VmkwaFcvWFFZdVQ5NVJ4OStiQklybHZqYkJwOUI0UW54dHNyNHVwMVJTcUJTRDV4amNZM3JXeEN5bXRCTGIyQkNzYVFpWTFyclA",
-      "imageMatchDimensions": {
-        "dimensionCapacity": "256gb",
-        "dimensionColor": "nightsky"
-      }
-    },
-    {
-      "partNumber": "MK2V4CH/A",
-      "basePartNumber": "MK2V4",
-      "category": "iphone",
-      "familyKey": "iphone-duo",
-      "familySlug": "iphone-duo",
-      "model": "iPhone Duo",
-      "title": "iPhone Duo 2TB 星光白色",
-      "titleSource": "page_labels",
-      "englishName": "iPhone Duo 2TB Star White",
-      "attributes": {
-        "color": "星光白色",
-        "capacity": "2TB"
-      },
-      "dimensionValues": {
-        "dimensionCapacity": "2tb",
-        "dimensionColor": "starwhite"
-      },
-      "priceCny": 26499,
-      "comingSoon": true,
-      "isCarrierDevice": false,
-      "upstreamContainer": null,
-      "sourceUrl": "https://www.apple.com.cn/shop/buy-iphone/iphone-duo",
-      "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-duo-finish-select-star-white-202609?wid=940&hei=1112&fmt=png-alpha&.v=L2FnUkNTRm43ZDRCREFsdzlaeThka1hsOUZkQmZFRkQ2eEh0dEM0bVFwVjZIYUZiOEZCU1dSYmlzT2FMVUpPY1gyaWxBVG1PRTU2YzhCN2c2emhzWHZ5ZTZTY3RKM0U0VzN2UzRGTGtzQ3F1ZFJUNEY5WjZkU21Ua0dNWEh2Zy8",
-      "imageAlt": "星光白色 iPhone Duo，呈折叠状态，背面外观，展示机身左上角的融合式双摄系统和机身中央的 Apple 标志；展开的内屏，展示全面屏设计和圆角设计。",
-      "imageWidth": 940,
-      "imageHeight": 1112,
-      "imageKey": "iphone-duo-finish-select-star-white-202609",
-      "imageSource": "apple-selector",
-      "imageSourceUrl": "https://www.apple.com.cn/shop/buy-iphone/iphone-duo",
-      "imageOriginalUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-duo-finish-select-star-white-202609?wid=940&hei=1112&fmt=png-alpha&.v=L2FnUkNTRm43ZDRCREFsdzlaeThka1hsOUZkQmZFRkQ2eEh0dEM0bVFwVjZIYUZiOEZCU1dSYmlzT2FMVUpPY1gyaWxBVG1PRTU2YzhCN2c2emhzWHZ5ZTZTY3RKM0U0VzN2UzRGTGtzQ3F1ZFJUNEY5WjZkU21Ua0dNWEh2Zy8",
-      "imageMatchDimensions": {
-        "dimensionCapacity": "2tb",
-        "dimensionColor": "starwhite"
-      }
-    },
-    {
-      "partNumber": "MK2T4CH/A",
-      "basePartNumber": "MK2T4",
-      "category": "iphone",
-      "familyKey": "iphone-duo",
-      "familySlug": "iphone-duo",
-      "model": "iPhone Duo",
-      "title": "iPhone Duo 1TB 星光白色",
-      "titleSource": "page_labels",
-      "englishName": "iPhone Duo 1TB Star White",
-      "attributes": {
-        "color": "星光白色",
-        "capacity": "1TB"
-      },
-      "dimensionValues": {
-        "dimensionCapacity": "1tb",
-        "dimensionColor": "starwhite"
-      },
-      "priceCny": 21499,
-      "comingSoon": true,
-      "isCarrierDevice": false,
-      "upstreamContainer": null,
-      "sourceUrl": "https://www.apple.com.cn/shop/buy-iphone/iphone-duo",
-      "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-duo-finish-select-star-white-202609?wid=940&hei=1112&fmt=png-alpha&.v=L2FnUkNTRm43ZDRCREFsdzlaeThka1hsOUZkQmZFRkQ2eEh0dEM0bVFwVjZIYUZiOEZCU1dSYmlzT2FMVUpPY1gyaWxBVG1PRTU2YzhCN2c2emhzWHZ5ZTZTY3RKM0U0VzN2UzRGTGtzQ3F1ZFJUNEY5WjZkU21Ua0dNWEh2Zy8",
-      "imageAlt": "星光白色 iPhone Duo，呈折叠状态，背面外观，展示机身左上角的融合式双摄系统和机身中央的 Apple 标志；展开的内屏，展示全面屏设计和圆角设计。",
-      "imageWidth": 940,
-      "imageHeight": 1112,
-      "imageKey": "iphone-duo-finish-select-star-white-202609",
-      "imageSource": "apple-selector",
-      "imageSourceUrl": "https://www.apple.com.cn/shop/buy-iphone/iphone-duo",
-      "imageOriginalUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-duo-finish-select-star-white-202609?wid=940&hei=1112&fmt=png-alpha&.v=L2FnUkNTRm43ZDRCREFsdzlaeThka1hsOUZkQmZFRkQ2eEh0dEM0bVFwVjZIYUZiOEZCU1dSYmlzT2FMVUpPY1gyaWxBVG1PRTU2YzhCN2c2emhzWHZ5ZTZTY3RKM0U0VzN2UzRGTGtzQ3F1ZFJUNEY5WjZkU21Ua0dNWEh2Zy8",
-      "imageMatchDimensions": {
-        "dimensionCapacity": "1tb",
-        "dimensionColor": "starwhite"
       }
     },
     {
@@ -12810,6 +12570,485 @@
       "imageMatchDimensions": {
         "dimensionColor": "orange"
       }
+    },
+    {
+      "partNumber": "MGHK4CH/A",
+      "basePartNumber": "MGHK4",
+      "category": "homepod",
+      "familyKey": "homepod-mini-2",
+      "familySlug": "homepod-mini",
+      "model": "HomePod mini 2",
+      "title": "HomePod mini 2 白色",
+      "titleSource": "page_labels",
+      "englishName": "HomePod mini 2 - White",
+      "attributes": {
+        "color": "白色"
+      },
+      "dimensionValues": {
+        "dimensionColor": "white"
+      },
+      "priceCny": 1099,
+      "comingSoon": false,
+      "isCarrierDevice": false,
+      "upstreamContainer": null,
+      "sourceUrl": "https://www.apple.com.cn/shop/buy-homepod/homepod-mini",
+      "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/homepod-mini-select-white-202610_FV1?wid=1868&hei=880&fmt=jpeg&qlt=90&.v=K2c3bEwyaWVDeDZkdHpLbHkwcGVScUNNeFgzb01NZmZpZzZSMGM2UHlLYkxCM1gvWjZsdy9IamM4SVJ5RVlRQWk3aEZ4ZFFGenkvaGw2NzRqZXFWbnd0QXVzNitnN1V2S2Y5d3JYSkZKdmE1N1BYU0VVSUxkRXBtTThsd0FWQWE",
+      "imageAlt": "白色 HomePod mini 2 的正面外观，展示小巧的球形设计和无缝式声学织网。外观俯视图，展示平坦的背光触控板，多色灯光亮起。",
+      "imageWidth": 1868,
+      "imageHeight": 880,
+      "imageKey": "homepod-mini-select-white-202610_FV1",
+      "imageSource": "apple-selector",
+      "imageSourceUrl": "https://www.apple.com.cn/shop/buy-homepod/homepod-mini",
+      "imageOriginalUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/homepod-mini-select-white-202610_FV1?wid=1868&hei=880&fmt=jpeg&qlt=90&.v=K2c3bEwyaWVDeDZkdHpLbHkwcGVScUNNeFgzb01NZmZpZzZSMGM2UHlLYkxCM1gvWjZsdy9IamM4SVJ5RVlRQWk3aEZ4ZFFGenkvaGw2NzRqZXFWbnd0QXVzNitnN1V2S2Y5d3JYSkZKdmE1N1BYU0VVSUxkRXBtTThsd0FWQWE",
+      "imageMatchDimensions": {
+        "dimensionColor": "white"
+      },
+      "upstreamTitle": "HomePod mini 2 - 白色",
+      "upstreamTitleCheckedAt": "2026-10-14T13:14:37.043Z"
+    },
+    {
+      "partNumber": "MGKR4CH/A",
+      "basePartNumber": "MGKR4",
+      "category": "homepod",
+      "familyKey": "homepod-mini-2",
+      "familySlug": "homepod-mini",
+      "model": "HomePod mini 2",
+      "title": "HomePod mini 2 粉色",
+      "titleSource": "page_labels",
+      "englishName": "HomePod mini 2 - Pink",
+      "attributes": {
+        "color": "粉色"
+      },
+      "dimensionValues": {
+        "dimensionColor": "pink"
+      },
+      "priceCny": 1099,
+      "comingSoon": false,
+      "isCarrierDevice": false,
+      "upstreamContainer": null,
+      "sourceUrl": "https://www.apple.com.cn/shop/buy-homepod/homepod-mini",
+      "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/homepod-mini-select-pink-202610_FV1?wid=1868&hei=880&fmt=jpeg&qlt=90&.v=K2c3bEwyaWVDeDZkdHpLbHkwcGVScXRRVlBBbThId3VGVjV5R0VkY1BOTmg5UEh1YlAveUJWditPbXN3blRmVi91YlVrZnFCSWZSZ3JZTTVzMlVYL29lZWZNakozTlo4c2tlc21wdGxDT3REUUplZW5Qelh1U3BrZStreHk1SEY",
+      "imageAlt": "粉色 (浅粉色系) HomePod mini 2 的正面外观，展示小巧的球形设计和无缝式声学织网。外观俯视图，展示平坦的背光触控板，多色灯光亮起。",
+      "imageWidth": 1868,
+      "imageHeight": 880,
+      "imageKey": "homepod-mini-select-pink-202610_FV1",
+      "imageSource": "apple-selector",
+      "imageSourceUrl": "https://www.apple.com.cn/shop/buy-homepod/homepod-mini",
+      "imageOriginalUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/homepod-mini-select-pink-202610_FV1?wid=1868&hei=880&fmt=jpeg&qlt=90&.v=K2c3bEwyaWVDeDZkdHpLbHkwcGVScXRRVlBBbThId3VGVjV5R0VkY1BOTmg5UEh1YlAveUJWditPbXN3blRmVi91YlVrZnFCSWZSZ3JZTTVzMlVYL29lZWZNakozTlo4c2tlc21wdGxDT3REUUplZW5Qelh1U3BrZStreHk1SEY",
+      "imageMatchDimensions": {
+        "dimensionColor": "pink"
+      },
+      "upstreamTitle": "HomePod mini 2 - 粉色",
+      "upstreamTitleCheckedAt": "2026-10-14T13:14:37.043Z"
+    },
+    {
+      "partNumber": "MGHM4CH/A",
+      "basePartNumber": "MGHM4",
+      "category": "homepod",
+      "familyKey": "homepod-mini-2",
+      "familySlug": "homepod-mini",
+      "model": "HomePod mini 2",
+      "title": "HomePod mini 2 蓝色",
+      "titleSource": "page_labels",
+      "englishName": "HomePod mini 2 - Blue",
+      "attributes": {
+        "color": "蓝色"
+      },
+      "dimensionValues": {
+        "dimensionColor": "blue"
+      },
+      "priceCny": 1099,
+      "comingSoon": false,
+      "isCarrierDevice": false,
+      "upstreamContainer": null,
+      "sourceUrl": "https://www.apple.com.cn/shop/buy-homepod/homepod-mini",
+      "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/homepod-mini-select-blue-202610_FV1?wid=1868&hei=880&fmt=jpeg&qlt=90&.v=K2c3bEwyaWVDeDZkdHpLbHkwcGVScXc1YnoxZGlJcWhmYnNWOWJuYkpDUmg5UEh1YlAveUJWditPbXN3blRmVi91YlVrZnFCSWZSZ3JZTTVzMlVYL29lZWZNakozTlo4c2tlc21wdGxDT3RLYXh2a0FSeEQ0SHoxUWtrbWl6dVA",
+      "imageAlt": "蓝色 (深蓝色系) HomePod mini 2 的正面外观，展示小巧的球形设计和无缝式声学织网。外观俯视图，展示平坦的背光触控板，多色灯光亮起。",
+      "imageWidth": 1868,
+      "imageHeight": 880,
+      "imageKey": "homepod-mini-select-blue-202610_FV1",
+      "imageSource": "apple-selector",
+      "imageSourceUrl": "https://www.apple.com.cn/shop/buy-homepod/homepod-mini",
+      "imageOriginalUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/homepod-mini-select-blue-202610_FV1?wid=1868&hei=880&fmt=jpeg&qlt=90&.v=K2c3bEwyaWVDeDZkdHpLbHkwcGVScXc1YnoxZGlJcWhmYnNWOWJuYkpDUmg5UEh1YlAveUJWditPbXN3blRmVi91YlVrZnFCSWZSZ3JZTTVzMlVYL29lZWZNakozTlo4c2tlc21wdGxDT3RLYXh2a0FSeEQ0SHoxUWtrbWl6dVA",
+      "imageMatchDimensions": {
+        "dimensionColor": "blue"
+      },
+      "upstreamTitle": "HomePod mini 2 - 蓝色",
+      "upstreamTitleCheckedAt": "2026-10-14T13:14:37.043Z"
+    },
+    {
+      "partNumber": "MGHL4CH/A",
+      "basePartNumber": "MGHL4",
+      "category": "homepod",
+      "familyKey": "homepod-mini-2",
+      "familySlug": "homepod-mini",
+      "model": "HomePod mini 2",
+      "title": "HomePod mini 2 绿色",
+      "titleSource": "page_labels",
+      "englishName": "HomePod mini 2 - Green",
+      "attributes": {
+        "color": "绿色"
+      },
+      "dimensionValues": {
+        "dimensionColor": "green"
+      },
+      "priceCny": 1099,
+      "comingSoon": false,
+      "isCarrierDevice": false,
+      "upstreamContainer": null,
+      "sourceUrl": "https://www.apple.com.cn/shop/buy-homepod/homepod-mini",
+      "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/homepod-mini-select-green-202610_FV1?wid=1868&hei=880&fmt=jpeg&qlt=90&.v=K2c3bEwyaWVDeDZkdHpLbHkwcGVSazBhY04wdUIvdlZUQk1GWGNzZHR6ekxCM1gvWjZsdy9IamM4SVJ5RVlRQWk3aEZ4ZFFGenkvaGw2NzRqZXFWbnd0QXVzNitnN1V2S2Y5d3JYSkZKdmJRUGVPZFluN3czQ0VSZldlM2VsWnA",
+      "imageAlt": "绿色 (深绿色系) HomePod mini 2 的正面外观，展示小巧的球形设计和无缝式声学织网。外观俯视图，展示平坦的背光触控板，多色灯光亮起。",
+      "imageWidth": 1868,
+      "imageHeight": 880,
+      "imageKey": "homepod-mini-select-green-202610_FV1",
+      "imageSource": "apple-selector",
+      "imageSourceUrl": "https://www.apple.com.cn/shop/buy-homepod/homepod-mini",
+      "imageOriginalUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/homepod-mini-select-green-202610_FV1?wid=1868&hei=880&fmt=jpeg&qlt=90&.v=K2c3bEwyaWVDeDZkdHpLbHkwcGVSazBhY04wdUIvdlZUQk1GWGNzZHR6ekxCM1gvWjZsdy9IamM4SVJ5RVlRQWk3aEZ4ZFFGenkvaGw2NzRqZXFWbnd0QXVzNitnN1V2S2Y5d3JYSkZKdmJRUGVPZFluN3czQ0VSZldlM2VsWnA",
+      "imageMatchDimensions": {
+        "dimensionColor": "green"
+      },
+      "upstreamTitle": "HomePod mini 2 - 绿色",
+      "upstreamTitleCheckedAt": "2026-10-14T13:14:37.043Z"
+    },
+    {
+      "partNumber": "MGHJ4CH/A",
+      "basePartNumber": "MGHJ4",
+      "category": "homepod",
+      "familyKey": "homepod-mini-2",
+      "familySlug": "homepod-mini",
+      "model": "HomePod mini 2",
+      "title": "HomePod mini 2 午夜色",
+      "titleSource": "page_labels",
+      "englishName": "HomePod mini 2 - Midnight",
+      "attributes": {
+        "color": "午夜色"
+      },
+      "dimensionValues": {
+        "dimensionColor": "midnight"
+      },
+      "priceCny": 1099,
+      "comingSoon": false,
+      "isCarrierDevice": false,
+      "upstreamContainer": null,
+      "sourceUrl": "https://www.apple.com.cn/shop/buy-homepod/homepod-mini",
+      "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/homepod-mini-select-midnight-202610_FV1?wid=1868&hei=880&fmt=jpeg&qlt=90&.v=K2c3bEwyaWVDeDZkdHpLbHkwcGVSaFRaZXZublY0K2p0Ri9sOWcwbVh6amwzc0hqbklCSmJHNTA2MnByUFJuSTN6WWY5a1JiR3h2V2h5Mis1dmgwRVRnQ1lhSmZUdzRUK1crYTlZTFpSRDlhblNYU3dVRzd1b3FleHZaelNicXk",
+      "imageAlt": "午夜色 (黑色系) HomePod mini 2 的正面外观，展示小巧的球形设计和无缝式声学织网。外观俯视图，展示平坦的背光触控板，多色灯光亮起。",
+      "imageWidth": 1868,
+      "imageHeight": 880,
+      "imageKey": "homepod-mini-select-midnight-202610_FV1",
+      "imageSource": "apple-selector",
+      "imageSourceUrl": "https://www.apple.com.cn/shop/buy-homepod/homepod-mini",
+      "imageOriginalUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/homepod-mini-select-midnight-202610_FV1?wid=1868&hei=880&fmt=jpeg&qlt=90&.v=K2c3bEwyaWVDeDZkdHpLbHkwcGVSaFRaZXZublY0K2p0Ri9sOWcwbVh6amwzc0hqbklCSmJHNTA2MnByUFJuSTN6WWY5a1JiR3h2V2h5Mis1dmgwRVRnQ1lhSmZUdzRUK1crYTlZTFpSRDlhblNYU3dVRzd1b3FleHZaelNicXk",
+      "imageMatchDimensions": {
+        "dimensionColor": "midnight"
+      },
+      "upstreamTitle": "HomePod mini 2 - 午夜色",
+      "upstreamTitleCheckedAt": "2026-10-14T13:14:37.043Z"
+    },
+    {
+      "partNumber": "MK2Q4CH/A",
+      "basePartNumber": "MK2Q4",
+      "category": "iphone",
+      "familyKey": "iphone-duo",
+      "familySlug": "iphone-duo",
+      "model": "iPhone Duo",
+      "title": "iPhone Duo 512GB 夜空色",
+      "titleSource": "page_labels",
+      "englishName": "iPhone Duo 512GB Night Sky",
+      "attributes": {
+        "color": "夜空色",
+        "capacity": "512GB"
+      },
+      "dimensionValues": {
+        "dimensionCapacity": "512gb",
+        "dimensionColor": "nightsky"
+      },
+      "priceCny": 17999,
+      "comingSoon": false,
+      "isCarrierDevice": false,
+      "upstreamContainer": null,
+      "sourceUrl": "https://www.apple.com.cn/shop/buy-iphone/iphone-duo",
+      "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-duo-finish-select-night-sky-202609?wid=940&hei=1112&fmt=png-alpha&.v=L2FnUkNTRm43ZDRCREFsdzlaeThkZ3h0LzRVb3pVcDdFRFlBZW9LdlZnTTY3eU1sRElTUWw3VmkwaFcvWFFZdVQ5NVJ4OStiQklybHZqYkJwOUI0UW54dHNyNHVwMVJTcUJTRDV4amNZM3JXeEN5bXRCTGIyQkNzYVFpWTFyclA",
+      "imageAlt": "夜空色 (深蓝色系) iPhone Duo，呈折叠状态，背面外观，展示机身左上角的融合式双摄系统和机身中央的 Apple 标志；展开的内屏，展示全面屏设计和圆角设计。",
+      "imageWidth": 940,
+      "imageHeight": 1112,
+      "imageKey": "iphone-duo-finish-select-night-sky-202609",
+      "imageSource": "apple-selector",
+      "imageSourceUrl": "https://www.apple.com.cn/shop/buy-iphone/iphone-duo",
+      "imageOriginalUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-duo-finish-select-night-sky-202609?wid=940&hei=1112&fmt=png-alpha&.v=L2FnUkNTRm43ZDRCREFsdzlaeThkZ3h0LzRVb3pVcDdFRFlBZW9LdlZnTTY3eU1sRElTUWw3VmkwaFcvWFFZdVQ5NVJ4OStiQklybHZqYkJwOUI0UW54dHNyNHVwMVJTcUJTRDV4amNZM3JXeEN5bXRCTGIyQkNzYVFpWTFyclA",
+      "imageMatchDimensions": {
+        "dimensionCapacity": "512gb",
+        "dimensionColor": "nightsky"
+      },
+      "upstreamTitle": "iPhone Duo 512GB 夜空色",
+      "upstreamTitleCheckedAt": "2026-10-14T13:15:55.129Z"
+    },
+    {
+      "partNumber": "MK2W4CH/A",
+      "basePartNumber": "MK2W4",
+      "category": "iphone",
+      "familyKey": "iphone-duo",
+      "familySlug": "iphone-duo",
+      "model": "iPhone Duo",
+      "title": "iPhone Duo 2TB 夜空色",
+      "titleSource": "page_labels",
+      "englishName": "iPhone Duo 2TB Night Sky",
+      "attributes": {
+        "color": "夜空色",
+        "capacity": "2TB"
+      },
+      "dimensionValues": {
+        "dimensionCapacity": "2tb",
+        "dimensionColor": "nightsky"
+      },
+      "priceCny": 26499,
+      "comingSoon": false,
+      "isCarrierDevice": false,
+      "upstreamContainer": null,
+      "sourceUrl": "https://www.apple.com.cn/shop/buy-iphone/iphone-duo",
+      "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-duo-finish-select-night-sky-202609?wid=940&hei=1112&fmt=png-alpha&.v=L2FnUkNTRm43ZDRCREFsdzlaeThkZ3h0LzRVb3pVcDdFRFlBZW9LdlZnTTY3eU1sRElTUWw3VmkwaFcvWFFZdVQ5NVJ4OStiQklybHZqYkJwOUI0UW54dHNyNHVwMVJTcUJTRDV4amNZM3JXeEN5bXRCTGIyQkNzYVFpWTFyclA",
+      "imageAlt": "夜空色 (深蓝色系) iPhone Duo，呈折叠状态，背面外观，展示机身左上角的融合式双摄系统和机身中央的 Apple 标志；展开的内屏，展示全面屏设计和圆角设计。",
+      "imageWidth": 940,
+      "imageHeight": 1112,
+      "imageKey": "iphone-duo-finish-select-night-sky-202609",
+      "imageSource": "apple-selector",
+      "imageSourceUrl": "https://www.apple.com.cn/shop/buy-iphone/iphone-duo",
+      "imageOriginalUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-duo-finish-select-night-sky-202609?wid=940&hei=1112&fmt=png-alpha&.v=L2FnUkNTRm43ZDRCREFsdzlaeThkZ3h0LzRVb3pVcDdFRFlBZW9LdlZnTTY3eU1sRElTUWw3VmkwaFcvWFFZdVQ5NVJ4OStiQklybHZqYkJwOUI0UW54dHNyNHVwMVJTcUJTRDV4amNZM3JXeEN5bXRCTGIyQkNzYVFpWTFyclA",
+      "imageMatchDimensions": {
+        "dimensionCapacity": "2tb",
+        "dimensionColor": "nightsky"
+      },
+      "upstreamTitle": "iPhone Duo 2TB 夜空色",
+      "upstreamTitleCheckedAt": "2026-10-14T13:15:55.129Z"
+    },
+    {
+      "partNumber": "MK2P4CH/A",
+      "basePartNumber": "MK2P4",
+      "category": "iphone",
+      "familyKey": "iphone-duo",
+      "familySlug": "iphone-duo",
+      "model": "iPhone Duo",
+      "title": "iPhone Duo 512GB 星光白色",
+      "titleSource": "page_labels",
+      "englishName": "iPhone Duo 512GB Star White",
+      "attributes": {
+        "color": "星光白色",
+        "capacity": "512GB"
+      },
+      "dimensionValues": {
+        "dimensionCapacity": "512gb",
+        "dimensionColor": "starwhite"
+      },
+      "priceCny": 17999,
+      "comingSoon": false,
+      "isCarrierDevice": false,
+      "upstreamContainer": null,
+      "sourceUrl": "https://www.apple.com.cn/shop/buy-iphone/iphone-duo",
+      "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-duo-finish-select-star-white-202609?wid=940&hei=1112&fmt=png-alpha&.v=L2FnUkNTRm43ZDRCREFsdzlaeThka1hsOUZkQmZFRkQ2eEh0dEM0bVFwVjZIYUZiOEZCU1dSYmlzT2FMVUpPY1gyaWxBVG1PRTU2YzhCN2c2emhzWHZ5ZTZTY3RKM0U0VzN2UzRGTGtzQ3F1ZFJUNEY5WjZkU21Ua0dNWEh2Zy8",
+      "imageAlt": "星光白色 iPhone Duo，呈折叠状态，背面外观，展示机身左上角的融合式双摄系统和机身中央的 Apple 标志；展开的内屏，展示全面屏设计和圆角设计。",
+      "imageWidth": 940,
+      "imageHeight": 1112,
+      "imageKey": "iphone-duo-finish-select-star-white-202609",
+      "imageSource": "apple-selector",
+      "imageSourceUrl": "https://www.apple.com.cn/shop/buy-iphone/iphone-duo",
+      "imageOriginalUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-duo-finish-select-star-white-202609?wid=940&hei=1112&fmt=png-alpha&.v=L2FnUkNTRm43ZDRCREFsdzlaeThka1hsOUZkQmZFRkQ2eEh0dEM0bVFwVjZIYUZiOEZCU1dSYmlzT2FMVUpPY1gyaWxBVG1PRTU2YzhCN2c2emhzWHZ5ZTZTY3RKM0U0VzN2UzRGTGtzQ3F1ZFJUNEY5WjZkU21Ua0dNWEh2Zy8",
+      "imageMatchDimensions": {
+        "dimensionCapacity": "512gb",
+        "dimensionColor": "starwhite"
+      },
+      "upstreamTitle": "iPhone Duo 512GB 星光白色",
+      "upstreamTitleCheckedAt": "2026-10-14T13:15:55.129Z"
+    },
+    {
+      "partNumber": "MK2M4CH/A",
+      "basePartNumber": "MK2M4",
+      "category": "iphone",
+      "familyKey": "iphone-duo",
+      "familySlug": "iphone-duo",
+      "model": "iPhone Duo",
+      "title": "iPhone Duo 256GB 星光白色",
+      "titleSource": "page_labels",
+      "englishName": "iPhone Duo 256GB Star White",
+      "attributes": {
+        "color": "星光白色",
+        "capacity": "256GB"
+      },
+      "dimensionValues": {
+        "dimensionCapacity": "256gb",
+        "dimensionColor": "starwhite"
+      },
+      "priceCny": 15999,
+      "comingSoon": false,
+      "isCarrierDevice": false,
+      "upstreamContainer": null,
+      "sourceUrl": "https://www.apple.com.cn/shop/buy-iphone/iphone-duo",
+      "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-duo-finish-select-star-white-202609?wid=940&hei=1112&fmt=png-alpha&.v=L2FnUkNTRm43ZDRCREFsdzlaeThka1hsOUZkQmZFRkQ2eEh0dEM0bVFwVjZIYUZiOEZCU1dSYmlzT2FMVUpPY1gyaWxBVG1PRTU2YzhCN2c2emhzWHZ5ZTZTY3RKM0U0VzN2UzRGTGtzQ3F1ZFJUNEY5WjZkU21Ua0dNWEh2Zy8",
+      "imageAlt": "星光白色 iPhone Duo，呈折叠状态，背面外观，展示机身左上角的融合式双摄系统和机身中央的 Apple 标志；展开的内屏，展示全面屏设计和圆角设计。",
+      "imageWidth": 940,
+      "imageHeight": 1112,
+      "imageKey": "iphone-duo-finish-select-star-white-202609",
+      "imageSource": "apple-selector",
+      "imageSourceUrl": "https://www.apple.com.cn/shop/buy-iphone/iphone-duo",
+      "imageOriginalUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-duo-finish-select-star-white-202609?wid=940&hei=1112&fmt=png-alpha&.v=L2FnUkNTRm43ZDRCREFsdzlaeThka1hsOUZkQmZFRkQ2eEh0dEM0bVFwVjZIYUZiOEZCU1dSYmlzT2FMVUpPY1gyaWxBVG1PRTU2YzhCN2c2emhzWHZ5ZTZTY3RKM0U0VzN2UzRGTGtzQ3F1ZFJUNEY5WjZkU21Ua0dNWEh2Zy8",
+      "imageMatchDimensions": {
+        "dimensionCapacity": "256gb",
+        "dimensionColor": "starwhite"
+      },
+      "upstreamTitle": "iPhone Duo 256GB 星光白色",
+      "upstreamTitleCheckedAt": "2026-10-14T13:15:55.129Z"
+    },
+    {
+      "partNumber": "MK2U4CH/A",
+      "basePartNumber": "MK2U4",
+      "category": "iphone",
+      "familyKey": "iphone-duo",
+      "familySlug": "iphone-duo",
+      "model": "iPhone Duo",
+      "title": "iPhone Duo 1TB 夜空色",
+      "titleSource": "page_labels",
+      "englishName": "iPhone Duo 1TB Night Sky",
+      "attributes": {
+        "color": "夜空色",
+        "capacity": "1TB"
+      },
+      "dimensionValues": {
+        "dimensionCapacity": "1tb",
+        "dimensionColor": "nightsky"
+      },
+      "priceCny": 21499,
+      "comingSoon": false,
+      "isCarrierDevice": false,
+      "upstreamContainer": null,
+      "sourceUrl": "https://www.apple.com.cn/shop/buy-iphone/iphone-duo",
+      "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-duo-finish-select-night-sky-202609?wid=940&hei=1112&fmt=png-alpha&.v=L2FnUkNTRm43ZDRCREFsdzlaeThkZ3h0LzRVb3pVcDdFRFlBZW9LdlZnTTY3eU1sRElTUWw3VmkwaFcvWFFZdVQ5NVJ4OStiQklybHZqYkJwOUI0UW54dHNyNHVwMVJTcUJTRDV4amNZM3JXeEN5bXRCTGIyQkNzYVFpWTFyclA",
+      "imageAlt": "夜空色 (深蓝色系) iPhone Duo，呈折叠状态，背面外观，展示机身左上角的融合式双摄系统和机身中央的 Apple 标志；展开的内屏，展示全面屏设计和圆角设计。",
+      "imageWidth": 940,
+      "imageHeight": 1112,
+      "imageKey": "iphone-duo-finish-select-night-sky-202609",
+      "imageSource": "apple-selector",
+      "imageSourceUrl": "https://www.apple.com.cn/shop/buy-iphone/iphone-duo",
+      "imageOriginalUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-duo-finish-select-night-sky-202609?wid=940&hei=1112&fmt=png-alpha&.v=L2FnUkNTRm43ZDRCREFsdzlaeThkZ3h0LzRVb3pVcDdFRFlBZW9LdlZnTTY3eU1sRElTUWw3VmkwaFcvWFFZdVQ5NVJ4OStiQklybHZqYkJwOUI0UW54dHNyNHVwMVJTcUJTRDV4amNZM3JXeEN5bXRCTGIyQkNzYVFpWTFyclA",
+      "imageMatchDimensions": {
+        "dimensionCapacity": "1tb",
+        "dimensionColor": "nightsky"
+      },
+      "upstreamTitle": "iPhone Duo 1TB 夜空色",
+      "upstreamTitleCheckedAt": "2026-10-14T13:15:55.129Z"
+    },
+    {
+      "partNumber": "MK2N4CH/A",
+      "basePartNumber": "MK2N4",
+      "category": "iphone",
+      "familyKey": "iphone-duo",
+      "familySlug": "iphone-duo",
+      "model": "iPhone Duo",
+      "title": "iPhone Duo 256GB 夜空色",
+      "titleSource": "page_labels",
+      "englishName": "iPhone Duo 256GB Night Sky",
+      "attributes": {
+        "color": "夜空色",
+        "capacity": "256GB"
+      },
+      "dimensionValues": {
+        "dimensionCapacity": "256gb",
+        "dimensionColor": "nightsky"
+      },
+      "priceCny": 15999,
+      "comingSoon": false,
+      "isCarrierDevice": false,
+      "upstreamContainer": null,
+      "sourceUrl": "https://www.apple.com.cn/shop/buy-iphone/iphone-duo",
+      "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-duo-finish-select-night-sky-202609?wid=940&hei=1112&fmt=png-alpha&.v=L2FnUkNTRm43ZDRCREFsdzlaeThkZ3h0LzRVb3pVcDdFRFlBZW9LdlZnTTY3eU1sRElTUWw3VmkwaFcvWFFZdVQ5NVJ4OStiQklybHZqYkJwOUI0UW54dHNyNHVwMVJTcUJTRDV4amNZM3JXeEN5bXRCTGIyQkNzYVFpWTFyclA",
+      "imageAlt": "夜空色 (深蓝色系) iPhone Duo，呈折叠状态，背面外观，展示机身左上角的融合式双摄系统和机身中央的 Apple 标志；展开的内屏，展示全面屏设计和圆角设计。",
+      "imageWidth": 940,
+      "imageHeight": 1112,
+      "imageKey": "iphone-duo-finish-select-night-sky-202609",
+      "imageSource": "apple-selector",
+      "imageSourceUrl": "https://www.apple.com.cn/shop/buy-iphone/iphone-duo",
+      "imageOriginalUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-duo-finish-select-night-sky-202609?wid=940&hei=1112&fmt=png-alpha&.v=L2FnUkNTRm43ZDRCREFsdzlaeThkZ3h0LzRVb3pVcDdFRFlBZW9LdlZnTTY3eU1sRElTUWw3VmkwaFcvWFFZdVQ5NVJ4OStiQklybHZqYkJwOUI0UW54dHNyNHVwMVJTcUJTRDV4amNZM3JXeEN5bXRCTGIyQkNzYVFpWTFyclA",
+      "imageMatchDimensions": {
+        "dimensionCapacity": "256gb",
+        "dimensionColor": "nightsky"
+      },
+      "upstreamTitle": "iPhone Duo 256GB 夜空色",
+      "upstreamTitleCheckedAt": "2026-10-14T13:15:55.129Z"
+    },
+    {
+      "partNumber": "MK2V4CH/A",
+      "basePartNumber": "MK2V4",
+      "category": "iphone",
+      "familyKey": "iphone-duo",
+      "familySlug": "iphone-duo",
+      "model": "iPhone Duo",
+      "title": "iPhone Duo 2TB 星光白色",
+      "titleSource": "page_labels",
+      "englishName": "iPhone Duo 2TB Star White",
+      "attributes": {
+        "color": "星光白色",
+        "capacity": "2TB"
+      },
+      "dimensionValues": {
+        "dimensionCapacity": "2tb",
+        "dimensionColor": "starwhite"
+      },
+      "priceCny": 26499,
+      "comingSoon": false,
+      "isCarrierDevice": false,
+      "upstreamContainer": null,
+      "sourceUrl": "https://www.apple.com.cn/shop/buy-iphone/iphone-duo",
+      "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-duo-finish-select-star-white-202609?wid=940&hei=1112&fmt=png-alpha&.v=L2FnUkNTRm43ZDRCREFsdzlaeThka1hsOUZkQmZFRkQ2eEh0dEM0bVFwVjZIYUZiOEZCU1dSYmlzT2FMVUpPY1gyaWxBVG1PRTU2YzhCN2c2emhzWHZ5ZTZTY3RKM0U0VzN2UzRGTGtzQ3F1ZFJUNEY5WjZkU21Ua0dNWEh2Zy8",
+      "imageAlt": "星光白色 iPhone Duo，呈折叠状态，背面外观，展示机身左上角的融合式双摄系统和机身中央的 Apple 标志；展开的内屏，展示全面屏设计和圆角设计。",
+      "imageWidth": 940,
+      "imageHeight": 1112,
+      "imageKey": "iphone-duo-finish-select-star-white-202609",
+      "imageSource": "apple-selector",
+      "imageSourceUrl": "https://www.apple.com.cn/shop/buy-iphone/iphone-duo",
+      "imageOriginalUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-duo-finish-select-star-white-202609?wid=940&hei=1112&fmt=png-alpha&.v=L2FnUkNTRm43ZDRCREFsdzlaeThka1hsOUZkQmZFRkQ2eEh0dEM0bVFwVjZIYUZiOEZCU1dSYmlzT2FMVUpPY1gyaWxBVG1PRTU2YzhCN2c2emhzWHZ5ZTZTY3RKM0U0VzN2UzRGTGtzQ3F1ZFJUNEY5WjZkU21Ua0dNWEh2Zy8",
+      "imageMatchDimensions": {
+        "dimensionCapacity": "2tb",
+        "dimensionColor": "starwhite"
+      },
+      "upstreamTitle": "iPhone Duo 2TB 星光白色",
+      "upstreamTitleCheckedAt": "2026-10-14T13:16:15.766Z"
+    },
+    {
+      "partNumber": "MK2T4CH/A",
+      "basePartNumber": "MK2T4",
+      "category": "iphone",
+      "familyKey": "iphone-duo",
+      "familySlug": "iphone-duo",
+      "model": "iPhone Duo",
+      "title": "iPhone Duo 1TB 星光白色",
+      "titleSource": "page_labels",
+      "englishName": "iPhone Duo 1TB Star White",
+      "attributes": {
+        "color": "星光白色",
+        "capacity": "1TB"
+      },
+      "dimensionValues": {
+        "dimensionCapacity": "1tb",
+        "dimensionColor": "starwhite"
+      },
+      "priceCny": 21499,
+      "comingSoon": false,
+      "isCarrierDevice": false,
+      "upstreamContainer": null,
+      "sourceUrl": "https://www.apple.com.cn/shop/buy-iphone/iphone-duo",
+      "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-duo-finish-select-star-white-202609?wid=940&hei=1112&fmt=png-alpha&.v=L2FnUkNTRm43ZDRCREFsdzlaeThka1hsOUZkQmZFRkQ2eEh0dEM0bVFwVjZIYUZiOEZCU1dSYmlzT2FMVUpPY1gyaWxBVG1PRTU2YzhCN2c2emhzWHZ5ZTZTY3RKM0U0VzN2UzRGTGtzQ3F1ZFJUNEY5WjZkU21Ua0dNWEh2Zy8",
+      "imageAlt": "星光白色 iPhone Duo，呈折叠状态，背面外观，展示机身左上角的融合式双摄系统和机身中央的 Apple 标志；展开的内屏，展示全面屏设计和圆角设计。",
+      "imageWidth": 940,
+      "imageHeight": 1112,
+      "imageKey": "iphone-duo-finish-select-star-white-202609",
+      "imageSource": "apple-selector",
+      "imageSourceUrl": "https://www.apple.com.cn/shop/buy-iphone/iphone-duo",
+      "imageOriginalUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-duo-finish-select-star-white-202609?wid=940&hei=1112&fmt=png-alpha&.v=L2FnUkNTRm43ZDRCREFsdzlaeThka1hsOUZkQmZFRkQ2eEh0dEM0bVFwVjZIYUZiOEZCU1dSYmlzT2FMVUpPY1gyaWxBVG1PRTU2YzhCN2c2emhzWHZ5ZTZTY3RKM0U0VzN2UzRGTGtzQ3F1ZFJUNEY5WjZkU21Ua0dNWEh2Zy8",
+      "imageMatchDimensions": {
+        "dimensionCapacity": "1tb",
+        "dimensionColor": "starwhite"
+      },
+      "upstreamTitle": "iPhone Duo 1TB 星光白色",
+      "upstreamTitleCheckedAt": "2026-10-14T13:16:15.766Z"
     }
   ],
   "pickupVerification": {
@@ -12820,6 +13059,6 @@
     "stopped": false,
     "note": "每个系列抽样 1 个 SKU，验证取货接口是否识别该 SKU；结果只说明接口可查询，不代表当前供货情况长期有效。pending 表示上游提示尚未开放取货。"
   },
-  "imagesGeneratedAt": "2026-09-15T07:02:18.681Z",
-  "imageCount": 292
+  "imagesGeneratedAt": "2026-10-14T13:16:53.334Z",
+  "imageCount": 297
 }

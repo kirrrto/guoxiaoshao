@@ -1,0 +1,89 @@
+{
+  "record": {
+    "storeNumber": "R577",
+    "partNumbers": [
+      "MK2Q4CH/A",
+      "MK2W4CH/A",
+      "MK2P4CH/A",
+      "MK2M4CH/A",
+      "MK2U4CH/A",
+      "MK2N4CH/A"
+    ],
+    "requestUrl": "https://www.apple.com.cn/shop/retail/pickup-message?pl=true&mts.0=regular&parts.0=MK2Q4CH%2FA&parts.1=MK2W4CH%2FA&parts.2=MK2P4CH%2FA&parts.3=MK2M4CH%2FA&parts.4=MK2U4CH%2FA&parts.5=MK2N4CH%2FA&store=R577",
+    "startedAt": "2026-10-14T13:15:54.564Z",
+    "httpStatus": 200,
+    "bytes": 8256,
+    "elapsedMs": 565,
+    "finishedAt": "2026-10-14T13:15:55.129Z",
+    "error": null,
+    "retryAfter": null
+  },
+  "observations": [
+    {
+      "storeNumber": "R577",
+      "storeName": "天环广场",
+      "partNumber": "MK2Q4CH/A",
+      "status": "ineligible",
+      "pickupDisplay": "ineligible",
+      "quote": "暂无供应",
+      "productTitle": "iPhone Duo 512GB 夜空色",
+      "observedAt": "2026-10-14T13:15:55.129Z",
+      "reason": null
+    },
+    {
+      "storeNumber": "R577",
+      "storeName": "天环广场",
+      "partNumber": "MK2W4CH/A",
+      "status": "ineligible",
+      "pickupDisplay": "ineligible",
+      "quote": "暂无供应",
+      "productTitle": "iPhone Duo 2TB 夜空色",
+      "observedAt": "2026-10-14T13:15:55.129Z",
+      "reason": null
+    },
+    {
+      "storeNumber": "R577",
+      "storeName": "天环广场",
+      "partNumber": "MK2P4CH/A",
+      "status": "ineligible",
+      "pickupDisplay": "ineligible",
+      "quote": "暂无供应",
+      "productTitle": "iPhone Duo 512GB 星光白色",
+      "observedAt": "2026-10-14T13:15:55.129Z",
+      "reason": null
+    },
+    {
+      "storeNumber": "R577",
+      "storeName": "天环广场",
+      "partNumber": "MK2M4CH/A",
+      "status": "ineligible",
+      "pickupDisplay": "ineligible",
+      "quote": "暂无供应",
+      "productTitle": "iPhone Duo 256GB 星光白色",
+      "observedAt": "2026-10-14T13:15:55.129Z",
+      "reason": null
+    },
+    {
+      "storeNumber": "R577",
+      "storeName": "天环广场",
+      "partNumber": "MK2U4CH/A",
+      "status": "ineligible",
+      "pickupDisplay": "ineligible",
+      "quote": "暂无供应",
+      "productTitle": "iPhone Duo 1TB 夜空色",
+      "observedAt": "2026-10-14T13:15:55.129Z",
+      "reason": null
+    },
+    {
+      "storeNumber": "R577",
+      "storeName": "天环广场",
+      "partNumber": "MK2N4CH/A",
+      "status": "ineligible",
+      "pickupDisplay": "ineligible",
+      "quote": "暂无供应",
+      "productTitle": "iPhone Duo 256GB 夜空色",
+      "observedAt": "2026-10-14T13:15:55.129Z",
+      "reason": null
+    }
+  ]
+}

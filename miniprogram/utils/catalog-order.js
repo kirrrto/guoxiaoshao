@@ -29,6 +29,7 @@ const FAMILY_RELEASES = {
   'apple-vision-pro': ['2025-10-15', 'https://www.apple.com/ca/newsroom/2025/10/apple-unleashes-m5-the-next-big-leap-in-ai-performance-for-apple-silicon/'],
   'homepod': ['2023-01-18', 'https://www.apple.com/newsroom/2023/01/apple-introduces-the-new-homepod-with-breakthrough-sound-and-intelligence/'],
   'homepod-mini': ['2020-10-13', 'https://www.apple.com/newsroom/2020/10/apple-introduces-homepod-mini-a-powerful-smart-speaker-with-amazing-sound/'],
+  'homepod-mini-2': ['2026-10-13', 'https://www.apple.com.cn/newsroom/2026/10/apple-announces-the-next-generation-of-homepod-mini/'],
 };
 
 function capacityBytes(value) {

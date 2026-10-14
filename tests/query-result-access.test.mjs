@@ -151,7 +151,8 @@ test('coming-soon selection with valid stores explains service availability whil
   page.catalog = { ...values.catalog, productByPart: { ...values.catalog.productByPart, [product.partNumber]: product } };
   const complete = page.selectionView({ ...values.selection, product });
   assert.equal(complete.selectionCanCollapse, false);
-  assert.match(complete.selectionNotice, /尚未开放取货查询/);
+  assert.match(complete.selectionNotice, /配置已保存/);
+  assert.match(complete.selectionNotice, /查询和关注暂未开放/);
   const incomplete = page.selectionView({ ...values.selection, product, storeNumbers: [] });
   assert.match(incomplete.selectionNotice, /补全或核对/);
 });

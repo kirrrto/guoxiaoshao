@@ -1,0 +1,21 @@
+{
+  "generatedAt": "2026-10-14T13:14:02.785Z",
+  "entries": [
+    {
+      "familyKey": "homepod-mini-2",
+      "category": "homepod",
+      "rawFile": "homepod-mini-2.html",
+      "record": {
+        "requestUrl": "https://www.apple.com.cn/shop/buy-homepod/homepod-mini",
+        "httpStatus": 200,
+        "finishedAt": "2026-10-14T13:14:02.781Z",
+        "sha256": "c97fac38786ed796089564d7ec2a789d38734e78394304afa280277817a2ce46"
+      },
+      "parse": {
+        "supported": true,
+        "pageTitle": "HomePod mini 2",
+        "productCount": 5
+      }
+    }
+  ]
+}

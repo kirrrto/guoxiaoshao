@@ -14,11 +14,12 @@ const copy = value => JSON.parse(JSON.stringify(value));
 const response = payload => ({ ok: true, product: seed.products.find(p => p.partNumber === payload.partNumber), balance: 3, quotaRevision: 1,
   queriedAt: new Date().toISOString(), results: payload.storeNumbers.map(storeNumber => ({ storeNumber, status: 'available', observedAt: new Date().toISOString() })) });
 
-async function opened({ value = saved(), cache, query = async payload => response(payload), getCurrentPages, getBoot = boot } = {}) {
+async function opened({ value = saved(), cache, catalogData, query = async payload => response(payload), getCurrentPages, getBoot = boot } = {}) {
   const rt = runtime(async (action, payload) => action === 'user.bootstrap' ? getBoot()
     : action === 'catalog.get' ? { unchanged: true } : action === 'query.pickup' ? query(payload) : {}, { getCurrentPages });
   if (value) rt.storage.set('gxs_query_selection_v1', value);
   if (cache) rt.storage.set('gxs_query_result_v1', cache);
+  if (catalogData) rt.storage.set('gxs_catalog_v1', catalogData);
   const page = rt.instance('pages/query/index.js');
   await page.onLoad();
   const ticks = [], scrolls = [];
@@ -48,13 +49,17 @@ test('valid saved selection opens as a compact exact-product and store summary w
 });
 
 test('first visit and invalid or incomplete saved selections require explicit repair before querying', async () => {
-  const unsupported = seed.products.find(p => !p.supported);
+  // Unavailable-selection behavior must still be exercised when every SKU in
+  // the current bundled catalog has been verified.
+  const unsupported = { ...seed.products[0], supported: false, comingSoon: true };
+  const catalogData = { ...seed, version: `${seed.version}-unsupported-fixture`,
+    products: seed.products.map(p => p.partNumber === unsupported.partNumber ? unsupported : p) };
   for (const value of [null, { partNumber: 'REMOVED', storeNumbers: ['R577'] },
     { partNumber: unsupported.partNumber, storeNumbers: ['R577'] },
     { partNumber: product.partNumber, storeNumbers: [] },
     { partNumber: product.partNumber, storeNumbers: ['REMOVED'] },
     { partNumber: product.partNumber, storeNumbers: ['R577', 'REMOVED'] }]) {
-    const { rt, page } = await opened({ value });
+    const { rt, page } = await opened({ value, catalogData });
     assert.equal(page.data.selectionCanCollapse, false, JSON.stringify(value));
     assert.equal(page.data.sheetVisible, false, 'loading a saved scope does not open an editor');
     await page.onQuery();
@@ -94,6 +99,33 @@ test('a disappeared catalog SKU requires review and cannot be silently confirmed
   assert.match(rt.messages.at(-1), /有效门店/);
   assert.equal(rt.calls.filter(call => call.action === 'query.pickup').length, 0);
   page.onUnload();
+});
+
+test('an unverified Duo selection can be saved and restored while query and follow remain blocked', async () => {
+  const duo = { ...seed.products.find(p => p.partNumber === 'MK2M4CH/A'), supported: false, comingSoon: true };
+  const catalogData = { ...seed, version: `${seed.version}-old-cloud-duo`,
+    products: seed.products.map(p => p.partNumber === duo.partNumber ? duo : p) };
+  const { page, rt } = await opened({ value: null, catalogData });
+  page.onEditSelection();
+  page.draftSelection = { partNumber: duo.partNumber, product: page.catalog.productByPart[duo.partNumber],
+    storeNumbers: ['R577', 'R639'], stores: ['R577', 'R639'].map(n => page.catalog.storeByNumber[n]) };
+  page.onDoneSelection();
+  assert.equal(page.data.sheetVisible, false);
+  assert.equal(page.data.selectionSummary.title, duo.title);
+  assert.deepEqual(rt.storage.get('gxs_query_selection_v1'), { partNumber: duo.partNumber, storeNumbers: ['R577', 'R639'] });
+  assert.equal(page.data.selectionCanCollapse, false);
+  assert.match(page.data.selectionNotice, /配置已保存/);
+  await page.onQuery();
+  page.data.boot.member = true;
+  page.onAddFollow();
+  assert.equal(rt.app.globalData.pendingFollow, null);
+  assert.equal(rt.calls.filter(c => c.action === 'query.pickup' || c.action === 'follow.save').length, 0);
+  page.onUnload();
+  const restored = await opened({ value: rt.storage.get('gxs_query_selection_v1'), catalogData });
+  assert.equal(restored.page.selection.partNumber, duo.partNumber);
+  assert.deepEqual(copy(restored.page.selection.storeNumbers), ['R577', 'R639']);
+  assert.match(restored.page.data.selectionNotice, /配置已保存/);
+  restored.page.onUnload();
 });
 
 test('old results are marked separately and their requery and follow retain their own targets', async () => {

@@ -246,11 +246,12 @@
       <view class="ui-label-with-icon"><image class="opening-calendar-logo" src="/images/brand/logo-mint-144.png" mode="aspectFit" aria-hidden="true" /><text class="opening-calendar-brand">果小哨 · 新品日历</text></view>
       <button class="opening-calendar-close" hover-class="ui-control-pressed" aria-label="关闭发售日历" bindtap="onCloseCalendar"><text>×</text></button>
     </view>
-    <scroll-view scroll-y="{{true}}" class="opening-calendar-scroll {{openingCalendar.imageUrl ? '' : 'opening-calendar-scroll--compact'}}">
+    <scroll-view scroll-y="{{true}}" class="opening-calendar-scroll {{openingCalendar.imageUrl ? '' : 'opening-calendar-scroll--compact'}} {{openingCalendar.followNotice ? 'opening-calendar-scroll--follow-ready' : ''}}">
       <view class="opening-calendar-content">
         <view class="poster-hero">
           <text class="poster-stage poster-stage--{{openingCalendar.stage}}">{{openingCalendar.stageText}}</text>
           <view class="poster-title">{{openingCalendar.title}}</view>
+          <view wx:if="{{openingCalendar.followNotice}}" class="poster-follow-notice"><view class="poster-follow-title">{{openingCalendar.followNotice}}</view><view class="poster-follow-detail">{{openingCalendar.followNoticeDetail}}</view></view>
           <view wx:if="{{openingCalendar.imageUrl}}" class="poster-hero-media"><image class="poster-hero-image" src="{{openingCalendar.imageUrl}}" mode="aspectFit" aria-label="{{openingCalendar.imageAlt || openingCalendar.title}}" binderror="onCalendarImageError" /></view>
         </view>
         <view class="poster-milestones">
