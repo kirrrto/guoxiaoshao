@@ -76,7 +76,7 @@
 
         <view wx:for="{{follows}}" wx:key="followId" id="follow-entry-{{index}}" class="card follow {{item.hasAvailable ? 'follow-available' : ''}}">
           <view class="follow-product">
-            <image wx:if="{{item.imageUrl}}" class="follow-image" src="{{item.imageUrl}}" mode="aspectFit" aria-label="{{item.imageAlt}}" data-index="{{index}}" binderror="onFollowImageError" />
+            <image wx:if="{{item.imageUrl}}" class="follow-image" src="{{item.imageDisplayUrl || item.imageUrl}}" mode="aspectFit" aria-label="{{item.imageAlt}}" data-index="{{index}}" binderror="onFollowImageError" />
             <view class="follow-head"><view class="follow-title"><text class="bold">{{item.productTitle}}</text></view><text class="pill pill-{{item.statusCls}}">{{item.statusLabel}}</text></view>
           </view>
           <view wx:if="{{item.monitoringText}}" class="small text-2 follow-note">{{item.monitoringText}}</view>
