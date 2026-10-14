@@ -15,15 +15,15 @@ const THUMBNAIL_WIDTH = 420;
 function productThumbnailUrl(imageUrl) {
   const source = typeof imageUrl === 'string' ? imageUrl : '';
   if (!source.startsWith(APPLE_IMAGE_PREFIX)) return source;
-  const width = /([?&])wid=(\\d+)(?=&|$)/.exec(source);
-  const height = /([?&])hei=(\\d+)(?=&|$)/.exec(source);
+  const width = /([?&])wid=(\d+)(?=&|$)/.exec(source);
+  const height = /([?&])hei=(\d+)(?=&|$)/.exec(source);
   if (!width || !height) return source;
   const originalWidth = Number(width[2]), originalHeight = Number(height[2]);
   if (!Number.isSafeInteger(originalWidth) || !Number.isSafeInteger(originalHeight) ||
       originalWidth <= THUMBNAIL_WIDTH || originalHeight <= 0) return source;
   const thumbnailHeight = Math.max(1, Math.round(originalHeight * THUMBNAIL_WIDTH / originalWidth));
-  return source.replace(/([?&])wid=\\d+(?=&|$)/, '$1wid=' + THUMBNAIL_WIDTH)
-    .replace(/([?&])hei=\\d+(?=&|$)/, '$1hei=' + thumbnailHeight);
+  return source.replace(/([?&])wid=\d+(?=&|$)/, '$1wid=' + THUMBNAIL_WIDTH)
+    .replace(/([?&])hei=\d+(?=&|$)/, '$1hei=' + thumbnailHeight);
 }
 
 function withImageFit(product) {
