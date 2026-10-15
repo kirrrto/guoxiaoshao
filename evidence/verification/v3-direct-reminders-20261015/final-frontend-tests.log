@@ -1,0 +1,46 @@
+✔ turning on a follow is distinct from the actual background collector state (131.9589ms)
+✔ missing subscription template gives a specific actionable reason without invoking WeChat authorization (22.9193ms)
+✔ configuration enabled alone never claims that delivery is running (23.7225ms)
+✔ sender and credential faults are presented in plain language, never as a user pause (92.7204ms)
+✔ authorization counts the current restock template and excludes obsolete credits (20.6364ms)
+✔ ready service still requires the personal message switch, valid credits and a permitted time (17.4261ms)
+✔ paused follows stay paused while a collector is running, and resume uses the real API (13.8042ms)
+✔ refreshing service status reads bootstrap and follows without issuing a stock query (13.8291ms)
+✔ collapsed follow summaries count only fresh permitted stores and age cached availability without a cloud request (13.7055ms)
+✔ all-limited, missing, restricted and unknown summaries cannot advertise current pickup availability or a fabricated timestamp (104.4713ms)
+✔ returning from native authorization ages cached observations locally while preserving card expansion and order (17.2438ms)
+✔ both page templates bind the visible top-up button directly and expose synchronization retry beside it (2.4032ms)
+✔ both reminder centers open without native authorization and only the explicit authorize action prompts (43.7722ms)
+✔ one direct tap on either page invokes native authorization synchronously without opening a second sheet (45.8572ms)
+✔ direct repeated taps share the native lock across pages but do not wait for slow server reconciliation (23.7123ms)
+✔ direct authorization cannot overlap editing, saving, redemption or payment actions (56.0545ms)
+✔ native authorization also blocks reverse payment, renewal and redemption entry while queued synchronization does not (20.6504ms)
+✔ mine payment and redemption buttons visibly disable during the native authorization request only (0.6511ms)
+✔ direct rejection or native failure never increases reminder credits (82.1059ms)
+✔ direct authorization shows a retryable sync failure in place and retry reuses its request without native authorization (44.0482ms)
+✔ a direct native result arriving before onShow remains visible after return and starts its feedback timeout then (87.8074ms)
+✔ direct authorization keeps late native feedback out of a different account and a later visit of the original account (24.7436ms)
+✔ a native failure before return stays readable and a cancelled old feedback timer cannot retire a newer timer (21.9437ms)
+✔ saving quiet periods preserves the verified account so explicit authorization works immediately (20.3052ms)
+✔ a bootstrap begun before settings were saved cannot restore the old settings (24.1637ms)
+✔ a save finishing while hidden preserves confirmed identity without opening a native sheet or overlay (19.3964ms)
+✔ a save from a hidden stale page cannot publish to an account changed on another page (17.9701ms)
+✔ a failed identity refresh after a successful save keeps saved settings and reports a refresh failure (15.6813ms)
+✔ a recovery read after saving does not repaint a hidden page or replace another account (40.1342ms)
+✔ native permission is shared across pages and pending grants remain separate from confirmed balances (24.5083ms)
+✔ cross-page retry drains the same durable request once without another native prompt (17.2086ms)
+✔ nonmembers can inspect the reminder center but cannot start native authorization or grant themselves credits (21.7021ms)
+✔ a late native callback after account switch stays owned by the original account and gives no new-account feedback (17.4767ms)
+✔ a late native rejection and an old feedback timer cannot overwrite the next account (16.1962ms)
+✔ a hidden page for a different account never adopts broadcast balances or pending grants (18.8313ms)
+✔ the mine and follow panels survive a short native-sheet round trip without a full page refresh (35.1332ms)
+✔ ordinary returns still refresh and an account change cannot use the native-return shortcut (93.9243ms)
+✔ unloading releases the overlay and listeners while the existing queue continues for the other page (24.6989ms)
+ℹ tests 38
+ℹ suites 0
+ℹ pass 38
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 992.3153

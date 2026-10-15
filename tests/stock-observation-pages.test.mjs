@@ -70,7 +70,7 @@ test('query summary ages the retained sample before a failed refresh and preserv
   page.applyBoot(verifiedAccount()); page.visible = true; page.startFollowPolling(); await flush();
   assert.equal(page.data.followTargets[0].statusLabel, '暂无供应');
   now += 180000; fail = true; await rt.nextTimer();
-  assert.equal(page.data.followRefreshError, true); assert.equal(page.data.followTargets[0].statusLabel, '待更新');
+  assert.equal(page.data.followTargets[0].statusLabel, '待更新');
   assert.equal(page.data.followTargets[0].observedText, '2026-09-15 18:35:06'); page.onHide();
 });
 

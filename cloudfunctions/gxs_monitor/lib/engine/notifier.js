@@ -13,7 +13,7 @@
 const { NOTIFIABLE_TYPES, targetKeyOf } = require('./events');
 const { canUseReminders, reminderBlockReason, isMember, followAllowance } = require('../rules/membership');
 const { loadFollowPolicy } = require('../rules/follow-access');
-const { inMinuteWindow } = require('../time');
+const { suppressDndEvent } = require('../rules/dnd');
 const { isValidTemplateId } = require('../config');
 const { targetSnapshot } = require('../notification-target');
 
@@ -73,7 +73,7 @@ function buildTasks({ events, follows, users, config, now }) {
       if (!followAllowance(user, follow, follows, now).eligibleStoreNumbers.includes(event.storeNumber)) { skip('plan_limit'); continue; }
       if (user.settings && user.settings.notifyEnabled === false) { skip('user_disabled'); continue; }
       const dnd = user.settings && user.settings.dnd;
-      if (dnd && dnd.enabled && inMinuteWindow(now, dnd.startMinute, dnd.endMinute)) { skip('dnd'); continue; }
+      if (suppressDndEvent(dnd, now, event.detectedAt)) { skip('dnd'); continue; }
       const sub = user.subscriptions && user.subscriptions[templateId];
       if (!sub || sub.credits <= 0) { skip('no_subscription_credit'); continue; }
       tasks.push(base);
@@ -148,7 +148,7 @@ function skipReason({ task, user, follow, config, now, senderAppid }) {
   if (!follow || follow.status !== 'active' || follow.userKey !== task.userKey || follow.partNumber !== task.partNumber || !follow.storeNumbers.includes(task.storeNumber)) return 'follow_not_active';
   if (!followAllowance(user, follow, [follow], now).eligibleStoreNumbers.includes(task.storeNumber)) return 'plan_limit';
   if (settings && settings.notifyEnabled === false) return 'user_disabled';
-  if (settings && settings.dnd && settings.dnd.enabled && inMinuteWindow(now, settings.dnd.startMinute, settings.dnd.endMinute)) return 'dnd';
+  if (suppressDndEvent(settings && settings.dnd, now, task.detectedAt)) return 'dnd';
   const detectedAt = Date.parse(task.detectedAt);
   if (!Number.isFinite(detectedAt) || detectedAt > now.getTime() + 30000) return 'event_invalid_time';
   if (now.getTime() - detectedAt > (config.notifications.maxEventAgeSeconds || 120) * 1000) return 'event_expired';

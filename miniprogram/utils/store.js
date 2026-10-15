@@ -90,6 +90,18 @@ function invalidateBootstrap() {
   getApp().globalData.bootstrap = null;
 }
 
+/** Keep the verified identity when publishing settings confirmed for that account. */
+function publishSettings(settings, expectedUserKey) {
+  const app = getApp(), cached = app.globalData.bootstrap;
+  if (!settings || typeof settings !== 'object' || !expectedUserKey || !cached
+    || !cached.identity || cached.identity.userKey !== expectedUserKey) return false;
+  // Retire reads started before the write, as with confirmed quota/grant updates.
+  bootstrapGeneration += 1;
+  bootstrapPromise = null;
+  app.globalData.bootstrap = { ...cached, settings };
+  return true;
+}
+
 function isOlderQuota(quota) {
   if (!latestQuota) return false;
   const revision = Number.isInteger(quota.revision) ? quota.revision : 0;
@@ -343,4 +355,4 @@ async function getCatalog({ force = false } = {}) {
   return catalog;
 }
 
-module.exports = { getBootstrap, refreshBootstrap, invalidateBootstrap, publishQuota, publishQueryBalance, currentQuota, subscribeQuota, publishSubscriptions, subscribeSubscriptions, getQuotaGeneration, getCatalog, refreshCatalog, currentCatalog, subscribeCatalog, getFollows, invalidateFollows, resetSession, CATEGORY_NAME };
+module.exports = { getBootstrap, refreshBootstrap, invalidateBootstrap, publishSettings, publishQuota, publishQueryBalance, currentQuota, subscribeQuota, publishSubscriptions, subscribeSubscriptions, getQuotaGeneration, getCatalog, refreshCatalog, currentCatalog, subscribeCatalog, getFollows, invalidateFollows, resetSession, CATEGORY_NAME };

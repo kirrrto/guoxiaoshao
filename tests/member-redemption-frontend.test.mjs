@@ -5,6 +5,7 @@ import path from 'node:path';
 import vm from 'node:vm';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
+import { isolatedAccountUi } from './helpers/isolated-account-ui.mjs';
 
 const require = createRequire(import.meta.url);
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../miniprogram');
@@ -26,7 +27,7 @@ function runtime({ handler = async action => action === 'member.status' ? { orde
     invalidateBootstrap: () => invalidated.push('bootstrap'), invalidateFollows: () => invalidated.push('follows'), publishQuota() {}, subscribeQuota: () => () => {} };
   const wx = { stopPullDownRefresh() {}, ...wxExtra };
   vm.runInNewContext(fs.readFileSync(path.join(root, 'pages/mine/index.js'), 'utf8'), { console, Date, Promise, Map, Set, wx, getApp: app ? () => app : undefined, Page: value => { definition = value; },
-    require: name => name.endsWith('/api') ? api : name.endsWith('/store') ? store : name.endsWith('/reminder-credits') ? { topUpReminderCredit: () => false } : require(path.resolve(root, 'pages/mine', name)) });
+    require: name => name.endsWith('/api') ? api : name.endsWith('/store') ? store : isolatedAccountUi(name) || require(path.resolve(root, 'pages/mine', name)) });
   const page = { ...definition, data: clone(definition.data) };
   page.setData = patch => { for (const [key, value] of Object.entries(clone(patch))) { const parts = key.split('.'); let target = page.data; for (const part of parts.slice(0, -1)) target = target[part] || (target[part] = {}); target[parts.at(-1)] = value; } };
   page.applyBoot(boot()); page.data.ready = true;
@@ -157,7 +158,7 @@ test('redemption deep link opens for a real account and ignores request data in 
 
 test('unloaded page ignores late settings, quota, ledger and reminder mutations', async () => {
   const settings = deferred(), signin = deferred(), ledger = deferred(), deleting = deferred();
-  const rt = runtime({ getBoot: async () => boot(), handler: action => {
+  const rt = runtime({ app: { globalData: { bootstrap: boot() } }, getBoot: async () => boot(), handler: action => {
     if (action === 'user.updateSettings') return settings.promise;
     if (action === 'quota.signin') return signin.promise;
     if (action === 'quota.ledger') return ledger.promise;

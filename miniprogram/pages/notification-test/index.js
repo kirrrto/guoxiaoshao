@@ -1,5 +1,6 @@
 const { call, newId, showError } = require('../../utils/api');
 const { publishQuota, publishQueryBalance, resetSession } = require('../../utils/store');
+const { sourceOf, stageTestReturn, returnToSource } = require('../../utils/journey-context');
 const ID = /^[A-Za-z0-9_-]{8,64}$/;
 const CALL_TIMEOUT_MS = 20000;
 function callTest(action, payload) {
@@ -33,13 +34,16 @@ const STATUS = {
 };
 
 Page({
-  data: { loading: true, busy: false, ready: false, balance: 0, test: null, statusTitle: '', statusNote: '', error: null, canContinue: false, pendingOther: false, blocked: false, feedbackNote: '', operationNote: '', checkNote: '', showTestRules: false, showTroubleshooting: false },
+  data: { loading: true, busy: false, ready: false, balance: 0, test: null, statusTitle: '', statusNote: '', error: null, canContinue: false, pendingOther: false, blocked: false, feedbackNote: '', operationNote: '', checkNote: '', showTestRules: false, showTroubleshooting: false, returnLabel: '返回提醒中心' },
   async onLoad(options = {}) {
     this.retired = false;
     this.visible = false;
     this.accountEpoch = 0;
     this.routeRequestId = ID.test(options.requestId || '') ? options.requestId : null;
-    this.openedFromMessage = Boolean(this.routeRequestId);
+    this.openedFromMessage = Boolean(this.routeRequestId && options.resume !== '1');
+    this.returnSource = sourceOf(options.from);
+    this.returnOwner = this.bootstrapOwner();
+    this.setData({ returnLabel: { query: '返回原查询', follow: '返回小哨任务', guide: '返回选购指南', history: '返回历史', mine: '返回提醒中心' }[this.returnSource] });
     await this.loadStatus();
   },
   onShow() {
@@ -65,6 +69,11 @@ Page({
       if ((this.quotaOwner || this.userKey) && (this.quotaOwner || this.userKey) !== userKey && this.bootstrapOwner() !== userKey) resetSession();
       this.accountEpoch += 1; this.userKey = userKey; this.pending = null; this.openedRecorded = false;
       this.setData({ canContinue: false, pendingOther: false, test: null, balance: 0, blocked: false, statusTitle: '', statusNote: '', feedbackNote: '' });
+    }
+    if (!this.returnOwner) this.returnOwner = userKey;
+    if (this.returnOwner !== userKey) {
+      this.returnSource = 'mine'; this.returnOwner = userKey;
+      this.setData({ returnLabel: '返回提醒中心' });
     }
     this.quotaOwner = userKey;
     this.storageKey = `gxs_notification_test_v1:${encodeURIComponent(userKey)}`;
@@ -246,7 +255,17 @@ Page({
     } }
     finally { this.finishOperation(context); }
   },
-  onGoMine() { wx.switchTab({ url: '/pages/mine/index' }); },
+  onReturnTask() {
+    if (this.data.busy || this.data.loading) return;
+    returnToSource(this.returnSource, this.returnOwner);
+  },
+  onGoMine() {
+    if (this.data.busy || this.data.loading || !this.contextCurrent(this.accountContext())) return;
+    const requestId = this.routeRequestId || this.data.test && this.data.test.requestId || this.pending && this.pending.requestId;
+    if (!stageTestReturn({ from: this.returnSource, requestId, ownerUserKey: this.userKey })) return;
+    getApp().globalData.pendingMineSection = 'quota-card';
+    wx.switchTab({ url: '/pages/mine/index' });
+  },
   onToggleTestRules() { this.setData({ showTestRules: !this.data.showTestRules }); },
   onToggleTroubleshooting() { this.setData({ showTroubleshooting: !this.data.showTroubleshooting }); },
 });

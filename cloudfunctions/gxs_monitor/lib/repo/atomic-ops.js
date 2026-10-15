@@ -189,6 +189,11 @@ function atomicMethods(run) {
     updateUserSettings: (userKey, patch) => run(async tx => {
       const user = await tx.get(C.users, userKey);
       if (!user) throw new ApiError('user_missing', '用户不存在');
+      const currentDnd = user.settings && user.settings.dnd;
+      if (patch.dnd && !Object.prototype.hasOwnProperty.call(patch.dnd, 'periods')
+        && currentDnd && Array.isArray(currentDnd.periods) && currentDnd.periods.length > 1) {
+        throw new ApiError('dnd_client_outdated', '已设置多个免打扰时段，请更新小程序后再修改');
+      }
       user.settings = { ...user.settings, ...patch };
       await tx.put(C.users, user);
       return user.settings;

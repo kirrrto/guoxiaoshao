@@ -18,8 +18,8 @@ test('fresh known unavailable and available observations produce different next 
   assert.equal(view().action, 'offer');
   assert.match(view().label, /7 天.*¥7.00/);
   const available = view({ snapshot: snapshot([row('available')]) });
-  assert.equal(available.action, 'follow');
-  assert.equal(available.label, '加入关注');
+  assert.equal(available.action, 'guide');
+  assert.equal(available.label, '查看下单指引');
   assert.match(available.detail, /Apple 官方渠道/);
   assert.equal(view({ account: { ...account, membership: { active: true } } }).action, 'follow');
 });
@@ -60,7 +60,7 @@ test('displayed action is rechecked at click time when an observation has expire
   page.accountSnapshot = account; page.features = { resultNextAction: true };
   page.querySnapshot = snapshot([row('available')]);
   Object.assign(page.data, { boot: { member: false }, result: page.querySnapshot, accountReady: true, collector: { state: 'running' } });
-  page.refreshJourney(); assert.equal(page.data.nextAction.action, 'follow');
+  page.refreshJourney(); assert.equal(page.data.nextAction.action, 'guide');
   clock += 121000;
   page.onNextAction();
   assert.equal(page.data.nextAction.action, 'retry');
@@ -96,6 +96,22 @@ test('activation distinguishes paid, saved, authorized and observed states', () 
   assert.equal(setup({ follows: [{ ...follow, partNumber: 'SKU-B' }], readiness: { ready: true } }).steps[1].done, false);
   assert.equal(setup({ followsLoaded: false }).action, '');
   assert.equal(activationStatus({ member: false }), null);
+});
+
+test('completed activation yields to follows, while an unfinished purchased target stays recoverable', t => {
+  t.mock.method(Date, 'now', () => now);
+  const rt = runtime(), page = rt.instance('pages/follow/index.js');
+  page.catalog = catalog;
+  page.features = { activationJourney: true };
+  page.accountSnapshot = { ...account, membership: { active: true } };
+  page.setData({ followsLoaded: true, follows: [{ partNumber: 'SKU-A', status: 'active', stores: [row()] }], readiness: { ready: true } });
+  page.refreshActivation();
+  assert.equal(page.data.activation, null, 'a completed checklist must not occupy the task list first screen');
+  page.checkoutStore().save(account.identity, { partNumber: 'SKU-A', storeNumbers: ['R001'] }, catalog);
+  page.setData({ follows: [] });
+  page.refreshActivation();
+  assert.equal(page.data.activation.action, 'continue', 'the paid target still has an explicit recovery path');
+  assert.equal(rt.calls.length, 0);
 });
 
 test('resuming a checkout selection validates the current account, revision and expiration before opening the editor', t => {

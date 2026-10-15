@@ -159,6 +159,13 @@ button.opening-calendar-close.opening-calendar-close {
 .alternative-panel .alternative-chip--selected, .alternative-panel .alternative-store--selected { border-color: var(--green); background: var(--green-soft); }
 .alternative-chip--selected .alternative-check, .alternative-store--selected .alternative-check { background: var(--green); border-color: var(--green); color: var(--green-ink); }
 .alternative-stores { display: flex; flex-direction: column; gap: 8rpx; }
+.alternative-city-picker { margin-bottom: 12rpx; }
+.alternative-selected-stores { margin-top: 20rpx; }
+.alternative-selected-list { display: flex; flex-wrap: wrap; gap: 10rpx; margin-top: 10rpx; }
+.alternative-panel .alternative-selected-store { display: flex; align-items: center; justify-content: space-between; gap: 14rpx; width: auto; max-width: 100%; min-width: 0; min-height: 44px; height: auto; margin: 0; padding: 12rpx 16rpx; border: 1rpx solid var(--green); border-radius: 12rpx; background: var(--green-soft); color: var(--green-dark); font-size: 23rpx; line-height: 1.5; text-align: left; white-space: normal; overflow-wrap: anywhere; }
+.alternative-selected-store::after { border: 0; }
+.alternative-selected-store text:first-child { flex: 1; min-width: 0; }
+.alternative-selected-store text:last-child { flex: none; }
 .alternative-panel .alternative-stores .alternative-store { width: 100%; max-width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 12rpx; text-align: left; }
 .alternative-store-copy { display: flex; flex: 1; flex-direction: column; min-width: 0; gap: 2rpx; }
 .alternative-store-label { font-size: 24rpx; overflow-wrap: anywhere; }
@@ -182,6 +189,69 @@ button.opening-calendar-close.opening-calendar-close {
 .target-evidence { border-top: 1rpx solid var(--line); padding-top: 22rpx; margin-top: 24rpx; }
 .launch-dates { display: flex; flex-wrap: wrap; gap: 12rpx 28rpx; font-size: 30rpx; font-weight: 600; padding: 22rpx 0 14rpx; }
 .launch-card .row-between { flex-wrap: wrap; gap: 12rpx; }
+
+.query-notice-region:empty { display: none; }
+.query-follow-entry.query-follow-entry { margin-bottom: 24rpx; text-align: left; }
+.query-guide-entry.query-guide-entry { padding: 20rpx 24rpx; }
+.query-guide-entry .query-guide-note { display: none; }
+.selection-follow-action.selection-follow-action { width: 100%; }
+
+/* Compact query hierarchy: target first, one next action, then store evidence. */
+.query-page { padding-top: 20rpx; }
+.query-page .page-heading { margin: 0 4rpx 22rpx; gap: 18rpx; }
+.query-page .brand-page-logo { width: 36px; height: 36px; border-radius: 10px; }
+.query-page .page-title { font-size: 20px; line-height: 1.35; letter-spacing: 0; }
+.query-page .page-subtitle { margin-top: 4rpx; font-size: 12px; line-height: 1.5; }
+.query-page .card { padding: 24rpx; margin-bottom: 20rpx; border-radius: 24rpx; }
+.query-page .card-title { font-size: max(15px, 30rpx); gap: 8rpx 12rpx; }
+.query-page .selection-card > .card-title { padding-bottom: 14rpx; margin-bottom: 0; }
+.query-page .selection-card > .card-title > text:first-child { flex-basis: auto; }
+.query-page .selection-card > .card-title .sub { padding: 4rpx 12rpx; font-size: 12px; }
+.query-page .selection-card--empty > .card-title { font-size: 18px; padding-bottom: 10rpx; }
+.query-page .selection-summary { padding-top: 16rpx; }
+.query-page .selection-summary-image-box { width: 112rpx; height: 132rpx; flex-basis: 112rpx; border-radius: 16rpx; }
+.query-page .selection-summary-title { font-size: max(14px, 29rpx); line-height: 1.4; }
+.query-page .selection-summary-city, .query-page .selection-summary-stores { font-size: 12px; line-height: 1.5; }
+.query-page .selection-summary-city { margin-top: 6rpx; }
+.query-page .selection-summary-footer { margin-top: 10rpx; padding-top: 6rpx; border-top: 0; gap: 12rpx; }
+.query-page .selection-summary-change.ui-action { flex-basis: 58px; min-width: 58px; padding: 8rpx 12rpx; }
+.query-page .selection-card > .btn { min-height: 44px; padding: 16rpx 20rpx; font-size: max(14px, 28rpx); }
+.selection-utilities { display: flex; gap: 12rpx; margin-top: 14rpx; }
+.selection-utilities .ui-action, .selection-utilities .ui-disclosure { flex: 1 1 0; min-width: 0; width: auto; margin: 0; padding: 12rpx 16rpx; gap: 8rpx; font-size: 12px; }
+.selection-utilities .ui-disclosure-label, .selection-utilities .ui-action-label { font-size: 12px; }
+.selection-utilities .ui-disclosure-meta { font-size: 12px; gap: 6rpx; }
+.query-page .result-target-note { padding: 0 0 10rpx; margin-bottom: 8rpx; background: transparent; border-radius: 0; font-size: 12px; }
+.query-page .result-target-different { padding: 12rpx 16rpx; background: var(--warn-soft); border-radius: 12rpx; }
+.query-page .result-product-row { gap: 18rpx; padding: 0 0 16rpx; }
+.query-page .result-product-media { width: 104rpx; height: 124rpx; flex-basis: 104rpx; border-radius: 16rpx; }
+.query-page .result-product-title { font-size: max(14px, 29rpx); line-height: 1.4; }
+.query-page .result-product-meta { margin-top: 6rpx; }
+.query-page .result-product-meta .pill { font-size: 11px; padding: 0 10rpx; }
+.query-page .result-product-time { margin-top: 4rpx; font-size: 12px; line-height: 1.4; }
+.query-page .result-next-action { margin-top: 16rpx; padding: 20rpx; border-radius: 16rpx; }
+.query-page .journey-title { font-size: max(15px, 30rpx); line-height: 1.4; }
+.query-page .result-next-action > .small { margin-top: 6rpx; font-size: 12px; line-height: 1.5; }
+.query-page .result-next-action > .btn { min-height: 44px; padding: 14rpx 18rpx; font-size: 14px; }
+.query-page .result-store { padding: 20rpx 0; }
+.query-page .result-store--available { margin-top: 12rpx; padding: 18rpx 16rpx; background: var(--green-soft); border: 1rpx solid var(--line); border-radius: 14rpx; }
+.result-store-heading.row-between { align-items: flex-start; flex-wrap: nowrap; gap: 12rpx; }
+.result-store-heading .result-store-name { flex: 1 1 0; min-width: 0; font-size: max(14px, 28rpx); line-height: 1.5; }
+.result-store-name > .small { display: block; font-size: 12px; }
+.result-store-heading > .pill { flex: none; font-size: 12px; padding: 4rpx 12rpx; }
+.query-page .result-store > .small, .query-page .result-store > .tiny { margin-top: 6rpx; font-size: 12px; line-height: 1.5; }
+.query-page .result-actions { margin-top: 14rpx; gap: 12rpx; }
+.query-page .query-follow-entry, .query-page .query-guide-entry { margin-bottom: 18rpx; padding: 16rpx 20rpx; border-radius: 20rpx; }
+.query-page .query-guide-icon { width: 32px; height: 32px; border-radius: 9px; }
+.query-page .query-guide-title { font-size: 14px; }
+
+@media (min-width: 600px) {
+  .query-page .card { padding: 20px; border-radius: 16px; }
+  .query-page .selection-summary-image-box { width: 64px; height: 76px; flex-basis: 64px; }
+  .query-page .result-product-media { width: 60px; height: 72px; flex-basis: 60px; }
+  .query-page .selection-summary-title, .query-page .result-product-title { font-size: 17px; }
+  .query-page .journey-title, .query-page .card-title { font-size: 18px; }
+  .query-page .result-store-name { font-size: 16px; }
+}
 
 @media (prefers-color-scheme: dark) {
   .selection-summary-image-box, .result-product-media { background: var(--image-tile); }

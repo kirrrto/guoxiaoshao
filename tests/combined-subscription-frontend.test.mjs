@@ -363,23 +363,20 @@ function ancestorsAt(markup, index) {
   return stack;
 }
 
-test('the follow page exposes exactly one combined authorization button and both balances without opening service details', () => {
-  const markup = fs.readFileSync(new URL('../miniprogram/pages/follow/index.wxml', import.meta.url), 'utf8');
-  const buttons = [...markup.matchAll(/<button\b[^>]*bindtap="onSubscribe"[^>]*>/g)];
-  assert.equal(buttons.length, 1, 'the main entry and alert card must not duplicate subscription buttons');
-  assert.ok(ancestorsAt(markup, buttons[0].index).every(tag => !tag.includes('showServiceDetails')), 'authorization is visible while service details are collapsed');
-  for (const field of ['credits', 'soldoutCredits']) {
-    const matches = [...markup.matchAll(new RegExp(`subscription\\.${field}\\b`, 'g'))];
-    assert.ok(matches.some(match => ancestorsAt(markup, match.index).every(tag => !tag.includes('showServiceDetails'))), `${field} remains visible without expanding service details`);
+test('both pages keep one optional shared authorization panel and expose direct top-up and synchronization retry', () => {
+  const follow = fs.readFileSync(new URL('../miniprogram/pages/follow/index.wxml', import.meta.url), 'utf8');
+  const mine = fs.readFileSync(new URL('../miniprogram/pages/mine/index.wxml', import.meta.url), 'utf8');
+  const shared = fs.readFileSync(new URL('../miniprogram/components/reminder-authorization/index.wxml', import.meta.url), 'utf8');
+  for (const markup of [follow, mine]) {
+    assert.equal((markup.match(/<reminder-authorization\b/g) || []).length, 1);
+    assert.match(markup, /bindauthorize="onSubscribe"/);
+    assert.match(markup, /bindretry="onRetryAuthorizationSync"/);
+    assert.match(markup, /wx:if="\{\{authorizationOpen\}\}"/);
+    assert.match(markup, /<button\b[^>]*bindtap="onSubscribe"/);
+    assert.match(markup, /<button\b[^>]*bindtap="onRetryAuthorizationSync"/);
   }
-  const actionButton = markup.match(/<button\b[^>]*bindtap="onReadinessAction"[^>]*>/);
-  assert.ok(actionButton, 'non-authorization next steps remain available');
-  const conditions = [...ancestorsAt(markup, actionButton.index), actionButton[0]]
-    .flatMap(tag => [...tag.matchAll(/wx:if="\{\{([\s\S]*?)\}\}"/g)].map(match => match[1]));
-  const state = pageFor(runtime()).data;
-  const visibleFor = action => conditions.every(condition => Boolean(vm.runInNewContext(condition,
-    { ...state, readiness: { ...state.readiness, action } }, { timeout: 100 })));
-  assert.equal(visibleFor('subscribe'), false, 'readiness must not expose a second authorization button');
-  assert.equal(visibleFor('membership'), true, 'membership and other non-authorization next steps remain visible');
-  assert.doesNotMatch(markup, /再加一次提醒/);
+  assert.equal((shared.match(/bindtap="onAuthorize"/g) || []).length, 1);
+  for (const field of ['credits', 'soldoutCredits']) assert.match(shared, new RegExp('subscription\\.' + field));
+  assert.match(follow, /管理提醒/);
+  assert.match(follow, /bindtap="onReadinessAction"/);
 });

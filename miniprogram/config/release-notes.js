@@ -8,6 +8,16 @@
 // Keep technical details and complete acceptance records in release documents.
 const RELEASE_NOTES = [
   {
+    version: '3.0.0',
+    title: '提醒更好管理，操作更顺手',
+    dateText: '本地候选 · 2026-10-15',
+    highlights: [
+      '提醒次数集中到「我的」，小哨优先展示关注商品。',
+      '免打扰可设多个时段，有货时先看下单指引。',
+      '历史与测试提醒可接回原来的任务。',
+    ],
+  },
+  {
     version: '2.2.0',
     title: '新款 HomePod mini 可选',
     dateText: '更新记录 · 2026-10-14',

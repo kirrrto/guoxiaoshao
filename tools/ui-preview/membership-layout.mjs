@@ -40,6 +40,15 @@ export function inspectMembershipLayout(expected = null) {
   const account = header && { box: bounds(header), logo: header.querySelector('.account-logo') && bounds(header.querySelector('.account-logo')), content: header.querySelector('.account-header-content') && bounds(header.querySelector('.account-header-content')), status: badge && { text: badge.textContent.trim(), className: badge.className, color: getComputedStyle(badge).color, backgroundColor: getComputedStyle(badge).backgroundColor } };
   if (expected) {
     if (packages.length !== expected.packages) errors.push(`Expected ${expected.packages} membership packages, received ${packages.length}`);
+    if (expected.planIds && JSON.stringify(packages.map(element => element.getAttribute('data-plan-id'))) !== JSON.stringify(expected.planIds)) errors.push('Visible package tiers do not match the current purchase mode');
+    if (expected.entryActions) {
+      const actions = [...(membership?.querySelectorAll('[data-preview-action="onOpenMembershipRenew"], [data-preview-action="onOpenMembershipUpgrade"]') || [])].filter(element => !element.closest('.membership-shop'));
+      if (JSON.stringify(actions.map(element => element.textContent.trim())) !== JSON.stringify(expected.entryActions)) errors.push('Membership summary has incorrect purchase entry buttons');
+      if (actions.length === 2) {
+        const a = bounds(actions[0]), b = bounds(actions[1]);
+        if (!close(a.width, b.width) || !close(a.y, b.y) || a.right >= b.x || a.height < 44 || b.height < 44) errors.push('Member renewal and upgrade actions must be equal-width adjacent touch targets');
+      }
+    }
     if (!visible(membership)) errors.push('Membership card is missing');
     if (expected.accountHeader) {
       if (!visible(header)) errors.push('Account header is missing');

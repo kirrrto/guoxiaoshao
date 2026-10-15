@@ -91,6 +91,49 @@ test('picker sorts all current capacities and restores exact SKU after catalog o
   }
 });
 
+test('real iPhone 17 colors keep one order and exact selection across 256GB, 512GB and reordered catalogs', () => {
+  const iphone = products.products.filter(p => p.model === 'iPhone 17');
+  const rawColors = capacity => iphone.filter(p => p.attributes.capacity === capacity).map(p => p.attributes.color);
+  assert.notDeepEqual(rawColors('256GB'), rawColors('512GB'), 'the current catalog reproduces different SKU traversal orders');
+  const expectedColors = ['白色', '黑色', '青雾蓝色', '鼠尾草绿色', '薰衣草紫色'];
+  for (const color of expectedColors) {
+    const saved = iphone.find(p => p.attributes.capacity === '256GB' && p.attributes.color === color);
+    const { instance: p, c } = picker({ partNumber: saved.partNumber, storeNumbers: ['R577'] });
+    assert.deepEqual(plain(p.data.colors), expectedColors);
+    for (const capacity of ['512GB', '256GB']) {
+      p.onCapacityTap({ currentTarget: { dataset: { index: p.data.capacities.indexOf(capacity) } } });
+      const expected = iphone.find(p => p.attributes.capacity === capacity && p.attributes.color === color);
+      assert.deepEqual(plain(p.data.colors), expectedColors);
+      assert.equal(p.data.colorIndex, expectedColors.indexOf(color));
+      assert.equal(p.getSelection().partNumber, expected.partNumber);
+      assert.equal(p.data.product.imageUrl, expected.imageUrl);
+      assert.deepEqual(p.lastEvent.detail.storeNumbers, ['R577']);
+    }
+    for (const category of c.categories) for (const family of category.families) family.products.reverse();
+    p.onCatalog(c);
+    assert.deepEqual(plain(p.data.colors), expectedColors);
+    assert.equal(p.getSelection().partNumber, saved.partNumber);
+    const restored = picker({ partNumber: saved.partNumber, storeNumbers: ['R577'] }, { catalog: c }).instance;
+    assert.deepEqual(plain(restored.data.colors), expectedColors, 'a new picker must not depend on previous SKU traversal order');
+    assert.equal(restored.getSelection().partNumber, saved.partNumber);
+  }
+});
+
+test('stable color ordering excludes nonexistent combinations and immediately resolves a real draft SKU', () => {
+  const c = catalog();
+  const family = c.categories.find(c => c.key === 'iphone').families.find(f => f.familyKey === 'iphone-17');
+  const saved = family.products.find(p => p.attributes.capacity === '256GB' && p.attributes.color === '白色');
+  family.products = family.products.filter(p => !(p.attributes.capacity === '512GB' && p.attributes.color === '白色'));
+  const { instance: p } = picker({ partNumber: saved.partNumber, storeNumbers: ['R577'] }, { catalog: c });
+  p.onCapacityTap({ currentTarget: { dataset: { index: p.data.capacities.indexOf('512GB') } } });
+  assert.deepEqual(plain(p.data.colors), ['黑色', '青雾蓝色', '鼠尾草绿色', '薰衣草紫色']);
+  const expected = family.products.find(p => p.attributes.capacity === '512GB' && p.attributes.color === '黑色');
+  assert.equal(p.getSelection().partNumber, expected.partNumber);
+  assert.equal(p.data.product.attributes.capacity, '512GB');
+  assert.equal(p.data.product.attributes.color, '黑色');
+  assert.deepEqual(p.lastEvent.detail.storeNumbers, ['R577']);
+});
+
 test('search matches Chinese city/store/province plus city pinyin and initials without a network call', () => {
   const guangzhou = stores.find(s => s.storeNumber === 'R577');
   for (const term of ['广州', '天环', '广东', 'guangzhou', 'GZ', 'gz 天环', 'parccentral']) assert.equal(storeMatches(guangzhou, term), true, term);
@@ -139,18 +182,24 @@ test('switching models keeps available capacity and color and selects the new ex
   assert.deepEqual(p.lastEvent.detail.storeNumbers, ['R577', 'R359']);
 });
 
-test('model changes explain unavailable attributes and clear the note after an explicit color choice', () => {
+test('changing models immediately uses a real default capacity while preserving a still-valid color', () => {
   const c = catalog();
   const family = c.categories.find(c => c.key === 'iphone').families.find(f => f.familyKey === 'iphone-18-pro');
   family.products = family.products.filter(p => p.model !== 'iPhone 18 Pro Max' || p.attributes.capacity === '256GB');
   const saved = family.products.find(p => p.model === 'iPhone 18 Pro' && p.attributes.capacity === '512GB' && p.attributes.color === '银色');
   const { instance: p } = picker({ partNumber: saved.partNumber, storeNumbers: ['R577'] }, { catalog: c });
   p.onModelChange({ detail: { value: p.data.models.indexOf('iPhone 18 Pro Max') } });
+  assert.equal(p.data.capacities[p.data.capacityIndex], '256GB');
+  assert.equal(p.data.colors[p.data.colorIndex], '银色', 'preserve the still-available color');
+  const expected = family.products.find(product => product.model === 'iPhone 18 Pro Max' && product.attributes.capacity === '256GB' && product.attributes.color === '银色');
+  assert.equal(p.lastEvent.detail.partNumber, expected.partNumber, 'an explicit model change resolves the current draft without another confirmation');
   assert.equal(p.data.product.attributes.capacity, '256GB');
-  assert.equal(p.data.product.attributes.color, '银色', 'preserve the still-available color despite a capacity fallback');
-  assert.match(p.data.selectionNote, /256GB/);
-  assert.match(p.data.selectionNote, /请核对/);
+  assert.equal(p.data.product.attributes.color, '银色');
   p.onColorTap({ currentTarget: { dataset: { index: 0 } } });
+  assert.equal(p.data.product.attributes.capacity, '256GB');
+  assert.equal(p.data.product.model, 'iPhone 18 Pro Max');
+  assert.ok(family.products.some(product => product.partNumber === p.getSelection().partNumber));
+  assert.deepEqual(p.lastEvent.detail.storeNumbers, ['R577']);
   assert.equal(p.data.selectionNote, '');
 });
 
@@ -228,15 +277,40 @@ test('a locally chosen SKU becoming unavailable does not silently switch on the 
   assert.deepEqual(p.lastEvent.detail.storeNumbers, ['R577', 'R359']);
 });
 
-test('an unavailable color on another model falls back explicitly while retaining available capacity', () => {
+test('changing models preserves available capacity and immediately uses a real default color', () => {
   const c = catalog();
   const family = c.categories.find(c => c.key === 'iphone').families.find(f => f.familyKey === 'iphone-18-pro');
   family.products = family.products.filter(p => p.model !== 'iPhone 18 Pro Max' || p.attributes.color !== '银色');
   const saved = family.products.find(p => p.model === 'iPhone 18 Pro' && p.attributes.capacity === '512GB' && p.attributes.color === '银色');
   const { instance: p } = picker({ partNumber: saved.partNumber, storeNumbers: ['R577'] }, { catalog: c });
   p.onModelChange({ detail: { value: p.data.models.indexOf('iPhone 18 Pro Max') } });
+  assert.equal(p.data.capacities[p.data.capacityIndex], '512GB');
   assert.equal(p.data.product.attributes.capacity, '512GB');
   assert.notEqual(p.data.product.attributes.color, '银色');
-  assert.ok(p.data.selectionNote.includes(p.data.product.attributes.color));
-  assert.match(p.data.selectionNote, /请核对/);
+  assert.ok(family.products.some(product => product.partNumber === p.getSelection().partNumber));
+  p.onColorTap({ currentTarget: { dataset: { index: 0 } } });
+  assert.equal(p.data.product.attributes.capacity, '512GB');
+  assert.notEqual(p.data.product.attributes.color, '银色');
+});
+
+test('catalog refresh retains a valid draft but never substitutes for a SKU removed by the refresh', () => {
+  const c = catalog();
+  const family = c.categories.find(c => c.key === 'iphone').families.find(f => f.familyKey === 'iphone-18-pro');
+  family.products = family.products.filter(p => p.model !== 'iPhone 18 Pro Max' || p.attributes.capacity === '256GB');
+  const saved = family.products.find(p => p.model === 'iPhone 18 Pro' && p.attributes.capacity === '512GB');
+  const { instance: p } = picker({ partNumber: saved.partNumber, storeNumbers: ['R577', 'R359'] }, { catalog: c });
+  p.onModelChange({ detail: { value: p.data.models.indexOf('iPhone 18 Pro Max') } });
+  const selected = p.getSelection().partNumber;
+  assert.ok(selected); assert.notEqual(selected, saved.partNumber);
+  p.onCatalog(c);
+  assert.equal(p.lastEvent.detail.partNumber, selected);
+  assert.equal(p.data.models[p.data.modelIndex], 'iPhone 18 Pro Max');
+  assert.deepEqual(p.lastEvent.detail.storeNumbers, ['R577', 'R359']);
+  family.products = family.products.filter(product => product.partNumber !== selected);
+  p.onCatalog(c);
+  assert.equal(p.getSelection().partNumber, null);
+  assert.match(p.data.selectionNote, /已从目录移除/);
+  p.onCatalog(c);
+  assert.equal(p.getSelection().partNumber, null, 'another refresh cannot silently choose a replacement');
+  assert.deepEqual(p.lastEvent.detail.storeNumbers, ['R577', 'R359']);
 });

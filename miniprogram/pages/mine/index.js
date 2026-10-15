@@ -1,5 +1,10 @@
+const { reminderPanelMethods } = require('../../utils/reminder-panel');
+const { restockSubscription, soldoutSubscription, activeDnd } = require('../../utils/reminder-readiness');
+const { getAuthorizationState } = require('../../utils/reminder-credits');
+const { dndPeriods, dndSummary, dndStatus, MAX_DND_PERIODS, validateDndPeriods } = require('../../utils/dnd');
+const { peekTestReturn, consumeTestReturnUrl } = require('../../utils/journey-context');
 const { call, showError, toast, newId } = require('../../utils/api');
-const { getBootstrap, getCatalog, currentCatalog, invalidateBootstrap, invalidateFollows, publishQuota, subscribeQuota, currentQuota } = require('../../utils/store');
+const { getBootstrap, getCatalog, currentCatalog, invalidateBootstrap, invalidateFollows, publishSettings, publishQuota, subscribeQuota, currentQuota } = require('../../utils/store');
 const { topUpReminderCredit } = require('../../utils/reminder-credits');
 const { confirmTap } = require('../../utils/haptic');
 const { VERSION } = require('../../config/version');
@@ -17,7 +22,7 @@ const { syncTabBar } = require('../../utils/tab-bar');
 const { notificationAdvice } = require('../../utils/reminder-readiness');
 const { shareAppMessage, shareTimeline } = require('../../utils/share');
 const { paymentAvailability, createPaymentController, purchaseNotice, planPurchasable, purchaseGate } = require('../../utils/member-payment');
-const { memberProducts, planId, renewalPreview, choosePurchasablePlan } = require('../../utils/member-products');
+const { memberProducts, planId, upgradeProducts, renewalPreview, choosePurchasablePlan } = require('../../utils/member-products');
 const { productBenefit } = require('../../utils/member-limits');
 const { createCheckoutContext, TTL_MS: CHECKOUT_TTL_MS } = require('../../utils/checkout-context');
 const conversion = require('../../utils/conversion-events');
@@ -173,6 +178,7 @@ const presentNotification = notification => {
 };
 
 Page({
+  ...reminderPanelMethods,
   data: {
     ready: false,
     loadError: null,
@@ -186,8 +192,10 @@ Page({
     quota: null,
     tasks: [],
     settings: null,
-    dndStart: '23:00',
-    dndEnd: '08:00',
+    dndPeriods: [], dndSummary: '', dndStatus: '', maxDndPeriods: MAX_DND_PERIODS,
+    authorizationOpen: false, subscribing: false, subscriptionPending: false,
+    authorization: {}, authorizationFeedback: '', subscription: {}, reminderCenterStatus: '',
+    testReturnAvailable: false,
     showLedger: false,
     ledger: [],
     orders: [],
@@ -195,7 +203,7 @@ Page({
     showMembershipRules: false,
     showPurchaseRules: false,
     membershipBenefitPlans: [],
-    membershipCanExpand: false,
+    membershipUpgradeEmptyText: '',
     membershipUpgradeOpen: false,
     showPurchaseShop: false,
     displayMemberProducts: [],
@@ -268,9 +276,17 @@ Page({
   async onShow() {
     syncTabBar(this, '/pages/mine/index');
     if (this.pageRetired) return;
-    this.setTabBarOverlay(this.data.redemptionOpen);
     this.pageVisible = true;
+    this.syncAuthorizationOverlay();
+    this.setData({ testReturnAvailable: Boolean(peekTestReturn()) });
+    this.observeAuthorization();
+    this.applyAuthorizationState(getAuthorizationState());
+    this.resumeAuthorizationSync();
     this.consumePendingSection();
+    this.refreshReadiness();
+    const nativeReturn = this.nativePromptHiddenAt && Date.now() - this.nativePromptHiddenAt < 60000;
+    this.nativePromptHiddenAt = 0;
+    if (nativeReturn && this.data.ready && this.isAuthorizationAccountCurrent()) return;
     if (this.data.ready || this.data.loadError) await this.refresh({ quiet: this.data.ready, force: Boolean(this.data.loadError) });
     if (!this.pageRetired && this.pageVisible && !this.data.redeeming && this.paymentController) this.paymentController.show();
   },
@@ -288,10 +304,13 @@ Page({
   },
 
   onHide() {
+    this.stopDndClock();
+    this.nativePromptHiddenAt = getAuthorizationState().nativeBusy ? Date.now() : 0;
     this.disconnectOfferObserver();
     this.orderConsentGeneration = (this.orderConsentGeneration || 0) + 1;
     this.paymentConsentGeneration = (this.paymentConsentGeneration || 0) + 1;
     this.pageVisible = false;
+    this.hideAuthorizationOverlay();
     if (this.data.redemptionOpen) {
       this.setData({ redemptionOpen: false });
       this.setTabBarOverlay(false);
@@ -300,6 +319,8 @@ Page({
   },
 
   retirePage() {
+    this.stopDndClock();
+    this.disposeAuthorizationPanel();
     this.disconnectOfferObserver();
     this.setTabBarOverlay(false);
     this.pageRetired = true;
@@ -483,37 +504,45 @@ Page({
       this.ordersLoadedAt = 0;
       this.hiddenOrderIds = new Set();
       this.failedOrderAction = null;
+      this.setData({ savingSettings: false });
       this.setData({ orders: [], ordersClearableCount: 0, ordersClearUnavailable: false, orderActionBusy: '', orderDeletingId: '', orderConfirming: false,
         ordersLoading: false, ordersError: null, ordersActionError: null, ordersActionNote: '',
         checkoutTarget: null, checkoutMessage: '', showPurchaseFeedback: false, purchaseFeedbackSent: false });
     }
     const membership = boot.membership;
+    this.accountSnapshot = boot;
+    const notifications = boot.notifications || {};
+    const subscription = restockSubscription(notifications, boot.subscriptions);
+    const soldout = soldoutSubscription(notifications, boot.subscriptions);
     const settings = boot.settings || { dnd: { enabled: false, startMinute: 23 * 60, endMinute: 8 * 60 }, notifyEnabled: true };
     const products = memberProducts(boot).map(presentMemberProduct);
     const gate = purchaseGate(products, wx);
     const hasPendingOrder = Boolean(this.paymentPendingPlanId || this.data.paymentPendingId);
-    const selected = choosePurchasablePlan(products, this.paymentPendingPlanId || this.data.selectedPlanId, {
+    const purchaseMode = membership.active ? !accountChanged && this.data.purchaseMode === 'upgrade' ? 'upgrade' : 'renew' : 'purchase';
+    const purchasable = gate.showShop ? gate.purchasable : [];
+    const choices = purchaseMode === 'upgrade' ? upgradeProducts(purchasable, membership) : purchasable;
+    const selected = choosePurchasablePlan(hasPendingOrder ? products : choices, this.paymentPendingPlanId || this.data.selectedPlanId, {
       hasPendingOrder, isPurchasable: item => item.available === true })
       || products.find(item => item.planId === (this.paymentPendingPlanId || this.data.selectedPlanId))
       || products[0] || boot.memberProduct;
     const availability = paymentAvailability(selected, wx);
     const showPurchaseShop = gate.showShop || hasPendingOrder;
-    const purchasable = gate.showShop ? gate.purchasable : [];
     this.setData({
       selectedPlanId: planId(selected),
       showPurchaseShop,
       purchaseUnavailableNote: gate.showShop ? '' : (gate.reason || '会员购买暂不可用，现有会员权益不受影响。'),
-      displayMemberProducts: showPurchaseShop ? (gate.showShop ? purchasable : products.filter(item => item.planId === planId(selected))) : [],
+      displayMemberProducts: showPurchaseShop ? (gate.showShop ? choices : products.filter(item => item.planId === planId(selected))) : [],
       contextualCheckout: Boolean(boot.features && boot.features.contextualCheckout),
-      membershipUpgradeOpen: showPurchaseShop && !accountChanged && membership.active && this.data.membershipUpgradeOpen,
-      purchaseMode: membership.active ? !accountChanged && this.data.purchaseMode === 'upgrade' ? 'upgrade' : 'renew' : 'purchase',
+      membershipUpgradeOpen: showPurchaseShop && !accountChanged && this.data.membershipUpgradeOpen,
+      purchaseMode,
+      membershipUpgradeEmptyText: membership.planId === 'member_365d' ? '你已是年卡会员，当前没有更高档套餐。' : '暂时没有可升级的套餐，可继续延长会员。',
       membershipUpgradePreview: renewalPreview(selected, membership),
       membershipBenefitPlans: membershipBenefitPlans(products),
-      membershipCanExpand: Boolean(membership.active && gate.showShop && purchasable.some(product => product.days >= 30
-        && product.limits && boot.limits && Number.isInteger(boot.limits.maxFollows) && Number.isInteger(boot.limits.maxStoresPerFollow)
-        && (product.limits.maxFollows > boot.limits.maxFollows || product.limits.maxStoresPerFollow > boot.limits.maxStoresPerFollow))),
       boot: {
         identity: boot.identity,
+        member: membership.active, templateIds: subscription.templateIds, soldoutId: soldout.templateId,
+        requestIds: [...new Set([...subscription.templateIds, ...(soldout.templateId ? [soldout.templateId] : [])])],
+        notificationReason: notifications.reason || '',
         features: boot.features || {},
         memberProducts: products,
         memberProduct: selected,
@@ -531,9 +560,14 @@ Page({
       quota: boot.quota,
       tasks: presentTasks(boot.tasks, boot.quota),
       settings,
-      dndStart: minuteToTime(settings.dnd.startMinute),
-      dndEnd: minuteToTime(settings.dnd.endMinute),
+      subscription: { ...subscription, soldoutEnabled: Boolean(soldout.templateId), soldoutCredits: soldout.credits },
+      ...this.presentDnd(settings),
+      testReturnAvailable: Boolean(peekTestReturn()),
     });
+    this.observeAuthorization();
+    this.applyAuthorizationState(getAuthorizationState());
+    this.refreshReadiness();
+    this.resumeAuthorizationSync();
     this.ensurePaymentController().sync(boot.identity, selected);
     this.restoreCheckoutContext();
   },
@@ -556,35 +590,40 @@ Page({
   },
 
   onSelectMemberProduct(event) {
-    if (this.pageRetired || this.data.redeeming || this.data.paymentBusy || this.data.paymentChecking || this.data.paymentPendingId || this.data.paymentConfirming) return;
+    if (this.pageRetired || this.isNativeAuthorizationBusy() || this.data.redeeming || this.data.paymentBusy || this.data.paymentChecking || this.data.paymentPendingId || this.data.paymentConfirming) return;
     const candidate = this.data.boot && (this.data.boot.memberProducts || []).find(item => item.planId === event.currentTarget.dataset.planId);
     if (!candidate || !candidate.available) return;
-    if (this.data.purchaseMode === 'upgrade' && this.data.membership && this.data.membership.active && candidate.days < 30) return;
+    if (this.data.purchaseMode === 'upgrade' && !upgradeProducts([candidate], this.data.membership).length) return;
     this.selectMemberProduct(event.currentTarget.dataset.planId);
   },
 
   canChangeMembershipPurchase() {
-    return !this.pageRetired && this.data.ready && this.data.boot && this.data.membership && this.data.membership.active
-      && !this.data.redeeming && !this.data.paymentBusy && !this.data.paymentChecking && !this.data.paymentPendingId && !this.data.paymentConfirming;
+    return !this.pageRetired && this.data.ready && this.data.boot && this.data.membership
+      && !this.isNativeAuthorizationBusy() && !this.data.redeeming && !this.data.paymentBusy && !this.data.paymentChecking && !this.data.paymentPendingId && !this.data.paymentConfirming;
+  },
+
+  isNativeAuthorizationBusy() {
+    return this.data.subscribing || getAuthorizationState().nativeBusy;
   },
 
   onOpenMembershipUpgrade() {
-    if (!this.canChangeMembershipPurchase()) return;
+    if (!this.canChangeMembershipPurchase() || !this.data.membership.active) return;
     const products = (this.data.boot.memberProducts || []).filter(item => item.available);
     if (!products.length) return toast('会员购买暂不可用，现有会员权益不受影响。');
-    const selected = products.find(item => item.planId === this.data.selectedPlanId && item.days >= 30)
-      || products.find(item => item.days === 30) || products.find(item => item.days === 365);
-    if (!selected) return toast('长期套餐暂未开放购买，请刷新账户后重试');
-    this.setData({ membershipUpgradeOpen: true, purchaseMode: 'upgrade' });
-    this.selectMemberProduct(selected.planId);
+    const choices = upgradeProducts(products, this.data.membership);
+    const selected = choices.find(item => item.planId === this.data.selectedPlanId) || choices[0];
+    this.setData({ membershipUpgradeOpen: true, purchaseMode: 'upgrade', displayMemberProducts: choices,
+      membershipUpgradeEmptyText: this.data.membership.planId === 'member_365d' ? '你已是年卡会员，当前没有更高档套餐。' : '暂时没有可升级的套餐，可继续延长会员。' });
+    if (selected) this.selectMemberProduct(selected.planId);
   },
 
   onOpenMembershipRenew() {
     if (!this.canChangeMembershipPurchase()) return;
     const products = (this.data.boot.memberProducts || []).filter(item => item.available);
-    if (!products.length) return toast('会员购买暂不可用，现有会员权益不受影响。');
-    const preferred = products.find(item => item.planId === this.data.selectedPlanId) || products[0];
-    this.setData({ membershipUpgradeOpen: true, purchaseMode: 'renew' });
+    if (!products.length) return toast('会员购买暂不可用，请稍后重试');
+    const preferred = this.data.membership.active && products.find(item => item.planId === this.data.membership.planId)
+      || products.find(item => item.planId === this.data.selectedPlanId) || products[0];
+    this.setData({ membershipUpgradeOpen: true, purchaseMode: this.data.membership.active ? 'renew' : 'purchase', displayMemberProducts: products });
     this.selectMemberProduct(preferred.planId);
   },
 
@@ -683,13 +722,13 @@ Page({
   observeMembershipOffer() {
     this.disconnectOfferObserver();
     if (this.pageRetired || this.pageVisible === false || !this.data.ready || !this.data.boot || this.data.checkoutLoading || !this.data.boot.features.growthEvents
-      || this.data.paymentPendingId || this.data.membership.active && !this.data.membershipUpgradeOpen || typeof this.createIntersectionObserver !== 'function') return;
+      || this.data.paymentPendingId || !this.data.membershipUpgradeOpen || !this.data.displayMemberProducts.length || typeof this.createIntersectionObserver !== 'function') return;
     // Actual native visibility, never a synthetic exposure at bootstrap time.
     const observer = this.createIntersectionObserver({ thresholds: [0, 0.01] });
     this.offerObserver = observer;
     observer.relativeToViewport().observe('#membership-offer', result => {
       if (this.offerObserver !== observer || this.pageRetired || this.pageVisible === false || this.data.paymentPendingId
-        || this.data.membership.active && !this.data.membershipUpgradeOpen || !result || result.intersectionRatio <= 0) return;
+        || !this.data.membershipUpgradeOpen || !this.data.displayMemberProducts.length || !result || result.intersectionRatio <= 0) return;
       const key = `${this.orderAccount()}|${this.data.selectedPlanId}|${this.checkoutContext ? this.checkoutContext.targetSignature : 'mine'}`;
       if (!this.offerSeen) this.offerSeen = new Set();
       if (this.offerSeen.has(key)) return;
@@ -701,7 +740,7 @@ Page({
 
   onTestNotification() {
     if (this.pageRetired) return;
-    wx.navigateTo({ url: '/pages/notification-test/index' });
+    wx.navigateTo({ url: '/pages/notification-test/index?from=mine' });
   },
 
   ensurePaymentController() {
@@ -743,16 +782,19 @@ Page({
       || !Number.isInteger(product.days) || product.days <= 0) return;
     const id = planId(product), products = this.data.boot.memberProducts.map(item => item.planId === id ? presentMemberProduct({ ...item, ...product }) : item);
     invalidateBootstrap();
-    this.setData({ boot: { ...this.data.boot, memberProducts: products } });
+    const available = products.filter(item => item.available);
+    this.setData({ boot: { ...this.data.boot, memberProducts: products },
+      displayMemberProducts: this.data.purchaseMode === 'upgrade' ? upgradeProducts(available, this.data.membership) : available });
     this.selectMemberProduct(id);
     this.setData({ paymentError: '套餐价格已更新，本次未发起付款。请核对当前金额后重新确认购买。' });
   },
 
   async onBuyMembership() {
-    if (this.pageRetired || this.data.redeeming || this.data.paymentBusy || this.data.paymentChecking || this.data.paymentConfirming || !this.data.ready || !this.data.boot) return;
+    if (this.pageRetired || this.isNativeAuthorizationBusy() || this.data.redeeming || this.data.paymentBusy || this.data.paymentChecking || this.data.paymentConfirming || !this.data.ready || !this.data.boot) return;
     if (!this.data.paymentPendingId) {
       if (!this.data.showPurchaseShop || !this.data.boot.paymentReady) return;
       const selected = (this.data.boot.memberProducts || []).find(item => item.planId === this.data.selectedPlanId) || this.data.boot.memberProduct;
+      if (this.data.purchaseMode === 'upgrade' && !upgradeProducts([selected], this.data.membership).length) return;
       if (!selected || !planPurchasable(selected, wx)) {
         this.setData({ paymentError: '会员购买暂不可用，现有会员权益不受影响。' });
         return;
@@ -803,6 +845,7 @@ Page({
       || consentOrder !== this.data.paymentPendingId) return;
     // Keep the controller's product aligned with the card the user just paid for.
     const latestSelected = (this.data.boot.memberProducts || []).find(item => item.planId === this.data.selectedPlanId) || this.data.boot.memberProduct;
+    if (!this.data.paymentPendingId && this.data.purchaseMode === 'upgrade' && !upgradeProducts([latestSelected], this.data.membership).length) return;
     if (latestSelected) this.ensurePaymentController().sync(this.data.boot.identity, latestSelected);
     const latestPackage = this.data.paymentOrderSummary || `${this.data.boot.memberProduct.days} 天会员 · ${this.data.boot.priceText}`;
     const latestTerms = JSON.stringify({ priceFen: this.data.boot.memberProduct.priceFen, days: this.data.boot.memberProduct.days, notice: this.data.boot.purchaseNotice });
@@ -818,12 +861,12 @@ Page({
   },
 
   onCheckPayment() {
-    if (this.pageRetired || this.data.redeeming || this.data.paymentConfirming) return;
+    if (this.pageRetired || this.isNativeAuthorizationBusy() || this.data.redeeming || this.data.paymentConfirming) return;
     return this.ensurePaymentController().check();
   },
 
   async onAbandonPayment() {
-    if (this.pageRetired || this.data.redeeming || this.data.paymentBusy || this.data.paymentChecking || this.data.paymentConfirming
+    if (this.pageRetired || this.isNativeAuthorizationBusy() || this.data.redeeming || this.data.paymentBusy || this.data.paymentChecking || this.data.paymentConfirming
       || !this.data.paymentPendingId || !this.data.boot) return;
     const consentGeneration = this.paymentConsentGeneration || 0;
     const consentAccount = this.data.boot.identity.userKey;
@@ -859,7 +902,7 @@ Page({
   noop() {},
 
   onOpenRedemption() {
-    if (this.pageRetired || this.data.redeeming || this.data.paymentBusy || this.data.paymentChecking || this.data.paymentConfirming) return;
+    if (this.pageRetired || this.isNativeAuthorizationBusy() || this.data.redeeming || this.data.paymentBusy || this.data.paymentChecking || this.data.paymentConfirming) return;
     const open = !this.data.redemptionOpen;
     this.setData({ redemptionOpen: open, redemptionCode: '', redemptionError: null, redemptionResult: null });
     this.setTabBarOverlay(open);
@@ -876,7 +919,7 @@ Page({
   },
 
   async onRedeemCode() {
-    if (this.pageRetired || this.data.redeeming || this.data.paymentBusy || this.data.paymentChecking || this.data.paymentConfirming) return;
+    if (this.pageRetired || this.isNativeAuthorizationBusy() || this.data.redeeming || this.data.paymentBusy || this.data.paymentChecking || this.data.paymentConfirming) return;
     const code = this.data.redemptionCode.trim();
     if (!code) { this.setData({ redemptionError: '请输入兑换码。' }); return; }
     // Suspend order polling while another server-side membership change runs.
@@ -1126,7 +1169,7 @@ Page({
   },
 
   onToggleMembershipRules() {
-    if (!this.pageRetired) this.setData({ showMembershipRules: !this.data.showMembershipRules });
+    if (!this.pageRetired) this.setData({ showMembershipRules: !this.data.showMembershipRules, showPurchaseRules: !this.data.showMembershipRules });
   },
 
   onTogglePurchaseRules() {
@@ -1166,9 +1209,9 @@ Page({
   consumePendingSection() {
     if (this.pageRetired || !this.pageVisible || !this.data.ready || this.data.loadError || typeof getApp !== 'function') return;
     const section = getApp().globalData.pendingMineSection;
-    if (!['reminder-settings', 'membership-card', 'quota-card', 'notification-records'].includes(section)) return;
+    if (!['reminder-center', 'reminder-settings', 'membership-card', 'quota-card', 'notification-records'].includes(section)) return;
     if (section === 'reminder-settings') this.setData({ showReminderSettings: true });
-    if (section === 'membership-card') this.setData({ showMembershipRules: true });
+    if (section === 'membership-card') this.setData({ showMembershipRules: true, showPurchaseRules: true });
     if (section === 'quota-card') this.setData({ showQuotaDetails: true });
     if (section === 'notification-records') {
       this.setData({ showNotifications: true });
@@ -1235,20 +1278,44 @@ Page({
   async saveSettings(patch) {
     if (this.pageRetired || this.data.savingSettings) return;
     const session = this.pageSession || 0;
+    const account = this.orderAccount(), accountGeneration = this.orderAccountGeneration || 0;
+    const samePage = () => this.isCurrentSession(session) && account === this.orderAccount()
+      && accountGeneration === (this.orderAccountGeneration || 0);
+    const current = () => {
+      const cached = getApp().globalData.bootstrap;
+      const owner = cached && cached.identity && cached.identity.userKey;
+      return samePage() && (!owner || owner === account);
+    };
+    if (!current()) return;
     this.setData({ savingSettings: true });
     try {
       const data = await call('user.updateSettings', patch);
-      if (!this.isCurrentSession(session)) return;
+      if (!current()) return;
       const settings = data.settings;
-      this.setData({ settings, dndStart: minuteToTime(settings.dnd.startMinute), dndEnd: minuteToTime(settings.dnd.endMinute) });
-      invalidateBootstrap();
+      this.setData({ settings, ...this.presentDnd(settings) });
+      if (this.accountSnapshot) this.accountSnapshot = { ...this.accountSnapshot, settings };
+      this.refreshReadiness();
+      if (!publishSettings(settings, account)) {
+        // A separate action may have invalidated the cache during this write.
+        // Restore verified identity without treating a read failure as a failed save.
+        invalidateBootstrap();
+        try {
+          const boot = await getBootstrap({ force: true });
+          if (current() && boot.identity && boot.identity.userKey === account && this.pageVisible !== false) {
+            this.applyBoot(boot);
+            this.setData({ refreshError: null });
+          }
+        } catch (error) {
+          if (current() && this.pageVisible !== false) this.setData({ refreshError: '设置已保存，账户信息刷新失败，请下拉刷新后再补充提醒授权。' });
+        }
+      }
     } catch (error) {
-      if (this.isCurrentSession(session)) {
+      if (current()) {
         showError(error);
         await this.refresh({ quiet: true, force: true });
       }
     } finally {
-      if (this.isCurrentSession(session)) this.setData({ savingSettings: false });
+      if (samePage()) this.setData({ savingSettings: false });
     }
   },
 
@@ -1257,22 +1324,99 @@ Page({
   },
 
   onDndToggle(e) {
-    const dnd = this.data.settings.dnd;
-    this.saveSettings({ dnd: { ...dnd, enabled: Boolean(e.detail.value) } });
+    if (this.pageRetired || this.data.savingSettings || !this.data.settings) return;
+    return this.saveDndPeriods(this.editableDndPeriods(this.data.settings.dnd), Boolean(e.detail.value));
   },
 
-  onDndStart(e) {
-    const dnd = this.data.settings.dnd;
-    this.saveSettings({ dnd: { ...dnd, startMinute: timeToMinute(e.detail.value) } });
+  editableDndPeriods(dnd) {
+    const periods = dndPeriods(dnd);
+    // A missing or malformed legacy value gets an editable default only.
+    // No permission or enabled state is inferred until the user saves it.
+    return periods.length ? periods : [{ startMinute: 1380, endMinute: 480 }];
   },
-
-  onDndEnd(e) {
-    const dnd = this.data.settings.dnd;
-    this.saveSettings({ dnd: { ...dnd, endMinute: timeToMinute(e.detail.value) } });
+  presentDnd(settings) {
+    const periods = this.editableDndPeriods(settings && settings.dnd);
+    return { dndPeriods: periods.map((period, index) => ({ ...period, index, start: minuteToTime(period.startMinute), end: minuteToTime(period.endMinute), overnight: period.startMinute > period.endMinute, allDay: period.startMinute === period.endMinute })),
+      dndSummary: dndSummary(settings && settings.dnd), dndStatus: dndStatus(settings && settings.dnd) };
   },
-
+  saveDndPeriods(periods, enabled) {
+    if (this.pageRetired || this.data.savingSettings || !this.data.settings) return;
+    if (!validateDndPeriods(periods)) return toast('请选择有效的免打扰时段');
+    return this.saveSettings({ dnd: { enabled: enabled === undefined ? Boolean(this.data.settings.dnd && this.data.settings.dnd.enabled) : enabled, periods, ...periods[0] } });
+  },
+  onDndStart(e) { return this.changeDndTime(e, 'startMinute'); },
+  onDndEnd(e) { return this.changeDndTime(e, 'endMinute'); },
+  changeDndTime(e, field) {
+    if (this.pageRetired || this.data.savingSettings || !this.data.settings) return;
+    const periods = this.editableDndPeriods(this.data.settings.dnd), index = Number(e.currentTarget && e.currentTarget.dataset && e.currentTarget.dataset.index || 0);
+    if (!Number.isInteger(index) || !periods[index] || !/^([01]\d|2[0-3]):[0-5]\d$/.test(e.detail.value)) return;
+    periods[index] = { ...periods[index], [field]: timeToMinute(e.detail.value) };
+    return this.saveDndPeriods(periods);
+  },
+  onAddDndPeriod() {
+    if (this.pageRetired || this.data.savingSettings || !this.data.settings) return;
+    const periods = this.editableDndPeriods(this.data.settings.dnd);
+    if (periods.length >= MAX_DND_PERIODS) return toast('最多设置 8 个时段');
+    return this.saveDndPeriods([...periods, { startMinute: 720, endMinute: 780 }]);
+  },
+  onAddDndPreset(e) {
+    if (this.pageRetired || this.data.savingSettings || !this.data.settings) return;
+    const preset = e.currentTarget && e.currentTarget.dataset && e.currentTarget.dataset.preset;
+    const period = preset === 'night' ? { startMinute: 1380, endMinute: 480 } : preset === 'lunch' ? { startMinute: 720, endMinute: 780 } : null;
+    if (!period) return;
+    const periods = this.editableDndPeriods(this.data.settings.dnd);
+    if (periods.some(item => item.startMinute === period.startMinute && item.endMinute === period.endMinute)) return toast('这个时段已添加，可直接调整时间');
+    if (periods.length >= MAX_DND_PERIODS) return toast('最多设置 8 个时段');
+    return this.saveDndPeriods([...periods, period]);
+  },
+  onRemoveDndPeriod(e) {
+    if (this.pageRetired || this.data.savingSettings || !this.data.settings) return;
+    const periods = this.editableDndPeriods(this.data.settings.dnd), index = Number(e.currentTarget && e.currentTarget.dataset && e.currentTarget.dataset.index);
+    if (periods.length <= 1 || !Number.isInteger(index) || !periods[index]) return;
+    return this.saveDndPeriods(periods.filter((_, i) => i !== index));
+  },
+  refreshReadiness() {
+    if (this.pageRetired || !this.data.boot) return;
+    const boot = this.accountSnapshot || {}, subscription = this.data.subscription || {};
+    const status = !this.data.boot.member ? '会员可开启持续提醒'
+      : this.data.settings && !this.data.settings.notifyEnabled ? '提醒已关闭'
+      : activeDnd(this.data.settings) ? '当前免打扰'
+      : !subscription.templateCount ? '提醒服务待配置'
+      : boot.notifications && (!boot.notifications.enabled || boot.notifications.deliveryReady !== true) ? '发送服务待恢复'
+      : !boot.collector || !['running', 'idle'].includes(boot.collector.state) || boot.collector.observationStale ? '后台状态待确认'
+      : !subscription.credits ? '到货暂无次数'
+      : subscription.credits <= 2 ? '到货次数较少' : '到货授权充足';
+    if (this.data.reminderCenterStatus !== status) this.setData({ reminderCenterStatus: status });
+    const quietStatus = dndStatus(this.data.settings && this.data.settings.dnd);
+    if (quietStatus !== this.data.dndStatus) this.setData({ dndStatus: quietStatus });
+    this.scheduleDndClock();
+  },
+  stopDndClock() {
+    if (this.dndClockTimer && typeof clearTimeout === 'function') clearTimeout(this.dndClockTimer);
+    this.dndClockTimer = null;
+  },
+  scheduleDndClock() {
+    if (!this.data.settings || !this.data.settings.dnd || !this.data.settings.dnd.enabled) { this.stopDndClock(); return; }
+    if (this.pageRetired || this.pageVisible === false || this.dndClockTimer || typeof setTimeout !== 'function'
+      || !this.data.settings || !this.data.settings.dnd || !this.data.settings.dnd.enabled) return;
+    // Refresh the local status at a minute boundary; this never polls a service.
+    this.dndClockTimer = setTimeout(() => {
+      this.dndClockTimer = null;
+      if (!this.pageRetired && this.pageVisible !== false) this.refreshReadiness();
+    }, 60000 - Date.now() % 60000 + 20);
+  },
+  showMemberModal() {
+    this.onCloseAuthorizationPanel();
+    getApp().globalData.pendingMineSection = 'membership-card';
+    this.consumePendingSection();
+  },
+  onReturnToTest() {
+    const url = consumeTestReturnUrl();
+    this.setData({ testReturnAvailable: false });
+    if (url) wx.navigateTo({ url });
+  },
   onHelp() {
-    if (!this.pageRetired) wx.navigateTo({ url: '/pages/guide/index' });
+    if (!this.pageRetired) wx.navigateTo({ url: '/pages/guide/index?section=prepare&from=mine' });
   },
 
   onOpenOrders() {

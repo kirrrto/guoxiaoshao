@@ -46,6 +46,8 @@ test('other-template credits cannot make restock delivery ready or appear in req
   let requested;
   rt.wx.requestSubscribeMessage = async value => { requested = copy(value); return { A: 'accept' }; };
   await page.onReadinessAction();
+  assert.deepEqual(requested.tmplIds, ['A'], 'the primary action requests permission directly in the tap');
+  assert.equal(page.data.authorizationOpen, false, 'no second-level authorization screen is opened');
   for (let i = 0; i < 8; i++) await new Promise(resolve => setImmediate(resolve));
   assert.deepEqual(requested.tmplIds, ['A']); assert.equal(page.data.subscription.credits, 1); assert.equal(page.data.readiness.ready, true);
 });

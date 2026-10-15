@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { runtime } from './helpers/miniprogram-runtime.mjs';
 
 const boot = (patch = {}) => ({
+  identity: { userKey: 'consumer:readiness-user' },
   membership: { active: true, expiresAt: '2027-01-01T00:00:00Z' },
   notifications: { enabled: true, deliveryReady: true, templateIds: { restock: 'template-A' } },
   collector: { state: 'running', updatedAt: '2026-09-16T10:00:00Z' },
@@ -34,7 +35,9 @@ test('missing subscription template gives a specific actionable reason without i
   const rt = runtime(); let prompts = 0;
   rt.wx.requestSubscribeMessage = async () => { prompts++; return {}; };
   const page = followPage(rt);
-  page.applyBoot(boot({ notifications: { enabled: false, templateIds: {} } }));
+  const account = boot({ notifications: { enabled: false, templateIds: {} } });
+  rt.app.globalData.bootstrap = account;
+  page.applyBoot(account);
   assert.equal(page.data.delivery.label, '暂不能发送');
   assert.match(page.data.delivery.detail, /模板尚未配置/);
   await page.onSubscribe(); assert.equal(prompts, 0);
@@ -107,4 +110,86 @@ test('refreshing service status reads bootstrap and follows without issuing a st
   assert.deepEqual(rt.calls.map(call => call.action), ['user.bootstrap', 'follow.list']);
   assert.equal(page.data.refreshing, false);
   assert.equal(page.data.refreshError, null);
+});
+
+test('collapsed follow summaries count only fresh permitted stores and age cached availability without a cloud request', async t => {
+  let now = Date.parse('2026-10-15T02:05:00Z');
+  t.mock.method(Date, 'now', () => now);
+  const stores = [
+    { storeNumber: 'R001', status: 'available', observedAt: '2026-10-15T02:04:50Z' },
+    { storeNumber: 'R002', status: 'unknown', lastKnownStatus: 'available', observedAt: '2026-10-15T02:04:55Z' },
+    { storeNumber: 'R003', status: 'available', observedAt: '2026-10-15T02:00:00Z' },
+    { storeNumber: 'R004', status: 'available', observedAt: '2026-10-15T01:59:00Z', limitPaused: true },
+  ];
+  const rt = runtime(async () => ({ follows: [{ ...savedFollow('active'), stores }], limits: {} }));
+  const page = followPage(rt); page.applyBoot(boot()); await page.loadFollows();
+  const first = page.data.follows[0];
+  assert.equal(first.observationLabel, '1 家可取货');
+  assert.equal(first.observationTone, 'ok');
+  assert.equal(first.hasAvailable, true);
+  assert.equal(first.observationIncomplete, true, 'unknown and aged stores remain visibly unconfirmed');
+  assert.equal(first.observationTime, '10-15 10:00', 'the oldest usable observation anchors the summary, excluding paused stores');
+  assert.equal(first.stores[1].observationState, 'unknown');
+  assert.equal(first.stores[2].observationState, 'stale');
+  const calls = rt.calls.length;
+  now += 121000; page.refreshFollowPresentation();
+  const aged = page.data.follows[0];
+  assert.equal(aged.observationLabel, '观测待更新');
+  assert.equal(aged.observationTone, 'warn');
+  assert.equal(aged.hasAvailable, false);
+  assert.equal(aged.observationTime, '10-15 10:00', 'local presentation must never invent a later observation time');
+  assert.equal(rt.calls.length, calls);
+});
+
+test('all-limited, missing, restricted and unknown summaries cannot advertise current pickup availability or a fabricated timestamp', async t => {
+  t.mock.method(Date, 'now', () => Date.parse('2026-10-15T02:05:00Z'));
+  const fresh = { storeNumber: 'R001', status: 'available', observedAt: '2026-10-15T02:04:00Z' };
+  const cases = [
+    { ...savedFollow('limit_paused'), limitPaused: true, stores: [{ ...fresh, limitPaused: true }] },
+    { ...savedFollow('active'), stores: [{ storeNumber: 'R001', status: null, observedAt: null }] },
+    { ...savedFollow('expired'), latestRestricted: true, stores: [{ storeNumber: 'R001', status: 'unknown', observedAt: null }] },
+    { ...savedFollow('active'), stores: [{ ...fresh, status: 'unknown', lastKnownStatus: 'available', observedAt: 'invalid-date' }] },
+    { ...savedFollow('active'), stores: [{ ...fresh, status: 'unknown', observedAt: '2026-10-16T02:04:00Z' }] },
+    { ...savedFollow('active'), stores: [{ ...fresh, status: 'available', observedAt: '2026-10-16T02:04:00Z' }] },
+  ];
+  for (const follow of cases) {
+    const rt = runtime(async () => ({ follows: [follow], limits: {} }));
+    const page = followPage(rt); page.applyBoot(boot()); await page.loadFollows();
+    const summary = page.data.follows[0];
+    assert.equal(summary.observationLabel, '观测待更新');
+    assert.equal(summary.observationTone, 'warn');
+    assert.equal(summary.hasAvailable, false);
+    assert.equal(summary.observationTime, '等待观测');
+  }
+});
+
+test('returning from native authorization ages cached observations locally while preserving card expansion and order', async t => {
+  let now = Date.parse('2026-10-15T02:05:00Z');
+  t.mock.method(Date, 'now', () => now);
+  const account = boot();
+  const rows = [
+    { ...savedFollow('active'), stores: [{ storeNumber: 'R001', status: 'available', observedAt: new Date(now - 100000).toISOString() }] },
+    { ...savedFollow('active'), followId: 'f2', stores: [{ storeNumber: 'R002', status: 'unavailable', observedAt: new Date(now - 10000).toISOString() }] },
+  ];
+  const rt = runtime(async action => action === 'follow.list' ? { follows: rows, limits: {} } : action === 'notify.recordSubscription' ? { subscriptions: account.subscriptions } : account);
+  rt.app.globalData.bootstrap = account;
+  let resolveNative;
+  rt.wx.requestSubscribeMessage = () => new Promise(resolve => { resolveNative = resolve; });
+  const page = followPage(rt); page.visible = true; page.applyBoot(account); page.data.ready = true;
+  await page.loadFollows();
+  page.setData({ 'follows[0].detailsExpanded': true });
+  assert.equal(page.data.follows[0].observationLabel, '1 家可取货');
+  const authorizing = page.onSubscribe(); page.onHide();
+  now += 30000;
+  const before = rt.calls.length;
+  await page.onShow();
+  assert.equal(rt.calls.length, before, 'a short native return must not fetch account, follows or live inventory');
+  assert.deepEqual(Array.from(page.data.follows, follow => follow.followId), ['f1', 'f2']);
+  assert.equal(page.data.follows[0].detailsExpanded, true);
+  assert.equal(page.data.follows[1].detailsExpanded, false);
+  assert.equal(page.data.follows[0].observationLabel, '观测待更新');
+  assert.equal(page.data.follows[0].hasAvailable, false);
+  assert.equal(page.data.follows[0].stores[0].observationState, 'stale');
+  assert.equal(page.data.follows[1].observationLabel, '无可取货观测');
+  resolveNative({ 'template-A': 'reject' }); await authorizing;
 });

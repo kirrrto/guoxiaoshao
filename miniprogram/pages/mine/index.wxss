@@ -1,3 +1,4 @@
+@import "../../styles/reminder-center.wxss";
 .account-header { display: grid; grid-template-columns: 56px minmax(0, 1fr); align-items: center; gap: 14px; min-width: 0; padding-bottom: 14px; margin-bottom: 16px; border-bottom: 1rpx solid var(--line); }
 .account-logo { display: block; width: 56px; height: 56px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0, 122, 73, .12); }
 .account-header-content { flex: 1 1 0; min-width: 0; }
@@ -105,7 +106,6 @@
 .notification-test-entry.ui-disclosure { gap: 10px; padding: 12px; border-color: var(--line); }
 .notification-test-entry .ui-disclosure-label { font-size: 14px; }
 .notification-test-description { color: var(--text-2); font-size: 12px; font-weight: 400; line-height: 1.5; }
-.notification-test-note { margin-top: 7px; color: var(--text-2); font-size: 12px; line-height: 1.6; }
 
 /* 小哨提醒：两行入口共用一张卡，行内摘要直接说明当前设置与记录数量。 */
 .reminder-row + .reminder-row { margin-top: 12rpx; }
@@ -303,6 +303,20 @@
 @media (min-width: 720px) {
   .membership-card { max-width: 560px; margin-left: auto; margin-right: auto; }
 }
+
+
+
+.dnd-period { margin-top:20rpx; padding:18rpx; border:1rpx solid var(--line); border-radius:18rpx; }
+.dnd-period-heading { display:flex; align-items:center; justify-content:space-between; gap:12rpx; font-size:28rpx; }
+.dnd-time-row { display:flex; align-items:center; gap:12rpx; flex-wrap:wrap; margin-top:12rpx; color:var(--text-2); }
+.dnd-time-row picker { flex:1 1 170rpx; min-width:0; }
+.dnd-time { display:flex; align-items:center; justify-content:space-between; gap:10rpx; min-height:44px; padding:8rpx 12rpx; background:var(--surface-soft); border-radius:12rpx; font-size:28rpx; color:var(--text); }
+.membership-member-actions .membership-manage-primary { flex:1; }
+
+.dnd-presets { display:flex; flex-wrap:wrap; gap:12rpx; margin:14rpx 0; }
+.dnd-presets .ui-action { flex:1 1 230rpx; min-height:44px; white-space:normal; line-height:1.5; }
+.dnd-status-note { padding-top:14rpx; font-size:26rpx; line-height:1.6; color:var(--green-dark); }
+.quota-card--member .balance { font-size:36rpx; }
 
 @media (prefers-color-scheme: dark) {
   .account-status-member { color: #F6DA96; border-color: #90753D; background: linear-gradient(110deg, #4B3B20, #392D1B); box-shadow: none; }

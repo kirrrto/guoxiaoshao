@@ -4,6 +4,7 @@ import { createRequire } from 'node:module';
 import fs from 'node:fs';
 import path from 'node:path';
 import vm from 'node:vm';
+import { isolatedAccountUi } from './helpers/isolated-account-ui.mjs';
 const require = createRequire(import.meta.url);
 const { createPaymentController, paymentAvailability, purchaseNotice, DEFAULT_PURCHASE_NOTICE, STORAGE_PREFIX } = require('../miniprogram/utils/member-payment');
 const product = { id: 'member_7d', title: '7 天会员', days: 7, priceFen: 700, enabled: true, paymentReady: true, iosEnabled: true };
@@ -501,7 +502,7 @@ test('account page applies server-confirmed membership, invalidates caches and r
   const source = path.resolve('miniprogram/pages/mine/index.js');
   const store = { invalidateBootstrap: () => invalidated.push('bootstrap'), invalidateFollows: () => invalidated.push('follows'), publishQuota() {}, subscribeQuota: () => () => {} };
   vm.runInNewContext(fs.readFileSync(source, 'utf8'), { wx, Page: value => { pageDefinition = value; },
-    require: name => name.endsWith('/api') ? { call } : name.endsWith('/store') ? store : require(path.resolve(path.dirname(source), name)) });
+    require: name => name.endsWith('/api') ? { call } : name.endsWith('/store') ? store : isolatedAccountUi(name) || require(path.resolve(path.dirname(source), name)) });
   const page = { ...pageDefinition, data: structuredClone(pageDefinition.data), setData(patch) { Object.assign(this.data, patch); } };
   page.applyBoot({ identity: { userKey: 'page-account' }, membership: free, memberProduct: product, collector: { state: 'not_deployed' }, quota: { tasksDoneToday: [] }, limits: { maxFollows: 3 }, tasks: [], followCount: 0 });
   page.data.ready = true; await page.paymentController.show();
@@ -524,7 +525,7 @@ test('cancelling the purchase notice never creates an order or opens the cashier
   vm.runInNewContext(fs.readFileSync(source, 'utf8'), { wx, Page: value => { pageDefinition = value; },
     require: name => name.endsWith('/api') ? { call: async (action, payload) => { calls.push({ action, payload }); throw new Error('unexpected'); } }
       : name.endsWith('/store') ? { invalidateBootstrap() {}, invalidateFollows() {}, publishQuota() {}, subscribeQuota: () => () => {} }
-      : require(path.resolve(path.dirname(source), name)) });
+      : isolatedAccountUi(name) || require(path.resolve(path.dirname(source), name)) });
   const page = { ...pageDefinition, data: structuredClone(pageDefinition.data), setData(patch) { Object.assign(this.data, patch); } };
   page.applyBoot({ identity: { userKey: 'page-account' }, membership: free, memberProduct: product, collector: { state: 'not_deployed' }, quota: { tasksDoneToday: [] }, limits: { maxFollows: 3 }, tasks: [], followCount: 0 });
   page.data.ready = true;
@@ -545,7 +546,7 @@ test('purchase confirmation cannot move to another account, hidden page or a rep
     vm.runInNewContext(fs.readFileSync(source, 'utf8'), { wx, Page: value => { definition = value; },
       require: name => name.endsWith('/api') ? { call: async (...args) => calls.push(args) }
         : name.endsWith('/store') ? { invalidateBootstrap() {}, invalidateFollows() {}, publishQuota() {}, subscribeQuota: () => () => {} }
-        : require(path.resolve(path.dirname(source), name)) });
+        : isolatedAccountUi(name) || require(path.resolve(path.dirname(source), name)) });
     const page = { ...definition, pageVisible: true, data: structuredClone(definition.data), setData(patch) { Object.assign(this.data, patch); } };
     const boot = { identity: { userKey: 'account-a' }, membership: free, memberProduct: product, collector: { state: 'not_deployed' }, quota: { tasksDoneToday: [] }, limits: {}, tasks: [], followCount: 0 };
     page.applyBoot(boot); page.data.ready = true;

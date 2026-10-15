@@ -104,12 +104,65 @@ test('guide poster reads the current catalog, follows refreshes and removes its 
   let refresh, removed = false;
   store.subscribeCatalog = listener => { refresh = listener; return () => { removed = true; }; };
   const page = rt.instance('pages/guide/index.js');
-  page.onLoad(); page.onShow();
+  page.onLoad({ section: 'calendar', from: 'query' }); page.onShow();
   assert.equal(page.data.calendars[0].followNotice, '已支持保存关注');
   refresh({ products: [] });
   assert.equal(page.data.calendars[0].followNotice, '');
   page.onUnload();
   assert.equal(removed, true);
+  assert.equal(rt.calls.length, 0);
+});
+
+test('query calendar and Mine help enter the guide with distinct visible content and no automatic actions', () => {
+  const rt = runtime(), routes = [], scrolls = [];
+  rt.wx.navigateTo = value => routes.push(value.url);
+  rt.wx.pageScrollTo = value => scrolls.push(value);
+  rt.load('utils/launch-calendar.js').activeCalendars = () => [calendar];
+  const query = rt.instance('pages/query/index.js'), mine = rt.instance('pages/mine/index.js');
+  query.onOpenGuide(); mine.onHelp();
+  assert.deepEqual(routes, ['/pages/guide/index?section=calendar&from=query', '/pages/guide/index?section=prepare&from=mine']);
+  const page = rt.instance('pages/guide/index.js');
+  page.onLoad(Object.fromEntries(new URLSearchParams(routes[0].split('?')[1])));
+  page.onShow(); if (page.onReady) page.onReady();
+  assert.equal(page.data.showLaunchPoster, true);
+  assert.equal(page.data.calendars.length, 1);
+  assert.equal(page.data.calendarExpanded, false, 'only the month grid is initially folded');
+  assert.equal(page.data.stageId, 'prepare');
+  assert.equal(page.data.stage.steps.length, 3, 'purchase guidance is already available without an expand action');
+  assert.equal(page.returnSource, 'query');
+  page.onLoad(Object.fromEntries(new URLSearchParams(routes[1].split('?')[1])));
+  page.onShow(); if (page.onReady) page.onReady();
+  assert.equal(page.data.showLaunchPoster, false);
+  assert.equal(page.data.calendars.length, 0);
+  assert.equal(page.data.stageId, 'prepare');
+  assert.equal(page.data.stage.steps.length, 3);
+  assert.equal(page.returnSource, 'mine');
+  assert.deepEqual(scrolls, []);
+  assert.equal(rt.calls.length, 0);
+  assert.equal(rt.messages.length, 0);
+  page.onUnload();
+});
+
+test('poster opt-in survives catalog refresh while image failure preserves dates and guide content', () => {
+  const rt = runtime();
+  rt.load('utils/launch-calendar.js').activeCalendars = () => [calendar];
+  const page = rt.instance('pages/guide/index.js');
+  for (const options of [{}, { from: 'query' }, { section: 'prepare', stage: 'pickup' }, { section: 'notification' }, { section: 'membership' }, { section: 'pickup' }, { section: 'unknown' }]) {
+    page.onLoad(options);
+    page.refreshCalendars(rt.load('utils/store.js').currentCatalog());
+    assert.equal(page.data.showLaunchPoster, false);
+    assert.equal(page.data.calendars.length, 0);
+    if (options.section === 'prepare') assert.equal(page.data.stageId, 'prepare');
+  }
+  page.onLoad({ section: 'calendar', from: 'query', stage: 'pickup' });
+  assert.equal(page.data.stageId, 'prepare');
+  page.onCalendarImageError({ currentTarget: { dataset: { index: '0' } } });
+  assert.equal(page.data.calendars[0].imageUrl, '');
+  assert.equal(page.data.calendars[0].preorderDateText, calendar.preorderDateText);
+  assert.equal(page.data.calendars[0].releaseDateText, calendar.releaseDateText);
+  assert.equal(page.data.stage.steps.length, 3);
+  page.onToggleCalendar();
+  assert.equal(page.data.calendarExpanded, true);
   assert.equal(rt.calls.length, 0);
 });
 
@@ -180,6 +233,6 @@ test('guide actions stay inside the mini program', () => {
   page.onStageAction();
   page.onTestNotification();
   page.onCalendarPlan();
-  assert.deepEqual(navigations, ['/pages/query/index', '/pages/follow/index', '/pages/follow/index', '/pages/follow/index', '/pages/notification-test/index', '/pages/query/index']);
+  assert.deepEqual(navigations, ['/pages/query/index', '/pages/follow/index', '/pages/follow/index', '/pages/follow/index', '/pages/notification-test/index?from=guide', '/pages/query/index']);
   assert.equal(rt.calls.length, 0);
 });

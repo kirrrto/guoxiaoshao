@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import vm from 'node:vm';
 import { createRequire } from 'node:module';
+import { isolatedAccountUi } from './helpers/isolated-account-ui.mjs';
 const require = createRequire(import.meta.url);
 const { createCheckoutContext } = require('../miniprogram/utils/checkout-context');
 const tick = async () => { for (let i = 0; i < 10; i++) await Promise.resolve(); };
@@ -23,7 +24,7 @@ function runtime({ catalogRead = async () => catalog, callRead = async () => ({}
     require: name => name.endsWith('/api') ? { call: async (action, payload) => { calls.push({ action, payload }); return callRead(action, payload); } }
       : name.endsWith('/store') ? { getCatalog: catalogRead, currentCatalog: () => current, invalidateBootstrap() {}, invalidateFollows() {} }
       : name.endsWith('/conversion-events') ? { track: (name, fields) => events.push({ name, fields }) }
-      : require(path.resolve(path.dirname(source), name)) });
+      : isolatedAccountUi(name) || require(path.resolve(path.dirname(source), name)) });
   const page = { ...definition, data: structuredClone(definition.data), pageVisible: true,
     setData(patch, done) { Object.assign(this.data, patch); if (done) done(); } };
   const context = createCheckoutContext({ wx });
@@ -86,6 +87,8 @@ test('offer exposure requires native viewport evidence and is deduplicated; rese
   let observerCallback;
   rt.page.createIntersectionObserver = () => ({ relativeToViewport() { return this; }, observe(_id, callback) { observerCallback = callback; }, disconnect() {} });
   rt.page.observeMembershipOffer(); assert.equal(rt.events.length, 0);
+  assert.equal(observerCallback, undefined, 'collapsed free-user entry has no offer to observe');
+  rt.page.onOpenMembershipRenew();
   observerCallback({ intersectionRatio: 0 }); assert.equal(rt.events.length, 0);
   observerCallback({ intersectionRatio: 0.5 }); observerCallback({ intersectionRatio: 0.9 });
   assert.equal(rt.events.filter(item => item.name === 'offer_viewed').length, 1);
@@ -108,7 +111,7 @@ test('pending payment removes offer observation and a closed original order rest
       disconnect() { this.disconnected = true; } };
     return observation;
   };
-  rt.page.observeMembershipOffer();
+  rt.page.onOpenMembershipRenew();
   const first = observations[0];
   await rt.page.paymentController.buy(); // Missing login preserves the real pending intent without opening a cashier.
   assert.ok(rt.page.data.paymentPendingId);

@@ -1,0 +1,185 @@
+{
+  "verifiedAt": "2026-10-15T08:49:41.132Z",
+  "version": "3.0.0",
+  "scope": "Paid member renewal and upgrade entries; free-user purchase entry; filter current/lower tiers from upgrade using server planId",
+  "tests": {
+    "total": 1447,
+    "passed": 1447,
+    "failed": 0,
+    "skipped": 0,
+    "durationMs": 125377.4761
+  },
+  "sourceCheck": {
+    "files": 499,
+    "javaScript": 350,
+    "json": 47,
+    "pages": 6,
+    "operatorPages": 1,
+    "errors": []
+  },
+  "releaseCheck": {
+    "passed": true,
+    "checks": 48,
+    "publicationReady": false
+  },
+  "layouts": [
+    {
+      "name": "main-light",
+      "total": 282,
+      "indexNavigationFailures": 0,
+      "expressionErrors": 0,
+      "missingText": 0,
+      "forbiddenText": 0,
+      "horizontalOverflow": 0,
+      "clippedText": 0,
+      "failedImages": 0,
+      "alternativeLayoutFailures": 0,
+      "calendarLayoutFailures": 0,
+      "membershipLayoutFailures": 0,
+      "notificationLayoutFailures": 0,
+      "v3LayoutFailures": 0
+    },
+    {
+      "name": "main-dark",
+      "total": 282,
+      "indexNavigationFailures": 0,
+      "expressionErrors": 0,
+      "missingText": 0,
+      "forbiddenText": 0,
+      "horizontalOverflow": 0,
+      "clippedText": 0,
+      "failedImages": 0,
+      "alternativeLayoutFailures": 0,
+      "calendarLayoutFailures": 0,
+      "membershipLayoutFailures": 0,
+      "notificationLayoutFailures": 0,
+      "v3LayoutFailures": 0
+    },
+    {
+      "name": "membership-light",
+      "total": 120,
+      "indexNavigationFailures": 0,
+      "expressionErrors": 0,
+      "missingText": 0,
+      "forbiddenText": 0,
+      "horizontalOverflow": 0,
+      "clippedText": 0,
+      "failedImages": 0,
+      "alternativeLayoutFailures": 0,
+      "calendarLayoutFailures": 0,
+      "membershipLayoutFailures": 0,
+      "notificationLayoutFailures": 0,
+      "v3LayoutFailures": 0
+    },
+    {
+      "name": "membership-dark",
+      "total": 120,
+      "indexNavigationFailures": 0,
+      "expressionErrors": 0,
+      "missingText": 0,
+      "forbiddenText": 0,
+      "horizontalOverflow": 0,
+      "clippedText": 0,
+      "failedImages": 0,
+      "alternativeLayoutFailures": 0,
+      "calendarLayoutFailures": 0,
+      "membershipLayoutFailures": 0,
+      "notificationLayoutFailures": 0,
+      "v3LayoutFailures": 0
+    },
+    {
+      "name": "membership-fonts",
+      "total": 6,
+      "indexNavigationFailures": 0,
+      "expressionErrors": 0,
+      "missingText": 0,
+      "forbiddenText": 0,
+      "horizontalOverflow": 0,
+      "clippedText": 0,
+      "failedImages": 0,
+      "alternativeLayoutFailures": 0,
+      "calendarLayoutFailures": 0,
+      "membershipLayoutFailures": 0,
+      "notificationLayoutFailures": 0,
+      "v3LayoutFailures": 0
+    }
+  ],
+  "totalLayoutCases": 810,
+  "previewLimit": "Chromium WXML/WXSS approximation, including button-width and 1.3x font stress. Fixture accounts; not native WeChat, real payments or deployment evidence.",
+  "externalActions": {
+    "cloudDeployment": false,
+    "miniProgramUpload": false,
+    "publicRelease": false,
+    "realPayment": false
+  },
+  "sourceHashes": [
+    {
+      "file": "miniprogram/pages/mine/index.js",
+      "sha256": "2d45a5458ed0e5ec6a3b2a37b4b37ab416370ca272bf107e0bfd51546d4a18ca"
+    },
+    {
+      "file": "miniprogram/pages/mine/index.wxml",
+      "sha256": "d3ea3d43a65f627fc7d158915b795cc104621c5d9871d0843b71ec1d7cab49ec"
+    },
+    {
+      "file": "miniprogram/pages/mine/index.wxss",
+      "sha256": "c8f9308adfa853887abba6ce6560396fd11a33ee85009b6cb60ec3cf8f22eac2"
+    },
+    {
+      "file": "miniprogram/utils/member-products.js",
+      "sha256": "8dde771bd110aec651d9644af6b9eefd5d902a17c84bc569f3cfd8c9c224cfd3"
+    },
+    {
+      "file": "tests/membership-upgrade-frontend.test.mjs",
+      "sha256": "353050e92524c88ff867049adaa2e634121c682d2b8d2434baae2795369db578"
+    },
+    {
+      "file": "tests/payment-compliance-ui.test.mjs",
+      "sha256": "1e5c8e8eada3061209bb7f26e50af51bcdcbbce462a961e28029f313c9bdd113"
+    },
+    {
+      "file": "tests/contextual-checkout-page.test.mjs",
+      "sha256": "9b1669b5f990d5ec18d56ca310b4553cda49a83d9673723bf8b86cb99712abe7"
+    },
+    {
+      "file": "tools/ui-preview/build.mjs",
+      "sha256": "8ce9c01b11e0a86b6cd28a7a75beb5a68ddfb258e22869279b0827d31af779de"
+    },
+    {
+      "file": "tools/ui-preview/membership-layout.mjs",
+      "sha256": "6a17247f7d77603068bba2a98e8007aabf92cfc78420572fa8568e0dffa735de"
+    }
+  ],
+  "previews": [
+    {
+      "name": "member-actions",
+      "scenario": "v3-member-monthly",
+      "output": "output/v3.0.0-member-actions.png",
+      "sha256": "1f0da1213a185bd6340ece7b8ed3fcc376472620ae13a360c07c12caca7db6b0"
+    },
+    {
+      "name": "free-entry",
+      "scenario": "v2-free",
+      "output": "output/v3.0.0-free-entry.png",
+      "sha256": "d837fe18023685abb2f2077825017fd11afe7bcd97906c96a4f3df75c96a1753"
+    },
+    {
+      "name": "upgrade-weekly",
+      "scenario": "v3-upgrade-weekly",
+      "output": "output/v3.0.0-upgrade-weekly.png",
+      "sha256": "300e1a3310d7c7c3c243139510101da49d5dbf52bd506fd3225d0b2dd8e9b746"
+    },
+    {
+      "name": "upgrade-monthly",
+      "scenario": "v3-upgrade-monthly",
+      "output": "output/v3.0.0-upgrade-monthly.png",
+      "sha256": "14c92c2465f0285e40362f0e6d9f45b0a3d41be17ab249bc884bbcad3aa92421"
+    },
+    {
+      "name": "upgrade-annual",
+      "scenario": "v3-upgrade-annual",
+      "output": "output/v3.0.0-upgrade-annual.png",
+      "sha256": "f2b1fd6eafd6e96e67a4515fefc3f2c277b8e56378dd16f5dd564d939228b2f2"
+    }
+  ]
+}

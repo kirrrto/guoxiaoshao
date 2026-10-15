@@ -15,7 +15,7 @@
           <button class="test-secondary test-feedback-choice {{test.feedback === 'not_received' ? 'test-choice-selected' : ''}}" bindtap="onFeedback" data-outcome="not_received" disabled="{{busy || loading}}">{{test.feedback === 'not_received' ? '已反馈未收到' : '暂时没收到'}}</button>
         </view>
         <view wx:if="{{feedbackNote}}" class="test-feedback-note" aria-live="polite">{{feedbackNote}}</view>
-        <button wx:if="{{test.feedback === 'received'}}" class="test-primary test-return" bindtap="onGoMine" disabled="{{busy || loading}}">返回会员区</button>
+        <button wx:if="{{test.feedback === 'received'}}" class="test-primary test-return" bindtap="onReturnTask" disabled="{{busy || loading}}">{{returnLabel}}</button>
         <view wx:if="{{test.feedback === 'not_received'}}" class="test-troubleshooting">
           <view class="test-copy">先返回微信，搜索并打开「服务通知」，查找【测试】消息。</view>
           <button class="test-disclosure" bindtap="onToggleTroubleshooting" aria-expanded="{{showTroubleshooting}}"><text class="test-disclosure-label">仍未找到？查看排查方法</text><view class="ui-chevron {{showTroubleshooting ? 'ui-chevron--up' : 'ui-chevron--down'}}" aria-hidden="true"></view></button>
@@ -43,7 +43,7 @@
         <button class="test-primary" bindtap="onContinue" disabled="{{busy || loading || !ready || blocked}}" loading="{{busy}}">继续原测试 · 本次最多 1 次</button>
       </block>
       <block wx:elif="{{!blocked}}">
-        <view class="test-cost"><text>每条消耗 <text class="test-cost-number">1 次</text>额度</text><text>可用 {{balance}} 次</text></view>
+        <view class="test-cost"><text>每条消耗 <text class="test-cost-number">1 次</text>查询／体验次数</text><text>可用 {{balance}} 次</text></view>
         <view wx:if="{{test && test.status === 'uncertain' && test.feedback}}" class="test-action-caption">原测试结果仍未知，扣次记录保留。再次体验会新建测试，另消耗 1 次。</view>
         <button class="{{test && (test.status === 'accepted' || test.status === 'uncertain') ? 'test-secondary test-again' : 'test-primary'}}" bindtap="onStart" disabled="{{busy || loading || !ready || balance < 1}}" loading="{{busy}}">{{test && test.status === 'uncertain' ? '重新授权新测试 · 1 次' : (test && test.status === 'accepted' ? '再体验一条 · 1 次' : '授权并发送测试 · 1 次')}}</button>
         <view wx:if="{{!test}}" class="test-action-caption">免费用户也可体验，会员同样消耗 1 次额度。</view>
@@ -61,4 +61,5 @@
     </view>
   </view>
   <view class="test-tip">【测试】非真实放货 · 微信受理不等于已送达</view>
+  <button wx:if="{{!test || test.feedback !== 'received'}}" class="test-secondary test-return" bindtap="onReturnTask" disabled="{{busy || loading}}">{{returnLabel}}</button>
 </view>

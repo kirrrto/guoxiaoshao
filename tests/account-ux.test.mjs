@@ -6,6 +6,7 @@ import vm from 'node:vm';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import { createFixture } from './helpers/fixture.mjs';
+import { isolatedAccountUi } from './helpers/isolated-account-ui.mjs';
 
 const require = createRequire(import.meta.url);
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../miniprogram');
@@ -23,7 +24,7 @@ function runtime(pageName, handler = async action => action === 'notify.list' ? 
   const api = { call: async (action, payload) => { calls.push({ action, payload }); return handler(action, payload); }, showError: error => messages.push(error.message), toast: message => messages.push(message) };
   const store = { getBootstrap: async (options = {}) => { bootstrapCalls.push(options); return boot(); }, invalidateBootstrap() {}, publishQuota() {}, subscribeQuota: () => () => {} };
   const wx = { stopPullDownRefresh() {}, switchTab() {}, showModal() {}, setClipboardData() {} };
-  const sandbox = { console, Date, Promise, wx, Page: value => { definition = value; }, require: name => name.endsWith('/api') ? api : name.endsWith('/store') ? store : name.endsWith('/operation') ? { begin: () => 'grant-test', finish() {}, uncertain: () => false } : require(path.join(pageRoot, 'pages', pageName, name)) };
+  const sandbox = { console, Date, Promise, wx, Page: value => { definition = value; }, require: name => name.endsWith('/api') ? api : name.endsWith('/store') ? store : name.endsWith('/operation') ? { begin: () => 'grant-test', finish() {}, uncertain: () => false } : isolatedAccountUi(name) || require(path.join(pageRoot, 'pages', pageName, name)) };
   vm.runInNewContext(fs.readFileSync(path.join(pageRoot, 'pages', pageName, 'index.js'), 'utf8'), sandbox);
   const page = { ...definition, data: clone(definition.data) };
   page.setData = patch => { for (const [key, value] of Object.entries(patch)) { const parts = key.split('.'); let target = page.data; for (const part of parts.slice(0, -1)) target = target[part] || (target[part] = {}); target[parts.at(-1)] = value; } };

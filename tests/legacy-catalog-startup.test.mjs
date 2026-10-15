@@ -40,7 +40,7 @@ test('follow summaries and alternative stores work without Array.prototype.flatM
   page.startFollowPolling();
   for (let i = 0; i < 16; i++) await Promise.resolve();
   assert.equal(page.data.followTargets.length, 1);
-  assert.equal(page.data.followRefreshError, false);
+  assert.equal(page.data.followTargets[0].productTitle, '测试配置');
   page.onHide();
 
   const choices = rt.load('utils/alternative-rules.js').storeChoices(stores, legacyValue(['R577']));

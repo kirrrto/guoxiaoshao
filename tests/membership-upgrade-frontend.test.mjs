@@ -38,6 +38,29 @@ test('expired membership starts at confirmation-time estimate rather than extend
   assert.equal(value.extensionText, '本次开通 30 天');
 });
 
+test('free and expired accounts can open, refresh and close member plans without invoking payment', () => {
+  for (const expired of [false, true]) {
+    const { page, boot, rt } = account(false);
+    if (expired) boot.membership.expiresAt = '2020-01-01T00:00:00Z';
+    page.applyBoot(boot);
+    assert.equal(page.data.showPurchaseShop, true);
+    assert.equal(page.data.membershipUpgradeOpen, false);
+    page.onOpenMembershipRenew();
+    assert.equal(page.data.membershipUpgradeOpen, true);
+    assert.equal(page.data.selectedPlanId, products[0].planId);
+    page.applyBoot(boot);
+    assert.equal(page.data.membershipUpgradeOpen, true, 'a refresh must not collapse a plan the user is considering');
+    page.onCloseMembershipUpgrade();
+    assert.equal(page.data.membershipUpgradeOpen, false);
+    page.onOpenMembershipUpgrade();
+    assert.equal(page.data.membershipUpgradeOpen, false, 'only an active member can use the upgrade mode');
+    page.setData({ paymentPendingId: 'existing-order' });
+    page.onOpenMembershipRenew();
+    assert.equal(page.data.membershipUpgradeOpen, false, 'an unresolved order still blocks new purchase choices');
+    assert.equal(rt.calls.length, 0, 'opening plans performs neither purchase nor extra reads');
+  }
+});
+
 test('member purchase cards describe server-issued limits without inferring rights from duration', () => {
   const { page, boot } = account();
   boot.memberProducts = products.map((p, index) => ({ ...p, limits: { maxFollows: index ? 4 : 3, maxStoresPerFollow: index ? 4 : 3 } }));
@@ -60,12 +83,12 @@ test('concise benefit cards group equal advertised allowances while the current 
   ]);
   assert.equal(page.data.boot.limits.maxFollows, 3, 'gifted or accumulated membership days do not grant paid-plan slots');
   const original = page.data.membership.expiresAt;
-  page.onToggleMembershipRules(); page.onTogglePurchaseRules();
+  page.onToggleMembershipRules();
   assert.equal(page.data.showMembershipRules, true);
   assert.equal(page.data.showPurchaseRules, true);
   page.onToggleMembershipRules();
   assert.equal(page.data.showMembershipRules, false);
-  assert.equal(page.data.showPurchaseRules, true, 'purchase terms have their own disclosure');
+  assert.equal(page.data.showPurchaseRules, false, 'the shared disclosure collapses benefits and purchase terms together');
   assert.equal(page.data.membership.expiresAt, original);
 });
 
@@ -77,21 +100,80 @@ test('legacy product snapshots never advertise enhanced slots based only on a lo
   assert.equal(card.configs, 3); assert.equal(card.stores, 3); assert.equal(card.enhanced, false);
 });
 
-test('the extra-slot entry requires an available product above the current server-issued allowance', () => {
+test('upgrade options follow the server plan instead of remaining days or identical allowances', () => {
   const { page, boot } = account();
   const expandedProducts = products.map((product, index) => ({ ...product,
     limits: { maxFollows: index ? 4 : 3, maxStoresPerFollow: index ? 4 : 3 } }));
-  for (const [current, offered, active, expected] of [
-    [{ maxFollows: 3, maxStoresPerFollow: 3 }, expandedProducts, true, true],
-    [{ maxFollows: 4, maxStoresPerFollow: 4 }, expandedProducts, true, false],
-    [{ maxFollows: 3, maxStoresPerFollow: 3 }, products, true, false],
-    [{ maxFollows: 3, maxStoresPerFollow: 3 }, expandedProducts.map(product => ({ ...product, enabled: false })), true, false],
-    [{ maxFollows: 3, maxStoresPerFollow: 3 }, expandedProducts, false, false],
-    [{}, expandedProducts, true, false],
+  for (const [currentPlan, remainingDays, expected] of [
+    ['member_7d', 365, ['member_30d', 'member_365d']],
+    ['member_30d', 1, ['member_365d']],
+    ['member_365d', 1, []],
+    [null, 365, ['member_30d', 'member_365d']],
   ]) {
-    page.applyBoot({ ...boot, limits: current, memberProducts: offered, membership: { ...boot.membership, active } });
-    assert.equal(page.data.membershipCanExpand, expected);
+    page.applyBoot({ ...boot, limits: { maxFollows: 4, maxStoresPerFollow: 4 }, memberProducts: expandedProducts,
+      membership: { ...boot.membership, planId: currentPlan, remainingMs: remainingDays * 86400000 } });
+    page.onOpenMembershipUpgrade();
+    assert.equal(page.data.membershipUpgradeOpen, true);
+    assert.deepEqual(Array.from(page.data.displayMemberProducts, item => item.planId), expected);
+    if (expected.length) assert.ok(expected.includes(page.data.selectedPlanId));
   }
+});
+
+test('monthly member renews their actual plan and upgrade never exposes or selects the current tier', () => {
+  const { page, boot, rt } = account();
+  page.applyBoot({ ...boot, membership: { ...boot.membership, planId: 'member_30d', remainingMs: 86400000 } });
+  page.onOpenMembershipRenew();
+  assert.equal(page.data.selectedPlanId, 'member_30d');
+  page.onOpenMembershipUpgrade();
+  assert.deepEqual(Array.from(page.data.displayMemberProducts, item => item.planId), ['member_365d']);
+  for (const planId of ['member_7d', 'member_30d']) page.onSelectMemberProduct({ currentTarget: { dataset: { planId } } });
+  assert.equal(page.data.selectedPlanId, 'member_365d');
+  page.applyBoot({ ...boot, membership: { ...boot.membership, planId: 'member_30d' } });
+  assert.deepEqual(Array.from(page.data.displayMemberProducts, item => item.planId), ['member_365d'], 'refresh must preserve the upgrade filter');
+  page.onOpenMembershipRenew();
+  assert.equal(page.data.selectedPlanId, 'member_30d');
+  assert.equal(page.data.membership.expiresAt, boot.membership.expiresAt);
+  assert.equal(rt.calls.length, 0);
+});
+
+test('highest-tier member sees an empty upgrade state and cannot start a hidden purchase', async () => {
+  const { page, boot, rt } = account();
+  page.applyBoot({ ...boot, membership: { ...boot.membership, planId: 'member_365d' } });
+  page.onOpenMembershipUpgrade();
+  assert.equal(page.data.displayMemberProducts.length, 0);
+  assert.match(page.data.membershipUpgradeEmptyText, /没有更高档套餐/);
+  let purchased = 0, modals = 0;
+  page.paymentController.buy = async () => purchased++;
+  rt.wx.showModal = () => modals++;
+  await page.onBuyMembership();
+  assert.equal(purchased, 0); assert.equal(modals, 0);
+  page.onOpenMembershipRenew();
+  assert.equal(page.data.selectedPlanId, 'member_365d');
+});
+
+test('unavailable higher tiers stay hidden and price refresh updates the visible upgrade card', () => {
+  const { page, boot } = account();
+  page.applyBoot({ ...boot, membership: { ...boot.membership, planId: 'member_7d' },
+    memberProducts: products.map(item => item.planId === 'member_30d' ? { ...item, enabled: false, paymentReady: false } : item) });
+  page.onOpenMembershipUpgrade();
+  assert.deepEqual(Array.from(page.data.displayMemberProducts, item => item.planId), ['member_365d']);
+  page.applyPriceChange({ ...products[2], priceFen: 18800 });
+  assert.equal(page.data.displayMemberProducts[0].priceText, '¥188.00');
+  assert.equal(page.data.boot.priceText, '¥188.00');
+});
+
+test('membership becoming the selected tier during consent cancels the obsolete upgrade purchase', async () => {
+  const { page, boot, rt } = account();
+  const current = { ...boot, membership: { ...boot.membership, planId: 'member_30d' } };
+  page.applyBoot(current); page.onOpenMembershipUpgrade();
+  let modal, bought = 0;
+  rt.wx.showModal = value => { modal = value; };
+  page.paymentController.buy = async () => bought++;
+  const pending = page.onBuyMembership();
+  page.applyBoot({ ...current, membership: { ...current.membership, planId: 'member_365d' } });
+  modal.success({ confirm: true }); await pending;
+  assert.equal(bought, 0);
+  assert.equal(page.data.displayMemberProducts.length, 0);
 });
 
 test('collapsed purchase details do not bypass the selected product notice and final consent', async () => {
@@ -209,7 +291,7 @@ test('guide navigation and purchase-record shortcut open their destinations with
   let destination, scroll;
   rt.wx.navigateTo = value => { destination = value.url; };
   rt.wx.pageScrollTo = value => { scroll = value.selector; };
-  page.onHelp(); assert.equal(destination, '/pages/guide/index');
+  page.onHelp(); assert.equal(destination, '/pages/guide/index?section=prepare&from=mine');
   await page.onOpenOrders();
   assert.equal(page.data.showOrders, true); assert.equal(scroll, '#membership-records');
   assert.deepEqual(rt.calls.map(value => value.action), ['member.status']);

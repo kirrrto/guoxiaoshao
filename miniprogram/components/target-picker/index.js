@@ -6,6 +6,7 @@ const { presentStore, storeLabelWithCity } = require('../../utils/store-label');
 const unique = items => [...new Set(items.filter(Boolean))];
 const capacityOf = p => (p.attributes || {}).capacity || '标准配置';
 const colorOf = p => (p.attributes || {}).color || '标准外观';
+const compareColors = (a, b) => a.localeCompare(b, 'zh-CN') || (a < b ? -1 : a > b ? 1 : 0);
 const modelOf = p => p.model || p.familyName || p.familyKey;
 const own = (source, key) => Object.prototype.hasOwnProperty.call(source, key);
 Component({
@@ -118,10 +119,12 @@ Component({
     familyProducts() { const c = this.catalogCategories[this.read('categoryIndex')]; const f = c && c.families[this.read('familyIndex')]; return f ? f.products : []; },
     selectCategory(index, silent = false) {
       const c = this.catalogCategories[index]; if (!c) return;
+      const wanted = silent ? null : this.currentAttributes();
       this.stage({ categoryIndex: index, families: c.families.map(f => ({ familyKey: f.familyKey, name: f.name })), familyNames: c.families.map(f => f.supported ? f.name : `${f.name}（待验证）`) });
-      this.selectFamily(0, true); if (!silent) this.emit();
+      this.selectFamily(0, true); if (!silent) { this.updateFilters(wanted); this.emit(); }
     },
-    selectFamily(index, silent = false) { this.stage({ familyIndex: index, selectionNote: '' }); this.updateFilters({}); if (!silent) this.emit(); },
+    currentAttributes() { return { model: this.read('models')[this.read('modelIndex')], capacity: this.read('capacities')[this.read('capacityIndex')], color: this.read('colors')[this.read('colorIndex')] }; },
+    selectFamily(index, silent = false) { const wanted = silent ? {} : this.currentAttributes(); this.stage({ familyIndex: index, selectionNote: '' }); this.updateFilters(wanted); if (!silent) this.emit(); },
     updateFilters(wanted) {
       this.unavailablePartNumber = null;
       const products = this.familyProducts();
@@ -129,10 +132,16 @@ Component({
       const byModel = products.filter(p => modelOf(p) === models[modelIndex]);
       const capacities = unique(byModel.map(capacityOf)).sort(compareCapacities); const capacityIndex = Math.max(0, capacities.indexOf(wanted.capacity));
       const byCapacity = byModel.filter(p => capacityOf(p) === capacities[capacityIndex]);
-      const colors = unique(byCapacity.map(colorOf)); const colorIndex = Math.max(0, colors.indexOf(wanted.color));
+      // One model-wide order keeps color positions stable across capacities and
+      // catalog refreshes. Only real SKUs at this capacity remain selectable.
+      const availableColors = new Set(byCapacity.map(colorOf));
+      const colors = unique(byModel.map(colorOf)).sort(compareColors).filter(color => availableColors.has(color));
+      const colorIndex = Math.max(0, colors.indexOf(wanted.color));
       const candidates = byCapacity.filter(p => colorOf(p) === colors[colorIndex]);
       const productIndex = Math.max(0, candidates.findIndex(p => p.partNumber === wanted.partNumber));
       this.currentCandidates = candidates;
+      // Visible options always describe a real draft SKU. The sheet's Save
+      // action commits it; changing a filter needs no additional confirmation.
       this.stage({ models, modelIndex, capacities, capacityIndex, colors, colorIndex, candidates: candidates.map(p => ({ partNumber: p.partNumber })),
         productTitles: candidates.map(p => `${p.title} · ${p.partNumber}`), productIndex,
         product: candidates[productIndex] ? this.publicProduct(candidates[productIndex]) : null, imageFailed: false });
@@ -146,10 +155,8 @@ Component({
       const model = this.data.models[Number(e.detail.value)]; if (!model) return;
       const capacity = this.data.capacities[this.data.capacityIndex], color = this.data.colors[this.data.colorIndex];
       this.batch(() => {
+        this.stage({ selectionNote: '' });
         this.updateFilters({ model, capacity, color });
-        const product = this.read('product');
-        const changed = product && (capacityOf(product) !== capacity || colorOf(product) !== color);
-        this.stage({ selectionNote: changed ? `新型号的可选配置不同，已调整为 ${capacityOf(product)} · ${colorOf(product)}，请核对。` : '' });
         this.emit();
       });
     },
@@ -157,14 +164,13 @@ Component({
       const capacity = this.data.capacities[Number(e.detail.value)]; if (!capacity) return;
       const color = this.data.colors[this.data.colorIndex];
       this.batch(() => {
+        this.stage({ selectionNote: '' });
         this.updateFilters({ model: this.data.models[this.data.modelIndex], capacity, color });
-        const product = this.read('product');
-        this.stage({ selectionNote: product && colorOf(product) !== color ? `该容量没有原先的 ${color}，已调整为 ${colorOf(product)}，请核对。` : '' });
         this.emit();
       });
     },
     onCapacityTap(e) { this.onCapacityChange({ detail: { value: e.currentTarget.dataset.index } }); },
-    onColorTap(e) { this.batch(() => { this.updateFilters({ model: this.data.models[this.data.modelIndex], capacity: this.data.capacities[this.data.capacityIndex], color: this.data.colors[Number(e.currentTarget.dataset.index)] }); this.stage({ selectionNote: '' }); this.emit(); }); },
+    onColorTap(e) { this.batch(() => { this.stage({ selectionNote: '' }); this.updateFilters({ model: this.data.models[this.data.modelIndex], capacity: this.data.capacities[this.data.capacityIndex], color: this.data.colors[Number(e.currentTarget.dataset.index)] }); this.emit(); }); },
     onProductChange(e) { const p = this.currentCandidates[Number(e.detail.value)]; if (!p) return; this.unavailablePartNumber = null; this.setData({ productIndex: Number(e.detail.value), product: this.publicProduct(p), imageFailed: false, selectionNote: '' }); this.emit(); },
     onImageError() { const p = this.data.product; if (p && p.imageDisplayUrl && p.imageDisplayUrl !== p.imageUrl) this.setData({ 'product.imageDisplayUrl': p.imageUrl }); else this.setData({ imageFailed: true }); },
     selectCity(index) {

@@ -76,6 +76,39 @@
 /* 按下反馈 */
 .chip.is-pressed, .store-result.is-pressed { opacity: 0.66; transform: scale(0.97); }
 
+.picker-current-summary { position: sticky; top: 0; z-index: 1; padding: 16rpx 0 22rpx; margin-bottom: 16rpx; background: var(--card); border-bottom: 1rpx solid var(--line); font-size: max(14px, 28rpx); line-height: 1.6; }
+.field-summary { border-bottom-style: dashed; }
+
+/* Keep choices within reach while preserving native-sized tap areas. */
+.picker-current-summary { padding: 8rpx 0 14rpx; margin-bottom: 14rpx; line-height: 1.4; }
+.picker-current-summary > .small { margin-top: 4rpx; }
+.picker-section-heading { font-size: max(15px, 28rpx); gap: 10rpx; }
+.section-label { margin: 16rpx 0 10rpx; }
+.chips { gap: 10rpx; }
+.chip { min-height: 44px; padding: 16rpx 20rpx; line-height: 1.45; border-radius: 14rpx; }
+/* Fixed tracks keep names intact and choices stationary when selection changes. */
+.category-chips { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.category-chips .chip { display: flex; align-items: center; justify-content: center; min-width: 0; padding: 8rpx; text-align: center; white-space: nowrap; overflow-wrap: normal; word-break: normal; font-weight: 500; }
+.choice-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.capacity-chips { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.choice-chip { position: relative; display: flex; align-items: center; justify-content: center; min-width: 0; padding: 8px 22px 8px 8px; text-align: center; }
+.choice-chip, .choice-chip.on { font-weight: 500; }
+.choice-label { min-width: 0; max-width: 100%; }
+.choice-check { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); width: 14px; line-height: 1; text-align: center; opacity: 0; }
+.choice-check-visible { opacity: 1; }
+.field { min-height: 44px; padding: 18rpx 0; }
+.field-summary { min-height: 34px; padding: 12rpx 0; border-bottom-style: solid; }
+.field-summary .label, .field-summary .value { font-size: max(13px, 26rpx); }
+.product-preview { gap: 16rpx; padding: 16rpx; border-radius: 16rpx; }
+.product-image-box, .product-image { width: 96rpx; height: 112rpx; }
+.product-image-box { flex-basis: 96rpx; border-radius: 12rpx; }
+.product-copy { line-height: 1.45; }
+.product-copy .mt { margin-top: 6rpx; }
+.picker-store-heading { margin-top: 20rpx; padding-top: 18rpx; margin-bottom: 14rpx; }
+.store-search { min-height: 44px; padding: 0 18rpx; border-radius: 16rpx; gap: 14rpx; }
+.search-hint { margin-top: 6rpx; }
+.selected { padding: 14rpx 16rpx; border-radius: 16rpx; }
+
 @media (prefers-color-scheme: dark) {
   .ui-icon { filter: brightness(1.5); }
   .chip { background: rgba(255, 255, 255, 0.07); border-color: rgba(255, 255, 255, 0.06); }

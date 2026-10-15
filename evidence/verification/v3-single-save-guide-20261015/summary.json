@@ -1,0 +1,526 @@
+{
+  "verifiedAt": "2026-10-15T08:16:05.587Z",
+  "version": "3.0.0",
+  "scope": [
+    "Single bottom Save for target selection",
+    "Query calendar entry above selection; poster before guide",
+    "Mine help opens guide without poster",
+    "All catalog cities selectable for explicit alternative queries; recent-record scope preserved",
+    "Removed repeated test notification note from Mine"
+  ],
+  "tests": {
+    "total": 1443,
+    "passed": 1443,
+    "failed": 0,
+    "skipped": 0,
+    "durationMs": 115081.9181
+  },
+  "sourceCheck": {
+    "files": 499,
+    "javaScript": 350,
+    "json": 47,
+    "pages": 6,
+    "operatorPages": 1,
+    "errors": []
+  },
+  "releaseCheck": {
+    "checkedAt": "2026-10-15T08:15:42.075Z",
+    "version": "3.0.0",
+    "scope": "Local source candidate only; no cloud deployment, account-console inspection or submission",
+    "publicationReady": false,
+    "passed": true,
+    "checks": [
+      {
+        "name": "root package and lock versions match the release",
+        "passed": true
+      },
+      {
+        "name": "release acceptance requirements are explicit and not marked as production-proven",
+        "passed": true
+      },
+      {
+        "name": "README identifies and links the current release",
+        "passed": true
+      },
+      {
+        "name": "current release note identifies the same version",
+        "passed": true
+      },
+      {
+        "name": "release development config validates request domains",
+        "passed": true
+      },
+      {
+        "name": "local private config does not bypass domain validation",
+        "passed": true
+      },
+      {
+        "name": "gxs_api: package and lock versions match release 3.0.0",
+        "passed": true
+      },
+      {
+        "name": "gxs_api: exact SDK version and integrity lock",
+        "passed": true
+      },
+      {
+        "name": "gxs_api: deployable package has no external local links",
+        "passed": true
+      },
+      {
+        "name": "gxs_api: security overrides and locks are consistent",
+        "passed": true
+      },
+      {
+        "name": "gxs_api: no prototype-pollution lodash.set in the deployable tree",
+        "passed": true
+      },
+      {
+        "name": "gxs_api: SDK entry points installed",
+        "passed": true
+      },
+      {
+        "name": "cloudbase_auth: package and lock versions match release 3.0.0",
+        "passed": true
+      },
+      {
+        "name": "cloudbase_auth: exact SDK version and integrity lock",
+        "passed": true
+      },
+      {
+        "name": "cloudbase_auth: deployable package has no external local links",
+        "passed": true
+      },
+      {
+        "name": "cloudbase_auth: security overrides and locks are consistent",
+        "passed": true
+      },
+      {
+        "name": "cloudbase_auth: no prototype-pollution lodash.set in the deployable tree",
+        "passed": true
+      },
+      {
+        "name": "cloudbase_auth: SDK entry points installed",
+        "passed": true
+      },
+      {
+        "name": "gxs_monitor: package and lock versions match release 3.0.0",
+        "passed": true
+      },
+      {
+        "name": "gxs_monitor: exact SDK version and integrity lock",
+        "passed": true
+      },
+      {
+        "name": "gxs_monitor: deployable package has no external local links",
+        "passed": true
+      },
+      {
+        "name": "gxs_monitor: security overrides and locks are consistent",
+        "passed": true
+      },
+      {
+        "name": "gxs_monitor: no prototype-pollution lodash.set in the deployable tree",
+        "passed": true
+      },
+      {
+        "name": "gxs_monitor: SDK entry points installed",
+        "passed": true
+      },
+      {
+        "name": "system.ping uses the release version",
+        "passed": true
+      },
+      {
+        "name": "Mine page version label uses the release version",
+        "passed": true
+      },
+      {
+        "name": "scheduled monitor has the expected minute trigger",
+        "passed": true
+      },
+      {
+        "name": "monitor rejects client-supplied timer payloads",
+        "passed": true
+      },
+      {
+        "name": "monitor contains exactly its canonical runtime dependency closure",
+        "passed": true
+      },
+      {
+        "name": "consumer AppID matches project and frontend",
+        "passed": true
+      },
+      {
+        "name": "shared resource identifiers match",
+        "passed": true
+      },
+      {
+        "name": "shared auth allows configured consumer and rejects payload spoofing",
+        "passed": true
+      },
+      {
+        "name": "consumer package contains four main pages, notification test and the buying guide",
+        "passed": true
+      },
+      {
+        "name": "operator project is separate and uses the existing resource AppID",
+        "passed": true
+      },
+      {
+        "name": "operator project is excluded from search",
+        "passed": true
+      },
+      {
+        "name": "queries default to persistent continuous capacity rather than a daily stop",
+        "passed": true
+      },
+      {
+        "name": "new sustained-availability polling requires explicit runtime enablement",
+        "passed": true
+      },
+      {
+        "name": "optional collector package and lock identify the same release",
+        "passed": true
+      },
+      {
+        "name": "optional collector dependencies stay inside the deployable package boundary",
+        "passed": true
+      },
+      {
+        "name": "payment stays closed in defaults",
+        "passed": true
+      },
+      {
+        "name": "membership purchase uses the confirmed seven-day product",
+        "passed": true
+      },
+      {
+        "name": "purchase notice states a non-refundable one-time virtual service",
+        "passed": true
+      },
+      {
+        "name": "payment recovery timer is five minutes and rejects client-triggered scans",
+        "passed": true
+      },
+      {
+        "name": "payment HTTP ingress uses its exact callback path",
+        "passed": true
+      },
+      {
+        "name": "acceptance page and mock runtime absent from mini program",
+        "passed": true
+      },
+      {
+        "name": "tab icons and page resources exist",
+        "passed": true
+      },
+      {
+        "name": "floating navigation component is enabled and registered",
+        "passed": true
+      },
+      {
+        "name": "custom navigation matches native tab routes, labels and icons",
+        "passed": true
+      }
+    ],
+    "frontend": {
+      "files": 117,
+      "sourceBytes": 1102887,
+      "note": "Source bytes, not the WeChat upload package size"
+    },
+    "externalReleaseChecks": [
+      {
+        "item": "Consumer account eligibility, filing, categories and privacy declaration",
+        "status": "requires account-console verification"
+      },
+      {
+        "item": "Deploy cloudbase_auth, gxs_api and gxs_monitor; verify actual timer invocations",
+        "status": "not checked by this local tool; consult the versioned cloud-deployment evidence"
+      },
+      {
+        "item": "Apply database indexes/rules and seed verified catalog",
+        "status": "not checked by this local tool; consult the versioned cloud-deployment evidence"
+      },
+      {
+        "item": "Real-account signin, quota, history and reminder deletion/clear",
+        "status": "requires deployed-cloud acceptance"
+      },
+      {
+        "item": "iOS and Android layout, images, failure recovery and package size",
+        "status": "requires physical-device acceptance"
+      },
+      {
+        "item": "Automatic collection and actual subscription delivery",
+        "status": "separate checks: verify automatic observations; enable messages only with real template, credentials and user authorization"
+      },
+      {
+        "item": "Virtual payment callback, production credentials and real-device payment/refund",
+        "status": "requires cloud gateway, credential and real-order verification; local mocks never prove a payment succeeded"
+      },
+      {
+        "item": "300 simultaneous querying members, with representative distinct targets and acceptable latency/freshness",
+        "status": "requires real staging-cloud load acceptance; same-target memory tests and server request rates do not prove 300-user capacity"
+      },
+      {
+        "item": "Actual observations across Beijing midnight and business-stall alert delivery/recovery",
+        "status": "requires deployed observation evidence and a tested operator alert rule; a heartbeat or structured log alone is insufficient"
+      },
+      {
+        "item": "CloudBase lodash.set prototype pollution",
+        "status": "removed from the deployable tree by overriding @cloudbase/database to 1.5.1 (bson only); npm audit reports 0 vulnerabilities in all three cloud functions"
+      }
+    ],
+    "monitorBundle": {
+      "passed": true,
+      "files": 41,
+      "sourceBytes": 274261,
+      "issues": []
+    },
+    "deliveryTargets": {
+      "version": "3.0.0",
+      "purpose": "Acceptance requirements, not deployed runtime configuration or achieved capacity",
+      "simultaneousQueryingMembers": 300,
+      "followNormalDetectionSeconds": 60,
+      "followAvailableRecheckSeconds": 3,
+      "availableRecheckPolicy": "Continue while a durably observed known target remains available; unknown, failures, source limits and worker gaps must be reported, never fabricated as successful samples",
+      "inventoryMeaning": "Store pickup availability; no exact remaining unit count is provided",
+      "productionAcceptancePassed": false
+    }
+  },
+  "layouts": [
+    {
+      "name": "main",
+      "theme": "light",
+      "total": 240,
+      "indexNavigationFailures": 0,
+      "expressionErrors": 0,
+      "missingText": 0,
+      "forbiddenText": 0,
+      "horizontalOverflow": 0,
+      "clippedText": 0,
+      "failedImages": 0,
+      "alternativeLayoutFailures": 0,
+      "calendarLayoutFailures": 0,
+      "membershipLayoutFailures": 0,
+      "notificationLayoutFailures": 0,
+      "v3LayoutFailures": 0
+    },
+    {
+      "name": "main",
+      "theme": "dark",
+      "total": 240,
+      "indexNavigationFailures": 0,
+      "expressionErrors": 0,
+      "missingText": 0,
+      "forbiddenText": 0,
+      "horizontalOverflow": 0,
+      "clippedText": 0,
+      "failedImages": 0,
+      "alternativeLayoutFailures": 0,
+      "calendarLayoutFailures": 0,
+      "membershipLayoutFailures": 0,
+      "notificationLayoutFailures": 0,
+      "v3LayoutFailures": 0
+    },
+    {
+      "name": "single-save",
+      "theme": "light",
+      "total": 48,
+      "indexNavigationFailures": 0,
+      "expressionErrors": 0,
+      "missingText": 0,
+      "forbiddenText": 0,
+      "horizontalOverflow": 0,
+      "clippedText": 0,
+      "failedImages": 0,
+      "alternativeLayoutFailures": 0,
+      "calendarLayoutFailures": 0,
+      "membershipLayoutFailures": 0,
+      "notificationLayoutFailures": 0,
+      "v3LayoutFailures": 0
+    },
+    {
+      "name": "single-save",
+      "theme": "dark",
+      "total": 48,
+      "indexNavigationFailures": 0,
+      "expressionErrors": 0,
+      "missingText": 0,
+      "forbiddenText": 0,
+      "horizontalOverflow": 0,
+      "clippedText": 0,
+      "failedImages": 0,
+      "alternativeLayoutFailures": 0,
+      "calendarLayoutFailures": 0,
+      "membershipLayoutFailures": 0,
+      "notificationLayoutFailures": 0,
+      "v3LayoutFailures": 0
+    },
+    {
+      "name": "cross-city",
+      "theme": "light",
+      "total": 36,
+      "indexNavigationFailures": 0,
+      "expressionErrors": 0,
+      "missingText": 0,
+      "forbiddenText": 0,
+      "horizontalOverflow": 0,
+      "clippedText": 0,
+      "failedImages": 0,
+      "alternativeLayoutFailures": 0,
+      "calendarLayoutFailures": 0,
+      "membershipLayoutFailures": 0,
+      "notificationLayoutFailures": 0,
+      "v3LayoutFailures": 0
+    },
+    {
+      "name": "cross-city",
+      "theme": "dark",
+      "total": 36,
+      "indexNavigationFailures": 0,
+      "expressionErrors": 0,
+      "missingText": 0,
+      "forbiddenText": 0,
+      "horizontalOverflow": 0,
+      "clippedText": 0,
+      "failedImages": 0,
+      "alternativeLayoutFailures": 0,
+      "calendarLayoutFailures": 0,
+      "membershipLayoutFailures": 0,
+      "notificationLayoutFailures": 0,
+      "v3LayoutFailures": 0
+    }
+  ],
+  "totalLayoutCases": 648,
+  "previews": [
+    {
+      "name": "query-calendar-top",
+      "file": "output/v3.0.0-query-calendar-top.png",
+      "sha256": "2cfc6ad3121531682dd50db24b7f9c1de8cd1a12dd263f931d994bc24aa7632e"
+    },
+    {
+      "name": "guide-poster",
+      "file": "output/v3.0.0-guide-poster.png",
+      "sha256": "2158e23e25597d8a533cd51c3fdabb735fcff3fd5aa3e4328c28938b2eaf18fa"
+    },
+    {
+      "name": "guide-direct",
+      "file": "output/v3.0.0-guide-direct.png",
+      "sha256": "070a1195810a0a63daf14125db559dce444527481597cae86fda38dcc84cd26b"
+    },
+    {
+      "name": "reminder-clean",
+      "file": "output/v3.0.0-reminder-clean.png",
+      "sha256": "789e974d71845b14af00bf05a13e02f3e028b7a8111308fe178da6b82aa3d987"
+    },
+    {
+      "name": "alternatives-hefei",
+      "file": "output/v3.0.0-alternatives-hefei.png",
+      "sha256": "1af390a7d6aab33a33655087768a8c71611abc4a231face5e8cc6e8516b05ae8"
+    },
+    {
+      "name": "alternatives-beijing",
+      "file": "output/v3.0.0-alternatives-beijing.png",
+      "sha256": "ed1e5c66eb6a2e679614aef788777b77f407588b066dd12de7bb5403333b63bc"
+    },
+    {
+      "name": "picker-single-save",
+      "file": "output/v3.0.0-picker-single-save.png",
+      "sha256": "5519d4e97c8b54a81043c9bb9c0082c718c7a003553af0c5e62ae936954bf3bc"
+    }
+  ],
+  "previewLimit": "Chromium approximation of WXML/WXSS with fixture stock, dates, balance and credits. Not WeChat device or production verification.",
+  "externalActions": {
+    "miniProgramUpload": false,
+    "cloudDeployment": false,
+    "publicRelease": false,
+    "realPayment": false,
+    "realNotifications": false
+  },
+  "sourceHashes": [
+    {
+      "file": "miniprogram/components/target-picker/index.js",
+      "sha256": "3a0f0624673a26d4413c17b3009f73d3f1928eb218203ae9ac137048154d16e6"
+    },
+    {
+      "file": "miniprogram/components/target-picker/index.wxml",
+      "sha256": "a9b921f5eae55816971cbda77a99758fcee9730f69ff14e1e5f45eef85520284"
+    },
+    {
+      "file": "miniprogram/components/target-picker/index.wxss",
+      "sha256": "92ad1fe7245092a380361e575067ab81b0ebaedc29e1b6b35e480cd467afba54"
+    },
+    {
+      "file": "miniprogram/pages/query/index.js",
+      "sha256": "6e7160b4069de5694fd94a88bc7cbcf31c8d21da7c5441d1f0817cdf95a9962b"
+    },
+    {
+      "file": "miniprogram/pages/query/index.wxml",
+      "sha256": "4d23edd87da4cf1b3f8a60b86ccddea041c6f51a26597eab29c6d3313794dde7"
+    },
+    {
+      "file": "miniprogram/pages/query/index.wxss",
+      "sha256": "7f13402a43072f9402c45891d9c73483ee123d3d57251e01ed967818dbd03bc2"
+    },
+    {
+      "file": "miniprogram/utils/query-alternatives.js",
+      "sha256": "d775252b1ea4b0462aa10f31bcd1eeeaaae0373f3ed6a2ac693605aa1283116f"
+    },
+    {
+      "file": "miniprogram/pages/guide/index.js",
+      "sha256": "061ec6c3e8df4be3b534234b23bc20852a17d8601bfeebcaaa55c70e77388626"
+    },
+    {
+      "file": "miniprogram/pages/guide/index.wxml",
+      "sha256": "eb3b07713ea4696d75a3148b525f2431d66a58dba682ac2bd3005c88bfc24cb7"
+    },
+    {
+      "file": "miniprogram/pages/guide/index.wxss",
+      "sha256": "8f6edd9c87fcaff8192c82d7473a024714a15e9b6bc72b163e0fa7ab1854431f"
+    },
+    {
+      "file": "miniprogram/pages/mine/index.js",
+      "sha256": "845b596fd67e2c13a525fe8edb3acfffa7830c258bad6fdce8cef43f60c4c2a9"
+    },
+    {
+      "file": "miniprogram/pages/mine/index.wxml",
+      "sha256": "94dfa35779d72e011fe056eb727b67fe01a3306b48a32d9b194be86e4da9d1b0"
+    },
+    {
+      "file": "miniprogram/pages/mine/index.wxss",
+      "sha256": "c8f9308adfa853887abba6ce6560396fd11a33ee85009b6cb60ec3cf8f22eac2"
+    },
+    {
+      "file": "tests/picker-ux.test.mjs",
+      "sha256": "c79f312dce8e587263229a3838757cd35dcd55d73bf279d73b2476426934a9ca"
+    },
+    {
+      "file": "tests/ux-sheet-selection.test.mjs",
+      "sha256": "4c091814ca1dc6a226e06383e5d54dc16c73f64fa7987408aa6b44154b42ce38"
+    },
+    {
+      "file": "tests/launch-calendar-guide.test.mjs",
+      "sha256": "4ad9818bb16a1af7a7f1f0e38451d47f02072e9a31c1fb22dfde88232243e0f1"
+    },
+    {
+      "file": "tests/v3-history-help-journey.test.mjs",
+      "sha256": "b72a5674fb521d1bb5885c698da9e2dca53ddb4dcd0dc92c2a1e729f71f88dbc"
+    },
+    {
+      "file": "tests/membership-upgrade-frontend.test.mjs",
+      "sha256": "e183b2aa4efd89a2ed7d3ce237685d81f94ebe94c891a78fcb57b73d5d3fa4d5"
+    },
+    {
+      "file": "tests/query-alternatives-frontend.test.mjs",
+      "sha256": "4ecbeae681f03718b0b3269f96d5ce018cfc52d7aba26e674cdf121ed1b47aad"
+    },
+    {
+      "file": "tools/ui-preview/build.mjs",
+      "sha256": "47a57a7c3523379f3bfbd8ec9ef9432381c546a45042a3e045dfd6e0c32c1ab4"
+    },
+    {
+      "file": "tools/ui-preview/check-layout.mjs",
+      "sha256": "9106470b87032f8a0b6a60585861f67f45f4ae7c5f8aa2eb00ec99d2c2cee603"
+    }
+  ]
+}

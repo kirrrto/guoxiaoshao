@@ -78,15 +78,15 @@ test('native permission is never reentered or counted before WeChat has answered
   assert.equal(page.data.subscribing, false);
 });
 
-test('first successful top-up keeps the authorization card in the same position for continued taps', async () => {
+test('first successful top-up keeps the shared panel open for continued explicit taps', async () => {
   const rt = runtime(async () => response(1, 1)), page = pageFor(rt, boot(0, 0));
   assert.equal(page.data.readiness.ready, false);
+  page.onOpenAuthorizationPanel();
   await page.onSubscribe(); await settle();
   assert.equal(page.data.readiness.ready, true);
-  assert.equal(page.data.authorizationSession, true);
-  assert.equal(page.data.authorizationPanelFirst, true);
+  assert.equal(page.data.authorizationOpen, true);
   await page.onSubscribe(); await settle();
-  assert.equal(page.data.authorizationPanelFirst, true);
+  assert.equal(page.data.authorizationOpen, true);
 });
 
 test('a failed sync has an independent retry that retains the request identity and never reopens permission', async () => {

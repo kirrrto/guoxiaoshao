@@ -16,7 +16,75 @@ function setup(kind) {
   return { rt, page, catalog, original, changed };
 }
 
+function openRealPicker(kind) {
+  const fixture = setup(kind), { rt, page, catalog } = fixture;
+  const product = catalog.products.find(product => product.model === 'iPhone 17' && product.attributes.capacity === '256GB' && product.attributes.color === '白色');
+  assert.ok(product, 'the bundled real catalog must contain the starting iPhone 17 configuration');
+  const original = { partNumber: product.partNumber, product, storeNumbers: ['R765'], stores: [catalog.storeByNumber.R765] };
+  page.onPickerChange({ detail: original });
+  const snapshot = { product, results: [{ storeNumber: 'R765' }] };
+  page.data.result = snapshot;
+  if (kind === 'history') page.historyRequest = { ...original, dayKey: page.data.dayKey };
+  page.onEditSelection();
+  const ticks = [];
+  rt.wx.nextTick = callback => ticks.push(callback);
+  const picker = rt.instance('components/target-picker/index.js', { value: page.data.draftValue, maxStores: 3, storesOptional: kind === 'history' });
+  picker.triggerEvent = (name, detail) => { if (name === 'change') page.onDraftChange({ detail }); };
+  picker.onCatalog(catalog);
+  const sheet = rt.instance('components/config-sheet/index.js', { visible: true, externalClose: true });
+  sheet.triggerEvent = name => {
+    if (name === 'confirm') page.onDoneSelection();
+    else if (name === 'requestclose') page.onRequestCloseSelection();
+    else if (name === 'close') page.onCloseSelection();
+  };
+  page.selectComponent = selector => selector.endsWith('target-picker') ? picker : selector.endsWith('config-sheet') ? sheet : null;
+  const familyIndex = picker.data.families.findIndex(family => family.familyKey === 'iphone-duo');
+  assert.ok(familyIndex >= 0, 'the bundled real catalog must contain iPhone Duo');
+  picker.onFamilyChange({ detail: { value: familyIndex } });
+  return { ...fixture, original, snapshot, picker, sheet, flushPickerEvents() { while (ticks.length) ticks.shift()(); } };
+}
+
 for (const kind of ['query', 'history']) {
+  test(`${kind} switches iPhone 17 to Duo in the real picker and commits with one bottom save`, () => {
+    const { rt, page, catalog, original, snapshot, picker, sheet, flushPickerEvents } = openRealPicker(kind);
+    const draft = picker.getSelection(), product = catalog.productByPart[draft.partNumber];
+    assert.ok(product, 'changing the family must immediately produce a real draft SKU');
+    assert.equal(product.model, 'iPhone Duo');
+    assert.equal(product.attributes.capacity, '256GB', 'retain the still-valid capacity');
+    assert.equal(draft.product.attributes.color, product.attributes.color);
+    assert.deepEqual(copy(draft.storeNumbers), original.storeNumbers);
+    assert.equal(page.selection.partNumber, original.partNumber, 'draft changes do not commit before Save');
+    assert.equal(rt.storage.get(`gxs_${kind}_selection_v1`).partNumber, original.partNumber);
+    sheet.onConfirm();
+    flushPickerEvents();
+    assert.equal(page.data.sheetVisible, false);
+    assert.equal(page.selection.partNumber, draft.partNumber);
+    assert.deepEqual(rt.storage.get(`gxs_${kind}_selection_v1`), { partNumber: draft.partNumber, storeNumbers: original.storeNumbers });
+    assert.equal(page.data.result, snapshot);
+    assert.equal(page.data.resultTargetDifferent, true);
+    assert.equal(rt.calls.length, 0, 'one local save does not query, charge, or create a follow');
+    assert.equal(rt.app.globalData.pendingFollow, null);
+  });
+
+  test(`${kind} cancelling a real iPhone 17 to Duo draft retains the original target and result`, () => {
+    const { rt, page, original, snapshot, picker, sheet, flushPickerEvents } = openRealPicker(kind);
+    assert.equal(picker.getSelection().product.model, 'iPhone Duo');
+    sheet.onCloseTap();
+    assert.equal(page.data.sheetVisible, true);
+    const discard = rt.messages.at(-1);
+    assert.equal(typeof discard.success, 'function', 'a dirty close should use the existing discard dialog');
+    discard.success({ confirm: true });
+    flushPickerEvents();
+    assert.equal(page.data.sheetVisible, false);
+    assert.equal(page.data.draftValue, null);
+    assert.equal(page.selection.partNumber, original.partNumber);
+    assert.deepEqual(copy(page.selection.storeNumbers), original.storeNumbers);
+    assert.deepEqual(rt.storage.get(`gxs_${kind}_selection_v1`), { partNumber: original.partNumber, storeNumbers: original.storeNumbers });
+    assert.equal(page.data.result, snapshot);
+    assert.equal(rt.calls.length, 0);
+    assert.equal(rt.app.globalData.pendingFollow, null);
+  });
+
   test(`${kind} sheet edits and cancelled changes never overwrite the committed selection or call an API`, () => {
     const { rt, page, original, changed } = setup(kind);
     const persisted = copy(rt.storage.get(`gxs_${kind}_selection_v1`));
@@ -188,7 +256,7 @@ for (const kind of ['query', 'history']) {
   });
 }
 
-test('capacity changes explicitly explain an unavailable previous color and resolve only real SKUs', () => {
+test('an explicit capacity change immediately resolves a real default color without a second confirmation', () => {
   const rt = runtime();
   const picker = rt.instance('components/target-picker/index.js', { maxStores: 3 });
   const products = [
@@ -199,7 +267,9 @@ test('capacity changes explicitly explain an unavailable previous color and reso
   picker.onValue({ partNumber: 'EXACT-A', storeNumbers: [] });
   picker.onCapacityTap({ currentTarget: { dataset: { index: 1 } } });
   assert.equal(picker.getSelection().partNumber, 'EXACT-B');
-  assert.match(picker.data.selectionNote, /没有原先的 蓝色.*银色/);
+  assert.equal(picker.getSelection().product.attributes.capacity, '512GB');
+  assert.equal(picker.getSelection().product.attributes.color, '银色');
+  assert.equal(picker.data.selectionNote, '');
 });
 
 test('corrupted saved catalog keys cannot select inherited objects or create unremovable store chips', () => {

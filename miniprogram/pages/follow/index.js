@@ -1,3 +1,5 @@
+const { reminderPanelMethods } = require('../../utils/reminder-panel');
+const { stageHistoryContext } = require('../../utils/journey-context');
 const { productThumbnailUrl } = require('../../utils/product-image-fit');
 const { call, newId, showError, toast } = require('../../utils/api');
 const { getBootstrap, getCatalog, refreshBootstrap, invalidateBootstrap, subscribeCatalog, getFollows, invalidateFollows, subscribeSubscriptions } = require('../../utils/store');
@@ -94,10 +96,25 @@ function presentFollow(follow, boot, catalog, collector) {
   }
   const product = catalog && catalog.productByPart && catalog.productByPart[follow.partNumber];
   const stores = (follow.stores || []).map(s => ({ ...s, storeName: storeLabel(s.storeNumber, s.storeName), storeLabel: storeLabelWithCity(s.storeNumber, s.storeName, s.city), ...fmt.stockObservation(s, now, { restricted: follow.latestRestricted }),
+    ...(Date.parse(s.observedAt) > now ? { observationState: 'unknown', statusLabel: '观测时间待核对', statusCls: 'unknown', freshnessText: '这条观测的时间尚未确认，请刷新后再判断取货状态。' } : {}),
     ...(s.limitPaused ? { statusLabel: follow.limitPaused ? '配置超出套餐名额' : '超出套餐门店上限', statusCls: 'muted',
       freshnessText: follow.limitPaused ? '配置和门店已保留，恢复配置名额后继续检测。' : '门店已保留，当前暂停检测；月卡／年卡可恢复第 4 家门店。' } : {}) }));
+  const color = product && product.attributes && product.attributes.color || '';
+  const title = follow.productTitle || product && product.title || follow.partNumber;
+  const splitColor = color && title.endsWith(color);
+  const usable = stores.filter(store => !store.limitPaused);
+  const availableCount = usable.filter(store => store.observationState === 'fresh' && store.status === 'available').length;
+  const incomplete = !usable.length || usable.some(store => store.observationState !== 'fresh');
+  const observed = usable.map(store => Date.parse(store.observedAt)).filter(stamp => Number.isFinite(stamp) && stamp <= now);
+  const observationAt = observed.length ? Math.min(...observed) : null;
   return {
     ...follow,
+    cardTitle: splitColor ? title.slice(0, -color.length).trim() : title,
+    cardSubtitle: splitColor ? color : '',
+    observationLabel: availableCount ? `${availableCount} 家可取货` : incomplete ? '观测待更新' : '无可取货观测',
+    observationTone: availableCount ? 'ok' : incomplete ? 'warn' : 'muted',
+    observationIncomplete: availableCount > 0 && incomplete,
+    observationTime: observationAt === null ? '等待观测' : fmt.fmtDateTime(observationAt).slice(5, 16),
     imageUrl: product && product.imageUrl || '',
     imageDisplayUrl: productThumbnailUrl(product && product.imageUrl),
     imageAlt: product && product.imageAlt || follow.productTitle,
@@ -154,6 +171,7 @@ function confirmsSavedFollow(follow, payload) {
 }
 
 Page({
+  ...reminderPanelMethods,
   data: {
     ready: false,
     loadError: null,
@@ -180,8 +198,7 @@ Page({
     subscriptionPending: false,
     authorization: { pendingRestock: 0, pendingSoldout: 0, pendingCount: 0, syncing: false, errorMessage: '', storageBlocked: false },
     authorizationFeedback: '',
-    authorizationSession: false,
-    authorizationPanelFirst: false,
+    authorizationOpen: false,
     refreshError: null,
     refreshedText: null,
     alert: null,
@@ -222,6 +239,7 @@ Page({
     if (this.pageRetired) return;
     syncTabBar(this, '/pages/follow/index');
     this.visible = true;
+    this.syncAuthorizationOverlay();
     this.recordAlertOpen();
     this.observeAuthorization();
     this.applyAuthorizationState(getAuthorizationState());
@@ -230,7 +248,11 @@ Page({
     // Preserve the card position and avoid a full follow/account render here.
     const nativeReturn = this.nativePromptHiddenAt && Date.now() - this.nativePromptHiddenAt < 60000;
     this.nativePromptHiddenAt = 0;
-    if (nativeReturn && this.data.ready) { this.startPolling(); return; }
+    if (nativeReturn && this.data.ready && this.isAuthorizationAccountCurrent()) {
+      this.refreshFollowPresentation();
+      this.startPolling();
+      return;
+    }
     if (!this.data.ready) {
       this.consumePending();
       if (this.data.loadError) return this.onRetryLoad();
@@ -250,8 +272,8 @@ Page({
     this.startPolling();
   },
 
-  onHide() { this.nativePromptHiddenAt = getAuthorizationState().nativeBusy ? Date.now() : 0; this.visible = false; this.serviceDetailsFocusEpoch = (this.serviceDetailsFocusEpoch || 0) + 1; this.stopPolling(); },
-  onUnload() { this.pageRetired = true; this.visible = false; this.serviceDetailsFocusEpoch = (this.serviceDetailsFocusEpoch || 0) + 1; this.stopPolling(); if (this.unsubscribeCatalog) this.unsubscribeCatalog(); if (this.unsubscribeCredits) this.unsubscribeCredits(); if (this.unsubscribeAuthorization) this.unsubscribeAuthorization(); },
+  onHide() { this.nativePromptHiddenAt = getAuthorizationState().nativeBusy ? Date.now() : 0; this.visible = false; this.hideAuthorizationOverlay(); this.serviceDetailsFocusEpoch = (this.serviceDetailsFocusEpoch || 0) + 1; this.stopPolling(); },
+  onUnload() { this.disposeAuthorizationPanel(); this.pageRetired = true; this.visible = false; this.serviceDetailsFocusEpoch = (this.serviceDetailsFocusEpoch || 0) + 1; this.stopPolling(); if (this.unsubscribeCatalog) this.unsubscribeCatalog(); if (this.unsubscribeCredits) this.unsubscribeCredits(); if (this.unsubscribeAuthorization) this.unsubscribeAuthorization(); },
 
   onShareAppMessage() {
     return shareAppMessage('/pages/follow/index', this.data);
@@ -428,7 +450,7 @@ Page({
       this.editorEpoch = (this.editorEpoch || 0) + 1;
       this.invalidateFollowRead();
       this.editorSelection = null;
-      this.setData({ follows: [], followsLoaded: false, editing: false, saving: false, activation: null });
+      this.setData({ follows: [], followsLoaded: false, editing: false, saving: false, activation: null, authorizationOpen: false, authorizationFeedback: '' });
     }
     this.accountSnapshot = boot;
     this.features = boot.features || {};
@@ -515,8 +537,10 @@ Page({
     }
     const restored = this.checkoutStore().restore(account.identity, this.catalog);
     this.activationContext = restored.status === 'ready' ? restored.context : null;
-    this.setData({ activation: activationStatus({ member: true, context: this.activationContext, contextStatus: restored.status,
-      follows: this.data.follows, followsLoaded: this.data.followsLoaded, readiness: this.data.readiness }) });
+    const activation = activationStatus({ member: true, context: this.activationContext, contextStatus: restored.status,
+      follows: this.data.follows, followsLoaded: this.data.followsLoaded, readiness: this.data.readiness });
+    // Completed setup yields to the task list; keep unfinished target recovery visible.
+    this.setData({ activation: activation && activation.action !== 'tasks' ? activation : null });
     if (this.visible && this.data.activation && this.activationEventKey !== this.data.activation.title) {
       this.activationEventKey = this.data.activation.title;
       conversion.track('activation_viewed', { entryPoint: 'follow', resultState: this.data.readiness.code });
@@ -736,89 +760,6 @@ Page({
     });
   },
 
-  observeAuthorization() {
-    if (this.pageRetired) return;
-    if (!this.unsubscribeCredits) this.unsubscribeCredits = subscribeSubscriptions(subscriptions => this.applyCredits(subscriptions));
-    if (!this.unsubscribeAuthorization) this.unsubscribeAuthorization = subscribeAuthorizationState(state => this.applyAuthorizationState(state));
-  },
-
-  applyAuthorizationState(state) {
-    if (this.pageRetired) return;
-    const boot = this.data.boot || {}, accepted = state.acceptedByTemplate || {};
-    const authorization = {
-      pendingRestock: accepted[boot.templateIds && boot.templateIds[0]] || 0,
-      pendingSoldout: accepted[boot.soldoutId] || 0,
-      pendingCount: state.pendingCount,
-      syncing: state.syncing,
-      errorMessage: state.storageBlocked ? (state.pendingCount ? '授权暂存在本次运行，存储失败，请重试同步。' : '无法读取本地授权记录，请重试同步后再授权。') : state.error && state.error.message || '',
-      storageBlocked: state.storageBlocked,
-    };
-    const patch = {};
-    if (JSON.stringify(this.data.authorization) !== JSON.stringify(authorization)) patch.authorization = authorization;
-    if (this.data.subscribing !== state.nativeBusy) patch.subscribing = state.nativeBusy;
-    const pendingChanged = this.data.subscriptionPending !== (state.pendingCount > 0);
-    if (pendingChanged) patch.subscriptionPending = state.pendingCount > 0;
-    if (Object.keys(patch).length) this.setData(patch);
-    if (pendingChanged) this.refreshReadiness();
-  },
-
-  resumeAuthorizationSync() {
-    const state = getAuthorizationState();
-    if (this.pageRetired || (!state.pendingCount && !state.storageBlocked)) return;
-    // The queue owns retries and survives page hide/unload; no native prompt.
-    return syncPendingAuthorization().catch(() => {});
-  },
-
-  async onRetryAuthorizationSync() {
-    if (this.pageRetired || this.data.authorization.syncing) return;
-    await this.resumeAuthorizationSync();
-    if (!this.pageRetired && this.visible !== false && !getAuthorizationState().pendingCount && !getAuthorizationState().error) this.setData({ authorizationFeedback: '已有授权已同步，未重复申请微信授权' });
-  },
-
-  async onSubscribe() {
-    if (this.pageRetired || this.data.subscribing) return;
-    if (!this.data.boot) return toast('正在读取账户，请稍后再试');
-    const tmplIds = this.data.boot.requestIds || this.data.boot.templateIds;
-    if (!tmplIds.length) {
-      wx.showModal({ title: '提醒暂未开放', content: this.data.boot.notificationReason || '尚未配置可用的订阅消息模板。可在关注页查看已有观测，页面可见时约每分钟刷新。', showCancel: false });
-      return;
-    }
-    if (!canRemind(this.data.boot)) return this.showMemberModal();
-    this.observeAuthorization();
-    if (this.data.authorization.storageBlocked) return;
-    if (!this.data.authorizationSession) this.setData({ authorizationSession: true, authorizationPanelFirst: this.data.readiness.action === 'subscribe' && !this.data.readiness.ready });
-    try {
-      // Call in the tap stack. Only WeChat's response blocks the next tap;
-      // persistence and server reconciliation continue in the shared queue.
-      const result = await requestReminderAuthorization(tmplIds, { deferSync: true });
-      if (this.pageRetired || this.visible === false) return;
-      const accepted = result.accepted || [], filtered = result.filtered || [];
-      const outcome = (label, id) => accepted.includes(id) ? label + ' +1' : filtered.includes(id) ? label + '模板被过滤' : result.results && result.results[id] === 'ban' ? label + '授权已关闭' : label + '未授权';
-      let feedback;
-      if (!Object.keys(result.results || {}).length) feedback = filtered.length ? '提醒模板被微信过滤，已有次数保留' : '本次未授权，已有次数保留';
-      else if (this.data.boot.soldoutId) feedback = (accepted.length ? '微信已允许：' : '') + outcome('到货', tmplIds[0]) + '，' + outcome('断货', this.data.boot.soldoutId);
-      else feedback = accepted.length ? '微信已允许到货 +1，可继续点击增加' : result.results[tmplIds[0]] === 'ban' ? '微信授权已关闭，本次未增加' : '本次未授权，次数未增加';
-      this.setData({ authorizationFeedback: feedback });
-      if (accepted.length) confirmTap();
-    } catch (error) {
-      if (this.pageRetired || this.visible === false || error && error.code === 'subscription_busy') return;
-      const message = error && (error.errMsg || error.message) || '';
-      const feedback = /20004/.test(message) ? '你已关闭订阅消息总开关，请在设置中开启'
-        : error && ['subscription_storage_failed', 'subscription_queue_full', 'subscription_identity_required'].includes(error.code) ? message : '授权未完成，已有次数保留';
-      this.setData({ authorizationFeedback: feedback });
-    }
-  },
-
-  applyCredits(subscriptions) {
-    if (this.pageRetired || !this.data.boot || !this.data.boot.templateIds.length) return;
-    const credits = restockSubscription({ templateIds: { restock: this.data.boot.templateIds[0] } }, subscriptions).credits;
-    const soldoutCredits = soldoutSubscription({ templateIds: { soldout: this.data.boot.soldoutId } }, subscriptions).credits;
-    if (credits !== this.data.subscription.credits || soldoutCredits !== this.data.subscription.soldoutCredits) {
-      this.setData({ 'subscription.credits': credits, 'subscription.soldoutCredits': soldoutCredits });
-      this.refreshReadiness();
-    }
-  },
-
   async onToggle(e) {
     if (this.toggling || this.pageRetired || this.data.saving || this.data.followBusyId) return;
     if (!canRemind(this.data.boot)) { this.showMemberModal(); return; }
@@ -910,6 +851,17 @@ Page({
     } });
   },
 
+  onViewHistory(e) {
+    const follow = this.data.follows.find(item => item.followId === e.currentTarget.dataset.id);
+    if (this.pageRetired || !follow) return;
+    if (!stageHistoryContext({ from: 'follow', target: { partNumber: follow.partNumber, storeNumbers: follow.stores.map(store => store.storeNumber) } })) return toast('请刷新账户后再查看历史');
+    wx.switchTab({ url: '/pages/history/index' });
+  },
+  onManageReminders() {
+    getApp().globalData.pendingMineSection = 'reminder-center';
+    this.onGoMine();
+  },
+  onTestNotification() { wx.navigateTo({ url: '/pages/notification-test/index?from=follow' }); },
   onGoMine() {
     wx.switchTab({ url: '/pages/mine/index' });
   },

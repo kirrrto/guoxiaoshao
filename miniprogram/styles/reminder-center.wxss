@@ -1,0 +1,9 @@
+.reminder-balances { display:flex; gap:16rpx; margin:16rpx 0 20rpx; }
+.reminder-balance { flex:1; min-width:0; display:flex; flex-direction:column; gap:6rpx; padding:18rpx; border-radius:18rpx; background:var(--surface-soft); }
+.reminder-balance-label,.reminder-balance-pending { font-size:26rpx; color:var(--text-2); line-height:1.5; overflow-wrap:anywhere; }
+.reminder-balance-value { font-size:36rpx; color:var(--green-dark); font-weight:650; line-height:1.5; overflow-wrap:anywhere; }
+.authorization-feedback,.authorization-hint { margin-top:16rpx; font-size:26rpx; line-height:1.65; color:var(--text-2); }
+.authorization-feedback { color:var(--green-dark); }
+.authorization-sync-error { display:flex; gap:12rpx; align-items:center; flex-wrap:wrap; padding:16rpx; margin-top:16rpx; border-radius:16rpx; background:var(--warn-soft); color:var(--warn); font-size:26rpx; line-height:1.6; }
+.authorization-sync-error > text { flex:1 1 240rpx; min-width:0; overflow-wrap:anywhere; }
+.authorization-panel .btn { min-height:48px; white-space:normal; line-height:1.5; }

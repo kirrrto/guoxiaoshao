@@ -174,6 +174,45 @@ try {
     });
     Object.assign(metrics, await page.evaluate(inspectMembershipLayout, item.expectedMembership || null));
     Object.assign(metrics, await page.evaluate(inspectNotificationLayout, item.expectedNotification || null));
+    metrics.calendarLayoutErrors.push(...await page.evaluate(expectedLaunchPoster => {
+      const errors = [], entry = document.querySelector('.query-guide-entry'), selection = document.querySelector('.selection-card');
+      if (entry && selection && entry.getBoundingClientRect().bottom > selection.getBoundingClientRect().top + 1) errors.push('Calendar entry must precede the query selection card');
+      if (expectedLaunchPoster !== undefined) {
+        const posters = [...document.querySelectorAll('.guide-launch')], steps = document.querySelector('.guide-steps');
+        if (expectedLaunchPoster !== Boolean(posters.length)) errors.push('Guide shows the wrong poster mode for its entry');
+        if (expectedLaunchPoster && (!steps || posters.some(poster => poster.getBoundingClientRect().bottom > steps.getBoundingClientRect().top))) errors.push('Buying guide must follow the poster in the same page');
+      }
+      return errors;
+    }, item.expectedLaunchPoster));
+    metrics.v3LayoutErrors = [];
+    if (item.scenario.startsWith('v3-')) {
+      metrics.v3LayoutErrors = await page.evaluate(({ scenario, expectedDndPeriodCount }) => {
+        const errors = [];
+        if (expectedDndPeriodCount !== undefined) {
+          const periods = [...document.querySelectorAll('.dnd-period')];
+          if (periods.length !== expectedDndPeriodCount) errors.push(`Expected ${expectedDndPeriodCount} DND periods, received ${periods.length}`);
+          if (periods.some(period => period.querySelectorAll('.dnd-time').length !== 2)) errors.push('Each DND period must retain both time controls');
+          const add = [...document.querySelectorAll('button')].find(button => button.textContent.includes('新增免打扰时段'));
+          if (!add || add.disabled !== (expectedDndPeriodCount === 8)) errors.push('DND add action does not enforce the displayed maximum');
+        }
+        if (scenario.startsWith('v3-authorization-')) {
+          const panel = document.querySelector('.reminder-status-strip') || document.querySelector('.reminder-card');
+          const buttons = panel?.querySelectorAll('button[data-preview-action="onSubscribe"]') || [];
+          const button = buttons[0];
+          if (buttons.length !== 1) errors.push('The page must retain exactly one direct authorization action');
+          if (document.querySelector('.authorization-panel') || document.querySelector('.config-sheet-panel')) errors.push('Direct authorization must not open a second-level sheet');
+          if (!panel || !button) errors.push('Inline reminder center or direct action is missing');
+          else {
+            const action = button.getBoundingClientRect(), bounds = panel.getBoundingClientRect();
+            if (action.width < 44 || action.height < 44) errors.push('Authorization action is smaller than a 44px touch target');
+            if (action.left < bounds.left || action.right > bounds.right + 1 || action.top < bounds.top || action.bottom > bounds.bottom + 1) errors.push('Authorization action falls outside its inline card');
+            if (!/到货[\s\S]*断货/.test(panel.textContent)) errors.push('The reminder card must distinguish both reminder types');
+            if (scenario.endsWith('-sync-error') && panel.querySelectorAll('button[data-preview-action="onRetryAuthorizationSync"]').length !== 1) errors.push('Pending grants need an independent inline sync retry');
+          }
+        }
+        return errors;
+      }, { scenario: item.scenario, expectedDndPeriodCount: item.expectedDndPeriodCount });
+    }
     const bodyText = await page.locator('body').innerText();
     const missingText = (item.expectedText || []).filter(text => !bodyText.replace(/\s+/g, '').includes(text.replace(/\s+/g, '')));
     const forbiddenTextFound = (item.forbiddenText || []).filter(text => bodyText.replace(/\s+/g, '').includes(text.replace(/\s+/g, '')));
@@ -221,7 +260,7 @@ try {
     }
     const representative = item.width === 375 && ['member', 'free'].includes(item.scenario) || item.scenario.startsWith('sheet-') || item.width === 320 && ['longcontent', 'history-longcontent', 'history-balance-cap', 'operator-longcontent'].includes(item.scenario) || item.width === 375 && ['mine', 'follow'].includes(item.page) && item.scenario === 'expired' || item.width === 430 && item.page === 'query' && item.scenario === 'member' || item.width === 375 && item.scenario.startsWith('monitor-') || item.width === 375 && item.scenario.startsWith('history-') && (item.page === 'history' || item.scenario === 'history-free-first');
     if (representative || item.scenario.startsWith('onboarding-') && item.width === 375 || /^(?:payment|notification-test|alternatives|orders|nudge)-/.test(item.scenario)) { const name = item.file.replace('.html', '.png'); await page.screenshot({ path: path.join(screenshots, name), fullPage: true }); record.screenshot = name; }
-    if (item.scenario.startsWith('v2-') && (item.width === 375 || [320, 1024].includes(item.width) && (item.page === 'guide' || item.scenario.startsWith('v2-promotion-') || item.scenario === 'v2-calendar-modal') || item.width === 320 && ['v2-longcontent', 'v2-context-checkout'].includes(item.scenario) || item.width === 1024 && ['v2-member', 'v2-context-checkout'].includes(item.scenario))) {
+    if (item.scenario.startsWith('v3-') && [320, 375].includes(item.width) || item.scenario.startsWith('v2-') && (item.width === 375 || [320, 1024].includes(item.width) && (item.page === 'guide' || item.scenario.startsWith('v2-promotion-') || item.scenario === 'v2-calendar-modal') || item.width === 320 && ['v2-longcontent', 'v2-context-checkout'].includes(item.scenario) || item.width === 1024 && ['v2-member', 'v2-context-checkout'].includes(item.scenario))) {
       const name = item.file.replace('.html', '.png');
       await page.screenshot({ path: path.join(screenshots, name), fullPage: true }); record.screenshot = name;
       const firstScreen = item.file.replace('.html', '-first-screen.png');
@@ -236,6 +275,11 @@ try {
         await page.locator('.membership-shop').evaluate(element => window.scrollTo(0, window.scrollY + element.getBoundingClientRect().top - 100));
         await page.locator('.membership-shop').screenshot({ path: path.join(screenshots, offerScreenshot) }); record.offerScreenshot = offerScreenshot;
       }
+    }
+    if (item.scenario === 'v3-dnd-two' && item.width === 375) {
+      const name = item.file.replace('.html', '-reminders.png');
+      await page.locator('.reminder-card').screenshot({ path: path.join(screenshots, name) });
+      record.remindersScreenshot = name;
     }
     if (item.scenario === 'alternatives-premium' || item.scenario === 'alternatives-free' && item.width === 320) {
       const panel = page.locator('.alternative-panel'), panelBounds = await panel.boundingBox();
@@ -262,8 +306,8 @@ try {
   }
 } finally { await context.close(); await browser.close(); }
 verifyPreviewSources();
-report.summary = { total: report.snapshots.length, indexNavigationFailures: report.indexNavigation.invalidTargets.length + report.indexNavigation.missingTargets.length, expressionErrors: manifest.expressionErrors || 0, missingText: report.snapshots.filter(x => x.missingText.length).length, forbiddenText: report.snapshots.filter(x => x.forbiddenTextFound.length).length, horizontalOverflow: report.snapshots.filter(x => x.scrollWidth > x.width + 1 || x.overflow.length).length, clippedText: report.snapshots.filter(x => x.clippedText.length).length, failedImages: report.snapshots.flatMap(x => x.images).filter(x => !x.loaded).length, alternativeLayoutFailures: report.snapshots.filter(x => x.alternativeLayoutErrors.length).length, calendarLayoutFailures: report.snapshots.filter(x => x.calendarLayoutErrors.length).length, membershipLayoutFailures: report.snapshots.filter(x => x.membershipLayoutErrors.length).length, notificationLayoutFailures: report.snapshots.filter(x => x.notificationLayoutErrors.length).length };
+report.summary = { total: report.snapshots.length, indexNavigationFailures: report.indexNavigation.invalidTargets.length + report.indexNavigation.missingTargets.length, expressionErrors: manifest.expressionErrors || 0, missingText: report.snapshots.filter(x => x.missingText.length).length, forbiddenText: report.snapshots.filter(x => x.forbiddenTextFound.length).length, horizontalOverflow: report.snapshots.filter(x => x.scrollWidth > x.width + 1 || x.overflow.length).length, clippedText: report.snapshots.filter(x => x.clippedText.length).length, failedImages: report.snapshots.flatMap(x => x.images).filter(x => !x.loaded).length, alternativeLayoutFailures: report.snapshots.filter(x => x.alternativeLayoutErrors.length).length, calendarLayoutFailures: report.snapshots.filter(x => x.calendarLayoutErrors.length).length, membershipLayoutFailures: report.snapshots.filter(x => x.membershipLayoutErrors.length).length, notificationLayoutFailures: report.snapshots.filter(x => x.notificationLayoutErrors.length).length, v3LayoutFailures: report.snapshots.filter(x => x.v3LayoutErrors.length).length };
 const reportBase = membershipFontPreview ? 'membership-font-metrics' : notificationFontPreview ? 'notification-font-metrics' : 'layout-metrics';
 fs.writeFileSync(path.join(directory, `${reportBase}${colorScheme === 'dark' ? '-dark' : ''}.json`), JSON.stringify(report, null, 2));
 console.log(JSON.stringify(report.summary));
-if (report.summary.indexNavigationFailures || report.summary.expressionErrors || report.summary.missingText || report.summary.forbiddenText || report.summary.horizontalOverflow || report.summary.clippedText || report.summary.failedImages || report.summary.alternativeLayoutFailures || report.summary.calendarLayoutFailures || report.summary.membershipLayoutFailures || report.summary.notificationLayoutFailures) process.exitCode = 1;
+if (report.summary.indexNavigationFailures || report.summary.expressionErrors || report.summary.missingText || report.summary.forbiddenText || report.summary.horizontalOverflow || report.summary.clippedText || report.summary.failedImages || report.summary.alternativeLayoutFailures || report.summary.calendarLayoutFailures || report.summary.membershipLayoutFailures || report.summary.notificationLayoutFailures || report.summary.v3LayoutFailures) process.exitCode = 1;

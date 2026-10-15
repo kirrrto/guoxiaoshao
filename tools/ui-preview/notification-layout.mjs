@@ -57,7 +57,8 @@ export function inspectNotificationLayout(expected = null) {
   if (!expectFeedback && feedback.length) errors.push('Feedback is shown before a potentially sent message');
   const needsCheck = Boolean(expected.status || expected.error || !expected.ready || expected.canContinue || expected.pendingOther);
   if (action('onCheck').length !== (needsCheck ? 1 : 0)) errors.push('Original-result recovery control count does not match the current state');
-  if ((expected.feedback === 'received' || expected.ready && expected.balance < 1 && !expected.blocked && !expected.canContinue && !expected.pendingOther) && !action('onGoMine').length) errors.push('Return-to-membership control is missing');
+  if (action('onReturnTask').length !== 1) errors.push('A unique return-to-original-task control is required');
+  if (expected.ready && expected.balance < 1 && !expected.blocked && !expected.canContinue && !expected.pendingOther && !action('onGoMine').length) errors.push('Quota/signin recovery control is missing');
   if (expected.status && !visible(root.querySelector('.test-status-heading'))) errors.push('Current test result is missing');
   if (feedback.some(element => element.disabled !== Boolean(expected.busy || expected.loading))) errors.push('Feedback is incorrectly disabled by the unresolved result');
   if (Boolean(expected.showTestRules) !== visible(root.querySelector('.test-rules'))) errors.push('Rules disclosure does not match its expanded state');

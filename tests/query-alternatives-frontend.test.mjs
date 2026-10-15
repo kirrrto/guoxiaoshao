@@ -6,6 +6,17 @@ import { userKeyOf } from './helpers/fixture.mjs';
 const copy = value => JSON.parse(JSON.stringify(value));
 const event = (kind, value) => ({ currentTarget: { dataset: { kind, value } } });
 const deferred = () => { let resolve; const promise = new Promise(done => { resolve = done; }); return { promise, resolve }; };
+const crossCityStores = [
+  { _id: 'R765', storeNumber: 'R765', name: '合肥测试门店', city: '合肥', province: '安徽' },
+  { _id: 'R320', storeNumber: 'R320', name: '北京测试门店', city: '北京', province: '北京' },
+  { _id: 'R578', storeNumber: 'R578', name: '北京测试门店二', city: '北京', province: '北京' },
+  { _id: 'R577', storeNumber: 'R577', name: '广州测试门店', city: '广州', province: '广东' },
+];
+const chooseCity = (page, city) => {
+  const index = page.data.alternativeCityNames.indexOf(city);
+  assert.ok(index >= 0, `${city} must be present in the catalog city selector`);
+  page.onAlternativeCityChange({ detail: { value: String(index) } });
+};
 
 test('monthly limits reach actual four-color/four-store selection and observation results; a downgrade trims only the unsaved alternative draft', async t => {
   const { f, rt, page } = await queried(t, null, { member: true });
@@ -35,7 +46,8 @@ test('monthly limits reach actual four-color/four-store selection and observatio
   page.onUnload();
 });
 async function queried(t, intercept, fixtureOptions = {}) {
-  const f = await alternativesFixture({ query: false, ...fixtureOptions });
+  const { originalStores = ['R577'], ...options } = fixtureOptions;
+  const f = await alternativesFixture({ query: false, ...options });
   t.mock.method(Date, 'now', () => f.state.now.getTime());
   const rt = runtime(async (action, payload) => {
     const response = ok(await f.call(action, payload));
@@ -44,7 +56,7 @@ async function queried(t, intercept, fixtureOptions = {}) {
   const page = rt.instance('pages/query/index.js'); await page.onLoad();
   page.applyCatalog(await rt.load('utils/store.js').getCatalog({ force: true }));
   await page.onShow();
-  page.onPickerChange({ detail: { partNumber: BASE, product: page.catalog.productByPart[BASE], storeNumbers: ['R577'], stores: [page.catalog.storeByNumber.R577] } });
+  page.onPickerChange({ detail: { partNumber: BASE, product: page.catalog.productByPart[BASE], storeNumbers: originalStores, stores: originalStores.map(number => page.catalog.storeByNumber[number]) } });
   await page.onQuery(); await f.observe();
   return { f, rt, page };
 }
@@ -58,7 +70,9 @@ async function match(t, intercept) {
 test('actual page explicitly selects a different acceptable color and a store outside the original query without side effects', async t => {
   const { f, rt, page } = await queried(t);
   assert.deepEqual(copy(page.data.alternativeColorChoices.map(item => item.partNumber)), [BASE, SILVER, BLACK]);
-  assert.deepEqual(copy(page.data.alternativeStoreChoices.map(item => item.storeNumber)), ['R577', 'R578', 'R579', 'R580']);
+  assert.deepEqual(copy(page.data.alternativeStoreChoices.map(item => item.storeNumber)), ['R577', 'R578', 'R579', 'R580', 'R320', 'R581']);
+  assert.deepEqual(copy(page.data.alternativeStoreChoices.map(item => item.observationEligible)), [true, true, true, true, false, false]);
+  assert.ok(page.data.alternativeStoreChoices.every(item => item.city && item.province));
   assert.match(page.data.alternativeStoreChoices[1].relationText, /同城门店/);
   assert.deepEqual(copy(page.data.alternativeParts), []); assert.deepEqual(copy(page.data.alternativeStores), ['R577']);
   const before = tablesSnapshot(f.repo), calls = f.fetchImpl.calls.length, target = copy(page.selection);
@@ -75,6 +89,145 @@ test('actual page explicitly selects a different acceptable color and a store ou
   assert.equal(tablesSnapshot(f.repo), before); assert.equal(f.fetchImpl.calls.length, calls);
   assert.equal(rt.calls.filter(call => call.action === 'query.alternatives').length, 2);
   assert.equal(rt.calls.filter(call => call.action === 'query.pickup').length, 1);
+  page.onUnload();
+});
+
+test('a single-store Hefei origin can select Beijing and return without querying, charging, following or changing the original result', async t => {
+  const { f, rt, page } = await queried(t, null, { storeCatalog: crossCityStores, originalStores: ['R765'] });
+  assert.equal(page.data.alternativeCity, '合肥');
+  assert.deepEqual(copy(page.data.alternativeVisibleStores.map(item => item.storeNumber)), ['R765']);
+  assert.deepEqual(copy(page.data.alternativeCityNames), ['北京', '广州', '合肥']);
+  const before = tablesSnapshot(f.repo), calls = rt.calls.length, samples = f.fetchImpl.calls.length;
+  const target = copy(page.selection), result = copy(page.data.result), snapshot = copy(page.querySnapshot), balance = page.data.boot.balance;
+  page.onToggleAlternative(event('part', SILVER));
+  chooseCity(page, '北京');
+  assert.deepEqual(copy(page.data.alternativeVisibleStores.map(item => item.storeNumber)), ['R320', 'R578']);
+  page.onToggleAlternative(event('store', 'R320'));
+  assert.deepEqual(copy(page.data.alternativeStores), ['R765', 'R320']);
+  assert.equal(page.data.alternativeObservationOutOfScope, true);
+  assert.equal(page.data.alternativeCanRead, false);
+  chooseCity(page, '合肥');
+  assert.deepEqual(copy(page.data.alternativeVisibleStores.map(item => item.storeNumber)), ['R765']);
+  assert.deepEqual(copy(page.data.alternativeStores), ['R765', 'R320']);
+  assert.deepEqual(copy(page.data.alternativeSelectedStores.map(item => item.storeNumber)), ['R765', 'R320']);
+  assert.equal(page.data.alternativeSelectedStores.find(item => item.storeNumber === 'R320').city, '北京');
+  assert.deepEqual(copy(page.selection), target);
+  assert.deepEqual(copy(page.data.result), result);
+  assert.deepEqual(copy(page.querySnapshot), snapshot);
+  assert.equal(page.data.boot.balance, balance);
+  assert.equal(tablesSnapshot(f.repo), before);
+  assert.equal(rt.calls.length, calls);
+  assert.equal(f.fetchImpl.calls.length, samples);
+  assert.equal(rt.calls.filter(call => call.action === 'follow.upsert').length, 0);
+  page.onUnload();
+});
+
+test('a cross-city selection blocks the entire recent-record read locally and its selected chip remains removable from another city', async t => {
+  const { f, rt, page } = await queried(t, null, { storeCatalog: crossCityStores, originalStores: ['R765'] });
+  page.onToggleAlternative(event('part', SILVER));
+  chooseCity(page, '北京'); page.onToggleAlternative(event('store', 'R320'));
+  chooseCity(page, '合肥');
+  const before = tablesSnapshot(f.repo), calls = rt.calls.length, target = copy(page.selection), result = copy(page.data.result);
+  await page.onReadAlternatives();
+  assert.equal(rt.calls.length, calls, 'must not silently submit only the readable Hefei subset');
+  assert.equal(tablesSnapshot(f.repo), before);
+  assert.match(rt.messages.at(-1), /所选门店不在近期记录范围.*直接查询/);
+  assert.deepEqual(copy(page.data.alternativeStores), ['R765', 'R320']);
+  assert.equal(page.data.alternativeMatches.length, 0);
+  page.onToggleAlternative(event('store', 'R320'));
+  assert.deepEqual(copy(page.data.alternativeStores), ['R765']);
+  assert.deepEqual(copy(page.data.alternativeSelectedStores.map(item => item.storeNumber)), ['R765']);
+  assert.equal(page.data.alternativeObservationOutOfScope, false);
+  assert.equal(page.data.alternativeCanRead, true);
+  assert.equal(rt.calls.length, calls, 'removing an off-screen selected chip must not trigger an automatic read');
+  await page.onReadAlternatives();
+  const read = rt.calls.filter(call => call.action === 'query.alternatives');
+  assert.equal(read.length, 1);
+  assert.deepEqual(copy(read[0].payload.storeNumbers), ['R765']);
+  assert.equal(tablesSnapshot(f.repo), before);
+  assert.deepEqual(copy(page.selection), target);
+  assert.deepEqual(copy(page.data.result), result);
+  page.onUnload();
+});
+
+test('cross-city drafts respect the store limit and a catalog deletion prunes only the vanished draft store', async t => {
+  const { f, rt, page } = await queried(t);
+  const before = tablesSnapshot(f.repo), calls = rt.calls.length, target = copy(page.selection), result = copy(page.data.result);
+  page.onToggleAlternative(event('part', SILVER));
+  chooseCity(page, '北京'); page.onToggleAlternative(event('store', 'R320'));
+  chooseCity(page, '广州'); page.onToggleAlternative(event('store', 'R578'));
+  page.onToggleAlternative(event('store', 'R579'));
+  assert.deepEqual(copy(page.data.alternativeStores), ['R577', 'R320', 'R578']);
+  assert.match(rt.messages.at(-1), /已达到可选数量上限/);
+  chooseCity(page, '北京');
+  const catalog = copy(page.catalog);
+  delete catalog.storeByNumber.R320;
+  catalog.stores = catalog.stores.filter(store => store.storeNumber !== 'R320');
+  catalog.cities = catalog.cities.filter(city => city.city !== '北京');
+  catalog.version = 'removed-cross-city-store';
+  page.applyCatalog(catalog);
+  assert.deepEqual(copy(page.data.alternativeStores), ['R577', 'R578']);
+  assert.deepEqual(copy(page.data.alternativeSelectedStores.map(item => item.storeNumber)), ['R577', 'R578']);
+  assert.equal(page.data.alternativeStoreChoices.some(store => store.storeNumber === 'R320'), false);
+  assert.equal(page.data.alternativeCity, '广州');
+  assert.equal(page.data.alternativeObservationOutOfScope, false);
+  assert.equal(page.data.alternativeCanRead, true);
+  page.onToggleAlternative(event('store', 'R320'));
+  page.onToggleAlternative(event('store', 'R999'));
+  assert.deepEqual(copy(page.data.alternativeStores), ['R577', 'R578']);
+  assert.deepEqual(copy(page.selection), target);
+  assert.deepEqual(copy(page.data.result), result);
+  assert.equal(tablesSnapshot(f.repo), before);
+  assert.equal(rt.calls.length, calls);
+  page.onUnload();
+});
+
+test('national catalog visibility never authenticates forged out-of-scope recent records, including same-city stores beyond the existing scope', async t => {
+  const { f, rt, page } = await queried(t);
+  const alternatives = rt.load('utils/query-alternatives.js');
+  const options = alternatives.options(page.querySnapshot, page.catalog, page.verifiedAccount());
+  assert.deepEqual(copy(options.readableStores.map(item => item.storeNumber)), ['R577', 'R578', 'R579', 'R580']);
+  const response = { queryId: page.querySnapshot.queryId, basePartNumber: BASE, partNumbers: [SILVER], storeNumbers: ['R578', 'R320', 'R581'],
+    readAt: f.state.now.toISOString(), expiresAt: page.querySnapshot.alternativesExpiresAt,
+    results: ['R578', 'R320', 'R581'].map(storeNumber => ({ partNumber: SILVER, storeNumber, status: 'available',
+      observedAt: f.state.now.toISOString(), expiresAt: page.querySnapshot.alternativesExpiresAt })) };
+  assert.deepEqual(copy(alternatives.matches(response, page.querySnapshot, page.catalog, page.verifiedAccount()).map(row => row.storeNumber)), ['R578']);
+  page.onToggleAlternative(event('part', SILVER)); page.onToggleAlternative(event('store', 'R578'));
+  page.alternativeResponse = response; page.refreshAlternativeChoices();
+  assert.deepEqual(copy(page.data.alternativeMatches.map(row => row.storeNumber)), ['R578']);
+  const calls = rt.calls.length, before = tablesSnapshot(f.repo);
+  page.setData({ accountReady: false }); page.refreshAlternativeChoices();
+  assert.equal(page.data.alternativeCanRead, false);
+  assert.equal(page.data.alternativeMatches.length, 0);
+  await page.onReadAlternatives();
+  assert.equal(rt.calls.length, calls);
+  assert.equal(tablesSnapshot(f.repo), before);
+  page.onUnload();
+});
+
+for (const member of [false, true]) test(`an explicit cross-city query submits every selected store and preserves ${member ? 'member no-debit' : 'one-credit-per-query'} rules`, async t => {
+  const { f, rt, page } = await queried(t, null, { member, storeCatalog: crossCityStores, originalStores: ['R765'] });
+  const balance = page.data.boot.balance;
+  page.onToggleAlternative(event('part', SILVER));
+  chooseCity(page, '北京'); page.onToggleAlternative(event('store', 'R320'));
+  assert.equal(rt.calls.filter(call => call.action === 'query.pickup').length, 1);
+  assert.equal(f.fetchImpl.calls.length, 1);
+  assert.equal(page.data.alternativeCanRead, false);
+  await page.onQueryAlternative({ currentTarget: { dataset: { part: SILVER } } });
+  const queries = rt.calls.filter(call => call.action === 'query.pickup');
+  assert.equal(queries.length, 2);
+  assert.equal(queries[1].payload.partNumber, SILVER);
+  assert.deepEqual(copy(queries[1].payload.storeNumbers), ['R765', 'R320']);
+  assert.deepEqual(f.fetchImpl.calls.slice(1).map(call => call.storeNumber), ['R765', 'R320']);
+  assert.ok(f.fetchImpl.calls.slice(1).every(call => call.parts.length === 1 && call.parts[0] === SILVER));
+  assert.equal(page.data.result.ok, true);
+  assert.equal(page.data.result.product.partNumber, SILVER);
+  assert.deepEqual(copy(page.querySnapshot.results.map(row => row.storeNumber)), ['R765', 'R320']);
+  assert.equal(page.querySnapshot.charged, member ? 0 : 1);
+  assert.equal(page.data.boot.balance, balance - (member ? 0 : 1));
+  assert.equal((await f.repo.getUser(userKeyOf())).quota.balance, balance - (member ? 0 : 1));
+  assert.equal(rt.calls.filter(call => call.action === 'query.alternatives').length, 0);
+  assert.equal(rt.calls.filter(call => call.action === 'follow.upsert').length, 0);
   page.onUnload();
 });
 

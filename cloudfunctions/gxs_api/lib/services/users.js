@@ -8,6 +8,7 @@ const { maskOpenid } = require('../identity');
 const { monitoringSnapshot } = require('../monitor-readiness');
 const { paymentProduct, paymentProducts } = require('../payment/service');
 const { runtimeFor } = require('../growth-policy');
+const { validateDndPeriods, MAX_DND_PERIODS } = require('../rules/dnd');
 
 function newUser(identity, nowIso) {
   return {
@@ -142,11 +143,16 @@ async function bootstrap(ctx) {
 async function updateSettings(ctx, payload) {
   const user = await ensureUser(ctx);
   const patch = {};
-  if (payload.dnd && typeof payload.dnd === 'object') {
-    const { enabled, startMinute, endMinute } = payload.dnd;
-    const valid = m => Number.isInteger(m) && m >= 0 && m < 24 * 60;
-    if (!valid(startMinute) || !valid(endMinute)) throw new ApiError('invalid_dnd', '免打扰时间无效');
-    patch.dnd = { enabled: Boolean(enabled), startMinute, endMinute };
+  if (Object.prototype.hasOwnProperty.call(payload, 'dnd')) {
+    const dnd = payload.dnd;
+    if (!dnd || typeof dnd !== 'object' || Array.isArray(dnd)) throw new ApiError('invalid_dnd', '免打扰时间无效');
+    const hasPeriods = Object.prototype.hasOwnProperty.call(dnd, 'periods');
+    const periods = hasPeriods ? dnd.periods : [{ startMinute: dnd.startMinute, endMinute: dnd.endMinute }];
+    if (!validateDndPeriods(periods)) throw new ApiError('invalid_dnd', `请设置 1–${MAX_DND_PERIODS} 个有效免打扰时段`);
+    const clean = periods.map(({ startMinute, endMinute }) => ({ startMinute, endMinute }));
+    // Keep the first interval mirrored for old clients. Legacy single-period
+    // writes keep their original shape; the transaction guards newer schedules.
+    patch.dnd = { enabled: Boolean(dnd.enabled), ...clean[0], ...(hasPeriods ? { periods: clean } : {}) };
   }
   if (typeof payload.notifyEnabled === 'boolean') patch.notifyEnabled = payload.notifyEnabled;
   const settings = await ctx.repo.updateUserSettings(user._id, patch);

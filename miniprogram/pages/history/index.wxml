@@ -8,7 +8,7 @@
   </view>
 
   <block wx:elif="{{!ready}}">
-    <view class="page-heading"><view class="page-title">供应变化历史</view><view class="page-subtitle">按配置、日期与门店查看已有观测记录</view></view>
+    <view class="page-heading history-heading"><view><view class="page-title">供应历史</view><view class="page-subtitle">近 10 天 · 北京时间</view></view></view>
     <view class="skeleton" aria-busy="true">
       <view class="skeleton-card"><view class="skeleton-line skeleton-title"></view><view class="skeleton-line"></view><view class="skeleton-line skeleton-short"></view><view class="skeleton-bar"></view></view>
       <view class="skeleton-card"><view class="skeleton-line skeleton-title"></view><view class="skeleton-line"></view><view class="skeleton-line skeleton-short"></view></view>
@@ -18,69 +18,66 @@
 
   <block wx:else>
     <view wx:if="{{!accountReady}}" class="banner banner-info small">{{accountError || '正在连接微信账户，你可以先选择查询条件。'}}<button wx:if="{{accountError}}" class="btn btn-outline btn-sm mt" bindtap="onRetryAccount">重试账户连接</button></view>
-    <view class="page-heading"><view class="page-title">供应变化历史</view><view class="page-subtitle">按配置、日期与门店查看已有观测记录</view></view>
+    <view class="page-heading history-heading"><view><view class="page-title">供应历史</view><view class="page-subtitle">近 10 天 · 北京时间</view></view><button class="ui-action ui-action--neutral history-explain" hover-class="ui-control-pressed" bindtap="onExplain"><image class="ui-icon" src="/images/ui/info.png" mode="aspectFit" aria-hidden="true" /><text class="ui-action-label">数据说明</text></button></view>
     <view class="card history-selection-card">
-      <view class="card-title">
-        <text>查询条件</text>
-        <button class="ui-action ui-action--neutral history-explain" hover-class="ui-control-pressed" bindtap="onExplain"><text class="ui-action-label">数据说明</text><view class="ui-chevron" aria-hidden="true"></view></button>
-      </view>
       <view wx:if="{{selectionSummary}}" class="history-config-summary">
-        <view class="history-config-copy"><view class="history-config-title">{{selectionSummary.title}}</view><view class="small text-2 mt">{{selectionSummary.scopeText}}</view></view>
+        <view class="history-product-media"><image wx:if="{{selectionSummary.imageUrl && selectionSummary.imageUrl !== failedSelectionImageUrl}}" class="history-product-image" src="{{selectionSummary.imageUrl}}" mode="aspectFit" data-src="{{selectionSummary.imageUrl}}" binderror="onSelectionImageError" aria-label="{{selectionSummary.title}}" /><image wx:else class="history-product-placeholder" src="/images/ui/device.png" mode="aspectFit" aria-hidden="true" /></view>
+        <view class="history-config-copy"><view class="history-config-title">{{selectionSummary.title}}</view></view>
         <button class="ui-action history-edit" hover-class="ui-control-pressed" disabled="{{querying || loadingMore}}" bindtap="onEditSelection"><text class="ui-action-label">修改</text><view class="ui-chevron" aria-hidden="true"></view></button>
       </view>
+      <view wx:if="{{selectionSummary}}" class="history-store-scope"><image class="ui-icon" src="/images/ui/store.png" mode="aspectFit" aria-hidden="true" /><text>{{selectionSummary.scopeText}}</text></view>
       <view wx:else class="history-config-empty"><view class="small text-2">选一个配置，查看已积累的供应变化。</view><button class="ui-action ui-action--block mt" hover-class="ui-control-pressed" bindtap="onEditSelection"><text class="ui-action-label">选择配置与门店</text><view class="ui-chevron" aria-hidden="true"></view></button></view>
-      <view wx:if="{{accountReady && !boot.member}}" class="small text-2 mt">受限新品仅可查询昨天及更早记录。</view>
 
-      <picker disabled="{{querying || loadingMore}}" mode="date" value="{{dayKey}}" start="{{earliestDay}}" end="{{today}}" bindchange="onDateChange">
+      <view class="history-date-row" aria-label="选择日期，北京时间">
+        <view class="history-date-shortcuts" aria-label="快捷选择日期">
+          <button class="ui-action history-date-chip {{dayKey === today ? 'history-date-chip--selected' : 'ui-action--neutral'}}" aria-pressed="{{dayKey === today}}" disabled="{{querying || loadingMore}}" bindtap="onQuickDate" data-day="today">今天</button>
+          <button class="ui-action history-date-chip {{dayKey === yesterday ? 'history-date-chip--selected' : 'ui-action--neutral'}}" aria-pressed="{{dayKey === yesterday}}" disabled="{{querying || loadingMore}}" bindtap="onQuickDate" data-day="yesterday">昨天</button>
+        </view>
+      <picker class="history-date-picker" disabled="{{querying || loadingMore}}" mode="date" value="{{dayKey}}" start="{{earliestDay}}" end="{{today}}" bindchange="onDateChange">
         <view class="history-date-control {{querying || loadingMore ? 'history-date-control--disabled' : ''}}" hover-class="ui-control-pressed" role="button" aria-label="选择日期，当前{{dayKey}}" aria-disabled="{{querying || loadingMore}}">
-          <image class="ui-icon" src="/images/ui/calendar.png" mode="aspectFit" aria-hidden="true" /><view class="history-date-copy">
-            <text class="history-date-label">日期（北京时间）</text>
-            <text class="history-date-value">{{dayKey === today ? '今天 ' + dayKey : dayKey}}</text>
-          </view>
+          <image class="ui-icon" src="/images/ui/calendar.png" mode="aspectFit" aria-hidden="true" /><text class="history-date-value">{{dayKey}}</text>
           <view class="ui-chevron ui-chevron--down" aria-hidden="true"></view>
         </view>
       </picker>
+      </view>
+      <view wx:if="{{accountReady && !boot.member}}" class="tiny text-2 history-restriction-note">受限新品仅可查昨天及更早记录。</view>
 
       <view wx:if="{{queryFailureMessage || restriction}}" class="banner banner-warn small mt" role="alert">{{queryFailureMessage || restriction}}</view>
       <button wx:if="{{!boot.member && boot.balance < boot.historyCost}}" class="ui-action ui-action--block mb" hover-class="ui-control-pressed" bindtap="onGoMine"><text class="ui-action-label">去签到 / 查看次数</text><view class="ui-chevron" aria-hidden="true"></view></button>
 
       <button class="btn btn-primary btn-block mt {{querying ? 'disabled' : ''}}" disabled="{{querying || loadingMore || !accountReady || !selectionSummary || !selectionSummary.valid}}" bindtap="onQuery">
-        {{!accountReady ? '正在连接账户…' : (querying ? '加载中…' : (boot.member ? '查看历史' : '查看历史（消耗 ' + boot.historyCost + ' 次，余 ' + boot.balance + ' 次）'))}}
+        {{!accountReady ? '正在连接账户…' : (querying ? '加载中…' : '查看历史')}}
       </button>
-      <view class="footer-note history-scope-note">最近 10 天的已记录变化；无记录不代表无货，也不代表全国覆盖。</view>
-      <view wx:if="{{!boot.member}}" class="tiny muted history-scope-note">查询需有足够余额；未查到历史事件，次数自动退还。</view>
+      <view wx:if="{{accountReady}}" class="history-query-cost"><text>{{boot.member ? '会员查询不扣次数' : '消耗 ' + boot.historyCost + ' 次 · 余 ' + boot.balance + ' 次'}}</text><text wx:if="{{!boot.member}}">无事件自动退还</text></view>
+      <view class="tiny muted history-scope-note">无记录不代表无货，也不代表全国覆盖。</view>
     </view>
 
     <view wx:if="{{restoreNotice}}" class="banner {{restoreWarning ? 'banner-warn' : 'banner-info'}} small">{{restoreNotice}}</view>
+    <button wx:if="{{journeySource}}" class="ui-action ui-action--neutral mb" bindtap="onReturnJourney"><text class="ui-action-label">{{journeySource === 'follow' ? '返回小哨任务' : '返回原查询'}}</text><view class="ui-chevron" aria-hidden="true"></view></button>
     <view wx:if="{{taskMessage}}" class="small muted history-task-note">{{taskMessage}}</view>
     <view wx:if="{{browseError && !browseExpanded}}" class="banner banner-warn small">{{browseError}}<button class="btn btn-outline btn-sm mt" disabled="{{browseLoading}}" bindtap="onRetryBrowse">重新加载浏览记录</button></view>
     <view wx:if="{{result}}" class="card history-result-card">
       <view wx:if="{{queryFailureMessage}}" class="banner banner-warn small mb">本次查询未完成，下方保留上次查询结果。</view>
       <view wx:elif="{{resultTargetDifferent}}" class="banner banner-info small mb">下方为上次查询结果，当前条件尚未查询。</view>
-      <view class="card-title">
-        <text class="ellipsis">{{result.product.title}}</text>
-        <text class="sub">{{result.dayText}}</text>
-      </view>
+      <view class="history-result-heading"><text class="history-result-date">{{result.dayText}}</text><text class="tiny muted">供应变化</text></view>
+      <view class="history-result-target">{{result.product.title}}</view>
 
-      <view class="history-data-notice">
+      <view class="history-data-notice {{result.hasEventRecords ? 'history-data-notice--recorded' : ''}}">
         <view class="history-data-title">{{result.coverageTitle}}</view>
-        <view class="small text-2 mt">{{result.coverageNote}}</view>
-        <view wx:if="{{result.billingText}}" class="small history-billing-note mt">{{result.billingText}}</view>
+        <view class="tiny text-2 history-data-detail">{{result.coverageNote}}</view>
+        <view wx:if="{{result.billingText}}" class="small history-billing-note history-data-detail">{{result.billingText}}</view>
       </view>
 
       <view wx:if="{{result.insights.lastRestockText}}" class="small text-2 mt">{{result.insights.lastRestockText}}</view>
       <view wx:if="{{result.latestRestricted}}" class="banner banner-info small mt">当前配置处于免费用户新品限制期，本页仅提供所选日期历史，不显示当前库存。</view>
-      <view wx:if="{{result.hasEventRecords}}" class="section-label">事件记录 · 已加载 {{result.events.length}} / {{result.pagination.total}}</view>
-      <view wx:for="{{result.events}}" wx:key="id" class="event">
-        <view class="event-time mono">{{item.timeText}}</view>
+      <view wx:if="{{result.hasEventRecords}}" class="history-timeline-heading"><text>变化时间轴</text><text class="tiny muted">已加载 {{result.events.length}} / {{result.pagination.total}}</text></view>
+      <view wx:for="{{result.events}}" wx:key="id" class="event {{index === result.events.length - 1 ? 'event--last' : ''}}">
+        <view class="event-rail"><view class="event-time mono">{{item.timeText}}</view><view class="event-dot event-dot--{{item.cls}}" aria-hidden="true"></view></view>
         <view class="event-body">
-          <view class="row-between">
-            <text class="small bold">{{item.storeName}}</text>
-            <text class="pill pill-{{item.cls}} tiny">{{item.label}}</text>
-          </view>
-          <view class="tiny muted mt" wx:if="{{item.detailText}}">{{item.detailText}}</view>
-          <view class="tiny muted" wx:if="{{item.quote}}">{{item.quote}}</view>
-          <view class="tiny muted">来源：{{item.sourceText}}</view>
+          <view class="event-main"><text class="small bold event-store">{{item.storeName}}</text><text class="pill pill-{{item.cls}} tiny event-status">{{item.label}}</text></view>
+          <view class="tiny text-2 event-detail" wx:if="{{item.detailText}}">{{item.detailText}}</view>
+          <view class="tiny muted event-detail" wx:if="{{item.quote}}">{{item.quote}}</view>
+          <view class="tiny muted event-source">来源：{{item.sourceText}}</view>
         </view>
       </view>
       <view wx:if="{{moreError}}" class="banner banner-warn small mt">{{moreError}}</view>
@@ -98,7 +95,6 @@
           <view wx:for="{{result.insights.timeBands}}" wx:key="label" class="history-time-band"><text class="bold">{{item.count}} 条</text><text class="tiny muted">{{item.label}}</text></view>
         </view>
         <view wx:if="{{result.insights.noRestockText}}" class="tiny muted mt">{{result.insights.noRestockText}}</view>
-        <view wx:if="{{result.insights.lastRestockText}}" class="small text-2 mt">{{result.insights.lastRestockText}}</view>
         <view class="tiny muted mt">{{result.insights.sampleWindowText}}</view>
         <view class="tiny muted mt">时间为北京时间，仅供回看已记录变化，不预测下一次补货。</view>
       </view>
@@ -127,9 +123,11 @@
 
     </view>
 
-    <view wx:if="{{result && result.latest.length}}" class="card history-latest-card">
-        <view class="card-title">所选门店最近观测</view>
-        <view class="small text-2 mt">此处为最近读取的状态，与上方所选日期的历史独立。</view>
+    <view class="card history-tools-card">
+    <view wx:if="{{result && result.latest.length}}" class="history-latest-card">
+        <button class="ui-disclosure" bindtap="onToggleLatest" hover-class="ui-control-pressed" aria-expanded="{{latestExpanded}}"><text class="ui-disclosure-label">所选门店最近观测</text><view class="ui-disclosure-meta"><text>{{latestExpanded ? '收起' : '查看'}}</text><view class="ui-chevron {{latestExpanded ? 'ui-chevron--up' : 'ui-chevron--down'}}" aria-hidden="true"></view></view></button>
+        <view class="tiny muted history-tools-note">最近观测与所选日期历史独立。</view>
+        <block wx:if="{{latestExpanded}}">
         <view class="row-between mt"><text class="tiny muted">服务当前状态</text><view class="pill pill-dot pill-{{collector.cls}} tiny">{{collector.label}}</view></view>
         <view wx:for="{{result.latest}}" wx:key="storeNumber" class="row-between latest-row">
           <view>
@@ -141,8 +139,9 @@
           </view>
           <view class="pill pill-dot pill-{{item.observationState === 'fresh' && item.status === 'unavailable' ? 'muted' : item.statusCls}} tiny">{{item.statusLabel}}</view>
         </view>
+        </block>
     </view>
-    <view class="card history-browse-card">
+    <view class="history-browse-card">
       <button class="ui-disclosure" hover-class="ui-control-pressed" bindtap="onToggleBrowse" aria-expanded="{{browseExpanded}}"><text class="ui-disclosure-label">恢复最近浏览条件</text><view class="ui-disclosure-meta"><text>{{browseExpanded ? '收起' : '展开'}}</text><view class="ui-chevron {{browseExpanded ? 'ui-chevron--up' : 'ui-chevron--down'}}" aria-hidden="true"></view></view></button>
       <block wx:if="{{browseExpanded}}">
       <view wx:if="{{browseLoading && !browse}}" class="small muted mt">正在加载浏览记录…</view>
@@ -153,6 +152,7 @@
       <view wx:if="{{browseError}}" class="banner banner-warn small mt">{{browseError}}<button class="btn btn-outline btn-sm mt" disabled="{{browseLoading}}" bindtap="onRetryBrowse">重新加载</button></view>
       <view class="small muted mt">浏览不扣次数；成功加载可完成每日浏览任务，查询另按账户规则计次。</view>
       </block>
+    </view>
     </view>
   </block>
 </view>

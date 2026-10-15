@@ -135,7 +135,7 @@ test('payment-unavailable page hides every purchase entry and keeps membership b
   assert.equal(page.data.showPurchaseShop, false);
   assert.equal(page.data.displayMemberProducts.length, 0);
   assert.equal(page.data.purchaseUnavailableNote, '会员购买暂不可用，现有会员权益不受影响。');
-  assert.equal(page.data.membershipCanExpand, false);
+  assert.equal(page.data.membershipUpgradeOpen, false);
   assert.equal(page.data.boot.paymentReady, false);
   assert.equal(page.data.membership.active, true, 'existing membership stays visible');
   assert.ok(Array.isArray(page.data.membershipBenefitPlans));

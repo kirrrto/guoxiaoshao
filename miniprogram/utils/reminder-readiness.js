@@ -1,4 +1,5 @@
 /** Personal readiness follows the configured sender templates and their separate credits. */
+const { activeDnd: activeDndSchedule } = require('./dnd');
 // At or below this many sends, members are asked to top up before alerts stop.
 const LOW_CREDITS = 2;
 // Members should stockpile well above the floor so a busy restock window cannot exhaust the queue.
@@ -19,13 +20,7 @@ function soldoutSubscription(notifications = {}, subscriptions = {}) {
 }
 
 function activeDnd(settings, now = Date.now()) {
-  const dnd = settings && settings.dnd;
-  if (!dnd || !dnd.enabled || !Number.isInteger(dnd.startMinute) || !Number.isInteger(dnd.endMinute)) return false;
-  const date = new Date(now + 8 * 3600000);
-  const minute = date.getUTCHours() * 60 + date.getUTCMinutes();
-  return dnd.startMinute === dnd.endMinute || (dnd.startMinute < dnd.endMinute
-    ? minute >= dnd.startMinute && minute < dnd.endMinute
-    : minute >= dnd.startMinute || minute < dnd.endMinute);
+  return activeDndSchedule(settings && settings.dnd, now);
 }
 
 /** Follow and WeChat reminders are member-only; free accounts only get query trial credits. */

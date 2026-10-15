@@ -104,7 +104,7 @@ test('subscription retry reuses authorization request ID without prompting WeCha
   const rt = runtime(async action => { if (action === 'notify.recordSubscription') { if (++n === 1) throw Error('lost response'); return { accepted: ['template-A'], subscriptions: { 'template-A': { credits: 1 } } }; } return boot(); });
   rt.wx.requestSubscribeMessage = async () => { prompts++; return { 'template-A': 'accept' }; };
   rt.app.globalData.bootstrap = boot();
-  const page = rt.instance('pages/follow/index.js'); page.data.boot = { member: true, templateIds: ['template-A'] };
+  const page = rt.instance('pages/follow/index.js'); page.applyBoot(boot());
   await page.onSubscribe(); await settle(); await page.onRetryAuthorizationSync(); await settle();
   const calls = rt.calls.filter(c => c.action === 'notify.recordSubscription');
   assert.equal(prompts, 1); assert.equal(calls[0].payload.requestId, calls[1].payload.requestId); assert.equal(page.data.subscriptionPending, false);

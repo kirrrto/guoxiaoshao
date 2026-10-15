@@ -8,6 +8,7 @@ const operation = require('../../utils/operation');
 const { syncTabBar } = require('../../utils/tab-bar');
 const { shareAppMessage, shareTimeline } = require('../../utils/share');
 const { historyInsights } = require('../../utils/observation-insights');
+const { consumeHistoryContext, returnToSource, currentOwner } = require('../../utils/journey-context');
 
 const SELECTION_KEY = 'gxs_history_selection_v1';
 const SOURCE_TEXT = { auto: '自动监测', manual: '手动查询' };
@@ -113,15 +114,19 @@ Page({
     catalogVersion: '',
     boot: null,
     selectionSummary: null,
+    failedSelectionImageUrl: '',
     sheetVisible: false,
     draftValue: null,
     draftDirty: false,
     draftSummary: '',
     browseExpanded: false,
     coverageExpanded: false,
+    latestExpanded: false,
+    journeySource: '',
     resultTargetDifferent: false,
     dayKey: fmt.todayKey(),
     today: fmt.todayKey(),
+    yesterday: fmt.fmtDate(Date.now() - 86400000),
     earliestDay: fmt.retentionStartKey(),
     querying: false,
     result: null,
@@ -244,7 +249,35 @@ Page({
       },
       collector: { ...boot.collector, ...fmt.collectorMeta(boot.collector.state) },
     });
+    this.consumeJourneyTarget();
   },
+
+  consumeJourneyTarget() {
+    if (!this.data.ready || !this.data.accountReady || this.data.querying || this.data.loadingMore || this.data.sheetVisible) return;
+    const intent = consumeHistoryContext();
+    if (!intent) return;
+    const target = intent.target;
+    const summary = selectionSummary(target, this.catalog);
+    if (!summary || !summary.valid) {
+      this.setData({ restoreNotice: '原配置或门店已变化，请重新核对；当前条件未改变。', restoreWarning: true });
+      return;
+    }
+    const dayKey = this.data.boot.member ? fmt.todayKey() : fmt.fmtDate(Date.now() - 86400000);
+    this.journeyOwner = intent.ownerUserKey;
+    this.journeyRequestId = intent.requestId;
+    this.dateExplicit = true;
+    this.selection = { ...target, product: this.catalog.productByPart[target.partNumber],
+      stores: target.storeNumbers.map(number => this.catalog.storeByNumber[number]) };
+    this.selectionNeedsReview = false;
+    this.restrictionReason = null;
+    this.setData({ dayKey, selectionSummary: summary, journeySource: intent.from,
+      restriction: null, queryFailureMessage: '', restoreWarning: false,
+      resultTargetDifferent: this.hasDifferentResult(this.selection, dayKey),
+      restoreNotice: `已带入${intent.from === 'follow' ? '关注' : '查询'}配置与门店，尚未查询，也未扣次。${this.data.boot.member ? '' : '默认选择昨天，可自行修改日期。'}` });
+    writeSession(localKey(SELECTION_KEY), { ...target, storeNumbers: target.storeNumbers.slice() });
+  },
+
+  onReturnJourney() { returnToSource(this.data.journeySource, this.journeyOwner || currentOwner()); },
 
   refreshDateWindow() {
     const today = fmt.todayKey(), earliestDay = fmt.retentionStartKey();
@@ -252,7 +285,7 @@ Page({
     const expired = dayKey < earliestDay || dayKey > today;
     // Do not silently replace an explicitly selected date with the oldest
     // retained date. That would change the intent of the next charged query.
-    this.setData({ today, earliestDay, dayKey, resultTargetDifferent: this.hasDifferentResult(this.selection, dayKey),
+    this.setData({ today, yesterday: fmt.fmtDate(Date.now() - 86400000), earliestDay, dayKey, resultTargetDifferent: this.hasDifferentResult(this.selection, dayKey),
       ...(expired ? { restoreWarning: true, restoreNotice: `所选日期已超出最近 ${fmt.RETENTION_DAYS} 天范围，请重新选择日期；当前条件未自动更改。` } : {}) });
   },
 
@@ -357,10 +390,18 @@ Page({
   },
 
   onDateChange(e) {
+    if (this.data.querying || this.data.loadingMore) return;
     this.dateExplicit = true;
     this.restoredSelection = null;
     this.restrictionReason = null;
     this.setData({ dayKey: e.detail.value, restriction: null, queryFailureMessage: '', restoreNotice: null, restoreWarning: false, resultTargetDifferent: this.hasDifferentResult(this.selection, e.detail.value) });
+  },
+
+  onQuickDate(e) {
+    const value = e.currentTarget.dataset.day;
+    if (value !== 'today' && value !== 'yesterday') return;
+    this.refreshDateWindow();
+    this.onDateChange({ detail: { value: value === 'today' ? this.data.today : this.data.yesterday } });
   },
 
   hasDifferentResult(selection = this.selection, dayKey = this.data.dayKey) {
@@ -409,7 +450,9 @@ Page({
   },
 
   onToggleBrowse() { this.setData({ browseExpanded: !this.data.browseExpanded }); },
+  onSelectionImageError(e) { this.setData({ failedSelectionImageUrl: e.currentTarget.dataset.src || '' }); },
   onToggleCoverage() { this.setData({ coverageExpanded: !this.data.coverageExpanded }); },
+  onToggleLatest() { this.refreshObservationSnapshot(); this.setData({ latestExpanded: !this.data.latestExpanded }); },
 
   async onQuery() {
     if (this.pageRetired || this.data.sheetVisible) return;

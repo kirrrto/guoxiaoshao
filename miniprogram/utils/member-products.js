@@ -17,6 +17,13 @@ function memberProducts(boot) {
     .map(item => ({ ...item, planId: planId(item) }));
 }
 
+/** Only the server's paid plan identifies the current tier; days left do not. */
+function upgradeProducts(products, membership) {
+  if (!membership || !membership.active) return [];
+  const currentRank = Math.max(0, PLAN_IDS.indexOf(membership.planId));
+  return products.filter(product => product && PLAN_IDS.indexOf(product.planId) > currentRank);
+}
+
 function renewalPreview(product, membership, now = Date.now()) {
   const days = product && product.days;
   const expires = membership && Date.parse(membership.expiresAt);
@@ -50,4 +57,4 @@ function choosePurchasablePlan(products, preferredPlanId, options = {}) {
   return purchasable[0] || null;
 }
 
-module.exports = { planId, memberProducts, renewalPreview, purchasableProducts, choosePurchasablePlan };
+module.exports = { planId, memberProducts, upgradeProducts, renewalPreview, purchasableProducts, choosePurchasablePlan };
