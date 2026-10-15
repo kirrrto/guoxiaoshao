@@ -1,6 +1,6 @@
 # 果小哨 v3.0.0 发布说明
 
-2026-10-15，本地候选。代码位于 `D:\guoxiaoshao-master`，本次没有执行云端部署、小程序上传、提审或发布。
+2026-10-15。代码位于 `D:\guoxiaoshao-master`。源码候选于同日同步 GitHub 并标记 `v3.0.0`。**维护者于 2026-10-15 确认：云函数已部署，微信小程序已正式发布。** 本次登记只记录维护者确认事实，不回填实际上传包体、云端源码下载核对报告、真机抽测或生产版本对应关系；此前本地验证边界仍按下文保留。
 
 ## 用户可见变化
 
@@ -68,12 +68,12 @@
 
 可查看该阶段 [关注页预览](../output/v3.0.0-refined-follow.png)、[查询页预览](../output/v3.0.0-refined-query.png)、[原页同步重试](../output/v3.0.0-refined-authorization-retry.png)，以及首轮 [多段免打扰预览](../output/v3.0.0-dnd-preview.png)。当前改动可审阅 [源代码差异](../output/v3.0.0-changes.diff) 与 [变更文件清单](../output/v3.0.0-changed-files.json)。
 
-## 上线顺序与剩余验证
+## 发布确认与剩余验证
 
-先保存并核对线上代码包与触发器，再按 **gxs_monitor → gxs_api → 小程序前端** 顺序发布同版代码。多段设置开始保存后，不能直接回退到只识别第一段的旧 monitor；需保留新版服务端兼容保护。
+维护者已确认完成部署与正式发布。上线顺序要求按 **gxs_monitor → gxs_api → 小程序前端** 发布同版代码；多段设置开始保存后，不能直接回退到只识别第一段的旧 monitor，需保留新版服务端兼容保护。本次登记未重新核对线上代码包与触发器。
 
-本地测试与浏览器近似渲染不代表微信真机验收。iOS/Android 布局与原生授权弹窗、真实账号多段设置回读、实际提醒收信、真实支付/退款、生产版本对应关系和最终上传回执仍需分别验证。
+本地测试与浏览器近似渲染不代表微信真机验收。iOS/Android 布局与原生授权弹窗、真实账号多段设置回读、实际提醒收信、真实支付/退款、生产版本对应关系和上传包回执仍待分别登记。`productionAcceptancePassed` 保持 false，直至容量整组标准另行达标。
 
 ## 改动保护
 
-开始修改前已保存 `tmp/v3-baseline/source-2.2.0-before-v3.zip` 和 SHA-256 清单；本次直接授权与视觉细化前另存 `tmp/v3-refinement-baseline/before-direct-reminders.zip`。当前根目录没有 Git 元数据，未创建提交；两份嵌套旧仓库未参与本轮修改。回退时逐文件核对本次差异，不覆盖现有用户、授权、会员或交易数据。
+开始修改前已保存 `tmp/v3-baseline/source-2.2.0-before-v3.zip` 和 SHA-256 清单；本次直接授权与视觉细化前另存 `tmp/v3-refinement-baseline/before-direct-reminders.zip`。源码已通过 `_github` 同步至 `kirrrto/guoxiaoshao` 并标记 `v3.0.0`（提交 `dff5465`）；根目录本身仍无 Git 元数据。回退时逐文件核对本次差异，不覆盖现有用户、授权、会员或交易数据。
