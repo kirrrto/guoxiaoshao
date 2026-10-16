@@ -89,11 +89,9 @@ function persistQueue() {
   } catch (_) { storageFailure(); return false; }
 }
 
-function loadQueue() {
-  if (queue !== null) return true;
-  let saved;
-  try { saved = wx.getStorageSync(localKey(PENDING_KEY)); }
-  catch (_) { storageFailure(); return false; }
+let queueLoading = null;
+
+function adoptQueue(saved) {
   if (!saved) { queue = []; storageBlocked = false; storageError = null; return true; }
   const legacy = saved && typeof saved === 'object' && typeof saved.requestId === 'string';
   const versionTwo = saved && saved.version === 2 && Array.isArray(saved.entries);
@@ -119,6 +117,51 @@ function loadQueue() {
   if (legacy && queue.some(entry => !entry.userKey)) return true;
   if (legacy || !entries.length) persistQueue();
   return true;
+}
+
+// Page startup must not call getStorageSync. A tap still reads synchronously so
+// the native authorization request stays inside the user gesture.
+function loadQueueSync() {
+  if (queue !== null) return true;
+  let saved;
+  try { saved = wx.getStorageSync(localKey(PENDING_KEY)); }
+  catch (_) { storageFailure(); return false; }
+  return adoptQueue(saved);
+}
+
+function loadQueue() {
+  if (queue !== null) return true;
+  if (typeof wx.getStorage !== 'function') return loadQueueSync();
+  if (!queueLoading) {
+    queueLoading = new Promise(resolve => {
+      try {
+        wx.getStorage({
+          key: localKey(PENDING_KEY),
+          success: result => resolve(result && Object.prototype.hasOwnProperty.call(result, 'data') ? result.data : null),
+          fail: () => resolve(null),
+        });
+      } catch (_) { resolve(undefined); }
+    }).then(saved => {
+      if (queue === null) {
+        if (saved === undefined) storageFailure();
+        else adoptQueue(saved);
+      }
+      emitState();
+      return queue !== null;
+    }).finally(() => { queueLoading = null; });
+  }
+  return false;
+}
+
+function ensureQueueForTap() {
+  return queue !== null || loadQueueSync();
+}
+
+function whenAuthorizationReady() {
+  if (queue !== null) return Promise.resolve();
+  if (typeof wx.getStorage !== 'function') { loadQueueSync(); return Promise.resolve(); }
+  loadQueue();
+  return queueLoading || Promise.resolve();
 }
 
 function activeEntries() {
@@ -183,7 +226,7 @@ function alwaysAccepts(templateId) {
 
 function readPending() { return activeEntries()[0] || null; }
 function savePending(pending) {
-  if (!loadQueue()) throw issue('subscription_storage_failed', storageError.message);
+  if (!ensureQueueForTap()) throw issue('subscription_storage_failed', storageError.message);
   const normalized = normalizePendingAuthorization(pending);
   const owner = normalized.userKey || userKey();
   if (!owner) throw issue('subscription_identity_required', '正在确认账户，请稍后再授权');
@@ -194,7 +237,7 @@ function savePending(pending) {
   queue.push(entry); persistQueue(); emitState(); return entry;
 }
 function clearPending(pending) {
-  if (!pending || !loadQueue()) return;
+  if (!pending || !ensureQueueForTap()) return;
   const owner = pending.userKey || userKey();
   const index = queue.findIndex(entry => entry.userKey === owner && entry.requestId === pending.requestId);
   if (index < 0) return;
@@ -300,6 +343,7 @@ async function syncPendingAuthorization() {
 function preflight() {
   const owner = userKey();
   if (!owner) throw issue('subscription_identity_required', '正在确认账户，请稍后再授权');
+  if (!ensureQueueForTap()) throw issue('subscription_storage_failed', storageError && storageError.message || '无法读取本地授权记录，请重试同步后再授权。');
   activeEntries();
   if (storageBlocked) throw issue('subscription_storage_failed', storageError.message);
   if (queue.length >= MAX_PENDING) throw issue('subscription_queue_full', '已有 100 条授权等待同步，请先重试同步');
@@ -338,7 +382,7 @@ function topUpReminderCredit() {
   const templateId = boot && boot.notifications && boot.notifications.templateIds && boot.notifications.templateIds.restock;
   const member = Boolean(boot && boot.membership && boot.membership.active);
   if (nativeBusy || !userKey() || typeof templateId !== 'string' || !templateId || !member
-    || readPending() || storageBlocked || typeof wx.requestSubscribeMessage !== 'function') return false;
+    || !ensureQueueForTap() || readPending() || storageBlocked || typeof wx.requestSubscribeMessage !== 'function') return false;
   const soldoutId = boot.notifications.templateIds.soldout;
   const tmplIds = [...new Set([templateId, ...(typeof soldoutId === 'string' && soldoutId ? [soldoutId] : [])])].filter(alwaysAccepts);
   if (!tmplIds.length || queue.length >= MAX_PENDING || !beginSubscription()) return false;
@@ -358,4 +402,4 @@ function topUpReminderCredit() {
 
 module.exports = { PENDING_KEY, MAX_PENDING, PENDING_TTL_MS, FINAL_ERRORS, refreshConsentSetting, alwaysAccepts, getConsentSetting, isSubscriptionBusy,
   readPending, savePending, clearPending, beginSubscription, endSubscription, normalizeSubscriptionResults, normalizePendingAuthorization,
-  requestReminderAuthorization, syncPendingAuthorization, topUpReminderCredit, getAuthorizationState, subscribeAuthorizationState };
+  requestReminderAuthorization, syncPendingAuthorization, topUpReminderCredit, getAuthorizationState, subscribeAuthorizationState, whenAuthorizationReady };

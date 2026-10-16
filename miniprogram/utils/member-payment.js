@@ -378,15 +378,29 @@ function createPaymentController({ wx: wxApi, call, onUpdate, onResolved, onDiag
       const nextAccount = identity && typeof identity.userKey === 'string' ? identity.userKey : '';
       if (nextAccount === account || disposed) return;
       stopPolling(); generation++; account = nextAccount; busy = false; pendingId = ''; pendingPlanId = ''; pendingPriceFen = null;
-      let stored;
-      try { stored = account ? wxApi.getStorageSync(key()) : null; } catch (_) { stored = null; }
-      if (stored && ORDER_ID.test(stored.orderId)) {
-        pendingId = stored.orderId;
-        pendingPlanId = ['member_30d', 'member_365d'].includes(stored.planId) ? stored.planId : 'member_7d';
-        pendingPriceFen = Number.isSafeInteger(stored.expectedPriceFen) && stored.expectedPriceFen > 0 ? stored.expectedPriceFen : null;
+      const version = generation;
+      const apply = stored => {
+        if (disposed || version !== generation) return;
+        if (stored && ORDER_ID.test(stored.orderId)) {
+          pendingId = stored.orderId;
+          pendingPlanId = ['member_30d', 'member_365d'].includes(stored.planId) ? stored.planId : 'member_7d';
+          pendingPriceFen = Number.isSafeInteger(stored.expectedPriceFen) && stored.expectedPriceFen > 0 ? stored.expectedPriceFen : null;
+        }
+        state = { ...INITIAL };
+        emit({ paymentPendingId: pendingId, paymentPendingPlanId: pendingPlanId, paymentMessage: pendingId ? '发现一笔待确认订单，可以查询支付结果。' : '' });
+        if (visible && pendingId && !busy && !checking) check({ automatic: true });
+      };
+      if (!account) { apply(null); return; }
+      // Startup must not block on getStorageSync. Callers without the async API keep the immediate read.
+      if (typeof wxApi.getStorage === 'function') {
+        try {
+          wxApi.getStorage({ key: key(), success: result => apply(result && result.data), fail: () => apply(null) });
+        } catch (_) { apply(null); }
+        return;
       }
-      state = { ...INITIAL };
-      emit({ paymentPendingId: pendingId, paymentPendingPlanId: pendingPlanId, paymentMessage: pendingId ? '发现一笔待确认订单，可以查询支付结果。' : '' });
+      let stored = null;
+      try { stored = wxApi.getStorageSync(key()); } catch (_) { stored = null; }
+      apply(stored);
     },
     show() { if (disposed) return; visible = true; if (pendingId && !busy && !checking) { stopPolling(); return check({ automatic: true }); } },
     hide() { visible = false; stopPolling(); },

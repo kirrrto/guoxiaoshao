@@ -8,6 +8,16 @@
 // Keep technical details and complete acceptance records in release documents.
 const RELEASE_NOTES = [
   {
+    version: '3.0.1',
+    title: '页面打开更轻快',
+    dateText: '本地候选 · 2026-10-16',
+    highlights: [
+      '页面打开更顺，页眉图标更小。',
+      '输入时底部导航会让开。',
+      '离开当前页面后，键盘不再挡住操作。',
+    ],
+  },
+  {
     version: '3.0.0',
     title: '提醒更好管理，操作更顺手',
     dateText: '本地候选 · 2026-10-15',

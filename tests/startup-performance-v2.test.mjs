@@ -26,7 +26,12 @@ test('native launch yields cloud SDK work and uses asynchronous launch storage w
   await rt.app.launchCountReady;
   assert.equal(rt.app.globalData.launchCount, 2);
   assert.equal(writes[0].data, 2);
-  for (const task of tasks.splice(0)) task();
+  for (let turn = 0; turn < 8 && !rt.app.globalData.cloud; turn += 1) {
+    const batch = tasks.splice(0);
+    for (const task of batch) task();
+    await Promise.resolve();
+    await Promise.resolve();
+  }
   assert.equal(await pending, rt.app.globalData.cloud);
   assert.equal(constructed, 1);
   assert.equal(rt.timers.size, 0);
@@ -103,6 +108,19 @@ test('legacy catalog storage is still read only once across indexing and forced 
   const store = rt.load('utils/store.js');
   store.currentCatalog(); await store.getCatalog(); await store.refreshCatalog(); await store.refreshCatalog();
   assert.equal(reads, 1);
+});
+
+test('mine page startup does not call synchronous storage', async () => {
+  const rt = runtime(async action => action === 'user.bootstrap' ? boot() : {});
+  const syncReads = [];
+  rt.wx.getStorage = options => { queueMicrotask(() => options.success({ data: null })); };
+  rt.wx.getStorageSync = key => { syncReads.push(key); return null; };
+  rt.wx.getAccountInfoSync = () => ({ miniProgram: { envVersion: 'release', appId: 'consumer' } });
+  const page = rt.instance('pages/mine/index.js');
+  await page.onLoad({});
+  await page.onShow();
+  assert.deepEqual(syncReads, []);
+  page.onUnload();
 });
 
 for (const name of ['query', 'history']) {

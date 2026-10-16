@@ -19,13 +19,19 @@ fs.mkdirSync(miniDir, { recursive: true });
 const master = path.join(masterDir, 'logo-mint-master.png');
 if (path.resolve(source) !== master) fs.copyFileSync(source, master);
 const outputs = [
-  { file: path.join(miniDir, 'logo-mint-144.png'), size: 144 },
+  // Homepage inline images over 10KB fail the miniprogram diagnostic.
+  // Palette quality 95 keeps the 144px icon near 6.5KB.
+  { file: path.join(miniDir, 'logo-mint-144.png'), size: 144, palette: true, quality: 95 },
   { file: path.join(masterDir, 'logo-mint-512.png'), size: 512 },
 ];
 for (const output of outputs) {
-  await sharp(master).resize(output.size, output.size, { fit: 'contain' }).png({ compressionLevel: 9 }).toFile(output.file);
+  const image = sharp(master).resize(output.size, output.size, { fit: 'contain' });
+  const png = output.palette
+    ? { compressionLevel: 9, palette: true, quality: output.quality, effort: 10 }
+    : { compressionLevel: 9 };
+  await image.png(png).toFile(output.file);
 }
 const metadata = await sharp(master).metadata();
-const record = { packagedAt: new Date().toISOString(), method: 'Original PNG copied unchanged; derivatives only resized using Lanczos3 and lossless PNG compression', master: { width: metadata.width, height: metadata.height, hasAlpha: metadata.hasAlpha }, files: [master, ...outputs.map(x => x.file)].map(file => ({ path: path.relative(root, file).replaceAll('\\', '/'), bytes: fs.statSync(file).size, sha256: crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex') })) };
+const record = { packagedAt: new Date().toISOString(), method: 'Original PNG copied unchanged. The 512 derivative is a Lanczos3 resize with lossless PNG compression. The miniprogram 144 derivative uses the same resize, then palette quantization at quality 95 so the packaged icon stays under 10KB.', master: { width: metadata.width, height: metadata.height, hasAlpha: metadata.hasAlpha }, files: [master, ...outputs.map(x => x.file)].map(file => ({ path: path.relative(root, file).replaceAll('\\', '/'), bytes: fs.statSync(file).size, sha256: crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex') })) };
 fs.writeFileSync(path.join(masterDir, 'logo-manifest.json'), JSON.stringify(record, null, 2) + '\n');
 console.log(JSON.stringify(record, null, 2));

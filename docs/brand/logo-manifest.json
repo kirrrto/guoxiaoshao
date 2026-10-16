@@ -14,8 +14,9 @@
     },
     {
       "path": "miniprogram/images/brand/logo-mint-144.png",
-      "bytes": 22992,
-      "sha256": "959b2f848f03466a2e04a1940f54fba1790b10e44775716be73bb7cab580e360"
+      "bytes": 6603,
+      "sha256": "667b346236310146cb2ac8c85cc343e44a40826e5189471ea6a71c49921fd986",
+      "note": "Palette quantized at quality 95 on 2026-10-16 so the packaged icon stays under the 10KB inline-image limit."
     },
     {
       "path": "docs/brand/logo-mint-512.png",

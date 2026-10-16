@@ -46,10 +46,26 @@ function createCheckoutContext({ wx: wxApi, now = Date.now }) {
         return { ok: true, context: presentTarget(context, catalog) };
       } catch (_) { return { ok: false, reason: 'storage_failed' }; }
     },
-    restore(identity, catalog) {
+    read(identity) {
+      if (!accountKey(identity)) return Promise.resolve(null);
+      const storageKey = key(identity);
+      if (typeof wxApi.getStorage === 'function') {
+        return new Promise(resolve => {
+          try {
+            wxApi.getStorage({ key: storageKey, success: result => resolve(result && result.data), fail: () => resolve(null) });
+          } catch (_) { resolve(undefined); }
+        });
+      }
+      try { return Promise.resolve(wxApi.getStorageSync(storageKey) ?? null); }
+      catch (_) { return Promise.resolve(undefined); }
+    },
+    restore(identity, catalog, stored) {
       if (!accountKey(identity)) return { status: 'empty' };
       let value;
-      try { value = wxApi.getStorageSync(key(identity)); } catch (_) { return { status: 'storage_failed' }; }
+      if (arguments.length >= 3) value = stored;
+      else {
+        try { value = wxApi.getStorageSync(key(identity)); } catch (_) { return { status: 'storage_failed' }; }
+      }
       if (!value) return { status: 'empty' };
       if (value.schemaVersion !== 1 || !Number.isSafeInteger(value.revision) || value.revision < 1
         || !targetSignature(value) || value.targetSignature !== targetSignature(value) || !ENTRY_POINTS.includes(value.entryPoint)

@@ -26,36 +26,43 @@ Component({
       });
       if (!isOnline()) this.setData({ offline: true });
       // Hide the floating controls while typing so they do not cover the city
-      // search or redemption input. Only subscribe when cleanup is supported.
-      if (typeof wx.onKeyboardHeightChange === 'function' && typeof wx.offKeyboardHeightChange === 'function') {
-        this._keyboardListener = event => {
-          if (!this._tabAttached || !this._tabVisible) return;
-          const hidden = Number(event && event.height) > 0;
-          if (hidden !== this.data.keyboardHidden) this.setData({ keyboardHidden: hidden });
-        };
-        wx.onKeyboardHeightChange(this._keyboardListener);
-      }
+      // search or redemption input. Release the listener while this page is hidden.
+      this.bindKeyboard();
     },
     detached() {
       this._tabAttached = false;
       this._tabVisible = false;
       if (this._unsubscribeNetwork) this._unsubscribeNetwork();
       this._unsubscribeNetwork = null;
-      if (this._keyboardListener && typeof wx.offKeyboardHeightChange === 'function') wx.offKeyboardHeightChange(this._keyboardListener);
-      this._keyboardListener = null;
+      this.unbindKeyboard();
     },
   },
 
   pageLifetimes: {
     show() {
       this._tabVisible = true;
+      this.bindKeyboard();
       this.syncRoute(getCurrentTabPath());
       this.syncOverlay();
     },
-    hide() { this._tabVisible = false; },
+    hide() { this._tabVisible = false; this.unbindKeyboard(); },
   },
 
   methods: {
+    bindKeyboard() {
+      if (this._keyboardListener || !this._tabAttached || !this._tabVisible) return;
+      if (typeof wx.onKeyboardHeightChange !== 'function' || typeof wx.offKeyboardHeightChange !== 'function') return;
+      this._keyboardListener = event => {
+        if (!this._tabAttached || !this._tabVisible) return;
+        const hidden = Number(event && event.height) > 0;
+        if (hidden !== this.data.keyboardHidden) this.setData({ keyboardHidden: hidden });
+      };
+      wx.onKeyboardHeightChange(this._keyboardListener);
+    },
+    unbindKeyboard() {
+      if (this._keyboardListener && typeof wx.offKeyboardHeightChange === 'function') wx.offKeyboardHeightChange(this._keyboardListener);
+      this._keyboardListener = null;
+    },
     syncOverlay() {
       // A tab bar can attach after its page already opened an editor. Derive the
       // current overlay state instead of relying on an earlier setData callback.

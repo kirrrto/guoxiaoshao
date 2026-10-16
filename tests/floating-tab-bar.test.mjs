@@ -165,6 +165,17 @@ test('keyboard hides only the visible bar and returning to a cached tab restores
   assert.equal(first.data.keyboardHidden, false, 'a previously visible keyboard must not leave a returning tab bar missing');
 });
 
+test('hiding a tab releases its keyboard listener before another page is shown', () => {
+  const h = navigationRuntime(), bar = h.makeBar();
+  assert.equal(h.keyboardListeners.size, 1);
+  bar.pageLifetimes.hide.call(bar);
+  assert.equal(h.keyboardListeners.size, 0);
+  assert.equal(h.removedListeners.length, 1);
+  bar.pageLifetimes.show.call(bar);
+  assert.equal(h.keyboardListeners.size, 1);
+  bar.lifetimes.detached.call(bar);
+});
+
 test('detaching releases the keyboard listener and late native callbacks never write to that bar', () => {
   const h = navigationRuntime(), bar = h.makeBar();
   const listener = [...h.keyboardListeners][0];

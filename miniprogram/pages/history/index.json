@@ -2,11 +2,13 @@
   "navigationBarTitleText": "果小哨 · 历史记录",
   "enablePullDownRefresh": true,
   "componentPlaceholder": {
-    "target-picker": "view"
+    "target-picker": "view",
+    "channel-video": "view"
   },
   "usingComponents": {
     "target-picker": "/components/target-picker/index",
     "config-sheet": "/components/config-sheet/index",
-    "reminder-nudge": "/components/reminder-nudge/index"
+    "reminder-nudge": "/components/reminder-nudge/index",
+    "channel-video": "/components/channel-video-placeholder/index"
   }
 }

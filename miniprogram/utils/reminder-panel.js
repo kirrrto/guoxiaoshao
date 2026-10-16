@@ -1,6 +1,6 @@
 const { subscribeSubscriptions } = require('./store');
 const { restockSubscription, soldoutSubscription, canRemind } = require('./reminder-readiness');
-const { getAuthorizationState, subscribeAuthorizationState, requestReminderAuthorization, syncPendingAuthorization } = require('./reminder-credits');
+const { getAuthorizationState, subscribeAuthorizationState, requestReminderAuthorization, syncPendingAuthorization, whenAuthorizationReady } = require('./reminder-credits');
 const { confirmTap } = require('./haptic');
 const { toast } = require('./api');
 const pageAccount = page => {
@@ -112,10 +112,12 @@ const reminderPanelMethods = {
   },
 
   resumeAuthorizationSync() {
-    const state = getAuthorizationState();
-    if (this.pageRetired || !accountMatches(this) || (!state.pendingCount && !state.storageBlocked)) return;
     // The queue owns retries and survives page hide/unload; no native prompt.
-    return syncPendingAuthorization().catch(() => {});
+    return whenAuthorizationReady().then(() => {
+      const state = getAuthorizationState();
+      if (this.pageRetired || !accountMatches(this) || (!state.pendingCount && !state.storageBlocked)) return;
+      return syncPendingAuthorization().catch(() => {});
+    });
   },
 
   async onRetryAuthorizationSync() {

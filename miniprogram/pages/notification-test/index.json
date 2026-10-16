@@ -1,3 +1,9 @@
 {
-  "navigationBarTitleText": "果小哨 · 体验微信提醒"
+  "navigationBarTitleText": "果小哨 · 体验微信提醒",
+  "componentPlaceholder": {
+    "channel-video": "view"
+  },
+  "usingComponents": {
+    "channel-video": "/components/channel-video-placeholder/index"
+  }
 }

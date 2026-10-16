@@ -17,12 +17,7 @@ Component({
       this.retired = false;
       const supported = typeof wx.canIUse === 'function' && wx.canIUse('page-container');
       this.setData({ nativeGuardSupported: Boolean(supported) });
-      if (typeof wx.onKeyboardHeightChange === 'function' && typeof wx.offKeyboardHeightChange === 'function') {
-        this.keyboardListener = event => {
-          if (!this.retired && this.data.visible) this.setData({ keyboardHeight: Math.max(0, Number(event.height) || 0) });
-        };
-        wx.onKeyboardHeightChange(this.keyboardListener);
-      }
+      this.syncKeyboard();
       if (this.data.visible) this.onVisible(true);
     },
     detached() {
@@ -30,17 +25,46 @@ Component({
       this.guardEpoch = (this.guardEpoch || 0) + 1;
       this.closeEpoch = (this.closeEpoch || 0) + 1;
       this.setTabHidden(false);
-      if (this.keyboardListener && typeof wx.offKeyboardHeightChange === 'function') wx.offKeyboardHeightChange(this.keyboardListener);
+      this.unbindKeyboard();
     },
   },
   pageLifetimes: {
-    show() { this.pageHidden = false; if (this.data.visible) { this.setTabHidden(true); this.armNativeGuard(); } },
-    hide() { this.pageHidden = true; this.guardEpoch = (this.guardEpoch || 0) + 1; this.setTabHidden(false); this.setData({ nativeGuardShow: false }); },
+    show() {
+      this.pageHidden = false;
+      this.syncKeyboard();
+      if (this.data.visible) { this.setTabHidden(true); this.armNativeGuard(); }
+    },
+    hide() {
+      this.pageHidden = true;
+      this.guardEpoch = (this.guardEpoch || 0) + 1;
+      this.setTabHidden(false);
+      this.unbindKeyboard();
+      const patch = { nativeGuardShow: false };
+      if (this.data.keyboardHeight) patch.keyboardHeight = 0;
+      this.setData(patch);
+    },
   },
   methods: {
+    bindKeyboard() {
+      if (this.keyboardListener || this.retired || this.pageHidden || !this.data.visible) return;
+      if (typeof wx.onKeyboardHeightChange !== 'function' || typeof wx.offKeyboardHeightChange !== 'function') return;
+      this.keyboardListener = event => {
+        if (!this.retired && !this.pageHidden && this.data.visible) this.setData({ keyboardHeight: Math.max(0, Number(event.height) || 0) });
+      };
+      wx.onKeyboardHeightChange(this.keyboardListener);
+    },
+    unbindKeyboard() {
+      if (this.keyboardListener && typeof wx.offKeyboardHeightChange === 'function') wx.offKeyboardHeightChange(this.keyboardListener);
+      this.keyboardListener = null;
+    },
+    syncKeyboard() {
+      if (!this.retired && !this.pageHidden && this.data.visible) this.bindKeyboard();
+      else this.unbindKeyboard();
+    },
     onVisible(visible) {
       this.closeEpoch = (this.closeEpoch || 0) + 1;
       this.confirmingClose = false;
+      this.syncKeyboard();
       this.setTabHidden(Boolean(visible));
       this.guardEpoch = (this.guardEpoch || 0) + 1;
       this.setData({ nativeGuardShow: Boolean(visible && this.data.nativeGuardSupported && !this.pageHidden) });

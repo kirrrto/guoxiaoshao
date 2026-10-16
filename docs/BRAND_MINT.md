@@ -15,11 +15,11 @@
 
 ## Logo 资源与来源
 
-Logo 使用内置图像生成工具，根据用户提供的微信图标材质参考和前一版白色口哨轮廓生成。生成后的原始 PNG 原样保留，仅用 `tools/assets/prepare-logo.mjs` 进行尺寸缩放和无损 PNG 压缩，未使用代码重绘图形。
+Logo 使用内置图像生成工具，根据用户提供的微信图标材质参考和前一版白色口哨轮廓生成。生成后的原始 PNG 原样保留。`tools/assets/prepare-logo.mjs` 对 512 图只做尺寸缩放和无损压缩；小程序内的 144 图在同样缩放后做调色板压缩，使单张图标低于 10KB。
 
 - `docs/brand/logo-mint-master.png`：1254 × 1254 原图。
 - `docs/brand/logo-mint-512.png`：512 × 512 平台备用文件。
-- `miniprogram/images/brand/logo-mint-144.png`：144 × 144，“我的”页面实际使用，约 23 KB。
+- `miniprogram/images/brand/logo-mint-144.png`：144 × 144，页眉与朋友圈分享使用，约 6.5 KB。
 - `docs/brand/logo-manifest.json`：尺寸、字节数和 SHA-256 校验。
 
 图像为不透明 RGB PNG，圆角外为浅薄荷底色；没有把棋盘格当作透明背景。平台头像尚未在公众平台替换，工程内的 Logo 已接入。

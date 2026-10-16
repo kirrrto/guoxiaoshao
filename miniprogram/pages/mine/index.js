@@ -660,7 +660,20 @@ Page({
       return;
     }
     const identity = this.data.boot.identity;
-    const stored = this.ensureCheckoutStore().restore(identity, typeof currentCatalog === 'function' ? currentCatalog() : null);
+    const store = this.ensureCheckoutStore();
+    // Clients with async storage must not call getStorageSync during page startup.
+    // The synchronous path stays immediate so an in-flight catalog read can still be superseded.
+    let record;
+    if (typeof wx.getStorage === 'function') {
+      record = await store.read(identity);
+      if (this.pageRetired || generation !== this.checkoutGeneration || !this.data.boot || identity.userKey !== this.data.boot.identity.userKey) return;
+      if (record === undefined) {
+        this.checkoutContext = null;
+        this.setData({ checkoutTarget: null, checkoutMessage: CHECKOUT_MESSAGES.storage_failed, checkoutLoading: false }, () => this.observeMembershipOffer());
+        return;
+      }
+    }
+    const stored = store.restore(identity, typeof currentCatalog === 'function' ? currentCatalog() : null, ...(record === undefined ? [] : [record]));
     if (['empty', 'expired', 'invalid', 'storage_failed'].includes(stored.status)) {
       this.checkoutContext = null;
       this.setData({ checkoutTarget: null, checkoutMessage: CHECKOUT_MESSAGES[stored.status] || '', checkoutLoading: false }, () => this.observeMembershipOffer());
@@ -671,7 +684,7 @@ Page({
       const catalog = typeof getCatalog === 'function' ? await getCatalog() : typeof currentCatalog === 'function' ? currentCatalog() : null;
       if (this.pageRetired || generation !== this.checkoutGeneration || identity.userKey !== this.data.boot.identity.userKey) return;
       this.checkoutCatalog = catalog;
-      const restored = this.ensureCheckoutStore().restore(identity, catalog);
+      const restored = store.restore(identity, catalog, ...(record === undefined ? [] : [record]));
       this.checkoutContext = restored.context || null;
       this.setData({ checkoutTarget: restored.context || null, checkoutMessage: CHECKOUT_MESSAGES[restored.status] || '', checkoutLoading: false }, () => this.observeMembershipOffer());
     } catch (_) {

@@ -7,6 +7,13 @@ const { readSession, writeSession } = require('./utils/session');
 const CLOUD_INIT_TIMEOUT_MS = 10000;
 const LAUNCH_COUNT_KEY = 'gxs_launch_count_v1';
 
+function yieldTurn() {
+  // nextTick splits the SDK work into separate script tasks. A microtask is
+  // only the fallback for runtimes that do not provide nextTick.
+  if (typeof wx.nextTick === 'function') return new Promise(resolve => wx.nextTick(resolve));
+  return Promise.resolve();
+}
+
 function errorText(detail) {
   return String(detail && (detail.stack || detail.errMsg || detail.message) || detail);
 }
@@ -195,8 +202,15 @@ App({
       this.globalData.cloudError = '请使用 2.23.0 或以上的基础库';
       throw new Error(this.globalData.cloudError);
     }
+    // Account lookup, SDK construction and init each resume on their own turn
+    // when the client can schedule one. One synchronous slice over about 50ms
+    // is reported as a long script task.
+    if (typeof wx.nextTick === 'function') await yieldTurn();
+    if (generation !== this.cloudInitGeneration) return this.globalData.cloud;
     const account = wx.getAccountInfoSync ? wx.getAccountInfoSync() : null;
     const selfAppid = account && account.miniProgram ? account.miniProgram.appId : null;
+    if (typeof wx.nextTick === 'function') await yieldTurn();
+    if (generation !== this.cloudInitGeneration) return this.globalData.cloud;
     try {
       let cloud;
       if (selfAppid && selfAppid === cloudConfig.resourceAppid) {
@@ -204,6 +218,8 @@ App({
         cloud = wx.cloud;
       } else {
         cloud = new wx.cloud.Cloud({ resourceAppid: cloudConfig.resourceAppid, resourceEnv: cloudConfig.resourceEnv });
+        if (typeof wx.nextTick === 'function') await yieldTurn();
+        if (generation !== this.cloudInitGeneration) return this.globalData.cloud;
         await cloud.init();
       }
       // A timed-out init can finish after its replacement. Only the newest

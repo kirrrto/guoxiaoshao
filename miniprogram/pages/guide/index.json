@@ -1,3 +1,9 @@
 {
-  "navigationBarTitleText": "选购攻略与发售日历"
+  "navigationBarTitleText": "选购攻略与发售日历",
+  "componentPlaceholder": {
+    "channel-video": "view"
+  },
+  "usingComponents": {
+    "channel-video": "/components/channel-video-placeholder/index"
+  }
 }
