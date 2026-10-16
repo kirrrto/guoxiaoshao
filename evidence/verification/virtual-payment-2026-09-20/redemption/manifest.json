@@ -1,0 +1,240 @@
+{
+  "generatedAt": "2026-09-20T04:17:36.472Z",
+  "source": "C:\\Users\\Administrator\\WeChatProjects\\miniprogram-6\\miniprogram",
+  "renderer": "offline WXML/WXSS approximation",
+  "remoteImages": false,
+  "expressionErrors": 0,
+  "snapshots": [
+    {
+      "page": "mine",
+      "scenario": "redemption-input",
+      "width": 320,
+      "file": "mine-redemption-input-320.html",
+      "expectedText": [
+        "兑换会员",
+        "付费购买暂未开放",
+        "确认兑换"
+      ]
+    },
+    {
+      "page": "mine",
+      "scenario": "redemption-input",
+      "width": 375,
+      "file": "mine-redemption-input-375.html",
+      "expectedText": [
+        "兑换会员",
+        "付费购买暂未开放",
+        "确认兑换"
+      ]
+    },
+    {
+      "page": "mine",
+      "scenario": "redemption-input",
+      "width": 430,
+      "file": "mine-redemption-input-430.html",
+      "expectedText": [
+        "兑换会员",
+        "付费购买暂未开放",
+        "确认兑换"
+      ]
+    },
+    {
+      "page": "mine",
+      "scenario": "redemption-loading",
+      "width": 320,
+      "file": "mine-redemption-loading-320.html",
+      "expectedText": [
+        "兑换会员",
+        "付费购买暂未开放",
+        "兑换中，请稍候"
+      ]
+    },
+    {
+      "page": "mine",
+      "scenario": "redemption-loading",
+      "width": 375,
+      "file": "mine-redemption-loading-375.html",
+      "expectedText": [
+        "兑换会员",
+        "付费购买暂未开放",
+        "兑换中，请稍候"
+      ]
+    },
+    {
+      "page": "mine",
+      "scenario": "redemption-loading",
+      "width": 430,
+      "file": "mine-redemption-loading-430.html",
+      "expectedText": [
+        "兑换会员",
+        "付费购买暂未开放",
+        "兑换中，请稍候"
+      ]
+    },
+    {
+      "page": "mine",
+      "scenario": "redemption-error",
+      "width": 320,
+      "file": "mine-redemption-error-320.html",
+      "expectedText": [
+        "兑换会员",
+        "付费购买暂未开放",
+        "兑换码无效"
+      ]
+    },
+    {
+      "page": "mine",
+      "scenario": "redemption-error",
+      "width": 375,
+      "file": "mine-redemption-error-375.html",
+      "expectedText": [
+        "兑换会员",
+        "付费购买暂未开放",
+        "兑换码无效"
+      ]
+    },
+    {
+      "page": "mine",
+      "scenario": "redemption-error",
+      "width": 430,
+      "file": "mine-redemption-error-430.html",
+      "expectedText": [
+        "兑换会员",
+        "付费购买暂未开放",
+        "兑换码无效"
+      ]
+    },
+    {
+      "page": "mine",
+      "scenario": "redemption-success",
+      "width": 320,
+      "file": "mine-redemption-success-320.html",
+      "expectedText": [
+        "兑换会员",
+        "付费购买暂未开放",
+        "兑换成功"
+      ]
+    },
+    {
+      "page": "mine",
+      "scenario": "redemption-success",
+      "width": 375,
+      "file": "mine-redemption-success-375.html",
+      "expectedText": [
+        "兑换会员",
+        "付费购买暂未开放",
+        "兑换成功"
+      ]
+    },
+    {
+      "page": "mine",
+      "scenario": "redemption-success",
+      "width": 430,
+      "file": "mine-redemption-success-430.html",
+      "expectedText": [
+        "兑换会员",
+        "付费购买暂未开放",
+        "兑换成功"
+      ]
+    },
+    {
+      "page": "mine",
+      "scenario": "redemption-used",
+      "width": 320,
+      "file": "mine-redemption-used-320.html",
+      "expectedText": [
+        "兑换会员",
+        "付费购买暂未开放",
+        "此账号已兑换过"
+      ]
+    },
+    {
+      "page": "mine",
+      "scenario": "redemption-used",
+      "width": 375,
+      "file": "mine-redemption-used-375.html",
+      "expectedText": [
+        "兑换会员",
+        "付费购买暂未开放",
+        "此账号已兑换过"
+      ]
+    },
+    {
+      "page": "mine",
+      "scenario": "redemption-used",
+      "width": 430,
+      "file": "mine-redemption-used-430.html",
+      "expectedText": [
+        "兑换会员",
+        "付费购买暂未开放",
+        "此账号已兑换过"
+      ]
+    },
+    {
+      "page": "mine",
+      "scenario": "redemption-limited",
+      "width": 320,
+      "file": "mine-redemption-limited-320.html",
+      "expectedText": [
+        "兑换会员",
+        "付费购买暂未开放",
+        "15 分钟后再试"
+      ]
+    },
+    {
+      "page": "mine",
+      "scenario": "redemption-limited",
+      "width": 375,
+      "file": "mine-redemption-limited-375.html",
+      "expectedText": [
+        "兑换会员",
+        "付费购买暂未开放",
+        "15 分钟后再试"
+      ]
+    },
+    {
+      "page": "mine",
+      "scenario": "redemption-limited",
+      "width": 430,
+      "file": "mine-redemption-limited-430.html",
+      "expectedText": [
+        "兑换会员",
+        "付费购买暂未开放",
+        "15 分钟后再试"
+      ]
+    },
+    {
+      "page": "mine",
+      "scenario": "redemption-empty",
+      "width": 320,
+      "file": "mine-redemption-empty-320.html",
+      "expectedText": [
+        "兑换会员",
+        "付费购买暂未开放",
+        "确认兑换"
+      ]
+    },
+    {
+      "page": "mine",
+      "scenario": "redemption-empty",
+      "width": 375,
+      "file": "mine-redemption-empty-375.html",
+      "expectedText": [
+        "兑换会员",
+        "付费购买暂未开放",
+        "确认兑换"
+      ]
+    },
+    {
+      "page": "mine",
+      "scenario": "redemption-empty",
+      "width": 430,
+      "file": "mine-redemption-empty-430.html",
+      "expectedText": [
+        "兑换会员",
+        "付费购买暂未开放",
+        "确认兑换"
+      ]
+    }
+  ]
+}

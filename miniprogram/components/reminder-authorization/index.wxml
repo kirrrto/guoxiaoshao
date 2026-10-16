@@ -1,0 +1,11 @@
+<view class="authorization-panel">
+  <view wx:if="{{member && subscription.templateCount}}" class="reminder-balances">
+    <view class="reminder-balance"><text class="reminder-balance-label">到货提醒</text><text class="reminder-balance-value">{{subscription.credits}} 次</text><text class="reminder-balance-pending">{{authorization.pendingRestock ? '待同步 +' + authorization.pendingRestock : '已同步可用'}}</text></view>
+    <view wx:if="{{subscription.soldoutEnabled}}" class="reminder-balance"><text class="reminder-balance-label">断货提醒</text><text class="reminder-balance-value">{{subscription.soldoutCredits}} 次</text><text class="reminder-balance-pending">{{authorization.pendingSoldout ? '待同步 +' + authorization.pendingSoldout : '已同步可用'}}</text></view>
+  </view>
+  <button id="increase-reminders" class="btn btn-primary btn-block" disabled="{{busy || authorization.storageBlocked}}" loading="{{busy}}" bindtap="onAuthorize">{{busy ? '等待微信授权…' : !subscription.templateCount ? '查看原因' : member ? '增加提醒次数' : '了解会员'}}</button>
+  <view wx:if="{{feedback}}" class="authorization-feedback" aria-live="polite">{{feedback}}</view>
+  <view wx:if="{{authorization.errorMessage || authorization.pendingCount}}" class="authorization-sync-error" role="status"><text>{{authorization.errorMessage || '微信已允许的记录正在同步，待同步次数尚不可发送。'}}</text><button class="ui-action" loading="{{authorization.syncing}}" disabled="{{authorization.syncing}}" bindtap="onRetry">重试同步</button></view>
+  <view class="authorization-hint">{{member ? (subscription.soldoutEnabled ? '每次允许，到货、断货各 +1；也可只允许其中一项。' : '每次允许，到货提醒 +1。') : '持续关注与微信提醒需会员，查询与体验次数单独计算。'}}</view>
+  <view wx:if="{{member}}" class="authorization-hint">微信允许后可继续点击。重试同步只恢复原记录，不会重复申请授权。</view>
+</view>

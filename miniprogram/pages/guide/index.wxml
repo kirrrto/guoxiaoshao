@@ -1,0 +1,73 @@
+<view class="page guide-page">
+  <view class="page-heading brand-page-heading"><image class="brand-page-logo" src="/images/brand/logo-mint-144.png" mode="aspectFit" aria-hidden="true" /><view class="brand-page-copy"><view class="page-title">{{showLaunchPoster ? '发售日历' : '选购攻略'}}</view><view class="page-subtitle">{{showLaunchPoster ? '先看发售安排，下滑查看选购攻略。' : '从选择配置，到收到提醒后下单。'}}</view></view></view>
+
+  <block wx:if="{{showLaunchPoster}}">
+  <!-- 发售日历：阶段与两个关键日期常显，整月日历按需展开 -->
+  <view id="guide-calendar-{{index}}" wx:for="{{calendars}}" wx:for-item="calendar" wx:key="id" class="card guide-launch">
+    <view class="guide-card-heading">
+      <view class="ui-label-with-icon"><image class="ui-icon" src="/images/ui/calendar.png" mode="aspectFit" aria-hidden="true" /><text class="guide-section-title">新品发售日历</text></view>
+      <text class="poster-stage poster-stage--{{calendar.stage}}">{{calendar.stageText}}</text>
+    </view>
+    <view class="poster-hero">
+      <view class="poster-title guide-poster-title">{{calendar.title}}</view>
+      <view wx:if="{{calendar.followNotice}}" class="poster-follow-notice"><view class="poster-follow-title">{{calendar.followNotice}}</view><view class="poster-follow-detail">{{calendar.followNoticeDetail}}</view></view>
+      <view wx:if="{{calendar.imageUrl}}" class="poster-hero-media"><image class="poster-hero-image" src="{{calendar.imageUrl}}" mode="aspectFit" aria-label="{{calendar.imageAlt || calendar.title}}" binderror="onCalendarImageError" data-index="{{index}}" /></view>
+    </view>
+    <view class="poster-milestones">
+      <view class="poster-milestone poster-milestone--{{calendar.preorderState}}">
+        <text class="poster-milestone-label">{{calendar.preorderState === 'done' ? '已开启预购' : '开启预购'}}</text>
+        <text class="poster-milestone-date">{{calendar.preorderDateText}}</text>
+        <text class="poster-milestone-meta">{{calendar.preorderWeekdayText}} {{calendar.preorderTimeText}}</text>
+      </view>
+      <view class="poster-milestone poster-milestone--{{calendar.releaseState}}">
+        <text class="poster-milestone-label">{{calendar.releaseState === 'done' ? '已正式发售' : '正式发售'}}</text>
+        <text class="poster-milestone-date">{{calendar.releaseDateText}}</text>
+        <text class="poster-milestone-meta">{{calendar.releaseWeekdayText}}</text>
+      </view>
+    </view>
+    <button class="ui-disclosure" hover-class="ui-control-pressed" bindtap="onToggleCalendar" aria-expanded="{{calendarExpanded}}"><text class="ui-disclosure-label">{{calendar.monthText}}日历</text><view class="ui-disclosure-meta"><text>{{calendarExpanded ? '收起' : '展开'}}</text><view class="ui-chevron {{calendarExpanded ? 'ui-chevron--up' : 'ui-chevron--down'}}" aria-hidden="true"></view></view></button>
+    <view wx:if="{{calendarExpanded}}" class="guide-month">
+      <view class="calendar-grid"><view wx:for="{{calendar.weekdays}}" wx:key="*this" class="calendar-weekday">{{item}}</view></view>
+      <view class="calendar-grid"><view wx:for="{{calendar.cells}}" wx:key="key" class="calendar-cell {{item.label ? 'calendar-cell--event' : ''}} {{item.today ? 'calendar-cell--today' : ''}}"><text>{{item.day}}</text><text class="calendar-event">{{item.label}}</text></view></view>
+    </view>
+    <view class="guide-launch-note">发售时间不等于取货查询开放时间，具体以可选配置和 Apple 官方页面为准。</view>
+    <button class="btn btn-outline btn-block guide-launch-action" bindtap="onCalendarPlan">去选择配置与门店</button>
+    <view class="guide-launch-source">来源：Apple 中国大陆 · 北京时间 · 核对于 {{calendar.verifiedOn}}</view>
+  </view>
+
+  </block>
+
+  <view wx:if="{{targetSummary}}" class="card guide-target"><view class="small text-2">正在查看的配置</view><view class="guide-section-title mt">{{targetSummary.title}}</view><view class="small text-2 mt">{{targetSummary.stores}}</view><view class="tiny muted mt">请在 Apple 官方渠道核对同一配置和门店；本页不会查询或锁定库存。</view></view>
+  <view wx:if="{{focusedFaq}}" class="card guide-focused-help"><view class="guide-section-title">{{focusedFaq.title}}</view><view class="small text-2 mt">{{focusedFaq.text}}</view><button class="btn btn-primary btn-block mt" bindtap="onReturnTask">{{returnLabel}}</button></view>
+
+  <!-- 选购四步：步骤条与内容同卡，切换不离开当前位置 -->
+  <view class="card guide-steps">
+    <view class="guide-section-title guide-steps-heading">选购攻略</view>
+    <view class="guide-stepper" aria-label="选购阶段">
+      <button wx:for="{{stages}}" wx:key="id" class="guide-stepper-item {{stageId === item.id ? 'guide-stepper-item--on' : ''}}" hover-class="ui-control-pressed" aria-pressed="{{stageId === item.id}}" data-id="{{item.id}}" bindtap="onSelectStage"><text class="guide-stepper-dot">{{index + 1}}</text><text class="guide-stepper-label">{{item.label}}</text></button>
+    </view>
+    <view class="guide-stage-copy"><view class="guide-section-title">{{stage.title}}</view><view class="small text-2 mt">{{stage.note}}</view></view>
+    <view wx:for="{{stage.steps}}" wx:key="title" class="guide-step"><view class="guide-step-number">{{index + 1}}</view><view class="guide-step-copy"><view class="guide-step-title">{{item.title}}</view><view class="small text-2 mt">{{item.text}}</view></view></view>
+    <block wx:if="{{section === 'pickup'}}"><view class="guide-section-title">下单后如何取货</view><view wx:for="{{pickupSteps}}" wx:key="title" class="guide-step"><view class="guide-step-number">{{index + 4}}</view><view class="guide-step-copy"><view class="guide-step-title">{{item.title}}</view><view class="small text-2 mt">{{item.text}}</view></view></view><button class="btn btn-primary btn-block" bindtap="onReturnTask">{{returnLabel}}</button></block>
+    <button wx:else class="btn btn-primary btn-block" bindtap="onStageAction">{{stage.actionText}}</button>
+  </view>
+
+  <view class="card">
+    <view class="guide-section-title">常见问题</view>
+    <view class="ui-disclosure-group">
+      <view wx:for="{{faqs}}" wx:key="id" wx:if="{{!focusedFaq || focusedFaq.id !== item.id}}" class="ui-disclosure-group-item"><button class="ui-disclosure" hover-class="ui-control-pressed" aria-expanded="{{faqOpen === item.id}}" data-id="{{item.id}}" bindtap="onToggleFaq"><text class="ui-disclosure-label">{{item.title}}</text><view class="ui-chevron {{faqOpen === item.id ? 'ui-chevron--up' : 'ui-chevron--down'}}" aria-hidden="true"></view></button><view wx:if="{{faqOpen === item.id}}" class="guide-answer small text-2">{{item.text}}</view></view>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="guide-section-title">还需要帮助</view>
+    <view class="ui-disclosure-group">
+      <view class="ui-disclosure-group-item"><button class="ui-disclosure ui-entry" hover-class="ui-control-pressed" open-type="contact" session-from="gxs_guide"><view class="ui-entry-main"><image class="ui-icon" src="/images/ui/support.png" mode="aspectFit" aria-hidden="true" /><view class="ui-entry-copy"><text class="ui-disclosure-label">联系客服</text><text class="ui-entry-note">会员、支付或提醒问题，可在线咨询</text></view></view><view class="ui-chevron" aria-hidden="true"></view></button></view>
+      <view class="ui-disclosure-group-item"><button class="ui-disclosure ui-entry" hover-class="ui-control-pressed" bindtap="onTestNotification"><view class="ui-entry-main"><image class="ui-icon" src="/images/ui/notification.png" mode="aspectFit" aria-hidden="true" /><view class="ui-entry-copy"><text class="ui-disclosure-label">先试收一条测试通知</text><text class="ui-entry-note">主动授权后发送 · 消耗 1 次额度</text></view></view><view class="ui-chevron" aria-hidden="true"></view></button></view>
+      <view class="ui-disclosure-group-item"><button class="ui-disclosure ui-entry" hover-class="ui-control-pressed" bindtap="onGoMine"><view class="ui-entry-main"><image class="ui-icon" src="/images/ui/receipt.png" mode="aspectFit" aria-hidden="true" /><view class="ui-entry-copy"><text class="ui-disclosure-label">查看会员权益与购买记录</text></view></view><view class="ui-chevron" aria-hidden="true"></view></button></view>
+      <view class="ui-disclosure-group-item"><button class="ui-disclosure ui-entry" hover-class="ui-control-pressed" bindtap="onCopyDiagnostics"><view class="ui-entry-copy"><text class="ui-disclosure-label">复制诊断摘要</text><text class="ui-entry-note">仅含版本、平台、固定错误码、页面与时间</text></view><view class="ui-chevron" aria-hidden="true"></view></button></view>
+    </view>
+  </view>
+  <button wx:if="{{section !== 'pickup' && !focusedFaq}}" class="btn btn-outline btn-block" bindtap="onReturnTask">{{returnLabel}}</button>
+  <view class="footer-note"><view>果小哨提供库存参考与提醒，购买请在 Apple 官方渠道完成。</view><view>官方取货帮助核对于 {{checkedOn}}。</view></view>
+</view>

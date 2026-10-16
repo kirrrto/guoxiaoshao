@@ -1,0 +1,388 @@
+{
+  "recordedAt": "2026-09-16T03:26:43.545Z",
+  "method": "Read-only invocation of installed official WeChat DevTools enhance compiler through ELECTRON_RUN_AS_NODE=1. Enumerates and compiles every current miniprogram JS file, including newly added custom-tab-bar/index.js and utils/tab-bar.js.",
+  "currentProject": "C:/Users/Administrator/WeChatProjects/miniprogram-6",
+  "compilerEntry": "D:/微信web开发者工具/resources/app.asar/js/common/miniprogram-builder/modules/corecompiler/original/js/enhance.js",
+  "runtime": {
+    "node": "v22.16.0",
+    "electron": "36.6.0",
+    "babel": "7.21.4",
+    "helperVersion": "7.21.0"
+  },
+  "checkedFiles": 18,
+  "allDependencies": [
+    "@babel/runtime/helpers/Arrayincludes",
+    "@babel/runtime/helpers/Objectvalues",
+    "@babel/runtime/helpers/arrayLikeToArray",
+    "@babel/runtime/helpers/arrayWithoutHoles",
+    "@babel/runtime/helpers/assertThisInitialized",
+    "@babel/runtime/helpers/asyncToGenerator",
+    "@babel/runtime/helpers/classCallCheck",
+    "@babel/runtime/helpers/construct",
+    "@babel/runtime/helpers/createClass",
+    "@babel/runtime/helpers/createForOfIteratorHelper",
+    "@babel/runtime/helpers/defineProperty",
+    "@babel/runtime/helpers/getPrototypeOf",
+    "@babel/runtime/helpers/inherits",
+    "@babel/runtime/helpers/isNativeFunction",
+    "@babel/runtime/helpers/isNativeReflectConstruct",
+    "@babel/runtime/helpers/iterableToArray",
+    "@babel/runtime/helpers/nonIterableSpread",
+    "@babel/runtime/helpers/objectSpread2",
+    "@babel/runtime/helpers/possibleConstructorReturn",
+    "@babel/runtime/helpers/regeneratorRuntime",
+    "@babel/runtime/helpers/setPrototypeOf",
+    "@babel/runtime/helpers/toConsumableArray",
+    "@babel/runtime/helpers/toPrimitive",
+    "@babel/runtime/helpers/toPropertyKey",
+    "@babel/runtime/helpers/typeof",
+    "@babel/runtime/helpers/unsupportedIterableToArray",
+    "@babel/runtime/helpers/wrapNativeSuper"
+  ],
+  "errors": [],
+  "files": [
+    {
+      "file": "miniprogram/app.js",
+      "sourceSha256": "9144ee338c94e59d5a13b9b6606d1872a8efd20c765764024700bfc036105a91",
+      "outputSha256": "6e61657d37b4c63e5980e72edf57d7f83eaa502f8ab1c63159e7a352e7729b61",
+      "outputLength": 3277,
+      "helpers": [
+        "@babel/runtime/helpers/asyncToGenerator",
+        "@babel/runtime/helpers/regeneratorRuntime"
+      ],
+      "dependencies": [
+        "@babel/runtime/helpers/asyncToGenerator",
+        "@babel/runtime/helpers/regeneratorRuntime",
+        "@babel/runtime/helpers/typeof"
+      ]
+    },
+    {
+      "file": "miniprogram/components/target-picker/index.js",
+      "sourceSha256": "4e09f96bc79b30e1b47e2300fb23828fafe813edcc67023828008015b40ebae2",
+      "outputSha256": "b99c063b661a8e8e80880f9f62d59536c6a798e604831135032e77ee40c7a908",
+      "outputLength": 15641,
+      "helpers": [
+        "@babel/runtime/helpers/createForOfIteratorHelper",
+        "@babel/runtime/helpers/objectSpread2",
+        "@babel/runtime/helpers/toConsumableArray"
+      ],
+      "dependencies": [
+        "@babel/runtime/helpers/arrayLikeToArray",
+        "@babel/runtime/helpers/arrayWithoutHoles",
+        "@babel/runtime/helpers/createForOfIteratorHelper",
+        "@babel/runtime/helpers/defineProperty",
+        "@babel/runtime/helpers/iterableToArray",
+        "@babel/runtime/helpers/nonIterableSpread",
+        "@babel/runtime/helpers/objectSpread2",
+        "@babel/runtime/helpers/toConsumableArray",
+        "@babel/runtime/helpers/toPrimitive",
+        "@babel/runtime/helpers/toPropertyKey",
+        "@babel/runtime/helpers/typeof",
+        "@babel/runtime/helpers/unsupportedIterableToArray"
+      ]
+    },
+    {
+      "file": "miniprogram/config/catalog-seed.js",
+      "sourceSha256": "0cbf7906f9819608581e5b1f0113765f58bfd16b723d052a32aa9fa87ada6608",
+      "outputSha256": "4891971f7b6fa3a94a1a6d556bc698fae9118d868d86cfe328e1cab26d874a67",
+      "outputLength": 134806,
+      "helpers": [],
+      "dependencies": []
+    },
+    {
+      "file": "miniprogram/config/cloud.js",
+      "sourceSha256": "6ba9f31ce4a581a33cda1f9bc62514d85a39aa91a3b68d1c4148cfabf05d4c81",
+      "outputSha256": "a73f4c5cad4e667d0f1355e930945ca5812b1a7948133321b937e79d9b990114",
+      "outputLength": 320,
+      "helpers": [],
+      "dependencies": []
+    },
+    {
+      "file": "miniprogram/config/product-images.js",
+      "sourceSha256": "4620405635e68e3ca4c5b49c7e45baab5f4683430b6b84aa47172bbd2818f586",
+      "outputSha256": "67aec1bf589edb0ab94014e1fcb25bf7e80648d8c98e0f33cf910ea4ac1ee594",
+      "outputLength": 132712,
+      "helpers": [],
+      "dependencies": []
+    },
+    {
+      "file": "miniprogram/custom-tab-bar/index.js",
+      "sourceSha256": "764579d0db508a7af4964c16969f51f124130a894f5071a90c801dde3f70589d",
+      "outputSha256": "9125dac89f38b1b12ff3282a6523ab9e60461887d43a996a57d6df4b71aa542a",
+      "outputLength": 2024,
+      "helpers": [],
+      "dependencies": []
+    },
+    {
+      "file": "miniprogram/pages/admin/index.js",
+      "sourceSha256": "546eb1160747053cd06e545d5bf82c7ae4bbc3a2a147e6116a69184a2f7f2790",
+      "outputSha256": "e018537578ef0d1f7fac641ef938beb295706d07b9422205b884a2e67b29e712",
+      "outputLength": 19818,
+      "helpers": [
+        "@babel/runtime/helpers/Arrayincludes",
+        "@babel/runtime/helpers/asyncToGenerator",
+        "@babel/runtime/helpers/defineProperty",
+        "@babel/runtime/helpers/objectSpread2",
+        "@babel/runtime/helpers/regeneratorRuntime"
+      ],
+      "dependencies": [
+        "@babel/runtime/helpers/Arrayincludes",
+        "@babel/runtime/helpers/asyncToGenerator",
+        "@babel/runtime/helpers/defineProperty",
+        "@babel/runtime/helpers/objectSpread2",
+        "@babel/runtime/helpers/regeneratorRuntime",
+        "@babel/runtime/helpers/toPrimitive",
+        "@babel/runtime/helpers/toPropertyKey",
+        "@babel/runtime/helpers/typeof"
+      ]
+    },
+    {
+      "file": "miniprogram/pages/follow/index.js",
+      "sourceSha256": "9fd7817547f8f82ea522dd306a69de8bc0256e9415eb370d925c6903e592b5af",
+      "outputSha256": "b05c48719df67210e7ed8a64f5d11bf28b3ca7bacbacabdee8003dc09b432051",
+      "outputLength": 35788,
+      "helpers": [
+        "@babel/runtime/helpers/Arrayincludes",
+        "@babel/runtime/helpers/Objectvalues",
+        "@babel/runtime/helpers/asyncToGenerator",
+        "@babel/runtime/helpers/createForOfIteratorHelper",
+        "@babel/runtime/helpers/defineProperty",
+        "@babel/runtime/helpers/objectSpread2",
+        "@babel/runtime/helpers/regeneratorRuntime"
+      ],
+      "dependencies": [
+        "@babel/runtime/helpers/Arrayincludes",
+        "@babel/runtime/helpers/Objectvalues",
+        "@babel/runtime/helpers/arrayLikeToArray",
+        "@babel/runtime/helpers/asyncToGenerator",
+        "@babel/runtime/helpers/createForOfIteratorHelper",
+        "@babel/runtime/helpers/defineProperty",
+        "@babel/runtime/helpers/objectSpread2",
+        "@babel/runtime/helpers/regeneratorRuntime",
+        "@babel/runtime/helpers/toPrimitive",
+        "@babel/runtime/helpers/toPropertyKey",
+        "@babel/runtime/helpers/typeof",
+        "@babel/runtime/helpers/unsupportedIterableToArray"
+      ]
+    },
+    {
+      "file": "miniprogram/pages/history/index.js",
+      "sourceSha256": "dba54767cac4dfa6ed7db7a46a859baafa5504760c1fea10d6ffcf600d954295",
+      "outputSha256": "80b322170f0f3c235761371d15488f68c94976ff49a1d24abcc23b9ca661bb80",
+      "outputLength": 26007,
+      "helpers": [
+        "@babel/runtime/helpers/asyncToGenerator",
+        "@babel/runtime/helpers/objectSpread2",
+        "@babel/runtime/helpers/regeneratorRuntime",
+        "@babel/runtime/helpers/toConsumableArray"
+      ],
+      "dependencies": [
+        "@babel/runtime/helpers/arrayLikeToArray",
+        "@babel/runtime/helpers/arrayWithoutHoles",
+        "@babel/runtime/helpers/asyncToGenerator",
+        "@babel/runtime/helpers/defineProperty",
+        "@babel/runtime/helpers/iterableToArray",
+        "@babel/runtime/helpers/nonIterableSpread",
+        "@babel/runtime/helpers/objectSpread2",
+        "@babel/runtime/helpers/regeneratorRuntime",
+        "@babel/runtime/helpers/toConsumableArray",
+        "@babel/runtime/helpers/toPrimitive",
+        "@babel/runtime/helpers/toPropertyKey",
+        "@babel/runtime/helpers/typeof",
+        "@babel/runtime/helpers/unsupportedIterableToArray"
+      ]
+    },
+    {
+      "file": "miniprogram/pages/mine/index.js",
+      "sourceSha256": "b0943e3b4fef98e50a614b0be724c9162014d3ed9bb5d82dd4af68af43a0d25d",
+      "outputSha256": "0702bc32907ada82e28208a0af4093b52283d519d368f562569f2cebddf418ef",
+      "outputLength": 52625,
+      "helpers": [
+        "@babel/runtime/helpers/Arrayincludes",
+        "@babel/runtime/helpers/asyncToGenerator",
+        "@babel/runtime/helpers/createForOfIteratorHelper",
+        "@babel/runtime/helpers/objectSpread2",
+        "@babel/runtime/helpers/regeneratorRuntime",
+        "@babel/runtime/helpers/toConsumableArray"
+      ],
+      "dependencies": [
+        "@babel/runtime/helpers/Arrayincludes",
+        "@babel/runtime/helpers/arrayLikeToArray",
+        "@babel/runtime/helpers/arrayWithoutHoles",
+        "@babel/runtime/helpers/asyncToGenerator",
+        "@babel/runtime/helpers/createForOfIteratorHelper",
+        "@babel/runtime/helpers/defineProperty",
+        "@babel/runtime/helpers/iterableToArray",
+        "@babel/runtime/helpers/nonIterableSpread",
+        "@babel/runtime/helpers/objectSpread2",
+        "@babel/runtime/helpers/regeneratorRuntime",
+        "@babel/runtime/helpers/toConsumableArray",
+        "@babel/runtime/helpers/toPrimitive",
+        "@babel/runtime/helpers/toPropertyKey",
+        "@babel/runtime/helpers/typeof",
+        "@babel/runtime/helpers/unsupportedIterableToArray"
+      ]
+    },
+    {
+      "file": "miniprogram/pages/query/index.js",
+      "sourceSha256": "1bf41a48291b6f0e45c50451e513a2b099b2085250ad24643ccabc5ceb058b71",
+      "outputSha256": "8a7e2ec308cbd6634a621cc64118476b0526f8b6b28c17328c41882f382dd80e",
+      "outputLength": 21064,
+      "helpers": [
+        "@babel/runtime/helpers/asyncToGenerator",
+        "@babel/runtime/helpers/objectSpread2",
+        "@babel/runtime/helpers/regeneratorRuntime"
+      ],
+      "dependencies": [
+        "@babel/runtime/helpers/asyncToGenerator",
+        "@babel/runtime/helpers/defineProperty",
+        "@babel/runtime/helpers/objectSpread2",
+        "@babel/runtime/helpers/regeneratorRuntime",
+        "@babel/runtime/helpers/toPrimitive",
+        "@babel/runtime/helpers/toPropertyKey",
+        "@babel/runtime/helpers/typeof"
+      ]
+    },
+    {
+      "file": "miniprogram/utils/api.js",
+      "sourceSha256": "7a3e2c72178f9d380bcf9b5e5c8c9076b7453125b6fdd5d7e2362b5a2dfbd01e",
+      "outputSha256": "ff75ba1d33c6d3e45f7c6650504e6651ab4b92fa2ea4175f06a8f6ef465101b6",
+      "outputLength": 5382,
+      "helpers": [
+        "@babel/runtime/helpers/asyncToGenerator",
+        "@babel/runtime/helpers/classCallCheck",
+        "@babel/runtime/helpers/createClass",
+        "@babel/runtime/helpers/getPrototypeOf",
+        "@babel/runtime/helpers/inherits",
+        "@babel/runtime/helpers/possibleConstructorReturn",
+        "@babel/runtime/helpers/regeneratorRuntime",
+        "@babel/runtime/helpers/typeof",
+        "@babel/runtime/helpers/wrapNativeSuper"
+      ],
+      "dependencies": [
+        "@babel/runtime/helpers/assertThisInitialized",
+        "@babel/runtime/helpers/asyncToGenerator",
+        "@babel/runtime/helpers/classCallCheck",
+        "@babel/runtime/helpers/construct",
+        "@babel/runtime/helpers/createClass",
+        "@babel/runtime/helpers/getPrototypeOf",
+        "@babel/runtime/helpers/inherits",
+        "@babel/runtime/helpers/isNativeFunction",
+        "@babel/runtime/helpers/isNativeReflectConstruct",
+        "@babel/runtime/helpers/possibleConstructorReturn",
+        "@babel/runtime/helpers/regeneratorRuntime",
+        "@babel/runtime/helpers/setPrototypeOf",
+        "@babel/runtime/helpers/toPrimitive",
+        "@babel/runtime/helpers/toPropertyKey",
+        "@babel/runtime/helpers/typeof",
+        "@babel/runtime/helpers/wrapNativeSuper"
+      ]
+    },
+    {
+      "file": "miniprogram/utils/catalog-order.js",
+      "sourceSha256": "9dad0aa72702ff0afa35706d2d5ce2c2f171405a6a9a87f356314f66709a5bd9",
+      "outputSha256": "5b035e4d6b746761a1b90c57b3ef03099aaef4761237f9be65e6406d07e0ce2c",
+      "outputLength": 9581,
+      "helpers": [
+        "@babel/runtime/helpers/Arrayincludes",
+        "@babel/runtime/helpers/Objectvalues",
+        "@babel/runtime/helpers/toConsumableArray"
+      ],
+      "dependencies": [
+        "@babel/runtime/helpers/Arrayincludes",
+        "@babel/runtime/helpers/Objectvalues",
+        "@babel/runtime/helpers/arrayLikeToArray",
+        "@babel/runtime/helpers/arrayWithoutHoles",
+        "@babel/runtime/helpers/iterableToArray",
+        "@babel/runtime/helpers/nonIterableSpread",
+        "@babel/runtime/helpers/toConsumableArray",
+        "@babel/runtime/helpers/unsupportedIterableToArray"
+      ]
+    },
+    {
+      "file": "miniprogram/utils/format.js",
+      "sourceSha256": "f174f12cb020a0c1b6eee09f38b89bdfc759f6710e10a2b1028a6f8ba24b5564",
+      "outputSha256": "c2e7cd3bca177c6b8ae490972f64bf694c793f65ea8b4ff180ebfb7708338512",
+      "outputLength": 7795,
+      "helpers": [
+        "@babel/runtime/helpers/objectSpread2"
+      ],
+      "dependencies": [
+        "@babel/runtime/helpers/defineProperty",
+        "@babel/runtime/helpers/objectSpread2",
+        "@babel/runtime/helpers/toPrimitive",
+        "@babel/runtime/helpers/toPropertyKey",
+        "@babel/runtime/helpers/typeof"
+      ]
+    },
+    {
+      "file": "miniprogram/utils/local-key.js",
+      "sourceSha256": "1103dd5137f91e7141267e1ea9a4fd6b282d9d9def8289a83b9d31062590f49e",
+      "outputSha256": "c166f8c7b74901cd37a54864813689024f0dff67b8116bcc2b476c7d65a29bbe",
+      "outputLength": 178,
+      "helpers": [],
+      "dependencies": []
+    },
+    {
+      "file": "miniprogram/utils/operation.js",
+      "sourceSha256": "59774655c2deea0713b5226a82657fae2cb088b50de0049b54fed904a109443d",
+      "outputSha256": "8725eb66b1b253c2f1b3d8404ce52b890627cda0564d331327a8c72c018956d6",
+      "outputLength": 1699,
+      "helpers": [
+        "@babel/runtime/helpers/Arrayincludes",
+        "@babel/runtime/helpers/objectSpread2",
+        "@babel/runtime/helpers/toConsumableArray"
+      ],
+      "dependencies": [
+        "@babel/runtime/helpers/Arrayincludes",
+        "@babel/runtime/helpers/arrayLikeToArray",
+        "@babel/runtime/helpers/arrayWithoutHoles",
+        "@babel/runtime/helpers/defineProperty",
+        "@babel/runtime/helpers/iterableToArray",
+        "@babel/runtime/helpers/nonIterableSpread",
+        "@babel/runtime/helpers/objectSpread2",
+        "@babel/runtime/helpers/toConsumableArray",
+        "@babel/runtime/helpers/toPrimitive",
+        "@babel/runtime/helpers/toPropertyKey",
+        "@babel/runtime/helpers/typeof",
+        "@babel/runtime/helpers/unsupportedIterableToArray"
+      ]
+    },
+    {
+      "file": "miniprogram/utils/store.js",
+      "sourceSha256": "c6bc5441cd03387135a87d6fd1cd74427357035441c0cc6d9be677e9f9ed56a2",
+      "outputSha256": "e858eabbddf490b5b521b6edd8c7f284ae721edc41556b3c688603098aa4d129",
+      "outputLength": 19470,
+      "helpers": [
+        "@babel/runtime/helpers/asyncToGenerator",
+        "@babel/runtime/helpers/createForOfIteratorHelper",
+        "@babel/runtime/helpers/objectSpread2",
+        "@babel/runtime/helpers/regeneratorRuntime"
+      ],
+      "dependencies": [
+        "@babel/runtime/helpers/arrayLikeToArray",
+        "@babel/runtime/helpers/asyncToGenerator",
+        "@babel/runtime/helpers/createForOfIteratorHelper",
+        "@babel/runtime/helpers/defineProperty",
+        "@babel/runtime/helpers/objectSpread2",
+        "@babel/runtime/helpers/regeneratorRuntime",
+        "@babel/runtime/helpers/toPrimitive",
+        "@babel/runtime/helpers/toPropertyKey",
+        "@babel/runtime/helpers/typeof",
+        "@babel/runtime/helpers/unsupportedIterableToArray"
+      ]
+    },
+    {
+      "file": "miniprogram/utils/tab-bar.js",
+      "sourceSha256": "67357ea6b66589e40f576c1d220d4abbb4dcf47da2132bef82c1590280328f5a",
+      "outputSha256": "d6c38517c9fad998472eb58492758000087091842c59dd30c0c935f8d08a8b4c",
+      "outputLength": 3374,
+      "helpers": [],
+      "dependencies": []
+    }
+  ],
+  "boundaries": [
+    "Compiles current source directly and resolves the generated Babel helper dependency graph; does not rely on the contents of an older release ZIP.",
+    "This does not inspect the running simulator module registry and does not replace native navigation or phone compatibility acceptance."
+  ]
+}

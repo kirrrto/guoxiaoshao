@@ -1,0 +1,65 @@
+<view class="test-page">
+  <view class="test-hero">
+    <view class="test-hero-icon"><image class="test-hero-art" src="/images/ui/notification.png" mode="aspectFit" aria-hidden="true" /></view>
+    <view class="test-hero-copy"><view class="test-title">体验微信提醒</view><view class="test-subtitle">看看小哨如何通过微信提醒你</view></view>
+  </view>
+  <view class="test-card test-main">
+    <block wx:if="{{test}}">
+      <view class="test-status-heading"><view class="test-status-dot test-status-{{test.status}}" aria-hidden="true"></view><view class="test-heading">{{statusTitle}}</view></view>
+      <view class="test-copy test-status-note">{{statusNote}}</view>
+      <view class="test-receipt">本次扣除 {{test.charged}} 次 · 已退回 {{test.refunded}} 次</view>
+      <view wx:if="{{test.status === 'accepted' || test.status === 'uncertain'}}" class="test-feedback">
+        <view class="test-feedback-title">在微信「服务通知」中收到了吗？</view>
+        <view class="test-feedback-actions">
+          <button class="test-secondary test-feedback-choice {{test.feedback === 'received' ? 'test-choice-selected' : ''}}" bindtap="onFeedback" data-outcome="received" disabled="{{busy || loading}}">{{test.feedback === 'received' ? '已确认收到' : '我收到了'}}</button>
+          <button class="test-secondary test-feedback-choice {{test.feedback === 'not_received' ? 'test-choice-selected' : ''}}" bindtap="onFeedback" data-outcome="not_received" disabled="{{busy || loading}}">{{test.feedback === 'not_received' ? '已反馈未收到' : '暂时没收到'}}</button>
+        </view>
+        <view wx:if="{{feedbackNote}}" class="test-feedback-note" aria-live="polite">{{feedbackNote}}</view>
+        <button wx:if="{{test.feedback === 'received'}}" class="test-primary test-return" bindtap="onReturnTask" disabled="{{busy || loading}}">{{returnLabel}}</button>
+        <view wx:if="{{test.feedback === 'not_received'}}" class="test-troubleshooting">
+          <view class="test-copy">先返回微信，搜索并打开「服务通知」，查找【测试】消息。</view>
+          <button class="test-disclosure" bindtap="onToggleTroubleshooting" aria-expanded="{{showTroubleshooting}}"><text class="test-disclosure-label">仍未找到？查看排查方法</text><view class="ui-chevron {{showTroubleshooting ? 'ui-chevron--up' : 'ui-chevron--down'}}" aria-hidden="true"></view></button>
+          <view wx:if="{{showTroubleshooting}}" class="test-help-steps">
+            <view class="test-help-step">1. 查看小程序右上角「…」中的设置与订阅消息选项。</view>
+            <view class="test-help-step">2. 查看微信通知设置及手机系统的微信通知权限。</view>
+            <view class="test-help-step">入口可能随版本不同。开启权限也不保证及时弹出锁屏提醒。</view>
+          </view>
+        </view>
+      </view>
+    </block>
+    <block wx:else>
+      <view class="test-heading">先给自己发一条</view>
+      <view class="test-copy">允许微信授权后，在「服务通知」中查收标注【测试】的消息。</view>
+      <view class="test-tag">仅体验提醒，不查询库存或创建监测</view>
+    </block>
+    <view wx:if="{{error}}" class="test-error" role="alert">{{error}}</view>
+    <view wx:if="{{operationNote}}" class="test-operation" aria-live="polite">{{operationNote}}</view>
+    <view wx:if="{{checkNote}}" class="test-operation" aria-live="polite">{{checkNote}}</view>
+    <view class="test-actions {{test ? 'test-actions-after-result' : ''}}">
+      <view wx:if="{{pendingOther}}" class="test-copy">另有一条待确认测试，请先查看它，避免重复操作。</view>
+      <button wx:if="{{pendingOther}}" class="test-primary" bindtap="onViewPending" disabled="{{busy || loading}}">查看另一个待确认测试</button>
+      <block wx:elif="{{canContinue}}">
+        <view class="test-action-caption">继续这次测试，无需再次授权</view>
+        <button class="test-primary" bindtap="onContinue" disabled="{{busy || loading || !ready || blocked}}" loading="{{busy}}">继续原测试 · 本次最多 1 次</button>
+      </block>
+      <block wx:elif="{{!blocked}}">
+        <view class="test-cost"><text>每条消耗 <text class="test-cost-number">1 次</text>查询／体验次数</text><text>可用 {{balance}} 次</text></view>
+        <view wx:if="{{test && test.status === 'uncertain' && test.feedback}}" class="test-action-caption">原测试结果仍未知，扣次记录保留。再次体验会新建测试，另消耗 1 次。</view>
+        <button class="{{test && (test.status === 'accepted' || test.status === 'uncertain') ? 'test-secondary test-again' : 'test-primary'}}" bindtap="onStart" disabled="{{busy || loading || !ready || balance < 1}}" loading="{{busy}}">{{test && test.status === 'uncertain' ? '重新授权新测试 · 1 次' : (test && test.status === 'accepted' ? '再体验一条 · 1 次' : '授权并发送测试 · 1 次')}}</button>
+        <view wx:if="{{!test}}" class="test-action-caption">免费用户也可体验，会员同样消耗 1 次额度。</view>
+      </block>
+      <button wx:if="{{test || error || !ready || canContinue || pendingOther}}" class="test-secondary test-check" bindtap="onCheck" disabled="{{busy || loading}}">{{loading ? '读取中…' : '查看原测试结果'}}</button>
+      <button wx:if="{{ready && balance < 1 && !blocked && !canContinue && !pendingOther}}" class="test-secondary test-signin" bindtap="onGoMine">去「我的」签到获取次数</button>
+    </view>
+  </view>
+  <view class="test-card test-rules-card">
+    <button class="test-disclosure test-rules-toggle" bindtap="onToggleTestRules" aria-expanded="{{showTestRules}}"><view class="ui-label-with-icon"><image class="ui-icon" src="/images/ui/info.png" mode="aspectFit" aria-hidden="true" /><text>体验说明</text></view><view class="test-disclosure-meta"><text>{{showTestRules ? '收起' : '查看'}}</text><view class="ui-chevron {{showTestRules ? 'ui-chevron--up' : 'ui-chevron--down'}}" aria-hidden="true"></view></view></button>
+    <view wx:if="{{showTestRules}}" class="test-rules">
+      <view class="test-rule"><view class="test-rule-title">次数如何扣除</view><view>每条消耗 1 次签到／任务额度，会员同样扣次。明确发送失败自动退回；结果不明时暂不退回，不会重复发送。</view></view>
+      <view class="test-rule"><view class="test-rule-title">授权与送达</view><view>微信授权次数与查询额度分开计算。微信受理不代表已送达，也不保证手机弹出横幅。</view></view>
+      <view class="test-rule"><view class="test-rule-title">正式提醒需要什么</view><view>测试不代表真实放货。正式到货和断货提醒需要会员、有效关注与微信授权。</view></view>
+    </view>
+  </view>
+  <view class="test-tip">【测试】非真实放货 · 微信受理不等于已送达</view>
+  <button wx:if="{{!test || test.feedback !== 'received'}}" class="test-secondary test-return" bindtap="onReturnTask" disabled="{{busy || loading}}">{{returnLabel}}</button>
+</view>

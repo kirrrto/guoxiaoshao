@@ -1,0 +1,91 @@
+{
+  "capturedAt": "2026-09-16 10:38:58 UTC",
+  "source": "Live CloudBase NoSQL read, before 1.1.4 deployment",
+  "events": {
+    "requestId": "e75bc69d-13ff-4ceb-82a1-96b0f7f3c724",
+    "total": 5,
+    "data": [
+      {
+        "dayKey": "2026-09-16",
+        "detectedAt": "2026-09-16T01:10:58.133Z",
+        "partNumber": "MKFW4CH/A",
+        "source": "manual",
+        "storeName": "深圳万象城",
+        "storeNumber": "R761",
+        "type": "first_seen_available"
+      },
+      {
+        "dayKey": "2026-09-16",
+        "detectedAt": "2026-09-16T01:10:58.749Z",
+        "partNumber": "MKFW4CH/A",
+        "source": "manual",
+        "storeName": "深圳益田假日广场",
+        "storeNumber": "R484",
+        "type": "first_seen_available"
+      },
+      {
+        "dayKey": "2026-09-16",
+        "detectedAt": "2026-09-16T01:10:58.929Z",
+        "partNumber": "MKFW4CH/A",
+        "source": "manual",
+        "storeName": "前海壹方城",
+        "storeNumber": "R793",
+        "type": "first_seen_available"
+      },
+      {
+        "dayKey": "2026-09-16",
+        "detectedAt": "2026-09-16T05:36:05.618Z",
+        "partNumber": "MKFW4CH/A",
+        "source": "manual",
+        "storeName": "珠江新城",
+        "storeNumber": "R639",
+        "type": "first_seen_available"
+      },
+      {
+        "dayKey": "2026-09-16",
+        "detectedAt": "2026-09-16T05:36:05.691Z",
+        "partNumber": "MKFW4CH/A",
+        "source": "manual",
+        "storeName": "天环广场",
+        "storeNumber": "R577",
+        "type": "first_seen_available"
+      }
+    ]
+  },
+  "selectedHistory": {
+    "requestId": "0dd1ebbf-2179-4417-8f20-0117271aac7e",
+    "total": 0,
+    "data": []
+  },
+  "collector": {
+    "requestId": "d97f65f7-185f-4eea-8821-41693bcdb5c7",
+    "total": 1,
+    "data": [
+      {
+        "_id": "collector_status",
+        "groupCount": 2,
+        "intervalMs": 60000,
+        "scheduler": {
+          "targets": [
+            {
+              "key": "R577|MJYE4CH/A"
+            },
+            {
+              "key": "R639|MJYE4CH/A"
+            }
+          ]
+        },
+        "state": "running",
+        "stats": {
+          "batches": 2,
+          "events": 0,
+          "lastBatchAt": "2026-09-16T10:38:06.122Z",
+          "observations": 2,
+          "sent": 0,
+          "tasks": 0
+        },
+        "updatedAt": "2026-09-16T10:38:06.579Z"
+      }
+    ]
+  }
+}

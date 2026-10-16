@@ -1,0 +1,297 @@
+{
+  "method": "Offline rendering of actual WXML/WXSS, computed font scaling; not WeChat native rendering",
+  "cases": [
+    {
+      "scenario": "history-no-data",
+      "width": 320,
+      "fontScale": 1,
+      "failures": [],
+      "clipped": [],
+      "stats": 0
+    },
+    {
+      "scenario": "history-no-data",
+      "width": 320,
+      "fontScale": 1.3,
+      "failures": [],
+      "clipped": [],
+      "stats": 0
+    },
+    {
+      "scenario": "history-no-data",
+      "width": 375,
+      "fontScale": 1,
+      "failures": [],
+      "clipped": [],
+      "stats": 0
+    },
+    {
+      "scenario": "history-no-data",
+      "width": 375,
+      "fontScale": 1.3,
+      "failures": [],
+      "clipped": [],
+      "stats": 0
+    },
+    {
+      "scenario": "history-no-data",
+      "width": 430,
+      "fontScale": 1,
+      "failures": [],
+      "clipped": [],
+      "stats": 0
+    },
+    {
+      "scenario": "history-no-data",
+      "width": 430,
+      "fontScale": 1.3,
+      "failures": [],
+      "clipped": [],
+      "stats": 0
+    },
+    {
+      "scenario": "history-unknown-only",
+      "width": 320,
+      "fontScale": 1,
+      "failures": [],
+      "clipped": [],
+      "stats": 0
+    },
+    {
+      "scenario": "history-unknown-only",
+      "width": 320,
+      "fontScale": 1.3,
+      "failures": [],
+      "clipped": [],
+      "stats": 0
+    },
+    {
+      "scenario": "history-unknown-only",
+      "width": 375,
+      "fontScale": 1,
+      "failures": [],
+      "clipped": [],
+      "stats": 0
+    },
+    {
+      "scenario": "history-unknown-only",
+      "width": 375,
+      "fontScale": 1.3,
+      "failures": [],
+      "clipped": [],
+      "stats": 0
+    },
+    {
+      "scenario": "history-unknown-only",
+      "width": 430,
+      "fontScale": 1,
+      "failures": [],
+      "clipped": [],
+      "stats": 0
+    },
+    {
+      "scenario": "history-unknown-only",
+      "width": 430,
+      "fontScale": 1.3,
+      "failures": [],
+      "clipped": [],
+      "stats": 0
+    },
+    {
+      "scenario": "history-observed-no-events",
+      "width": 320,
+      "fontScale": 1,
+      "failures": [],
+      "clipped": [],
+      "stats": 0
+    },
+    {
+      "scenario": "history-observed-no-events",
+      "width": 320,
+      "fontScale": 1.3,
+      "failures": [],
+      "clipped": [],
+      "stats": 0
+    },
+    {
+      "scenario": "history-observed-no-events",
+      "width": 375,
+      "fontScale": 1,
+      "failures": [],
+      "clipped": [],
+      "stats": 0
+    },
+    {
+      "scenario": "history-observed-no-events",
+      "width": 375,
+      "fontScale": 1.3,
+      "failures": [],
+      "clipped": [],
+      "stats": 0
+    },
+    {
+      "scenario": "history-observed-no-events",
+      "width": 430,
+      "fontScale": 1,
+      "failures": [],
+      "clipped": [],
+      "stats": 0
+    },
+    {
+      "scenario": "history-observed-no-events",
+      "width": 430,
+      "fontScale": 1.3,
+      "failures": [],
+      "clipped": [],
+      "stats": 0
+    },
+    {
+      "scenario": "history-events-only",
+      "width": 320,
+      "fontScale": 1,
+      "failures": [],
+      "clipped": [],
+      "stats": 4
+    },
+    {
+      "scenario": "history-events-only",
+      "width": 320,
+      "fontScale": 1.3,
+      "failures": [],
+      "clipped": [],
+      "stats": 4
+    },
+    {
+      "scenario": "history-events-only",
+      "width": 375,
+      "fontScale": 1,
+      "failures": [],
+      "clipped": [],
+      "stats": 4
+    },
+    {
+      "scenario": "history-events-only",
+      "width": 375,
+      "fontScale": 1.3,
+      "failures": [],
+      "clipped": [],
+      "stats": 4
+    },
+    {
+      "scenario": "history-events-only",
+      "width": 430,
+      "fontScale": 1,
+      "failures": [],
+      "clipped": [],
+      "stats": 4
+    },
+    {
+      "scenario": "history-events-only",
+      "width": 430,
+      "fontScale": 1.3,
+      "failures": [],
+      "clipped": [],
+      "stats": 4
+    },
+    {
+      "scenario": "history-observed-events",
+      "width": 320,
+      "fontScale": 1,
+      "failures": [],
+      "clipped": [],
+      "stats": 4
+    },
+    {
+      "scenario": "history-observed-events",
+      "width": 320,
+      "fontScale": 1.3,
+      "failures": [],
+      "clipped": [],
+      "stats": 4
+    },
+    {
+      "scenario": "history-observed-events",
+      "width": 375,
+      "fontScale": 1,
+      "failures": [],
+      "clipped": [],
+      "stats": 4
+    },
+    {
+      "scenario": "history-observed-events",
+      "width": 375,
+      "fontScale": 1.3,
+      "failures": [],
+      "clipped": [],
+      "stats": 4
+    },
+    {
+      "scenario": "history-observed-events",
+      "width": 430,
+      "fontScale": 1,
+      "failures": [],
+      "clipped": [],
+      "stats": 4
+    },
+    {
+      "scenario": "history-observed-events",
+      "width": 430,
+      "fontScale": 1.3,
+      "failures": [],
+      "clipped": [],
+      "stats": 4
+    },
+    {
+      "scenario": "history-partial-stores",
+      "width": 320,
+      "fontScale": 1,
+      "failures": [],
+      "clipped": [],
+      "stats": 4
+    },
+    {
+      "scenario": "history-partial-stores",
+      "width": 320,
+      "fontScale": 1.3,
+      "failures": [],
+      "clipped": [],
+      "stats": 4
+    },
+    {
+      "scenario": "history-partial-stores",
+      "width": 375,
+      "fontScale": 1,
+      "failures": [],
+      "clipped": [],
+      "stats": 4
+    },
+    {
+      "scenario": "history-partial-stores",
+      "width": 375,
+      "fontScale": 1.3,
+      "failures": [],
+      "clipped": [],
+      "stats": 4
+    },
+    {
+      "scenario": "history-partial-stores",
+      "width": 430,
+      "fontScale": 1,
+      "failures": [],
+      "clipped": [],
+      "stats": 4
+    },
+    {
+      "scenario": "history-partial-stores",
+      "width": 430,
+      "fontScale": 1.3,
+      "failures": [],
+      "clipped": [],
+      "stats": 4
+    }
+  ],
+  "summary": {
+    "cases": 36,
+    "failed": 0
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "checkedAt": "2026-10-15T08:49:40.598Z",
+  "scope": "Chromium WXML/WXSS approximation with fixture accounts; not WeChat or a real purchase",
+  "report": [
+    {
+      "name": "member-actions",
+      "scenario": "v3-member-monthly",
+      "output": "output/v3.0.0-member-actions.png"
+    },
+    {
+      "name": "free-entry",
+      "scenario": "v2-free",
+      "output": "output/v3.0.0-free-entry.png"
+    },
+    {
+      "name": "upgrade-weekly",
+      "scenario": "v3-upgrade-weekly",
+      "output": "output/v3.0.0-upgrade-weekly.png"
+    },
+    {
+      "name": "upgrade-monthly",
+      "scenario": "v3-upgrade-monthly",
+      "output": "output/v3.0.0-upgrade-monthly.png"
+    },
+    {
+      "name": "upgrade-annual",
+      "scenario": "v3-upgrade-annual",
+      "output": "output/v3.0.0-upgrade-annual.png"
+    }
+  ]
+}

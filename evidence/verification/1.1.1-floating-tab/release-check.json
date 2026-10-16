@@ -1,0 +1,127 @@
+{
+  "checkedAt": "2026-09-16T03:28:01.025Z",
+  "version": "1.1.1",
+  "scope": "Local source candidate only; no cloud deployment, account-console inspection or submission",
+  "passed": true,
+  "checks": [
+    {
+      "name": "gxs_api: package and lock versions match release 1.1.1",
+      "passed": true
+    },
+    {
+      "name": "gxs_api: exact SDK version and integrity lock",
+      "passed": true
+    },
+    {
+      "name": "gxs_api: SDK entry points installed",
+      "passed": true
+    },
+    {
+      "name": "cloudbase_auth: package and lock versions match release 1.1.1",
+      "passed": true
+    },
+    {
+      "name": "cloudbase_auth: exact SDK version and integrity lock",
+      "passed": true
+    },
+    {
+      "name": "cloudbase_auth: SDK entry points installed",
+      "passed": true
+    },
+    {
+      "name": "gxs_monitor: package and lock versions match release 1.1.1",
+      "passed": true
+    },
+    {
+      "name": "gxs_monitor: exact SDK version and integrity lock",
+      "passed": true
+    },
+    {
+      "name": "gxs_monitor: SDK entry points installed",
+      "passed": true
+    },
+    {
+      "name": "system.ping uses the release version",
+      "passed": true
+    },
+    {
+      "name": "scheduled monitor has the expected minute trigger",
+      "passed": true
+    },
+    {
+      "name": "monitor rejects client-supplied timer payloads",
+      "passed": true
+    },
+    {
+      "name": "API and monitor share identical business logic",
+      "passed": true
+    },
+    {
+      "name": "consumer AppID matches project and frontend",
+      "passed": true
+    },
+    {
+      "name": "shared resource identifiers match",
+      "passed": true
+    },
+    {
+      "name": "shared auth allows configured consumer and rejects payload spoofing",
+      "passed": true
+    },
+    {
+      "name": "private routes excluded from search",
+      "passed": true
+    },
+    {
+      "name": "payment stays closed in defaults",
+      "passed": true
+    },
+    {
+      "name": "acceptance page and mock runtime absent from mini program",
+      "passed": true
+    },
+    {
+      "name": "tab icons and page resources exist",
+      "passed": true
+    },
+    {
+      "name": "floating navigation component is enabled and registered",
+      "passed": true
+    },
+    {
+      "name": "custom navigation matches native tab routes, labels and icons",
+      "passed": true
+    }
+  ],
+  "frontend": {
+    "files": 53,
+    "sourceBytes": 513255,
+    "note": "Source bytes, not the WeChat upload package size"
+  },
+  "externalReleaseChecks": [
+    {
+      "item": "Consumer account eligibility, filing, categories and privacy declaration",
+      "status": "requires account-console verification"
+    },
+    {
+      "item": "Deploy cloudbase_auth, gxs_api and gxs_monitor; verify actual timer invocations",
+      "status": "not checked by this local tool; consult the versioned cloud-deployment evidence"
+    },
+    {
+      "item": "Apply database indexes/rules and seed verified catalog",
+      "status": "not checked by this local tool; consult the versioned cloud-deployment evidence"
+    },
+    {
+      "item": "Real-account signin, quota, history and reminder deletion/clear",
+      "status": "requires deployed-cloud acceptance"
+    },
+    {
+      "item": "iOS and Android layout, images, failure recovery and package size",
+      "status": "requires physical-device acceptance"
+    },
+    {
+      "item": "Automatic collection and actual subscription delivery",
+      "status": "separate checks: verify automatic observations; enable messages only with real template, credentials and user authorization"
+    }
+  ]
+}

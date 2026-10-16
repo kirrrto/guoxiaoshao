@@ -1,0 +1,17 @@
+{
+  "name": "gxs_monitor",
+  "version": "3.0.2",
+  "license": "MIT",
+  "private": true,
+  "description": "果小哨每分钟补货监测与订阅通知定时云函数",
+  "main": "index.js",
+  "type": "commonjs",
+  "dependencies": {
+    "wx-server-sdk": "4.0.2"
+  },
+  "overrides": {
+    "axios": "0.34.0",
+    "lodash.unset": "4.18.0",
+    "@cloudbase/database": "1.5.1"
+  }
+}

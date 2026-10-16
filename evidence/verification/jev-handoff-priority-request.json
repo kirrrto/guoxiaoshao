@@ -1,0 +1,57 @@
+﻿{
+  "state": "Project: guoxiaoshao WeChat mini program (Apple China retail pickup monitor), local version 1.1.6.\nLocal quality gates all green: 378/378 tests, 0 source-check errors, 30/30 release preflight, monitor bundle 28 files hash-match.\nSecurity already improved: manual+auto share upstream budget and circuit breaker; adminUserKeys only changeable by trusted operator with transactional audit; consumer package has only 4 pages; operator tool is a separate project; payment defaults remain disabled.\nOpen items:\n1 commit_1_1_6: working tree uncommitted (payment scaffold, subscription readiness); deploy target ambiguous without tag.\n2 cloud_deploy: three cloud functions + trusted adminUserKeys + indexes not yet applied to production.\n3 subscribe_template: WeChat subscribe template + consumer credentials + real delivery acceptance still open; restock alerts off.\n4 payment_real: production virtual payment credentials + real-device payment/refund not accepted; purchase intentionally closed.\n5 apple_toS: confirm Apple site API usage authorization/scope before scaling collector; engineering throttles exist.\n6 evidence_cleanup: archive large evidence screenshots; repo hygiene only.\nConstraints: local tests are not production verification; payment stays closed until real credentials/acceptance; collector and notifications are optional runtime switches; agent must not mutate main git worktree without user confirmation.",
+  "model": "jev-latest",
+  "questions": {
+    "next_action": {
+      "type": "choice",
+      "instructions": "Given current local quality and open items, which single action should the team take next to reduce operational risk fastest?",
+      "criteria": {
+        "commit_1_1_6": "Commit and tag the current 1.1.6 tree as the release baseline",
+        "cloud_deploy": "Deploy the three cloud functions and apply trusted runtime config and indexes",
+        "subscribe_template": "Finish WeChat subscription template and real delivery acceptance",
+        "payment_real": "Wire production virtual payment credentials and real-device payment acceptance",
+        "apple_toS": "Resolve upstream data authorization before any scale-up",
+        "evidence_cleanup": "Only repository hygiene"
+      }
+    },
+    "release_gate": {
+      "type": "choice",
+      "instructions": "Which missing gate most threatens a mistaken production release from this local tree?",
+      "criteria": {
+        "no_tag": "Working tree not committed or tagged so deploy target is ambiguous",
+        "no_cloud_1_1_6": "Cloud functions may still be older than local 1.1.6 code",
+        "payment_misconfig": "Payment credentials or defaults misconfiguration could enable unintended purchase",
+        "admin_keys": "adminUserKeys misapplied via an untrusted path",
+        "upstream_toS": "Unauthorized scaled scraping of Apple endpoints",
+        "test_overtrust": "Over-trusting offline tests and shipping without device or cloud acceptance"
+      }
+    },
+    "admin_risk_severity": {
+      "type": "score",
+      "instructions": "Rate residual admin/configuration privilege risk after operator-only adminUserKeys edits and transactional audit, if cloud still uses old defaults or an empty admin list",
+      "criteria": [
+        "none: no meaningful privilege path remains; empty admin list is safe and recoverable only via trusted operator",
+        "low: operational inconvenience only; no unauthorized admin mutation path",
+        "medium: deploy misconfiguration could lock out ops or leave unintended admin keys if process is skipped",
+        "high: a realistic production path lets untrusted actors gain admin or grant membership or credits",
+        "critical: ordinary consumer users can currently become admin or alter membership or quota at will"
+      ]
+    },
+    "payment_ready": {
+      "type": "noul",
+      "instructions": "Is production virtual payment operationally ready to enable now?",
+      "criteria": {
+        "true": "Credentials, gateway, real-device acceptance, and legal or filing readiness are all confirmed",
+        "false": "Any of credentials, gateway, real-device acceptance, or filing readiness is missing; keep purchase closed"
+      }
+    },
+    "shared_rate_limit_closed": {
+      "type": "noul",
+      "instructions": "Does the local code close the prior gap where manual queries bypassed collector budget and circuit breaker?",
+      "criteria": {
+        "true": "Manual and auto share persisted budget and breaker and offline tests cover this",
+        "false": "Manual queries still bypass shared upstream protection or coverage is missing"
+      }
+    }
+  }
+}

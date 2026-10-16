@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 1,
+  "asOf": "2026-10-11",
+  "timezone": "Asia/Shanghai",
+  "localOnly": true,
+  "networkAccessed": false,
+  "productionChanged": false,
+  "calendarEnablesService": false,
+  "passed": true,
+  "errors": [],
+  "launches": [
+    {
+      "familyKey": "iphone-duo",
+      "title": "iPhone Duo",
+      "sourceUrl": "https://www.apple.com.cn/newsroom/2026/09/apple-unveils-iphone-duo/",
+      "officialUrl": "https://www.apple.com.cn/shop/buy-iphone/iphone-duo",
+      "editorialVerifiedOn": "2026-10-11",
+      "sourceContentRevalidated": false,
+      "preorderAt": "2026-10-16T20:00:00+08:00",
+      "releaseDate": "2026-10-23",
+      "catalogProductCount": 8,
+      "effectiveSupportedCount": 0,
+      "comingSoonCount": 8,
+      "sampledPartNumber": null,
+      "pickupVerificationStatus": "all_coming_soon",
+      "blockers": [
+        "catalog_coming_soon",
+        "pickup_not_verified",
+        "no_sampled_sku"
+      ],
+      "variants": [
+        {
+          "partNumber": "MK2Q4CH/A",
+          "comingSoon": true,
+          "supported": false
+        },
+        {
+          "partNumber": "MK2W4CH/A",
+          "comingSoon": true,
+          "supported": false
+        },
+        {
+          "partNumber": "MK2P4CH/A",
+          "comingSoon": true,
+          "supported": false
+        },
+        {
+          "partNumber": "MK2M4CH/A",
+          "comingSoon": true,
+          "supported": false
+        },
+        {
+          "partNumber": "MK2U4CH/A",
+          "comingSoon": true,
+          "supported": false
+        },
+        {
+          "partNumber": "MK2N4CH/A",
+          "comingSoon": true,
+          "supported": false
+        },
+        {
+          "partNumber": "MK2V4CH/A",
+          "comingSoon": true,
+          "supported": false
+        },
+        {
+          "partNumber": "MK2T4CH/A",
+          "comingSoon": true,
+          "supported": false
+        }
+      ],
+      "operationalStatus": "not_open_for_query_or_monitoring",
+      "nextSteps": [
+        "核对官方可售状态与真实 SKU",
+        "经授权完成真实门店取货采样",
+        "更新并同步目录后重新核验限制、查询与提醒"
+      ]
+    }
+  ],
+  "interpretation": "通过仅表示本地登记格式和目录状态一致；不证明来源网页本次已联网核实，不证明取货或监测服务已开放。",
+  "catalogSha256": "0273e07bd8767bb824488499fb2f51b471555d7998f7ed82422e9664e2b0d8fd",
+  "cloudBundleMatchesLocal": true
+}

@@ -1,0 +1,25 @@
+{
+  "createdAt": "2026-10-11T06:02:41.286259+00:00",
+  "version": "2.0.0",
+  "archive": "E:\\guoxiaoshao-master\\guoxiaoshao-master\\output\\guoxiaoshao-2.0.0-candidate.zip",
+  "bytes": 4305143,
+  "sha256": "b28404f7c9887ad437421c4d951877bf7a2904b4505ddb04e782f5eaa2838981",
+  "entries": 503,
+  "sourceFiles": 493,
+  "sourceBytesVerified": true,
+  "offlinePreview": {
+    "archive": "E:\\guoxiaoshao-master\\guoxiaoshao-master\\output\\guoxiaoshao-2.0.0-ui-preview.zip",
+    "bytes": 5270215,
+    "sha256": "99ee31346086aaae014cb776ec8b54687548db422494319507d739c100129496",
+    "open": "index.html"
+  },
+  "excluded": [
+    "dependencies",
+    "local private config and credentials",
+    "input documents/competitor images",
+    "temporary files",
+    "offline screenshot gallery",
+    "old evidence"
+  ],
+  "restoreBaseline": "E:\\guoxiaoshao-master\\guoxiaoshao-master\\tmp\\v2-input\\baseline-1.6.1.zip"
+}

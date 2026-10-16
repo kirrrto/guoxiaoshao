@@ -1,0 +1,91 @@
+{
+  "version": "1.4.1",
+  "checkedAt": "2026-09-28T02:32:00.643Z",
+  "scope": "Real timer invocations and projected collector heartbeat; no forced notifications or phone acceptance",
+  "timerInvocations": [
+    {
+      "timeBeijing": "2026-09-28 10:31:14.945",
+      "requestId": "826251b0-7558-41c3-b665-491679940f12",
+      "startedAt": "2026-09-28T02:31:00.895Z",
+      "statusCode": "200",
+      "source": "TRIGGER_TIMER",
+      "durationMs": 14044,
+      "result": {
+        "ok": true,
+        "state": "running",
+        "scanned": 9,
+        "observations": 9,
+        "events": 0,
+        "sent": 0,
+        "deadlineReached": false
+      }
+    },
+    {
+      "timeBeijing": "2026-09-28 10:30:23.472",
+      "requestId": "d0d9066f-74cf-4d0a-9180-adcacffc5a03",
+      "startedAt": "2026-09-28T02:30:06.201Z",
+      "statusCode": "200",
+      "source": "TRIGGER_TIMER",
+      "durationMs": 17265,
+      "result": {
+        "ok": true,
+        "state": "running",
+        "scanned": 9,
+        "observations": 9,
+        "events": 0,
+        "sent": 0,
+        "deadlineReached": false
+      }
+    }
+  ],
+  "status": {
+    "_id": "collector_status",
+    "expiresAt": "2026-09-28T02:33:44.731Z",
+    "groupCount": 9,
+    "mode": "scheduled",
+    "notifications": {
+      "authReady": true,
+      "authState": "ready",
+      "checkedAt": "2026-09-28T02:31:02.244Z",
+      "credentialsConfigured": true,
+      "enabled": true,
+      "lastErrorCode": null,
+      "reason": null,
+      "validUntil": "2026-09-28T04:19:02.244Z"
+    },
+    "state": "running",
+    "stats": {
+      "batches": 9,
+      "events": 0,
+      "lastBatchAt": "2026-09-28T02:31:13.269Z",
+      "observations": 9,
+      "sent": 0,
+      "tasks": 0
+    },
+    "updatedAt": "2026-09-28T02:31:14.731Z"
+  },
+  "readiness": {
+    "collector": {
+      "enabled": true,
+      "state": "running",
+      "stale": false,
+      "mode": "scheduled",
+      "breaker": null,
+      "intervalMs": null,
+      "groupCount": 9,
+      "lastBatchAt": "2026-09-28T02:31:13.269Z",
+      "updatedAt": "2026-09-28T02:31:14.731Z",
+      "nextRunAt": null
+    },
+    "notifications": {
+      "enabled": true,
+      "templateIds": {
+        "restock": "qcfmYZuvfallzFUAVrEaRsWw4vtnwpucYMaao65OzCw"
+      },
+      "templateTitle": "商品到货提醒",
+      "templateConfigured": true,
+      "deliveryReady": true,
+      "reason": null
+    }
+  }
+}

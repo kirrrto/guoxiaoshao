@@ -1,0 +1,30 @@
+<view class="page notice-page">
+  <view class="page-heading brand-page-heading">
+    <view class="brand-page-copy">
+      <view class="page-title">公告</view>
+      <view class="page-subtitle">服务说明与临时通知，过期内容不再展示</view>
+    </view>
+  </view>
+
+  <view wx:if="{{loadError}}" class="card load-error" role="alert">
+    <view class="load-error-title">暂时没有连上</view>
+    <view class="load-error-detail">{{loadError}}</view>
+    <button class="btn btn-primary btn-block mt" bindtap="onRetry">重试</button>
+  </view>
+
+  <block wx:elif="{{ready}}">
+    <view wx:if="{{!hasContent}}" class="card empty-notice">
+      <view class="empty-notice-title">暂时没有公告</view>
+      <view class="small text-2">需要说明服务状态或操作指引时，会显示在这里。</view>
+    </view>
+    <view wx:for="{{items}}" wx:key="key" class="card notice-card notice-card--{{item.tone}}">
+      <view class="notice-card-head">
+        <text class="notice-card-title">{{item.title}}</text>
+        <text wx:if="{{item.publishedAt}}" class="notice-card-stamp">发布 {{item.publishedAt}}</text>
+        <text wx:elif="{{item.stamp}}" class="notice-card-stamp">{{item.stamp}}</text>
+      </view>
+      <view class="notice-card-text">{{item.text}}</view>
+    </view>
+    <view class="tiny muted notice-foot">仅展示仍在有效期内的说明。具体库存与下单请以苹果官网为准。</view>
+  </block>
+</view>

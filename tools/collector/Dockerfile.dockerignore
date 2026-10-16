@@ -1,0 +1,11 @@
+**
+!cloudfunctions/
+!cloudfunctions/gxs_api/
+!cloudfunctions/gxs_api/lib/
+!cloudfunctions/gxs_api/lib/**
+!tools/
+!tools/collector/
+!tools/collector/package.json
+!tools/collector/package-lock.json
+!tools/collector/runner.js
+!tools/collector/Dockerfile

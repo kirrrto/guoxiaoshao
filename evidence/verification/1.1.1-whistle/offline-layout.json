@@ -1,0 +1,84 @@
+{
+  "suites": [
+    {
+      "largeFontReport": "C:\\Users\\Administrator\\Documents\\ChatGPT\\果小哨\\ui-whistle-20260916\\large-font-metrics.json",
+      "layoutReportSha256": "583490299a4c63657d74398cefed0e33676161ca9f3be3e5487a6cc7c088feea",
+      "largeFont": {
+        "total": 72,
+        "horizontalOverflow": 0,
+        "clippedText": 0
+      },
+      "largeFontReportSha256": "89f8b710f01bc563bf0c78909df96c99a929a026d218b2518c58d407fc21e641",
+      "layout": {
+        "total": 90,
+        "expressionErrors": 0,
+        "missingText": 0,
+        "horizontalOverflow": 0,
+        "clippedText": 0,
+        "failedImages": 0
+      },
+      "layoutReport": "C:\\Users\\Administrator\\Documents\\ChatGPT\\果小哨\\ui-whistle-20260916\\layout-metrics.json",
+      "directory": "C:\\Users\\Administrator\\Documents\\ChatGPT\\果小哨\\ui-whistle-20260916"
+    },
+    {
+      "largeFontReport": "C:\\Users\\Administrator\\Documents\\ChatGPT\\果小哨\\ui-whistle-reminders-20260916\\large-font-metrics.json",
+      "layoutReportSha256": "d157e6c7f7ea02587c32bc658607dc314a3d4c51daef7b8a966a27ed7c636cdc",
+      "largeFont": {
+        "total": 24,
+        "horizontalOverflow": 0,
+        "clippedText": 0
+      },
+      "largeFontReportSha256": "7e9c7f570fe878bedec8006f1983de2236b7622f1772f96cc8ea9131727564f7",
+      "layout": {
+        "total": 24,
+        "expressionErrors": 0,
+        "missingText": 0,
+        "horizontalOverflow": 0,
+        "clippedText": 0,
+        "failedImages": 0
+      },
+      "layoutReport": "C:\\Users\\Administrator\\Documents\\ChatGPT\\果小哨\\ui-whistle-reminders-20260916\\layout-metrics.json",
+      "directory": "C:\\Users\\Administrator\\Documents\\ChatGPT\\果小哨\\ui-whistle-reminders-20260916"
+    },
+    {
+      "largeFontReport": "C:\\Users\\Administrator\\Documents\\ChatGPT\\果小哨\\ui-whistle-monitor-20260916\\large-font-metrics.json",
+      "layoutReportSha256": "d6100ef5b17bfd9f01ff4c0471109b80be0c5878f2d0bc51db3ead984a94f550",
+      "largeFont": {
+        "total": 18,
+        "horizontalOverflow": 0,
+        "clippedText": 0
+      },
+      "largeFontReportSha256": "741d3077b974e6244484e8fc3fce1dfd67c5c3b1a6bc6dcc69e68a7f8cb8e9cd",
+      "layout": {
+        "total": 18,
+        "expressionErrors": 0,
+        "missingText": 0,
+        "horizontalOverflow": 0,
+        "clippedText": 0,
+        "failedImages": 0
+      },
+      "layoutReport": "C:\\Users\\Administrator\\Documents\\ChatGPT\\果小哨\\ui-whistle-monitor-20260916\\layout-metrics.json",
+      "directory": "C:\\Users\\Administrator\\Documents\\ChatGPT\\果小哨\\ui-whistle-monitor-20260916"
+    }
+  ],
+  "normalCases": 132,
+  "visualReview": "Inspected 320/375px follow with template missing and free empty state; mine reminder records and empty state; query follow CTA; 320px member hero and 130 percent follow. No observed overlap, clipping, missing icon or garbled text.",
+  "largeFontNote": "130 percent CSS font sizes; approximation, not WeChat system font scaling",
+  "largeFontCases": 114,
+  "representativeScreenshots": [
+    "C:\\Users\\Administrator\\Documents\\ChatGPT\\果小哨\\ui-whistle-20260916\\screenshots\\follow-free-320-brand-review.png",
+    "C:\\Users\\Administrator\\Documents\\ChatGPT\\果小哨\\ui-whistle-monitor-20260916\\screenshots\\follow-monitor-template-missing-320-brand-review.png",
+    "C:\\Users\\Administrator\\Documents\\ChatGPT\\果小哨\\ui-whistle-reminders-20260916\\screenshots\\mine-reminders-320-brand-review.png",
+    "C:\\Users\\Administrator\\Documents\\ChatGPT\\果小哨\\ui-whistle-reminders-20260916\\screenshots\\mine-reminder-empty-320-brand-review.png",
+    "C:\\Users\\Administrator\\Documents\\ChatGPT\\果小哨\\ui-whistle-20260916\\screenshots\\query-member-320-brand-review.png",
+    "C:\\Users\\Administrator\\Documents\\ChatGPT\\果小哨\\ui-whistle-20260916\\screenshots\\mine-member-320-brand-review.png",
+    "C:\\Users\\Administrator\\Documents\\ChatGPT\\果小哨\\ui-whistle-20260916\\screenshots\\follow-free-375-brand-review.png",
+    "C:\\Users\\Administrator\\Documents\\ChatGPT\\果小哨\\ui-whistle-monitor-20260916\\screenshots\\follow-monitor-template-missing-375-brand-review.png",
+    "C:\\Users\\Administrator\\Documents\\ChatGPT\\果小哨\\ui-whistle-reminders-20260916\\screenshots\\mine-reminders-375-brand-review.png",
+    "C:\\Users\\Administrator\\Documents\\ChatGPT\\果小哨\\ui-whistle-reminders-20260916\\screenshots\\mine-reminder-empty-375-brand-review.png",
+    "C:\\Users\\Administrator\\Documents\\ChatGPT\\果小哨\\ui-whistle-20260916\\screenshots\\query-member-375-brand-review.png",
+    "C:\\Users\\Administrator\\Documents\\ChatGPT\\果小哨\\ui-whistle-20260916\\screenshots\\mine-member-375-brand-review.png"
+  ],
+  "generatedAt": "2026-09-16T02:58:15.9120285Z",
+  "renderer": "Offline generated WXML/WXSS approximation in headless Chromium, not WeChat or real device"
+}

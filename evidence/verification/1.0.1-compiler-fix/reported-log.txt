@@ -1,0 +1,352 @@
+[system] WeChatLib: 3.17.3 (2026.9.14 14:19:37)
+WAServiceMainContext.js?t=wechat&v=3.17.3:1 [system] Subpackages: N/A
+WAServiceMainContext.js?t=wechat&v=3.17.3:1 [system] LazyCodeLoading: true
+WAServiceMainContext.js?t=wechat&v=3.17.3:1 Lazy code loading is enabled. Only injecting required components.
+WAServiceMainContext.js?t=wechat&v=3.17.3:1 [Perf] App.initCloud took 85ms
+vl @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+l @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+ensureCloud @ app.js:21
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+onLaunch @ app.js:14
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+ln @ WASubContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ app.js:3
+f @ WASubContext.js?t=wechat&v=3.17.3:1
+A @ WASubContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+runWith @ WASubContext.js?t=wechat&v=3.17.3:1
+J @ WASubContext.js?t=wechat&v=3.17.3:1
+WAServiceMainContext.js?t=wechat&v=3.17.3:1 [Perf] App.ensureCloud took 86ms
+vl @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+l @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+onLaunch @ app.js:14
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+ln @ WASubContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ app.js:3
+f @ WASubContext.js?t=wechat&v=3.17.3:1
+A @ WASubContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+runWith @ WASubContext.js?t=wechat&v=3.17.3:1
+J @ WASubContext.js?t=wechat&v=3.17.3:1
+WAServiceMainContext.js?t=wechat&v=3.17.3:1 [Perf] App.onLaunch took 86ms
+vl @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+l @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+ln @ WASubContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ app.js:3
+f @ WASubContext.js?t=wechat&v=3.17.3:1
+A @ WASubContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+runWith @ WASubContext.js?t=wechat&v=3.17.3:1
+J @ WASubContext.js?t=wechat&v=3.17.3:1
+WAServiceMainContext.js?t=wechat&v=3.17.3:1 <Error: MiniProgramError
+module '@babel/runtime/helpers/arrayWithHoles.js' is not defined, require args is './arrayWithHoles'>
+Error: module '@babel/runtime/helpers/arrayWithHoles.js' is not defined, require args is './arrayWithHoles'
+    at J (http://127.0.0.1:54953/__dev__/WASubContext.js?t=wechat&v=3.17.3:1:520204)
+    at n (http://127.0.0.1:54953/__dev__/WASubContext.js?t=wechat&v=3.17.3:1:519258)
+    at <anonymous>:1:788
+    at Module.f (http://127.0.0.1:54953/__dev__/WASubContext.js?t=wechat&v=3.17.3:1:171025)
+    at A (http://127.0.0.1:54953/__dev__/WASubContext.js?t=wechat&v=3.17.3:1:511456)
+    at http://127.0.0.1:54953/__dev__/WASubContext.js?t=wechat&v=3.17.3:1:520594
+    at f.runWith (http://127.0.0.1:54953/__dev__/WASubContext.js?t=wechat&v=3.17.3:1:509782)
+    at J (http://127.0.0.1:54953/__dev__/WASubContext.js?t=wechat&v=3.17.3:1:520576)
+    at n (http://127.0.0.1:54953/__dev__/WASubContext.js?t=wechat&v=3.17.3:1:519258)
+    at weapp:///pages/query/index.js:4:23
+errorReport @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+thirdErrorReport @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+f @ WASubContext.js?t=wechat&v=3.17.3:1
+A @ WASubContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+runWith @ WASubContext.js?t=wechat&v=3.17.3:1
+J @ WASubContext.js?t=wechat&v=3.17.3:1
+n @ WASubContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ index.js:4
+f @ WASubContext.js?t=wechat&v=3.17.3:1
+A @ WASubContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+runWith @ WASubContext.js?t=wechat&v=3.17.3:1
+J @ WASubContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ VM700:8
+invoke @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+kr @ WASubContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+batchInjectComponents @ WASubContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+wrapComponentsInjection @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+injectComponentsRecursively @ WASubContext.js?t=wechat&v=3.17.3:1
+as @ WASubContext.js?t=wechat&v=3.17.3:1
+create @ WASubContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+Ar @ WASubContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+l.emit @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+emitInternal @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+p @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+_ @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+$ @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+l.emit @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+emit @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+_emit @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+emit @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+emit @ VM578 sandbox_bundle:2
+onMessage @ VM578 sandbox_bundle:2
+Show 23 more frames
+VM700:11 页面【pages/query/index]错误:
+ <Error: module '@babel/runtime/helpers/arrayWithHoles.js' is not defined, require args is './arrayWithHoles'>
+Error: module '@babel/runtime/helpers/arrayWithHoles.js' is not defined, require args is './arrayWithHoles'
+    at J (http://127.0.0.1:54953/__dev__/WASubContext.js?t=wechat&v=3.17.3:1:520204)
+    at n (http://127.0.0.1:54953/__dev__/WASubContext.js?t=wechat&v=3.17.3:1:519258)
+    at <anonymous>:1:788
+    at Module.f (http://127.0.0.1:54953/__dev__/WASubContext.js?t=wechat&v=3.17.3:1:171025)
+    at A (http://127.0.0.1:54953/__dev__/WASubContext.js?t=wechat&v=3.17.3:1:511456)
+    at http://127.0.0.1:54953/__dev__/WASubContext.js?t=wechat&v=3.17.3:1:520594
+    at f.runWith (http://127.0.0.1:54953/__dev__/WASubContext.js?t=wechat&v=3.17.3:1:509782)
+    at J (http://127.0.0.1:54953/__dev__/WASubContext.js?t=wechat&v=3.17.3:1:520576)
+    at n (http://127.0.0.1:54953/__dev__/WASubContext.js?t=wechat&v=3.17.3:1:519258)
+    at weapp:///pages/query/index.js:4:23
+(anonymous) @ VM700:11
+invoke @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+kr @ WASubContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+batchInjectComponents @ WASubContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+wrapComponentsInjection @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+injectComponentsRecursively @ WASubContext.js?t=wechat&v=3.17.3:1
+as @ WASubContext.js?t=wechat&v=3.17.3:1
+create @ WASubContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+Ar @ WASubContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+l.emit @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+emitInternal @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+p @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+_ @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+$ @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+l.emit @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+emit @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+_emit @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+emit @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+emit @ VM578 sandbox_bundle:2
+onMessage @ VM578 sandbox_bundle:2
+Show 8 more frames
+WAServiceMainContext.js?t=wechat&v=3.17.3:1 <Error: SystemError (appServiceSDKScriptError)
+module '@babel/runtime/helpers/arrayWithHoles.js' is not defined, require args is './arrayWithHoles'>
+Error: module '@babel/runtime/helpers/arrayWithHoles.js' is not defined, require args is './arrayWithHoles'
+    at J (http://127.0.0.1:54953/__dev__/WASubContext.js?t=wechat&v=3.17.3:1:520204)
+    at n (http://127.0.0.1:54953/__dev__/WASubContext.js?t=wechat&v=3.17.3:1:519258)
+    at <anonymous>:1:788
+    at Module.f (http://127.0.0.1:54953/__dev__/WASubContext.js?t=wechat&v=3.17.3:1:171025)
+    at A (http://127.0.0.1:54953/__dev__/WASubContext.js?t=wechat&v=3.17.3:1:511456)
+    at http://127.0.0.1:54953/__dev__/WASubContext.js?t=wechat&v=3.17.3:1:520594
+    at f.runWith (http://127.0.0.1:54953/__dev__/WASubContext.js?t=wechat&v=3.17.3:1:509782)
+    at J (http://127.0.0.1:54953/__dev__/WASubContext.js?t=wechat&v=3.17.3:1:520576)
+    at n (http://127.0.0.1:54953/__dev__/WASubContext.js?t=wechat&v=3.17.3:1:519258)
+    at weapp:///pages/query/index.js:4:23
+errorReport @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+_privEmit @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+emit @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+i @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+Ye @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+Ze @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+pe @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+_emit @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+emit @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+invoke @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+kr @ WASubContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+batchInjectComponents @ WASubContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+wrapComponentsInjection @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+injectComponentsRecursively @ WASubContext.js?t=wechat&v=3.17.3:1
+as @ WASubContext.js?t=wechat&v=3.17.3:1
+create @ WASubContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+Ar @ WASubContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+l.emit @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+emitInternal @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+p @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+_ @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+$ @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+l.emit @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+emit @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+_emit @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+emit @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+emit @ VM578 sandbox_bundle:2
+onMessage @ VM578 sandbox_bundle:2
+Show 21 more frames
+WAServiceMainContext.js?t=wechat&v=3.17.3:1 <Error: MiniProgramError
+module '@babel/runtime/helpers/arrayWithHoles.js' is not defined, require args is './arrayWithHoles'>
+Error: module '@babel/runtime/helpers/arrayWithHoles.js' is not defined, require args is './arrayWithHoles'
+    at J (http://127.0.0.1:54953/__dev__/WASubContext.js?t=wechat&v=3.17.3:1:520204)
+    at n (http://127.0.0.1:54953/__dev__/WASubContext.js?t=wechat&v=3.17.3:1:519258)
+    at <anonymous>:1:788
+    at Module.f (http://127.0.0.1:54953/__dev__/WASubContext.js?t=wechat&v=3.17.3:1:171025)
+    at A (http://127.0.0.1:54953/__dev__/WASubContext.js?t=wechat&v=3.17.3:1:511456)
+    at http://127.0.0.1:54953/__dev__/WASubContext.js?t=wechat&v=3.17.3:1:520594
+    at f.runWith (http://127.0.0.1:54953/__dev__/WASubContext.js?t=wechat&v=3.17.3:1:509782)
+    at J (http://127.0.0.1:54953/__dev__/WASubContext.js?t=wechat&v=3.17.3:1:520576)
+    at n (http://127.0.0.1:54953/__dev__/WASubContext.js?t=wechat&v=3.17.3:1:519258)
+    at weapp:///pages/query/index.js:4:23
+errorReport @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+thirdErrorReport @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+i @ WASubContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+_privEmit @ WASubContext.js?t=wechat&v=3.17.3:1
+emit @ WASubContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+o @ WASubContext.js?t=wechat&v=3.17.3:1
+Qe @ WASubContext.js?t=wechat&v=3.17.3:1
+et @ WASubContext.js?t=wechat&v=3.17.3:1
+fe @ WASubContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+invoke @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+kr @ WASubContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+batchInjectComponents @ WASubContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+wrapComponentsInjection @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+injectComponentsRecursively @ WASubContext.js?t=wechat&v=3.17.3:1
+as @ WASubContext.js?t=wechat&v=3.17.3:1
+create @ WASubContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+Ar @ WASubContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+l.emit @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+emitInternal @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+p @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+_ @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+$ @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+l.emit @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+emit @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+_emit @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+emit @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+emit @ VM578 sandbox_bundle:2
+onMessage @ VM578 sandbox_bundle:2
+Show 20 more frames
+WAServiceMainContext.js?t=wechat&v=3.17.3:1 <Error: MiniProgramError
+Component is not found in path "wx://not-found".>
+Error: Component is not found in path "wx://not-found".
+    at ps.recurseComponentImpl (http://127.0.0.1:54953/__dev__/WASubContext.js?t=wechat&v=3.17.3:1:428354)
+    at http://127.0.0.1:54953/__dev__/WASubContext.js?t=wechat&v=3.17.3:1:426737
+    at Array.forEach (<anonymous>)
+    at ps.recurse (http://127.0.0.1:54953/__dev__/WASubContext.js?t=wechat&v=3.17.3:1:426719)
+    at Gi (http://127.0.0.1:54953/__dev__/WASubContext.js?t=wechat&v=3.17.3:1:415542)
+    at Module.as (http://127.0.0.1:54953/__dev__/WASubContext.js?t=wechat&v=3.17.3:1:424883)
+    at At.create (http://127.0.0.1:54953/__dev__/WASubContext.js?t=wechat&v=3.17.3:1:467256)
+    at http://127.0.0.1:54953/__dev__/WASubContext.js?t=wechat&v=3.17.3:1:480233
+    at http://127.0.0.1:54953/__dev__/WASubContext.js?t=wechat&v=3.17.3:1:444797
+    at http://127.0.0.1:54953/__dev__/WASubContext.js?t=wechat&v=3.17.3:1:482389
+errorReport @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+thirdErrorReport @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+recurseComponentImpl @ WASubContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+recurse @ WASubContext.js?t=wechat&v=3.17.3:1
+Gi @ WASubContext.js?t=wechat&v=3.17.3:1
+as @ WASubContext.js?t=wechat&v=3.17.3:1
+create @ WASubContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+Ar @ WASubContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WASubContext.js?t=wechat&v=3.17.3:1
+l.emit @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+emitInternal @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+p @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+_ @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+$ @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+l.emit @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+emit @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+(anonymous) @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+_emit @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+emit @ WAServiceMainContext.js?t=wechat&v=3.17.3:1
+emit @ VM578 sandbox_bundle:2
+onMessage @ VM578 sandbox_bundle:2
+Show 4 more frames
+The resource http://127.0.0.1:54953/__dev__/WAAutoService.js?t=wechat&v=3.17.3 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+The resource http://127.0.0.1:54953/__dev__/WAServiceMainContext.js?t=wechat&v=3.17.3 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+The resource http://127.0.0.1:54953/__dev__/WAAutoService.js?t=wechat&v=3.17.3 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+The resource http://127.0.0.1:54953/__dev__/WAServiceMainContext.js?t=wechat&v=3.17.3 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.

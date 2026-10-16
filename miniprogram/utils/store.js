@@ -1,0 +1,358 @@
+/**
+ * Tiny session store: bootstrap (identity/quota/membership) and the catalog.
+ * Catalog is cached in local storage and refreshed by version.
+ */
+const { call } = require('./api');
+const PRODUCT_IMAGES = require('../config/product-images');
+const CATALOG_SEED = require('../config/catalog-seed');
+const { sortFamilies } = require('./catalog-order');
+const { presentStore } = require('./store-label');
+const { readSession, writeSession } = require('./session');
+
+const CATALOG_KEY = 'gxs_catalog_v1';
+const CATEGORY_ORDER = ['iphone', 'ipad', 'mac', 'watch', 'airpods', 'vision', 'homepod'];
+const CATEGORY_NAME = { iphone: 'iPhone', ipad: 'iPad', mac: 'Mac', watch: 'Watch', airpods: 'AirPods', vision: 'Vision Pro', homepod: 'HomePod' };
+
+let bootstrapPromise = null;
+let bootstrapGeneration = 0;
+let bootstrapFetchedAt = 0;
+let latestQuota = null;
+// A query returns only balance + revision, not signin/task metadata. Track it
+// separately so a later-arriving full quota can still fill that metadata in.
+let latestBalance = null;
+let catalogPromise = null;
+let catalogGeneration = 0;
+let catalogCheckedAt = 0;
+let catalogRetryAt = 0;
+let catalogRaw = null;
+let catalogStorageRead = false;
+let catalogStoragePromise = null;
+const catalogListeners = new Set();
+const quotaListeners = new Set();
+const subscriptionListeners = new Set();
+const BOOTSTRAP_TTL_MS = 30000;
+const CATALOG_TTL_MS = 5 * 60000;
+let followSnapshot = null;
+let followPromise = null;
+let followFetchedAt = 0;
+let followGeneration = 0;
+
+function invalidateFollows() { followGeneration += 1; followSnapshot = null; followPromise = null; }
+function resetSession() {
+  invalidateBootstrap(); invalidateFollows();
+  try { require('./conversion-events').configure(null); }
+  catch (error) { console.error('[gxs] conversion configuration', error); }
+  latestQuota = null; latestBalance = null;
+  bootstrapFetchedAt = 0; catalogCheckedAt = 0; catalogRetryAt = 0; catalogPromise = null; catalogGeneration += 1;
+  const app = getApp(); app.globalData.catalog = null; app.globalData.lastQuery = null; app.globalData.pendingFollow = null;
+}
+async function getFollows({ force = false } = {}) {
+  if (!force && followSnapshot && Date.now() - followFetchedAt < 15000) return followSnapshot;
+  if (followPromise) return followPromise;
+  const generation = followGeneration;
+  const pending = call('follow.list').then(value => {
+    if (generation !== followGeneration) return getFollows();
+    followSnapshot = value; followFetchedAt = Date.now(); return value;
+  }, error => {
+    if (generation !== followGeneration) return getFollows();
+    throw error;
+  });
+  followPromise = pending;
+  try { return await pending; } finally { if (followPromise === pending) followPromise = null; }
+}
+
+async function refreshBootstrap() {
+  if (bootstrapPromise) return bootstrapPromise;
+  const app = getApp();
+  const generation = bootstrapGeneration;
+  const pending = call('user.bootstrap').then(data => {
+    if (generation !== bootstrapGeneration) return getBootstrap();
+    if (data.quota) {
+      if (!isOlderQuota(data.quota)) rememberQuota(data.quota);
+      data = { ...data, quota: currentQuota() };
+    }
+    app.globalData.bootstrap = data; bootstrapFetchedAt = Date.now();
+    try { require('./conversion-events').configure(data); }
+    catch (error) { console.error('[gxs] conversion configuration', error); }
+    return data;
+  }, error => {
+    if (generation !== bootstrapGeneration) return getBootstrap();
+    throw error;
+  });
+  bootstrapPromise = pending;
+  try { return await pending; }
+  finally { if (bootstrapPromise === pending) bootstrapPromise = null; }
+}
+
+function invalidateBootstrap() {
+  bootstrapGeneration += 1;
+  bootstrapPromise = null;
+  getApp().globalData.bootstrap = null;
+}
+
+/** Keep the verified identity when publishing settings confirmed for that account. */
+function publishSettings(settings, expectedUserKey) {
+  const app = getApp(), cached = app.globalData.bootstrap;
+  if (!settings || typeof settings !== 'object' || !expectedUserKey || !cached
+    || !cached.identity || cached.identity.userKey !== expectedUserKey) return false;
+  // Retire reads started before the write, as with confirmed quota/grant updates.
+  bootstrapGeneration += 1;
+  bootstrapPromise = null;
+  app.globalData.bootstrap = { ...cached, settings };
+  return true;
+}
+
+function isOlderQuota(quota) {
+  if (!latestQuota) return false;
+  const revision = Number.isInteger(quota.revision) ? quota.revision : 0;
+  const latestRevision = Number.isInteger(latestQuota.revision) ? latestQuota.revision : 0;
+  return revision < latestRevision || (revision === latestRevision && quota.dayKey && latestQuota.dayKey && quota.dayKey < latestQuota.dayKey);
+}
+
+const validBalance = value => Number.isSafeInteger(value) && value >= 0;
+const validRevision = value => Number.isSafeInteger(value) && value >= 0;
+
+function rememberBalance(balance, revision) {
+  if (!validBalance(balance) || !validRevision(revision) || latestBalance && revision < latestBalance.revision) return false;
+  latestBalance = { balance, revision };
+  return true;
+}
+
+function rememberQuota(quota) {
+  latestQuota = { ...quota };
+  rememberBalance(quota.balance, validRevision(quota.revision) ? quota.revision : 0);
+}
+
+/** Latest full quota metadata with the newest confirmed balance projected onto it. */
+function currentQuota() {
+  return latestQuota ? { ...latestQuota, ...(latestBalance ? { balance: latestBalance.balance } : {}) } : null;
+}
+
+function broadcastQuota(quota) {
+  if (!quota) return;
+  const app = getApp();
+  if (app.globalData.bootstrap) app.globalData.bootstrap = { ...app.globalData.bootstrap, quota };
+  for (const listener of quotaListeners) { try { listener(quota); } catch (e) { console.error('[gxs] quota listener', e); } }
+}
+
+function publishQuota(quota) {
+  if (isOlderQuota(quota)) return false;
+  rememberQuota(quota);
+  // Cancel older account reads so returning to Mine cannot repaint a pre-reward
+  // balance. Broadcast even when no complete bootstrap is currently cached.
+  bootstrapGeneration += 1;
+  bootstrapPromise = null;
+  broadcastQuota(currentQuota());
+  return true;
+}
+
+/** Publish a query's atomic balance snapshot without inventing full quota metadata. */
+function publishQueryBalance(response) {
+  const versioned = response && validBalance(response.balance) && validRevision(response.quotaRevision);
+  if (!versioned) {
+    // Old deployed functions cannot establish ordering. Preserve observed quota
+    // and ask the caller for one safe account refresh; query results stay usable.
+    invalidateBootstrap();
+    return { balance: latestBalance ? latestBalance.balance : null, accepted: false, needsRefresh: true };
+  }
+  const accepted = rememberBalance(response.balance, response.quotaRevision);
+  if (accepted) {
+    bootstrapGeneration += 1;
+    bootstrapPromise = null;
+    broadcastQuota(currentQuota());
+  }
+  return { balance: latestBalance.balance, accepted, needsRefresh: false };
+}
+
+/** Apply confirmed reminder credits to the cached account and open pages without a refetch. */
+function publishSubscriptions(subscriptions) {
+  if (!subscriptions || typeof subscriptions !== 'object') return;
+  // An account read begun before this confirmed grant may still be in flight.
+  // Retire it so its callers receive the updated cache or a new server read.
+  bootstrapGeneration += 1;
+  bootstrapPromise = null;
+  const app = getApp();
+  if (app.globalData.bootstrap) app.globalData.bootstrap = { ...app.globalData.bootstrap, subscriptions };
+  for (const listener of subscriptionListeners) { try { listener(subscriptions); } catch (e) { console.error('[gxs] subscription listener', e); } }
+}
+
+function subscribeSubscriptions(listener) {
+  subscriptionListeners.add(listener);
+  return () => subscriptionListeners.delete(listener);
+}
+
+function getQuotaGeneration() { return bootstrapGeneration; }
+
+function subscribeQuota(listener) {
+  quotaListeners.add(listener);
+  return () => quotaListeners.delete(listener);
+}
+
+async function getBootstrap({ force = false } = {}) {
+  const app = getApp();
+  const cached = app.globalData.bootstrap;
+  const now = Date.now();
+  const beijingDay = new Date(now + 8 * 3600000).toISOString().slice(0, 10);
+  const expiry = cached && cached.membership && Date.parse(cached.membership.expiresAt);
+  const expired = cached && cached.membership && cached.membership.active && Number.isFinite(expiry) && now >= expiry;
+  const changedDay = cached && cached.quota && cached.quota.dayKey && cached.quota.dayKey !== beijingDay;
+  if (!force && cached && now - bootstrapFetchedAt < BOOTSTRAP_TTL_MS && !expired && !changedDay) return cached;
+  if (!force && bootstrapPromise) return bootstrapPromise;
+  return refreshBootstrap();
+}
+
+function indexCatalog(raw) {
+  const stores = (raw.stores || []).map(presentStore);
+  // Static ES2019 helpers are not guaranteed by syntax transpilation. Build
+  // these maps directly so an older JS engine can still show the offline seed.
+  const familyNames = Object.create(null), familyMetadata = Object.create(null);
+  (raw.families || []).forEach((family, catalogOrder) => {
+    familyNames[family.familyKey] = family.displayName || family.name || family.familyKey;
+    familyMetadata[family.familyKey] = { ...family, catalogOrder };
+  });
+  const products = (raw.products || []).map(source => {
+    // Only send fields used by the UI through setData. Indexed lookup maps
+    // repeat each product, so provenance/unused upstream metadata can exceed
+    // WeChat's one-update payload limit when images are added.
+    const product = {};
+    for (const key of ['partNumber', 'category', 'familyKey', 'familyName', 'model', 'title', 'attributes', 'priceCny', 'comingSoon', 'supported', 'verificationStatus', 'imageUrl', 'imageAlt']) {
+      if (source[key] !== undefined) product[key] = source[key];
+    }
+    const fallback = PRODUCT_IMAGES[product.partNumber];
+    return fallback && !product.imageUrl ? { ...product, ...fallback } : product;
+  });
+  const cities = [];
+  const cityMap = new Map();
+  for (const store of stores) {
+    const key = store.city || '未知';
+    if (!cityMap.has(key)) {
+      cityMap.set(key, { city: key, province: store.province || '', stores: [] });
+      cities.push(cityMap.get(key));
+    }
+    cityMap.get(key).stores.push(store);
+  }
+  const storeByNumber = {};
+  for (const store of stores) storeByNumber[store.storeNumber] = store;
+
+  const categories = [];
+  const categoryMap = new Map();
+  for (const product of products) {
+    if (!categoryMap.has(product.category)) {
+      categoryMap.set(product.category, { key: product.category, name: CATEGORY_NAME[product.category] || product.category, families: [], familyMap: new Map() });
+      categories.push(categoryMap.get(product.category));
+    }
+    const category = categoryMap.get(product.category);
+    if (!category.familyMap.has(product.familyKey)) {
+      const family = { ...(familyMetadata[product.familyKey] || {}), familyKey: product.familyKey, name: product.familyName || familyNames[product.familyKey] || product.familyKey, products: [], supported: false };
+      category.familyMap.set(product.familyKey, family);
+      category.families.push(family);
+    }
+    const family = category.familyMap.get(product.familyKey);
+    family.products.push(product);
+    if (product.supported) family.supported = true;
+  }
+  categories.sort((a, b) => CATEGORY_ORDER.indexOf(a.key) - CATEGORY_ORDER.indexOf(b.key));
+  for (const category of categories) { category.families = sortFamilies(category.families); delete category.familyMap; }
+  const productByPart = {};
+  for (const product of products) productByPart[product.partNumber] = product;
+  return { version: raw.version, families: raw.families || [], excludedFamilies: raw.excludedFamilies || [], stores, cities, storeByNumber, categories, products, productByPart };
+}
+
+function validCatalog(raw) { return raw && Array.isArray(raw.products) && Array.isArray(raw.stores); }
+
+// The indexed catalog lives only in JavaScript memory. Pages bind its version
+// and target-picker reads it here, so products never cross the render bridge.
+function currentCatalog() {
+  const app = getApp();
+  if (!app.globalData.catalog) app.globalData.catalog = indexCatalog(cachedCatalog() || CATALOG_SEED);
+  return app.globalData.catalog;
+}
+
+function subscribeCatalog(listener) {
+  catalogListeners.add(listener);
+  return () => catalogListeners.delete(listener);
+}
+
+function cachedCatalog() {
+  if (!catalogStorageRead && typeof wx.getStorage !== 'function') {
+    catalogStorageRead = true;
+    try { const value = wx.getStorageSync(CATALOG_KEY); catalogRaw = validCatalog(value) ? value : null; }
+    catch (e) { catalogRaw = null; }
+  }
+  return catalogRaw;
+}
+
+function loadCatalogCache() {
+  if (catalogStorageRead) return Promise.resolve(catalogRaw);
+  if (catalogStoragePromise) return catalogStoragePromise;
+  catalogStoragePromise = readSession(CATALOG_KEY).then(value => {
+    catalogStorageRead = true;
+    catalogRaw = validCatalog(value) ? value : null;
+    return catalogRaw;
+  });
+  return catalogStoragePromise;
+}
+
+async function refreshCatalog({ force = false } = {}) {
+  if (catalogPromise) return catalogPromise;
+  const generation = catalogGeneration;
+  const app = getApp();
+  const request = () => {
+    // Read the persisted snapshot before choosing ifVersion. A seed created by
+    // a picker during startup must not cause an avoidable full catalog reply.
+    const raw = cachedCatalog() || CATALOG_SEED;
+    const current = app.globalData.catalog;
+    const version = current && current.version !== CATALOG_SEED.version ? current.version : raw.version;
+    return call('catalog.get', version ? { ifVersion: version } : {}).then(response => {
+      // An earlier request may finish after this session has been invalidated.
+      // Its result must not publish, persist or reset the new session's timers.
+      if (generation !== catalogGeneration) return app.globalData.catalog || indexCatalog(cachedCatalog() || CATALOG_SEED);
+      if (!response || (!response.unchanged && !validCatalog(response))) throw new Error('商品目录暂时不可用，请稍后刷新');
+      catalogCheckedAt = Date.now();
+      catalogRetryAt = 0;
+      if (response.unchanged) {
+        if (!app.globalData.catalog || app.globalData.catalog.version !== version) app.globalData.catalog = indexCatalog(raw);
+        return app.globalData.catalog;
+      }
+      const indexed = indexCatalog(response);
+      app.globalData.catalog = indexed;
+      catalogRaw = response;
+      writeSession(CATALOG_KEY, response);
+      if (!current || current.version !== indexed.version) {
+        for (const listener of catalogListeners) { try { listener(indexed); } catch (e) { console.error('[gxs] catalog listener', e); } }
+      }
+      return indexed;
+    });
+  };
+  const pending = typeof wx.getStorage === 'function' ? loadCatalogCache().then(request) : request();
+  catalogPromise = pending;
+  try { return await pending; }
+  catch (error) { if (generation === catalogGeneration) catalogRetryAt = Date.now() + 30000; throw error; }
+  finally { if (catalogPromise === pending) catalogPromise = null; }
+}
+
+async function getCatalog({ force = false } = {}) {
+  const app = getApp();
+  if (typeof wx.getStorage === 'function' && !catalogStorageRead) {
+    const generation = catalogGeneration;
+    const cached = await loadCatalogCache();
+    if (generation === catalogGeneration && cached && (!app.globalData.catalog || app.globalData.catalog.version === CATALOG_SEED.version && app.globalData.catalog.version !== cached.version)) {
+      const previous = app.globalData.catalog;
+      app.globalData.catalog = indexCatalog(cached);
+      if (previous && previous.version !== cached.version) {
+        for (const listener of catalogListeners) { try { listener(app.globalData.catalog); } catch (e) { console.error('[gxs] catalog listener', e); } }
+      }
+    }
+  }
+  const catalog = currentCatalog();
+  if (force) return refreshCatalog({ force: true });
+  const expected = app.globalData.bootstrap && app.globalData.bootstrap.catalogVersion;
+  const now = Date.now();
+  if (now >= catalogRetryAt && (catalogRetryAt > 0 || (expected && expected !== catalog.version) || now - catalogCheckedAt >= CATALOG_TTL_MS)) {
+    // Browse immediately; the server still validates supported SKU and limits.
+    refreshCatalog().catch(() => {});
+  }
+  return catalog;
+}
+
+module.exports = { getBootstrap, refreshBootstrap, invalidateBootstrap, publishSettings, publishQuota, publishQueryBalance, currentQuota, subscribeQuota, publishSubscriptions, subscribeSubscriptions, getQuotaGeneration, getCatalog, refreshCatalog, currentCatalog, subscribeCatalog, getFollows, invalidateFollows, resetSession, CATEGORY_NAME };
