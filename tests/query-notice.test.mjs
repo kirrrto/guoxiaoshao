@@ -46,6 +46,15 @@ test('without an announcement, a live collector fault shows the actual abnormal 
   assert.doesNotMatch(notice.text, /已恢复/);
 });
 
+test('running monitor with delayed samples does not claim the pickup API is broken', () => {
+  const notice = resolveQueryNotice({ announcement: null, now: NOW, collector: { state: 'running', observationStale: true } });
+  assert.equal(notice.source, 'collector_observation_stale');
+  assert.ok(!/接口状态异常/.test(notice.text));
+  assert.match(notice.text, /观测更新延迟/);
+  const idleStale = resolveQueryNotice({ announcement: null, now: NOW, collector: { state: 'idle', observationStale: true } });
+  assert.equal(idleStale.source, 'collector_observation_stale');
+});
+
 test('healthy service with no announcement shows no banner', () => {
   assert.equal(resolveQueryNotice({ announcement: null, now: NOW, collector: { state: 'running' } }), null);
   assert.equal(resolveQueryNotice({ announcement: '', now: NOW, collector: { state: 'idle' } }), null);

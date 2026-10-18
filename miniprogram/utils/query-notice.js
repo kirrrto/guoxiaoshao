@@ -152,7 +152,18 @@ function resolveQueryNotice({ announcement, now = Date.now(), consent = null, co
   }
   const state = collector && collector.state;
   const stale = Boolean(collector && collector.observationStale);
-  if (stale || (state && state !== 'running' && state !== 'idle')) {
+  const serviceUp = state === 'running' || state === 'idle';
+  // Service alive but samples late is not the same as a dead upstream. Keep
+  // the two honest so a running monitor is not labelled "接口状态异常".
+  if (stale && serviceUp) {
+    return {
+      tone: 'warn',
+      text: '库存观测更新延迟，页面上的取货时间可能不是最新。可点刷新状态；不以延迟推断无货或已恢复。',
+      source: 'collector_observation_stale',
+      action: 'refresh',
+    };
+  }
+  if (stale || (state && !serviceUp)) {
     return {
       tone: 'warn',
       text: '取货接口状态异常，查询结果可能不完整或失败。以实际查询返回和苹果官网为准。',
