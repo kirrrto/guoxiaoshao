@@ -1,0 +1,22 @@
+{
+  "envId": "flowermean-6gjaxfqhf6c13e88",
+  "functionRoot": "cloudfunctions",
+  "functions": [
+    {
+      "name": "gxs_api",
+      "timeout": 60,
+      "envVariables": {},
+      "runtime": "Nodejs20.19",
+      "installDependency": true,
+      "ignore": ["node_modules/**", ".cloudbase_temp/**"]
+    },
+    {
+      "name": "gxs_monitor",
+      "timeout": 60,
+      "envVariables": {},
+      "runtime": "Nodejs20.19",
+      "installDependency": true,
+      "ignore": ["node_modules/**", ".cloudbase_temp/**"]
+    }
+  ]
+}
