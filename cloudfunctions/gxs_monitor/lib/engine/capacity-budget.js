@@ -8,18 +8,19 @@ const IDLE_LANE_MS = 60000;
 const EPSILON = 1e-9;
 const CAPACITY_ID = 'upstream_capacity';
 
-function capacityLimits(maxRequestsPerMinute, maxRequestsPerDay) {
+function capacityLimits(maxRequestsPerMinute, maxRequestsPerDay, autoShare = AUTO_SHARE) {
+  const share = Number.isFinite(autoShare) && autoShare > 0 && autoShare < 1 ? autoShare : AUTO_SHARE;
   const shared = Math.max(1, maxRequestsPerMinute);
-  const auto = Math.max(1, Math.floor(shared * AUTO_SHARE));
+  const auto = Math.max(1, Math.floor(shared * share));
   const manual = Math.max(1, shared - auto);
   const rate = maxRequestsPerDay / DAY_MS;
-  return { capacities: { shared, auto, manual }, rates: { shared: rate, auto: rate * AUTO_SHARE, manual: rate * (1 - AUTO_SHARE) } };
+  return { capacities: { shared, auto, manual }, rates: { shared: rate, auto: rate * share, manual: rate * (1 - share) }, autoShare: share };
 }
 
-function reserveCapacity(stored, { nowMs, maxRequestsPerMinute, maxRequestsPerDay, source, legacyDayCount = 0, consume = true }) {
+function reserveCapacity(stored, { nowMs, maxRequestsPerMinute, maxRequestsPerDay, source, legacyDayCount = 0, consume = true, autoShare = AUTO_SHARE }) {
   source = source === 'auto' ? 'auto' : 'manual';
   const other = source === 'auto' ? 'manual' : 'auto';
-  const limits = capacityLimits(maxRequestsPerMinute, maxRequestsPerDay);
+  const limits = capacityLimits(maxRequestsPerMinute, maxRequestsPerDay, autoShare);
   const previous = stored && stored.version === 1 ? stored : null;
   // Migrating an exhausted legacy day must not create a fresh request burst.
   // A partially used legacy day gets at most one immediate shared request.

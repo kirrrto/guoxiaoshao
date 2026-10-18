@@ -4,7 +4,8 @@ const { fetchPickup } = require('../apple-pickup');
 async function guardedPickup({ repo, config, clock, fetchImpl, storeNumber, partNumbers, timeoutMs, source = 'manual', beforeRequest = async () => true, onBudget = () => {}, remainingMs = () => Infinity }) {
   const denied = (reason, retryAt) => ({ record: { httpStatus: null, budgetDenied: true, retryAt, error: { message: reason }, elapsedMs: 0 }, observations: partNumbers.map(partNumber => ({ storeNumber, partNumber, status: 'unknown', quote: null, storeName: null, productTitle: null, observedAt: clock().toISOString(), reason: { code: reason, message: '暂缓查询，请稍后重试' } })) });
   if (remainingMs() <= 1000) return denied('request_cancelled', clock().getTime() + 1000);
-  const budget = await repo.consumeCollectorBudget({ now: clock().toISOString(), maxRequestsPerMinute: config.collector.maxRequestsPerMinute, maxRequestsPerDay: config.collector.maxRequestsPerDay, budgetMode: config.collector.budgetMode, source });
+  const autoShare = Math.min(0.95, Math.max(0.01, (config.collector.autoSharePercent || 80) / 100));
+  const budget = await repo.consumeCollectorBudget({ now: clock().toISOString(), maxRequestsPerMinute: config.collector.maxRequestsPerMinute, maxRequestsPerDay: config.collector.maxRequestsPerDay, budgetMode: config.collector.budgetMode, source, autoShare });
   onBudget(budget);
   if (!budget.allowed) return denied(budget.reason, budget.retryAt);
   if (!await beforeRequest()) return denied('request_cancelled', clock().getTime() + 1000);

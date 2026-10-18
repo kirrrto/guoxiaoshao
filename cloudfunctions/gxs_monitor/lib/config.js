@@ -64,6 +64,13 @@ const DEFAULTS = Object.freeze({
     // Continuous mode treats the daily number as a sustained refill target.
     // 'daily' retains the optional hard stop at the Beijing calendar-day cap.
     budgetMode: 'continuous',
+    // 'adaptive' stretches the target period as request groups grow (legacy).
+    // 'fixed' keeps intervalSeconds as the absolute per-group target period
+    // (e.g. 3) and relies on capacity admission when the budget cannot keep up.
+    cadenceMode: 'adaptive',
+    // Percent of the shared daily/minute budget reserved for automatic monitoring.
+    // Manual online queries keep the remainder; both still share one global cap.
+    autoSharePercent: 80,
     maxPartsPerRequest: 20,
     statusStaleAfterSeconds: 30,
   },
@@ -183,9 +190,12 @@ function validateConfig(config) {
   integer(config.collector.availableIntervalSeconds, 0, 60, 'collector.availableIntervalSeconds');
   integer(config.collector.maxConcurrency, 1, 10, 'collector.maxConcurrency');
   integer(config.collector.continuityGapMs, 1000, 86400000, 'collector.continuityGapMs');
-  integer(config.collector.maxRequestsPerMinute, 1, 600, 'collector.maxRequestsPerMinute');
-  integer(config.collector.maxRequestsPerDay, 1, 100000, 'collector.maxRequestsPerDay');
+  integer(config.collector.maxRequestsPerMinute, 1, 6000, 'collector.maxRequestsPerMinute');
+  integer(config.collector.maxRequestsPerDay, 1, 10000000, 'collector.maxRequestsPerDay');
   if (!['continuous', 'daily'].includes(config.collector.budgetMode)) invalid('collector.budgetMode');
+  if (!['adaptive', 'fixed'].includes(config.collector.cadenceMode)) invalid('collector.cadenceMode');
+  integer(config.collector.autoSharePercent, 1, 95, 'collector.autoSharePercent');
+  if (config.collector.cadenceMode === 'fixed' && config.collector.intervalSeconds < 1) invalid('collector.intervalSeconds');
   integer(config.collector.maxPartsPerRequest, 1, 100, 'collector.maxPartsPerRequest');
   integer(config.collector.statusStaleAfterSeconds, 5, 3600, 'collector.statusStaleAfterSeconds');
   integer(config.notifications.cooldownMinutes, 0, 1440, 'notifications.cooldownMinutes');

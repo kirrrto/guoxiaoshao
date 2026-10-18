@@ -41,7 +41,7 @@ function upstreamGuardMethods(run) {
       collector: await tx.get(C.config, 'collector_status'),
     })),
     // Legacy method name retained; this is now the shared manual + auto budget.
-    consumeCollectorBudget: ({ now, maxRequestsPerMinute, maxRequestsPerDay, budgetMode = 'continuous', source = 'manual' }) => run(async tx => {
+    consumeCollectorBudget: ({ now, maxRequestsPerMinute, maxRequestsPerDay, budgetMode = 'continuous', source = 'manual', autoShare = AUTO_SHARE }) => run(async tx => {
       source = source === 'auto' ? 'auto' : 'manual';
       const nowMs = Date.parse(now);
       const breaker = await tx.get(C.config, 'upstream_breaker') || { _id: 'upstream_breaker', generation: 0, trips: 0 };
@@ -57,7 +57,7 @@ function upstreamGuardMethods(run) {
       if (budgetMode === 'daily') {
         // Explicit compatibility/cost-control mode. This is the only mode that
         // can stop all queries until the next Beijing calendar day.
-        const autoLimit = Math.max(1, Math.floor(maxRequestsPerDay * AUTO_SHARE));
+        const autoLimit = Math.max(1, Math.floor(maxRequestsPerDay * autoShare));
         if (source === 'auto' && current.dayCount >= autoLimit && current.dayCount < maxRequestsPerDay) {
           return { allowed: false, reason: 'auto_budget_reserved', retryAt: endOfDay(date).getTime(), minuteCount, dayCount: current.dayCount, ...detail };
         }
@@ -65,7 +65,7 @@ function upstreamGuardMethods(run) {
           return { allowed: false, reason: 'daily_budget', retryAt: endOfDay(date).getTime(), minuteCount, dayCount: current.dayCount, ...detail };
         }
       } else {
-        const capacity = reserveCapacity(await tx.get(C.config, CAPACITY_ID), { nowMs, maxRequestsPerMinute, maxRequestsPerDay, source,
+        const capacity = reserveCapacity(await tx.get(C.config, CAPACITY_ID), { nowMs, maxRequestsPerMinute, maxRequestsPerDay, source, autoShare,
           legacyDayCount: current.dayCount, consume: minuteCount < maxRequestsPerMinute });
         await tx.put(C.config, capacity.state);
         detail = { ...capacity.detail, sourceCounts };

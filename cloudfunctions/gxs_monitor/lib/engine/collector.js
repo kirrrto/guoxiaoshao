@@ -34,6 +34,7 @@ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = cons
   let running = false;
   let stopping = false;
   let budget = { allowed: true, reason: null, minuteCount: 0, dayCount: 0 };
+  let cadenceInfo = { cadenceMode: 'adaptive', targetPeriodMs: 0, budgetIntervalMs: 0, autoSharePercent: 80 };
   const stats = { batches: 0, observations: 0, events: 0, tasks: 0, sent: 0, lastBatchAt: null };
 
   const lease = createLeaseKeeper({ repo, ownerId, ttlMs: 15000, clock, log });
@@ -251,13 +252,25 @@ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = cons
     // Continuous monitoring in both modes fits the sustainable automatic lane,
     // independent of user count. Bursts still pass the shared admission guard.
     // Explicit daily mode retains the previous resident-mode cadence.
-    const autoLimit = config.collector.budgetMode === 'daily'
-      ? Math.max(1, Math.floor(config.collector.maxRequestsPerDay * AUTO_SHARE))
-      : config.collector.maxRequestsPerDay * AUTO_SHARE;
-    const budgetIntervalMs = config.collector.budgetMode === 'daily' && mode !== 'scheduled' ? 0 : Math.ceil(groups.length * DAY_MS / autoLimit);
-    scheduler.configure({ intervalMs: Math.max(minimumIntervalMs, config.collector.intervalSeconds * 1000, budgetIntervalMs), maxConcurrency: config.collector.maxConcurrency, timeoutMs: config.query.upstreamTimeoutMs,
+    const autoShare = Math.min(0.95, Math.max(0.01, (config.collector.autoSharePercent || 80) / 100));
+    const cadenceMode = config.collector.cadenceMode === 'fixed' ? 'fixed' : 'adaptive';
+    const baseIntervalMs = Math.max(minimumIntervalMs, config.collector.intervalSeconds * 1000);
+    let intervalMs = baseIntervalMs;
+    let budgetIntervalMs = 0;
+    if (cadenceMode === 'adaptive') {
+      const autoLimit = config.collector.budgetMode === 'daily'
+        ? Math.max(1, Math.floor(config.collector.maxRequestsPerDay * autoShare))
+        : config.collector.maxRequestsPerDay * autoShare;
+      budgetIntervalMs = config.collector.budgetMode === 'daily' && mode !== 'scheduled' ? 0 : Math.ceil(groups.length * DAY_MS / autoLimit);
+      intervalMs = Math.max(minimumIntervalMs, config.collector.intervalSeconds * 1000, budgetIntervalMs);
+    }
+    // Fixed cadence never stretches with group count. Capacity shortfalls surface
+    // as admission waits / observation delay instead of a silent longer period.
+    scheduler.configure({ intervalMs, fixedCadence: cadenceMode === 'fixed',
+      maxConcurrency: config.collector.maxConcurrency, timeoutMs: config.query.upstreamTimeoutMs,
       burstIntervalMs: config.collector.burstIntervalSeconds * 1000, burstQuietMs: config.collector.burstQuietSeconds * 1000,
       availableIntervalMs: config.collector.availableIntervalSeconds * 1000 });
+    cadenceInfo = { cadenceMode, targetPeriodMs: intervalMs, budgetIntervalMs, autoSharePercent: Math.round(autoShare * 100) };
     scheduler.setTargets(groups);
     lastRefreshAt = now.getTime();
     return { follows: follows.length, eligible: eligible.length, groups: groups.length, enabled: config.collector.enabled };
@@ -301,6 +314,10 @@ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = cons
       groupCount: snap.groupCount,
       inFlight: snap.inFlight,
       intervalMs: snap.intervalMs,
+      cadenceMode: cadenceInfo.cadenceMode,
+      targetPeriodMs: cadenceInfo.targetPeriodMs || snap.intervalMs,
+      budgetIntervalMs: cadenceInfo.budgetIntervalMs,
+      autoSharePercent: cadenceInfo.autoSharePercent,
       availableIntervalMs: snap.availableIntervalMs,
       maxConcurrency: snap.maxConcurrency,
       budget: { ...budget, budgetMode: config.collector.budgetMode, maxRequestsPerMinute: config.collector.maxRequestsPerMinute || 60, maxRequestsPerDay: config.collector.maxRequestsPerDay || 10000 },

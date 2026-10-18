@@ -118,8 +118,9 @@ async function capacity(ctx) {
   const normalCadenceSeconds = monitorMode ? Math.max(monitorMode === 'scheduled' ? 60 : 1, ctx.config.collector.intervalSeconds) : null;
   const configuredNormalRequestsPerDay = uniqueGroups !== null && normalCadenceSeconds
     ? Math.ceil(uniqueGroups * 86400 / normalCadenceSeconds) : null;
+  const autoShare = Math.min(0.95, Math.max(0.01, (ctx.config.collector.autoSharePercent || 80) / 100));
   const autoRequestsPerDay = ctx.config.collector.budgetMode === 'daily'
-    ? Math.max(1, Math.floor(ctx.config.collector.maxRequestsPerDay * AUTO_SHARE)) : ctx.config.collector.maxRequestsPerDay * AUTO_SHARE;
+    ? Math.max(1, Math.floor(ctx.config.collector.maxRequestsPerDay * autoShare)) : ctx.config.collector.maxRequestsPerDay * autoShare;
   const recordedAtMs = stored && finite(stored.updatedAtMs);
   const recordedAt = recordedAtMs !== null && stored && Number.isFinite(new Date(recordedAtMs).getTime()) ? new Date(recordedAtMs).toISOString() : null;
   const lanes = (values, factor = 1) => Object.fromEntries(['shared', 'auto', 'manual'].map(lane => {

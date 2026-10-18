@@ -18,6 +18,9 @@
  */
 const DEFAULTS = Object.freeze({
   intervalMs: 1000,
+  // When true, intervalMs is an absolute per-group target period with a stable
+  // phase slot; missed slots are skipped, never caught up in a burst.
+  fixedCadence: false,
   burstIntervalMs: 0, // 0 disables burst mode
   burstQuietMs: 20000,
   availableIntervalMs: 0, // explicit opt-in, independently of status-change bursts
@@ -28,6 +31,11 @@ const DEFAULTS = Object.freeze({
 });
 
 const groupKeyOf = (storeNumber, partNumbers) => `${storeNumber}|${[...partNumbers].sort().join(',')}`;
+const phaseOfKey = (key, intervalMs) => {
+  let hash = 2166136261;
+  for (let i = 0; i < key.length; i++) hash = Math.imul(hash ^ key.charCodeAt(i), 16777619);
+  return intervalMs > 0 ? (hash >>> 0) % intervalMs : 0;
+};
 const ADMISSION_REASONS = new Set(['capacity_wait', 'minute_budget', 'daily_budget', 'auto_budget_reserved', 'upstream_paused']);
 const DAILY_REASONS = new Set(['daily_budget', 'auto_budget_reserved']);
 
@@ -93,6 +101,25 @@ function createScheduler(options) {
     return align > 0 ? Math.floor(nowMs / align) * align + Math.ceil(opts.intervalMs / align) * align : nowMs + opts.intervalMs;
   }
 
+  /** Absolute slot at or after afterMs for this group's stable phase. */
+  function slotAfter(key, afterMs) {
+    const interval = Math.max(1, opts.intervalMs);
+    const phase = phaseOfKey(key, interval);
+    const n = Math.ceil((afterMs - phase) / interval);
+    return phase + Math.max(0, n) * interval;
+  }
+
+  /**
+   * Fixed cadence: advance one period from the planned slot, skipping any
+   * slots already missed while the process was down or the request was slow.
+   */
+  function nextFixedDue(key, plannedAt, nowMs) {
+    const interval = Math.max(1, opts.intervalMs);
+    let next = plannedAt + interval;
+    if (next < nowMs) next = slotAfter(key, nowMs);
+    return next;
+  }
+
   function fastInterval(entry, nowMs) {
     const intervals = [];
     if (opts.burstIntervalMs > 0 && entry.burstUntil > nowMs) intervals.push(opts.burstIntervalMs);
@@ -101,7 +128,10 @@ function createScheduler(options) {
   }
 
   function plannedDueAt(entry, requestedAt, nowMs) {
-    const normalDue = nextInterval(requestedAt);
+    const key = entry.group.key;
+    const normalDue = opts.fixedCadence
+      ? (Number.isFinite(entry.plannedAt) ? nextFixedDue(key, entry.plannedAt, nowMs) : slotAfter(key, Math.max(requestedAt + 1, nowMs)))
+      : nextInterval(requestedAt);
     const fast = fastInterval(entry, nowMs);
     return fast ? Math.min(normalDue, requestedAt + fast) : normalDue;
   }
@@ -113,7 +143,8 @@ function createScheduler(options) {
     return Math.max(entry.nextDueAt, entry.guardUntil || 0, admissionUntil, previous === undefined ? 0 : previous + spacing);
   }
 
-  function configure({ intervalMs, maxConcurrency, timeoutMs, burstIntervalMs, burstQuietMs, availableIntervalMs } = {}) {
+  function configure({ intervalMs, maxConcurrency, timeoutMs, burstIntervalMs, burstQuietMs, availableIntervalMs, fixedCadence } = {}) {
+    if (fixedCadence !== undefined) opts.fixedCadence = Boolean(fixedCadence);
     if (availableIntervalMs !== undefined) {
       if (!Number.isSafeInteger(availableIntervalMs) || availableIntervalMs < 0 || availableIntervalMs > 60000 || (availableIntervalMs > 0 && availableIntervalMs < 1000)) throw new TypeError('invalid available interval');
       opts.availableIntervalMs = availableIntervalMs;
@@ -148,7 +179,9 @@ function createScheduler(options) {
     for (const group of nextGroups) {
       keep.add(group.key);
       if (!groups.has(group.key)) {
-        groups.set(group.key, { group, trackedAt: clock().getTime(), nextDueAt: 0, inFlight: false, failures: 0, burstUntil: 0, available: false, availableObservedAt: null, health: emptyHealth() });
+        const trackedAt = clock().getTime();
+        const nextDueAt = opts.fixedCadence ? slotAfter(group.key, trackedAt) : 0;
+        groups.set(group.key, { group, trackedAt, nextDueAt, plannedAt: null, scheduleDelayMs: 0, inFlight: false, failures: 0, burstUntil: 0, available: false, availableObservedAt: null, health: emptyHealth() });
       }
     }
     for (const key of [...groups.keys()]) if (!keep.has(key)) groups.delete(key);
@@ -213,6 +246,9 @@ function createScheduler(options) {
   async function dispatch(entry, nowMs) {
     const { group, health } = entry;
     entry.inFlight = true;
+    // Schedule metrics: planned slot vs actual request start (tick time).
+    entry.plannedAt = Number.isFinite(entry.nextDueAt) ? entry.nextDueAt : nowMs;
+    entry.scheduleDelayMs = Math.max(0, nowMs - entry.plannedAt);
     const wasProbe = breaker.state === 'half_open';
     const generation = breaker.trips;
     if (wasProbe) breaker.probeInFlight = true;
@@ -259,7 +295,9 @@ function createScheduler(options) {
       health.successes += 1;
       health.consecutiveFailures = 0;
       entry.failures = 0;
-      entry.nextDueAt = nextInterval(nowMs);
+      entry.nextDueAt = opts.fixedCadence
+        ? nextFixedDue(group.key, entry.plannedAt || nowMs, finishedMs)
+        : nextInterval(nowMs);
       noteSuccess(wasProbe, generation);
     } else {
       health.failures += 1;
@@ -357,13 +395,21 @@ function createScheduler(options) {
 
   function snapshot() {
     const nowMs = clock().getTime();
-    const targets = [...groups.values()].map(e => ({
-      key: e.group.key, storeNumber: e.group.storeNumber, partNumbers: e.group.partNumbers, trackedAt: e.trackedAt,
-      inFlight: e.inFlight, dueInMs: Math.max(0, dueAt(e) - nowMs), storeDelayed: admissionUntil <= nowMs && e.nextDueAt <= nowMs && (e.guardUntil || 0) <= nowMs && dueAt(e) > nowMs,
-      failures: e.failures, bursting: fastInterval(e, nowMs) > 0, available: e.available, health: e.health,
-    }));
+    const targets = [...groups.values()].map(e => {
+      const storeDelayed = admissionUntil <= nowMs && e.nextDueAt <= nowMs && (e.guardUntil || 0) <= nowMs && dueAt(e) > nowMs;
+      return {
+        key: e.group.key, storeNumber: e.group.storeNumber, partNumbers: e.group.partNumbers, trackedAt: e.trackedAt,
+        inFlight: e.inFlight, dueInMs: Math.max(0, dueAt(e) - nowMs), storeDelayed,
+        storeDelayReason: storeDelayed ? 'store_serial_or_spacing' : null,
+        plannedAt: Number.isFinite(e.plannedAt) ? e.plannedAt : null,
+        scheduleDelayMs: Number.isFinite(e.scheduleDelayMs) ? e.scheduleDelayMs : 0,
+        failures: e.failures, bursting: fastInterval(e, nowMs) > 0, available: e.available, health: e.health,
+      };
+    });
     const state = paused ? 'paused' : breaker.state === 'open' ? 'throttled' : admissionUntil > nowMs ? (admissionReason === 'upstream_paused' ? 'throttled' : 'budget_limited') : breaker.state === 'half_open' ? 'probing' : targets.some(t => t.health.persistenceFailed) ? 'error' : targets.length ? 'running' : 'idle';
-    return { state, breaker: { ...breaker, failures: breaker.failures.length }, admissionUntil, admissionReason, groupCount: targets.length, inFlight: pending.size, intervalMs: opts.intervalMs, burstIntervalMs: opts.burstIntervalMs, availableIntervalMs: opts.availableIntervalMs, maxConcurrency: opts.maxConcurrency, targets };
+    return { state, breaker: { ...breaker, failures: breaker.failures.length }, admissionUntil, admissionReason, groupCount: targets.length, inFlight: pending.size,
+      intervalMs: opts.intervalMs, fixedCadence: Boolean(opts.fixedCadence),
+      burstIntervalMs: opts.burstIntervalMs, availableIntervalMs: opts.availableIntervalMs, maxConcurrency: opts.maxConcurrency, targets };
   }
 
   // Persist due times and the global breaker across scheduled function cold
@@ -399,6 +445,7 @@ function createScheduler(options) {
       entry.trackedAt = pastTimestamp(item.trackedAt)
         ?? pastTimestamp(item.health && item.health.lastRequestAt, entry.trackedAt);
       entry.nextDueAt = item.nextDueAt;
+      entry.plannedAt = Number.isFinite(item.plannedAt) ? item.plannedAt : null;
       entry.guardUntil = Number.isFinite(item.guardUntil) ? item.guardUntil : 0;
       entry.guardReason = typeof item.guardReason === 'string' ? item.guardReason : null;
       entry.failures = Math.max(0, Number(item.failures) || 0);
@@ -421,8 +468,10 @@ function createScheduler(options) {
       // no-stock targets by several extra minutes after capacity was freed.
       // Only recalculate a proven configuration change; persisted admission,
       // backoff and Retry-After remain authoritative.
-      const previousNormalDue = opts.alignIntervalMs > 0
-        ? Math.floor(entry.health.lastRequestAt / opts.alignIntervalMs) * opts.alignIntervalMs + Math.ceil(savedIntervalMs / opts.alignIntervalMs) * opts.alignIntervalMs
+      const previousNormalDue = opts.fixedCadence || opts.alignIntervalMs > 0
+        ? (opts.fixedCadence
+          ? nextFixedDue(entry.group.key, entry.plannedAt || entry.health.lastRequestAt, restoredAt)
+          : Math.floor(entry.health.lastRequestAt / opts.alignIntervalMs) * opts.alignIntervalMs + Math.ceil(savedIntervalMs / opts.alignIntervalMs) * opts.alignIntervalMs)
         : entry.health.lastRequestAt + savedIntervalMs;
       const normalCadenceChanged = cadenceChanged && item.nextDueAt === previousNormalDue;
       if ((entry.available || normalCadenceChanged) && !entry.failures && !entry.guardUntil && entry.health.lastRequestAt !== null) {
