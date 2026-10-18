@@ -1,0 +1,112 @@
+{
+  "recordedAt": "2026-10-08T10:29:42.3269351Z",
+  "version": "1.6.1",
+  "baseCommit": "8da9299b6c208cf7e94613356b15187e32a3276e",
+  "change": "Concise version summaries, three-version pagination and progressive membership information",
+  "files": {
+    "miniprogram/config/release-notes.js": "2db2989e15fae7408ec62672dbaaa2fa3a68c429002c5e0aa14b69cda0e0a9a8",
+    "miniprogram/pages/mine/index.js": "b817d7341c7756f591a81f6dd7778db7bbc8cc0496b62bedbea88c25672ed2c0",
+    "miniprogram/pages/mine/index.wxml": "93f9b3361ca55004bd86145458fa0ed04d6124baa92ba35639c93499fff2c3a2",
+    "miniprogram/pages/mine/index.wxss": "f2d5bbf7a833e4532bbf8cc4c303f0bc7144eeebdb93963665c72dbdd3c52adb",
+    "tests/release-notes-ui.test.mjs": "fd4f5d1de6c039cef478ca8cc4261b17fb5f289152b0db4517587fba076e3d05",
+    "tests/membership-upgrade-frontend.test.mjs": "5ae69e2de6fe7287a2b6c978d51b6cc3d555e721881b857377d908ec7016ce05",
+    "tools/ui-preview/build.mjs": "53c4c4c0449c1324976230da01d69a6199edb9f98cc2aeb18efd93626640a8c2",
+    "tools/ui-preview/check-layout.mjs": "0142ed11b8e21a13c5d00a72ac3be6ed7713753a9cdc4698d71d031684c08ecd",
+    "AGENTS.md": "f482be85dd67e88857f555427247206a525f55d4dbdf724a90391b921eb5c3d4",
+    ".cursor/rules/product-copy.mdc": "5509a439a12d3d45b8114ffc63aff3671310535246386826381eb9d1d3103ef7"
+  },
+  "releaseNotes": {
+    "versions": 22,
+    "pageSize": 3,
+    "pages": 8,
+    "highlightsPerVersion": "2-3",
+    "maxHighlightCharacters": 78,
+    "originalVersionsAndDatesPreserved": true
+  },
+  "tests": {
+    "total": 1193,
+    "passed": 1193,
+    "failed": 0,
+    "durationMs": 116397.1334
+  },
+  "source": {
+    "files": 427,
+    "errors": 0
+  },
+  "release": {
+    "passed": true,
+    "passedChecks": 45,
+    "totalChecks": 45,
+    "monitorFiles": 38
+  },
+  "layouts": {
+    "releases": {
+      "light": {
+        "total": 18,
+        "expressionErrors": 0,
+        "missingText": 0,
+        "horizontalOverflow": 0,
+        "clippedText": 0,
+        "failedImages": 0,
+        "alternativeLayoutFailures": 0
+      },
+      "dark": {
+        "total": 18,
+        "expressionErrors": 0,
+        "missingText": 0,
+        "horizontalOverflow": 0,
+        "clippedText": 0,
+        "failedImages": 0,
+        "alternativeLayoutFailures": 0
+      }
+    },
+    "membership": {
+      "light": {
+        "total": 54,
+        "expressionErrors": 0,
+        "missingText": 0,
+        "horizontalOverflow": 0,
+        "clippedText": 0,
+        "failedImages": 0,
+        "alternativeLayoutFailures": 0
+      },
+      "dark": {
+        "total": 54,
+        "expressionErrors": 0,
+        "missingText": 0,
+        "horizontalOverflow": 0,
+        "clippedText": 0,
+        "failedImages": 0,
+        "alternativeLayoutFailures": 0
+      }
+    }
+  },
+  "desktop": {
+    "application": "WeChat DevTools 2.02.2609292 Nightly",
+    "project": "D:\\Projects\\guoxiaoshao",
+    "sourceBranch": "master",
+    "performed": [
+      "Opened and collapsed membership allowances",
+      "Opened and collapsed purchase details",
+      "Opened update announcements"
+    ],
+    "observed": [
+      "Current 3x3 allowance and 4x4 month/year plan cards",
+      "Separate grouped purchase information",
+      "Announcement first-page 1/8 controls",
+      "Three versions on page 4/8 after maintainer interaction"
+    ],
+    "navigationBoundary": "Agent next-page input was interrupted by user input; page navigation and boundaries verified in offline behavior tests. No physical-device test or real purchase."
+  },
+  "upload": {
+    "success": true,
+    "appid": "wxe96ad9e77b602f1b",
+    "version": "1.6.1",
+    "sizeBytes": 773159,
+    "receiptAt": "2026-10-08T18:28:49.6699541+08:00",
+    "cliLogSHA256": "217d05151e666417fc2129ce08f5c917e1ef1572c90749f9ab4a7cfb6291a5f8",
+    "description": "精简更新小结，新增版本分页，优化会员权益展示"
+  },
+  "cloudDeployment": "No cloud code changes or deployment in this UI update",
+  "publication": "Uploaded development version only; maintainer will submit later; no review approval or production release confirmed"
+}

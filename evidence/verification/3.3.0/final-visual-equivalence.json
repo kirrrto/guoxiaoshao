@@ -1,0 +1,17 @@
+{
+  "reason": "Final correction of annual quota wording in native modal JS; rendered HTML must remain byte-for-byte equal to the validated snapshots",
+  "results": [
+    {
+      "directory": "/tmp/gxs-v330-ui",
+      "htmlFilesCompared": 301,
+      "changedHtmlFiles": [],
+      "sourceMismatch": []
+    },
+    {
+      "directory": "/tmp/gxs-v330-notifications",
+      "htmlFilesCompared": 161,
+      "changedHtmlFiles": [],
+      "sourceMismatch": []
+    }
+  ]
+}

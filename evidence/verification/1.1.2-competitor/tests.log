@@ -1,0 +1,1936 @@
+TAP version 13
+# Subtest: develop: retired sandbox flags cannot bypass cloud initialization or membership API
+ok 1 - develop: retired sandbox flags cannot bypass cloud initialization or membership API
+  ---
+  duration_ms: 7.678
+  type: 'test'
+  ...
+# Subtest: trial: retired sandbox flags cannot bypass cloud initialization or membership API
+ok 2 - trial: retired sandbox flags cannot bypass cloud initialization or membership API
+  ---
+  duration_ms: 3.5519
+  type: 'test'
+  ...
+# Subtest: release: retired sandbox flags cannot bypass cloud initialization or membership API
+ok 3 - release: retired sandbox flags cannot bypass cloud initialization or membership API
+  ---
+  duration_ms: 5.0914
+  type: 'test'
+  ...
+# Subtest: retired test cache never replaces real-account recovery IDs or saved results
+ok 4 - retired test cache never replaces real-account recovery IDs or saved results
+  ---
+  duration_ms: 3.0511
+  type: 'test'
+  ...
+# Subtest: upload directory contains neither the retired page nor a sandbox execution path
+ok 5 - upload directory contains neither the retired page nor a sandbox execution path
+  ---
+  duration_ms: 30.4668
+  type: 'test'
+  ...
+# Subtest: acceptance stays off by default and release/trial builds ignore forged storage flags
+ok 6 - acceptance stays off by default and release/trial builds ignore forged storage flags
+  ---
+  duration_ms: 9.4476
+  type: 'test'
+  ...
+# Subtest: free acceptance signup, charged history task, exhausted balance match production quota defaults
+ok 7 - free acceptance signup, charged history task, exhausted balance match production quota defaults
+  ---
+  duration_ms: 12.6879
+  type: 'test'
+  ...
+# Subtest: failed queries refund once and repeated request IDs cannot debit or change target twice
+ok 8 - failed queries refund once and repeated request IDs cannot debit or change target twice
+  ---
+  duration_ms: 6.959
+  type: 'test'
+  ...
+# Subtest: member queries need no payment or credits and share production three-by-three follow limits
+ok 9 - member queries need no payment or credits and share production three-by-three follow limits
+  ---
+  duration_ms: 20.3634
+  type: 'test'
+  ...
+# Subtest: membership expiration preserves follows but stops monitoring, resume and new follows
+ok 10 - membership expiration preserves follows but stops monitoring, resume and new follows
+  ---
+  duration_ms: 5.4664
+  type: 'test'
+  ...
+# Subtest: simulated authorization, do-not-disturb, restock history and cooldown never report WeChat delivery
+ok 11 - simulated authorization, do-not-disturb, restock history and cooldown never report WeChat delivery
+  ---
+  duration_ms: 7.0669
+  type: 'test'
+  ...
+# Subtest: new product limitations differ by identity and history date without exposing restricted latest data
+ok 12 - new product limitations differ by identity and history date without exposing restricted latest data
+  ---
+  duration_ms: 12.1981
+  type: 'test'
+  ...
+# Subtest: reset and exit isolate all acceptance data and unsupported/admin actions fail closed
+ok 13 - reset and exit isolate all acceptance data and unsupported/admin actions fail closed
+  ---
+  duration_ms: 3.5481
+  type: 'test'
+  ...
+# Subtest: history acceptance paginates a frozen snapshot with exact totals, tied timestamps and one charge
+ok 14 - history acceptance paginates a frozen snapshot with exact totals, tied timestamps and one charge
+  ---
+  duration_ms: 1163.005
+  type: 'test'
+  ...
+# Subtest: history replay rechecks new-product access and never restores restricted live stock after membership expires
+ok 15 - history replay rechecks new-product access and never restores restricted live stock after membership expires
+  ---
+  duration_ms: 3.682
+  type: 'test'
+  ...
+# Subtest: unknown and failed acceptance observations preserve known status, emit no event and refund like production
+ok 16 - unknown and failed acceptance observations preserve known status, emit no event and refund like production
+  ---
+  duration_ms: 8.8488
+  type: 'test'
+  ...
+# Subtest: access denial can retry after sign-in and evicted acceptance responses cannot charge the same ID again
+ok 17 - access denial can retry after sign-in and evicted acceptance responses cannot charge the same ID again
+  ---
+  duration_ms: 905.6585
+  type: 'test'
+  ...
+# Subtest: acceptance reminder pagination and single deletion preserve the internal record and newer arrivals
+ok 18 - acceptance reminder pagination and single deletion preserve the internal record and newer arrivals
+  ---
+  duration_ms: 74.4443
+  type: 'test'
+  ...
+# Subtest: acceptance clear removes all snapshot reminders, retains same-time arrivals, follows, events and cooldown
+ok 19 - acceptance clear removes all snapshot reminders, retains same-time arrivals, follows, events and cooldown
+  ---
+  duration_ms: 476.1046
+  type: 'test'
+  ...
+# Subtest: acceptance reminder management rejects invalid IDs, future ranges and malformed cursors without changing records
+ok 20 - acceptance reminder management rejects invalid IDs, future ranges and malformed cursors without changing records
+  ---
+  duration_ms: 3.8499
+  type: 'test'
+  ...
+# Subtest: task reports need a successful server history query; unsupported configured tasks do not grant
+ok 21 - task reports need a successful server history query; unsupported configured tasks do not grant
+  ---
+  duration_ms: 16.3899
+  type: 'test'
+  ...
+# Subtest: task proof rejects pending, failed, live, other-user, previous-day and invalid response records
+ok 22 - task proof rejects pending, failed, live, other-user, previous-day and invalid response records
+  ---
+  duration_ms: 8.137
+  type: 'test'
+  ...
+# Subtest: legacy proof is found by Beijing completion day and rechecked after the lookup
+ok 23 - legacy proof is found by Beijing completion day and rechecked after the lookup
+  ---
+  duration_ms: 1.1235
+  type: 'test'
+  ...
+# Subtest: zero rewards stay disabled instead of falling back to the configured default
+ok 24 - zero rewards stay disabled instead of falling back to the configured default
+  ---
+  duration_ms: 2.339
+  type: 'test'
+  ...
+# Subtest: failure to commit a successful history response also rolls back its task proof
+ok 25 - failure to commit a successful history response also rolls back its task proof
+  ---
+  duration_ms: 4.0484
+  type: 'test'
+  ...
+# Subtest: bootstrap uses server summaries without skipping fresh identity, status or query recovery reads
+ok 26 - bootstrap uses server summaries without skipping fresh identity, status or query recovery reads
+  ---
+  duration_ms: 7.0518
+  type: 'test'
+  ...
+# Subtest: legacy bootstrap scans the full day and legacy follow documents; reward commit upgrades its summary
+ok 27 - legacy bootstrap scans the full day and legacy follow documents; reward commit upgrades its summary
+  ---
+  duration_ms: 2.8928
+  type: 'test'
+  ...
+# Subtest: independent settings updates merge atomically, are isolated by account and roll back on error
+ok 28 - independent settings updates merge atomically, are isolated by account and roll back on error
+  ---
+  duration_ms: 1.4205
+  type: 'test'
+  ...
+# Subtest: account tab reuses secondary results and loads membership records only when opened
+ok 29 - account tab reuses secondary results and loads membership records only when opened
+  ---
+  duration_ms: 10.0977
+  type: 'test'
+  ...
+# Subtest: overlapping account refreshes share the pending request
+ok 30 - overlapping account refreshes share the pending request
+  ---
+  duration_ms: 2.8188
+  type: 'test'
+  ...
+# Subtest: failed account records show retryable errors instead of claiming no records
+ok 31 - failed account records show retryable errors instead of claiming no records
+  ---
+  duration_ms: 4.5705
+  type: 'test'
+  ...
+# Subtest: cached admin identity never reveals admin controls before server authorization
+ok 32 - cached admin identity never reveals admin controls before server authorization
+  ---
+  duration_ms: 14.6127
+  type: 'test'
+  ...
+# Subtest: admin access rechecks on returning and removes previously loaded data if revoked
+ok 33 - admin access rechecks on returning and removes previously loaded data if revoked
+  ---
+  duration_ms: 7.1714
+  type: 'test'
+  ...
+# Subtest: ordinary users cannot call administrative APIs directly regardless of client flags
+ok 34 - ordinary users cannot call administrative APIs directly regardless of client flags
+  ---
+  duration_ms: 4.6081
+  type: 'test'
+  ...
+# Subtest: consumer account page contains no admin route or catalog timestamp
+ok 35 - consumer account page contains no admin route or catalog timestamp
+  ---
+  duration_ms: 1.1554
+  type: 'test'
+  ...
+# Subtest: buildPickupUrl mirrors the storefront request shape
+ok 36 - buildPickupUrl mirrors the storefront request shape
+  ---
+  duration_ms: 3.2438
+  type: 'test'
+  ...
+# Subtest: known pickupDisplay values map to distinct statuses including pending
+ok 37 - known pickupDisplay values map to distinct statuses including pending
+  ---
+  duration_ms: 3.4753
+  type: 'test'
+  ...
+# Subtest: transport and envelope failures never become unavailable
+ok 38 - transport and envelope failures never become unavailable
+  ---
+  duration_ms: 0.5611
+  type: 'test'
+  ...
+# Subtest: store and part reconciliation is explicit per target
+ok 39 - store and part reconciliation is explicit per target
+  ---
+  duration_ms: 0.324
+  type: 'test'
+  ...
+# Subtest: parseApplePickup rejects implicit capture time or targets
+ok 40 - parseApplePickup rejects implicit capture time or targets
+  ---
+  duration_ms: 0.2915
+  type: 'test'
+  ...
+# Subtest: fetchPickup wraps a single bounded request and reports transport errors as unknown
+ok 41 - fetchPickup wraps a single bounded request and reports transport errors as unknown
+  ---
+  duration_ms: 39.5843
+  type: 'test'
+  ...
+# Subtest: concurrent retries run one upstream request and bind the query ID to its parameters
+ok 42 - concurrent retries run one upstream request and bind the query ID to its parameters
+  ---
+  duration_ms: 53.5292
+  type: 'test'
+  ...
+# Subtest: a worker crash after debit recovers with the last credit already spent and fences the old worker
+ok 43 - a worker crash after debit recovers with the last credit already spent and fences the old worker
+  ---
+  duration_ms: 2.6692
+  type: 'test'
+  ...
+# Subtest: pending-record failure rolls back debit; event-write failure rolls back latest and refunds the query
+ok 44 - pending-record failure rolls back debit; event-write failure rolls back latest and refunds the query
+  ---
+  duration_ms: 4.7238
+  type: 'test'
+  ...
+# Subtest: returning to the app refunds an abandoned query after the recovery grace period exactly once
+ok 45 - returning to the app refunds an abandoned query after the recovery grace period exactly once
+  ---
+  duration_ms: 4.5959
+  type: 'test'
+  ...
+# Subtest: parallel store fetches obey the three-request bound and timeout returns a refund
+ok 46 - parallel store fetches obey the three-request bound and timeout returns a refund
+  ---
+  duration_ms: 82.8061
+  type: 'test'
+  ...
+# Subtest: atomic observations ignore older samples and retry one event after a transaction failure
+ok 47 - atomic observations ignore older samples and retry one event after a transaction failure
+  ---
+  duration_ms: 2.732
+  type: 'test'
+  ...
+# Subtest: new-product history cannot expose live status and cannot reuse payment for changed filters
+ok 48 - new-product history cannot expose live status and cannot reuse payment for changed filters
+  ---
+  duration_ms: 3.1231
+  type: 'test'
+  ...
+# Subtest: history pages include all 305 events with exact totals, tie ordering and one debit
+ok 49 - history pages include all 305 events with exact totals, tie ordering and one debit
+  ---
+  duration_ms: 22.2266
+  type: 'test'
+  ...
+# Subtest: concurrent rewards enforce both balance and daily limits inside the transaction
+ok 50 - concurrent rewards enforce both balance and daily limits inside the transaction
+  ---
+  duration_ms: 6.5032
+  type: 'test'
+  ...
+# Subtest: concurrent follows cannot exceed three SKUs; expiry and stale health are reported honestly
+ok 51 - concurrent follows cannot exceed three SKUs; expiry and stale health are reported honestly
+  ---
+  duration_ms: 7.6778
+  type: 'test'
+  ...
+# Subtest: expired follows cannot expose restricted new-product inventory through any stock field
+ok 52 - expired follows cannot expose restricted new-product inventory through any stock field
+  ---
+  duration_ms: 5.6083
+  type: 'test'
+  ...
+# Subtest: membership fulfillment rolls back on failure and concurrent different orders preserve all days
+ok 53 - membership fulfillment rolls back on failure and concurrent different orders preserve all days
+  ---
+  duration_ms: 1.5427
+  type: 'test'
+  ...
+# Subtest: retained disabled payment repository primitives prevent transaction reuse and repeated refunds
+ok 54 - retained disabled payment repository primitives prevent transaction reuse and repeated refunds
+  ---
+  duration_ms: 2.6688
+  type: 'test'
+  ...
+# Subtest: unknown invocation origins cannot become administrators and cross-account identity cannot mix OPENIDs
+ok 55 - unknown invocation origins cannot become administrators and cross-account identity cannot mix OPENIDs
+  ---
+  duration_ms: 1.5359
+  type: 'test'
+  ...
+# Subtest: reused admin operation IDs reject changed amounts or membership days
+ok 56 - reused admin operation IDs reject changed amounts or membership days
+  ---
+  duration_ms: 2.6819
+  type: 'test'
+  ...
+# Subtest: real wx-server-sdk 4.0.2 adapter preserves transaction results, null/object replacements, rollback and conflict retries
+ok 57 - real wx-server-sdk 4.0.2 adapter preserves transaction results, null/object replacements, rollback and conflict retries
+  ---
+  duration_ms: 897.9372
+  type: 'test'
+  ...
+# Subtest: CloudBase bulk reads paginate past 1000 and split ID filters into bounded chunks
+ok 58 - CloudBase bulk reads paginate past 1000 and split ID filters into bounded chunks
+  ---
+  duration_ms: 9.1306
+  type: 'test'
+  ...
+# Subtest: every catalog SKU has a sourced official image, with no unresolved image request
+ok 59 - every catalog SKU has a sourced official image, with no unresolved image request
+  ---
+  duration_ms: 33.5545
+  type: 'test'
+  ...
+# Subtest: selector parsing uses each retail SKU imageKey and preserves signed source parameters
+ok 60 - selector parsing uses each retail SKU imageKey and preserves signed source parameters
+  ---
+  duration_ms: 3.9358
+  type: 'test'
+  ...
+# Subtest: configurator images require selected dimensions; cold family collage is not a color fallback
+ok 61 - configurator images require selected dimensions; cold family collage is not a color fallback
+  ---
+  duration_ms: 1.3784
+  type: 'test'
+  ...
+# Subtest: iMac adds the fixed standard stand only when both retail container and official enum prove it
+ok 62 - iMac adds the fixed standard stand only when both retail container and official enum prove it
+  ---
+  duration_ms: 0.7141
+  type: 'test'
+  ...
+# Subtest: gallery resolution deduplicates SKU requests, verifies color and replays cached evidence offline
+ok 63 - gallery resolution deduplicates SKU requests, verifies color and replays cached evidence offline
+  ---
+  duration_ms: 22.5057
+  type: 'test'
+  ...
+# Subtest: catalog API forwards image fields and changes cache version when images are added
+ok 64 - catalog API forwards image fields and changes cache version when images are added
+  ---
+  duration_ms: 9.1977
+  type: 'test'
+  ...
+# Subtest: retained HTTP and decode evidence covers every unique URL and every SKU in this catalog
+ok 65 - retained HTTP and decode evidence covers every unique URL and every SKU in this catalog
+  ---
+  duration_ms: 54.6393
+  type: 'test'
+  ...
+# Subtest: collector only targets active follows of active members and merges same-store SKUs
+ok 66 - collector only targets active follows of active members and merges same-store SKUs
+  ---
+  duration_ms: 41.4411
+  type: 'test'
+  ...
+# Subtest: collector runs the loop: observations → events → deduped notification tasks → one send per user
+ok 67 - collector runs the loop: observations → events → deduped notification tasks → one send per user
+  ---
+  duration_ms: 33.7754
+  type: 'test'
+  ...
+# Subtest: a second collector cannot take the lease while the first renews it; it takes over after expiry
+ok 68 - a second collector cannot take the lease while the first renews it; it takes over after expiry
+  ---
+  duration_ms: 10.1378
+  type: 'test'
+  ...
+# Subtest: collector switch off empties the target set without touching follows
+ok 69 - collector switch off empties the target set without touching follows
+  ---
+  duration_ms: 0.9124
+  type: 'test'
+  ...
+# Subtest: notifier explains every skipped delivery and never sends when notifications are disabled
+ok 70 - notifier explains every skipped delivery and never sends when notifications are disabled
+  ---
+  duration_ms: 0.7726
+  type: 'test'
+  ...
+# Subtest: invalid runtime values cannot corrupt quota, collector limits or notification mappings
+ok 71 - invalid runtime values cannot corrupt quota, collector limits or notification mappings
+  ---
+  duration_ms: 10.8112
+  type: 'test'
+  ...
+# Subtest: partial configuration patches preserve previously configured siblings
+ok 72 - partial configuration patches preserve previously configured siblings
+  ---
+  duration_ms: 1.2079
+  type: 'test'
+  ...
+# Subtest: concurrent unrelated config patches cannot reopen redemption or erase each other
+ok 73 - concurrent unrelated config patches cannot reopen redemption or erase each other
+  ---
+  duration_ms: 10.8883
+  type: 'test'
+  ...
+# Subtest: invalid or failed atomic config patches leave the complete runtime unchanged
+ok 74 - invalid or failed atomic config patches leave the complete runtime unchanged
+  ---
+  duration_ms: 2.9909
+  type: 'test'
+  ...
+# Subtest: deferred payment cannot be enabled by a runtime flag or a direct client order call
+ok 75 - deferred payment cannot be enabled by a runtime flag or a direct client order call
+  ---
+  duration_ms: 1.4877
+  type: 'test'
+  ...
+# Subtest: same-worker lease renewals share one in-flight transaction and recover after rejection
+ok 76 - same-worker lease renewals share one in-flight transaction and recover after rejection
+  ---
+  duration_ms: 4.602
+  type: 'test'
+  ...
+# Subtest: only explicit transaction conflicts are retriable after wx-server-sdk wrapping
+ok 77 - only explicit transaction conflicts are retriable after wx-server-sdk wrapping
+  ---
+  duration_ms: 0.7833
+  type: 'test'
+  ...
+# Subtest: runtime 8-second interval and concurrency one are effective and can change without restart
+ok 78 - runtime 8-second interval and concurrency one are effective and can change without restart
+  ---
+  duration_ms: 34.224
+  type: 'test'
+  ...
+# Subtest: a success already in flight cannot clear a concurrent 429 Retry-After breaker
+ok 79 - a success already in flight cannot clear a concurrent 429 Retry-After breaker
+  ---
+  duration_ms: 1.4716
+  type: 'test'
+  ...
+# Subtest: replacing a target retains the in-flight request in the global concurrency count
+ok 80 - replacing a target retains the in-flight request in the global concurrency count
+  ---
+  duration_ms: 0.5165
+  type: 'test'
+  ...
+# Subtest: a manual query restock creates exactly one durable subscription notification
+ok 81 - a manual query restock creates exactly one durable subscription notification
+  ---
+  duration_ms: 21.0234
+  type: 'test'
+  ...
+# Subtest: a temporary notification insert failure is recovered from the persisted event
+ok 82 - a temporary notification insert failure is recovered from the persisted event
+  ---
+  duration_ms: 7.1438
+  type: 'test'
+  ...
+# Subtest: two workers claim one task once and spend one subscription credit
+ok 83 - two workers claim one task once and spend one subscription credit
+  ---
+  duration_ms: 1.5211
+  type: 'test'
+  ...
+# Subtest: send-time membership, follow, DND and user switch are rechecked after planning
+ok 84 - send-time membership, follow, DND and user switch are rechecked after planning
+  ---
+  duration_ms: 6.4042
+  type: 'test'
+  ...
+# Subtest: uncertain transport and malformed platform response are never blindly replayed
+ok 85 - uncertain transport and malformed platform response are never blindly replayed
+  ---
+  duration_ms: 3.6686
+  type: 'test'
+  ...
+# Subtest: a crashed sending claim expires to uncertain rather than returning to pending
+ok 86 - a crashed sending claim expires to uncertain rather than returning to pending
+  ---
+  duration_ms: 1.2932
+  type: 'test'
+  ...
+# Subtest: cooldown applies atomically per user and target; explicit rejection releases credit
+ok 87 - cooldown applies atomically per user and target; explicit rejection releases credit
+  ---
+  duration_ms: 13.4844
+  type: 'test'
+  ...
+# Subtest: subscription grants enforce template whitelist and idempotency under concurrent retries
+ok 88 - subscription grants enforce template whitelist and idempotency under concurrent retries
+  ---
+  duration_ms: 2.0476
+  type: 'test'
+  ...
+# Subtest: durable collector budgets survive another collector process and reset by minute/day
+ok 89 - durable collector budgets survive another collector process and reset by minute/day
+  ---
+  duration_ms: 0.8147
+  type: 'test'
+  ...
+# Subtest: consumer sender is explicitly disabled without matching credentials
+ok 90 - consumer sender is explicitly disabled without matching credentials
+  ---
+  duration_ms: 1.9796
+  type: 'test'
+  ...
+# Subtest: consumer HTTP sender maps platform fields correctly and caches only the consumer token
+ok 91 - consumer HTTP sender maps platform fields correctly and caches only the consumer token
+  ---
+  duration_ms: 1.1535
+  type: 'test'
+  ...
+# Subtest: resident runner exposes health while disabled and shuts down without any upstream calls
+ok 92 - resident runner exposes health while disabled and shuts down without any upstream calls
+  ---
+  duration_ms: 186.0594
+  type: 'test'
+  ...
+# Subtest: resident runner drains, records stopped state and releases its lease on shutdown
+ok 93 - resident runner drains, records stopped state and releases its lease on shutdown
+  ---
+  duration_ms: 1060.4744
+  type: 'test'
+  ...
+# Subtest: first known available is recorded as first_seen_available; steady states emit nothing
+ok 94 - first known available is recorded as first_seen_available; steady states emit nothing
+  ---
+  duration_ms: 7.0709
+  type: 'test'
+  ...
+# Subtest: unavailable → available without gaps is a confirmed restock
+ok 95 - unavailable → available without gaps is a confirmed restock
+  ---
+  duration_ms: 0.8182
+  type: 'test'
+  ...
+# Subtest: unknown observations never change status and turn the next restock into a recovery
+ok 96 - unknown observations never change status and turn the next restock into a recovery
+  ---
+  duration_ms: 0.4147
+  type: 'test'
+  ...
+# Subtest: a long silence between known observations also counts as a coverage gap
+ok 97 - a long silence between known observations also counts as a coverage gap
+  ---
+  duration_ms: 0.2762
+  type: 'test'
+  ...
+# Subtest: available → unavailable records the end of supply with its duration
+ok 98 - available → unavailable records the end of supply with its duration
+  ---
+  duration_ms: 0.2902
+  type: 'test'
+  ...
+# Subtest: pending → unavailable is a status change, pending → available is a restock
+ok 99 - pending → unavailable is a status change, pending → available is a restock
+  ---
+  duration_ms: 0.2468
+  type: 'test'
+  ...
+# Subtest: stale and duplicate observations are ignored without touching the record
+ok 100 - stale and duplicate observations are ignored without touching the record
+  ---
+  duration_ms: 2.0478
+  type: 'test'
+  ...
+# Subtest: event ids are deterministic so persistence can dedupe retries
+ok 101 - event ids are deterministic so persistence can dedupe retries
+  ---
+  duration_ms: 0.2976
+  type: 'test'
+  ...
+# Subtest: each cold tab selects its actual route before account and catalog loading can finish
+ok 102 - each cold tab selects its actual route before account and catalog loading can finish
+  ---
+  duration_ms: 82.0492
+  type: 'test'
+  ...
+# Subtest: a late mounted tab bar recovers the page selection when onShow ran before getTabBar existed
+ok 103 - a late mounted tab bar recovers the page selection when onShow ran before getTabBar existed
+  ---
+  duration_ms: 75.6985
+  type: 'test'
+  ...
+# Subtest: cached pages recover selection after real programmatic query, history and mine navigation
+ok 104 - cached pages recover selection after real programmatic query, history and mine navigation
+  ---
+  duration_ms: 28.7556
+  type: 'test'
+  ...
+# Subtest: rapid taps share one navigation and select only the page that actually becomes visible
+ok 105 - rapid taps share one navigation and select only the page that actually becomes visible
+  ---
+  duration_ms: 2.9788
+  type: 'test'
+  ...
+# Subtest: a failed navigation preserves the current tab and permits a retry
+ok 106 - a failed navigation preserves the current tab and permits a retry
+  ---
+  duration_ms: 3.0196
+  type: 'test'
+  ...
+# Subtest: arrival at the real destination permits the next tap before the previous native completion callback
+ok 107 - arrival at the real destination permits the next tap before the previous native completion callback
+  ---
+  duration_ms: 17.8848
+  type: 'test'
+  ...
+# Subtest: a synchronous switchTab exception releases navigation so the user can retry
+ok 108 - a synchronous switchTab exception releases navigation so the user can retry
+  ---
+  duration_ms: 4.0481
+  type: 'test'
+  ...
+# Subtest: keyboard hides only the visible bar and returning to a cached tab restores it
+ok 109 - keyboard hides only the visible bar and returning to a cached tab restores it
+  ---
+  duration_ms: 3.3059
+  type: 'test'
+  ...
+# Subtest: detaching releases the keyboard listener and late native callbacks never write to that bar
+ok 110 - detaching releases the keyboard listener and late native callbacks never write to that bar
+  ---
+  duration_ms: 5.8432
+  type: 'test'
+  ...
+# Subtest: unexpected gesture datasets cannot navigate outside the configured tabs
+ok 111 - unexpected gesture datasets cannot navigate outside the configured tabs
+  ---
+  duration_ms: 4.6766
+  type: 'test'
+  ...
+# Subtest: turning on a follow is distinct from the actual background collector state
+ok 112 - turning on a follow is distinct from the actual background collector state
+  ---
+  duration_ms: 158.8129
+  type: 'test'
+  ...
+# Subtest: missing subscription template gives a specific actionable reason without invoking WeChat authorization
+ok 113 - missing subscription template gives a specific actionable reason without invoking WeChat authorization
+  ---
+  duration_ms: 14.0328
+  type: 'test'
+  ...
+# Subtest: configuration enabled alone never claims that delivery is running
+ok 114 - configuration enabled alone never claims that delivery is running
+  ---
+  duration_ms: 40.5715
+  type: 'test'
+  ...
+# Subtest: sender and credential faults are presented in plain language, never as a user pause
+ok 115 - sender and credential faults are presented in plain language, never as a user pause
+  ---
+  duration_ms: 63.1648
+  type: 'test'
+  ...
+# Subtest: authorization counts the current restock template and excludes obsolete credits
+ok 116 - authorization counts the current restock template and excludes obsolete credits
+  ---
+  duration_ms: 57.8328
+  type: 'test'
+  ...
+# Subtest: ready service still requires the personal message switch, valid credits and a permitted time
+ok 117 - ready service still requires the personal message switch, valid credits and a permitted time
+  ---
+  duration_ms: 33.0132
+  type: 'test'
+  ...
+# Subtest: paused follows stay paused while a collector is running, and resume uses the real API
+ok 118 - paused follows stay paused while a collector is running, and resume uses the real API
+  ---
+  duration_ms: 17.924
+  type: 'test'
+  ...
+# Subtest: refreshing service status reads bootstrap and follows without issuing a stock query
+ok 119 - refreshing service status reads bootstrap and follows without issuing a stock query
+  ---
+  duration_ms: 17.9024
+  type: 'test'
+  ...
+# Subtest: bootstrap transient failure can retry and explicit invalidation fetches fresh data
+ok 120 - bootstrap transient failure can retry and explicit invalidation fetches fresh data
+  ---
+  duration_ms: 17.5122
+  type: 'test'
+  ...
+# Subtest: cloud initialization recovers after a transient failure and shares an in-flight init
+ok 121 - cloud initialization recovers after a transient failure and shares an in-flight init
+  ---
+  duration_ms: 3.658
+  type: 'test'
+  ...
+# Subtest: result-card requery retains its displayed SKU and stores after picker changes
+ok 122 - result-card requery retains its displayed SKU and stores after picker changes
+  ---
+  duration_ms: 22.3988
+  type: 'test'
+  ...
+# Subtest: uncertain query retries reuse request ID; completed queries start a new ID
+ok 123 - uncertain query retries reuse request ID; completed queries start a new ID
+  ---
+  duration_ms: 23.1507
+  type: 'test'
+  ...
+# Subtest: query guard prevents double taps from starting two paid operations
+ok 124 - query guard prevents double taps from starting two paid operations
+  ---
+  duration_ms: 46.4497
+  type: 'test'
+  ...
+# Subtest: zero-balance recovery and store reordering retain the original uncertain query ID
+ok 125 - zero-balance recovery and store reordering retain the original uncertain query ID
+  ---
+  duration_ms: 14.9172
+  type: 'test'
+  ...
+# Subtest: history pagination retains the original request and merges unique events
+ok 126 - history pagination retains the original request and merges unique events
+  ---
+  duration_ms: 16.6568
+  type: 'test'
+  ...
+# Subtest: follow page refreshes while visible and stops polling when hidden
+ok 127 - follow page refreshes while visible and stops polling when hidden
+  ---
+  duration_ms: 52.7632
+  type: 'test'
+  ...
+# Subtest: expired memberships and stale observations are not presented as active monitoring
+ok 128 - expired memberships and stale observations are not presented as active monitoring
+  ---
+  duration_ms: 15.7334
+  type: 'test'
+  ...
+# Subtest: subscription retry reuses authorization request ID without prompting WeChat twice
+ok 129 - subscription retry reuses authorization request ID without prompting WeChat twice
+  ---
+  duration_ms: 24.2067
+  type: 'test'
+  ...
+# Subtest: a permanently rejected old subscription is cleared and a new template can be authorized
+ok 130 - a permanently rejected old subscription is cleared and a new template can be authorized
+  ---
+  duration_ms: 15.3743
+  type: 'test'
+  ...
+# Subtest: SKU filters switch exact-color images and never borrow a missing color image
+ok 131 - SKU filters switch exact-color images and never borrow a missing color image
+  ---
+  duration_ms: 5.0662
+  type: 'test'
+  ...
+# Subtest: payment is intentionally unavailable and no checkout/query-order API is reachable
+ok 132 - payment is intentionally unavailable and no checkout/query-order API is reachable
+  ---
+  duration_ms: 14.4407
+  type: 'test'
+  ...
+# Subtest: abandoned refunded query response clears pending request without requiring a product
+ok 133 - abandoned refunded query response clears pending request without requiring a product
+  ---
+  duration_ms: 13.7307
+  type: 'test'
+  ...
+# Subtest: history uses server full-result last-hour count when only one page is loaded
+ok 134 - history uses server full-result last-hour count when only one page is loaded
+  ---
+  duration_ms: 17.5205
+  type: 'test'
+  ...
+# Subtest: active saved follows separate the user switch from a missing collector
+ok 135 - active saved follows separate the user switch from a missing collector
+  ---
+  duration_ms: 18.4653
+  type: 'test'
+  ...
+# Subtest: pull-to-refresh formats follows using the newly fetched membership state
+ok 136 - pull-to-refresh formats follows using the newly fetched membership state
+  ---
+  duration_ms: 17.695
+  type: 'test'
+  ...
+# Subtest: first-visit pending follow editor receives catalog and ready state before opening
+ok 137 - first-visit pending follow editor receives catalog and ready state before opening
+  ---
+  duration_ms: 26.4655
+  type: 'test'
+  ...
+# Subtest: bundled image fallback exactly matches every current catalog SKU and preserves signed URLs
+ok 138 - bundled image fallback exactly matches every current catalog SKU and preserves signed URLs
+  ---
+  duration_ms: 9.2269
+  type: 'test'
+  ...
+# Subtest: complete image-enabled catalog stays safely below the WeChat setData payload limit
+ok 139 - complete image-enabled catalog stays safely below the WeChat setData payload limit
+  ---
+  duration_ms: 45.6167
+  type: 'test'
+  ...
+# Subtest: isolated picker styles contain only class selectors and no imported global selectors
+ok 140 - isolated picker styles contain only class selectors and no imported global selectors
+  ---
+  duration_ms: 2.6952
+  type: 'test'
+  ...
+# Subtest: all page event handlers exist; WXML expressions have no XML entity operators; UTF-8 is valid
+ok 141 - all page event handlers exist; WXML expressions have no XML entity operators; UTF-8 is valid
+  ---
+  duration_ms: 110.6947
+  type: 'test'
+  ...
+# Subtest: free landing browse rewards zero-balance users and members even with no history, without a query debit
+ok 142 - free landing browse rewards zero-balance users and members even with no history, without a query debit
+  ---
+  duration_ms: 12.6095
+  type: 'test'
+  ...
+# Subtest: concurrent page visits share one Beijing-day reward and the next day may grant once again
+ok 143 - concurrent page visits share one Beijing-day reward and the next day may grant once again
+  ---
+  duration_ms: 6.4902
+  type: 'test'
+  ...
+# Subtest: history landing proves the server completion date when reading crosses midnight
+ok 144 - history landing proves the server completion date when reading crosses midnight
+  ---
+  duration_ms: 0.9949
+  type: 'test'
+  ...
+# Subtest: failed landing reads and failed evidence commits cannot reward; retry can finish once
+ok 145 - failed landing reads and failed evidence commits cannot reward; retry can finish once
+  ---
+  duration_ms: 3.306
+  type: 'test'
+  ...
+# Subtest: free landing exposes only the caller viewing conditions, never paid stock results or other accounts
+ok 146 - free landing exposes only the caller viewing conditions, never paid stock results or other accounts
+  ---
+  duration_ms: 2.821
+  type: 'test'
+  ...
+# Subtest: disabled or capped browse rewards never fabricate a +1 entry and a balance cap can be retried later
+ok 147 - disabled or capped browse rewards never fabricate a +1 entry and a balance cap can be retried later
+  ---
+  duration_ms: 3.4482
+  type: 'test'
+  ...
+# Subtest: task entry loads free history, updates member Mine and refreshes its already open ledger on return
+ok 148 - task entry loads free history, updates member Mine and refreshes its already open ledger on return
+  ---
+  duration_ms: 68.092
+  type: 'test'
+  ...
+# Subtest: a late reward updates Mine immediately and older bootstrap/ledger responses cannot undo it
+ok 149 - a late reward updates Mine immediately and older bootstrap/ledger responses cannot undo it
+  ---
+  duration_ms: 25.2398
+  type: 'test'
+  ...
+# Subtest: failed history landing visibly offers retry and does not mark the task complete
+ok 150 - failed history landing visibly offers retry and does not mark the task complete
+  ---
+  duration_ms: 40.8838
+  type: 'test'
+  ...
+# Subtest: restock detail labels an observation gap without calling it unavailable duration
+ok 151 - restock detail labels an observation gap without calling it unavailable duration
+  ---
+  duration_ms: 14.6768
+  type: 'test'
+  ...
+# Subtest: delayed browse reward cannot restore credits after a newer explicit paid history query
+ok 152 - delayed browse reward cannot restore credits after a newer explicit paid history query
+  ---
+  duration_ms: 31.8035
+  type: 'test'
+  ...
+# Subtest: quota revisions reject out-of-order mutations even when timestamps are identical
+ok 153 - quota revisions reject out-of-order mutations even when timestamps are identical
+  ---
+  duration_ms: 10.5534
+  type: 'test'
+  ...
+# Subtest: a capped browse has a newer revision even without a ledger entry
+ok 154 - a capped browse has a newer revision even without a ledger entry
+  ---
+  duration_ms: 13.0535
+  type: 'test'
+  ...
+# Subtest: Mine shows successful browsing separately from an unclaimed capped reward
+ok 155 - Mine shows successful browsing separately from an unclaimed capped reward
+  ---
+  duration_ms: 88.6246
+  type: 'test'
+  ...
+# Subtest: history hour totals name their original snapshot cutoff after the page remains open
+ok 156 - history hour totals name their original snapshot cutoff after the page remains open
+  ---
+  duration_ms: 14.7046
+  type: 'test'
+  ...
+# Subtest: recent history restores the exact SKU, day and stores without any request or debit
+ok 157 - recent history restores the exact SKU, day and stores without any request or debit
+  ---
+  duration_ms: 51.1983
+  type: 'test'
+  ...
+# Subtest: picker synchronization retains the restore hint, while an explicit later filter change clears it
+ok 158 - picker synchronization retains the restore hint, while an explicit later filter change clears it
+  ---
+  duration_ms: 14.2465
+  type: 'test'
+  ...
+# Subtest: a removed SKU or store refuses the entire restore without silently replacing product or widening scope
+ok 159 - a removed SKU or store refuses the entire restore without silently replacing product or widening scope
+  ---
+  duration_ms: 41.9249
+  type: 'test'
+  ...
+# Subtest: invalid calendar dates, future days and malformed store data cannot restore an unqueryable form
+ok 160 - invalid calendar dates, future days and malformed store data cannot restore an unqueryable form
+  ---
+  duration_ms: 135.6665
+  type: 'test'
+  ...
+# Subtest: empty saved store scope remains intentional and queries only after a separate user action
+ok 161 - empty saved store scope remains intentional and queries only after a separate user action
+  ---
+  duration_ms: 16.114
+  type: 'test'
+  ...
+# Subtest: restoring a restricted new-product day stays free and the explicit query still uses server access checks
+ok 162 - restoring a restricted new-product day stays free and the explicit query still uses server access checks
+  ---
+  duration_ms: 22.3474
+  type: 'test'
+  ...
+# Subtest: busy history requests cannot have their conditions changed by restore taps
+ok 163 - busy history requests cannot have their conditions changed by restore taps
+  ---
+  duration_ms: 25.9065
+  type: 'test'
+  ...
+# Subtest: production history adapter counts the full rolling hour across Beijing midnight, with exact bounds and scope
+ok 164 - production history adapter counts the full rolling hour across Beijing midnight, with exact bounds and scope
+  ---
+  duration_ms: 6.9303
+  type: 'test'
+  ...
+# Subtest: past-day new-product history does not reveal restricted current-day activity through the rolling counter
+ok 165 - past-day new-product history does not reveal restricted current-day activity through the rolling counter
+  ---
+  duration_ms: 6.0537
+  type: 'test'
+  ...
+# Subtest: history pages retain the original cross-midnight counter after time advances, without charging another credit
+ok 166 - history pages retain the original cross-midnight counter after time advances, without charging another credit
+  ---
+  duration_ms: 9.8716
+  type: 'test'
+  ...
+# Subtest: real observation coverage gaps survive history serialization and become qualified frontend time spans
+ok 167 - real observation coverage gaps survive history serialization and become qualified frontend time spans
+  ---
+  duration_ms: 23.8484
+  type: 'test'
+  ...
+# Subtest: frontend names the fixed rolling-hour cutoff and explicitly identifies the previous day at midnight
+ok 168 - frontend names the fixed rolling-hour cutoff and explicitly identifies the previous day at midnight
+  ---
+  duration_ms: 50.1761
+  type: 'test'
+  ...
+# Subtest: real account redemption entry trims input only at the server request
+ok 169 - real account redemption entry trims input only at the server request
+  ---
+  duration_ms: 12.7719
+  type: 'test'
+  ...
+# Subtest: redemption stays pending until the server confirms and double submissions make one request
+ok 170 - redemption stays pending until the server confirms and double submissions make one request
+  ---
+  duration_ms: 7.9954
+  type: 'test'
+  ...
+# Subtest: confirmed membership survives failed account and order refreshes
+ok 171 - confirmed membership survives failed account and order refreshes
+  ---
+  duration_ms: 2.3312
+  type: 'test'
+  ...
+# Subtest: already-used code with expired membership never claims a new activation
+ok 172 - already-used code with expired membership never claims a new activation
+  ---
+  duration_ms: 4.2002
+  type: 'test'
+  ...
+# Subtest: invalid, disabled, throttled and unknown errors stay readable and never echo the code or internal error
+ok 173 - invalid, disabled, throttled and unknown errors stay readable and never echo the code or internal error
+  ---
+  duration_ms: 10.1688
+  type: 'test'
+  ...
+# Subtest: empty input makes no request and uncertain redemption can retry without local extension
+ok 174 - empty input makes no request and uncertain redemption can retry without local extension
+  ---
+  duration_ms: 2.8099
+  type: 'test'
+  ...
+# Subtest: late pre-redemption account and membership-record reads cannot undo confirmed membership or its record
+ok 175 - late pre-redemption account and membership-record reads cannot undo confirmed membership or its record
+  ---
+  duration_ms: 5.2888
+  type: 'test'
+  ...
+# Subtest: unloaded account page ignores late account, membership-record and reminder reads
+ok 176 - unloaded account page ignores late account, membership-record and reminder reads
+  ---
+  duration_ms: 2.8126
+  type: 'test'
+  ...
+# Subtest: redemption deep link opens for a real account and ignores request data in the URL
+ok 177 - redemption deep link opens for a real account and ignores request data in the URL
+  ---
+  duration_ms: 3.8448
+  type: 'test'
+  ...
+# Subtest: unloaded page ignores late settings, quota, ledger and reminder mutations
+ok 178 - unloaded page ignores late settings, quota, ledger and reminder mutations
+  ---
+  duration_ms: 6.5381
+  type: 'test'
+  ...
+# Subtest: redemption completion after unload cannot update a retired page or launch follow-up reads
+ok 179 - redemption completion after unload cannot update a retired page or launch follow-up reads
+  ---
+  duration_ms: 18.855
+  type: 'test'
+  ...
+# Subtest: an already-used response with no current membership preserves the inactive server snapshot
+ok 180 - an already-used response with no current membership preserves the inactive server snapshot
+  ---
+  duration_ms: 2.3052
+  type: 'test'
+  ...
+# Subtest: redemption activates the real membership and records one zero-amount redemption order without enabling payment
+ok 181 - redemption activates the real membership and records one zero-amount redemption order without enabling payment
+  ---
+  duration_ms: 10.9682
+  type: 'test'
+  ...
+# Subtest: concurrent request IDs redeem a campaign once and retries after expiry never reactivate it
+ok 182 - concurrent request IDs redeem a campaign once and retries after expiry never reactivate it
+  ---
+  duration_ms: 8.1344
+  type: 'test'
+  ...
+# Subtest: redemption preserves remaining membership days and serializes with another membership fulfilment
+ok 183 - redemption preserves remaining membership days and serializes with another membership fulfilment
+  ---
+  duration_ms: 4.3086
+  type: 'test'
+  ...
+# Subtest: redemption binds to trusted appid/openid and rejects anonymous or untrusted callers
+ok 184 - redemption binds to trusted appid/openid and rejects anonymous or untrusted callers
+  ---
+  duration_ms: 1.8126
+  type: 'test'
+  ...
+# Subtest: five concurrent invalid guesses lock only that account for exactly fifteen minutes
+ok 185 - five concurrent invalid guesses lock only that account for exactly fifteen minutes
+  ---
+  duration_ms: 6.444
+  type: 'test'
+  ...
+# Subtest: malformed codes consume guessing attempts and successful verification resets consecutive failures
+ok 186 - malformed codes consume guessing attempts and successful verification resets consecutive failures
+  ---
+  duration_ms: 4.8316
+  type: 'test'
+  ...
+# Subtest: runtime disabling is authoritative inside the transaction and cannot be bypassed with client config
+ok 187 - runtime disabling is authoritative inside the transaction and cannot be bypassed with client config
+  ---
+  duration_ms: 2.8
+  type: 'test'
+  ...
+# Subtest: failed order persistence rolls back membership and failed-attempt reset so retry safely succeeds once
+ok 188 - failed order persistence rolls back membership and failed-attempt reset so retry safely succeeds once
+  ---
+  duration_ms: 1.4801
+  type: 'test'
+  ...
+# Subtest: reminder pagination loads twenty at a time, deduplicates overlap, and keeps the original clear boundary
+ok 189 - reminder pagination loads twenty at a time, deduplicates overlap, and keeps the original clear boundary
+  ---
+  duration_ms: 11.674
+  type: 'test'
+  ...
+# Subtest: loading-more failure keeps visible rows and cursor so the same page can be retried
+ok 190 - loading-more failure keeps visible rows and cursor so the same page can be retried
+  ---
+  duration_ms: 4.8794
+  type: 'test'
+  ...
+# Subtest: cancelling delete or clear sends no mutation and rapid taps open only one confirmation
+ok 191 - cancelling delete or clear sends no mutation and rapid taps open only one confirmation
+  ---
+  duration_ms: 3.1441
+  type: 'test'
+  ...
+# Subtest: successful delete refills older records and a delayed pre-delete refresh cannot resurrect the deleted row
+ok 192 - successful delete refills older records and a delayed pre-delete refresh cannot resurrect the deleted row
+  ---
+  duration_ms: 2.6832
+  type: 'test'
+  ...
+# Subtest: clear uses the boundary captured before confirmation and retains reminders arriving while the modal is open
+ok 193 - clear uses the boundary captured before confirmation and retains reminders arriving while the modal is open
+  ---
+  duration_ms: 3.6524
+  type: 'test'
+  ...
+# Subtest: clear failure preserves records and retry reuses the original boundary even after a newer refresh
+ok 194 - clear failure preserves records and retry reuses the original boundary even after a newer refresh
+  ---
+  duration_ms: 3.4713
+  type: 'test'
+  ...
+# Subtest: late pagination cannot repopulate old reminders after clearing the whole personal list
+ok 195 - late pagination cannot repopulate old reminders after clearing the whole personal list
+  ---
+  duration_ms: 2.9398
+  type: 'test'
+  ...
+# Subtest: mutation is guarded while pending; failures keep rows and provide a working delete retry
+ok 196 - mutation is guarded while pending; failures keep rows and provide a working delete retry
+  ---
+  duration_ms: 2.4026
+  type: 'test'
+  ...
+# Subtest: clearing confirmed old rows retains a newly arrived row if the follow-up refresh fails
+ok 197 - clearing confirmed old rows retains a newly arrived row if the follow-up refresh fails
+  ---
+  duration_ms: 2.2018
+  type: 'test'
+  ...
+# Subtest: an empty list or missing server boundary cannot send an unbounded clear request
+ok 198 - an empty list or missing server boundary cannot send an unbounded clear request
+  ---
+  duration_ms: 3.6214
+  type: 'test'
+  ...
+# Subtest: legacy list responses without pagination do not claim the first twenty are all records
+ok 199 - legacy list responses without pagination do not claim the first twenty are all records
+  ---
+  duration_ms: 3.1813
+  type: 'test'
+  ...
+# Subtest: older rows arriving while clear confirmation is open are removed even if the post-clear refresh fails
+ok 200 - older rows arriving while clear confirmation is open are removed even if the post-clear refresh fails
+  ---
+  duration_ms: 5.8214
+  type: 'test'
+  ...
+# Subtest: cancelling clear keeps pages that arrived during confirmation and allows normal later pagination
+ok 201 - cancelling clear keeps pages that arrived during confirmation and allows normal later pagination
+  ---
+  duration_ms: 2.4369
+  type: 'test'
+  ...
+# Subtest: same-snapshot older pages loaded after a failed clear join the original retry boundary
+ok 202 - same-snapshot older pages loaded after a failed clear join the original retry boundary
+  ---
+  duration_ms: 3.9275
+  type: 'test'
+  ...
+# Subtest: sending, known skip reasons and platform failures render safe Chinese labels without exposing internal codes
+ok 203 - sending, known skip reasons and platform failures render safe Chinese labels without exposing internal codes
+  ---
+  duration_ms: 3.6924
+  type: 'test'
+  ...
+# Subtest: notification deletion is owner-only, idempotent and preserves the internal task
+ok 204 - notification deletion is owner-only, idempotent and preserves the internal task
+  ---
+  duration_ms: 19.1402
+  type: 'test'
+  ...
+# Subtest: notification keyset pages cover more than 100 tied records and ignore later inserts and hidden rows
+ok 205 - notification keyset pages cover more than 100 tied records and ignore later inserts and hidden rows
+  ---
+  duration_ms: 252.0822
+  type: 'test'
+  ...
+# Subtest: clear removes all legacy pages and keeps newly inserted records even when their event time is old
+ok 206 - clear removes all legacy pages and keeps newly inserted records even when their event time is old
+  ---
+  duration_ms: 11.6183
+  type: 'test'
+  ...
+# Subtest: request-time arrivals use one sequence boundary for pages and clear while legacy rows keep the time boundary
+ok 207 - request-time arrivals use one sequence boundary for pages and clear while legacy rows keep the time boundary
+  ---
+  duration_ms: 3.5106
+  type: 'test'
+  ...
+# Subtest: concurrent clear and insert preserve new arrivals, and watermarks never move backwards
+ok 208 - concurrent clear and insert preserve new arrivals, and watermarks never move backwards
+  ---
+  duration_ms: 4.5281
+  type: 'test'
+  ...
+# Subtest: clear and page tokens reject tampering, other users, wrong purposes, future times and unknown sequences
+ok 209 - clear and page tokens reject tampering, other users, wrong purposes, future times and unknown sequences
+  ---
+  duration_ms: 3.6323
+  type: 'test'
+  ...
+# Subtest: hiding and clearing an in-flight notification do not cancel delivery, refund its credit or reset dedupe/cooldown
+ok 210 - hiding and clearing an in-flight notification do not cancel delivery, refund its credit or reset dedupe/cooldown
+  ---
+  duration_ms: 6.6545
+  type: 'test'
+  ...
+# Subtest: notification insertion and clearing roll back metadata together with task writes
+ok 211 - notification insertion and clearing roll back metadata together with task writes
+  ---
+  duration_ms: 9.0369
+  type: 'test'
+  ...
+# Subtest: real wx-server-sdk 4.0.2 notification view queries and atomic sequence/clear/delete work with serialized predicates
+ok 212 - real wx-server-sdk 4.0.2 notification view queries and atomic sequence/clear/delete work with serialized predicates
+  ---
+  duration_ms: 477.4273
+  type: 'test'
+  ...
+# Subtest: cold catalog is usable while cloud is unresolved and concurrent callers share one refresh
+ok 213 - cold catalog is usable while cloud is unresolved and concurrent callers share one refresh
+  ---
+  duration_ms: 18.6507
+  type: 'test'
+  ...
+# Subtest: catalog refresh publishes once and unchanged versions keep the same render reference
+ok 214 - catalog refresh publishes once and unchanged versions keep the same render reference
+  ---
+  duration_ms: 8.6452
+  type: 'test'
+  ...
+# Subtest: rapid tab account reads reuse one fresh bootstrap; explicit invalidation fetches again
+ok 215 - rapid tab account reads reuse one fresh bootstrap; explicit invalidation fetches again
+  ---
+  duration_ms: 9.9505
+  type: 'test'
+  ...
+# Subtest: late catalog response cannot overwrite a newly selected real or acceptance session
+ok 216 - late catalog response cannot overwrite a newly selected real or acceptance session
+  ---
+  duration_ms: 11.3114
+  type: 'test'
+  ...
+# Subtest: expired membership cannot remain active merely because the account cache is fresh
+ok 217 - expired membership cannot remain active merely because the account cache is fresh
+  ---
+  duration_ms: 9.956
+  type: 'test'
+  ...
+# Subtest: query page paints selectable public catalog before slow account authentication finishes
+ok 218 - query page paints selectable public catalog before slow account authentication finishes
+  ---
+  duration_ms: 70.3416
+  type: 'test'
+  ...
+# Subtest: failed account connection keeps catalog visible and can retry without clearing selections
+ok 219 - failed account connection keeps catalog visible and can retry without clearing selections
+  ---
+  duration_ms: 22.1474
+  type: 'test'
+  ...
+# Subtest: query and follow tabs reuse recent follows but a mutation invalidates the shared snapshot
+ok 220 - query and follow tabs reuse recent follows but a mutation invalidates the shared snapshot
+  ---
+  duration_ms: 7.2031
+  type: 'test'
+  ...
+# Subtest: personal readiness distinguishes loading, no follows and all paused from healthy shared services
+ok 221 - personal readiness distinguishes loading, no follows and all paused from healthy shared services
+  ---
+  duration_ms: 1.879
+  type: 'test'
+  ...
+# Subtest: other-template credits cannot make restock delivery ready or appear in requested template IDs
+ok 222 - other-template credits cannot make restock delivery ready or appear in requested template IDs
+  ---
+  duration_ms: 58.3658
+  type: 'test'
+  ...
+# Subtest: template and sender blockers explain service configuration instead of asking for repeated authorization
+ok 223 - template and sender blockers explain service configuration instead of asking for repeated authorization
+  ---
+  duration_ms: 0.4428
+  type: 'test'
+  ...
+# Subtest: personal switch, expiry and Beijing overnight DND retain their separate next steps
+ok 224 - personal switch, expiry and Beijing overnight DND retain their separate next steps
+  ---
+  duration_ms: 0.3749
+  type: 'test'
+  ...
+# Subtest: pause and resume immediately recompute the personal outcome after reloading real follow state
+ok 225 - pause and resume immediately recompute the personal outcome after reloading real follow state
+  ---
+  duration_ms: 16.4509
+  type: 'test'
+  ...
+# Subtest: personal next steps navigate to a precise list or settings target without mutating preferences
+ok 226 - personal next steps navigate to a precise list or settings target without mutating preferences
+  ---
+  duration_ms: 28.2617
+  type: 'test'
+  ...
+# Subtest: notification reasons lead to settings or live readiness, while uncertain messages have no resend
+ok 227 - notification reasons lead to settings or live readiness, while uncertain messages have no resend
+  ---
+  duration_ms: 13.6353
+  type: 'test'
+  ...
+# Subtest: settings deep link survives a cold page and a deferred callback after hiding cannot scroll another page
+ok 228 - settings deep link survives a cold page and a deferred callback after hiding cannot scroll another page
+  ---
+  duration_ms: 13.3716
+  type: 'test'
+  ...
+# Subtest: returning from a reminder focuses the matching configuration after load without resuming it or requesting authorization
+ok 229 - returning from a reminder focuses the matching configuration after load without resuming it or requesting authorization
+  ---
+  duration_ms: 21.3463
+  type: 'test'
+  ...
+# Subtest: a delayed pre-pause poll cannot replace the newly paused list or falsely restore personal readiness
+ok 230 - a delayed pre-pause poll cannot replace the newly paused list or falsely restore personal readiness
+  ---
+  duration_ms: 28.2693
+  type: 'test'
+  ...
+# Subtest: storage uses numeric units across GB and TB rather than SKU or lexical order
+ok 231 - storage uses numeric units across GB and TB rather than SKU or lexical order
+  ---
+  duration_ms: 2.5898
+  type: 'test'
+  ...
+# Subtest: current iPhone and Mac families show newer official announcements first
+ok 232 - current iPhone and Mac families show newer official announcements first
+  ---
+  duration_ms: 4.9297
+  type: 'test'
+  ...
+# Subtest: explicit catalog dates override bundled compatibility dates and do not mutate input
+ok 233 - explicit catalog dates override bundled compatibility dates and do not mutate input
+  ---
+  duration_ms: 18.0251
+  type: 'test'
+  ...
+# Subtest: picker sorts all current capacities and restores exact SKU after catalog order changes
+ok 234 - picker sorts all current capacities and restores exact SKU after catalog order changes
+  ---
+  duration_ms: 26.0787
+  type: 'test'
+  ...
+# Subtest: search matches Chinese city/store/province plus city pinyin and initials without a network call
+ok 235 - search matches Chinese city/store/province plus city pinyin and initials without a network call
+  ---
+  duration_ms: 4.3376
+  type: 'test'
+  ...
+# Subtest: search selection is shared across cities, enforces max stores, and survives clear/reset
+ok 236 - search selection is shared across cities, enforces max stores, and survives clear/reset
+  ---
+  duration_ms: 5.6516
+  type: 'test'
+  ...
+# Subtest: lookup maps and duplicate full products are kept out of component updates
+ok 237 - lookup maps and duplicate full products are kept out of component updates
+  ---
+  duration_ms: 2.8225
+  type: 'test'
+  ...
+# Subtest: switching models keeps available capacity and color and selects the new exact SKU image
+ok 238 - switching models keeps available capacity and color and selects the new exact SKU image
+  ---
+  duration_ms: 3.4712
+  type: 'test'
+  ...
+# Subtest: model changes explain unavailable attributes and clear the note after an explicit color choice
+ok 239 - model changes explain unavailable attributes and clear the note after an explicit color choice
+  ---
+  duration_ms: 4.2719
+  type: 'test'
+  ...
+# Subtest: supported-only selection removes unavailable SKUs and empty groups without mutating the shared catalog
+ok 240 - supported-only selection removes unavailable SKUs and empty groups without mutating the shared catalog
+  ---
+  duration_ms: 16.5407
+  type: 'test'
+  ...
+# Subtest: an unavailable saved follow stays unselected across refreshes until the user chooses another configuration
+ok 241 - an unavailable saved follow stays unselected across refreshes until the user chooses another configuration
+  ---
+  duration_ms: 3.7791
+  type: 'test'
+  ...
+# Subtest: supported-only mode handles an entirely unavailable catalog and a live availability change
+ok 242 - supported-only mode handles an entirely unavailable catalog and a live availability change
+  ---
+  duration_ms: 4.5282
+  type: 'test'
+  ...
+# Subtest: a locally chosen SKU becoming unavailable does not silently switch on the next catalog refresh
+ok 243 - a locally chosen SKU becoming unavailable does not silently switch on the next catalog refresh
+  ---
+  duration_ms: 6.3576
+  type: 'test'
+  ...
+# Subtest: an unavailable color on another model falls back explicitly while retaining available capacity
+ok 244 - an unavailable color on another model falls back explicitly while retaining available capacity
+  ---
+  duration_ms: 5.1341
+  type: 'test'
+  ...
+# Subtest: valid saved selection opens as a compact exact-product and store summary without querying
+ok 245 - valid saved selection opens as a compact exact-product and store summary without querying
+  ---
+  duration_ms: 33.6792
+  type: 'test'
+  ...
+# Subtest: first visit and invalid or incomplete saved selections stay expanded for review
+ok 246 - first visit and invalid or incomplete saved selections stay expanded for review
+  ---
+  duration_ms: 113.6042
+  type: 'test'
+  ...
+# Subtest: explicit editing retains the mounted picker value and catalog refresh never closes it
+ok 247 - explicit editing retains the mounted picker value and catalog refresh never closes it
+  ---
+  duration_ms: 15.392
+  type: 'test'
+  ...
+# Subtest: a disappeared catalog SKU expands its summary and cannot be silently confirmed
+ok 248 - a disappeared catalog SKU expands its summary and cannot be silently confirmed
+  ---
+  duration_ms: 19.1565
+  type: 'test'
+  ...
+# Subtest: old results are marked separately and their requery and follow retain their own targets
+ok 249 - old results are marked separately and their requery and follow retain their own targets
+  ---
+  duration_ms: 19.1202
+  type: 'test'
+  ...
+# Subtest: only successful explicit queries schedule result focus; snapshots and polling keep position
+ok 250 - only successful explicit queries schedule result focus; snapshots and polling keep position
+  ---
+  duration_ms: 67.0217
+  type: 'test'
+  ...
+# Subtest: editing while a query is pending preserves the new selection and cancels late result focus
+ok 251 - editing while a query is pending preserves the new selection and cancels late result focus
+  ---
+  duration_ms: 22.9219
+  type: 'test'
+  ...
+# Subtest: leaving and returning during a query prevents its delayed result from moving the new viewport
+ok 252 - leaving and returning during a query prevents its delayed result from moving the new viewport
+  ---
+  duration_ms: 17.4611
+  type: 'test'
+  ...
+# Subtest: queued focus checks interaction and visibility again after the native render tick
+ok 253 - queued focus checks interaction and visibility again after the native render tick
+  ---
+  duration_ms: 48.1778
+  type: 'test'
+  ...
+# Subtest: optional focus APIs missing or failing do not discard a successful query
+ok 254 - optional focus APIs missing or failing do not discard a successful query
+  ---
+  duration_ms: 44.818
+  type: 'test'
+  ...
+# Subtest: denied queries never schedule focus or create a successful result
+ok 255 - denied queries never schedule focus or create a successful result
+  ---
+  duration_ms: 13.0296
+  type: 'test'
+  ...
+# Subtest: a changed active route blocks queued focus even before its hide callback arrives
+ok 256 - a changed active route blocks queued focus even before its hide callback arrives
+  ---
+  duration_ms: 13.537
+  type: 'test'
+  ...
+# Subtest: an older queued query focus cannot run after a newer explicit query has finished
+ok 257 - an older queued query focus cannot run after a newer explicit query has finished
+  ---
+  duration_ms: 13.0888
+  type: 'test'
+  ...
+# Subtest: cold cached manual query shows expired results as pending update without changing their timestamps
+ok 258 - cold cached manual query shows expired results as pending update without changing their timestamps
+  ---
+  duration_ms: 54.9776
+  type: 'test'
+  ...
+# Subtest: retained manual snapshot ages before pending account refresh settles on returning to the query page
+ok 259 - retained manual snapshot ages before pending account refresh settles on returning to the query page
+  ---
+  duration_ms: 20.2045
+  type: 'test'
+  ...
+# Subtest: visible manual snapshots age locally for free users and stop updating when hidden without new requests
+ok 260 - visible manual snapshots age locally for free users and stop updating when hidden without new requests
+  ---
+  duration_ms: 28.7396
+  type: 'test'
+  ...
+# Subtest: a manual query with missing or unknown observations cannot show a positive current-stock badge
+ok 261 - a manual query with missing or unknown observations cannot show a positive current-stock badge
+  ---
+  duration_ms: 14.5652
+  type: 'test'
+  ...
+# Subtest: selected-target follow uses current selection while result-card follow keeps its original query target
+ok 262 - selected-target follow uses current selection while result-card follow keeps its original query target
+  ---
+  duration_ms: 17.0465
+  type: 'test'
+  ...
+# Subtest: free users are guided to membership without silently querying or creating a pending follow
+ok 263 - free users are guided to membership without silently querying or creating a pending follow
+  ---
+  duration_ms: 13.7393
+  type: 'test'
+  ...
+# Subtest: incomplete or unsupported selections do not navigate to the follow editor
+ok 264 - incomplete or unsupported selections do not navigate to the follow editor
+  ---
+  duration_ms: 60.4879
+  type: 'test'
+  ...
+# Subtest: business days follow Beijing time
+ok 265 - business days follow Beijing time
+  ---
+  duration_ms: 3.0813
+  type: 'test'
+  ...
+# Subtest: enabled do-not-disturb treats equal endpoints as all day and uses inclusive start/exclusive end across midnight
+ok 266 - enabled do-not-disturb treats equal endpoints as all day and uses inclusive start/exclusive end across midnight
+  ---
+  duration_ms: 5.4647
+  type: 'test'
+  ...
+# Subtest: membership is active strictly before expiry and renewals extend remaining time
+ok 267 - membership is active strictly before expiry and renewals extend remaining time
+  ---
+  duration_ms: 0.5207
+  type: 'test'
+  ...
+# Subtest: follow limits: 3 SKUs, up to 3 stores each, no duplicate SKU
+ok 268 - follow limits: 3 SKUs, up to 3 stores each, no duplicate SKU
+  ---
+  duration_ms: 0.4761
+  type: 'test'
+  ...
+# Subtest: credit grants respect the daily cap and the balance cap
+ok 269 - credit grants respect the daily cap and the balance cap
+  ---
+  duration_ms: 0.5691
+  type: 'test'
+  ...
+# Subtest: new products are restricted for 30 days after release for free users
+ok 270 - new products are restricted for 30 days after release for free users
+  ---
+  duration_ms: 0.5671
+  type: 'test'
+  ...
+# Subtest: live query access: members free, free users pay one credit and cannot see restricted products
+ok 271 - live query access: members free, free users pay one credit and cannot see restricted products
+  ---
+  duration_ms: 1.7193
+  type: 'test'
+  ...
+# Subtest: scheduled function trusts platform SOURCE and rejects all forged client Timer events
+ok 272 - scheduled function trusts platform SOURCE and rejects all forged client Timer events
+  ---
+  duration_ms: 1.7019
+  type: 'test'
+  ...
+# Subtest: request-scoped SCF environment overrides warm-instance markers and exposes no secrets
+ok 273 - request-scoped SCF environment overrides warm-instance markers and exposes no secrets
+  ---
+  duration_ms: 0.6763
+  type: 'test'
+  ...
+# Subtest: minute scans keep real availability state across invocations and deliver one restock
+ok 274 - minute scans keep real availability state across invocations and deliver one restock
+  ---
+  duration_ms: 73.9028
+  type: 'test'
+  ...
+# Subtest: cold-start jitter does not skip a new minute or duplicate the same minute
+ok 275 - cold-start jitter does not skip a new minute or duplicate the same minute
+  ---
+  duration_ms: 13.2338
+  type: 'test'
+  ...
+# Subtest: deadline carries unfinished stores before recently scanned stores into the next minute
+ok 276 - deadline carries unfinished stores before recently scanned stores into the next minute
+  ---
+  duration_ms: 14.463
+  type: 'test'
+  ...
+# Subtest: failed observation persistence is visible and never reported as a successful batch
+ok 277 - failed observation persistence is visible and never reported as a successful batch
+  ---
+  duration_ms: 4.4933
+  type: 'test'
+  ...
+# Subtest: scheduled monitor remains useful with missing message credentials and has honest delivery readiness
+ok 278 - scheduled monitor remains useful with missing message credentials and has honest delivery readiness
+  ---
+  duration_ms: 4.0801
+  type: 'test'
+  ...
+# Subtest: a persisted 429 Retry-After survives the next function cold start
+ok 279 - a persisted 429 Retry-After survives the next function cold start
+  ---
+  duration_ms: 5.7121
+  type: 'test'
+  ...
+# Subtest: deadline and old outbox are respected without another Apple request
+ok 280 - deadline and old outbox are respected without another Apple request
+  ---
+  duration_ms: 12.5922
+  type: 'test'
+  ...
+# Subtest: another active lease prevents timer traffic and heartbeat clobbering
+ok 281 - another active lease prevents timer traffic and heartbeat clobbering
+  ---
+  duration_ms: 1.0212
+  type: 'test'
+  ...
+# Subtest: readiness distinguishes stale worker, missing credentials and configured sender
+ok 282 - readiness distinguishes stale worker, missing credentials and configured sender
+  ---
+  duration_ms: 3.0969
+  type: 'test'
+  ...
+# Subtest: observation transaction fences out a worker whose lease changed after its request started
+ok 283 - observation transaction fences out a worker whose lease changed after its request started
+  ---
+  duration_ms: 1.6999
+  type: 'test'
+  ...
+# Subtest: a real short-phrase template status is supported without permitting mismatched product fields
+ok 284 - a real short-phrase template status is supported without permitting mismatched product fields
+  ---
+  duration_ms: 1.1098
+  type: 'test'
+  ...
+# Subtest: follows collapse into one request per store with deduped SKUs
+ok 285 - follows collapse into one request per store with deduped SKUs
+  ---
+  duration_ms: 17.1478
+  type: 'test'
+  ...
+# Subtest: each group is requested once per period, never stacked while in flight
+ok 286 - each group is requested once per period, never stacked while in flight
+  ---
+  duration_ms: 3.5239
+  type: 'test'
+  ...
+# Subtest: concurrency cap limits simultaneous requests and later groups wait for a slot
+ok 287 - concurrency cap limits simultaneous requests and later groups wait for a slot
+  ---
+  duration_ms: 2.132
+  type: 'test'
+  ...
+# Subtest: failures back off exponentially per group and recover on the next success
+ok 288 - failures back off exponentially per group and recover on the next success
+  ---
+  duration_ms: 1.272
+  type: 'test'
+  ...
+# Subtest: a burst of failures opens the breaker; one probe half-opens it; success closes it
+ok 289 - a burst of failures opens the breaker; one probe half-opens it; success closes it
+  ---
+  duration_ms: 2.9975
+  type: 'test'
+  ...
+# Subtest: HTTP 429 trips the breaker immediately and honours Retry-After
+ok 290 - HTTP 429 trips the breaker immediately and honours Retry-After
+  ---
+  duration_ms: 7.1854
+  type: 'test'
+  ...
+# Subtest: removing a follow drops its group; health keeps measured intervals
+ok 291 - removing a follow drops its group; health keeps measured intervals
+  ---
+  duration_ms: 0.8083
+  type: 'test'
+  ...
+# Subtest: ping works without a user; user actions require a mini-program identity
+ok 292 - ping works without a user; user actions require a mini-program identity
+  ---
+  duration_ms: 7.0866
+  type: 'test'
+  ...
+# Subtest: bootstrap lazily creates the user keyed by appid:openid and reports quota/membership
+ok 293 - bootstrap lazily creates the user keyed by appid:openid and reports quota/membership
+  ---
+  duration_ms: 1.8231
+  type: 'test'
+  ...
+# Subtest: account creation ignores unused UnionID identifiers supplied by WeChat
+ok 294 - account creation ignores unused UnionID identifiers supplied by WeChat
+  ---
+  duration_ms: 0.9987
+  type: 'test'
+  ...
+# Subtest: sign-in grants once per Beijing day and respects caps
+ok 295 - sign-in grants once per Beijing day and respects caps
+  ---
+  duration_ms: 7.8971
+  type: 'test'
+  ...
+# Subtest: live query: free user pays once per queryId, replays are free, empty balance is refused
+ok 296 - live query: free user pays once per queryId, replays are free, empty balance is refused
+  ---
+  duration_ms: 9.5391
+  type: 'test'
+  ...
+# Subtest: live query: upstream failure on every store refunds the credit and never records unavailable
+ok 297 - live query: upstream failure on every store refunds the credit and never records unavailable
+  ---
+  duration_ms: 3.3511
+  type: 'test'
+  ...
+# Subtest: live query: partial upstream failure keeps the charge and reports per-store reasons
+ok 298 - live query: partial upstream failure keeps the charge and reports per-store reasons
+  ---
+  duration_ms: 2.72
+  type: 'test'
+  ...
+# Subtest: live query validation: part number, store list size and catalog membership
+ok 299 - live query validation: part number, store list size and catalog membership
+  ---
+  duration_ms: 1.6505
+  type: 'test'
+  ...
+# Subtest: new products are blocked for free users for 30 days and open to members
+ok 300 - new products are blocked for free users for 30 days and open to members
+  ---
+  duration_ms: 5.1156
+  type: 'test'
+  ...
+# Subtest: history: one credit per historyQueryId, re-reads are free, events from live queries are visible
+ok 301 - history: one credit per historyQueryId, re-reads are free, events from live queries are visible
+  ---
+  duration_ms: 7.8376
+  type: 'test'
+  ...
+# Subtest: history: today of a restricted new product is closed to free users, yesterday is open
+ok 302 - history: today of a restricted new product is closed to free users, yesterday is open
+  ---
+  duration_ms: 1.7621
+  type: 'test'
+  ...
+# Subtest: follows: members only, 3 SKUs × 3 stores, no duplicate SKU, pause/resume/remove
+ok 303 - follows: members only, 3 SKUs × 3 stores, no duplicate SKU, pause/resume/remove
+  ---
+  duration_ms: 8.6852
+  type: 'test'
+  ...
+# Subtest: membership expiry closes follow resume; renewals extend from the current expiry
+ok 304 - membership expiry closes follow resume; renewals extend from the current expiry
+  ---
+  duration_ms: 2.2061
+  type: 'test'
+  ...
+# Subtest: admin: config patches are whitelisted and non-admins are rejected
+ok 305 - admin: config patches are whitelisted and non-admins are rejected
+  ---
+  duration_ms: 3.2478
+  type: 'test'
+  ...
+# Subtest: subscription results are counted per template; only accepts add send credits
+ok 306 - subscription results are counted per template; only accepts add send credits
+  ---
+  duration_ms: 2.1181
+  type: 'test'
+  ...
+# Subtest: unexpected repository failures become internal_error and are logged, not leaked
+ok 307 - unexpected repository failures become internal_error and are logged, not leaked
+  ---
+  duration_ms: 0.7199
+  type: 'test'
+  ...
+# Subtest: catalog.get serves the seeded catalog with version short-circuit
+ok 308 - catalog.get serves the seeded catalog with version short-circuit
+  ---
+  duration_ms: 12.7254
+  type: 'test'
+  ...
+# Subtest: query monitored summary marks the 2–5 minute sample as historical, without changing its timestamp
+ok 309 - query monitored summary marks the 2–5 minute sample as historical, without changing its timestamp
+  ---
+  duration_ms: 27.1829
+  type: 'test'
+  ...
+# Subtest: query summary explains missing and unknown samples, and does not reveal restricted inventory
+ok 310 - query summary explains missing and unknown samples, and does not reveal restricted inventory
+  ---
+  duration_ms: 38.2677
+  type: 'test'
+  ...
+# Subtest: query summary ages the retained sample before a failed refresh and preserves the original observation time
+ok 311 - query summary ages the retained sample before a failed refresh and preserves the original observation time
+  ---
+  duration_ms: 27.2355
+  type: 'test'
+  ...
+# Subtest: history latest uses the same stale, missing and unknown semantics as monitored summaries
+ok 312 - history latest uses the same stale, missing and unknown semantics as monitored summaries
+  ---
+  duration_ms: 19.6579
+  type: 'test'
+  ...
+# Subtest: query return-to-page ages the snapshot before a pending account request completes
+ok 313 - query return-to-page ages the snapshot before a pending account request completes
+  ---
+  duration_ms: 16.1116
+  type: 'test'
+  ...
+# Subtest: history latest omits zero duration and restricted historical values
+ok 314 - history latest omits zero duration and restricted historical values
+  ---
+  duration_ms: 31.1812
+  type: 'test'
+  ...
+# Subtest: history return-to-page re-evaluates an old snapshot even when account refresh is offline
+ok 315 - history return-to-page re-evaluates an old snapshot even when account refresh is offline
+  ---
+  duration_ms: 15.2107
+  type: 'test'
+  ...
+# Subtest: a two-to-five-minute stock sample cannot have both a current stock badge and an expired note
+ok 316 - a two-to-five-minute stock sample cannot have both a current stock badge and an expired note
+  ---
+  duration_ms: 1.9091
+  type: 'test'
+  ...
+# Subtest: a newly recorded or changed status has no misleading zero-second continuous duration
+ok 317 - a newly recorded or changed status has no misleading zero-second continuous duration
+  ---
+  duration_ms: 0.4492
+  type: 'test'
+  ...
+# Subtest: a fresh timestamp never overrides a server unknown or stale result
+ok 318 - a fresh timestamp never overrides a server unknown or stale result
+  ---
+  duration_ms: 0.3488
+  type: 'test'
+  ...
+# Subtest: missing and restricted observations have distinct explanations without leaking historical stock
+ok 319 - missing and restricted observations have distinct explanations without leaking historical stock
+  ---
+  duration_ms: 0.2167
+  type: 'test'
+  ...
+# Subtest: follow polling expires the retained badge even when refreshing the account fails
+ok 320 - follow polling expires the retained badge even when refreshing the account fails
+  ---
+  duration_ms: 27.5467
+  type: 'test'
+  ...
+# Subtest: acceptance list refresh reads existing samples without inventing newer stock
+ok 321 - acceptance list refresh reads existing samples without inventing newer stock
+  ---
+  duration_ms: 30.973
+  type: 'test'
+  ...
+1..321
+# tests 321
+# suites 0
+# pass 321
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2881.8841

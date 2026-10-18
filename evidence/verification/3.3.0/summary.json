@@ -1,0 +1,210 @@
+{
+  "version": "3.3.0",
+  "scope": "Local release candidate only",
+  "productionAcceptancePassed": false,
+  "deployed": false,
+  "uploaded": false,
+  "published": false,
+  "realNotificationsSent": false,
+  "tests": {
+    "tests": 1550,
+    "pass": 1550,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "scope": "Full suite before the native-button layout and optional-query follow-up; latest targeted validation is in followLayoutFollowup",
+    "evidence": "follow-refresh/tests.log"
+  },
+  "finalCopyRegression": {
+    "tests": 89,
+    "pass": 89,
+    "fail": 0
+  },
+  "source": {
+    "files": 527,
+    "javaScript": 372,
+    "json": 48,
+    "pages": 7,
+    "operatorPages": 1,
+    "errors": []
+  },
+  "release": {
+    "checks": 48,
+    "passed": true
+  },
+  "officialTemplateCompile": [
+    {
+      "compiler": "wcc",
+      "files": 12,
+      "exitCode": 0,
+      "stderr": ""
+    },
+    {
+      "compiler": "wcsc",
+      "files": 16,
+      "exitCode": 0,
+      "stderr": ""
+    }
+  ],
+  "layout": [
+    {
+      "name": "ui-light",
+      "total": 300,
+      "indexNavigationFailures": 0,
+      "expressionErrors": 0,
+      "missingText": 0,
+      "forbiddenText": 0,
+      "horizontalOverflow": 0,
+      "clippedText": 0,
+      "failedImages": 0,
+      "alternativeLayoutFailures": 0,
+      "calendarLayoutFailures": 0,
+      "membershipLayoutFailures": 0,
+      "notificationLayoutFailures": 0,
+      "v3LayoutFailures": 0
+    },
+    {
+      "name": "ui-dark",
+      "total": 300,
+      "indexNavigationFailures": 0,
+      "expressionErrors": 0,
+      "missingText": 0,
+      "forbiddenText": 0,
+      "horizontalOverflow": 0,
+      "clippedText": 0,
+      "failedImages": 0,
+      "alternativeLayoutFailures": 0,
+      "calendarLayoutFailures": 0,
+      "membershipLayoutFailures": 0,
+      "notificationLayoutFailures": 0,
+      "v3LayoutFailures": 0
+    },
+    {
+      "name": "notification-ui-light",
+      "total": 160,
+      "indexNavigationFailures": 0,
+      "expressionErrors": 0,
+      "missingText": 0,
+      "forbiddenText": 0,
+      "horizontalOverflow": 0,
+      "clippedText": 0,
+      "failedImages": 0,
+      "alternativeLayoutFailures": 0,
+      "calendarLayoutFailures": 0,
+      "membershipLayoutFailures": 0,
+      "notificationLayoutFailures": 0,
+      "v3LayoutFailures": 0
+    },
+    {
+      "name": "notification-ui-dark",
+      "total": 160,
+      "indexNavigationFailures": 0,
+      "expressionErrors": 0,
+      "missingText": 0,
+      "forbiddenText": 0,
+      "horizontalOverflow": 0,
+      "clippedText": 0,
+      "failedImages": 0,
+      "alternativeLayoutFailures": 0,
+      "calendarLayoutFailures": 0,
+      "membershipLayoutFailures": 0,
+      "notificationLayoutFailures": 0,
+      "v3LayoutFailures": 0
+    },
+    {
+      "name": "navigation-layout",
+      "total": 1074,
+      "failed": 0
+    },
+    {
+      "name": "notification-ui-fonts",
+      "total": 12,
+      "indexNavigationFailures": 0,
+      "expressionErrors": 0,
+      "missingText": 0,
+      "forbiddenText": 0,
+      "horizontalOverflow": 0,
+      "clippedText": 0,
+      "failedImages": 0,
+      "alternativeLayoutFailures": 0,
+      "calendarLayoutFailures": 0,
+      "membershipLayoutFailures": 0,
+      "notificationLayoutFailures": 0,
+      "v3LayoutFailures": 0
+    }
+  ],
+  "pending": [
+    "Deploy API and monitor together plus the missing notification index",
+    "Verify fresh production observations and real timer invocations",
+    "Verify iOS and Android receipt and notification deep links on an authorized test account",
+    "Verify fifth annual configuration reaches real monitoring and delivery",
+    "Correlate production JS errors with Source Maps; measure real startup/query/notification latency"
+  ],
+  "noticeExpiryFollowup": {
+    "scope": "Local follow-up only; production config unchanged",
+    "confirmedExpiry": "2026-10-16T20:20:00+08:00",
+    "match": {
+      "title": "接口限流说明",
+      "publishedAt": "2026-10-16T14:00:00+08:00"
+    },
+    "tests": {
+      "files": [
+        "tests/notice-expiry-regression.test.mjs",
+        "tests/query-notice.test.mjs",
+        "tests/delivery-experience-v330.test.mjs"
+      ],
+      "tests": 24,
+      "pass": 24,
+      "fail": 0,
+      "timezones": [
+        "UTC",
+        "Asia/Shanghai"
+      ],
+      "logFiles": [
+        "notice-expiry-utc.log",
+        "notice-expiry-shanghai.log"
+      ]
+    },
+    "productionConfigUpdated": false,
+    "deployed": false,
+    "changedFiles": [
+      "cloudfunctions/gxs_api/lib/services/users.js",
+      "miniprogram/utils/query-notice.js",
+      "miniprogram/pages/notice-board/index.js",
+      "tests/query-notice.test.mjs",
+      "tests/notice-expiry-regression.test.mjs",
+      "docs/RELEASE_3.3.0.md"
+    ],
+    "releaseChecks": {
+      "checks": 48,
+      "passed": true,
+      "evidence": "notice-expiry-release-check.json"
+    },
+    "visualScope": "No WXML/WXSS changes; prior layout evidence retained, notice content/timer behavior covered by targeted runtime tests"
+  },
+  "baselineTests": {
+    "tests": 1503,
+    "pass": 1503,
+    "fail": 0,
+    "skipped": 0,
+    "scope": "Full-suite baseline before the six new notice-expiry tests; targeted follow-up results recorded separately"
+  },
+  "layoutBaselineScope": "Earlier broad UI checks; final follow-page layout and navigation verified by followRefreshFollowup",
+  "followRefreshFollowup": {
+    "evidence": "follow-refresh/summary.json",
+    "tests": 1550,
+    "pass": 1550,
+    "layoutCases": 94,
+    "navigationCases": 156,
+    "deployed": false
+  },
+  "followLayoutFollowup": {
+    "evidence": "follow-layout/summary.json",
+    "tests": 113,
+    "pass": 113,
+    "layoutCases": 94,
+    "navigationCases": 156,
+    "checkerControls": 24,
+    "deployed": false
+  }
+}

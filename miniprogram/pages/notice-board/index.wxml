@@ -1,0 +1,28 @@
+<view class="page notice-page">
+  <view class="page-heading notice-heading">
+    <view class="brand-page-copy"><view class="page-title">公告与服务</view><view class="page-subtitle">服务说明、临时通知与提醒帮助</view></view>
+    <button class="ui-action" disabled="{{refreshing}}" loading="{{refreshing}}" bindtap="onRetry">刷新</button>
+  </view>
+  <view wx:if="{{loadError}}" class="card load-error" role="alert">
+    <view class="load-error-title">公告暂未更新</view><view class="load-error-detail">{{loadError}}</view>
+    <view wx:if="{{hasContent}}" class="small text-2">下方保留上次读取的有效说明。</view>
+    <button class="btn btn-primary btn-block mt" disabled="{{refreshing}}" bindtap="onRetry">重新读取</button>
+  </view>
+  <view wx:if="{{!ready}}" class="card loading-line" aria-busy="true">正在读取公告与服务状态…</view>
+  <block wx:else>
+    <view wx:if="{{service}}" class="card notice-service">
+      <view class="notice-card-head"><text class="notice-card-title">后台最近状态</text><view class="pill pill-{{service.tone}}">{{service.label}}</view></view>
+      <view class="small text-2">{{loadError ? '当前未能更新，以下为上次读取的服务状态。' : service.detail}}</view>
+      <view class="notice-service-footer"><text class="tiny muted">读取于 {{refreshedText}}</text><button class="ui-action" bindtap="onGoFollows">查看我的小哨</button></view>
+    </view>
+    <view class="notice-section-title">服务说明</view>
+    <view wx:if="{{!hasContent && !loadError}}" class="card empty-notice"><view class="empty-notice-title">暂无有效公告</view><view class="small text-2">需要你留意的服务变化会在这里说明。</view></view>
+    <view wx:for="{{items}}" wx:key="key" class="card notice-card notice-card--{{item.tone}}">
+      <view class="notice-card-head"><text class="notice-card-title">{{item.title}}</text></view>
+      <view class="notice-card-meta"><text wx:if="{{item.publishedAt}}">发布 {{item.publishedAt}}</text><text>{{item.stamp}}</text></view>
+      <view class="notice-card-text">{{item.text}}</view>
+    </view>
+    <view class="notice-foot tiny muted">说明的发布时间不代表当前故障。库存状态与观测时间请查看对应配置。</view>
+    <button class="btn btn-outline btn-block mt" bindtap="onGoHelp">没有收到提醒？查看排查步骤</button>
+  </block>
+</view>

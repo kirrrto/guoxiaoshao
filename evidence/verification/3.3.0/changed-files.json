@@ -1,0 +1,601 @@
+{
+  "baseline": "source-before.tgz, created before v3.3.0 changes; Git repository initially had no commits",
+  "updatedAt": "2026-10-18T03:10:10.048Z",
+  "changes": [
+    {
+      "file": "cloudfunctions/cloudbase_auth/package-lock.json",
+      "status": "modified",
+      "sha256": "ecb089600d60146818cebc7f0145549110f69e11df83e3560392233b9043bded"
+    },
+    {
+      "file": "cloudfunctions/cloudbase_auth/package.json",
+      "status": "modified",
+      "sha256": "5d1d6594a51c035c6303b86cdc36e1733f3432f1f82051276bd7ebb9dc821727"
+    },
+    {
+      "file": "cloudfunctions/gxs_api/lib/collections.js",
+      "status": "modified",
+      "sha256": "1092b23f72aa7c1733ffc5b7d33b1e9910850c375e9d507d41815b484b3ee614"
+    },
+    {
+      "file": "cloudfunctions/gxs_api/lib/engine/collector.js",
+      "status": "modified",
+      "sha256": "f719f7a265b700c41966f8f766ff04207031fe045d91c6dc77ecdd6d6f744242"
+    },
+    {
+      "file": "cloudfunctions/gxs_api/lib/engine/current-availability.js",
+      "status": "added",
+      "sha256": "be993d1f6a77b58ec3601f5e18633f1c5810c86c636b41a94784020b4701b7ef"
+    },
+    {
+      "file": "cloudfunctions/gxs_api/lib/engine/events.js",
+      "status": "modified",
+      "sha256": "10fcd67adf812c26689ea3b17716d0cbc8f6066e3a41742e7c670c3133e25c20"
+    },
+    {
+      "file": "cloudfunctions/gxs_api/lib/engine/notifier.js",
+      "status": "modified",
+      "sha256": "6dc3c7f23ca5343c7aaaf932f9c66489e157463eee9889cb2778630e86f9e776"
+    },
+    {
+      "file": "cloudfunctions/gxs_api/lib/engine/scheduled.js",
+      "status": "modified",
+      "sha256": "fe2290af2f92ff94d3c73753b36a322eedb59911aee67275bc496c9d8992fb63"
+    },
+    {
+      "file": "cloudfunctions/gxs_api/lib/engine/scheduler.js",
+      "status": "modified",
+      "sha256": "8037401ee37fe0fc22e7b199701e834bdea9e3475488887cb9f6776f43be93d1"
+    },
+    {
+      "file": "cloudfunctions/gxs_api/lib/payment/service.js",
+      "status": "modified",
+      "sha256": "24369628168256c2b27c1735cd1f7431748e9c84753fe89352a08b523a9ed977"
+    },
+    {
+      "file": "cloudfunctions/gxs_api/lib/repo/atomic-ops.js",
+      "status": "modified",
+      "sha256": "5b8df0388221f8ae45535e7a7c5e31ce50327d475b8c6d57b581509bda05aea0"
+    },
+    {
+      "file": "cloudfunctions/gxs_api/lib/repo/cloudbase-repo.js",
+      "status": "modified",
+      "sha256": "4fe509f3955109ebc85690298cde2937983f5234816c1e0abaca202400fd5484"
+    },
+    {
+      "file": "cloudfunctions/gxs_api/lib/repo/current-availability.js",
+      "status": "added",
+      "sha256": "d3c773f1b2b2bf5c92452387bde0195fe5a8bcd1810aa11e1a98e411534da985"
+    },
+    {
+      "file": "cloudfunctions/gxs_api/lib/rules/membership.js",
+      "status": "modified",
+      "sha256": "d7e92151680c38f0aecd86748584f7ca9dc3b6ae444046087b439c0eaf581b37"
+    },
+    {
+      "file": "cloudfunctions/gxs_api/lib/services/follows.js",
+      "status": "modified",
+      "sha256": "ecd94dcd3d08740eebf500ef8f14322fdc43bfdbe5da1f5c080fdebbaf15bcf6"
+    },
+    {
+      "file": "cloudfunctions/gxs_api/lib/services/users.js",
+      "status": "modified",
+      "sha256": "ed1f524848b0a17bd198ac5f42d0069ef94b4a68a7afe17e61caeddc1bc81e4a"
+    },
+    {
+      "file": "cloudfunctions/gxs_api/package-lock.json",
+      "status": "modified",
+      "sha256": "963aee82c69b09e5258b2ef1f59376ba3fa405c4670214f36d107e4887ddf7cd"
+    },
+    {
+      "file": "cloudfunctions/gxs_api/package.json",
+      "status": "modified",
+      "sha256": "5eaee19a507810aed0f5399eff90fd51e8508ba8b63580e469f827e0c0709266"
+    },
+    {
+      "file": "cloudfunctions/gxs_monitor/lib-manifest.json",
+      "status": "modified",
+      "sha256": "c4b50ac2b96f9525ea5ca151f648db30c9b1bc6309659db3b8c0f286c7cbd58b"
+    },
+    {
+      "file": "cloudfunctions/gxs_monitor/lib/collections.js",
+      "status": "modified",
+      "sha256": "1092b23f72aa7c1733ffc5b7d33b1e9910850c375e9d507d41815b484b3ee614"
+    },
+    {
+      "file": "cloudfunctions/gxs_monitor/lib/engine/collector.js",
+      "status": "modified",
+      "sha256": "f719f7a265b700c41966f8f766ff04207031fe045d91c6dc77ecdd6d6f744242"
+    },
+    {
+      "file": "cloudfunctions/gxs_monitor/lib/engine/current-availability.js",
+      "status": "added",
+      "sha256": "be993d1f6a77b58ec3601f5e18633f1c5810c86c636b41a94784020b4701b7ef"
+    },
+    {
+      "file": "cloudfunctions/gxs_monitor/lib/engine/events.js",
+      "status": "modified",
+      "sha256": "10fcd67adf812c26689ea3b17716d0cbc8f6066e3a41742e7c670c3133e25c20"
+    },
+    {
+      "file": "cloudfunctions/gxs_monitor/lib/engine/notifier.js",
+      "status": "modified",
+      "sha256": "6dc3c7f23ca5343c7aaaf932f9c66489e157463eee9889cb2778630e86f9e776"
+    },
+    {
+      "file": "cloudfunctions/gxs_monitor/lib/engine/scheduled.js",
+      "status": "modified",
+      "sha256": "fe2290af2f92ff94d3c73753b36a322eedb59911aee67275bc496c9d8992fb63"
+    },
+    {
+      "file": "cloudfunctions/gxs_monitor/lib/engine/scheduler.js",
+      "status": "modified",
+      "sha256": "8037401ee37fe0fc22e7b199701e834bdea9e3475488887cb9f6776f43be93d1"
+    },
+    {
+      "file": "cloudfunctions/gxs_monitor/lib/repo/atomic-ops.js",
+      "status": "modified",
+      "sha256": "5b8df0388221f8ae45535e7a7c5e31ce50327d475b8c6d57b581509bda05aea0"
+    },
+    {
+      "file": "cloudfunctions/gxs_monitor/lib/repo/cloudbase-repo.js",
+      "status": "modified",
+      "sha256": "4fe509f3955109ebc85690298cde2937983f5234816c1e0abaca202400fd5484"
+    },
+    {
+      "file": "cloudfunctions/gxs_monitor/lib/repo/current-availability.js",
+      "status": "added",
+      "sha256": "d3c773f1b2b2bf5c92452387bde0195fe5a8bcd1810aa11e1a98e411534da985"
+    },
+    {
+      "file": "cloudfunctions/gxs_monitor/lib/rules/membership.js",
+      "status": "modified",
+      "sha256": "d7e92151680c38f0aecd86748584f7ca9dc3b6ae444046087b439c0eaf581b37"
+    },
+    {
+      "file": "cloudfunctions/gxs_monitor/package-lock.json",
+      "status": "modified",
+      "sha256": "8881b2eedc0827882bf85f1c383af8b5be492b42758ede8827c02a0ab5264ac2"
+    },
+    {
+      "file": "cloudfunctions/gxs_monitor/package.json",
+      "status": "modified",
+      "sha256": "c86d9923617d6531d4c8259ca8d4bda2f45ace7902b63ef6e6b88692b1777e32"
+    },
+    {
+      "file": "config/database-deployment-plan.json",
+      "status": "modified",
+      "sha256": "0e8feb718584d8c6f2ed4b98b5a5434a92eb903778694f98947761e48887c739"
+    },
+    {
+      "file": "config/delivery-targets.json",
+      "status": "modified",
+      "sha256": "6b99059a33dc771934371f7d50731defa4118c78f427edbc40e23a1ee3271637"
+    },
+    {
+      "file": "docs/DATA_MODEL_AND_API.md",
+      "status": "modified",
+      "sha256": "8343fe1ae4c9afd8eac58bdba4324ed30e8439af0f5b5b733d0bb59b6cbcd376"
+    },
+    {
+      "file": "docs/RELEASE_3.3.0.md",
+      "status": "added",
+      "sha256": "047ffc54d1b474fd1e09c93dc4aa2c8aad54bf313395002ee62b8bdc9511c955"
+    },
+    {
+      "file": "docs/SCHEDULED_MONITOR.md",
+      "status": "modified",
+      "sha256": "114e110fdf9fae6d9ef822c864becbfe798508af51c89143c7ec49c101c31f95"
+    },
+    {
+      "file": "miniprogram/app.js",
+      "status": "modified",
+      "sha256": "cf6bef2de6b35e7e20d46949032a9393a690a808092e3b94a755dbaafd155eab"
+    },
+    {
+      "file": "miniprogram/components/config-sheet/index.js",
+      "status": "modified",
+      "sha256": "4075983fdf0c9adf0a4673084608eaa4214adc48b3b20a90e829d91364ac5257"
+    },
+    {
+      "file": "miniprogram/components/target-picker/index.js",
+      "status": "modified",
+      "sha256": "b238ada13d02582858e0813d5e5fe849c82b3dfd023fdad93779d23a8917797e"
+    },
+    {
+      "file": "miniprogram/config/release-notes.js",
+      "status": "modified",
+      "sha256": "766339e5bf151fa66d1a1fd924cac1d668f058ae68d90cc4746898496e47e657"
+    },
+    {
+      "file": "miniprogram/config/usage-guide.js",
+      "status": "modified",
+      "sha256": "33ec570f37d5d8145b8fed413ba3581fda4a0227a083d779ece8035ec729502d"
+    },
+    {
+      "file": "miniprogram/config/version.js",
+      "status": "modified",
+      "sha256": "adaaa9c342610faadcd0f6859c27d33de532c87fe58e3c411788d06f06c095bf"
+    },
+    {
+      "file": "miniprogram/pages/follow/index.js",
+      "status": "modified",
+      "sha256": "10ca57a1c90772c1e55b0acda64d87436c3bf04eed21b2844513210b4c412824"
+    },
+    {
+      "file": "miniprogram/pages/follow/index.wxml",
+      "status": "modified",
+      "sha256": "53cfc87b091ede8dda13d61c7cabbdae96a42d469d13f2713db6fd8618505277"
+    },
+    {
+      "file": "miniprogram/pages/follow/index.wxss",
+      "status": "modified",
+      "sha256": "1a5f41427ab600b556de35fbdcf2b1ce385d39656df0978b5778ccb6fc865c26"
+    },
+    {
+      "file": "miniprogram/pages/guide/index.js",
+      "status": "modified",
+      "sha256": "60226efa439fbab5c38232e59370cd8305ec0850ac606fb78222604d27c365a5"
+    },
+    {
+      "file": "miniprogram/pages/guide/index.wxml",
+      "status": "modified",
+      "sha256": "206cf11b938d99f5ac5b1a76afb65c93b83183e1e600e005505b81406a3609f4"
+    },
+    {
+      "file": "miniprogram/pages/history/index.js",
+      "status": "modified",
+      "sha256": "456c5f68fe52b3ff26b98ea5f4b796f0fc26228edee70defad10cccc277f36b7"
+    },
+    {
+      "file": "miniprogram/pages/history/index.wxml",
+      "status": "modified",
+      "sha256": "674fabd03346db625090eb85402bb7d03cde136bf447d05113dbeda4a0e87093"
+    },
+    {
+      "file": "miniprogram/pages/history/index.wxss",
+      "status": "modified",
+      "sha256": "93b9388fa96c396a675ad27139855dc6c96f2b821f544855bbba6cf74339add5"
+    },
+    {
+      "file": "miniprogram/pages/mine/index.js",
+      "status": "modified",
+      "sha256": "256fd88e10944a4bdf3fbc5318e5a77a76326d2d1cce6e6cd2e9c4f124695206"
+    },
+    {
+      "file": "miniprogram/pages/mine/index.wxml",
+      "status": "modified",
+      "sha256": "8f1be9c71a02a9028f35918f928ec7e359f141912843198294587939e6a3a354"
+    },
+    {
+      "file": "miniprogram/pages/mine/index.wxss",
+      "status": "modified",
+      "sha256": "1e45f935ddb121ed0ae5cf6867ae7f1f4a71267e86cf5ea8b70a2eb1027dbfeb"
+    },
+    {
+      "file": "miniprogram/pages/notice-board/index.js",
+      "status": "modified",
+      "sha256": "f18fcdffc60db62b20b433b2570f9a9a85151009e5a68750b3c499fedc8e0085"
+    },
+    {
+      "file": "miniprogram/pages/notice-board/index.json",
+      "status": "modified",
+      "sha256": "47f93f10580ec6d415a10d342caf45da80dd1fcec05d3e084c560f93b472deae"
+    },
+    {
+      "file": "miniprogram/pages/notice-board/index.wxml",
+      "status": "modified",
+      "sha256": "91ab60efd1874955087aafe3ba753f69a033bbbe4942513130c56d70a890edd9"
+    },
+    {
+      "file": "miniprogram/pages/notice-board/index.wxss",
+      "status": "modified",
+      "sha256": "93135f3d8f0949b73f3a1020988018832912b56d805dc5c5acd83d1401b8afff"
+    },
+    {
+      "file": "miniprogram/pages/notification-test/index.js",
+      "status": "modified",
+      "sha256": "8d711d479e8b0e9de1c4e3eb4d21c78824ad8ad897b6316175f1cce23c665c2d"
+    },
+    {
+      "file": "miniprogram/pages/notification-test/index.wxml",
+      "status": "modified",
+      "sha256": "570d32ae9624347a4087f130e0c83c2d5fc22b6e11d407c80329fdc7fdb78cb3"
+    },
+    {
+      "file": "miniprogram/pages/notification-test/index.wxss",
+      "status": "modified",
+      "sha256": "66cb647194e80ebbe3e94baee2e74e399bcad0911c45fa215db5f5db0d10cdd6"
+    },
+    {
+      "file": "miniprogram/pages/query/index.js",
+      "status": "modified",
+      "sha256": "915aa9f031aa0b4265bd26b49a7d2ca680c73299824d6b1b3c2b549906a70d25"
+    },
+    {
+      "file": "miniprogram/pages/query/index.wxml",
+      "status": "modified",
+      "sha256": "15199fd8ebf9e875ec0bf53aaa022354b7e46f4d573efe0fc3a142aa524131aa"
+    },
+    {
+      "file": "miniprogram/pages/query/index.wxss",
+      "status": "modified",
+      "sha256": "c6f6c1c7a4f21a0a0eb767c443dbc96d676a576d85b1af9f36f90b829f1f509b"
+    },
+    {
+      "file": "miniprogram/utils/api.js",
+      "status": "modified",
+      "sha256": "51883908c4700809825a04be8044df91a30354eea404242ef76116c245ae53f7"
+    },
+    {
+      "file": "miniprogram/utils/format.js",
+      "status": "modified",
+      "sha256": "4e58b57cfea3977ef9d3c1df9aa3767e9697a1952aa8fbc08560de04197595d5"
+    },
+    {
+      "file": "miniprogram/utils/member-limits.js",
+      "status": "modified",
+      "sha256": "f879d980e3184122edf25c905399b56127776d1450e7123187cea007784afe39"
+    },
+    {
+      "file": "miniprogram/utils/network.js",
+      "status": "modified",
+      "sha256": "f1c1385a2de9c9403f31681f2e20fe173444c316ee5a2869dbc3a26c86a29761"
+    },
+    {
+      "file": "miniprogram/utils/notification-test-progress.js",
+      "status": "added",
+      "sha256": "691e9a3787a936ab448ff4627fb3255b2979437712812a319bde36ce7b2c5d83"
+    },
+    {
+      "file": "miniprogram/utils/operation.js",
+      "status": "modified",
+      "sha256": "7b936944f7a904bc24a7b7e0c9d10c5b9ab6cdb4c44a95165e508430f1f78c8f"
+    },
+    {
+      "file": "miniprogram/utils/poll.js",
+      "status": "modified",
+      "sha256": "10ecabb717c07e2214b6cf796947d9ea7a4066b73c011b78b7232dfb9aa0a98f"
+    },
+    {
+      "file": "miniprogram/utils/query-notice.js",
+      "status": "modified",
+      "sha256": "4a8355bbfcdf66422cf3d08bac7a453d188dce8ec174e476eabd051c00167f60"
+    },
+    {
+      "file": "miniprogram/utils/reminder-readiness.js",
+      "status": "modified",
+      "sha256": "d7c820bf9433d02d9cc332af6c86df67afcabcd43c49f911cb6513e93e006d34"
+    },
+    {
+      "file": "miniprogram/utils/request-progress.js",
+      "status": "added",
+      "sha256": "8f540e2c84cb4bcc8612e804d86a3826ec9970fd726bd5d40b6a6b80eddcc66e"
+    },
+    {
+      "file": "miniprogram/utils/store.js",
+      "status": "modified",
+      "sha256": "ce3e8d6fc59d658c5f736e4da2fde7f0d430373eb20a1fc35e59c1f979d63c84"
+    },
+    {
+      "file": "package-lock.json",
+      "status": "modified",
+      "sha256": "f1869a0191ff843497650b762b73cd7dba86ffece8202a2a8d1cd5383c2c5c81"
+    },
+    {
+      "file": "package.json",
+      "status": "modified",
+      "sha256": "38567ffc9e3efa798c5b200f7ffa565a054003650b6df610def9512606727fcf"
+    },
+    {
+      "file": "README.md",
+      "status": "modified",
+      "sha256": "919204eaa8d021bfad5263242a2169e42f84f381c1b29f97c4f3d4b880e9e725"
+    },
+    {
+      "file": "tests/account-ux.test.mjs",
+      "status": "modified",
+      "sha256": "47ef74338ce8bef79d624957552818d9dde4b6614704f371fa90a4432ee526bd"
+    },
+    {
+      "file": "tests/api-deadline-recovery.test.mjs",
+      "status": "modified",
+      "sha256": "0b7abd9a001ec55363810631d5f5d0d0e0c184e9b656e76094c7f7d23e81bfb6"
+    },
+    {
+      "file": "tests/backend-reliability.test.mjs",
+      "status": "modified",
+      "sha256": "2698c690e9ee5249e4e274e2fa125da90a35a547898ec0ea8afca1b49d250305"
+    },
+    {
+      "file": "tests/burst-alerts.test.mjs",
+      "status": "modified",
+      "sha256": "af3a6f440c33ff9a7c965d6740967f093363e442acb78ba6d2ce8dd166ef97c8"
+    },
+    {
+      "file": "tests/collector-observation-latency.test.mjs",
+      "status": "added",
+      "sha256": "94dd9a3045071654371efca4b4a869ea99cf3ea9177040d0c772f34e1c4c774f"
+    },
+    {
+      "file": "tests/current-availability-delivery.test.mjs",
+      "status": "added",
+      "sha256": "e442488f3618037cdd1072097b73938fae1aa35a3b005728a2c726306bc33b92"
+    },
+    {
+      "file": "tests/delivery-experience-v330.test.mjs",
+      "status": "added",
+      "sha256": "8b8f5bdd4dc5ad86122b219ec831cf33c4fe254e1fe110fdd334ac099e644950"
+    },
+    {
+      "file": "tests/follow-alert-account-isolation.test.mjs",
+      "status": "added",
+      "sha256": "1cf35b94df1162288ab6ecc7fd69e0cf820762f2d976350e7a010c7a519e35ff"
+    },
+    {
+      "file": "tests/follow-alert-return.test.mjs",
+      "status": "added",
+      "sha256": "e58602f2c7ecb7e1b1486c25bd2f1c0aa9c109ddb7ad6b98ef53d217cadc0fbf"
+    },
+    {
+      "file": "tests/follow-fast-authorization-frontend.test.mjs",
+      "status": "modified",
+      "sha256": "305b010469803a52c89b4587224fc04568c27305657030f0e2c9109fde490313"
+    },
+    {
+      "file": "tests/follow-live-refresh.test.mjs",
+      "status": "added",
+      "sha256": "3f0b447757e87e214c5eab6e04f6b2fbeb8da1ad51900699c8580370d5984ed7"
+    },
+    {
+      "file": "tests/follow-readiness.test.mjs",
+      "status": "modified",
+      "sha256": "5e21919ded7d0fd9112fc236ae8f198657b600b7940610a1c8ad1bcfe6889234"
+    },
+    {
+      "file": "tests/follow-stock-clarity.test.mjs",
+      "status": "added",
+      "sha256": "9a5f601b052a059e4e07601f577802216b4d3fca8e12d64de58cf6a461cbfa38"
+    },
+    {
+      "file": "tests/frontend-regression.test.mjs",
+      "status": "modified",
+      "sha256": "3604cf91cf198cc5f69c24c6fc2a79062507a78f62b6e3f9d1c072c4c8341306"
+    },
+    {
+      "file": "tests/helpers/memory-repo.mjs",
+      "status": "modified",
+      "sha256": "20238f9bd5e3da2289d906b1a1a331d8c794dda3efd20a94dd87c03877536291"
+    },
+    {
+      "file": "tests/member-plan-limits.test.mjs",
+      "status": "modified",
+      "sha256": "5eb0b1f640307227280e6c78408373bdafe241f3d18a0afb612e17782456a29e"
+    },
+    {
+      "file": "tests/membership-upgrade-frontend.test.mjs",
+      "status": "modified",
+      "sha256": "b235f4e8e8afdae49959737f903af0d82b63e5468897b99cfb2f1e5cf1afd393"
+    },
+    {
+      "file": "tests/notice-expiry-regression.test.mjs",
+      "status": "added",
+      "sha256": "664ec28082d2c5841fa28d2d55d30cd33374e02c15a2ecdc9c270a6deb7cfc97"
+    },
+    {
+      "file": "tests/notification-test-frontend.test.mjs",
+      "status": "modified",
+      "sha256": "d824be76adbf1d7ef316073af4488708a7233449f6571683922a1148631541f4"
+    },
+    {
+      "file": "tests/notification-test-progress.test.mjs",
+      "status": "added",
+      "sha256": "45ff55e4105abf9520e6311412bb1c6c1b5c6715d7a77b80c7656d45f1199c1b"
+    },
+    {
+      "file": "tests/performance-ux.test.mjs",
+      "status": "modified",
+      "sha256": "1181665ae37d99aee79ddf94fe91c0afb83819f88a95496ab61c0e258f476d95"
+    },
+    {
+      "file": "tests/query-compact-selection.test.mjs",
+      "status": "modified",
+      "sha256": "f1d84016d352ef80c37027f7451bbc7900c6190cd40b7053b38e391e50cef080"
+    },
+    {
+      "file": "tests/query-notice.test.mjs",
+      "status": "modified",
+      "sha256": "4decb03c5e8e6f935075ce4ab1ed0a067161b62d5da3a7dc2e2776e8d0de9194"
+    },
+    {
+      "file": "tests/reminder-center-v3.test.mjs",
+      "status": "modified",
+      "sha256": "3e6c04c50ce3e6e754ff42ac522bed2049765371f2bf3594c2e121b482bc1863"
+    },
+    {
+      "file": "tests/reminder-credits.test.mjs",
+      "status": "modified",
+      "sha256": "869dfbee0c8157f4fb3fd8256f8f9d774703257b35c7d21103a7a56f695c9b8f"
+    },
+    {
+      "file": "tests/resident-notification-cadence.test.mjs",
+      "status": "modified",
+      "sha256": "cfb080a5c97e9f735563a3d79cebce0c22fe4322ea7e894585f35e8134c9f67c"
+    },
+    {
+      "file": "tests/stock-observation.test.mjs",
+      "status": "modified",
+      "sha256": "d0414e3cbfb2c18f01bd451e6702ee8c8a0dc09d97b1847dad8aa6e804c1428e"
+    },
+    {
+      "file": "tests/ux-overlay-navigation.test.mjs",
+      "status": "modified",
+      "sha256": "b9ce4da12770ae767a0ded92778e2010e9fb7169bac821f1668540dfdee41aaf"
+    },
+    {
+      "file": "tests/ux-sheet-selection.test.mjs",
+      "status": "modified",
+      "sha256": "6ad7c8692d92e4050628facbda2211147547f9efbcafa6a27a2eacd2f3ba1ef3"
+    },
+    {
+      "file": "tests/v330-runtime-reliability.test.mjs",
+      "status": "added",
+      "sha256": "5a80b43015164a93c900a83db07ca73fa8bc1c92aba098ee45787b9e0da4dd11"
+    },
+    {
+      "file": "tests/virtual-payment-service.test.mjs",
+      "status": "modified",
+      "sha256": "5e5508ee8abc8cd16c659a35e22379d1a502036f556d08572c4c298686c48bac"
+    },
+    {
+      "file": "tools/collector/package-lock.json",
+      "status": "modified",
+      "sha256": "f6c7dac7eade4d1e425722cb28319c1f545bcd62e8083b50452b84b7efb2313d"
+    },
+    {
+      "file": "tools/collector/package.json",
+      "status": "modified",
+      "sha256": "456a1938e9517a4044e1ebf4f18e803215482de2953f841b70af7cd3d91c09a8"
+    },
+    {
+      "file": "tools/release/bump-version.mjs",
+      "status": "modified",
+      "sha256": "d7223c817e3e273a44a0658fa0fb7db665d49a01672dbb4994aac5b77137b218"
+    },
+    {
+      "file": "tools/ui-preview/build.mjs",
+      "status": "modified",
+      "sha256": "c52e6d00563d76386fa05986e7d190ca1e51e20a8d32e6b31be9119888dc7a79"
+    },
+    {
+      "file": "tools/ui-preview/check-floating-tabs.mjs",
+      "status": "modified",
+      "sha256": "80b73261b65e1e6c6b60ee92516421f2f5d79179471259afb742721e875fa7a9"
+    },
+    {
+      "file": "tools/ui-preview/check-layout.mjs",
+      "status": "modified",
+      "sha256": "550350d6d3580f2565e116d1e5a7067a273d17dd1883221416c52ebd57ad95fd"
+    },
+    {
+      "file": "tools/ui-preview/check-stock-regression.mjs",
+      "status": "added",
+      "sha256": "d7c62572b9fa0df162f8c6c219a7295ea25556ded2d862d30f3be331cd27f537"
+    },
+    {
+      "file": "tools/ui-preview/README.md",
+      "status": "modified",
+      "sha256": "e0a7198fe35196a350b6dc44ae495bb0fbde39397dda5d825528be91646009d3"
+    },
+    {
+      "file": "tools/ui-preview/stock-layout.mjs",
+      "status": "added",
+      "sha256": "e39ba93781635a2b52d5cc4b373aeb0db00c8aee11c5db9f023f2e657f5d4fab"
+    },
+    {
+      "file": "tools/ui-preview/stock-native-button.mjs",
+      "status": "added",
+      "sha256": "0692a9aa8c9bcb43b144f986203be051befe7b8316c08eb66a39ddb3b76eae8d"
+    }
+  ]
+}

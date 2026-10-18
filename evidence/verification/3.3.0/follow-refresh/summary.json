@@ -1,0 +1,136 @@
+{
+  "checkedAt": "2026-10-18T03:01:38.219Z",
+  "version": "3.3.0",
+  "scope": "Final local follow-page and scheduled-collector changes; simulation only",
+  "tests": {
+    "tests": 1550,
+    "pass": 1550,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0
+  },
+  "source": {
+    "files": 524,
+    "javaScript": 369,
+    "json": 48,
+    "pages": 7,
+    "operatorPages": 1,
+    "errors": []
+  },
+  "release": {
+    "checks": 48,
+    "passed": true
+  },
+  "officialTemplateCompile": [
+    {
+      "tool": "wcc",
+      "files": 12,
+      "exitCode": 0,
+      "stderr": ""
+    },
+    {
+      "tool": "wcsc",
+      "files": 16,
+      "exitCode": 0,
+      "stderr": ""
+    }
+  ],
+  "layout": [
+    {
+      "file": "ui/layout-metrics.json",
+      "total": 39,
+      "indexNavigationFailures": 0,
+      "expressionErrors": 0,
+      "missingText": 0,
+      "forbiddenText": 0,
+      "horizontalOverflow": 0,
+      "clippedText": 0,
+      "failedImages": 0,
+      "alternativeLayoutFailures": 0,
+      "calendarLayoutFailures": 0,
+      "membershipLayoutFailures": 0,
+      "notificationLayoutFailures": 0,
+      "v3LayoutFailures": 0,
+      "stockLayoutFailures": 0
+    },
+    {
+      "file": "ui/layout-metrics-dark.json",
+      "total": 39,
+      "indexNavigationFailures": 0,
+      "expressionErrors": 0,
+      "missingText": 0,
+      "forbiddenText": 0,
+      "horizontalOverflow": 0,
+      "clippedText": 0,
+      "failedImages": 0,
+      "alternativeLayoutFailures": 0,
+      "calendarLayoutFailures": 0,
+      "membershipLayoutFailures": 0,
+      "notificationLayoutFailures": 0,
+      "v3LayoutFailures": 0,
+      "stockLayoutFailures": 0
+    },
+    {
+      "file": "ui/layout-metrics-stock-fonts.json",
+      "total": 8,
+      "indexNavigationFailures": 0,
+      "expressionErrors": 0,
+      "missingText": 0,
+      "forbiddenText": 0,
+      "horizontalOverflow": 0,
+      "clippedText": 0,
+      "failedImages": 0,
+      "alternativeLayoutFailures": 0,
+      "calendarLayoutFailures": 0,
+      "membershipLayoutFailures": 0,
+      "notificationLayoutFailures": 0,
+      "v3LayoutFailures": 0,
+      "stockLayoutFailures": 0
+    },
+    {
+      "file": "ui/layout-metrics-stock-fonts-dark.json",
+      "total": 8,
+      "indexNavigationFailures": 0,
+      "expressionErrors": 0,
+      "missingText": 0,
+      "forbiddenText": 0,
+      "horizontalOverflow": 0,
+      "clippedText": 0,
+      "failedImages": 0,
+      "alternativeLayoutFailures": 0,
+      "calendarLayoutFailures": 0,
+      "membershipLayoutFailures": 0,
+      "notificationLayoutFailures": 0,
+      "v3LayoutFailures": 0,
+      "stockLayoutFailures": 0
+    }
+  ],
+  "navigation": {
+    "file": "ui/floating-tab-metrics.json",
+    "total": 156,
+    "failed": 0
+  },
+  "behavior": {
+    "normalReadWaitMaxMs": 30000,
+    "requestDurationAdditional": true,
+    "failureBackoffMs": [
+      30000,
+      60000,
+      120000
+    ],
+    "automaticReadConsumesQueryCredits": false,
+    "automaticReadCallsUpstream": false,
+    "stockFreshnessThresholdMs": 120000,
+    "returnAndReconnectReadImmediately": true,
+    "alertReceiptRequiresConfirmedAccount": true
+  },
+  "limits": [
+    "Foreground record reads do not guarantee upstream detection within 30 seconds",
+    "Production cadence remains subject to merged target count, configured request budget, timer execution and upstream protection",
+    "Offline Chromium rendering is not WeChat device verification"
+  ],
+  "deployed": false,
+  "productionConfigUpdated": false,
+  "realNotificationsSent": false,
+  "preview": "ui/screenshots/follow-stock-old-expanded-375.png"
+}

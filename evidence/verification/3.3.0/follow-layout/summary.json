@@ -1,0 +1,120 @@
+{
+  "checkedAt": "2026-10-18T03:10:10.043Z",
+  "scope": "Local native-button layout and automatic-stock clarification; no deployment",
+  "tests": {
+    "tests": 113,
+    "pass": 113,
+    "fail": 0,
+    "skipped": 0
+  },
+  "source": {
+    "files": 527,
+    "javaScript": 372,
+    "json": 48,
+    "pages": 7,
+    "operatorPages": 1,
+    "errors": []
+  },
+  "release": {
+    "checks": 48,
+    "passed": true
+  },
+  "officialCompile": [
+    {
+      "compiler": "wcc",
+      "files": 12,
+      "exitCode": 0,
+      "stderr": ""
+    },
+    {
+      "compiler": "wcsc",
+      "files": 16,
+      "exitCode": 0,
+      "stderr": ""
+    }
+  ],
+  "layout": [
+    {
+      "file": "ui/layout-metrics.json",
+      "total": 39,
+      "indexNavigationFailures": 0,
+      "expressionErrors": 0,
+      "missingText": 0,
+      "forbiddenText": 0,
+      "horizontalOverflow": 0,
+      "clippedText": 0,
+      "failedImages": 0,
+      "alternativeLayoutFailures": 0,
+      "calendarLayoutFailures": 0,
+      "membershipLayoutFailures": 0,
+      "notificationLayoutFailures": 0,
+      "v3LayoutFailures": 0,
+      "stockLayoutFailures": 0
+    },
+    {
+      "file": "ui/layout-metrics-dark.json",
+      "total": 39,
+      "indexNavigationFailures": 0,
+      "expressionErrors": 0,
+      "missingText": 0,
+      "forbiddenText": 0,
+      "horizontalOverflow": 0,
+      "clippedText": 0,
+      "failedImages": 0,
+      "alternativeLayoutFailures": 0,
+      "calendarLayoutFailures": 0,
+      "membershipLayoutFailures": 0,
+      "notificationLayoutFailures": 0,
+      "v3LayoutFailures": 0,
+      "stockLayoutFailures": 0
+    },
+    {
+      "file": "ui/layout-metrics-stock-fonts.json",
+      "total": 8,
+      "indexNavigationFailures": 0,
+      "expressionErrors": 0,
+      "missingText": 0,
+      "forbiddenText": 0,
+      "horizontalOverflow": 0,
+      "clippedText": 0,
+      "failedImages": 0,
+      "alternativeLayoutFailures": 0,
+      "calendarLayoutFailures": 0,
+      "membershipLayoutFailures": 0,
+      "notificationLayoutFailures": 0,
+      "v3LayoutFailures": 0,
+      "stockLayoutFailures": 0
+    },
+    {
+      "file": "ui/layout-metrics-stock-fonts-dark.json",
+      "total": 8,
+      "indexNavigationFailures": 0,
+      "expressionErrors": 0,
+      "missingText": 0,
+      "forbiddenText": 0,
+      "horizontalOverflow": 0,
+      "clippedText": 0,
+      "failedImages": 0,
+      "alternativeLayoutFailures": 0,
+      "calendarLayoutFailures": 0,
+      "membershipLayoutFailures": 0,
+      "notificationLayoutFailures": 0,
+      "v3LayoutFailures": 0,
+      "stockLayoutFailures": 0
+    }
+  ],
+  "navigation": {
+    "total": 156,
+    "failed": 0
+  },
+  "checkerControls": {
+    "tests": 24,
+    "pass": 24
+  },
+  "nativeButtonProfile": "WeChat base library 3.17.3 selected button defaults: 184px non-mini width, auto inline margins, base typography/padding and explicit type colors; verified in local WAWebview.js; Chromium approximation only",
+  "autoStockEvidence": "auto-stock-verification.json",
+  "preview": "ui/screenshots/follow-stock-old-375-first-screen.png",
+  "deployed": false,
+  "productionConfigUpdated": false,
+  "realNotificationsSent": false
+}

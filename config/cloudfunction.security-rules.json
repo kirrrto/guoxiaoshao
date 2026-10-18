@@ -1,0 +1,4 @@
+{
+  "*": { "invoke": "auth != null" },
+  "gxs_monitor": { "invoke": false }
+}

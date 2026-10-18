@@ -1,0 +1,135 @@
+{
+  "verification": "auto-stock-without-restock-authorization",
+  "mode": "pure in-memory simulation",
+  "productionAccess": false,
+  "realUpstreamRequests": 0,
+  "realMessagesSent": 0,
+  "sourceChanged": false,
+  "conclusion": "到货次数为0或全局通知开关关闭，均不停止有效会员、已开启且额度范围内关注的自动库存检测；只阻止对应通知发送。",
+  "samplingEligibility": [
+    "collector.enabled",
+    "active follow",
+    "active membership",
+    "follow and store allowance"
+  ],
+  "notSamplingEligibility": [
+    "restock subscription credits",
+    "soldout subscription credits",
+    "notifications.enabled",
+    "settings.notifyEnabled"
+  ],
+  "sourceReferences": [
+    {
+      "file": "cloudfunctions/gxs_api/lib/engine/collector.js",
+      "line": 238,
+      "role": "refreshTargets qualification filters and groups"
+    },
+    {
+      "file": "cloudfunctions/gxs_api/lib/rules/membership.js",
+      "line": 116,
+      "role": "canUseReminders only checks active membership"
+    },
+    {
+      "file": "cloudfunctions/gxs_api/lib/engine/notifier.js",
+      "line": 70,
+      "role": "notification switch and credits checked during task planning"
+    },
+    {
+      "file": "cloudfunctions/gxs_api/lib/services/follows.js",
+      "line": 56,
+      "role": "reads shared latest observations"
+    }
+  ],
+  "cases": [
+    {
+      "notificationsEnabled": true,
+      "memberActive": true,
+      "followStatus": "active",
+      "restockCredits": 0,
+      "soldoutCredits": 41,
+      "rounds": [
+        {
+          "scanned": 1,
+          "status": "unavailable",
+          "observedAt": "2026-09-15T02:00:00.000Z",
+          "knownAt": "2026-09-15T02:00:00.000Z",
+          "source": "auto"
+        },
+        {
+          "scanned": 1,
+          "status": "available",
+          "observedAt": "2026-09-15T02:01:00.000Z",
+          "knownAt": "2026-09-15T02:01:00.000Z",
+          "source": "auto"
+        },
+        {
+          "scanned": 1,
+          "status": "available",
+          "observedAt": "2026-09-15T02:02:00.000Z",
+          "knownAt": "2026-09-15T02:02:00.000Z",
+          "source": "auto"
+        }
+      ],
+      "simulatedUpstreamRequests": 3,
+      "manualQueries": 0,
+      "senderStubCalls": 0,
+      "skippedNotifications": [
+        {
+          "eventType": "restock_confirmed",
+          "status": "skipped",
+          "reason": "no_subscription_credit"
+        }
+      ],
+      "creditsAfter": {
+        "restock": 0,
+        "soldout": 41
+      },
+      "passed": true
+    },
+    {
+      "notificationsEnabled": false,
+      "memberActive": true,
+      "followStatus": "active",
+      "restockCredits": 0,
+      "soldoutCredits": 41,
+      "rounds": [
+        {
+          "scanned": 1,
+          "status": "unavailable",
+          "observedAt": "2026-09-15T02:00:00.000Z",
+          "knownAt": "2026-09-15T02:00:00.000Z",
+          "source": "auto"
+        },
+        {
+          "scanned": 1,
+          "status": "available",
+          "observedAt": "2026-09-15T02:01:00.000Z",
+          "knownAt": "2026-09-15T02:01:00.000Z",
+          "source": "auto"
+        },
+        {
+          "scanned": 1,
+          "status": "available",
+          "observedAt": "2026-09-15T02:02:00.000Z",
+          "knownAt": "2026-09-15T02:02:00.000Z",
+          "source": "auto"
+        }
+      ],
+      "simulatedUpstreamRequests": 3,
+      "manualQueries": 0,
+      "senderStubCalls": 0,
+      "skippedNotifications": [
+        {
+          "eventType": "restock_confirmed",
+          "status": "skipped",
+          "reason": "notifications_disabled"
+        }
+      ],
+      "creditsAfter": {
+        "restock": 0,
+        "soldout": 41
+      },
+      "passed": true
+    }
+  ]
+}

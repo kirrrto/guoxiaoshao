@@ -1,0 +1,12 @@
+
+> guoxiaoshao@3.0.0 check
+> node tools/check-source.mjs
+
+{
+  "files": 499,
+  "javaScript": 350,
+  "json": 47,
+  "pages": 6,
+  "operatorPages": 1,
+  "errors": []
+}

@@ -1,0 +1,37 @@
+{
+  "checkedAt": "2026-09-20T06:07:56.281Z",
+  "scope": "Downloaded cloud archives compared to all local source files, excluding node_modules",
+  "deployed": [
+    {
+      "function": "gxs_api",
+      "version": "1.1.6",
+      "sdkVersion": "4.0.2",
+      "crcVerified": true,
+      "sourceFilesMatched": 55,
+      "differences": [],
+      "extraSourceFiles": [],
+      "sha256": "864cc1df322b63ea3b655db9377b28b37ec7e2e97eef38ad3eedd086b40d7cc4"
+    },
+    {
+      "function": "gxs_monitor",
+      "version": "1.1.6",
+      "sdkVersion": "4.0.2",
+      "crcVerified": true,
+      "sourceFilesMatched": 33,
+      "differences": [],
+      "extraSourceFiles": [],
+      "sha256": "ad868e544e1a6604acae7fef15b12a0dff608d85deeff35d6e3830e6ed4b343a"
+    },
+    {
+      "function": "cloudbase_auth",
+      "version": "1.1.6",
+      "sdkVersion": "4.0.2",
+      "crcVerified": true,
+      "sourceFilesMatched": 4,
+      "differences": [],
+      "extraSourceFiles": [],
+      "sha256": "9f220dff09dacbff54617f748ac8cc512befe02a99e57f27512eb5deb51b0d9e"
+    }
+  ],
+  "passed": true
+}

@@ -1,0 +1,46 @@
+{
+  "version": "1.4.1",
+  "scope": "Apply the existing v1.4.0 restock and sold-out configuration from SUBSCRIBE_SETUP.md; no forced messages or credit grants",
+  "requestId": "e8b89c99-d80c-4d37-8e39-ea8031960a9b",
+  "serverTime": "2026-09-28T02:33:59.338Z",
+  "ok": true,
+  "patch": {
+    "notifications": {
+      "cooldownMinutes": 0,
+      "templateIds": {
+        "restock": "qcfmYZuvfallzFUAVrEaRsWw4vtnwpucYMaao65OzCw",
+        "soldout": "0km1cSmh23x-cHRGw4UXzx6aTFLInWjQMoXhHuywK5M"
+      },
+      "soldoutFields": {
+        "status": "thing1",
+        "time": "time2",
+        "product": "thing12",
+        "quantity": "number6",
+        "store": "thing19"
+      }
+    }
+  },
+  "before": {
+    "templateIds": {
+      "restock": "qcfmYZuvfallzFUAVrEaRsWw4vtnwpucYMaao65OzCw"
+    },
+    "cooldownMinutes": 30
+  },
+  "after": {
+    "templateIds": {
+      "restock": "qcfmYZuvfallzFUAVrEaRsWw4vtnwpucYMaao65OzCw",
+      "soldout": "0km1cSmh23x-cHRGw4UXzx6aTFLInWjQMoXhHuywK5M"
+    },
+    "cooldownMinutes": 0,
+    "soldoutFields": {
+      "product": "thing12",
+      "store": "thing19",
+      "time": "time2",
+      "status": "thing1",
+      "quantity": "number6"
+    }
+  },
+  "otherConfigPreserved": true,
+  "otherNotificationSettingsPreserved": true,
+  "physicalDelivery": "not verified; member consent for sold-out template required"
+}

@@ -1,0 +1,348 @@
+{
+  "recordedAt": "2026-09-16T01:27:23.910Z",
+  "scope": "Actual cloud environment read/write evidence; notification delivery remains disabled",
+  "environment": "flowermean-6gjaxfqhf6c13e88",
+  "deployment": [
+    {
+      "function": "gxs_monitor",
+      "success": true,
+      "data": {
+        "action": "updateFunctionCode",
+        "functionName": "gxs_monitor",
+        "raw": {
+          "RequestId": "bef5ec78-b65a-462d-91a2-d9b31fa5dfbc"
+        }
+      },
+      "message": "已更新函数 gxs_monitor 的代码",
+      "nextActions": [
+        {
+          "tool": "queryFunctions",
+          "action": "getFunctionDetail",
+          "reason": "确认最新函数配置"
+        }
+      ]
+    },
+    {
+      "function": "gxs_api",
+      "success": true,
+      "data": {
+        "action": "updateFunctionCode",
+        "functionName": "gxs_api",
+        "raw": {
+          "RequestId": "210c000e-95c0-4cee-b8bc-fa32f266dfc0"
+        }
+      },
+      "message": "已更新函数 gxs_api 的代码",
+      "nextActions": [
+        {
+          "tool": "queryFunctions",
+          "action": "getFunctionDetail",
+          "reason": "确认最新函数配置"
+        }
+      ]
+    },
+    {
+      "function": "cloudbase_auth",
+      "success": true,
+      "data": {
+        "action": "updateFunctionCode",
+        "functionName": "cloudbase_auth",
+        "raw": {
+          "RequestId": "0b6ea0cc-4a46-41dc-a504-3e0ac1597b9c"
+        }
+      },
+      "message": "已更新函数 cloudbase_auth 的代码",
+      "nextActions": [
+        {
+          "tool": "queryFunctions",
+          "action": "getFunctionDetail",
+          "reason": "确认最新函数配置"
+        }
+      ]
+    }
+  ],
+  "timerGuard": [
+    {
+      "requestId": "d27608d7-bb1c-4a19-96da-0b9e6c74f5be",
+      "source": "TRIGGER_TIMER",
+      "time": "1789521780643",
+      "result": "{\"ok\":true,\"state\":\"process_disabled\",\"source\":null,\"triggerSource\":\"timer\",\"runEnvironment\":\"SCF\"}"
+    },
+    {
+      "requestId": "9ca5c55a-1000-46bc-93fd-1f02b6e40443",
+      "source": "TRIGGER_TIMER",
+      "time": "1789521720570",
+      "result": "{\"ok\":false,\"reason\":\"timer_only\",\"source\":null,\"hasUser\":false,\"diagnostics\":{\"tcbSource\":null,\"wxSource\":null,\"wxContextKeys\":[],\"contextKeys\":[\"succeed\",\"fail\",\"callbackWaitsForEmptyEventLoop\",\"getRemainingTimeInMillis\",\"tencentcloud_appid\",\"tencentcloud_uin\",\"time_limit_in_ms\",\"request_id\",\"environment\",\"namespace\",\"memory_limit_in_mb\",\"environ\",\"function_version\",\"function_name\",\"tencentcloud_region\"],\"runtimeKeyNames\":[\"TRIGGER_SRC\"]}}"
+    }
+  ],
+  "enabledAt": "2026-09-16T01:24:03.043Z",
+  "beforeLatest": {
+    "success": true,
+    "requestId": "f27a613c-2f24-4fb5-ad63-f57b28183aea",
+    "data": [
+      {
+        "_id": "R577|MJYE4CH/A",
+        "knownAt": "2026-09-16T00:13:12.073Z",
+        "lastReason": null,
+        "observedAt": "2026-09-16T00:13:12.073Z",
+        "partNumber": "MJYE4CH/A",
+        "pickupDisplay": "unavailable",
+        "productTitle": "iPhone 18 Pro Max 512GB 冰川蓝色",
+        "quote": "暂无供应",
+        "sampleCount": 5,
+        "source": "manual",
+        "status": "unavailable",
+        "statusSince": "2026-09-15T07:33:06.893Z",
+        "storeName": "天环广场",
+        "storeNumber": "R577",
+        "unknownCount": 0,
+        "unknownSince": null
+      },
+      {
+        "_id": "R639|MJYE4CH/A",
+        "knownAt": "2026-09-16T00:13:11.877Z",
+        "lastReason": null,
+        "observedAt": "2026-09-16T00:13:11.877Z",
+        "partNumber": "MJYE4CH/A",
+        "pickupDisplay": "unavailable",
+        "productTitle": "iPhone 18 Pro Max 512GB 冰川蓝色",
+        "quote": "暂无供应",
+        "sampleCount": 5,
+        "source": "manual",
+        "status": "unavailable",
+        "statusSince": "2026-09-15T07:33:07.387Z",
+        "storeName": "珠江新城",
+        "storeNumber": "R639",
+        "unknownCount": 0,
+        "unknownSince": null
+      }
+    ],
+    "total": 2,
+    "pager": {
+      "Offset": 0,
+      "Limit": 5,
+      "Total": 2
+    },
+    "message": "文档查询成功",
+    "collection": "gxs_latest",
+    "collectionName": "gxs_latest"
+  },
+  "initialAutoLatest": {
+    "success": true,
+    "requestId": "e7adf5c7-5a7b-46e4-996b-2406ae050d47",
+    "data": [
+      {
+        "_id": "R577|MJYE4CH/A",
+        "knownAt": "2026-09-16T01:26:02.587Z",
+        "lastReason": null,
+        "observedAt": "2026-09-16T01:26:02.587Z",
+        "partNumber": "MJYE4CH/A",
+        "pickupDisplay": "unavailable",
+        "productTitle": "iPhone 18 Pro Max 512GB 冰川蓝色",
+        "quote": "暂无供应",
+        "sampleCount": 6,
+        "source": "auto",
+        "status": "unavailable",
+        "statusSince": "2026-09-15T07:33:06.893Z",
+        "storeName": "天环广场",
+        "storeNumber": "R577",
+        "unknownCount": 0,
+        "unknownSince": null
+      },
+      {
+        "_id": "R639|MJYE4CH/A",
+        "knownAt": "2026-09-16T01:26:02.834Z",
+        "lastReason": null,
+        "observedAt": "2026-09-16T01:26:02.834Z",
+        "partNumber": "MJYE4CH/A",
+        "pickupDisplay": "unavailable",
+        "productTitle": "iPhone 18 Pro Max 512GB 冰川蓝色",
+        "quote": "暂无供应",
+        "sampleCount": 7,
+        "source": "auto",
+        "status": "unavailable",
+        "statusSince": "2026-09-15T07:33:07.387Z",
+        "storeName": "珠江新城",
+        "storeNumber": "R639",
+        "unknownCount": 0,
+        "unknownSince": null
+      }
+    ],
+    "total": 2,
+    "pager": {
+      "Offset": 0,
+      "Limit": 5,
+      "Total": 2
+    },
+    "message": "文档查询成功",
+    "collection": "gxs_latest",
+    "collectionName": "gxs_latest"
+  },
+  "initialAutoHeartbeat": {
+    "success": true,
+    "requestId": "02189193-9d2a-4c82-bad6-1aa6e03c78f7",
+    "data": [
+      {
+        "_id": "collector_status",
+        "breaker": {
+          "reason": null,
+          "state": "closed",
+          "until": null
+        },
+        "budget": {
+          "allowed": true,
+          "dayCount": 4,
+          "maxRequestsPerDay": 10000,
+          "maxRequestsPerMinute": 60,
+          "minuteCount": 2,
+          "reason": null
+        },
+        "expiresAt": "2026-09-16T01:28:33.729Z",
+        "groupCount": 2,
+        "inFlight": 0,
+        "intervalMs": 60000,
+        "maxConcurrency": 2,
+        "mode": "scheduled",
+        "nextRunAt": "2026-09-16T01:27:00.000Z",
+        "notifications": {
+          "enabled": false,
+          "reason": "notifications_disabled"
+        },
+        "ownerId": "timer-c4204b2a-0840-4e5e-9e1e-a97f71829fa8",
+        "scheduler": {
+          "breaker": {
+            "failures": [],
+            "openedAt": null,
+            "probeInFlight": false,
+            "reason": null,
+            "state": "closed",
+            "trips": 0,
+            "until": null
+          },
+          "targets": [
+            {
+              "failures": 0,
+              "health": {
+                "consecutiveFailures": 0,
+                "failures": 0,
+                "lastError": "observation_persistence_failed",
+                "lastFailureAt": null,
+                "lastPersistedAt": 1789521963126,
+                "lastRequestAt": 1789521961398,
+                "lastSuccessAt": 1789521962587,
+                "latency": {
+                  "count": 2,
+                  "maxMs": 929,
+                  "sumMs": 1735
+                },
+                "persistenceFailed": false,
+                "persistenceFailures": 1,
+                "requestInterval": {
+                  "count": 1,
+                  "maxMs": 58349,
+                  "sumMs": 58349
+                },
+                "requests": 2,
+                "successInterval": {
+                  "count": 1,
+                  "maxMs": 57876,
+                  "sumMs": 57876
+                },
+                "successes": 2
+              },
+              "key": "R577|MJYE4CH/A",
+              "nextDueAt": 1789522020000
+            },
+            {
+              "failures": 0,
+              "health": {
+                "consecutiveFailures": 0,
+                "failures": 0,
+                "lastError": null,
+                "lastFailureAt": null,
+                "lastPersistedAt": 1789521963353,
+                "lastRequestAt": 1789521961398,
+                "lastSuccessAt": 1789521962834,
+                "latency": {
+                  "count": 2,
+                  "maxMs": 1179,
+                  "sumMs": 2065
+                },
+                "persistenceFailed": false,
+                "persistenceFailures": 0,
+                "requestInterval": {
+                  "count": 1,
+                  "maxMs": 58349,
+                  "sumMs": 58349
+                },
+                "requests": 2,
+                "successInterval": {
+                  "count": 1,
+                  "maxMs": 58138,
+                  "sumMs": 58138
+                },
+                "successes": 2
+              },
+              "key": "R639|MJYE4CH/A",
+              "nextDueAt": 1789522020000
+            }
+          ],
+          "version": 1
+        },
+        "state": "running",
+        "stats": {
+          "batches": 2,
+          "events": 0,
+          "lastBatchAt": "2026-09-16T01:26:03.231Z",
+          "observations": 2,
+          "sent": 0,
+          "tasks": 0
+        },
+        "updatedAt": "2026-09-16T01:26:03.729Z"
+      }
+    ],
+    "total": 1,
+    "pager": {
+      "Offset": 0,
+      "Limit": 1,
+      "Total": 1
+    },
+    "message": "文档查询成功",
+    "collection": "gxs_config",
+    "collectionName": "gxs_config"
+  },
+  "functionRules": {
+    "success": true,
+    "data": {
+      "action": "getResourcePermission",
+      "envId": "flowermean-6gjaxfqhf6c13e88",
+      "resourceType": "function",
+      "resourceId": "gxs_monitor",
+      "aclTag": "CUSTOM",
+      "permissions": [
+        {
+          "Resource": "",
+          "Permission": "CUSTOM",
+          "ResourceType": "function",
+          "SecurityRule": "{\"*\":{\"invoke\":\"auth != null\"},\"gxs_monitor\":{\"invoke\":false}}"
+        }
+      ],
+      "hints": [],
+      "raw": {
+        "RequestId": "a17bb825-7155-41a0-916e-2c240786cf9f",
+        "Data": {
+          "TotalCount": 1,
+          "PermissionList": [
+            {
+              "Resource": "",
+              "Permission": "CUSTOM",
+              "ResourceType": "function",
+              "SecurityRule": "{\"*\":{\"invoke\":\"auth != null\"},\"gxs_monitor\":{\"invoke\":false}}"
+            }
+          ]
+        }
+      }
+    },
+    "message": "资源权限查询成功"
+  }
+}

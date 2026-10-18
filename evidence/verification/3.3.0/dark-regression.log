@@ -1,0 +1,22 @@
+TAP version 13
+# Subtest: window and tab colors follow the system theme through complete theme.json variables
+ok 1 - window and tab colors follow the system theme through complete theme.json variables
+  ---
+  duration_ms: 0.596416
+  type: 'test'
+  ...
+# Subtest: every stylesheet with light surfaces carries a dark-mode block at its end
+ok 2 - every stylesheet with light surfaces carries a dark-mode block at its end
+  ---
+  duration_ms: 0.97675
+  type: 'test'
+  ...
+1..2
+# tests 2
+# suites 0
+# pass 2
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 39.009958

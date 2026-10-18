@@ -1,0 +1,154 @@
+TAP version 13
+# Subtest: a changed announcement or same-id edited notice lights the unread indicator again
+ok 1 - a changed announcement or same-id edited notice lights the unread indicator again
+  ---
+  duration_ms: 1.874458
+  type: 'test'
+  ...
+# Subtest: an open notice board removes expired content locally and releases its timer on unload
+ok 2 - an open notice board removes expired content locally and releases its timer on unload
+  ---
+  duration_ms: 17.219209
+  type: 'test'
+  ...
+# Subtest: notice refresh failure keeps valid prior content and does not fabricate recovery
+ok 3 - notice refresh failure keeps valid prior content and does not fabricate recovery
+  ---
+  duration_ms: 9.374333
+  type: 'test'
+  ...
+# Subtest: a late notice read cannot update an unloaded page
+ok 4 - a late notice read cannot update an unloaded page
+  ---
+  duration_ms: 5.335916
+  type: 'test'
+  ...
+# Subtest: stale available observations remain explicit historical evidence, not current availability
+ok 5 - stale available observations remain explicit historical evidence, not current availability
+  ---
+  duration_ms: 13.678208
+  type: 'test'
+  ...
+# Subtest: fresh available follow has an actionable summary and explains no repeat notifications
+ok 6 - fresh available follow has an actionable summary and explains no repeat notifications
+  ---
+  duration_ms: 7.193042
+  type: 'test'
+  ...
+# Subtest: querying a follow carries its permitted targets without running or charging a stock query
+ok 7 - querying a follow carries its permitted targets without running or charging a stock query
+  ---
+  duration_ms: 6.122083
+  type: 'test'
+  ...
+# Subtest: refresh status is single flight and never opens a permission prompt or stock query
+ok 8 - refresh status is single flight and never opens a permission prompt or stock query
+  ---
+  duration_ms: 5.5875
+  type: 'test'
+  ...
+# Subtest: a previous account refresh cannot claim delivery status has refreshed for the next account
+ok 9 - a previous account refresh cannot claim delivery status has refreshed for the next account
+  ---
+  duration_ms: 8.4655
+  type: 'test'
+  ...
+# Subtest: the dated rate-limit notice expires exactly at the confirmed end in both runtimes
+ok 10 - the dated rate-limit notice expires exactly at the confirmed end in both runtimes
+  ---
+  duration_ms: 4.408375
+  type: 'test'
+  ...
+# Subtest: expired cached content has no board row, banner or unread indicator
+ok 11 - expired cached content has no board row, banner or unread indicator
+  ---
+  duration_ms: 0.652334
+  type: 'test'
+  ...
+# Subtest: retiring the old incident does not hide a new same-title notice or unrelated content
+ok 12 - retiring the old incident does not hide a new same-title notice or unrelated content
+  ---
+  duration_ms: 0.352375
+  type: 'test'
+  ...
+# Subtest: the confirmed end never extends an earlier expiry or allows a later one
+ok 13 - the confirmed end never extends an earlier expiry or allows a later one
+  ---
+  duration_ms: 1.450041
+  type: 'test'
+  ...
+# Subtest: backend notice rows use the same request clock as the banner, not the machine clock
+ok 14 - backend notice rows use the same request clock as the banner, not the machine clock
+  ---
+  duration_ms: 0.671542
+  type: 'test'
+  ...
+# Subtest: an already open board removes the legacy row at its inferred end without another request
+ok 15 - an already open board removes the legacy row at its inferred end without another request
+  ---
+  duration_ms: 9.521459
+  type: 'test'
+  ...
+# Subtest: legacy string announcements stay until the operator clears them
+ok 16 - legacy string announcements stay until the operator clears them
+  ---
+  duration_ms: 0.39325
+  type: 'test'
+  ...
+# Subtest: structured announcements hide themselves after expiresAt without claiming recovery
+ok 17 - structured announcements hide themselves after expiresAt without claiming recovery
+  ---
+  duration_ms: 0.169583
+  type: 'test'
+  ...
+# Subtest: active maintenance banners render and win over collector noise
+ok 18 - active maintenance banners render and win over collector noise
+  ---
+  duration_ms: 0.064375
+  type: 'test'
+  ...
+# Subtest: blocked WeChat subscribe permission is a recoverable query banner
+ok 19 - blocked WeChat subscribe permission is a recoverable query banner
+  ---
+  duration_ms: 0.092083
+  type: 'test'
+  ...
+# Subtest: without an announcement, a live collector fault shows the actual abnormal state
+ok 20 - without an announcement, a live collector fault shows the actual abnormal state
+  ---
+  duration_ms: 0.094792
+  type: 'test'
+  ...
+# Subtest: healthy service with no announcement shows no banner
+ok 21 - healthy service with no announcement shows no banner
+  ---
+  duration_ms: 0.044834
+  type: 'test'
+  ...
+# Subtest: not-yet-started announcements stay hidden
+ok 22 - not-yet-started announcements stay hidden
+  ---
+  duration_ms: 0.070208
+  type: 'test'
+  ...
+# Subtest: notice board keeps only live rows and exposes titles
+ok 23 - notice board keeps only live rows and exposes titles
+  ---
+  duration_ms: 0.106792
+  type: 'test'
+  ...
+# Subtest: opening the notice board clears the red dot until a new notice appears
+ok 24 - opening the notice board clears the red dot until a new notice appears
+  ---
+  duration_ms: 0.698916
+  type: 'test'
+  ...
+1..24
+# tests 24
+# suites 0
+# pass 24
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 119.896209

@@ -1,0 +1,39 @@
+{
+  "output": "/tmp/gxs-v330-notifications",
+  "snapshots": 160,
+  "pages": [
+    "notification-test"
+  ],
+  "scenarios": [
+    "notification-test-ready",
+    "notification-test-no-quota",
+    "notification-test-accepted",
+    "notification-test-uncertain",
+    "notification-test-failed",
+    "notification-test-received",
+    "notification-test-not-received",
+    "notification-test-authorized",
+    "notification-test-authorized-no-quota",
+    "notification-test-sending",
+    "notification-test-pending-other",
+    "notification-test-error",
+    "notification-test-loading",
+    "notification-test-rules",
+    "notification-test-needs-authorization",
+    "notification-test-uncertain-received"
+  ],
+  "widths": [
+    320,
+    360,
+    375,
+    390,
+    393,
+    414,
+    430,
+    480,
+    768,
+    1024
+  ],
+  "remoteImages": false,
+  "expressionErrors": 0
+}

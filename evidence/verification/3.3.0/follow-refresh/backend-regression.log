@@ -1,0 +1,574 @@
+TAP version 13
+# Subtest: continuous availability cadence is explicit and defaults to disabled
+ok 1 - continuous availability cadence is explicit and defaults to disabled
+  ---
+  duration_ms: 2.139833
+  type: 'test'
+  ...
+# Subtest: persisted available results remain on the three-second cadence beyond the old twenty-second quiet window
+ok 2 - persisted available results remain on the three-second cadence beyond the old twenty-second quiet window
+  ---
+  duration_ms: 4.428833
+  type: 'test'
+  ...
+# Subtest: a known non-available result stops the availability cadence without creating another status-change burst
+ok 3 - a known non-available result stops the availability cadence without creating another status-change burst
+  ---
+  duration_ms: 0.400459
+  type: 'test'
+  ...
+# Subtest: unknown and failed or superseded persistence never establish continued availability
+ok 4 - unknown and failed or superseded persistence never establish continued availability
+  ---
+  duration_ms: 0.707042
+  type: 'test'
+  ...
+# Subtest: available cadence survives checkpoints and an old or future checkpoint cannot invent availability
+ok 5 - available cadence survives checkpoints and an old or future checkpoint cannot invent availability
+  ---
+  duration_ms: 0.785958
+  type: 'test'
+  ...
+# Subtest: explicit enable and disable apply to resident and restored schedules without clearing guard waits
+ok 6 - explicit enable and disable apply to resident and restored schedules without clearing guard waits
+  ---
+  duration_ms: 0.312709
+  type: 'test'
+  ...
+# Subtest: availability mode preserves per-store spacing and Retry-After even when change bursts are disabled
+ok 7 - availability mode preserves per-store spacing and Retry-After even when change bursts are disabled
+  ---
+  duration_ms: 14.15175
+  type: 'test'
+  ...
+# Subtest: the collector wires explicit availability cadence through real local observations and retains guarded admission
+ok 8 - the collector wires explicit availability cadence through real local observations and retains guarded admission
+  ---
+  duration_ms: 30.272375
+  type: 'test'
+  ...
+# Subtest: an enabled available target still waits for actual capacity and stops requesting after another worker owns the lease
+ok 9 - an enabled available target still waits for actual capacity and stops requesting after another worker owns the lease
+  ---
+  duration_ms: 6.823291
+  type: 'test'
+  ...
+# Subtest: scheduled same-store SKU batches wait for enabled availability spacing even while every product is unavailable
+ok 10 - scheduled same-store SKU batches wait for enabled availability spacing even while every product is unavailable
+  ---
+  duration_ms: 13.19575
+  type: 'test'
+  ...
+# Subtest: restock then sell-out: each confirmed by a 2s re-check, sent on its own template, cooling down separately
+ok 11 - restock then sell-out: each confirmed by a 2s re-check, sent on its own template, cooling down separately
+  ---
+  duration_ms: 80.63
+  type: 'test'
+  ...
+# Subtest: a one-sample flicker sends nothing, in either direction
+ok 12 - a one-sample flicker sends nothing, in either direction
+  ---
+  duration_ms: 36.39225
+  type: 'test'
+  ...
+# Subtest: sell-out alerts need their own template and are for members only
+ok 13 - sell-out alerts need their own template and are for members only
+  ---
+  duration_ms: 11.570666
+  type: 'test'
+  ...
+# Subtest: with no cooldown every new restock and sell-out is sent; the fast cadence ends 20s after the last change
+ok 14 - with no cooldown every new restock and sell-out is sent; the fast cadence ends 20s after the last change
+  ---
+  duration_ms: 15.02025
+  type: 'test'
+  ...
+# Subtest: scheduler burst mode only speeds a store up, spaces checks and survives a cold start
+ok 15 - scheduler burst mode only speeds a store up, spaces checks and survives a cold start
+  ---
+  duration_ms: 0.358833
+  type: 'test'
+  ...
+# Subtest: a run lasts as long as the platform allows, with a margin
+ok 16 - a run lasts as long as the platform allows, with a margin
+  ---
+  duration_ms: 0.062958
+  type: 'test'
+  ...
+# Subtest: a slow notification backlog cannot consume the scheduled scan window before inventory starts
+ok 17 - a slow notification backlog cannot consume the scheduled scan window before inventory starts
+  ---
+  duration_ms: 48.058125
+  type: 'test'
+  ...
+# Subtest: an exceptional scheduled exit waits for the one active send before releasing its lease
+ok 18 - an exceptional scheduled exit waits for the one active send before releasing its lease
+  ---
+  duration_ms: 9.570375
+  type: 'test'
+  ...
+# Subtest: inventory reversal during a concurrent credit reservation is rechecked before sending and refunds the permission
+ok 19 - inventory reversal during a concurrent credit reservation is rechecked before sending and refunds the permission
+  ---
+  duration_ms: 7.977667
+  type: 'test'
+  ...
+# Subtest: a shorter healthy no-stock cadence takes effect on the next cold start, including legacy checkpoints
+ok 20 - a shorter healthy no-stock cadence takes effect on the next cold start, including legacy checkpoints
+  ---
+  duration_ms: 12.102375
+  type: 'test'
+  ...
+# Subtest: changing the normal cadence preserves source backoff, shared admission, and unexplained future due times
+ok 21 - changing the normal cadence preserves source backoff, shared admission, and unexplained future due times
+  ---
+  duration_ms: 0.319125
+  type: 'test'
+  ...
+# Subtest: capacity-driven four-minute observations recover when target count falls without raising request budgets
+ok 22 - capacity-driven four-minute observations recover when target count falls without raising request budgets
+  ---
+  duration_ms: 33.56875
+  type: 'test'
+  ...
+# Subtest: follow presentation separates the last attempted check from the last valid inventory observation
+ok 23 - follow presentation separates the last attempted check from the last valid inventory observation
+  ---
+  duration_ms: 0.439291
+  type: 'test'
+  ...
+# Subtest: a newly saved follow receives current confirmed availability without waiting for a new stock transition or upstream request
+ok 24 - a newly saved follow receives current confirmed availability without waiting for a new stock transition or upstream request
+  ---
+  duration_ms: 8.063958
+  type: 'test'
+  ...
+# Subtest: resume and replenishing consent recover continued availability missed while paused or lacking credits
+ok 25 - resume and replenishing consent recover continued availability missed while paused or lacking credits
+  ---
+  duration_ms: 8.788791
+  type: 'test'
+  ...
+# Subtest: old skipped transition records do not permanently suppress a fresh current-state reminder
+ok 26 - old skipped transition records do not permanently suppress a fresh current-state reminder
+  ---
+  duration_ms: 1.622625
+  type: 'test'
+  ...
+# Subtest: accepted or uncertain current delivery is never replayed by consent, pause/resume, cooldown expiry, restart, or history deletion
+ok 27 - accepted or uncertain current delivery is never replayed by consent, pause/resume, cooldown expiry, restart, or history deletion
+  ---
+  duration_ms: 6.056708
+  type: 'test'
+  ...
+# Subtest: legacy accepted transition and cooldown documents prevent a duplicate during rollout
+ok 28 - legacy accepted transition and cooldown documents prevent a duplicate during rollout
+  ---
+  duration_ms: 1.972
+  type: 'test'
+  ...
+# Subtest: stale, unknown, future, unconfirmed and no-stock samples cannot trigger current-state delivery
+ok 29 - stale, unknown, future, unconfirmed and no-stock samples cannot trigger current-state delivery
+  ---
+  duration_ms: 6.379083
+  type: 'test'
+  ...
+# Subtest: a legacy latest row with two known observations can deliver current availability without a new schema migration
+ok 30 - a legacy latest row with two known observations can deliver current availability without a new schema migration
+  ---
+  duration_ms: 1.777334
+  type: 'test'
+  ...
+# Subtest: quiet-hour samples are not replayed after DND; a newly confirmed sample outside quiet hours can notify
+ok 31 - quiet-hour samples are not replayed after DND; a newly confirmed sample outside quiet hours can notify
+  ---
+  duration_ms: 3.778583
+  type: 'test'
+  ...
+# Subtest: a confirmed new no-stock phase resets the episode, but a one-sample blip and coverage gap do not
+ok 32 - a confirmed new no-stock phase resets the episode, but a one-sample blip and coverage gap do not
+  ---
+  duration_ms: 2.918875
+  type: 'test'
+  ...
+# Subtest: final stock recheck prevents delivery if inventory changes after planning, without losing a permission
+ok 33 - final stock recheck prevents delivery if inventory changes after planning, without losing a permission
+  ---
+  duration_ms: 0.869917
+  type: 'test'
+  ...
+# Subtest: explicitly expired WeChat authorization can recover with fresh consent, while unknown sends remain blocked
+ok 34 - explicitly expired WeChat authorization can recover with fresh consent, while unknown sends remain blocked
+  ---
+  duration_ms: 8.316125
+  type: 'test'
+  ...
+# Subtest: concurrent normal and current-state senders reserve only one permission for an availability episode
+ok 35 - concurrent normal and current-state senders reserve only one permission for an availability episode
+  ---
+  duration_ms: 4.4385
+  type: 'test'
+  ...
+# Subtest: scheduled cold starts persist the catch-up cursor so accounts past the first page are serviced
+ok 36 - scheduled cold starts persist the catch-up cursor so accounts past the first page are serviced
+  ---
+  duration_ms: 160.822167
+  type: 'test'
+  ...
+# Subtest: a large stale outbox cannot block new useful alerts, and reserved or uncertain sends are never refunded/replayed by expiry
+ok 37 - a large stale outbox cannot block new useful alerts, and reserved or uncertain sends are never refunded/replayed by expiry
+  ---
+  duration_ms: 10.597375
+  type: 'test'
+  ...
+# Subtest: explicit temporary platform failures retry only after backoff and a fresh confirmed sample
+ok 38 - explicit temporary platform failures retry only after backoff and a fresh confirmed sample
+  ---
+  duration_ms: 1.262667
+  type: 'test'
+  ...
+# Subtest: failures proven to occur before the message endpoint back off exponentially without consuming permission
+ok 39 - failures proven to occur before the message endpoint back off exponentially without consuming permission
+  ---
+  duration_ms: 1.229792
+  type: 'test'
+  ...
+# Subtest: current-state fallback respects the original transition sender backoff
+ok 40 - current-state fallback respects the original transition sender backoff
+  ---
+  duration_ms: 0.556667
+  type: 'test'
+  ...
+# Subtest: reauthorization after hiding or clearing a failed attempt creates a visible receipt and a readable message deep link
+ok 41 - reauthorization after hiding or clearing a failed attempt creates a visible receipt and a readable message deep link
+  ---
+  duration_ms: 3.189625
+  type: 'test'
+  ...
+# Subtest: unknown breaks consecutive confirmation for both restock and sold-out alerts
+ok 42 - unknown breaks consecutive confirmation for both restock and sold-out alerts
+  ---
+  duration_ms: 17.448
+  type: 'test'
+  ...
+# Subtest: re-reading a waiting event cannot extend the 20-second quiet period
+ok 43 - re-reading a waiting event cannot extend the 20-second quiet period
+  ---
+  duration_ms: 3.564542
+  type: 'test'
+  ...
+# Subtest: unconfirmed stock separated by an unknown sample cannot create a phantom sold-out alert
+ok 44 - unconfirmed stock separated by an unknown sample cannot create a phantom sold-out alert
+  ---
+  duration_ms: 2.999042
+  type: 'test'
+  ...
+# Subtest: an unconfirmed sold-out dip with an unknown sample cannot duplicate the restock alert
+ok 45 - an unconfirmed sold-out dip with an unknown sample cannot duplicate the restock alert
+  ---
+  duration_ms: 2.974417
+  type: 'test'
+  ...
+# Subtest: legacy confirmed availability survives an unknown gap during upgrade and can still alert on sold-out
+ok 46 - legacy confirmed availability survives an unknown gap during upgrade and can still alert on sold-out
+  ---
+  duration_ms: 2.55875
+  type: 'test'
+  ...
+# Subtest: refreshing the same interval preserves a running burst and its next re-check
+ok 47 - refreshing the same interval preserves a running burst and its next re-check
+  ---
+  duration_ms: 2.883
+  type: 'test'
+  ...
+# Subtest: scheduled pickup timeout fits the remaining budget and retains time to persist results
+ok 48 - scheduled pickup timeout fits the remaining budget and retains time to persist results
+  ---
+  duration_ms: 4.073417
+  type: 'test'
+  ...
+# Subtest: a deadline reached during credit reservation prevents the send and restores the subscription credit
+ok 49 - a deadline reached during credit reservation prevents the send and restores the subscription credit
+  ---
+  duration_ms: 3.259208
+  type: 'test'
+  ...
+# Subtest: consumer message token and send requests share the per-attempt time budget
+ok 50 - consumer message token and send requests share the per-attempt time budget
+  ---
+  duration_ms: 0.914959
+  type: 'test'
+  ...
+# Subtest: split SKU groups share the same-store interval across target changes and cold starts
+ok 51 - split SKU groups share the same-store interval across target changes and cold starts
+  ---
+  duration_ms: 7.760625
+  type: 'test'
+  ...
+# Subtest: a scheduled scan still visits all same-store SKU batches after spacing them out
+ok 52 - a scheduled scan still visits all same-store SKU batches after spacing them out
+  ---
+  duration_ms: 3.173542
+  type: 'test'
+  ...
+# Subtest: slow database admission cannot compress actual same-store HTTP starts below two seconds
+ok 53 - slow database admission cannot compress actual same-store HTTP starts below two seconds
+  ---
+  duration_ms: 6.669917
+  type: 'test'
+  ...
+# Subtest: pickup timeout uses the actual lease time left after a slow renewal
+ok 54 - pickup timeout uses the actual lease time left after a slow renewal
+  ---
+  duration_ms: 1.00125
+  type: 'test'
+  ...
+# Subtest: message timeout uses the actual lease time left after the final renewal
+ok 55 - message timeout uses the actual lease time left after the final renewal
+  ---
+  duration_ms: 2.939125
+  type: 'test'
+  ...
+# Subtest: token probe timeout also reserves time inside the actual remaining lease
+ok 56 - token probe timeout also reserves time inside the actual remaining lease
+  ---
+  duration_ms: 0.950709
+  type: 'test'
+  ...
+# Subtest: a confirmed pending restock is skipped if stock changed again before delivery
+ok 57 - a confirmed pending restock is skipped if stock changed again before delivery
+  ---
+  duration_ms: 13.795291
+  type: 'test'
+  ...
+# Subtest: unknown latest or missing latest cannot deliver a previously confirmed pending restock
+ok 58 - unknown latest or missing latest cannot deliver a previously confirmed pending restock
+  ---
+  duration_ms: 4.098959
+  type: 'test'
+  ...
+# Subtest: send-time reread after reservation suppresses a stock reversal and restores the authorization
+ok 59 - send-time reread after reservation suppresses a stock reversal and restores the authorization
+  ---
+  duration_ms: 2.876
+  type: 'test'
+  ...
+# Subtest: changes during the final lease renewal are reread before handing a notification to WeChat
+ok 60 - changes during the final lease renewal are reread before handing a notification to WeChat
+  ---
+  duration_ms: 7.612417
+  type: 'test'
+  ...
+# Subtest: final policy reads still cannot send after the claim expires or the worker budget runs out
+ok 61 - final policy reads still cannot send after the claim expires or the worker budget runs out
+  ---
+  duration_ms: 5.286083
+  type: 'test'
+  ...
+# Subtest: an event expiring while its credit is reserved is not sent and the credit is restored
+ok 62 - an event expiring while its credit is reserved is not sent and the credit is restored
+  ---
+  duration_ms: 2.481583
+  type: 'test'
+  ...
+# Subtest: malformed or implausibly future event time cannot bypass notification expiry
+ok 63 - malformed or implausibly future event time cannot bypass notification expiry
+  ---
+  duration_ms: 2.253375
+  type: 'test'
+  ...
+# Subtest: a valid confirmed current restock is delivered only once across competing calls
+ok 64 - a valid confirmed current restock is delivered only once across competing calls
+  ---
+  duration_ms: 3.0595
+  type: 'test'
+  ...
+# Subtest: an expired sender cannot replay a claim reconciled by another worker
+ok 65 - an expired sender cannot replay a claim reconciled by another worker
+  ---
+  duration_ms: 1.126375
+  type: 'test'
+  ...
+# Subtest: a message attempt is bounded by its task claim even without a collector deadline
+ok 66 - a message attempt is bounded by its task claim even without a collector deadline
+  ---
+  duration_ms: 1.3375
+  type: 'test'
+  ...
+# Subtest: resident availability sampling persists while five controlled slow notifications are sent serially
+ok 67 - resident availability sampling persists while five controlled slow notifications are sent serially
+  ---
+  duration_ms: 49.902542
+  type: 'test'
+  ...
+# Subtest: concurrent notification kicks share one work promise and one coalesced follow-up pass
+ok 68 - concurrent notification kicks share one work promise and one coalesced follow-up pass
+  ---
+  duration_ms: 21.251916
+  type: 'test'
+  ...
+# Subtest: resident stop joins the existing send and starts no later notification
+ok 69 - resident stop joins the existing send and starts no later notification
+  ---
+  duration_ms: 10.025208
+  type: 'test'
+  ...
+# Subtest: a lost collector lease fences queued notifications and subsequent HTTP after the in-flight send settles
+ok 70 - a lost collector lease fences queued notifications and subsequent HTTP after the in-flight send settles
+  ---
+  duration_ms: 5.266167
+  type: 'test'
+  ...
+# Subtest: default resident batches await delivery while scheduled batches join the same serial outbox separately
+ok 71 - default resident batches await delivery while scheduled batches join the same serial outbox separately
+  ---
+  duration_ms: 13.608917
+  type: 'test'
+  ...
+# Subtest: a delayed notification config read cannot roll back a newer collector configuration
+ok 72 - a delayed notification config read cannot roll back a newer collector configuration
+  ---
+  duration_ms: 6.699958
+  type: 'test'
+  ...
+# Subtest: scheduled budget survives the SCF Node.js 20 remaining-time helper failure
+ok 73 - scheduled budget survives the SCF Node.js 20 remaining-time helper failure
+  ---
+  duration_ms: 0.448875
+  type: 'test'
+  ...
+# Subtest: scheduled budget preserves the platform method receiver and reserves cleanup time
+ok 74 - scheduled budget preserves the platform method receiver and reserves cleanup time
+  ---
+  duration_ms: 0.339125
+  type: 'test'
+  ...
+# Subtest: production monitor entry publishes a fresh heartbeat when the platform time helper throws
+ok 75 - production monitor entry publishes a fresh heartbeat when the platform time helper throws
+  ---
+  duration_ms: 28.42325
+  type: 'test'
+  ...
+# Subtest: scheduled function trusts platform SOURCE and rejects all forged client Timer events
+ok 76 - scheduled function trusts platform SOURCE and rejects all forged client Timer events
+  ---
+  duration_ms: 0.121416
+  type: 'test'
+  ...
+# Subtest: request-scoped SCF environment overrides warm-instance markers and exposes no secrets
+ok 77 - request-scoped SCF environment overrides warm-instance markers and exposes no secrets
+  ---
+  duration_ms: 0.274209
+  type: 'test'
+  ...
+# Subtest: minute scans keep real availability state; a restock is re-checked every 2s and sent once confirmed
+ok 78 - minute scans keep real availability state; a restock is re-checked every 2s and sent once confirmed
+  ---
+  duration_ms: 50.930083
+  type: 'test'
+  ...
+# Subtest: cold-start jitter does not skip a new minute or duplicate the same minute
+ok 79 - cold-start jitter does not skip a new minute or duplicate the same minute
+  ---
+  duration_ms: 5.168292
+  type: 'test'
+  ...
+# Subtest: deadline carries unfinished stores before recently scanned stores into the next minute
+ok 80 - deadline carries unfinished stores before recently scanned stores into the next minute
+  ---
+  duration_ms: 4.213
+  type: 'test'
+  ...
+# Subtest: failed observation persistence is visible and never reported as a successful batch
+ok 81 - failed observation persistence is visible and never reported as a successful batch
+  ---
+  duration_ms: 1.152458
+  type: 'test'
+  ...
+# Subtest: scheduled monitor remains useful with missing message credentials and has honest delivery readiness
+ok 82 - scheduled monitor remains useful with missing message credentials and has honest delivery readiness
+  ---
+  duration_ms: 1.694084
+  type: 'test'
+  ...
+# Subtest: a persisted 429 Retry-After survives the next function cold start
+ok 83 - a persisted 429 Retry-After survives the next function cold start
+  ---
+  duration_ms: 1.672833
+  type: 'test'
+  ...
+# Subtest: a shared capacity pause bounds admission checks across hundreds of stores and cold starts
+ok 84 - a shared capacity pause bounds admission checks across hundreds of stores and cold starts
+  ---
+  duration_ms: 2.217875
+  type: 'test'
+  ...
+# Subtest: continuous mode migrates legacy daily checkpoints and resumes the same day
+ok 85 - continuous mode migrates legacy daily checkpoints and resumes the same day
+  ---
+  duration_ms: 7.61725
+  type: 'test'
+  ...
+# Subtest: daily checkpoint migration leaves an existing source 429 pause intact
+ok 86 - daily checkpoint migration leaves an existing source 429 pause intact
+  ---
+  duration_ms: 1.095833
+  type: 'test'
+  ...
+# Subtest: continuous migration recovers all 17 legacy midnight targets after idle heartbeats lost the daily reason
+ok 87 - continuous migration recovers all 17 legacy midnight targets after idle heartbeats lost the daily reason
+  ---
+  duration_ms: 27.58925
+  type: 'test'
+  ...
+# Subtest: legacy midnight migration needs persisted exhaustion and does not reset ordinary future targets
+ok 88 - legacy midnight migration needs persisted exhaustion and does not reset ordinary future targets
+  ---
+  duration_ms: 1.747417
+  type: 'test'
+  ...
+# Subtest: legacy idle-heartbeat migration preserves the real source pause and reconstructed failure backoff
+ok 89 - legacy idle-heartbeat migration preserves the real source pause and reconstructed failure backoff
+  ---
+  duration_ms: 0.624875
+  type: 'test'
+  ...
+# Subtest: deadline is respected, and a manual-query restock is confirmed by one prompt re-check before sending
+ok 90 - deadline is respected, and a manual-query restock is confirmed by one prompt re-check before sending
+  ---
+  duration_ms: 10.441792
+  type: 'test'
+  ...
+# Subtest: another active lease prevents timer traffic and heartbeat clobbering
+ok 91 - another active lease prevents timer traffic and heartbeat clobbering
+  ---
+  duration_ms: 0.210958
+  type: 'test'
+  ...
+# Subtest: readiness distinguishes stale worker, missing credentials and configured sender
+ok 92 - readiness distinguishes stale worker, missing credentials and configured sender
+  ---
+  duration_ms: 0.07625
+  type: 'test'
+  ...
+# Subtest: observation transaction fences out a worker whose lease changed after its request started
+ok 93 - observation transaction fences out a worker whose lease changed after its request started
+  ---
+  duration_ms: 0.324208
+  type: 'test'
+  ...
+# Subtest: a real short-phrase template status is supported without permitting mismatched product fields
+ok 94 - a real short-phrase template status is supported without permitting mismatched product fields
+  ---
+  duration_ms: 0.691458
+  type: 'test'
+  ...
+1..94
+# tests 94
+# suites 0
+# pass 94
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 336.118125

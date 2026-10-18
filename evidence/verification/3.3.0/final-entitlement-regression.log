@@ -1,0 +1,544 @@
+TAP version 13
+# Subtest: an accepted template is recorded even when WeChat filters the other template
+ok 1 - an accepted template is recorded even when WeChat filters the other template
+  ---
+  duration_ms: 25.97
+  type: 'test'
+  ...
+# Subtest: all filtered templates do not create an empty pending authorization or lose existing credits
+ok 2 - all filtered templates do not create an empty pending authorization or lose existing credits
+  ---
+  duration_ms: 16.535125
+  type: 'test'
+  ...
+# Subtest: one shared authorization reports both outcomes accurately: accept/accept
+ok 3 - one shared authorization reports both outcomes accurately: accept/accept
+  ---
+  duration_ms: 26.687625
+  type: 'test'
+  ...
+# Subtest: one shared authorization reports both outcomes accurately: reject/accept
+ok 4 - one shared authorization reports both outcomes accurately: reject/accept
+  ---
+  duration_ms: 28.625917
+  type: 'test'
+  ...
+# Subtest: one shared authorization reports both outcomes accurately: accept/reject
+ok 5 - one shared authorization reports both outcomes accurately: accept/reject
+  ---
+  duration_ms: 8.644458
+  type: 'test'
+  ...
+# Subtest: a banned restock choice is identified without hiding the other successful authorization
+ok 6 - a banned restock choice is identified without hiding the other successful authorization
+  ---
+  duration_ms: 16.186708
+  type: 'test'
+  ...
+# Subtest: a banned soldout choice is identified without hiding the other successful authorization
+ok 7 - a banned soldout choice is identified without hiding the other successful authorization
+  ---
+  duration_ms: 13.929875
+  type: 'test'
+  ...
+# Subtest: a free account is blocked from authorization and asked to become a member
+ok 8 - a free account is blocked from authorization and asked to become a member
+  ---
+  duration_ms: 10.980875
+  type: 'test'
+  ...
+# Subtest: the shared reminder status distinguishes missing 断货 credits from available 到货 credits
+ok 9 - the shared reminder status distinguishes missing 断货 credits from available 到货 credits
+  ---
+  duration_ms: 9.247125
+  type: 'test'
+  ...
+# Subtest: the shared reminder status distinguishes missing 到货 credits from available 断货 credits
+ok 10 - the shared reminder status distinguishes missing 到货 credits from available 断货 credits
+  ---
+  duration_ms: 11.718459
+  type: 'test'
+  ...
+# Subtest: zero credits for both templates ask for one combined authorization
+ok 11 - zero credits for both templates ask for one combined authorization
+  ---
+  duration_ms: 9.883916
+  type: 'test'
+  ...
+# Subtest: accepting only restock enables reminders without requiring optional sold-out consent
+ok 12 - accepting only restock enables reminders without requiring optional sold-out consent
+  ---
+  duration_ms: 7.702167
+  type: 'test'
+  ...
+# Subtest: a balance of 5/1 identifies 断货 as the reminder type needing top-up
+ok 13 - a balance of 5/1 identifies 断货 as the reminder type needing top-up
+  ---
+  duration_ms: 14.44075
+  type: 'test'
+  ...
+# Subtest: a balance of 5/2 identifies 断货 as the reminder type needing top-up
+ok 14 - a balance of 5/2 identifies 断货 as the reminder type needing top-up
+  ---
+  duration_ms: 9.883875
+  type: 'test'
+  ...
+# Subtest: a balance of 1/5 identifies 到货 as the reminder type needing top-up
+ok 15 - a balance of 1/5 identifies 到货 as the reminder type needing top-up
+  ---
+  duration_ms: 8.281208
+  type: 'test'
+  ...
+# Subtest: a balance of 2/5 identifies 到货 as the reminder type needing top-up
+ok 16 - a balance of 2/5 identifies 到货 as the reminder type needing top-up
+  ---
+  duration_ms: 8.974708
+  type: 'test'
+  ...
+# Subtest: both sufficient balances describe both configured reminder types as ready
+ok 17 - both sufficient balances describe both configured reminder types as ready
+  ---
+  duration_ms: 7.800583
+  type: 'test'
+  ...
+# Subtest: members below the recommended buffer are nudged to stockpile at least 10 sends of each type
+ok 18 - members below the recommended buffer are nudged to stockpile at least 10 sends of each type
+  ---
+  duration_ms: 27.442792
+  type: 'test'
+  ...
+# Subtest: sold-out credit broadcasts retain restock readiness and recompute optional type availability without an account fetch
+ok 19 - sold-out credit broadcasts retain restock readiness and recompute optional type availability without an account fetch
+  ---
+  duration_ms: 7.74575
+  type: 'test'
+  ...
+# Subtest: an unconfigured sold-out template does not block existing restock-only membership reminders
+ok 20 - an unconfigured sold-out template does not block existing restock-only membership reminders
+  ---
+  duration_ms: 9.069791
+  type: 'test'
+  ...
+# Subtest: uncertain dual-template synchronization retries the same record without a second native prompt or optimistic credit increment
+ok 21 - uncertain dual-template synchronization retries the same record without a second native prompt or optimistic credit increment
+  ---
+  duration_ms: 12.543334
+  type: 'test'
+  ...
+# Subtest: rapid taps of the combined button share one native prompt and one dual-template record
+ok 22 - rapid taps of the combined button share one native prompt and one dual-template record
+  ---
+  duration_ms: 14.512709
+  type: 'test'
+  ...
+# Subtest: a native response containing only restock records only that result and explains both reminder outcomes
+ok 23 - a native response containing only restock records only that result and explains both reminder outcomes
+  ---
+  duration_ms: 11.033625
+  type: 'test'
+  ...
+# Subtest: a native response containing only soldout records only that result and explains both reminder outcomes
+ok 24 - a native response containing only soldout records only that result and explains both reminder outcomes
+  ---
+  duration_ms: 7.280833
+  type: 'test'
+  ...
+# Subtest: a queued restock-only silent grant keeps its ID and explains that sold-out credits were not added
+ok 25 - a queued restock-only silent grant keeps its ID and explains that sold-out credits were not added
+  ---
+  duration_ms: 11.791583
+  type: 'test'
+  ...
+# Subtest: replayed authorization uses the current server balances even when both original grants have already been consumed
+ok 26 - replayed authorization uses the current server balances even when both original grants have already been consumed
+  ---
+  duration_ms: 11.924959
+  type: 'test'
+  ...
+# Subtest: rejecting or banning both choices preserves the confirmed balances and never announces an increment
+ok 27 - rejecting or banning both choices preserves the confirmed balances and never announces an increment
+  ---
+  duration_ms: 7.461125
+  type: 'test'
+  ...
+# Subtest: the balance uses server confirmation while inline feedback labels the native consent: restock-A
+ok 28 - the balance uses server confirmation while inline feedback labels the native consent: restock-A
+  ---
+  duration_ms: 10.612583
+  type: 'test'
+  ...
+# Subtest: the balance uses server confirmation while inline feedback labels the native consent: soldout-B
+ok 29 - the balance uses server confirmation while inline feedback labels the native consent: soldout-B
+  ---
+  duration_ms: 6.947583
+  type: 'test'
+  ...
+# Subtest: the balance uses server confirmation while inline feedback labels the native consent: none
+ok 30 - the balance uses server confirmation while inline feedback labels the native consent: none
+  ---
+  duration_ms: 6.309583
+  type: 'test'
+  ...
+# Subtest: both pages keep one optional shared authorization panel and expose direct top-up and synchronization retry
+ok 31 - both pages keep one optional shared authorization panel and expose direct top-up and synchronization retry
+  ---
+  duration_ms: 0.522625
+  type: 'test'
+  ...
+# Subtest: a changed announcement or same-id edited notice lights the unread indicator again
+ok 32 - a changed announcement or same-id edited notice lights the unread indicator again
+  ---
+  duration_ms: 1.706333
+  type: 'test'
+  ...
+# Subtest: an open notice board removes expired content locally and releases its timer on unload
+ok 33 - an open notice board removes expired content locally and releases its timer on unload
+  ---
+  duration_ms: 11.395542
+  type: 'test'
+  ...
+# Subtest: notice refresh failure keeps valid prior content and does not fabricate recovery
+ok 34 - notice refresh failure keeps valid prior content and does not fabricate recovery
+  ---
+  duration_ms: 7.235333
+  type: 'test'
+  ...
+# Subtest: a late notice read cannot update an unloaded page
+ok 35 - a late notice read cannot update an unloaded page
+  ---
+  duration_ms: 5.789208
+  type: 'test'
+  ...
+# Subtest: stale available observations remain explicit historical evidence, not current availability
+ok 36 - stale available observations remain explicit historical evidence, not current availability
+  ---
+  duration_ms: 19.9625
+  type: 'test'
+  ...
+# Subtest: fresh available follow has an actionable summary and explains no repeat notifications
+ok 37 - fresh available follow has an actionable summary and explains no repeat notifications
+  ---
+  duration_ms: 20.951042
+  type: 'test'
+  ...
+# Subtest: querying a follow carries its permitted targets without running or charging a stock query
+ok 38 - querying a follow carries its permitted targets without running or charging a stock query
+  ---
+  duration_ms: 21.652584
+  type: 'test'
+  ...
+# Subtest: refresh status is single flight and never opens a permission prompt or stock query
+ok 39 - refresh status is single flight and never opens a permission prompt or stock query
+  ---
+  duration_ms: 16.043625
+  type: 'test'
+  ...
+# Subtest: a previous account refresh cannot claim delivery status has refreshed for the next account
+ok 40 - a previous account refresh cannot claim delivery status has refreshed for the next account
+  ---
+  duration_ms: 21.290292
+  type: 'test'
+  ...
+# Subtest: turning on a follow is distinct from the actual background collector state
+ok 41 - turning on a follow is distinct from the actual background collector state
+  ---
+  duration_ms: 113.977542
+  type: 'test'
+  ...
+# Subtest: missing subscription template gives a specific actionable reason without invoking WeChat authorization
+ok 42 - missing subscription template gives a specific actionable reason without invoking WeChat authorization
+  ---
+  duration_ms: 8.731125
+  type: 'test'
+  ...
+# Subtest: configuration enabled alone never claims that delivery is running
+ok 43 - configuration enabled alone never claims that delivery is running
+  ---
+  duration_ms: 10.548041
+  type: 'test'
+  ...
+# Subtest: sender and credential faults are presented in plain language, never as a user pause
+ok 44 - sender and credential faults are presented in plain language, never as a user pause
+  ---
+  duration_ms: 66.874291
+  type: 'test'
+  ...
+# Subtest: authorization counts the current restock template and excludes obsolete credits
+ok 45 - authorization counts the current restock template and excludes obsolete credits
+  ---
+  duration_ms: 11.555834
+  type: 'test'
+  ...
+# Subtest: ready service still requires the personal message switch, valid credits and a permitted time
+ok 46 - ready service still requires the personal message switch, valid credits and a permitted time
+  ---
+  duration_ms: 6.503458
+  type: 'test'
+  ...
+# Subtest: paused follows stay paused while a collector is running, and resume uses the real API
+ok 47 - paused follows stay paused while a collector is running, and resume uses the real API
+  ---
+  duration_ms: 8.228708
+  type: 'test'
+  ...
+# Subtest: refreshing service status reads bootstrap and follows without issuing a stock query
+ok 48 - refreshing service status reads bootstrap and follows without issuing a stock query
+  ---
+  duration_ms: 10.408334
+  type: 'test'
+  ...
+# Subtest: collapsed follow summaries count only fresh permitted stores and age cached availability without a cloud request
+ok 49 - collapsed follow summaries count only fresh permitted stores and age cached availability without a cloud request
+  ---
+  duration_ms: 9.138667
+  type: 'test'
+  ...
+# Subtest: all-limited, missing, restricted and unknown summaries cannot advertise current pickup availability or a fabricated timestamp
+ok 50 - all-limited, missing, restricted and unknown summaries cannot advertise current pickup availability or a fabricated timestamp
+  ---
+  duration_ms: 59.8225
+  type: 'test'
+  ...
+# Subtest: returning from native authorization ages cached observations locally while preserving card expansion and order
+ok 51 - returning from native authorization ages cached observations locally while preserving card expansion and order
+  ---
+  duration_ms: 13.425458
+  type: 'test'
+  ...
+# Subtest: paid annual exposes 5×4, monthly 4×4 while weekly, gifts and expiry-only membership stay 3×3
+ok 52 - paid annual exposes 5×4, monthly 4×4 while weekly, gifts and expiry-only membership stay 3×3
+  ---
+  duration_ms: 18.476625
+  type: 'test'
+  ...
+# Subtest: existing annual receipts gain the fifth configuration on read without changing price, expiry, quota or order
+ok 53 - existing annual receipts gain the fifth configuration on read without changing price, expiry, quota or order
+  ---
+  duration_ms: 0.578583
+  type: 'test'
+  ...
+# Subtest: annual fifth slot is transactionally bounded and participates in monitoring and notification planning
+ok 54 - annual fifth slot is transactionally bounded and participates in monitoring and notification planning
+  ---
+  duration_ms: 20.6025
+  type: 'test'
+  ...
+# Subtest: annual expiry and refund remove only the fifth slot while preserving later monthly rights and saved configurations
+ok 55 - annual expiry and refund remove only the fifth slot while preserving later monthly rights and saved configurations
+  ---
+  duration_ms: 13.284917
+  type: 'test'
+  ...
+# Subtest: legacy paid segment migration uses hidden confirmed orders and never changes days or unrelated account data
+ok 56 - legacy paid segment migration uses hidden confirmed orders and never changes days or unrelated account data
+  ---
+  duration_ms: 0.857334
+  type: 'test'
+  ...
+# Subtest: cross-account, unconfirmed, mismatched and missing order evidence cannot upgrade legacy segments
+ok 57 - cross-account, unconfirmed, mismatched and missing order evidence cannot upgrade legacy segments
+  ---
+  duration_ms: 6.70875
+  type: 'test'
+  ...
+# Subtest: mixed renewals upgrade immediately and only the unconsumed monthly/yearly segments keep the extra slots
+ok 58 - mixed renewals upgrade immediately and only the unconsumed monthly/yearly segments keep the extra slots
+  ---
+  duration_ms: 0.945458
+  type: 'test'
+  ...
+# Subtest: concurrent new follows cannot exceed four and downgrade keeps data while enforcing stable slot ownership
+ok 59 - concurrent new follows cannot exceed four and downgrade keeps data while enforcing stable slot ownership
+  ---
+  duration_ms: 4.270292
+  type: 'test'
+  ...
+# Subtest: collector and planning exclude downgraded fourth configuration and store without deleting saved targets
+ok 60 - collector and planning exclude downgraded fourth configuration and store without deleting saved targets
+  ---
+  duration_ms: 3.573458
+  type: 'test'
+  ...
+# Subtest: a refund after subscription reservation prevents sending the fourth-store alert and returns the credit
+ok 61 - a refund after subscription reservation prevents sending the fourth-store alert and returns the credit
+  ---
+  duration_ms: 3.123083
+  type: 'test'
+  ...
+# Subtest: four-store queries use server-owned membership limits and respect a tighter operational cap
+ok 62 - four-store queries use server-owned membership limits and respect a tighter operational cap
+  ---
+  duration_ms: 14.049167
+  type: 'test'
+  ...
+# Subtest: monthly alternatives accept four colors and stores through read-only evidence, weekly callers cannot forge that scope
+ok 63 - monthly alternatives accept four colors and stores through read-only evidence, weekly callers cannot forge that scope
+  ---
+  duration_ms: 4.004541
+  type: 'test'
+  ...
+# Subtest: a downgrade between service validation and the follow transaction cannot save a fourth store
+ok 64 - a downgrade between service validation and the follow transaction cannot save a fourth store
+  ---
+  duration_ms: 0.878917
+  type: 'test'
+  ...
+# Subtest: ordinary and enhanced indexed accounts avoid per-user follow scans while paused slots retain their order after downgrade
+ok 65 - ordinary and enhanced indexed accounts avoid per-user follow scans while paused slots retain their order after downgrade
+  ---
+  duration_ms: 4.303166
+  type: 'test'
+  ...
+# Subtest: concurrent metadata migration and refund cannot resurrect monthly slots or overwrite weekly balance
+ok 66 - concurrent metadata migration and refund cannot resurrect monthly slots or overwrite weekly balance
+  ---
+  duration_ms: 1.032042
+  type: 'test'
+  ...
+# Subtest: refund removes only the unconsumed days of the refunded order, preserving a later purchase
+ok 67 - refund removes only the unconsumed days of the refunded order, preserving a later purchase
+  ---
+  duration_ms: 6.774083
+  type: 'test'
+  ...
+# Subtest: an already consumed order cannot revoke the later order currently being used
+ok 68 - an already consumed order cannot revoke the later order currently being used
+  ---
+  duration_ms: 2.618417
+  type: 'test'
+  ...
+# Subtest: redemption shares the entitlement ledger and survives a refund of the preceding paid order
+ok 69 - redemption shares the entitlement ledger and survives a refund of the preceding paid order
+  ---
+  duration_ms: 1.798583
+  type: 'test'
+  ...
+# Subtest: legacy membership stays unattributed and an old order refund cannot deduct its baseline or regrant it
+ok 70 - legacy membership stays unattributed and an old order refund cannot deduct its baseline or regrant it
+  ---
+  duration_ms: 0.93125
+  type: 'test'
+  ...
+# Subtest: partial refunds use cumulative money amounts, ignoring duplicate and out-of-order smaller amounts
+ok 71 - partial refunds use cumulative money amounts, ignoring duplicate and out-of-order smaller amounts
+  ---
+  duration_ms: 4.505625
+  type: 'test'
+  ...
+# Subtest: later partial-refund increments are capped by that order remaining time after consumption
+ok 72 - later partial-refund increments are capped by that order remaining time after consumption
+  ---
+  duration_ms: 2.075625
+  type: 'test'
+  ...
+# Subtest: partial refund before fulfilment requires payment confirmation and grants the paid net duration once
+ok 73 - partial refund before fulfilment requires payment confirmation and grants the paid net duration once
+  ---
+  duration_ms: 2.089958
+  type: 'test'
+  ...
+# Subtest: paid-before-fulfil partial refund grants only the net days and a full refund prohibits fulfilment
+ok 74 - paid-before-fulfil partial refund grants only the net days and a full refund prohibits fulfilment
+  ---
+  duration_ms: 2.039459
+  type: 'test'
+  ...
+# Subtest: a confirmed full refund that precedes payment confirmation cannot be revived by a delayed paid event
+ok 75 - a confirmed full refund that precedes payment confirmation cannot be revived by a delayed paid event
+  ---
+  duration_ms: 4.458083
+  type: 'test'
+  ...
+# Subtest: fulfilment racing a partial refund produces the same net entitlement in either transaction ordering
+ok 76 - fulfilment racing a partial refund produces the same net entitlement in either transaction ordering
+  ---
+  duration_ms: 3.185208
+  type: 'test'
+  ...
+# Subtest: fulfilment racing a full refund never leaves membership active or harms an unrelated purchase
+ok 77 - fulfilment racing a full refund never leaves membership active or harms an unrelated purchase
+  ---
+  duration_ms: 5.041334
+  type: 'test'
+  ...
+# Subtest: concurrent cumulative refunds converge to the highest confirmed amount without duplicate revocation
+ok 78 - concurrent cumulative refunds converge to the highest confirmed amount without duplicate revocation
+  ---
+  duration_ms: 4.594458
+  type: 'test'
+  ...
+# Subtest: clock rollback never resurrects consumed time or anchors a new grant before the last settlement
+ok 79 - clock rollback never resurrects consumed time or anchors a new grant before the last settlement
+  ---
+  duration_ms: 3.822875
+  type: 'test'
+  ...
+# Subtest: a refund write failure rolls back both the member ledger and order amounts, then retries exactly once
+ok 80 - a refund write failure rolls back both the member ledger and order amounts, then retries exactly once
+  ---
+  duration_ms: 7.182083
+  type: 'test'
+  ...
+# Subtest: fractional money ratios use exact cumulative milliseconds and invalid amounts leave state unchanged
+ok 81 - fractional money ratios use exact cumulative milliseconds and invalid amounts leave state unchanged
+  ---
+  duration_ms: 2.318375
+  type: 'test'
+  ...
+# Subtest: empty and expired legacy accounts start grants at the current accounting time and exhausted segments are removed
+ok 82 - empty and expired legacy accounts start grants at the current accounting time and exhausted segments are removed
+  ---
+  duration_ms: 0.141458
+  type: 'test'
+  ...
+# Subtest: legacy cached query keeps target and original timestamps while stock waits for an account-bound requery
+ok 83 - legacy cached query keeps target and original timestamps while stock waits for an account-bound requery
+  ---
+  duration_ms: 25.679208
+  type: 'test'
+  ...
+# Subtest: retained manual snapshot ages before pending account refresh settles on returning to the query page
+ok 84 - retained manual snapshot ages before pending account refresh settles on returning to the query page
+  ---
+  duration_ms: 19.321042
+  type: 'test'
+  ...
+# Subtest: visible manual snapshots age locally for free users and stop updating when hidden without new requests
+ok 85 - visible manual snapshots age locally for free users and stop updating when hidden without new requests
+  ---
+  duration_ms: 26.447375
+  type: 'test'
+  ...
+# Subtest: a manual query with missing or unknown observations cannot show a positive current-stock badge
+ok 86 - a manual query with missing or unknown observations cannot show a positive current-stock badge
+  ---
+  duration_ms: 19.945166
+  type: 'test'
+  ...
+# Subtest: selected-target follow uses current selection while result-card follow keeps its original query target
+ok 87 - selected-target follow uses current selection while result-card follow keeps its original query target
+  ---
+  duration_ms: 14.625209
+  type: 'test'
+  ...
+# Subtest: free users are guided to membership without opening the follow editor
+ok 88 - free users are guided to membership without opening the follow editor
+  ---
+  duration_ms: 23.722584
+  type: 'test'
+  ...
+# Subtest: incomplete or unsupported selections do not navigate to the follow editor
+ok 89 - incomplete or unsupported selections do not navigate to the follow editor
+  ---
+  duration_ms: 54.619416
+  type: 'test'
+  ...
+1..89
+# tests 89
+# suites 0
+# pass 89
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 480.273917

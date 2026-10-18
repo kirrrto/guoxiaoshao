@@ -1,0 +1,36 @@
+{
+  "scope": "Local follow-up only; production config unchanged",
+  "confirmedExpiry": "2026-10-16T20:20:00+08:00",
+  "match": {
+    "title": "接口限流说明",
+    "publishedAt": "2026-10-16T14:00:00+08:00"
+  },
+  "tests": {
+    "files": [
+      "tests/notice-expiry-regression.test.mjs",
+      "tests/query-notice.test.mjs",
+      "tests/delivery-experience-v330.test.mjs"
+    ],
+    "tests": 24,
+    "pass": 24,
+    "fail": 0,
+    "timezones": [
+      "UTC",
+      "Asia/Shanghai"
+    ],
+    "logFiles": [
+      "notice-expiry-utc.log",
+      "notice-expiry-shanghai.log"
+    ]
+  },
+  "productionConfigUpdated": false,
+  "deployed": false,
+  "changedFiles": [
+    "cloudfunctions/gxs_api/lib/services/users.js",
+    "miniprogram/utils/query-notice.js",
+    "miniprogram/pages/notice-board/index.js",
+    "tests/query-notice.test.mjs",
+    "tests/notice-expiry-regression.test.mjs",
+    "docs/RELEASE_3.3.0.md"
+  ]
+}

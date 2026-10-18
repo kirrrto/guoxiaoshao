@@ -1,0 +1,169 @@
+{
+  "checkedAt": "2026-09-28T02:48:02.410Z",
+  "scope": "Offline browser approximation, not WeChat device acceptance",
+  "passed": true,
+  "checks": [
+    {
+      "width": 320,
+      "colorScheme": "light",
+      "scenario": "monitor-dual-ready",
+      "buttonCount": 1,
+      "label": "增加提醒次数",
+      "buttonBottom": 419.234375,
+      "horizontalOverflow": false
+    },
+    {
+      "width": 320,
+      "colorScheme": "light",
+      "scenario": "monitor-dual-soldout-empty",
+      "buttonCount": 1,
+      "label": "增加提醒次数",
+      "buttonBottom": 419.234375,
+      "horizontalOverflow": false
+    },
+    {
+      "width": 320,
+      "colorScheme": "light",
+      "scenario": "monitor-dual-pending",
+      "buttonCount": 1,
+      "label": "同步授权",
+      "buttonBottom": 419.234375,
+      "horizontalOverflow": false
+    },
+    {
+      "width": 375,
+      "colorScheme": "light",
+      "scenario": "monitor-dual-ready",
+      "buttonCount": 1,
+      "label": "增加提醒次数",
+      "buttonBottom": 473.5,
+      "horizontalOverflow": false
+    },
+    {
+      "width": 375,
+      "colorScheme": "light",
+      "scenario": "monitor-dual-soldout-empty",
+      "buttonCount": 1,
+      "label": "增加提醒次数",
+      "buttonBottom": 473.5,
+      "horizontalOverflow": false
+    },
+    {
+      "width": 375,
+      "colorScheme": "light",
+      "scenario": "monitor-dual-pending",
+      "buttonCount": 1,
+      "label": "同步授权",
+      "buttonBottom": 473.5,
+      "horizontalOverflow": false
+    },
+    {
+      "width": 430,
+      "colorScheme": "light",
+      "scenario": "monitor-dual-ready",
+      "buttonCount": 1,
+      "label": "增加提醒次数",
+      "buttonBottom": 527.4375,
+      "horizontalOverflow": false
+    },
+    {
+      "width": 430,
+      "colorScheme": "light",
+      "scenario": "monitor-dual-soldout-empty",
+      "buttonCount": 1,
+      "label": "增加提醒次数",
+      "buttonBottom": 527.4375,
+      "horizontalOverflow": false
+    },
+    {
+      "width": 430,
+      "colorScheme": "light",
+      "scenario": "monitor-dual-pending",
+      "buttonCount": 1,
+      "label": "同步授权",
+      "buttonBottom": 527.4375,
+      "horizontalOverflow": false
+    },
+    {
+      "width": 320,
+      "colorScheme": "dark",
+      "scenario": "monitor-dual-ready",
+      "buttonCount": 1,
+      "label": "增加提醒次数",
+      "buttonBottom": 419.234375,
+      "horizontalOverflow": false
+    },
+    {
+      "width": 320,
+      "colorScheme": "dark",
+      "scenario": "monitor-dual-soldout-empty",
+      "buttonCount": 1,
+      "label": "增加提醒次数",
+      "buttonBottom": 419.234375,
+      "horizontalOverflow": false
+    },
+    {
+      "width": 320,
+      "colorScheme": "dark",
+      "scenario": "monitor-dual-pending",
+      "buttonCount": 1,
+      "label": "同步授权",
+      "buttonBottom": 419.234375,
+      "horizontalOverflow": false
+    },
+    {
+      "width": 375,
+      "colorScheme": "dark",
+      "scenario": "monitor-dual-ready",
+      "buttonCount": 1,
+      "label": "增加提醒次数",
+      "buttonBottom": 473.5,
+      "horizontalOverflow": false
+    },
+    {
+      "width": 375,
+      "colorScheme": "dark",
+      "scenario": "monitor-dual-soldout-empty",
+      "buttonCount": 1,
+      "label": "增加提醒次数",
+      "buttonBottom": 473.5,
+      "horizontalOverflow": false
+    },
+    {
+      "width": 375,
+      "colorScheme": "dark",
+      "scenario": "monitor-dual-pending",
+      "buttonCount": 1,
+      "label": "同步授权",
+      "buttonBottom": 473.5,
+      "horizontalOverflow": false
+    },
+    {
+      "width": 430,
+      "colorScheme": "dark",
+      "scenario": "monitor-dual-ready",
+      "buttonCount": 1,
+      "label": "增加提醒次数",
+      "buttonBottom": 527.4375,
+      "horizontalOverflow": false
+    },
+    {
+      "width": 430,
+      "colorScheme": "dark",
+      "scenario": "monitor-dual-soldout-empty",
+      "buttonCount": 1,
+      "label": "增加提醒次数",
+      "buttonBottom": 527.4375,
+      "horizontalOverflow": false
+    },
+    {
+      "width": 430,
+      "colorScheme": "dark",
+      "scenario": "monitor-dual-pending",
+      "buttonCount": 1,
+      "label": "同步授权",
+      "buttonBottom": 527.4375,
+      "horizontalOverflow": false
+    }
+  ]
+}

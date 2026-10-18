@@ -1,0 +1,14 @@
+<view wx:if="{{open}}" class="reminder-overlay" catchtouchmove="swallow" bindtap="dismiss">
+  <view class="reminder-dialog" role="dialog" aria-modal="true" aria-label="{{prompt.title}}" catchtap="swallow">
+    <view class="reminder-eyebrow">微信提醒</view>
+    <view class="reminder-title">{{prompt.title}}</view>
+    <view class="reminder-counts">
+      <view class="reminder-count"><text>到货</text><text class="reminder-number">{{prompt.restockCount}}<text class="reminder-unit"> 次</text></text></view>
+      <view wx:if="{{prompt.soldoutEnabled}}" class="reminder-count"><text>断货</text><text class="reminder-number">{{prompt.soldoutCount}}<text class="reminder-unit"> 次</text></text></view>
+    </view>
+    <view class="reminder-detail">{{prompt.detail}}</view>
+    <button class="reminder-allow" bindtap="authorize" loading="{{submitting}}" disabled="{{submitting}}">补充提醒次数</button>
+    <button class="reminder-later" bindtap="dismiss" disabled="{{submitting}}">稍后再说</button>
+    <view class="reminder-footnote">24 小时内不再主动提示</view>
+  </view>
+</view>

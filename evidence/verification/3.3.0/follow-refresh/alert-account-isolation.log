@@ -1,0 +1,238 @@
+TAP version 13
+# Subtest: a restock message opens that alert on the follow page once, with current stock, copy and feedback
+ok 1 - a restock message opens that alert on the follow page once, with current stock, copy and feedback
+  ---
+  duration_ms: 23.943042
+  type: 'test'
+  ...
+# Subtest: an expired or deleted alert explains itself instead of an empty card
+ok 2 - an expired or deleted alert explains itself instead of an empty card
+  ---
+  duration_ms: 7.399
+  type: 'test'
+  ...
+# Subtest: a Moments preview skips cloud access and explains how to open the full app
+ok 3 - a Moments preview skips cloud access and explains how to open the full app
+  ---
+  duration_ms: 2.057
+  type: 'test'
+  ...
+# Subtest: a sell-out message opens a sell-out card without the purchase question
+ok 4 - a sell-out message opens a sell-out card without the purchase question
+  ---
+  duration_ms: 7.940875
+  type: 'test'
+  ...
+# Subtest: a late purchase feedback cannot repaint an alert after close
+ok 5 - a late purchase feedback cannot repaint an alert after close
+  ---
+  duration_ms: 8.2735
+  type: 'test'
+  ...
+# Subtest: a late purchase feedback cannot repaint an alert after replace
+ok 6 - a late purchase feedback cannot repaint an alert after replace
+  ---
+  duration_ms: 7.044
+  type: 'test'
+  ...
+# Subtest: a late purchase feedback cannot repaint an alert after unload
+ok 7 - a late purchase feedback cannot repaint an alert after unload
+  ---
+  duration_ms: 14.0975
+  type: 'test'
+  ...
+# Subtest: a failed alert read has an explicit retry, and only a visible successful render acknowledges opening
+ok 8 - a failed alert read has an explicit retry, and only a visible successful render acknowledges opening
+  ---
+  duration_ms: 9.267333
+  type: 'test'
+  ...
+# Subtest: late details while hidden count only after a visible visit, and failed analytics retries without reloading stock
+ok 9 - late details while hidden count only after a visible visit, and failed analytics retries without reloading stock
+  ---
+  duration_ms: 7.866833
+  type: 'test'
+  ...
+# Subtest: closing an alert invalidates late detail reads without recording a presentation
+ok 10 - closing an alert invalidates late detail reads without recording a presentation
+  ---
+  duration_ms: 8.924666
+  type: 'test'
+  ...
+# Subtest: switching accounts clears a displayed alert and permits the new owner to open the same stock event
+ok 11 - switching accounts clears a displayed alert and permits the new owner to open the same stock event
+  ---
+  duration_ms: 25.302791
+  type: 'test'
+  ...
+# Subtest: an old-account detail success cannot replace the same event loading for a new account
+ok 12 - an old-account detail success cannot replace the same event loading for a new account
+  ---
+  duration_ms: 7.926875
+  type: 'test'
+  ...
+# Subtest: an old-account detail failure cannot replace the same event loading for a new account
+ok 13 - an old-account detail failure cannot replace the same event loading for a new account
+  ---
+  duration_ms: 7.903542
+  type: 'test'
+  ...
+# Subtest: returning to the original account does not revive that account previous outstanding detail read
+ok 14 - returning to the original account does not revive that account previous outstanding detail read
+  ---
+  duration_ms: 8.709292
+  type: 'test'
+  ...
+# Subtest: a queued open receipt is retired before dispatch if the account changes synchronously
+ok 15 - a queued open receipt is retired before dispatch if the account changes synchronously
+  ---
+  duration_ms: 6.819875
+  type: 'test'
+  ...
+# Subtest: closing and reopening before a queued receipt starts still acknowledges the new visible presentation once
+ok 16 - closing and reopening before a queued receipt starts still acknowledges the new visible presentation once
+  ---
+  duration_ms: 12.026583
+  type: 'test'
+  ...
+# Subtest: a late old-account open success cannot acknowledge or unlock the new account receipt, which can retry
+ok 17 - a late old-account open success cannot acknowledge or unlock the new account receipt, which can retry
+  ---
+  duration_ms: 8.233708
+  type: 'test'
+  ...
+# Subtest: a late old-account open failure cannot acknowledge or unlock the new account receipt, which can retry
+ok 18 - a late old-account open failure cannot acknowledge or unlock the new account receipt, which can retry
+  ---
+  duration_ms: 7.864625
+  type: 'test'
+  ...
+# Subtest: a late old-account feedback success cannot alter a new same-event card or its busy state
+ok 19 - a late old-account feedback success cannot alter a new same-event card or its busy state
+  ---
+  duration_ms: 6.56575
+  type: 'test'
+  ...
+# Subtest: a late old-account feedback failure cannot alter a new same-event card or its busy state
+ok 20 - a late old-account feedback failure cannot alter a new same-event card or its busy state
+  ---
+  duration_ms: 6.845958
+  type: 'test'
+  ...
+# Subtest: current-account feedback failures remain visible and retry can confirm a purchase and refresh follows
+ok 21 - current-account feedback failures remain visible and retry can confirm a purchase and refresh follows
+  ---
+  duration_ms: 6.360542
+  type: 'test'
+  ...
+# Subtest: closing and reopening the same event retires old feedback presentation but still refreshes its actual same-account pause
+ok 22 - closing and reopening the same event retires old feedback presentation but still refreshes its actual same-account pause
+  ---
+  duration_ms: 5.7775
+  type: 'test'
+  ...
+# Subtest: follow reads begin while bootstrap is pending and still publish if that account refresh fails
+ok 23 - follow reads begin while bootstrap is pending and still publish if that account refresh fails
+  ---
+  duration_ms: 24.162
+  type: 'test'
+  ...
+# Subtest: visible reads cap stale collector scheduling at 30 seconds and slow reads never overlap
+ok 24 - visible reads cap stale collector scheduling at 30 seconds and slow reads never overlap
+  ---
+  duration_ms: 8.358292
+  type: 'test'
+  ...
+# Subtest: hiding retires in-flight page updates and returning bypasses the 15-second settled follow cache
+ok 25 - hiding retires in-flight page updates and returning bypasses the 15-second settled follow cache
+  ---
+  duration_ms: 12.806208
+  type: 'test'
+  ...
+# Subtest: an account switch discovered during parallel reads discards the old records and reads the new owner
+ok 26 - an account switch discovered during parallel reads discards the old records and reads the new owner
+  ---
+  duration_ms: 8.010458
+  type: 'test'
+  ...
+# Subtest: an external account switch survives an old refresh success and keeps automatic polling alive
+ok 27 - an external account switch survives an old refresh success and keeps automatic polling alive
+  ---
+  duration_ms: 9.713417
+  type: 'test'
+  ...
+# Subtest: an external account switch survives an old refresh failure and keeps automatic polling alive
+ok 28 - an external account switch survives an old refresh failure and keeps automatic polling alive
+  ---
+  duration_ms: 11.644209
+  type: 'test'
+  ...
+# Subtest: offline stops polling and reconnect starts one immediate read across duplicate restoration callbacks
+ok 29 - offline stops polling and reconnect starts one immediate read across duplicate restoration callbacks
+  ---
+  duration_ms: 6.84675
+  type: 'test'
+  ...
+# Subtest: repeated read failures back off without losing the old observation or starting paid queries
+ok 30 - repeated read failures back off without losing the old observation or starting paid queries
+  ---
+  duration_ms: 7.511125
+  type: 'test'
+  ...
+# Subtest: offline visible records age into historical observations without network activity
+ok 31 - offline visible records age into historical observations without network activity
+  ---
+  duration_ms: 6.210625
+  type: 'test'
+  ...
+# Subtest: a slow old-account follow response cannot trigger an extra read or cross the confirmed account boundary
+ok 32 - a slow old-account follow response cannot trigger an extra read or cross the confirmed account boundary
+  ---
+  duration_ms: 6.966834
+  type: 'test'
+  ...
+# Subtest: cold startup completed in the background cannot paint, and the next visible visit starts normally
+ok 33 - cold startup completed in the background cannot paint, and the next visible visit starts normally
+  ---
+  duration_ms: 6.681583
+  type: 'test'
+  ...
+# Subtest: a quick return before cold startup settles resumes once without leaving the page loading forever
+ok 34 - a quick return before cold startup settles resumes once without leaving the page loading forever
+  ---
+  duration_ms: 7.935833
+  type: 'test'
+  ...
+# Subtest: paid users with plenty of authorization still see their own four-minute stock delay
+ok 35 - paid users with plenty of authorization still see their own four-minute stock delay
+  ---
+  duration_ms: 23.346792
+  type: 'test'
+  ...
+# Subtest: partial current availability is timed from its matching store and keeps the stale remainder visible
+ok 36 - partial current availability is timed from its matching store and keeps the stale remainder visible
+  ---
+  duration_ms: 7.208833
+  type: 'test'
+  ...
+# Subtest: a failed recent check cannot make the last valid in-stock result look recent
+ok 37 - a failed recent check cannot make the last valid in-stock result look recent
+  ---
+  duration_ms: 16.403167
+  type: 'test'
+  ...
+# Subtest: no-sample, paused and restricted targets never inflate the active delay summary
+ok 38 - no-sample, paused and restricted targets never inflate the active delay summary
+  ---
+  duration_ms: 25.621834
+  type: 'test'
+  ...
+1..38
+# tests 38
+# suites 0
+# pass 38
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 170.146375

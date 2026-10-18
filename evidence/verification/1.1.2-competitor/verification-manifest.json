@@ -1,0 +1,1347 @@
+{
+  "checkedAt": "2026-09-16T08:42:36.935Z",
+  "version": "1.1.2",
+  "sourcesStable": true,
+  "changedDuringChecks": [],
+  "results": [
+    {
+      "checkedAt": "2026-09-16T08:42:28.441Z",
+      "command": "node --test --test-reporter=tap tests/**/*.test.mjs",
+      "exitCode": 0,
+      "elapsedMs": 3000,
+      "tests": 321,
+      "suites": 0,
+      "pass": 321,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    {
+      "checkedAt": "2026-09-16T08:42:36.907Z",
+      "command": "node tools/check-source.mjs",
+      "exitCode": 0,
+      "elapsedMs": 11450
+    },
+    {
+      "checkedAt": "2026-09-16T08:42:34.271Z",
+      "command": "node tools/release/check.mjs",
+      "exitCode": 0,
+      "elapsedMs": 8803
+    }
+  ],
+  "sources": [
+    {
+      "file": "miniprogram/app.js",
+      "sha256": "9144ee338c94e59d5a13b9b6606d1872a8efd20c765764024700bfc036105a91"
+    },
+    {
+      "file": "miniprogram/app.json",
+      "sha256": "6bbf020443c3679a76cb41a462230e61ffe2912c613293ffa9db6134337a0cff"
+    },
+    {
+      "file": "miniprogram/app.wxss",
+      "sha256": "665a60577aa895632dec08502942b7a6aa13eaf40142500e7827e42c806bb469"
+    },
+    {
+      "file": "miniprogram/components/target-picker/index.js",
+      "sha256": "43e8cdcc8279b51afc90d27508af44ecee557deba495d32a5e2df9a2bbb5abd7"
+    },
+    {
+      "file": "miniprogram/components/target-picker/index.json",
+      "sha256": "035503c1a56d8b4b9227ce8bb9145fbd1ef8ec7dce59e55f9d5d55fb5eb7d566"
+    },
+    {
+      "file": "miniprogram/components/target-picker/index.wxml",
+      "sha256": "dde7f088c488a698dc9d4077e26f1247687b442d934eb2d1792dc9b8f5630ffc"
+    },
+    {
+      "file": "miniprogram/components/target-picker/index.wxss",
+      "sha256": "1eb2a03e5f464d3eeff0c5d3f5a3c27a6a9badcd2d9c5da8aa0e45d10387de46"
+    },
+    {
+      "file": "miniprogram/config/catalog-seed.js",
+      "sha256": "0cbf7906f9819608581e5b1f0113765f58bfd16b723d052a32aa9fa87ada6608"
+    },
+    {
+      "file": "miniprogram/config/cloud.js",
+      "sha256": "6ba9f31ce4a581a33cda1f9bc62514d85a39aa91a3b68d1c4148cfabf05d4c81"
+    },
+    {
+      "file": "miniprogram/config/product-images.js",
+      "sha256": "4620405635e68e3ca4c5b49c7e45baab5f4683430b6b84aa47172bbd2818f586"
+    },
+    {
+      "file": "miniprogram/custom-tab-bar/index.js",
+      "sha256": "764579d0db508a7af4964c16969f51f124130a894f5071a90c801dde3f70589d"
+    },
+    {
+      "file": "miniprogram/custom-tab-bar/index.json",
+      "sha256": "259c7940ae58eb9615eafe3ff71ac3fcab6be4390d2dce3176f5b5e895c9aa16"
+    },
+    {
+      "file": "miniprogram/custom-tab-bar/index.wxml",
+      "sha256": "0815bf08a7d475376855437e6448b7699ec0eed38b4a207a0b8fb626243b21a4"
+    },
+    {
+      "file": "miniprogram/custom-tab-bar/index.wxss",
+      "sha256": "14ac5fcdaca05c2ef6a950d56f965bccca155ce4f8179d121f0f5654e9516047"
+    },
+    {
+      "file": "miniprogram/pages/admin/index.js",
+      "sha256": "546eb1160747053cd06e545d5bf82c7ae4bbc3a2a147e6116a69184a2f7f2790"
+    },
+    {
+      "file": "miniprogram/pages/admin/index.json",
+      "sha256": "300930d2e9db34659cc69e3b084d6abe59cf8921264e0beb4f3cfedd8fca786f"
+    },
+    {
+      "file": "miniprogram/pages/admin/index.wxml",
+      "sha256": "1734db004e5a0448460c0461d175dc40bdfe94e3a303d0d6a9b982f148974c2a"
+    },
+    {
+      "file": "miniprogram/pages/admin/index.wxss",
+      "sha256": "cf9e98224184e69b5df463225331b3bbef55213b76355808f0ab8f02a3978f1c"
+    },
+    {
+      "file": "miniprogram/pages/follow/index.js",
+      "sha256": "47742cb321540f4fa7a2e8661bbc92480c5213415fa62d45c8b10ae6252c456f"
+    },
+    {
+      "file": "miniprogram/pages/follow/index.json",
+      "sha256": "bf0a13fac9d4d8c326a039df101f2d2d174e3fac4be6ee08611bcd67eee43cc6"
+    },
+    {
+      "file": "miniprogram/pages/follow/index.wxml",
+      "sha256": "6fef475dae8ab9c605b4e5376e774069a261826006cea6981aedbbf8078745e2"
+    },
+    {
+      "file": "miniprogram/pages/follow/index.wxss",
+      "sha256": "c4f3f185bc326162910304a461de3d05158259d6ec0858e8570b4d2256d13711"
+    },
+    {
+      "file": "miniprogram/pages/history/index.js",
+      "sha256": "f8f9f81e5ce92aa39517c9c495f2f9efdbb5149d82c80318a560521f8a3be7ba"
+    },
+    {
+      "file": "miniprogram/pages/history/index.json",
+      "sha256": "ecdcaecb8d978f88110346da199925830984daa831bb03b35ebd1ed5d8bd212e"
+    },
+    {
+      "file": "miniprogram/pages/history/index.wxml",
+      "sha256": "e77108e7c7a5009941412ffbafae919103d58303fb83099aeba50020cc45f4e3"
+    },
+    {
+      "file": "miniprogram/pages/history/index.wxss",
+      "sha256": "24747434d330308ae743788d4244c51e340d44d83c148ada4e3669000d1caceb"
+    },
+    {
+      "file": "miniprogram/pages/mine/index.js",
+      "sha256": "365e1d56c06cb9a3b14a1e677922f5628bf53da001b770b9b44f314337f9cfd0"
+    },
+    {
+      "file": "miniprogram/pages/mine/index.json",
+      "sha256": "edf2cb4e10d9b9ef5d8ef9026ce7bcf728a271b7bb7c62a617299bb3a1361236"
+    },
+    {
+      "file": "miniprogram/pages/mine/index.wxml",
+      "sha256": "1aa213f625c647b26d05610cf51ddfa12b571a8ca3534c67e2d68c36eb851a08"
+    },
+    {
+      "file": "miniprogram/pages/mine/index.wxss",
+      "sha256": "7976ced7b5cf29c4d6a55579af86b55f11ca5ac4e376a94f946a6a18d021253d"
+    },
+    {
+      "file": "miniprogram/pages/query/index.js",
+      "sha256": "9a3db9c40481077232908aff9f4862b1ae620692d3169d97f61957eea4add648"
+    },
+    {
+      "file": "miniprogram/pages/query/index.json",
+      "sha256": "6c4d982cebc20127fba5c485a7004de59b16a22d220bfe452bb7f712aa399f30"
+    },
+    {
+      "file": "miniprogram/pages/query/index.wxml",
+      "sha256": "6c6f4445083936eabbb564ba8f285c8e27fd0c32a1cbd50e662d381e1203173b"
+    },
+    {
+      "file": "miniprogram/pages/query/index.wxss",
+      "sha256": "232763ddaeadb6d8d6f85e48026a8cee9bcccfbb01efbf89388a2ed86914dc64"
+    },
+    {
+      "file": "miniprogram/sitemap.json",
+      "sha256": "09ec98cbb33cef9a2b040b38ca231563a20bdeede4e0c541b81b4cd2c6a02a52"
+    },
+    {
+      "file": "miniprogram/styles/common.wxss",
+      "sha256": "ac5faef31d5cea649fb509bdb04f280658ee5ffc88b887491765b4e059fcbb22"
+    },
+    {
+      "file": "miniprogram/utils/api.js",
+      "sha256": "7a3e2c72178f9d380bcf9b5e5c8c9076b7453125b6fdd5d7e2362b5a2dfbd01e"
+    },
+    {
+      "file": "miniprogram/utils/catalog-order.js",
+      "sha256": "9dad0aa72702ff0afa35706d2d5ce2c2f171405a6a9a87f356314f66709a5bd9"
+    },
+    {
+      "file": "miniprogram/utils/format.js",
+      "sha256": "f174f12cb020a0c1b6eee09f38b89bdfc759f6710e10a2b1028a6f8ba24b5564"
+    },
+    {
+      "file": "miniprogram/utils/local-key.js",
+      "sha256": "1103dd5137f91e7141267e1ea9a4fd6b282d9d9def8289a83b9d31062590f49e"
+    },
+    {
+      "file": "miniprogram/utils/operation.js",
+      "sha256": "59774655c2deea0713b5226a82657fae2cb088b50de0049b54fed904a109443d"
+    },
+    {
+      "file": "miniprogram/utils/reminder-readiness.js",
+      "sha256": "60531f428b46eb60f867c5e5c17b82be1915b1ac03de5749c0be1f36169b4aa3"
+    },
+    {
+      "file": "miniprogram/utils/store.js",
+      "sha256": "c6bc5441cd03387135a87d6fd1cd74427357035441c0cc6d9be677e9f9ed56a2"
+    },
+    {
+      "file": "miniprogram/utils/tab-bar.js",
+      "sha256": "67357ea6b66589e40f576c1d220d4abbb4dcf47da2132bef82c1590280328f5a"
+    },
+    {
+      "file": "cloudfunctions/cloudbase_auth/authorize.js",
+      "sha256": "7bc9a3d5c860c6791cad8e712dc9b6d080afc477f71f8c890784190215a45357"
+    },
+    {
+      "file": "cloudfunctions/cloudbase_auth/index.js",
+      "sha256": "911fcdd3c6175398e6a36c5c4dc2cd25e670383bb3b7dfa336ddbdbeb8010e63"
+    },
+    {
+      "file": "cloudfunctions/cloudbase_auth/package-lock.json",
+      "sha256": "cd67287e9d9fa9a4dbb79bedb1962bca92758ff0b07696dfef4d4fdb4997f3c5"
+    },
+    {
+      "file": "cloudfunctions/cloudbase_auth/package.json",
+      "sha256": "c120ccbe93c007748212def88bcfbf0064d439c81ebd8a9b186c3eb3527ea454"
+    },
+    {
+      "file": "cloudfunctions/gxs_api/catalog/manifest.json",
+      "sha256": "be537fdc4d8eacff2f3a4e65440567e846d642400cbedf214eccfd42ad5bb37d"
+    },
+    {
+      "file": "cloudfunctions/gxs_api/catalog/products.json",
+      "sha256": "0273e07bd8767bb824488499fb2f51b471555d7998f7ed82422e9664e2b0d8fd"
+    },
+    {
+      "file": "cloudfunctions/gxs_api/catalog/stores.json",
+      "sha256": "ff62ad48138c04eac7fd6f4ad93895bacc260e0f87b881cc433a0501a6b2d5c6"
+    },
+    {
+      "file": "cloudfunctions/gxs_api/index.js",
+      "sha256": "8676eb83b1eff8e59ab14cde5834e3eb36ab9b42de5f3eb6c83e16f199974f84"
+    },
+    {
+      "file": "cloudfunctions/gxs_api/lib/app.js",
+      "sha256": "454cb356acf86837eef00b5da1467cb0ed11d45f9850b920f1fe63983b58a3eb"
+    },
+    {
+      "file": "cloudfunctions/gxs_api/lib/apple-pickup.js",
+      "sha256": "dbd35fb494a68c82358c3c3a4f4e7e0de141e162d061c5e7f31b29c539a0cfed"
+    },
+    {
+      "file": "cloudfunctions/gxs_api/lib/collections.js",
+      "sha256": "a0e93d291c7648621244acd429767e7ee2bcc9e2c1fa858cbcff4c667b42d232"
+    },
+    {
+      "file": "cloudfunctions/gxs_api/lib/config.js",
+      "sha256": "9e597d514ce580b80508deb184a3992d0838b2ac50671448f86fe1c765e9ae4c"
+    },
+    {
+      "file": "cloudfunctions/gxs_api/lib/connection.js",
+      "sha256": "8099a99c0454283891b5ca93e14c59e58f0b524d7a59d9543accf765fc57e694"
+    },
+    {
+      "file": "cloudfunctions/gxs_api/lib/engine/collector.js",
+      "sha256": "cb4ecef3656365ee192131e39b3251a3a53102c6313f202f732a028b1be873ae"
+    },
+    {
+      "file": "cloudfunctions/gxs_api/lib/engine/events.js",
+      "sha256": "23900314b4a89344a2b97beef4e8aa65c16dce4885e7342472bdca954ed63884"
+    },
+    {
+      "file": "cloudfunctions/gxs_api/lib/engine/lease.js",
+      "sha256": "863379f4ac898ae6da4f15a21bd88097877edb1f8624faf120875034affa0e63"
+    },
+    {
+      "file": "cloudfunctions/gxs_api/lib/engine/notifier.js",
+      "sha256": "6d94a43fca715655b95ef7353b55128a787913d769a4eb0a22dbe908560a2510"
+    },
+    {
+      "file": "cloudfunctions/gxs_api/lib/engine/scheduled.js",
+      "sha256": "8aa2056e7f67248280910055c91750c7050fad057804c6f3fca2b36af98b07cc"
+    },
+    {
+      "file": "cloudfunctions/gxs_api/lib/engine/scheduler.js",
+      "sha256": "246fcc8177339bf5c98d7a669bea50b5eafb7c979eee04c0d384685dfe81f2e7"
+    },
+    {
+      "file": "cloudfunctions/gxs_api/lib/engine/wechat-sender.js",
+      "sha256": "fab6b633d4dc96b72e36c5f780faa6e7f457e9245dcfae9dfc8e9b6320c42f60"
+    },
+    {
+      "file": "cloudfunctions/gxs_api/lib/errors.js",
+      "sha256": "0eaacc48b4a991e598048cb529202e9eed770d17bea46ffee2241aaf5661a8b3"
+    },
+    {
+      "file": "cloudfunctions/gxs_api/lib/identity.js",
+      "sha256": "da5cfe7f13114c9ddb00dbaf7198b1b4e13d3359561e278adbb18759eab40f68"
+    },
+    {
+      "file": "cloudfunctions/gxs_api/lib/member-redemption.js",
+      "sha256": "3ca9db45e505fd7c1bcb0229c4eacca6f689c7a676ba23add877aaefb5d360f2"
+    },
+    {
+      "file": "cloudfunctions/gxs_api/lib/monitor-readiness.js",
+      "sha256": "6bce472c2a716491e9e2809a796a1fcafabc5a1a1157ed3293b07a27e8d42ffd"
+    },
+    {
+      "file": "cloudfunctions/gxs_api/lib/notification-view.js",
+      "sha256": "d5745dcd17f16dc9dd10fb9b08d2e5eabd1eb75da0480a0358a3ef1755a575d6"
+    },
+    {
+      "file": "cloudfunctions/gxs_api/lib/repo/atomic-ops.js",
+      "sha256": "c5fe4b7407aade294b6f947e7fc5cf3dbff8a8ecff0109ef6bfd940429c3d574"
+    },
+    {
+      "file": "cloudfunctions/gxs_api/lib/repo/cloudbase-repo.js",
+      "sha256": "ac26d3c4ef6e00ebc34d32eab6c7443af8f2f83dc2463331c69be1b925bc18fa"
+    },
+    {
+      "file": "cloudfunctions/gxs_api/lib/rules/access.js",
+      "sha256": "fe8e23d3b3413526fcdf5a3f7d2e1308c09f6e30a2840a30071d078e199c4388"
+    },
+    {
+      "file": "cloudfunctions/gxs_api/lib/rules/membership.js",
+      "sha256": "028365284f8093a7a36ad5f798534edc0695fcc4ee85a1cb89381b28963b987c"
+    },
+    {
+      "file": "cloudfunctions/gxs_api/lib/rules/new-product.js",
+      "sha256": "a5b57d59e52ba1190a4e97ce19903d680f83b8ede1ec7088bcc5bdd840cc490a"
+    },
+    {
+      "file": "cloudfunctions/gxs_api/lib/rules/quota.js",
+      "sha256": "3d959021c4a34b5d0cd0326a7f696d56cfb0c8e99e6536c05985f2d2fe80c9d3"
+    },
+    {
+      "file": "cloudfunctions/gxs_api/lib/services/admin.js",
+      "sha256": "2a47985caa0c62bd5712701cb46bd08167431e48b407a55547d33671c107dd47"
+    },
+    {
+      "file": "cloudfunctions/gxs_api/lib/services/catalog.js",
+      "sha256": "6550811e2e0aca2c96c4fb3621b9412190c6f28e02a1b97ca6942beb642c2072"
+    },
+    {
+      "file": "cloudfunctions/gxs_api/lib/services/follows.js",
+      "sha256": "0f7421c5a649af1d21a7288411225e8dde3d1486c80f754e787326b8f1a9fabd"
+    },
+    {
+      "file": "cloudfunctions/gxs_api/lib/services/history.js",
+      "sha256": "c6f116699ad4a827e7dd925fc51b59cbf4e4da54b7e758c23a2f99359c397208"
+    },
+    {
+      "file": "cloudfunctions/gxs_api/lib/services/member.js",
+      "sha256": "34ebb64d2bb5dac390fb0c9640753c48ef9e94552086f2a41ba6b1db22b4beb5"
+    },
+    {
+      "file": "cloudfunctions/gxs_api/lib/services/notify.js",
+      "sha256": "2efef9cdab0ce6319046082f9848e9825f5c675fed87706a7865b3a6dd2c0fab"
+    },
+    {
+      "file": "cloudfunctions/gxs_api/lib/services/query.js",
+      "sha256": "9264e1a401da0d8078b7d334e1869abc84c83e4c05939c50b2ffee8f82a4d961"
+    },
+    {
+      "file": "cloudfunctions/gxs_api/lib/services/quota.js",
+      "sha256": "da67ea623ed668b8577f1d094f2194af7ad1771ab98f98a1faa966451b6136a9"
+    },
+    {
+      "file": "cloudfunctions/gxs_api/lib/services/users.js",
+      "sha256": "0b14dfd4f2cfb7d3964b4267d180d2d6c5a8fad52db09781aca51dc16570ba6c"
+    },
+    {
+      "file": "cloudfunctions/gxs_api/lib/time.js",
+      "sha256": "6b0e76b43a671ced5f5c68f4826f97c13d53de9078c5c5ab7882721e2c6d9d3f"
+    },
+    {
+      "file": "cloudfunctions/gxs_api/package-lock.json",
+      "sha256": "ec863ecf487bd66e8409ec9f7b4b90e8736ca63a2ca95215eb02a3771ebf8ee2"
+    },
+    {
+      "file": "cloudfunctions/gxs_api/package.json",
+      "sha256": "3571e0f933922a5611c0257f616580dafcaf05a9d40574ef480e8c1dea080b54"
+    },
+    {
+      "file": "cloudfunctions/gxs_monitor/config.json",
+      "sha256": "e88863f42739b0272a7f60f6c8c92a21491c1b79a155b8a8b4c4111bb4e08bab"
+    },
+    {
+      "file": "cloudfunctions/gxs_monitor/index.js",
+      "sha256": "1ea2597bd65f7f7ef6b472a1cc414d32bfb458ce965040834c9db241cfd0c950"
+    },
+    {
+      "file": "cloudfunctions/gxs_monitor/lib/app.js",
+      "sha256": "454cb356acf86837eef00b5da1467cb0ed11d45f9850b920f1fe63983b58a3eb"
+    },
+    {
+      "file": "cloudfunctions/gxs_monitor/lib/apple-pickup.js",
+      "sha256": "dbd35fb494a68c82358c3c3a4f4e7e0de141e162d061c5e7f31b29c539a0cfed"
+    },
+    {
+      "file": "cloudfunctions/gxs_monitor/lib/collections.js",
+      "sha256": "a0e93d291c7648621244acd429767e7ee2bcc9e2c1fa858cbcff4c667b42d232"
+    },
+    {
+      "file": "cloudfunctions/gxs_monitor/lib/config.js",
+      "sha256": "9e597d514ce580b80508deb184a3992d0838b2ac50671448f86fe1c765e9ae4c"
+    },
+    {
+      "file": "cloudfunctions/gxs_monitor/lib/connection.js",
+      "sha256": "8099a99c0454283891b5ca93e14c59e58f0b524d7a59d9543accf765fc57e694"
+    },
+    {
+      "file": "cloudfunctions/gxs_monitor/lib/engine/collector.js",
+      "sha256": "cb4ecef3656365ee192131e39b3251a3a53102c6313f202f732a028b1be873ae"
+    },
+    {
+      "file": "cloudfunctions/gxs_monitor/lib/engine/events.js",
+      "sha256": "23900314b4a89344a2b97beef4e8aa65c16dce4885e7342472bdca954ed63884"
+    },
+    {
+      "file": "cloudfunctions/gxs_monitor/lib/engine/lease.js",
+      "sha256": "863379f4ac898ae6da4f15a21bd88097877edb1f8624faf120875034affa0e63"
+    },
+    {
+      "file": "cloudfunctions/gxs_monitor/lib/engine/notifier.js",
+      "sha256": "6d94a43fca715655b95ef7353b55128a787913d769a4eb0a22dbe908560a2510"
+    },
+    {
+      "file": "cloudfunctions/gxs_monitor/lib/engine/scheduled.js",
+      "sha256": "8aa2056e7f67248280910055c91750c7050fad057804c6f3fca2b36af98b07cc"
+    },
+    {
+      "file": "cloudfunctions/gxs_monitor/lib/engine/scheduler.js",
+      "sha256": "246fcc8177339bf5c98d7a669bea50b5eafb7c979eee04c0d384685dfe81f2e7"
+    },
+    {
+      "file": "cloudfunctions/gxs_monitor/lib/engine/wechat-sender.js",
+      "sha256": "fab6b633d4dc96b72e36c5f780faa6e7f457e9245dcfae9dfc8e9b6320c42f60"
+    },
+    {
+      "file": "cloudfunctions/gxs_monitor/lib/errors.js",
+      "sha256": "0eaacc48b4a991e598048cb529202e9eed770d17bea46ffee2241aaf5661a8b3"
+    },
+    {
+      "file": "cloudfunctions/gxs_monitor/lib/identity.js",
+      "sha256": "da5cfe7f13114c9ddb00dbaf7198b1b4e13d3359561e278adbb18759eab40f68"
+    },
+    {
+      "file": "cloudfunctions/gxs_monitor/lib/member-redemption.js",
+      "sha256": "3ca9db45e505fd7c1bcb0229c4eacca6f689c7a676ba23add877aaefb5d360f2"
+    },
+    {
+      "file": "cloudfunctions/gxs_monitor/lib/monitor-readiness.js",
+      "sha256": "6bce472c2a716491e9e2809a796a1fcafabc5a1a1157ed3293b07a27e8d42ffd"
+    },
+    {
+      "file": "cloudfunctions/gxs_monitor/lib/notification-view.js",
+      "sha256": "d5745dcd17f16dc9dd10fb9b08d2e5eabd1eb75da0480a0358a3ef1755a575d6"
+    },
+    {
+      "file": "cloudfunctions/gxs_monitor/lib/repo/atomic-ops.js",
+      "sha256": "c5fe4b7407aade294b6f947e7fc5cf3dbff8a8ecff0109ef6bfd940429c3d574"
+    },
+    {
+      "file": "cloudfunctions/gxs_monitor/lib/repo/cloudbase-repo.js",
+      "sha256": "ac26d3c4ef6e00ebc34d32eab6c7443af8f2f83dc2463331c69be1b925bc18fa"
+    },
+    {
+      "file": "cloudfunctions/gxs_monitor/lib/rules/access.js",
+      "sha256": "fe8e23d3b3413526fcdf5a3f7d2e1308c09f6e30a2840a30071d078e199c4388"
+    },
+    {
+      "file": "cloudfunctions/gxs_monitor/lib/rules/membership.js",
+      "sha256": "028365284f8093a7a36ad5f798534edc0695fcc4ee85a1cb89381b28963b987c"
+    },
+    {
+      "file": "cloudfunctions/gxs_monitor/lib/rules/new-product.js",
+      "sha256": "a5b57d59e52ba1190a4e97ce19903d680f83b8ede1ec7088bcc5bdd840cc490a"
+    },
+    {
+      "file": "cloudfunctions/gxs_monitor/lib/rules/quota.js",
+      "sha256": "3d959021c4a34b5d0cd0326a7f696d56cfb0c8e99e6536c05985f2d2fe80c9d3"
+    },
+    {
+      "file": "cloudfunctions/gxs_monitor/lib/services/admin.js",
+      "sha256": "2a47985caa0c62bd5712701cb46bd08167431e48b407a55547d33671c107dd47"
+    },
+    {
+      "file": "cloudfunctions/gxs_monitor/lib/services/catalog.js",
+      "sha256": "6550811e2e0aca2c96c4fb3621b9412190c6f28e02a1b97ca6942beb642c2072"
+    },
+    {
+      "file": "cloudfunctions/gxs_monitor/lib/services/follows.js",
+      "sha256": "0f7421c5a649af1d21a7288411225e8dde3d1486c80f754e787326b8f1a9fabd"
+    },
+    {
+      "file": "cloudfunctions/gxs_monitor/lib/services/history.js",
+      "sha256": "c6f116699ad4a827e7dd925fc51b59cbf4e4da54b7e758c23a2f99359c397208"
+    },
+    {
+      "file": "cloudfunctions/gxs_monitor/lib/services/member.js",
+      "sha256": "34ebb64d2bb5dac390fb0c9640753c48ef9e94552086f2a41ba6b1db22b4beb5"
+    },
+    {
+      "file": "cloudfunctions/gxs_monitor/lib/services/notify.js",
+      "sha256": "2efef9cdab0ce6319046082f9848e9825f5c675fed87706a7865b3a6dd2c0fab"
+    },
+    {
+      "file": "cloudfunctions/gxs_monitor/lib/services/query.js",
+      "sha256": "9264e1a401da0d8078b7d334e1869abc84c83e4c05939c50b2ffee8f82a4d961"
+    },
+    {
+      "file": "cloudfunctions/gxs_monitor/lib/services/quota.js",
+      "sha256": "da67ea623ed668b8577f1d094f2194af7ad1771ab98f98a1faa966451b6136a9"
+    },
+    {
+      "file": "cloudfunctions/gxs_monitor/lib/services/users.js",
+      "sha256": "0b14dfd4f2cfb7d3964b4267d180d2d6c5a8fad52db09781aca51dc16570ba6c"
+    },
+    {
+      "file": "cloudfunctions/gxs_monitor/lib/time.js",
+      "sha256": "6b0e76b43a671ced5f5c68f4826f97c13d53de9078c5c5ab7882721e2c6d9d3f"
+    },
+    {
+      "file": "cloudfunctions/gxs_monitor/package-lock.json",
+      "sha256": "4f858c93f7723d74d781bbe9e42f23197d41c14f406a3a2c9897dac4e2af8f01"
+    },
+    {
+      "file": "cloudfunctions/gxs_monitor/package.json",
+      "sha256": "1585f2e7356ab05289c758d559f0cf3ab9de60fdebdf183c8695d46f54f95d4a"
+    },
+    {
+      "file": "tests/acceptance-integration.test.mjs",
+      "sha256": "e9c9aa9210db789c56f87e19af7abd3c32ecf62deb7db19e13f1a34c58550578"
+    },
+    {
+      "file": "tests/acceptance.test.mjs",
+      "sha256": "a0cc26db4bd926fdcdd97686e28c889935bac189824221ddf57f863fe54d6713"
+    },
+    {
+      "file": "tests/account-bootstrap.test.mjs",
+      "sha256": "2e576785639013df7017cde1b41ea63c66372dde565742bd2697dcd4adce6442"
+    },
+    {
+      "file": "tests/account-ux.test.mjs",
+      "sha256": "c2e03469b2341bb88447c51e09fd6effa34b2c557cc6961e4c0fb39e2d7a02bf"
+    },
+    {
+      "file": "tests/apple-pickup.test.mjs",
+      "sha256": "d1448dc1c9969276940e7b706675afaf59a09ff18f43ef2870b2f2158672283e"
+    },
+    {
+      "file": "tests/backend-reliability.test.mjs",
+      "sha256": "17481103966c206d0e62b8da1e0891ab2e165a2c6086fc2d7821d7db4c0c9156"
+    },
+    {
+      "file": "tests/catalog-images.test.mjs",
+      "sha256": "334e6e059bc3bf85c213b251dd85ec634adfdb6d831b0f3c4b29e3f77b1fd956"
+    },
+    {
+      "file": "tests/collector.test.mjs",
+      "sha256": "2338b9536e94c1e3149025af7f0bfcfeb38750d0d637f85afbecd933be4908de"
+    },
+    {
+      "file": "tests/config-regression.test.mjs",
+      "sha256": "8be5cf7de1eb2ec4cd325b8ec1a88aac056ecd2acb225105d0bf71a186dd8d7d"
+    },
+    {
+      "file": "tests/engine-reliability.test.mjs",
+      "sha256": "733a40056af4f5c464b1215b01ef27cef97ef719a9df304b8bf48a21c5fef0c1"
+    },
+    {
+      "file": "tests/events.test.mjs",
+      "sha256": "36f49cac4f98c8d3576237c3d8caa1c0d54c83b984a7d16b434d4df64f216cae"
+    },
+    {
+      "file": "tests/floating-tab-bar.test.mjs",
+      "sha256": "2d33b1a4077510c2de75b24bb47efdc66a9f6ec26c2a2907c776c3a5b901f40d"
+    },
+    {
+      "file": "tests/follow-readiness.test.mjs",
+      "sha256": "cca4848796a30bfc77bd1ba2d3d98c9b0228d23b48d9441357799228c4a1f985"
+    },
+    {
+      "file": "tests/frontend-regression.test.mjs",
+      "sha256": "8a7179724ba323263327071bb843211a68f6e9d97f7888cb680660c9a9795a31"
+    },
+    {
+      "file": "tests/helpers/acceptance-sandbox.js",
+      "sha256": "16eb94b8d51bfd173b7be946e94ab857480c30fc625e4fd261b118987c780b95"
+    },
+    {
+      "file": "tests/helpers/fixture.mjs",
+      "sha256": "c3cace50e7d529fd2d813536fd80d25909bcb5bdcecf567ad17da095daaa17c2"
+    },
+    {
+      "file": "tests/helpers/memory-repo.mjs",
+      "sha256": "9a15df1a4a0d3f14e17318f090e57e75315989dd935303f8a7fc71149f2fc305"
+    },
+    {
+      "file": "tests/helpers/miniprogram-runtime.mjs",
+      "sha256": "af38d4df8cf4f8b9abecc39c8faf0a07cb43cb0dc4783ec53caa70371eba1821"
+    },
+    {
+      "file": "tests/history-browse-reward.test.mjs",
+      "sha256": "b38d809c46e97bb0b5fb73c0255c52b1edec1320e6c8ee00f7eed5e0f89bfb69"
+    },
+    {
+      "file": "tests/history-restore-browse.test.mjs",
+      "sha256": "2c2b943500a792a3dcd7fb685f766db3f1fec411f3414e950a1a6af95bf9e142"
+    },
+    {
+      "file": "tests/history-statistics.test.mjs",
+      "sha256": "9ab317b99990c9b9648cbd77cd547cd25781da5421bf575187b314797741d5b5"
+    },
+    {
+      "file": "tests/member-redemption-frontend.test.mjs",
+      "sha256": "8fa2a9be16be4e409f96023e32f6ede3bf31935307d34afb0e8fcc2447d5168e"
+    },
+    {
+      "file": "tests/member-redemption.test.mjs",
+      "sha256": "eef0f17423545ad9929eddd06f35b7580b82aabe573c4b5e40153278aacf5193"
+    },
+    {
+      "file": "tests/notification-management-frontend.test.mjs",
+      "sha256": "def0cd434039001032be78d9b0f348614a4cdefca3035cea89ef21ac52224f85"
+    },
+    {
+      "file": "tests/notification-view.test.mjs",
+      "sha256": "03e44ba051046ba32d867e1a15915f06f57014c75c81e99d447ea5b3ae45bdbf"
+    },
+    {
+      "file": "tests/performance-ux.test.mjs",
+      "sha256": "4830e423f375c86a7a33fa0b30a3b7c5388365fca0c4c85c1518e1acb2913c03"
+    },
+    {
+      "file": "tests/personal-reminder-readiness.test.mjs",
+      "sha256": "47d8ccf662d573a08d3b09cb73a08085a7970cda0c4210c352f7302c90309704"
+    },
+    {
+      "file": "tests/picker-ux.test.mjs",
+      "sha256": "21b35b26544c81a6f4d824de806bc99cc1b0a897c02a2ade40b0b7b087085dbb"
+    },
+    {
+      "file": "tests/query-compact-selection.test.mjs",
+      "sha256": "f77a113858abc40bc1363c3c5674a92858cc3ed4f17bfb637aabf4012ea578f6"
+    },
+    {
+      "file": "tests/query-snapshot-and-follow.test.mjs",
+      "sha256": "79160dd14d5329d1a7d67c155e2c97681366bbfcf34b10b2eaef873cb31ebcc3"
+    },
+    {
+      "file": "tests/rules.test.mjs",
+      "sha256": "e3153d88bd0ca0374b893816256f03edda16fdf2979cd0b9ccd6cd2a9b1c6f5b"
+    },
+    {
+      "file": "tests/scheduled-monitor.test.mjs",
+      "sha256": "5a27f4b58d1b32dc5a168fe1b3830cd5c2fc090f89290a1c6825b28426ac456f"
+    },
+    {
+      "file": "tests/scheduler.test.mjs",
+      "sha256": "53b0651b1f8d98b6d839001c56b0ade4eea277f281f961b30d64d8d681c976d9"
+    },
+    {
+      "file": "tests/services.test.mjs",
+      "sha256": "c5f6b54162da99e7b3afb7ecd01bd3ecea30c9df909f65a58b2cde90c7ec6b95"
+    },
+    {
+      "file": "tests/stock-observation-pages.test.mjs",
+      "sha256": "77e4211334a3edf369474b300a4bc2e0e8f77d8c4995a898e505e33ed9d658c8"
+    },
+    {
+      "file": "tests/stock-observation.test.mjs",
+      "sha256": "5fae95e14343100c944fc0b2c3f34373d17462c7806301e34be16cb3b54f4644"
+    },
+    {
+      "file": "package.json",
+      "sha256": "b56893c64e292ec407179763a642cdb3c0904c39adc60ece3d56b2ba3edc2efa"
+    }
+  ],
+  "postVisualUpdate": {
+    "checkedAt": "2026-09-16T08:49:54.548Z",
+    "changesSinceTests": [
+      {
+        "file": "miniprogram/pages/query/index.wxss",
+        "sha256": "1403c3a1eea8c1abecfd08fe6aabb4d0f945c722ce956d897b118c6ce5974ee2"
+      }
+    ],
+    "onlyWxssChanged": true,
+    "reason": "44px minimum query actions and fallback on narrow displays; no business JavaScript or tests changed",
+    "testsRepeated": false,
+    "refreshedChecks": [
+      {
+        "name": "source-check",
+        "exitCode": 0
+      },
+      {
+        "name": "release-check",
+        "exitCode": 0
+      }
+    ],
+    "currentSources": [
+      {
+        "file": "miniprogram/app.js",
+        "sha256": "9144ee338c94e59d5a13b9b6606d1872a8efd20c765764024700bfc036105a91"
+      },
+      {
+        "file": "miniprogram/app.json",
+        "sha256": "6bbf020443c3679a76cb41a462230e61ffe2912c613293ffa9db6134337a0cff"
+      },
+      {
+        "file": "miniprogram/app.wxss",
+        "sha256": "665a60577aa895632dec08502942b7a6aa13eaf40142500e7827e42c806bb469"
+      },
+      {
+        "file": "miniprogram/components/target-picker/index.js",
+        "sha256": "43e8cdcc8279b51afc90d27508af44ecee557deba495d32a5e2df9a2bbb5abd7"
+      },
+      {
+        "file": "miniprogram/components/target-picker/index.json",
+        "sha256": "035503c1a56d8b4b9227ce8bb9145fbd1ef8ec7dce59e55f9d5d55fb5eb7d566"
+      },
+      {
+        "file": "miniprogram/components/target-picker/index.wxml",
+        "sha256": "dde7f088c488a698dc9d4077e26f1247687b442d934eb2d1792dc9b8f5630ffc"
+      },
+      {
+        "file": "miniprogram/components/target-picker/index.wxss",
+        "sha256": "1eb2a03e5f464d3eeff0c5d3f5a3c27a6a9badcd2d9c5da8aa0e45d10387de46"
+      },
+      {
+        "file": "miniprogram/config/catalog-seed.js",
+        "sha256": "0cbf7906f9819608581e5b1f0113765f58bfd16b723d052a32aa9fa87ada6608"
+      },
+      {
+        "file": "miniprogram/config/cloud.js",
+        "sha256": "6ba9f31ce4a581a33cda1f9bc62514d85a39aa91a3b68d1c4148cfabf05d4c81"
+      },
+      {
+        "file": "miniprogram/config/product-images.js",
+        "sha256": "4620405635e68e3ca4c5b49c7e45baab5f4683430b6b84aa47172bbd2818f586"
+      },
+      {
+        "file": "miniprogram/custom-tab-bar/index.js",
+        "sha256": "764579d0db508a7af4964c16969f51f124130a894f5071a90c801dde3f70589d"
+      },
+      {
+        "file": "miniprogram/custom-tab-bar/index.json",
+        "sha256": "259c7940ae58eb9615eafe3ff71ac3fcab6be4390d2dce3176f5b5e895c9aa16"
+      },
+      {
+        "file": "miniprogram/custom-tab-bar/index.wxml",
+        "sha256": "0815bf08a7d475376855437e6448b7699ec0eed38b4a207a0b8fb626243b21a4"
+      },
+      {
+        "file": "miniprogram/custom-tab-bar/index.wxss",
+        "sha256": "14ac5fcdaca05c2ef6a950d56f965bccca155ce4f8179d121f0f5654e9516047"
+      },
+      {
+        "file": "miniprogram/pages/admin/index.js",
+        "sha256": "546eb1160747053cd06e545d5bf82c7ae4bbc3a2a147e6116a69184a2f7f2790"
+      },
+      {
+        "file": "miniprogram/pages/admin/index.json",
+        "sha256": "300930d2e9db34659cc69e3b084d6abe59cf8921264e0beb4f3cfedd8fca786f"
+      },
+      {
+        "file": "miniprogram/pages/admin/index.wxml",
+        "sha256": "1734db004e5a0448460c0461d175dc40bdfe94e3a303d0d6a9b982f148974c2a"
+      },
+      {
+        "file": "miniprogram/pages/admin/index.wxss",
+        "sha256": "cf9e98224184e69b5df463225331b3bbef55213b76355808f0ab8f02a3978f1c"
+      },
+      {
+        "file": "miniprogram/pages/follow/index.js",
+        "sha256": "47742cb321540f4fa7a2e8661bbc92480c5213415fa62d45c8b10ae6252c456f"
+      },
+      {
+        "file": "miniprogram/pages/follow/index.json",
+        "sha256": "bf0a13fac9d4d8c326a039df101f2d2d174e3fac4be6ee08611bcd67eee43cc6"
+      },
+      {
+        "file": "miniprogram/pages/follow/index.wxml",
+        "sha256": "6fef475dae8ab9c605b4e5376e774069a261826006cea6981aedbbf8078745e2"
+      },
+      {
+        "file": "miniprogram/pages/follow/index.wxss",
+        "sha256": "c4f3f185bc326162910304a461de3d05158259d6ec0858e8570b4d2256d13711"
+      },
+      {
+        "file": "miniprogram/pages/history/index.js",
+        "sha256": "f8f9f81e5ce92aa39517c9c495f2f9efdbb5149d82c80318a560521f8a3be7ba"
+      },
+      {
+        "file": "miniprogram/pages/history/index.json",
+        "sha256": "ecdcaecb8d978f88110346da199925830984daa831bb03b35ebd1ed5d8bd212e"
+      },
+      {
+        "file": "miniprogram/pages/history/index.wxml",
+        "sha256": "e77108e7c7a5009941412ffbafae919103d58303fb83099aeba50020cc45f4e3"
+      },
+      {
+        "file": "miniprogram/pages/history/index.wxss",
+        "sha256": "24747434d330308ae743788d4244c51e340d44d83c148ada4e3669000d1caceb"
+      },
+      {
+        "file": "miniprogram/pages/mine/index.js",
+        "sha256": "365e1d56c06cb9a3b14a1e677922f5628bf53da001b770b9b44f314337f9cfd0"
+      },
+      {
+        "file": "miniprogram/pages/mine/index.json",
+        "sha256": "edf2cb4e10d9b9ef5d8ef9026ce7bcf728a271b7bb7c62a617299bb3a1361236"
+      },
+      {
+        "file": "miniprogram/pages/mine/index.wxml",
+        "sha256": "1aa213f625c647b26d05610cf51ddfa12b571a8ca3534c67e2d68c36eb851a08"
+      },
+      {
+        "file": "miniprogram/pages/mine/index.wxss",
+        "sha256": "7976ced7b5cf29c4d6a55579af86b55f11ca5ac4e376a94f946a6a18d021253d"
+      },
+      {
+        "file": "miniprogram/pages/query/index.js",
+        "sha256": "9a3db9c40481077232908aff9f4862b1ae620692d3169d97f61957eea4add648"
+      },
+      {
+        "file": "miniprogram/pages/query/index.json",
+        "sha256": "6c4d982cebc20127fba5c485a7004de59b16a22d220bfe452bb7f712aa399f30"
+      },
+      {
+        "file": "miniprogram/pages/query/index.wxml",
+        "sha256": "6c6f4445083936eabbb564ba8f285c8e27fd0c32a1cbd50e662d381e1203173b"
+      },
+      {
+        "file": "miniprogram/pages/query/index.wxss",
+        "sha256": "1403c3a1eea8c1abecfd08fe6aabb4d0f945c722ce956d897b118c6ce5974ee2"
+      },
+      {
+        "file": "miniprogram/sitemap.json",
+        "sha256": "09ec98cbb33cef9a2b040b38ca231563a20bdeede4e0c541b81b4cd2c6a02a52"
+      },
+      {
+        "file": "miniprogram/styles/common.wxss",
+        "sha256": "ac5faef31d5cea649fb509bdb04f280658ee5ffc88b887491765b4e059fcbb22"
+      },
+      {
+        "file": "miniprogram/utils/api.js",
+        "sha256": "7a3e2c72178f9d380bcf9b5e5c8c9076b7453125b6fdd5d7e2362b5a2dfbd01e"
+      },
+      {
+        "file": "miniprogram/utils/catalog-order.js",
+        "sha256": "9dad0aa72702ff0afa35706d2d5ce2c2f171405a6a9a87f356314f66709a5bd9"
+      },
+      {
+        "file": "miniprogram/utils/format.js",
+        "sha256": "f174f12cb020a0c1b6eee09f38b89bdfc759f6710e10a2b1028a6f8ba24b5564"
+      },
+      {
+        "file": "miniprogram/utils/local-key.js",
+        "sha256": "1103dd5137f91e7141267e1ea9a4fd6b282d9d9def8289a83b9d31062590f49e"
+      },
+      {
+        "file": "miniprogram/utils/operation.js",
+        "sha256": "59774655c2deea0713b5226a82657fae2cb088b50de0049b54fed904a109443d"
+      },
+      {
+        "file": "miniprogram/utils/reminder-readiness.js",
+        "sha256": "60531f428b46eb60f867c5e5c17b82be1915b1ac03de5749c0be1f36169b4aa3"
+      },
+      {
+        "file": "miniprogram/utils/store.js",
+        "sha256": "c6bc5441cd03387135a87d6fd1cd74427357035441c0cc6d9be677e9f9ed56a2"
+      },
+      {
+        "file": "miniprogram/utils/tab-bar.js",
+        "sha256": "67357ea6b66589e40f576c1d220d4abbb4dcf47da2132bef82c1590280328f5a"
+      },
+      {
+        "file": "cloudfunctions/cloudbase_auth/authorize.js",
+        "sha256": "7bc9a3d5c860c6791cad8e712dc9b6d080afc477f71f8c890784190215a45357"
+      },
+      {
+        "file": "cloudfunctions/cloudbase_auth/index.js",
+        "sha256": "911fcdd3c6175398e6a36c5c4dc2cd25e670383bb3b7dfa336ddbdbeb8010e63"
+      },
+      {
+        "file": "cloudfunctions/cloudbase_auth/package-lock.json",
+        "sha256": "cd67287e9d9fa9a4dbb79bedb1962bca92758ff0b07696dfef4d4fdb4997f3c5"
+      },
+      {
+        "file": "cloudfunctions/cloudbase_auth/package.json",
+        "sha256": "c120ccbe93c007748212def88bcfbf0064d439c81ebd8a9b186c3eb3527ea454"
+      },
+      {
+        "file": "cloudfunctions/gxs_api/catalog/manifest.json",
+        "sha256": "be537fdc4d8eacff2f3a4e65440567e846d642400cbedf214eccfd42ad5bb37d"
+      },
+      {
+        "file": "cloudfunctions/gxs_api/catalog/products.json",
+        "sha256": "0273e07bd8767bb824488499fb2f51b471555d7998f7ed82422e9664e2b0d8fd"
+      },
+      {
+        "file": "cloudfunctions/gxs_api/catalog/stores.json",
+        "sha256": "ff62ad48138c04eac7fd6f4ad93895bacc260e0f87b881cc433a0501a6b2d5c6"
+      },
+      {
+        "file": "cloudfunctions/gxs_api/index.js",
+        "sha256": "8676eb83b1eff8e59ab14cde5834e3eb36ab9b42de5f3eb6c83e16f199974f84"
+      },
+      {
+        "file": "cloudfunctions/gxs_api/lib/app.js",
+        "sha256": "454cb356acf86837eef00b5da1467cb0ed11d45f9850b920f1fe63983b58a3eb"
+      },
+      {
+        "file": "cloudfunctions/gxs_api/lib/apple-pickup.js",
+        "sha256": "dbd35fb494a68c82358c3c3a4f4e7e0de141e162d061c5e7f31b29c539a0cfed"
+      },
+      {
+        "file": "cloudfunctions/gxs_api/lib/collections.js",
+        "sha256": "a0e93d291c7648621244acd429767e7ee2bcc9e2c1fa858cbcff4c667b42d232"
+      },
+      {
+        "file": "cloudfunctions/gxs_api/lib/config.js",
+        "sha256": "9e597d514ce580b80508deb184a3992d0838b2ac50671448f86fe1c765e9ae4c"
+      },
+      {
+        "file": "cloudfunctions/gxs_api/lib/connection.js",
+        "sha256": "8099a99c0454283891b5ca93e14c59e58f0b524d7a59d9543accf765fc57e694"
+      },
+      {
+        "file": "cloudfunctions/gxs_api/lib/engine/collector.js",
+        "sha256": "cb4ecef3656365ee192131e39b3251a3a53102c6313f202f732a028b1be873ae"
+      },
+      {
+        "file": "cloudfunctions/gxs_api/lib/engine/events.js",
+        "sha256": "23900314b4a89344a2b97beef4e8aa65c16dce4885e7342472bdca954ed63884"
+      },
+      {
+        "file": "cloudfunctions/gxs_api/lib/engine/lease.js",
+        "sha256": "863379f4ac898ae6da4f15a21bd88097877edb1f8624faf120875034affa0e63"
+      },
+      {
+        "file": "cloudfunctions/gxs_api/lib/engine/notifier.js",
+        "sha256": "6d94a43fca715655b95ef7353b55128a787913d769a4eb0a22dbe908560a2510"
+      },
+      {
+        "file": "cloudfunctions/gxs_api/lib/engine/scheduled.js",
+        "sha256": "8aa2056e7f67248280910055c91750c7050fad057804c6f3fca2b36af98b07cc"
+      },
+      {
+        "file": "cloudfunctions/gxs_api/lib/engine/scheduler.js",
+        "sha256": "246fcc8177339bf5c98d7a669bea50b5eafb7c979eee04c0d384685dfe81f2e7"
+      },
+      {
+        "file": "cloudfunctions/gxs_api/lib/engine/wechat-sender.js",
+        "sha256": "fab6b633d4dc96b72e36c5f780faa6e7f457e9245dcfae9dfc8e9b6320c42f60"
+      },
+      {
+        "file": "cloudfunctions/gxs_api/lib/errors.js",
+        "sha256": "0eaacc48b4a991e598048cb529202e9eed770d17bea46ffee2241aaf5661a8b3"
+      },
+      {
+        "file": "cloudfunctions/gxs_api/lib/identity.js",
+        "sha256": "da5cfe7f13114c9ddb00dbaf7198b1b4e13d3359561e278adbb18759eab40f68"
+      },
+      {
+        "file": "cloudfunctions/gxs_api/lib/member-redemption.js",
+        "sha256": "3ca9db45e505fd7c1bcb0229c4eacca6f689c7a676ba23add877aaefb5d360f2"
+      },
+      {
+        "file": "cloudfunctions/gxs_api/lib/monitor-readiness.js",
+        "sha256": "6bce472c2a716491e9e2809a796a1fcafabc5a1a1157ed3293b07a27e8d42ffd"
+      },
+      {
+        "file": "cloudfunctions/gxs_api/lib/notification-view.js",
+        "sha256": "d5745dcd17f16dc9dd10fb9b08d2e5eabd1eb75da0480a0358a3ef1755a575d6"
+      },
+      {
+        "file": "cloudfunctions/gxs_api/lib/repo/atomic-ops.js",
+        "sha256": "c5fe4b7407aade294b6f947e7fc5cf3dbff8a8ecff0109ef6bfd940429c3d574"
+      },
+      {
+        "file": "cloudfunctions/gxs_api/lib/repo/cloudbase-repo.js",
+        "sha256": "ac26d3c4ef6e00ebc34d32eab6c7443af8f2f83dc2463331c69be1b925bc18fa"
+      },
+      {
+        "file": "cloudfunctions/gxs_api/lib/rules/access.js",
+        "sha256": "fe8e23d3b3413526fcdf5a3f7d2e1308c09f6e30a2840a30071d078e199c4388"
+      },
+      {
+        "file": "cloudfunctions/gxs_api/lib/rules/membership.js",
+        "sha256": "028365284f8093a7a36ad5f798534edc0695fcc4ee85a1cb89381b28963b987c"
+      },
+      {
+        "file": "cloudfunctions/gxs_api/lib/rules/new-product.js",
+        "sha256": "a5b57d59e52ba1190a4e97ce19903d680f83b8ede1ec7088bcc5bdd840cc490a"
+      },
+      {
+        "file": "cloudfunctions/gxs_api/lib/rules/quota.js",
+        "sha256": "3d959021c4a34b5d0cd0326a7f696d56cfb0c8e99e6536c05985f2d2fe80c9d3"
+      },
+      {
+        "file": "cloudfunctions/gxs_api/lib/services/admin.js",
+        "sha256": "2a47985caa0c62bd5712701cb46bd08167431e48b407a55547d33671c107dd47"
+      },
+      {
+        "file": "cloudfunctions/gxs_api/lib/services/catalog.js",
+        "sha256": "6550811e2e0aca2c96c4fb3621b9412190c6f28e02a1b97ca6942beb642c2072"
+      },
+      {
+        "file": "cloudfunctions/gxs_api/lib/services/follows.js",
+        "sha256": "0f7421c5a649af1d21a7288411225e8dde3d1486c80f754e787326b8f1a9fabd"
+      },
+      {
+        "file": "cloudfunctions/gxs_api/lib/services/history.js",
+        "sha256": "c6f116699ad4a827e7dd925fc51b59cbf4e4da54b7e758c23a2f99359c397208"
+      },
+      {
+        "file": "cloudfunctions/gxs_api/lib/services/member.js",
+        "sha256": "34ebb64d2bb5dac390fb0c9640753c48ef9e94552086f2a41ba6b1db22b4beb5"
+      },
+      {
+        "file": "cloudfunctions/gxs_api/lib/services/notify.js",
+        "sha256": "2efef9cdab0ce6319046082f9848e9825f5c675fed87706a7865b3a6dd2c0fab"
+      },
+      {
+        "file": "cloudfunctions/gxs_api/lib/services/query.js",
+        "sha256": "9264e1a401da0d8078b7d334e1869abc84c83e4c05939c50b2ffee8f82a4d961"
+      },
+      {
+        "file": "cloudfunctions/gxs_api/lib/services/quota.js",
+        "sha256": "da67ea623ed668b8577f1d094f2194af7ad1771ab98f98a1faa966451b6136a9"
+      },
+      {
+        "file": "cloudfunctions/gxs_api/lib/services/users.js",
+        "sha256": "0b14dfd4f2cfb7d3964b4267d180d2d6c5a8fad52db09781aca51dc16570ba6c"
+      },
+      {
+        "file": "cloudfunctions/gxs_api/lib/time.js",
+        "sha256": "6b0e76b43a671ced5f5c68f4826f97c13d53de9078c5c5ab7882721e2c6d9d3f"
+      },
+      {
+        "file": "cloudfunctions/gxs_api/package-lock.json",
+        "sha256": "ec863ecf487bd66e8409ec9f7b4b90e8736ca63a2ca95215eb02a3771ebf8ee2"
+      },
+      {
+        "file": "cloudfunctions/gxs_api/package.json",
+        "sha256": "3571e0f933922a5611c0257f616580dafcaf05a9d40574ef480e8c1dea080b54"
+      },
+      {
+        "file": "cloudfunctions/gxs_monitor/config.json",
+        "sha256": "e88863f42739b0272a7f60f6c8c92a21491c1b79a155b8a8b4c4111bb4e08bab"
+      },
+      {
+        "file": "cloudfunctions/gxs_monitor/index.js",
+        "sha256": "1ea2597bd65f7f7ef6b472a1cc414d32bfb458ce965040834c9db241cfd0c950"
+      },
+      {
+        "file": "cloudfunctions/gxs_monitor/lib/app.js",
+        "sha256": "454cb356acf86837eef00b5da1467cb0ed11d45f9850b920f1fe63983b58a3eb"
+      },
+      {
+        "file": "cloudfunctions/gxs_monitor/lib/apple-pickup.js",
+        "sha256": "dbd35fb494a68c82358c3c3a4f4e7e0de141e162d061c5e7f31b29c539a0cfed"
+      },
+      {
+        "file": "cloudfunctions/gxs_monitor/lib/collections.js",
+        "sha256": "a0e93d291c7648621244acd429767e7ee2bcc9e2c1fa858cbcff4c667b42d232"
+      },
+      {
+        "file": "cloudfunctions/gxs_monitor/lib/config.js",
+        "sha256": "9e597d514ce580b80508deb184a3992d0838b2ac50671448f86fe1c765e9ae4c"
+      },
+      {
+        "file": "cloudfunctions/gxs_monitor/lib/connection.js",
+        "sha256": "8099a99c0454283891b5ca93e14c59e58f0b524d7a59d9543accf765fc57e694"
+      },
+      {
+        "file": "cloudfunctions/gxs_monitor/lib/engine/collector.js",
+        "sha256": "cb4ecef3656365ee192131e39b3251a3a53102c6313f202f732a028b1be873ae"
+      },
+      {
+        "file": "cloudfunctions/gxs_monitor/lib/engine/events.js",
+        "sha256": "23900314b4a89344a2b97beef4e8aa65c16dce4885e7342472bdca954ed63884"
+      },
+      {
+        "file": "cloudfunctions/gxs_monitor/lib/engine/lease.js",
+        "sha256": "863379f4ac898ae6da4f15a21bd88097877edb1f8624faf120875034affa0e63"
+      },
+      {
+        "file": "cloudfunctions/gxs_monitor/lib/engine/notifier.js",
+        "sha256": "6d94a43fca715655b95ef7353b55128a787913d769a4eb0a22dbe908560a2510"
+      },
+      {
+        "file": "cloudfunctions/gxs_monitor/lib/engine/scheduled.js",
+        "sha256": "8aa2056e7f67248280910055c91750c7050fad057804c6f3fca2b36af98b07cc"
+      },
+      {
+        "file": "cloudfunctions/gxs_monitor/lib/engine/scheduler.js",
+        "sha256": "246fcc8177339bf5c98d7a669bea50b5eafb7c979eee04c0d384685dfe81f2e7"
+      },
+      {
+        "file": "cloudfunctions/gxs_monitor/lib/engine/wechat-sender.js",
+        "sha256": "fab6b633d4dc96b72e36c5f780faa6e7f457e9245dcfae9dfc8e9b6320c42f60"
+      },
+      {
+        "file": "cloudfunctions/gxs_monitor/lib/errors.js",
+        "sha256": "0eaacc48b4a991e598048cb529202e9eed770d17bea46ffee2241aaf5661a8b3"
+      },
+      {
+        "file": "cloudfunctions/gxs_monitor/lib/identity.js",
+        "sha256": "da5cfe7f13114c9ddb00dbaf7198b1b4e13d3359561e278adbb18759eab40f68"
+      },
+      {
+        "file": "cloudfunctions/gxs_monitor/lib/member-redemption.js",
+        "sha256": "3ca9db45e505fd7c1bcb0229c4eacca6f689c7a676ba23add877aaefb5d360f2"
+      },
+      {
+        "file": "cloudfunctions/gxs_monitor/lib/monitor-readiness.js",
+        "sha256": "6bce472c2a716491e9e2809a796a1fcafabc5a1a1157ed3293b07a27e8d42ffd"
+      },
+      {
+        "file": "cloudfunctions/gxs_monitor/lib/notification-view.js",
+        "sha256": "d5745dcd17f16dc9dd10fb9b08d2e5eabd1eb75da0480a0358a3ef1755a575d6"
+      },
+      {
+        "file": "cloudfunctions/gxs_monitor/lib/repo/atomic-ops.js",
+        "sha256": "c5fe4b7407aade294b6f947e7fc5cf3dbff8a8ecff0109ef6bfd940429c3d574"
+      },
+      {
+        "file": "cloudfunctions/gxs_monitor/lib/repo/cloudbase-repo.js",
+        "sha256": "ac26d3c4ef6e00ebc34d32eab6c7443af8f2f83dc2463331c69be1b925bc18fa"
+      },
+      {
+        "file": "cloudfunctions/gxs_monitor/lib/rules/access.js",
+        "sha256": "fe8e23d3b3413526fcdf5a3f7d2e1308c09f6e30a2840a30071d078e199c4388"
+      },
+      {
+        "file": "cloudfunctions/gxs_monitor/lib/rules/membership.js",
+        "sha256": "028365284f8093a7a36ad5f798534edc0695fcc4ee85a1cb89381b28963b987c"
+      },
+      {
+        "file": "cloudfunctions/gxs_monitor/lib/rules/new-product.js",
+        "sha256": "a5b57d59e52ba1190a4e97ce19903d680f83b8ede1ec7088bcc5bdd840cc490a"
+      },
+      {
+        "file": "cloudfunctions/gxs_monitor/lib/rules/quota.js",
+        "sha256": "3d959021c4a34b5d0cd0326a7f696d56cfb0c8e99e6536c05985f2d2fe80c9d3"
+      },
+      {
+        "file": "cloudfunctions/gxs_monitor/lib/services/admin.js",
+        "sha256": "2a47985caa0c62bd5712701cb46bd08167431e48b407a55547d33671c107dd47"
+      },
+      {
+        "file": "cloudfunctions/gxs_monitor/lib/services/catalog.js",
+        "sha256": "6550811e2e0aca2c96c4fb3621b9412190c6f28e02a1b97ca6942beb642c2072"
+      },
+      {
+        "file": "cloudfunctions/gxs_monitor/lib/services/follows.js",
+        "sha256": "0f7421c5a649af1d21a7288411225e8dde3d1486c80f754e787326b8f1a9fabd"
+      },
+      {
+        "file": "cloudfunctions/gxs_monitor/lib/services/history.js",
+        "sha256": "c6f116699ad4a827e7dd925fc51b59cbf4e4da54b7e758c23a2f99359c397208"
+      },
+      {
+        "file": "cloudfunctions/gxs_monitor/lib/services/member.js",
+        "sha256": "34ebb64d2bb5dac390fb0c9640753c48ef9e94552086f2a41ba6b1db22b4beb5"
+      },
+      {
+        "file": "cloudfunctions/gxs_monitor/lib/services/notify.js",
+        "sha256": "2efef9cdab0ce6319046082f9848e9825f5c675fed87706a7865b3a6dd2c0fab"
+      },
+      {
+        "file": "cloudfunctions/gxs_monitor/lib/services/query.js",
+        "sha256": "9264e1a401da0d8078b7d334e1869abc84c83e4c05939c50b2ffee8f82a4d961"
+      },
+      {
+        "file": "cloudfunctions/gxs_monitor/lib/services/quota.js",
+        "sha256": "da67ea623ed668b8577f1d094f2194af7ad1771ab98f98a1faa966451b6136a9"
+      },
+      {
+        "file": "cloudfunctions/gxs_monitor/lib/services/users.js",
+        "sha256": "0b14dfd4f2cfb7d3964b4267d180d2d6c5a8fad52db09781aca51dc16570ba6c"
+      },
+      {
+        "file": "cloudfunctions/gxs_monitor/lib/time.js",
+        "sha256": "6b0e76b43a671ced5f5c68f4826f97c13d53de9078c5c5ab7882721e2c6d9d3f"
+      },
+      {
+        "file": "cloudfunctions/gxs_monitor/package-lock.json",
+        "sha256": "4f858c93f7723d74d781bbe9e42f23197d41c14f406a3a2c9897dac4e2af8f01"
+      },
+      {
+        "file": "cloudfunctions/gxs_monitor/package.json",
+        "sha256": "1585f2e7356ab05289c758d559f0cf3ab9de60fdebdf183c8695d46f54f95d4a"
+      },
+      {
+        "file": "tests/acceptance-integration.test.mjs",
+        "sha256": "e9c9aa9210db789c56f87e19af7abd3c32ecf62deb7db19e13f1a34c58550578"
+      },
+      {
+        "file": "tests/acceptance.test.mjs",
+        "sha256": "a0cc26db4bd926fdcdd97686e28c889935bac189824221ddf57f863fe54d6713"
+      },
+      {
+        "file": "tests/account-bootstrap.test.mjs",
+        "sha256": "2e576785639013df7017cde1b41ea63c66372dde565742bd2697dcd4adce6442"
+      },
+      {
+        "file": "tests/account-ux.test.mjs",
+        "sha256": "c2e03469b2341bb88447c51e09fd6effa34b2c557cc6961e4c0fb39e2d7a02bf"
+      },
+      {
+        "file": "tests/apple-pickup.test.mjs",
+        "sha256": "d1448dc1c9969276940e7b706675afaf59a09ff18f43ef2870b2f2158672283e"
+      },
+      {
+        "file": "tests/backend-reliability.test.mjs",
+        "sha256": "17481103966c206d0e62b8da1e0891ab2e165a2c6086fc2d7821d7db4c0c9156"
+      },
+      {
+        "file": "tests/catalog-images.test.mjs",
+        "sha256": "334e6e059bc3bf85c213b251dd85ec634adfdb6d831b0f3c4b29e3f77b1fd956"
+      },
+      {
+        "file": "tests/collector.test.mjs",
+        "sha256": "2338b9536e94c1e3149025af7f0bfcfeb38750d0d637f85afbecd933be4908de"
+      },
+      {
+        "file": "tests/config-regression.test.mjs",
+        "sha256": "8be5cf7de1eb2ec4cd325b8ec1a88aac056ecd2acb225105d0bf71a186dd8d7d"
+      },
+      {
+        "file": "tests/engine-reliability.test.mjs",
+        "sha256": "733a40056af4f5c464b1215b01ef27cef97ef719a9df304b8bf48a21c5fef0c1"
+      },
+      {
+        "file": "tests/events.test.mjs",
+        "sha256": "36f49cac4f98c8d3576237c3d8caa1c0d54c83b984a7d16b434d4df64f216cae"
+      },
+      {
+        "file": "tests/floating-tab-bar.test.mjs",
+        "sha256": "2d33b1a4077510c2de75b24bb47efdc66a9f6ec26c2a2907c776c3a5b901f40d"
+      },
+      {
+        "file": "tests/follow-readiness.test.mjs",
+        "sha256": "cca4848796a30bfc77bd1ba2d3d98c9b0228d23b48d9441357799228c4a1f985"
+      },
+      {
+        "file": "tests/frontend-regression.test.mjs",
+        "sha256": "8a7179724ba323263327071bb843211a68f6e9d97f7888cb680660c9a9795a31"
+      },
+      {
+        "file": "tests/helpers/acceptance-sandbox.js",
+        "sha256": "16eb94b8d51bfd173b7be946e94ab857480c30fc625e4fd261b118987c780b95"
+      },
+      {
+        "file": "tests/helpers/fixture.mjs",
+        "sha256": "c3cace50e7d529fd2d813536fd80d25909bcb5bdcecf567ad17da095daaa17c2"
+      },
+      {
+        "file": "tests/helpers/memory-repo.mjs",
+        "sha256": "9a15df1a4a0d3f14e17318f090e57e75315989dd935303f8a7fc71149f2fc305"
+      },
+      {
+        "file": "tests/helpers/miniprogram-runtime.mjs",
+        "sha256": "af38d4df8cf4f8b9abecc39c8faf0a07cb43cb0dc4783ec53caa70371eba1821"
+      },
+      {
+        "file": "tests/history-browse-reward.test.mjs",
+        "sha256": "b38d809c46e97bb0b5fb73c0255c52b1edec1320e6c8ee00f7eed5e0f89bfb69"
+      },
+      {
+        "file": "tests/history-restore-browse.test.mjs",
+        "sha256": "2c2b943500a792a3dcd7fb685f766db3f1fec411f3414e950a1a6af95bf9e142"
+      },
+      {
+        "file": "tests/history-statistics.test.mjs",
+        "sha256": "9ab317b99990c9b9648cbd77cd547cd25781da5421bf575187b314797741d5b5"
+      },
+      {
+        "file": "tests/member-redemption-frontend.test.mjs",
+        "sha256": "8fa2a9be16be4e409f96023e32f6ede3bf31935307d34afb0e8fcc2447d5168e"
+      },
+      {
+        "file": "tests/member-redemption.test.mjs",
+        "sha256": "eef0f17423545ad9929eddd06f35b7580b82aabe573c4b5e40153278aacf5193"
+      },
+      {
+        "file": "tests/notification-management-frontend.test.mjs",
+        "sha256": "def0cd434039001032be78d9b0f348614a4cdefca3035cea89ef21ac52224f85"
+      },
+      {
+        "file": "tests/notification-view.test.mjs",
+        "sha256": "03e44ba051046ba32d867e1a15915f06f57014c75c81e99d447ea5b3ae45bdbf"
+      },
+      {
+        "file": "tests/performance-ux.test.mjs",
+        "sha256": "4830e423f375c86a7a33fa0b30a3b7c5388365fca0c4c85c1518e1acb2913c03"
+      },
+      {
+        "file": "tests/personal-reminder-readiness.test.mjs",
+        "sha256": "47d8ccf662d573a08d3b09cb73a08085a7970cda0c4210c352f7302c90309704"
+      },
+      {
+        "file": "tests/picker-ux.test.mjs",
+        "sha256": "21b35b26544c81a6f4d824de806bc99cc1b0a897c02a2ade40b0b7b087085dbb"
+      },
+      {
+        "file": "tests/query-compact-selection.test.mjs",
+        "sha256": "f77a113858abc40bc1363c3c5674a92858cc3ed4f17bfb637aabf4012ea578f6"
+      },
+      {
+        "file": "tests/query-snapshot-and-follow.test.mjs",
+        "sha256": "79160dd14d5329d1a7d67c155e2c97681366bbfcf34b10b2eaef873cb31ebcc3"
+      },
+      {
+        "file": "tests/rules.test.mjs",
+        "sha256": "e3153d88bd0ca0374b893816256f03edda16fdf2979cd0b9ccd6cd2a9b1c6f5b"
+      },
+      {
+        "file": "tests/scheduled-monitor.test.mjs",
+        "sha256": "5a27f4b58d1b32dc5a168fe1b3830cd5c2fc090f89290a1c6825b28426ac456f"
+      },
+      {
+        "file": "tests/scheduler.test.mjs",
+        "sha256": "53b0651b1f8d98b6d839001c56b0ade4eea277f281f961b30d64d8d681c976d9"
+      },
+      {
+        "file": "tests/services.test.mjs",
+        "sha256": "c5f6b54162da99e7b3afb7ecd01bd3ecea30c9df909f65a58b2cde90c7ec6b95"
+      },
+      {
+        "file": "tests/stock-observation-pages.test.mjs",
+        "sha256": "77e4211334a3edf369474b300a4bc2e0e8f77d8c4995a898e505e33ed9d658c8"
+      },
+      {
+        "file": "tests/stock-observation.test.mjs",
+        "sha256": "5fae95e14343100c944fc0b2c3f34373d17462c7806301e34be16cb3b54f4644"
+      },
+      {
+        "file": "package.json",
+        "sha256": "b56893c64e292ec407179763a642cdb3c0904c39adc60ece3d56b2ba3edc2efa"
+      }
+    ]
+  }
+}

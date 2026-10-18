@@ -1,0 +1,187 @@
+{
+  "discoveredAt": "2026-09-15T02:44:20.250Z",
+  "results": [
+    {
+      "category": "iphone",
+      "landing": "https://www.apple.com.cn/shop/buy-iphone",
+      "record": {
+        "requestUrl": "https://www.apple.com.cn/shop/buy-iphone",
+        "method": "GET",
+        "startedAt": "2026-09-15T02:43:59.115Z",
+        "retries": 0,
+        "httpStatus": 200,
+        "headers": {
+          "content-type": "text/html;charset=utf-8",
+          "date": "Tue, 15 Sep 2026 02:44:00 GMT",
+          "cache-control": "public, max-age=120, s-maxage=120"
+        },
+        "bytes": 392312,
+        "sha256": "231c7f6096032946f1cbf75aead4b47b3eb03e8d69722e4235c1a51e724fb007",
+        "elapsedMs": 3061,
+        "finishedAt": "2026-09-15T02:44:02.176Z"
+      },
+      "title": "购买 iPhone - Apple (中国大陆)",
+      "familyPaths": [
+        "/shop/buy-iphone/iphone-16",
+        "/shop/buy-iphone/iphone-17",
+        "/shop/buy-iphone/iphone-17e",
+        "/shop/buy-iphone/iphone-18-pro",
+        "/shop/buy-iphone/iphone-air",
+        "/shop/buy-iphone/iphone-duo"
+      ]
+    },
+    {
+      "category": "ipad",
+      "landing": "https://www.apple.com.cn/shop/buy-ipad",
+      "record": {
+        "requestUrl": "https://www.apple.com.cn/shop/buy-ipad",
+        "method": "GET",
+        "startedAt": "2026-09-15T02:44:03.681Z",
+        "retries": 0,
+        "httpStatus": 200,
+        "headers": {
+          "content-type": "text/html;charset=utf-8",
+          "date": "Tue, 15 Sep 2026 02:44:04 GMT",
+          "cache-control": "public, max-age=120, s-maxage=120"
+        },
+        "bytes": 432286,
+        "sha256": "99b4dd1f2ffd3602a65926a63b6520e2e6abd842318cb3de289a2c3481e0af82",
+        "elapsedMs": 1358,
+        "finishedAt": "2026-09-15T02:44:05.039Z"
+      },
+      "title": "购买 iPad - Apple (中国大陆)",
+      "familyPaths": [
+        "/shop/buy-ipad/ipad",
+        "/shop/buy-ipad/ipad-10-2",
+        "/shop/buy-ipad/ipad-air",
+        "/shop/buy-ipad/ipad-mini",
+        "/shop/buy-ipad/ipad-pro"
+      ]
+    },
+    {
+      "category": "mac",
+      "landing": "https://www.apple.com.cn/shop/buy-mac",
+      "record": {
+        "requestUrl": "https://www.apple.com.cn/shop/buy-mac",
+        "method": "GET",
+        "startedAt": "2026-09-15T02:44:06.549Z",
+        "retries": 0,
+        "httpStatus": 200,
+        "headers": {
+          "content-type": "text/html;charset=utf-8",
+          "date": "Tue, 15 Sep 2026 02:44:07 GMT",
+          "cache-control": "public, max-age=120, s-maxage=120"
+        },
+        "bytes": 432523,
+        "sha256": "d8a50ac3375d8d2acd4ffa5962de6a008e6f2fcb5b5212c04fd2b7f2b4708480",
+        "elapsedMs": 1630,
+        "finishedAt": "2026-09-15T02:44:08.179Z"
+      },
+      "title": "购买 Mac - Apple (中国大陆)",
+      "familyPaths": [
+        "/shop/buy-mac/imac",
+        "/shop/buy-mac/mac-mini",
+        "/shop/buy-mac/mac-studio",
+        "/shop/buy-mac/macbook-air",
+        "/shop/buy-mac/macbook-neo",
+        "/shop/buy-mac/macbook-pro",
+        "/shop/buy-mac/studio-display",
+        "/shop/buy-mac/studio-display-xdr"
+      ]
+    },
+    {
+      "category": "watch",
+      "landing": "https://www.apple.com.cn/shop/buy-watch",
+      "record": {
+        "requestUrl": "https://www.apple.com.cn/shop/buy-watch",
+        "method": "GET",
+        "startedAt": "2026-09-15T02:44:09.682Z",
+        "retries": 0,
+        "httpStatus": 200,
+        "headers": {
+          "content-type": "text/html;charset=utf-8",
+          "date": "Tue, 15 Sep 2026 02:44:10 GMT",
+          "cache-control": "public, max-age=120, s-maxage=120"
+        },
+        "bytes": 431196,
+        "sha256": "e60ec28abb4095a4f952fdd7cf43096a4bdb8f99c61ff9f689e0244f41c12db6",
+        "elapsedMs": 1539,
+        "finishedAt": "2026-09-15T02:44:11.221Z"
+      },
+      "title": "购买 Apple Watch - Apple (中国大陆)",
+      "familyPaths": [
+        "/shop/buy-watch/apple-watch",
+        "/shop/buy-watch/apple-watch-hermes",
+        "/shop/buy-watch/apple-watch-hermes-ultra",
+        "/shop/buy-watch/apple-watch-se",
+        "/shop/buy-watch/apple-watch-ultra"
+      ]
+    },
+    {
+      "category": "airpods",
+      "landing": "https://www.apple.com.cn/shop/buy-airpods",
+      "record": {
+        "requestUrl": "https://www.apple.com.cn/shop/buy-airpods",
+        "method": "GET",
+        "startedAt": "2026-09-15T02:44:12.727Z",
+        "retries": 0,
+        "httpStatus": 404,
+        "headers": {
+          "content-type": "text/html;charset=utf-8",
+          "date": "Tue, 15 Sep 2026 02:44:12 GMT",
+          "cache-control": "public, max-age=120, s-maxage=120"
+        },
+        "bytes": 138001,
+        "sha256": "7300b577499f3d29807638b9c2952b6f08db0ca41bd191fb66c4a855953887c5",
+        "elapsedMs": 1754,
+        "finishedAt": "2026-09-15T02:44:14.482Z"
+      },
+      "title": "未找到页面 - Apple (中国大陆)",
+      "familyPaths": []
+    },
+    {
+      "category": "vision",
+      "landing": "https://www.apple.com.cn/shop/buy-vision",
+      "record": {
+        "requestUrl": "https://www.apple.com.cn/shop/buy-vision",
+        "method": "GET",
+        "startedAt": "2026-09-15T02:44:15.990Z",
+        "retries": 0,
+        "httpStatus": 200,
+        "headers": {
+          "content-type": "text/html;charset=utf-8",
+          "date": "Tue, 15 Sep 2026 02:44:16 GMT",
+          "cache-control": "public, max-age=120, s-maxage=120"
+        },
+        "bytes": 223738,
+        "sha256": "b10ace5629adba0a5759136004cc2d8a7e8a6770389d211959619ce79868540a",
+        "elapsedMs": 1451,
+        "finishedAt": "2026-09-15T02:44:17.441Z"
+      },
+      "title": "购买 Apple Vision Pro - Apple (中国大陆)",
+      "familyPaths": []
+    },
+    {
+      "category": "homepod",
+      "landing": "https://www.apple.com.cn/shop/buy-homepod",
+      "record": {
+        "requestUrl": "https://www.apple.com.cn/shop/buy-homepod",
+        "method": "GET",
+        "startedAt": "2026-09-15T02:44:18.952Z",
+        "retries": 0,
+        "httpStatus": 404,
+        "headers": {
+          "content-type": "text/html;charset=utf-8",
+          "date": "Tue, 15 Sep 2026 02:44:19 GMT",
+          "cache-control": "public, max-age=120, s-maxage=120"
+        },
+        "bytes": 137995,
+        "sha256": "201f447e7437dc434667e2ca9a790823586eec6a5d4db58d8766841451982e7b",
+        "elapsedMs": 1298,
+        "finishedAt": "2026-09-15T02:44:20.250Z"
+      },
+      "title": "未找到页面 - Apple (中国大陆)",
+      "familyPaths": []
+    }
+  ]
+}

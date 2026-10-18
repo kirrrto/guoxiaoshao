@@ -1,0 +1,14 @@
+[
+  {
+    "tool": "wcc",
+    "files": 12,
+    "exitCode": 0,
+    "stderr": ""
+  },
+  {
+    "tool": "wcsc",
+    "files": 16,
+    "exitCode": 0,
+    "stderr": ""
+  }
+]

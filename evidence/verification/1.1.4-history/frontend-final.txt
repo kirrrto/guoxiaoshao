@@ -1,0 +1,34 @@
+✔ bootstrap transient failure can retry and explicit invalidation fetches fresh data (11.6867ms)
+✔ cloud initialization recovers after a transient failure and shares an in-flight init (3.3379ms)
+✔ result-card requery retains its displayed SKU and stores after picker changes (12.5177ms)
+✔ uncertain query retries reuse request ID; completed queries start a new ID (9.6424ms)
+✔ query guard prevents double taps from starting two paid operations (7.804ms)
+✔ zero-balance recovery and store reordering retain the original uncertain query ID (13.6862ms)
+✔ history pagination retains the original request and merges unique events (10.8719ms)
+✔ follow page refreshes while visible and stops polling when hidden (20.2099ms)
+✔ expired memberships and stale observations are not presented as active monitoring (8.8733ms)
+✔ subscription retry reuses authorization request ID without prompting WeChat twice (13.6779ms)
+✔ a permanently rejected old subscription is cleared and a new template can be authorized (8.6441ms)
+✔ SKU filters switch exact-color images and never borrow a missing color image (2.4535ms)
+✔ payment is intentionally unavailable and no checkout/query-order API is reachable (9.0404ms)
+✔ abandoned refunded query response clears pending request without requiring a product (7.5707ms)
+✔ history uses server full-result last-hour count when only one page is loaded (7.883ms)
+✔ active saved follows separate the user switch from a missing collector (16.8455ms)
+✔ pull-to-refresh formats follows using the newly fetched membership state (18.4157ms)
+✔ first-visit pending follow editor receives catalog and ready state before opening (12.4909ms)
+✔ bundled image fallback exactly matches every current catalog SKU and preserves signed URLs (4.6022ms)
+✔ complete image-enabled catalog stays safely below the WeChat setData payload limit (13.6434ms)
+✔ isolated picker styles contain only class selectors and no imported global selectors (1.0418ms)
+✔ all page event handlers exist; WXML expressions have no XML entity operators; UTF-8 is valid (47.0129ms)
+✔ empty history never implies a recorded zero even with a current known latest observation (21.2227ms)
+✔ sampled unchanged states and failed samples have distinct copy without implying full-day coverage (17.2255ms)
+✔ legacy events remain valid evidence without fabricating daily sample coverage (9.5127ms)
+✔ member empty result describes no charge only when server confirms the billing outcome (19.9351ms)
+ℹ tests 26
+ℹ suites 0
+ℹ pass 26
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 362.0002

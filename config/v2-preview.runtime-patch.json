@@ -1,0 +1,11 @@
+{
+  "features": {
+    "contextualCheckout": true,
+    "resultNextAction": true,
+    "activationJourney": true,
+    "targetEvidence": true,
+    "growthEvents": false,
+    "experimentAssignments": false,
+    "launchGuide": true
+  }
+}

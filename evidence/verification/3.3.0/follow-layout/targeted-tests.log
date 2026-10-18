@@ -1,0 +1,689 @@
+TAP version 13
+# [gxs_config_auth_denied] {"stage":"admin.updateConfig.requireAdmin","documentIsArray":false,"documentHasId":false,"adminListIsArray":true,"adminCount":0,"actorHasUser":true,"isOperator":false,"isAdmin":false,"matchesAdminList":false}
+# Subtest: account tab reuses secondary results and loads membership records only when opened
+ok 1 - account tab reuses secondary results and loads membership records only when opened
+  ---
+  duration_ms: 13.556583
+  type: 'test'
+  ...
+# Subtest: overlapping account refreshes share the pending request
+ok 2 - overlapping account refreshes share the pending request
+  ---
+  duration_ms: 2.105
+  type: 'test'
+  ...
+# Subtest: failed account records show retryable errors instead of claiming no records
+ok 3 - failed account records show retryable errors instead of claiming no records
+  ---
+  duration_ms: 2.695791
+  type: 'test'
+  ...
+# Subtest: cached admin identity never reveals admin controls before server authorization
+ok 4 - cached admin identity never reveals admin controls before server authorization
+  ---
+  duration_ms: 2.940541
+  type: 'test'
+  ...
+# Subtest: admin access rechecks on returning and removes previously loaded data if revoked
+ok 5 - admin access rechecks on returning and removes previously loaded data if revoked
+  ---
+  duration_ms: 1.826
+  type: 'test'
+  ...
+# Subtest: ordinary users cannot call administrative APIs directly regardless of client flags
+ok 6 - ordinary users cannot call administrative APIs directly regardless of client flags
+  ---
+  duration_ms: 3.80275
+  type: 'test'
+  ...
+# Subtest: consumer account page contains no admin route or catalog timestamp
+ok 7 - consumer account page contains no admin route or catalog timestamp
+  ---
+  duration_ms: 0.712042
+  type: 'test'
+  ...
+# Subtest: customer service opens the native WeChat contact session from the account page and guide
+ok 8 - customer service opens the native WeChat contact session from the account page and guide
+  ---
+  duration_ms: 1.091375
+  type: 'test'
+  ...
+# Subtest: operator configuration cannot send administrator-list edits and malformed JSON values
+ok 9 - operator configuration cannot send administrator-list edits and malformed JSON values
+  ---
+  duration_ms: 0.6975
+  type: 'test'
+  ...
+# Subtest: an operator editor sends its loaded revision and retains edited text when another administrator already changed config
+ok 10 - an operator editor sends its loaded revision and retains edited text when another administrator already changed config
+  ---
+  duration_ms: 0.801375
+  type: 'test'
+  ...
+# Subtest: an operator editor cannot save without a version supplied by the configuration read
+ok 11 - an operator editor cannot save without a version supplied by the configuration read
+  ---
+  duration_ms: 0.940625
+  type: 'test'
+  ...
+# Subtest: operator project is physically outside the consumer upload root and has all local dependencies
+ok 12 - operator project is physically outside the consumer upload root and has all local dependencies
+  ---
+  duration_ms: 2.413375
+  type: 'test'
+  ...
+# Subtest: operator cloud connection requires the existing resource app and never grants a client admin identity
+ok 13 - operator cloud connection requires the existing resource app and never grants a client admin identity
+  ---
+  duration_ms: 2.244958
+  type: 'test'
+  ...
+# Subtest: operators read the seven-day alert insights as plain lines
+ok 14 - operators read the seven-day alert insights as plain lines
+  ---
+  duration_ms: 0.909375
+  type: 'test'
+  ...
+# Subtest: a changed announcement or same-id edited notice lights the unread indicator again
+ok 15 - a changed announcement or same-id edited notice lights the unread indicator again
+  ---
+  duration_ms: 3.55475
+  type: 'test'
+  ...
+# Subtest: an open notice board removes expired content locally and releases its timer on unload
+ok 16 - an open notice board removes expired content locally and releases its timer on unload
+  ---
+  duration_ms: 20.884125
+  type: 'test'
+  ...
+# Subtest: notice refresh failure keeps valid prior content and does not fabricate recovery
+ok 17 - notice refresh failure keeps valid prior content and does not fabricate recovery
+  ---
+  duration_ms: 9.230458
+  type: 'test'
+  ...
+# Subtest: a late notice read cannot update an unloaded page
+ok 18 - a late notice read cannot update an unloaded page
+  ---
+  duration_ms: 4.9325
+  type: 'test'
+  ...
+# Subtest: stale available observations remain explicit historical evidence, not current availability
+ok 19 - stale available observations remain explicit historical evidence, not current availability
+  ---
+  duration_ms: 21.003083
+  type: 'test'
+  ...
+# Subtest: fresh available follow has an actionable summary and explains no repeat notifications
+ok 20 - fresh available follow has an actionable summary and explains no repeat notifications
+  ---
+  duration_ms: 13.114084
+  type: 'test'
+  ...
+# Subtest: querying a follow carries its permitted targets without running or charging a stock query
+ok 21 - querying a follow carries its permitted targets without running or charging a stock query
+  ---
+  duration_ms: 11.153375
+  type: 'test'
+  ...
+# Subtest: refresh status is single flight and never opens a permission prompt or stock query
+ok 22 - refresh status is single flight and never opens a permission prompt or stock query
+  ---
+  duration_ms: 11.767833
+  type: 'test'
+  ...
+# Subtest: a previous account refresh cannot claim delivery status has refreshed for the next account
+ok 23 - a previous account refresh cannot claim delivery status has refreshed for the next account
+  ---
+  duration_ms: 15.134417
+  type: 'test'
+  ...
+# Subtest: an automatic record update changes the same followed product from no stock to pickup without a manual query
+ok 24 - an automatic record update changes the same followed product from no stock to pickup without a manual query
+  ---
+  duration_ms: 30.2055
+  type: 'test'
+  ...
+# Subtest: follow reads begin while bootstrap is pending and still publish if that account refresh fails
+ok 25 - follow reads begin while bootstrap is pending and still publish if that account refresh fails
+  ---
+  duration_ms: 14.22425
+  type: 'test'
+  ...
+# Subtest: visible reads cap stale collector scheduling at 30 seconds and slow reads never overlap
+ok 26 - visible reads cap stale collector scheduling at 30 seconds and slow reads never overlap
+  ---
+  duration_ms: 13.77825
+  type: 'test'
+  ...
+# Subtest: hiding retires in-flight page updates and returning bypasses the 15-second settled follow cache
+ok 27 - hiding retires in-flight page updates and returning bypasses the 15-second settled follow cache
+  ---
+  duration_ms: 14.342791
+  type: 'test'
+  ...
+# Subtest: an account switch discovered during parallel reads discards the old records and reads the new owner
+ok 28 - an account switch discovered during parallel reads discards the old records and reads the new owner
+  ---
+  duration_ms: 16.57725
+  type: 'test'
+  ...
+# Subtest: an external account switch survives an old refresh success and keeps automatic polling alive
+ok 29 - an external account switch survives an old refresh success and keeps automatic polling alive
+  ---
+  duration_ms: 17.815417
+  type: 'test'
+  ...
+# Subtest: an external account switch survives an old refresh failure and keeps automatic polling alive
+ok 30 - an external account switch survives an old refresh failure and keeps automatic polling alive
+  ---
+  duration_ms: 8.661667
+  type: 'test'
+  ...
+# Subtest: offline stops polling and reconnect starts one immediate read across duplicate restoration callbacks
+ok 31 - offline stops polling and reconnect starts one immediate read across duplicate restoration callbacks
+  ---
+  duration_ms: 7.887417
+  type: 'test'
+  ...
+# Subtest: repeated read failures back off without losing the old observation or starting paid queries
+ok 32 - repeated read failures back off without losing the old observation or starting paid queries
+  ---
+  duration_ms: 12.55675
+  type: 'test'
+  ...
+# Subtest: offline visible records age into historical observations without network activity
+ok 33 - offline visible records age into historical observations without network activity
+  ---
+  duration_ms: 8.136041
+  type: 'test'
+  ...
+# Subtest: a slow old-account follow response cannot trigger an extra read or cross the confirmed account boundary
+ok 34 - a slow old-account follow response cannot trigger an extra read or cross the confirmed account boundary
+  ---
+  duration_ms: 7.00125
+  type: 'test'
+  ...
+# Subtest: cold startup completed in the background cannot paint, and the next visible visit starts normally
+ok 35 - cold startup completed in the background cannot paint, and the next visible visit starts normally
+  ---
+  duration_ms: 7.008292
+  type: 'test'
+  ...
+# Subtest: a quick return before cold startup settles resumes once without leaving the page loading forever
+ok 36 - a quick return before cold startup settles resumes once without leaving the page loading forever
+  ---
+  duration_ms: 6.939958
+  type: 'test'
+  ...
+# Subtest: paid users with plenty of authorization still see their own four-minute stock delay
+ok 37 - paid users with plenty of authorization still see their own four-minute stock delay
+  ---
+  duration_ms: 23.053833
+  type: 'test'
+  ...
+# Subtest: partial current availability is timed from its matching store and keeps the stale remainder visible
+ok 38 - partial current availability is timed from its matching store and keeps the stale remainder visible
+  ---
+  duration_ms: 15.216
+  type: 'test'
+  ...
+# Subtest: a failed recent check cannot make the last valid in-stock result look recent
+ok 39 - a failed recent check cannot make the last valid in-stock result look recent
+  ---
+  duration_ms: 21.315958
+  type: 'test'
+  ...
+# Subtest: no-sample, paused and restricted targets never inflate the active delay summary
+ok 40 - no-sample, paused and restricted targets never inflate the active delay summary
+  ---
+  duration_ms: 42.079791
+  type: 'test'
+  ...
+# Subtest: save-follow announcement requires current supported configurations even after the preorder date
+ok 41 - save-follow announcement requires current supported configurations even after the preorder date
+  ---
+  duration_ms: 1.12875
+  type: 'test'
+  ...
+# Subtest: launch dates use Monday-first Beijing calendar independent of device timezone
+ok 42 - launch dates use Monday-first Beijing calendar independent of device timezone
+  ---
+  duration_ms: 0.706541
+  type: 'test'
+  ...
+# Subtest: opening notice stops after launch day while manual calendar remains available
+ok 43 - opening notice stops after launch day while manual calendar remains available
+  ---
+  duration_ms: 0.356458
+  type: 'test'
+  ...
+# Subtest: poster stage, weekdays and milestone states follow Beijing launch times without a timer
+ok 44 - poster stage, weekdays and milestone states follow Beijing launch times without a timer
+  ---
+  duration_ms: 0.413459
+  type: 'test'
+  ...
+# Subtest: guide entry note follows the launch stage and returns to generic copy after the window
+ok 45 - guide entry note follows the launch stage and returns to generic copy after the window
+  ---
+  duration_ms: 1.224083
+  type: 'test'
+  ...
+# Subtest: frequency is once per Beijing date and dismissal applies to this launch revision
+ok 46 - frequency is once per Beijing date and dismissal applies to this launch revision
+  ---
+  duration_ms: 0.144458
+  type: 'test'
+  ...
+# Subtest: opening poster announces follow readiness and retracts it when the catalog changes
+ok 47 - opening poster announces follow readiness and retracts it when the catalog changes
+  ---
+  duration_ms: 21.701041
+  type: 'test'
+  ...
+# Subtest: guide poster reads the current catalog, follows refreshes and removes its listener on unload
+ok 48 - guide poster reads the current catalog, follows refreshes and removes its listener on unload
+  ---
+  duration_ms: 12.378666
+  type: 'test'
+  ...
+# Subtest: query calendar and Mine help enter the guide with distinct visible content and no automatic actions
+ok 49 - query calendar and Mine help enter the guide with distinct visible content and no automatic actions
+  ---
+  duration_ms: 19.390625
+  type: 'test'
+  ...
+# Subtest: poster opt-in survives catalog refresh while image failure preserves dates and guide content
+ok 50 - poster opt-in survives catalog refresh while image failure preserves dates and guide content
+  ---
+  duration_ms: 7.491333
+  type: 'test'
+  ...
+# Subtest: opening calendar waits for first render, performs no API calls, and releases tab on close
+ok 51 - opening calendar waits for first render, performs no API calls, and releases tab on close
+  ---
+  duration_ms: 9.65675
+  type: 'test'
+  ...
+# Subtest: async cache response cannot open a hidden page or interrupt an active editor
+ok 52 - async cache response cannot open a hidden page or interrupt an active editor
+  ---
+  duration_ms: 18.370959
+  type: 'test'
+  ...
+# Subtest: share and single-page entries keep their intended journey without an opening overlay
+ok 53 - share and single-page entries keep their intended journey without an opening overlay
+  ---
+  duration_ms: 24.324833
+  type: 'test'
+  ...
+# Subtest: guide actions stay inside the mini program
+ok 54 - guide actions stay inside the mini program
+  ---
+  duration_ms: 6.365
+  type: 'test'
+  ...
+# Subtest: monthly and annual upgrades add the full duration after the existing expiry
+ok 55 - monthly and annual upgrades add the full duration after the existing expiry
+  ---
+  duration_ms: 1.182625
+  type: 'test'
+  ...
+# Subtest: expired membership starts at confirmation-time estimate rather than extending a date in the past
+ok 56 - expired membership starts at confirmation-time estimate rather than extending a date in the past
+  ---
+  duration_ms: 0.209375
+  type: 'test'
+  ...
+# Subtest: free and expired accounts can open, refresh and close member plans without invoking payment
+ok 57 - free and expired accounts can open, refresh and close member plans without invoking payment
+  ---
+  duration_ms: 38.674834
+  type: 'test'
+  ...
+# Subtest: member purchase cards describe server-issued limits without inferring rights from duration
+ok 58 - member purchase cards describe server-issued limits without inferring rights from duration
+  ---
+  duration_ms: 11.07025
+  type: 'test'
+  ...
+# Subtest: concise benefit cards group equal advertised allowances while the current account keeps its own actual limit
+ok 59 - concise benefit cards group equal advertised allowances while the current account keeps its own actual limit
+  ---
+  duration_ms: 12.097917
+  type: 'test'
+  ...
+# Subtest: legacy product snapshots never advertise enhanced slots based only on a long duration
+ok 60 - legacy product snapshots never advertise enhanced slots based only on a long duration
+  ---
+  duration_ms: 12.562334
+  type: 'test'
+  ...
+# Subtest: annual products advertise five configurations without expanding stores and current plan shows its actual expiry
+ok 61 - annual products advertise five configurations without expanding stores and current plan shows its actual expiry
+  ---
+  duration_ms: 13.528666
+  type: 'test'
+  ...
+# Subtest: changing account clears the latest-notification preview and ignores a previous-account response
+ok 62 - changing account clears the latest-notification preview and ignores a previous-account response
+  ---
+  duration_ms: 13.977459
+  type: 'test'
+  ...
+# Subtest: upgrade options follow the server plan instead of remaining days or identical allowances
+ok 63 - upgrade options follow the server plan instead of remaining days or identical allowances
+  ---
+  duration_ms: 14.327708
+  type: 'test'
+  ...
+# Subtest: monthly member renews their actual plan and upgrade never exposes or selects the current tier
+ok 64 - monthly member renews their actual plan and upgrade never exposes or selects the current tier
+  ---
+  duration_ms: 9.498542
+  type: 'test'
+  ...
+# Subtest: highest-tier member sees an empty upgrade state and cannot start a hidden purchase
+ok 65 - highest-tier member sees an empty upgrade state and cannot start a hidden purchase
+  ---
+  duration_ms: 7.839791
+  type: 'test'
+  ...
+# Subtest: unavailable higher tiers stay hidden and price refresh updates the visible upgrade card
+ok 66 - unavailable higher tiers stay hidden and price refresh updates the visible upgrade card
+  ---
+  duration_ms: 6.466667
+  type: 'test'
+  ...
+# Subtest: membership becoming the selected tier during consent cancels the obsolete upgrade purchase
+ok 67 - membership becoming the selected tier during consent cancels the obsolete upgrade purchase
+  ---
+  duration_ms: 6.765834
+  type: 'test'
+  ...
+# Subtest: collapsed purchase details do not bypass the selected product notice and final consent
+ok 68 - collapsed purchase details do not bypass the selected product notice and final consent
+  ---
+  duration_ms: 6.773583
+  type: 'test'
+  ...
+# Subtest: ongoing monthly and annual offers use server prices and do not invent a price-restoration deadline
+ok 69 - ongoing monthly and annual offers use server prices and do not invent a price-restoration deadline
+  ---
+  duration_ms: 5.9235
+  type: 'test'
+  ...
+# Subtest: a changed server snapshot with inactive offers follows its prices without a stale offer label
+ok 70 - a changed server snapshot with inactive offers follows its prices without a stale offer label
+  ---
+  duration_ms: 10.863125
+  type: 'test'
+  ...
+# Subtest: a safely changed monthly quote updates the actual account page and requires a second modal before paying
+ok 71 - a safely changed monthly quote updates the actual account page and requires a second modal before paying
+  ---
+  duration_ms: 9.387042
+  type: 'test'
+  ...
+# Subtest: an open purchase modal cannot approve a refreshed price or inherit an account change
+ok 72 - an open purchase modal cannot approve a refreshed price or inherit an account change
+  ---
+  duration_ms: 12.140541
+  type: 'test'
+  ...
+# Subtest: guide navigation and purchase-record shortcut open their destinations without ordering
+ok 73 - guide navigation and purchase-record shortcut open their destinations without ordering
+  ---
+  duration_ms: 5.485292
+  type: 'test'
+  ...
+# Subtest: paid member upgrade selects a long-term package at full price without ordering or changing existing membership
+ok 74 - paid member upgrade selects a long-term package at full price without ordering or changing existing membership
+  ---
+  duration_ms: 5.370792
+  type: 'test'
+  ...
+# Subtest: renewal can select the weekly package, while pending orders cannot be replaced through upgrade controls
+ok 75 - renewal can select the weekly package, while pending orders cannot be replaced through upgrade controls
+  ---
+  duration_ms: 7.017834
+  type: 'test'
+  ...
+# Subtest: free accounts cannot trigger the paid-member upgrade entry and switching accounts closes it
+ok 76 - free accounts cannot trigger the paid-member upgrade entry and switching accounts closes it
+  ---
+  duration_ms: 12.038791
+  type: 'test'
+  ...
+# Subtest: abandon confirmation belongs to its original visible account and order
+ok 77 - abandon confirmation belongs to its original visible account and order
+  ---
+  duration_ms: 18.915625
+  type: 'test'
+  ...
+# Subtest: real account page lifecycle loads membership and quota and recovers an initial failure
+ok 78 - real account page lifecycle loads membership and quota and recovers an initial failure
+  ---
+  duration_ms: 17.872375
+  type: 'test'
+  ...
+# Subtest: opening reminder details focuses the rendered section and collapse cancels a queued focus
+ok 79 - opening reminder details focuses the rendered section and collapse cancels a queued focus
+  ---
+  duration_ms: 16.800917
+  type: 'test'
+  ...
+# Subtest: leaving the follow page cancels reminder focus even if the page becomes visible again
+ok 80 - leaving the follow page cancels reminder focus even if the page becomes visible again
+  ---
+  duration_ms: 33.816833
+  type: 'test'
+  ...
+# Subtest: unavailable or failed scroll APIs never prevent opening reminder details
+ok 81 - unavailable or failed scroll APIs never prevent opening reminder details
+  ---
+  duration_ms: 53.459125
+  type: 'test'
+  ...
+# Subtest: automatic follow refresh updates observations without reordering existing cards or closing details
+ok 82 - automatic follow refresh updates observations without reordering existing cards or closing details
+  ---
+  duration_ms: 8.30925
+  type: 'test'
+  ...
+# Subtest: editing a middle card preserves its position after confirmation even when the refresh is offline
+ok 83 - editing a middle card preserves its position after confirmation even when the refresh is offline
+  ---
+  duration_ms: 9.621916
+  type: 'test'
+  ...
+# Subtest: closing the sheet checks the live picker rather than the last deferred change event
+ok 84 - closing the sheet checks the live picker rather than the last deferred change event
+  ---
+  duration_ms: 8.877334
+  type: 'test'
+  ...
+# Subtest: an unchanged selection can close without a discard warning, regardless of store order
+ok 85 - an unchanged selection can close without a discard warning, regardless of store order
+  ---
+  duration_ms: 7.573375
+  type: 'test'
+  ...
+# Subtest: a new editor cannot lose its first selected store before the initial picker event is delivered
+ok 86 - a new editor cannot lose its first selected store before the initial picker event is delivered
+  ---
+  duration_ms: 5.940834
+  type: 'test'
+  ...
+# Subtest: the draft owns a copy of the committed store selection and cannot close during a save
+ok 87 - the draft owns a copy of the committed store selection and cannot close during a save
+  ---
+  duration_ms: 6.928167
+  type: 'test'
+  ...
+# Subtest: server-confirmed pause stays paused when the subsequent observation read fails
+ok 88 - server-confirmed pause stays paused when the subsequent observation read fails
+  ---
+  duration_ms: 6.854042
+  type: 'test'
+  ...
+# Subtest: duplicate delete taps share one confirmation and a confirmed delete is not reversed by read failure
+ok 89 - duplicate delete taps share one confirmation and a confirmed delete is not reversed by read failure
+  ---
+  duration_ms: 7.442666
+  type: 'test'
+  ...
+# Subtest: an uncertain pause keeps the last confirmed card and gives a state check instead of an optimistic success
+ok 90 - an uncertain pause keeps the last confirmed card and gives a state check instead of an optimistic success
+  ---
+  duration_ms: 14.25075
+  type: 'test'
+  ...
+# Subtest: a definitive resume rejection preserves its explanation and the paused card
+ok 91 - a definitive resume rejection preserves its explanation and the paused card
+  ---
+  duration_ms: 6.235916
+  type: 'test'
+  ...
+# Subtest: a late pause response after unload invalidates caches without repainting or starting another page read
+ok 92 - a late pause response after unload invalidates caches without repainting or starting another page read
+  ---
+  duration_ms: 5.515875
+  type: 'test'
+  ...
+# Subtest: pickup details recheck freshness at the tap and never present old availability as current
+ok 93 - pickup details recheck freshness at the tap and never present old availability as current
+  ---
+  duration_ms: 5.555584
+  type: 'test'
+  ...
+# Subtest: pickup details only include fresh available stores and keep uncertainty out of the copy shortcut
+ok 94 - pickup details only include fresh available stores and keep uncertainty out of the copy shortcut
+  ---
+  duration_ms: 5.519875
+  type: 'test'
+  ...
+# Subtest: history handoff copies the original target once and never queries or debits on arrival
+ok 95 - history handoff copies the original target once and never queries or debits on arrival
+  ---
+  duration_ms: 18.863459
+  type: 'test'
+  ...
+# Subtest: history shortcut dates only change filters and mark old results independently
+ok 96 - history shortcut dates only change filters and mark old results independently
+  ---
+  duration_ms: 8.789458
+  type: 'test'
+  ...
+# Subtest: history handoffs reject changed accounts, expired intents and arbitrary route values
+ok 97 - history handoffs reject changed accounts, expired intents and arbitrary route values
+  ---
+  duration_ms: 7.316208
+  type: 'test'
+  ...
+# Subtest: history handoff waits for the editor and rejects removed catalog entries without widening scope
+ok 98 - history handoff waits for the editor and rejects removed catalog entries without widening scope
+  ---
+  duration_ms: 9.583292
+  type: 'test'
+  ...
+# Subtest: a new history target preserves the old result under its own request label
+ok 99 - a new history target preserves the old result under its own request label
+  ---
+  duration_ms: 7.560875
+  type: 'test'
+  ...
+# Subtest: sign-in return carries only the original request and an allowed source, once, for its account
+ok 100 - sign-in return carries only the original request and an allowed source, once, for its account
+  ---
+  duration_ms: 0.842958
+  type: 'test'
+  ...
+# Subtest: test page resumes the original result after sign-in without sending or recording a message-open
+ok 101 - test page resumes the original result after sign-in without sending or recording a message-open
+  ---
+  duration_ms: 4.35075
+  type: 'test'
+  ...
+# Subtest: test page source fallback and changed-account return use the reminder center
+ok 102 - test page source fallback and changed-account return use the reminder center
+  ---
+  duration_ms: 10.073125
+  type: 'test'
+  ...
+# Subtest: test return to an existing guide uses the page stack and retains guide state
+ok 103 - test return to an existing guide uses the page stack and retains guide state
+  ---
+  duration_ms: 0.74325
+  type: 'test'
+  ...
+# Subtest: pickup guide validates its public target and returns without overwriting query drafts
+ok 104 - pickup guide validates its public target and returns without overwriting query drafts
+  ---
+  duration_ms: 13.323959
+  type: 'test'
+  ...
+# Subtest: guide opens the requested allowed help and ignores arbitrary sections and destinations
+ok 105 - guide opens the requested allowed help and ignores arbitrary sections and destinations
+  ---
+  duration_ms: 9.220208
+  type: 'test'
+  ...
+# Subtest: diagnostic copy is explicit and has exactly the fixed fields without untrusted source text
+ok 106 - diagnostic copy is explicit and has exactly the fixed fields without untrusted source text
+  ---
+  duration_ms: 7.983458
+  type: 'test'
+  ...
+# Subtest: history current observation stays separate and the guide opt-in poster precedes always-visible guidance
+ok 107 - history current observation stays separate and the guide opt-in poster precedes always-visible guidance
+  ---
+  duration_ms: 0.46575
+  type: 'test'
+  ...
+# Subtest: fresh pickup opens an internal guide with the original result target, including four stores
+ok 108 - fresh pickup opens an internal guide with the original result target, including four stores
+  ---
+  duration_ms: 29.678167
+  type: 'test'
+  ...
+# Subtest: a formerly fresh pickup cannot open its guide after expiry, permission loss or uncertain query
+ok 109 - a formerly fresh pickup cannot open its guide after expiry, permission loss or uncertain query
+  ---
+  duration_ms: 52.135583
+  type: 'test'
+  ...
+# Subtest: query lifecycle never invokes the opening calendar, including a normal returning user
+ok 110 - query lifecycle never invokes the opening calendar, including a normal returning user
+  ---
+  duration_ms: 14.663083
+  type: 'test'
+  ...
+# Subtest: alternatives and evidence start folded and disclosure taps have no business side effects
+ok 111 - alternatives and evidence start folded and disclosure taps have no business side effects
+  ---
+  duration_ms: 10.507833
+  type: 'test'
+  ...
+# Subtest: available history receives only the chosen target and waits for an explicit history request
+ok 112 - available history receives only the chosen target and waits for an explicit history request
+  ---
+  duration_ms: 12.762334
+  type: 'test'
+  ...
+# Subtest: query presentation places only fresh available stores first without changing the retained query
+ok 113 - query presentation places only fresh available stores first without changing the retained query
+  ---
+  duration_ms: 29.448375
+  type: 'test'
+  ...
+1..113
+# tests 113
+# suites 0
+# pass 113
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 380.063291
