@@ -31,7 +31,9 @@
 .history-query-cost { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 6rpx 16rpx; margin-top: 14rpx; font-size: max(12px, 24rpx); line-height: 1.5; color: var(--text-2); }
 .history-query-cost > text:first-child { color: var(--green-dark); }
 .history-scope-note { margin-top: 8rpx; line-height: 1.5; }
-.history-task-note { margin: 0 8rpx 20rpx; }
+.history-task-bar { display: flex; align-items: center; justify-content: space-between; gap: 16rpx; margin: 0 4rpx 20rpx; padding: 14rpx 18rpx; border-radius: 16rpx; background: var(--surface-soft); border: 1rpx solid var(--line); }
+.history-task-note { flex: 1; min-width: 0; margin: 0; line-height: 1.5; }
+.history-task-claim.btn { flex: none; width: auto; height: auto; min-height: 44px; margin: 0; padding: 6rpx 16rpx; font-size: max(12px, 24rpx); line-height: 1.45; }
 .history-result-heading { display: flex; justify-content: space-between; align-items: baseline; gap: 16rpx; }
 .history-result-date { font-size: max(16px, 34rpx); font-weight: 700; font-variant-numeric: tabular-nums; }
 .history-result-target { margin-top: 6rpx; font-size: max(12px, 25rpx); color: var(--text-2); overflow-wrap: anywhere; }

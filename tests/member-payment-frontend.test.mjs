@@ -505,6 +505,8 @@ test('account page applies server-confirmed membership, invalidates caches and r
     require: name => name.endsWith('/api') ? { call } : name.endsWith('/store') ? store : isolatedAccountUi(name) || require(path.resolve(path.dirname(source), name)) });
   const page = { ...pageDefinition, data: structuredClone(pageDefinition.data), setData(patch) { Object.assign(this.data, patch); } };
   page.applyBoot({ identity: { userKey: 'page-account' }, membership: free, memberProduct: product, collector: { state: 'not_deployed' }, quota: { tasksDoneToday: [] }, limits: { maxFollows: 3 }, tasks: [], followCount: 0 });
+  assert.deepEqual(invalidated, ['follows'], 'first account confirmation discards unowned follow caches');
+  invalidated.length = 0;
   page.data.ready = true; await page.paymentController.show();
   assert.equal(page.data.boot.paymentReady, true);
   assert.match(page.data.boot.purchaseNotice, /一经售出不予退款/);

@@ -56,7 +56,11 @@
 
     <view wx:if="{{restoreNotice}}" class="banner {{restoreWarning ? 'banner-warn' : 'banner-info'}} small">{{restoreNotice}}</view>
     <button wx:if="{{journeySource}}" class="ui-action ui-action--neutral mb" bindtap="onReturnJourney"><text class="ui-action-label">{{journeySource === 'follow' ? '返回小哨任务' : '返回原查询'}}</text><view class="ui-chevron" aria-hidden="true"></view></button>
-    <view wx:if="{{taskMessage}}" class="small muted history-task-note">{{taskMessage}}</view>
+    <view wx:if="{{taskMessage || (accountReady && boot && boot.taskAvailable)}}" class="history-task-bar small">
+      <text class="history-task-note muted">{{taskMessage || ('今日浏览本页可领 +' + boot.taskReward + ' 次查询额度')}}</text>
+      <button wx:if="{{accountReady && boot && boot.taskAvailable}}" class="btn btn-primary btn-sm history-task-claim" loading="{{taskClaimLoading}}" disabled="{{browseLoading || taskClaimLoading}}" bindtap="onClaimTask">{{taskClaimLoading ? '领取中…' : (browseLoading ? '确认中…' : '领取奖励')}}</button>
+    </view>
+    <view wx:if="{{taskClaimError}}" class="banner banner-warn small" role="alert">{{taskClaimError}}</view>
     <view wx:if="{{browseError && !browseExpanded}}" class="banner banner-warn small">{{browseError}}<button class="btn btn-outline btn-sm mt" disabled="{{browseLoading}}" bindtap="onRetryBrowse">重新加载浏览记录</button></view>
     <view wx:if="{{result}}" class="card history-result-card">
       <view wx:if="{{queryFailureMessage}}" class="banner banner-warn small mb">本次查询未完成，下方保留上次查询结果。</view>

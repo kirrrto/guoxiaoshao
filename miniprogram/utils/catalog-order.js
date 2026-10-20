@@ -7,8 +7,8 @@ const compareText = (a, b) => text(a).localeCompare(text(b), 'zh-CN', { numeric:
 // New catalog releases should supply releaseDate/releaseOrder and override this
 // compatibility map, which also fixes catalogs already deployed without dates.
 const FAMILY_RELEASES = {
-  'iphone-18-pro': ['2026-09-09', 'https://www.apple.com.cn/newsroom/2026/09/apple-debuts-iphone-18-pro-and-iphone-18-pro-max/'],
   'iphone-duo': ['2026-09-09', 'https://www.apple.com.cn/newsroom/2026/09/apple-unveils-iphone-duo/'],
+  'iphone-18-pro': ['2026-09-09', 'https://www.apple.com.cn/newsroom/2026/09/apple-debuts-iphone-18-pro-and-iphone-18-pro-max/'],
   'iphone-17e': ['2026-03-02', 'https://www.apple.com.cn/newsroom/2026/03/apple-introduces-iphone-17e/'],
   'iphone-air': ['2025-09-09', 'https://www.apple.com/newsroom/2025/09/introducing-iphone-air-a-powerful-new-iphone-with-a-breakthrough-design/'],
   'iphone-17': ['2025-09-09', 'https://www.apple.com/uk/newsroom/2025/09/apple-introduces-iphone-17/'],
@@ -75,6 +75,10 @@ function compareRecency(a, b, leftName, rightName) {
   return 0;
 }
 
+const FAMILY_PRIORITY = {
+  'iphone-duo': 1,
+};
+
 function sortFamilies(families) {
   const ordered = families.map((family, index) => ({ family, index })).sort((a, b) => {
     const ao = Number.isFinite(a.family.catalogOrder) ? a.family.catalogOrder : a.index;
@@ -91,7 +95,7 @@ function sortFamilies(families) {
   ordered.forEach((family, index) => {
     if (releaseRank(family) !== null) dated.push(index);
   });
-  reorder(dated, (a, b) => releaseRank(b) - releaseRank(a));
+  reorder(dated, (a, b) => (releaseRank(b) - releaseRank(a)) || ((FAMILY_PRIORITY[b.familyKey] || 0) - (FAMILY_PRIORITY[a.familyKey] || 0)));
   const lines = {};
   ordered.forEach((family, index) => {
     const value = generation(family.name || family.familyKey);

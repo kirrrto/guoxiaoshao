@@ -8,6 +8,16 @@
 // Keep technical details and complete acceptance records in release documents.
 const RELEASE_NOTES = [
   {
+    version: '3.3.1',
+    title: '选配与提醒体验优化',
+    dateText: '本地候选 · 2026-10-20',
+    highlights: [
+      'iPhone 系列优先展示 iPhone Duo，选门店支持常用城市快选。',
+      '历史浏览达标后可页内直接领奖，处理提醒时可顺手补充通知次数。',
+      '会员套餐按需求智能预选，页面切换与打开更流畅。',
+    ],
+  },
+  {
     version: '3.3.0',
     title: '提醒交付与库存查看优化',
     dateText: '本地候选 · 2026-10-18',

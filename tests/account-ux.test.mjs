@@ -22,7 +22,7 @@ function runtime(pageName, handler = async action => action === 'notify.list' ? 
   let definition;
   const calls = [], bootstrapCalls = [], messages = [];
   const api = { call: async (action, payload) => { calls.push({ action, payload }); return handler(action, payload); }, showError: error => messages.push(error.message), toast: message => messages.push(message) };
-  const store = { getBootstrap: async (options = {}) => { bootstrapCalls.push(options); return boot(); }, invalidateBootstrap() {}, publishQuota() {}, subscribeQuota: () => () => {} };
+  const store = { getBootstrap: async (options = {}) => { bootstrapCalls.push(options); return boot(); }, invalidateBootstrap() {}, invalidateFollows() {}, publishQuota() {}, subscribeQuota: () => () => {} };
   const wx = { stopPullDownRefresh() {}, switchTab() {}, showModal() {}, setClipboardData() {} };
   const sandbox = { console, Date, Promise, wx, Page: value => { definition = value; }, require: name => name.endsWith('/api') ? api : name.endsWith('/store') ? store : name.endsWith('/operation') ? { begin: () => 'grant-test', finish() {}, uncertain: () => false } : isolatedAccountUi(name) || require(path.join(pageRoot, 'pages', pageName, name)) };
   vm.runInNewContext(fs.readFileSync(path.join(pageRoot, 'pages', pageName, 'index.js'), 'utf8'), sandbox);

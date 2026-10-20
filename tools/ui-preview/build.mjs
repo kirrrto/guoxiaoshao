@@ -249,12 +249,14 @@ const buttonConstraintProfile = membershipNativePreview
   ? 'membership cascade regression stress: button:not([size=mini]) fixed 184px and auto inline margins; reproduces selected native-style constraints in Chromium, not WeChat rendering evidence'
   : notificationTestPreview ? 'notification-test cascade regression stress: button:not([size=mini]) fixed 184px and auto inline margins; reproduces selected native-style constraints in Chromium, not WeChat rendering evidence'
   : stockPreview ? stockNativeButtonProfile
-  : alternativesPreview ? 'regression stress only: alternative-panel button:not([size=mini]) fixed 184px, min-width:min-content, auto inline margins; not verified WeChat implementation' : null;
+  : alternativesPreview ? 'regression stress only: alternative-panel button:not([size=mini]) fixed 184px, min-width:min-content, auto inline margins; not verified WeChat implementation'
+  : v2Preview ? 'history-claim cascade regression stress: button:not([size=mini]) fixed 184px and auto inline margins within the task bar; Chromium approximation only, not WeChat rendering evidence' : null;
 const buttonConstraintCss = membershipNativePreview
   ? ':where(.mine-page) button:not([size=mini]){width:184px;margin-left:auto;margin-right:auto;}'
   : notificationTestPreview ? ':where(.test-page) button:not([size=mini]){width:184px;margin-left:auto;margin-right:auto;}'
   : stockPreview ? stockNativeButtonCss
-  : alternativesPreview ? ':where(.alternative-panel) button:not([size=mini]){width:184px;min-width:min-content;margin-left:auto;margin-right:auto;}' : '';
+  : alternativesPreview ? ':where(.alternative-panel) button:not([size=mini]){width:184px;min-width:min-content;margin-left:auto;margin-right:auto;}'
+  : v2Preview ? ':where(.history-task-bar) button:not([size=mini]){width:184px;margin-left:auto;margin-right:auto;}' : '';
 const widths = [320, 375, 430], scenarios = adminPreview ? ['operator-ready', 'operator-denied', 'operator-loading', 'operator-error', 'operator-longcontent', 'operator-saving'] : historyTaskPreview ? ['history-member-reward', 'history-free-first', 'history-read-error', 'history-balance-cap', 'history-completed', 'history-longcontent', 'history-loading'] : monitoringPreview ? ['monitor-template-missing', 'monitor-ready-authorized', 'monitor-needs-authorization', 'monitor-stale', 'monitor-disabled', 'monitor-expired-paused'] : redemptionPreview ? ['redemption-input', 'redemption-loading', 'redemption-error', 'redemption-success', 'redemption-used', 'redemption-limited', 'redemption-empty'] : stockPreview ? Object.keys(stockScenarios) : reminderPreview ? ['reminders', 'reminder-empty', 'reminder-loading', 'reminder-deleting', 'reminder-clearing', 'reminder-error', 'reminder-more-error', 'longcontent'] : ['free', 'member', 'expired', 'empty', 'error', 'loading', 'longcontent'];
 if (historyDataPreview) scenarios.splice(0, scenarios.length, 'history-no-data', 'history-unknown-only', 'history-observed-no-events', 'history-events-only', 'history-observed-events', 'history-partial-stores');
 if (paymentPreview) scenarios.splice(0, scenarios.length, 'payment-ready', 'payment-renew', 'payment-blocked', 'payment-old-ios', 'payment-pending', 'payment-cancelled', 'payment-error', 'payment-fulfilled', 'payment-partial-refund', 'payment-monthly', 'payment-annual', 'payment-pending-monthly', 'payment-member', 'payment-upgrade-monthly', 'payment-upgrade-annual', 'payment-member-pending-monthly', 'payment-benefits', 'payment-rules');
@@ -311,6 +313,9 @@ const v2Pages = {
   'v3-authorization-mine-sync-error': ['mine'],
   'v3-authorization-follow': ['follow'],
   'v3-authorization-follow-sync-error': ['follow'],
+  'v331-history-claim-capped': ['history'],
+  'v331-history-claim-loading': ['history'],
+  'v331-history-claim-error': ['history'],
 };
 if (v2Preview) {
   scenarios.splice(0, scenarios.length, ...Object.keys(v2Pages));
@@ -326,7 +331,8 @@ const manifest = [];
 
 for (const scenario of scenarios) {
   const cityPreview = scenario.startsWith('alternatives-city-');
-  const stores = cityPreview ? (rawStores.stores || rawStores).filter(store => ['合肥', '北京'].includes(store.city)) : previewStores;
+  const stores = sheetPreview ? (rawStores.stores || rawStores)
+    : cityPreview ? (rawStores.stores || rawStores).filter(store => ['合肥', '北京'].includes(store.city)) : previewStores;
   now = scenario.startsWith('v2-promotion-expired-') ? new Date('2026-11-30T16:00:00.000Z') : defaultPreviewDate;
   const products = copy(baseProducts);
   if (['longcontent', 'history-longcontent', 'sheet-longcontent', 'v2-longcontent'].includes(scenario)) { const p = products.find(p => p.partNumber === sample.partNumber); p.title += ' · 超长商品名称与配置说明用于检查换行及小屏布局 ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; }
@@ -361,7 +367,7 @@ for (const scenario of scenarios) {
   if (notificationTestPreview) bootstrap.quota.balance = ['notification-test-no-quota', 'notification-test-authorized-no-quota'].includes(scenario) ? 0 : 2;
   if (scenario === 'payment-expired') bootstrap.membership = { active: false, remainingMs: 0, expiresAt: '2026-09-10T07:00:00Z' };
   if (scenario === 'alternatives-premium') Object.assign(bootstrap.limits, { queryMaxStores: 4, alternativeMaxColors: 4 });
-  if (scenario === 'history-balance-cap') bootstrap.quota.balance = 10;
+  if (scenario === 'history-balance-cap' || scenario.startsWith('v331-history-claim-')) bootstrap.quota.balance = 10;
   if (sheetPreview) bootstrap.membership = { active: true, expiresAt: '2026-09-22T07:00:00Z', remainingMs: 7 * 86400000 };
   if (['payment-renew', 'payment-member', 'payment-upgrade-monthly', 'payment-upgrade-annual', 'payment-member-pending-monthly'].includes(scenario)) bootstrap.membership = { active: true, remainingMs: 18 * 86400000, expiresAt: '2026-10-03T07:00:00Z' };
   const previewOrder = { orderId: '', productId: 'vip666', source: 'virtual_payment', type: 'membership', amountFen: 700, days: 7, createdAt: now.toISOString(),
@@ -543,7 +549,11 @@ for (const scenario of scenarios) {
       if (scenario === 'history-loading') return new Promise(() => {});
       return { recentViews, browsedAt: now.toISOString(), task: completeHistoryTask() };
     }
-    if (action === 'quota.completeTask') return completeHistoryTask();
+    if (action === 'quota.completeTask') {
+      if (scenario === 'v331-history-claim-loading') return new Promise(() => {});
+      if (scenario === 'v331-history-claim-error') throw Error('offline history reward confirmation failed');
+      return completeHistoryTask();
+    }
     if (action === 'quota.ledger') return { balance: bootstrap.quota.balance, entries: copy(ledgerEntries) };
     if (action === 'member.status') return { orders: orderRecordsPreview ? copy(recordOrders) : previewOrder.orderId ? [copy(previewOrder)] : [] };
     if (action === 'member.deleteRecord' || action === 'member.clearRecords') {
@@ -665,6 +675,13 @@ for (const scenario of scenarios) {
     if (scenario === 'operator-saving') page.setData({ saving: true, configDirty: true });
     if (scenario === 'operator-longcontent') page.setData({ lookup: { user: true }, lookupText: JSON.stringify({ userKey: 'wxe96ad9e77b602f1b:long-user-identity-0123456789abcdefghijklmnopqrstuvwxyz', note: '运营查询长文本换行验收' }, null, 2), configText: JSON.stringify({ announcement: '运行配置说明需要在小屏完整换行且不遮挡操作按钮。'.repeat(5) }, null, 2) });
     if (pageName === 'history' && scenario !== 'history-loading' && page.browsePending) await page.browsePending;
+    if (scenario.startsWith('v331-history-claim-')) {
+      if (!page.data.boot.taskAvailable || page.data.browseLoading || !page.data.browse) throw Error('History claim fixture must retain a completed browse with an unclaimed reward');
+      if (scenario === 'v331-history-claim-loading') page.onClaimTask();
+      if (scenario === 'v331-history-claim-error') await page.onClaimTask();
+      if (page.data.taskClaimLoading !== (scenario === 'v331-history-claim-loading')
+        || Boolean(page.data.taskClaimError) !== (scenario === 'v331-history-claim-error')) throw Error('History claim fixture failed to enter its requested claim state');
+    }
     // Mine sections are collapsed by default; open the ones each audit checks.
     if (pageName === 'mine' && historyTaskPreview) { page.setData({ showQuotaDetails: true }); await page.onToggleLedger(); }
     if (pageName === 'mine' && orderRecordsPreview) {
@@ -779,7 +796,7 @@ for (const scenario of scenarios) {
       if (pageName === 'query') {
         if (alternativesPreview || v2Preview && scenario !== 'v2-new-product' || ['member', 'longcontent', 'expired'].includes(scenario)) page.onDoneSelection();
       }
-      if (alternativesPreview || historyDataPreview || v2Preview && !['v2-new-product', 'v2-restricted', 'v2-paid-unconfigured'].includes(scenario) || ['member', 'longcontent', 'expired', 'empty'].includes(scenario)) await page.onQuery();
+      if (alternativesPreview || historyDataPreview || v2Preview && !scenario.startsWith('v331-history-claim-') && !['v2-new-product', 'v2-restricted', 'v2-paid-unconfigured'].includes(scenario) || ['member', 'longcontent', 'expired', 'empty'].includes(scenario)) await page.onQuery();
     }
     if (v2Preview && pageName === 'query') page.refreshJourney();
     if (alternativesPreview) {
@@ -920,7 +937,15 @@ for (const scenario of scenarios) {
         expectedV2Text = ['公告与服务', '后台最近状态', '查看我的小哨', '没有收到提醒'];
         expectedV2Text.push(scenario === 'v330-notice-active' ? '库存更新说明' : '暂无有效公告');
         forbiddenText.push('不应展示的过期公告');
-      } else expectedV2Text = [p.title, '最近浏览'];
+      } else {
+        expectedV2Text = [p.title, '最近浏览'];
+        if (scenario.startsWith('v331-history-claim-')) {
+          if (previewCalls.some(item => item.action === 'history.list')) throw Error('History reward preview must not start a paid query');
+          expectedV2Text.push('余额已达 10 次上限', '使用次数后可返回领取', scenario === 'v331-history-claim-loading' ? '领取中…' : '领取奖励');
+          if (scenario === 'v331-history-claim-error') expectedV2Text.push('浏览奖励暂未确认，请重新领取');
+          forbiddenText.push('历史查询成功', '今日浏览任务完成，+1 次');
+        }
+      }
       if (scenario.startsWith('v3-dnd-')) expectedV2Text.push('通知与免打扰', '时段 1', '跨午夜', '时段 2', '23:00', '08:00', '12:00', '13:00', `新增免打扰时段（${page.data.dndPeriods.length} / 8）`, '监测继续', '结束后不补发旧提醒');
       if (scenario === 'v3-dnd-eight') expectedV2Text.push('时段 8', '18:00', '18:30');
       if (scenario.startsWith('v3-authorization-')) {
@@ -1027,7 +1052,7 @@ for (const scenario of scenarios) {
         'payment-monthly': ['立即开通 · ¥14.99', '30 天'],
         'payment-annual': ['立即开通 · ¥129.00', '365 天'],
         'payment-pending-monthly': ['30 天会员 · ¥19.90', 'offline-original-monthly-order', '支付正在确认中', '查询支付结果'],
-        'payment-member': ['剩余18天', '有效期至2026-10-03 15:00', '延长会员', '升级套餐'],
+        'payment-member': ['剩余18天·至2026-10-03 15:00', '延长会员', '升级套餐'],
         'payment-expired': ['会员已到期', '已于2026-09-10', '监测与提醒停止', '关注配置与次数仍保留', '立即开通'],
         'payment-upgrade-monthly': ['确认购买 · ¥14.99', '在原到期时间后增加 30 天', '预计到期 2026-11-02', '按所选套餐全价购买', '不抵扣差价'],
         'payment-upgrade-annual': ['确认购买 · ¥129.00', '在原到期时间后增加 365 天', '预计到期 2027-10-03', '按所选套餐全价购买', '不抵扣差价'],
@@ -1055,6 +1080,7 @@ for (const scenario of scenarios) {
         : pageName === 'follow' ? ['给心仪的配置留个小哨']
         : pageName === 'admin' ? ['运行统计', '128'] : [p.title, ...(sheetPreview ? ['选商品', '选门店', '已选门店'] : [])];
       if (adminPreview && ['operator-ready', 'operator-longcontent'].includes(scenario)) expectedText.push('成功查询 56', '查看提醒详情 12', '测试通知：28 条／20 人', '各行为分别计数', ...(scenario === 'operator-longcontent' ? ['以上不是完整统计'] : []));
+      if (sheetPreview) expectedText.push('上海', '北京', '深圳', '广州', '杭州', '成都');
       if (nudgePreview) expectedText.push('补充提醒次数', '稍后再说', '24 小时内不再主动提示');
       if (releaseNotesPreview) expectedText.push('更新公告', ...(page.data.showReleaseNotes ? [
         ...page.data.visibleReleaseNotes.map(entry => `v${entry.version}`), '上一页', '下一页', '收起',

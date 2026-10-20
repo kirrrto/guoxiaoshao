@@ -275,7 +275,8 @@ Page({
     if (this.pageRetired) return;
     syncTabBar(this, '/pages/query/index');
     this.visible = true;
-    this.setData({ guideNote: guideNote() });
+    const nextGuideNote = guideNote();
+    if (this.data.guideNote !== nextGuideNote) this.setData({ guideNote: nextGuideNote });
     if (this.data.calendarOpen) this.syncCalendarOverlay();
     this.visibilityEpoch = (this.visibilityEpoch || 0) + 1;
     this.consumePendingSharedTarget();
@@ -288,7 +289,7 @@ Page({
       this.applyBoot(boot);
       getCatalog();
     } catch (e) { if (!this.pageRetired) this.setData({ accountError: '账户连接失败，库存权限尚未核验，请检查网络后重试。' }); }
-    this.startFollowPolling();
+    this.startFollowPolling({ skipInitialActions: true });
   },
 
   onHide() {
@@ -378,12 +379,13 @@ Page({
     if (this.data.ready && !this.data.accountReady) return this.onRetryAccount();
   },
 
-  refreshQuerySnapshot() {
+  refreshQuerySnapshot({ refreshActions = true } = {}) {
     // Re-evaluate a saved observation locally. Reading it must never perform
     // another charged query or replace its original observation timestamp.
     if (this.querySnapshot && this.data.result) {
       this.setData({ 'result.results': presentResults(this.querySnapshot, this.catalog) });
     }
+    if (!refreshActions || this.accountVerificationPending) return;
     this.refreshStoreChoices();
     this.refreshJourney();
   },
@@ -417,12 +419,16 @@ Page({
   },
 
   /** Age local snapshots while visible; only accounts that can be alerted and have follows fetch monitored targets. */
-  startFollowPolling() {
+  startFollowPolling({ skipInitialActions = false } = {}) {
     this.stopFollowPolling();
     const epoch = this.followEpoch;
+    let skipActions = skipInitialActions;
     const tick = async () => {
       if (!this.visible || epoch !== this.followEpoch) return;
-      this.refreshQuerySnapshot();
+      // Account reads may cross the observation expiry boundary. Always age
+      // visible rows; applyBoot already refreshed the initial account actions.
+      this.refreshQuerySnapshot({ refreshActions: !skipActions });
+      skipActions = false;
       const boot = this.data.boot;
       if (!this.verifiedAccount() || !boot || !boot.member || !boot.followCount) {
         this.followSnapshot = null;
@@ -456,7 +462,7 @@ Page({
     this.beginAccountVerification();
     this.refreshQuerySnapshot();
     const pending = Promise.all([getBootstrap({ force: true }), getCatalog({ force: true })])
-      .then(results => { if (this.pageRetired) return; this.applyBoot(results[0]); this.applyCatalog(results[1]); this.setData({ ready: true, loadError: null, refreshMessage: '页面已更新；确认最新库存请点「立即查询」。' }); this.startFollowPolling(); })
+      .then(results => { if (this.pageRetired) return; this.applyBoot(results[0]); this.applyCatalog(results[1]); this.setData({ ready: true, loadError: null, refreshMessage: '页面已更新；确认最新库存请点「立即查询」。' }); this.startFollowPolling({ skipInitialActions: true }); })
       .catch(error => { if (!this.pageRetired) { this.setData({ accountError: '账户连接失败，库存权限尚未核验，请重试。' }); showError(error); } })
       .finally(() => { if (this.refreshPending === pending) this.refreshPending = null; if (!this.pageRetired) this.setData({ refreshing: false }); wx.stopPullDownRefresh(); });
     this.refreshPending = pending;

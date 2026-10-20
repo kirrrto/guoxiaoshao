@@ -31,6 +31,7 @@
     <view wx:else class="search-empty">没有找到相关直营店，试试城市名称或其他关键词。</view>
   </block>
   <block wx:else>
+    <view wx:if="{{hotCities.length > 1}}" class="chips hot-city-chips mt" aria-label="常用城市"><view wx:for="{{hotCities}}" wx:key="name" class="chip hot-city-chip {{item.index === cityIndex ? 'on' : ''}}" data-index="{{item.index}}" hover-class="is-pressed" hover-stay-time="60" bindtap="onHotCityTap" role="button" aria-label="{{item.name + (item.index === cityIndex ? '，当前城市' : '')}}">{{item.name}}</view></view>
     <picker mode="selector" range="{{cities}}" value="{{cityIndex}}" bindchange="onCityChange"><view class="field"><text class="label">城市</text><text class="value">{{cities[cityIndex] || '暂无门店'}} ›</text></view></picker>
     <view class="chips mt"><view wx:for="{{cityStores}}" wx:key="storeNumber" class="chip {{item.on ? 'on' : ''}}" data-store="{{item.storeNumber}}" hover-class="is-pressed" hover-stay-time="60" bindtap="onStoreTap">{{item.name}}</view></view>
   </block>

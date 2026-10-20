@@ -9,6 +9,7 @@ const colorOf = p => (p.attributes || {}).color || '标准外观';
 const compareColors = (a, b) => a.localeCompare(b, 'zh-CN') || (a < b ? -1 : a > b ? 1 : 0);
 const modelOf = p => p.model || p.familyName || p.familyKey;
 const own = (source, key) => Object.prototype.hasOwnProperty.call(source, key);
+const HOT_CITY_NAMES = ['上海', '北京', '深圳', '广州', '杭州', '成都'];
 Component({
   properties: {
     // Pages bind only the catalog version. The indexed catalog is read from the
@@ -20,7 +21,7 @@ Component({
   data: { categories: [], categoryIndex: 0, families: [], familyNames: [], familyIndex: 0,
     models: [], modelIndex: 0, capacities: [], capacityIndex: 0, colors: [], colorIndex: 0,
     candidates: [], productTitles: [], productIndex: 0, product: null, imageFailed: false,
-    cities: [], cityIndex: 0, cityStores: [], selectedStores: [], selectionNote: '', searchKeyword: '', searchActive: false, searchResults: [] },
+    cities: [], hotCities: [], cityIndex: 0, cityStores: [], selectedStores: [], selectionNote: '', searchKeyword: '', searchActive: false, searchResults: [] },
   lifetimes: {
     // Observers fire only for non-default values; load even if no version is bound.
     attached() { if (!this.sourceCatalog) this.loadCatalog(); },
@@ -70,7 +71,10 @@ Component({
           const store = { ...s, city: s.city || city.city, province: s.province || city.province || '' };
           this.storeByNumber[store.storeNumber] = store; this.allStores.push(store);
         }
-        this.stage({ categories: this.catalogCategories.map(c => ({ key: c.key, name: c.name })), cities: this.catalogCities.map(c => `${c.city}（${c.stores.length}）`) });
+        const hotCities = HOT_CITY_NAMES
+          .map(name => ({ name, index: this.catalogCities.findIndex(c => c.city === name) }))
+          .filter(item => item.index >= 0);
+        this.stage({ categories: this.catalogCategories.map(c => ({ key: c.key, name: c.name })), cities: this.catalogCities.map(c => `${c.city}（${c.stores.length}）`), hotCities });
         if (!this.catalogCategories.length) {
           this.currentCandidates = [];
           this.stage({ categoryIndex: 0, families: [], familyNames: [], familyIndex: 0, models: [], modelIndex: 0,
@@ -179,6 +183,7 @@ Component({
       this.stage({ cityIndex: index, cityStores: city.stores.map(s => ({ storeNumber: s.storeNumber, name: s.name, city: s.city, on: selected.has(s.storeNumber) })) });
     },
     onCityChange(e) { this.selectCity(Number(e.detail.value)); },
+    onHotCityTap(e) { this.selectCity(Number(e.currentTarget.dataset.index)); },
     onSearchInput(e) { this.batch(() => { this.stage({ searchKeyword: String(e.detail.value || '').slice(0, 60) }); this.updateSearchResults(); }); },
     onClearSearch() { this.batch(() => { this.stage({ searchKeyword: '' }); this.updateSearchResults(); }); },
     updateSearchResults() {

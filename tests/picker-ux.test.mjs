@@ -52,7 +52,7 @@ test('storage uses numeric units across GB and TB rather than SKU or lexical ord
 test('current iPhone and Mac families show newer official announcements first', () => {
   const c = catalog();
   const iphone = sortFamilies([...c.categories.find(c => c.key === 'iphone').families].reverse());
-  assert.deepEqual(iphone.map(f => f.familyKey), ['iphone-18-pro', 'iphone-duo', 'iphone-17e', 'iphone-air', 'iphone-17', 'iphone-16']);
+  assert.deepEqual(iphone.map(f => f.familyKey), ['iphone-duo', 'iphone-18-pro', 'iphone-17e', 'iphone-air', 'iphone-17', 'iphone-16']);
   const mac = sortFamilies(c.categories.find(c => c.key === 'mac').families);
   assert.deepEqual(mac.slice(0, 3).map(f => f.familyKey), ['mac-mini', 'mac-studio', 'macbook-neo']);
   const ipad = sortFamilies(c.categories.find(c => c.key === 'ipad').families);

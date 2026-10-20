@@ -107,6 +107,8 @@
 .picker-store-heading { margin-top: 20rpx; padding-top: 18rpx; margin-bottom: 14rpx; }
 .store-search { min-height: 44px; padding: 0 18rpx; border-radius: 16rpx; gap: 14rpx; }
 .search-hint { margin-top: 6rpx; }
+.hot-city-chips { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8rpx; margin-bottom: 4rpx; }
+.hot-city-chip.chip { display: flex; align-items: center; justify-content: center; min-height: 36px; padding: 8rpx 4rpx; border-radius: 12rpx; font-size: max(12px, 24rpx); text-align: center; white-space: nowrap; }
 .selected { padding: 14rpx 16rpx; border-radius: 16rpx; }
 
 @media (prefers-color-scheme: dark) {

@@ -1,0 +1,182 @@
+{
+  "checkedAt": "2026-10-20T10:39:08.894Z",
+  "version": "3.3.1",
+  "baselineCommit": "da96096acad0e3c20a3583190edf05f28cbb05f1",
+  "scope": "Local review and verification only. No cloud deployment, database mutation, WeChat upload, payment or message delivery.",
+  "tests": {
+    "tests": 1591,
+    "pass": 1591,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "source": {
+    "files": 533,
+    "javaScript": 376,
+    "json": 48,
+    "pages": 7,
+    "operatorPages": 1,
+    "errors": []
+  },
+  "release": {
+    "passed": true,
+    "checks": 48,
+    "publicationReady": false
+  },
+  "monitor": {
+    "passed": true,
+    "files": 43
+  },
+  "compilers": [
+    {
+      "compiler": "wcc",
+      "files": 12,
+      "exitCode": 0,
+      "stderr": ""
+    },
+    {
+      "compiler": "wcsc",
+      "files": 16,
+      "exitCode": 0,
+      "stderr": ""
+    }
+  ],
+  "layouts": {
+    "passed": true,
+    "total": 972,
+    "reports": [
+      {
+        "group": "main",
+        "colorScheme": "light",
+        "total": 318,
+        "indexNavigationFailures": 0,
+        "expressionErrors": 0,
+        "missingText": 0,
+        "forbiddenText": 0,
+        "horizontalOverflow": 0,
+        "clippedText": 0,
+        "failedImages": 0,
+        "alternativeLayoutFailures": 0,
+        "calendarLayoutFailures": 0,
+        "membershipLayoutFailures": 0,
+        "notificationLayoutFailures": 0,
+        "v3LayoutFailures": 0,
+        "stockLayoutFailures": 0,
+        "sourceManifestSha256": "ffadd9cea3aaaec99650dac0b68aad9008f8597de670072b8ff545b8ad90d155"
+      },
+      {
+        "group": "main",
+        "colorScheme": "dark",
+        "total": 318,
+        "indexNavigationFailures": 0,
+        "expressionErrors": 0,
+        "missingText": 0,
+        "forbiddenText": 0,
+        "horizontalOverflow": 0,
+        "clippedText": 0,
+        "failedImages": 0,
+        "alternativeLayoutFailures": 0,
+        "calendarLayoutFailures": 0,
+        "membershipLayoutFailures": 0,
+        "notificationLayoutFailures": 0,
+        "v3LayoutFailures": 0,
+        "stockLayoutFailures": 0,
+        "sourceManifestSha256": "ffadd9cea3aaaec99650dac0b68aad9008f8597de670072b8ff545b8ad90d155"
+      },
+      {
+        "group": "membership",
+        "colorScheme": "light",
+        "total": 120,
+        "indexNavigationFailures": 0,
+        "expressionErrors": 0,
+        "missingText": 0,
+        "forbiddenText": 0,
+        "horizontalOverflow": 0,
+        "clippedText": 0,
+        "failedImages": 0,
+        "alternativeLayoutFailures": 0,
+        "calendarLayoutFailures": 0,
+        "membershipLayoutFailures": 0,
+        "notificationLayoutFailures": 0,
+        "v3LayoutFailures": 0,
+        "stockLayoutFailures": 0,
+        "sourceManifestSha256": "ffadd9cea3aaaec99650dac0b68aad9008f8597de670072b8ff545b8ad90d155"
+      },
+      {
+        "group": "membership",
+        "colorScheme": "dark",
+        "total": 120,
+        "indexNavigationFailures": 0,
+        "expressionErrors": 0,
+        "missingText": 0,
+        "forbiddenText": 0,
+        "horizontalOverflow": 0,
+        "clippedText": 0,
+        "failedImages": 0,
+        "alternativeLayoutFailures": 0,
+        "calendarLayoutFailures": 0,
+        "membershipLayoutFailures": 0,
+        "notificationLayoutFailures": 0,
+        "v3LayoutFailures": 0,
+        "stockLayoutFailures": 0,
+        "sourceManifestSha256": "ffadd9cea3aaaec99650dac0b68aad9008f8597de670072b8ff545b8ad90d155"
+      },
+      {
+        "group": "picker",
+        "colorScheme": "light",
+        "total": 48,
+        "indexNavigationFailures": 0,
+        "expressionErrors": 0,
+        "missingText": 0,
+        "forbiddenText": 0,
+        "horizontalOverflow": 0,
+        "clippedText": 0,
+        "failedImages": 0,
+        "alternativeLayoutFailures": 0,
+        "calendarLayoutFailures": 0,
+        "membershipLayoutFailures": 0,
+        "notificationLayoutFailures": 0,
+        "v3LayoutFailures": 0,
+        "stockLayoutFailures": 0,
+        "sourceManifestSha256": "ffadd9cea3aaaec99650dac0b68aad9008f8597de670072b8ff545b8ad90d155"
+      },
+      {
+        "group": "picker",
+        "colorScheme": "dark",
+        "total": 48,
+        "indexNavigationFailures": 0,
+        "expressionErrors": 0,
+        "missingText": 0,
+        "forbiddenText": 0,
+        "horizontalOverflow": 0,
+        "clippedText": 0,
+        "failedImages": 0,
+        "alternativeLayoutFailures": 0,
+        "calendarLayoutFailures": 0,
+        "membershipLayoutFailures": 0,
+        "notificationLayoutFailures": 0,
+        "v3LayoutFailures": 0,
+        "stockLayoutFailures": 0,
+        "sourceManifestSha256": "ffadd9cea3aaaec99650dac0b68aad9008f8597de670072b8ff545b8ad90d155"
+      }
+    ]
+  },
+  "focusedLayouts": {
+    "historyReward": {
+      "passed": true,
+      "cases": 24
+    },
+    "hotCities": {
+      "passed": true,
+      "cases": 8
+    },
+    "renderer": "Headless Chromium WXML/WXSS approximation, not WeChat physical-device acceptance"
+  },
+  "resolvedFindings": [
+    "Age saved stock after account reconnects across the observation expiry boundary",
+    "Deduplicate history reward claims and clear retry errors without crossing account/page generations",
+    "Select fitting server-advertised plans without guessing capacity, overriding manual orders, or reusing a previous account follow cache",
+    "Override native fixed button width in the history reward bar"
+  ]
+}

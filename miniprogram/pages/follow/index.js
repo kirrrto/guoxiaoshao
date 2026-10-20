@@ -563,6 +563,7 @@ Page({
   onCopyAlert() {
     const alert = this.data.alert;
     if (!alert || !alert.partNumber) return;
+    topUpReminderCredit();
     wx.setClipboardData({
       data: `${alert.productTitle}\n型号：${alert.partNumber}\n门店：Apple ${alert.storeName}`,
       success: () => toast('已复制，可到 Apple Store App 下单'),
@@ -573,6 +574,7 @@ Page({
   async onAlertFeedback(e) {
     const alert = this.data.alert, outcome = e.currentTarget.dataset.outcome;
     if (this.pageRetired || !alert || !alert.eventId || this.data.alertBusy) return;
+    topUpReminderCredit();
     const accountEpoch = this.accountEpoch || 0, readEpoch = this.alertReadEpoch || 0;
     const work = {};
     this.alertFeedbackWork = work;

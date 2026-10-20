@@ -3,11 +3,20 @@
  * Catalog is cached in local storage and refreshed by version.
  */
 const { call, resetPendingReads } = require('./api');
-const PRODUCT_IMAGES = require('../config/product-images');
-const CATALOG_SEED = require('../config/catalog-seed');
 const { sortFamilies } = require('./catalog-order');
 const { presentStore } = require('./store-label');
 const { readSession, writeSession } = require('./session');
+
+let productImagesCache = null;
+let catalogSeedCache = null;
+function getProductImages() {
+  if (!productImagesCache) productImagesCache = require('../config/product-images');
+  return productImagesCache;
+}
+function getCatalogSeed() {
+  if (!catalogSeedCache) catalogSeedCache = require('../config/catalog-seed');
+  return catalogSeedCache;
+}
 
 const CATALOG_KEY = 'gxs_catalog_v1';
 const CATEGORY_ORDER = ['iphone', 'ipad', 'mac', 'watch', 'airpods', 'vision', 'homepod'];
@@ -224,8 +233,8 @@ function indexCatalog(raw) {
     for (const key of ['partNumber', 'category', 'familyKey', 'familyName', 'model', 'title', 'attributes', 'priceCny', 'comingSoon', 'supported', 'verificationStatus', 'imageUrl', 'imageAlt']) {
       if (source[key] !== undefined) product[key] = source[key];
     }
-    const fallback = PRODUCT_IMAGES[product.partNumber];
-    return fallback && !product.imageUrl ? { ...product, ...fallback } : product;
+    const fallback = !product.imageUrl && getProductImages()[product.partNumber];
+    return fallback ? { ...product, ...fallback } : product;
   });
   const cities = [];
   const cityMap = new Map();
@@ -270,7 +279,7 @@ function validCatalog(raw) { return raw && Array.isArray(raw.products) && Array.
 // and target-picker reads it here, so products never cross the render bridge.
 function currentCatalog() {
   const app = getApp();
-  if (!app.globalData.catalog) app.globalData.catalog = indexCatalog(cachedCatalog() || CATALOG_SEED);
+  if (!app.globalData.catalog) app.globalData.catalog = indexCatalog(cachedCatalog() || getCatalogSeed());
   return app.globalData.catalog;
 }
 
@@ -306,13 +315,15 @@ async function refreshCatalog({ force = false } = {}) {
   const request = () => {
     // Read the persisted snapshot before choosing ifVersion. A seed created by
     // a picker during startup must not cause an avoidable full catalog reply.
-    const raw = cachedCatalog() || CATALOG_SEED;
+    const cached = cachedCatalog();
+    const raw = cached || getCatalogSeed();
     const current = app.globalData.catalog;
-    const version = current && current.version !== CATALOG_SEED.version ? current.version : raw.version;
+    const isSeedCurrent = Boolean(current && catalogSeedCache && current.version === catalogSeedCache.version);
+    const version = current && !isSeedCurrent ? current.version : raw.version;
     return call('catalog.get', version ? { ifVersion: version } : {}).then(response => {
       // An earlier request may finish after this session has been invalidated.
       // Its result must not publish, persist or reset the new session's timers.
-      if (generation !== catalogGeneration) return app.globalData.catalog || indexCatalog(cachedCatalog() || CATALOG_SEED);
+      if (generation !== catalogGeneration) return app.globalData.catalog || indexCatalog(cachedCatalog() || getCatalogSeed());
       if (!response || (!response.unchanged && !validCatalog(response))) throw new Error('商品目录暂时不可用，请稍后刷新');
       catalogCheckedAt = Date.now();
       catalogRetryAt = 0;
@@ -342,7 +353,8 @@ async function getCatalog({ force = false } = {}) {
   if (typeof wx.getStorage === 'function' && !catalogStorageRead) {
     const generation = catalogGeneration;
     const cached = await loadCatalogCache();
-    if (generation === catalogGeneration && cached && (!app.globalData.catalog || app.globalData.catalog.version === CATALOG_SEED.version && app.globalData.catalog.version !== cached.version)) {
+    const isSeedCurrent = Boolean(app.globalData.catalog && catalogSeedCache && app.globalData.catalog.version === catalogSeedCache.version);
+    if (generation === catalogGeneration && cached && (!app.globalData.catalog || isSeedCurrent && app.globalData.catalog.version !== cached.version)) {
       const previous = app.globalData.catalog;
       app.globalData.catalog = indexCatalog(cached);
       if (previous && previous.version !== cached.version) {

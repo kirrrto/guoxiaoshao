@@ -112,6 +112,37 @@ test('returning to the page masks retained member stock and follow observations 
   page.onUnload();
 });
 
+for (const action of ['onShow', 'onPullDownRefresh']) {
+  test(`${action} expires stock that ages out while the account is reconnecting`, async t => {
+    let clock = now;
+    t.mock.method(Date, 'now', () => clock);
+    let resolve;
+    const rt = runtime(current => current === 'user.bootstrap'
+      ? new Promise(done => { resolve = done; }) : { unchanged: true });
+    const values = fixture(rt), page = rt.instance('pages/query/index.js');
+    values.snapshot.results[0].observedAt = new Date(now - 119000).toISOString();
+    page.catalog = values.catalog; page.selection = values.selection;
+    page.querySnapshot = values.snapshot; page.querySnapshotOwner = 'account:alice';
+    page.visible = true;
+    Object.assign(page.data, { ready: true, result: structuredClone(values.snapshot) });
+    page.applyBoot(boot());
+
+    const refreshing = page[action]();
+    assert.equal(page.data.result.results[0].observationState, 'fresh');
+    assert.equal(page.data.liveResultRestricted, true);
+    clock += 3000;
+    resolve(boot());
+    await refreshing;
+
+    assert.equal(page.data.liveResultRestricted, false, 'the current account can read the saved result');
+    assert.equal(page.data.result.results[0].observationState, 'stale');
+    assert.equal(page.data.result.results[0].statusLabel, '待更新');
+    assert.equal(page.data.result.results[0].pickupReady, false, 'expired availability must not regain its pickup highlight');
+    assert.equal(rt.calls.some(call => call.action === 'query.pickup'), false, 'aging a saved result never performs a charged query');
+    page.onUnload();
+  });
+}
+
 test('switching accounts retires old stock permissions and late charged-query responses while retaining selection', async t => {
   t.mock.method(Date, 'now', () => now);
   let resolve;

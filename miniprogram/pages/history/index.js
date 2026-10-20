@@ -145,6 +145,8 @@ Page({
     browseError: null,
     browse: null,
     taskMessage: null,
+    taskClaimLoading: false,
+    taskClaimError: null,
     restoreNotice: null,
     restoreWarning: false,
   },
@@ -197,7 +199,7 @@ Page({
     try { const boot = await getBootstrap(); if (this.pageRetired) return; this.applyBoot(boot); getCatalog(); this.loadBrowse(); } catch (e) { /* keep snapshot */ }
   },
 
-  onUnload() { stopProgress(this); this.pageRetired = true; if (this.unsubscribeCatalog) this.unsubscribeCatalog(); if (this.unsubscribeQuota) this.unsubscribeQuota(); },
+  onUnload() { stopProgress(this); this.pageRetired = true; this.taskClaimPending = null; if (this.unsubscribeCatalog) this.unsubscribeCatalog(); if (this.unsubscribeQuota) this.unsubscribeQuota(); },
 
   onShareAppMessage() {
     return shareAppMessage('/pages/history/index', { ...this.data, selection: this.selection });
@@ -254,10 +256,10 @@ Page({
       this.accountEpoch = (this.accountEpoch || 0) + 1;
       stopProgress(this);
       this.historyRequest = null; this.historySnapshot = null;
-      this.browsePending = null; this.browseDay = null; this.restrictionReason = null;
+      this.browsePending = null; this.browseDay = null; this.taskClaimPending = null; this.restrictionReason = null;
       this.setData({ result: null, browse: null, querying: false, loadingMore: false, browseLoading: false,
         requestSlow: false, queryFailureMessage: '', restriction: null, moreError: null, browseError: null,
-        taskMessage: null, resultTargetDifferent: false });
+        taskMessage: null, taskClaimLoading: false, taskClaimError: null, resultTargetDifferent: false });
     }
     this.accountSnapshot = boot;
     this.refreshDateWindow();
@@ -402,7 +404,7 @@ Page({
       balance_cap_reached: `已完成浏览，余额已达 ${result.quota.balanceCap} 次上限；使用次数后可返回领取。`,
       reward_disabled: '浏览已完成，当前体验任务奖励暂未开放。',
     };
-    this.setData({ 'boot.taskAvailable': !done && result.reason !== 'reward_disabled', 'boot.balance': result.quota.balance,
+    this.setData({ 'boot.taskAvailable': !done && result.reason !== 'reward_disabled', 'boot.balance': result.quota.balance, taskClaimError: null,
       taskMessage: result.granted > 0 ? `今日浏览任务完成，+${result.granted} 次，已计入次数明细。` : messages[result.reason] || (done ? messages.already_completed : '奖励暂未确认，请重试。') });
     if (result.granted > 0) toast(`体验任务完成，+${result.granted} 次`, 'success');
   },
@@ -562,15 +564,33 @@ Page({
 
   onGoMine() { wx.switchTab({ url: '/pages/mine/index' }); },
 
-  async completeTask() {
+  onClaimTask() {
+    if (this.pageRetired || !this.data.accountReady || !this.data.boot || !this.data.boot.taskAvailable) return;
+    if (this.taskClaimPending) return this.taskClaimPending;
+    if (this.data.browseLoading) return this.browsePending;
+    this.setData({ taskClaimError: null });
+    if (this.browseDay === fmt.todayKey() && this.data.browse) return this.completeTask();
+    return this.loadBrowse({ force: true });
+  },
+
+  completeTask() {
     if (this.pageRetired) return;
+    if (this.taskClaimPending) return this.taskClaimPending;
     const accountEpoch = this.accountEpoch || 0;
-    try {
-      const data = await call('quota.completeTask', { taskId: 'view_history' });
-      if (accountEpoch !== (this.accountEpoch || 0)) return;
+    this.setData({ taskClaimLoading: true, taskClaimError: null });
+    const pending = call('quota.completeTask', { taskId: 'view_history' }).then(data => {
+      if (this.pageRetired || accountEpoch !== (this.accountEpoch || 0)) return;
       const accepted = publishQuota(data.quota);
-      if (!this.pageRetired && accepted) this.applyTaskReward({ ...data, quota: currentQuota() || data.quota });
-    } catch (e) { if (!this.pageRetired && accountEpoch === (this.accountEpoch || 0)) this.setData({ browseError: '历史查询成功，奖励暂未确认，请重试；不会重复发奖。' }); }
+      if (accepted) this.applyTaskReward({ ...data, quota: currentQuota() || data.quota });
+    }).catch(() => {
+      if (!this.pageRetired && accountEpoch === (this.accountEpoch || 0)) this.setData({ taskClaimError: '浏览奖励暂未确认，请重新领取；不会重复发奖。' });
+    }).finally(() => {
+      if (this.taskClaimPending !== pending) return;
+      this.taskClaimPending = null;
+      if (!this.pageRetired && accountEpoch === (this.accountEpoch || 0)) this.setData({ taskClaimLoading: false });
+    });
+    this.taskClaimPending = pending;
+    return pending;
   },
 
   onExplain() {

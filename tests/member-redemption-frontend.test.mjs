@@ -31,6 +31,8 @@ function runtime({ handler = async action => action === 'member.status' ? { orde
   const page = { ...definition, data: clone(definition.data) };
   page.setData = patch => { for (const [key, value] of Object.entries(clone(patch))) { const parts = key.split('.'); let target = page.data; for (const part of parts.slice(0, -1)) target = target[part] || (target[part] = {}); target[parts.at(-1)] = value; } };
   page.applyBoot(boot()); page.data.ready = true;
+  assert.deepEqual(invalidated, ['follows'], 'initial account confirmation clears any previous account follow cache');
+  invalidated.length = 0;
   return { page, calls, invalidated, bootstrapCalls, toasts, errors };
 }
 const enter = (page, code = 'EXAMPLE-UNLISTED') => page.onRedemptionInput({ detail: { value: code } });

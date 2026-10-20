@@ -4,7 +4,7 @@ const { getAuthorizationState, buildConsentReport } = require('../../utils/remin
 const { dndPeriods, dndSummary, dndStatus, MAX_DND_PERIODS, validateDndPeriods } = require('../../utils/dnd');
 const { peekTestReturn, consumeTestReturnUrl } = require('../../utils/journey-context');
 const { call, showError, toast, newId } = require('../../utils/api');
-const { getBootstrap, getCatalog, currentCatalog, invalidateBootstrap, invalidateFollows, publishSettings, publishQuota, subscribeQuota, currentQuota } = require('../../utils/store');
+const { getBootstrap, getCatalog, currentCatalog, getFollows, invalidateBootstrap, invalidateFollows, publishSettings, publishQuota, subscribeQuota, currentQuota } = require('../../utils/store');
 const { topUpReminderCredit } = require('../../utils/reminder-credits');
 const { confirmTap } = require('../../utils/haptic');
 const { VERSION } = require('../../config/version');
@@ -61,6 +61,7 @@ function presentMemberProduct(item) {
     && item.standardPriceFen > item.priceFen;
   return { ...item, priceText: fmt.fen(item.priceFen), standardPriceText: discounted ? fmt.fen(item.standardPriceFen) : '',
     promotionText: discounted ? '优惠价' : '',
+    recommendedText: item.planId === 'member_30d' ? '主力推荐' : '',
     dailyPriceText: `约 ¥${(item.priceFen / item.days / 100).toFixed(2)} / 天`,
     benefitText: productBenefit(item),
     benefitShort: `${item.limits && item.limits.maxFollows || 3} 配置 × ${item.limits && item.limits.maxStoresPerFollow || 3} 门店`,
@@ -497,6 +498,7 @@ Page({
 
   applyBoot(boot) {
     const accountChanged = !this.data.boot || this.data.boot.identity.userKey !== boot.identity.userKey;
+    if (accountChanged) invalidateFollows();
     if (accountChanged) this.paymentConsentGeneration = (this.paymentConsentGeneration || 0) + 1;
     if (accountChanged) {
       this.pageSession = (this.pageSession || 0) + 1;
@@ -510,6 +512,7 @@ Page({
         notificationActionBusy: '', notificationDeletingId: '', notificationConfirming: false, notificationsActionError: null, ledger: [] });
       this.checkoutGeneration = (this.checkoutGeneration || 0) + 1;
       this.checkoutContext = null;
+      this.userSelectedPlan = false;
       this.offerSeen = new Set();
       this.orderAccountGeneration = (this.orderAccountGeneration || 0) + 1;
       this.orderConsentGeneration = (this.orderConsentGeneration || 0) + 1;
@@ -607,7 +610,14 @@ Page({
     const candidate = this.data.boot && (this.data.boot.memberProducts || []).find(item => item.planId === event.currentTarget.dataset.planId);
     if (!candidate || !candidate.available) return;
     if (this.data.purchaseMode === 'upgrade' && !upgradeProducts([candidate], this.data.membership).length) return;
+    this.userSelectedPlan = true;
     this.selectMemberProduct(event.currentTarget.dataset.planId);
+  },
+
+  canAutoSelectMemberProduct() {
+    return !this.userSelectedPlan && !this.paymentPendingPlanId && !this.data.paymentPendingId
+      && !this.data.paymentBusy && !this.data.paymentChecking && !this.data.paymentConfirming && !this.data.redeeming
+      && this.data.membership && !this.data.membership.active;
   },
 
   canChangeMembershipPurchase() {
@@ -699,6 +709,33 @@ Page({
       this.checkoutCatalog = catalog;
       const restored = store.restore(identity, catalog, ...(record === undefined ? [] : [record]));
       this.checkoutContext = restored.context || null;
+      if (this.checkoutContext && this.canAutoSelectMemberProduct()) {
+        const neededStores = Array.isArray(this.checkoutContext.storeNumbers) ? this.checkoutContext.storeNumbers.length : 0;
+        const savedCount = Math.max(0, Number(this.data.boot.followCount) || 0);
+        let neededConfigs = savedCount ? null : 1;
+        if (savedCount && typeof getFollows === 'function') {
+          // Expired memberships retain their follows. Restoring the same SKU
+          // consumes no additional slot; an unavailable read cannot justify an upsell.
+          try {
+            const listing = await getFollows();
+            if (Array.isArray(listing && listing.follows)) {
+              const saved = listing.follows.filter(item => item.status !== 'removed');
+              const existing = saved.some(item => item.partNumber === restored.context.partNumber);
+              neededConfigs = Math.max(savedCount, saved.length) + (existing ? 0 : 1);
+            }
+          } catch (_) { /* Preserve the selection until saved follows can be verified. */ }
+        }
+        if (this.pageRetired || generation !== this.checkoutGeneration || identity.userKey !== this.data.boot.identity.userKey) return;
+        if (neededConfigs !== null && this.canAutoSelectMemberProduct()) {
+          // Product limits and prices are server-owned. Never infer capacity
+          // from a plan ID or recommend the largest plan for an impossible target.
+          const recommended = (this.data.displayMemberProducts || []).filter(item => item.available && item.limits
+            && Number.isInteger(item.limits.maxFollows) && item.limits.maxFollows >= neededConfigs
+            && Number.isInteger(item.limits.maxStoresPerFollow) && item.limits.maxStoresPerFollow >= neededStores)
+            .sort((a, b) => a.priceFen - b.priceFen || a.days - b.days)[0];
+          if (recommended) this.selectMemberProduct(recommended.planId);
+        }
+      }
       this.setData({ checkoutTarget: restored.context || null, checkoutMessage: CHECKOUT_MESSAGES[restored.status] || '', checkoutLoading: false }, () => this.observeMembershipOffer());
     } catch (_) {
       if (!this.pageRetired && generation === this.checkoutGeneration) this.setData({ checkoutTarget: null, checkoutMessage: '暂时无法确认所选配置，请刷新后重试。', checkoutLoading: false }, () => this.observeMembershipOffer());
