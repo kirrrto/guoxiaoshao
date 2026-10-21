@@ -11,6 +11,10 @@ try { playwright = require('playwright'); }
 catch { playwright = require(path.join(os.homedir(), '.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright')); }
 const directory = path.resolve(process.argv[2]);
 const manifest = JSON.parse(fs.readFileSync(path.join(directory, 'manifest.json'), 'utf8'));
+if (JSON.parse(fs.readFileSync(path.join(manifest.source, 'app.json'), 'utf8')).tabBar?.custom !== true) {
+  await import('./check-native-tabs.mjs');
+  process.exit(process.exitCode || 0);
+}
 function verifyPreviewSources() {
   for (const source of manifest.sourceHashes || []) {
     const actual = crypto.createHash('sha256').update(fs.readFileSync(path.join(manifest.source, source.file))).digest('hex');

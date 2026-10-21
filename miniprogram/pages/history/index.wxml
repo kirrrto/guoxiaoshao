@@ -1,5 +1,6 @@
 <page-meta page-style="{{sheetVisible ? 'overflow:hidden;' : ''}}" />
 <view class="page tab-page history-page">
+  <view wx:if="{{networkOffline}}" class="network-notice" role="status">网络已断开，恢复后自动刷新</view>
   <view wx:if="{{loadError}}" class="card load-error" role="alert">
     <view class="load-error-title">暂时没有连上</view>
     <view class="load-error-detail">{{loadError}}</view>
@@ -22,7 +23,7 @@
     <view class="page-heading history-heading"><view><view class="page-title">供应历史</view><view class="page-subtitle">近 10 天 · 北京时间</view></view><button class="ui-action ui-action--neutral history-explain" hover-class="ui-control-pressed" bindtap="onExplain"><image class="ui-icon" src="/images/ui/info.png" mode="aspectFit" aria-hidden="true" /><text class="ui-action-label">数据说明</text></button></view>
     <view class="card history-selection-card">
       <view wx:if="{{selectionSummary}}" class="history-config-summary">
-        <view class="history-product-media"><image wx:if="{{selectionSummary.imageUrl && selectionSummary.imageUrl !== failedSelectionImageUrl}}" class="history-product-image" src="{{selectionSummary.imageUrl}}" mode="aspectFit" data-src="{{selectionSummary.imageUrl}}" binderror="onSelectionImageError" aria-label="{{selectionSummary.title}}" /><image wx:else class="history-product-placeholder" src="/images/ui/device.png" mode="aspectFit" aria-hidden="true" /></view>
+        <view class="history-product-media"><image wx:if="{{selectionSummary.imageDisplayUrl && selectionSummary.imageUrl !== failedSelectionImageUrl}}" class="history-product-image" src="{{selectionSummary.imageDisplayUrl}}" webp="{{true}}" mode="aspectFit" data-src="{{selectionSummary.imageUrl}}" binderror="onSelectionImageError" aria-label="{{selectionSummary.title}}" /><image wx:else class="history-product-placeholder" src="/images/ui/device.png" mode="aspectFit" aria-hidden="true" /></view>
         <view class="history-config-copy"><view class="history-config-title">{{selectionSummary.title}}</view></view>
         <button class="ui-action history-edit" hover-class="ui-control-pressed" disabled="{{querying || loadingMore}}" bindtap="onEditSelection"><text class="ui-action-label">修改</text><view class="ui-chevron" aria-hidden="true"></view></button>
       </view>

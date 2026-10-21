@@ -54,7 +54,7 @@ async function ingest(ctx, payload) {
 /** Infer cash only from the existing server-verified order receipt fields. */
 function classifyOrder(order) {
   const source = order.payment && order.payment.source || order.source;
-  if (order.productId === 'admin_grant' || ['admin', 'admin_grant', 'redemption', 'member_redemption', 'gift', 'test'].includes(source)
+  if (order.productId === 'admin_grant' || ['admin', 'admin_grant', 'service_compensation', 'trial_compensation', 'redemption', 'member_redemption', 'gift', 'test'].includes(source)
     || /^(grant_|redeem_)/.test(order.orderId || '') || order.test === true) return { kind: 'non_cash' };
   const paid = order.payment && order.payment.providerData;
   const valid = order.provider === 'wechat_virtual_payment' && paid && paid.provider === order.provider

@@ -5,7 +5,7 @@ const { call, newId, showError, toast } = require('../../utils/api');
 const { getBootstrap, getCatalog, refreshBootstrap, invalidateBootstrap, subscribeCatalog, getFollows, invalidateFollows, subscribeSubscriptions } = require('../../utils/store');
 const fmt = require('../../utils/format');
 const { storeLabel, storeLabelWithCity } = require('../../utils/store-label');
-const { syncTabBar } = require('../../utils/tab-bar');
+const { syncTabBar, switchToTab, releaseTabBar } = require('../../utils/tab-bar');
 const { restockSubscription, soldoutSubscription, reminderReadiness, canRemind, creditBoostTip } = require('../../utils/reminder-readiness');
 const { shareAppMessage, shareTimeline } = require('../../utils/share');
 const { followPollDelay } = require('../../utils/poll');
@@ -161,7 +161,7 @@ function presentFollow(follow, boot, catalog, collector) {
       ? '' : `${fmt.relative(new Date(observationAt).toISOString(), now)}检查`,
     pendingStoreCount: usable.filter(store => store.observationState !== 'fresh').length,
     imageUrl: product && product.imageUrl || '',
-    imageDisplayUrl: productThumbnailUrl(product && product.imageUrl),
+    imageDisplayUrl: productThumbnailUrl(product && product.imageUrl, 'card', product && product.partNumber),
     imageAlt: product && product.imageAlt || follow.productTitle,
     statusLabel: status.label,
     statusCls: status.cls,
@@ -218,6 +218,7 @@ function confirmsSavedFollow(follow, payload) {
 Page({
   ...reminderPanelMethods,
   data: {
+    networkOffline: false,
     ready: false,
     loadError: null,
     catalogVersion: '',
@@ -321,6 +322,7 @@ Page({
   },
 
   onHide() {
+    releaseTabBar(this);
     this.nativePromptHiddenAt = getAuthorizationState().nativeBusy ? Date.now() : 0;
     this.visible = false; this.hideAuthorizationOverlay();
     this.serviceDetailsFocusEpoch = (this.serviceDetailsFocusEpoch || 0) + 1;
@@ -328,6 +330,7 @@ Page({
     this.setLiveSync('paused', '页面返回后会立即更新后台记录。');
   },
   onUnload() {
+    releaseTabBar(this);
     this.disposeAuthorizationPanel(); this.pageRetired = true; this.visible = false;
     this.serviceDetailsFocusEpoch = (this.serviceDetailsFocusEpoch || 0) + 1;
     this.retireLiveRead(); this.stopPolling(); this.stopObservationClock();
@@ -868,7 +871,7 @@ Page({
       title: '关注与到货提醒为会员专属',
       content: `周卡 3 个配置、每配置 3 家门店；月卡 4 个配置、每配置 4 家门店；年卡 5 个配置、每配置 5 家门店。会员可累加到货和断货提醒次数。免费用户可用查询次数实时看货。${product.paymentReady ? '' : '\n\n会员购买暂未开放，可在「我的」查看状态。'}`,
       confirmText: '前往我的',
-      success: r => { if (r.confirm) wx.switchTab({ url: '/pages/mine/index' }); },
+      success: r => { if (r.confirm) switchToTab({ url: '/pages/mine/index' }); },
     });
   },
 
@@ -1077,11 +1080,13 @@ Page({
     const app = getApp();
     const target = { partNumber: follow.partNumber, storeNumbers: follow.stores.filter(store => !store.limitPaused).map(store => store.storeNumber), source: 'follow' };
     if (!target.storeNumbers.length) return this.showMemberModal();
+    const previousTarget = app.globalData.pendingSharedTarget;
     app.globalData.pendingSharedTarget = target;
-    wx.switchTab({ url: '/pages/query/index', fail: () => {
+    const started = switchToTab({ url: '/pages/query/index', fail: () => {
       if (app.globalData.pendingSharedTarget === target) app.globalData.pendingSharedTarget = null;
       toast('未能打开查询，请重试');
     } });
+    if (!started && app.globalData.pendingSharedTarget === target) app.globalData.pendingSharedTarget = previousTarget;
   },
 
   onPickupInfo(e) {
@@ -1102,7 +1107,7 @@ Page({
     const follow = this.data.follows.find(item => item.followId === e.currentTarget.dataset.id);
     if (this.pageRetired || !follow) return;
     if (!stageHistoryContext({ from: 'follow', target: { partNumber: follow.partNumber, storeNumbers: follow.stores.map(store => store.storeNumber) } })) return toast('请刷新账户后再查看历史');
-    wx.switchTab({ url: '/pages/history/index' });
+    switchToTab({ url: '/pages/history/index' });
   },
   onManageReminders() {
     getApp().globalData.pendingMineSection = 'reminder-center';
@@ -1110,7 +1115,7 @@ Page({
   },
   onTestNotification() { wx.navigateTo({ url: '/pages/notification-test/index?from=follow' }); },
   onGoMine() {
-    wx.switchTab({ url: '/pages/mine/index' });
+    switchToTab({ url: '/pages/mine/index' });
   },
 
   onGoReminderSettings() {
@@ -1118,7 +1123,7 @@ Page({
     this.onGoMine();
   },
 
-  onFollowImageError(e) { const index = Number(e.currentTarget.dataset.index); const item = this.data.follows && this.data.follows[index]; if (!item) return; if (item.imageDisplayUrl && item.imageDisplayUrl !== item.imageUrl) this.setData({ [`follows[${index}].imageDisplayUrl`]: item.imageUrl }); else this.setData({ [`follows[${index}].imageUrl`]: '' }); },
+  onFollowImageError(e) { const index = Number(e.currentTarget.dataset.index); if (this.data.follows && this.data.follows[index]) this.setData({ [`follows[${index}].imageDisplayUrl`]: '' }); },
 
   onRetryLoad() {
     if (this.pageRetired) return;

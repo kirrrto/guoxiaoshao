@@ -6,9 +6,10 @@ const { localKey } = require('../../utils/local-key');
 const { readSession, writeSession } = require('../../utils/session');
 const operation = require('../../utils/operation');
 const { startProgress, stopProgress } = require('../../utils/request-progress');
-const { syncTabBar } = require('../../utils/tab-bar');
+const { syncTabBar, switchToTab, releaseTabBar } = require('../../utils/tab-bar');
 const { shareAppMessage, shareTimeline } = require('../../utils/share');
 const { historyInsights } = require('../../utils/observation-insights');
+const { productThumbnailUrl } = require('../../utils/product-image-fit');
 const { consumeHistoryContext, returnToSource, currentOwner } = require('../../utils/journey-context');
 
 const SELECTION_KEY = 'gxs_history_selection_v1';
@@ -31,7 +32,7 @@ function selectionSummary(selection, catalog) {
   const numbers = selection.storeNumbers || [];
   const stores = numbers.map(number => typeof number === 'string' && /^R\d{3}$/.test(number) && Object.prototype.hasOwnProperty.call(catalog.storeByNumber, number) ? catalog.storeByNumber[number] : null).filter(Boolean);
   const valid = !selection.invalidStoredScope && numbers.length <= 10 && new Set(numbers).size === numbers.length && stores.length === numbers.length;
-  return { title: product.title, imageUrl: product.imageUrl || '', valid,
+  return { title: product.title, imageUrl: product.imageUrl || '', imageDisplayUrl: productThumbnailUrl(product.imageUrl, 'card', product.partNumber), valid,
     scopeText: !valid ? '已保存门店信息发生变化，请修改后查询'
       : stores.length ? stores.map(store => storeLabel(store.storeNumber, store.name)).join('、') : '各地已有记录 · 未限定门店' };
 }
@@ -109,6 +110,7 @@ function presentHistory(response, catalog, request) {
 
 Page({
   data: {
+    networkOffline: false,
     ready: false,
     accountReady: false,
     accountError: null,
@@ -199,7 +201,8 @@ Page({
     try { const boot = await getBootstrap(); if (this.pageRetired) return; this.applyBoot(boot); getCatalog(); this.loadBrowse(); } catch (e) { /* keep snapshot */ }
   },
 
-  onUnload() { stopProgress(this); this.pageRetired = true; this.taskClaimPending = null; if (this.unsubscribeCatalog) this.unsubscribeCatalog(); if (this.unsubscribeQuota) this.unsubscribeQuota(); },
+  onHide() { releaseTabBar(this); },
+  onUnload() { releaseTabBar(this); stopProgress(this); this.pageRetired = true; this.taskClaimPending = null; if (this.unsubscribeCatalog) this.unsubscribeCatalog(); if (this.unsubscribeQuota) this.unsubscribeQuota(); },
 
   onShareAppMessage() {
     return shareAppMessage('/pages/history/index', { ...this.data, selection: this.selection });
@@ -562,7 +565,7 @@ Page({
     finally { if (!this.pageRetired && accountEpoch === (this.accountEpoch || 0)) this.setData({ loadingMore: false }); }
   },
 
-  onGoMine() { wx.switchTab({ url: '/pages/mine/index' }); },
+  onGoMine() { switchToTab({ url: '/pages/mine/index' }); },
 
   onClaimTask() {
     if (this.pageRetired || !this.data.accountReady || !this.data.boot || !this.data.boot.taskAvailable) return;

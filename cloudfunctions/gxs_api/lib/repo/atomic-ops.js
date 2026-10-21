@@ -8,8 +8,8 @@ const { ApiError } = require('../errors');
 const { dayKey } = require('../time');
 const { decideLiveQuery, decideHistoryQuery } = require('../rules/access');
 const { grantableAmount, ledgerIds } = require('../rules/quota');
-const { isMember, hasFreeReminder, canUseReminders, validateFollowLimits, memberLimits, accountLimits, followAllowance } = require('../rules/membership');
-const { purchasedPlan, needsPlanMetadata, resolvePlanMetadata } = require('../rules/member-plan');
+const { isMember, hasFreeReminder, canUseReminders, validateFollowLimits, memberLimits, accountLimits, followAllowance, planSnapshot } = require('../rules/membership');
+const { OUTAGE_COMPENSATION_ORDER_ID, purchasedPlan, needsPlanMetadata, resolvePlanMetadata, needsOutageCompensation } = require('../rules/member-plan');
 const membershipEntitlements = require('../rules/membership-entitlements');
 const { applyObservation, targetKeyOf } = require('../engine/events');
 const { observationDayId, appendObservationDay } = require('../engine/observation-day');
@@ -65,7 +65,8 @@ async function fulfilMembershipIn(tx, user, order, source, nowIso) {
   const grantedMs = membershipEntitlements.durationMs(order) - refundedMs;
   if (grantedMs <= 0) throw new ApiError('order_refunded', '订单已全额退款，不能再发放会员');
   await hydrateMemberPlansIn(tx, user);
-  const planId = source === 'virtual_payment' ? purchasedPlan(order, user, true) : null;
+  const planId = source === 'virtual_payment' ? purchasedPlan(order, user, true)
+    : ['service_compensation', 'trial_compensation'].includes(source) ? (order.planId || null) : null;
   user.membership = { ...membershipEntitlements.grant(user.membership || {}, { orderId: order._id, source, milliseconds: grantedMs, nowIso, planId }), lastOrderId: order.orderId };
   user.membership.entitlements.planMetadataVersion = 1;
   const expiresAt = user.membership.expiresAt;
@@ -111,6 +112,51 @@ function atomicMethods(run) {
     ensureMemberPlanMetadata: ({ userKey }) => run(async tx => {
       const user = await tx.get(C.users, userKey);
       if (user && await hydrateMemberPlansIn(tx, user)) await tx.put(C.users, user);
+      return user;
+    }),
+    ensureOutageCompensation: ({ userKey, nowIso }) => run(async tx => {
+      const user = await tx.get(C.users, userKey);
+      if (!user || !needsOutageCompensation(user, nowIso)) return user;
+      await hydrateMemberPlansIn(tx, user);
+      const recordId = `${userKey}|${OUTAGE_COMPENSATION_ORDER_ID}`;
+      const existing = await tx.get(C.orders, recordId);
+      if (existing) {
+        user.membership = { ...(user.membership || {}), outage20261021CompensatedAt: existing.fulfilledAt || nowIso };
+        await tx.put(C.users, user);
+        return user;
+      }
+      const now = new Date(nowIso);
+      const activeSnap = planSnapshot(user, now);
+      let restoredPlanId = activeSnap.planId && activeSnap.planId !== 'member_trial' ? activeSnap.planId : null;
+      const lastOrderId = user.membership && user.membership.lastOrderId;
+      if (!restoredPlanId && typeof lastOrderId === 'string' && lastOrderId) {
+        const lastOrder = await tx.get(C.orders, `${userKey}|${lastOrderId}`) || await tx.get(C.orders, lastOrderId);
+        if (lastOrder) restoredPlanId = purchasedPlan(lastOrder, user);
+      }
+      const hadMembership = isMember(user, now)
+        || Boolean(user.membership && (user.membership.expiresAt || user.membership.lastOrderId))
+        || Boolean(restoredPlanId);
+      const source = hadMembership ? 'service_compensation' : 'trial_compensation';
+      const type = hadMembership ? 'membership_compensation' : 'membership_trial';
+      const planId = hadMembership ? (restoredPlanId || null) : 'member_trial';
+      const order = {
+        _id: recordId,
+        orderId: OUTAGE_COMPENSATION_ORDER_ID,
+        userKey,
+        productId: 'admin_grant',
+        type,
+        source,
+        ...(planId ? { planId } : {}),
+        days: 1,
+        amountFen: 0,
+        status: 'paid',
+        createdAt: nowIso,
+        paidAt: nowIso,
+        fulfilledAt: null,
+        note: '2026-10-21 服务器故障补偿',
+      };
+      user.membership = { ...(user.membership || {}), outage20261021CompensatedAt: nowIso };
+      await fulfilMembershipIn(tx, user, order, source, nowIso);
       return user;
     }),
     ...notificationTestMethods(run, applyLedgerIn),

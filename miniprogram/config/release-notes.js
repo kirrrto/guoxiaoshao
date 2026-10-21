@@ -8,13 +8,23 @@
 // Keep technical details and complete acceptance records in release documents.
 const RELEASE_NOTES = [
   {
+    version: '3.3.2',
+    title: '服务恢复与会员时长补偿',
+    dateText: '本地候选 · 2026-10-21',
+    highlights: [
+      '昨晚服务器故障已恢复，会员及曾付费用户自动顺延 1 天。',
+      '免费用户 10 月 21 日打开自动获赠 1 天体验会员。',
+      '修复手机预览商品图显示与查询卡片「修改」按钮换行。',
+    ],
+  },
+  {
     version: '3.3.1',
     title: '选配与提醒体验优化',
-    dateText: '本地候选 · 2026-10-20',
+    dateText: '修订候选 · 2026-10-21',
     highlights: [
-      'iPhone 系列优先展示 iPhone Duo，选门店支持常用城市快选。',
-      '历史浏览达标后可页内直接领奖，处理提醒时可顺手补充通知次数。',
-      '会员套餐按需求智能预选，页面切换与打开更流畅。',
+      'iPhone Duo 优先展示，选门店支持常用城市快选。',
+      '商品图更轻，底部导航改为微信原生样式。',
+      '浏览达标可页内领奖，提醒操作可补充次数，会员套餐按需求预选。',
     ],
   },
   {

@@ -5,6 +5,7 @@ const TTL_MS = 24 * 60 * 60 * 1000;
 let lastRevision = 0;
 const ENTRY_POINTS = ['query', 'result', 'query_result', 'query_selection', 'follow', 'mine'];
 const { storeLabelWithCity } = require('./store-label');
+const { productThumbnailUrl } = require('./product-image-fit');
 const accountKey = identity => identity && typeof identity.userKey === 'string' && identity.userKey.length <= 256 ? identity.userKey : '';
 const storesOf = value => Array.isArray(value) && value.length >= 1 && value.length <= 5
   && value.every(item => typeof item === 'string' && /^[A-Za-z0-9_-]{1,32}$/.test(item)) && new Set(value).size === value.length ? value.slice().sort() : null;
@@ -20,7 +21,7 @@ function presentTarget(target, catalog) {
   const stores = target.storeNumbers.map(number => catalog && (own(catalog.storeByNumber, number)
     || (catalog.stores || []).find(item => item.storeNumber === number)));
   if (!product || product.supported !== true || product.comingSoon || stores.some(item => !item || item.enabled === false)) return null;
-  return { ...target, title: product.title || product.model || product.partNumber, imageUrl: product.imageUrl || '',
+  return { ...target, title: product.title || product.model || product.partNumber, imageUrl: product.imageUrl || '', imageDisplayUrl: productThumbnailUrl(product.imageUrl, 'card', product.partNumber),
     storeNames: stores.map(item => storeLabelWithCity(item.storeNumber, item.name, item.city)),
     storeText: stores.map(item => storeLabelWithCity(item.storeNumber, item.name, item.city)).join('、') };
 }

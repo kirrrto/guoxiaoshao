@@ -20,7 +20,7 @@ test('window and tab colors follow the system theme through complete theme.json 
 });
 
 test('every stylesheet with light surfaces carries a dark-mode block at its end', () => {
-  for (const file of ['app.wxss', 'styles/common.wxss', 'components/target-picker/index.wxss', 'custom-tab-bar/index.wxss', 'pages/query/index.wxss', 'pages/follow/index.wxss', 'pages/mine/index.wxss']) {
+  for (const file of ['app.wxss', 'styles/common.wxss', 'components/target-picker/index.wxss', 'pages/query/index.wxss', 'pages/follow/index.wxss', 'pages/mine/index.wxss']) {
     const source = read(file), at = source.indexOf('@media (prefers-color-scheme: dark)');
     assert.ok(at > 0, `${file} has a dark block`);
     // Only the block's own indented rules and closing brace may follow it.

@@ -18,7 +18,7 @@ function versionLabel() {
   return `v${VERSION}${{ develop: ' · 开发版', trial: ' · 体验版' }[env] || ''}`;
 }
 const fmt = require('../../utils/format');
-const { syncTabBar } = require('../../utils/tab-bar');
+const { syncTabBar, switchToTab, releaseTabBar, setTabBarOverlay } = require('../../utils/tab-bar');
 const { notificationAdvice } = require('../../utils/reminder-readiness');
 const { shareAppMessage, shareTimeline } = require('../../utils/share');
 const { paymentAvailability, createPaymentController, purchaseNotice, planPurchasable, purchaseGate } = require('../../utils/member-payment');
@@ -143,7 +143,7 @@ const presentTasks = (tasks, quota) => (tasks || []).map(task => ({ ...task,
     ? quota.grantedToday >= quota.dailyGrantCap ? '已浏览·今日上限' : task.reward === 0 ? '已浏览·奖励未开放' : '已浏览·待领取' : '',
 }));
 const presentMembership = membership => ({ ...membership, expired: !membership.active && Boolean(membership.expiresAt),
-  planLabel: ({ member_7d: '周卡会员', member_30d: '月卡会员', member_365d: '年卡会员' })[membership.planId] || '会员',
+  planLabel: ({ member_7d: '周卡会员', member_30d: '月卡会员', member_365d: '年卡会员', member_trial: '体验会员' })[membership.planId] || '会员',
   daysLeft: membership.active ? Math.ceil(membership.remainingMs / 86400000) : 0,
   enhancedExpiresText: membership.enhancedExpiresAt ? fmt.fmtDateTime(membership.enhancedExpiresAt) : '',
   annualExpiresText: membership.annualExpiresAt ? fmt.fmtDateTime(membership.annualExpiresAt) : '',
@@ -165,8 +165,14 @@ function redemptionErrorText(error) {
 }
 function presentOrder(order) {
   const redeemed = order.source === 'redemption_code' || order.type === 'membership_redemption';
-  const sourceLabel = redeemed ? '兑换码开通' : ['admin', 'admin_grant'].includes(order.source) || order.productId === 'admin_grant' ? '平台发放' : order.amountFen > 0 ? '付费开通' : '会员开通';
-  return { ...order, sourceLabel, titleText: order.type === 'membership_cancelled_intent' ? '购买前已取消' : `${order.days} 天会员 · ${sourceLabel}`, amountText: order.amountFen > 0 ? fmt.fen(order.amountFen) : '',
+  const trialCompensated = order.source === 'trial_compensation' || order.type === 'membership_trial';
+  const serviceCompensated = order.source === 'service_compensation' || order.type === 'membership_compensation';
+  const sourceLabel = redeemed ? '兑换码开通'
+    : trialCompensated || serviceCompensated ? '故障补偿'
+    : ['admin', 'admin_grant'].includes(order.source) || order.productId === 'admin_grant' ? '平台发放'
+    : order.amountFen > 0 ? '付费开通' : '会员开通';
+  const memberKind = trialCompensated ? '体验会员' : '会员';
+  return { ...order, sourceLabel, titleText: order.type === 'membership_cancelled_intent' ? '购买前已取消' : `${order.days} 天${memberKind} · ${sourceLabel}`, amountText: order.amountFen > 0 ? fmt.fen(order.amountFen) : '',
     refundText: order.refundFen > 0 ? `已退款 ${fmt.fen(order.refundFen)}` : '',
     statusLabel: order.abandoned ? '已放弃' : ORDER_STATUS[order.status] || '状态待确认', timeText: fmt.fmtDateTime(order.fulfilledAt || order.paidAt || order.createdAt) };
 }
@@ -185,6 +191,7 @@ const presentNotification = notification => {
 Page({
   ...reminderPanelMethods,
   data: {
+    networkOffline: false,
     ready: false,
     loadError: null,
     versionLabel: versionLabel(),
@@ -309,6 +316,7 @@ Page({
   },
 
   onHide() {
+    releaseTabBar(this);
     this.stopDndClock();
     this.nativePromptHiddenAt = getAuthorizationState().nativeBusy ? Date.now() : 0;
     this.disconnectOfferObserver();
@@ -324,6 +332,7 @@ Page({
   },
 
   retirePage() {
+    releaseTabBar(this);
     this.stopDndClock();
     this.disposeAuthorizationPanel();
     this.disconnectOfferObserver();
@@ -757,12 +766,12 @@ Page({
     if (!intent || typeof getApp !== 'function') return;
     getApp().globalData.pendingFollow = { partNumber: intent.partNumber, storeNumbers: intent.storeNumbers.slice(),
       checkoutRevision: intent.revision, checkoutSignature: intent.targetSignature };
-    wx.switchTab({ url: '/pages/follow/index' });
+    switchToTab({ url: '/pages/follow/index' });
   },
 
   onReturnToQuery() {
     if (this.pageRetired || this.data.paymentBusy || this.data.paymentConfirming) return;
-    wx.switchTab({ url: '/pages/query/index' });
+    switchToTab({ url: '/pages/query/index' });
   },
 
   onTogglePurchaseFeedback() { this.setData({ showPurchaseFeedback: !this.data.showPurchaseFeedback }); },
@@ -808,7 +817,7 @@ Page({
 
   onOpenFollows() {
     if (this.pageRetired || this.data.paymentBusy || this.data.paymentChecking || this.data.paymentConfirming) return;
-    wx.switchTab({ url: this.data.boot && this.data.boot.followCount > 0 ? '/pages/follow/index' : '/pages/query/index' });
+    switchToTab({ url: this.data.boot && this.data.boot.followCount > 0 ? '/pages/follow/index' : '/pages/query/index' });
   },
 
   ensurePaymentController() {
@@ -977,8 +986,7 @@ Page({
   },
 
   setTabBarOverlay(hidden) {
-    const bar = typeof this.getTabBar === 'function' ? this.getTabBar() : null;
-    if (bar && bar.setData) bar.setData({ sheetHidden: Boolean(hidden) });
+    setTabBarOverlay(this, Boolean(hidden), 'redemption');
   },
 
   onRedemptionInput(e) {
@@ -1045,7 +1053,7 @@ Page({
         if (!r.confirm || this.pageRetired || this.pageVisible === false || generation !== (this.paymentConsentGeneration || 0)
           || account !== (this.data.boot && this.data.boot.identity && this.data.boot.identity.userKey)) return;
         app.globalData.pendingFollow = { partNumber: intent.partNumber, storeNumbers: intent.storeNumbers.slice() };
-        wx.switchTab({ url: '/pages/follow/index' });
+        switchToTab({ url: '/pages/follow/index' });
       },
     });
   },
@@ -1233,7 +1241,7 @@ Page({
   },
 
   onGoHistory() {
-    wx.switchTab({ url: '/pages/history/index' });
+    switchToTab({ url: '/pages/history/index' });
   },
 
   onToggleMembershipRules() {
@@ -1317,7 +1325,7 @@ Page({
     }
     if (['authorization', 'follow', 'service'].includes(action)) {
       getApp().globalData.pendingFollowFocus = { section: action === 'follow' ? 'follow-configurations' : 'reminder-health', partNumber: action === 'follow' ? notification.partNumber : null };
-      wx.switchTab({ url: '/pages/follow/index' });
+      switchToTab({ url: '/pages/follow/index' });
     }
   },
 
@@ -1529,6 +1537,8 @@ Page({
     const id = this.data.boot.identity.userKey || this.data.boot.identity.openidMasked;
     wx.setClipboardData({ data: id, success: () => toast('已复制用户标识'), fail: () => toast('复制失败，请长按用户标识手动复制') });
   },
+
+  onCheckoutImageError() { if (this.data.checkoutTarget) this.setData({ 'checkoutTarget.imageDisplayUrl': '' }); },
 
   onRetryLoad() {
     if (this.pageRetired) return;

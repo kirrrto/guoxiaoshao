@@ -1,0 +1,2 @@
+# Encoder version recorded in the manifest; install with python -m pip install -r tools/assets/requirements.txt.
+Pillow==12.3.0

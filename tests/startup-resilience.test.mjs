@@ -72,29 +72,28 @@ test('an unknown page opens the home tab and launches are counted for the add-to
   assert.equal(rt.storage.get('gxs_launch_count_v1'), 2);
 });
 
-test('the tab bar shows an offline notice and the visible page reloads once the phone reconnects', () => {
+test('the visible page shows an offline notice and reloads once the phone reconnects', () => {
   let reloads = 0, statusListener = null;
-  const page = { onNetworkRestored: () => { reloads++; } };
+  const page = { data: { networkOffline: false }, setData(patch) { Object.assign(this.data, patch); }, onNetworkRestored: () => { reloads++; } };
   const rt = runtime(undefined, { getCurrentPages: () => [page] });
   rt.wx.getNetworkType = ({ success }) => success({ networkType: 'wifi' });
   rt.wx.onNetworkStatusChange = listener => { statusListener = listener; };
-  const bar = rt.instance('custom-tab-bar/index.js');
-  bar.lifetimes.attached.call(bar);
-  assert.equal(bar.data.offline, false);
+  const tabs = rt.load('utils/tab-bar.js');
+  tabs.syncTabBar(page, '/pages/query/index');
+  assert.equal(page.data.networkOffline, false);
   statusListener({ isConnected: false });
-  assert.equal(bar.data.offline, true);
+  assert.equal(page.data.networkOffline, true);
   assert.equal(reloads, 0);
   statusListener({ isConnected: true });
-  assert.equal(bar.data.offline, false);
+  assert.equal(page.data.networkOffline, false);
   assert.equal(reloads, 1);
   statusListener({ isConnected: true });
   assert.equal(reloads, 1, 'staying online does not reload again');
-  bar.pageLifetimes.hide.call(bar);
+  tabs.releaseTabBar(page);
   statusListener({ isConnected: false }); statusListener({ isConnected: true });
   assert.equal(reloads, 1, 'a hidden tab page leaves the reload to the visible one');
-  bar.lifetimes.detached.call(bar);
   statusListener({ isConnected: false });
-  assert.equal(bar.data.offline, false, 'a detached tab bar stops listening');
+  assert.equal(page.data.networkOffline, false, 'a hidden page stops listening');
 });
 
 test('pages reload their failed or unconnected parts when the network returns', async () => {

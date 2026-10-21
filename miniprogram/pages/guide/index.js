@@ -68,7 +68,7 @@ Page({
   onCalendarImageError(event) {
     const index = Number(event.currentTarget.dataset.index);
     if (Number.isInteger(index) && this.data.calendars[index]) {
-      this.setData({ [`calendars[${index}].imageUrl`]: '' });
+      this.setData({ [`calendars[${index}].imageDisplayUrl`]: '' });
     }
   },
   onStageAction() {

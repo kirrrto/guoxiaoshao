@@ -6,10 +6,12 @@ import vm from 'node:vm';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { stockNativeButtonProfile, stockNativeButtonCss } from './stock-native-button.mjs';
+import { nativeTabPreview } from './native-tab-preview.mjs';
 
 const project = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const adminPreview = process.argv.includes('--admin-only');
 const v2Preview = process.argv.includes('--v2-only');
+const baselinePreview = !process.argv.some(arg => /^--.*-only$/.test(arg));
 const membershipNativePreview = process.argv.includes('--membership-native-only');
 if (membershipNativePreview && process.argv.some(arg => arg !== '--membership-native-only' && /^--.*-only$/.test(arg))) throw Error('--membership-native-only cannot be combined with another scenario group');
 if (adminPreview && process.argv.some(arg => /^--(?:v2|reminders|stock|redemption|payment|orders|monitoring|history-task|history-data|sheets|release-notes|onboarding|notification-test|alternatives|membership-native)-only$/.test(arg))) throw Error('--admin-only cannot be combined with consumer scenarios');
@@ -49,18 +51,13 @@ function sandbox(handler, { paymentScenario } = {}) {
     requestVirtualPayment: options => paymentScenario === 'payment-cancelled' ? options.fail({ errMsg: 'requestVirtualPayment:fail cancel' }) : options.success({ errMsg: 'requestVirtualPayment:ok' }) });
   function load(filename) {
     if (filename === path.join(mini, 'utils/api.js')) return api;
-    if (!allowRemoteImages && filename === path.join(mini, 'config/product-images.js')) return {};
     if (modules.has(filename)) return modules.get(filename).exports;
     const module = { exports: {} }; modules.set(filename, module);
     vm.runInNewContext(fs.readFileSync(filename, 'utf8'), { module, wx, console, Date: PreviewDate, Set, Map, Promise, getApp: () => app,
       Page: value => { captured = value; }, Component: value => { captured = value; },
       setTimeout: () => 0, clearTimeout() {}, require: id => load(path.resolve(path.dirname(filename), id.endsWith('.js') ? id : id + '.js')) }, { filename });
-    // Static HTML cannot dispatch the WXML image-error handler. Offline launch
-    // fixtures therefore render the page's real no-image fallback up front;
-    // remote-image mode keeps the original URL for a separate network check.
-    if (!allowRemoteImages && filename === path.join(mini, 'config/product-launches.js')) {
-      module.exports = module.exports.map(entry => /^https?:\/\//i.test(entry.imageUrl || '') ? { ...entry, imageUrl: '' } : entry);
-    }
+    // Product source URLs remain unchanged. The real display helper resolves
+    // packaged JPEG/PNG assets, including calendar posters, without network access.
     return module.exports;
   }
   function instantiate(relative, props = {}) {
@@ -180,7 +177,14 @@ function renderNode(node, scope, context) {
   if (style) renderedAttrs += ` style="${html(style)}"`;
   if (node.name === 'image') {
     let src = evaluate(attrs.src || '', scope);
-    if (src.startsWith('/')) { const local = path.join(mini, src); if (fs.existsSync(local)) src = `data:image/png;base64,${fs.readFileSync(local).toString('base64')}`; }
+    if (src.startsWith('/')) {
+      const local = path.join(mini, src);
+      if (fs.existsSync(local)) {
+        const mime = { '.png': 'image/png', '.webp': 'image/webp', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.svg': 'image/svg+xml', '.gif': 'image/gif' }[path.extname(local).toLowerCase()];
+        if (!mime) throw Error(`Unsupported local preview image: ${src}`);
+        src = `data:${mime};base64,${fs.readFileSync(local).toString('base64')}`;
+      }
+    }
     renderedAttrs += ` src="${html(src)}" alt="${html(evaluate(attrs['aria-label'] || '', scope))}" style="object-fit:contain"`;
   }
   if (node.name === 'switch') renderedAttrs += ` type="checkbox" ${truth(attrs.checked || '', scope) ? 'checked' : ''}`;
@@ -206,7 +210,7 @@ function htmlElementSelectors(css) {
 }
 const rawCatalog = JSON.parse(fs.readFileSync(path.join(project, 'catalog/products.json'), 'utf8'));
 const rawStores = JSON.parse(fs.readFileSync(path.join(project, 'catalog/stores.json'), 'utf8'));
-const baseProducts = (rawCatalog.products || rawCatalog).map(p => ({ ...p, supported: true, imageUrl: allowRemoteImages ? p.imageUrl || '' : '' }));
+const baseProducts = (rawCatalog.products || rawCatalog).map(p => ({ ...p, supported: true }));
 const previewStores = (rawStores.stores || rawStores).slice(0, 6);
 const partAt = process.argv.indexOf('--part-number');
 const sample = partAt >= 0 ? baseProducts.find(p => p.partNumber === process.argv[partAt + 1]) : baseProducts.find(p => p.category === 'iphone' && (p.attributes || {}).color) || baseProducts[0];
@@ -709,6 +713,13 @@ for (const scenario of scenarios) {
         if (page.data.selectedPlanId !== 'member_30d' || page.data.paymentPendingId !== previewOrder.orderId) throw Error('Original monthly order was not retained in offline preview');
       }
     }
+    if (baselinePreview && pageName === 'mine' && !['error', 'loading'].includes(scenario)) {
+      if (page.data.showPurchaseShop || page.data.membershipUpgradeOpen || page.data.displayMemberProducts.length || page.data.showPurchaseRules)
+        throw Error('Disabled membership fixture must retain its unavailable notice and closed purchase controls');
+    }
+    if (baselinePreview && pageName === 'follow' && scenario === 'longcontent') {
+      for (const follow of page.data.follows) page.onToggleFollowDetails({ currentTarget: { dataset: { id: follow.followId } } });
+    }
     if (notificationTestPreview && ['notification-test-received', 'notification-test-not-received', 'notification-test-uncertain-received'].includes(scenario)) {
       const outcome = scenario === 'notification-test-not-received' ? 'not_received' : 'received';
       await page.onFeedback({ currentTarget: { dataset: { outcome } } });
@@ -962,23 +973,15 @@ for (const scenario of scenarios) {
     const componentCss = adminPreview ? '' : cssFile('components/target-picker/index.wxss').replace(/\/\*[\s\S]*?\*\//g, '').replace(/([^{}]+)\{/g, (_, selectors) => selectors.trim().startsWith('@') ? `${selectors}{` : selectors.split(',').map(selector => `.component-target-picker ${selector.trim()}`).join(',') + '{');
     const tabIndex = appConfig.tabBar.list.findIndex(tab => tab.pagePath === `pages/${pageName}/index`);
     const navigationHidden = Boolean(page.data.sheetVisible || page.data.editing || page.data.redemptionOpen || page.data.calendarOpen || page.data.authorizationOpen);
-    let renderedTabs = '', tabCss = '';
-    if (appConfig.tabBar.custom && tabIndex >= 0) {
-      const tabComponent = rt.instantiate('custom-tab-bar/index.js', { selected: tabIndex, sheetHidden: navigationHidden });
-      const tabAst = parse(fs.readFileSync(path.join(mini, 'custom-tab-bar/index.wxml'), 'utf8'));
-      renderedTabs = renderNode(tabAst, tabComponent.data, { rt });
-      tabCss = cssFile('custom-tab-bar/index.wxss');
-    }
+    if (appConfig.tabBar.custom) throw Error('This preview models native navigation; custom tab components require their own renderer.');
+    const nativeTabs = nativeTabPreview(appConfig.tabBar, theme, mini, tabIndex, navigationHidden);
+    const tabCss = nativeTabs.css;
     const rawCss = `${buttonConstraintCss}\n${cssFile('app.wxss')}\n${cssFile(`pages/${pageName}/index.wxss`)}\n${componentCss}\n${adminPreview ? '' : cssFile('components/config-sheet/index.wxss') + cssFile('components/reminder-nudge/index.wxss') + cssFile('components/reminder-authorization/index.wxss')}\n${tabCss}`;
     for (const width of widths) {
       const css = htmlElementSelectors(rawCss.replace(/(-?[\d.]+)rpx/g, (_, value) => { const pixels = Number(value) * width / 750; return `${roundRpx ? Math.round(pixels) : pixels}px`; }));
       const filename = `${pageName}-${scenario}-${width}.html`;
-      const tabbar = appConfig.tabBar.custom ? renderedTabs : tabIndex < 0 ? '' : '<div class="preview-tabbar">' + appConfig.tabBar.list.map(tab => {
-        const selected = tab.pagePath === `pages/${pageName}/index`;
-        const icon = fs.readFileSync(path.join(mini, selected ? tab.selectedIconPath : tab.iconPath)).toString('base64');
-        return `<span style="display:flex;align-items:center;flex-direction:column;color:${selected ? appConfig.tabBar.selectedColor : appConfig.tabBar.color}"><img src="data:image/png;base64,${icon}" alt="" style="width:26px;height:26px;margin-bottom:5px">${html(tab.text)}</span>`;
-      }).join('') + '</div>';
-      const body = `<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${names[pageName]} · ${scenario} · ${width}px 离线预览</title><style>html{width:${width}px;max-width:100%;margin:0 auto}body{margin:0}button,input,textarea{font:inherit}button{cursor:default}img{display:block}input[type=checkbox]{width:36px;height:22px;flex:none;accent-color:#1ba35a}.simulation{position:sticky;top:0;z-index:10;padding:8px 12px;background:#fff2ce;color:#705000;font:11px/1.5 sans-serif;border-bottom:1px solid #ead49c}.native-nav{text-align:center;padding:16px;font:600 15px sans-serif}${navCss('light')}${theme ? `@media (prefers-color-scheme: dark){${navCss('dark')}}` : ''}.preview-tabbar{display:flex;justify-content:space-around;gap:6px;background:white;padding:15px 8px;border-top:1px solid #ddd;font-size:12px;color:#65776c}${css}</style><div class="simulation">离线模拟 · ${width}px · ${scenario}${membershipNativePreview || notificationTestPreview ? ' · 184px按钮级联压力' : ''} · 使用实际 WXML/WXSS；不代表微信实测或实时库存</div><div class="native-nav">果小哨 · ${names[pageName]}</div>${rendered}${tabbar}<script>window.previewAudit=()=>({width:innerWidth,scrollWidth:document.documentElement.scrollWidth,overflow:[...document.querySelectorAll('body *')].filter(e=>{const r=e.getBoundingClientRect();return r.width&&r.right>document.documentElement.clientWidth+1&&getComputedStyle(e.parentElement).overflowX!=='auto'}).map(e=>({tag:e.tagName,class:e.className,right:e.getBoundingClientRect().right,text:e.textContent.slice(0,60)}))});</script></html>`;
+      const tabbar = nativeTabs.markup;
+      const body = `<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${names[pageName]} · ${scenario} · ${width}px 离线预览</title><style>html{width:${width}px;max-width:100%;margin:0 auto}body{margin:0}button,input,textarea{font:inherit}button{cursor:default}img{display:block}input[type=checkbox]{width:36px;height:22px;flex:none;accent-color:#1ba35a}.simulation{position:sticky;top:0;z-index:10;padding:8px 12px;background:#fff2ce;color:#705000;font:11px/1.5 sans-serif;border-bottom:1px solid #ead49c}.native-nav{text-align:center;padding:16px;font:600 15px sans-serif}${navCss('light')}${theme ? `@media (prefers-color-scheme: dark){${navCss('dark')}}` : ''}${css}</style><div class="simulation">离线模拟 · ${width}px · ${scenario}${membershipNativePreview || notificationTestPreview ? ' · 184px按钮级联压力' : ''} · 使用实际 WXML/WXSS；不代表微信实测或实时库存</div><div class="native-nav">果小哨 · ${names[pageName]}</div>${rendered}${tabbar}<script>window.previewAudit=()=>({width:innerWidth,scrollWidth:document.documentElement.scrollWidth,overflow:[...document.querySelectorAll('body *')].filter(e=>{const r=e.getBoundingClientRect();return r.width&&r.right>document.documentElement.clientWidth+1&&getComputedStyle(e.parentElement).overflowX!=='auto'}).map(e=>({tag:e.tagName,class:e.className,right:e.getBoundingClientRect().right,text:e.textContent.slice(0,60)}))});</script></html>`;
       fs.writeFileSync(path.join(out, filename), body, 'utf8');
       const expectedText = v2Preview ? expectedV2Text : alternativesPreview ? [p.title,
         '选择可接受的颜色与门店', '同机型、同容量', ...(cityPreview ? [] : ['同城门店']), '勾选不扣次', '切换城市',
@@ -1075,8 +1078,8 @@ for (const scenario of scenarios) {
         ...(stockScenarios[scenario].authorizationPending ? ['待同步 +1', '重试同步', '网络较慢，授权记录尚未同步。'] : member ? ['微信提醒授权已备好'] : []),
       ] : scenario === 'loading' ? [{ query: '正在加载商品目录', follow: '正在读取你的关注', history: '正在加载商品目录', mine: '正在读取账户信息' }[pageName]]
         : scenario === 'error' ? [pageName === 'admin' ? '模拟错误：网络连接中断' : '模拟错误：云环境连接超时', '暂时没有连上', '重试']
-        : pageName === 'mine' ? [member ? '果小哨会员' : expired ? '会员已到期' : '让小哨持续帮你留意', ...(page.data.membership.active ? ['延长会员'] : ['¥7.00', '付费购买暂未开放', '不自动续费']), '提醒记录', ...(reminderPreview && reminderRecords.length ? ['删除记录', scenario === 'reminder-clearing' ? '清空中' : '清空'] : [])]
-        : pageName === 'follow' && follows.length ? [p.title, stores[0].name, ...(sheetPreview ? ['调整关注', '选商品', '选门店', '已选门店', p.title + ' · 2 家门店', scenario === 'sheet-saving' ? '正在保存' : '保存关注'] : [])]
+        : pageName === 'mine' ? [member ? '果小哨会员' : expired ? '会员已到期' : '让小哨持续帮你留意', ...(page.data.showPurchaseShop ? page.data.membership.active ? ['延长会员', '升级套餐'] : ['开通会员'] : ['会员购买暂不可用，现有会员权益不受影响。']), '会员权益与购买规则', '提醒记录', ...(reminderPreview && reminderRecords.length ? ['删除记录', scenario === 'reminder-clearing' ? '清空中' : '清空'] : [])]
+        : pageName === 'follow' && follows.length ? [p.title, '2 家门店', ...(page.data.follows.some(follow => follow.detailsExpanded) ? [stores[0].name, '收起详情', '调整', '查看供应历史', '删除关注'] : ['详情与管理']), ...(sheetPreview ? ['调整关注', '选商品', '选门店', '已选门店', p.title + ' · 2 家门店', scenario === 'sheet-saving' ? '正在保存' : '保存关注'] : [])]
         : pageName === 'follow' ? ['给心仪的配置留个小哨']
         : pageName === 'admin' ? ['运行统计', '128'] : [p.title, ...(sheetPreview ? ['选商品', '选门店', '已选门店'] : [])];
       if (adminPreview && ['operator-ready', 'operator-longcontent'].includes(scenario)) expectedText.push('成功查询 56', '查看提醒详情 12', '测试通知：28 条／20 人', '各行为分别计数', ...(scenario === 'operator-longcontent' ? ['以上不是完整统计'] : []));
@@ -1108,7 +1111,7 @@ for (const scenario of scenarios) {
       const expectedAlternativeCounts = alternativesPreview ? { colors: page.data.alternativeColorChoices.length, stores: page.data.alternativeVisibleStores.length, queries: page.data.alternativeSelectedColors.length } : undefined;
       const expectedDndPeriodCount = scenario.startsWith('v3-dnd-') ? page.data.dndPeriods.length : undefined;
       const expectedReleaseNoteCount = releaseNotesPreview ? (page.data.showReleaseNotes ? page.data.visibleReleaseNotes.length : 0) : undefined;
-      const expectedMembership = (membershipNativePreview || v2Preview) && pageName === 'mine' ? {
+      const expectedMembership = (membershipNativePreview || v2Preview || baselinePreview && !['error', 'loading'].includes(scenario)) && pageName === 'mine' ? {
         accountHeader: !page.data.contextualCheckout || !page.data.checkoutTarget || page.data.membership.active,
         active: page.data.membership.active,
         accountState: page.data.membership.active ? 'member' : page.data.membership.expired ? 'expired' : 'free',

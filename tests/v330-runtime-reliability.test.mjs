@@ -56,21 +56,23 @@ test('a picker parent echo terminates, and the next real selection still emits o
   assert.equal(events, 2); assert.equal(rt.timers.size, 0);
 });
 
-test('sheet observers never re-enter another component render and closing before detach releases its bar', () => {
+test('sheet observers defer the native bridge until rendering completes and detach releases navigation', () => {
   let inParentRender = false;
-  const ticks = [], bar = { data: { sheetHidden: false }, setData(patch) {
-    assert.equal(inParentRender, false, 'cross-component updates must wait for the current render');
-    Object.assign(this.data, patch);
-  } };
-  const rt = runtime(undefined, { getCurrentPages: () => [{ getTabBar: () => bar }] });
+  let hidden = false;
+  const ticks = [], owner = { data: {} };
+  const rt = runtime(undefined, { getCurrentPages: () => [owner] });
+  for (const [method, value] of [['hideTabBar', true], ['showTabBar', false]]) rt.wx[method] = options => {
+    assert.equal(inParentRender, false, 'native visibility updates must wait for the current render');
+    hidden = value; options.success(); options.complete();
+  };
   rt.wx.nextTick = fn => ticks.push(fn);
   const sheet = rt.instance('components/config-sheet/index.js', { visible: true });
   inParentRender = true; sheet.onVisible(true); inParentRender = false;
   while (ticks.length) ticks.shift()();
-  assert.equal(bar.data.sheetHidden, true);
+  assert.equal(hidden, true);
   inParentRender = true; sheet.data.visible = false; sheet.onVisible(false); sheet.lifetimes.detached.call(sheet); inParentRender = false;
   while (ticks.length) ticks.shift()();
-  assert.equal(bar.data.sheetHidden, false);
+  assert.equal(hidden, false);
 });
 
 for (const name of ['query', 'history']) {

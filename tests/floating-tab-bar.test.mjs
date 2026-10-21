@@ -1,204 +1,215 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
 import { runtime } from './helpers/miniprogram-runtime.mjs';
+import { nativeTabBar } from './helpers/native-tab-bar.mjs';
 
 const routes = ['pages/query/index', 'pages/follow/index', 'pages/history/index', 'pages/mine/index'];
-const tap = index => ({ currentTarget: { dataset: { index } } });
-const copy = value => JSON.parse(JSON.stringify(value));
-
-function navigationRuntime(initialRoute = routes[0]) {
-  const stack = [{ route: initialRoute }];
+function navigationRuntime(initialRoute = routes[0], options = {}) {
+  const stack = [{ route: initialRoute }], switches = [];
   const rt = runtime(undefined, { getCurrentPages: () => stack });
-  const switches = [], keyboardListeners = new Set(), removedListeners = [];
-  rt.wx.switchTab = options => { switches.push(options); };
-  rt.wx.onKeyboardHeightChange = listener => keyboardListeners.add(listener);
-  rt.wx.offKeyboardHeightChange = listener => { removedListeners.push(listener); keyboardListeners.delete(listener); };
-  const template = rt.instance('custom-tab-bar/index.js');
-  const bars = [];
-  function makeBar() {
-    const bar = { ...template, data: copy(template.data), writes: [] };
-    bar.setData = patch => { bar.writes.push(copy(patch)); Object.assign(bar.data, patch); };
-    bar.lifetimes.attached.call(bar);
-    bars.push(bar);
-    return bar;
-  }
-  function setRoute(route) { stack.splice(0, stack.length, { route }); }
-  function keyboard(height) { for (const listener of keyboardListeners) listener({ height }); }
-  return { rt, switches, keyboardListeners, removedListeners, makeBar, setRoute, keyboard, stack, bars };
+  const native = nativeTabBar(rt, options), tabs = rt.load('utils/tab-bar.js');
+  rt.wx.switchTab = options => switches.push(options);
+  const makePage = (index = 0) => ({ route: routes[index], data: { networkOffline: false }, setData(patch) { Object.assign(this.data, patch); } });
+  const show = page => { stack.splice(0, stack.length, page); tabs.syncTabBar(page, page.route); };
+  return { rt, native, tabs, switches, stack, show, makePage };
 }
 
-test('each cold tab selects its actual route before account and catalog loading can finish', async () => {
-  for (let index = 0; index < routes.length; index += 1) {
+test('the four routes and themed icons are registered with the native tab bar only', () => {
+  const app = JSON.parse(fs.readFileSync(new URL('../miniprogram/app.json', import.meta.url)));
+  assert.notEqual(app.tabBar.custom, true);
+  assert.deepEqual(app.tabBar.list.map(tab => tab.pagePath), routes);
+  assert.deepEqual(app.tabBar.list.map(tab => tab.text), ['查询', '小哨', '历史', '我的']);
+  for (const tab of app.tabBar.list) for (const name of ['iconPath', 'selectedIconPath'])
+    assert.ok(fs.existsSync(new URL(`../miniprogram/${tab[name]}`, import.meta.url)));
+  assert.equal(fs.existsSync(new URL('../miniprogram/custom-tab-bar', import.meta.url)), false,
+    'a page-specific custom component must not be included in the package');
+});
+
+test('each cold tab confirms its route without loading or hiding the native bar', async () => {
+  for (let index = 0; index < routes.length; index++) {
     const h = navigationRuntime(routes[index]);
-    const bar = h.makeBar();
-    assert.equal(bar.data.selected, index, 'attached must also cover getTabBar not yet existing during page.onShow');
-    bar.setData({ selected: (index + 1) % routes.length });
     const page = h.rt.instance(`${routes[index]}.js`);
-    page.getTabBar = () => bar;
+    h.stack.splice(0, 1, { ...page, route: routes[index] });
     assert.equal(page.data.ready, false);
     await page.onShow();
-    assert.equal(bar.data.selected, index, 'onShow must sync before the page readiness guard');
-    assert.equal(h.rt.calls.length, 0, 'navigation selection must not wait for or initiate cloud calls');
-  }
-});
-
-test('a late mounted tab bar recovers the page selection when onShow ran before getTabBar existed', async () => {
-  for (let index = 0; index < routes.length; index += 1) {
-    const h = navigationRuntime(routes[index]);
     h.stack.length = 0;
-    const page = h.rt.instance(`${routes[index]}.js`);
-    page.getTabBar = () => null;
-    await page.onShow();
-    const bar = h.makeBar();
-    assert.equal(bar.data.selected, index, 'the route confirmed by the page must survive delayed component attachment');
+    assert.equal(h.tabs.getCurrentTabPath(), `/${routes[index]}`);
+    assert.equal(h.native.commands.length, 0, 'first selection does not rebuild or toggle navigation');
+    assert.equal(h.rt.calls.length, 0, 'navigation does not depend on cloud loading');
   }
 });
 
-test('cached pages recover selection after real programmatic query, history and mine navigation', async () => {
-  const h = navigationRuntime();
-  const bars = routes.map(() => h.makeBar());
-  const pages = routes.map((route, index) => {
-    const page = h.rt.instance(`${route}.js`);
-    page.getTabBar = () => bars[index];
-    return page;
-  });
-  pages[0].setData({ boot: { member: true } }); pages[0].selection = { partNumber: 'SKU-A', product: { supported: true }, storeNumbers: ['R001'] };
-  pages[0].onFollowSelection();
-  assert.equal(h.switches.at(-1).url, '/pages/follow/index');
-  assert.deepEqual(copy(h.rt.app.globalData.pendingFollow), { partNumber: 'SKU-A', storeNumbers: ['R001'] });
-  // The follow editor uses catalog data after boot. Keep this test about the
-  // navigation lifecycle, rather than constructing a catalog solely to open it.
-  h.rt.app.globalData.pendingFollow = null;
-  for (const [source, action, target] of [[1, 'onGoMine', 3], [3, 'onGoHistory', 2], [2, 'onGoMine', 3]]) {
-    h.setRoute(routes[source]);
-    pages[source][action]();
-    assert.equal(h.switches.at(-1).url, `/${routes[target]}`);
-    bars[target].setData({ selected: source });
-    h.setRoute(routes[target]);
-    await pages[target].onShow();
-    assert.equal(bars[target].data.selected, target, 'the destination instance must not retain another tab selection');
-  }
+test('programmatic navigation deduplicates rapid taps and current-route selections', () => {
+  const h = navigationRuntime(), source = h.makePage(), next = h.makePage(1);
+  h.show(source);
+  assert.equal(h.tabs.navigateToTab(source, 1), true);
+  assert.equal(h.tabs.navigateToTab(source, 2), false);
+  assert.equal(h.tabs.navigateToTab(next, 3), false);
+  assert.equal(h.switches.length, 1);
+  assert.equal(h.tabs.getCurrentTabPath(), `/${routes[0]}`);
+  h.show(next);
+  assert.equal(h.tabs.navigateToTab(next, 1), false);
+  assert.equal(h.tabs.navigateToTab(next, 2), true, 'arrival releases the old navigation before its native completion');
+  h.switches[0].complete({});
+  assert.equal(h.tabs.navigateToTab(next, 3), false, 'a late old completion cannot release a newer navigation');
+  h.switches[1].complete({});
+  assert.equal(h.tabs.navigateToTab(next, 3), true);
 });
 
-test('rapid taps share one navigation and select only the page that actually becomes visible', () => {
-  const h = navigationRuntime(), source = h.makeBar(), other = h.makeBar();
-  source.onTabTap(tap('1'));
-  source.onTabTap(tap(2));
-  other.onTabTap(tap(3));
-  assert.equal(h.switches.length, 1, 'separate tab-bar instances must not issue competing switches');
-  assert.equal(source.data.selected, 0, 'the source page must not show a destination selection before navigation succeeds');
-  source.pageLifetimes.hide.call(source);
-  h.setRoute(routes[1]);
-  other.pageLifetimes.show.call(other);
-  assert.equal(other.data.selected, 1);
-  h.switches[0].success?.({});
-  h.switches[0].complete?.({});
-  other.onTabTap(tap(1));
-  assert.equal(h.switches.length, 1, 'tapping the current tab does not reload it or re-run its rewards');
-  other.onTabTap(tap(2));
-  assert.equal(h.switches.length, 2, 'the next navigation is available after completion');
+test('failed navigation keeps the confirmed route and releases the lock for retry', () => {
+  const h = navigationRuntime(), page = h.makePage(); h.show(page);
+  h.tabs.navigateToTab(page, 2);
+  h.switches[0].fail({}); h.switches[0].complete({});
+  assert.equal(h.tabs.getCurrentTabPath(), `/${routes[0]}`);
+  assert.equal(h.rt.messages.length, 1);
+  assert.equal(h.tabs.navigateToTab(page, 2), true);
+  h.switches[0].complete({});
+  assert.equal(h.tabs.navigateToTab(page, 3), false);
 });
 
-test('a failed navigation preserves the current tab and permits a retry', () => {
-  const h = navigationRuntime(), bar = h.makeBar();
-  bar.onTabTap(tap(2));
-  const failed = h.switches[0];
-  failed.fail?.({ errMsg: 'switchTab:fail interrupted' });
-  failed.complete?.({ errMsg: 'switchTab:fail interrupted' });
-  assert.equal(bar.data.selected, 0);
-  assert.equal(h.rt.messages.length, 1, 'a failed tap must give the user a retry cue');
-  bar.onTabTap(tap(2));
-  assert.equal(h.switches.length, 2);
-  // A late callback from the failed attempt must not release a newer attempt.
-  failed.complete?.({});
-  bar.onTabTap(tap(3));
-  assert.equal(h.switches.length, 2);
-  h.switches[1].fail?.({ errMsg: 'switchTab:fail interrupted again' });
-  h.switches[1].complete?.({});
-  bar.onTabTap(tap(3));
-  assert.equal(h.switches.length, 3);
-});
-
-test('arrival at the real destination permits the next tap before the previous native completion callback', async () => {
-  const h = navigationRuntime(), source = h.makeBar(), destination = h.makeBar();
-  source.onTabTap(tap(1));
-  const first = h.switches[0];
-  h.setRoute(routes[1]);
+test('real page navigation retains intent and caller failure cleanup while suppressing duplicate switches', () => {
+  const h = navigationRuntime(routes[1]);
   const page = h.rt.instance('pages/follow/index.js');
-  page.getTabBar = () => destination;
-  await page.onShow();
-  assert.equal(destination.data.selected, 1);
-  destination.onTabTap(tap(2));
-  assert.equal(h.switches.length, 2, 'the newly visible page must not feel unresponsive while an old completion is delayed');
-  first.complete?.({});
-  destination.onTabTap(tap(3));
-  assert.equal(h.switches.length, 2, 'the old completion must not release a newer in-flight navigation');
+  page.route = routes[1]; h.show(page);
+  page.setData({ follows: [{ followId: 'saved-1', partNumber: 'SKU-1', stores: [{ storeNumber: 'R001' }] }] });
+  const event = { currentTarget: { dataset: { id: 'saved-1' } } };
+  page.onQueryFollow(event); page.onQueryFollow(event);
+  assert.equal(h.switches.length, 1);
+  assert.equal(h.rt.app.globalData.pendingSharedTarget.partNumber, 'SKU-1');
+  // Use the surviving target: the repeated entry must not replace the first
+  // pending intent, or its failure callback can no longer clean it up.
+  h.switches[0].fail({ errMsg: 'native failure' }); h.switches[0].complete({});
+  assert.equal(h.rt.app.globalData.pendingSharedTarget, null);
+  assert.equal(h.rt.messages.length, 1);
+  page.onQueryFollow(event); assert.equal(h.switches.length, 2);
 });
 
-test('a synchronous switchTab exception releases navigation so the user can retry', () => {
-  const h = navigationRuntime(), bar = h.makeBar();
-  h.rt.wx.switchTab = () => { throw new Error('native bridge unavailable'); };
-  assert.doesNotThrow(() => bar.onTabTap(tap(1)));
-  assert.equal(bar.data.selected, 0);
+test('explicit programmatic navigation retains success and completion callbacks', () => {
+  const h = navigationRuntime(), page = h.makePage(), seen = []; h.show(page);
+  assert.equal(h.tabs.switchToTab({ url: '/pages/history/index', success: result => seen.push(['success', result]),
+    complete: result => seen.push(['complete', result]) }), true);
+  const result = { errMsg: 'switchTab:ok' };
+  h.switches[0].success(result); h.switches[0].complete(result);
+  assert.deepEqual(seen, [['success', result], ['complete', result]]);
+});
+
+test('a synchronous bridge exception permits retry and malformed indices cannot navigate', () => {
+  const h = navigationRuntime(routes[3]), page = h.makePage(3); h.show(page);
+  for (const index of [-1, 4, 1.5, 'missing', undefined, null, '', false, [], {}])
+    assert.equal(h.tabs.navigateToTab(page, index), false);
+  h.rt.wx.switchTab = () => { throw Error('bridge unavailable'); };
+  assert.equal(h.tabs.navigateToTab(page, 1), false);
   h.rt.wx.switchTab = options => h.switches.push(options);
-  bar.onTabTap(tap(1));
+  assert.equal(h.tabs.navigateToTab(page, '1'), true);
   assert.equal(h.switches.length, 1);
 });
 
-test('keyboard hides only the visible bar and returning to a cached tab restores it', () => {
-  const h = navigationRuntime(), first = h.makeBar(), second = h.makeBar();
-  second.pageLifetimes.hide.call(second);
-  const hiddenWrites = second.writes.length;
-  h.keyboard(320);
-  assert.equal(first.data.keyboardHidden, true, 'navigation must not obstruct the city search or redemption keyboard');
-  assert.equal(second.writes.length, hiddenWrites, 'hidden cached pages must not react to another page keyboard');
-  h.keyboard(0);
-  assert.equal(first.data.keyboardHidden, false);
-  h.keyboard(280);
-  first.pageLifetimes.hide.call(first);
-  h.setRoute(routes[3]);
-  second.pageLifetimes.show.call(second);
-  assert.equal(second.data.keyboardHidden, false);
-  assert.equal(second.data.selected, 3);
-  h.setRoute(routes[0]);
-  first.pageLifetimes.show.call(first);
-  assert.equal(first.data.keyboardHidden, false, 'a previously visible keyboard must not leave a returning tab bar missing');
+test('keyboard close cannot expose a native bar while any overlay owner remains', () => {
+  const h = navigationRuntime(), page = h.makePage(); h.show(page);
+  h.tabs.setTabBarOverlay(page, true, 'sheet');
+  h.tabs.setTabBarOverlay(page, true, 'redemption');
+  h.native.keyboard(320); h.native.keyboard(0);
+  h.tabs.setTabBarOverlay(page, false, 'sheet');
+  assert.equal(h.native.hidden, true);
+  assert.equal(h.tabs.navigateToTab(page, 1), false);
+  h.tabs.setTabBarOverlay(page, false, 'redemption');
+  assert.equal(h.native.hidden, false);
+  assert.deepEqual(h.native.commands.map(c => c.method), ['hideTabBar', 'showTabBar']);
+  assert.ok(h.native.commands.every(c => c.options.animation === false));
 });
 
-test('hiding a tab releases its keyboard listener before another page is shown', () => {
-  const h = navigationRuntime(), bar = h.makeBar();
-  assert.equal(h.keyboardListeners.size, 1);
-  bar.pageLifetimes.hide.call(bar);
-  assert.equal(h.keyboardListeners.size, 0);
-  assert.equal(h.removedListeners.length, 1);
-  bar.pageLifetimes.show.call(bar);
-  assert.equal(h.keyboardListeners.size, 1);
-  bar.lifetimes.detached.call(bar);
+test('hide and show are serialized so late native completion cannot leave navigation hidden', () => {
+  const h = navigationRuntime(routes[0], { deferred: true }), page = h.makePage(); h.show(page);
+  h.tabs.setTabBarOverlay(page, true);
+  h.tabs.setTabBarOverlay(page, false);
+  assert.equal(h.native.commands.length, 1);
+  h.native.commands[0].finish();
+  assert.equal(h.native.commands.length, 2);
+  h.native.commands[1].finish();
+  assert.equal(h.native.hidden, false);
 });
 
-test('detaching releases the keyboard listener and late native callbacks never write to that bar', () => {
-  const h = navigationRuntime(), bar = h.makeBar();
-  const listener = [...h.keyboardListeners][0];
-  assert.equal(typeof listener, 'function');
-  bar.onTabTap(tap(1));
-  bar.lifetimes.detached.call(bar);
-  const writesAtDetach = bar.writes.length;
-  assert.equal(h.keyboardListeners.size, 0);
-  assert.ok(h.removedListeners.includes(listener), 'offKeyboardHeightChange must use the registered listener identity');
-  listener({ height: 300 });
-  h.switches[0].fail?.({ errMsg: 'switchTab:fail page removed' });
-  h.switches[0].complete?.({});
-  assert.equal(bar.writes.length, writesAtDetach);
-  const replacement = h.makeBar();
-  replacement.onTabTap(tap(2));
-  assert.equal(h.switches.length, 2, 'retired navigation must not leave the replacement instance locked');
+test('a failed native hide retries without a new gesture and a failed show restores navigation', async () => {
+  const h = navigationRuntime(routes[0], { deferred: true }), page = h.makePage(); h.show(page);
+  h.tabs.setTabBarOverlay(page, true);
+  h.native.commands[0].finish(false);
+  assert.equal([...h.rt.timers.values()][0].ms, 120);
+  await h.rt.nextTimer();
+  assert.equal(h.native.commands[1].method, 'hideTabBar');
+  h.native.commands[1].finish(); assert.equal(h.native.hidden, true);
+  h.tabs.setTabBarOverlay(page, false);
+  h.native.commands[2].finish(false);
+  assert.equal(h.native.hidden, true, 'the native bar stays hidden while the failed show is pending retry');
+  await h.rt.nextTimer();
+  assert.equal(h.native.commands[3].method, 'showTabBar');
+  h.native.commands[3].finish();
+  assert.equal(h.native.hidden, false);
+  assert.equal(h.rt.timers.size, 0);
 });
 
-test('unexpected gesture datasets cannot navigate outside the configured tabs', () => {
-  for (const route of [routes[0], routes[3]]) {
-    const h = navigationRuntime(route), bar = h.makeBar();
-    for (const index of [-1, 4, 1.5, 'missing', undefined, null, '', false, [], {}]) bar.onTabTap(tap(index));
-    assert.equal(h.switches.length, 0, 'missing or malformed button data must not be coerced into the query tab');
-    assert.equal(bar.data.selected, routes.indexOf(route));
+test('persistent bridge failures stop after two delayed retries and repeated events cannot bypass backoff', async () => {
+  for (const hidden of [true, false]) {
+    const h = navigationRuntime(routes[0], { deferred: true }), page = h.makePage(); h.show(page);
+    if (!hidden) { h.tabs.setTabBarOverlay(page, true); h.native.commands[0].finish(); }
+    const start = h.native.commands.length;
+    h.tabs.setTabBarOverlay(page, hidden);
+    for (let attempt = 0; attempt < 3; attempt++) {
+      h.native.commands.at(-1).finish(false);
+      h.tabs.setTabBarOverlay(page, hidden); h.native.keyboard(0);
+      assert.equal(h.native.commands.length, start + attempt + 1);
+      assert.equal(await h.rt.nextTimer(), attempt < 2);
+    }
+    assert.equal(h.rt.timers.size, 0);
+    assert.equal(h.native.commands.length, start + 3);
+  }
+});
+
+test('a new show intention cancels a pending hide retry, including an already queued old timer', () => {
+  const h = navigationRuntime(routes[0], { deferred: true }), page = h.makePage(); h.show(page);
+  h.tabs.setTabBarOverlay(page, true); h.native.commands[0].finish(false);
+  const staleRetry = [...h.rt.timers.values()][0].fn;
+  h.tabs.setTabBarOverlay(page, false);
+  assert.equal(h.rt.timers.size, 0);
+  assert.equal(h.native.commands.at(-1).method, 'showTabBar');
+  h.native.commands.at(-1).finish(); staleRetry();
+  assert.equal(h.native.commands.length, 2);
+  assert.equal(h.native.hidden, false);
+});
+
+test('a retry owned by a previous page cannot hide navigation on the new page', () => {
+  const h = navigationRuntime(routes[0], { deferred: true }), first = h.makePage(), next = h.makePage(1); h.show(first);
+  h.tabs.setTabBarOverlay(first, true); h.native.commands[0].finish(false);
+  const staleRetry = [...h.rt.timers.values()][0].fn;
+  h.show(next);
+  h.native.commands.at(-1).finish(); staleRetry();
+  assert.deepEqual(h.native.commands.map(command => command.method), ['hideTabBar', 'showTabBar']);
+  assert.equal(h.native.hidden, false);
+  h.tabs.setTabBarOverlay(first, false);
+  assert.equal(h.native.commands.length, 2);
+});
+
+test('page hide releases listeners; late keyboard callbacks and old sheets cannot affect the next page', () => {
+  const h = navigationRuntime(), first = h.makePage(), next = h.makePage(1); h.show(first);
+  const oldListener = [...h.native.keyboardListeners][0];
+  h.native.keyboard(300); assert.equal(h.native.hidden, true);
+  h.tabs.releaseTabBar(first);
+  assert.equal(h.native.keyboardListeners.size, 0);
+  h.show(next); h.tabs.setTabBarOverlay(next, true, 'editor');
+  h.tabs.setTabBarOverlay(first, false); oldListener({ height: 0 });
+  assert.equal(h.native.hidden, true);
+  h.tabs.setTabBarOverlay(next, false, 'editor');
+  assert.equal(h.native.hidden, false);
+  h.show(first); assert.equal(h.native.hidden, false);
+  assert.equal(h.native.keyboardListeners.size, 1);
+});
+
+test('returning to a cached page restores an already-open overlay before navigation can run', () => {
+  for (const field of ['sheetVisible', 'editing', 'redemptionOpen', 'calendarOpen', 'authorizationOpen']) {
+    const h = navigationRuntime(), page = h.makePage(); page.data[field] = true; h.show(page);
+    assert.equal(h.native.hidden, true, field);
+    assert.equal(h.tabs.navigateToTab(page, 1), false);
+    page.data[field] = false; h.show(page);
+    assert.equal(h.native.hidden, false, field);
   }
 });

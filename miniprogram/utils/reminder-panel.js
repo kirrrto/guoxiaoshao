@@ -3,6 +3,7 @@ const { restockSubscription, soldoutSubscription, canRemind } = require('./remin
 const { getAuthorizationState, subscribeAuthorizationState, requestReminderAuthorization, syncPendingAuthorization, whenAuthorizationReady, consentLockState, refreshConsentSetting, refreshConsentSettingAsync, showConsentSettingsGuide, buildConsentReport, openSubscribeSettings, getConsentSetting } = require('./reminder-credits');
 const { confirmTap } = require('./haptic');
 const { toast } = require('./api');
+const { setTabBarOverlay } = require('./tab-bar');
 const pageAccount = page => {
   const boot = page.accountSnapshot || page.data.boot;
   return boot && boot.identity && boot.identity.userKey || null;
@@ -16,8 +17,7 @@ const accountMatches = (page, owner = pageAccount(page)) => Boolean(owner && own
 const currentAction = (page, owner, epoch) => !page.pageRetired && accountMatches(page, owner) && epoch === page.authorizationEpoch;
 const visible = page => page.visible !== false && page.pageVisible !== false;
 function setOverlay(page, hidden) {
-  const bar = typeof page.getTabBar === 'function' && page.getTabBar();
-  if (bar && typeof bar.setData === 'function') bar.setData({ sheetHidden: Boolean(hidden) });
+  setTabBarOverlay(page, Boolean(hidden), 'authorization');
 }
 // Both pages share presentation actions and the existing durable authorization queue.
 const reminderPanelMethods = {

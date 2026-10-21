@@ -2,13 +2,15 @@
 
 运行 `node tools/ui-preview/build.mjs --out <输出目录>`，打开生成的 `index.html`。
 
+v3.3.1 使用微信原生 `tabBar`。离线工具从实际 `app.json`、`theme.json` 和图标生成底栏示意，模拟 50px 导航高度及 0/34px 安全区对内容视口的占用，不再渲染已删除的自定义底栏组件。`check-native-tabs.mjs` 检查四个触控区、当前页选中、字体压力、末尾内容可滚动到导航上方及弹层期间隐藏；它不能验证微信原生首帧、切页闪烁、API 桥接时序或真机安全区。
+
 ## 会员原生按钮级联专项
 
 ```powershell
 node tools/ui-preview/build.mjs --membership-native-only --out tmp/ui-membership-native
 node tools/ui-preview/check-layout.mjs tmp/ui-membership-native
 node tools/ui-preview/check-layout.mjs tmp/ui-membership-native --dark
-node tools/ui-preview/check-floating-tabs.mjs tmp/ui-membership-native
+node tools/ui-preview/check-native-tabs.mjs tmp/ui-membership-native
 node tools/ui-preview/check-membership-regression.mjs tmp/ui-membership-native
 node tools/ui-preview/check-layout.mjs tmp/ui-membership-native --membership-fonts-only
 ```
@@ -17,7 +19,7 @@ node tools/ui-preview/check-layout.mjs tmp/ui-membership-native --membership-fon
 
 这仍是 Chromium 的定向压力测试，**不是微信原生渲染或真机验收证据**。生成页的提示、清单和报告均标记压力模式及实际注入 CSS；真实开发者工具和设备截图仍需另行核验。
 
-检查保留原有全部断言，增加套餐是否铺满容器、主信息可用宽度、内部溢出/重叠、账户与会员状态、七个独立图标加载及入口对齐、免费账户的「体验微信提醒」位置与消耗/授权/测试说明，并限制平板下的异常大字。免费及会员首页在每个宽度另存首屏、账户、会员卡、底部七入口截图。待支付时恢复订单保持优先，体验入口按页面条件隐藏。浮动导航专项另测 1×/1.3×字体、0/34px 模拟安全区，共 480 组。
+检查保留原有全部断言，增加套餐是否铺满容器、主信息可用宽度、内部溢出/重叠、账户与会员状态、七个独立图标加载及入口对齐、免费账户的「体验微信提醒」位置与消耗/授权/测试说明，并限制平板下的异常大字。免费及会员首页在每个宽度另存首屏、账户、会员卡、底部七入口截图。待支付时恢复订单保持优先，体验入口按页面条件隐藏。原生底栏几何专项另测 1×/1.3×字体、0/34px 模拟安全区，共 480 组。
 
 源码校验包含小程序 JS/JSON/WXML/WXSS 和本地图像资产；检查前后任一文件变化都必须重新构建，避免使用旧图标或旧页面截图。
 
@@ -50,7 +52,7 @@ node tools/ui-preview/check-notification-regression.mjs tmp/ui-notification-test
 node tools/ui-preview/build.mjs --v2-only --out tmp/ui-preview-v2
 node tools/ui-preview/check-layout.mjs tmp/ui-preview-v2
 node tools/ui-preview/check-layout.mjs tmp/ui-preview-v2 --dark
-node tools/ui-preview/check-floating-tabs.mjs tmp/ui-preview-v2
+node tools/ui-preview/check-native-tabs.mjs tmp/ui-preview-v2
 ```
 
 `--v2-only` 保留原命令名，使用本地模拟的 `bootstrap.features` 打开界面开关，`growthEvents` 保持关闭，不发送漏斗事件。普通场景时钟为北京时间 2026-10-11 15:00；未来日期场景为 2026-12-01 00:00，每个快照在清单中记录 `previewDate`。当前共 38 种状态，按相关页面组合生成 318 个快照：账户／库存／服务状态、套餐与续费、提醒授权及同步失败、免打扰、攻略、公告及历史领奖。宽度为 320、375、390、430、768、1024 像素；浅/深色分别检查同一组快照。其余旧专项保持原来的固定时钟和场景。关注页的未知与过期状态要求「库存待确认」，权限受限要求「库存暂不可见」，不再依赖旧版「观测待更新」文案。
@@ -63,7 +65,7 @@ v3.3.1 新增历史领奖的余额触顶、领取中和失败三种状态，后�
 
 这些场景执行实际页面的加载、选择、查询格式化和上下文恢复方法，再读取当前 WXML/WXSS；不会调用真实云函数、支付、原生授权或库存采集。结果动作用独立断言验证未知/过期/服务异常不呈现无货转化话术，受限新品保留权限入口，已付费未配置需主动继续。
 
-布局检查输出 `layout-metrics.json`、`layout-metrics-dark.json`、代表整页/首屏/结果动作/套餐区截图。`check-floating-tabs` 对各 tab 页检查 1×/1.3×字体和 0/34px 模拟安全区，并分别验证非 tab 页没有浮动导航、阻断弹窗期间导航隐藏；实际数量见 `floating-tab-metrics.json`。全页长截图的悬浮导航固定在第一个视口位置；判断实际遮挡时须同时看首屏与滚动后的区域截图。
+布局检查输出 `layout-metrics.json`、`layout-metrics-dark.json`、代表整页/首屏/结果动作/套餐区截图。`check-native-tabs` 对各 tab 页检查 1×/1.3×字体和 0/34px 模拟安全区，并分别验证非 tab 页没有底栏、阻断弹窗期间底栏隐藏；实际数量见 `native-tab-metrics.json` 和 `native-tab-metrics-dark.json`。全页长截图中的浏览器底栏示意固定在第一个视口位置；判断内容边界时须同时看首屏与滚动后的区域截图。旧 `check-floating-tabs.mjs` 命令保留为原生检查器入口兼容。
 
 构建清单保存小程序 JS/JSON/WXML/WXSS 的 SHA-256。布局检查开始和结束均对照本地源码；期间若修改业务源码，会要求重新构建，避免旧截图被当成最终结果。浏览器仍是 WXML/WXSS 的近似渲染，不能验证微信原生组件注入顺序、真实支付/授权弹窗、JS 基础库、真机性能或设备安全区。
 
@@ -71,7 +73,8 @@ v3.3.1 新增历史领奖的余额触顶、领取中和失败三种状态，后�
 
 - 从项目当前的实际 WXML、WXSS 与页面 JS 派生消费者 4 页 × 7 种状态 × 3 种宽度，共 84 个独立 HTML。管理页已移入独立运营项目，默认预览不再包含它。
 - 状态为 `free`、`member`、`expired`、`empty`、`error`、`loading`、`longcontent`；宽度为 320、375、430 像素。
-- 数据明确是模拟的，不调用云函数、不扣次数、不支付、不发送消息。默认不加载远程产品图片；加 `--remote-images` 可读取目录中精确 SKU 的官方图片 URL。
+- 默认 84 案保留服务端停购夹具，检查购买不可用提示、套餐及购买入口隐藏、权益说明入口仍在；可购买、续费、升级、应付金额与退款说明由 v2／付款专项验证。关注页的会员和已过期状态保持详情折叠，长文案状态通过真实处理方法展开门店详情，分别检查摘要与门店文字。
+- 数据明确是模拟的，不调用云函数、不扣次数、不支付、不发送消息。商品卡与日历海报使用真实 helper 映射的包内 JPEG／PNG（2026-10-21 起不再打包 WebP），保留原始 URL，并以正确 MIME 内嵌，因此默认离线检查也覆盖实际商品图片。`--remote-images` 仅允许检查器访问其他外部图片，不覆盖业务 helper 的本地展示策略。
 - HTML 可离线打开。浏览器不是微信原生渲染器；原生组件、选择器弹层、平台字体及安全区域需以开发者工具和真机验证。
 - 独立快照提供 `window.previewAudit()`，供浏览器脚本检查横向溢出。横向品类滚动区域允许超宽内容。
 - 构建器不改动业务源码；默认输出系统临时目录，也可通过 `--out` 指定项目外的目录。

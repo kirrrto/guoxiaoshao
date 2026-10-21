@@ -24,12 +24,12 @@ try {
   for (const item of samples) {
     await page.goto(pathToFileURL(path.join(directory, item.file)).href);
     const controls = await page.evaluate(() => {
-      const selector = 'button:not(.floating-tab-item), .floating-tab-label, .settings-link, .service-link, .retry-link, .chip.on, .segment.on, .scroll-tabs .tab.on, [style*="color: var(--green-dark)"]';
+      const selector = 'button:not(.preview-native-tab-item), .preview-native-tab-label, .settings-link, .service-link, .retry-link, .chip.on, .segment.on, .scroll-tabs .tab.on, [style*="color: var(--green-dark)"]';
       const controls = [...document.querySelectorAll(selector)].filter(e => e.getBoundingClientRect().width && e.textContent.trim());
       const data = controls.map((element, index) => {
         element.dataset.colorAudit = index;
         const style = getComputedStyle(element), parent = element.closest('button');
-        return { index, label: element.textContent.trim().replace(/\s+/g, ' ').slice(0, 100), className: element.className, color: style.color, fontSize: parseFloat(style.fontSize), fontWeight: parseFloat(style.fontWeight), disabled: element.hasAttribute('disabled') || Boolean(parent?.hasAttribute('disabled')), selectedNav: Boolean(element.closest('.floating-tab-item.is-selected')), nav: Boolean(element.closest('.floating-tab-item')), ownBackground: style.backgroundColor, ownGradient: style.backgroundImage };
+        return { index, label: element.textContent.trim().replace(/\s+/g, ' ').slice(0, 100), className: element.className, color: style.color, fontSize: parseFloat(style.fontSize), fontWeight: parseFloat(style.fontWeight), disabled: element.hasAttribute('disabled') || Boolean(parent?.hasAttribute('disabled')), selectedNav: Boolean(element.closest('.preview-native-tab-item.is-selected')), nav: Boolean(element.closest('.preview-native-tab-item')), ownBackground: style.backgroundColor, ownGradient: style.backgroundImage };
       });
       // Remove glyphs and images without changing box geometry or backgrounds.
       // This isolates the intended surface color from letter antialiasing and
@@ -43,7 +43,7 @@ try {
     for (const control of controls) {
       const target = page.locator(`[data-color-audit="${control.index}"]`);
       await target.evaluate(element => {
-        if (element.closest('.floating-tab-shell')) window.scrollTo(0, 0);
+        if (element.closest('.preview-native-tabbar')) window.scrollTo(0, 0);
         else window.scrollTo(0, window.scrollY + element.getBoundingClientRect().top - 350);
       });
       const png = await target.screenshot();
@@ -68,7 +68,7 @@ try {
 } finally { await browser.close(); }
 const primary = records.filter(r => !r.disabled && (r.className.includes('btn-primary') || r.className.includes('redemption-entry')));
 const selectedNav = records.filter(r => r.selectedNav);
-const sources = ['miniprogram/app.wxss', 'miniprogram/styles/common.wxss', 'miniprogram/custom-tab-bar/index.wxss', ...['query', 'follow', 'history', 'mine'].map(page => `miniprogram/pages/${page}/index.wxss`)].map(file => ({ file, sha256: crypto.createHash('sha256').update(fs.readFileSync(path.join(project, file))).digest('hex') }));
+const sources = ['miniprogram/app.wxss', 'miniprogram/styles/common.wxss', 'miniprogram/theme.json', 'miniprogram/app.json', ...['query', 'follow', 'history', 'mine'].map(page => `miniprogram/pages/${page}/index.wxss`)].map(file => ({ file, sha256: crypto.createHash('sha256').update(fs.readFileSync(path.join(project, file))).digest('hex') }));
 const report = { checkedAt: new Date().toISOString(), previewGeneratedAt: manifest.generatedAt, sources, renderer: 'Offline Chromium / Edge using actual page CSS and markup', scope: '375px member and free pages; primary/secondary buttons, green action links, selected chips and navigation labels. This is a limited readability check, not a whole-screen WCAG certification.', method: 'Nine rendered background samples per control, removing glyphs and images without changing layout. Contrast uses computed foreground and sampled gradient/composited surface. Does not count text shadow. Disabled controls are reported but exempt from failures.', limitations: 'Transparent bar content changes while scrolling. Removing background glyphs isolates intended surface colors; overlapping moving text and device-specific blur require visual/device review. Icon shape and icon contrast are not part of this test.', summary: { total: records.length, active: records.filter(r => !r.disabled).length, belowTarget: records.filter(r => r.belowTarget).length, primaryMinimum: Math.min(...primary.map(r => r.minRatio)), selectedNavMinimum: Math.min(...selectedNav.map(r => r.minRatio)) }, records };
 fs.mkdirSync(output, { recursive: true });
 report.colorScheme = colorScheme;

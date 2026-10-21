@@ -18,8 +18,9 @@ function planSnapshot(user, now) {
   let cursor = Date.parse(membership.entitlements.settledAt), enhancedUntil = null, annualUntil = null, planId = null;
   for (const segment of membership.entitlements.segments) {
     cursor += segment.remainingMs;
-    if (segment.source !== 'virtual_payment') continue;
-    if (segment.planId === 'member_7d' && !planId) planId = segment.planId;
+    if (segment.source === 'trial_compensation' && !planId) planId = 'member_trial';
+    if (!['virtual_payment', 'service_compensation'].includes(segment.source)) continue;
+    if (segment.planId === 'member_7d' && (!planId || planId === 'member_trial')) planId = segment.planId;
     if (['member_30d', 'member_365d'].includes(segment.planId)) {
       enhancedUntil = cursor;
       if (segment.planId === 'member_365d') annualUntil = cursor;

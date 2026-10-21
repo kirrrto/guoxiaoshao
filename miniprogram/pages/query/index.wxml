@@ -1,5 +1,6 @@
 <page-meta page-style="{{sheetVisible || calendarOpen ? 'overflow:hidden;' : ''}}" />
 <view class="page tab-page query-page">
+  <view wx:if="{{networkOffline}}" class="network-notice" role="status">网络已断开，恢复后自动刷新</view>
   <view wx:if="{{loadError}}" class="card load-error" role="alert">
     <view class="load-error-title">暂时没有连上</view>
     <view class="load-error-detail">{{loadError}}</view>
@@ -53,7 +54,7 @@
       </view>
       <view wx:if="{{selectionSummary}}" class="selection-summary">
         <view class="selection-summary-product">
-          <view class="selection-summary-image-box"><image wx:if="{{selectionSummary.imageUrl && !selectionImageFailed}}" class="selection-summary-image {{selectionSummary.imageFitClass}}" src="{{selectionSummary.imageDisplayUrl || selectionSummary.imageUrl}}" mode="aspectFit" aria-label="{{selectionSummary.imageAlt}}" binderror="onSelectionImageError" /><view wx:else class="selection-summary-image-placeholder">商品</view></view>
+          <view class="selection-summary-image-box"><image wx:if="{{selectionSummary.imageDisplayUrl && !selectionImageFailed}}" class="selection-summary-image {{selectionSummary.imageFitClass}}" src="{{selectionSummary.imageDisplayUrl}}" webp="{{true}}" mode="aspectFit" aria-label="{{selectionSummary.imageAlt}}" binderror="onSelectionImageError" /><view wx:else class="selection-summary-image-placeholder">商品</view></view>
           <view class="selection-summary-copy"><view class="selection-summary-title">{{selectionSummary.title}}</view><view class="selection-summary-city">{{selectionSummary.cityLabel}}</view></view>
         </view>
         <view class="selection-summary-footer"><view class="selection-summary-stores">{{selectionSummary.storeLabel}}</view><button class="ui-action selection-summary-change" hover-class="ui-control-pressed" bindtap="onEditSelection"><text class="ui-action-label">修改</text><text class="ui-chevron" aria-hidden="true"></text></button></view>
@@ -112,7 +113,7 @@
       <view wx:else class="result-target-note {{resultTargetDifferent ? 'result-target-different' : ''}}">{{resultTargetDifferent ? '上次查询结果 · 与当前选择不同' : '对应当前所选配置与门店'}}</view>
       <view class="result-product-row">
         <view class="result-product-media">
-          <image wx:if="{{result.product.imageUrl}}" class="result-product-image {{result.product.imageFitClass}}" src="{{result.product.imageDisplayUrl || result.product.imageUrl}}" mode="aspectFit" aria-label="{{result.product.imageAlt || result.product.title}}" binderror="onResultImageError" />
+          <image wx:if="{{result.product.imageDisplayUrl}}" class="result-product-image {{result.product.imageFitClass}}" src="{{result.product.imageDisplayUrl}}" webp="{{true}}" mode="aspectFit" aria-label="{{result.product.imageAlt || result.product.title}}" binderror="onResultImageError" />
           <view wx:else class="result-product-placeholder">暂无图片</view>
         </view>
         <view class="result-product-copy">
@@ -257,13 +258,13 @@
       <view class="ui-label-with-icon"><image class="opening-calendar-logo" src="/images/brand/logo-mint-144.png" mode="aspectFit" aria-hidden="true" /><text class="opening-calendar-brand">果小哨 · 新品日历</text></view>
       <button class="opening-calendar-close" hover-class="ui-control-pressed" aria-label="关闭发售日历" bindtap="onCloseCalendar"><text>×</text></button>
     </view>
-    <scroll-view scroll-y="{{true}}" class="opening-calendar-scroll {{openingCalendar.imageUrl ? '' : 'opening-calendar-scroll--compact'}} {{openingCalendar.followNotice ? 'opening-calendar-scroll--follow-ready' : ''}}">
+    <scroll-view scroll-y="{{true}}" class="opening-calendar-scroll {{openingCalendar.imageDisplayUrl ? '' : 'opening-calendar-scroll--compact'}} {{openingCalendar.followNotice ? 'opening-calendar-scroll--follow-ready' : ''}}">
       <view class="opening-calendar-content">
         <view class="poster-hero">
           <text class="poster-stage poster-stage--{{openingCalendar.stage}}">{{openingCalendar.stageText}}</text>
           <view class="poster-title">{{openingCalendar.title}}</view>
           <view wx:if="{{openingCalendar.followNotice}}" class="poster-follow-notice"><view class="poster-follow-title">{{openingCalendar.followNotice}}</view><view class="poster-follow-detail">{{openingCalendar.followNoticeDetail}}</view></view>
-          <view wx:if="{{openingCalendar.imageUrl}}" class="poster-hero-media"><image class="poster-hero-image" src="{{openingCalendar.imageUrl}}" mode="aspectFit" aria-label="{{openingCalendar.imageAlt || openingCalendar.title}}" binderror="onCalendarImageError" /></view>
+          <view wx:if="{{openingCalendar.imageDisplayUrl}}" class="poster-hero-media"><image class="poster-hero-image" src="{{openingCalendar.imageDisplayUrl}}" webp="{{true}}" mode="aspectFit" aria-label="{{openingCalendar.imageAlt || openingCalendar.title}}" binderror="onCalendarImageError" /></view>
         </view>
         <view class="poster-milestones">
           <view class="poster-milestone poster-milestone--{{openingCalendar.preorderState}}">

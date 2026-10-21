@@ -152,7 +152,7 @@ Component({
     },
     publicProduct(p) { return { partNumber: p.partNumber, title: p.title, model: p.model, familyName: p.familyName, category: p.category,
       supported: Boolean(p.supported), comingSoon: p.comingSoon, priceCny: p.priceCny, verificationStatus: p.verificationStatus,
-      imageUrl: p.imageUrl || '', imageDisplayUrl: productThumbnailUrl(p.imageUrl), imageAlt: p.imageAlt || p.title, attributes: p.attributes || {} }; },
+      imageUrl: p.imageUrl || '', imageDisplayUrl: productThumbnailUrl(p.imageUrl, 'card', p.partNumber), imageAlt: p.imageAlt || p.title, attributes: p.attributes || {} }; },
     onCategoryTap(e) { this.batch(() => this.selectCategory(Number(e.currentTarget.dataset.index))); },
     onFamilyChange(e) { this.batch(() => this.selectFamily(Number(e.detail.value))); },
     onModelChange(e) {
@@ -176,7 +176,7 @@ Component({
     onCapacityTap(e) { this.onCapacityChange({ detail: { value: e.currentTarget.dataset.index } }); },
     onColorTap(e) { this.batch(() => { this.stage({ selectionNote: '' }); this.updateFilters({ model: this.data.models[this.data.modelIndex], capacity: this.data.capacities[this.data.capacityIndex], color: this.data.colors[Number(e.currentTarget.dataset.index)] }); this.emit(); }); },
     onProductChange(e) { const p = this.currentCandidates[Number(e.detail.value)]; if (!p) return; this.unavailablePartNumber = null; this.setData({ productIndex: Number(e.detail.value), product: this.publicProduct(p), imageFailed: false, selectionNote: '' }); this.emit(); },
-    onImageError() { const p = this.data.product; if (p && p.imageDisplayUrl && p.imageDisplayUrl !== p.imageUrl) this.setData({ 'product.imageDisplayUrl': p.imageUrl }); else this.setData({ imageFailed: true }); },
+    onImageError() { this.setData({ imageFailed: true }); },
     selectCity(index) {
       const city = this.catalogCities[index]; if (!city) { this.stage({ cityStores: [] }); return; }
       const selected = new Set(this.read('selectedStores').map(s => s.storeNumber));

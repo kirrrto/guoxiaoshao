@@ -1,10 +1,12 @@
 'use strict';
-const { ensurePlanMetadata } = require('./member-plan');
+const { ensurePlanMetadata, ensureOutageCompensation } = require('./member-plan');
 const { LIMITS } = require('./membership');
 
 /** A read-time snapshot only; never persist the attached follow policy. */
 async function loadFollowPolicy(repo, user, fallback = [], now = new Date()) {
-  const current = await ensurePlanMetadata(repo, user);
+  let current = await ensurePlanMetadata(repo, user);
+  if (!current) return null;
+  current = await ensureOutageCompensation(repo, current, now);
   if (!current) return null;
   const index = current.followIndex;
   const indexed = Array.isArray(index) && fallback.every(f => index.some(item => item._id === f._id));

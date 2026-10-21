@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "reportedVersion": "3.3.1",
+  "versionConfirmation": "Maintainer confirmed both reports are fresh v3.3.1 retests on 2026-10-21 (Asia/Shanghai)",
+  "uploadSourceMapping": "unknown",
+  "reports": [
+    {
+      "kind": "screenshot",
+      "taskId": "14127",
+      "reference": "Maintainer-provided WeChat quality report screenshot",
+      "reportedVersion": "3.3.1"
+    },
+    {
+      "kind": "spreadsheet-attachment",
+      "taskId": "195099",
+      "reference": "Maintainer-provided XLS attachment identified by test task 195099",
+      "reportedVersion": "3.3.1"
+    }
+  ],
+  "findings": [
+    {
+      "id": "unused-channel-video",
+      "title": "四个主页面被报告声明了未使用的 channel-video 组件",
+      "reportedVersion": "3.3.1",
+      "status": "open"
+    },
+    {
+      "id": "custom-tabbar-first-switch",
+      "title": "WebView 自定义底部导航首次切换闪烁",
+      "reportedVersion": "3.3.1",
+      "status": "open"
+    },
+    {
+      "id": "oversized-product-image",
+      "title": "商品图片过大",
+      "reportedVersion": "3.3.1",
+      "status": "open"
+    },
+    {
+      "id": "legacy-product-image-format",
+      "title": "商品图片格式未通过质检建议",
+      "reportedVersion": "3.3.1",
+      "status": "open"
+    }
+  ]
+}

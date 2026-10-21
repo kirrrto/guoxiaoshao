@@ -27,7 +27,9 @@ function runtime({ handler = async action => action === 'member.status' ? { orde
     invalidateBootstrap: () => invalidated.push('bootstrap'), invalidateFollows: () => invalidated.push('follows'), publishQuota() {}, subscribeQuota: () => () => {} };
   const wx = { stopPullDownRefresh() {}, ...wxExtra };
   vm.runInNewContext(fs.readFileSync(path.join(root, 'pages/mine/index.js'), 'utf8'), { console, Date, Promise, Map, Set, wx, getApp: app ? () => app : undefined, Page: value => { definition = value; },
-    require: name => name.endsWith('/api') ? api : name.endsWith('/store') ? store : isolatedAccountUi(name) || require(path.resolve(root, 'pages/mine', name)) });
+    require: name => name.endsWith('/api') ? api : name.endsWith('/store') ? store : name.endsWith('/tab-bar') ? {
+      syncTabBar() {}, releaseTabBar() {}, setTabBarOverlay() {}, switchToTab: options => wx.switchTab(options),
+    } : isolatedAccountUi(name) || require(path.resolve(root, 'pages/mine', name)) });
   const page = { ...definition, data: clone(definition.data) };
   page.setData = patch => { for (const [key, value] of Object.entries(clone(patch))) { const parts = key.split('.'); let target = page.data; for (const part of parts.slice(0, -1)) target = target[part] || (target[part] = {}); target[parts.at(-1)] = value; } };
   page.applyBoot(boot()); page.data.ready = true;

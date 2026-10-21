@@ -16,7 +16,6 @@
     "navigationBarTextStyle": "@navTextStyle"
   },
   "tabBar": {
-    "custom": true,
     "color": "@tabColor",
     "selectedColor": "@tabSelectedColor",
     "backgroundColor": "@tabBackground",

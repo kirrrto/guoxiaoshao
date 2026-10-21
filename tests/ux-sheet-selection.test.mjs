@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { runtime } from './helpers/miniprogram-runtime.mjs';
+import { nativeTabBar } from './helpers/native-tab-bar.mjs';
 
 const copy = value => JSON.parse(JSON.stringify(value));
 function setup(kind) {
@@ -199,16 +200,17 @@ test('sheet prevents closing or confirmation during save and retires a pending d
 });
 
 test('sheet navigation lock is independent of keyboard visibility and restored on detach', async () => {
-  const updates = [], bar = { setData: patch => updates.push(patch) };
-  const rt = runtime(undefined, { getCurrentPages: () => [{ getTabBar: () => bar }] });
+  const owner = { data: {} };
+  const rt = runtime(undefined, { getCurrentPages: () => [owner] });
+  const native = nativeTabBar(rt);
   const sheet = rt.instance('components/config-sheet/index.js', { visible: true });
   sheet.onVisible(true);
   await rt.nextTimer();
-  assert.deepEqual(copy(updates.at(-1)), { sheetHidden: true });
+  assert.equal(native.hidden, true);
   sheet.lifetimes.detached.call(sheet);
   await rt.nextTimer();
-  assert.deepEqual(copy(updates.at(-1)), { sheetHidden: false });
-  assert.equal(updates.some(patch => 'keyboardHidden' in patch), false);
+  assert.equal(native.hidden, false);
+  assert.deepEqual(native.commands.map(command => command.method), ['hideTabBar', 'showTabBar']);
 });
 
 test('native back uses the same discard confirmation and re-arms after cancel or while saving', () => {

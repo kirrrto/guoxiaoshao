@@ -5,6 +5,7 @@ import path from 'node:path';
 import vm from 'node:vm';
 import { createRequire } from 'node:module';
 import { isolatedAccountUi } from './helpers/isolated-account-ui.mjs';
+import { runtime as miniprogramRuntime } from './helpers/miniprogram-runtime.mjs';
 const require = createRequire(import.meta.url);
 const { createCheckoutContext } = require('../miniprogram/utils/checkout-context');
 const tick = async () => { for (let i = 0; i < 10; i++) await Promise.resolve(); };
@@ -18,12 +19,22 @@ function runtime({ catalogRead = async () => catalog, callRead = async () => ({}
   const storage = new Map(), modals = [], calls = [], events = [], navigations = [], app = { globalData: {} }; let definition, current = catalog;
   const wx = { getDeviceInfo: () => ({ platform: 'android' }), canIUse: () => true, requestVirtualPayment() {},
     getStorageSync: key => structuredClone(storage.get(key)), setStorageSync: (key, value) => storage.set(key, structuredClone(value)), removeStorageSync: key => storage.delete(key),
-    showModal: options => modals.push(options), switchTab: options => navigations.push(options.url) };
+    showModal: options => modals.push(options), switchTab: options => {
+      navigations.push(options.url);
+      const result = { errMsg: 'switchTab:ok' };
+      options.success?.(result); options.complete?.(result);
+    } };
+  // Load the real navigation helper with this fixture's native bridge, rather
+  // than Node's host require where the WeChat wx global does not exist.
+  const navigationRuntime = miniprogramRuntime();
+  Object.assign(navigationRuntime.wx, wx);
+  const navigation = navigationRuntime.load('utils/tab-bar.js');
   const source = path.resolve('miniprogram/pages/mine/index.js');
   vm.runInNewContext(fs.readFileSync(source, 'utf8'), { wx, getApp: () => app, Page: value => { definition = value; },
     require: name => name.endsWith('/api') ? { call: async (action, payload) => { calls.push({ action, payload }); return callRead(action, payload); } }
       : name.endsWith('/store') ? { getCatalog: catalogRead, currentCatalog: () => current, invalidateBootstrap() {}, invalidateFollows() {} }
       : name.endsWith('/conversion-events') ? { track: (name, fields) => events.push({ name, fields }) }
+      : name.endsWith('/tab-bar') ? navigation
       : isolatedAccountUi(name) || require(path.resolve(path.dirname(source), name)) });
   const page = { ...definition, data: structuredClone(definition.data), pageVisible: true,
     setData(patch, done) { Object.assign(this.data, patch); if (done) done(); } };

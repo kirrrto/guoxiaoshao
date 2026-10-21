@@ -1,5 +1,5 @@
 const { getBootstrap } = require('../../utils/store');
-const { normalizeAnnouncement, liveNotices, markNoticesSeen, parseTime, noticeExpiresAt } = require('../../utils/query-notice');
+const { normalizeAnnouncement, liveNotices, markNoticesSeen, parseTime, noticeExpiresAt, withOutageCompensationNotice } = require('../../utils/query-notice');
 const fmt = require('../../utils/format');
 const { shareAppMessage, shareTimeline } = require('../../utils/share');
 
@@ -46,7 +46,7 @@ Page({
     this.loadingNotices = true;
     this.setData({ refreshing: true });
     try {
-      const boot = await getBootstrap(force ? { force: true } : {});
+      const boot = withOutageCompensationNotice(await getBootstrap(force ? { force: true } : {}));
       if (this.pageRetired) return;
       this.noticePayload = boot;
       const collector = boot.collector || {};

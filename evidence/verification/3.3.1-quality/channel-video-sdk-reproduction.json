@@ -1,0 +1,200 @@
+{
+  "schemaVersion": 1,
+  "kind": "isolated-sdk-reproduction-not-wechat-cloud-verification",
+  "status": "platform defect pending WeChat verification",
+  "defectReproduced": true,
+  "wechatVerificationPassed": false,
+  "sdk": {
+    "version": "3.17.3",
+    "updateTime": "2026.10.9 19:51:01",
+    "packageSha256": "ac2c6879a5b623b9caedf50077d0ebd6a5b36199724dd393b107519a745ff370",
+    "runtimeSha256": "51c8013a237fec0a6eed42b09da7b28bc6256e7ea8b843eba7dfc7ceb43839ba",
+    "auditSha256": "ff8abfcb03245b7f309b714f3f81e495bd149fe19fed2d059d48529b4108742a"
+  },
+  "registration": {
+    "file": "WAWebview.js",
+    "charOffset": 2201938,
+    "byteOffset": 2227347,
+    "marker": "const Cm=Je(\"channel-video\")"
+  },
+  "originalAudit": {
+    "file": "WAProgneWebview.js",
+    "charOffset": 11176,
+    "byteOffset": 11180,
+    "sha256": "4a74c1867587fb33e4fdf176e34bd24455e33523eb6f559b28c181b242849db1",
+    "callbacks": "y=()=>{var e=exparser.Component._advancedCreate;exparser.Component._advancedCreate=function(t,r,...n){return C.add(r.is),e(t,r,...n)}},document.addEventListener(\"beforeinitRender\",y),c((()=>{var e=[\"custom-tab-bar/index\",window.__route__],t=exparser.Component._list||{};N=new Set(Object.keys(t).filter((e=>e&&!e.startsWith(\"wx\")&&!e.startsWith(\"exparser-inspector\")))),e.forEach((e=>N.delete(e)))})),d((()=>{var e=[...N].filter((e=>!C.has(e))).sort();if(e.length){var r=e.join(\" <br/> \");r!==S&&(function(e,r){t.pub(\"unused-component-data\",{page:window.__route__,component:e,len:r})}(r,e.length),S=r)}}))"
+  },
+  "runtimeResult": {
+    "componentCount": 155,
+    "channelVideoRegistryKeys": [
+      "channel-video",
+      "wx-channel-video"
+    ],
+    "emitted": [
+      {
+        "event": "unused-component-data",
+        "payload": {
+          "page": "pages/empty/index",
+          "component": "channel-video",
+          "len": 1
+        }
+      }
+    ]
+  },
+  "controls": [
+    {
+      "name": "ordinary builtins excluded",
+      "declared": [
+        "wx-view",
+        "wx-text",
+        "wx-channel-video",
+        "pages/empty/index",
+        "custom-tab-bar/index"
+      ],
+      "used": [],
+      "expected": [],
+      "actual": [],
+      "passed": true
+    },
+    {
+      "name": "unprefixed builtin alias reported",
+      "declared": [
+        "wx-view",
+        "channel-video",
+        "wx-channel-video"
+      ],
+      "used": [],
+      "expected": [
+        "channel-video"
+      ],
+      "actual": [
+        "channel-video"
+      ],
+      "passed": true
+    },
+    {
+      "name": "unused business component reported",
+      "declared": [
+        "wx-view",
+        "components/unused/index"
+      ],
+      "used": [],
+      "expected": [
+        "components/unused/index"
+      ],
+      "actual": [
+        "components/unused/index"
+      ],
+      "passed": true
+    },
+    {
+      "name": "instantiated business component excluded",
+      "declared": [
+        "wx-view",
+        "components/used/index"
+      ],
+      "used": [
+        "components/used/index"
+      ],
+      "expected": [],
+      "actual": [],
+      "passed": true
+    }
+  ],
+  "pageErrors": [],
+  "bridgeWarnings": [
+    "[jsbridge] invoke getNetworkType fail: jsbridge not ready. Error: jsbridge not ready",
+    "[jsbridge] invoke systemLog fail: jsbridge not ready. Error: jsbridge not ready"
+  ],
+  "sourceFingerprint": "sha256:2ab8cec911e705e21375afe66d32e65c10f1fd2f97a2cef98e589ca8ff23ce6d",
+  "projectSourceScan": {
+    "kind": "source-scan-not-compiled-page-configuration",
+    "scannedFiles": 80,
+    "declarations": [
+      {
+        "file": "miniprogram/components/config-sheet/index.json",
+        "sha256": "035503c1a56d8b4b9227ce8bb9145fbd1ef8ec7dce59e55f9d5d55fb5eb7d566",
+        "usingComponents": {},
+        "componentPlaceholder": {},
+        "componentGenerics": {}
+      },
+      {
+        "file": "miniprogram/components/target-picker/index.json",
+        "sha256": "035503c1a56d8b4b9227ce8bb9145fbd1ef8ec7dce59e55f9d5d55fb5eb7d566",
+        "usingComponents": {},
+        "componentPlaceholder": {},
+        "componentGenerics": {}
+      },
+      {
+        "file": "miniprogram/pages/follow/index.json",
+        "sha256": "77a10454a6897c2d5f12ff0c7bd79964ad06f41af6bae7be0b25c1e19bd0024a",
+        "usingComponents": {
+          "target-picker": "/components/target-picker/index",
+          "config-sheet": "/components/config-sheet/index",
+          "reminder-nudge": "/components/reminder-nudge/index",
+          "reminder-authorization": "/components/reminder-authorization/index"
+        },
+        "componentPlaceholder": {
+          "target-picker": "view",
+          "config-sheet": "view",
+          "reminder-authorization": "view"
+        },
+        "componentGenerics": {}
+      },
+      {
+        "file": "miniprogram/pages/history/index.json",
+        "sha256": "7896937c58d1f8a51a2577583ef12d55bece622eb70a02a41afe64c25b0ae3fc",
+        "usingComponents": {
+          "target-picker": "/components/target-picker/index",
+          "config-sheet": "/components/config-sheet/index",
+          "reminder-nudge": "/components/reminder-nudge/index"
+        },
+        "componentPlaceholder": {
+          "target-picker": "view"
+        },
+        "componentGenerics": {}
+      },
+      {
+        "file": "miniprogram/pages/mine/index.json",
+        "sha256": "d35e258b24ba6175ae6b6b2699184b973bd915e299c68f0c3a12680cb4a7dd8f",
+        "usingComponents": {
+          "reminder-nudge": "/components/reminder-nudge/index",
+          "reminder-authorization": "/components/reminder-authorization/index",
+          "config-sheet": "/components/config-sheet/index"
+        },
+        "componentPlaceholder": {
+          "config-sheet": "view",
+          "reminder-authorization": "view"
+        },
+        "componentGenerics": {}
+      },
+      {
+        "file": "miniprogram/pages/notice-board/index.json",
+        "sha256": "47f93f10580ec6d415a10d342caf45da80dd1fcec05d3e084c560f93b472deae",
+        "usingComponents": {},
+        "componentPlaceholder": {},
+        "componentGenerics": {}
+      },
+      {
+        "file": "miniprogram/pages/query/index.json",
+        "sha256": "4606da8bdc23edcb9142e8d4ec07c1788c4cbf05a28ca7a0e7d7d1dcbc7b0df7",
+        "usingComponents": {
+          "target-picker": "/components/target-picker/index",
+          "config-sheet": "/components/config-sheet/index",
+          "reminder-nudge": "/components/reminder-nudge/index"
+        },
+        "componentPlaceholder": {
+          "target-picker": "view"
+        },
+        "componentGenerics": {}
+      }
+    ],
+    "channelVideoMentions": []
+  },
+  "limitations": [
+    "Only the unmodified SDK is loaded in a local empty browser page.",
+    "Callbacks use a local lifecycle harness; this is not a complete native project build.",
+    "Source fingerprint does not establish the uploaded WeChat package identity.",
+    "No installed SDK, project registry, renderer, or quality-finding status is modified."
+  ]
+}

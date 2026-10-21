@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { runtime } from './helpers/miniprogram-runtime.mjs';
+import { nativeTabBar } from './helpers/native-tab-bar.mjs';
 
 const copy = value => JSON.parse(JSON.stringify(value));
 const settle = async () => { for (let i = 0; i < 45; i++) await Promise.resolve(); };
@@ -36,14 +37,13 @@ function setup({ snapshot = boot(), record = async () => ({ subscriptions: balan
   rt.wx.pageScrollTo = () => {};
   rt.wx.requestSubscribeMessage = options => { prompts++; return native ? native(options) : Promise.resolve({ RESTOCK: 'accept', SOLDOUT: 'accept' }); };
   const mine = rt.instance('pages/mine/index.js'), follow = rt.instance('pages/follow/index.js');
+  const tabbar = nativeTabBar(rt);
   const pages = [mine, follow];
   for (const page of pages) {
-    const bar = { data: { sheetHidden: false }, setData(patch) { Object.assign(this.data, patch); } };
-    page.getTabBar = () => bar;
     page.pageVisible = true; page.visible = true;
     page.applyBoot(copy(current)); page.setData({ ready: true, followsLoaded: true });
   }
-  return { rt, mine, follow, pages, prompts: () => prompts, credits: rt.load('utils/reminder-credits.js'),
+  return { rt, mine, follow, pages, tabbar, prompts: () => prompts, credits: rt.load('utils/reminder-credits.js'),
     records: () => rt.calls.filter(call => call.action === 'notify.recordSubscription'),
     changeAccount: (snapshot, update = pages) => { current = copy(snapshot); rt.app.globalData.bootstrap = copy(current); for (const page of update) page.applyBoot(copy(current)); } };
 }
@@ -66,17 +66,17 @@ test('both page templates bind the visible top-up button directly and expose syn
 });
 
 test('both reminder centers open without native authorization and only the explicit authorize action prompts', async () => {
-  const s = setup();
-  for (const page of s.pages) {
+  for (const target of ['mine', 'follow']) {
+    const s = setup(), page = s[target];
     page.onOpenAuthorizationPanel();
     assert.equal(page.data.authorizationOpen, true);
-    assert.equal(page.getTabBar().data.sheetHidden, true);
+    assert.equal(s.tabbar.hidden, true);
+    assert.equal(s.prompts(), 0); assert.equal(s.records().length, 0);
+    await page.onSubscribe(); await settle();
+    assert.equal(s.prompts(), 1); assert.equal(s.records().length, 1);
+    assert.deepEqual(s.records()[0].payload.results, { RESTOCK: 'accept', SOLDOUT: 'accept' });
+    page.onCloseAuthorizationPanel(); assert.equal(s.tabbar.hidden, false);
   }
-  assert.equal(s.prompts(), 0); assert.equal(s.records().length, 0);
-  await s.mine.onSubscribe(); await settle();
-  assert.equal(s.prompts(), 1); assert.equal(s.records().length, 1);
-  assert.deepEqual(s.records()[0].payload.results, { RESTOCK: 'accept', SOLDOUT: 'accept' });
-  for (const page of s.pages) { page.onCloseAuthorizationPanel(); assert.equal(page.getTabBar().data.sheetHidden, false); }
 });
 
 test('one direct tap on either page invokes native authorization synchronously without opening a second sheet', async () => {
@@ -90,7 +90,7 @@ test('one direct tap on either page invokes native authorization synchronously w
     assert.equal(s.prompts(), 1, 'native must be invoked before the tap handler yields');
     assert.equal(s.rt.calls.length, 0, 'no account fetch or cloud write may precede native authorization');
     assert.equal(page.data.authorizationOpen, false);
-    assert.equal(page.getTabBar().data.sheetHidden, false);
+    assert.equal(s.tabbar.hidden, false);
     native.resolve({ RESTOCK: 'accept', SOLDOUT: 'accept' }); await authorizing; await settle();
     assert.equal(page.data.subscription.credits, 6);
     assert.equal(page.data.authorizationOpen, false);
@@ -254,7 +254,7 @@ test('a direct native result arriving before onShow remains visible after return
       const timer = s.rt.timers.get(page.authorizationFeedbackTimer);
       assert.ok(timer);
       assert.equal(page.data.authorizationOpen, false);
-      assert.equal(page.getTabBar().data.sheetHidden, false);
+      assert.equal(s.tabbar.hidden, false);
       assert.equal(page.data.subscription.credits, accepted ? 6 : 5);
       s.rt.timers.delete(page.authorizationFeedbackTimer); timer.fn();
       assert.equal(page.data.authorizationFeedback, '');
@@ -328,7 +328,7 @@ test('a save finishing while hidden preserves confirmed identity without opening
   assert.equal(s.rt.app.globalData.bootstrap.identity.userKey, 'consumer:alice');
   assert.equal(s.rt.app.globalData.bootstrap.settings.dnd.periods[0].startMinute, 720);
   assert.equal(s.mine.data.savingSettings, false);
-  assert.equal(s.mine.getTabBar().data.sheetHidden, false);
+  assert.equal(s.tabbar.hidden, false);
   assert.equal(s.prompts(), 0);
 });
 
@@ -380,7 +380,7 @@ test('a recovery read after saving does not repaint a hidden page or replace ano
     assert.deepEqual(copy(s.mine.data.settings), before.settings);
     assert.equal(s.mine.data.boot.identity.userKey, changeAccount ? 'consumer:bob' : 'consumer:alice');
     assert.equal(s.rt.app.globalData.bootstrap.identity.userKey, changeAccount ? 'consumer:bob' : 'consumer:alice');
-    assert.equal(s.mine.getTabBar().data.sheetHidden, false);
+    assert.equal(s.tabbar.hidden, false);
     assert.equal(s.prompts(), 0);
   }
 });
@@ -477,10 +477,10 @@ test('native-sheet round trips preserve both panels while follow resumes one rea
     const native = deferred(); const s = setup({ native: () => native.promise });
     const page = s[target]; page.onOpenAuthorizationPanel();
     const authorizing = page.onSubscribe();
-    page.onHide(); assert.equal(page.getTabBar().data.sheetHidden, false);
+    page.onHide(); assert.equal(s.tabbar.hidden, false);
     await page.onShow();
     assert.equal(page.data.authorizationOpen, true);
-    assert.equal(page.getTabBar().data.sheetHidden, true);
+    assert.equal(s.tabbar.hidden, true);
     if (target === 'mine') assert.equal(s.rt.calls.length, 0, 'the mine authorization shortcut does not reload its account');
     else {
       assert.equal(s.rt.calls.filter(call => call.action === 'user.bootstrap').length, 1);
@@ -492,7 +492,7 @@ test('native-sheet round trips preserve both panels while follow resumes one rea
     assert.equal(s.records().length, 1);
     assert.equal(s.prompts(), 1);
     assert.equal(s.rt.calls.some(call => call.action === 'query.pickup'), false);
-    page.onCloseAuthorizationPanel(); assert.equal(page.getTabBar().data.sheetHidden, false);
+    page.onCloseAuthorizationPanel(); assert.equal(s.tabbar.hidden, false);
   }
 });
 
@@ -514,7 +514,7 @@ test('unloading releases the overlay and listeners while the existing queue cont
   const sync = deferred(); const s = setup({ record: () => sync.promise });
   s.mine.onOpenAuthorizationPanel(); await s.mine.onSubscribe(); await settle();
   s.mine.onUnload(); const before = copy(s.mine.data);
-  assert.equal(s.mine.getTabBar().data.sheetHidden, false);
+  assert.equal(s.tabbar.hidden, false);
   sync.resolve({ subscriptions: balances(6, 4) }); await settle();
   assert.deepEqual(copy(s.mine.data), before);
   assert.equal(s.follow.data.subscription.credits, 6);

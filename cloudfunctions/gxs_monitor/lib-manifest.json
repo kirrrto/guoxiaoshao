@@ -143,8 +143,8 @@
     },
     {
       "path": "repo/atomic-ops.js",
-      "bytes": 52191,
-      "sha256": "5b8df0388221f8ae45535e7a7c5e31ce50327d475b8c6d57b581509bda05aea0"
+      "bytes": 54504,
+      "sha256": "9cb5c2b81ab4a598be3ba354e8ac4bdb8a269cad011bdf5f7c8ca6d2dfa579d3"
     },
     {
       "path": "repo/cloudbase-repo.js",
@@ -198,13 +198,13 @@
     },
     {
       "path": "rules/follow-access.js",
-      "bytes": 1508,
-      "sha256": "b466c721ade7726d64e29e4dceb6d6adf5381796032febcd87fe9580800af191"
+      "bytes": 1625,
+      "sha256": "967a310c7c38b22c0195f93ecbd018cd754395b3c605b219847666476bbbabc8"
     },
     {
       "path": "rules/member-plan.js",
-      "bytes": 2433,
-      "sha256": "cb07f5bbe1756d7ea1288c07ba2c2ed9bf31c57d38167ffb608ff3a45be3b814"
+      "bytes": 3811,
+      "sha256": "3fbf54236174b4c00a35da1b55f5b3e0505ed1085cf637938c402772563dcf9a"
     },
     {
       "path": "rules/membership-entitlements.js",
@@ -213,8 +213,8 @@
     },
     {
       "path": "rules/membership.js",
-      "bytes": 6142,
-      "sha256": "9c3b31a7c4bac2c3351c9ee863b0c1a315b01b96afd83b0210d85ded728e786d"
+      "bytes": 6291,
+      "sha256": "916681add08a41857e52621b0a20ae196ad2e7a3d76096da6c5694444ed5f20b"
     },
     {
       "path": "rules/new-product.js",

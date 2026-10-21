@@ -116,7 +116,7 @@ test('annual products advertise five configurations by five stores and current p
   assert.equal(page.data.membership.annualExpiresText, '2027-10-18 08:00:00');
   assert.equal(page.data.membership.enhancedExpiresText, '2027-11-17 08:00:00');
   const destinations = [];
-  rt.wx.switchTab = value => destinations.push(value.url);
+  rt.wx.switchTab = value => { destinations.push(value.url); value.success?.({}); value.complete?.({}); };
   page.onOpenFollows();
   boot.followCount = 5; page.applyBoot(boot); page.onOpenFollows();
   assert.deepEqual(destinations, ['/pages/query/index', '/pages/follow/index']);

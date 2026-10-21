@@ -1,5 +1,6 @@
 <page-meta page-style="{{(editing || authorizationOpen) ? 'overflow:hidden;' : ''}}" />
 <view class="page tab-page follow-page">
+  <view wx:if="{{networkOffline}}" class="network-notice" role="status">网络已断开，恢复后自动刷新</view>
   <view wx:if="{{loadError}}" class="card load-error" role="alert">
     <view class="load-error-title">暂时没有连上</view>
     <view class="load-error-detail">{{loadError}}</view>
@@ -98,7 +99,7 @@
 
         <view wx:for="{{follows}}" wx:key="followId" id="follow-entry-{{index}}" class="card follow {{item.hasAvailable ? 'follow-available' : ''}}">
           <view class="follow-product">
-            <image wx:if="{{item.imageUrl}}" class="follow-image" src="{{item.imageDisplayUrl || item.imageUrl}}" mode="aspectFit" aria-label="{{item.imageAlt}}" data-index="{{index}}" binderror="onFollowImageError" />
+            <image wx:if="{{item.imageDisplayUrl}}" class="follow-image" src="{{item.imageDisplayUrl}}" webp="{{true}}" mode="aspectFit" aria-label="{{item.imageAlt}}" data-index="{{index}}" binderror="onFollowImageError" />
             <view wx:else class="follow-image follow-image-placeholder"><image src="/images/brand/whistle-green.png" mode="aspectFit" aria-hidden="true" /></view>
             <view class="follow-head"><view class="follow-title"><text class="bold">{{item.cardTitle}}</text></view><text wx:if="{{item.cardSubtitle}}" class="follow-variant">{{item.cardSubtitle}}</text><text class="follow-status follow-status--{{item.statusCls}}"><text class="follow-status-dot"></text>{{item.statusLabel}}</text></view>
           </view>

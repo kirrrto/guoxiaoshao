@@ -1,5 +1,5 @@
 /**
- * Network reachability shared by the pages. The floating tab bar shows a notice
+ * Network reachability shared by the pages. Each visible page shows a notice
  * while the phone is offline, and the visible page reloads once it reconnects.
  */
 let online = true;

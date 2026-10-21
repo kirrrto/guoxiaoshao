@@ -2,13 +2,23 @@
 const { ApiError } = require('../errors');
 const { dayKey } = require('../time');
 const { membershipSnapshot, accountLimits } = require('../rules/membership');
-const { ensurePlanMetadata } = require('../rules/member-plan');
+const { ensurePlanMetadata, ensureOutageCompensation } = require('../rules/member-plan');
 const { resolveConfig } = require('../rules/quota');
 const { maskOpenid } = require('../identity');
 const { monitoringSnapshot } = require('../monitor-readiness');
 const { paymentProduct, paymentProducts } = require('../payment/service');
 const { runtimeFor } = require('../growth-policy');
 const { validateDndPeriods, MAX_DND_PERIODS } = require('../rules/dnd');
+
+const OUTAGE_COMPENSATION_NOTICE = Object.freeze({
+  id: 'outage-compensation-2026-10-21',
+  title: '服务恢复与会员时长补偿',
+  kind: 'recovery',
+  publishedAt: '2026-10-21T00:00:00+08:00',
+  startsAt: '2026-10-21T00:00:00+08:00',
+  expiresAt: '2026-10-21T23:59:59+08:00',
+  text: '因昨晚服务器故障，目前查询与监测服务已恢复。今日（10 月 21 日）已为会员及曾付费用户自动顺延 1 天会员时长，免费用户今日打开自动获赠 1 天体验会员，可在「我的」查看。',
+});
 
 function noticeExpiresAt(raw) {
   const configured = raw.expiresAt ? Date.parse(raw.expiresAt) : NaN;
@@ -77,7 +87,8 @@ async function ensureUser(ctx) {
   if (!ctx.identity.userKey) throw new ApiError('user_required', '该操作需要小程序用户身份');
   let user = await ctx.repo.getUser(ctx.identity.userKey);
   if (!user) user = await ctx.repo.createUser(newUser(ctx.identity, ctx.nowIso));
-  return ensurePlanMetadata(ctx.repo, user);
+  user = await ensurePlanMetadata(ctx.repo, user);
+  return ensureOutageCompensation(ctx.repo, user, ctx.now);
 }
 
 async function touchUser(ctx, user) {
@@ -163,6 +174,17 @@ async function bootstrap(ctx) {
   ]);
   const { catalogMeta, collectorStatus } = metadata;
   const monitoring = monitoringSnapshot(ctx.config, collectorStatus, ctx.now);
+  const outageBanner = liveAnnouncement(OUTAGE_COMPENSATION_NOTICE, ctx.now);
+  const configuredBanner = liveAnnouncement(ctx.config.announcement, ctx.now);
+  const configuredNotices = liveNotices(ctx.config.notices, ctx.now);
+  const announcement = configuredBanner || (outageBanner ? {
+    ...outageBanner,
+    title: OUTAGE_COMPENSATION_NOTICE.title,
+    publishedAt: OUTAGE_COMPENSATION_NOTICE.publishedAt,
+  } : null);
+  const notices = outageBanner && configuredBanner && !configuredNotices.some(item => item.id === OUTAGE_COMPENSATION_NOTICE.id)
+    ? [{ id: OUTAGE_COMPENSATION_NOTICE.id, title: OUTAGE_COMPENSATION_NOTICE.title, publishedAt: OUTAGE_COMPENSATION_NOTICE.publishedAt, ...outageBanner }, ...configuredNotices]
+    : configuredNotices;
   return {
     collector: monitoring.collector,
     serverTime: ctx.nowIso,
@@ -181,8 +203,8 @@ async function bootstrap(ctx) {
     settings: user.settings,
     subscriptions: user.subscriptions || {},
     catalogVersion: catalogMeta ? catalogMeta.version : null,
-    announcement: liveAnnouncement(ctx.config.announcement, ctx.now),
-    notices: liveNotices(ctx.config.notices, ctx.now),
+    announcement,
+    notices,
     ...runtimeFor(ctx.config, user._id),
   };
 }

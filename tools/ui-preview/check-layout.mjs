@@ -185,6 +185,14 @@ try {
     metrics.calendarLayoutErrors.push(...await page.evaluate(expectedLaunchPoster => {
       const errors = [], entry = document.querySelector('.query-guide-entry'), selection = document.querySelector('.selection-card');
       if (entry && selection && entry.getBoundingClientRect().bottom > selection.getBoundingClientRect().top + 1) errors.push('Calendar entry must precede the query selection card');
+      for (const button of document.querySelectorAll('.selection-summary-change, .history-edit')) {
+        const label = button.querySelector('.ui-action-label'), chevron = button.querySelector('.ui-chevron');
+        if (label) {
+          const range = document.createRange(); range.selectNodeContents(label);
+          if (range.getClientRects().length > 1 || label.scrollWidth > label.clientWidth + 1) errors.push('Selection edit button label wrapped or clipped');
+        }
+        if (label && chevron && label.getBoundingClientRect().right > chevron.getBoundingClientRect().left + 1) errors.push('Selection edit button label overlaps its chevron');
+      }
       if (expectedLaunchPoster !== undefined) {
         const posters = [...document.querySelectorAll('.guide-launch')], steps = document.querySelector('.guide-steps');
         if (expectedLaunchPoster !== Boolean(posters.length)) errors.push('Guide shows the wrong poster mode for its entry');

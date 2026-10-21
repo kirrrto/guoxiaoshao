@@ -97,16 +97,22 @@ test('a manual query with missing or unknown observations cannot show a positive
 });
 
 test('selected-target follow uses current selection while result-card follow keeps its original query target', () => {
-  const rt = runtime(), page = rt.instance('pages/query/index.js'), navigations = [];
-  rt.wx.switchTab = value => navigations.push(value.url);
+  const rt = runtime(), page = rt.instance('pages/query/index.js'), navigations = [], pendingSwitches = [];
+  rt.wx.switchTab = value => { navigations.push(value.url); pendingSwitches.push(value); };
   Object.assign(page.data, { boot: { member: true }, result: response() }); page.selection = selection('SKU-B', ['R002']);
   page.onFollowSelection();
   assert.deepEqual(copy(rt.app.globalData.pendingFollow), { partNumber: 'SKU-B', storeNumbers: ['R002'] });
   page.selection.storeNumbers.push('R003');
   assert.deepEqual(copy(rt.app.globalData.pendingFollow.storeNumbers), ['R002'], 'the editor receives a copy of the selected stores');
+  // These are independent entries: finish the first native navigation before
+  // returning to choose the result-card action. Rapid concurrent taps have a
+  // separate navigation-deduplication regression test.
+  const result = { errMsg: 'switchTab:ok' };
+  pendingSwitches[0].success?.(result); pendingSwitches[0].complete?.(result);
   page.onAddFollow();
   assert.deepEqual(copy(rt.app.globalData.pendingFollow), { partNumber: 'SKU-A', storeNumbers: ['R001'] });
   assert.deepEqual(navigations, ['/pages/follow/index', '/pages/follow/index']);
+  pendingSwitches[1].success?.(result); pendingSwitches[1].complete?.(result);
   assert.equal(rt.calls.length, 0, 'adding a follow must not first perform a charged stock query');
 });
 

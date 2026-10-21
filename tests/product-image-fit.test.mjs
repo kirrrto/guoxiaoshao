@@ -22,23 +22,25 @@ test('image framing does not mutate cached product data or reuse an obsolete fra
   assert.equal(output.title, 'Device');
 });
 
-test('Apple CDN display uses the exact verified original URL, including all parameters', () => {
-  for (const sku of ['MJYH4CH/A', 'MJYJ4CH/A', 'MJTA4CH/A']) {
+test('display uses the packaged phone-safe rendition while preserving the verified original URL as provenance', () => {
+  for (const sku of ['MJYH4CH/A', 'MJYJ4CH/A', 'MJTA4CH/A', 'MK2M4CH/A']) {
     const original = images[sku].imageUrl;
-    assert.equal(productThumbnailUrl(original), original);
-    assert.equal(withImageFit({ imageUrl: original }).imageDisplayUrl, original);
-    assert.equal(productImageFit(original), productImageFit(productThumbnailUrl(original)));
+    assert.match(productThumbnailUrl(original), /^\/images\/products\/[a-f0-9]{20}-card\.(?:png|jpg)$/);
+    const displayed = withImageFit({ imageUrl: original });
+    assert.equal(displayed.imageUrl, original);
+    assert.equal(displayed.imageDisplayUrl, productThumbnailUrl(original));
+    assert.equal(displayed.imageFitClass, productImageFit(original));
   }
 });
 
-test('unknown, signed non-Apple and already-small URLs remain byte-for-byte unchanged', () => {
+test('unknown image URLs never trigger a guessed CDN request or an unbudgeted original download', () => {
   const cases = [
     '', undefined, 'https://example.com/image.png?wid=940&hei=1112',
     'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/test?wid=320&hei=400&fmt=png-alpha',
     'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/test?wid=940&fmt=png-alpha',
     'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/test?wid=wrong&hei=1112',
   ];
-  for (const url of cases) assert.equal(productThumbnailUrl(url), url || '');
+  for (const url of cases) assert.equal(productThumbnailUrl(url), '');
   const product = { imageUrl: 'https://example.com/image.png', title: 'Unchanged' };
   assert.equal(withImageFit(product).imageUrl, product.imageUrl);
   assert.deepEqual(product, { imageUrl: 'https://example.com/image.png', title: 'Unchanged' });

@@ -1,3 +1,5 @@
+const { setTabBarOverlay } = require('../../utils/tab-bar');
+
 Component({
   options: { multipleSlots: true, styleIsolation: 'apply-shared' },
   properties: {
@@ -74,25 +76,17 @@ Component({
       if (hidden) {
         const pages = typeof getCurrentPages === 'function' ? getCurrentPages() : [];
         this.ownerPage = pages[pages.length - 1];
-        this.ownerBar = this.ownerPage && typeof this.ownerPage.getTabBar === 'function' ? this.ownerPage.getTabBar() : null;
       }
-      // The tab bar can mount after the sheet. Resolve it again on the same
-      // owning page so closing also releases a late-mounted bar.
-      const bar = (this.ownerPage && typeof this.ownerPage.getTabBar === 'function' ? this.ownerPage.getTabBar() : this.ownerBar) || this.pendingTabBar;
-      this.pendingTabBar = bar;
-      // Separate from keyboardHidden: closing a keyboard must not expose the
-      // bottom navigation while a configuration sheet is still active.
+      const page = this.ownerPage;
       const epoch = this.tabVisibilityEpoch = (this.tabVisibilityEpoch || 0) + 1;
       const sync = () => {
-        if (epoch !== this.tabVisibilityEpoch || !bar || typeof bar.setData !== 'function') return;
-        if (!bar.data || bar.data.sheetHidden !== hidden) bar.setData({ sheetHidden: hidden });
-        this.pendingTabBar = null;
+        if (epoch !== this.tabVisibilityEpoch) return;
+        setTabBarOverlay(page, hidden, this);
       };
       // This method is called from a property observer during the parent render.
-      // Updating a separate component inside that update re-enters its render
-      // transaction. Publish only the latest state after the current turn.
+      // Change native viewport visibility after that render transaction, and
+      // publish only the latest open/close state if both occur in one turn.
       if (typeof wx.nextTick === 'function') wx.nextTick(sync); else setTimeout(sync, 0);
-      if (!hidden) { this.ownerBar = null; this.ownerPage = null; }
     },
     stopTouch() {},
     armNativeGuard() {

@@ -11,7 +11,7 @@
     <view class="poster-hero">
       <view class="poster-title guide-poster-title">{{calendar.title}}</view>
       <view wx:if="{{calendar.followNotice}}" class="poster-follow-notice"><view class="poster-follow-title">{{calendar.followNotice}}</view><view class="poster-follow-detail">{{calendar.followNoticeDetail}}</view></view>
-      <view wx:if="{{calendar.imageUrl}}" class="poster-hero-media"><image class="poster-hero-image" src="{{calendar.imageUrl}}" mode="aspectFit" aria-label="{{calendar.imageAlt || calendar.title}}" binderror="onCalendarImageError" data-index="{{index}}" /></view>
+      <view wx:if="{{calendar.imageDisplayUrl}}" class="poster-hero-media"><image class="poster-hero-image" src="{{calendar.imageDisplayUrl}}" webp="{{true}}" mode="aspectFit" aria-label="{{calendar.imageAlt || calendar.title}}" binderror="onCalendarImageError" data-index="{{index}}" /></view>
     </view>
     <view class="poster-milestones">
       <view class="poster-milestone poster-milestone--{{calendar.preorderState}}">

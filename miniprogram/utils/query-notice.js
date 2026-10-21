@@ -54,6 +54,32 @@ function normalizeAnnouncement(raw, now = Date.now()) {
 
 const TONE = { notice: 'info', maintenance: 'info', recovery: 'ok', warn: 'warn' };
 
+const OUTAGE_COMPENSATION_NOTICE = Object.freeze({
+  id: 'outage-compensation-2026-10-21',
+  title: '服务恢复与会员时长补偿',
+  kind: 'recovery',
+  publishedAt: '2026-10-21T00:00:00+08:00',
+  startsAt: '2026-10-21T00:00:00+08:00',
+  expiresAt: '2026-10-21T23:59:59+08:00',
+  text: '因昨晚服务器故障，目前查询与监测服务已恢复。今日（10 月 21 日）已为会员及曾付费用户自动顺延 1 天会员时长，免费用户今日打开自动获赠 1 天体验会员，可在「我的」查看。',
+});
+
+function withOutageCompensationNotice(payload, now = Date.now()) {
+  if (!payload || typeof payload !== 'object' || typeof payload.serverTime !== 'string') return payload;
+  const serverNow = parseTime(payload.serverTime);
+  if (serverNow === null || !normalizeAnnouncement(OUTAGE_COMPENSATION_NOTICE, serverNow)) return payload;
+  const checkTime = Number.isFinite(now) ? now : serverNow;
+  if (!normalizeAnnouncement(OUTAGE_COMPENSATION_NOTICE, checkTime)) return payload;
+  const activeAnnouncement = normalizeAnnouncement(payload.announcement, checkTime);
+  const announcement = activeAnnouncement ? payload.announcement : OUTAGE_COMPENSATION_NOTICE;
+  const rawNotices = Array.isArray(payload.notices) ? payload.notices : [];
+  const needsBoardRow = Boolean(activeAnnouncement && activeAnnouncement.text !== OUTAGE_COMPENSATION_NOTICE.text);
+  const notices = needsBoardRow && !rawNotices.some(item => item && item.id === OUTAGE_COMPENSATION_NOTICE.id)
+    ? [OUTAGE_COMPENSATION_NOTICE, ...rawNotices]
+    : rawNotices;
+  return { ...payload, announcement, notices };
+}
+
 /** Extra operator texts for the notice board; empty/expired rows are dropped. */
 function liveNotices(raw, now = Date.now()) {
   if (!Array.isArray(raw)) return [];
@@ -168,6 +194,7 @@ function resolveQueryNotice({ announcement, now = Date.now(), consent = null, co
 }
 
 module.exports = {
+  OUTAGE_COMPENSATION_NOTICE, withOutageCompensationNotice,
   parseTime, noticeExpiresAt, normalizeAnnouncement, liveNotices, hasLiveNoticeContent, resolveQueryNotice,
   noticeFingerprint, noticeUnreadCount, markNoticesSeen,
 };

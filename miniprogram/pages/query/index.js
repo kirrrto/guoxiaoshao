@@ -6,11 +6,11 @@ const { localKey } = require('../../utils/local-key');
 const { readSession, writeSession } = require('../../utils/session');
 const operation = require('../../utils/operation');
 const { startProgress, stopProgress } = require('../../utils/request-progress');
-const { syncTabBar } = require('../../utils/tab-bar');
+const { syncTabBar, switchToTab, releaseTabBar, setTabBarOverlay } = require('../../utils/tab-bar');
 const { shareAppMessage, shareTimeline, readSharedSelection } = require('../../utils/share');
 const { monitorPollDelay } = require('../../utils/poll');
 const { topUpReminderCredit, buildConsentReport, openSubscribeSettings } = require('../../utils/reminder-credits');
-const { resolveQueryNotice, normalizeAnnouncement, liveNotices, hasLiveNoticeContent, noticeUnreadCount } = require('../../utils/query-notice');
+const { resolveQueryNotice, normalizeAnnouncement, liveNotices, hasLiveNoticeContent, noticeUnreadCount, withOutageCompensationNotice } = require('../../utils/query-notice');
 const { confirmTap } = require('../../utils/haptic');
 const { productImageFit, withImageFit, productThumbnailUrl } = require('../../utils/product-image-fit');
 const { availableStoreChoices } = require('../../utils/observation-insights');
@@ -63,7 +63,7 @@ function selectionDetails(selection, catalog, maxStores) {
   const cities = Array.from(new Set(stores.map(s => s.city).filter(Boolean)));
   return { validScope, valid, notice: unavailable ? '配置已保存，尚未开始监测。取货查询和关注暂未开放。' : '请补全或核对配置与门店后查询。', summary: product ? {
     title: product.title || product.model || product.partNumber,
-    imageUrl: product.imageUrl || '', imageDisplayUrl: productThumbnailUrl(product.imageUrl), imageAlt: product.imageAlt || product.title || '',
+    imageUrl: product.imageUrl || '', imageDisplayUrl: productThumbnailUrl(product.imageUrl, 'card', product.partNumber), imageAlt: product.imageAlt || product.title || '',
     imageFitClass: productImageFit(product.imageUrl),
     cityLabel: `${cities.join('、') || '已选'} · ${stores.length} 家门店`,
     storeLabel: numbers.length !== stores.length || new Set(numbers).size !== numbers.length || numbers.length > maxStores
@@ -133,6 +133,7 @@ function presentFollowTargets(follows) {
 
 Page({
   data: {
+    networkOffline: false,
     ready: false,
     accountReady: false,
     accountError: null,
@@ -293,6 +294,7 @@ Page({
   },
 
   onHide() {
+    releaseTabBar(this);
     this.visible = false;
     if (this.data.calendarOpen) this.onCloseCalendar();
     this.visibilityEpoch = (this.visibilityEpoch || 0) + 1;
@@ -300,6 +302,7 @@ Page({
   },
 
   onUnload() {
+    releaseTabBar(this);
     stopProgress(this);
     if (this.data.calendarOpen) this.onCloseCalendar();
     this.pageRetired = true;
@@ -336,8 +339,7 @@ Page({
     } finally { this.calendarReadPending = false; }
   },
   syncCalendarOverlay() {
-    const bar = typeof this.getTabBar === 'function' ? this.getTabBar() : null;
-    if (bar && typeof bar.setData === 'function') bar.setData({ sheetHidden: Boolean(this.data.calendarOpen || this.data.sheetVisible) });
+    setTabBarOverlay(this, Boolean(this.data.calendarOpen), 'calendar');
   },
   onCalendarMute(event) { this.setData({ calendarMuted: Boolean(event.detail.value && event.detail.value.includes('mute')) }); },
   onCloseCalendar() {
@@ -348,7 +350,7 @@ Page({
   },
   onCalendarTouch() {},
   onCalendarImageError() {
-    if (this.data.openingCalendar) this.setData({ 'openingCalendar.imageUrl': '' });
+    if (this.data.openingCalendar) this.setData({ 'openingCalendar.imageDisplayUrl': '' });
   },
   onOpenGuide() {
     if (this.data.calendarOpen) this.onCloseCalendar();
@@ -469,8 +471,9 @@ Page({
     return pending;
   },
 
-  applyBoot(boot) {
+  applyBoot(rawBoot) {
     if (this.pageRetired) return;
+    const boot = withOutageCompensationNotice(rawBoot);
     const previousKey = this.accountSnapshot && this.accountSnapshot.identity && this.accountSnapshot.identity.userKey;
     const currentKey = boot.identity && boot.identity.userKey;
     if (previousKey && previousKey !== currentKey) {
@@ -583,15 +586,15 @@ Page({
     return this.checkoutContext;
   },
 
-  onContinueSetup() { wx.switchTab({ url: '/pages/follow/index' }); },
+  onContinueSetup() { switchToTab({ url: '/pages/follow/index' }); },
   onToggleAlternatives() { this.setData({ alternativesExpanded: !this.data.alternativesExpanded }); },
   onToggleEvidence() { this.setData({ evidenceExpanded: !this.data.evidenceExpanded }); },
-  onGoFollow() { wx.switchTab({ url: '/pages/follow/index' }); },
+  onGoFollow() { switchToTab({ url: '/pages/follow/index' }); },
 
   onSelectionHistory() {
     const { stageHistoryContext } = require('../../utils/journey-context');
     if (!stageHistoryContext({ from: 'query', target: this.selection })) return toast('请先确认账户与查询配置');
-    wx.switchTab({ url: '/pages/history/index' });
+    switchToTab({ url: '/pages/history/index' });
   },
 
   onNextAction() {
@@ -937,7 +940,7 @@ Page({
 
   onToggleRules() { this.setData({ rulesExpanded: !this.data.rulesExpanded }); },
 
-  onSelectionImageError() { const item = this.data.selectionSummary; if (item && item.imageDisplayUrl && item.imageDisplayUrl !== item.imageUrl) this.setData({ 'selectionSummary.imageDisplayUrl': item.imageUrl }); else this.setData({ selectionImageFailed: true }); },
+  onSelectionImageError() { this.setData({ selectionImageFailed: true }); },
 
   readPickerSelection() {
     // The component coalesces change events until nextTick. A tap must use
@@ -1062,7 +1065,7 @@ Page({
     }
   },
 
-  onResultImageError() { const product = this.data.result && this.data.result.product; if (product && product.imageDisplayUrl && product.imageDisplayUrl !== product.imageUrl) this.setData({ 'result.product.imageDisplayUrl': product.imageUrl }); else this.setData({ 'result.product.imageUrl': '' }); },
+  onResultImageError() { if (this.data.result && this.data.result.product) this.setData({ 'result.product.imageDisplayUrl': '' }); },
 
   onFollowSelection() {
     const { boot } = this.data, selection = this.readPickerSelection();
@@ -1092,26 +1095,26 @@ Page({
       const app = getApp();
       if (boot.member) {
         app.globalData.pendingFollow = { partNumber: target.partNumber, storeNumbers: target.storeNumbers.slice(), checkoutRevision: saved.context.revision, checkoutSignature: saved.context.targetSignature };
-        return wx.switchTab({ url: '/pages/follow/index' });
+        return switchToTab({ url: '/pages/follow/index' });
       }
       app.globalData.pendingMemberFollow = { partNumber: target.partNumber, storeNumbers: target.storeNumbers.slice(), title: target.title || target.partNumber,
         userKey: this.accountSnapshot.identity.userKey, createdAt: Date.now() };
-      return wx.switchTab({ url: '/pages/mine/index' });
+      return switchToTab({ url: '/pages/mine/index' });
     }
     if (!boot.member) {
       // Keep the intent: 「我的」 offers to continue with it once membership is active.
       const app = getApp();
       app.globalData.pendingMemberFollow = { partNumber: target.partNumber, storeNumbers: target.storeNumbers.slice(), title: target.title || target.partNumber };
       wx.showModal({ title: '关注与到货提醒为会员专属', content: '周卡 3 个配置、每配置 3 家门店；月卡 4 个配置、每配置 4 家门店；年卡 5 个配置、每配置 5 家门店。提醒需微信授权。开通后会继续为你关注这个配置。', confirmText: '去开通',
-        success: r => { if (r.confirm) wx.switchTab({ url: '/pages/mine/index' }); else app.globalData.pendingMemberFollow = null; } });
+        success: r => { if (r.confirm) switchToTab({ url: '/pages/mine/index' }); else app.globalData.pendingMemberFollow = null; } });
       return;
     }
     getApp().globalData.pendingFollow = { partNumber: target.partNumber, storeNumbers: target.storeNumbers.slice() };
-    wx.switchTab({ url: '/pages/follow/index' });
+    switchToTab({ url: '/pages/follow/index' });
   },
 
   onGoMine() {
-    wx.switchTab({ url: '/pages/mine/index' });
+    switchToTab({ url: '/pages/mine/index' });
   },
 
   onRetryLoad() {

@@ -10,6 +10,10 @@ import { createRequire } from 'node:module';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const project = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
+if (JSON.parse(fs.readFileSync(path.join(project, 'miniprogram/app.json'), 'utf8')).tabBar.custom !== true) {
+  console.log(JSON.stringify({ status: 'not-applicable', reason: 'The app uses native navigation. There is no custom glass surface; run check-native-tabs.mjs for viewport geometry.' }));
+  process.exit(0);
+}
 const directory = path.resolve(process.argv[2]);
 const output = path.resolve(process.argv[3] || path.join(project, 'evidence/verification/1.1.1-mint-glass'));
 const manifest = JSON.parse(fs.readFileSync(path.join(directory, 'manifest.json'), 'utf8'));

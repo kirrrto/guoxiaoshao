@@ -3,7 +3,9 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
+import { spawnSync } from 'node:child_process';
 import { checkMonitorBundle } from '../lib/monitor-bundle.mjs';
+import { fingerprintQualitySource, validateQualityFindings } from './quality-findings.mjs';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const require = createRequire(import.meta.url);
 const json = file => JSON.parse(fs.readFileSync(path.join(root, file), 'utf8'));
@@ -78,12 +80,23 @@ const app = json('miniprogram/app.json');
 check('acceptance page and mock runtime absent from mini program', !app.pages.some(page => /acceptance/.test(page)) && !fs.existsSync(path.join(root, 'miniprogram/utils/acceptance.js')) && !['.js','.json','.wxml','.wxss'].some(ext => fs.existsSync(path.join(root, 'miniprogram/pages/acceptance/index' + ext))));
 check('tab icons and page resources exist', app.pages.every(page => ['.js','.wxml','.wxss','.json'].every(ext => fs.existsSync(path.join(root, 'miniprogram', page + ext)))) && app.tabBar.list.every(tab => [tab.iconPath,tab.selectedIconPath].every(icon => fs.existsSync(path.join(root,'miniprogram',icon)))));
 const customTabs = require(path.join(root, 'miniprogram/utils/tab-bar.js')).TABS;
-check('floating navigation component is enabled and registered', app.tabBar.custom === true && ['.js', '.json', '.wxml', '.wxss'].every(ext => fs.existsSync(path.join(root, 'miniprogram/custom-tab-bar/index' + ext))) && json('miniprogram/custom-tab-bar/index.json').component === true);
-check('custom navigation matches native tab routes, labels and icons', customTabs.length === app.tabBar.list.length && customTabs.every((tab, index) => ['pagePath', 'text', 'iconPath', 'selectedIconPath'].every(key => tab[key].replace(/^\//, '') === app.tabBar.list[index][key].replace(/^\//, ''))));
+check('native navigation avoids per-page custom tab component creation', app.tabBar.custom !== true && !fs.existsSync(path.join(root, 'miniprogram/custom-tab-bar')));
+check('navigation helpers match native tab routes, labels and icons', customTabs.length === app.tabBar.list.length && customTabs.every((tab, index) => ['pagePath', 'text', 'iconPath', 'selectedIconPath'].every(key => tab[key].replace(/^\//, '') === app.tabBar.list[index][key].replace(/^\//, ''))));
 let frontendBytes = 0, frontendFiles = 0;
 function walk(dir) { for (const entry of fs.readdirSync(dir, { withFileTypes: true })) { if (entry.name === 'node_modules') continue; const file = path.join(dir, entry.name); if (entry.isDirectory()) walk(file); else { frontendFiles++; frontendBytes += fs.statSync(file).size; } } }
 walk(path.join(root, 'miniprogram'));
-const report = { checkedAt: new Date().toISOString(), version: project.version, scope: 'Local source candidate only; no cloud deployment, account-console inspection or submission', publicationReady: false, passed: checks.every(c => c.passed), checks, frontend: { files: frontendFiles, sourceBytes: frontendBytes, note: 'Source bytes, not the WeChat upload package size' }, externalReleaseChecks: [
+const thumbnailCheck = spawnSync(process.execPath, [path.join(root, 'tools/assets/build-product-thumbnails.mjs'), '--check'], { encoding: 'utf8', windowsHide: true });
+check('verified local thumbnails cover the current catalog and match recorded asset hashes', thumbnailCheck.status === 0);
+check('frontend source and assets fit within the 2 MiB main-package budget before compilation', frontendBytes < 2 * 1024 * 1024);
+const sourceChecksPassed = checks.every(c => c.passed);
+let qualityGate;
+let sourceFingerprint = null;
+try {
+  sourceFingerprint = fingerprintQualitySource(root);
+  qualityGate = validateQualityFindings(json('config/wechat-quality-findings.json'), project.version, sourceFingerprint);
+} catch (error) { qualityGate = { passed: false, version: project.version, sourceFingerprint, blockers: [{ id: 'registry', code: 'quality_gate_read_error', message: error.message }] }; }
+check('known WeChat quality findings have passing current-version retest evidence', qualityGate.passed);
+const report = { checkedAt: new Date().toISOString(), version: project.version, scope: 'Local source and recorded quality evidence only; no cloud deployment, real-device retest, account-console inspection or submission', publicationReady: false, sourceChecksPassed, qualityGate, passed: checks.every(c => c.passed), checks, frontend: { files: frontendFiles, sourceBytes: frontendBytes, note: 'Source bytes, not the WeChat upload package size' }, externalReleaseChecks: [
   { item: 'Consumer account eligibility, filing, categories and privacy declaration', status: 'requires account-console verification' },
   { item: 'Deploy cloudbase_auth, gxs_api and gxs_monitor; verify actual timer invocations', status: 'not checked by this local tool; consult the versioned cloud-deployment evidence' },
   { item: 'Apply database indexes/rules and seed verified catalog', status: 'not checked by this local tool; consult the versioned cloud-deployment evidence' },

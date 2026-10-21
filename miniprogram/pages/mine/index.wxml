@@ -1,5 +1,6 @@
 <page-meta page-style="{{(redemptionOpen || authorizationOpen) ? 'overflow:hidden;' : ''}}" />
 <view class="page tab-page mine-page">
+  <view wx:if="{{networkOffline}}" class="network-notice" role="status">网络已断开，恢复后自动刷新</view>
   <view wx:if="{{loadError}}" class="card load-error" role="alert">
     <view class="load-error-title">暂时没有连上</view>
     <view class="load-error-detail">{{loadError}}</view>
@@ -44,7 +45,7 @@
         <view wx:if="{{checkoutLoading}}" class="small muted">正在确认所选配置…</view>
         <block wx:elif="{{checkoutTarget}}">
           <view class="checkout-target">
-            <image wx:if="{{checkoutTarget.imageUrl}}" class="checkout-image" src="{{checkoutTarget.imageUrl}}" mode="aspectFit" aria-hidden="true" />
+            <image wx:if="{{checkoutTarget.imageDisplayUrl}}" class="checkout-image" src="{{checkoutTarget.imageDisplayUrl}}" webp="{{true}}" mode="aspectFit" aria-hidden="true" binderror="onCheckoutImageError" />
             <view class="checkout-target-copy"><view class="checkout-target-title">{{checkoutTarget.title}}</view><view class="checkout-stores">{{checkoutTarget.storeText}}</view></view>
           </view>
           <view class="checkout-explanation">保存后持续检测；符合条件时，通过已授权的微信消息提醒。</view>
