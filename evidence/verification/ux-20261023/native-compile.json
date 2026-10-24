@@ -1,0 +1,16 @@
+[
+  {
+    "compiler": "wcc",
+    "files": 11,
+    "exitCode": 0,
+    "diagnostics": "",
+    "bytes": 337889
+  },
+  {
+    "compiler": "wcsc",
+    "files": 15,
+    "exitCode": 0,
+    "diagnostics": "",
+    "bytes": 29249
+  }
+]

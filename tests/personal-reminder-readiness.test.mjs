@@ -22,7 +22,8 @@ test('a live collector heartbeat cannot claim readiness when actual stock observ
   assert.equal(page.data.readiness.code, 'collector_observation_stale');
   assert.equal(page.data.collector.cls, 'warn');
   assert.match(page.data.collector.detail, /观测.*更新/);
-  assert.match(page.data.delivery.detail, /观测.*更新/);
+  assert.equal(page.data.delivery.label, '发送状态待确认', 'legacy stock errors do not prove a sender failure');
+  assert.match(page.data.delivery.detail, /发送通道.*状态/);
   assert.match(page.data.follows[0].monitoringText, /后台检测情况见上方/);
 });
 

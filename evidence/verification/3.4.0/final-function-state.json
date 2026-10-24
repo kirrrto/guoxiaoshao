@@ -1,0 +1,38 @@
+{
+  "checkedAt": "2026-10-24T00:25:31.527Z",
+  "functions": [
+    {
+      "name": "gxs_monitor",
+      "status": "Active",
+      "timeout": 60,
+      "runtime": "Nodejs20.19",
+      "triggers": [
+        {
+          "name": "gxs-monitor-minute",
+          "type": "timer",
+          "config": "0 * * * * * *"
+        }
+      ]
+    },
+    {
+      "name": "gxs_api",
+      "status": "Active",
+      "timeout": 60,
+      "runtime": "Nodejs18.15",
+      "triggers": [
+        {
+          "name": "gxs-payment-reconcile-five-minutes",
+          "type": "timer",
+          "config": "0 */5 * * * * *"
+        }
+      ]
+    },
+    {
+      "name": "cloudbase_auth",
+      "status": "Active",
+      "timeout": 5,
+      "runtime": "Nodejs18.15",
+      "triggers": null
+    }
+  ]
+}

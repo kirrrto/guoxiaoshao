@@ -1,0 +1,51 @@
+{
+  "beforeAt": "2026-10-23T13:39:48.309Z",
+  "afterAt": "2026-10-23T13:41:35.327Z",
+  "targets": [
+    {
+      "id": "cancelled-1",
+      "previousLastSuccessAt": "2026-10-23T13:39:13.751Z",
+      "nextLastSuccessAt": "2026-10-23T13:41:10.238Z",
+      "successesAdded": 2,
+      "guardReasonNow": null,
+      "guardActiveNow": false
+    },
+    {
+      "id": "cancelled-2",
+      "previousLastSuccessAt": "2026-10-23T13:39:17.936Z",
+      "nextLastSuccessAt": "2026-10-23T13:41:15.264Z",
+      "successesAdded": 2,
+      "guardReasonNow": null,
+      "guardActiveNow": false
+    },
+    {
+      "id": "cancelled-3",
+      "previousLastSuccessAt": "2026-10-23T13:39:15.722Z",
+      "nextLastSuccessAt": "2026-10-23T13:41:12.921Z",
+      "successesAdded": 2,
+      "guardReasonNow": null,
+      "guardActiveNow": false
+    },
+    {
+      "id": "cancelled-4",
+      "previousLastSuccessAt": "2026-10-23T13:39:16.484Z",
+      "nextLastSuccessAt": "2026-10-23T13:41:12.444Z",
+      "successesAdded": 2,
+      "guardReasonNow": null,
+      "guardActiveNow": false
+    }
+  ],
+  "allPreviouslyCancelledGroupsHaveNewSuccess": true,
+  "health": {
+    "evaluatedAt": "2026-10-23T13:41:35.327Z",
+    "freshGroups": 31,
+    "groupCount": 31,
+    "lastSuccessAt": "2026-10-23T13:41:34.548Z",
+    "oldestSuccessAt": "2026-10-23T13:40:25.351Z",
+    "pendingGroups": 0,
+    "staleAfterMs": 188000,
+    "staleGroups": 0,
+    "state": "healthy"
+  },
+  "state": "running"
+}

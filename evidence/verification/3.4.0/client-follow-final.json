@@ -1,0 +1,49 @@
+{
+  "checkedAt": "2026-10-23T13:13:48.778Z",
+  "scope": "Current local v3.4.0 candidate in WeChat Developer Tools using live production backend",
+  "route": "pages/follow/index",
+  "collector": {
+    "enabled": true,
+    "state": "running",
+    "stale": false,
+    "mode": "scheduled",
+    "observationHealth": {
+      "state": "healthy",
+      "groupCount": 31,
+      "freshGroups": 31,
+      "staleGroups": 0,
+      "pendingGroups": 0,
+      "staleAfterMs": 188000,
+      "oldestSuccessAt": "2026-10-23T13:11:03.133Z",
+      "lastSuccessAt": "2026-10-23T13:12:34.138Z",
+      "evaluatedAt": "2026-10-23T13:12:59.859Z"
+    },
+    "observationStale": false,
+    "breaker": {
+      "state": "closed",
+      "reason": null,
+      "until": null
+    },
+    "intervalMs": 60000,
+    "groupCount": 31,
+    "lastBatchAt": "2026-10-23T13:12:34.567Z",
+    "updatedAt": "2026-10-23T13:12:35.931Z",
+    "nextRunAt": "2026-10-23T13:13:00.000Z",
+    "label": "监测服务运行中",
+    "cls": "ok",
+    "detail": "后台持续检测已开启关注的门店，离开小程序后仍由后台运行。",
+    "updatedText": "2026-10-23 21:12:35",
+    "batchText": "2026-10-23 21:12:34"
+  },
+  "delivery": {
+    "overallReady": true,
+    "label": "发送服务已就绪",
+    "cls": "ok",
+    "detail": "微信发送通道已连接。实际发送仍需库存、关注与有效授权等条件满足。"
+  },
+  "readiness": {
+    "code": "ready",
+    "title": "到货、断货提醒已就绪"
+  },
+  "followCount": 2
+}

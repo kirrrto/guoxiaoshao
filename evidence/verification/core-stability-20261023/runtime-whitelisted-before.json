@@ -1,0 +1,20 @@
+{
+  "_id": "runtime",
+  "collector": {
+    "autoSharePercent": 80,
+    "budgetMode": "continuous",
+    "cadenceMode": "fixed",
+    "enabled": true,
+    "intervalSeconds": 3,
+    "maxRequestsPerDay": 800000,
+    "maxRequestsPerMinute": 600,
+    "statusStaleAfterSeconds": 150
+  },
+  "notifications": {
+    "consumerAppId": "wxe96ad9e77b602f1b",
+    "cooldownMinutes": 0,
+    "enabled": true,
+    "miniprogramState": "formal"
+  },
+  "updatedAt": "2026-10-18T05:38:09.757Z"
+}

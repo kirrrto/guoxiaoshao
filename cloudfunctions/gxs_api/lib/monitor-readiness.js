@@ -32,15 +32,21 @@ function monitoringSnapshot(config, status, now) {
   const sender = status && status.notifications;
   const authExpiry = sender && Date.parse(sender.validUntil);
   const authReady = Boolean(sender && sender.authReady === true && sender.authState === 'ready' && Number.isFinite(authExpiry) && authExpiry > now.getTime());
-  let reason = !templateConfigured ? 'template_missing' : !notifications.enabled ? 'notifications_disabled'
+  const serviceReason = !templateConfigured ? 'template_missing' : !notifications.enabled ? 'notifications_disabled'
     : !status ? 'collector_not_deployed' : stale ? 'collector_stale'
     : ['stopped', 'no_lease', 'disabled', 'error'].includes(state) || !config.collector.enabled ? 'collector_stopped'
-    : observationStale ? 'collector_observation_stale'
-    : !sender ? 'sender_unknown' : sender.reason || (!sender.enabled ? 'sender_missing' : !authReady ? 'consumer_auth_unchecked' : null);
+    : null;
+  // A current, authenticated sender can be connected while stock observations
+  // lag. Keep the whole reminder path blocked without labelling that a sender
+  // failure. An expired/stopped worker still cannot prove a live sender.
+  const senderReason = serviceReason || (!sender ? 'sender_unknown'
+    : sender.reason || (!sender.enabled ? 'sender_missing' : !authReady ? 'consumer_auth_unchecked' : null));
+  const reason = serviceReason || (observationStale ? 'collector_observation_stale' : senderReason);
   return { collector, notifications: {
     enabled: Boolean(notifications.enabled), templateIds: notifications.templateIds,
     templateTitle: notifications.templateTitle || '',
-    templateConfigured, deliveryReady: reason === null, reason,
+    templateConfigured, senderReady: senderReason === null, senderReason,
+    deliveryReady: reason === null, reason,
   } };
 }
 

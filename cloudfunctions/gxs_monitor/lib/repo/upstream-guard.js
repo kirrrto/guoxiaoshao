@@ -89,7 +89,11 @@ function upstreamGuardMethods(run) {
       const ownsProbe = token && token.probe && state.probeId === token.id && token.generation === state.generation && state.probeUntil > nowMs;
       if (success) {
         // A request started before a 429 cannot reopen the source afterward.
-        if (ownsProbe || (!state.until && token && token.generation === state.generation)) {
+        const needsReset = state.reason || state.probeId || state.probeUntil || state.trips || (state.failures || []).length;
+        // Healthy requests only need to read a clean closed breaker. Rewriting
+        // it for every success makes all stores and manual queries contend on
+        // the same document without changing any admission decision.
+        if (ownsProbe || (!state.until && token && token.generation === state.generation && needsReset)) {
           await tx.put(C.config, { ...state, until: null, reason: null, probeId: null, probeUntil: null, trips: 0, failures: [], updatedAt: now });
         }
         return { paused: Boolean(state.until && !ownsProbe) };

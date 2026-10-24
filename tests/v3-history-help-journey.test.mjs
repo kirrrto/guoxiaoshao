@@ -141,15 +141,13 @@ test('pickup guide validates its public target and returns without overwriting q
   const page = rt.instance('pages/guide/index.js');
   page.onLoad({ section: 'pickup', from: 'query', gxsPart: encodeURIComponent(product.partNumber), gxsStores: storeNumbers.join(',') });
   assert.equal(page.data.stageId, 'notice');
-  assert.equal(page.data.showLaunchPoster, false);
-  assert.equal(page.data.calendars.length, 0);
   assert.equal(page.data.targetSummary.title, product.title);
   assert.equal(page.sharedTarget.storeNumbers.length, 4);
   assert.equal(page.data.pickupSteps.length, 3);
   page.onReturnTask();
   assert.deepEqual(navigations, ['/pages/query/index']);
   assert.equal(rt.storage.size, 0); assert.equal(rt.calls.length, 0);
-  page.refreshCalendars({ productByPart: {}, storeByNumber: {}, products: [] });
+  page.refreshTarget({ productByPart: {}, storeByNumber: {}, products: [] });
   assert.equal(page.data.targetSummary, null);
 });
 
@@ -181,17 +179,15 @@ test('diagnostic copy is explicit and has exactly the fixed fields without untru
   assert.equal(rt.calls.length, 0);
 });
 
-test('history current observation stays separate and the guide opt-in poster precedes always-visible guidance', () => {
+test('history current observation stays separate and the guide leads directly to task guidance', () => {
   const history = fs.readFileSync(new URL('../miniprogram/pages/history/index.wxml', import.meta.url), 'utf8');
   assert.match(history, /bindtap="onToggleLatest"/);
   assert.match(history, /wx:if="{{latestExpanded}}"/);
   const guide = fs.readFileSync(new URL('../miniprogram/pages/guide/index.wxml', import.meta.url), 'utf8');
-  const posterGate = guide.indexOf('<block wx:if="{{showLaunchPoster}}">');
-  const poster = guide.indexOf('class="card guide-launch"');
-  const posterEnd = guide.indexOf('</block>', poster);
   const task = guide.indexOf('class="card guide-target"');
   const steps = guide.indexOf('<view class="card guide-steps">');
-  assert.ok(posterGate >= 0 && posterGate < poster && poster < posterEnd && posterEnd < task && task < steps);
+  assert.ok(task >= 0 && task < steps);
+  assert.doesNotMatch(guide, /guide-launch|showLaunchPoster|新品发售日历/);
   assert.match(guide, /wx:for="{{stage.steps}}"/);
   assert.match(guide, /bindtap="onCopyDiagnostics"/);
 });

@@ -1,0 +1,38 @@
+{
+  "createdAt": "2026-10-24T00:17:38.399Z",
+  "expiresAt": "2026-10-24T02:17:38.398Z",
+  "originalSHA256": "23a2a126d8b58ad5b8dc2ff562d301e3826dc040fdbec7a78342b15dd75b9208",
+  "temporarySHA256": "72e99b0258fec34ea877f5a07f3f6f81f7202e632c1bae53c6669861ba9fc41c",
+  "file": "gxs_api/index.js",
+  "privateCollections": [
+    "gxs_v340_e2e_config",
+    "gxs_v340_e2e_follows",
+    "gxs_v340_e2e_latest",
+    "gxs_v340_e2e_events",
+    "gxs_v340_e2e_observation_days",
+    "gxs_v340_e2e_notifications"
+  ],
+  "testResult": {
+    "passed": 7,
+    "failed": 0,
+    "scope": "local safety and actual collector/repository code with fake DB and fake WeChat, no live sends"
+  },
+  "runtimeSources": {
+    "engine/collector.js": "e44df0c1ca9839ea16fd578d29591fba5f4baa1da4256f17bab2902e78e80f14",
+    "engine/notifier.js": "6dc3c7f23ca5343c7aaaf932f9c66489e157463eee9889cb2778630e86f9e776",
+    "repo/cloudbase-repo.js": "b3887555131942733cfae8e292250e4738a36efe65ef00a9c133243c7531fba7",
+    "repo/atomic-ops.js": "3bd235a658f30f86312388e852d25dce5b89458fec77363da4d06fb3a411a4a7",
+    "repo/current-availability.js": "d3c773f1b2b2bf5c92452387bde0195fe5a8bcd1810aa11e1a98e411534da985"
+  },
+  "scope": "Temporary maintainer-only controlled cloud chain acceptance; synthetic inventory, real template sending; restore original entry after evidence",
+  "privacy": "Fixed consumer SDK identity, fixed administrator hash, random nonce hash and expiry; separate private collections; real subscription debit for only verified maintainer",
+  "localTests": {
+    "passed": 7,
+    "failed": 0,
+    "skipped": 0,
+    "realWechatCalls": 0
+  },
+  "reviewedAt": "2026-10-24T00:17:55.437Z",
+  "reviewedBy": "root",
+  "candidateSourceUnchanged": true
+}

@@ -1,0 +1,49 @@
+{
+  "version": "3.4.0",
+  "checkedAt": "2026-10-24T00:12:43.191Z",
+  "scope": "Seven metadata files only; no dependencies, runtime libraries, triggers or timeout changes",
+  "files": [
+    {
+      "function": "gxs_api",
+      "file": "package.json",
+      "sha256": "6e54d53fdac10109046f38f85ca26b8fd6a01d907ba257809989e6db19cca306",
+      "change": "version metadata only"
+    },
+    {
+      "function": "gxs_api",
+      "file": "package-lock.json",
+      "sha256": "4818ad6038a940ea5a45a59fd8588e5555749a7e90bb4f735dbb1f5e55cc124b",
+      "change": "version metadata only"
+    },
+    {
+      "function": "gxs_monitor",
+      "file": "package.json",
+      "sha256": "7a04c6e0998fd58995f1a8a70b7e0d236d416fa8b9b89d07fd93f3cd3a49da66",
+      "change": "version metadata only"
+    },
+    {
+      "function": "gxs_monitor",
+      "file": "package-lock.json",
+      "sha256": "565cb1ee4abcdf56a831bb5b2d0a63856c5abb47b295452c5f4671636c7466f5",
+      "change": "version metadata only"
+    },
+    {
+      "function": "gxs_monitor",
+      "file": "lib-manifest.json",
+      "sha256": "9e55e1c679673cb6b40e7c27af76280ba18ff66cc6a88944bc55bcdc80da908c",
+      "change": "manifest matching deployed runtime libraries"
+    },
+    {
+      "function": "cloudbase_auth",
+      "file": "package.json",
+      "sha256": "f1dfb0be78ffd7f7c03be78ad5004b2f612e7a321e5c92b8a757c5fd8369b2b5",
+      "change": "version metadata only"
+    },
+    {
+      "function": "cloudbase_auth",
+      "file": "package-lock.json",
+      "sha256": "c14712e01d89c774dab6886eece1d59ea64a56561e9e9ec6b9f7c0ed52274cc6",
+      "change": "version metadata only"
+    }
+  ]
+}

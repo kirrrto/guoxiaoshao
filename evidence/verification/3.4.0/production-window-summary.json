@@ -1,0 +1,148 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-10-23T13:15:59.983Z",
+  "scope": "Independent production status window after the final monitor lib43 / api lib69 incremental deployments; earlier initial-fix samples are excluded from all interval/counter totals.",
+  "deployment": {
+    "reportedEffectiveAt": "2026-10-23T13:09:42.000Z",
+    "source": "Parent agent official deployment result; approximate effective time, not inferred from snapshots."
+  },
+  "window": {
+    "firstSnapshotAt": "2026-10-23T13:10:15.553Z",
+    "lastSnapshotAt": "2026-10-23T13:14:21.437Z",
+    "elapsedMs": 245884,
+    "snapshotCount": 5,
+    "finalGroupCount": 31,
+    "unionGroups": 31,
+    "stableIntersectionGroups": 31,
+    "allDeclaredGroupsFreshInEverySnapshot": true,
+    "allRecomputedGroupsFreshInEverySnapshot": true,
+    "comparableGroups": 31,
+    "nonComparableGroups": 0,
+    "requestsAdded": 116,
+    "successesAdded": 115,
+    "failuresAdded": 1,
+    "persistenceFailuresAdded": 0,
+    "groupsWithoutNewRequest": 0,
+    "groupsWithoutNewSuccess": 0,
+    "recordedRequestIntervals": {
+      "comparableGroups": 31,
+      "count": 116,
+      "sumMs": 7866121,
+      "weightedMeanMs": 67811.38793103448
+    },
+    "recordedSuccessfulResultIntervals": {
+      "comparableGroups": 31,
+      "count": 115,
+      "sumMs": 7871852,
+      "weightedMeanMs": 68450.88695652173
+    },
+    "recordedHttpLatency": {
+      "comparableGroups": 31,
+      "count": 116,
+      "sumMs": 79959,
+      "weightedMeanMs": 689.301724137931
+    },
+    "perGroupRequestCountFrequency": {
+      "2": 2,
+      "3": 9,
+      "4": 15,
+      "5": 5
+    },
+    "perGroupSuccessCountFrequency": {
+      "2": 3,
+      "3": 8,
+      "4": 15,
+      "5": 5
+    }
+  },
+  "exactSingleIntervalObservations": {
+    "requestIntervals": {
+      "count": 94,
+      "minimumMs": 30822,
+      "maximumMs": 143400,
+      "meanMs": 70212.13829787234
+    },
+    "successfulResultIntervals": {
+      "count": 93,
+      "minimumMs": 30628,
+      "maximumMs": 162708,
+      "meanMs": 71087.12903225806
+    },
+    "durablySavedKnownResultIntervals": {
+      "count": 93,
+      "minimumMs": 30628,
+      "maximumMs": 162708,
+      "meanMs": 71087.12903225806
+    },
+    "entirelyAfterDeployment": {
+      "requestIntervals": {
+        "count": 73,
+        "minimumMs": 30822,
+        "maximumMs": 143400,
+        "meanMs": 69653.75342465754
+      },
+      "successfulResultIntervals": {
+        "count": 72,
+        "minimumMs": 30628,
+        "maximumMs": 143782,
+        "meanMs": 69376.59722222222
+      },
+      "durablySavedKnownResultIntervals": {
+        "count": 72,
+        "minimumMs": 30628,
+        "maximumMs": 143782,
+        "meanMs": 69376.59722222222
+      }
+    },
+    "excludedMultiRequestSegments": 11,
+    "excludedMultiSuccessSegments": 11,
+    "zeroRequestProgressSegments": 19
+  },
+  "anomalyReview": {
+    "recoveredFailures": [
+      {
+        "id": "group-006",
+        "failuresAdded": 1,
+        "errorCategory": "timeout_reported",
+        "lastFailureAt": "2026-10-23T13:10:34.844Z",
+        "firstObservedRecoveredSuccessAt": "2026-10-23T13:12:09.144Z",
+        "firstRecoveredSnapshotAt": "2026-10-23T13:12:20.185Z",
+        "recoveredBeforeWindowEnd": true,
+        "finalConsecutiveFailures": 0,
+        "note": "Error classification uses the saved error text; it does not establish which HTTP or persistence stage caused a timeout."
+      }
+    ],
+    "longerThanTwiceTargetPeriod": [
+      {
+        "id": "group-008",
+        "fromSnapshotAt": "2026-10-23T13:13:21.133Z",
+        "toSnapshotAt": "2026-10-23T13:14:21.437Z",
+        "exactSingleRequestIntervalMs": 143400,
+        "exactSingleSuccessfulResultIntervalMs": 143782,
+        "failuresAddedInSegment": 0
+      },
+      {
+        "id": "group-012",
+        "fromSnapshotAt": "2026-10-23T13:12:20.185Z",
+        "toSnapshotAt": "2026-10-23T13:13:21.133Z",
+        "exactSingleRequestIntervalMs": 120921,
+        "exactSingleSuccessfulResultIntervalMs": 120848,
+        "failuresAddedInSegment": 0
+      }
+    ],
+    "finalMaximumDurableSuccessAgeMs": 77456,
+    "maximumDurableSuccessAgeObservedAtAnySnapshotMs": 136429,
+    "provenZeroRequestIntervalSegments": 0
+  },
+  "limitations": [
+    "Anonymized group numbers are stable only within this report. No owner, user, store, SKU, target key, credentials or token identifiers are emitted.",
+    "31 or any later current group count comes from final status. Only keys retained in every final snapshot contribute to the full-window counter/interval totals. Group additions/removals are listed separately.",
+    "Recorded interval means use differences in cumulative count/sumMs, representing intervals completed during the final snapshot window. The first completed interval may start before its first snapshot or deployment; strictly post-deployment exact single intervals are separately reported.",
+    "A timestamp span with more than one added request/success is not one interval. Exact single intervals require the relevant cumulative counter to increase by exactly one. A 59-second poll need not contain exactly one request.",
+    "The inherited lifetime maxMs is not a window maximum; no p95 is reconstructed. Observed exact-single minima/maxima cover only individually recoverable intervals and are not whole-window extrema.",
+    "Scheduler request times precede admission/HTTP work. Success times include the upstream outcome transaction. Durable equality validates the corresponding saved success but does not reconstruct all raw HTTP/DB stage timings.",
+    "Snapshot counters and timestamps cannot exclude transient same-instant duplicates hidden inside a multi-request segment; exact-phase behavior also requires code regression tests.",
+    "Invocation stats reset each scheduled invocation and are displayed only per snapshot, never differenced or summed as cumulative totals.",
+    "Freshness is measured against the configured stale threshold; it does not establish an exact 60-second SLA or real WeChat phone receipt. Sender authReady only verifies sender readiness."
+  ]
+}

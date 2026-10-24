@@ -1,0 +1,38 @@
+{
+  "checkedAt": "2026-10-24T00:18:33.118Z",
+  "functions": {
+    "gxs_api": {
+      "success": true,
+      "taskId": "confirmation_cloud_fn_inc_deploy_e38738d2-b4c3-471c-8140-2c58996f3fdf",
+      "taskType": "confirmation_cloud_fn_inc_deploy",
+      "status": "success",
+      "createdAt": 1792801075594,
+      "updatedAt": 1792801086651,
+      "detail": "execution_success",
+      "result": {
+        "name": "gxs_api",
+        "filesCount": 3,
+        "packSize": "15.7 KB"
+      }
+    },
+    "gxs_monitor": {
+      "success": true,
+      "taskId": "confirmation_cloud_fn_inc_deploy_fd6df7d3-f6b7-4f5f-ba73-a5164d4f8cc3",
+      "taskType": "confirmation_cloud_fn_inc_deploy",
+      "status": "success",
+      "createdAt": 1792801075770,
+      "updatedAt": 1792801085806,
+      "detail": "execution_success",
+      "result": {
+        "name": "gxs_monitor",
+        "filesCount": 3,
+        "packSize": "12.4 KB"
+      }
+    }
+  },
+  "temporaryAcceptanceEntryActive": false,
+  "deployedAt": "2026-10-24T00:18:06.651Z",
+  "formalEntryRestoredAt": "2026-10-24T00:24:12.853Z",
+  "downloadedCandidateMatch": true,
+  "comparedFiles": 123
+}

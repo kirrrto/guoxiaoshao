@@ -1,0 +1,234 @@
+{
+  "version": "3.4.0",
+  "checkedAt": "2026-10-24T00:21:13.882Z",
+  "kind": "controlled_cloud_automatic_notification_acceptance",
+  "syntheticInventory": true,
+  "realCloudDatabase": true,
+  "realWechatPlatform": true,
+  "naturalAppleInventoryChange": false,
+  "phoneReceipt": {
+    "verified": true,
+    "maintainerReply": "两条都收到，没有重复",
+    "replyRecordedAt": "2026-10-24T00:22:33.332Z",
+    "duplicateReceived": false,
+    "exactArrivalTimeKnown": false
+  },
+  "inputSequence": [
+    "unavailable",
+    "unavailable",
+    "available",
+    "available",
+    "unavailable",
+    "unavailable"
+  ],
+  "source": "temporary maintainer-only entry using existing collector, observation confirmation, event planning, atomic outbox and real sender",
+  "scopeLimits": [
+    "Private accelerated sampling does not measure production minute trigger cadence",
+    "Private event messages route to the follow page, not public production event details"
+  ],
+  "samples": [
+    {
+      "step": 0,
+      "startedAt": "2026-10-24T00:19:18.167Z",
+      "finishedAt": "2026-10-24T00:19:25.187Z",
+      "observedAt": "2026-10-24T00:19:23.768Z",
+      "status": "unavailable",
+      "observations": 1,
+      "tasks": 0,
+      "sent": 0,
+      "acceptedCount": 0
+    },
+    {
+      "step": 1,
+      "startedAt": "2026-10-24T00:19:34.502Z",
+      "finishedAt": "2026-10-24T00:19:40.532Z",
+      "observedAt": "2026-10-24T00:19:39.173Z",
+      "status": "unavailable",
+      "observations": 1,
+      "tasks": 0,
+      "sent": 0,
+      "acceptedCount": 0
+    },
+    {
+      "step": 2,
+      "startedAt": "2026-10-24T00:19:47.402Z",
+      "finishedAt": "2026-10-24T00:19:53.922Z",
+      "observedAt": "2026-10-24T00:19:52.103Z",
+      "status": "available",
+      "observations": 1,
+      "tasks": 0,
+      "sent": 0,
+      "acceptedCount": 0
+    },
+    {
+      "step": 3,
+      "startedAt": "2026-10-24T00:19:53.995Z",
+      "finishedAt": "2026-10-24T00:20:04.493Z",
+      "observedAt": "2026-10-24T00:19:59.724Z",
+      "status": "available",
+      "observations": 1,
+      "tasks": 1,
+      "sent": 1,
+      "acceptedCount": 1
+    },
+    {
+      "step": 4,
+      "startedAt": "2026-10-24T00:20:04.582Z",
+      "finishedAt": "2026-10-24T00:20:11.245Z",
+      "observedAt": "2026-10-24T00:20:09.482Z",
+      "status": "unavailable",
+      "observations": 1,
+      "tasks": 0,
+      "sent": 0,
+      "acceptedCount": 1
+    },
+    {
+      "step": 5,
+      "startedAt": "2026-10-24T00:20:11.317Z",
+      "finishedAt": "2026-10-24T00:20:19.731Z",
+      "observedAt": "2026-10-24T00:20:16.065Z",
+      "status": "unavailable",
+      "observations": 1,
+      "tasks": 1,
+      "sent": 1,
+      "acceptedCount": 2
+    }
+  ],
+  "notifications": [
+    {
+      "eventType": "became_unavailable",
+      "status": "accepted",
+      "reason": null,
+      "detectedAt": "2026-10-24T00:20:09.482Z",
+      "createdAt": "2026-10-24T00:20:16.667Z",
+      "startedAt": "2026-10-24T00:20:17.487Z",
+      "sentAt": "2026-10-24T00:20:18.857Z",
+      "attempts": 1,
+      "reserved": true,
+      "released": false,
+      "eventHash": "7a202c850f40bc0c6d6a3082eb847afb0a70387798437624113a5915bfc9d0d5",
+      "taskHash": "7ae57e7a1603cccb4106b8f646cb7f2d75543abcad6b0a3ae1c7f82975784334",
+      "confirmedObservationAt": "2026-10-24T00:20:16.065Z",
+      "detectedToAcceptedMs": 9375,
+      "confirmedToAcceptedMs": 2792,
+      "claimToAcceptedMs": 1370
+    },
+    {
+      "eventType": "restock_confirmed",
+      "status": "accepted",
+      "reason": null,
+      "detectedAt": "2026-10-24T00:19:52.103Z",
+      "createdAt": "2026-10-24T00:20:00.602Z",
+      "startedAt": "2026-10-24T00:20:01.859Z",
+      "sentAt": "2026-10-24T00:20:03.562Z",
+      "attempts": 1,
+      "reserved": true,
+      "released": false,
+      "eventHash": "bcce7fc0552211ced978ed30f6f8d533f0ae1edd959b175a894130b19e1b2cbb",
+      "taskHash": "f7aa69d5649d5ecf37e9487eeb9a244565a81993e47d761e2b4857858f8db748",
+      "confirmedObservationAt": "2026-10-24T00:19:59.724Z",
+      "detectedToAcceptedMs": 11459,
+      "confirmedToAcceptedMs": 3838,
+      "claimToAcceptedMs": 1703
+    }
+  ],
+  "replays": [
+    {
+      "finishedAt": "2026-10-24T00:20:36.882Z",
+      "acceptedCount": 2,
+      "attempts": [
+        1,
+        1
+      ]
+    },
+    {
+      "finishedAt": "2026-10-24T00:20:42.142Z",
+      "acceptedCount": 2,
+      "attempts": [
+        1,
+        1
+      ]
+    }
+  ],
+  "credits": {
+    "before": {
+      "restock": 13,
+      "soldout": 28,
+      "observedAt": "2026-10-24T00:19:02.810Z",
+      "source": "initial preflight tool response"
+    },
+    "after": {
+      "restock": 12,
+      "soldout": 27,
+      "observedAt": "2026-10-24T00:20:58.271Z"
+    },
+    "consumed": {
+      "restock": 1,
+      "soldout": 1
+    }
+  },
+  "queue": {
+    "pending": 0,
+    "sending": 0,
+    "uncertain": 0,
+    "failed": 0
+  },
+  "cleanup": {
+    "done": true,
+    "cleanedAt": "2026-10-24T00:23:44.455Z",
+    "retainedTombstone": true,
+    "realCreditsRefunded": false,
+    "previousAttempt": {
+      "done": false,
+      "attemptedAt": "2026-10-24T00:21:13.977Z",
+      "result": "e2e_internal_error",
+      "privateCollectionCountsAfterAttempt": {
+        "config": 9,
+        "follows": 1,
+        "latest": 1,
+        "events": 2,
+        "observation_days": 1,
+        "notifications": 2
+      },
+      "impact": "Private acceptance records remain; no additional messages sent and no public inventory/follows modified by cleanup"
+    },
+    "verifiedCollectionCounts": {
+      "checkedAt": "2026-10-24T00:24:38.065Z",
+      "collections": {
+        "config": {
+          "total": 2,
+          "data": [
+            {},
+            {
+              "cleanedAt": "2026-10-24T00:23:44.455Z",
+              "nextStep": 6
+            }
+          ]
+        },
+        "follows": {
+          "total": 0,
+          "data": []
+        },
+        "latest": {
+          "total": 0,
+          "data": []
+        },
+        "events": {
+          "total": 0,
+          "data": []
+        },
+        "observation_days": {
+          "total": 0,
+          "data": []
+        },
+        "notifications": {
+          "total": 0,
+          "data": []
+        }
+      }
+    }
+  },
+  "originalEntryRestored": true,
+  "restoredAt": "2026-10-24T00:24:12.853Z",
+  "status": "passed_controlled_cloud_chain_and_phone_receipt"
+}

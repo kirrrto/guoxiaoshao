@@ -14,13 +14,17 @@ const { guardedPickup } = require('./guarded-pickup');
 const { createScheduler, buildGroups } = require('./scheduler');
 const { createLeaseKeeper } = require('./lease');
 const { recordObservations } = require('./observations');
-const { buildTasks, sendTask, TASK_STATUS, alertKind } = require('./notifier');
+const { buildTasks, sendTask, TASK_STATUS } = require('./notifier');
 const { targetKeyOf } = require('./events');
 const { AUTO_SHARE, DAY_MS } = require('./capacity-budget');
 const { observationHealth } = require('./observation-health');
 const { currentAvailabilityEvent } = require('./current-availability');
 
 const NOTIFICATION_RECONCILE_INTERVAL_MS = 30000;
+const NOTIFICATION_PLAN_PAGE_SIZE = 50;
+const NOTIFICATION_PLAN_MAX_PAGES = 4;
+const NOTIFICATION_PLAN_TASK_LIMIT = 20;
+const NOTIFICATION_PLAN_SLICE_MS = 5000;
 
 function createCollector({ repo, fetchImpl, clock = () => new Date(), log = console, sendImpl = null, ownerId = `collector-${process.pid}-${Date.now()}`, sleep = ms => new Promise(resolve => setTimeout(resolve, ms)), refreshEveryMs = 10000, statusEveryMs = 5000, mode = 'resident', minimumIntervalMs = 0, statusTtlMs = 0, shouldContinue = () => true, remainingMs = () => Infinity }) {
   let config = mergeConfig(null);
@@ -106,36 +110,70 @@ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = cons
     return Date.parse(latest.knownAt) > Date.parse(latest.knownStreakSince || event.detectedAt) ? 'confirmed' : 'waiting';
   }
 
-  async function planEvents(events, planningConfig) {
-    const follows = await repo.listActiveFollows();
-    const users = await loadFollowUsers(repo, follows, clock());
-    const alerting = events.filter(e => alertKind(e.type));
-    const latestByKey = new Map((alerting.length ? await repo.getLatest([...new Set(alerting.map(e => targetKeyOf(e.storeNumber, e.partNumber)))]) : []).map(l => [l._id, l]));
-    const now = clock();
+  async function planEvents(planningConfig) {
+    // Bound planning independently of delivery. Slow task inserts must leave
+    // time to send already-durable tasks before this invocation ends.
+    const deadline = clock().getTime() + Math.min(NOTIFICATION_PLAN_SLICE_MS, Math.max(0, remainingMs() - 2000));
+    const canPlan = () => !stopping && shouldContinue() && lease.isHeld() && clock().getTime() < deadline;
     const maxAgeMs = (planningConfig.notifications.maxEventAgeSeconds || 120) * 1000;
-    for (const event of events) {
-      if (!shouldContinue()) break;
-      let planned = [event];
-      if (alertKind(event.type)) {
+    const since = new Date(clock().getTime() - Math.max(600000, maxAgeMs)).toISOString();
+    let snapshot = null;
+    let taskCount = 0;
+    for (let page = 0; page < NOTIFICATION_PLAN_MAX_PAGES && canPlan(); page++) {
+      let events = await repo.listUnprocessedEvents({ limit: NOTIFICATION_PLAN_PAGE_SIZE, since, cursor: stats.notificationEventCursor });
+      // A saved cursor can point past a now-empty tail after other work
+      // completed. Wrap once, then the page bound prevents waiting-event spins.
+      if (!events.length && page === 0 && stats.notificationEventCursor) {
+        stats.notificationEventCursor = null;
+        events = await repo.listUnprocessedEvents({ limit: NOTIFICATION_PLAN_PAGE_SIZE, since });
+      }
+      if (!events.length) { stats.notificationEventCursor = null; break; }
+      const latestByKey = new Map((await repo.getLatest([...new Set(events.map(e => targetKeyOf(e.storeNumber, e.partNumber)))])).map(l => [l._id, l]));
+      for (const event of events) {
+        if (!canPlan() || !await lease.renew()) return { snapshot, more: taskCount > 0 };
+        const nextCursor = { detectedAt: event.detectedAt, id: event._id };
+        const now = clock();
         const state = await confirmation(event, latestByKey.get(targetKeyOf(event.storeNumber, event.partNumber)));
-        const expired = now.getTime() - Date.parse(event.detectedAt) > maxAgeMs;
-        if (state === 'waiting' && !expired) {
-          // Check this store right away; the next drain plans the event once confirmed.
+        if (state === 'waiting' && now.getTime() - Date.parse(event.detectedAt) <= maxAgeMs) {
           scheduler.hurry(event.storeNumber, Date.parse(event.detectedAt));
+          // Leave this event unplanned, but do not let it hide later alerts.
+          stats.notificationEventCursor = nextCursor;
           continue;
         }
-        if (state !== 'confirmed') planned = [];
+        if (!snapshot && state === 'confirmed') {
+          const follows = await repo.listActiveFollows();
+          snapshot = { follows, users: await loadFollowUsers(repo, follows, clock()) };
+        }
+        const tasks = state === 'confirmed' ? buildTasks({ events: [event], ...snapshot, config: planningConfig, now })
+          .filter(task => task.userKey > (event.notificationPlanningAfterUserKey || ''))
+          .sort((a, b) => a.userKey < b.userKey ? -1 : a.userKey > b.userKey ? 1 : 0) : [];
+        let afterUserKey = event.notificationPlanningAfterUserKey || null;
+        let uncommitted = 0;
+        const checkpoint = async complete => {
+          if (!await lease.renew()) throw new Error('collector_lease_lost');
+          await repo.checkpointEventPlanning({ eventId: event._id, afterUserKey, complete, ownerId, nowIso: clock().toISOString() });
+          uncommitted = 0;
+        };
+        for (const task of tasks) {
+          if (!canPlan() || taskCount >= NOTIFICATION_PLAN_TASK_LIMIT || !await lease.renew()) {
+            if (uncommitted) await checkpoint(false);
+            return { snapshot, more: taskCount > 0 };
+          }
+          if (await repo.saveNotification(task)) stats.tasks += 1;
+          afterUserKey = task.userKey;
+          taskCount += 1;
+          uncommitted += 1;
+          if (uncommitted >= 10) await checkpoint(false);
+        }
+        // Completion is separate from partial progress. Crashes replay only
+        // the unsaved chunk; deterministic task ids still dedupe every replay.
+        await checkpoint(true);
+        stats.notificationEventCursor = nextCursor;
+        if (taskCount >= NOTIFICATION_PLAN_TASK_LIMIT) return { snapshot, more: true };
       }
-      const tasks = buildTasks({ events: planned, follows, users, config: planningConfig, now });
-      for (const task of tasks) {
-        if (!shouldContinue()) return;
-        if (await repo.saveNotification(task)) stats.tasks += 1;
-      }
-      // Only commit the cursor after ALL deterministic tasks are durable. A
-      // failure/restart replays planning safely; already-created tasks dedupe.
-      await repo.markEventPlanned(event._id, now.toISOString());
+      if (events.length < NOTIFICATION_PLAN_PAGE_SIZE) { stats.notificationEventCursor = null; break; }
     }
-    return { follows, users };
+    return { snapshot, more: false };
   }
 
   async function planCurrentAvailability(planningConfig, planningSnapshot) {
@@ -189,7 +227,7 @@ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = cons
     notificationWork = serialised(async () => {
       while (notificationRequested && concurrentNotifications() && !stopping && lease.isHeld() && shouldContinue()) {
         notificationRequested = false;
-        await notificationPass();
+        if (await notificationPass()) notificationRequested = true;
       }
     }).catch(error => {
       log.error('[collector] notification pass failed', error && error.message);
@@ -220,13 +258,10 @@ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = cons
           pendingBefore: new Date(reconcileAt.getTime() - (notificationConfig.notifications.maxEventAgeSeconds || 120) * 1000).toISOString() });
         lastNotificationReconcileAt = reconcileAt.getTime();
       }
-      // Ten minutes is well past the send window, so an old backlog never delays new alerts.
-      const since = new Date(clock().getTime() - Math.max(600, notificationConfig.notifications.maxEventAgeSeconds || 120) * 1000).toISOString();
-      const events = await repo.listUnprocessedEvents({ limit: 50, since });
-      const planningSnapshot = events.length ? await planEvents(events, notificationConfig) : null;
-      if (!sendImpl || sendImpl.enabled === false) return;
-      if (typeof sendImpl.getHealth === 'function' && !sendImpl.getHealth().authReady) return;
-      await planCurrentAvailability(notificationConfig, planningSnapshot);
+      const planning = await planEvents(notificationConfig);
+      if (!sendImpl || sendImpl.enabled === false) return planning.more;
+      if (typeof sendImpl.getHealth === 'function' && !sendImpl.getHealth().authReady) return planning.more;
+      await planCurrentAvailability(notificationConfig, planning.snapshot);
       for (const task of await repo.listPendingNotifications({ limit: 20 })) {
         if (stopping || !shouldContinue() || !await lease.renew()) break;
         if (typeof sendImpl.getHealth === 'function' && !sendImpl.getHealth().authReady) break;
@@ -234,6 +269,7 @@ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = cons
           beforeSend: async () => !stopping && shouldContinue() && await lease.renew() && lease.isHeld() && shouldContinue() });
         if (result.status === TASK_STATUS.accepted) stats.sent += 1;
       }
+      return planning.more;
   }
 
   async function refreshTargets() {

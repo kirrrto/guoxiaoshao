@@ -1,0 +1,44 @@
+{
+  "source": "read-only replay of the three stale groups from production checkpoint; fake clock, HTTP results and persistence only",
+  "trackedStaleGroups": 3,
+  "before": {
+    "totalRequests": 0,
+    "invocations": [
+      {
+        "minute": 0,
+        "requests": 0,
+        "stillStaleGroups": 3
+      },
+      {
+        "minute": 1,
+        "requests": 0,
+        "stillStaleGroups": 3
+      },
+      {
+        "minute": 2,
+        "requests": 0,
+        "stillStaleGroups": 3
+      }
+    ]
+  },
+  "after": {
+    "totalRequests": 9,
+    "invocations": [
+      {
+        "minute": 0,
+        "requests": 3,
+        "stillStaleGroups": 0
+      },
+      {
+        "minute": 1,
+        "requests": 3,
+        "stillStaleGroups": 0
+      },
+      {
+        "minute": 2,
+        "requests": 3,
+        "stillStaleGroups": 0
+      }
+    ]
+  }
+}

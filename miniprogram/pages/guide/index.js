@@ -1,11 +1,10 @@
 const guide = require('../../config/usage-guide');
-const { activeCalendars, withFollowReadiness } = require('../../utils/launch-calendar');
 const { currentCatalog, subscribeCatalog } = require('../../utils/store');
 const { storeLabel } = require('../../utils/store-label');
 const { sourceOf, currentOwner, returnToSource } = require('../../utils/journey-context');
 const { VERSION } = require('../../config/version');
 const { shareAppMessage, shareTimeline } = require('../../utils/share');
-const SECTIONS = ['pickup', 'notification', 'membership', 'prepare', 'monitor', 'calendar', 'faq', 'history'];
+const SECTIONS = ['pickup', 'notification', 'membership', 'prepare', 'monitor', 'faq', 'history'];
 const ERROR_CODES = ['needs_authorization', 'subscription_rejected', 'subscription_disabled', 'notification_test_account_changed', 'call_failed', 'test_request_timeout', 'insufficient_credits'];
 function readGuideTarget(options) {
   if (typeof options.gxsPart !== 'string' || options.gxsPart.length > 80 || typeof options.gxsStores !== 'string' || options.gxsStores.length > 160) return null;
@@ -20,12 +19,13 @@ function readGuideTarget(options) {
 
 Page({
   data: { stages: guide.stages, stage: guide.stages[0], stageId: 'prepare', faqs: guide.faqs,
-    faqOpen: '', showLaunchPoster: false, calendarExpanded: false, calendars: [], checkedOn: guide.checkedOn,
+    faqOpen: '', checkedOn: guide.checkedOn,
     section: '', focusedFaq: null, targetSummary: null, returnLabel: '返回提醒中心', pickupSteps: guide.stages.find(item => item.id === 'pickup').steps },
   onLoad(options = {}) {
-    const section = SECTIONS.includes(options.section) ? options.section : '';
+    // Previously shared calendar links now lead directly to the buying guide.
+    const section = options.section === 'calendar' ? 'prepare' : SECTIONS.includes(options.section) ? options.section : '';
     const stageId = section === 'pickup' ? 'notice' : section === 'notification' || section === 'monitor' ? 'monitor'
-      : section === 'calendar' || section === 'prepare' ? 'prepare' : options.stage;
+      : section === 'prepare' ? 'prepare' : options.stage;
     let stage = guide.stages.find(item => item.id === stageId) || guide.stages[0];
     if (section === 'pickup') stage = { ...stage, title: '核对配置，前往官方下单',
       note: '适用于 Apple 中国大陆官方商店；门店可取货情况以结账页面为准。',
@@ -38,23 +38,21 @@ Page({
     this.setData({ stage, stageId: stage.id,
       section, focusedFaq: guide.faqs.find(item => item.id === faqId) || null,
       returnLabel: { query: '返回原查询', follow: '返回小哨任务', history: '返回历史', mine: '返回提醒中心', guide: '返回提醒中心' }[this.returnSource],
-      showLaunchPoster: section === 'calendar', calendarExpanded: false,
       faqOpen: guide.faqs.some(item => item.id === faqId) ? faqId : '' });
-    this.refreshCalendars(currentCatalog());
+    this.refreshTarget(currentCatalog());
   },
   onShow() {
-    if (!this.unsubscribeCatalog) this.unsubscribeCatalog = subscribeCatalog(catalog => this.refreshCalendars(catalog));
-    this.refreshCalendars(currentCatalog());
+    if (!this.unsubscribeCatalog) this.unsubscribeCatalog = subscribeCatalog(catalog => this.refreshTarget(catalog));
+    this.refreshTarget(currentCatalog());
   },
   onUnload() { if (this.unsubscribeCatalog) this.unsubscribeCatalog(); this.unsubscribeCatalog = null; },
-  refreshCalendars(catalog) {
+  refreshTarget(catalog) {
     const target = this.sharedTarget;
     const products = catalog && catalog.productByPart || {};
     const stores = catalog && catalog.storeByNumber || {};
     const product = target && Object.prototype.hasOwnProperty.call(products, target.partNumber) ? products[target.partNumber] : null;
     const valid = product && target.storeNumbers.every(number => Object.prototype.hasOwnProperty.call(stores, number));
-    this.setData({ calendars: this.data.showLaunchPoster ? activeCalendars().map(calendar => withFollowReadiness(calendar, catalog)) : [],
-      targetSummary: valid ? { title: product.title, stores: target.storeNumbers.map(number => storeLabel(number, stores[number].name)).join('、') } : null });
+    this.setData({ targetSummary: valid ? { title: product.title, stores: target.storeNumbers.map(number => storeLabel(number, stores[number].name)).join('、') } : null });
   },
   onSelectStage(event) {
     const stage = guide.stages.find(item => item.id === event.currentTarget.dataset.id);
@@ -64,18 +62,10 @@ Page({
     const id = event.currentTarget.dataset.id;
     if (guide.faqs.some(item => item.id === id)) this.setData({ faqOpen: this.data.faqOpen === id ? '' : id });
   },
-  onToggleCalendar() { this.setData({ calendarExpanded: !this.data.calendarExpanded }); },
-  onCalendarImageError(event) {
-    const index = Number(event.currentTarget.dataset.index);
-    if (Number.isInteger(index) && this.data.calendars[index]) {
-      this.setData({ [`calendars[${index}].imageDisplayUrl`]: '' });
-    }
-  },
   onStageAction() {
     const action = this.data.stage.action;
     if (action === 'query' || action === 'follow') wx.switchTab({ url: `/pages/${action}/index` });
   },
-  onCalendarPlan() { wx.switchTab({ url: '/pages/query/index' }); },
   onTestNotification() { wx.navigateTo({ url: '/pages/notification-test/index?from=guide' }); },
   onCheckReminders() { getApp().globalData.pendingMineSection = 'reminder-center'; wx.switchTab({ url: '/pages/mine/index' }); },
   onCheckFollows() { wx.switchTab({ url: '/pages/follow/index' }); },

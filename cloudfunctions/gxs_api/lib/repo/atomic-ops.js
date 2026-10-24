@@ -204,6 +204,18 @@ function atomicMethods(run) {
       return view;
     }),
 
+    checkpointEventPlanning: ({ eventId, afterUserKey = null, complete = false, ownerId, nowIso }) => run(async tx => {
+      const lease = await tx.get(C.config, 'collector_lease');
+      if (!lease || lease.ownerId !== ownerId || lease.expiresAt <= nowIso) throw new ApiError('collector_lease_lost', '采集执行权已转移');
+      const event = await tx.get(C.events, eventId);
+      if (!event || event.notificationPlannedAt) return;
+      // A partial plan is not a completed event. Only durable tasks precede
+      // this monotone cursor, so a restart replays at most one small chunk.
+      if (afterUserKey && afterUserKey > (event.notificationPlanningAfterUserKey || '')) event.notificationPlanningAfterUserKey = afterUserKey;
+      if (complete) event.notificationPlannedAt = nowIso;
+      await tx.put(C.events, event);
+    }),
+
     saveNotification: notification => run(async tx => {
       if (await tx.get(C.notifications, notification._id)) return false;
       if (typeof notification.userKey !== 'string' || !notification.userKey) throw new ApiError('invalid_notification', '提醒缺少用户身份');

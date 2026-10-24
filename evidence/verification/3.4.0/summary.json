@@ -1,0 +1,226 @@
+{
+  "checkedAt": "2026-10-24T00:26:53.277Z",
+  "version": "3.4.0",
+  "stage": "release_candidate",
+  "tests": {
+    "total": 1642,
+    "passed": 1642,
+    "failed": 0,
+    "skipped": 0,
+    "durationMs": 59163.257625,
+    "log": "transaction-full-tests.log"
+  },
+  "sourceChecks": {
+    "files": 549,
+    "errors": 0,
+    "log": "transaction-source-check.log"
+  },
+  "nativeCompilation": {
+    "checkedAt": "2026-10-23T09:48:16.922Z",
+    "scope": "Native WXML/WXSS compilation only; not device or cloud quality acceptance",
+    "results": [
+      {
+        "compiler": "wcc",
+        "files": 11,
+        "status": 0,
+        "stderr": "",
+        "outputBytes": 337889
+      },
+      {
+        "compiler": "wcsc",
+        "files": 15,
+        "status": 0,
+        "stderr": "",
+        "outputBytes": 29249
+      }
+    ]
+  },
+  "sourceFingerprint": "sha256:2fae39fb185f42555a2c23a6907527477c4c02288957b535d7fccd190974736f",
+  "sourceChecksPassed": true,
+  "publicationReady": false,
+  "qualityRetestOpen": [
+    "unused-channel-video",
+    "custom-tabbar-first-switch",
+    "oversized-product-image",
+    "legacy-product-image-format"
+  ],
+  "frontendPublication": {
+    "uploaded": false,
+    "submitted": false,
+    "published": false
+  },
+  "production": {
+    "initialSchedulerRepair": "deployed and verified over five snapshots",
+    "remainingCoreFixes": "Deployed and verified against downloaded candidate source; no pending core code deployment.",
+    "deployedPackageMetadataVersion": "3.4.0",
+    "runtimeCapacityChanged": false,
+    "actualPhoneReceiptVerified": true,
+    "finalWindow": {
+      "start": "2026-10-24T00:19:36.885Z",
+      "end": "2026-10-24T00:24:27.898Z",
+      "elapsedMs": 291013,
+      "snapshotCount": 6,
+      "initialGroupCount": 30,
+      "finalGroupCount": 30,
+      "comparableGroupCount": 30,
+      "stableIntersectionGroupCount": 30,
+      "requestsAdded": 148,
+      "successesAdded": 147,
+      "failuresAdded": 1,
+      "persistenceFailuresAdded": 0,
+      "groupsWithNewSuccess": 30,
+      "allFramesHealthy": true,
+      "maximumSnapshotDurableSuccessAgeMs": 57733,
+      "maximumRetrievalDurableSuccessAgeMs": 90517,
+      "allFramesFreshAtRetrieval": true,
+      "strictEndpointCutoff": "2026-10-24T00:19:00.000Z",
+      "successfulIntervalMeanMs": 60310.54421768708,
+      "exactSingleSuccessIntervals": {
+        "count": 137,
+        "minimumMs": 41455,
+        "maximumMs": 95528,
+        "meanMs": 60038.153284671534
+      },
+      "strict60SecondCadenceVerified": false,
+      "timeoutRecovered": true,
+      "newTransactionConflictFailures": 0
+    },
+    "notificationQueue": {
+      "checkedAt": "2026-10-24T00:27:03.417Z",
+      "scope": "Public production notifications collection",
+      "pendingSendingUncertain": 0,
+      "senderReady": true
+    },
+    "followup": {
+      "stage": "deployed_source_verified_and_observed",
+      "cancelledTargetPriority": "preserve original due with guard-based retry",
+      "scanWindowMs": 45000,
+      "verifiedCloudTimeoutSeconds": 60,
+      "deployed": true,
+      "files": [
+        {
+          "path": "cloudfunctions/gxs_api/lib/engine/scheduler.js",
+          "sha256": "81f16542f824c80ab525c0bb2028835042db2ab58bda61cd3b2f201734052a11"
+        },
+        {
+          "path": "cloudfunctions/gxs_api/lib/engine/scheduled.js",
+          "sha256": "64fbc145d9dd225c53761c10bb9999fb145f6540bb801d7708d779d0438da616"
+        },
+        {
+          "path": "cloudfunctions/gxs_monitor/lib/engine/scheduler.js",
+          "sha256": "81f16542f824c80ab525c0bb2028835042db2ab58bda61cd3b2f201734052a11"
+        },
+        {
+          "path": "cloudfunctions/gxs_monitor/lib/engine/scheduled.js",
+          "sha256": "64fbc145d9dd225c53761c10bb9999fb145f6540bb801d7708d779d0438da616"
+        }
+      ],
+      "deployedAt": "2026-10-23T13:32:29.687Z",
+      "libraryFilesVerified": 112
+    },
+    "preFollowupWindow": {
+      "start": "2026-10-23T13:10:15.553Z",
+      "end": "2026-10-23T13:14:21.437Z",
+      "groups": 31,
+      "snapshots": 5,
+      "staleGroups": 0,
+      "newRequests": 116,
+      "newSuccesses": 115,
+      "newFailures": 1,
+      "persistenceFailures": 0,
+      "recoveredFailures": 1,
+      "successIntervalMeanMs": 68450.88695652173,
+      "exactPostDeploymentSuccessIntervalMaxMs": 143782,
+      "strict60SecondCadenceVerified": false
+    },
+    "phoneReceiptScope": "Earlier manual test plus 2026-10-24 controlled automatic restock/soldout messages both received without duplicates.",
+    "actualAutomaticStockChangeDeliveryVerified": true,
+    "completeDownloadedSourceMatch": true,
+    "comparedSourceFiles": 123,
+    "automaticStockChangeDeliveryScope": "Synthetic inventory in isolated collections, actual collector/planner/outbox, real WeChat delivery, maintainer confirms both directions without duplicates; not natural Apple stock changes.",
+    "previousWindow20261023": {
+      "start": "2026-10-23T13:34:05.417Z",
+      "end": "2026-10-23T13:39:48.309Z",
+      "elapsedMs": 342892,
+      "snapshotCount": 6,
+      "finalGroupCount": 31,
+      "unionGroups": 31,
+      "stableIntersectionGroups": 31,
+      "comparableGroups": 31,
+      "requestsAdded": 189,
+      "successesAdded": 189,
+      "failuresAdded": 0,
+      "persistenceFailuresAdded": 0,
+      "groupsWithNewRequest": 31,
+      "groupsWithNewSuccessAfterCutoff": 31,
+      "groupsWithNewDurableSuccessAfterCutoff": 31,
+      "perGroupRequestFrequency": {
+        "6": 28,
+        "7": 3
+      },
+      "perGroupSuccessFrequency": {
+        "6": 28,
+        "7": 3
+      },
+      "allSnapshotsRecomputedFresh": true,
+      "successfulIntervalMeanMs": 58970.46031746032,
+      "exactSingleSuccessIntervals": {
+        "count": 122,
+        "minimumMs": 37086,
+        "maximumMs": 87679,
+        "meanMs": 62747.16393442623
+      },
+      "strict60SecondCadenceVerified": false
+    },
+    "transactionRepair": {
+      "deployedAt": "2026-10-24T00:18:06.651Z",
+      "maximumAttempts": 4,
+      "maxAdditionalRetryWaitMs": 347,
+      "sharedHealthyBreakerWritesReduced": true,
+      "actualSenderRetryAdded": false
+    },
+    "temporaryAcceptanceEntryActive": false,
+    "controlledAcceptanceQueue": {
+      "checkedAt": "2026-10-24T00:21:13.882Z",
+      "scope": "Isolated controlled automatic acceptance outbox",
+      "pendingSendingUncertain": 0,
+      "newAutomaticTasks": 2,
+      "accepted": 2,
+      "attemptsEach": 1,
+      "senderReady": true,
+      "phoneReceiptVerified": true
+    }
+  },
+  "evidence": {
+    "sampling": "../core-stability-20261023/sampling-before-after-redacted.json",
+    "notifications": "../core-stability-20261023/notification-summary-before.json",
+    "finalSampling": "post-transaction-window-2026-10-24.json",
+    "deployment": "core-deployment-results.json",
+    "notificationQueue": "notification-queue-final.json",
+    "clientReadiness": "client-follow-final.json",
+    "followupSampling": "followup-window-summary.json",
+    "followupDeployment": "followup-deployment-results.json",
+    "followupCodeComparison": "followup-deployed-core-comparison.json",
+    "phoneReceipt": "phone-receipt-followup.json",
+    "followupNotificationQueue": "notification-queue-followup.json",
+    "followupClientReadiness": "client-bootstrap-followup.json",
+    "transactionRepair": "transaction-conflict-repair.json",
+    "transactionDeployment": "transaction-deployment-results.json",
+    "automaticAcceptance": "controlled-automatic-acceptance.json",
+    "restoration": "controlled-acceptance-restoration.json",
+    "finalCodeComparison": "final-deployed-source-comparison.json",
+    "officialQuality": "wechat-quality-retest-status.json",
+    "finalNotificationQueue": "public-notification-queue-final.json"
+  },
+  "lastEvidenceUpdatedAt": "2026-10-24T00:27:19.142Z",
+  "coreAcceptance": {
+    "status": "completed_current_scope",
+    "scope": "Production window plus controlled automatic restock/soldout chain and confirmed phone receipt",
+    "strict60SecondSLA": false,
+    "naturalAppleChangeTest": false,
+    "frontendQuality": "deferred_by_maintainer"
+  },
+  "releaseBlockers": [
+    "WeChat official current-build quality retest deferred by maintainer; four findings remain open."
+  ]
+}

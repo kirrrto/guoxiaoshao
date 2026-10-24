@@ -111,6 +111,56 @@
 .hot-city-chip.chip { display: flex; align-items: center; justify-content: center; min-height: 36px; padding: 8rpx 4rpx; border-radius: 12rpx; font-size: max(12px, 24rpx); text-align: center; white-space: nowrap; }
 .selected { padding: 14rpx 16rpx; border-radius: 16rpx; }
 
+/* Component isolation and viewport-based rpx both outlive the sheet's width
+   limit. Keep the actual choices at readable touch sizes on an unfolded screen. */
+@media (min-width: 600px) {
+  .picker, .product-copy, .picker-current-summary, .label, .value, .chip,
+  .search-input, .search-placeholder, .store-result-name, .store-result-action { font-size: 14px; }
+  .section-label, .small, .tiny, .image-placeholder, .search-clear, .search-hint,
+  .search-summary, .store-result-city, .search-empty, .picker-count { font-size: 12px; }
+  .field-summary .label, .field-summary .value { font-size: 13px; }
+  .picker-section-heading { font-size: 16px; gap: 8px; }
+  .picker-current-summary { padding: 4px 0 8px; margin-bottom: 12px; }
+  .picker-current-summary > .small { margin-top: 4px; }
+  .section-label { margin: 14px 0 8px; }
+  .chips { gap: 8px; }
+  .chip { min-height: 44px; padding: 10px 12px; border-radius: 8px; }
+  .category-chips .chip { padding: 8px; }
+  .choice-chip { padding: 8px 22px 8px 8px; }
+  .field { gap: 12px; min-height: 44px; padding: 10px 0; }
+  .field-summary { min-height: 34px; padding: 8px 0; }
+  .mt { margin-top: 12px; }
+  .banner { padding: 12px; border-radius: 10px; }
+  .product-preview { gap: 12px; padding: 12px; border-radius: 10px; }
+  .product-image-box, .product-image { width: 56px; height: 64px; }
+  .product-image-box { flex-basis: 56px; border-radius: 8px; }
+  .image-placeholder { padding: 8px; }
+  .product-copy .mt { margin-top: 4px; }
+  .picker-store-heading { margin-top: 16px; padding-top: 16px; margin-bottom: 10px; }
+  .store-search { min-height: 44px; padding: 0 12px; border-radius: 10px; gap: 10px; }
+  .search-input { height: 44px; line-height: 44px; }
+  .search-clear { flex-basis: 44px; }
+  .search-glass { flex-basis: 14px; width: 14px; height: 14px; border-width: 2px; margin-right: 3px; }
+  .search-glass::after { width: 7px; height: 2px; right: -5px; bottom: -3px; }
+  .search-hint { margin-top: 4px; }
+  .search-summary { margin: 12px 0 8px; }
+  .search-results { height: 216px; border-radius: 12px; }
+  .search-results.results-1 { height: 64px; }
+  .search-results.results-2 { height: 128px; }
+  .search-results.results-3 { height: 192px; }
+  .store-result { gap: 12px; min-height: 64px; padding: 10px 12px; border-bottom-width: 1px; }
+  .store-result-city { margin-top: 4px; }
+  .search-empty { padding: 14px 12px; border-radius: 8px; }
+  .hot-city-chips { gap: 6px; margin-bottom: 4px; }
+  .hot-city-chip.chip { min-height: 44px; padding: 8px 4px; font-size: 12px; border-radius: 8px; }
+  .selected { padding: 10px 12px; border-radius: 10px; }
+}
+
+@media (max-height: 600px) {
+  /* A keyboard can leave barely one row of form space in a short window. */
+  .picker-current-summary { position: static; }
+}
+
 @media (prefers-color-scheme: dark) {
   .ui-icon { filter: brightness(1.5); }
   .chip { background: rgba(255, 255, 255, 0.07); border-color: rgba(255, 255, 255, 0.06); }

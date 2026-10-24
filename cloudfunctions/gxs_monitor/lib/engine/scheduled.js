@@ -46,7 +46,9 @@ function isTrustedTimer(event, wxContext, trustedRuntime = {}) {
  * store is on the fast cadence it keeps polling until the function's own time
  * limit (from the platform context) leaves a safety margin.
  */
-function runBudgetMs(context, fallbackMs = 35000) {
+// The fallback requires a deployment timeout of at least 60 seconds. Reserve
+// a nominal 15 seconds for the final checkpoint, in-flight work and release.
+function runBudgetMs(context, fallbackMs = 45000) {
   let remaining = NaN;
   try {
     // Some SCF Node.js 20 runtimes expose this method but throw internally
@@ -58,7 +60,7 @@ function runBudgetMs(context, fallbackMs = 35000) {
   return Number.isFinite(remaining) ? Math.max(0, Math.min(55000, remaining - 5000)) : fallbackMs;
 }
 
-async function runScheduled({ repo, fetchImpl, sendImpl, clock = () => new Date(), log = console, maxRunMs = 35000, ownerId = `timer-${crypto.randomUUID()}`, sleep = ms => new Promise(resolve => setTimeout(resolve, ms)) }) {
+async function runScheduled({ repo, fetchImpl, sendImpl, clock = () => new Date(), log = console, maxRunMs = 45000, ownerId = `timer-${crypto.randomUUID()}`, sleep = ms => new Promise(resolve => setTimeout(resolve, ms)) }) {
   const deadline = clock().getTime() + maxRunMs;
   const shouldContinue = () => clock().getTime() < deadline;
   const collector = createCollector({ repo, fetchImpl, sendImpl, clock, log, ownerId,
@@ -96,6 +98,7 @@ async function runScheduled({ repo, fetchImpl, sendImpl, clock = () => new Date(
       }
       collector.stats.lastBatchAt = previous.stats && previous.stats.lastBatchAt || null;
       collector.stats.availabilityCursor = previous.stats && previous.stats.availabilityCursor || null;
+      collector.stats.notificationEventCursor = previous.stats && previous.stats.notificationEventCursor || null;
     }
     const snap = collector.scheduler.snapshot();
     // Same-store SKU batches cannot occupy concurrent slots. Allow one wave

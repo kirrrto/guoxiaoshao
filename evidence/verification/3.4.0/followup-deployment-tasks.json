@@ -1,0 +1,23 @@
+{
+  "requestedAt": "2026-10-23T13:32:36.413Z",
+  "tasks": [
+    {
+      "functionName": "gxs_monitor",
+      "scope": "lib/engine",
+      "success": true,
+      "taskId": "confirmation_cloud_fn_inc_deploy_4553a7b2-50a7-4f9b-a558-88af0be4e371",
+      "taskType": "confirmation_cloud_fn_inc_deploy",
+      "status": "pending",
+      "message": "Waiting for user confirmation."
+    },
+    {
+      "functionName": "gxs_api",
+      "scope": "lib/engine",
+      "success": true,
+      "taskId": "confirmation_cloud_fn_inc_deploy_d561caed-7e0c-41c0-bff6-6d2fbb9f97dc",
+      "taskType": "confirmation_cloud_fn_inc_deploy",
+      "status": "pending",
+      "message": "Waiting for user confirmation."
+    }
+  ]
+}

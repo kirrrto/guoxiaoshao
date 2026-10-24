@@ -1,0 +1,33 @@
+{
+  "querySince": "2026-10-16T00:00:00.000Z",
+  "total": 142,
+  "returned": 142,
+  "truncated": false,
+  "status": {
+    "accepted": 80,
+    "skipped": 57,
+    "failed": 5
+  },
+  "reason": {
+    "none": 80,
+    "member_expired": 10,
+    "no_subscription_credit": 22,
+    "subscription_authorization_expired": 5,
+    "event_unconfirmed": 2,
+    "event_superseded": 2,
+    "dnd": 21
+  },
+  "firstCreatedAt": "2026-10-16T12:27:11.137Z",
+  "lastCreatedAt": "2026-10-23T02:11:03.227Z",
+  "detectedToPlatformAcceptedMs": {
+    "count": 80,
+    "p50": 27528,
+    "p90": 62997,
+    "max": 95291
+  },
+  "limits": [
+    "Platform accepted is not proof of device receipt",
+    "Delays exclude inventory discovery before detectedAt",
+    "No outgoing test messages were sent"
+  ]
+}

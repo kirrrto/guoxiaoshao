@@ -1,0 +1,20 @@
+{
+  "checkedAt": "2026-10-23T09:48:16.922Z",
+  "scope": "Native WXML/WXSS compilation only; not device or cloud quality acceptance",
+  "results": [
+    {
+      "compiler": "wcc",
+      "files": 11,
+      "status": 0,
+      "stderr": "",
+      "outputBytes": 337889
+    },
+    {
+      "compiler": "wcsc",
+      "files": 15,
+      "status": 0,
+      "stderr": "",
+      "outputBytes": 29249
+    }
+  ]
+}

@@ -6,7 +6,7 @@ const { localKey } = require('../../utils/local-key');
 const { readSession, writeSession } = require('../../utils/session');
 const operation = require('../../utils/operation');
 const { startProgress, stopProgress } = require('../../utils/request-progress');
-const { syncTabBar, switchToTab, releaseTabBar, setTabBarOverlay } = require('../../utils/tab-bar');
+const { syncTabBar, switchToTab, releaseTabBar } = require('../../utils/tab-bar');
 const { shareAppMessage, shareTimeline, readSharedSelection } = require('../../utils/share');
 const { monitorPollDelay } = require('../../utils/poll');
 const { topUpReminderCredit, buildConsentReport, openSubscribeSettings } = require('../../utils/reminder-credits');
@@ -19,7 +19,6 @@ const { resultNextAction, targetEvidence, targetSignature } = require('../../uti
 const { canOfferLiveChoices } = require('../../utils/observation-insights');
 const { createCheckoutContext } = require('../../utils/checkout-context');
 const conversion = require('../../utils/conversion-events');
-const { activeCalendars, guideNote, shouldOpenCalendar, withFollowReadiness } = require('../../utils/launch-calendar');
 
 const SELECTION_KEY = 'gxs_query_selection_v1';
 const RESULT_KEY = 'gxs_query_result_v1';
@@ -202,10 +201,6 @@ Page({
     evidenceExpanded: false,
     nextAction: null,
     evidenceCard: null,
-    openingCalendar: null,
-    calendarOpen: false,
-    guideNote: '',
-    calendarMuted: false,
     selectionRestricted: false,
     contextualCheckout: false,
     liveResultRestricted: true,
@@ -221,7 +216,6 @@ Page({
     this.loadingBoot = true;
     this.beginAccountVerification();
     const shared = readSharedSelection(options);
-    this.enteredFromShare = Boolean(shared);
     if (shared) this.queueSharedTarget(shared);
     this.consumePendingSharedTarget();
     if (!this.unsubscribeCatalog) this.unsubscribeCatalog = subscribeCatalog(catalog => this.applyCatalog(catalog));
@@ -245,7 +239,6 @@ Page({
       this.setData({
         catalogVersion: catalog.version,
         ready: true,
-        guideNote: guideNote(),
         selectionCanCollapse: restored.valid,
         selectionSummary: restored.summary,
         selectionNotice: restored.notice,
@@ -276,9 +269,6 @@ Page({
     if (this.pageRetired) return;
     syncTabBar(this, '/pages/query/index');
     this.visible = true;
-    const nextGuideNote = guideNote();
-    if (this.data.guideNote !== nextGuideNote) this.setData({ guideNote: nextGuideNote });
-    if (this.data.calendarOpen) this.syncCalendarOverlay();
     this.visibilityEpoch = (this.visibilityEpoch || 0) + 1;
     this.consumePendingSharedTarget();
     if (!this.data.ready) return;
@@ -296,7 +286,6 @@ Page({
   onHide() {
     releaseTabBar(this);
     this.visible = false;
-    if (this.data.calendarOpen) this.onCloseCalendar();
     this.visibilityEpoch = (this.visibilityEpoch || 0) + 1;
     this.stopFollowPolling();
   },
@@ -304,7 +293,6 @@ Page({
   onUnload() {
     releaseTabBar(this);
     stopProgress(this);
-    if (this.data.calendarOpen) this.onCloseCalendar();
     this.pageRetired = true;
     this.visible = false;
     this.visibilityEpoch = (this.visibilityEpoch || 0) + 1;
@@ -313,48 +301,8 @@ Page({
     if (this.unsubscribeQuota) this.unsubscribeQuota();
   },
 
-  // Calendar remains an explicit help entry; returning to query never opens it.
-  onReady() { this.calendarViewReady = true; },
-
-  async maybeOpenCalendar() {
-    // Editorial UI is local and runs after the first page render. It never
-    // initiates payment, inventory queries, authorization or telemetry.
-    if (!this.calendarViewReady || !this.visible || !this.data.ready || this.pageRetired
-      || this.calendarChecked || this.calendarReadPending || this.enteredFromShare
-      || getApp().globalData.singlePage) return;
-    const calendar = activeCalendars(Date.now(), true)[0];
-    if (!calendar) return;
-    this.calendarReadPending = true;
-    try {
-      const key = localKey(`gxs_launch_calendar_${calendar.familyKey}`);
-      const saved = await readSession(key);
-      if (this.pageRetired || !this.visible) return;
-      this.calendarChecked = true;
-      if (!shouldOpenCalendar(calendar, saved) || this.data.sheetVisible || this.data.querying
-        || this.data.signing || this.data.alternativeLoading) return;
-      this.calendarStorageKey = key;
-      this.setData({ openingCalendar: withFollowReadiness(calendar, this.catalog), calendarOpen: true, calendarMuted: false });
-      this.syncCalendarOverlay();
-      writeSession(key, { id: calendar.id, day: fmt.fmtDate(Date.now()), muted: false });
-    } finally { this.calendarReadPending = false; }
-  },
-  syncCalendarOverlay() {
-    setTabBarOverlay(this, Boolean(this.data.calendarOpen), 'calendar');
-  },
-  onCalendarMute(event) { this.setData({ calendarMuted: Boolean(event.detail.value && event.detail.value.includes('mute')) }); },
-  onCloseCalendar() {
-    if (this.data.openingCalendar && this.calendarStorageKey) writeSession(this.calendarStorageKey,
-      { id: this.data.openingCalendar.id, day: fmt.fmtDate(Date.now()), muted: this.data.calendarMuted });
-    this.setData({ calendarOpen: false });
-    this.syncCalendarOverlay();
-  },
-  onCalendarTouch() {},
-  onCalendarImageError() {
-    if (this.data.openingCalendar) this.setData({ 'openingCalendar.imageDisplayUrl': '' });
-  },
   onOpenGuide() {
-    if (this.data.calendarOpen) this.onCloseCalendar();
-    wx.navigateTo({ url: '/pages/guide/index?section=calendar&from=query' });
+    wx.navigateTo({ url: '/pages/guide/index?section=prepare&from=query' });
   },
 
   onShareAppMessage() {
@@ -554,7 +502,6 @@ Page({
     const patch = this.selectionView(this.selection);
     this.selectionNeedsReview = selectionNeedsReview(this.selection, patch.selectionCanCollapse);
     if (this.data.catalogVersion !== catalog.version) patch.catalogVersion = catalog.version;
-    if (this.data.openingCalendar) patch.openingCalendar = withFollowReadiness(this.data.openingCalendar, catalog);
     this.setData(patch);
     this.resolveSharedTarget();
     this.refreshStoreChoices();

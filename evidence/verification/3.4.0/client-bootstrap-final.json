@@ -1,0 +1,34 @@
+{
+  "checkedAt": "2026-10-23T13:12:57.101Z",
+  "scope": "Live consumer SDK user.bootstrap response, whitelisted non-account fields only",
+  "ok": true,
+  "serverTime": "2026-10-23T13:12:23.244Z",
+  "collector": {
+    "state": "running",
+    "stale": false,
+    "groupCount": 31,
+    "intervalMs": 60000,
+    "updatedAt": "2026-10-23T13:12:22.337Z",
+    "observationHealth": {
+      "state": "healthy",
+      "groupCount": 31,
+      "freshGroups": 31,
+      "staleGroups": 0,
+      "pendingGroups": 0,
+      "staleAfterMs": 188000,
+      "oldestSuccessAt": "2026-10-23T13:11:03.133Z",
+      "lastSuccessAt": "2026-10-23T13:12:21.649Z",
+      "evaluatedAt": "2026-10-23T13:12:23.244Z"
+    }
+  },
+  "notifications": {
+    "enabled": true,
+    "deliveryReady": true,
+    "reason": null,
+    "senderReady": true,
+    "senderReason": null
+  },
+  "routes": [
+    "pages/query/index"
+  ]
+}

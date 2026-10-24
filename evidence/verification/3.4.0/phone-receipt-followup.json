@@ -1,0 +1,28 @@
+{
+  "checkedAt": "2026-10-23T13:38:39.610Z",
+  "userFeedback": {
+    "phoneReceiptConfirmed": true,
+    "reportedDelay": "more than 10 seconds",
+    "exactDelaySeconds": null
+  },
+  "platformRecords": [
+    {
+      "attempts": 1,
+      "charged": 1,
+      "createdAt": "2026-10-23T13:36:25.668Z",
+      "reason": null,
+      "refunded": 0,
+      "sendStartedAt": "2026-10-23T13:36:29.443Z",
+      "settledAt": "2026-10-23T13:36:30.431Z",
+      "status": "accepted",
+      "recordCreationToSettlementMs": 4763,
+      "sendStartToSettlementMs": 988
+    }
+  ],
+  "limitations": [
+    "The test channel is separate from automatic stock-change notification planning.",
+    "createdAt is authorization record creation; this span includes any client step between authorization and send, not pure network latency.",
+    "User-reported receipt has no exact timestamp; no precise platform-to-phone delay can be calculated.",
+    "sendStartedAt precedes admission transaction completion; the 988ms span is not a raw HTTP-only measurement."
+  ]
+}

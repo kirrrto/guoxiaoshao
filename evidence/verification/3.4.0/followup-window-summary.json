@@ -1,0 +1,157 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-10-23T13:42:46.717Z",
+  "scope": "Independent follow-up window after cancellation-priority and 45-second fallback deployment. Earlier samples and pre-followup files are excluded.",
+  "deployment": {
+    "reportedMonitorUpdatedAt": "2026-10-23T13:32:29.687Z",
+    "strictIntervalEndpointCutoff": "2026-10-23T13:33:00.000Z",
+    "source": "Parent official deployment result and next invocation cutoff."
+  },
+  "window": {
+    "start": "2026-10-23T13:34:05.417Z",
+    "end": "2026-10-23T13:39:48.309Z",
+    "elapsedMs": 342892,
+    "snapshotCount": 6,
+    "finalGroupCount": 31,
+    "unionGroups": 31,
+    "stableIntersectionGroups": 31,
+    "comparableGroups": 31,
+    "requestsAdded": 189,
+    "successesAdded": 189,
+    "failuresAdded": 0,
+    "persistenceFailuresAdded": 0,
+    "groupsWithNewRequest": 31,
+    "groupsWithNewSuccessAfterCutoff": 31,
+    "groupsWithNewDurableSuccessAfterCutoff": 31,
+    "perGroupRequestFrequency": {
+      "6": 28,
+      "7": 3
+    },
+    "perGroupSuccessFrequency": {
+      "6": 28,
+      "7": 3
+    },
+    "allSnapshotsRecomputedFresh": true
+  },
+  "strictIntervals": {
+    "endpointCutoff": "2026-10-23T13:33:00.000Z",
+    "requestIntervals": {
+      "count": 189,
+      "sumMs": 11150479,
+      "weightedMeanMs": 58997.24338624338,
+      "coveredGroups": 31,
+      "includedSegments": 155,
+      "excludedBoundarySegments": 0,
+      "excludedBoundaryIntervalCount": 0,
+      "invalidMetricSegments": 0
+    },
+    "successfulResultIntervals": {
+      "count": 189,
+      "sumMs": 11145417,
+      "weightedMeanMs": 58970.46031746032,
+      "coveredGroups": 31,
+      "includedSegments": 155,
+      "excludedBoundarySegments": 0,
+      "excludedBoundaryIntervalCount": 0,
+      "invalidMetricSegments": 0
+    },
+    "recordedHttpLatency": {
+      "count": 189,
+      "sumMs": 77246,
+      "weightedMeanMs": 408.70899470899474,
+      "coveredGroups": 31,
+      "includedSegments": 155,
+      "excludedBoundarySegments": 0,
+      "excludedBoundaryIntervalCount": 0,
+      "invalidMetricSegments": 0
+    },
+    "exactSingleRequestIntervals": {
+      "count": 122,
+      "minimumMs": 37756,
+      "maximumMs": 87749,
+      "meanMs": 62740.2868852459
+    },
+    "exactSingleSuccessfulResultIntervals": {
+      "count": 122,
+      "minimumMs": 37086,
+      "maximumMs": 87679,
+      "meanMs": 62747.16393442623
+    },
+    "exactSingleDurableSuccessIntervals": {
+      "count": 122,
+      "minimumMs": 37086,
+      "maximumMs": 87679,
+      "meanMs": 62747.16393442623
+    },
+    "excludedMultiRequestSegments": 33,
+    "excludedMultiSuccessSegments": 33,
+    "longerThanTwiceTargetPeriod": [],
+    "provenZeroRequestIntervals": 0
+  },
+  "healthAndLeaseEvidence": {
+    "lastMaximumDurableSuccessAgeMs": 34558,
+    "maximumDurableSuccessAgeAtAnySnapshotMs": 53876,
+    "observedInvocationCount": 6,
+    "observedLeaseErrorSnapshots": [],
+    "interpretation": "Owner changes are anonymized invocation evidence. collector_status.expiresAt is heartbeat expiry, not the actual lease TTL. These files do not prove final lease release or rule out an unobserved lease interruption."
+  },
+  "cancellationEvidence": {
+    "snapshotGuardRecords": 6,
+    "distinctGroups": 6,
+    "allRetainEarlierDue": true,
+    "finalActiveGuardRecords": [
+      {
+        "group": "group-003",
+        "active": true,
+        "remainingGuardMs": 59,
+        "retainsEarlierDue": true,
+        "nextDueAt": "2026-10-23T13:39:36.242Z",
+        "guardUntil": "2026-10-23T13:39:48.368Z",
+        "lastDurableSuccessAt": "2026-10-23T13:39:13.751Z",
+        "alreadySucceededInSnapshotMinute": true
+      },
+      {
+        "group": "group-007",
+        "active": true,
+        "remainingGuardMs": 585,
+        "retainsEarlierDue": true,
+        "nextDueAt": "2026-10-23T13:39:36.293Z",
+        "guardUntil": "2026-10-23T13:39:48.894Z",
+        "lastDurableSuccessAt": "2026-10-23T13:39:17.936Z",
+        "alreadySucceededInSnapshotMinute": true
+      },
+      {
+        "group": "group-023",
+        "active": true,
+        "remainingGuardMs": 59,
+        "retainsEarlierDue": true,
+        "nextDueAt": "2026-10-23T13:39:36.281Z",
+        "guardUntil": "2026-10-23T13:39:48.368Z",
+        "lastDurableSuccessAt": "2026-10-23T13:39:15.722Z",
+        "alreadySucceededInSnapshotMinute": true
+      },
+      {
+        "group": "group-028",
+        "active": true,
+        "remainingGuardMs": 585,
+        "retainsEarlierDue": true,
+        "nextDueAt": "2026-10-23T13:39:36.281Z",
+        "guardUntil": "2026-10-23T13:39:48.894Z",
+        "lastDurableSuccessAt": "2026-10-23T13:39:16.484Z",
+        "alreadySucceededInSnapshotMinute": true
+      }
+    ],
+    "note": "Guard records are checkpoint observations, not a counter of all cancellation attempts. request_cancelled is a pre-HTTP guard; snapshots alone cannot distinguish runtime-budget exhaustion from every lease/probe guard condition."
+  },
+  "limitations": [
+    "All targets, owners, stores, SKUs and token identifiers are omitted. Group and invocation numbers are stable only within this report.",
+    "Whole-window counts report progress between snapshots. They are distinct from strict interval statistics, whose earlier and later recorded anchors both must be at or after 13:33:00Z.",
+    "For a multi-request segment, an earlier lastRequestAt at or after the cutoff proves all subsequently recorded request intervals start after it. The same rule separately applies to successful-result anchors. Otherwise the entire metric segment is excluded from strict means.",
+    "Exact single intervals require exactly one counter increment and both timestamp endpoints after the cutoff. Spans covering multiple requests/successes are never treated as one interval.",
+    "Known-single extrema cover only recoverable individual intervals. Lifetime maxMs, snapshot polling gaps and aggregate count/sumMs cannot reconstruct a window p95 or whole-window extrema.",
+    "Request timestamps are scheduler dispatch times. Success timestamps include the upstream outcome transaction. Durable equality confirms that corresponding success was saved, not all intermediate stage timings.",
+    "Guard absence at six snapshots cannot rule out a transient denial between polls. Per-target inFlight and exact runtime deadline are not retained in checkpoints.",
+    "Per-invocation stats reset and are neither summed nor differenced. Sender readiness does not establish receipt of a real phone notification.",
+    "Passing the freshness threshold is not evidence that every interval meets the 60-second target. The configured work budget is not persisted in these snapshots and must be established by deployed source/version evidence."
+  ]
+}

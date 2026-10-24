@@ -63,6 +63,62 @@ test('sender and credential faults are presented in plain language, never as a u
   }
 });
 
+test('a connected sender stays green while stale stock keeps overall reminders blocked', () => {
+  const rt = runtime(), page = followPage(rt);
+  page.applyBoot(boot({
+    collector: { state: 'running', observationStale: true, observationHealth: { state: 'stalled', staleGroups: 3 } },
+    notifications: { enabled: true, senderReady: true, senderReason: null, deliveryReady: false,
+      reason: 'collector_observation_stale', templateIds: { restock: 'template-A' } },
+  }));
+  assert.equal(page.data.delivery.label, '发送服务已就绪');
+  assert.equal(page.data.delivery.cls, 'ok');
+  assert.equal(page.data.delivery.overallReady, false);
+  assert.match(page.data.delivery.detail, /通道已连接/);
+  assert.equal(page.data.collector.cls, 'warn');
+  assert.match(page.data.collector.detail, /观测.*更新/);
+  assert.equal(page.data.readiness.code, 'collector_observation_stale');
+  assert.equal(page.data.readiness.ready, false);
+  page.promptSubscribe();
+  assert.equal(rt.messages.length, 0, 'the new sender display does not open an authorization prompt');
+  assert.equal(rt.calls.length, 0);
+});
+
+test('new sender authentication failures are not hidden by the separate stock warning', () => {
+  const rt = runtime(), page = followPage(rt);
+  page.applyBoot(boot({
+    collector: { state: 'running', observationStale: true },
+    notifications: { enabled: true, senderReady: false, senderReason: 'consumer_auth_failed', deliveryReady: false,
+      reason: 'collector_observation_stale', templateIds: { restock: 'template-A' } },
+  }));
+  assert.equal(page.data.delivery.cls, 'warn');
+  assert.match(page.data.delivery.detail, /验证未通过/);
+  assert.equal(page.data.readiness.ready, false);
+  assert.equal(page.data.readiness.code, 'collector_observation_stale');
+  assert.equal(rt.calls.length, 0);
+});
+
+test('legacy stock errors leave sender state unconfirmed while legacy success remains supported', () => {
+  const rt = runtime(), page = followPage(rt);
+  page.applyBoot(boot({ collector: { state: 'running', observationStale: true },
+    notifications: { enabled: true, deliveryReady: false, reason: 'collector_observation_stale', templateIds: { restock: 'template-A' } } }));
+  assert.equal(page.data.delivery.label, '发送状态待确认');
+  assert.equal(page.data.delivery.cls, 'muted');
+  assert.equal(page.data.readiness.ready, false);
+  page.applyBoot(boot());
+  assert.equal(page.data.delivery.cls, 'ok');
+  assert.equal(page.data.readiness.ready, true);
+});
+
+test('a sender-only status cannot override the full delivery gate when collector detail is incomplete', () => {
+  const rt = runtime(), page = followPage(rt);
+  page.applyBoot(boot({ notifications: { enabled: true, senderReady: true, senderReason: null, deliveryReady: false,
+    reason: 'collector_observation_stale', templateIds: { restock: 'template-A' } } }));
+  assert.equal(page.data.delivery.cls, 'ok');
+  assert.equal(page.data.readiness.ready, false);
+  page.promptSubscribe();
+  assert.equal(rt.messages.length, 0);
+});
+
 test('authorization counts the current restock template and excludes obsolete credits', () => {
   const rt = runtime(); const page = followPage(rt);
   page.applyBoot(boot({ notifications: { enabled: true, deliveryReady: true, templateIds: { restock: 'template-A', b: 'template-A' } },

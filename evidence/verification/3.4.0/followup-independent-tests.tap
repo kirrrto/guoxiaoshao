@@ -1,0 +1,358 @@
+TAP version 13
+# Subtest: a stalled account read settles at its deadline without duplicating a still-running request
+ok 1 - a stalled account read settles at its deadline without duplicating a still-running request
+  ---
+  duration_ms: 9.026125
+  type: 'test'
+  ...
+# Subtest: a stalled query.pickup remains uncertain and never automatically repeats
+ok 2 - a stalled query.pickup remains uncertain and never automatically repeats
+  ---
+  duration_ms: 2.444875
+  type: 'test'
+  ...
+# Subtest: a stalled history.list remains uncertain and never automatically repeats
+ok 3 - a stalled history.list remains uncertain and never automatically repeats
+  ---
+  duration_ms: 1.062042
+  type: 'test'
+  ...
+# Subtest: a stalled member.createOrder remains uncertain and never automatically repeats
+ok 4 - a stalled member.createOrder remains uncertain and never automatically repeats
+  ---
+  duration_ms: 1.248375
+  type: 'test'
+  ...
+# Subtest: a stalled notificationTest.send remains uncertain and never automatically repeats
+ok 5 - a stalled notificationTest.send remains uncertain and never automatically repeats
+  ---
+  duration_ms: 1.008125
+  type: 'test'
+  ...
+# Subtest: a synchronously throwing platform request releases its deadline
+ok 6 - a synchronously throwing platform request releases its deadline
+  ---
+  duration_ms: 0.686375
+  type: 'test'
+  ...
+# Subtest: a slow notification backlog cannot consume the scheduled scan window before inventory starts
+ok 7 - a slow notification backlog cannot consume the scheduled scan window before inventory starts
+  ---
+  duration_ms: 33.062625
+  type: 'test'
+  ...
+# Subtest: an exceptional scheduled exit waits for the one active send before releasing its lease
+ok 8 - an exceptional scheduled exit waits for the one active send before releasing its lease
+  ---
+  duration_ms: 3.610459
+  type: 'test'
+  ...
+# Subtest: inventory reversal during a concurrent credit reservation is rechecked before sending and refunds the permission
+ok 9 - inventory reversal during a concurrent credit reservation is rechecked before sending and refunds the permission
+  ---
+  duration_ms: 2.570084
+  type: 'test'
+  ...
+# Subtest: a shorter healthy no-stock cadence takes effect on the next cold start, including legacy checkpoints
+ok 10 - a shorter healthy no-stock cadence takes effect on the next cold start, including legacy checkpoints
+  ---
+  duration_ms: 9.206583
+  type: 'test'
+  ...
+# Subtest: changing the normal cadence preserves source backoff, shared admission, and unexplained future due times
+ok 11 - changing the normal cadence preserves source backoff, shared admission, and unexplained future due times
+  ---
+  duration_ms: 0.300458
+  type: 'test'
+  ...
+# Subtest: capacity-driven four-minute observations recover when target count falls without raising request budgets
+ok 12 - capacity-driven four-minute observations recover when target count falls without raising request budgets
+  ---
+  duration_ms: 29.957833
+  type: 'test'
+  ...
+# Subtest: follow presentation separates the last attempted check from the last valid inventory observation
+ok 13 - follow presentation separates the last attempted check from the last valid inventory observation
+  ---
+  duration_ms: 0.442416
+  type: 'test'
+  ...
+# Subtest: unknown breaks consecutive confirmation for both restock and sold-out alerts
+ok 14 - unknown breaks consecutive confirmation for both restock and sold-out alerts
+  ---
+  duration_ms: 9.829917
+  type: 'test'
+  ...
+# Subtest: re-reading a waiting event cannot extend the 20-second quiet period
+ok 15 - re-reading a waiting event cannot extend the 20-second quiet period
+  ---
+  duration_ms: 2.840375
+  type: 'test'
+  ...
+# Subtest: unconfirmed stock separated by an unknown sample cannot create a phantom sold-out alert
+ok 16 - unconfirmed stock separated by an unknown sample cannot create a phantom sold-out alert
+  ---
+  duration_ms: 1.635167
+  type: 'test'
+  ...
+# Subtest: an unconfirmed sold-out dip with an unknown sample cannot duplicate the restock alert
+ok 17 - an unconfirmed sold-out dip with an unknown sample cannot duplicate the restock alert
+  ---
+  duration_ms: 3.36875
+  type: 'test'
+  ...
+# Subtest: legacy confirmed availability survives an unknown gap during upgrade and can still alert on sold-out
+ok 18 - legacy confirmed availability survives an unknown gap during upgrade and can still alert on sold-out
+  ---
+  duration_ms: 1.935625
+  type: 'test'
+  ...
+# Subtest: refreshing the same interval preserves a running burst and its next re-check
+ok 19 - refreshing the same interval preserves a running burst and its next re-check
+  ---
+  duration_ms: 0.303667
+  type: 'test'
+  ...
+# Subtest: scheduled pickup timeout fits the remaining budget and retains time to persist results
+ok 20 - scheduled pickup timeout fits the remaining budget and retains time to persist results
+  ---
+  duration_ms: 4.151334
+  type: 'test'
+  ...
+# Subtest: a deadline reached during credit reservation prevents the send and restores the subscription credit
+ok 21 - a deadline reached during credit reservation prevents the send and restores the subscription credit
+  ---
+  duration_ms: 1.217333
+  type: 'test'
+  ...
+# Subtest: consumer message token and send requests share the per-attempt time budget
+ok 22 - consumer message token and send requests share the per-attempt time budget
+  ---
+  duration_ms: 0.414583
+  type: 'test'
+  ...
+# Subtest: split SKU groups share the same-store interval across target changes and cold starts
+ok 23 - split SKU groups share the same-store interval across target changes and cold starts
+  ---
+  duration_ms: 4.435834
+  type: 'test'
+  ...
+# Subtest: a scheduled scan still visits all same-store SKU batches after spacing them out
+ok 24 - a scheduled scan still visits all same-store SKU batches after spacing them out
+  ---
+  duration_ms: 3.434583
+  type: 'test'
+  ...
+# Subtest: slow database admission cannot compress actual same-store HTTP starts below two seconds
+ok 25 - slow database admission cannot compress actual same-store HTTP starts below two seconds
+  ---
+  duration_ms: 2.095458
+  type: 'test'
+  ...
+# Subtest: pickup timeout uses the actual lease time left after a slow renewal
+ok 26 - pickup timeout uses the actual lease time left after a slow renewal
+  ---
+  duration_ms: 0.81925
+  type: 'test'
+  ...
+# Subtest: message timeout uses the actual lease time left after the final renewal
+ok 27 - message timeout uses the actual lease time left after the final renewal
+  ---
+  duration_ms: 1.654792
+  type: 'test'
+  ...
+# Subtest: token probe timeout also reserves time inside the actual remaining lease
+ok 28 - token probe timeout also reserves time inside the actual remaining lease
+  ---
+  duration_ms: 0.623208
+  type: 'test'
+  ...
+# Subtest: 50 one-sample events cannot hide a later confirmed alert until its send window expires
+ok 29 - 50 one-sample events cannot hide a later confirmed alert until its send window expires
+  ---
+  duration_ms: 22.436417
+  type: 'test'
+  ...
+# Subtest: bounded waiting-event pages persist their scan position across scheduled cold starts
+ok 30 - bounded waiting-event pages persist their scan position across scheduled cold starts
+  ---
+  duration_ms: 345.940708
+  type: 'test'
+  ...
+# Subtest: slow large-event fanout yields to sends and resumes after durable users on a cold start
+ok 31 - slow large-event fanout yields to sends and resumes after durable users on a cold start
+  ---
+  duration_ms: 477.236916
+  type: 'test'
+  ...
+# Subtest: a resumed fanout rechecks cancelled follows and expired memberships without replaying accepted users
+ok 32 - a resumed fanout rechecks cancelled follows and expired memberships without replaying accepted users
+  ---
+  duration_ms: 30.70825
+  type: 'test'
+  ...
+# Subtest: a failed progress transaction replays only its durable chunk without duplicate delivery or credit spending
+ok 33 - a failed progress transaction replays only its durable chunk without duplicate delivery or credit spending
+  ---
+  duration_ms: 35.608541
+  type: 'test'
+  ...
+# Subtest: event planning checkpoints are monotone and a former lease owner cannot mark an event complete
+ok 34 - event planning checkpoints are monotone and a former lease owner cannot mark an event complete
+  ---
+  duration_ms: 0.506167
+  type: 'test'
+  ...
+# Subtest: the pinned CloudBase SDK keyset query covers tied timestamps while completed rows disappear
+ok 35 - the pinned CloudBase SDK keyset query covers tied timestamps while completed rows disappear
+  ---
+  duration_ms: 61.137792
+  type: 'test'
+  ...
+# Subtest: scheduled budget survives the SCF Node.js 20 remaining-time helper failure
+ok 36 - scheduled budget survives the SCF Node.js 20 remaining-time helper failure
+  ---
+  duration_ms: 0.414792
+  type: 'test'
+  ...
+# Subtest: scheduled budget preserves the platform method receiver and reserves cleanup time
+ok 37 - scheduled budget preserves the platform method receiver and reserves cleanup time
+  ---
+  duration_ms: 0.122959
+  type: 'test'
+  ...
+# Subtest: the fallback covers 31 overdue groups with database overhead and still honours short platform budgets
+ok 38 - the fallback covers 31 overdue groups with database overhead and still honours short platform budgets
+  ---
+  duration_ms: 202.70775
+  type: 'test'
+  ...
+# Subtest: production monitor entry publishes a fresh heartbeat when the platform time helper throws
+ok 39 - production monitor entry publishes a fresh heartbeat when the platform time helper throws
+  ---
+  duration_ms: 10.300959
+  type: 'test'
+  ...
+# Subtest: scheduled function trusts platform SOURCE and rejects all forged client Timer events
+ok 40 - scheduled function trusts platform SOURCE and rejects all forged client Timer events
+  ---
+  duration_ms: 0.103958
+  type: 'test'
+  ...
+# Subtest: request-scoped SCF environment overrides warm-instance markers and exposes no secrets
+ok 41 - request-scoped SCF environment overrides warm-instance markers and exposes no secrets
+  ---
+  duration_ms: 0.101041
+  type: 'test'
+  ...
+# Subtest: minute scans keep real availability state; a restock is re-checked every 2s and sent once confirmed
+ok 42 - minute scans keep real availability state; a restock is re-checked every 2s and sent once confirmed
+  ---
+  duration_ms: 18.952916
+  type: 'test'
+  ...
+# Subtest: cold-start jitter does not skip a new minute or duplicate the same minute
+ok 43 - cold-start jitter does not skip a new minute or duplicate the same minute
+  ---
+  duration_ms: 3.210833
+  type: 'test'
+  ...
+# Subtest: deadline carries unfinished stores before recently scanned stores into the next minute
+ok 44 - deadline carries unfinished stores before recently scanned stores into the next minute
+  ---
+  duration_ms: 3.069334
+  type: 'test'
+  ...
+# Subtest: failed observation persistence is visible and never reported as a successful batch
+ok 45 - failed observation persistence is visible and never reported as a successful batch
+  ---
+  duration_ms: 1.63375
+  type: 'test'
+  ...
+# Subtest: scheduled monitor remains useful with missing message credentials and has honest delivery readiness
+ok 46 - scheduled monitor remains useful with missing message credentials and has honest delivery readiness
+  ---
+  duration_ms: 1.128417
+  type: 'test'
+  ...
+# Subtest: a persisted 429 Retry-After survives the next function cold start
+ok 47 - a persisted 429 Retry-After survives the next function cold start
+  ---
+  duration_ms: 1.399458
+  type: 'test'
+  ...
+# Subtest: a shared capacity pause bounds admission checks across hundreds of stores and cold starts
+ok 48 - a shared capacity pause bounds admission checks across hundreds of stores and cold starts
+  ---
+  duration_ms: 1.648167
+  type: 'test'
+  ...
+# Subtest: continuous mode migrates legacy daily checkpoints and resumes the same day
+ok 49 - continuous mode migrates legacy daily checkpoints and resumes the same day
+  ---
+  duration_ms: 5.117541
+  type: 'test'
+  ...
+# Subtest: daily checkpoint migration leaves an existing source 429 pause intact
+ok 50 - daily checkpoint migration leaves an existing source 429 pause intact
+  ---
+  duration_ms: 0.977083
+  type: 'test'
+  ...
+# Subtest: continuous migration recovers all 17 legacy midnight targets after idle heartbeats lost the daily reason
+ok 51 - continuous migration recovers all 17 legacy midnight targets after idle heartbeats lost the daily reason
+  ---
+  duration_ms: 24.194959
+  type: 'test'
+  ...
+# Subtest: legacy midnight migration needs persisted exhaustion and does not reset ordinary future targets
+ok 52 - legacy midnight migration needs persisted exhaustion and does not reset ordinary future targets
+  ---
+  duration_ms: 1.53725
+  type: 'test'
+  ...
+# Subtest: legacy idle-heartbeat migration preserves the real source pause and reconstructed failure backoff
+ok 53 - legacy idle-heartbeat migration preserves the real source pause and reconstructed failure backoff
+  ---
+  duration_ms: 0.589083
+  type: 'test'
+  ...
+# Subtest: deadline is respected, and a manual-query restock is confirmed by one prompt re-check before sending
+ok 54 - deadline is respected, and a manual-query restock is confirmed by one prompt re-check before sending
+  ---
+  duration_ms: 10.414917
+  type: 'test'
+  ...
+# Subtest: another active lease prevents timer traffic and heartbeat clobbering
+ok 55 - another active lease prevents timer traffic and heartbeat clobbering
+  ---
+  duration_ms: 0.19475
+  type: 'test'
+  ...
+# Subtest: readiness distinguishes stale worker, missing credentials and configured sender
+ok 56 - readiness distinguishes stale worker, missing credentials and configured sender
+  ---
+  duration_ms: 0.071083
+  type: 'test'
+  ...
+# Subtest: observation transaction fences out a worker whose lease changed after its request started
+ok 57 - observation transaction fences out a worker whose lease changed after its request started
+  ---
+  duration_ms: 0.312417
+  type: 'test'
+  ...
+# Subtest: a real short-phrase template status is supported without permitting mismatched product fields
+ok 58 - a real short-phrase template status is supported without permitting mismatched product fields
+  ---
+  duration_ms: 0.622042
+  type: 'test'
+  ...
+1..58
+# tests 58
+# suites 0
+# pass 58
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1036.771417

@@ -1,0 +1,293 @@
+{
+  "generatedAt": "2026-10-23T13:26:55.721Z",
+  "scope": "Read-only causal review of the final lib43/lib69 deployed sample window, before the newly reviewed cancellation-priority source patch is deployed.",
+  "groups": [
+    {
+      "id": "group-008",
+      "hashPhaseMs": 40690,
+      "frames": [
+        {
+          "file": "final-status-1.json",
+          "at": "2026-10-23T13:10:15.553Z",
+          "nextDueAt": "2026-10-23T13:09:40.690Z",
+          "nextDuePhaseMs": 40690,
+          "available": false,
+          "failures": 0,
+          "guardUntil": 0,
+          "guardReason": null,
+          "health": {
+            "requests": 1893,
+            "successes": 1880,
+            "failures": 13,
+            "consecutiveFailures": 0,
+            "lastRequestAt": "2026-10-23T13:09:29.081Z",
+            "lastSuccessAt": "2026-10-23T13:09:29.887Z",
+            "lastPersistedSuccessAt": "2026-10-23T13:09:29.887Z",
+            "lastPersistedAt": "2026-10-23T13:09:30.238Z"
+          },
+          "rawDueQueueRank": 20,
+          "rawDueQueueSize": 20,
+          "overdueMs": 34863
+        },
+        {
+          "file": "final-status-2.json",
+          "at": "2026-10-23T13:11:16.683Z",
+          "nextDueAt": "2026-10-23T13:11:40.690Z",
+          "nextDuePhaseMs": 40690,
+          "available": false,
+          "failures": 0,
+          "guardUntil": 0,
+          "guardReason": null,
+          "health": {
+            "requests": 1894,
+            "successes": 1881,
+            "failures": 13,
+            "consecutiveFailures": 0,
+            "lastRequestAt": "2026-10-23T13:11:03.938Z",
+            "lastSuccessAt": "2026-10-23T13:11:04.704Z",
+            "lastPersistedSuccessAt": "2026-10-23T13:11:04.704Z",
+            "lastPersistedAt": "2026-10-23T13:11:05.112Z"
+          },
+          "rawDueQueueRank": 0,
+          "rawDueQueueSize": 20,
+          "overdueMs": 0
+        },
+        {
+          "file": "final-status-3.json",
+          "at": "2026-10-23T13:12:20.185Z",
+          "nextDueAt": "2026-10-23T13:11:40.690Z",
+          "nextDuePhaseMs": 40690,
+          "available": false,
+          "failures": 0,
+          "guardUntil": 0,
+          "guardReason": null,
+          "health": {
+            "requests": 1894,
+            "successes": 1881,
+            "failures": 13,
+            "consecutiveFailures": 0,
+            "lastRequestAt": "2026-10-23T13:11:03.938Z",
+            "lastSuccessAt": "2026-10-23T13:11:04.704Z",
+            "lastPersistedSuccessAt": "2026-10-23T13:11:04.704Z",
+            "lastPersistedAt": "2026-10-23T13:11:05.112Z"
+          },
+          "rawDueQueueRank": 16,
+          "rawDueQueueSize": 18,
+          "overdueMs": 39495
+        },
+        {
+          "file": "final-status-4.json",
+          "at": "2026-10-23T13:13:21.133Z",
+          "nextDueAt": "2026-10-23T13:12:36.528Z",
+          "nextDuePhaseMs": 36528,
+          "available": false,
+          "failures": 0,
+          "guardUntil": "2026-10-23T13:12:36.528Z",
+          "guardReason": "request_cancelled",
+          "health": {
+            "requests": 1894,
+            "successes": 1881,
+            "failures": 13,
+            "consecutiveFailures": 0,
+            "lastRequestAt": "2026-10-23T13:11:03.938Z",
+            "lastSuccessAt": "2026-10-23T13:11:04.704Z",
+            "lastPersistedSuccessAt": "2026-10-23T13:11:04.704Z",
+            "lastPersistedAt": "2026-10-23T13:11:05.112Z"
+          },
+          "rawDueQueueRank": 8,
+          "rawDueQueueSize": 14,
+          "overdueMs": 44605
+        },
+        {
+          "file": "final-status-5.json",
+          "at": "2026-10-23T13:14:21.437Z",
+          "nextDueAt": "2026-10-23T13:13:36.528Z",
+          "nextDuePhaseMs": 36528,
+          "available": false,
+          "failures": 0,
+          "guardUntil": 0,
+          "guardReason": null,
+          "health": {
+            "requests": 1895,
+            "successes": 1882,
+            "failures": 13,
+            "consecutiveFailures": 0,
+            "lastRequestAt": "2026-10-23T13:13:27.338Z",
+            "lastSuccessAt": "2026-10-23T13:13:28.486Z",
+            "lastPersistedSuccessAt": "2026-10-23T13:13:28.486Z",
+            "lastPersistedAt": "2026-10-23T13:13:28.724Z"
+          },
+          "rawDueQueueRank": 2,
+          "rawDueQueueSize": 13,
+          "overdueMs": 44909
+        }
+      ]
+    },
+    {
+      "id": "group-012",
+      "hashPhaseMs": 47852,
+      "frames": [
+        {
+          "file": "final-status-1.json",
+          "at": "2026-10-23T13:10:15.553Z",
+          "nextDueAt": "2026-10-23T13:09:36.915Z",
+          "nextDuePhaseMs": 36915,
+          "available": false,
+          "failures": 0,
+          "guardUntil": 0,
+          "guardReason": null,
+          "health": {
+            "requests": 1871,
+            "successes": 1862,
+            "failures": 9,
+            "consecutiveFailures": 0,
+            "lastRequestAt": "2026-10-23T13:09:27.406Z",
+            "lastSuccessAt": "2026-10-23T13:09:28.355Z",
+            "lastPersistedSuccessAt": "2026-10-23T13:09:28.355Z",
+            "lastPersistedAt": "2026-10-23T13:09:28.734Z"
+          },
+          "rawDueQueueRank": 17,
+          "rawDueQueueSize": 20,
+          "overdueMs": 38638
+        },
+        {
+          "file": "final-status-2.json",
+          "at": "2026-10-23T13:11:16.683Z",
+          "nextDueAt": "2026-10-23T13:11:47.852Z",
+          "nextDuePhaseMs": 47852,
+          "available": false,
+          "failures": 0,
+          "guardUntil": 0,
+          "guardReason": null,
+          "health": {
+            "requests": 1872,
+            "successes": 1863,
+            "failures": 9,
+            "consecutiveFailures": 0,
+            "lastRequestAt": "2026-10-23T13:11:01.949Z",
+            "lastSuccessAt": "2026-10-23T13:11:03.133Z",
+            "lastPersistedSuccessAt": "2026-10-23T13:11:03.133Z",
+            "lastPersistedAt": "2026-10-23T13:11:03.596Z"
+          },
+          "rawDueQueueRank": 0,
+          "rawDueQueueSize": 20,
+          "overdueMs": 0
+        },
+        {
+          "file": "final-status-3.json",
+          "at": "2026-10-23T13:12:20.185Z",
+          "nextDueAt": "2026-10-23T13:11:47.852Z",
+          "nextDuePhaseMs": 47852,
+          "available": false,
+          "failures": 0,
+          "guardUntil": 0,
+          "guardReason": null,
+          "health": {
+            "requests": 1872,
+            "successes": 1863,
+            "failures": 9,
+            "consecutiveFailures": 0,
+            "lastRequestAt": "2026-10-23T13:11:01.949Z",
+            "lastSuccessAt": "2026-10-23T13:11:03.133Z",
+            "lastPersistedSuccessAt": "2026-10-23T13:11:03.133Z",
+            "lastPersistedAt": "2026-10-23T13:11:03.596Z"
+          },
+          "rawDueQueueRank": 17,
+          "rawDueQueueSize": 18,
+          "overdueMs": 32333
+        },
+        {
+          "file": "final-status-4.json",
+          "at": "2026-10-23T13:13:21.133Z",
+          "nextDueAt": "2026-10-23T13:13:47.852Z",
+          "nextDuePhaseMs": 47852,
+          "available": false,
+          "failures": 0,
+          "guardUntil": 0,
+          "guardReason": null,
+          "health": {
+            "requests": 1873,
+            "successes": 1864,
+            "failures": 9,
+            "consecutiveFailures": 0,
+            "lastRequestAt": "2026-10-23T13:13:02.870Z",
+            "lastSuccessAt": "2026-10-23T13:13:03.981Z",
+            "lastPersistedSuccessAt": "2026-10-23T13:13:03.981Z",
+            "lastPersistedAt": "2026-10-23T13:13:04.328Z"
+          },
+          "rawDueQueueRank": 0,
+          "rawDueQueueSize": 14,
+          "overdueMs": 0
+        },
+        {
+          "file": "final-status-5.json",
+          "at": "2026-10-23T13:14:21.437Z",
+          "nextDueAt": "2026-10-23T13:13:47.852Z",
+          "nextDuePhaseMs": 47852,
+          "available": false,
+          "failures": 0,
+          "guardUntil": 0,
+          "guardReason": null,
+          "health": {
+            "requests": 1873,
+            "successes": 1864,
+            "failures": 9,
+            "consecutiveFailures": 0,
+            "lastRequestAt": "2026-10-23T13:13:02.870Z",
+            "lastSuccessAt": "2026-10-23T13:13:03.981Z",
+            "lastPersistedSuccessAt": "2026-10-23T13:13:03.981Z",
+            "lastPersistedAt": "2026-10-23T13:13:04.328Z"
+          },
+          "rawDueQueueRank": 8,
+          "rawDueQueueSize": 13,
+          "overdueMs": 33585
+        }
+      ]
+    }
+  ],
+  "conclusions": [
+    {
+      "group": "group-012",
+      "knownIntervalMs": 120848,
+      "classification": "real_missed_minute_under_bounded_scan",
+      "evidence": [
+        "Success advanced once from 13:11:03.133Z to 13:13:03.981Z; count grew by exactly one, so this is one real interval, not a polling span.",
+        "nextDueAt remained 13:11:47.852Z at 13:12:20.185Z: already overdue, not moved into the future on restore.",
+        "At the 13:12:20 snapshot its raw due rank was 17 of 18, with two global requests in flight. The preceding queue group-008 was cancelled near the same invocation deadline at 13:12:35.528Z.",
+        "It resumed at 13:13:02.870Z in the next invocation with no new collection failure."
+      ],
+      "certainty": "Confirmed no sample in the 13:12 invocation; bounded-window exhaustion is strongly supported by queue order and the adjacent cancellation. The snapshots do not include that invocation return.deadlineReached or a complete dispatch trace."
+    },
+    {
+      "group": "group-008",
+      "knownIntervalMs": 143782,
+      "classification": "bounded_window_cancellation_plus_proven_priority_and_phase_bug",
+      "evidence": [
+        "Success advanced once from 13:11:04.704Z to 13:13:28.486Z; one new request, one new success, no new failure.",
+        "The original due 13:11:40.690Z was replaced by 13:12:36.528Z together with guardReason=request_cancelled. This guard is returned before HTTP and does not increment request/failure health counters.",
+        "Replacing nextDueAt moved unserved work behind other later-due groups. At 13:13:21 it was raw due rank 8 of 14; it dispatched at 13:13:27.338Z.",
+        "After success nextDueAt became 13:13:36.528Z, preserving the cancellation retry offset instead of its hash phase 40.690 seconds."
+      ],
+      "certainty": "The priority/phase mutation is directly visible in production checkpoints and reproduced against old source. The 35-second fallback is source/runtime evidence supplied by the parent; this report does not infer a per-invocation deadline from status.updatedAt."
+    }
+  ],
+  "exactDifferenceFromPreviousRootCause": "The old restore bug repeatedly advanced overdue available groups into future phases. These two groups were unavailable, retained overdue due times through 13:12, and later recovered; this is not recurrence of that permanent-starvation path.",
+  "reviewedPatch": {
+    "source": "/Users/kel/Downloads/guoxiaoshao-master/cloudfunctions/gxs_api/lib/engine/scheduler.js",
+    "sha256": "81f16542f824c80ab525c0bb2028835042db2ab58bda61cd3b2f201734052a11",
+    "behavior": "Only request_cancelled retains its unserved nextDueAt; guardUntil still receives retryAt and prevents early retry. Other denial reasons retain original behavior.",
+    "independentCases": 44,
+    "resultsFile": "/tmp/gxs-core-20261023/review-cancelled-guard-results.json",
+    "reproduction": "/tmp/gxs-core-20261023/cancelled-priority-repro-result.json",
+    "review": "No blocking finding. Fixed, unfixed and minute-aligned modes, cold restore, active guard, default retry, non-cancellation admission equivalence and no same-instant extra dispatch all passed."
+  },
+  "coverageLimits": [
+    "Restoring cancelled priority improves fairness and prevents fixed-phase drift, but does not create extra work time. Had group-008 resumed in the next minute first wave, its preceding successful sample would still have been approximately two minutes earlier.",
+    "Therefore neither the 188-second freshness threshold nor this priority patch establishes the 60-second sampling objective.",
+    "The scheduler currently waits for both requests in each wave, and normal scheduled scans are bounded to the fallback 35-second work window. Increasing that window needs separate cleanup/runtime-budget review and production validation.",
+    "One proven ordinary group (group-031) sampled twice during 13:13 at 02.870 and 33.692 seconds. Its second fixed phase became due after the first overdue recovery; no fast cadence was active. It was last among the 14 raw due entries in the 13:13:21 checkpoint, so this is not evidence that this repeat delayed group-008 or group-012.",
+    "The five snapshots do not prove that removing same-invocation ordinary repeats would improve first-pass coverage; do not broaden the fix solely on that inference.",
+    "Raw due ranks include possible in-flight groups because checkpoint does not retain per-target inFlight; they describe persisted queue ordering, not exact remaining dispatch positions."
+  ],
+  "recommendedScope": "Apply the narrow cancellation-priority fix with its regressions. Keep 35-to-45-second runtime headroom evaluation separate; do not change configured concurrency or ordinary cadence semantics without a justified capacity experiment."
+}

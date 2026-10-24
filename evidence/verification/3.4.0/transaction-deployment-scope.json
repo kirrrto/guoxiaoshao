@@ -1,0 +1,32 @@
+{
+  "version": "3.4.0",
+  "preparedAt": "2026-10-24T00:16:26.049Z",
+  "files": [
+    {
+      "function": "gxs_api",
+      "path": "lib/repo/cloudbase-repo.js",
+      "sha256": "b3887555131942733cfae8e292250e4738a36efe65ef00a9c133243c7531fba7"
+    },
+    {
+      "function": "gxs_api",
+      "path": "lib/repo/upstream-guard.js",
+      "sha256": "50d64cd91ad9f4c31014c6d18fda893eb0cc388ced4ca8edd877912c01036b69"
+    },
+    {
+      "function": "gxs_monitor",
+      "path": "lib/repo/cloudbase-repo.js",
+      "sha256": "b3887555131942733cfae8e292250e4738a36efe65ef00a9c133243c7531fba7"
+    },
+    {
+      "function": "gxs_monitor",
+      "path": "lib/repo/upstream-guard.js",
+      "sha256": "50d64cd91ad9f4c31014c6d18fda893eb0cc388ced4ca8edd877912c01036b69"
+    },
+    {
+      "function": "gxs_monitor",
+      "path": "lib-manifest.json",
+      "sha256": "261d9788e707d22f15774a4e976c655f52471447ae148d115011ee2ca3a25471"
+    }
+  ],
+  "scope": "Conflict handling and clean breaker write reduction; no sender code, dependencies, triggers or runtime config changes"
+}

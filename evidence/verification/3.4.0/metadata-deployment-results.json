@@ -1,0 +1,122 @@
+{
+  "checkedAt": "2026-10-24T00:13:39.582Z",
+  "scope": "Seven metadata files incrementally deployed; subsequent downloaded-code verification required",
+  "functions": {
+    "gxs_api": {
+      "success": true,
+      "taskId": "confirmation_cloud_fn_inc_deploy_64c92b04-8313-4186-8836-9b83b47a56ec",
+      "taskType": "confirmation_cloud_fn_inc_deploy",
+      "status": "success",
+      "createdAt": 1792800756861,
+      "updatedAt": 1792800806049,
+      "detail": "execution_success",
+      "result": {
+        "name": "gxs_api",
+        "filesCount": 2,
+        "packSize": "11.1 KB"
+      }
+    },
+    "gxs_monitor": {
+      "success": true,
+      "taskId": "confirmation_cloud_fn_inc_deploy_8b074b25-e59c-4340-b8e9-09ac3da1cdff",
+      "taskType": "confirmation_cloud_fn_inc_deploy",
+      "status": "success",
+      "createdAt": 1792800765807,
+      "updatedAt": 1792800805179,
+      "detail": "execution_success",
+      "result": {
+        "name": "gxs_monitor",
+        "filesCount": 3,
+        "packSize": "13.6 KB"
+      }
+    },
+    "cloudbase_auth": {
+      "success": true,
+      "taskId": "confirmation_cloud_fn_inc_deploy_6079433c-d775-48a9-b2d9-2a661464c95d",
+      "taskType": "confirmation_cloud_fn_inc_deploy",
+      "status": "success",
+      "createdAt": 1792800765985,
+      "updatedAt": 1792800804367,
+      "detail": "execution_success",
+      "result": {
+        "name": "cloudbase_auth",
+        "filesCount": 2,
+        "packSize": "11.0 KB"
+      }
+    }
+  },
+  "downloadedSource": {
+    "report": "metadata-deployed-source-comparison.json",
+    "passed": true,
+    "comparedFiles": 123
+  },
+  "lockFiles": [
+    {
+      "name": "gxs_api",
+      "match": true,
+      "version": "3.4.0",
+      "sha256": "4818ad6038a940ea5a45a59fd8588e5555749a7e90bb4f735dbb1f5e55cc124b"
+    },
+    {
+      "name": "gxs_monitor",
+      "match": true,
+      "version": "3.4.0",
+      "sha256": "565cb1ee4abcdf56a831bb5b2d0a63856c5abb47b295452c5f4671636c7466f5"
+    },
+    {
+      "name": "cloudbase_auth",
+      "match": true,
+      "version": "3.4.0",
+      "sha256": "c14712e01d89c774dab6886eece1d59ea64a56561e9e9ec6b9f7c0ed52274cc6"
+    }
+  ],
+  "clientPing": {
+    "ok": true,
+    "data": {
+      "version": "3.4.0",
+      "env": "flowermean-6gjaxfqhf6c13e88",
+      "appid": "wxe96ad9e77b602f1b",
+      "crossAccount": true,
+      "hasUser": true,
+      "isAdmin": true
+    },
+    "serverTime": "2026-10-24T00:14:28.470Z",
+    "requestId": "2c4c97af-32f3-420f-9af6-7ab571d3836c"
+  },
+  "functionState": [
+    {
+      "name": "gxs_monitor",
+      "status": "Active",
+      "timeout": 60,
+      "runtime": "Nodejs20.19",
+      "downloadedTriggers": [
+        {
+          "name": "gxs-monitor-minute",
+          "type": "timer",
+          "config": "0 * * * * * *"
+        }
+      ]
+    },
+    {
+      "name": "gxs_api",
+      "status": "Active",
+      "timeout": 60,
+      "runtime": "Nodejs18.15",
+      "downloadedTriggers": [
+        {
+          "name": "gxs-payment-reconcile-five-minutes",
+          "type": "timer",
+          "config": "0 */5 * * * * *"
+        }
+      ]
+    },
+    {
+      "name": "cloudbase_auth",
+      "status": "Active",
+      "timeout": 5,
+      "runtime": "Nodejs18.15",
+      "downloadedTriggers": null
+    }
+  ],
+  "verifiedAt": "2026-10-24T00:14:49.521Z"
+}

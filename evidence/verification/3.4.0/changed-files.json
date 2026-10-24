@@ -1,0 +1,317 @@
+{
+  "version": "3.4.0",
+  "scope": "Known candidate runtime, UI, version, tests and release documentation changes against recorded baselines; includes 2026-10-24 transaction repair. Temporary acceptance source is excluded. README refreshed with final acceptance status before GitHub synchronization.",
+  "files": [
+    {
+      "path": "cloudfunctions/cloudbase_auth/package-lock.json",
+      "change": "modified",
+      "sha256": "c14712e01d89c774dab6886eece1d59ea64a56561e9e9ec6b9f7c0ed52274cc6"
+    },
+    {
+      "path": "cloudfunctions/cloudbase_auth/package.json",
+      "change": "modified",
+      "sha256": "f1dfb0be78ffd7f7c03be78ad5004b2f612e7a321e5c92b8a757c5fd8369b2b5"
+    },
+    {
+      "path": "cloudfunctions/gxs_api/lib/engine/collector.js",
+      "change": "modified",
+      "sha256": "e44df0c1ca9839ea16fd578d29591fba5f4baa1da4256f17bab2902e78e80f14"
+    },
+    {
+      "path": "cloudfunctions/gxs_api/lib/engine/scheduled.js",
+      "change": "modified",
+      "sha256": "64fbc145d9dd225c53761c10bb9999fb145f6540bb801d7708d779d0438da616"
+    },
+    {
+      "path": "cloudfunctions/gxs_api/lib/engine/scheduler.js",
+      "change": "modified",
+      "sha256": "81f16542f824c80ab525c0bb2028835042db2ab58bda61cd3b2f201734052a11"
+    },
+    {
+      "path": "cloudfunctions/gxs_api/lib/monitor-readiness.js",
+      "change": "modified",
+      "sha256": "4791ca899c14aefff3b181328c8ba4ac85ca8484dfc0359aec59ef9d2f7a9046"
+    },
+    {
+      "path": "cloudfunctions/gxs_api/lib/repo/atomic-ops.js",
+      "change": "modified",
+      "sha256": "3bd235a658f30f86312388e852d25dce5b89458fec77363da4d06fb3a411a4a7"
+    },
+    {
+      "path": "cloudfunctions/gxs_api/lib/repo/cloudbase-repo.js",
+      "change": "modified",
+      "sha256": "b3887555131942733cfae8e292250e4738a36efe65ef00a9c133243c7531fba7"
+    },
+    {
+      "path": "cloudfunctions/gxs_api/lib/repo/upstream-guard.js",
+      "change": "modified",
+      "sha256": "50d64cd91ad9f4c31014c6d18fda893eb0cc388ced4ca8edd877912c01036b69"
+    },
+    {
+      "path": "cloudfunctions/gxs_api/package-lock.json",
+      "change": "modified",
+      "sha256": "4818ad6038a940ea5a45a59fd8588e5555749a7e90bb4f735dbb1f5e55cc124b"
+    },
+    {
+      "path": "cloudfunctions/gxs_api/package.json",
+      "change": "modified",
+      "sha256": "6e54d53fdac10109046f38f85ca26b8fd6a01d907ba257809989e6db19cca306"
+    },
+    {
+      "path": "cloudfunctions/gxs_monitor/lib-manifest.json",
+      "change": "modified",
+      "sha256": "261d9788e707d22f15774a4e976c655f52471447ae148d115011ee2ca3a25471"
+    },
+    {
+      "path": "cloudfunctions/gxs_monitor/lib/engine/collector.js",
+      "change": "modified",
+      "sha256": "e44df0c1ca9839ea16fd578d29591fba5f4baa1da4256f17bab2902e78e80f14"
+    },
+    {
+      "path": "cloudfunctions/gxs_monitor/lib/engine/scheduled.js",
+      "change": "modified",
+      "sha256": "64fbc145d9dd225c53761c10bb9999fb145f6540bb801d7708d779d0438da616"
+    },
+    {
+      "path": "cloudfunctions/gxs_monitor/lib/engine/scheduler.js",
+      "change": "modified",
+      "sha256": "81f16542f824c80ab525c0bb2028835042db2ab58bda61cd3b2f201734052a11"
+    },
+    {
+      "path": "cloudfunctions/gxs_monitor/lib/repo/atomic-ops.js",
+      "change": "modified",
+      "sha256": "3bd235a658f30f86312388e852d25dce5b89458fec77363da4d06fb3a411a4a7"
+    },
+    {
+      "path": "cloudfunctions/gxs_monitor/lib/repo/cloudbase-repo.js",
+      "change": "modified",
+      "sha256": "b3887555131942733cfae8e292250e4738a36efe65ef00a9c133243c7531fba7"
+    },
+    {
+      "path": "cloudfunctions/gxs_monitor/lib/repo/upstream-guard.js",
+      "change": "modified",
+      "sha256": "50d64cd91ad9f4c31014c6d18fda893eb0cc388ced4ca8edd877912c01036b69"
+    },
+    {
+      "path": "cloudfunctions/gxs_monitor/package-lock.json",
+      "change": "modified",
+      "sha256": "565cb1ee4abcdf56a831bb5b2d0a63856c5abb47b295452c5f4671636c7466f5"
+    },
+    {
+      "path": "cloudfunctions/gxs_monitor/package.json",
+      "change": "modified",
+      "sha256": "7a04c6e0998fd58995f1a8a70b7e0d236d416fa8b9b89d07fd93f3cd3a49da66"
+    },
+    {
+      "path": "config/delivery-targets.json",
+      "change": "modified",
+      "sha256": "705be860a9e0cc38e1b64470800b8761ebdbaf92271b8f4dc1002b694130aa50"
+    },
+    {
+      "path": "docs/CORE_ACCEPTANCE_2026-10-24.md",
+      "change": "added",
+      "sha256": "ff503aa56452d0937f6e1095f29001d19fb0afdacc38d4894755a950a4eb7b48"
+    },
+    {
+      "path": "docs/CORE_STABILITY_2026-10-23.md",
+      "change": "added",
+      "sha256": "0890db8fcc7b32c3e25fbd42d24c4a7d33c0828f59221396295b2946547befa5"
+    },
+    {
+      "path": "docs/RELEASE_3.4.0.md",
+      "change": "added",
+      "sha256": "b68dae8a58078d4874df7902a862dcc81b5b5c2c5c44464d21f93420cb25a40f"
+    },
+    {
+      "path": "docs/UX_REFINEMENT_2026-10-23.md",
+      "change": "added",
+      "sha256": "ed62828aa9a5ded3a89544f3290d91446feaebe52aaabbdc06a934134e5d30c4"
+    },
+    {
+      "path": "miniprogram/components/config-sheet/index.wxml",
+      "change": "modified",
+      "sha256": "1a1a072e42c621a8e7c74946809481a98271c1b7b4b7578ebba3ac5377454c5b"
+    },
+    {
+      "path": "miniprogram/components/config-sheet/index.wxss",
+      "change": "modified",
+      "sha256": "7dda47a51398c084ff6fbc1c2a7ed901b97f2d148dcef0fcae4e3ba13f22e4d5"
+    },
+    {
+      "path": "miniprogram/components/target-picker/index.wxss",
+      "change": "modified",
+      "sha256": "85de566f4dd8694be570682b1db14a37bfb9d2088d46bcfd91a2818a7bcf30b5"
+    },
+    {
+      "path": "miniprogram/config/release-notes.js",
+      "change": "modified",
+      "sha256": "e092d95602ffb7a556528765042313714ea65eef321bef703f5d4771b6245062"
+    },
+    {
+      "path": "miniprogram/config/usage-guide.js",
+      "change": "modified",
+      "sha256": "7db9b88a1a3013fc301708a325691763945311b58d241b4b367692b2f81b6b7e"
+    },
+    {
+      "path": "miniprogram/config/version.js",
+      "change": "modified",
+      "sha256": "31ac1a21e2826bf24f04643513eff10b6dc8dce9465023dd45241cc35db68345"
+    },
+    {
+      "path": "miniprogram/pages/follow/index.js",
+      "change": "modified",
+      "sha256": "d74702ded0f5cfcb6ac6895e5a7a606df3f3f8d7818a0cac7f5509ab4777cdad"
+    },
+    {
+      "path": "miniprogram/pages/follow/index.wxml",
+      "change": "modified",
+      "sha256": "0a06eeba7c7d9206487941636c41e3344ea93744a4c45e3812fd0422907b91c3"
+    },
+    {
+      "path": "miniprogram/pages/follow/index.wxss",
+      "change": "modified",
+      "sha256": "bd12a652c23276df7dbf429f93a6a4d660fa666597e6bc601649585873b1d80e"
+    },
+    {
+      "path": "miniprogram/pages/guide/index.js",
+      "change": "modified",
+      "sha256": "dd9b3834677fbb1917ee98f166d04a9e366f4723d2a0562ae8e0ae9e41354def"
+    },
+    {
+      "path": "miniprogram/pages/guide/index.json",
+      "change": "modified",
+      "sha256": "e7d97c431b996ee8cc525ac80ce16ab47b90860410e5440649d22ee3ee084ecc"
+    },
+    {
+      "path": "miniprogram/pages/guide/index.wxml",
+      "change": "modified",
+      "sha256": "230d1017464cb7c972b3b707bfae816852b5460b1c96ec53e63b55ba62843c9e"
+    },
+    {
+      "path": "miniprogram/pages/guide/index.wxss",
+      "change": "modified",
+      "sha256": "7d5376269184cbd3553cc9a13d87d15af213f5d1b422647a9cac4a29cec5c1cf"
+    },
+    {
+      "path": "miniprogram/pages/query/index.js",
+      "change": "modified",
+      "sha256": "54a3663d6267e48be6ee65f6db69117e7f62752378f931ab911a942eefee1454"
+    },
+    {
+      "path": "miniprogram/pages/query/index.wxml",
+      "change": "modified",
+      "sha256": "aa18881e41229a35ec6ee4f46dcd2b2464ad84aa5adc00aad92176fe365f03d2"
+    },
+    {
+      "path": "miniprogram/pages/query/index.wxss",
+      "change": "modified",
+      "sha256": "afebc95fec48fe303e031b8bc96b885a4e357a8488dc114067bd4676cad3dc2b"
+    },
+    {
+      "path": "package-lock.json",
+      "change": "modified",
+      "sha256": "980785262e037cdceb199c03c855537e236719ce3fba5f41b7bed0409379da2d"
+    },
+    {
+      "path": "package.json",
+      "change": "modified",
+      "sha256": "b06e5e465ccd19818f479a3e26839c4ff5a01ac20970c16b9ddd4b16408d78c0"
+    },
+    {
+      "path": "README.md",
+      "change": "modified",
+      "sha256": "39e907bf4534c7c6b1655f97639791704e52d940cc074a4a13f6d707c12564ac"
+    },
+    {
+      "path": "tests/burst-alerts.test.mjs",
+      "change": "modified",
+      "sha256": "9074c0a6a2544ab451ddff6cd06ac678f260dedf83fb5adeb5114f9e6849975a"
+    },
+    {
+      "path": "tests/fixed-cadence.test.mjs",
+      "change": "modified",
+      "sha256": "1da72c73410c7b3634a9bc77fd72278a1c0b060b3ad986dad3bd2fb3130805a0"
+    },
+    {
+      "path": "tests/follow-readiness.test.mjs",
+      "change": "modified",
+      "sha256": "4da9233dd07133ce98d1bcffbdc9186b1d36604eab1b7162d2dec64134b48f78"
+    },
+    {
+      "path": "tests/frontend-regression.test.mjs",
+      "change": "modified",
+      "sha256": "d1cce9f3934fae6ff613a96108f667a4d9a4d1964a38f962d21c4f7cc12da345"
+    },
+    {
+      "path": "tests/helpers/memory-repo.mjs",
+      "change": "modified",
+      "sha256": "4f372396ca7d58dfbc3a86e573a1bc197dbed9055f1c34b0da14fc29c67c6c94"
+    },
+    {
+      "path": "tests/launch-calendar-guide.test.mjs",
+      "change": "modified",
+      "sha256": "a0cd551bd3f8e9ea427129f3d5b1c5a0cb3d06487282ad7bbea020eaaea43bd7"
+    },
+    {
+      "path": "tests/monitor-business-health.test.mjs",
+      "change": "modified",
+      "sha256": "77d8ca1bf9e042f7b8848af4334372788f65381fce08b8c26ba64243563dbdbb"
+    },
+    {
+      "path": "tests/notification-planning-fairness.test.mjs",
+      "change": "added",
+      "sha256": "6458f434102d3bd8e5e77d77054dd07a18bff44643c15d9120e5bf7c7a1eb721"
+    },
+    {
+      "path": "tests/personal-reminder-readiness.test.mjs",
+      "change": "modified",
+      "sha256": "a9ffee9af6c49cef6edefef19bab8fd276fb41d154e75f9fa740799b395d612a"
+    },
+    {
+      "path": "tests/product-thumbnails.test.mjs",
+      "change": "modified",
+      "sha256": "3d4267cf5daaa4b345182cc59c56be7db99291e4f0bb09f750c68668d08ec427"
+    },
+    {
+      "path": "tests/scheduled-monitor.test.mjs",
+      "change": "modified",
+      "sha256": "51cd8b020c67e88356b247191c38ad5adf7ab523f03e1bd794deb1eb73393a13"
+    },
+    {
+      "path": "tests/transaction-conflict-recovery.test.mjs",
+      "change": "added",
+      "sha256": "c0101b4d0846016d68d2683470b64411eb72ab115b8756fb5a35a0555b1af069"
+    },
+    {
+      "path": "tests/v3-history-help-journey.test.mjs",
+      "change": "modified",
+      "sha256": "5ef08cf5dad96674386d053a12a1b49654a23f1141a77663edbfe1c173fe914f"
+    },
+    {
+      "path": "tests/v3-query-journey.test.mjs",
+      "change": "modified",
+      "sha256": "0ab82022fab8f719e017e80ae06f0e2d6e3445b01fb68e64d2c7b26364d95aef"
+    },
+    {
+      "path": "tools/collector/package-lock.json",
+      "change": "modified",
+      "sha256": "05f9ce552c2c9723f51ffb17bf2dcf0e74297f253b462bfb5634ff2ad8d88b12"
+    },
+    {
+      "path": "tools/collector/package.json",
+      "change": "modified",
+      "sha256": "b5c642a9bb2b48684f95bd3f0526a847d88e88e6c85af287642cc2ddf183453b"
+    },
+    {
+      "path": "tools/ui-preview/build.mjs",
+      "change": "modified",
+      "sha256": "f0496f5e185e83960f42acc2e787bf0eb6cf9193e6a8909a496a413584aae5da"
+    },
+    {
+      "path": "tools/ui-preview/check-sheet-layout.mjs",
+      "change": "added",
+      "sha256": "8e9c4587dd83fb0988987558dea7faa5e1a151729c642c30723d6524892de9e4"
+    }
+  ],
+  "generatedAt": "2026-10-24T00:32:54.293Z"
+}

@@ -55,12 +55,17 @@ const DETECTION_DETAIL = {
 };
 
 function deliveryView(notifications, templateIds) {
-  const reason = notifications.reason || notifications.disabledReason || '';
+  const overallReady = notifications.deliveryReady === true;
+  const hasSenderStatus = typeof notifications.senderReady === 'boolean';
+  const senderReady = hasSenderStatus ? notifications.senderReady : overallReady;
+  const rawReason = hasSenderStatus ? notifications.senderReason : notifications.reason || notifications.disabledReason;
+  const reason = typeof rawReason === 'string' ? rawReason : '';
   const detail = DELIVERY_REASON[reason] || (/[^\x00-\x7F]/.test(reason) ? reason : '消息服务尚未就绪，请稍后刷新状态。');
-  if (!templateIds.length) return { label: '暂不能发送', cls: 'warn', detail: DELIVERY_REASON.template_missing };
-  if (!notifications.enabled) return { label: '尚未开放', cls: 'warn', detail: DELIVERY_REASON.notifications_disabled };
-  if (notifications.deliveryReady !== true) return { label: '发送服务未就绪', cls: 'warn', detail };
-  return { label: '发送服务已就绪', cls: 'ok', detail: '检测到符合条件的库存变化后，将使用对应的有效授权发送提醒。' };
+  if (!templateIds.length) return { overallReady, label: '暂不能发送', cls: 'warn', detail: DELIVERY_REASON.template_missing };
+  if (!notifications.enabled) return { overallReady, label: '尚未开放', cls: 'warn', detail: DELIVERY_REASON.notifications_disabled };
+  if (!senderReady && reason.startsWith('collector_')) return { overallReady, label: '发送状态待确认', cls: 'muted', detail: '暂未取得微信发送通道的有效状态，请稍后刷新确认。' };
+  if (!senderReady) return { overallReady, label: '发送服务未就绪', cls: 'warn', detail };
+  return { overallReady, label: '发送服务已就绪', cls: 'ok', detail: '微信发送通道已连接。实际发送仍需库存、关注与有效授权等条件满足。' };
 }
 
 const FEEDBACK_TOAST = { bought: '恭喜买到！', missed: '已记录，继续为你盯着', skipped: '已记录，继续为你盯着' };
@@ -736,7 +741,10 @@ Page({
       soldoutTitle: '库存不足提醒',
     }) : { anyBlocked: false, restockBlocked: false, blocked: [] };
     if (JSON.stringify(this.data.consent || null) !== JSON.stringify(consent)) this.setData({ consent });
-    const readiness = reminderReadiness({ ...this.data, settings: this.settings, consent });
+    // The status column describes the sender; overall reminder readiness must
+    // still honour the server's full delivery gate, including stock health.
+    const delivery = this.data.delivery.overallReady === false ? { ...this.data.delivery, cls: 'warn' } : this.data.delivery;
+    const readiness = reminderReadiness({ ...this.data, delivery, settings: this.settings, consent });
     // Other credit states already include this guidance in the notice. Service
     // failures and pending records need recovery, not more authorizations.
     const tip = readiness.code === 'ready' ? creditBoostTip(this.data.subscription || {}) : '';
@@ -985,7 +993,7 @@ Page({
   },
 
   promptSubscribe() {
-    if (!this.data.boot.templateIds.length || this.data.delivery.cls !== 'ok') return;
+    if (!this.data.boot.templateIds.length || this.data.delivery.cls !== 'ok' || this.data.delivery.overallReady === false) return;
     // showModal's confirm is not a user gesture for wx.requestSubscribeMessage
     // on Android — the dialog stays silent. Point at the real tap button instead.
     wx.showModal({

@@ -1,0 +1,34 @@
+{
+  "checkedAt": "2026-10-23T13:12:21.913Z",
+  "totalRuntimeFilesCompared": 123,
+  "runtimeImplementationMatches": true,
+  "remainingReleaseMetadata": [
+    {
+      "function": "gxs_api",
+      "file": "package.json",
+      "reason": "Incremental core repair intentionally retained deployed package version 3.3.2; local candidate is 3.4.0"
+    },
+    {
+      "function": "gxs_monitor",
+      "file": "lib-manifest.json",
+      "reason": "Generated monitor manifest is outside deployed lib folder; synchronize with full candidate release"
+    },
+    {
+      "function": "gxs_monitor",
+      "file": "package.json",
+      "reason": "Incremental core repair intentionally retained deployed package version 3.3.2; local candidate is 3.4.0"
+    },
+    {
+      "function": "cloudbase_auth",
+      "file": "package.json",
+      "reason": "Incremental core repair intentionally retained deployed package version 3.3.2; local candidate is 3.4.0"
+    }
+  ],
+  "coreLibraryComparison": "deployed-core-comparison.json",
+  "sourceCandidateVersion": "3.4.0",
+  "frontendPublished": false,
+  "implementationMatchesCurrentCandidate": true,
+  "followupPendingRuntimeFiles": [],
+  "note": "Both follow-up engine updates succeeded at 21:32. All 112 downloaded library files match the current reviewed candidate; package and lib-manifest metadata are outside this incremental scope and remain release work.",
+  "followupComparison": "followup-deployed-core-comparison.json"
+}

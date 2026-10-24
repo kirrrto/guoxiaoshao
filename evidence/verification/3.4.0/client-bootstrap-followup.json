@@ -1,0 +1,31 @@
+{
+  "checkedAt": "2026-10-23T13:39:16.562Z",
+  "scope": "Live consumer SDK response; account fields excluded",
+  "ok": true,
+  "serverTime": "2026-10-23T13:39:16.039Z",
+  "collector": {
+    "state": "running",
+    "stale": false,
+    "groupCount": 31,
+    "intervalMs": 60000,
+    "updatedAt": "2026-10-23T13:39:14.838Z",
+    "observationHealth": {
+      "state": "healthy",
+      "groupCount": 31,
+      "freshGroups": 31,
+      "staleGroups": 0,
+      "pendingGroups": 0,
+      "staleAfterMs": 188000,
+      "oldestSuccessAt": "2026-10-23T13:38:12.837Z",
+      "lastSuccessAt": "2026-10-23T13:39:13.894Z",
+      "evaluatedAt": "2026-10-23T13:39:16.039Z"
+    }
+  },
+  "notifications": {
+    "enabled": true,
+    "deliveryReady": true,
+    "reason": null,
+    "senderReady": true,
+    "senderReason": null
+  }
+}

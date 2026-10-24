@@ -1,0 +1,4949 @@
+{
+  "schemaVersion": 1,
+  "release": "v3.4.0",
+  "title": "35-second versus 45-second scheduled scan window: isolated virtual-clock evidence",
+  "generatedAt": "2026-10-23T13:30:45.773Z",
+  "mode": "offline_fixture_only_no_production_requests_or_notifications",
+  "platformCondition": {
+    "function": "gxs_monitor",
+    "status": "Active",
+    "timeoutSeconds": 60,
+    "runtime": "Nodejs20.19",
+    "verification": "Parent independently re-read cloud_fn_info; saved local read-only tool response also confirms these exact whitelisted fields.",
+    "evidenceFile": "/tmp/gxs-core-20261023/monitor-info-followup.json",
+    "evidenceFileSha256": "108477ac4099c9346c892db590efa76d51a58d2e96e6f8bd7c962ab996a8695d",
+    "constraint": "45 seconds is assessed only against the currently verified 60-second function timeout. Re-evaluate if that timeout changes."
+  },
+  "method": {
+    "groupCount": 31,
+    "distinctStores": 31,
+    "partNumbersPerGroup": 1,
+    "maxConcurrency": 2,
+    "cadenceSeconds": 60,
+    "cadenceMode": "fixed",
+    "initialNextDueAtOffsetMs": -24000,
+    "initialInventory": "unavailable, no alert events, empty notification queue except slow_notification scenarios",
+    "accountFollowIndexes": "Present and valid; no legacy per-account follow lookup fallback.",
+    "clock": "A deterministic asynchronous timer queue advances to the next scheduled completion; overlapping operations consume concurrent, not additive, elapsed time.",
+    "database": "Each repository method awaits the configured synthetic delay, then runs the existing in-memory repository implementation. Atomic transaction logic, lease ownership, quota decisions and application code remain active.",
+    "http": "AbortSignal.timeout budgets are recorded; the simulated fetch completes at min(response delay, granted timeout). Exceeding that timeout throws a TimeoutError, so deadline-truncated requests do not count as successful coverage.",
+    "notification": "slow_notification scenarios seed one valid pending task for a confirmed available target, use an 8-second simulated message call bounded by the options.timeoutMs supplied by notifier, and retain actual claim/reservation/settlement code.",
+    "workBudget": "Explicit runScheduled maxRunMs is 35000 or 45000. Source files were not edited by this experiment.",
+    "measuredEndpoint": "Await runScheduled resolution, including scheduler drain, settleNotifications and collector lease release.",
+    "successfulUniqueGroupsDefinition": "Distinct storeNumber values whose simulated HTTP response completed successfully before its assigned timeout. The generated response is a valid known-stock observation.",
+    "scannedDefinition": "The production result.scanned count includes persisted unknown observations and may include repeated phase visits; it is not unique successful coverage.",
+    "lateDatabaseStall": "All repository methods starting at or after maxRunMs - 1000 switch to an 8000ms delay; this is an adversarial boundary test, not a production measurement."
+  },
+  "keyFindings": [
+    "With 200ms repository methods and 800ms HTTP, 35 -> 45 seconds improves successful unique coverage from 30/31 to 31/31; elapsed time including cleanup is 35.4 -> 45.8 seconds.",
+    "With 300ms repository methods and 800ms HTTP, successful coverage is 22/31 -> 30/31 after honoring shortened HTTP budgets; 45 seconds still does not guarantee every group.",
+    "At 45 seconds, tested ordinary and slow DB/HTTP/message cases finish between 25.8 and 54 seconds, excluding entry/cold-start overhead.",
+    "At 45 seconds with 200ms repository latency there are 39 attempts but only 31 unique successful groups; 8 attempts revisit groups in a subsequent phase.",
+    "An adversarial late 8-second DB stall exceeds the 60-second platform timeout under both 35- and 45-second work windows (66 and 68 seconds), and loses the collector lease.",
+    "No test result establishes absence of missed notifications or real WeChat receipt."
+  ],
+  "limitations": [
+    "Synthetic repository-method latency is not a per-CloudBase-RPC latency; production transactions can contain multiple reads/writes and retries.",
+    "No platform hard kill was applied at 60 seconds, so adversarial results above 60 seconds are diagnostic counterexamples rather than deployable completion guarantees.",
+    "Timing starts at runScheduled entry and excludes module cold start, handler prelude, real token probe/network overhead and platform scheduling delays.",
+    "No real database contention, CloudBase transaction retries, multi-instance race, large SKU batches or actual Apple/WeChat traffic is modeled.",
+    "Daily retention is modeled at repository-method granularity; production purgeExpiredData and purgeGrowthData contain multiple sequential operations that can overrun a nominal cleanup allowance.",
+    "HTTP and message cancellation are modeled from the budgets the code supplies, not by wall-clock platform transport execution.",
+    "A 15-second nominal reserve is not a hard bound on cleanup because existing database operations and settlement are not collectively deadline-cancelled.",
+    "The 45-second experiment measures throughput and bounded-network behavior; it does not change shared request quotas, concurrency, notification dedupe, uncertain-send retry semantics or platform remaining-time helper behavior."
+  ],
+  "artifacts": {
+    "authoritativeResults": {
+      "path": "/tmp/gxs-scheduled-window-slow-audit-20261023.json",
+      "sha256": "9ca69fdad2db41ad047b56d5b27e86f2f07bc03f73dba94aa305600267591503"
+    },
+    "reproductionScript": {
+      "path": "/tmp/gxs-scheduled-window-slow-audit-20261023.mjs",
+      "sha256": "53eb08161bf72bbdd190973e6670a8f0a19e6450d3aa57ca69e98bb3d27cdb87"
+    },
+    "earlierSimplifiedResults": {
+      "path": "/tmp/gxs-scheduled-window-audit-20261023.json",
+      "status": "superseded for coverage assertions because that first script did not enforce the shortened HTTP timeout at the deadline"
+    }
+  },
+  "pairs": [
+    {
+      "category": "normal",
+      "repositoryMethodDelayMs": 100,
+      "httpResponseDelayMs": 800,
+      "pendingMessageDelayMs": 0,
+      "lateDatabaseDelayMs": 0,
+      "budget35": {
+        "scenario": "window-01",
+        "elapsedThroughLeaseReleaseMs": 25400,
+        "nominalPlatformHeadroomMs": 34600,
+        "overLogicalWorkBudgetMs": 0,
+        "attemptedRequests": 31,
+        "successfulUniqueGroups": 31,
+        "fullyCovered": true,
+        "acceptedMessages": 0,
+        "state": "running",
+        "deadlineReached": false,
+        "scannedBatchesIncludingUnknown": 31,
+        "statusWrites": 35,
+        "totalRepositoryMethodCalls": 300,
+        "finalStatus": {
+          "kind": "status",
+          "at": 25200,
+          "batches": 31,
+          "inFlight": 0
+        }
+      },
+      "budget45": {
+        "scenario": "window-02",
+        "elapsedThroughLeaseReleaseMs": 25800,
+        "nominalPlatformHeadroomMs": 34200,
+        "overLogicalWorkBudgetMs": 0,
+        "attemptedRequests": 31,
+        "successfulUniqueGroups": 31,
+        "fullyCovered": true,
+        "acceptedMessages": 0,
+        "state": "running",
+        "deadlineReached": false,
+        "scannedBatchesIncludingUnknown": 31,
+        "statusWrites": 35,
+        "totalRepositoryMethodCalls": 304,
+        "finalStatus": {
+          "kind": "status",
+          "at": 25600,
+          "batches": 31,
+          "inFlight": 0
+        }
+      }
+    },
+    {
+      "category": "normal",
+      "repositoryMethodDelayMs": 200,
+      "httpResponseDelayMs": 800,
+      "pendingMessageDelayMs": 0,
+      "lateDatabaseDelayMs": 0,
+      "budget35": {
+        "scenario": "window-03",
+        "elapsedThroughLeaseReleaseMs": 35400,
+        "nominalPlatformHeadroomMs": 24600,
+        "overLogicalWorkBudgetMs": 400,
+        "attemptedRequests": 30,
+        "successfulUniqueGroups": 30,
+        "fullyCovered": false,
+        "acceptedMessages": 0,
+        "state": "running",
+        "deadlineReached": true,
+        "scannedBatchesIncludingUnknown": 30,
+        "statusWrites": 35,
+        "totalRepositoryMethodCalls": 283,
+        "finalStatus": {
+          "kind": "status",
+          "at": 35000,
+          "batches": 30,
+          "inFlight": 0
+        }
+      },
+      "budget45": {
+        "scenario": "window-04",
+        "elapsedThroughLeaseReleaseMs": 45800,
+        "nominalPlatformHeadroomMs": 14200,
+        "overLogicalWorkBudgetMs": 800,
+        "attemptedRequests": 39,
+        "successfulUniqueGroups": 31,
+        "fullyCovered": true,
+        "acceptedMessages": 0,
+        "state": "running",
+        "deadlineReached": true,
+        "scannedBatchesIncludingUnknown": 39,
+        "statusWrites": 43,
+        "totalRepositoryMethodCalls": 363,
+        "finalStatus": {
+          "kind": "status",
+          "at": 45400,
+          "batches": 39,
+          "inFlight": 0
+        }
+      }
+    },
+    {
+      "category": "normal",
+      "repositoryMethodDelayMs": 300,
+      "httpResponseDelayMs": 800,
+      "pendingMessageDelayMs": 0,
+      "lateDatabaseDelayMs": 0,
+      "budget35": {
+        "scenario": "window-05",
+        "elapsedThroughLeaseReleaseMs": 35800,
+        "nominalPlatformHeadroomMs": 24200,
+        "overLogicalWorkBudgetMs": 800,
+        "attemptedRequests": 24,
+        "successfulUniqueGroups": 22,
+        "fullyCovered": false,
+        "acceptedMessages": 0,
+        "state": "running",
+        "deadlineReached": true,
+        "scannedBatchesIncludingUnknown": 24,
+        "statusWrites": 25,
+        "totalRepositoryMethodCalls": 214,
+        "finalStatus": {
+          "kind": "status",
+          "at": 35200,
+          "batches": 24,
+          "inFlight": 0
+        }
+      },
+      "budget45": {
+        "scenario": "window-06",
+        "elapsedThroughLeaseReleaseMs": 46400,
+        "nominalPlatformHeadroomMs": 13600,
+        "overLogicalWorkBudgetMs": 1400,
+        "attemptedRequests": 30,
+        "successfulUniqueGroups": 30,
+        "fullyCovered": false,
+        "acceptedMessages": 0,
+        "state": "running",
+        "deadlineReached": true,
+        "scannedBatchesIncludingUnknown": 30,
+        "statusWrites": 35,
+        "totalRepositoryMethodCalls": 279,
+        "finalStatus": {
+          "kind": "status",
+          "at": 45800,
+          "batches": 30,
+          "inFlight": 0
+        }
+      }
+    },
+    {
+      "category": "slow_http",
+      "repositoryMethodDelayMs": 300,
+      "httpResponseDelayMs": 5000,
+      "pendingMessageDelayMs": 0,
+      "lateDatabaseDelayMs": 0,
+      "budget35": {
+        "scenario": "window-07",
+        "elapsedThroughLeaseReleaseMs": 36100,
+        "nominalPlatformHeadroomMs": 23900,
+        "overLogicalWorkBudgetMs": 1100,
+        "attemptedRequests": 10,
+        "successfulUniqueGroups": 8,
+        "fullyCovered": false,
+        "acceptedMessages": 0,
+        "state": "running",
+        "deadlineReached": true,
+        "scannedBatchesIncludingUnknown": 10,
+        "statusWrites": 11,
+        "totalRepositoryMethodCalls": 110,
+        "finalStatus": {
+          "kind": "status",
+          "at": 35200,
+          "batches": 10,
+          "inFlight": 0
+        }
+      },
+      "budget45": {
+        "scenario": "window-08",
+        "elapsedThroughLeaseReleaseMs": 46300,
+        "nominalPlatformHeadroomMs": 13700,
+        "overLogicalWorkBudgetMs": 1300,
+        "attemptedRequests": 12,
+        "successfulUniqueGroups": 12,
+        "fullyCovered": false,
+        "acceptedMessages": 0,
+        "state": "running",
+        "deadlineReached": true,
+        "scannedBatchesIncludingUnknown": 12,
+        "statusWrites": 17,
+        "totalRepositoryMethodCalls": 137,
+        "finalStatus": {
+          "kind": "status",
+          "at": 45700,
+          "batches": 12,
+          "inFlight": 0
+        }
+      }
+    },
+    {
+      "category": "slow_database",
+      "repositoryMethodDelayMs": 1000,
+      "httpResponseDelayMs": 800,
+      "pendingMessageDelayMs": 0,
+      "lateDatabaseDelayMs": 0,
+      "budget35": {
+        "scenario": "window-09",
+        "elapsedThroughLeaseReleaseMs": 38000,
+        "nominalPlatformHeadroomMs": 22000,
+        "overLogicalWorkBudgetMs": 3000,
+        "attemptedRequests": 8,
+        "successfulUniqueGroups": 8,
+        "fullyCovered": false,
+        "acceptedMessages": 0,
+        "state": "running",
+        "deadlineReached": true,
+        "scannedBatchesIncludingUnknown": 8,
+        "statusWrites": 11,
+        "totalRepositoryMethodCalls": 74,
+        "finalStatus": {
+          "kind": "status",
+          "at": 36000,
+          "batches": 8,
+          "inFlight": 0
+        }
+      },
+      "budget45": {
+        "scenario": "window-10",
+        "elapsedThroughLeaseReleaseMs": 50000,
+        "nominalPlatformHeadroomMs": 10000,
+        "overLogicalWorkBudgetMs": 5000,
+        "attemptedRequests": 12,
+        "successfulUniqueGroups": 10,
+        "fullyCovered": false,
+        "acceptedMessages": 0,
+        "state": "running",
+        "deadlineReached": true,
+        "scannedBatchesIncludingUnknown": 12,
+        "statusWrites": 13,
+        "totalRepositoryMethodCalls": 103,
+        "finalStatus": {
+          "kind": "status",
+          "at": 48000,
+          "batches": 12,
+          "inFlight": 0
+        }
+      }
+    },
+    {
+      "category": "slow_database",
+      "repositoryMethodDelayMs": 3000,
+      "httpResponseDelayMs": 800,
+      "pendingMessageDelayMs": 0,
+      "lateDatabaseDelayMs": 0,
+      "budget35": {
+        "scenario": "window-11",
+        "elapsedThroughLeaseReleaseMs": 42800,
+        "nominalPlatformHeadroomMs": 17200,
+        "overLogicalWorkBudgetMs": 7800,
+        "attemptedRequests": 2,
+        "successfulUniqueGroups": 2,
+        "fullyCovered": false,
+        "acceptedMessages": 0,
+        "state": "running",
+        "deadlineReached": true,
+        "scannedBatchesIncludingUnknown": 2,
+        "statusWrites": 3,
+        "totalRepositoryMethodCalls": 25,
+        "finalStatus": {
+          "kind": "status",
+          "at": 36800,
+          "batches": 2,
+          "inFlight": 0
+        }
+      },
+      "budget45": {
+        "scenario": "window-12",
+        "elapsedThroughLeaseReleaseMs": 54000,
+        "nominalPlatformHeadroomMs": 6000,
+        "overLogicalWorkBudgetMs": 9000,
+        "attemptedRequests": 2,
+        "successfulUniqueGroups": 2,
+        "fullyCovered": false,
+        "acceptedMessages": 0,
+        "state": "running",
+        "deadlineReached": true,
+        "scannedBatchesIncludingUnknown": 2,
+        "statusWrites": 5,
+        "totalRepositoryMethodCalls": 32,
+        "finalStatus": {
+          "kind": "status",
+          "at": 48000,
+          "batches": 2,
+          "inFlight": 0
+        }
+      }
+    },
+    {
+      "category": "http_timeout",
+      "repositoryMethodDelayMs": 300,
+      "httpResponseDelayMs": 12000,
+      "pendingMessageDelayMs": 0,
+      "lateDatabaseDelayMs": 0,
+      "budget35": {
+        "scenario": "window-13",
+        "elapsedThroughLeaseReleaseMs": 34800,
+        "nominalPlatformHeadroomMs": 25200,
+        "overLogicalWorkBudgetMs": 0,
+        "attemptedRequests": 6,
+        "successfulUniqueGroups": 0,
+        "fullyCovered": false,
+        "acceptedMessages": 0,
+        "state": "throttled",
+        "deadlineReached": false,
+        "scannedBatchesIncludingUnknown": 6,
+        "statusWrites": 9,
+        "totalRepositoryMethodCalls": 91,
+        "finalStatus": {
+          "kind": "status",
+          "at": 34200,
+          "batches": 6,
+          "inFlight": 0
+        }
+      },
+      "budget45": {
+        "scenario": "window-14",
+        "elapsedThroughLeaseReleaseMs": 36600,
+        "nominalPlatformHeadroomMs": 23400,
+        "overLogicalWorkBudgetMs": 0,
+        "attemptedRequests": 6,
+        "successfulUniqueGroups": 0,
+        "fullyCovered": false,
+        "acceptedMessages": 0,
+        "state": "throttled",
+        "deadlineReached": false,
+        "scannedBatchesIncludingUnknown": 6,
+        "statusWrites": 9,
+        "totalRepositoryMethodCalls": 97,
+        "finalStatus": {
+          "kind": "status",
+          "at": 36000,
+          "batches": 6,
+          "inFlight": 0
+        }
+      }
+    },
+    {
+      "category": "slow_notification",
+      "repositoryMethodDelayMs": 300,
+      "httpResponseDelayMs": 800,
+      "pendingMessageDelayMs": 8000,
+      "lateDatabaseDelayMs": 0,
+      "budget35": {
+        "scenario": "window-15",
+        "elapsedThroughLeaseReleaseMs": 35800,
+        "nominalPlatformHeadroomMs": 24200,
+        "overLogicalWorkBudgetMs": 800,
+        "attemptedRequests": 24,
+        "successfulUniqueGroups": 22,
+        "fullyCovered": false,
+        "acceptedMessages": 1,
+        "state": "running",
+        "deadlineReached": true,
+        "scannedBatchesIncludingUnknown": 24,
+        "statusWrites": 25,
+        "totalRepositoryMethodCalls": 202,
+        "finalStatus": {
+          "kind": "status",
+          "at": 35200,
+          "batches": 24,
+          "inFlight": 0
+        }
+      },
+      "budget45": {
+        "scenario": "window-16",
+        "elapsedThroughLeaseReleaseMs": 46400,
+        "nominalPlatformHeadroomMs": 13600,
+        "overLogicalWorkBudgetMs": 1400,
+        "attemptedRequests": 30,
+        "successfulUniqueGroups": 30,
+        "fullyCovered": false,
+        "acceptedMessages": 1,
+        "state": "running",
+        "deadlineReached": true,
+        "scannedBatchesIncludingUnknown": 30,
+        "statusWrites": 35,
+        "totalRepositoryMethodCalls": 264,
+        "finalStatus": {
+          "kind": "status",
+          "at": 45800,
+          "batches": 30,
+          "inFlight": 0
+        }
+      }
+    },
+    {
+      "category": "slow_notification",
+      "repositoryMethodDelayMs": 1000,
+      "httpResponseDelayMs": 800,
+      "pendingMessageDelayMs": 8000,
+      "lateDatabaseDelayMs": 0,
+      "budget35": {
+        "scenario": "window-17",
+        "elapsedThroughLeaseReleaseMs": 38000,
+        "nominalPlatformHeadroomMs": 22000,
+        "overLogicalWorkBudgetMs": 3000,
+        "attemptedRequests": 8,
+        "successfulUniqueGroups": 8,
+        "fullyCovered": false,
+        "acceptedMessages": 0,
+        "state": "running",
+        "deadlineReached": true,
+        "scannedBatchesIncludingUnknown": 8,
+        "statusWrites": 11,
+        "totalRepositoryMethodCalls": 73,
+        "finalStatus": {
+          "kind": "status",
+          "at": 36000,
+          "batches": 8,
+          "inFlight": 0
+        }
+      },
+      "budget45": {
+        "scenario": "window-18",
+        "elapsedThroughLeaseReleaseMs": 50800,
+        "nominalPlatformHeadroomMs": 9200,
+        "overLogicalWorkBudgetMs": 5800,
+        "attemptedRequests": 12,
+        "successfulUniqueGroups": 12,
+        "fullyCovered": false,
+        "acceptedMessages": 0,
+        "state": "running",
+        "deadlineReached": true,
+        "scannedBatchesIncludingUnknown": 12,
+        "statusWrites": 13,
+        "totalRepositoryMethodCalls": 106,
+        "finalStatus": {
+          "kind": "status",
+          "at": 47600,
+          "batches": 12,
+          "inFlight": 0
+        }
+      }
+    },
+    {
+      "category": "late_database_stall",
+      "repositoryMethodDelayMs": 300,
+      "httpResponseDelayMs": 800,
+      "pendingMessageDelayMs": 0,
+      "lateDatabaseDelayMs": 8000,
+      "budget35": {
+        "scenario": "window-19",
+        "elapsedThroughLeaseReleaseMs": 66000,
+        "nominalPlatformHeadroomMs": -6000,
+        "overLogicalWorkBudgetMs": 31000,
+        "attemptedRequests": 24,
+        "successfulUniqueGroups": 22,
+        "fullyCovered": false,
+        "acceptedMessages": 0,
+        "state": "lease_lost",
+        "deadlineReached": true,
+        "scannedBatchesIncludingUnknown": 24,
+        "statusWrites": 23,
+        "totalRepositoryMethodCalls": 210,
+        "finalStatus": {
+          "kind": "status",
+          "at": 33000,
+          "batches": 22,
+          "inFlight": 2
+        }
+      },
+      "budget45": {
+        "scenario": "window-20",
+        "elapsedThroughLeaseReleaseMs": 68000,
+        "nominalPlatformHeadroomMs": -8000,
+        "overLogicalWorkBudgetMs": 23000,
+        "attemptedRequests": 30,
+        "successfulUniqueGroups": 30,
+        "fullyCovered": false,
+        "acceptedMessages": 0,
+        "state": "lease_lost",
+        "deadlineReached": true,
+        "scannedBatchesIncludingUnknown": 30,
+        "statusWrites": 31,
+        "totalRepositoryMethodCalls": 270,
+        "finalStatus": {
+          "kind": "status",
+          "at": 52000,
+          "batches": 30,
+          "inFlight": 0
+        }
+      }
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "window-01",
+      "category": "normal",
+      "input": {
+        "logicalWorkBudgetMs": 35000,
+        "repositoryMethodDelayMs": 100,
+        "httpResponseDelayMs": 800,
+        "pendingMessageDelayMs": 0,
+        "lateDatabaseDelayMs": 0,
+        "lateDatabaseStartsAtLogicalWorkBudgetMinusMs": null
+      },
+      "observed": {
+        "elapsedThroughLeaseReleaseMs": 25400,
+        "nominalPlatformHeadroomMs": 34600,
+        "overLogicalWorkBudgetMs": 0,
+        "attemptedRequests": 31,
+        "successfulUniqueGroups": 31,
+        "fullyCovered": true,
+        "acceptedMessages": 0,
+        "state": "running",
+        "deadlineReached": false,
+        "scannedBatchesIncludingUnknown": 31,
+        "statusWrites": 35,
+        "totalRepositoryMethodCalls": 300,
+        "finalStatus": {
+          "kind": "status",
+          "at": 25200,
+          "batches": 31,
+          "inFlight": 0
+        }
+      },
+      "detail": {
+        "variant": "new",
+        "dbMs": 100,
+        "httpMs": 800,
+        "statusEveryMs": 0,
+        "maxRunMs": 35000,
+        "pendingSendMs": 0,
+        "lateDbMs": 0,
+        "result": {
+          "state": "running",
+          "scanned": 31,
+          "observations": 31,
+          "events": 0,
+          "sent": 0,
+          "deadlineReached": false
+        },
+        "elapsedMs": 25400,
+        "uniqueStores": 31,
+        "starts": [
+          800,
+          800,
+          2200,
+          2200,
+          3600,
+          3600,
+          5100,
+          5100,
+          6600,
+          6600,
+          8100,
+          8100,
+          9600,
+          9600,
+          11100,
+          11100,
+          12600,
+          12600,
+          14100,
+          14100,
+          15600,
+          15600,
+          17100,
+          17100,
+          18600,
+          18600,
+          20100,
+          20100,
+          21600,
+          21600,
+          23100
+        ],
+        "lastStart": 23100,
+        "calls": {
+          "acquireLease": 67,
+          "getCollectorStatus": 1,
+          "getConfig": 33,
+          "listActiveFollows": 2,
+          "getUsers": 2,
+          "consumeCollectorBudget": 31,
+          "saveCollectorStatus": 35,
+          "reconcileExpiredNotifications": 1,
+          "listUnprocessedEvents": 32,
+          "getLatest": 1,
+          "recordUpstreamOutcome": 31,
+          "recordObservation": 31,
+          "listPendingNotifications": 32,
+          "releaseLease": 1
+        },
+        "timeline": [
+          {
+            "kind": "status",
+            "at": 600,
+            "batches": 0,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 1800,
+            "batches": 2,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 2000,
+            "batches": 2,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 3200,
+            "batches": 4,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 3400,
+            "batches": 4,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 4700,
+            "batches": 6,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 4900,
+            "batches": 6,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 6200,
+            "batches": 8,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 6400,
+            "batches": 8,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 7700,
+            "batches": 10,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 7900,
+            "batches": 10,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 9200,
+            "batches": 12,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 9400,
+            "batches": 12,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 10700,
+            "batches": 14,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 10900,
+            "batches": 14,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 12200,
+            "batches": 16,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 12400,
+            "batches": 16,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 13700,
+            "batches": 18,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 13900,
+            "batches": 18,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 15200,
+            "batches": 20,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 15400,
+            "batches": 20,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 16700,
+            "batches": 22,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 16900,
+            "batches": 22,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 18200,
+            "batches": 24,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 18400,
+            "batches": 24,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 19700,
+            "batches": 26,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 19900,
+            "batches": 26,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 21200,
+            "batches": 28,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 21400,
+            "batches": 28,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 22700,
+            "batches": 30,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 22900,
+            "batches": 30,
+            "inFlight": 1
+          },
+          {
+            "kind": "status",
+            "at": 24200,
+            "batches": 31,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 24400,
+            "batches": 31,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 24500,
+            "batches": 31,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 25200,
+            "batches": 31,
+            "inFlight": 0
+          }
+        ]
+      }
+    },
+    {
+      "id": "window-02",
+      "category": "normal",
+      "input": {
+        "logicalWorkBudgetMs": 45000,
+        "repositoryMethodDelayMs": 100,
+        "httpResponseDelayMs": 800,
+        "pendingMessageDelayMs": 0,
+        "lateDatabaseDelayMs": 0,
+        "lateDatabaseStartsAtLogicalWorkBudgetMinusMs": null
+      },
+      "observed": {
+        "elapsedThroughLeaseReleaseMs": 25800,
+        "nominalPlatformHeadroomMs": 34200,
+        "overLogicalWorkBudgetMs": 0,
+        "attemptedRequests": 31,
+        "successfulUniqueGroups": 31,
+        "fullyCovered": true,
+        "acceptedMessages": 0,
+        "state": "running",
+        "deadlineReached": false,
+        "scannedBatchesIncludingUnknown": 31,
+        "statusWrites": 35,
+        "totalRepositoryMethodCalls": 304,
+        "finalStatus": {
+          "kind": "status",
+          "at": 25600,
+          "batches": 31,
+          "inFlight": 0
+        }
+      },
+      "detail": {
+        "variant": "new",
+        "dbMs": 100,
+        "httpMs": 800,
+        "statusEveryMs": 0,
+        "maxRunMs": 45000,
+        "pendingSendMs": 0,
+        "lateDbMs": 0,
+        "result": {
+          "state": "running",
+          "scanned": 31,
+          "observations": 31,
+          "events": 0,
+          "sent": 0,
+          "deadlineReached": false
+        },
+        "elapsedMs": 25800,
+        "uniqueStores": 31,
+        "starts": [
+          800,
+          800,
+          2200,
+          2200,
+          3600,
+          3600,
+          5100,
+          5100,
+          6600,
+          6600,
+          8100,
+          8100,
+          9600,
+          9600,
+          11100,
+          11100,
+          12600,
+          12600,
+          14100,
+          14100,
+          15600,
+          15600,
+          17100,
+          17100,
+          18600,
+          18600,
+          20100,
+          20100,
+          21600,
+          21600,
+          23100
+        ],
+        "lastStart": 23100,
+        "calls": {
+          "acquireLease": 67,
+          "getCollectorStatus": 1,
+          "getConfig": 33,
+          "listActiveFollows": 2,
+          "getUsers": 2,
+          "consumeCollectorBudget": 31,
+          "saveCollectorStatus": 35,
+          "reconcileExpiredNotifications": 1,
+          "listUnprocessedEvents": 32,
+          "getLatest": 1,
+          "recordUpstreamOutcome": 31,
+          "recordObservation": 31,
+          "listPendingNotifications": 32,
+          "getRetentionStatus": 1,
+          "purgeExpiredData": 1,
+          "purgeGrowthData": 1,
+          "saveRetentionStatus": 1,
+          "releaseLease": 1
+        },
+        "timeline": [
+          {
+            "kind": "status",
+            "at": 600,
+            "batches": 0,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 1800,
+            "batches": 2,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 2000,
+            "batches": 2,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 3200,
+            "batches": 4,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 3400,
+            "batches": 4,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 4700,
+            "batches": 6,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 4900,
+            "batches": 6,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 6200,
+            "batches": 8,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 6400,
+            "batches": 8,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 7700,
+            "batches": 10,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 7900,
+            "batches": 10,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 9200,
+            "batches": 12,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 9400,
+            "batches": 12,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 10700,
+            "batches": 14,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 10900,
+            "batches": 14,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 12200,
+            "batches": 16,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 12400,
+            "batches": 16,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 13700,
+            "batches": 18,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 13900,
+            "batches": 18,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 15200,
+            "batches": 20,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 15400,
+            "batches": 20,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 16700,
+            "batches": 22,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 16900,
+            "batches": 22,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 18200,
+            "batches": 24,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 18400,
+            "batches": 24,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 19700,
+            "batches": 26,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 19900,
+            "batches": 26,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 21200,
+            "batches": 28,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 21400,
+            "batches": 28,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 22700,
+            "batches": 30,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 22900,
+            "batches": 30,
+            "inFlight": 1
+          },
+          {
+            "kind": "status",
+            "at": 24200,
+            "batches": 31,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 24400,
+            "batches": 31,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 24500,
+            "batches": 31,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 25600,
+            "batches": 31,
+            "inFlight": 0
+          }
+        ]
+      }
+    },
+    {
+      "id": "window-03",
+      "category": "normal",
+      "input": {
+        "logicalWorkBudgetMs": 35000,
+        "repositoryMethodDelayMs": 200,
+        "httpResponseDelayMs": 800,
+        "pendingMessageDelayMs": 0,
+        "lateDatabaseDelayMs": 0,
+        "lateDatabaseStartsAtLogicalWorkBudgetMinusMs": null
+      },
+      "observed": {
+        "elapsedThroughLeaseReleaseMs": 35400,
+        "nominalPlatformHeadroomMs": 24600,
+        "overLogicalWorkBudgetMs": 400,
+        "attemptedRequests": 30,
+        "successfulUniqueGroups": 30,
+        "fullyCovered": false,
+        "acceptedMessages": 0,
+        "state": "running",
+        "deadlineReached": true,
+        "scannedBatchesIncludingUnknown": 30,
+        "statusWrites": 35,
+        "totalRepositoryMethodCalls": 283,
+        "finalStatus": {
+          "kind": "status",
+          "at": 35000,
+          "batches": 30,
+          "inFlight": 0
+        }
+      },
+      "detail": {
+        "variant": "new",
+        "dbMs": 200,
+        "httpMs": 800,
+        "statusEveryMs": 0,
+        "maxRunMs": 35000,
+        "pendingSendMs": 0,
+        "lateDbMs": 0,
+        "result": {
+          "state": "running",
+          "scanned": 30,
+          "observations": 30,
+          "events": 0,
+          "sent": 0,
+          "deadlineReached": true
+        },
+        "elapsedMs": 35400,
+        "uniqueStores": 30,
+        "starts": [
+          1600,
+          1600,
+          3800,
+          3800,
+          5800,
+          5800,
+          8000,
+          8000,
+          10200,
+          10200,
+          12400,
+          12400,
+          14600,
+          14600,
+          16800,
+          16800,
+          19000,
+          19000,
+          21200,
+          21200,
+          23400,
+          23400,
+          25600,
+          25600,
+          27800,
+          27800,
+          30000,
+          30000,
+          32200,
+          32200
+        ],
+        "lastStart": 32200,
+        "calls": {
+          "acquireLease": 62,
+          "getCollectorStatus": 1,
+          "getConfig": 31,
+          "listActiveFollows": 2,
+          "getUsers": 2,
+          "consumeCollectorBudget": 30,
+          "saveCollectorStatus": 35,
+          "reconcileExpiredNotifications": 2,
+          "listUnprocessedEvents": 26,
+          "getLatest": 1,
+          "recordUpstreamOutcome": 30,
+          "recordObservation": 30,
+          "listPendingNotifications": 30,
+          "releaseLease": 1
+        },
+        "timeline": [
+          {
+            "kind": "status",
+            "at": 1200,
+            "batches": 0,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 3000,
+            "batches": 2,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 3400,
+            "batches": 2,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 5000,
+            "batches": 4,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 5400,
+            "batches": 4,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 7200,
+            "batches": 6,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 7600,
+            "batches": 6,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 9400,
+            "batches": 8,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 9800,
+            "batches": 8,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 11600,
+            "batches": 10,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 12000,
+            "batches": 10,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 13800,
+            "batches": 12,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 14200,
+            "batches": 12,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 16000,
+            "batches": 14,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 16400,
+            "batches": 14,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 18200,
+            "batches": 16,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 18600,
+            "batches": 16,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 20400,
+            "batches": 18,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 20800,
+            "batches": 18,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 22600,
+            "batches": 20,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 23000,
+            "batches": 20,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 24800,
+            "batches": 22,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 25200,
+            "batches": 22,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 27000,
+            "batches": 24,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 27400,
+            "batches": 24,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 29200,
+            "batches": 26,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 29600,
+            "batches": 26,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 31400,
+            "batches": 28,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 31800,
+            "batches": 28,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 33600,
+            "batches": 30,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 34000,
+            "batches": 30,
+            "inFlight": 1
+          },
+          {
+            "kind": "status",
+            "at": 34200,
+            "batches": 30,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 34600,
+            "batches": 30,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 34800,
+            "batches": 30,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 35000,
+            "batches": 30,
+            "inFlight": 0
+          }
+        ]
+      }
+    },
+    {
+      "id": "window-04",
+      "category": "normal",
+      "input": {
+        "logicalWorkBudgetMs": 45000,
+        "repositoryMethodDelayMs": 200,
+        "httpResponseDelayMs": 800,
+        "pendingMessageDelayMs": 0,
+        "lateDatabaseDelayMs": 0,
+        "lateDatabaseStartsAtLogicalWorkBudgetMinusMs": null
+      },
+      "observed": {
+        "elapsedThroughLeaseReleaseMs": 45800,
+        "nominalPlatformHeadroomMs": 14200,
+        "overLogicalWorkBudgetMs": 800,
+        "attemptedRequests": 39,
+        "successfulUniqueGroups": 31,
+        "fullyCovered": true,
+        "acceptedMessages": 0,
+        "state": "running",
+        "deadlineReached": true,
+        "scannedBatchesIncludingUnknown": 39,
+        "statusWrites": 43,
+        "totalRepositoryMethodCalls": 363,
+        "finalStatus": {
+          "kind": "status",
+          "at": 45400,
+          "batches": 39,
+          "inFlight": 0
+        }
+      },
+      "detail": {
+        "variant": "new",
+        "dbMs": 200,
+        "httpMs": 800,
+        "statusEveryMs": 0,
+        "maxRunMs": 45000,
+        "pendingSendMs": 0,
+        "lateDbMs": 0,
+        "result": {
+          "state": "running",
+          "scanned": 39,
+          "observations": 39,
+          "events": 0,
+          "sent": 0,
+          "deadlineReached": true
+        },
+        "elapsedMs": 45800,
+        "uniqueStores": 31,
+        "starts": [
+          1600,
+          1600,
+          3800,
+          3800,
+          5800,
+          5800,
+          8000,
+          8000,
+          10200,
+          10200,
+          12400,
+          12400,
+          14600,
+          14600,
+          16800,
+          16800,
+          19000,
+          19000,
+          21200,
+          21200,
+          23400,
+          23400,
+          25600,
+          25600,
+          27800,
+          27800,
+          30000,
+          30000,
+          32200,
+          32200,
+          34400,
+          36600,
+          36600,
+          38800,
+          38800,
+          41000,
+          41000,
+          43200,
+          43200
+        ],
+        "lastStart": 43200,
+        "calls": {
+          "acquireLease": 84,
+          "getCollectorStatus": 1,
+          "getConfig": 37,
+          "listActiveFollows": 3,
+          "getUsers": 3,
+          "consumeCollectorBudget": 39,
+          "saveCollectorStatus": 43,
+          "reconcileExpiredNotifications": 2,
+          "listUnprocessedEvents": 34,
+          "getLatest": 2,
+          "recordUpstreamOutcome": 39,
+          "recordObservation": 39,
+          "listPendingNotifications": 36,
+          "releaseLease": 1
+        },
+        "timeline": [
+          {
+            "kind": "status",
+            "at": 1200,
+            "batches": 0,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 3000,
+            "batches": 2,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 3400,
+            "batches": 2,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 5000,
+            "batches": 4,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 5400,
+            "batches": 4,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 7200,
+            "batches": 6,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 7600,
+            "batches": 6,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 9400,
+            "batches": 8,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 9800,
+            "batches": 8,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 11600,
+            "batches": 10,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 12000,
+            "batches": 10,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 13800,
+            "batches": 12,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 14200,
+            "batches": 12,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 16000,
+            "batches": 14,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 16400,
+            "batches": 14,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 18200,
+            "batches": 16,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 18600,
+            "batches": 16,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 20400,
+            "batches": 18,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 20800,
+            "batches": 18,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 22600,
+            "batches": 20,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 23000,
+            "batches": 20,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 24800,
+            "batches": 22,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 25200,
+            "batches": 22,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 27000,
+            "batches": 24,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 27400,
+            "batches": 24,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 29200,
+            "batches": 26,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 29600,
+            "batches": 26,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 31400,
+            "batches": 28,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 31800,
+            "batches": 28,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 33600,
+            "batches": 30,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 34000,
+            "batches": 30,
+            "inFlight": 1
+          },
+          {
+            "kind": "status",
+            "at": 35800,
+            "batches": 31,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 36200,
+            "batches": 31,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 38000,
+            "batches": 33,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 38400,
+            "batches": 33,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 40200,
+            "batches": 35,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 40600,
+            "batches": 35,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 42400,
+            "batches": 37,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 42800,
+            "batches": 37,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 44600,
+            "batches": 39,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 45000,
+            "batches": 39,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 45200,
+            "batches": 39,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 45400,
+            "batches": 39,
+            "inFlight": 0
+          }
+        ]
+      }
+    },
+    {
+      "id": "window-05",
+      "category": "normal",
+      "input": {
+        "logicalWorkBudgetMs": 35000,
+        "repositoryMethodDelayMs": 300,
+        "httpResponseDelayMs": 800,
+        "pendingMessageDelayMs": 0,
+        "lateDatabaseDelayMs": 0,
+        "lateDatabaseStartsAtLogicalWorkBudgetMinusMs": null
+      },
+      "observed": {
+        "elapsedThroughLeaseReleaseMs": 35800,
+        "nominalPlatformHeadroomMs": 24200,
+        "overLogicalWorkBudgetMs": 800,
+        "attemptedRequests": 24,
+        "successfulUniqueGroups": 22,
+        "fullyCovered": false,
+        "acceptedMessages": 0,
+        "state": "running",
+        "deadlineReached": true,
+        "scannedBatchesIncludingUnknown": 24,
+        "statusWrites": 25,
+        "totalRepositoryMethodCalls": 214,
+        "finalStatus": {
+          "kind": "status",
+          "at": 35200,
+          "batches": 24,
+          "inFlight": 0
+        }
+      },
+      "detail": {
+        "variant": "new",
+        "dbMs": 300,
+        "httpMs": 800,
+        "statusEveryMs": 0,
+        "maxRunMs": 35000,
+        "pendingSendMs": 0,
+        "lateDbMs": 0,
+        "result": {
+          "state": "running",
+          "scanned": 24,
+          "observations": 24,
+          "events": 0,
+          "sent": 0,
+          "deadlineReached": true
+        },
+        "elapsedMs": 35800,
+        "uniqueStores": 22,
+        "starts": [
+          2400,
+          2400,
+          5000,
+          5000,
+          7700,
+          7700,
+          10400,
+          10400,
+          13300,
+          13300,
+          16200,
+          16200,
+          19100,
+          19100,
+          22000,
+          22000,
+          24900,
+          24900,
+          27800,
+          27800,
+          30700,
+          30700,
+          33600,
+          33600
+        ],
+        "lastStart": 33600,
+        "calls": {
+          "acquireLease": 50,
+          "getCollectorStatus": 1,
+          "getConfig": 21,
+          "listActiveFollows": 2,
+          "getUsers": 2,
+          "consumeCollectorBudget": 24,
+          "saveCollectorStatus": 25,
+          "reconcileExpiredNotifications": 2,
+          "listUnprocessedEvents": 17,
+          "recordUpstreamOutcome": 24,
+          "getLatest": 1,
+          "recordObservation": 24,
+          "listPendingNotifications": 20,
+          "releaseLease": 1
+        },
+        "timeline": [
+          {
+            "kind": "status",
+            "at": 1800,
+            "batches": 0,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 4100,
+            "batches": 2,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 4400,
+            "batches": 2,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 6500,
+            "batches": 4,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 7100,
+            "batches": 4,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 9200,
+            "batches": 6,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 9800,
+            "batches": 6,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 12100,
+            "batches": 8,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 12700,
+            "batches": 8,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 15000,
+            "batches": 10,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 15600,
+            "batches": 10,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 17900,
+            "batches": 12,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 18500,
+            "batches": 12,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 20800,
+            "batches": 14,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 21400,
+            "batches": 14,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 23700,
+            "batches": 16,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 24300,
+            "batches": 16,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 26600,
+            "batches": 18,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 27200,
+            "batches": 18,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 29500,
+            "batches": 20,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 30100,
+            "batches": 20,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 32400,
+            "batches": 22,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 33000,
+            "batches": 22,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 34900,
+            "batches": 24,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 35200,
+            "batches": 24,
+            "inFlight": 0
+          }
+        ]
+      }
+    },
+    {
+      "id": "window-06",
+      "category": "normal",
+      "input": {
+        "logicalWorkBudgetMs": 45000,
+        "repositoryMethodDelayMs": 300,
+        "httpResponseDelayMs": 800,
+        "pendingMessageDelayMs": 0,
+        "lateDatabaseDelayMs": 0,
+        "lateDatabaseStartsAtLogicalWorkBudgetMinusMs": null
+      },
+      "observed": {
+        "elapsedThroughLeaseReleaseMs": 46400,
+        "nominalPlatformHeadroomMs": 13600,
+        "overLogicalWorkBudgetMs": 1400,
+        "attemptedRequests": 30,
+        "successfulUniqueGroups": 30,
+        "fullyCovered": false,
+        "acceptedMessages": 0,
+        "state": "running",
+        "deadlineReached": true,
+        "scannedBatchesIncludingUnknown": 30,
+        "statusWrites": 35,
+        "totalRepositoryMethodCalls": 279,
+        "finalStatus": {
+          "kind": "status",
+          "at": 45800,
+          "batches": 30,
+          "inFlight": 0
+        }
+      },
+      "detail": {
+        "variant": "new",
+        "dbMs": 300,
+        "httpMs": 800,
+        "statusEveryMs": 0,
+        "maxRunMs": 45000,
+        "pendingSendMs": 0,
+        "lateDbMs": 0,
+        "result": {
+          "state": "running",
+          "scanned": 30,
+          "observations": 30,
+          "events": 0,
+          "sent": 0,
+          "deadlineReached": true
+        },
+        "elapsedMs": 46400,
+        "uniqueStores": 30,
+        "starts": [
+          2400,
+          2400,
+          5000,
+          5000,
+          7700,
+          7700,
+          10400,
+          10400,
+          13300,
+          13300,
+          16200,
+          16200,
+          19100,
+          19100,
+          22000,
+          22000,
+          24900,
+          24900,
+          27800,
+          27800,
+          30700,
+          30700,
+          33600,
+          33600,
+          36500,
+          36500,
+          39400,
+          39400,
+          42000,
+          42000
+        ],
+        "lastStart": 42000,
+        "calls": {
+          "acquireLease": 63,
+          "getCollectorStatus": 1,
+          "getConfig": 28,
+          "listActiveFollows": 3,
+          "getUsers": 3,
+          "consumeCollectorBudget": 30,
+          "saveCollectorStatus": 35,
+          "reconcileExpiredNotifications": 2,
+          "listUnprocessedEvents": 24,
+          "recordUpstreamOutcome": 30,
+          "getLatest": 2,
+          "recordObservation": 30,
+          "listPendingNotifications": 27,
+          "releaseLease": 1
+        },
+        "timeline": [
+          {
+            "kind": "status",
+            "at": 1800,
+            "batches": 0,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 4100,
+            "batches": 2,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 4400,
+            "batches": 2,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 6500,
+            "batches": 4,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 7100,
+            "batches": 4,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 9200,
+            "batches": 6,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 9800,
+            "batches": 6,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 12100,
+            "batches": 8,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 12700,
+            "batches": 8,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 15000,
+            "batches": 10,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 15600,
+            "batches": 10,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 17900,
+            "batches": 12,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 18500,
+            "batches": 12,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 20800,
+            "batches": 14,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 21400,
+            "batches": 14,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 23700,
+            "batches": 16,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 24300,
+            "batches": 16,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 26600,
+            "batches": 18,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 27200,
+            "batches": 18,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 29500,
+            "batches": 20,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 30100,
+            "batches": 20,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 32400,
+            "batches": 22,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 33000,
+            "batches": 22,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 35300,
+            "batches": 24,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 35900,
+            "batches": 24,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 38200,
+            "batches": 26,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 38800,
+            "batches": 26,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 41100,
+            "batches": 28,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 41400,
+            "batches": 28,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 43700,
+            "batches": 30,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 44300,
+            "batches": 30,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 44600,
+            "batches": 30,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 45200,
+            "batches": 30,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 45500,
+            "batches": 30,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 45800,
+            "batches": 30,
+            "inFlight": 0
+          }
+        ]
+      }
+    },
+    {
+      "id": "window-07",
+      "category": "slow_http",
+      "input": {
+        "logicalWorkBudgetMs": 35000,
+        "repositoryMethodDelayMs": 300,
+        "httpResponseDelayMs": 5000,
+        "pendingMessageDelayMs": 0,
+        "lateDatabaseDelayMs": 0,
+        "lateDatabaseStartsAtLogicalWorkBudgetMinusMs": null
+      },
+      "observed": {
+        "elapsedThroughLeaseReleaseMs": 36100,
+        "nominalPlatformHeadroomMs": 23900,
+        "overLogicalWorkBudgetMs": 1100,
+        "attemptedRequests": 10,
+        "successfulUniqueGroups": 8,
+        "fullyCovered": false,
+        "acceptedMessages": 0,
+        "state": "running",
+        "deadlineReached": true,
+        "scannedBatchesIncludingUnknown": 10,
+        "statusWrites": 11,
+        "totalRepositoryMethodCalls": 110,
+        "finalStatus": {
+          "kind": "status",
+          "at": 35200,
+          "batches": 10,
+          "inFlight": 0
+        }
+      },
+      "detail": {
+        "variant": "new",
+        "dbMs": 300,
+        "httpMs": 5000,
+        "statusEveryMs": 0,
+        "maxRunMs": 35000,
+        "pendingSendMs": 0,
+        "lateDbMs": 0,
+        "result": {
+          "state": "running",
+          "scanned": 10,
+          "observations": 10,
+          "events": 0,
+          "sent": 0,
+          "deadlineReached": true
+        },
+        "elapsedMs": 36100,
+        "uniqueStores": 8,
+        "starts": [
+          2400,
+          2400,
+          9300,
+          9300,
+          16400,
+          16400,
+          23500,
+          23500,
+          30600,
+          30600
+        ],
+        "lastStart": 30600,
+        "calls": {
+          "acquireLease": 33,
+          "getCollectorStatus": 1,
+          "getConfig": 10,
+          "listActiveFollows": 2,
+          "getUsers": 2,
+          "consumeCollectorBudget": 10,
+          "saveCollectorStatus": 11,
+          "reconcileExpiredNotifications": 2,
+          "listUnprocessedEvents": 8,
+          "getLatest": 1,
+          "recordUpstreamOutcome": 10,
+          "recordObservation": 10,
+          "listPendingNotifications": 9,
+          "releaseLease": 1
+        },
+        "timeline": [
+          {
+            "kind": "status",
+            "at": 1800,
+            "batches": 0,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 8100,
+            "batches": 2,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 8700,
+            "batches": 2,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 15200,
+            "batches": 4,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 15800,
+            "batches": 4,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 22300,
+            "batches": 6,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 22900,
+            "batches": 6,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 29400,
+            "batches": 8,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 30000,
+            "batches": 8,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 34900,
+            "batches": 10,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 35200,
+            "batches": 10,
+            "inFlight": 0
+          }
+        ]
+      }
+    },
+    {
+      "id": "window-08",
+      "category": "slow_http",
+      "input": {
+        "logicalWorkBudgetMs": 45000,
+        "repositoryMethodDelayMs": 300,
+        "httpResponseDelayMs": 5000,
+        "pendingMessageDelayMs": 0,
+        "lateDatabaseDelayMs": 0,
+        "lateDatabaseStartsAtLogicalWorkBudgetMinusMs": null
+      },
+      "observed": {
+        "elapsedThroughLeaseReleaseMs": 46300,
+        "nominalPlatformHeadroomMs": 13700,
+        "overLogicalWorkBudgetMs": 1300,
+        "attemptedRequests": 12,
+        "successfulUniqueGroups": 12,
+        "fullyCovered": false,
+        "acceptedMessages": 0,
+        "state": "running",
+        "deadlineReached": true,
+        "scannedBatchesIncludingUnknown": 12,
+        "statusWrites": 17,
+        "totalRepositoryMethodCalls": 137,
+        "finalStatus": {
+          "kind": "status",
+          "at": 45700,
+          "batches": 12,
+          "inFlight": 0
+        }
+      },
+      "detail": {
+        "variant": "new",
+        "dbMs": 300,
+        "httpMs": 5000,
+        "statusEveryMs": 0,
+        "maxRunMs": 45000,
+        "pendingSendMs": 0,
+        "lateDbMs": 0,
+        "result": {
+          "state": "running",
+          "scanned": 12,
+          "observations": 12,
+          "events": 0,
+          "sent": 0,
+          "deadlineReached": true
+        },
+        "elapsedMs": 46300,
+        "uniqueStores": 12,
+        "starts": [
+          2400,
+          2400,
+          9300,
+          9300,
+          16400,
+          16400,
+          23500,
+          23500,
+          30600,
+          30600,
+          37700,
+          37700
+        ],
+        "lastStart": 37700,
+        "calls": {
+          "acquireLease": 38,
+          "getCollectorStatus": 1,
+          "getConfig": 14,
+          "listActiveFollows": 2,
+          "getUsers": 2,
+          "consumeCollectorBudget": 12,
+          "saveCollectorStatus": 17,
+          "reconcileExpiredNotifications": 2,
+          "listUnprocessedEvents": 10,
+          "getLatest": 1,
+          "recordUpstreamOutcome": 12,
+          "recordObservation": 12,
+          "listPendingNotifications": 13,
+          "releaseLease": 1
+        },
+        "timeline": [
+          {
+            "kind": "status",
+            "at": 1800,
+            "batches": 0,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 8100,
+            "batches": 2,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 8700,
+            "batches": 2,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 15200,
+            "batches": 4,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 15800,
+            "batches": 4,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 22300,
+            "batches": 6,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 22900,
+            "batches": 6,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 29400,
+            "batches": 8,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 30000,
+            "batches": 8,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 36500,
+            "batches": 10,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 37100,
+            "batches": 10,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 43600,
+            "batches": 12,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 44200,
+            "batches": 12,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 44500,
+            "batches": 12,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 45100,
+            "batches": 12,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 45400,
+            "batches": 12,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 45700,
+            "batches": 12,
+            "inFlight": 0
+          }
+        ]
+      }
+    },
+    {
+      "id": "window-09",
+      "category": "slow_database",
+      "input": {
+        "logicalWorkBudgetMs": 35000,
+        "repositoryMethodDelayMs": 1000,
+        "httpResponseDelayMs": 800,
+        "pendingMessageDelayMs": 0,
+        "lateDatabaseDelayMs": 0,
+        "lateDatabaseStartsAtLogicalWorkBudgetMinusMs": null
+      },
+      "observed": {
+        "elapsedThroughLeaseReleaseMs": 38000,
+        "nominalPlatformHeadroomMs": 22000,
+        "overLogicalWorkBudgetMs": 3000,
+        "attemptedRequests": 8,
+        "successfulUniqueGroups": 8,
+        "fullyCovered": false,
+        "acceptedMessages": 0,
+        "state": "running",
+        "deadlineReached": true,
+        "scannedBatchesIncludingUnknown": 8,
+        "statusWrites": 11,
+        "totalRepositoryMethodCalls": 74,
+        "finalStatus": {
+          "kind": "status",
+          "at": 36000,
+          "batches": 8,
+          "inFlight": 0
+        }
+      },
+      "detail": {
+        "variant": "new",
+        "dbMs": 1000,
+        "httpMs": 800,
+        "statusEveryMs": 0,
+        "maxRunMs": 35000,
+        "pendingSendMs": 0,
+        "lateDbMs": 0,
+        "result": {
+          "state": "running",
+          "scanned": 8,
+          "observations": 8,
+          "events": 0,
+          "sent": 0,
+          "deadlineReached": true
+        },
+        "elapsedMs": 38000,
+        "uniqueStores": 8,
+        "starts": [
+          8000,
+          8000,
+          15000,
+          15000,
+          22000,
+          22000,
+          29000,
+          29000
+        ],
+        "lastStart": 29000,
+        "calls": {
+          "acquireLease": 25,
+          "getCollectorStatus": 1,
+          "getConfig": 3,
+          "listActiveFollows": 2,
+          "getUsers": 2,
+          "consumeCollectorBudget": 8,
+          "saveCollectorStatus": 11,
+          "reconcileExpiredNotifications": 1,
+          "listUnprocessedEvents": 1,
+          "recordUpstreamOutcome": 8,
+          "recordObservation": 8,
+          "getLatest": 1,
+          "listPendingNotifications": 2,
+          "releaseLease": 1
+        },
+        "timeline": [
+          {
+            "kind": "status",
+            "at": 6000,
+            "batches": 0,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 11800,
+            "batches": 2,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 13000,
+            "batches": 2,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 18000,
+            "batches": 4,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 20000,
+            "batches": 4,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 25000,
+            "batches": 6,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 27000,
+            "batches": 6,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 32000,
+            "batches": 8,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 34000,
+            "batches": 8,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 35000,
+            "batches": 8,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 36000,
+            "batches": 8,
+            "inFlight": 0
+          }
+        ]
+      }
+    },
+    {
+      "id": "window-10",
+      "category": "slow_database",
+      "input": {
+        "logicalWorkBudgetMs": 45000,
+        "repositoryMethodDelayMs": 1000,
+        "httpResponseDelayMs": 800,
+        "pendingMessageDelayMs": 0,
+        "lateDatabaseDelayMs": 0,
+        "lateDatabaseStartsAtLogicalWorkBudgetMinusMs": null
+      },
+      "observed": {
+        "elapsedThroughLeaseReleaseMs": 50000,
+        "nominalPlatformHeadroomMs": 10000,
+        "overLogicalWorkBudgetMs": 5000,
+        "attemptedRequests": 12,
+        "successfulUniqueGroups": 10,
+        "fullyCovered": false,
+        "acceptedMessages": 0,
+        "state": "running",
+        "deadlineReached": true,
+        "scannedBatchesIncludingUnknown": 12,
+        "statusWrites": 13,
+        "totalRepositoryMethodCalls": 103,
+        "finalStatus": {
+          "kind": "status",
+          "at": 48000,
+          "batches": 12,
+          "inFlight": 0
+        }
+      },
+      "detail": {
+        "variant": "new",
+        "dbMs": 1000,
+        "httpMs": 800,
+        "statusEveryMs": 0,
+        "maxRunMs": 45000,
+        "pendingSendMs": 0,
+        "lateDbMs": 0,
+        "result": {
+          "state": "running",
+          "scanned": 12,
+          "observations": 12,
+          "events": 0,
+          "sent": 0,
+          "deadlineReached": true
+        },
+        "elapsedMs": 50000,
+        "uniqueStores": 10,
+        "starts": [
+          8000,
+          8000,
+          15000,
+          15000,
+          22000,
+          22000,
+          29000,
+          29000,
+          36000,
+          36000,
+          43800,
+          43800
+        ],
+        "lastStart": 43800,
+        "calls": {
+          "acquireLease": 30,
+          "getCollectorStatus": 1,
+          "getConfig": 6,
+          "listActiveFollows": 2,
+          "getUsers": 2,
+          "consumeCollectorBudget": 12,
+          "saveCollectorStatus": 13,
+          "reconcileExpiredNotifications": 2,
+          "listUnprocessedEvents": 4,
+          "recordUpstreamOutcome": 12,
+          "recordObservation": 12,
+          "getLatest": 1,
+          "listPendingNotifications": 5,
+          "releaseLease": 1
+        },
+        "timeline": [
+          {
+            "kind": "status",
+            "at": 6000,
+            "batches": 0,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 11800,
+            "batches": 2,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 13000,
+            "batches": 2,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 18000,
+            "batches": 4,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 20000,
+            "batches": 4,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 25000,
+            "batches": 6,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 27000,
+            "batches": 6,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 32000,
+            "batches": 8,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 34000,
+            "batches": 8,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 39800,
+            "batches": 10,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 41800,
+            "batches": 10,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 47000,
+            "batches": 12,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 48000,
+            "batches": 12,
+            "inFlight": 0
+          }
+        ]
+      }
+    },
+    {
+      "id": "window-11",
+      "category": "slow_database",
+      "input": {
+        "logicalWorkBudgetMs": 35000,
+        "repositoryMethodDelayMs": 3000,
+        "httpResponseDelayMs": 800,
+        "pendingMessageDelayMs": 0,
+        "lateDatabaseDelayMs": 0,
+        "lateDatabaseStartsAtLogicalWorkBudgetMinusMs": null
+      },
+      "observed": {
+        "elapsedThroughLeaseReleaseMs": 42800,
+        "nominalPlatformHeadroomMs": 17200,
+        "overLogicalWorkBudgetMs": 7800,
+        "attemptedRequests": 2,
+        "successfulUniqueGroups": 2,
+        "fullyCovered": false,
+        "acceptedMessages": 0,
+        "state": "running",
+        "deadlineReached": true,
+        "scannedBatchesIncludingUnknown": 2,
+        "statusWrites": 3,
+        "totalRepositoryMethodCalls": 25,
+        "finalStatus": {
+          "kind": "status",
+          "at": 36800,
+          "batches": 2,
+          "inFlight": 0
+        }
+      },
+      "detail": {
+        "variant": "new",
+        "dbMs": 3000,
+        "httpMs": 800,
+        "statusEveryMs": 0,
+        "maxRunMs": 35000,
+        "pendingSendMs": 0,
+        "lateDbMs": 0,
+        "result": {
+          "state": "running",
+          "scanned": 2,
+          "observations": 2,
+          "events": 0,
+          "sent": 0,
+          "deadlineReached": true
+        },
+        "elapsedMs": 42800,
+        "uniqueStores": 2,
+        "starts": [
+          24000,
+          24000
+        ],
+        "lastStart": 24000,
+        "calls": {
+          "acquireLease": 4,
+          "getCollectorStatus": 1,
+          "getConfig": 2,
+          "listActiveFollows": 2,
+          "getUsers": 2,
+          "consumeCollectorBudget": 2,
+          "saveCollectorStatus": 3,
+          "reconcileExpiredNotifications": 1,
+          "listUnprocessedEvents": 1,
+          "recordUpstreamOutcome": 2,
+          "recordObservation": 2,
+          "getLatest": 1,
+          "listPendingNotifications": 1,
+          "releaseLease": 1
+        },
+        "timeline": [
+          {
+            "kind": "status",
+            "at": 18000,
+            "batches": 0,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 33800,
+            "batches": 2,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 36800,
+            "batches": 2,
+            "inFlight": 0
+          }
+        ]
+      }
+    },
+    {
+      "id": "window-12",
+      "category": "slow_database",
+      "input": {
+        "logicalWorkBudgetMs": 45000,
+        "repositoryMethodDelayMs": 3000,
+        "httpResponseDelayMs": 800,
+        "pendingMessageDelayMs": 0,
+        "lateDatabaseDelayMs": 0,
+        "lateDatabaseStartsAtLogicalWorkBudgetMinusMs": null
+      },
+      "observed": {
+        "elapsedThroughLeaseReleaseMs": 54000,
+        "nominalPlatformHeadroomMs": 6000,
+        "overLogicalWorkBudgetMs": 9000,
+        "attemptedRequests": 2,
+        "successfulUniqueGroups": 2,
+        "fullyCovered": false,
+        "acceptedMessages": 0,
+        "state": "running",
+        "deadlineReached": true,
+        "scannedBatchesIncludingUnknown": 2,
+        "statusWrites": 5,
+        "totalRepositoryMethodCalls": 32,
+        "finalStatus": {
+          "kind": "status",
+          "at": 48000,
+          "batches": 2,
+          "inFlight": 0
+        }
+      },
+      "detail": {
+        "variant": "new",
+        "dbMs": 3000,
+        "httpMs": 800,
+        "statusEveryMs": 0,
+        "maxRunMs": 45000,
+        "pendingSendMs": 0,
+        "lateDbMs": 0,
+        "result": {
+          "state": "running",
+          "scanned": 2,
+          "observations": 2,
+          "events": 0,
+          "sent": 0,
+          "deadlineReached": true
+        },
+        "elapsedMs": 54000,
+        "uniqueStores": 2,
+        "starts": [
+          24000,
+          24000
+        ],
+        "lastStart": 24000,
+        "calls": {
+          "acquireLease": 7,
+          "getCollectorStatus": 1,
+          "getConfig": 2,
+          "listActiveFollows": 2,
+          "getUsers": 2,
+          "consumeCollectorBudget": 4,
+          "saveCollectorStatus": 5,
+          "reconcileExpiredNotifications": 1,
+          "listUnprocessedEvents": 1,
+          "recordUpstreamOutcome": 2,
+          "recordObservation": 2,
+          "getLatest": 1,
+          "listPendingNotifications": 1,
+          "releaseLease": 1
+        },
+        "timeline": [
+          {
+            "kind": "status",
+            "at": 18000,
+            "batches": 0,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 33800,
+            "batches": 2,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 39000,
+            "batches": 2,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 45000,
+            "batches": 2,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 48000,
+            "batches": 2,
+            "inFlight": 0
+          }
+        ]
+      }
+    },
+    {
+      "id": "window-13",
+      "category": "http_timeout",
+      "input": {
+        "logicalWorkBudgetMs": 35000,
+        "repositoryMethodDelayMs": 300,
+        "httpResponseDelayMs": 12000,
+        "pendingMessageDelayMs": 0,
+        "lateDatabaseDelayMs": 0,
+        "lateDatabaseStartsAtLogicalWorkBudgetMinusMs": null
+      },
+      "observed": {
+        "elapsedThroughLeaseReleaseMs": 34800,
+        "nominalPlatformHeadroomMs": 25200,
+        "overLogicalWorkBudgetMs": 0,
+        "attemptedRequests": 6,
+        "successfulUniqueGroups": 0,
+        "fullyCovered": false,
+        "acceptedMessages": 0,
+        "state": "throttled",
+        "deadlineReached": false,
+        "scannedBatchesIncludingUnknown": 6,
+        "statusWrites": 9,
+        "totalRepositoryMethodCalls": 91,
+        "finalStatus": {
+          "kind": "status",
+          "at": 34200,
+          "batches": 6,
+          "inFlight": 0
+        }
+      },
+      "detail": {
+        "variant": "new",
+        "dbMs": 300,
+        "httpMs": 12000,
+        "statusEveryMs": 0,
+        "maxRunMs": 35000,
+        "pendingSendMs": 0,
+        "lateDbMs": 0,
+        "result": {
+          "state": "throttled",
+          "scanned": 6,
+          "observations": 6,
+          "events": 0,
+          "sent": 0,
+          "deadlineReached": false
+        },
+        "elapsedMs": 34800,
+        "uniqueStores": 0,
+        "starts": [
+          2400,
+          2400,
+          12500,
+          12500,
+          22600,
+          22600
+        ],
+        "lastStart": 22600,
+        "calls": {
+          "acquireLease": 32,
+          "getCollectorStatus": 1,
+          "getConfig": 9,
+          "listActiveFollows": 2,
+          "getUsers": 2,
+          "consumeCollectorBudget": 6,
+          "saveCollectorStatus": 9,
+          "reconcileExpiredNotifications": 2,
+          "listUnprocessedEvents": 6,
+          "getLatest": 1,
+          "listPendingNotifications": 8,
+          "recordUpstreamOutcome": 6,
+          "recordObservation": 6,
+          "releaseLease": 1
+        },
+        "timeline": [
+          {
+            "kind": "status",
+            "at": 1800,
+            "batches": 0,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 11300,
+            "batches": 2,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 11900,
+            "batches": 2,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 21400,
+            "batches": 4,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 22000,
+            "batches": 4,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 31500,
+            "batches": 6,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 32100,
+            "batches": 6,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 32400,
+            "batches": 6,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 34200,
+            "batches": 6,
+            "inFlight": 0
+          }
+        ]
+      }
+    },
+    {
+      "id": "window-14",
+      "category": "http_timeout",
+      "input": {
+        "logicalWorkBudgetMs": 45000,
+        "repositoryMethodDelayMs": 300,
+        "httpResponseDelayMs": 12000,
+        "pendingMessageDelayMs": 0,
+        "lateDatabaseDelayMs": 0,
+        "lateDatabaseStartsAtLogicalWorkBudgetMinusMs": null
+      },
+      "observed": {
+        "elapsedThroughLeaseReleaseMs": 36600,
+        "nominalPlatformHeadroomMs": 23400,
+        "overLogicalWorkBudgetMs": 0,
+        "attemptedRequests": 6,
+        "successfulUniqueGroups": 0,
+        "fullyCovered": false,
+        "acceptedMessages": 0,
+        "state": "throttled",
+        "deadlineReached": false,
+        "scannedBatchesIncludingUnknown": 6,
+        "statusWrites": 9,
+        "totalRepositoryMethodCalls": 97,
+        "finalStatus": {
+          "kind": "status",
+          "at": 36000,
+          "batches": 6,
+          "inFlight": 0
+        }
+      },
+      "detail": {
+        "variant": "new",
+        "dbMs": 300,
+        "httpMs": 12000,
+        "statusEveryMs": 0,
+        "maxRunMs": 45000,
+        "pendingSendMs": 0,
+        "lateDbMs": 0,
+        "result": {
+          "state": "throttled",
+          "scanned": 6,
+          "observations": 6,
+          "events": 0,
+          "sent": 0,
+          "deadlineReached": false
+        },
+        "elapsedMs": 36600,
+        "uniqueStores": 0,
+        "starts": [
+          2400,
+          2400,
+          12500,
+          12500,
+          22600,
+          22600
+        ],
+        "lastStart": 22600,
+        "calls": {
+          "acquireLease": 32,
+          "getCollectorStatus": 1,
+          "getConfig": 9,
+          "listActiveFollows": 2,
+          "getUsers": 2,
+          "consumeCollectorBudget": 6,
+          "saveCollectorStatus": 9,
+          "reconcileExpiredNotifications": 2,
+          "listUnprocessedEvents": 8,
+          "getLatest": 1,
+          "listPendingNotifications": 8,
+          "recordUpstreamOutcome": 6,
+          "recordObservation": 6,
+          "getRetentionStatus": 1,
+          "purgeExpiredData": 1,
+          "purgeGrowthData": 1,
+          "saveRetentionStatus": 1,
+          "releaseLease": 1
+        },
+        "timeline": [
+          {
+            "kind": "status",
+            "at": 1800,
+            "batches": 0,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 11300,
+            "batches": 2,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 11900,
+            "batches": 2,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 21400,
+            "batches": 4,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 22000,
+            "batches": 4,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 31500,
+            "batches": 6,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 32100,
+            "batches": 6,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 32400,
+            "batches": 6,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 36000,
+            "batches": 6,
+            "inFlight": 0
+          }
+        ]
+      }
+    },
+    {
+      "id": "window-15",
+      "category": "slow_notification",
+      "input": {
+        "logicalWorkBudgetMs": 35000,
+        "repositoryMethodDelayMs": 300,
+        "httpResponseDelayMs": 800,
+        "pendingMessageDelayMs": 8000,
+        "lateDatabaseDelayMs": 0,
+        "lateDatabaseStartsAtLogicalWorkBudgetMinusMs": null
+      },
+      "observed": {
+        "elapsedThroughLeaseReleaseMs": 35800,
+        "nominalPlatformHeadroomMs": 24200,
+        "overLogicalWorkBudgetMs": 800,
+        "attemptedRequests": 24,
+        "successfulUniqueGroups": 22,
+        "fullyCovered": false,
+        "acceptedMessages": 1,
+        "state": "running",
+        "deadlineReached": true,
+        "scannedBatchesIncludingUnknown": 24,
+        "statusWrites": 25,
+        "totalRepositoryMethodCalls": 202,
+        "finalStatus": {
+          "kind": "status",
+          "at": 35200,
+          "batches": 24,
+          "inFlight": 0
+        }
+      },
+      "detail": {
+        "variant": "new",
+        "dbMs": 300,
+        "httpMs": 800,
+        "statusEveryMs": 0,
+        "maxRunMs": 35000,
+        "pendingSendMs": 8000,
+        "lateDbMs": 0,
+        "result": {
+          "state": "running",
+          "scanned": 24,
+          "observations": 24,
+          "events": 0,
+          "sent": 1,
+          "deadlineReached": true
+        },
+        "elapsedMs": 35800,
+        "uniqueStores": 22,
+        "starts": [
+          2400,
+          2400,
+          5000,
+          5000,
+          7700,
+          7700,
+          10400,
+          10400,
+          13000,
+          13000,
+          15900,
+          15900,
+          18800,
+          18800,
+          21700,
+          21700,
+          24600,
+          24600,
+          27500,
+          27500,
+          30400,
+          30400,
+          33300,
+          33300
+        ],
+        "lastStart": 33300,
+        "calls": {
+          "acquireLease": 50,
+          "getCollectorStatus": 1,
+          "getConfig": 13,
+          "listActiveFollows": 2,
+          "getUsers": 2,
+          "consumeCollectorBudget": 24,
+          "saveCollectorStatus": 25,
+          "reconcileExpiredNotifications": 2,
+          "listUnprocessedEvents": 7,
+          "recordUpstreamOutcome": 24,
+          "getLatest": 4,
+          "recordObservation": 24,
+          "queueCurrentAvailability": 1,
+          "listPendingNotifications": 9,
+          "claimNotification": 2,
+          "getUser": 3,
+          "getFollow": 3,
+          "reserveSubscriptionCredit": 2,
+          "settleFirstReminder": 1,
+          "updateNotification": 2,
+          "releaseLease": 1
+        },
+        "timeline": [
+          {
+            "kind": "status",
+            "at": 1800,
+            "batches": 0,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 4100,
+            "batches": 2,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 4400,
+            "batches": 2,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 6500,
+            "batches": 4,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 7100,
+            "batches": 4,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 9200,
+            "batches": 6,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 9800,
+            "batches": 6,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 12100,
+            "batches": 8,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 12700,
+            "batches": 8,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 14700,
+            "batches": 10,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 15300,
+            "batches": 10,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 17600,
+            "batches": 12,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 18200,
+            "batches": 12,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 20500,
+            "batches": 14,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 21100,
+            "batches": 14,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 23400,
+            "batches": 16,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 24000,
+            "batches": 16,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 26300,
+            "batches": 18,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 26900,
+            "batches": 18,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 29200,
+            "batches": 20,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 29800,
+            "batches": 20,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 32100,
+            "batches": 22,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 32700,
+            "batches": 22,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 34900,
+            "batches": 24,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 35200,
+            "batches": 24,
+            "inFlight": 0
+          }
+        ]
+      }
+    },
+    {
+      "id": "window-16",
+      "category": "slow_notification",
+      "input": {
+        "logicalWorkBudgetMs": 45000,
+        "repositoryMethodDelayMs": 300,
+        "httpResponseDelayMs": 800,
+        "pendingMessageDelayMs": 8000,
+        "lateDatabaseDelayMs": 0,
+        "lateDatabaseStartsAtLogicalWorkBudgetMinusMs": null
+      },
+      "observed": {
+        "elapsedThroughLeaseReleaseMs": 46400,
+        "nominalPlatformHeadroomMs": 13600,
+        "overLogicalWorkBudgetMs": 1400,
+        "attemptedRequests": 30,
+        "successfulUniqueGroups": 30,
+        "fullyCovered": false,
+        "acceptedMessages": 1,
+        "state": "running",
+        "deadlineReached": true,
+        "scannedBatchesIncludingUnknown": 30,
+        "statusWrites": 35,
+        "totalRepositoryMethodCalls": 264,
+        "finalStatus": {
+          "kind": "status",
+          "at": 45800,
+          "batches": 30,
+          "inFlight": 0
+        }
+      },
+      "detail": {
+        "variant": "new",
+        "dbMs": 300,
+        "httpMs": 800,
+        "statusEveryMs": 0,
+        "maxRunMs": 45000,
+        "pendingSendMs": 8000,
+        "lateDbMs": 0,
+        "result": {
+          "state": "running",
+          "scanned": 30,
+          "observations": 30,
+          "events": 0,
+          "sent": 1,
+          "deadlineReached": true
+        },
+        "elapsedMs": 46400,
+        "uniqueStores": 30,
+        "starts": [
+          2400,
+          2400,
+          5000,
+          5000,
+          7700,
+          7700,
+          10400,
+          10400,
+          13000,
+          13000,
+          15900,
+          15900,
+          18800,
+          18800,
+          21700,
+          21700,
+          24600,
+          24600,
+          27500,
+          27500,
+          30400,
+          30400,
+          33300,
+          33300,
+          36200,
+          36200,
+          39100,
+          39100,
+          42000,
+          42000
+        ],
+        "lastStart": 42000,
+        "calls": {
+          "acquireLease": 61,
+          "getCollectorStatus": 1,
+          "getConfig": 21,
+          "listActiveFollows": 2,
+          "getUsers": 2,
+          "consumeCollectorBudget": 30,
+          "saveCollectorStatus": 35,
+          "reconcileExpiredNotifications": 2,
+          "listUnprocessedEvents": 14,
+          "recordUpstreamOutcome": 30,
+          "getLatest": 4,
+          "recordObservation": 30,
+          "queueCurrentAvailability": 1,
+          "listPendingNotifications": 17,
+          "claimNotification": 2,
+          "getUser": 3,
+          "getFollow": 3,
+          "reserveSubscriptionCredit": 2,
+          "settleFirstReminder": 1,
+          "updateNotification": 2,
+          "releaseLease": 1
+        },
+        "timeline": [
+          {
+            "kind": "status",
+            "at": 1800,
+            "batches": 0,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 4100,
+            "batches": 2,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 4400,
+            "batches": 2,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 6500,
+            "batches": 4,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 7100,
+            "batches": 4,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 9200,
+            "batches": 6,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 9800,
+            "batches": 6,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 12100,
+            "batches": 8,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 12700,
+            "batches": 8,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 14700,
+            "batches": 10,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 15300,
+            "batches": 10,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 17600,
+            "batches": 12,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 18200,
+            "batches": 12,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 20500,
+            "batches": 14,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 21100,
+            "batches": 14,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 23400,
+            "batches": 16,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 24000,
+            "batches": 16,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 26300,
+            "batches": 18,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 26900,
+            "batches": 18,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 29200,
+            "batches": 20,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 29800,
+            "batches": 20,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 32100,
+            "batches": 22,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 32700,
+            "batches": 22,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 35000,
+            "batches": 24,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 35600,
+            "batches": 24,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 37900,
+            "batches": 26,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 38500,
+            "batches": 26,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 40800,
+            "batches": 28,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 41400,
+            "batches": 28,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 43700,
+            "batches": 30,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 44300,
+            "batches": 30,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 44600,
+            "batches": 30,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 45200,
+            "batches": 30,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 45500,
+            "batches": 30,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 45800,
+            "batches": 30,
+            "inFlight": 0
+          }
+        ]
+      }
+    },
+    {
+      "id": "window-17",
+      "category": "slow_notification",
+      "input": {
+        "logicalWorkBudgetMs": 35000,
+        "repositoryMethodDelayMs": 1000,
+        "httpResponseDelayMs": 800,
+        "pendingMessageDelayMs": 8000,
+        "lateDatabaseDelayMs": 0,
+        "lateDatabaseStartsAtLogicalWorkBudgetMinusMs": null
+      },
+      "observed": {
+        "elapsedThroughLeaseReleaseMs": 38000,
+        "nominalPlatformHeadroomMs": 22000,
+        "overLogicalWorkBudgetMs": 3000,
+        "attemptedRequests": 8,
+        "successfulUniqueGroups": 8,
+        "fullyCovered": false,
+        "acceptedMessages": 0,
+        "state": "running",
+        "deadlineReached": true,
+        "scannedBatchesIncludingUnknown": 8,
+        "statusWrites": 11,
+        "totalRepositoryMethodCalls": 73,
+        "finalStatus": {
+          "kind": "status",
+          "at": 36000,
+          "batches": 8,
+          "inFlight": 0
+        }
+      },
+      "detail": {
+        "variant": "new",
+        "dbMs": 1000,
+        "httpMs": 800,
+        "statusEveryMs": 0,
+        "maxRunMs": 35000,
+        "pendingSendMs": 8000,
+        "lateDbMs": 0,
+        "result": {
+          "state": "running",
+          "scanned": 8,
+          "observations": 8,
+          "events": 0,
+          "sent": 0,
+          "deadlineReached": true
+        },
+        "elapsedMs": 38000,
+        "uniqueStores": 8,
+        "starts": [
+          8000,
+          8000,
+          15000,
+          15000,
+          22000,
+          22000,
+          29000,
+          29000
+        ],
+        "lastStart": 29000,
+        "calls": {
+          "acquireLease": 25,
+          "getCollectorStatus": 1,
+          "getConfig": 2,
+          "listActiveFollows": 2,
+          "getUsers": 2,
+          "consumeCollectorBudget": 8,
+          "saveCollectorStatus": 11,
+          "reconcileExpiredNotifications": 1,
+          "listUnprocessedEvents": 1,
+          "recordUpstreamOutcome": 8,
+          "recordObservation": 8,
+          "getLatest": 1,
+          "queueCurrentAvailability": 1,
+          "listPendingNotifications": 1,
+          "releaseLease": 1
+        },
+        "timeline": [
+          {
+            "kind": "status",
+            "at": 6000,
+            "batches": 0,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 11800,
+            "batches": 2,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 13000,
+            "batches": 2,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 18000,
+            "batches": 4,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 20000,
+            "batches": 4,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 25000,
+            "batches": 6,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 27000,
+            "batches": 6,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 32000,
+            "batches": 8,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 34000,
+            "batches": 8,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 35000,
+            "batches": 8,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 36000,
+            "batches": 8,
+            "inFlight": 0
+          }
+        ]
+      }
+    },
+    {
+      "id": "window-18",
+      "category": "slow_notification",
+      "input": {
+        "logicalWorkBudgetMs": 45000,
+        "repositoryMethodDelayMs": 1000,
+        "httpResponseDelayMs": 800,
+        "pendingMessageDelayMs": 8000,
+        "lateDatabaseDelayMs": 0,
+        "lateDatabaseStartsAtLogicalWorkBudgetMinusMs": null
+      },
+      "observed": {
+        "elapsedThroughLeaseReleaseMs": 50800,
+        "nominalPlatformHeadroomMs": 9200,
+        "overLogicalWorkBudgetMs": 5800,
+        "attemptedRequests": 12,
+        "successfulUniqueGroups": 12,
+        "fullyCovered": false,
+        "acceptedMessages": 0,
+        "state": "running",
+        "deadlineReached": true,
+        "scannedBatchesIncludingUnknown": 12,
+        "statusWrites": 13,
+        "totalRepositoryMethodCalls": 106,
+        "finalStatus": {
+          "kind": "status",
+          "at": 47600,
+          "batches": 12,
+          "inFlight": 0
+        }
+      },
+      "detail": {
+        "variant": "new",
+        "dbMs": 1000,
+        "httpMs": 800,
+        "statusEveryMs": 0,
+        "maxRunMs": 45000,
+        "pendingSendMs": 8000,
+        "lateDbMs": 0,
+        "result": {
+          "state": "running",
+          "scanned": 12,
+          "observations": 12,
+          "events": 0,
+          "sent": 0,
+          "deadlineReached": true
+        },
+        "elapsedMs": 50800,
+        "uniqueStores": 12,
+        "starts": [
+          8000,
+          8000,
+          15000,
+          15000,
+          22000,
+          22000,
+          29000,
+          29000,
+          36000,
+          36000,
+          42800,
+          42800
+        ],
+        "lastStart": 42800,
+        "calls": {
+          "acquireLease": 31,
+          "getCollectorStatus": 1,
+          "getConfig": 4,
+          "listActiveFollows": 2,
+          "getUsers": 2,
+          "consumeCollectorBudget": 12,
+          "saveCollectorStatus": 13,
+          "reconcileExpiredNotifications": 1,
+          "listUnprocessedEvents": 1,
+          "recordUpstreamOutcome": 12,
+          "recordObservation": 12,
+          "getLatest": 3,
+          "queueCurrentAvailability": 1,
+          "listPendingNotifications": 1,
+          "claimNotification": 1,
+          "getUser": 2,
+          "getFollow": 2,
+          "reserveSubscriptionCredit": 1,
+          "releaseSubscriptionCredit": 1,
+          "settleFirstReminder": 1,
+          "updateNotification": 1,
+          "releaseLease": 1
+        },
+        "timeline": [
+          {
+            "kind": "status",
+            "at": 6000,
+            "batches": 0,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 11800,
+            "batches": 2,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 13000,
+            "batches": 2,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 18000,
+            "batches": 4,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 20000,
+            "batches": 4,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 25000,
+            "batches": 6,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 27000,
+            "batches": 6,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 32000,
+            "batches": 8,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 34000,
+            "batches": 8,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 39800,
+            "batches": 10,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 41800,
+            "batches": 10,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 46600,
+            "batches": 12,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 47600,
+            "batches": 12,
+            "inFlight": 0
+          }
+        ]
+      }
+    },
+    {
+      "id": "window-19",
+      "category": "late_database_stall",
+      "input": {
+        "logicalWorkBudgetMs": 35000,
+        "repositoryMethodDelayMs": 300,
+        "httpResponseDelayMs": 800,
+        "pendingMessageDelayMs": 0,
+        "lateDatabaseDelayMs": 8000,
+        "lateDatabaseStartsAtLogicalWorkBudgetMinusMs": 1000
+      },
+      "observed": {
+        "elapsedThroughLeaseReleaseMs": 66000,
+        "nominalPlatformHeadroomMs": -6000,
+        "overLogicalWorkBudgetMs": 31000,
+        "attemptedRequests": 24,
+        "successfulUniqueGroups": 22,
+        "fullyCovered": false,
+        "acceptedMessages": 0,
+        "state": "lease_lost",
+        "deadlineReached": true,
+        "scannedBatchesIncludingUnknown": 24,
+        "statusWrites": 23,
+        "totalRepositoryMethodCalls": 210,
+        "finalStatus": {
+          "kind": "status",
+          "at": 33000,
+          "batches": 22,
+          "inFlight": 2
+        }
+      },
+      "detail": {
+        "variant": "new",
+        "dbMs": 300,
+        "httpMs": 800,
+        "statusEveryMs": 0,
+        "maxRunMs": 35000,
+        "pendingSendMs": 0,
+        "lateDbMs": 8000,
+        "result": {
+          "state": "lease_lost",
+          "scanned": 24,
+          "observations": 24,
+          "events": 0,
+          "sent": 0,
+          "deadlineReached": true
+        },
+        "elapsedMs": 66000,
+        "uniqueStores": 22,
+        "starts": [
+          2400,
+          2400,
+          5000,
+          5000,
+          7700,
+          7700,
+          10400,
+          10400,
+          13300,
+          13300,
+          16200,
+          16200,
+          19100,
+          19100,
+          22000,
+          22000,
+          24900,
+          24900,
+          27800,
+          27800,
+          30700,
+          30700,
+          33600,
+          33600
+        ],
+        "lastStart": 33600,
+        "calls": {
+          "acquireLease": 50,
+          "getCollectorStatus": 1,
+          "getConfig": 20,
+          "listActiveFollows": 2,
+          "getUsers": 2,
+          "consumeCollectorBudget": 24,
+          "saveCollectorStatus": 23,
+          "reconcileExpiredNotifications": 2,
+          "listUnprocessedEvents": 17,
+          "recordUpstreamOutcome": 24,
+          "getLatest": 1,
+          "recordObservation": 24,
+          "listPendingNotifications": 19,
+          "releaseLease": 1
+        },
+        "timeline": [
+          {
+            "kind": "status",
+            "at": 1800,
+            "batches": 0,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 4100,
+            "batches": 2,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 4400,
+            "batches": 2,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 6500,
+            "batches": 4,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 7100,
+            "batches": 4,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 9200,
+            "batches": 6,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 9800,
+            "batches": 6,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 12100,
+            "batches": 8,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 12700,
+            "batches": 8,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 15000,
+            "batches": 10,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 15600,
+            "batches": 10,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 17900,
+            "batches": 12,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 18500,
+            "batches": 12,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 20800,
+            "batches": 14,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 21400,
+            "batches": 14,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 23700,
+            "batches": 16,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 24300,
+            "batches": 16,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 26600,
+            "batches": 18,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 27200,
+            "batches": 18,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 29500,
+            "batches": 20,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 30100,
+            "batches": 20,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 32400,
+            "batches": 22,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 33000,
+            "batches": 22,
+            "inFlight": 2
+          }
+        ]
+      }
+    },
+    {
+      "id": "window-20",
+      "category": "late_database_stall",
+      "input": {
+        "logicalWorkBudgetMs": 45000,
+        "repositoryMethodDelayMs": 300,
+        "httpResponseDelayMs": 800,
+        "pendingMessageDelayMs": 0,
+        "lateDatabaseDelayMs": 8000,
+        "lateDatabaseStartsAtLogicalWorkBudgetMinusMs": 1000
+      },
+      "observed": {
+        "elapsedThroughLeaseReleaseMs": 68000,
+        "nominalPlatformHeadroomMs": -8000,
+        "overLogicalWorkBudgetMs": 23000,
+        "attemptedRequests": 30,
+        "successfulUniqueGroups": 30,
+        "fullyCovered": false,
+        "acceptedMessages": 0,
+        "state": "lease_lost",
+        "deadlineReached": true,
+        "scannedBatchesIncludingUnknown": 30,
+        "statusWrites": 31,
+        "totalRepositoryMethodCalls": 270,
+        "finalStatus": {
+          "kind": "status",
+          "at": 52000,
+          "batches": 30,
+          "inFlight": 0
+        }
+      },
+      "detail": {
+        "variant": "new",
+        "dbMs": 300,
+        "httpMs": 800,
+        "statusEveryMs": 0,
+        "maxRunMs": 45000,
+        "pendingSendMs": 0,
+        "lateDbMs": 8000,
+        "result": {
+          "state": "lease_lost",
+          "scanned": 30,
+          "observations": 30,
+          "events": 0,
+          "sent": 0,
+          "deadlineReached": true
+        },
+        "elapsedMs": 68000,
+        "uniqueStores": 30,
+        "starts": [
+          2400,
+          2400,
+          5000,
+          5000,
+          7700,
+          7700,
+          10400,
+          10400,
+          13300,
+          13300,
+          16200,
+          16200,
+          19100,
+          19100,
+          22000,
+          22000,
+          24900,
+          24900,
+          27800,
+          27800,
+          30700,
+          30700,
+          33600,
+          33600,
+          36500,
+          36500,
+          39400,
+          39400,
+          42000,
+          42000
+        ],
+        "lastStart": 42000,
+        "calls": {
+          "acquireLease": 62,
+          "getCollectorStatus": 1,
+          "getConfig": 26,
+          "listActiveFollows": 3,
+          "getUsers": 3,
+          "consumeCollectorBudget": 30,
+          "saveCollectorStatus": 31,
+          "reconcileExpiredNotifications": 2,
+          "listUnprocessedEvents": 24,
+          "recordUpstreamOutcome": 30,
+          "getLatest": 2,
+          "recordObservation": 30,
+          "listPendingNotifications": 25,
+          "releaseLease": 1
+        },
+        "timeline": [
+          {
+            "kind": "status",
+            "at": 1800,
+            "batches": 0,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 4100,
+            "batches": 2,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 4400,
+            "batches": 2,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 6500,
+            "batches": 4,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 7100,
+            "batches": 4,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 9200,
+            "batches": 6,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 9800,
+            "batches": 6,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 12100,
+            "batches": 8,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 12700,
+            "batches": 8,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 15000,
+            "batches": 10,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 15600,
+            "batches": 10,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 17900,
+            "batches": 12,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 18500,
+            "batches": 12,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 20800,
+            "batches": 14,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 21400,
+            "batches": 14,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 23700,
+            "batches": 16,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 24300,
+            "batches": 16,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 26600,
+            "batches": 18,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 27200,
+            "batches": 18,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 29500,
+            "batches": 20,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 30100,
+            "batches": 20,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 32400,
+            "batches": 22,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 33000,
+            "batches": 22,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 35300,
+            "batches": 24,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 35900,
+            "batches": 24,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 38200,
+            "batches": 26,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 38800,
+            "batches": 26,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 41100,
+            "batches": 28,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 41400,
+            "batches": 28,
+            "inFlight": 2
+          },
+          {
+            "kind": "status",
+            "at": 43700,
+            "batches": 30,
+            "inFlight": 0
+          },
+          {
+            "kind": "status",
+            "at": 52000,
+            "batches": 30,
+            "inFlight": 0
+          }
+        ]
+      }
+    }
+  ]
+}

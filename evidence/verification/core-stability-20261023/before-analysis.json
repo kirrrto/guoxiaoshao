@@ -1,0 +1,145 @@
+{
+  "schemaVersion": 1,
+  "analyzedAt": "2026-10-23T09:29:18.115Z",
+  "inputCounts": {
+    "statusSnapshots": 1,
+    "latest": 0,
+    "observationDays": 0,
+    "events": 0,
+    "eligibleTargets": 0
+  },
+  "planAudit": null,
+  "frames": [
+    {
+      "at": "2026-10-23T09:29:18.115Z",
+      "mode": "scheduled",
+      "state": "running",
+      "heartbeatGapMs": null,
+      "ageAtAnalysisMs": 0,
+      "intervalMs": 60000,
+      "minuteAlignedBasePeriodMs": null,
+      "targetPeriodMs": 60000,
+      "budgetIntervalMs": 0,
+      "reportedGroups": 29,
+      "checkpointGroups": 29,
+      "availableGroups": 5,
+      "checkpointHasPlannedAt": 0,
+      "checkpointHasScheduleDelay": 0,
+      "budget": {
+        "allowed": true,
+        "reason": null,
+        "retryInMs": 0,
+        "sourceTokens": 478,
+        "refillPerSecond": 7.407407407407407
+      },
+      "admission": {
+        "reason": null,
+        "remainingMs": 0
+      },
+      "breaker": {
+        "state": "closed",
+        "reason": null,
+        "remainingMs": 0
+      },
+      "nominalOverdueGroups": 7,
+      "guardedGroups": 0,
+      "persistenceFailedGroups": 0,
+      "neverRequestedGroups": 0,
+      "staleSavedSuccessGroups": 3,
+      "unchangedMatchedGroups": 0,
+      "requestsAddedAcrossMatchedGroups": 0,
+      "requestIntervals": {
+        "sampleCount": 82221,
+        "meanMs": 72123.7813210737,
+        "maxMs": 17569535
+      },
+      "successfulResultIntervals": {
+        "sampleCount": 81843,
+        "meanMs": 72456.78536954902,
+        "maxMs": 17569166
+      },
+      "httpLatency": {
+        "sampleCount": 82250,
+        "meanMs": 527.1864437689969,
+        "maxMs": 8004
+      },
+      "latestPersistenceTailMs": {
+        "count": 29,
+        "min": 268,
+        "p50": 391,
+        "p95": 681,
+        "max": 747,
+        "mean": 450.9655172413793
+      },
+      "invocationStats": {
+        "batches": 18,
+        "observations": 44,
+        "lastBatchAt": "2026-10-23T09:29:17.750Z"
+      }
+    }
+  ],
+  "latest": {
+    "observedAgeMs": {
+      "count": 0,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": null
+    },
+    "knownAgeMs": {
+      "count": 0,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": null
+    },
+    "sourceCounts": {
+      "auto": 0,
+      "manual": 0
+    },
+    "statusCounts": {
+      "available": 0,
+      "unavailable": 0,
+      "unknown": 0,
+      "pending": 0,
+      "ineligible": 0
+    },
+    "unknownStreaks": 0
+  },
+  "dayCoverage": {
+    "sampleCount": 0,
+    "knownCount": 0,
+    "unknownCount": 0,
+    "autoCount": 0,
+    "manualCount": 0,
+    "meanSpanPerAcceptedSampleMs": {
+      "count": 0,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": null
+    }
+  },
+  "events": {
+    "types": {
+      "first_seen_available": 0,
+      "restock_confirmed": 0,
+      "recovered_available": 0,
+      "became_unavailable": 0,
+      "status_changed": 0
+    },
+    "withCoverageGap": 0
+  },
+  "limitations": [
+    "No account/owner/target identifiers are emitted.",
+    "eligibleTargets must be a complete already-filtered entitlement snapshot; do not treat all follows as eligible.",
+    "Events occur only on status changes and are not sample timestamps. Daily summaries mix auto/manual unless a source-specific stream is supplied.",
+    "collector.stats is invocation-scoped; cumulative per-group scheduler.health survives scheduled restarts but resets on group-key changes.",
+    "lastRequestAt records dispatch before admission/lease work; lastSuccessAt is after upstream-outcome persistence. latency is HTTP only. The persistence tail excludes earlier budget/lease/outcome transactions.",
+    "One snapshot cannot establish timer invocation gaps, disappearing/reappearing targets or per-target sample percentiles. Read 3+ snapshots across 3-5 minute ticks.",
+    "No raw per-sample observation stream is currently persisted by recordObservation; latest plus day counters cannot recover exact sample intervals."
+  ]
+}

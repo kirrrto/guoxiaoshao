@@ -1,0 +1,3080 @@
+diff --git a/cloudfunctions/cloudbase_auth/package-lock.json b/cloudfunctions/cloudbase_auth/package-lock.json
+--- a/cloudfunctions/cloudbase_auth/package-lock.json
++++ b/cloudfunctions/cloudbase_auth/package-lock.json
+@@ -1,12 +1,12 @@
+ {
+   "name": "cloudbase_auth",
+-  "version": "3.3.2",
++  "version": "3.4.0",
+   "lockfileVersion": 3,
+   "requires": true,
+   "packages": {
+     "": {
+       "name": "cloudbase_auth",
+-      "version": "3.3.2",
++      "version": "3.4.0",
+       "license": "MIT",
+       "dependencies": {
+         "wx-server-sdk": "4.0.2"
+diff --git a/cloudfunctions/cloudbase_auth/package.json b/cloudfunctions/cloudbase_auth/package.json
+--- a/cloudfunctions/cloudbase_auth/package.json
++++ b/cloudfunctions/cloudbase_auth/package.json
+@@ -1,6 +1,6 @@
+ {
+   "name": "cloudbase_auth",
+-  "version": "3.3.2",
++  "version": "3.4.0",
+   "license": "MIT",
+   "private": true,
+   "description": "云开发环境共享鉴权钩子：仅放行果小哨 AppID",
+diff --git a/cloudfunctions/gxs_api/lib/engine/collector.js b/cloudfunctions/gxs_api/lib/engine/collector.js
+--- a/cloudfunctions/gxs_api/lib/engine/collector.js
++++ b/cloudfunctions/gxs_api/lib/engine/collector.js
+@@ -14,13 +14,17 @@
+ const { createScheduler, buildGroups } = require('./scheduler');
+ const { createLeaseKeeper } = require('./lease');
+ const { recordObservations } = require('./observations');
+-const { buildTasks, sendTask, TASK_STATUS, alertKind } = require('./notifier');
++const { buildTasks, sendTask, TASK_STATUS } = require('./notifier');
+ const { targetKeyOf } = require('./events');
+ const { AUTO_SHARE, DAY_MS } = require('./capacity-budget');
+ const { observationHealth } = require('./observation-health');
+ const { currentAvailabilityEvent } = require('./current-availability');
+ 
+ const NOTIFICATION_RECONCILE_INTERVAL_MS = 30000;
++const NOTIFICATION_PLAN_PAGE_SIZE = 50;
++const NOTIFICATION_PLAN_MAX_PAGES = 4;
++const NOTIFICATION_PLAN_TASK_LIMIT = 20;
++const NOTIFICATION_PLAN_SLICE_MS = 5000;
+ 
+ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = console, sendImpl = null, ownerId = `collector-${process.pid}-${Date.now()}`, sleep = ms => new Promise(resolve => setTimeout(resolve, ms)), refreshEveryMs = 10000, statusEveryMs = 5000, mode = 'resident', minimumIntervalMs = 0, statusTtlMs = 0, shouldContinue = () => true, remainingMs = () => Infinity }) {
+   let config = mergeConfig(null);
+@@ -106,36 +110,70 @@
+     return Date.parse(latest.knownAt) > Date.parse(latest.knownStreakSince || event.detectedAt) ? 'confirmed' : 'waiting';
+   }
+ 
+-  async function planEvents(events, planningConfig) {
+-    const follows = await repo.listActiveFollows();
+-    const users = await loadFollowUsers(repo, follows, clock());
+-    const alerting = events.filter(e => alertKind(e.type));
+-    const latestByKey = new Map((alerting.length ? await repo.getLatest([...new Set(alerting.map(e => targetKeyOf(e.storeNumber, e.partNumber)))]) : []).map(l => [l._id, l]));
+-    const now = clock();
++  async function planEvents(planningConfig) {
++    // Bound planning independently of delivery. Slow task inserts must leave
++    // time to send already-durable tasks before this invocation ends.
++    const deadline = clock().getTime() + Math.min(NOTIFICATION_PLAN_SLICE_MS, Math.max(0, remainingMs() - 2000));
++    const canPlan = () => !stopping && shouldContinue() && lease.isHeld() && clock().getTime() < deadline;
+     const maxAgeMs = (planningConfig.notifications.maxEventAgeSeconds || 120) * 1000;
+-    for (const event of events) {
+-      if (!shouldContinue()) break;
+-      let planned = [event];
+-      if (alertKind(event.type)) {
++    const since = new Date(clock().getTime() - Math.max(600000, maxAgeMs)).toISOString();
++    let snapshot = null;
++    let taskCount = 0;
++    for (let page = 0; page < NOTIFICATION_PLAN_MAX_PAGES && canPlan(); page++) {
++      let events = await repo.listUnprocessedEvents({ limit: NOTIFICATION_PLAN_PAGE_SIZE, since, cursor: stats.notificationEventCursor });
++      // A saved cursor can point past a now-empty tail after other work
++      // completed. Wrap once, then the page bound prevents waiting-event spins.
++      if (!events.length && page === 0 && stats.notificationEventCursor) {
++        stats.notificationEventCursor = null;
++        events = await repo.listUnprocessedEvents({ limit: NOTIFICATION_PLAN_PAGE_SIZE, since });
++      }
++      if (!events.length) { stats.notificationEventCursor = null; break; }
++      const latestByKey = new Map((await repo.getLatest([...new Set(events.map(e => targetKeyOf(e.storeNumber, e.partNumber)))])).map(l => [l._id, l]));
++      for (const event of events) {
++        if (!canPlan() || !await lease.renew()) return { snapshot, more: taskCount > 0 };
++        const nextCursor = { detectedAt: event.detectedAt, id: event._id };
++        const now = clock();
+         const state = await confirmation(event, latestByKey.get(targetKeyOf(event.storeNumber, event.partNumber)));
+-        const expired = now.getTime() - Date.parse(event.detectedAt) > maxAgeMs;
+-        if (state === 'waiting' && !expired) {
+-          // Check this store right away; the next drain plans the event once confirmed.
++        if (state === 'waiting' && now.getTime() - Date.parse(event.detectedAt) <= maxAgeMs) {
+           scheduler.hurry(event.storeNumber, Date.parse(event.detectedAt));
++          // Leave this event unplanned, but do not let it hide later alerts.
++          stats.notificationEventCursor = nextCursor;
+           continue;
+         }
+-        if (state !== 'confirmed') planned = [];
+-      }
+-      const tasks = buildTasks({ events: planned, follows, users, config: planningConfig, now });
+-      for (const task of tasks) {
+-        if (!shouldContinue()) return;
+-        if (await repo.saveNotification(task)) stats.tasks += 1;
+-      }
+-      // Only commit the cursor after ALL deterministic tasks are durable. A
+-      // failure/restart replays planning safely; already-created tasks dedupe.
+-      await repo.markEventPlanned(event._id, now.toISOString());
++        if (!snapshot && state === 'confirmed') {
++          const follows = await repo.listActiveFollows();
++          snapshot = { follows, users: await loadFollowUsers(repo, follows, clock()) };
++        }
++        const tasks = state === 'confirmed' ? buildTasks({ events: [event], ...snapshot, config: planningConfig, now })
++          .filter(task => task.userKey > (event.notificationPlanningAfterUserKey || ''))
++          .sort((a, b) => a.userKey < b.userKey ? -1 : a.userKey > b.userKey ? 1 : 0) : [];
++        let afterUserKey = event.notificationPlanningAfterUserKey || null;
++        let uncommitted = 0;
++        const checkpoint = async complete => {
++          if (!await lease.renew()) throw new Error('collector_lease_lost');
++          await repo.checkpointEventPlanning({ eventId: event._id, afterUserKey, complete, ownerId, nowIso: clock().toISOString() });
++          uncommitted = 0;
++        };
++        for (const task of tasks) {
++          if (!canPlan() || taskCount >= NOTIFICATION_PLAN_TASK_LIMIT || !await lease.renew()) {
++            if (uncommitted) await checkpoint(false);
++            return { snapshot, more: taskCount > 0 };
++          }
++          if (await repo.saveNotification(task)) stats.tasks += 1;
++          afterUserKey = task.userKey;
++          taskCount += 1;
++          uncommitted += 1;
++          if (uncommitted >= 10) await checkpoint(false);
++        }
++        // Completion is separate from partial progress. Crashes replay only
++        // the unsaved chunk; deterministic task ids still dedupe every replay.
++        await checkpoint(true);
++        stats.notificationEventCursor = nextCursor;
++        if (taskCount >= NOTIFICATION_PLAN_TASK_LIMIT) return { snapshot, more: true };
++      }
++      if (events.length < NOTIFICATION_PLAN_PAGE_SIZE) { stats.notificationEventCursor = null; break; }
+     }
+-    return { follows, users };
++    return { snapshot, more: false };
+   }
+ 
+   async function planCurrentAvailability(planningConfig, planningSnapshot) {
+@@ -189,7 +227,7 @@
+     notificationWork = serialised(async () => {
+       while (notificationRequested && concurrentNotifications() && !stopping && lease.isHeld() && shouldContinue()) {
+         notificationRequested = false;
+-        await notificationPass();
++        if (await notificationPass()) notificationRequested = true;
+       }
+     }).catch(error => {
+       log.error('[collector] notification pass failed', error && error.message);
+@@ -220,13 +258,10 @@
+           pendingBefore: new Date(reconcileAt.getTime() - (notificationConfig.notifications.maxEventAgeSeconds || 120) * 1000).toISOString() });
+         lastNotificationReconcileAt = reconcileAt.getTime();
+       }
+-      // Ten minutes is well past the send window, so an old backlog never delays new alerts.
+-      const since = new Date(clock().getTime() - Math.max(600, notificationConfig.notifications.maxEventAgeSeconds || 120) * 1000).toISOString();
+-      const events = await repo.listUnprocessedEvents({ limit: 50, since });
+-      const planningSnapshot = events.length ? await planEvents(events, notificationConfig) : null;
+-      if (!sendImpl || sendImpl.enabled === false) return;
+-      if (typeof sendImpl.getHealth === 'function' && !sendImpl.getHealth().authReady) return;
+-      await planCurrentAvailability(notificationConfig, planningSnapshot);
++      const planning = await planEvents(notificationConfig);
++      if (!sendImpl || sendImpl.enabled === false) return planning.more;
++      if (typeof sendImpl.getHealth === 'function' && !sendImpl.getHealth().authReady) return planning.more;
++      await planCurrentAvailability(notificationConfig, planning.snapshot);
+       for (const task of await repo.listPendingNotifications({ limit: 20 })) {
+         if (stopping || !shouldContinue() || !await lease.renew()) break;
+         if (typeof sendImpl.getHealth === 'function' && !sendImpl.getHealth().authReady) break;
+@@ -234,6 +269,7 @@
+           beforeSend: async () => !stopping && shouldContinue() && await lease.renew() && lease.isHeld() && shouldContinue() });
+         if (result.status === TASK_STATUS.accepted) stats.sent += 1;
+       }
++      return planning.more;
+   }
+ 
+   async function refreshTargets() {
+diff --git a/cloudfunctions/gxs_api/lib/engine/scheduled.js b/cloudfunctions/gxs_api/lib/engine/scheduled.js
+--- a/cloudfunctions/gxs_api/lib/engine/scheduled.js
++++ b/cloudfunctions/gxs_api/lib/engine/scheduled.js
+@@ -46,7 +46,9 @@
+  * store is on the fast cadence it keeps polling until the function's own time
+  * limit (from the platform context) leaves a safety margin.
+  */
+-function runBudgetMs(context, fallbackMs = 35000) {
++// The fallback requires a deployment timeout of at least 60 seconds. Reserve
++// a nominal 15 seconds for the final checkpoint, in-flight work and release.
++function runBudgetMs(context, fallbackMs = 45000) {
+   let remaining = NaN;
+   try {
+     // Some SCF Node.js 20 runtimes expose this method but throw internally
+@@ -58,7 +60,7 @@
+   return Number.isFinite(remaining) ? Math.max(0, Math.min(55000, remaining - 5000)) : fallbackMs;
+ }
+ 
+-async function runScheduled({ repo, fetchImpl, sendImpl, clock = () => new Date(), log = console, maxRunMs = 35000, ownerId = `timer-${crypto.randomUUID()}`, sleep = ms => new Promise(resolve => setTimeout(resolve, ms)) }) {
++async function runScheduled({ repo, fetchImpl, sendImpl, clock = () => new Date(), log = console, maxRunMs = 45000, ownerId = `timer-${crypto.randomUUID()}`, sleep = ms => new Promise(resolve => setTimeout(resolve, ms)) }) {
+   const deadline = clock().getTime() + maxRunMs;
+   const shouldContinue = () => clock().getTime() < deadline;
+   const collector = createCollector({ repo, fetchImpl, sendImpl, clock, log, ownerId,
+@@ -96,6 +98,7 @@
+       }
+       collector.stats.lastBatchAt = previous.stats && previous.stats.lastBatchAt || null;
+       collector.stats.availabilityCursor = previous.stats && previous.stats.availabilityCursor || null;
++      collector.stats.notificationEventCursor = previous.stats && previous.stats.notificationEventCursor || null;
+     }
+     const snap = collector.scheduler.snapshot();
+     // Same-store SKU batches cannot occupy concurrent slots. Allow one wave
+diff --git a/cloudfunctions/gxs_api/lib/engine/scheduler.js b/cloudfunctions/gxs_api/lib/engine/scheduler.js
+--- a/cloudfunctions/gxs_api/lib/engine/scheduler.js
++++ b/cloudfunctions/gxs_api/lib/engine/scheduler.js
+@@ -116,7 +116,9 @@
+   function nextFixedDue(key, plannedAt, nowMs) {
+     const interval = Math.max(1, opts.intervalMs);
+     let next = plannedAt + interval;
+-    if (next < nowMs) next = slotAfter(key, nowMs);
++    // A completion exactly on a later phase has already consumed this turn.
++    // Keep the next normal slot strictly in the future, never catch up twice.
++    if (next <= nowMs) next = slotAfter(key, nowMs + 1);
+     return next;
+   }
+ 
+@@ -267,9 +269,13 @@
+     const finishedMs = clock().getTime();
+     const { record, observations } = result;
+     if (record.budgetDenied) {
+-      entry.nextDueAt = record.retryAt || finishedMs + 60000;
+-      entry.guardUntil = entry.nextDueAt;
+-      entry.guardReason = record.error && record.error.message || null;
++      const retryAt = record.retryAt || finishedMs + 60000;
++      const reason = record.error && record.error.message || null;
++      // Cancellation happens before HTTP starts. Keep the unserved slot and
++      // its queue priority; the guard alone prevents an immediate retry.
++      if (reason !== 'request_cancelled') entry.nextDueAt = retryAt;
++      entry.guardUntil = retryAt;
++      entry.guardReason = reason;
+       // The automatic lane is shared by every store. Once it is exhausted,
+       // polling other groups only repeats the same database admission check.
+       if (ADMISSION_REASONS.has(entry.guardReason) && entry.guardUntil >= admissionUntil) {
+diff --git a/cloudfunctions/gxs_api/lib/monitor-readiness.js b/cloudfunctions/gxs_api/lib/monitor-readiness.js
+--- a/cloudfunctions/gxs_api/lib/monitor-readiness.js
++++ b/cloudfunctions/gxs_api/lib/monitor-readiness.js
+@@ -32,15 +32,21 @@
+   const sender = status && status.notifications;
+   const authExpiry = sender && Date.parse(sender.validUntil);
+   const authReady = Boolean(sender && sender.authReady === true && sender.authState === 'ready' && Number.isFinite(authExpiry) && authExpiry > now.getTime());
+-  let reason = !templateConfigured ? 'template_missing' : !notifications.enabled ? 'notifications_disabled'
++  const serviceReason = !templateConfigured ? 'template_missing' : !notifications.enabled ? 'notifications_disabled'
+     : !status ? 'collector_not_deployed' : stale ? 'collector_stale'
+     : ['stopped', 'no_lease', 'disabled', 'error'].includes(state) || !config.collector.enabled ? 'collector_stopped'
+-    : observationStale ? 'collector_observation_stale'
+-    : !sender ? 'sender_unknown' : sender.reason || (!sender.enabled ? 'sender_missing' : !authReady ? 'consumer_auth_unchecked' : null);
++    : null;
++  // A current, authenticated sender can be connected while stock observations
++  // lag. Keep the whole reminder path blocked without labelling that a sender
++  // failure. An expired/stopped worker still cannot prove a live sender.
++  const senderReason = serviceReason || (!sender ? 'sender_unknown'
++    : sender.reason || (!sender.enabled ? 'sender_missing' : !authReady ? 'consumer_auth_unchecked' : null));
++  const reason = serviceReason || (observationStale ? 'collector_observation_stale' : senderReason);
+   return { collector, notifications: {
+     enabled: Boolean(notifications.enabled), templateIds: notifications.templateIds,
+     templateTitle: notifications.templateTitle || '',
+-    templateConfigured, deliveryReady: reason === null, reason,
++    templateConfigured, senderReady: senderReason === null, senderReason,
++    deliveryReady: reason === null, reason,
+   } };
+ }
+ 
+diff --git a/cloudfunctions/gxs_api/lib/repo/atomic-ops.js b/cloudfunctions/gxs_api/lib/repo/atomic-ops.js
+--- a/cloudfunctions/gxs_api/lib/repo/atomic-ops.js
++++ b/cloudfunctions/gxs_api/lib/repo/atomic-ops.js
+@@ -202,6 +202,18 @@
+       let view = await tx.get(C.config, viewId(userKey));
+       if (!view) { view = newView(userKey); await tx.put(C.config, view); }
+       return view;
++    }),
++
++    checkpointEventPlanning: ({ eventId, afterUserKey = null, complete = false, ownerId, nowIso }) => run(async tx => {
++      const lease = await tx.get(C.config, 'collector_lease');
++      if (!lease || lease.ownerId !== ownerId || lease.expiresAt <= nowIso) throw new ApiError('collector_lease_lost', '采集执行权已转移');
++      const event = await tx.get(C.events, eventId);
++      if (!event || event.notificationPlannedAt) return;
++      // A partial plan is not a completed event. Only durable tasks precede
++      // this monotone cursor, so a restart replays at most one small chunk.
++      if (afterUserKey && afterUserKey > (event.notificationPlanningAfterUserKey || '')) event.notificationPlanningAfterUserKey = afterUserKey;
++      if (complete) event.notificationPlannedAt = nowIso;
++      await tx.put(C.events, event);
+     }),
+ 
+     saveNotification: notification => run(async tx => {
+diff --git a/cloudfunctions/gxs_api/lib/repo/cloudbase-repo.js b/cloudfunctions/gxs_api/lib/repo/cloudbase-repo.js
+--- a/cloudfunctions/gxs_api/lib/repo/cloudbase-repo.js
++++ b/cloudfunctions/gxs_api/lib/repo/cloudbase-repo.js
+@@ -57,10 +57,10 @@
+   }
+ }
+ 
+-function createCloudbaseRepo(db) {
++function createCloudbaseRepo(db, { sleep = ms => new Promise(resolve => setTimeout(resolve, ms)), random = Math.random } = {}) {
+   const _ = db.command;
+   const col = name => db.collection(name);
+-  const run = body => db.runTransaction(async transaction => {
++  const transaction = body => db.runTransaction(async transaction => {
+     const cache = new Map();
+     const get = async (collection, id) => {
+       const key = `${collection}\0${id}`;
+@@ -77,16 +77,23 @@
+       else await transaction.collection(collection).add({ data: doc });
+       cache.set(`${collection}\0${_id}`, doc);
+     };
+-    try {
+-      return await body({ get, put });
+-    } catch (error) {
+-      // wx-server-sdk wraps read/write errors and can discard CloudBase's
+-      // string code. Restore only the explicit transaction-conflict signal so
+-      // the SDK's bounded retry loop also covers read/write conflicts.
+-      if (isTransactionConflict(error)) error.code = 'DATABASE_TRANSACTION_CONFLICT';
+-      throw error;
++    return body({ get, put });
++  }, 0);
++  const run = async body => {
++    // Keep the SDK's original four-attempt budget. Disabling its immediate
++    // recursive retries makes it roll back the failed transaction first.
++    // Then jitter only explicit conflicts; an uncertain network/write outcome
++    // must escape unchanged. These callbacks contain database work, never sends.
++    for (let attempt = 0; ; attempt++) {
++      try { return await transaction(body); }
++      catch (error) {
++        if (attempt >= 3 || !isTransactionConflict(error)) throw error;
++        const baseMs = 25 * 2 ** attempt;
++        // Total retry waiting stays below 350ms across all three retries.
++        await sleep(baseMs + Math.floor(random() * baseMs));
++      }
+     }
+-  });
++  };
+   const readIds = async (collection, ids) => {
+     const unique = [...new Set(ids)];
+     const result = [];
+@@ -355,9 +362,10 @@
+       return { items, hasMore: Boolean(extra.data && extra.data.length) };
+     },
+     /** Alert events not yet planned; `since` skips a backlog too old to alert about. */
+-    async listUnprocessedEvents({ limit = 100, since = null } = {}) {
++    async listUnprocessedEvents({ limit = 100, since = null, cursor = null } = {}) {
+       const where = [{ type: _.in([...ALERT_TYPES]) }, _.or([{ notificationPlannedAt: _.eq(null) }, { notificationPlannedAt: _.exists(false) }])];
+       if (since) where.push({ detectedAt: _.gte(since) });
++      if (cursor) where.push(_.or([{ detectedAt: _.gt(cursor.detectedAt) }, { detectedAt: cursor.detectedAt, _id: _.gt(cursor.id) }]));
+       return readAll(col(COLLECTIONS.events).where(_.and(where)).orderBy('detectedAt', 'asc').orderBy('_id', 'asc'), limit);
+     },
+     async getEvent(id) {
+diff --git a/cloudfunctions/gxs_api/lib/repo/upstream-guard.js b/cloudfunctions/gxs_api/lib/repo/upstream-guard.js
+--- a/cloudfunctions/gxs_api/lib/repo/upstream-guard.js
++++ b/cloudfunctions/gxs_api/lib/repo/upstream-guard.js
+@@ -89,7 +89,11 @@
+       const ownsProbe = token && token.probe && state.probeId === token.id && token.generation === state.generation && state.probeUntil > nowMs;
+       if (success) {
+         // A request started before a 429 cannot reopen the source afterward.
+-        if (ownsProbe || (!state.until && token && token.generation === state.generation)) {
++        const needsReset = state.reason || state.probeId || state.probeUntil || state.trips || (state.failures || []).length;
++        // Healthy requests only need to read a clean closed breaker. Rewriting
++        // it for every success makes all stores and manual queries contend on
++        // the same document without changing any admission decision.
++        if (ownsProbe || (!state.until && token && token.generation === state.generation && needsReset)) {
+           await tx.put(C.config, { ...state, until: null, reason: null, probeId: null, probeUntil: null, trips: 0, failures: [], updatedAt: now });
+         }
+         return { paused: Boolean(state.until && !ownsProbe) };
+diff --git a/cloudfunctions/gxs_api/package-lock.json b/cloudfunctions/gxs_api/package-lock.json
+--- a/cloudfunctions/gxs_api/package-lock.json
++++ b/cloudfunctions/gxs_api/package-lock.json
+@@ -1,12 +1,12 @@
+ {
+   "name": "gxs_api",
+-  "version": "3.3.2",
++  "version": "3.4.0",
+   "lockfileVersion": 3,
+   "requires": true,
+   "packages": {
+     "": {
+       "name": "gxs_api",
+-      "version": "3.3.2",
++      "version": "3.4.0",
+       "license": "MIT",
+       "dependencies": {
+         "wx-server-sdk": "4.0.2"
+diff --git a/cloudfunctions/gxs_api/package.json b/cloudfunctions/gxs_api/package.json
+--- a/cloudfunctions/gxs_api/package.json
++++ b/cloudfunctions/gxs_api/package.json
+@@ -1,6 +1,6 @@
+ {
+   "name": "gxs_api",
+-  "version": "3.3.2",
++  "version": "3.4.0",
+   "license": "MIT",
+   "private": true,
+   "description": "果小哨业务云函数：身份、目录、实时查询、次数账本、关注、会员、历史与管理",
+diff --git a/cloudfunctions/gxs_monitor/lib-manifest.json b/cloudfunctions/gxs_monitor/lib-manifest.json
+--- a/cloudfunctions/gxs_monitor/lib-manifest.json
++++ b/cloudfunctions/gxs_monitor/lib-manifest.json
+@@ -48,8 +48,8 @@
+     },
+     {
+       "path": "engine/collector.js",
+-      "bytes": 23459,
+-      "sha256": "1c41a6537cac6baf5d8643d8a5e4d2d3c271d16762331e7b6188b6cb9209cb0c"
++      "bytes": 25716,
++      "sha256": "e44df0c1ca9839ea16fd578d29591fba5f4baa1da4256f17bab2902e78e80f14"
+     },
+     {
+       "path": "engine/current-availability.js",
+@@ -98,13 +98,13 @@
+     },
+     {
+       "path": "engine/scheduled.js",
+-      "bytes": 9654,
+-      "sha256": "fe2290af2f92ff94d3c73753b36a322eedb59911aee67275bc496c9d8992fb63"
++      "bytes": 9924,
++      "sha256": "64fbc145d9dd225c53761c10bb9999fb145f6540bb801d7708d779d0438da616"
+     },
+     {
+       "path": "engine/scheduler.js",
+-      "bytes": 28137,
+-      "sha256": "bc6061f1034b4f5e47a878ec4319551673813af62c18fd34f5243058c9870242"
++      "bytes": 29479,
++      "sha256": "81f16542f824c80ab525c0bb2028835042db2ab58bda61cd3b2f201734052a11"
+     },
+     {
+       "path": "engine/wechat-sender.js",
+@@ -143,13 +143,13 @@
+     },
+     {
+       "path": "repo/atomic-ops.js",
+-      "bytes": 54504,
+-      "sha256": "9cb5c2b81ab4a598be3ba354e8ac4bdb8a269cad011bdf5f7c8ca6d2dfa579d3"
++      "bytes": 55347,
++      "sha256": "3bd235a658f30f86312388e852d25dce5b89458fec77363da4d06fb3a411a4a7"
+     },
+     {
+       "path": "repo/cloudbase-repo.js",
+-      "bytes": 24889,
+-      "sha256": "4fe509f3955109ebc85690298cde2937983f5234816c1e0abaca202400fd5484"
++      "bytes": 25487,
++      "sha256": "b3887555131942733cfae8e292250e4738a36efe65ef00a9c133243c7531fba7"
+     },
+     {
+       "path": "repo/current-availability.js",
+@@ -183,8 +183,8 @@
+     },
+     {
+       "path": "repo/upstream-guard.js",
+-      "bytes": 7853,
+-      "sha256": "6b02ba45609772c70da0bd410422bcd8e426a06d6cc441f460c57539e3c66141"
++      "bytes": 8222,
++      "sha256": "50d64cd91ad9f4c31014c6d18fda893eb0cc388ced4ca8edd877912c01036b69"
+     },
+     {
+       "path": "rules/access.js",
+diff --git a/cloudfunctions/gxs_monitor/lib/engine/collector.js b/cloudfunctions/gxs_monitor/lib/engine/collector.js
+--- a/cloudfunctions/gxs_monitor/lib/engine/collector.js
++++ b/cloudfunctions/gxs_monitor/lib/engine/collector.js
+@@ -14,13 +14,17 @@
+ const { createScheduler, buildGroups } = require('./scheduler');
+ const { createLeaseKeeper } = require('./lease');
+ const { recordObservations } = require('./observations');
+-const { buildTasks, sendTask, TASK_STATUS, alertKind } = require('./notifier');
++const { buildTasks, sendTask, TASK_STATUS } = require('./notifier');
+ const { targetKeyOf } = require('./events');
+ const { AUTO_SHARE, DAY_MS } = require('./capacity-budget');
+ const { observationHealth } = require('./observation-health');
+ const { currentAvailabilityEvent } = require('./current-availability');
+ 
+ const NOTIFICATION_RECONCILE_INTERVAL_MS = 30000;
++const NOTIFICATION_PLAN_PAGE_SIZE = 50;
++const NOTIFICATION_PLAN_MAX_PAGES = 4;
++const NOTIFICATION_PLAN_TASK_LIMIT = 20;
++const NOTIFICATION_PLAN_SLICE_MS = 5000;
+ 
+ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = console, sendImpl = null, ownerId = `collector-${process.pid}-${Date.now()}`, sleep = ms => new Promise(resolve => setTimeout(resolve, ms)), refreshEveryMs = 10000, statusEveryMs = 5000, mode = 'resident', minimumIntervalMs = 0, statusTtlMs = 0, shouldContinue = () => true, remainingMs = () => Infinity }) {
+   let config = mergeConfig(null);
+@@ -106,36 +110,70 @@
+     return Date.parse(latest.knownAt) > Date.parse(latest.knownStreakSince || event.detectedAt) ? 'confirmed' : 'waiting';
+   }
+ 
+-  async function planEvents(events, planningConfig) {
+-    const follows = await repo.listActiveFollows();
+-    const users = await loadFollowUsers(repo, follows, clock());
+-    const alerting = events.filter(e => alertKind(e.type));
+-    const latestByKey = new Map((alerting.length ? await repo.getLatest([...new Set(alerting.map(e => targetKeyOf(e.storeNumber, e.partNumber)))]) : []).map(l => [l._id, l]));
+-    const now = clock();
++  async function planEvents(planningConfig) {
++    // Bound planning independently of delivery. Slow task inserts must leave
++    // time to send already-durable tasks before this invocation ends.
++    const deadline = clock().getTime() + Math.min(NOTIFICATION_PLAN_SLICE_MS, Math.max(0, remainingMs() - 2000));
++    const canPlan = () => !stopping && shouldContinue() && lease.isHeld() && clock().getTime() < deadline;
+     const maxAgeMs = (planningConfig.notifications.maxEventAgeSeconds || 120) * 1000;
+-    for (const event of events) {
+-      if (!shouldContinue()) break;
+-      let planned = [event];
+-      if (alertKind(event.type)) {
++    const since = new Date(clock().getTime() - Math.max(600000, maxAgeMs)).toISOString();
++    let snapshot = null;
++    let taskCount = 0;
++    for (let page = 0; page < NOTIFICATION_PLAN_MAX_PAGES && canPlan(); page++) {
++      let events = await repo.listUnprocessedEvents({ limit: NOTIFICATION_PLAN_PAGE_SIZE, since, cursor: stats.notificationEventCursor });
++      // A saved cursor can point past a now-empty tail after other work
++      // completed. Wrap once, then the page bound prevents waiting-event spins.
++      if (!events.length && page === 0 && stats.notificationEventCursor) {
++        stats.notificationEventCursor = null;
++        events = await repo.listUnprocessedEvents({ limit: NOTIFICATION_PLAN_PAGE_SIZE, since });
++      }
++      if (!events.length) { stats.notificationEventCursor = null; break; }
++      const latestByKey = new Map((await repo.getLatest([...new Set(events.map(e => targetKeyOf(e.storeNumber, e.partNumber)))])).map(l => [l._id, l]));
++      for (const event of events) {
++        if (!canPlan() || !await lease.renew()) return { snapshot, more: taskCount > 0 };
++        const nextCursor = { detectedAt: event.detectedAt, id: event._id };
++        const now = clock();
+         const state = await confirmation(event, latestByKey.get(targetKeyOf(event.storeNumber, event.partNumber)));
+-        const expired = now.getTime() - Date.parse(event.detectedAt) > maxAgeMs;
+-        if (state === 'waiting' && !expired) {
+-          // Check this store right away; the next drain plans the event once confirmed.
++        if (state === 'waiting' && now.getTime() - Date.parse(event.detectedAt) <= maxAgeMs) {
+           scheduler.hurry(event.storeNumber, Date.parse(event.detectedAt));
++          // Leave this event unplanned, but do not let it hide later alerts.
++          stats.notificationEventCursor = nextCursor;
+           continue;
+         }
+-        if (state !== 'confirmed') planned = [];
+-      }
+-      const tasks = buildTasks({ events: planned, follows, users, config: planningConfig, now });
+-      for (const task of tasks) {
+-        if (!shouldContinue()) return;
+-        if (await repo.saveNotification(task)) stats.tasks += 1;
+-      }
+-      // Only commit the cursor after ALL deterministic tasks are durable. A
+-      // failure/restart replays planning safely; already-created tasks dedupe.
+-      await repo.markEventPlanned(event._id, now.toISOString());
++        if (!snapshot && state === 'confirmed') {
++          const follows = await repo.listActiveFollows();
++          snapshot = { follows, users: await loadFollowUsers(repo, follows, clock()) };
++        }
++        const tasks = state === 'confirmed' ? buildTasks({ events: [event], ...snapshot, config: planningConfig, now })
++          .filter(task => task.userKey > (event.notificationPlanningAfterUserKey || ''))
++          .sort((a, b) => a.userKey < b.userKey ? -1 : a.userKey > b.userKey ? 1 : 0) : [];
++        let afterUserKey = event.notificationPlanningAfterUserKey || null;
++        let uncommitted = 0;
++        const checkpoint = async complete => {
++          if (!await lease.renew()) throw new Error('collector_lease_lost');
++          await repo.checkpointEventPlanning({ eventId: event._id, afterUserKey, complete, ownerId, nowIso: clock().toISOString() });
++          uncommitted = 0;
++        };
++        for (const task of tasks) {
++          if (!canPlan() || taskCount >= NOTIFICATION_PLAN_TASK_LIMIT || !await lease.renew()) {
++            if (uncommitted) await checkpoint(false);
++            return { snapshot, more: taskCount > 0 };
++          }
++          if (await repo.saveNotification(task)) stats.tasks += 1;
++          afterUserKey = task.userKey;
++          taskCount += 1;
++          uncommitted += 1;
++          if (uncommitted >= 10) await checkpoint(false);
++        }
++        // Completion is separate from partial progress. Crashes replay only
++        // the unsaved chunk; deterministic task ids still dedupe every replay.
++        await checkpoint(true);
++        stats.notificationEventCursor = nextCursor;
++        if (taskCount >= NOTIFICATION_PLAN_TASK_LIMIT) return { snapshot, more: true };
++      }
++      if (events.length < NOTIFICATION_PLAN_PAGE_SIZE) { stats.notificationEventCursor = null; break; }
+     }
+-    return { follows, users };
++    return { snapshot, more: false };
+   }
+ 
+   async function planCurrentAvailability(planningConfig, planningSnapshot) {
+@@ -189,7 +227,7 @@
+     notificationWork = serialised(async () => {
+       while (notificationRequested && concurrentNotifications() && !stopping && lease.isHeld() && shouldContinue()) {
+         notificationRequested = false;
+-        await notificationPass();
++        if (await notificationPass()) notificationRequested = true;
+       }
+     }).catch(error => {
+       log.error('[collector] notification pass failed', error && error.message);
+@@ -220,13 +258,10 @@
+           pendingBefore: new Date(reconcileAt.getTime() - (notificationConfig.notifications.maxEventAgeSeconds || 120) * 1000).toISOString() });
+         lastNotificationReconcileAt = reconcileAt.getTime();
+       }
+-      // Ten minutes is well past the send window, so an old backlog never delays new alerts.
+-      const since = new Date(clock().getTime() - Math.max(600, notificationConfig.notifications.maxEventAgeSeconds || 120) * 1000).toISOString();
+-      const events = await repo.listUnprocessedEvents({ limit: 50, since });
+-      const planningSnapshot = events.length ? await planEvents(events, notificationConfig) : null;
+-      if (!sendImpl || sendImpl.enabled === false) return;
+-      if (typeof sendImpl.getHealth === 'function' && !sendImpl.getHealth().authReady) return;
+-      await planCurrentAvailability(notificationConfig, planningSnapshot);
++      const planning = await planEvents(notificationConfig);
++      if (!sendImpl || sendImpl.enabled === false) return planning.more;
++      if (typeof sendImpl.getHealth === 'function' && !sendImpl.getHealth().authReady) return planning.more;
++      await planCurrentAvailability(notificationConfig, planning.snapshot);
+       for (const task of await repo.listPendingNotifications({ limit: 20 })) {
+         if (stopping || !shouldContinue() || !await lease.renew()) break;
+         if (typeof sendImpl.getHealth === 'function' && !sendImpl.getHealth().authReady) break;
+@@ -234,6 +269,7 @@
+           beforeSend: async () => !stopping && shouldContinue() && await lease.renew() && lease.isHeld() && shouldContinue() });
+         if (result.status === TASK_STATUS.accepted) stats.sent += 1;
+       }
++      return planning.more;
+   }
+ 
+   async function refreshTargets() {
+diff --git a/cloudfunctions/gxs_monitor/lib/engine/scheduled.js b/cloudfunctions/gxs_monitor/lib/engine/scheduled.js
+--- a/cloudfunctions/gxs_monitor/lib/engine/scheduled.js
++++ b/cloudfunctions/gxs_monitor/lib/engine/scheduled.js
+@@ -46,7 +46,9 @@
+  * store is on the fast cadence it keeps polling until the function's own time
+  * limit (from the platform context) leaves a safety margin.
+  */
+-function runBudgetMs(context, fallbackMs = 35000) {
++// The fallback requires a deployment timeout of at least 60 seconds. Reserve
++// a nominal 15 seconds for the final checkpoint, in-flight work and release.
++function runBudgetMs(context, fallbackMs = 45000) {
+   let remaining = NaN;
+   try {
+     // Some SCF Node.js 20 runtimes expose this method but throw internally
+@@ -58,7 +60,7 @@
+   return Number.isFinite(remaining) ? Math.max(0, Math.min(55000, remaining - 5000)) : fallbackMs;
+ }
+ 
+-async function runScheduled({ repo, fetchImpl, sendImpl, clock = () => new Date(), log = console, maxRunMs = 35000, ownerId = `timer-${crypto.randomUUID()}`, sleep = ms => new Promise(resolve => setTimeout(resolve, ms)) }) {
++async function runScheduled({ repo, fetchImpl, sendImpl, clock = () => new Date(), log = console, maxRunMs = 45000, ownerId = `timer-${crypto.randomUUID()}`, sleep = ms => new Promise(resolve => setTimeout(resolve, ms)) }) {
+   const deadline = clock().getTime() + maxRunMs;
+   const shouldContinue = () => clock().getTime() < deadline;
+   const collector = createCollector({ repo, fetchImpl, sendImpl, clock, log, ownerId,
+@@ -96,6 +98,7 @@
+       }
+       collector.stats.lastBatchAt = previous.stats && previous.stats.lastBatchAt || null;
+       collector.stats.availabilityCursor = previous.stats && previous.stats.availabilityCursor || null;
++      collector.stats.notificationEventCursor = previous.stats && previous.stats.notificationEventCursor || null;
+     }
+     const snap = collector.scheduler.snapshot();
+     // Same-store SKU batches cannot occupy concurrent slots. Allow one wave
+diff --git a/cloudfunctions/gxs_monitor/lib/engine/scheduler.js b/cloudfunctions/gxs_monitor/lib/engine/scheduler.js
+--- a/cloudfunctions/gxs_monitor/lib/engine/scheduler.js
++++ b/cloudfunctions/gxs_monitor/lib/engine/scheduler.js
+@@ -116,7 +116,9 @@
+   function nextFixedDue(key, plannedAt, nowMs) {
+     const interval = Math.max(1, opts.intervalMs);
+     let next = plannedAt + interval;
+-    if (next < nowMs) next = slotAfter(key, nowMs);
++    // A completion exactly on a later phase has already consumed this turn.
++    // Keep the next normal slot strictly in the future, never catch up twice.
++    if (next <= nowMs) next = slotAfter(key, nowMs + 1);
+     return next;
+   }
+ 
+@@ -267,9 +269,13 @@
+     const finishedMs = clock().getTime();
+     const { record, observations } = result;
+     if (record.budgetDenied) {
+-      entry.nextDueAt = record.retryAt || finishedMs + 60000;
+-      entry.guardUntil = entry.nextDueAt;
+-      entry.guardReason = record.error && record.error.message || null;
++      const retryAt = record.retryAt || finishedMs + 60000;
++      const reason = record.error && record.error.message || null;
++      // Cancellation happens before HTTP starts. Keep the unserved slot and
++      // its queue priority; the guard alone prevents an immediate retry.
++      if (reason !== 'request_cancelled') entry.nextDueAt = retryAt;
++      entry.guardUntil = retryAt;
++      entry.guardReason = reason;
+       // The automatic lane is shared by every store. Once it is exhausted,
+       // polling other groups only repeats the same database admission check.
+       if (ADMISSION_REASONS.has(entry.guardReason) && entry.guardUntil >= admissionUntil) {
+diff --git a/cloudfunctions/gxs_monitor/lib/repo/atomic-ops.js b/cloudfunctions/gxs_monitor/lib/repo/atomic-ops.js
+--- a/cloudfunctions/gxs_monitor/lib/repo/atomic-ops.js
++++ b/cloudfunctions/gxs_monitor/lib/repo/atomic-ops.js
+@@ -202,6 +202,18 @@
+       let view = await tx.get(C.config, viewId(userKey));
+       if (!view) { view = newView(userKey); await tx.put(C.config, view); }
+       return view;
++    }),
++
++    checkpointEventPlanning: ({ eventId, afterUserKey = null, complete = false, ownerId, nowIso }) => run(async tx => {
++      const lease = await tx.get(C.config, 'collector_lease');
++      if (!lease || lease.ownerId !== ownerId || lease.expiresAt <= nowIso) throw new ApiError('collector_lease_lost', '采集执行权已转移');
++      const event = await tx.get(C.events, eventId);
++      if (!event || event.notificationPlannedAt) return;
++      // A partial plan is not a completed event. Only durable tasks precede
++      // this monotone cursor, so a restart replays at most one small chunk.
++      if (afterUserKey && afterUserKey > (event.notificationPlanningAfterUserKey || '')) event.notificationPlanningAfterUserKey = afterUserKey;
++      if (complete) event.notificationPlannedAt = nowIso;
++      await tx.put(C.events, event);
+     }),
+ 
+     saveNotification: notification => run(async tx => {
+diff --git a/cloudfunctions/gxs_monitor/lib/repo/cloudbase-repo.js b/cloudfunctions/gxs_monitor/lib/repo/cloudbase-repo.js
+--- a/cloudfunctions/gxs_monitor/lib/repo/cloudbase-repo.js
++++ b/cloudfunctions/gxs_monitor/lib/repo/cloudbase-repo.js
+@@ -57,10 +57,10 @@
+   }
+ }
+ 
+-function createCloudbaseRepo(db) {
++function createCloudbaseRepo(db, { sleep = ms => new Promise(resolve => setTimeout(resolve, ms)), random = Math.random } = {}) {
+   const _ = db.command;
+   const col = name => db.collection(name);
+-  const run = body => db.runTransaction(async transaction => {
++  const transaction = body => db.runTransaction(async transaction => {
+     const cache = new Map();
+     const get = async (collection, id) => {
+       const key = `${collection}\0${id}`;
+@@ -77,16 +77,23 @@
+       else await transaction.collection(collection).add({ data: doc });
+       cache.set(`${collection}\0${_id}`, doc);
+     };
+-    try {
+-      return await body({ get, put });
+-    } catch (error) {
+-      // wx-server-sdk wraps read/write errors and can discard CloudBase's
+-      // string code. Restore only the explicit transaction-conflict signal so
+-      // the SDK's bounded retry loop also covers read/write conflicts.
+-      if (isTransactionConflict(error)) error.code = 'DATABASE_TRANSACTION_CONFLICT';
+-      throw error;
++    return body({ get, put });
++  }, 0);
++  const run = async body => {
++    // Keep the SDK's original four-attempt budget. Disabling its immediate
++    // recursive retries makes it roll back the failed transaction first.
++    // Then jitter only explicit conflicts; an uncertain network/write outcome
++    // must escape unchanged. These callbacks contain database work, never sends.
++    for (let attempt = 0; ; attempt++) {
++      try { return await transaction(body); }
++      catch (error) {
++        if (attempt >= 3 || !isTransactionConflict(error)) throw error;
++        const baseMs = 25 * 2 ** attempt;
++        // Total retry waiting stays below 350ms across all three retries.
++        await sleep(baseMs + Math.floor(random() * baseMs));
++      }
+     }
+-  });
++  };
+   const readIds = async (collection, ids) => {
+     const unique = [...new Set(ids)];
+     const result = [];
+@@ -355,9 +362,10 @@
+       return { items, hasMore: Boolean(extra.data && extra.data.length) };
+     },
+     /** Alert events not yet planned; `since` skips a backlog too old to alert about. */
+-    async listUnprocessedEvents({ limit = 100, since = null } = {}) {
++    async listUnprocessedEvents({ limit = 100, since = null, cursor = null } = {}) {
+       const where = [{ type: _.in([...ALERT_TYPES]) }, _.or([{ notificationPlannedAt: _.eq(null) }, { notificationPlannedAt: _.exists(false) }])];
+       if (since) where.push({ detectedAt: _.gte(since) });
++      if (cursor) where.push(_.or([{ detectedAt: _.gt(cursor.detectedAt) }, { detectedAt: cursor.detectedAt, _id: _.gt(cursor.id) }]));
+       return readAll(col(COLLECTIONS.events).where(_.and(where)).orderBy('detectedAt', 'asc').orderBy('_id', 'asc'), limit);
+     },
+     async getEvent(id) {
+diff --git a/cloudfunctions/gxs_monitor/lib/repo/upstream-guard.js b/cloudfunctions/gxs_monitor/lib/repo/upstream-guard.js
+--- a/cloudfunctions/gxs_monitor/lib/repo/upstream-guard.js
++++ b/cloudfunctions/gxs_monitor/lib/repo/upstream-guard.js
+@@ -89,7 +89,11 @@
+       const ownsProbe = token && token.probe && state.probeId === token.id && token.generation === state.generation && state.probeUntil > nowMs;
+       if (success) {
+         // A request started before a 429 cannot reopen the source afterward.
+-        if (ownsProbe || (!state.until && token && token.generation === state.generation)) {
++        const needsReset = state.reason || state.probeId || state.probeUntil || state.trips || (state.failures || []).length;
++        // Healthy requests only need to read a clean closed breaker. Rewriting
++        // it for every success makes all stores and manual queries contend on
++        // the same document without changing any admission decision.
++        if (ownsProbe || (!state.until && token && token.generation === state.generation && needsReset)) {
+           await tx.put(C.config, { ...state, until: null, reason: null, probeId: null, probeUntil: null, trips: 0, failures: [], updatedAt: now });
+         }
+         return { paused: Boolean(state.until && !ownsProbe) };
+diff --git a/cloudfunctions/gxs_monitor/package-lock.json b/cloudfunctions/gxs_monitor/package-lock.json
+--- a/cloudfunctions/gxs_monitor/package-lock.json
++++ b/cloudfunctions/gxs_monitor/package-lock.json
+@@ -1,12 +1,12 @@
+ {
+   "name": "gxs_monitor",
+-  "version": "3.3.2",
++  "version": "3.4.0",
+   "lockfileVersion": 3,
+   "requires": true,
+   "packages": {
+     "": {
+       "name": "gxs_monitor",
+-      "version": "3.3.2",
++      "version": "3.4.0",
+       "license": "MIT",
+       "dependencies": {
+         "wx-server-sdk": "4.0.2"
+diff --git a/cloudfunctions/gxs_monitor/package.json b/cloudfunctions/gxs_monitor/package.json
+--- a/cloudfunctions/gxs_monitor/package.json
++++ b/cloudfunctions/gxs_monitor/package.json
+@@ -1,6 +1,6 @@
+ {
+   "name": "gxs_monitor",
+-  "version": "3.3.2",
++  "version": "3.4.0",
+   "license": "MIT",
+   "private": true,
+   "description": "果小哨每分钟补货监测与订阅通知定时云函数",
+diff --git a/config/delivery-targets.json b/config/delivery-targets.json
+--- a/config/delivery-targets.json
++++ b/config/delivery-targets.json
+@@ -1,5 +1,5 @@
+ {
+-  "version": "3.3.2",
++  "version": "3.4.0",
+   "purpose": "Acceptance requirements, not deployed runtime configuration or achieved capacity",
+   "simultaneousQueryingMembers": 300,
+   "followNormalDetectionSeconds": 60,
+diff --git a/docs/CORE_ACCEPTANCE_2026-10-24.md b/docs/CORE_ACCEPTANCE_2026-10-24.md
+new file mode 100644
+--- /dev/null
++++ b/docs/CORE_ACCEPTANCE_2026-10-24.md
+@@ -0,0 +1,57 @@
++# v3.4.0 核心稳定性验收（2026-10-24）
++
++北京时间 08:25 完成本轮核验。库存调度修复、追加数据库冲突修复已部署；到货与断货提醒已完成隔离的真实云端链路及手机实收验收。维护者随后明确选择“暂不上传，先完成核心稳定性验收”，因此本轮没有上传、提审或发布小程序界面，微信官方质检仍待后续执行。
++
++## 追加修复与验证
++
++晨间检查发现，昨晚至今存在超时、HTTP 错误及数据库事务冲突。29 个共同目标新增 18,190 次请求、18,140 次成功、50 次失败，部分累计最大成功间隔增长到 198.070 秒。快照只保留最后错误和累计最大值，不能断言这些长间隔全部由事务冲突造成。
++
++实际安装的 wx-server-sdk 4.0.2 / @cloudbase/database 1.5.1 回归确认：旧重试路径不会在每次冲突重试前回滚，提交阶段的 ResourceUnavailable.TransactionConflict 也可能漏过旧回调分类。现在保留最多四次尝试，明确冲突先回滚再短暂随机等待，新增等待总计 175–347ms；一般网络错误和提交结果不确定时不重试。发送消息的逻辑未增加重试。
++
++正常库存查询不再重复写入已经正常的公共断路器；真实失败清理、探针所有权、过期及熔断保护继续保留。修复已同步至 gxs_api 与 gxs_monitor，08:18:06 部署成功。
++
++- 全量 1,642 / 1,642 通过，0 失败、0 跳过；源码检查 549 文件、0 错误。
++- 针对性 47 / 47 通过；新增回归在旧代码上出现 7 项失败，证明覆盖实际缺陷。
++- monitor 的 43 文件依赖闭包检查通过。
++- 证据：[冲突修复](../evidence/verification/3.4.0/transaction-conflict-repair.json)、[部署记录](../evidence/verification/3.4.0/transaction-deployment-results.json)。
++
++## 公共库存实际刷新
++
++排除部署前启动的云调用，以 08:19:00 之后的成功时间为边界。六个正式检查点为 08:19:36–08:24:27，最后读取完成于 08:25:03；覆盖全部 30 个稳定采集组。
++
++| 项目 | 实测 |
++| --- | --- |
++| 新请求 / 成功 | 148 / 147 |
++| 失败 | 1 次上游超时，0 次新增事务冲突 |
++| 落库失败 | 0 |
++| 成功更新间隔加权均值 | 60.311 秒 |
++| 可逐次恢复的成功间隔 | 137 个，41.455–95.528 秒；不是完整窗口最大值或 P95 |
++| 进展与新鲜度 | 30 组全部新增成功；六帧在检查点及实际读取时均无过期 |
++| 发送状态 | 六帧均已就绪 |
++
++唯一超时发生在 08:23:45，该组当分钟已经成功过；21.522 秒后恢复，跨该次超时的真实成功间隔为 60.566 秒。另两个执行窗口结束前的取消保留了到期优先级，下一分钟均成功，最终保护状态清空。当前没有未恢复的目标；本窗口不能证明全天严格 60 秒刷新、持续 3 秒复查或 300 会员生产容量。
++
++检查点的最大已落库成功年龄为 57.733 秒，实际读取完成时为 90.517 秒，两者不得混用。详细证据：[部署后窗口与逐组恢复](../evidence/verification/3.4.0/post-transaction-window-2026-10-24.json)、[部署前晨间基线](../evidence/verification/3.4.0/morning-baseline-2026-10-24.json)。
++
++## 双向自动提醒验收
++
++使用固定维护者真实微信身份、短期随机凭证及独立数据库集合。输入为六次合成库存观测：无货、无货、有货、有货、无货、无货；实际走现有采集器、连续观测确认、事件规划、原子队列、授权扣次和真实微信发送。公共库存、关注、调度租约和请求预算不接收合成数据。消息均标有“【验收】非真实库存”。
++
++| 项目 | 到货 | 断货 |
++| --- | --- | --- |
++| 微信受理时间 | 08:20:03.562 | 08:20:18.857 |
++| 二次库存确认至受理 | 3.838 秒 | 2.792 秒 |
++| 发送尝试 / 消耗提醒额度 | 1 / 1 | 1 / 1 |
++| 手机实收 | 维护者确认收到 | 维护者确认收到 |
++
++维护者原话：“两条都收到，没有重复”。随后两次重放仍只有原来两条受理记录、每条尝试一次，待发送/发送中/结果不确定/失败均为零。到货额度 13→12、断货 28→27。手机精确到达时间未知；上述秒数是后台确认至微信受理，不是手机送达耗时。
++
++这是合成库存输入、真实数据库与真实微信的受控线上验收，并非 Apple 自然库存变化实测。私有加速采样不证明公共分钟调度频率；验收消息打开“我的小哨”，不覆盖公共真实事件详情深链。证据：[自动提醒验收](../evidence/verification/3.4.0/controlled-automatic-acceptance.json)。
++
++## 清理、云端一致性和发布边界
++
++最初隔离清理调用失败且未删除记录；补充明确的 `_id` 存在条件后，08:23:44 清理成功。五个私有业务集合已为空，仅配置集合留两个防重置标记，不退款已受理消息的授权。临时入口于 08:24:12 恢复为正式文件，实际再次调用验收 action 返回 `unknown_action`。
++
++最终下载核对 gxs_api 74、gxs_monitor 46、cloudbase_auth 3 个 JS/JSON 文件，共 123 个全部一致；三个锁文件也一致。实际小程序调用返回 3.4.0，三个函数均 Active。分钟采集触发器、函数超时与依赖未改。证据：[云端一致性](../evidence/verification/3.4.0/final-deployed-source-comparison.json)、[恢复与清理](../evidence/verification/3.4.0/controlled-acceptance-restoration.json)。
++
++v3.4.0 保持发布候选。源码预检通过；四项历史微信质检仍缺当前上传包官方复测，按维护者本轮选择暂不上传，不将其标为通过。官方质检入口的电脑访问曾被工具拒绝，未绕过限制。完整发布前仍需当前包的微信官方质检与对应设备报告。
+diff --git a/docs/CORE_STABILITY_2026-10-23.md b/docs/CORE_STABILITY_2026-10-23.md
+new file mode 100644
+--- /dev/null
++++ b/docs/CORE_STABILITY_2026-10-23.md
+@@ -0,0 +1,81 @@
++# 2026-10-23 核心库存与提醒排查
++
++本文保留 10 月 23 日排查过程。10 月 24 日追加数据库冲突修复、双向自动提醒受控实收、最终云端同步及最新观察结果见 [核心验收记录](CORE_ACCEPTANCE_2026-10-24.md)，以该记录为当前结论。
++
++本次通过微信开发者工具官方 `wechatide` 只读入口查询共享生产环境，诊断资料仅保留采样与发送统计，未导出用户身份或凭证。诊断脚本未发送消息，维护者主动发起的手机测试另行记录。时间如无特别说明均为北京时间。
++
++## 已确认的线上问题
++
++17:29–17:31 连续三份 `collector_status` 显示共 29 个采集组，其中 26 个正常，3 个持续过期。三个组的请求计数完全不增加，但下次计划时间每分钟向后移动：
++
++| 目标组 | 修复前最后一次后台成功观测 | 请求数 |
++| --- | --- | ---: |
++| R401 / MK2P4CH/A | 10 月 23 日 07:31:34 | 6995 |
++| R644 / MJTA4CH/A | 10 月 18 日 13:34:04 | 454 |
++| R761 / MK2M4CH/A、MK2N4CH/A、MK2P4CH/A、MK2Q4CH/A | 10 月 23 日 06:00:11 | 995 |
++
++当前是分钟定时采集，实际普通计划周期为 60 秒。运行配置虽然填写 `intervalSeconds: 3`，但定时执行器的普通周期下限是 60 秒；持续有货快速复查未开启。不能将配置中的 3 秒宣称为实际覆盖。
++
++本次异常不是请求配额耗尽：生产预算为连续模式 800000 次/日、600 次/分钟，自动通道份额 80%；当时配额允许请求、熔断关闭、没有当前落库失败。此前基于默认预算推测的四分钟周期不适用于这份生产配置。
++
++### 调度根因
++
++固定相位调度恢复 `available: true` 的旧目标时，即使未启用有货快速复查，也会重新计算未来相位。若相位落在本次定时函数工作窗口之后，调用结束前不会执行，下次恢复又继续向后推移。重新应用未变化的配置同样可能重排逾期目标。
++
++修复保留相同固定周期下的逾期任务，真正执行后才跳过历史时隙；相同配置不再重排任务。容量保护、同店间隔、失败退避和熔断保持有效。
++
++生产快照纯内存重放（模拟三个 35 秒工作窗口）：旧代码共 0 次请求，修复后每轮 3 次、共 9 次，首轮消除三个过期组。该重放未访问外网、未写生产数据库。
++
++## 消息记录与状态显示
++
++查询 10 月 16 日 08:00 起至本次排查时的全部 142 条提醒任务，无截断：微信受理 80 条，跳过 57 条，拒绝 5 条。拒绝原因均为订阅授权失效。跳过原因：提醒次数不足 22、免打扰 21、会员过期 10、事件未确认 2、事件已被后续状态替代 2。
++
++80 条受理记录从检测到变化至微信受理的延迟：中位数 27.528 秒，P90 62.997 秒，最大 95.291 秒。这个时间不包含发现变化前的采样等待，也不代表用户手机实际显示通知的时间。
++
++截图中“发送服务未就绪”混合了整体提醒状态与发送通道状态。本次线上发送鉴权正常，但库存过期使整体 `deliveryReady` 为 false。代码已分别表示发送通道状态和整体提醒状态；库存异常仍保留警告，过期心跳或真实鉴权失败仍不允许显示就绪。
++
++另发现一个离线可复现的通知规划缺陷：前 50 个等待二次确认的事件会挡住后面的有效事件。当前线上最近十分钟无未规划事件积压，近一周任务中没有 `event_expired`，因此不能宣称已经证实该缺陷造成线上漏推。
++
++## 线上恢复进展
++
++已通过开发者工具确认并增量更新 `gxs_monitor/lib/engine/scheduler.js`。首次更新仅包含这个文件，不包含界面发布或运行配额调整。
++
++17:36:36 的生产快照：29 个组全部新鲜，过期组为 0，发送鉴权正常。上述三个组分别在 17:36:11、17:36:05、17:36:08 取得新库存结果，请求数各增加 1。
++
++17:36:36–17:40:37 共五份修复后快照全部保持 29 新鲜、0 过期。29 组均新增请求及成功，共 109 次请求、109 次成功，0 请求失败、0 落库失败。依据累计计数及总时长差分，请求间隔加权均值 62.053 秒；可明确对应单次新增成功的 103 个持久化成功间隔为 51.214–102.631 秒。多个请求跨段未当成单次间隔，也没有推算无法证实的 P95。
++
++精确相位边界、通知规划和发送状态修复经本地审查，1630 项测试全部通过，源码检查 548 文件零错误，原生 WXML 11 文件及 WXSS 15 文件编译通过。维护者确认后，21:09 的官方部署结果显示 gxs_monitor 的 43 个 lib 文件及 gxs_api 的 69 个 lib 文件均更新成功；下载的 112 个库文件与这次受审源码逐一匹配。
++
++### 第二轮部署后的独立采样
++
++21:10:15–21:14:21 的五份快照均为 31 个正常组、0 个过期组。31 组全部新增成功结果，共新增 116 次请求、115 次成功、1 次超时、0 次落库失败；超时组在观察期内恢复。成功间隔累计差分均值为 68.451 秒。仅统计两个端点都在第二轮部署后的可明确单次成功间隔，范围为 30.628–143.782 秒；这不是全部请求的分位数。
++
++其中两组没有新增失败，却出现 120.848 秒和 143.782 秒的成功间隔。健康判断阈值为 188 秒，因此“全部正常”不能证明严格每分钟更新。35 秒的实际工作窗口可能不足以覆盖所有组，已观察到 HTTP 开始前的 `request_cancelled`。离线夹具中，31 组、并发 2、HTTP 800ms，仓库调用耗时增至 200ms 时，新旧通知规划都只能覆盖 30 组；没有证据将这个现象归因于新版空通知队列的开销。
++
++继续审查发现：`request_cancelled` 将原到期时间改为取消时刻加重试等待，丢失已逾期任务的优先级，并漂移固定相位。匿名生产到期时刻重放可复现：被取消目标在下一轮落到已采样目标之后；保留原到期时间、仅以 guardUntil 限制重试后，优先级和原相位均保留。这个追加修复单独验证与部署，不将前述 112 文件比对冒充追加补丁已在线生效的证据。
++
++另按官方函数详情再次确认 monitor 当前超时为 60 秒。在此部署条件下，将缺省扫描预算从 35 秒调为 45 秒，名义保留 15 秒收尾；平台能够正常提供剩余时间时继续使用原有剩余时间限制，配额、并发、HTTP 截止及消息发送保护均不放宽。31 组、HTTP 800ms、仓库调用 200ms 的虚拟时钟对比中，成功覆盖由 30 组提高到 31 组；计入 HTTP 剩余预算截断后，仓库调用 300ms 时由 22 组提高到 30 组，仍不能保证每轮覆盖。慢请求与通知收尾结果单独归档；模拟未计入平台冷启动和真实鉴权探针，不能替代部署后实际间隔验收，也不证明数据库任意长阻塞时绝不超时。
++
++追加两处修复已通过独立审查及全量 1633 项测试，548 文件源码检查零错误，monitor 43 文件依赖闭包同步通过。受审运行文件哈希保存在 `evidence/verification/3.4.0/followup-reviewed-runtime.json`；部署前保持这些运行文件冻结。此前原生页面编译结果仍对应未再修改的前端源码。
++
++21:12 的小程序实际云调用返回 senderReady、deliveryReady 均为 true；“我的小哨”实际显示“监测服务运行中”“发送服务已就绪”。pending、sending、uncertain 队列均为空，第二轮部署后查询没有新提醒任务，也没有近期未规划事件。本次没有发送测试消息，因此尚未验证修复后的真实手机收信，空队列不能证明没有漏推。
++
++本次两项更新范围仅为 lib。生产 package.json 仍标识 3.3.2，monitor 的 lib-manifest.json 也未随本次增量更新；完整发布前仍须同步版本元数据。小程序界面未上传或发布。
++
++### 追加修复部署与最终观察
++
++维护者再次确认后，21:32:29 官方结果显示 gxs_monitor、gxs_api 的 lib/engine 增量更新均成功。重新下载后独立比对 112 个库文件全部一致；其中四个追加修改的运行文件均等于部署前记录的受审哈希。package 与 manifest 的范围外差异仍保留。
++
++只使用 21:33 新调用之后的独立窗口：21:34:05–21:39:48 六份快照，31 组全部新增成功库存，共 189 次请求、189 次成功，0 请求失败、0 落库失败。全部 189 个新增累计成功间隔的两个端点均在新补丁运行之后，加权均值 58.970 秒；可逐次恢复的 122 个单次成功间隔为 37.086–87.679 秒。本窗口未再观察到前一轮的 121–144 秒间隔，但不据此承诺所有时段严格 60 秒或大规模用户容量达标。
++
++最后一帧四个短暂 request_cancelled guard 均发生在这些目标本分钟已成功更新后的再次轮询，原到期时间被保留；没有将它们误计为四组未采样。21:41:35 追加跟踪确认四组各再新增两次成功、guard 均解除，此跟踪不混入前述六帧间隔统计。快照均为 running、31 新鲜、0 过期；不能仅凭这些快照证明每次云调用均已正常释放租约。
++
++21:36 的同期测试任务：发送开始 21:36:29.443，微信受理结算 21:36:30.431，间隔 988ms，仅一次发送尝试，无错误，扣次一次。维护者明确反馈手机已收到、主观耗时超过 10 秒。该跨度包含发送准入事务，不是纯 HTTP 耗时；没有手机精确到达时刻，不能把全部感知延迟归因于微信或设备。测试验证了发送通道及手机接收，但没有替代真实到货/断货事件的自动规划、发送、跨调用去重验收。本轮查询自动提醒队列为空、无新自动任务，不能据此宣布无漏推。
++
++最终线上消费端调用也返回 collector.running、senderReady=true、deliveryReady=true。依据这些证据，v3.4.0 可继续作为发布候选；自动变化提醒端到端实测、当前构建微信质检与完整发布元数据同步仍是后续发布前工作。
++
++## 证据与验收边界
++
++脱敏生产证据保存在 `evidence/verification/core-stability-20261023/`。包含三份修复前采集快照、白名单运行配置和通知统计。没有导出 access token、AppSecret、用户 openid 或账户信息。
++
++`gxs_events` 是状态变化事件，不是逐次采样日志；不能把事件间隔当作刷新周期。应结合连续采集快照中的请求数、成功数和实际成功时刻判断。局部线上恢复不等于已经证明所有时段、所有用户手机均无延迟或漏推；界面版本仍未发布。
+diff --git a/docs/RELEASE_3.4.0.md b/docs/RELEASE_3.4.0.md
+new file mode 100644
+--- /dev/null
++++ b/docs/RELEASE_3.4.0.md
+@@ -0,0 +1,50 @@
++# 果小哨 v3.4.0 发布说明
++
++2026-10-24 更新的发布候选。核心修复已部署、双向自动提醒受控实收验收通过、云端代码已同步。维护者选择“暂不上传，先完成核心稳定性验收”，因此界面版本未上传、提审或发布，微信官方质检保留待办。最新结论见 [10 月 24 日核心验收](CORE_ACCEPTANCE_2026-10-24.md)。
++
++## 用户能感知的变化
++
++- 修复部分关注库存长时间不更新，改善提醒处理。
++- 库存检测与微信发送状态分开显示，提醒情况更清楚。
++- 移除过时海报，优化大屏选配和键盘弹出时的操作。
++
++## 核心修复
++
++1. 固定周期任务恢复时保留已逾期目标，避免曾经有货的配置在每次定时启动时反复向后顺延。相同配置不重排到期任务；完成后下一普通周期严格在当前时刻之后，避免精确相位边界的重复请求。追加处理执行窗口不足、请求尚未开始就取消时的到期优先级丢失问题；该追加补丁的部署结果单独记录。
++2. 提醒事件使用稳定分页继续扫描，等待二次确认的旧事件不阻挡后续已确认事件。单事件分批持久化用户进度，冷启动继续处理剩余用户，并为已落库提醒留出发送时间。
++3. 保留请求预算、失败退避、上游熔断、发送前库存复核、授权扣减与发送去重；不重试结果不确定的消息。
++4. 将微信发送通道与整体提醒就绪分别表示。库存过期仍显示异常；发送鉴权、心跳或配置异常仍不能标为正常。
++5. 针对已确认的 60 秒采集云函数超时，追加将缺省扫描窗口从 35 秒提高至 45 秒，保留 15 秒名义收尾时间；有效的平台剩余时间限制仍优先。离线 31 组场景覆盖改善，已完成部署后采样，结果见下。
++6. 明确数据库事务冲突先回滚，再以短随机等待进行最多四次尝试，覆盖读、写和提交阶段；不重试结果不确定的网络写入或消息发送。健康库存查询不再无意义重写共享断路器，减少争用。此项于 10 月 24 日 08:18 部署。
++
++## 页面与交互
++
++- 下线查询页和攻略页的过时海报入口；旧日历链接继续定位到选购准备内容。
++- 小哨常显后台检测与发送通道状态，页面读取时间和实际库存观测时间分开。
++- 配置面板增加大屏宽度限制与独立滚动区域，适应较矮窗口、键盘和安全区；关闭与保存操作保持可见。
++- 此次为响应式布局验证，不宣称已完成所有折叠屏或 iPhone Duo 真机验收。
++
++## 验证与生产证据
++
++- 生产诊断与恢复记录：[核心稳定性排查](CORE_STABILITY_2026-10-23.md)。17:29–17:31 的三个快照均为 26 个正常组、3 个过期组；首次调度修复后 17:36–17:40 五个快照均为 29 个正常组、0 个过期组。
++- 近一周全部 142 条提醒任务中，微信受理 80 条，5 条因订阅授权失效被拒绝，其余有明确跳过原因。平台受理不等于手机实际收信。
++- 队首阻塞和大批用户规划为离线确定性复现及回归，不冒称已经证实线上漏推。
++- 21:09 两项 lib 增量部署成功，112 个库文件下载比对一致。21:10–21:14 五份快照为 31 个正常组、0 个过期组，共 116 次新请求、115 次成功，1 次超时后恢复、0 次落库失败。成功间隔均值 68.451 秒，但可确认的部署后单次间隔仍出现 120.848–143.782 秒，尚未达成严格每分钟更新。
++- 追加修复于 21:32:29 部署成功，112 个库文件重新下载比对一致。21:34–21:39 六份快照中 31 组全部更新，189 次请求全部成功、0 落库失败，成功间隔均值 58.970 秒，可逐次确认的间隔 37.086–87.679 秒；不代表全天或大规模负载承诺。
++- 10 月 23 日实际页面显示监测运行、发送服务就绪，待发送/发送中/结果不确定的任务数均为 0。维护者主动测试后确认手机已收到、耗时超过 10 秒；同期后台测试仅一次发送，发送开始至微信受理结算 988ms。当时尚无新自动变化任务，双向验收于下述 10 月 24 日完成。
++- 10 月 23 日全量 1633 项测试通过，548 文件源码检查零错误，生成的 monitor 43 文件依赖闭包一致；本次未再修改的前端已通过原生 WXML/WXSS 编译。
++- 页面修改的离线布局、源码和微信原生编译证据见 [交互优化记录](UX_REFINEMENT_2026-10-23.md)；新版本最终回归结果另存 `evidence/verification/3.4.0/`。
++- 10 月 24 日追加修复后，全量 1642 / 1642 通过，0 失败、0 跳过；549 文件源码检查零错误。08:19–08:24 六帧覆盖 30 组，148 次请求 / 147 次成功，1 次超时随后恢复，0 新增事务冲突、0 落库失败。成功间隔均值 60.311 秒，137 个可恢复单次间隔 41.455–95.528 秒，不能据此承诺全天每分钟必达。
++- 隔离合成库存分别触发真实到货、断货自动提醒，维护者确认“两条都收到，没有重复”；每条只尝试一次、扣一次授权，两次重放没有额外推送。二次观测确认至微信受理分别 3.838 秒、2.792 秒，不代表手机送达时间。验收数据已清理、临时入口已恢复。详见 [完整验收范围与证据](CORE_ACCEPTANCE_2026-10-24.md)。
++
++## 发布状态与边界
++
++- 版本号、锁文件、前端版本和更新说明统一为 3.4.0。最终下载的三函数 123 个源码/元数据文件与候选完全一致，三个锁文件也一致，实际小程序调用返回 3.4.0；临时验收入口不存在。
++- 已完成调度器、事件规划、取消优先级/45 秒扫描及数据库冲突修复的后端部署。函数均 Active，原分钟触发器、依赖和超时不变。
++- 普通库存采集实际仍为分钟定时模式，不能将配置值 3 秒解释为已达成持续 3 秒覆盖；300 并发会员、持续有货 3 秒复查目标仍未获生产验收。
++- 四项历史微信质检记录尚缺当前源码对应的逐项复测证据，继续保持 open。维护者本轮明确暂不上传，官方质检因此延后，不清除发布门禁。
++- 未上传、提审或正式发布本次小程序界面版本。完成当前构建真机与微信质检后再进入正式发布流程。
++
++## 恢复与回退
++
++部署前的云端源码归档保留在本机临时安全目录；补丁不要求批量改写库存、用户或通知记录。新增规划游标是兼容字段。代码回退不会撤销已经受理的消息；不得清空 uncertain 状态强制重推。修复调度器应优先向前修正，回退旧版本会重新引入已确认的采样饥饿问题。
+diff --git a/docs/UX_REFINEMENT_2026-10-23.md b/docs/UX_REFINEMENT_2026-10-23.md
+new file mode 100644
+--- /dev/null
++++ b/docs/UX_REFINEMENT_2026-10-23.md
+@@ -0,0 +1,37 @@
++# 2026-10-23 界面优化与监测核验
++
++本次是当前 3.3.2 源码上的本地修改，尚未上传、提审或发布，不新增已发布版本记录。
++
++## 界面变化
++
++- 移除查询页新品海报弹层及攻略页日历，入口统一为“选购与取货攻略”。旧 `section=calendar` 链接继续进入准备选购阶段，并保留目标、来源及返回路径。
++- 小哨页面直接展示后台检测和微信发送状态，明确“下次读取”指页面读取后台记录；各门店保留实际库存观测时间，延迟与发送异常仍可见。
++- 配置弹层在宽屏限宽 640px，长说明与摘要随表单滚动，短窗口取消选择器摘要吸顶。关闭、保存和搜索框可操作。
++
++采集、通知、授权、账号隔离、会员及计费业务代码未调整。没有提高上游请求预算或修改生产配置。
++
++## 本轮验证
++
++- 全量 Node 测试 1,614 / 1,614 通过，零失败、零跳过。原海报测试调整为移除展示与旧链接兼容验证。
++- 源码检查 544 个文件，零错误。微信原生编译器通过 11 个 WXML、15 个 WXSS。
++- 主流程浅深色 636 项、配置标准布局 168 项、配置短窗口/键盘/安全区/重排专项 696 项，共 1,500 项离线检查通过。
++- 配置专项覆盖 320—1024px、500/900px 高、280px 模拟键盘和 44/34px 模拟安全区。1024×500 表单区域从 0px 恢复为 314px；原 DOM 宽窄重排保留输入和选择。
++- 以上浏览器检查是 WXML/WXSS 近似渲染，不代表折叠屏真机生命周期、微信原生键盘或实际收信验收。
++
++## 线上只读核对
++
++通过已登录的微信开发者工具，在共享环境所属 AppID 下读取 `flowermean-6gjaxfqhf6c13e88`：
++
++- `gxs_api`、`gxs_monitor`、`cloudbase_auth` 均为 Active。
++- 下载的三个云函数共 123 个运行源码文件与当前本地后台源码一致，版本 3.3.2。比较不覆盖运行配置、实际触发、安装后的依赖、流量与前端发布状态。
++- 本轮未读取实时运行配置、逐目标有效采样间隔或通知队列统计，未发送测试消息；因此不能确认没有大规模延迟或漏推。
++
++默认容量的已知约束仍需核实实际生产参数：10,000 请求/日持续目标、自动份额 80% 时，17 个请求组约需 184 秒，分钟定时对齐后可能约 4 分钟；一个请求组持续每 3 秒复查需 28,800 请求/日。参数标称间隔、函数 Active 和健康心跳都不能替代真实覆盖率。
++
++下一步沿现有管理员身份读取 `admin.capacity`、`admin.insights`，配合连续的 `collector_status.scheduler.targets[].health.lastPersistedSuccessAt`、有效库存 `knownAt` 与通知状态统计，确认计划周期、实际间隔和积压原因。微信 `accepted` 只表示平台受理，手机收信仍需用户实测。
++
++本地发布预检源码项通过；四项历史微信质检仍缺对应源码的复测通过记录，发布门禁仍未通过，没有绕过。
++
++## 证据
++
++摘要与截图位于 [`evidence/verification/ux-20261023`](../evidence/verification/ux-20261023/summary.json)。原文件备份位于 `/tmp/gxs-ux-20261023-baseline`，未覆盖既有备份。完整临时预览位于 `/tmp/gxs-ux-20261023-ui` 与 `/tmp/gxs-ux-20261023-sheets`。
+diff --git a/miniprogram/components/config-sheet/index.wxml b/miniprogram/components/config-sheet/index.wxml
+--- a/miniprogram/components/config-sheet/index.wxml
++++ b/miniprogram/components/config-sheet/index.wxml
+@@ -1,14 +1,17 @@
+ <page-container wx:if="{{nativeGuardSupported}}" show="{{nativeGuardShow}}" overlay="{{false}}" duration="{{0}}" position="bottom" close-on-slide-down="{{false}}" custom-style="height:1px;min-height:0;background:transparent;pointer-events:none;" bindafterleave="onNativeLeave" aria-hidden="true" />
+ <view wx:if="{{visible}}" class="config-sheet-root">
+   <view class="config-sheet-scrim" catchtap="onCloseTap" catchtouchmove="stopTouch" aria-hidden="true"></view>
+-  <view class="config-sheet-panel" style="bottom: {{keyboardHeight}}px; max-height: calc(100vh - {{keyboardHeight}}px - 64px);" role="dialog" aria-modal="true" aria-label="{{title}}">
++  <view class="config-sheet-panel" style="bottom: {{keyboardHeight}}px; max-height: calc(100vh - {{keyboardHeight}}px - max(12px, env(safe-area-inset-top)));" role="dialog" aria-modal="true" aria-label="{{title}}">
+     <view class="config-sheet-header">
+-      <view class="config-sheet-heading"><view class="config-sheet-title">{{title}}</view><view wx:if="{{subtitle}}" class="config-sheet-subtitle">{{subtitle}}</view></view>
++      <view class="config-sheet-heading"><view class="config-sheet-title">{{title}}</view></view>
+       <button class="config-sheet-close" disabled="{{busy}}" bindtap="onCloseTap" aria-label="关闭配置面板">×</button>
+     </view>
+-    <scroll-view class="config-sheet-body" scroll-y enhanced show-scrollbar="{{true}}"><view class="config-sheet-content"><slot /></view></scroll-view>
+-    <view class="config-sheet-footer {{keyboardHeight ? 'config-sheet-keyboard' : ''}}">
++    <scroll-view class="config-sheet-body" scroll-y enhanced show-scrollbar="{{true}}"><view class="config-sheet-content">
++      <view wx:if="{{subtitle}}" class="config-sheet-subtitle">{{subtitle}}</view>
++      <slot />
+       <view wx:if="{{summary}}" class="config-sheet-summary">{{summary}}</view>
++    </view></scroll-view>
++    <view class="config-sheet-footer {{keyboardHeight ? 'config-sheet-keyboard' : ''}}">
+       <slot name="notice" />
+       <button class="btn btn-primary btn-block config-sheet-confirm" disabled="{{busy || disabled}}" loading="{{busy}}" bindtap="onConfirm">{{busy ? '正在保存…' : confirmText}}</button>
+     </view>
+diff --git a/miniprogram/components/config-sheet/index.wxss b/miniprogram/components/config-sheet/index.wxss
+--- a/miniprogram/components/config-sheet/index.wxss
++++ b/miniprogram/components/config-sheet/index.wxss
+@@ -1,16 +1,23 @@
+ .config-sheet-root { position: fixed; inset: 0; z-index: 1000; color: var(--text); }
+ .config-sheet-scrim { position: absolute; inset: 0; background: rgba(10, 24, 17, .42); }
+-.config-sheet-panel { position: absolute; left: 0; right: 0; display: flex; flex-direction: column; height: 88vh; background: var(--card, #fff); border-radius: 32rpx 32rpx 0 0; overflow: hidden; box-shadow: 0 -12rpx 64rpx rgba(0, 0, 0, .13); }
+-.config-sheet-header { display: flex; flex: none; align-items: center; gap: 24rpx; padding: 28rpx 32rpx 20rpx; border-bottom: 1rpx solid var(--line); }
++.config-sheet-panel { box-sizing: border-box; position: absolute; left: 0; right: 0; display: flex; flex-direction: column; height: 88vh; min-height: 0; background: var(--card, #fff); border-radius: 20px 20px 0 0; overflow: hidden; box-shadow: 0 -6px 32px rgba(0, 0, 0, .13); font-size: 14px; }
++.config-sheet-header { display: flex; flex: none; align-items: center; gap: 12px; padding: 8px 16px; border-bottom: 1px solid var(--line); }
+ .config-sheet-heading { flex: 1; min-width: 0; }
+-.config-sheet-title { font-size: max(18px, 34rpx); line-height: 1.4; font-weight: 600; }
+-.config-sheet-subtitle { margin-top: 8rpx; color: var(--text-2); font-size: max(12px, 25rpx); line-height: 1.5; }
+-.config-sheet-close { display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; flex: 0 0 44px; margin: 0; padding: 0; border: none; border-radius: 50%; background: var(--surface-soft); color: var(--text-2); font-size: 42rpx; line-height: 1; }
++.config-sheet-title { font-size: 18px; line-height: 1.4; font-weight: 600; overflow-wrap: anywhere; }
++.config-sheet-subtitle { margin-bottom: 12px; color: var(--text-2); font-size: 13px; line-height: 1.5; }
++.config-sheet-close { display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; flex: 0 0 44px; margin: 0; padding: 0; border: none; border-radius: 50%; background: var(--surface-soft); color: var(--text-2); font-size: 24px; line-height: 1; }
+ .config-sheet-close::after { border: none; }
+-.config-sheet-body { flex: 1; height: 0; min-height: 0; }
+-.config-sheet-content { padding: 24rpx 32rpx 32rpx; }
+-.config-sheet-footer { flex: none; padding: 20rpx 32rpx calc(20rpx + env(safe-area-inset-bottom)); border-top: 1rpx solid var(--line); background: var(--card, #fff); }
+-.config-sheet-keyboard { padding-bottom: 16rpx; }
+-.config-sheet-summary { font-size: max(12px, 25rpx); color: var(--text-2); line-height: 1.5; margin-bottom: 16rpx; overflow-wrap: anywhere; }
+-.config-sheet-confirm { min-height: 44px; min-height: max(44px, 96rpx); }
++.config-sheet-body { flex: 1 1 0%; height: 0; min-height: 0; }
++/* Descriptions and long selections scroll with the form, leaving its controls
++   reachable when the keyboard or a fold reduces the available height. */
++.config-sheet-content { padding: 12px 16px 16px; }
++.config-sheet-footer { flex: none; padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); border-top: 1px solid var(--line); background: var(--card, #fff); }
++.config-sheet-keyboard { padding-bottom: 10px; }
++.config-sheet-summary { font-size: 13px; color: var(--text-2); line-height: 1.5; margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--line); overflow-wrap: anywhere; }
++.config-sheet-confirm.btn { width: 100%; min-height: 44px; height: auto; padding: 10px 16px; border-radius: 12px; font-size: 16px; line-height: 1.5; }
++@media (min-width: 600px) {
++  .config-sheet-panel { width: calc(100% - 48px); max-width: 640px; margin-left: auto; margin-right: auto; border-radius: 24px 24px 0 0; }
++  .config-sheet-header, .config-sheet-content, .config-sheet-footer { padding-left: 24px; padding-right: 24px; }
++  .config-sheet-title { font-size: 20px; }
++}
+ @media (prefers-color-scheme: dark) { .config-sheet-panel, .config-sheet-footer { background: var(--card, #1B251F); } }
+diff --git a/miniprogram/components/target-picker/index.wxss b/miniprogram/components/target-picker/index.wxss
+--- a/miniprogram/components/target-picker/index.wxss
++++ b/miniprogram/components/target-picker/index.wxss
+@@ -111,6 +111,56 @@
+ .hot-city-chip.chip { display: flex; align-items: center; justify-content: center; min-height: 36px; padding: 8rpx 4rpx; border-radius: 12rpx; font-size: max(12px, 24rpx); text-align: center; white-space: nowrap; }
+ .selected { padding: 14rpx 16rpx; border-radius: 16rpx; }
+ 
++/* Component isolation and viewport-based rpx both outlive the sheet's width
++   limit. Keep the actual choices at readable touch sizes on an unfolded screen. */
++@media (min-width: 600px) {
++  .picker, .product-copy, .picker-current-summary, .label, .value, .chip,
++  .search-input, .search-placeholder, .store-result-name, .store-result-action { font-size: 14px; }
++  .section-label, .small, .tiny, .image-placeholder, .search-clear, .search-hint,
++  .search-summary, .store-result-city, .search-empty, .picker-count { font-size: 12px; }
++  .field-summary .label, .field-summary .value { font-size: 13px; }
++  .picker-section-heading { font-size: 16px; gap: 8px; }
++  .picker-current-summary { padding: 4px 0 8px; margin-bottom: 12px; }
++  .picker-current-summary > .small { margin-top: 4px; }
++  .section-label { margin: 14px 0 8px; }
++  .chips { gap: 8px; }
++  .chip { min-height: 44px; padding: 10px 12px; border-radius: 8px; }
++  .category-chips .chip { padding: 8px; }
++  .choice-chip { padding: 8px 22px 8px 8px; }
++  .field { gap: 12px; min-height: 44px; padding: 10px 0; }
++  .field-summary { min-height: 34px; padding: 8px 0; }
++  .mt { margin-top: 12px; }
++  .banner { padding: 12px; border-radius: 10px; }
++  .product-preview { gap: 12px; padding: 12px; border-radius: 10px; }
++  .product-image-box, .product-image { width: 56px; height: 64px; }
++  .product-image-box { flex-basis: 56px; border-radius: 8px; }
++  .image-placeholder { padding: 8px; }
++  .product-copy .mt { margin-top: 4px; }
++  .picker-store-heading { margin-top: 16px; padding-top: 16px; margin-bottom: 10px; }
++  .store-search { min-height: 44px; padding: 0 12px; border-radius: 10px; gap: 10px; }
++  .search-input { height: 44px; line-height: 44px; }
++  .search-clear { flex-basis: 44px; }
++  .search-glass { flex-basis: 14px; width: 14px; height: 14px; border-width: 2px; margin-right: 3px; }
++  .search-glass::after { width: 7px; height: 2px; right: -5px; bottom: -3px; }
++  .search-hint { margin-top: 4px; }
++  .search-summary { margin: 12px 0 8px; }
++  .search-results { height: 216px; border-radius: 12px; }
++  .search-results.results-1 { height: 64px; }
++  .search-results.results-2 { height: 128px; }
++  .search-results.results-3 { height: 192px; }
++  .store-result { gap: 12px; min-height: 64px; padding: 10px 12px; border-bottom-width: 1px; }
++  .store-result-city { margin-top: 4px; }
++  .search-empty { padding: 14px 12px; border-radius: 8px; }
++  .hot-city-chips { gap: 6px; margin-bottom: 4px; }
++  .hot-city-chip.chip { min-height: 44px; padding: 8px 4px; font-size: 12px; border-radius: 8px; }
++  .selected { padding: 10px 12px; border-radius: 10px; }
++}
++
++@media (max-height: 600px) {
++  /* A keyboard can leave barely one row of form space in a short window. */
++  .picker-current-summary { position: static; }
++}
++
+ @media (prefers-color-scheme: dark) {
+   .ui-icon { filter: brightness(1.5); }
+   .chip { background: rgba(255, 255, 255, 0.07); border-color: rgba(255, 255, 255, 0.06); }
+diff --git a/miniprogram/config/release-notes.js b/miniprogram/config/release-notes.js
+--- a/miniprogram/config/release-notes.js
++++ b/miniprogram/config/release-notes.js
+@@ -7,6 +7,16 @@
+ // User-facing summaries use 2–3 short highlights, at most 90 characters total.
+ // Keep technical details and complete acceptance records in release documents.
+ const RELEASE_NOTES = [
++  {
++    version: '3.4.0',
++    title: '库存监测与提醒更稳定',
++    dateText: '发布候选 · 2026-10-23',
++    highlights: [
++      '修复部分关注库存长时间不更新，改善提醒处理。',
++      '库存检测与微信发送状态分开显示，提醒情况更清楚。',
++      '移除过时海报，优化大屏选配和键盘弹出时的操作。',
++    ],
++  },
+   {
+     version: '3.3.2',
+     title: '服务恢复与会员时长补偿',
+diff --git a/miniprogram/config/usage-guide.js b/miniprogram/config/usage-guide.js
+--- a/miniprogram/config/usage-guide.js
++++ b/miniprogram/config/usage-guide.js
+@@ -30,7 +30,7 @@
+     { id: 'refresh', title: '取货信息会自动更新吗？', text: '已开启的关注由后台自动检测，页面会自动同步结果，无需手动查询。请留意门店检查时间；若一直不变，可查看状态详情。需要单独查询时，从门店详情进入查询页即可。' },
+     { id: 'test', title: '测试通知和真实到货提醒有什么不同？', text: '测试由你主动授权发送，明确标为【测试】，每次消耗 1 次签到／任务额度；不会查询库存或创建关注。正式提醒需要有效会员、关注和微信授权。' },
+     { id: 'stock', title: '提示可取货，就一定能买到吗？', text: '结果反映标注时间的门店观测，可能存在更新延迟，且不提供剩余件数。商品是否仍可购买、能否预约取货，以 Apple 官方结账页面为准。' },
+-    { id: 'release', title: '到了预购或发售时间，为什么还不能查？', text: '发售日历是官方产品信息。取货查询还需要对应商品和门店开放接口并通过验证，日期到来不会自动解锁查询或开始监测。' },
++    { id: 'release', title: '商品已发售，为什么还不能查？', text: '取货查询需要对应商品和门店开放接口并通过验证。商品发售不会自动解锁查询或开始监测，请以当前可选配置的查询状态为准。' },
+     { id: 'membership', title: '会员会自动续费吗？到期后怎么办？', text: '会员按次购买，不自动扣费续订。重复购买的有效期按购买页规则顺延；到期后的查询、历史与提醒按免费用户规则执行。实际名额和退款说明可在「我的」会员区域查看。' },
+     { id: 'history', title: '历史趋势能预测下一次补货吗？', text: '历史用于回看已有观测和供应变化，不保证后续时间、数量或购买结果。遇到采集间断时，应同时查看数据覆盖情况。' },
+   ],
+diff --git a/miniprogram/config/version.js b/miniprogram/config/version.js
+--- a/miniprogram/config/version.js
++++ b/miniprogram/config/version.js
+@@ -1 +1 @@
+-module.exports = { VERSION: '3.3.2' };
++module.exports = { VERSION: '3.4.0' };
+diff --git a/miniprogram/pages/follow/index.js b/miniprogram/pages/follow/index.js
+--- a/miniprogram/pages/follow/index.js
++++ b/miniprogram/pages/follow/index.js
+@@ -55,12 +55,17 @@
+ };
+ 
+ function deliveryView(notifications, templateIds) {
+-  const reason = notifications.reason || notifications.disabledReason || '';
++  const overallReady = notifications.deliveryReady === true;
++  const hasSenderStatus = typeof notifications.senderReady === 'boolean';
++  const senderReady = hasSenderStatus ? notifications.senderReady : overallReady;
++  const rawReason = hasSenderStatus ? notifications.senderReason : notifications.reason || notifications.disabledReason;
++  const reason = typeof rawReason === 'string' ? rawReason : '';
+   const detail = DELIVERY_REASON[reason] || (/[^\x00-\x7F]/.test(reason) ? reason : '消息服务尚未就绪，请稍后刷新状态。');
+-  if (!templateIds.length) return { label: '暂不能发送', cls: 'warn', detail: DELIVERY_REASON.template_missing };
+-  if (!notifications.enabled) return { label: '尚未开放', cls: 'warn', detail: DELIVERY_REASON.notifications_disabled };
+-  if (notifications.deliveryReady !== true) return { label: '发送服务未就绪', cls: 'warn', detail };
+-  return { label: '发送服务已就绪', cls: 'ok', detail: '检测到符合条件的库存变化后，将使用对应的有效授权发送提醒。' };
++  if (!templateIds.length) return { overallReady, label: '暂不能发送', cls: 'warn', detail: DELIVERY_REASON.template_missing };
++  if (!notifications.enabled) return { overallReady, label: '尚未开放', cls: 'warn', detail: DELIVERY_REASON.notifications_disabled };
++  if (!senderReady && reason.startsWith('collector_')) return { overallReady, label: '发送状态待确认', cls: 'muted', detail: '暂未取得微信发送通道的有效状态，请稍后刷新确认。' };
++  if (!senderReady) return { overallReady, label: '发送服务未就绪', cls: 'warn', detail };
++  return { overallReady, label: '发送服务已就绪', cls: 'ok', detail: '微信发送通道已连接。实际发送仍需库存、关注与有效授权等条件满足。' };
+ }
+ 
+ const FEEDBACK_TOAST = { bought: '恭喜买到！', missed: '已记录，继续为你盯着', skipped: '已记录，继续为你盯着' };
+@@ -736,7 +741,10 @@
+       soldoutTitle: '库存不足提醒',
+     }) : { anyBlocked: false, restockBlocked: false, blocked: [] };
+     if (JSON.stringify(this.data.consent || null) !== JSON.stringify(consent)) this.setData({ consent });
+-    const readiness = reminderReadiness({ ...this.data, settings: this.settings, consent });
++    // The status column describes the sender; overall reminder readiness must
++    // still honour the server's full delivery gate, including stock health.
++    const delivery = this.data.delivery.overallReady === false ? { ...this.data.delivery, cls: 'warn' } : this.data.delivery;
++    const readiness = reminderReadiness({ ...this.data, delivery, settings: this.settings, consent });
+     // Other credit states already include this guidance in the notice. Service
+     // failures and pending records need recovery, not more authorizations.
+     const tip = readiness.code === 'ready' ? creditBoostTip(this.data.subscription || {}) : '';
+@@ -985,7 +993,7 @@
+   },
+ 
+   promptSubscribe() {
+-    if (!this.data.boot.templateIds.length || this.data.delivery.cls !== 'ok') return;
++    if (!this.data.boot.templateIds.length || this.data.delivery.cls !== 'ok' || this.data.delivery.overallReady === false) return;
+     // showModal's confirm is not a user gesture for wx.requestSubscribeMessage
+     // on Android — the dialog stays silent. Point at the real tap button instead.
+     wx.showModal({
+diff --git a/miniprogram/pages/follow/index.wxml b/miniprogram/pages/follow/index.wxml
+--- a/miniprogram/pages/follow/index.wxml
++++ b/miniprogram/pages/follow/index.wxml
+@@ -21,8 +21,8 @@
+       <view class="whistle-heading-copy"><view class="page-title">我的小哨</view><view class="page-subtitle">关注心仪配置，留意取货变化</view></view>
+       <button class="btn btn-ghost btn-sm compact-action" loading="{{refreshing}}" disabled="{{refreshing || saving}}" bindtap="onRefreshStatus">{{refreshing ? '读取中' : '刷新状态'}}</button>
+     </view>
+-    <view class="follow-sync-bar" role="status"><view class="follow-sync-copy"><text class="follow-sync-dot follow-sync-dot--{{liveSync.state}}"></text><text>{{liveSync.state === 'syncing' ? '正在更新页面' : liveSync.state === 'offline' ? '网络已断开' : liveSync.state === 'retrying' ? '连接暂时中断，稍后重试' : '页面自动更新'}}</text></view><view class="follow-sync-times"><text wx:if="{{liveSync.lastReadText}}" class="follow-sync-time">{{liveSync.lastReadText}}读取</text><text wx:if="{{liveSync.nextReadText}}" class="follow-sync-time">下次 {{liveSync.nextReadText}}</text></view></view>
+-    <view wx:if="{{readiness.activeCount > 0}}" class="follow-sync-note">{{liveSync.state === 'offline' ? '联网后会自动同步检测结果。' : liveSync.state === 'retrying' ? '暂时未连上，保留上次结果并自动重试。' : '后台检测结果会自动同步，无需手动查询。'}}</view>
++    <view class="follow-sync-bar" role="status"><view class="follow-sync-copy"><text class="follow-sync-dot follow-sync-dot--{{liveSync.state}}"></text><text>{{liveSync.state === 'syncing' ? '正在更新页面' : liveSync.state === 'offline' ? '网络已断开' : liveSync.state === 'retrying' ? '连接暂时中断，稍后重试' : '页面自动更新'}}</text></view><view class="follow-sync-times"><text wx:if="{{liveSync.lastReadText}}" class="follow-sync-time">{{liveSync.lastReadText}}读取</text><text wx:if="{{liveSync.nextReadText}}" class="follow-sync-time">下次读取 {{liveSync.nextReadText}}</text></view></view>
++    <view wx:if="{{readiness.activeCount > 0}}" class="follow-sync-note">{{liveSync.state === 'offline' ? '联网后会自动同步检测结果。' : liveSync.state === 'retrying' ? '暂时未连上，保留上次结果并自动重试。' : '自动同步后台记录；实际库存时间见各门店。'}}</view>
+     <view wx:if="{{stockOverview}}" class="follow-inventory-status"><text class="bold">{{stockOverview.label}}</text><text>{{stockOverview.detail}}</text></view>
+     <view wx:if="{{refreshError}}" class="banner banner-warn" role="alert">{{refreshError}}</view>
+     <view wx:elif="{{refreshFeedback}}" class="follow-refresh-feedback" role="status">{{refreshFeedback}}</view>
+@@ -61,6 +61,11 @@
+ 
+     <view id="reminder-health" class="card reminder-status-strip" aria-live="polite">
+       <view class="reminder-status-row"><view class="reminder-status-copy"><text class="bold">{{readiness.code === 'ready' || readiness.code === 'restock_ready' ? '微信提醒授权已备好' : readiness.title}}</text><text wx:if="{{boot.member && subscription.templateCount}}" class="reminder-inline-balance">到货 {{subscription.credits}} 次{{authorization.pendingRestock ? '（待同步 +' + authorization.pendingRestock + '）' : ''}}<text wx:if="{{subscription.soldoutEnabled}}"> · 断货 {{subscription.soldoutCredits}} 次{{authorization.pendingSoldout ? '（待同步 +' + authorization.pendingSoldout + '）' : ''}}</text></text></view><button class="ui-action ui-action--neutral reminder-details-toggle" bindtap="onToggleServiceDetails" aria-expanded="{{showServiceDetails}}">{{showServiceDetails ? '收起' : '状态详情'}}<view class="ui-chevron {{showServiceDetails ? 'ui-chevron--up' : 'ui-chevron--down'}}"></view></button></view>
++      <view wx:if="{{readiness.activeCount > 0}}" class="reminder-health-summary">
++        <view class="reminder-health-item"><text class="reminder-health-label">后台检测</text><text class="reminder-health-value reminder-health-value--{{collector.cls}}">{{collector.label}}</text></view>
++        <view class="reminder-health-item"><text class="reminder-health-label">微信发送</text><text class="reminder-health-value reminder-health-value--{{delivery.cls}}">{{delivery.label}}</text></view>
++      </view>
++      <view wx:if="{{!showServiceDetails && readiness.action === 'service'}}" class="reminder-health-warning" role="status">{{readinessTaskDetail}}</view>
+       <view wx:if="{{consent && consent.anyBlocked}}" class="consent-recovery" role="status">
+         <view class="consent-recovery-title">微信提醒权限未开启</view>
+         <view class="consent-recovery-desc">检测到微信已拒绝以下消息，库存监测会继续，但相关微信提醒可能无法正常接收。</view>
+diff --git a/miniprogram/pages/follow/index.wxss b/miniprogram/pages/follow/index.wxss
+--- a/miniprogram/pages/follow/index.wxss
++++ b/miniprogram/pages/follow/index.wxss
+@@ -120,6 +120,14 @@
+ .reminder-status-copy { gap:2rpx; flex-basis:260rpx; }
+ .reminder-details-toggle.ui-action { padding:10rpx 14rpx; font-size:24rpx; min-height:44px; }
+ .reminder-direct-button { margin-top:12rpx; min-height:44px; }
++.reminder-health-summary { display:flex; gap:12px; margin-top:12px; padding:12px; border-radius:12px; background:var(--surface-soft); }
++.reminder-health-item { display:flex; flex:1 1 0%; min-width:0; flex-direction:column; gap:4px; }
++.reminder-health-item + .reminder-health-item { border-left:1px solid var(--line); padding-left:12px; }
++.reminder-health-label { color:var(--text-2); font-size:12px; line-height:1.5; }
++.reminder-health-value { color:var(--text-2); font-size:14px; line-height:1.5; font-weight:600; overflow-wrap:anywhere; }
++.reminder-health-value--ok { color:var(--green-dark); }
++.reminder-health-value--warn, .reminder-health-value--bad { color:var(--warn); }
++.reminder-health-warning { margin-top:10px; color:var(--warn); font-size:14px; line-height:1.6; overflow-wrap:anywhere; }
+ 
+ .consent-recovery {
+   margin-top: 12rpx;
+diff --git a/miniprogram/pages/guide/index.js b/miniprogram/pages/guide/index.js
+--- a/miniprogram/pages/guide/index.js
++++ b/miniprogram/pages/guide/index.js
+@@ -1,11 +1,10 @@
+ const guide = require('../../config/usage-guide');
+-const { activeCalendars, withFollowReadiness } = require('../../utils/launch-calendar');
+ const { currentCatalog, subscribeCatalog } = require('../../utils/store');
+ const { storeLabel } = require('../../utils/store-label');
+ const { sourceOf, currentOwner, returnToSource } = require('../../utils/journey-context');
+ const { VERSION } = require('../../config/version');
+ const { shareAppMessage, shareTimeline } = require('../../utils/share');
+-const SECTIONS = ['pickup', 'notification', 'membership', 'prepare', 'monitor', 'calendar', 'faq', 'history'];
++const SECTIONS = ['pickup', 'notification', 'membership', 'prepare', 'monitor', 'faq', 'history'];
+ const ERROR_CODES = ['needs_authorization', 'subscription_rejected', 'subscription_disabled', 'notification_test_account_changed', 'call_failed', 'test_request_timeout', 'insufficient_credits'];
+ function readGuideTarget(options) {
+   if (typeof options.gxsPart !== 'string' || options.gxsPart.length > 80 || typeof options.gxsStores !== 'string' || options.gxsStores.length > 160) return null;
+@@ -20,12 +19,13 @@
+ 
+ Page({
+   data: { stages: guide.stages, stage: guide.stages[0], stageId: 'prepare', faqs: guide.faqs,
+-    faqOpen: '', showLaunchPoster: false, calendarExpanded: false, calendars: [], checkedOn: guide.checkedOn,
++    faqOpen: '', checkedOn: guide.checkedOn,
+     section: '', focusedFaq: null, targetSummary: null, returnLabel: '返回提醒中心', pickupSteps: guide.stages.find(item => item.id === 'pickup').steps },
+   onLoad(options = {}) {
+-    const section = SECTIONS.includes(options.section) ? options.section : '';
++    // Previously shared calendar links now lead directly to the buying guide.
++    const section = options.section === 'calendar' ? 'prepare' : SECTIONS.includes(options.section) ? options.section : '';
+     const stageId = section === 'pickup' ? 'notice' : section === 'notification' || section === 'monitor' ? 'monitor'
+-      : section === 'calendar' || section === 'prepare' ? 'prepare' : options.stage;
++      : section === 'prepare' ? 'prepare' : options.stage;
+     let stage = guide.stages.find(item => item.id === stageId) || guide.stages[0];
+     if (section === 'pickup') stage = { ...stage, title: '核对配置，前往官方下单',
+       note: '适用于 Apple 中国大陆官方商店；门店可取货情况以结账页面为准。',
+@@ -38,23 +38,21 @@
+     this.setData({ stage, stageId: stage.id,
+       section, focusedFaq: guide.faqs.find(item => item.id === faqId) || null,
+       returnLabel: { query: '返回原查询', follow: '返回小哨任务', history: '返回历史', mine: '返回提醒中心', guide: '返回提醒中心' }[this.returnSource],
+-      showLaunchPoster: section === 'calendar', calendarExpanded: false,
+       faqOpen: guide.faqs.some(item => item.id === faqId) ? faqId : '' });
+-    this.refreshCalendars(currentCatalog());
++    this.refreshTarget(currentCatalog());
+   },
+   onShow() {
+-    if (!this.unsubscribeCatalog) this.unsubscribeCatalog = subscribeCatalog(catalog => this.refreshCalendars(catalog));
+-    this.refreshCalendars(currentCatalog());
++    if (!this.unsubscribeCatalog) this.unsubscribeCatalog = subscribeCatalog(catalog => this.refreshTarget(catalog));
++    this.refreshTarget(currentCatalog());
+   },
+   onUnload() { if (this.unsubscribeCatalog) this.unsubscribeCatalog(); this.unsubscribeCatalog = null; },
+-  refreshCalendars(catalog) {
++  refreshTarget(catalog) {
+     const target = this.sharedTarget;
+     const products = catalog && catalog.productByPart || {};
+     const stores = catalog && catalog.storeByNumber || {};
+     const product = target && Object.prototype.hasOwnProperty.call(products, target.partNumber) ? products[target.partNumber] : null;
+     const valid = product && target.storeNumbers.every(number => Object.prototype.hasOwnProperty.call(stores, number));
+-    this.setData({ calendars: this.data.showLaunchPoster ? activeCalendars().map(calendar => withFollowReadiness(calendar, catalog)) : [],
+-      targetSummary: valid ? { title: product.title, stores: target.storeNumbers.map(number => storeLabel(number, stores[number].name)).join('、') } : null });
++    this.setData({ targetSummary: valid ? { title: product.title, stores: target.storeNumbers.map(number => storeLabel(number, stores[number].name)).join('、') } : null });
+   },
+   onSelectStage(event) {
+     const stage = guide.stages.find(item => item.id === event.currentTarget.dataset.id);
+@@ -64,18 +62,10 @@
+     const id = event.currentTarget.dataset.id;
+     if (guide.faqs.some(item => item.id === id)) this.setData({ faqOpen: this.data.faqOpen === id ? '' : id });
+   },
+-  onToggleCalendar() { this.setData({ calendarExpanded: !this.data.calendarExpanded }); },
+-  onCalendarImageError(event) {
+-    const index = Number(event.currentTarget.dataset.index);
+-    if (Number.isInteger(index) && this.data.calendars[index]) {
+-      this.setData({ [`calendars[${index}].imageDisplayUrl`]: '' });
+-    }
+-  },
+   onStageAction() {
+     const action = this.data.stage.action;
+     if (action === 'query' || action === 'follow') wx.switchTab({ url: `/pages/${action}/index` });
+   },
+-  onCalendarPlan() { wx.switchTab({ url: '/pages/query/index' }); },
+   onTestNotification() { wx.navigateTo({ url: '/pages/notification-test/index?from=guide' }); },
+   onCheckReminders() { getApp().globalData.pendingMineSection = 'reminder-center'; wx.switchTab({ url: '/pages/mine/index' }); },
+   onCheckFollows() { wx.switchTab({ url: '/pages/follow/index' }); },
+diff --git a/miniprogram/pages/guide/index.json b/miniprogram/pages/guide/index.json
+--- a/miniprogram/pages/guide/index.json
++++ b/miniprogram/pages/guide/index.json
+@@ -1,3 +1,3 @@
+ {
+-  "navigationBarTitleText": "选购攻略与发售日历"
++  "navigationBarTitleText": "选购与取货攻略"
+ }
+diff --git a/miniprogram/pages/guide/index.wxml b/miniprogram/pages/guide/index.wxml
+--- a/miniprogram/pages/guide/index.wxml
++++ b/miniprogram/pages/guide/index.wxml
+@@ -1,42 +1,6 @@
+ <view class="page guide-page">
+-  <view class="page-heading brand-page-heading"><image class="brand-page-logo" src="/images/brand/logo-mint-144.png" mode="aspectFit" aria-hidden="true" /><view class="brand-page-copy"><view class="page-title">{{showLaunchPoster ? '发售日历' : '选购攻略'}}</view><view class="page-subtitle">{{showLaunchPoster ? '先看发售安排，下滑查看选购攻略。' : '从选择配置，到收到提醒后下单。'}}</view></view></view>
++  <view class="page-heading brand-page-heading"><image class="brand-page-logo" src="/images/brand/logo-mint-144.png" mode="aspectFit" aria-hidden="true" /><view class="brand-page-copy"><view class="page-title">选购与取货攻略</view><view class="page-subtitle">从选择配置，到收到提醒后下单。</view></view></view>
+ 
+-  <block wx:if="{{showLaunchPoster}}">
+-  <!-- 发售日历：阶段与两个关键日期常显，整月日历按需展开 -->
+-  <view id="guide-calendar-{{index}}" wx:for="{{calendars}}" wx:for-item="calendar" wx:key="id" class="card guide-launch">
+-    <view class="guide-card-heading">
+-      <view class="ui-label-with-icon"><image class="ui-icon" src="/images/ui/calendar.png" mode="aspectFit" aria-hidden="true" /><text class="guide-section-title">新品发售日历</text></view>
+-      <text class="poster-stage poster-stage--{{calendar.stage}}">{{calendar.stageText}}</text>
+-    </view>
+-    <view class="poster-hero">
+-      <view class="poster-title guide-poster-title">{{calendar.title}}</view>
+-      <view wx:if="{{calendar.followNotice}}" class="poster-follow-notice"><view class="poster-follow-title">{{calendar.followNotice}}</view><view class="poster-follow-detail">{{calendar.followNoticeDetail}}</view></view>
+-      <view wx:if="{{calendar.imageDisplayUrl}}" class="poster-hero-media"><image class="poster-hero-image" src="{{calendar.imageDisplayUrl}}" webp="{{true}}" mode="aspectFit" aria-label="{{calendar.imageAlt || calendar.title}}" binderror="onCalendarImageError" data-index="{{index}}" /></view>
+-    </view>
+-    <view class="poster-milestones">
+-      <view class="poster-milestone poster-milestone--{{calendar.preorderState}}">
+-        <text class="poster-milestone-label">{{calendar.preorderState === 'done' ? '已开启预购' : '开启预购'}}</text>
+-        <text class="poster-milestone-date">{{calendar.preorderDateText}}</text>
+-        <text class="poster-milestone-meta">{{calendar.preorderWeekdayText}} {{calendar.preorderTimeText}}</text>
+-      </view>
+-      <view class="poster-milestone poster-milestone--{{calendar.releaseState}}">
+-        <text class="poster-milestone-label">{{calendar.releaseState === 'done' ? '已正式发售' : '正式发售'}}</text>
+-        <text class="poster-milestone-date">{{calendar.releaseDateText}}</text>
+-        <text class="poster-milestone-meta">{{calendar.releaseWeekdayText}}</text>
+-      </view>
+-    </view>
+-    <button class="ui-disclosure" hover-class="ui-control-pressed" bindtap="onToggleCalendar" aria-expanded="{{calendarExpanded}}"><text class="ui-disclosure-label">{{calendar.monthText}}日历</text><view class="ui-disclosure-meta"><text>{{calendarExpanded ? '收起' : '展开'}}</text><view class="ui-chevron {{calendarExpanded ? 'ui-chevron--up' : 'ui-chevron--down'}}" aria-hidden="true"></view></view></button>
+-    <view wx:if="{{calendarExpanded}}" class="guide-month">
+-      <view class="calendar-grid"><view wx:for="{{calendar.weekdays}}" wx:key="*this" class="calendar-weekday">{{item}}</view></view>
+-      <view class="calendar-grid"><view wx:for="{{calendar.cells}}" wx:key="key" class="calendar-cell {{item.label ? 'calendar-cell--event' : ''}} {{item.today ? 'calendar-cell--today' : ''}}"><text>{{item.day}}</text><text class="calendar-event">{{item.label}}</text></view></view>
+-    </view>
+-    <view class="guide-launch-note">发售时间不等于取货查询开放时间，具体以可选配置和 Apple 官方页面为准。</view>
+-    <button class="btn btn-outline btn-block guide-launch-action" bindtap="onCalendarPlan">去选择配置与门店</button>
+-    <view class="guide-launch-source">来源：Apple 中国大陆 · 北京时间 · 核对于 {{calendar.verifiedOn}}</view>
+-  </view>
+-
+-  </block>
+-
+   <view wx:if="{{targetSummary}}" class="card guide-target"><view class="small text-2">正在查看的配置</view><view class="guide-section-title mt">{{targetSummary.title}}</view><view class="small text-2 mt">{{targetSummary.stores}}</view><view class="tiny muted mt">请在 Apple 官方渠道核对同一配置和门店；本页不会查询或锁定库存。</view></view>
+   <view wx:if="{{focusedFaq}}" class="card guide-focused-help"><view class="guide-section-title">{{focusedFaq.title}}</view><view class="small text-2 mt">{{focusedFaq.text}}</view><button class="btn btn-primary btn-block mt" bindtap="onReturnTask">{{returnLabel}}</button></view>
+   <view wx:if="{{section === 'notification' || section === 'monitor' || section === 'faq'}}" class="card guide-reminder-check">
+diff --git a/miniprogram/pages/guide/index.wxss b/miniprogram/pages/guide/index.wxss
+--- a/miniprogram/pages/guide/index.wxss
++++ b/miniprogram/pages/guide/index.wxss
+@@ -1,18 +1,7 @@
+ @import '../../styles/common.wxss';
+-@import '../../styles/launch-calendar.wxss';
+ .guide-page { max-width: 960px; margin: 0 auto; padding-bottom: calc(40rpx + env(safe-area-inset-bottom)); }
+ .guide-section-title { font-size: 32rpx; font-weight: 650; line-height: 1.45; }
+-.guide-card-heading { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12rpx 16rpx; margin-bottom: 20rpx; }
+-.guide-card-heading .poster-stage { flex: none; }
+ 
+-/* Launch card: the poster and two dates stay visible; the month grid folds. */
+-.guide-launch .poster-hero { padding-top: 22rpx; }
+-.guide-poster-title { margin-top: 0; }
+-.guide-month { margin-top: 20rpx; }
+-.guide-launch-note { margin-top: 20rpx; color: var(--text-2); font-size: max(12px, 24rpx); line-height: 1.65; }
+-.guide-launch-action.btn.btn { margin-top: 20rpx; }
+-.guide-launch-source { margin-top: 14rpx; color: var(--text-3); font-size: max(12px, 22rpx); line-height: 1.6; text-align: center; }
+-
+ /* Four stages read as one stepper inside the card they control. */
+ .guide-steps-heading { margin-bottom: 22rpx; }
+ .guide-stepper { position: relative; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin: -6rpx -8rpx 22rpx; }
+@@ -39,12 +28,6 @@
+ 
+ @media (min-width: 600px) {
+   .guide-section-title { font-size: 20px; }
+-  .guide-card-heading { gap: 8px 12px; margin-bottom: 14px; }
+-  .guide-launch { max-width: 640px; margin-left: auto; margin-right: auto; }
+-  .guide-month { margin-top: 14px; }
+-  .guide-launch-note { margin-top: 14px; font-size: 13px; }
+-  .guide-launch-action.btn.btn { margin-top: 14px; }
+-  .guide-launch-source { font-size: 12px; }
+   .guide-stepper { margin: -4px -6px 18px; }
+   button.guide-stepper-item.guide-stepper-item { font-size: 14px; }
+   .guide-stepper-label { font-size: 13px; }
+diff --git a/miniprogram/pages/query/index.js b/miniprogram/pages/query/index.js
+--- a/miniprogram/pages/query/index.js
++++ b/miniprogram/pages/query/index.js
+@@ -6,7 +6,7 @@
+ const { readSession, writeSession } = require('../../utils/session');
+ const operation = require('../../utils/operation');
+ const { startProgress, stopProgress } = require('../../utils/request-progress');
+-const { syncTabBar, switchToTab, releaseTabBar, setTabBarOverlay } = require('../../utils/tab-bar');
++const { syncTabBar, switchToTab, releaseTabBar } = require('../../utils/tab-bar');
+ const { shareAppMessage, shareTimeline, readSharedSelection } = require('../../utils/share');
+ const { monitorPollDelay } = require('../../utils/poll');
+ const { topUpReminderCredit, buildConsentReport, openSubscribeSettings } = require('../../utils/reminder-credits');
+@@ -19,7 +19,6 @@
+ const { canOfferLiveChoices } = require('../../utils/observation-insights');
+ const { createCheckoutContext } = require('../../utils/checkout-context');
+ const conversion = require('../../utils/conversion-events');
+-const { activeCalendars, guideNote, shouldOpenCalendar, withFollowReadiness } = require('../../utils/launch-calendar');
+ 
+ const SELECTION_KEY = 'gxs_query_selection_v1';
+ const RESULT_KEY = 'gxs_query_result_v1';
+@@ -202,10 +201,6 @@
+     evidenceExpanded: false,
+     nextAction: null,
+     evidenceCard: null,
+-    openingCalendar: null,
+-    calendarOpen: false,
+-    guideNote: '',
+-    calendarMuted: false,
+     selectionRestricted: false,
+     contextualCheckout: false,
+     liveResultRestricted: true,
+@@ -221,7 +216,6 @@
+     this.loadingBoot = true;
+     this.beginAccountVerification();
+     const shared = readSharedSelection(options);
+-    this.enteredFromShare = Boolean(shared);
+     if (shared) this.queueSharedTarget(shared);
+     this.consumePendingSharedTarget();
+     if (!this.unsubscribeCatalog) this.unsubscribeCatalog = subscribeCatalog(catalog => this.applyCatalog(catalog));
+@@ -245,7 +239,6 @@
+       this.setData({
+         catalogVersion: catalog.version,
+         ready: true,
+-        guideNote: guideNote(),
+         selectionCanCollapse: restored.valid,
+         selectionSummary: restored.summary,
+         selectionNotice: restored.notice,
+@@ -276,9 +269,6 @@
+     if (this.pageRetired) return;
+     syncTabBar(this, '/pages/query/index');
+     this.visible = true;
+-    const nextGuideNote = guideNote();
+-    if (this.data.guideNote !== nextGuideNote) this.setData({ guideNote: nextGuideNote });
+-    if (this.data.calendarOpen) this.syncCalendarOverlay();
+     this.visibilityEpoch = (this.visibilityEpoch || 0) + 1;
+     this.consumePendingSharedTarget();
+     if (!this.data.ready) return;
+@@ -296,7 +286,6 @@
+   onHide() {
+     releaseTabBar(this);
+     this.visible = false;
+-    if (this.data.calendarOpen) this.onCloseCalendar();
+     this.visibilityEpoch = (this.visibilityEpoch || 0) + 1;
+     this.stopFollowPolling();
+   },
+@@ -304,7 +293,6 @@
+   onUnload() {
+     releaseTabBar(this);
+     stopProgress(this);
+-    if (this.data.calendarOpen) this.onCloseCalendar();
+     this.pageRetired = true;
+     this.visible = false;
+     this.visibilityEpoch = (this.visibilityEpoch || 0) + 1;
+@@ -313,48 +301,8 @@
+     if (this.unsubscribeQuota) this.unsubscribeQuota();
+   },
+ 
+-  // Calendar remains an explicit help entry; returning to query never opens it.
+-  onReady() { this.calendarViewReady = true; },
+-
+-  async maybeOpenCalendar() {
+-    // Editorial UI is local and runs after the first page render. It never
+-    // initiates payment, inventory queries, authorization or telemetry.
+-    if (!this.calendarViewReady || !this.visible || !this.data.ready || this.pageRetired
+-      || this.calendarChecked || this.calendarReadPending || this.enteredFromShare
+-      || getApp().globalData.singlePage) return;
+-    const calendar = activeCalendars(Date.now(), true)[0];
+-    if (!calendar) return;
+-    this.calendarReadPending = true;
+-    try {
+-      const key = localKey(`gxs_launch_calendar_${calendar.familyKey}`);
+-      const saved = await readSession(key);
+-      if (this.pageRetired || !this.visible) return;
+-      this.calendarChecked = true;
+-      if (!shouldOpenCalendar(calendar, saved) || this.data.sheetVisible || this.data.querying
+-        || this.data.signing || this.data.alternativeLoading) return;
+-      this.calendarStorageKey = key;
+-      this.setData({ openingCalendar: withFollowReadiness(calendar, this.catalog), calendarOpen: true, calendarMuted: false });
+-      this.syncCalendarOverlay();
+-      writeSession(key, { id: calendar.id, day: fmt.fmtDate(Date.now()), muted: false });
+-    } finally { this.calendarReadPending = false; }
+-  },
+-  syncCalendarOverlay() {
+-    setTabBarOverlay(this, Boolean(this.data.calendarOpen), 'calendar');
+-  },
+-  onCalendarMute(event) { this.setData({ calendarMuted: Boolean(event.detail.value && event.detail.value.includes('mute')) }); },
+-  onCloseCalendar() {
+-    if (this.data.openingCalendar && this.calendarStorageKey) writeSession(this.calendarStorageKey,
+-      { id: this.data.openingCalendar.id, day: fmt.fmtDate(Date.now()), muted: this.data.calendarMuted });
+-    this.setData({ calendarOpen: false });
+-    this.syncCalendarOverlay();
+-  },
+-  onCalendarTouch() {},
+-  onCalendarImageError() {
+-    if (this.data.openingCalendar) this.setData({ 'openingCalendar.imageDisplayUrl': '' });
+-  },
+-  onOpenGuide() {
+-    if (this.data.calendarOpen) this.onCloseCalendar();
+-    wx.navigateTo({ url: '/pages/guide/index?section=calendar&from=query' });
++  onOpenGuide() {
++    wx.navigateTo({ url: '/pages/guide/index?section=prepare&from=query' });
+   },
+ 
+   onShareAppMessage() {
+@@ -554,7 +502,6 @@
+     const patch = this.selectionView(this.selection);
+     this.selectionNeedsReview = selectionNeedsReview(this.selection, patch.selectionCanCollapse);
+     if (this.data.catalogVersion !== catalog.version) patch.catalogVersion = catalog.version;
+-    if (this.data.openingCalendar) patch.openingCalendar = withFollowReadiness(this.data.openingCalendar, catalog);
+     this.setData(patch);
+     this.resolveSharedTarget();
+     this.refreshStoreChoices();
+diff --git a/miniprogram/pages/query/index.wxml b/miniprogram/pages/query/index.wxml
+--- a/miniprogram/pages/query/index.wxml
++++ b/miniprogram/pages/query/index.wxml
+@@ -1,4 +1,4 @@
+-<page-meta page-style="{{sheetVisible || calendarOpen ? 'overflow:hidden;' : ''}}" />
++<page-meta page-style="{{sheetVisible ? 'overflow:hidden;' : ''}}" />
+ <view class="page tab-page query-page">
+   <view wx:if="{{networkOffline}}" class="network-notice" role="status">网络已断开，恢复后自动刷新</view>
+   <view wx:if="{{loadError}}" class="card load-error" role="alert">
+@@ -40,10 +40,10 @@
+       <text class="add-tip-close tap-target" bindtap="onDismissAddTip" aria-role="button" aria-label="关闭提示">×</text>
+     </view>
+     <button class="ui-disclosure query-guide-entry" hover-class="ui-control-pressed" bindtap="onOpenGuide">
+-      <view class="query-guide-icon" aria-hidden="true"><image class="ui-icon" src="/images/ui/calendar.png" mode="aspectFit" /></view>
++      <view class="query-guide-icon" aria-hidden="true"><image class="ui-icon" src="/images/ui/guide.png" mode="aspectFit" /></view>
+       <view class="query-guide-copy">
+-        <text class="query-guide-title">发售日历与选购攻略</text>
+-        <text class="query-guide-note">{{guideNote || '从选择配置，到收到提醒后下单'}}</text>
++        <text class="query-guide-title">选购与取货攻略</text>
++        <text class="query-guide-note">选好配置，了解提醒与取货流程</text>
+       </view>
+       <view class="ui-chevron" aria-hidden="true"></view>
+     </button>
+@@ -250,37 +250,5 @@
+   <target-picker wx:if="{{sheetVisible}}" id="query-target-picker" catalog-version="{{catalogVersion}}" value="{{draftValue}}" max-stores="{{boot ? boot.maxStores : 3}}" in-sheet="{{true}}" bindchange="onDraftChange" />
+ </config-sheet>
+ 
+-<reminder-nudge enabled="{{ready}}" blocked="{{!accountReady || querying || signing || sheetVisible || alternativeLoading || calendarOpen}}" />
++<reminder-nudge enabled="{{ready}}" blocked="{{!accountReady || querying || signing || sheetVisible || alternativeLoading}}" />
+ 
+-<view wx:if="{{calendarOpen && openingCalendar}}" class="opening-calendar-mask" catchtouchmove="onCalendarTouch">
+-  <view class="opening-calendar-panel" role="dialog" aria-modal="true" aria-label="新品发售日历">
+-    <view class="opening-calendar-header">
+-      <view class="ui-label-with-icon"><image class="opening-calendar-logo" src="/images/brand/logo-mint-144.png" mode="aspectFit" aria-hidden="true" /><text class="opening-calendar-brand">果小哨 · 新品日历</text></view>
+-      <button class="opening-calendar-close" hover-class="ui-control-pressed" aria-label="关闭发售日历" bindtap="onCloseCalendar"><text>×</text></button>
+-    </view>
+-    <scroll-view scroll-y="{{true}}" class="opening-calendar-scroll {{openingCalendar.imageDisplayUrl ? '' : 'opening-calendar-scroll--compact'}} {{openingCalendar.followNotice ? 'opening-calendar-scroll--follow-ready' : ''}}">
+-      <view class="opening-calendar-content">
+-        <view class="poster-hero">
+-          <text class="poster-stage poster-stage--{{openingCalendar.stage}}">{{openingCalendar.stageText}}</text>
+-          <view class="poster-title">{{openingCalendar.title}}</view>
+-          <view wx:if="{{openingCalendar.followNotice}}" class="poster-follow-notice"><view class="poster-follow-title">{{openingCalendar.followNotice}}</view><view class="poster-follow-detail">{{openingCalendar.followNoticeDetail}}</view></view>
+-          <view wx:if="{{openingCalendar.imageDisplayUrl}}" class="poster-hero-media"><image class="poster-hero-image" src="{{openingCalendar.imageDisplayUrl}}" webp="{{true}}" mode="aspectFit" aria-label="{{openingCalendar.imageAlt || openingCalendar.title}}" binderror="onCalendarImageError" /></view>
+-        </view>
+-        <view class="poster-milestones">
+-          <view class="poster-milestone poster-milestone--{{openingCalendar.preorderState}}">
+-            <text class="poster-milestone-label">{{openingCalendar.preorderState === 'done' ? '已开启预购' : '开启预购'}}</text>
+-            <text class="poster-milestone-date">{{openingCalendar.preorderDateText}}</text>
+-            <text class="poster-milestone-meta">{{openingCalendar.preorderWeekdayText}} {{openingCalendar.preorderTimeText}}</text>
+-          </view>
+-          <view class="poster-milestone poster-milestone--{{openingCalendar.releaseState}}">
+-            <text class="poster-milestone-label">{{openingCalendar.releaseState === 'done' ? '已正式发售' : '正式发售'}}</text>
+-            <text class="poster-milestone-date">{{openingCalendar.releaseDateText}}</text>
+-            <text class="poster-milestone-meta">{{openingCalendar.releaseWeekdayText}}</text>
+-          </view>
+-        </view>
+-        <view class="poster-source"><view>Apple 官方时间 · 北京时间</view><view>日期到来不代表已开放取货查询</view></view>
+-      </view>
+-    </scroll-view>
+-    <view class="opening-calendar-actions"><button class="btn btn-primary btn-block" bindtap="onOpenGuide">查看完整日历与选购攻略</button><checkbox-group bindchange="onCalendarMute"><label class="opening-calendar-mute"><checkbox value="mute" checked="{{calendarMuted}}" color="#008D55" /><text>本次发售不再提醒</text></label></checkbox-group></view>
+-  </view>
+-</view>
+diff --git a/miniprogram/pages/query/index.wxss b/miniprogram/pages/query/index.wxss
+--- a/miniprogram/pages/query/index.wxss
++++ b/miniprogram/pages/query/index.wxss
+@@ -1,6 +1,5 @@
+ /* 查询页专用样式（公共样式见 app.wxss） */
+-@import '../../styles/launch-calendar.wxss';
+-/* Launch calendar + purchase guide: a calm entry row below the heading. It stays
++/* Purchase and pickup guide: a calm entry row below the heading. It stays
+    recognizable as a control without competing with the primary query action. */
+ .query-guide-entry.query-guide-entry {
+   gap: 12px;
+@@ -17,53 +16,7 @@
+ .query-guide-title { color: var(--text); font-size: max(15px, 30rpx); font-weight: 600; line-height: 1.45; }
+ .query-guide-note { color: var(--text-2); font-size: max(12px, 24rpx); font-weight: 400; line-height: 1.5; white-space: normal; overflow-wrap: anywhere; }
+ .query-guide-entry .ui-chevron { color: var(--green-dark); }
+-.opening-calendar-heading { flex: 1 1 0; min-width: 0; }
+-.opening-calendar-mask { position: fixed; inset: 0; z-index: 1100; display: flex; align-items: center; justify-content: center; padding: 32rpx; background: rgba(9, 24, 18, .6); }
+-.opening-calendar-panel { width: 100%; max-width: 440px; max-height: calc(100vh - 64rpx - env(safe-area-inset-top) - env(safe-area-inset-bottom)); display: flex; flex-direction: column; border-radius: 32rpx; background: var(--card); box-shadow: 0 20rpx 80rpx rgba(0, 0, 0, .22); overflow: hidden; }
+-/* Poster chrome shared via styles/launch-calendar.wxss; only modal chrome below. */
+-.opening-calendar-header { display: flex; align-items: center; justify-content: space-between; gap: 16rpx; flex: none; padding: 12rpx 24rpx 12rpx 30rpx; }
+-.opening-calendar-logo { display: block; flex: none; width: 24px; height: 24px; border-radius: 7px; }
+-button.opening-calendar-close.opening-calendar-close {
+-  box-sizing: border-box;
+-  display: flex;
+-  align-items: center;
+-  justify-content: center;
+-  flex: none;
+-  width: 44px;
+-  height: 44px;
+-  min-height: 44px;
+-  margin: 0;
+-  padding: 0;
+-  border: 1rpx solid var(--line);
+-  border-radius: 50%;
+-  background: var(--surface-soft);
+-  color: var(--text-2);
+-}
+-.opening-calendar-close::after { border: 0; }
+-.opening-calendar-close text { font-size: 26px; line-height: 1; font-weight: 300; }
+-.opening-calendar-close.ui-control-pressed { background: var(--control-pressed); color: var(--green-dark); }
+-.opening-calendar-scroll { flex: 0 1 auto; min-height: 0; height: 680rpx; max-height: calc(100vh - 240px - env(safe-area-inset-top) - env(safe-area-inset-bottom)); }
+-.opening-calendar-scroll--compact { height: 380rpx; }
+-.opening-calendar-scroll--compact.opening-calendar-scroll--follow-ready { height: 340px; }
+-.opening-calendar-content { padding: 0 30rpx 18rpx; }
+-.opening-calendar-content .poster-source { line-height: 1.5; }
+-.opening-calendar-actions { flex: none; padding: 16rpx 30rpx 18rpx; border-top: 1rpx solid var(--line); }
+-.opening-calendar-actions .btn { height: auto; min-height: 44px; padding: 20rpx; line-height: 1.4; }
+-.opening-calendar-mute { display: flex; align-items: center; justify-content: center; min-height: 44px; color: var(--text-2); gap: 8rpx; font-size: 14px; margin-top: 4rpx; }
+ @media (min-width: 600px) {
+-  .opening-calendar-mask { padding: 24px; }
+-  .opening-calendar-panel { max-height: calc(100vh - 48px); border-radius: 24px; }
+-  .opening-calendar-header { padding: 8px 18px 8px 24px; }
+-  .opening-calendar-scroll { height: 400px; }
+-  .opening-calendar-scroll--compact { height: 230px; }
+-  .opening-calendar-content { padding: 0 24px 12px; }
+-  .opening-calendar-actions { padding: 10px 24px 12px; }
+-  .opening-calendar-actions .btn { padding: 12px; }
+-  .opening-calendar-panel .small { font-size: 14px; line-height: 1.5; }
+-  .opening-calendar-panel .tiny { font-size: 12px; line-height: 1.5; }
+-  .opening-calendar-panel .btn { font-size: 16px; line-height: 1.5; padding: 12px 16px; }
+-  .opening-calendar-panel .mt { margin-top: 10px; }
+-  .opening-calendar-mute { font-size: 14px; gap: 6px; margin-top: 2px; }
+   .query-guide-entry.query-guide-entry { padding: 14px 18px; border-radius: 18px; }
+   .query-guide-title { font-size: 16px; }
+   .query-guide-note { font-size: 13px; }
+@@ -190,8 +143,6 @@
+ .result-next-action { padding: 24rpx; margin-top: 24rpx; border-radius: 20rpx; background: var(--surface-soft); }
+ .result-next-action--available, .journey-resume { background: var(--green-soft); }
+ .target-evidence { border-top: 1rpx solid var(--line); padding-top: 22rpx; margin-top: 24rpx; }
+-.launch-dates { display: flex; flex-wrap: wrap; gap: 12rpx 28rpx; font-size: 30rpx; font-weight: 600; padding: 22rpx 0 14rpx; }
+-.launch-card .row-between { flex-wrap: wrap; gap: 12rpx; }
+ 
+ .query-notice-region:empty { display: none; }
+ .query-follow-entry.query-follow-entry { margin-bottom: 24rpx; text-align: left; }
+diff --git a/package-lock.json b/package-lock.json
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -1,12 +1,12 @@
+ {
+   "name": "guoxiaoshao",
+-  "version": "3.3.2",
++  "version": "3.4.0",
+   "lockfileVersion": 3,
+   "requires": true,
+   "packages": {
+     "": {
+       "name": "guoxiaoshao",
+-      "version": "3.3.2",
++      "version": "3.4.0",
+       "license": "MIT",
+       "devDependencies": {
+         "acorn": "8.18.0"
+diff --git a/package.json b/package.json
+--- a/package.json
++++ b/package.json
+@@ -1,6 +1,6 @@
+ {
+   "name": "guoxiaoshao",
+-  "version": "3.3.2",
++  "version": "3.4.0",
+   "license": "MIT",
+   "private": true,
+   "description": "果小哨 —— Apple 直营店取货供应监测小程序（云开发共享环境）",
+diff --git a/README.md b/README.md
+--- a/README.md
++++ b/README.md
+@@ -1,14 +1,14 @@
+-# 果小哨 · v3.3.2
++# 果小哨 · v3.4.0
+ 
+-**2026-10-21 本地候选，准备同步 GitHub。** 针对昨晚服务器故障，本版新增 **2026-10-21（北京时间）全天自动会员时长补偿与服务恢复公告**：付费及在期／曾开通会员用户今日访问或后台巡检时自动顺延 **1 天**会员时长（保留原周卡／月卡 4×4／年卡 5×5 套餐档位与额外名额有效期），免费用户今日打开小程序自动获赠 **1 天体验会员**（3 配置 × 3 门店，可在「我的」查看），并在查询页顶部公告栏与「公告与服务」页面同步展示恢复与补偿说明（展示至 2026-10-21 23:59:59）。同时包含 v3.3.1 手机预览修复：将包内 119 个商品缩图与日历海报改为全机型及微信开发者工具代码包白名单（`white.miniProgram`）兼容的 47 个透明索引 PNG 与 72 个不透明基线 JPEG（共 595,221 B），并移除查询卡片「修改」按钮固定窄宽度上限以消除换行。完整变更与部署说明见 [3.3.2 发布说明](docs/RELEASE_3.3.2.md)，质检追踪见 [当前质检记录](docs/WECHAT_QUALITY_3.3.1.md)。
++**2026-10-24 发布候选，核心稳定性验收已完成。** 库存调度、通知排队及数据库冲突修复已部署；本轮 30 个采集组均持续更新，到货与断货提醒均获维护者手机实收确认且无重复。移除过时海报，优化大屏选配、短窗口和键盘弹出时的操作。小程序界面尚未上传、提审或发布，四项微信官方质检仍待当前包复测。详见 [3.4.0 发布说明](docs/RELEASE_3.4.0.md) 和 [本轮核心验收与实测边界](docs/CORE_ACCEPTANCE_2026-10-24.md)。
+ 
+ 本版用户更新小结：
+ 
+-- 昨晚服务器故障已恢复，会员及曾付费用户自动顺延 1 天。
+-- 免费用户 10 月 21 日打开自动获赠 1 天体验会员。
+-- 修复手机预览商品图显示与查询卡片「修改」按钮换行。
++- 改善库存自动更新与到货、断货提醒的稳定性。
++- 分开展示库存更新与微信提醒状态，方便了解当前服务情况。
++- 移除过时海报，优化大屏选配与小窗口操作。
+ 
+-个人取货信息查询、关注和提醒记录工具。四个主页面用于查询、小哨提醒、历史记录和账户管理，另有独立测试通知页。当前源码为 **v3.3.2 本地候选**，状态见上文；服务恢复补偿与预览修复见 [3.3.2 发布说明](docs/RELEASE_3.3.2.md)，选配体验、提醒续次与性能优化见 [3.3.1 发布说明](docs/RELEASE_3.3.1.md)，上一版通知交付与年卡 5 配置改进见 [3.3.0 发布说明](docs/RELEASE_3.3.0.md)。已发布的 **v3.0.0** 由维护者于 **2026-10-15** 确认云函数已部署、微信小程序已正式发布，边界见 [3.0.0 发布说明](docs/RELEASE_3.0.0.md)。v2.2.0 在引用对话中已有维护者发布确认，旧文档仍保留候选记录；准确上传包与云端源码映射尚未核实。上版记录见 [2.1.1 发布说明](docs/RELEASE_2.1.1.md)。前版 **v1.6.0** 维护者于 **2026-10-08** 确认该版本**已经正式发布并投入使用**，实际发布日期及上传包对应的精确源码提交尚待登记。完整修复、历史云端核查及真机边界见 [1.6.0 发布说明](docs/RELEASE_1.6.0.md)。维护者此前于 **2026-09-30** 确认微信小程序 **v1.5.0 已正式发布**。本批原 1.5.2 候选按维护者确认转为 1.5.3，将关注与微信提醒改为会员专属（免费用户保留查询次数），10 月 5 日审查进一步修复超时恢复、查询幂等与余额乱序，并补充首页签到和配置分享，见 [1.5.3 发布说明](docs/RELEASE_1.5.3.md) 与 [审查记录及容量边界](docs/REVIEW_1.5.3_2026-10-05.md)。历史编号保留在原变更记录中。
++个人取货信息查询、关注和提醒记录工具。四个主页面用于查询、小哨提醒、历史记录和账户管理，另有独立测试通知页。当前源码为 **v3.4.0 发布候选**，状态见 [3.4.0 发布说明](docs/RELEASE_3.4.0.md)；服务恢复补偿与预览修复见 [3.3.2 发布说明](docs/RELEASE_3.3.2.md)，选配体验、提醒续次与性能优化见 [3.3.1 发布说明](docs/RELEASE_3.3.1.md)，上一版通知交付与年卡 5 配置改进见 [3.3.0 发布说明](docs/RELEASE_3.3.0.md)。已发布的 **v3.0.0** 由维护者于 **2026-10-15** 确认云函数已部署、微信小程序已正式发布，边界见 [3.0.0 发布说明](docs/RELEASE_3.0.0.md)。v2.2.0 在引用对话中已有维护者发布确认，旧文档仍保留候选记录；准确上传包与云端源码映射尚未核实。上版记录见 [2.1.1 发布说明](docs/RELEASE_2.1.1.md)。前版 **v1.6.0** 维护者于 **2026-10-08** 确认该版本**已经正式发布并投入使用**，实际发布日期及上传包对应的精确源码提交尚待登记。完整修复、历史云端核查及真机边界见 [1.6.0 发布说明](docs/RELEASE_1.6.0.md)。维护者此前于 **2026-09-30** 确认微信小程序 **v1.5.0 已正式发布**。本批原 1.5.2 候选按维护者确认转为 1.5.3，将关注与微信提醒改为会员专属（免费用户保留查询次数），10 月 5 日审查进一步修复超时恢复、查询幂等与余额乱序，并补充首页签到和配置分享，见 [1.5.3 发布说明](docs/RELEASE_1.5.3.md) 与 [审查记录及容量边界](docs/REVIEW_1.5.3_2026-10-05.md)。历史编号保留在原变更记录中。
+ 
+ 本项目代码采用 [MIT License](LICENSE)，允许商业使用、修改和再分发，须保留版权及许可声明。第三方素材与依赖的适用范围见 [第三方说明](THIRD_PARTY_NOTICES.md)。
+ 
+@@ -18,6 +18,7 @@ v3.3.1 在维护者提供的下载副本中审查，已为该项目建立独立
+ 
+ ## 当前发布状态
+ 
++- **v3.4.0 发布候选（2026-10-24）**：[发布说明](docs/RELEASE_3.4.0.md)。核心修复已部署，受控自动提醒手机实收与云端源码比对通过；[核心验收](docs/CORE_ACCEPTANCE_2026-10-24.md)记录实测窗口和适用边界。当前界面未上传，官方质检待复测。
+ - **v3.3.2 本地候选，已含 2026-10-21 故障会员补偿与公告同步（2026-10-21）**：[发布说明](docs/RELEASE_3.3.2.md)。新增 2026-10-21 全天付费／会员用户自动顺延 1 天会员时长、免费用户今日打开自动获赠 1 天体验会员，并同步查询页顶部公告与「公告与服务」列表；合并 v3.3.1 商品图 PNG／JPEG 代码包白名单修复与查询卡片「修改」按钮不换行修复。需在微信开发者工具部署 `gxs_api` 与 `gxs_monitor` 云函数并上传小程序版本后在线上生效。
+ 
+ - **v3.3.1 修订记录（2026-10-21）**：[发布说明](docs/RELEASE_3.3.1.md)。商品图片与原生底栏修订已完成；整仓 **1,614** 项测试、**541** 文件源码检查、**900** 离线布局和 **3,060** 几何检查通过。开发者工具 **2.02.2610202／基础库 3.17.3** 实际编译及星光白组件显示正常，预览包 **1,066,652 B**。详见 [质检追踪](docs/WECHAT_QUALITY_3.3.1.md)。
+diff --git a/tests/burst-alerts.test.mjs b/tests/burst-alerts.test.mjs
+--- a/tests/burst-alerts.test.mjs
++++ b/tests/burst-alerts.test.mjs
+@@ -121,6 +121,6 @@
+   assert.equal(runBudgetMs({ getRemainingTimeInMillis: () => 59900 }), 54900);
+   assert.equal(runBudgetMs({ getRemainingTimeInMillis: () => 120000 }), 55000);
+   assert.equal(runBudgetMs({ getRemainingTimeInMillis: () => 8000 }), 3000);
+-  assert.equal(runBudgetMs({}), 35000);
+-  assert.equal(runBudgetMs(null), 35000);
++  assert.equal(runBudgetMs({}), 45000);
++  assert.equal(runBudgetMs(null), 45000);
+ });
+diff --git a/tests/fixed-cadence.test.mjs b/tests/fixed-cadence.test.mjs
+--- a/tests/fixed-cadence.test.mjs
++++ b/tests/fixed-cadence.test.mjs
+@@ -259,4 +259,101 @@
+   assert.equal(h.scheduler.checkpoint().targets[0].nextDueAt, dueAt, 'an unchanged settings refresh leaves due work queued');
+   await h.runTick();
+   assert.equal(h.calls.length, 2);
++});
++
++test('recovered fixed work completing exactly on a later phase cannot dispatch twice at that time', async () => {
++  for (const restore of [false, true]) {
++    let nowMs = base, calls = 0;
++    const options = { intervalMs: 8000, fixedCadence: true, availableIntervalMs: 0, burstIntervalMs: 0,
++      clock: () => new Date(nowMs),
++      fetchPickup: async () => { calls++; return { record: { httpStatus: 200, elapsedMs: 0 }, observations: [{ status: 'available' }] }; },
++      onBatch: async () => ({ persisted: true, changed: false }) };
++    const groups = [{ key: 'R577|SKU', storeNumber: 'R577', partNumbers: ['SKU'] }];
++    let scheduler = createScheduler(options); scheduler.setTargets(groups);
++    nowMs = scheduler.checkpoint().targets[0].nextDueAt;
++    await Promise.all(scheduler.tick());
++    assert.equal(scheduler.checkpoint().targets[0].nextDueAt, nowMs + 8000, 'a zero-duration on-time request retains the next regular slot');
++    const saved = structuredClone(scheduler.checkpoint());
++    nowMs = saved.targets[0].nextDueAt + 8000;
++    if (restore) { scheduler = createScheduler(options); scheduler.setTargets(groups); scheduler.restore(saved); }
++    assert.equal(scheduler.checkpoint().targets[0].nextDueAt, saved.targets[0].nextDueAt, 'one overdue slot stays queued');
++    await Promise.all(scheduler.tick());
++    assert.equal(calls, 2);
++    assert.equal(scheduler.checkpoint().targets[0].nextDueAt, nowMs + 8000, 'normal cadence skips the phase just consumed by recovery');
++    assert.equal(scheduler.tick().length, 0, 'a second tick at the same instant cannot replay missed work');
++    nowMs += 8000;
++    await Promise.all(scheduler.tick());
++    assert.equal(calls, 3, 'normal sampling resumes at the following slot');
++  }
+ });
++
++test('a pre-request cancellation retains the fixed phase while its retry guard survives a cold start', async () => {
++  for (const restore of [false, true]) {
++    let nowMs = base, attempts = 0, persisted = 0;
++    const options = { intervalMs: 60000, fixedCadence: true, burstIntervalMs: 0, availableIntervalMs: 0,
++      clock: () => new Date(nowMs),
++      fetchPickup: async () => ++attempts === 1
++        ? { record: { budgetDenied: true, retryAt: nowMs + 1000, error: { message: 'request_cancelled' } }, observations: [] }
++        : { record: { httpStatus: 200 }, observations: [{ status: 'unavailable' }] },
++      onBatch: async () => { persisted++; return { persisted: true, changed: false }; } };
++    const groups = [{ key: 'R577|SKU', storeNumber: 'R577', partNumbers: ['SKU'] }];
++    let scheduler = createScheduler(options); scheduler.setTargets(groups);
++    const originalDue = scheduler.checkpoint().targets[0].nextDueAt;
++    nowMs = originalDue + 20000;
++    await Promise.all(scheduler.tick());
++    const saved = structuredClone(scheduler.checkpoint()), cancelled = saved.targets[0];
++    assert.equal(cancelled.nextDueAt, originalDue, 'work that never reached HTTP keeps its original slot');
++    assert.equal(cancelled.guardUntil, nowMs + 1000);
++    assert.equal(cancelled.health.requests, 0);
++    assert.equal(cancelled.failures, 0);
++    assert.equal(persisted, 0);
++    if (restore) { scheduler = createScheduler(options); scheduler.setTargets(groups); scheduler.restore(saved); }
++    nowMs = cancelled.guardUntil - 1;
++    assert.equal(scheduler.tick().length, 0, 'preserving priority must not bypass the retry guard');
++    nowMs = cancelled.guardUntil + 10000;
++    await Promise.all(scheduler.tick());
++    const recovered = scheduler.checkpoint().targets[0];
++    assert.equal(attempts, 2);
++    assert.equal(recovered.nextDueAt, originalDue + 60000, 'a cancellation must not move the stable phase to its retry time');
++    assert.equal(recovered.guardUntil, 0);
++    assert.equal(recovered.guardReason, null);
++    assert.equal(recovered.health.requests, 1);
++    assert.equal(persisted, 1);
++    assert.equal(scheduler.tick().length, 0, 'recovery cannot dispatch again at the same instant');
++  }
++});
++
++test('a cancelled overdue group remains ahead of later due work after a scheduled cold start', async () => {
++  let nowMs = base;
++  const groups = [
++    { key: 'oldest', storeNumber: 'R1', partNumbers: ['SKU'] },
++    { key: 'later-a', storeNumber: 'R2', partNumbers: ['SKU'] },
++    { key: 'later-b', storeNumber: 'R3', partNumbers: ['SKU'] },
++  ];
++  const options = { intervalMs: 60000, fixedCadence: true, maxConcurrency: 2,
++    burstIntervalMs: 0, availableIntervalMs: 0, clock: () => new Date(nowMs),
++    onBatch: async () => ({ persisted: true, changed: false }) };
++  const warm = createScheduler({ ...options, fetchPickup: async () => ({
++    record: { budgetDenied: true, retryAt: nowMs + 1000, error: { message: 'request_cancelled' } }, observations: [] }) });
++  warm.setTargets([groups[0]]);
++  const originalDue = warm.checkpoint().targets[0].nextDueAt;
++  nowMs = originalDue + 20000;
++  await Promise.all(warm.tick());
++  const saved = structuredClone(warm.checkpoint());
++  const cancelled = saved.targets[0];
++  // Other groups became due while this group's invocation ran out of time.
++  for (const [index, group] of groups.slice(1).entries()) saved.targets.push({
++    ...structuredClone(cancelled), key: group.key, nextDueAt: originalDue + (index + 1) * 10000,
++    guardUntil: 0, guardReason: null,
++  });
++  nowMs = originalDue + 30000;
++  const starts = [];
++  const cold = createScheduler({ ...options, fetchPickup: async ({ storeNumber }) => {
++    starts.push(storeNumber);
++    return { record: { httpStatus: 200 }, observations: [{ status: 'unavailable' }] };
++  } });
++  cold.setTargets(groups); cold.restore(saved);
++  await Promise.all(cold.tick());
++  assert.deepEqual(starts, ['R1', 'R2'], 'the oldest unserved group gets one of the first two recovery slots');
++  assert.equal(cold.checkpoint().targets.find(target => target.key === 'later-b').health.requests, 0);
++});
+diff --git a/tests/follow-readiness.test.mjs b/tests/follow-readiness.test.mjs
+--- a/tests/follow-readiness.test.mjs
++++ b/tests/follow-readiness.test.mjs
+@@ -63,6 +63,62 @@
+   }
+ });
+ 
++test('a connected sender stays green while stale stock keeps overall reminders blocked', () => {
++  const rt = runtime(), page = followPage(rt);
++  page.applyBoot(boot({
++    collector: { state: 'running', observationStale: true, observationHealth: { state: 'stalled', staleGroups: 3 } },
++    notifications: { enabled: true, senderReady: true, senderReason: null, deliveryReady: false,
++      reason: 'collector_observation_stale', templateIds: { restock: 'template-A' } },
++  }));
++  assert.equal(page.data.delivery.label, '发送服务已就绪');
++  assert.equal(page.data.delivery.cls, 'ok');
++  assert.equal(page.data.delivery.overallReady, false);
++  assert.match(page.data.delivery.detail, /通道已连接/);
++  assert.equal(page.data.collector.cls, 'warn');
++  assert.match(page.data.collector.detail, /观测.*更新/);
++  assert.equal(page.data.readiness.code, 'collector_observation_stale');
++  assert.equal(page.data.readiness.ready, false);
++  page.promptSubscribe();
++  assert.equal(rt.messages.length, 0, 'the new sender display does not open an authorization prompt');
++  assert.equal(rt.calls.length, 0);
++});
++
++test('new sender authentication failures are not hidden by the separate stock warning', () => {
++  const rt = runtime(), page = followPage(rt);
++  page.applyBoot(boot({
++    collector: { state: 'running', observationStale: true },
++    notifications: { enabled: true, senderReady: false, senderReason: 'consumer_auth_failed', deliveryReady: false,
++      reason: 'collector_observation_stale', templateIds: { restock: 'template-A' } },
++  }));
++  assert.equal(page.data.delivery.cls, 'warn');
++  assert.match(page.data.delivery.detail, /验证未通过/);
++  assert.equal(page.data.readiness.ready, false);
++  assert.equal(page.data.readiness.code, 'collector_observation_stale');
++  assert.equal(rt.calls.length, 0);
++});
++
++test('legacy stock errors leave sender state unconfirmed while legacy success remains supported', () => {
++  const rt = runtime(), page = followPage(rt);
++  page.applyBoot(boot({ collector: { state: 'running', observationStale: true },
++    notifications: { enabled: true, deliveryReady: false, reason: 'collector_observation_stale', templateIds: { restock: 'template-A' } } }));
++  assert.equal(page.data.delivery.label, '发送状态待确认');
++  assert.equal(page.data.delivery.cls, 'muted');
++  assert.equal(page.data.readiness.ready, false);
++  page.applyBoot(boot());
++  assert.equal(page.data.delivery.cls, 'ok');
++  assert.equal(page.data.readiness.ready, true);
++});
++
++test('a sender-only status cannot override the full delivery gate when collector detail is incomplete', () => {
++  const rt = runtime(), page = followPage(rt);
++  page.applyBoot(boot({ notifications: { enabled: true, senderReady: true, senderReason: null, deliveryReady: false,
++    reason: 'collector_observation_stale', templateIds: { restock: 'template-A' } } }));
++  assert.equal(page.data.delivery.cls, 'ok');
++  assert.equal(page.data.readiness.ready, false);
++  page.promptSubscribe();
++  assert.equal(rt.messages.length, 0);
++});
++
+ test('authorization counts the current restock template and excludes obsolete credits', () => {
+   const rt = runtime(); const page = followPage(rt);
+   page.applyBoot(boot({ notifications: { enabled: true, deliveryReady: true, templateIds: { restock: 'template-A', b: 'template-A' } },
+diff --git a/tests/frontend-regression.test.mjs b/tests/frontend-regression.test.mjs
+--- a/tests/frontend-regression.test.mjs
++++ b/tests/frontend-regression.test.mjs
+@@ -214,14 +214,24 @@
+   assert.equal(updates.length, 1, 'the same catalog object is not re-applied');
+ });
+ 
+-test('isolated picker styles contain only class selectors and no imported global selectors', () => {
+-  const css = fs.readFileSync(path.join(root, 'components/target-picker/index.wxss'), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
++function assertIsolatedPickerStyles(source) {
++  const css = source.replace(/\/\*[\s\S]*?\*\//g, '');
+   assert.doesNotMatch(css, /@import/);
+   for (const match of css.matchAll(/([^{}]+)\{/g)) {
+-    // The dark-mode media query is an at-rule prelude, not a selector.
+-    if (match[1].trim() === '@media (prefers-color-scheme: dark)') continue;
++    // Skip only the media prelude. matchAll still visits every nested rule,
++    // including width/height breakpoints; none of their selectors are exempt.
++    if (/^@media\s+\([^{}]+\)$/.test(match[1].trim())) continue;
+     for (const selector of match[1].split(',')) { assert.match(selector.trim(), /^\./); assert.doesNotMatch(selector, /\[|#/); }
+   }
++}
++
++test('isolated picker styles contain only class selectors and no imported global selectors', () => {
++  assertIsolatedPickerStyles(fs.readFileSync(path.join(root, 'components/target-picker/index.wxss'), 'utf8'));
++  for (const query of ['(prefers-color-scheme: dark)', '(min-width: 600px)', '(max-height: 600px)']) {
++    assert.doesNotThrow(() => assertIsolatedPickerStyles(`@media ${query} { .picker { color: green; } }`));
++    assert.throws(() => assertIsolatedPickerStyles(`@media ${query} { view { color: green; } }`), 'media wrappers must not hide forbidden element selectors');
++    assert.throws(() => assertIsolatedPickerStyles(`@media ${query} { .picker, #global { color: green; } }`), 'all selectors inside each media rule remain checked');
++  }
+ });
+ 
+ test('all page event handlers exist; WXML expressions have no XML entity operators; UTF-8 is valid', () => {
+diff --git a/tests/helpers/memory-repo.mjs b/tests/helpers/memory-repo.mjs
+--- a/tests/helpers/memory-repo.mjs
++++ b/tests/helpers/memory-repo.mjs
+@@ -172,7 +172,7 @@
+         .sort((a, b) => byDesc('createdAt')(a, b) || byDesc('_id')(a, b));
+       return { items: rows.slice(0, limit), hasMore: rows.length > limit };
+     },
+-    async listUnprocessedEvents({ limit = 100, since = null } = {}) { return all(COLLECTIONS.events).filter(e => ALERT_TYPES.has(e.type) && !e.notificationPlannedAt && (!since || e.detectedAt >= since)).sort((a, b) => byAsc('detectedAt')(a, b) || byAsc('_id')(a, b)).slice(0, limit); },
++    async listUnprocessedEvents({ limit = 100, since = null, cursor = null } = {}) { return all(COLLECTIONS.events).filter(e => ALERT_TYPES.has(e.type) && !e.notificationPlannedAt && (!since || e.detectedAt >= since) && (!cursor || e.detectedAt > cursor.detectedAt || e.detectedAt === cursor.detectedAt && e._id > cursor.id)).sort((a, b) => byAsc('detectedAt')(a, b) || byAsc('_id')(a, b)).slice(0, limit); },
+     async getEvent(id) { return get(COLLECTIONS.events, id); },
+     async markEventPlanned(id, nowIso) { const event = get(COLLECTIONS.events, id); if (event) put(COLLECTIONS.events, { ...event, notificationPlannedAt: nowIso }); },
+     async listPendingNotifications({ limit = 100 } = {}) { return all(COLLECTIONS.notifications).filter(t => t.status === 'pending').sort((a, b) => byAsc('createdAt')(a, b) || byAsc('_id')(a, b)).slice(0, limit); },
+diff --git a/tests/launch-calendar-guide.test.mjs b/tests/launch-calendar-guide.test.mjs
+--- a/tests/launch-calendar-guide.test.mjs
++++ b/tests/launch-calendar-guide.test.mjs
+@@ -2,7 +2,6 @@
+ import assert from 'node:assert/strict';
+ import { createRequire } from 'node:module';
+ import { runtime } from './helpers/miniprogram-runtime.mjs';
+-import { nativeTabBar } from './helpers/native-tab-bar.mjs';
+ const require = createRequire(import.meta.url);
+ const { activeCalendars, calendarView, guideNote, shouldOpenCalendar, withFollowReadiness } = require('../miniprogram/utils/launch-calendar');
+ const entry = require('../miniprogram/config/product-launches')[0];
+@@ -36,7 +35,7 @@
+   assert.equal(calendarView(entry, Date.parse('2026-10-11T16:00:00Z')).cells.filter(cell => cell.today)[0].day, 12);
+ });
+ 
+-test('opening notice stops after launch day while manual calendar remains available', () => {
++test('archived calendar data distinguishes opening and editorial expiry', () => {
+   assert.equal(activeCalendars(Date.parse('2026-10-23T15:59:59Z'), true).length, 1);
+   assert.equal(activeCalendars(Date.parse('2026-10-23T16:00:00Z'), true).length, 0);
+   assert.equal(activeCalendars(Date.parse('2026-10-24T00:00:00Z')).length, 1);
+@@ -73,149 +72,54 @@
+   assert.equal(shouldOpenCalendar({ ...calendar, id: 'updated-official-dates' }, { ...saved, muted: true }, now), true);
+ });
+ 
+-function pageRuntime() {
+-  const rt = runtime();
+-  rt.load('utils/launch-calendar.js').activeCalendars = () => [calendar];
+-  const page = rt.instance('pages/query/index.js');
+-  const bar = nativeTabBar(rt);
+-  page.visible = true;
+-  page.setData({ ready: true });
+-  return { rt, page, bar };
+-}
+-
+-test('opening poster announces follow readiness and retracts it when the catalog changes', async () => {
+-  const { rt, page } = pageRuntime();
+-  const catalog = rt.load('utils/store.js').currentCatalog();
+-  page.catalog = catalog;
+-  page.calendarViewReady = true;
+-  await page.maybeOpenCalendar();
+-  assert.equal(page.data.openingCalendar.followNotice, '已支持保存关注');
+-  page.applyCatalog({ ...catalog, version: `${catalog.version}-revoked`,
+-    products: catalog.products.map(product => product.familyKey === entry.familyKey ? { ...product, supported: false } : product) });
+-  assert.equal(page.data.openingCalendar.followNotice, '');
+-  assert.equal(rt.calls.length, 0);
+-  page.onUnload();
+-});
+-
+-test('guide poster reads the current catalog, follows refreshes and removes its listener on unload', () => {
+-  const rt = runtime();
+-  rt.load('utils/launch-calendar.js').activeCalendars = () => [calendar];
+-  const store = rt.load('utils/store.js');
+-  let refresh, removed = false;
+-  store.subscribeCatalog = listener => { refresh = listener; return () => { removed = true; }; };
+-  const page = rt.instance('pages/guide/index.js');
+-  page.onLoad({ section: 'calendar', from: 'query' }); page.onShow();
+-  assert.equal(page.data.calendars[0].followNotice, '已支持保存关注');
+-  refresh({ products: [] });
+-  assert.equal(page.data.calendars[0].followNotice, '');
+-  page.onUnload();
+-  assert.equal(removed, true);
+-  assert.equal(rt.calls.length, 0);
+-});
+-
+-test('query calendar and Mine help enter the guide with distinct visible content and no automatic actions', () => {
++test('query and Mine help open the buying guide without performing business actions', () => {
+   const rt = runtime(), routes = [], scrolls = [];
+   rt.wx.navigateTo = value => routes.push(value.url);
+   rt.wx.pageScrollTo = value => scrolls.push(value);
+-  rt.load('utils/launch-calendar.js').activeCalendars = () => [calendar];
+   const query = rt.instance('pages/query/index.js'), mine = rt.instance('pages/mine/index.js');
+   query.onOpenGuide(); mine.onHelp();
+-  assert.deepEqual(routes, ['/pages/guide/index?section=calendar&from=query', '/pages/guide/index?section=prepare&from=mine']);
++  assert.deepEqual(routes, ['/pages/guide/index?section=prepare&from=query', '/pages/guide/index?section=prepare&from=mine']);
+   const page = rt.instance('pages/guide/index.js');
+-  page.onLoad(Object.fromEntries(new URLSearchParams(routes[0].split('?')[1])));
+-  page.onShow(); if (page.onReady) page.onReady();
+-  assert.equal(page.data.showLaunchPoster, true);
+-  assert.equal(page.data.calendars.length, 1);
+-  assert.equal(page.data.calendarExpanded, false, 'only the month grid is initially folded');
+-  assert.equal(page.data.stageId, 'prepare');
+-  assert.equal(page.data.stage.steps.length, 3, 'purchase guidance is already available without an expand action');
+-  assert.equal(page.returnSource, 'query');
+-  page.onLoad(Object.fromEntries(new URLSearchParams(routes[1].split('?')[1])));
+-  page.onShow(); if (page.onReady) page.onReady();
+-  assert.equal(page.data.showLaunchPoster, false);
+-  assert.equal(page.data.calendars.length, 0);
+-  assert.equal(page.data.stageId, 'prepare');
+-  assert.equal(page.data.stage.steps.length, 3);
+-  assert.equal(page.returnSource, 'mine');
++  for (const [index, source] of ['query', 'mine'].entries()) {
++    page.onLoad(Object.fromEntries(new URLSearchParams(routes[index].split('?')[1])));
++    page.onShow();
++    assert.equal(page.data.section, 'prepare');
++    assert.equal(page.data.stageId, 'prepare');
++    assert.equal(page.data.stage.steps.length, 3, 'buying guidance is immediately available');
++    assert.equal(page.returnSource, source);
++  }
+   assert.deepEqual(scrolls, []);
+   assert.equal(rt.calls.length, 0);
+   assert.equal(rt.messages.length, 0);
+   page.onUnload();
+ });
+ 
+-test('poster opt-in survives catalog refresh while image failure preserves dates and guide content', () => {
+-  const rt = runtime();
+-  rt.load('utils/launch-calendar.js').activeCalendars = () => [calendar];
++test('old calendar links retain their target and return path while opening current buying help', () => {
++  const rt = runtime(), routes = [];
++  rt.wx.switchTab = value => routes.push(value.url);
++  const store = rt.load('utils/store.js'), catalog = store.currentCatalog();
++  const product = catalog.products.find(item => item.supported && !item.comingSoon);
++  const storeNumber = Object.keys(catalog.storeByNumber)[0];
++  let refresh, removed = false;
++  store.subscribeCatalog = listener => { refresh = listener; return () => { removed = true; }; };
+   const page = rt.instance('pages/guide/index.js');
+-  for (const options of [{}, { from: 'query' }, { section: 'prepare', stage: 'pickup' }, { section: 'notification' }, { section: 'membership' }, { section: 'pickup' }, { section: 'unknown' }]) {
+-    page.onLoad(options);
+-    page.refreshCalendars(rt.load('utils/store.js').currentCatalog());
+-    assert.equal(page.data.showLaunchPoster, false);
+-    assert.equal(page.data.calendars.length, 0);
+-    if (options.section === 'prepare') assert.equal(page.data.stageId, 'prepare');
+-  }
+-  page.onLoad({ section: 'calendar', from: 'query', stage: 'pickup' });
++  page.onLoad({ section: 'calendar', from: 'query', stage: 'pickup', gxsPart: encodeURIComponent(product.partNumber), gxsStores: storeNumber });
++  page.onShow();
++  assert.equal(page.data.section, 'prepare');
+   assert.equal(page.data.stageId, 'prepare');
+-  page.onCalendarImageError({ currentTarget: { dataset: { index: '0' } } });
+-  assert.equal(page.data.calendars[0].imageUrl, calendar.imageUrl, 'retain the verified source as provenance');
+-  assert.equal(page.data.calendars[0].imageDisplayUrl, '', 'hide a failed poster without loading the large original');
+-  assert.equal(page.data.calendars[0].preorderDateText, calendar.preorderDateText);
+-  assert.equal(page.data.calendars[0].releaseDateText, calendar.releaseDateText);
++  assert.equal(page.data.targetSummary.title, product.title);
+   assert.equal(page.data.stage.steps.length, 3);
+-  page.onToggleCalendar();
+-  assert.equal(page.data.calendarExpanded, true);
++  refresh({ productByPart: {}, storeByNumber: {} });
++  assert.equal(page.data.targetSummary, null, 'removed targets are not shown after catalog refresh');
++  page.onReturnTask();
++  assert.deepEqual(routes, ['/pages/query/index']);
++  page.onUnload();
++  assert.equal(removed, true);
+   assert.equal(rt.calls.length, 0);
++  assert.equal(rt.storage.size, 0);
+ });
+ 
+-test('opening calendar waits for first render, performs no API calls, and releases tab on close', async () => {
+-  const { rt, page, bar } = pageRuntime();
+-  await page.maybeOpenCalendar();
+-  assert.equal(page.data.calendarOpen, false);
+-  page.calendarViewReady = true;
+-  await Promise.all([page.maybeOpenCalendar(), page.maybeOpenCalendar()]);
+-  assert.equal(page.data.calendarOpen, true);
+-  assert.equal(bar.hidden, true);
+-  assert.equal(rt.calls.length, 0);
+-  page.onCalendarMute({ detail: { value: ['mute'] } });
+-  page.onCloseCalendar();
+-  assert.equal(page.data.calendarOpen, false);
+-  assert.equal(bar.hidden, false);
+-  assert.equal(rt.storage.get(page.calendarStorageKey).muted, true);
+-  page.calendarChecked = false;
+-  await page.maybeOpenCalendar();
+-  assert.equal(page.data.calendarOpen, false);
+-});
+-
+-test('async cache response cannot open a hidden page or interrupt an active editor', async () => {
+-  const { rt, page } = pageRuntime();
+-  let response;
+-  rt.wx.getStorage = options => { response = options.success; };
+-  page.calendarViewReady = true;
+-  const pending = page.maybeOpenCalendar();
+-  page.visible = false;
+-  response({ data: null });
+-  await pending;
+-  assert.equal(page.data.calendarOpen, false);
+-  assert.equal(rt.storage.has('gxs_launch_calendar_iphone-duo'), false);
+-  page.visible = true;
+-  page.setData({ sheetVisible: true });
+-  await page.maybeOpenCalendar();
+-  assert.equal(page.data.calendarOpen, false);
+-});
+-
+-test('share and single-page entries keep their intended journey without an opening overlay', async () => {
+-  for (const mode of ['share', 'single']) {
+-    const { rt, page } = pageRuntime();
+-    page.calendarViewReady = true;
+-    if (mode === 'share') page.enteredFromShare = true;
+-    else rt.app.globalData.singlePage = true;
+-    await page.maybeOpenCalendar();
+-    assert.equal(page.data.calendarOpen, false);
+-    assert.equal(rt.calls.length, 0);
+-  }
+-});
+-
+-test('guide actions stay inside the mini program', () => {
++test('guide actions preserve all four buying stages and explicit test-notification navigation', () => {
+   const rt = runtime();
+   const navigations = [];
+   rt.wx.switchTab = options => navigations.push(options.url);
+@@ -233,7 +137,6 @@
+   page.onSelectStage({ currentTarget: { dataset: { id: 'pickup' } } });
+   page.onStageAction();
+   page.onTestNotification();
+-  page.onCalendarPlan();
+-  assert.deepEqual(navigations, ['/pages/query/index', '/pages/follow/index', '/pages/follow/index', '/pages/follow/index', '/pages/notification-test/index?from=guide', '/pages/query/index']);
++  assert.deepEqual(navigations, ['/pages/query/index', '/pages/follow/index', '/pages/follow/index', '/pages/follow/index', '/pages/notification-test/index?from=guide']);
+   assert.equal(rt.calls.length, 0);
+ });
+diff --git a/tests/monitor-business-health.test.mjs b/tests/monitor-business-health.test.mjs
+--- a/tests/monitor-business-health.test.mjs
++++ b/tests/monitor-business-health.test.mjs
+@@ -28,8 +28,40 @@
+   assert.equal(result.collector.observationHealth.staleGroups, 17);
+   assert.equal(result.notifications.deliveryReady, false);
+   assert.equal(result.notifications.reason, 'collector_observation_stale');
++  assert.equal(result.notifications.senderReady, true, 'stock freshness does not invalidate current sender authentication');
++  assert.equal(result.notifications.senderReason, null);
+ });
+ 
++test('sender authentication failures remain visible when stock observations are also delayed', () => {
++  for (const successAt of [now.getTime() - 1000, now.getTime() - 3600000]) {
++    const status = heartbeat([target('R577|SKU', successAt)]);
++    status.notifications = { ...status.notifications, authReady: false, authState: 'failed', reason: 'consumer_auth_failed' };
++    const result = monitoringSnapshot(config, status, now);
++    assert.equal(result.notifications.senderReady, false);
++    assert.equal(result.notifications.senderReason, 'consumer_auth_failed');
++    assert.equal(result.notifications.deliveryReady, false);
++    assert.equal(result.notifications.reason, successAt === now.getTime() - 1000 ? 'consumer_auth_failed' : 'collector_observation_stale');
++    assert.doesNotMatch(JSON.stringify(result.notifications), /validUntil|authState|credentials|token|secret/);
++  }
++});
++
++test('an old or stopped heartbeat cannot prove the sender remains ready even with unexpired authentication', () => {
++  const status = heartbeat([target('R577|SKU', now.getTime() - 1000)]);
++  const cases = [
++    [config, status, new Date(now.getTime() + 150001), 'collector_stale'],
++    [config, { ...status, state: 'stopped' }, now, 'collector_stopped'],
++    [{ ...config, collector: { ...config.collector, enabled: false } }, status, now, 'collector_stopped'],
++    [{ ...config, notifications: { ...config.notifications, enabled: false } }, status, now, 'notifications_disabled'],
++    [config, null, now, 'collector_not_deployed'],
++  ];
++  for (const [settings, worker, checkedAt, reason] of cases) {
++    const result = monitoringSnapshot(settings, worker, checkedAt);
++    assert.equal(result.notifications.senderReady, false, reason);
++    assert.equal(result.notifications.senderReason, reason);
++    assert.equal(result.notifications.deliveryReady, false);
++  }
++});
++
+ test('a healthy target cannot hide another stalled target or unpersisted success', () => {
+   const targets = [target('fresh', now.getTime() - 1000), target('stalled', now.getTime() - 3600000),
+     target('not-persisted', now.getTime() - 1000, { health: { lastSuccessAt: now.getTime() - 1000, lastPersistedAt: now.getTime() - 3600000, persistenceFailed: true } })];
+diff --git a/tests/notification-planning-fairness.test.mjs b/tests/notification-planning-fairness.test.mjs
+new file mode 100644
+--- /dev/null
++++ b/tests/notification-planning-fairness.test.mjs
+@@ -0,0 +1,208 @@
++import { test } from 'node:test';
++import assert from 'node:assert/strict';
++import { createRequire } from 'node:module';
++import { createFixture, userKeyOf, CONSUMER_APPID } from './helpers/fixture.mjs';
++
++const require = createRequire(import.meta.url);
++const { createCollector } = require('../cloudfunctions/gxs_api/lib/engine/collector');
++const { runScheduled } = require('../cloudfunctions/gxs_api/lib/engine/scheduled');
++const { COLLECTIONS: C } = require('../cloudfunctions/gxs_api/lib/collections');
++const { createCloudbaseRepo } = require('../cloudfunctions/gxs_api/lib/repo/cloudbase-repo');
++const log = { info() {}, warn() {}, error() {} };
++const memberKey = index => `member-${String(index).padStart(3, '0')}`;
++
++async function setup({ accounts = 1, waiting = 0 } = {}) {
++  const f = createFixture({ config: { collector: { enabled: false }, notifications: {
++    enabled: true, templateIds: { restock: 'RESTOCK', soldout: 'SOLDOUT' }, cooldownMinutes: 0, maxEventAgeSeconds: 120,
++  } } });
++  const base = f.state.now.getTime(), at = ms => new Date(base + ms).toISOString();
++  await f.call('user.bootstrap');
++  const seed = await f.repo.getUser(userKeyOf());
++  for (let i = 0; i < accounts; i++) {
++    const userKey = memberKey(i);
++    await f.repo.createUser({ ...seed, _id: userKey, openid: `oMEMBER${String(i).padStart(21, '0')}`, followIndex: [],
++      membership: { expiresAt: '2027-10-15T00:00:00.000Z' }, subscriptions: { SOLDOUT: { credits: 3 } } });
++    await f.repo.saveFollow({ _id: `F${i}`, userKey, partNumber: 'MJYH4CH/A', storeNumbers: ['R577'], status: 'active', createdAt: at(0) });
++  }
++  for (let i = 0; i < waiting; i++) {
++    const partNumber = `UNFOLLOWED${String(i).padStart(4, '0')}`, storeNumber = 'R999', key = `${storeNumber}|${partNumber}`;
++    await f.repo.saveLatest({ _id: key, partNumber, storeNumber, status: 'available', statusSince: at(0), knownAt: at(0),
++      observedAt: at(0), knownStreakSince: at(0), unknownSince: null });
++    await f.repo.saveEvents([{ _id: `${key}|first_seen_available|${at(0)}`, partNumber, storeNumber, type: 'first_seen_available',
++      status: 'available', detectedAt: at(0), notificationPlannedAt: null }]);
++  }
++  const eventId = `R577|MJYH4CH/A|became_unavailable|${at(1000)}`;
++  await f.repo.saveEvents([{ _id: eventId, partNumber: 'MJYH4CH/A', storeNumber: 'R577', type: 'became_unavailable',
++    status: 'unavailable', detectedAt: at(1000), availableSince: at(-60000), previousKnownAt: at(0),
++    previousStatusConfirmed: true, notificationPlannedAt: null }]);
++  await f.repo.saveLatest({ _id: 'R577|MJYH4CH/A', partNumber: 'MJYH4CH/A', storeNumber: 'R577', status: 'unavailable',
++    statusSince: at(1000), knownStreakSince: at(1000), knownAt: at(2000), observedAt: at(2000), unknownSince: null });
++  f.advance(3000);
++  const sends = [];
++  const sendImpl = async message => { sends.push({ ...message, at: f.state.now.getTime() }); return { errcode: 0 }; };
++  sendImpl.appid = CONSUMER_APPID;
++  const options = { repo: f.repo, sendImpl, clock: () => new Date(f.state.now), log };
++  return { f, at, eventId, sends, options, run: overrides => runScheduled({ ...options, sleep: async ms => f.advance(ms), ...overrides }) };
++}
++
++test('50 one-sample events cannot hide a later confirmed alert until its send window expires', async () => {
++  const s = await setup({ waiting: 50 });
++  const collector = createCollector({ ...s.options, ownerId: 'fairness' });
++  await collector.lease.acquire();
++  await collector.drainNotifications();
++  assert.equal(s.sends.length, 1);
++  assert.ok((await s.f.repo.getEvent(s.eventId)).notificationPlannedAt);
++  const waiting = await s.f.repo.listUnprocessedEvents();
++  assert.equal(waiting.length, 50, 'unconfirmed events remain eligible for a later second sample');
++  assert.ok(waiting.every(event => !event.notificationPlannedAt));
++  // Confirm one formerly waiting event and visit it after the scan wraps.
++  const first = waiting[0], key = `${first.storeNumber}|${first.partNumber}`;
++  const [latest] = await s.f.repo.getLatest([key]);
++  await s.f.repo.saveLatest({ ...latest, knownAt: s.at(4000) });
++  s.f.advance(1000);
++  await collector.drainNotifications();
++  assert.ok((await s.f.repo.getEvent(first._id)).notificationPlannedAt);
++  assert.equal(s.sends.length, 1, 'unfollowed confirmed events do not manufacture recipients');
++  await collector.lease.release();
++});
++
++test('bounded waiting-event pages persist their scan position across scheduled cold starts', async () => {
++  const s = await setup({ waiting: 500 });
++  const getLatest = s.f.repo.getLatest;
++  s.f.repo.getLatest = async keys => { const rows = await getLatest(keys); s.f.advance(1000); return rows; };
++  await s.run({ ownerId: 'page-one', maxRunMs: 6000 });
++  const first = await s.f.repo.getCollectorStatus();
++  assert.ok(first.stats.notificationEventCursor, 'the next invocation must not restart at the first waiting page');
++  assert.equal(s.sends.length, 0);
++  for (let index = 0; index < 3 && !s.sends.length; index++) {
++    s.f.advance(6000);
++    await s.run({ ownerId: `page-next-${index}`, maxRunMs: 6000 });
++  }
++  assert.equal(s.sends.length, 1);
++  assert.equal((await s.f.repo.listUnprocessedEvents({ limit: 1000 })).length, 500);
++});
++
++test('slow large-event fanout yields to sends and resumes after durable users on a cold start', async () => {
++  const s = await setup({ accounts: 100 });
++  const save = s.f.repo.saveNotification;
++  let attempts = 0;
++  s.f.repo.saveNotification = async task => { const result = await save(task); attempts++; s.f.advance(500); return result; };
++  const started = s.f.state.now.getTime();
++  await s.run({ ownerId: 'fanout-first', maxRunMs: 35000 });
++  assert.ok(s.sends.length > 0 && s.sends.length < 100);
++  assert.ok(s.sends[0].at - started <= 5000, 'task inserts leave time for an already-durable task to send');
++  const partial = await s.f.repo.getEvent(s.eventId);
++  assert.ok(partial.notificationPlanningAfterUserKey);
++  assert.equal(partial.notificationPlannedAt, null);
++  s.f.state.now = new Date(s.at(63000));
++  await s.run({ ownerId: 'fanout-second', maxRunMs: 35000 });
++  assert.equal(s.sends.length, 100);
++  assert.equal(attempts, 100, 'the new invocation must not replay the first planning slice');
++  assert.equal(new Set(s.sends.map(message => message.touser)).size, 100);
++  assert.ok((await s.f.repo.getEvent(s.eventId)).notificationPlannedAt);
++  for (let index = 0; index < 100; index++) assert.equal((await s.f.repo.getUser(memberKey(index))).subscriptions.SOLDOUT.credits, 2);
++});
++
++test('a resumed fanout rechecks cancelled follows and expired memberships without replaying accepted users', async () => {
++  const s = await setup({ accounts: 25 });
++  const collector = createCollector({ ...s.options, ownerId: 'fanout-cancel' });
++  await collector.lease.acquire();
++  await collector.drainNotifications();
++  assert.equal(s.sends.length, 20);
++  await s.f.repo.saveFollow({ ...await s.f.repo.getFollow('F22'), status: 'paused' });
++  await s.f.repo.updateUser(memberKey(23), { membership: { expiresAt: s.at(0) } });
++  await collector.drainNotifications();
++  assert.equal(s.sends.length, 23);
++  assert.ok((await s.f.repo.getEvent(s.eventId)).notificationPlannedAt);
++  for (const index of [22, 23]) assert.equal((await s.f.repo.getUser(memberKey(index))).subscriptions.SOLDOUT.credits, 3);
++  assert.equal(new Set(s.sends.map(message => message.touser)).size, 23);
++  await collector.lease.release();
++});
++
++test('a failed progress transaction replays only its durable chunk without duplicate delivery or credit spending', async () => {
++  const s = await setup({ accounts: 25 });
++  const collector = createCollector({ ...s.options, ownerId: 'fanout-retry' });
++  await collector.lease.acquire();
++  let failed = false, attempts = 0;
++  const save = s.f.repo.saveNotification;
++  s.f.repo.saveNotification = async task => { attempts++; return save(task); };
++  s.f.repo.transactionWriteHook = async (collection, doc) => {
++    if (!failed && collection === C.events && doc.notificationPlanningAfterUserKey) { failed = true; throw new Error('checkpoint unavailable'); }
++  };
++  await assert.rejects(collector.drainNotifications(), /checkpoint unavailable/);
++  assert.equal((await s.f.repo.getEvent(s.eventId)).notificationPlanningAfterUserKey, undefined);
++  assert.equal(s.f.repo.tables.get(C.notifications).size, 10);
++  assert.equal(s.sends.length, 0);
++  s.f.repo.transactionWriteHook = null;
++  await collector.drainNotifications();
++  await collector.drainNotifications();
++  assert.equal(attempts, 35);
++  assert.equal(s.sends.length, 25);
++  assert.equal(s.f.repo.tables.get(C.notifications).size, 25);
++  for (let index = 0; index < 25; index++) assert.equal((await s.f.repo.getUser(memberKey(index))).subscriptions.SOLDOUT.credits, 2);
++  await collector.lease.release();
++});
++
++test('event planning checkpoints are monotone and a former lease owner cannot mark an event complete', async () => {
++  const s = await setup();
++  const old = createCollector({ ...s.options, ownerId: 'old' });
++  await old.lease.acquire();
++  const checkpoint = args => s.f.repo.checkpointEventPlanning({ eventId: s.eventId, ownerId: 'old', nowIso: s.f.state.now.toISOString(), ...args });
++  await checkpoint({ afterUserKey: 'member-020' });
++  await checkpoint({ afterUserKey: 'member-010' });
++  assert.equal((await s.f.repo.getEvent(s.eventId)).notificationPlanningAfterUserKey, 'member-020');
++  s.f.advance(16000);
++  const next = createCollector({ ...s.options, ownerId: 'new' });
++  await next.lease.acquire();
++  await assert.rejects(checkpoint({ complete: true }), error => error.code === 'collector_lease_lost');
++  assert.equal((await s.f.repo.getEvent(s.eventId)).notificationPlannedAt, null);
++  await next.lease.release();
++});
++
++test('the pinned CloudBase SDK keyset query covers tied timestamps while completed rows disappear', async t => {
++  const sdkRequire = createRequire(new URL('../cloudfunctions/gxs_api/package.json', import.meta.url));
++  try { sdkRequire.resolve('wx-server-sdk'); } catch { t.skip('Run npm ci in cloudfunctions/gxs_api for the pinned SDK contract'); return; }
++  const previousRuntime = process.env.TENCENTCLOUD_RUNENV; process.env.TENCENTCLOUD_RUNENV = 'SCF';
++  const cloud = sdkRequire('wx-server-sdk'); cloud.init({ env: 'offline-event-keyset' });
++  const db = cloud.database(), Database = db._db.constructor, previousRequest = Database.reqClass;
++  const { EJSON } = sdkRequire('bson');
++  const at = '2026-09-15T02:00:00.000Z';
++  const rows = ['a', 'b', 'c', 'd'].map(_id => ({ _id, type: 'first_seen_available', detectedAt: at, notificationPlannedAt: null }));
++  rows.push({ _id: 'e', type: 'became_unavailable', detectedAt: '2026-09-15T02:00:01.000Z' });
++  const match = (doc, query) => Object.entries(query).every(([field, value]) => {
++    if (field === '$and') return value.every(item => match(doc, item));
++    if (field === '$or') return value.some(item => match(doc, item));
++    if (!value || typeof value !== 'object') return doc[field] === value;
++    return Object.entries(value).every(([op, operand]) => {
++      if (op === '$in') return operand.includes(doc[field]);
++      if (op === '$eq') return operand === null ? doc[field] == null : doc[field] === operand;
++      if (op === '$exists') return (doc[field] !== undefined) === operand;
++      if (op === '$gt') return doc[field] > operand;
++      if (op === '$gte') return doc[field] >= operand;
++      throw new Error(`Unexpected query operator ${op}`);
++    });
++  });
++  Database.reqClass = class OfflineTransport {
++    async send(action, args) {
++      assert.equal(action, 'database.getDocument');
++      assert.equal(args.collectionName, C.events);
++      assert.deepEqual(EJSON.parse(args.order), { detectedAt: 1, _id: 1 });
++      const found = rows.filter(row => match(row, EJSON.parse(args.query)));
++      return { data: { list: found.slice(args.offset || 0, (args.offset || 0) + args.limit).map(row => EJSON.stringify(row)) } };
++    }
++  };
++  try {
++    const repo = createCloudbaseRepo(db);
++    const first = await repo.listUnprocessedEvents({ limit: 2, since: at });
++    assert.deepEqual(first.map(row => row._id), ['a', 'b']);
++    rows[0].notificationPlannedAt = at;
++    rows[1].notificationPlannedAt = at;
++    const second = await repo.listUnprocessedEvents({ limit: 2, since: at, cursor: { detectedAt: at, id: 'b' } });
++    assert.deepEqual(second.map(row => row._id), ['c', 'd']);
++    const last = await repo.listUnprocessedEvents({ limit: 2, since: at, cursor: { detectedAt: at, id: 'd' } });
++    assert.deepEqual(last.map(row => row._id), ['e']);
++  } finally {
++    Database.reqClass = previousRequest;
++    if (previousRuntime === undefined) delete process.env.TENCENTCLOUD_RUNENV; else process.env.TENCENTCLOUD_RUNENV = previousRuntime;
++  }
++});
+diff --git a/tests/personal-reminder-readiness.test.mjs b/tests/personal-reminder-readiness.test.mjs
+--- a/tests/personal-reminder-readiness.test.mjs
++++ b/tests/personal-reminder-readiness.test.mjs
+@@ -22,7 +22,8 @@
+   assert.equal(page.data.readiness.code, 'collector_observation_stale');
+   assert.equal(page.data.collector.cls, 'warn');
+   assert.match(page.data.collector.detail, /观测.*更新/);
+-  assert.match(page.data.delivery.detail, /观测.*更新/);
++  assert.equal(page.data.delivery.label, '发送状态待确认', 'legacy stock errors do not prove a sender failure');
++  assert.match(page.data.delivery.detail, /发送通道.*状态/);
+   assert.match(page.data.follows[0].monitoringText, /后台检测情况见上方/);
+ });
+ 
+diff --git a/tests/product-thumbnails.test.mjs b/tests/product-thumbnails.test.mjs
+--- a/tests/product-thumbnails.test.mjs
++++ b/tests/product-thumbnails.test.mjs
+@@ -119,15 +119,14 @@
+   const rt = runtime(), original = catalog.products.find(product => product.familyKey === 'iphone-duo').imageUrl;
+   const image = withImageFit({ imageUrl: original });
+   const query = rt.instance('pages/query/index.js');
+-  query.data.result = { product: clone(image) }; query.data.selectionSummary = clone(image); query.data.openingCalendar = clone(image);
+-  query.onResultImageError(); query.onSelectionImageError(); query.onCalendarImageError();
++  query.data.result = { product: clone(image) }; query.data.selectionSummary = clone(image);
++  query.onResultImageError(); query.onSelectionImageError();
+   assert.equal(query.data.result.product.imageDisplayUrl, ''); assert.equal(query.data.result.product.imageUrl, original);
+-  assert.equal(query.data.selectionImageFailed, true); assert.equal(query.data.openingCalendar.imageDisplayUrl, '');
++  assert.equal(query.data.selectionImageFailed, true);
+   const follow = rt.instance('pages/follow/index.js'); follow.data.follows = [clone(image)]; follow.onFollowImageError({ currentTarget: { dataset: { index: 0 } } });
+   assert.equal(follow.data.follows[0].imageDisplayUrl, ''); assert.equal(follow.data.follows[0].imageUrl, original);
+   const picker = rt.instance('components/target-picker/index.js'); picker.data.product = clone(image); picker.onImageError(); assert.equal(picker.data.imageFailed, true);
+   const mine = rt.instance('pages/mine/index.js'); mine.data.checkoutTarget = clone(image); mine.onCheckoutImageError(); assert.equal(mine.data.checkoutTarget.imageDisplayUrl, '');
+-  const guide = rt.instance('pages/guide/index.js'); guide.data.calendars = [clone(image)]; guide.onCalendarImageError({ currentTarget: { dataset: { index: 0 } } }); assert.equal(guide.data.calendars[0].imageDisplayUrl, '');
+ });
+ 
+ test('all product image templates bind only display resources and opt into WeChat WebP decoding', () => {
+@@ -140,7 +139,7 @@
+       images++;
+     }
+   }
+-  assert.equal(images, 8);
++  assert.equal(images, 6);
+   const calendar = require('../miniprogram/utils/launch-calendar').calendarView(require('../miniprogram/config/product-launches')[0]);
+   assert.match(calendar.imageDisplayUrl, /-poster\.(?:png|jpg)$/);
+ });
+diff --git a/tests/scheduled-monitor.test.mjs b/tests/scheduled-monitor.test.mjs
+--- a/tests/scheduled-monitor.test.mjs
++++ b/tests/scheduled-monitor.test.mjs
+@@ -16,11 +16,11 @@
+ 
+ test('scheduled budget survives the SCF Node.js 20 remaining-time helper failure', () => {
+   const context = { getRemainingTimeInMillis() { throw new TypeError('client.ms_elapsed is not a function'); } };
+-  assert.equal(runBudgetMs(context), 35000);
++  assert.equal(runBudgetMs(context), 45000);
+   assert.equal(runBudgetMs(context, 12000), 12000);
+-  assert.equal(runBudgetMs({}), 35000);
+-  assert.equal(runBudgetMs(null), 35000);
+-  assert.equal(runBudgetMs({ getRemainingTimeInMillis: () => NaN }), 35000);
++  assert.equal(runBudgetMs({}), 45000);
++  assert.equal(runBudgetMs(null), 45000);
++  assert.equal(runBudgetMs({ getRemainingTimeInMillis: () => NaN }), 45000);
+ });
+ 
+ test('scheduled budget preserves the platform method receiver and reserves cleanup time', () => {
+@@ -61,6 +61,97 @@
+   }
+ }
+ 
++test('the fallback covers 31 overdue groups with database overhead and still honours short platform budgets', async () => {
++  async function scenario(options = {}) {
++    const f = createFixture({ config: {
++      collector: { enabled: true, cadenceMode: 'fixed', intervalSeconds: 60, maxConcurrency: 2,
++        burstIntervalSeconds: 0, availableIntervalSeconds: 0, budgetMode: 'continuous',
++        maxRequestsPerDay: 800000, maxRequestsPerMinute: 600 },
++      notifications: { enabled: false },
++    } });
++    const base = f.state.now.getTime(), partNumber = 'MJYH4CH/A';
++    await f.call('user.bootstrap');
++    const seed = await f.repo.getUser(userKeyOf());
++    for (let index = 0; index < 31; index++) {
++      const userKey = `window-member-${index}`, storeNumber = `R${1000 + index}`, followId = `WF${index}`;
++      const follow = { _id: followId, userKey, partNumber, storeNumbers: [storeNumber], status: 'active', createdAt: f.state.now.toISOString() };
++      await f.repo.createUser({ ...seed, _id: userKey, followIndex: [follow], membership: { expiresAt: '2027-10-15T00:00:00.000Z' } });
++      await f.repo.saveFollow(follow);
++      const at = f.state.now.toISOString();
++      await f.repo.saveLatest({ _id: `${storeNumber}|${partNumber}`, storeNumber, partNumber, status: 'unavailable',
++        statusSince: at, knownStreakSince: at, knownAt: at, observedAt: at, unknownSince: null });
++    }
++    // Every group is already due: measure scan throughput, not initial phase waiting.
++    await f.repo.saveCollectorStatus({ _id: 'collector_status', mode: 'scheduled', intervalMs: 60000,
++      budget: { budgetMode: 'continuous' }, stats: {}, scheduler: { version: 1, intervalMs: 60000,
++        targets: Array.from({ length: 31 }, (_, index) => ({ key: `R${1000 + index}|${partNumber}`, nextDueAt: base - 24000, failures: 0 })) } });
++    let nowMs = base, sequence = 0;
++    const timers = [];
++    const sleep = ms => new Promise(resolve => timers.push({ at: nowMs + ms, sequence: sequence++, resolve }));
++    // Concurrent operations share elapsed time; do not add two parallel DB waits.
++    for (const name of Object.keys(f.repo)) {
++      if (typeof f.repo[name] !== 'function') continue;
++      const original = f.repo[name];
++      f.repo[name] = async (...args) => { await sleep(200); return original(...args); };
++    }
++    const upstream = fakeFetch(() => ({ display: 'unavailable' }));
++    const starts = [];
++    let active = 0, maxActive = 0;
++    const signalTimeouts = new WeakMap(), nativeTimeout = AbortSignal.timeout;
++    AbortSignal.timeout = ms => { const signal = new AbortController().signal; signalTimeouts.set(signal, ms); return signal; };
++    const fetchImpl = async (...args) => {
++      starts.push(nowMs - base); maxActive = Math.max(maxActive, ++active);
++      try {
++        const timeout = signalTimeouts.get(args[1]?.signal) ?? Infinity;
++        await sleep(Math.min(800, timeout));
++        if (timeout < 800) throw Object.assign(new Error('fixture network timeout'), { name: 'TimeoutError' });
++        return await upstream(...args);
++      } finally { active--; }
++    };
++    let completed = false, result, error;
++    try {
++      const work = runScheduled({ repo: f.repo, fetchImpl, sendImpl: null, clock: () => new Date(nowMs),
++        log, sleep, ownerId: 'window-test', ...options }).then(value => { result = value; completed = true; }, caught => { error = caught; completed = true; });
++      for (let turns = 0; !completed; turns++) {
++        assert.ok(turns < 10000, 'the virtual run must terminate');
++        await new Promise(resolve => setImmediate(resolve));
++        if (completed) break;
++        timers.sort((a, b) => a.at - b.at || a.sequence - b.sequence);
++        assert.ok(timers.length, 'the virtual run must not deadlock');
++        nowMs = timers[0].at; f.state.now = new Date(nowMs);
++        while (timers.length && timers[0].at === nowMs) timers.shift().resolve();
++      }
++      await work;
++      if (error) throw error;
++    } finally { AbortSignal.timeout = nativeTimeout; }
++    const status = f.repo.tables.get(C.config).get('collector_status');
++    const lease = f.repo.tables.get(C.config).get('collector_lease');
++    return { result, elapsedMs: nowMs - base, starts, maxActive, status,
++      uniqueStores: new Set(upstream.calls.map(call => call.storeNumber)).size,
++      persistedGroups: status.scheduler.targets.filter(target => target.health.lastPersistedSuccessAt >= base).length,
++      leaseReleased: Date.parse(lease.expiresAt) <= nowMs };
++  }
++
++  const legacy = await scenario({ maxRunMs: 35000 });
++  assert.ok(legacy.uniqueStores < 31, 'the old window leaves already-due tail groups unvisited');
++  assert.ok(legacy.persistedGroups < 31);
++  const brokenContext = { getRemainingTimeInMillis() { throw new TypeError('client.ms_elapsed is not a function'); } };
++  for (const options of [{}, { maxRunMs: runBudgetMs(brokenContext) }]) {
++    const extended = await scenario(options);
++    assert.equal(extended.uniqueStores, 31);
++    assert.equal(extended.persistedGroups, 31, 'all stores must have durable observations, not just started requests');
++    assert.ok(extended.maxActive <= 2, 'extra coverage must not raise concurrency');
++    assert.ok(extended.starts.every(at => at < 45000), 'the work deadline still stops new HTTP requests');
++    assert.ok(extended.elapsedMs < 60000, 'this bounded DB scenario retains cleanup time inside the deployment timeout');
++    assert.equal(extended.leaseReleased, true);
++    assert.equal(extended.status.budget.allowed, true);
++  }
++  const short = await scenario({ maxRunMs: runBudgetMs({ getRemainingTimeInMillis: () => 5500 }) });
++  assert.equal(short.uniqueStores, 0, 'a valid short platform budget must not fall back to 45 seconds');
++  assert.equal(short.starts.length, 0);
++  assert.equal(short.leaseReleased, true);
++});
++
+ test('production monitor entry publishes a fresh heartbeat when the platform time helper throws', async () => {
+   const s = await setup();
+   const entry = fs.readFileSync(new URL('../cloudfunctions/gxs_monitor/index.js', import.meta.url), 'utf8');
+diff --git a/tests/transaction-conflict-recovery.test.mjs b/tests/transaction-conflict-recovery.test.mjs
+new file mode 100644
+--- /dev/null
++++ b/tests/transaction-conflict-recovery.test.mjs
+@@ -0,0 +1,119 @@
++import test from 'node:test';
++import assert from 'node:assert/strict';
++import { createRequire } from 'node:module';
++import { createFixture } from './helpers/fixture.mjs';
++const require = createRequire(import.meta.url);
++const { createCloudbaseRepo } = require('../cloudfunctions/gxs_api/lib/repo/cloudbase-repo');
++const { COLLECTIONS: C } = require('../cloudfunctions/gxs_api/lib/collections');
++
++test('pinned CloudBase SDK rolls back each conflict before bounded, jittered transaction replay', async t => {
++  const sdkRequire = createRequire(new URL('../cloudfunctions/gxs_api/package.json', import.meta.url));
++  try { sdkRequire.resolve('wx-server-sdk'); } catch { t.skip('Run npm ci in cloudfunctions/gxs_api for the pinned SDK contract'); return; }
++  const previousRuntime = process.env.TENCENTCLOUD_RUNENV;
++  process.env.TENCENTCLOUD_RUNENV = 'SCF';
++  const cloud = sdkRequire('wx-server-sdk');
++  cloud.init({ env: 'offline-conflict-contract' });
++  const db = cloud.database(), Database = db._db.constructor, previousRequest = Database.reqClass;
++  const { EJSON } = sdkRequire('bson');
++  const copy = value => EJSON.parse(EJSON.stringify(value));
++  const input = { id: 'collector_lease', ownerId: 'worker', now: '2026-10-24T00:00:00.000Z', expiresAt: '2026-10-24T00:00:15.000Z' };
++  let committed, transactions, calls, waits, sequence, failAction, failuresLeft, failureCode, failureMessage, commitBeforeFailure;
++  function reset(action, count, { code = 'ResourceUnavailable.TransactionConflict', message = '[ResourceUnavailable.TransactionConflict] Transaction is conflict, maybe resource operated by others', uncertainCommit = false } = {}) {
++    committed = { _id: input.id, ownerId: input.ownerId, expiresAt: input.now };
++    transactions = new Map(); calls = []; waits = []; sequence = 0;
++    failAction = action; failuresLeft = count; failureCode = code; failureMessage = message; commitBeforeFailure = uncertainCommit;
++  }
++  Database.reqClass = class OfflineTransport {
++    async send(action, args = {}) {
++      calls.push({ action, id: args.transactionId });
++      if (action === 'database.startTransaction') {
++        const id = `tx-${++sequence}`;
++        transactions.set(id, copy(committed));
++        return { transactionId: id };
++      }
++      if (action === failAction && failuresLeft-- > 0) {
++        if (commitBeforeFailure) committed = copy(transactions.get(args.transactionId));
++        return { code: failureCode, message: failureMessage };
++      }
++      if (action === 'database.abortTransaction') { transactions.delete(args.transactionId); return {}; }
++      if (action === 'database.commitTransaction') { committed = copy(transactions.get(args.transactionId)); transactions.delete(args.transactionId); return {}; }
++      if (action === 'database.getDocument') return { data: { list: [EJSON.stringify(transactions.get(args.transactionId))] } };
++      if (action === 'database.modifyDocument') {
++        transactions.set(args.transactionId, { _id: EJSON.parse(args.query)._id, ...EJSON.parse(args.data) });
++        return { data: { updated: 1 } };
++      }
++      throw new Error(`Unexpected SDK operation: ${action}`);
++    }
++  };
++  const repo = createCloudbaseRepo(db, {
++    random: () => 0.999999,
++    sleep: async ms => { waits.push(ms); assert.equal(transactions.size, 0, 'failed transaction is rolled back before retry waiting'); },
++  });
++  try {
++    for (const action of ['database.getDocument', 'database.modifyDocument', 'database.commitTransaction']) {
++      await t.test(`${action} explicit conflict recovers once and releases its transaction`, async () => {
++        reset(action, 1);
++        assert.equal((await repo.acquireLease(input)).acquired, true);
++        assert.equal(sequence, 2);
++        assert.equal(transactions.size, 0);
++        assert.deepEqual(waits, [49]);
++        assert.equal(committed.expiresAt, input.expiresAt);
++        const abort = calls.findIndex(call => call.action === 'database.abortTransaction');
++        const retry = calls.findIndex((call, index) => index > 0 && call.action === 'database.startTransaction');
++        assert.ok(abort > 0 && abort < retry, 'rollback precedes the fresh transaction');
++      });
++    }
++    await t.test('persistent wrapped conflicts stop after four attempts and under 350ms added waiting', async () => {
++      reset('database.modifyDocument', Infinity);
++      await assert.rejects(repo.acquireLease(input), /TransactionConflict/);
++      assert.equal(sequence, 4, 'SDK retries must be disabled; nested loops would multiply attempts');
++      assert.deepEqual(waits, [49, 99, 199]);
++      assert.ok(waits.reduce((sum, value) => sum + value, 0) < 350);
++      assert.equal(transactions.size, 0);
++      assert.equal(committed.expiresAt, input.now, 'failed transaction writes never commit');
++    });
++    await t.test('canonical commit conflict also recovers through the same bounded loop', async () => {
++      reset('database.commitTransaction', 1, { code: 'DATABASE_TRANSACTION_CONFLICT', message: 'database transaction conflict' });
++      assert.equal((await repo.acquireLease(input)).acquired, true);
++      assert.equal(sequence, 2);
++      assert.equal(transactions.size, 0);
++    });
++    for (const uncertainCommit of [false, true]) {
++      await t.test(`generic ${uncertainCommit ? 'committed-but-uncertain' : 'write'} failure is never replayed`, async () => {
++        reset(uncertainCommit ? 'database.commitTransaction' : 'database.modifyDocument', 1,
++          { code: 'ResourceUnavailable', message: 'resource system error: connection reset', uncertainCommit });
++        await assert.rejects(repo.acquireLease(input));
++        assert.equal(sequence, 1);
++        assert.deepEqual(waits, []);
++        assert.equal(committed.expiresAt, uncertainCommit ? input.expiresAt : input.now);
++      });
++    }
++  } finally {
++    Database.reqClass = previousRequest;
++    if (previousRuntime === undefined) delete process.env.TENCENTCLOUD_RUNENV;
++    else process.env.TENCENTCLOUD_RUNENV = previousRuntime;
++  }
++});
++
++test('healthy successful observations leave a clean shared breaker untouched but reset real failures', async () => {
++  const f = createFixture();
++  const now = f.state.now.toISOString();
++  const token = { generation: 0, id: 'normal', probe: false };
++  const outcome = success => f.repo.recordUpstreamOutcome({ token, record: { httpStatus: success ? 200 : null }, success, now });
++  const writes = [];
++  f.repo.transactionWriteHook = async (collection, doc) => { if (collection === C.config && doc._id === 'upstream_breaker') writes.push(doc); };
++  await outcome(true);
++  assert.equal(writes.length, 0, 'first healthy response need not create a shared hotspot document');
++  await outcome(false);
++  assert.equal(writes.length, 1);
++  assert.equal(writes[0].failures.length, 1);
++  await outcome(true);
++  assert.equal(writes.length, 2, 'success must still clear a preceding failure');
++  assert.deepEqual(writes[1].failures, []);
++  const settled = copyPlain(writes[1]);
++  await outcome(true);
++  assert.equal(writes.length, 2);
++  assert.deepEqual(f.repo.tables.get(C.config).get('upstream_breaker'), settled);
++});
++
++function copyPlain(value) { return JSON.parse(JSON.stringify(value)); }
+diff --git a/tests/v3-history-help-journey.test.mjs b/tests/v3-history-help-journey.test.mjs
+--- a/tests/v3-history-help-journey.test.mjs
++++ b/tests/v3-history-help-journey.test.mjs
+@@ -141,15 +141,13 @@
+   const page = rt.instance('pages/guide/index.js');
+   page.onLoad({ section: 'pickup', from: 'query', gxsPart: encodeURIComponent(product.partNumber), gxsStores: storeNumbers.join(',') });
+   assert.equal(page.data.stageId, 'notice');
+-  assert.equal(page.data.showLaunchPoster, false);
+-  assert.equal(page.data.calendars.length, 0);
+   assert.equal(page.data.targetSummary.title, product.title);
+   assert.equal(page.sharedTarget.storeNumbers.length, 4);
+   assert.equal(page.data.pickupSteps.length, 3);
+   page.onReturnTask();
+   assert.deepEqual(navigations, ['/pages/query/index']);
+   assert.equal(rt.storage.size, 0); assert.equal(rt.calls.length, 0);
+-  page.refreshCalendars({ productByPart: {}, storeByNumber: {}, products: [] });
++  page.refreshTarget({ productByPart: {}, storeByNumber: {}, products: [] });
+   assert.equal(page.data.targetSummary, null);
+ });
+ 
+@@ -181,17 +179,15 @@
+   assert.equal(rt.calls.length, 0);
+ });
+ 
+-test('history current observation stays separate and the guide opt-in poster precedes always-visible guidance', () => {
++test('history current observation stays separate and the guide leads directly to task guidance', () => {
+   const history = fs.readFileSync(new URL('../miniprogram/pages/history/index.wxml', import.meta.url), 'utf8');
+   assert.match(history, /bindtap="onToggleLatest"/);
+   assert.match(history, /wx:if="{{latestExpanded}}"/);
+   const guide = fs.readFileSync(new URL('../miniprogram/pages/guide/index.wxml', import.meta.url), 'utf8');
+-  const posterGate = guide.indexOf('<block wx:if="{{showLaunchPoster}}">');
+-  const poster = guide.indexOf('class="card guide-launch"');
+-  const posterEnd = guide.indexOf('</block>', poster);
+   const task = guide.indexOf('class="card guide-target"');
+   const steps = guide.indexOf('<view class="card guide-steps">');
+-  assert.ok(posterGate >= 0 && posterGate < poster && poster < posterEnd && posterEnd < task && task < steps);
++  assert.ok(task >= 0 && task < steps);
++  assert.doesNotMatch(guide, /guide-launch|showLaunchPoster|新品发售日历/);
+   assert.match(guide, /wx:for="{{stage.steps}}"/);
+   assert.match(guide, /bindtap="onCopyDiagnostics"/);
+ });
+diff --git a/tests/v3-query-journey.test.mjs b/tests/v3-query-journey.test.mjs
+--- a/tests/v3-query-journey.test.mjs
++++ b/tests/v3-query-journey.test.mjs
+@@ -57,13 +57,12 @@
+   }
+ });
+ 
+-test('query lifecycle never invokes the opening calendar, including a normal returning user', async () => {
++test('returning to query keeps the page available without launching a promotion or business action', async () => {
+   const rt = runtime(action => action === 'user.bootstrap' ? account() : { unchanged: true });
+   const page = rt.instance('pages/query/index.js');
+-  let opens = 0; page.maybeOpenCalendar = () => { opens++; };
+-  await page.onLoad(); page.onReady(); await page.onShow(); page.onHide(); await page.onShow();
+-  assert.equal(opens, 0);
+-  assert.equal(page.data.calendarOpen, false);
++  await page.onLoad(); await page.onShow(); page.onHide(); await page.onShow();
++  assert.equal(page.data.ready, true);
++  assert.equal(Boolean(page.data.calendarOpen), false);
+   assert.equal(rt.calls.some(call => ['query.pickup', 'quota.signin', 'follow.save'].includes(call.action)), false);
+   page.onUnload();
+ });
+diff --git a/tools/collector/package-lock.json b/tools/collector/package-lock.json
+--- a/tools/collector/package-lock.json
++++ b/tools/collector/package-lock.json
+@@ -1,12 +1,12 @@
+ {
+   "name": "guoxiaoshao-collector",
+-  "version": "3.3.2",
++  "version": "3.4.0",
+   "lockfileVersion": 3,
+   "requires": true,
+   "packages": {
+     "": {
+       "name": "guoxiaoshao-collector",
+-      "version": "3.3.2",
++      "version": "3.4.0",
+       "license": "MIT",
+       "dependencies": {
+         "wx-server-sdk": "4.0.2"
+diff --git a/tools/collector/package.json b/tools/collector/package.json
+--- a/tools/collector/package.json
++++ b/tools/collector/package.json
+@@ -1,6 +1,6 @@
+ {
+   "name": "guoxiaoshao-collector",
+-  "version": "3.3.2",
++  "version": "3.4.0",
+   "license": "MIT",
+   "private": true,
+   "type": "commonjs",
+diff --git a/tools/ui-preview/build.mjs b/tools/ui-preview/build.mjs
+--- a/tools/ui-preview/build.mjs
++++ b/tools/ui-preview/build.mjs
+@@ -271,7 +271,7 @@
+ if (orderRecordsPreview) scenarios.splice(0, scenarios.length, 'orders-single', 'orders-deleting', 'orders-clearing', 'orders-error', 'orders-pending', 'orders-empty', 'orders-legacy');
+ if (sheetPreview) {
+   scenarios.splice(0, scenarios.length, 'sheet-edit', 'sheet-keyboard', 'sheet-longcontent', 'sheet-saving');
+-  widths.splice(0, widths.length, 320, 375, 390, 430);
++  widths.splice(0, widths.length, 320, 375, 390, 430, 600, 768, 1024);
+ }
+ if (releaseNotesPreview) scenarios.splice(0, scenarios.length, 'free', 'member', 'release-middle', 'release-last', 'release-collapsed', 'longcontent');
+ if (onboardingPreview) scenarios.splice(0, scenarios.length, 'onboarding-first', 'onboarding-signing', 'onboarding-error', 'onboarding-signed', 'onboarding-shared', 'onboarding-share-pending', 'onboarding-share-catalog', 'onboarding-share-error');
+@@ -627,7 +627,6 @@
+     // Notification feedback requires a visible page, just like an actual tap
+     // in WeChat. onLoad alone now intentionally represents a hidden preload.
+     if ((alternativesPreview || notificationTestPreview || v2Preview) && scenario !== 'notification-test-loading' && typeof page.onShow === 'function') await page.onShow();
+-    if (pageName === 'guide' && scenario === 'v3-guide-calendar-expanded') page.onToggleCalendar();
+     if (v2Preview && pageName === 'mine') await page.restoreCheckoutContext();
+     if (scenario.startsWith('v3-dnd-')) {
+       page.onToggleReminderSettings();
+@@ -660,7 +659,7 @@
+     }
+     if (pageName === 'guide' && scenario === 'v2-guide-faq' && page.data.faqOpen !== 'notification') page.onToggleFaq({ currentTarget: { dataset: { id: 'notification' } } });
+     if (scenario === 'v2-calendar-modal') {
+-      page.onReady();
++      if (page.onReady) page.onReady();
+       for (let count = 0; count < 8; count++) await Promise.resolve();
+       if (page.data.calendarOpen || page.data.openingCalendar) throw Error('Returning to query unexpectedly opened a launch calendar');
+     }
+@@ -887,8 +886,8 @@
+         if (scenario === 'v2-restricted' && !page.data.selectionRestricted) throw Error('Restricted fixture did not retain the access gate');
+         if (scenario === 'v2-paid-unconfigured' && !page.data.resumeSetup) throw Error('Paid fixture lost the unfinished target');
+         if (scenario === 'v2-new-product' && (!page.data.selectionSummary || page.data.selectionCanCollapse)) throw Error('Unopened saved product lost its summary or incorrectly enabled querying');
+-        if (scenario === 'v2-calendar-modal' && page.data.calendarOpen) throw Error('Query must retain a lightweight manual calendar entry');
+-        expectedV2Text = [...(scenario === 'v2-calendar-modal' ? ['想查哪一款', '选择配置与门店', '发售日历与选购攻略'] : [p.title]), ...({
++        if (scenario === 'v2-calendar-modal' && page.data.calendarOpen) throw Error('Query must lead directly to selection without a launch overlay');
++        expectedV2Text = [...(scenario === 'v2-calendar-modal' ? ['想查哪一款', '选择配置与门店', '选购与取货攻略'] : [p.title]), ...({
+           'v2-free': ['暂时没有可取货观测', '微信提醒需另行授权'],
+           'v2-member': ['2 家门店有可取货观测', '查看下单指引', '加入关注', '购买请在 Apple 官方渠道完成'],
+           'v2-unknown': ['当前取货状态待确认', '继续查询原配置'],
+@@ -933,12 +932,10 @@
+       } else if (pageName === 'guide') {
+         expectedV2Text = [scenario === 'v330-reminder-help' ? '让提醒真正准备好' : '先选好想要的配置', '常见问题', '联系客服'];
+         if (scenario === 'v2-guide-calendar' || scenario === 'v3-guide-calendar-expanded') {
+-          if (!page.data.showLaunchPoster || !page.data.calendars.length || page.data.calendarExpanded !== (scenario === 'v3-guide-calendar-expanded')) throw Error('Guide poster or explicit month disclosure has the wrong state');
+-          expectedV2Text.push('先看发售安排，下滑查看选购攻略', '新品发售日历', '距预购 5 天 5 小时', '2026 年 10 月日历', '开启预购', '10.16', '周五 20:00', '10.23', '去选择配置与门店');
+-        } else {
+-          expectedV2Text.push('从选择配置，到收到提醒后下单');
+-          forbiddenText.push('新品发售日历');
++          if (page.data.section !== 'prepare' || page.data.stageId !== 'prepare') throw Error('Old calendar links must open buying preparation');
+         }
++        expectedV2Text.push('选购与取货攻略', '从选择配置，到收到提醒后下单');
++        forbiddenText.push('新品发售日历', '本次发售不再提醒', '开启预购');
+         if (scenario === 'v2-guide-faq') {
+           if (page.data.faqOpen !== 'notification') throw Error('Guide notification FAQ did not expand');
+           expectedV2Text.push('没有发现有货、授权不足或处于免打扰时不会发送');
+@@ -1135,7 +1132,7 @@
+         partial: stockScenarios[scenario].mode === 'mixed',
+         authorizationPending: Boolean(stockScenarios[scenario].authorizationPending),
+       } : undefined;
+-      const expectedLaunchPoster = pageName === 'guide' ? Boolean(page.data.showLaunchPoster && page.data.calendars.length) : undefined;
++      const expectedLaunchPoster = pageName === 'guide' ? false : undefined;
+       manifest.push({ page: pageName, scenario, width, file: filename, tabPage: tabIndex >= 0, navigationHidden, previewDate: now.toISOString(), expectedText, forbiddenText, expectedAlternativeCounts, expectedDndPeriodCount, expectedReleaseNoteCount, expectedMembership, expectedNotification, expectedStock, expectedLaunchPoster });
+     }
+   }
+diff --git a/tools/ui-preview/check-sheet-layout.mjs b/tools/ui-preview/check-sheet-layout.mjs
+new file mode 100644
+--- /dev/null
++++ b/tools/ui-preview/check-sheet-layout.mjs
+@@ -0,0 +1,131 @@
++/** Config-sheet geometry and in-place CSS reflow; not native WeChat/device evidence. */
++import fs from 'node:fs';
++import path from 'node:path';
++import os from 'node:os';
++import crypto from 'node:crypto';
++import { createRequire } from 'node:module';
++import { pathToFileURL } from 'node:url';
++const require = createRequire(import.meta.url);
++let playwright;
++try { playwright = require('playwright'); }
++catch { playwright = require(path.join(os.homedir(), '.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright')); }
++const directory = path.resolve(process.argv[2]);
++const dark = process.argv.includes('--dark');
++const manifest = JSON.parse(fs.readFileSync(path.join(directory, 'manifest.json'), 'utf8'));
++const snapshots = manifest.snapshots.filter(item => item.scenario.startsWith('sheet-'));
++if (!snapshots.length) throw Error('Build a --sheets-only preview before checking sheet layout.');
++for (const width of [320, 375, 390, 430, 600, 768, 1024]) {
++  if (!snapshots.some(item => item.width === width)) throw Error(`Missing sheet width: ${width}`);
++}
++function verifySources() {
++  for (const source of manifest.sourceHashes || []) {
++    const hash = crypto.createHash('sha256').update(fs.readFileSync(path.join(manifest.source, source.file))).digest('hex');
++    if (hash !== source.sha256) throw Error(`Preview source changed: ${source.file}; rebuild before checking sheets.`);
++  }
++}
++verifySources();
++const executablePath = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH || ['/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe', 'C:/Program Files/Google/Chrome/Application/chrome.exe'].find(file => fs.existsSync(file));
++const browser = await playwright.chromium.launch({ headless: true, ...(executablePath ? { executablePath } : {}) });
++const records = [], reflows = [];
++const screenshotDirectory = path.join(directory, dark ? 'sheet-screenshots-dark' : 'sheet-screenshots');
++fs.mkdirSync(screenshotDirectory, { recursive: true });
++
++function inspectSheet({ keyboardHeight = 0 } = {}) {
++  const panel = document.querySelector('.config-sheet-panel');
++  const body = panel?.querySelector('.config-sheet-body');
++  const content = panel?.querySelector('.config-sheet-content');
++  if (!panel || !body || !content) return { issues: ['missing sheet'] };
++  const box = element => {
++    const r = element.getBoundingClientRect();
++    return { x: r.x, y: r.y, width: r.width, height: r.height, right: r.right, bottom: r.bottom };
++  };
++  const bounds = box(panel), bodyBounds = box(body), issues = [];
++  if (bounds.x < -1 || bounds.right > innerWidth + 1 || bounds.y < -1 || bounds.bottom > innerHeight - keyboardHeight + 1) issues.push('panel exceeds usable viewport');
++  if (innerWidth >= 600 && bounds.width > 641) issues.push('wide panel has no readable width limit');
++  if (bodyBounds.height < 44) issues.push('form scroll area collapsed below one touch target');
++  if (bodyBounds.y < bounds.y || bodyBounds.bottom > bounds.bottom + 1) issues.push('form outside panel');
++  if (document.documentElement.scrollWidth > innerWidth + 1 || body.scrollWidth > body.clientWidth + 1) issues.push('horizontal overflow');
++  const controls = {};
++  for (const selector of ['.config-sheet-close', '.config-sheet-confirm']) {
++    const element = panel.querySelector(selector), rect = box(element);
++    controls[selector] = { ...rect, fontSize: parseFloat(getComputedStyle(element).fontSize) };
++    if (rect.width < 43.5 || rect.height < 43.5) issues.push(`${selector}: small touch target`);
++    if (rect.x < bounds.x - 1 || rect.right > bounds.right + 1 || rect.y < bounds.y - 1 || rect.bottom > bounds.bottom + 1) issues.push(`${selector}: clipped`);
++    if (!element.contains(document.elementFromPoint(rect.x + rect.width / 2, rect.y + rect.height / 2))) issues.push(`${selector}: covered`);
++  }
++  const titleFont = parseFloat(getComputedStyle(panel.querySelector('.config-sheet-title')).fontSize);
++  if (innerWidth >= 600 && (titleFont > 27 || controls['.config-sheet-confirm'].fontSize > 22)) issues.push('wide sheet typography scales with viewport');
++  const choiceFont = panel.querySelector('.choice-label');
++  if (innerWidth >= 600 && choiceFont && parseFloat(getComputedStyle(choiceFont).fontSize) > 20) issues.push('isolated choice typography scales with viewport');
++  body.scrollTop = body.scrollHeight;
++  const last = content.lastElementChild;
++  if (last && box(last).bottom > box(body).bottom + 2) issues.push('last form content cannot scroll into view');
++  const scrollEnd = body.scrollTop;
++  const search = panel.querySelector('.search-input');
++  if (search) {
++    search.scrollIntoView({ block: 'center' });
++    const rect = box(search), visibleBody = box(body);
++    if (rect.y < visibleBody.y - 1 || rect.bottom > visibleBody.bottom + 1) issues.push('search input cannot scroll fully into view');
++    for (const y of [rect.y + 2, rect.y + rect.height / 2, rect.bottom - 2]) {
++      if (document.elementFromPoint(rect.x + rect.width / 2, y) !== search) { issues.push('search input covered by sticky content'); break; }
++    }
++  }
++  body.scrollTop = 0;
++  return { bounds, body: bodyBounds, bodyScrollHeight: body.scrollHeight, scrollEnd, titleFont, controls, issues };
++}
++
++try {
++  const page = await browser.newPage({ deviceScaleFactor: 1, colorScheme: dark ? 'dark' : 'light' });
++  await page.route(/^https?:/, route => route.abort());
++  for (const item of snapshots) for (const height of [900, 500]) for (const safe of [false, true]) {
++    await page.setViewportSize({ width: item.width, height });
++    await page.goto(pathToFileURL(path.join(directory, item.file)).href);
++    await page.evaluate(({ safe }) => {
++      // Browser env() values cannot emulate an iPhone inset; replace only the
++      // generated preview's CSS with explicit test values, leaving source intact.
++      const replaceInsets = text => text.replace(/env\(safe-area-inset-top\)/g, safe ? '44px' : '0px').replace(/env\(safe-area-inset-bottom\)/g, safe ? '34px' : '0px');
++      document.querySelectorAll('style').forEach(element => { element.textContent = replaceInsets(element.textContent); });
++      document.querySelectorAll('[style]').forEach(element => element.setAttribute('style', replaceInsets(element.getAttribute('style'))));
++    }, { safe });
++    const keyboardHeight = item.scenario === 'sheet-keyboard' ? 280 : 0;
++    const metrics = await page.evaluate(inspectSheet, { keyboardHeight });
++    records.push({ page: item.page, scenario: item.scenario, width: item.width, height, safeTop: safe ? 44 : 0, safeBottom: safe ? 34 : 0, keyboardHeight, ...metrics });
++    if (!safe && item.page === 'query' && [375, 768, 1024].includes(item.width) && height === 500 && ['sheet-edit', 'sheet-keyboard'].includes(item.scenario)) {
++      await page.screenshot({ path: path.join(screenshotDirectory, `${item.scenario}-${item.width}x${height}.png`) });
++    }
++  }
++  // Generated rpx is converted at build time. Swap the new width's generated
++  // stylesheet in-place so this models rpx reflow without replacing the form DOM.
++  // It verifies DOM/input retention, not the native fold lifecycle or JS bridge.
++  for (const pageName of ['query', 'follow', 'history']) {
++    const find = width => snapshots.find(item => item.page === pageName && item.scenario === 'sheet-edit' && item.width === width);
++    await page.setViewportSize({ width: 375, height: 900 });
++    await page.goto(pathToFileURL(path.join(directory, find(375).file)).href);
++    await page.evaluate(() => {
++      window.sheetReflowReference = { panel: document.querySelector('.config-sheet-panel'), input: document.querySelector('.search-input'), selection: [...document.querySelectorAll('.picker .chip.on')].map(e => e.textContent).join('|') };
++      window.sheetReflowReference.input.value = '广州';
++    });
++    for (const [width, height] of [[768, 500], [1024, 500], [320, 900], [375, 900]]) {
++      const html = fs.readFileSync(path.join(directory, find(width).file), 'utf8');
++      await page.setViewportSize({ width, height });
++      await page.evaluate(html => {
++        const replacement = new DOMParser().parseFromString(html, 'text/html');
++        const current = [...document.querySelectorAll('style')], next = [...replacement.querySelectorAll('style')];
++        if (current.length !== next.length) throw Error('Preview stylesheet shape changed');
++        current.forEach((element, index) => { element.textContent = next[index].textContent; });
++      }, html);
++      const metrics = await page.evaluate(inspectSheet);
++      const retained = await page.evaluate(() => {
++        const before = window.sheetReflowReference;
++        return before.panel === document.querySelector('.config-sheet-panel') && before.input === document.querySelector('.search-input') && before.input.value === '广州' && before.selection === [...document.querySelectorAll('.picker .chip.on')].map(e => e.textContent).join('|');
++      });
++      if (!retained) metrics.issues.push('CSS reflow replaced or reset the draft form');
++      reflows.push({ page: pageName, width, height, retained, ...metrics });
++    }
++  }
++} finally { await browser.close(); }
++verifySources();
++const report = { checkedAt: new Date().toISOString(), renderer: 'Offline Chromium approximation; safe areas and keyboard heights are simulated. Reflow checks preserve the DOM while replacing width-converted CSS. Not WeChat or device lifecycle evidence.', colorScheme: dark ? 'dark' : 'light', sourceHashes: manifest.sourceHashes, summary: { total: records.length + reflows.length, failed: [...records, ...reflows].filter(item => item.issues.length).length, layoutCases: records.length, reflowCases: reflows.length }, screenshotDirectory, records, reflows };
++fs.writeFileSync(path.join(directory, dark ? 'sheet-layout-metrics-dark.json' : 'sheet-layout-metrics.json'), JSON.stringify(report, null, 2));
++console.log(JSON.stringify(report.summary));
++if (report.summary.failed) { console.log(JSON.stringify([...records, ...reflows].filter(item => item.issues.length).slice(0, 12), null, 2)); process.exitCode = 1; }

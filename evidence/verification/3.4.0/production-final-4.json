@@ -1,0 +1,796 @@
+{
+  "deploymentPhase": "final core libraries verified against reviewed source",
+  "updatedAt": "2026-10-23T13:13:21.133Z",
+  "expiresAt": "2026-10-23T13:15:51.133Z",
+  "mode": "scheduled",
+  "state": "running",
+  "groupCount": 31,
+  "intervalMs": 60000,
+  "availableIntervalMs": 0,
+  "notifications": {
+    "authReady": true,
+    "authState": "ready",
+    "checkedAt": "2026-10-23T13:13:02.677Z",
+    "credentialsConfigured": true,
+    "enabled": true,
+    "lastErrorCode": null,
+    "reason": null,
+    "validUntil": "2026-10-23T14:44:03.677Z"
+  },
+  "observationHealth": {
+    "evaluatedAt": "2026-10-23T13:13:21.133Z",
+    "freshGroups": 31,
+    "groupCount": 31,
+    "lastSuccessAt": "2026-10-23T13:13:20.487Z",
+    "oldestSuccessAt": "2026-10-23T13:11:04.704Z",
+    "pendingGroups": 0,
+    "staleAfterMs": 188000,
+    "staleGroups": 0,
+    "state": "healthy"
+  },
+  "budget": {
+    "allowed": true,
+    "reason": null,
+    "dayCount": 32516,
+    "minuteCount": 18
+  },
+  "breaker": {
+    "reason": null,
+    "state": "closed",
+    "until": null
+  },
+  "stats": {
+    "batches": 18,
+    "observations": 39,
+    "events": 0,
+    "tasks": 0,
+    "sent": 0,
+    "lastBatchAt": "2026-10-23T13:13:20.775Z"
+  },
+  "targets": [
+    {
+      "key": "R320|MK2M4CH/A,MK2P4CH/A,MK2T4CH/A",
+      "available": false,
+      "nextDueAt": 1792761156464,
+      "health": {
+        "requests": 1910,
+        "successes": 1903,
+        "failures": 7,
+        "lastRequestAt": 1792761147559,
+        "lastFailureAt": 1792760195733,
+        "lastPersistedSuccessAt": 1792761148932,
+        "persistenceFailures": 0,
+        "requestInterval": {
+          "count": 1909,
+          "maxMs": 174323,
+          "sumMs": 114975133
+        },
+        "successInterval": {
+          "count": 1902,
+          "maxMs": 185347,
+          "sumMs": 114975561
+        }
+      }
+    },
+    {
+      "key": "R359|MK2T4CH/A",
+      "available": false,
+      "nextDueAt": 1792761216356,
+      "health": {
+        "requests": 816,
+        "successes": 806,
+        "failures": 10,
+        "lastRequestAt": 1792761195690,
+        "lastFailureAt": 1792756050899,
+        "lastPersistedSuccessAt": 1792761196618,
+        "persistenceFailures": 0,
+        "requestInterval": {
+          "count": 815,
+          "maxMs": 176161,
+          "sumMs": 49563613
+        },
+        "successInterval": {
+          "count": 805,
+          "maxMs": 177069,
+          "sumMs": 49563340
+        }
+      }
+    },
+    {
+      "key": "R388|MK2P4CH/A,MK2Q4CH/A,MK2T4CH/A,MK2U4CH/A",
+      "available": false,
+      "nextDueAt": 1792761216242,
+      "health": {
+        "requests": 1883,
+        "successes": 1869,
+        "failures": 14,
+        "lastRequestAt": 1792761191886,
+        "lastFailureAt": 1792757015375,
+        "lastPersistedSuccessAt": 1792761192955,
+        "persistenceFailures": 1,
+        "requestInterval": {
+          "count": 1882,
+          "maxMs": 198010,
+          "sumMs": 115083927
+        },
+        "successInterval": {
+          "count": 1868,
+          "maxMs": 197702,
+          "sumMs": 115083345
+        }
+      }
+    },
+    {
+      "key": "R389|MK2P4CH/A,MK2T4CH/A",
+      "available": false,
+      "nextDueAt": 1792761156457,
+      "health": {
+        "requests": 71,
+        "successes": 71,
+        "failures": 0,
+        "lastRequestAt": 1792761144907,
+        "lastFailureAt": null,
+        "lastPersistedSuccessAt": 1792761146344,
+        "persistenceFailures": 0,
+        "requestInterval": {
+          "count": 70,
+          "maxMs": 174118,
+          "sumMs": 4974344
+        },
+        "successInterval": {
+          "count": 70,
+          "maxMs": 174163,
+          "sumMs": 4974926
+        }
+      }
+    },
+    {
+      "key": "R390|MK2P4CH/A,MK2T4CH/A",
+      "available": false,
+      "nextDueAt": 1792761216233,
+      "health": {
+        "requests": 82,
+        "successes": 81,
+        "failures": 1,
+        "lastRequestAt": 1792761189635,
+        "lastFailureAt": 1792759286597,
+        "lastPersistedSuccessAt": 1792761191109,
+        "persistenceFailures": 0,
+        "requestInterval": {
+          "count": 81,
+          "maxMs": 119284,
+          "sumMs": 5017027
+        },
+        "successInterval": {
+          "count": 80,
+          "maxMs": 118601,
+          "sumMs": 5017245
+        }
+      }
+    },
+    {
+      "key": "R401|MK2P4CH/A",
+      "available": false,
+      "nextDueAt": 1792761176953,
+      "health": {
+        "requests": 7198,
+        "successes": 7173,
+        "failures": 25,
+        "lastRequestAt": 1792761128026,
+        "lastFailureAt": 1792761034844,
+        "lastPersistedSuccessAt": 1792761129144,
+        "persistenceFailures": 0,
+        "requestInterval": {
+          "count": 7197,
+          "maxMs": 36276220,
+          "sumMs": 588482119
+        },
+        "successInterval": {
+          "count": 7172,
+          "maxMs": 36276244,
+          "sumMs": 588481189
+        }
+      }
+    },
+    {
+      "key": "R448|MK2M4CH/A,MK2P4CH/A,MK2Q4CH/A,MK2U4CH/A",
+      "available": false,
+      "nextDueAt": 1792761183050,
+      "health": {
+        "requests": 1908,
+        "successes": 1890,
+        "failures": 18,
+        "lastRequestAt": 1792761125106,
+        "lastFailureAt": 1792759280538,
+        "lastPersistedSuccessAt": 1792761126408,
+        "persistenceFailures": 0,
+        "requestInterval": {
+          "count": 1907,
+          "maxMs": 180326,
+          "sumMs": 115017147
+        },
+        "successInterval": {
+          "count": 1889,
+          "maxMs": 198158,
+          "sumMs": 115016535
+        }
+      }
+    },
+    {
+      "key": "R471|MK2P4CH/A",
+      "available": false,
+      "nextDueAt": 1792761156528,
+      "health": {
+        "requests": 1894,
+        "successes": 1881,
+        "failures": 13,
+        "lastRequestAt": 1792761063938,
+        "lastFailureAt": 1792760615286,
+        "lastPersistedSuccessAt": 1792761064704,
+        "persistenceFailures": 0,
+        "requestInterval": {
+          "count": 1893,
+          "maxMs": 183048,
+          "sumMs": 114889925
+        },
+        "successInterval": {
+          "count": 1880,
+          "maxMs": 183790,
+          "sumMs": 114889672
+        }
+      }
+    },
+    {
+      "key": "R479|MK2M4CH/A,MK2P4CH/A",
+      "available": false,
+      "nextDueAt": 1792761216317,
+      "health": {
+        "requests": 7780,
+        "successes": 7758,
+        "failures": 22,
+        "lastRequestAt": 1792761193917,
+        "lastFailureAt": 1792759290680,
+        "lastPersistedSuccessAt": 1792761194697,
+        "persistenceFailures": 0,
+        "requestInterval": {
+          "count": 7779,
+          "maxMs": 17568338,
+          "sumMs": 582132095
+        },
+        "successInterval": {
+          "count": 7757,
+          "maxMs": 17568335,
+          "sumMs": 582131029
+        }
+      }
+    },
+    {
+      "key": "R484|MK2M4CH/A,MK2N4CH/A,MK2P4CH/A,MK2Q4CH/A",
+      "available": false,
+      "nextDueAt": 1792761211477,
+      "health": {
+        "requests": 1904,
+        "successes": 1891,
+        "failures": 13,
+        "lastRequestAt": 1792761187161,
+        "lastFailureAt": 1792759475859,
+        "lastPersistedSuccessAt": 1792761188698,
+        "persistenceFailures": 0,
+        "requestInterval": {
+          "count": 1903,
+          "maxMs": 1859460,
+          "sumMs": 115019187
+        },
+        "successInterval": {
+          "count": 1890,
+          "maxMs": 1859391,
+          "sumMs": 115019910
+        }
+      }
+    },
+    {
+      "key": "R502|MK2P4CH/A,MK2Q4CH/A",
+      "available": false,
+      "nextDueAt": 1792761188103,
+      "health": {
+        "requests": 1896,
+        "successes": 1889,
+        "failures": 7,
+        "lastRequestAt": 1792761128026,
+        "lastFailureAt": 1792759414800,
+        "lastPersistedSuccessAt": 1792761129528,
+        "persistenceFailures": 1,
+        "requestInterval": {
+          "count": 1895,
+          "maxMs": 178711,
+          "sumMs": 115017028
+        },
+        "successInterval": {
+          "count": 1888,
+          "maxMs": 178166,
+          "sumMs": 115016680
+        }
+      }
+    },
+    {
+      "key": "R532|MK2P4CH/A",
+      "available": false,
+      "nextDueAt": 1792761227852,
+      "health": {
+        "requests": 1873,
+        "successes": 1864,
+        "failures": 9,
+        "lastRequestAt": 1792761182870,
+        "lastFailureAt": 1792756030019,
+        "lastPersistedSuccessAt": 1792761183981,
+        "persistenceFailures": 0,
+        "requestInterval": {
+          "count": 1872,
+          "maxMs": 177923,
+          "sumMs": 115007047
+        },
+        "successInterval": {
+          "count": 1863,
+          "maxMs": 178242,
+          "sumMs": 115007431
+        }
+      }
+    },
+    {
+      "key": "R534|MK2M4CH/A,MK2N4CH/A,MK2P4CH/A",
+      "available": false,
+      "nextDueAt": 1792761156464,
+      "health": {
+        "requests": 1877,
+        "successes": 1867,
+        "failures": 10,
+        "lastRequestAt": 1792761150194,
+        "lastFailureAt": 1792760528137,
+        "lastPersistedSuccessAt": 1792761151596,
+        "persistenceFailures": 0,
+        "requestInterval": {
+          "count": 1876,
+          "maxMs": 181024,
+          "sumMs": 114972151
+        },
+        "successInterval": {
+          "count": 1866,
+          "maxMs": 237896,
+          "sumMs": 114972868
+        }
+      }
+    },
+    {
+      "key": "R575|MK2T4CH/A",
+      "available": false,
+      "nextDueAt": 1792761216441,
+      "health": {
+        "requests": 1884,
+        "successes": 1872,
+        "failures": 12,
+        "lastRequestAt": 1792761199525,
+        "lastFailureAt": 1792756294932,
+        "lastPersistedSuccessAt": 1792761200399,
+        "persistenceFailures": 0,
+        "requestInterval": {
+          "count": 1883,
+          "maxMs": 179577,
+          "sumMs": 115023702
+        },
+        "successInterval": {
+          "count": 1871,
+          "maxMs": 225440,
+          "sumMs": 115023093
+        }
+      }
+    },
+    {
+      "key": "R576|MK2M4CH/A,MK2N4CH/A,MK2P4CH/A",
+      "available": false,
+      "nextDueAt": 1792761215954,
+      "health": {
+        "requests": 7812,
+        "successes": 7788,
+        "failures": 24,
+        "lastRequestAt": 1792761187161,
+        "lastFailureAt": 1792756047112,
+        "lastPersistedSuccessAt": 1792761188412,
+        "persistenceFailures": 2,
+        "requestInterval": {
+          "count": 7811,
+          "maxMs": 17541634,
+          "sumMs": 588529359
+        },
+        "successInterval": {
+          "count": 7787,
+          "maxMs": 17541853,
+          "sumMs": 588528795
+        }
+      }
+    },
+    {
+      "key": "R577|MJTF4CH/A,MK2M4CH/A,MK2P4CH/A,MK2Q4CH/A",
+      "available": true,
+      "nextDueAt": 1792761156457,
+      "health": {
+        "requests": 859,
+        "successes": 807,
+        "failures": 52,
+        "lastRequestAt": 1792761147559,
+        "lastFailureAt": 1792758875844,
+        "lastPersistedSuccessAt": 1792761149403,
+        "persistenceFailures": 1,
+        "requestInterval": {
+          "count": 858,
+          "maxMs": 7796300,
+          "sumMs": 114979585
+        },
+        "successInterval": {
+          "count": 806,
+          "maxMs": 7796561,
+          "sumMs": 114979755
+        }
+      }
+    },
+    {
+      "key": "R579|MK2P4CH/A",
+      "available": false,
+      "nextDueAt": 1792761209477,
+      "health": {
+        "requests": 1908,
+        "successes": 1892,
+        "failures": 16,
+        "lastRequestAt": 1792761185206,
+        "lastFailureAt": 1792760374907,
+        "lastPersistedSuccessAt": 1792761186403,
+        "persistenceFailures": 0,
+        "requestInterval": {
+          "count": 1907,
+          "maxMs": 182824,
+          "sumMs": 115052757
+        },
+        "successInterval": {
+          "count": 1891,
+          "maxMs": 184217,
+          "sumMs": 115052445
+        }
+      }
+    },
+    {
+      "key": "R580|MK2P4CH/A,MK2Q4CH/A",
+      "available": false,
+      "nextDueAt": 1792761216404,
+      "health": {
+        "requests": 1876,
+        "successes": 1866,
+        "failures": 10,
+        "lastRequestAt": 1792761197787,
+        "lastFailureAt": 1792759292404,
+        "lastPersistedSuccessAt": 1792761198783,
+        "persistenceFailures": 0,
+        "requestInterval": {
+          "count": 1875,
+          "maxMs": 180027,
+          "sumMs": 115023774
+        },
+        "successInterval": {
+          "count": 1865,
+          "maxMs": 242099,
+          "sumMs": 115024010
+        }
+      }
+    },
+    {
+      "key": "R581|MK2P4CH/A",
+      "available": false,
+      "nextDueAt": 1792761207782,
+      "health": {
+        "requests": 82,
+        "successes": 81,
+        "failures": 1,
+        "lastRequestAt": 1792761185206,
+        "lastFailureAt": 1792759288795,
+        "lastPersistedSuccessAt": 1792761186163,
+        "persistenceFailures": 0,
+        "requestInterval": {
+          "count": 81,
+          "maxMs": 97382,
+          "sumMs": 4980989
+        },
+        "successInterval": {
+          "count": 80,
+          "maxMs": 96976,
+          "sumMs": 4975789
+        }
+      }
+    },
+    {
+      "key": "R609|MK2M4CH/A,MK2N4CH/A,MK2P4CH/A",
+      "available": false,
+      "nextDueAt": 1792761156490,
+      "health": {
+        "requests": 7771,
+        "successes": 7738,
+        "failures": 33,
+        "lastRequestAt": 1792761152791,
+        "lastFailureAt": 1792756694971,
+        "lastPersistedSuccessAt": 1792761153867,
+        "persistenceFailures": 0,
+        "requestInterval": {
+          "count": 7770,
+          "maxMs": 17568338,
+          "sumMs": 588492130
+        },
+        "successInterval": {
+          "count": 7737,
+          "maxMs": 17567563,
+          "sumMs": 588491267
+        }
+      }
+    },
+    {
+      "key": "R637|MK2P4CH/A",
+      "available": false,
+      "nextDueAt": 1792761216374,
+      "health": {
+        "requests": 1902,
+        "successes": 1893,
+        "failures": 9,
+        "lastRequestAt": 1792761195690,
+        "lastFailureAt": 1792756028196,
+        "lastPersistedSuccessAt": 1792761197102,
+        "persistenceFailures": 0,
+        "requestInterval": {
+          "count": 1901,
+          "maxMs": 146233,
+          "sumMs": 115067785
+        },
+        "successInterval": {
+          "count": 1892,
+          "maxMs": 208420,
+          "sumMs": 115067598
+        }
+      }
+    },
+    {
+      "key": "R638|MK2P4CH/A",
+      "available": false,
+      "nextDueAt": 1792761216317,
+      "health": {
+        "requests": 1897,
+        "successes": 1887,
+        "failures": 10,
+        "lastRequestAt": 1792761193917,
+        "lastFailureAt": 1792757074698,
+        "lastPersistedSuccessAt": 1792761194986,
+        "persistenceFailures": 0,
+        "requestInterval": {
+          "count": 1896,
+          "maxMs": 180511,
+          "sumMs": 115063560
+        },
+        "successInterval": {
+          "count": 1886,
+          "maxMs": 181842,
+          "sumMs": 115063588
+        }
+      }
+    },
+    {
+      "key": "R639|MJTF4CH/A,MK2M4CH/A,MK2P4CH/A,MK2Q4CH/A",
+      "available": true,
+      "nextDueAt": 1792761215954,
+      "health": {
+        "requests": 1844,
+        "successes": 1808,
+        "failures": 36,
+        "lastRequestAt": 1792761189635,
+        "lastFailureAt": 1792760554525,
+        "lastPersistedSuccessAt": 1792761190958,
+        "persistenceFailures": 0,
+        "requestInterval": {
+          "count": 1843,
+          "maxMs": 416246,
+          "sumMs": 115069470
+        },
+        "successInterval": {
+          "count": 1807,
+          "maxMs": 415727,
+          "sumMs": 115069091
+        }
+      }
+    },
+    {
+      "key": "R644|MJTA4CH/A",
+      "available": true,
+      "nextDueAt": 1792761216441,
+      "health": {
+        "requests": 658,
+        "successes": 652,
+        "failures": 6,
+        "lastRequestAt": 1792761199525,
+        "lastFailureAt": 1792758097300,
+        "lastPersistedSuccessAt": 1792761200487,
+        "persistenceFailures": 0,
+        "requestInterval": {
+          "count": 657,
+          "maxMs": 446521265,
+          "sumMs": 588535780
+        },
+        "successInterval": {
+          "count": 651,
+          "maxMs": 446521800,
+          "sumMs": 588535187
+        }
+      }
+    },
+    {
+      "key": "R645|MK2M4CH/A,MK2P4CH/A,MK2T4CH/A,MK2U4CH/A",
+      "available": false,
+      "nextDueAt": 1792761216233,
+      "health": {
+        "requests": 7785,
+        "successes": 7758,
+        "failures": 27,
+        "lastRequestAt": 1792761191886,
+        "lastFailureAt": 1792759284304,
+        "lastPersistedSuccessAt": 1792761192822,
+        "persistenceFailures": 0,
+        "requestInterval": {
+          "count": 7784,
+          "maxMs": 17569535,
+          "sumMs": 582366753
+        },
+        "successInterval": {
+          "count": 7757,
+          "maxMs": 17569166,
+          "sumMs": 582366586
+        }
+      }
+    },
+    {
+      "key": "R646|MK2N4CH/A,MK2P4CH/A,MK2Q4CH/A",
+      "available": false,
+      "nextDueAt": 1792761156490,
+      "health": {
+        "requests": 7807,
+        "successes": 7776,
+        "failures": 31,
+        "lastRequestAt": 1792761152791,
+        "lastFailureAt": 1792759115599,
+        "lastPersistedSuccessAt": 1792761154138,
+        "persistenceFailures": 0,
+        "requestInterval": {
+          "count": 7806,
+          "maxMs": 17568886,
+          "sumMs": 588486000
+        },
+        "successInterval": {
+          "count": 7775,
+          "maxMs": 17568631,
+          "sumMs": 588486162
+        }
+      }
+    },
+    {
+      "key": "R678|MK2P4CH/A,MK2T4CH/A",
+      "available": false,
+      "nextDueAt": 1792761216374,
+      "health": {
+        "requests": 819,
+        "successes": 812,
+        "failures": 7,
+        "lastRequestAt": 1792761197787,
+        "lastFailureAt": 1792758155629,
+        "lastPersistedSuccessAt": 1792761198657,
+        "persistenceFailures": 0,
+        "requestInterval": {
+          "count": 818,
+          "maxMs": 177223,
+          "sumMs": 49611516
+        },
+        "successInterval": {
+          "count": 811,
+          "maxMs": 211044,
+          "sumMs": 49610987
+        }
+      }
+    },
+    {
+      "key": "R683|MK2P4CH/A",
+      "available": false,
+      "nextDueAt": 1792761156528,
+      "health": {
+        "requests": 79,
+        "successes": 78,
+        "failures": 1,
+        "lastRequestAt": 1792761092431,
+        "lastFailureAt": 1792759175872,
+        "lastPersistedSuccessAt": 1792761093800,
+        "persistenceFailures": 0,
+        "requestInterval": {
+          "count": 78,
+          "maxMs": 104240,
+          "sumMs": 4857392
+        },
+        "successInterval": {
+          "count": 77,
+          "maxMs": 186095,
+          "sumMs": 4857751
+        }
+      }
+    },
+    {
+      "key": "R761|MK2M4CH/A,MK2N4CH/A,MK2P4CH/A,MK2Q4CH/A",
+      "available": false,
+      "nextDueAt": 1792761171385,
+      "health": {
+        "requests": 1187,
+        "successes": 1177,
+        "failures": 10,
+        "lastRequestAt": 1792761122111,
+        "lastFailureAt": 1792757615493,
+        "lastPersistedSuccessAt": 1792761124030,
+        "persistenceFailures": 0,
+        "requestInterval": {
+          "count": 1186,
+          "maxMs": 41756716,
+          "sumMs": 114944068
+        },
+        "successInterval": {
+          "count": 1176,
+          "maxMs": 41757418,
+          "sumMs": 114945039
+        }
+      }
+    },
+    {
+      "key": "R792|MK2P4CH/A,MK2Q4CH/A,MK2T4CH/A,MK2U4CH/A",
+      "available": false,
+      "nextDueAt": 1792761156465,
+      "health": {
+        "requests": 7769,
+        "successes": 7721,
+        "failures": 48,
+        "lastRequestAt": 1792761150194,
+        "lastFailureAt": 1792759294245,
+        "lastPersistedSuccessAt": 1792761151803,
+        "persistenceFailures": 2,
+        "requestInterval": {
+          "count": 7768,
+          "maxMs": 17541449,
+          "sumMs": 582325061
+        },
+        "successInterval": {
+          "count": 7720,
+          "maxMs": 17541817,
+          "sumMs": 582325392
+        }
+      }
+    },
+    {
+      "key": "R793|MK2M4CH/A,MK2N4CH/A,MK2P4CH/A,MK2Q4CH/A",
+      "available": false,
+      "nextDueAt": 1792761196920,
+      "health": {
+        "requests": 1929,
+        "successes": 1921,
+        "failures": 8,
+        "lastRequestAt": 1792761182870,
+        "lastFailureAt": 1792756475165,
+        "lastPersistedSuccessAt": 1792761184086,
+        "persistenceFailures": 0,
+        "requestInterval": {
+          "count": 1928,
+          "maxMs": 149090,
+          "sumMs": 115059939
+        },
+        "successInterval": {
+          "count": 1920,
+          "maxMs": 210301,
+          "sumMs": 115059544
+        }
+      }
+    }
+  ]
+}

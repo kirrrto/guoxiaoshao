@@ -116,7 +116,9 @@ function createScheduler(options) {
   function nextFixedDue(key, plannedAt, nowMs) {
     const interval = Math.max(1, opts.intervalMs);
     let next = plannedAt + interval;
-    if (next < nowMs) next = slotAfter(key, nowMs);
+    // A completion exactly on a later phase has already consumed this turn.
+    // Keep the next normal slot strictly in the future, never catch up twice.
+    if (next <= nowMs) next = slotAfter(key, nowMs + 1);
     return next;
   }
 
@@ -144,6 +146,10 @@ function createScheduler(options) {
   }
 
   function configure({ intervalMs, maxConcurrency, timeoutMs, burstIntervalMs, burstQuietMs, availableIntervalMs, fixedCadence } = {}) {
+    const cadenceChanged = (intervalMs !== undefined && intervalMs !== opts.intervalMs)
+      || (availableIntervalMs !== undefined && availableIntervalMs !== opts.availableIntervalMs)
+      || (burstIntervalMs !== undefined && burstIntervalMs !== opts.burstIntervalMs)
+      || (fixedCadence !== undefined && Boolean(fixedCadence) !== Boolean(opts.fixedCadence));
     if (fixedCadence !== undefined) opts.fixedCadence = Boolean(fixedCadence);
     if (availableIntervalMs !== undefined) {
       if (!Number.isSafeInteger(availableIntervalMs) || availableIntervalMs < 0 || availableIntervalMs > 60000 || (availableIntervalMs > 0 && availableIntervalMs < 1000)) throw new TypeError('invalid available interval');
@@ -161,7 +167,9 @@ function createScheduler(options) {
       if (!Number.isSafeInteger(intervalMs) || intervalMs < 1000) throw new TypeError('invalid collector interval');
       opts.intervalMs = intervalMs;
     }
-    if (intervalMs !== undefined || availableIntervalMs !== undefined || burstIntervalMs !== undefined) {
+    // Periodic target refreshes reapply the same settings. Replanning then can
+    // skip an overdue fixed slot just before tick() has a chance to dispatch it.
+    if (cadenceChanged) {
       for (const e of groups.values()) if (!e.failures && e.health.lastRequestAt !== null) e.nextDueAt = plannedDueAt(e, e.health.lastRequestAt, clock().getTime());
     }
     if (maxConcurrency !== undefined) {
@@ -261,9 +269,13 @@ function createScheduler(options) {
     const finishedMs = clock().getTime();
     const { record, observations } = result;
     if (record.budgetDenied) {
-      entry.nextDueAt = record.retryAt || finishedMs + 60000;
-      entry.guardUntil = entry.nextDueAt;
-      entry.guardReason = record.error && record.error.message || null;
+      const retryAt = record.retryAt || finishedMs + 60000;
+      const reason = record.error && record.error.message || null;
+      // Cancellation happens before HTTP starts. Keep the unserved slot and
+      // its queue priority; the guard alone prevents an immediate retry.
+      if (reason !== 'request_cancelled') entry.nextDueAt = retryAt;
+      entry.guardUntil = retryAt;
+      entry.guardReason = reason;
       // The automatic lane is shared by every store. Once it is exhausted,
       // polling other groups only repeats the same database admission check.
       if (ADMISSION_REASONS.has(entry.guardReason) && entry.guardUntil >= admissionUntil) {
@@ -475,7 +487,13 @@ function createScheduler(options) {
         : entry.health.lastRequestAt + savedIntervalMs;
       const normalCadenceChanged = cadenceChanged && item.nextDueAt === previousNormalDue;
       if ((entry.available || normalCadenceChanged) && !entry.failures && !entry.guardUntil && entry.health.lastRequestAt !== null) {
-        entry.nextDueAt = plannedDueAt(entry, entry.health.lastRequestAt, restoredAt);
+        const recalculatedDueAt = plannedDueAt(entry, entry.health.lastRequestAt, restoredAt);
+        // An available result is retained even when its fast cadence is off.
+        // With fixed phases, slotAfter(now) would otherwise move overdue work
+        // into the next scan window on every cold start, starving late phases.
+        // Dispatch it once; the ordinary completion path skips missed slots.
+        entry.nextDueAt = opts.fixedCadence && !cadenceChanged && item.nextDueAt <= restoredAt
+          ? Math.min(item.nextDueAt, recalculatedDueAt) : recalculatedDueAt;
       }
     }
     if (saved.breaker && ['closed', 'open', 'half_open'].includes(saved.breaker.state)) {

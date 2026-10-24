@@ -28,6 +28,38 @@ test('fresh timer heartbeats cannot declare delivery ready when all 17 real obse
   assert.equal(result.collector.observationHealth.staleGroups, 17);
   assert.equal(result.notifications.deliveryReady, false);
   assert.equal(result.notifications.reason, 'collector_observation_stale');
+  assert.equal(result.notifications.senderReady, true, 'stock freshness does not invalidate current sender authentication');
+  assert.equal(result.notifications.senderReason, null);
+});
+
+test('sender authentication failures remain visible when stock observations are also delayed', () => {
+  for (const successAt of [now.getTime() - 1000, now.getTime() - 3600000]) {
+    const status = heartbeat([target('R577|SKU', successAt)]);
+    status.notifications = { ...status.notifications, authReady: false, authState: 'failed', reason: 'consumer_auth_failed' };
+    const result = monitoringSnapshot(config, status, now);
+    assert.equal(result.notifications.senderReady, false);
+    assert.equal(result.notifications.senderReason, 'consumer_auth_failed');
+    assert.equal(result.notifications.deliveryReady, false);
+    assert.equal(result.notifications.reason, successAt === now.getTime() - 1000 ? 'consumer_auth_failed' : 'collector_observation_stale');
+    assert.doesNotMatch(JSON.stringify(result.notifications), /validUntil|authState|credentials|token|secret/);
+  }
+});
+
+test('an old or stopped heartbeat cannot prove the sender remains ready even with unexpired authentication', () => {
+  const status = heartbeat([target('R577|SKU', now.getTime() - 1000)]);
+  const cases = [
+    [config, status, new Date(now.getTime() + 150001), 'collector_stale'],
+    [config, { ...status, state: 'stopped' }, now, 'collector_stopped'],
+    [{ ...config, collector: { ...config.collector, enabled: false } }, status, now, 'collector_stopped'],
+    [{ ...config, notifications: { ...config.notifications, enabled: false } }, status, now, 'notifications_disabled'],
+    [config, null, now, 'collector_not_deployed'],
+  ];
+  for (const [settings, worker, checkedAt, reason] of cases) {
+    const result = monitoringSnapshot(settings, worker, checkedAt);
+    assert.equal(result.notifications.senderReady, false, reason);
+    assert.equal(result.notifications.senderReason, reason);
+    assert.equal(result.notifications.deliveryReady, false);
+  }
 });
 
 test('a healthy target cannot hide another stalled target or unpersisted success', () => {

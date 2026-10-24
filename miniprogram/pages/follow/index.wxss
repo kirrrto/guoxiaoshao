@@ -120,6 +120,14 @@
 .reminder-status-copy { gap:2rpx; flex-basis:260rpx; }
 .reminder-details-toggle.ui-action { padding:10rpx 14rpx; font-size:24rpx; min-height:44px; }
 .reminder-direct-button { margin-top:12rpx; min-height:44px; }
+.reminder-health-summary { display:flex; gap:12px; margin-top:12px; padding:12px; border-radius:12px; background:var(--surface-soft); }
+.reminder-health-item { display:flex; flex:1 1 0%; min-width:0; flex-direction:column; gap:4px; }
+.reminder-health-item + .reminder-health-item { border-left:1px solid var(--line); padding-left:12px; }
+.reminder-health-label { color:var(--text-2); font-size:12px; line-height:1.5; }
+.reminder-health-value { color:var(--text-2); font-size:14px; line-height:1.5; font-weight:600; overflow-wrap:anywhere; }
+.reminder-health-value--ok { color:var(--green-dark); }
+.reminder-health-value--warn, .reminder-health-value--bad { color:var(--warn); }
+.reminder-health-warning { margin-top:10px; color:var(--warn); font-size:14px; line-height:1.6; overflow-wrap:anywhere; }
 
 .consent-recovery {
   margin-top: 12rpx;

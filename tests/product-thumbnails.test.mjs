@@ -119,15 +119,14 @@ test('product-image failures keep provenance but never fall back to the large ne
   const rt = runtime(), original = catalog.products.find(product => product.familyKey === 'iphone-duo').imageUrl;
   const image = withImageFit({ imageUrl: original });
   const query = rt.instance('pages/query/index.js');
-  query.data.result = { product: clone(image) }; query.data.selectionSummary = clone(image); query.data.openingCalendar = clone(image);
-  query.onResultImageError(); query.onSelectionImageError(); query.onCalendarImageError();
+  query.data.result = { product: clone(image) }; query.data.selectionSummary = clone(image);
+  query.onResultImageError(); query.onSelectionImageError();
   assert.equal(query.data.result.product.imageDisplayUrl, ''); assert.equal(query.data.result.product.imageUrl, original);
-  assert.equal(query.data.selectionImageFailed, true); assert.equal(query.data.openingCalendar.imageDisplayUrl, '');
+  assert.equal(query.data.selectionImageFailed, true);
   const follow = rt.instance('pages/follow/index.js'); follow.data.follows = [clone(image)]; follow.onFollowImageError({ currentTarget: { dataset: { index: 0 } } });
   assert.equal(follow.data.follows[0].imageDisplayUrl, ''); assert.equal(follow.data.follows[0].imageUrl, original);
   const picker = rt.instance('components/target-picker/index.js'); picker.data.product = clone(image); picker.onImageError(); assert.equal(picker.data.imageFailed, true);
   const mine = rt.instance('pages/mine/index.js'); mine.data.checkoutTarget = clone(image); mine.onCheckoutImageError(); assert.equal(mine.data.checkoutTarget.imageDisplayUrl, '');
-  const guide = rt.instance('pages/guide/index.js'); guide.data.calendars = [clone(image)]; guide.onCalendarImageError({ currentTarget: { dataset: { index: 0 } } }); assert.equal(guide.data.calendars[0].imageDisplayUrl, '');
 });
 
 test('all product image templates bind only display resources and opt into WeChat WebP decoding', () => {
@@ -140,7 +139,7 @@ test('all product image templates bind only display resources and opt into WeCha
       images++;
     }
   }
-  assert.equal(images, 8);
+  assert.equal(images, 6);
   const calendar = require('../miniprogram/utils/launch-calendar').calendarView(require('../miniprogram/config/product-launches')[0]);
   assert.match(calendar.imageDisplayUrl, /-poster\.(?:png|jpg)$/);
 });

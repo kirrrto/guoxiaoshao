@@ -1,0 +1,30 @@
+{
+  "gxs_api": {
+    "taskId": "confirmation_cloud_fn_inc_deploy_64c92b04-8313-4186-8836-9b83b47a56ec",
+    "status": "success",
+    "tool": "cloud_fn_inc_deploy",
+    "scope": [
+      "package.json",
+      "package-lock.json"
+    ]
+  },
+  "gxs_monitor": {
+    "taskId": "confirmation_cloud_fn_inc_deploy_8b074b25-e59c-4340-b8e9-09ac3da1cdff",
+    "status": "success",
+    "tool": "cloud_fn_inc_deploy",
+    "scope": [
+      "package.json",
+      "package-lock.json",
+      "lib-manifest.json"
+    ]
+  },
+  "cloudbase_auth": {
+    "taskId": "confirmation_cloud_fn_inc_deploy_6079433c-d775-48a9-b2d9-2a661464c95d",
+    "status": "success",
+    "tool": "cloud_fn_inc_deploy",
+    "scope": [
+      "package.json",
+      "package-lock.json"
+    ]
+  }
+}

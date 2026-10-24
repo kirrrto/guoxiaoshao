@@ -1,0 +1,111 @@
+{
+  "cleanupDeployment": {
+    "success": true,
+    "taskId": "confirmation_cloud_fn_inc_deploy_144913b3-9ba9-45f2-a2a8-1c8c3c0edfb1",
+    "taskType": "confirmation_cloud_fn_inc_deploy",
+    "status": "success",
+    "createdAt": 1792801405321,
+    "updatedAt": 1792801413070,
+    "detail": "execution_success",
+    "result": {
+      "name": "gxs_api",
+      "filesCount": 1,
+      "packSize": "5.9 KB"
+    }
+  },
+  "formalEntryRestore": {
+    "success": true,
+    "taskId": "confirmation_cloud_fn_inc_deploy_05f6dd8c-0d5a-442f-b20f-33e403b24a12",
+    "taskType": "confirmation_cloud_fn_inc_deploy",
+    "status": "success",
+    "createdAt": 1792801445630,
+    "updatedAt": 1792801452853,
+    "detail": "execution_success",
+    "result": {
+      "name": "gxs_api",
+      "filesCount": 1,
+      "packSize": "488 B"
+    }
+  },
+  "cleanupCounts": {
+    "checkedAt": "2026-10-24T00:24:38.065Z",
+    "collections": {
+      "config": {
+        "total": 2,
+        "data": [
+          {},
+          {
+            "cleanedAt": "2026-10-24T00:23:44.455Z",
+            "nextStep": 6
+          }
+        ]
+      },
+      "follows": {
+        "total": 0,
+        "data": []
+      },
+      "latest": {
+        "total": 0,
+        "data": []
+      },
+      "events": {
+        "total": 0,
+        "data": []
+      },
+      "observation_days": {
+        "total": 0,
+        "data": []
+      },
+      "notifications": {
+        "total": 0,
+        "data": []
+      }
+    }
+  },
+  "runtimeCheck": {
+    "ping": {
+      "ok": true,
+      "data": {
+        "version": "3.4.0",
+        "env": "flowermean-6gjaxfqhf6c13e88",
+        "appid": "wxe96ad9e77b602f1b",
+        "crossAccount": true,
+        "hasUser": true,
+        "isAdmin": true
+      },
+      "serverTime": "2026-10-24T00:24:40.847Z",
+      "requestId": "df662d98-cca7-433b-a8ea-480db40c6250"
+    },
+    "removed": {
+      "ok": false,
+      "error": {
+        "code": "unknown_action",
+        "message": "未知操作：release.v340.acceptance",
+        "details": null
+      },
+      "serverTime": "2026-10-24T00:24:41.657Z",
+      "requestId": "679b7def-3934-4472-8143-685d1e3b2f6c"
+    }
+  },
+  "downloadedSource": {
+    "report": "final-deployed-source-comparison.json",
+    "passed": true,
+    "comparedFiles": 123,
+    "indexSHA256": "23a2a126d8b58ad5b8dc2ff562d301e3826dc040fdbec7a78342b15dd75b9208"
+  },
+  "lockFiles": [
+    {
+      "name": "gxs_api",
+      "match": true
+    },
+    {
+      "name": "gxs_monitor",
+      "match": true
+    },
+    {
+      "name": "cloudbase_auth",
+      "match": true
+    }
+  ],
+  "verifiedAt": "2026-10-24T00:25:19.120Z"
+}

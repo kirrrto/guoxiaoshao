@@ -1,0 +1,168 @@
+{
+  "checkedAt": "2026-10-23T09:22:29.869Z",
+  "sourceVersion": "3.3.2",
+  "published": false,
+  "sourceFingerprint": "sha256:ab3d32993ba02531b75ece1820919cd4efb4237cf095dade6cb44ea605160907",
+  "tests": {
+    "total": 1614,
+    "passed": 1614,
+    "failed": 0,
+    "skipped": 0
+  },
+  "ui": {
+    "scope": "Offline Chromium approximation. Simulated keyboard/safe areas and in-place CSS reflow; not WeChat physical-device lifecycle acceptance.",
+    "total": 1500,
+    "reports": {
+      "mainLight": {
+        "total": 318,
+        "indexNavigationFailures": 0,
+        "expressionErrors": 0,
+        "missingText": 0,
+        "forbiddenText": 0,
+        "horizontalOverflow": 0,
+        "clippedText": 0,
+        "failedImages": 0,
+        "alternativeLayoutFailures": 0,
+        "calendarLayoutFailures": 0,
+        "membershipLayoutFailures": 0,
+        "notificationLayoutFailures": 0,
+        "v3LayoutFailures": 0,
+        "stockLayoutFailures": 0
+      },
+      "mainDark": {
+        "total": 318,
+        "indexNavigationFailures": 0,
+        "expressionErrors": 0,
+        "missingText": 0,
+        "forbiddenText": 0,
+        "horizontalOverflow": 0,
+        "clippedText": 0,
+        "failedImages": 0,
+        "alternativeLayoutFailures": 0,
+        "calendarLayoutFailures": 0,
+        "membershipLayoutFailures": 0,
+        "notificationLayoutFailures": 0,
+        "v3LayoutFailures": 0,
+        "stockLayoutFailures": 0
+      },
+      "sheetsLight": {
+        "total": 84,
+        "indexNavigationFailures": 0,
+        "expressionErrors": 0,
+        "missingText": 0,
+        "forbiddenText": 0,
+        "horizontalOverflow": 0,
+        "clippedText": 0,
+        "failedImages": 0,
+        "alternativeLayoutFailures": 0,
+        "calendarLayoutFailures": 0,
+        "membershipLayoutFailures": 0,
+        "notificationLayoutFailures": 0,
+        "v3LayoutFailures": 0,
+        "stockLayoutFailures": 0
+      },
+      "sheetsDark": {
+        "total": 84,
+        "indexNavigationFailures": 0,
+        "expressionErrors": 0,
+        "missingText": 0,
+        "forbiddenText": 0,
+        "horizontalOverflow": 0,
+        "clippedText": 0,
+        "failedImages": 0,
+        "alternativeLayoutFailures": 0,
+        "calendarLayoutFailures": 0,
+        "membershipLayoutFailures": 0,
+        "notificationLayoutFailures": 0,
+        "v3LayoutFailures": 0,
+        "stockLayoutFailures": 0
+      },
+      "sheetStressLight": {
+        "total": 348,
+        "failed": 0,
+        "layoutCases": 336,
+        "reflowCases": 12
+      },
+      "sheetStressDark": {
+        "total": 348,
+        "failed": 0,
+        "layoutCases": 336,
+        "reflowCases": 12
+      }
+    }
+  },
+  "nativeCompile": [
+    {
+      "compiler": "wcc",
+      "files": 11,
+      "exitCode": 0,
+      "diagnostics": "",
+      "bytes": 337889
+    },
+    {
+      "compiler": "wcsc",
+      "files": 15,
+      "exitCode": 0,
+      "diagnostics": "",
+      "bytes": 29249
+    }
+  ],
+  "cloud": {
+    "readOnly": true,
+    "envId": "flowermean-6gjaxfqhf6c13e88",
+    "functions": [
+      {
+        "name": "gxs_api",
+        "status": "Active",
+        "timeout": 60,
+        "runtime": "Nodejs18.15"
+      },
+      {
+        "name": "gxs_monitor",
+        "status": "Active",
+        "timeout": 60,
+        "runtime": "Nodejs20.19"
+      },
+      {
+        "name": "cloudbase_auth",
+        "status": "Active",
+        "timeout": 5,
+        "runtime": "Nodejs18.15"
+      }
+    ],
+    "downloadedRuntimeSourceMatches": true,
+    "comparedFiles": 123,
+    "liveRuntimeConfigurationRead": false,
+    "observationIntervalsVerified": false,
+    "deliveryBacklogVerified": false,
+    "physicalReceiptVerified": false
+  },
+  "release": {
+    "sourceChecksPassed": true,
+    "passed": false,
+    "publicationReady": false,
+    "qualityBlockers": [
+      {
+        "id": "unused-channel-video",
+        "code": "finding_open",
+        "message": "四个主页面被报告声明了未使用的 channel-video 组件: unresolved since 3.3.1."
+      },
+      {
+        "id": "custom-tabbar-first-switch",
+        "code": "finding_open",
+        "message": "WebView 自定义底部导航首次切换闪烁: unresolved since 3.3.1."
+      },
+      {
+        "id": "oversized-product-image",
+        "code": "finding_open",
+        "message": "商品图片过大: unresolved since 3.3.1."
+      },
+      {
+        "id": "legacy-product-image-format",
+        "code": "finding_open",
+        "message": "商品图片格式未通过质检建议: unresolved since 3.3.1."
+      }
+    ]
+  },
+  "backup": "/tmp/gxs-ux-20261023-baseline"
+}

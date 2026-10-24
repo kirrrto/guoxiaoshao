@@ -214,13 +214,23 @@ test('complete image-enabled catalog never crosses the render bridge; a saved se
   assert.equal(updates.length, 1, 'the same catalog object is not re-applied');
 });
 
-test('isolated picker styles contain only class selectors and no imported global selectors', () => {
-  const css = fs.readFileSync(path.join(root, 'components/target-picker/index.wxss'), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+function assertIsolatedPickerStyles(source) {
+  const css = source.replace(/\/\*[\s\S]*?\*\//g, '');
   assert.doesNotMatch(css, /@import/);
   for (const match of css.matchAll(/([^{}]+)\{/g)) {
-    // The dark-mode media query is an at-rule prelude, not a selector.
-    if (match[1].trim() === '@media (prefers-color-scheme: dark)') continue;
+    // Skip only the media prelude. matchAll still visits every nested rule,
+    // including width/height breakpoints; none of their selectors are exempt.
+    if (/^@media\s+\([^{}]+\)$/.test(match[1].trim())) continue;
     for (const selector of match[1].split(',')) { assert.match(selector.trim(), /^\./); assert.doesNotMatch(selector, /\[|#/); }
+  }
+}
+
+test('isolated picker styles contain only class selectors and no imported global selectors', () => {
+  assertIsolatedPickerStyles(fs.readFileSync(path.join(root, 'components/target-picker/index.wxss'), 'utf8'));
+  for (const query of ['(prefers-color-scheme: dark)', '(min-width: 600px)', '(max-height: 600px)']) {
+    assert.doesNotThrow(() => assertIsolatedPickerStyles(`@media ${query} { .picker { color: green; } }`));
+    assert.throws(() => assertIsolatedPickerStyles(`@media ${query} { view { color: green; } }`), 'media wrappers must not hide forbidden element selectors');
+    assert.throws(() => assertIsolatedPickerStyles(`@media ${query} { .picker, #global { color: green; } }`), 'all selectors inside each media rule remain checked');
   }
 });
 

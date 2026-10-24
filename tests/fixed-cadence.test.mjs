@@ -217,3 +217,143 @@ test('schedule metrics record planned slot, start delay and last success separat
   assert.ok(Number.isFinite(t.health.lastRequestAt), 'actual request start recorded');
   assert.ok(Number.isFinite(t.health.lastSuccessAt), 'last success recorded');
 });
+
+test('scheduled cold starts retain overdue available groups whose fixed phase falls after the scan window', async () => {
+  let nowMs = base, calls = 0;
+  const options = { intervalMs: 60000, fixedCadence: true, alignIntervalMs: 60000,
+    availableIntervalMs: 0, burstIntervalMs: 0, clock: () => new Date(nowMs),
+    fetchPickup: async ({ storeNumber, partNumbers }) => {
+      calls++;
+      return { record: { httpStatus: 200, elapsedMs: 0 }, observations: partNumbers.map(partNumber => ({ storeNumber, partNumber, status: 'available' })) };
+    }, onBatch: async () => ({ persisted: true, changed: false }), log: { warn() {}, error() {} } };
+  const candidates = buildGroups(Array.from({ length: 100 }, (_, i) => ({ partNumber: 'PHASE-SKU', storeNumbers: [`R${i}`] })));
+  const phases = createScheduler(options); phases.setTargets(candidates);
+  const late = phases.checkpoint().targets.find(target => target.nextDueAt - base > 40000);
+  assert.ok(late, 'fixture includes a phase outside a 35-second scheduled scan');
+  const group = candidates.find(candidate => candidate.key === late.key);
+  const warm = createScheduler(options); warm.setTargets([group]);
+  nowMs = late.nextDueAt; await Promise.all(warm.tick());
+  let saved = structuredClone(warm.checkpoint());
+  assert.equal(saved.targets[0].available, true);
+  for (let invocation = 0; invocation < 3; invocation++) {
+    nowMs = base + (invocation + 2) * 60000 + 3000;
+    const overdueAt = saved.targets[0].nextDueAt;
+    assert.ok(overdueAt < nowMs);
+    const cold = createScheduler(options); cold.setTargets([group]); cold.restore(saved);
+    assert.equal(cold.checkpoint().targets[0].nextDueAt, overdueAt, 'restoring an available result must not move an overdue fixed slot into this minute');
+    const before = calls;
+    await Promise.all(cold.tick());
+    assert.equal(calls, before + 1, 'the already-due group runs at the beginning of every invocation');
+    assert.equal(cold.tick().length, 0, 'a missed interval never creates catch-up bursts');
+    saved = structuredClone(cold.checkpoint());
+  }
+});
+
+test('reapplying unchanged fixed cadence cannot skip a due group during target refresh', async () => {
+  const h = harness({ groupCount: 1, options: { intervalMs: 60000, fixedCadence: true }, upstream: () => ({ status: 'available' }) });
+  h.state.nowMs = h.scheduler.checkpoint().targets[0].nextDueAt;
+  await h.runTick();
+  const dueAt = h.scheduler.checkpoint().targets[0].nextDueAt;
+  h.state.nowMs = dueAt + 1000;
+  h.scheduler.configure({ intervalMs: 60000, fixedCadence: true, availableIntervalMs: 0, burstIntervalMs: 0, maxConcurrency: 2 });
+  assert.equal(h.scheduler.checkpoint().targets[0].nextDueAt, dueAt, 'an unchanged settings refresh leaves due work queued');
+  await h.runTick();
+  assert.equal(h.calls.length, 2);
+});
+
+test('recovered fixed work completing exactly on a later phase cannot dispatch twice at that time', async () => {
+  for (const restore of [false, true]) {
+    let nowMs = base, calls = 0;
+    const options = { intervalMs: 8000, fixedCadence: true, availableIntervalMs: 0, burstIntervalMs: 0,
+      clock: () => new Date(nowMs),
+      fetchPickup: async () => { calls++; return { record: { httpStatus: 200, elapsedMs: 0 }, observations: [{ status: 'available' }] }; },
+      onBatch: async () => ({ persisted: true, changed: false }) };
+    const groups = [{ key: 'R577|SKU', storeNumber: 'R577', partNumbers: ['SKU'] }];
+    let scheduler = createScheduler(options); scheduler.setTargets(groups);
+    nowMs = scheduler.checkpoint().targets[0].nextDueAt;
+    await Promise.all(scheduler.tick());
+    assert.equal(scheduler.checkpoint().targets[0].nextDueAt, nowMs + 8000, 'a zero-duration on-time request retains the next regular slot');
+    const saved = structuredClone(scheduler.checkpoint());
+    nowMs = saved.targets[0].nextDueAt + 8000;
+    if (restore) { scheduler = createScheduler(options); scheduler.setTargets(groups); scheduler.restore(saved); }
+    assert.equal(scheduler.checkpoint().targets[0].nextDueAt, saved.targets[0].nextDueAt, 'one overdue slot stays queued');
+    await Promise.all(scheduler.tick());
+    assert.equal(calls, 2);
+    assert.equal(scheduler.checkpoint().targets[0].nextDueAt, nowMs + 8000, 'normal cadence skips the phase just consumed by recovery');
+    assert.equal(scheduler.tick().length, 0, 'a second tick at the same instant cannot replay missed work');
+    nowMs += 8000;
+    await Promise.all(scheduler.tick());
+    assert.equal(calls, 3, 'normal sampling resumes at the following slot');
+  }
+});
+
+test('a pre-request cancellation retains the fixed phase while its retry guard survives a cold start', async () => {
+  for (const restore of [false, true]) {
+    let nowMs = base, attempts = 0, persisted = 0;
+    const options = { intervalMs: 60000, fixedCadence: true, burstIntervalMs: 0, availableIntervalMs: 0,
+      clock: () => new Date(nowMs),
+      fetchPickup: async () => ++attempts === 1
+        ? { record: { budgetDenied: true, retryAt: nowMs + 1000, error: { message: 'request_cancelled' } }, observations: [] }
+        : { record: { httpStatus: 200 }, observations: [{ status: 'unavailable' }] },
+      onBatch: async () => { persisted++; return { persisted: true, changed: false }; } };
+    const groups = [{ key: 'R577|SKU', storeNumber: 'R577', partNumbers: ['SKU'] }];
+    let scheduler = createScheduler(options); scheduler.setTargets(groups);
+    const originalDue = scheduler.checkpoint().targets[0].nextDueAt;
+    nowMs = originalDue + 20000;
+    await Promise.all(scheduler.tick());
+    const saved = structuredClone(scheduler.checkpoint()), cancelled = saved.targets[0];
+    assert.equal(cancelled.nextDueAt, originalDue, 'work that never reached HTTP keeps its original slot');
+    assert.equal(cancelled.guardUntil, nowMs + 1000);
+    assert.equal(cancelled.health.requests, 0);
+    assert.equal(cancelled.failures, 0);
+    assert.equal(persisted, 0);
+    if (restore) { scheduler = createScheduler(options); scheduler.setTargets(groups); scheduler.restore(saved); }
+    nowMs = cancelled.guardUntil - 1;
+    assert.equal(scheduler.tick().length, 0, 'preserving priority must not bypass the retry guard');
+    nowMs = cancelled.guardUntil + 10000;
+    await Promise.all(scheduler.tick());
+    const recovered = scheduler.checkpoint().targets[0];
+    assert.equal(attempts, 2);
+    assert.equal(recovered.nextDueAt, originalDue + 60000, 'a cancellation must not move the stable phase to its retry time');
+    assert.equal(recovered.guardUntil, 0);
+    assert.equal(recovered.guardReason, null);
+    assert.equal(recovered.health.requests, 1);
+    assert.equal(persisted, 1);
+    assert.equal(scheduler.tick().length, 0, 'recovery cannot dispatch again at the same instant');
+  }
+});
+
+test('a cancelled overdue group remains ahead of later due work after a scheduled cold start', async () => {
+  let nowMs = base;
+  const groups = [
+    { key: 'oldest', storeNumber: 'R1', partNumbers: ['SKU'] },
+    { key: 'later-a', storeNumber: 'R2', partNumbers: ['SKU'] },
+    { key: 'later-b', storeNumber: 'R3', partNumbers: ['SKU'] },
+  ];
+  const options = { intervalMs: 60000, fixedCadence: true, maxConcurrency: 2,
+    burstIntervalMs: 0, availableIntervalMs: 0, clock: () => new Date(nowMs),
+    onBatch: async () => ({ persisted: true, changed: false }) };
+  const warm = createScheduler({ ...options, fetchPickup: async () => ({
+    record: { budgetDenied: true, retryAt: nowMs + 1000, error: { message: 'request_cancelled' } }, observations: [] }) });
+  warm.setTargets([groups[0]]);
+  const originalDue = warm.checkpoint().targets[0].nextDueAt;
+  nowMs = originalDue + 20000;
+  await Promise.all(warm.tick());
+  const saved = structuredClone(warm.checkpoint());
+  const cancelled = saved.targets[0];
+  // Other groups became due while this group's invocation ran out of time.
+  for (const [index, group] of groups.slice(1).entries()) saved.targets.push({
+    ...structuredClone(cancelled), key: group.key, nextDueAt: originalDue + (index + 1) * 10000,
+    guardUntil: 0, guardReason: null,
+  });
+  nowMs = originalDue + 30000;
+  const starts = [];
+  const cold = createScheduler({ ...options, fetchPickup: async ({ storeNumber }) => {
+    starts.push(storeNumber);
+    return { record: { httpStatus: 200 }, observations: [{ status: 'unavailable' }] };
+  } });
+  cold.setTargets(groups); cold.restore(saved);
+  await Promise.all(cold.tick());
+  assert.deepEqual(starts, ['R1', 'R2'], 'the oldest unserved group gets one of the first two recovery slots');
+  assert.equal(cold.checkpoint().targets.find(target => target.key === 'later-b').health.requests, 0);
+});

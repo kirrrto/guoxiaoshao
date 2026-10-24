@@ -8,6 +8,16 @@
 // Keep technical details and complete acceptance records in release documents.
 const RELEASE_NOTES = [
   {
+    version: '3.4.0',
+    title: '库存监测与提醒更稳定',
+    dateText: '发布候选 · 2026-10-23',
+    highlights: [
+      '修复部分关注库存长时间不更新，改善提醒处理。',
+      '库存检测与微信发送状态分开显示，提醒情况更清楚。',
+      '移除过时海报，优化大屏选配和键盘弹出时的操作。',
+    ],
+  },
+  {
     version: '3.3.2',
     title: '服务恢复与会员时长补偿',
     dateText: '本地候选 · 2026-10-21',

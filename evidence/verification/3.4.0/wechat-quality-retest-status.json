@@ -1,0 +1,23 @@
+{
+  "checkedAt": "2026-10-24T00:15:29.520Z",
+  "version": "3.4.0",
+  "sourceFingerprint": "sha256:2fae39fb185f42555a2c23a6907527477c4c02288957b535d7fccd190974736f",
+  "status": "deferred_by_maintainer_pending_core_stability",
+  "uploaded": false,
+  "submitted": false,
+  "published": false,
+  "officialCurrentBuildRetestReceived": false,
+  "openFindings": [
+    "unused-channel-video",
+    "custom-tabbar-first-switch",
+    "oversized-product-image",
+    "legacy-product-image-format"
+  ],
+  "accessBlocker": {
+    "surface": "Chrome via computer tool",
+    "error": "Computer Use is not allowed on the current browser URL",
+    "action": "Stopped computer use; did not bypass restriction"
+  },
+  "maintainerDecision": "暂不上传，先完成核心稳定性验收",
+  "next": "After core acceptance and maintainer upload instruction, upload development build, run WeChat official cloud test, attach task and per-item device results."
+}

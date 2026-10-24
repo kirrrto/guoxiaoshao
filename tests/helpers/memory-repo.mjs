@@ -172,7 +172,7 @@ export function createMemoryRepo(seed = {}) {
         .sort((a, b) => byDesc('createdAt')(a, b) || byDesc('_id')(a, b));
       return { items: rows.slice(0, limit), hasMore: rows.length > limit };
     },
-    async listUnprocessedEvents({ limit = 100, since = null } = {}) { return all(COLLECTIONS.events).filter(e => ALERT_TYPES.has(e.type) && !e.notificationPlannedAt && (!since || e.detectedAt >= since)).sort((a, b) => byAsc('detectedAt')(a, b) || byAsc('_id')(a, b)).slice(0, limit); },
+    async listUnprocessedEvents({ limit = 100, since = null, cursor = null } = {}) { return all(COLLECTIONS.events).filter(e => ALERT_TYPES.has(e.type) && !e.notificationPlannedAt && (!since || e.detectedAt >= since) && (!cursor || e.detectedAt > cursor.detectedAt || e.detectedAt === cursor.detectedAt && e._id > cursor.id)).sort((a, b) => byAsc('detectedAt')(a, b) || byAsc('_id')(a, b)).slice(0, limit); },
     async getEvent(id) { return get(COLLECTIONS.events, id); },
     async markEventPlanned(id, nowIso) { const event = get(COLLECTIONS.events, id); if (event) put(COLLECTIONS.events, { ...event, notificationPlannedAt: nowIso }); },
     async listPendingNotifications({ limit = 100 } = {}) { return all(COLLECTIONS.notifications).filter(t => t.status === 'pending').sort((a, b) => byAsc('createdAt')(a, b) || byAsc('_id')(a, b)).slice(0, limit); },

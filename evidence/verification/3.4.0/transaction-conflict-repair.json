@@ -1,0 +1,88 @@
+{
+  "kind": "local-candidate-transaction-conflict-repair",
+  "version": "3.4.0",
+  "verifiedAt": "2026-10-24T00:16:08.118Z",
+  "status": "deployed_source_verified_and_live_window_completed",
+  "rootCause": {
+    "observed": "Production snapshots include recent document.set -501001 ResourceUnavailable.TransactionConflict errors despite the existing SDK code mapping.",
+    "limits": "Latest error fields and lifetime max intervals do not prove every overnight failure or max interval was caused by conflict.",
+    "sdk": "Pinned wx-server-sdk 4.0.2 and @cloudbase/database 1.5.1: default retry count 3 means four attempts. The default recursive loop neither waits nor aborts each failed attempt before retry. Wrapped callback mapping does not catch raw ResourceUnavailable.TransactionConflict returned by commit."
+  },
+  "changes": [
+    "Use db.runTransaction(callback, 0), preserving four total attempts with explicit-conflict-only retry after the SDK rollback path.",
+    "Jitter waits 25-49, 50-99, 100-199 ms; total additional waiting 175-347 ms. Generic/uncertain writes and commits are never replayed. No message-send retry added.",
+    "Successful upstream observations do not rewrite an already-clean closed breaker. Real failure reset, probe ownership, expiration, generation and cooldown behavior remain checked."
+  ],
+  "validation": {
+    "focused": {
+      "tests": 47,
+      "pass": 47,
+      "fail": 0,
+      "skip": 0,
+      "log": "/tmp/gxs-core-20261024-transaction/focused-tests.log"
+    },
+    "newRegressionAgainstPreviousCode": {
+      "tests": 9,
+      "pass": 2,
+      "fail": 7,
+      "skip": 0,
+      "log": "/tmp/gxs-core-20261024-transaction/baseline-tests.log",
+      "meaning": "Real SDK get/set/canonical commit conflict cases leave one un-aborted transaction; raw ResourceUnavailable commit fails; healthy outcomes rewrite clean breaker."
+    },
+    "monitorBuild": {
+      "files": 43,
+      "passed": true
+    },
+    "full": {
+      "tests": 1642,
+      "pass": 1642,
+      "fail": 0,
+      "skip": 0,
+      "durationMs": 59163.257625,
+      "log": "transaction-full-tests.log"
+    },
+    "source": {
+      "files": 549,
+      "errors": 0,
+      "log": "transaction-source-check.log"
+    },
+    "productionWindow": "post-transaction-window-2026-10-24.json",
+    "downloadedSource": "final-deployed-source-comparison.json"
+  },
+  "remaining": [
+    "Short production window cannot establish an all-day strict 60-second SLA; persistent conflicts after four attempts still fail visibly."
+  ],
+  "files": [
+    {
+      "path": "cloudfunctions/gxs_api/lib/repo/cloudbase-repo.js",
+      "sha256": "b3887555131942733cfae8e292250e4738a36efe65ef00a9c133243c7531fba7",
+      "bytes": 25487
+    },
+    {
+      "path": "cloudfunctions/gxs_api/lib/repo/upstream-guard.js",
+      "sha256": "50d64cd91ad9f4c31014c6d18fda893eb0cc388ced4ca8edd877912c01036b69",
+      "bytes": 8222
+    },
+    {
+      "path": "cloudfunctions/gxs_monitor/lib/repo/cloudbase-repo.js",
+      "sha256": "b3887555131942733cfae8e292250e4738a36efe65ef00a9c133243c7531fba7",
+      "bytes": 25487
+    },
+    {
+      "path": "cloudfunctions/gxs_monitor/lib/repo/upstream-guard.js",
+      "sha256": "50d64cd91ad9f4c31014c6d18fda893eb0cc388ced4ca8edd877912c01036b69",
+      "bytes": 8222
+    },
+    {
+      "path": "cloudfunctions/gxs_monitor/lib-manifest.json",
+      "sha256": "261d9788e707d22f15774a4e976c655f52471447ae148d115011ee2ca3a25471",
+      "bytes": 7026
+    },
+    {
+      "path": "tests/transaction-conflict-recovery.test.mjs",
+      "sha256": "c0101b4d0846016d68d2683470b64411eb72ab115b8756fb5a35a0555b1af069",
+      "bytes": 7171
+    }
+  ],
+  "deployedAt": "2026-10-24T00:18:06.651Z"
+}

@@ -1,17 +1,6 @@
 @import '../../styles/common.wxss';
-@import '../../styles/launch-calendar.wxss';
 .guide-page { max-width: 960px; margin: 0 auto; padding-bottom: calc(40rpx + env(safe-area-inset-bottom)); }
 .guide-section-title { font-size: 32rpx; font-weight: 650; line-height: 1.45; }
-.guide-card-heading { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12rpx 16rpx; margin-bottom: 20rpx; }
-.guide-card-heading .poster-stage { flex: none; }
-
-/* Launch card: the poster and two dates stay visible; the month grid folds. */
-.guide-launch .poster-hero { padding-top: 22rpx; }
-.guide-poster-title { margin-top: 0; }
-.guide-month { margin-top: 20rpx; }
-.guide-launch-note { margin-top: 20rpx; color: var(--text-2); font-size: max(12px, 24rpx); line-height: 1.65; }
-.guide-launch-action.btn.btn { margin-top: 20rpx; }
-.guide-launch-source { margin-top: 14rpx; color: var(--text-3); font-size: max(12px, 22rpx); line-height: 1.6; text-align: center; }
 
 /* Four stages read as one stepper inside the card they control. */
 .guide-steps-heading { margin-bottom: 22rpx; }
@@ -39,12 +28,6 @@ button.guide-stepper-item.guide-stepper-item--on { color: var(--green-dark); fon
 
 @media (min-width: 600px) {
   .guide-section-title { font-size: 20px; }
-  .guide-card-heading { gap: 8px 12px; margin-bottom: 14px; }
-  .guide-launch { max-width: 640px; margin-left: auto; margin-right: auto; }
-  .guide-month { margin-top: 14px; }
-  .guide-launch-note { margin-top: 14px; font-size: 13px; }
-  .guide-launch-action.btn.btn { margin-top: 14px; }
-  .guide-launch-source { font-size: 12px; }
   .guide-stepper { margin: -4px -6px 18px; }
   button.guide-stepper-item.guide-stepper-item { font-size: 14px; }
   .guide-stepper-label { font-size: 13px; }

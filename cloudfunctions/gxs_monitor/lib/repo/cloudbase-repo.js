@@ -57,10 +57,10 @@ async function transactionGet(transaction, collection, id) {
   }
 }
 
-function createCloudbaseRepo(db) {
+function createCloudbaseRepo(db, { sleep = ms => new Promise(resolve => setTimeout(resolve, ms)), random = Math.random } = {}) {
   const _ = db.command;
   const col = name => db.collection(name);
-  const run = body => db.runTransaction(async transaction => {
+  const transaction = body => db.runTransaction(async transaction => {
     const cache = new Map();
     const get = async (collection, id) => {
       const key = `${collection}\0${id}`;
@@ -77,16 +77,23 @@ function createCloudbaseRepo(db) {
       else await transaction.collection(collection).add({ data: doc });
       cache.set(`${collection}\0${_id}`, doc);
     };
-    try {
-      return await body({ get, put });
-    } catch (error) {
-      // wx-server-sdk wraps read/write errors and can discard CloudBase's
-      // string code. Restore only the explicit transaction-conflict signal so
-      // the SDK's bounded retry loop also covers read/write conflicts.
-      if (isTransactionConflict(error)) error.code = 'DATABASE_TRANSACTION_CONFLICT';
-      throw error;
+    return body({ get, put });
+  }, 0);
+  const run = async body => {
+    // Keep the SDK's original four-attempt budget. Disabling its immediate
+    // recursive retries makes it roll back the failed transaction first.
+    // Then jitter only explicit conflicts; an uncertain network/write outcome
+    // must escape unchanged. These callbacks contain database work, never sends.
+    for (let attempt = 0; ; attempt++) {
+      try { return await transaction(body); }
+      catch (error) {
+        if (attempt >= 3 || !isTransactionConflict(error)) throw error;
+        const baseMs = 25 * 2 ** attempt;
+        // Total retry waiting stays below 350ms across all three retries.
+        await sleep(baseMs + Math.floor(random() * baseMs));
+      }
     }
-  });
+  };
   const readIds = async (collection, ids) => {
     const unique = [...new Set(ids)];
     const result = [];
@@ -355,9 +362,10 @@ function createCloudbaseRepo(db) {
       return { items, hasMore: Boolean(extra.data && extra.data.length) };
     },
     /** Alert events not yet planned; `since` skips a backlog too old to alert about. */
-    async listUnprocessedEvents({ limit = 100, since = null } = {}) {
+    async listUnprocessedEvents({ limit = 100, since = null, cursor = null } = {}) {
       const where = [{ type: _.in([...ALERT_TYPES]) }, _.or([{ notificationPlannedAt: _.eq(null) }, { notificationPlannedAt: _.exists(false) }])];
       if (since) where.push({ detectedAt: _.gte(since) });
+      if (cursor) where.push(_.or([{ detectedAt: _.gt(cursor.detectedAt) }, { detectedAt: cursor.detectedAt, _id: _.gt(cursor.id) }]));
       return readAll(col(COLLECTIONS.events).where(_.and(where)).orderBy('detectedAt', 'asc').orderBy('_id', 'asc'), limit);
     },
     async getEvent(id) {

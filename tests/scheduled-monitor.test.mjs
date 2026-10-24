@@ -16,11 +16,11 @@ const event = { Type: 'Timer', TriggerName: TRIGGER_NAME };
 
 test('scheduled budget survives the SCF Node.js 20 remaining-time helper failure', () => {
   const context = { getRemainingTimeInMillis() { throw new TypeError('client.ms_elapsed is not a function'); } };
-  assert.equal(runBudgetMs(context), 35000);
+  assert.equal(runBudgetMs(context), 45000);
   assert.equal(runBudgetMs(context, 12000), 12000);
-  assert.equal(runBudgetMs({}), 35000);
-  assert.equal(runBudgetMs(null), 35000);
-  assert.equal(runBudgetMs({ getRemainingTimeInMillis: () => NaN }), 35000);
+  assert.equal(runBudgetMs({}), 45000);
+  assert.equal(runBudgetMs(null), 45000);
+  assert.equal(runBudgetMs({ getRemainingTimeInMillis: () => NaN }), 45000);
 });
 
 test('scheduled budget preserves the platform method receiver and reserves cleanup time', () => {
@@ -60,6 +60,97 @@ async function distributeStores(f, stores) {
       storeNumbers: stores.slice(i, i + 3), status: 'active', createdAt: f.state.now.toISOString() });
   }
 }
+
+test('the fallback covers 31 overdue groups with database overhead and still honours short platform budgets', async () => {
+  async function scenario(options = {}) {
+    const f = createFixture({ config: {
+      collector: { enabled: true, cadenceMode: 'fixed', intervalSeconds: 60, maxConcurrency: 2,
+        burstIntervalSeconds: 0, availableIntervalSeconds: 0, budgetMode: 'continuous',
+        maxRequestsPerDay: 800000, maxRequestsPerMinute: 600 },
+      notifications: { enabled: false },
+    } });
+    const base = f.state.now.getTime(), partNumber = 'MJYH4CH/A';
+    await f.call('user.bootstrap');
+    const seed = await f.repo.getUser(userKeyOf());
+    for (let index = 0; index < 31; index++) {
+      const userKey = `window-member-${index}`, storeNumber = `R${1000 + index}`, followId = `WF${index}`;
+      const follow = { _id: followId, userKey, partNumber, storeNumbers: [storeNumber], status: 'active', createdAt: f.state.now.toISOString() };
+      await f.repo.createUser({ ...seed, _id: userKey, followIndex: [follow], membership: { expiresAt: '2027-10-15T00:00:00.000Z' } });
+      await f.repo.saveFollow(follow);
+      const at = f.state.now.toISOString();
+      await f.repo.saveLatest({ _id: `${storeNumber}|${partNumber}`, storeNumber, partNumber, status: 'unavailable',
+        statusSince: at, knownStreakSince: at, knownAt: at, observedAt: at, unknownSince: null });
+    }
+    // Every group is already due: measure scan throughput, not initial phase waiting.
+    await f.repo.saveCollectorStatus({ _id: 'collector_status', mode: 'scheduled', intervalMs: 60000,
+      budget: { budgetMode: 'continuous' }, stats: {}, scheduler: { version: 1, intervalMs: 60000,
+        targets: Array.from({ length: 31 }, (_, index) => ({ key: `R${1000 + index}|${partNumber}`, nextDueAt: base - 24000, failures: 0 })) } });
+    let nowMs = base, sequence = 0;
+    const timers = [];
+    const sleep = ms => new Promise(resolve => timers.push({ at: nowMs + ms, sequence: sequence++, resolve }));
+    // Concurrent operations share elapsed time; do not add two parallel DB waits.
+    for (const name of Object.keys(f.repo)) {
+      if (typeof f.repo[name] !== 'function') continue;
+      const original = f.repo[name];
+      f.repo[name] = async (...args) => { await sleep(200); return original(...args); };
+    }
+    const upstream = fakeFetch(() => ({ display: 'unavailable' }));
+    const starts = [];
+    let active = 0, maxActive = 0;
+    const signalTimeouts = new WeakMap(), nativeTimeout = AbortSignal.timeout;
+    AbortSignal.timeout = ms => { const signal = new AbortController().signal; signalTimeouts.set(signal, ms); return signal; };
+    const fetchImpl = async (...args) => {
+      starts.push(nowMs - base); maxActive = Math.max(maxActive, ++active);
+      try {
+        const timeout = signalTimeouts.get(args[1]?.signal) ?? Infinity;
+        await sleep(Math.min(800, timeout));
+        if (timeout < 800) throw Object.assign(new Error('fixture network timeout'), { name: 'TimeoutError' });
+        return await upstream(...args);
+      } finally { active--; }
+    };
+    let completed = false, result, error;
+    try {
+      const work = runScheduled({ repo: f.repo, fetchImpl, sendImpl: null, clock: () => new Date(nowMs),
+        log, sleep, ownerId: 'window-test', ...options }).then(value => { result = value; completed = true; }, caught => { error = caught; completed = true; });
+      for (let turns = 0; !completed; turns++) {
+        assert.ok(turns < 10000, 'the virtual run must terminate');
+        await new Promise(resolve => setImmediate(resolve));
+        if (completed) break;
+        timers.sort((a, b) => a.at - b.at || a.sequence - b.sequence);
+        assert.ok(timers.length, 'the virtual run must not deadlock');
+        nowMs = timers[0].at; f.state.now = new Date(nowMs);
+        while (timers.length && timers[0].at === nowMs) timers.shift().resolve();
+      }
+      await work;
+      if (error) throw error;
+    } finally { AbortSignal.timeout = nativeTimeout; }
+    const status = f.repo.tables.get(C.config).get('collector_status');
+    const lease = f.repo.tables.get(C.config).get('collector_lease');
+    return { result, elapsedMs: nowMs - base, starts, maxActive, status,
+      uniqueStores: new Set(upstream.calls.map(call => call.storeNumber)).size,
+      persistedGroups: status.scheduler.targets.filter(target => target.health.lastPersistedSuccessAt >= base).length,
+      leaseReleased: Date.parse(lease.expiresAt) <= nowMs };
+  }
+
+  const legacy = await scenario({ maxRunMs: 35000 });
+  assert.ok(legacy.uniqueStores < 31, 'the old window leaves already-due tail groups unvisited');
+  assert.ok(legacy.persistedGroups < 31);
+  const brokenContext = { getRemainingTimeInMillis() { throw new TypeError('client.ms_elapsed is not a function'); } };
+  for (const options of [{}, { maxRunMs: runBudgetMs(brokenContext) }]) {
+    const extended = await scenario(options);
+    assert.equal(extended.uniqueStores, 31);
+    assert.equal(extended.persistedGroups, 31, 'all stores must have durable observations, not just started requests');
+    assert.ok(extended.maxActive <= 2, 'extra coverage must not raise concurrency');
+    assert.ok(extended.starts.every(at => at < 45000), 'the work deadline still stops new HTTP requests');
+    assert.ok(extended.elapsedMs < 60000, 'this bounded DB scenario retains cleanup time inside the deployment timeout');
+    assert.equal(extended.leaseReleased, true);
+    assert.equal(extended.status.budget.allowed, true);
+  }
+  const short = await scenario({ maxRunMs: runBudgetMs({ getRemainingTimeInMillis: () => 5500 }) });
+  assert.equal(short.uniqueStores, 0, 'a valid short platform budget must not fall back to 45 seconds');
+  assert.equal(short.starts.length, 0);
+  assert.equal(short.leaseReleased, true);
+});
 
 test('production monitor entry publishes a fresh heartbeat when the platform time helper throws', async () => {
   const s = await setup();

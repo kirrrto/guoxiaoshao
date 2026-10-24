@@ -2,7 +2,6 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
 import { runtime } from './helpers/miniprogram-runtime.mjs';
-import { nativeTabBar } from './helpers/native-tab-bar.mjs';
 const require = createRequire(import.meta.url);
 const { activeCalendars, calendarView, guideNote, shouldOpenCalendar, withFollowReadiness } = require('../miniprogram/utils/launch-calendar');
 const entry = require('../miniprogram/config/product-launches')[0];
@@ -36,7 +35,7 @@ test('launch dates use Monday-first Beijing calendar independent of device timez
   assert.equal(calendarView(entry, Date.parse('2026-10-11T16:00:00Z')).cells.filter(cell => cell.today)[0].day, 12);
 });
 
-test('opening notice stops after launch day while manual calendar remains available', () => {
+test('archived calendar data distinguishes opening and editorial expiry', () => {
   assert.equal(activeCalendars(Date.parse('2026-10-23T15:59:59Z'), true).length, 1);
   assert.equal(activeCalendars(Date.parse('2026-10-23T16:00:00Z'), true).length, 0);
   assert.equal(activeCalendars(Date.parse('2026-10-24T00:00:00Z')).length, 1);
@@ -73,149 +72,54 @@ test('frequency is once per Beijing date and dismissal applies to this launch re
   assert.equal(shouldOpenCalendar({ ...calendar, id: 'updated-official-dates' }, { ...saved, muted: true }, now), true);
 });
 
-function pageRuntime() {
-  const rt = runtime();
-  rt.load('utils/launch-calendar.js').activeCalendars = () => [calendar];
-  const page = rt.instance('pages/query/index.js');
-  const bar = nativeTabBar(rt);
-  page.visible = true;
-  page.setData({ ready: true });
-  return { rt, page, bar };
-}
-
-test('opening poster announces follow readiness and retracts it when the catalog changes', async () => {
-  const { rt, page } = pageRuntime();
-  const catalog = rt.load('utils/store.js').currentCatalog();
-  page.catalog = catalog;
-  page.calendarViewReady = true;
-  await page.maybeOpenCalendar();
-  assert.equal(page.data.openingCalendar.followNotice, '已支持保存关注');
-  page.applyCatalog({ ...catalog, version: `${catalog.version}-revoked`,
-    products: catalog.products.map(product => product.familyKey === entry.familyKey ? { ...product, supported: false } : product) });
-  assert.equal(page.data.openingCalendar.followNotice, '');
-  assert.equal(rt.calls.length, 0);
-  page.onUnload();
-});
-
-test('guide poster reads the current catalog, follows refreshes and removes its listener on unload', () => {
-  const rt = runtime();
-  rt.load('utils/launch-calendar.js').activeCalendars = () => [calendar];
-  const store = rt.load('utils/store.js');
-  let refresh, removed = false;
-  store.subscribeCatalog = listener => { refresh = listener; return () => { removed = true; }; };
-  const page = rt.instance('pages/guide/index.js');
-  page.onLoad({ section: 'calendar', from: 'query' }); page.onShow();
-  assert.equal(page.data.calendars[0].followNotice, '已支持保存关注');
-  refresh({ products: [] });
-  assert.equal(page.data.calendars[0].followNotice, '');
-  page.onUnload();
-  assert.equal(removed, true);
-  assert.equal(rt.calls.length, 0);
-});
-
-test('query calendar and Mine help enter the guide with distinct visible content and no automatic actions', () => {
+test('query and Mine help open the buying guide without performing business actions', () => {
   const rt = runtime(), routes = [], scrolls = [];
   rt.wx.navigateTo = value => routes.push(value.url);
   rt.wx.pageScrollTo = value => scrolls.push(value);
-  rt.load('utils/launch-calendar.js').activeCalendars = () => [calendar];
   const query = rt.instance('pages/query/index.js'), mine = rt.instance('pages/mine/index.js');
   query.onOpenGuide(); mine.onHelp();
-  assert.deepEqual(routes, ['/pages/guide/index?section=calendar&from=query', '/pages/guide/index?section=prepare&from=mine']);
+  assert.deepEqual(routes, ['/pages/guide/index?section=prepare&from=query', '/pages/guide/index?section=prepare&from=mine']);
   const page = rt.instance('pages/guide/index.js');
-  page.onLoad(Object.fromEntries(new URLSearchParams(routes[0].split('?')[1])));
-  page.onShow(); if (page.onReady) page.onReady();
-  assert.equal(page.data.showLaunchPoster, true);
-  assert.equal(page.data.calendars.length, 1);
-  assert.equal(page.data.calendarExpanded, false, 'only the month grid is initially folded');
-  assert.equal(page.data.stageId, 'prepare');
-  assert.equal(page.data.stage.steps.length, 3, 'purchase guidance is already available without an expand action');
-  assert.equal(page.returnSource, 'query');
-  page.onLoad(Object.fromEntries(new URLSearchParams(routes[1].split('?')[1])));
-  page.onShow(); if (page.onReady) page.onReady();
-  assert.equal(page.data.showLaunchPoster, false);
-  assert.equal(page.data.calendars.length, 0);
-  assert.equal(page.data.stageId, 'prepare');
-  assert.equal(page.data.stage.steps.length, 3);
-  assert.equal(page.returnSource, 'mine');
+  for (const [index, source] of ['query', 'mine'].entries()) {
+    page.onLoad(Object.fromEntries(new URLSearchParams(routes[index].split('?')[1])));
+    page.onShow();
+    assert.equal(page.data.section, 'prepare');
+    assert.equal(page.data.stageId, 'prepare');
+    assert.equal(page.data.stage.steps.length, 3, 'buying guidance is immediately available');
+    assert.equal(page.returnSource, source);
+  }
   assert.deepEqual(scrolls, []);
   assert.equal(rt.calls.length, 0);
   assert.equal(rt.messages.length, 0);
   page.onUnload();
 });
 
-test('poster opt-in survives catalog refresh while image failure preserves dates and guide content', () => {
-  const rt = runtime();
-  rt.load('utils/launch-calendar.js').activeCalendars = () => [calendar];
+test('old calendar links retain their target and return path while opening current buying help', () => {
+  const rt = runtime(), routes = [];
+  rt.wx.switchTab = value => routes.push(value.url);
+  const store = rt.load('utils/store.js'), catalog = store.currentCatalog();
+  const product = catalog.products.find(item => item.supported && !item.comingSoon);
+  const storeNumber = Object.keys(catalog.storeByNumber)[0];
+  let refresh, removed = false;
+  store.subscribeCatalog = listener => { refresh = listener; return () => { removed = true; }; };
   const page = rt.instance('pages/guide/index.js');
-  for (const options of [{}, { from: 'query' }, { section: 'prepare', stage: 'pickup' }, { section: 'notification' }, { section: 'membership' }, { section: 'pickup' }, { section: 'unknown' }]) {
-    page.onLoad(options);
-    page.refreshCalendars(rt.load('utils/store.js').currentCatalog());
-    assert.equal(page.data.showLaunchPoster, false);
-    assert.equal(page.data.calendars.length, 0);
-    if (options.section === 'prepare') assert.equal(page.data.stageId, 'prepare');
-  }
-  page.onLoad({ section: 'calendar', from: 'query', stage: 'pickup' });
+  page.onLoad({ section: 'calendar', from: 'query', stage: 'pickup', gxsPart: encodeURIComponent(product.partNumber), gxsStores: storeNumber });
+  page.onShow();
+  assert.equal(page.data.section, 'prepare');
   assert.equal(page.data.stageId, 'prepare');
-  page.onCalendarImageError({ currentTarget: { dataset: { index: '0' } } });
-  assert.equal(page.data.calendars[0].imageUrl, calendar.imageUrl, 'retain the verified source as provenance');
-  assert.equal(page.data.calendars[0].imageDisplayUrl, '', 'hide a failed poster without loading the large original');
-  assert.equal(page.data.calendars[0].preorderDateText, calendar.preorderDateText);
-  assert.equal(page.data.calendars[0].releaseDateText, calendar.releaseDateText);
+  assert.equal(page.data.targetSummary.title, product.title);
   assert.equal(page.data.stage.steps.length, 3);
-  page.onToggleCalendar();
-  assert.equal(page.data.calendarExpanded, true);
+  refresh({ productByPart: {}, storeByNumber: {} });
+  assert.equal(page.data.targetSummary, null, 'removed targets are not shown after catalog refresh');
+  page.onReturnTask();
+  assert.deepEqual(routes, ['/pages/query/index']);
+  page.onUnload();
+  assert.equal(removed, true);
   assert.equal(rt.calls.length, 0);
+  assert.equal(rt.storage.size, 0);
 });
 
-test('opening calendar waits for first render, performs no API calls, and releases tab on close', async () => {
-  const { rt, page, bar } = pageRuntime();
-  await page.maybeOpenCalendar();
-  assert.equal(page.data.calendarOpen, false);
-  page.calendarViewReady = true;
-  await Promise.all([page.maybeOpenCalendar(), page.maybeOpenCalendar()]);
-  assert.equal(page.data.calendarOpen, true);
-  assert.equal(bar.hidden, true);
-  assert.equal(rt.calls.length, 0);
-  page.onCalendarMute({ detail: { value: ['mute'] } });
-  page.onCloseCalendar();
-  assert.equal(page.data.calendarOpen, false);
-  assert.equal(bar.hidden, false);
-  assert.equal(rt.storage.get(page.calendarStorageKey).muted, true);
-  page.calendarChecked = false;
-  await page.maybeOpenCalendar();
-  assert.equal(page.data.calendarOpen, false);
-});
-
-test('async cache response cannot open a hidden page or interrupt an active editor', async () => {
-  const { rt, page } = pageRuntime();
-  let response;
-  rt.wx.getStorage = options => { response = options.success; };
-  page.calendarViewReady = true;
-  const pending = page.maybeOpenCalendar();
-  page.visible = false;
-  response({ data: null });
-  await pending;
-  assert.equal(page.data.calendarOpen, false);
-  assert.equal(rt.storage.has('gxs_launch_calendar_iphone-duo'), false);
-  page.visible = true;
-  page.setData({ sheetVisible: true });
-  await page.maybeOpenCalendar();
-  assert.equal(page.data.calendarOpen, false);
-});
-
-test('share and single-page entries keep their intended journey without an opening overlay', async () => {
-  for (const mode of ['share', 'single']) {
-    const { rt, page } = pageRuntime();
-    page.calendarViewReady = true;
-    if (mode === 'share') page.enteredFromShare = true;
-    else rt.app.globalData.singlePage = true;
-    await page.maybeOpenCalendar();
-    assert.equal(page.data.calendarOpen, false);
-    assert.equal(rt.calls.length, 0);
-  }
-});
-
-test('guide actions stay inside the mini program', () => {
+test('guide actions preserve all four buying stages and explicit test-notification navigation', () => {
   const rt = runtime();
   const navigations = [];
   rt.wx.switchTab = options => navigations.push(options.url);
@@ -233,7 +137,6 @@ test('guide actions stay inside the mini program', () => {
   page.onSelectStage({ currentTarget: { dataset: { id: 'pickup' } } });
   page.onStageAction();
   page.onTestNotification();
-  page.onCalendarPlan();
-  assert.deepEqual(navigations, ['/pages/query/index', '/pages/follow/index', '/pages/follow/index', '/pages/follow/index', '/pages/notification-test/index?from=guide', '/pages/query/index']);
+  assert.deepEqual(navigations, ['/pages/query/index', '/pages/follow/index', '/pages/follow/index', '/pages/follow/index', '/pages/notification-test/index?from=guide']);
   assert.equal(rt.calls.length, 0);
 });

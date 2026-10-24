@@ -271,7 +271,7 @@ if (membershipNativePreview) {
 if (orderRecordsPreview) scenarios.splice(0, scenarios.length, 'orders-single', 'orders-deleting', 'orders-clearing', 'orders-error', 'orders-pending', 'orders-empty', 'orders-legacy');
 if (sheetPreview) {
   scenarios.splice(0, scenarios.length, 'sheet-edit', 'sheet-keyboard', 'sheet-longcontent', 'sheet-saving');
-  widths.splice(0, widths.length, 320, 375, 390, 430);
+  widths.splice(0, widths.length, 320, 375, 390, 430, 600, 768, 1024);
 }
 if (releaseNotesPreview) scenarios.splice(0, scenarios.length, 'free', 'member', 'release-middle', 'release-last', 'release-collapsed', 'longcontent');
 if (onboardingPreview) scenarios.splice(0, scenarios.length, 'onboarding-first', 'onboarding-signing', 'onboarding-error', 'onboarding-signed', 'onboarding-shared', 'onboarding-share-pending', 'onboarding-share-catalog', 'onboarding-share-error');
@@ -627,7 +627,6 @@ for (const scenario of scenarios) {
     // Notification feedback requires a visible page, just like an actual tap
     // in WeChat. onLoad alone now intentionally represents a hidden preload.
     if ((alternativesPreview || notificationTestPreview || v2Preview) && scenario !== 'notification-test-loading' && typeof page.onShow === 'function') await page.onShow();
-    if (pageName === 'guide' && scenario === 'v3-guide-calendar-expanded') page.onToggleCalendar();
     if (v2Preview && pageName === 'mine') await page.restoreCheckoutContext();
     if (scenario.startsWith('v3-dnd-')) {
       page.onToggleReminderSettings();
@@ -660,7 +659,7 @@ for (const scenario of scenarios) {
     }
     if (pageName === 'guide' && scenario === 'v2-guide-faq' && page.data.faqOpen !== 'notification') page.onToggleFaq({ currentTarget: { dataset: { id: 'notification' } } });
     if (scenario === 'v2-calendar-modal') {
-      page.onReady();
+      if (page.onReady) page.onReady();
       for (let count = 0; count < 8; count++) await Promise.resolve();
       if (page.data.calendarOpen || page.data.openingCalendar) throw Error('Returning to query unexpectedly opened a launch calendar');
     }
@@ -887,8 +886,8 @@ for (const scenario of scenarios) {
         if (scenario === 'v2-restricted' && !page.data.selectionRestricted) throw Error('Restricted fixture did not retain the access gate');
         if (scenario === 'v2-paid-unconfigured' && !page.data.resumeSetup) throw Error('Paid fixture lost the unfinished target');
         if (scenario === 'v2-new-product' && (!page.data.selectionSummary || page.data.selectionCanCollapse)) throw Error('Unopened saved product lost its summary or incorrectly enabled querying');
-        if (scenario === 'v2-calendar-modal' && page.data.calendarOpen) throw Error('Query must retain a lightweight manual calendar entry');
-        expectedV2Text = [...(scenario === 'v2-calendar-modal' ? ['想查哪一款', '选择配置与门店', '发售日历与选购攻略'] : [p.title]), ...({
+        if (scenario === 'v2-calendar-modal' && page.data.calendarOpen) throw Error('Query must lead directly to selection without a launch overlay');
+        expectedV2Text = [...(scenario === 'v2-calendar-modal' ? ['想查哪一款', '选择配置与门店', '选购与取货攻略'] : [p.title]), ...({
           'v2-free': ['暂时没有可取货观测', '微信提醒需另行授权'],
           'v2-member': ['2 家门店有可取货观测', '查看下单指引', '加入关注', '购买请在 Apple 官方渠道完成'],
           'v2-unknown': ['当前取货状态待确认', '继续查询原配置'],
@@ -933,12 +932,10 @@ for (const scenario of scenarios) {
       } else if (pageName === 'guide') {
         expectedV2Text = [scenario === 'v330-reminder-help' ? '让提醒真正准备好' : '先选好想要的配置', '常见问题', '联系客服'];
         if (scenario === 'v2-guide-calendar' || scenario === 'v3-guide-calendar-expanded') {
-          if (!page.data.showLaunchPoster || !page.data.calendars.length || page.data.calendarExpanded !== (scenario === 'v3-guide-calendar-expanded')) throw Error('Guide poster or explicit month disclosure has the wrong state');
-          expectedV2Text.push('先看发售安排，下滑查看选购攻略', '新品发售日历', '距预购 5 天 5 小时', '2026 年 10 月日历', '开启预购', '10.16', '周五 20:00', '10.23', '去选择配置与门店');
-        } else {
-          expectedV2Text.push('从选择配置，到收到提醒后下单');
-          forbiddenText.push('新品发售日历');
+          if (page.data.section !== 'prepare' || page.data.stageId !== 'prepare') throw Error('Old calendar links must open buying preparation');
         }
+        expectedV2Text.push('选购与取货攻略', '从选择配置，到收到提醒后下单');
+        forbiddenText.push('新品发售日历', '本次发售不再提醒', '开启预购');
         if (scenario === 'v2-guide-faq') {
           if (page.data.faqOpen !== 'notification') throw Error('Guide notification FAQ did not expand');
           expectedV2Text.push('没有发现有货、授权不足或处于免打扰时不会发送');
@@ -1135,7 +1132,7 @@ for (const scenario of scenarios) {
         partial: stockScenarios[scenario].mode === 'mixed',
         authorizationPending: Boolean(stockScenarios[scenario].authorizationPending),
       } : undefined;
-      const expectedLaunchPoster = pageName === 'guide' ? Boolean(page.data.showLaunchPoster && page.data.calendars.length) : undefined;
+      const expectedLaunchPoster = pageName === 'guide' ? false : undefined;
       manifest.push({ page: pageName, scenario, width, file: filename, tabPage: tabIndex >= 0, navigationHidden, previewDate: now.toISOString(), expectedText, forbiddenText, expectedAlternativeCounts, expectedDndPeriodCount, expectedReleaseNoteCount, expectedMembership, expectedNotification, expectedStock, expectedLaunchPoster });
     }
   }

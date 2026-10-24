@@ -1,0 +1,25 @@
+{
+  "createdAt": "2026-10-24T00:17:58.869Z",
+  "stage": "deployed_pending_live_validation",
+  "scope": "Conflict fix plus temporary isolated maintainer acceptance entry",
+  "functions": {
+    "gxs_api": {
+      "taskId": "confirmation_cloud_fn_inc_deploy_e38738d2-b4c3-471c-8140-2c58996f3fdf",
+      "status": "success",
+      "files": [
+        "index.js",
+        "lib/repo/cloudbase-repo.js",
+        "lib/repo/upstream-guard.js"
+      ]
+    },
+    "gxs_monitor": {
+      "taskId": "confirmation_cloud_fn_inc_deploy_fd6df7d3-f6b7-4f5f-ba73-a5164d4f8cc3",
+      "status": "success",
+      "files": [
+        "lib/repo/cloudbase-repo.js",
+        "lib/repo/upstream-guard.js",
+        "lib-manifest.json"
+      ]
+    }
+  }
+}

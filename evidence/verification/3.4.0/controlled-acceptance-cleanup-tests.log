@@ -1,0 +1,70 @@
+TAP version 13
+# Subtest: normal candidate entry remains byte identical and delegates unchanged
+ok 1 - normal candidate entry remains byte identical and delegates unchanged
+  ---
+  duration_ms: 18.298666
+  type: 'test'
+  ...
+# Subtest: wrong nonce, app, admin, fixed owner, operator and expiry are denied
+ok 2 - wrong nonce, app, admin, fixed owner, operator and expiry are denied
+  ---
+  duration_ms: 2.865833
+  type: 'test'
+  ...
+# Subtest: user proxy denies queries, other document access, non-transactional writes and unrelated fields
+ok 3 - user proxy denies queries, other document access, non-transactional writes and unrelated fields
+  ---
+  duration_ms: 1.034292
+  type: 'test'
+  ...
+# Subtest: all private collections and transaction accesses are mapped, arbitrary collections denied
+ok 4 - all private collections and transaction accesses are mapped, arbitrary collections denied
+  ---
+  duration_ms: 0.485792
+  type: 'test'
+  ...
+# Subtest: sender refuses changed recipient, app, template, and unmarked synthetic content
+ok 5 - sender refuses changed recipient, app, template, and unmarked synthetic content
+  ---
+  duration_ms: 0.411583
+  type: 'test'
+  ...
+# Subtest: real collector and cloudbase repository execute both directions once across six independent calls and concurrent replays
+ok 6 - real collector and cloudbase repository execute both directions once across six independent calls and concurrent replays
+  ---
+  duration_ms: 53.592083
+  type: 'test'
+  ...
+# Subtest: cleanup cannot discard pending, sending, uncertain or incomplete acceptance
+ok 7 - cleanup cannot discard pending, sending, uncertain or incomplete acceptance
+  ---
+  duration_ms: 1.228583
+  type: 'test'
+  ...
+# Subtest: actual installed SDK serializes old empty where into an empty backend deletion condition
+ok 8 - actual installed SDK serializes old empty where into an empty backend deletion condition
+  ---
+  duration_ms: 1.012333
+  type: 'test'
+  ...
+# Subtest: actual installed SDK serializes explicit id existence into a nonempty private condition
+ok 9 - actual installed SDK serializes explicit id existence into a nonempty private condition
+  ---
+  duration_ms: 0.795
+  type: 'test'
+  ...
+# Subtest: actual installed SDK preserves the cleanup tombstone and entry lease using nin
+ok 10 - actual installed SDK preserves the cleanup tombstone and entry lease using nin
+  ---
+  duration_ms: 0.165125
+  type: 'test'
+  ...
+1..10
+# tests 10
+# suites 0
+# pass 10
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 163.109042

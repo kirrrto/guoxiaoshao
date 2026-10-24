@@ -57,13 +57,12 @@ test('a formerly fresh pickup cannot open its guide after expiry, permission los
   }
 });
 
-test('query lifecycle never invokes the opening calendar, including a normal returning user', async () => {
+test('returning to query keeps the page available without launching a promotion or business action', async () => {
   const rt = runtime(action => action === 'user.bootstrap' ? account() : { unchanged: true });
   const page = rt.instance('pages/query/index.js');
-  let opens = 0; page.maybeOpenCalendar = () => { opens++; };
-  await page.onLoad(); page.onReady(); await page.onShow(); page.onHide(); await page.onShow();
-  assert.equal(opens, 0);
-  assert.equal(page.data.calendarOpen, false);
+  await page.onLoad(); await page.onShow(); page.onHide(); await page.onShow();
+  assert.equal(page.data.ready, true);
+  assert.equal(Boolean(page.data.calendarOpen), false);
   assert.equal(rt.calls.some(call => ['query.pickup', 'quota.signin', 'follow.save'].includes(call.action)), false);
   page.onUnload();
 });

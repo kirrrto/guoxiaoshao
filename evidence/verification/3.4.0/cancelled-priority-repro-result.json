@@ -1,0 +1,53 @@
+{
+  "generatedAt": "2026-10-23T13:21:36.477Z",
+  "sourcePath": "/Users/kel/Downloads/guoxiaoshao-master/cloudfunctions/gxs_api/lib/engine/scheduler.js",
+  "method": "Source read only. Candidate patch compiled in memory. Synthetic keys with observed due times.",
+  "scenarios": {
+    "current": {
+      "phase": {
+        "originalPhaseMs": 29814,
+        "originalDue": 1829814,
+        "cancellationAt": 1849814,
+        "guardUntil": 1850814,
+        "dueAfterCancellation": 1850814,
+        "requestsWhileGuardActive": 0,
+        "nextDueAfterSuccess": 1910814,
+        "nextPhaseMs": 50814,
+        "phaseShiftMs": 21000
+      },
+      "priority": {
+        "cancelledOriginalDue": "2026-10-23T13:11:40.690Z",
+        "cancelledDueAfterGuard": "2026-10-23T13:12:36.528Z",
+        "retryGuardUntil": "2026-10-23T13:12:36.528Z",
+        "firstTwoAtRecovery": [
+          "group-012",
+          "already-sampled-peer"
+        ],
+        "cancelledGroupStillWaiting": true
+      }
+    },
+    "preserveCancelledDue": {
+      "phase": {
+        "originalPhaseMs": 29814,
+        "originalDue": 1829814,
+        "cancellationAt": 1849814,
+        "guardUntil": 1850814,
+        "dueAfterCancellation": 1829814,
+        "requestsWhileGuardActive": 0,
+        "nextDueAfterSuccess": 1889814,
+        "nextPhaseMs": 29814,
+        "phaseShiftMs": 0
+      },
+      "priority": {
+        "cancelledOriginalDue": "2026-10-23T13:11:40.690Z",
+        "cancelledDueAfterGuard": "2026-10-23T13:11:40.690Z",
+        "retryGuardUntil": "2026-10-23T13:12:36.528Z",
+        "firstTwoAtRecovery": [
+          "group-008",
+          "group-012"
+        ],
+        "cancelledGroupStillWaiting": false
+      }
+    }
+  }
+}

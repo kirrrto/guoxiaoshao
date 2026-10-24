@@ -1,0 +1,318 @@
+{
+  "source": "/Users/kel/Downloads/guoxiaoshao-master/cloudfunctions/gxs_api/lib/engine/scheduler.js",
+  "baseline": "/tmp/gxs-core-20261023/cancel-priority-baseline/cloudfunctions/gxs_api/lib/engine/scheduler.js",
+  "caseCount": 44,
+  "passed": true,
+  "cases": [
+    {
+      "fixedCadence": true,
+      "alignIntervalMs": 0,
+      "reason": "request_cancelled",
+      "restore": false,
+      "passed": true
+    },
+    {
+      "fixedCadence": true,
+      "alignIntervalMs": 0,
+      "reason": "request_cancelled",
+      "restore": true,
+      "passed": true
+    },
+    {
+      "fixedCadence": true,
+      "alignIntervalMs": 0,
+      "reason": "capacity_wait",
+      "restore": false,
+      "passed": true
+    },
+    {
+      "fixedCadence": true,
+      "alignIntervalMs": 0,
+      "reason": "capacity_wait",
+      "restore": true,
+      "passed": true
+    },
+    {
+      "fixedCadence": true,
+      "alignIntervalMs": 0,
+      "reason": "minute_budget",
+      "restore": false,
+      "passed": true
+    },
+    {
+      "fixedCadence": true,
+      "alignIntervalMs": 0,
+      "reason": "minute_budget",
+      "restore": true,
+      "passed": true
+    },
+    {
+      "fixedCadence": true,
+      "alignIntervalMs": 0,
+      "reason": "daily_budget",
+      "restore": false,
+      "passed": true
+    },
+    {
+      "fixedCadence": true,
+      "alignIntervalMs": 0,
+      "reason": "daily_budget",
+      "restore": true,
+      "passed": true
+    },
+    {
+      "fixedCadence": true,
+      "alignIntervalMs": 0,
+      "reason": "auto_budget_reserved",
+      "restore": false,
+      "passed": true
+    },
+    {
+      "fixedCadence": true,
+      "alignIntervalMs": 0,
+      "reason": "auto_budget_reserved",
+      "restore": true,
+      "passed": true
+    },
+    {
+      "fixedCadence": true,
+      "alignIntervalMs": 0,
+      "reason": "upstream_paused",
+      "restore": false,
+      "passed": true
+    },
+    {
+      "fixedCadence": true,
+      "alignIntervalMs": 0,
+      "reason": "upstream_paused",
+      "restore": true,
+      "passed": true
+    },
+    {
+      "fixedCadence": true,
+      "alignIntervalMs": 0,
+      "reason": "other_denial",
+      "restore": false,
+      "passed": true
+    },
+    {
+      "fixedCadence": true,
+      "alignIntervalMs": 0,
+      "reason": "other_denial",
+      "restore": true,
+      "passed": true
+    },
+    {
+      "fixedCadence": false,
+      "alignIntervalMs": 0,
+      "reason": "request_cancelled",
+      "restore": false,
+      "passed": true
+    },
+    {
+      "fixedCadence": false,
+      "alignIntervalMs": 0,
+      "reason": "request_cancelled",
+      "restore": true,
+      "passed": true
+    },
+    {
+      "fixedCadence": false,
+      "alignIntervalMs": 0,
+      "reason": "capacity_wait",
+      "restore": false,
+      "passed": true
+    },
+    {
+      "fixedCadence": false,
+      "alignIntervalMs": 0,
+      "reason": "capacity_wait",
+      "restore": true,
+      "passed": true
+    },
+    {
+      "fixedCadence": false,
+      "alignIntervalMs": 0,
+      "reason": "minute_budget",
+      "restore": false,
+      "passed": true
+    },
+    {
+      "fixedCadence": false,
+      "alignIntervalMs": 0,
+      "reason": "minute_budget",
+      "restore": true,
+      "passed": true
+    },
+    {
+      "fixedCadence": false,
+      "alignIntervalMs": 0,
+      "reason": "daily_budget",
+      "restore": false,
+      "passed": true
+    },
+    {
+      "fixedCadence": false,
+      "alignIntervalMs": 0,
+      "reason": "daily_budget",
+      "restore": true,
+      "passed": true
+    },
+    {
+      "fixedCadence": false,
+      "alignIntervalMs": 0,
+      "reason": "auto_budget_reserved",
+      "restore": false,
+      "passed": true
+    },
+    {
+      "fixedCadence": false,
+      "alignIntervalMs": 0,
+      "reason": "auto_budget_reserved",
+      "restore": true,
+      "passed": true
+    },
+    {
+      "fixedCadence": false,
+      "alignIntervalMs": 0,
+      "reason": "upstream_paused",
+      "restore": false,
+      "passed": true
+    },
+    {
+      "fixedCadence": false,
+      "alignIntervalMs": 0,
+      "reason": "upstream_paused",
+      "restore": true,
+      "passed": true
+    },
+    {
+      "fixedCadence": false,
+      "alignIntervalMs": 0,
+      "reason": "other_denial",
+      "restore": false,
+      "passed": true
+    },
+    {
+      "fixedCadence": false,
+      "alignIntervalMs": 0,
+      "reason": "other_denial",
+      "restore": true,
+      "passed": true
+    },
+    {
+      "fixedCadence": false,
+      "alignIntervalMs": 60000,
+      "reason": "request_cancelled",
+      "restore": false,
+      "passed": true
+    },
+    {
+      "fixedCadence": false,
+      "alignIntervalMs": 60000,
+      "reason": "request_cancelled",
+      "restore": true,
+      "passed": true
+    },
+    {
+      "fixedCadence": false,
+      "alignIntervalMs": 60000,
+      "reason": "capacity_wait",
+      "restore": false,
+      "passed": true
+    },
+    {
+      "fixedCadence": false,
+      "alignIntervalMs": 60000,
+      "reason": "capacity_wait",
+      "restore": true,
+      "passed": true
+    },
+    {
+      "fixedCadence": false,
+      "alignIntervalMs": 60000,
+      "reason": "minute_budget",
+      "restore": false,
+      "passed": true
+    },
+    {
+      "fixedCadence": false,
+      "alignIntervalMs": 60000,
+      "reason": "minute_budget",
+      "restore": true,
+      "passed": true
+    },
+    {
+      "fixedCadence": false,
+      "alignIntervalMs": 60000,
+      "reason": "daily_budget",
+      "restore": false,
+      "passed": true
+    },
+    {
+      "fixedCadence": false,
+      "alignIntervalMs": 60000,
+      "reason": "daily_budget",
+      "restore": true,
+      "passed": true
+    },
+    {
+      "fixedCadence": false,
+      "alignIntervalMs": 60000,
+      "reason": "auto_budget_reserved",
+      "restore": false,
+      "passed": true
+    },
+    {
+      "fixedCadence": false,
+      "alignIntervalMs": 60000,
+      "reason": "auto_budget_reserved",
+      "restore": true,
+      "passed": true
+    },
+    {
+      "fixedCadence": false,
+      "alignIntervalMs": 60000,
+      "reason": "upstream_paused",
+      "restore": false,
+      "passed": true
+    },
+    {
+      "fixedCadence": false,
+      "alignIntervalMs": 60000,
+      "reason": "upstream_paused",
+      "restore": true,
+      "passed": true
+    },
+    {
+      "fixedCadence": false,
+      "alignIntervalMs": 60000,
+      "reason": "other_denial",
+      "restore": false,
+      "passed": true
+    },
+    {
+      "fixedCadence": false,
+      "alignIntervalMs": 60000,
+      "reason": "other_denial",
+      "restore": true,
+      "passed": true
+    },
+    {
+      "fixedCadence": true,
+      "alignIntervalMs": 0,
+      "reason": "request_cancelled",
+      "restore": true,
+      "missingRetry": true,
+      "passed": true
+    },
+    {
+      "fixedCadence": false,
+      "alignIntervalMs": 60000,
+      "reason": "request_cancelled",
+      "restore": true,
+      "missingRetry": true,
+      "passed": true
+    }
+  ]
+}
