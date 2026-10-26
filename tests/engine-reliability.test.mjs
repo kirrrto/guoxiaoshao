@@ -18,13 +18,16 @@ const config = { collector: { enabled: true, intervalSeconds: 1, maxConcurrency:
 
 test('same-worker lease renewals share one in-flight transaction and recover after rejection', async () => {
   let calls = 0; let resolve; let reject;
-  const lease = createLeaseKeeper({ ownerId: 'same-worker', clock: () => new Date('2026-09-16T01:25:00Z'), log,
+  let nowMs = Date.parse('2026-09-16T01:25:00Z');
+  const lease = createLeaseKeeper({ ownerId: 'same-worker', clock: () => new Date(nowMs), log,
     repo: { acquireLease: () => { calls++; return new Promise((yes, no) => { resolve = yes; reject = no; }); } } });
   const first = lease.renew(); const second = lease.renew();
   assert.equal(first, second); assert.equal(calls, 1);
   resolve({ acquired: true, expiresAt: '2026-09-16T01:25:15Z' });
   assert.deepEqual(await Promise.all([first, second]), [true, true]);
+  nowMs += 5000; // The cached grant now has exactly ten seconds left and must renew.
   const failed = lease.renew(); const alsoFailed = lease.renew();
+  assert.equal(failed, alsoFailed);
   reject(new Error('temporary conflict')); await assert.rejects(failed); await assert.rejects(alsoFailed);
   assert.equal(calls, 2);
   const recovered = lease.renew(); resolve({ acquired: false, holder: 'new-owner', expiresAt: '2026-09-16T01:25:15Z' });

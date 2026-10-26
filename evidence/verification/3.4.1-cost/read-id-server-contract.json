@@ -1,0 +1,10 @@
+{
+  "checkedAt": "2026-10-26T08:56:33.677Z",
+  "mode": "read only",
+  "collection": "gxs_latest",
+  "queryShape": "100 distinct nonexistent IDs in _id.$in; projection _id; limit100",
+  "requestId": "f06973da-f3ae-458a-af8b-4bc52d8ae4d4",
+  "success": true,
+  "rows": 0,
+  "scope": "Control-plane database predicate accepted by live service; SDK transport contract tested separately. Does not alone prove a real SDK query result for 100 present documents."
+}

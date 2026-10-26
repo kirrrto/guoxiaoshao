@@ -1,0 +1,253 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-10-26",
+  "environment": "flowermean-6gjaxfqhf6c13e88",
+  "region": "ap-shanghai",
+  "scope": "Read-only CloudBase CLS search. No function invocation, deployment, database write, log-service mutation, or SDK execution.",
+  "window": {
+    "start": "2026-10-24 07:55:00",
+    "end": "2026-10-24 08:10:00",
+    "timezone": "Asia/Shanghai",
+    "reportedIncident": "2026-10-24 08:01:55",
+    "reportedError": "-601008 server-side request timedout",
+    "reportedMiniProgramVersion": "3.3.2"
+  },
+  "logServiceEnabled": true,
+  "queries": [
+    {
+      "name": "initial-access-page",
+      "service": "tcb",
+      "queryString": "logType:accesslog",
+      "limit": 100,
+      "sort": "asc",
+      "success": true,
+      "listOver": false,
+      "returnedRawRecords": 100,
+      "analysisRecords": []
+    },
+    {
+      "name": "all-access-groups",
+      "service": "tcb",
+      "queryString": "logType:accesslog | select module, action, statusCode, count(*) as count, max(cast(timeCost as bigint)) as maxMs group by module, action, statusCode order by count desc limit 100",
+      "limit": 100,
+      "sort": "asc",
+      "success": true,
+      "listOver": true,
+      "returnedRawRecords": 0,
+      "analysisRecords": [
+        {
+          "maxMs": 414,
+          "module": "database",
+          "action": "QueryDocument",
+          "statusCode": 200,
+          "count": 10932
+        },
+        {
+          "module": "database",
+          "action": "UpdateDocument",
+          "statusCode": 200,
+          "count": 6138,
+          "maxMs": 400
+        },
+        {
+          "count": 4811,
+          "maxMs": 1388,
+          "module": "database",
+          "action": "StartTransaction",
+          "statusCode": 200
+        },
+        {
+          "action": "CommitTransaction",
+          "statusCode": 200,
+          "count": 4531,
+          "maxMs": 641,
+          "module": "database"
+        },
+        {
+          "maxMs": 153,
+          "module": "database",
+          "action": "UpdateDocument",
+          "statusCode": 404,
+          "count": 280
+        },
+        {
+          "action": "InvokeFunction",
+          "statusCode": 200,
+          "count": 2,
+          "maxMs": 5756,
+          "module": "function"
+        },
+        {
+          "module": "database",
+          "action": "AbortTransaction",
+          "statusCode": 404,
+          "count": 1,
+          "maxMs": 10
+        }
+      ]
+    },
+    {
+      "name": "gateway-errors",
+      "service": "tcb",
+      "queryString": "logType:accesslog AND (level:error OR timeout OR timedout OR \"-601008\" OR statusCode:504 OR statusCode:502 OR statusCode:500)",
+      "limit": 100,
+      "sort": "asc",
+      "success": true,
+      "listOver": true,
+      "returnedRawRecords": 0,
+      "analysisRecords": []
+    },
+    {
+      "name": "function-access-records",
+      "service": "tcb",
+      "queryString": "logType:accesslog AND module:function",
+      "limit": 100,
+      "sort": "asc",
+      "success": true,
+      "listOver": true,
+      "returnedRawRecords": 2,
+      "analysisRecords": []
+    },
+    {
+      "name": "404-code-groups",
+      "service": "tcb",
+      "queryString": "logType:accesslog AND statusCode:404 | select action, code, count(*) as count, max(cast(timeCost as bigint)) as maxMs group by action, code order by count desc limit 100",
+      "limit": 100,
+      "sort": "asc",
+      "success": true,
+      "listOver": true,
+      "returnedRawRecords": 0,
+      "analysisRecords": [
+        {
+          "action": "UpdateDocument",
+          "code": "DATABASE_TRANSACTION_CONFLICT",
+          "count": 280,
+          "maxMs": 153
+        },
+        {
+          "maxMs": 10,
+          "action": "AbortTransaction",
+          "code": "DATABASE_TRANSACTION_FAIL",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "name": "all-service-timeout-keywords",
+      "service": "tcb",
+      "queryString": "timeout OR timedout OR \"-601008\"",
+      "limit": 100,
+      "sort": "asc",
+      "success": true,
+      "listOver": true,
+      "returnedRawRecords": 0,
+      "analysisRecords": []
+    },
+    {
+      "name": "all-service-log-types",
+      "service": "tcb",
+      "queryString": "* | select module, logType, count(*) as count group by module, logType order by count desc limit 100",
+      "limit": 100,
+      "sort": "asc",
+      "success": true,
+      "listOver": true,
+      "returnedRawRecords": 0,
+      "analysisRecords": [
+        {
+          "module": "database",
+          "logType": "accesslog",
+          "count": 26693
+        },
+        {
+          "module": null,
+          "logType": null,
+          "count": 144
+        },
+        {
+          "module": "function",
+          "logType": "accesslog",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "name": "transaction-conflict-window",
+      "service": "tcb",
+      "queryString": "logType:accesslog AND code:DATABASE_TRANSACTION_CONFLICT | select min(startTime) as firstUtc, max(startTime) as lastUtc, count(*) as count",
+      "limit": 100,
+      "sort": "asc",
+      "success": true,
+      "listOver": true,
+      "returnedRawRecords": 0,
+      "analysisRecords": [
+        {
+          "lastUtc": "2026-10-24T00:09:20.269Z",
+          "count": 280,
+          "firstUtc": "2026-10-23T23:55:03.401Z"
+        }
+      ]
+    },
+    {
+      "name": "all-service-error-level",
+      "service": "tcb",
+      "queryString": "level:error OR level:ERROR",
+      "limit": 100,
+      "sort": "asc",
+      "success": true,
+      "listOver": true,
+      "returnedRawRecords": 0,
+      "analysisRecords": []
+    }
+  ],
+  "functionAccessRecords": [
+    {
+      "endTimeLocal": "2026-10-24 08:01:20.057",
+      "startTimeUtc": "2026-10-24T00:01:14.383Z",
+      "resourceName": "gxs_api",
+      "action": "InvokeFunction",
+      "statusCode": 200,
+      "code": "",
+      "gatewayDurationMs": 5674,
+      "upstreamDurationMs": 91,
+      "upstreamStatus": 200,
+      "functionRequestId": "d4d47e3b-49e0-4af5-8773-bec46e917d75",
+      "sdkVersion": "wx-miniprogram-sdk/3.17.4 (NaN platform/ios})",
+      "accessSource": "wx_client"
+    },
+    {
+      "endTimeLocal": "2026-10-24 08:01:20.113",
+      "startTimeUtc": "2026-10-24T00:01:14.357Z",
+      "resourceName": "gxs_api",
+      "action": "InvokeFunction",
+      "statusCode": 200,
+      "code": "",
+      "gatewayDurationMs": 5756,
+      "upstreamDurationMs": 83,
+      "upstreamStatus": 200,
+      "functionRequestId": "d38ae2eb-2383-4a4c-bfba-3db3caba154f",
+      "sdkVersion": "wx-miniprogram-sdk/3.17.4 (NaN platform/ios})",
+      "accessSource": "wx_client"
+    }
+  ],
+  "summary": {
+    "allServiceLogRecords": 26839,
+    "accessLogRecords": 26695,
+    "databaseAccessRecords": 26693,
+    "functionAccessRecords": 2,
+    "timeoutKeywordMatches": 0,
+    "errorLevelMatches": 0,
+    "transactionConflictRecords": 280,
+    "abortTransactionFailureRecords": 1,
+    "twoFunctionRecordsSameUser": true
+  },
+  "limitations": [
+    "The initial raw page contained 100 rows with ListOver:false and covered only 07:55:01.906 through 07:55:03.958. It was not treated as complete; subsequent aggregation queries covered the full window and returned ListOver:true.",
+    "Aggregation groups were below the SQL limit of 100, and function/timeout/error queries returned ListOver:true.",
+    "Search covers the configured TCB CLS topic, not uncollected or unavailable client-to-WeChat transport stages.",
+    "This window has 2 function gateway access records, while the separate SCF investigation found 4 gxs_api requests. These sources must not be assumed to cover every request or the same request population.",
+    "No reported client requestId was supplied, and no user identity was printed or retained here. Successful gateway records cannot be definitively linked to the 08:01:55 screenshot.",
+    "A gateway-versus-upstream duration difference is observed, but the logs do not establish its cause.",
+    "No timeout match does not prove absence of the reported incident, and does not establish a client-network cause.",
+    "The database conflicts predate the documented 2026-10-24 08:18 transaction retry deployment; this query does not show a current regression."
+  ]
+}

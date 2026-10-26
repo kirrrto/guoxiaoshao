@@ -1,0 +1,93 @@
+{
+  "schemaVersion": 1,
+  "version": "3.4.1",
+  "scope": "Minute aligned scheduled cadence; no budget or interval reduction",
+  "at": {
+    "monitor": "2026-10-26T08:13:14.098Z",
+    "api": "2026-10-26T08:13:19.371Z"
+  },
+  "receipts": {
+    "monitor": {
+      "RequestId": "a72a4588-d07a-41b4-9006-5fe70778b0a3"
+    },
+    "api": {
+      "RequestId": "558c1e1a-6143-41fa-bd3a-dc9f913eb57d"
+    }
+  },
+  "configurations": {
+    "gxs_api": {
+      "before": {
+        "runtime": "Nodejs18.15",
+        "memoryMb": 256,
+        "timeoutSeconds": 60,
+        "handler": "index.main",
+        "triggers": [
+          {
+            "AddTime": "2026-09-20 12:32:27",
+            "ModTime": "2026-10-21 11:01:29",
+            "TriggerDesc": "{\"cron\":\"0 */5 * * * * *\"}",
+            "TriggerName": "gxs-payment-reconcile-five-minutes",
+            "Type": "timer"
+          }
+        ]
+      },
+      "after": {
+        "runtime": "Nodejs18.15",
+        "memoryMb": 256,
+        "timeoutSeconds": 60,
+        "handler": "index.main",
+        "triggers": [
+          {
+            "AddTime": "2026-09-20 12:32:27",
+            "ModTime": "2026-10-21 11:01:29",
+            "TriggerDesc": "{\"cron\":\"0 */5 * * * * *\"}",
+            "TriggerName": "gxs-payment-reconcile-five-minutes",
+            "Type": "timer"
+          }
+        ]
+      },
+      "unchanged": true
+    },
+    "gxs_monitor": {
+      "before": {
+        "runtime": "Nodejs20.19",
+        "memoryMb": 256,
+        "timeoutSeconds": 60,
+        "handler": "index.main",
+        "triggers": [
+          {
+            "AddTime": "2026-09-16 09:16:58",
+            "ModTime": "2026-10-21 11:01:30",
+            "TriggerDesc": "{\"cron\":\"0 * * * * * *\"}",
+            "TriggerName": "gxs-monitor-minute",
+            "Type": "timer"
+          }
+        ]
+      },
+      "after": {
+        "runtime": "Nodejs20.19",
+        "memoryMb": 256,
+        "timeoutSeconds": 60,
+        "handler": "index.main",
+        "triggers": [
+          {
+            "AddTime": "2026-09-16 09:16:58",
+            "ModTime": "2026-10-21 11:01:30",
+            "TriggerDesc": "{\"cron\":\"0 * * * * * *\"}",
+            "TriggerName": "gxs-monitor-minute",
+            "Type": "timer"
+          }
+        ]
+      },
+      "unchanged": true
+    }
+  },
+  "configRevision": 12,
+  "codeVerification": "phase-deployed-code.json",
+  "localTests": {
+    "passed": 1711,
+    "failed": 0,
+    "log": "output/cost-20261026/final-phase-tests.log"
+  },
+  "transition": "Old unavailable fixed-phase checkpoint may take one invocation to align; no forced checkpoint reset."
+}

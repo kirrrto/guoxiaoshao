@@ -1,8 +1,9 @@
+const navigation = require('../../utils/navigation');
 const { reminderPanelMethods } = require('../../utils/reminder-panel');
 const { restockSubscription, soldoutSubscription, activeDnd } = require('../../utils/reminder-readiness');
 const { getAuthorizationState, buildConsentReport } = require('../../utils/reminder-credits');
 const { dndPeriods, dndSummary, dndStatus, MAX_DND_PERIODS, validateDndPeriods } = require('../../utils/dnd');
-const { peekTestReturn, consumeTestReturnUrl } = require('../../utils/journey-context');
+const { peekTestReturn, peekTestReturnUrl, consumeTestReturnUrl } = require('../../utils/journey-context');
 const { call, showError, toast, newId } = require('../../utils/api');
 const { getBootstrap, getCatalog, currentCatalog, getFollows, invalidateBootstrap, invalidateFollows, publishSettings, publishQuota, subscribeQuota, currentQuota } = require('../../utils/store');
 const { topUpReminderCredit } = require('../../utils/reminder-credits');
@@ -761,6 +762,7 @@ Page({
   },
 
   onContinueCheckout() {
+    if (navigation.isNavigating()) return;
     if (this.pageRetired || !this.data.membership || !this.data.membership.active) return;
     const intent = this.currentCheckout();
     if (!intent || typeof getApp !== 'function') return;
@@ -812,7 +814,7 @@ Page({
 
   onTestNotification() {
     if (this.pageRetired) return;
-    wx.navigateTo({ url: '/pages/notification-test/index?from=mine' });
+    navigation.navigateTo({ url: '/pages/notification-test/index?from=mine' });
   },
 
   onOpenFollows() {
@@ -1495,12 +1497,17 @@ Page({
     this.consumePendingSection();
   },
   onReturnToTest() {
-    const url = consumeTestReturnUrl();
-    this.setData({ testReturnAvailable: false });
-    if (url) wx.navigateTo({ url });
+    if (this.pageRetired || navigation.isNavigating()) return;
+    const intent = peekTestReturn();
+    const url = peekTestReturnUrl();
+    if (!intent || !url) { this.setData({ testReturnAvailable: false }); return; }
+    navigation.navigateTo({ url, success: () => {
+      const consumed = consumeTestReturnUrl(url, intent.generation);
+      if (consumed && !this.pageRetired) this.setData({ testReturnAvailable: false });
+    } });
   },
   onHelp() {
-    if (!this.pageRetired) wx.navigateTo({ url: '/pages/guide/index?section=prepare&from=mine' });
+    if (!this.pageRetired) navigation.navigateTo({ url: '/pages/guide/index?section=prepare&from=mine' });
   },
 
   onOpenOrders() {

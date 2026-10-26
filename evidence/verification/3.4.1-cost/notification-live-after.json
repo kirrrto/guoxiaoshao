@@ -1,0 +1,187 @@
+{
+  "window": {
+    "start": "2026-10-26 17:01:00",
+    "end": "2026-10-26 17:06:00"
+  },
+  "accessRows": [
+    {
+      "action": "QueryDocument",
+      "resourceName": "gxs_config",
+      "statusCode": 200,
+      "code": "",
+      "count": 824
+    },
+    {
+      "statusCode": 200,
+      "code": "",
+      "count": 478,
+      "action": "CommitTransaction",
+      "resourceName": "undefined"
+    },
+    {
+      "action": "StartTransaction",
+      "resourceName": "undefined",
+      "statusCode": 200,
+      "code": "",
+      "count": 478
+    },
+    {
+      "action": "UpdateDocument",
+      "resourceName": "gxs_config",
+      "statusCode": 200,
+      "code": "",
+      "count": 304
+    },
+    {
+      "action": "QueryDocument",
+      "resourceName": "gxs_latest",
+      "statusCode": 200,
+      "code": "",
+      "count": 283
+    },
+    {
+      "action": "QueryDocument",
+      "resourceName": "gxs_observation_days",
+      "statusCode": 200,
+      "code": "",
+      "count": 261
+    },
+    {
+      "statusCode": 200,
+      "code": "",
+      "count": 261,
+      "action": "UpdateDocument",
+      "resourceName": "gxs_latest"
+    },
+    {
+      "resourceName": "gxs_observation_days",
+      "statusCode": 200,
+      "code": "",
+      "count": 261,
+      "action": "UpdateDocument"
+    },
+    {
+      "action": "QueryDocument",
+      "resourceName": "gxs_notifications",
+      "statusCode": 200,
+      "code": "",
+      "count": 172
+    },
+    {
+      "statusCode": 200,
+      "code": "",
+      "count": 160,
+      "action": "QueryDocument",
+      "resourceName": "gxs_events"
+    },
+    {
+      "statusCode": 200,
+      "code": "",
+      "count": 37,
+      "action": "QueryDocument",
+      "resourceName": "gxs_orders"
+    },
+    {
+      "action": "QueryDocument",
+      "resourceName": "gxs_users",
+      "statusCode": 200,
+      "code": "",
+      "count": 34
+    },
+    {
+      "action": "QueryDocument",
+      "resourceName": "gxs_follows",
+      "statusCode": 200,
+      "code": "",
+      "count": 27
+    },
+    {
+      "action": "UpdateDocument",
+      "resourceName": "gxs_orders",
+      "statusCode": 200,
+      "code": "",
+      "count": 23
+    },
+    {
+      "action": "UpdateDocument",
+      "resourceName": "gxs_notifications",
+      "statusCode": 200,
+      "code": "",
+      "count": 10
+    },
+    {
+      "action": "QueryDocument",
+      "resourceName": "gxs_catalog_products",
+      "statusCode": 200,
+      "code": "",
+      "count": 10
+    },
+    {
+      "action": "QueryDocument",
+      "resourceName": "gxs_catalog_stores",
+      "statusCode": 200,
+      "code": "",
+      "count": 5
+    }
+  ],
+  "totalAccess": 3628,
+  "monitorRuns": [
+    {
+      "requestId": "4e04031d-693b-4105-83d9-6fe7c0308e44",
+      "at": "2026-10-26 17:05:21.065",
+      "ok": true,
+      "state": "running",
+      "scanned": 21,
+      "observations": 52,
+      "events": 0,
+      "sent": 0,
+      "deadlineReached": false
+    },
+    {
+      "requestId": "5234c16d-2be0-43b5-b064-d03136f44977",
+      "at": "2026-10-26 17:04:30.730",
+      "ok": true,
+      "state": "running",
+      "scanned": 22,
+      "observations": 53,
+      "events": 0,
+      "sent": 0,
+      "deadlineReached": false
+    },
+    {
+      "requestId": "93c7aa02-42d2-4697-b83f-85e88fb4ccbd",
+      "at": "2026-10-26 17:03:24.380",
+      "ok": true,
+      "state": "running",
+      "scanned": 21,
+      "observations": 52,
+      "events": 0,
+      "sent": 0,
+      "deadlineReached": false
+    },
+    {
+      "requestId": "4ea2541b-7af2-4805-82a0-c0915b618f3c",
+      "at": "2026-10-26 17:02:22.797",
+      "ok": true,
+      "state": "running",
+      "scanned": 21,
+      "observations": 52,
+      "events": 0,
+      "sent": 0,
+      "deadlineReached": false
+    },
+    {
+      "requestId": "b71c1f52-95ab-4062-993f-ae07b5ff1cc4",
+      "at": "2026-10-26 17:01:22.719",
+      "ok": true,
+      "state": "running",
+      "scanned": 21,
+      "observations": 52,
+      "events": 0,
+      "sent": 0,
+      "deadlineReached": false
+    }
+  ],
+  "samples": 261,
+  "logHasMore": false
+}

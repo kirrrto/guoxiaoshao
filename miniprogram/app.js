@@ -2,6 +2,7 @@ const cloudConfig = require('./config/cloud');
 const { readSharedSelection } = require('./utils/share');
 const { readSession, writeSession } = require('./utils/session');
 const { VERSION } = require('./config/version');
+const { reLaunch, getNavigationContext } = require('./utils/navigation');
 
 // The shared environment's auth hook can stall on a weak network. Give up after
 // this long so pages show a retry instead of waiting forever; the next call retries.
@@ -20,14 +21,27 @@ function errorText(detail) {
   catch (_) { return 'Runtime error details could not be read'; }
 }
 
-function errorContext() {
-  const context = { version: VERSION, route: '' };
+function errorContext(app, detail) {
+  const context = { version: VERSION, route: '', observedAt: new Date().toISOString(),
+    appState: app && app.runtimeVisibility || 'unknown' };
   try {
     const pages = typeof getCurrentPages === 'function' ? getCurrentPages() : [];
     const page = pages[pages.length - 1];
     // Route only: query strings can contain order or notification identifiers.
-    context.route = page && typeof page.route === 'string' ? page.route.split('?')[0].slice(0, 120) : '';
+    context.route = page && typeof page.route === 'string' ? page.route.split(/[?#]/)[0].slice(0, 120) : '';
   } catch (_) { /* Error collection is best effort. */ }
+  // Read only our own state here: asking the native bridge for device details
+  // while it is failing can produce another error before it has started.
+  try {
+    const navigation = getNavigationContext();
+    if (navigation) context.navigation = navigation;
+  } catch (_) { /* Navigation context must not prevent the original report. */ }
+  for (const name of ['errCode', 'errno']) {
+    try {
+      const value = detail && detail[name];
+      if (typeof value === 'number' && Number.isFinite(value)) context[name] = value;
+    } catch (_) { /* Some native Error properties are inaccessible. */ }
+  }
   return context;
 }
 
@@ -38,7 +52,9 @@ const APP_FRAME = /(?:^|[/\\(\s])(?:app\.js\b|(?:pages|utils|components|config|c
 
 function isSdkTimeout(detail, text) {
   if (APP_FRAME.test(text)) return false;
-  const knownTimeout = Number(detail && detail.errCode) === -601008
+  let errCode;
+  try { errCode = Number(detail && detail.errCode); } catch (_) { /* Retain the error if its code cannot be read. */ }
+  const knownTimeout = errCode === -601008
     || /(?:^|[^\d])-601008(?!\d)|server-side request timed\s*out/i.test(text);
   if (!knownTimeout) return false;
   const frames = text.split(/\r?\n/).filter(line => /(?:^\s*at\s|@|\.js:\d+)/.test(line));
@@ -61,6 +77,7 @@ App({
   },
 
   onLaunch(options) {
+    this.runtimeVisibility = 'launching';
     // Opened from a Moments share (scene 1154): a preview without cloud access.
     this.globalData.singlePage = Boolean(options && options.scene === 1154);
     this.launchCountReady = this.countLaunch();
@@ -75,7 +92,7 @@ App({
 
   /** An old shared link may name a page that no longer exists: open the home tab instead. */
   onPageNotFound() {
-    wx.reLaunch({ url: '/pages/query/index' });
+    reLaunch({ url: '/pages/query/index' });
   },
 
   countLaunch() {
@@ -94,6 +111,7 @@ App({
 
   // Users can change "总是保持以上选择" in WeChat settings while the app is hidden.
   onShow(options) {
+    this.runtimeVisibility = 'foreground';
     // A warm entry from the Moments preview must regain normal cloud access.
     // Do not infer a transition from missing options (ordinary native returns).
     if (this.globalData.singlePage && options && Number.isInteger(options.scene) && options.scene !== 1154) {
@@ -103,6 +121,8 @@ App({
     }
     this.captureAlert(options); this.captureSharedTarget(options); this.refreshConsentLater();
   },
+
+  onHide() { this.runtimeVisibility = 'background'; },
 
   refreshConsentLater() {
     if (this.consentRefreshScheduled) return;
@@ -174,13 +194,13 @@ App({
     if (isSdkTimeout(detail, text)) {
       try {
         const log = typeof wx.getRealtimeLogManager === 'function' ? wx.getRealtimeLogManager() : null;
-        if (log && typeof log.warn === 'function') log.warn('[gxs] sdk_timeout', { kind, detail: text.slice(0, 500) });
+        if (log && typeof log.warn === 'function') log.warn('[gxs] sdk_timeout', { kind, detail: text.slice(0, 500), ...errorContext(this, detail) });
       } catch (e) { /* Diagnostics must never raise another error. */ }
       return;
     }
     try {
       const log = typeof wx.getRealtimeLogManager === 'function' ? wx.getRealtimeLogManager() : null;
-      if (log && typeof log.error === 'function') log.error(`[gxs] ${kind}`, text.slice(0, 2000), errorContext());
+      if (log && typeof log.error === 'function') log.error(`[gxs] ${kind}`, text.slice(0, 2000), errorContext(this, detail));
     } catch (e) { /* Reporting must never raise another error. */ }
     try { console.error(`[gxs] ${kind}`, text.slice(0, 2000)); }
     catch (_) { /* An unavailable native logger cannot throw from onError. */ }

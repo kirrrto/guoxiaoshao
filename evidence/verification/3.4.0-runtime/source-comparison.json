@@ -1,0 +1,31 @@
+{
+  "checkedAt": "2026-10-26T02:55:59.994Z",
+  "originalSourceMapSha256": "c19f94a79eff9954d7f00bf20ee00a04b99c08b74812c8cb3337e1deabd9e228",
+  "originalPackage": {
+    "version": 1,
+    "userVersion": "3.4.0",
+    "userNotes": "Kevin 在 2026年10月24日早上8点28分 提交上传",
+    "packageVersion": "84d6d662cd52225241e1c498674df0c5"
+  },
+  "initialComparison": {
+    "sources": 55,
+    "identical": 55,
+    "scope": "before this patch; verified earlier in the current chat"
+  },
+  "finalSourceFingerprint": "sha256:3c276768d2cb4e70614b09dcf8cdd943dd5c09305829a0febd6adb87b044f848",
+  "changedSources": [
+    "utils/journey-context.js",
+    "utils/tab-bar.js",
+    "app.js",
+    "pages/query/index.js",
+    "pages/follow/index.js",
+    "pages/guide/index.js",
+    "pages/mine/index.js",
+    "pages/notice-board/index.js",
+    "pages/notification-test/index.js"
+  ],
+  "addedSources": [
+    "utils/navigation.js"
+  ],
+  "uploaded": false
+}

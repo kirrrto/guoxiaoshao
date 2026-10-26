@@ -229,6 +229,13 @@
             "bucket": -1
           },
           "unique": false
+        },
+        {
+          "name": "recorded_at",
+          "keys": {
+            "recordedAt": 1
+          },
+          "unique": false
         }
       ]
     },

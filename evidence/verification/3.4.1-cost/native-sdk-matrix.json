@@ -1,0 +1,145 @@
+{
+  "schemaVersion": 1,
+  "version": "3.4.1",
+  "scope": "Official WeChat DevTools simulator; not a physical-device, MiniTest, or cloud-quality run",
+  "passed": true,
+  "matrix": [
+    {
+      "requestedSdk": "3.16.3",
+      "startedAt": "2026-10-26T14:20:03.7901271+08:00",
+      "passed": true,
+      "tests": {
+        "guideElementTap": [
+          "pages/query/index",
+          "pages/guide/index"
+        ],
+        "guideElementReturn": "pages/query/index",
+        "rapidGuide3PlusCompetingFollow": {
+          "method": "Three synchronous onOpenGuide calls followed by onGoFollow on the same query-page instance",
+          "stack": [
+            "pages/query/index",
+            "pages/guide/index"
+          ]
+        },
+        "rapidGuideReturn": "pages/query/index",
+        "fourTabs": [
+          "pages/follow/index",
+          "pages/history/index",
+          "pages/mine/index",
+          "pages/query/index"
+        ],
+        "nativeBack": "pages/query/index",
+        "account": {
+          "accountReady": true,
+          "route": "pages/query/index",
+          "cloudReady": true,
+          "hasCloudError": false
+        },
+        "consoleMatchingLineCounts": {
+          "601008": 0,
+          "error": 0,
+          "routeDone": 0,
+          "too early": 0
+        }
+      },
+      "automationPort": 9423,
+      "runtime": {
+        "model": "iPhone 12/13 (Pro)",
+        "sdkVersion": "3.16.3",
+        "platform": "devtools"
+      },
+      "finishedAt": "2026-10-26T14:21:12.1996201+08:00",
+      "routeObservation": "Official automation_runtime_info pageStack/currentPage, two consecutive matches; return via page_action.callMethod"
+    },
+    {
+      "requestedSdk": "3.17.4",
+      "startedAt": "2026-10-26T14:24:05.6850454+08:00",
+      "passed": true,
+      "tests": {
+        "guideElementTap": [
+          "pages/query/index",
+          "pages/guide/index"
+        ],
+        "guideElementReturn": "pages/query/index",
+        "rapidGuide3PlusCompetingFollow": {
+          "stack": [
+            "pages/query/index",
+            "pages/guide/index"
+          ],
+          "method": "Three synchronous onOpenGuide calls followed by onGoFollow on the same query-page instance"
+        },
+        "rapidGuideReturn": "pages/query/index",
+        "fourTabs": [
+          "pages/follow/index",
+          "pages/history/index",
+          "pages/mine/index",
+          "pages/query/index"
+        ],
+        "nativeBack": "pages/query/index",
+        "account": {
+          "cloudReady": true,
+          "hasCloudError": false,
+          "accountReady": true,
+          "route": "pages/query/index"
+        },
+        "consoleMatchingLineCounts": {
+          "601008": 0,
+          "error": 0,
+          "routeDone": 0,
+          "too early": 0
+        }
+      },
+      "automationPort": 9454,
+      "runtime": {
+        "sdkVersion": "3.17.4",
+        "model": "iPhone 12/13 (Pro)",
+        "platform": "devtools"
+      },
+      "finishedAt": "2026-10-26T14:25:03.7287407+08:00",
+      "routeObservation": "Official automation_evaluate reads getCurrentPages(), two consecutive matches; return invokes verified current guide-page handler"
+    }
+  ],
+  "observations": {
+    "guideElementBinding": "Actual automation_element_action tap on .query-guide-entry",
+    "rapidNavigation": "Three synchronous query-page onOpenGuide handlers plus competing onGoFollow in one evaluate call; not three physical touch gestures",
+    "console": "Matching line counts for error, routeDone, 601008, and too early over each reopened simulator session; zero matches is not a guarantee against untested incidents"
+  },
+  "restoration": {
+    "restored": true,
+    "actualSdkVersion": "3.17.3",
+    "platform": "devtools",
+    "automationPort": 9452,
+    "originalConfigSha256": {
+      "project.config.json": "27d56443e699a0a58949251ab6da15f854c7704ef7835565677da2568523dbd1",
+      "project.private.config.json": "52c80108e1e3a25851a84ccbbee1eaf7dc58d5c8ee1fa2428435853bb333ab61"
+    },
+    "finalConfigSha256": {
+      "project.config.json": "27d56443e699a0a58949251ab6da15f854c7704ef7835565677da2568523dbd1",
+      "project.private.config.json": "52c80108e1e3a25851a84ccbbee1eaf7dc58d5c8ee1fa2428435853bb333ab61"
+    },
+    "verifiedAt": "2026-10-26T06:25:48.878Z"
+  },
+  "attempts": [
+    {
+      "path": "output/diagnostics-20261026/sdk-3.16.3-native.json",
+      "outcome": "Failed refresh-only SDK switch; actual SDK remained 3.17.3"
+    },
+    {
+      "path": "output/diagnostics-20261026/sdk-matrix-20261026-121215/native-sdk-matrix.json",
+      "outcome": "Reopened project without re-enabling automation: runtimeid unavailable; no navigation tested"
+    },
+    {
+      "path": "output/diagnostics-20261026/sdk-matrix-20261026-121447/native-sdk-matrix.json",
+      "outcome": "Immediate route assertion ran before settlement; later old-port automation connection stalled"
+    },
+    {
+      "path": "C:\\Users\\Administrator\\Downloads\\flower book\\guoxiaoshao-master\\guoxiaoshao-master\\output\\diagnostics-20261026\\sdk-matrix-20261026-142002/native-sdk-matrix.json",
+      "outcome": "3.16.3 navigation passed; 3.17.4 cached page callMethod failed; original-port restoration connection timed out"
+    },
+    {
+      "path": "C:\\Users\\Administrator\\Downloads\\flower book\\guoxiaoshao-master\\guoxiaoshao-master\\output\\diagnostics-20261026\\sdk-matrix-20261026-142404/native-sdk-matrix.json",
+      "outcome": "3.17.4 navigation passed with runtime-page reads; original config bytes and actual SDK 3.17.3 restored on fresh automation port"
+    }
+  ],
+  "finishedAt": "2026-10-26T14:25:17.8908783+08:00"
+}

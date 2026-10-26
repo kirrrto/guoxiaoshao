@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 1,
+  "reason": "Production CloudBase rejected concurrent operations inside one transaction with ResourceUnavailable.TransactionBusy. Offline SDK transport did not model server-side transaction concurrency.",
+  "failedWindow": {
+    "start": "2026-10-26T15:48:00+08:00",
+    "end": "2026-10-26T15:51:00+08:00"
+  },
+  "originalDeployment": "batch-deployment.json",
+  "rollback": {
+    "monitor": {
+      "at": "2026-10-26T07:50:47.152Z",
+      "RequestId": "910e21ea-d342-4b83-900a-65574ef8bbbf"
+    },
+    "api": {
+      "at": "2026-10-26T07:50:52.941Z",
+      "RequestId": "f36d8d0e-5f01-4407-8eee-8c7fdc29d8ef"
+    }
+  },
+  "restoredFiles": [
+    "lib/repo/atomic-ops.js",
+    "lib/engine/observations.js"
+  ],
+  "retainedFiles": [
+    "lib/collections.js",
+    "lib/engine/guarded-pickup.js"
+  ],
+  "monitorManifestRebuilt": true,
+  "codeVerification": "admission-deployed-code.json",
+  "failedInvocations": [
+    {
+      "at": "2026-10-26 15:50:19.713",
+      "requestId": "a8ddcec6-31d3-4c42-be36-21bf9966f0be",
+      "result": {
+        "ok": true,
+        "state": "error",
+        "scanned": 16,
+        "observations": 40,
+        "events": 0,
+        "sent": 0,
+        "deadlineReached": false
+      }
+    },
+    {
+      "at": "2026-10-26 15:49:35.105",
+      "requestId": "09faa20b-1b2e-44ab-b261-846978dd754f",
+      "result": {
+        "ok": true,
+        "state": "error",
+        "scanned": 18,
+        "observations": 44,
+        "events": 0,
+        "sent": 0,
+        "deadlineReached": false
+      }
+    },
+    {
+      "at": "2026-10-26 15:48:28.938",
+      "requestId": "179c0db7-fd62-452f-be9e-53bd1c1c86e1",
+      "result": {
+        "ok": true,
+        "state": "error",
+        "scanned": 19,
+        "observations": 47,
+        "events": 0,
+        "sent": 0,
+        "deadlineReached": false
+      }
+    }
+  ],
+  "limitations": [
+    "Observation statistics are fetched samples, not proof all failed-batch samples committed.",
+    "Coverage during the three error invocations is not guaranteed; the failed window is excluded from savings comparison.",
+    "No new stock event or delivered message was demonstrated."
+  ],
+  "recoveryInvocations": [
+    {
+      "at": "2026-10-26 15:51:28.031",
+      "requestId": "9303d451-254e-4317-9887-a8adb7480744",
+      "result": {
+        "ok": true,
+        "state": "running",
+        "scanned": 26,
+        "observations": 64,
+        "events": 0,
+        "sent": 0,
+        "deadlineReached": false
+      }
+    }
+  ]
+}

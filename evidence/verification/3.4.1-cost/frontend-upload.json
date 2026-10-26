@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "version": "3.4.1",
+  "appid": "wxe96ad9e77b602f1b",
+  "uploadInfoWrittenAt": "2026-10-26T06:26:46.073Z",
+  "timeSource": "Local CLI receipt file modification time; no server timestamp returned",
+  "verifiedAt": "2026-10-26T06:27:37.431Z",
+  "sourceFingerprint": "sha256:8d9b7d28df6c4d611098dcec25185d0cde4cd554e0f7cf4075c4247e424dbdd0",
+  "sourceFingerprintUnchangedAfterUpload": true,
+  "description": "2026-10-26 导航稳定性与后台降耗修复，源码8d9b7d28df6c",
+  "exitCode": 0,
+  "packageBytes": 1660719,
+  "uploadLogSha256": "5ed19b41cae745bb6e90a1540edfc155b4f379e92e12f03e1e473e2216603320",
+  "uploadInfo": {
+    "size": {
+      "total": 1660719,
+      "packages": [
+        {
+          "name": "TOTAL",
+          "size": 1660719
+        }
+      ]
+    }
+  },
+  "trialSelection": "unconfirmed",
+  "submittedForReview": false,
+  "published": false,
+  "cloudQualityRetest": "pending",
+  "nativeEvidence": "native-sdk-matrix.json"
+}

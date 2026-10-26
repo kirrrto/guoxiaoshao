@@ -1,0 +1,85 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-10-26T06:17:34.145Z",
+  "environment": "flowermean-6gjaxfqhf6c13e88",
+  "deploymentRequests": [
+    {
+      "name": "gxs_api",
+      "phase": "logic",
+      "at": "2026-10-26T06:16:45.251Z",
+      "response": {
+        "RequestId": "ae7ced0e-9585-47ab-b459-ad0e86013783"
+      }
+    },
+    {
+      "name": "gxs_api",
+      "phase": "metadata",
+      "at": "2026-10-26T06:16:50.709Z",
+      "response": {
+        "RequestId": "3071c917-5fa1-4239-9e47-65fe5dfae8fe"
+      }
+    },
+    {
+      "name": "gxs_monitor",
+      "phase": "logic",
+      "at": "2026-10-26T06:16:57.106Z",
+      "response": {
+        "RequestId": "0f3a36dd-f85e-425a-b251-ce840d6326fe"
+      }
+    },
+    {
+      "name": "gxs_monitor",
+      "phase": "metadata",
+      "at": "2026-10-26T06:17:03.578Z",
+      "response": {
+        "RequestId": "689f4f65-ed74-4d27-8991-06d275347614"
+      }
+    },
+    {
+      "name": "cloudbase_auth",
+      "phase": "metadata",
+      "at": "2026-10-26T06:17:07.201Z",
+      "response": {
+        "RequestId": "217a2ad8-070c-4268-aaf3-f449e6f942e9"
+      }
+    }
+  ],
+  "configuration": [
+    {
+      "name": "gxs_api",
+      "status": "Active",
+      "modifiedAt": "2026-10-26 14:16:50",
+      "runtime": "Nodejs18.15",
+      "timeout": 60,
+      "memory": 256,
+      "unchangedConfiguration": true,
+      "changedConfigurationFields": [],
+      "beforeCodeSha256": "cebbbb703e0356e91c3b5cb736d894eb084ddc1abe01599b769f380175b99d2a",
+      "afterCodeSha256": "7a6b7ec2dc65213f912f7b65778f47ebf41d3e5572bb7356a045aa88d550815b"
+    },
+    {
+      "name": "gxs_monitor",
+      "status": "Active",
+      "modifiedAt": "2026-10-26 14:17:02",
+      "runtime": "Nodejs20.19",
+      "timeout": 60,
+      "memory": 256,
+      "unchangedConfiguration": true,
+      "changedConfigurationFields": [],
+      "beforeCodeSha256": "3d0c1f424e61b123d9808a2ba43ecd539c6b7dfe066b8fca5d4eda7a7909c7d7",
+      "afterCodeSha256": "a3d9b498f52d49b4ed0e3d40606eed7e8260ea9906aa87d4cd1613a1778b7bbc"
+    },
+    {
+      "name": "cloudbase_auth",
+      "status": "Active",
+      "modifiedAt": "2026-10-26 14:17:06",
+      "runtime": "Nodejs18.15",
+      "timeout": 5,
+      "memory": 256,
+      "unchangedConfiguration": true,
+      "changedConfigurationFields": [],
+      "beforeCodeSha256": "f2ceae654117e301f753682d48211d624c0366e2cd583d50a905062b8a5e6c16",
+      "afterCodeSha256": "09edc086ceab1dd93a4fa85aea6bb17177c1f667aba376e62ea5719937a329a2"
+    }
+  ]
+}

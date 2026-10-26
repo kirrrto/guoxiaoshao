@@ -1,0 +1,203 @@
+{
+  "schemaVersion": 1,
+  "environment": "flowermean-6gjaxfqhf6c13e88",
+  "service": "ibot-huajingling",
+  "changedAt": "2026-10-26T06:21:23.933Z",
+  "checkedAt": "2026-10-26T06:22:34.161Z",
+  "reason": "Reduce an idle request-driven AI service's always-on instance cost; no application background timers found in source review",
+  "before": {
+    "minInstances": 1,
+    "maxInstances": 5,
+    "cpu": 1,
+    "memoryGb": 2
+  },
+  "after": {
+    "minInstances": 0,
+    "maxInstances": 5,
+    "cpu": 1,
+    "memoryGb": 2,
+    "status": "normal"
+  },
+  "semanticChangedFields": [
+    "MinNum"
+  ],
+  "imageUnchanged": true,
+  "domainUnchanged": true,
+  "accessTypes": [
+    "OA",
+    "PUBLIC"
+  ],
+  "receipt": {
+    "success": true,
+    "data": {
+      "serviceName": "ibot-huajingling",
+      "status": "configUpdating",
+      "itemsCount": 1,
+      "itemsKeys": [
+        "MinNum"
+      ],
+      "appliedConfig": {
+        "hasVpcConf": false,
+        "envParamKeys": []
+      },
+      "verifiedConfig": {
+        "hasVpcConf": false,
+        "openAccessTypes": [
+          "OA",
+          "PUBLIC"
+        ],
+        "envParamKeys": []
+      },
+      "likelyRedeployFields": [],
+      "consoleUrl": "https://tcb.cloud.tencent.com/dev?envId=flowermean-6gjaxfqhf6c13e88#/platform-run/service/detail?serverName=ibot-huajingling&tabId=overview&envId=flowermean-6gjaxfqhf6c13e88"
+    },
+    "message": "已提交 'ibot-huajingling' 的配置变更。 变更可能以热更新方式生效（如 MinNum/MaxNum/AccessTypes）。请用 queryCloudRun(action=\"detail\") 核验。控制台：https://tcb.cloud.tencent.com/dev?envId=flowermean-6gjaxfqhf6c13e88#/platform-run/service/detail?serverName=ibot-huajingling&tabId=overview&envId=flowermean-6gjaxfqhf6c13e88"
+  },
+  "sourceReview": "output/cost-20261026/ibot-scale-zero-readonly-review.json",
+  "requestMetric": {
+    "EnvId": "flowermean-6gjaxfqhf6c13e88",
+    "MetricName": "TkeInvokeNumService",
+    "StartTime": "2026-10-25 00:00:00",
+    "EndTime": "2026-10-26 14:00:00",
+    "TimeSource": "params",
+    "Period": 3600,
+    "ResourceID": "ibot-huajingling",
+    "Curve": {
+      "EndTime": "2026-10-26 14:00:00",
+      "MetricName": "TkeInvokeNumService",
+      "NewValues": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "Period": 3600,
+      "RequestId": "c4b4d66f-c075-4e06-a9cc-cce4805f061a",
+      "StartTime": "2026-10-25 00:00:00",
+      "Statistics": "sum",
+      "Time": [
+        1792857600,
+        1792861200,
+        1792864800,
+        1792868400,
+        1792872000,
+        1792875600,
+        1792879200,
+        1792882800,
+        1792886400,
+        1792890000,
+        1792893600,
+        1792897200,
+        1792900800,
+        1792904400,
+        1792908000,
+        1792911600,
+        1792915200,
+        1792918800,
+        1792922400,
+        1792926000,
+        1792929600,
+        1792933200,
+        1792936800,
+        1792940400,
+        1792944000,
+        1792947600,
+        1792951200,
+        1792954800,
+        1792958400,
+        1792962000,
+        1792965600,
+        1792969200,
+        1792972800,
+        1792976400
+      ],
+      "Values": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "Summary": {
+      "sampleCount": 34,
+      "max": 0,
+      "min": 0,
+      "avg": 0,
+      "latest": 0,
+      "peakTimestamp": 1792857600,
+      "allZero": true
+    }
+  },
+  "limitations": [
+    "MinNum=0 configuration is confirmed; hourly billed savings have not yet settled.",
+    "The first message after idle may incur cold-start delay. Actual official-account message delivery was not tested.",
+    "Application source reviewed, not every installed framework dependency."
+  ],
+  "rollback": {
+    "action": "manageCloudRun.updateConfig",
+    "serverName": "ibot-huajingling",
+    "serverConfig": {
+      "MinNum": 1
+    }
+  }
+}

@@ -1,0 +1,113 @@
+{
+  "schemaVersion": 1,
+  "version": "3.4.1",
+  "checkedAt": "2026-10-26T08:19:39.598Z",
+  "sourceFingerprint": "sha256:8d9b7d28df6c4d611098dcec25185d0cde4cd554e0f7cf4075c4247e424dbdd0",
+  "localTests": {
+    "passed": true,
+    "count": 1711,
+    "evidence": "phase-local-checks.json"
+  },
+  "sourceCheck": {
+    "passed": true,
+    "files": 562
+  },
+  "backend": {
+    "deployed": true,
+    "zipVerified": true,
+    "functions": [
+      "gxs_api",
+      "gxs_monitor",
+      "cloudbase_auth"
+    ],
+    "configurationRevision": 12,
+    "latestCodeEvidence": "phase-deployed-code.json",
+    "experimentalBatching": "withdrawn after production TransactionBusy; see batch-withdrawal.json",
+    "minuteAlignmentDeployedAt": "2026-10-26T16:13:19+08:00"
+  },
+  "runtimeSampling": {
+    "scope": "eligible active member follows only; shared store/SKU batches",
+    "previousTemporaryTypicalPeriodSeconds": 240,
+    "currentConfiguredMinimumPeriodSeconds": 60,
+    "currentGroupCount": 21,
+    "continuousUpstreamRequestBudgetPerDay": 800000,
+    "configurationEvidence": "runtime-cadence-restored.json",
+    "strictPerTargetOneMinuteCoverageVerified": false,
+    "notes": [
+      "Fixed scheduled cadence now uses minute alignment; resident hash phases unchanged.",
+      "Observed one scan per group per minute in four rounds; no long-term latency SLA verified."
+    ],
+    "phaseFixEvidence": "phase-deployment.json",
+    "observedOneScanPerMinute": true,
+    "observedRounds": 4,
+    "stableSuccessIntervalSeconds": {
+      "min": 58.489,
+      "max": 61.423,
+      "p95": 61.343
+    }
+  },
+  "liveObservation": {
+    "twoRegularCyclesObserved": true,
+    "windowStart": "2026-10-26T16:15:00+08:00",
+    "windowEnd": "2026-10-26T16:18:00+08:00",
+    "gatewayAccessBefore": 2591,
+    "gatewayAccessAfter": 2383,
+    "samplesBefore": 156,
+    "samplesAfter": 156,
+    "configUpdateTransactionConflictsBefore": 30,
+    "configUpdateTransactionConflictsAfter": 0,
+    "observationalReductionPercent": 8.02778849864917,
+    "pureCodeSavingsMeasured": false,
+    "settledInvoiceSavingsVerified": false,
+    "coverageEvidence": "phase-live-comparison.json",
+    "priorTenMinuteComparisonEvidence": "same-cadence-admission-comparison.json"
+  },
+  "nativeSimulator": {
+    "passed": true,
+    "actualSdks": [
+      "3.16.3",
+      "3.17.4"
+    ],
+    "restoredSdk": "3.17.3"
+  },
+  "frontend": {
+    "uploaded": true,
+    "packageBytes": 1660719,
+    "trialSelection": "unconfirmed",
+    "published": false
+  },
+  "cloudQuality": {
+    "passed": false,
+    "findingsRemainOpen": true,
+    "accessBlockedBySiteSafetyPolicy": true
+  },
+  "publicationReady": false,
+  "evidence": [
+    "local-checks.json",
+    "deployment.json",
+    "deployed-code.json",
+    "runtime-config-change.json",
+    "live-before.json",
+    "live-after.json",
+    "live-comparison.json",
+    "idle-service-scaling.json",
+    "native-sdk-matrix.json",
+    "frontend-upload.json",
+    "release-check.json",
+    "historical-cycles.json",
+    "runtime-cadence-restored.json",
+    "retention-index-fix.json",
+    "batch-withdrawal.json",
+    "admission-deployed-code.json",
+    "admission-local-checks.json",
+    "admission-release-check.json",
+    "same-cadence-after-admission.json",
+    "same-cadence-admission-comparison.json",
+    "phase-deployment.json",
+    "phase-deployed-code.json",
+    "phase-local-checks.json",
+    "scheduled-phase-reproduction.json",
+    "phase-live-comparison.json",
+    "phase-release-check.json"
+  ]
+}

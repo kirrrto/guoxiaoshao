@@ -1,0 +1,84 @@
+{
+  "generatedAt": "2026-10-26T07:40:46.208Z",
+  "source": "Actual diagnostics emitted by tests/observation-batch-transaction.test.mjs",
+  "command": "node --test tests/observation-batch-transaction.test.mjs",
+  "exitCode": 0,
+  "sdk": "wx-server-sdk@4.0.2",
+  "offline": true,
+  "fixture": {
+    "sdkOperationLatencyMs": 50,
+    "normalSource": "auto",
+    "storeNumber": "R577",
+    "oldPath": "Same production repository with batch method disabled, preserving the former three-worker single-target path.",
+    "newPath": "Shared transaction only for automatic responses of 2 or 3 targets; larger responses retain the former path."
+  },
+  "cases": [
+    {
+      "targets": 2,
+      "available": false,
+      "beforeCalls": 14,
+      "afterCalls": 11,
+      "beforePlanningReadyMs": 350,
+      "afterPlanningReadyMs": 350
+    },
+    {
+      "targets": 2,
+      "available": true,
+      "beforeCalls": 18,
+      "afterCalls": 15,
+      "beforePlanningReadyMs": 450,
+      "afterPlanningReadyMs": 450
+    },
+    {
+      "targets": 3,
+      "available": false,
+      "beforeCalls": 21,
+      "afterCalls": 15,
+      "beforePlanningReadyMs": 350,
+      "afterPlanningReadyMs": 350
+    },
+    {
+      "targets": 3,
+      "available": true,
+      "beforeCalls": 27,
+      "afterCalls": 21,
+      "beforePlanningReadyMs": 450,
+      "afterPlanningReadyMs": 450
+    },
+    {
+      "targets": 7,
+      "available": false,
+      "beforeCalls": 49,
+      "afterCalls": 49,
+      "beforePlanningReadyMs": 1050,
+      "afterPlanningReadyMs": 1050
+    },
+    {
+      "targets": 7,
+      "available": true,
+      "beforeCalls": 63,
+      "afterCalls": 63,
+      "beforePlanningReadyMs": 1350,
+      "afterPlanningReadyMs": 1350
+    }
+  ],
+  "verification": {
+    "targetedCombination": {
+      "tests": 94,
+      "passed": 94,
+      "failed": 0,
+      "skipped": 0
+    },
+    "thisFileOutput": "✔ automatic batch preserves per-target freshness, events, coverage, and stale/duplicate outcomes (12.3362ms)\n✔ one failed daily write rolls back all batch snapshots and events; retry accepts every sample once (2.1945ms)\n✔ duplicate targets run in input order inside a batch without racing the transaction cache (0.5161ms)\n✔ a batch at Beijing midnight creates the next day summary and keeps the previous day intact (0.4918ms)\n✔ batch enforces its bound and rejects missing, expired, or replaced collector ownership (0.6277ms)\n✔ automatic responses above three targets keep the old bounded worker path; manual target leases stay unchanged (1.5553ms)\n▶ pinned SDK reduces operations without delaying batch completion or the event-planning handoff\n  ✔ 2 targets, unchanged stock (12.0535ms)\n  ✔ 2 targets, new events (4.9024ms)\n  ✔ 3 targets, unchanged stock (4.5221ms)\n  ✔ 3 targets, new events (3.8845ms)\n  ✔ 7 targets, unchanged stock (8.5749ms)\n  ✔ 7 targets, new events (10.5439ms)\n  ✔ a failed write waits for sibling operations and aborts the whole batch without blind retries (2.2226ms)\n  ✔ a real SDK conflict rolls back before retry and preserves a newer manual observation (2.0709ms)\n✔ pinned SDK reduces operations without delaying batch completion or the event-planning handoff (358.7529ms)\nℹ {\"targets\":2,\"available\":false,\"beforeCalls\":14,\"afterCalls\":11,\"beforePlanningReadyMs\":350,\"afterPlanningReadyMs\":350}\nℹ {\"targets\":2,\"available\":true,\"beforeCalls\":18,\"afterCalls\":15,\"beforePlanningReadyMs\":450,\"afterPlanningReadyMs\":450}\nℹ {\"targets\":3,\"available\":false,\"beforeCalls\":21,\"afterCalls\":15,\"beforePlanningReadyMs\":350,\"afterPlanningReadyMs\":350}\nℹ {\"targets\":3,\"available\":true,\"beforeCalls\":27,\"afterCalls\":21,\"beforePlanningReadyMs\":450,\"afterPlanningReadyMs\":450}\nℹ {\"targets\":7,\"available\":false,\"beforeCalls\":49,\"afterCalls\":49,\"beforePlanningReadyMs\":1050,\"afterPlanningReadyMs\":1050}\nℹ {\"targets\":7,\"available\":true,\"beforeCalls\":63,\"afterCalls\":63,\"beforePlanningReadyMs\":1350,\"afterPlanningReadyMs\":1350}\nℹ tests 15\nℹ suites 0\nℹ pass 15\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 470.4314\n"
+  },
+  "limitations": [
+    "Fixed 50ms virtual time per real SDK request through an in-memory transport; milliseconds are not production latency measurements.",
+    "No cloud request, real message delivery, billing-rate conversion, or production throughput test performed.",
+    "Every latest and daily-summary write is retained; only transaction boundaries and repeated collector-lease reads are removed."
+  ],
+  "sourceSha256": {
+    "cloudfunctions/gxs_api/lib/repo/atomic-ops.js": "b916c21ab51c425af48b38b966a7e7609342afee5df5feb6f997853419181d76",
+    "cloudfunctions/gxs_api/lib/engine/observations.js": "1cfc27468fb19513739bd74eba1242bee67d3cb4a745b6c4b8ca526928b1e303",
+    "tests/observation-batch-transaction.test.mjs": "3bb7148ae90657036c8447ca1102b666fd7c0287df6db9af7ac1210ebdaa705e"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "checkedAt": "2026-10-26T02:52:59.022Z",
+  "scope": "Local official WXML/WXSS compiler execution; not simulator, physical device, upload, or cloud quality acceptance",
+  "results": [
+    {
+      "compiler": "wcc",
+      "compilerSha256": "2ec832ea823c5f53e264230960637290a8cc7694773016b4c232a439193c9179",
+      "files": 11,
+      "status": 0,
+      "stderr": "",
+      "outputBytes": 349907
+    },
+    {
+      "compiler": "wcsc",
+      "compilerSha256": "23914ded6433a178c184e4e0fcdb077b499502b4e5a784a1f44f3db55699ce31",
+      "files": 15,
+      "status": 0,
+      "stderr": "",
+      "outputBytes": 29481
+    }
+  ]
+}

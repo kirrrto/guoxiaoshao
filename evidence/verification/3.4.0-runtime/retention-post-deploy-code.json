@@ -1,0 +1,99 @@
+{
+  "schemaVersion": 1,
+  "kind": "downloaded-cloud-function-code-exact-byte-comparison",
+  "checkedAt": "2026-10-26T03:18:41.862684+00:00",
+  "method": "Compare every decompressed non-directory ZIP entry, including node_modules, byte for byte; compare the three intended changes with current local files.",
+  "passed": true,
+  "functions": [
+    {
+      "functionName": "gxs_api",
+      "oldArchive": "output/cloud-code-audit-2026-10-26/gxs_api.zip",
+      "newArchive": "output/diagnostics-20261026/post-deploy/gxs_api.zip",
+      "oldArchiveSha256": "c9886639dc3ef761cef18a711a74a8fc6272c45359984b193014ab953c858239",
+      "newArchiveSha256": "cebbbb703e0356e91c3b5cb736d894eb084ddc1abe01599b769f380175b99d2a",
+      "oldFileCount": 5902,
+      "deployedFileCount": 5902,
+      "unchangedFileCount": 5901,
+      "unchangedDependencyFileCount": 5826,
+      "addedFiles": [],
+      "removedFiles": [],
+      "changedFiles": [
+        {
+          "file": "lib/repo/cloudbase-repo.js",
+          "oldSha256": "b3887555131942733cfae8e292250e4738a36efe65ef00a9c133243c7531fba7",
+          "deployedSha256": "10c02a7981cc06c624f9f8c571544a22581a9216ee377bb012780ccd4932da1c"
+        }
+      ],
+      "expectedChangedFiles": [
+        "lib/repo/cloudbase-repo.js"
+      ],
+      "localMatches": [
+        {
+          "file": "lib/repo/cloudbase-repo.js",
+          "localSha256": "10c02a7981cc06c624f9f8c571544a22581a9216ee377bb012780ccd4932da1c",
+          "deployedSha256": "10c02a7981cc06c624f9f8c571544a22581a9216ee377bb012780ccd4932da1c",
+          "exactBytesMatch": true
+        }
+      ],
+      "passed": true,
+      "cloudReportedCodeSha256": "cebbbb703e0356e91c3b5cb736d894eb084ddc1abe01599b769f380175b99d2a",
+      "downloadMatchesCloudCodeSha256": true
+    },
+    {
+      "functionName": "gxs_monitor",
+      "oldArchive": "output/cloud-code-audit-2026-10-26/gxs_monitor.zip",
+      "newArchive": "output/diagnostics-20261026/post-deploy/gxs_monitor.zip",
+      "oldArchiveSha256": "b2c8b3cc8ff433b0973af286064e2676982c523bfd7a5cdbfecc5e1965bc07b8",
+      "newArchiveSha256": "3d0c1f424e61b123d9808a2ba43ecd539c6b7dfe066b8fca5d4eda7a7909c7d7",
+      "oldFileCount": 5825,
+      "deployedFileCount": 5825,
+      "unchangedFileCount": 5823,
+      "unchangedDependencyFileCount": 5777,
+      "addedFiles": [],
+      "removedFiles": [],
+      "changedFiles": [
+        {
+          "file": "lib-manifest.json",
+          "oldSha256": "261d9788e707d22f15774a4e976c655f52471447ae148d115011ee2ca3a25471",
+          "deployedSha256": "a394a71c1450bfac48302fcf3114368c0fdac1f06afe103b5e48f911ab4ed829"
+        },
+        {
+          "file": "lib/repo/cloudbase-repo.js",
+          "oldSha256": "b3887555131942733cfae8e292250e4738a36efe65ef00a9c133243c7531fba7",
+          "deployedSha256": "10c02a7981cc06c624f9f8c571544a22581a9216ee377bb012780ccd4932da1c"
+        }
+      ],
+      "expectedChangedFiles": [
+        "lib-manifest.json",
+        "lib/repo/cloudbase-repo.js"
+      ],
+      "localMatches": [
+        {
+          "file": "lib-manifest.json",
+          "localSha256": "a394a71c1450bfac48302fcf3114368c0fdac1f06afe103b5e48f911ab4ed829",
+          "deployedSha256": "a394a71c1450bfac48302fcf3114368c0fdac1f06afe103b5e48f911ab4ed829",
+          "exactBytesMatch": true
+        },
+        {
+          "file": "lib/repo/cloudbase-repo.js",
+          "localSha256": "10c02a7981cc06c624f9f8c571544a22581a9216ee377bb012780ccd4932da1c",
+          "deployedSha256": "10c02a7981cc06c624f9f8c571544a22581a9216ee377bb012780ccd4932da1c",
+          "exactBytesMatch": true
+        }
+      ],
+      "passed": true,
+      "cloudReportedCodeSha256": "3d0c1f424e61b123d9808a2ba43ecd539c6b7dfe066b8fca5d4eda7a7909c7d7",
+      "downloadMatchesCloudCodeSha256": true
+    }
+  ],
+  "limitations": [
+    "Code identity verification does not prove a function invocation or data retention outcome.",
+    "Signed download URLs are intentionally neither recorded nor displayed."
+  ],
+  "cloudReadOperations": [
+    "auth status",
+    "getFunctionDownloadUrl: gxs_api",
+    "getFunctionDownloadUrl: gxs_monitor",
+    "download official signed ZIP responses without storing the URLs"
+  ]
+}

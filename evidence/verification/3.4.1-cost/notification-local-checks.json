@@ -1,0 +1,46 @@
+{
+  "checkedAt": "2026-10-26T08:59:09.379Z",
+  "tests": {
+    "command": "npm test",
+    "exitCode": 0,
+    "tests": 1736,
+    "passed": 1736,
+    "failed": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "durationMs": 121868.1896,
+    "log": "output/cost-20261026/final-release-341-tests.log"
+  },
+  "sourceCheck": {
+    "files": 564,
+    "javaScript": 400,
+    "json": 48,
+    "pages": 7,
+    "operatorPages": 1,
+    "errors": []
+  },
+  "monitorCheck": {
+    "checked": true,
+    "source": "cloudfunctions/gxs_api/lib",
+    "target": "cloudfunctions/gxs_monitor/lib",
+    "passed": true,
+    "files": 43,
+    "sourceBytes": 311927,
+    "issues": []
+  },
+  "sourceHashes": [
+    {
+      "file": "lib/engine/collector.js",
+      "sha256": "9f8497462ccbb201ec0312a9e56d241c947df86d154a2f425c7b624cb767e371"
+    },
+    {
+      "file": "lib/repo/cloudbase-repo.js",
+      "sha256": "a5e9c975f04c0573d5e2dca2252ffcaf0da8e22de8c13240cbe0728c5010283c"
+    }
+  ],
+  "independentReview": {
+    "notificationTests": 44,
+    "readIdTests": 32,
+    "blockingFindings": 0
+  }
+}

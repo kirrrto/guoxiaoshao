@@ -1,0 +1,533 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-10-26T06:34:50.232Z",
+  "window": {
+    "start": "2026-10-26T14:20:00+08:00",
+    "end": "2026-10-26T14:30:00+08:00",
+    "minutes": 10
+  },
+  "access": {
+    "total": 3226,
+    "groups": [
+      {
+        "module": "database",
+        "action": "QueryDocument",
+        "resourceName": "gxs_config",
+        "statusCode": 200,
+        "count": 812
+      },
+      {
+        "count": 418,
+        "module": "database",
+        "action": "StartTransaction",
+        "resourceName": "undefined",
+        "statusCode": 200
+      },
+      {
+        "module": "database",
+        "action": "CommitTransaction",
+        "resourceName": "undefined",
+        "statusCode": 200,
+        "count": 388
+      },
+      {
+        "statusCode": 200,
+        "count": 265,
+        "module": "database",
+        "action": "UpdateDocument",
+        "resourceName": "gxs_config"
+      },
+      {
+        "module": "database",
+        "action": "QueryDocument",
+        "resourceName": "gxs_latest",
+        "statusCode": 200,
+        "count": 190
+      },
+      {
+        "module": "database",
+        "action": "QueryDocument",
+        "resourceName": "gxs_observation_days",
+        "statusCode": 200,
+        "count": 157
+      },
+      {
+        "module": "database",
+        "action": "UpdateDocument",
+        "resourceName": "gxs_latest",
+        "statusCode": 200,
+        "count": 157
+      },
+      {
+        "statusCode": 200,
+        "count": 157,
+        "module": "database",
+        "action": "UpdateDocument",
+        "resourceName": "gxs_observation_days"
+      },
+      {
+        "module": "database",
+        "action": "QueryDocument",
+        "resourceName": "gxs_users",
+        "statusCode": 200,
+        "count": 142
+      },
+      {
+        "module": "database",
+        "action": "QueryDocument",
+        "resourceName": "gxs_notifications",
+        "statusCode": 200,
+        "count": 115
+      },
+      {
+        "module": "database",
+        "action": "QueryDocument",
+        "resourceName": "gxs_events",
+        "statusCode": 200,
+        "count": 106
+      },
+      {
+        "module": "database",
+        "action": "QueryDocument",
+        "resourceName": "gxs_orders",
+        "statusCode": 200,
+        "count": 80
+      },
+      {
+        "module": "database",
+        "action": "UpdateDocument",
+        "resourceName": "gxs_orders",
+        "statusCode": 200,
+        "count": 49
+      },
+      {
+        "count": 43,
+        "module": "database",
+        "action": "QueryDocument",
+        "resourceName": "gxs_follows",
+        "statusCode": 200
+      },
+      {
+        "statusCode": 404,
+        "count": 30,
+        "module": "database",
+        "action": "UpdateDocument",
+        "resourceName": "gxs_config"
+      },
+      {
+        "resourceName": "undefined",
+        "statusCode": 404,
+        "count": 30,
+        "module": "database",
+        "action": "AbortTransaction"
+      },
+      {
+        "resourceName": "gxs_catalog_products",
+        "statusCode": 200,
+        "count": 28,
+        "module": "database",
+        "action": "QueryDocument"
+      },
+      {
+        "count": 20,
+        "module": "database",
+        "action": "UpdateDocument",
+        "resourceName": "gxs_notifications",
+        "statusCode": 200
+      },
+      {
+        "module": "database",
+        "action": "QueryDocument",
+        "resourceName": "gxs_catalog_stores",
+        "statusCode": 200,
+        "count": 14
+      },
+      {
+        "module": "database",
+        "action": "QueryDocument",
+        "resourceName": "gxs_quota_ledger",
+        "statusCode": 200,
+        "count": 12
+      },
+      {
+        "action": "QueryDocument",
+        "resourceName": "gxs_queries",
+        "statusCode": 200,
+        "count": 8,
+        "module": "database"
+      },
+      {
+        "module": "function",
+        "action": "InvokeFunction",
+        "resourceName": "gxs_api",
+        "statusCode": 200,
+        "count": 4
+      },
+      {
+        "action": "UpdateDocument",
+        "resourceName": "gxs_users",
+        "statusCode": 200,
+        "count": 1,
+        "module": "database"
+      }
+    ]
+  },
+  "monitor": [
+    {
+      "at": "2026-10-26 14:29:04.095",
+      "requestId": "2707ba82-f77a-4565-b71e-083b447c90f6",
+      "result": {
+        "ok": true,
+        "state": "running",
+        "scanned": 0,
+        "observations": 0,
+        "events": 0,
+        "sent": 0,
+        "deadlineReached": false
+      }
+    },
+    {
+      "at": "2026-10-26 14:28:20.283",
+      "requestId": "0f708c96-20b2-46f6-af40-29a888abc675",
+      "result": {
+        "ok": true,
+        "state": "running",
+        "scanned": 20,
+        "observations": 50,
+        "events": 0,
+        "sent": 0,
+        "deadlineReached": false
+      }
+    },
+    {
+      "at": "2026-10-26 14:27:04.344",
+      "requestId": "1c232bec-faeb-4ecf-a684-e047c544cb45",
+      "result": {
+        "ok": true,
+        "state": "running",
+        "scanned": 1,
+        "observations": 2,
+        "events": 0,
+        "sent": 0,
+        "deadlineReached": false
+      }
+    },
+    {
+      "at": "2026-10-26 14:26:03.961",
+      "requestId": "bfb2ebaa-af77-4e2e-8154-b982180105db",
+      "result": {
+        "ok": true,
+        "state": "running",
+        "scanned": 0,
+        "observations": 0,
+        "events": 0,
+        "sent": 0,
+        "deadlineReached": false
+      }
+    },
+    {
+      "at": "2026-10-26 14:25:04.564",
+      "requestId": "fb1d6e34-89a2-4983-bc99-6663ab672878",
+      "result": {
+        "ok": true,
+        "state": "running",
+        "scanned": 0,
+        "observations": 0,
+        "events": 0,
+        "sent": 0,
+        "deadlineReached": false
+      }
+    },
+    {
+      "at": "2026-10-26 14:24:30.616",
+      "requestId": "27372d19-bef6-4be7-80c9-61ac6f9ae75a",
+      "result": {
+        "ok": true,
+        "state": "running",
+        "scanned": 20,
+        "observations": 50,
+        "events": 0,
+        "sent": 0,
+        "deadlineReached": false
+      }
+    },
+    {
+      "at": "2026-10-26 14:23:11.643",
+      "requestId": "7dd49f87-8856-482d-b04c-ef6ee0a57e8c",
+      "result": {
+        "ok": true,
+        "state": "running",
+        "scanned": 5,
+        "observations": 8,
+        "events": 0,
+        "sent": 0,
+        "deadlineReached": false
+      }
+    },
+    {
+      "at": "2026-10-26 14:22:03.162",
+      "requestId": "4ec8993c-7a8b-4748-8f4e-86064262eee3",
+      "result": {
+        "ok": true,
+        "state": "running",
+        "scanned": 0,
+        "observations": 0,
+        "events": 0,
+        "sent": 0,
+        "deadlineReached": false
+      }
+    },
+    {
+      "at": "2026-10-26 14:21:03.073",
+      "requestId": "5b25ba67-4522-4197-bb74-a083269ec298",
+      "result": {
+        "ok": true,
+        "state": "running",
+        "scanned": 0,
+        "observations": 0,
+        "events": 0,
+        "sent": 0,
+        "deadlineReached": false
+      }
+    },
+    {
+      "at": "2026-10-26 14:20:21.297",
+      "requestId": "b18ae1a8-5738-46de-8f77-efeaace670b7",
+      "result": {
+        "ok": true,
+        "state": "running",
+        "scanned": 18,
+        "observations": 47,
+        "events": 0,
+        "sent": 0,
+        "deadlineReached": false
+      }
+    }
+  ],
+  "functionReports": [
+    {
+      "at": "2026-10-26 14:29:04.095",
+      "requestId": "2707ba82-f77a-4565-b71e-083b447c90f6",
+      "durationMs": 2776,
+      "statusCode": "200",
+      "retCode": "0"
+    },
+    {
+      "at": "2026-10-26 14:28:20.283",
+      "requestId": "0f708c96-20b2-46f6-af40-29a888abc675",
+      "durationMs": 19063,
+      "statusCode": "200",
+      "retCode": "0"
+    },
+    {
+      "at": "2026-10-26 14:27:04.344",
+      "requestId": "1c232bec-faeb-4ecf-a684-e047c544cb45",
+      "durationMs": 3583,
+      "statusCode": "200",
+      "retCode": "0"
+    },
+    {
+      "at": "2026-10-26 14:26:03.961",
+      "requestId": "bfb2ebaa-af77-4e2e-8154-b982180105db",
+      "durationMs": 2569,
+      "statusCode": "200",
+      "retCode": "0"
+    },
+    {
+      "at": "2026-10-26 14:25:04.564",
+      "requestId": "fb1d6e34-89a2-4983-bc99-6663ab672878",
+      "durationMs": 2499,
+      "statusCode": "200",
+      "retCode": "0"
+    },
+    {
+      "at": "2026-10-26 14:24:30.616",
+      "requestId": "27372d19-bef6-4be7-80c9-61ac6f9ae75a",
+      "durationMs": 25069,
+      "statusCode": "200",
+      "retCode": "0"
+    },
+    {
+      "at": "2026-10-26 14:23:11.643",
+      "requestId": "7dd49f87-8856-482d-b04c-ef6ee0a57e8c",
+      "durationMs": 10528,
+      "statusCode": "200",
+      "retCode": "0"
+    },
+    {
+      "at": "2026-10-26 14:22:03.162",
+      "requestId": "4ec8993c-7a8b-4748-8f4e-86064262eee3",
+      "durationMs": 1913,
+      "statusCode": "200",
+      "retCode": "0"
+    },
+    {
+      "at": "2026-10-26 14:21:03.073",
+      "requestId": "5b25ba67-4522-4197-bb74-a083269ec298",
+      "durationMs": 2329,
+      "statusCode": "200",
+      "retCode": "0"
+    },
+    {
+      "at": "2026-10-26 14:20:21.297",
+      "requestId": "b18ae1a8-5738-46de-8f77-efeaace670b7",
+      "durationMs": 18863,
+      "statusCode": "200",
+      "retCode": "0"
+    }
+  ],
+  "finalCollectorStatus": {
+    "_id": "collector_status",
+    "budget": {
+      "allowed": true,
+      "maxRequestsPerDay": 10000,
+      "reason": null
+    },
+    "cadenceMode": "adaptive",
+    "expiresAt": "2026-10-26T06:32:34.716Z",
+    "groupCount": 21,
+    "intervalMs": 226800,
+    "mode": "scheduled",
+    "notifications": {
+      "authReady": true,
+      "authState": "ready",
+      "checkedAt": "2026-10-26T06:30:03.420Z",
+      "credentialsConfigured": true,
+      "enabled": true,
+      "lastErrorCode": null,
+      "reason": null,
+      "validUntil": "2026-10-26T08:06:03.420Z"
+    },
+    "observationHealth": {
+      "evaluatedAt": "2026-10-26T06:30:04.716Z",
+      "freshGroups": 21,
+      "groupCount": 21,
+      "lastSuccessAt": "2026-10-26T06:28:19.409Z",
+      "oldestSuccessAt": "2026-10-26T06:27:02.935Z",
+      "pendingGroups": 0,
+      "staleAfterMs": 521600,
+      "staleGroups": 0,
+      "state": "healthy"
+    },
+    "state": "running",
+    "stats": {
+      "batches": 0,
+      "lastBatchAt": "2026-10-26T06:28:19.781Z",
+      "observations": 0
+    },
+    "targetPeriodMs": 226800,
+    "updatedAt": "2026-10-26T06:30:04.716Z"
+  },
+  "apiLogStatusGroups": [
+    {
+      "status_code": 200,
+      "ret_code": 0,
+      "count": 93
+    },
+    {
+      "status_code": 202,
+      "ret_code": 2,
+      "count": 70
+    }
+  ],
+  "databaseCurves": {
+    "read": {
+      "EnvId": "flowermean-6gjaxfqhf6c13e88",
+      "MetricName": "DbRead",
+      "StartTime": "2026-10-26 14:05:00",
+      "EndTime": "2026-10-26 14:35:00",
+      "TimeSource": "params",
+      "Period": 300,
+      "Curve": {
+        "EndTime": "2026-10-26 14:35:00",
+        "MetricName": "DbRead",
+        "NewValues": [
+          3469,
+          2799,
+          2958,
+          3499,
+          636,
+          498
+        ],
+        "Period": 300,
+        "RequestId": "9dd8977f-e0ed-4960-a56d-9a1e9bf4b873",
+        "StartTime": "2026-10-26 14:05:00",
+        "Statistics": "sum",
+        "Time": [
+          1792994700,
+          1792995000,
+          1792995300,
+          1792995600,
+          1792995900,
+          1792996200
+        ],
+        "Values": [
+          3469,
+          2799,
+          2958,
+          3499,
+          636,
+          498
+        ]
+      },
+      "Summary": {
+        "sampleCount": 6,
+        "max": 3499,
+        "min": 498,
+        "avg": 2309.8333333333335,
+        "latest": 498,
+        "peakTimestamp": 1792995600,
+        "allZero": false
+      }
+    },
+    "write": {
+      "EnvId": "flowermean-6gjaxfqhf6c13e88",
+      "MetricName": "DbWrite",
+      "StartTime": "2026-10-26 14:05:00",
+      "EndTime": "2026-10-26 14:35:00",
+      "TimeSource": "params",
+      "Period": 300,
+      "Curve": {
+        "EndTime": "2026-10-26 14:35:00",
+        "MetricName": "DbWrite",
+        "NewValues": [
+          5036,
+          4090,
+          4340,
+          4338,
+          474,
+          389
+        ],
+        "Period": 300,
+        "RequestId": "e9b16c76-1743-4598-a687-f6e865e21c6e",
+        "StartTime": "2026-10-26 14:05:00",
+        "Statistics": "sum",
+        "Time": [
+          1792994700,
+          1792995000,
+          1792995300,
+          1792995600,
+          1792995900,
+          1792996200
+        ],
+        "Values": [
+          5036,
+          4090,
+          4340,
+          4338,
+          474,
+          389
+        ]
+      },
+      "Summary": {
+        "sampleCount": 6,
+        "max": 5036,
+        "min": 389,
+        "avg": 3111.1666666666665,
+        "latest": 389,
+        "peakTimestamp": 1792994700,
+        "allZero": false
+      }
+    }
+  }
+}

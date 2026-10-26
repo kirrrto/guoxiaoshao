@@ -1,0 +1,54 @@
+{
+  "mode": "prepare",
+  "scope": "Skip proven-empty notification configuration reads and use 100-ID bounded read-only batches; retain cadence, eligibility checks, authoritative delivery validation and 20-item write/delete batches",
+  "functions": [
+    {
+      "functionName": "gxs_api",
+      "baselineSha256": "ea6822315459c9707eb2d4df02f1cfe0f9efb559499e93e788c73033b3281e42",
+      "changed": [
+        {
+          "file": "lib/engine/collector.js",
+          "beforeSha256": "94b0a1b331dfb70d97e9d7b70d731d3f65c65c7985ff1d2b321ffddd98eb96d4",
+          "afterSha256": "9f8497462ccbb201ec0312a9e56d241c947df86d154a2f425c7b624cb767e371",
+          "bytes": 29516
+        },
+        {
+          "file": "lib/repo/cloudbase-repo.js",
+          "beforeSha256": "e11d6e3a12261547482b042115946d1a4cd4c1a7c189bbd836be6ccacdbaffaa",
+          "afterSha256": "a5e9c975f04c0573d5e2dca2252ffcaf0da8e22de8c13240cbe0728c5010283c",
+          "bytes": 25768
+        }
+      ],
+      "fileCount": 5902,
+      "patchSha256": "0a30a411968fe1de153462fb5dbea04422e9bba031c80805e3fb3db5c7c93bfc",
+      "patchBytes": 16505
+    },
+    {
+      "functionName": "gxs_monitor",
+      "baselineSha256": "3755761d22d2d2427610d27c521f3e2596ade3aa951849c8be316db09d1eab1a",
+      "changed": [
+        {
+          "file": "lib/engine/collector.js",
+          "beforeSha256": "94b0a1b331dfb70d97e9d7b70d731d3f65c65c7985ff1d2b321ffddd98eb96d4",
+          "afterSha256": "9f8497462ccbb201ec0312a9e56d241c947df86d154a2f425c7b624cb767e371",
+          "bytes": 29516
+        },
+        {
+          "file": "lib/repo/cloudbase-repo.js",
+          "beforeSha256": "e11d6e3a12261547482b042115946d1a4cd4c1a7c189bbd836be6ccacdbaffaa",
+          "afterSha256": "a5e9c975f04c0573d5e2dca2252ffcaf0da8e22de8c13240cbe0728c5010283c",
+          "bytes": 25768
+        },
+        {
+          "file": "lib-manifest.json",
+          "beforeSha256": "7f92f3c19b7c2f505ddcb2acc7e622690f60964658ba2f1ed232e47eeaa36293",
+          "afterSha256": "8e612a6f49e28ede9be7bed1fdd33ab956bc3526fc68868252fa5ff798d13178",
+          "bytes": 7026
+        }
+      ],
+      "fileCount": 5825,
+      "patchSha256": "ab7774a88c87562930019438e419f4729d268999849ca5468b8a8a5e3ed46751",
+      "patchBytes": 19201
+    }
+  ]
+}

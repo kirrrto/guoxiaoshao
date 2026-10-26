@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-10-26T08:14:29.789Z",
+  "scope": "Final admission/index/minute-alignment patch",
+  "tests": {
+    "command": "npm test",
+    "passed": 1711,
+    "failed": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "durationMs": 91750.6447,
+    "log": "output/cost-20261026/final-phase-tests.log"
+  },
+  "sourceCheck": {
+    "command": "npm run check",
+    "files": 562,
+    "javaScript": 398,
+    "json": 48,
+    "pages": 7,
+    "operatorPages": 1,
+    "errors": [],
+    "log": "output/cost-20261026/final-phase-source-check.log"
+  },
+  "monitor": {
+    "files": 43,
+    "bytes": 309221,
+    "passed": true
+  },
+  "independentReview": {
+    "focusedPassed": 39,
+    "newAndRelatedFocusedPassed": 59
+  },
+  "initialTestFailure": {
+    "log": "output/cost-20261026/phase-tests-initial-assertion.log",
+    "reason": "The added test incorrectly counted all getConfig calls as target refreshes; corrected to assert exactly one admission per sampled group. No business-source change was needed."
+  }
+}

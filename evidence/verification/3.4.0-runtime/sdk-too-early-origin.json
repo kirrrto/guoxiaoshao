@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-10-26",
+  "method": "Static inspection of an official SDK package, including exact reported one-based stack columns. Downloaded SDK code was not executed or installed.",
+  "sdk": {
+    "version": "3.16.3",
+    "officialUrl": "https://res.servicewechat.com/weapp/public/commlib/1637.wxapkg",
+    "urlSource": "Installed official WeChat DevTools WeappVendor/cfg.json libs.3.16.3",
+    "packageBytes": 39678801,
+    "packageSha256": "055b83604c451c4b44d18f3364390f12181cf5473c9b2e3bed6812cfb0154c62",
+    "file": "WAServiceMainContext.js",
+    "fileSha256": "53ebdc4b2dad161600b5eafc68d6ddc3f0f79baa93f190bbf181f68a9c37e3a6",
+    "fileCharacters": 2995632
+  },
+  "reportedIncident": {
+    "miniProgramVersion": "3.4.0",
+    "platform": "Android",
+    "wechatVersion": "8.0.74",
+    "sdkVersion": "3.16.3",
+    "localTime": "2026-10-26 09:21:04",
+    "timeZone": "Asia/Shanghai",
+    "message": "Error: too early",
+    "occurrences": 1
+  },
+  "stackMapping": [
+    { "line": 1, "column": 1347901, "meaning": "Promise API fail adapter constructs an Error after removing the API:fail prefix.", "nearbyCharactersSha256": "807809e5e280aa8bfed783e5ee4a188454191bc4c7af033978728fa5fd623967" },
+    { "line": 1, "column": 176294, "meaning": "Shared function wrapper executes callback r.apply.", "nearbyCharactersSha256": "d42dc8b42b093689b90a4f434e942b610027aede6e4fd36dcd9d6f16437518a3" },
+    { "line": 1, "column": 176737, "meaning": "Shared wrapped callback delegates to p.", "nearbyCharactersSha256": "ba20c6efd56da4feef0328b058599dfc81965e811263811aabc91e86ae2f1cf6" },
+    { "line": 1, "column": 1545942, "meaning": "API failure dispatcher invokes the supplied fail callback.", "nearbyCharactersSha256": "cc82353ba88177c797061e662b2d8f0f9798b6d1003cbfd138ece365daf9c8b9" },
+    { "line": 1, "column": 1546094, "meaning": "Shared API result handler passes a failure through the dispatcher.", "nearbyCharactersSha256": "9ce4c6435f937fc99c7e8048e841cd534b22ee3a09033d26424b8519cfd17a17" },
+    { "line": 1, "column": 1546286, "meaning": "Generic API callback delegates to result handler H.", "nearbyCharactersSha256": "2a68cb7902c7fd07ce2c6d31123e1cfbf7399b0b44459bef158ade00d5576f01" },
+    { "line": 1, "column": 852793, "meaning": "Generic native-invoke callback passes its result to d.", "nearbyCharactersSha256": "f1b333dbcd85860c69c538dd4c84b37607e58b45700414b3ea427cbdc536ec17" },
+    { "line": 1, "column": 134236, "meaning": "Shared bridge result callback forwards the result to r.", "nearbyCharactersSha256": "e2ef8332a6cbf615190ee30b0bb1393d300599b64e7dc29a3e82ee0f2a99743a" },
+    { "line": 1, "column": 134359, "meaning": "Shared bridge returns a synchronous interceptor result via s(u).", "nearbyCharactersSha256": "2fe068d7aefb1622143406111b12f684db166dde8499080e757a133794d992f8" },
+    { "line": 1, "column": 853105, "meaning": "Generic native invoke calls u.invoke; the API name remains the dynamic argument e.", "nearbyCharactersSha256": "ab94d336f412a48a8fea4952b7de8ab6826f773bbf8931108dad801ee422a3a4" }
+  ],
+  "origin": {
+    "messageOffset0": 137562,
+    "condition": "A non-whitelisted bridge API is invoked before library isStarted, outside the allowed agent or worker contexts.",
+    "resultShape": { "errMsg": "<api>:fail too early", "errno": 4 },
+    "promiseTransformation": "Remove the leading API name and :fail prefix, create Error('too early'), and preserve errno.",
+    "knownSourceExcerpt": "t.replace(/^\\w+:fail[ :]?/,\"\")"
+  },
+  "libraryLifecycle": {
+    "isStartedDefinition": "The internal start event is present in the completed lifecycle event registry.",
+    "eventOrder": ["start", "postStart", "execEntryFile"],
+    "implication": "Normal entry-file execution follows start. This stack alone cannot identify whether an internal preload task or another early execution path invoked the API."
+  },
+  "limitations": [
+    "No business frame or native API name is retained in the supplied stack.",
+    "Matching SDK code and stack establishes the failure mechanism, not the caller or an application-level root cause.",
+    "Downloaded SDK source was only parsed as text. An attempted isolated VM replay was rejected by automatic approval review with blocked by policy; it was not retried or counted as validation.",
+    "The independent navigation hardening cannot be claimed to eliminate this incident."
+  ]
+}

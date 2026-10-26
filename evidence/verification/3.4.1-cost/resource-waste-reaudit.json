@@ -1,0 +1,824 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-10-26T08:37:36.883Z",
+  "scope": "Read-only re-audit after minute-alignment patch; no new business-source or cloud mutation in this audit",
+  "window": {
+    "start": "2026-10-26T16:20:00+08:00",
+    "end": "2026-10-26T16:30:00+08:00"
+  },
+  "usage": {
+    "checkedAt": "2026-10-26T08:32:32.948Z",
+    "start": "2026-10-23",
+    "end": "2026-11-22",
+    "totalPoints": 231492.71000000002,
+    "modules": [
+      {
+        "name": "FLEXDB",
+        "points": 140229.14,
+        "metrics": [
+          {
+            "name": "Capacity",
+            "resourceType": "FLEXDB",
+            "value": 67,
+            "points": 2.62,
+            "lastReport": "2026-10-25 00:00:00"
+          },
+          {
+            "name": "ReadRequests",
+            "resourceType": "FLEXDB",
+            "value": 2919934,
+            "points": 58398.68,
+            "lastReport": "2026-10-25 00:00:00"
+          },
+          {
+            "name": "WriteRequests",
+            "resourceType": "FLEXDB",
+            "value": 4091392,
+            "points": 81827.84,
+            "lastReport": "2026-10-25 00:00:00"
+          }
+        ]
+      },
+      {
+        "name": "TDSQL",
+        "points": 0,
+        "metrics": []
+      },
+      {
+        "name": "SCF",
+        "points": 4817,
+        "metrics": [
+          {
+            "name": "MemoryUse",
+            "resourceType": "SCF",
+            "value": 42534,
+            "points": 4724.8,
+            "lastReport": "2026-10-26 00:00:00"
+          },
+          {
+            "name": "Outflow",
+            "resourceType": "SCF",
+            "value": 102497,
+            "points": 78.19,
+            "lastReport": "2026-10-26 00:00:00"
+          },
+          {
+            "name": "Invocation",
+            "resourceType": "SCF",
+            "value": 10459,
+            "points": 14.01,
+            "lastReport": "2026-10-26 00:00:00"
+          }
+        ]
+      },
+      {
+        "name": "EKS",
+        "points": 9588.73,
+        "metrics": [
+          {
+            "name": "Flux",
+            "resourceType": "NAT",
+            "value": 24028808,
+            "points": 17.95,
+            "lastReport": "2026-10-26 00:00:00"
+          },
+          {
+            "name": "CPU",
+            "resourceType": "EKS",
+            "value": 289536,
+            "points": 4423.47,
+            "lastReport": "2026-10-26 00:00:00"
+          },
+          {
+            "name": "Mem",
+            "resourceType": "EKS",
+            "value": 579072,
+            "points": 5147.31,
+            "lastReport": "2026-10-26 00:00:00"
+          }
+        ]
+      },
+      {
+        "name": "COS",
+        "points": 0.48,
+        "metrics": [
+          {
+            "name": "Capacity",
+            "resourceType": "COS",
+            "value": 126,
+            "points": 0.48,
+            "lastReport": "2026-10-25 00:00:00"
+          }
+        ]
+      },
+      {
+        "name": "AI",
+        "points": 0,
+        "metrics": []
+      },
+      {
+        "name": "HOSTING",
+        "points": 6.87,
+        "metrics": [
+          {
+            "name": "Capacity",
+            "resourceType": "HOSTING",
+            "value": 28,
+            "points": 0.1,
+            "lastReport": "2026-10-25 00:00:00"
+          },
+          {
+            "name": "Flux",
+            "resourceType": "HOSTING",
+            "value": 34590415,
+            "points": 6.77,
+            "lastReport": "2026-10-25 00:00:00"
+          }
+        ]
+      },
+      {
+        "name": "Auth",
+        "points": 0,
+        "metrics": []
+      },
+      {
+        "name": "APIInvocation",
+        "points": 76848.5,
+        "metrics": [
+          {
+            "name": "CloudDevelopmentSecureCallsInvocation",
+            "resourceType": "Gateway",
+            "value": 7683242,
+            "points": 76832.42,
+            "lastReport": "2026-10-26 00:00:00"
+          },
+          {
+            "name": "WXInvocation",
+            "resourceType": "Gateway",
+            "value": 804,
+            "points": 16.08,
+            "lastReport": "2026-10-26 00:00:00"
+          }
+        ]
+      },
+      {
+        "name": "HTTPInvocation",
+        "points": 1.99,
+        "metrics": [
+          {
+            "name": "CloudDevelopmentStandardCallsInvocation",
+            "resourceType": "Gateway",
+            "value": 653,
+            "points": 1.99,
+            "lastReport": "2026-10-26 00:00:00"
+          }
+        ]
+      },
+      {
+        "name": "VM",
+        "points": 0,
+        "metrics": []
+      },
+      {
+        "name": "Workflow",
+        "points": 0,
+        "metrics": []
+      },
+      {
+        "name": "Other",
+        "points": 0,
+        "metrics": []
+      }
+    ]
+  },
+  "access": {
+    "total": 7525,
+    "samples": 520,
+    "apiPerSample": 14.471153846153847,
+    "dbQueries": 3950,
+    "dbUpdates": 1696,
+    "transactions": 1872,
+    "configReads": 1898,
+    "notificationEventReads": 646,
+    "errorCalls": 0,
+    "groups": [
+      {
+        "action": "QueryDocument",
+        "resourceName": "gxs_config",
+        "statusCode": 200,
+        "code": "",
+        "count": 1898
+      },
+      {
+        "statusCode": 200,
+        "code": "",
+        "count": 936,
+        "action": "CommitTransaction",
+        "resourceName": "undefined"
+      },
+      {
+        "resourceName": "undefined",
+        "statusCode": 200,
+        "code": "",
+        "count": 936,
+        "action": "StartTransaction"
+      },
+      {
+        "action": "UpdateDocument",
+        "resourceName": "gxs_config",
+        "statusCode": 200,
+        "code": "",
+        "count": 589
+      },
+      {
+        "action": "QueryDocument",
+        "resourceName": "gxs_latest",
+        "statusCode": 200,
+        "code": "",
+        "count": 564
+      },
+      {
+        "action": "UpdateDocument",
+        "resourceName": "gxs_observation_days",
+        "statusCode": 200,
+        "code": "",
+        "count": 520
+      },
+      {
+        "resourceName": "gxs_latest",
+        "statusCode": 200,
+        "code": "",
+        "count": 520,
+        "action": "UpdateDocument"
+      },
+      {
+        "code": "",
+        "count": 520,
+        "action": "QueryDocument",
+        "resourceName": "gxs_observation_days",
+        "statusCode": 200
+      },
+      {
+        "code": "",
+        "count": 334,
+        "action": "QueryDocument",
+        "resourceName": "gxs_notifications",
+        "statusCode": 200
+      },
+      {
+        "action": "QueryDocument",
+        "resourceName": "gxs_events",
+        "statusCode": 200,
+        "code": "",
+        "count": 312
+      },
+      {
+        "code": "",
+        "count": 162,
+        "action": "QueryDocument",
+        "resourceName": "gxs_users",
+        "statusCode": 200
+      },
+      {
+        "statusCode": 200,
+        "code": "",
+        "count": 76,
+        "action": "QueryDocument",
+        "resourceName": "gxs_orders"
+      },
+      {
+        "action": "QueryDocument",
+        "resourceName": "gxs_follows",
+        "statusCode": 200,
+        "code": "",
+        "count": 54
+      },
+      {
+        "action": "UpdateDocument",
+        "resourceName": "gxs_orders",
+        "statusCode": 200,
+        "code": "",
+        "count": 47
+      },
+      {
+        "action": "UpdateDocument",
+        "resourceName": "gxs_notifications",
+        "statusCode": 200,
+        "code": "",
+        "count": 20
+      },
+      {
+        "count": 20,
+        "action": "QueryDocument",
+        "resourceName": "gxs_catalog_products",
+        "statusCode": 200,
+        "code": ""
+      },
+      {
+        "statusCode": 200,
+        "code": "",
+        "count": 10,
+        "action": "QueryDocument",
+        "resourceName": "gxs_catalog_stores"
+      },
+      {
+        "resourceName": "quota",
+        "statusCode": 304,
+        "code": null,
+        "count": 2,
+        "action": "GET"
+      },
+      {
+        "code": "",
+        "count": 2,
+        "action": "InvokeFunction",
+        "resourceName": "gxs_api",
+        "statusCode": 200
+      },
+      {
+        "resourceName": null,
+        "statusCode": 200,
+        "code": null,
+        "count": 2,
+        "action": "GET"
+      },
+      {
+        "resourceName": null,
+        "statusCode": 200,
+        "code": null,
+        "count": 1,
+        "action": "POST"
+      }
+    ]
+  },
+  "monitor": [
+    {
+      "at": "2026-10-26 16:29:17.402",
+      "requestId": "b285a4f9-fee1-4303-94d3-037bf4e50969",
+      "result": {
+        "ok": true,
+        "state": "running",
+        "scanned": 21,
+        "observations": 52,
+        "events": 0,
+        "sent": 0,
+        "deadlineReached": false
+      }
+    },
+    {
+      "at": "2026-10-26 16:28:15.309",
+      "requestId": "18347d41-1397-46ac-b5eb-262fc333a089",
+      "result": {
+        "ok": true,
+        "state": "running",
+        "scanned": 21,
+        "observations": 52,
+        "events": 0,
+        "sent": 0,
+        "deadlineReached": false
+      }
+    },
+    {
+      "at": "2026-10-26 16:27:21.880",
+      "requestId": "767a08ab-60b7-4495-b8ad-a66640816793",
+      "result": {
+        "ok": true,
+        "state": "running",
+        "scanned": 21,
+        "observations": 52,
+        "events": 0,
+        "sent": 0,
+        "deadlineReached": false
+      }
+    },
+    {
+      "at": "2026-10-26 16:26:19.922",
+      "requestId": "cbd19488-0d3a-46aa-bf31-ff2035e4abd0",
+      "result": {
+        "ok": true,
+        "state": "running",
+        "scanned": 21,
+        "observations": 52,
+        "events": 0,
+        "sent": 0,
+        "deadlineReached": false
+      }
+    },
+    {
+      "at": "2026-10-26 16:25:21.367",
+      "requestId": "ee38b23d-59ef-4d47-b17a-9724d26289c9",
+      "result": {
+        "ok": true,
+        "state": "running",
+        "scanned": 21,
+        "observations": 52,
+        "events": 0,
+        "sent": 0,
+        "deadlineReached": false
+      }
+    },
+    {
+      "at": "2026-10-26 16:24:22.258",
+      "requestId": "7392c81f-309e-4937-a0fd-2fa2f209f8d6",
+      "result": {
+        "ok": true,
+        "state": "running",
+        "scanned": 21,
+        "observations": 52,
+        "events": 0,
+        "sent": 0,
+        "deadlineReached": false
+      }
+    },
+    {
+      "at": "2026-10-26 16:23:19.349",
+      "requestId": "7f9a64dd-b053-4dc7-b996-7c9a44fdbd18",
+      "result": {
+        "ok": true,
+        "state": "running",
+        "scanned": 21,
+        "observations": 52,
+        "events": 0,
+        "sent": 0,
+        "deadlineReached": false
+      }
+    },
+    {
+      "at": "2026-10-26 16:22:20.827",
+      "requestId": "0a426e44-7c9b-4c27-bf25-f1890f7e551f",
+      "result": {
+        "ok": true,
+        "state": "running",
+        "scanned": 21,
+        "observations": 52,
+        "events": 0,
+        "sent": 0,
+        "deadlineReached": false
+      }
+    },
+    {
+      "at": "2026-10-26 16:21:22.887",
+      "requestId": "3dde3758-a230-43ad-ba5a-487642745a14",
+      "result": {
+        "ok": true,
+        "state": "running",
+        "scanned": 21,
+        "observations": 52,
+        "events": 0,
+        "sent": 0,
+        "deadlineReached": false
+      }
+    },
+    {
+      "at": "2026-10-26 16:20:22.650",
+      "requestId": "f789645b-fcc8-4bc7-9c3e-f3edbc9450d2",
+      "result": {
+        "ok": true,
+        "state": "running",
+        "scanned": 21,
+        "observations": 52,
+        "events": 0,
+        "sent": 0,
+        "deadlineReached": false
+      }
+    }
+  ],
+  "triggers": [
+    {
+      "functionName": "gxs_monitor",
+      "triggers": [
+        {
+          "AddTime": "2026-09-16 09:16:58",
+          "ModTime": "2026-10-21 11:01:30",
+          "TriggerDesc": "{\"cron\":\"0 * * * * * *\"}",
+          "TriggerName": "gxs-monitor-minute",
+          "Type": "timer"
+        }
+      ],
+      "requestId": "f1fc54a1-c3dd-46c1-b22b-292861e205cd"
+    },
+    {
+      "functionName": "gxs_api",
+      "triggers": [
+        {
+          "AddTime": "2026-09-20 12:32:27",
+          "ModTime": "2026-10-21 11:01:29",
+          "TriggerDesc": "{\"cron\":\"0 */5 * * * * *\"}",
+          "TriggerName": "gxs-payment-reconcile-five-minutes",
+          "Type": "timer"
+        }
+      ],
+      "requestId": "bbd84c5b-7cfa-4ef1-a60a-94bfb74f345e"
+    },
+    {
+      "functionName": "cloudbase_auth",
+      "triggers": [],
+      "requestId": "9bed60b8-9d19-407e-8327-9a89d800a60f"
+    },
+    {
+      "functionName": "gxs_apple_source_probe",
+      "triggers": [],
+      "requestId": "b28ee830-b46e-4e8f-976d-098a70fd395c"
+    },
+    {
+      "functionName": "generateImage-bSZM14",
+      "triggers": [],
+      "requestId": "2429c495-1c9f-4c44-a9b6-4eda54b3c843"
+    },
+    {
+      "functionName": "summarizeBouquetV2",
+      "triggers": [],
+      "requestId": "7aa965f6-79b2-4961-aea0-5dc9510782e7"
+    },
+    {
+      "functionName": "flowerRecipe",
+      "triggers": [],
+      "requestId": "9c1173a8-3124-4b27-b1be-57d7f3eb9419"
+    },
+    {
+      "functionName": "submitFeedback",
+      "triggers": [],
+      "requestId": "851d9e29-b31b-4c6a-baab-409c301e8e9a"
+    },
+    {
+      "functionName": "getOpenid",
+      "triggers": [],
+      "requestId": "28c2ce27-04e7-4429-900a-27f26d03391d"
+    },
+    {
+      "functionName": "callAI",
+      "triggers": [],
+      "requestId": "e4429ab8-270f-4ced-8a60-20e4309a85e3"
+    },
+    {
+      "functionName": "agent-flower-5g1zbnl519c2a33b",
+      "triggers": [],
+      "requestId": "8090f99f-d1be-48b3-b471-9b8695068eed"
+    },
+    {
+      "functionName": "recognizeFlower",
+      "triggers": [],
+      "requestId": "995194c9-1897-4680-b7af-5a8dce8e35fb"
+    }
+  ],
+  "functions": [
+    {
+      "name": "gxs_monitor",
+      "modifiedAt": "2026-10-26 16:13:13",
+      "status": "Active",
+      "reservedConcurrencyMem": 0,
+      "provisionedConcurrencyMem": 0
+    },
+    {
+      "name": "gxs_api",
+      "modifiedAt": "2026-10-26 16:13:18",
+      "status": "Active",
+      "reservedConcurrencyMem": 0,
+      "provisionedConcurrencyMem": 0
+    },
+    {
+      "name": "cloudbase_auth",
+      "modifiedAt": "2026-10-26 14:17:06",
+      "status": "Active",
+      "reservedConcurrencyMem": 0,
+      "provisionedConcurrencyMem": 0
+    },
+    {
+      "name": "gxs_apple_source_probe",
+      "modifiedAt": "2026-10-17 00:23:14",
+      "status": "UpdateFailed",
+      "reservedConcurrencyMem": 0,
+      "provisionedConcurrencyMem": 0
+    },
+    {
+      "name": "generateImage-bSZM14",
+      "modifiedAt": "2026-02-06 17:31:35",
+      "status": "Active",
+      "reservedConcurrencyMem": 0,
+      "provisionedConcurrencyMem": 0
+    },
+    {
+      "name": "summarizeBouquetV2",
+      "modifiedAt": "2026-02-06 17:31:44",
+      "status": "Active",
+      "reservedConcurrencyMem": 0,
+      "provisionedConcurrencyMem": 0
+    },
+    {
+      "name": "flowerRecipe",
+      "modifiedAt": "2026-02-06 17:31:32",
+      "status": "Active",
+      "reservedConcurrencyMem": 0,
+      "provisionedConcurrencyMem": 0
+    },
+    {
+      "name": "submitFeedback",
+      "modifiedAt": "2026-02-06 17:31:41",
+      "status": "Active",
+      "reservedConcurrencyMem": 0,
+      "provisionedConcurrencyMem": 0
+    },
+    {
+      "name": "getOpenid",
+      "modifiedAt": "2026-02-06 17:31:38",
+      "status": "Active",
+      "reservedConcurrencyMem": 0,
+      "provisionedConcurrencyMem": 0
+    },
+    {
+      "name": "callAI",
+      "modifiedAt": "2026-02-06 17:31:32",
+      "status": "Active",
+      "reservedConcurrencyMem": 0,
+      "provisionedConcurrencyMem": 0
+    },
+    {
+      "name": "agent-flower-5g1zbnl519c2a33b",
+      "modifiedAt": "2026-02-04 22:13:26",
+      "status": "UpdateFailed",
+      "reservedConcurrencyMem": 0,
+      "provisionedConcurrencyMem": 0
+    },
+    {
+      "name": "recognizeFlower",
+      "modifiedAt": "2026-02-06 17:31:39",
+      "status": "Active",
+      "reservedConcurrencyMem": 0,
+      "provisionedConcurrencyMem": 0
+    }
+  ],
+  "cloudRun": {
+    "services": [
+      {
+        "ServerName": "ibot-huajingling",
+        "DefaultDomainName": "",
+        "CustomDomainName": "",
+        "Status": "normal",
+        "UpdateTime": "2026-10-26 14:21:23",
+        "AccessTypes": [
+          "OA",
+          "PUBLIC"
+        ],
+        "CustomDomainNames": [
+          ""
+        ],
+        "ServerType": "function",
+        "TrafficType": "FLOW",
+        "CreateTime": "2026-01-28 09:55:59"
+      }
+    ],
+    "pagination": {
+      "total": 1,
+      "pageSize": 100,
+      "pageNum": 1,
+      "totalPages": 1
+    }
+  },
+  "invocationCounts": [
+    {
+      "count": 12,
+      "function_name": "gxs_api"
+    },
+    {
+      "function_name": "gxs_monitor",
+      "count": 10
+    }
+  ],
+  "costModel": {
+    "perMinute": {
+      "appleRequestGroups": 21,
+      "targetSamples": 52,
+      "observationActions": 364,
+      "budgetActions": 147,
+      "healthyOutcomeReads": 21,
+      "totalCoreActions": 532
+    },
+    "per10Minutes": {
+      "modelCore": 5320,
+      "observedAll": 7525,
+      "difference": 2205,
+      "differenceRatio": 0.2930232558139535
+    },
+    "notes": [
+      "Action counts are not settled billing units.",
+      "The difference includes necessary lease/status/follow entitlement/payment/front-end operations; it is not all waste.",
+      "Empty queues were not independently sampled from live payloads; no new events or sends plus code/replay shows repeated polling mechanism, not proof every live query returned empty.",
+      "Observation timestamps, exact counters, two-sample confirmations and transactional owner fencing cannot simply be removed."
+    ]
+  },
+  "knownRemainingCandidates": [
+    "Event/outbox scans are kicked by both each batch and scheduler steps.",
+    "Each notification pass reads config again.",
+    "Every available batch invalidates the 30-second current-availability scan guard even if stock is unchanged; offline reproduction required for amplification quantification.",
+    "Two-document per-sample aggregates and two-document request-budget state amplify writes; merging needs migration and correctness testing."
+  ],
+  "officialPricing": "https://cloud.tencent.com/document/product/876/127357",
+  "limits": [
+    "No new deployment; not a claim of waste-free production.",
+    "Billing DB daily details currently stop at October 25; screenshot cumulative figures do not measure post-patch rates.",
+    "No long-term paid notification timing or budget sufficiency claim."
+  ],
+  "noEventWindowCosts": {
+    "latestWrites": 520,
+    "daySummaryWrites": 520,
+    "eventsGenerated": 0,
+    "notificationsSent": 0
+  },
+  "offlineNotificationEvidence": "notification-read-audit.json",
+  "billingMetrics": {
+    "read": {
+      "EnvId": "flowermean-6gjaxfqhf6c13e88",
+      "MetricName": "DbRead",
+      "StartTime": "2026-10-26 16:20:00",
+      "EndTime": "2026-10-26 16:30:00",
+      "TimeSource": "params",
+      "Period": 300,
+      "Curve": {
+        "EndTime": "2026-10-26 16:30:00",
+        "MetricName": "DbRead",
+        "NewValues": [
+          2001,
+          1988,
+          1565
+        ],
+        "Period": 300,
+        "RequestId": "6ccedf3e-bbae-4c15-85e4-98e1bc491cbc",
+        "StartTime": "2026-10-26 16:20:00",
+        "Statistics": "sum",
+        "Time": [
+          1793002800,
+          1793003100,
+          1793003400
+        ],
+        "Values": [
+          2001,
+          1988,
+          1565
+        ]
+      },
+      "Summary": {
+        "sampleCount": 3,
+        "max": 2001,
+        "min": 1565,
+        "avg": 1851.3333333333333,
+        "latest": 1565,
+        "peakTimestamp": 1793002800,
+        "allZero": false
+      }
+    },
+    "write": {
+      "EnvId": "flowermean-6gjaxfqhf6c13e88",
+      "MetricName": "DbWrite",
+      "StartTime": "2026-10-26 16:20:00",
+      "EndTime": "2026-10-26 16:30:00",
+      "TimeSource": "params",
+      "Period": 300,
+      "Curve": {
+        "EndTime": "2026-10-26 16:30:00",
+        "MetricName": "DbWrite",
+        "NewValues": [
+          1859,
+          1772,
+          1373
+        ],
+        "Period": 300,
+        "RequestId": "6281fc57-7b76-45ce-b8af-7e61289bb95d",
+        "StartTime": "2026-10-26 16:20:00",
+        "Statistics": "sum",
+        "Time": [
+          1793002800,
+          1793003100,
+          1793003400
+        ],
+        "Values": [
+          1859,
+          1772,
+          1373
+        ]
+      },
+      "Summary": {
+        "sampleCount": 3,
+        "max": 1859,
+        "min": 1373,
+        "avg": 1668,
+        "latest": 1373,
+        "peakTimestamp": 1793002800,
+        "allZero": false
+      }
+    },
+    "notes": [
+      "Curves include an endpoint bucket and may be backfilled; not summed as exact invoice totals."
+    ]
+  },
+  "frontendReview": {
+    "followListLikeResults": 10,
+    "paymentReconciliations": 2,
+    "pageHiddenPollingLeakFound": false,
+    "localRegressionPassed": 13,
+    "callerAttributed": false,
+    "notes": [
+      "Response shape matches follow.list. Current frontend normally pairs user.bootstrap and follow.list with a <=30-second delay after completion, so these once-per-minute calls cannot be attributed to the present DevTools view without further evidence.",
+      "Page.onHide/onUnload stop timers and retire epochs; in-flight completion can occur but does not reschedule while hidden."
+    ]
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "mode": "verify",
+  "scope": "Use existing minute alignment in scheduled mode; resident fixed phases, interval budget and fast cadence unchanged",
+  "functions": [
+    {
+      "functionName": "gxs_api",
+      "baselineSha256": "abe4da8ea8c4f13cf8a62399a9c1707a783cf4f4018f6358d8f200cb118796cf",
+      "changed": [
+        {
+          "file": "lib/engine/collector.js",
+          "beforeSha256": "f1ff779661aba6d4409ad2788919e75727f73d935e6b56afb1a37a4abb76796f",
+          "afterSha256": "94b0a1b331dfb70d97e9d7b70d731d3f65c65c7985ff1d2b321ffddd98eb96d4",
+          "bytes": 26986
+        }
+      ],
+      "fileCount": 5902,
+      "deployedSha256": "ea6822315459c9707eb2d4df02f1cfe0f9efb559499e93e788c73033b3281e42",
+      "exactMatch": true,
+      "unchangedFileCount": 5901
+    },
+    {
+      "functionName": "gxs_monitor",
+      "baselineSha256": "71677565789bc570141ded902d12116d35e5f667db47531aad84ff2f77706bda",
+      "changed": [
+        {
+          "file": "lib/engine/collector.js",
+          "beforeSha256": "f1ff779661aba6d4409ad2788919e75727f73d935e6b56afb1a37a4abb76796f",
+          "afterSha256": "94b0a1b331dfb70d97e9d7b70d731d3f65c65c7985ff1d2b321ffddd98eb96d4",
+          "bytes": 26986
+        },
+        {
+          "file": "lib-manifest.json",
+          "beforeSha256": "009b1410f26e96e162233bc82978d8a9e99c9fa81f50148a8fd03f191027ed17",
+          "afterSha256": "7f92f3c19b7c2f505ddcb2acc7e622690f60964658ba2f1ed232e47eeaa36293",
+          "bytes": 7026
+        }
+      ],
+      "fileCount": 5825,
+      "deployedSha256": "3755761d22d2d2427610d27c521f3e2596ade3aa951849c8be316db09d1eab1a",
+      "exactMatch": true,
+      "unchangedFileCount": 5823
+    }
+  ]
+}

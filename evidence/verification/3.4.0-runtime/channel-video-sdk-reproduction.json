@@ -1,0 +1,448 @@
+{
+  "schemaVersion": 1,
+  "kind": "isolated-official-sdk-component-audit-reproduction",
+  "checkedAt": "2026-10-26T02:50:53.428Z",
+  "applicationVersion": "3.4.0",
+  "reportedCloudFinding": {
+    "taskId": "14190",
+    "version": "3.4.0",
+    "source": "maintainer confirmed in current chat",
+    "status": "failed",
+    "reportedComponent": "channel-video",
+    "reportedPages": [
+      "pages/query/index",
+      "pages/mine/index",
+      "pages/history/index"
+    ],
+    "reportedDeviceNames": [
+      "iPhone 11",
+      "华为 P40"
+    ],
+    "exactSdkVersion": null,
+    "executionTime": null
+  },
+  "conclusion": "All four original SDKs register both channel-video and wx-channel-video in a page containing no business code. Their original unused-component callbacks report the unprefixed builtin alias as unused. This explains a platform-audit failure mechanism without a business declaration; cloud task 14190 remains failed pending WeChat verification.",
+  "probes": [
+    {
+      "version": "3.16.1",
+      "sdk": {
+        "version": "3.16.1",
+        "updateTime": "2026.6.13 16:16:31",
+        "packageSha256": "b2f446e84364dd9654da7f56eac2b0af0597039c3566f19ba74b131385c2bc53",
+        "runtimeSha256": "b425f87530e9653f62b794845b189b7bc7830d9905c92f02c5ce99ece4000ec0",
+        "auditSha256": "ff8abfcb03245b7f309b714f3f81e495bd149fe19fed2d059d48529b4108742a"
+      },
+      "officialPackageUrl": "https://res.servicewechat.com/weapp/public/commlib/1586.wxapkg",
+      "packageSource": "installed official Developer Tools SDK cache; not modified",
+      "runtimeResult": {
+        "componentCount": 154,
+        "channelVideoRegistryKeys": [
+          "channel-video",
+          "wx-channel-video"
+        ],
+        "emitted": [
+          {
+            "event": "unused-component-data",
+            "payload": {
+              "page": "pages/empty/index",
+              "component": "channel-video",
+              "len": 1
+            }
+          }
+        ]
+      },
+      "originalAudit": {
+        "file": "WAProgneWebview.js",
+        "charOffset": 11176,
+        "byteOffset": 11180,
+        "sha256": "4a74c1867587fb33e4fdf176e34bd24455e33523eb6f559b28c181b242849db1"
+      },
+      "controls": [
+        {
+          "name": "ordinary builtins excluded",
+          "expected": [],
+          "actual": [],
+          "passed": true
+        },
+        {
+          "name": "unprefixed builtin alias reported",
+          "expected": [
+            "channel-video"
+          ],
+          "actual": [
+            "channel-video"
+          ],
+          "passed": true
+        },
+        {
+          "name": "unused business component reported",
+          "expected": [
+            "components/unused/index"
+          ],
+          "actual": [
+            "components/unused/index"
+          ],
+          "passed": true
+        },
+        {
+          "name": "instantiated business component excluded",
+          "expected": [],
+          "actual": [],
+          "passed": true
+        }
+      ],
+      "pageErrors": [],
+      "bridgeWarnings": [
+        "[jsbridge] invoke getNetworkType fail: jsbridge not ready. Error: jsbridge not ready",
+        "[jsbridge] invoke systemLog fail: jsbridge not ready. Error: jsbridge not ready"
+      ],
+      "sourceFingerprintAtProbe": "sha256:87fb6c3d069d491d7c369e8898abab7efbe8f120c4158d78066759af5fa6d59b",
+      "sourceScan": {
+        "scannedFiles": 81,
+        "channelVideoMentions": []
+      },
+      "reportRef": "output/diagnostics-20261026/channel-video-sdk-3.16.1.json",
+      "defectReproduced": true,
+      "wechatVerificationPassed": false
+    },
+    {
+      "version": "3.16.3",
+      "sdk": {
+        "version": "3.16.3",
+        "updateTime": "2026.8.31 17:25:58",
+        "packageSha256": "055b83604c451c4b44d18f3364390f12181cf5473c9b2e3bed6812cfb0154c62",
+        "runtimeSha256": "ed4a8c89b4953907899aeacb6861959cfc782d81f441fd6e98a81fb49010a47b",
+        "auditSha256": "ff8abfcb03245b7f309b714f3f81e495bd149fe19fed2d059d48529b4108742a"
+      },
+      "officialPackageUrl": "https://res.servicewechat.com/weapp/public/commlib/1637.wxapkg",
+      "packageSource": "downloaded from official URL listed in installed Developer Tools cfg.json into isolated output directory",
+      "runtimeResult": {
+        "componentCount": 154,
+        "channelVideoRegistryKeys": [
+          "channel-video",
+          "wx-channel-video"
+        ],
+        "emitted": [
+          {
+            "event": "unused-component-data",
+            "payload": {
+              "page": "pages/empty/index",
+              "component": "channel-video",
+              "len": 1
+            }
+          }
+        ]
+      },
+      "originalAudit": {
+        "file": "WAProgneWebview.js",
+        "charOffset": 11176,
+        "byteOffset": 11180,
+        "sha256": "4a74c1867587fb33e4fdf176e34bd24455e33523eb6f559b28c181b242849db1"
+      },
+      "controls": [
+        {
+          "name": "ordinary builtins excluded",
+          "expected": [],
+          "actual": [],
+          "passed": true
+        },
+        {
+          "name": "unprefixed builtin alias reported",
+          "expected": [
+            "channel-video"
+          ],
+          "actual": [
+            "channel-video"
+          ],
+          "passed": true
+        },
+        {
+          "name": "unused business component reported",
+          "expected": [
+            "components/unused/index"
+          ],
+          "actual": [
+            "components/unused/index"
+          ],
+          "passed": true
+        },
+        {
+          "name": "instantiated business component excluded",
+          "expected": [],
+          "actual": [],
+          "passed": true
+        }
+      ],
+      "pageErrors": [],
+      "bridgeWarnings": [
+        "[jsbridge] invoke getNetworkType fail: jsbridge not ready. Error: jsbridge not ready",
+        "[jsbridge] invoke systemLog fail: jsbridge not ready. Error: jsbridge not ready",
+        "[jsbridge] invoke traceEvent fail: jsbridge not ready. Error: jsbridge not ready"
+      ],
+      "sourceFingerprintAtProbe": "sha256:87fb6c3d069d491d7c369e8898abab7efbe8f120c4158d78066759af5fa6d59b",
+      "sourceScan": {
+        "scannedFiles": 81,
+        "channelVideoMentions": []
+      },
+      "reportRef": "output/diagnostics-20261026/channel-video-sdk-3.16.3.json",
+      "defectReproduced": true,
+      "wechatVerificationPassed": false
+    },
+    {
+      "version": "3.17.3",
+      "sdk": {
+        "version": "3.17.3",
+        "updateTime": "2026.10.9 19:51:01",
+        "packageSha256": "ac2c6879a5b623b9caedf50077d0ebd6a5b36199724dd393b107519a745ff370",
+        "runtimeSha256": "51c8013a237fec0a6eed42b09da7b28bc6256e7ea8b843eba7dfc7ceb43839ba",
+        "auditSha256": "ff8abfcb03245b7f309b714f3f81e495bd149fe19fed2d059d48529b4108742a"
+      },
+      "officialPackageUrl": "https://res.servicewechat.com/weapp/public/commlib/1655.wxapkg",
+      "packageSource": "installed official Developer Tools SDK cache; not modified",
+      "runtimeResult": {
+        "componentCount": 155,
+        "channelVideoRegistryKeys": [
+          "channel-video",
+          "wx-channel-video"
+        ],
+        "emitted": [
+          {
+            "event": "unused-component-data",
+            "payload": {
+              "page": "pages/empty/index",
+              "component": "channel-video",
+              "len": 1
+            }
+          }
+        ]
+      },
+      "originalAudit": {
+        "file": "WAProgneWebview.js",
+        "charOffset": 11176,
+        "byteOffset": 11180,
+        "sha256": "4a74c1867587fb33e4fdf176e34bd24455e33523eb6f559b28c181b242849db1"
+      },
+      "controls": [
+        {
+          "name": "ordinary builtins excluded",
+          "expected": [],
+          "actual": [],
+          "passed": true
+        },
+        {
+          "name": "unprefixed builtin alias reported",
+          "expected": [
+            "channel-video"
+          ],
+          "actual": [
+            "channel-video"
+          ],
+          "passed": true
+        },
+        {
+          "name": "unused business component reported",
+          "expected": [
+            "components/unused/index"
+          ],
+          "actual": [
+            "components/unused/index"
+          ],
+          "passed": true
+        },
+        {
+          "name": "instantiated business component excluded",
+          "expected": [],
+          "actual": [],
+          "passed": true
+        }
+      ],
+      "pageErrors": [],
+      "bridgeWarnings": [
+        "[jsbridge] invoke getNetworkType fail: jsbridge not ready. Error: jsbridge not ready"
+      ],
+      "sourceFingerprintAtProbe": "sha256:2fae39fb185f42555a2c23a6907527477c4c02288957b535d7fccd190974736f",
+      "sourceScan": {
+        "scannedFiles": 80,
+        "channelVideoMentions": []
+      },
+      "reportRef": "output/diagnostics-20261026/channel-video-sdk-3.17.3.json",
+      "defectReproduced": true,
+      "wechatVerificationPassed": false
+    },
+    {
+      "version": "3.17.4",
+      "sdk": {
+        "version": "3.17.4",
+        "updateTime": "2026.10.20 15:48:31",
+        "packageSha256": "013f52df50d686ccd4cdc8e93a3cef7e34585633631765cf9f043ba0645446f3",
+        "runtimeSha256": "ad09b39fdca9d990fcae984f7a0e02099211e5a0cfd789027fe2b9da57a4ce74",
+        "auditSha256": "ff8abfcb03245b7f309b714f3f81e495bd149fe19fed2d059d48529b4108742a"
+      },
+      "officialPackageUrl": "https://res.servicewechat.com/weapp/public/commlib/1659.wxapkg",
+      "packageSource": "downloaded from official URL listed in installed Developer Tools cfg.json into isolated output directory",
+      "runtimeResult": {
+        "componentCount": 156,
+        "channelVideoRegistryKeys": [
+          "channel-video",
+          "wx-channel-video"
+        ],
+        "emitted": [
+          {
+            "event": "unused-component-data",
+            "payload": {
+              "page": "pages/empty/index",
+              "component": "channel-video",
+              "len": 1
+            }
+          }
+        ]
+      },
+      "originalAudit": {
+        "file": "WAProgneWebview.js",
+        "charOffset": 11176,
+        "byteOffset": 11180,
+        "sha256": "4a74c1867587fb33e4fdf176e34bd24455e33523eb6f559b28c181b242849db1"
+      },
+      "controls": [
+        {
+          "name": "ordinary builtins excluded",
+          "expected": [],
+          "actual": [],
+          "passed": true
+        },
+        {
+          "name": "unprefixed builtin alias reported",
+          "expected": [
+            "channel-video"
+          ],
+          "actual": [
+            "channel-video"
+          ],
+          "passed": true
+        },
+        {
+          "name": "unused business component reported",
+          "expected": [
+            "components/unused/index"
+          ],
+          "actual": [
+            "components/unused/index"
+          ],
+          "passed": true
+        },
+        {
+          "name": "instantiated business component excluded",
+          "expected": [],
+          "actual": [],
+          "passed": true
+        }
+      ],
+      "pageErrors": [],
+      "bridgeWarnings": [
+        "[jsbridge] invoke getNetworkType fail: jsbridge not ready. Error: jsbridge not ready",
+        "[jsbridge] invoke systemLog fail: jsbridge not ready. Error: jsbridge not ready"
+      ],
+      "sourceFingerprintAtProbe": "sha256:0228fe95e7afd2d0c047dbb09bd0ca0ea912b06b3ad38594fa5094f1ed8239d1",
+      "sourceScan": {
+        "scannedFiles": 81,
+        "channelVideoMentions": []
+      },
+      "reportRef": "output/diagnostics-20261026/channel-video-sdk-3.17.4.json",
+      "defectReproduced": true,
+      "wechatVerificationPassed": false
+    }
+  ],
+  "limitations": [
+    "Only the unmodified official SDK runtime is loaded in an isolated empty browser page, with all page network requests aborted.",
+    "Vendor callbacks use a local lifecycle harness; this is not a full native project or cloud quality run.",
+    "The SDK version and uploaded-package fingerprint of cloud task 14190 have not been independently verified.",
+    "Application source fingerprints are snapshots at probe time; concurrent later source changes require a refreshed source scan.",
+    "No SDK, application registry, renderer or quality finding status was modified."
+  ],
+  "finalSourceScan": {
+    "kind": "final-source-scan-not-compiled-page-configuration",
+    "checkedAt": "2026-10-26T02:55:59.994Z",
+    "sourceFingerprint": "sha256:3c276768d2cb4e70614b09dcf8cdd943dd5c09305829a0febd6adb87b044f848",
+    "scannedFiles": 81,
+    "channelVideoMentions": [],
+    "declarations": [
+      {
+        "file": "miniprogram/components/config-sheet/index.json",
+        "sha256": "035503c1a56d8b4b9227ce8bb9145fbd1ef8ec7dce59e55f9d5d55fb5eb7d566",
+        "usingComponents": {},
+        "componentPlaceholder": {},
+        "componentGenerics": {}
+      },
+      {
+        "file": "miniprogram/components/target-picker/index.json",
+        "sha256": "035503c1a56d8b4b9227ce8bb9145fbd1ef8ec7dce59e55f9d5d55fb5eb7d566",
+        "usingComponents": {},
+        "componentPlaceholder": {},
+        "componentGenerics": {}
+      },
+      {
+        "file": "miniprogram/pages/follow/index.json",
+        "sha256": "77a10454a6897c2d5f12ff0c7bd79964ad06f41af6bae7be0b25c1e19bd0024a",
+        "usingComponents": {
+          "target-picker": "/components/target-picker/index",
+          "config-sheet": "/components/config-sheet/index",
+          "reminder-nudge": "/components/reminder-nudge/index",
+          "reminder-authorization": "/components/reminder-authorization/index"
+        },
+        "componentPlaceholder": {
+          "target-picker": "view",
+          "config-sheet": "view",
+          "reminder-authorization": "view"
+        },
+        "componentGenerics": {}
+      },
+      {
+        "file": "miniprogram/pages/history/index.json",
+        "sha256": "7896937c58d1f8a51a2577583ef12d55bece622eb70a02a41afe64c25b0ae3fc",
+        "usingComponents": {
+          "target-picker": "/components/target-picker/index",
+          "config-sheet": "/components/config-sheet/index",
+          "reminder-nudge": "/components/reminder-nudge/index"
+        },
+        "componentPlaceholder": {
+          "target-picker": "view"
+        },
+        "componentGenerics": {}
+      },
+      {
+        "file": "miniprogram/pages/mine/index.json",
+        "sha256": "d35e258b24ba6175ae6b6b2699184b973bd915e299c68f0c3a12680cb4a7dd8f",
+        "usingComponents": {
+          "reminder-nudge": "/components/reminder-nudge/index",
+          "reminder-authorization": "/components/reminder-authorization/index",
+          "config-sheet": "/components/config-sheet/index"
+        },
+        "componentPlaceholder": {
+          "config-sheet": "view",
+          "reminder-authorization": "view"
+        },
+        "componentGenerics": {}
+      },
+      {
+        "file": "miniprogram/pages/notice-board/index.json",
+        "sha256": "47f93f10580ec6d415a10d342caf45da80dd1fcec05d3e084c560f93b472deae",
+        "usingComponents": {},
+        "componentPlaceholder": {},
+        "componentGenerics": {}
+      },
+      {
+        "file": "miniprogram/pages/query/index.json",
+        "sha256": "4606da8bdc23edcb9142e8d4ec07c1788c4cbf05a28ca7a0e7d7d1dcbc7b0df7",
+        "usingComponents": {
+          "target-picker": "/components/target-picker/index",
+          "config-sheet": "/components/config-sheet/index",
+          "reminder-nudge": "/components/reminder-nudge/index"
+        },
+        "componentPlaceholder": {
+          "target-picker": "view"
+        },
+        "componentGenerics": {}
+      }
+    ]
+  }
+}

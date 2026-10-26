@@ -1,0 +1,133 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-10-26T08:56:37.471Z",
+  "scope": "Read-only ID batching in the canonical repository; offline SDK transport, no network or cloud mutation",
+  "change": {
+    "readIdChunk": 100,
+    "writeDeleteChunk": 20,
+    "perBatchResultBound": "unique chunk.length; readAll pagination retained",
+    "eligibilityCacheAdded": false,
+    "collectorCadenceChanged": false
+  },
+  "officialEvidence": [
+    {
+      "url": "https://docs.cloudbase.net/api-reference/server/node-sdk/database/fetch",
+      "retrievedWith": "CloudBase official knowledge base readDoc on 2026-10-26",
+      "supports": "Node SDK query defaults to 100 records, explicit limit supports up to 1000 and skip supports pagination"
+    },
+    {
+      "url": "https://docs.cloudbase.net/api-reference/server/node-sdk/database/command",
+      "retrievedWith": "Official Node SDK operator documentation on 2026-10-26",
+      "supports": "command.in accepts an array; the documentation does not state a 20-element cap",
+      "limitation": "No explicit maximum IN-list length was found; a 100-element server-side read requires separate verification by the parent agent"
+    }
+  ],
+  "installedSdk": {
+    "wxServerSdk": "4.0.2",
+    "cloudbaseDatabase": "1.5.1",
+    "contract": "Actual pinned SDK query serialization through its replaced offline request transport, not a fake command implementation"
+  },
+  "test": {
+    "command": "node --test tests/read-id-batching.test.mjs tests/backend-reliability.test.mjs tests/retention-sdk-contract.test.mjs",
+    "exitCode": 0,
+    "tests": 33,
+    "passed": 33,
+    "failed": 0,
+    "skipped": 0,
+    "sdkResults": [
+      {
+        "method": "getUsers",
+        "ids": 0,
+        "sdkRequests": 0,
+        "limits": []
+      },
+      {
+        "method": "getUsers",
+        "ids": 21,
+        "sdkRequests": 1,
+        "limits": [
+          21
+        ]
+      },
+      {
+        "method": "getUsers",
+        "ids": 100,
+        "sdkRequests": 1,
+        "limits": [
+          100
+        ]
+      },
+      {
+        "method": "getUsers",
+        "ids": 101,
+        "sdkRequests": 2,
+        "limits": [
+          100,
+          1
+        ]
+      },
+      {
+        "method": "getUsers",
+        "ids": 245,
+        "sdkRequests": 3,
+        "limits": [
+          100,
+          100,
+          45
+        ]
+      },
+      {
+        "method": "getLatest",
+        "ids": 0,
+        "sdkRequests": 0,
+        "limits": []
+      },
+      {
+        "method": "getLatest",
+        "ids": 21,
+        "sdkRequests": 1,
+        "limits": [
+          21
+        ]
+      },
+      {
+        "method": "getLatest",
+        "ids": 100,
+        "sdkRequests": 1,
+        "limits": [
+          100
+        ]
+      },
+      {
+        "method": "getLatest",
+        "ids": 101,
+        "sdkRequests": 2,
+        "limits": [
+          100,
+          1
+        ]
+      },
+      {
+        "method": "getLatest",
+        "ids": 245,
+        "sdkRequests": 3,
+        "limits": [
+          100,
+          100,
+          45
+        ]
+      }
+    ],
+    "otherAssertions": [
+      "getUsers and getLatest omit missing IDs, deduplicate across chunks, and issue zero queries for empty IDs",
+      "Existing unbounded reads still paginate beyond 1000 documents",
+      "Retention SDK deletion ID filters remain three batches of 20"
+    ]
+  },
+  "limitations": [
+    "SDK client encoding and mocked data responses do not prove the server accepts a 100-element IN list",
+    "Document count returned is unchanged; fewer SDK calls do not imply an equal reduction in billed database document units",
+    "Result ordering remains per batch by _id, not caller input order or a newly promised global sort"
+  ]
+}
+

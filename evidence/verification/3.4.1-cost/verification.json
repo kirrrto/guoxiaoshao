@@ -1,0 +1,154 @@
+{
+  "schemaVersion": 1,
+  "version": "3.4.1",
+  "checkedAt": "2026-10-26T09:10:16.571Z",
+  "sourceFingerprint": "sha256:8d9b7d28df6c4d611098dcec25185d0cde4cd554e0f7cf4075c4247e424dbdd0",
+  "localTests": {
+    "passed": true,
+    "count": 1736,
+    "evidence": "notification-local-checks.json"
+  },
+  "sourceCheck": {
+    "passed": true,
+    "files": 564
+  },
+  "backend": {
+    "deployed": true,
+    "zipVerified": true,
+    "functions": [
+      "gxs_api",
+      "gxs_monitor",
+      "cloudbase_auth"
+    ],
+    "configurationRevision": 12,
+    "latestCodeEvidence": "notification-deployed-code.json",
+    "experimentalBatching": "withdrawn after production TransactionBusy; see batch-withdrawal.json",
+    "minuteAlignmentDeployedAt": "2026-10-26T16:13:19+08:00",
+    "notificationReadFixVerifiedAt": "2026-10-26T09:03:17.527Z"
+  },
+  "runtimeSampling": {
+    "scope": "eligible active member follows only; shared store/SKU batches",
+    "previousTemporaryTypicalPeriodSeconds": 240,
+    "currentConfiguredMinimumPeriodSeconds": 60,
+    "currentGroupCount": 21,
+    "continuousUpstreamRequestBudgetPerDay": 800000,
+    "configurationEvidence": "runtime-cadence-restored.json",
+    "strictPerTargetOneMinuteCoverageVerified": false,
+    "notes": [
+      "Fixed scheduled cadence now uses minute alignment; resident hash phases unchanged.",
+      "Observed one scan per group per minute in four rounds; no long-term latency SLA verified."
+    ],
+    "phaseFixEvidence": "phase-deployment.json",
+    "observedOneScanPerMinute": true,
+    "observedRounds": 4,
+    "stableSuccessIntervalSeconds": {
+      "min": 58.489,
+      "max": 61.423,
+      "p95": 61.343
+    },
+    "latestCoverageEvidence": "notification-live-comparison.json",
+    "latestObservedRounds": 5,
+    "latestConsecutiveSuccessIntervalSeconds": {
+      "min": 57.674,
+      "max": 60.515
+    }
+  },
+  "liveObservation": {
+    "twoRegularCyclesObserved": true,
+    "windowStart": "2026-10-26T17:01:00+08:00",
+    "windowEnd": "2026-10-26T17:06:00+08:00",
+    "gatewayAccessBefore": 3930,
+    "gatewayAccessAfter": 3628,
+    "samplesBefore": 260,
+    "samplesAfter": 261,
+    "recoveredUpstreamTimeouts": 1,
+    "cloudbaseErrorsAfter": 0,
+    "observationalReductionPercent": 7.684478371501273,
+    "pureCodeSavingsMeasured": false,
+    "settledInvoiceSavingsVerified": false,
+    "coverageEvidence": "notification-live-comparison.json",
+    "notes": [
+      "The before window contains additional real client bootstrap/manual activity; the after window contains one recovered upstream timeout and its additional unknown observation. Traffic is not fully isolated.",
+      "Both windows include a five-minute payment reconciliation trigger; user/order distributions and platform latency can differ.",
+      "These are gateway access records, not billed document/API units. Settled invoice savings are not yet verified.",
+      "No inventory change event or real notification send occurred in the window; actual receipt is not validated."
+    ],
+    "scheduledSampleRecordsExcludingRetryFailure": 260
+  },
+  "nativeSimulator": {
+    "passed": true,
+    "actualSdks": [
+      "3.16.3",
+      "3.17.4"
+    ],
+    "restoredSdk": "3.17.3"
+  },
+  "frontend": {
+    "uploaded": true,
+    "packageBytes": 1660719,
+    "trialSelection": "unconfirmed",
+    "published": false
+  },
+  "cloudQuality": {
+    "passed": false,
+    "findingsRemainOpen": true,
+    "accessBlockedBySiteSafetyPolicy": true
+  },
+  "publicationReady": false,
+  "evidence": [
+    "local-checks.json",
+    "deployment.json",
+    "deployed-code.json",
+    "runtime-config-change.json",
+    "live-before.json",
+    "live-after.json",
+    "live-comparison.json",
+    "idle-service-scaling.json",
+    "native-sdk-matrix.json",
+    "frontend-upload.json",
+    "release-check.json",
+    "historical-cycles.json",
+    "runtime-cadence-restored.json",
+    "retention-index-fix.json",
+    "batch-withdrawal.json",
+    "admission-deployed-code.json",
+    "admission-local-checks.json",
+    "admission-release-check.json",
+    "same-cadence-after-admission.json",
+    "same-cadence-admission-comparison.json",
+    "phase-deployment.json",
+    "phase-deployed-code.json",
+    "phase-local-checks.json",
+    "scheduled-phase-reproduction.json",
+    "phase-live-comparison.json",
+    "phase-release-check.json",
+    "notification-local-checks.json",
+    "notification-deployment.json",
+    "notification-deployed-code.json",
+    "notification-change-review.json",
+    "notification-live-before.json",
+    "notification-live-after.json",
+    "notification-live-comparison.json",
+    "notification-live-snapshots.json",
+    "read-id-batching.json",
+    "read-id-server-contract.json",
+    "final-release-341-check.json",
+    "release-341-candidate.json"
+  ],
+  "priorLiveObservation": {
+    "twoRegularCyclesObserved": true,
+    "windowStart": "2026-10-26T16:15:00+08:00",
+    "windowEnd": "2026-10-26T16:18:00+08:00",
+    "gatewayAccessBefore": 2591,
+    "gatewayAccessAfter": 2383,
+    "samplesBefore": 156,
+    "samplesAfter": 156,
+    "configUpdateTransactionConflictsBefore": 30,
+    "configUpdateTransactionConflictsAfter": 0,
+    "observationalReductionPercent": 8.02778849864917,
+    "pureCodeSavingsMeasured": false,
+    "settledInvoiceSavingsVerified": false,
+    "coverageEvidence": "phase-live-comparison.json",
+    "priorTenMinuteComparisonEvidence": "same-cadence-admission-comparison.json"
+  }
+}

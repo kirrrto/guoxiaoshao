@@ -15,6 +15,15 @@
       "taskId": "195099",
       "reference": "Maintainer-provided XLS attachment identified by test task 195099",
       "reportedVersion": "3.3.1"
+    },
+    {
+      "kind": "screenshot",
+      "taskId": "14190",
+      "reference": "docs/RUNTIME_QUALITY_2026-10-26.md",
+      "reportedVersion": "3.4.0",
+      "versionConfirmation": "Maintainer confirmed the new channel-video findings belong to the current online 3.4.0 on 2026-10-26; task link observed in browser inventory, report contents could not be read",
+      "exactSdkVersion": null,
+      "executionTime": null
     }
   ],
   "findings": [
@@ -22,7 +31,10 @@
       "id": "unused-channel-video",
       "title": "四个主页面被报告声明了未使用的 channel-video 组件",
       "reportedVersion": "3.3.1",
-      "status": "open"
+      "status": "open",
+      "latestReportedVersion": "3.4.0",
+      "latestReportRef": "docs/RUNTIME_QUALITY_2026-10-26.md",
+      "localReproductionRef": "evidence/verification/3.4.0-runtime/channel-video-sdk-reproduction.json"
     },
     {
       "id": "custom-tabbar-first-switch",

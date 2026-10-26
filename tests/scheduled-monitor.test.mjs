@@ -89,10 +89,11 @@ test('the fallback covers 31 overdue groups with database overhead and still hon
     const timers = [];
     const sleep = ms => new Promise(resolve => timers.push({ at: nowMs + ms, sequence: sequence++, resolve }));
     // Concurrent operations share elapsed time; do not add two parallel DB waits.
+    const repoCalls = {};
     for (const name of Object.keys(f.repo)) {
       if (typeof f.repo[name] !== 'function') continue;
       const original = f.repo[name];
-      f.repo[name] = async (...args) => { await sleep(200); return original(...args); };
+      f.repo[name] = async (...args) => { repoCalls[name] = (repoCalls[name] || 0) + 1; await sleep(200); return original(...args); };
     }
     const upstream = fakeFetch(() => ({ display: 'unavailable' }));
     const starts = [];
@@ -126,15 +127,17 @@ test('the fallback covers 31 overdue groups with database overhead and still hon
     } finally { AbortSignal.timeout = nativeTimeout; }
     const status = f.repo.tables.get(C.config).get('collector_status');
     const lease = f.repo.tables.get(C.config).get('collector_lease');
-    return { result, elapsedMs: nowMs - base, starts, maxActive, status,
+    return { result, elapsedMs: nowMs - base, starts, maxActive, status, repoCalls,
       uniqueStores: new Set(upstream.calls.map(call => call.storeNumber)).size,
       persistedGroups: status.scheduler.targets.filter(target => target.health.lastPersistedSuccessAt >= base).length,
       leaseReleased: Date.parse(lease.expiresAt) <= nowMs };
   }
 
-  const legacy = await scenario({ maxRunMs: 35000 });
-  assert.ok(legacy.uniqueStores < 31, 'the old window leaves already-due tail groups unvisited');
-  assert.ok(legacy.persistedGroups < 31);
+  const compact = await scenario({ maxRunMs: 35000 });
+  assert.equal(compact.uniqueStores, 31, 'coalesced lease and status transactions also fit the shorter scan window');
+  assert.equal(compact.persistedGroups, 31);
+  assert.ok(compact.repoCalls.acquireLease <= 10, 'lease writes follow elapsed time, not checks per target');
+  assert.ok(compact.repoCalls.saveCollectorStatus <= 10, 'step and wave share the checkpoint interval');
   const brokenContext = { getRemainingTimeInMillis() { throw new TypeError('client.ms_elapsed is not a function'); } };
   for (const options of [{}, { maxRunMs: runBudgetMs(brokenContext) }]) {
     const extended = await scenario(options);
@@ -409,6 +412,44 @@ test('deadline is respected, and a manual-query restock is confirmed by one prom
   await s.f.call('query.pickup', { queryId: 'scheduled-manual-1', partNumber: 'MJYH4CH/A', storeNumbers: ['R577'] });
   assert.equal(s.sends.length, 0);
   const result = await s.run(); assert.ok(result.scanned >= 1, 'the store is re-checked to confirm'); assert.equal(s.sends.length, 1);
+});
+
+test('a useful manual event older than its burst window is confirmed during a five-minute normal cadence', async () => {
+  const s = await setup({ collector: { enabled: true, intervalSeconds: 300, budgetMode: 'continuous', maxRequestsPerDay: 10000,
+    burstIntervalSeconds: 2, burstQuietSeconds: 20, availableIntervalSeconds: 0, continuityGapMs: 900000 } });
+  await s.run();
+  const normalDue = (await s.f.repo.getCollectorStatus()).scheduler.targets.find(target => target.key.startsWith('R577|')).nextDueAt;
+  s.f.advance(10000); s.available();
+  const queried = await s.f.call('query.pickup', { queryId: 'slow-cycle-manual', partNumber: 'MJYH4CH/A', storeNumbers: ['R577'] });
+  assert.equal(queried.ok, true);
+  const event = [...s.f.repo.tables.get(C.events).values()].find(row => row.storeNumber === 'R577');
+  const detectedAt = event.detectedAt;
+  s.f.advance(50000);
+  assert.ok(s.f.state.now.getTime() < normalDue, 'the ordinary five-minute turn is not due');
+  assert.ok(s.f.state.now.getTime() - Date.parse(detectedAt) > 20000, 'the original burst window has elapsed');
+  const before = s.upstream.calls.length;
+  await s.run();
+  assert.ok(s.upstream.calls.length > before, 'an unexpired pending event brings the next confirmation forward');
+  assert.equal(s.sends.length, 1, 'confirmation still sends only once');
+  const accepted = [...s.f.repo.tables.get(C.notifications).values()].filter(row => row.status === 'accepted');
+  assert.equal(accepted.length, 1);
+  assert.equal(accepted[0].detectedAt, detectedAt, 'confirmation never restamps the original event to evade max age');
+  assert.ok(Date.parse(accepted[0].sentAt) - Date.parse(detectedAt) <= 120000);
+  assert.equal(s.upstream.calls.slice(before).every(call => call.storeNumber === 'R577'), true, 'other stores keep their normal cadence');
+});
+
+test('an expired manual event does not hurry a five-minute target or create a late reminder', async () => {
+  const s = await setup({ collector: { enabled: true, intervalSeconds: 300, budgetMode: 'continuous', maxRequestsPerDay: 10000,
+    burstIntervalSeconds: 2, burstQuietSeconds: 20, availableIntervalSeconds: 0, continuityGapMs: 900000 } });
+  await s.run(); s.f.advance(10000); s.available();
+  await s.f.call('query.pickup', { queryId: 'expired-slow-cycle-manual', partNumber: 'MJYH4CH/A', storeNumbers: ['R577'] });
+  const event = [...s.f.repo.tables.get(C.events).values()].find(row => row.storeNumber === 'R577');
+  const before = s.upstream.calls.length;
+  s.f.advance(120001);
+  await s.run();
+  assert.equal(s.upstream.calls.length, before, 'expired events cannot extend or restart the fast cadence');
+  assert.equal(s.sends.length, 0);
+  assert.ok((await s.f.repo.getEvent(event._id)).notificationPlannedAt, 'the expired pending event is retired');
 });
 
 test('another active lease prevents timer traffic and heartbeat clobbering', async () => {

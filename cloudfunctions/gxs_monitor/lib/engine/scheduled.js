@@ -65,7 +65,7 @@ async function runScheduled({ repo, fetchImpl, sendImpl, clock = () => new Date(
   const shouldContinue = () => clock().getTime() < deadline;
   const collector = createCollector({ repo, fetchImpl, sendImpl, clock, log, ownerId,
     mode: 'scheduled', minimumIntervalMs: 60000, statusTtlMs: 150000,
-    refreshEveryMs: 60000, statusEveryMs: 0, shouldContinue, remainingMs: () => Math.max(0, deadline - clock().getTime()) });
+    refreshEveryMs: 60000, statusEveryMs: 5000, shouldContinue, remainingMs: () => Math.max(0, deadline - clock().getTime()) });
   if (!await collector.lease.acquire()) return { state: 'standby', scanned: 0 };
   let failed = false;
   try {
@@ -111,7 +111,7 @@ async function runScheduled({ repo, fetchImpl, sendImpl, clock = () => new Date(
       const result = await collector.step();
       if (!result.held) return { state: 'standby', scanned: collector.stats.batches };
       await Promise.all(result.started);
-      if (collector.lease.isHeld()) await collector.publishStatus();
+      if (collector.lease.isHeld()) await collector.publishStatus(undefined, { force: false });
       if (!result.started.length) {
         const waitMs = collector.scheduler.nextDueInMs();
         const storeDelayed = collector.scheduler.snapshot().targets.some(target => target.storeDelayed);

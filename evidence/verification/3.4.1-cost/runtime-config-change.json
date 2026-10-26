@@ -1,0 +1,75 @@
+{
+  "scope": "Normal existing mini-program admin session",
+  "startedAt": "2026-10-26T06:19:02.08Z",
+  "patch": {
+    "collector": {
+      "cadenceMode": "adaptive",
+      "budgetMode": "continuous",
+      "maxRequestsPerDay": 10000,
+      "continuityGapMs": 900000
+    }
+  },
+  "ok": true,
+  "before": {
+    "revision": 10,
+    "collector": {
+      "enabled": true,
+      "intervalSeconds": 3,
+      "burstIntervalSeconds": 2,
+      "burstQuietSeconds": 20,
+      "availableIntervalSeconds": 0,
+      "maxConcurrency": 2,
+      "continuityGapMs": 300000,
+      "maxRequestsPerMinute": 600,
+      "maxRequestsPerDay": 800000,
+      "budgetMode": "continuous",
+      "cadenceMode": "fixed",
+      "autoSharePercent": 80,
+      "maxPartsPerRequest": 20,
+      "statusStaleAfterSeconds": 150
+    },
+    "requestId": "00840743-5004-4ee8-98b8-1b9b08ada74c",
+    "at": "2026-10-26T06:19:02.889Z"
+  },
+  "update": {
+    "ok": true,
+    "revision": 11,
+    "code": null,
+    "requestId": "e2547d60-6790-4669-8346-bda487dd14d8",
+    "at": "2026-10-26T06:19:03.688Z"
+  },
+  "after": {
+    "revision": 11,
+    "collector": {
+      "enabled": true,
+      "intervalSeconds": 3,
+      "burstIntervalSeconds": 2,
+      "burstQuietSeconds": 20,
+      "availableIntervalSeconds": 0,
+      "maxConcurrency": 2,
+      "continuityGapMs": 900000,
+      "maxRequestsPerMinute": 600,
+      "maxRequestsPerDay": 10000,
+      "budgetMode": "continuous",
+      "cadenceMode": "adaptive",
+      "autoSharePercent": 80,
+      "maxPartsPerRequest": 20,
+      "statusStaleAfterSeconds": 150
+    },
+    "requestId": "52c66ab5-5dcb-49f1-a4fd-755da61a8a88",
+    "at": "2026-10-26T06:19:04.308Z"
+  },
+  "changedCollectorKeys": [
+    "continuityGapMs",
+    "maxRequestsPerDay",
+    "cadenceMode"
+  ],
+  "systemPing": {
+    "ok": true,
+    "version": "3.4.1",
+    "isAdmin": true,
+    "requestId": "677ea328-80bc-47b9-a5f7-80a98acc6263",
+    "at": "2026-10-26T06:19:04.715Z"
+  },
+  "finishedAt": "2026-10-26T06:19:04.716Z"
+}

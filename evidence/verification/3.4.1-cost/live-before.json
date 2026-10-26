@@ -1,0 +1,407 @@
+{
+  "schemaVersion": 1,
+  "window": {
+    "start": "2026-10-26T14:05:00+08:00",
+    "end": "2026-10-26T14:15:00+08:00",
+    "minutes": 10
+  },
+  "access": {
+    "total": 14084,
+    "groups": [
+      {
+        "module": "database",
+        "action": "QueryDocument",
+        "resourceName": "gxs_config",
+        "statusCode": 200,
+        "count": 3753
+      },
+      {
+        "module": "database",
+        "action": "StartTransaction",
+        "resourceName": "undefined",
+        "statusCode": 200,
+        "count": 2594
+      },
+      {
+        "resourceName": "undefined",
+        "statusCode": 200,
+        "count": 2483,
+        "module": "database",
+        "action": "CommitTransaction"
+      },
+      {
+        "action": "UpdateDocument",
+        "resourceName": "gxs_config",
+        "statusCode": 200,
+        "count": 1899,
+        "module": "database"
+      },
+      {
+        "action": "QueryDocument",
+        "resourceName": "gxs_latest",
+        "statusCode": 200,
+        "count": 580,
+        "module": "database"
+      },
+      {
+        "resourceName": "gxs_latest",
+        "statusCode": 200,
+        "count": 539,
+        "module": "database",
+        "action": "UpdateDocument"
+      },
+      {
+        "action": "QueryDocument",
+        "resourceName": "gxs_observation_days",
+        "statusCode": 200,
+        "count": 539,
+        "module": "database"
+      },
+      {
+        "action": "UpdateDocument",
+        "resourceName": "gxs_observation_days",
+        "statusCode": 200,
+        "count": 539,
+        "module": "database"
+      },
+      {
+        "statusCode": 200,
+        "count": 279,
+        "module": "database",
+        "action": "QueryDocument",
+        "resourceName": "gxs_notifications"
+      },
+      {
+        "module": "database",
+        "action": "QueryDocument",
+        "resourceName": "gxs_events",
+        "statusCode": 200,
+        "count": 253
+      },
+      {
+        "module": "database",
+        "action": "QueryDocument",
+        "resourceName": "gxs_users",
+        "statusCode": 200,
+        "count": 177
+      },
+      {
+        "module": "database",
+        "action": "UpdateDocument",
+        "resourceName": "gxs_config",
+        "statusCode": 404,
+        "count": 111
+      },
+      {
+        "statusCode": 404,
+        "count": 111,
+        "module": "database",
+        "action": "AbortTransaction",
+        "resourceName": "undefined"
+      },
+      {
+        "module": "database",
+        "action": "QueryDocument",
+        "resourceName": "gxs_orders",
+        "statusCode": 200,
+        "count": 84
+      },
+      {
+        "module": "database",
+        "action": "QueryDocument",
+        "resourceName": "gxs_follows",
+        "statusCode": 200,
+        "count": 51
+      },
+      {
+        "action": "UpdateDocument",
+        "resourceName": "gxs_orders",
+        "statusCode": 200,
+        "count": 51,
+        "module": "database"
+      },
+      {
+        "module": "database",
+        "action": "UpdateDocument",
+        "resourceName": "gxs_notifications",
+        "statusCode": 200,
+        "count": 24
+      },
+      {
+        "statusCode": 304,
+        "count": 4,
+        "module": "aibot",
+        "action": "GET",
+        "resourceName": "quota"
+      },
+      {
+        "action": "GET",
+        "resourceName": null,
+        "statusCode": 200,
+        "count": 4,
+        "module": "auth"
+      },
+      {
+        "module": "auth",
+        "action": "POST",
+        "resourceName": null,
+        "statusCode": 200,
+        "count": 2
+      },
+      {
+        "module": "database",
+        "action": "QueryDocument",
+        "resourceName": "gxs_catalog_products",
+        "statusCode": 200,
+        "count": 2
+      },
+      {
+        "module": "database",
+        "action": "QueryDocument",
+        "resourceName": "gxs_catalog_stores",
+        "statusCode": 200,
+        "count": 1
+      },
+      {
+        "module": "database",
+        "action": "QueryDocument",
+        "resourceName": "gxs_quota_ledger",
+        "statusCode": 200,
+        "count": 1
+      },
+      {
+        "module": "database",
+        "action": "QueryDocument",
+        "resourceName": "gxs_queries",
+        "statusCode": 200,
+        "count": 1
+      },
+      {
+        "module": "database",
+        "action": "UpdateDocument",
+        "resourceName": "gxs_users",
+        "statusCode": 200,
+        "count": 1
+      },
+      {
+        "resourceName": "gxs_api",
+        "statusCode": 200,
+        "count": 1,
+        "module": "function",
+        "action": "InvokeFunction"
+      }
+    ]
+  },
+  "monitor": [
+    {
+      "at": "2026-10-26 14:14:27.302",
+      "requestId": "099c1343-8e16-4738-9747-7595ae07d205",
+      "result": {
+        "ok": true,
+        "state": "running",
+        "scanned": 22,
+        "observations": 53,
+        "events": 0,
+        "sent": 0,
+        "deadlineReached": false
+      }
+    },
+    {
+      "at": "2026-10-26 14:13:29.415",
+      "requestId": "7c4ef392-8746-474f-830f-45ff14f56b96",
+      "result": {
+        "ok": true,
+        "state": "running",
+        "scanned": 22,
+        "observations": 53,
+        "events": 0,
+        "sent": 0,
+        "deadlineReached": false
+      }
+    },
+    {
+      "at": "2026-10-26 14:12:38.223",
+      "requestId": "51aeb8cc-413c-4ac1-aeda-f4d73d64ae0f",
+      "result": {
+        "ok": true,
+        "state": "running",
+        "scanned": 25,
+        "observations": 56,
+        "events": 0,
+        "sent": 0,
+        "deadlineReached": false
+      }
+    },
+    {
+      "at": "2026-10-26 14:11:24.125",
+      "requestId": "79fc129e-9b91-4f44-ac45-9e42d2bbfe0a",
+      "result": {
+        "ok": true,
+        "state": "running",
+        "scanned": 21,
+        "observations": 52,
+        "events": 0,
+        "sent": 0,
+        "deadlineReached": false
+      }
+    },
+    {
+      "at": "2026-10-26 14:10:41.664",
+      "requestId": "5f1757fc-1150-47a8-9058-986129b60f1c",
+      "result": {
+        "ok": true,
+        "state": "running",
+        "scanned": 25,
+        "observations": 56,
+        "events": 0,
+        "sent": 0,
+        "deadlineReached": false
+      }
+    },
+    {
+      "at": "2026-10-26 14:09:24.920",
+      "requestId": "7b95e031-d1b5-4896-b611-92aa3b40c9ec",
+      "result": {
+        "ok": true,
+        "state": "running",
+        "scanned": 21,
+        "observations": 52,
+        "events": 0,
+        "sent": 0,
+        "deadlineReached": false
+      }
+    },
+    {
+      "at": "2026-10-26 14:08:33.613",
+      "requestId": "d4e0197d-aa53-4919-a3b8-0fa146abe685",
+      "result": {
+        "ok": true,
+        "state": "running",
+        "scanned": 24,
+        "observations": 55,
+        "events": 0,
+        "sent": 0,
+        "deadlineReached": false
+      }
+    },
+    {
+      "at": "2026-10-26 14:07:30.050",
+      "requestId": "bd5233a5-c933-4d40-989e-fc1e0c6c402b",
+      "result": {
+        "ok": true,
+        "state": "running",
+        "scanned": 24,
+        "observations": 55,
+        "events": 0,
+        "sent": 0,
+        "deadlineReached": false
+      }
+    },
+    {
+      "at": "2026-10-26 14:06:26.693",
+      "requestId": "33f9a51e-e61d-4caa-a6c2-a29ea671a76d",
+      "result": {
+        "ok": true,
+        "state": "running",
+        "scanned": 22,
+        "observations": 53,
+        "events": 0,
+        "sent": 0,
+        "deadlineReached": false
+      }
+    },
+    {
+      "at": "2026-10-26 14:05:30.364",
+      "requestId": "73aa70f6-9407-4bfc-a202-b50ac0fec906",
+      "result": {
+        "ok": true,
+        "state": "running",
+        "scanned": 23,
+        "observations": 54,
+        "events": 0,
+        "sent": 0,
+        "deadlineReached": false
+      }
+    }
+  ],
+  "dbRead": {
+    "EnvId": "flowermean-6gjaxfqhf6c13e88",
+    "MetricName": "DbRead",
+    "StartTime": "2026-10-26 14:05:00",
+    "EndTime": "2026-10-26 14:15:00",
+    "TimeSource": "params",
+    "Period": 300,
+    "Curve": {
+      "EndTime": "2026-10-26 14:15:00",
+      "MetricName": "DbRead",
+      "NewValues": [
+        3469,
+        2799,
+        2958
+      ],
+      "Period": 300,
+      "RequestId": "ce67ac08-8202-4545-b865-5f2af1b2a5b9",
+      "StartTime": "2026-10-26 14:05:00",
+      "Statistics": "sum",
+      "Time": [
+        1792994700,
+        1792995000,
+        1792995300
+      ],
+      "Values": [
+        3469,
+        2799,
+        2958
+      ]
+    },
+    "Summary": {
+      "sampleCount": 3,
+      "max": 3469,
+      "min": 2799,
+      "avg": 3075.3333333333335,
+      "latest": 2958,
+      "peakTimestamp": 1792994700,
+      "allZero": false
+    }
+  },
+  "dbWrite": {
+    "EnvId": "flowermean-6gjaxfqhf6c13e88",
+    "MetricName": "DbWrite",
+    "StartTime": "2026-10-26 14:05:00",
+    "EndTime": "2026-10-26 14:15:00",
+    "TimeSource": "params",
+    "Period": 300,
+    "Curve": {
+      "EndTime": "2026-10-26 14:15:00",
+      "MetricName": "DbWrite",
+      "NewValues": [
+        5036,
+        4090,
+        4340
+      ],
+      "Period": 300,
+      "RequestId": "058782b4-1d39-46c7-b165-3e499d7d4aac",
+      "StartTime": "2026-10-26 14:05:00",
+      "Statistics": "sum",
+      "Time": [
+        1792994700,
+        1792995000,
+        1792995300
+      ],
+      "Values": [
+        5036,
+        4090,
+        4340
+      ]
+    },
+    "Summary": {
+      "sampleCount": 3,
+      "max": 5036,
+      "min": 4090,
+      "avg": 4488.666666666667,
+      "latest": 4340,
+      "peakTimestamp": 1792994700,
+      "allZero": false
+    }
+  }
+}

@@ -1,3 +1,4 @@
+const navigation = require('../../utils/navigation');
 const { reminderPanelMethods } = require('../../utils/reminder-panel');
 const { stageHistoryContext } = require('../../utils/journey-context');
 const { productThumbnailUrl } = require('../../utils/product-image-fit');
@@ -802,6 +803,7 @@ Page({
     if (action === 'add') return this.onAdd();
     if (action === 'membership') return this.onGoMine();
     if (action === 'settings') {
+      if (navigation.isNavigating()) return;
       getApp().globalData.pendingMineSection = 'reminder-settings';
       return this.onGoMine();
     }
@@ -1112,21 +1114,24 @@ Page({
   },
 
   onViewHistory(e) {
+    if (navigation.isNavigating()) return;
     const follow = this.data.follows.find(item => item.followId === e.currentTarget.dataset.id);
     if (this.pageRetired || !follow) return;
     if (!stageHistoryContext({ from: 'follow', target: { partNumber: follow.partNumber, storeNumbers: follow.stores.map(store => store.storeNumber) } })) return toast('请刷新账户后再查看历史');
     switchToTab({ url: '/pages/history/index' });
   },
   onManageReminders() {
+    if (navigation.isNavigating()) return;
     getApp().globalData.pendingMineSection = 'reminder-center';
     this.onGoMine();
   },
-  onTestNotification() { wx.navigateTo({ url: '/pages/notification-test/index?from=follow' }); },
+  onTestNotification() { navigation.navigateTo({ url: '/pages/notification-test/index?from=follow' }); },
   onGoMine() {
     switchToTab({ url: '/pages/mine/index' });
   },
 
   onGoReminderSettings() {
+    if (navigation.isNavigating()) return;
     getApp().globalData.pendingMineSection = 'reminder-settings';
     this.onGoMine();
   },

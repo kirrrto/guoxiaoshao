@@ -1,9 +1,11 @@
+const navigation = require('./navigation');
 // Short-lived navigation intents only. Never store payments, balances or consent here.
 const MAX_AGE = 10 * 60 * 1000;
 const SOURCES = ['query', 'follow', 'mine', 'guide', 'history'];
 const REQUEST_ID = /^[A-Za-z0-9_-]{8,64}$/;
 let historyIntent = null;
 let testReturn = null;
+let testReturnGeneration = 0;
 
 function currentOwner() {
   if (typeof getApp !== 'function') return null;
@@ -34,7 +36,7 @@ function consumeHistoryContext() {
 }
 function stageTestReturn({ from, requestId, ownerUserKey } = {}) {
   if (!ownerUserKey || currentOwner() && currentOwner() !== ownerUserKey) return false;
-  testReturn = { version: 1, ownerUserKey, from: sourceOf(from), createdAt: Date.now(),
+  testReturn = { version: 1, generation: ++testReturnGeneration, ownerUserKey, from: sourceOf(from), createdAt: Date.now(),
     requestId: REQUEST_ID.test(requestId || '') ? requestId : null };
   return true;
 }
@@ -43,24 +45,31 @@ function peekTestReturn() {
   if (!validIntent(testReturn)) { testReturn = null; return null; }
   return { ...testReturn };
 }
-function consumeTestReturnUrl() {
-  const value = peekTestReturn(); testReturn = null;
+function peekTestReturnUrl() {
+  const value = peekTestReturn();
   if (!value) return null;
   return `/pages/notification-test/index?from=${value.from}${value.requestId ? `&requestId=${encodeURIComponent(value.requestId)}` : ''}&resume=1`;
 }
+function consumeTestReturnUrl(expected, generation) {
+  const url = peekTestReturnUrl();
+  if (expected && expected !== url || generation !== undefined && (!testReturn || generation !== testReturn.generation)) return null;
+  testReturn = null;
+  return url;
+}
 function returnToSource(from, ownerUserKey) {
+  if (navigation.isNavigating()) return false;
   let source = sourceOf(from);
   if (ownerUserKey && currentOwner() && ownerUserKey !== currentOwner()) source = 'mine';
   if (source === 'guide') {
     const pages = typeof getCurrentPages === 'function' ? getCurrentPages() : [];
     const previous = pages[pages.length - 2];
     if (previous && previous.route === 'pages/guide/index' && typeof wx.navigateBack === 'function') {
-      wx.navigateBack({ delta: 1 }); return;
+      navigation.navigateBack({ delta: 1 }); return;
     }
-    wx.navigateTo({ url: '/pages/guide/index?section=notification&from=mine' }); return;
+    navigation.navigateTo({ url: '/pages/guide/index?section=notification&from=mine' }); return;
   }
   if (source === 'mine') getApp().globalData.pendingMineSection = 'reminder-center';
-  wx.switchTab({ url: `/pages/${source}/index` });
+  navigation.switchTab({ url: `/pages/${source}/index` });
 }
 module.exports = { sourceOf, currentOwner, stageHistoryContext, consumeHistoryContext,
-  stageTestReturn, peekTestReturn, consumeTestReturnUrl, returnToSource };
+  stageTestReturn, peekTestReturn, peekTestReturnUrl, consumeTestReturnUrl, returnToSource };

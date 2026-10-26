@@ -1,0 +1,30 @@
+{
+  "checkedAt": "2026-10-26T08:59:54.108Z",
+  "version": "3.4.1",
+  "scope": "Additional cost fixes approved 2026-10-26; no cadence/authorization caching change",
+  "sourceChecks": "notification-local-checks.json",
+  "patchPlan": "notification-deployment-plan.json",
+  "beforeWindow": "notification-live-before.json",
+  "changes": [
+    {
+      "file": "lib/engine/collector.js",
+      "purpose": "Avoid fresh configuration read only after current event/outbox queries prove empty and neither eligibility nor reconciliation is due; keep existing polling opportunities."
+    },
+    {
+      "file": "lib/repo/cloudbase-repo.js",
+      "purpose": "Combine up to100 read IDs per request and stop at the known unique-ID count; write/delete batches remain20."
+    }
+  ],
+  "limitations": [
+    "Old unprocessed events10–60minutes old may cause one additional query before applying the actual policy window.",
+    "The broader scan still checks fresh eligibility because all relevant business writes do not yet publish a shared invalidation revision.",
+    "Daily-summary/latest writes and quota/lease transactions are retained for correctness; this patch does not eliminate the underlying per-sample database cost."
+  ],
+  "reviews": {
+    "blockingFindings": 0,
+    "notification": "44 independent tests pass",
+    "readIdBatching": "32 independent tests pass",
+    "deadlineGuard": "47 related tests pass"
+  },
+  "runtimeConfigChanged": false
+}

@@ -1,0 +1,27 @@
+{
+  "version": "3.4.1",
+  "checkedAt": "2026-10-26T06:18:17.562Z",
+  "fullTest": {
+    "passed": true,
+    "tests": 1689,
+    "failed": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "log": "output/cost-20261026/final-tests.log",
+    "sha256": "1e3acfff0e2ab4fe9e0707efbad0cc631289f1bfc68cc5b92a73c4b01e044d28"
+  },
+  "sourceCheck": {
+    "files": 558,
+    "javaScript": 395,
+    "json": 48,
+    "pages": 7,
+    "operatorPages": 1,
+    "errors": []
+  },
+  "monitorBundle": {
+    "passed": true,
+    "files": 43,
+    "sourceBytes": 307578
+  },
+  "scope": "Local automated checks; not physical-device, platform-quality or billing verification"
+}

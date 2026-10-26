@@ -1,3 +1,5 @@
+const navigation = require('./navigation');
+
 // Native switchTab and page onShow share these routes. The page that actually
 // becomes visible owns selection; a tap alone must never mark another page active.
 const TABS = [
@@ -8,7 +10,6 @@ const TABS = [
 ];
 
 let confirmedRoute = TABS[0].pagePath;
-let pendingNavigation = null;
 let visiblePage = null;
 let nativeHidden = false;
 let requestedHidden = false;
@@ -48,11 +49,29 @@ function applyNativeVisibility(hidden) {
       visibilityRetryTimer = timer;
     }
   };
+  const success = () => { if (nativeRequest === request) nativeHidden = hidden; };
+  let failureReported = false;
+  const fail = error => {
+    if (nativeRequest !== request) return;
+    nativeHidden = null;
+    if (failureReported) return;
+    failureReported = true;
+    try {
+      const log = typeof wx.getRealtimeLogManager === 'function' ? wx.getRealtimeLogManager() : null;
+      if (log && typeof log.warn === 'function') log.warn('[gxs] native_tab_bar_failure', {
+        method: hidden ? 'hideTabBar' : 'showTabBar', route: confirmedRoute,
+        ...navigation.nativeErrorCodes(error),
+        errMsg: String(error && (error.errMsg || error.message) || error || 'native tab bar failed').slice(0, 300),
+      });
+    } catch (_) { /* Keep visibility recovery independent of logging. */ }
+  };
   try {
-    method.call(wx, { animation: false,
-      success: () => { if (nativeRequest === request) nativeHidden = hidden; },
-      fail: () => { if (nativeRequest === request) nativeHidden = null; }, complete });
-  } catch (_) { nativeHidden = null; complete(); }
+    const result = method.call(wx, { animation: false, success, fail, complete });
+    if (result && typeof result.then === 'function') Promise.resolve(result).then(
+      value => { success(value); complete(); },
+      error => { fail(error); complete(); },
+    );
+  } catch (error) { fail(error); complete(); }
 }
 
 function updateVisibility(page) {
@@ -106,7 +125,7 @@ function syncTabBar(page, pagePath) {
   const index = tabIndex(pagePath);
   if (index < 0) return;
   confirmedRoute = TABS[index].pagePath;
-  if (pendingNavigation && pendingNavigation.pagePath === confirmedRoute) pendingNavigation = null;
+  navigation.confirmNavigation(confirmedRoute);
   if (!page) return;
   if (visiblePage && visiblePage !== page) releaseTabBar(visiblePage, false);
   visiblePage = page;
@@ -138,28 +157,17 @@ function navigateToTab(component, rawIndex) {
   // lock until the destination onShow or the native completion callback.
   if (typeof rawIndex !== 'number' && !(typeof rawIndex === 'string' && /^\d+$/.test(rawIndex))) return false;
   const index = Number(rawIndex);
-  if (!Number.isInteger(index) || index < 0 || index >= TABS.length || pendingNavigation || requestedHidden) return false;
+  if (!Number.isInteger(index) || index < 0 || index >= TABS.length || navigation.isNavigating() || requestedHidden) return false;
   if (getCurrentTabPath() === TABS[index].pagePath) return false;
   return switchToTab({ url: TABS[index].pagePath });
 }
 
 function switchToTab(options) {
   const index = tabIndex(options && options.url);
-  if (index < 0 || pendingNavigation) return false;
+  if (index < 0 || navigation.isNavigating()) return false;
   const pagePath = TABS[index].pagePath;
   if (visiblePage && getCurrentTabPath() === pagePath) return false;
-  const navigation = { pagePath };
-  pendingNavigation = navigation;
-  const release = () => { if (pendingNavigation === navigation) pendingNavigation = null; };
-  const fail = error => {
-    release();
-    if (typeof options.fail === 'function') options.fail(error);
-    else if (typeof wx.showToast === 'function') wx.showToast({ title: '页面切换未完成，请重试', icon: 'none' });
-  };
-  const complete = result => { release(); if (typeof options.complete === 'function') options.complete(result); };
-  try { wx.switchTab({ ...options, url: pagePath, fail, complete }); }
-  catch (error) { fail(error); complete(error); return false; }
-  return true;
+  return navigation.switchTab({ ...options, url: pagePath });
 }
 
 module.exports = { TABS, tabIndex, getCurrentTabPath, syncTabBar, releaseTabBar, setTabBarOverlay, navigateToTab, switchToTab };

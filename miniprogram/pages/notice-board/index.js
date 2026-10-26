@@ -1,3 +1,4 @@
+const navigation = require('../../utils/navigation');
 const { getBootstrap } = require('../../utils/store');
 const { normalizeAnnouncement, liveNotices, markNoticesSeen, parseTime, noticeExpiresAt, withOutageCompensationNotice } = require('../../utils/query-notice');
 const fmt = require('../../utils/format');
@@ -11,7 +12,7 @@ function formatPublishedAt(value) {
 Page({
   data: { ready: false, refreshing: false, loadError: '', items: [], hasContent: false, refreshedText: '', service: null },
   onLoad() { this.visible = true; return this.load(); },
-  onShow() { this.visible = true; if (this.noticePayload) this.renderNotices(); if (this.data.ready) return this.load(); },
+  onShow() { navigation.confirmNavigation('pages/notice-board/index'); this.visible = true; if (this.noticePayload) this.renderNotices(); if (this.data.ready) return this.load(); },
   onHide() { this.visible = false; this.stopExpiryTimer(); },
   onUnload() { this.pageRetired = true; this.visible = false; this.stopExpiryTimer(); },
   stopExpiryTimer() { if (this.expiryTimer) clearTimeout(this.expiryTimer); this.expiryTimer = null; },
@@ -71,8 +72,8 @@ Page({
   },
   onRetry() { return this.load(true); },
   async onPullDownRefresh() { try { await this.load(true); } finally { wx.stopPullDownRefresh(); } },
-  onGoFollows() { wx.switchTab({ url: '/pages/follow/index' }); },
-  onGoHelp() { wx.navigateTo({ url: '/pages/guide/index?section=notification&from=mine' }); },
+  onGoFollows() { navigation.switchTab({ url: '/pages/follow/index' }); },
+  onGoHelp() { navigation.navigateTo({ url: '/pages/guide/index?section=notification&from=mine' }); },
   onShareAppMessage() { return shareAppMessage('/pages/notice-board/index', this.data); },
   onShareTimeline() { return shareTimeline('/pages/notice-board/index', this.data); },
 });

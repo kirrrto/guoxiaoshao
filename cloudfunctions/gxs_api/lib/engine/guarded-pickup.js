@@ -1,11 +1,40 @@
 'use strict';
 const { fetchPickup } = require('../apple-pickup');
 
+// Concurrent stores share two budget documents. Queue only local admission;
+// database transactions still arbitrate other repositories/instances.
+const admissionTails = new WeakMap();
+function serialiseAdmission(repo, task, waitMs) {
+  let started = false, cancelled = false, timer;
+  const expired = Number.isFinite(waitMs) ? new Promise(resolve => {
+    timer = setTimeout(() => {
+      if (!started) { cancelled = true; resolve(null); }
+    }, Math.max(0, waitMs));
+  }) : null;
+  const next = (admissionTails.get(repo) || Promise.resolve()).then(() => {
+    started = true;
+    clearTimeout(timer);
+    return cancelled ? null : task();
+  });
+  // A waiting caller may finish early, but its queue slot stays behind the
+  // running transaction. Never race the tail or cancel an admission in flight.
+  const tail = next.then(() => {}, () => {});
+  admissionTails.set(repo, tail);
+  tail.then(() => { if (admissionTails.get(repo) === tail) admissionTails.delete(repo); });
+  return expired ? Promise.race([next, expired]) : next;
+}
+
 async function guardedPickup({ repo, config, clock, fetchImpl, storeNumber, partNumbers, timeoutMs, source = 'manual', beforeRequest = async () => true, onBudget = () => {}, remainingMs = () => Infinity }) {
   const denied = (reason, retryAt) => ({ record: { httpStatus: null, budgetDenied: true, retryAt, error: { message: reason }, elapsedMs: 0 }, observations: partNumbers.map(partNumber => ({ storeNumber, partNumber, status: 'unknown', quote: null, storeName: null, productTitle: null, observedAt: clock().toISOString(), reason: { code: reason, message: '暂缓查询，请稍后重试' } })) });
   if (remainingMs() <= 1000) return denied('request_cancelled', clock().getTime() + 1000);
   const autoShare = Math.min(0.95, Math.max(0.01, (config.collector.autoSharePercent || 80) / 100));
-  const budget = await repo.consumeCollectorBudget({ now: clock().toISOString(), maxRequestsPerMinute: config.collector.maxRequestsPerMinute, maxRequestsPerDay: config.collector.maxRequestsPerDay, budgetMode: config.collector.budgetMode, source, autoShare });
+  const budget = await serialiseAdmission(repo, () => {
+    // Waiting consumes the invocation/lease budget too. Do not reserve an
+    // expired request, and choose its calendar day only when it reaches the head.
+    if (remainingMs() <= 1000) return null;
+    return repo.consumeCollectorBudget({ now: clock().toISOString(), maxRequestsPerMinute: config.collector.maxRequestsPerMinute, maxRequestsPerDay: config.collector.maxRequestsPerDay, budgetMode: config.collector.budgetMode, source, autoShare });
+  }, remainingMs() - 1000);
+  if (!budget) return denied('request_cancelled', clock().getTime() + 1000);
   onBudget(budget);
   if (!budget.allowed) return denied(budget.reason, budget.retryAt);
   if (!await beforeRequest()) return denied('request_cancelled', clock().getTime() + 1000);

@@ -1,0 +1,393 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-26T03:07:22.712Z",
+  "environment": "flowermean-6gjaxfqhf6c13e88",
+  "timezone": "Asia/Shanghai",
+  "scope": "Authenticated read-only production function logs and retention status; no invocation, database modification or deployment",
+  "functions": [
+    {
+      "functionName": "gxs_api",
+      "status": "Active",
+      "runtime": "Nodejs18.15",
+      "timeoutSeconds": 60,
+      "lastModifiedAt": "2026-10-24 08:28:33"
+    },
+    {
+      "functionName": "cloudbase_auth",
+      "status": "Active",
+      "runtime": "Nodejs18.15",
+      "timeoutSeconds": 5,
+      "lastModifiedAt": "2026-10-24 08:28:31"
+    },
+    {
+      "functionName": "gxs_monitor",
+      "status": "Active",
+      "runtime": "Nodejs20.19",
+      "timeoutSeconds": 60,
+      "lastModifiedAt": "2026-10-24 08:28:32"
+    }
+  ],
+  "queries": {
+    "api": {
+      "functionName": "gxs_api",
+      "startTime": "2026-10-24 07:55:00",
+      "endTime": "2026-10-24 08:10:00",
+      "hasMore": false,
+      "logLineCount": 50,
+      "uniqueRequests": 7,
+      "completedRequests": [
+        {
+          "requestId": "e68c24f7-6a66-4df6-989f-0e9de839b2d2",
+          "timestamp": "2026-10-24 08:05:17.352",
+          "source": "TRIGGER_TIMER",
+          "statusCode": "200",
+          "retCode": "0",
+          "durationMs": 11420
+        },
+        {
+          "requestId": "68d176c5-5e43-4771-b292-322bf77c17e9",
+          "timestamp": "2026-10-24 08:01:34.815",
+          "source": "TCB_API",
+          "statusCode": "200",
+          "retCode": "0",
+          "durationMs": 141
+        },
+        {
+          "requestId": "220b7c86-7037-440c-a193-d0c4325db099",
+          "timestamp": "2026-10-24 08:01:34.749",
+          "source": "TCB_API",
+          "statusCode": "200",
+          "retCode": "0",
+          "durationMs": 84
+        },
+        {
+          "requestId": "d38ae2eb-2383-4a4c-bfba-3db3caba154f",
+          "timestamp": "2026-10-24 08:01:20.001",
+          "source": "TCB_API",
+          "statusCode": "200",
+          "retCode": "0",
+          "durationMs": 295
+        },
+        {
+          "requestId": "d4d47e3b-49e0-4af5-8773-bec46e917d75",
+          "timestamp": "2026-10-24 08:01:19.941",
+          "source": "TCB_API",
+          "statusCode": "200",
+          "retCode": "0",
+          "durationMs": 115
+        },
+        {
+          "requestId": "b14a6ec1-545b-4783-a4bf-02986bd653e3",
+          "timestamp": "2026-10-24 08:00:11.007",
+          "source": "TRIGGER_TIMER",
+          "statusCode": "200",
+          "retCode": "0",
+          "durationMs": 9299
+        },
+        {
+          "requestId": "14930639-36a3-4b9e-b155-346a3f689627",
+          "timestamp": "2026-10-24 07:55:12.051",
+          "source": "TRIGGER_TIMER",
+          "statusCode": "200",
+          "retCode": "0",
+          "durationMs": 10185
+        }
+      ],
+      "retentionFailures": [],
+      "paymentEntryFailureCount": 12
+    },
+    "auth": {
+      "functionName": "cloudbase_auth",
+      "startTime": "2026-10-24 07:58:00",
+      "endTime": "2026-10-24 08:05:00",
+      "hasMore": false,
+      "logLineCount": 14,
+      "uniqueRequests": 2,
+      "completedRequests": [
+        {
+          "requestId": "038e77cd-ae77-4890-addb-7b2eb6ceddac",
+          "timestamp": "2026-10-24 08:01:14.024",
+          "source": "TCB_API",
+          "statusCode": "200",
+          "retCode": "0",
+          "durationMs": 4
+        },
+        {
+          "requestId": "35cfbbed-33b0-44ec-858f-d9e7325f6c9a",
+          "timestamp": "2026-10-24 08:01:13.468",
+          "source": "TCB_API",
+          "statusCode": "200",
+          "retCode": "0",
+          "durationMs": 4
+        }
+      ],
+      "retentionFailures": [],
+      "paymentEntryFailureCount": 0
+    },
+    "monitorHistorical": {
+      "functionName": "gxs_monitor",
+      "startTime": "2026-10-24 07:58:00",
+      "endTime": "2026-10-24 08:05:00",
+      "hasMore": false,
+      "logLineCount": 36,
+      "uniqueRequests": 7,
+      "completedRequests": [
+        {
+          "requestId": "78658cb2-02ca-480b-89d9-5970ad857240",
+          "timestamp": "2026-10-24 08:04:37.598",
+          "source": "TRIGGER_TIMER",
+          "statusCode": "200",
+          "retCode": "0",
+          "durationMs": 35935
+        },
+        {
+          "requestId": "e63c9b5b-9222-44e2-850d-931d31030163",
+          "timestamp": "2026-10-24 08:03:38.060",
+          "source": "TRIGGER_TIMER",
+          "statusCode": "200",
+          "retCode": "0",
+          "durationMs": 36283
+        },
+        {
+          "requestId": "c64b4611-912a-4d8c-839a-a71010b5266e",
+          "timestamp": "2026-10-24 08:02:44.020",
+          "source": "TRIGGER_TIMER",
+          "statusCode": "200",
+          "retCode": "0",
+          "durationMs": 42897
+        },
+        {
+          "requestId": "7b813c0a-a243-4b73-af32-5b17eefcbbf0",
+          "timestamp": "2026-10-24 08:01:24.687",
+          "source": "TRIGGER_TIMER",
+          "statusCode": "200",
+          "retCode": "0",
+          "durationMs": 23507
+        },
+        {
+          "requestId": "2e6a137f-751c-44a5-a70a-9543a8fd0318",
+          "timestamp": "2026-10-24 08:00:39.681",
+          "source": "TRIGGER_TIMER",
+          "statusCode": "200",
+          "retCode": "0",
+          "durationMs": 36576
+        },
+        {
+          "requestId": "c379be38-6909-440d-93f4-4ab787971be1",
+          "timestamp": "2026-10-24 07:59:36.615",
+          "source": "TRIGGER_TIMER",
+          "statusCode": "200",
+          "retCode": "0",
+          "durationMs": 35667
+        },
+        {
+          "requestId": "3c102f6f-4f7c-4b26-b291-286b5dcff6a7",
+          "timestamp": "2026-10-24 07:58:36.472",
+          "source": "TRIGGER_TIMER",
+          "statusCode": "200",
+          "retCode": "0",
+          "durationMs": 35275
+        }
+      ],
+      "retentionFailures": [
+        {
+          "requestId": "7b813c0a-a243-4b73-af32-5b17eefcbbf0",
+          "timestamp": "2026-10-24 08:01:24.447",
+          "error": "Cannot read properties of undefined (reading 'in')"
+        }
+      ],
+      "paymentEntryFailureCount": 0
+    },
+    "monitorCurrent": {
+      "functionName": "gxs_monitor",
+      "startTime": "2026-10-26 10:50:00",
+      "endTime": "2026-10-26 11:05:00",
+      "hasMore": false,
+      "logLineCount": 79,
+      "uniqueRequests": 13,
+      "completedRequests": [
+        {
+          "requestId": "ffb331ff-c244-474f-9db5-9b77101c0380",
+          "timestamp": "2026-10-26 11:02:24.896",
+          "source": "TRIGGER_TIMER",
+          "statusCode": "200",
+          "retCode": "0",
+          "durationMs": 23994
+        },
+        {
+          "requestId": "2689e697-027b-455b-bcf6-860e301ee3f6",
+          "timestamp": "2026-10-26 11:01:34.600",
+          "source": "TRIGGER_TIMER",
+          "statusCode": "200",
+          "retCode": "0",
+          "durationMs": 34090
+        },
+        {
+          "requestId": "30c93d33-4166-432b-a7c9-b0caf569e1bb",
+          "timestamp": "2026-10-26 11:00:39.638",
+          "source": "TRIGGER_TIMER",
+          "statusCode": "200",
+          "retCode": "0",
+          "durationMs": 36216
+        },
+        {
+          "requestId": "1594a291-9f97-4c61-89ce-087fb7597bea",
+          "timestamp": "2026-10-26 10:59:26.937",
+          "source": "TRIGGER_TIMER",
+          "statusCode": "200",
+          "retCode": "0",
+          "durationMs": 26341
+        },
+        {
+          "requestId": "3f504053-3193-45d7-8a12-2283887842a7",
+          "timestamp": "2026-10-26 10:58:31.150",
+          "source": "TRIGGER_TIMER",
+          "statusCode": "200",
+          "retCode": "0",
+          "durationMs": 29363
+        },
+        {
+          "requestId": "ab591778-24c3-4339-9e0c-cc3cbc9e76b4",
+          "timestamp": "2026-10-26 10:57:25.387",
+          "source": "TRIGGER_TIMER",
+          "statusCode": "200",
+          "retCode": "0",
+          "durationMs": 24289
+        },
+        {
+          "requestId": "97d0fb68-d3f0-4c39-8885-b8898abe96e3",
+          "timestamp": "2026-10-26 10:56:30.476",
+          "source": "TRIGGER_TIMER",
+          "statusCode": "200",
+          "retCode": "0",
+          "durationMs": 29235
+        },
+        {
+          "requestId": "ef0b90cd-5980-444d-86dc-f1051bdeb9d0",
+          "timestamp": "2026-10-26 10:55:25.680",
+          "source": "TRIGGER_TIMER",
+          "statusCode": "200",
+          "retCode": "0",
+          "durationMs": 22608
+        },
+        {
+          "requestId": "19a24ba4-1bd0-4127-a0c1-b2f25b005ef8",
+          "timestamp": "2026-10-26 10:54:30.682",
+          "source": "TRIGGER_TIMER",
+          "statusCode": "200",
+          "retCode": "0",
+          "durationMs": 29771
+        },
+        {
+          "requestId": "86337ff4-1717-4276-888d-df1c212a098f",
+          "timestamp": "2026-10-26 10:53:29.615",
+          "source": "TRIGGER_TIMER",
+          "statusCode": "200",
+          "retCode": "0",
+          "durationMs": 28835
+        },
+        {
+          "requestId": "a7d14c75-2913-4fcb-b95c-b04f9d07a0e3",
+          "timestamp": "2026-10-26 10:52:29.869",
+          "source": "TRIGGER_TIMER",
+          "statusCode": "200",
+          "retCode": "0",
+          "durationMs": 28584
+        },
+        {
+          "requestId": "e8b048d0-2553-49bf-9bf7-6d29f11ee223",
+          "timestamp": "2026-10-26 10:51:29.507",
+          "source": "TRIGGER_TIMER",
+          "statusCode": "200",
+          "retCode": "0",
+          "durationMs": 28970
+        },
+        {
+          "requestId": "579f00d2-50ea-4ef8-8a6b-f454470ebbb4",
+          "timestamp": "2026-10-26 10:50:26.624",
+          "source": "TRIGGER_TIMER",
+          "statusCode": "200",
+          "retCode": "0",
+          "durationMs": 25120
+        }
+      ],
+      "retentionFailures": [
+        {
+          "requestId": "ffb331ff-c244-474f-9db5-9b77101c0380",
+          "timestamp": "2026-10-26 11:02:24.662",
+          "error": "Cannot read properties of undefined (reading 'in')"
+        },
+        {
+          "requestId": "2689e697-027b-455b-bcf6-860e301ee3f6",
+          "timestamp": "2026-10-26 11:01:34.368",
+          "error": "Cannot read properties of undefined (reading 'in')"
+        },
+        {
+          "requestId": "1594a291-9f97-4c61-89ce-087fb7597bea",
+          "timestamp": "2026-10-26 10:59:26.713",
+          "error": "Cannot read properties of undefined (reading 'in')"
+        },
+        {
+          "requestId": "3f504053-3193-45d7-8a12-2283887842a7",
+          "timestamp": "2026-10-26 10:58:30.885",
+          "error": "Cannot read properties of undefined (reading 'in')"
+        },
+        {
+          "requestId": "ab591778-24c3-4339-9e0c-cc3cbc9e76b4",
+          "timestamp": "2026-10-26 10:57:25.180",
+          "error": "Cannot read properties of undefined (reading 'in')"
+        },
+        {
+          "requestId": "97d0fb68-d3f0-4c39-8885-b8898abe96e3",
+          "timestamp": "2026-10-26 10:56:30.238",
+          "error": "Cannot read properties of undefined (reading 'in')"
+        },
+        {
+          "requestId": "ef0b90cd-5980-444d-86dc-f1051bdeb9d0",
+          "timestamp": "2026-10-26 10:55:25.457",
+          "error": "Cannot read properties of undefined (reading 'in')"
+        },
+        {
+          "requestId": "19a24ba4-1bd0-4127-a0c1-b2f25b005ef8",
+          "timestamp": "2026-10-26 10:54:30.455",
+          "error": "Cannot read properties of undefined (reading 'in')"
+        },
+        {
+          "requestId": "86337ff4-1717-4276-888d-df1c212a098f",
+          "timestamp": "2026-10-26 10:53:29.390",
+          "error": "Cannot read properties of undefined (reading 'in')"
+        },
+        {
+          "requestId": "a7d14c75-2913-4fcb-b95c-b04f9d07a0e3",
+          "timestamp": "2026-10-26 10:52:29.636",
+          "error": "Cannot read properties of undefined (reading 'in')"
+        },
+        {
+          "requestId": "e8b048d0-2553-49bf-9bf7-6d29f11ee223",
+          "timestamp": "2026-10-26 10:51:29.286",
+          "error": "Cannot read properties of undefined (reading 'in')"
+        },
+        {
+          "requestId": "579f00d2-50ea-4ef8-8a6b-f454470ebbb4",
+          "timestamp": "2026-10-26 10:50:26.394",
+          "error": "Cannot read properties of undefined (reading 'in')"
+        }
+      ],
+      "paymentEntryFailureCount": 0,
+      "observedThrough": "2026-10-26 11:02:24.896",
+      "note": "Query endTime was later than query execution; this is the returned snapshot through 11:02, not a complete 11:05 window."
+    }
+  },
+  "retentionStatus": {
+    "collection": "gxs_config",
+    "documentId": "retention_status",
+    "found": false
+  },
+  "conclusions": [
+    "All four client-origin gxs_api completions and two cloudbase_auth completions in the queried historical window returned platform status 200 / retCode 0; API responses were separately inspected as business ok:true",
+    "The screenshot has no requestId; these calls cannot be attributed to the reporting user or used to exclude a gateway/client failure outside function execution",
+    "The current monitor window contains repeated retention shadowing failures despite successful monitor platform completion; this is an independently established backend defect, not a proven cause of the screenshot timeout",
+    "Historical scheduled payment reconciliation failures are separate partial business failures; no financial repair or write was attempted"
+  ],
+  "redaction": "No openID, response payloads, credentials, environment variables or signed URLs retained"
+}

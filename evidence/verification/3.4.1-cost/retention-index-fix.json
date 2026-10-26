@@ -1,0 +1,181 @@
+{
+  "checkedAt": "2026-10-26T07:33:14.319Z",
+  "collection": "gxs_target_health",
+  "alert": {
+    "eventType": "MongoSlowQuery",
+    "action": "DeleteItemV3",
+    "requestId": "1a176377c8b_557",
+    "startTime": "2026-10-26T11:18:32.595957674+08:00",
+    "timeCostMs": 2280,
+    "where": {
+      "recordedAt": {
+        "$lt": "2026-10-16T16:00:00.000Z"
+      }
+    }
+  },
+  "retention": {
+    "lastRunAt": "2026-10-26T03:18:29.980Z",
+    "firstDay": "2026-10-17",
+    "targetHealthRemoved": 20994,
+    "errors": {},
+    "retentionDaysUnchanged": 10
+  },
+  "slowQuerySearch": {
+    "start": "2026-10-26T00:00:00+08:00",
+    "end": "2026-10-26T15:29:00+08:00",
+    "records": [
+      {
+        "resourceName": "gxs_target_health",
+        "action": "DeleteItemV3",
+        "count": 1,
+        "maxTimeCost": 2280
+      }
+    ]
+  },
+  "beforeIndexes": [
+    {
+      "Name": "target_bucket",
+      "Accesses": {
+        "Ops": 0,
+        "Since": "2026-09-15T11:33:17.985+08:00"
+      },
+      "Keys": [
+        {
+          "Name": "targetKey",
+          "Direction": "1"
+        },
+        {
+          "Name": "bucket",
+          "Direction": "-1"
+        }
+      ],
+      "Size": 32768,
+      "Unique": false,
+      "Sparse": false,
+      "PartialFilterExpression": ""
+    },
+    {
+      "Name": "_openid_1",
+      "Accesses": {
+        "Ops": 0,
+        "Since": "2026-09-15T11:32:52.871+08:00"
+      },
+      "Keys": [
+        {
+          "Name": "_openid",
+          "Direction": "1"
+        }
+      ],
+      "Size": 12288,
+      "Unique": false,
+      "Sparse": false,
+      "PartialFilterExpression": ""
+    },
+    {
+      "Name": "_id_",
+      "Accesses": {
+        "Ops": 62980,
+        "Since": "2026-09-15T11:32:52.865+08:00"
+      },
+      "Keys": [
+        {
+          "Name": "_id",
+          "Direction": "1"
+        }
+      ],
+      "Size": 12288,
+      "Unique": false,
+      "Sparse": false,
+      "PartialFilterExpression": ""
+    }
+  ],
+  "createResult": {
+    "success": true,
+    "requestId": "cec2b4e9-2fb2-479f-918e-e548dc89862e",
+    "action": "updateCollection",
+    "message": "云开发数据库集合更新成功",
+    "collection": "gxs_target_health",
+    "collectionName": "gxs_target_health"
+  },
+  "afterIndexes": [
+    {
+      "Name": "recorded_at",
+      "Accesses": {
+        "Ops": 2,
+        "Since": "2026-10-26T15:30:32.457+08:00"
+      },
+      "Keys": [
+        {
+          "Name": "recordedAt",
+          "Direction": "1"
+        }
+      ],
+      "Size": 12288,
+      "Unique": false,
+      "Sparse": false,
+      "PartialFilterExpression": ""
+    },
+    {
+      "Name": "_id_",
+      "Accesses": {
+        "Ops": 62980,
+        "Since": "2026-09-15T11:32:52.865+08:00"
+      },
+      "Keys": [
+        {
+          "Name": "_id",
+          "Direction": "1"
+        }
+      ],
+      "Size": 12288,
+      "Unique": false,
+      "Sparse": false,
+      "PartialFilterExpression": ""
+    },
+    {
+      "Name": "target_bucket",
+      "Accesses": {
+        "Ops": 0,
+        "Since": "2026-09-15T11:33:17.985+08:00"
+      },
+      "Keys": [
+        {
+          "Name": "targetKey",
+          "Direction": "1"
+        },
+        {
+          "Name": "bucket",
+          "Direction": "-1"
+        }
+      ],
+      "Size": 32768,
+      "Unique": false,
+      "Sparse": false,
+      "PartialFilterExpression": ""
+    },
+    {
+      "Name": "_openid_1",
+      "Accesses": {
+        "Ops": 0,
+        "Since": "2026-09-15T11:32:52.871+08:00"
+      },
+      "Keys": [
+        {
+          "Name": "_openid",
+          "Direction": "1"
+        }
+      ],
+      "Size": 12288,
+      "Unique": false,
+      "Sparse": false,
+      "PartialFilterExpression": ""
+    }
+  ],
+  "verification": {
+    "indexListed": true,
+    "indexObservedAccesses": 2,
+    "expiredMatchingDocuments": 0,
+    "deleteLatencyRetested": false,
+    "note": "Read-only query of the identical cutoff returned no remaining expired row. No repeat deletion or retention-window change; next scheduled cleanup latency is not yet measured."
+  }
+}

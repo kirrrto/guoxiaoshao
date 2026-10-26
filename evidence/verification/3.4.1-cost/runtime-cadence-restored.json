@@ -1,0 +1,57 @@
+{
+  "reason": "Restore original monitoring timeliness following owner feedback; retain deployed code optimizations",
+  "patch": {
+    "collector": {
+      "cadenceMode": "fixed",
+      "maxRequestsPerDay": 800000,
+      "continuityGapMs": 300000
+    }
+  },
+  "before": {
+    "revision": 11,
+    "collector": {
+      "enabled": true,
+      "intervalSeconds": 3,
+      "burstIntervalSeconds": 2,
+      "burstQuietSeconds": 20,
+      "availableIntervalSeconds": 0,
+      "maxConcurrency": 2,
+      "continuityGapMs": 900000,
+      "maxRequestsPerMinute": 600,
+      "maxRequestsPerDay": 10000,
+      "budgetMode": "continuous",
+      "cadenceMode": "adaptive",
+      "autoSharePercent": 80,
+      "maxPartsPerRequest": 20,
+      "statusStaleAfterSeconds": 150
+    },
+    "requestId": "98cca1e7-1cad-4020-a815-449ffb12d01b",
+    "at": "2026-10-26T07:31:11.462Z"
+  },
+  "update": {
+    "revision": 12,
+    "requestId": "d85fbc91-2ebd-4930-a0a3-48c2dae999bf",
+    "at": "2026-10-26T07:31:11.941Z"
+  },
+  "after": {
+    "revision": 12,
+    "collector": {
+      "enabled": true,
+      "intervalSeconds": 3,
+      "burstIntervalSeconds": 2,
+      "burstQuietSeconds": 20,
+      "availableIntervalSeconds": 0,
+      "maxConcurrency": 2,
+      "continuityGapMs": 300000,
+      "maxRequestsPerMinute": 600,
+      "maxRequestsPerDay": 800000,
+      "budgetMode": "continuous",
+      "cadenceMode": "fixed",
+      "autoSharePercent": 80,
+      "maxPartsPerRequest": 20,
+      "statusStaleAfterSeconds": 150
+    },
+    "requestId": "73dd8138-f031-4d16-83d0-2f0de29c8ab7",
+    "at": "2026-10-26T07:31:12.653Z"
+  }
+}

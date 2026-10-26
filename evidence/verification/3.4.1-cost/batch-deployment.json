@@ -1,0 +1,112 @@
+{
+  "schemaVersion": 1,
+  "version": "3.4.1",
+  "scope": "Keep one-minute monitoring; reduce per-observation transactions and same-process budget conflicts; add retention index declaration",
+  "deployedAt": {
+    "api": "2026-10-26T07:47:50.013Z",
+    "monitor": "2026-10-26T07:47:56.453Z"
+  },
+  "receipts": {
+    "api": {
+      "RequestId": "78c44260-4696-4bec-944c-251517f52378"
+    },
+    "monitor": {
+      "RequestId": "8208192a-d325-4b31-b9d7-fbf24b02235f"
+    }
+  },
+  "configurations": {
+    "api": {
+      "before": {
+        "runtime": "Nodejs18.15",
+        "memoryMb": 256,
+        "timeoutSeconds": 60,
+        "handler": "index.main",
+        "triggers": [
+          {
+            "AddTime": "2026-09-20 12:32:27",
+            "ModTime": "2026-10-21 11:01:29",
+            "TriggerDesc": "{\"cron\":\"0 */5 * * * * *\"}",
+            "TriggerName": "gxs-payment-reconcile-five-minutes",
+            "Type": "timer"
+          }
+        ]
+      },
+      "after": {
+        "runtime": "Nodejs18.15",
+        "memoryMb": 256,
+        "timeoutSeconds": 60,
+        "handler": "index.main",
+        "triggers": [
+          {
+            "AddTime": "2026-09-20 12:32:27",
+            "ModTime": "2026-10-21 11:01:29",
+            "TriggerDesc": "{\"cron\":\"0 */5 * * * * *\"}",
+            "TriggerName": "gxs-payment-reconcile-five-minutes",
+            "Type": "timer"
+          }
+        ]
+      }
+    },
+    "monitor": {
+      "before": {
+        "runtime": "Nodejs20.19",
+        "memoryMb": 256,
+        "timeoutSeconds": 60,
+        "handler": "index.main",
+        "triggers": [
+          {
+            "AddTime": "2026-09-16 09:16:58",
+            "ModTime": "2026-10-21 11:01:30",
+            "TriggerDesc": "{\"cron\":\"0 * * * * * *\"}",
+            "TriggerName": "gxs-monitor-minute",
+            "Type": "timer"
+          }
+        ]
+      },
+      "after": {
+        "runtime": "Nodejs20.19",
+        "memoryMb": 256,
+        "timeoutSeconds": 60,
+        "handler": "index.main",
+        "triggers": [
+          {
+            "AddTime": "2026-09-16 09:16:58",
+            "ModTime": "2026-10-21 11:01:30",
+            "TriggerDesc": "{\"cron\":\"0 * * * * * *\"}",
+            "TriggerName": "gxs-monitor-minute",
+            "Type": "timer"
+          }
+        ]
+      }
+    }
+  },
+  "configurationComparedEqual": true,
+  "runtimeConfigRevision": 12,
+  "regularSamplingPeriodSeconds": 60,
+  "codeOnlyApi": true,
+  "localValidation": {
+    "testsPassed": 1716,
+    "failed": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "durationMs": 104736.2108,
+    "sourceFiles": 560,
+    "monitorFiles": 43,
+    "monitorBytes": 311652
+  },
+  "independentReview": {
+    "issue": "Queued admission did not expire while head remained pending",
+    "fixed": true,
+    "regression": "Pending item returns at remainingMs-1000; its slot cannot pass running transaction; no reservation after cancellation."
+  },
+  "frontendUnchanged": true,
+  "sourceFingerprint": "sha256:8d9b7d28df6c4d611098dcec25185d0cde4cd554e0f7cf4075c4247e424dbdd0",
+  "limitations": [
+    "Cloud quality and real-device delivery gates remain unverified.",
+    "Synthetic fixed-latency SDK comparison does not prove production notification latency.",
+    "Code-only updates do not include an environment-variable mutation; readback comparison covers runtime/memory/timeout/handler/triggers."
+  ],
+  "superseded": true,
+  "supersededBy": "batch-withdrawal.json",
+  "productionBatchValidationPassed": false
+}

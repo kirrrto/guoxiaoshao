@@ -18,6 +18,8 @@ const { dayKey: beijingDayKey, startOfDay, addDays } = require('../time');
 const { observationDayId } = require('../engine/observation-day');
 
 const CHUNK = 20;
+// Read-only ID queries fit one server page; write/delete batches stay at 20.
+const READ_ID_CHUNK = 100;
 
 function isTransactionConflict(error) {
   if (!error || typeof error !== 'object') return false;
@@ -97,7 +99,10 @@ function createCloudbaseRepo(db, { sleep = ms => new Promise(resolve => setTimeo
   const readIds = async (collection, ids) => {
     const unique = [...new Set(ids)];
     const result = [];
-    for (let i = 0; i < unique.length; i += CHUNK) result.push(...await readAll(col(collection).where({ _id: _.in(unique.slice(i, i + CHUNK)) }).orderBy('_id', 'asc')));
+    for (let i = 0; i < unique.length; i += READ_ID_CHUNK) {
+      const chunk = unique.slice(i, i + READ_ID_CHUNK);
+      result.push(...await readAll(col(collection).where({ _id: _.in(chunk) }).orderBy('_id', 'asc'), chunk.length));
+    }
     return result;
   };
 
@@ -426,7 +431,7 @@ function createCloudbaseRepo(db, { sleep = ms => new Promise(resolve => setTimeo
       // Budget documents are keyed by Beijing day. The 60 days before the window
       // cover any backlog by _id instead of scanning gxs_config with a pattern.
       const budgetIds = Array.from({ length: 60 }, (_, i) => `collector_budget_${beijingDayKey(addDays(startOfDay(firstDay), -(i + 1)))}`);
-      const byIds = (collection, ids) => Array.from({ length: Math.ceil(ids.length / CHUNK) }, (_, i) => col(collection).where({ _id: _.in(ids.slice(i * CHUNK, (i + 1) * CHUNK)) }));
+      const byIds = (collection, ids) => Array.from({ length: Math.ceil(ids.length / CHUNK) }, (unused, i) => col(collection).where({ _id: _.in(ids.slice(i * CHUNK, (i + 1) * CHUNK)) }));
       const targets = {
         events: [col(COLLECTIONS.events).where({ dayKey: _.lt(firstDay) })],
         // A pending query may still owe its refund on the user's next bootstrap.
@@ -456,7 +461,7 @@ function createCloudbaseRepo(db, { sleep = ms => new Promise(resolve => setTimeo
       const result = await col(collection).where(where || {}).count();
       return result.total;
     },
-    ...atomicMethods(run),
+    ...atomicMethods(run, { readUpstreamBreaker: () => readOne(col(COLLECTIONS.config).where({ _id: 'upstream_breaker' })) }),
   };
 }
 

@@ -58,6 +58,7 @@ const INDEX_PLAN = Object.freeze({
   ],
   [COLLECTIONS.health]: [
     { name: 'target_bucket', keys: { targetKey: 1, bucket: -1 }, unique: false },
+    { name: 'recorded_at', keys: { recordedAt: 1 }, unique: false },
   ],
   [COLLECTIONS.observationDays]: [
     { name: 'part_day_store', keys: { partNumber: 1, dayKey: 1, storeNumber: 1 }, unique: false },

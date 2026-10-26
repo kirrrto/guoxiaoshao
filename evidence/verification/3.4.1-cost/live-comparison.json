@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-10-26T06:34:50.232Z",
+  "beforeWindow": {
+    "start": "2026-10-26T14:05:00+08:00",
+    "end": "2026-10-26T14:15:00+08:00",
+    "minutes": 10
+  },
+  "afterWindow": {
+    "start": "2026-10-26T14:20:00+08:00",
+    "end": "2026-10-26T14:30:00+08:00",
+    "minutes": 10
+  },
+  "scope": "Actual environment CLS gateway access counts in two 10-minute windows; not settled billing credits",
+  "metrics": [
+    {
+      "name": "allGatewayAccess",
+      "before": 14084,
+      "after": 3226,
+      "reductionPercent": 77.09457540471458
+    },
+    {
+      "name": "QueryDocument",
+      "before": 5721,
+      "after": 1707,
+      "reductionPercent": 70.16255899318301
+    },
+    {
+      "name": "UpdateDocument",
+      "before": 3164,
+      "after": 679,
+      "reductionPercent": 78.53982300884957
+    },
+    {
+      "name": "StartTransaction",
+      "before": 2594,
+      "after": 418,
+      "reductionPercent": 83.88589051657671
+    },
+    {
+      "name": "CommitTransaction",
+      "before": 2483,
+      "after": 388,
+      "reductionPercent": 84.37374144180427
+    }
+  ],
+  "monitor": {
+    "invocationsBefore": 10,
+    "invocationsAfter": 10,
+    "observationsBefore": 539,
+    "observationsAfter": 157,
+    "allAfterOk": true,
+    "mainScansAfter": [
+      "2026-10-26 14:28:20.283",
+      "2026-10-26 14:24:30.616",
+      "2026-10-26 14:20:21.297"
+    ],
+    "twoRegularIntervalsObserved": true,
+    "eventsAfter": 0,
+    "messagesSentAfter": 0
+  },
+  "limitations": [
+    "Combined effect of code fixes, deliberate lower sampling frequency, and live workload changes; this is not a pure-code savings estimate.",
+    "Active request groups changed from 23 before to 21 after. Requests are only for eligible active follows, deduplicated by store/SKU.",
+    "The before regime sampled about once per minute; the after regime about once per four minutes at 21 groups. Short stock appearances between samples may be missed.",
+    "No stock events or real messages occurred in this window; sender auth health is not proof of message receipt.",
+    "Resource-point billing and database curves are delayed/backfilled. No invoice reduction or current-cycle budget sufficiency is claimed.",
+    "The idle AI service MinNum change is separate; no settled hourly savings are included in this gateway comparison."
+  ]
+}

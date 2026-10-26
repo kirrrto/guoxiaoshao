@@ -1,3 +1,4 @@
+const navigation = require('../../utils/navigation');
 const guide = require('../../config/usage-guide');
 const { currentCatalog, subscribeCatalog } = require('../../utils/store');
 const { storeLabel } = require('../../utils/store-label');
@@ -42,6 +43,7 @@ Page({
     this.refreshTarget(currentCatalog());
   },
   onShow() {
+    navigation.confirmNavigation('pages/guide/index');
     if (!this.unsubscribeCatalog) this.unsubscribeCatalog = subscribeCatalog(catalog => this.refreshTarget(catalog));
     this.refreshTarget(currentCatalog());
   },
@@ -64,13 +66,13 @@ Page({
   },
   onStageAction() {
     const action = this.data.stage.action;
-    if (action === 'query' || action === 'follow') wx.switchTab({ url: `/pages/${action}/index` });
+    if (action === 'query' || action === 'follow') navigation.switchTab({ url: `/pages/${action}/index` });
   },
-  onTestNotification() { wx.navigateTo({ url: '/pages/notification-test/index?from=guide' }); },
-  onCheckReminders() { getApp().globalData.pendingMineSection = 'reminder-center'; wx.switchTab({ url: '/pages/mine/index' }); },
-  onCheckFollows() { wx.switchTab({ url: '/pages/follow/index' }); },
+  onTestNotification() { navigation.navigateTo({ url: '/pages/notification-test/index?from=guide' }); },
+  onCheckReminders() { if (navigation.isNavigating()) return; getApp().globalData.pendingMineSection = 'reminder-center'; navigation.switchTab({ url: '/pages/mine/index' }); },
+  onCheckFollows() { navigation.switchTab({ url: '/pages/follow/index' }); },
   onReturnTask() { returnToSource(this.returnSource === 'guide' ? 'mine' : this.returnSource, this.returnOwner); },
-  onGoMine() { getApp().globalData.pendingMineSection = 'membership-card'; wx.switchTab({ url: '/pages/mine/index' }); },
+  onGoMine() { if (navigation.isNavigating()) return; getApp().globalData.pendingMineSection = 'membership-card'; navigation.switchTab({ url: '/pages/mine/index' }); },
   onCopyDiagnostics() {
     // Only this explicit tap reads device metadata and writes the clipboard.
     let platform = 'unknown';

@@ -1,3 +1,4 @@
+const navigation = require('../../utils/navigation');
 const { call, newId, showError, toast } = require('../../utils/api');
 const { getBootstrap, getCatalog, invalidateBootstrap, subscribeCatalog, getFollows, publishQuota, subscribeQuota, publishQueryBalance } = require('../../utils/store');
 const fmt = require('../../utils/format');
@@ -302,7 +303,7 @@ Page({
   },
 
   onOpenGuide() {
-    wx.navigateTo({ url: '/pages/guide/index?section=prepare&from=query' });
+    navigation.navigateTo({ url: '/pages/guide/index?section=prepare&from=query' });
   },
 
   onShareAppMessage() {
@@ -472,7 +473,7 @@ Page({
 
   onOpenNoticeBoard() {
     if (this.pageRetired) return;
-    wx.navigateTo({ url: '/pages/notice-board/index' });
+    navigation.navigateTo({ url: '/pages/notice-board/index' });
   },
 
   buildQueryNotice(boot) {
@@ -539,6 +540,7 @@ Page({
   onGoFollow() { switchToTab({ url: '/pages/follow/index' }); },
 
   onSelectionHistory() {
+    if (navigation.isNavigating()) return;
     const { stageHistoryContext } = require('../../utils/journey-context');
     if (!stageHistoryContext({ from: 'query', target: this.selection })) return toast('请先确认账户与查询配置');
     switchToTab({ url: '/pages/history/index' });
@@ -556,7 +558,7 @@ Page({
     if (next.action === 'guide') {
       const snapshot = this.querySnapshot;
       const stores = snapshot.results.map(row => row.storeNumber).join(',');
-      return wx.navigateTo({ url: `/pages/guide/index?section=pickup&from=query&gxsPart=${encodeURIComponent(snapshot.product.partNumber)}&gxsStores=${encodeURIComponent(stores)}` });
+      return navigation.navigateTo({ url: `/pages/guide/index?section=pickup&from=query&gxsPart=${encodeURIComponent(snapshot.product.partNumber)}&gxsStores=${encodeURIComponent(stores)}` });
     }
     return this.onAddFollow();
   },
@@ -1030,6 +1032,7 @@ Page({
   },
 
   navigateToFollow(target) {
+    if (navigation.isNavigating()) return;
     const boot = this.data.boot;
     if (!boot) return toast('账户正在连接，请稍后再试');
     this.onSelectionInteraction();

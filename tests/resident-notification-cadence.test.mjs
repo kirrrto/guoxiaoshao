@@ -139,6 +139,9 @@ test('a delayed notification config read cannot roll back a newer collector conf
   let releaseRead;
   try {
     s.releaseAll(); await s.secondWork; await s.collector.drainNotifications();
+    // A new eligibility/reconciliation window requires configuration; empty
+    // polls within the window intentionally no longer read it.
+    s.f.advance(30000); await s.collector.lease.renew();
     const readConfig = s.f.repo.getConfig, previous = await readConfig();
     let intercept = true, entered = false;
     s.f.repo.getConfig = async () => {

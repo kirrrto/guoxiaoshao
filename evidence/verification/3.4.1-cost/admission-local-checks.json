@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-10-26T08:00:01.153Z",
+  "scope": "Final admission queue and retention index patch; experimental observation batching withdrawn",
+  "tests": {
+    "command": "npm test",
+    "passed": 1701,
+    "failed": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "durationMs": 98370.8395,
+    "log": "output/cost-20261026/final-admission-tests.log"
+  },
+  "sourceCheck": {
+    "command": "npm run check",
+    "files": 560,
+    "javaScript": 396,
+    "json": 48,
+    "pages": 7,
+    "operatorPages": 1,
+    "errors": [],
+    "log": "output/cost-20261026/final-admission-source-check.log"
+  },
+  "monitor": {
+    "files": 43,
+    "bytes": 309035,
+    "passed": true
+  },
+  "notes": [
+    "1716-test result belongs to withdrawn batch candidate; final retained code has 1701 passing tests."
+  ]
+}

@@ -1,0 +1,725 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-10-26T03:39:34.970Z",
+  "scope": "Official WeChat DevTools simulator automation against compiled project; not iOS/Android physical-device or MiniTest cloud acceptance",
+  "devtoolsVersion": "2.02.2610212 Nightly",
+  "sdkVersion": "3.17.3",
+  "sourceFingerprint": "sha256:3c276768d2cb4e70614b09dcf8cdd943dd5c09305829a0febd6adb87b044f848",
+  "passed": true,
+  "cases": [
+    "Actual guide-entry tap and return button",
+    "Three guide-handler calls plus competing follow-handler in one compiled-runtime turn produce only one guide page",
+    "Four native tab routes and return to query",
+    "Notification test -> mine -> resume original test -> guide, without sending a notification",
+    "Selection overlay open/close and subsequent tab navigation",
+    "Recompile/restart reaches query with accountReady=true, cloudReady=true, cloudError=null"
+  ],
+  "notes": [
+    "Initial mine navigation was correctly blocked while notification status was loading; retried once after ready state was observed and completed.",
+    "Test mix includes native element taps, compiled page-method calls and framework tab navigation; it is not a physical touch or visual frame-continuity test."
+  ],
+  "images": {
+    "count": 119,
+    "passed": 119,
+    "failed": [],
+    "formats": {
+      "jpeg": 72,
+      "png": 47
+    }
+  },
+  "console": {
+    "afterRestartAt": "2026-10-26T03:38:51.001Z",
+    "returnedLineCount": 4,
+    "errorMatches": 0,
+    "reportedSdkErrorMatches": 0,
+    "scope": "Observed console window; absence of matches is not proof of future absence"
+  },
+  "screenshots": [
+    "output/diagnostics-20261026/native-config-sheet.jpg",
+    "output/diagnostics-20261026/native-follow.jpg"
+  ],
+  "steps": [
+    {
+      "at": "2026-10-26T03:32:21.031Z",
+      "tool": "automation_evaluate",
+      "args": [
+        "--fn-source",
+        "function(){ const p=getCurrentPages(); const a=wx.getAppBaseInfo(); return {routes:p.map(x=>x.route),SDKVersion:a.SDKVersion,version:a.version,queryReady:p[p.length-1].data.accountReady}; }"
+      ],
+      "result": {
+        "success": true,
+        "result": {
+          "result": {
+            "routes": [
+              "pages/query/index"
+            ],
+            "SDKVersion": "3.17.3",
+            "version": "8.0.5",
+            "queryReady": true
+          }
+        }
+      }
+    },
+    {
+      "at": "2026-10-26T03:32:22.445Z",
+      "tool": "automation_element_action",
+      "args": [
+        "--selector",
+        ".query-guide-entry",
+        "--action",
+        "tap",
+        "--wait-for-selector",
+        ".query-guide-entry"
+      ],
+      "result": {
+        "success": true
+      }
+    },
+    {
+      "at": "2026-10-26T03:32:23.981Z",
+      "tool": "automation_runtime_info",
+      "args": [
+        "--action",
+        "currentPage"
+      ],
+      "result": {
+        "success": true,
+        "currentPage": {
+          "pageId": 7,
+          "path": "pages/guide/index",
+          "query": {
+            "section": "prepare",
+            "from": "query"
+          },
+          "route": "/pages/guide/index?section=prepare&from=query",
+          "title": "选购与取货攻略"
+        }
+      }
+    },
+    {
+      "at": "2026-10-26T03:32:48.688Z",
+      "tool": "automation_element_action",
+      "args": [
+        "--selector",
+        ".btn-outline.btn-block",
+        "--action",
+        "tap"
+      ],
+      "result": {
+        "success": true
+      }
+    },
+    {
+      "at": "2026-10-26T03:32:50.008Z",
+      "tool": "automation_runtime_info",
+      "args": [
+        "--action",
+        "currentPage"
+      ],
+      "result": {
+        "success": true,
+        "currentPage": {
+          "pageId": 6,
+          "path": "pages/query/index",
+          "query": {},
+          "route": "/pages/query/index",
+          "title": "果小哨 · 门店查询"
+        }
+      }
+    },
+    {
+      "at": "2026-10-26T03:32:51.336Z",
+      "tool": "automation_evaluate",
+      "args": [
+        "--fn-source",
+        "function(){ const p=getCurrentPages().slice(-1)[0]; if(p.route!=='pages/query/index')throw Error('Wrong route'); p.onOpenGuide();p.onOpenGuide();p.onOpenGuide();if(typeof p.onGoFollow==='function')p.onGoFollow();return {guideInvocations:3,followInvoked:typeof p.onGoFollow==='function'}; }"
+      ],
+      "result": {
+        "success": true,
+        "result": {
+          "result": {
+            "guideInvocations": 3,
+            "followInvoked": true
+          }
+        }
+      }
+    },
+    {
+      "at": "2026-10-26T03:32:52.924Z",
+      "tool": "automation_runtime_info",
+      "args": [
+        "--action",
+        "pageStack"
+      ],
+      "result": {
+        "success": true,
+        "pageStack": [
+          {
+            "pageId": 6,
+            "path": "pages/query/index",
+            "query": {},
+            "route": "/pages/query/index",
+            "title": "果小哨 · 门店查询"
+          },
+          {
+            "pageId": 9,
+            "path": "pages/guide/index",
+            "query": {
+              "section": "prepare",
+              "from": "query"
+            },
+            "route": "/pages/guide/index?section=prepare&from=query",
+            "title": "选购与取货攻略"
+          }
+        ]
+      }
+    },
+    {
+      "at": "2026-10-26T03:32:54.271Z",
+      "tool": "automation_page_action",
+      "args": [
+        "--action",
+        "callMethod",
+        "--method",
+        "onReturnTask"
+      ],
+      "result": {
+        "success": true
+      }
+    },
+    {
+      "at": "2026-10-26T03:32:55.901Z",
+      "tool": "automation_navigate",
+      "args": [
+        "--action",
+        "switchTab",
+        "--url",
+        "/pages/follow/index"
+      ],
+      "result": {
+        "success": true
+      }
+    },
+    {
+      "at": "2026-10-26T03:32:57.397Z",
+      "tool": "automation_runtime_info",
+      "args": [
+        "--action",
+        "currentPage"
+      ],
+      "result": {
+        "success": true,
+        "currentPage": {
+          "pageId": 10,
+          "path": "pages/follow/index",
+          "query": {},
+          "route": "/pages/follow/index",
+          "title": "果小哨 · 小哨提醒"
+        }
+      }
+    },
+    {
+      "at": "2026-10-26T03:32:59.071Z",
+      "tool": "automation_navigate",
+      "args": [
+        "--action",
+        "switchTab",
+        "--url",
+        "/pages/history/index"
+      ],
+      "result": {
+        "success": true
+      }
+    },
+    {
+      "at": "2026-10-26T03:33:00.421Z",
+      "tool": "automation_runtime_info",
+      "args": [
+        "--action",
+        "currentPage"
+      ],
+      "result": {
+        "success": true,
+        "currentPage": {
+          "pageId": 11,
+          "path": "pages/history/index",
+          "query": {},
+          "route": "/pages/history/index",
+          "title": "果小哨 · 历史记录"
+        }
+      }
+    },
+    {
+      "at": "2026-10-26T03:33:02.124Z",
+      "tool": "automation_navigate",
+      "args": [
+        "--action",
+        "switchTab",
+        "--url",
+        "/pages/mine/index"
+      ],
+      "result": {
+        "success": true
+      }
+    },
+    {
+      "at": "2026-10-26T03:33:03.681Z",
+      "tool": "automation_runtime_info",
+      "args": [
+        "--action",
+        "currentPage"
+      ],
+      "result": {
+        "success": true,
+        "currentPage": {
+          "pageId": 12,
+          "path": "pages/mine/index",
+          "query": {},
+          "route": "/pages/mine/index",
+          "title": "果小哨 · 我的"
+        }
+      }
+    },
+    {
+      "at": "2026-10-26T03:33:05.336Z",
+      "tool": "automation_navigate",
+      "args": [
+        "--action",
+        "switchTab",
+        "--url",
+        "/pages/query/index"
+      ],
+      "result": {
+        "success": true
+      }
+    },
+    {
+      "at": "2026-10-26T03:33:06.730Z",
+      "tool": "automation_runtime_info",
+      "args": [
+        "--action",
+        "currentPage"
+      ],
+      "result": {
+        "success": true,
+        "currentPage": {
+          "pageId": 6,
+          "path": "pages/query/index",
+          "query": {},
+          "route": "/pages/query/index",
+          "title": "果小哨 · 门店查询"
+        }
+      }
+    },
+    {
+      "at": "2026-10-26T03:33:08.040Z",
+      "tool": "get_simulator_console",
+      "args": [
+        "--command",
+        "grep -i error"
+      ],
+      "result": ""
+    },
+    {
+      "at": "2026-10-26T03:35:06.896Z",
+      "tool": "automation_element_action",
+      "args": [
+        "--selector",
+        ".query-guide-entry",
+        "--action",
+        "tap"
+      ],
+      "result": {
+        "success": true
+      }
+    },
+    {
+      "at": "2026-10-26T03:35:08.333Z",
+      "tool": "automation_page_action",
+      "args": [
+        "--action",
+        "callMethod",
+        "--method",
+        "onTestNotification"
+      ],
+      "result": {
+        "success": true
+      }
+    },
+    {
+      "at": "2026-10-26T03:35:09.656Z",
+      "tool": "automation_runtime_info",
+      "args": [
+        "--action",
+        "currentPage"
+      ],
+      "result": {
+        "success": true,
+        "currentPage": {
+          "pageId": 14,
+          "path": "pages/notification-test/index",
+          "query": {
+            "from": "guide"
+          },
+          "route": "/pages/notification-test/index",
+          "title": "果小哨 · 体验微信提醒"
+        }
+      }
+    },
+    {
+      "at": "2026-10-26T03:35:10.998Z",
+      "tool": "automation_evaluate",
+      "args": [
+        "--fn-source",
+        "function(){const p=getCurrentPages().slice(-1)[0];return {route:p.route,loading:p.data.loading,busy:p.data.busy,ready:p.data.ready,error:p.data.error};}"
+      ],
+      "result": {
+        "success": true,
+        "result": {
+          "result": {
+            "route": "pages/notification-test/index",
+            "loading": true,
+            "busy": false,
+            "ready": false,
+            "error": null
+          }
+        }
+      }
+    },
+    {
+      "at": "2026-10-26T03:35:13.337Z",
+      "tool": "automation_page_action",
+      "args": [
+        "--action",
+        "callMethod",
+        "--method",
+        "onGoMine",
+        "--wait",
+        "1"
+      ],
+      "result": {
+        "success": true
+      }
+    },
+    {
+      "at": "2026-10-26T03:35:14.648Z",
+      "tool": "automation_runtime_info",
+      "args": [
+        "--action",
+        "currentPage"
+      ],
+      "result": {
+        "success": true,
+        "currentPage": {
+          "pageId": 14,
+          "path": "pages/notification-test/index",
+          "query": {
+            "from": "guide"
+          },
+          "route": "/pages/notification-test/index",
+          "title": "果小哨 · 体验微信提醒"
+        }
+      }
+    },
+    {
+      "at": "2026-10-26T03:35:47.161Z",
+      "tool": "automation_page_action",
+      "args": [
+        "--action",
+        "callMethod",
+        "--method",
+        "onGoMine"
+      ],
+      "result": {
+        "success": true
+      }
+    },
+    {
+      "at": "2026-10-26T03:35:48.508Z",
+      "tool": "automation_runtime_info",
+      "args": [
+        "--action",
+        "currentPage"
+      ],
+      "result": {
+        "success": true,
+        "currentPage": {
+          "pageId": 12,
+          "path": "pages/mine/index",
+          "query": {},
+          "route": "/pages/mine/index",
+          "title": "果小哨 · 我的"
+        }
+      }
+    },
+    {
+      "at": "2026-10-26T03:35:49.996Z",
+      "tool": "automation_page_action",
+      "args": [
+        "--action",
+        "getData",
+        "--data-path",
+        "testReturnAvailable"
+      ],
+      "result": {
+        "success": true,
+        "data": true
+      }
+    },
+    {
+      "at": "2026-10-26T03:35:51.318Z",
+      "tool": "automation_page_action",
+      "args": [
+        "--action",
+        "callMethod",
+        "--method",
+        "onReturnToTest"
+      ],
+      "result": {
+        "success": true
+      }
+    },
+    {
+      "at": "2026-10-26T03:35:52.760Z",
+      "tool": "automation_runtime_info",
+      "args": [
+        "--action",
+        "currentPage"
+      ],
+      "result": {
+        "success": true,
+        "currentPage": {
+          "pageId": 15,
+          "path": "pages/notification-test/index",
+          "query": {
+            "from": "guide",
+            "resume": "1"
+          },
+          "route": "/pages/notification-test/index",
+          "title": "果小哨 · 体验微信提醒"
+        }
+      }
+    },
+    {
+      "at": "2026-10-26T03:35:54.103Z",
+      "tool": "automation_evaluate",
+      "args": [
+        "--fn-source",
+        "function(){const p=getCurrentPages().slice(-1)[0];return {route:p.route,loading:p.data.loading,ready:p.data.ready,error:p.data.error};}"
+      ],
+      "result": {
+        "success": true,
+        "result": {
+          "result": {
+            "route": "pages/notification-test/index",
+            "loading": false,
+            "ready": true,
+            "error": null
+          }
+        }
+      }
+    },
+    {
+      "at": "2026-10-26T03:35:55.435Z",
+      "tool": "get_simulator_console",
+      "args": [
+        "--command",
+        "grep -i error"
+      ],
+      "result": ""
+    },
+    {
+      "at": "2026-10-26T03:35:56.750Z",
+      "tool": "get_simulator_console",
+      "args": [
+        "--command",
+        "grep -i routeDone"
+      ],
+      "result": ""
+    },
+    {
+      "at": "2026-10-26T03:36:00.296Z",
+      "tool": "get_simulator_console",
+      "args": [
+        "--command",
+        "grep -i 601008"
+      ],
+      "result": ""
+    },
+    {
+      "at": "2026-10-26T03:36:01.573Z",
+      "tool": "get_simulator_console",
+      "args": [
+        "--command",
+        "grep -i too"
+      ],
+      "result": [
+        "[log]",
+        "[wxobs] auto recording mode is not enabled in devtools. \n[体验分析] 为避免影响调试，开发者工具在非自定义启动模式下不会启动采集。详见 https://dev.weixin.qq.com/docs/analysis/sdk/debugging.html"
+      ]
+    },
+    {
+      "at": "2026-10-26T03:37:23.338Z",
+      "tool": "automation_page_action",
+      "args": [
+        "--action",
+        "callMethod",
+        "--method",
+        "onReturnTask"
+      ],
+      "result": {
+        "success": true
+      }
+    },
+    {
+      "at": "2026-10-26T03:37:24.758Z",
+      "tool": "automation_runtime_info",
+      "args": [
+        "--action",
+        "currentPage"
+      ],
+      "result": {
+        "success": true,
+        "currentPage": {
+          "pageId": 16,
+          "path": "pages/guide/index",
+          "query": {
+            "section": "notification",
+            "from": "mine"
+          },
+          "route": "/pages/guide/index",
+          "title": "选购与取货攻略"
+        }
+      }
+    },
+    {
+      "at": "2026-10-26T03:37:26.201Z",
+      "tool": "automation_navigate",
+      "args": [
+        "--action",
+        "switchTab",
+        "--url",
+        "/pages/query/index"
+      ],
+      "result": {
+        "success": true
+      }
+    },
+    {
+      "at": "2026-10-26T03:37:27.473Z",
+      "tool": "automation_page_action",
+      "args": [
+        "--action",
+        "callMethod",
+        "--method",
+        "onEditSelection"
+      ],
+      "result": {
+        "success": true
+      }
+    },
+    {
+      "at": "2026-10-26T03:37:28.877Z",
+      "tool": "automation_page_action",
+      "args": [
+        "--action",
+        "getData",
+        "--data-path",
+        "sheetVisible"
+      ],
+      "result": {
+        "success": true,
+        "data": true
+      }
+    },
+    {
+      "at": "2026-10-26T03:37:31.994Z",
+      "tool": "simulator_screenshot",
+      "args": [
+        "--path",
+        "C:\\Users\\Administrator\\Downloads\\flower book\\guoxiaoshao-master\\guoxiaoshao-master\\output\\diagnostics-20261026\\native-config-sheet.jpg",
+        "--wait",
+        "1"
+      ],
+      "result": {
+        "success": true,
+        "path": "C:\\Users\\Administrator\\Downloads\\flower book\\guoxiaoshao-master\\guoxiaoshao-master\\output\\diagnostics-20261026\\native-config-sheet.jpg",
+        "imageWidth": 371,
+        "imageHeight": 802
+      }
+    },
+    {
+      "at": "2026-10-26T03:37:33.308Z",
+      "tool": "automation_page_action",
+      "args": [
+        "--action",
+        "callMethod",
+        "--method",
+        "onCloseSelection"
+      ],
+      "result": {
+        "success": true
+      }
+    },
+    {
+      "at": "2026-10-26T03:37:34.612Z",
+      "tool": "automation_page_action",
+      "args": [
+        "--action",
+        "getData",
+        "--data-path",
+        "sheetVisible"
+      ],
+      "result": {
+        "success": true,
+        "data": false
+      }
+    },
+    {
+      "at": "2026-10-26T03:37:36.206Z",
+      "tool": "automation_navigate",
+      "args": [
+        "--action",
+        "switchTab",
+        "--url",
+        "/pages/follow/index"
+      ],
+      "result": {
+        "success": true
+      }
+    },
+    {
+      "at": "2026-10-26T03:37:43.753Z",
+      "tool": "simulator_screenshot",
+      "args": [
+        "--path",
+        "C:\\Users\\Administrator\\Downloads\\flower book\\guoxiaoshao-master\\guoxiaoshao-master\\output\\diagnostics-20261026\\native-follow.jpg",
+        "--wait",
+        "1"
+      ],
+      "result": {
+        "success": true,
+        "path": "C:\\Users\\Administrator\\Downloads\\flower book\\guoxiaoshao-master\\guoxiaoshao-master\\output\\diagnostics-20261026\\native-follow.jpg",
+        "imageWidth": 371,
+        "imageHeight": 802
+      }
+    },
+    {
+      "at": "2026-10-26T03:37:45.048Z",
+      "tool": "get_simulator_console",
+      "args": [
+        "--command",
+        "grep -i error"
+      ],
+      "result": ""
+    },
+    {
+      "at": "2026-10-26T03:37:47.892Z",
+      "tool": "simulator_refresh",
+      "args": [],
+      "result": {
+        "success": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,4172 @@
+{
+  "snapshots": [
+    {
+      "_id": "collector_status",
+      "observationHealth": {
+        "evaluatedAt": "2026-10-26T09:01:22.438Z",
+        "freshGroups": 21,
+        "groupCount": 21,
+        "lastSuccessAt": "2026-10-26T09:01:21.944Z",
+        "oldestSuccessAt": "2026-10-26T09:01:05.389Z",
+        "pendingGroups": 0,
+        "staleAfterMs": 188000,
+        "staleGroups": 0,
+        "state": "healthy"
+      },
+      "scheduler": {
+        "admissionReason": null,
+        "admissionUntil": 0,
+        "breaker": {
+          "failures": [],
+          "openedAt": 1792820256695,
+          "probeInFlight": false,
+          "reason": null,
+          "state": "closed",
+          "trips": 0,
+          "until": null
+        },
+        "intervalMs": 60000,
+        "storeLastRequestAt": [
+          [
+            "R320",
+            1793005265934
+          ],
+          [
+            "R388",
+            1793005267243
+          ],
+          [
+            "R401",
+            1793005268787
+          ],
+          [
+            "R448",
+            1793005270848
+          ],
+          [
+            "R471",
+            1793005270550
+          ],
+          [
+            "R479",
+            1793005272678
+          ],
+          [
+            "R484",
+            1793005272220
+          ],
+          [
+            "R532",
+            1793005274528
+          ],
+          [
+            "R534",
+            1792847898088
+          ],
+          [
+            "R575",
+            1793005274307
+          ],
+          [
+            "R576",
+            1792847895776
+          ],
+          [
+            "R577",
+            1793005276106
+          ],
+          [
+            "R579",
+            1793005275845
+          ],
+          [
+            "R609",
+            1792847893053
+          ],
+          [
+            "R639",
+            1793005277136
+          ],
+          [
+            "R644",
+            1793005277246
+          ],
+          [
+            "R645",
+            1793005278691
+          ],
+          [
+            "R646",
+            1792848686613
+          ],
+          [
+            "R678",
+            1793005278391
+          ],
+          [
+            "R761",
+            1793005280407
+          ],
+          [
+            "R792",
+            1793005280159
+          ],
+          [
+            "R793",
+            1793005281944
+          ],
+          [
+            "R502",
+            1792891646171
+          ],
+          [
+            "R580",
+            1792891650267
+          ],
+          [
+            "R637",
+            1792995564560
+          ],
+          [
+            "R638",
+            1792995565486
+          ],
+          [
+            "R493",
+            1792646055252
+          ],
+          [
+            "R766",
+            1792646058802
+          ],
+          [
+            "R683",
+            1792796773963
+          ],
+          [
+            "R359",
+            1793005265389
+          ],
+          [
+            "R574",
+            1792646073043
+          ],
+          [
+            "R765",
+            1792646045844
+          ],
+          [
+            "R617",
+            1792587668484
+          ],
+          [
+            "R581",
+            1792804143017
+          ],
+          [
+            "R389",
+            1793005267521
+          ],
+          [
+            "R703",
+            1792559787628
+          ],
+          [
+            "R643",
+            1792559789807
+          ],
+          [
+            "R557",
+            1792653801249
+          ],
+          [
+            "R390",
+            1793005269105
+          ]
+        ],
+        "targets": [
+          {
+            "available": false,
+            "availableObservedAt": null,
+            "burstUntil": 1792891559563,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 4,
+              "lastError": "http_error",
+              "lastFailureAt": 1792892118316,
+              "lastPersistedAt": 1793005266489,
+              "lastPersistedSuccessAt": 1793005265934,
+              "lastRequestAt": 1793005263852,
+              "lastSuccessAt": 1793005265934,
+              "latency": {
+                "count": 2798,
+                "maxMs": 7817,
+                "sumMs": 1753757
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 0,
+              "requestInterval": {
+                "count": 2797,
+                "maxMs": 246517,
+                "sumMs": 170755817
+              },
+              "requests": 2798,
+              "successInterval": {
+                "count": 2793,
+                "maxMs": 246456,
+                "sumMs": 170756975
+              },
+              "successes": 2794
+            },
+            "key": "R320|MK2M4CH/A,MK2P4CH/A,MK2T4CH/A,MK2U4CH/A",
+            "nextDueAt": 1793005320000,
+            "trackedAt": 1792834442114
+          },
+          {
+            "available": false,
+            "availableObservedAt": null,
+            "burstUntil": 1792892024005,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 8,
+              "lastError": "observation_persistence_failed",
+              "lastFailureAt": 1792897098655,
+              "lastPersistedAt": 1793005265721,
+              "lastPersistedSuccessAt": 1793005265389,
+              "lastRequestAt": 1793005263852,
+              "lastSuccessAt": 1793005265389,
+              "latency": {
+                "count": 3435,
+                "maxMs": 4815,
+                "sumMs": 1686809
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 1,
+              "requestInterval": {
+                "count": 3434,
+                "maxMs": 243917,
+                "sumMs": 208417691
+              },
+              "requests": 3435,
+              "successInterval": {
+                "count": 3426,
+                "maxMs": 245281,
+                "sumMs": 208417601
+              },
+              "successes": 3427
+            },
+            "key": "R359|MK2P4CH/A,MK2T4CH/A",
+            "nextDueAt": 1793005320000,
+            "trackedAt": 1792796821437
+          },
+          {
+            "available": false,
+            "availableObservedAt": null,
+            "burstUntil": 1792725406028,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 24,
+              "lastError": "The operation was aborted due to timeout",
+              "lastFailureAt": 1792945664903,
+              "lastPersistedAt": 1793005267799,
+              "lastPersistedSuccessAt": 1793005267243,
+              "lastRequestAt": 1793005266490,
+              "lastSuccessAt": 1793005267243,
+              "latency": {
+                "count": 5898,
+                "maxMs": 8003,
+                "sumMs": 3162327
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 1,
+              "requestInterval": {
+                "count": 5897,
+                "maxMs": 246491,
+                "sumMs": 359158531
+              },
+              "requests": 5898,
+              "successInterval": {
+                "count": 5873,
+                "maxMs": 246705,
+                "sumMs": 359157633
+              },
+              "successes": 5874
+            },
+            "key": "R388|MK2P4CH/A,MK2Q4CH/A,MK2T4CH/A,MK2U4CH/A",
+            "nextDueAt": 1793005320000,
+            "trackedAt": 1792646101822
+          },
+          {
+            "available": false,
+            "availableObservedAt": null,
+            "burstUntil": 0,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 9,
+              "lastError": "observation_persistence_failed",
+              "lastFailureAt": 1792923795410,
+              "lastPersistedAt": 1793005267778,
+              "lastPersistedSuccessAt": 1793005267521,
+              "lastRequestAt": 1793005266490,
+              "lastSuccessAt": 1793005267521,
+              "latency": {
+                "count": 4088,
+                "maxMs": 3973,
+                "sumMs": 2076154
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 2,
+              "requestInterval": {
+                "count": 4087,
+                "maxMs": 245307,
+                "sumMs": 249095927
+              },
+              "requests": 4088,
+              "successInterval": {
+                "count": 4078,
+                "maxMs": 245336,
+                "sumMs": 249096103
+              },
+              "successes": 4079
+            },
+            "key": "R389|MK2P4CH/A,MK2T4CH/A",
+            "nextDueAt": 1793005320000,
+            "trackedAt": 1792756141761
+          },
+          {
+            "available": false,
+            "availableObservedAt": null,
+            "burstUntil": 0,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 14,
+              "lastError": "observation_persistence_failed",
+              "lastFailureAt": 1792909546077,
+              "lastPersistedAt": 1793005269403,
+              "lastPersistedSuccessAt": 1793005269105,
+              "lastRequestAt": 1793005267799,
+              "lastSuccessAt": 1793005269105,
+              "latency": {
+                "count": 4102,
+                "maxMs": 3075,
+                "sumMs": 2119865
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 1,
+              "requestInterval": {
+                "count": 4101,
+                "maxMs": 246410,
+                "sumMs": 249095191
+              },
+              "requests": 4102,
+              "successInterval": {
+                "count": 4087,
+                "maxMs": 247353,
+                "sumMs": 249095241
+              },
+              "successes": 4088
+            },
+            "key": "R390|MK2P4CH/A,MK2T4CH/A",
+            "nextDueAt": 1793005320000,
+            "trackedAt": 1792756141761
+          },
+          {
+            "available": false,
+            "availableObservedAt": null,
+            "burstUntil": 1792711909036,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 38,
+              "lastError": "document.set:fail -501001 resource system error. [ResourceUnavailable.TransactionConflict] Transaction is conflict, maybe resource operated by others. Please check your request, but if the problem persists, contact us. 更多错误信息请访问：https://docs.cloudbase.net/error-code/basic/DATABASE_TRANSACTION_CONFLICT",
+              "lastFailureAt": 1792944024532,
+              "lastPersistedAt": 1793005269042,
+              "lastPersistedSuccessAt": 1793005268787,
+              "lastRequestAt": 1793005267799,
+              "lastSuccessAt": 1793005268787,
+              "latency": {
+                "count": 11210,
+                "maxMs": 8003,
+                "sumMs": 5602572
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 0,
+              "requestInterval": {
+                "count": 11209,
+                "maxMs": 36276220,
+                "sumMs": 832621892
+              },
+              "requests": 11210,
+              "successInterval": {
+                "count": 11171,
+                "maxMs": 36276244,
+                "sumMs": 832620832
+              },
+              "successes": 11172
+            },
+            "key": "R401|MK2P4CH/A",
+            "nextDueAt": 1793005320000,
+            "trackedAt": 1792172641054
+          },
+          {
+            "available": false,
+            "availableObservedAt": null,
+            "burstUntil": 0,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 3,
+              "lastError": "http_error",
+              "lastFailureAt": 1792912399439,
+              "lastPersistedAt": 1793005271378,
+              "lastPersistedSuccessAt": 1793005270848,
+              "lastRequestAt": 1793005269634,
+              "lastSuccessAt": 1793005270848,
+              "latency": {
+                "count": 2793,
+                "maxMs": 7981,
+                "sumMs": 1581950
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 0,
+              "requestInterval": {
+                "count": 2792,
+                "maxMs": 246903,
+                "sumMs": 170693127
+              },
+              "requests": 2793,
+              "successInterval": {
+                "count": 2789,
+                "maxMs": 247687,
+                "sumMs": 170693190
+              },
+              "successes": 2790
+            },
+            "key": "R448|MK2M4CH/A,MK2P4CH/A,MK2Q4CH/A,MK2T4CH/A,MK2U4CH/A",
+            "nextDueAt": 1793005320000,
+            "trackedAt": 1792834561053
+          },
+          {
+            "available": false,
+            "availableObservedAt": null,
+            "burstUntil": 1792972781243,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 33,
+              "lastError": "The operation was aborted due to timeout",
+              "lastFailureAt": 1792987630497,
+              "lastPersistedAt": 1793005270802,
+              "lastPersistedSuccessAt": 1793005270550,
+              "lastRequestAt": 1793005269634,
+              "lastSuccessAt": 1793005270550,
+              "latency": {
+                "count": 5935,
+                "maxMs": 8004,
+                "sumMs": 2958547
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 0,
+              "requestInterval": {
+                "count": 5934,
+                "maxMs": 246903,
+                "sumMs": 359095621
+              },
+              "requests": 5935,
+              "successInterval": {
+                "count": 5901,
+                "maxMs": 246952,
+                "sumMs": 359095518
+              },
+              "successes": 5902
+            },
+            "key": "R471|MK2P4CH/A",
+            "nextDueAt": 1793005320000,
+            "trackedAt": 1792646101822
+          },
+          {
+            "available": false,
+            "availableObservedAt": null,
+            "burstUntil": 0,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 5,
+              "lastError": "The operation was aborted due to timeout",
+              "lastFailureAt": 1792940453190,
+              "lastPersistedAt": 1793005273179,
+              "lastPersistedSuccessAt": 1793005272678,
+              "lastRequestAt": 1793005271379,
+              "lastSuccessAt": 1793005272678,
+              "latency": {
+                "count": 2795,
+                "maxMs": 3975,
+                "sumMs": 1629031
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 0,
+              "requestInterval": {
+                "count": 2794,
+                "maxMs": 247953,
+                "sumMs": 170634367
+              },
+              "requests": 2795,
+              "successInterval": {
+                "count": 2789,
+                "maxMs": 248548,
+                "sumMs": 170634467
+              },
+              "successes": 2790
+            },
+            "key": "R479|MK2M4CH/A,MK2P4CH/A,MK2T4CH/A,MK2U4CH/A",
+            "nextDueAt": 1793005320000,
+            "trackedAt": 1792834561053
+          },
+          {
+            "available": false,
+            "availableObservedAt": null,
+            "burstUntil": 1793000796576,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 9,
+              "lastError": "observation_persistence_failed",
+              "lastFailureAt": 1792988405112,
+              "lastPersistedAt": 1793005272499,
+              "lastPersistedSuccessAt": 1793005272220,
+              "lastRequestAt": 1793005271379,
+              "lastSuccessAt": 1793005272220,
+              "latency": {
+                "count": 2951,
+                "maxMs": 8002,
+                "sumMs": 1620574
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 4,
+              "requestInterval": {
+                "count": 2950,
+                "maxMs": 247953,
+                "sumMs": 172910484
+              },
+              "requests": 2951,
+              "successInterval": {
+                "count": 2941,
+                "maxMs": 248313,
+                "sumMs": 172910260
+              },
+              "successes": 2942
+            },
+            "key": "R484|MK2M4CH/A,MK2P4CH/A,MK2Q4CH/A",
+            "nextDueAt": 1793005320000,
+            "trackedAt": 1792832341512
+          },
+          {
+            "available": false,
+            "availableObservedAt": null,
+            "burstUntil": 1792935646215,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 20,
+              "lastError": "The operation was aborted due to timeout",
+              "lastFailureAt": 1792936485708,
+              "lastPersistedAt": 1793005274756,
+              "lastPersistedSuccessAt": 1793005274528,
+              "lastRequestAt": 1793005273339,
+              "lastSuccessAt": 1793005274528,
+              "latency": {
+                "count": 5892,
+                "maxMs": 7572,
+                "sumMs": 2845279
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 0,
+              "requestInterval": {
+                "count": 5891,
+                "maxMs": 251262,
+                "sumMs": 359097516
+              },
+              "requests": 5892,
+              "successInterval": {
+                "count": 5871,
+                "maxMs": 250332,
+                "sumMs": 359097978
+              },
+              "successes": 5872
+            },
+            "key": "R532|MK2P4CH/A",
+            "nextDueAt": 1793005320000,
+            "trackedAt": 1792646101822
+          },
+          {
+            "available": false,
+            "availableObservedAt": null,
+            "burstUntil": 1792706205426,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 21,
+              "lastError": "http_error",
+              "lastFailureAt": 1792897103270,
+              "lastPersistedAt": 1793005274574,
+              "lastPersistedSuccessAt": 1793005274307,
+              "lastRequestAt": 1793005273339,
+              "lastSuccessAt": 1793005274307,
+              "latency": {
+                "count": 5899,
+                "maxMs": 8003,
+                "sumMs": 2970011
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 0,
+              "requestInterval": {
+                "count": 5898,
+                "maxMs": 248252,
+                "sumMs": 359097516
+              },
+              "requests": 5899,
+              "successInterval": {
+                "count": 5877,
+                "maxMs": 249040,
+                "sumMs": 359097001
+              },
+              "successes": 5878
+            },
+            "key": "R575|MK2T4CH/A",
+            "nextDueAt": 1793005320000,
+            "trackedAt": 1792646101822
+          },
+          {
+            "available": true,
+            "availableObservedAt": 1793005276106,
+            "burstUntil": 0,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 2,
+              "lastError": "observation_persistence_failed",
+              "lastFailureAt": 1792995789061,
+              "lastPersistedAt": 1793005276373,
+              "lastPersistedSuccessAt": 1793005276106,
+              "lastRequestAt": 1793005274944,
+              "lastSuccessAt": 1793005276106,
+              "latency": {
+                "count": 414,
+                "maxMs": 1849,
+                "sumMs": 228510
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 3,
+              "requestInterval": {
+                "count": 413,
+                "maxMs": 254880,
+                "sumMs": 27835147
+              },
+              "requests": 414,
+              "successInterval": {
+                "count": 411,
+                "maxMs": 287644,
+                "sumMs": 27834987
+              },
+              "successes": 412
+            },
+            "key": "R577|MJTF4CH/A,MK2P4CH/A",
+            "nextDueAt": 1793005320000,
+            "trackedAt": 1792977421413
+          },
+          {
+            "available": false,
+            "availableObservedAt": null,
+            "burstUntil": 1792719594525,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 30,
+              "lastError": "The operation was aborted due to timeout",
+              "lastFailureAt": 1792977988376,
+              "lastPersistedAt": 1793005276099,
+              "lastPersistedSuccessAt": 1793005275845,
+              "lastRequestAt": 1793005274944,
+              "lastSuccessAt": 1793005275845,
+              "latency": {
+                "count": 5926,
+                "maxMs": 8002,
+                "sumMs": 3024717
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 0,
+              "requestInterval": {
+                "count": 5925,
+                "maxMs": 260411,
+                "sumMs": 359142495
+              },
+              "requests": 5926,
+              "successInterval": {
+                "count": 5895,
+                "maxMs": 259375,
+                "sumMs": 359141887
+              },
+              "successes": 5896
+            },
+            "key": "R579|MK2P4CH/A",
+            "nextDueAt": 1793005320000,
+            "trackedAt": 1792646101822
+          },
+          {
+            "available": true,
+            "availableObservedAt": 1793005277136,
+            "burstUntil": 0,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 0,
+              "lastError": "observation_persistence_failed",
+              "lastFailureAt": null,
+              "lastPersistedAt": 1793005277381,
+              "lastPersistedSuccessAt": 1793005277136,
+              "lastRequestAt": 1793005276374,
+              "lastSuccessAt": 1793005277136,
+              "latency": {
+                "count": 416,
+                "maxMs": 1912,
+                "sumMs": 234022
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 7,
+              "requestInterval": {
+                "count": 415,
+                "maxMs": 243016,
+                "sumMs": 27838634
+              },
+              "requests": 416,
+              "successInterval": {
+                "count": 415,
+                "maxMs": 243918,
+                "sumMs": 27838063
+              },
+              "successes": 416
+            },
+            "key": "R639|MJTF4CH/A,MK2P4CH/A",
+            "nextDueAt": 1793005320000,
+            "trackedAt": 1792977421413
+          },
+          {
+            "available": true,
+            "availableObservedAt": 1793005277246,
+            "burstUntil": 0,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 28,
+              "lastError": "http_error",
+              "lastFailureAt": 1792995790569,
+              "lastPersistedAt": 1793005277476,
+              "lastPersistedSuccessAt": 1793005277246,
+              "lastRequestAt": 1793005276374,
+              "lastSuccessAt": 1793005277246,
+              "latency": {
+                "count": 4681,
+                "maxMs": 7820,
+                "sumMs": 2526304
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 0,
+              "requestInterval": {
+                "count": 4680,
+                "maxMs": 446521265,
+                "sumMs": 832612629
+              },
+              "requests": 4681,
+              "successInterval": {
+                "count": 4652,
+                "maxMs": 446521800,
+                "sumMs": 832611946
+              },
+              "successes": 4653
+            },
+            "key": "R644|MJTA4CH/A",
+            "nextDueAt": 1793005320000,
+            "trackedAt": 1792172641054
+          },
+          {
+            "available": false,
+            "availableObservedAt": null,
+            "burstUntil": 1792977349918,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 37,
+              "lastError": "http_error",
+              "lastFailureAt": 1792912397191,
+              "lastPersistedAt": 1793005279166,
+              "lastPersistedSuccessAt": 1793005278691,
+              "lastRequestAt": 1793005277476,
+              "lastSuccessAt": 1793005278691,
+              "latency": {
+                "count": 11816,
+                "maxMs": 8003,
+                "sumMs": 6949006
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 0,
+              "requestInterval": {
+                "count": 11815,
+                "maxMs": 17569535,
+                "sumMs": 826452343
+              },
+              "requests": 11816,
+              "successInterval": {
+                "count": 11778,
+                "maxMs": 17569166,
+                "sumMs": 826452455
+              },
+              "successes": 11779
+            },
+            "key": "R645|MK2M4CH/A,MK2P4CH/A,MK2T4CH/A,MK2U4CH/A",
+            "nextDueAt": 1793005320000,
+            "trackedAt": 1792178821399
+          },
+          {
+            "available": false,
+            "availableObservedAt": null,
+            "burstUntil": 1792935649539,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 14,
+              "lastError": "observation_persistence_failed",
+              "lastFailureAt": 1792935645748,
+              "lastPersistedAt": 1793005278797,
+              "lastPersistedSuccessAt": 1793005278391,
+              "lastRequestAt": 1793005277476,
+              "lastSuccessAt": 1793005278391,
+              "latency": {
+                "count": 4843,
+                "maxMs": 6013,
+                "sumMs": 2500050
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 1,
+              "requestInterval": {
+                "count": 4842,
+                "maxMs": 253094,
+                "sumMs": 293691205
+              },
+              "requests": 4843,
+              "successInterval": {
+                "count": 4828,
+                "maxMs": 253546,
+                "sumMs": 293690721
+              },
+              "successes": 4829
+            },
+            "key": "R678|MK2P4CH/A,MK2T4CH/A",
+            "nextDueAt": 1793005320000,
+            "trackedAt": 1792711561032
+          },
+          {
+            "available": false,
+            "availableObservedAt": null,
+            "burstUntil": 1792935644836,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 14,
+              "lastError": "observation_persistence_failed",
+              "lastFailureAt": 1792935491330,
+              "lastPersistedAt": 1793005280674,
+              "lastPersistedSuccessAt": 1793005280407,
+              "lastRequestAt": 1793005279167,
+              "lastSuccessAt": 1793005280407,
+              "latency": {
+                "count": 2875,
+                "maxMs": 3546,
+                "sumMs": 1561628
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 5,
+              "requestInterval": {
+                "count": 2874,
+                "maxMs": 260693,
+                "sumMs": 172857336
+              },
+              "requests": 2875,
+              "successInterval": {
+                "count": 2860,
+                "maxMs": 260497,
+                "sumMs": 172856734
+              },
+              "successes": 2861
+            },
+            "key": "R761|MK2M4CH/A,MK2P4CH/A,MK2Q4CH/A",
+            "nextDueAt": 1793005320000,
+            "trackedAt": 1792832341512
+          },
+          {
+            "available": false,
+            "availableObservedAt": null,
+            "burstUntil": 1792713953469,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 63,
+              "lastError": "The operation was aborted due to timeout",
+              "lastFailureAt": 1792933248083,
+              "lastPersistedAt": 1793005280616,
+              "lastPersistedSuccessAt": 1793005280159,
+              "lastRequestAt": 1793005279167,
+              "lastSuccessAt": 1793005280159,
+              "latency": {
+                "count": 11790,
+                "maxMs": 8001,
+                "sumMs": 6848872
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 2,
+              "requestInterval": {
+                "count": 11789,
+                "maxMs": 17541449,
+                "sumMs": 826454034
+              },
+              "requests": 11790,
+              "successInterval": {
+                "count": 11726,
+                "maxMs": 17541817,
+                "sumMs": 826453748
+              },
+              "successes": 11727
+            },
+            "key": "R792|MK2P4CH/A,MK2Q4CH/A,MK2T4CH/A,MK2U4CH/A",
+            "nextDueAt": 1793005320000,
+            "trackedAt": 1792178821399
+          },
+          {
+            "available": false,
+            "availableObservedAt": null,
+            "burstUntil": 1792975611848,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 8,
+              "lastError": "observation_persistence_failed",
+              "lastFailureAt": 1792945642666,
+              "lastPersistedAt": 1793005282266,
+              "lastPersistedSuccessAt": 1793005281944,
+              "lastRequestAt": 1793005280857,
+              "lastSuccessAt": 1793005281944,
+              "latency": {
+                "count": 2849,
+                "maxMs": 8001,
+                "sumMs": 1573665
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 6,
+              "requestInterval": {
+                "count": 2848,
+                "maxMs": 260347,
+                "sumMs": 172873156
+              },
+              "requests": 2849,
+              "successInterval": {
+                "count": 2840,
+                "maxMs": 260763,
+                "sumMs": 172873062
+              },
+              "successes": 2841
+            },
+            "key": "R793|MK2M4CH/A,MK2P4CH/A,MK2Q4CH/A",
+            "nextDueAt": 1793005320000,
+            "trackedAt": 1792832341512
+          }
+        ],
+        "version": 1
+      },
+      "state": "running",
+      "stats": {
+        "batches": 21,
+        "events": 0,
+        "lastBatchAt": "2026-10-26T09:01:22.265Z",
+        "notificationConfigReads": 3,
+        "notificationEmptyPassesSkipped": 28,
+        "notificationPasses": 31,
+        "observations": 52,
+        "sent": 0,
+        "tasks": 0
+      },
+      "updatedAt": "2026-10-26T09:01:22.438Z"
+    },
+    {
+      "_id": "collector_status",
+      "observationHealth": {
+        "evaluatedAt": "2026-10-26T09:02:22.547Z",
+        "freshGroups": 21,
+        "groupCount": 21,
+        "lastSuccessAt": "2026-10-26T09:02:21.918Z",
+        "oldestSuccessAt": "2026-10-26T09:02:03.608Z",
+        "pendingGroups": 0,
+        "staleAfterMs": 188000,
+        "staleGroups": 0,
+        "state": "healthy"
+      },
+      "scheduler": {
+        "admissionReason": null,
+        "admissionUntil": 0,
+        "breaker": {
+          "failures": [],
+          "openedAt": 1792820256695,
+          "probeInFlight": false,
+          "reason": null,
+          "state": "closed",
+          "trips": 0,
+          "until": null
+        },
+        "intervalMs": 60000,
+        "storeLastRequestAt": [
+          [
+            "R320",
+            1793005323608
+          ],
+          [
+            "R388",
+            1793005325454
+          ],
+          [
+            "R401",
+            1793005327879
+          ],
+          [
+            "R448",
+            1793005329229
+          ],
+          [
+            "R471",
+            1793005329627
+          ],
+          [
+            "R479",
+            1793005330672
+          ],
+          [
+            "R484",
+            1793005331531
+          ],
+          [
+            "R532",
+            1793005333335
+          ],
+          [
+            "R534",
+            1792847898088
+          ],
+          [
+            "R575",
+            1793005334204
+          ],
+          [
+            "R576",
+            1792847895776
+          ],
+          [
+            "R577",
+            1793005335158
+          ],
+          [
+            "R579",
+            1793005335978
+          ],
+          [
+            "R609",
+            1792847893053
+          ],
+          [
+            "R639",
+            1793005336903
+          ],
+          [
+            "R644",
+            1793005337375
+          ],
+          [
+            "R645",
+            1793005338621
+          ],
+          [
+            "R646",
+            1792848686613
+          ],
+          [
+            "R678",
+            1793005338906
+          ],
+          [
+            "R761",
+            1793005339807
+          ],
+          [
+            "R792",
+            1793005340480
+          ],
+          [
+            "R793",
+            1793005341918
+          ],
+          [
+            "R502",
+            1792891646171
+          ],
+          [
+            "R580",
+            1792891650267
+          ],
+          [
+            "R637",
+            1792995564560
+          ],
+          [
+            "R638",
+            1792995565486
+          ],
+          [
+            "R493",
+            1792646055252
+          ],
+          [
+            "R766",
+            1792646058802
+          ],
+          [
+            "R683",
+            1792796773963
+          ],
+          [
+            "R359",
+            1793005324402
+          ],
+          [
+            "R574",
+            1792646073043
+          ],
+          [
+            "R765",
+            1792646045844
+          ],
+          [
+            "R617",
+            1792587668484
+          ],
+          [
+            "R581",
+            1792804143017
+          ],
+          [
+            "R389",
+            1793005326353
+          ],
+          [
+            "R703",
+            1792559787628
+          ],
+          [
+            "R643",
+            1792559789807
+          ],
+          [
+            "R557",
+            1792653801249
+          ],
+          [
+            "R390",
+            1793005327896
+          ]
+        ],
+        "targets": [
+          {
+            "available": false,
+            "availableObservedAt": null,
+            "burstUntil": 1792891559563,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 4,
+              "lastError": "http_error",
+              "lastFailureAt": 1792892118316,
+              "lastPersistedAt": 1793005324227,
+              "lastPersistedSuccessAt": 1793005323608,
+              "lastRequestAt": 1793005321739,
+              "lastSuccessAt": 1793005323608,
+              "latency": {
+                "count": 2799,
+                "maxMs": 7817,
+                "sumMs": 1754344
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 0,
+              "requestInterval": {
+                "count": 2798,
+                "maxMs": 246517,
+                "sumMs": 170813704
+              },
+              "requests": 2799,
+              "successInterval": {
+                "count": 2794,
+                "maxMs": 246456,
+                "sumMs": 170814649
+              },
+              "successes": 2795
+            },
+            "key": "R320|MK2M4CH/A,MK2P4CH/A,MK2T4CH/A,MK2U4CH/A",
+            "nextDueAt": 1793005380000,
+            "trackedAt": 1792834442114
+          },
+          {
+            "available": false,
+            "availableObservedAt": null,
+            "burstUntil": 1792892024005,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 8,
+              "lastError": "observation_persistence_failed",
+              "lastFailureAt": 1792897098655,
+              "lastPersistedAt": 1793005324670,
+              "lastPersistedSuccessAt": 1793005324402,
+              "lastRequestAt": 1793005321739,
+              "lastSuccessAt": 1793005324402,
+              "latency": {
+                "count": 3436,
+                "maxMs": 4815,
+                "sumMs": 1687802
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 1,
+              "requestInterval": {
+                "count": 3435,
+                "maxMs": 243917,
+                "sumMs": 208475578
+              },
+              "requests": 3436,
+              "successInterval": {
+                "count": 3427,
+                "maxMs": 245281,
+                "sumMs": 208476614
+              },
+              "successes": 3428
+            },
+            "key": "R359|MK2P4CH/A,MK2T4CH/A",
+            "nextDueAt": 1793005380000,
+            "trackedAt": 1792796821437
+          },
+          {
+            "available": false,
+            "availableObservedAt": null,
+            "burstUntil": 1792725406028,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 24,
+              "lastError": "The operation was aborted due to timeout",
+              "lastFailureAt": 1792945664903,
+              "lastPersistedAt": 1793005326054,
+              "lastPersistedSuccessAt": 1793005325454,
+              "lastRequestAt": 1793005324671,
+              "lastSuccessAt": 1793005325454,
+              "latency": {
+                "count": 5899,
+                "maxMs": 8003,
+                "sumMs": 3162736
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 1,
+              "requestInterval": {
+                "count": 5898,
+                "maxMs": 246491,
+                "sumMs": 359216712
+              },
+              "requests": 5899,
+              "successInterval": {
+                "count": 5874,
+                "maxMs": 246705,
+                "sumMs": 359215844
+              },
+              "successes": 5875
+            },
+            "key": "R388|MK2P4CH/A,MK2Q4CH/A,MK2T4CH/A,MK2U4CH/A",
+            "nextDueAt": 1793005380000,
+            "trackedAt": 1792646101822
+          },
+          {
+            "available": false,
+            "availableObservedAt": null,
+            "burstUntil": 0,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 9,
+              "lastError": "observation_persistence_failed",
+              "lastFailureAt": 1792923795410,
+              "lastPersistedAt": 1793005326812,
+              "lastPersistedSuccessAt": 1793005326353,
+              "lastRequestAt": 1793005324671,
+              "lastSuccessAt": 1793005326353,
+              "latency": {
+                "count": 4089,
+                "maxMs": 3973,
+                "sumMs": 2077155
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 2,
+              "requestInterval": {
+                "count": 4088,
+                "maxMs": 245307,
+                "sumMs": 249154108
+              },
+              "requests": 4089,
+              "successInterval": {
+                "count": 4079,
+                "maxMs": 245336,
+                "sumMs": 249154935
+              },
+              "successes": 4080
+            },
+            "key": "R389|MK2P4CH/A,MK2T4CH/A",
+            "nextDueAt": 1793005380000,
+            "trackedAt": 1792756141761
+          },
+          {
+            "available": false,
+            "availableObservedAt": null,
+            "burstUntil": 0,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 14,
+              "lastError": "observation_persistence_failed",
+              "lastFailureAt": 1792909546077,
+              "lastPersistedAt": 1793005328201,
+              "lastPersistedSuccessAt": 1793005327896,
+              "lastRequestAt": 1793005326999,
+              "lastSuccessAt": 1793005327896,
+              "latency": {
+                "count": 4103,
+                "maxMs": 3075,
+                "sumMs": 2120461
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 1,
+              "requestInterval": {
+                "count": 4102,
+                "maxMs": 246410,
+                "sumMs": 249154391
+              },
+              "requests": 4103,
+              "successInterval": {
+                "count": 4088,
+                "maxMs": 247353,
+                "sumMs": 249154032
+              },
+              "successes": 4089
+            },
+            "key": "R390|MK2P4CH/A,MK2T4CH/A",
+            "nextDueAt": 1793005380000,
+            "trackedAt": 1792756141761
+          },
+          {
+            "available": false,
+            "availableObservedAt": null,
+            "burstUntil": 1792711909036,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 38,
+              "lastError": "document.set:fail -501001 resource system error. [ResourceUnavailable.TransactionConflict] Transaction is conflict, maybe resource operated by others. Please check your request, but if the problem persists, contact us. 更多错误信息请访问：https://docs.cloudbase.net/error-code/basic/DATABASE_TRANSACTION_CONFLICT",
+              "lastFailureAt": 1792944024532,
+              "lastPersistedAt": 1793005328218,
+              "lastPersistedSuccessAt": 1793005327879,
+              "lastRequestAt": 1793005326999,
+              "lastSuccessAt": 1793005327879,
+              "latency": {
+                "count": 11211,
+                "maxMs": 8003,
+                "sumMs": 5602885
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 0,
+              "requestInterval": {
+                "count": 11210,
+                "maxMs": 36276220,
+                "sumMs": 832681092
+              },
+              "requests": 11211,
+              "successInterval": {
+                "count": 11172,
+                "maxMs": 36276244,
+                "sumMs": 832679924
+              },
+              "successes": 11173
+            },
+            "key": "R401|MK2P4CH/A",
+            "nextDueAt": 1793005380000,
+            "trackedAt": 1792172641054
+          },
+          {
+            "available": false,
+            "availableObservedAt": null,
+            "burstUntil": 0,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 3,
+              "lastError": "http_error",
+              "lastFailureAt": 1792912399439,
+              "lastPersistedAt": 1793005329809,
+              "lastPersistedSuccessAt": 1793005329229,
+              "lastRequestAt": 1793005328218,
+              "lastSuccessAt": 1793005329229,
+              "latency": {
+                "count": 2794,
+                "maxMs": 7981,
+                "sumMs": 1582648
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 0,
+              "requestInterval": {
+                "count": 2793,
+                "maxMs": 246903,
+                "sumMs": 170751711
+              },
+              "requests": 2794,
+              "successInterval": {
+                "count": 2790,
+                "maxMs": 247687,
+                "sumMs": 170751571
+              },
+              "successes": 2791
+            },
+            "key": "R448|MK2M4CH/A,MK2P4CH/A,MK2Q4CH/A,MK2T4CH/A,MK2U4CH/A",
+            "nextDueAt": 1793005380000,
+            "trackedAt": 1792834561053
+          },
+          {
+            "available": false,
+            "availableObservedAt": null,
+            "burstUntil": 1792972781243,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 33,
+              "lastError": "The operation was aborted due to timeout",
+              "lastFailureAt": 1792987630497,
+              "lastPersistedAt": 1793005329941,
+              "lastPersistedSuccessAt": 1793005329627,
+              "lastRequestAt": 1793005328218,
+              "lastSuccessAt": 1793005329627,
+              "latency": {
+                "count": 5936,
+                "maxMs": 8004,
+                "sumMs": 2959398
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 0,
+              "requestInterval": {
+                "count": 5935,
+                "maxMs": 246903,
+                "sumMs": 359154205
+              },
+              "requests": 5936,
+              "successInterval": {
+                "count": 5902,
+                "maxMs": 246952,
+                "sumMs": 359154595
+              },
+              "successes": 5903
+            },
+            "key": "R471|MK2P4CH/A",
+            "nextDueAt": 1793005380000,
+            "trackedAt": 1792646101822
+          },
+          {
+            "available": false,
+            "availableObservedAt": null,
+            "burstUntil": 0,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 5,
+              "lastError": "The operation was aborted due to timeout",
+              "lastFailureAt": 1792940453190,
+              "lastPersistedAt": 1793005331142,
+              "lastPersistedSuccessAt": 1793005330672,
+              "lastRequestAt": 1793005329945,
+              "lastSuccessAt": 1793005330672,
+              "latency": {
+                "count": 2796,
+                "maxMs": 3975,
+                "sumMs": 1629461
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 0,
+              "requestInterval": {
+                "count": 2795,
+                "maxMs": 247953,
+                "sumMs": 170692933
+              },
+              "requests": 2796,
+              "successInterval": {
+                "count": 2790,
+                "maxMs": 248548,
+                "sumMs": 170692461
+              },
+              "successes": 2791
+            },
+            "key": "R479|MK2M4CH/A,MK2P4CH/A,MK2T4CH/A,MK2U4CH/A",
+            "nextDueAt": 1793005380000,
+            "trackedAt": 1792834561053
+          },
+          {
+            "available": false,
+            "availableObservedAt": null,
+            "burstUntil": 1793000796576,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 9,
+              "lastError": "observation_persistence_failed",
+              "lastFailureAt": 1792988405112,
+              "lastPersistedAt": 1793005332294,
+              "lastPersistedSuccessAt": 1793005331531,
+              "lastRequestAt": 1793005329945,
+              "lastSuccessAt": 1793005331531,
+              "latency": {
+                "count": 2952,
+                "maxMs": 8002,
+                "sumMs": 1621594
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 4,
+              "requestInterval": {
+                "count": 2951,
+                "maxMs": 247953,
+                "sumMs": 172969050
+              },
+              "requests": 2952,
+              "successInterval": {
+                "count": 2942,
+                "maxMs": 248313,
+                "sumMs": 172969571
+              },
+              "successes": 2943
+            },
+            "key": "R484|MK2M4CH/A,MK2P4CH/A,MK2Q4CH/A",
+            "nextDueAt": 1793005380000,
+            "trackedAt": 1792832341512
+          },
+          {
+            "available": false,
+            "availableObservedAt": null,
+            "burstUntil": 1792935646215,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 20,
+              "lastError": "The operation was aborted due to timeout",
+              "lastFailureAt": 1792936485708,
+              "lastPersistedAt": 1793005333577,
+              "lastPersistedSuccessAt": 1793005333335,
+              "lastRequestAt": 1793005332693,
+              "lastSuccessAt": 1793005333335,
+              "latency": {
+                "count": 5893,
+                "maxMs": 7572,
+                "sumMs": 2845633
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 0,
+              "requestInterval": {
+                "count": 5892,
+                "maxMs": 251262,
+                "sumMs": 359156870
+              },
+              "requests": 5893,
+              "successInterval": {
+                "count": 5872,
+                "maxMs": 250332,
+                "sumMs": 359156785
+              },
+              "successes": 5873
+            },
+            "key": "R532|MK2P4CH/A",
+            "nextDueAt": 1793005380000,
+            "trackedAt": 1792646101822
+          },
+          {
+            "available": false,
+            "availableObservedAt": null,
+            "burstUntil": 1792706205426,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 21,
+              "lastError": "http_error",
+              "lastFailureAt": 1792897103270,
+              "lastPersistedAt": 1793005334437,
+              "lastPersistedSuccessAt": 1793005334204,
+              "lastRequestAt": 1793005332693,
+              "lastSuccessAt": 1793005334204,
+              "latency": {
+                "count": 5900,
+                "maxMs": 8003,
+                "sumMs": 2970985
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 0,
+              "requestInterval": {
+                "count": 5899,
+                "maxMs": 248252,
+                "sumMs": 359156870
+              },
+              "requests": 5900,
+              "successInterval": {
+                "count": 5878,
+                "maxMs": 249040,
+                "sumMs": 359156898
+              },
+              "successes": 5879
+            },
+            "key": "R575|MK2T4CH/A",
+            "nextDueAt": 1793005380000,
+            "trackedAt": 1792646101822
+          },
+          {
+            "available": true,
+            "availableObservedAt": 1793005335158,
+            "burstUntil": 0,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 2,
+              "lastError": "observation_persistence_failed",
+              "lastFailureAt": 1792995789061,
+              "lastPersistedAt": 1793005335444,
+              "lastPersistedSuccessAt": 1793005335158,
+              "lastRequestAt": 1793005334438,
+              "lastSuccessAt": 1793005335158,
+              "latency": {
+                "count": 415,
+                "maxMs": 1849,
+                "sumMs": 228874
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 3,
+              "requestInterval": {
+                "count": 414,
+                "maxMs": 254880,
+                "sumMs": 27894641
+              },
+              "requests": 415,
+              "successInterval": {
+                "count": 412,
+                "maxMs": 287644,
+                "sumMs": 27894039
+              },
+              "successes": 413
+            },
+            "key": "R577|MJTF4CH/A,MK2P4CH/A",
+            "nextDueAt": 1793005380000,
+            "trackedAt": 1792977421413
+          },
+          {
+            "available": false,
+            "availableObservedAt": null,
+            "burstUntil": 1792719594525,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 30,
+              "lastError": "The operation was aborted due to timeout",
+              "lastFailureAt": 1792977988376,
+              "lastPersistedAt": 1793005336247,
+              "lastPersistedSuccessAt": 1793005335978,
+              "lastRequestAt": 1793005334438,
+              "lastSuccessAt": 1793005335978,
+              "latency": {
+                "count": 5927,
+                "maxMs": 8002,
+                "sumMs": 3025675
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 0,
+              "requestInterval": {
+                "count": 5926,
+                "maxMs": 260411,
+                "sumMs": 359201989
+              },
+              "requests": 5927,
+              "successInterval": {
+                "count": 5896,
+                "maxMs": 259375,
+                "sumMs": 359202020
+              },
+              "successes": 5897
+            },
+            "key": "R579|MK2P4CH/A",
+            "nextDueAt": 1793005380000,
+            "trackedAt": 1792646101822
+          },
+          {
+            "available": true,
+            "availableObservedAt": 1793005336903,
+            "burstUntil": 0,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 0,
+              "lastError": "observation_persistence_failed",
+              "lastFailureAt": null,
+              "lastPersistedAt": 1793005337161,
+              "lastPersistedSuccessAt": 1793005336903,
+              "lastRequestAt": 1793005336249,
+              "lastSuccessAt": 1793005336903,
+              "latency": {
+                "count": 417,
+                "maxMs": 1912,
+                "sumMs": 234387
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 7,
+              "requestInterval": {
+                "count": 416,
+                "maxMs": 243016,
+                "sumMs": 27898509
+              },
+              "requests": 417,
+              "successInterval": {
+                "count": 416,
+                "maxMs": 243918,
+                "sumMs": 27897830
+              },
+              "successes": 417
+            },
+            "key": "R639|MJTF4CH/A,MK2P4CH/A",
+            "nextDueAt": 1793005380000,
+            "trackedAt": 1792977421413
+          },
+          {
+            "available": true,
+            "availableObservedAt": 1793005337375,
+            "burstUntil": 0,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 28,
+              "lastError": "http_error",
+              "lastFailureAt": 1792995790569,
+              "lastPersistedAt": 1793005337651,
+              "lastPersistedSuccessAt": 1793005337375,
+              "lastRequestAt": 1793005336249,
+              "lastSuccessAt": 1793005337375,
+              "latency": {
+                "count": 4682,
+                "maxMs": 7820,
+                "sumMs": 2526711
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 0,
+              "requestInterval": {
+                "count": 4681,
+                "maxMs": 446521265,
+                "sumMs": 832672504
+              },
+              "requests": 4682,
+              "successInterval": {
+                "count": 4653,
+                "maxMs": 446521800,
+                "sumMs": 832672075
+              },
+              "successes": 4654
+            },
+            "key": "R644|MJTA4CH/A",
+            "nextDueAt": 1793005380000,
+            "trackedAt": 1792172641054
+          },
+          {
+            "available": false,
+            "availableObservedAt": null,
+            "burstUntil": 1792977349918,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 37,
+              "lastError": "http_error",
+              "lastFailureAt": 1792912397191,
+              "lastPersistedAt": 1793005339115,
+              "lastPersistedSuccessAt": 1793005338621,
+              "lastRequestAt": 1793005337896,
+              "lastSuccessAt": 1793005338621,
+              "latency": {
+                "count": 11817,
+                "maxMs": 8003,
+                "sumMs": 6949424
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 0,
+              "requestInterval": {
+                "count": 11816,
+                "maxMs": 17569535,
+                "sumMs": 826512763
+              },
+              "requests": 11817,
+              "successInterval": {
+                "count": 11779,
+                "maxMs": 17569166,
+                "sumMs": 826512385
+              },
+              "successes": 11780
+            },
+            "key": "R645|MK2M4CH/A,MK2P4CH/A,MK2T4CH/A,MK2U4CH/A",
+            "nextDueAt": 1793005380000,
+            "trackedAt": 1792178821399
+          },
+          {
+            "available": false,
+            "availableObservedAt": null,
+            "burstUntil": 1792935649539,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 14,
+              "lastError": "observation_persistence_failed",
+              "lastFailureAt": 1792935645748,
+              "lastPersistedAt": 1793005339190,
+              "lastPersistedSuccessAt": 1793005338906,
+              "lastRequestAt": 1793005337896,
+              "lastSuccessAt": 1793005338906,
+              "latency": {
+                "count": 4844,
+                "maxMs": 6013,
+                "sumMs": 2500523
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 1,
+              "requestInterval": {
+                "count": 4843,
+                "maxMs": 253094,
+                "sumMs": 293751625
+              },
+              "requests": 4844,
+              "successInterval": {
+                "count": 4829,
+                "maxMs": 253546,
+                "sumMs": 293751236
+              },
+              "successes": 4830
+            },
+            "key": "R678|MK2P4CH/A,MK2T4CH/A",
+            "nextDueAt": 1793005380000,
+            "trackedAt": 1792711561032
+          },
+          {
+            "available": false,
+            "availableObservedAt": null,
+            "burstUntil": 1792935644836,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 14,
+              "lastError": "observation_persistence_failed",
+              "lastFailureAt": 1792935491330,
+              "lastPersistedAt": 1793005340072,
+              "lastPersistedSuccessAt": 1793005339807,
+              "lastRequestAt": 1793005339191,
+              "lastSuccessAt": 1793005339807,
+              "latency": {
+                "count": 2876,
+                "maxMs": 3546,
+                "sumMs": 1561995
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 5,
+              "requestInterval": {
+                "count": 2875,
+                "maxMs": 260693,
+                "sumMs": 172917360
+              },
+              "requests": 2876,
+              "successInterval": {
+                "count": 2861,
+                "maxMs": 260497,
+                "sumMs": 172916134
+              },
+              "successes": 2862
+            },
+            "key": "R761|MK2M4CH/A,MK2P4CH/A,MK2Q4CH/A",
+            "nextDueAt": 1793005380000,
+            "trackedAt": 1792832341512
+          },
+          {
+            "available": false,
+            "availableObservedAt": null,
+            "burstUntil": 1792713953469,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 63,
+              "lastError": "The operation was aborted due to timeout",
+              "lastFailureAt": 1792933248083,
+              "lastPersistedAt": 1793005341005,
+              "lastPersistedSuccessAt": 1793005340480,
+              "lastRequestAt": 1793005339191,
+              "lastSuccessAt": 1793005340480,
+              "latency": {
+                "count": 11791,
+                "maxMs": 8001,
+                "sumMs": 6849659
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 2,
+              "requestInterval": {
+                "count": 11790,
+                "maxMs": 17541449,
+                "sumMs": 826514058
+              },
+              "requests": 11791,
+              "successInterval": {
+                "count": 11727,
+                "maxMs": 17541817,
+                "sumMs": 826514069
+              },
+              "successes": 11728
+            },
+            "key": "R792|MK2P4CH/A,MK2Q4CH/A,MK2T4CH/A,MK2U4CH/A",
+            "nextDueAt": 1793005380000,
+            "trackedAt": 1792178821399
+          },
+          {
+            "available": false,
+            "availableObservedAt": null,
+            "burstUntil": 1792975611848,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 8,
+              "lastError": "observation_persistence_failed",
+              "lastFailureAt": 1792945642666,
+              "lastPersistedAt": 1793005342372,
+              "lastPersistedSuccessAt": 1793005341918,
+              "lastRequestAt": 1793005341006,
+              "lastSuccessAt": 1793005341918,
+              "latency": {
+                "count": 2850,
+                "maxMs": 8001,
+                "sumMs": 1574276
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 6,
+              "requestInterval": {
+                "count": 2849,
+                "maxMs": 260347,
+                "sumMs": 172933305
+              },
+              "requests": 2850,
+              "successInterval": {
+                "count": 2841,
+                "maxMs": 260763,
+                "sumMs": 172933036
+              },
+              "successes": 2842
+            },
+            "key": "R793|MK2M4CH/A,MK2P4CH/A,MK2Q4CH/A",
+            "nextDueAt": 1793005380000,
+            "trackedAt": 1792832341512
+          }
+        ],
+        "version": 1
+      },
+      "state": "running",
+      "stats": {
+        "batches": 21,
+        "events": 0,
+        "lastBatchAt": "2026-10-26T09:02:22.372Z",
+        "notificationConfigReads": 4,
+        "notificationEmptyPassesSkipped": 28,
+        "notificationPasses": 32,
+        "observations": 52,
+        "sent": 0,
+        "tasks": 0
+      },
+      "updatedAt": "2026-10-26T09:02:22.547Z"
+    },
+    {
+      "_id": "collector_status",
+      "observationHealth": {
+        "evaluatedAt": "2026-10-26T09:04:21.214Z",
+        "freshGroups": 21,
+        "groupCount": 21,
+        "lastSuccessAt": "2026-10-26T09:04:20.969Z",
+        "oldestSuccessAt": "2026-10-26T09:03:09.505Z",
+        "pendingGroups": 0,
+        "staleAfterMs": 188000,
+        "staleGroups": 0,
+        "state": "healthy"
+      },
+      "scheduler": {
+        "admissionReason": null,
+        "admissionUntil": 0,
+        "breaker": {
+          "failures": [],
+          "openedAt": 1792820256695,
+          "probeInFlight": false,
+          "reason": null,
+          "state": "closed",
+          "trips": 0,
+          "until": null
+        },
+        "intervalMs": 60000,
+        "storeLastRequestAt": [
+          [
+            "R320",
+            1793005442315
+          ],
+          [
+            "R388",
+            1793005444327
+          ],
+          [
+            "R401",
+            1793005454760
+          ],
+          [
+            "R448",
+            1793005456756
+          ],
+          [
+            "R471",
+            1793005456642
+          ],
+          [
+            "R479",
+            1793005458545
+          ],
+          [
+            "R484",
+            1793005459323
+          ],
+          [
+            "R532",
+            1793005460957
+          ],
+          [
+            "R534",
+            1792847898088
+          ],
+          [
+            "R575",
+            1793005460969
+          ],
+          [
+            "R576",
+            1792847895776
+          ],
+          [
+            "R577",
+            1793005396676
+          ],
+          [
+            "R579",
+            1793005396346
+          ],
+          [
+            "R609",
+            1792847893053
+          ],
+          [
+            "R639",
+            1793005398416
+          ],
+          [
+            "R644",
+            1793005398582
+          ],
+          [
+            "R645",
+            1793005400337
+          ],
+          [
+            "R646",
+            1792848686613
+          ],
+          [
+            "R678",
+            1793005400228
+          ],
+          [
+            "R761",
+            1793005401667
+          ],
+          [
+            "R792",
+            1793005401839
+          ],
+          [
+            "R793",
+            1793005403414
+          ],
+          [
+            "R502",
+            1792891646171
+          ],
+          [
+            "R580",
+            1792891650267
+          ],
+          [
+            "R637",
+            1792995564560
+          ],
+          [
+            "R638",
+            1792995565486
+          ],
+          [
+            "R493",
+            1792646055252
+          ],
+          [
+            "R766",
+            1792646058802
+          ],
+          [
+            "R683",
+            1792796773963
+          ],
+          [
+            "R359",
+            1793005443252
+          ],
+          [
+            "R574",
+            1792646073043
+          ],
+          [
+            "R765",
+            1792646045844
+          ],
+          [
+            "R617",
+            1792587668484
+          ],
+          [
+            "R581",
+            1792804143017
+          ],
+          [
+            "R389",
+            1793005445588
+          ],
+          [
+            "R703",
+            1792559787628
+          ],
+          [
+            "R643",
+            1792559789807
+          ],
+          [
+            "R557",
+            1792653801249
+          ],
+          [
+            "R390",
+            1793005446655
+          ]
+        ],
+        "targets": [
+          {
+            "available": false,
+            "availableObservedAt": null,
+            "burstUntil": 1792891559563,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 4,
+              "lastError": "http_error",
+              "lastFailureAt": 1792892118316,
+              "lastPersistedAt": 1793005442913,
+              "lastPersistedSuccessAt": 1793005442315,
+              "lastRequestAt": 1793005441445,
+              "lastSuccessAt": 1793005442315,
+              "latency": {
+                "count": 2801,
+                "maxMs": 7817,
+                "sumMs": 1755650
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 0,
+              "requestInterval": {
+                "count": 2800,
+                "maxMs": 246517,
+                "sumMs": 170933410
+              },
+              "requests": 2801,
+              "successInterval": {
+                "count": 2796,
+                "maxMs": 246456,
+                "sumMs": 170933356
+              },
+              "successes": 2797
+            },
+            "key": "R320|MK2M4CH/A,MK2P4CH/A,MK2T4CH/A,MK2U4CH/A",
+            "nextDueAt": 1793005500000,
+            "trackedAt": 1792834442114
+          },
+          {
+            "available": false,
+            "availableObservedAt": null,
+            "burstUntil": 1792892024005,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 8,
+              "lastError": "observation_persistence_failed",
+              "lastFailureAt": 1792897098655,
+              "lastPersistedAt": 1793005443599,
+              "lastPersistedSuccessAt": 1793005443252,
+              "lastRequestAt": 1793005441445,
+              "lastSuccessAt": 1793005443252,
+              "latency": {
+                "count": 3438,
+                "maxMs": 4815,
+                "sumMs": 1689680
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 1,
+              "requestInterval": {
+                "count": 3437,
+                "maxMs": 243917,
+                "sumMs": 208595284
+              },
+              "requests": 3438,
+              "successInterval": {
+                "count": 3429,
+                "maxMs": 245281,
+                "sumMs": 208595464
+              },
+              "successes": 3430
+            },
+            "key": "R359|MK2P4CH/A,MK2T4CH/A",
+            "nextDueAt": 1793005500000,
+            "trackedAt": 1792796821437
+          },
+          {
+            "available": false,
+            "availableObservedAt": null,
+            "burstUntil": 1792725406028,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 24,
+              "lastError": "The operation was aborted due to timeout",
+              "lastFailureAt": 1792945664903,
+              "lastPersistedAt": 1793005444919,
+              "lastPersistedSuccessAt": 1793005444327,
+              "lastRequestAt": 1793005443600,
+              "lastSuccessAt": 1793005444327,
+              "latency": {
+                "count": 5901,
+                "maxMs": 8003,
+                "sumMs": 3164133
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 1,
+              "requestInterval": {
+                "count": 5900,
+                "maxMs": 246491,
+                "sumMs": 359335641
+              },
+              "requests": 5901,
+              "successInterval": {
+                "count": 5876,
+                "maxMs": 246705,
+                "sumMs": 359334717
+              },
+              "successes": 5877
+            },
+            "key": "R388|MK2P4CH/A,MK2Q4CH/A,MK2T4CH/A,MK2U4CH/A",
+            "nextDueAt": 1793005500000,
+            "trackedAt": 1792646101822
+          },
+          {
+            "available": false,
+            "availableObservedAt": null,
+            "burstUntil": 0,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 9,
+              "lastError": "observation_persistence_failed",
+              "lastFailureAt": 1792923795410,
+              "lastPersistedAt": 1793005445890,
+              "lastPersistedSuccessAt": 1793005445588,
+              "lastRequestAt": 1793005443600,
+              "lastSuccessAt": 1793005445588,
+              "latency": {
+                "count": 4091,
+                "maxMs": 3973,
+                "sumMs": 2082024
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 2,
+              "requestInterval": {
+                "count": 4090,
+                "maxMs": 245307,
+                "sumMs": 249273037
+              },
+              "requests": 4091,
+              "successInterval": {
+                "count": 4081,
+                "maxMs": 245336,
+                "sumMs": 249274170
+              },
+              "successes": 4082
+            },
+            "key": "R389|MK2P4CH/A,MK2T4CH/A",
+            "nextDueAt": 1793005500000,
+            "trackedAt": 1792756141761
+          },
+          {
+            "available": false,
+            "availableObservedAt": null,
+            "burstUntil": 0,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 14,
+              "lastError": "observation_persistence_failed",
+              "lastFailureAt": 1792909546077,
+              "lastPersistedAt": 1793005446928,
+              "lastPersistedSuccessAt": 1793005446655,
+              "lastRequestAt": 1793005446042,
+              "lastSuccessAt": 1793005446655,
+              "latency": {
+                "count": 4105,
+                "maxMs": 3075,
+                "sumMs": 2121286
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 1,
+              "requestInterval": {
+                "count": 4104,
+                "maxMs": 246410,
+                "sumMs": 249273434
+              },
+              "requests": 4105,
+              "successInterval": {
+                "count": 4090,
+                "maxMs": 247353,
+                "sumMs": 249272791
+              },
+              "successes": 4091
+            },
+            "key": "R390|MK2P4CH/A,MK2T4CH/A",
+            "nextDueAt": 1793005500000,
+            "trackedAt": 1792756141761
+          },
+          {
+            "available": false,
+            "availableObservedAt": null,
+            "burstUntil": 1792711909036,
+            "failures": 1,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 1,
+              "failures": 39,
+              "lastError": "The operation was aborted due to timeout",
+              "lastFailureAt": 1793005454760,
+              "lastPersistedAt": 1793005455247,
+              "lastPersistedSuccessAt": 1793005389505,
+              "lastRequestAt": 1793005446042,
+              "lastSuccessAt": 1793005389505,
+              "latency": {
+                "count": 11213,
+                "maxMs": 8003,
+                "sumMs": 5611235
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 0,
+              "requestInterval": {
+                "count": 11212,
+                "maxMs": 36276220,
+                "sumMs": 832800135
+              },
+              "requests": 11213,
+              "successInterval": {
+                "count": 11173,
+                "maxMs": 36276244,
+                "sumMs": 832741550
+              },
+              "successes": 11174
+            },
+            "key": "R401|MK2P4CH/A",
+            "nextDueAt": 1793005456760,
+            "trackedAt": 1792172641054
+          },
+          {
+            "available": false,
+            "availableObservedAt": null,
+            "burstUntil": 0,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 3,
+              "lastError": "http_error",
+              "lastFailureAt": 1792912399439,
+              "lastPersistedAt": 1793005457318,
+              "lastPersistedSuccessAt": 1793005456756,
+              "lastRequestAt": 1793005455497,
+              "lastSuccessAt": 1793005456756,
+              "latency": {
+                "count": 2796,
+                "maxMs": 7981,
+                "sumMs": 1584664
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 0,
+              "requestInterval": {
+                "count": 2795,
+                "maxMs": 246903,
+                "sumMs": 170878990
+              },
+              "requests": 2796,
+              "successInterval": {
+                "count": 2792,
+                "maxMs": 247687,
+                "sumMs": 170879098
+              },
+              "successes": 2793
+            },
+            "key": "R448|MK2M4CH/A,MK2P4CH/A,MK2Q4CH/A,MK2T4CH/A,MK2U4CH/A",
+            "nextDueAt": 1793005500000,
+            "trackedAt": 1792834561053
+          },
+          {
+            "available": false,
+            "availableObservedAt": null,
+            "burstUntil": 1792972781243,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 33,
+              "lastError": "The operation was aborted due to timeout",
+              "lastFailureAt": 1792987630497,
+              "lastPersistedAt": 1793005456941,
+              "lastPersistedSuccessAt": 1793005456642,
+              "lastRequestAt": 1793005455497,
+              "lastSuccessAt": 1793005456642,
+              "latency": {
+                "count": 5938,
+                "maxMs": 8004,
+                "sumMs": 2960332
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 0,
+              "requestInterval": {
+                "count": 5937,
+                "maxMs": 246903,
+                "sumMs": 359281484
+              },
+              "requests": 5938,
+              "successInterval": {
+                "count": 5904,
+                "maxMs": 246952,
+                "sumMs": 359281610
+              },
+              "successes": 5905
+            },
+            "key": "R471|MK2P4CH/A",
+            "nextDueAt": 1793005500000,
+            "trackedAt": 1792646101822
+          },
+          {
+            "available": false,
+            "availableObservedAt": null,
+            "burstUntil": 0,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 5,
+              "lastError": "The operation was aborted due to timeout",
+              "lastFailureAt": 1792940453190,
+              "lastPersistedAt": 1793005459063,
+              "lastPersistedSuccessAt": 1793005458545,
+              "lastRequestAt": 1793005457321,
+              "lastSuccessAt": 1793005458545,
+              "latency": {
+                "count": 2798,
+                "maxMs": 3975,
+                "sumMs": 1631324
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 0,
+              "requestInterval": {
+                "count": 2797,
+                "maxMs": 247953,
+                "sumMs": 170820309
+              },
+              "requests": 2798,
+              "successInterval": {
+                "count": 2792,
+                "maxMs": 248548,
+                "sumMs": 170820334
+              },
+              "successes": 2793
+            },
+            "key": "R479|MK2M4CH/A,MK2P4CH/A,MK2T4CH/A,MK2U4CH/A",
+            "nextDueAt": 1793005500000,
+            "trackedAt": 1792834561053
+          },
+          {
+            "available": false,
+            "availableObservedAt": null,
+            "burstUntil": 1793000796576,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 9,
+              "lastError": "observation_persistence_failed",
+              "lastFailureAt": 1792988405112,
+              "lastPersistedAt": 1793005459614,
+              "lastPersistedSuccessAt": 1793005459323,
+              "lastRequestAt": 1793005457321,
+              "lastSuccessAt": 1793005459323,
+              "latency": {
+                "count": 2954,
+                "maxMs": 8002,
+                "sumMs": 1623339
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 4,
+              "requestInterval": {
+                "count": 2953,
+                "maxMs": 247953,
+                "sumMs": 173096426
+              },
+              "requests": 2954,
+              "successInterval": {
+                "count": 2944,
+                "maxMs": 248313,
+                "sumMs": 173097363
+              },
+              "successes": 2945
+            },
+            "key": "R484|MK2M4CH/A,MK2P4CH/A,MK2Q4CH/A",
+            "nextDueAt": 1793005500000,
+            "trackedAt": 1792832341512
+          },
+          {
+            "available": false,
+            "availableObservedAt": null,
+            "burstUntil": 1792935646215,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 20,
+              "lastError": "The operation was aborted due to timeout",
+              "lastFailureAt": 1792936485708,
+              "lastPersistedAt": 1793005461214,
+              "lastPersistedSuccessAt": 1793005460957,
+              "lastRequestAt": 1793005459615,
+              "lastSuccessAt": 1793005460957,
+              "latency": {
+                "count": 5895,
+                "maxMs": 7572,
+                "sumMs": 2847534
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 0,
+              "requestInterval": {
+                "count": 5894,
+                "maxMs": 251262,
+                "sumMs": 359283792
+              },
+              "requests": 5895,
+              "successInterval": {
+                "count": 5874,
+                "maxMs": 250332,
+                "sumMs": 359284407
+              },
+              "successes": 5875
+            },
+            "key": "R532|MK2P4CH/A",
+            "nextDueAt": 1793005500000,
+            "trackedAt": 1792646101822
+          },
+          {
+            "available": false,
+            "availableObservedAt": null,
+            "burstUntil": 1792706205426,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 21,
+              "lastError": "http_error",
+              "lastFailureAt": 1792897103270,
+              "lastPersistedAt": 1793005461211,
+              "lastPersistedSuccessAt": 1793005460969,
+              "lastRequestAt": 1793005459615,
+              "lastSuccessAt": 1793005460969,
+              "latency": {
+                "count": 5902,
+                "maxMs": 8003,
+                "sumMs": 2972345
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 0,
+              "requestInterval": {
+                "count": 5901,
+                "maxMs": 248252,
+                "sumMs": 359283792
+              },
+              "requests": 5902,
+              "successInterval": {
+                "count": 5880,
+                "maxMs": 249040,
+                "sumMs": 359283663
+              },
+              "successes": 5881
+            },
+            "key": "R575|MK2T4CH/A",
+            "nextDueAt": 1793005500000,
+            "trackedAt": 1792646101822
+          },
+          {
+            "available": true,
+            "availableObservedAt": 1793005396676,
+            "burstUntil": 0,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 2,
+              "lastError": "observation_persistence_failed",
+              "lastFailureAt": 1792995789061,
+              "lastPersistedAt": 1793005397018,
+              "lastPersistedSuccessAt": 1793005396676,
+              "lastRequestAt": 1793005395433,
+              "lastSuccessAt": 1793005396676,
+              "latency": {
+                "count": 416,
+                "maxMs": 1849,
+                "sumMs": 229819
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 3,
+              "requestInterval": {
+                "count": 415,
+                "maxMs": 254880,
+                "sumMs": 27955636
+              },
+              "requests": 416,
+              "successInterval": {
+                "count": 413,
+                "maxMs": 287644,
+                "sumMs": 27955557
+              },
+              "successes": 414
+            },
+            "key": "R577|MJTF4CH/A,MK2P4CH/A",
+            "nextDueAt": 1793005440000,
+            "trackedAt": 1792977421413
+          },
+          {
+            "available": false,
+            "availableObservedAt": null,
+            "burstUntil": 1792719594525,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 30,
+              "lastError": "The operation was aborted due to timeout",
+              "lastFailureAt": 1792977988376,
+              "lastPersistedAt": 1793005396576,
+              "lastPersistedSuccessAt": 1793005396346,
+              "lastRequestAt": 1793005395433,
+              "lastSuccessAt": 1793005396346,
+              "latency": {
+                "count": 5928,
+                "maxMs": 8002,
+                "sumMs": 3026028
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 0,
+              "requestInterval": {
+                "count": 5927,
+                "maxMs": 260411,
+                "sumMs": 359262984
+              },
+              "requests": 5928,
+              "successInterval": {
+                "count": 5897,
+                "maxMs": 259375,
+                "sumMs": 359262388
+              },
+              "successes": 5898
+            },
+            "key": "R579|MK2P4CH/A",
+            "nextDueAt": 1793005440000,
+            "trackedAt": 1792646101822
+          },
+          {
+            "available": true,
+            "availableObservedAt": 1793005398416,
+            "burstUntil": 0,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 0,
+              "lastError": "observation_persistence_failed",
+              "lastFailureAt": null,
+              "lastPersistedAt": 1793005398863,
+              "lastPersistedSuccessAt": 1793005398416,
+              "lastRequestAt": 1793005397019,
+              "lastSuccessAt": 1793005398416,
+              "latency": {
+                "count": 418,
+                "maxMs": 1912,
+                "sumMs": 235469
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 7,
+              "requestInterval": {
+                "count": 417,
+                "maxMs": 243016,
+                "sumMs": 27959279
+              },
+              "requests": 418,
+              "successInterval": {
+                "count": 417,
+                "maxMs": 243918,
+                "sumMs": 27959343
+              },
+              "successes": 418
+            },
+            "key": "R639|MJTF4CH/A,MK2P4CH/A",
+            "nextDueAt": 1793005440000,
+            "trackedAt": 1792977421413
+          },
+          {
+            "available": true,
+            "availableObservedAt": 1793005398582,
+            "burstUntil": 0,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 28,
+              "lastError": "http_error",
+              "lastFailureAt": 1792995790569,
+              "lastPersistedAt": 1793005398862,
+              "lastPersistedSuccessAt": 1793005398582,
+              "lastRequestAt": 1793005397019,
+              "lastSuccessAt": 1793005398582,
+              "latency": {
+                "count": 4683,
+                "maxMs": 7820,
+                "sumMs": 2527695
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 0,
+              "requestInterval": {
+                "count": 4682,
+                "maxMs": 446521265,
+                "sumMs": 832733274
+              },
+              "requests": 4683,
+              "successInterval": {
+                "count": 4654,
+                "maxMs": 446521800,
+                "sumMs": 832733282
+              },
+              "successes": 4655
+            },
+            "key": "R644|MJTA4CH/A",
+            "nextDueAt": 1793005440000,
+            "trackedAt": 1792172641054
+          },
+          {
+            "available": false,
+            "availableObservedAt": null,
+            "burstUntil": 1792977349918,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 37,
+              "lastError": "http_error",
+              "lastFailureAt": 1792912397191,
+              "lastPersistedAt": 1793005400921,
+              "lastPersistedSuccessAt": 1793005400337,
+              "lastRequestAt": 1793005399066,
+              "lastSuccessAt": 1793005400337,
+              "latency": {
+                "count": 11818,
+                "maxMs": 8003,
+                "sumMs": 6950397
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 0,
+              "requestInterval": {
+                "count": 11817,
+                "maxMs": 17569535,
+                "sumMs": 826573933
+              },
+              "requests": 11818,
+              "successInterval": {
+                "count": 11780,
+                "maxMs": 17569166,
+                "sumMs": 826574101
+              },
+              "successes": 11781
+            },
+            "key": "R645|MK2M4CH/A,MK2P4CH/A,MK2T4CH/A,MK2U4CH/A",
+            "nextDueAt": 1793005440000,
+            "trackedAt": 1792178821399
+          },
+          {
+            "available": false,
+            "availableObservedAt": null,
+            "burstUntil": 1792935649539,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 14,
+              "lastError": "observation_persistence_failed",
+              "lastFailureAt": 1792935645748,
+              "lastPersistedAt": 1793005400537,
+              "lastPersistedSuccessAt": 1793005400228,
+              "lastRequestAt": 1793005399066,
+              "lastSuccessAt": 1793005400228,
+              "latency": {
+                "count": 4845,
+                "maxMs": 6013,
+                "sumMs": 2501127
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 1,
+              "requestInterval": {
+                "count": 4844,
+                "maxMs": 253094,
+                "sumMs": 293812795
+              },
+              "requests": 4845,
+              "successInterval": {
+                "count": 4830,
+                "maxMs": 253546,
+                "sumMs": 293812558
+              },
+              "successes": 4831
+            },
+            "key": "R678|MK2P4CH/A,MK2T4CH/A",
+            "nextDueAt": 1793005440000,
+            "trackedAt": 1792711561032
+          },
+          {
+            "available": false,
+            "availableObservedAt": null,
+            "burstUntil": 1792935644836,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 14,
+              "lastError": "observation_persistence_failed",
+              "lastFailureAt": 1792935491330,
+              "lastPersistedAt": 1793005401937,
+              "lastPersistedSuccessAt": 1793005401667,
+              "lastRequestAt": 1793005400921,
+              "lastSuccessAt": 1793005401667,
+              "latency": {
+                "count": 2877,
+                "maxMs": 3546,
+                "sumMs": 1562496
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 5,
+              "requestInterval": {
+                "count": 2876,
+                "maxMs": 260693,
+                "sumMs": 172979090
+              },
+              "requests": 2877,
+              "successInterval": {
+                "count": 2862,
+                "maxMs": 260497,
+                "sumMs": 172977994
+              },
+              "successes": 2863
+            },
+            "key": "R761|MK2M4CH/A,MK2P4CH/A,MK2Q4CH/A",
+            "nextDueAt": 1793005440000,
+            "trackedAt": 1792832341512
+          },
+          {
+            "available": false,
+            "availableObservedAt": null,
+            "burstUntil": 1792713953469,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 63,
+              "lastError": "The operation was aborted due to timeout",
+              "lastFailureAt": 1792933248083,
+              "lastPersistedAt": 1793005402324,
+              "lastPersistedSuccessAt": 1793005401839,
+              "lastRequestAt": 1793005400921,
+              "lastSuccessAt": 1793005401839,
+              "latency": {
+                "count": 11792,
+                "maxMs": 8001,
+                "sumMs": 6850073
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 2,
+              "requestInterval": {
+                "count": 11791,
+                "maxMs": 17541449,
+                "sumMs": 826575788
+              },
+              "requests": 11792,
+              "successInterval": {
+                "count": 11728,
+                "maxMs": 17541817,
+                "sumMs": 826575428
+              },
+              "successes": 11729
+            },
+            "key": "R792|MK2P4CH/A,MK2Q4CH/A,MK2T4CH/A,MK2U4CH/A",
+            "nextDueAt": 1793005440000,
+            "trackedAt": 1792178821399
+          },
+          {
+            "available": false,
+            "availableObservedAt": null,
+            "burstUntil": 1792975611848,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 8,
+              "lastError": "observation_persistence_failed",
+              "lastFailureAt": 1792945642666,
+              "lastPersistedAt": 1793005403745,
+              "lastPersistedSuccessAt": 1793005403414,
+              "lastRequestAt": 1793005402324,
+              "lastSuccessAt": 1793005403414,
+              "latency": {
+                "count": 2851,
+                "maxMs": 8001,
+                "sumMs": 1575046
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 6,
+              "requestInterval": {
+                "count": 2850,
+                "maxMs": 260347,
+                "sumMs": 172994623
+              },
+              "requests": 2851,
+              "successInterval": {
+                "count": 2842,
+                "maxMs": 260763,
+                "sumMs": 172994532
+              },
+              "successes": 2843
+            },
+            "key": "R793|MK2M4CH/A,MK2P4CH/A,MK2Q4CH/A",
+            "nextDueAt": 1793005440000,
+            "trackedAt": 1792832341512
+          }
+        ],
+        "version": 1
+      },
+      "state": "running",
+      "stats": {
+        "batches": 12,
+        "events": 0,
+        "lastBatchAt": "2026-10-26T09:04:21.214Z",
+        "notificationConfigReads": 1,
+        "notificationEmptyPassesSkipped": 16,
+        "notificationPasses": 18,
+        "observations": 30,
+        "sent": 0,
+        "tasks": 0
+      },
+      "updatedAt": "2026-10-26T09:04:21.214Z"
+    },
+    {
+      "_id": "collector_status",
+      "observationHealth": {
+        "evaluatedAt": "2026-10-26T09:05:20.790Z",
+        "freshGroups": 21,
+        "groupCount": 21,
+        "lastSuccessAt": "2026-10-26T09:05:20.386Z",
+        "oldestSuccessAt": "2026-10-26T09:05:03.402Z",
+        "pendingGroups": 0,
+        "staleAfterMs": 188000,
+        "staleGroups": 0,
+        "state": "healthy"
+      },
+      "scheduler": {
+        "admissionReason": null,
+        "admissionUntil": 0,
+        "breaker": {
+          "failures": [],
+          "openedAt": 1792820256695,
+          "probeInFlight": false,
+          "reason": null,
+          "state": "closed",
+          "trips": 0,
+          "until": null
+        },
+        "intervalMs": 60000,
+        "storeLastRequestAt": [
+          [
+            "R320",
+            1793005503402
+          ],
+          [
+            "R388",
+            1793005505370
+          ],
+          [
+            "R401",
+            1793005507222
+          ],
+          [
+            "R448",
+            1793005508639
+          ],
+          [
+            "R471",
+            1793005509238
+          ],
+          [
+            "R479",
+            1793005510165
+          ],
+          [
+            "R484",
+            1793005511084
+          ],
+          [
+            "R532",
+            1793005511912
+          ],
+          [
+            "R534",
+            1792847898088
+          ],
+          [
+            "R575",
+            1793005512633
+          ],
+          [
+            "R576",
+            1792847895776
+          ],
+          [
+            "R577",
+            1793005513882
+          ],
+          [
+            "R579",
+            1793005514546
+          ],
+          [
+            "R609",
+            1792847893053
+          ],
+          [
+            "R639",
+            1793005515466
+          ],
+          [
+            "R644",
+            1793005515809
+          ],
+          [
+            "R645",
+            1793005516648
+          ],
+          [
+            "R646",
+            1792848686613
+          ],
+          [
+            "R678",
+            1793005517514
+          ],
+          [
+            "R761",
+            1793005518443
+          ],
+          [
+            "R792",
+            1793005519137
+          ],
+          [
+            "R793",
+            1793005520386
+          ],
+          [
+            "R502",
+            1792891646171
+          ],
+          [
+            "R580",
+            1792891650267
+          ],
+          [
+            "R637",
+            1792995564560
+          ],
+          [
+            "R638",
+            1792995565486
+          ],
+          [
+            "R493",
+            1792646055252
+          ],
+          [
+            "R766",
+            1792646058802
+          ],
+          [
+            "R683",
+            1792796773963
+          ],
+          [
+            "R359",
+            1793005504288
+          ],
+          [
+            "R574",
+            1792646073043
+          ],
+          [
+            "R765",
+            1792646045844
+          ],
+          [
+            "R617",
+            1792587668484
+          ],
+          [
+            "R581",
+            1792804143017
+          ],
+          [
+            "R389",
+            1793005505632
+          ],
+          [
+            "R703",
+            1792559787628
+          ],
+          [
+            "R643",
+            1792559789807
+          ],
+          [
+            "R557",
+            1792653801249
+          ],
+          [
+            "R390",
+            1793005506557
+          ]
+        ],
+        "targets": [
+          {
+            "available": false,
+            "availableObservedAt": null,
+            "burstUntil": 1792891559563,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 4,
+              "lastError": "http_error",
+              "lastFailureAt": 1792892118316,
+              "lastPersistedAt": 1793005503998,
+              "lastPersistedSuccessAt": 1793005503402,
+              "lastRequestAt": 1793005502571,
+              "lastSuccessAt": 1793005503402,
+              "latency": {
+                "count": 2802,
+                "maxMs": 7817,
+                "sumMs": 1756061
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 0,
+              "requestInterval": {
+                "count": 2801,
+                "maxMs": 246517,
+                "sumMs": 170994536
+              },
+              "requests": 2802,
+              "successInterval": {
+                "count": 2797,
+                "maxMs": 246456,
+                "sumMs": 170994443
+              },
+              "successes": 2798
+            },
+            "key": "R320|MK2M4CH/A,MK2P4CH/A,MK2T4CH/A,MK2U4CH/A",
+            "nextDueAt": 1793005560000,
+            "trackedAt": 1792834442114
+          },
+          {
+            "available": false,
+            "availableObservedAt": null,
+            "burstUntil": 1792892024005,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 8,
+              "lastError": "observation_persistence_failed",
+              "lastFailureAt": 1792897098655,
+              "lastPersistedAt": 1793005504640,
+              "lastPersistedSuccessAt": 1793005504288,
+              "lastRequestAt": 1793005502571,
+              "lastSuccessAt": 1793005504288,
+              "latency": {
+                "count": 3439,
+                "maxMs": 4815,
+                "sumMs": 1690596
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 1,
+              "requestInterval": {
+                "count": 3438,
+                "maxMs": 243917,
+                "sumMs": 208656410
+              },
+              "requests": 3439,
+              "successInterval": {
+                "count": 3430,
+                "maxMs": 245281,
+                "sumMs": 208656500
+              },
+              "successes": 3431
+            },
+            "key": "R359|MK2P4CH/A,MK2T4CH/A",
+            "nextDueAt": 1793005560000,
+            "trackedAt": 1792796821437
+          },
+          {
+            "available": false,
+            "availableObservedAt": null,
+            "burstUntil": 1792725406028,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 24,
+              "lastError": "The operation was aborted due to timeout",
+              "lastFailureAt": 1792945664903,
+              "lastPersistedAt": 1793005505871,
+              "lastPersistedSuccessAt": 1793005505370,
+              "lastRequestAt": 1793005504640,
+              "lastSuccessAt": 1793005505370,
+              "latency": {
+                "count": 5902,
+                "maxMs": 8003,
+                "sumMs": 3164474
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 1,
+              "requestInterval": {
+                "count": 5901,
+                "maxMs": 246491,
+                "sumMs": 359396681
+              },
+              "requests": 5902,
+              "successInterval": {
+                "count": 5877,
+                "maxMs": 246705,
+                "sumMs": 359395760
+              },
+              "successes": 5878
+            },
+            "key": "R388|MK2P4CH/A,MK2Q4CH/A,MK2T4CH/A,MK2U4CH/A",
+            "nextDueAt": 1793005560000,
+            "trackedAt": 1792646101822
+          },
+          {
+            "available": false,
+            "availableObservedAt": null,
+            "burstUntil": 0,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 9,
+              "lastError": "observation_persistence_failed",
+              "lastFailureAt": 1792923795410,
+              "lastPersistedAt": 1793005505924,
+              "lastPersistedSuccessAt": 1793005505632,
+              "lastRequestAt": 1793005504640,
+              "lastSuccessAt": 1793005505632,
+              "latency": {
+                "count": 4092,
+                "maxMs": 3973,
+                "sumMs": 2082357
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 2,
+              "requestInterval": {
+                "count": 4091,
+                "maxMs": 245307,
+                "sumMs": 249334077
+              },
+              "requests": 4092,
+              "successInterval": {
+                "count": 4082,
+                "maxMs": 245336,
+                "sumMs": 249334214
+              },
+              "successes": 4083
+            },
+            "key": "R389|MK2P4CH/A,MK2T4CH/A",
+            "nextDueAt": 1793005560000,
+            "trackedAt": 1792756141761
+          },
+          {
+            "available": false,
+            "availableObservedAt": null,
+            "burstUntil": 0,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 14,
+              "lastError": "observation_persistence_failed",
+              "lastFailureAt": 1792909546077,
+              "lastPersistedAt": 1793005506995,
+              "lastPersistedSuccessAt": 1793005506557,
+              "lastRequestAt": 1793005505924,
+              "lastSuccessAt": 1793005506557,
+              "latency": {
+                "count": 4106,
+                "maxMs": 3075,
+                "sumMs": 2121597
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 1,
+              "requestInterval": {
+                "count": 4105,
+                "maxMs": 246410,
+                "sumMs": 249333316
+              },
+              "requests": 4106,
+              "successInterval": {
+                "count": 4091,
+                "maxMs": 247353,
+                "sumMs": 249332693
+              },
+              "successes": 4092
+            },
+            "key": "R390|MK2P4CH/A,MK2T4CH/A",
+            "nextDueAt": 1793005560000,
+            "trackedAt": 1792756141761
+          },
+          {
+            "available": false,
+            "availableObservedAt": null,
+            "burstUntil": 1792711909036,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 39,
+              "lastError": "The operation was aborted due to timeout",
+              "lastFailureAt": 1793005454760,
+              "lastPersistedAt": 1793005507629,
+              "lastPersistedSuccessAt": 1793005507222,
+              "lastRequestAt": 1793005505924,
+              "lastSuccessAt": 1793005507222,
+              "latency": {
+                "count": 11215,
+                "maxMs": 8003,
+                "sumMs": 5612863
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 0,
+              "requestInterval": {
+                "count": 11214,
+                "maxMs": 36276220,
+                "sumMs": 832860017
+              },
+              "requests": 11215,
+              "successInterval": {
+                "count": 11175,
+                "maxMs": 36276244,
+                "sumMs": 832859267
+              },
+              "successes": 11176
+            },
+            "key": "R401|MK2P4CH/A",
+            "nextDueAt": 1793005560000,
+            "trackedAt": 1792172641054
+          },
+          {
+            "available": false,
+            "availableObservedAt": null,
+            "burstUntil": 0,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 3,
+              "lastError": "http_error",
+              "lastFailureAt": 1792912399439,
+              "lastPersistedAt": 1793005509324,
+              "lastPersistedSuccessAt": 1793005508639,
+              "lastRequestAt": 1793005507830,
+              "lastSuccessAt": 1793005508639,
+              "latency": {
+                "count": 2797,
+                "maxMs": 7981,
+                "sumMs": 1585177
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 0,
+              "requestInterval": {
+                "count": 2796,
+                "maxMs": 246903,
+                "sumMs": 170931323
+              },
+              "requests": 2797,
+              "successInterval": {
+                "count": 2793,
+                "maxMs": 247687,
+                "sumMs": 170930981
+              },
+              "successes": 2794
+            },
+            "key": "R448|MK2M4CH/A,MK2P4CH/A,MK2Q4CH/A,MK2T4CH/A,MK2U4CH/A",
+            "nextDueAt": 1793005560000,
+            "trackedAt": 1792834561053
+          },
+          {
+            "available": false,
+            "availableObservedAt": null,
+            "burstUntil": 1792972781243,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 33,
+              "lastError": "The operation was aborted due to timeout",
+              "lastFailureAt": 1792987630497,
+              "lastPersistedAt": 1793005509553,
+              "lastPersistedSuccessAt": 1793005509238,
+              "lastRequestAt": 1793005507830,
+              "lastSuccessAt": 1793005509238,
+              "latency": {
+                "count": 5939,
+                "maxMs": 8004,
+                "sumMs": 2961168
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 0,
+              "requestInterval": {
+                "count": 5938,
+                "maxMs": 246903,
+                "sumMs": 359333817
+              },
+              "requests": 5939,
+              "successInterval": {
+                "count": 5905,
+                "maxMs": 246952,
+                "sumMs": 359334206
+              },
+              "successes": 5906
+            },
+            "key": "R471|MK2P4CH/A",
+            "nextDueAt": 1793005560000,
+            "trackedAt": 1792646101822
+          },
+          {
+            "available": false,
+            "availableObservedAt": null,
+            "burstUntil": 0,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 5,
+              "lastError": "The operation was aborted due to timeout",
+              "lastFailureAt": 1792940453190,
+              "lastPersistedAt": 1793005510651,
+              "lastPersistedSuccessAt": 1793005510165,
+              "lastRequestAt": 1793005509553,
+              "lastSuccessAt": 1793005510165,
+              "latency": {
+                "count": 2799,
+                "maxMs": 3975,
+                "sumMs": 1631640
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 0,
+              "requestInterval": {
+                "count": 2798,
+                "maxMs": 247953,
+                "sumMs": 170872541
+              },
+              "requests": 2799,
+              "successInterval": {
+                "count": 2793,
+                "maxMs": 248548,
+                "sumMs": 170871954
+              },
+              "successes": 2794
+            },
+            "key": "R479|MK2M4CH/A,MK2P4CH/A,MK2T4CH/A,MK2U4CH/A",
+            "nextDueAt": 1793005560000,
+            "trackedAt": 1792834561053
+          },
+          {
+            "available": false,
+            "availableObservedAt": null,
+            "burstUntil": 1793000796576,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 9,
+              "lastError": "observation_persistence_failed",
+              "lastFailureAt": 1792988405112,
+              "lastPersistedAt": 1793005511363,
+              "lastPersistedSuccessAt": 1793005511084,
+              "lastRequestAt": 1793005509553,
+              "lastSuccessAt": 1793005511084,
+              "latency": {
+                "count": 2955,
+                "maxMs": 8002,
+                "sumMs": 1624337
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 4,
+              "requestInterval": {
+                "count": 2954,
+                "maxMs": 247953,
+                "sumMs": 173148658
+              },
+              "requests": 2955,
+              "successInterval": {
+                "count": 2945,
+                "maxMs": 248313,
+                "sumMs": 173149124
+              },
+              "successes": 2946
+            },
+            "key": "R484|MK2M4CH/A,MK2P4CH/A,MK2Q4CH/A",
+            "nextDueAt": 1793005560000,
+            "trackedAt": 1792832341512
+          },
+          {
+            "available": false,
+            "availableObservedAt": null,
+            "burstUntil": 1792935646215,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 20,
+              "lastError": "The operation was aborted due to timeout",
+              "lastFailureAt": 1792936485708,
+              "lastPersistedAt": 1793005512147,
+              "lastPersistedSuccessAt": 1793005511912,
+              "lastRequestAt": 1793005511364,
+              "lastSuccessAt": 1793005511912,
+              "latency": {
+                "count": 5896,
+                "maxMs": 7572,
+                "sumMs": 2847814
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 0,
+              "requestInterval": {
+                "count": 5895,
+                "maxMs": 251262,
+                "sumMs": 359335541
+              },
+              "requests": 5896,
+              "successInterval": {
+                "count": 5875,
+                "maxMs": 250332,
+                "sumMs": 359335362
+              },
+              "successes": 5876
+            },
+            "key": "R532|MK2P4CH/A",
+            "nextDueAt": 1793005560000,
+            "trackedAt": 1792646101822
+          },
+          {
+            "available": false,
+            "availableObservedAt": null,
+            "burstUntil": 1792706205426,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 21,
+              "lastError": "http_error",
+              "lastFailureAt": 1792897103270,
+              "lastPersistedAt": 1793005512991,
+              "lastPersistedSuccessAt": 1793005512633,
+              "lastRequestAt": 1793005511364,
+              "lastSuccessAt": 1793005512633,
+              "latency": {
+                "count": 5903,
+                "maxMs": 8003,
+                "sumMs": 2973124
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 0,
+              "requestInterval": {
+                "count": 5902,
+                "maxMs": 248252,
+                "sumMs": 359335541
+              },
+              "requests": 5903,
+              "successInterval": {
+                "count": 5881,
+                "maxMs": 249040,
+                "sumMs": 359335327
+              },
+              "successes": 5882
+            },
+            "key": "R575|MK2T4CH/A",
+            "nextDueAt": 1793005560000,
+            "trackedAt": 1792646101822
+          },
+          {
+            "available": true,
+            "availableObservedAt": 1793005513882,
+            "burstUntil": 0,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 2,
+              "lastError": "observation_persistence_failed",
+              "lastFailureAt": 1792995789061,
+              "lastPersistedAt": 1793005514161,
+              "lastPersistedSuccessAt": 1793005513882,
+              "lastRequestAt": 1793005513219,
+              "lastSuccessAt": 1793005513882,
+              "latency": {
+                "count": 418,
+                "maxMs": 1849,
+                "sumMs": 231109
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 3,
+              "requestInterval": {
+                "count": 417,
+                "maxMs": 254880,
+                "sumMs": 28073422
+              },
+              "requests": 418,
+              "successInterval": {
+                "count": 415,
+                "maxMs": 287644,
+                "sumMs": 28072763
+              },
+              "successes": 416
+            },
+            "key": "R577|MJTF4CH/A,MK2P4CH/A",
+            "nextDueAt": 1793005560000,
+            "trackedAt": 1792977421413
+          },
+          {
+            "available": false,
+            "availableObservedAt": null,
+            "burstUntil": 1792719594525,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 30,
+              "lastError": "The operation was aborted due to timeout",
+              "lastFailureAt": 1792977988376,
+              "lastPersistedAt": 1793005514812,
+              "lastPersistedSuccessAt": 1793005514546,
+              "lastRequestAt": 1793005513219,
+              "lastSuccessAt": 1793005514546,
+              "latency": {
+                "count": 5930,
+                "maxMs": 8002,
+                "sumMs": 3027715
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 0,
+              "requestInterval": {
+                "count": 5929,
+                "maxMs": 260411,
+                "sumMs": 359380770
+              },
+              "requests": 5930,
+              "successInterval": {
+                "count": 5899,
+                "maxMs": 259375,
+                "sumMs": 359380588
+              },
+              "successes": 5900
+            },
+            "key": "R579|MK2P4CH/A",
+            "nextDueAt": 1793005560000,
+            "trackedAt": 1792646101822
+          },
+          {
+            "available": true,
+            "availableObservedAt": 1793005515466,
+            "burstUntil": 0,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 0,
+              "lastError": "observation_persistence_failed",
+              "lastFailureAt": null,
+              "lastPersistedAt": 1793005515722,
+              "lastPersistedSuccessAt": 1793005515466,
+              "lastRequestAt": 1793005514813,
+              "lastSuccessAt": 1793005515466,
+              "latency": {
+                "count": 420,
+                "maxMs": 1912,
+                "sumMs": 236754
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 7,
+              "requestInterval": {
+                "count": 419,
+                "maxMs": 243016,
+                "sumMs": 28077073
+              },
+              "requests": 420,
+              "successInterval": {
+                "count": 419,
+                "maxMs": 243918,
+                "sumMs": 28076393
+              },
+              "successes": 420
+            },
+            "key": "R639|MJTF4CH/A,MK2P4CH/A",
+            "nextDueAt": 1793005560000,
+            "trackedAt": 1792977421413
+          },
+          {
+            "available": true,
+            "availableObservedAt": 1793005515809,
+            "burstUntil": 0,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 28,
+              "lastError": "http_error",
+              "lastFailureAt": 1792995790569,
+              "lastPersistedAt": 1793005516050,
+              "lastPersistedSuccessAt": 1793005515809,
+              "lastRequestAt": 1793005514813,
+              "lastSuccessAt": 1793005515809,
+              "latency": {
+                "count": 4685,
+                "maxMs": 7820,
+                "sumMs": 2528898
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 0,
+              "requestInterval": {
+                "count": 4684,
+                "maxMs": 446521265,
+                "sumMs": 832851068
+              },
+              "requests": 4685,
+              "successInterval": {
+                "count": 4656,
+                "maxMs": 446521800,
+                "sumMs": 832850509
+              },
+              "successes": 4657
+            },
+            "key": "R644|MJTA4CH/A",
+            "nextDueAt": 1793005560000,
+            "trackedAt": 1792172641054
+          },
+          {
+            "available": false,
+            "availableObservedAt": null,
+            "burstUntil": 1792977349918,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 37,
+              "lastError": "http_error",
+              "lastFailureAt": 1792912397191,
+              "lastPersistedAt": 1793005517161,
+              "lastPersistedSuccessAt": 1793005516648,
+              "lastRequestAt": 1793005516051,
+              "lastSuccessAt": 1793005516648,
+              "latency": {
+                "count": 11820,
+                "maxMs": 8003,
+                "sumMs": 6951571
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 0,
+              "requestInterval": {
+                "count": 11819,
+                "maxMs": 17569535,
+                "sumMs": 826690918
+              },
+              "requests": 11820,
+              "successInterval": {
+                "count": 11782,
+                "maxMs": 17569166,
+                "sumMs": 826690412
+              },
+              "successes": 11783
+            },
+            "key": "R645|MK2M4CH/A,MK2P4CH/A,MK2T4CH/A,MK2U4CH/A",
+            "nextDueAt": 1793005560000,
+            "trackedAt": 1792178821399
+          },
+          {
+            "available": false,
+            "availableObservedAt": null,
+            "burstUntil": 1792935649539,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 14,
+              "lastError": "observation_persistence_failed",
+              "lastFailureAt": 1792935645748,
+              "lastPersistedAt": 1793005517765,
+              "lastPersistedSuccessAt": 1793005517514,
+              "lastRequestAt": 1793005516051,
+              "lastSuccessAt": 1793005517514,
+              "latency": {
+                "count": 4847,
+                "maxMs": 6013,
+                "sumMs": 2502825
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 1,
+              "requestInterval": {
+                "count": 4846,
+                "maxMs": 253094,
+                "sumMs": 293929780
+              },
+              "requests": 4847,
+              "successInterval": {
+                "count": 4832,
+                "maxMs": 253546,
+                "sumMs": 293929844
+              },
+              "successes": 4833
+            },
+            "key": "R678|MK2P4CH/A,MK2T4CH/A",
+            "nextDueAt": 1793005560000,
+            "trackedAt": 1792711561032
+          },
+          {
+            "available": false,
+            "availableObservedAt": null,
+            "burstUntil": 1792935644836,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 14,
+              "lastError": "observation_persistence_failed",
+              "lastFailureAt": 1792935491330,
+              "lastPersistedAt": 1793005518697,
+              "lastPersistedSuccessAt": 1793005518443,
+              "lastRequestAt": 1793005517902,
+              "lastSuccessAt": 1793005518443,
+              "latency": {
+                "count": 2879,
+                "maxMs": 3546,
+                "sumMs": 1563786
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 5,
+              "requestInterval": {
+                "count": 2878,
+                "maxMs": 260693,
+                "sumMs": 173096071
+              },
+              "requests": 2879,
+              "successInterval": {
+                "count": 2864,
+                "maxMs": 260497,
+                "sumMs": 173094770
+              },
+              "successes": 2865
+            },
+            "key": "R761|MK2M4CH/A,MK2P4CH/A,MK2Q4CH/A",
+            "nextDueAt": 1793005560000,
+            "trackedAt": 1792832341512
+          },
+          {
+            "available": false,
+            "availableObservedAt": null,
+            "burstUntil": 1792713953469,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 63,
+              "lastError": "The operation was aborted due to timeout",
+              "lastFailureAt": 1792933248083,
+              "lastPersistedAt": 1793005519605,
+              "lastPersistedSuccessAt": 1793005519137,
+              "lastRequestAt": 1793005517902,
+              "lastSuccessAt": 1793005519137,
+              "latency": {
+                "count": 11794,
+                "maxMs": 8001,
+                "sumMs": 6851240
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 2,
+              "requestInterval": {
+                "count": 11793,
+                "maxMs": 17541449,
+                "sumMs": 826692769
+              },
+              "requests": 11794,
+              "successInterval": {
+                "count": 11730,
+                "maxMs": 17541817,
+                "sumMs": 826692726
+              },
+              "successes": 11731
+            },
+            "key": "R792|MK2P4CH/A,MK2Q4CH/A,MK2T4CH/A,MK2U4CH/A",
+            "nextDueAt": 1793005560000,
+            "trackedAt": 1792178821399
+          },
+          {
+            "available": false,
+            "availableObservedAt": null,
+            "burstUntil": 1792975611848,
+            "failures": 0,
+            "guardReason": null,
+            "guardUntil": 0,
+            "health": {
+              "consecutiveFailures": 0,
+              "failures": 8,
+              "lastError": "observation_persistence_failed",
+              "lastFailureAt": 1792945642666,
+              "lastPersistedAt": 1793005520635,
+              "lastPersistedSuccessAt": 1793005520386,
+              "lastRequestAt": 1793005519818,
+              "lastSuccessAt": 1793005520386,
+              "latency": {
+                "count": 2853,
+                "maxMs": 8001,
+                "sumMs": 1576010
+              },
+              "persistenceFailed": false,
+              "persistenceFailures": 6,
+              "requestInterval": {
+                "count": 2852,
+                "maxMs": 260347,
+                "sumMs": 173112117
+              },
+              "requests": 2853,
+              "successInterval": {
+                "count": 2844,
+                "maxMs": 260763,
+                "sumMs": 173111504
+              },
+              "successes": 2845
+            },
+            "key": "R793|MK2M4CH/A,MK2P4CH/A,MK2Q4CH/A",
+            "nextDueAt": 1793005560000,
+            "trackedAt": 1792832341512
+          }
+        ],
+        "version": 1
+      },
+      "state": "running",
+      "stats": {
+        "batches": 21,
+        "events": 0,
+        "lastBatchAt": "2026-10-26T09:05:20.635Z",
+        "notificationConfigReads": 4,
+        "notificationEmptyPassesSkipped": 28,
+        "notificationPasses": 32,
+        "observations": 52,
+        "sent": 0,
+        "tasks": 0
+      },
+      "updatedAt": "2026-10-26T09:05:20.790Z"
+    }
+  ]
+}

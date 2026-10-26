@@ -74,7 +74,11 @@ test('frequency is once per Beijing date and dismissal applies to this launch re
 
 test('query and Mine help open the buying guide without performing business actions', () => {
   const rt = runtime(), routes = [], scrolls = [];
-  rt.wx.navigateTo = value => routes.push(value.url);
+  rt.wx.navigateTo = value => {
+    routes.push(value.url);
+    value.success({ errMsg: 'navigateTo:ok' });
+    value.complete({ errMsg: 'navigateTo:ok' });
+  };
   rt.wx.pageScrollTo = value => scrolls.push(value);
   const query = rt.instance('pages/query/index.js'), mine = rt.instance('pages/mine/index.js');
   query.onOpenGuide(); mine.onHelp();
@@ -122,8 +126,14 @@ test('old calendar links retain their target and return path while opening curre
 test('guide actions preserve all four buying stages and explicit test-notification navigation', () => {
   const rt = runtime();
   const navigations = [];
-  rt.wx.switchTab = options => navigations.push(options.url);
-  rt.wx.navigateTo = options => navigations.push(options.url);
+  // These are separate completed visits, not rapid taps during one transition.
+  const completeNavigation = options => {
+    navigations.push(options.url);
+    options.success({ errMsg: 'navigation:ok' });
+    options.complete({ errMsg: 'navigation:ok' });
+  };
+  rt.wx.switchTab = completeNavigation;
+  rt.wx.navigateTo = completeNavigation;
   rt.wx.setClipboardData = () => { throw new Error('guide must not copy an external link'); };
   const page = rt.instance('pages/guide/index.js');
   page.onLoad({ stage: 'unknown', section: 'faq' });

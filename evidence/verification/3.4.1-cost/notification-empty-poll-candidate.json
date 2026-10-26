@@ -1,0 +1,188 @@
+{
+  "checkedAt": "2026-10-26T09:00:51.105Z",
+  "offline": true,
+  "scope": "Current collector control flow and repository-method counts, not metered CloudBase units or historical billing attribution.",
+  "conditions": {
+    "groups": 21,
+    "sampleTargets": 52,
+    "syntheticMemberAccounts": 21,
+    "activeFollowDocuments": 52,
+    "notificationsEnabled": true,
+    "senderAuthReady": true,
+    "subscriptionCredits": 0,
+    "newEvents": 0,
+    "realSends": 0,
+    "databaseMethodLatencyMs": 200,
+    "fakeUpstreamLatencyMs": 800,
+    "oldCheckpoint": false
+  },
+  "collectorHash": "9f8497462ccbb201ec0312a9e56d241c947df86d154a2f425c7b624cb767e371",
+  "recordedDeployedHash": "94b0a1b331dfb70d97e9d7b70d731d3f65c65c7985ff1d2b321ffddd98eb96d4",
+  "matchesRecordedDeployment": false,
+  "limitations": [
+    "Synthetic user/follow distribution and zero subscription credits are not claims about current production accounts.",
+    "Repository methods may issue multiple SDK/database operations; counts are not invoice API or document units.",
+    "The memory repository uses its own transactional implementation, so this audit does not measure production SDK transaction cost.",
+    "Day-retention work appears on the first synthetic invocation; production does it only when due.",
+    "No new event or send in this fixture does not make every polling read removable: external manual events and eligibility changes may arrive during a real invocation.",
+    "The parent agent confirmed production upstream_breaker exists at generation 39, with no active reason/until/failures; the absent-breaker fallback is not a current overhead claim."
+  ],
+  "cases": [
+    {
+      "available": true,
+      "offline": true,
+      "groupCount": 21,
+      "maxActiveHttp": 2,
+      "rows": [
+        {
+          "minute": 0,
+          "observations": 52,
+          "events": 0,
+          "sent": 0,
+          "scanned": 21,
+          "requests": 21,
+          "uniqueStores": 21,
+          "elapsedMs": 21800,
+          "startsMs": [
+            1200,
+            1400,
+            2800,
+            3000,
+            4400,
+            4600,
+            6000,
+            6200,
+            7800,
+            8000,
+            9400,
+            9600,
+            11000,
+            11200,
+            12800,
+            13000,
+            14400,
+            14600,
+            16000,
+            16200,
+            17800
+          ],
+          "phaseRemainders": [
+            0
+          ],
+          "cadenceMode": "fixed",
+          "intervalMs": 60000,
+          "deadlineReached": false,
+          "admissionUntil": 0,
+          "breakerUntil": null,
+          "repoCalls": {
+            "acquireLease": 5,
+            "getCollectorStatus": 1,
+            "getConfig": 13,
+            "listActiveFollows": 13,
+            "getUsers": 13,
+            "saveCollectorStatus": 5,
+            "consumeCollectorBudget": 21,
+            "reconcileExpiredNotifications": 1,
+            "listUnprocessedEvents": 23,
+            "recordUpstreamOutcome": 21,
+            "listPendingNotifications": 23,
+            "recordObservation": 52,
+            "getRetentionStatus": 1,
+            "purgeExpiredData": 1,
+            "purgeGrowthData": 1,
+            "saveRetentionStatus": 1,
+            "releaseLease": 1
+          }
+        }
+      ],
+      "callsites": {
+        "getConfig:at Object.refreshTargets": 1,
+        "listActiveFollows:at Object.refreshTargets": 1,
+        "getUsers:at Object.refreshTargets": 1,
+        "getConfig:at notificationPass": 12,
+        "listUnprocessedEvents:at firstEventPage": 23,
+        "listActiveFollows:at planCurrentAvailability": 12,
+        "getUsers:at planCurrentAvailability": 12,
+        "listPendingNotifications:at notificationPass": 23
+      }
+    },
+    {
+      "available": false,
+      "offline": true,
+      "groupCount": 21,
+      "maxActiveHttp": 2,
+      "rows": [
+        {
+          "minute": 0,
+          "observations": 52,
+          "events": 0,
+          "sent": 0,
+          "scanned": 21,
+          "requests": 21,
+          "uniqueStores": 21,
+          "elapsedMs": 21000,
+          "startsMs": [
+            1200,
+            1400,
+            2800,
+            3000,
+            4400,
+            4600,
+            6000,
+            6200,
+            7800,
+            8000,
+            9400,
+            9600,
+            11000,
+            11200,
+            12800,
+            13000,
+            14400,
+            14600,
+            16000,
+            16200,
+            17800
+          ],
+          "phaseRemainders": [
+            0
+          ],
+          "cadenceMode": "fixed",
+          "intervalMs": 60000,
+          "deadlineReached": false,
+          "admissionUntil": 0,
+          "breakerUntil": null,
+          "repoCalls": {
+            "acquireLease": 4,
+            "getCollectorStatus": 1,
+            "getConfig": 2,
+            "listActiveFollows": 2,
+            "getUsers": 2,
+            "saveCollectorStatus": 5,
+            "consumeCollectorBudget": 21,
+            "reconcileExpiredNotifications": 1,
+            "listUnprocessedEvents": 26,
+            "recordUpstreamOutcome": 21,
+            "listPendingNotifications": 26,
+            "recordObservation": 52,
+            "getRetentionStatus": 1,
+            "purgeExpiredData": 1,
+            "purgeGrowthData": 1,
+            "saveRetentionStatus": 1,
+            "releaseLease": 1
+          }
+        }
+      ],
+      "callsites": {
+        "getConfig:at Object.refreshTargets": 1,
+        "listActiveFollows:at Object.refreshTargets": 1,
+        "getUsers:at Object.refreshTargets": 1,
+        "getConfig:at notificationPass": 1,
+        "listUnprocessedEvents:at firstEventPage": 26,
+        "listActiveFollows:at planCurrentAvailability": 1,
+        "getUsers:at planCurrentAvailability": 1,
+        "listPendingNotifications:at notificationPass": 26
+      }
+    }
+  ]
+}

@@ -99,7 +99,7 @@ test('test page resumes the original result after sign-in without sending or rec
   const requestId = 'test-original-001';
   const rt = runtime(async () => ({ userKey: 'alice', ready: true, balance: 2, templateId: 'test-template',
     test: { requestId, status: 'accepted', charged: 1, refunded: 0, feedback: 'received' } }));
-  owner(rt); const navigations = []; rt.wx.switchTab = value => navigations.push(value.url);
+  owner(rt); const navigations = []; rt.wx.switchTab = value => { navigations.push(value.url); value.complete({ errMsg: 'switchTab:ok' }); };
   const page = rt.instance('pages/notification-test/index.js');
   await page.onLoad({ from: 'follow', requestId, resume: '1' }); await page.onShow();
   assert.equal(page.openedFromMessage, false);

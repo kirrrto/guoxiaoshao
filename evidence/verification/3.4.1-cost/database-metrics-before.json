@@ -1,0 +1,124 @@
+{
+  "read": {
+    "EnvId": "flowermean-6gjaxfqhf6c13e88",
+    "MetricName": "DbRead",
+    "StartTime": "2026-10-26 11:30:00",
+    "EndTime": "2026-10-26 12:20:00",
+    "TimeSource": "params",
+    "Period": 300,
+    "Curve": {
+      "EndTime": "2026-10-26 12:20:00",
+      "MetricName": "DbRead",
+      "NewValues": [
+        3760,
+        2604,
+        2895,
+        2267,
+        4958,
+        3404,
+        2835,
+        2880,
+        3495,
+        2813
+      ],
+      "Period": 300,
+      "RequestId": "c4d8cea5-3319-46e9-a413-bd4db297d7a5",
+      "StartTime": "2026-10-26 11:30:00",
+      "Statistics": "sum",
+      "Time": [
+        1792985400,
+        1792985700,
+        1792986000,
+        1792986300,
+        1792986600,
+        1792986900,
+        1792987200,
+        1792987500,
+        1792987800,
+        1792988100
+      ],
+      "Values": [
+        3760,
+        2604,
+        2895,
+        2267,
+        4958,
+        3404,
+        2835,
+        2880,
+        3495,
+        2813
+      ]
+    },
+    "Summary": {
+      "sampleCount": 10,
+      "max": 4958,
+      "min": 2267,
+      "avg": 3191.1,
+      "latest": 2813,
+      "peakTimestamp": 1792986600,
+      "allZero": false
+    }
+  },
+  "write": {
+    "EnvId": "flowermean-6gjaxfqhf6c13e88",
+    "MetricName": "DbWrite",
+    "StartTime": "2026-10-26 11:30:00",
+    "EndTime": "2026-10-26 12:20:00",
+    "TimeSource": "params",
+    "Period": 300,
+    "Curve": {
+      "EndTime": "2026-10-26 12:20:00",
+      "MetricName": "DbWrite",
+      "NewValues": [
+        5329,
+        3586,
+        4018,
+        3179,
+        7035,
+        4809,
+        4010,
+        4080,
+        5033,
+        3949
+      ],
+      "Period": 300,
+      "RequestId": "d3553e4e-8df5-4a92-9d11-daed986f1362",
+      "StartTime": "2026-10-26 11:30:00",
+      "Statistics": "sum",
+      "Time": [
+        1792985400,
+        1792985700,
+        1792986000,
+        1792986300,
+        1792986600,
+        1792986900,
+        1792987200,
+        1792987500,
+        1792987800,
+        1792988100
+      ],
+      "Values": [
+        5329,
+        3586,
+        4018,
+        3179,
+        7035,
+        4809,
+        4010,
+        4080,
+        5033,
+        3949
+      ]
+    },
+    "Summary": {
+      "sampleCount": 10,
+      "max": 7035,
+      "min": 3179,
+      "avg": 4502.8,
+      "latest": 3949,
+      "peakTimestamp": 1792986600,
+      "allZero": false
+    }
+  }
+}

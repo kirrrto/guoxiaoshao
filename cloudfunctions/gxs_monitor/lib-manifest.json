@@ -23,8 +23,8 @@
     },
     {
       "path": "collections.js",
-      "bytes": 4412,
-      "sha256": "1092b23f72aa7c1733ffc5b7d33b1e9910850c375e9d507d41815b484b3ee614"
+      "bytes": 4481,
+      "sha256": "66fdf0de6355a8c5c70ea973996863bd9f40024c0426b7510b659b5c49de309f"
     },
     {
       "path": "config-audit.js",
@@ -48,8 +48,8 @@
     },
     {
       "path": "engine/collector.js",
-      "bytes": 25716,
-      "sha256": "e44df0c1ca9839ea16fd578d29591fba5f4baa1da4256f17bab2902e78e80f14"
+      "bytes": 29516,
+      "sha256": "9f8497462ccbb201ec0312a9e56d241c947df86d154a2f425c7b624cb767e371"
     },
     {
       "path": "engine/current-availability.js",
@@ -63,13 +63,13 @@
     },
     {
       "path": "engine/guarded-pickup.js",
-      "bytes": 2752,
-      "sha256": "4193b7d2e4a00f59c20c7e760c22bae1649a2c749c3b917493f8d352e9978d22"
+      "bytes": 4140,
+      "sha256": "59875e168d36bfd77549316ee4cf5e4fc90368669859fc6b0b6e603ae331bd13"
     },
     {
       "path": "engine/lease.js",
-      "bytes": 1390,
-      "sha256": "863379f4ac898ae6da4f15a21bd88097877edb1f8624faf120875034affa0e63"
+      "bytes": 2055,
+      "sha256": "d3d2767d50bd502eb90e2e9ecb1eb03f68dcb8dbb11177406fb1d3b0c200a6c7"
     },
     {
       "path": "engine/notifier.js",
@@ -98,8 +98,8 @@
     },
     {
       "path": "engine/scheduled.js",
-      "bytes": 9924,
-      "sha256": "64fbc145d9dd225c53761c10bb9999fb145f6540bb801d7708d779d0438da616"
+      "bytes": 9954,
+      "sha256": "4cb64f53a626e8fb23bc0d28b93a6f694ad3cbf7323280bc627307f9dd4556dc"
     },
     {
       "path": "engine/scheduler.js",
@@ -143,13 +143,13 @@
     },
     {
       "path": "repo/atomic-ops.js",
-      "bytes": 55347,
-      "sha256": "3bd235a658f30f86312388e852d25dce5b89458fec77363da4d06fb3a411a4a7"
+      "bytes": 55402,
+      "sha256": "7031043ebd77c65b4fd793928cfc78a1e0f0297e8c752c3b5cecde5b243ad9d5"
     },
     {
       "path": "repo/cloudbase-repo.js",
-      "bytes": 25487,
-      "sha256": "b3887555131942733cfae8e292250e4738a36efe65ef00a9c133243c7531fba7"
+      "bytes": 25768,
+      "sha256": "a5e9c975f04c0573d5e2dca2252ffcaf0da8e22de8c13240cbe0728c5010283c"
     },
     {
       "path": "repo/current-availability.js",
@@ -183,8 +183,8 @@
     },
     {
       "path": "repo/upstream-guard.js",
-      "bytes": 8222,
-      "sha256": "50d64cd91ad9f4c31014c6d18fda893eb0cc388ced4ca8edd877912c01036b69"
+      "bytes": 9131,
+      "sha256": "498c72087b9606864bc76e34e118591e7d739fce7e74536a5fa5ec8b3189bef7"
     },
     {
       "path": "rules/access.js",

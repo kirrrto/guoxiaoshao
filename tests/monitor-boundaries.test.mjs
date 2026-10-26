@@ -62,6 +62,87 @@ test('re-reading a waiting event cannot extend the 20-second quiet period', asyn
   assert.equal(s.sends.length, 0);
 });
 
+async function delayedWaitingFixture() {
+  const s = await collectorFixture();
+  const detectedAt = s.f.state.now.toISOString();
+  const result = await s.f.repo.recordObservation({ observation: { storeNumber: 'R577', partNumber: 'MJYH4CH/A', status: 'available',
+    observedAt: detectedAt, source: 'manual' } });
+  const event = result.events[0];
+  s.f.advance(50000);
+  await s.collector.lease.renew();
+  let hurries = 0;
+  const hurry = s.collector.scheduler.hurry;
+  s.collector.scheduler.hurry = (...args) => { hurries++; return hurry(...args); };
+  await s.collector.drainNotifications();
+  return { ...s, event, hurries: () => hurries };
+}
+
+test('late first discovery opens one confirmation window and repeated reads cannot renew it before final expiry', async () => {
+  const s = await delayedWaitingFixture();
+  assert.equal(s.hurries(), 1);
+  assert.equal(s.collector.scheduler.bursting(), true, 'the 50-second-old event is still useful even though its original burst expired');
+  for (let i = 0; i < 10; i++) {
+    s.f.advance(2000); await s.collector.lease.renew(); await s.collector.drainNotifications();
+  }
+  assert.equal(s.hurries(), 1);
+  assert.equal(s.collector.scheduler.bursting(), false, 'twenty seconds from first discovery still ends the quiet window');
+  s.f.advance(50000); await s.collector.lease.renew(); await s.collector.drainNotifications();
+  assert.equal(s.hurries(), 1, 'the original event-age boundary cannot restart a window');
+  s.f.advance(1); await s.collector.drainNotifications();
+  assert.equal(s.hurries(), 1);
+  const retired = await s.f.repo.getEvent(s.event._id);
+  assert.equal(retired.detectedAt, s.event.detectedAt);
+  assert.ok(retired.notificationPlannedAt, 'the expired waiting event is retired instead of rejuvenated');
+  assert.equal(s.sends.length, 0);
+});
+
+test('a replacement collector may confirm a still-valid waiting event once without extending repeats or expired events', async () => {
+  const s = await delayedWaitingFixture();
+  const checkpoint = s.collector.scheduler.checkpoint();
+  await s.collector.lease.release();
+  s.f.advance(10000);
+  const replacement = createCollector({ repo: s.f.repo, ownerId: 'replacement-confirmation', clock: () => new Date(s.f.state.now), log });
+  await replacement.lease.acquire(); await replacement.refreshTargets();
+  replacement.scheduler.restore(checkpoint, 60000);
+  let hurries = 0;
+  const hurry = replacement.scheduler.hurry;
+  replacement.scheduler.hurry = (...args) => { hurries++; return hurry(...args); };
+  await replacement.drainNotifications();
+  assert.equal(hurries, 1, 'the restarted worker may retry an event it has not yet confirmed');
+  for (let i = 0; i < 10; i++) {
+    s.f.advance(2000); await replacement.lease.renew(); await replacement.drainNotifications();
+  }
+  assert.equal(hurries, 1);
+  assert.equal(replacement.scheduler.bursting(), false);
+  s.f.advance(40001); await replacement.lease.renew(); await replacement.drainNotifications();
+  assert.equal(hurries, 1, 'the event retains its original 120-second expiry across workers');
+  await replacement.lease.release();
+});
+
+test('waiting-event memory is bounded without evicting live entries and expired entries free capacity', async () => {
+  const s = await collectorFixture();
+  let current;
+  s.f.repo.listUnprocessedEvents = async () => [current];
+  s.f.repo.getLatest = async () => [{ _id: 'R577|MJYH4CH/A', status: 'available', statusSince: current.detectedAt,
+    knownAt: current.detectedAt, knownStreakSince: current.detectedAt, observedAt: current.detectedAt }];
+  const makeEvent = id => ({ _id: id, storeNumber: 'R577', partNumber: 'MJYH4CH/A', type: 'first_seen_available', status: 'available', detectedAt: s.f.state.now.toISOString() });
+  let hurries = 0;
+  const hurry = s.collector.scheduler.hurry;
+  s.collector.scheduler.hurry = (...args) => { hurries++; return hurry(...args); };
+  const first = makeEvent('waiting-0');
+  for (let i = 0; i <= 4096; i++) {
+    current = makeEvent(`waiting-${i}`); await s.collector.drainNotifications();
+  }
+  assert.equal(hurries, 4096, 'excess distinct events cannot grow the confirmation map without bound');
+  current = first; await s.collector.drainNotifications();
+  assert.equal(hurries, 4096, 'capacity pressure must not evict a live key and restart its burst');
+  s.f.advance(120001); await s.collector.lease.renew();
+  current = makeEvent('fresh-after-expiry'); await s.collector.drainNotifications();
+  assert.equal(hurries, 4097, 'expired entries no longer prevent new valid confirmation work');
+  await s.collector.drainNotifications();
+  assert.equal(hurries, 4097);
+});
+
 test('unconfirmed stock separated by an unknown sample cannot create a phantom sold-out alert', async () => {
   const s = await collectorFixture();
   for (const status of ['unavailable', 'available', 'unknown', 'available', 'unavailable', 'unavailable']) await s.observe(status);

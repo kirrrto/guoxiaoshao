@@ -1,3 +1,4 @@
+const navigation = require('../../utils/navigation');
 const { call, newId, showError } = require('../../utils/api');
 const { publishQuota, publishQueryBalance, resetSession } = require('../../utils/store');
 const { sourceOf, stageTestReturn, returnToSource } = require('../../utils/journey-context');
@@ -49,6 +50,7 @@ Page({
     await this.loadStatus();
   },
   onShow() {
+    navigation.confirmNavigation('pages/notification-test/index');
     this.visible = true;
     const bootstrapOwner = this.bootstrapOwner();
     if (bootstrapOwner && this.userKey && bootstrapOwner !== this.userKey) this.stopChangedAccount();
@@ -287,11 +289,11 @@ Page({
     returnToSource(this.returnSource, this.returnOwner);
   },
   onGoMine() {
-    if (this.data.busy || this.data.loading || !this.contextCurrent(this.accountContext())) return;
+    if (navigation.isNavigating() || this.data.busy || this.data.loading || !this.contextCurrent(this.accountContext())) return;
     const requestId = this.routeRequestId || this.data.test && this.data.test.requestId || this.pending && this.pending.requestId;
     if (!stageTestReturn({ from: this.returnSource, requestId, ownerUserKey: this.userKey })) return;
     getApp().globalData.pendingMineSection = 'quota-card';
-    wx.switchTab({ url: '/pages/mine/index' });
+    navigation.switchTab({ url: '/pages/mine/index' });
   },
   onToggleTestRules() { this.setData({ showTestRules: !this.data.showTestRules }); },
   onToggleTroubleshooting() { this.setData({ showTroubleshooting: !this.data.showTroubleshooting }); },

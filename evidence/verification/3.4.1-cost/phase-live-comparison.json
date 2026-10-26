@@ -1,0 +1,1310 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-10-26T08:18:51.952Z",
+  "before": {
+    "window": {
+      "start": "2026-10-26T15:38:00+08:00",
+      "end": "2026-10-26T15:41:00+08:00"
+    },
+    "groupCount": 21,
+    "samples": 156,
+    "access": {
+      "total": 2591,
+      "groups": [
+        {
+          "code": "",
+          "count": 680,
+          "action": "QueryDocument",
+          "resourceName": "gxs_config",
+          "statusCode": 200
+        },
+        {
+          "count": 341,
+          "action": "StartTransaction",
+          "resourceName": "undefined",
+          "statusCode": 200,
+          "code": ""
+        },
+        {
+          "action": "CommitTransaction",
+          "resourceName": "undefined",
+          "statusCode": 200,
+          "code": "",
+          "count": 311
+        },
+        {
+          "action": "UpdateDocument",
+          "resourceName": "gxs_config",
+          "statusCode": 200,
+          "code": "",
+          "count": 198
+        },
+        {
+          "resourceName": "gxs_latest",
+          "statusCode": 200,
+          "code": "",
+          "count": 171,
+          "action": "QueryDocument"
+        },
+        {
+          "count": 156,
+          "action": "UpdateDocument",
+          "resourceName": "gxs_observation_days",
+          "statusCode": 200,
+          "code": ""
+        },
+        {
+          "statusCode": 200,
+          "code": "",
+          "count": 156,
+          "action": "UpdateDocument",
+          "resourceName": "gxs_latest"
+        },
+        {
+          "action": "QueryDocument",
+          "resourceName": "gxs_observation_days",
+          "statusCode": 200,
+          "code": "",
+          "count": 156
+        },
+        {
+          "resourceName": "gxs_notifications",
+          "statusCode": 200,
+          "code": "",
+          "count": 103,
+          "action": "QueryDocument"
+        },
+        {
+          "count": 95,
+          "action": "QueryDocument",
+          "resourceName": "gxs_events",
+          "statusCode": 200,
+          "code": ""
+        },
+        {
+          "action": "QueryDocument",
+          "resourceName": "gxs_users",
+          "statusCode": 200,
+          "code": "",
+          "count": 61
+        },
+        {
+          "code": "",
+          "count": 43,
+          "action": "QueryDocument",
+          "resourceName": "gxs_orders",
+          "statusCode": 200
+        },
+        {
+          "statusCode": 404,
+          "code": "DATABASE_TRANSACTION_FAIL",
+          "count": 30,
+          "action": "AbortTransaction",
+          "resourceName": "undefined"
+        },
+        {
+          "code": "DATABASE_TRANSACTION_CONFLICT",
+          "count": 30,
+          "action": "UpdateDocument",
+          "resourceName": "gxs_config",
+          "statusCode": 404
+        },
+        {
+          "action": "UpdateDocument",
+          "resourceName": "gxs_orders",
+          "statusCode": 200,
+          "code": "",
+          "count": 26
+        },
+        {
+          "code": "",
+          "count": 18,
+          "action": "QueryDocument",
+          "resourceName": "gxs_follows",
+          "statusCode": 200
+        },
+        {
+          "count": 6,
+          "action": "UpdateDocument",
+          "resourceName": "gxs_notifications",
+          "statusCode": 200,
+          "code": ""
+        },
+        {
+          "statusCode": 200,
+          "code": "",
+          "count": 6,
+          "action": "QueryDocument",
+          "resourceName": "gxs_catalog_products"
+        },
+        {
+          "action": "QueryDocument",
+          "resourceName": "gxs_catalog_stores",
+          "statusCode": 200,
+          "code": "",
+          "count": 3
+        },
+        {
+          "action": "InvokeFunction",
+          "resourceName": "gxs_api",
+          "statusCode": 200,
+          "code": "",
+          "count": 1
+        }
+      ]
+    },
+    "monitor": [
+      {
+        "at": "2026-10-26 15:40:25.548",
+        "requestId": "3f9b3b9f-3aed-44e5-af54-4c52c5017e1b",
+        "result": {
+          "ok": true,
+          "state": "running",
+          "scanned": 21,
+          "observations": 52,
+          "events": 0,
+          "sent": 0,
+          "deadlineReached": false
+        }
+      },
+      {
+        "at": "2026-10-26 15:39:28.650",
+        "requestId": "8a3603e5-7ee9-46bb-a733-2f0e76c3c4e3",
+        "result": {
+          "ok": true,
+          "state": "running",
+          "scanned": 21,
+          "observations": 52,
+          "events": 0,
+          "sent": 0,
+          "deadlineReached": false
+        }
+      },
+      {
+        "at": "2026-10-26 15:38:25.587",
+        "requestId": "76807423-9085-4199-8866-390a87d86f47",
+        "result": {
+          "ok": true,
+          "state": "running",
+          "scanned": 21,
+          "observations": 52,
+          "events": 0,
+          "sent": 0,
+          "deadlineReached": false
+        }
+      }
+    ]
+  },
+  "after": {
+    "window": {
+      "start": "2026-10-26T16:15:00+08:00",
+      "end": "2026-10-26T16:18:00+08:00"
+    },
+    "groupCount": 21,
+    "samples": 156,
+    "access": {
+      "total": 2383,
+      "groups": [
+        {
+          "action": "QueryDocument",
+          "resourceName": "gxs_config",
+          "statusCode": 200,
+          "code": "",
+          "count": 587
+        },
+        {
+          "action": "CommitTransaction",
+          "resourceName": "undefined",
+          "statusCode": 200,
+          "code": "",
+          "count": 308
+        },
+        {
+          "resourceName": "undefined",
+          "statusCode": 200,
+          "code": "",
+          "count": 308,
+          "action": "StartTransaction"
+        },
+        {
+          "statusCode": 200,
+          "code": "",
+          "count": 196,
+          "action": "UpdateDocument",
+          "resourceName": "gxs_config"
+        },
+        {
+          "count": 169,
+          "action": "QueryDocument",
+          "resourceName": "gxs_latest",
+          "statusCode": 200,
+          "code": ""
+        },
+        {
+          "action": "UpdateDocument",
+          "resourceName": "gxs_latest",
+          "statusCode": 200,
+          "code": "",
+          "count": 156
+        },
+        {
+          "resourceName": "gxs_observation_days",
+          "statusCode": 200,
+          "code": "",
+          "count": 156,
+          "action": "QueryDocument"
+        },
+        {
+          "action": "UpdateDocument",
+          "resourceName": "gxs_observation_days",
+          "statusCode": 200,
+          "code": "",
+          "count": 156
+        },
+        {
+          "count": 103,
+          "action": "QueryDocument",
+          "resourceName": "gxs_notifications",
+          "statusCode": 200,
+          "code": ""
+        },
+        {
+          "resourceName": "gxs_events",
+          "statusCode": 200,
+          "code": "",
+          "count": 95,
+          "action": "QueryDocument"
+        },
+        {
+          "action": "QueryDocument",
+          "resourceName": "gxs_users",
+          "statusCode": 200,
+          "code": "",
+          "count": 52
+        },
+        {
+          "action": "QueryDocument",
+          "resourceName": "gxs_orders",
+          "statusCode": 200,
+          "code": "",
+          "count": 41
+        },
+        {
+          "action": "UpdateDocument",
+          "resourceName": "gxs_orders",
+          "statusCode": 200,
+          "code": "",
+          "count": 25
+        },
+        {
+          "action": "QueryDocument",
+          "resourceName": "gxs_follows",
+          "statusCode": 200,
+          "code": "",
+          "count": 16
+        },
+        {
+          "action": "UpdateDocument",
+          "resourceName": "gxs_notifications",
+          "statusCode": 200,
+          "code": "",
+          "count": 6
+        },
+        {
+          "action": "QueryDocument",
+          "resourceName": "gxs_catalog_products",
+          "statusCode": 200,
+          "code": "",
+          "count": 6
+        },
+        {
+          "statusCode": 200,
+          "code": "",
+          "count": 3,
+          "action": "QueryDocument",
+          "resourceName": "gxs_catalog_stores"
+        }
+      ]
+    },
+    "monitor": [
+      {
+        "at": "2026-10-26 16:17:23.180",
+        "requestId": "1ba5a56f-3dcd-4d0b-9a4d-18fd81dd4abb",
+        "result": {
+          "ok": true,
+          "state": "running",
+          "scanned": 21,
+          "observations": 52,
+          "events": 0,
+          "sent": 0,
+          "deadlineReached": false
+        }
+      },
+      {
+        "at": "2026-10-26 16:16:21.810",
+        "requestId": "81916602-04e3-45f9-b130-7d0bdf89b9fa",
+        "result": {
+          "ok": true,
+          "state": "running",
+          "scanned": 21,
+          "observations": 52,
+          "events": 0,
+          "sent": 0,
+          "deadlineReached": false
+        }
+      },
+      {
+        "at": "2026-10-26 16:15:22.762",
+        "requestId": "6b6bfc36-a484-43dc-ab47-4c368dda98ae",
+        "result": {
+          "ok": true,
+          "state": "running",
+          "scanned": 21,
+          "observations": 52,
+          "events": 0,
+          "sent": 0,
+          "deadlineReached": false
+        }
+      }
+    ]
+  },
+  "delta": {
+    "accessReductionPercent": 8.02778849864917,
+    "configUpdateTransactionConflicts": {
+      "before": 30,
+      "after": 0
+    },
+    "normalSamplesEqual": true
+  },
+  "coverage": {
+    "snapshots": [
+      {
+        "at": "2026-10-26T08:14:24.800Z",
+        "state": "running",
+        "intervalMs": 60000,
+        "health": {
+          "evaluatedAt": "2026-10-26T08:14:24.800Z",
+          "freshGroups": 21,
+          "groupCount": 21,
+          "lastSuccessAt": "2026-10-26T08:14:24.320Z",
+          "oldestSuccessAt": "2026-10-26T08:14:04.351Z",
+          "pendingGroups": 0,
+          "staleAfterMs": 188000,
+          "staleGroups": 0,
+          "state": "healthy"
+        },
+        "targets": [
+          {
+            "key": "R320|MK2M4CH/A,MK2P4CH/A,MK2T4CH/A,MK2U4CH/A",
+            "lastSuccessAt": 1793002448740,
+            "lastPersistedSuccessAt": 1793002448740,
+            "requests": 2751,
+            "successes": 2747,
+            "failures": 4,
+            "nextDueAt": 1793002500000
+          },
+          {
+            "key": "R359|MK2P4CH/A,MK2T4CH/A",
+            "lastSuccessAt": 1793002462554,
+            "lastPersistedSuccessAt": 1793002462554,
+            "requests": 3388,
+            "successes": 3380,
+            "failures": 8,
+            "nextDueAt": 1793002500000
+          },
+          {
+            "key": "R388|MK2P4CH/A,MK2Q4CH/A,MK2T4CH/A,MK2U4CH/A",
+            "lastSuccessAt": 1793002450837,
+            "lastPersistedSuccessAt": 1793002450837,
+            "requests": 5851,
+            "successes": 5827,
+            "failures": 24,
+            "nextDueAt": 1793002500000
+          },
+          {
+            "key": "R389|MK2P4CH/A,MK2T4CH/A",
+            "lastSuccessAt": 1793002446682,
+            "lastPersistedSuccessAt": 1793002446682,
+            "requests": 4041,
+            "successes": 4032,
+            "failures": 9,
+            "nextDueAt": 1793002500000
+          },
+          {
+            "key": "R390|MK2P4CH/A,MK2T4CH/A",
+            "lastSuccessAt": 1793002464320,
+            "lastPersistedSuccessAt": 1793002464320,
+            "requests": 4055,
+            "successes": 4041,
+            "failures": 14,
+            "nextDueAt": 1793002500000
+          },
+          {
+            "key": "R401|MK2P4CH/A",
+            "lastSuccessAt": 1793002451027,
+            "lastPersistedSuccessAt": 1793002451027,
+            "requests": 11163,
+            "successes": 11125,
+            "failures": 38,
+            "nextDueAt": 1793002500000
+          },
+          {
+            "key": "R448|MK2M4CH/A,MK2P4CH/A,MK2Q4CH/A,MK2T4CH/A,MK2U4CH/A",
+            "lastSuccessAt": 1793002452500,
+            "lastPersistedSuccessAt": 1793002452500,
+            "requests": 2746,
+            "successes": 2743,
+            "failures": 3,
+            "nextDueAt": 1793002500000
+          },
+          {
+            "key": "R471|MK2P4CH/A",
+            "lastSuccessAt": 1793002452817,
+            "lastPersistedSuccessAt": 1793002452817,
+            "requests": 5888,
+            "successes": 5855,
+            "failures": 33,
+            "nextDueAt": 1793002500000
+          },
+          {
+            "key": "R479|MK2M4CH/A,MK2P4CH/A,MK2T4CH/A,MK2U4CH/A",
+            "lastSuccessAt": 1793002454325,
+            "lastPersistedSuccessAt": 1793002454325,
+            "requests": 2748,
+            "successes": 2743,
+            "failures": 5,
+            "nextDueAt": 1793002500000
+          },
+          {
+            "key": "R484|MK2M4CH/A,MK2P4CH/A,MK2Q4CH/A",
+            "lastSuccessAt": 1793002448528,
+            "lastPersistedSuccessAt": 1793002448528,
+            "requests": 2904,
+            "successes": 2895,
+            "failures": 9,
+            "nextDueAt": 1793002500000
+          },
+          {
+            "key": "R532|MK2P4CH/A",
+            "lastSuccessAt": 1793002454534,
+            "lastPersistedSuccessAt": 1793002454534,
+            "requests": 5845,
+            "successes": 5825,
+            "failures": 20,
+            "nextDueAt": 1793002500000
+          },
+          {
+            "key": "R575|MK2T4CH/A",
+            "lastSuccessAt": 1793002455689,
+            "lastPersistedSuccessAt": 1793002455689,
+            "requests": 5852,
+            "successes": 5831,
+            "failures": 21,
+            "nextDueAt": 1793002500000
+          },
+          {
+            "key": "R577|MJTF4CH/A,MK2P4CH/A",
+            "lastSuccessAt": 1793002456671,
+            "lastPersistedSuccessAt": 1793002456671,
+            "requests": 367,
+            "successes": 365,
+            "failures": 2,
+            "nextDueAt": 1793002500000
+          },
+          {
+            "key": "R579|MK2P4CH/A",
+            "lastSuccessAt": 1793002458353,
+            "lastPersistedSuccessAt": 1793002458353,
+            "requests": 5879,
+            "successes": 5849,
+            "failures": 30,
+            "nextDueAt": 1793002500000
+          },
+          {
+            "key": "R639|MJTF4CH/A,MK2P4CH/A",
+            "lastSuccessAt": 1793002458565,
+            "lastPersistedSuccessAt": 1793002458565,
+            "requests": 369,
+            "successes": 369,
+            "failures": 0,
+            "nextDueAt": 1793002500000
+          },
+          {
+            "key": "R644|MJTA4CH/A",
+            "lastSuccessAt": 1793002460377,
+            "lastPersistedSuccessAt": 1793002460377,
+            "requests": 4634,
+            "successes": 4606,
+            "failures": 28,
+            "nextDueAt": 1793002500000
+          },
+          {
+            "key": "R645|MK2M4CH/A,MK2P4CH/A,MK2T4CH/A,MK2U4CH/A",
+            "lastSuccessAt": 1793002460371,
+            "lastPersistedSuccessAt": 1793002460371,
+            "requests": 11769,
+            "successes": 11732,
+            "failures": 37,
+            "nextDueAt": 1793002500000
+          },
+          {
+            "key": "R678|MK2P4CH/A,MK2T4CH/A",
+            "lastSuccessAt": 1793002444351,
+            "lastPersistedSuccessAt": 1793002444351,
+            "requests": 4796,
+            "successes": 4782,
+            "failures": 14,
+            "nextDueAt": 1793002500000
+          },
+          {
+            "key": "R761|MK2M4CH/A,MK2P4CH/A,MK2Q4CH/A",
+            "lastSuccessAt": 1793002446186,
+            "lastPersistedSuccessAt": 1793002446186,
+            "requests": 2828,
+            "successes": 2814,
+            "failures": 14,
+            "nextDueAt": 1793002500000
+          },
+          {
+            "key": "R792|MK2P4CH/A,MK2Q4CH/A,MK2T4CH/A,MK2U4CH/A",
+            "lastSuccessAt": 1793002462362,
+            "lastPersistedSuccessAt": 1793002462362,
+            "requests": 11743,
+            "successes": 11680,
+            "failures": 63,
+            "nextDueAt": 1793002500000
+          },
+          {
+            "key": "R793|MK2M4CH/A,MK2P4CH/A,MK2Q4CH/A",
+            "lastSuccessAt": 1793002444767,
+            "lastPersistedSuccessAt": 1793002444767,
+            "requests": 2802,
+            "successes": 2794,
+            "failures": 8,
+            "nextDueAt": 1793002500000
+          }
+        ]
+      },
+      {
+        "at": "2026-10-26T08:15:22.551Z",
+        "state": "running",
+        "intervalMs": 60000,
+        "health": {
+          "evaluatedAt": "2026-10-26T08:15:22.551Z",
+          "freshGroups": 21,
+          "groupCount": 21,
+          "lastSuccessAt": "2026-10-26T08:15:21.870Z",
+          "oldestSuccessAt": "2026-10-26T08:15:02.821Z",
+          "pendingGroups": 0,
+          "staleAfterMs": 188000,
+          "staleGroups": 0,
+          "state": "healthy"
+        },
+        "targets": [
+          {
+            "key": "R320|MK2M4CH/A,MK2P4CH/A,MK2T4CH/A,MK2U4CH/A",
+            "lastSuccessAt": 1793002502821,
+            "lastPersistedSuccessAt": 1793002502821,
+            "requests": 2752,
+            "successes": 2748,
+            "failures": 4,
+            "nextDueAt": 1793002560000
+          },
+          {
+            "key": "R359|MK2P4CH/A,MK2T4CH/A",
+            "lastSuccessAt": 1793002503412,
+            "lastPersistedSuccessAt": 1793002503412,
+            "requests": 3389,
+            "successes": 3381,
+            "failures": 8,
+            "nextDueAt": 1793002560000
+          },
+          {
+            "key": "R388|MK2P4CH/A,MK2Q4CH/A,MK2T4CH/A,MK2U4CH/A",
+            "lastSuccessAt": 1793002504940,
+            "lastPersistedSuccessAt": 1793002504940,
+            "requests": 5852,
+            "successes": 5828,
+            "failures": 24,
+            "nextDueAt": 1793002560000
+          },
+          {
+            "key": "R389|MK2P4CH/A,MK2T4CH/A",
+            "lastSuccessAt": 1793002505227,
+            "lastPersistedSuccessAt": 1793002505227,
+            "requests": 4042,
+            "successes": 4033,
+            "failures": 9,
+            "nextDueAt": 1793002560000
+          },
+          {
+            "key": "R390|MK2P4CH/A,MK2T4CH/A",
+            "lastSuccessAt": 1793002507190,
+            "lastPersistedSuccessAt": 1793002507190,
+            "requests": 4056,
+            "successes": 4042,
+            "failures": 14,
+            "nextDueAt": 1793002560000
+          },
+          {
+            "key": "R401|MK2P4CH/A",
+            "lastSuccessAt": 1793002507457,
+            "lastPersistedSuccessAt": 1793002507457,
+            "requests": 11164,
+            "successes": 11126,
+            "failures": 38,
+            "nextDueAt": 1793002560000
+          },
+          {
+            "key": "R448|MK2M4CH/A,MK2P4CH/A,MK2Q4CH/A,MK2T4CH/A,MK2U4CH/A",
+            "lastSuccessAt": 1793002508787,
+            "lastPersistedSuccessAt": 1793002508787,
+            "requests": 2747,
+            "successes": 2744,
+            "failures": 3,
+            "nextDueAt": 1793002560000
+          },
+          {
+            "key": "R471|MK2P4CH/A",
+            "lastSuccessAt": 1793002509653,
+            "lastPersistedSuccessAt": 1793002509653,
+            "requests": 5889,
+            "successes": 5856,
+            "failures": 33,
+            "nextDueAt": 1793002560000
+          },
+          {
+            "key": "R479|MK2M4CH/A,MK2P4CH/A,MK2T4CH/A,MK2U4CH/A",
+            "lastSuccessAt": 1793002511281,
+            "lastPersistedSuccessAt": 1793002511281,
+            "requests": 2749,
+            "successes": 2744,
+            "failures": 5,
+            "nextDueAt": 1793002560000
+          },
+          {
+            "key": "R484|MK2M4CH/A,MK2P4CH/A,MK2Q4CH/A",
+            "lastSuccessAt": 1793002510851,
+            "lastPersistedSuccessAt": 1793002510851,
+            "requests": 2905,
+            "successes": 2896,
+            "failures": 9,
+            "nextDueAt": 1793002560000
+          },
+          {
+            "key": "R532|MK2P4CH/A",
+            "lastSuccessAt": 1793002512677,
+            "lastPersistedSuccessAt": 1793002512677,
+            "requests": 5846,
+            "successes": 5826,
+            "failures": 20,
+            "nextDueAt": 1793002560000
+          },
+          {
+            "key": "R575|MK2T4CH/A",
+            "lastSuccessAt": 1793002513503,
+            "lastPersistedSuccessAt": 1793002513503,
+            "requests": 5853,
+            "successes": 5832,
+            "failures": 21,
+            "nextDueAt": 1793002560000
+          },
+          {
+            "key": "R577|MJTF4CH/A,MK2P4CH/A",
+            "lastSuccessAt": 1793002514682,
+            "lastPersistedSuccessAt": 1793002514682,
+            "requests": 368,
+            "successes": 366,
+            "failures": 2,
+            "nextDueAt": 1793002560000
+          },
+          {
+            "key": "R579|MK2P4CH/A",
+            "lastSuccessAt": 1793002515227,
+            "lastPersistedSuccessAt": 1793002515227,
+            "requests": 5880,
+            "successes": 5850,
+            "failures": 30,
+            "nextDueAt": 1793002560000
+          },
+          {
+            "key": "R639|MJTF4CH/A,MK2P4CH/A",
+            "lastSuccessAt": 1793002516196,
+            "lastPersistedSuccessAt": 1793002516196,
+            "requests": 370,
+            "successes": 370,
+            "failures": 0,
+            "nextDueAt": 1793002560000
+          },
+          {
+            "key": "R644|MJTA4CH/A",
+            "lastSuccessAt": 1793002516998,
+            "lastPersistedSuccessAt": 1793002516998,
+            "requests": 4635,
+            "successes": 4607,
+            "failures": 28,
+            "nextDueAt": 1793002560000
+          },
+          {
+            "key": "R645|MK2M4CH/A,MK2P4CH/A,MK2T4CH/A,MK2U4CH/A",
+            "lastSuccessAt": 1793002517991,
+            "lastPersistedSuccessAt": 1793002517991,
+            "requests": 11770,
+            "successes": 11733,
+            "failures": 37,
+            "nextDueAt": 1793002560000
+          },
+          {
+            "key": "R678|MK2P4CH/A,MK2T4CH/A",
+            "lastSuccessAt": 1793002518636,
+            "lastPersistedSuccessAt": 1793002518636,
+            "requests": 4797,
+            "successes": 4783,
+            "failures": 14,
+            "nextDueAt": 1793002560000
+          },
+          {
+            "key": "R761|MK2M4CH/A,MK2P4CH/A,MK2Q4CH/A",
+            "lastSuccessAt": 1793002519761,
+            "lastPersistedSuccessAt": 1793002519761,
+            "requests": 2829,
+            "successes": 2815,
+            "failures": 14,
+            "nextDueAt": 1793002560000
+          },
+          {
+            "key": "R792|MK2P4CH/A,MK2Q4CH/A,MK2T4CH/A,MK2U4CH/A",
+            "lastSuccessAt": 1793002520406,
+            "lastPersistedSuccessAt": 1793002520406,
+            "requests": 11744,
+            "successes": 11681,
+            "failures": 63,
+            "nextDueAt": 1793002560000
+          },
+          {
+            "key": "R793|MK2M4CH/A,MK2P4CH/A,MK2Q4CH/A",
+            "lastSuccessAt": 1793002521870,
+            "lastPersistedSuccessAt": 1793002521870,
+            "requests": 2803,
+            "successes": 2795,
+            "failures": 8,
+            "nextDueAt": 1793002560000
+          }
+        ]
+      },
+      {
+        "at": "2026-10-26T08:16:21.559Z",
+        "state": "running",
+        "intervalMs": 60000,
+        "health": {
+          "evaluatedAt": "2026-10-26T08:16:21.559Z",
+          "freshGroups": 21,
+          "groupCount": 21,
+          "lastSuccessAt": "2026-10-26T08:16:20.854Z",
+          "oldestSuccessAt": "2026-10-26T08:16:02.758Z",
+          "pendingGroups": 0,
+          "staleAfterMs": 188000,
+          "staleGroups": 0,
+          "state": "healthy"
+        },
+        "targets": [
+          {
+            "key": "R320|MK2M4CH/A,MK2P4CH/A,MK2T4CH/A,MK2U4CH/A",
+            "lastSuccessAt": 1793002562758,
+            "lastPersistedSuccessAt": 1793002562758,
+            "requests": 2753,
+            "successes": 2749,
+            "failures": 4,
+            "nextDueAt": 1793002620000
+          },
+          {
+            "key": "R359|MK2P4CH/A,MK2T4CH/A",
+            "lastSuccessAt": 1793002563125,
+            "lastPersistedSuccessAt": 1793002563125,
+            "requests": 3390,
+            "successes": 3382,
+            "failures": 8,
+            "nextDueAt": 1793002620000
+          },
+          {
+            "key": "R388|MK2P4CH/A,MK2Q4CH/A,MK2T4CH/A,MK2U4CH/A",
+            "lastSuccessAt": 1793002564158,
+            "lastPersistedSuccessAt": 1793002564158,
+            "requests": 5853,
+            "successes": 5829,
+            "failures": 24,
+            "nextDueAt": 1793002620000
+          },
+          {
+            "key": "R389|MK2P4CH/A,MK2T4CH/A",
+            "lastSuccessAt": 1793002565043,
+            "lastPersistedSuccessAt": 1793002565043,
+            "requests": 4043,
+            "successes": 4034,
+            "failures": 9,
+            "nextDueAt": 1793002620000
+          },
+          {
+            "key": "R390|MK2P4CH/A,MK2T4CH/A",
+            "lastSuccessAt": 1793002566703,
+            "lastPersistedSuccessAt": 1793002566703,
+            "requests": 4057,
+            "successes": 4043,
+            "failures": 14,
+            "nextDueAt": 1793002620000
+          },
+          {
+            "key": "R401|MK2P4CH/A",
+            "lastSuccessAt": 1793002566737,
+            "lastPersistedSuccessAt": 1793002566737,
+            "requests": 11165,
+            "successes": 11127,
+            "failures": 38,
+            "nextDueAt": 1793002620000
+          },
+          {
+            "key": "R448|MK2M4CH/A,MK2P4CH/A,MK2Q4CH/A,MK2T4CH/A,MK2U4CH/A",
+            "lastSuccessAt": 1793002568433,
+            "lastPersistedSuccessAt": 1793002568433,
+            "requests": 2748,
+            "successes": 2745,
+            "failures": 3,
+            "nextDueAt": 1793002620000
+          },
+          {
+            "key": "R471|MK2P4CH/A",
+            "lastSuccessAt": 1793002568145,
+            "lastPersistedSuccessAt": 1793002568145,
+            "requests": 5890,
+            "successes": 5857,
+            "failures": 33,
+            "nextDueAt": 1793002620000
+          },
+          {
+            "key": "R479|MK2M4CH/A,MK2P4CH/A,MK2T4CH/A,MK2U4CH/A",
+            "lastSuccessAt": 1793002570200,
+            "lastPersistedSuccessAt": 1793002570200,
+            "requests": 2750,
+            "successes": 2745,
+            "failures": 5,
+            "nextDueAt": 1793002620000
+          },
+          {
+            "key": "R484|MK2M4CH/A,MK2P4CH/A,MK2Q4CH/A",
+            "lastSuccessAt": 1793002570512,
+            "lastPersistedSuccessAt": 1793002570512,
+            "requests": 2906,
+            "successes": 2897,
+            "failures": 9,
+            "nextDueAt": 1793002620000
+          },
+          {
+            "key": "R532|MK2P4CH/A",
+            "lastSuccessAt": 1793002572016,
+            "lastPersistedSuccessAt": 1793002572016,
+            "requests": 5847,
+            "successes": 5827,
+            "failures": 20,
+            "nextDueAt": 1793002620000
+          },
+          {
+            "key": "R575|MK2T4CH/A",
+            "lastSuccessAt": 1793002572417,
+            "lastPersistedSuccessAt": 1793002572417,
+            "requests": 5854,
+            "successes": 5833,
+            "failures": 21,
+            "nextDueAt": 1793002620000
+          },
+          {
+            "key": "R577|MJTF4CH/A,MK2P4CH/A",
+            "lastSuccessAt": 1793002573583,
+            "lastPersistedSuccessAt": 1793002573583,
+            "requests": 369,
+            "successes": 367,
+            "failures": 2,
+            "nextDueAt": 1793002620000
+          },
+          {
+            "key": "R579|MK2P4CH/A",
+            "lastSuccessAt": 1793002574231,
+            "lastPersistedSuccessAt": 1793002574231,
+            "requests": 5881,
+            "successes": 5851,
+            "failures": 30,
+            "nextDueAt": 1793002620000
+          },
+          {
+            "key": "R639|MJTF4CH/A,MK2P4CH/A",
+            "lastSuccessAt": 1793002575479,
+            "lastPersistedSuccessAt": 1793002575479,
+            "requests": 371,
+            "successes": 371,
+            "failures": 0,
+            "nextDueAt": 1793002620000
+          },
+          {
+            "key": "R644|MJTA4CH/A",
+            "lastSuccessAt": 1793002575487,
+            "lastPersistedSuccessAt": 1793002575487,
+            "requests": 4636,
+            "successes": 4608,
+            "failures": 28,
+            "nextDueAt": 1793002620000
+          },
+          {
+            "key": "R645|MK2M4CH/A,MK2P4CH/A,MK2T4CH/A,MK2U4CH/A",
+            "lastSuccessAt": 1793002577340,
+            "lastPersistedSuccessAt": 1793002577340,
+            "requests": 11771,
+            "successes": 11734,
+            "failures": 37,
+            "nextDueAt": 1793002620000
+          },
+          {
+            "key": "R678|MK2P4CH/A,MK2T4CH/A",
+            "lastSuccessAt": 1793002577392,
+            "lastPersistedSuccessAt": 1793002577392,
+            "requests": 4798,
+            "successes": 4784,
+            "failures": 14,
+            "nextDueAt": 1793002620000
+          },
+          {
+            "key": "R761|MK2M4CH/A,MK2P4CH/A,MK2Q4CH/A",
+            "lastSuccessAt": 1793002579616,
+            "lastPersistedSuccessAt": 1793002579616,
+            "requests": 2830,
+            "successes": 2816,
+            "failures": 14,
+            "nextDueAt": 1793002620000
+          },
+          {
+            "key": "R792|MK2P4CH/A,MK2Q4CH/A,MK2T4CH/A,MK2U4CH/A",
+            "lastSuccessAt": 1793002579208,
+            "lastPersistedSuccessAt": 1793002579208,
+            "requests": 11745,
+            "successes": 11682,
+            "failures": 63,
+            "nextDueAt": 1793002620000
+          },
+          {
+            "key": "R793|MK2M4CH/A,MK2P4CH/A,MK2Q4CH/A",
+            "lastSuccessAt": 1793002580854,
+            "lastPersistedSuccessAt": 1793002580854,
+            "requests": 2804,
+            "successes": 2796,
+            "failures": 8,
+            "nextDueAt": 1793002620000
+          }
+        ]
+      },
+      {
+        "at": "2026-10-26T08:17:22.932Z",
+        "state": "running",
+        "intervalMs": 60000,
+        "health": {
+          "evaluatedAt": "2026-10-26T08:17:22.932Z",
+          "freshGroups": 21,
+          "groupCount": 21,
+          "lastSuccessAt": "2026-10-26T08:17:22.260Z",
+          "oldestSuccessAt": "2026-10-26T08:17:02.959Z",
+          "pendingGroups": 0,
+          "staleAfterMs": 188000,
+          "staleGroups": 0,
+          "state": "healthy"
+        },
+        "targets": [
+          {
+            "key": "R320|MK2M4CH/A,MK2P4CH/A,MK2T4CH/A,MK2U4CH/A",
+            "lastSuccessAt": 1793002622959,
+            "lastPersistedSuccessAt": 1793002622959,
+            "requests": 2754,
+            "successes": 2750,
+            "failures": 4,
+            "nextDueAt": 1793002680000
+          },
+          {
+            "key": "R359|MK2P4CH/A,MK2T4CH/A",
+            "lastSuccessAt": 1793002623745,
+            "lastPersistedSuccessAt": 1793002623745,
+            "requests": 3391,
+            "successes": 3383,
+            "failures": 8,
+            "nextDueAt": 1793002680000
+          },
+          {
+            "key": "R388|MK2P4CH/A,MK2Q4CH/A,MK2T4CH/A,MK2U4CH/A",
+            "lastSuccessAt": 1793002625257,
+            "lastPersistedSuccessAt": 1793002625257,
+            "requests": 5854,
+            "successes": 5830,
+            "failures": 24,
+            "nextDueAt": 1793002680000
+          },
+          {
+            "key": "R389|MK2P4CH/A,MK2T4CH/A",
+            "lastSuccessAt": 1793002624920,
+            "lastPersistedSuccessAt": 1793002624920,
+            "requests": 4044,
+            "successes": 4035,
+            "failures": 9,
+            "nextDueAt": 1793002680000
+          },
+          {
+            "key": "R390|MK2P4CH/A,MK2T4CH/A",
+            "lastSuccessAt": 1793002626985,
+            "lastPersistedSuccessAt": 1793002626985,
+            "requests": 4058,
+            "successes": 4044,
+            "failures": 14,
+            "nextDueAt": 1793002680000
+          },
+          {
+            "key": "R401|MK2P4CH/A",
+            "lastSuccessAt": 1793002627422,
+            "lastPersistedSuccessAt": 1793002627422,
+            "requests": 11166,
+            "successes": 11128,
+            "failures": 38,
+            "nextDueAt": 1793002680000
+          },
+          {
+            "key": "R448|MK2M4CH/A,MK2P4CH/A,MK2Q4CH/A,MK2T4CH/A,MK2U4CH/A",
+            "lastSuccessAt": 1793002629261,
+            "lastPersistedSuccessAt": 1793002629261,
+            "requests": 2749,
+            "successes": 2746,
+            "failures": 3,
+            "nextDueAt": 1793002680000
+          },
+          {
+            "key": "R471|MK2P4CH/A",
+            "lastSuccessAt": 1793002629488,
+            "lastPersistedSuccessAt": 1793002629488,
+            "requests": 5891,
+            "successes": 5858,
+            "failures": 33,
+            "nextDueAt": 1793002680000
+          },
+          {
+            "key": "R479|MK2M4CH/A,MK2P4CH/A,MK2T4CH/A,MK2U4CH/A",
+            "lastSuccessAt": 1793002630479,
+            "lastPersistedSuccessAt": 1793002630479,
+            "requests": 2751,
+            "successes": 2746,
+            "failures": 5,
+            "nextDueAt": 1793002680000
+          },
+          {
+            "key": "R484|MK2M4CH/A,MK2P4CH/A,MK2Q4CH/A",
+            "lastSuccessAt": 1793002631065,
+            "lastPersistedSuccessAt": 1793002631065,
+            "requests": 2907,
+            "successes": 2898,
+            "failures": 9,
+            "nextDueAt": 1793002680000
+          },
+          {
+            "key": "R532|MK2P4CH/A",
+            "lastSuccessAt": 1793002632642,
+            "lastPersistedSuccessAt": 1793002632642,
+            "requests": 5848,
+            "successes": 5828,
+            "failures": 20,
+            "nextDueAt": 1793002680000
+          },
+          {
+            "key": "R575|MK2T4CH/A",
+            "lastSuccessAt": 1793002632335,
+            "lastPersistedSuccessAt": 1793002632335,
+            "requests": 5855,
+            "successes": 5834,
+            "failures": 21,
+            "nextDueAt": 1793002680000
+          },
+          {
+            "key": "R577|MJTF4CH/A,MK2P4CH/A",
+            "lastSuccessAt": 1793002634390,
+            "lastPersistedSuccessAt": 1793002634390,
+            "requests": 370,
+            "successes": 368,
+            "failures": 2,
+            "nextDueAt": 1793002680000
+          },
+          {
+            "key": "R579|MK2P4CH/A",
+            "lastSuccessAt": 1793002634876,
+            "lastPersistedSuccessAt": 1793002634876,
+            "requests": 5882,
+            "successes": 5852,
+            "failures": 30,
+            "nextDueAt": 1793002680000
+          },
+          {
+            "key": "R639|MJTF4CH/A,MK2P4CH/A",
+            "lastSuccessAt": 1793002636337,
+            "lastPersistedSuccessAt": 1793002636337,
+            "requests": 372,
+            "successes": 372,
+            "failures": 0,
+            "nextDueAt": 1793002680000
+          },
+          {
+            "key": "R644|MJTA4CH/A",
+            "lastSuccessAt": 1793002636910,
+            "lastPersistedSuccessAt": 1793002636910,
+            "requests": 4637,
+            "successes": 4609,
+            "failures": 28,
+            "nextDueAt": 1793002680000
+          },
+          {
+            "key": "R645|MK2M4CH/A,MK2P4CH/A,MK2T4CH/A,MK2U4CH/A",
+            "lastSuccessAt": 1793002638414,
+            "lastPersistedSuccessAt": 1793002638414,
+            "requests": 11772,
+            "successes": 11735,
+            "failures": 37,
+            "nextDueAt": 1793002680000
+          },
+          {
+            "key": "R678|MK2P4CH/A,MK2T4CH/A",
+            "lastSuccessAt": 1793002638493,
+            "lastPersistedSuccessAt": 1793002638493,
+            "requests": 4799,
+            "successes": 4785,
+            "failures": 14,
+            "nextDueAt": 1793002680000
+          },
+          {
+            "key": "R761|MK2M4CH/A,MK2P4CH/A,MK2Q4CH/A",
+            "lastSuccessAt": 1793002640253,
+            "lastPersistedSuccessAt": 1793002640253,
+            "requests": 2831,
+            "successes": 2817,
+            "failures": 14,
+            "nextDueAt": 1793002680000
+          },
+          {
+            "key": "R792|MK2P4CH/A,MK2Q4CH/A,MK2T4CH/A,MK2U4CH/A",
+            "lastSuccessAt": 1793002640535,
+            "lastPersistedSuccessAt": 1793002640535,
+            "requests": 11746,
+            "successes": 11683,
+            "failures": 63,
+            "nextDueAt": 1793002680000
+          },
+          {
+            "key": "R793|MK2M4CH/A,MK2P4CH/A,MK2Q4CH/A",
+            "lastSuccessAt": 1793002642260,
+            "lastPersistedSuccessAt": 1793002642260,
+            "requests": 2805,
+            "successes": 2797,
+            "failures": 8,
+            "nextDueAt": 1793002680000
+          }
+        ]
+      }
+    ],
+    "groupCount": 21,
+    "completeSuccessIntervals": 63,
+    "minSeconds": 40.858,
+    "p95Seconds": 62.323,
+    "maxSeconds": 77.103,
+    "everyGroupAdvancedOnceEachRound": true,
+    "allPersisted": true,
+    "allNextPhasesAligned": true,
+    "failuresDuringWindow": 0,
+    "monitor": [
+      {
+        "at": "2026-10-26 16:17:23.180",
+        "requestId": "1ba5a56f-3dcd-4d0b-9a4d-18fd81dd4abb",
+        "result": {
+          "ok": true,
+          "state": "running",
+          "scanned": 21,
+          "observations": 52,
+          "events": 0,
+          "sent": 0,
+          "deadlineReached": false
+        }
+      },
+      {
+        "at": "2026-10-26 16:16:21.810",
+        "requestId": "81916602-04e3-45f9-b130-7d0bdf89b9fa",
+        "result": {
+          "ok": true,
+          "state": "running",
+          "scanned": 21,
+          "observations": 52,
+          "events": 0,
+          "sent": 0,
+          "deadlineReached": false
+        }
+      },
+      {
+        "at": "2026-10-26 16:15:22.762",
+        "requestId": "6b6bfc36-a484-43dc-ab47-4c368dda98ae",
+        "result": {
+          "ok": true,
+          "state": "running",
+          "scanned": 21,
+          "observations": 52,
+          "events": 0,
+          "sent": 0,
+          "deadlineReached": false
+        }
+      },
+      {
+        "at": "2026-10-26 16:14:25.052",
+        "requestId": "a1bdc892-e67d-4620-ad2b-0a87f663c184",
+        "result": {
+          "ok": true,
+          "state": "running",
+          "scanned": 21,
+          "observations": 52,
+          "events": 0,
+          "sent": 0,
+          "deadlineReached": false
+        }
+      }
+    ],
+    "intervalPairs": [
+      {
+        "from": "2026-10-26T08:14:24.800Z",
+        "to": "2026-10-26T08:15:22.551Z",
+        "minSeconds": 40.858,
+        "p95Seconds": 74.285,
+        "maxSeconds": 77.103
+      },
+      {
+        "from": "2026-10-26T08:15:22.551Z",
+        "to": "2026-10-26T08:16:21.559Z",
+        "minSeconds": 58.489,
+        "p95Seconds": 59.855,
+        "maxSeconds": 59.937
+      },
+      {
+        "from": "2026-10-26T08:16:21.559Z",
+        "to": "2026-10-26T08:17:22.932Z",
+        "minSeconds": 59.877,
+        "p95Seconds": 61.406,
+        "maxSeconds": 61.423
+      }
+    ],
+    "stableIntervals": {
+      "count": 42,
+      "minSeconds": 58.489,
+      "p95Seconds": 61.343,
+      "maxSeconds": 61.423
+    }
+  },
+  "limitations": [
+    "Short observational production windows; not an isolated controlled experiment or long-term latency/capacity SLA.",
+    "Same config revision 12 and target set; both windows include one payment reconciliation trigger. Other environment activity may differ.",
+    "API access-log operations are not settled document request billing units or invoiced savings.",
+    "No stock events and no actual messages sent during the observation window.",
+    "Transition 16:14 to 16:15 reordered targets: observed 40.858-77.103s success gaps; stable later intervals are reported separately."
+  ]
+}

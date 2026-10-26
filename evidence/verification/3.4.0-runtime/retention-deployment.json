@@ -1,0 +1,362 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-10-26T03:21:26.521Z",
+  "environment": "flowermean-6gjaxfqhf6c13e88",
+  "timezone": "Asia/Shanghai",
+  "authorization": "Maintainer explicitly approved the three-file production deployment and restoration of the existing cleanup rules on 2026-10-26.",
+  "scope": "Only the authorized retention command-shadowing fix deployed; frontend patch not uploaded and unrelated WeChat quality findings remain open.",
+  "deployment": {
+    "method": "SCF UpdateFunctionIncrementalCode via authenticated CloudBase callCloudApi; one approved-file ZIP per request",
+    "apiVersion": "2018-04-16",
+    "region": "ap-shanghai",
+    "receipts": [
+      {
+        "functionName": "gxs_api",
+        "file": "lib/repo/cloudbase-repo.js",
+        "sha256": "10c02a7981cc06c624f9f8c571544a22581a9216ee377bb012780ccd4932da1c",
+        "requestedAt": "2026-10-26T03:17:16.754Z",
+        "requestId": "0e1f8a82-c9ba-4972-a3f8-10d65e0a85fd"
+      },
+      {
+        "functionName": "gxs_monitor",
+        "file": "lib-manifest.json",
+        "sha256": "a394a71c1450bfac48302fcf3114368c0fdac1f06afe103b5e48f911ab4ed829",
+        "requestedAt": "2026-10-26T03:17:26.546Z",
+        "requestId": "4bc9416a-0510-4fab-a789-2d236d019290"
+      },
+      {
+        "functionName": "gxs_monitor",
+        "file": "lib/repo/cloudbase-repo.js",
+        "sha256": "10c02a7981cc06c624f9f8c571544a22581a9216ee377bb012780ccd4932da1c",
+        "requestedAt": "2026-10-26T03:17:52.554Z",
+        "requestId": "58148a1c-d297-4be0-aa1d-8903b187e9d0"
+      }
+    ],
+    "unsupportedAttempt": {
+      "tool": "manageFunctions incrementalDeployFunction",
+      "success": false,
+      "changedCloud": false,
+      "reason": "Host incremental implementation not injected"
+    },
+    "configVerification": [
+      {
+        "name": "gxs_api",
+        "status": "Active",
+        "lastModifiedAt": "2026-10-26 11:17:16",
+        "unchangedConfigurationFields": [
+          "Runtime",
+          "Handler",
+          "Timeout",
+          "MemorySize",
+          "InitTimeout",
+          "VpcConfig",
+          "Layers",
+          "Triggers",
+          "InstallDependency",
+          "InstanceConcurrencyConfig",
+          "Role",
+          "Type",
+          "LogFormat",
+          "LogType"
+        ],
+        "changedConfigurationFields": [],
+        "redactedEnvironmentMetadataUnchanged": true,
+        "triggers": [
+          {
+            "AddTime": "2026-09-20 12:32:27",
+            "ModTime": "2026-10-21 11:01:29",
+            "TriggerDesc": "{\"cron\":\"0 */5 * * * * *\"}",
+            "TriggerName": "gxs-payment-reconcile-five-minutes",
+            "Type": "timer"
+          }
+        ]
+      },
+      {
+        "name": "gxs_monitor",
+        "status": "Active",
+        "lastModifiedAt": "2026-10-26 11:17:52",
+        "unchangedConfigurationFields": [
+          "Runtime",
+          "Handler",
+          "Timeout",
+          "MemorySize",
+          "InitTimeout",
+          "VpcConfig",
+          "Layers",
+          "Triggers",
+          "InstallDependency",
+          "InstanceConcurrencyConfig",
+          "Role",
+          "Type",
+          "LogFormat",
+          "LogType"
+        ],
+        "changedConfigurationFields": [],
+        "redactedEnvironmentMetadataUnchanged": true,
+        "triggers": [
+          {
+            "AddTime": "2026-09-16 09:16:58",
+            "ModTime": "2026-10-21 11:01:30",
+            "TriggerDesc": "{\"cron\":\"0 * * * * * *\"}",
+            "TriggerName": "gxs-monitor-minute",
+            "Type": "timer"
+          }
+        ]
+      }
+    ],
+    "codeVerificationRef": "retention-post-deploy-code.json"
+  },
+  "before": {
+    "retentionStatusFound": false,
+    "lastObservedErrors": [
+      {
+        "timestamp": "2026-10-26 11:12:29.681",
+        "requestId": "f079101a-f00c-4947-89b4-c16aa9d412c6",
+        "message": "[retention] skipped Cannot read properties of undefined (reading 'in')"
+      },
+      {
+        "timestamp": "2026-10-26 11:11:26.279",
+        "requestId": "13af623c-5acc-445f-a594-3e8e8fdde8d5",
+        "message": "[retention] skipped Cannot read properties of undefined (reading 'in')"
+      },
+      {
+        "timestamp": "2026-10-26 11:10:29.691",
+        "requestId": "f92b85fc-4860-4516-84a3-df30065edfd0",
+        "message": "[retention] skipped Cannot read properties of undefined (reading 'in')"
+      }
+    ]
+  },
+  "firstSuccessfulCleanup": {
+    "observedAt": "2026-10-26T03:20:07.488Z",
+    "state": {
+      "_id": "retention_status",
+      "errors": {},
+      "firstDay": "2026-10-17",
+      "growth": {
+        "compactedIntents": 0,
+        "detailCutoff": "2026-07-28T16:00:00.000Z",
+        "errors": {},
+        "eventCutoff": "2026-09-26T16:00:00.000Z",
+        "removedEvents": 0,
+        "removedGuards": 0
+      },
+      "lastRunAt": "2026-10-26T03:18:29.980Z",
+      "lastRunDay": "2026-10-26",
+      "removed": {
+        "budgets": 31,
+        "events": 632,
+        "notifications": 458,
+        "queries": 599,
+        "queryGuards": 216,
+        "queryTargets": 199,
+        "subscriptionGrants": 594,
+        "targetHealth": 20994
+      }
+    },
+    "baseDeletedRecords": 23723,
+    "growthDeletedRecords": 0,
+    "compactedIntents": 0
+  },
+  "residualChecks": [
+    {
+      "name": "events",
+      "collectionName": "gxs_events",
+      "query": {
+        "dayKey": {
+          "$lt": "2026-10-17"
+        }
+      },
+      "success": true,
+      "returnedRows": 0,
+      "requestId": "82dc3ac2-de6b-4071-b39c-1b3ca264e839"
+    },
+    {
+      "name": "queries",
+      "collectionName": "gxs_queries",
+      "query": {
+        "createdAt": {
+          "$lt": "2026-10-16T16:00:00.000Z"
+        },
+        "status": {
+          "$ne": "pending"
+        }
+      },
+      "success": true,
+      "returnedRows": 0,
+      "requestId": "564e3baf-4e19-4046-be50-7255b1cc8023"
+    },
+    {
+      "name": "notifications",
+      "collectionName": "gxs_notifications",
+      "query": {
+        "createdAt": {
+          "$lt": "2026-10-16T16:00:00.000Z"
+        },
+        "status": {
+          "$nin": [
+            "pending",
+            "sending"
+          ]
+        }
+      },
+      "success": true,
+      "returnedRows": 0,
+      "requestId": "fe2bb19f-f6bf-4daa-ba64-b5bdc42eabed"
+    },
+    {
+      "name": "targetHealth",
+      "collectionName": "gxs_target_health",
+      "query": {
+        "recordedAt": {
+          "$lt": "2026-10-16T16:00:00.000Z"
+        }
+      },
+      "success": true,
+      "returnedRows": 0,
+      "requestId": "29b29b9b-de54-48e5-b5b0-0ec6d8ba0104"
+    },
+    {
+      "name": "subscriptionGrants",
+      "collectionName": "gxs_config",
+      "query": {
+        "kind": "subscription_grant",
+        "createdAt": {
+          "$lt": "2026-10-16T16:00:00.000Z"
+        }
+      },
+      "success": true,
+      "returnedRows": 0,
+      "requestId": "33cd5825-c32a-434f-bde0-b59769bfdd93"
+    },
+    {
+      "name": "queryGuards",
+      "collectionName": "gxs_config",
+      "query": {
+        "kind": "query_guard",
+        "updatedAt": {
+          "$lt": "2026-10-16T16:00:00.000Z"
+        }
+      },
+      "success": true,
+      "returnedRows": 0,
+      "requestId": "81e6125e-e13c-4d00-926c-62ae87892a33"
+    },
+    {
+      "name": "queryTargets",
+      "collectionName": "gxs_config",
+      "query": {
+        "kind": "query_target",
+        "updatedAt": {
+          "$lt": "2026-10-16T16:00:00.000Z"
+        }
+      },
+      "success": true,
+      "returnedRows": 0,
+      "requestId": "d8fe0fe9-41cc-4090-963b-bda5e1687226"
+    },
+    {
+      "name": "budgets",
+      "collectionName": "gxs_config",
+      "budgetIdCount": 60,
+      "newestId": "collector_budget_2026-10-16",
+      "oldestId": "collector_budget_2026-08-18",
+      "success": true,
+      "returnedRows": 0,
+      "requestId": "f3a76dbf-597d-420d-9c63-bb4721304dac"
+    }
+  ],
+  "limitations": [
+    "Observation covers these post-deployment scheduled invocations, not a full day or the next day's retention rollover.",
+    "Growth counts of zero can include absent default-off telemetry collections under the existing policy.",
+    "No manual purge or synthetic business invocation was used; the existing minute timer executed the cleanup.",
+    "Code rollback cannot restore deleted history; existing 10/30/90-day retention policies were not changed."
+  ],
+  "afterFollowupState": {
+    "observedAt": "2026-10-26T03:21:26.521Z",
+    "state": {
+      "_id": "retention_status",
+      "errors": {},
+      "firstDay": "2026-10-17",
+      "growth": {
+        "compactedIntents": 0,
+        "detailCutoff": "2026-07-28T16:00:00.000Z",
+        "errors": {},
+        "eventCutoff": "2026-09-26T16:00:00.000Z",
+        "removedEvents": 0,
+        "removedGuards": 0
+      },
+      "lastRunAt": "2026-10-26T03:18:29.980Z",
+      "lastRunDay": "2026-10-26",
+      "removed": {
+        "budgets": 31,
+        "events": 632,
+        "notifications": 458,
+        "queries": 599,
+        "queryGuards": 216,
+        "queryTargets": 199,
+        "subscriptionGrants": 594,
+        "targetHealth": 20994
+      }
+    },
+    "unchangedAfterTwoFurtherScheduledRuns": true
+  },
+  "scheduledObservation": {
+    "queryStart": "2026-10-26 11:17:52",
+    "queryEnd": "2026-10-26 11:21:00",
+    "hasMore": false,
+    "logLineCount": 15,
+    "completedRequests": [
+      {
+        "requestId": "4de5aad3-c547-4a98-98e2-7ae8d1a6b269",
+        "completedAt": "2026-10-26 11:18:33.282",
+        "statusCode": "200",
+        "retCode": "0",
+        "durationMs": 31402,
+        "businessResponse": {
+          "ok": true,
+          "state": "running",
+          "scanned": 24,
+          "observations": 55,
+          "events": 0,
+          "sent": 0,
+          "deadlineReached": false
+        }
+      },
+      {
+        "requestId": "ff8c5b56-1579-417d-a041-2af5bc96f12f",
+        "completedAt": "2026-10-26 11:19:26.359",
+        "statusCode": "200",
+        "retCode": "0",
+        "durationMs": 25911,
+        "businessResponse": {
+          "ok": true,
+          "state": "running",
+          "scanned": 22,
+          "observations": 53,
+          "events": 0,
+          "sent": 0,
+          "deadlineReached": false
+        }
+      },
+      {
+        "requestId": "1093ac99-7ed4-4fe4-9a2a-820c89b0a04a",
+        "completedAt": "2026-10-26 11:20:36.094",
+        "statusCode": "200",
+        "retCode": "0",
+        "durationMs": 34609,
+        "businessResponse": {
+          "ok": true,
+          "state": "running",
+          "scanned": 25,
+          "observations": 56,
+          "events": 0,
+          "sent": 0,
+          "deadlineReached": false
+        }
+      }
+    ],
+    "retentionErrors": [],
+    "completedInvocationCount": 3
+  },
+  "acceptancePassed": true
+}

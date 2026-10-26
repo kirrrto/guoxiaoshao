@@ -1,0 +1,508 @@
+{
+  "checkedAt": "2026-10-26T09:08:56.077Z",
+  "scope": "Observed same-duration production windows, not a controlled experiment or settled invoice",
+  "before": {
+    "window": {
+      "start": "2026-10-26 16:45:00",
+      "end": "2026-10-26 16:50:00"
+    },
+    "totalAccess": 3930,
+    "monitorInvocations": 5,
+    "observations": 260
+  },
+  "after": {
+    "window": {
+      "start": "2026-10-26 17:01:00",
+      "end": "2026-10-26 17:06:00"
+    },
+    "totalAccess": 3628,
+    "monitorInvocations": 5,
+    "observations": 261
+  },
+  "totalAccessReductionPercent": 7.684478371501273,
+  "accessPerObservation": {
+    "before": 15.115384615384615,
+    "after": 13.900383141762452
+  },
+  "configReads": {
+    "before": 995,
+    "after": 824
+  },
+  "userReads": {
+    "before": 98,
+    "after": 34
+  },
+  "cloudbaseErrorsAfter": [],
+  "monitorState": "all running, no deadlineReached",
+  "upstreamIncident": {
+    "time": "2026-10-26T09:04:14.760Z",
+    "target": "R401|MK2P4CH/A",
+    "error": "The operation was aborted due to timeout",
+    "recoveredWithinInvocation": true,
+    "additionalFailedObservation": 1,
+    "scheduledSampleRecordsExcludingRetryFailure": 260
+  },
+  "events": 0,
+  "sent": 0,
+  "configRevision": 12,
+  "cadenceChanged": false,
+  "limitations": [
+    "The before window contains additional real client bootstrap/manual activity; the after window contains one recovered upstream timeout and its additional unknown observation. Traffic is not fully isolated.",
+    "Both windows include a five-minute payment reconciliation trigger; user/order distributions and platform latency can differ.",
+    "These are gateway access records, not billed document/API units. Settled invoice savings are not yet verified.",
+    "No inventory change event or real notification send occurred in the window; actual receipt is not validated."
+  ],
+  "equalMonitorSampleCheck": {
+    "beforeWindow": {
+      "start": "2026-10-26 16:46:00",
+      "end": "2026-10-26 16:49:00"
+    },
+    "afterWindow": {
+      "start": "2026-10-26 17:01:00",
+      "end": "2026-10-26 17:04:00"
+    },
+    "monitorSamplesEach": 156,
+    "beforeAccess": 2270,
+    "afterAccess": 2023,
+    "note": "Before includes3 additional manually queried observations, user bootstrap and quota activity; this secondary window is also not controlled.",
+    "beforeRows": [
+      {
+        "resourceName": "gxs_config",
+        "statusCode": 200,
+        "code": "",
+        "count": 597,
+        "action": "QueryDocument"
+      },
+      {
+        "code": "",
+        "count": 272,
+        "action": "CommitTransaction",
+        "resourceName": "undefined",
+        "statusCode": 200
+      },
+      {
+        "statusCode": 200,
+        "code": "",
+        "count": 272,
+        "action": "StartTransaction",
+        "resourceName": "undefined"
+      },
+      {
+        "resourceName": "gxs_latest",
+        "statusCode": 200,
+        "code": "",
+        "count": 175,
+        "action": "QueryDocument"
+      },
+      {
+        "code": "",
+        "count": 172,
+        "action": "UpdateDocument",
+        "resourceName": "gxs_config",
+        "statusCode": 200
+      },
+      {
+        "code": "",
+        "count": 159,
+        "action": "UpdateDocument",
+        "resourceName": "gxs_observation_days",
+        "statusCode": 200
+      },
+      {
+        "statusCode": 200,
+        "code": "",
+        "count": 159,
+        "action": "UpdateDocument",
+        "resourceName": "gxs_latest"
+      },
+      {
+        "action": "QueryDocument",
+        "resourceName": "gxs_observation_days",
+        "statusCode": 200,
+        "code": "",
+        "count": 159
+      },
+      {
+        "action": "QueryDocument",
+        "resourceName": "gxs_notifications",
+        "statusCode": 200,
+        "code": "",
+        "count": 99
+      },
+      {
+        "resourceName": "gxs_events",
+        "statusCode": 200,
+        "code": "",
+        "count": 91,
+        "action": "QueryDocument"
+      },
+      {
+        "action": "QueryDocument",
+        "resourceName": "gxs_users",
+        "statusCode": 200,
+        "code": "",
+        "count": 56
+      },
+      {
+        "code": "",
+        "count": 19,
+        "action": "QueryDocument",
+        "resourceName": "gxs_follows",
+        "statusCode": 200
+      },
+      {
+        "action": "QueryDocument",
+        "resourceName": "gxs_queries",
+        "statusCode": 200,
+        "code": "",
+        "count": 7
+      },
+      {
+        "resourceName": "gxs_catalog_products",
+        "statusCode": 200,
+        "code": "",
+        "count": 7,
+        "action": "QueryDocument"
+      },
+      {
+        "action": "UpdateDocument",
+        "resourceName": "gxs_notifications",
+        "statusCode": 200,
+        "code": "",
+        "count": 6
+      },
+      {
+        "action": "QueryDocument",
+        "resourceName": "gxs_catalog_stores",
+        "statusCode": 200,
+        "code": "",
+        "count": 4
+      },
+      {
+        "action": "InvokeFunction",
+        "resourceName": "gxs_api",
+        "statusCode": 200,
+        "code": "",
+        "count": 4
+      },
+      {
+        "count": 3,
+        "action": "UpdateDocument",
+        "resourceName": "gxs_users",
+        "statusCode": 200,
+        "code": ""
+      },
+      {
+        "action": "InsertDocument",
+        "resourceName": "gxs_users",
+        "statusCode": 200,
+        "code": "",
+        "count": 2
+      },
+      {
+        "action": "InsertDocument",
+        "resourceName": "gxs_quota_ledger",
+        "statusCode": 200,
+        "code": "",
+        "count": 2
+      },
+      {
+        "action": "QueryDocument",
+        "resourceName": "gxs_quota_ledger",
+        "statusCode": 200,
+        "code": "",
+        "count": 2
+      },
+      {
+        "action": "InsertDocument",
+        "resourceName": "gxs_config",
+        "statusCode": 200,
+        "code": "",
+        "count": 1
+      },
+      {
+        "action": "UpdateDocument",
+        "resourceName": "gxs_queries",
+        "statusCode": 200,
+        "code": "",
+        "count": 1
+      },
+      {
+        "action": "InsertDocument",
+        "resourceName": "gxs_queries",
+        "statusCode": 200,
+        "code": "",
+        "count": 1
+      }
+    ],
+    "afterRows": [
+      {
+        "resourceName": "gxs_config",
+        "statusCode": 200,
+        "code": "",
+        "count": 476,
+        "action": "QueryDocument"
+      },
+      {
+        "code": "",
+        "count": 255,
+        "action": "CommitTransaction",
+        "resourceName": "undefined",
+        "statusCode": 200
+      },
+      {
+        "action": "StartTransaction",
+        "resourceName": "undefined",
+        "statusCode": 200,
+        "code": "",
+        "count": 255
+      },
+      {
+        "action": "QueryDocument",
+        "resourceName": "gxs_latest",
+        "statusCode": 200,
+        "code": "",
+        "count": 169
+      },
+      {
+        "action": "UpdateDocument",
+        "resourceName": "gxs_config",
+        "statusCode": 200,
+        "code": "",
+        "count": 159
+      },
+      {
+        "action": "UpdateDocument",
+        "resourceName": "gxs_latest",
+        "statusCode": 200,
+        "code": "",
+        "count": 156
+      },
+      {
+        "count": 156,
+        "action": "QueryDocument",
+        "resourceName": "gxs_observation_days",
+        "statusCode": 200,
+        "code": ""
+      },
+      {
+        "statusCode": 200,
+        "code": "",
+        "count": 156,
+        "action": "UpdateDocument",
+        "resourceName": "gxs_observation_days"
+      },
+      {
+        "action": "QueryDocument",
+        "resourceName": "gxs_notifications",
+        "statusCode": 200,
+        "code": "",
+        "count": 100
+      },
+      {
+        "resourceName": "gxs_events",
+        "statusCode": 200,
+        "code": "",
+        "count": 94,
+        "action": "QueryDocument"
+      },
+      {
+        "action": "QueryDocument",
+        "resourceName": "gxs_users",
+        "statusCode": 200,
+        "code": "",
+        "count": 16
+      },
+      {
+        "action": "QueryDocument",
+        "resourceName": "gxs_follows",
+        "statusCode": 200,
+        "code": "",
+        "count": 16
+      },
+      {
+        "statusCode": 200,
+        "code": "",
+        "count": 6,
+        "action": "UpdateDocument",
+        "resourceName": "gxs_notifications"
+      },
+      {
+        "count": 6,
+        "action": "QueryDocument",
+        "resourceName": "gxs_catalog_products",
+        "statusCode": 200,
+        "code": ""
+      },
+      {
+        "action": "QueryDocument",
+        "resourceName": "gxs_catalog_stores",
+        "statusCode": 200,
+        "code": "",
+        "count": 3
+      }
+    ]
+  },
+  "consecutiveRoundCoverage": {
+    "from": "2026-10-26T09:01:22.438Z",
+    "to": "2026-10-26T09:02:22.547Z",
+    "groups": 21,
+    "everyGroupAdvancedOnce": true,
+    "everySuccessPersisted": true,
+    "successIntervalMs": {
+      "min": 57674,
+      "max": 60515
+    },
+    "targets": [
+      {
+        "key": "R320|MK2M4CH/A,MK2P4CH/A,MK2T4CH/A,MK2U4CH/A",
+        "successDelta": 1,
+        "intervalMs": 57674,
+        "persistedSuccessMatches": true
+      },
+      {
+        "key": "R359|MK2P4CH/A,MK2T4CH/A",
+        "successDelta": 1,
+        "intervalMs": 59013,
+        "persistedSuccessMatches": true
+      },
+      {
+        "key": "R388|MK2P4CH/A,MK2Q4CH/A,MK2T4CH/A,MK2U4CH/A",
+        "successDelta": 1,
+        "intervalMs": 58211,
+        "persistedSuccessMatches": true
+      },
+      {
+        "key": "R389|MK2P4CH/A,MK2T4CH/A",
+        "successDelta": 1,
+        "intervalMs": 58832,
+        "persistedSuccessMatches": true
+      },
+      {
+        "key": "R390|MK2P4CH/A,MK2T4CH/A",
+        "successDelta": 1,
+        "intervalMs": 58791,
+        "persistedSuccessMatches": true
+      },
+      {
+        "key": "R401|MK2P4CH/A",
+        "successDelta": 1,
+        "intervalMs": 59092,
+        "persistedSuccessMatches": true
+      },
+      {
+        "key": "R448|MK2M4CH/A,MK2P4CH/A,MK2Q4CH/A,MK2T4CH/A,MK2U4CH/A",
+        "successDelta": 1,
+        "intervalMs": 58381,
+        "persistedSuccessMatches": true
+      },
+      {
+        "key": "R471|MK2P4CH/A",
+        "successDelta": 1,
+        "intervalMs": 59077,
+        "persistedSuccessMatches": true
+      },
+      {
+        "key": "R479|MK2M4CH/A,MK2P4CH/A,MK2T4CH/A,MK2U4CH/A",
+        "successDelta": 1,
+        "intervalMs": 57994,
+        "persistedSuccessMatches": true
+      },
+      {
+        "key": "R484|MK2M4CH/A,MK2P4CH/A,MK2Q4CH/A",
+        "successDelta": 1,
+        "intervalMs": 59311,
+        "persistedSuccessMatches": true
+      },
+      {
+        "key": "R532|MK2P4CH/A",
+        "successDelta": 1,
+        "intervalMs": 58807,
+        "persistedSuccessMatches": true
+      },
+      {
+        "key": "R575|MK2T4CH/A",
+        "successDelta": 1,
+        "intervalMs": 59897,
+        "persistedSuccessMatches": true
+      },
+      {
+        "key": "R577|MJTF4CH/A,MK2P4CH/A",
+        "successDelta": 1,
+        "intervalMs": 59052,
+        "persistedSuccessMatches": true
+      },
+      {
+        "key": "R579|MK2P4CH/A",
+        "successDelta": 1,
+        "intervalMs": 60133,
+        "persistedSuccessMatches": true
+      },
+      {
+        "key": "R639|MJTF4CH/A,MK2P4CH/A",
+        "successDelta": 1,
+        "intervalMs": 59767,
+        "persistedSuccessMatches": true
+      },
+      {
+        "key": "R644|MJTA4CH/A",
+        "successDelta": 1,
+        "intervalMs": 60129,
+        "persistedSuccessMatches": true
+      },
+      {
+        "key": "R645|MK2M4CH/A,MK2P4CH/A,MK2T4CH/A,MK2U4CH/A",
+        "successDelta": 1,
+        "intervalMs": 59930,
+        "persistedSuccessMatches": true
+      },
+      {
+        "key": "R678|MK2P4CH/A,MK2T4CH/A",
+        "successDelta": 1,
+        "intervalMs": 60515,
+        "persistedSuccessMatches": true
+      },
+      {
+        "key": "R761|MK2M4CH/A,MK2P4CH/A,MK2Q4CH/A",
+        "successDelta": 1,
+        "intervalMs": 59400,
+        "persistedSuccessMatches": true
+      },
+      {
+        "key": "R792|MK2P4CH/A,MK2Q4CH/A,MK2T4CH/A,MK2U4CH/A",
+        "successDelta": 1,
+        "intervalMs": 60321,
+        "persistedSuccessMatches": true
+      },
+      {
+        "key": "R793|MK2M4CH/A,MK2P4CH/A,MK2Q4CH/A",
+        "successDelta": 1,
+        "intervalMs": 59974,
+        "persistedSuccessMatches": true
+      }
+    ]
+  },
+  "completedRunCounters": [
+    {
+      "at": "2026-10-26T09:01:22.438Z",
+      "observations": 52,
+      "passes": 31,
+      "emptyConfigReadsSkipped": 28,
+      "configReads": 3
+    },
+    {
+      "at": "2026-10-26T09:02:22.547Z",
+      "observations": 52,
+      "passes": 32,
+      "emptyConfigReadsSkipped": 28,
+      "configReads": 4
+    },
+    {
+      "at": "2026-10-26T09:05:20.790Z",
+      "observations": 52,
+      "passes": 32,
+      "emptyConfigReadsSkipped": 28,
+      "configReads": 4
+    }
+  ]
+}

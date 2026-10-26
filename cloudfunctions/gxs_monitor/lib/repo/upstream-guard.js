@@ -33,7 +33,10 @@ function retryAfterMs(value, now) {
   const result = Number.isFinite(seconds) && seconds >= 0 ? seconds * 1000 : Date.parse(value) - now;
   return Number.isFinite(result) ? Math.max(0, Math.min(result, 2147483647)) : 0;
 }
-function upstreamGuardMethods(run) {
+function needsBreakerReset(state) {
+  return state.reason || state.probeId || state.probeUntil || state.trips || (state.failures || []).length;
+}
+function upstreamGuardMethods(run, { readUpstreamBreaker } = {}) {
   return {
     getUpstreamCapacity: ({ now }) => run(async tx => ({
       day: await tx.get(C.config, `collector_budget_${dayKey(now)}`),
@@ -83,33 +86,46 @@ function upstreamGuardMethods(run) {
         autoCount: sourceCounts.auto, manualCount: sourceCounts.manual, updatedAt: now, expiresAt: new Date(nowMs + 7 * 86400000).toISOString() });
       return { allowed: true, reason: null, minuteCount: minuteCount + 1, dayCount: current.dayCount + 1, ...detail, token };
     }),
-    recordUpstreamOutcome: ({ token, record, success, now }) => run(async tx => {
-      const state = await tx.get(C.config, 'upstream_breaker') || { _id: 'upstream_breaker', generation: 0, trips: 0 };
-      const nowMs = Date.parse(now);
-      const ownsProbe = token && token.probe && state.probeId === token.id && token.generation === state.generation && state.probeUntil > nowMs;
-      if (success) {
-        // A request started before a 429 cannot reopen the source afterward.
-        const needsReset = state.reason || state.probeId || state.probeUntil || state.trips || (state.failures || []).length;
-        // Healthy requests only need to read a clean closed breaker. Rewriting
-        // it for every success makes all stores and manual queries contend on
-        // the same document without changing any admission decision.
-        if (ownsProbe || (!state.until && token && token.generation === state.generation && needsReset)) {
-          await tx.put(C.config, { ...state, until: null, reason: null, probeId: null, probeUntil: null, trips: 0, failures: [], updatedAt: now });
+    recordUpstreamOutcome: async ({ token, record, success, now }) => {
+      if (readUpstreamBreaker && success === true && token && token.probe === false) {
+        const snapshot = await readUpstreamBreaker();
+        // A normal success has nothing to mutate in an already clean generation.
+        // Never create a default generation from an absent/malformed snapshot.
+        // If a concurrent 429 arrives after this read, this path performs no write
+        // and cannot clear it; admission still reads the authoritative breaker.
+        if (snapshot && Number.isSafeInteger(snapshot.generation) && snapshot.generation >= 0 &&
+            token.generation === snapshot.generation && !snapshot.until && !needsBreakerReset(snapshot)) {
+          return { paused: false };
         }
-        return { paused: Boolean(state.until && !ownsProbe) };
       }
-      const failures = (state.failures || []).filter(at => at > nowMs - 60000).concat(nowMs).slice(-5);
-      const immediate = record.httpStatus === 429 || record.httpStatus === 503;
-      if (!immediate && !ownsProbe && failures.length < 5) {
-        await tx.put(C.config, { ...state, failures, updatedAt: now });
-        return { paused: Boolean(state.until), retryAt: state.until || null };
-      }
-      const trips = (state.trips || 0) + 1;
-      const cooldown = Math.max(retryAfterMs(record.retryAfter, nowMs), Math.min(1800000, 30000 * 2 ** Math.min(trips - 1, 6)));
-      const until = Math.max(state.until || 0, nowMs + cooldown);
-      await tx.put(C.config, { _id: 'upstream_breaker', generation: (state.generation || 0) + 1, trips, until, reason: immediate ? `http_${record.httpStatus}` : 'failure_burst', failures: [], probeId: null, probeUntil: null, updatedAt: now });
-      return { paused: true, retryAt: until };
-    }),
+      return run(async tx => {
+        const state = await tx.get(C.config, 'upstream_breaker') || { _id: 'upstream_breaker', generation: 0, trips: 0 };
+        const nowMs = Date.parse(now);
+        const ownsProbe = token && token.probe && state.probeId === token.id && token.generation === state.generation && state.probeUntil > nowMs;
+        if (success) {
+          // A request started before a 429 cannot reopen the source afterward.
+          const needsReset = needsBreakerReset(state);
+          // Healthy requests only need to read a clean closed breaker. Rewriting
+          // it for every success makes all stores and manual queries contend on
+          // the same document without changing any admission decision.
+          if (ownsProbe || (!state.until && token && token.generation === state.generation && needsReset)) {
+            await tx.put(C.config, { ...state, until: null, reason: null, probeId: null, probeUntil: null, trips: 0, failures: [], updatedAt: now });
+          }
+          return { paused: Boolean(state.until && !ownsProbe) };
+        }
+        const failures = (state.failures || []).filter(at => at > nowMs - 60000).concat(nowMs).slice(-5);
+        const immediate = record.httpStatus === 429 || record.httpStatus === 503;
+        if (!immediate && !ownsProbe && failures.length < 5) {
+          await tx.put(C.config, { ...state, failures, updatedAt: now });
+          return { paused: Boolean(state.until), retryAt: state.until || null };
+        }
+        const trips = (state.trips || 0) + 1;
+        const cooldown = Math.max(retryAfterMs(record.retryAfter, nowMs), Math.min(1800000, 30000 * 2 ** Math.min(trips - 1, 6)));
+        const until = Math.max(state.until || 0, nowMs + cooldown);
+        await tx.put(C.config, { _id: 'upstream_breaker', generation: (state.generation || 0) + 1, trips, until, reason: immediate ? `http_${record.httpStatus}` : 'failure_burst', failures: [], probeId: null, probeUntil: null, updatedAt: now });
+        return { paused: true, retryAt: until };
+      });
+    },
   };
 }
 module.exports = { upstreamGuardMethods, reserveAccountQuery, releaseAccountQuery, retryAfterMs };

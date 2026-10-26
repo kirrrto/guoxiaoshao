@@ -8,6 +8,15 @@
 // Keep technical details and complete acceptance records in release documents.
 const RELEASE_NOTES = [
   {
+    version: '3.4.1',
+    title: '页面跳转与运行修复',
+    dateText: '发布候选 · 2026-10-26',
+    highlights: [
+      '改善快速切页和返回提醒体验时的稳定性。',
+      '修复历史数据清理异常，减少后台重复处理。',
+    ],
+  },
+  {
     version: '3.4.0',
     title: '库存监测与提醒更稳定',
     dateText: '发布候选 · 2026-10-23',

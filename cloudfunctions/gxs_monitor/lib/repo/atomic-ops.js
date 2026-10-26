@@ -107,7 +107,7 @@ async function refundMembershipIn(tx, { orderId, nowIso, refundFen, providerData
   return { order: refunded, applied: true, revokedMs: removedMs, expiresAt: user && user.membership.expiresAt };
 }
 
-function atomicMethods(run) {
+function atomicMethods(run, { readUpstreamBreaker } = {}) {
   return {
     ensureMemberPlanMetadata: ({ userKey }) => run(async tx => {
       const user = await tx.get(C.users, userKey);
@@ -596,7 +596,7 @@ function atomicMethods(run) {
       return { order: paid, applied: !receipt };
     }),
 
-    ...upstreamGuardMethods(run),
+    ...upstreamGuardMethods(run, { readUpstreamBreaker }),
     ...growthMethods(run),
     ...queryTargetMethods(run),
     ...currentAvailabilityMethods(run),

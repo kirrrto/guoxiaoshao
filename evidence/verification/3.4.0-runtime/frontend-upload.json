@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "version": "3.4.0",
+  "appid": "wxe96ad9e77b602f1b",
+  "uploadedAt": "2026-10-26T11:33:42+08:00",
+  "sourceFingerprint": "sha256:3c276768d2cb4e70614b09dcf8cdd943dd5c09305829a0febd6adb87b044f848",
+  "description": "2026-10-26 导航并发与失败恢复补丁，源码3c276768d2cb",
+  "exitCode": 0,
+  "packageBytes": 1660491,
+  "uploadLogSha256": "f3261f90b41de2796bf1b8d0d2bd74dc80eb8f7511b6cecc10de2623046c3e37",
+  "uploadInfo": {
+    "size": {
+      "total": 1660491,
+      "packages": [
+        {
+          "name": "TOTAL",
+          "size": 1660491
+        }
+      ]
+    }
+  },
+  "trialSelection": "unconfirmed",
+  "submittedForReview": false,
+  "published": false,
+  "cloudQualityRetest": "pending",
+  "nativeEvidence": "native-runtime-regression.json"
+}

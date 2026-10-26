@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-10-26T03:09:41.515Z",
+  "scope": "Read-only download and byte comparison of deployed non-dependency files; node_modules not compared; no deployment or database write",
+  "environment": "flowermean-6gjaxfqhf6c13e88",
+  "functions": [
+    {
+      "functionName": "gxs_api",
+      "remoteNonDependencyFiles": 76,
+      "summary": [
+        {
+          "status": "changed",
+          "count": 1
+        },
+        {
+          "status": "identical_bytes",
+          "count": 75
+        }
+      ],
+      "differences": [
+        {
+          "path": "lib/repo/cloudbase-repo.js",
+          "status": "changed",
+          "remoteSha256": "b3887555131942733cfae8e292250e4738a36efe65ef00a9c133243c7531fba7",
+          "localSha256": "10c02a7981cc06c624f9f8c571544a22581a9216ee377bb012780ccd4932da1c"
+        }
+      ]
+    },
+    {
+      "functionName": "gxs_monitor",
+      "remoteNonDependencyFiles": 48,
+      "summary": [
+        {
+          "status": "changed",
+          "count": 2
+        },
+        {
+          "status": "identical_bytes",
+          "count": 46
+        }
+      ],
+      "differences": [
+        {
+          "path": "lib/repo/cloudbase-repo.js",
+          "status": "changed",
+          "remoteSha256": "b3887555131942733cfae8e292250e4738a36efe65ef00a9c133243c7531fba7",
+          "localSha256": "10c02a7981cc06c624f9f8c571544a22581a9216ee377bb012780ccd4932da1c"
+        },
+        {
+          "path": "lib-manifest.json",
+          "status": "changed",
+          "remoteSha256": "261d9788e707d22f15774a4e976c655f52471447ae148d115011ee2ca3a25471",
+          "localSha256": "a394a71c1450bfac48302fcf3114368c0fdac1f06afe103b5e48f911ab4ed829"
+        }
+      ]
+    }
+  ],
+  "packageSha256": {
+    "gxs_api": "c9886639dc3ef761cef18a711a74a8fc6272c45359984b193014ab953c858239",
+    "gxs_monitor": "b2c8b3cc8ff433b0973af286064e2676982c523bfd7a5cdbfecc5e1965bc07b8"
+  },
+  "packageHashesMatchCloudBase": true,
+  "exactChange": "Rename Array.from callback argument from _ to unused to avoid shadowing db.command; generated monitor manifest changes only this file hash and byte count",
+  "unchanged": [
+    "other source files",
+    "package.json",
+    "package-lock.json",
+    "config.json",
+    "retention policies"
+  ],
+  "noAddedOrMissingFiles": true,
+  "backupDirectory": "output/cloud-code-audit-2026-10-26",
+  "deployed": false
+}

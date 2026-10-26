@@ -1,0 +1,58 @@
+{
+  "scope": "Exact deployed ZIP comparison including every existing dependency file",
+  "functions": [
+    {
+      "functionName": "gxs_api",
+      "fileCount": 5902,
+      "unchanged": 5894,
+      "changed": [
+        "lib/engine/collector.js",
+        "lib/engine/lease.js",
+        "lib/engine/scheduled.js",
+        "lib/repo/atomic-ops.js",
+        "lib/repo/cloudbase-repo.js",
+        "lib/repo/upstream-guard.js",
+        "package-lock.json",
+        "package.json"
+      ],
+      "added": [],
+      "removed": [],
+      "matchesLocalBytes": true,
+      "passed": true
+    },
+    {
+      "functionName": "gxs_monitor",
+      "fileCount": 5825,
+      "unchanged": 5816,
+      "changed": [
+        "lib-manifest.json",
+        "lib/engine/collector.js",
+        "lib/engine/lease.js",
+        "lib/engine/scheduled.js",
+        "lib/repo/atomic-ops.js",
+        "lib/repo/cloudbase-repo.js",
+        "lib/repo/upstream-guard.js",
+        "package-lock.json",
+        "package.json"
+      ],
+      "added": [],
+      "removed": [],
+      "matchesLocalBytes": true,
+      "passed": true
+    },
+    {
+      "functionName": "cloudbase_auth",
+      "fileCount": 5830,
+      "unchanged": 5828,
+      "changed": [
+        "package-lock.json",
+        "package.json"
+      ],
+      "added": [],
+      "removed": [],
+      "matchesLocalBytes": true,
+      "passed": true
+    }
+  ],
+  "passed": true
+}

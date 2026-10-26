@@ -481,9 +481,10 @@ test('CloudBase bulk reads paginate past 1000 and split ID filters into bounded 
       },
     };
   }
-  const repo = createCloudbaseRepo({ command: { in: values => { assert.ok(values.length <= 20); return { in: values }; } }, collection: name => query(name) });
+  const repo = createCloudbaseRepo({ command: { in: values => { assert.ok(values.length <= 100); return { in: values }; } }, collection: name => query(name) });
   assert.equal((await repo.listStores()).length, 245);
   assert.equal((await repo.listActiveFollows()).length, 1205);
   assert.equal((await repo.getUsers(dataset[C.users].map(u => u._id))).length, 245);
+  assert.deepEqual(calls.filter(call => call.name === C.users).map(call => call.limit), [100, 100, 45]);
   assert.ok(calls.some(call => call.name === C.follows && call.skip >= 1000));
 });

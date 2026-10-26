@@ -1,0 +1,162 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-10-26T03:21:26.521Z",
+  "version": "3.4.0",
+  "sourceFingerprint": "sha256:3c276768d2cb4e70614b09dcf8cdd943dd5c09305829a0febd6adb87b044f848",
+  "scope": "Local tests, SDK analysis, official DevTools simulator navigation and image decode, 3.4.0 frontend upload, and authorized production retention deployment; no physical-device or fresh cloud-quality pass",
+  "tests": {
+    "command": "npm test",
+    "tests": 1658,
+    "pass": 1658,
+    "fail": 0,
+    "skipped": 0,
+    "cancelled": 0,
+    "durationMs": 113052.1147,
+    "logSha256": "f79127f3658e60e7fec00b1c4e1a6d8fdf150559de2ecbeade30c4146bd94de7"
+  },
+  "sourceCheck": {
+    "files": 555,
+    "javaScript": 393,
+    "json": 48,
+    "pages": 7,
+    "operatorPages": 1,
+    "errors": []
+  },
+  "nativeCompile": {
+    "checkedAt": "2026-10-26T02:52:59.022Z",
+    "scope": "Local official WXML/WXSS compiler execution; not simulator, physical device, upload, or cloud quality acceptance",
+    "results": [
+      {
+        "compiler": "wcc",
+        "compilerSha256": "2ec832ea823c5f53e264230960637290a8cc7694773016b4c232a439193c9179",
+        "files": 11,
+        "status": 0,
+        "stderr": "",
+        "outputBytes": 349907
+      },
+      {
+        "compiler": "wcsc",
+        "compilerSha256": "23914ded6433a178c184e4e0fcdb077b499502b4e5a784a1f44f3db55699ce31",
+        "files": 15,
+        "status": 0,
+        "stderr": "",
+        "outputBytes": 29481
+      }
+    ]
+  },
+  "monitorBundle": {
+    "passed": true,
+    "files": 43,
+    "sourceBytes": 304735,
+    "issues": []
+  },
+  "releaseGate": {
+    "passed": false,
+    "sourceChecksPassed": true,
+    "publicationReady": false,
+    "checks": 51,
+    "passedChecks": 50,
+    "failedChecks": [
+      {
+        "name": "known WeChat quality findings have passing current-version retest evidence",
+        "passed": false
+      }
+    ],
+    "blockers": [
+      {
+        "id": "unused-channel-video",
+        "code": "finding_open",
+        "message": "四个主页面被报告声明了未使用的 channel-video 组件: unresolved since 3.3.1."
+      },
+      {
+        "id": "custom-tabbar-first-switch",
+        "code": "finding_open",
+        "message": "WebView 自定义底部导航首次切换闪烁: unresolved since 3.3.1."
+      },
+      {
+        "id": "oversized-product-image",
+        "code": "finding_open",
+        "message": "商品图片过大: unresolved since 3.3.1."
+      },
+      {
+        "id": "legacy-product-image-format",
+        "code": "finding_open",
+        "message": "商品图片格式未通过质检建议: unresolved since 3.3.1."
+      }
+    ]
+  },
+  "evidence": {
+    "channelVideo": "channel-video-sdk-reproduction.json",
+    "tooEarly": "sdk-too-early-origin.json",
+    "sourceComparison": "source-comparison.json",
+    "cloudReadOnlyDiagnosis": "cloud-logs.json",
+    "cloudSourceComparison": "cloud-source-comparison.json",
+    "cloudGatewayDiagnosis": "cloud-gateway-logs.json",
+    "retentionDeployment": "retention-deployment.json",
+    "retentionPostDeployCode": "retention-post-deploy-code.json",
+    "frontendUpload": "frontend-upload.json",
+    "nativeRuntime": "native-runtime-regression.json"
+  },
+  "changes": {
+    "newTests": 16,
+    "production": "Shared navigation lock and explicit native failure handling; Promise/callback deduplication; return-intent generation protection; safe runtime context and error codes; retention database-command shadowing fix in canonical API and generated monitor",
+    "retentionRegression": "Pinned real wx-server-sdk 4.0.2 with offline transport; reproduces original pre-deletion failure and validates exact existing cleanup predicates, 60 budget IDs in three batches, protected collections and partial failure continuation",
+    "testFixtureCorrections": [
+      "launch-calendar-guide: complete independent simulated visits",
+      "v3-history-help-journey: complete simulated navigation"
+    ],
+    "dependencySetup": "Installed pinned local root and three cloud-function dependencies with npm ci --ignore-scripts; later incremental deployment preserved all existing cloud dependency files",
+    "review": "Independent read-only review found a stale-success race consuming a newer equal-URL intent; fixed and independently rechecked"
+  },
+  "incidents": [
+    {
+      "id": "sdk-timeout",
+      "reportedVersion": "3.3.2",
+      "state": "Existing recovery verified and diagnostics improved; authenticated historical API/auth/monitor logs read; no function execution timeout in queried windows, but no requestId links these calls to the reported client incident"
+    },
+    {
+      "id": "too-early",
+      "reportedVersion": "3.4.0",
+      "state": "Exact SDK 3.16.3 stack mechanism identified statically; caller and live elimination not established"
+    },
+    {
+      "id": "route-done",
+      "reportedVersion": "3.3.2",
+      "state": "Independent concurrent-navigation and recovery defects fixed locally; no proof linking the historical incident to those defects"
+    },
+    {
+      "id": "unused-channel-video",
+      "reportedVersion": "3.4.0",
+      "state": "Platform builtin alias audit reproduced on four official SDK versions without business code; WeChat quality finding remains open"
+    },
+    {
+      "id": "retention-command-shadowing",
+      "reportedVersion": "3.4.0",
+      "state": "Fixed and deployed with explicit approval; exact three-file cloud comparison passed; existing timer cleared 23723 expired records with no retention errors, eight residual checks empty, and state unchanged after two further normal scheduled runs"
+    }
+  ],
+  "externalActions": {
+    "uploaded": true,
+    "deployed": true,
+    "submittedForReview": false,
+    "published": false,
+    "platformIssueSubmitted": false,
+    "deploymentScope": {
+      "functions": [
+        "gxs_api",
+        "gxs_monitor"
+      ],
+      "files": 3,
+      "change": "retention-command-shadowing only",
+      "retentionAcceptancePassed": true
+    },
+    "trialSelection": "unconfirmed"
+  },
+  "limitations": [
+    "MiniTest and We分析 content access was denied by browser site-safety policy; no alternate access attempted",
+    "Isolated too-early SDK VM execution was rejected by automatic approval review: blocked by policy; only static analysis counted",
+    "No corresponding physical-device or fresh WeChat cloud quality retest yet",
+    "CloudBase authorization completed and production logs were read; missing client requestId prevents exact timeout correlation",
+    "Retention production acceptance covers three scheduled runs and unchanged state after two followups; not a full-day or next-day rollover observation"
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "checkedAt": "2026-10-26T09:10:16.572Z",
+  "version": "3.4.1",
+  "frontendSourceFingerprint": "sha256:8d9b7d28df6c4d611098dcec25185d0cde4cd554e0f7cf4075c4247e424dbdd0",
+  "matchesUploadedSource": true,
+  "uploadReceipt": "frontend-upload.json",
+  "reuploadRequiredForBackendOnlyChanges": false,
+  "trialSelection": "unconfirmed",
+  "submittedForReview": false,
+  "published": false,
+  "publicationReady": false,
+  "qualityEvidence": "final-release-341-check.json",
+  "qualityFindingsOpen": [
+    "unused-channel-video",
+    "custom-tabbar-first-switch",
+    "oversized-product-image",
+    "legacy-product-image-format"
+  ],
+  "backendFinalChecks": "passed:1736 tests,564 source files,43 monitor files;API5902/monitor5825 exact online ZIP match",
+  "note": "Frontend unchanged and matches the uploaded3.4.1 candidate. Backend cost patches are deployed and observed across5 regular cycles. Current-version official quality evidence and trial selection remain unconfirmed; not submitted or published.",
+  "backendDeployed": true,
+  "deploymentEvidence": "notification-deployment.json",
+  "liveEvidence": "notification-live-comparison.json"
+}

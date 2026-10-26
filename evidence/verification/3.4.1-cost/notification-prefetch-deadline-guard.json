@@ -1,0 +1,16 @@
+{
+  "offline": true,
+  "scope": "One post-prefetch lifecycle guard; no cloud deployment or billing claim.",
+  "file": "cloudfunctions/gxs_api/lib/engine/collector.js",
+  "priorCollectorSha256": "984b8e42cb850021884a19a0f2a200ed877bb16c2a8f71afe951369f47344f14",
+  "collectorSha256": "9f8497462ccbb201ec0312a9e56d241c947df86d154a2f425c7b624cb767e371",
+  "change": "Recheck stopping, live lease, and shouldContinue after notification prefetch before fresh configuration and reconciliation.",
+  "regression": "Pause an empty pending-task read, advance 30 seconds so eligibility/reconciliation are due, renew the lease, mark shouldContinue false, and release the read. No config, reconciliation, or eligibility reads follow; the earlier empty shortcut is not used.",
+  "validation": {
+    "command": "node --test tests/notification-empty-poll.test.mjs tests/notification-planning-fairness.test.mjs tests/resident-notification-cadence.test.mjs tests/collector-database-cost.test.mjs tests/notification-freshness.test.mjs tests/collector-auth-readiness.test.mjs",
+    "passed": 47,
+    "failed": 0,
+    "skipped": 0
+  },
+  "comparisonNote": "The parent reran audit-notification-empty-poll.mjs on the final guard-inclusive collector hash; see notification-empty-poll-comparison.json. This is offline repository-call evidence, not cloud billing."
+}

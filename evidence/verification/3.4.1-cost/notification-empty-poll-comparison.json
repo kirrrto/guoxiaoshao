@@ -1,0 +1,81 @@
+{
+  "checkedAt": "2026-10-26T09:00:51.108Z",
+  "offline": true,
+  "conditions": {
+    "groups": 21,
+    "sampleTargets": 52,
+    "syntheticMemberAccounts": 21,
+    "activeFollowDocuments": 52,
+    "notificationsEnabled": true,
+    "senderAuthReady": true,
+    "subscriptionCredits": 0,
+    "newEvents": 0,
+    "realSends": 0,
+    "databaseMethodLatencyMs": 200,
+    "fakeUpstreamLatencyMs": 800,
+    "oldCheckpoint": false
+  },
+  "beforeCollectorHash": "94b0a1b331dfb70d97e9d7b70d731d3f65c65c7985ff1d2b321ffddd98eb96d4",
+  "afterCollectorHash": "9f8497462ccbb201ec0312a9e56d241c947df86d154a2f425c7b624cb767e371",
+  "limitations": [
+    "Synthetic user/follow distribution and zero subscription credits are not claims about current production accounts.",
+    "Repository methods may issue multiple SDK/database operations; counts are not invoice API or document units.",
+    "The memory repository uses its own transactional implementation, so this audit does not measure production SDK transaction cost.",
+    "Day-retention work appears on the first synthetic invocation; production does it only when due.",
+    "No new event or send in this fixture does not make every polling read removable: external manual events and eligibility changes may arrive during a real invocation.",
+    "The parent agent confirmed production upstream_breaker exists at generation 39, with no active reason/until/failures; the absent-breaker fallback is not a current overhead claim.",
+    "The candidate is local source, not proof of cloud deployment or actual billing reduction."
+  ],
+  "cases": [
+    {
+      "available": true,
+      "before": {
+        "observations": 52,
+        "requests": 21,
+        "counts": {
+          "getConfig": 24,
+          "listUnprocessedEvents": 23,
+          "listPendingNotifications": 23,
+          "listActiveFollows": 13,
+          "getUsers": 13
+        }
+      },
+      "after": {
+        "observations": 52,
+        "requests": 21,
+        "counts": {
+          "getConfig": 13,
+          "listUnprocessedEvents": 23,
+          "listPendingNotifications": 23,
+          "listActiveFollows": 13,
+          "getUsers": 13
+        }
+      }
+    },
+    {
+      "available": false,
+      "before": {
+        "observations": 52,
+        "requests": 21,
+        "counts": {
+          "getConfig": 24,
+          "listUnprocessedEvents": 23,
+          "listPendingNotifications": 23,
+          "listActiveFollows": 2,
+          "getUsers": 2
+        }
+      },
+      "after": {
+        "observations": 52,
+        "requests": 21,
+        "counts": {
+          "getConfig": 2,
+          "listUnprocessedEvents": 26,
+          "listPendingNotifications": 26,
+          "listActiveFollows": 2,
+          "getUsers": 2
+        }
+      }
+    }
+  ]
+}

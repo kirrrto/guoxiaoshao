@@ -1,0 +1,80 @@
+{
+  "mode": "verify",
+  "scope": "Observation batching, in-process budget admission, retention index declaration only",
+  "functions": [
+    {
+      "functionName": "gxs_api",
+      "baselineSha256": "7a6b7ec2dc65213f912f7b65778f47ebf41d3e5572bb7356a045aa88d550815b",
+      "changed": [
+        {
+          "file": "lib/collections.js",
+          "beforeSha256": "1092b23f72aa7c1733ffc5b7d33b1e9910850c375e9d507d41815b484b3ee614",
+          "afterSha256": "66fdf0de6355a8c5c70ea973996863bd9f40024c0426b7510b659b5c49de309f",
+          "bytes": 4481
+        },
+        {
+          "file": "lib/engine/guarded-pickup.js",
+          "beforeSha256": "4193b7d2e4a00f59c20c7e760c22bae1649a2c749c3b917493f8d352e9978d22",
+          "afterSha256": "59875e168d36bfd77549316ee4cf5e4fc90368669859fc6b0b6e603ae331bd13",
+          "bytes": 4140
+        },
+        {
+          "file": "lib/engine/observations.js",
+          "beforeSha256": "4f9bf5a91f4e117c7c9fc5d538216a5b77f6502a3c7ce2fa07138fa87fdaba3d",
+          "afterSha256": "1cfc27468fb19513739bd74eba1242bee67d3cb4a745b6c4b8ca526928b1e303",
+          "bytes": 1827
+        },
+        {
+          "file": "lib/repo/atomic-ops.js",
+          "beforeSha256": "7031043ebd77c65b4fd793928cfc78a1e0f0297e8c752c3b5cecde5b243ad9d5",
+          "afterSha256": "b916c21ab51c425af48b38b966a7e7609342afee5df5feb6f997853419181d76",
+          "bytes": 57224
+        }
+      ],
+      "fileCount": 5902,
+      "deployedSha256": "952bd9b27ba15924dbd87b0c9301aa0e9413a0b970e21e2ce2b51cad00e59efa",
+      "exactMatch": true,
+      "unchangedFileCount": 5898
+    },
+    {
+      "functionName": "gxs_monitor",
+      "baselineSha256": "a3d9b498f52d49b4ed0e3d40606eed7e8260ea9906aa87d4cd1613a1778b7bbc",
+      "changed": [
+        {
+          "file": "lib/collections.js",
+          "beforeSha256": "1092b23f72aa7c1733ffc5b7d33b1e9910850c375e9d507d41815b484b3ee614",
+          "afterSha256": "66fdf0de6355a8c5c70ea973996863bd9f40024c0426b7510b659b5c49de309f",
+          "bytes": 4481
+        },
+        {
+          "file": "lib/engine/guarded-pickup.js",
+          "beforeSha256": "4193b7d2e4a00f59c20c7e760c22bae1649a2c749c3b917493f8d352e9978d22",
+          "afterSha256": "59875e168d36bfd77549316ee4cf5e4fc90368669859fc6b0b6e603ae331bd13",
+          "bytes": 4140
+        },
+        {
+          "file": "lib/engine/observations.js",
+          "beforeSha256": "4f9bf5a91f4e117c7c9fc5d538216a5b77f6502a3c7ce2fa07138fa87fdaba3d",
+          "afterSha256": "1cfc27468fb19513739bd74eba1242bee67d3cb4a745b6c4b8ca526928b1e303",
+          "bytes": 1827
+        },
+        {
+          "file": "lib/repo/atomic-ops.js",
+          "beforeSha256": "7031043ebd77c65b4fd793928cfc78a1e0f0297e8c752c3b5cecde5b243ad9d5",
+          "afterSha256": "b916c21ab51c425af48b38b966a7e7609342afee5df5feb6f997853419181d76",
+          "bytes": 57224
+        },
+        {
+          "file": "lib-manifest.json",
+          "beforeSha256": "ef69ec4fe67ee21439326d3c705b8ede773823518108aa7da5609bfda93b551b",
+          "afterSha256": "9e4bc5e6bcf5084a78013909f34b5e620d835d0b35a4fef20cbeff2af1c76ead",
+          "bytes": 7026
+        }
+      ],
+      "fileCount": 5825,
+      "deployedSha256": "fc00ebab32ab019800149faa60298a0bbcc95c2d3f13627307e3c068081957d8",
+      "exactMatch": true,
+      "unchangedFileCount": 5820
+    }
+  ]
+}

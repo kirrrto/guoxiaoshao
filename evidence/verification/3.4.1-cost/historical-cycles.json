@@ -1,0 +1,816 @@
+{
+  "checkedAt": "2026-10-26T07:44:17.418Z",
+  "periods": [
+    {
+      "key": "jul",
+      "start": "2026-07-23",
+      "end": "2026-08-22",
+      "totalCredits": 88469.85000000002,
+      "modules": [
+        {
+          "name": "FLEXDB",
+          "credits": 9.04
+        },
+        {
+          "name": "SCF",
+          "credits": 0.78
+        },
+        {
+          "name": "EKS",
+          "credits": 88335.88
+        },
+        {
+          "name": "COS",
+          "credits": 21.31
+        },
+        {
+          "name": "HOSTING",
+          "credits": 101.71
+        },
+        {
+          "name": "APIInvocation",
+          "credits": 1.13
+        }
+      ],
+      "dbRead": 451,
+      "dbWrite": 1,
+      "cloudApi": 51,
+      "wxApi": 31,
+      "dbTotal": 452
+    },
+    {
+      "key": "aug",
+      "start": "2026-08-23",
+      "end": "2026-09-22",
+      "totalCredits": 104630.63999999998,
+      "modules": [
+        {
+          "name": "FLEXDB",
+          "credits": 22623.33
+        },
+        {
+          "name": "SCF",
+          "credits": 832.34
+        },
+        {
+          "name": "EKS",
+          "credits": 74052.64
+        },
+        {
+          "name": "COS",
+          "credits": 5.29
+        },
+        {
+          "name": "HOSTING",
+          "credits": 25.22
+        },
+        {
+          "name": "APIInvocation",
+          "credits": 7091.7
+        },
+        {
+          "name": "HTTPInvocation",
+          "credits": 0.12
+        }
+      ],
+      "dbRead": 460382,
+      "dbWrite": 670677,
+      "cloudApi": 708440,
+      "wxApi": 365,
+      "dbTotal": 1131059
+    },
+    {
+      "key": "sep",
+      "start": "2026-09-23",
+      "end": "2026-10-22",
+      "totalCredits": 472428.26,
+      "modules": [
+        {
+          "name": "FLEXDB",
+          "credits": 290467.87
+        },
+        {
+          "name": "SCF",
+          "credits": 10860.84
+        },
+        {
+          "name": "EKS",
+          "credits": 45368.1
+        },
+        {
+          "name": "COS",
+          "credits": 14.13
+        },
+        {
+          "name": "HOSTING",
+          "credits": 132.14
+        },
+        {
+          "name": "APIInvocation",
+          "credits": 125578.71
+        },
+        {
+          "name": "HTTPInvocation",
+          "credits": 6.47
+        }
+      ],
+      "dbRead": 6087704,
+      "dbWrite": 8435025,
+      "cloudApi": 12551755,
+      "wxApi": 3058,
+      "dbTotal": 14522729
+    },
+    {
+      "key": "current",
+      "start": "2026-10-23",
+      "end": "2026-11-22",
+      "totalCredits": 231058.5,
+      "modules": [
+        {
+          "name": "FLEXDB",
+          "credits": 140229.14
+        },
+        {
+          "name": "SCF",
+          "credits": 4789.34
+        },
+        {
+          "name": "EKS",
+          "credits": 9537.95
+        },
+        {
+          "name": "COS",
+          "credits": 0.48
+        },
+        {
+          "name": "HOSTING",
+          "credits": 6.87
+        },
+        {
+          "name": "APIInvocation",
+          "credits": 76492.73
+        },
+        {
+          "name": "HTTPInvocation",
+          "credits": 1.99
+        }
+      ],
+      "dbRead": 2919934,
+      "dbWrite": 4091392,
+      "cloudApi": 7647699,
+      "wxApi": 787,
+      "dbTotal": 7011326
+    }
+  ],
+  "daily": [
+    {
+      "day": "2026-07-23",
+      "dbRead": 105,
+      "dbWrite": 0,
+      "cloudApi": 4,
+      "wxApi": 4
+    },
+    {
+      "day": "2026-07-25",
+      "dbRead": 13,
+      "dbWrite": 0,
+      "cloudApi": 6,
+      "wxApi": 2
+    },
+    {
+      "day": "2026-07-27",
+      "cloudApi": 1,
+      "wxApi": 0
+    },
+    {
+      "day": "2026-07-28",
+      "dbRead": 35,
+      "dbWrite": 1,
+      "cloudApi": 3,
+      "wxApi": 3
+    },
+    {
+      "day": "2026-08-01",
+      "dbRead": 7,
+      "dbWrite": 0,
+      "cloudApi": 2,
+      "wxApi": 1
+    },
+    {
+      "day": "2026-08-04",
+      "dbRead": 25,
+      "dbWrite": 0,
+      "cloudApi": 6,
+      "wxApi": 6
+    },
+    {
+      "day": "2026-08-06",
+      "dbRead": 9,
+      "dbWrite": 0,
+      "cloudApi": 1,
+      "wxApi": 1
+    },
+    {
+      "day": "2026-08-07",
+      "dbRead": 6,
+      "dbWrite": 0,
+      "cloudApi": 1,
+      "wxApi": 1
+    },
+    {
+      "day": "2026-08-13",
+      "dbRead": 3,
+      "dbWrite": 0,
+      "cloudApi": 1,
+      "wxApi": 1
+    },
+    {
+      "day": "2026-08-15",
+      "dbRead": 179,
+      "dbWrite": 0,
+      "cloudApi": 14,
+      "wxApi": 1
+    },
+    {
+      "day": "2026-08-18",
+      "dbRead": 2,
+      "dbWrite": 0,
+      "cloudApi": 2,
+      "wxApi": 1
+    },
+    {
+      "day": "2026-08-19",
+      "dbRead": 6,
+      "dbWrite": 0,
+      "cloudApi": 1,
+      "wxApi": 1
+    },
+    {
+      "day": "2026-08-20",
+      "dbRead": 10,
+      "dbWrite": 0,
+      "cloudApi": 1,
+      "wxApi": 1
+    },
+    {
+      "day": "2026-08-22",
+      "dbRead": 51,
+      "dbWrite": 0,
+      "cloudApi": 8,
+      "wxApi": 8
+    },
+    {
+      "day": "2026-08-23",
+      "cloudApi": 6,
+      "wxApi": 2
+    },
+    {
+      "day": "2026-08-25",
+      "dbRead": 1,
+      "dbWrite": 0,
+      "cloudApi": 2,
+      "wxApi": 1
+    },
+    {
+      "day": "2026-08-27",
+      "dbRead": 33,
+      "dbWrite": 0,
+      "cloudApi": 1,
+      "wxApi": 1
+    },
+    {
+      "day": "2026-09-14",
+      "dbRead": 4,
+      "dbWrite": 0,
+      "cloudApi": 36,
+      "wxApi": 0
+    },
+    {
+      "day": "2026-09-15",
+      "dbRead": 1299,
+      "dbWrite": 650,
+      "cloudApi": 10,
+      "wxApi": 63
+    },
+    {
+      "day": "2026-09-16",
+      "dbRead": 52666,
+      "dbWrite": 57704,
+      "cloudApi": 55992,
+      "wxApi": 93
+    },
+    {
+      "day": "2026-09-17",
+      "dbRead": 55945,
+      "dbWrite": 86837,
+      "cloudApi": 98398,
+      "wxApi": 14
+    },
+    {
+      "day": "2026-09-18",
+      "dbRead": 56110,
+      "dbWrite": 87630,
+      "cloudApi": 121763,
+      "wxApi": 5
+    },
+    {
+      "day": "2026-09-19",
+      "dbRead": 56522,
+      "dbWrite": 88316,
+      "cloudApi": 121707,
+      "wxApi": 0
+    },
+    {
+      "day": "2026-09-20",
+      "dbRead": 68398,
+      "dbWrite": 100281,
+      "cloudApi": 83694,
+      "wxApi": 12
+    },
+    {
+      "day": "2026-09-21",
+      "dbRead": 87579,
+      "dbWrite": 120469,
+      "cloudApi": 147797,
+      "wxApi": 74
+    },
+    {
+      "day": "2026-09-22",
+      "dbRead": 81825,
+      "dbWrite": 128790,
+      "cloudApi": 79034,
+      "wxApi": 100
+    },
+    {
+      "day": "2026-09-23",
+      "dbRead": 88916,
+      "dbWrite": 136660,
+      "cloudApi": 186264,
+      "wxApi": 71
+    },
+    {
+      "day": "2026-09-24",
+      "dbRead": 93667,
+      "dbWrite": 141257,
+      "cloudApi": 61340,
+      "wxApi": 67
+    },
+    {
+      "day": "2026-09-25",
+      "cloudApi": 35971,
+      "wxApi": 28
+    },
+    {
+      "day": "2026-09-26",
+      "dbRead": 17488,
+      "dbWrite": 40310,
+      "cloudApi": 21589,
+      "wxApi": 22
+    },
+    {
+      "day": "2026-09-27",
+      "cloudApi": 43732,
+      "wxApi": 2
+    },
+    {
+      "day": "2026-09-28",
+      "cloudApi": 26004,
+      "wxApi": 0
+    },
+    {
+      "day": "2026-09-29",
+      "dbRead": 220943,
+      "dbWrite": 316887,
+      "cloudApi": 350061,
+      "wxApi": 95
+    },
+    {
+      "day": "2026-09-30",
+      "dbRead": 232023,
+      "dbWrite": 333186,
+      "cloudApi": 500272,
+      "wxApi": 156
+    },
+    {
+      "day": "2026-10-01",
+      "cloudApi": 512285,
+      "wxApi": 139
+    },
+    {
+      "day": "2026-10-03",
+      "dbRead": 179586,
+      "dbWrite": 249623,
+      "cloudApi": 67075,
+      "wxApi": 18
+    },
+    {
+      "day": "2026-10-05",
+      "dbRead": 187181,
+      "dbWrite": 259104
+    },
+    {
+      "day": "2026-10-06",
+      "dbRead": 200528,
+      "dbWrite": 281912,
+      "cloudApi": 404436,
+      "wxApi": 76
+    },
+    {
+      "day": "2026-10-07",
+      "cloudApi": 412224,
+      "wxApi": 46
+    },
+    {
+      "day": "2026-10-09",
+      "cloudApi": 14647,
+      "wxApi": 4
+    },
+    {
+      "day": "2026-10-11",
+      "dbRead": 138770,
+      "dbWrite": 183997,
+      "cloudApi": 76932,
+      "wxApi": 56
+    },
+    {
+      "day": "2026-10-12",
+      "cloudApi": 87961,
+      "wxApi": 8
+    },
+    {
+      "day": "2026-10-13",
+      "dbRead": 135854,
+      "dbWrite": 182276,
+      "cloudApi": 45911,
+      "wxApi": 59
+    },
+    {
+      "day": "2026-10-14",
+      "dbRead": 147919,
+      "dbWrite": 195868,
+      "cloudApi": 170354,
+      "wxApi": 102
+    },
+    {
+      "day": "2026-10-15",
+      "dbRead": 138027,
+      "dbWrite": 183741,
+      "cloudApi": 317518,
+      "wxApi": 191
+    },
+    {
+      "day": "2026-10-16",
+      "dbRead": 124548,
+      "dbWrite": 154892,
+      "cloudApi": 182727,
+      "wxApi": 493
+    },
+    {
+      "day": "2026-10-17",
+      "dbRead": 244791,
+      "dbWrite": 317500,
+      "cloudApi": 465412,
+      "wxApi": 652
+    },
+    {
+      "day": "2026-10-18",
+      "dbRead": 564578,
+      "dbWrite": 753352,
+      "cloudApi": 1110248,
+      "wxApi": 262
+    },
+    {
+      "day": "2026-10-19",
+      "dbRead": 855542,
+      "dbWrite": 1140135,
+      "cloudApi": 1744160,
+      "wxApi": 176
+    },
+    {
+      "day": "2026-10-20",
+      "dbRead": 900936,
+      "dbWrite": 1203731,
+      "cloudApi": 1953831,
+      "wxApi": 145
+    },
+    {
+      "day": "2026-10-21",
+      "dbRead": 739245,
+      "dbWrite": 1086495,
+      "cloudApi": 1699352,
+      "wxApi": 105
+    },
+    {
+      "day": "2026-10-22",
+      "dbRead": 877162,
+      "dbWrite": 1274099,
+      "cloudApi": 2061449,
+      "wxApi": 85
+    },
+    {
+      "day": "2026-10-23",
+      "dbRead": 995548,
+      "dbWrite": 1364466,
+      "cloudApi": 2168093,
+      "wxApi": 329
+    },
+    {
+      "day": "2026-10-24",
+      "dbRead": 1051979,
+      "dbWrite": 1488713,
+      "cloudApi": 2385685,
+      "wxApi": 219
+    },
+    {
+      "day": "2026-10-25",
+      "dbRead": 872407,
+      "dbWrite": 1238213,
+      "cloudApi": 1944169,
+      "wxApi": 153
+    },
+    {
+      "day": "2026-10-26",
+      "cloudApi": 1149752,
+      "wxApi": 86
+    }
+  ],
+  "comparison": {
+    "priorCycleDays": 30,
+    "currentCompleteDays": 3,
+    "priorDbDaily": 484090.9666666667,
+    "currentDbDaily": 2337108.6666666665,
+    "priorCloudApiDaily": 418391.8333333333,
+    "currentCloudApiDaily": 2165982.3333333335,
+    "dbDailyRatio": 4.827829535344217,
+    "cloudApiDailyRatio": 5.17692306773037
+  },
+  "audit": [
+    {
+      "_id": "config_audit_786f64b3-24de-4633-8b5d-aba3e4a5a151",
+      "changedKeys": [
+        "notifications"
+      ],
+      "changes": {},
+      "createdAt": "2026-09-20T04:02:14.443Z",
+      "previousRevision": 0,
+      "revision": 1
+    },
+    {
+      "_id": "config_audit_4f3a2842-407a-4860-a304-3668ce1d3669",
+      "changedKeys": [
+        "memberProduct"
+      ],
+      "changes": {},
+      "createdAt": "2026-09-20T04:17:27.189Z",
+      "previousRevision": 1,
+      "revision": 2
+    },
+    {
+      "_id": "config_audit_928079e6-8f76-4e38-bcb8-0dc25e2b67f6",
+      "changedKeys": [],
+      "changes": {},
+      "createdAt": "2026-09-20T04:32:18.701Z",
+      "previousRevision": 2,
+      "revision": 3
+    },
+    {
+      "_id": "config_audit_890cebc5-d248-4950-a16e-aa7182f9aa63",
+      "changedKeys": [
+        "notifications"
+      ],
+      "changes": {},
+      "createdAt": "2026-09-24T09:42:49.692Z",
+      "previousRevision": 4,
+      "revision": 5
+    },
+    {
+      "_id": "config_audit_b88e7e6f-faa8-4443-b00f-ed6c9b786161",
+      "changedKeys": [
+        "notifications"
+      ],
+      "changes": {},
+      "createdAt": "2026-09-28T02:33:59.338Z",
+      "previousRevision": 5,
+      "revision": 6
+    },
+    {
+      "_id": "config_audit_554a9fff-f501-4020-a399-80c9e80dd921",
+      "changedKeys": [],
+      "changes": {},
+      "createdAt": "2026-10-01T14:01:04.252Z",
+      "previousRevision": 6,
+      "revision": 7
+    },
+    {
+      "_id": "config_audit_6e14b8bd-15b6-447b-bb13-28432ece5b43",
+      "changedKeys": [
+        "announcement"
+      ],
+      "changes": {},
+      "createdAt": "2026-10-16T09:17:59.845Z",
+      "previousRevision": 8,
+      "revision": 9
+    },
+    {
+      "_id": "config_audit_ccc70bec-0e19-4e5c-976a-f244e2ebf8fb",
+      "changedKeys": [
+        "collector"
+      ],
+      "changes": {
+        "collector": {
+          "after": {
+            "autoSharePercent": 80,
+            "availableIntervalSeconds": 0,
+            "budgetMode": {
+              "hash": "f7496f1fc9731f2ed7dd3f1d968469b89382f5f9030a86e08638f638699264f9",
+              "length": 10
+            },
+            "burstIntervalSeconds": 2,
+            "burstQuietSeconds": 20,
+            "cadenceMode": {
+              "hash": "992a93455c71fedd36ac9bbc439952c041cf61445958472af479269b8d873513",
+              "length": 5
+            },
+            "continuityGapMs": 300000,
+            "enabled": true,
+            "intervalSeconds": 3,
+            "maxConcurrency": 2,
+            "maxPartsPerRequest": 20,
+            "maxRequestsPerDay": 800000,
+            "maxRequestsPerMinute": 600,
+            "statusStaleAfterSeconds": 150
+          },
+          "before": {
+            "autoSharePercent": 80,
+            "availableIntervalSeconds": 0,
+            "budgetMode": {
+              "hash": "f7496f1fc9731f2ed7dd3f1d968469b89382f5f9030a86e08638f638699264f9",
+              "length": 10
+            },
+            "burstIntervalSeconds": 2,
+            "burstQuietSeconds": 20,
+            "cadenceMode": {
+              "hash": "4bc3f07393f7bc8e0d2b6a40b27695dcff105a082c93683ae5fc07e5af016be7",
+              "length": 8
+            },
+            "continuityGapMs": 300000,
+            "enabled": true,
+            "intervalSeconds": 60,
+            "maxConcurrency": 2,
+            "maxPartsPerRequest": 20,
+            "maxRequestsPerDay": 10000,
+            "maxRequestsPerMinute": 60,
+            "statusStaleAfterSeconds": 150
+          }
+        }
+      },
+      "createdAt": "2026-10-18T05:38:09.757Z",
+      "previousRevision": 9,
+      "revision": 10
+    },
+    {
+      "_id": "config_audit_0ff484b6-9717-4fd9-bc23-ea6ad63d453a",
+      "changedKeys": [
+        "collector"
+      ],
+      "changes": {
+        "collector": {
+          "after": {
+            "autoSharePercent": 80,
+            "availableIntervalSeconds": 0,
+            "budgetMode": {
+              "hash": "f7496f1fc9731f2ed7dd3f1d968469b89382f5f9030a86e08638f638699264f9",
+              "length": 10
+            },
+            "burstIntervalSeconds": 2,
+            "burstQuietSeconds": 20,
+            "cadenceMode": {
+              "hash": "4bc3f07393f7bc8e0d2b6a40b27695dcff105a082c93683ae5fc07e5af016be7",
+              "length": 8
+            },
+            "continuityGapMs": 900000,
+            "enabled": true,
+            "intervalSeconds": 3,
+            "maxConcurrency": 2,
+            "maxPartsPerRequest": 20,
+            "maxRequestsPerDay": 10000,
+            "maxRequestsPerMinute": 600,
+            "statusStaleAfterSeconds": 150
+          },
+          "before": {
+            "autoSharePercent": 80,
+            "availableIntervalSeconds": 0,
+            "budgetMode": {
+              "hash": "f7496f1fc9731f2ed7dd3f1d968469b89382f5f9030a86e08638f638699264f9",
+              "length": 10
+            },
+            "burstIntervalSeconds": 2,
+            "burstQuietSeconds": 20,
+            "cadenceMode": {
+              "hash": "992a93455c71fedd36ac9bbc439952c041cf61445958472af479269b8d873513",
+              "length": 5
+            },
+            "continuityGapMs": 300000,
+            "enabled": true,
+            "intervalSeconds": 3,
+            "maxConcurrency": 2,
+            "maxPartsPerRequest": 20,
+            "maxRequestsPerDay": 800000,
+            "maxRequestsPerMinute": 600,
+            "statusStaleAfterSeconds": 150
+          }
+        }
+      },
+      "createdAt": "2026-10-26T06:19:02.793Z",
+      "previousRevision": 10,
+      "revision": 11
+    },
+    {
+      "_id": "config_audit_1b46984e-2c4b-43e3-afed-bb9e5d4b285b",
+      "changedKeys": [
+        "collector"
+      ],
+      "changes": {
+        "collector": {
+          "after": {
+            "autoSharePercent": 80,
+            "availableIntervalSeconds": 0,
+            "budgetMode": {
+              "hash": "f7496f1fc9731f2ed7dd3f1d968469b89382f5f9030a86e08638f638699264f9",
+              "length": 10
+            },
+            "burstIntervalSeconds": 2,
+            "burstQuietSeconds": 20,
+            "cadenceMode": {
+              "hash": "992a93455c71fedd36ac9bbc439952c041cf61445958472af479269b8d873513",
+              "length": 5
+            },
+            "continuityGapMs": 300000,
+            "enabled": true,
+            "intervalSeconds": 3,
+            "maxConcurrency": 2,
+            "maxPartsPerRequest": 20,
+            "maxRequestsPerDay": 800000,
+            "maxRequestsPerMinute": 600,
+            "statusStaleAfterSeconds": 150
+          },
+          "before": {
+            "autoSharePercent": 80,
+            "availableIntervalSeconds": 0,
+            "budgetMode": {
+              "hash": "f7496f1fc9731f2ed7dd3f1d968469b89382f5f9030a86e08638f638699264f9",
+              "length": 10
+            },
+            "burstIntervalSeconds": 2,
+            "burstQuietSeconds": 20,
+            "cadenceMode": {
+              "hash": "4bc3f07393f7bc8e0d2b6a40b27695dcff105a082c93683ae5fc07e5af016be7",
+              "length": 8
+            },
+            "continuityGapMs": 900000,
+            "enabled": true,
+            "intervalSeconds": 3,
+            "maxConcurrency": 2,
+            "maxPartsPerRequest": 20,
+            "maxRequestsPerDay": 10000,
+            "maxRequestsPerMinute": 600,
+            "statusStaleAfterSeconds": 150
+          }
+        }
+      },
+      "createdAt": "2026-10-26T07:31:11.941Z",
+      "previousRevision": 11,
+      "revision": 12
+    }
+  ],
+  "notes": [
+    "Metric names overlap across services; database read/write counters are filtered to Module=FLEXDB only.",
+    "Current cycle remains incomplete; database billing available only through Oct 25, API Oct 26 is partial. Completed-day comparison uses Oct 23–25 only.",
+    "Prior cycles are accounting totals; earlier periods include ramp-up/pre-launch days, not a controlled equal-workload experiment."
+  ],
+  "adjacentCompleteThreeDays": {
+    "prior": {
+      "start": "2026-10-20",
+      "end": "2026-10-22",
+      "days": 3,
+      "db": 6081668,
+      "cloudApi": 5714632,
+      "wxApi": 335
+    },
+    "current": {
+      "start": "2026-10-23",
+      "end": "2026-10-25",
+      "days": 3,
+      "db": 7011326,
+      "cloudApi": 6497947,
+      "wxApi": 701
+    },
+    "dbIncreasePercent": 15.286233973968976,
+    "cloudApiIncreasePercent": 13.707181844780214
+  },
+  "auditStringVerification": {
+    "fixed": "992a93455c71fedd36ac9bbc439952c041cf61445958472af479269b8d873513",
+    "adaptive": "4bc3f07393f7bc8e0d2b6a40b27695dcff105a082c93683ae5fc07e5af016be7",
+    "continuous": "f7496f1fc9731f2ed7dd3f1d968469b89382f5f9030a86e08638f638699264f9"
+  }
+}

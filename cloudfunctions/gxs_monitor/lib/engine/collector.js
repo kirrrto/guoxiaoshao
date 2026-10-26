@@ -25,6 +25,10 @@ const NOTIFICATION_PLAN_PAGE_SIZE = 50;
 const NOTIFICATION_PLAN_MAX_PAGES = 4;
 const NOTIFICATION_PLAN_TASK_LIMIT = 20;
 const NOTIFICATION_PLAN_SLICE_MS = 5000;
+// validateConfig caps maxEventAgeSeconds at one hour. An empty page over this
+// whole window is also empty under any newly-read notification configuration.
+const NOTIFICATION_MAX_EVENT_AGE_MS = 3600000;
+const WAITING_CONFIRMATION_LIMIT = 4096;
 
 function createCollector({ repo, fetchImpl, clock = () => new Date(), log = console, sendImpl = null, ownerId = `collector-${process.pid}-${Date.now()}`, sleep = ms => new Promise(resolve => setTimeout(resolve, ms)), refreshEveryMs = 10000, statusEveryMs = 5000, mode = 'resident', minimumIntervalMs = 0, statusTtlMs = 0, shouldContinue = () => true, remainingMs = () => Infinity }) {
   let config = mergeConfig(null);
@@ -35,11 +39,13 @@ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = cons
   let lastAvailabilityPlanAt = -Infinity;
   let lastObservationHealthState = null;
   let lastObservationHealthLogAt = -Infinity;
+  const hurriedWaitingEvents = new Map();
   let running = false;
   let stopping = false;
   let budget = { allowed: true, reason: null, minuteCount: 0, dayCount: 0 };
   let cadenceInfo = { cadenceMode: 'adaptive', targetPeriodMs: 0, budgetIntervalMs: 0, autoSharePercent: 80 };
-  const stats = { batches: 0, observations: 0, events: 0, tasks: 0, sent: 0, lastBatchAt: null };
+  const stats = { batches: 0, observations: 0, events: 0, tasks: 0, sent: 0, lastBatchAt: null,
+    notificationPasses: 0, notificationEmptyPassesSkipped: 0, notificationConfigReads: 0 };
 
   const lease = createLeaseKeeper({ repo, ownerId, ttlMs: 15000, clock, log });
   // Renewal transactions can consume part of their own TTL. Bound external
@@ -110,23 +116,33 @@ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = cons
     return Date.parse(latest.knownAt) > Date.parse(latest.knownStreakSince || event.detectedAt) ? 'confirmed' : 'waiting';
   }
 
-  async function planEvents(planningConfig) {
+  async function firstEventPage(since) {
+    let events = await repo.listUnprocessedEvents({ limit: NOTIFICATION_PLAN_PAGE_SIZE, since, cursor: stats.notificationEventCursor });
+    // A saved cursor can point past a now-empty tail. Wrap just once.
+    if (!events.length && stats.notificationEventCursor) {
+      stats.notificationEventCursor = null;
+      events = await repo.listUnprocessedEvents({ limit: NOTIFICATION_PLAN_PAGE_SIZE, since });
+    }
+    return events;
+  }
+
+  async function planEvents(planningConfig, prefetchedEvents = null) {
     // Bound planning independently of delivery. Slow task inserts must leave
     // time to send already-durable tasks before this invocation ends.
     const deadline = clock().getTime() + Math.min(NOTIFICATION_PLAN_SLICE_MS, Math.max(0, remainingMs() - 2000));
     const canPlan = () => !stopping && shouldContinue() && lease.isHeld() && clock().getTime() < deadline;
     const maxAgeMs = (planningConfig.notifications.maxEventAgeSeconds || 120) * 1000;
+    const planAt = clock().getTime();
+    for (const [key, expiresAt] of hurriedWaitingEvents) if (expiresAt < planAt) hurriedWaitingEvents.delete(key);
     const since = new Date(clock().getTime() - Math.max(600000, maxAgeMs)).toISOString();
     let snapshot = null;
     let taskCount = 0;
     for (let page = 0; page < NOTIFICATION_PLAN_MAX_PAGES && canPlan(); page++) {
-      let events = await repo.listUnprocessedEvents({ limit: NOTIFICATION_PLAN_PAGE_SIZE, since, cursor: stats.notificationEventCursor });
-      // A saved cursor can point past a now-empty tail after other work
-      // completed. Wrap once, then the page bound prevents waiting-event spins.
-      if (!events.length && page === 0 && stats.notificationEventCursor) {
-        stats.notificationEventCursor = null;
-        events = await repo.listUnprocessedEvents({ limit: NOTIFICATION_PLAN_PAGE_SIZE, since });
-      }
+      // An over-wide prefetched page must not let old rows hide current events.
+      // Reuse it only when every row is inside the actual configuration window.
+      const usePrefetched = page === 0 && prefetchedEvents !== null && prefetchedEvents.every(event => event.detectedAt >= since);
+      const events = usePrefetched ? prefetchedEvents : page === 0 ? await firstEventPage(since)
+        : await repo.listUnprocessedEvents({ limit: NOTIFICATION_PLAN_PAGE_SIZE, since, cursor: stats.notificationEventCursor });
       if (!events.length) { stats.notificationEventCursor = null; break; }
       const latestByKey = new Map((await repo.getLatest([...new Set(events.map(e => targetKeyOf(e.storeNumber, e.partNumber)))])).map(l => [l._id, l]));
       for (const event of events) {
@@ -135,7 +151,15 @@ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = cons
         const now = clock();
         const state = await confirmation(event, latestByKey.get(targetKeyOf(event.storeNumber, event.partNumber)));
         if (state === 'waiting' && now.getTime() - Date.parse(event.detectedAt) <= maxAgeMs) {
-          scheduler.hurry(event.storeNumber, Date.parse(event.detectedAt));
+          // An event first seen after its old burst window still needs a prompt
+          // confirmation. Re-reading it must not renew the quiet window. Keep
+          // one bounded entry per event until its original expiry; never evict
+          // a live entry to make room, which would permit repeated bursts.
+          const waitingKey = `${event._id}\0${event.detectedAt}`;
+          if (!hurriedWaitingEvents.has(waitingKey) && hurriedWaitingEvents.size < WAITING_CONFIRMATION_LIMIT
+            && scheduler.hurry(event.storeNumber, now.getTime()) > 0) {
+            hurriedWaitingEvents.set(waitingKey, Date.parse(event.detectedAt) + maxAgeMs);
+          }
           // Leave this event unplanned, but do not let it hide later alerts.
           stats.notificationEventCursor = nextCursor;
           continue;
@@ -246,10 +270,32 @@ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = cons
 
   async function notificationPass() {
       if (stopping || !lease.isHeld() || !shouldContinue()) return;
+      stats.notificationPasses += 1;
+      const availabilityDue = () => clock().getTime() - lastAvailabilityPlanAt >= 30000;
+      const reconcileDue = () => clock().getTime() - lastNotificationReconcileAt >= NOTIFICATION_RECONCILE_INTERVAL_MS;
+      let prefetchedEvents = null, prefetchedTasks = null;
+      if (!availabilityDue() && !reconcileDue()) {
+        // Keep every existing poll opportunity. Only omit the configuration
+        // read after proving this pass has no work; do not cache eligibility.
+        prefetchedEvents = await firstEventPage(new Date(clock().getTime() - NOTIFICATION_MAX_EVENT_AGE_MS).toISOString());
+        if (!prefetchedEvents.length) {
+          const senderReady = sendImpl && sendImpl.enabled !== false
+            && (typeof sendImpl.getHealth !== 'function' || sendImpl.getHealth().authReady);
+          prefetchedTasks = senderReady ? await repo.listPendingNotifications({ limit: 20 }) : [];
+          // A sample can invalidate availability while these reads are pending.
+          if (!prefetchedTasks.length && !availabilityDue() && !reconcileDue()) {
+            stats.notificationEmptyPassesSkipped += 1;
+            return false;
+          }
+        }
+      }
+      if (stopping || !lease.isHeld() || !shouldContinue()) return;
       // Delivery has its own snapshot. A delayed read must not overwrite the
       // newer configuration already applied to the sampling scheduler.
+      stats.notificationConfigReads += 1;
       const notificationConfig = mergeConfig(await repo.getConfig());
       const reconcileAt = clock();
+      let reconciled = false;
       if (reconcileAt.getTime() - lastNotificationReconcileAt >= NOTIFICATION_RECONCILE_INTERVAL_MS) {
         // Passes already run serially. Reconcile once at startup, then avoid an
         // identical expiry update after every batch. Only success advances the
@@ -257,16 +303,22 @@ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = cons
         await repo.reconcileExpiredNotifications({ now: reconcileAt.toISOString(),
           pendingBefore: new Date(reconcileAt.getTime() - (notificationConfig.notifications.maxEventAgeSeconds || 120) * 1000).toISOString() });
         lastNotificationReconcileAt = reconcileAt.getTime();
+        reconciled = true;
       }
-      const planning = await planEvents(notificationConfig);
+      const tasksBeforePlanning = stats.tasks;
+      const planning = await planEvents(notificationConfig, prefetchedEvents);
       if (!sendImpl || sendImpl.enabled === false) return planning.more;
       if (typeof sendImpl.getHealth === 'function' && !sendImpl.getHealth().authReady) return planning.more;
       await planCurrentAvailability(notificationConfig, planning.snapshot);
-      for (const task of await repo.listPendingNotifications({ limit: 20 })) {
+      // Planning may have created tasks, and reconciliation may have retired a
+      // full stale prefix. In either case read the current delivery page.
+      const tasks = prefetchedTasks !== null && !reconciled && stats.tasks === tasksBeforePlanning
+        ? prefetchedTasks : await repo.listPendingNotifications({ limit: 20 });
+      for (const task of tasks) {
         if (stopping || !shouldContinue() || !await lease.renew()) break;
         if (typeof sendImpl.getHealth === 'function' && !sendImpl.getHealth().authReady) break;
         const result = await sendTask({ task, config: notificationConfig, sendImpl, repo, now: clock(), clock, ownerId, remainingMs: remainingWorkMs,
-          beforeSend: async () => !stopping && shouldContinue() && await lease.renew() && lease.isHeld() && shouldContinue() });
+          beforeSend: async () => !stopping && shouldContinue() && await lease.renew({ force: true }) && lease.isHeld() && shouldContinue() });
         if (result.status === TASK_STATUS.accepted) stats.sent += 1;
       }
       return planning.more;
@@ -302,7 +354,9 @@ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = cons
     }
     // Fixed cadence never stretches with group count. Capacity shortfalls surface
     // as admission waits / observation delay instead of a silent longer period.
-    scheduler.configure({ intervalMs, fixedCadence: cadenceMode === 'fixed',
+    // Minute timers use the existing aligned slots; hash phases can fall after
+    // their bounded scan ends. Fixed still keeps intervalMs independent of load.
+    scheduler.configure({ intervalMs, fixedCadence: cadenceMode === 'fixed' && mode !== 'scheduled',
       maxConcurrency: config.collector.maxConcurrency, timeoutMs: config.query.upstreamTimeoutMs,
       burstIntervalMs: config.collector.burstIntervalSeconds * 1000, burstQuietMs: config.collector.burstQuietSeconds * 1000,
       availableIntervalMs: config.collector.availableIntervalSeconds * 1000 });
@@ -337,7 +391,10 @@ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = cons
       lastErrorCode: health && health.lastErrorCode || null };
   }
 
-  async function publishStatus(extra) {
+  async function publishStatus(extra, { force = true } = {}) {
+    // Scheduled waves and step() share this window. Explicit/final/error
+    // checkpoints keep their immediate write and the repository's owner fence.
+    if (!force && clock().getTime() - lastStatusAt < statusEveryMs) return null;
     const snap = scheduler.snapshot();
     const now = clock();
     const health = observationHealth({ targets: snap.targets, intervalMs: snap.intervalMs, mode, nowMs: now.getTime(), timeoutMs: config.query.upstreamTimeoutMs });
@@ -398,7 +455,7 @@ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = cons
     if (!lease.isHeld()) return { held: false, started: [] };
     await flushOrKickNotifications();
     const started = shouldContinue() ? scheduler.tick() : [];
-    if (nowMs - lastStatusAt >= statusEveryMs) await publishStatus();
+    await publishStatus(undefined, { force: false });
     return { held: true, started };
   }
 
