@@ -1,0 +1,141 @@
+name: 上传微信版本
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: '版本号（必须与源码 package.json 一致，例如 3.4.0）'
+        required: true
+        type: string
+      description:
+        description: '本次上传说明（最多 180 个字符）'
+        required: true
+        type: string
+      dry_run:
+        description: '只检查配置和源码，不向微信上传'
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: wechat-upload
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: '24'
+          package-manager-cache: false
+      - name: 检查版本号与上传说明
+        env:
+          UPLOAD_VERSION: ${{ inputs.version }}
+          UPLOAD_DESCRIPTION: ${{ inputs.description }}
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const version = JSON.parse(fs.readFileSync('package.json', 'utf8')).version;
+          if (process.env.UPLOAD_VERSION !== version) throw new Error(`上传版本必须与源码版本 ${version} 一致，请先完成版本同步`);
+          const description = process.env.UPLOAD_DESCRIPTION.trim();
+          if (!description || [...description].length > 180) throw new Error('上传说明须为 1–180 个字符');
+          NODE
+      - name: 安装锁定依赖
+        run: |
+          npm ci --ignore-scripts --no-audit --no-fund
+          for function in gxs_api gxs_monitor cloudbase_auth; do
+            npm ci --prefix "cloudfunctions/$function" --ignore-scripts --no-audit --no-fund
+          done
+      - name: 检查监测代码、测试、源码与发布候选
+        run: |
+          node tools/build-monitor.mjs --check
+          npm test
+          npm run check
+          node tools/release/check.mjs
+
+  upload:
+    needs: verify
+    runs-on: ${{ vars.WECHAT_UPLOAD_RUNNER || 'ubuntu-latest' }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: '24'
+          package-manager-cache: false
+      - name: 检查上传配置
+        env:
+          WECHAT_PRIVATE_KEY: ${{ secrets.WECHAT_PRIVATE_KEY }}
+          NETWORK_READY: ${{ vars.WECHAT_UPLOAD_NETWORK_READY }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        shell: bash
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import { createPrivateKey } from 'node:crypto';
+          const missing = [];
+          const key = process.env.WECHAT_PRIVATE_KEY;
+          if (!key) missing.push('GitHub Secret: WECHAT_PRIVATE_KEY（微信代码上传密钥）');
+          else createPrivateKey(key);
+          if (process.env.NETWORK_READY !== 'true') missing.push('配置微信上传 IP 白名单后，将 Variable WECHAT_UPLOAD_NETWORK_READY 设为 true');
+          const config = JSON.parse(fs.readFileSync('project.config.json', 'utf8'));
+          if (!/^wx[0-9a-f]{16}$/.test(config.appid)) throw new Error('项目 AppID 无效');
+          fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, `## 上传配置检查\nAppID: ${config.appid}\n\n${missing.length ? missing.map(x => '- 待配置：' + x).join('\n') : '配置项齐全；实际网络和密钥授权仍以微信上传结果为准。'}\n`);
+          if (missing.length && process.env.DRY_RUN !== 'true') throw new Error('首次配置尚未完成，请查看运行摘要');
+          NODE
+      - name: 安装微信官方上传工具
+        if: ${{ !inputs.dry_run }}
+        shell: bash
+        run: npm install --prefix "$RUNNER_TEMP/gxs-wechat-ci-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT" --no-audit --no-fund miniprogram-ci@2.1.31
+      - name: 上传小程序开发版本
+        if: ${{ !inputs.dry_run }}
+        env:
+          WECHAT_PRIVATE_KEY: ${{ secrets.WECHAT_PRIVATE_KEY }}
+          UPLOAD_VERSION: ${{ inputs.version }}
+          UPLOAD_DESCRIPTION: ${{ inputs.description }}
+        shell: bash
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import path from 'node:path';
+          import { createRequire } from 'node:module';
+          const toolRoot = path.join(process.env.RUNNER_TEMP, `gxs-wechat-ci-${process.env.GITHUB_RUN_ID}-${process.env.GITHUB_RUN_ATTEMPT}`);
+          const require = createRequire(path.join(toolRoot, 'package.json'));
+          const ci = require('miniprogram-ci');
+          const config = JSON.parse(fs.readFileSync('project.config.json', 'utf8'));
+          const project = new ci.Project({
+            appid: config.appid,
+            type: 'miniProgram',
+            projectPath: process.cwd(),
+            privateKey: process.env.WECHAT_PRIVATE_KEY,
+            ignores: ['node_modules/**/*', '.git/**/*'],
+          });
+          await ci.upload({
+            project,
+            version: process.env.UPLOAD_VERSION,
+            desc: process.env.UPLOAD_DESCRIPTION.trim(),
+            robot: 1,
+            setting: { es6: true, es7: true, minify: true, codeProtect: true, autoPrefixWXSS: true },
+          });
+          fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, '\n**微信接口已确认开发版本上传成功。** 请到微信公众平台设为体验版，真机验证后提审。\n');
+          NODE
+      - name: 记录本次运行范围
+        if: always()
+        env:
+          UPLOAD_VERSION: ${{ inputs.version }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        shell: bash
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, `\n源码提交：${process.env.GITHUB_SHA}\n\n版本：${process.env.UPLOAD_VERSION}\n\n仅检查：${process.env.DRY_RUN}\n\n本工作流不部署云函数、数据库规则或采集服务，也不提交审核或正式发布。\n`);
+          NODE
