@@ -93,6 +93,7 @@ const REASON_TEXT = {
   query_failed: '原请求执行失败，已按服务端规则处理次数，请重新查询',
   query_expired: '上次未完成查询已过期，次数已返还，请重新查询',
   member_required: '开通会员后可继续关注和接收提醒',
+  product_retired: '该老款官方取货接口已停用，请改选新款配置',
 };
 
 function reasonText(code) {

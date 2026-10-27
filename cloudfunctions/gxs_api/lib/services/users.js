@@ -20,6 +20,16 @@ const OUTAGE_COMPENSATION_NOTICE = Object.freeze({
   text: '因昨晚服务器故障，目前查询与监测服务已恢复。今日（10 月 21 日）已为会员及曾付费用户自动顺延 1 天会员时长，免费用户今日打开自动获赠 1 天体验会员，可在「我的」查看。',
 });
 
+const IPAD_MINI_CATALOG_NOTICE = Object.freeze({
+  id: 'ipad-mini-catalog-2026-10-27',
+  title: '新款 iPad mini 目录更新说明',
+  kind: 'notice',
+  publishedAt: '2026-10-27T00:00:00+08:00',
+  startsAt: '2026-10-27T00:00:00+08:00',
+  expiresAt: '2026-11-06T23:59:59+08:00',
+  text: '苹果商店已上架新款 iPad mini（A20 Pro），老款取货接口已停用。果小哨已同步更新新款全系配置；原关注老款的用户请点「调整」改选新款。',
+});
+
 function noticeExpiresAt(raw) {
   const configured = raw.expiresAt ? Date.parse(raw.expiresAt) : NaN;
   const published = typeof raw.publishedAt === 'string' ? raw.publishedAt.trim() : '';
@@ -174,16 +184,18 @@ async function bootstrap(ctx) {
   ]);
   const { catalogMeta, collectorStatus } = metadata;
   const monitoring = monitoringSnapshot(ctx.config, collectorStatus, ctx.now);
-  const outageBanner = liveAnnouncement(OUTAGE_COMPENSATION_NOTICE, ctx.now);
+  const builtInNotice = [IPAD_MINI_CATALOG_NOTICE, OUTAGE_COMPENSATION_NOTICE]
+    .map(raw => ({ raw, live: liveAnnouncement(raw, ctx.now) }))
+    .find(item => item.live);
   const configuredBanner = liveAnnouncement(ctx.config.announcement, ctx.now);
   const configuredNotices = liveNotices(ctx.config.notices, ctx.now);
-  const announcement = configuredBanner || (outageBanner ? {
-    ...outageBanner,
-    title: OUTAGE_COMPENSATION_NOTICE.title,
-    publishedAt: OUTAGE_COMPENSATION_NOTICE.publishedAt,
+  const announcement = configuredBanner || (builtInNotice ? {
+    ...builtInNotice.live,
+    title: builtInNotice.raw.title,
+    publishedAt: builtInNotice.raw.publishedAt,
   } : null);
-  const notices = outageBanner && configuredBanner && !configuredNotices.some(item => item.id === OUTAGE_COMPENSATION_NOTICE.id)
-    ? [{ id: OUTAGE_COMPENSATION_NOTICE.id, title: OUTAGE_COMPENSATION_NOTICE.title, publishedAt: OUTAGE_COMPENSATION_NOTICE.publishedAt, ...outageBanner }, ...configuredNotices]
+  const notices = builtInNotice && configuredBanner && !configuredNotices.some(item => item.id === builtInNotice.raw.id)
+    ? [{ id: builtInNotice.raw.id, title: builtInNotice.raw.title, publishedAt: builtInNotice.raw.publishedAt, ...builtInNotice.live }, ...configuredNotices]
     : configuredNotices;
   return {
     collector: monitoring.collector,

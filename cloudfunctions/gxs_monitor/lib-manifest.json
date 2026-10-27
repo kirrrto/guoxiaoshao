@@ -48,8 +48,8 @@
     },
     {
       "path": "engine/collector.js",
-      "bytes": 29516,
-      "sha256": "9f8497462ccbb201ec0312a9e56d241c947df86d154a2f425c7b624cb767e371"
+      "bytes": 29687,
+      "sha256": "dd44afbcaa1eabf83d86e474cd7c0afeaea5d41e2ce5333afe672a978daecb16"
     },
     {
       "path": "engine/current-availability.js",
@@ -148,8 +148,8 @@
     },
     {
       "path": "repo/cloudbase-repo.js",
-      "bytes": 25768,
-      "sha256": "a5e9c975f04c0573d5e2dca2252ffcaf0da8e22de8c13240cbe0728c5010283c"
+      "bytes": 26220,
+      "sha256": "2c0f6bad162411c64f965489467a1414b51285f23418d231a229a909de8f4dac"
     },
     {
       "path": "repo/current-availability.js",
@@ -198,8 +198,8 @@
     },
     {
       "path": "rules/follow-access.js",
-      "bytes": 1625,
-      "sha256": "967a310c7c38b22c0195f93ecbd018cd754395b3c605b219847666476bbbabc8"
+      "bytes": 2438,
+      "sha256": "7dc7217f4782b75fdef173c5db23c315099685b1470f1fd8f29b161070eb7d0d"
     },
     {
       "path": "rules/member-plan.js",

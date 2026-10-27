@@ -1,6 +1,7 @@
 'use strict';
 const { ApiError } = require('../errors');
 const { isMember, canUseReminders, validateFollowLimits, memberLimits, followAllowance } = require('../rules/membership');
+const { isRetiredPartNumber, RETIRED_PRODUCT_MESSAGE } = require('../rules/follow-access');
 const { isLiveRestricted } = require('../rules/new-product');
 const { targetKeyOf } = require('../engine/events');
 const { ensureUser } = require('./users');
@@ -9,15 +10,17 @@ const ID_PATTERN = /^[A-Za-z0-9_-]{8,64}$/;
 
 // `member` gates restricted live inventory; `active` (member or unused free alert) decides monitoring.
 function present(follow, latestByKey, storesByNumber, product, ctx, member = true, active = member) {
+  const productRetired = isRetiredPartNumber(follow.partNumber);
   const latestRestricted = !member && isLiveRestricted(product || { partNumber: follow.partNumber }, ctx.config.newProductWindows, ctx.now).restricted;
   return {
     followId: follow._id,
     partNumber: follow.partNumber,
     productTitle: product ? product.title : follow.productTitle || follow.partNumber,
     familyName: product ? product.familyName : null,
-    status: !active && follow.status === 'active' ? 'expired' : follow.status,
+    status: productRetired ? 'paused' : (!active && follow.status === 'active' ? 'expired' : follow.status),
     savedStatus: follow.status,
-    statusReason: !active && follow.status === 'active' ? 'membership_expired' : follow.statusReason || null,
+    statusReason: productRetired ? 'product_retired' : (!active && follow.status === 'active' ? 'membership_expired' : follow.statusReason || null),
+    productRetired,
     createdAt: follow.createdAt,
     updatedAt: follow.updatedAt,
     latestRestricted,
@@ -75,7 +78,7 @@ async function list(ctx) {
   return { member, freeReminder: false, limits: memberLimits(user, ctx.now), follows: presented.map((row, i) => {
     const allowance = followAllowance(user, follows[i], follows, ctx.now);
     return { ...row, ...allowance,
-      ...(allowance.limitPaused ? { status: 'limit_paused', statusReason: 'plan_limit' } : {}),
+      ...(row.productRetired ? {} : allowance.limitPaused ? { status: 'limit_paused', statusReason: 'plan_limit' } : {}),
       stores: row.stores.map(store => ({ ...store, limitPaused: member && !allowance.eligibleStoreNumbers.includes(store.storeNumber) })) };
   }) };
 }
@@ -87,6 +90,7 @@ async function upsert(ctx, payload) {
   const member = isMember(user, ctx.now);
   const partNumber = typeof payload.partNumber === 'string' ? payload.partNumber.trim() : '';
   if (!/^[A-Z0-9]{5}CH\/A$/.test(partNumber)) throw new ApiError('invalid_part_number', '商品编号格式无效');
+  if (isRetiredPartNumber(partNumber)) throw new ApiError('product_retired', RETIRED_PRODUCT_MESSAGE);
   const storeNumbers = Array.isArray(payload.storeNumbers) ? payload.storeNumbers.filter(s => typeof s === 'string' && /^R\d{3}$/.test(s)) : [];
   const rawId = typeof payload.followId === 'string' && payload.followId.startsWith(`${user._id}|`) ? payload.followId.slice(user._id.length + 1) : payload.followId;
   const followId = typeof rawId === 'string' && ID_PATTERN.test(rawId) ? rawId : null;
@@ -139,6 +143,7 @@ async function setStatus(ctx, payload, status) {
   const recordId = followId.startsWith(`${user._id}|`) ? followId : `${user._id}|${followId}`;
   const follow = await ctx.repo.getFollow(recordId);
   if (!follow || follow.userKey !== user._id || follow.status === 'removed') throw new ApiError('unknown_follow', '关注不存在');
+  if (status === 'active' && isRetiredPartNumber(follow.partNumber)) throw new ApiError('product_retired', RETIRED_PRODUCT_MESSAGE);
   if (status === 'active' && !canUseReminders(user, ctx.now)) throw new ApiError('member_required', '关注与到货提醒为会员专属，开通会员后可恢复监测');
   const updated = await ctx.repo.mutateFollow({ userKey: user._id, followId: recordId, status, nowIso: ctx.nowIso, knownFollows: await ctx.repo.listFollows(user._id) });
   if (status === 'removed') return { removed: true, followId };

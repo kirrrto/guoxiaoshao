@@ -5,9 +5,9 @@
   <view wx:if="{{focusedFaq}}" class="card guide-focused-help"><view class="guide-section-title">{{focusedFaq.title}}</view><view class="small text-2 mt">{{focusedFaq.text}}</view><button class="btn btn-primary btn-block mt" bindtap="onReturnTask">{{returnLabel}}</button></view>
   <view wx:if="{{section === 'notification' || section === 'monitor' || section === 'faq'}}" class="card guide-reminder-check">
     <view class="guide-section-title">按这三步确认提醒</view>
-    <view class="guide-step"><view class="guide-step-number">1</view><view class="guide-step-copy"><view class="guide-step-title">库存有没有及时检查</view><view class="small text-2 mt">看对应配置的门店和观测时间。待更新不等于无货，网络在线也不代表后台检测正常。</view><button class="ui-action mt" bindtap="onCheckFollows">查看关注与库存</button></view></view>
-    <view class="guide-step"><view class="guide-step-number">2</view><view class="guide-step-copy"><view class="guide-step-title">消息是否已经发出</view><view class="small text-2 mt">查看提醒记录、剩余授权和免打扰设置。记录未确认时，不要把它当作已收到。</view><button class="ui-action mt" bindtap="onCheckReminders">查看提醒记录与设置</button></view></view>
-    <view class="guide-step"><view class="guide-step-number">3</view><view class="guide-step-copy"><view class="guide-step-title">微信能否正常收信</view><view class="small text-2 mt">主动试收一条测试消息，收到后确认反馈。测试消耗 1 次额度，不代表监测到库存。</view><button class="ui-action mt" bindtap="onTestNotification">测试收信</button></view></view>
+    <view class="guide-step"><view class="guide-step-number">1</view><view class="guide-step-copy"><view class="guide-step-title">库存有没有及时检查</view><view class="small text-2 mt">看门店观测时间；「待更新」不等于无货。</view><button class="ui-action mt" bindtap="onCheckFollows">查看关注与库存</button></view></view>
+    <view class="guide-step"><view class="guide-step-number">2</view><view class="guide-step-copy"><view class="guide-step-title">消息是否已经发出</view><view class="small text-2 mt">核对提醒记录、剩余授权次数与免打扰设置。</view><button class="ui-action mt" bindtap="onCheckReminders">查看提醒记录与设置</button></view></view>
+    <view class="guide-step"><view class="guide-step-number">3</view><view class="guide-step-copy"><view class="guide-step-title">微信能否正常收信</view><view class="small text-2 mt">试收一条测试消息（消耗 1 次查询额度，不查库存）。</view><button class="ui-action mt" bindtap="onTestNotification">测试收信</button></view></view>
   </view>
 
   <!-- 选购四步：步骤条与内容同卡，切换不离开当前位置 -->

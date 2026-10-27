@@ -56,8 +56,8 @@ Page({
       const meta = fmt.collectorMeta(observationStale && state === 'running' ? 'running' : observationStale ? 'stale' : state);
       // Delay is explained here (公告), not as a query-page alarm banner.
       const detail = observationStale
-        ? '库存观测更新延迟，页面上的取货时间可能不是最新。可下拉刷新；不以延迟推断无货或已恢复。各配置时间请到「小哨」查看。'
-        : state === 'running' ? '检测服务正在运行，各配置的库存时间请到「小哨」查看。' : '请到「小哨」查看受影响的配置与处理入口。';
+        ? '部分库存观测更新延迟，可下拉刷新；各配置最新时间请到「小哨」查看。'
+        : state === 'running' ? '检测服务运行正常，各配置库存时间请到「小哨」查看。' : '请到「小哨」查看受影响配置与处理入口。';
       this.setData({ ready: true, loadError: '', refreshedText: fmt.fmtTime(Date.now()),
         service: state || observationStale ? { label: meta.label, tone: observationStale && meta.cls === 'ok' ? 'warn' : meta.cls, detail } : null });
       this.renderNotices();

@@ -37,8 +37,8 @@
 .history-result-heading { display: flex; justify-content: space-between; align-items: baseline; gap: 16rpx; }
 .history-result-date { font-size: max(16px, 34rpx); font-weight: 700; font-variant-numeric: tabular-nums; }
 .history-result-target { margin-top: 6rpx; font-size: max(12px, 25rpx); color: var(--text-2); overflow-wrap: anywhere; }
-.history-data-notice { margin-top: 18rpx; padding: 18rpx 20rpx; border-radius: 16rpx; background: var(--surface-soft); overflow-wrap: anywhere; }
-.history-data-notice--recorded { background: var(--green-soft); }
+.history-data-notice { margin-top: 18rpx; padding: 18rpx 20rpx; border-radius: 16rpx; background: var(--surface-soft); border: 1rpx solid var(--line); overflow-wrap: anywhere; }
+.history-data-notice--recorded { background: var(--green-soft); border-color: rgba(0, 195, 117, 0.34); }
 .history-data-title { font-size: max(14px, 28rpx); font-weight: 600; line-height: 1.5; color: var(--text); }
 .history-data-detail { margin-top: 6rpx; }
 .history-billing-note { color: var(--green-dark); }

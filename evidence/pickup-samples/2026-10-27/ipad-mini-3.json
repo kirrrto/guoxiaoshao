@@ -1,0 +1,89 @@
+{
+  "record": {
+    "storeNumber": "R577",
+    "partNumbers": [
+      "MJ744CH/A",
+      "MJ754CH/A",
+      "MJ784CH/A",
+      "MJ794CH/A",
+      "ML344CH/A",
+      "ML364CH/A"
+    ],
+    "requestUrl": "https://www.apple.com.cn/shop/retail/pickup-message?pl=true&mts.0=regular&parts.0=MJ744CH%2FA&parts.1=MJ754CH%2FA&parts.2=MJ784CH%2FA&parts.3=MJ794CH%2FA&parts.4=ML344CH%2FA&parts.5=ML364CH%2FA&store=R577",
+    "startedAt": "2026-10-27T10:13:10.323Z",
+    "httpStatus": 200,
+    "bytes": 8590,
+    "elapsedMs": 370,
+    "finishedAt": "2026-10-27T10:13:10.693Z",
+    "error": null,
+    "retryAfter": null
+  },
+  "observations": [
+    {
+      "storeNumber": "R577",
+      "storeName": "天环广场",
+      "partNumber": "MJ744CH/A",
+      "status": "ineligible",
+      "pickupDisplay": "ineligible",
+      "quote": "暂无供应",
+      "productTitle": "iPad mini 无线局域网 + 蜂窝网络机型 256GB 配标准玻璃 - 午夜色",
+      "observedAt": "2026-10-27T10:13:10.693Z",
+      "reason": null
+    },
+    {
+      "storeNumber": "R577",
+      "storeName": "天环广场",
+      "partNumber": "MJ754CH/A",
+      "status": "ineligible",
+      "pickupDisplay": "ineligible",
+      "quote": "暂无供应",
+      "productTitle": "iPad mini 无线局域网 + 蜂窝网络机型 256GB 配标准玻璃 - 星光色",
+      "observedAt": "2026-10-27T10:13:10.693Z",
+      "reason": null
+    },
+    {
+      "storeNumber": "R577",
+      "storeName": "天环广场",
+      "partNumber": "MJ784CH/A",
+      "status": "ineligible",
+      "pickupDisplay": "ineligible",
+      "quote": "暂无供应",
+      "productTitle": "iPad mini 无线局域网 + 蜂窝网络机型 512GB 配标准玻璃 - 午夜色",
+      "observedAt": "2026-10-27T10:13:10.693Z",
+      "reason": null
+    },
+    {
+      "storeNumber": "R577",
+      "storeName": "天环广场",
+      "partNumber": "MJ794CH/A",
+      "status": "ineligible",
+      "pickupDisplay": "ineligible",
+      "quote": "暂无供应",
+      "productTitle": "iPad mini 无线局域网 + 蜂窝网络机型 512GB 配标准玻璃 - 星光色",
+      "observedAt": "2026-10-27T10:13:10.693Z",
+      "reason": null
+    },
+    {
+      "storeNumber": "R577",
+      "storeName": "天环广场",
+      "partNumber": "ML344CH/A",
+      "status": "ineligible",
+      "pickupDisplay": "ineligible",
+      "quote": "暂无供应",
+      "productTitle": "iPad mini 无线局域网 + 蜂窝网络机型 256GB 配纳米纹理玻璃 - 午夜色",
+      "observedAt": "2026-10-27T10:13:10.693Z",
+      "reason": null
+    },
+    {
+      "storeNumber": "R577",
+      "storeName": "天环广场",
+      "partNumber": "ML364CH/A",
+      "status": "ineligible",
+      "pickupDisplay": "ineligible",
+      "quote": "暂无供应",
+      "productTitle": "iPad mini 无线局域网 + 蜂窝网络机型 256GB 配纳米纹理玻璃 - 星光色",
+      "observedAt": "2026-10-27T10:13:10.693Z",
+      "reason": null
+    }
+  ]
+}

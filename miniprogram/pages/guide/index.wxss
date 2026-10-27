@@ -15,12 +15,13 @@ button.guide-stepper-item.guide-stepper-item--on { color: var(--green-dark); fon
 .guide-stepper-item--on .guide-stepper-dot { border-color: var(--green); background: var(--green); color: var(--green-ink); }
 .guide-stage-copy { padding-top: 22rpx; border-top: 1rpx solid var(--line); }
 
-.guide-step { display: flex; align-items: flex-start; gap: 18rpx; margin: 28rpx 0; }
+.guide-step { display: flex; align-items: flex-start; gap: 18rpx; margin: 24rpx 0; }
+.guide-step + .guide-step { padding-top: 20rpx; border-top: 1rpx solid var(--line); }
 .guide-step-number { flex: none; display: flex; align-items: center; justify-content: center; width: 44rpx; height: 44rpx; margin-top: 2rpx; background: var(--green-soft); color: var(--green-dark); border-radius: 50%; font-size: 24rpx; font-weight: 600; }
 .guide-step-copy { flex: 1; min-width: 0; }
 .guide-step-title { font-size: 29rpx; font-weight: 600; line-height: 1.5; }
-.guide-step-copy .small { line-height: 1.75; }
-.guide-answer { padding: 0 22rpx 22rpx; line-height: 1.75; }
+.guide-step-copy .small { line-height: 1.65; }
+.guide-answer { padding: 0 22rpx 22rpx; line-height: 1.65; }
 .guide-page .btn { height: auto; min-height: 44px; line-height: 1.5; padding: 20rpx 26rpx; white-space: normal; }
 .guide-page .footer-note { line-height: 1.7; }
 .guide-target, .guide-focused-help { overflow-wrap: anywhere; }

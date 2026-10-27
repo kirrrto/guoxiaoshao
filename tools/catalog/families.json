@@ -12,7 +12,7 @@
     { "category": "ipad", "familyKey": "ipad-air", "displayName": "iPad Air", "url": "https://www.apple.com.cn/shop/buy-ipad/ipad-air", "include": true },
     { "category": "ipad", "familyKey": "ipad", "displayName": "iPad", "url": "https://www.apple.com.cn/shop/buy-ipad/ipad", "include": true },
     { "category": "ipad", "familyKey": "ipad-10-2", "displayName": "iPad (10.2 英寸)", "url": "https://www.apple.com.cn/shop/buy-ipad/ipad-10-2", "include": true },
-    { "category": "ipad", "familyKey": "ipad-mini", "displayName": "iPad mini", "url": "https://www.apple.com.cn/shop/buy-ipad/ipad-mini", "include": true },
+    { "category": "ipad", "familyKey": "ipad-mini", "displayName": "iPad mini", "url": "https://www.apple.com.cn/shop/buy-ipad/ipad-mini", "include": true, "releaseDate": "2026-10-26", "releaseSourceUrl": "https://www.apple.com.cn/newsroom/2026/10/apple-gives-ipad-mini-its-biggest-update-ever/" },
 
     { "category": "mac", "familyKey": "macbook-air", "displayName": "MacBook Air", "url": "https://www.apple.com.cn/shop/buy-mac/macbook-air", "include": true },
     { "category": "mac", "familyKey": "macbook-pro", "displayName": "MacBook Pro", "url": "https://www.apple.com.cn/shop/buy-mac/macbook-pro", "include": true },

@@ -71,7 +71,7 @@
         <view class="member-delivery-note">查询与历史不扣次数 · 微信提醒需单独授权</view>
         <view wx:if="{{membership.annualExpiresText}}" class="member-enhanced">年卡 5 配置 × 5 门店权益至 {{membership.annualExpiresText}}</view>
         <view wx:elif="{{membership.enhanced}}" class="member-enhanced">额外名额有效至 {{membership.enhancedExpiresText}}</view>
-        <view wx:if="{{!boot.followCount}}" class="member-setup-note">还没有关注配置。添加心仪配置与门店后，小哨才会开始为你留意。</view>
+        <view wx:if="{{!boot.followCount}}" class="member-setup-note">尚未添加关注配置。添加心仪配置与门店后，小哨将开始自动监测。</view>
         <button class="btn btn-primary btn-block member-delivery-action" disabled="{{paymentBusy || paymentChecking || paymentConfirming}}" bindtap="onOpenFollows">{{boot.followCount ? '查看关注与最新库存' : '添加第一个关注'}}</button>
       </block>
       <block wx:else>
@@ -147,14 +147,14 @@
             <text class="member-benefit-plan-detail">每配置 {{item.stores}} 家门店</text>
           </view>
         </view>
-        <view class="member-benefit-note"><text class="member-benefit-note-title">免费与会员</text><text>免费按次数查询和看历史；会员不扣次，并可持续关注、接收到货与断货提醒。</text></view>
+        <view class="member-benefit-note"><text class="member-benefit-note-title">免费与会员</text><text>免费按次查询与看历史；会员不扣次，支持持续关注及到货／断货提醒。</text></view>
         <view class="member-benefit-note"><text class="member-benefit-note-title">新品也能查</text><text>新品开售 30 天内，会员可实时查询。</text></view>
       </block>
       <block wx:if="{{showPurchaseRules}}">
         <view class="membership-rules">
-          <view class="membership-rule"><text class="membership-rule-title">付款与续费</text><text class="membership-rule-copy">{{boot.purchaseNotice || '一次性虚拟服务，一经售出不予退款。'}}</text><text class="membership-rule-copy">按所选套餐价格购买，剩余有效期顺延，不抵扣差价，不自动续费。</text></view>
-          <view class="membership-rule"><text class="membership-rule-title">关注名额</text><text class="membership-rule-copy">不同容量或颜色各占一个配置；暂停仍占名额，删除后释放。</text><text class="membership-rule-copy">月／年卡额外名额仅在其有效期内可用，续购周卡不延长。到期后保留配置与门店，按保存顺序暂停超额部分；升级后恢复。</text></view>
-          <view class="membership-rule"><text class="membership-rule-title">提醒与查询</text><text class="membership-rule-copy">每条提醒消耗对应类型的 1 次微信授权；到货、断货分别计次，免打扰期间不发送。</text><text class="membership-rule-copy">会员到期后监测与提醒停止，关注配置与次数保留。测试通知使用查询次数，与提醒授权分开计算。</text><text class="membership-rule-copy">请求繁忙或数据源限流时需稍后重试，库存以结果采集时间为准。</text></view>
+          <view class="membership-rule"><text class="membership-rule-title">付款与续费</text><text class="membership-rule-copy">{{boot.purchaseNotice || '一次性虚拟服务，一经售出不予退款。'}}</text><text class="membership-rule-copy">按所选套餐全价购买，剩余有效期顺延，不抵扣差价，不自动续费。</text></view>
+          <view class="membership-rule"><text class="membership-rule-title">关注名额</text><text class="membership-rule-copy">不同容量或颜色各占 1 个配置；暂停仍占名额，删除后释放。</text><text class="membership-rule-copy">月／年卡额外名额仅在有效期内可用，续购周卡不延长；到期后保留配置并暂停超额部分，升级后恢复。</text></view>
+          <view class="membership-rule"><text class="membership-rule-title">提醒与查询</text><text class="membership-rule-copy">每条提醒消耗对应类型 1 次微信授权；到货、断货独立计次，免打扰期间不发送。</text><text class="membership-rule-copy">到期后监测与提醒停止，配置与次数保留；测试通知消耗查询次数，与提醒授权分开计算。</text><text class="membership-rule-copy">如遇繁忙或限流请稍后重试，库存以采集时间为准。</text></view>
         </view>
       </block>
       <view wx:if="{{redemptionOpen}}" class="redemption-mask" catchtap="onOpenRedemption" catchtouchmove="noop">
@@ -208,13 +208,13 @@
         <view class="reminder-balance"><text class="reminder-balance-label">到货提醒</text><text class="reminder-balance-value">{{subscription.credits}} 次</text><text wx:if="{{authorization.pendingRestock}}" class="reminder-balance-pending">待同步 +{{authorization.pendingRestock}}</text></view>
         <view wx:if="{{subscription.soldoutEnabled}}" class="reminder-balance"><text class="reminder-balance-label">断货提醒</text><text class="reminder-balance-value">{{subscription.soldoutCredits}} 次</text><text wx:if="{{authorization.pendingSoldout}}" class="reminder-balance-pending">待同步 +{{authorization.pendingSoldout}}</text></view>
       </view>
-      <view class="reminder-delivery-note">提醒次数是微信授权余额，与签到获得的查询／体验次数分开计算。</view>
+      <view class="reminder-delivery-note">提醒次数为微信授权余额，与签到／任务获得的查询次数分开计算。</view>
       <view wx:if="{{consent && consent.anyBlocked}}" class="consent-recovery" role="status">
         <view class="consent-recovery-title">微信提醒权限未开启</view>
-        <view class="consent-recovery-desc">检测到微信已拒绝以下消息，库存监测会继续，但相关微信提醒可能无法正常接收。</view>
+        <view class="consent-recovery-desc">微信已拒绝以下消息；库存监测继续，但对应提醒暂无法接收。</view>
         <view class="consent-recovery-row" wx:for="{{consent.blocked}}" wx:key="id"><text class="consent-recovery-name">{{item.title}}</text><text class="consent-recovery-state">{{item.label}}</text></view>
         <button class="btn btn-primary btn-block consent-recovery-action" bindtap="onOpenSubscribeSetting">前往微信设置</button>
-        <view class="consent-recovery-steps">开启步骤：微信设置 → 订阅消息 → 将对应项改为“接收” → 返回补充提醒次数。设置里的“允许接收”不会自动加次数，仍需点「补充提醒次数」由微信确认。</view>
+        <view class="consent-recovery-steps">步骤：微信设置 → 订阅消息 → 改为「接收」→ 返回点「补充提醒次数」（开启权限不会自动加次数）。</view>
       </view>
       <button class="btn btn-primary btn-block" disabled="{{paymentBusy || paymentChecking || paymentConfirming || paymentPendingId || redemptionOpen || redeeming || subscribing || authorization.storageBlocked}}" loading="{{subscribing}}" bindtap="onSubscribe">{{subscribing ? '等待微信授权…' : '补充提醒次数'}}</button>
       <view wx:if="{{authorizationFeedback}}" class="authorization-feedback" aria-live="polite">{{authorizationFeedback}}</view>
@@ -241,7 +241,7 @@
         </view>
         <button class="ui-action ui-action--block mt" disabled="{{savingSettings || dndPeriods.length >= maxDndPeriods}}" bindtap="onAddDndPeriod">＋ 新增免打扰时段（{{dndPeriods.length}} / {{maxDndPeriods}}）</button>
       </block>
-      <view class="tiny muted mt">按北京时间，每天生效，修改自动保存。重叠时段连续免打扰，结束后不补发旧提醒。起止相同＝全天。</view>
+      <view class="tiny muted mt">北京时间每日生效，修改自动保存；结束后不补发旧提醒，起止相同＝全天。</view>
       </block>
       <view wx:if="{{!paymentPendingId}}" class="member-notification-experience">
         <button class="ui-disclosure notification-test-entry" hover-class="ui-control-pressed" disabled="{{paymentBusy || paymentChecking || paymentConfirming}}" bindtap="onTestNotification"><image class="ui-icon" src="/images/ui/notification.png" mode="aspectFit" aria-hidden="true" /><view class="notification-test-copy"><text class="ui-disclosure-label">体验微信提醒</text><text class="notification-test-description">{{membership.active ? '给自己发一条测试消息' : '开通前，先体验一条微信消息'}}</text></view><view class="ui-chevron" aria-hidden="true"></view></button>
@@ -255,14 +255,14 @@
       </view>
       <block wx:if="{{showNotifications}}">
       <view class="notification-toolbar">
-        <text class="tiny muted notification-scope">提醒记录保留最近 10 天。删除和清空只影响本列表，不取消关注、不撤回微信消息、不删库存历史。</text>
+        <text class="tiny muted notification-scope">保留近 10 天；清理仅隐藏本列表，不影响关注、已发消息与库存历史。</text>
         <button wx:if="{{notifications.length}}" class="ui-action ui-action--neutral notification-button notification-clear" hover-class="ui-control-pressed" disabled="{{notificationActionBusy || notificationConfirming || !notificationsClearBefore}}" bindtap="onClearNotifications">{{notificationActionBusy === 'clear' ? '清空中…' : '清空'}}</button>
       </view>
       <view wx:if="{{notificationsLoading && !notifications.length}}" class="loading-line">正在加载提醒记录…</view>
       <view wx:elif="{{notificationsLoading}}" class="loading-line">正在更新提醒记录…</view>
       <view wx:if="{{notificationsError}}" class="record-error"><text>{{notificationsError}}</text><button class="ui-action notification-button notification-retry" hover-class="ui-control-pressed" disabled="{{notificationsLoading || notificationActionBusy || notificationConfirming}}" bindtap="onRetryNotifications">重试加载</button></view>
       <view wx:if="{{notificationsActionError}}" class="record-error"><text>{{notificationsActionError}}</text><button class="ui-action notification-button notification-retry" hover-class="ui-control-pressed" disabled="{{notificationActionBusy || notificationConfirming}}" bindtap="onRetryNotificationAction">重试操作</button></view>
-      <view wx:if="{{!notificationsLoading && !notificationsError && !notificationsActionError && !notifications.length}}" class="empty small"><image class="record-empty-whistle" src="/images/brand/whistle-green.png" mode="aspectFit" aria-hidden="true" /><view>最近 10 天暂无提醒记录</view><view class="notification-empty-note">暂无提醒不等于一直无货。可到「小哨」查看所选配置、门店和最近检测结果。</view><button class="ui-action ui-action--neutral mt" bindtap="onOpenFollows">查看关注与库存</button></view>
+      <view wx:if="{{!notificationsLoading && !notificationsError && !notificationsActionError && !notifications.length}}" class="empty small"><image class="record-empty-whistle" src="/images/brand/whistle-green.png" mode="aspectFit" aria-hidden="true" /><view>最近 10 天暂无提醒记录</view><view class="notification-empty-note">暂无提醒不代表一直无货，可去「小哨」查看配置与检测状态。</view><button class="ui-action ui-action--neutral mt" bindtap="onOpenFollows">查看关注与库存</button></view>
       <view wx:for="{{notifications}}" wx:key="id" class="notification-item">
         <view class="notification-product">{{item.productTitle || item.partNumber}}</view>
         <view class="notification-meta"><text class="pill pill-{{item.statusCls}} tiny">{{item.statusLabel}}</text><text class="tiny muted">{{item.timeText}}</text></view>

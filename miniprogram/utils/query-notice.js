@@ -64,18 +64,30 @@ const OUTAGE_COMPENSATION_NOTICE = Object.freeze({
   text: '因昨晚服务器故障，目前查询与监测服务已恢复。今日（10 月 21 日）已为会员及曾付费用户自动顺延 1 天会员时长，免费用户今日打开自动获赠 1 天体验会员，可在「我的」查看。',
 });
 
+const IPAD_MINI_CATALOG_NOTICE = Object.freeze({
+  id: 'ipad-mini-catalog-2026-10-27',
+  title: '新款 iPad mini 目录更新说明',
+  kind: 'notice',
+  publishedAt: '2026-10-27T00:00:00+08:00',
+  startsAt: '2026-10-27T00:00:00+08:00',
+  expiresAt: '2026-11-06T23:59:59+08:00',
+  text: '苹果商店已上架新款 iPad mini（A20 Pro），老款取货接口已停用。果小哨已同步更新新款全系配置；原关注老款的用户请点「调整」改选新款。',
+});
+
 function withOutageCompensationNotice(payload, now = Date.now()) {
   if (!payload || typeof payload !== 'object' || typeof payload.serverTime !== 'string') return payload;
   const serverNow = parseTime(payload.serverTime);
-  if (serverNow === null || !normalizeAnnouncement(OUTAGE_COMPENSATION_NOTICE, serverNow)) return payload;
+  if (serverNow === null) return payload;
   const checkTime = Number.isFinite(now) ? now : serverNow;
-  if (!normalizeAnnouncement(OUTAGE_COMPENSATION_NOTICE, checkTime)) return payload;
+  const builtIn = [IPAD_MINI_CATALOG_NOTICE, OUTAGE_COMPENSATION_NOTICE]
+    .find(notice => normalizeAnnouncement(notice, serverNow) && normalizeAnnouncement(notice, checkTime));
+  if (!builtIn) return payload;
   const activeAnnouncement = normalizeAnnouncement(payload.announcement, checkTime);
-  const announcement = activeAnnouncement ? payload.announcement : OUTAGE_COMPENSATION_NOTICE;
+  const announcement = activeAnnouncement ? payload.announcement : builtIn;
   const rawNotices = Array.isArray(payload.notices) ? payload.notices : [];
-  const needsBoardRow = Boolean(activeAnnouncement && activeAnnouncement.text !== OUTAGE_COMPENSATION_NOTICE.text);
-  const notices = needsBoardRow && !rawNotices.some(item => item && item.id === OUTAGE_COMPENSATION_NOTICE.id)
-    ? [OUTAGE_COMPENSATION_NOTICE, ...rawNotices]
+  const needsBoardRow = Boolean(activeAnnouncement && activeAnnouncement.text !== builtIn.text);
+  const notices = needsBoardRow && !rawNotices.some(item => item && item.id === builtIn.id)
+    ? [builtIn, ...rawNotices]
     : rawNotices;
   return { ...payload, announcement, notices };
 }
@@ -194,7 +206,7 @@ function resolveQueryNotice({ announcement, now = Date.now(), consent = null, co
 }
 
 module.exports = {
-  OUTAGE_COMPENSATION_NOTICE, withOutageCompensationNotice,
+  OUTAGE_COMPENSATION_NOTICE, IPAD_MINI_CATALOG_NOTICE, withOutageCompensationNotice,
   parseTime, noticeExpiresAt, normalizeAnnouncement, liveNotices, hasLiveNoticeContent, resolveQueryNotice,
   noticeFingerprint, noticeUnreadCount, markNoticesSeen,
 };

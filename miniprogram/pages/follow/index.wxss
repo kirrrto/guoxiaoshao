@@ -17,8 +17,8 @@
 .readiness-action.btn { width: auto; min-height: 44px; margin-top: 16rpx; font-size: 28rpx; white-space: normal; }
 .follow.card { padding: 26rpx; border: 1rpx solid var(--line); box-shadow: 0 4rpx 18rpx rgba(26, 67, 50, 0.035); }
 .follow-available.card { border-color: var(--control-line); }
-.follow-stock-panel { margin-top: 22rpx; padding: 20rpx; border-radius: 16rpx; background: var(--surface-soft); }
-.follow-stock-panel--ok { background: var(--green-soft); }
+.follow-stock-panel { margin-top: 20rpx; padding: 20rpx; border-radius: 16rpx; background: var(--surface-soft); border: 1rpx solid var(--line); }
+.follow-stock-panel--ok { background: var(--green-soft); border-color: rgba(0, 195, 117, 0.34); }
 .follow-stock-panel--warn { background: var(--surface-soft); }
 .follow-stock-heading { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8rpx 16rpx; }
 .follow-stock-label { font-size: 32rpx; line-height: 1.5; font-weight: 700; color: var(--text); }

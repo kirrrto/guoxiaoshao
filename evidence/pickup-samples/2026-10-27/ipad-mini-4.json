@@ -1,0 +1,41 @@
+{
+  "record": {
+    "storeNumber": "R577",
+    "partNumbers": [
+      "MJ7A4CH/A",
+      "MJ7C4CH/A"
+    ],
+    "requestUrl": "https://www.apple.com.cn/shop/retail/pickup-message?pl=true&mts.0=regular&parts.0=MJ7A4CH%2FA&parts.1=MJ7C4CH%2FA&store=R577",
+    "startedAt": "2026-10-27T10:13:12.209Z",
+    "httpStatus": 200,
+    "bytes": 6338,
+    "elapsedMs": 301,
+    "finishedAt": "2026-10-27T10:13:12.510Z",
+    "error": null,
+    "retryAfter": null
+  },
+  "observations": [
+    {
+      "storeNumber": "R577",
+      "storeName": "天环广场",
+      "partNumber": "MJ7A4CH/A",
+      "status": "ineligible",
+      "pickupDisplay": "ineligible",
+      "quote": "暂无供应",
+      "productTitle": "iPad mini 无线局域网 + 蜂窝网络机型 512GB 配纳米纹理玻璃 - 午夜色",
+      "observedAt": "2026-10-27T10:13:12.510Z",
+      "reason": null
+    },
+    {
+      "storeNumber": "R577",
+      "storeName": "天环广场",
+      "partNumber": "MJ7C4CH/A",
+      "status": "ineligible",
+      "pickupDisplay": "ineligible",
+      "quote": "暂无供应",
+      "productTitle": "iPad mini 无线局域网 + 蜂窝网络机型 512GB 配纳米纹理玻璃 - 星光色",
+      "observedAt": "2026-10-27T10:13:12.510Z",
+      "reason": null
+    }
+  ]
+}

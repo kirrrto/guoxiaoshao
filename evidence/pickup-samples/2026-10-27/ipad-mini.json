@@ -1,0 +1,89 @@
+{
+  "record": {
+    "storeNumber": "R577",
+    "partNumbers": [
+      "MJ6F4CH/A",
+      "MJ6J4CH/A",
+      "MJ6Q4CH/A",
+      "MJ6R4CH/A",
+      "MJ6V4CH/A",
+      "MJ6W4CH/A"
+    ],
+    "requestUrl": "https://www.apple.com.cn/shop/retail/pickup-message?pl=true&mts.0=regular&parts.0=MJ6F4CH%2FA&parts.1=MJ6J4CH%2FA&parts.2=MJ6Q4CH%2FA&parts.3=MJ6R4CH%2FA&parts.4=MJ6V4CH%2FA&parts.5=MJ6W4CH%2FA&store=R577",
+    "startedAt": "2026-10-27T10:13:06.095Z",
+    "httpStatus": 200,
+    "bytes": 8488,
+    "elapsedMs": 883,
+    "finishedAt": "2026-10-27T10:13:06.978Z",
+    "error": null,
+    "retryAfter": null
+  },
+  "observations": [
+    {
+      "storeNumber": "R577",
+      "storeName": "天环广场",
+      "partNumber": "MJ6F4CH/A",
+      "status": "ineligible",
+      "pickupDisplay": "ineligible",
+      "quote": "暂无供应",
+      "productTitle": "iPad mini 无线局域网机型 128GB 配标准玻璃 - 午夜色",
+      "observedAt": "2026-10-27T10:13:06.978Z",
+      "reason": null
+    },
+    {
+      "storeNumber": "R577",
+      "storeName": "天环广场",
+      "partNumber": "MJ6J4CH/A",
+      "status": "ineligible",
+      "pickupDisplay": "ineligible",
+      "quote": "暂无供应",
+      "productTitle": "iPad mini 无线局域网机型 128GB 配标准玻璃 - 星光色",
+      "observedAt": "2026-10-27T10:13:06.978Z",
+      "reason": null
+    },
+    {
+      "storeNumber": "R577",
+      "storeName": "天环广场",
+      "partNumber": "MJ6Q4CH/A",
+      "status": "ineligible",
+      "pickupDisplay": "ineligible",
+      "quote": "暂无供应",
+      "productTitle": "iPad mini 无线局域网机型 256GB 配标准玻璃 - 午夜色",
+      "observedAt": "2026-10-27T10:13:06.978Z",
+      "reason": null
+    },
+    {
+      "storeNumber": "R577",
+      "storeName": "天环广场",
+      "partNumber": "MJ6R4CH/A",
+      "status": "ineligible",
+      "pickupDisplay": "ineligible",
+      "quote": "暂无供应",
+      "productTitle": "iPad mini 无线局域网机型 256GB 配标准玻璃 - 星光色",
+      "observedAt": "2026-10-27T10:13:06.978Z",
+      "reason": null
+    },
+    {
+      "storeNumber": "R577",
+      "storeName": "天环广场",
+      "partNumber": "MJ6V4CH/A",
+      "status": "ineligible",
+      "pickupDisplay": "ineligible",
+      "quote": "暂无供应",
+      "productTitle": "iPad mini 无线局域网机型 512GB 配标准玻璃 - 午夜色",
+      "observedAt": "2026-10-27T10:13:06.978Z",
+      "reason": null
+    },
+    {
+      "storeNumber": "R577",
+      "storeName": "天环广场",
+      "partNumber": "MJ6W4CH/A",
+      "status": "ineligible",
+      "pickupDisplay": "ineligible",
+      "quote": "暂无供应",
+      "productTitle": "iPad mini 无线局域网机型 512GB 配标准玻璃 - 星光色",
+      "observedAt": "2026-10-27T10:13:06.978Z",
+      "reason": null
+    }
+  ]
+}

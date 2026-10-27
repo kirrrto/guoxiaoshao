@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "catalogSha256": "7ee4d65c4e3e9d87f99be5d19bba2fd4de12221d4f92c1b9f51cec46dc39b968",
+  "catalogSha256": "22aca7f06a535f88a7b892ade5dd2251e814abb675eb2502a79de24225081d47",
   "encoder": {
     "pillow": "12.3.0",
     "opaque": {
@@ -1182,184 +1182,100 @@
       ]
     },
     {
-      "source": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-mini-select-cell-blue-202410?wid=940&hei=1112&fmt=png-alpha&.v=NmJhVkxMSzd4RmRrSjJwN2s4VWJVNnFxcm9uQnI0UkNxL0JGTTZkSTliMzRXdlpsMGFvb09SOHRPYjdBV3NIZmJjNitDN2kyNWFITm1kN1lsSUFHR2RIbWJ5RU5pUkozVEt3L3VhMjZNQWdVRk5BYjU4dkMrYjBKSjFqVXFOVGg",
-      "sourceSha256": "c61a1f17ebd38f3df9b47e8eb0ab81465c190ae28e2a3832e794223b8ad660df",
+      "source": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-mini-finish-select-cell-midnight-202610?wid=940&hei=1112&fmt=png-alpha&.v=eDJDc00wczl1QWk5QmpVYitFNXQwd2JzYWVhN3hTUnNiaGhtQ3NDUHB0Y05McDAxVVRGOGxkL0tQbDIrMnZxUXNjcXQ1U2FBY2RzWU80SEN4Z1NYZXA4TndFSGFWdWZMa21CRXlrUm45emFYUXhWUy90eVo3b3luQWlLeFk1cG0",
+      "sourceSha256": "399f8b21d95ec3a49ca44f2722c70b67a9eb7c0ab9013e00d1ac3efcdad43d37",
       "sourceWidth": 940,
       "sourceHeight": 1112,
       "parts": [
-        "MXQ13CH/A",
-        "MXQ53CH/A",
-        "MYHH3CH/A"
+        "MJ704CH/A",
+        "MJ744CH/A",
+        "MJ784CH/A",
+        "MJ7A4CH/A",
+        "ML344CH/A"
       ],
       "renditions": [
         {
           "variant": "card",
-          "path": "/images/products/fa9fa60f1ab922690c01-card.png",
+          "path": "/images/products/83a551817f4599b8b22e-card.png",
           "width": 183,
           "height": 216,
-          "bytes": 5078,
-          "sha256": "8ffb3454da86f872cf074da7d9ad80d0f727278cc057f44b47fc951e8a554664",
+          "bytes": 12283,
+          "sha256": "097a48fa78bffb4834b3eab7b2e61bd96eadebb7a7b376edb5ad979f01bf2bd4",
           "format": "PNG",
           "hasTransparency": true
         }
       ]
     },
     {
-      "source": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-mini-select-cell-purple-202410?wid=940&hei=1112&fmt=png-alpha&.v=NmJhVkxMSzd4RmRrSjJwN2s4VWJVOHdIZXRCbDExRVBHaUM1aVJGRkVEQWVIWjNpaWxvby9UZ2w1T1c3cUwrbTJpdkFkeXRGenVzczlmSUZMYlgrMHB6RnJHdDBvVzRQRjh2czM1SklLUnM5R3EzeG52eUtwaGNxeEw2T0xwVmY",
-      "sourceSha256": "cd3a348e26c03971f87fd95de8b55238ca6ce0119338270f3d960ceb5ca57c31",
+      "source": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-mini-finish-select-cell-starlight-202610?wid=940&hei=1112&fmt=png-alpha&.v=eDJDc00wczl1QWk5QmpVYitFNXQwNHIvV1dPSm1KT0tPMnhMTTlIWldtQVRaSWZ1ME9HWEdjS2xUZEIzNGJDU1JIMnJUYkhxeFlQUFF6U1JnK1dZZmROL1VCcUxMZGhIeWpHS1Y3Y0ZmQm82V2tlVVJSMEFaTXBZcVhaQ0JGeEk",
+      "sourceSha256": "e405e7486446bf865daa964b608d087620c27ce8fdb514e049d48ca6f35589b7",
       "sourceWidth": 940,
       "sourceHeight": 1112,
       "parts": [
-        "MXQ33CH/A",
-        "MXQ73CH/A",
-        "MYHK3CH/A"
+        "MJ714CH/A",
+        "MJ754CH/A",
+        "MJ794CH/A",
+        "MJ7C4CH/A",
+        "ML364CH/A"
       ],
       "renditions": [
         {
           "variant": "card",
-          "path": "/images/products/a7864bdfac14b70ba454-card.png",
+          "path": "/images/products/ff7aa768aae5a6b58d3e-card.png",
           "width": 183,
           "height": 216,
-          "bytes": 4893,
-          "sha256": "4ed8ab82d6ce7ed3a89149dbb4356e1b82be890e4cdf6b86e70017d9f32bf8aa",
+          "bytes": 12028,
+          "sha256": "775a9bcee4e83bee33504f179cd6492ea35c687458cf0fc453f7e6cb602f746b",
           "format": "PNG",
           "hasTransparency": true
         }
       ]
     },
     {
-      "source": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-mini-select-cell-spacegray-202410?wid=940&hei=1112&fmt=png-alpha&.v=NmJhVkxMSzd4RmRrSjJwN2s4VWJVKzFmYXNPQ1R6OGhNZzRDdE9DNlZ1dlRKc3dEODNneTBSZFNTOGZoVVpTaURPUU9BWmJWRXFZMEJicERYSS9tMXZ3UU5uUUpBVE5PT3lEMWJHa3h5c3FkWEZUMWFDNUgzR2ZMdE43eXZoVkQ",
-      "sourceSha256": "9298bb9c75b2d0a66f586a11704cf458f3d9206fd887820fd4498422f79f2f67",
+      "source": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-mini-finish-select-wifi-midnight-202610?wid=940&hei=1112&fmt=png-alpha&.v=eDJDc00wczl1QWk5QmpVYitFNXQwKzBkbDBUcm9yL3BiUFNTeVREWE9la05McDAxVVRGOGxkL0tQbDIrMnZxUXNjcXQ1U2FBY2RzWU80SEN4Z1NYZXA4TndFSGFWdWZMa21CRXlrUm45emFzeGxwcUlqRndPWkFnV214OVc4R2E",
+      "sourceSha256": "4c876f50d7ed9dff7118ec5ce1d8baaebd70b9c481f1a22cfc07c69fe927550f",
       "sourceWidth": 940,
       "sourceHeight": 1112,
       "parts": [
-        "MXQ03CH/A",
-        "MXQ43CH/A",
-        "MYHG3CH/A"
+        "MJ6F4CH/A",
+        "MJ6Q4CH/A",
+        "MJ6V4CH/A",
+        "MJ6X4CH/A",
+        "ML2Q4CH/A"
       ],
       "renditions": [
         {
           "variant": "card",
-          "path": "/images/products/c6c32839ddfaaff9746c-card.png",
+          "path": "/images/products/531902edd044f5371a5b-card.png",
           "width": 183,
           "height": 216,
-          "bytes": 4997,
-          "sha256": "806d615512c0de828d2fe8fec7e880cc119ca1f5b8a95aae5957590f1faafa97",
+          "bytes": 12190,
+          "sha256": "8e6229ad39fd6d1da8fae2516bcdc1e50ae23e9d8251ad8301bf2c13e12d6c52",
           "format": "PNG",
           "hasTransparency": true
         }
       ]
     },
     {
-      "source": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-mini-select-cell-starlight-202410?wid=940&hei=1112&fmt=png-alpha&.v=NmJhVkxMSzd4RmRrSjJwN2s4VWJVeFdIdWRKY1Y2SEtRQ1dVZVptOEEzdlRKc3dEODNneTBSZFNTOGZoVVpTaURPUU9BWmJWRXFZMEJicERYSS9tMXJDcDlldEFQaVVyK0hEMVJoODVlTnhuRlFoTE1iaVF1MFVlUWh4dG00bzY",
-      "sourceSha256": "7a85ef62c00ea34b645f922eb826ef98acb1908d4c908fdfb08fb352f9d9fbf9",
+      "source": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-mini-finish-select-wifi-starlight-202610?wid=940&hei=1112&fmt=png-alpha&.v=eDJDc00wczl1QWk5QmpVYitFNXQwekk1Q0xiaWduTXdPZms4aUZ1ODlPc1RaSWZ1ME9HWEdjS2xUZEIzNGJDU1JIMnJUYkhxeFlQUFF6U1JnK1dZZmROL1VCcUxMZGhIeWpHS1Y3Y0ZmQnI5SzlsS1VZdEdhREZhN0U1V0J4SW8",
+      "sourceSha256": "b0ff9d8d460272a4e7411c606713a00237d2b4b8276e302256721fca7b4a6f3d",
       "sourceWidth": 940,
       "sourceHeight": 1112,
       "parts": [
-        "MXQ23CH/A",
-        "MXQ63CH/A",
-        "MYHJ3CH/A"
+        "MJ6J4CH/A",
+        "MJ6R4CH/A",
+        "MJ6W4CH/A",
+        "MJ6Y4CH/A",
+        "ML2T4CH/A"
       ],
       "renditions": [
         {
           "variant": "card",
-          "path": "/images/products/bca50a2e113dd281ec42-card.png",
+          "path": "/images/products/07511cb81383c964fcf2-card.png",
           "width": 183,
           "height": 216,
-          "bytes": 4873,
-          "sha256": "8b73051c9a62386e1f36f3dc96c4d5456591803456d0396f758b49dcac38477e",
-          "format": "PNG",
-          "hasTransparency": true
-        }
-      ]
-    },
-    {
-      "source": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-mini-select-wifi-blue-202410?wid=940&hei=1112&fmt=png-alpha&.v=NmJhVkxMSzd4RmRrSjJwN2s4VWJVMHBIYm5EcjF5ZHdTWjByNmplMHhtVDRXdlpsMGFvb09SOHRPYjdBV3NIZmJjNitDN2kyNWFITm1kN1lsSUFHR2JiZ2pyMnJPbUExZmhtMSs0WUFMOWIrNmVjbmk5c1V4VVk2VEt3TGcxekg",
-      "sourceSha256": "8ff35f34f96795c99a51c9f7ff994310cc89f592201a88956dae6be06d5fcc22",
-      "sourceWidth": 940,
-      "sourceHeight": 1112,
-      "parts": [
-        "MXN73CH/A",
-        "MXNC3CH/A",
-        "MYH13CH/A"
-      ],
-      "renditions": [
-        {
-          "variant": "card",
-          "path": "/images/products/8ed8d672e92184614c93-card.png",
-          "width": 183,
-          "height": 216,
-          "bytes": 5028,
-          "sha256": "e4136f4a4f8c626a674035a3a358ec5fff3bf81a36e613e9a7ce9c895b8d194c",
-          "format": "PNG",
-          "hasTransparency": true
-        }
-      ]
-    },
-    {
-      "source": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-mini-select-wifi-purple-202410?wid=940&hei=1112&fmt=png-alpha&.v=NmJhVkxMSzd4RmRrSjJwN2s4VWJVNzVFK2U2TjRHYmZNU1M0UzNyaEJrVWVIWjNpaWxvby9UZ2w1T1c3cUwrbTJpdkFkeXRGenVzczlmSUZMYlgrMGpTeHhnaUcyb2JhMy9MQVIreWhPN2IrQWpCVmo0bmtLZHNRZStPMUV5Smw",
-      "sourceSha256": "a0b8268b40b5e17e4b38e551154d1bdeae71a308b952a535dd9f494da72c2ac7",
-      "sourceWidth": 940,
-      "sourceHeight": 1112,
-      "parts": [
-        "MXN93CH/A",
-        "MXNE3CH/A",
-        "MYH33CH/A"
-      ],
-      "renditions": [
-        {
-          "variant": "card",
-          "path": "/images/products/4ccc2415f7b628495faf-card.png",
-          "width": 183,
-          "height": 216,
-          "bytes": 4844,
-          "sha256": "35146ffda5b67a234fc0165bc6dc91eb3eac45c901d63680445e6718e1a92972",
-          "format": "PNG",
-          "hasTransparency": true
-        }
-      ]
-    },
-    {
-      "source": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-mini-select-wifi-spacegray-202410?wid=940&hei=1112&fmt=png-alpha&.v=NmJhVkxMSzd4RmRrSjJwN2s4VWJVKzlBaHA1THNMUXlDa1dRMU1wTGcxYlRKc3dEODNneTBSZFNTOGZoVVpTaURPUU9BWmJWRXFZMEJicERYSS9tMXZ3UU5uUUpBVE5PT3lEMWJHa3h5c29tYUg4SmtKcW5xSGI3YTdpRVdNejg",
-      "sourceSha256": "63b93553a790eeeb717f93331939a26a8a63dbc83e3ba059232a1f6ad8b9dfa2",
-      "sourceWidth": 940,
-      "sourceHeight": 1112,
-      "parts": [
-        "MXN63CH/A",
-        "MXNA3CH/A",
-        "MYGY3CH/A"
-      ],
-      "renditions": [
-        {
-          "variant": "card",
-          "path": "/images/products/1605c11e2426bab21fbb-card.png",
-          "width": 183,
-          "height": 216,
-          "bytes": 4937,
-          "sha256": "2c1b42724590b0e72d5af172ebbb2ad04a85337b71802bf1cfe006392f287382",
-          "format": "PNG",
-          "hasTransparency": true
-        }
-      ]
-    },
-    {
-      "source": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-mini-select-wifi-starlight-202410?wid=940&hei=1112&fmt=png-alpha&.v=NmJhVkxMSzd4RmRrSjJwN2s4VWJVL1BpQlQwb3h0VkRmZ2J1a0V4U1RJUFRKc3dEODNneTBSZFNTOGZoVVpTaURPUU9BWmJWRXFZMEJicERYSS9tMXJDcDlldEFQaVVyK0hEMVJoODVlTnc1SS91S1JMZnFCdjg2TmtONThzSkE",
-      "sourceSha256": "dc5b45b59b9f486b2e942815f593e27e17465daa9feb8cac7d8fc5e3c9124d2e",
-      "sourceWidth": 940,
-      "sourceHeight": 1112,
-      "parts": [
-        "MXN83CH/A",
-        "MXND3CH/A",
-        "MYH23CH/A"
-      ],
-      "renditions": [
-        {
-          "variant": "card",
-          "path": "/images/products/3da1654267290278f8ee-card.png",
-          "width": 183,
-          "height": 216,
-          "bytes": 4800,
-          "sha256": "fc8cbd9d30c96081f4e96fd28de994f08161a5345c545d790e0782dd6c9fc6e5",
+          "bytes": 11918,
+          "sha256": "b85e5690d21fdde45c0328704859dd8de1c7b96943ee87f2a51860374d5a5378",
           "format": "PNG",
           "hasTransparency": true
         }
@@ -2693,6 +2609,6 @@
       ]
     }
   ],
-  "mappingSha256": "08c266bb009fbbc7265391c38286b7553b3c9681217ec8e4a78bed856f444339",
-  "totalBytes": 595221
+  "mappingSha256": "1119c5772193bff5dbe710cd6f5cea40fe77fa9b3bc5d3f8e2952857249d8f6b",
+  "totalBytes": 604190
 }

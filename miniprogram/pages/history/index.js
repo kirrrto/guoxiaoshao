@@ -55,10 +55,10 @@ function presentHistory(response, catalog, request) {
   const coverageTitle = eventCount > 0 ? `已记录 ${eventCount} 条变化事件`
     : knownCount > 0 ? '已留存观测，暂无变化事件'
     : unknownCount > 0 ? '当天观测未获得有效结果' : '暂无该日期的历史数据';
-  const coverageNote = eventCount > 0 ? '以下统计仅包含已保存的事件，不代表全天全部供应变化。'
-    : knownCount > 0 ? '本次未查到变化事件；仅凭已有采样，不能判断全天没有补货。'
-    : unknownCount > 0 ? '已记录的请求未能确认供应状态，不能据此判断当天是否有货。'
-    : '未查到该条件的历史事件或当日观测凭据，无法判断当天供应情况。';
+  const coverageNote = eventCount > 0 ? '以下仅统计已保存事件，不代表全天全部变化。'
+    : knownCount > 0 ? '当日未记录到变化事件；不代表全天无补货。'
+    : unknownCount > 0 ? '当日请求未能确认状态，不能据此判断是否有货。'
+    : '暂无该条件的历史事件或当日观测凭据，无法判断当天是否到货。';
   return {
     ...response,
     insights: historyInsights(response, request, catalog),
@@ -602,7 +602,7 @@ Page({
     const costText = boot && Number.isFinite(boot.historyCost) ? `需有 ${boot.historyCost} 次余额` : '需有足够余额';
     wx.showModal({
       title: '数据说明',
-      content: `历史来自本小程序的实际查询和会员关注监测，只保留最近 ${fmt.RETENTION_DAYS} 天，并非可追溯任意日期的完整数据库。未采集的过去记录不能补查；没有事件不代表没有货。\n\n观测摘要从启用记录后积累，首末观测之间不代表连续覆盖。首次可取货和中断后恢复不等同于确认补货。\n\n免费用户查询${costText}；未查到事件会自动退还，同一查询分页不额外扣次。受限新品开售 30 天内，仅会员可看今天。时间均为北京时间。`,
+      content: `1. 数据范围：保留近 ${fmt.RETENTION_DAYS} 天实际查询与监测记录；未采集时段不补录，无事件不代表无货。\n2. 统计说明：首末观测间不代表连续覆盖；首次可取货与中断恢复不等同确认补货。\n3. 计次与权限：免费用户查询${costText}（无事件自动退还，分页不扣次）；受限新品开售 30 天内仅会员可查今天。`,
       showCancel: false,
     });
   },

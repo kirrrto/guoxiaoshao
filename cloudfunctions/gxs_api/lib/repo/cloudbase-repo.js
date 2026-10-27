@@ -160,13 +160,21 @@ function createCloudbaseRepo(db, { sleep = ms => new Promise(resolve => setTimeo
       if (!storeNumbers.length) return [];
       return readIds(COLLECTIONS.catalogStores, storeNumbers);
     },
-    async replaceCatalog({ stores, products, meta }) {
+    async replaceCatalog({ stores, products, meta, prune = false }) {
       const upsert = async (collection, docs) => {
         for (let i = 0; i < docs.length; i += CHUNK) {
           await Promise.all(docs.slice(i, i + CHUNK).map(doc => {
             const { _id, ...data } = doc;
             return col(collection).doc(_id).set({ data });
           }));
+        }
+        if (prune) {
+          const keep = new Set(docs.map(doc => doc._id));
+          const existing = await readAll(col(collection).field({ _id: true }).orderBy('_id', 'asc'));
+          const stale = existing.filter(row => !keep.has(row._id));
+          for (let i = 0; i < stale.length; i += CHUNK) {
+            await Promise.all(stale.slice(i, i + CHUNK).map(row => col(collection).doc(row._id).remove()));
+          }
         }
       };
       await upsert(COLLECTIONS.catalogStores, stores);

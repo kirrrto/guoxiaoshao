@@ -94,9 +94,13 @@ function presentAlert({ notification: n, latest, follow }, now = Date.now()) {
 function presentFollow(follow, boot, catalog, collector) {
   const now = Date.now();
   const status = { ...(FOLLOW_STATUS[follow.status] || { label: follow.status, cls: 'muted' }) };
+  const retired = Boolean(follow.productRetired || follow.statusReason === 'product_retired');
   if (follow.status === 'paused' && ['member_expired', 'membership_expired'].includes(follow.statusReason)) status.label = '会员到期，已暂停';
   if (follow.status === 'expired') status.label = '会员已到期，监测已停止';
-  let monitoringText = follow.status === 'limit_paused' ? '配置已保留，可在会员权益中查看可用名额并恢复' : '';
+  if (retired) { status.label = '老款已下架，请改选新款'; status.cls = 'warn'; }
+  let monitoringText = retired
+    ? '老款官方取货接口已停用，请点「调整」改选新款配置'
+    : follow.status === 'limit_paused' ? '配置已保留，可在会员权益中查看可用名额并恢复' : '';
   if (follow.status === 'active') {
     if (!canRemind(boot)) { status.cls = 'warn'; monitoringText = '会员未生效，当前不参与自动检测'; }
     else if (!collector || collector.state !== 'running' || collector.observationStale) monitoringText = '关注已保存，后台检测情况见上方';

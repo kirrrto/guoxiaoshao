@@ -8,6 +8,16 @@
 // Keep technical details and complete acceptance records in release documents.
 const RELEASE_NOTES = [
   {
+    version: '3.4.2',
+    title: 'iPad mini 目录更新与界面精炼',
+    dateText: '发布候选 · 2026-10-27',
+    highlights: [
+      '目录更新为新款 iPad mini（A20 Pro），下线已停用的老款接口并同步公告。',
+      '已关注老款配置自动提示改选新款，避免无效监测。',
+      '精炼各页说明文案与卡片层级，阅读和选配更高效。',
+    ],
+  },
+  {
     version: '3.4.1',
     title: '页面跳转与运行修复',
     dateText: '发布候选 · 2026-10-26',

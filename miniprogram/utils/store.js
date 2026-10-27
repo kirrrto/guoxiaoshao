@@ -273,7 +273,21 @@ function indexCatalog(raw) {
   return { version: raw.version, families: raw.families || [], excludedFamilies: raw.excludedFamilies || [], stores, cities, storeByNumber, categories, products, productByPart };
 }
 
-function validCatalog(raw) { return raw && Array.isArray(raw.products) && Array.isArray(raw.stores); }
+function catalogTimestamp(version) {
+  if (typeof version !== 'string') return NaN;
+  const head = version.split('|')[0];
+  return /^\d{4}-\d{2}-\d{2}T/.test(head) ? Date.parse(head) : NaN;
+}
+
+function isOlderThanSeed(raw) {
+  const rawTime = catalogTimestamp(raw && raw.version);
+  const seedTime = catalogTimestamp(getCatalogSeed().version);
+  return Number.isFinite(rawTime) && Number.isFinite(seedTime) && rawTime < seedTime;
+}
+
+function validCatalog(raw) {
+  return Boolean(raw && Array.isArray(raw.products) && Array.isArray(raw.stores) && !isOlderThanSeed(raw));
+}
 
 // The indexed catalog lives only in JavaScript memory. Pages bind its version
 // and target-picker reads it here, so products never cross the render bridge.
@@ -324,11 +338,18 @@ async function refreshCatalog({ force = false } = {}) {
       // An earlier request may finish after this session has been invalidated.
       // Its result must not publish, persist or reset the new session's timers.
       if (generation !== catalogGeneration) return app.globalData.catalog || indexCatalog(cachedCatalog() || getCatalogSeed());
-      if (!response || (!response.unchanged && !validCatalog(response))) throw new Error('商品目录暂时不可用，请稍后刷新');
+      const staleServer = Boolean(response && !response.unchanged && Array.isArray(response.products) && Array.isArray(response.stores) && isOlderThanSeed(response));
+      if (!response || (!response.unchanged && !staleServer && !validCatalog(response))) throw new Error('商品目录暂时不可用，请稍后刷新');
       catalogCheckedAt = Date.now();
       catalogRetryAt = 0;
-      if (response.unchanged) {
-        if (!app.globalData.catalog || app.globalData.catalog.version !== version) app.globalData.catalog = indexCatalog(raw);
+      if (response.unchanged || staleServer) {
+        if (!app.globalData.catalog || app.globalData.catalog.version !== version) {
+          const indexed = indexCatalog(raw);
+          app.globalData.catalog = indexed;
+          if (!current || current.version !== indexed.version) {
+            for (const listener of catalogListeners) { try { listener(indexed); } catch (e) { console.error('[gxs] catalog listener', e); } }
+          }
+        }
         return app.globalData.catalog;
       }
       const indexed = indexCatalog(response);
@@ -365,8 +386,9 @@ async function getCatalog({ force = false } = {}) {
   const catalog = currentCatalog();
   if (force) return refreshCatalog({ force: true });
   const expected = app.globalData.bootstrap && app.globalData.bootstrap.catalogVersion;
+  const expectedStale = Boolean(expected && isOlderThanSeed({ version: expected }));
   const now = Date.now();
-  if (now >= catalogRetryAt && (catalogRetryAt > 0 || (expected && expected !== catalog.version) || now - catalogCheckedAt >= CATALOG_TTL_MS)) {
+  if (now >= catalogRetryAt && (catalogRetryAt > 0 || (expected && !expectedStale && expected !== catalog.version) || now - catalogCheckedAt >= CATALOG_TTL_MS)) {
     // Browse immediately; the server still validates supported SKU and limits.
     refreshCatalog().catch(() => {});
   }

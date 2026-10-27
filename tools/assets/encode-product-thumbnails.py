@@ -31,17 +31,21 @@ def encode_jpeg(image):
     return buffer.getvalue(), 'JPEG', 'jpg'
 
 
-def encode_png(image):
-    quantized = image.quantize(colors=PNG_COLORS, method=Image.Quantize.FASTOCTREE, dither=Image.Dither.FLOYDSTEINBERG)
-    palette = quantized.getpalette('RGBA')
-    # Octree quantization can leave solid product pixels slightly see-through;
-    # snap palette alpha so solid stays solid and clear margins stay clear.
-    for index in range(3, len(palette), 4):
-        palette[index] = 0 if palette[index] <= ALPHA_CLEAR else 255 if palette[index] >= ALPHA_SOLID else palette[index]
-    quantized.putpalette(palette, 'RGBA')
-    buffer = io.BytesIO()
-    quantized.save(buffer, format='PNG', optimize=True)
-    return buffer.getvalue(), 'PNG', 'png'
+def encode_png(image, budget=12288):
+    for colors in (PNG_COLORS, 192, 160, 128):
+        quantized = image.quantize(colors=colors, method=Image.Quantize.FASTOCTREE, dither=Image.Dither.FLOYDSTEINBERG)
+        palette = quantized.getpalette('RGBA')
+        # Octree quantization can leave solid product pixels slightly see-through;
+        # snap palette alpha so solid stays solid and clear margins stay clear.
+        for index in range(3, len(palette), 4):
+            palette[index] = 0 if palette[index] <= ALPHA_CLEAR else 255 if palette[index] >= ALPHA_SOLID else palette[index]
+        quantized.putpalette(palette, 'RGBA')
+        buffer = io.BytesIO()
+        quantized.save(buffer, format='PNG', optimize=True)
+        data = buffer.getvalue()
+        if len(data) <= budget:
+            return data, 'PNG', 'png'
+    return data, 'PNG', 'png'
 
 
 written = set()
@@ -60,7 +64,7 @@ for entry in plan['entries']:
         resized = image.copy()
         resized.thumbnail((edge, edge), Image.Resampling.LANCZOS, reducing_gap=3.0)
         transparent = resized.getchannel('A').getextrema()[0] < 255
-        encoded, image_format, extension = (encode_png if transparent else encode_jpeg)(resized)
+        encoded, image_format, extension = encode_png(resized, budget) if transparent else encode_jpeg(resized)
         assert len(encoded) <= budget, f'thumbnail_byte_budget:{key}:{variant}:{len(encoded)}'
         with Image.open(io.BytesIO(encoded)) as verified:
             verified.load()

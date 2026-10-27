@@ -22,7 +22,7 @@
       <view class="notice-card-meta"><text wx:if="{{item.publishedAt}}">发布 {{item.publishedAt}}</text><text>{{item.stamp}}</text></view>
       <view class="notice-card-text">{{item.text}}</view>
     </view>
-    <view class="notice-foot tiny muted">说明的发布时间不代表当前故障。库存状态与观测时间请查看对应配置。</view>
+    <view class="notice-foot tiny muted">发布时间不代表当前故障，实时库存与观测时间请看对应配置。</view>
     <button class="btn btn-outline btn-block mt" bindtap="onGoHelp">没有收到提醒？查看排查步骤</button>
   </block>
 </view>

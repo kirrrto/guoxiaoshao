@@ -26,7 +26,7 @@ function resultNextAction({ snapshot, account, collector, catalog, now = Date.no
   const counts = { knownCount: known.length, unknownCount: rows.length - known.length };
   if (snapshot.ok !== true || !known.length) return { ...base, ...counts };
   if (available.length) return { ...base, ...counts, action: 'guide', tone: 'available', title: `${available.length} 家门店有可取货观测`,
-    detail: `${partial ? `另有 ${rows.length - known.length} 家状态待确认。` : ''}观测不保留库存，也不会替你下单。购买请在 Apple 官方渠道完成。`, label: '查看下单指引' };
+    detail: `${partial ? `另有 ${rows.length - known.length} 家待确认。` : ''}观测不锁库存，购买请在 Apple 官方渠道完成。`, label: '查看下单指引' };
   if (partial) return { ...base, ...counts, title: `${rows.length - known.length} 家门店仍待确认`, detail: '已有有效结果保留在下方，未知状态不等于无货。' };
   if (!collector || !['running', 'idle'].includes(collector.state) || collector.observationStale) return { ...base, ...counts,
     title: '本次暂无可取货观测', detail: '后台检测状态待恢复；开通会员不会消除服务异常。' };
@@ -47,7 +47,7 @@ function targetEvidence(snapshot, account, catalog, now = Date.now()) {
   const times = rows.map(row => Date.parse(row.observedAt)).filter(time => Number.isFinite(time) && time <= now);
   return { title: '这次查询的记录范围', detail: `仅包含当前配置的 ${rows.length} 家门店，不代表全国库存。`,
     time: times.length ? `最近记录 ${fmt.fmtDateTime(Math.max(...times))}` : '尚未取得有效观测',
-    note: '各店状态与时间独立；未采集的时段无法还原，记录也不能预测下次到货。' };
+    note: '各店状态独立；未采集时段无法还原，记录不预测下次到货。' };
 }
 
 module.exports = { resultNextAction, targetEvidence, targetSignature };

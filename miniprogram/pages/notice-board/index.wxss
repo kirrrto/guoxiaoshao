@@ -15,6 +15,10 @@
 
 .notice-card {
   margin-bottom: 16rpx;
+  border-left: 6rpx solid var(--green-dark);
+}
+.notice-card--warn {
+  border-left-color: var(--warn);
 }
 
 .notice-card-head {

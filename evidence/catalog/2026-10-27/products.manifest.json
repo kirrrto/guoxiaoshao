@@ -1,0 +1,45 @@
+{
+  "generatedAt": "2026-10-27T10:13:12.515Z",
+  "stopped": false,
+  "offlineReplay": false,
+  "entries": [
+    {
+      "familyKey": "ipad-mini",
+      "category": "ipad",
+      "rawFile": "ipad-mini.html",
+      "record": {
+        "requestUrl": "https://www.apple.com.cn/shop/buy-ipad/ipad-mini",
+        "method": "GET",
+        "startedAt": "2026-10-27T10:13:06.080Z",
+        "retries": 0,
+        "httpStatus": 200,
+        "headers": {
+          "content-type": "text/html;charset=utf-8"
+        },
+        "bytes": 480868,
+        "sha256": "504363ea393d77478d51e7ec19928e98b8da9c5a6a3eadd09b82bd39d6589a3a",
+        "elapsedMs": 620,
+        "finishedAt": "2026-10-27T10:13:06.080Z"
+      },
+      "parse": {
+        "supported": true,
+        "reason": null,
+        "layout": "selector",
+        "pageTitle": "iPad mini",
+        "dimensions": [
+          "dimensionColor",
+          "dimensionCapacity",
+          "dimensionFinish",
+          "dimensionConnection"
+        ],
+        "productCount": 20,
+        "rejected": []
+      }
+    }
+  ],
+  "images": {
+    "fetched": 0,
+    "evidence": [],
+    "missing": []
+  }
+}

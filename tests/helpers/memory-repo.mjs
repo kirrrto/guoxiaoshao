@@ -84,7 +84,13 @@ export function createMemoryRepo(seed = {}) {
     async listProducts() { return all(COLLECTIONS.catalogProducts); },
     async getProduct(partNumber) { return get(COLLECTIONS.catalogProducts, partNumber); },
     async getStores(storeNumbers) { return storeNumbers.map(s => get(COLLECTIONS.catalogStores, s)).filter(Boolean); },
-    async replaceCatalog({ stores, products, meta }) {
+    async replaceCatalog({ stores, products, meta, prune = false }) {
+      if (prune) {
+        const keepStores = new Set(stores.map(s => s._id));
+        const keepProducts = new Set(products.map(p => p._id));
+        for (const id of [...table(COLLECTIONS.catalogStores).keys()]) if (!keepStores.has(id)) table(COLLECTIONS.catalogStores).delete(id);
+        for (const id of [...table(COLLECTIONS.catalogProducts).keys()]) if (!keepProducts.has(id)) table(COLLECTIONS.catalogProducts).delete(id);
+      }
       for (const store of stores) put(COLLECTIONS.catalogStores, store);
       for (const product of products) put(COLLECTIONS.catalogProducts, product);
       put(COLLECTIONS.config, { ...meta, _id: 'catalog' });

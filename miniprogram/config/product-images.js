@@ -177,38 +177,6 @@ module.exports = {
     "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-air-finish-select-lightgold-202509?wid=940&hei=1112&fmt=png-alpha&.v=NUpaQVl1bitSNmJWZUdKdi9QZHhsQ0FRNjA2a0FndFVGandMdTMzMTI3T0Nvd0w2dVF4Vk1peXVBQ1A5RnFJblQ5NVJ4OStiQklybHZqYkJwOUI0UWpLeDJBOVg1WWI4SnpydnJleTJOaVBPdXQzMlBmb1p0VFkzYVZUVnExVE4",
     "imageAlt": "浅金色 iPhone Air，背面外观展示先进的二合一摄像头系统，正面外观展示全面屏设计、灵动岛和显示屏细黑边框，侧面外观展示操作按钮、音量调节按钮、侧边按钮和相机控制按钮。"
   },
-  "MK2Q4CH/A": {
-    "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-duo-finish-select-night-sky-202609?wid=940&hei=1112&fmt=png-alpha&.v=L2FnUkNTRm43ZDRCREFsdzlaeThkZ3h0LzRVb3pVcDdFRFlBZW9LdlZnTTY3eU1sRElTUWw3VmkwaFcvWFFZdVQ5NVJ4OStiQklybHZqYkJwOUI0UW54dHNyNHVwMVJTcUJTRDV4amNZM3JXeEN5bXRCTGIyQkNzYVFpWTFyclA",
-    "imageAlt": "夜空色 (深蓝色系) iPhone Duo，呈折叠状态，背面外观，展示机身左上角的融合式双摄系统和机身中央的 Apple 标志；展开的内屏，展示全面屏设计和圆角设计。"
-  },
-  "MK2W4CH/A": {
-    "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-duo-finish-select-night-sky-202609?wid=940&hei=1112&fmt=png-alpha&.v=L2FnUkNTRm43ZDRCREFsdzlaeThkZ3h0LzRVb3pVcDdFRFlBZW9LdlZnTTY3eU1sRElTUWw3VmkwaFcvWFFZdVQ5NVJ4OStiQklybHZqYkJwOUI0UW54dHNyNHVwMVJTcUJTRDV4amNZM3JXeEN5bXRCTGIyQkNzYVFpWTFyclA",
-    "imageAlt": "夜空色 (深蓝色系) iPhone Duo，呈折叠状态，背面外观，展示机身左上角的融合式双摄系统和机身中央的 Apple 标志；展开的内屏，展示全面屏设计和圆角设计。"
-  },
-  "MK2P4CH/A": {
-    "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-duo-finish-select-star-white-202609?wid=940&hei=1112&fmt=png-alpha&.v=L2FnUkNTRm43ZDRCREFsdzlaeThka1hsOUZkQmZFRkQ2eEh0dEM0bVFwVjZIYUZiOEZCU1dSYmlzT2FMVUpPY1gyaWxBVG1PRTU2YzhCN2c2emhzWHZ5ZTZTY3RKM0U0VzN2UzRGTGtzQ3F1ZFJUNEY5WjZkU21Ua0dNWEh2Zy8",
-    "imageAlt": "星光白色 iPhone Duo，呈折叠状态，背面外观，展示机身左上角的融合式双摄系统和机身中央的 Apple 标志；展开的内屏，展示全面屏设计和圆角设计。"
-  },
-  "MK2M4CH/A": {
-    "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-duo-finish-select-star-white-202609?wid=940&hei=1112&fmt=png-alpha&.v=L2FnUkNTRm43ZDRCREFsdzlaeThka1hsOUZkQmZFRkQ2eEh0dEM0bVFwVjZIYUZiOEZCU1dSYmlzT2FMVUpPY1gyaWxBVG1PRTU2YzhCN2c2emhzWHZ5ZTZTY3RKM0U0VzN2UzRGTGtzQ3F1ZFJUNEY5WjZkU21Ua0dNWEh2Zy8",
-    "imageAlt": "星光白色 iPhone Duo，呈折叠状态，背面外观，展示机身左上角的融合式双摄系统和机身中央的 Apple 标志；展开的内屏，展示全面屏设计和圆角设计。"
-  },
-  "MK2U4CH/A": {
-    "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-duo-finish-select-night-sky-202609?wid=940&hei=1112&fmt=png-alpha&.v=L2FnUkNTRm43ZDRCREFsdzlaeThkZ3h0LzRVb3pVcDdFRFlBZW9LdlZnTTY3eU1sRElTUWw3VmkwaFcvWFFZdVQ5NVJ4OStiQklybHZqYkJwOUI0UW54dHNyNHVwMVJTcUJTRDV4amNZM3JXeEN5bXRCTGIyQkNzYVFpWTFyclA",
-    "imageAlt": "夜空色 (深蓝色系) iPhone Duo，呈折叠状态，背面外观，展示机身左上角的融合式双摄系统和机身中央的 Apple 标志；展开的内屏，展示全面屏设计和圆角设计。"
-  },
-  "MK2N4CH/A": {
-    "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-duo-finish-select-night-sky-202609?wid=940&hei=1112&fmt=png-alpha&.v=L2FnUkNTRm43ZDRCREFsdzlaeThkZ3h0LzRVb3pVcDdFRFlBZW9LdlZnTTY3eU1sRElTUWw3VmkwaFcvWFFZdVQ5NVJ4OStiQklybHZqYkJwOUI0UW54dHNyNHVwMVJTcUJTRDV4amNZM3JXeEN5bXRCTGIyQkNzYVFpWTFyclA",
-    "imageAlt": "夜空色 (深蓝色系) iPhone Duo，呈折叠状态，背面外观，展示机身左上角的融合式双摄系统和机身中央的 Apple 标志；展开的内屏，展示全面屏设计和圆角设计。"
-  },
-  "MK2V4CH/A": {
-    "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-duo-finish-select-star-white-202609?wid=940&hei=1112&fmt=png-alpha&.v=L2FnUkNTRm43ZDRCREFsdzlaeThka1hsOUZkQmZFRkQ2eEh0dEM0bVFwVjZIYUZiOEZCU1dSYmlzT2FMVUpPY1gyaWxBVG1PRTU2YzhCN2c2emhzWHZ5ZTZTY3RKM0U0VzN2UzRGTGtzQ3F1ZFJUNEY5WjZkU21Ua0dNWEh2Zy8",
-    "imageAlt": "星光白色 iPhone Duo，呈折叠状态，背面外观，展示机身左上角的融合式双摄系统和机身中央的 Apple 标志；展开的内屏，展示全面屏设计和圆角设计。"
-  },
-  "MK2T4CH/A": {
-    "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-duo-finish-select-star-white-202609?wid=940&hei=1112&fmt=png-alpha&.v=L2FnUkNTRm43ZDRCREFsdzlaeThka1hsOUZkQmZFRkQ2eEh0dEM0bVFwVjZIYUZiOEZCU1dSYmlzT2FMVUpPY1gyaWxBVG1PRTU2YzhCN2c2emhzWHZ5ZTZTY3RKM0U0VzN2UzRGTGtzQ3F1ZFJUNEY5WjZkU21Ua0dNWEh2Zy8",
-    "imageAlt": "星光白色 iPhone Duo，呈折叠状态，背面外观，展示机身左上角的融合式双摄系统和机身中央的 Apple 标志；展开的内屏，展示全面屏设计和圆角设计。"
-  },
   "MG724CH/A": {
     "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-17-finish-select-black-202509?wid=940&hei=1112&fmt=png-alpha&.v=WGdCRlQ0YVlqbTdXTEkxRnVQb0oxb2VRRjNicDE2eUYxNWtxdDZEUE9tUTZZWWVuUzd1a0I0NDBmaU1xUHlJN05iYkdTUlNaelA5cmVIcElYY3o4K1NIY0pUWEVieVJZdHMyOW9BNndwM2s2QUptcEFzMGt4cjBzMVdIazF2eXo",
     "imageAlt": "黑色 iPhone 17，背面外观展示融合式双摄系统，正面外观展示全面屏设计、灵动岛和细窄的黑色显示屏边框。"
@@ -837,101 +805,85 @@ module.exports = {
     "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-2022-hero-silver-cell-select?wid=940&hei=1112&fmt=png-alpha&.v=MG1udWpyWFI4d3VJQmF2aGlucjRyYWNSSkpMQ3dVSURqMlRlYVVBSzZ5TWhPVVo3RjZFdVpCTXpsVXRVUk9xbmJjNitDN2kyNWFITm1kN1lsSUFHR1RNUWM5aEc5aGhtVWFmQzlocWNKWVArNmVjbmk5c1V4VVk2VEt3TGcxekg",
     "imageAlt": "银色 iPad 的正面和背面视图。"
   },
-  "MXN93CH/A": {
-    "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-mini-select-wifi-purple-202410?wid=940&hei=1112&fmt=png-alpha&.v=NmJhVkxMSzd4RmRrSjJwN2s4VWJVNzVFK2U2TjRHYmZNU1M0UzNyaEJrVWVIWjNpaWxvby9UZ2w1T1c3cUwrbTJpdkFkeXRGenVzczlmSUZMYlgrMGpTeHhnaUcyb2JhMy9MQVIreWhPN2IrQWpCVmo0bmtLZHNRZStPMUV5Smw",
-    "imageAlt": "紫色 iPad mini 无线局域网机型。背面外观，展示单摄像头；正面外观，展示黑色的显示屏边框和圆角设计。"
+  "MJ6F4CH/A": {
+    "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-mini-finish-select-wifi-midnight-202610?wid=940&hei=1112&fmt=png-alpha&.v=eDJDc00wczl1QWk5QmpVYitFNXQwKzBkbDBUcm9yL3BiUFNTeVREWE9la05McDAxVVRGOGxkL0tQbDIrMnZxUXNjcXQ1U2FBY2RzWU80SEN4Z1NYZXA4TndFSGFWdWZMa21CRXlrUm45emFzeGxwcUlqRndPWkFnV214OVc4R2E",
+    "imageAlt": "午夜色 iPad mini 无线局域网机型。背面外观，展示单摄像头；正面外观，展示黑色显示屏边框和圆角设计。"
   },
-  "MXNE3CH/A": {
-    "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-mini-select-wifi-purple-202410?wid=940&hei=1112&fmt=png-alpha&.v=NmJhVkxMSzd4RmRrSjJwN2s4VWJVNzVFK2U2TjRHYmZNU1M0UzNyaEJrVWVIWjNpaWxvby9UZ2w1T1c3cUwrbTJpdkFkeXRGenVzczlmSUZMYlgrMGpTeHhnaUcyb2JhMy9MQVIreWhPN2IrQWpCVmo0bmtLZHNRZStPMUV5Smw",
-    "imageAlt": "紫色 iPad mini 无线局域网机型。背面外观，展示单摄像头；正面外观，展示黑色的显示屏边框和圆角设计。"
+  "MJ6J4CH/A": {
+    "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-mini-finish-select-wifi-starlight-202610?wid=940&hei=1112&fmt=png-alpha&.v=eDJDc00wczl1QWk5QmpVYitFNXQwekk1Q0xiaWduTXdPZms4aUZ1ODlPc1RaSWZ1ME9HWEdjS2xUZEIzNGJDU1JIMnJUYkhxeFlQUFF6U1JnK1dZZmROL1VCcUxMZGhIeWpHS1Y3Y0ZmQnI5SzlsS1VZdEdhREZhN0U1V0J4SW8",
+    "imageAlt": "星光色 iPad mini 无线局域网机型。背面外观，展示单摄像头；正面外观，展示黑色显示屏边框和圆角设计。"
   },
-  "MYH33CH/A": {
-    "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-mini-select-wifi-purple-202410?wid=940&hei=1112&fmt=png-alpha&.v=NmJhVkxMSzd4RmRrSjJwN2s4VWJVNzVFK2U2TjRHYmZNU1M0UzNyaEJrVWVIWjNpaWxvby9UZ2w1T1c3cUwrbTJpdkFkeXRGenVzczlmSUZMYlgrMGpTeHhnaUcyb2JhMy9MQVIreWhPN2IrQWpCVmo0bmtLZHNRZStPMUV5Smw",
-    "imageAlt": "紫色 iPad mini 无线局域网机型。背面外观，展示单摄像头；正面外观，展示黑色的显示屏边框和圆角设计。"
+  "MJ6Q4CH/A": {
+    "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-mini-finish-select-wifi-midnight-202610?wid=940&hei=1112&fmt=png-alpha&.v=eDJDc00wczl1QWk5QmpVYitFNXQwKzBkbDBUcm9yL3BiUFNTeVREWE9la05McDAxVVRGOGxkL0tQbDIrMnZxUXNjcXQ1U2FBY2RzWU80SEN4Z1NYZXA4TndFSGFWdWZMa21CRXlrUm45emFzeGxwcUlqRndPWkFnV214OVc4R2E",
+    "imageAlt": "午夜色 iPad mini 无线局域网机型。背面外观，展示单摄像头；正面外观，展示黑色显示屏边框和圆角设计。"
   },
-  "MXN83CH/A": {
-    "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-mini-select-wifi-starlight-202410?wid=940&hei=1112&fmt=png-alpha&.v=NmJhVkxMSzd4RmRrSjJwN2s4VWJVL1BpQlQwb3h0VkRmZ2J1a0V4U1RJUFRKc3dEODNneTBSZFNTOGZoVVpTaURPUU9BWmJWRXFZMEJicERYSS9tMXJDcDlldEFQaVVyK0hEMVJoODVlTnc1SS91S1JMZnFCdjg2TmtONThzSkE",
-    "imageAlt": "星光色 iPad mini 无线局域网机型。背面外观，展示单摄像头；正面外观，展示黑色的显示屏边框和圆角设计。"
+  "MJ6R4CH/A": {
+    "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-mini-finish-select-wifi-starlight-202610?wid=940&hei=1112&fmt=png-alpha&.v=eDJDc00wczl1QWk5QmpVYitFNXQwekk1Q0xiaWduTXdPZms4aUZ1ODlPc1RaSWZ1ME9HWEdjS2xUZEIzNGJDU1JIMnJUYkhxeFlQUFF6U1JnK1dZZmROL1VCcUxMZGhIeWpHS1Y3Y0ZmQnI5SzlsS1VZdEdhREZhN0U1V0J4SW8",
+    "imageAlt": "星光色 iPad mini 无线局域网机型。背面外观，展示单摄像头；正面外观，展示黑色显示屏边框和圆角设计。"
   },
-  "MXND3CH/A": {
-    "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-mini-select-wifi-starlight-202410?wid=940&hei=1112&fmt=png-alpha&.v=NmJhVkxMSzd4RmRrSjJwN2s4VWJVL1BpQlQwb3h0VkRmZ2J1a0V4U1RJUFRKc3dEODNneTBSZFNTOGZoVVpTaURPUU9BWmJWRXFZMEJicERYSS9tMXJDcDlldEFQaVVyK0hEMVJoODVlTnc1SS91S1JMZnFCdjg2TmtONThzSkE",
-    "imageAlt": "星光色 iPad mini 无线局域网机型。背面外观，展示单摄像头；正面外观，展示黑色的显示屏边框和圆角设计。"
+  "MJ6V4CH/A": {
+    "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-mini-finish-select-wifi-midnight-202610?wid=940&hei=1112&fmt=png-alpha&.v=eDJDc00wczl1QWk5QmpVYitFNXQwKzBkbDBUcm9yL3BiUFNTeVREWE9la05McDAxVVRGOGxkL0tQbDIrMnZxUXNjcXQ1U2FBY2RzWU80SEN4Z1NYZXA4TndFSGFWdWZMa21CRXlrUm45emFzeGxwcUlqRndPWkFnV214OVc4R2E",
+    "imageAlt": "午夜色 iPad mini 无线局域网机型。背面外观，展示单摄像头；正面外观，展示黑色显示屏边框和圆角设计。"
   },
-  "MYH23CH/A": {
-    "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-mini-select-wifi-starlight-202410?wid=940&hei=1112&fmt=png-alpha&.v=NmJhVkxMSzd4RmRrSjJwN2s4VWJVL1BpQlQwb3h0VkRmZ2J1a0V4U1RJUFRKc3dEODNneTBSZFNTOGZoVVpTaURPUU9BWmJWRXFZMEJicERYSS9tMXJDcDlldEFQaVVyK0hEMVJoODVlTnc1SS91S1JMZnFCdjg2TmtONThzSkE",
-    "imageAlt": "星光色 iPad mini 无线局域网机型。背面外观，展示单摄像头；正面外观，展示黑色的显示屏边框和圆角设计。"
+  "MJ6W4CH/A": {
+    "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-mini-finish-select-wifi-starlight-202610?wid=940&hei=1112&fmt=png-alpha&.v=eDJDc00wczl1QWk5QmpVYitFNXQwekk1Q0xiaWduTXdPZms4aUZ1ODlPc1RaSWZ1ME9HWEdjS2xUZEIzNGJDU1JIMnJUYkhxeFlQUFF6U1JnK1dZZmROL1VCcUxMZGhIeWpHS1Y3Y0ZmQnI5SzlsS1VZdEdhREZhN0U1V0J4SW8",
+    "imageAlt": "星光色 iPad mini 无线局域网机型。背面外观，展示单摄像头；正面外观，展示黑色显示屏边框和圆角设计。"
   },
-  "MYGY3CH/A": {
-    "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-mini-select-wifi-spacegray-202410?wid=940&hei=1112&fmt=png-alpha&.v=NmJhVkxMSzd4RmRrSjJwN2s4VWJVKzlBaHA1THNMUXlDa1dRMU1wTGcxYlRKc3dEODNneTBSZFNTOGZoVVpTaURPUU9BWmJWRXFZMEJicERYSS9tMXZ3UU5uUUpBVE5PT3lEMWJHa3h5c29tYUg4SmtKcW5xSGI3YTdpRVdNejg",
-    "imageAlt": "深空灰色 iPad mini 无线局域网机型。背面外观，展示单摄像头；正面外观，展示黑色的显示屏边框和圆角设计。"
+  "ML2Q4CH/A": {
+    "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-mini-finish-select-wifi-midnight-202610?wid=940&hei=1112&fmt=png-alpha&.v=eDJDc00wczl1QWk5QmpVYitFNXQwKzBkbDBUcm9yL3BiUFNTeVREWE9la05McDAxVVRGOGxkL0tQbDIrMnZxUXNjcXQ1U2FBY2RzWU80SEN4Z1NYZXA4TndFSGFWdWZMa21CRXlrUm45emFzeGxwcUlqRndPWkFnV214OVc4R2E",
+    "imageAlt": "午夜色 iPad mini 无线局域网机型。背面外观，展示单摄像头；正面外观，展示黑色显示屏边框和圆角设计。"
   },
-  "MXN63CH/A": {
-    "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-mini-select-wifi-spacegray-202410?wid=940&hei=1112&fmt=png-alpha&.v=NmJhVkxMSzd4RmRrSjJwN2s4VWJVKzlBaHA1THNMUXlDa1dRMU1wTGcxYlRKc3dEODNneTBSZFNTOGZoVVpTaURPUU9BWmJWRXFZMEJicERYSS9tMXZ3UU5uUUpBVE5PT3lEMWJHa3h5c29tYUg4SmtKcW5xSGI3YTdpRVdNejg",
-    "imageAlt": "深空灰色 iPad mini 无线局域网机型。背面外观，展示单摄像头；正面外观，展示黑色的显示屏边框和圆角设计。"
+  "ML2T4CH/A": {
+    "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-mini-finish-select-wifi-starlight-202610?wid=940&hei=1112&fmt=png-alpha&.v=eDJDc00wczl1QWk5QmpVYitFNXQwekk1Q0xiaWduTXdPZms4aUZ1ODlPc1RaSWZ1ME9HWEdjS2xUZEIzNGJDU1JIMnJUYkhxeFlQUFF6U1JnK1dZZmROL1VCcUxMZGhIeWpHS1Y3Y0ZmQnI5SzlsS1VZdEdhREZhN0U1V0J4SW8",
+    "imageAlt": "星光色 iPad mini 无线局域网机型。背面外观，展示单摄像头；正面外观，展示黑色显示屏边框和圆角设计。"
   },
-  "MXNA3CH/A": {
-    "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-mini-select-wifi-spacegray-202410?wid=940&hei=1112&fmt=png-alpha&.v=NmJhVkxMSzd4RmRrSjJwN2s4VWJVKzlBaHA1THNMUXlDa1dRMU1wTGcxYlRKc3dEODNneTBSZFNTOGZoVVpTaURPUU9BWmJWRXFZMEJicERYSS9tMXZ3UU5uUUpBVE5PT3lEMWJHa3h5c29tYUg4SmtKcW5xSGI3YTdpRVdNejg",
-    "imageAlt": "深空灰色 iPad mini 无线局域网机型。背面外观，展示单摄像头；正面外观，展示黑色的显示屏边框和圆角设计。"
+  "MJ6X4CH/A": {
+    "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-mini-finish-select-wifi-midnight-202610?wid=940&hei=1112&fmt=png-alpha&.v=eDJDc00wczl1QWk5QmpVYitFNXQwKzBkbDBUcm9yL3BiUFNTeVREWE9la05McDAxVVRGOGxkL0tQbDIrMnZxUXNjcXQ1U2FBY2RzWU80SEN4Z1NYZXA4TndFSGFWdWZMa21CRXlrUm45emFzeGxwcUlqRndPWkFnV214OVc4R2E",
+    "imageAlt": "午夜色 iPad mini 无线局域网机型。背面外观，展示单摄像头；正面外观，展示黑色显示屏边框和圆角设计。"
   },
-  "MXN73CH/A": {
-    "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-mini-select-wifi-blue-202410?wid=940&hei=1112&fmt=png-alpha&.v=NmJhVkxMSzd4RmRrSjJwN2s4VWJVMHBIYm5EcjF5ZHdTWjByNmplMHhtVDRXdlpsMGFvb09SOHRPYjdBV3NIZmJjNitDN2kyNWFITm1kN1lsSUFHR2JiZ2pyMnJPbUExZmhtMSs0WUFMOWIrNmVjbmk5c1V4VVk2VEt3TGcxekg",
-    "imageAlt": "蓝色 iPad mini 无线局域网机型。背面外观，展示单摄像头；正面外观，展示黑色的显示屏边框和圆角设计。"
+  "MJ6Y4CH/A": {
+    "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-mini-finish-select-wifi-starlight-202610?wid=940&hei=1112&fmt=png-alpha&.v=eDJDc00wczl1QWk5QmpVYitFNXQwekk1Q0xiaWduTXdPZms4aUZ1ODlPc1RaSWZ1ME9HWEdjS2xUZEIzNGJDU1JIMnJUYkhxeFlQUFF6U1JnK1dZZmROL1VCcUxMZGhIeWpHS1Y3Y0ZmQnI5SzlsS1VZdEdhREZhN0U1V0J4SW8",
+    "imageAlt": "星光色 iPad mini 无线局域网机型。背面外观，展示单摄像头；正面外观，展示黑色显示屏边框和圆角设计。"
   },
-  "MXNC3CH/A": {
-    "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-mini-select-wifi-blue-202410?wid=940&hei=1112&fmt=png-alpha&.v=NmJhVkxMSzd4RmRrSjJwN2s4VWJVMHBIYm5EcjF5ZHdTWjByNmplMHhtVDRXdlpsMGFvb09SOHRPYjdBV3NIZmJjNitDN2kyNWFITm1kN1lsSUFHR2JiZ2pyMnJPbUExZmhtMSs0WUFMOWIrNmVjbmk5c1V4VVk2VEt3TGcxekg",
-    "imageAlt": "蓝色 iPad mini 无线局域网机型。背面外观，展示单摄像头；正面外观，展示黑色的显示屏边框和圆角设计。"
+  "MJ704CH/A": {
+    "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-mini-finish-select-cell-midnight-202610?wid=940&hei=1112&fmt=png-alpha&.v=eDJDc00wczl1QWk5QmpVYitFNXQwd2JzYWVhN3hTUnNiaGhtQ3NDUHB0Y05McDAxVVRGOGxkL0tQbDIrMnZxUXNjcXQ1U2FBY2RzWU80SEN4Z1NYZXA4TndFSGFWdWZMa21CRXlrUm45emFYUXhWUy90eVo3b3luQWlLeFk1cG0",
+    "imageAlt": "午夜色 iPad mini 无线局域网 + 蜂窝网络机型。背面外观，展示单摄像头；正面外观，展示黑色显示屏边框和圆角设计。"
   },
-  "MYH13CH/A": {
-    "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-mini-select-wifi-blue-202410?wid=940&hei=1112&fmt=png-alpha&.v=NmJhVkxMSzd4RmRrSjJwN2s4VWJVMHBIYm5EcjF5ZHdTWjByNmplMHhtVDRXdlpsMGFvb09SOHRPYjdBV3NIZmJjNitDN2kyNWFITm1kN1lsSUFHR2JiZ2pyMnJPbUExZmhtMSs0WUFMOWIrNmVjbmk5c1V4VVk2VEt3TGcxekg",
-    "imageAlt": "蓝色 iPad mini 无线局域网机型。背面外观，展示单摄像头；正面外观，展示黑色的显示屏边框和圆角设计。"
+  "MJ714CH/A": {
+    "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-mini-finish-select-cell-starlight-202610?wid=940&hei=1112&fmt=png-alpha&.v=eDJDc00wczl1QWk5QmpVYitFNXQwNHIvV1dPSm1KT0tPMnhMTTlIWldtQVRaSWZ1ME9HWEdjS2xUZEIzNGJDU1JIMnJUYkhxeFlQUFF6U1JnK1dZZmROL1VCcUxMZGhIeWpHS1Y3Y0ZmQm82V2tlVVJSMEFaTXBZcVhaQ0JGeEk",
+    "imageAlt": "星光色 iPad mini 无线局域网 + 蜂窝网络机型。背面外观，展示单摄像头；正面外观，展示黑色显示屏边框和圆角设计。"
   },
-  "MYHK3CH/A": {
-    "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-mini-select-cell-purple-202410?wid=940&hei=1112&fmt=png-alpha&.v=NmJhVkxMSzd4RmRrSjJwN2s4VWJVOHdIZXRCbDExRVBHaUM1aVJGRkVEQWVIWjNpaWxvby9UZ2w1T1c3cUwrbTJpdkFkeXRGenVzczlmSUZMYlgrMHB6RnJHdDBvVzRQRjh2czM1SklLUnM5R3EzeG52eUtwaGNxeEw2T0xwVmY",
-    "imageAlt": "紫色 iPad mini 无线局域网 + 蜂窝网络机型。背面外观，展示单摄像头；正面外观，展示黑色的显示屏边框和圆角设计。"
+  "MJ744CH/A": {
+    "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-mini-finish-select-cell-midnight-202610?wid=940&hei=1112&fmt=png-alpha&.v=eDJDc00wczl1QWk5QmpVYitFNXQwd2JzYWVhN3hTUnNiaGhtQ3NDUHB0Y05McDAxVVRGOGxkL0tQbDIrMnZxUXNjcXQ1U2FBY2RzWU80SEN4Z1NYZXA4TndFSGFWdWZMa21CRXlrUm45emFYUXhWUy90eVo3b3luQWlLeFk1cG0",
+    "imageAlt": "午夜色 iPad mini 无线局域网 + 蜂窝网络机型。背面外观，展示单摄像头；正面外观，展示黑色显示屏边框和圆角设计。"
   },
-  "MXQ33CH/A": {
-    "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-mini-select-cell-purple-202410?wid=940&hei=1112&fmt=png-alpha&.v=NmJhVkxMSzd4RmRrSjJwN2s4VWJVOHdIZXRCbDExRVBHaUM1aVJGRkVEQWVIWjNpaWxvby9UZ2w1T1c3cUwrbTJpdkFkeXRGenVzczlmSUZMYlgrMHB6RnJHdDBvVzRQRjh2czM1SklLUnM5R3EzeG52eUtwaGNxeEw2T0xwVmY",
-    "imageAlt": "紫色 iPad mini 无线局域网 + 蜂窝网络机型。背面外观，展示单摄像头；正面外观，展示黑色的显示屏边框和圆角设计。"
+  "MJ754CH/A": {
+    "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-mini-finish-select-cell-starlight-202610?wid=940&hei=1112&fmt=png-alpha&.v=eDJDc00wczl1QWk5QmpVYitFNXQwNHIvV1dPSm1KT0tPMnhMTTlIWldtQVRaSWZ1ME9HWEdjS2xUZEIzNGJDU1JIMnJUYkhxeFlQUFF6U1JnK1dZZmROL1VCcUxMZGhIeWpHS1Y3Y0ZmQm82V2tlVVJSMEFaTXBZcVhaQ0JGeEk",
+    "imageAlt": "星光色 iPad mini 无线局域网 + 蜂窝网络机型。背面外观，展示单摄像头；正面外观，展示黑色显示屏边框和圆角设计。"
   },
-  "MXQ73CH/A": {
-    "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-mini-select-cell-purple-202410?wid=940&hei=1112&fmt=png-alpha&.v=NmJhVkxMSzd4RmRrSjJwN2s4VWJVOHdIZXRCbDExRVBHaUM1aVJGRkVEQWVIWjNpaWxvby9UZ2w1T1c3cUwrbTJpdkFkeXRGenVzczlmSUZMYlgrMHB6RnJHdDBvVzRQRjh2czM1SklLUnM5R3EzeG52eUtwaGNxeEw2T0xwVmY",
-    "imageAlt": "紫色 iPad mini 无线局域网 + 蜂窝网络机型。背面外观，展示单摄像头；正面外观，展示黑色的显示屏边框和圆角设计。"
+  "MJ784CH/A": {
+    "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-mini-finish-select-cell-midnight-202610?wid=940&hei=1112&fmt=png-alpha&.v=eDJDc00wczl1QWk5QmpVYitFNXQwd2JzYWVhN3hTUnNiaGhtQ3NDUHB0Y05McDAxVVRGOGxkL0tQbDIrMnZxUXNjcXQ1U2FBY2RzWU80SEN4Z1NYZXA4TndFSGFWdWZMa21CRXlrUm45emFYUXhWUy90eVo3b3luQWlLeFk1cG0",
+    "imageAlt": "午夜色 iPad mini 无线局域网 + 蜂窝网络机型。背面外观，展示单摄像头；正面外观，展示黑色显示屏边框和圆角设计。"
   },
-  "MYHG3CH/A": {
-    "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-mini-select-cell-spacegray-202410?wid=940&hei=1112&fmt=png-alpha&.v=NmJhVkxMSzd4RmRrSjJwN2s4VWJVKzFmYXNPQ1R6OGhNZzRDdE9DNlZ1dlRKc3dEODNneTBSZFNTOGZoVVpTaURPUU9BWmJWRXFZMEJicERYSS9tMXZ3UU5uUUpBVE5PT3lEMWJHa3h5c3FkWEZUMWFDNUgzR2ZMdE43eXZoVkQ",
-    "imageAlt": "深空灰色 iPad mini 无线局域网 + 蜂窝网络机型。背面外观，展示单摄像头；正面外观，展示黑色的显示屏边框和圆角设计。"
+  "MJ794CH/A": {
+    "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-mini-finish-select-cell-starlight-202610?wid=940&hei=1112&fmt=png-alpha&.v=eDJDc00wczl1QWk5QmpVYitFNXQwNHIvV1dPSm1KT0tPMnhMTTlIWldtQVRaSWZ1ME9HWEdjS2xUZEIzNGJDU1JIMnJUYkhxeFlQUFF6U1JnK1dZZmROL1VCcUxMZGhIeWpHS1Y3Y0ZmQm82V2tlVVJSMEFaTXBZcVhaQ0JGeEk",
+    "imageAlt": "星光色 iPad mini 无线局域网 + 蜂窝网络机型。背面外观，展示单摄像头；正面外观，展示黑色显示屏边框和圆角设计。"
   },
-  "MXQ03CH/A": {
-    "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-mini-select-cell-spacegray-202410?wid=940&hei=1112&fmt=png-alpha&.v=NmJhVkxMSzd4RmRrSjJwN2s4VWJVKzFmYXNPQ1R6OGhNZzRDdE9DNlZ1dlRKc3dEODNneTBSZFNTOGZoVVpTaURPUU9BWmJWRXFZMEJicERYSS9tMXZ3UU5uUUpBVE5PT3lEMWJHa3h5c3FkWEZUMWFDNUgzR2ZMdE43eXZoVkQ",
-    "imageAlt": "深空灰色 iPad mini 无线局域网 + 蜂窝网络机型。背面外观，展示单摄像头；正面外观，展示黑色的显示屏边框和圆角设计。"
+  "ML344CH/A": {
+    "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-mini-finish-select-cell-midnight-202610?wid=940&hei=1112&fmt=png-alpha&.v=eDJDc00wczl1QWk5QmpVYitFNXQwd2JzYWVhN3hTUnNiaGhtQ3NDUHB0Y05McDAxVVRGOGxkL0tQbDIrMnZxUXNjcXQ1U2FBY2RzWU80SEN4Z1NYZXA4TndFSGFWdWZMa21CRXlrUm45emFYUXhWUy90eVo3b3luQWlLeFk1cG0",
+    "imageAlt": "午夜色 iPad mini 无线局域网 + 蜂窝网络机型。背面外观，展示单摄像头；正面外观，展示黑色显示屏边框和圆角设计。"
   },
-  "MXQ43CH/A": {
-    "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-mini-select-cell-spacegray-202410?wid=940&hei=1112&fmt=png-alpha&.v=NmJhVkxMSzd4RmRrSjJwN2s4VWJVKzFmYXNPQ1R6OGhNZzRDdE9DNlZ1dlRKc3dEODNneTBSZFNTOGZoVVpTaURPUU9BWmJWRXFZMEJicERYSS9tMXZ3UU5uUUpBVE5PT3lEMWJHa3h5c3FkWEZUMWFDNUgzR2ZMdE43eXZoVkQ",
-    "imageAlt": "深空灰色 iPad mini 无线局域网 + 蜂窝网络机型。背面外观，展示单摄像头；正面外观，展示黑色的显示屏边框和圆角设计。"
+  "ML364CH/A": {
+    "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-mini-finish-select-cell-starlight-202610?wid=940&hei=1112&fmt=png-alpha&.v=eDJDc00wczl1QWk5QmpVYitFNXQwNHIvV1dPSm1KT0tPMnhMTTlIWldtQVRaSWZ1ME9HWEdjS2xUZEIzNGJDU1JIMnJUYkhxeFlQUFF6U1JnK1dZZmROL1VCcUxMZGhIeWpHS1Y3Y0ZmQm82V2tlVVJSMEFaTXBZcVhaQ0JGeEk",
+    "imageAlt": "星光色 iPad mini 无线局域网 + 蜂窝网络机型。背面外观，展示单摄像头；正面外观，展示黑色显示屏边框和圆角设计。"
   },
-  "MYHJ3CH/A": {
-    "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-mini-select-cell-starlight-202410?wid=940&hei=1112&fmt=png-alpha&.v=NmJhVkxMSzd4RmRrSjJwN2s4VWJVeFdIdWRKY1Y2SEtRQ1dVZVptOEEzdlRKc3dEODNneTBSZFNTOGZoVVpTaURPUU9BWmJWRXFZMEJicERYSS9tMXJDcDlldEFQaVVyK0hEMVJoODVlTnhuRlFoTE1iaVF1MFVlUWh4dG00bzY",
-    "imageAlt": "星光色 iPad mini 无线局域网 + 蜂窝网络机型。背面外观，展示单摄像头；正面外观，展示黑色的显示屏边框和圆角设计。"
+  "MJ7A4CH/A": {
+    "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-mini-finish-select-cell-midnight-202610?wid=940&hei=1112&fmt=png-alpha&.v=eDJDc00wczl1QWk5QmpVYitFNXQwd2JzYWVhN3hTUnNiaGhtQ3NDUHB0Y05McDAxVVRGOGxkL0tQbDIrMnZxUXNjcXQ1U2FBY2RzWU80SEN4Z1NYZXA4TndFSGFWdWZMa21CRXlrUm45emFYUXhWUy90eVo3b3luQWlLeFk1cG0",
+    "imageAlt": "午夜色 iPad mini 无线局域网 + 蜂窝网络机型。背面外观，展示单摄像头；正面外观，展示黑色显示屏边框和圆角设计。"
   },
-  "MXQ23CH/A": {
-    "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-mini-select-cell-starlight-202410?wid=940&hei=1112&fmt=png-alpha&.v=NmJhVkxMSzd4RmRrSjJwN2s4VWJVeFdIdWRKY1Y2SEtRQ1dVZVptOEEzdlRKc3dEODNneTBSZFNTOGZoVVpTaURPUU9BWmJWRXFZMEJicERYSS9tMXJDcDlldEFQaVVyK0hEMVJoODVlTnhuRlFoTE1iaVF1MFVlUWh4dG00bzY",
-    "imageAlt": "星光色 iPad mini 无线局域网 + 蜂窝网络机型。背面外观，展示单摄像头；正面外观，展示黑色的显示屏边框和圆角设计。"
-  },
-  "MXQ63CH/A": {
-    "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-mini-select-cell-starlight-202410?wid=940&hei=1112&fmt=png-alpha&.v=NmJhVkxMSzd4RmRrSjJwN2s4VWJVeFdIdWRKY1Y2SEtRQ1dVZVptOEEzdlRKc3dEODNneTBSZFNTOGZoVVpTaURPUU9BWmJWRXFZMEJicERYSS9tMXJDcDlldEFQaVVyK0hEMVJoODVlTnhuRlFoTE1iaVF1MFVlUWh4dG00bzY",
-    "imageAlt": "星光色 iPad mini 无线局域网 + 蜂窝网络机型。背面外观，展示单摄像头；正面外观，展示黑色的显示屏边框和圆角设计。"
-  },
-  "MYHH3CH/A": {
-    "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-mini-select-cell-blue-202410?wid=940&hei=1112&fmt=png-alpha&.v=NmJhVkxMSzd4RmRrSjJwN2s4VWJVNnFxcm9uQnI0UkNxL0JGTTZkSTliMzRXdlpsMGFvb09SOHRPYjdBV3NIZmJjNitDN2kyNWFITm1kN1lsSUFHR2RIbWJ5RU5pUkozVEt3L3VhMjZNQWdVRk5BYjU4dkMrYjBKSjFqVXFOVGg",
-    "imageAlt": "蓝色 iPad mini 无线局域网 + 蜂窝网络机型。背面外观，展示单摄像头；正面外观，展示黑色的显示屏边框和圆角设计。"
-  },
-  "MXQ13CH/A": {
-    "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-mini-select-cell-blue-202410?wid=940&hei=1112&fmt=png-alpha&.v=NmJhVkxMSzd4RmRrSjJwN2s4VWJVNnFxcm9uQnI0UkNxL0JGTTZkSTliMzRXdlpsMGFvb09SOHRPYjdBV3NIZmJjNitDN2kyNWFITm1kN1lsSUFHR2RIbWJ5RU5pUkozVEt3L3VhMjZNQWdVRk5BYjU4dkMrYjBKSjFqVXFOVGg",
-    "imageAlt": "蓝色 iPad mini 无线局域网 + 蜂窝网络机型。背面外观，展示单摄像头；正面外观，展示黑色的显示屏边框和圆角设计。"
-  },
-  "MXQ53CH/A": {
-    "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-mini-select-cell-blue-202410?wid=940&hei=1112&fmt=png-alpha&.v=NmJhVkxMSzd4RmRrSjJwN2s4VWJVNnFxcm9uQnI0UkNxL0JGTTZkSTliMzRXdlpsMGFvb09SOHRPYjdBV3NIZmJjNitDN2kyNWFITm1kN1lsSUFHR2RIbWJ5RU5pUkozVEt3L3VhMjZNQWdVRk5BYjU4dkMrYjBKSjFqVXFOVGg",
-    "imageAlt": "蓝色 iPad mini 无线局域网 + 蜂窝网络机型。背面外观，展示单摄像头；正面外观，展示黑色的显示屏边框和圆角设计。"
+  "MJ7C4CH/A": {
+    "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-mini-finish-select-cell-starlight-202610?wid=940&hei=1112&fmt=png-alpha&.v=eDJDc00wczl1QWk5QmpVYitFNXQwNHIvV1dPSm1KT0tPMnhMTTlIWldtQVRaSWZ1ME9HWEdjS2xUZEIzNGJDU1JIMnJUYkhxeFlQUFF6U1JnK1dZZmROL1VCcUxMZGhIeWpHS1Y3Y0ZmQm82V2tlVVJSMEFaTXBZcVhaQ0JGeEk",
+    "imageAlt": "星光色 iPad mini 无线局域网 + 蜂窝网络机型。背面外观，展示单摄像头；正面外观，展示黑色显示屏边框和圆角设计。"
   },
   "MDVH4CH/A": {
     "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/macbook-air-summary-select-202601-15inch-midnight?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=UFF0NkRqeUxtaWlaSUFkYStDV2d2RU9LemlpOVprRVViZlJ6K21Cd1JTQWNzSytjWDhzK2UwL1RiU1IvdGU0Y2JYSmNXRjkxVTArV3g4alJJbGdRZlVwL2pxdjZGZnp2NEQ5RTUrZUJaSnM5K2pwVXNEejVCMjJmb1hqWjN6L0REelljRy8vcjhsdDJpaWNGODE0VGJn&traceId=1",
@@ -1188,5 +1140,37 @@ module.exports = {
   "MGHJ4CH/A": {
     "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/homepod-mini-select-midnight-202610_FV1?wid=1868&hei=880&fmt=jpeg&qlt=90&.v=K2c3bEwyaWVDeDZkdHpLbHkwcGVSaFRaZXZublY0K2p0Ri9sOWcwbVh6amwzc0hqbklCSmJHNTA2MnByUFJuSTN6WWY5a1JiR3h2V2h5Mis1dmgwRVRnQ1lhSmZUdzRUK1crYTlZTFpSRDlhblNYU3dVRzd1b3FleHZaelNicXk",
     "imageAlt": "午夜色 (黑色系) HomePod mini 2 的正面外观，展示小巧的球形设计和无缝式声学织网。外观俯视图，展示平坦的背光触控板，多色灯光亮起。"
+  },
+  "MK2Q4CH/A": {
+    "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-duo-finish-select-night-sky-202609?wid=940&hei=1112&fmt=png-alpha&.v=L2FnUkNTRm43ZDRCREFsdzlaeThkZ3h0LzRVb3pVcDdFRFlBZW9LdlZnTTY3eU1sRElTUWw3VmkwaFcvWFFZdVQ5NVJ4OStiQklybHZqYkJwOUI0UW54dHNyNHVwMVJTcUJTRDV4amNZM3JXeEN5bXRCTGIyQkNzYVFpWTFyclA",
+    "imageAlt": "夜空色 (深蓝色系) iPhone Duo，呈折叠状态，背面外观，展示机身左上角的融合式双摄系统和机身中央的 Apple 标志；展开的内屏，展示全面屏设计和圆角设计。"
+  },
+  "MK2W4CH/A": {
+    "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-duo-finish-select-night-sky-202609?wid=940&hei=1112&fmt=png-alpha&.v=L2FnUkNTRm43ZDRCREFsdzlaeThkZ3h0LzRVb3pVcDdFRFlBZW9LdlZnTTY3eU1sRElTUWw3VmkwaFcvWFFZdVQ5NVJ4OStiQklybHZqYkJwOUI0UW54dHNyNHVwMVJTcUJTRDV4amNZM3JXeEN5bXRCTGIyQkNzYVFpWTFyclA",
+    "imageAlt": "夜空色 (深蓝色系) iPhone Duo，呈折叠状态，背面外观，展示机身左上角的融合式双摄系统和机身中央的 Apple 标志；展开的内屏，展示全面屏设计和圆角设计。"
+  },
+  "MK2P4CH/A": {
+    "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-duo-finish-select-star-white-202609?wid=940&hei=1112&fmt=png-alpha&.v=L2FnUkNTRm43ZDRCREFsdzlaeThka1hsOUZkQmZFRkQ2eEh0dEM0bVFwVjZIYUZiOEZCU1dSYmlzT2FMVUpPY1gyaWxBVG1PRTU2YzhCN2c2emhzWHZ5ZTZTY3RKM0U0VzN2UzRGTGtzQ3F1ZFJUNEY5WjZkU21Ua0dNWEh2Zy8",
+    "imageAlt": "星光白色 iPhone Duo，呈折叠状态，背面外观，展示机身左上角的融合式双摄系统和机身中央的 Apple 标志；展开的内屏，展示全面屏设计和圆角设计。"
+  },
+  "MK2M4CH/A": {
+    "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-duo-finish-select-star-white-202609?wid=940&hei=1112&fmt=png-alpha&.v=L2FnUkNTRm43ZDRCREFsdzlaeThka1hsOUZkQmZFRkQ2eEh0dEM0bVFwVjZIYUZiOEZCU1dSYmlzT2FMVUpPY1gyaWxBVG1PRTU2YzhCN2c2emhzWHZ5ZTZTY3RKM0U0VzN2UzRGTGtzQ3F1ZFJUNEY5WjZkU21Ua0dNWEh2Zy8",
+    "imageAlt": "星光白色 iPhone Duo，呈折叠状态，背面外观，展示机身左上角的融合式双摄系统和机身中央的 Apple 标志；展开的内屏，展示全面屏设计和圆角设计。"
+  },
+  "MK2U4CH/A": {
+    "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-duo-finish-select-night-sky-202609?wid=940&hei=1112&fmt=png-alpha&.v=L2FnUkNTRm43ZDRCREFsdzlaeThkZ3h0LzRVb3pVcDdFRFlBZW9LdlZnTTY3eU1sRElTUWw3VmkwaFcvWFFZdVQ5NVJ4OStiQklybHZqYkJwOUI0UW54dHNyNHVwMVJTcUJTRDV4amNZM3JXeEN5bXRCTGIyQkNzYVFpWTFyclA",
+    "imageAlt": "夜空色 (深蓝色系) iPhone Duo，呈折叠状态，背面外观，展示机身左上角的融合式双摄系统和机身中央的 Apple 标志；展开的内屏，展示全面屏设计和圆角设计。"
+  },
+  "MK2N4CH/A": {
+    "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-duo-finish-select-night-sky-202609?wid=940&hei=1112&fmt=png-alpha&.v=L2FnUkNTRm43ZDRCREFsdzlaeThkZ3h0LzRVb3pVcDdFRFlBZW9LdlZnTTY3eU1sRElTUWw3VmkwaFcvWFFZdVQ5NVJ4OStiQklybHZqYkJwOUI0UW54dHNyNHVwMVJTcUJTRDV4amNZM3JXeEN5bXRCTGIyQkNzYVFpWTFyclA",
+    "imageAlt": "夜空色 (深蓝色系) iPhone Duo，呈折叠状态，背面外观，展示机身左上角的融合式双摄系统和机身中央的 Apple 标志；展开的内屏，展示全面屏设计和圆角设计。"
+  },
+  "MK2V4CH/A": {
+    "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-duo-finish-select-star-white-202609?wid=940&hei=1112&fmt=png-alpha&.v=L2FnUkNTRm43ZDRCREFsdzlaeThka1hsOUZkQmZFRkQ2eEh0dEM0bVFwVjZIYUZiOEZCU1dSYmlzT2FMVUpPY1gyaWxBVG1PRTU2YzhCN2c2emhzWHZ5ZTZTY3RKM0U0VzN2UzRGTGtzQ3F1ZFJUNEY5WjZkU21Ua0dNWEh2Zy8",
+    "imageAlt": "星光白色 iPhone Duo，呈折叠状态，背面外观，展示机身左上角的融合式双摄系统和机身中央的 Apple 标志；展开的内屏，展示全面屏设计和圆角设计。"
+  },
+  "MK2T4CH/A": {
+    "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-duo-finish-select-star-white-202609?wid=940&hei=1112&fmt=png-alpha&.v=L2FnUkNTRm43ZDRCREFsdzlaeThka1hsOUZkQmZFRkQ2eEh0dEM0bVFwVjZIYUZiOEZCU1dSYmlzT2FMVUpPY1gyaWxBVG1PRTU2YzhCN2c2emhzWHZ5ZTZTY3RKM0U0VzN2UzRGTGtzQ3F1ZFJUNEY5WjZkU21Ua0dNWEh2Zy8",
+    "imageAlt": "星光白色 iPhone Duo，呈折叠状态，背面外观，展示机身左上角的融合式双摄系统和机身中央的 Apple 标志；展开的内屏，展示全面屏设计和圆角设计。"
   }
 };

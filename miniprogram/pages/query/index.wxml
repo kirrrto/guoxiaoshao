@@ -36,7 +36,7 @@
     </view>
     <!-- Pin tip belongs at the top of the content, not buried under query cards. -->
     <view wx:if="{{addTipVisible}}" class="banner banner-ok add-tip add-tip--top">
-      <text class="add-tip-text">添加到「我的小程序」，下次从微信首页下拉就能打开。</text>
+      <text class="add-tip-text">添加到「我的小程序」，微信下拉即可打开。</text>
       <text class="add-tip-close tap-target" bindtap="onDismissAddTip" aria-role="button" aria-label="关闭提示">×</text>
     </view>
     <button class="ui-disclosure query-guide-entry" hover-class="ui-control-pressed" bindtap="onOpenGuide">
@@ -64,7 +64,7 @@
         <button class="btn btn-primary btn-block mt" bindtap="onEditSelection">选择配置与门店</button>
       </view>
       <view wx:elif="{{!selectionCanCollapse}}" class="banner banner-warn small mt">{{selectionNotice}}</view>
-    <view wx:if="{{!accountReady}}" class="banner banner-info small">{{accountError || '正在连接微信账户，你可以先选择商品和门店。'}}<button wx:if="{{accountError}}" class="btn btn-outline btn-sm mt" bindtap="onRetryAccount">重试账户连接</button></view>
+    <view wx:if="{{!accountReady}}" class="banner banner-info small">{{accountError || '正在连接微信账户，可先选商品与门店。'}}<button wx:if="{{accountError}}" class="btn btn-outline btn-sm mt" bindtap="onRetryAccount">重试账户连接</button></view>
     <view wx:if="{{sharedTargetPending}}" class="banner banner-info small">
       <view>{{sharedTargetError || (sharedTargetReady ? (sharedTargetSource === 'follow' ? '关注配置已保留，可在当前操作结束后切换。' : '朋友分享的配置已保留，可在当前操作结束后切换。') : '配置暂未在商品目录中确认，当前选择已保留。')}}</view>
       <button class="btn btn-outline btn-sm mt" loading="{{loadingSharedTarget}}" disabled="{{sheetVisible || querying || signing || loadingSharedTarget}}" bindtap="onLoadSharedTarget">{{loadingSharedTarget ? '正在确认…' : (sharedTargetReady ? '载入配置' : '刷新目录并重试')}}</button>
@@ -72,7 +72,7 @@
     </view>
 
       <view wx:if="{{queryFailureMessage || restriction}}" class="banner banner-warn small mt" role="alert">{{queryFailureMessage || restriction}}</view>
-      <view wx:if="{{selectionRestricted}}" class="banner banner-info small mt">此配置实时查询需会员。免费用户仍可按现有规则查看有权限的历史记录。</view>
+      <view wx:if="{{selectionRestricted}}" class="banner banner-info small mt">此配置实时查询需会员，免费用户可查有权限的历史记录。</view>
       <button wx:if="{{selectionRestricted}}" class="btn btn-primary btn-block mt" disabled="{{!accountReady || !selectionCanCollapse}}" bindtap="onFollowSelection">查看此配置会员权益</button>
       <button wx:elif="{{restrictionReason === 'new_product_restricted'}}" class="btn btn-primary btn-block mt" bindtap="onEditSelection">改查其他配置</button>
       <button wx:elif="{{selectionSummary && !selectionCanCollapse}}" class="btn btn-primary btn-block mt" bindtap="onEditSelection">核对或修改选择</button>
@@ -81,7 +81,7 @@
       <button wx:elif="{{selectionSummary}}" class="btn btn-primary btn-block mt {{querying || signing ? 'disabled' : ''}}" loading="{{querying}}" disabled="{{querying || signing || !accountReady || !selectionCanCollapse}}" bindtap="onQuery">
         {{!accountReady ? '正在连接账户…' : (querying ? '查询中…' : (boot.member ? '立即查询' : '立即查询（消耗 ' + boot.queryCost + ' 次）'))}}
       </button>
-      <view wx:if="{{querying}}" class="request-progress {{requestSlow ? 'request-progress--slow' : ''}}" role="status">{{requestSlow ? requestProgressText : '正在确认所选门店，结果会显示各店的核实时间。'}}</view>
+      <view wx:if="{{querying}}" class="request-progress {{requestSlow ? 'request-progress--slow' : ''}}" role="status">{{requestSlow ? requestProgressText : '正在核实所选门店，结果将标注各店时间。'}}</view>
       <view wx:if="{{signinError}}" class="small text-bad mt" role="alert">{{signinError}}</view>
       <view class="selection-utilities">
       <button wx:if="{{selectionRestricted}}" class="ui-action" hover-class="ui-control-pressed" bindtap="onSelectionHistory">查看可用历史</button>
@@ -98,11 +98,11 @@
         </view>
         <view class="selection-rule">
           <text class="selection-rule-label">查询规则</text>
-          <view class="selection-rule-copy">{{boot.member ? '会员查询不扣次数；请求繁忙或数据源限流时，需按页面提示稍后重试。' : '获取新的有效结果扣 ' + boot.queryCost + ' 次；未取得新的有效结果则返还，复用最近结果不扣次数。'}}</view>
+          <view class="selection-rule-copy">{{boot.member ? '会员查询不扣次；如遇限流请按提示稍后重试。' : '新有效结果扣 ' + boot.queryCost + ' 次；未取得有效结果自动返还，复用近期结果不扣次。'}}</view>
         </view>
         <view wx:if="{{!boot.member}}" class="selection-rule">
           <text class="selection-rule-label">新品限制</text>
-          <view class="selection-rule-copy">受限新品开售 30 天内，免费用户可查看昨天及更早的历史，暂不可实时查询。</view>
+          <view class="selection-rule-copy">受限新品开售 30 天内，免费用户可查昨天及更早历史，暂不可实时查询。</view>
         </view>
       </view>
     </view>
@@ -158,7 +158,7 @@
       <button wx:if="{{storeChoices.length || alternativeColorChoices.length}}" class="ui-disclosure" hover-class="ui-control-pressed" bindtap="onToggleAlternatives" aria-expanded="{{alternativesExpanded}}"><text class="ui-disclosure-label">看看其他可接受配置</text><view class="ui-disclosure-meta"><text>{{alternativesExpanded ? '收起' : '展开'}}</text><text class="ui-chevron {{alternativesExpanded ? 'ui-chevron--up' : 'ui-chevron--down'}}"></text></view></button>
       <view wx:if="{{alternativesExpanded && storeChoices.length && !alternativeColorChoices.length}}" class="observed-store-choices">
         <view class="small bold">同一配置，可考虑的门店</view>
-        <view class="tiny muted mt">仅列出这次结果中最近观测可取货的门店。勾选你能接受的门店后，仍需重新确认；不会自动查询或添加关注。</view>
+        <view class="tiny muted mt">仅列本次观测可取货门店。勾选后需手动查询确认，不会自动扣次或关注。</view>
         <button wx:for="{{storeChoices}}" wx:key="storeNumber" class="observed-store-choice {{item.selected ? 'observed-store-choice--selected' : ''}}" data-store="{{item.storeNumber}}" aria-pressed="{{item.selected}}" disabled="{{querying || signing || sheetVisible}}" bindtap="onToggleAcceptableStore">
           <view class="observed-store-choice-copy"><text>{{item.label}}</text><text class="tiny muted">观测 {{item.observedText}} · {{item.ageText}}</text></view><text class="small">{{item.selected ? '已勾选' : '可接受'}}</text>
         </button>
@@ -241,7 +241,7 @@
         <text class="small text-2">自动监测状态</text>
         <view class="pill pill-dot pill-{{collector.cls}}">{{collector.label}}</view>
       </view>
-      <view class="tiny muted mt">仅显示是否可取货，不提供剩余件数。结果对应标注的观测时间，之后可能变化；请以苹果官网结算页面为准。</view>
+      <view class="tiny muted mt">仅展示是否可取货，不含剩余件数；库存随时间变化，请以 Apple 官网结算页为准。</view>
     </view>
   </block>
 </view>

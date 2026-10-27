@@ -56,7 +56,7 @@ test('current iPhone and Mac families show newer official announcements first', 
   const mac = sortFamilies(c.categories.find(c => c.key === 'mac').families);
   assert.deepEqual(mac.slice(0, 3).map(f => f.familyKey), ['mac-mini', 'mac-studio', 'macbook-neo']);
   const ipad = sortFamilies(c.categories.find(c => c.key === 'ipad').families);
-  assert.deepEqual(ipad.map(f => f.familyKey), ['ipad-air', 'ipad-pro', 'ipad', 'ipad-mini']);
+  assert.deepEqual(ipad.map(f => f.familyKey), ['ipad-mini', 'ipad-air', 'ipad-pro', 'ipad']);
   for (const key of new Set(products.products.map(p => p.familyKey))) assert.ok(FAMILY_RELEASES[key], `missing maintained announcement evidence: ${key}`);
 });
 

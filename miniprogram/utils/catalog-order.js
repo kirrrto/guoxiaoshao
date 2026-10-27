@@ -16,7 +16,7 @@ const FAMILY_RELEASES = {
   'ipad-pro': ['2025-10-15', 'https://www.apple.com/sg/newsroom/2025/10/apple-introduces-the-powerful-new-ipad-pro-with-the-m5-chip/'],
   'ipad-air': ['2026-03-02', 'https://www.apple.com/newsroom/2026/03/apple-introduces-the-new-ipad-air-powered-by-m4/'],
   'ipad': ['2025-03-04', 'https://www.apple.com/newsroom/2025/03/apple-introduces-ipad-air-with-powerful-m3-chip-and-new-magic-keyboard/'],
-  'ipad-mini': ['2024-10-15', 'https://www.apple.com/newsroom/2024/10/apple-introduces-powerful-new-ipad-mini-built-for-apple-intelligence/'],
+  'ipad-mini': ['2026-10-26', 'https://www.apple.com.cn/newsroom/2026/10/apple-gives-ipad-mini-its-biggest-update-ever/'],
   'macbook-air': ['2026-03-03', 'https://www.apple.com/newsroom/2026/03/apple-introduces-the-new-macbook-air-with-m5/'],
   'macbook-pro': ['2026-03-03', 'https://www.apple.com/newsroom/2026/03/apple-introduces-macbook-pro-with-all-new-m5-pro-and-m5-max/'],
   'macbook-neo': ['2026-03-04', 'https://www.apple.com/newsroom/2026/03/say-hello-to-macbook-neo/'],

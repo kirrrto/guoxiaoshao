@@ -116,7 +116,7 @@
       <view wx:if="{{result.hasEventRecords && result.lastHour !== null}}" class="small text-2 mt">{{(result.lastHourComplete ? '' : '已加载记录中，') + result.lastHourWindowText + '记录到确认补货 ' + result.lastHour + ' 次'}}</view>
 
 
-      <view wx:if="{{result.hasEventRecords}}" class="tiny muted mt">四项按事件类型分别计数；其他状态变化仅列入事件记录，总数可能不同。</view>
+      <view wx:if="{{result.hasEventRecords}}" class="tiny muted mt">四项按类型分别计数，其他状态变化仅列于时间轴。</view>
 
       <view wx:if="{{result.coverageCheckedText}}" class="tiny muted mt">采样摘要单独更新于 {{result.coverageCheckedText}}</view>
       <view wx:for="{{result.coverageStores}}" wx:key="storeNumber" class="history-coverage-row">
@@ -124,7 +124,7 @@
         <view class="tiny text-2">有效 {{item.knownCount}} 次 · 未确认 {{item.unknownCount}} 次</view>
         <view class="tiny muted">首末观测 {{item.rangeText}}</view>
       </view>
-      <view class="tiny muted mt">凭据从启用记录后积累；首末观测之间不代表持续监测，较早的数据可能没有采样摘要。</view>
+      <view class="tiny muted mt">首末观测间不代表连续监测；较早数据可能无采样摘要。</view>
 
       </block>
 
@@ -153,11 +153,11 @@
       <block wx:if="{{browseExpanded}}">
       <view wx:if="{{browseLoading && !browse}}" class="small muted mt">正在加载浏览记录…</view>
       <view wx:if="{{browse}}" class="small text-2 mt">
-        <view wx:if="{{!browse.recentViews.length}}">还没有浏览记录。可在上方选择配置、门店与日期查看供应变化。</view>
+        <view wx:if="{{!browse.recentViews.length}}">还没有浏览记录，可在上方选择条件查看。</view>
         <view wx:for="{{browse.recentViews}}" wx:key="index" class="history-recent mt"><view class="history-recent-copy"><view>{{item.title}}</view><view class="tiny muted">{{item.dayKey}} · {{item.scopeText}}</view></view><button class="ui-action ui-action--neutral history-restore" hover-class="ui-control-pressed" data-index="{{index}}" disabled="{{querying || loadingMore}}" bindtap="onRestoreBrowse"><text class="ui-action-label">恢复条件</text><view class="ui-chevron" aria-hidden="true"></view></button></view>
       </view>
       <view wx:if="{{browseError}}" class="banner banner-warn small mt">{{browseError}}<button class="btn btn-outline btn-sm mt" disabled="{{browseLoading}}" bindtap="onRetryBrowse">重新加载</button></view>
-      <view class="small muted mt">浏览不扣次数；成功加载可完成每日浏览任务，查询另按账户规则计次。</view>
+      <view class="small muted mt">浏览不扣次数，加载本页即可完成每日浏览任务。</view>
       </block>
     </view>
     </view>

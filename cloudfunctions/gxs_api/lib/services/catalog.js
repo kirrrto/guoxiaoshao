@@ -77,10 +77,33 @@ function buildFromBundled() {
   };
 }
 
+function catalogTimestamp(version) {
+  if (typeof version !== 'string') return NaN;
+  const head = version.split('|')[0];
+  return /^\d{4}-\d{2}-\d{2}T/.test(head) ? Date.parse(head) : NaN;
+}
+
 async function get(ctx, payload) {
-  const meta = await ctx.repo.getCatalogMeta();
+  let meta = await ctx.repo.getCatalogMeta();
+  const bundled = buildFromBundled();
+  const metaTime = catalogTimestamp(meta && meta.version);
+  const bundledTime = catalogTimestamp(bundled && bundled.meta && bundled.meta.version);
+  const databaseOlderThanBundle = Number.isFinite(metaTime) && Number.isFinite(bundledTime) && metaTime < bundledTime;
+  if (databaseOlderThanBundle) {
+    try {
+      await seed(ctx);
+      meta = await ctx.repo.getCatalogMeta();
+    } catch (_) {
+      meta = bundled.meta;
+    }
+  }
   if (payload && payload.ifVersion && meta && payload.ifVersion === meta.version) return { unchanged: true, version: meta.version };
-  const [stores, products] = await Promise.all([ctx.repo.listStores(), ctx.repo.listProducts()]);
+  let [stores, products] = await Promise.all([ctx.repo.listStores(), ctx.repo.listProducts()]);
+  if (databaseOlderThanBundle && (!meta || catalogTimestamp(meta.version) < bundledTime)) {
+    stores = bundled.stores;
+    products = bundled.products;
+    meta = bundled.meta;
+  }
   if (!stores.length || !products.length) throw new ApiError('catalog_empty', '目录尚未初始化，请稍后再试');
   const orderCategory = ['iphone', 'ipad', 'mac', 'watch', 'airpods', 'vision', 'homepod'];
   products.sort((a, b) => orderCategory.indexOf(a.category) - orderCategory.indexOf(b.category) || a.familyKey.localeCompare(b.familyKey) || (a.title || '').localeCompare(b.title || '', 'zh-Hans-CN'));
@@ -98,7 +121,7 @@ async function get(ctx, payload) {
 async function seed(ctx) {
   const built = buildFromBundled();
   built.meta.seededAt = ctx.nowIso;
-  await ctx.repo.replaceCatalog(built);
+  await ctx.repo.replaceCatalog({ ...built, prune: true });
   return { version: built.meta.version, stores: built.stores.length, products: built.products.length, supportedProducts: built.products.filter(p => p.supported).length };
 }
 
