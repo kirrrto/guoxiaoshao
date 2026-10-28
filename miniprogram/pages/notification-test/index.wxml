@@ -38,7 +38,7 @@
       <view class="test-copy">允许微信授权后，在「服务通知」中查收标注【测试】的消息。</view>
       <view class="test-tag">仅体验提醒，不查询库存或创建监测</view>
     </block>
-    <view wx:if="{{error}}" class="test-error" role="alert">{{error}}</view>
+    <view wx:if="{{error}}" class="test-error" aria-role="alert">{{error}}</view>
     <view wx:if="{{operationNote}}" class="test-operation" aria-live="polite">{{operationNote}}</view>
     <view wx:if="{{checkNote}}" class="test-operation" aria-live="polite">{{checkNote}}</view>
     <view class="test-actions {{test ? 'test-actions-after-result' : ''}}">

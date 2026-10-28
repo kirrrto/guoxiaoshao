@@ -5,6 +5,7 @@ import path from 'node:path';
 import vm from 'node:vm';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
+import { runtime as fullRuntime } from './helpers/miniprogram-runtime.mjs';
 
 const require = createRequire(import.meta.url);
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../miniprogram');
@@ -28,6 +29,84 @@ function runtime(handler) {
   return { page, calls, modals, toasts, answer(confirm = true) { modals.at(-1).success({ confirm }); } };
 }
 const deleteEvent = id => ({ currentTarget: { dataset: { id } } });
+
+test('a collapsed five-page reminder list refreshes only its first page and expands using the new snapshot cursor', async () => {
+  let snapshot = 'old';
+  const rt = runtime(async (action, payload) => {
+    const pageNumber = payload.cursor ? Number(payload.cursor.split(':')[1]) : 0;
+    if (payload.cursor) assert.ok(payload.cursor.startsWith(snapshot + ':'), 'never mix a new first page with an old tail cursor');
+    return list(Array.from({ length: 20 }, (_, i) => `${snapshot}-${pageNumber * 20 + i}`),
+      { nextCursor: `${snapshot}:${pageNumber + 1}`, hasMore: pageNumber < 6, clearBefore: `${snapshot}-boundary` });
+  });
+  rt.page.data.showNotifications = true;
+  await rt.page.loadNotifications();
+  for (let i = 0; i < 4; i++) await rt.page.onLoadMoreNotifications();
+  assert.equal(rt.page.data.notifications.length, 100);
+  await rt.page.onToggleNotifications();
+  snapshot = 'new';
+  rt.page.notificationsLoadedAt = Date.now() - 30001;
+  const reads = rt.calls.length;
+  await rt.page.loadNotifications();
+  assert.equal(rt.calls.length - reads, 1, 'the hidden tail does not trigger four extra reads');
+  assert.equal(rt.page.data.notifications.length, 20);
+  assert.equal(rt.page.data.notifications[0].id, 'new-0');
+  assert.equal(rt.page.notificationsNextCursor, 'new:1');
+  assert.equal(rt.page.data.notificationsClearBefore, 'new-boundary');
+  await rt.page.onToggleNotifications();
+  assert.equal(rt.calls.length - reads, 1, 'expanding a fresh list reuses the first page');
+  await rt.page.onLoadMoreNotifications();
+  assert.equal(rt.page.data.notifications.length, 40);
+  assert.ok(rt.page.data.notifications.every(row => row.id.startsWith('new-')));
+});
+
+test('collapsing while an expanded refresh is in flight stops further background pages', async () => {
+  const first = deferred();
+  const rt = runtime(async () => first.promise);
+  rt.page.data.showNotifications = true;
+  rt.page.data.notifications = Array.from({ length: 100 }, (_, i) => item(`old-${i}`));
+  const refresh = rt.page.loadNotifications({ force: true });
+  await rt.page.onToggleNotifications();
+  first.resolve(list(Array.from({ length: 20 }, (_, i) => `new-${i}`), { hasMore: true, nextCursor: 'new-tail' }));
+  await refresh;
+  assert.equal(rt.calls.length, 1);
+  assert.equal(rt.page.data.notifications.length, 20);
+  assert.equal(rt.page.notificationsNextCursor, 'new-tail');
+});
+
+test('leaving mine cancels an in-flight reminder refill and a late response cannot repaint on return', async () => {
+  const stale = deferred(); let reads = 0;
+  const rt = fullRuntime(async () => ++reads === 1 ? stale.promise : list(['current']));
+  const page = rt.instance('pages/mine/index.js');
+  page.pageVisible = true;
+  page.data.showNotifications = true;
+  page.data.notifications = Array.from({ length: 100 }, (_, i) => item(`old-${i}`));
+  const refresh = page.loadNotifications({ force: true });
+  page.onHide();
+  page.pageVisible = true;
+  await page.loadNotifications();
+  stale.resolve(list(['late-old'], { hasMore: true, nextCursor: 'old-tail' }));
+  await refresh;
+  assert.equal(reads, 2);
+  assert.deepEqual(clone(page.data.notifications.map(row => row.id)), ['current']);
+  assert.equal(page.data.notificationsLoading, false);
+  assert.equal(page.data.notificationsLoadingMore, false);
+});
+
+test('switching account during reminder refresh ignores the previous account response and cursors', async () => {
+  const stale = deferred(); let reads = 0;
+  const rt = fullRuntime(async () => ++reads === 1 ? stale.promise : list(['account-b'], { clearBefore: 'account-b-boundary' }));
+  const page = rt.instance('pages/mine/index.js');
+  const boot = userKey => ({ identity: { userKey }, membership: { active: false }, settings: {}, limits: {}, notifications: {}, quota: {}, collector: { state: 'running' }, memberProduct: { priceFen: 0 }, queryProduct: { priceFen: 0 } });
+  page.applyBoot(boot('consumer:a'));
+  const refresh = page.loadNotifications({ force: true });
+  page.applyBoot(boot('consumer:b'));
+  await page.loadNotifications();
+  stale.resolve(list(['account-a'], { hasMore: true, nextCursor: 'account-a-tail', clearBefore: 'account-a-boundary' }));
+  await refresh;
+  assert.deepEqual(clone(page.data.notifications.map(row => row.id)), ['account-b']);
+  assert.equal(page.notificationsNextCursor, null);
+  assert.equal(page.data.notificationsClearBefore, 'account-b-boundary');
+});
 
 test('discarded stock alerts explain current inventory validation without asking users to repay or authorize', async () => {
   const reasons = ['event_superseded', 'event_unconfirmed', 'event_invalid_time'];

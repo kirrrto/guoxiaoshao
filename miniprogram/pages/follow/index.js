@@ -99,9 +99,9 @@ function presentFollow(follow, boot, catalog, collector) {
   if (follow.status === 'expired') status.label = '会员已到期，监测已停止';
   if (retired) { status.label = '老款已下架，请改选新款'; status.cls = 'warn'; }
   let monitoringText = retired
-    ? '老款官方取货接口已停用，请点「调整」改选新款配置'
+    ? '老款官方取货接口已停用，请改选新款配置'
     : follow.status === 'limit_paused' ? '配置已保留，可在会员权益中查看可用名额并恢复' : '';
-  if (follow.status === 'active') {
+  if (!retired && follow.status === 'active') {
     if (!canRemind(boot)) { status.cls = 'warn'; monitoringText = '会员未生效，当前不参与自动检测'; }
     else if (!collector || collector.state !== 'running' || collector.observationStale) monitoringText = '关注已保存，后台检测情况见上方';
   }
@@ -113,6 +113,7 @@ function presentFollow(follow, boot, catalog, collector) {
     const observed = Date.parse(store.observedAt);
     const validTime = Number.isFinite(observed) && observed <= now;
     const previous = store.lastKnownStatus || store.status;
+    if (retired && store.observationState === 'fresh') store = { ...store, observationState: 'stale' };
     const historical = validTime && ['stale', 'unknown'].includes(store.observationState);
     const knownAt = Date.parse(store.knownAt);
     return { ...store,
@@ -151,18 +152,24 @@ function presentFollow(follow, boot, catalog, collector) {
     : incomplete ? usable.every(store => !store.observedAt) ? '等待首次检查' : '库存待确认' : '所选门店暂不可取货';
   return {
     ...follow,
+    productRetired: retired,
+    canToggle: !retired && !follow.limitPaused && follow.status !== 'limit_paused',
+    canQuery: !retired,
+    editLabel: retired ? '改选新款' : '调整',
     cardTitle: splitColor ? title.slice(0, -color.length).trim() : title,
     cardSubtitle: splitColor ? color : '',
     observationLabel: stockLabel,
     observationTone: availableCount ? 'ok' : incomplete ? 'warn' : 'muted',
     observationIncomplete: availableCount > 0 && incomplete,
-    stockDetail: follow.latestRestricted ? '当前权益暂不能查看此配置的库存。'
+    stockDetail: retired ? '老款已停止检测，已有结果仅供回看。'
+      : follow.latestRestricted ? '当前权益暂不能查看此配置的库存。'
       : follow.limitPaused ? '配置已保留，可调整关注或查看会员名额。'
       : availableCount ? usable.filter(store => store.observationState === 'fresh' && store.status === 'available').map(store => store.storeLabel).join('、')
       : historicalAvailable ? '这是上次的结果，当前库存待确认。'
       : incomplete ? observationAt === null ? '关注已保存，有检测结果后会在这里显示。' : '最近未取得新的有效结果，不能据此判断无货。'
       : follow.status === 'active' ? '有货后会更新这里，并按你的提醒设置发送消息。' : '自动检测已暂停，可恢复关注继续留意。',
-    notificationExpectation: follow.status !== 'active' ? '此配置未在监测，可在详情中恢复。'
+    notificationExpectation: retired ? '老款无法恢复检测，请改选新款。'
+      : follow.status !== 'active' ? '此配置未在监测，可在详情中恢复。'
       : availableCount ? '同一轮持续有货不重复提醒，可直接查看取货信息。'
       : incomplete ? '后台检测结果会自动同步，无需手动查询。'
       : '确认有货且提醒条件满足后，将发送微信提醒。',
@@ -894,7 +901,11 @@ Page({
     if (!this.data.boot) return toast('正在读取账户，请稍后再试');
     if (!this.data.boot.member) return this.showMemberModal();
     if (!this.data.followsLoaded) return toast('正在确认已有关注，请稍后再试');
-    if (this.data.follows.length >= this.data.limits.maxFollows) return toast(`最多同时关注 ${this.data.limits.maxFollows} 个机型`);
+    if (this.data.follows.length >= this.data.limits.maxFollows) return wx.showModal({
+      title: '配置名额已满', content: `已保存 ${this.data.follows.length} 个配置，当前最多 ${this.data.limits.maxFollows} 个。暂停的配置也占名额，可调整或删除已有关注。`,
+      confirmText: '管理关注', cancelText: '取消',
+      success: result => { if (result.confirm && !this.pageRetired) this.setData({ follows: this.data.follows.map(follow => ({ ...follow, detailsExpanded: true })) }); },
+    });
     this.openEditor({ followId: newId('f'), pickerValue: null, isNew: true });
   },
 
@@ -926,7 +937,7 @@ Page({
   },
 
   onEditorChange(e) {
-    if (this.pageRetired || !this.data.editing) return;
+    if (this.pageRetired || !this.data.editing || this.data.saving) return;
     // The selection is logic state; only its validity needs the render bridge.
     const selection = this.editorSelection = e.detail;
     // New pickers choose a default product, but never choose stores themselves.
@@ -954,6 +965,7 @@ Page({
     const savedIdentity = this.accountSnapshot && this.accountSnapshot.identity;
     const intentAtSave = savedIdentity ? this.checkoutStore().restore(savedIdentity, this.catalog) : null;
     const toppedUp = topUpReminderCredit();
+    if (picker && typeof picker.setInteractionLocked === 'function') picker.setInteractionLocked(true);
     this.setData({ saving: true, saveError: '' });
     try {
       const result = await call('follow.upsert', payload);
@@ -994,6 +1006,7 @@ Page({
         if (this.visible !== false) showError(error);
       }
     } finally {
+      if (picker && typeof picker.setInteractionLocked === 'function') picker.setInteractionLocked(false);
       if (!this.pageRetired && accountEpoch === (this.accountEpoch || 0)) this.setData({ saving: false });
     }
   },
@@ -1016,6 +1029,8 @@ Page({
     const { id, status } = e.currentTarget.dataset;
     const existing = this.data.follows.find(follow => follow.followId === id);
     if (!existing) return;
+    if (existing.productRetired || existing.statusReason === 'product_retired') return toast('老款已下架，请改选新款');
+    if (existing.limitPaused || existing.status === 'limit_paused') return this.showMemberModal();
     this.toggling = true;
     const nextStatus = (existing.status || status) === 'active' ? 'paused' : 'active';
     this.setData({ followBusyId: id, followActionId: '', followActionError: '' });
@@ -1091,6 +1106,7 @@ Page({
     if (this.pageRetired || this.data.editing || this.data.saving) return;
     const follow = this.data.follows.find(item => item.followId === e.currentTarget.dataset.id);
     if (!follow || !follow.stores.length) return;
+    if (follow.productRetired || follow.statusReason === 'product_retired') return toast('老款已下架，请改选新款');
     const app = getApp();
     const target = { partNumber: follow.partNumber, storeNumbers: follow.stores.filter(store => !store.limitPaused).map(store => store.storeNumber), source: 'follow' };
     if (!target.storeNumbers.length) return this.showMemberModal();

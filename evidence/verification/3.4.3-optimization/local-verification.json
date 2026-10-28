@@ -1,0 +1,586 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-10-28T07:28:27.382Z",
+  "version": "3.4.3",
+  "baseline": "8ecd44195e3e66c0c56d99a84fab70a71bb7b9fc",
+  "branch": "codex/v3.4.3-experience-usage",
+  "scope": "Local code, offline SDK transports and Chromium approximation only",
+  "nodeVersion": "v24.22.1",
+  "localChecksPassed": true,
+  "publicationReady": false,
+  "production": {
+    "deployments": 0,
+    "inventoryMigrations": 0,
+    "gifts": 0,
+    "upstreamRequests": 0,
+    "payments": 0,
+    "notifications": 0,
+    "wechatUploads": 0,
+    "gitPushes": 0
+  },
+  "frontendSourceFingerprint": "sha256:5c7840f6e0e791d8b586248fdcbaa72d45c8ebbaf9fd6da4d7d8807bff8026df",
+  "monitorDependencyManifestSha256": "a3f434459822ca868df35e05e022330755b1e0b1333a677df19dbe5134f6d288",
+  "tests": {
+    "tests": 1799,
+    "pass": 1799,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0,
+    "report": "output/gxs343-review/full-tests-final.log",
+    "sha256": "fa5fb522fdfbd99a7122e0af14982011572fde9928dad510bde06d3b12a82bec"
+  },
+  "source": {
+    "files": 593,
+    "javaScript": 421,
+    "json": 49,
+    "pages": 7,
+    "operatorPages": 1,
+    "errors": []
+  },
+  "monitor": {
+    "checked": true,
+    "source": "cloudfunctions/gxs_api/lib",
+    "target": "cloudfunctions/gxs_monitor/lib",
+    "passed": true,
+    "files": 46,
+    "sourceBytes": 343824,
+    "issues": []
+  },
+  "assets": {
+    "checked": 114,
+    "skus": 340,
+    "totalBytes": 139837,
+    "mainPackageRawBytes": 1207294
+  },
+  "browser": {
+    "layoutCases": 816,
+    "sheetCases": 1392,
+    "nativeTabCases": 1416,
+    "pickerCases": 120,
+    "colorSamples": 776,
+    "layout": [
+      {
+        "report": "output/gxs343-review/pages-final/layout-metrics.json",
+        "sha256": "360da46cbbd091090d61307ab98d8335f51ba44060f3db5e42d0641a2c06d02e",
+        "summary": {
+          "total": 84,
+          "indexNavigationFailures": 0,
+          "expressionErrors": 0,
+          "missingText": 0,
+          "forbiddenText": 0,
+          "horizontalOverflow": 0,
+          "clippedText": 0,
+          "failedImages": 0,
+          "alternativeLayoutFailures": 0,
+          "calendarLayoutFailures": 0,
+          "membershipLayoutFailures": 0,
+          "notificationLayoutFailures": 0,
+          "v3LayoutFailures": 0,
+          "stockLayoutFailures": 0
+        }
+      },
+      {
+        "report": "output/gxs343-review/pages-final/layout-metrics-dark.json",
+        "sha256": "8c1cc5603901ace3632a7cdf0ef3949830287b3ba62bc3d5492c46471fce98e5",
+        "summary": {
+          "total": 84,
+          "indexNavigationFailures": 0,
+          "expressionErrors": 0,
+          "missingText": 0,
+          "forbiddenText": 0,
+          "horizontalOverflow": 0,
+          "clippedText": 0,
+          "failedImages": 0,
+          "alternativeLayoutFailures": 0,
+          "calendarLayoutFailures": 0,
+          "membershipLayoutFailures": 0,
+          "notificationLayoutFailures": 0,
+          "v3LayoutFailures": 0,
+          "stockLayoutFailures": 0
+        }
+      },
+      {
+        "report": "output/gxs343-review/v343-final/layout-metrics.json",
+        "sha256": "dd3089042b7b33e788814b858f77b76ece7fcf5cd046bc712b93df7acaa4e4b1",
+        "summary": {
+          "total": 156,
+          "indexNavigationFailures": 0,
+          "expressionErrors": 0,
+          "missingText": 0,
+          "forbiddenText": 0,
+          "horizontalOverflow": 0,
+          "clippedText": 0,
+          "failedImages": 0,
+          "alternativeLayoutFailures": 0,
+          "calendarLayoutFailures": 0,
+          "membershipLayoutFailures": 0,
+          "notificationLayoutFailures": 0,
+          "v3LayoutFailures": 0,
+          "stockLayoutFailures": 0
+        }
+      },
+      {
+        "report": "output/gxs343-review/v343-final/layout-metrics-dark.json",
+        "sha256": "a43333aa7aea4ba5ef6b42a278d4f94cb7a94936e7a2d939aedd6b8627ca2309",
+        "summary": {
+          "total": 156,
+          "indexNavigationFailures": 0,
+          "expressionErrors": 0,
+          "missingText": 0,
+          "forbiddenText": 0,
+          "horizontalOverflow": 0,
+          "clippedText": 0,
+          "failedImages": 0,
+          "alternativeLayoutFailures": 0,
+          "calendarLayoutFailures": 0,
+          "membershipLayoutFailures": 0,
+          "notificationLayoutFailures": 0,
+          "v3LayoutFailures": 0,
+          "stockLayoutFailures": 0
+        }
+      },
+      {
+        "report": "output/gxs343-review/imac-sheets/layout-metrics.json",
+        "sha256": "ab6198070404873302620986093d5778d1d6b8c89c41f23a6c40fa9f41fb1e36",
+        "summary": {
+          "total": 84,
+          "indexNavigationFailures": 0,
+          "expressionErrors": 0,
+          "missingText": 0,
+          "forbiddenText": 0,
+          "horizontalOverflow": 0,
+          "clippedText": 0,
+          "failedImages": 0,
+          "alternativeLayoutFailures": 0,
+          "calendarLayoutFailures": 0,
+          "membershipLayoutFailures": 0,
+          "notificationLayoutFailures": 0,
+          "v3LayoutFailures": 0,
+          "stockLayoutFailures": 0
+        }
+      },
+      {
+        "report": "output/gxs343-review/imac-sheets/layout-metrics-dark.json",
+        "sha256": "9b46f139c1f280ce8e27756c99bd60eaa0e54017c262c6e375f5a39325ac304b",
+        "summary": {
+          "total": 84,
+          "indexNavigationFailures": 0,
+          "expressionErrors": 0,
+          "missingText": 0,
+          "forbiddenText": 0,
+          "horizontalOverflow": 0,
+          "clippedText": 0,
+          "failedImages": 0,
+          "alternativeLayoutFailures": 0,
+          "calendarLayoutFailures": 0,
+          "membershipLayoutFailures": 0,
+          "notificationLayoutFailures": 0,
+          "v3LayoutFailures": 0,
+          "stockLayoutFailures": 0
+        }
+      },
+      {
+        "report": "output/gxs343-review/macbook-sheets/layout-metrics.json",
+        "sha256": "0b6272a968468dfbd348e70298b7e517635300d892a892c04ec6ad4367bb6e64",
+        "summary": {
+          "total": 84,
+          "indexNavigationFailures": 0,
+          "expressionErrors": 0,
+          "missingText": 0,
+          "forbiddenText": 0,
+          "horizontalOverflow": 0,
+          "clippedText": 0,
+          "failedImages": 0,
+          "alternativeLayoutFailures": 0,
+          "calendarLayoutFailures": 0,
+          "membershipLayoutFailures": 0,
+          "notificationLayoutFailures": 0,
+          "v3LayoutFailures": 0,
+          "stockLayoutFailures": 0
+        }
+      },
+      {
+        "report": "output/gxs343-review/macbook-sheets/layout-metrics-dark.json",
+        "sha256": "c07b79da2919b61556b2c3d5fb417b1809334436ef54815fdf9852e9ae88bd61",
+        "summary": {
+          "total": 84,
+          "indexNavigationFailures": 0,
+          "expressionErrors": 0,
+          "missingText": 0,
+          "forbiddenText": 0,
+          "horizontalOverflow": 0,
+          "clippedText": 0,
+          "failedImages": 0,
+          "alternativeLayoutFailures": 0,
+          "calendarLayoutFailures": 0,
+          "membershipLayoutFailures": 0,
+          "notificationLayoutFailures": 0,
+          "v3LayoutFailures": 0,
+          "stockLayoutFailures": 0
+        }
+      }
+    ],
+    "sheet": [
+      {
+        "report": "output/gxs343-review/imac-sheets/sheet-layout-metrics.json",
+        "sha256": "b0e03f1aad29ccd8c4ae67549a59fd12de8ce32c77d181c30315b0bf8c8bc7b1",
+        "summary": {
+          "total": 348,
+          "failed": 0,
+          "layoutCases": 336,
+          "reflowCases": 12
+        }
+      },
+      {
+        "report": "output/gxs343-review/imac-sheets/sheet-layout-metrics-dark.json",
+        "sha256": "b9d59ad777825d6cc1c51babf22c8af7743e79ba2461b5c1a3585c6dc3b02355",
+        "summary": {
+          "total": 348,
+          "failed": 0,
+          "layoutCases": 336,
+          "reflowCases": 12
+        }
+      },
+      {
+        "report": "output/gxs343-review/macbook-sheets/sheet-layout-metrics.json",
+        "sha256": "216a344b5cd84407dfc7a55558bf3c0ca4d28679600969790aff2aa35b32049c",
+        "summary": {
+          "total": 348,
+          "failed": 0,
+          "layoutCases": 336,
+          "reflowCases": 12
+        }
+      },
+      {
+        "report": "output/gxs343-review/macbook-sheets/sheet-layout-metrics-dark.json",
+        "sha256": "0bc62c558b1d5268c62e74011baf5514e1188399d36f243763dc100ec46b3490",
+        "summary": {
+          "total": 348,
+          "failed": 0,
+          "layoutCases": 336,
+          "reflowCases": 12
+        }
+      }
+    ],
+    "native": [
+      {
+        "report": "output/gxs343-review/pages-final/native-tab-metrics.json",
+        "sha256": "899afabca363a8c5b2866008a70b01d88b60f46b85b44adb2472b8687c86fcfc",
+        "summary": {
+          "total": 336,
+          "failed": 0
+        }
+      },
+      {
+        "report": "output/gxs343-review/pages-final/native-tab-metrics-dark.json",
+        "sha256": "206665bfd5b4f9fd896edbacf1d4dba50e54ce0325e52a1c764a28eb4157220d",
+        "summary": {
+          "total": 336,
+          "failed": 0
+        }
+      },
+      {
+        "report": "output/gxs343-review/v343-final/native-tab-metrics.json",
+        "sha256": "0256f1adb90723e5dc6fc9289700df4acf1fd50f50368f7cbb19d81c7f53d4e6",
+        "summary": {
+          "total": 372,
+          "failed": 0
+        }
+      },
+      {
+        "report": "output/gxs343-review/v343-final/native-tab-metrics-dark.json",
+        "sha256": "d3d9cc3ea1cfa2dce0d0663d37bf2581e725f129ceb36f511d0d06874cf84e3f",
+        "summary": {
+          "total": 372,
+          "failed": 0
+        }
+      }
+    ],
+    "picker": {
+      "report": "output/gxs343-review/v343-final/picker-alignment.json",
+      "sha256": "a62aecbb23cb73d69bc3d09cbbf2014e733fd1f5a1b16599dd275e7ffa47e98a",
+      "summary": {
+        "total": 120,
+        "failed": 0
+      }
+    },
+    "color": [
+      {
+        "report": "output/gxs343-review/colors/pages-final/theme-colors.json",
+        "sha256": "540adf6a817f60f954bdb9265e7ebc585362d4bbdfc639fa3a7d567435d0c8ee",
+        "summary": {
+          "total": 107,
+          "active": 107,
+          "belowTarget": 0,
+          "primaryMinimum": 5.357131444839318,
+          "selectedNavMinimum": 5.230867846703258
+        },
+        "excluded": 0
+      },
+      {
+        "report": "output/gxs343-review/colors/pages-final/theme-colors-dark.json",
+        "sha256": "dc03485247508038d8e20297f3d72d52de9d528648bf288ae3a4c13eb2ccf510",
+        "summary": {
+          "total": 107,
+          "active": 107,
+          "belowTarget": 0,
+          "primaryMinimum": 5.357131444839318,
+          "selectedNavMinimum": 7.139531628869566
+        },
+        "excluded": 0
+      },
+      {
+        "report": "output/gxs343-review/colors/v343-final/theme-colors.json",
+        "sha256": "1cc490446efb00acfa7b882b8281ebd6499db062c945d89c57e96b596eee685c",
+        "summary": {
+          "total": 227,
+          "active": 227,
+          "belowTarget": 0,
+          "primaryMinimum": 5.357131444839318,
+          "selectedNavMinimum": 5.230867846703258
+        },
+        "excluded": 31
+      },
+      {
+        "report": "output/gxs343-review/colors/v343-final/theme-colors-dark.json",
+        "sha256": "b9085e2432110129aa6a0704969b300b54b89816441bc74d7240444bcce6149c",
+        "summary": {
+          "total": 227,
+          "active": 227,
+          "belowTarget": 0,
+          "primaryMinimum": 5.357131444839318,
+          "selectedNavMinimum": 7.139531628869566
+        },
+        "excluded": 31
+      },
+      {
+        "report": "output/gxs343-review/colors/imac-sheets/theme-colors.json",
+        "sha256": "7a3f22e9bbc1dd5a985d176a0429d07acd339b1e9c26a778e3a77668c99268d1",
+        "summary": {
+          "total": 27,
+          "active": 27,
+          "belowTarget": 0,
+          "primaryMinimum": 5.357131444839318,
+          "selectedNavMinimum": null
+        },
+        "excluded": 20
+      },
+      {
+        "report": "output/gxs343-review/colors/imac-sheets/theme-colors-dark.json",
+        "sha256": "b2494bdeed9bf5866bc1d9ee99afbe1e3413866d5f3d80295312466d2429e9f3",
+        "summary": {
+          "total": 27,
+          "active": 27,
+          "belowTarget": 0,
+          "primaryMinimum": 5.357131444839318,
+          "selectedNavMinimum": null
+        },
+        "excluded": 20
+      },
+      {
+        "report": "output/gxs343-review/colors/macbook-sheets/theme-colors.json",
+        "sha256": "48e1bbfbc14b5dfac11706bf51d63391d248d313b25ef3840fc4d7703e63c664",
+        "summary": {
+          "total": 27,
+          "active": 27,
+          "belowTarget": 0,
+          "primaryMinimum": 5.357131444839318,
+          "selectedNavMinimum": null
+        },
+        "excluded": 20
+      },
+      {
+        "report": "output/gxs343-review/colors/macbook-sheets/theme-colors-dark.json",
+        "sha256": "a9b517625fd2e57070bf4174d13690840f75eb3bf9a7a8ea9e3e55cd91a67490",
+        "summary": {
+          "total": 27,
+          "active": 27,
+          "belowTarget": 0,
+          "primaryMinimum": 5.357131444839318,
+          "selectedNavMinimum": null
+        },
+        "excluded": 20
+      }
+    ],
+    "limitations": "Not native WeChat, device pixels, real keyboard lifecycle or full-screen WCAG certification. Samples exclude hidden/occluded controls and disabled controls are exempt."
+  },
+  "inventory": {
+    "report": "output/gxs343-review/inventory/verification.json",
+    "sha256": "489323daa5feae07e14be647bb622b010960d94d3b019880c49cb52a5613e7de",
+    "productionWrites": false,
+    "steadyStateSdkActions": {
+      "legacy": 7,
+      "embedded": 5
+    },
+    "defaultMode": "legacy"
+  },
+  "gift": {
+    "dryRunReport": "output/gxs343-review/gift/dry-run/report.json",
+    "localApplyReport": "output/gxs343-review/gift/applied-local/report.json",
+    "restoration": {
+      "schemaVersion": 1,
+      "checkedAt": "2026-10-28T07:19:35.775Z",
+      "nodeVersion": "24.22.1",
+      "testPath": "tests/launch-celebration-gift.test.mjs",
+      "testSha256": "4e7c3ffc22937fc89e45cdbbe944d5d0ed31064c3d44c3bf56d11b9bfb1132da",
+      "experiment": "A26_gift_restore_targets",
+      "scope": "synthetic memory collector plus pinned SDK offline transport",
+      "expiredPaidAccounts": 4,
+      "neverPaidAccounts": 1,
+      "grantedAccounts": 4,
+      "beforeUniqueTargets": 0,
+      "afterUniqueTargets": 2,
+      "activeFollowOwnersRestored": 2,
+      "pausedFollowUnchanged": true,
+      "retiredTargetExcluded": true,
+      "neverPaidExcluded": true,
+      "regularIntervalMs": 60000,
+      "oneTimeScan": {
+        "actions": 22,
+        "starts": 4,
+        "reads": 14,
+        "writes": 0,
+        "commits": 4
+      },
+      "oneTimeAssessAndGrant": {
+        "actions": 56,
+        "starts": 8,
+        "reads": 32,
+        "writes": 8,
+        "commits": 8
+      },
+      "completedCheckpointReplay": {
+        "actions": 0,
+        "starts": 0,
+        "reads": 0,
+        "writes": 0,
+        "commits": 0
+      },
+      "steadyStateModel": {
+        "acceptedSamplesPerHealthyRegularRound": 2,
+        "legacyObservationActions": 14,
+        "embeddedObservationActionsIfSeparatelyMigrated": 10,
+        "excludes": [
+          "request budget and health",
+          "lease/status outside sample transactions",
+          "event and notification work",
+          "frontend reads",
+          "migration and archives"
+        ]
+      },
+      "productionRequests": 0,
+      "productionGrants": 0,
+      "productionNotifications": 0
+    },
+    "productionGrants": 0
+  },
+  "images": {
+    "rehearsal": "output/gxs343-review/asset-rehearsal.json",
+    "availableOriginals": 12,
+    "missingOriginals": 102,
+    "fullRebuildPassed": false,
+    "existingPackagedAssetsReplaced": false
+  },
+  "capacity": {
+    "report": "output/gxs343-review/capacity-300-local.json",
+    "productionRequests": 0,
+    "fixture": {
+      "enabled": true,
+      "intervalSeconds": 8,
+      "burstIntervalSeconds": 2,
+      "burstQuietSeconds": 20,
+      "availableIntervalSeconds": 0,
+      "maxConcurrency": 2,
+      "continuityGapMs": 300000,
+      "maxRequestsPerMinute": 60,
+      "maxRequestsPerDay": 10000,
+      "budgetMode": "continuous",
+      "cadenceMode": "adaptive",
+      "autoSharePercent": 80,
+      "maxPartsPerRequest": 20,
+      "statusStaleAfterSeconds": 30
+    },
+    "scenarios": [
+      {
+        "name": "same-target-fast",
+        "success": 300,
+        "busy": 0,
+        "upstreamHttp": 1,
+        "netQuotaDebit": 0
+      },
+      {
+        "name": "same-target-slow",
+        "success": 300,
+        "busy": 0,
+        "upstreamHttp": 1,
+        "netQuotaDebit": 0
+      },
+      {
+        "name": "same-three-stores",
+        "success": 300,
+        "busy": 0,
+        "upstreamHttp": 3,
+        "netQuotaDebit": 0
+      },
+      {
+        "name": "distinct-300-targets",
+        "success": 59,
+        "busy": 241,
+        "upstreamHttp": 59,
+        "netQuotaDebit": 0
+      },
+      {
+        "name": "distinct-900-targets",
+        "success": 20,
+        "busy": 280,
+        "upstreamHttp": 59,
+        "netQuotaDebit": 0
+      },
+      {
+        "name": "continuous-300-manual-plus-300-auto-every-45s",
+        "success": 4,
+        "busy": 1196,
+        "upstreamHttp": 75,
+        "netQuotaDebit": 0
+      }
+    ],
+    "limitations": "Legacy synthetic 8-second/adaptive fixture; not the current 60-second cadence, real throughput or proof all 300 distinct requests succeed."
+  },
+  "release": {
+    "report": "output/gxs343-review/release-check.json",
+    "sourceChecksPassed": true,
+    "passedChecks": 51,
+    "totalChecks": 52,
+    "blockers": [
+      {
+        "id": "unused-channel-video",
+        "code": "finding_open",
+        "message": "四个主页面被报告声明了未使用的 channel-video 组件: unresolved since 3.3.1."
+      },
+      {
+        "id": "custom-tabbar-first-switch",
+        "code": "finding_open",
+        "message": "WebView 自定义底部导航首次切换闪烁: unresolved since 3.3.1."
+      },
+      {
+        "id": "oversized-product-image",
+        "code": "finding_open",
+        "message": "商品图片过大: unresolved since 3.3.1."
+      },
+      {
+        "id": "legacy-product-image-format",
+        "code": "finding_open",
+        "message": "商品图片格式未通过质检建议: unresolved since 3.3.1."
+      }
+    ]
+  },
+  "externalRemaining": [
+    "102 original images and full isolated rebuild",
+    "WeChat compile/upload/current-source retest for four open findings",
+    "iOS/Android device fonts/images/authorization/keyboard and real message/payment flows",
+    "Isolated CloudBase transaction/index contract and 24-hour midnight latency/metering",
+    "Reviewed production gift list boundary and trusted execution/checkpoint adapter",
+    "Authorized compatible deployment, staged inventory migration and actual gifts"
+  ]
+}

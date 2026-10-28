@@ -152,12 +152,12 @@ test('production coverage adapter uses the new collection, exact day/SKU or dete
   rows.push({ ...rows[0], _id: 'wrong-day', dayKey: '2026-09-15' }, { ...rows[0], _id: 'wrong-sku', partNumber: 'MYYY2CH/A' });
   const reads = [];
   const db = {
-    command: { in: values => ({ in: values }) },
+    command: { in: values => ({ in: values }), gt: value => ({ gt: value }) },
     collection(name) {
-      assert.equal(name, C.observationDays);
+      assert.ok([C.latest, C.observationDays].includes(name));
       return { where(condition) {
-        reads.push(condition);
-        const matching = rows.filter(row => Object.entries(condition).every(([key, value]) => value && value.in ? value.in.includes(row[key]) : row[key] === value));
+        if (name === C.observationDays) reads.push(condition);
+        const matching = (name === C.latest ? [] : rows).filter(row => Object.entries(condition).every(([key, value]) => value && value.in ? value.in.includes(row[key]) : value && value.gt ? row[key] > value.gt : row[key] === value));
         let skip = 0, limit = 100; const ordering = [];
         const query = { orderBy(key, direction) { ordering.push([key, direction]); return query; }, skip(value) { skip = value; return query; }, limit(value) { limit = value; return query; },
           async get() { return { data: matching.slice().sort((a, b) => { for (const [key, direction] of ordering) if (a[key] !== b[key]) return (a[key] < b[key] ? -1 : 1) * (direction === 'asc' ? 1 : -1); return 0; }).slice(skip, skip + limit) }; } };
@@ -171,6 +171,7 @@ test('production coverage adapter uses the new collection, exact day/SKU or dete
   assert.deepEqual(reads[0], { partNumber, dayKey: request.dayKey });
   const selected = await repo.getObservationCoverage({ ...request, storeNumbers: ['R229', 'R100', 'R100', 'R999'] });
   assert.deepEqual(selected.map(row => row.storeNumber), ['R100', 'R229']);
-  assert.deepEqual(reads[1]._id.in, ['R229', 'R100', 'R999'].map(store => observationDayId(store, partNumber, request.dayKey)));
+  assert.ok(reads[1]._id.gt, 'archive scan uses keyset, never offset');
+  assert.deepEqual(reads[2]._id.in, ['R229', 'R100', 'R999'].map(store => observationDayId(store, partNumber, request.dayKey)));
   assert.deepEqual(INDEX_PLAN[C.observationDays][0].keys, { partNumber: 1, dayKey: 1, storeNumber: 1 });
 });

@@ -1,7 +1,7 @@
 <page-meta page-style="{{sheetVisible ? 'overflow:hidden;' : ''}}" />
 <view class="page tab-page history-page">
-  <view wx:if="{{networkOffline}}" class="network-notice" role="status">网络已断开，恢复后自动刷新</view>
-  <view wx:if="{{loadError}}" class="card load-error" role="alert">
+  <view wx:if="{{networkOffline}}" class="network-notice" aria-role="status">网络已断开，恢复后自动刷新</view>
+  <view wx:if="{{loadError}}" class="card load-error" aria-role="alert">
     <view class="load-error-title">暂时没有连上</view>
     <view class="load-error-detail">{{loadError}}</view>
     <button class="btn btn-primary btn-block" bindtap="onRetryLoad">重试</button>
@@ -17,7 +17,7 @@
   </block>
 
   <block wx:else>
-    <view wx:if="{{refreshing || refreshMessage}}" class="refresh-feedback" role="status">{{refreshing ? '正在更新账户与页面…' : refreshMessage}}</view>
+    <view wx:if="{{refreshing || refreshMessage}}" class="refresh-feedback" aria-role="status">{{refreshing ? '正在更新账户与页面…' : refreshMessage}}</view>
     <view wx:if="{{!accountReady}}" class="banner banner-info small">{{accountError || '正在连接微信账户，你可以先选择查询条件。'}}<button wx:if="{{accountError}}" class="btn btn-outline btn-sm mt" bindtap="onRetryAccount">重试账户连接</button></view>
     <view class="page-heading history-heading"><view><view class="page-title">供应历史</view></view><button class="ui-action ui-action--neutral history-explain" hover-class="ui-control-pressed" bindtap="onExplain"><image class="ui-icon" src="/images/ui/info.png" mode="aspectFit" aria-hidden="true" /><text class="ui-action-label">数据说明</text></button></view>
     <view class="card history-selection-card">
@@ -35,7 +35,7 @@
           <button class="ui-action history-date-chip {{dayKey === yesterday ? 'history-date-chip--selected' : 'ui-action--neutral'}}" aria-pressed="{{dayKey === yesterday}}" disabled="{{querying || loadingMore}}" bindtap="onQuickDate" data-day="yesterday">昨天</button>
         </view>
       <picker class="history-date-picker" disabled="{{querying || loadingMore}}" mode="date" value="{{dayKey}}" start="{{earliestDay}}" end="{{today}}" bindchange="onDateChange">
-        <view class="history-date-control {{querying || loadingMore ? 'history-date-control--disabled' : ''}}" hover-class="ui-control-pressed" role="button" aria-label="选择日期，当前{{dayKey}}" aria-disabled="{{querying || loadingMore}}">
+        <view class="history-date-control {{querying || loadingMore ? 'history-date-control--disabled' : ''}}" hover-class="ui-control-pressed" aria-role="button" aria-label="选择日期，当前{{dayKey}}" aria-disabled="{{querying || loadingMore}}">
           <image class="ui-icon" src="/images/ui/calendar.png" mode="aspectFit" aria-hidden="true" /><text class="history-date-value">{{dayKey}}</text>
           <view class="ui-chevron ui-chevron--down" aria-hidden="true"></view>
         </view>
@@ -43,13 +43,13 @@
       </view>
       <view wx:if="{{accountReady && !boot.member}}" class="tiny text-2 history-restriction-note">受限新品仅可查昨天及更早记录。</view>
 
-      <view wx:if="{{queryFailureMessage || restriction}}" class="banner banner-warn small mt" role="alert">{{queryFailureMessage || restriction}}</view>
+      <view wx:if="{{queryFailureMessage || restriction}}" class="banner banner-warn small mt" aria-role="alert">{{queryFailureMessage || restriction}}</view>
       <button wx:if="{{!boot.member && boot.balance < boot.historyCost}}" class="ui-action ui-action--block mb" hover-class="ui-control-pressed" bindtap="onGoMine"><text class="ui-action-label">去签到 / 查看次数</text><view class="ui-chevron" aria-hidden="true"></view></button>
 
       <button class="btn btn-primary btn-block mt {{querying ? 'disabled' : ''}}" loading="{{querying}}" disabled="{{querying || loadingMore || !accountReady || !selectionSummary || !selectionSummary.valid}}" bindtap="onQuery">
         {{!accountReady ? '正在连接账户…' : (querying ? '加载中…' : '查看历史')}}
       </button>
-      <view wx:if="{{querying}}" class="request-progress {{requestSlow ? 'request-progress--slow' : ''}}" role="status">{{requestSlow ? requestProgressText : '正在读取所选日期的已记录变化。'}}</view>
+      <view wx:if="{{querying}}" class="request-progress {{requestSlow ? 'request-progress--slow' : ''}}" aria-role="status">{{requestSlow ? requestProgressText : '正在读取所选日期的已记录变化。'}}</view>
       <view wx:if="{{accountReady}}" class="history-query-cost"><text>{{boot.member ? '会员查询不扣次数' : '消耗 ' + boot.historyCost + ' 次 · 余 ' + boot.balance + ' 次'}}</text><text wx:if="{{!boot.member}}">无事件自动退还</text></view>
       <view class="tiny muted history-scope-note">无记录不代表无货，也不代表全国覆盖。</view>
     </view>
@@ -60,7 +60,7 @@
       <text class="history-task-note muted">{{taskMessage || ('今日浏览本页可领 +' + boot.taskReward + ' 次查询额度')}}</text>
       <button wx:if="{{accountReady && boot && boot.taskAvailable}}" class="btn btn-primary btn-sm history-task-claim" loading="{{taskClaimLoading}}" disabled="{{browseLoading || taskClaimLoading}}" bindtap="onClaimTask">{{taskClaimLoading ? '领取中…' : (browseLoading ? '确认中…' : '领取奖励')}}</button>
     </view>
-    <view wx:if="{{taskClaimError}}" class="banner banner-warn small" role="alert">{{taskClaimError}}</view>
+    <view wx:if="{{taskClaimError}}" class="banner banner-warn small" aria-role="alert">{{taskClaimError}}</view>
     <view wx:if="{{browseError && !browseExpanded}}" class="banner banner-warn small">{{browseError}}<button class="btn btn-outline btn-sm mt" disabled="{{browseLoading}}" bindtap="onRetryBrowse">重新加载浏览记录</button></view>
     <view wx:if="{{result}}" class="card history-result-card">
       <view wx:if="{{queryFailureMessage}}" class="banner banner-warn small mb">本次查询未完成，下方保留上次查询结果。</view>

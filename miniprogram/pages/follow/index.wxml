@@ -1,7 +1,7 @@
 <page-meta page-style="{{(editing || authorizationOpen) ? 'overflow:hidden;' : ''}}" />
 <view class="page tab-page follow-page">
-  <view wx:if="{{networkOffline}}" class="network-notice" role="status">网络已断开，恢复后自动刷新</view>
-  <view wx:if="{{loadError}}" class="card load-error" role="alert">
+  <view wx:if="{{networkOffline}}" class="network-notice" aria-role="status">网络已断开，恢复后自动刷新</view>
+  <view wx:if="{{loadError}}" class="card load-error" aria-role="alert">
     <view class="load-error-title">暂时没有连上</view>
     <view class="load-error-detail">{{loadError}}</view>
     <button class="btn btn-primary btn-block" bindtap="onRetryLoad">重试</button>
@@ -20,10 +20,10 @@
       <view class="whistle-heading-copy"><view class="page-title">我的小哨</view></view>
       <button class="btn btn-ghost btn-sm compact-action" loading="{{refreshing}}" disabled="{{refreshing || saving}}" bindtap="onRefreshStatus">{{refreshing ? '读取中' : '刷新状态'}}</button>
     </view>
-    <view class="follow-sync-bar" role="status"><view class="follow-sync-copy"><text class="follow-sync-dot follow-sync-dot--{{liveSync.state}}"></text><text>{{liveSync.state === 'syncing' ? '正在更新页面' : liveSync.state === 'offline' ? '网络已断开' : liveSync.state === 'retrying' ? '连接暂时中断，稍后重试' : '页面自动更新'}}</text></view><view class="follow-sync-times"><text wx:if="{{liveSync.lastReadText}}" class="follow-sync-time">{{liveSync.lastReadText}}读取</text><text wx:if="{{liveSync.nextReadText}}" class="follow-sync-time">下次读取 {{liveSync.nextReadText}}</text></view></view>
+    <view class="follow-sync-bar" aria-role="status"><view class="follow-sync-copy"><text class="follow-sync-dot follow-sync-dot--{{liveSync.state}}"></text><text>{{liveSync.state === 'syncing' ? '正在更新页面' : liveSync.state === 'offline' ? '网络已断开' : liveSync.state === 'retrying' ? '连接暂时中断，稍后重试' : '页面自动更新'}}</text></view><view class="follow-sync-times"><text wx:if="{{liveSync.lastReadText}}" class="follow-sync-time">{{liveSync.lastReadText}}读取</text><text wx:if="{{liveSync.nextReadText}}" class="follow-sync-time">下次读取 {{liveSync.nextReadText}}</text></view></view>
     <view wx:if="{{stockOverview}}" class="follow-inventory-status"><text class="bold">{{stockOverview.label}}</text><text>{{stockOverview.detail}}</text></view>
-    <view wx:if="{{refreshError}}" class="banner banner-warn" role="alert">{{refreshError}}</view>
-    <view wx:elif="{{refreshFeedback}}" class="follow-refresh-feedback" role="status">{{refreshFeedback}}</view>
+    <view wx:if="{{refreshError}}" class="banner banner-warn" aria-role="alert">{{refreshError}}</view>
+    <view wx:elif="{{refreshFeedback}}" class="follow-refresh-feedback" aria-role="status">{{refreshFeedback}}</view>
     <view wx:if="{{activation}}" class="card activation-card" aria-live="polite">
       <view class="activation-title">{{activation.title}}</view>
       <view wx:if="{{activation.targetTitle}}" class="small bold mt">{{activation.targetTitle}}</view>
@@ -36,7 +36,7 @@
       <view class="card-title"><text>{{alert.soldOut ? '断货提醒' : '到货提醒'}}</text><button class="ui-action ui-action--neutral" hover-class="ui-control-pressed" bindtap="onCloseAlert">关闭</button></view>
       <view wx:if="{{alert.loading}}" class="loading-line">正在读取这条提醒…</view>
       <view wx:elif="{{alert.error}}">
-        <view class="small text-2" role="alert">{{alert.error}}</view>
+        <view class="small text-2" aria-role="alert">{{alert.error}}</view>
         <button wx:if="{{alert.retryable}}" class="btn btn-outline btn-block mt" bindtap="onRetryAlert">重新读取这条提醒</button>
       </view>
       <block wx:else>
@@ -63,8 +63,8 @@
         <view class="reminder-health-item"><text class="reminder-health-label">后台检测</text><text class="reminder-health-value reminder-health-value--{{collector.cls}}">{{collector.label}}</text></view>
         <view class="reminder-health-item"><text class="reminder-health-label">微信发送</text><text class="reminder-health-value reminder-health-value--{{delivery.cls}}">{{delivery.label}}</text></view>
       </view>
-      <view wx:if="{{!showServiceDetails && readiness.action === 'service'}}" class="reminder-health-warning" role="status">{{readinessTaskDetail}}</view>
-      <view wx:if="{{consent && consent.anyBlocked}}" class="consent-recovery" role="status">
+      <view wx:if="{{!showServiceDetails && readiness.action === 'service'}}" class="reminder-health-warning" aria-role="status">{{readinessTaskDetail}}</view>
+      <view wx:if="{{consent && consent.anyBlocked}}" class="consent-recovery" aria-role="status">
         <view class="consent-recovery-title">微信提醒权限未开启</view>
         <view class="consent-recovery-desc">微信已拒绝以下消息；库存监测继续，但对应提醒暂无法接收。</view>
         <view class="consent-recovery-row" wx:for="{{consent.blocked}}" wx:key="id"><text class="consent-recovery-name">{{item.title}}</text><text class="consent-recovery-state">{{item.label}}</text></view>
@@ -74,7 +74,7 @@
       <button wx:if="{{boot.member && subscription.templateCount}}" class="btn {{primaryTopUp ? 'btn-primary' : 'btn-outline'}} btn-block reminder-direct-button" disabled="{{subscribing || authorization.storageBlocked || editing || saving}}" loading="{{subscribing}}" bindtap="onSubscribe">{{subscribing ? '等待微信授权…' : '补充提醒次数'}}</button>
       <view class="reminder-shortcuts"><button class="ui-action ui-action--neutral" bindtap="onManageReminders">查看提醒记录</button><button class="ui-action ui-action--neutral" bindtap="onTestNotification">测试收信</button></view>
       <view wx:if="{{authorizationFeedback}}" class="authorization-feedback" aria-live="polite">{{authorizationFeedback}}</view>
-      <view wx:if="{{subscriptionPending || authorization.errorMessage}}" class="authorization-sync-error" role="status"><text>{{authorization.errorMessage || '微信已允许，次数待同步'}}</text><button class="ui-action" disabled="{{authorization.syncing}}" loading="{{authorization.syncing}}" bindtap="onRetryAuthorizationSync">重试同步</button></view>
+      <view wx:if="{{subscriptionPending || authorization.errorMessage}}" class="authorization-sync-error" aria-role="status"><text>{{authorization.errorMessage || '微信已允许，次数待同步'}}</text><button class="ui-action" disabled="{{authorization.syncing}}" loading="{{authorization.syncing}}" bindtap="onRetryAuthorizationSync">重试同步</button></view>
       <button wx:if="{{!readiness.ready && readiness.action && readiness.action !== 'subscribe' && readiness.action !== 'add' && readiness.action !== 'follows'}}" class="ui-action mt" bindtap="onReadinessAction">{{readiness.actionLabel}}</button>
         <block wx:if="{{showServiceDetails}}">
           <view wx:if="{{!readiness.ready}}" class="small text-2 mt">{{readinessTaskDetail}}</view>
@@ -123,12 +123,12 @@
             <view wx:if="{{s.lastResultTimeText}}" class="store-detail-note">{{s.lastResultTimeText}}</view>
             <view wx:if="{{s.compactNote}}" class="store-detail-note">{{s.compactNote}}</view>
           </view>
-          <view wx:if="{{followActionId === item.followId && followActionError}}" class="follow-action-error" role="alert"><text>{{followActionError}}</text><button class="ui-action" hover-class="ui-control-pressed" loading="{{refreshing}}" disabled="{{refreshing}}" bindtap="onRefreshStatus">刷新状态</button></view>
-          <view class="follow-optional-query"><button class="btn btn-outline btn-block" data-id="{{item.followId}}" disabled="{{saving || editing}}" bindtap="onQueryFollow">单独查询库存</button></view>
+          <view wx:if="{{followActionId === item.followId && followActionError}}" class="follow-action-error" aria-role="alert"><text>{{followActionError}}</text><button class="ui-action" hover-class="ui-control-pressed" loading="{{refreshing}}" disabled="{{refreshing}}" bindtap="onRefreshStatus">刷新状态</button></view>
+          <view wx:if="{{item.canQuery}}" class="follow-optional-query"><button class="btn btn-outline btn-block" data-id="{{item.followId}}" disabled="{{saving || editing}}" bindtap="onQueryFollow">单独查询库存</button></view>
           <view class="btn-row follow-actions">
-            <button class="btn btn-outline" disabled="{{saving || followBusyId}}" data-id="{{item.followId}}" bindtap="onEdit">调整</button>
+            <button class="btn btn-outline" disabled="{{saving || followBusyId}}" data-id="{{item.followId}}" bindtap="onEdit">{{item.editLabel}}</button>
             <button wx:if="{{item.limitPaused}}" class="btn btn-ghost" disabled="{{saving || followBusyId}}" bindtap="showMemberModal">查看套餐</button>
-            <button wx:elif="{{boot.member}}" class="btn btn-ghost" loading="{{followBusyId === item.followId}}" disabled="{{saving || followBusyId}}" data-id="{{item.followId}}" data-status="{{item.status}}" bindtap="onToggle">{{item.status === 'active' ? '暂停' : '恢复'}}</button>
+            <button wx:elif="{{boot.member && item.canToggle}}" class="btn btn-ghost" loading="{{followBusyId === item.followId}}" disabled="{{saving || followBusyId}}" data-id="{{item.followId}}" data-status="{{item.status}}" bindtap="onToggle">{{item.status === 'active' ? '暂停' : '恢复'}}</button>
           </view>
           <view wx:if="{{item.detailsExpanded}}" class="follow-management"><button class="ui-action" data-id="{{item.followId}}" bindtap="onViewHistory">查看供应历史</button><text class="small text-2 mono" user-select>{{item.partNumber}}</text><button class="ui-action ui-action--neutral danger-action" hover-class="ui-control-pressed" disabled="{{saving || followBusyId}}" data-id="{{item.followId}}" bindtap="onRemove">删除关注</button></view>
           </block>
@@ -142,8 +142,8 @@
 </view>
 
 <config-sheet wx:if="{{editing}}" id="follow-config-sheet" visible="{{editing}}" title="{{editor.isNew ? '添加关注' : '调整关注'}}" confirm-text="保存关注" busy="{{saving}}" disabled="{{!editorCanSave}}" dirty="{{editorDirty}}" summary="{{editorSummary}}" external-close="{{true}}" bindconfirm="onSave" bindrequestclose="onRequestCloseEditor" bindclose="onCancelEdit">
-  <target-picker id="follow-target-picker" catalog-version="{{catalogVersion}}" value="{{editor.pickerValue}}" max-stores="{{limits.maxStoresPerFollow}}" supported-only="{{true}}" in-sheet="{{true}}" bindchange="onEditorChange" />
-  <view slot="notice" wx:if="{{saveError}}" class="banner banner-warn small" role="alert">{{saveError}}</view>
+  <target-picker id="follow-target-picker" disabled="{{saving}}" catalog-version="{{catalogVersion}}" value="{{editor.pickerValue}}" max-stores="{{limits.maxStoresPerFollow}}" supported-only="{{true}}" in-sheet="{{true}}" bindchange="onEditorChange" />
+  <view slot="notice" wx:if="{{saveError}}" class="banner banner-warn small" aria-role="alert">{{saveError}}</view>
 </config-sheet>
 
 <reminder-nudge enabled="{{ready && followsLoaded}}" blocked="{{authorizationOpen || editing || saving || subscribing || refreshing || alert || followBusyId}}" />

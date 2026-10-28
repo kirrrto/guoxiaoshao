@@ -141,7 +141,7 @@ view, text { box-sizing: border-box; }
 .stat .lbl { font-size: 22rpx; color: var(--text-3); margin-top: 4rpx; }
 
 /* 页脚 */
-.footer-note { text-align: center; color: var(--text-3); font-size: 22rpx; padding: 24rpx 0 0; }
+.footer-note { text-align: center; color: var(--text-3); font-size: 24rpx; font-size: max(12px, 24rpx); padding: 24rpx 0 0; }
 
 /* 加载 */
 .loading-line { text-align: center; color: var(--text-3); font-size: 24rpx; padding: 20rpx 0; }

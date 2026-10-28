@@ -60,9 +60,11 @@
 .picker-store-heading { margin-top: 28rpx; }
 .search-summary, .store-result-city, .tiny { font-size: 24rpx; }
 .store-search, .selected { background: var(--surface-soft); border-color: var(--line); }
+/* Avoid stacking the selected chip's translucent green on a tinted surface. */
+.selected { background: var(--card); }
 .search-summary, .muted, .store-result-city { color: var(--text-2); }
 .store-result-name { color: var(--text); }
-.search-clear { min-height: 44px; }
+.search-clear { flex-basis: 44px; min-width: 44px; min-height: 44px; }
 
 /* Isolated components do not receive page typography. Keep small-phone choices readable. */
 .label, .value, .chip, .search-input, .search-placeholder, .store-result-name, .store-result-action { font-size: max(14px, 28rpx); }
@@ -106,7 +108,7 @@
 .picker-store-heading { margin-top: 20rpx; padding-top: 18rpx; margin-bottom: 14rpx; }
 .store-search { min-height: 44px; padding: 0 18rpx; border-radius: 16rpx; gap: 14rpx; }
 .hot-city-chips { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8rpx; margin-bottom: 4rpx; }
-.hot-city-chip.chip { display: flex; align-items: center; justify-content: center; min-height: 36px; padding: 8rpx 4rpx; border-radius: 12rpx; font-size: max(12px, 24rpx); text-align: center; white-space: nowrap; }
+.hot-city-chip.chip { display: flex; align-items: center; justify-content: center; min-height: 44px; padding: 8rpx 4rpx; border-radius: 12rpx; font-size: max(12px, 24rpx); text-align: center; white-space: nowrap; }
 .selected { padding: 14rpx 16rpx; border-radius: 16rpx; }
 
 /* Component isolation and viewport-based rpx both outlive the sheet's width
@@ -150,6 +152,10 @@
   .hot-city-chips { gap: 6px; margin-bottom: 4px; }
   .hot-city-chip.chip { min-height: 44px; padding: 8px 4px; font-size: 12px; border-radius: 8px; }
   .selected { padding: 10px 12px; border-radius: 10px; }
+}
+
+@media (max-width: 359px) {
+  .hot-city-chips { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 
 @media (max-height: 600px) {

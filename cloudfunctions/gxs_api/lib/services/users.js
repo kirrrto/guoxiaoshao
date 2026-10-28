@@ -33,11 +33,11 @@ const IPAD_MINI_CATALOG_NOTICE = Object.freeze({
 const MAC_LAUNCH_CELEBRATION_NOTICE = Object.freeze({
   id: 'mac-launch-celebration-2026-10-28',
   title: '庆祝苹果 Mac 新品发布 · 会员礼遇与目录更新',
-  kind: 'recovery',
+  kind: 'notice',
   publishedAt: '2026-10-28T00:00:00+08:00',
   startsAt: '2026-10-28T00:00:00+08:00',
   expiresAt: '2026-11-06T23:59:59+08:00',
-  text: '庆祝苹果发布新款 14 英寸 MacBook Pro（M6）与新款 iMac（M6），果小哨已同步上线全系新配置，并今日（10 月 28 日）为全体会员及曾付费用户自动赠送 1 天会员时长，可在「我的」查看。',
+  text: '新款 Mac 配置已更新。10 月 28 日会员礼遇将由后台向符合条件的曾付费用户自动发放 1 天会员，无需打开小程序；到账后可在「我的」会员记录查看。',
 });
 
 const MAC_CATALOG_NOTICE = Object.freeze({

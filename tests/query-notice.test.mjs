@@ -27,6 +27,22 @@ test('active maintenance banners render and win over collector noise', () => {
   assert.equal(notice.text, '苹果官网维护中');
 });
 
+test('ordinary launch notices yield to consent and faults while maintenance keeps priority', () => {
+  const { MAC_LAUNCH_CELEBRATION_NOTICE: announcement } = require('../miniprogram/utils/query-notice.js');
+  const now = Date.parse('2026-10-28T12:00:00+08:00');
+  const consent = { anyBlocked: true };
+  const fault = { state: 'error', observationStale: true };
+  assert.equal(resolveQueryNotice({ announcement, now, consent, collector: fault }).source, 'consent');
+  assert.equal(resolveQueryNotice({ announcement, now, collector: fault }).source, 'collector');
+  for (const state of ['running', 'idle']) {
+    assert.equal(resolveQueryNotice({ announcement, now, collector: { state, observationStale: true } }).source, 'announcement');
+  }
+  assert.equal(resolveQueryNotice({ announcement: { ...announcement, kind: 'maintenance' }, now, consent, collector: fault }).source, 'announcement');
+  assert.equal(resolveQueryNotice({ announcement, now: Date.parse('2026-11-07T00:00:00+08:00'), collector: fault }).source, 'collector');
+  assert.equal(normalizeAnnouncement(announcement, Date.parse('2026-10-27T23:59:59+08:00')), null);
+  assert.doesNotMatch(announcement.text, /今日|全体会员|已发放|已赠送/);
+});
+
 test('blocked WeChat subscribe permission is a recoverable query banner', () => {
   const notice = resolveQueryNotice({
     announcement: null,

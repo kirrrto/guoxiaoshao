@@ -62,7 +62,7 @@ async function decorate(ctx, follows, member = true, active = member) {
   const [latest, stores, products] = await Promise.all([
     ctx.repo.getLatest(keys),
     ctx.repo.getStores(storeNumbers),
-    Promise.all([...new Set(follows.map(f => f.partNumber))].map(part => ctx.repo.getProduct(part))),
+    ctx.repo.getProducts([...new Set(follows.map(f => f.partNumber))]),
   ]);
   const latestByKey = new Map(latest.map(l => [l._id, l]));
   const storesByNumber = new Map(stores.map(s => [s.storeNumber, s]));

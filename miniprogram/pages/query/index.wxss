@@ -87,13 +87,13 @@
 .add-tip-close { flex: none; font-size: 34rpx; line-height: 1.1; color: var(--text-3); }
 
 .observed-store-choices { margin-top: 24rpx; padding: 24rpx; border: 1rpx solid var(--line); border-radius: 20rpx; background: var(--surface-soft); line-height: 1.6; }
-.observed-store-choice { display: flex; align-items: center; justify-content: space-between; gap: 16rpx; width: 100%; min-height: 44px; margin-top: 16rpx; padding: 18rpx; background: var(--surface); border: 1rpx solid var(--line); border-radius: 16rpx; color: var(--text); text-align: left; white-space: normal; line-height: 1.6; }
+.observed-store-choice { display: flex; align-items: center; justify-content: space-between; gap: 16rpx; width: 100%; min-height: 44px; margin-top: 16rpx; padding: 18rpx; background: var(--card); border: 1rpx solid var(--line); border-radius: 16rpx; color: var(--text); text-align: left; white-space: normal; line-height: 1.6; }
 .observed-store-choice-copy { display: flex; flex: 1; min-width: 0; flex-direction: column; gap: 6rpx; overflow-wrap: anywhere; }
 .observed-store-choice--selected { border-color: var(--green); background: var(--green-soft); }
 .observed-store-choice > text { flex: none; }
 .observed-store-choice::after { border: 0; }
 .alternative-match { margin-top: 24rpx; padding-top: 24rpx; border-top: 1rpx solid var(--line); overflow-wrap: anywhere; }
-.alternative-panel { padding: 24rpx; background: var(--surface); }
+.alternative-panel { padding: 24rpx; background: var(--surface-soft); }
 .alternative-heading { font-size: 28rpx; font-weight: 600; line-height: 1.45; color: var(--text); }
 .alternative-caption { margin-top: 8rpx; font-size: 22rpx; line-height: 1.55; color: var(--text-3); }
 .alternative-section-title { display: flex; align-items: center; justify-content: space-between; gap: 16rpx; margin-top: 24rpx; margin-bottom: 12rpx; color: var(--text-2); font-size: 24rpx; font-weight: 500; }
@@ -110,7 +110,7 @@
 .alternative-panel .alternative-colors .alternative-chip { display: flex; flex: 1 1 auto; align-items: center; justify-content: space-between; gap: 8rpx; width: 100%; max-width: 100%; text-align: left; }
 .alternative-chip-label { flex: 1; min-width: 0; overflow-wrap: anywhere; }
 .alternative-current { display: block; margin-top: 2rpx; font-size: 21rpx; color: var(--text-3); }
-.alternative-check { display: flex; align-items: center; justify-content: center; flex: 0 0 30rpx; height: 30rpx; border: 1rpx solid var(--line); border-radius: 8rpx; font-size: 22rpx; color: var(--text-3); background: var(--surface); }
+.alternative-check { display: flex; align-items: center; justify-content: center; flex: 0 0 30rpx; height: 30rpx; border: 1rpx solid var(--line); border-radius: 8rpx; font-size: 22rpx; color: var(--text-3); background: var(--card); }
 .alternative-panel .alternative-chip--selected, .alternative-panel .alternative-store--selected { border-color: var(--green); background: var(--green-soft); }
 .alternative-chip--selected .alternative-check, .alternative-store--selected .alternative-check { background: var(--green); border-color: var(--green); color: var(--green-ink); }
 .alternative-stores { display: flex; flex-direction: column; gap: 8rpx; }

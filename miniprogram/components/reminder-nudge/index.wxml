@@ -1,5 +1,5 @@
 <view wx:if="{{open}}" class="reminder-overlay" catchtouchmove="swallow" bindtap="dismiss">
-  <view class="reminder-dialog" role="dialog" aria-modal="true" aria-label="{{prompt.title}}" catchtap="swallow">
+  <view class="reminder-dialog" aria-role="dialog" aria-modal="true" aria-label="{{prompt.title}}" catchtap="swallow">
     <view class="reminder-eyebrow">微信提醒</view>
     <view class="reminder-title">{{prompt.title}}</view>
     <view class="reminder-counts">

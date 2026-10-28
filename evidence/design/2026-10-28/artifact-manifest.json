@@ -1,0 +1,83 @@
+{
+  "recordedAt": "2026-10-28T08:53:49.367Z",
+  "scope": "Official preset/browser reference screenshots and generated native-source UI screenshots. No live business data.",
+  "nativeSourceFingerprint": "sha256:7ae69180501091bae90a29ec1c610f17c329724640d2860af3968b9fd03c4b16",
+  "files": [
+    {
+      "file": "evidence/design/2026-10-28/shadcn-create-command.jpg",
+      "bytes": 90228,
+      "sha256": "31ce0100a9ca129e4138ee84e109c7cbabf88f344a7129f22580abab203b0138"
+    },
+    {
+      "file": "evidence/design/2026-10-28/shadcn-create-config.jpg",
+      "bytes": 48599,
+      "sha256": "6f414cadce2fc9b1ba971b4594df1d2cdc40392076e6ae524aa039aeddceec20"
+    },
+    {
+      "file": "evidence/design/2026-10-28/shadcn-create-dark.jpg",
+      "bytes": 153936,
+      "sha256": "2c5ed67306a495f2ffcf023cdecb4f695594917f70612914a987db8dbfe726aa"
+    },
+    {
+      "file": "evidence/design/2026-10-28/shadcn-create-light.jpg",
+      "bytes": 162443,
+      "sha256": "58b3a06804ef622fd33430129e3a07f67dfc9b90cc1249c51cbca434d649465b"
+    },
+    {
+      "file": "evidence/design/2026-10-28/shadcn-preset.css",
+      "bytes": 2451,
+      "sha256": "da3ddbaa903dfe808ac98319bb17bdaf1f00ce307c331495c3d612630ed81905"
+    },
+    {
+      "file": "evidence/design/2026-10-28/shadcn-reference-dark.jpg",
+      "bytes": 61892,
+      "sha256": "ab32199156e2b154abfb6ed91b44d32a3cd763ba3167799f6f8fb83fa4b8eb42"
+    },
+    {
+      "file": "evidence/design/2026-10-28/shadcn-reference-light.jpg",
+      "bytes": 62292,
+      "sha256": "7086727ff979b837997ca1f992ddbbbc177bf088c4c69a0995e6a97ed8fcc541"
+    },
+    {
+      "file": "evidence/design/2026-10-28/shadcn-reference-source.zip",
+      "bytes": 64728,
+      "sha256": "c80bf0375284e22cfbaaa054c0e1adedccba70451d2561fd48ea59a22260c614"
+    },
+    {
+      "file": "output/gxs343-design/final/gallery/follow-375-dark.png",
+      "bytes": 54990,
+      "sha256": "a3231787bc96d6612a8fba26d362b81cda903357d28732ec818747cbb28e2952"
+    },
+    {
+      "file": "output/gxs343-design/final/gallery/follow-375-light.png",
+      "bytes": 54185,
+      "sha256": "a5c265cd535d72febd1ffb123b271a71d2feda040bc9bb06ac67f9fa9cd1cbfc"
+    },
+    {
+      "file": "output/gxs343-design/final/gallery/imac-exact-375-dark.png",
+      "bytes": 42057,
+      "sha256": "d9c60bd6433aa7a203c1c34f0ff380f5cab8274a2e7733adae99bddde31ee518"
+    },
+    {
+      "file": "output/gxs343-design/final/gallery/imac-exact-375-light.png",
+      "bytes": 42156,
+      "sha256": "203789f84b27958480b92a52a4609ef556d3321d35296af8e8e8dc34efbda055"
+    },
+    {
+      "file": "output/gxs343-design/final/gallery/retired-follow-375-dark.png",
+      "bytes": 53905,
+      "sha256": "e49f77e45b1142580084aab882c2872418325ce6dc66172c359007e71b0a185e"
+    },
+    {
+      "file": "output/gxs343-design/final/gallery/retired-follow-375-light.png",
+      "bytes": 52730,
+      "sha256": "75102d3b9bd8a71c4fcbd6b38a5e47ad80faf82fa8b123e322273936c6709184"
+    },
+    {
+      "file": "output/gxs343-design/final/gallery/sheet-search-375-dark.png",
+      "bytes": 43962,
+      "sha256": "9fcd8856947819ed65a591f96771b960b1e2b0110c456bd54976c2364e48833b"
+    }
+  ],
+  "largeArtifacts": "Images and source ZIP follow repository .gitignore and remain local deliverables; textual evidence is included in review patches."
+}

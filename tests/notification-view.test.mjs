@@ -218,8 +218,11 @@ test('real wx-server-sdk 4.0.2 notification view queries and atomic sequence/cle
     const view = await repo.getNotificationView(userKeyOf()); assert.equal(view.lastSequence, 2);
     assert.equal(new Set(Object.values(committed[C.notifications]).filter(n => n.viewSequence).map(n => n.viewSequence)).size, 2);
     const snapshot = { at: nowIso, sequence: 2 };
+    const readCount = () => calls.filter(call => call.action === 'database.getDocument' && !call.args.transactionId).length;
+    const before = readCount();
     const page = await repo.listVisibleNotifications({ userKey: userKeyOf(), view, snapshot, cursor: null, limit: 1 });
     assert.equal(page.items[0]._id, 'new-B'); assert.equal(page.hasMore, true);
+    assert.equal(readCount() - before, 1, 'limit+1 uses one SDK query for a full small page');
     const next = await repo.listVisibleNotifications({ userKey: userKeyOf(), view, snapshot, cursor: { createdAt: afterRequest, id: 'new-B' }, limit: 10 });
     assert.deepEqual(next.items.map(n => n._id), ['new-A', 'legacy']);
     await repo.hideNotification({ userKey: userKeyOf(), id: 'new-B', nowIso });

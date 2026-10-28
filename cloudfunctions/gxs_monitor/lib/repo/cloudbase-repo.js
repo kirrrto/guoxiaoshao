@@ -16,6 +16,7 @@ const { atomicMethods } = require('./atomic-ops');
 const { ALERT_TYPES } = require('../engine/events');
 const { dayKey: beijingDayKey, startOfDay, addDays } = require('../time');
 const { observationDayId } = require('../engine/observation-day');
+const { selectObservationCoverage } = require('./observation-storage');
 
 const CHUNK = 20;
 // Read-only ID queries fit one server page; write/delete batches stay at 20.
@@ -124,6 +125,17 @@ function createCloudbaseRepo(db, { sleep = ms => new Promise(resolve => setTimeo
       await col(COLLECTIONS.users).doc(userKey).update({ data: patch });
     },
 
+    async getLaunchGiftOrderWatermark() {
+      const row = await readOne(col(COLLECTIONS.orders).orderBy('_id', 'desc'));
+      return row ? row._id : null;
+    },
+    async scanLaunchGiftOrders({ afterId = null, throughId, limit = 100 }) {
+      if (!throughId) return [];
+      const where = { _id: afterId ? _.gt(afterId).and(_.lte(throughId)) : _.lte(throughId) };
+      const result = await col(COLLECTIONS.orders).where(where).orderBy('_id', 'asc').limit(Math.min(100, Math.max(1, Math.floor(Number(limit) || 100)))).get();
+      return result.data || [];
+    },
+
     // ---- quota ledger --------------------------------------------------
     // Atomic ledger and lifecycle methods are attached below via atomicMethods.
     async listLedger(userKey, { dayKey, limit } = {}) {
@@ -155,6 +167,9 @@ function createCloudbaseRepo(db, { sleep = ms => new Promise(resolve => setTimeo
     },
     async getProduct(partNumber) {
       return readOne(col(COLLECTIONS.catalogProducts).where({ _id: partNumber }));
+    },
+    async getProducts(partNumbers) {
+      return readIds(COLLECTIONS.catalogProducts, partNumbers);
     },
     async getStores(storeNumbers) {
       if (!storeNumbers.length) return [];
@@ -189,11 +204,25 @@ function createCloudbaseRepo(db, { sleep = ms => new Promise(resolve => setTimeo
       return readIds(COLLECTIONS.latest, targetKeys);
     },
     async getObservationCoverage({ partNumber, storeNumbers = [], dayKey }) {
-      // Missing documents mean no verifiable daily summary, never zero historical samples.
-      const rows = storeNumbers.length
+      // Freeze embedded versions first, then archives. Keyset the stable SKU
+      // target set; a shrinking embedded-date result set must never use skip.
+      const readKeyset = async (collection, base) => {
+        const rows = []; let afterId = null;
+        for (;;) {
+          const where = afterId ? { ...base, _id: _.gt(afterId) } : base;
+          const result = await col(collection).where(where).orderBy('_id', 'asc').limit(100).get();
+          const page = result.data || []; rows.push(...page);
+          if (page.length < 100) return rows;
+          afterId = page.at(-1)._id;
+        }
+      };
+      const latest = storeNumbers.length
+        ? await readIds(COLLECTIONS.latest, storeNumbers.map(store => store + '|' + partNumber))
+        : await readKeyset(COLLECTIONS.latest, { partNumber });
+      const archived = storeNumbers.length
         ? await readIds(COLLECTIONS.observationDays, storeNumbers.map(store => observationDayId(store, partNumber, dayKey)))
-        : await readAll(col(COLLECTIONS.observationDays).where({ partNumber, dayKey }).orderBy('storeNumber', 'asc'));
-      return rows.sort((a, b) => a.storeNumber.localeCompare(b.storeNumber));
+        : await readKeyset(COLLECTIONS.observationDays, { partNumber, dayKey });
+      return selectObservationCoverage(latest, archived, { partNumber, storeNumbers, dayKey });
     },
     async saveLatest(latest) {
       const { _id, ...data } = latest;
@@ -365,8 +394,12 @@ function createCloudbaseRepo(db, { sleep = ms => new Promise(resolve => setTimeo
       const older = position => _.or([{ createdAt: _.lt(position.createdAt) }, { createdAt: position.createdAt, _id: _.lt(position.id) }]);
       if (cursor) filters.push(older(cursor));
       const query = where => col(COLLECTIONS.notifications).where(_.and(where)).orderBy('createdAt', 'desc').orderBy('_id', 'desc');
-      const result = await query(filters).limit(limit).get();
-      const items = result.data || [];
+      // Keep the SDK's 100-document ceiling. Smaller pages can include their
+      // lookahead in the same keyset read, preserving the snapshot/clear fence.
+      const result = await query(filters).limit(limit < 100 ? limit + 1 : limit).get();
+      const rows = result.data || [];
+      const items = rows.slice(0, limit);
+      if (limit < 100) return { items, hasMore: rows.length > limit };
       if (items.length < limit) return { items, hasMore: false };
       const last = items[items.length - 1];
       // Keyset lookahead avoids skip() losing an item if a deletion occurs

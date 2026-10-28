@@ -21,6 +21,9 @@ const COLLECTIONS = Object.freeze({
 
 /** Index plan used by tools/db/create-collections and documented in docs/DATA_MODEL.md. */
 const INDEX_PLAN = Object.freeze({
+  [COLLECTIONS.latest]: [
+    { name: 'part_id', keys: { partNumber: 1, _id: 1 }, unique: false },
+  ],
   [COLLECTIONS.growthEvents]: [
     { name: 'received_id', keys: { receivedAt: -1, _id: -1 }, unique: false },
     { name: 'account_received_id', keys: { accountKey: 1, receivedAt: -1, _id: -1 }, unique: false },
@@ -62,6 +65,7 @@ const INDEX_PLAN = Object.freeze({
   ],
   [COLLECTIONS.observationDays]: [
     { name: 'part_day_store', keys: { partNumber: 1, dayKey: 1, storeNumber: 1 }, unique: false },
+    { name: 'part_day_id', keys: { partNumber: 1, dayKey: 1, _id: 1 }, unique: false },
   ],
   [COLLECTIONS.orders]: [
     { name: 'user_created', keys: { userKey: 1, createdAt: -1 }, unique: false },

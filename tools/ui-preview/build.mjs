@@ -7,10 +7,13 @@ import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { stockNativeButtonProfile, stockNativeButtonCss } from './stock-native-button.mjs';
 import { nativeTabPreview } from './native-tab-preview.mjs';
+import { v343DefaultDate, v343Scenarios, configureV343Bootstrap, v343Orders, prepareV343Page, v343TextExpectations } from './v343-scenarios.mjs';
 
 const project = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const adminPreview = process.argv.includes('--admin-only');
 const v2Preview = process.argv.includes('--v2-only');
+const v343Preview = process.argv.includes('--v343-only');
+if (v343Preview && process.argv.some(arg => arg !== '--v343-only' && /^--.*-only$/.test(arg))) throw Error('--v343-only cannot be combined with another scenario group');
 const baselinePreview = !process.argv.some(arg => /^--.*-only$/.test(arg));
 const membershipNativePreview = process.argv.includes('--membership-native-only');
 if (membershipNativePreview && process.argv.some(arg => arg !== '--membership-native-only' && /^--.*-only$/.test(arg))) throw Error('--membership-native-only cannot be combined with another scenario group');
@@ -30,7 +33,7 @@ const allowRemoteImages = process.argv.includes('--remote-images');
 // is not a claim about any particular WeChat renderer's conversion rules.
 const roundRpx = process.argv.includes('--round-rpx');
 const rpxRoundingProfile = roundRpx ? 'whole CSS pixel rounding stress; not a WeChat renderer implementation' : null;
-const defaultPreviewDate = new Date(v2Preview ? '2026-10-11T07:00:00.000Z' : '2026-09-15T07:00:00.000Z');
+const defaultPreviewDate = new Date(v343Preview ? v343DefaultDate : v2Preview ? '2026-10-11T07:00:00.000Z' : '2026-09-15T07:00:00.000Z');
 let now = defaultPreviewDate;
 class PreviewDate extends Date {
   constructor(...args) { super(...(args.length ? args : [now.getTime()])); }
@@ -126,6 +129,7 @@ function renderChildren(children, scope, context) {
   }
   return result;
 }
+const placeholderClasses = new Set();
 function renderNode(node, scope, context) {
   if (node.name === 'block') return renderChildren(node.children, scope, context);
   if (node.name === 'page-meta') return '';
@@ -161,14 +165,25 @@ function renderNode(node, scope, context) {
     return `<div class="component-config-sheet">${renderNode(sheetAst, sheet.data, { ...context, slots })}</div>`;
   }
   if (node.name === 'target-picker') {
-    const p = context.rt.instantiate('components/target-picker/index.js', { catalogVersion: evaluate(attrs['catalog-version'] || '', scope), value: evaluate(attrs.value || '', scope), maxStores: Number(evaluate(attrs['max-stores'] || '3', scope)), storesOptional: truth(attrs['stores-optional'] || '', scope), supportedOnly: truth(attrs['supported-only'] || '', scope) });
+    const p = context.rt.instantiate('components/target-picker/index.js', { catalogVersion: evaluate(attrs['catalog-version'] || '', scope), value: evaluate(attrs.value || '', scope), maxStores: Number(evaluate(attrs['max-stores'] || '3', scope)), storesOptional: truth(attrs['stores-optional'] || '', scope), supportedOnly: truth(attrs['supported-only'] || '', scope), disabled: truth(attrs.disabled || '', scope), inSheet: truth(attrs['in-sheet'] || '', scope) });
     p.loadCatalog(); if (p.data.value) p.onValue(p.data.value);
+    if (context.pickerSearch) p.onSearchInput({ detail: { value: context.pickerSearch } });
     return `<div class="component-target-picker">${renderNode(pickerAst, p.data, context)}</div>`;
   }
   const tags = { view: 'div', text: 'span', 'scroll-view': 'div', picker: 'div', image: 'img', switch: 'input', checkbox: 'input', 'checkbox-group': 'div', label: 'label', input: 'input', textarea: 'textarea', button: 'button' };
   const tag = tags[node.name] || 'div';
   const classes = evaluate(attrs.class || '', scope);
   let renderedAttrs = classes ? ` class="${html(classes)}"` : '';
+  if (['input', 'textarea'].includes(node.name) && attrs['placeholder-class']) {
+    const names = String(evaluate(attrs['placeholder-class'], scope)).trim();
+    for (const name of names.split(/\s+/).filter(Boolean)) placeholderClasses.add(name);
+    renderedAttrs += ` data-preview-placeholder-class="${html(names)}"`;
+  }
+  // HTML accessibility here is a faithful diagnostic mapping of source
+  // attributes, not evidence of WeChat screen-reader behavior.
+  for (const [name, value] of Object.entries(attrs)) {
+    if (name === 'role' || name.startsWith('aria-')) renderedAttrs += ` ${name === 'aria-role' ? 'role' : name}="${html(evaluate(value, scope))}"`;
+  }
   if ('hidden' in attrs && truth(attrs.hidden, scope)) renderedAttrs += ' hidden';
   let style = evaluate(attrs.style || '', scope);
   if (node.name === 'switch' && attrs.color) style += `;accent-color:${evaluate(attrs.color, scope)};`;
@@ -190,7 +205,9 @@ function renderNode(node, scope, context) {
   if (node.name === 'switch') renderedAttrs += ` type="checkbox" ${truth(attrs.checked || '', scope) ? 'checked' : ''}`;
   if (node.name === 'checkbox') renderedAttrs += ` type="checkbox" value="${html(evaluate(attrs.value || '', scope))}" style="width:20px;height:20px;accent-color:${html(evaluate(attrs.color || '#008D55', scope))}" ${truth(attrs.checked || '', scope) ? 'checked' : ''}`;
   if (node.name === 'input') renderedAttrs += ` value="${html(evaluate(attrs.value || '', scope))}" placeholder="${html(evaluate(attrs.placeholder || '', scope))}"`;
-  if (node.name === 'button' && truth(attrs.disabled || '', scope)) renderedAttrs += ' disabled';
+  if (['button', 'input', 'textarea', 'switch', 'checkbox'].includes(node.name) && truth(attrs.disabled || '', scope)) renderedAttrs += ' disabled';
+  if (node.name === 'picker' && truth(attrs.disabled || '', scope)) renderedAttrs += ' aria-disabled="true"';
+  if (node.name === 'picker') renderedAttrs += ' data-preview-native="picker"';
   if (node.name === 'button' && attrs.type) renderedAttrs += ` type="${html(evaluate(attrs.type, scope))}"`;
   if (node.name === 'button' && attrs.size) renderedAttrs += ` size="${html(evaluate(attrs.size, scope))}"`;
   if (node.name === 'button' && attrs.bindtap) renderedAttrs += ` data-preview-action="${html(attrs.bindtap)}"`;
@@ -207,6 +224,17 @@ function cssFile(relative) {
 function htmlElementSelectors(css) {
   const tags = { page: 'body', view: 'div', text: 'span', image: 'img', 'scroll-view': 'div', checkbox: 'input[type="checkbox"]' };
   return css.replace(/([^{}]+)\{/g, (_, selectors) => selectors.replace(/(^|[\s>+~,])(page|view|text|image|scroll-view|checkbox)(?=[\s>+~,.#:[\]]|$)/g, (match, before, tag) => before + tags[tag]) + '{');
+}
+function htmlPlaceholderSelectors(css) {
+  // Reuse the exact source declaration in its component/theme scope. Merely
+  // putting placeholder-class on the HTML input styles its value, not its hint.
+  return css.replace(/([^{}]+)\{/g, (_, selectors) => {
+    if (selectors.trim().startsWith('@')) return selectors + '{';
+    return selectors.split(',').flatMap(selector => {
+      const mapped = selector.replace(/\.([a-zA-Z_][\w-]*)/g, (match, name) => placeholderClasses.has(name) ? `[data-preview-placeholder-class~="${name}"]` : match);
+      return mapped === selector ? [selector] : [selector, mapped.trimEnd() + '::placeholder'];
+    }).join(',') + '{';
+  });
 }
 const rawCatalog = JSON.parse(fs.readFileSync(path.join(project, 'catalog/products.json'), 'utf8'));
 const rawStores = JSON.parse(fs.readFileSync(path.join(project, 'catalog/stores.json'), 'utf8'));
@@ -270,7 +298,7 @@ if (membershipNativePreview) {
 }
 if (orderRecordsPreview) scenarios.splice(0, scenarios.length, 'orders-single', 'orders-deleting', 'orders-clearing', 'orders-error', 'orders-pending', 'orders-empty', 'orders-legacy');
 if (sheetPreview) {
-  scenarios.splice(0, scenarios.length, 'sheet-edit', 'sheet-keyboard', 'sheet-longcontent', 'sheet-saving');
+  scenarios.splice(0, scenarios.length, 'sheet-edit', 'sheet-keyboard', 'sheet-longcontent', 'sheet-saving', 'sheet-search');
   widths.splice(0, widths.length, 320, 375, 390, 430, 600, 768, 1024);
 }
 if (releaseNotesPreview) scenarios.splice(0, scenarios.length, 'free', 'member', 'release-middle', 'release-last', 'release-collapsed', 'longcontent');
@@ -325,22 +353,29 @@ if (v2Preview) {
   scenarios.splice(0, scenarios.length, ...Object.keys(v2Pages));
   widths.splice(0, widths.length, 320, 375, 390, 430, 768, 1024);
 }
+if (v343Preview) {
+  scenarios.splice(0, scenarios.length, ...Object.keys(v343Scenarios));
+  widths.splice(0, widths.length, 320, 375, 390, 430, 768, 1024);
+}
 const names = nudgePreview ? { mine: '我的' } : alternativesPreview ? { query: '查询' } : notificationTestPreview ? { 'notification-test': '体验微信提醒' } : adminPreview ? { admin: '运营工具' } : onboardingPreview ? { query: '查询' } : paymentPreview || orderRecordsPreview ? { mine: '我的' } : historyDataPreview ? { history: '历史' } : historyTaskPreview ? { history: '历史', mine: '我的' } : stockPreview || monitoringPreview ? { follow: '小哨提醒' } : reminderPreview || redemptionPreview || releaseNotesPreview ? { mine: '我的' } : { query: '查询', follow: '小哨提醒', history: '历史', mine: '我的' };
 if (v2Preview) names.guide = '使用攻略';
 if (v2Preview) names['notice-board'] = '公告与服务';
+if (v343Preview) names['notice-board'] = '公告与服务';
 if (sheetPreview) delete names.mine;
 if (monitoringPreview) scenarios.push('monitor-no-follows', 'monitor-all-paused', 'monitor-user-disabled', 'monitor-dnd', 'monitor-free-account', 'monitor-alert', 'monitor-dual-ready', 'monitor-dual-soldout-empty', 'monitor-dual-restock-empty', 'monitor-dual-soldout-low', 'monitor-dual-pending', 'monitor-dual-native', 'monitor-dual-sync-error', 'monitor-dual-storage-error');
 fs.mkdirSync(out, { recursive: true });
 const manifest = [];
 
 for (const scenario of scenarios) {
+  const v343Fixture = v343Preview ? v343Scenarios[scenario] : null;
+  const sheetScenario = sheetPreview || Boolean(v343Fixture?.sheet);
   const cityPreview = scenario.startsWith('alternatives-city-');
-  const stores = sheetPreview ? (rawStores.stores || rawStores)
+  const stores = sheetScenario ? (rawStores.stores || rawStores)
     : cityPreview ? (rawStores.stores || rawStores).filter(store => ['合肥', '北京'].includes(store.city)) : previewStores;
-  now = scenario.startsWith('v2-promotion-expired-') ? new Date('2026-11-30T16:00:00.000Z') : defaultPreviewDate;
+  now = v343Fixture?.date ? new Date(v343Fixture.date) : scenario.startsWith('v2-promotion-expired-') ? new Date('2026-11-30T16:00:00.000Z') : defaultPreviewDate;
   const products = copy(baseProducts);
   if (['longcontent', 'history-longcontent', 'sheet-longcontent', 'v2-longcontent'].includes(scenario)) { const p = products.find(p => p.partNumber === sample.partNumber); p.title += ' · 超长商品名称与配置说明用于检查换行及小屏布局 ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; }
-  const p = scenario === 'v2-new-product' ? products.find(item => item.familyKey === 'iphone-duo') : products.find(p => p.partNumber === sample.partNumber), member = v2Preview ? ['v2-member', 'v2-paid-unconfigured', 'v2-longcontent'].includes(scenario) || scenario.startsWith('v3-') : nudgePreview ? true : alternativesPreview ? scenario !== 'alternatives-free' : historyTaskPreview ? ['history-member-reward', 'history-longcontent'].includes(scenario) : monitoringPreview ? !['monitor-expired-paused', 'monitor-free-account'].includes(scenario) : stockPreview ? scenario !== 'stock-restricted' : ['member', 'longcontent'].includes(scenario), expired = scenario === 'expired' || scenario === 'monitor-expired-paused';
+  const p = scenario === 'v2-new-product' ? products.find(item => item.familyKey === 'iphone-duo') : products.find(p => p.partNumber === (v343Fixture?.partNumber || sample.partNumber)), member = v343Preview || (v2Preview ? ['v2-member', 'v2-paid-unconfigured', 'v2-longcontent'].includes(scenario) || scenario.startsWith('v3-') : nudgePreview ? true : alternativesPreview ? scenario !== 'alternatives-free' : historyTaskPreview ? ['history-member-reward', 'history-longcontent'].includes(scenario) : monitoringPreview ? !['monitor-expired-paused', 'monitor-free-account'].includes(scenario) : stockPreview ? scenario !== 'stock-restricted' : ['member', 'longcontent'].includes(scenario)), expired = scenario === 'expired' || scenario === 'monitor-expired-paused';
   if (!p) throw Error(`Missing catalog product for ${scenario}`);
   if (scenario === 'v2-new-product') Object.assign(p, { supported: false, comingSoon: true });
   const bootstrap = { identity: { userKey: 'preview:offline-user', openidMasked: 'preview…0001', isAdmin: true }, membership: { active: member, remainingMs: member ? 18 * 86400000 : 0, expiresAt: member ? new Date(now.getTime() + 18 * 86400000).toISOString() : expired ? '2026-09-10T07:00:00Z' : null },
@@ -363,7 +398,8 @@ for (const scenario of scenarios) {
   // Keep the former expiry-time fixtures as a future-date regression: current
   // discounted prices must no longer revert at the removed deadline.
   const promotion = { active: true, endsAt: null, timezone: 'Asia/Shanghai' };
-  if (paymentPreview || v2Preview) bootstrap.memberProducts = [
+  if (v343Preview) configureV343Bootstrap(bootstrap, v343Fixture, now);
+  if (paymentPreview || v2Preview || v343Preview) bootstrap.memberProducts = [
     { ...bootstrap.memberProduct, planId: 'member_7d', limits: { maxFollows: 3, maxStoresPerFollow: 3 } },
     { ...bootstrap.memberProduct, id: 'vip777', planId: 'member_30d', limits: { maxFollows: 4, maxStoresPerFollow: 4 }, title: '30 天会员', days: 30, priceFen: 1499, standardPriceFen: 3000, promotion, note: '一次性虚拟服务，一经售出不予退款。一次购买 30 天，已有会员按剩余有效期顺延，不自动续费。' },
     { ...bootstrap.memberProduct, id: 'vip888', planId: 'member_365d', limits: { maxFollows: 5, maxStoresPerFollow: 5 }, title: '365 天会员', days: 365, priceFen: 12900, standardPriceFen: 36000, promotion, note: '一次性虚拟服务，一经售出不予退款。一次购买 365 天，已有会员按剩余有效期顺延，不自动续费。' },
@@ -438,6 +474,8 @@ for (const scenario of scenarios) {
     response.latest = [{ ...response.results[0], status: 'unavailable' }];
   }
   const follows = scenario === 'empty' || scenario === 'free' ? [] : [{ followId: 'f-preview', partNumber: p.partNumber, productTitle: p.title, status: expired ? 'expired' : 'active', statusReason: expired ? 'membership_expired' : null, stores: response.results }];
+  if (v343Fixture?.retired) Object.assign(follows[0], { partNumber: 'offline-retired-mac', productTitle: '旧款 MacBook Pro 14 英寸', status: 'paused', statusReason: 'product_retired', productRetired: true,
+    stores: response.results.map(row => ({ ...row, status: 'available' })) });
   if (v2Preview) {
     if (['v2-free', 'v2-paid-unconfigured', 'v2-context-checkout', 'v2-new-product'].includes(scenario)) follows.length = 0;
     bootstrap.followCount = follows.length;
@@ -513,6 +551,7 @@ for (const scenario of scenarios) {
     { orderId: 'offline-paid-monthly', days: 30, amountFen: 1990, status: 'fulfilled', canClearRecord: true, fulfilledAt: now.toISOString() },
     { orderId: 'offline-payment-unconfirmed', days: 365, amountFen: 20000, status: 'paid', canClearRecord: false, clearRecordReason: 'payment_unconfirmed', paidAt: now.toISOString() },
   ] : [];
+  if (v343Preview) recordOrders = v343Orders(v343Fixture, now);
   if (scenario === 'orders-single') recordOrders = recordOrders.slice(0, 1);
   if (scenario === 'orders-empty') recordOrders = recordOrders.slice(0, 2);
   if (scenario === 'orders-pending') recordOrders = recordOrders.slice(1);
@@ -559,7 +598,7 @@ for (const scenario of scenarios) {
       return completeHistoryTask();
     }
     if (action === 'quota.ledger') return { balance: bootstrap.quota.balance, entries: copy(ledgerEntries) };
-    if (action === 'member.status') return { orders: orderRecordsPreview ? copy(recordOrders) : previewOrder.orderId ? [copy(previewOrder)] : [] };
+    if (action === 'member.status') return { orders: orderRecordsPreview || v343Preview ? copy(recordOrders) : previewOrder.orderId ? [copy(previewOrder)] : [] };
     if (action === 'member.deleteRecord' || action === 'member.clearRecords') {
       if (scenario === 'orders-error') throw Error('offline preview timeout');
       const hiddenOrderIds = payload.orderIds || [payload.orderId];
@@ -609,6 +648,10 @@ for (const scenario of scenarios) {
   if (scenario === 'notification-test-pending-other') rt.storage.set(`gxs_notification_test_v1:${encodeURIComponent(bootstrap.identity.userKey)}`, {
     requestId: 'offline-pending-test', templateId: 'offline-notification-template', decision: 'accept', ownerUserKey: bootstrap.identity.userKey,
   });
+  if (v343Preview) {
+    rt.wx.getSetting = options => options.success({ subscriptionsSetting: { mainSwitch: true, itemSettings: { 'offline-v343-restock': v343Fixture.consentRejected ? 'reject' : 'accept', 'offline-v343-soldout': 'accept' } } });
+    rt.load('utils/reminder-credits.js').refreshConsentSetting();
+  }
   const catalog = adminPreview || notificationTestPreview ? null : await rt.load('utils/store.js').getCatalog({ force: true });
   if (v2Preview && ['v2-paid-unconfigured', 'v2-context-checkout', 'v2-longcontent'].includes(scenario)) {
     const saved = rt.load('utils/checkout-context.js').createCheckoutContext({ wx: rt.wx, now: () => now.getTime() })
@@ -617,6 +660,7 @@ for (const scenario of scenarios) {
   }
   for (const pageName of Object.keys(names)) {
     if (v2Preview && !v2Pages[scenario].includes(pageName)) continue;
+    if (v343Preview && !v343Fixture.pages.includes(pageName)) continue;
     const page = rt.instantiate(`pages/${pageName}/index.js`);
     if (['payment-pending-monthly', 'payment-member-pending-monthly'].includes(scenario)) page.setData({ selectedPlanId: 'member_365d' });
     if (pageName === 'follow' && scenario === 'monitor-alert') Object.assign(rt.app.globalData, { pendingAlert: 'preview-event', handledAlerts: [] });
@@ -626,7 +670,7 @@ for (const scenario of scenarios) {
       : scenario === 'notification-test-pending-other' ? { requestId: notificationTest.requestId } : undefined);
     // Notification feedback requires a visible page, just like an actual tap
     // in WeChat. onLoad alone now intentionally represents a hidden preload.
-    if ((alternativesPreview || notificationTestPreview || v2Preview) && scenario !== 'notification-test-loading' && typeof page.onShow === 'function') await page.onShow();
+    if ((alternativesPreview || notificationTestPreview || v2Preview || v343Preview) && scenario !== 'notification-test-loading' && typeof page.onShow === 'function') await page.onShow();
     if (v2Preview && pageName === 'mine') await page.restoreCheckoutContext();
     if (scenario.startsWith('v3-dnd-')) {
       page.onToggleReminderSettings();
@@ -801,10 +845,10 @@ for (const scenario of scenarios) {
     }
     const selected = { partNumber: p.partNumber, product: p, storeNumbers: stores.slice(0, cityPreview ? 1 : 2).map(s => s.storeNumber), stores: stores.slice(0, cityPreview ? 1 : 2) };
     if ((pageName === 'query' || pageName === 'history') && !['loading', 'v2-calendar-modal'].includes(scenario)) {
-      page.setData({ pickerValue: { partNumber: p.partNumber, storeNumbers: selected.storeNumbers }, dayKey: v2Preview ? '2026-10-11' : '2026-09-15' });
+      page.setData({ pickerValue: { partNumber: p.partNumber, storeNumbers: selected.storeNumbers }, dayKey: v343Preview ? new Date(now.getTime() + 8 * 3600000).toISOString().slice(0, 10) : v2Preview ? '2026-10-11' : '2026-09-15' });
       page.onPickerChange({ detail: selected });
       if (pageName === 'query') {
-        if (alternativesPreview || v2Preview && scenario !== 'v2-new-product' || ['member', 'longcontent', 'expired'].includes(scenario)) page.onDoneSelection();
+        if (v343Preview || alternativesPreview || v2Preview && scenario !== 'v2-new-product' || ['member', 'longcontent', 'expired'].includes(scenario)) page.onDoneSelection();
       }
       if (alternativesPreview || historyDataPreview || v2Preview && !scenario.startsWith('v331-history-claim-') && !['v2-new-product', 'v2-restricted', 'v2-paid-unconfigured'].includes(scenario) || ['member', 'longcontent', 'expired', 'empty'].includes(scenario)) await page.onQuery();
     }
@@ -864,7 +908,7 @@ for (const scenario of scenarios) {
       sharedTargetError: scenario === 'onboarding-share-error' ? '商品目录刷新失败，可稍后重试，当前选择已保留。' : null,
     });
     if (scenario === 'error') { if (pageName === 'admin') page.setData({ allowed: false, checked: true, accessError: '模拟错误：网络连接中断，无法完成权限校验。请检查网络后重新加载。' }); else page.setData({ loadError: '模拟错误：云环境连接超时。请检查网络或稍后重试。request-id-abcdefghijklmnopqrstuvwxyz0123456789' }); }
-    if (sheetPreview) {
+    if (sheetScenario) {
       if (pageName === 'follow') {
         page.onEdit({ currentTarget: { dataset: { id: follows[0].followId } } });
         // Rendering a slotted component alone does not deliver its native
@@ -876,7 +920,10 @@ for (const scenario of scenarios) {
       else page.onEditSelection();
       if (scenario === 'sheet-saving' && pageName === 'follow') page.setData({ saving: true });
     }
+    if (v343Preview) await prepareV343Page({ fixture: v343Fixture, page, pageName, follows });
     let expectedV2Text = [], forbiddenText = [];
+    const v343Text = v343Preview ? v343TextExpectations({ fixture: v343Fixture, pageName, product: p }) : null;
+    if (v343Text) forbiddenText.push(...v343Text.forbidden);
     if (stockPreview) forbiddenText.push('观测已过期，当前库存待新观测确认。', '上次有效结果：', '到货提醒已就绪', '查最新库存', ...(!stockScenarios[scenario].expanded ? ['单独查询库存'] : []));
     if (sheetPreview) forbiddenText.push('确认此配置', '配置待确认', '请确认下方配置后保存');
     if (v2Preview) {
@@ -965,7 +1012,7 @@ for (const scenario of scenarios) {
     }
     const ast = parse(fs.readFileSync(path.join(mini, `pages/${pageName}/index.wxml`), 'utf8'));
     const nudge = nudgePreview ? { title: scenario === 'nudge-both' ? '补充到货和断货提醒次数' : '补充到货提醒次数', restockCount: 1, soldoutCount: scenario === 'nudge-both' ? 0 : 15, soldoutEnabled: scenario !== 'nudge-one', detail: '已有次数会保留。每项选择「允许」增加 1 次，消息发送后消耗对应次数。' } : null;
-    const rendered = renderNode(ast, page.data, { rt, nudge, keyboardHeight: scenario === 'sheet-keyboard' ? 280 : 0 });
+    const rendered = renderNode(ast, page.data, { rt, nudge, keyboardHeight: scenario === 'sheet-keyboard' ? 280 : 0, pickerSearch: scenario === 'sheet-search' ? '上海' : '' });
     if (alternativesPreview && !rendered.includes('选择可接受的颜色与门店')) throw Error('Manual alternative choices were hidden');
     const componentCss = adminPreview ? '' : cssFile('components/target-picker/index.wxss').replace(/\/\*[\s\S]*?\*\//g, '').replace(/([^{}]+)\{/g, (_, selectors) => selectors.trim().startsWith('@') ? `${selectors}{` : selectors.split(',').map(selector => `.component-target-picker ${selector.trim()}`).join(',') + '{');
     const tabIndex = appConfig.tabBar.list.findIndex(tab => tab.pagePath === `pages/${pageName}/index`);
@@ -975,12 +1022,12 @@ for (const scenario of scenarios) {
     const tabCss = nativeTabs.css;
     const rawCss = `${buttonConstraintCss}\n${cssFile('app.wxss')}\n${cssFile(`pages/${pageName}/index.wxss`)}\n${componentCss}\n${adminPreview ? '' : cssFile('components/config-sheet/index.wxss') + cssFile('components/reminder-nudge/index.wxss') + cssFile('components/reminder-authorization/index.wxss')}\n${tabCss}`;
     for (const width of widths) {
-      const css = htmlElementSelectors(rawCss.replace(/(-?[\d.]+)rpx/g, (_, value) => { const pixels = Number(value) * width / 750; return `${roundRpx ? Math.round(pixels) : pixels}px`; }));
+      const css = htmlPlaceholderSelectors(htmlElementSelectors(rawCss.replace(/(-?[\d.]+)rpx/g, (_, value) => { const pixels = Number(value) * width / 750; return `${roundRpx ? Math.round(pixels) : pixels}px`; })));
       const filename = `${pageName}-${scenario}-${width}.html`;
       const tabbar = nativeTabs.markup;
       const body = `<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${names[pageName]} · ${scenario} · ${width}px 离线预览</title><style>html{width:${width}px;max-width:100%;margin:0 auto}body{margin:0}button,input,textarea{font:inherit}button{cursor:default}img{display:block}input[type=checkbox]{width:36px;height:22px;flex:none;accent-color:#1ba35a}.simulation{position:sticky;top:0;z-index:10;padding:8px 12px;background:#fff2ce;color:#705000;font:11px/1.5 sans-serif;border-bottom:1px solid #ead49c}.native-nav{text-align:center;padding:16px;font:600 15px sans-serif}${navCss('light')}${theme ? `@media (prefers-color-scheme: dark){${navCss('dark')}}` : ''}${css}</style><div class="simulation">离线模拟 · ${width}px · ${scenario}${membershipNativePreview || notificationTestPreview ? ' · 184px按钮级联压力' : ''} · 使用实际 WXML/WXSS；不代表微信实测或实时库存</div><div class="native-nav">果小哨 · ${names[pageName]}</div>${rendered}${tabbar}<script>window.previewAudit=()=>({width:innerWidth,scrollWidth:document.documentElement.scrollWidth,overflow:[...document.querySelectorAll('body *')].filter(e=>{const r=e.getBoundingClientRect();return r.width&&r.right>document.documentElement.clientWidth+1&&getComputedStyle(e.parentElement).overflowX!=='auto'}).map(e=>({tag:e.tagName,class:e.className,right:e.getBoundingClientRect().right,text:e.textContent.slice(0,60)}))});</script></html>`;
       fs.writeFileSync(path.join(out, filename), body, 'utf8');
-      const expectedText = v2Preview ? expectedV2Text : alternativesPreview ? [p.title,
+      const expectedText = v343Preview ? [...v343Text.expected] : v2Preview ? expectedV2Text : alternativesPreview ? [p.title,
         '选择可接受的颜色与门店', '同机型、同容量', ...(cityPreview ? [] : ['同城门店']), '勾选不扣次', '切换城市',
         ...{
           'alternatives-default': ['先选可接受的颜色', '本次查询门店'],
@@ -1076,11 +1123,32 @@ for (const scenario of scenarios) {
       ] : scenario === 'loading' ? [{ query: '正在加载商品目录', follow: '正在读取你的关注', history: '正在加载商品目录', mine: '正在读取账户信息' }[pageName]]
         : scenario === 'error' ? [pageName === 'admin' ? '模拟错误：网络连接中断' : '模拟错误：云环境连接超时', '暂时没有连上', '重试']
         : pageName === 'mine' ? [member ? '果小哨会员' : expired ? '会员已到期' : '让小哨持续帮你留意', ...(page.data.showPurchaseShop ? page.data.membership.active ? ['延长会员', '升级套餐'] : ['开通会员'] : ['会员购买暂不可用，现有会员权益不受影响。']), '会员权益与购买规则', '提醒记录', ...(reminderPreview && reminderRecords.length ? ['删除记录', scenario === 'reminder-clearing' ? '清空中' : '清空'] : [])]
-        : pageName === 'follow' && follows.length ? [p.title, '2 家门店', ...(page.data.follows.some(follow => follow.detailsExpanded) ? [stores[0].name, '收起详情', '调整', '查看供应历史', '删除关注'] : ['详情与管理']), ...(sheetPreview ? ['调整关注', '选商品', '选门店', '已选门店', p.title + ' · 2 家门店', scenario === 'sheet-saving' ? '正在保存' : '保存关注'] : [])]
+        : pageName === 'follow' && follows.length ? [p.title, '2 家门店', ...(page.data.follows.some(follow => follow.detailsExpanded) ? [stores[0].name, '收起详情', '调整', '查看供应历史', '删除关注'] : ['详情与管理']), ...(sheetPreview ? ['调整关注', '选商品', '选门店', '已选 2 家门店', p.title + ' · 2 家门店', scenario === 'sheet-saving' ? '正在保存' : '保存关注'] : [])]
         : pageName === 'follow' ? ['给心仪的配置留个小哨']
-        : pageName === 'admin' ? ['运行统计', '128'] : [p.title, ...(sheetPreview ? ['选商品', '选门店', '已选门店'] : [])];
+        : pageName === 'admin' ? ['运行统计', '128'] : [p.title, ...(sheetPreview ? ['选商品', '选门店', '已选 2 家门店', '保存选择'] : [])];
       if (adminPreview && ['operator-ready', 'operator-longcontent'].includes(scenario)) expectedText.push('成功查询 56', '查看提醒详情 12', '测试通知：28 条／20 人', '各行为分别计数', ...(scenario === 'operator-longcontent' ? ['以上不是完整统计'] : []));
-      if (sheetPreview) expectedText.push('上海', '北京', '深圳', '广州', '杭州', '成都');
+      if (sheetPreview) {
+        const pickerLimit = pageName === 'history' ? 10 : pageName === 'follow' ? page.data.limits.maxStoresPerFollow : page.data.boot.maxStores;
+        expectedText.push(`当前最多 ${pickerLimit} 家`, p.partNumber);
+        if (scenario === 'sheet-search') {
+          // Active search replaces the city chips with matching stores. Assert
+          // the visible search state, rather than demanding hidden city names.
+          const { storeMatches } = rt.load('utils/catalog-order.js');
+          const matches = Object.values(catalog.storeByNumber).filter(store => storeMatches(store, '上海'));
+          if (!matches.length) throw Error('The Shanghai search fixture requires matching catalog stores');
+          expectedText.push('清空', `找到 ${matches.length} 家门店`, '上海', matches[0].name);
+        } else expectedText.push('上海', '北京', '深圳', '广州', '杭州', '成都');
+        // The compact Mac header is not its full identity: retain assertions
+        // for the full product title above, exact SKU and each real dimension.
+        // Mac mini / Studio have no color dimension; do not invent one here.
+        if (p.category === 'mac') {
+          const attributes = p.attributes || {};
+          expectedText.push('具体配置', ...['chipName', 'chip', 'finish'].map(key => attributes[key]).filter(Boolean));
+          for (const [key, label] of [['memory', '内存'], ['capacity', '容量'], ['color', '颜色']]) {
+            if (attributes[key]) expectedText.push(label, attributes[key]);
+          }
+        }
+      }
       if (nudgePreview) expectedText.push('补充提醒次数', '稍后再说', '24 小时内不再主动提示');
       if (releaseNotesPreview) expectedText.push('更新公告', ...(page.data.showReleaseNotes ? [
         ...page.data.visibleReleaseNotes.map(entry => `v${entry.version}`), '上一页', '下一页', '收起',
@@ -1133,7 +1201,7 @@ for (const scenario of scenarios) {
         authorizationPending: Boolean(stockScenarios[scenario].authorizationPending),
       } : undefined;
       const expectedLaunchPoster = pageName === 'guide' ? false : undefined;
-      manifest.push({ page: pageName, scenario, width, file: filename, tabPage: tabIndex >= 0, navigationHidden, previewDate: now.toISOString(), expectedText, forbiddenText, expectedAlternativeCounts, expectedDndPeriodCount, expectedReleaseNoteCount, expectedMembership, expectedNotification, expectedStock, expectedLaunchPoster });
+      manifest.push({ page: pageName, scenario, width, file: filename, tabPage: tabIndex >= 0, navigationHidden, previewDate: now.toISOString(), pickerSheet: sheetScenario, fixture: v343Fixture, expectedText, forbiddenText, expectedAlternativeCounts, expectedDndPeriodCount, expectedReleaseNoteCount, expectedMembership, expectedNotification, expectedStock, expectedLaunchPoster });
     }
   }
 }

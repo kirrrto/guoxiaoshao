@@ -33,7 +33,7 @@ function fixture(existingIds) {
   return { repo, calls };
 }
 
-for (const [method, collection] of [['getUsers', C.users], ['getLatest', C.latest]]) {
+for (const [method, collection] of [['getUsers', C.users], ['getLatest', C.latest], ['getProducts', C.catalogProducts]]) {
   test(`${method} reads 21/100/101/245 IDs without an empty boundary page`, async t => {
     for (const count of [21, 100, 101, 245]) await t.test(String(count), async () => {
       const requested = ids(count), f = fixture(requested);
@@ -91,7 +91,7 @@ test('installed wx-server-sdk encodes 100-ID reads with their exact limits and n
   };
   try {
     const repo = createCloudbaseRepo(db), summary = [];
-    for (const [method, collection] of [['getUsers', C.users], ['getLatest', C.latest]]) {
+    for (const [method, collection] of [['getUsers', C.users], ['getLatest', C.latest], ['getProducts', C.catalogProducts]]) {
       for (const count of [0, 21, 100, 101, 245]) {
         requests.length = 0;
         const requested = ids(count), result = await repo[method](requested);

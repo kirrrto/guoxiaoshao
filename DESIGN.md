@@ -1,0 +1,152 @@
+---
+name: 果小哨
+description: 以清晰层级和原生控件完成选配、库存查询、关注与提醒
+colors:
+  primary: "#00C375"
+  primary-ink: "#073C2C"
+  accent-text: "#007A49"
+  background: "#F6F8F7"
+  card: "#FFFFFF"
+  surface-soft: "#F2F6F4"
+  text: "#182A23"
+  text-secondary: "#52665B"
+  text-muted: "#5C6E65"
+  line: "#E2E9E5"
+  warning: "#895806"
+  warning-surface: "#FFF2D5"
+  danger: "#A83E3E"
+  danger-surface: "#FCECED"
+  dark-background: "#101713"
+  dark-card: "#1B251F"
+  dark-text: "#E7EFE9"
+  dark-text-secondary: "#B7C8BD"
+  dark-text-muted: "#A8B8AE"
+  dark-accent-text: "#56DDA4"
+typography:
+  body:
+    fontFamily: '-apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", Helvetica, sans-serif'
+    fontSize: "28rpx"
+    lineHeight: 1.5
+  title:
+    fontSize: "32rpx"
+    fontWeight: 600
+  label:
+    fontSize: "max(12px, 24rpx)"
+rounded:
+  card: "28rpx"
+  action: "24rpx"
+spacing:
+  page-inline: "24rpx"
+  card-padding: "30rpx"
+  card-gap: "26rpx"
+  action-gap: "16rpx"
+components:
+  button-primary:
+    backgroundColor: "{colors.primary}"
+    textColor: "{colors.primary-ink}"
+    rounded: "{rounded.action}"
+  card:
+    backgroundColor: "{colors.card}"
+    textColor: "{colors.text}"
+    rounded: "{rounded.card}"
+    padding: "{spacing.card-padding}"
+---
+
+# 果小哨设计基准
+
+## Overview
+
+**Creative North Star: "让布局本身来传达信息"**
+
+保留现有绿色、中文系统字体和微信原生交互。让商品配置、库存观测与下一步操作各有清晰位置；优先使用层级、间距和一致控件，减少不必要的次要标签与重复说明。简洁不能删去影响购买、授权、到期、退款或库存判断的事实。
+
+本规范于 2026-10-28 按 3.4.3 原生 WXML/WXSS 合并更新，供后续界面工作持续沿用。前置颜色、文字与形状取自 [app.wxss](miniprogram/app.wxss) 和 [common.wxss](miniprogram/styles/common.wxss)；新增样式复用这些语义变量，修改公共值时同步核对规范。隔离组件的局部样式和深色覆盖仍需分别检查。
+
+实际参考为 [shadcn/create preset b2BnwlLhw](https://ui.shadcn.com/create?preset=b2BnwlLhw)：Vega、Neutral、Emerald、medium radius、Noto Sans、Lucide。已在真实浏览器配置并导出 [preset](evidence/design/2026-10-28/shadcn-preset.json) 与 [CSS](evidence/design/2026-10-28/shadcn-preset.css)，随后用固定 shadcn 4.23.0 在独立目录生成 Vite 参照，构建并比对浅深色共 63 个变量，差异为零；命令、版本、[源码归档](evidence/design/2026-10-28/shadcn-reference-source.zip) 的重建方法与哈希见 [验证记录](evidence/design/2026-10-28/shadcn-cli-verification.json)。采用其控件层级、成对语义颜色和状态组织；小程序继续使用自己的颜色、字体、原生组件及精确 SKU，不移植 React、Tailwind、OKLCH 或 Web DOM 状态规则。Web 参照本身不证明微信实现通过验收。
+
+同时保留 [规范草稿 PR #7](https://github.com/kirrrto/guoxiaoshao/pull/7) 中适用的方法；本地采用不代表远端合并。后续复核以当前源码、渲染结果与会话授权为准，不把外部方案当作实施事实。
+
+## Colors
+
+主绿用于主要操作、当前选中及有依据的状态；中性色承载内容和分组。语义色按前景与背景成对选择，不能只替换填充色。
+
+- `--action-fill` / `--action-text` 定义主按钮，`--green-dark` 用于浅色表面的强调文字。保持两者分工，不能统一改成绿底白字。
+- Web 预设的 `primary` 首先是填充角色，不能直接当作普通文字色。本次独立参照的深色检查已暴露这种误用；标题和普通标签使用其前景语义，不能以主题变量成功生成或完全一致推定对比度合格。
+- `--green-mist` 是页面底色，`--card` 是内容面，`--surface-soft` 是次级分组，`--line` 是边界。避免同一段信息重复套卡片。
+- `--text`、`--text-2`、`--text-3` 区分正文与辅助信息；有货、未知、陈旧、故障和暂停仍须有文字或图形表达，颜色不能独自传递含义。
+- 警示使用 `--warn` / `--warn-soft`，错误或删除使用 `--bad` / `--bad-soft`。普通活动不占用故障视觉优先级。
+- 深色跟随系统主题。使用现有主题覆盖，并在实际叠加后的背景上检查正文、按钮、占位文字和状态颜色；浅色通过不能推定深色通过。
+
+## Typography
+
+正文、标题、按钮和数据沿用同一套系统字体。SKU 等需要逐字符辨识的信息可使用项目现有等宽样式；不要因 Web 参照使用 Noto Sans 而给小程序引入新字体资源。
+
+标题用字重和少量字号差建立层级，辅助文字保持可读。基础字号见前置 tokens；会随屏宽缩小的 `rpx` 文字，在受影响的功能区域使用已有的 `max(px, rpx)` 下限，避免靠缩字塞下内容。抽屉底部摘要、关注卡片的状态、观测时间、反馈及展开入口等功能文字，在 320px 离线场景下至少保持 12 CSS px；主要选项和输入优先沿用组件中更大的字号。
+
+12px 是当前离线检查的最低门槛，不是推荐正文大小，也不代表所有旧页面或微信真机已满足可读性要求。长配置、长门店名、1.3 倍字号需要换行和布局调整；关键事实不能仅靠截断展示。
+
+## Layout
+
+保留查询、小哨、历史、我的四个原生 tab，以及无需先查询即可直接关注的路径。页面按“当前选择或状态 → 主要操作 → 可展开详情”组织；会员区优先核心权益、当前套餐与实际名额，规则按组折叠。
+
+复用公共页边距、卡片间距和操作间距，不为单个页面另造一套密度。行内容允许收缩或换行；窄屏按实际可用宽度调整选项列数。抽屉正文独立滚动，摘要和操作区域保持可见，并考虑键盘、短窗口和底部安全区，不能遮挡保存或关闭入口。
+
+常用选项、主操作及清空搜索等小动作，以真实可点击区域至少 44 × 44 CSS px 作为离线检查门槛。不能只增大图标或在 CSS 中声明高度而不检查渲染后的尺寸。44px 门槛与 12px 文字下限均须在微信开发者工具及真机复验，不是原生认证。
+
+至少检查受影响路径在 320/375/430px、浅深色、1.3 倍字号、短窗口、键盘及安全区下的离线近似结果。具体覆盖与未验证项写进本次交付记录，不把这些场景列为已通过的默认结论。
+
+## Elevation & Depth
+
+默认用底色、留白和细边界区分层级，公共卡片使用现有 `--shadow-soft` 的轻阴影。抽屉与遮罩表达临时操作层，不能用重阴影或装饰性渐变补救信息层级。
+
+保持静态页面表面，不依赖整页滤镜、动画渐变或背景模糊；按下、展开和加载反馈应短且服务状态变化，不为装饰增加云请求或轮询。深色阴影和遮罩需要独立查看，不能让正文与底层内容混成一层。
+
+## Shapes
+
+卡片和主操作复用 `--radius-card`、`--radius-action`；选项、搜索框、内部分组沿用各组件现有较小圆角。用一致形状让按钮、可选项和静态标签容易区分，不把所有信息都做成胶囊或可点击卡片。
+
+边界与选中态使用既有 `--line`、绿色描边和选中标记。图片保持比例，加载失败使用明确占位；深色商品图底板保留现有对比度处理，不用裁切掩盖图片缺失或替代配置差异。
+
+## Components
+
+### Buttons and selection controls
+
+主操作沿用主题绿实心按钮；展开、收起、跳转使用项目统一、可识别的按钮样式。保留默认、按下、选中、禁用、加载和错误反馈；有键盘或读屏入口时检查相应焦点和名称。禁用和加载不接受重复提交，处理函数再次校验，不只改变外观。
+
+原生 `view` 充当选择或清空控件时，使用微信支持的 `aria-role`、`aria-label`、`aria-disabled` 等语义；可访问名称说明当前选中与动作。装饰图形隐藏于读屏。离线 DOM 的 role 映射只辅助检查，不能替代原生可访问性验证。
+
+### Inputs and configuration sheet
+
+门店输入提供可访问名称、清空动作、空结果和就地错误。WXML 用 `placeholder-class` 声明占位样式；离线转换必须正确映射到占位文字并单独检查明暗主题对比度，不能拿输入框正文颜色代替占位颜色。
+
+选配抽屉中，同值点击保留精确配置；切换维度只在合法候选中保留偏好，确需回退时就地说明。Mac 标签优先表达芯片、核心与玻璃差异，完整 SKU 和配置有一处可查，不把不同 SKU 合并为同名。
+
+保存才提交，取消保留原目标。保存开始时同步锁定 picker 及输入，再传播禁用状态，避免异步属性更新的间隙继续改写草稿；成功、失败和关闭后的释放按实际流程处理。失败保留可恢复的草稿与明确重试动作，不能把一次失败显示成已保存。
+
+### Follow cards and inventory states
+
+卡片首先显示配置身份、库存观测及可执行动作。活跃、普通暂停、到期、名额受限与退役分别表达；暂停仍占已保存配置名额。退役提供改选、删除、历史，不承诺恢复，处理函数再次校验能力。
+
+有货、确定无货、未知、陈旧、读取失败保持不同含义，显示真实观测时间；刷新页面的时间不能替代库存观测时间。观测迟滞不能直接宣称接口故障。查询、关注、后台监测、微信授权、发送受理和真实收信分别表达，不能由前一步推定后一步成功。
+
+### Membership, notices and history
+
+当前套餐按服务端 `planId` 与真实数据展示，不按剩余天数或额度猜档位。购买前保留价格、时长、实际名额、续费及退款关键规则；提醒授权和到期规则保持可访问。新品礼遇的个人“已到账”只来自实际发放凭证，资格或公告不等于到账。
+
+维护或警告可以优先，普通活动不能遮住授权恢复或真实故障。我的页提醒折叠时刷新首屏，展开按新快照游标继续，不拼接旧尾页。版本公告遵守 [文案规则](.cursor/rules/product-copy.mdc)：用户可感知的变化、简短小结、每页三个版本及明确分页操作。
+
+## Do's and Don'ts
+
+### Do
+
+- **Do** 先读 [PRODUCT.md](PRODUCT.md)、本规范和 [持续检查流程](docs/IMPECCABLE_WORKFLOW.md)，复用当前组件与语义变量，在变更范围内核对层级、文案、状态、适配和一致性。
+- **Do** 让布局解释关系，把必要规则放到合适层级；在失败、空、未知、陈旧、加载及真实成功状态下逐一核对文案与动作。
+- **Do** 对参考方案和工具输出独立复核，记录采用、调整或不实施的理由；新增设计规范只收录已确认的产品约束与源码事实。
+- **Do** 在 [本轮优化进度](docs/OPTIMIZATION_3.4.3_PROGRESS.md) 或后续交付记录保存实际测试、证据位置和未验证项，分别陈述离线预览、微信编译、真机、云端、真实支付/收信、上传与发布。
+
+### Don't
+
+- **Don't** 用重复说明、装饰性徽章或另一套控件语言增加阅读负担；也不要为简洁删去影响购买、退款、授权、库存时效或恢复操作的关键事实。
+- **Don't** 将 Web 的字体、配色值、框架或 DOM 行为直接移入小程序，或把独立参照页的构建、截图和检测结果当作原生验收。
+- **Don't** 以减少采样、遗漏 unknown、缓存发送资格或虚构已完成状态制造体验或用量收益。
+- **Don't** 用离线字号、点击区域、颜色检查或 Impeccable 检测的通过结论关闭微信原生质检问题；本规范本身也不授权生产发放、部署、上传、合并或真实业务操作。

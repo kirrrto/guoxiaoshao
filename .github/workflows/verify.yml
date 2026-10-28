@@ -28,6 +28,8 @@ jobs:
           package-manager-cache: false
       - name: Install locked tooling dependencies
         run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Install Chromium for required browser regressions
+        run: npx --no-install playwright install --with-deps chromium
       - name: Install locked cloud function SDKs
         shell: bash
         run: |
@@ -37,8 +39,30 @@ jobs:
       - name: Verify generated monitor dependency closure
         run: node tools/build-monitor.mjs --check
       - name: Run offline tests
-        run: npm test
+        shell: bash
+        run: |
+          mkdir -p output
+          npm test 2>&1 | tee output/ci-tests.log
       - name: Check source encoding and syntax
         run: npm run check
+      - name: Verify current mini program UI in offline Chromium
+        shell: bash
+        run: |
+          node tools/ui-preview/build.mjs --v343-only --out output/ci-ui
+          node tools/ui-preview/check-layout.mjs output/ci-ui
+          node tools/ui-preview/check-layout.mjs output/ci-ui --dark
+          node tools/ui-preview/check-native-tabs.mjs output/ci-ui
+          node tools/ui-preview/check-native-tabs.mjs output/ci-ui --dark
+          node tools/ui-preview/check-picker-alignment.mjs output/ci-ui
+          node tools/ui-preview/check-theme-colors.mjs output/ci-ui output/ci-colors
+          node tools/ui-preview/check-theme-colors.mjs output/ci-ui output/ci-colors --dark
       - name: Check release candidate
-        run: node tools/release/check.mjs
+        run: node tools/release/check.mjs --out output/ci-release.json
+      - name: Preserve verification evidence even when release is blocked
+        if: always()
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5
+        with:
+          name: verification-${{ github.sha }}
+          path: output/ci-*
+          retention-days: 14
+          if-no-files-found: warn

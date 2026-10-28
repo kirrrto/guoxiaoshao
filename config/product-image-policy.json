@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "cardMaxEdge": 96,
+  "posterMaxEdge": 180,
+  "cardMaxBytes": 12288,
+  "posterMaxBytes": 65536,
+  "thumbnailMaxBytes": 184320,
+  "imageMaxBytes": 204800,
+  "mainPackageMaxBytes": 1572864,
+  "jpegQuality": 85,
+  "pngColors": 256,
+  "alphaClear": 16,
+  "alphaSolid": 224
+}

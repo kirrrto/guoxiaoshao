@@ -15,6 +15,7 @@ const catalog = JSON.parse(fs.readFileSync(path.join(root, 'catalog/products.jso
 const originals = JSON.parse(fs.readFileSync(path.join(root, `evidence/catalog/${catalog.imagesGeneratedAt.slice(0, 10)}/images.verification.json`), 'utf8'));
 const sha = data => createHash('sha256').update(data).digest('hex');
 const clone = value => JSON.parse(JSON.stringify(value));
+const policy = JSON.parse(fs.readFileSync(path.join(root, 'config/product-image-policy.json'), 'utf8'));
 
 // Packaged renditions must decode on phones: WeChat documents <image webp> for
 // network resources only, and packaged WebP failed in v3.3.1 phone previews.
@@ -62,14 +63,15 @@ test('actual packaged image headers, dimensions, byte budgets and source aspect 
     assert.deepEqual(imageSize(bytes, rendition.format), [rendition.width, rendition.height]);
     assert.equal(rendition.format, rendition.hasTransparency ? 'PNG' : 'JPEG', 'transparent art keeps alpha; opaque art uses JPEG');
     assert.ok(rendition.path.endsWith(rendition.format === 'PNG' ? '.png' : '.jpg'), rendition.path);
-    const edge = rendition.variant === 'poster' ? 720 : 216;
+    const edge = rendition.variant === 'poster' ? policy.posterMaxEdge : policy.cardMaxEdge;
     assert.ok(Math.max(rendition.width, rendition.height) <= edge);
     assert.ok(Math.abs(rendition.width - rendition.height * asset.sourceWidth / asset.sourceHeight) <= 1.5, 'preserve uncropped proportions');
-    assert.ok(bytes.length <= (rendition.variant === 'poster' ? 65536 : 12288));
+    assert.ok(bytes.length > 0 && bytes.length <= (rendition.variant === 'poster' ? policy.posterMaxBytes : policy.cardMaxBytes));
     total += bytes.length;
   }
   assert.equal(total, manifest.totalBytes);
-  assert.ok(total <= 750000);
+  assert.ok(total > 0 && total <= policy.thumbnailMaxBytes);
+  for (const field of ['cardMaxEdge', 'posterMaxEdge', 'cardMaxBytes', 'posterMaxBytes']) assert.equal(manifest[field], policy[field]);
   const files = directory => fs.readdirSync(directory, { withFileTypes: true }).flatMap(entry => entry.isDirectory() ? files(path.join(directory, entry.name)) : [path.join(directory, entry.name)]);
   assert.ok(files(path.join(root, 'miniprogram')).reduce((sum, file) => sum + fs.statSync(file).size, 0) < 2 * 1024 * 1024, 'raw main-package bytes must fit 2 MiB before compiler compression');
   assert.deepEqual(files(path.join(root, 'miniprogram')).filter(file => /\.webp$/i.test(file)), [], 'no packaged WebP: phone clients failed to render it');

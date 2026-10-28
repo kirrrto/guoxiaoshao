@@ -34,7 +34,7 @@
   font-size: 27rpx;
   line-height: 1.5;
 }
-.consent-recovery-name { color: var(--text-1); flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
+.consent-recovery-name { color: var(--text); flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
 .consent-recovery-state { color: var(--warn); font-weight: 650; flex: 0 0 auto; }
 .consent-recovery-action { margin-top: 16rpx; min-height: 44px; }
 .consent-recovery-steps {

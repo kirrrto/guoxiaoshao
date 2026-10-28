@@ -173,7 +173,7 @@ test('outage compensation and notice are active on 2026-10-21 and inactive on ot
   assert.equal(bootBefore.announcement, null);
   assert.equal(bootBefore.notices.length, 0);
 
-  const during = createFixture({ start: OUTAGE_TIME });
+  const during = createFixture({ start: OUTAGE_TIME, config: { collector: { enabled: true } } });
   const bootDuring = ok(await during.call('user.bootstrap'));
   assert.equal(bootDuring.membership.active, true);
   assert.equal(bootDuring.announcement.kind, 'recovery');
@@ -181,15 +181,33 @@ test('outage compensation and notice are active on 2026-10-21 and inactive on ot
   assert.match(bootDuring.announcement.text, /顺延 1 天会员时长/);
   assert.match(bootDuring.announcement.text, /1 天体验会员/);
 
-  // Frontend query page and notice board display the outage notice on 2026-10-21
+  // A dated recovery announcement is not evidence that a worker is healthy.
+  // This fixture initially has no collector checkpoint, so the actual service
+  // warning takes priority while the notice remains available on its board.
   let nowMs = Date.parse(OUTAGE_TIME);
   t.mock.method(Date, 'now', () => nowMs);
   const rt = runtime(async () => ({ ...bootDuring, announcement: null, notices: [] }));
   const queryPage = rt.instance('pages/query/index.js');
   queryPage.applyBoot(withOutageCompensationNotice({ ...bootDuring, announcement: null, notices: [] }, nowMs));
+  assert.equal(bootDuring.collector.state, 'not_deployed');
+  assert.equal(queryPage.data.queryNotice.source, 'collector');
+  assert.equal(queryPage.data.queryNotice.tone, 'warn');
+  assert.doesNotMatch(queryPage.data.queryNotice.text, /已恢复/);
+
+  await during.repo.saveCollectorStatus({ state: 'running', updatedAt: OUTAGE_TIME });
+  const recoveredBoot = ok(await during.call('user.bootstrap'));
+  assert.equal(recoveredBoot.collector.state, 'running');
+  queryPage.applyBoot(withOutageCompensationNotice({ ...recoveredBoot, announcement: null, notices: [] }, nowMs));
   assert.equal(queryPage.data.queryNotice.source, 'announcement');
   assert.equal(queryPage.data.queryNotice.tone, 'ok');
   assert.match(queryPage.data.queryNotice.text, /顺延 1 天会员时长/);
+
+  // A new failure supersedes an older recovery message immediately.
+  await during.repo.saveCollectorStatus({ state: 'error', updatedAt: OUTAGE_TIME });
+  const failedAgain = ok(await during.call('user.bootstrap'));
+  queryPage.applyBoot(failedAgain);
+  assert.equal(queryPage.data.queryNotice.source, 'collector');
+  assert.equal(queryPage.data.queryNotice.action, 'refresh');
 
   const boardPage = rt.instance('pages/notice-board/index.js');
   await boardPage.onLoad();

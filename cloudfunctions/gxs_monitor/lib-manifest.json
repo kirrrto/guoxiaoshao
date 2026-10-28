@@ -23,8 +23,8 @@
     },
     {
       "path": "collections.js",
-      "bytes": 4481,
-      "sha256": "66fdf0de6355a8c5c70ea973996863bd9f40024c0426b7510b659b5c49de309f"
+      "bytes": 4673,
+      "sha256": "88f844aca3d1f6923d637b651fb5df9e5341f523f9c40e1e73f0e399ee500a71"
     },
     {
       "path": "config-audit.js",
@@ -143,13 +143,13 @@
     },
     {
       "path": "repo/atomic-ops.js",
-      "bytes": 58603,
-      "sha256": "6e5803fa3b03994922f022038a84ce20d592b2c5ed7072480a297734f8edb4db"
+      "bytes": 53837,
+      "sha256": "bbcea37c67d2ae82426a7c22d8033bf64bdfc428a0a41aaaabf74a4ab23400f6"
     },
     {
       "path": "repo/cloudbase-repo.js",
-      "bytes": 26220,
-      "sha256": "2c0f6bad162411c64f965489467a1414b51285f23418d231a229a909de8f4dac"
+      "bytes": 27976,
+      "sha256": "e9109620d2e23509c243cac80fdae03daad0f6bb91fb1b0edf2ba928661469cb"
     },
     {
       "path": "repo/current-availability.js",
@@ -162,6 +162,11 @@
       "sha256": "ddcf61ba2d350a30d2894c0e0fd639da94c8a3e353e7bc7d2aaf9497526dbb0a"
     },
     {
+      "path": "repo/launch-gift.js",
+      "bytes": 5941,
+      "sha256": "604d855dd070bea263c84882522e97b99a6d98942d7c52d5a94a972c06ada1c0"
+    },
+    {
       "path": "repo/member-records.js",
       "bytes": 3367,
       "sha256": "0557422485ec544e7b5670777a43cc7dbc6579f42f44c76d4fd49f49dc2f14cc"
@@ -170,6 +175,11 @@
       "path": "repo/notification-test.js",
       "bytes": 8364,
       "sha256": "b35f800ad7ca02fbeb418c5cf834814468d5e6fae8709fef54b5517f8422c716"
+    },
+    {
+      "path": "repo/observation-storage.js",
+      "bytes": 15080,
+      "sha256": "af2a33d8a006ccd040c092d7ebc3a521605529f75161922c50f455f700cb8598"
     },
     {
       "path": "repo/query-target.js",
@@ -202,9 +212,14 @@
       "sha256": "f3c0ec53ed1337f3b496566698d340c75040d481ab7461a01d67e8dbccd8bd01"
     },
     {
+      "path": "rules/launch-gift.js",
+      "bytes": 6581,
+      "sha256": "628d30a3224a01b2447c37c5760f61f28631628aca3df9f2b079c0bf2f7c35c5"
+    },
+    {
       "path": "rules/member-plan.js",
-      "bytes": 5653,
-      "sha256": "1714c8ae7623a8db7c0eaf3f05785860822723e5e1411b0b26b2e45eea67db51"
+      "bytes": 5299,
+      "sha256": "99af9a0c8eee5a41a8830220d890b8611fb17199f53e205c87d1c8b89ae06640"
     },
     {
       "path": "rules/membership-entitlements.js",

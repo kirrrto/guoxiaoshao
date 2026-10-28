@@ -1,0 +1,37 @@
+{
+  "checkedAt": "2026-10-28T08:35:45.599Z",
+  "url": "http://127.0.0.1:4179/",
+  "checks": [
+    {
+      "action": "clear then save",
+      "observed": "请输入城市或门店。",
+      "passed": true
+    },
+    {
+      "action": "24 GB + 上海环球港 then save",
+      "observed": "已保存：iMac · 24 GB · 上海环球港",
+      "passed": true
+    },
+    {
+      "action": "disabled example",
+      "observed": "暂不可用 and 禁用示例 disabled",
+      "passed": true
+    },
+    {
+      "action": "toggle theme",
+      "observed": "light and dark screenshots inspected",
+      "passed": true
+    },
+    {
+      "action": "reload final build after replacing primary text with foreground",
+      "observed": "dark label oklch(0.985 0 0) on oklch(0.145 0 0); successful save retained in new screenshots",
+      "passed": true
+    }
+  ],
+  "screenshots": [
+    "shadcn-reference-light.jpg",
+    "shadcn-reference-dark.jpg"
+  ],
+  "scope": "Local Web reference only. No business services or native WeChat behavior exercised.",
+  "finalReloadAt": "2026-10-28T08:42:11.796Z"
+}

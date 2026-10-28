@@ -1,0 +1,568 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-10-28T08:54:54.804Z",
+  "version": "3.4.3",
+  "baseline": "8ecd44195e3e66c0c56d99a84fab70a71bb7b9fc",
+  "branch": "codex/v3.4.3-experience-usage",
+  "nodeVersion": "v24.22.1",
+  "scope": "Final local source and offline Chromium verification. Native WeChat/device and production evidence remain separate.",
+  "localChecksPassed": true,
+  "publicationReady": false,
+  "frontendSourceFingerprint": "sha256:7ae69180501091bae90a29ec1c610f17c329724640d2860af3968b9fd03c4b16",
+  "tests": {
+    "tests": 1803,
+    "pass": 1803,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0,
+    "file": "output/gxs343-design/full-tests-final.log",
+    "sha256": "a10992324ed9550faea6aeda0d53f05a2494a08ddccf00f9d65b0224a18b2c0d"
+  },
+  "source": {
+    "files": 594,
+    "javaScript": 421,
+    "json": 49,
+    "pages": 7,
+    "operatorPages": 1,
+    "errors": []
+  },
+  "monitor": {
+    "checked": true,
+    "source": "cloudfunctions/gxs_api/lib",
+    "target": "cloudfunctions/gxs_monitor/lib",
+    "passed": true,
+    "files": 46,
+    "sourceBytes": 343824,
+    "issues": []
+  },
+  "assets": {
+    "checked": 114,
+    "skus": 340,
+    "totalBytes": 139837,
+    "mainPackageRawBytes": 1209639
+  },
+  "whitespace": {
+    "projectCheck": "git diff --check -- . :(exclude).agents/skills/impeccable/**",
+    "projectExitCode": 0,
+    "upstreamCrLfAwareExitCode": 2,
+    "upstreamUnchanged": true,
+    "reason": "Pinned official vendor contains CRLF and existing trailing whitespace/end blank lines. Preserve original bytes and SHA instead of editing upstream for formatting.",
+    "upstreamWarningLines": 6
+  },
+  "browser": {
+    "previewSources": [
+      {
+        "name": "pages",
+        "snapshots": 84,
+        "sourceCount": 235,
+        "manifestSha256": "8ec1ed25b80f05ce1b9a510d1136cc2e213a7b03fbbaa39f2121d362bc17bc3a"
+      },
+      {
+        "name": "v343",
+        "snapshots": 156,
+        "sourceCount": 235,
+        "manifestSha256": "9312a421fe39fcdebb2d295be6195483b95b44efbe467954d91fab29b976a2a1"
+      },
+      {
+        "name": "imac-sheets",
+        "snapshots": 105,
+        "sourceCount": 235,
+        "manifestSha256": "807b577b1d270890b46d40e000a897754e143bc08984074a701ae2c42e0e3e9a"
+      },
+      {
+        "name": "macbook-sheets",
+        "snapshots": 105,
+        "sourceCount": 235,
+        "manifestSha256": "412fef75b40d7248411523fe6c015b12f2ba9cee040f2ad74c2683c82d7da8d5"
+      }
+    ],
+    "layoutCases": 900,
+    "sheetCases": 1728,
+    "nativeTabCases": 1416,
+    "pickerCases": 120,
+    "colorSamples": 894,
+    "placeholderSamples": 22,
+    "layout": [
+      {
+        "report": "output/gxs343-design/final/pages/layout-metrics.json",
+        "sha256": "2f244e815a0b08ffc9fde01c458a4ffa6e39ce7e760580430fdbeb69b613cd2f",
+        "summary": {
+          "total": 84,
+          "indexNavigationFailures": 0,
+          "expressionErrors": 0,
+          "missingText": 0,
+          "forbiddenText": 0,
+          "horizontalOverflow": 0,
+          "clippedText": 0,
+          "failedImages": 0,
+          "alternativeLayoutFailures": 0,
+          "calendarLayoutFailures": 0,
+          "membershipLayoutFailures": 0,
+          "notificationLayoutFailures": 0,
+          "v3LayoutFailures": 0,
+          "stockLayoutFailures": 0,
+          "followFontFailures": 0
+        }
+      },
+      {
+        "report": "output/gxs343-design/final/pages/layout-metrics-dark.json",
+        "sha256": "45771127541a49a63b8cd66f30da75fd5f13d3156675721dd09083d6f79a4d75",
+        "summary": {
+          "total": 84,
+          "indexNavigationFailures": 0,
+          "expressionErrors": 0,
+          "missingText": 0,
+          "forbiddenText": 0,
+          "horizontalOverflow": 0,
+          "clippedText": 0,
+          "failedImages": 0,
+          "alternativeLayoutFailures": 0,
+          "calendarLayoutFailures": 0,
+          "membershipLayoutFailures": 0,
+          "notificationLayoutFailures": 0,
+          "v3LayoutFailures": 0,
+          "stockLayoutFailures": 0,
+          "followFontFailures": 0
+        }
+      },
+      {
+        "report": "output/gxs343-design/final/v343/layout-metrics.json",
+        "sha256": "8367bd97ae8616533250c1b3ea7cd42fcbeca7817cae93dac5743653f8f8a472",
+        "summary": {
+          "total": 156,
+          "indexNavigationFailures": 0,
+          "expressionErrors": 0,
+          "missingText": 0,
+          "forbiddenText": 0,
+          "horizontalOverflow": 0,
+          "clippedText": 0,
+          "failedImages": 0,
+          "alternativeLayoutFailures": 0,
+          "calendarLayoutFailures": 0,
+          "membershipLayoutFailures": 0,
+          "notificationLayoutFailures": 0,
+          "v3LayoutFailures": 0,
+          "stockLayoutFailures": 0,
+          "followFontFailures": 0
+        }
+      },
+      {
+        "report": "output/gxs343-design/final/v343/layout-metrics-dark.json",
+        "sha256": "c6a1c826f38bc98650f9fe058f155d9b698244e94084ec58de0e03055f1a4cfc",
+        "summary": {
+          "total": 156,
+          "indexNavigationFailures": 0,
+          "expressionErrors": 0,
+          "missingText": 0,
+          "forbiddenText": 0,
+          "horizontalOverflow": 0,
+          "clippedText": 0,
+          "failedImages": 0,
+          "alternativeLayoutFailures": 0,
+          "calendarLayoutFailures": 0,
+          "membershipLayoutFailures": 0,
+          "notificationLayoutFailures": 0,
+          "v3LayoutFailures": 0,
+          "stockLayoutFailures": 0,
+          "followFontFailures": 0
+        }
+      },
+      {
+        "report": "output/gxs343-design/final/imac-sheets/layout-metrics.json",
+        "sha256": "1eda1cf95991f8788ef104da2606e096f36f81c0c886194197932fcb917defc0",
+        "summary": {
+          "total": 105,
+          "indexNavigationFailures": 0,
+          "expressionErrors": 0,
+          "missingText": 0,
+          "forbiddenText": 0,
+          "horizontalOverflow": 0,
+          "clippedText": 0,
+          "failedImages": 0,
+          "alternativeLayoutFailures": 0,
+          "calendarLayoutFailures": 0,
+          "membershipLayoutFailures": 0,
+          "notificationLayoutFailures": 0,
+          "v3LayoutFailures": 0,
+          "stockLayoutFailures": 0,
+          "followFontFailures": 0
+        }
+      },
+      {
+        "report": "output/gxs343-design/final/imac-sheets/layout-metrics-dark.json",
+        "sha256": "1d2c134af5e76597dc9483a3ead46d7f911ffe9995932208bfa7771e0466def3",
+        "summary": {
+          "total": 105,
+          "indexNavigationFailures": 0,
+          "expressionErrors": 0,
+          "missingText": 0,
+          "forbiddenText": 0,
+          "horizontalOverflow": 0,
+          "clippedText": 0,
+          "failedImages": 0,
+          "alternativeLayoutFailures": 0,
+          "calendarLayoutFailures": 0,
+          "membershipLayoutFailures": 0,
+          "notificationLayoutFailures": 0,
+          "v3LayoutFailures": 0,
+          "stockLayoutFailures": 0,
+          "followFontFailures": 0
+        }
+      },
+      {
+        "report": "output/gxs343-design/final/macbook-sheets/layout-metrics.json",
+        "sha256": "f0f886d10f4aef268cd8ccfbe03ea635cb1b10c4e07dded9badb66733f13f33d",
+        "summary": {
+          "total": 105,
+          "indexNavigationFailures": 0,
+          "expressionErrors": 0,
+          "missingText": 0,
+          "forbiddenText": 0,
+          "horizontalOverflow": 0,
+          "clippedText": 0,
+          "failedImages": 0,
+          "alternativeLayoutFailures": 0,
+          "calendarLayoutFailures": 0,
+          "membershipLayoutFailures": 0,
+          "notificationLayoutFailures": 0,
+          "v3LayoutFailures": 0,
+          "stockLayoutFailures": 0,
+          "followFontFailures": 0
+        }
+      },
+      {
+        "report": "output/gxs343-design/final/macbook-sheets/layout-metrics-dark.json",
+        "sha256": "e4118bf3c42bd05f17c442feef37807a1878fa16c9e0458721fca5beffcfe657",
+        "summary": {
+          "total": 105,
+          "indexNavigationFailures": 0,
+          "expressionErrors": 0,
+          "missingText": 0,
+          "forbiddenText": 0,
+          "horizontalOverflow": 0,
+          "clippedText": 0,
+          "failedImages": 0,
+          "alternativeLayoutFailures": 0,
+          "calendarLayoutFailures": 0,
+          "membershipLayoutFailures": 0,
+          "notificationLayoutFailures": 0,
+          "v3LayoutFailures": 0,
+          "stockLayoutFailures": 0,
+          "followFontFailures": 0
+        }
+      }
+    ],
+    "sheet": [
+      {
+        "report": "output/gxs343-design/final/imac-sheets/sheet-layout-metrics.json",
+        "sha256": "5a58f21d664d50e8a3e5bffbeca8bf5455765fea1a1eac7c64d8fde193cb1190",
+        "summary": {
+          "total": 432,
+          "failed": 0,
+          "layoutCases": 420,
+          "reflowCases": 12
+        }
+      },
+      {
+        "report": "output/gxs343-design/final/imac-sheets/sheet-layout-metrics-dark.json",
+        "sha256": "9c56c34a0923dc9a90308f329e4d0926d913a5e0cdf5aa1b4d410086d67d433a",
+        "summary": {
+          "total": 432,
+          "failed": 0,
+          "layoutCases": 420,
+          "reflowCases": 12
+        }
+      },
+      {
+        "report": "output/gxs343-design/final/macbook-sheets/sheet-layout-metrics.json",
+        "sha256": "cd10da3c7fd04ca9a695e183f23525451c801b5bdaab87db9a12fb976ed0a0f0",
+        "summary": {
+          "total": 432,
+          "failed": 0,
+          "layoutCases": 420,
+          "reflowCases": 12
+        }
+      },
+      {
+        "report": "output/gxs343-design/final/macbook-sheets/sheet-layout-metrics-dark.json",
+        "sha256": "6a7e5d22b5f0fe69e701bdbe8d1f82e563424372da70f370c8d984906c931fe2",
+        "summary": {
+          "total": 432,
+          "failed": 0,
+          "layoutCases": 420,
+          "reflowCases": 12
+        }
+      }
+    ],
+    "native": [
+      {
+        "report": "output/gxs343-design/final/pages/native-tab-metrics.json",
+        "sha256": "d9af77ed3f5ca02d30a80b696351dc1b97ffd0aa1f10b3d9d091fe897ff605dc",
+        "summary": {
+          "total": 336,
+          "failed": 0
+        }
+      },
+      {
+        "report": "output/gxs343-design/final/pages/native-tab-metrics-dark.json",
+        "sha256": "4740fd0e3c8a4259942e2887422067116578a35238674678e8577c55322c5940",
+        "summary": {
+          "total": 336,
+          "failed": 0
+        }
+      },
+      {
+        "report": "output/gxs343-design/final/v343/native-tab-metrics.json",
+        "sha256": "7d50b06ac521bd758ba9b9d130525ec807eff92d742d47cb62565b71f18d5bfc",
+        "summary": {
+          "total": 372,
+          "failed": 0
+        }
+      },
+      {
+        "report": "output/gxs343-design/final/v343/native-tab-metrics-dark.json",
+        "sha256": "a2eb017863d8cdddd3bf255c681997070c7ad49884e162015f3f9f7b3810f9cb",
+        "summary": {
+          "total": 372,
+          "failed": 0
+        }
+      }
+    ],
+    "picker": {
+      "report": "output/gxs343-design/final/v343/picker-alignment.json",
+      "sha256": "ef11903f60a74f74c600bc5179e4062322d51eac6a1deef43734866efdf41e5a",
+      "summary": {
+        "total": 120,
+        "failed": 0
+      }
+    },
+    "color": [
+      {
+        "report": "output/gxs343-design/final/colors/pages/theme-colors.json",
+        "sha256": "4487d6aff3c280ed1fd72adba25215b0a5b59a149158515a018c81af6eaf9880",
+        "summary": {
+          "total": 107,
+          "active": 107,
+          "belowTarget": 0,
+          "primaryMinimum": 5.357131444839318,
+          "selectedNavMinimum": 5.230867846703258,
+          "unsupportedMeasurements": 0
+        },
+        "placeholderSamples": 0,
+        "excluded": 0
+      },
+      {
+        "report": "output/gxs343-design/final/colors/pages/theme-colors-dark.json",
+        "sha256": "481971b6e426f0b4119d1900d9c11593fcb97d3fd447bc04fdc182c653583980",
+        "summary": {
+          "total": 107,
+          "active": 107,
+          "belowTarget": 0,
+          "primaryMinimum": 5.357131444839318,
+          "selectedNavMinimum": 7.139531628869566,
+          "unsupportedMeasurements": 0
+        },
+        "placeholderSamples": 0,
+        "excluded": 0
+      },
+      {
+        "report": "output/gxs343-design/final/colors/v343/theme-colors.json",
+        "sha256": "5f61d27a1669ecee96042d32dbcb90df4c4222bbe8df90def61f9b5d35d43eda",
+        "summary": {
+          "total": 232,
+          "active": 232,
+          "belowTarget": 0,
+          "primaryMinimum": 5.357131444839318,
+          "selectedNavMinimum": 5.230867846703258,
+          "unsupportedMeasurements": 0
+        },
+        "placeholderSamples": 5,
+        "excluded": 31
+      },
+      {
+        "report": "output/gxs343-design/final/colors/v343/theme-colors-dark.json",
+        "sha256": "adc2eaa25534b68931dfca64448a49332d746ada468c22b4d3ed5c8a362e2c2b",
+        "summary": {
+          "total": 232,
+          "active": 232,
+          "belowTarget": 0,
+          "primaryMinimum": 5.357131444839318,
+          "selectedNavMinimum": 7.139531628869566,
+          "unsupportedMeasurements": 0
+        },
+        "placeholderSamples": 5,
+        "excluded": 31
+      },
+      {
+        "report": "output/gxs343-design/final/colors/imac-sheets/theme-colors.json",
+        "sha256": "30555974b057d813aac77e7613b881744591535a1595b814f93bed6d8a27a503",
+        "summary": {
+          "total": 54,
+          "active": 54,
+          "belowTarget": 0,
+          "primaryMinimum": 5.357131444839318,
+          "selectedNavMinimum": null,
+          "unsupportedMeasurements": 0
+        },
+        "placeholderSamples": 3,
+        "excluded": 40
+      },
+      {
+        "report": "output/gxs343-design/final/colors/imac-sheets/theme-colors-dark.json",
+        "sha256": "6917c607b33be7d1f32f847897b20ce4de87be412d3dd3c77961adda1b9bbcb2",
+        "summary": {
+          "total": 54,
+          "active": 54,
+          "belowTarget": 0,
+          "primaryMinimum": 5.357131444839318,
+          "selectedNavMinimum": null,
+          "unsupportedMeasurements": 0
+        },
+        "placeholderSamples": 3,
+        "excluded": 40
+      },
+      {
+        "report": "output/gxs343-design/final/colors/macbook-sheets/theme-colors.json",
+        "sha256": "56a97dae119b20ece44c00bc0b27982125dabeb6d235e960407ac76388a56dd9",
+        "summary": {
+          "total": 54,
+          "active": 54,
+          "belowTarget": 0,
+          "primaryMinimum": 5.357131444839318,
+          "selectedNavMinimum": null,
+          "unsupportedMeasurements": 0
+        },
+        "placeholderSamples": 3,
+        "excluded": 40
+      },
+      {
+        "report": "output/gxs343-design/final/colors/macbook-sheets/theme-colors-dark.json",
+        "sha256": "4ade038775d4d06020f99ac4bdce84a97731deef30afeb0adb44c56eda244025",
+        "summary": {
+          "total": 54,
+          "active": 54,
+          "belowTarget": 0,
+          "primaryMinimum": 5.357131444839318,
+          "selectedNavMinimum": null,
+          "unsupportedMeasurements": 0
+        },
+        "placeholderSamples": 3,
+        "excluded": 40
+      }
+    ],
+    "limitations": "Generated HTML is an approximation; not native keyboard lifecycle, system font behavior, physical touch units, assistive technology or whole-screen WCAG certification. Disabled controls exempt; obscured controls recorded separately."
+  },
+  "browserExecution": [
+    {
+      "file": "output/gxs343-design/final/browser-gates-final.json",
+      "sha256": "11572b149c4f9221cf30dd5f00d7ffebcbe90154682a849afab003afd5cd042f"
+    },
+    {
+      "file": "output/gxs343-design/final/browser-summary.json",
+      "sha256": "c445df4ede13e36c6a1ad6893dd001923edce6cfdc7de30988ac24818cb49ff1"
+    },
+    {
+      "file": "output/gxs343-design/final/browser-colors-final.json",
+      "sha256": "0d46dfeda95e898208c014e4a0ef4f461b5ea49b9865cfa8c3822c00c894077c"
+    }
+  ],
+  "design": {
+    "preset": "b2BnwlLhw",
+    "url": "https://ui.shadcn.com/create?preset=b2BnwlLhw&template=vite",
+    "documents": [
+      "DESIGN.md",
+      "docs/IMPECCABLE_WORKFLOW.md",
+      "docs/DESIGN_REVIEW_3.4.3_20261028.md",
+      ".cursor/rules/ui-quality.mdc",
+      "AGENTS.md"
+    ],
+    "evidence": [
+      {
+        "file": "evidence/design/2026-10-28/shadcn-preset.json",
+        "sha256": "84406bda6fd69fff4270d2f80f10a728898a445b59694d1ab66dad3da0fa61c4"
+      },
+      {
+        "file": "evidence/design/2026-10-28/shadcn-preset.css",
+        "sha256": "da3ddbaa903dfe808ac98319bb17bdaf1f00ce307c331495c3d612630ed81905"
+      },
+      {
+        "file": "evidence/design/2026-10-28/shadcn-cli-verification.json",
+        "sha256": "ee7552620724132184edc1c5be128c6ec5aa4047292b438d81b2757ec8462f9d"
+      },
+      {
+        "file": "evidence/design/2026-10-28/shadcn-browser-verification.json",
+        "sha256": "59e960938af5b0984a4a6c78d3e0dd11c468c0dcc3acabf407f7193573a8a4b9"
+      },
+      {
+        "file": "evidence/design/2026-10-28/impeccable-actual-use.json",
+        "sha256": "d18368a51171bc35bb04210e3435002ea70e42b454693a87d72659c5330c0bdf"
+      },
+      {
+        "file": "evidence/design/2026-10-28/artifact-manifest.json",
+        "sha256": "77f7eaaf23335d78242b939bad5951a988126aeb293c0dfd5fc44d330b7d58e6"
+      }
+    ],
+    "scope": "Actual official skill/engine and CLI/browser Web reference used; WXML is not a supported engine source scanner."
+  },
+  "release": {
+    "sourceChecksPassed": true,
+    "passedChecks": 51,
+    "totalChecks": 52,
+    "blockers": [
+      {
+        "id": "unused-channel-video",
+        "code": "finding_open",
+        "message": "四个主页面被报告声明了未使用的 channel-video 组件: unresolved since 3.3.1."
+      },
+      {
+        "id": "custom-tabbar-first-switch",
+        "code": "finding_open",
+        "message": "WebView 自定义底部导航首次切换闪烁: unresolved since 3.3.1."
+      },
+      {
+        "id": "oversized-product-image",
+        "code": "finding_open",
+        "message": "商品图片过大: unresolved since 3.3.1."
+      },
+      {
+        "id": "legacy-product-image-format",
+        "code": "finding_open",
+        "message": "商品图片格式未通过质检建议: unresolved since 3.3.1."
+      }
+    ],
+    "file": "output/gxs343-design/release-check.json",
+    "sha256": "b29e6c84820171c3dcb9184618144dc033d9936ed21daddece9d9417de2670c0"
+  },
+  "earlierBackendEvidence": {
+    "file": "evidence/verification/3.4.3-optimization/local-verification.json",
+    "sha256": "c293bd5abb498fcf6e1b3a0f4a9738f6d224cfafd07e7b4ffc7e69923d037a10",
+    "note": "Earlier inventory/gift/capacity experiments; frontend fingerprint and browser totals superseded by this record. Backend not changed in design phase."
+  },
+  "finalChanges": [
+    "Synchronous save lock and failure recovery",
+    "44px clear-search target",
+    "Native aria-role and accessible control names",
+    "12px floor for actual narrow-screen functional text",
+    "Placeholder rendering and alpha-aware contrast gate",
+    "Search fixture checks current search results rather than intentionally hidden frequent cities"
+  ],
+  "production": {
+    "deployments": 0,
+    "inventoryMigrations": 0,
+    "gifts": 0,
+    "upstreamRequests": 0,
+    "payments": 0,
+    "notifications": 0,
+    "wechatUploads": 0,
+    "gitPushes": 0
+  },
+  "remaining": [
+    "Current-source WeChat compile and four open quality findings",
+    "Physical iOS/Android fonts, max(), touch, keyboard, safe areas, focus and VoiceOver/TalkBack",
+    "Real weak-network save and authorization, payment/refund and subscription delivery",
+    "102 missing originals, full isolated rebuild and real-device image clarity",
+    "CloudBase transaction/index and 24h midnight integrity, real latency and metering",
+    "Reviewed production gift list, trusted executor and durable checkpoints; authorized deploy/migration/gift/release"
+  ]
+}

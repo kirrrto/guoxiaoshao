@@ -9,6 +9,10 @@ const capacityOf = p => (p.attributes || {}).capacity || '标准配置';
 const colorOf = p => (p.attributes || {}).color || '标准外观';
 const compareColors = (a, b) => a.localeCompare(b, 'zh-CN') || (a < b ? -1 : a > b ? 1 : 0);
 const modelOf = p => p.model || p.familyName || p.familyKey;
+const configurationKeys = ['chipName', 'chip', 'finish', 'connection', 'charging'];
+const configurationLabelOf = p => configurationKeys.map(key => (p.attributes || {})[key]).filter(Boolean).join(' · ') || p.title;
+const selectionTitleOf = p => p.category === 'mac'
+  ? [modelOf(p), memoryOf(p), capacityOf(p), (p.attributes || {}).color].filter(Boolean).join(' · ') : p.title;
 const specSummaryOf = p => {
   const a = p.attributes || {};
   if (!a.chipName && !a.chip && !a.memory && !a.finish && !a.connection) return '';
@@ -23,6 +27,7 @@ Component({
     // session store, so the full product list never crosses the render bridge.
     catalogVersion: { type: String, value: '', observer: 'onCatalogVersion' }, value: { type: Object, value: null, observer: 'onValue' },
     inSheet: { type: Boolean, value: false },
+    disabled: { type: Boolean, value: false },
     maxStores: { type: Number, value: 3 }, supportedOnly: { type: Boolean, value: false, observer: 'onSupportedOnlyChange' }, storesOptional: { type: Boolean, value: false },
   },
   data: { categories: [], categoryIndex: 0, families: [], familyNames: [], familyIndex: 0,
@@ -35,6 +40,10 @@ Component({
     detached() { this.emitEpoch = (this.emitEpoch || 0) + 1; },
   },
   methods: {
+    // The parent locks synchronously before sending a save; its disabled prop
+    // also disables native controls when the render bridge catches up.
+    setInteractionLocked(locked) { this.interactionLocked = Boolean(locked); },
+    isInteractionLocked() { return Boolean(this.interactionLocked || this.data.disabled); },
     // One cascade (catalog, restore, filter or store change) becomes one setData.
     // Steps inside a batch stage their fields; read() sees staged values first.
     batch(run) {
@@ -134,7 +143,7 @@ Component({
       this.stage({ categoryIndex: index, families: c.families.map(f => ({ familyKey: f.familyKey, name: f.name })), familyNames: c.families.map(f => f.supported ? f.name : `${f.name}（待验证）`) });
       this.selectFamily(0, true); if (!silent) { this.updateFilters(wanted); this.emit(); }
     },
-    currentAttributes() { return { model: this.read('models')[this.read('modelIndex')], memory: (this.read('memories') || [])[this.read('memoryIndex')], capacity: this.read('capacities')[this.read('capacityIndex')], color: this.read('colors')[this.read('colorIndex')] }; },
+    currentAttributes() { return { model: this.read('models')[this.read('modelIndex')], memory: (this.read('memories') || [])[this.read('memoryIndex')], capacity: this.read('capacities')[this.read('capacityIndex')], color: this.read('colors')[this.read('colorIndex')], partNumber: (this.read('product') || {}).partNumber }; },
     selectFamily(index, silent = false) { const wanted = silent ? {} : this.currentAttributes(); this.stage({ familyIndex: index, selectionNote: '' }); this.updateFilters(wanted); if (!silent) this.emit(); },
     updateFilters(wanted) {
       this.unavailablePartNumber = null;
@@ -162,60 +171,80 @@ Component({
       const colors = unique(byModel.map(colorOf)).sort(compareColors).filter(color => availableColors.has(color));
       const colorIndex = Math.max(0, colors.indexOf(wanted.color));
       const candidates = byCapacity.filter(p => colorOf(p) === colors[colorIndex]);
-      const productIndex = Math.max(0, candidates.findIndex(p => p.partNumber === wanted.partNumber));
+      let productIndex = candidates.findIndex(p => p.partNumber === wanted.partNumber);
+      const previous = wanted.partNumber && this.productByPart[wanted.partNumber];
+      const preserveConfiguration = previous && previous.familyKey === (candidates[0] || {}).familyKey && modelOf(previous) === models[modelIndex];
+      if (productIndex < 0 && preserveConfiguration) {
+        // Keep chip generation, cores, glass and connectivity in that order.
+        // Filters still choose a real SKU; unavailable preferences are surfaced
+        // beside the resulting configuration instead of silently taking row 0.
+        const score = product => configurationKeys.reduce((value, key) => value * 2 + Number((product.attributes || {})[key] === (previous.attributes || {})[key]), 0);
+        let best = -1;
+        candidates.forEach((product, index) => { const value = score(product); if (value > best) { best = value; productIndex = index; } });
+      }
+      productIndex = Math.max(0, productIndex);
+      const chosen = candidates[productIndex];
+      if (preserveConfiguration && previous.category === 'mac' && chosen && (configurationKeys.some(key => (chosen.attributes || {})[key] !== (previous.attributes || {})[key])
+        || (wanted.memory && memoryOf(chosen) !== wanted.memory) || (wanted.capacity && capacityOf(chosen) !== wanted.capacity) || (wanted.color && colorOf(chosen) !== wanted.color))) {
+        this.stage({ selectionNote: '原配置没有此组合，已调整为下方具体配置，请核对后保存。' });
+      }
+      const labels = candidates.map(configurationLabelOf);
       this.currentCandidates = candidates;
       // Visible options always describe a real draft SKU. The sheet's Save
       // action commits it; changing a filter needs no additional confirmation.
       this.stage({ models, modelIndex, memories, memoryIndex, capacities, capacityIndex, colors, colorIndex, candidates: candidates.map(p => ({ partNumber: p.partNumber })),
-        productTitles: candidates.map(p => `${p.title} · ${p.partNumber}`), productIndex,
+        productTitles: candidates.map((p, index) => labels.indexOf(labels[index]) !== labels.lastIndexOf(labels[index]) ? `${labels[index]} · ${p.partNumber}` : labels[index]), productIndex,
         product: candidates[productIndex] ? this.publicProduct(candidates[productIndex]) : null, imageFailed: false });
     },
-    publicProduct(p) { return { partNumber: p.partNumber, title: p.title, specSummary: specSummaryOf(p), model: p.model, familyName: p.familyName, category: p.category,
+    publicProduct(p) { return { partNumber: p.partNumber, title: p.title, selectionTitle: selectionTitleOf(p), configurationLabel: configurationLabelOf(p), specSummary: specSummaryOf(p), model: p.model, familyName: p.familyName, category: p.category,
       supported: Boolean(p.supported), comingSoon: p.comingSoon, priceCny: p.priceCny, verificationStatus: p.verificationStatus,
       imageUrl: p.imageUrl || '', imageDisplayUrl: productThumbnailUrl(p.imageUrl, 'card', p.partNumber), imageAlt: p.imageAlt || p.title, attributes: p.attributes || {} }; },
-    onCategoryTap(e) { this.batch(() => this.selectCategory(Number(e.currentTarget.dataset.index))); },
-    onFamilyChange(e) { this.batch(() => this.selectFamily(Number(e.detail.value))); },
+    onCategoryTap(e) { if (this.isInteractionLocked()) return; this.batch(() => this.selectCategory(Number(e.currentTarget.dataset.index))); },
+    onFamilyChange(e) { if (this.isInteractionLocked()) return; this.batch(() => this.selectFamily(Number(e.detail.value))); },
     onModelChange(e) {
+      if (this.isInteractionLocked()) return;
       const model = this.data.models[Number(e.detail.value)]; if (!model) return;
       const memory = (this.data.memories || [])[this.data.memoryIndex], capacity = this.data.capacities[this.data.capacityIndex], color = this.data.colors[this.data.colorIndex];
       this.batch(() => {
         this.stage({ selectionNote: '' });
-        this.updateFilters({ model, memory, capacity, color });
+        this.updateFilters({ model, memory, capacity, color, partNumber: (this.data.product || {}).partNumber });
         this.emit();
       });
     },
     onMemoryChange(e) {
+      if (this.isInteractionLocked()) return;
       const memory = (this.data.memories || [])[Number(e.detail.value)]; if (!memory) return;
       const capacity = this.data.capacities[this.data.capacityIndex], color = this.data.colors[this.data.colorIndex];
       this.batch(() => {
         this.stage({ selectionNote: '' });
-        this.updateFilters({ model: this.data.models[this.data.modelIndex], memory, capacity, color, prefer: 'memory' });
+        this.updateFilters({ model: this.data.models[this.data.modelIndex], memory, capacity, color, prefer: 'memory', partNumber: (this.data.product || {}).partNumber });
         this.emit();
       });
     },
     onMemoryTap(e) { this.onMemoryChange({ detail: { value: e.currentTarget.dataset.index } }); },
     onCapacityChange(e) {
+      if (this.isInteractionLocked()) return;
       const capacity = this.data.capacities[Number(e.detail.value)]; if (!capacity) return;
       const memory = (this.data.memories || [])[this.data.memoryIndex], color = this.data.colors[this.data.colorIndex];
       this.batch(() => {
         this.stage({ selectionNote: '' });
-        this.updateFilters({ model: this.data.models[this.data.modelIndex], memory, capacity, color, prefer: 'capacity' });
+        this.updateFilters({ model: this.data.models[this.data.modelIndex], memory, capacity, color, prefer: 'capacity', partNumber: (this.data.product || {}).partNumber });
         this.emit();
       });
     },
     onCapacityTap(e) { this.onCapacityChange({ detail: { value: e.currentTarget.dataset.index } }); },
-    onColorTap(e) { this.batch(() => { this.stage({ selectionNote: '' }); this.updateFilters({ model: this.data.models[this.data.modelIndex], memory: (this.data.memories || [])[this.data.memoryIndex], capacity: this.data.capacities[this.data.capacityIndex], color: this.data.colors[Number(e.currentTarget.dataset.index)] }); this.emit(); }); },
-    onProductChange(e) { const p = this.currentCandidates[Number(e.detail.value)]; if (!p) return; this.unavailablePartNumber = null; this.setData({ productIndex: Number(e.detail.value), product: this.publicProduct(p), imageFailed: false, selectionNote: '' }); this.emit(); },
+    onColorTap(e) { if (this.isInteractionLocked()) return; this.batch(() => { this.stage({ selectionNote: '' }); this.updateFilters({ ...this.currentAttributes(), color: this.data.colors[Number(e.currentTarget.dataset.index)] }); this.emit(); }); },
+    onProductChange(e) { if (this.isInteractionLocked()) return; const p = this.currentCandidates[Number(e.detail.value)]; if (!p) return; this.unavailablePartNumber = null; this.setData({ productIndex: Number(e.detail.value), product: this.publicProduct(p), imageFailed: false, selectionNote: '' }); this.emit(); },
     onImageError() { this.setData({ imageFailed: true }); },
     selectCity(index) {
       const city = this.catalogCities[index]; if (!city) { this.stage({ cityStores: [] }); return; }
       const selected = new Set(this.read('selectedStores').map(s => s.storeNumber));
       this.stage({ cityIndex: index, cityStores: city.stores.map(s => ({ storeNumber: s.storeNumber, name: s.name, city: s.city, on: selected.has(s.storeNumber) })) });
     },
-    onCityChange(e) { this.selectCity(Number(e.detail.value)); },
-    onHotCityTap(e) { this.selectCity(Number(e.currentTarget.dataset.index)); },
-    onSearchInput(e) { this.batch(() => { this.stage({ searchKeyword: String(e.detail.value || '').slice(0, 60) }); this.updateSearchResults(); }); },
-    onClearSearch() { this.batch(() => { this.stage({ searchKeyword: '' }); this.updateSearchResults(); }); },
+    onCityChange(e) { if (this.isInteractionLocked()) return; this.selectCity(Number(e.detail.value)); },
+    onHotCityTap(e) { if (this.isInteractionLocked()) return; this.selectCity(Number(e.currentTarget.dataset.index)); },
+    onSearchInput(e) { if (this.isInteractionLocked()) return; this.batch(() => { this.stage({ searchKeyword: String(e.detail.value || '').slice(0, 60) }); this.updateSearchResults(); }); },
+    onClearSearch() { if (this.isInteractionLocked()) return; this.batch(() => { this.stage({ searchKeyword: '' }); this.updateSearchResults(); }); },
     updateSearchResults() {
       const keyword = this.read('searchKeyword'), searchActive = Boolean(keyword.trim());
       const selected = new Set(this.read('selectedStores').map(s => s.storeNumber));
@@ -223,6 +252,7 @@ Component({
       this.stage({ searchActive, searchResults });
     },
     onStoreTap(e) {
+      if (this.isInteractionLocked()) return;
       const number = e.currentTarget.dataset.store;
       const store = typeof number === 'string' && own(this.storeByNumber, number) ? this.storeByNumber[number] : null; if (!store) return;
       const selected = this.data.selectedStores.slice(); const index = selected.findIndex(s => s.storeNumber === store.storeNumber);

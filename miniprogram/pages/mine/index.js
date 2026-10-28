@@ -326,6 +326,10 @@ Page({
     this.orderConsentGeneration = (this.orderConsentGeneration || 0) + 1;
     this.paymentConsentGeneration = (this.paymentConsentGeneration || 0) + 1;
     this.pageVisible = false;
+    if (this.notificationReadPromise) {
+      this.invalidateNotificationRead();
+      this.setData({ notificationsLoading: false, notificationsLoadingMore: false });
+    }
     this.hideAuthorizationOverlay();
     if (this.data.redemptionOpen) {
       this.setData({ redemptionOpen: false });
@@ -1082,12 +1086,12 @@ Page({
   },
 
   async loadNotifications({ force = false, targetCount, afterChange = false } = {}) {
-    if (this.notificationUnloaded || this.data.notificationActionBusy) return;
+    if (this.notificationUnloaded || this.pageVisible === false || this.data.notificationActionBusy) return;
     if (!force && this.notificationReadPromise) return this.notificationReadPromise;
     if (!force && this.notificationsLoadedAt && Date.now() - this.notificationsLoadedAt < SECONDARY_CACHE_MS) return;
     const generation = (this.notificationGeneration || 0) + 1;
     this.notificationGeneration = generation;
-    const wanted = Math.max(20, targetCount || this.data.notifications.length);
+    const wanted = this.data.showNotifications ? Math.max(20, targetCount || this.data.notifications.length) : 20;
     this.setData({ notificationsLoading: true, notificationsLoadingMore: false, notificationsError: null, notificationsMoreError: null });
     const pending = (async () => {
       try {
@@ -1104,7 +1108,7 @@ Page({
           hasMore = Boolean(data.hasMore && cursor && !cursors.has(cursor));
           paginationKnown = typeof data.hasMore === 'boolean' && (!data.hasMore || hasMore);
           if (cursor) cursors.add(cursor);
-        } while (hasMore && fetchedPages < Math.ceil(wanted / 20));
+        } while (hasMore && this.data.showNotifications && fetchedPages < Math.ceil(wanted / 20));
         this.notificationsNextCursor = cursor;
         this.setData({ notifications, notificationsHasMore: hasMore, notificationsPaginationKnown: paginationKnown, notificationsClearBefore: clearBefore });
         this.notificationsLoadedAt = Date.now();
@@ -1120,7 +1124,7 @@ Page({
   },
 
   async onLoadMoreNotifications() {
-    if (this.notificationUnloaded || this.data.notificationActionBusy || this.notificationReadPromise || !this.data.notificationsHasMore || !this.notificationsNextCursor) return;
+    if (this.notificationUnloaded || this.pageVisible === false || this.data.notificationActionBusy || this.notificationReadPromise || !this.data.notificationsHasMore || !this.notificationsNextCursor) return;
     const generation = (this.notificationGeneration || 0) + 1;
     this.notificationGeneration = generation;
     const cursor = this.notificationsNextCursor;

@@ -1,0 +1,216 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-10-28T09:17:14.196Z",
+  "version": "3.4.3",
+  "releaseIntent": "Maintainer selected this source for the 3.4.3 official release; deployment and WeChat publication not performed",
+  "baseline": "8ecd44195e3e66c0c56d99a84fab70a71bb7b9fc",
+  "nodeVersion": "v24.22.1",
+  "frontendSourceFingerprint": "sha256:0cb18a94e14cb94070253f63d2af5cb249f4c43a9d5cb0c75066e43da0576012",
+  "localCodePassed": true,
+  "publicationReady": false,
+  "tests": {
+    "tests": 1803,
+    "pass": 1803,
+    "fail": 0,
+    "skipped": 0,
+    "cancelled": 0,
+    "todo": 0,
+    "file": "output/gxs343-release/full-tests.log",
+    "sha256": "071d1825841fe03c7361e1b060884a61a552739f874b4d04f54574d9c96fb617"
+  },
+  "source": {
+    "files": 594,
+    "javaScript": 421,
+    "json": 49,
+    "pages": 7,
+    "operatorPages": 1,
+    "errors": []
+  },
+  "monitor": {
+    "checked": true,
+    "source": "cloudfunctions/gxs_api/lib",
+    "target": "cloudfunctions/gxs_monitor/lib",
+    "passed": true,
+    "files": 46,
+    "sourceBytes": 343824,
+    "issues": []
+  },
+  "lockedTooling": {
+    "playwright": "1.62.1",
+    "rootLock": {
+      "file": "package-lock.json",
+      "sha256": "ee9d65dc6304ee79680021697feeb8099ea8698adcea16d59586a99b01ec5ef8"
+    },
+    "npmCi": [
+      {
+        "directory": ".",
+        "exitCode": 0,
+        "file": "output/gxs343-release/npm-ci-0.log",
+        "sha256": "c59541a7d8bfc9987c0aa47adf2cdd2858be8b66de5abc0331d5a6484ae63ab6"
+      },
+      {
+        "directory": "cloudfunctions/gxs_api",
+        "exitCode": 0,
+        "file": "output/gxs343-release/npm-ci-1.log",
+        "sha256": "1c347b0f2c457d00197bc4d8a935f8717e927a3ec36d22f3ccbeeb1705728340"
+      },
+      {
+        "directory": "cloudfunctions/gxs_monitor",
+        "exitCode": 0,
+        "file": "output/gxs343-release/npm-ci-2.log",
+        "sha256": "8ca06598a2f5d158e2cedb8420462198159945f3c990e801d57a727883d6ae3d"
+      },
+      {
+        "directory": "cloudfunctions/cloudbase_auth",
+        "exitCode": 0,
+        "file": "output/gxs343-release/npm-ci-3.log",
+        "sha256": "8ca06598a2f5d158e2cedb8420462198159945f3c990e801d57a727883d6ae3d"
+      }
+    ]
+  },
+  "browser": {
+    "mainHtml": 450,
+    "mainLayouts": 900,
+    "nativeTabCases": 1416,
+    "sheetCases": 1728,
+    "pickerAlignmentCases": 120,
+    "colorSuites": 8,
+    "colorSamples": 92,
+    "colorControlRecords": 894,
+    "announcementHtml": 18,
+    "announcementLayouts": 36,
+    "passed": true,
+    "renderer": "Offline Edge/Chromium; not native WeChat",
+    "reports": [
+      {
+        "file": "output/gxs343-release/ui/browser-summary.json",
+        "sha256": "569143131ff797a3557ae71526741de4bfe047f366ba2e3c1f0c27a9eeab7313"
+      },
+      {
+        "file": "output/gxs343-release/ui/browser-gates.json",
+        "sha256": "9b9c890e912ad3cc4b9d28fb1e55e1e474adf6ea64759d5f16fd780e1c94e7bf"
+      }
+    ]
+  },
+  "release": {
+    "sourceChecksPassed": true,
+    "passedChecks": 51,
+    "totalChecks": 52,
+    "exitCode": 1,
+    "blockers": [
+      {
+        "id": "unused-channel-video",
+        "code": "finding_open",
+        "message": "四个主页面被报告声明了未使用的 channel-video 组件: unresolved since 3.3.1."
+      },
+      {
+        "id": "custom-tabbar-first-switch",
+        "code": "finding_open",
+        "message": "WebView 自定义底部导航首次切换闪烁: unresolved since 3.3.1."
+      },
+      {
+        "id": "oversized-product-image",
+        "code": "finding_open",
+        "message": "商品图片过大: unresolved since 3.3.1."
+      },
+      {
+        "id": "legacy-product-image-format",
+        "code": "finding_open",
+        "message": "商品图片格式未通过质检建议: unresolved since 3.3.1."
+      }
+    ],
+    "file": "output/gxs343-release/release-check.json",
+    "sha256": "5935568dc2851f01a420f7538bf2df3d96c64da64dae5098190c743822bf4e9d"
+  },
+  "github": {
+    "targetRepository": "kirrrto/guoxiaoshao",
+    "targetBranch": "master",
+    "sourceTag": "v3.4.3",
+    "state": "This file records pre-push local verification; remote SHA and CI must be verified after push",
+    "ciChanges": [
+      "Pin Playwright 1.62.1 in root devDependencies",
+      "Install Chromium and its dependencies from locked CLI",
+      "Missing browser tooling now fails instead of skipping four regressions",
+      "Run current-source v343 light/dark layout, navigation, picker and color checks",
+      "Always preserve CI logs and UI reports as artifacts",
+      "Strict release gate still fails for missing current WeChat evidence"
+    ],
+    "workflow": {
+      "file": ".github/workflows/verify.yml",
+      "sha256": "8c168653741242793cfbd5eda070e6d962fee08277839112cf9748578776c5f7"
+    }
+  },
+  "designAttachments": [
+    {
+      "file": "evidence/design/2026-10-28/shadcn-reference-source.zip",
+      "sha256": "c80bf0375284e22cfbaaa054c0e1adedccba70451d2561fd48ea59a22260c614",
+      "bytes": 64728
+    },
+    {
+      "file": "evidence/design/2026-10-28/shadcn-create-light.jpg",
+      "sha256": "58b3a06804ef622fd33430129e3a07f67dfc9b90cc1249c51cbca434d649465b",
+      "bytes": 162443
+    },
+    {
+      "file": "evidence/design/2026-10-28/shadcn-create-dark.jpg",
+      "sha256": "2c5ed67306a495f2ffcf023cdecb4f695594917f70612914a987db8dbfe726aa",
+      "bytes": 153936
+    },
+    {
+      "file": "evidence/design/2026-10-28/shadcn-create-command.jpg",
+      "sha256": "31ce0100a9ca129e4138ee84e109c7cbabf88f344a7129f22580abab203b0138",
+      "bytes": 90228
+    },
+    {
+      "file": "evidence/design/2026-10-28/shadcn-reference-light.jpg",
+      "sha256": "7086727ff979b837997ca1f992ddbbbc177bf088c4c69a0995e6a97ed8fcc541",
+      "bytes": 62292
+    },
+    {
+      "file": "evidence/design/2026-10-28/shadcn-reference-dark.jpg",
+      "sha256": "ab32199156e2b154abfb6ed91b44d32a3cd763ba3167799f6f8fb83fa4b8eb42",
+      "bytes": 61892
+    },
+    {
+      "file": "evidence/design/2026-10-28/native-imac-light.png",
+      "sha256": "203789f84b27958480b92a52a4609ef556d3321d35296af8e8e8dc34efbda055",
+      "bytes": 42156
+    },
+    {
+      "file": "evidence/design/2026-10-28/native-store-search-dark.png",
+      "sha256": "9fcd8856947819ed65a591f96771b960b1e2b0110c456bd54976c2364e48833b",
+      "bytes": 43962
+    },
+    {
+      "file": "evidence/design/2026-10-28/native-retired-follow-light.png",
+      "sha256": "75102d3b9bd8a71c4fcbd6b38a5e47ad80faf82fa8b123e322273936c6709184",
+      "bytes": 52730
+    }
+  ],
+  "whitespace": {
+    "projectOwnedDiffPassed": true,
+    "unchangedPinnedVendorRetainsOriginalFormatting": true,
+    "rawWholeTreeCheckNotClaimedPassing": true
+  },
+  "productionActions": {
+    "deployments": 0,
+    "databaseWrites": 0,
+    "inventoryMigrations": 0,
+    "gifts": 0,
+    "upstreamBusinessRequests": 0,
+    "payments": 0,
+    "notifications": 0,
+    "wechatUploads": 0
+  },
+  "mandatoryBeforeWeChatRelease": [
+    "Verify new coverage indexes even in legacy mode",
+    "Compatible API/monitor/active runner deployment and actual service/transaction verification",
+    "Account for same-day automatic gift side effects and reconcile actual grants",
+    "Current-source WeChat compile, device validation and four open quality findings"
+  ],
+  "separatePhases": [
+    "Embedded inventory migration remains off by default; staged real 24-hour midnight verification required",
+    "Trusted production full-gift executor and persistent checkpoints not yet connected; no all-users completion claim",
+    "102 original images required for full reproducible rebuild; current assets still require device checks"
+  ]
+}

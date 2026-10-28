@@ -12,6 +12,7 @@ const json = file => JSON.parse(fs.readFileSync(path.join(root, file), 'utf8'));
 const checks = [];
 function check(name, passed) { checks.push({ name, passed: Boolean(passed) }); }
 const project = json('package.json');
+const imagePolicy = json('config/product-image-policy.json');
 const deliveryTargets = json('config/delivery-targets.json');
 const rootLock = json('package-lock.json');
 check('root package and lock versions match the release', rootLock.version === project.version && rootLock.packages?.['']?.version === project.version);
@@ -87,8 +88,8 @@ function walk(dir) { for (const entry of fs.readdirSync(dir, { withFileTypes: tr
 walk(path.join(root, 'miniprogram'));
 const thumbnailCheck = spawnSync(process.execPath, [path.join(root, 'tools/assets/build-product-thumbnails.mjs'), '--check'], { encoding: 'utf8', windowsHide: true });
 check('verified local thumbnails cover the current catalog and match recorded asset hashes', thumbnailCheck.status === 0);
-check('frontend source and assets fit within the 1.5 MiB main-package budget before compilation', frontendBytes < 1.5 * 1024 * 1024);
-check('image assets fit within the 200 KB WeChat quality audit recommendation', imageBytes <= 200 * 1024);
+check('frontend source and assets fit within the 1.5 MiB main-package budget before compilation', frontendBytes <= imagePolicy.mainPackageMaxBytes);
+check('image assets fit within the 200 KB WeChat quality audit recommendation', imageBytes <= imagePolicy.imageMaxBytes);
 const sourceChecksPassed = checks.every(c => c.passed);
 let qualityGate;
 let sourceFingerprint = null;

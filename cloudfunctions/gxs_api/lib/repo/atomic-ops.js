@@ -9,10 +9,11 @@ const { dayKey } = require('../time');
 const { decideLiveQuery, decideHistoryQuery } = require('../rules/access');
 const { grantableAmount, ledgerIds } = require('../rules/quota');
 const { isMember, hasFreeReminder, canUseReminders, validateFollowLimits, memberLimits, accountLimits, followAllowance, planSnapshot } = require('../rules/membership');
-const { OUTAGE_COMPENSATION_ORDER_ID, LAUNCH_CELEBRATION_ORDER_ID, purchasedPlan, needsPlanMetadata, resolvePlanMetadata, needsOutageCompensation, needsLaunchCelebrationGift } = require('../rules/member-plan');
+const { OUTAGE_COMPENSATION_ORDER_ID, purchasedPlan, needsPlanMetadata, resolvePlanMetadata, needsOutageCompensation } = require('../rules/member-plan');
 const membershipEntitlements = require('../rules/membership-entitlements');
-const { applyObservation, targetKeyOf } = require('../engine/events');
-const { observationDayId, appendObservationDay } = require('../engine/observation-day');
+const { targetKeyOf } = require('../engine/events');
+const { observationStorageMethods } = require('./observation-storage');
+const { launchGiftMethods } = require('./launch-gift');
 const { viewId, newView, decodeToken } = require('../notification-view');
 const { mergeConfig, patchConfig } = require('../config');
 const { assertConfigEditor, makeConfigAudit } = require('../config-audit');
@@ -159,69 +160,7 @@ function atomicMethods(run, { readUpstreamBreaker } = {}) {
       await fulfilMembershipIn(tx, user, order, source, nowIso);
       return user;
     }),
-    ensureLaunchCelebrationGift: ({ userKey, nowIso }) => run(async tx => {
-      const user = await tx.get(C.users, userKey);
-      if (!user || !needsLaunchCelebrationGift(user, nowIso)) return user;
-      await hydrateMemberPlansIn(tx, user);
-      const recordId = `${userKey}|${LAUNCH_CELEBRATION_ORDER_ID}`;
-      const existing = await tx.get(C.orders, recordId);
-      if (existing) {
-        user.membership = { ...(user.membership || {}), launch20261028GiftedAt: existing.fulfilledAt || nowIso };
-        await tx.put(C.users, user);
-        return user;
-      }
-      const now = new Date(nowIso);
-      const activeSnap = planSnapshot(user, now);
-      let restoredPlanId = activeSnap.planId && activeSnap.planId !== 'member_trial' ? activeSnap.planId : null;
-      const m = user.membership || {};
-      const segments = m.entitlements && Array.isArray(m.entitlements.segments) ? m.entitlements.segments : [];
-      for (let i = segments.length - 1; i >= 0 && !restoredPlanId; i--) {
-        const seg = segments[i];
-        if (seg && seg.planId && seg.planId !== 'member_trial') restoredPlanId = seg.planId;
-      }
-      const lastOrderId = m.lastOrderId;
-      const lastOrder = typeof lastOrderId === 'string' && lastOrderId
-        ? (await tx.get(C.orders, `${userKey}|${lastOrderId}`) || await tx.get(C.orders, lastOrderId))
-        : null;
-      if (!restoredPlanId && lastOrder) {
-        restoredPlanId = purchasedPlan(lastOrder, user)
-          || (lastOrder.source === 'service_compensation' && lastOrder.planId && lastOrder.planId !== 'member_trial' ? lastOrder.planId : null);
-      }
-      if (!restoredPlanId && m.planId && m.planId !== 'member_trial') {
-        restoredPlanId = m.planId;
-      }
-      const hasPaidSegment = segments.some(
-        seg => seg && ((seg.planId && seg.planId !== 'member_trial') || (seg.source && seg.source !== 'trial_compensation')),
-      );
-      const hasPaidLastOrder = Boolean(
-        lastOrder && (purchasedPlan(lastOrder, user) || (lastOrder.source === 'service_compensation' && lastOrder.type === 'membership_compensation')),
-      );
-      const hasNonTrialDirect = Boolean(
-        m.expiresAt && m.source !== 'trial_compensation' && m.planId !== 'member_trial'
-        && (!lastOrder || lastOrder.source !== 'trial_compensation'),
-      );
-      const hadPaidMembership = Boolean(restoredPlanId) || hasPaidSegment || hasPaidLastOrder || hasNonTrialDirect;
-      if (!hadPaidMembership) return user;
-      const order = {
-        _id: recordId,
-        orderId: LAUNCH_CELEBRATION_ORDER_ID,
-        userKey,
-        productId: 'admin_grant',
-        type: 'membership_compensation',
-        source: 'service_compensation',
-        ...(restoredPlanId ? { planId: restoredPlanId } : {}),
-        days: 1,
-        amountFen: 0,
-        status: 'paid',
-        createdAt: nowIso,
-        paidAt: nowIso,
-        fulfilledAt: null,
-        note: '2026-10-28 苹果新品发布会员赠礼',
-      };
-      user.membership = { ...m, launch20261028GiftedAt: nowIso };
-      await fulfilMembershipIn(tx, user, order, 'service_compensation', nowIso);
-      return user;
-    }),
+    ...launchGiftMethods(run, { hydrateMemberPlansIn }),
     ...notificationTestMethods(run, applyLedgerIn),
     ...memberRecordMethods(run),
     acquireLease: ({ id, ownerId, now, expiresAt }) => run(async tx => {
@@ -460,29 +399,7 @@ function atomicMethods(run, { readUpstreamBreaker } = {}) {
       return { expired: true, refunded, ...quotaBalance(user) };
     }),
 
-    recordObservation: ({ observation, continuityGapMs, collectorLease, queryTargetLease, nowIso }) => run(async tx => {
-      if (collectorLease) {
-        const lease = await tx.get(C.config, 'collector_lease');
-        if (!lease || lease.ownerId !== collectorLease.ownerId || lease.expiresAt <= collectorLease.nowIso) throw new ApiError('collector_lease_lost', '采集执行权已转移');
-      }
-      if (queryTargetLease) {
-        const lease = await tx.get(C.config, queryTargetLease.id);
-        if (!lease || lease.ownerId !== queryTargetLease.ownerId || lease.leaseUntil <= Date.parse(queryTargetLease.nowIso)) throw new ApiError('query_target_lease_lost', '该目标由新的查询更新中');
-      }
-      const previous = await tx.get(C.latest, targetKeyOf(observation.storeNumber, observation.partNumber));
-      const result = applyObservation(previous, observation, {
-        ...(Number.isFinite(continuityGapMs) ? { continuityGapMs } : {}),
-        ...(Number.isFinite(Date.parse(nowIso)) ? { nowMs: Date.parse(nowIso) } : {}),
-      });
-      if (result.outcome !== 'stale' && result.outcome !== 'duplicate') {
-        const summaryId = observationDayId(observation.storeNumber, observation.partNumber, dayKey(observation.observedAt));
-        const previousDay = await tx.get(C.observationDays, summaryId);
-        await tx.put(C.latest, result.latest);
-        for (const event of result.events) await tx.put(C.events, { ...event, dayKey: dayKey(event.detectedAt), notificationPlannedAt: null });
-        await tx.put(C.observationDays, appendObservationDay(previousDay, observation, result.events));
-      }
-      return { ...result, observation };
-    }),
+    ...observationStorageMethods(run),
 
     mutateFollow: args => run(async tx => {
       const { userKey, follow, followId, status, nowIso, knownFollows = [] } = args;

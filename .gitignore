@@ -34,6 +34,17 @@ evidence/**/*.webp
 evidence/**/*.mp4
 evidence/**/*.zip
 
+# Selected 3.4.3 design handoff files are intentionally available on GitHub.
+!evidence/design/2026-10-28/shadcn-reference-source.zip
+!evidence/design/2026-10-28/shadcn-create-light.jpg
+!evidence/design/2026-10-28/shadcn-create-dark.jpg
+!evidence/design/2026-10-28/shadcn-create-command.jpg
+!evidence/design/2026-10-28/shadcn-reference-light.jpg
+!evidence/design/2026-10-28/shadcn-reference-dark.jpg
+!evidence/design/2026-10-28/native-imac-light.png
+!evidence/design/2026-10-28/native-store-search-dark.png
+!evidence/design/2026-10-28/native-retired-follow-light.png
+
 # Raw upstream captures (large HTML/JSON bodies); hashes live in evidence/**/manifest files
 evidence/raw/
 

@@ -229,6 +229,17 @@ try {
         return errors;
       }, { scenario: item.scenario, expectedDndPeriodCount: item.expectedDndPeriodCount });
     }
+    // Only the status/time/authorization classes audited on the follow page;
+    // this is not a global font rule or a claim about native text scaling.
+    metrics.followFunctionalText = item.page === 'follow' ? await page.evaluate(() => {
+      const selector = '.follow-sync-copy > span:not(.follow-sync-dot), .follow-sync-time, .reminder-inline-balance, .reminder-inline-balance > span, .reminder-details-toggle.ui-action, .follow-status, .follow-stock-time, .follow-stock-detail';
+      return [...document.querySelectorAll(selector)].filter(element => {
+        const box = element.getBoundingClientRect(), style = getComputedStyle(element);
+        return box.width > 0 && box.height > 0 && style.visibility !== 'hidden';
+      }).map(element => ({ class: element.className, text: element.textContent.trim(), fontSize: parseFloat(getComputedStyle(element).fontSize) }));
+    }) : [];
+    metrics.followFontErrors = metrics.followFunctionalText.filter(element => element.fontSize < 11.99).map(element => `${element.class || element.text}: ${element.fontSize}px below 12px`);
+    if (item.scenario === 'v343-retired-follow' && metrics.followFunctionalText.length !== 9) metrics.followFontErrors.push(`Expected 9 audited functional text nodes, received ${metrics.followFunctionalText.length}`);
     const bodyText = await page.locator('body').innerText();
     const missingText = (item.expectedText || []).filter(text => !bodyText.replace(/\s+/g, '').includes(text.replace(/\s+/g, '')));
     const forbiddenTextFound = (item.forbiddenText || []).filter(text => bodyText.replace(/\s+/g, '').includes(text.replace(/\s+/g, '')));
@@ -282,7 +293,7 @@ try {
     }
     const representative = item.width === 375 && ['member', 'free'].includes(item.scenario) || item.scenario.startsWith('sheet-') || item.width === 320 && ['longcontent', 'history-longcontent', 'history-balance-cap', 'operator-longcontent'].includes(item.scenario) || item.width === 375 && ['mine', 'follow'].includes(item.page) && item.scenario === 'expired' || item.width === 430 && item.page === 'query' && item.scenario === 'member' || item.width === 375 && item.scenario.startsWith('monitor-') || item.width === 375 && item.scenario.startsWith('history-') && (item.page === 'history' || item.scenario === 'history-free-first');
     if (representative || item.scenario.startsWith('onboarding-') && item.width === 375 || /^(?:payment|notification-test|alternatives|orders|nudge)-/.test(item.scenario)) { const name = item.file.replace('.html', '.png'); await page.screenshot({ path: path.join(screenshots, name), fullPage: true }); record.screenshot = name; }
-    if (item.scenario.startsWith('v3-') && [320, 375].includes(item.width) || item.scenario.startsWith('v2-') && (item.width === 375 || [320, 1024].includes(item.width) && (item.page === 'guide' || item.scenario.startsWith('v2-promotion-') || item.scenario === 'v2-calendar-modal') || item.width === 320 && ['v2-longcontent', 'v2-context-checkout'].includes(item.scenario) || item.width === 1024 && ['v2-member', 'v2-context-checkout'].includes(item.scenario))) {
+    if (item.fixture && [320, 375, 1024].includes(item.width) || item.scenario.startsWith('v3-') && [320, 375].includes(item.width) || item.scenario.startsWith('v2-') && (item.width === 375 || [320, 1024].includes(item.width) && (item.page === 'guide' || item.scenario.startsWith('v2-promotion-') || item.scenario === 'v2-calendar-modal') || item.width === 320 && ['v2-longcontent', 'v2-context-checkout'].includes(item.scenario) || item.width === 1024 && ['v2-member', 'v2-context-checkout'].includes(item.scenario))) {
       const name = item.file.replace('.html', '.png');
       await page.screenshot({ path: path.join(screenshots, name), fullPage: true }); record.screenshot = name;
       const firstScreen = item.file.replace('.html', '-first-screen.png');
@@ -296,6 +307,11 @@ try {
         const offerScreenshot = item.file.replace('.html', '-offer.png');
         await page.locator('.membership-shop').evaluate(element => window.scrollTo(0, window.scrollY + element.getBoundingClientRect().top - 100));
         await page.locator('.membership-shop').screenshot({ path: path.join(screenshots, offerScreenshot) }); record.offerScreenshot = offerScreenshot;
+      }
+      if (item.fixture?.sheet) {
+        await page.locator('.config-sheet-panel .hot-city-chips').scrollIntoViewIfNeeded();
+        const storesScreenshot = item.file.replace('.html', '-stores.png');
+        await page.screenshot({ path: path.join(screenshots, storesScreenshot), fullPage: false }); record.storesScreenshot = storesScreenshot;
       }
     }
     if (item.scenario === 'v3-dnd-two' && item.width === 375) {
@@ -328,8 +344,8 @@ try {
   }
 } finally { await context.close(); await browser.close(); }
 verifyPreviewSources();
-report.summary = { total: report.snapshots.length, indexNavigationFailures: report.indexNavigation.invalidTargets.length + report.indexNavigation.missingTargets.length, expressionErrors: manifest.expressionErrors || 0, missingText: report.snapshots.filter(x => x.missingText.length).length, forbiddenText: report.snapshots.filter(x => x.forbiddenTextFound.length).length, horizontalOverflow: report.snapshots.filter(x => x.scrollWidth > x.width + 1 || x.overflow.length).length, clippedText: report.snapshots.filter(x => x.clippedText.length).length, failedImages: report.snapshots.flatMap(x => x.images).filter(x => !x.loaded).length, alternativeLayoutFailures: report.snapshots.filter(x => x.alternativeLayoutErrors.length).length, calendarLayoutFailures: report.snapshots.filter(x => x.calendarLayoutErrors.length).length, membershipLayoutFailures: report.snapshots.filter(x => x.membershipLayoutErrors.length).length, notificationLayoutFailures: report.snapshots.filter(x => x.notificationLayoutErrors.length).length, v3LayoutFailures: report.snapshots.filter(x => x.v3LayoutErrors.length).length, stockLayoutFailures: report.snapshots.filter(x => x.stockLayoutErrors.length).length };
+report.summary = { total: report.snapshots.length, indexNavigationFailures: report.indexNavigation.invalidTargets.length + report.indexNavigation.missingTargets.length, expressionErrors: manifest.expressionErrors || 0, missingText: report.snapshots.filter(x => x.missingText.length).length, forbiddenText: report.snapshots.filter(x => x.forbiddenTextFound.length).length, horizontalOverflow: report.snapshots.filter(x => x.scrollWidth > x.width + 1 || x.overflow.length).length, clippedText: report.snapshots.filter(x => x.clippedText.length).length, failedImages: report.snapshots.flatMap(x => x.images).filter(x => !x.loaded).length, alternativeLayoutFailures: report.snapshots.filter(x => x.alternativeLayoutErrors.length).length, calendarLayoutFailures: report.snapshots.filter(x => x.calendarLayoutErrors.length).length, membershipLayoutFailures: report.snapshots.filter(x => x.membershipLayoutErrors.length).length, notificationLayoutFailures: report.snapshots.filter(x => x.notificationLayoutErrors.length).length, v3LayoutFailures: report.snapshots.filter(x => x.v3LayoutErrors.length).length, stockLayoutFailures: report.snapshots.filter(x => x.stockLayoutErrors.length).length, followFontFailures: report.snapshots.filter(x => x.followFontErrors.length).length };
 const reportBase = membershipFontPreview ? 'membership-font-metrics' : notificationFontPreview ? 'notification-font-metrics' : stockFontPreview ? 'layout-metrics-stock-fonts' : 'layout-metrics';
 fs.writeFileSync(path.join(directory, `${reportBase}${colorScheme === 'dark' ? '-dark' : ''}.json`), JSON.stringify(report, null, 2));
 console.log(JSON.stringify(report.summary));
-if (report.summary.indexNavigationFailures || report.summary.expressionErrors || report.summary.missingText || report.summary.forbiddenText || report.summary.horizontalOverflow || report.summary.clippedText || report.summary.failedImages || report.summary.alternativeLayoutFailures || report.summary.calendarLayoutFailures || report.summary.membershipLayoutFailures || report.summary.notificationLayoutFailures || report.summary.v3LayoutFailures || report.summary.stockLayoutFailures) process.exitCode = 1;
+if (report.summary.indexNavigationFailures || report.summary.expressionErrors || report.summary.missingText || report.summary.forbiddenText || report.summary.horizontalOverflow || report.summary.clippedText || report.summary.failedImages || report.summary.alternativeLayoutFailures || report.summary.calendarLayoutFailures || report.summary.membershipLayoutFailures || report.summary.notificationLayoutFailures || report.summary.v3LayoutFailures || report.summary.stockLayoutFailures || report.summary.followFontFailures) process.exitCode = 1;

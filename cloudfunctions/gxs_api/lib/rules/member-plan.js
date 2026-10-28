@@ -75,15 +75,10 @@ function needsLaunchCelebrationGift(user, now) {
   if (membership.lastOrderId === LAUNCH_CELEBRATION_ORDER_ID) return false;
   const segments = membership.entitlements && Array.isArray(membership.entitlements.segments) ? membership.entitlements.segments : [];
   if (segments.some(segment => segment && segment.orderId === recordId)) return false;
-  if (!membership.expiresAt && !membership.lastOrderId && !membership.planId && !segments.length) return false;
-  const onlyTrialSegments = segments.length > 0 && segments.every(
-    segment => segment && (segment.source === 'trial_compensation' || segment.planId === 'member_trial'),
-  );
-  if (onlyTrialSegments && (!membership.planId || membership.planId === 'member_trial')
-    && (!membership.lastOrderId || membership.lastOrderId === OUTAGE_COMPENSATION_ORDER_ID)) return false;
-  if (membership.source === 'trial_compensation' && !segments.length
-    && (!membership.planId || membership.planId === 'member_trial')) return false;
-  return true;
+  // This is only a cheap access-path hint, never proof of eligibility. The
+  // transaction checks immutable payment terms and its server receipt. Older
+  // paid accounts are covered by the bounded frozen-list background task.
+  return require('./launch-gift').touchEvidenceIds(user).length > 0;
 }
 
 async function ensureLaunchCelebrationGift(repo, user, now) {

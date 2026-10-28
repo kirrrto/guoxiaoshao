@@ -77,11 +77,11 @@ const IPAD_MINI_CATALOG_NOTICE = Object.freeze({
 const MAC_LAUNCH_CELEBRATION_NOTICE = Object.freeze({
   id: 'mac-launch-celebration-2026-10-28',
   title: '庆祝苹果 Mac 新品发布 · 会员礼遇与目录更新',
-  kind: 'recovery',
+  kind: 'notice',
   publishedAt: '2026-10-28T00:00:00+08:00',
   startsAt: '2026-10-28T00:00:00+08:00',
   expiresAt: '2026-11-06T23:59:59+08:00',
-  text: '庆祝苹果发布新款 14 英寸 MacBook Pro（M6）与新款 iMac（M6），果小哨已同步上线全系新配置，并今日（10 月 28 日）为全体会员及曾付费用户自动赠送 1 天会员时长，可在「我的」查看。',
+  text: '新款 Mac 配置已更新。10 月 28 日会员礼遇将由后台向符合条件的曾付费用户自动发放 1 天会员，无需打开小程序；到账后可在「我的」会员记录查看。',
 });
 
 const MAC_CATALOG_NOTICE = Object.freeze({
@@ -191,12 +191,12 @@ function markNoticesSeen(payload, now = Date.now()) {
 
 /**
  * Pick the single banner for the query notice region.
- * Priority: live announcement → reminder consent blocked → actual collector fault.
+ * Priority: maintenance/warning → consent → actual fault → ordinary notice.
  * Expired announcements never claim the service recovered.
  */
 function resolveQueryNotice({ announcement, now = Date.now(), consent = null, collector = null } = {}) {
   const active = normalizeAnnouncement(announcement, now);
-  if (active) {
+  if (active && ['maintenance', 'warn'].includes(active.kind)) {
     return { tone: TONE[active.kind] || 'info', text: active.text, source: 'announcement', kind: active.kind };
   }
   if (consent && consent.anyBlocked) {
@@ -213,8 +213,7 @@ function resolveQueryNotice({ announcement, now = Date.now(), consent = null, co
   const serviceUp = state === 'running' || state === 'idle';
   // Observation delay is a service-status detail (公告页), not a query-page
   // banner. Only a real upstream/collector fault earns the loud warning.
-  if (stale && serviceUp) return null;
-  if (stale || (state && !serviceUp)) {
+  if (!serviceUp && (stale || state)) {
     return {
       tone: 'warn',
       text: '取货接口状态异常，查询结果可能不完整或失败。以实际查询返回和苹果官网为准。',
@@ -222,7 +221,7 @@ function resolveQueryNotice({ announcement, now = Date.now(), consent = null, co
       action: 'refresh',
     };
   }
-  return null;
+  return active ? { tone: TONE[active.kind] || 'info', text: active.text, source: 'announcement', kind: active.kind } : null;
 }
 
 module.exports = {

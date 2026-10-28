@@ -23,10 +23,10 @@
 .follow-stock-label { font-size: 32rpx; line-height: 1.5; font-weight: 700; color: var(--text); }
 .follow-stock-panel--ok .follow-stock-label { color: var(--green-dark); }
 .follow-stock-panel--warn .follow-stock-label { color: var(--warn); }
-.follow-stock-time { font-size: 23rpx; line-height: 1.5; color: var(--text-2); }
-.follow-stock-detail { margin-top: 6rpx; font-size: 25rpx; line-height: 1.6; color: var(--text-2); overflow-wrap: anywhere; }
+.follow-stock-time { font-size: 23rpx; font-size: max(12px, 23rpx); line-height: 1.5; color: var(--text-2); }
+.follow-stock-detail { margin-top: 6rpx; font-size: 25rpx; font-size: max(12px, 25rpx); line-height: 1.6; color: var(--text-2); overflow-wrap: anywhere; }
 .follow-partial-note { margin-top: 8rpx; font-size: 24rpx; line-height: 1.5; color: var(--warn); }
-.follow-sync-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8rpx 16rpx; font-size: 23rpx; line-height: 1.6; color: var(--text-2); margin: -6rpx 0 20rpx; }
+.follow-sync-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8rpx 16rpx; font-size: 23rpx; font-size: max(12px, 23rpx); line-height: 1.6; color: var(--text-2); margin: -6rpx 0 20rpx; }
 .follow-sync-copy { display: flex; align-items: center; gap: 10rpx; min-width: 0; }
 .follow-sync-dot { width: 10rpx; height: 10rpx; flex: none; border-radius: 50%; background: var(--green-dark); }
 .follow-sync-dot--offline, .follow-sync-dot--retrying { background: var(--warn); }
@@ -111,9 +111,9 @@
 .follow-page .page-title { font-size:42rpx; line-height:1.4; }
 .follow-page .section-title { font-size:28rpx; }
 .follow-page .section-heading { min-height:44px; margin-bottom:10rpx; }
-.reminder-inline-balance { font-size:24rpx; color:var(--text-2); }
+.reminder-inline-balance { font-size:24rpx; font-size:max(12px, 24rpx); color:var(--text-2); }
 .reminder-status-copy { gap:2rpx; flex-basis:260rpx; }
-.reminder-details-toggle.ui-action { padding:10rpx 14rpx; font-size:24rpx; min-height:44px; }
+.reminder-details-toggle.ui-action { padding:10rpx 14rpx; font-size:24rpx; font-size:max(12px, 24rpx); min-height:44px; }
 .reminder-direct-button { margin-top:12rpx; min-height:44px; }
 .reminder-health-summary { display:flex; gap:12px; margin-top:12px; padding:12px; border-radius:12px; background:var(--surface-soft); }
 .reminder-health-item { display:flex; flex:1 1 0%; min-width:0; flex-direction:column; gap:4px; }
@@ -151,7 +151,7 @@
   font-size: 27rpx;
   line-height: 1.5;
 }
-.consent-recovery-name { color: var(--text-1); flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
+.consent-recovery-name { color: var(--text); flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
 .consent-recovery-state { color: var(--warn); font-weight: 650; flex: 0 0 auto; }
 .consent-recovery-action { margin-top: 16rpx; min-height: 44px; }
 .consent-recovery-steps {
@@ -161,7 +161,7 @@
   line-height: 1.6;
 }
 .follow-variant { color:var(--text-2); font-size:26rpx; line-height:1.45; }
-.follow-status { display:flex; align-items:center; gap:8rpx; color:var(--text-2); font-size:24rpx; line-height:1.5; }
+.follow-status { display:flex; align-items:center; gap:8rpx; color:var(--text-2); font-size:24rpx; font-size:max(12px, 24rpx); line-height:1.5; }
 .follow-status-dot { flex:none; width:10rpx; height:10rpx; border-radius:50%; background:currentColor; }
 .follow-status--ok { color:var(--green-dark); }
 .follow-status--warn { color:var(--warn); }

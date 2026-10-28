@@ -1,6 +1,14 @@
 # 产品图片来源与更新
 
-## 当前覆盖
+## 2026-10-28 当前覆盖与复核边界
+
+当前 V3.4.3 目录为 **340 个 SKU、114 个精确原图 URL**，包内对应 **115 份展示资源、139,837 B**。目录图片版本为 `2026-10-28T02:55:00.000Z`，以当前目录、`evidence/catalog/2026-10-28/images.verification.json` 及 `evidence/assets/product-thumbnails.manifest.json` 为准。下节 10 月 26 日的数量、尺寸及哈希是历史记录，不作为当前门禁。
+
+尺寸、编码参数和预算集中于 `config/product-image-policy.json`：卡片最大边 96px、海报 180px，缩图总预算 184,320 B、全部图片预算 204,800 B、主包源码及资源预算 1,572,864 B。编码默认 JPEG quality 85、PNG 256 色、透明度阈值 16/224。`--check` 同时比较 manifest 记录的尺寸/预算与这四个编码参数；策略漂移或缺少编码元数据直接失败，不能拿旧产物声称符合新策略。
+
+此次只取得 **12/114** 份哈希匹配的本地原图，在 `output/gxs343-review/asset-rebuild-isolated/` 进行隔离子集重建，结果记录于 `output/gxs343-review/asset-rehearsal.json`。12 份新字节均与当前包内对应资源不同，即使记录的 Pillow 12.3.0、quality 85 等元数据相同，也没有证明逐字节可重现。102 份原图缺失，完整重建尚未通过；本次没有替换实际包内资源、自动下载缺失原图或证明高像素手机清晰度。参数一致、已有文件哈希校验、重建字节一致、微信真机清晰度是四项不同证据。
+
+## 2026-10-26 历史覆盖记录
 
 2026-10-26 本地复核：当前目录共 **297 个零售 SKU、118 个精确官方原图 URL**，均有对应的已验证包内展示图。已有原图核验报告生成于 2026-10-14，记录 118 个有效 HTTP 图片、完整解码与 SHA-256 校验通过，原图总字节数为 46,126,818；本次没有重新请求全部官网原图，不能把历史 HTTP 结果当作当前网络可用性证明。
 
@@ -46,6 +54,14 @@
 
 当前包内使用透明 PNG 和基线 JPEG，是已记录的真机兼容修复：此前本地 `.webp` 被开发者工具代码包白名单剔除，造成模拟器读盘正常、手机预览缺图。不得仅为满足“现代格式”建议再把包内资源改回 `.webp`。模板里的 `webp` 属性仅是解码选项，不会将 PNG／JPEG 自动转换为 WebP。图片格式项仍需在实际上传包上取得微信质检结果，不能以本地编码或属性设置替代。
 
+## 隔离重建要求
+
+`encode-product-thumbnails.py` 当前会逐图写文件，并在最终总预算检查之前清理旧生成图及写入映射；一次中途失败可能留下不完整的候选产物。因此，**所有重建必须在包含当前工具、策略及候选源码的完整隔离副本中执行**，不得直接在准备发布的工作区试跑。保持原图、旧 manifest、映射和图片目录的完整备份，不把只含 12 份原图的子集当成可替换的完整产物。
+
+在隔离副本中取得全部原图、重建成功后，继续执行 `--check`、资产测试及 release check，检查当前全部 SKU 的映射、包体预算、尺寸、透明度和图片差异。需要更新实际候选时，图片目录、mapping、manifest 作为同一批复制，保留可恢复备份，再在目标工作区复跑门禁与微信显示验收。任何失败都保留原候选，不用局部新图覆盖旧映射。
+
+本轮没有把 Python 改为多路径原子发布：图片目录、mapping 与 manifest 位于不同路径，单独给其中一个文件加原子 rename 不能保证整批一致。完整 stage/promote 方案需要对应失败恢复、备份和跨路径替换验证，应独立实现；当前以隔离重建及整批验收控制风险。
+
 ## 更新与复核命令
 
 以下命令在项目根目录运行。首次采集或刷新官方页面会产生真实外部 GET 请求；离线模式使用已有原始缓存。
@@ -54,7 +70,7 @@
 
 重新建立整套产品目录时使用 `npm run catalog:products`。该流程已包含图片映射；它按新抓取的页面重建目录，因此后续仍需单独运行原有供应接口抽样验证流程。只补图片应使用 `enrich-images.mjs`。
 
-映射更新成功后验证并同步：
+映射更新成功后验证并同步。以下涉及重建的命令仅在上述隔离副本运行：
 
 ```powershell
 node tools/catalog/verify-images.mjs
@@ -62,7 +78,7 @@ python tools/catalog/verify-image-decode.py
 npm run catalog:sync
 node tools/assets/build-product-thumbnails.mjs --python python
 node tools/assets/build-product-thumbnails.mjs --check
-node --test tests/catalog-images.test.mjs tests/product-image-fit.test.mjs tests/product-thumbnails.test.mjs
+node --test tests/catalog-images.test.mjs tests/product-image-fit.test.mjs tests/product-thumbnails.test.mjs tests/product-thumbnail-policy-check.test.mjs
 ```
 
 Python 需要 Pillow。图片下载脚本每个唯一 URL 只保存一份，最多 3 个并发；若本地已有匹配哈希的原图则直接复用。解码脚本再次检查文件哈希并完整解码。缩图构建默认只读取已有、哈希匹配的原图；缺少原图时先恢复缓存，或明确使用 `--download` 获取原样来源。`--check` 及单元测试不联网，不依赖被忽略的大型原始素材。

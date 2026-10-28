@@ -126,7 +126,16 @@
         "read": false,
         "write": false
       },
-      "indexes": []
+      "indexes": [
+        {
+          "name": "part_id",
+          "keys": {
+            "partNumber": 1,
+            "_id": 1
+          },
+          "unique": false
+        }
+      ]
     },
     {
       "collectionName": "gxs_observation_days",
@@ -141,6 +150,15 @@
             "partNumber": 1,
             "dayKey": 1,
             "storeNumber": 1
+          },
+          "unique": false
+        },
+        {
+          "name": "part_day_id",
+          "keys": {
+            "partNumber": 1,
+            "dayKey": 1,
+            "_id": 1
           },
           "unique": false
         }

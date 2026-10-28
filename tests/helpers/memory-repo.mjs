@@ -8,6 +8,7 @@ import { createRequire } from 'node:module';
 const require = createRequire(import.meta.url);
 const { COLLECTIONS } = require('../../cloudfunctions/gxs_api/lib/collections.js');
 const { atomicMethods } = require('../../cloudfunctions/gxs_api/lib/repo/atomic-ops.js');
+const { selectObservationCoverage } = require('../../cloudfunctions/gxs_api/lib/repo/observation-storage.js');
 const { ALERT_TYPES } = require('../../cloudfunctions/gxs_api/lib/engine/events.js');
 const { dayKey: beijingDayKey, startOfDay, addDays } = require('../../cloudfunctions/gxs_api/lib/time.js');
 
@@ -73,6 +74,12 @@ export function createMemoryRepo(seed = {}) {
         }
       }
     },
+    async getLaunchGiftOrderWatermark() { return all(COLLECTIONS.orders).sort(byDesc('_id'))[0]?._id || null; },
+    async scanLaunchGiftOrders({ afterId = null, throughId, limit = 100 }) {
+      if (!throughId) return [];
+      return all(COLLECTIONS.orders).filter(row => row._id <= throughId && (!afterId || row._id > afterId)).sort(byAsc('_id'))
+        .slice(0, Math.min(100, Math.max(1, Math.floor(Number(limit) || 100))));
+    },
     async listLedger(userKey, { dayKey, limit } = {}) {
       return all(COLLECTIONS.ledger).filter(e => e.userKey === userKey && (!dayKey || e.dayKey === dayKey)).sort(byDesc('createdAt')).slice(0, limit || 50);
     },
@@ -83,6 +90,7 @@ export function createMemoryRepo(seed = {}) {
     async listStores() { return all(COLLECTIONS.catalogStores); },
     async listProducts() { return all(COLLECTIONS.catalogProducts); },
     async getProduct(partNumber) { return get(COLLECTIONS.catalogProducts, partNumber); },
+    async getProducts(partNumbers) { return [...new Set(partNumbers)].map(id => get(COLLECTIONS.catalogProducts, id)).filter(Boolean); },
     async getStores(storeNumbers) { return storeNumbers.map(s => get(COLLECTIONS.catalogStores, s)).filter(Boolean); },
     async replaceCatalog({ stores, products, meta, prune = false }) {
       if (prune) {
@@ -97,9 +105,7 @@ export function createMemoryRepo(seed = {}) {
     },
     async getLatest(targetKeys) { return targetKeys.map(k => get(COLLECTIONS.latest, k)).filter(Boolean); },
     async getObservationCoverage({ partNumber, storeNumbers = [], dayKey }) {
-      return all(COLLECTIONS.observationDays)
-        .filter(row => row.partNumber === partNumber && row.dayKey === dayKey && (!storeNumbers.length || storeNumbers.includes(row.storeNumber)))
-        .sort(byAsc('storeNumber'));
+      return selectObservationCoverage(all(COLLECTIONS.latest), all(COLLECTIONS.observationDays), { partNumber, storeNumbers, dayKey });
     },
     async saveLatest(latest) { put(COLLECTIONS.latest, latest); },
     async saveEvents(events) {

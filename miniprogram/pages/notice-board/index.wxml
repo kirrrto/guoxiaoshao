@@ -3,7 +3,7 @@
     <view class="brand-page-copy"><view class="page-title">公告与服务</view></view>
     <button class="ui-action" disabled="{{refreshing}}" loading="{{refreshing}}" bindtap="onRetry">刷新</button>
   </view>
-  <view wx:if="{{loadError}}" class="card load-error" role="alert">
+  <view wx:if="{{loadError}}" class="card load-error" aria-role="alert">
     <view class="load-error-title">公告暂未更新</view><view class="load-error-detail">{{loadError}}</view>
     <button class="btn btn-primary btn-block mt" disabled="{{refreshing}}" bindtap="onRetry">重新读取</button>
   </view>

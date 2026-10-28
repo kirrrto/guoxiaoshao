@@ -30,7 +30,7 @@ const records = [], reflows = [];
 const screenshotDirectory = path.join(directory, dark ? 'sheet-screenshots-dark' : 'sheet-screenshots');
 fs.mkdirSync(screenshotDirectory, { recursive: true });
 
-function inspectSheet({ keyboardHeight = 0 } = {}) {
+function inspectSheet({ keyboardHeight = 0, scenario = '', pageName = '' } = {}) {
   const panel = document.querySelector('.config-sheet-panel');
   const body = panel?.querySelector('.config-sheet-body');
   const content = panel?.querySelector('.config-sheet-content');
@@ -70,6 +70,25 @@ function inspectSheet({ keyboardHeight = 0 } = {}) {
       if (document.elementFromPoint(rect.x + rect.width / 2, y) !== search) { issues.push('search input covered by sticky content'); break; }
     }
   }
+  if (panel.getAttribute('role') !== 'dialog' || !panel.getAttribute('aria-label')) issues.push('dialog role/name missing from preview');
+  if (search && search.getAttribute('aria-label') !== '搜索城市、商场或门店') issues.push('search accessible name missing from preview');
+  if (scenario === 'sheet-search') {
+    const clear = panel.querySelector('.search-clear');
+    if (!clear) issues.push('search fixture did not render the clear action');
+    else {
+      const rect = box(clear);
+      controls['.search-clear'] = rect;
+      if (rect.width < 43.5 || rect.height < 43.5) issues.push('.search-clear: small touch target');
+      if (clear.getAttribute('role') !== 'button' || clear.getAttribute('aria-label') !== '清空搜索') issues.push('search clear role/name missing from preview');
+    }
+  }
+  if (scenario === 'sheet-saving' && pageName === 'follow') {
+    if (!search?.disabled) issues.push('saving did not disable search input');
+    const pickers = [...panel.querySelectorAll('[data-preview-native="picker"]')];
+    if (!pickers.length || pickers.some(element => element.getAttribute('aria-disabled') !== 'true')) issues.push('saving did not disable native pickers');
+    const choices = [...panel.querySelectorAll('.component-target-picker [role="button"]')];
+    if (!choices.length || choices.some(element => element.getAttribute('aria-disabled') !== 'true')) issues.push('saving choices did not expose disabled state');
+  }
   body.scrollTop = 0;
   return { bounds, body: bodyBounds, bodyScrollHeight: body.scrollHeight, scrollEnd, titleFont, controls, issues };
 }
@@ -88,7 +107,7 @@ try {
       document.querySelectorAll('[style]').forEach(element => element.setAttribute('style', replaceInsets(element.getAttribute('style'))));
     }, { safe });
     const keyboardHeight = item.scenario === 'sheet-keyboard' ? 280 : 0;
-    const metrics = await page.evaluate(inspectSheet, { keyboardHeight });
+    const metrics = await page.evaluate(inspectSheet, { keyboardHeight, scenario: item.scenario, pageName: item.page });
     records.push({ page: item.page, scenario: item.scenario, width: item.width, height, safeTop: safe ? 44 : 0, safeBottom: safe ? 34 : 0, keyboardHeight, ...metrics });
     if (!safe && item.page === 'query' && [375, 768, 1024].includes(item.width) && height === 500 && ['sheet-edit', 'sheet-keyboard'].includes(item.scenario)) {
       await page.screenshot({ path: path.join(screenshotDirectory, `${item.scenario}-${item.width}x${height}.png`) });

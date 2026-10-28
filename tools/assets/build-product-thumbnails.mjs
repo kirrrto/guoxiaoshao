@@ -11,6 +11,7 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const require = createRequire(import.meta.url), args = process.argv.slice(2);
 const value = name => args.includes(name) ? args[args.indexOf(name) + 1] : null;
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
+const policy = JSON.parse(await readFile(resolve(root, 'config/product-image-policy.json'), 'utf8'));
 const catalog = JSON.parse(await readFile(resolve(root, 'catalog/products.json'), 'utf8'));
 const report = JSON.parse(await readFile(resolve(root, `evidence/catalog/${catalog.imagesGeneratedAt.slice(0, 10)}/images.verification.json`), 'utf8'));
 const destinations = { manifest: 'evidence/assets/product-thumbnails.manifest.json', mapping: 'miniprogram/config/product-thumbnails.js' };
@@ -23,6 +24,20 @@ for (const product of catalog.products) {
 if (args.includes('--check')) {
   const manifest = JSON.parse(await readFile(resolve(root, destinations.manifest), 'utf8'));
   const mapping = require(resolve(root, destinations.mapping));
+  if (!catalog.products.length || !manifest.assets.length || !mapping.assets.length) throw Error('empty_thumbnail_sample');
+  for (const field of ['cardMaxEdge', 'posterMaxEdge', 'cardMaxBytes', 'posterMaxBytes']) {
+    if (manifest[field] !== policy[field]) throw Error(`thumbnail_policy_mismatch:${field}`);
+  }
+  const encoderPolicy = {
+    jpegQuality: manifest.encoder?.opaque?.quality,
+    pngColors: manifest.encoder?.transparent?.colors,
+    alphaClear: manifest.encoder?.transparent?.alphaSnap?.[0],
+    alphaSolid: manifest.encoder?.transparent?.alphaSnap?.[1],
+  };
+  for (const [field, recorded] of Object.entries(encoderPolicy)) {
+    if (recorded !== policy[field]) throw Error(`thumbnail_encoder_policy_mismatch:${field}`);
+  }
+  if (manifest.encoder.transparent.alphaSnap.length !== 2) throw Error('thumbnail_encoder_policy_mismatch:alphaSnap');
   if (manifest.catalogSha256 !== hash(await readFile(resolve(root, 'catalog/products.json')))) throw Error('thumbnail_catalog_changed');
   if (manifest.mappingSha256 !== hash(await readFile(resolve(root, destinations.mapping)))) throw Error('thumbnail_mapping_changed');
   let totalBytes = 0;
@@ -36,19 +51,26 @@ if (args.includes('--check')) {
     if (!matches || !rendition.path.endsWith(extension) || !matches(bytes) || rendition.format !== (rendition.hasTransparency ? 'PNG' : 'JPEG')) throw Error(`unsupported_thumbnail_format:${rendition.path}`);
     if (hash(bytes) !== rendition.sha256 || bytes.length !== rendition.bytes) throw Error(`invalid_thumbnail:${rendition.path}`);
     const poster = rendition.variant === 'poster';
-    if (bytes.length > (poster ? 65536 : 12288) || Math.max(rendition.width, rendition.height) > (poster ? 720 : 216)) throw Error(`thumbnail_budget:${rendition.path}`);
+    if (!bytes.length || !(rendition.width > 0 && rendition.height > 0) || bytes.length > (poster ? policy.posterMaxBytes : policy.cardMaxBytes) || Math.max(rendition.width, rendition.height) > (poster ? policy.posterMaxEdge : policy.cardMaxEdge)) throw Error(`thumbnail_budget:${rendition.path}`);
     totalBytes += bytes.length;
   }
-  if (totalBytes !== manifest.totalBytes || totalBytes > 750000) throw Error('thumbnail_package_budget');
+  if (totalBytes !== manifest.totalBytes || totalBytes > policy.thumbnailMaxBytes) throw Error('thumbnail_package_budget');
+  const knownPaths = new Set(manifest.assets.flatMap(asset => asset.renditions.map(r => r.path)));
   for (const product of catalog.products) {
     const asset = mapping.assets[mapping.byPart[product.partNumber]];
     if (!asset || asset.source !== product.imageUrl || !asset.card) throw Error(`missing_thumbnail:${product.partNumber}`);
+    if (!knownPaths.has(asset.card) || (asset.poster && !knownPaths.has(asset.poster))) throw Error(`unverified_thumbnail_path:${product.partNumber}`);
   }
   const packageBytes = async directory => (await Promise.all((await readdir(directory, { withFileTypes: true })).map(async entry => entry.isDirectory() ? packageBytes(resolve(directory, entry.name)) : (await stat(resolve(directory, entry.name))).size))).reduce((sum, bytes) => sum + bytes, 0);
   const packagedWebp = (await readdir(resolve(root, 'miniprogram'), { recursive: true })).filter(file => /\.webp$/i.test(file));
   if (packagedWebp.length) throw Error(`packaged_webp:${packagedWebp[0]}`);
   const mainPackageRawBytes = await packageBytes(resolve(root, 'miniprogram'));
-  if (mainPackageRawBytes >= 2 * 1024 * 1024) throw Error(`main_package_budget:${mainPackageRawBytes}`);
+  if (mainPackageRawBytes > policy.mainPackageMaxBytes) throw Error(`main_package_budget:${mainPackageRawBytes}`);
+  let imageBytes = 0;
+  for (const file of await readdir(resolve(root, 'miniprogram'), { recursive: true })) {
+    if (/\.(?:png|jpg|jpeg|gif|svg)$/i.test(file)) imageBytes += (await stat(resolve(root, 'miniprogram', file))).size;
+  }
+  if (imageBytes > policy.imageMaxBytes) throw Error(`image_package_budget:${imageBytes}`);
   console.log(JSON.stringify({ checked: manifest.assets.length, skus: Object.keys(mapping.byPart).length, totalBytes, mainPackageRawBytes }));
 } else {
   const cache = resolve(root, 'output/product-image-sources');
@@ -78,7 +100,8 @@ if (args.includes('--check')) {
   for (const url of posterUrls) if (!entries.some(entry => entry.source === url)) throw Error('poster_missing_verified_original');
   entries.sort((a, b) => a.source < b.source ? -1 : a.source > b.source ? 1 : 0);
   const planPath = resolve(cache, 'build-plan.json');
-  await writeFile(planPath, JSON.stringify({ root, destinations, catalogSha256: hash(await readFile(resolve(root, 'catalog/products.json'))), entries }));
+  if (!entries.length) throw Error('empty_thumbnail_sample');
+  await writeFile(planPath, JSON.stringify({ root, destinations, policy, catalogSha256: hash(await readFile(resolve(root, 'catalog/products.json'))), entries }));
   const python = value('--python') || process.env.PYTHON || 'python';
   const built = spawnSync(python, [resolve(root, 'tools/assets/encode-product-thumbnails.py'), planPath], { stdio: 'inherit', windowsHide: true });
   if (built.error) throw built.error;

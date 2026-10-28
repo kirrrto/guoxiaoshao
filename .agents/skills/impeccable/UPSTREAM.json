@@ -1,0 +1,15 @@
+{
+  "repository": "https://github.com/pbakaus/impeccable",
+  "commit": "3e3a9179e01a60265000ce239c0a99803ec1e60d",
+  "sourceDirectory": ".agents/skills/impeccable",
+  "skillVersion": "4.8.0",
+  "engineVersion": "0.1.18",
+  "engineAsset": "https://github.com/pbakaus/impeccable/releases/download/engine-v0.1.18/impeccable-windows-x64.exe",
+  "engineSha256": "8f61e96b0c97001546a824d79b44f46b423b560f3eb1a0cc44a8695a1b395d9f",
+  "license": "Apache-2.0",
+  "installationScope": "project",
+  "upstreamFilesModified": false,
+  "hooksInstalled": false,
+  "globalConfigurationModified": false,
+  "notes": "Original Codex skill copied from the pinned official repository, with its LICENSE. UPSTREAM.json and .gitignore are local provenance additions. The verified Windows engine is local and ignored; upstream launchers support a sibling binary and pinned verified download. WeChat WXML/WXSS are not recognized by engine context; audit uses native/source review plus explicitly labelled generated HTML checks."
+}

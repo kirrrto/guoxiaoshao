@@ -33,6 +33,8 @@ const {
 } = require('../miniprogram/utils/query-notice');
 
 const DAY = 86400000;
+const { paymentOrderId } = require('../cloudfunctions/gxs_api/lib/rules/launch-gift');
+const { scanLaunchGiftManifest, runLaunchGiftBatch } = require('../cloudfunctions/gxs_api/lib/services/launch-gift-task');
 const LAUNCH_GIFT_TIME = '2026-10-28T04:00:00.000Z'; // 2026-10-28 12:00:00+08:00
 const BEFORE_LAUNCH_GIFT = '2026-10-27T12:00:00.000Z'; // 2026-10-27 20:00:00+08:00
 const AFTER_LAUNCH_GIFT_DAY = '2026-10-28T16:00:00.000Z'; // 2026-10-29 00:00:00+08:00
@@ -49,7 +51,8 @@ async function purchase(f, id, planId) {
   const [days, amountFen] = plans[planId];
   const nowIso = f.state.now.toISOString();
   const order = {
-    _id: `${user._id}|${id}`,
+    _id: paymentOrderId(user._id, id),
+    outTradeNo: paymentOrderId(user._id, id),
     orderId: id,
     userKey: user._id,
     appid: user.appid,
@@ -77,6 +80,8 @@ async function purchase(f, id, planId) {
     },
   };
   await f.repo.createOrderIfAbsent(order);
+  await f.repo.markOrderPaid({ orderId: order._id, transactionId: `transaction_${id}`, nowIso,
+    providerData: { provider: 'wechat_virtual_payment', amountFen } });
   await f.repo.fulfilMembershipOrder({ orderId: order._id, source: 'virtual_payment', nowIso });
   return order;
 }
@@ -178,7 +183,7 @@ test('v3.4.3 catalog syncs all 88 standard Mac SKUs (including M6 MacBook Pro & 
   picker.onCapacityTap({ currentTarget: { dataset: { index: picker.data.capacities.indexOf('256GB') } } });
   assert.equal(picker.data.product.attributes.memory, '16GB');
   assert.equal(picker.data.product.attributes.capacity, '256GB');
-  assert.match(picker.data.product.specSummary, /M6 · 10核CPU\/10核GPU · 16GB \+ 256GB/);
+  assert.match(picker.data.product.specSummary, /M6 · 12核CPU\/12核GPU · 16GB \+ 256GB/);
 
   // 3. MacBook Air, Mac mini, Mac Studio, MacBook Neo all expose memories, capacities, and specSummary
   for (const [key, expectedMemories, expectedCapacities] of [
@@ -298,6 +303,11 @@ test('expired previously paid member (including one compensated on 2026-10-21) g
   ok(await paidFixture.call('user.bootstrap')); // receives grant_outage_20261021
 
   paidFixture.state.now = new Date(LAUNCH_GIFT_TIME);
+  // Consumed older payment segments are deliberately covered by the backend
+  // manifest, without scanning the payment history on every user bootstrap.
+  const { manifest } = await scanLaunchGiftManifest(paidFixture.repo, { environmentId: 'offline', snapshotAt: LAUNCH_GIFT_TIME,
+    cutoffExclusive: AFTER_LAUNCH_GIFT_DAY, cutoffConfirmed: true });
+  await runLaunchGiftBatch(paidFixture.repo, manifest, { expectedEnvironmentId: 'offline', nowIso: LAUNCH_GIFT_TIME, dryRun: false });
   const paidBoot = ok(await paidFixture.call('user.bootstrap'));
   assert.equal(paidBoot.membership.active, true);
   assert.equal(paidBoot.membership.planId, 'member_30d');
@@ -361,8 +371,9 @@ test('2026-10-28 celebration and Mac catalog announcements surface in bootstrap,
   const boot = ok(await f.call('user.bootstrap'));
   assert.ok(boot.announcement);
   assert.equal(boot.announcement.title, MAC_LAUNCH_CELEBRATION_NOTICE.title);
-  assert.equal(boot.announcement.kind, 'recovery');
-  assert.match(boot.announcement.text, /MacBook Pro（M6）.*iMac（M6）.*赠送 1 天会员时长/);
+  assert.equal(boot.announcement.kind, 'notice');
+  assert.match(boot.announcement.text, /10 月 28 日.*曾付费用户.*发放 1 天会员/);
+  assert.doesNotMatch(boot.announcement.text, /今日|全体会员|已发放/);
 
   // Secondary built-in notices (Mac catalog update + iPad mini catalog update) appear in notices list
   assert.ok(Array.isArray(boot.notices));
@@ -374,8 +385,8 @@ test('2026-10-28 celebration and Mac catalog announcements surface in bootstrap,
     now: Date.parse(LAUNCH_GIFT_TIME),
   });
   assert.ok(queryBanner);
-  assert.equal(queryBanner.tone, 'ok');
-  assert.match(queryBanner.text, /赠送 1 天会员时长/);
+  assert.equal(queryBanner.tone, 'info');
+  assert.match(queryBanner.text, /发放 1 天会员/);
 
   // Client fallback also injects celebration announcement and secondary notices if server cache was older
   const fallbackPayload = withOutageCompensationNotice(
@@ -393,6 +404,6 @@ test('2026-10-28 celebration and Mac catalog announcements surface in bootstrap,
   const board = rt.instance('pages/notice-board/index.js');
   await board.load();
   assert.equal(board.data.hasContent, true);
-  assert.ok(board.data.items.some(n => n.title === MAC_LAUNCH_CELEBRATION_NOTICE.title && n.tone === 'ok'));
+  assert.ok(board.data.items.some(n => n.title === MAC_LAUNCH_CELEBRATION_NOTICE.title && n.tone === 'info'));
   assert.ok(board.data.items.some(n => n.title === MAC_CATALOG_NOTICE.title));
 });

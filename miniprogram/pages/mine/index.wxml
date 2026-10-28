@@ -1,7 +1,7 @@
 <page-meta page-style="{{(redemptionOpen || authorizationOpen) ? 'overflow:hidden;' : ''}}" />
 <view class="page tab-page mine-page">
-  <view wx:if="{{networkOffline}}" class="network-notice" role="status">网络已断开，恢复后自动刷新</view>
-  <view wx:if="{{loadError}}" class="card load-error" role="alert">
+  <view wx:if="{{networkOffline}}" class="network-notice" aria-role="status">网络已断开，恢复后自动刷新</view>
+  <view wx:if="{{loadError}}" class="card load-error" aria-role="alert">
     <view class="load-error-title">暂时没有连上</view>
     <view class="load-error-detail">{{loadError}}</view>
     <button class="btn btn-primary btn-block" bindtap="onRetryLoad">重试</button>
@@ -200,7 +200,7 @@
         <view class="reminder-balance"><text class="reminder-balance-label">到货提醒</text><text class="reminder-balance-value">{{subscription.credits}} 次</text><text wx:if="{{authorization.pendingRestock}}" class="reminder-balance-pending">待同步 +{{authorization.pendingRestock}}</text></view>
         <view wx:if="{{subscription.soldoutEnabled}}" class="reminder-balance"><text class="reminder-balance-label">断货提醒</text><text class="reminder-balance-value">{{subscription.soldoutCredits}} 次</text><text wx:if="{{authorization.pendingSoldout}}" class="reminder-balance-pending">待同步 +{{authorization.pendingSoldout}}</text></view>
       </view>
-      <view wx:if="{{consent && consent.anyBlocked}}" class="consent-recovery" role="status">
+      <view wx:if="{{consent && consent.anyBlocked}}" class="consent-recovery" aria-role="status">
         <view class="consent-recovery-title">微信提醒权限未开启</view>
         <view class="consent-recovery-desc">微信已拒绝以下消息；库存监测继续，但对应提醒暂无法接收。</view>
         <view class="consent-recovery-row" wx:for="{{consent.blocked}}" wx:key="id"><text class="consent-recovery-name">{{item.title}}</text><text class="consent-recovery-state">{{item.label}}</text></view>
@@ -214,11 +214,11 @@
       <block wx:if="{{showReminderSettings}}">
       <view class="field">
         <text class="label">接收补货提醒</text>
-        <switch checked="{{settings.notifyEnabled}}" disabled="{{savingSettings}}" color="#00C375" bindchange="onNotifyToggle" />
+        <switch aria-label="接收补货提醒" checked="{{settings.notifyEnabled}}" disabled="{{savingSettings}}" color="#00C375" bindchange="onNotifyToggle" />
       </view>
       <view class="field">
         <text class="label">免打扰时段</text>
-        <switch checked="{{settings.dnd.enabled}}" disabled="{{savingSettings}}" color="#00C375" bindchange="onDndToggle" />
+        <switch aria-label="免打扰时段" checked="{{settings.dnd.enabled}}" disabled="{{savingSettings}}" color="#00C375" bindchange="onDndToggle" />
       </view>
       <block wx:if="{{settings.dnd.enabled}}">
         <view class="dnd-status-note" aria-live="polite">{{dndStatus}} · 监测继续</view>
