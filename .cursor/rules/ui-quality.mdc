@@ -1,0 +1,10 @@
+---
+description: 果小哨每次更新的设计与体验影响检查
+alwaysApply: true
+---
+
+# 持续设计与体验检查
+
+每次更新遵守根目录 [AGENTS.md](../../AGENTS.md) 和 [docs/IMPECCABLE_WORKFLOW.md](../../docs/IMPECCABLE_WORKFLOW.md)。涉及用户界面时先读 [PRODUCT.md](../../PRODUCT.md) 与 [DESIGN.md](../../DESIGN.md)，按改动范围进行审查和验收；后端或纯文档更新先判断用户体验影响，允许说明不适用原因。
+
+原有 [product-copy.mdc](product-copy.mdc) 文案与交互约定继续适用。以果小哨当前源码和维护者已确认需求为准，不机械套用网页风格、不把浏览器近似渲染当作小程序真机验收，也不因本规则自动安装、升级或执行上游工具。
