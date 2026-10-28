@@ -16,7 +16,7 @@
 - 最终前端指纹：`sha256:0cb18a94e14cb94070253f63d2af5cb249f4c43a9d5cb0c75066e43da0576012`；前端源码235文件、1,209,648 B，实际上传包体待微信工具核验。
 - GitHub 同步目标：[`kirrrto/guoxiaoshao` 的 master](https://github.com/kirrrto/guoxiaoshao/tree/master)，源码版本标签 [`v3.4.3`](https://github.com/kirrrto/guoxiaoshao/tree/v3.4.3)。提交、推送与 CI 的最终真实结果在本次交付中按远端 SHA 核对；标签不代表微信已经发布。
 - 本地发布检查51/52：源码项通过，4个 open 微信 finding 仍使严格检查退出1。GitHub CI 同样保留这一阻断，不以版本定稿、测试通过或 GitHub 标签替代真机证据。
-- 云端版本/索引与服务验收、微信开发包/质检/真机证据：待取得。
+- 云端补验（北京时间 2026-10-28 17:31–17:35）：两个缺失索引已新增并回读；云端三函数130个运行源码文件与 `065542f` 一致，故本次没有重复部署。API ping、目录条件读取和两集合游标首/续页读取通过；实际 scheduled 监测状态持续更新。详见[云端兼容性证据](../evidence/verification/3.4.3-cloud/compatibility-verification.json)。用户业务闭环、微信开发包/质检/真机证据仍待取得。
 - 正式发布的实际时间与对应上传包：待微信发布后登记。
 
 ## 正式上线前必须完成
@@ -32,9 +32,11 @@
 ### 兼容部署、索引与实际服务
 
 - [ ] 核对目标环境、当前函数/runner 版本、运行中的 writer、必要备份和回退材料，记录真实结果。当前 [数据库部署计划](../config/database-deployment-plan.json) 的 `deployed:false` 不代表已经执行。
-- [ ] 创建缺失索引并等待可用，特别是 `gxs_latest.part_id`（`partNumber, _id`）和 `gxs_observation_days.part_day_id`（`partNumber, dayKey, _id`）。新 coverage reader 在 **legacy 模式也会使用这些 keyset 查询**，不能等迁移到 embedded 后才准备。保留已有索引，同名异构先核对，不直接覆盖或删除。
+- [x] 本轮已创建并回读 `gxs_latest.part_id`（`partNumber, _id`）和 `gxs_observation_days.part_day_id`（`partNumber, dayKey, _id`），均为非唯一升序索引，保留全部旧索引；实际首/续页查询成功，回读访问计数分别为4和3。此状态只针对这两个索引，不将整个数据库部署计划改记为完成。新 coverage reader 在 **legacy 模式也会使用这些 keyset 查询**。
 - [ ] 完成 `gxs_api`、`gxs_monitor` 及实际运行的 runner 的兼容代码部署与指纹核对；未运行 runner 也记录可核对的状态。同时核对 `cloudbase_auth` 与目标版本，根据实际差异决定更新范围，不假定三函数已一致。
 - [ ] 在实际环境验证串行事务、冲突/失败恢复、历史读取/翻页、查询、关注保存与退役改选、会员展示、提醒视图、采集时效及定时调用。验证涉及真实赠礼、付款、退款或收信时，按具体授权范围执行并单独保存账本/回执，不能以 mock、发送受理或页面刷新代替。
+
+本轮下载并保留了三份线上代码包，包哈希与云平台返回值一致；按既有部署校验规则比对 JavaScript/JSON 源码（排除平台配置、云端重写的锁文件及 node_modules），API 78、monitor 49、auth 3个文件均匹配。三函数安装的 `wx-server-sdk` 均为4.0.2。实际采集为 `scheduled`，已有每分钟触发器和连续更新的状态；这不证明未盘点的外部机器不存在休眠 runner，也不证明3秒采样目标达成。`admin.paymentStatus` 调用被权限检查拒绝，支付准备状态仍未验证。本轮未修改函数、运行配置、用户记录或会员权益，未主动触发通知和支付；自然运行的线上业务另行留证。
 
 ### 当天自动赠礼的真实副作用与对账
 

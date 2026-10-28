@@ -1,0 +1,593 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-10-28T09:36:25.743Z",
+  "version": "3.4.3",
+  "sourceCommit": "065542fdb047d1618469b01f0edb079cb9cc5038",
+  "environment": "flowermean-6gjaxfqhf6c13e88",
+  "region": "ap-shanghai",
+  "scope": "Create only the two missing non-unique indexes; verify deployed source and existing scheduled collector; no function update or business mutation.",
+  "indexCreateResults": [
+    {
+      "success": true,
+      "requestId": "c102ecdb-5e93-44e6-86ee-639fc16675d3",
+      "action": "updateCollection",
+      "message": "云开发数据库集合更新成功",
+      "collection": "gxs_latest",
+      "collectionName": "gxs_latest"
+    },
+    {
+      "success": true,
+      "requestId": "0703a429-fcb5-4459-bbac-ba24c075e420",
+      "action": "updateCollection",
+      "message": "云开发数据库集合更新成功",
+      "collection": "gxs_observation_days",
+      "collectionName": "gxs_observation_days"
+    }
+  ],
+  "indexesBefore": [
+    {
+      "collection": "gxs_latest",
+      "requestId": "fa0bcd82-2191-4ef3-8e86-10090bef5990",
+      "indexes": [
+        {
+          "name": "_openid_1",
+          "keys": [
+            {
+              "Name": "_openid",
+              "Direction": "1"
+            }
+          ],
+          "unique": false,
+          "size": 36864,
+          "accesses": {
+            "Ops": 0,
+            "Since": "2026-09-15T11:32:44.588+08:00"
+          }
+        },
+        {
+          "name": "_id_",
+          "keys": [
+            {
+              "Name": "_id",
+              "Direction": "1"
+            }
+          ],
+          "unique": false,
+          "size": 45056,
+          "accesses": {
+            "Ops": 2227041,
+            "Since": "2026-09-15T11:32:44.584+08:00"
+          }
+        }
+      ]
+    },
+    {
+      "collection": "gxs_observation_days",
+      "requestId": "2536ce75-e7df-4139-9dc5-61c0cb37049a",
+      "indexes": [
+        {
+          "name": "_openid_1",
+          "keys": [
+            {
+              "Name": "_openid",
+              "Direction": "1"
+            }
+          ],
+          "unique": false,
+          "size": 53248,
+          "accesses": {
+            "Ops": 0,
+            "Since": "2026-09-16T18:34:23.726+08:00"
+          }
+        },
+        {
+          "name": "_id_",
+          "keys": [
+            {
+              "Name": "_id",
+              "Direction": "1"
+            }
+          ],
+          "unique": false,
+          "size": 77824,
+          "accesses": {
+            "Ops": 2159023,
+            "Since": "2026-09-16T18:34:23.72+08:00"
+          }
+        },
+        {
+          "name": "part_day_store",
+          "keys": [
+            {
+              "Name": "partNumber",
+              "Direction": "1"
+            },
+            {
+              "Name": "dayKey",
+              "Direction": "1"
+            },
+            {
+              "Name": "storeNumber",
+              "Direction": "1"
+            }
+          ],
+          "unique": false,
+          "size": 73728,
+          "accesses": {
+            "Ops": 68,
+            "Since": "2026-09-16T18:34:24.312+08:00"
+          }
+        }
+      ]
+    }
+  ],
+  "indexesAfter": [
+    {
+      "collection": "gxs_latest",
+      "requestId": "d959cbf4-37e6-406d-9d52-32e52157fc9c",
+      "indexes": [
+        {
+          "name": "_openid_1",
+          "keys": [
+            {
+              "Name": "_openid",
+              "Direction": "1"
+            }
+          ],
+          "unique": false,
+          "size": 36864,
+          "accesses": {
+            "Ops": 0,
+            "Since": "2026-09-15T11:32:44.588+08:00"
+          }
+        },
+        {
+          "name": "part_id",
+          "keys": [
+            {
+              "Name": "partNumber",
+              "Direction": "1"
+            },
+            {
+              "Name": "_id",
+              "Direction": "1"
+            }
+          ],
+          "unique": false,
+          "size": 28672,
+          "accesses": {
+            "Ops": 4,
+            "Since": "2026-10-28T17:31:47.757+08:00"
+          }
+        },
+        {
+          "name": "_id_",
+          "keys": [
+            {
+              "Name": "_id",
+              "Direction": "1"
+            }
+          ],
+          "unique": false,
+          "size": 45056,
+          "accesses": {
+            "Ops": 2227720,
+            "Since": "2026-09-15T11:32:44.584+08:00"
+          }
+        }
+      ]
+    },
+    {
+      "collection": "gxs_observation_days",
+      "requestId": "229447fa-dca6-4213-896b-363fb15dbacb",
+      "indexes": [
+        {
+          "name": "_openid_1",
+          "keys": [
+            {
+              "Name": "_openid",
+              "Direction": "1"
+            }
+          ],
+          "unique": false,
+          "size": 53248,
+          "accesses": {
+            "Ops": 0,
+            "Since": "2026-09-16T18:34:23.726+08:00"
+          }
+        },
+        {
+          "name": "part_day_store",
+          "keys": [
+            {
+              "Name": "partNumber",
+              "Direction": "1"
+            },
+            {
+              "Name": "dayKey",
+              "Direction": "1"
+            },
+            {
+              "Name": "storeNumber",
+              "Direction": "1"
+            }
+          ],
+          "unique": false,
+          "size": 73728,
+          "accesses": {
+            "Ops": 69,
+            "Since": "2026-09-16T18:34:24.312+08:00"
+          }
+        },
+        {
+          "name": "part_day_id",
+          "keys": [
+            {
+              "Name": "partNumber",
+              "Direction": "1"
+            },
+            {
+              "Name": "dayKey",
+              "Direction": "1"
+            },
+            {
+              "Name": "_id",
+              "Direction": "1"
+            }
+          ],
+          "unique": false,
+          "size": 81920,
+          "accesses": {
+            "Ops": 3,
+            "Since": "2026-10-28T17:31:48.266+08:00"
+          }
+        },
+        {
+          "name": "_id_",
+          "keys": [
+            {
+              "Name": "_id",
+              "Direction": "1"
+            }
+          ],
+          "unique": false,
+          "size": 77824,
+          "accesses": {
+            "Ops": 2159671,
+            "Since": "2026-09-16T18:34:23.72+08:00"
+          }
+        }
+      ]
+    }
+  ],
+  "functions": [
+    {
+      "name": "gxs_api",
+      "namespace": "flowermean-6gjaxfqhf6c13e88",
+      "status": "Active",
+      "runtime": "Nodejs18.15",
+      "modifiedAt": "2026-10-28 16:58:49",
+      "timeout": 60,
+      "installedDependencies": "TRUE",
+      "environmentVariableNames": [
+        "GXS_CONSUMER_APPID",
+        "GXS_CONSUMER_APPSECRET",
+        "GXS_ENABLE_PAYMENT_RECONCILE",
+        "GXS_PAYMENT_CALLBACK_AES_KEY",
+        "GXS_PAYMENT_CALLBACK_TOKEN",
+        "GXS_VIRTUAL_PAYMENT_APPKEY"
+      ],
+      "triggers": [
+        {
+          "AddTime": "2026-09-20 12:32:27",
+          "ModTime": "2026-10-21 11:01:29",
+          "TriggerDesc": "{\"cron\":\"0 */5 * * * * *\"}",
+          "TriggerName": "gxs-payment-reconcile-five-minutes",
+          "Type": "timer"
+        }
+      ],
+      "requestId": "16037b52-87d9-4a6b-b867-5c335efa87ed"
+    },
+    {
+      "name": "gxs_monitor",
+      "namespace": "flowermean-6gjaxfqhf6c13e88",
+      "status": "Active",
+      "runtime": "Nodejs20.19",
+      "modifiedAt": "2026-10-28 16:58:49",
+      "timeout": 60,
+      "installedDependencies": "TRUE",
+      "environmentVariableNames": [
+        "GXS_CONSUMER_APPID",
+        "GXS_CONSUMER_APPSECRET",
+        "GXS_ENABLE_SCHEDULED_MONITOR"
+      ],
+      "triggers": [
+        {
+          "AddTime": "2026-09-16 09:16:58",
+          "ModTime": "2026-10-21 11:01:30",
+          "TriggerDesc": "{\"cron\":\"0 * * * * * *\"}",
+          "TriggerName": "gxs-monitor-minute",
+          "Type": "timer"
+        }
+      ],
+      "requestId": "9d1177fb-2d63-47ba-84d0-2c115fbb0ded"
+    },
+    {
+      "name": "cloudbase_auth",
+      "namespace": "flowermean-6gjaxfqhf6c13e88",
+      "status": "Active",
+      "runtime": "Nodejs18.15",
+      "modifiedAt": "2026-10-28 16:58:48",
+      "timeout": 5,
+      "installedDependencies": "TRUE",
+      "environmentVariableNames": [],
+      "triggers": [],
+      "requestId": "97f329bb-8361-4edc-8140-0729a47c38f7"
+    }
+  ],
+  "apiPing": {
+    "requestId": "07809dce-dba6-4700-bc89-9e06da5f6172",
+    "durationMs": 42,
+    "result": {
+      "ok": true,
+      "data": {
+        "version": "3.4.3",
+        "env": "flowermean-6gjaxfqhf6c13e88",
+        "appid": "wxe96ad9e77b602f1b",
+        "crossAccount": true,
+        "hasUser": true,
+        "isAdmin": true
+      },
+      "serverTime": "2026-10-28T09:33:08.346Z",
+      "requestId": "07809dce-dba6-4700-bc89-9e06da5f6172"
+    }
+  },
+  "catalogConditionalRead": {
+    "requestId": "ed18252e-ab4b-42a7-8c3b-9812a8e5ca56",
+    "durationMs": 133,
+    "result": {
+      "ok": true,
+      "data": {
+        "unchanged": true,
+        "version": "2026-10-28T02:55:00.000Z|2026-09-15T02:43:32.425Z|2026-10-28T02:55:00.000Z"
+      },
+      "serverTime": "2026-10-28T09:35:25.537Z",
+      "requestId": "ed18252e-ab4b-42a7-8c3b-9812a8e5ca56"
+    }
+  },
+  "paymentReadinessAttempt": {
+    "requestId": "e76b46e7-8ecf-42e4-a89f-995e002c1e6a",
+    "durationMs": 110,
+    "result": {
+      "ok": false,
+      "error": {
+        "code": "forbidden",
+        "message": "需要管理员权限",
+        "details": null
+      },
+      "serverTime": "2026-10-28T09:35:13.561Z",
+      "requestId": "e76b46e7-8ecf-42e4-a89f-995e002c1e6a"
+    }
+  },
+  "keysetReads": [
+    {
+      "key": "keyset-latest-first",
+      "success": true,
+      "requestId": "3a4ec739-9750-4169-8a21-1e5f83edfdc4",
+      "data": [
+        {
+          "_id": "R320|MK2P4CH/A",
+          "observedAt": "2026-10-28T09:33:03.795Z",
+          "partNumber": "MK2P4CH/A",
+          "storeNumber": "R320"
+        },
+        {
+          "_id": "R359|MK2P4CH/A",
+          "observedAt": "2026-10-28T09:33:03.679Z",
+          "partNumber": "MK2P4CH/A",
+          "storeNumber": "R359"
+        }
+      ],
+      "total": 48,
+      "pager": {
+        "Offset": 0,
+        "Limit": 2,
+        "Total": 48
+      },
+      "message": "文档查询成功",
+      "collection": "gxs_latest",
+      "collectionName": "gxs_latest"
+    },
+    {
+      "key": "keyset-latest-next",
+      "success": true,
+      "requestId": "3f7905de-47c1-4313-8c7a-634f662f1179",
+      "data": [
+        {
+          "_id": "R388|MK2P4CH/A",
+          "observedAt": "2026-10-28T09:34:06.388Z",
+          "partNumber": "MK2P4CH/A",
+          "storeNumber": "R388"
+        },
+        {
+          "_id": "R389|MK2P4CH/A",
+          "observedAt": "2026-10-28T09:34:04.905Z",
+          "partNumber": "MK2P4CH/A",
+          "storeNumber": "R389"
+        }
+      ],
+      "total": 46,
+      "pager": {
+        "Offset": 0,
+        "Limit": 2,
+        "Total": 46
+      },
+      "message": "文档查询成功",
+      "collection": "gxs_latest",
+      "collectionName": "gxs_latest"
+    },
+    {
+      "key": "keyset-days-first",
+      "success": true,
+      "requestId": "9c66ab0e-ccc4-40f6-aebd-eb814b29d50d",
+      "data": [
+        {
+          "_id": "R320|MK2P4CH/A|2026-10-28",
+          "dayKey": "2026-10-28",
+          "lastObservedAt": "2026-10-28T09:33:03.795Z",
+          "partNumber": "MK2P4CH/A",
+          "sampleCount": 1071,
+          "storeNumber": "R320"
+        },
+        {
+          "_id": "R359|MK2P4CH/A|2026-10-28",
+          "dayKey": "2026-10-28",
+          "lastObservedAt": "2026-10-28T09:33:03.679Z",
+          "partNumber": "MK2P4CH/A",
+          "sampleCount": 1055,
+          "storeNumber": "R359"
+        }
+      ],
+      "total": 30,
+      "pager": {
+        "Offset": 0,
+        "Limit": 2,
+        "Total": 30
+      },
+      "message": "文档查询成功",
+      "collection": "gxs_observation_days",
+      "collectionName": "gxs_observation_days"
+    },
+    {
+      "key": "keyset-days-next",
+      "success": true,
+      "requestId": "75a44544-7e02-42dc-942d-6fbcd00bbac7",
+      "data": [
+        {
+          "_id": "R388|MK2P4CH/A|2026-10-28",
+          "dayKey": "2026-10-28",
+          "lastObservedAt": "2026-10-28T09:34:06.388Z",
+          "partNumber": "MK2P4CH/A",
+          "sampleCount": 1056,
+          "storeNumber": "R388"
+        },
+        {
+          "_id": "R389|MK2P4CH/A|2026-10-28",
+          "dayKey": "2026-10-28",
+          "lastObservedAt": "2026-10-28T09:34:04.905Z",
+          "partNumber": "MK2P4CH/A",
+          "sampleCount": 1056,
+          "storeNumber": "R389"
+        }
+      ],
+      "total": 28,
+      "pager": {
+        "Offset": 0,
+        "Limit": 2,
+        "Total": 28
+      },
+      "message": "文档查询成功",
+      "collection": "gxs_observation_days",
+      "collectionName": "gxs_observation_days"
+    }
+  ],
+  "collector": {
+    "before": {
+      "mode": "scheduled",
+      "state": "running",
+      "ownerId": "timer-4e4f41ce-e090-44a9-ab34-9e175f42b2c8",
+      "updatedAt": "2026-10-28T09:32:21.512Z",
+      "expiresAt": "2026-10-28T09:34:51.512Z",
+      "targetPeriodMs": 60000,
+      "stats": {
+        "batches": 29,
+        "observations": 81,
+        "sent": 0,
+        "lastBatchAt": "2026-10-28T09:32:21.331Z"
+      }
+    },
+    "after": {
+      "mode": "scheduled",
+      "state": "running",
+      "ownerId": "timer-18ca9e2b-3b67-4627-9a55-73c8cd49a347",
+      "updatedAt": "2026-10-28T09:33:24.303Z",
+      "expiresAt": "2026-10-28T09:35:54.303Z",
+      "targetPeriodMs": 60000,
+      "stats": {
+        "batches": 29,
+        "observations": 81,
+        "sent": 0,
+        "lastBatchAt": "2026-10-28T09:33:24.138Z"
+      }
+    },
+    "observedMode": "scheduled",
+    "scope": "Active collector state and logs observed; not an inventory of every external host or proof that no dormant resident runner exists."
+  },
+  "embeddedTargets": {
+    "requestId": "b59bf7cd-703a-4ad3-8c90-22dc06cc8f8f",
+    "total": 0
+  },
+  "productionMutations": {
+    "indexesCreated": 2,
+    "existingIndexesDropped": 0,
+    "cloudFunctionsUpdated": 0,
+    "runtimeConfigUpdates": 0,
+    "businessRecordsWritten": 0,
+    "inventoryMigrations": 0,
+    "explicitGiftRuns": 0,
+    "explicitNotifications": 0,
+    "payments": 0,
+    "wechatUploads": 0
+  },
+  "limitations": [
+    "The payment-readiness admin action returned forbidden; no authorization bypass attempted and payment readiness is not verified.",
+    "No user-account follow/member/history actions were invoked, because they can write quota/user state or grant gifts.",
+    "Read-only keyset checks validate database query shape; they do not replace end-to-end client history verification.",
+    "No forced transaction conflict, failure recovery, midnight migration, payment or message delivery tests were performed.",
+    "Existing scheduled collector continues business work independently; this audit does not claim zero natural gifts/messages by the running application."
+  ],
+  "publicationReady": false,
+  "sourceComparison": {
+    "passed": true,
+    "functions": [
+      {
+        "name": "gxs_api",
+        "passed": true,
+        "comparedFiles": 78,
+        "differences": []
+      },
+      {
+        "name": "gxs_monitor",
+        "passed": true,
+        "comparedFiles": 49,
+        "differences": []
+      },
+      {
+        "name": "cloudbase_auth",
+        "passed": true,
+        "comparedFiles": 3,
+        "differences": []
+      }
+    ]
+  },
+  "packages": [
+    {
+      "name": "gxs_api",
+      "bytes": 7664956,
+      "packageSha256": "16af612db6bc26a4b49526cb595428a457cb4dec079b55f5e1c4d74a4be620a3",
+      "providerCodeSha256": "16af612db6bc26a4b49526cb595428a457cb4dec079b55f5e1c4d74a4be620a3"
+    },
+    {
+      "name": "gxs_monitor",
+      "bytes": 7682527,
+      "packageSha256": "209834ba5c4f73d65a3572985c16ec1bb09989ee20d773139a96895df1076fac",
+      "providerCodeSha256": "209834ba5c4f73d65a3572985c16ec1bb09989ee20d773139a96895df1076fac"
+    },
+    {
+      "name": "cloudbase_auth",
+      "bytes": 7430081,
+      "packageSha256": "9893bef640cee26478626b97c81490271f28952f13e8e4d0f12fcbc3b47a2fef",
+      "providerCodeSha256": "9893bef640cee26478626b97c81490271f28952f13e8e4d0f12fcbc3b47a2fef"
+    }
+  ]
+}
