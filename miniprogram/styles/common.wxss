@@ -216,7 +216,6 @@ view, text { box-sizing: border-box; }
 /* 加载失败 */
 .load-error-title { font-size: 32rpx; font-weight: 600; color: var(--text); }
 .load-error-detail { margin-top: 12rpx; font-size: 26rpx; color: var(--text-2); line-height: 1.6; overflow-wrap: anywhere; }
-.load-error-hint { margin: 12rpx 0 28rpx; font-size: 23rpx; color: var(--text-3); line-height: 1.6; }
 
 /* Shared responsive contract: every row can shrink or wrap at 320px. */
 view, text, button, input, textarea, image, scroll-view, picker { box-sizing: border-box; }
@@ -227,7 +226,6 @@ view, text, button, input, textarea, image, scroll-view, picker { box-sizing: bo
 .network-notice { margin-bottom: 16rpx; padding: 16rpx 24rpx; border-radius: 16rpx; background: var(--warn-soft, #FFF3DD); color: var(--warn, #8A5A12); font-size: 26rpx; line-height: 1.5; }
 .page-heading { margin: 8rpx 10rpx 30rpx; }
 .page-title { font-size: 44rpx; font-weight: 700; line-height: 1.3; letter-spacing: -0.5rpx; }
-.page-subtitle { margin-top: 12rpx; color: var(--text-2); font-size: max(12px, 25rpx); line-height: 1.65; }
 .card { min-width: 0; border: 1rpx solid var(--glass-line); }
 .card-title { align-items: flex-start; flex-wrap: wrap; gap: 10rpx 16rpx; line-height: 1.45; }
 .card-title > text:first-child { flex: 1 1 220rpx; min-width: 0; white-space: normal; overflow-wrap: anywhere; }
@@ -288,7 +286,7 @@ view, text, button, input, textarea, image, scroll-view, picker { box-sizing: bo
 @media (min-width: 600px) {
   .page { width: 100%; max-width: 960px; margin-left: auto; margin-right: auto; padding: 24px 24px 100px; font-size: 16px; }
   .page .page-title { font-size: 26px; }
-  .page .page-subtitle, .page .small { font-size: 15px; }
+  .page .small { font-size: 15px; }
   .page .tiny, .page .pill, .page .sub, .page .footer-note { font-size: 13px; }
   .page .card { padding: 24px; border-radius: 18px; margin-bottom: 20px; }
   .page .card-title, .page .section-title, .page .journey-title, .page .activation-title { font-size: 20px; }
@@ -327,7 +325,7 @@ view, text, button, input, textarea, image, scroll-view, picker { box-sizing: bo
   .page .membership-package-selected .membership-package-radio { border-width: 4px; }
   .page .checkout-core-benefits { font-size: 14px; }
   .page .membership-contextual .checkout-context { padding: 16px 18px; border-radius: 16px; }
-  .page .membership-contextual .checkout-target, .page .membership-contextual .checkout-explanation { margin-top: 8px; }
+  .page .membership-contextual .checkout-target { margin-top: 8px; }
   .page .membership-contextual .member-overview { margin-top: 16px; margin-bottom: 8px; }
   .page .membership-contextual .member-authorization { margin-top: 8px; }
   .page .membership-contextual .membership-shop { margin-top: 16px; padding-top: 16px; }
@@ -336,7 +334,7 @@ view, text, button, input, textarea, image, scroll-view, picker { box-sizing: bo
   .page .membership-packages-context .membership-package-price, .page .membership-packages-context .membership-package-choice { margin-top: 8px; }
   .page .membership-contextual .checkout-terms { margin-top: 12px; }
   .page .checkout-target-title { font-size: 18px; }
-  .page .checkout-stores, .page .checkout-explanation, .page .checkout-terms, .page .checkout-problem, .page .checkout-eyebrow { font-size: 14px; }
+  .page .checkout-stores, .page .checkout-terms, .page .checkout-problem, .page .checkout-eyebrow { font-size: 14px; }
   .page .checkout-image { width: 72px; height: 86px; flex-basis: 72px; }
 }
 

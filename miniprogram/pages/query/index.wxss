@@ -199,12 +199,6 @@
   letter-spacing: 0;
   word-break: keep-all;
 }
-.query-page .page-subtitle {
-  margin-top: 4rpx;
-  font-size: 12px;
-  line-height: 1.5;
-  color: var(--text-2);
-}
 
 .add-tip--top {
   margin: 0 0 18rpx;

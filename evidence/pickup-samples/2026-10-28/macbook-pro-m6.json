@@ -1,0 +1,53 @@
+{
+  "record": {
+    "storeNumber": "R577",
+    "partNumbers": [
+      "MHWT4CH/A",
+      "MHWW4CH/A",
+      "MJ2C4CH/A"
+    ],
+    "requestUrl": "https://www.apple.com.cn/shop/retail/pickup-message?pl=true&mts.0=regular&parts.0=MHWT4CH%2FA&parts.1=MHWW4CH%2FA&parts.2=MJ2C4CH%2FA&store=R577",
+    "startedAt": "2026-10-28T02:05:32.516Z",
+    "httpStatus": 200,
+    "bytes": 6753,
+    "elapsedMs": 1317,
+    "finishedAt": "2026-10-28T02:05:33.833Z",
+    "error": null,
+    "retryAfter": null
+  },
+  "observations": [
+    {
+      "storeNumber": "R577",
+      "storeName": "天环广场",
+      "partNumber": "MHWT4CH/A",
+      "status": "ineligible",
+      "pickupDisplay": "ineligible",
+      "quote": "暂无供应",
+      "productTitle": "14 英寸 MacBook Pro - 深空黑色",
+      "observedAt": "2026-10-28T02:05:33.833Z",
+      "reason": null
+    },
+    {
+      "storeNumber": "R577",
+      "storeName": "天环广场",
+      "partNumber": "MHWW4CH/A",
+      "status": "ineligible",
+      "pickupDisplay": "ineligible",
+      "quote": "暂无供应",
+      "productTitle": "14 英寸 MacBook Pro - 银色",
+      "observedAt": "2026-10-28T02:05:33.833Z",
+      "reason": null
+    },
+    {
+      "storeNumber": "R577",
+      "storeName": "天环广场",
+      "partNumber": "MJ2C4CH/A",
+      "status": "ineligible",
+      "pickupDisplay": "ineligible",
+      "quote": "暂无供应",
+      "productTitle": "14 英寸 MacBook Pro - 深空黑色",
+      "observedAt": "2026-10-28T02:05:33.833Z",
+      "reason": null
+    }
+  ]
+}

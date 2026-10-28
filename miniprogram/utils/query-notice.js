@@ -74,21 +74,41 @@ const IPAD_MINI_CATALOG_NOTICE = Object.freeze({
   text: '苹果商店已上架新款 iPad mini（A20 Pro），老款取货接口已停用。果小哨已同步更新新款全系配置；原关注老款的用户请点「调整」改选新款。',
 });
 
+const MAC_LAUNCH_CELEBRATION_NOTICE = Object.freeze({
+  id: 'mac-launch-celebration-2026-10-28',
+  title: '庆祝苹果 Mac 新品发布 · 会员礼遇与目录更新',
+  kind: 'recovery',
+  publishedAt: '2026-10-28T00:00:00+08:00',
+  startsAt: '2026-10-28T00:00:00+08:00',
+  expiresAt: '2026-11-06T23:59:59+08:00',
+  text: '庆祝苹果发布新款 14 英寸 MacBook Pro（M6）与新款 iMac（M6），果小哨已同步上线全系新配置，并今日（10 月 28 日）为全体会员及曾付费用户自动赠送 1 天会员时长，可在「我的」查看。',
+});
+
+const MAC_CATALOG_NOTICE = Object.freeze({
+  id: 'mac-catalog-2026-10-28',
+  title: '新款 MacBook Pro 与 iMac 目录更新说明',
+  kind: 'notice',
+  publishedAt: '2026-10-28T00:00:00+08:00',
+  startsAt: '2026-10-28T00:00:00+08:00',
+  expiresAt: '2026-11-06T23:59:59+08:00',
+  text: '苹果商店已上架新款 14 英寸 MacBook Pro（M6）与新款 iMac（M6），老款对应配置取货接口已停用。果小哨已同步更新新款配置；原关注老款的用户请点「调整」改选新款。',
+});
+
 function withOutageCompensationNotice(payload, now = Date.now()) {
   if (!payload || typeof payload !== 'object' || typeof payload.serverTime !== 'string') return payload;
   const serverNow = parseTime(payload.serverTime);
   if (serverNow === null) return payload;
   const checkTime = Number.isFinite(now) ? now : serverNow;
-  const builtIn = [IPAD_MINI_CATALOG_NOTICE, OUTAGE_COMPENSATION_NOTICE]
-    .find(notice => normalizeAnnouncement(notice, serverNow) && normalizeAnnouncement(notice, checkTime));
+  const activeBuiltIns = [MAC_LAUNCH_CELEBRATION_NOTICE, MAC_CATALOG_NOTICE, IPAD_MINI_CATALOG_NOTICE, OUTAGE_COMPENSATION_NOTICE]
+    .filter(notice => normalizeAnnouncement(notice, serverNow) && normalizeAnnouncement(notice, checkTime));
+  const builtIn = activeBuiltIns[0] || null;
   if (!builtIn) return payload;
   const activeAnnouncement = normalizeAnnouncement(payload.announcement, checkTime);
   const announcement = activeAnnouncement ? payload.announcement : builtIn;
   const rawNotices = Array.isArray(payload.notices) ? payload.notices : [];
-  const needsBoardRow = Boolean(activeAnnouncement && activeAnnouncement.text !== builtIn.text);
-  const notices = needsBoardRow && !rawNotices.some(item => item && item.id === builtIn.id)
-    ? [builtIn, ...rawNotices]
-    : rawNotices;
+  const boardBuiltIns = (activeAnnouncement && activeAnnouncement.text !== builtIn.text ? activeBuiltIns : activeBuiltIns.slice(1))
+    .filter(notice => !rawNotices.some(item => item && item.id === notice.id));
+  const notices = boardBuiltIns.length ? [...boardBuiltIns, ...rawNotices] : rawNotices;
   return { ...payload, announcement, notices };
 }
 
@@ -206,7 +226,8 @@ function resolveQueryNotice({ announcement, now = Date.now(), consent = null, co
 }
 
 module.exports = {
-  OUTAGE_COMPENSATION_NOTICE, IPAD_MINI_CATALOG_NOTICE, withOutageCompensationNotice,
+  OUTAGE_COMPENSATION_NOTICE, IPAD_MINI_CATALOG_NOTICE, MAC_LAUNCH_CELEBRATION_NOTICE, MAC_CATALOG_NOTICE,
+  withOutageCompensationNotice,
   parseTime, noticeExpiresAt, normalizeAnnouncement, liveNotices, hasLiveNoticeContent, resolveQueryNotice,
   noticeFingerprint, noticeUnreadCount, markNoticesSeen,
 };

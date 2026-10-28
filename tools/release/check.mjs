@@ -82,12 +82,13 @@ check('tab icons and page resources exist', app.pages.every(page => ['.js','.wxm
 const customTabs = require(path.join(root, 'miniprogram/utils/tab-bar.js')).TABS;
 check('native navigation avoids per-page custom tab component creation', app.tabBar.custom !== true && !fs.existsSync(path.join(root, 'miniprogram/custom-tab-bar')));
 check('navigation helpers match native tab routes, labels and icons', customTabs.length === app.tabBar.list.length && customTabs.every((tab, index) => ['pagePath', 'text', 'iconPath', 'selectedIconPath'].every(key => tab[key].replace(/^\//, '') === app.tabBar.list[index][key].replace(/^\//, ''))));
-let frontendBytes = 0, frontendFiles = 0;
-function walk(dir) { for (const entry of fs.readdirSync(dir, { withFileTypes: true })) { if (entry.name === 'node_modules') continue; const file = path.join(dir, entry.name); if (entry.isDirectory()) walk(file); else { frontendFiles++; frontendBytes += fs.statSync(file).size; } } }
+let frontendBytes = 0, frontendFiles = 0, imageBytes = 0;
+function walk(dir) { for (const entry of fs.readdirSync(dir, { withFileTypes: true })) { if (entry.name === 'node_modules') continue; const file = path.join(dir, entry.name); if (entry.isDirectory()) walk(file); else { frontendFiles++; const size = fs.statSync(file).size; frontendBytes += size; if (/\.(?:png|jpg|jpeg|gif|svg)$/i.test(entry.name)) imageBytes += size; } } }
 walk(path.join(root, 'miniprogram'));
 const thumbnailCheck = spawnSync(process.execPath, [path.join(root, 'tools/assets/build-product-thumbnails.mjs'), '--check'], { encoding: 'utf8', windowsHide: true });
 check('verified local thumbnails cover the current catalog and match recorded asset hashes', thumbnailCheck.status === 0);
-check('frontend source and assets fit within the 2 MiB main-package budget before compilation', frontendBytes < 2 * 1024 * 1024);
+check('frontend source and assets fit within the 1.5 MiB main-package budget before compilation', frontendBytes < 1.5 * 1024 * 1024);
+check('image assets fit within the 200 KB WeChat quality audit recommendation', imageBytes <= 200 * 1024);
 const sourceChecksPassed = checks.every(c => c.passed);
 let qualityGate;
 let sourceFingerprint = null;

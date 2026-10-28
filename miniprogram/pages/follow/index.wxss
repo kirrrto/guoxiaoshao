@@ -2,7 +2,6 @@
 .whistle-mark { display: flex; align-items: center; justify-content: center; flex: 0 0 80rpx; width: 80rpx; height: 80rpx; border-radius: 24rpx; background: var(--green-soft); }
 .whistle-heading-image { display: block; width: 54rpx; height: 54rpx; }
 .whistle-heading-copy { flex: 1; min-width: 0; }
-.whistle-heading-copy .page-subtitle { line-height: 1.65; }
 .compact-action.btn { flex: none; width: auto; min-width: 64px; min-height: 44px; padding: 0 20rpx; }
 .section-heading { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8rpx 16rpx; margin-bottom: 16rpx; }
 .section-title { color: var(--text); font-size: 32rpx; line-height: 1.5; font-weight: 650; }
@@ -33,7 +32,6 @@
 .follow-sync-dot--offline, .follow-sync-dot--retrying { background: var(--warn); }
 .follow-sync-time { font-variant-numeric: tabular-nums; }
 .follow-sync-times { display: flex; flex-wrap: wrap; gap: 4rpx 14rpx; }
-.follow-sync-note { margin: -10rpx 0 20rpx; color: var(--text-2); font-size: 24rpx; line-height: 1.6; }
 .follow-inventory-status { display: flex; flex-direction: column; gap: 4rpx; border-left: 4rpx solid var(--warn); padding: 4rpx 18rpx; margin-bottom: 22rpx; color: var(--text-2); font-size: 24rpx; line-height: 1.6; }
 .follow-inventory-status .bold { color: var(--text); font-size: 26rpx; }
 .follow-expectation, .follow-refresh-feedback { font-size: 24rpx; line-height: 1.6; color: var(--text-2); margin: 14rpx 0; overflow-wrap: anywhere; }
@@ -105,15 +103,12 @@
 .activation-dot { display: flex; align-items: center; justify-content: center; width: 34rpx; height: 34rpx; border: 1rpx solid var(--line); border-radius: 50%; }
 .activation-step--done .activation-dot { color: var(--green-ink); background: var(--green); border-color: var(--green); }
 
-
-
 .reminder-status-strip.card { padding:18rpx 24rpx; margin-bottom:26rpx; }
 .reminder-status-row { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12rpx; }
 .reminder-status-copy { display:flex; flex-direction:column; gap:6rpx; flex:1 1 260rpx; font-size:28rpx; line-height:1.5; }
 .reminder-status-strip > .ui-action { min-height:44px; }
 .follow-page .page-heading { margin-bottom:22rpx; }
 .follow-page .page-title { font-size:42rpx; line-height:1.4; }
-.follow-page .page-subtitle { font-size:24rpx; margin-top:4rpx; }
 .follow-page .section-title { font-size:28rpx; }
 .follow-page .section-heading { min-height:44px; margin-bottom:10rpx; }
 .reminder-inline-balance { font-size:24rpx; color:var(--text-2); }

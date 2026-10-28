@@ -15,9 +15,9 @@
     { "category": "ipad", "familyKey": "ipad-mini", "displayName": "iPad mini", "url": "https://www.apple.com.cn/shop/buy-ipad/ipad-mini", "include": true, "releaseDate": "2026-10-26", "releaseSourceUrl": "https://www.apple.com.cn/newsroom/2026/10/apple-gives-ipad-mini-its-biggest-update-ever/" },
 
     { "category": "mac", "familyKey": "macbook-air", "displayName": "MacBook Air", "url": "https://www.apple.com.cn/shop/buy-mac/macbook-air", "include": true },
-    { "category": "mac", "familyKey": "macbook-pro", "displayName": "MacBook Pro", "url": "https://www.apple.com.cn/shop/buy-mac/macbook-pro", "include": true },
+    { "category": "mac", "familyKey": "macbook-pro", "displayName": "MacBook Pro", "url": "https://www.apple.com.cn/shop/buy-mac/macbook-pro", "include": true, "releaseDate": "2026-10-27", "releaseSourceUrl": "https://www.apple.com.cn/newsroom/2026/10/apple-introduces-the-new-14-inch-macbook-pro-with-m6/" },
     { "category": "mac", "familyKey": "macbook-neo", "displayName": "MacBook Neo", "url": "https://www.apple.com.cn/shop/buy-mac/macbook-neo", "include": true },
-    { "category": "mac", "familyKey": "imac", "displayName": "iMac", "url": "https://www.apple.com.cn/shop/buy-mac/imac", "include": true },
+    { "category": "mac", "familyKey": "imac", "displayName": "iMac", "url": "https://www.apple.com.cn/shop/buy-mac/imac", "include": true, "releaseDate": "2026-10-27", "releaseSourceUrl": "https://www.apple.com.cn/newsroom/2026/10/apple-unveils-new-imac-with-m6/" },
     { "category": "mac", "familyKey": "mac-mini", "displayName": "Mac mini", "url": "https://www.apple.com.cn/shop/buy-mac/mac-mini", "include": true },
     { "category": "mac", "familyKey": "mac-studio", "displayName": "Mac Studio", "url": "https://www.apple.com.cn/shop/buy-mac/mac-studio", "include": true },
     { "category": "mac", "familyKey": "studio-display", "displayName": "Studio Display", "url": "https://www.apple.com.cn/shop/buy-mac/studio-display", "include": false, "excludeReason": "显示器属于配件范围，首版不纳入" },

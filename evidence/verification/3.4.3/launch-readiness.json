@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "asOf": "2026-10-28",
+  "timezone": "Asia/Shanghai",
+  "localOnly": true,
+  "networkAccessed": false,
+  "productionChanged": false,
+  "calendarEnablesService": false,
+  "passed": true,
+  "errors": [],
+  "launches": [
+    {
+      "familyKey": "iphone-duo",
+      "title": "iPhone Duo",
+      "sourceUrl": "https://www.apple.com.cn/newsroom/2026/09/apple-unveils-iphone-duo/",
+      "officialUrl": "https://www.apple.com.cn/shop/buy-iphone/iphone-duo",
+      "editorialVerifiedOn": "2026-10-11",
+      "sourceContentRevalidated": false,
+      "preorderAt": "2026-10-16T20:00:00+08:00",
+      "releaseDate": "2026-10-23",
+      "catalogProductCount": 8,
+      "effectiveSupportedCount": 8,
+      "comingSoonCount": 0,
+      "sampledPartNumber": "MK2Q4CH/A",
+      "pickupVerificationStatus": "ineligible",
+      "blockers": [],
+      "variants": [
+        {
+          "partNumber": "MK2Q4CH/A",
+          "comingSoon": false,
+          "supported": true
+        },
+        {
+          "partNumber": "MK2W4CH/A",
+          "comingSoon": false,
+          "supported": true
+        },
+        {
+          "partNumber": "MK2P4CH/A",
+          "comingSoon": false,
+          "supported": true
+        },
+        {
+          "partNumber": "MK2M4CH/A",
+          "comingSoon": false,
+          "supported": true
+        },
+        {
+          "partNumber": "MK2U4CH/A",
+          "comingSoon": false,
+          "supported": true
+        },
+        {
+          "partNumber": "MK2N4CH/A",
+          "comingSoon": false,
+          "supported": true
+        },
+        {
+          "partNumber": "MK2V4CH/A",
+          "comingSoon": false,
+          "supported": true
+        },
+        {
+          "partNumber": "MK2T4CH/A",
+          "comingSoon": false,
+          "supported": true
+        }
+      ],
+      "operationalStatus": "catalog_support_present_requires_release_acceptance",
+      "nextSteps": [
+        "经授权完成发布前真机、目录和监测验收"
+      ]
+    }
+  ],
+  "interpretation": "通过仅表示本地登记格式和目录状态一致；不证明来源网页本次已联网核实，不证明取货或监测服务已开放。",
+  "catalogSha256": "28652bb91eb6f47d5e4ce3ed1986a2af56a2f21d0c0fdc72fa9fad9d4075c2c6",
+  "cloudBundleMatchesLocal": true
+}

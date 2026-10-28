@@ -18,9 +18,9 @@ const FAMILY_RELEASES = {
   'ipad': ['2025-03-04', 'https://www.apple.com/newsroom/2025/03/apple-introduces-ipad-air-with-powerful-m3-chip-and-new-magic-keyboard/'],
   'ipad-mini': ['2026-10-26', 'https://www.apple.com.cn/newsroom/2026/10/apple-gives-ipad-mini-its-biggest-update-ever/'],
   'macbook-air': ['2026-03-03', 'https://www.apple.com/newsroom/2026/03/apple-introduces-the-new-macbook-air-with-m5/'],
-  'macbook-pro': ['2026-03-03', 'https://www.apple.com/newsroom/2026/03/apple-introduces-macbook-pro-with-all-new-m5-pro-and-m5-max/'],
+  'macbook-pro': ['2026-10-27', 'https://www.apple.com.cn/newsroom/2026/10/apple-introduces-the-new-14-inch-macbook-pro-with-m6/'],
   'macbook-neo': ['2026-03-04', 'https://www.apple.com/newsroom/2026/03/say-hello-to-macbook-neo/'],
-  'imac': ['2024-10-28', 'https://www.apple.com/uk/newsroom/2024/10/apple-introduces-new-imac-supercharged-by-m4-and-apple-intelligence/'],
+  'imac': ['2026-10-27', 'https://www.apple.com.cn/newsroom/2026/10/apple-unveils-new-imac-with-m6/'],
   'mac-mini': ['2026-08-25', 'https://www.apple.com/uk/newsroom/2026/08/apple-unveils-a-more-powerful-mac-mini-featuring-the-all-new-m6-and-m5-pro/'],
   'mac-studio': ['2026-08-25', 'https://www.apple.com/newsroom/2026/08/apple-introduces-new-mac-studio-with-m5-max-and-m5-ultra/'],
   'airpods-pro-3': ['2025-09-09', 'https://www.apple.com/newsroom/2025/09/introducing-airpods-pro-3-the-ultimate-audio-experience/'],
@@ -77,6 +77,7 @@ function compareRecency(a, b, leftName, rightName) {
 
 const FAMILY_PRIORITY = {
   'iphone-duo': 1,
+  'macbook-pro': 1,
 };
 
 function sortFamilies(families) {

@@ -4,7 +4,7 @@ const { ApiError } = require('../errors');
 const { sharedQueryPickup } = require('../engine/shared-query');
 const { ensureUser } = require('./users');
 const { accountLimits } = require('../rules/membership');
-const { isRetiredPartNumber, RETIRED_PRODUCT_MESSAGE } = require('../rules/follow-access');
+const { isRetiredPartNumber, retiredProductMessage } = require('../rules/follow-access');
 const { recordObservations } = require('../engine/observations');
 const ID_PATTERN = /^[A-Za-z0-9_-]{8,64}$/;
 function validatePayload(ctx, payload, user) {
@@ -12,7 +12,7 @@ function validatePayload(ctx, payload, user) {
   if (!queryId) throw new ApiError('invalid_query_id', 'queryId 需为 8–64 位字母数字标识');
   const partNumber = typeof payload.partNumber === 'string' ? payload.partNumber.trim() : '';
   if (!/^[A-Z0-9]{5}CH\/A$/.test(partNumber)) throw new ApiError('invalid_part_number', '商品编号格式无效');
-  if (isRetiredPartNumber(partNumber)) throw new ApiError('product_retired', RETIRED_PRODUCT_MESSAGE);
+  if (isRetiredPartNumber(partNumber)) throw new ApiError('product_retired', retiredProductMessage(partNumber));
   const maxStores = accountLimits(user, ctx.now, ctx.config).queryMaxStores;
   const storeNumbers = Array.isArray(payload.storeNumbers) ? [...new Set(payload.storeNumbers.filter(s => typeof s === 'string' && /^R\d{3}$/.test(s)))] : [];
   if (storeNumbers.length === 0) throw new ApiError('no_stores', '请至少选择一家门店');

@@ -2,7 +2,7 @@
 const { ApiError } = require('../errors');
 const { dayKey } = require('../time');
 const { membershipSnapshot, accountLimits } = require('../rules/membership');
-const { ensurePlanMetadata, ensureOutageCompensation } = require('../rules/member-plan');
+const { ensurePlanMetadata, ensureOutageCompensation, ensureLaunchCelebrationGift } = require('../rules/member-plan');
 const { resolveConfig } = require('../rules/quota');
 const { maskOpenid } = require('../identity');
 const { monitoringSnapshot } = require('../monitor-readiness');
@@ -28,6 +28,26 @@ const IPAD_MINI_CATALOG_NOTICE = Object.freeze({
   startsAt: '2026-10-27T00:00:00+08:00',
   expiresAt: '2026-11-06T23:59:59+08:00',
   text: '苹果商店已上架新款 iPad mini（A20 Pro），老款取货接口已停用。果小哨已同步更新新款全系配置；原关注老款的用户请点「调整」改选新款。',
+});
+
+const MAC_LAUNCH_CELEBRATION_NOTICE = Object.freeze({
+  id: 'mac-launch-celebration-2026-10-28',
+  title: '庆祝苹果 Mac 新品发布 · 会员礼遇与目录更新',
+  kind: 'recovery',
+  publishedAt: '2026-10-28T00:00:00+08:00',
+  startsAt: '2026-10-28T00:00:00+08:00',
+  expiresAt: '2026-11-06T23:59:59+08:00',
+  text: '庆祝苹果发布新款 14 英寸 MacBook Pro（M6）与新款 iMac（M6），果小哨已同步上线全系新配置，并今日（10 月 28 日）为全体会员及曾付费用户自动赠送 1 天会员时长，可在「我的」查看。',
+});
+
+const MAC_CATALOG_NOTICE = Object.freeze({
+  id: 'mac-catalog-2026-10-28',
+  title: '新款 MacBook Pro 与 iMac 目录更新说明',
+  kind: 'notice',
+  publishedAt: '2026-10-28T00:00:00+08:00',
+  startsAt: '2026-10-28T00:00:00+08:00',
+  expiresAt: '2026-11-06T23:59:59+08:00',
+  text: '苹果商店已上架新款 14 英寸 MacBook Pro（M6）与新款 iMac（M6），老款对应配置取货接口已停用。果小哨已同步更新新款配置；原关注老款的用户请点「调整」改选新款。',
 });
 
 function noticeExpiresAt(raw) {
@@ -98,7 +118,8 @@ async function ensureUser(ctx) {
   let user = await ctx.repo.getUser(ctx.identity.userKey);
   if (!user) user = await ctx.repo.createUser(newUser(ctx.identity, ctx.nowIso));
   user = await ensurePlanMetadata(ctx.repo, user);
-  return ensureOutageCompensation(ctx.repo, user, ctx.now);
+  user = await ensureOutageCompensation(ctx.repo, user, ctx.now);
+  return ensureLaunchCelebrationGift(ctx.repo, user, ctx.now);
 }
 
 async function touchUser(ctx, user) {
@@ -184,9 +205,10 @@ async function bootstrap(ctx) {
   ]);
   const { catalogMeta, collectorStatus } = metadata;
   const monitoring = monitoringSnapshot(ctx.config, collectorStatus, ctx.now);
-  const builtInNotice = [IPAD_MINI_CATALOG_NOTICE, OUTAGE_COMPENSATION_NOTICE]
+  const activeBuiltIns = [MAC_LAUNCH_CELEBRATION_NOTICE, MAC_CATALOG_NOTICE, IPAD_MINI_CATALOG_NOTICE, OUTAGE_COMPENSATION_NOTICE]
     .map(raw => ({ raw, live: liveAnnouncement(raw, ctx.now) }))
-    .find(item => item.live);
+    .filter(item => item.live);
+  const builtInNotice = activeBuiltIns[0] || null;
   const configuredBanner = liveAnnouncement(ctx.config.announcement, ctx.now);
   const configuredNotices = liveNotices(ctx.config.notices, ctx.now);
   const announcement = configuredBanner || (builtInNotice ? {
@@ -194,9 +216,10 @@ async function bootstrap(ctx) {
     title: builtInNotice.raw.title,
     publishedAt: builtInNotice.raw.publishedAt,
   } : null);
-  const notices = builtInNotice && configuredBanner && !configuredNotices.some(item => item.id === builtInNotice.raw.id)
-    ? [{ id: builtInNotice.raw.id, title: builtInNotice.raw.title, publishedAt: builtInNotice.raw.publishedAt, ...builtInNotice.live }, ...configuredNotices]
-    : configuredNotices;
+  const extraBuiltIns = (configuredBanner ? activeBuiltIns : activeBuiltIns.slice(1))
+    .filter(item => !configuredNotices.some(row => row.id === item.raw.id))
+    .map(item => ({ id: item.raw.id, title: item.raw.title, publishedAt: item.raw.publishedAt, ...item.live }));
+  const notices = extraBuiltIns.length ? [...extraBuiltIns, ...configuredNotices] : configuredNotices;
   return {
     collector: monitoring.collector,
     serverTime: ctx.nowIso,

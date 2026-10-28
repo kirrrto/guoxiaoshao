@@ -4,6 +4,8 @@ const { planForTerms, planIdOfOrder, snapshotTermsValid } = require('../payment/
 
 const OUTAGE_COMPENSATION_DAY = '2026-10-21';
 const OUTAGE_COMPENSATION_ORDER_ID = 'grant_outage_20261021';
+const LAUNCH_CELEBRATION_DAY = '2026-10-28';
+const LAUNCH_CELEBRATION_ORDER_ID = 'grant_launch_20261028';
 
 /** Only immutable, server-confirmed purchase terms can grant the extra slots. */
 function purchasedPlan(order, user, granting = false) {
@@ -63,13 +65,43 @@ async function ensureOutageCompensation(repo, user, now) {
   return await repo.ensureOutageCompensation({ userKey: user._id, nowIso: toDate(now).toISOString() }) || user;
 }
 
+function needsLaunchCelebrationGift(user, now) {
+  if (!user || !user._id || !now) return false;
+  const nowIso = toDate(now).toISOString();
+  if (dayKey(nowIso) !== LAUNCH_CELEBRATION_DAY) return false;
+  const membership = user.membership || {};
+  if (membership.launch20261028GiftedAt) return false;
+  const recordId = `${user._id}|${LAUNCH_CELEBRATION_ORDER_ID}`;
+  if (membership.lastOrderId === LAUNCH_CELEBRATION_ORDER_ID) return false;
+  const segments = membership.entitlements && Array.isArray(membership.entitlements.segments) ? membership.entitlements.segments : [];
+  if (segments.some(segment => segment && segment.orderId === recordId)) return false;
+  if (!membership.expiresAt && !membership.lastOrderId && !membership.planId && !segments.length) return false;
+  const onlyTrialSegments = segments.length > 0 && segments.every(
+    segment => segment && (segment.source === 'trial_compensation' || segment.planId === 'member_trial'),
+  );
+  if (onlyTrialSegments && (!membership.planId || membership.planId === 'member_trial')
+    && (!membership.lastOrderId || membership.lastOrderId === OUTAGE_COMPENSATION_ORDER_ID)) return false;
+  if (membership.source === 'trial_compensation' && !segments.length
+    && (!membership.planId || membership.planId === 'member_trial')) return false;
+  return true;
+}
+
+async function ensureLaunchCelebrationGift(repo, user, now) {
+  if (!needsLaunchCelebrationGift(user, now) || typeof repo.ensureLaunchCelebrationGift !== 'function') return user;
+  return await repo.ensureLaunchCelebrationGift({ userKey: user._id, nowIso: toDate(now).toISOString() }) || user;
+}
+
 module.exports = {
   OUTAGE_COMPENSATION_DAY,
   OUTAGE_COMPENSATION_ORDER_ID,
+  LAUNCH_CELEBRATION_DAY,
+  LAUNCH_CELEBRATION_ORDER_ID,
   purchasedPlan,
   needsPlanMetadata,
   ensurePlanMetadata,
   resolvePlanMetadata,
   needsOutageCompensation,
   ensureOutageCompensation,
+  needsLaunchCelebrationGift,
+  ensureLaunchCelebrationGift,
 };

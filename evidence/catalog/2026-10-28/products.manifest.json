@@ -1,0 +1,304 @@
+{
+  "generatedAt": "2026-10-28T02:55:00.000Z",
+  "stopped": false,
+  "offlineReplay": false,
+  "entries": [
+    {
+      "familyKey": "macbook-pro",
+      "category": "mac",
+      "rawFile": "macbook-pro.html",
+      "record": {
+        "requestUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro",
+        "method": "GET",
+        "startedAt": "2026-10-28T01:57:44.833Z",
+        "retries": 0,
+        "httpStatus": 200,
+        "headers": {
+          "content-type": "text/html;charset=utf-8",
+          "date": "Wed, 28 Oct 2026 01:57:44 GMT",
+          "cache-control": "public, max-age=54, s-maxage=120"
+        },
+        "bytes": 356947,
+        "sha256": "45a93ed245c73d7c91035611d07322f8723ec5172fe1cb793215735d88d7f60c",
+        "elapsedMs": 395,
+        "finishedAt": "2026-10-28T01:57:45.228Z"
+      },
+      "parse": {
+        "supported": true,
+        "reason": null,
+        "layout": "configurator",
+        "pageTitle": "MacBook Pro",
+        "dimensions": [
+          "chassis-dimensionScreensize",
+          "chassis-dimensionColor",
+          "display-dimensionFinish",
+          "processor-dimensionChip",
+          "processor-dimensionChip-cpuCoreCount-gpuCoreCount"
+        ],
+        "productCount": 24,
+        "rejected": [
+          {
+            "partNumber": "RO_MBP_M5PRO_M5MAX_14INCH_SILVER_BT_BS_UT_2026",
+            "reason": "cto_only_base"
+          },
+          {
+            "partNumber": "RO_MBP_M5PRO_M5MAX_14INCH_SILVER_BT_BS_UT_2026",
+            "reason": "cto_only_base"
+          },
+          {
+            "partNumber": "RO_MBP_M5PRO_M5MAX_14INCH_SILVER_BT_BS_UT_2026",
+            "reason": "cto_only_base"
+          },
+          {
+            "partNumber": "RO_MBP_M5PRO_M5MAX_14INCH_SILVER_BT_BS_UT_2026",
+            "reason": "cto_only_base"
+          },
+          {
+            "partNumber": "RO_MBP_M5PRO_M5MAX_16INCH_SPACEBLACK_BT_UT_SP_2026",
+            "reason": "cto_only_base"
+          },
+          {
+            "partNumber": "RO_MBP_M5PRO_M5MAX_16INCH_SPACEBLACK_BT_UT_SP_2026",
+            "reason": "cto_only_base"
+          },
+          {
+            "partNumber": "RO_MBP_M5PRO_M5MAX_14INCH_SILVER_BT_BS_UT_2026",
+            "reason": "cto_only_base"
+          },
+          {
+            "partNumber": "RO_MBP_M5PRO_M5MAX_14INCH_SPACEBLACK_BT_BS_UT_2026",
+            "reason": "cto_only_base"
+          },
+          {
+            "partNumber": "RO_MBP_M5PRO_M5MAX_14INCH_SPACEBLACK_BT_BS_UT_2026",
+            "reason": "cto_only_base"
+          },
+          {
+            "partNumber": "RO_MBP_M6_14INCH_SILVER_BET_BES_ULT_2026",
+            "reason": "cto_only_base"
+          },
+          {
+            "partNumber": "RO_MBP_M5PRO_M5MAX_16INCH_SILVER_BT_UT_SP_2026",
+            "reason": "cto_only_base"
+          },
+          {
+            "partNumber": "RO_MBP_M5PRO_M5MAX_14INCH_SPACEBLACK_BT_BS_UT_2026",
+            "reason": "cto_only_base"
+          },
+          {
+            "partNumber": "RO_MBP_M5PRO_M5MAX_14INCH_SPACEBLACK_BT_BS_UT_2026",
+            "reason": "cto_only_base"
+          },
+          {
+            "partNumber": "RO_MBP_M5PRO_M5MAX_16INCH_SILVER_BT_UT_SP_2026",
+            "reason": "cto_only_base"
+          },
+          {
+            "partNumber": "RO_MBP_M5PRO_M5MAX_16INCH_SILVER_BT_UT_SP_2026",
+            "reason": "cto_only_base"
+          },
+          {
+            "partNumber": "RO_MBP_M5PRO_M5MAX_14INCH_SILVER_BT_BS_UT_2026",
+            "reason": "cto_only_base"
+          },
+          {
+            "partNumber": "RO_MBP_M5PRO_M5MAX_14INCH_SPACEBLACK_BT_BS_UT_2026",
+            "reason": "cto_only_base"
+          },
+          {
+            "partNumber": "RO_MBP_M5PRO_M5MAX_16INCH_SPACEBLACK_BT_UT_SP_2026",
+            "reason": "cto_only_base"
+          },
+          {
+            "partNumber": "RO_MBP_M5PRO_M5MAX_14INCH_SPACEBLACK_BT_BS_UT_2026",
+            "reason": "cto_only_base"
+          }
+        ]
+      }
+    },
+    {
+      "familyKey": "imac",
+      "category": "mac",
+      "rawFile": "imac.html",
+      "record": {
+        "requestUrl": "https://www.apple.com.cn/shop/buy-mac/imac",
+        "method": "GET",
+        "startedAt": "2026-10-28T01:57:49.880Z",
+        "retries": 0,
+        "httpStatus": 200,
+        "headers": {
+          "content-type": "text/html;charset=utf-8",
+          "date": "Wed, 28 Oct 2026 01:57:50 GMT",
+          "cache-control": "public, max-age=120, s-maxage=120"
+        },
+        "bytes": 328952,
+        "sha256": "c7acb995c50e7928795d09b44ad2053a61c45e305aba882a55d8b53853334684",
+        "elapsedMs": 1113,
+        "finishedAt": "2026-10-28T01:57:50.993Z"
+      },
+      "parse": {
+        "supported": true,
+        "reason": null,
+        "layout": "configurator",
+        "pageTitle": "iMac",
+        "dimensions": [
+          "chassis-dimensionColor",
+          "processor-cpuCoreCount-gpuCoreCount"
+        ],
+        "productCount": 17,
+        "rejected": [
+          {
+            "partNumber": "RO_IMAC_M6_24INCH_STAND_PURPLE_BBU_2026",
+            "reason": "cto_only_base"
+          },
+          {
+            "partNumber": "RO_IMAC_M6_24INCH_STAND_YELLOW_GOO_2026",
+            "reason": "cto_only_base"
+          },
+          {
+            "partNumber": "RO_IMAC_M6_24INCH_STAND_ORANGE_GOO_2026",
+            "reason": "cto_only_base"
+          },
+          {
+            "partNumber": "RO_IMAC_M6_24INCH_STAND_ORANGE_BBU_2026",
+            "reason": "cto_only_base"
+          },
+          {
+            "partNumber": "RO_IMAC_M6_24INCH_STAND_YELLOW_BBU_2026",
+            "reason": "cto_only_base"
+          },
+          {
+            "partNumber": "RO_IMAC_M6_24INCH_STAND_PURPLE_GOO_2026",
+            "reason": "cto_only_base"
+          }
+        ]
+      }
+    }
+  ],
+  "images": {
+    "fetched": 12,
+    "evidence": [
+      {
+        "identity": "/shop/buy-mac/macbook-pro|{\"chassis-dimensionScreensize\":\"14inch\",\"chassis-dimensionColor\":\"silver\"}",
+        "requestUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_pro%2Fselect&dm.chassis-dimensionColor=silver&dm.processor-dimensionChip=m6&dm.processor-dimensionChip-cpuCoreCount-gpuCoreCount=m6-12-12&dm.display-dimensionFinish=standard&dm.chassis-dimensionScreensize=14inch",
+        "cacheFile": "1285a3ef183cdee5e2bfe77a.json",
+        "httpStatus": 200,
+        "sha256": "3584acd6f87e4f31e59f5e019075582d45350d933910d7fc3f6c7a359f747409",
+        "fetchedAt": "2026-10-28T01:58:05.506Z",
+        "imageKey": "mac-macbook-pro-summary-select-202610-14inch-silver",
+        "matched": true
+      },
+      {
+        "identity": "/shop/buy-mac/macbook-pro|{\"chassis-dimensionScreensize\":\"16inch\",\"chassis-dimensionColor\":\"spaceblack\"}",
+        "requestUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_pro%2Fselect&dm.chassis-dimensionColor=spaceblack&dm.processor-dimensionChip=m5max&dm.processor-dimensionChip-cpuCoreCount-gpuCoreCount=m5max-18-40&dm.display-dimensionFinish=standard&dm.chassis-dimensionScreensize=16inch",
+        "cacheFile": "3aa79c61cfe66dc1c9f0ad06.json",
+        "httpStatus": 200,
+        "sha256": "4399467f7f83b446c9570c7c42558573692a4938ee4c8e2d42994a7ee6eae19d",
+        "fetchedAt": "2026-10-28T01:58:06.555Z",
+        "imageKey": "mac-macbook-pro-summary-select-202610-16inch-spaceblack",
+        "matched": true
+      },
+      {
+        "identity": "/shop/buy-mac/macbook-pro|{\"chassis-dimensionScreensize\":\"14inch\",\"chassis-dimensionColor\":\"spaceblack\"}",
+        "requestUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_pro%2Fselect&dm.chassis-dimensionColor=spaceblack&dm.processor-dimensionChip=m5pro&dm.processor-dimensionChip-cpuCoreCount-gpuCoreCount=m5pro-15-16&dm.display-dimensionFinish=standard&dm.chassis-dimensionScreensize=14inch",
+        "cacheFile": "3111de14751d58f4cd1501df.json",
+        "httpStatus": 200,
+        "sha256": "2e014cfc5ec40cb5cf81a52dc6fe1b7fb5d0d8a3060cd06f637b15e2eb830d65",
+        "fetchedAt": "2026-10-28T01:58:07.601Z",
+        "imageKey": "mac-macbook-pro-summary-select-202610-14inch-spaceblack",
+        "matched": true
+      },
+      {
+        "identity": "/shop/buy-mac/macbook-pro|{\"chassis-dimensionScreensize\":\"16inch\",\"chassis-dimensionColor\":\"silver\"}",
+        "requestUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_pro%2Fselect&dm.chassis-dimensionColor=silver&dm.processor-dimensionChip=m5max&dm.processor-dimensionChip-cpuCoreCount-gpuCoreCount=m5max-18-32&dm.display-dimensionFinish=standard&dm.chassis-dimensionScreensize=16inch",
+        "cacheFile": "846401136a1a4463b8e1676e.json",
+        "httpStatus": 200,
+        "sha256": "c6405fd387536084555a3612640f45d884974c1ce2463c868e7ea04e2c93a896",
+        "fetchedAt": "2026-10-28T01:58:08.642Z",
+        "imageKey": "mac-macbook-pro-summary-select-202610-16inch-silver",
+        "matched": true
+      },
+      {
+        "identity": "/shop/buy-mac/imac|{\"chassis-dimensionColor\":\"green\",\"chassis-dimensionStandType\":\"desktop\",\"processor-cpuCoreCount-gpuCoreCount\":\"10-10\"}",
+        "requestUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fimac%2Fselect&dm.chassis-dimensionColor=green&dm.processor-cpuCoreCount-gpuCoreCount=10-10&dm.chassis-dimensionStandType=desktop",
+        "cacheFile": "81b00b60b4f5083ea380fe81.json",
+        "httpStatus": 200,
+        "sha256": "00da31543ab8519ba7721f99f322074b4451003c2e7afebe27dcbbbd1b96360b",
+        "fetchedAt": "2026-10-28T01:58:18.525Z",
+        "imageKey": "imac-summary-select-202610-green-10-10-desktop",
+        "matched": true
+      },
+      {
+        "identity": "/shop/buy-mac/imac|{\"chassis-dimensionColor\":\"pink\",\"chassis-dimensionStandType\":\"desktop\",\"processor-cpuCoreCount-gpuCoreCount\":\"12-12\"}",
+        "requestUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fimac%2Fselect&dm.chassis-dimensionColor=pink&dm.processor-cpuCoreCount-gpuCoreCount=12-12&dm.chassis-dimensionStandType=desktop",
+        "cacheFile": "118f9ba3597a832b428a5255.json",
+        "httpStatus": 200,
+        "sha256": "f65043059c776fa7af144b505d0bc91302978da13b8e068e4524b1483da9193b",
+        "fetchedAt": "2026-10-28T01:58:19.571Z",
+        "imageKey": "imac-summary-select-202610-pink-12-12-desktop",
+        "matched": true
+      },
+      {
+        "identity": "/shop/buy-mac/imac|{\"chassis-dimensionColor\":\"blue\",\"chassis-dimensionStandType\":\"desktop\",\"processor-cpuCoreCount-gpuCoreCount\":\"12-12\"}",
+        "requestUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fimac%2Fselect&dm.chassis-dimensionColor=blue&dm.processor-cpuCoreCount-gpuCoreCount=12-12&dm.chassis-dimensionStandType=desktop",
+        "cacheFile": "b42970681aae99af2d12f507.json",
+        "httpStatus": 200,
+        "sha256": "48e093f4b1ed4f70d3f1949e0b63eb8fff0b5f0af729c89c4447d4cc4b0a24fb",
+        "fetchedAt": "2026-10-28T01:58:20.613Z",
+        "imageKey": "imac-summary-select-202610-blue-12-12-desktop",
+        "matched": true
+      },
+      {
+        "identity": "/shop/buy-mac/imac|{\"chassis-dimensionColor\":\"green\",\"chassis-dimensionStandType\":\"desktop\",\"processor-cpuCoreCount-gpuCoreCount\":\"12-12\"}",
+        "requestUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fimac%2Fselect&dm.chassis-dimensionColor=green&dm.processor-cpuCoreCount-gpuCoreCount=12-12&dm.chassis-dimensionStandType=desktop",
+        "cacheFile": "00defc9a303b8af93e5383a1.json",
+        "httpStatus": 200,
+        "sha256": "317d6c03223679744d4b11c6b39acf405f82ca99af430c5808f54cf1fd38da39",
+        "fetchedAt": "2026-10-28T01:58:21.698Z",
+        "imageKey": "imac-summary-select-202610-green-12-12-desktop",
+        "matched": true
+      },
+      {
+        "identity": "/shop/buy-mac/imac|{\"chassis-dimensionColor\":\"blue\",\"chassis-dimensionStandType\":\"desktop\",\"processor-cpuCoreCount-gpuCoreCount\":\"10-10\"}",
+        "requestUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fimac%2Fselect&dm.chassis-dimensionColor=blue&dm.processor-cpuCoreCount-gpuCoreCount=10-10&dm.chassis-dimensionStandType=desktop",
+        "cacheFile": "db31c85ae89a6c6dbf93511e.json",
+        "httpStatus": 200,
+        "sha256": "cb3c7da5da3d517f9b54000bd5ae6c206518a976207945c1b1d5248b94c1772e",
+        "fetchedAt": "2026-10-28T01:58:22.770Z",
+        "imageKey": "imac-summary-select-202610-blue-10-10-desktop",
+        "matched": true
+      },
+      {
+        "identity": "/shop/buy-mac/imac|{\"chassis-dimensionColor\":\"silver\",\"chassis-dimensionStandType\":\"desktop\",\"processor-cpuCoreCount-gpuCoreCount\":\"12-12\"}",
+        "requestUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fimac%2Fselect&dm.chassis-dimensionColor=silver&dm.processor-cpuCoreCount-gpuCoreCount=12-12&dm.chassis-dimensionStandType=desktop",
+        "cacheFile": "84530021361158e0f950ea89.json",
+        "httpStatus": 200,
+        "sha256": "5170e454a4b98525ada1bfdf99038a87881672575a29a9671814fe7ebc979032",
+        "fetchedAt": "2026-10-28T01:58:23.875Z",
+        "imageKey": "imac-summary-select-202610-silver-12-12-desktop",
+        "matched": true
+      },
+      {
+        "identity": "/shop/buy-mac/imac|{\"chassis-dimensionColor\":\"silver\",\"chassis-dimensionStandType\":\"desktop\",\"processor-cpuCoreCount-gpuCoreCount\":\"10-10\"}",
+        "requestUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fimac%2Fselect&dm.chassis-dimensionColor=silver&dm.processor-cpuCoreCount-gpuCoreCount=10-10&dm.chassis-dimensionStandType=desktop",
+        "cacheFile": "beeecccdf27c81125ff62b10.json",
+        "httpStatus": 200,
+        "sha256": "65612cf7d670ebe8755ff809f4f480e3288cbcc3ebb8125e7940ecf9c243ce39",
+        "fetchedAt": "2026-10-28T01:58:24.918Z",
+        "imageKey": "imac-summary-select-202610-silver-10-10-desktop",
+        "matched": true
+      },
+      {
+        "identity": "/shop/buy-mac/imac|{\"chassis-dimensionColor\":\"pink\",\"chassis-dimensionStandType\":\"desktop\",\"processor-cpuCoreCount-gpuCoreCount\":\"10-10\"}",
+        "requestUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fimac%2Fselect&dm.chassis-dimensionColor=pink&dm.processor-cpuCoreCount-gpuCoreCount=10-10&dm.chassis-dimensionStandType=desktop",
+        "cacheFile": "f2bc87ef0940801e490e039e.json",
+        "httpStatus": 200,
+        "sha256": "869852df3c8acd9719ac9e0a9b235fa50bb9ebd9b94001127cac11e44f457b9f",
+        "fetchedAt": "2026-10-28T01:58:25.978Z",
+        "imageKey": "imac-summary-select-202610-pink-10-10-desktop",
+        "matched": true
+      }
+    ],
+    "missing": []
+  }
+}

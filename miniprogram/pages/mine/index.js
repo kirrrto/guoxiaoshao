@@ -168,7 +168,9 @@ function presentOrder(order) {
   const redeemed = order.source === 'redemption_code' || order.type === 'membership_redemption';
   const trialCompensated = order.source === 'trial_compensation' || order.type === 'membership_trial';
   const serviceCompensated = order.source === 'service_compensation' || order.type === 'membership_compensation';
+  const launchGift = order.orderId === 'grant_launch_20261028' || /新品/.test(String(order.note || ''));
   const sourceLabel = redeemed ? '兑换码开通'
+    : launchGift ? '新品礼遇'
     : trialCompensated || serviceCompensated ? '故障补偿'
     : ['admin', 'admin_grant'].includes(order.source) || order.productId === 'admin_grant' ? '平台发放'
     : order.amountFen > 0 ? '付费开通' : '会员开通';

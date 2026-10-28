@@ -8,6 +8,16 @@
 // Keep technical details and complete acceptance records in release documents.
 const RELEASE_NOTES = [
   {
+    version: '3.4.3',
+    title: 'Mac 新品同步与会员礼遇',
+    dateText: '发布候选 · 2026-10-28',
+    highlights: [
+      '同步新款 MacBook Pro（M6）与 iMac（M6），老款关注自动提示改选。',
+      '庆祝新品发布，10 月 28 日向会员及曾付费用户赠送 1 天会员时长。',
+      '移除各页冗余副标题，让页面布局直接传达信息。',
+    ],
+  },
+  {
     version: '3.4.2',
     title: 'iPad mini 目录更新与界面精炼',
     dateText: '发布候选 · 2026-10-27',

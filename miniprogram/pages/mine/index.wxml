@@ -4,7 +4,6 @@
   <view wx:if="{{loadError}}" class="card load-error" role="alert">
     <view class="load-error-title">暂时没有连上</view>
     <view class="load-error-detail">{{loadError}}</view>
-    <view class="load-error-hint">检查网络后点重试；网络恢复时也会自动重新加载。</view>
     <button class="btn btn-primary btn-block" bindtap="onRetryLoad">重试</button>
   </view>
 
@@ -48,14 +47,13 @@
             <image wx:if="{{checkoutTarget.imageDisplayUrl}}" class="checkout-image" src="{{checkoutTarget.imageDisplayUrl}}" webp="{{true}}" mode="aspectFit" aria-hidden="true" binderror="onCheckoutImageError" />
             <view class="checkout-target-copy"><view class="checkout-target-title">{{checkoutTarget.title}}</view><view class="checkout-stores">{{checkoutTarget.storeText}}</view></view>
           </view>
-          <view class="checkout-explanation">保存后持续检测；符合条件时，通过已授权的微信消息提醒。</view>
           <button wx:if="{{membership.active}}" class="btn btn-primary btn-block mt" disabled="{{paymentBusy || paymentChecking || paymentConfirming}}" bindtap="onContinueCheckout">会员已生效 · 继续设置关注</button>
         </block>
         <view wx:if="{{checkoutMessage}}" class="checkout-problem">{{checkoutMessage}}</view>
         <button wx:if="{{checkoutMessage || membership.active}}" class="ui-action ui-action--neutral ui-action--block mt" hover-class="ui-control-pressed" disabled="{{paymentBusy || paymentConfirming}}" bindtap="onReturnToQuery">{{checkoutMessage ? '重新确认配置与门店' : '返回查询'}}<view class="ui-chevron" aria-hidden="true"></view></button>
       </view>
       <view wx:if="{{membership.active}}" class="member-overview">
-        <view class="member-current-plan">{{membership.planLabel}}<text class="member-delivered">权益已生效</text></view>
+        <view class="member-current-plan">{{membership.planLabel}}</view>
         <view class="member-renewal">剩余 {{membership.daysLeft}} 天 · 至 {{membership.expiresShortText}}</view>
       </view>
       <view wx:if="{{!membership.active && !paymentPendingId && (!contextualCheckout || !checkoutTarget)}}" class="member-core-benefits" aria-label="会员核心权益">
@@ -68,15 +66,12 @@
           <view><text class="member-delivery-label">已保存关注</text><view class="member-delivery-value">{{boot.followCount}}<text class="member-delivery-total"> / {{boot.limits.maxFollows}} 个配置</text></view></view>
           <view><text class="member-delivery-label">每个配置</text><view class="member-delivery-value">{{boot.limits.maxStoresPerFollow}}<text class="member-delivery-total"> 家门店</text></view></view>
         </view>
-        <view class="member-delivery-note">查询与历史不扣次数 · 微信提醒需单独授权</view>
         <view wx:if="{{membership.annualExpiresText}}" class="member-enhanced">年卡 5 配置 × 5 门店权益至 {{membership.annualExpiresText}}</view>
         <view wx:elif="{{membership.enhanced}}" class="member-enhanced">额外名额有效至 {{membership.enhancedExpiresText}}</view>
-        <view wx:if="{{!boot.followCount}}" class="member-setup-note">尚未添加关注配置。添加心仪配置与门店后，小哨将开始自动监测。</view>
         <button class="btn btn-primary btn-block member-delivery-action" disabled="{{paymentBusy || paymentChecking || paymentConfirming}}" bindtap="onOpenFollows">{{boot.followCount ? '查看关注与最新库存' : '添加第一个关注'}}</button>
       </block>
       <block wx:else>
         <view wx:if="{{membership.expired}}" class="banner banner-warn small">已于 {{membership.expiresText}} 到期，监测与提醒停止；关注配置与次数仍保留。</view>
-        <view wx:elif="{{!paymentPendingId}}" class="member-free-note">免费可用次数查询；持续关注与到货提醒需会员。</view>
       </block>
       <view wx:if="{{showPurchaseShop && membership.active && !membershipUpgradeOpen && !paymentPendingId}}" class="membership-member-actions">
         <button class="membership-manage membership-manage-primary" hover-class="ui-control-pressed" disabled="{{subscribing || redeeming || paymentBusy || paymentChecking || paymentConfirming}}" bindtap="onOpenMembershipRenew">延长会员</button>
@@ -147,7 +142,6 @@
             <text class="member-benefit-plan-detail">每配置 {{item.stores}} 家门店</text>
           </view>
         </view>
-        <view class="member-benefit-note"><text class="member-benefit-note-title">免费与会员</text><text>免费按次查询与看历史；会员不扣次，支持持续关注及到货／断货提醒。</text></view>
         <view class="member-benefit-note"><text class="member-benefit-note-title">新品也能查</text><text>新品开售 30 天内，会员可实时查询。</text></view>
       </block>
       <block wx:if="{{showPurchaseRules}}">
@@ -160,7 +154,6 @@
       <view wx:if="{{redemptionOpen}}" class="redemption-mask" catchtap="onOpenRedemption" catchtouchmove="noop">
         <view class="redemption-modal" catchtap="noop">
           <view class="redemption-title">兑换会员</view>
-          <view class="redemption-description">输入你收到的兑换码，为当前微信账号开通会员。</view>
           <input class="redemption-input" type="text" value="{{redemptionCode}}" placeholder="请输入兑换码" placeholder-class="redemption-placeholder" maxlength="64" disabled="{{redeeming}}" confirm-type="done" adjust-position="{{true}}" cursor-spacing="24" bindinput="onRedemptionInput" bindconfirm="onRedeemCode" focus="{{redemptionOpen}}" />
           <button class="member-entry redemption-entry" disabled="{{subscribing || redeeming || paymentBusy || paymentChecking || !redemptionCode}}" bindtap="onRedeemCode">{{redeeming ? '兑换中，请稍候…' : '确认兑换'}}</button>
           <view class="redemption-hint">同一账号重复提交不会重复增加会员时间。</view>
@@ -172,7 +165,6 @@
       <button wx:if="{{showOrders}}" id="membership-records" class="ui-disclosure mt" hover-class="ui-control-pressed" bindtap="onToggleOrders" aria-expanded="{{showOrders}}"><view class="ui-label-with-icon"><image class="ui-icon" src="/images/ui/receipt.png" mode="aspectFit" aria-hidden="true" /><text class="ui-disclosure-label">购买与开通记录</text></view><view class="ui-disclosure-meta"><text>{{showOrders ? '收起' : '展开'}}</text><view class="ui-chevron {{showOrders ? 'ui-chevron--up' : 'ui-chevron--down'}}" aria-hidden="true"></view></view></button>
       <block wx:if="{{showOrders}}">
         <view wx:if="{{orders.length}}" class="order-record-toolbar">
-          <text class="tiny muted">仅清理个人展示记录</text>
           <button class="ui-action ui-action--neutral order-record-button" hover-class="ui-control-pressed" disabled="{{!ordersClearableCount || orderActionBusy || orderConfirming}}" bindtap="onClearOrders">{{orderActionBusy === 'clear' ? '清空中…' : '清空当前显示的记录'}}</button>
         </view>
         <view wx:if="{{ordersLoading && !orders.length}}" class="loading-line">正在加载会员记录…</view>
@@ -208,7 +200,6 @@
         <view class="reminder-balance"><text class="reminder-balance-label">到货提醒</text><text class="reminder-balance-value">{{subscription.credits}} 次</text><text wx:if="{{authorization.pendingRestock}}" class="reminder-balance-pending">待同步 +{{authorization.pendingRestock}}</text></view>
         <view wx:if="{{subscription.soldoutEnabled}}" class="reminder-balance"><text class="reminder-balance-label">断货提醒</text><text class="reminder-balance-value">{{subscription.soldoutCredits}} 次</text><text wx:if="{{authorization.pendingSoldout}}" class="reminder-balance-pending">待同步 +{{authorization.pendingSoldout}}</text></view>
       </view>
-      <view class="reminder-delivery-note">提醒次数为微信授权余额，与签到／任务获得的查询次数分开计算。</view>
       <view wx:if="{{consent && consent.anyBlocked}}" class="consent-recovery" role="status">
         <view class="consent-recovery-title">微信提醒权限未开启</view>
         <view class="consent-recovery-desc">微信已拒绝以下消息；库存监测继续，但对应提醒暂无法接收。</view>
@@ -244,9 +235,9 @@
       <view class="tiny muted mt">北京时间每日生效，修改自动保存；结束后不补发旧提醒，起止相同＝全天。</view>
       </block>
       <view wx:if="{{!paymentPendingId}}" class="member-notification-experience">
-        <button class="ui-disclosure notification-test-entry" hover-class="ui-control-pressed" disabled="{{paymentBusy || paymentChecking || paymentConfirming}}" bindtap="onTestNotification"><image class="ui-icon" src="/images/ui/notification.png" mode="aspectFit" aria-hidden="true" /><view class="notification-test-copy"><text class="ui-disclosure-label">体验微信提醒</text><text class="notification-test-description">{{membership.active ? '给自己发一条测试消息' : '开通前，先体验一条微信消息'}}</text></view><view class="ui-chevron" aria-hidden="true"></view></button>
+        <button class="ui-disclosure notification-test-entry" hover-class="ui-control-pressed" disabled="{{paymentBusy || paymentChecking || paymentConfirming}}" bindtap="onTestNotification"><image class="ui-icon" src="/images/ui/notification.png" mode="aspectFit" aria-hidden="true" /><view class="notification-test-copy"><text class="ui-disclosure-label">体验微信提醒</text></view><view class="ui-chevron" aria-hidden="true"></view></button>
       </view>
-      <button id="notification-records" class="ui-disclosure ui-entry reminder-row" hover-class="ui-control-pressed" bindtap="onToggleNotifications" aria-expanded="{{showNotifications}}"><view class="ui-entry-main"><image class="ui-icon" src="/images/ui/clock.png" mode="aspectFit" aria-hidden="true" /><view class="ui-entry-copy"><text class="ui-disclosure-label">提醒记录</text><text class="ui-entry-note">{{notifications.length ? '已显示 ' + notifications.length + ' 条' : '保留最近 10 天'}}</text></view></view><view class="ui-disclosure-meta"><text>{{showNotifications ? '收起' : '展开'}}</text><view class="ui-chevron {{showNotifications ? 'ui-chevron--up' : 'ui-chevron--down'}}" aria-hidden="true"></view></view></button>
+      <button id="notification-records" class="ui-disclosure ui-entry reminder-row" hover-class="ui-control-pressed" bindtap="onToggleNotifications" aria-expanded="{{showNotifications}}"><view class="ui-entry-main"><image class="ui-icon" src="/images/ui/clock.png" mode="aspectFit" aria-hidden="true" /><view class="ui-entry-copy"><text class="ui-disclosure-label">提醒记录</text><text wx:if="{{notifications.length}}" class="ui-entry-note">已显示 {{notifications.length}} 条</text></view></view><view class="ui-disclosure-meta"><text>{{showNotifications ? '收起' : '展开'}}</text><view class="ui-chevron {{showNotifications ? 'ui-chevron--up' : 'ui-chevron--down'}}" aria-hidden="true"></view></view></button>
       <view wx:if="{{!showNotifications && notifications.length}}" class="notification-latest">
         <view class="notification-latest-heading"><text>最近一次提醒</text><text class="pill pill-{{notifications[0].statusCls}} tiny">{{notifications[0].statusLabel}}</text></view>
         <view class="notification-product">{{notifications[0].productTitle || notifications[0].partNumber}}</view>
@@ -255,7 +246,7 @@
       </view>
       <block wx:if="{{showNotifications}}">
       <view class="notification-toolbar">
-        <text class="tiny muted notification-scope">保留近 10 天；清理仅隐藏本列表，不影响关注、已发消息与库存历史。</text>
+        <text class="tiny muted notification-scope">清理仅隐藏本列表，不影响关注、已发消息与库存历史。</text>
         <button wx:if="{{notifications.length}}" class="ui-action ui-action--neutral notification-button notification-clear" hover-class="ui-control-pressed" disabled="{{notificationActionBusy || notificationConfirming || !notificationsClearBefore}}" bindtap="onClearNotifications">{{notificationActionBusy === 'clear' ? '清空中…' : '清空'}}</button>
       </view>
       <view wx:if="{{notificationsLoading && !notifications.length}}" class="loading-line">正在加载提醒记录…</view>
@@ -292,7 +283,6 @@
         <button wx:if="{{!quota.signedInToday}}" class="btn btn-primary btn-sm {{signing ? 'disabled' : ''}}" disabled="{{signing}}" bindtap="onSignin">{{signing ? '签到中…' : '每日签到'}}</button>
         <view wx:else class="signin-done"><image class="ui-icon signin-done-icon" src="/images/ui/check.png" mode="aspectFit" aria-hidden="true" /><text>今日已签到</text></view>
       </view>
-      <view wx:if="{{!membership.active && !quota.signedInToday && quota.balance < quota.queryCost}}" class="banner banner-ok small mt">签到可领次数，用于查询或体验测试通知。</view>
 
 
       <button class="ui-disclosure mt" hover-class="ui-control-pressed" bindtap="onToggleQuotaDetails" aria-expanded="{{showQuotaDetails}}"><text class="ui-disclosure-label">次数任务与明细</text><view class="ui-disclosure-meta"><text>{{showQuotaDetails ? '收起' : '展开'}}</text><view class="ui-chevron {{showQuotaDetails ? 'ui-chevron--up' : 'ui-chevron--down'}}" aria-hidden="true"></view></view></button>
@@ -323,7 +313,7 @@
 
     <!-- 其他 -->
     <view class="card">
-      <button class="ui-disclosure ui-entry account-link" open-type="contact" session-from="gxs_mine" hover-class="ui-control-pressed"><view class="ui-entry-main"><image class="ui-icon" src="/images/ui/support.png" mode="aspectFit" aria-hidden="true" /><view class="ui-entry-copy"><text class="ui-disclosure-label">联系客服</text><text class="ui-entry-note">会员、支付或提醒问题，可在线咨询</text></view></view><view class="ui-chevron" aria-hidden="true"></view></button>
+      <button class="ui-disclosure ui-entry account-link" open-type="contact" session-from="gxs_mine" hover-class="ui-control-pressed"><view class="ui-entry-main"><image class="ui-icon" src="/images/ui/support.png" mode="aspectFit" aria-hidden="true" /><view class="ui-entry-copy"><text class="ui-disclosure-label">联系客服</text></view></view><view class="ui-chevron" aria-hidden="true"></view></button>
       <button class="ui-disclosure account-link" hover-class="ui-control-pressed" bindtap="onToggleReleaseNotes" aria-expanded="{{showReleaseNotes}}"><view class="ui-label-with-icon"><image class="ui-icon" src="/images/ui/news.png" mode="aspectFit" aria-hidden="true" /><text class="ui-disclosure-label">更新公告</text></view><view class="ui-disclosure-meta"><text>{{showReleaseNotes ? '收起' : '查看'}}</text><view class="ui-chevron {{showReleaseNotes ? 'ui-chevron--up' : 'ui-chevron--down'}}" aria-hidden="true"></view></view></button>
       <view wx:if="{{showReleaseNotes}}" class="release-notes">
         <view class="release-pagination" aria-label="更新公告翻页">
@@ -347,12 +337,12 @@
       <button class="ui-disclosure account-link feedback" open-type="feedback" hover-class="ui-control-pressed"><view class="ui-label-with-icon"><image class="ui-icon" src="/images/ui/feedback.png" mode="aspectFit" aria-hidden="true" /><text class="ui-disclosure-label">意见反馈</text></view><view class="ui-chevron" aria-hidden="true"></view></button>
     </view>
 
-    <view class="footer-note">果小哨 {{versionLabel}} · 为心仪好物留个哨</view>
+    <view class="footer-note">果小哨 {{versionLabel}}</view>
   </block>
 </view>
 
 <reminder-nudge enabled="{{ready}}" blocked="{{authorizationOpen || redemptionOpen || redeeming || paymentBusy || paymentChecking || paymentPendingId || paymentConfirming || orderConfirming}}" />
 
-<config-sheet wx:if="{{authorizationOpen}}" visible="{{authorizationOpen}}" title="补充微信提醒次数" subtitle="授权按类型独立计算" confirm-text="完成" disabled="{{subscribing}}" external-close="{{true}}" bindconfirm="onCloseAuthorizationPanel" bindrequestclose="onCloseAuthorizationPanel" bindclose="onCloseAuthorizationPanel">
+<config-sheet wx:if="{{authorizationOpen}}" visible="{{authorizationOpen}}" title="补充微信提醒次数" confirm-text="完成" disabled="{{subscribing}}" external-close="{{true}}" bindconfirm="onCloseAuthorizationPanel" bindrequestclose="onCloseAuthorizationPanel" bindclose="onCloseAuthorizationPanel">
   <reminder-authorization subscription="{{subscription}}" authorization="{{authorization}}" member="{{boot.member}}" busy="{{subscribing}}" feedback="{{authorizationFeedback}}" bindauthorize="onSubscribe" bindretry="onRetryAuthorizationSync" />
 </config-sheet>

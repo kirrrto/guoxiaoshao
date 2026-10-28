@@ -9,7 +9,7 @@ const { dayKey } = require('../time');
 const { decideLiveQuery, decideHistoryQuery } = require('../rules/access');
 const { grantableAmount, ledgerIds } = require('../rules/quota');
 const { isMember, hasFreeReminder, canUseReminders, validateFollowLimits, memberLimits, accountLimits, followAllowance, planSnapshot } = require('../rules/membership');
-const { OUTAGE_COMPENSATION_ORDER_ID, purchasedPlan, needsPlanMetadata, resolvePlanMetadata, needsOutageCompensation } = require('../rules/member-plan');
+const { OUTAGE_COMPENSATION_ORDER_ID, LAUNCH_CELEBRATION_ORDER_ID, purchasedPlan, needsPlanMetadata, resolvePlanMetadata, needsOutageCompensation, needsLaunchCelebrationGift } = require('../rules/member-plan');
 const membershipEntitlements = require('../rules/membership-entitlements');
 const { applyObservation, targetKeyOf } = require('../engine/events');
 const { observationDayId, appendObservationDay } = require('../engine/observation-day');
@@ -157,6 +157,69 @@ function atomicMethods(run, { readUpstreamBreaker } = {}) {
       };
       user.membership = { ...(user.membership || {}), outage20261021CompensatedAt: nowIso };
       await fulfilMembershipIn(tx, user, order, source, nowIso);
+      return user;
+    }),
+    ensureLaunchCelebrationGift: ({ userKey, nowIso }) => run(async tx => {
+      const user = await tx.get(C.users, userKey);
+      if (!user || !needsLaunchCelebrationGift(user, nowIso)) return user;
+      await hydrateMemberPlansIn(tx, user);
+      const recordId = `${userKey}|${LAUNCH_CELEBRATION_ORDER_ID}`;
+      const existing = await tx.get(C.orders, recordId);
+      if (existing) {
+        user.membership = { ...(user.membership || {}), launch20261028GiftedAt: existing.fulfilledAt || nowIso };
+        await tx.put(C.users, user);
+        return user;
+      }
+      const now = new Date(nowIso);
+      const activeSnap = planSnapshot(user, now);
+      let restoredPlanId = activeSnap.planId && activeSnap.planId !== 'member_trial' ? activeSnap.planId : null;
+      const m = user.membership || {};
+      const segments = m.entitlements && Array.isArray(m.entitlements.segments) ? m.entitlements.segments : [];
+      for (let i = segments.length - 1; i >= 0 && !restoredPlanId; i--) {
+        const seg = segments[i];
+        if (seg && seg.planId && seg.planId !== 'member_trial') restoredPlanId = seg.planId;
+      }
+      const lastOrderId = m.lastOrderId;
+      const lastOrder = typeof lastOrderId === 'string' && lastOrderId
+        ? (await tx.get(C.orders, `${userKey}|${lastOrderId}`) || await tx.get(C.orders, lastOrderId))
+        : null;
+      if (!restoredPlanId && lastOrder) {
+        restoredPlanId = purchasedPlan(lastOrder, user)
+          || (lastOrder.source === 'service_compensation' && lastOrder.planId && lastOrder.planId !== 'member_trial' ? lastOrder.planId : null);
+      }
+      if (!restoredPlanId && m.planId && m.planId !== 'member_trial') {
+        restoredPlanId = m.planId;
+      }
+      const hasPaidSegment = segments.some(
+        seg => seg && ((seg.planId && seg.planId !== 'member_trial') || (seg.source && seg.source !== 'trial_compensation')),
+      );
+      const hasPaidLastOrder = Boolean(
+        lastOrder && (purchasedPlan(lastOrder, user) || (lastOrder.source === 'service_compensation' && lastOrder.type === 'membership_compensation')),
+      );
+      const hasNonTrialDirect = Boolean(
+        m.expiresAt && m.source !== 'trial_compensation' && m.planId !== 'member_trial'
+        && (!lastOrder || lastOrder.source !== 'trial_compensation'),
+      );
+      const hadPaidMembership = Boolean(restoredPlanId) || hasPaidSegment || hasPaidLastOrder || hasNonTrialDirect;
+      if (!hadPaidMembership) return user;
+      const order = {
+        _id: recordId,
+        orderId: LAUNCH_CELEBRATION_ORDER_ID,
+        userKey,
+        productId: 'admin_grant',
+        type: 'membership_compensation',
+        source: 'service_compensation',
+        ...(restoredPlanId ? { planId: restoredPlanId } : {}),
+        days: 1,
+        amountFen: 0,
+        status: 'paid',
+        createdAt: nowIso,
+        paidAt: nowIso,
+        fulfilledAt: null,
+        note: '2026-10-28 苹果新品发布会员赠礼',
+      };
+      user.membership = { ...m, launch20261028GiftedAt: nowIso };
+      await fulfilMembershipIn(tx, user, order, 'service_compensation', nowIso);
       return user;
     }),
     ...notificationTestMethods(run, applyLedgerIn),

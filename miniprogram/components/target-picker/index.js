@@ -4,10 +4,17 @@ const { sortFamilies, sortModels, compareCapacities, storeMatches } = require('.
 const { currentCatalog } = require('../../utils/store');
 const { presentStore, storeLabelWithCity } = require('../../utils/store-label');
 const unique = items => [...new Set(items.filter(Boolean))];
+const memoryOf = p => (p.attributes || {}).memory || '';
 const capacityOf = p => (p.attributes || {}).capacity || '标准配置';
 const colorOf = p => (p.attributes || {}).color || '标准外观';
 const compareColors = (a, b) => a.localeCompare(b, 'zh-CN') || (a < b ? -1 : a > b ? 1 : 0);
 const modelOf = p => p.model || p.familyName || p.familyKey;
+const specSummaryOf = p => {
+  const a = p.attributes || {};
+  if (!a.chipName && !a.chip && !a.memory && !a.finish && !a.connection) return '';
+  const memCap = a.memory && a.capacity ? `${a.memory} + ${a.capacity}` : (a.memory || a.capacity || '');
+  return [a.chipName, a.chip, memCap, a.connection, a.finish].filter(Boolean).join(' · ');
+};
 const own = (source, key) => Object.prototype.hasOwnProperty.call(source, key);
 const HOT_CITY_NAMES = ['上海', '北京', '深圳', '广州', '杭州', '成都'];
 Component({
@@ -19,7 +26,7 @@ Component({
     maxStores: { type: Number, value: 3 }, supportedOnly: { type: Boolean, value: false, observer: 'onSupportedOnlyChange' }, storesOptional: { type: Boolean, value: false },
   },
   data: { categories: [], categoryIndex: 0, families: [], familyNames: [], familyIndex: 0,
-    models: [], modelIndex: 0, capacities: [], capacityIndex: 0, colors: [], colorIndex: 0,
+    models: [], modelIndex: 0, memories: [], memoryIndex: 0, capacities: [], capacityIndex: 0, colors: [], colorIndex: 0,
     candidates: [], productTitles: [], productIndex: 0, product: null, imageFailed: false,
     cities: [], hotCities: [], cityIndex: 0, cityStores: [], selectedStores: [], selectionNote: '', searchKeyword: '', searchActive: false, searchResults: [] },
   lifetimes: {
@@ -78,7 +85,7 @@ Component({
         if (!this.catalogCategories.length) {
           this.currentCandidates = [];
           this.stage({ categoryIndex: 0, families: [], familyNames: [], familyIndex: 0, models: [], modelIndex: 0,
-            capacities: [], capacityIndex: 0, colors: [], colorIndex: 0, candidates: [], productTitles: [], productIndex: 0,
+            memories: [], memoryIndex: 0, capacities: [], capacityIndex: 0, colors: [], colorIndex: 0, candidates: [], productTitles: [], productIndex: 0,
             product: null, selectedStores: [], imageFailed: false, selectionNote: this.emptyCatalogNote() });
         } else this.selectCategory(0, true);
         if (previous) this.applyValue(previous); else { this.selectCity(0); this.updateSearchResults(); this.emit(); }
@@ -99,7 +106,7 @@ Component({
         this.selectCategory(Math.max(0, this.catalogCategories.findIndex(c => c.key === p.category)), true);
         const category = this.catalogCategories[this.read('categoryIndex')];
         this.selectFamily(Math.max(0, category.families.findIndex(f => f.familyKey === p.familyKey)), true);
-        this.updateFilters({ model: modelOf(p), capacity: capacityOf(p), color: colorOf(p), partNumber: p.partNumber });
+        this.updateFilters({ model: modelOf(p), memory: memoryOf(p), capacity: capacityOf(p), color: colorOf(p), partNumber: p.partNumber });
       } else if (value.partNumber) {
         // Keep this identity across later refreshes: an unavailable saved follow
         // must never turn into the first selectable product without user input.
@@ -127,15 +134,28 @@ Component({
       this.stage({ categoryIndex: index, families: c.families.map(f => ({ familyKey: f.familyKey, name: f.name })), familyNames: c.families.map(f => f.supported ? f.name : `${f.name}（待验证）`) });
       this.selectFamily(0, true); if (!silent) { this.updateFilters(wanted); this.emit(); }
     },
-    currentAttributes() { return { model: this.read('models')[this.read('modelIndex')], capacity: this.read('capacities')[this.read('capacityIndex')], color: this.read('colors')[this.read('colorIndex')] }; },
+    currentAttributes() { return { model: this.read('models')[this.read('modelIndex')], memory: (this.read('memories') || [])[this.read('memoryIndex')], capacity: this.read('capacities')[this.read('capacityIndex')], color: this.read('colors')[this.read('colorIndex')] }; },
     selectFamily(index, silent = false) { const wanted = silent ? {} : this.currentAttributes(); this.stage({ familyIndex: index, selectionNote: '' }); this.updateFilters(wanted); if (!silent) this.emit(); },
     updateFilters(wanted) {
       this.unavailablePartNumber = null;
       const products = this.familyProducts();
       const models = sortModels(unique(products.map(modelOf)), products); const modelIndex = Math.max(0, models.indexOf(wanted.model));
       const byModel = products.filter(p => modelOf(p) === models[modelIndex]);
-      const capacities = unique(byModel.map(capacityOf)).sort(compareCapacities); const capacityIndex = Math.max(0, capacities.indexOf(wanted.capacity));
-      const byCapacity = byModel.filter(p => capacityOf(p) === capacities[capacityIndex]);
+      const memories = unique(byModel.map(memoryOf)).sort(compareCapacities);
+      const capacities = unique(byModel.map(capacityOf)).sort(compareCapacities);
+      let memoryIndex = memories.length ? Math.max(0, memories.indexOf(wanted.memory)) : 0;
+      let capacityIndex = Math.max(0, capacities.indexOf(wanted.capacity));
+      let byCapacity = byModel.filter(p => (!memories.length || memoryOf(p) === memories[memoryIndex]) && capacityOf(p) === capacities[capacityIndex]);
+      if (memories.length && !byCapacity.length) {
+        if (wanted.prefer === 'capacity') {
+          const validMemories = new Set(byModel.filter(p => capacityOf(p) === capacities[capacityIndex]).map(memoryOf));
+          memoryIndex = Math.max(0, memories.findIndex(m => validMemories.has(m)));
+        } else {
+          const validCapacities = new Set(byModel.filter(p => memoryOf(p) === memories[memoryIndex]).map(capacityOf));
+          capacityIndex = Math.max(0, capacities.findIndex(c => validCapacities.has(c)));
+        }
+        byCapacity = byModel.filter(p => memoryOf(p) === memories[memoryIndex] && capacityOf(p) === capacities[capacityIndex]);
+      }
       // One model-wide order keeps color positions stable across capacities and
       // catalog refreshes. Only real SKUs at this capacity remain selectable.
       const availableColors = new Set(byCapacity.map(colorOf));
@@ -146,35 +166,45 @@ Component({
       this.currentCandidates = candidates;
       // Visible options always describe a real draft SKU. The sheet's Save
       // action commits it; changing a filter needs no additional confirmation.
-      this.stage({ models, modelIndex, capacities, capacityIndex, colors, colorIndex, candidates: candidates.map(p => ({ partNumber: p.partNumber })),
+      this.stage({ models, modelIndex, memories, memoryIndex, capacities, capacityIndex, colors, colorIndex, candidates: candidates.map(p => ({ partNumber: p.partNumber })),
         productTitles: candidates.map(p => `${p.title} · ${p.partNumber}`), productIndex,
         product: candidates[productIndex] ? this.publicProduct(candidates[productIndex]) : null, imageFailed: false });
     },
-    publicProduct(p) { return { partNumber: p.partNumber, title: p.title, model: p.model, familyName: p.familyName, category: p.category,
+    publicProduct(p) { return { partNumber: p.partNumber, title: p.title, specSummary: specSummaryOf(p), model: p.model, familyName: p.familyName, category: p.category,
       supported: Boolean(p.supported), comingSoon: p.comingSoon, priceCny: p.priceCny, verificationStatus: p.verificationStatus,
       imageUrl: p.imageUrl || '', imageDisplayUrl: productThumbnailUrl(p.imageUrl, 'card', p.partNumber), imageAlt: p.imageAlt || p.title, attributes: p.attributes || {} }; },
     onCategoryTap(e) { this.batch(() => this.selectCategory(Number(e.currentTarget.dataset.index))); },
     onFamilyChange(e) { this.batch(() => this.selectFamily(Number(e.detail.value))); },
     onModelChange(e) {
       const model = this.data.models[Number(e.detail.value)]; if (!model) return;
-      const capacity = this.data.capacities[this.data.capacityIndex], color = this.data.colors[this.data.colorIndex];
+      const memory = (this.data.memories || [])[this.data.memoryIndex], capacity = this.data.capacities[this.data.capacityIndex], color = this.data.colors[this.data.colorIndex];
       this.batch(() => {
         this.stage({ selectionNote: '' });
-        this.updateFilters({ model, capacity, color });
+        this.updateFilters({ model, memory, capacity, color });
         this.emit();
       });
     },
-    onCapacityChange(e) {
-      const capacity = this.data.capacities[Number(e.detail.value)]; if (!capacity) return;
-      const color = this.data.colors[this.data.colorIndex];
+    onMemoryChange(e) {
+      const memory = (this.data.memories || [])[Number(e.detail.value)]; if (!memory) return;
+      const capacity = this.data.capacities[this.data.capacityIndex], color = this.data.colors[this.data.colorIndex];
       this.batch(() => {
         this.stage({ selectionNote: '' });
-        this.updateFilters({ model: this.data.models[this.data.modelIndex], capacity, color });
+        this.updateFilters({ model: this.data.models[this.data.modelIndex], memory, capacity, color, prefer: 'memory' });
+        this.emit();
+      });
+    },
+    onMemoryTap(e) { this.onMemoryChange({ detail: { value: e.currentTarget.dataset.index } }); },
+    onCapacityChange(e) {
+      const capacity = this.data.capacities[Number(e.detail.value)]; if (!capacity) return;
+      const memory = (this.data.memories || [])[this.data.memoryIndex], color = this.data.colors[this.data.colorIndex];
+      this.batch(() => {
+        this.stage({ selectionNote: '' });
+        this.updateFilters({ model: this.data.models[this.data.modelIndex], memory, capacity, color, prefer: 'capacity' });
         this.emit();
       });
     },
     onCapacityTap(e) { this.onCapacityChange({ detail: { value: e.currentTarget.dataset.index } }); },
-    onColorTap(e) { this.batch(() => { this.stage({ selectionNote: '' }); this.updateFilters({ model: this.data.models[this.data.modelIndex], capacity: this.data.capacities[this.data.capacityIndex], color: this.data.colors[Number(e.currentTarget.dataset.index)] }); this.emit(); }); },
+    onColorTap(e) { this.batch(() => { this.stage({ selectionNote: '' }); this.updateFilters({ model: this.data.models[this.data.modelIndex], memory: (this.data.memories || [])[this.data.memoryIndex], capacity: this.data.capacities[this.data.capacityIndex], color: this.data.colors[Number(e.currentTarget.dataset.index)] }); this.emit(); }); },
     onProductChange(e) { const p = this.currentCandidates[Number(e.detail.value)]; if (!p) return; this.unavailablePartNumber = null; this.setData({ productIndex: Number(e.detail.value), product: this.publicProduct(p), imageFailed: false, selectionNote: '' }); this.emit(); },
     onImageError() { this.setData({ imageFailed: true }); },
     selectCity(index) {

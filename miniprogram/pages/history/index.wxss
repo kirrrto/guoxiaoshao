@@ -2,7 +2,6 @@
 .history-page .card { padding: 24rpx; margin-bottom: 20rpx; border-radius: 24rpx; }
 .history-heading { display: flex; justify-content: space-between; align-items: center; gap: 16rpx; margin: 0 6rpx 22rpx; }
 .history-heading .page-title { font-size: 38rpx; letter-spacing: 0; }
-.history-heading .page-subtitle { margin-top: 4rpx; font-size: max(12px, 24rpx); }
 .history-explain.ui-action { flex: none; gap: 8rpx; padding: 10rpx 14rpx; }
 .history-explain .ui-icon { width: 16px; height: 16px; }
 .history-config-summary { display: flex; align-items: center; gap: 18rpx; }
@@ -66,7 +65,6 @@
 .history-coverage-row { padding: 16rpx 0; border-bottom: 1rpx solid var(--line); line-height: 1.6; overflow-wrap: anywhere; }
 .history-coverage-row:last-of-type { border-bottom: none; }
 .history-tools-card .ui-disclosure.ui-disclosure { margin-top: 0; padding: 12rpx 16rpx; min-height: 44px; }
-.history-tools-note { margin: 8rpx 16rpx 0; }
 .history-latest-card + .history-browse-card { margin-top: 18rpx; padding-top: 18rpx; border-top: 1rpx solid var(--line); }
 .history-latest-card { overflow-wrap: anywhere; }
 .latest-row { gap: 16rpx; padding: 18rpx 0; border-bottom: 1rpx solid var(--line); }

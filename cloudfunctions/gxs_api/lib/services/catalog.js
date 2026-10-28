@@ -21,7 +21,7 @@ function toProductDoc(product, family) {
     familyKey: product.familyKey,
     familyName: family ? family.displayName : product.familyKey,
     model: product.model,
-    title: product.upstreamTitle || product.title,
+    title: product.category === 'mac' ? product.title : (product.upstreamTitle || product.title),
     catalogTitle: product.title,
     upstreamTitle: product.upstreamTitle || null,
     attributes: Object.fromEntries(Object.entries(product.attributes || {}).filter(([key]) => !key.endsWith('Detail'))),

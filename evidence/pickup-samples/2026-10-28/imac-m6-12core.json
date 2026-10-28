@@ -1,0 +1,65 @@
+{
+  "record": {
+    "storeNumber": "R577",
+    "partNumbers": [
+      "MH1D4CH/A",
+      "MH1H4CH/A",
+      "MH114CH/A",
+      "MH1P4CH/A"
+    ],
+    "requestUrl": "https://www.apple.com.cn/shop/retail/pickup-message?pl=true&mts.0=regular&parts.0=MH1D4CH%2FA&parts.1=MH1H4CH%2FA&parts.2=MH114CH%2FA&parts.3=MH1P4CH%2FA&store=R577",
+    "startedAt": "2026-10-28T02:05:38.196Z",
+    "httpStatus": 200,
+    "bytes": 7176,
+    "elapsedMs": 372,
+    "finishedAt": "2026-10-28T02:05:38.568Z",
+    "error": null,
+    "retryAfter": null
+  },
+  "observations": [
+    {
+      "storeNumber": "R577",
+      "storeName": "天环广场",
+      "partNumber": "MH1D4CH/A",
+      "status": "ineligible",
+      "pickupDisplay": "ineligible",
+      "quote": "暂无供应",
+      "productTitle": "绿色 iMac",
+      "observedAt": "2026-10-28T02:05:38.568Z",
+      "reason": null
+    },
+    {
+      "storeNumber": "R577",
+      "storeName": "天环广场",
+      "partNumber": "MH1H4CH/A",
+      "status": "ineligible",
+      "pickupDisplay": "ineligible",
+      "quote": "暂无供应",
+      "productTitle": "蓝色 iMac",
+      "observedAt": "2026-10-28T02:05:38.568Z",
+      "reason": null
+    },
+    {
+      "storeNumber": "R577",
+      "storeName": "天环广场",
+      "partNumber": "MH114CH/A",
+      "status": "ineligible",
+      "pickupDisplay": "ineligible",
+      "quote": "暂无供应",
+      "productTitle": "银色 iMac",
+      "observedAt": "2026-10-28T02:05:38.568Z",
+      "reason": null
+    },
+    {
+      "storeNumber": "R577",
+      "storeName": "天环广场",
+      "partNumber": "MH1P4CH/A",
+      "status": "ineligible",
+      "pickupDisplay": "ineligible",
+      "quote": "暂无供应",
+      "productTitle": "粉色 iMac",
+      "observedAt": "2026-10-28T02:05:38.568Z",
+      "reason": null
+    }
+  ]
+}

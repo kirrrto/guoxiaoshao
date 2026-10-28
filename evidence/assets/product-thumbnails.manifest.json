@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "catalogSha256": "22aca7f06a535f88a7b892ade5dd2251e814abb675eb2502a79de24225081d47",
+  "catalogSha256": "28652bb91eb6f47d5e4ce3ed1986a2af56a2f21d0c0fdc72fa9fad9d4075c2c6",
   "encoder": {
     "pillow": "12.3.0",
     "opaque": {
@@ -20,8 +20,8 @@
       ]
     }
   },
-  "cardMaxEdge": 216,
-  "posterMaxEdge": 720,
+  "cardMaxEdge": 96,
+  "posterMaxEdge": 180,
   "cardMaxBytes": 12288,
   "posterMaxBytes": 65536,
   "assets": [
@@ -37,10 +37,10 @@
         {
           "variant": "card",
           "path": "/images/products/f18bac220be8fb9aa47a-card.jpg",
-          "width": 216,
-          "height": 203,
-          "bytes": 2886,
-          "sha256": "f0d4ca0d7a6ff686038d537815f6eca254ed0f9838e5c840966351ec7b0f3624",
+          "width": 96,
+          "height": 90,
+          "bytes": 810,
+          "sha256": "43d413c82515a8446c6c8298abe1fb6b6cdc0dd9b9f0c9eb7ba5f5cb82e75383",
           "format": "JPEG",
           "hasTransparency": false
         }
@@ -58,10 +58,10 @@
         {
           "variant": "card",
           "path": "/images/products/e727362174c33a22e682-card.jpg",
-          "width": 216,
-          "height": 203,
-          "bytes": 3978,
-          "sha256": "0671f27613fb9b1c79deaa1eea5942df7fdecac6e33e7d4ddd86e80245d0f0c3",
+          "width": 96,
+          "height": 90,
+          "bytes": 1049,
+          "sha256": "1a0c2a67a4269d3fd52ec891c7f486cd7e16e60ea2167e3f61f09c09c784d914",
           "format": "JPEG",
           "hasTransparency": false
         }
@@ -79,10 +79,10 @@
         {
           "variant": "card",
           "path": "/images/products/0d51d4518e7f9539c0da-card.jpg",
-          "width": 216,
-          "height": 203,
-          "bytes": 6452,
-          "sha256": "98bfff1f6fe2aaa9f6c6a6de55bed649ea807966761d8c3f094924edd16b1a2f",
+          "width": 96,
+          "height": 90,
+          "bytes": 1675,
+          "sha256": "0684672d4c65fc9edc799fda695384a36ec621db80784dfcb85934bbbf13a327",
           "format": "JPEG",
           "hasTransparency": false
         }
@@ -100,10 +100,10 @@
         {
           "variant": "card",
           "path": "/images/products/fc04dca464ba1884845a-card.jpg",
-          "width": 216,
-          "height": 203,
-          "bytes": 6940,
-          "sha256": "57451a2d4ba17521d882ac407c8a2a2fcf67bb36df36be05a94f5e6680c083d0",
+          "width": 96,
+          "height": 90,
+          "bytes": 1835,
+          "sha256": "a82ba45d1692447a0a18af543c717ac6e792b1787cff18fd126762dc29a8cd55",
           "format": "JPEG",
           "hasTransparency": false
         }
@@ -121,10 +121,10 @@
         {
           "variant": "card",
           "path": "/images/products/a30de28737ae32710778-card.jpg",
-          "width": 216,
-          "height": 203,
-          "bytes": 5936,
-          "sha256": "f605378853b551a8443586b3b3152bddb34fa705319af23ba726cd0edf8f7cd2",
+          "width": 96,
+          "height": 90,
+          "bytes": 1489,
+          "sha256": "79c4dd15811c7deb888f77f9d41811d5bbb0386b52299d78efea8f6b5391d2f3",
           "format": "JPEG",
           "hasTransparency": false
         }
@@ -142,10 +142,10 @@
         {
           "variant": "card",
           "path": "/images/products/c73610b51bc8245e27e2-card.jpg",
-          "width": 216,
-          "height": 203,
-          "bytes": 5056,
-          "sha256": "92176543626df95432f6f11e35e1f5c6a060694a28814e113a9f879c4aa10e4f",
+          "width": 96,
+          "height": 90,
+          "bytes": 1311,
+          "sha256": "9e91630c79ef6f02d7cdf3e03485524530b510ba517dd0c3d87cb3a4a43bdeef",
           "format": "JPEG",
           "hasTransparency": false
         }
@@ -163,10 +163,10 @@
         {
           "variant": "card",
           "path": "/images/products/f0f264e7b6e439cb8b07-card.jpg",
-          "width": 216,
-          "height": 203,
-          "bytes": 5037,
-          "sha256": "62da68b777c1b2e3d6f53bdfe36ee6e8fa6418cd948fd9f37861565a35ae4ba0",
+          "width": 96,
+          "height": 90,
+          "bytes": 1262,
+          "sha256": "cd1b2ed195d60501906a93c5cbeb47db2f135b9262b734954bd54130c7de6875",
           "format": "JPEG",
           "hasTransparency": false
         }
@@ -184,10 +184,10 @@
         {
           "variant": "card",
           "path": "/images/products/602cb908a47b4a43fedc-card.png",
-          "width": 183,
-          "height": 216,
-          "bytes": 4008,
-          "sha256": "0f2d16c46371f24651ef4d0064bf927180403aeec4607bb3124995cff70db8a0",
+          "width": 81,
+          "height": 96,
+          "bytes": 1497,
+          "sha256": "86351fdadd83a002afd6b7d073bb4371dd0c623490cbffbe4f20bbda918f47e1",
           "format": "PNG",
           "hasTransparency": true
         }
@@ -205,10 +205,10 @@
         {
           "variant": "card",
           "path": "/images/products/1c022e130430e540abec-card.jpg",
-          "width": 216,
-          "height": 102,
-          "bytes": 1747,
-          "sha256": "44858ba9eeff65dc2236191fd67bc4660ecad6d045cc3056dd229d5d9e4e84bc",
+          "width": 96,
+          "height": 45,
+          "bytes": 625,
+          "sha256": "a38e20787574948dccf959ac853d1fae32e37cec7d3e354c84d02f7aa559ac6d",
           "format": "JPEG",
           "hasTransparency": false
         }
@@ -226,10 +226,10 @@
         {
           "variant": "card",
           "path": "/images/products/b62a5807f6def38f2585-card.jpg",
-          "width": 216,
-          "height": 102,
-          "bytes": 1891,
-          "sha256": "ca49e798bd3068e27b54f7c66fabeb7e7c21a9c55e93576bf627924653031bcd",
+          "width": 96,
+          "height": 45,
+          "bytes": 623,
+          "sha256": "19d21d7019c9a81f537d94590fece1d00dc10ac7a26af7816bff4d7edd5c5a5c",
           "format": "JPEG",
           "hasTransparency": false
         }
@@ -247,10 +247,10 @@
         {
           "variant": "card",
           "path": "/images/products/c97bea3d0e20e91e7e3f-card.jpg",
-          "width": 216,
-          "height": 102,
-          "bytes": 1903,
-          "sha256": "f6b38ecfdfb592e349aaf7dc1046165a1f49d83d518b55cde345c1d511604dd8",
+          "width": 96,
+          "height": 45,
+          "bytes": 600,
+          "sha256": "041d70f3e0f560c0cdd0f0e1ed225f0e2e98acf3281d3e5d57b1c9d3368a96a4",
           "format": "JPEG",
           "hasTransparency": false
         }
@@ -268,10 +268,10 @@
         {
           "variant": "card",
           "path": "/images/products/781c797e850cfc2ce5ee-card.jpg",
-          "width": 216,
-          "height": 102,
-          "bytes": 1629,
-          "sha256": "89a29d9e7b29ed4ccfe86bc9dc0b3b8bc96177135fa71d48833fc7c18020bfbf",
+          "width": 96,
+          "height": 45,
+          "bytes": 595,
+          "sha256": "988f9589d1681af9c0e025edb12dc5241e26e1653c443347bd34ad72cf1fc6f4",
           "format": "JPEG",
           "hasTransparency": false
         }
@@ -289,10 +289,10 @@
         {
           "variant": "card",
           "path": "/images/products/db96602cc12138ed1b33-card.jpg",
-          "width": 216,
-          "height": 102,
-          "bytes": 1751,
-          "sha256": "4137ac3b75a5bfe56cf873ca5599ed1d62c7835812b08531561b7af827ebeca5",
+          "width": 96,
+          "height": 45,
+          "bytes": 607,
+          "sha256": "2620f2118edfb2bc5501bd0fe8637dd13e9e2b2e848392f143dc38fae08eec92",
           "format": "JPEG",
           "hasTransparency": false
         }
@@ -310,10 +310,10 @@
         {
           "variant": "card",
           "path": "/images/products/bf35168235111161a237-card.jpg",
-          "width": 216,
-          "height": 102,
-          "bytes": 1833,
-          "sha256": "c1a20812e22806392e7d9893cceda39436098cb26f1332430224073c631dfeef",
+          "width": 96,
+          "height": 45,
+          "bytes": 605,
+          "sha256": "c5b3b75ca35babf3c0bf95308bcc1776737a5afd9efab21bb7922f44eed7865e",
           "format": "JPEG",
           "hasTransparency": false
         }
@@ -331,10 +331,10 @@
         {
           "variant": "card",
           "path": "/images/products/8fb43e7f8306e159f637-card.jpg",
-          "width": 216,
-          "height": 102,
-          "bytes": 1650,
-          "sha256": "4ac4cd6cf11175cdc3be8a9b42fe7a8d5ef99c0e5c0aefe701740dfc52ed0280",
+          "width": 96,
+          "height": 45,
+          "bytes": 517,
+          "sha256": "f4f43e4cacfa72bfcfd0e1918c1579d25538a72e619a10412286c5370e35ae52",
           "format": "JPEG",
           "hasTransparency": false
         }
@@ -352,10 +352,10 @@
         {
           "variant": "card",
           "path": "/images/products/e6d04439462431bc4218-card.jpg",
-          "width": 216,
-          "height": 102,
-          "bytes": 1359,
-          "sha256": "d9807fb55126f1cee880b76c9a0c6d14ea9a7a621cc567bf193ec4167f459853",
+          "width": 96,
+          "height": 45,
+          "bytes": 470,
+          "sha256": "060213610ec25de6b161ae57a6958947de93a02e4fd38a171aacba783f91d2bc",
           "format": "JPEG",
           "hasTransparency": false
         }
@@ -373,10 +373,10 @@
         {
           "variant": "card",
           "path": "/images/products/887a0c923b0ceddadb30-card.jpg",
-          "width": 216,
-          "height": 102,
-          "bytes": 1420,
-          "sha256": "356c20a2c725b58996bd5c6ef958e207f118398ec110eadea1a386573f20aacc",
+          "width": 96,
+          "height": 45,
+          "bytes": 466,
+          "sha256": "7f7cf152029ac95e1485ce16d6692a2474820c882e290819f5afdba9bec5717e",
           "format": "JPEG",
           "hasTransparency": false
         }
@@ -394,10 +394,10 @@
         {
           "variant": "card",
           "path": "/images/products/9d8ee211ca16f0216740-card.jpg",
-          "width": 216,
-          "height": 102,
-          "bytes": 1677,
-          "sha256": "3e410825033b41963317e8e1d75ef2768cb6f97bd6a264be1cc437357a8f9ff6",
+          "width": 96,
+          "height": 45,
+          "bytes": 569,
+          "sha256": "e26d66ea1c0c0eeef2564a0c886cc8cc57719b5c834c072f9b73dbef2e4255d2",
           "format": "JPEG",
           "hasTransparency": false
         }
@@ -415,10 +415,10 @@
         {
           "variant": "card",
           "path": "/images/products/9b9c6116fb1cc23cdab3-card.png",
-          "width": 183,
-          "height": 216,
-          "bytes": 4361,
-          "sha256": "8db2b6202174c2e222216b21849cdb111ff01634e38c93e279352326613bb32a",
+          "width": 81,
+          "height": 96,
+          "bytes": 962,
+          "sha256": "08920dfb1f457d1462db8d0624f1aed6f744ff5b3e40eccea060e45ff5932b08",
           "format": "PNG",
           "hasTransparency": true
         }
@@ -436,178 +436,187 @@
         {
           "variant": "card",
           "path": "/images/products/e8cacc9f64a366fb7455-card.png",
-          "width": 183,
-          "height": 216,
-          "bytes": 4215,
-          "sha256": "d2c0e0acca005c1a7c7798932e9173befda895426affd72c08f5ceb27b5f4361",
+          "width": 81,
+          "height": 96,
+          "bytes": 948,
+          "sha256": "b483651cd7d86f65407512eb3ec8a160eb01a841c741a452d5100b92a4e003c5",
           "format": "PNG",
           "hasTransparency": true
         }
       ]
     },
     {
-      "source": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/imac-summary-select-202601-blue-10-10-desktop?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=WllUWC93anFnTVNzaGhjT3ByaHgrK1BMOXNMWE5zKzFrN0x0ZytrVTZPUXFUZEpKTy93N09sK3NVU0RqNGkzeWtXOFZBWlBHUmZ1SFluOWlKMkovNG15aFM4QSthSG1nSUl6WXJQME1SZ2tZVUdPS3gxbDJkNWlQUTdqemxMK2pGQlRRRytmTHd2bTlDU2RZMUtqVTRR&traceId=1",
-      "sourceSha256": "0da74f46fd184ecf15cbd2c46409334eb2c414889c9df60e42e88598d69e0f53",
-      "sourceWidth": 5120,
-      "sourceHeight": 3280,
-      "parts": [
-        "MWV13CH/A"
-      ],
-      "renditions": [
-        {
-          "variant": "card",
-          "path": "/images/products/356c82eaf0bd0d3056c1-card.jpg",
-          "width": 216,
-          "height": 138,
-          "bytes": 4139,
-          "sha256": "997e19f8bcea80bb096cd03b2fde222972f99ccab46f529be2cd24a67c748488",
-          "format": "JPEG",
-          "hasTransparency": false
-        }
-      ]
-    },
-    {
-      "source": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/imac-summary-select-202601-blue-8-8-desktop?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=WllUWC93anFnTVNzaGhjT3ByaHgrK1BMOXNMWE5zKzFrN0x0ZytrVTZPUW13RXJ5SHBGdFdsQTJxU3BOVmwrV0tZMGFKbG9yanhQdjZDS1dZUFFhRWJZc3g4ZkhUVEc0bFNFL1l3MHJZd1ZKZTV1QlJBOG9HbTVNTC9UZjBUQlo&traceId=1",
+      "source": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/imac-summary-select-202610-blue-10-10-desktop?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=WllUWC93anFnTVNzaGhjT3ByaHgrOFlkb0tLbGVNL3FSUkRveDZDY24rd3FUZEpKTy93N09sK3NVU0RqNGkzeWtXOFZBWlBHUmZ1SFluOWlKMkovNG15aFM4QSthSG1nSUl6WXJQME1SZ2tRR0owbDh6WWNzaUJoWDRqRUZ1dkt1YmZQMXFXa2w0U3RUanhYSTV4Z29R&traceId=1",
       "sourceSha256": "7f86492a47c963d2f073257305314688b08403c92f45e92bb79aeea584a543c8",
       "sourceWidth": 5120,
       "sourceHeight": 3280,
       "parts": [
-        "MWUF3CH/A"
+        "MH094CH/A"
       ],
       "renditions": [
         {
           "variant": "card",
-          "path": "/images/products/a2fac815dafb77c2dd52-card.jpg",
-          "width": 216,
-          "height": 138,
-          "bytes": 4134,
-          "sha256": "e75276dc7686981d873db3283679f33c3dc2f8fbca4909f32db9c53d792d5ee5",
+          "path": "/images/products/d3e0160ba018c87aeb94-card.jpg",
+          "width": 96,
+          "height": 62,
+          "bytes": 1099,
+          "sha256": "aa6d80cac2e03cfcd77d85cb8526fc6f63af5b9eca80bfaddaa42208ef4880c1",
           "format": "JPEG",
           "hasTransparency": false
         }
       ]
     },
     {
-      "source": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/imac-summary-select-202601-green-10-10-desktop?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=WllUWC93anFnTVNzaGhjT3ByaHgrNWdrQ0MyTU1ZRUVhOHJqT2lzbGdRTnc5eWVvTDBndmJDU0ZtSzZYczNMdnJUNGJWZ1llU1plZmhBekVhZm5NQnJ4YnM0WFduSzYyM1pGalVqQlB0d0k5TDcwK3BLN240NXYwbkFJejNxVXNNUjhodU9MTHNlVnVUMUtlUmw4RU9R&traceId=1",
-      "sourceSha256": "b097001eaf07843ddbbef04a2fb98f9db68ce254ad9d20a8ecbccfce44469bdd",
+      "source": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/imac-summary-select-202610-blue-12-12-desktop?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=WllUWC93anFnTVNzaGhjT3ByaHgrOFlkb0tLbGVNL3FSUkRveDZDY24rd2ZISnF6RVlGbUxrZGs1R1h6UnZ1VmtXOFZBWlBHUmZ1SFluOWlKMkovNG15aFM4QSthSG1nSUl6WXJQME1SZ2s1eEVmMmpPSEgraElvZ1pGbGFiZTBGblJodVFEaGgxMERMNjl1RlVMTnp3&traceId=1",
+      "sourceSha256": "0da74f46fd184ecf15cbd2c46409334eb2c414889c9df60e42e88598d69e0f53",
       "sourceWidth": 5120,
       "sourceHeight": 3280,
       "parts": [
-        "MWUY3CH/A"
+        "MH1H4CH/A",
+        "MH1J4CH/A",
+        "MH1N4CH/A"
       ],
       "renditions": [
         {
           "variant": "card",
-          "path": "/images/products/912b6fd453ad07a0a398-card.jpg",
-          "width": 216,
-          "height": 138,
-          "bytes": 4061,
-          "sha256": "c21164cbe04e091e9b3c48bd58d28a48a360043af871cc3d4c8276d2b23d48e6",
+          "path": "/images/products/2423a56b76054a9f6283-card.jpg",
+          "width": 96,
+          "height": 62,
+          "bytes": 1103,
+          "sha256": "b1d842674fbe480ba4032ea0a3a445600d21d5c537c777c3eb13a5f3aa6c7715",
           "format": "JPEG",
           "hasTransparency": false
         }
       ]
     },
     {
-      "source": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/imac-summary-select-202601-green-8-8-desktop?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=WllUWC93anFnTVNzaGhjT3ByaHgrNWdrQ0MyTU1ZRUVhOHJqT2lzbGdRTW5oTDI1aDhNMkE3VEhKeXVZV1IyVkRNSlovakh3TEZaVjd3SkhSOUZwUkRBSHlqQStCOGVBOUJkSkVqU0hLTkFnTzMzTmNwbHlHYndBcG84dVZ1S2FmbW94YnYxc1YvNXZ4emJGL0IxNFp3&traceId=1",
+      "source": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/imac-summary-select-202610-green-10-10-desktop?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=WllUWC93anFnTVNzaGhjT3ByaHgrNjV6eSt5ak9GYU5RMjFpcTA3dlhZZHc5eWVvTDBndmJDU0ZtSzZYczNMdnJUNGJWZ1llU1plZmhBekVhZm5NQnJ4YnM0WFduSzYyM1pGalVqQlB0d0pLM042RTEwUXV1c0NySXEyY2haY1A4SldkNUdiVVh1ckJyWEdmVzdaY2xn&traceId=1",
       "sourceSha256": "08d357eba1c66dbe6712231a0876f0bde0622ef5e69c3378c7f86133480e8343",
       "sourceWidth": 5120,
       "sourceHeight": 3280,
       "parts": [
-        "MWUE3CH/A"
+        "MH084CH/A"
       ],
       "renditions": [
         {
           "variant": "card",
-          "path": "/images/products/4e2243c723c1361cd001-card.jpg",
-          "width": 216,
-          "height": 138,
-          "bytes": 4052,
-          "sha256": "06aff81223c8c761710a6e5e763e6cdaf42416c725e2ef111752dde5737d8b58",
+          "path": "/images/products/cf1e9c2bab58cb974840-card.jpg",
+          "width": 96,
+          "height": 62,
+          "bytes": 1090,
+          "sha256": "172c18cee332fac5a3160fe0bd016dea142aca9e93c912b9e8add9743b14126d",
           "format": "JPEG",
           "hasTransparency": false
         }
       ]
     },
     {
-      "source": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/imac-summary-select-202601-pink-10-10-desktop?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=WllUWC93anFnTVNzaGhjT3ByaHgrd09Mb1Z2ck5oSk8zTXI1RTRaSFNNMHFUZEpKTy93N09sK3NVU0RqNGkzeWtXOFZBWlBHUmZ1SFluOWlKMkovNG15aFM4QSthSG1nSUl6WXJQME1SZ2xhemVmQWZuZmtXQ3lpbU93KzdxQkhRRXB6YUhNcms5Z1pYZXdkbUhocnBn&traceId=1",
-      "sourceSha256": "6f7c212bebfafd0ed1095754699bf42c2f572f2a05eb6aef4d2d834d27ca4dff",
+      "source": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/imac-summary-select-202610-green-12-12-desktop?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=WllUWC93anFnTVNzaGhjT3ByaHgrNjV6eSt5ak9GYU5RMjFpcTA3dlhZZVZrTUJmWHp1eS9lMkJ0d3BrSEVGQXJUNGJWZ1llU1plZmhBekVhZm5NQnJ4YnM0WFduSzYyM1pGalVqQlB0d0t0TnN1OTMzSEVQY3czMkxyazBmalR5T2JvREFOUlNtWURiWG1FVHR3cWFB&traceId=1",
+      "sourceSha256": "b097001eaf07843ddbbef04a2fb98f9db68ce254ad9d20a8ecbccfce44469bdd",
       "sourceWidth": 5120,
       "sourceHeight": 3280,
       "parts": [
-        "MWV43CH/A"
+        "MH1D4CH/A",
+        "MH1F4CH/A",
+        "MH1G4CH/A"
       ],
       "renditions": [
         {
           "variant": "card",
-          "path": "/images/products/96d5373de8906b96d965-card.jpg",
-          "width": 216,
-          "height": 138,
-          "bytes": 4028,
-          "sha256": "e17d1482d097b0c272e6eabfb03c6c7dfa4145d8109deb876439cfaf5fb86233",
+          "path": "/images/products/0130f46728258a31bc26-card.jpg",
+          "width": 96,
+          "height": 62,
+          "bytes": 1092,
+          "sha256": "375f0f97dfe23dad995b1920e261b38486c06388f2a881d14133f59c5e9fddcf",
           "format": "JPEG",
           "hasTransparency": false
         }
       ]
     },
     {
-      "source": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/imac-summary-select-202601-pink-8-8-desktop?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=WllUWC93anFnTVNzaGhjT3ByaHgrd09Mb1Z2ck5oSk8zTXI1RTRaSFNNMG13RXJ5SHBGdFdsQTJxU3BOVmwrV0tZMGFKbG9yanhQdjZDS1dZUFFhRWJZc3g4ZkhUVEc0bFNFL1l3MHJZd1ZUb0J6UUdzOEthMUFMVzFqeUVCREY&traceId=1",
+      "source": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/imac-summary-select-202610-pink-10-10-desktop?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=WllUWC93anFnTVNzaGhjT3ByaHgrOGFnWGhJeGkrQ0hKeHFaY3h4RmNBa3FUZEpKTy93N09sK3NVU0RqNGkzeWtXOFZBWlBHUmZ1SFluOWlKMkovNG15aFM4QSthSG1nSUl6WXJQME1SZ212QVJlUXhhYWI4SnZPNkdsRzB1cjNGQlRRRytmTHd2bTlDU2RZMUtqVTRR&traceId=1",
       "sourceSha256": "e9fadd68946d8fb0d31904482ac57f1b935bf2e18532501c0d5b5e7efd41528f",
       "sourceWidth": 5120,
       "sourceHeight": 3280,
       "parts": [
-        "MWUG3CH/A"
+        "MH0A4CH/A"
       ],
       "renditions": [
         {
           "variant": "card",
-          "path": "/images/products/4f1cc49fc49920bc1daf-card.jpg",
-          "width": 216,
-          "height": 138,
-          "bytes": 4020,
-          "sha256": "ba4bed103cee9c4a5268b8d0abee411f7cd58ab4b04b7cdd042e4ddc06f727fd",
+          "path": "/images/products/7388982910d84e287116-card.jpg",
+          "width": 96,
+          "height": 62,
+          "bytes": 1050,
+          "sha256": "6cc0cfe76e2fa94dd51ef82c6e748ac03bcd6756b6d7f9a6c050c32efc719892",
           "format": "JPEG",
           "hasTransparency": false
         }
       ]
     },
     {
-      "source": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/imac-summary-select-202601-silver-10-10-desktop?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=WllUWC93anFnTVNzaGhjT3ByaHgrMEF3V3JMa1pDeDhXR0JFWlhDZVE0NVRqVzJHSzdmYmljQW9MSSttbnJuckVlNEJLYXlpcWN3dVUzSHNPQldJNHlaSE1Qa0haZTFvMWVJTkxjaWwxSnd0TjJoY2pwK21DUVZUK3RpNGFPSlRZc3p5WmRXa1R6YzVoL3RNUGFxYy9R&traceId=1",
-      "sourceSha256": "8517159b5400fe8c80387791b6ff8d8f3c046b26daddf413cd09970fab63acc7",
+      "source": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/imac-summary-select-202610-pink-12-12-desktop?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=WllUWC93anFnTVNzaGhjT3ByaHgrOGFnWGhJeGkrQ0hKeHFaY3h4RmNBa2ZISnF6RVlGbUxrZGs1R1h6UnZ1VmtXOFZBWlBHUmZ1SFluOWlKMkovNG15aFM4QSthSG1nSUl6WXJQME1SZ204ZmRLcXBvbXJ0eVI3NjRnaE1oaytsWG55WFNZREIrcHRwdlRvMGw2S3BR&traceId=1",
+      "sourceSha256": "6f7c212bebfafd0ed1095754699bf42c2f572f2a05eb6aef4d2d834d27ca4dff",
       "sourceWidth": 5120,
       "sourceHeight": 3280,
       "parts": [
-        "MWUU3CH/A"
+        "MH1P4CH/A",
+        "MH1Q4CH/A",
+        "MH1R4CH/A"
       ],
       "renditions": [
         {
           "variant": "card",
-          "path": "/images/products/402371ccb72a538573f0-card.jpg",
-          "width": 216,
-          "height": 138,
-          "bytes": 3389,
-          "sha256": "447491b68a877f07c0dd55db46223f83bf6e5851f3c6dab18b84a0d2f5c285e8",
+          "path": "/images/products/a5431b7614b52500ec1c-card.jpg",
+          "width": 96,
+          "height": 62,
+          "bytes": 1050,
+          "sha256": "401e297c96a6626a141a8f152bcab8436a026e711765981c0bd582f977e093a7",
           "format": "JPEG",
           "hasTransparency": false
         }
       ]
     },
     {
-      "source": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/imac-summary-select-202601-silver-8-8-desktop?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=WllUWC93anFnTVNzaGhjT3ByaHgrMEF3V3JMa1pDeDhXR0JFWlhDZVE0NUZLb0FEQXNuSi96TXQxb0ZGV0xGOGtXOFZBWlBHUmZ1SFluOWlKMkovNG15aFM4QSthSG1nSUl6WXJQME1SZ2t1UVR1eWpuZ3pqZkFIblEvRlhPK0xka0xmckVNVTBkS20yTzkwa0dhU09n&traceId=1",
+      "source": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/imac-summary-select-202610-silver-10-10-desktop?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=WllUWC93anFnTVNzaGhjT3ByaHgrenYzV1FIMFB6dWhrV3k2cXIvVzErUlRqVzJHSzdmYmljQW9MSSttbnJuckVlNEJLYXlpcWN3dVUzSHNPQldJNHlaSE1Qa0haZTFvMWVJTkxjaWwxSnhjUURMUXg0QTVUTUx3VzcwWHpIZ0Nva3RWUTQwUHRIOXI1RmdUSkI1c3hn&traceId=1",
       "sourceSha256": "f5ee52a34e540ab8ccf227d92ef948736444a02406438af503ade3e597533a90",
       "sourceWidth": 5120,
       "sourceHeight": 3280,
       "parts": [
-        "MWUC3CH/A"
+        "MH064CH/A"
       ],
       "renditions": [
         {
           "variant": "card",
-          "path": "/images/products/1a179d5e03995acb35f4-card.jpg",
-          "width": 216,
-          "height": 138,
-          "bytes": 3373,
-          "sha256": "76a5bee18d9bf5d1347b296556b028a7d6e79fce552aeba9608cd4328ca90527",
+          "path": "/images/products/a2c15e2e230f4497a93d-card.jpg",
+          "width": 96,
+          "height": 62,
+          "bytes": 935,
+          "sha256": "9259df086471ac705f4abe8856f4a92bbd2c8b5a297d007cd2d7456b17aed992",
+          "format": "JPEG",
+          "hasTransparency": false
+        }
+      ]
+    },
+    {
+      "source": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/imac-summary-select-202610-silver-12-12-desktop?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=WllUWC93anFnTVNzaGhjT3ByaHgrenYzV1FIMFB6dWhrV3k2cXIvVzErUytoV0tjRFlmMVI3RHZJQ2RLWkVKb0VlNEJLYXlpcWN3dVUzSHNPQldJNHlaSE1Qa0haZTFvMWVJTkxjaWwxSnhjUURMUXg0QTVUTUx3VzcwWHpIZ0NESFpDanFhRTZrek9UVFdFVVMyVnJ3&traceId=1",
+      "sourceSha256": "8517159b5400fe8c80387791b6ff8d8f3c046b26daddf413cd09970fab63acc7",
+      "sourceWidth": 5120,
+      "sourceHeight": 3280,
+      "parts": [
+        "MH114CH/A",
+        "MH154CH/A",
+        "MH164CH/A",
+        "MH2U4CH/A"
+      ],
+      "renditions": [
+        {
+          "variant": "card",
+          "path": "/images/products/e97cb930b70f205caaa1-card.jpg",
+          "width": 96,
+          "height": 62,
+          "bytes": 938,
+          "sha256": "156a2c9025079a98e7fbd57b962b12860dbfd43ae0be2cc487405f7c1e26ea2c",
           "format": "JPEG",
           "hasTransparency": false
         }
@@ -627,10 +636,10 @@
         {
           "variant": "card",
           "path": "/images/products/01d8f0de8e6edbb202e5-card.png",
-          "width": 183,
-          "height": 216,
-          "bytes": 4557,
-          "sha256": "2843ec46c605a28f2a331eb9b0040af3b0aa02234ae2f63722059449e04afa6e",
+          "width": 81,
+          "height": 96,
+          "bytes": 1223,
+          "sha256": "0aafcebfee07ed2e6c693479780a8d794466b154deaf03cf2aaf51ccd4432467",
           "format": "PNG",
           "hasTransparency": true
         }
@@ -650,10 +659,10 @@
         {
           "variant": "card",
           "path": "/images/products/3daa16e1d9e4619ac6b0-card.png",
-          "width": 183,
-          "height": 216,
-          "bytes": 4516,
-          "sha256": "3f683eced2c39c5bcae88b1836e0f4ae2d7086dcb514fe8b7a998e3fb65f71ce",
+          "width": 81,
+          "height": 96,
+          "bytes": 1219,
+          "sha256": "ff10f5c4ba785028c85f282e5e6a19af135fa8d11aeac70dc60be5e543eeb091",
           "format": "PNG",
           "hasTransparency": true
         }
@@ -673,10 +682,10 @@
         {
           "variant": "card",
           "path": "/images/products/7ace05f18121744b7862-card.png",
-          "width": 183,
-          "height": 216,
-          "bytes": 4586,
-          "sha256": "c8f296217a492ad4d19a180e8df93b8b612e90f07e391ddb29a0414e549b1561",
+          "width": 81,
+          "height": 96,
+          "bytes": 1218,
+          "sha256": "b87560fb87453b5c616312b874c74623b73b89acd0178b71e7d403e65d345c34",
           "format": "PNG",
           "hasTransparency": true
         }
@@ -696,10 +705,10 @@
         {
           "variant": "card",
           "path": "/images/products/fe8ead5db44576952a3f-card.png",
-          "width": 183,
-          "height": 216,
-          "bytes": 4529,
-          "sha256": "405df2972540d8fc139751f4bc467b78f77656a03993f17db2ef4841108966ab",
+          "width": 81,
+          "height": 96,
+          "bytes": 1221,
+          "sha256": "57132bad76b1e4ffadd2225ba849627d07450c2ff3ebad20b40c8d0202104718",
           "format": "PNG",
           "hasTransparency": true
         }
@@ -719,10 +728,10 @@
         {
           "variant": "card",
           "path": "/images/products/31d1fac04420158bc214-card.png",
-          "width": 183,
-          "height": 216,
-          "bytes": 3960,
-          "sha256": "a69bf4a45382e3d98f586d6a11f3f14452b76a43905196699d66ad4019af5a1f",
+          "width": 81,
+          "height": 96,
+          "bytes": 980,
+          "sha256": "0f60a8e2dbacb577f83ea64a99a6fd84eac6e818d5199ccdb5a8ee829d9acac3",
           "format": "PNG",
           "hasTransparency": true
         }
@@ -742,10 +751,10 @@
         {
           "variant": "card",
           "path": "/images/products/4b14c3eb1354f6922780-card.png",
-          "width": 183,
-          "height": 216,
-          "bytes": 3927,
-          "sha256": "d523219dc0050c94c36f71c0f8140df3da8ac1db2a099ca9c86b3cd67c1b58aa",
+          "width": 81,
+          "height": 96,
+          "bytes": 973,
+          "sha256": "f1f994284d9717f75e544697291c197c253b44998f06c68357c3de3028c9fdb2",
           "format": "PNG",
           "hasTransparency": true
         }
@@ -765,10 +774,10 @@
         {
           "variant": "card",
           "path": "/images/products/7124ab49081687ce9699-card.png",
-          "width": 183,
-          "height": 216,
-          "bytes": 4296,
-          "sha256": "b353246f39de5f92971207805648e943f5cd342d54c1524a2ae51a50aef3f274",
+          "width": 81,
+          "height": 96,
+          "bytes": 1220,
+          "sha256": "ad913c5de663dda7111f6861cab44fe94a6362a72fd1798c81525218b06cebf3",
           "format": "PNG",
           "hasTransparency": true
         }
@@ -788,10 +797,10 @@
         {
           "variant": "card",
           "path": "/images/products/ce7e365754032c786821-card.png",
-          "width": 183,
-          "height": 216,
-          "bytes": 4250,
-          "sha256": "71195d3b4ce5f7cf2615a80f59b921c7e7d047c6e8db95e1d81b51fae9e360c5",
+          "width": 81,
+          "height": 96,
+          "bytes": 1199,
+          "sha256": "3d615b7e703bd26b4927dd47acda7bab9693f7f85e86e098d12d26a9206baee0",
           "format": "PNG",
           "hasTransparency": true
         }
@@ -812,10 +821,10 @@
         {
           "variant": "card",
           "path": "/images/products/4d0642cc24853d13629e-card.jpg",
-          "width": 183,
-          "height": 216,
-          "bytes": 6589,
-          "sha256": "68499a694dbb590b1bd49d2b0823c8c7cf519e0e18ec1d2da579e3dd5eaded46",
+          "width": 81,
+          "height": 96,
+          "bytes": 1566,
+          "sha256": "d53df111097d1d40d3977f9f8c89998d4876eabc95d21dffddbf5e88b843b31f",
           "format": "JPEG",
           "hasTransparency": false
         }
@@ -836,10 +845,10 @@
         {
           "variant": "card",
           "path": "/images/products/640340718372f5ae18f8-card.jpg",
-          "width": 183,
-          "height": 216,
-          "bytes": 6381,
-          "sha256": "27474cefac22fc2e0d4a1ccc7283ba23cb0bb4132497e6d333690ace4b9f4ea7",
+          "width": 81,
+          "height": 96,
+          "bytes": 1528,
+          "sha256": "5308e5a5595f40d1430d3be7f5603938a63164c19ec0be613dbda58872182483",
           "format": "JPEG",
           "hasTransparency": false
         }
@@ -860,10 +869,10 @@
         {
           "variant": "card",
           "path": "/images/products/78c9c6ff6da83f7b9f44-card.jpg",
-          "width": 183,
-          "height": 216,
-          "bytes": 6028,
-          "sha256": "20d2fd6d6b16c0bb2f8551d83d76d40d22abc1d8e5d4bcbc1d9e1c4f3209edd0",
+          "width": 81,
+          "height": 96,
+          "bytes": 1454,
+          "sha256": "f9bf5f71d925fcc1be21a51b0c4780290d87f00ecd79d256e203e3067d58be6c",
           "format": "JPEG",
           "hasTransparency": false
         }
@@ -884,10 +893,10 @@
         {
           "variant": "card",
           "path": "/images/products/a1996531574a397e9de4-card.jpg",
-          "width": 183,
-          "height": 216,
-          "bytes": 6446,
-          "sha256": "d76ca0b5d99c1cf47208fd8a65524e7bfdfe7e03f6fa1bae6e718fcc7f652805",
+          "width": 81,
+          "height": 96,
+          "bytes": 1550,
+          "sha256": "7c4cd866d24c9ad45545832d197cf79ab4c2222a36ce7c204279fc498cca9806",
           "format": "JPEG",
           "hasTransparency": false
         }
@@ -908,10 +917,10 @@
         {
           "variant": "card",
           "path": "/images/products/c603d2d006e942a94c1b-card.jpg",
-          "width": 183,
-          "height": 216,
-          "bytes": 6568,
-          "sha256": "9df76c5a3c8c8f3cf8ca876033a82f43d7522ddfa8ae5263ca1c99b65e967937",
+          "width": 81,
+          "height": 96,
+          "bytes": 1565,
+          "sha256": "c2e14b62dab8f53bcd5ee55e52eebb2ad4715084e46bbda97ea2fd0700fb913f",
           "format": "JPEG",
           "hasTransparency": false
         }
@@ -932,10 +941,10 @@
         {
           "variant": "card",
           "path": "/images/products/dc09c1dcf85753c968eb-card.jpg",
-          "width": 183,
-          "height": 216,
-          "bytes": 6348,
-          "sha256": "bd23664979496f6e2c597cbf1ba29c2fd002d240161f40638f4b0277ee65264e",
+          "width": 81,
+          "height": 96,
+          "bytes": 1531,
+          "sha256": "c8345ebd3b0d58011a6afe99bb029f4e83fd058966d16ecf45997218569448ff",
           "format": "JPEG",
           "hasTransparency": false
         }
@@ -956,10 +965,10 @@
         {
           "variant": "card",
           "path": "/images/products/b49f94ec6eb45471b282-card.jpg",
-          "width": 183,
-          "height": 216,
-          "bytes": 6002,
-          "sha256": "00a4b8b0d6e68cd3303773e5a52838098a300eddf970da2fc2566a165bfb3b71",
+          "width": 81,
+          "height": 96,
+          "bytes": 1446,
+          "sha256": "63c0911749cf692587b622afab6c03e31e747f566dd8569e401d7fdd2e49bae0",
           "format": "JPEG",
           "hasTransparency": false
         }
@@ -980,10 +989,10 @@
         {
           "variant": "card",
           "path": "/images/products/9d8bfeeb7fb51dbbf2b5-card.jpg",
-          "width": 183,
-          "height": 216,
-          "bytes": 6448,
-          "sha256": "657bbec3075bffdd8895a727551a16abe6a66a86725c10b91d028f64f773f156",
+          "width": 81,
+          "height": 96,
+          "bytes": 1543,
+          "sha256": "db489d28242d8ffa8d1fe0e6299ae7dab1f8ebc08ffdc8651904e4d4f5230dca",
           "format": "JPEG",
           "hasTransparency": false
         }
@@ -1004,10 +1013,10 @@
         {
           "variant": "card",
           "path": "/images/products/31cdecf2c4459a0e5586-card.jpg",
-          "width": 183,
-          "height": 216,
-          "bytes": 8308,
-          "sha256": "33b467ed922f5e29ee5656ce03e1da4d339ce79f2b8a96371039cae36c845390",
+          "width": 81,
+          "height": 96,
+          "bytes": 1845,
+          "sha256": "f8892949c2153e2ec85fa39d99da856581011565b30593d96f6f0248053f10af",
           "format": "JPEG",
           "hasTransparency": false
         }
@@ -1028,10 +1037,10 @@
         {
           "variant": "card",
           "path": "/images/products/f334d1feca0f84809c27-card.jpg",
-          "width": 183,
-          "height": 216,
-          "bytes": 7999,
-          "sha256": "16c8f1374fb51a5c2e66ae719d1cb4e9c28b11e254903a33a2ef5fd7bbd7bae9",
+          "width": 81,
+          "height": 96,
+          "bytes": 1801,
+          "sha256": "8f09d22794c88d415c928c86be08285553664ebde48b1c6e6f4eed2108115dfd",
           "format": "JPEG",
           "hasTransparency": false
         }
@@ -1052,10 +1061,10 @@
         {
           "variant": "card",
           "path": "/images/products/96712c9c589cc44c4fc6-card.jpg",
-          "width": 183,
-          "height": 216,
-          "bytes": 7592,
-          "sha256": "f68460764fc504c6a2a261403859b53c1f70f432b2e04bd7e234fa0b0fcd5987",
+          "width": 81,
+          "height": 96,
+          "bytes": 1703,
+          "sha256": "637940e06516d6e383242651602513067c77cb5c24e13bfdcd66e57e175fcb35",
           "format": "JPEG",
           "hasTransparency": false
         }
@@ -1076,10 +1085,10 @@
         {
           "variant": "card",
           "path": "/images/products/4294c546bd63c427ac8d-card.jpg",
-          "width": 183,
-          "height": 216,
-          "bytes": 8091,
-          "sha256": "4007477b7ed74cbc9d970b6496731b7b2a42adc4c379cfd9584867651d9b6192",
+          "width": 81,
+          "height": 96,
+          "bytes": 1838,
+          "sha256": "4c354ffce4bb2afcd11bd8e89c7411f3ff61d8fe660869be0409d3faa198d5d6",
           "format": "JPEG",
           "hasTransparency": false
         }
@@ -1100,10 +1109,10 @@
         {
           "variant": "card",
           "path": "/images/products/23a00718e67797d6328a-card.jpg",
-          "width": 183,
-          "height": 216,
-          "bytes": 8287,
-          "sha256": "a2e3d8bfa71f70360b8b38bcb7d7f48de6ddff22b67bc78b861dea720c9c9803",
+          "width": 81,
+          "height": 96,
+          "bytes": 1841,
+          "sha256": "8e5d64b19098788a65030999c26728a4bc12f3cc9333062f0732ccb842fd12fb",
           "format": "JPEG",
           "hasTransparency": false
         }
@@ -1124,10 +1133,10 @@
         {
           "variant": "card",
           "path": "/images/products/f543e398e1a12ce46f2d-card.jpg",
-          "width": 183,
-          "height": 216,
-          "bytes": 7976,
-          "sha256": "e1eaa91c56dc2ca705d785d32c1cdb7edbe83ebf8d30958a3aee43fd4ba82457",
+          "width": 81,
+          "height": 96,
+          "bytes": 1803,
+          "sha256": "3b5a21e9c9ec24438699981064a8069bd905bc6102cc519d4180e448362961f1",
           "format": "JPEG",
           "hasTransparency": false
         }
@@ -1148,10 +1157,10 @@
         {
           "variant": "card",
           "path": "/images/products/d63c67886b050d8095c5-card.jpg",
-          "width": 183,
-          "height": 216,
-          "bytes": 7565,
-          "sha256": "cb936330763220218d9e208dc6b0ac48c97e77410f5961603abc93e2c6028c71",
+          "width": 81,
+          "height": 96,
+          "bytes": 1701,
+          "sha256": "6cdb513a93c2800f87b354d22063d5b6fe9cdba476c177e46b09ca463dee8a02",
           "format": "JPEG",
           "hasTransparency": false
         }
@@ -1172,10 +1181,10 @@
         {
           "variant": "card",
           "path": "/images/products/9f2f683a96c9b1ff699d-card.jpg",
-          "width": 183,
-          "height": 216,
-          "bytes": 8064,
-          "sha256": "d135cf9397e070095e5127c013ddc4bec41e2241bbf094c933e6d29870bcf61d",
+          "width": 81,
+          "height": 96,
+          "bytes": 1841,
+          "sha256": "a5089e92b2e6402d8a766b9709f5c108de1210b1ce599bd124442542a11212e6",
           "format": "JPEG",
           "hasTransparency": false
         }
@@ -1197,10 +1206,10 @@
         {
           "variant": "card",
           "path": "/images/products/83a551817f4599b8b22e-card.png",
-          "width": 183,
-          "height": 216,
-          "bytes": 12283,
-          "sha256": "097a48fa78bffb4834b3eab7b2e61bd96eadebb7a7b376edb5ad979f01bf2bd4",
+          "width": 81,
+          "height": 96,
+          "bytes": 2145,
+          "sha256": "c7a70dd8aa375e466cd3bafcec8f5a9c020e7501da3d6dd5ddf383fed9629b76",
           "format": "PNG",
           "hasTransparency": true
         }
@@ -1222,10 +1231,10 @@
         {
           "variant": "card",
           "path": "/images/products/ff7aa768aae5a6b58d3e-card.png",
-          "width": 183,
-          "height": 216,
-          "bytes": 12028,
-          "sha256": "775a9bcee4e83bee33504f179cd6492ea35c687458cf0fc453f7e6cb602f746b",
+          "width": 81,
+          "height": 96,
+          "bytes": 2022,
+          "sha256": "37c33e11b4f73ea50cc7351265ed091d431c7f1bc0c66932f97637fa0787573a",
           "format": "PNG",
           "hasTransparency": true
         }
@@ -1247,10 +1256,10 @@
         {
           "variant": "card",
           "path": "/images/products/531902edd044f5371a5b-card.png",
-          "width": 183,
-          "height": 216,
-          "bytes": 12190,
-          "sha256": "8e6229ad39fd6d1da8fae2516bcdc1e50ae23e9d8251ad8301bf2c13e12d6c52",
+          "width": 81,
+          "height": 96,
+          "bytes": 2124,
+          "sha256": "8ab84f57e22084b617a5fb439ed778d46f27a166160374f5abc0a3a0b05b7e91",
           "format": "PNG",
           "hasTransparency": true
         }
@@ -1272,10 +1281,10 @@
         {
           "variant": "card",
           "path": "/images/products/07511cb81383c964fcf2-card.png",
-          "width": 183,
-          "height": 216,
-          "bytes": 11918,
-          "sha256": "b85e5690d21fdde45c0328704859dd8de1c7b96943ee87f2a51860374d5a5378",
+          "width": 81,
+          "height": 96,
+          "bytes": 1991,
+          "sha256": "1652ae599601306224aa04e3f1189320666980bdee4b726c56a55947caad12d9",
           "format": "PNG",
           "hasTransparency": true
         }
@@ -1298,10 +1307,10 @@
         {
           "variant": "card",
           "path": "/images/products/a1405f761b3267a6eae9-card.jpg",
-          "width": 183,
-          "height": 216,
-          "bytes": 6304,
-          "sha256": "4b042554d0c19b03d105bf10f0dd111f93f2df2532f1a12b4b1e36c3d4363eef",
+          "width": 81,
+          "height": 96,
+          "bytes": 1522,
+          "sha256": "ff11907f93fafa53b0db273cbc0bf887d804bc3fbe95f2931fe871a8f638a005",
           "format": "JPEG",
           "hasTransparency": false
         }
@@ -1324,10 +1333,10 @@
         {
           "variant": "card",
           "path": "/images/products/1edca0003b15ea78e378-card.jpg",
-          "width": 183,
-          "height": 216,
-          "bytes": 6288,
-          "sha256": "e1c7794d788263f0e2edf6afba34a4afab5848972d223a17f9e96f29ac76b87a",
+          "width": 81,
+          "height": 96,
+          "bytes": 1522,
+          "sha256": "a3a4a2c495cf7b240b8d6a746e7695a5532311891ce1d42fe4715c7c0053b345",
           "format": "JPEG",
           "hasTransparency": false
         }
@@ -1350,10 +1359,10 @@
         {
           "variant": "card",
           "path": "/images/products/3c2aaaa0daac79cb5057-card.jpg",
-          "width": 183,
-          "height": 216,
-          "bytes": 9114,
-          "sha256": "a279e26ff2cdf8e935b24f805f67a2f4413dfbc69a652a16160dc85d2ee74fef",
+          "width": 81,
+          "height": 96,
+          "bytes": 1983,
+          "sha256": "ab98ee071fa9caa62dba8dd7061f0a664585029ea7148cdc47dc0f895c189b99",
           "format": "JPEG",
           "hasTransparency": false
         }
@@ -1376,10 +1385,10 @@
         {
           "variant": "card",
           "path": "/images/products/b26392fe42aa1c36c5fc-card.jpg",
-          "width": 183,
-          "height": 216,
-          "bytes": 6299,
-          "sha256": "00309bd443100cfb6600268d89f844029586df4f4b87ed8ce98262a2080e4d0c",
+          "width": 81,
+          "height": 96,
+          "bytes": 1520,
+          "sha256": "aad4fa39049645241dc95cdaef52b60b50ebb6a816aad22f634a16ef1f74fd7c",
           "format": "JPEG",
           "hasTransparency": false
         }
@@ -1402,10 +1411,10 @@
         {
           "variant": "card",
           "path": "/images/products/13177a965cc43a79e256-card.jpg",
-          "width": 183,
-          "height": 216,
-          "bytes": 8601,
-          "sha256": "99e4e1a62295b0e9f3922cd5691fd3794ee971301add0543345e5ad74fcf1e8c",
+          "width": 81,
+          "height": 96,
+          "bytes": 2002,
+          "sha256": "588116c7c4562542ba34aed517ed8826a5265cb8bb133837b7065579bd98dc2b",
           "format": "JPEG",
           "hasTransparency": false
         }
@@ -1428,10 +1437,10 @@
         {
           "variant": "card",
           "path": "/images/products/0da5a9fd0b3fe50cf9fe-card.jpg",
-          "width": 183,
-          "height": 216,
-          "bytes": 8630,
-          "sha256": "d9f10f7aff5d2dc64293f07cd24d2414bc4cf7f5f9633f58ee86130abf351090",
+          "width": 81,
+          "height": 96,
+          "bytes": 1979,
+          "sha256": "58ed808d913027d0c2b60a0b562523de9ed7bede51a8bd9377984168b9d1c525",
           "format": "JPEG",
           "hasTransparency": false
         }
@@ -1454,10 +1463,10 @@
         {
           "variant": "card",
           "path": "/images/products/aafbdee028191839f4c6-card.jpg",
-          "width": 183,
-          "height": 216,
-          "bytes": 8618,
-          "sha256": "e6ca92d4a84de1d9ae29488b9a7020bd0b32e3b3e4ad3ff6ecbb27894193ef6a",
+          "width": 81,
+          "height": 96,
+          "bytes": 1993,
+          "sha256": "f4c4ca394f3e6d41618ad70150046ea36bb3127f2fea785c3b47d00cbf3ff04f",
           "format": "JPEG",
           "hasTransparency": false
         }
@@ -1480,10 +1489,10 @@
         {
           "variant": "card",
           "path": "/images/products/c233071627fa56f2813e-card.jpg",
-          "width": 183,
-          "height": 216,
-          "bytes": 8614,
-          "sha256": "40ebac5c8b71f33af19b771cc7070020a790cd87dfddfeedce8d43000b5be9b5",
+          "width": 81,
+          "height": 96,
+          "bytes": 1983,
+          "sha256": "793fd1befad150071ceb51db2a0dc2b0f7ac04b154a0584675493e0bbf385734",
           "format": "JPEG",
           "hasTransparency": false
         }
@@ -1501,10 +1510,10 @@
         {
           "variant": "card",
           "path": "/images/products/94bdee3972a448d8335f-card.png",
-          "width": 183,
-          "height": 216,
-          "bytes": 4707,
-          "sha256": "531b49598a20631a32fe281f301baca8e66187a57bf9ca59869783ac8f080cd1",
+          "width": 81,
+          "height": 96,
+          "bytes": 1271,
+          "sha256": "3873ab7a4dbc12c92d986cd229e82ac1a644ca4cea6d5acba1e0eadf5b7091ca",
           "format": "PNG",
           "hasTransparency": true
         }
@@ -1522,10 +1531,10 @@
         {
           "variant": "card",
           "path": "/images/products/27c190d53103f28ecc2e-card.png",
-          "width": 183,
-          "height": 216,
-          "bytes": 5974,
-          "sha256": "cfe1b210a154d9d1ce3863fb040d939d28d98e11f17d83583f8cb43e034d9495",
+          "width": 81,
+          "height": 96,
+          "bytes": 1111,
+          "sha256": "88849618df0f563505491d49ab030fe2d8b6446e098b6b0d0db385f06eeb55ce",
           "format": "PNG",
           "hasTransparency": true
         }
@@ -1543,10 +1552,10 @@
         {
           "variant": "card",
           "path": "/images/products/d2a1c4fce570c9b11358-card.png",
-          "width": 183,
-          "height": 216,
-          "bytes": 5958,
-          "sha256": "db81f6c42e10850444e93615668fbb24de382d23ec302a200475106657dfcf9e",
+          "width": 81,
+          "height": 96,
+          "bytes": 1391,
+          "sha256": "117e72ec20029aadd107908a58b0ab6f7d7699e1b9ff3bb67b735377ac273909",
           "format": "PNG",
           "hasTransparency": true
         }
@@ -1564,10 +1573,10 @@
         {
           "variant": "card",
           "path": "/images/products/833db607967d3db1bf57-card.png",
-          "width": 183,
-          "height": 216,
-          "bytes": 6152,
-          "sha256": "34a9cc2049b3382d7f7bc697685acbaa9dd751952c0a91d8baaf5989ea105f81",
+          "width": 81,
+          "height": 96,
+          "bytes": 1485,
+          "sha256": "474459a51632c4fb2d71e435a5f3304fe782271e0fef9cbf9f28557996e4d5b9",
           "format": "PNG",
           "hasTransparency": true
         }
@@ -1585,10 +1594,10 @@
         {
           "variant": "card",
           "path": "/images/products/4fec6dac7c47fd1386f3-card.png",
-          "width": 183,
-          "height": 216,
-          "bytes": 5148,
-          "sha256": "df23b1980e031b6caa12d2daf0790cfd3060bb4e3c69afee3ac45e50f1f72960",
+          "width": 81,
+          "height": 96,
+          "bytes": 1033,
+          "sha256": "2f8fb589ab5bf13f68ecd0889cf82634dfe17e23b53b563a86ee06f5eb076c6d",
           "format": "PNG",
           "hasTransparency": true
         }
@@ -1607,10 +1616,10 @@
         {
           "variant": "card",
           "path": "/images/products/670926dadec38a800459-card.png",
-          "width": 183,
-          "height": 216,
-          "bytes": 5214,
-          "sha256": "d3d9c6864dfed85a5ced82001e0aefecba2c3799dc2684295b5a9fd7dc7f0d0d",
+          "width": 81,
+          "height": 96,
+          "bytes": 921,
+          "sha256": "d923e6625aab38c68e8460a441f5509d4f9ec2c5383b10bf5aecc03ebd480e31",
           "format": "PNG",
           "hasTransparency": true
         }
@@ -1629,10 +1638,10 @@
         {
           "variant": "card",
           "path": "/images/products/0e26b797c0a5c108e2ea-card.png",
-          "width": 183,
-          "height": 216,
-          "bytes": 5532,
-          "sha256": "b871bfb409254a2de9171a79345e7006a4d4461e3065c46d3f97342e147ebd3c",
+          "width": 81,
+          "height": 96,
+          "bytes": 1326,
+          "sha256": "0d856653768d3621a7388e625f80c196d8b9baca2d78f23da2868dd474cf31f1",
           "format": "PNG",
           "hasTransparency": true
         }
@@ -1651,10 +1660,10 @@
         {
           "variant": "card",
           "path": "/images/products/76bd8031f36be2ca973f-card.png",
-          "width": 183,
-          "height": 216,
-          "bytes": 5676,
-          "sha256": "3038f76bec348b6320e51658a58da1052780c56f6e7e8d95b210621fb0090147",
+          "width": 81,
+          "height": 96,
+          "bytes": 1033,
+          "sha256": "8982c98b238320a7eb4b2dc53f8821d89dac4933b95c289b6c6a8715d0ed1811",
           "format": "PNG",
           "hasTransparency": true
         }
@@ -1673,10 +1682,10 @@
         {
           "variant": "card",
           "path": "/images/products/1de9a0cd7ece293c4445-card.png",
-          "width": 183,
-          "height": 216,
-          "bytes": 5746,
-          "sha256": "0dddc4d44af032e17424e02fc910a55893180bbc8383e266d836f4e433c1edf9",
+          "width": 81,
+          "height": 96,
+          "bytes": 1107,
+          "sha256": "770b028fd07303bcc2323d0c3925cded67697e6e17456dd4402d6c8db45ee335",
           "format": "PNG",
           "hasTransparency": true
         }
@@ -1695,10 +1704,10 @@
         {
           "variant": "card",
           "path": "/images/products/45317f1b211a1c7be9de-card.png",
-          "width": 183,
-          "height": 216,
-          "bytes": 4668,
-          "sha256": "22cc6871ebaf04cae1889235a4721c4daa0f14157d05b9345f4f99c04b21a6dc",
+          "width": 81,
+          "height": 96,
+          "bytes": 771,
+          "sha256": "e0a253da600f171a637c5c9060f77df3f62733abb4c52c610b7157de7e503291",
           "format": "PNG",
           "hasTransparency": true
         }
@@ -1717,10 +1726,10 @@
         {
           "variant": "card",
           "path": "/images/products/d49e5b65e6f5febbfa35-card.png",
-          "width": 183,
-          "height": 216,
-          "bytes": 5006,
-          "sha256": "c216daef63d0421bbcdb566d17cbaff3ae9b72a191101a1c77851b9c4f044ab2",
+          "width": 81,
+          "height": 96,
+          "bytes": 1045,
+          "sha256": "6ab5982c9556f0a43e1563f652e2ddfe2ee02b73d5e422a27a0c6e99fd74dc97",
           "format": "PNG",
           "hasTransparency": true
         }
@@ -1739,10 +1748,10 @@
         {
           "variant": "card",
           "path": "/images/products/63c73982c4a1b2d17a5c-card.png",
-          "width": 183,
-          "height": 216,
-          "bytes": 4821,
-          "sha256": "09cf5ba1c12927dbadeaa9fc400bcb62eb2045ec121919fe29ababb0758bb3c8",
+          "width": 81,
+          "height": 96,
+          "bytes": 795,
+          "sha256": "bd3115d07b1beef681a7954fa99d2248620b54158b3b85b5e7e2124e501402f3",
           "format": "PNG",
           "hasTransparency": true
         }
@@ -1761,10 +1770,10 @@
         {
           "variant": "card",
           "path": "/images/products/7268604e48ff9fd5791b-card.png",
-          "width": 183,
-          "height": 216,
-          "bytes": 4244,
-          "sha256": "a0e50c79535c8422d62837ce10f47c01110ecc30cfeac9dab845cc0755842d59",
+          "width": 81,
+          "height": 96,
+          "bytes": 1121,
+          "sha256": "1777fd2046b18e1c1fd6ca119b83872c2d5a0da1193c7d0abf656690e645f478",
           "format": "PNG",
           "hasTransparency": true
         }
@@ -1785,10 +1794,10 @@
         {
           "variant": "card",
           "path": "/images/products/e2d89ae2698754829740-card.png",
-          "width": 183,
-          "height": 216,
-          "bytes": 3868,
-          "sha256": "dc197c5abd8493c6982ad602a9b4ef660881cc4f097f577d88dc136ed606264e",
+          "width": 81,
+          "height": 96,
+          "bytes": 1065,
+          "sha256": "f39f6f084ffff8354b837f5d27734aef5bcbe518ddd68fa49ba7f3a7f3241661",
           "format": "PNG",
           "hasTransparency": true
         }
@@ -1809,10 +1818,10 @@
         {
           "variant": "card",
           "path": "/images/products/db00d788d35b1c295f5e-card.png",
-          "width": 183,
-          "height": 216,
-          "bytes": 4775,
-          "sha256": "903c28b6acc69f1a66b041bb3fad99b52e7845c6fd09cd3f3a62453bd9fc379f",
+          "width": 81,
+          "height": 96,
+          "bytes": 1374,
+          "sha256": "2deb7d69fe577ad3ebda01075d9ebbad078ed9aa56a91b2a13e306494547c24b",
           "format": "PNG",
           "hasTransparency": true
         }
@@ -1833,10 +1842,10 @@
         {
           "variant": "card",
           "path": "/images/products/a5f5ebeba6aa80b6ce04-card.png",
-          "width": 183,
-          "height": 216,
-          "bytes": 4932,
-          "sha256": "c79dd9c269c97d90ae1b73895c064ad66bb091e192642f7c0a66336bf0893739",
+          "width": 81,
+          "height": 96,
+          "bytes": 930,
+          "sha256": "11f1c0addcb28b1f9e3b8cfec96fbf978a6620354bebabc737a1da3fa220dd1b",
           "format": "PNG",
           "hasTransparency": true
         }
@@ -1857,10 +1866,10 @@
         {
           "variant": "card",
           "path": "/images/products/806c8d8e4031558d7329-card.png",
-          "width": 183,
-          "height": 216,
-          "bytes": 4100,
-          "sha256": "67040487c35fc613334e1de07967e96b777041e1dc95462d890999fce70788d2",
+          "width": 81,
+          "height": 96,
+          "bytes": 1272,
+          "sha256": "838147e987f92d5b46af4db353360c8d4acab35d16585eb2966f4200862e932a",
           "format": "PNG",
           "hasTransparency": true
         }
@@ -1881,10 +1890,10 @@
         {
           "variant": "card",
           "path": "/images/products/6de52fd444f0941bba2e-card.png",
-          "width": 183,
-          "height": 216,
-          "bytes": 4082,
-          "sha256": "7dafe6a4ec14e70e6d5ecdba34fee2bcc60935e8a3a285b4700171b33c0076f6",
+          "width": 81,
+          "height": 96,
+          "bytes": 1245,
+          "sha256": "58822eb94f056795fd5f117890fce722a55eaf191ac8ea88b51a6bd1a013fffa",
           "format": "PNG",
           "hasTransparency": true
         }
@@ -1905,10 +1914,10 @@
         {
           "variant": "card",
           "path": "/images/products/f9913e9933d4281da3f7-card.png",
-          "width": 183,
-          "height": 216,
-          "bytes": 4963,
-          "sha256": "d803a32f8884c5954c820f1c10ef5e5aa9a1eb99bd90848b980916dd08947213",
+          "width": 81,
+          "height": 96,
+          "bytes": 937,
+          "sha256": "8b8b473d51c9cff45fdb668524756a1486a3a34efe3145da5ac1c915cfc0711c",
           "format": "PNG",
           "hasTransparency": true
         }
@@ -1929,10 +1938,10 @@
         {
           "variant": "card",
           "path": "/images/products/74fb34f80f99983dd4ff-card.png",
-          "width": 183,
-          "height": 216,
-          "bytes": 5129,
-          "sha256": "80ab6a388ae7161701357133c5c6004bc3f7b8b11212c92f9814e9f80f4d48d1",
+          "width": 81,
+          "height": 96,
+          "bytes": 1037,
+          "sha256": "648bb1e6f43bcd335c80c976a1b456500eb403f7eda8490e84c9046c78a254f6",
           "format": "PNG",
           "hasTransparency": true
         }
@@ -1953,10 +1962,10 @@
         {
           "variant": "card",
           "path": "/images/products/73f35e235f1cdfd1592d-card.png",
-          "width": 183,
-          "height": 216,
-          "bytes": 4275,
-          "sha256": "ec71ac53d764318b80522df02111bb46704adf26eda689b0a3724c5ab690ce93",
+          "width": 81,
+          "height": 96,
+          "bytes": 1354,
+          "sha256": "c581cb91a9d01889e589007fb134406896128d4913543fa252edfd59d2edda6d",
           "format": "PNG",
           "hasTransparency": true
         }
@@ -1976,10 +1985,10 @@
         {
           "variant": "card",
           "path": "/images/products/9d21e8a6e778821a0fcd-card.png",
-          "width": 183,
-          "height": 216,
-          "bytes": 3637,
-          "sha256": "e841fbe481ec6508f53a789e8d37057cbd1c7d022ae6b8c8d41b2b90ed132feb",
+          "width": 81,
+          "height": 96,
+          "bytes": 765,
+          "sha256": "bad9a3a9b1d50ad0e43032bf668a234110bb6212047f5c86bfc50c9f7753e9f5",
           "format": "PNG",
           "hasTransparency": true
         }
@@ -1999,10 +2008,10 @@
         {
           "variant": "card",
           "path": "/images/products/38541dd10a18c31b24f6-card.png",
-          "width": 183,
-          "height": 216,
-          "bytes": 4116,
-          "sha256": "0c11a458fc689f7c52bc7c2f2d01af2ea9b7042110692bddfc6723357b9d31b5",
+          "width": 81,
+          "height": 96,
+          "bytes": 675,
+          "sha256": "0bc22938dd7bc03ca44b0512d17f73aa2e85c85e20e6ecc5dd91fe4cb1afdc79",
           "format": "PNG",
           "hasTransparency": true
         }
@@ -2022,10 +2031,10 @@
         {
           "variant": "card",
           "path": "/images/products/56f5902919cad4b88c3d-card.png",
-          "width": 183,
-          "height": 216,
-          "bytes": 4132,
-          "sha256": "d31f13ffe1ab69966d5e8aff5cc04843ab33c1c8ea0dae1229e1132cbda7b437",
+          "width": 81,
+          "height": 96,
+          "bytes": 745,
+          "sha256": "cfe9a3a6c86a14ea15a0164e68a994dee9932027a6dbb80a461d2360ec44fd56",
           "format": "PNG",
           "hasTransparency": true
         }
@@ -2045,10 +2054,10 @@
         {
           "variant": "card",
           "path": "/images/products/a336f3411bfe0502fed7-card.png",
-          "width": 183,
-          "height": 216,
-          "bytes": 3503,
-          "sha256": "4eb8c65112d9786a092fe45df6cc1b715723c600745d3fe9d25fbcf89f42869c",
+          "width": 81,
+          "height": 96,
+          "bytes": 924,
+          "sha256": "590fa2cae60fd04bc42d2d64aebd3ba7f245727264fb52d543a6097485097e07",
           "format": "PNG",
           "hasTransparency": true
         }
@@ -2069,20 +2078,20 @@
         {
           "variant": "card",
           "path": "/images/products/4a1634416eb87c129e12-card.png",
-          "width": 183,
-          "height": 216,
-          "bytes": 4789,
-          "sha256": "b126fab9bcdfc03d2b9e63dac44cc5896e40f371fef72739107cffaefa88832c",
+          "width": 81,
+          "height": 96,
+          "bytes": 920,
+          "sha256": "76b8e580f1caf7afb7175fe8654efa4d6e2a5e973916b25837be52bb5fafb297",
           "format": "PNG",
           "hasTransparency": true
         },
         {
           "variant": "poster",
           "path": "/images/products/4a1634416eb87c129e12-poster.png",
-          "width": 609,
-          "height": 720,
-          "bytes": 28226,
-          "sha256": "c42900a0dde438ab0f03a84703c85205459c912e9ce86de3a07a541540cf1e20",
+          "width": 152,
+          "height": 180,
+          "bytes": 1703,
+          "sha256": "93c3f8e60974605aacd47af6e780b2ec081c7f37e33f35f45f0ab7854f46c1a6",
           "format": "PNG",
           "hasTransparency": true
         }
@@ -2103,103 +2112,114 @@
         {
           "variant": "card",
           "path": "/images/products/294849ca5d8591836437-card.png",
-          "width": 183,
-          "height": 216,
-          "bytes": 5284,
-          "sha256": "b1d4583d5f1a524626b75db87a275d3b16c1556222f84c324a79cb85d0079478",
+          "width": 81,
+          "height": 96,
+          "bytes": 1098,
+          "sha256": "d5b32eaa65ac1bcd7d1b5c13d0252fa8c195d7230002f2d83bbeb3dced63e34d",
           "format": "PNG",
           "hasTransparency": true
         }
       ]
     },
     {
-      "source": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-summary-select-202601-14inch-silver?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0MlllLy9mUUZibXJtaURkcVBmZXl6SlFrdDE1SXFBb0xoZ0pxc3BmWHpmRTA0NlFNZVBLdlJNcjRha3NVaFYxSG54TS9QOFlhVHZoV2xFZjU3V3B4aXNFRkthS25NaVd2dmdNekpYZDEzRlFsN1pXOVpMMDhTaGY0RnhORDZ0UWNB&traceId=1",
-      "sourceSha256": "7d350ba3513da048b80ea26dc181ffdec23395e06722a50ba75d37d3c04e05bc",
+      "source": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-summary-select-202610-14inch-silver?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0MlllLy9mUUZibXJtaURkcVBmZXl6SWNoZVhpRkJSdlIvL2hEMTMybU9ocTA0NlFNZVBLdlJNcjRha3NVaFYxSG54TS9QOFlhVHZoV2xFZjU3V3B4aXVxVTZXZmg4WmZLbzB1RGYzRzRjYUZkclVOTnFnQW4rSWEvbldNb1dlYitn&traceId=1",
+      "sourceSha256": "6c5301bb5efb3d6aab5e2b35775e88002b8c9040221e3cdeea8347ea1ef2d7ff",
       "sourceWidth": 5120,
       "sourceHeight": 3280,
       "parts": [
-        "MDE54CH/A",
         "MGDN4CH/A",
-        "MGDQ4CH/A"
+        "MGDP4CH/A",
+        "MGDQ4CH/A",
+        "MHWW4CH/A",
+        "MHWX4CH/A",
+        "MHWY4CH/A",
+        "MJLV4CH/A"
       ],
       "renditions": [
         {
           "variant": "card",
-          "path": "/images/products/a194203ed46ee4acbdc5-card.jpg",
-          "width": 216,
-          "height": 138,
-          "bytes": 2913,
-          "sha256": "653f610d310d0a6b31e496764d48559fff8b0e7f3af82765314693b683790c46",
+          "path": "/images/products/bed52af081417045aa98-card.jpg",
+          "width": 96,
+          "height": 62,
+          "bytes": 883,
+          "sha256": "4140f141ef1f3d05eca20ab27a6f7c32e5214058e59fa181497019388955c17d",
           "format": "JPEG",
           "hasTransparency": false
         }
       ]
     },
     {
-      "source": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-summary-select-202601-14inch-spaceblack?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0MlllLy9mUUZibXJtaURkcVBmZXl6TGZwYzY0U3JBMlVNMzZiaWVuTi9EK3FUbGFVTWR0Ti93a3VSRzN5cEpVUnl6S3hTY3gyZUhtbmsvOWVKOWJVV3RybkIybk5RZmlyRnNkQjBrajdkK0xMN0tDNVJMR2thMkcrRnBjMEx2dmt3&traceId=1",
+      "source": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-summary-select-202610-14inch-spaceblack?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0MlllLy9mUUZibXJtaURkcVBmZXl6SVhMNEtUU24xZENXTzcvK0NLTmNHR3FUbGFVTWR0Ti93a3VSRzN5cEpVUnl6S3hTY3gyZUhtbmsvOWVKOWJVV3RybkIybk5RZmlyRnNkQjBrajdkK0xuSG1ZcEJ0aXBsSUdYZUdaU0svM2pB&traceId=1",
       "sourceSha256": "8f9f2dd8fceea96f1adfaf1a6e46b6396589ef3d3b3b4fe760608a226a4a1ff2",
       "sourceWidth": 5120,
       "sourceHeight": 3280,
       "parts": [
-        "MDE14CH/A",
-        "MEQJ4CH/A",
         "MGDR4CH/A",
-        "MGDU4CH/A"
+        "MGDT4CH/A",
+        "MGDU4CH/A",
+        "MGXX4CH/A",
+        "MHWT4CH/A",
+        "MHWU4CH/A",
+        "MHWV4CH/A",
+        "MJ2C4CH/A",
+        "MJLW4CH/A"
       ],
       "renditions": [
         {
           "variant": "card",
-          "path": "/images/products/f048b33508e026845dce-card.jpg",
-          "width": 216,
-          "height": 138,
-          "bytes": 3038,
-          "sha256": "17dfd0be2115a5034d30ae697652b7c6deea26d78b9f59cba3566b4eff929562",
+          "path": "/images/products/42ca330ac2d46be4fcba-card.jpg",
+          "width": 96,
+          "height": 62,
+          "bytes": 962,
+          "sha256": "cfbea2c84c6615cd1f80d379911b1c00bd393136872e73684b4e84ef661bd403",
           "format": "JPEG",
           "hasTransparency": false
         }
       ]
     },
     {
-      "source": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-summary-select-202601-16inch-silver?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0MlllLy9mUUZibXJtaURkcVBmZXl6TDkyend4dUVnSGhXYVF1U3IvS2oxMjA0NlFNZVBLdlJNcjRha3NVaFYxSG54TS9QOFlhVHZoV2xFZjU3V3B4aXNFRkthS25NaVd2dmdNekpYZDEzRlFmcWtRNEdjUTh6MkZLZzg5WFU3TFln&traceId=1",
+      "source": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-summary-select-202610-16inch-silver?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0MlllLy9mUUZibXJtaURkcVBmZXl6SkZZcWljV0g1eGg4Rk5WSmEyY2h2ZTA0NlFNZVBLdlJNcjRha3NVaFYxSG54TS9QOFlhVHZoV2xFZjU3V3B4aXRNZUhzbVArbEt2TUhwTUpUcjdscHRkN1JMWS9GcS9EM0huU0pNWFFBb1Bn&traceId=1",
       "sourceSha256": "131ee5590d0b55d432adb3db0b0cf738bb3353742d9cfea61421bd31e82ce5cd",
       "sourceWidth": 5120,
       "sourceHeight": 3280,
       "parts": [
         "MGE44CH/A",
+        "MGE64CH/A",
         "MGE74CH/A",
         "MGE94CH/A"
       ],
       "renditions": [
         {
           "variant": "card",
-          "path": "/images/products/69c3bda4fc137c450427-card.jpg",
-          "width": 216,
-          "height": 138,
-          "bytes": 3219,
-          "sha256": "ab4225404f6e10ce5f3b3ae8c8f699de386c19fb07f93d7a1e332789929b74d1",
+          "path": "/images/products/cf64cfac749ec433aeb5-card.jpg",
+          "width": 96,
+          "height": 62,
+          "bytes": 973,
+          "sha256": "63203222147f65e8389a28dd2fe3c3989b6b20bfba3cae78999645c8d983b95a",
           "format": "JPEG",
           "hasTransparency": false
         }
       ]
     },
     {
-      "source": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-summary-select-202601-16inch-spaceblack?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0MlllLy9mUUZibXJtaURkcVBmZXl6TDVjaG9iMDMrRENSSCs1VG9OMUpob3FUbGFVTWR0Ti93a3VSRzN5cEpVUnl6S3hTY3gyZUhtbmsvOWVKOWJVV3RybkIybk5RZmlyRnNkQjBrajdkK0xUM0YvMnhsWFkwZkl5OVJaSm5TWmh3&traceId=1",
+      "source": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-summary-select-202610-16inch-spaceblack?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0MlllLy9mUUZibXJtaURkcVBmZXl6SitVelBVd1haTHZ5UWJDbThRTWVBL3FUbGFVTWR0Ti93a3VSRzN5cEpVUnl6S3hTY3gyZUhtbmsvOWVKOWJVV3RybkIybk5RZmlyRnNkQjBrajdkK0xianpPQ21PaU5sL3Q3NFE4NXFUb1ZB&traceId=1",
       "sourceSha256": "3658363151e9000077b574c5b704c6ce9e56ed1f76aeddfa33b6d8bc24d243b4",
       "sourceWidth": 5120,
       "sourceHeight": 3280,
       "parts": [
         "MGEA4CH/A",
+        "MGEC4CH/A",
         "MGED4CH/A",
         "MGEE4CH/A"
       ],
       "renditions": [
         {
           "variant": "card",
-          "path": "/images/products/c1f3689fa80a54d72314-card.jpg",
-          "width": 216,
-          "height": 138,
-          "bytes": 3397,
-          "sha256": "1ebcf77862275fff5cbfdbcc4b54aa318f188ac0c28f708dc7345ca5e5a95b7b",
+          "path": "/images/products/9b7a46201f8bd520f275-card.jpg",
+          "width": 96,
+          "height": 62,
+          "bytes": 1026,
+          "sha256": "9310fd2ede07cb70319f658859e372f7f7fcfe7a047a64fa40c93166054ba25e",
           "format": "JPEG",
           "hasTransparency": false
         }
@@ -2212,16 +2232,20 @@
       "sourceHeight": 3280,
       "parts": [
         "MHQK4CH/A",
-        "MHQN4CH/A"
+        "MHQL4CH/A",
+        "MHQM4CH/A",
+        "MHQN4CH/A",
+        "MHQU4CH/A",
+        "MHQV4CH/A"
       ],
       "renditions": [
         {
           "variant": "card",
           "path": "/images/products/0dffbbc495eff9563b28-card.jpg",
-          "width": 216,
-          "height": 138,
-          "bytes": 2295,
-          "sha256": "641ee527e3b2260af39a45def4efbc88bf94fc82a47a63442b1631de6c948d4a",
+          "width": 96,
+          "height": 62,
+          "bytes": 789,
+          "sha256": "1fa397e22b70f8d0fc216cc45792af6be9015ec5d8bcdcc3a8c95d8e70567704",
           "format": "JPEG",
           "hasTransparency": false
         }
@@ -2234,16 +2258,17 @@
       "sourceHeight": 3280,
       "parts": [
         "MHL64CH/A",
-        "MHL74CH/A"
+        "MHL74CH/A",
+        "MHQJ4CH/A"
       ],
       "renditions": [
         {
           "variant": "card",
           "path": "/images/products/b3b3e6803c7950de3a8d-card.jpg",
-          "width": 216,
-          "height": 138,
-          "bytes": 2695,
-          "sha256": "3f973981e4d4804dc5381a806b3eddac8cff2479b25467063a1178662e6c5512",
+          "width": 96,
+          "height": 62,
+          "bytes": 912,
+          "sha256": "d59745ad5f71776bf75db7dd0689b5ec3eec0d0d33f8fb372999f4234825447e",
           "format": "JPEG",
           "hasTransparency": false
         }
@@ -2255,16 +2280,19 @@
       "sourceWidth": 5120,
       "sourceHeight": 3280,
       "parts": [
-        "MDHE4CH/A"
+        "MDHE4CH/A",
+        "MDHF4CH/A",
+        "MDHG4CH/A",
+        "MGP84CH/A"
       ],
       "renditions": [
         {
           "variant": "card",
           "path": "/images/products/a3077fb68158b14e03ee-card.jpg",
-          "width": 216,
-          "height": 138,
-          "bytes": 4668,
-          "sha256": "5cef95f5abde0e711649f9ba09b9ff8a13fc74dc146cffd40172a1b888278e40",
+          "width": 96,
+          "height": 62,
+          "bytes": 1166,
+          "sha256": "9770c32a909697b6c65b4578ee930872be72ce78ffd1d2d9e27390be97bb0a8a",
           "format": "JPEG",
           "hasTransparency": false
         }
@@ -2276,16 +2304,18 @@
       "sourceWidth": 5120,
       "sourceHeight": 3280,
       "parts": [
-        "MDH74CH/A"
+        "MDH74CH/A",
+        "MDH84CH/A",
+        "MDH94CH/A"
       ],
       "renditions": [
         {
           "variant": "card",
           "path": "/images/products/45e32e8c971048f586e2-card.jpg",
-          "width": 216,
-          "height": 138,
-          "bytes": 4303,
-          "sha256": "56edb2f1e9f9b50ce8feebcaed72c8118784afafc6c668d7f53544b1725c006c",
+          "width": 96,
+          "height": 62,
+          "bytes": 1049,
+          "sha256": "739f7d5b43a7a7d77af720cb630e94c2e9740bb92b939c242d2da972e1f34798",
           "format": "JPEG",
           "hasTransparency": false
         }
@@ -2297,16 +2327,19 @@
       "sourceWidth": 5120,
       "sourceHeight": 3280,
       "parts": [
-        "MDHH4CH/A"
+        "MDHH4CH/A",
+        "MDHJ4CH/A",
+        "MDHK4CH/A",
+        "MGP94CH/A"
       ],
       "renditions": [
         {
           "variant": "card",
           "path": "/images/products/5c5f42666fcca9c30066-card.jpg",
-          "width": 216,
-          "height": 138,
-          "bytes": 4366,
-          "sha256": "dacb96e0f744669abe803fd58ef6c6cb77201afc8aa200280c33f422e6a022d8",
+          "width": 96,
+          "height": 62,
+          "bytes": 1080,
+          "sha256": "20db2bbc4a2eaaab4e13ef12e263041b7f77b7c7b72de11e53c331c6bab3cc79",
           "format": "JPEG",
           "hasTransparency": false
         }
@@ -2318,16 +2351,19 @@
       "sourceWidth": 5120,
       "sourceHeight": 3280,
       "parts": [
-        "MDHA4CH/A"
+        "MDHA4CH/A",
+        "MDHC4CH/A",
+        "MDHD4CH/A",
+        "MGP74CH/A"
       ],
       "renditions": [
         {
           "variant": "card",
           "path": "/images/products/b43c8438f0f5918d8ff2-card.jpg",
-          "width": 216,
-          "height": 138,
-          "bytes": 4688,
-          "sha256": "e3037d6a0b8ca42dfb88b2060466d0a0574f160cd544eae102e342d6bfc39aa3",
+          "width": 96,
+          "height": 62,
+          "bytes": 1129,
+          "sha256": "34071a1276495861354cdfb1bcfe63f5808c646693f0487c0194f7d1bad9f073",
           "format": "JPEG",
           "hasTransparency": false
         }
@@ -2339,16 +2375,19 @@
       "sourceWidth": 5120,
       "sourceHeight": 3280,
       "parts": [
-        "MDVH4CH/A"
+        "MDVH4CH/A",
+        "MDVK4CH/A",
+        "MDVN4CH/A",
+        "MGPD4CH/A"
       ],
       "renditions": [
         {
           "variant": "card",
           "path": "/images/products/33129f967073e6a6d493-card.jpg",
-          "width": 216,
-          "height": 138,
-          "bytes": 5200,
-          "sha256": "cd25dcbe4c6a7819ab01f8853238248bab6b58d422a4ecb036254e0935fff081",
+          "width": 96,
+          "height": 62,
+          "bytes": 1251,
+          "sha256": "a24c409d08e87d640c6b5c795f9bc9918fe05c25ca197e6dc1df555e7d116c77",
           "format": "JPEG",
           "hasTransparency": false
         }
@@ -2360,16 +2399,18 @@
       "sourceWidth": 5120,
       "sourceHeight": 3280,
       "parts": [
-        "MDV94CH/A"
+        "MDV94CH/A",
+        "MDVA4CH/A",
+        "MDVC4CH/A"
       ],
       "renditions": [
         {
           "variant": "card",
           "path": "/images/products/fabc706ba6f87b85bf84-card.jpg",
-          "width": 216,
-          "height": 138,
-          "bytes": 4843,
-          "sha256": "87c1c108af616616b2c13b596fc1c823b3abc250cdff4d1c1c239c0cec848cb5",
+          "width": 96,
+          "height": 62,
+          "bytes": 1150,
+          "sha256": "355457172bacc6858caf35b03b0787e1cda941f039e1502f125a50896f8bf9ff",
           "format": "JPEG",
           "hasTransparency": false
         }
@@ -2381,16 +2422,19 @@
       "sourceWidth": 5120,
       "sourceHeight": 3280,
       "parts": [
-        "MDVQ4CH/A"
+        "MDVQ4CH/A",
+        "MDVT4CH/A",
+        "MDVU4CH/A",
+        "MGPE4CH/A"
       ],
       "renditions": [
         {
           "variant": "card",
           "path": "/images/products/e952fff5d11f05e55ded-card.jpg",
-          "width": 216,
-          "height": 138,
-          "bytes": 4942,
-          "sha256": "e3b896d8e8b1b23bfebe6dfa34ee90482423b26278e07b0ddb60bb9765c04ef3",
+          "width": 96,
+          "height": 62,
+          "bytes": 1166,
+          "sha256": "25257a12753843642fb0ae8f5306235f28677d360d4b89dd163d0a10d3819012",
           "format": "JPEG",
           "hasTransparency": false
         }
@@ -2402,16 +2446,19 @@
       "sourceWidth": 5120,
       "sourceHeight": 3280,
       "parts": [
-        "MDVD4CH/A"
+        "MDVD4CH/A",
+        "MDVE4CH/A",
+        "MDVF4CH/A",
+        "MGPC4CH/A"
       ],
       "renditions": [
         {
           "variant": "card",
           "path": "/images/products/9e2202b00c3b75a71541-card.jpg",
-          "width": 216,
-          "height": 138,
-          "bytes": 5384,
-          "sha256": "0b71f601f57457767dc657310fc3cff42e642b5273a502e335c23d965bf3e125",
+          "width": 96,
+          "height": 62,
+          "bytes": 1225,
+          "sha256": "1ea6a5d2fede9cc5c92da0e7e01791a8f4402c4f1f8f46ef7e3100539b1759bb",
           "format": "JPEG",
           "hasTransparency": false
         }
@@ -2429,10 +2476,10 @@
         {
           "variant": "card",
           "path": "/images/products/cb858274e576d174ebb8-card.jpg",
-          "width": 216,
-          "height": 138,
-          "bytes": 3553,
-          "sha256": "72f263f4bda44cd2649927c6c7459aca2c5b5889ddba5e24c2392cff250804e7",
+          "width": 96,
+          "height": 62,
+          "bytes": 1006,
+          "sha256": "6c80881a1af42ac3dee34325e23893e0770b42d36ea85eee2088ca7d15d8556f",
           "format": "JPEG",
           "hasTransparency": false
         }
@@ -2450,10 +2497,10 @@
         {
           "variant": "card",
           "path": "/images/products/098843fd7259b13906a3-card.jpg",
-          "width": 216,
-          "height": 138,
-          "bytes": 3539,
-          "sha256": "f35ce8b9424137677d8e4025c30f724e4ce673444009ace0a5a65355defc4efb",
+          "width": 96,
+          "height": 62,
+          "bytes": 1007,
+          "sha256": "ff3cad74e109a90a6ca70db4702de05db380a1aa53230326d43a56775b94e5f8",
           "format": "JPEG",
           "hasTransparency": false
         }
@@ -2471,10 +2518,10 @@
         {
           "variant": "card",
           "path": "/images/products/1dc87fcd2d1409d07f82-card.jpg",
-          "width": 216,
-          "height": 138,
-          "bytes": 3732,
-          "sha256": "83f1eb9eae85a99981574ce3e434e99546d2467a1a2345467b4a08f5b68742ee",
+          "width": 96,
+          "height": 62,
+          "bytes": 1026,
+          "sha256": "19d277c2723e819e43af3e7edf341591d5ae1ac4e14f6285bfcf43baa2272de9",
           "format": "JPEG",
           "hasTransparency": false
         }
@@ -2492,10 +2539,10 @@
         {
           "variant": "card",
           "path": "/images/products/babbb7de63fea99de227-card.jpg",
-          "width": 216,
-          "height": 138,
-          "bytes": 3709,
-          "sha256": "cbbd7b969cdd309fcd3da42e6354c3d7f74487fc2f36f69172dbce72cfa0f9db",
+          "width": 96,
+          "height": 62,
+          "bytes": 1030,
+          "sha256": "7db6b279179cc1b7a0193fdeb2250c771ea0c8a9008e06e44bcd8146c03f7c83",
           "format": "JPEG",
           "hasTransparency": false
         }
@@ -2513,10 +2560,10 @@
         {
           "variant": "card",
           "path": "/images/products/6229e8793fed05f3cfdf-card.jpg",
-          "width": 216,
-          "height": 138,
-          "bytes": 4200,
-          "sha256": "cb980c7a298e80e9db1f22a115e4ae38579a2a22a928be8a421b2504776648ab",
+          "width": 96,
+          "height": 62,
+          "bytes": 1165,
+          "sha256": "b029f7e936c91a6ec87c9d7a5ad345de23efc1592a3da45ae567bd4bbb96bc60",
           "format": "JPEG",
           "hasTransparency": false
         }
@@ -2534,10 +2581,10 @@
         {
           "variant": "card",
           "path": "/images/products/b187dd94bc49d003e7c4-card.jpg",
-          "width": 216,
-          "height": 138,
-          "bytes": 4202,
-          "sha256": "a7eb6b7e71a4908aecdbdcfc98c2db873bc09be9aa1302a037258a88eae5b3c8",
+          "width": 96,
+          "height": 62,
+          "bytes": 1164,
+          "sha256": "87613e91411a77d989407d07b1e66dfadacfb5bcc1cc5b48865e850a66016c9a",
           "format": "JPEG",
           "hasTransparency": false
         }
@@ -2555,10 +2602,10 @@
         {
           "variant": "card",
           "path": "/images/products/91ec0d2950aaa12e1675-card.jpg",
-          "width": 216,
-          "height": 138,
-          "bytes": 3525,
-          "sha256": "c481ca3c0f3dd3e2e6a1cfa4e8d17bdaf646659b8185a8399983ba0e1d099192",
+          "width": 96,
+          "height": 62,
+          "bytes": 999,
+          "sha256": "9f52dcacd7e43d1019050d88246f5648a77d942966448e547cf3c4b994f56d2f",
           "format": "JPEG",
           "hasTransparency": false
         }
@@ -2576,10 +2623,10 @@
         {
           "variant": "card",
           "path": "/images/products/9da63ab69602d7a55df9-card.jpg",
-          "width": 216,
-          "height": 138,
-          "bytes": 3510,
-          "sha256": "2304a135262aff1a0a79428b1f0ee1f5ba64d7ea0f7ff0901a264fc5bbbbfeb6",
+          "width": 96,
+          "height": 62,
+          "bytes": 997,
+          "sha256": "e59ed583aab9f7a5e2cedd36abe0f6ef3c057b8247ae1a281822b9576ceff8af",
           "format": "JPEG",
           "hasTransparency": false
         }
@@ -2599,16 +2646,18 @@
         {
           "variant": "card",
           "path": "/images/products/3009a5934756c8312f3f-card.jpg",
-          "width": 216,
-          "height": 122,
-          "bytes": 2487,
-          "sha256": "be9a6e316977526fa696d156ffda80af5be6c3a6c3b11c71a58038bff313d38c",
+          "width": 96,
+          "height": 54,
+          "bytes": 761,
+          "sha256": "879202106a1d26d98b4e21cba38a18d2404b94106933fac38eae02ccc6c5f72d",
           "format": "JPEG",
           "hasTransparency": false
         }
       ]
     }
   ],
-  "mappingSha256": "1119c5772193bff5dbe710cd6f5cea40fe77fa9b3bc5d3f8e2952857249d8f6b",
-  "totalBytes": 604190
+  "mappingSha256": "85a76a5433fd48ea5af0bca848dd4b94a9bc69692cc9f272ddf0a3b5e6f3439c",
+  "totalBytes": 139837,
+  "generatedAt": "2026-10-28T02:55:00.000Z",
+  "catalogImagesGeneratedAt": "2026-10-28T02:55:00.000Z"
 }

@@ -143,8 +143,8 @@
     },
     {
       "path": "repo/atomic-ops.js",
-      "bytes": 55402,
-      "sha256": "7031043ebd77c65b4fd793928cfc78a1e0f0297e8c752c3b5cecde5b243ad9d5"
+      "bytes": 58603,
+      "sha256": "6e5803fa3b03994922f022038a84ce20d592b2c5ed7072480a297734f8edb4db"
     },
     {
       "path": "repo/cloudbase-repo.js",
@@ -198,13 +198,13 @@
     },
     {
       "path": "rules/follow-access.js",
-      "bytes": 2438,
-      "sha256": "7dc7217f4782b75fdef173c5db23c315099685b1470f1fd8f29b161070eb7d0d"
+      "bytes": 3426,
+      "sha256": "f3c0ec53ed1337f3b496566698d340c75040d481ab7461a01d67e8dbccd8bd01"
     },
     {
       "path": "rules/member-plan.js",
-      "bytes": 3811,
-      "sha256": "3fbf54236174b4c00a35da1b55f5b3e0505ed1085cf637938c402772563dcf9a"
+      "bytes": 5653,
+      "sha256": "1714c8ae7623a8db7c0eaf3f05785860822723e5e1411b0b26b2e45eea67db51"
     },
     {
       "path": "rules/membership-entitlements.js",
