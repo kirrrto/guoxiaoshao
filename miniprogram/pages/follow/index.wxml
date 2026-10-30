@@ -1,4 +1,4 @@
-<page-meta page-style="{{(editing || authorizationOpen) ? 'overflow:hidden;' : ''}}" />
+<page-meta page-style="color-scheme:{{_themeMode || 'light'}};{{(editing || authorizationOpen) ? 'overflow:hidden;' : ''}}" />
 <view class="page tab-page follow-page">
   <view wx:if="{{networkOffline}}" class="network-notice" aria-role="status">网络已断开，恢复后自动刷新</view>
   <view class="page-heading whistle-heading">

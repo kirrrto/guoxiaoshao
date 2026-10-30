@@ -128,11 +128,12 @@ App({
   // the system theme changes. Force every live page to re-render so CSS picks up
   // the new theme without requiring a mini-program restart.
   onThemeChange(res) {
-    this.globalData.themeMode = res && res.theme === 'dark' ? 'dark' : 'light';
+    const mode = res && res.theme === 'dark' ? 'dark' : 'light';
+    this.globalData.themeMode = mode;
     const pages = getCurrentPages();
     for (const page of pages) {
       if (page && typeof page.setData === 'function') {
-        page.setData({ _themeForce: Date.now() });
+        page.setData({ _themeMode: mode });
       }
     }
   },

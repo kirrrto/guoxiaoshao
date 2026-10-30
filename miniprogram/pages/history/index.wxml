@@ -1,4 +1,4 @@
-<page-meta page-style="{{sheetVisible ? 'overflow:hidden;' : ''}}" />
+<page-meta page-style="color-scheme:{{_themeMode || 'light'}};{{sheetVisible ? 'overflow:hidden;' : ''}}" />
 <view class="page tab-page history-page">
   <view wx:if="{{networkOffline}}" class="network-notice" aria-role="status">网络已断开，恢复后自动刷新</view>
   <view wx:if="{{loadError}}" class="card load-error" aria-role="alert">
