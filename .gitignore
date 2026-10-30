@@ -54,3 +54,4 @@ evidence/verification/virtual-payment-2026-09-20/**/layout-metrics.json
 
 # Agent tool output
 Claude outputs/
+.workbuddy/

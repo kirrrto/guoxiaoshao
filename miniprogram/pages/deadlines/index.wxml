@@ -11,6 +11,11 @@
   <button wx:elif="{{!serviceAvailable}}" class="btn btn-primary btn-block" loading="{{loading}}" disabled="{{loading || busy}}" bindtap="load">重新读取</button>
   <block wx:if="{{ready}}">
     <view wx:if="{{serviceAvailable && !capability.enabled}}" class="banner banner-info deadline-service-note">当前可保存事项，微信到期提醒尚未开启。到期前请主动查看。</view>
+    <view wx:if="{{serviceAvailable}}" class="deadline-notify-row">
+      <view class="deadline-notify-copy"><text class="bold">微信提醒</text><text class="small muted">{{capability.enabled ? '到期前提醒已就绪' : '尚未开启'}}</text></view>
+      <switch checked="{{capability.enabled}}" disabled="{{true}}" color="#00C375" aria-label="微信到期提醒" />
+    </view>
+    <button wx:if="{{serviceAvailable}}" class="ui-disclosure" hover-class="ui-control-pressed" bindtap="onGoNotificationSettings"><text class="ui-disclosure-label">通知与免打扰设置</text><view class="ui-chevron" aria-hidden="true"></view></button>
     <view wx:if="{{editing}}" class="card deadline-editor">
       <view class="card-title">{{editingId ? '编辑事项' : '添加到期事项'}}</view>
       <view class="deadline-field"><text class="deadline-label">事项名称</text><input class="deadline-input" value="{{draft.title}}" maxlength="40" placeholder="例如：视频会员续费" placeholder-class="deadline-placeholder" aria-label="事项名称" data-field="title" bindinput="onField" disabled="{{busy || pending}}" /></view>

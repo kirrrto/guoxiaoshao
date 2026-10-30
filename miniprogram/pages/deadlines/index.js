@@ -193,4 +193,7 @@ Page({
         this.performPending();
       } });
   },
+  onGoNotificationSettings() {
+    wx.switchTab({ url: '/pages/mine/index' });
+  },
 });

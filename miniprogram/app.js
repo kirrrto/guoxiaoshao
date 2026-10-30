@@ -124,6 +124,19 @@ App({
 
   onHide() { this.runtimeVisibility = 'background'; },
 
+  // Android WebView may not re-evaluate prefers-color-scheme media queries when
+  // the system theme changes. Force every live page to re-render so CSS picks up
+  // the new theme without requiring a mini-program restart.
+  onThemeChange(res) {
+    this.globalData.themeMode = res && res.theme === 'dark' ? 'dark' : 'light';
+    const pages = getCurrentPages();
+    for (const page of pages) {
+      if (page && typeof page.setData === 'function') {
+        page.setData({ _themeForce: Date.now() });
+      }
+    }
+  },
+
   refreshConsentLater() {
     if (this.consentRefreshScheduled) return;
     this.consentRefreshScheduled = true;
