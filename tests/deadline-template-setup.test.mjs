@@ -30,7 +30,7 @@ test('date and time template keywords receive their matching Beijing date/clock 
 
 test('the checked-in calendar template maps every verified keyword without surplus slots', () => {
   const config = mergeConfig({});
-  assert.equal(config.deadlineReminders.templateId, 'ciI4JTu358s2e_TEPLgB-9g26_CrHGcVga9fdSKG68Y');
+  assert.equal(config.deadlineReminders.templateId, 'cil4jTu358s2e_TEPLgB-9g26_CrHGcVga9fdSKGo8Y');
   assert.deepEqual(config.deadlineReminders.templateFields,
     { title: 'thing3', date: 'time2', time: 'time6', category: 'thing7', remark: 'thing5' });
   assert.equal(capability(config).reason, 'notifications_disabled');

@@ -119,7 +119,19 @@ Page({
     else payload.requestId = this.saveRequestId || (this.saveRequestId = newId('deadline'));
     try { this.persistPending({ action, payload }); }
     catch (error) { this.setData({ formError: friendlyError(error) }); return; }
-    return this.performPending();
+    await this.performPending();
+    // After a successful save, ask whether to enable the one-time WeChat reminder.
+    if (this.data.capability.enabled && !this.data.pending && this.owner && typeof wx.requestSubscribeMessage === 'function') {
+      const saved = this.data.items.find(row => row.title === payload.title && row.canAuthorize);
+      if (saved) this.promptAuthorization(saved);
+    }
+  },
+  promptAuthorization(item) {
+    wx.showModal({ title: '开启微信提醒', content: '是否允许一次微信到期提醒？修改内容后需重新授权。', confirmText: '开启', cancelText: '暂不',
+      success: res => {
+        if (!res.confirm) return;
+        this.onAuthorize({ currentTarget: { dataset: { id: item.id } } });
+      } });
   },
   async performPending() {
     const operation = this.pendingOperation;
@@ -192,8 +204,5 @@ Page({
         catch (error) { this.setData({ error: friendlyError(error) }); return; }
         this.performPending();
       } });
-  },
-  onGoNotificationSettings() {
-    wx.switchTab({ url: '/pages/mine/index' });
   },
 });

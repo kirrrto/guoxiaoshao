@@ -29,7 +29,3 @@
 .deadline-item-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 12px; padding-top: 8px; border-top: 1px solid var(--line); }
 .deadline-page button[disabled] { opacity: 0.6; }
 .deadline-page .text-bad { color: var(--bad); }
-.deadline-notify-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--line); }
-.deadline-notify-copy { display: flex; flex-direction: column; gap: 4px; }
-.deadline-notify-copy .bold { font-size: 15px; }
-.deadline-notify-copy .small { font-size: 13px; }
