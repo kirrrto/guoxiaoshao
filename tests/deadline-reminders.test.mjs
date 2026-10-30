@@ -333,7 +333,7 @@ test('dispatch is bounded to five due rows and never lists users or Apple follow
 });
 
 test('independent configuration rejects shared stock templates and invalid/duplicate field mappings', () => {
-  assert.equal(validateConfig(mergeConfig({})).deadlineReminders.enabled, false);
+  assert.equal(validateConfig(mergeConfig({})).deadlineReminders.enabled, true);
   for (const deadlineReminders of [{ templateId: '123' }, { templateFields: { title: 'phrase1' } },
     { templateFields: { title: 'thing1', date: 'time2', category: 'thing7', remark: 'thing7' } }, { templateId: TEMPLATE }]) {
     const config = mergeConfig({ notifications: { templateIds: { restock: TEMPLATE } }, deadlineReminders });

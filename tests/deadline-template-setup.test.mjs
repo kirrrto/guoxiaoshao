@@ -33,7 +33,7 @@ test('the checked-in calendar template maps every verified keyword without surpl
   assert.equal(config.deadlineReminders.templateId, 'cil4jTu358s2e_TEPLgB-9g26_CrHGcVga9fdSKGo8Y');
   assert.deepEqual(config.deadlineReminders.templateFields,
     { title: 'thing3', date: 'time2', time: 'time6', category: 'thing7', remark: 'thing5' });
-  assert.equal(capability(config).reason, 'notifications_disabled');
+  assert.equal(capability(config).enabled, true);
   const message = buildDeadlineMessage(record, user, config);
   assert.deepEqual(Object.keys(message.data).sort(), ['thing3', 'time2', 'time6', 'thing7', 'thing5'].sort());
   assert.equal(message.data.time2.value, '2026-11-02 23:59');

@@ -39,7 +39,7 @@ const DEFAULTS = Object.freeze({
     // 2026-10-30 consumer template「日历事件提醒」. Delivery remains off until
     // the same-version cloud functions, consumer credentials and a real user
     // authorization have each been verified.
-    enabled: false, templateId: 'cil4jTu358s2e_TEPLgB-9g26_CrHGcVga9fdSKGo8Y', miniprogramState: 'formal',
+    enabled: true, templateId: 'cil4jTu358s2e_TEPLgB-9g26_CrHGcVga9fdSKGo8Y', miniprogramState: 'formal',
     templateFields: { title: 'thing3', date: 'time2', time: 'time6', category: 'thing7', remark: 'thing5' },
   },
   notifications: {

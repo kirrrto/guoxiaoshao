@@ -33,8 +33,8 @@
     },
     {
       "path": "config.js",
-      "bytes": 22638,
-      "sha256": "dae6b58f57f833e7164105154d8210a9e6883151fb53b1cafde91ba35b2d4a1d"
+      "bytes": 22637,
+      "sha256": "44beeaffc7a93b53dfe8bf291de9f4b7448a026b5bc0a63b767285bf51634b70"
     },
     {
       "path": "connection.js",
