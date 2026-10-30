@@ -1,0 +1,60 @@
+const PLAN_IDS = ['member_7d', 'member_30d', 'member_365d'];
+const fmt = require('./format');
+const { productBenefit } = require('./member-limits');
+
+function planId(product) {
+  if (product && PLAN_IDS.includes(product.planId)) return product.planId;
+  if (product && PLAN_IDS.includes(product.id)) return product.id;
+  return 'member_7d';
+}
+
+/** Server products own pricing; the client only preserves the chosen plan. */
+function memberProducts(boot) {
+  const list = Array.isArray(boot.memberProducts) && boot.memberProducts.length
+    ? boot.memberProducts : [boot.memberProduct];
+  return list.filter(item => item && Number.isInteger(item.priceFen) && item.priceFen > 0
+    && Number.isInteger(item.days) && item.days > 0)
+    .map(item => ({ ...item, planId: planId(item) }));
+}
+
+/** Only the server's paid plan identifies the current tier; days left do not. */
+function upgradeProducts(products, membership) {
+  if (!membership || !membership.active) return [];
+  const currentRank = Math.max(0, PLAN_IDS.indexOf(membership.planId));
+  return products.filter(product => product && PLAN_IDS.indexOf(product.planId) > currentRank);
+}
+
+function renewalPreview(product, membership, now = Date.now()) {
+  const days = product && product.days;
+  const expires = membership && Date.parse(membership.expiresAt);
+  const active = Boolean(membership && membership.active && Number.isFinite(expires) && expires > now);
+  const end = Number.isInteger(days) && days > 0 ? (active ? expires : now) + days * 86400000 : NaN;
+  return {
+    title: active ? '剩余有效期继续保留' : '付款确认后开通',
+    description: `本套餐：${productBenefit(product)}。按所选套餐价格购买，不抵扣差价，不自动续费。月／年卡额外名额在已购月／年卡时长尚未用完时有效。`,
+    extensionText: Number.isInteger(days) && days > 0 ? `${active ? '在原到期时间后增加' : '本次开通'} ${days} 天` : '',
+    expiresAtText: Number.isFinite(end) && Number.isFinite(new Date(end).getTime()) ? fmt.fmtDateTime(end) : '',
+  };
+}
+
+/** Keep only plans that may show a purchase entry; empty means hide the shop. */
+function purchasableProducts(products, isPurchasable) {
+  const list = Array.isArray(products) ? products.filter(Boolean) : [];
+  if (typeof isPurchasable !== 'function') return list;
+  return list.filter(item => isPurchasable(item) === true);
+}
+
+/**
+ * Prefer the current selection when it is still purchasable. With a pending
+ * order the chosen plan is frozen and must not auto-switch to another SKU.
+ */
+function choosePurchasablePlan(products, preferredPlanId, options = {}) {
+  const list = Array.isArray(products) ? products.filter(Boolean) : [];
+  const preferred = list.find(item => planId(item) === preferredPlanId);
+  if (options.hasPendingOrder) return preferred || list[0] || null;
+  const purchasable = options.isPurchasable ? list.filter(item => options.isPurchasable(item) === true) : list;
+  if (preferred && purchasable.some(item => planId(item) === planId(preferred))) return preferred;
+  return purchasable[0] || null;
+}
+
+module.exports = { planId, memberProducts, upgradeProducts, renewalPreview, purchasableProducts, choosePurchasablePlan };
