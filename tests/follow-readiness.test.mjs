@@ -159,11 +159,13 @@ test('paused follows stay paused while a collector is running, and resume uses t
   assert.ok(rt.calls.some(call => call.action === 'follow.resume' && call.payload.followId === 'f1'));
 });
 
-test('refreshing service status reads bootstrap and follows without issuing a stock query', async () => {
-  const rt = runtime(async action => action === 'user.bootstrap' ? boot() : { follows: [], limits: {} });
+test('refreshing home reads account, follows and deadlines without issuing a stock query', async () => {
+  const rt = runtime(async action => action === 'user.bootstrap' ? boot() : action === 'deadline.list'
+    ? { items: [], userKey: boot().identity?.userKey || 'home-user', capability: { enabled: false } }
+    : { follows: [], limits: {} });
   const page = rt.instance('pages/follow/index.js');
   await page.onRefreshStatus();
-  assert.deepEqual(rt.calls.map(call => call.action), ['user.bootstrap', 'follow.list']);
+  assert.deepEqual(rt.calls.map(call => call.action), ['user.bootstrap', 'follow.list', 'deadline.list']);
   assert.equal(page.data.refreshing, false);
   assert.equal(page.data.refreshError, null);
 });

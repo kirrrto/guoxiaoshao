@@ -1,0 +1,29 @@
+✔ every catalog SKU has a sourced official image, with no unresolved image request (12.4974ms)
+✔ selector parsing uses each retail SKU imageKey and preserves signed source parameters (2.4906ms)
+✔ configurator images require selected dimensions; cold family collage is not a color fallback (0.6873ms)
+✔ iMac adds the fixed standard stand only when both retail container and official enum prove it (0.4171ms)
+✔ gallery resolution deduplicates SKU requests, verifies color and replays cached evidence offline (13.7651ms)
+✔ catalog API forwards image fields and changes cache version when images are added (9.5609ms)
+✔ retained HTTP and decode evidence covers every unique URL and every SKU in this catalog (5.9314ms)
+✔ home lists saved dates independently of Apple bootstrap and only schedules future authorized items (48.9009ms)
+✔ date summary deduplicates reads and ignores hidden-page completions (20.9073ms)
+✔ a response from the previous account never appears in the home summary (17.967ms)
+✔ failed summary refresh retains confirmed records and exposes retry instead of an empty success (17.5834ms)
+✔ a new server identity clears the previous summary while bootstrap is still stale (15.396ms)
+✔ selected official pages recover all 15 ProLED retail SKUs including four absent from the cold BTR list (2.4452ms)
+✔ selected Mac parsing refuses CTO identifiers and unresolved memory labels (0.6799ms)
+✔ ProLED gallery, all catalog copies and pending pickup remain aligned without enabling query or monitoring (8.9945ms)
+✔ Mac Studio exact current official configurations match the existing three catalog SKUs (0.4618ms)
+✔ each prelaunch ProLED SKU remains individually selectable for browsing without gaining support (175.93ms)
+✔ normal collector follows the captured official links and supplements cold ProLED 11 to 15 and Studio 2 to 3 (6.3725ms)
+✔ selected-page discovery stays within the exact official family and enforces a bounded request count (0.7676ms)
+✔ selected-page HTTP failure or unresolved configuration stops immediately without retrying or dropping the SKU (0.8931ms)
+✔ loss of a previously verified Mac SKU fails closed even when upstream selected links disappear (0.4998ms)
+ℹ tests 21
+ℹ suites 0
+ℹ pass 21
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 350.9147

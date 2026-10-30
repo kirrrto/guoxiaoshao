@@ -6,6 +6,7 @@ import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import { createFixture, userKeyOf, PRODUCTS, STORES } from './helpers/fixture.mjs';
 import { runtime } from './helpers/miniprogram-runtime.mjs';
+import { v343DefaultDate, v343Scenarios, v343TextExpectations } from '../tools/ui-preview/v343-scenarios.mjs';
 
 const require = createRequire(import.meta.url);
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -25,11 +26,10 @@ const {
 const { createCollector } = require('../cloudfunctions/gxs_api/lib/engine/collector');
 const { sortFamilies } = require('../miniprogram/utils/catalog-order');
 const {
-  MAC_LAUNCH_CELEBRATION_NOTICE,
   MAC_CATALOG_NOTICE,
   IPAD_MINI_CATALOG_NOTICE,
   withOutageCompensationNotice,
-  resolveQueryNotice,
+  resolveQueryNotice, normalizeAnnouncement, liveNotices,
 } = require('../miniprogram/utils/query-notice');
 
 const DAY = 86400000;
@@ -116,7 +116,7 @@ test('v3.4.3 catalog syncs all 88 standard Mac SKUs (including M6 MacBook Pro & 
   assert.deepEqual(imacProducts.map(p => p.partNumber), NEW_IMAC_M6_SKUS);
 
   // Every Mac SKU across all 6 Mac families has memory, capacity, chipName, chip, and descriptive title
-  const macProducts = catalog.products.filter(p => p.category === 'mac');
+  const macProducts = catalog.products.filter(p => p.category === 'mac' && p.familyKey !== 'macbook-pro-proled-xdr' && p.targetType !== 'apple_cto');
   assert.equal(macProducts.length, 88);
   for (const prod of macProducts) {
     const part = prod.partNumber;
@@ -143,7 +143,7 @@ test('v3.4.3 catalog syncs all 88 standard Mac SKUs (including M6 MacBook Pro & 
     assert.equal(seed.products.some(p => p.partNumber === retired), false, `retired SKU ${retired} still in client seed`);
   }
 
-  const macFamilies = sortFamilies(catalog.families.filter(f => f.category === 'mac'));
+  const macFamilies = sortFamilies(catalog.families.filter(f => f.category === 'mac' && f.familyKey !== 'macbook-pro-proled-xdr'));
   assert.deepEqual(macFamilies.map(f => f.familyKey), [
     'macbook-pro',
     'imac',
@@ -160,6 +160,8 @@ test('v3.4.3 catalog syncs all 88 standard Mac SKUs (including M6 MacBook Pro & 
   picker.onCatalog(indexedCatalog);
   const macCatIdx = picker.data.categories.findIndex(c => c.key === 'mac');
   picker.onCategoryTap({ currentTarget: { dataset: { index: macCatIdx } } });
+  picker.onFamilyChange({ detail: { value: picker.data.families.findIndex(f => f.familyKey === 'macbook-pro') } });
+  picker.onMemoryTap({ currentTarget: { dataset: { index: picker.data.memories.indexOf('16GB') } } });
 
   // 1. MacBook Pro 14-inch: memories 16GB/24GB/32GB/36GB/48GB, capacities 1TB/2TB
   assert.equal(picker.data.families[picker.data.familyIndex].familyKey, 'macbook-pro');
@@ -366,37 +368,37 @@ test('background monitor loadFollowUsers extends paid member duration on 2026-10
   assert.equal(giftRow.titleText, '1 天会员 · 新品礼遇');
 });
 
-test('2026-10-28 celebration and Mac catalog announcements surface in bootstrap, query banner, and notice-board', async () => {
-  const f = createFixture({ start: LAUNCH_GIFT_TIME });
+test('expired celebration banner is gone while the current Mac catalog note surfaces in bootstrap, query banner, and notice-board', async () => {
+  const now = '2026-10-30T04:00:00.000Z';
+  const f = createFixture({ start: now });
   const boot = ok(await f.call('user.bootstrap'));
   assert.ok(boot.announcement);
-  assert.equal(boot.announcement.title, MAC_LAUNCH_CELEBRATION_NOTICE.title);
+  assert.equal(boot.announcement.title, MAC_CATALOG_NOTICE.title);
   assert.equal(boot.announcement.kind, 'notice');
-  assert.match(boot.announcement.text, /10 月 28 日.*曾付费用户.*发放 1 天会员/);
-  assert.doesNotMatch(boot.announcement.text, /今日|全体会员|已发放/);
+  assert.match(boot.announcement.text, /Mac Studio 官网定制款不支持 Apple Store 店内取货/);
+  assert.doesNotMatch(boot.announcement.text, /会员礼遇|发放 1 天会员|10 月 28 日/);
 
-  // Secondary built-in notices (Mac catalog update + iPad mini catalog update) appear in notices list
+  // The primary banner is not repeated as a notice row; other current notices remain.
   assert.ok(Array.isArray(boot.notices));
-  assert.ok(boot.notices.some(n => n.id === MAC_CATALOG_NOTICE.id));
+  assert.ok(!boot.notices.some(n => n.id === MAC_CATALOG_NOTICE.id));
   assert.ok(boot.notices.some(n => n.id === IPAD_MINI_CATALOG_NOTICE.id));
 
   const queryBanner = resolveQueryNotice({
     announcement: boot.announcement,
-    now: Date.parse(LAUNCH_GIFT_TIME),
+    now: Date.parse(now),
   });
   assert.ok(queryBanner);
   assert.equal(queryBanner.tone, 'info');
-  assert.match(queryBanner.text, /发放 1 天会员/);
+  assert.match(queryBanner.text, /定制款不支持 Apple Store 店内取货/);
 
-  // Client fallback also injects celebration announcement and secondary notices if server cache was older
   const fallbackPayload = withOutageCompensationNotice(
-    { serverTime: LAUNCH_GIFT_TIME, announcement: null, notices: [] },
-    Date.parse(LAUNCH_GIFT_TIME),
+    { serverTime: now, announcement: null, notices: [] },
+    Date.parse(now),
   );
-  assert.equal(fallbackPayload.announcement.title, MAC_LAUNCH_CELEBRATION_NOTICE.title);
-  assert.ok(fallbackPayload.notices.some(n => n.id === MAC_CATALOG_NOTICE.id));
+  assert.equal(fallbackPayload.announcement.title, MAC_CATALOG_NOTICE.title);
+  assert.ok(!fallbackPayload.notices.some(n => n.id === MAC_CATALOG_NOTICE.id));
+  assert.ok(fallbackPayload.notices.some(n => n.id === IPAD_MINI_CATALOG_NOTICE.id));
 
-  // Notice-board page renders both primary celebration card and secondary Mac catalog row
   const rt = runtime(async action => {
     if (action === 'user.bootstrap') return boot;
     return {};
@@ -404,6 +406,34 @@ test('2026-10-28 celebration and Mac catalog announcements surface in bootstrap,
   const board = rt.instance('pages/notice-board/index.js');
   await board.load();
   assert.equal(board.data.hasContent, true);
-  assert.ok(board.data.items.some(n => n.title === MAC_LAUNCH_CELEBRATION_NOTICE.title && n.tone === 'info'));
-  assert.ok(board.data.items.some(n => n.title === MAC_CATALOG_NOTICE.title));
+  assert.ok(board.data.items.some(n => n.title === MAC_CATALOG_NOTICE.title && n.tone === 'info'));
+  assert.ok(!board.data.items.some(n => /会员礼遇/.test(n.title + n.text)));
+
+  const stale = createFixture({ start: now, config: {
+    announcement: '新款 Mac 配置已更新。10 月 28 日会员礼遇将由后台自动发放 1 天会员。',
+  } });
+  const staleBoot = ok(await stale.call('user.bootstrap'));
+  assert.equal(staleBoot.announcement.title, MAC_CATALOG_NOTICE.title);
+  assert.doesNotMatch(JSON.stringify(staleBoot.announcement), /会员礼遇/);
+});
+
+test('legacy CI activity fixtures assert current announcements, reject retired copy and keep exact expiry behavior', async () => {
+  for (const [name, fixture] of Object.entries(v343Scenarios).filter(([, f]) => Object.hasOwn(f, 'banner'))) {
+    const now = Date.parse(fixture.date || v343DefaultDate);
+    const f = createFixture({ start: fixture.serverTime || new Date(now).toISOString() });
+    const boot = withOutageCompensationNotice(ok(await f.call('user.bootstrap')), now);
+    const announcement = normalizeAnnouncement(boot.announcement, now);
+    const notices = liveNotices(boot.notices, now);
+    const text = [announcement && announcement.title, announcement && announcement.text, ...notices.flatMap(n => [n.title, n.text])].filter(Boolean).join('\n') || '暂无有效公告';
+    const expected = v343TextExpectations({ fixture, pageName: 'notice-board' });
+    for (const value of expected.expected.slice(2)) assert.ok(text.includes(value), `${name}: missing ${value}`);
+    for (const value of expected.forbidden) assert.ok(!text.includes(value), `${name}: retired or expired ${value}`);
+    if (fixture.banner === 'announcement' || fixture.banner === null) {
+      const notice = resolveQueryNotice({ announcement: boot.announcement, now });
+      assert.equal(notice?.source || null, fixture.banner, name);
+      const query = v343TextExpectations({ fixture, pageName: 'query', product: { title: 'test product' } });
+      for (const value of query.expected.slice(1)) assert.ok(notice.text.includes(value), `${name}: missing query text ${value}`);
+      for (const value of query.forbidden) assert.ok(!(notice?.text || '').includes(value), name);
+    }
+  }
 });

@@ -59,6 +59,11 @@ export function v343TextExpectations({ fixture, pageName, product }) {
   if (fixture.retired) return { expected: ['老款已停止检测', '改选新款', '删除关注'], forbidden: ['单独查询库存', '恢复关注', '暂停关注'] };
   if (fixture.records) return { expected: ['购买与开通记录', ...(fixture.records === 'free' ? ['1 天会员 · 平台发放'] : ['1 天会员 · 新品礼遇', '已退款 ¥7.00'])], forbidden: fixture.records === 'free' ? ['新品礼遇', 'grant_launch_20261028'] : [] };
   const active = fixture.banner !== null;
-  if (pageName === 'notice-board') return { expected: ['公告与服务', '后台最近状态', active ? '庆祝苹果 Mac 新品发布' : '暂无有效公告'], forbidden: active ? [] : ['庆祝苹果 Mac 新品发布', '会员礼遇将由后台'] };
-  return { expected: [product.title, ...({ announcement: ['会员礼遇将由后台'], consent: ['前往微信设置', '未开启'], collector: ['取货接口状态异常', '刷新状态'] }[fixture.banner] || [])], forbidden: active ? [] : ['会员礼遇将由后台'] };
+  const macNotice = Date.parse(fixture.date || v343DefaultDate) >= Date.parse('2026-10-30T00:00:00+08:00');
+  const noticeTitle = macNotice ? 'Mac 目录与定制款说明' : '新款 iPad mini 目录更新说明';
+  const noticeText = macNotice ? 'Mac Studio 官网定制款不支持 Apple Store 店内取货' : '新款 iPad mini（A20 Pro）';
+  const forbidden = ['庆祝苹果 Mac 新品发布', '会员礼遇将由后台'];
+  if (!active) forbidden.push('Mac 目录与定制款说明', '新款 iPad mini 目录更新说明');
+  if (pageName === 'notice-board') return { expected: ['公告与服务', '后台最近状态', active ? noticeTitle : '暂无有效公告'], forbidden };
+  return { expected: [product.title, ...({ announcement: [noticeText], consent: ['前往微信设置', '未开启'], collector: ['取货接口状态异常', '刷新状态'] }[fixture.banner] || [])], forbidden };
 }

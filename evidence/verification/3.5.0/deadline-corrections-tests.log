@@ -1,0 +1,46 @@
+✔ a failed refresh retains the draft but prevents new writes until a successful retry (9.6234ms)
+✔ deadline draft converts Beijing calendar dates without device timezone and validates impossible dates (0.9949ms)
+✔ saving synchronously locks fields and repeated tap, uncertain retry preserves the original request across page recreation (3.4946ms)
+✔ storage failure prevents a write whose recovery identity cannot be persisted (3.4525ms)
+✔ a definitive save error remains visible after refreshing and preserves the draft (3.286ms)
+✔ native authorization is called synchronously from the tap and a failed sync reuses the original result without a second prompt (4.4097ms)
+✔ account changes cannot display another owner records or retry their pending writes (2.6584ms)
+✔ a new server identity clears visible old records and drafts even while bootstrap is stale (3.4315ms)
+✔ disabled reminder service never opens native authorization and an elapsed schedule never promises a future send (2.5984ms)
+✔ revision conflict protects the draft and offers explicit reload before submitting a newer revision (4.438ms)
+✔ switching account during a pending save clears private data and late completion cannot unlock the new account save (5.0064ms)
+✔ native authorization synchronous failure releases the controls for a retry (2.797ms)
+✔ missing deadline collection is a service-readiness error, other database failures remain errors (5.3718ms)
+✔ free accounts can save and list dates while unavailable WeChat delivery stays explicit (3.0675ms)
+✔ configured template without sender credentials is not presented as enabled (0.7821ms)
+✔ dates use Beijing calendar boundaries and reject impossible dates or a passed reminder (1.86ms)
+✔ create retries are idempotent even after reminder time; different payload cannot reuse the request (1.181ms)
+✔ account expectations fail before reads and foreign identifiers cannot be read, modified or authorized (2.5875ms)
+✔ the 20-record cap survives concurrent creates and deletion releases one slot without retaining title/date (5.9961ms)
+✔ a failed transaction leaves neither a reminder nor an occupied slot (0.6368ms)
+✔ editing invalidates authorization, retries are replayable, and stale writers cannot overwrite a newer revision (1.5238ms)
+✔ authorization is bound to one reminder revision and cannot be replayed onto another record (1.4037ms)
+✔ parallel dispatchers send a due reminder once and accepted never implies actual receipt (2.594ms)
+✔ transport ambiguity is never automatically retried and uncertain history can be deleted (1.2953ms)
+✔ definite rejection is not retried; a new future schedule can be explicitly authorized (2.219ms)
+✔ a worker crash becomes uncertain after its lease and a late worker cannot erase that barrier (1.2387ms)
+✔ template changes and global/user switches are checked after claim, before external send (2.0449ms)
+✔ DND defers a date without spending it; expired dates are marked missed (1.9803ms)
+✔ dispatch is bounded to five due rows and never lists users or Apple follows (5.9655ms)
+✔ independent configuration rejects shared stock templates and invalid/duplicate field mappings (1.448ms)
+✔ trusted minute entry dispatches dates while Apple scheduling is disabled and refuses forged user timers (6.4038ms)
+✔ home lists saved dates independently of Apple bootstrap and only schedules future authorized items (36.3495ms)
+✔ a failed service read never opens an add flow and retry restores records-only access (16.5418ms)
+✔ disabled delivery never promotes an old scheduled row into a next-send promise (16.6907ms)
+✔ date summary deduplicates reads and ignores hidden-page completions (15.761ms)
+✔ a response from the previous account never appears in the home summary (14.9993ms)
+✔ failed summary refresh retains confirmed records and exposes retry instead of an empty success (18.6097ms)
+✔ a new server identity clears the previous summary while bootstrap is still stale (13.5094ms)
+ℹ tests 38
+ℹ suites 0
+ℹ pass 38
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 246.9727

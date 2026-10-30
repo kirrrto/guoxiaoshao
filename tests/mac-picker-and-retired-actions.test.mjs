@@ -15,12 +15,12 @@ function pickerFor(partNumber) {
 
 test('every nonfirst Mac SKU in each ambiguous filter group survives same-value taps and a catalog reload', () => {
   const { catalog } = pickerFor('MH2U4CH/A'), groups = new Map();
-  for (const product of catalog.products.filter(p => p.category === 'mac')) {
+  for (const product of catalog.products.filter(p => p.category === 'mac' && p.targetType !== 'apple_cto')) {
     const a = product.attributes || {}, key = [product.familyKey, product.model, a.memory, a.capacity, a.color].join('|');
     groups.set(key, [...(groups.get(key) || []), product]);
   }
   const ambiguous = [...groups.values()].filter(group => group.length > 1);
-  assert.equal(ambiguous.length, 10, 'all ten ambiguous groups in the v3.4.3 catalog are covered');
+  assert.equal(ambiguous.length, 11, 'all ambiguous groups include the ProLED standard and nano-texture pair');
   for (const group of ambiguous) for (const product of group.slice(1)) {
     const { rt, picker, catalog: source } = pickerFor(product.partNumber);
     for (const [method, index] of [['onMemoryChange', picker.data.memoryIndex], ['onCapacityChange', picker.data.capacityIndex]]) {

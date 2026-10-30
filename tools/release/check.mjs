@@ -40,6 +40,7 @@ for (const name of ['gxs_api', 'cloudbase_auth', 'gxs_monitor']) {
     && lock.packages['node_modules/@cloudbase/database']?.version === '1.5.1'
     && !lock.packages['node_modules/lodash.set']);
   check(`${name}: no prototype-pollution lodash.set in the deployable tree`, !lock.packages['node_modules/lodash.set'] && !JSON.stringify(lock.packages).includes('"lodash.set"'));
+  check(`${name}: redirect and query-string dependencies use reviewed patched versions`, lock.packages['node_modules/follow-redirects']?.version === '1.16.2' && lock.packages['node_modules/qs']?.version === '6.17.1');
   const sdkRequire = createRequire(path.join(root, `cloudfunctions/${name}/package.json`));
   try { const sdk = sdkRequire('wx-server-sdk'); check(`${name}: SDK entry points installed`, typeof sdk.init === 'function' && typeof sdk.getWXContext === 'function'); }
   catch { check(`${name}: SDK entry points installed (run npm ci)`, false); }
@@ -59,7 +60,7 @@ check('shared resource identifiers match', miniConnection.resourceEnv === connec
 const { authorize } = require(path.join(root, 'cloudfunctions/cloudbase_auth/authorize.js'));
 check('shared auth allows configured consumer and rejects payload spoofing', authorize({ FROM_APPID: connection.consumerAppid }, {}).allowed && !authorize({}, { fromAppid: connection.consumerAppid }).allowed);
 const consumerPages = json('miniprogram/app.json').pages;
-check('consumer package contains four main pages, notice board, notification test and the buying guide', consumerPages.length === 7 && ['query', 'follow', 'history', 'mine', 'notice-board', 'notification-test', 'guide'].every(name => consumerPages.includes(`pages/${name}/index`)) && !fs.existsSync(path.join(root, 'miniprogram/pages/admin')));
+check('consumer package opens inventory query and contains four main pages, notice board, notification test, buying guide and deadline trial', consumerPages.length === 8 && ['query', 'follow', 'history', 'mine', 'notice-board', 'notification-test', 'guide', 'deadlines'].every(name => consumerPages.includes(`pages/${name}/index`)) && consumerPages[0] === 'pages/query/index' && !fs.existsSync(path.join(root, 'miniprogram/pages/admin')));
 const adminProject = json('tools/admin-miniprogram/project.config.json');
 const adminApp = json('tools/admin-miniprogram/miniprogram/app.json');
 check('operator project is separate and uses the existing resource AppID', adminProject.appid === connection.resourceAppid && adminProject.miniprogramRoot === 'miniprogram/' && adminProject.setting.urlCheck === true && adminApp.pages.length === 1 && adminApp.pages[0] === 'pages/admin/index');
@@ -69,6 +70,11 @@ check('queries default to persistent continuous capacity rather than a daily sto
 check('new sustained-availability polling requires explicit runtime enablement', defaults.collector.availableIntervalSeconds === 0);
 const collectorPackage = json('tools/collector/package.json'), collectorLock = json('tools/collector/package-lock.json');
 check('optional collector package and lock identify the same release', collectorPackage.version === project.version && collectorLock.version === project.version && collectorLock.packages[''].version === project.version);
+check('optional collector uses the reviewed patched SDK dependency tree', collectorPackage.overrides?.['@cloudbase/database'] === '1.5.1'
+  && collectorLock.packages['node_modules/@cloudbase/database']?.version === '1.5.1'
+  && !JSON.stringify(collectorLock.packages).includes('"lodash.set"')
+  && collectorLock.packages['node_modules/follow-redirects']?.version === '1.16.2'
+  && collectorLock.packages['node_modules/qs']?.version === '6.17.1');
 check('optional collector dependencies stay inside the deployable package boundary', !Object.values(collectorPackage.dependencies).some(value => /^(?:file:|link:|workspace:)/.test(value)) && !Object.values(collectorLock.packages).some(value => value.link));
 check('payment stays closed in defaults', defaults.memberProduct.enabled === false);
 check('membership purchase uses the confirmed seven-day product', defaults.memberProduct.id === 'vip666' && defaults.memberProduct.days === 7 && defaults.memberProduct.priceFen === 700);

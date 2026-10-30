@@ -57,12 +57,15 @@ function createWechatSender({ appid, appSecret, expectedAppid, fetchImpl = globa
     return tokenRequest;
   }
 
-  const send = async (message, { timeoutMs: requestedTimeout = timeoutMs } = {}) => {
+  const send = async (message, { timeoutMs: requestedTimeout = timeoutMs, deadlineAt = Infinity } = {}) => {
     if (disabledReason) throw notSent(disabledReason);
     if (message.appid !== appid) throw notSent('consumer_appid_mismatch');
     const boundedTimeout = Math.max(1, Math.min(timeoutMs, Number.isFinite(requestedTimeout) ? Math.floor(requestedTimeout) : timeoutMs));
-    const deadline = clock().getTime() + boundedTimeout;
-    const accessToken = await getToken(boundedTimeout);
+    const startedAt = clock().getTime();
+    const deadline = Math.min(startedAt + boundedTimeout, deadlineAt);
+    const tokenTimeout = Math.floor(deadline - startedAt);
+    if (tokenTimeout < 1) throw notSent('wechat_send_deadline');
+    const accessToken = await getToken(tokenTimeout);
     const messageTimeout = Math.floor(deadline - clock().getTime());
     if (messageTimeout < 1) throw notSent('wechat_send_deadline');
     try {

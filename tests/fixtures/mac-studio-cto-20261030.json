@@ -1,0 +1,769 @@
+[
+  {
+    "chipId": "m5max-18-32",
+    "sourceUrl": "https://www.apple.com.cn/shop/api/cto/update-config?collection=MACSTUDIO_2026_COLLECTION&fae=true&sv.processor-dimensionChip=m5max&sv.processor-dimensionChip-cpuCoreCount-gpuCoreCount=m5max-18-32",
+    "checkedAt": "2026-10-30T04:44:27.214Z",
+    "capturedResponseSha256": "4d9f9eeeb5a333e9df64574770f8cf9f72e086fadcec8e4c37be874b27016c7d",
+    "response": {
+      "head": {
+        "status": "200",
+        "data": {}
+      },
+      "body": {
+        "options": {
+          "processor-dimensionChip": {
+            "compatibleOptions": {
+              "m5max": {
+                "isSelected": true,
+                "isDefault": true,
+                "isBlocked": false
+              },
+              "m5ultra": {
+                "isSelected": false,
+                "isDefault": false,
+                "isBlocked": false
+              }
+            },
+            "upgradeOptions": {},
+            "hasChanged": false
+          },
+          "memory-dimensionMemory": {
+            "compatibleOptions": {
+              "36gb": {
+                "priceDelta": "0_0",
+                "isSelected": false,
+                "isDefault": true,
+                "isBlocked": false
+              }
+            },
+            "upgradeOptions": {
+              "48gb": {
+                "isBlocked": false
+              },
+              "64gb": {
+                "isBlocked": false
+              },
+              "96gb": {
+                "isBlocked": false
+              },
+              "128gb": {
+                "isBlocked": false
+              },
+              "256gb": {
+                "isBlocked": false
+              },
+              "512gb": {
+                "isBlocked": false
+              }
+            },
+            "hasChanged": false
+          },
+          "processor-dimensionChip-cpuCoreCount-gpuCoreCount": {
+            "compatibleOptions": {
+              "m5max-18-32": {
+                "priceDelta": "0_0",
+                "isSelected": true,
+                "isDefault": true,
+                "isBlocked": false
+              },
+              "m5max-18-40": {
+                "priceDelta": "2250_00",
+                "isSelected": false,
+                "isDefault": false,
+                "isBlocked": false
+              },
+              "m5ultra-30-64": {
+                "priceDelta": "13500_00",
+                "isSelected": false,
+                "isDefault": false,
+                "isBlocked": false
+              },
+              "m5ultra-36-80": {
+                "priceDelta": "23250_00",
+                "isSelected": false,
+                "isDefault": false,
+                "isBlocked": false
+              }
+            },
+            "upgradeOptions": {},
+            "hasChanged": false
+          },
+          "storage-dimensionCapacity": {
+            "compatibleOptions": {
+              "512gb": {
+                "priceDelta": "0_0",
+                "isSelected": false,
+                "isDefault": true,
+                "isBlocked": false
+              },
+              "1tb": {
+                "priceDelta": "2250_00",
+                "isSelected": false,
+                "isDefault": false,
+                "isBlocked": false
+              },
+              "2tb": {
+                "priceDelta": "6000_00",
+                "isSelected": false,
+                "isDefault": false,
+                "isBlocked": false
+              },
+              "4tb": {
+                "priceDelta": "13500_00",
+                "isSelected": false,
+                "isDefault": false,
+                "isBlocked": false
+              },
+              "8tb": {
+                "priceDelta": "28500_00",
+                "isSelected": false,
+                "isDefault": false,
+                "isBlocked": false
+              }
+            },
+            "upgradeOptions": {
+              "16tb": {
+                "isBlocked": false
+              }
+            },
+            "hasChanged": false
+          },
+          "software_logic-preInstalledSoftware": {
+            "compatibleOptions": {
+              "none": {
+                "priceDelta": "0_0",
+                "isSelected": false,
+                "isDefault": true,
+                "isBlocked": false
+              },
+              "logic_pro": {
+                "priceDelta": "1298_00",
+                "isSelected": false,
+                "isDefault": false,
+                "isBlocked": false
+              }
+            },
+            "upgradeOptions": {},
+            "hasChanged": false
+          },
+          "software_final-preInstalledSoftware": {
+            "compatibleOptions": {
+              "none": {
+                "priceDelta": "0_0",
+                "isSelected": false,
+                "isDefault": true,
+                "isBlocked": false
+              },
+              "final_cut_pro": {
+                "priceDelta": "1998_00",
+                "isSelected": false,
+                "isDefault": false,
+                "isBlocked": false
+              }
+            },
+            "upgradeOptions": {},
+            "hasChanged": false
+          }
+        },
+        "selectedKits": {
+          "dimensions": {
+            "processor-dimensionChip": {
+              "dimensionValue": "m5max",
+              "partNumber": "065-CLPX"
+            },
+            "memory-dimensionMemory": {
+              "dimensionValue": "36gb",
+              "partNumber": "065-CLQ2"
+            },
+            "processor-dimensionChip-cpuCoreCount-gpuCoreCount": {
+              "dimensionValue": "m5max-18-32",
+              "partNumber": "065-CLPX"
+            },
+            "storage-dimensionCapacity": {
+              "dimensionValue": "512gb",
+              "partNumber": "065-CLQW"
+            },
+            "software_final-preInstalledSoftware": {
+              "dimensionValue": "none",
+              "partNumber": "065-CLTK"
+            },
+            "software_logic-preInstalledSoftware": {
+              "dimensionValue": "none",
+              "partNumber": "065-CLTM"
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "chipId": "m5max-18-40",
+    "sourceUrl": "https://www.apple.com.cn/shop/api/cto/update-config?collection=MACSTUDIO_2026_COLLECTION&fae=true&sv.processor-dimensionChip=m5max&sv.processor-dimensionChip-cpuCoreCount-gpuCoreCount=m5max-18-40",
+    "checkedAt": "2026-10-30T04:44:29.758Z",
+    "capturedResponseSha256": "e40bee3abfc77a5d29f67c7da8787184c4e35035b20471636bb258285c80d1f4",
+    "response": {
+      "head": {
+        "status": "200",
+        "data": {}
+      },
+      "body": {
+        "options": {
+          "processor-dimensionChip": {
+            "compatibleOptions": {
+              "m5max": {
+                "isSelected": true,
+                "isDefault": true,
+                "isBlocked": false
+              },
+              "m5ultra": {
+                "isSelected": false,
+                "isDefault": false,
+                "isBlocked": false
+              }
+            },
+            "upgradeOptions": {},
+            "hasChanged": false
+          },
+          "memory-dimensionMemory": {
+            "compatibleOptions": {
+              "48gb": {
+                "priceDelta": "0_0",
+                "isSelected": false,
+                "isDefault": true,
+                "isBlocked": false
+              },
+              "64gb": {
+                "priceDelta": "3000_00",
+                "isSelected": false,
+                "isDefault": false,
+                "isBlocked": false
+              },
+              "128gb": {
+                "priceDelta": "15000_00",
+                "isSelected": false,
+                "isDefault": false,
+                "isBlocked": false
+              }
+            },
+            "upgradeOptions": {
+              "96gb": {
+                "isBlocked": false
+              },
+              "256gb": {
+                "isBlocked": false
+              },
+              "512gb": {
+                "isBlocked": false
+              }
+            },
+            "hasChanged": false
+          },
+          "processor-dimensionChip-cpuCoreCount-gpuCoreCount": {
+            "compatibleOptions": {
+              "m5max-18-32": {
+                "priceDelta": "-2250_00",
+                "isSelected": false,
+                "isDefault": true,
+                "isBlocked": false
+              },
+              "m5max-18-40": {
+                "priceDelta": "0_0",
+                "isSelected": true,
+                "isDefault": false,
+                "isBlocked": false
+              },
+              "m5ultra-30-64": {
+                "priceDelta": "11250_00",
+                "isSelected": false,
+                "isDefault": false,
+                "isBlocked": false
+              },
+              "m5ultra-36-80": {
+                "priceDelta": "21000_00",
+                "isSelected": false,
+                "isDefault": false,
+                "isBlocked": false
+              }
+            },
+            "upgradeOptions": {},
+            "hasChanged": false
+          },
+          "storage-dimensionCapacity": {
+            "compatibleOptions": {
+              "512gb": {
+                "priceDelta": "0_0",
+                "isSelected": false,
+                "isDefault": true,
+                "isBlocked": false
+              },
+              "1tb": {
+                "priceDelta": "2250_00",
+                "isSelected": false,
+                "isDefault": false,
+                "isBlocked": false
+              },
+              "2tb": {
+                "priceDelta": "6000_00",
+                "isSelected": false,
+                "isDefault": false,
+                "isBlocked": false
+              },
+              "4tb": {
+                "priceDelta": "13500_00",
+                "isSelected": false,
+                "isDefault": false,
+                "isBlocked": false
+              },
+              "8tb": {
+                "priceDelta": "28500_00",
+                "isSelected": false,
+                "isDefault": false,
+                "isBlocked": false
+              }
+            },
+            "upgradeOptions": {
+              "16tb": {
+                "isBlocked": false
+              }
+            },
+            "hasChanged": false
+          },
+          "software_logic-preInstalledSoftware": {
+            "compatibleOptions": {
+              "none": {
+                "priceDelta": "0_0",
+                "isSelected": false,
+                "isDefault": true,
+                "isBlocked": false
+              },
+              "logic_pro": {
+                "priceDelta": "1298_00",
+                "isSelected": false,
+                "isDefault": false,
+                "isBlocked": false
+              }
+            },
+            "upgradeOptions": {},
+            "hasChanged": false
+          },
+          "software_final-preInstalledSoftware": {
+            "compatibleOptions": {
+              "none": {
+                "priceDelta": "0_0",
+                "isSelected": false,
+                "isDefault": true,
+                "isBlocked": false
+              },
+              "final_cut_pro": {
+                "priceDelta": "1998_00",
+                "isSelected": false,
+                "isDefault": false,
+                "isBlocked": false
+              }
+            },
+            "upgradeOptions": {},
+            "hasChanged": false
+          }
+        },
+        "selectedKits": {
+          "dimensions": {
+            "processor-dimensionChip": {
+              "dimensionValue": "m5max",
+              "partNumber": "065-CLPY"
+            },
+            "memory-dimensionMemory": {
+              "dimensionValue": "48gb",
+              "partNumber": "065-CLQ3"
+            },
+            "processor-dimensionChip-cpuCoreCount-gpuCoreCount": {
+              "dimensionValue": "m5max-18-40",
+              "partNumber": "065-CLPY"
+            },
+            "storage-dimensionCapacity": {
+              "dimensionValue": "512gb",
+              "partNumber": "065-CLQW"
+            },
+            "software_final-preInstalledSoftware": {
+              "dimensionValue": "none",
+              "partNumber": "065-CLTK"
+            },
+            "software_logic-preInstalledSoftware": {
+              "dimensionValue": "none",
+              "partNumber": "065-CLTM"
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "chipId": "m5ultra-30-64",
+    "sourceUrl": "https://www.apple.com.cn/shop/api/cto/update-config?collection=MACSTUDIO_2026_COLLECTION&fae=true&sv.processor-dimensionChip=m5ultra&sv.processor-dimensionChip-cpuCoreCount-gpuCoreCount=m5ultra-30-64",
+    "checkedAt": "2026-10-30T04:44:32.696Z",
+    "capturedResponseSha256": "7ed32d24d427e241bf547f9778553ab7db5879a898c5ffa326174c1ee0705b53",
+    "response": {
+      "head": {
+        "status": "200",
+        "data": {}
+      },
+      "body": {
+        "options": {
+          "processor-dimensionChip": {
+            "compatibleOptions": {
+              "m5max": {
+                "isSelected": false,
+                "isDefault": false,
+                "isBlocked": false
+              },
+              "m5ultra": {
+                "isSelected": true,
+                "isDefault": true,
+                "isBlocked": false
+              }
+            },
+            "upgradeOptions": {},
+            "hasChanged": false
+          },
+          "memory-dimensionMemory": {
+            "compatibleOptions": {
+              "96gb": {
+                "priceDelta": "0_0",
+                "isSelected": false,
+                "isDefault": true,
+                "isBlocked": false
+              },
+              "256gb": {
+                "priceDelta": "30000_00",
+                "isSelected": false,
+                "isDefault": false,
+                "isBlocked": false
+              }
+            },
+            "upgradeOptions": {
+              "512gb": {
+                "isBlocked": false
+              }
+            },
+            "hasChanged": false
+          },
+          "processor-dimensionChip-cpuCoreCount-gpuCoreCount": {
+            "compatibleOptions": {
+              "m5max-18-32": {
+                "priceDelta": "-13500_00",
+                "isSelected": false,
+                "isDefault": false,
+                "isBlocked": false
+              },
+              "m5max-18-40": {
+                "priceDelta": "-11250_00",
+                "isSelected": false,
+                "isDefault": false,
+                "isBlocked": false
+              },
+              "m5ultra-30-64": {
+                "priceDelta": "0_0",
+                "isSelected": true,
+                "isDefault": true,
+                "isBlocked": false
+              },
+              "m5ultra-36-80": {
+                "priceDelta": "9750_00",
+                "isSelected": false,
+                "isDefault": false,
+                "isBlocked": false
+              }
+            },
+            "upgradeOptions": {},
+            "hasChanged": false
+          },
+          "storage-dimensionCapacity": {
+            "compatibleOptions": {
+              "1tb": {
+                "priceDelta": "0_0",
+                "isSelected": false,
+                "isDefault": true,
+                "isBlocked": false
+              },
+              "2tb": {
+                "priceDelta": "3750_00",
+                "isSelected": false,
+                "isDefault": false,
+                "isBlocked": false
+              },
+              "4tb": {
+                "priceDelta": "11250_00",
+                "isSelected": false,
+                "isDefault": false,
+                "isBlocked": false
+              },
+              "8tb": {
+                "priceDelta": "26250_00",
+                "isSelected": false,
+                "isDefault": false,
+                "isBlocked": false
+              },
+              "16tb": {
+                "priceDelta": "56250_00",
+                "isSelected": false,
+                "isDefault": false,
+                "isBlocked": false
+              }
+            },
+            "upgradeOptions": {},
+            "hasChanged": false
+          },
+          "software_logic-preInstalledSoftware": {
+            "compatibleOptions": {
+              "none": {
+                "priceDelta": "0_0",
+                "isSelected": false,
+                "isDefault": true,
+                "isBlocked": false
+              },
+              "logic_pro": {
+                "priceDelta": "1298_00",
+                "isSelected": false,
+                "isDefault": false,
+                "isBlocked": false
+              }
+            },
+            "upgradeOptions": {},
+            "hasChanged": false
+          },
+          "software_final-preInstalledSoftware": {
+            "compatibleOptions": {
+              "none": {
+                "priceDelta": "0_0",
+                "isSelected": false,
+                "isDefault": true,
+                "isBlocked": false
+              },
+              "final_cut_pro": {
+                "priceDelta": "1998_00",
+                "isSelected": false,
+                "isDefault": false,
+                "isBlocked": false
+              }
+            },
+            "upgradeOptions": {},
+            "hasChanged": false
+          }
+        },
+        "selectedKits": {
+          "dimensions": {
+            "processor-dimensionChip": {
+              "dimensionValue": "m5ultra",
+              "partNumber": "065-CLQ0"
+            },
+            "memory-dimensionMemory": {
+              "dimensionValue": "96gb",
+              "partNumber": "065-CLQ5"
+            },
+            "processor-dimensionChip-cpuCoreCount-gpuCoreCount": {
+              "dimensionValue": "m5ultra-30-64",
+              "partNumber": "065-CLQ0"
+            },
+            "storage-dimensionCapacity": {
+              "dimensionValue": "1tb",
+              "partNumber": "065-CLQX"
+            },
+            "software_final-preInstalledSoftware": {
+              "dimensionValue": "none",
+              "partNumber": "065-CLTK"
+            },
+            "software_logic-preInstalledSoftware": {
+              "dimensionValue": "none",
+              "partNumber": "065-CLTM"
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "chipId": "m5ultra-36-80",
+    "sourceUrl": "https://www.apple.com.cn/shop/api/cto/update-config?collection=MACSTUDIO_2026_COLLECTION&fae=true&sv.processor-dimensionChip=m5ultra&sv.processor-dimensionChip-cpuCoreCount-gpuCoreCount=m5ultra-36-80",
+    "checkedAt": "2026-10-30T04:44:35.290Z",
+    "capturedResponseSha256": "d00afe27b702fa26aa37ec87e2a3ebb244760f92db046c1b29fa90b7440f3d13",
+    "response": {
+      "head": {
+        "status": "200",
+        "data": {}
+      },
+      "body": {
+        "options": {
+          "processor-dimensionChip": {
+            "compatibleOptions": {
+              "m5max": {
+                "isSelected": false,
+                "isDefault": false,
+                "isBlocked": false
+              },
+              "m5ultra": {
+                "isSelected": true,
+                "isDefault": true,
+                "isBlocked": false
+              }
+            },
+            "upgradeOptions": {},
+            "hasChanged": false
+          },
+          "memory-dimensionMemory": {
+            "compatibleOptions": {
+              "96gb": {
+                "priceDelta": "0_0",
+                "isSelected": false,
+                "isDefault": true,
+                "isBlocked": false
+              },
+              "256gb": {
+                "priceDelta": "30000_00",
+                "isSelected": false,
+                "isDefault": false,
+                "isBlocked": false
+              },
+              "512gb": {
+                "priceDelta": "116250_00",
+                "isSelected": false,
+                "isDefault": false,
+                "isBlocked": false
+              }
+            },
+            "upgradeOptions": {},
+            "hasChanged": false
+          },
+          "processor-dimensionChip-cpuCoreCount-gpuCoreCount": {
+            "compatibleOptions": {
+              "m5max-18-32": {
+                "priceDelta": "-23250_00",
+                "isSelected": false,
+                "isDefault": false,
+                "isBlocked": false
+              },
+              "m5max-18-40": {
+                "priceDelta": "-21000_00",
+                "isSelected": false,
+                "isDefault": false,
+                "isBlocked": false
+              },
+              "m5ultra-30-64": {
+                "priceDelta": "-9750_00",
+                "isSelected": false,
+                "isDefault": true,
+                "isBlocked": false
+              },
+              "m5ultra-36-80": {
+                "priceDelta": "0_0",
+                "isSelected": true,
+                "isDefault": false,
+                "isBlocked": false
+              }
+            },
+            "upgradeOptions": {},
+            "hasChanged": false
+          },
+          "storage-dimensionCapacity": {
+            "compatibleOptions": {
+              "1tb": {
+                "priceDelta": "0_0",
+                "isSelected": false,
+                "isDefault": true,
+                "isBlocked": false
+              },
+              "2tb": {
+                "priceDelta": "3750_00",
+                "isSelected": false,
+                "isDefault": false,
+                "isBlocked": false
+              },
+              "4tb": {
+                "priceDelta": "11250_00",
+                "isSelected": false,
+                "isDefault": false,
+                "isBlocked": false
+              },
+              "8tb": {
+                "priceDelta": "26250_00",
+                "isSelected": false,
+                "isDefault": false,
+                "isBlocked": false
+              },
+              "16tb": {
+                "priceDelta": "56250_00",
+                "isSelected": false,
+                "isDefault": false,
+                "isBlocked": false
+              }
+            },
+            "upgradeOptions": {},
+            "hasChanged": false
+          },
+          "software_logic-preInstalledSoftware": {
+            "compatibleOptions": {
+              "none": {
+                "priceDelta": "0_0",
+                "isSelected": false,
+                "isDefault": true,
+                "isBlocked": false
+              },
+              "logic_pro": {
+                "priceDelta": "1298_00",
+                "isSelected": false,
+                "isDefault": false,
+                "isBlocked": false
+              }
+            },
+            "upgradeOptions": {},
+            "hasChanged": false
+          },
+          "software_final-preInstalledSoftware": {
+            "compatibleOptions": {
+              "none": {
+                "priceDelta": "0_0",
+                "isSelected": false,
+                "isDefault": true,
+                "isBlocked": false
+              },
+              "final_cut_pro": {
+                "priceDelta": "1998_00",
+                "isSelected": false,
+                "isDefault": false,
+                "isBlocked": false
+              }
+            },
+            "upgradeOptions": {},
+            "hasChanged": false
+          }
+        },
+        "selectedKits": {
+          "dimensions": {
+            "processor-dimensionChip": {
+              "dimensionValue": "m5ultra",
+              "partNumber": "065-CLQ1"
+            },
+            "memory-dimensionMemory": {
+              "dimensionValue": "96gb",
+              "partNumber": "065-CLQ5"
+            },
+            "processor-dimensionChip-cpuCoreCount-gpuCoreCount": {
+              "dimensionValue": "m5ultra-36-80",
+              "partNumber": "065-CLQ1"
+            },
+            "storage-dimensionCapacity": {
+              "dimensionValue": "1tb",
+              "partNumber": "065-CLQX"
+            },
+            "software_final-preInstalledSoftware": {
+              "dimensionValue": "none",
+              "partNumber": "065-CLTK"
+            },
+            "software_logic-preInstalledSoftware": {
+              "dimensionValue": "none",
+              "partNumber": "065-CLTM"
+            }
+          }
+        }
+      }
+    }
+  }
+]

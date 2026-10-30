@@ -4,6 +4,28 @@
 
 v3.3.1 使用微信原生 `tabBar`。离线工具从实际 `app.json`、`theme.json` 和图标生成底栏示意，模拟 50px 导航高度及 0/34px 安全区对内容视口的占用，不再渲染已删除的自定义底栏组件。`check-native-tabs.mjs` 检查四个触控区、当前页选中、字体压力、末尾内容可滚动到导航上方及弹层期间隐藏；它不能验证微信原生首帧、切页闪烁、API 桥接时序或真机安全区。
 
+## V3.5.0 我的小哨与到期提醒
+
+```powershell
+node tools/ui-preview/build.mjs --v350-only --out "$env:TEMP/gxs-v350-preview"
+node tools/ui-preview/check-layout.mjs "$env:TEMP/gxs-v350-preview"
+node tools/ui-preview/check-layout.mjs "$env:TEMP/gxs-v350-preview" --dark
+node tools/ui-preview/check-layout.mjs "$env:TEMP/gxs-v350-preview" --v350-fonts-only
+node tools/ui-preview/check-layout.mjs "$env:TEMP/gxs-v350-preview" --v350-fonts-only --dark
+node tools/ui-preview/check-native-tabs.mjs "$env:TEMP/gxs-v350-preview"
+node tools/ui-preview/check-native-tabs.mjs "$env:TEMP/gxs-v350-preview" --dark
+node tools/ui-preview/check-theme-colors.mjs "$env:TEMP/gxs-v350-preview" "$env:TEMP/gxs-v350-preview/colors"
+node tools/ui-preview/check-theme-colors.mjs "$env:TEMP/gxs-v350-preview" "$env:TEMP/gxs-v350-preview/colors" --dark
+```
+
+专项使用固定北京时间 2026-10-30 15:00、合成身份与事项，执行实际 `query` / `follow` / `deadlines` 页的加载和表单处理。20 组场景在 320/375/430px 生成 96 个快照：查询首屏、Mac Studio 零售摘要、定制款参考范围收起/展开、到期事项加载、空、已安排、发送未开启、待授权、受理/不确定/错过、读取失败、服务尚未开放、苹果读取失败仍保留到期入口、编辑、空编辑、保存中、保存结果未知、修改冲突、授权时刻已过和长标题。部分场景仅适用于对应页面；清单记录每个实际组合。
+
+保存中与结果未知通过真实 `onSave` 进入本地持久化待确认操作；所有 API 均为离线替身，禁止授权、发送或其他业务写入。额外检查新区域实际触区不小于 44px、文字不小于 12px、输入名称和保存中禁用状态。`--v350-fonts-only` 将全页字号/行高扩大至 1.3 倍并使用 600px 短窗口，仍保留全部场景断言。浅深色颜色检查包含空输入框实际显示的占位文字，禁用控件单独记录。
+
+查询首屏顺序来自 `app.json` 并做断言；未开放或读取失败的到期服务不得出现可用的新建/管理/保存入口，通知关闭与服务不可用分开验证。Mac Studio 使用实际可查询标准 SKU `MHQJ4CH/A`，并通过真实 `onToggleConfigurations` 展开经官网逐项核实的定制范围供参考。定制款不支持 Apple Store 店内取货，明确标注“仅作配置参考”，不进入可查询/可关注候选，也不把内部 CTO 编号当作零售货号展示。
+
+这些结果不证明原生日期/时间选择器、微信键盘/安全区、订阅弹窗、云端定时执行或实际收信通过。业务源码和包内图片变更后须重建再检查；不能使用旧指纹报告关闭本版问题。
+
 ## 会员原生按钮级联专项
 
 ```powershell

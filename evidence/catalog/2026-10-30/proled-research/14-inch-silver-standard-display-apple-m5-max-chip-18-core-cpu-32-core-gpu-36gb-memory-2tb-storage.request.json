@@ -1,0 +1,16 @@
+{
+  "requestUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/14-inch-silver-standard-display-apple-m5-max-chip-18-core-cpu-32-core-gpu-36gb-memory-2tb-storage",
+  "method": "GET",
+  "startedAt": "2026-10-30T03:50:46.399Z",
+  "retries": 0,
+  "httpStatus": 200,
+  "headers": {
+    "content-type": "text/html;charset=utf-8",
+    "date": "Fri, 30 Oct 2026 03:50:47 GMT",
+    "cache-control": "public, max-age=120, s-maxage=120"
+  },
+  "bytes": 349855,
+  "sha256": "8e7ef662fc9191364af1253a8fb02b6941b2078747a00fa11298513f3e7dd116",
+  "elapsedMs": 4194,
+  "finishedAt": "2026-10-30T03:50:50.593Z"
+}

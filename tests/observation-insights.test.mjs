@@ -68,6 +68,13 @@ test('store alternatives use only catalog-valid recent available observations fr
   assert.equal(availableStoreChoices(snapshot, { ...catalog, productByPart: {} }, account, now).length, 0);
 });
 
+test('reference-only CTO observations never open same-SKU store choices', () => {
+  const cto = seed.products.find(item => item.targetType === 'apple_cto');
+  const ctoCatalog = { ...catalog, productByPart: { [cto.partNumber]: cto } };
+  const snapshot = { ...response(), product: cto };
+  assert.equal(availableStoreChoices(snapshot, ctoCatalog, account, now).length, 0);
+});
+
 test('store alternatives respect member expiry and configured family or SKU release restrictions', () => {
   for (const window of [{ familyKey: product.familyKey, releaseAt: iso(-86400000) }, { partNumbers: [product.partNumber], releaseAt: iso(-86400000) }]) {
     const restricted = { ...account, newProductWindows: [window] };

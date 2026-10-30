@@ -1,0 +1,626 @@
+{
+  "generatedAt": "2026-10-30T07:12:46.858Z",
+  "products": 397,
+  "mapped": 397,
+  "sources": [
+    {
+      "familyKey": "iphone-18-pro",
+      "sourceUrl": "https://www.apple.com.cn/shop/buy-iphone/iphone-18-pro",
+      "rawFile": "evidence/raw/2026-09-15/iphone-18-pro.html",
+      "sha256": "e60c82288a88a2040cd17d4111692ab5b952a6b30b060f3b0cc7fadf88eaab95",
+      "count": 32
+    },
+    {
+      "familyKey": "iphone-air",
+      "sourceUrl": "https://www.apple.com.cn/shop/buy-iphone/iphone-air",
+      "rawFile": "evidence/raw/2026-09-15/iphone-air.html",
+      "sha256": "bb330703f065dfda02e5a47b7e78bcaf76821bfd767910f642568f7756a04d66",
+      "count": 12
+    },
+    {
+      "familyKey": "iphone-17",
+      "sourceUrl": "https://www.apple.com.cn/shop/buy-iphone/iphone-17",
+      "rawFile": "evidence/raw/2026-09-15/iphone-17.html",
+      "sha256": "4b74c3d268cfaf6646f705255824e2c9acbea893689987bbc5e76ad02cd4b4f5",
+      "count": 10
+    },
+    {
+      "familyKey": "iphone-17e",
+      "sourceUrl": "https://www.apple.com.cn/shop/buy-iphone/iphone-17e",
+      "rawFile": "evidence/raw/2026-09-15/iphone-17e.html",
+      "sha256": "4cf8021ce092227592f98b7bb2b6421d08bd9b7e615e418d1c09c2d0e928e18a",
+      "count": 6
+    },
+    {
+      "familyKey": "iphone-16",
+      "sourceUrl": "https://www.apple.com.cn/shop/buy-iphone/iphone-16",
+      "rawFile": "evidence/raw/2026-09-15/iphone-16.html",
+      "sha256": "3ffc2f87afd37b1b6c24d48f160180510fab09d2984730b172726d43d8d72509",
+      "count": 5
+    },
+    {
+      "familyKey": "ipad-pro",
+      "sourceUrl": "https://www.apple.com.cn/shop/buy-ipad/ipad-pro",
+      "rawFile": "evidence/raw/2026-09-15/ipad-pro.html",
+      "sha256": "b01f4d197883167eeed4d7ddd917f04b8893bf9dec30adfb839b832b75061aef",
+      "count": 48
+    },
+    {
+      "familyKey": "ipad-air",
+      "sourceUrl": "https://www.apple.com.cn/shop/buy-ipad/ipad-air",
+      "rawFile": "evidence/raw/2026-09-15/ipad-air.html",
+      "sha256": "62d1b6d5af7e198cd7a3b322a3079277a60444ecd6603b3214314f22d6fa2f25",
+      "count": 64
+    },
+    {
+      "familyKey": "ipad",
+      "sourceUrl": "https://www.apple.com.cn/shop/buy-ipad/ipad",
+      "rawFile": "evidence/raw/2026-09-15/ipad.html",
+      "sha256": "b7c49b9fac107bf0bec4dc617369d1e089d0ac0f199f6322cd317aabbae0416e",
+      "count": 24
+    },
+    {
+      "familyKey": "ipad-10-2",
+      "sourceUrl": "https://www.apple.com.cn/shop/buy-ipad/ipad-10-2",
+      "rawFile": "evidence/raw/2026-09-15/ipad-10-2.html",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "count": 0
+    },
+    {
+      "familyKey": "ipad-mini",
+      "sourceUrl": "https://www.apple.com.cn/shop/buy-ipad/ipad-mini",
+      "rawFile": "evidence/raw/2026-10-27/ipad-mini.html",
+      "sha256": "504363ea393d77478d51e7ec19928e98b8da9c5a6a3eadd09b82bd39d6589a3a",
+      "count": 20
+    },
+    {
+      "familyKey": "macbook-air",
+      "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-air",
+      "rawFile": "evidence/raw/2026-09-15/macbook-air.html",
+      "sha256": "9a4cb66e908843e0d725d2cbc0ce04abd1f73d55718f9a2e90e94299e6a5183b",
+      "count": 30
+    },
+    {
+      "familyKey": "macbook-pro",
+      "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro",
+      "rawFile": "evidence/raw/2026-10-28/macbook-pro.html",
+      "sha256": "45a93ed245c73d7c91035611d07322f8723ec5172fe1cb793215735d88d7f60c",
+      "count": 24
+    },
+    {
+      "familyKey": "macbook-neo",
+      "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-neo",
+      "rawFile": "evidence/raw/2026-09-15/macbook-neo.html",
+      "sha256": "62aafb28e90add5b90af462396aeffee9923d47c26b0e1071c050f0c4ec5e0bc",
+      "count": 8
+    },
+    {
+      "familyKey": "imac",
+      "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/imac",
+      "rawFile": "evidence/raw/2026-10-28/imac.html",
+      "sha256": "c7acb995c50e7928795d09b44ad2053a61c45e305aba882a55d8b53853334684",
+      "count": 17
+    },
+    {
+      "familyKey": "mac-mini",
+      "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/mac-mini",
+      "rawFile": "evidence/raw/2026-09-15/mac-mini.html",
+      "sha256": "c5e6d25ce71664f7a22ae6723ddc4bcf082a7b260e4f880ed1f1c6f752574161",
+      "count": 6
+    },
+    {
+      "familyKey": "mac-studio",
+      "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/mac-studio",
+      "rawFile": "evidence/raw/2026-09-15/mac-studio.html",
+      "sha256": "d356408e33c666443d55922a8ff761d941154681fd34e95a56dd6e77655b5906",
+      "count": 45,
+      "configurationEvidence": "evidence/catalog/2026-10-30/mac-studio-configurations.json"
+    },
+    {
+      "familyKey": "airpods-pro-3",
+      "sourceUrl": "https://www.apple.com.cn/shop/buy-airpods/airpods-pro-3",
+      "rawFile": "evidence/raw/2026-09-15/airpods-pro-3.html",
+      "sha256": "b14f222cbc2af80a0fb1e99951582a3a91c73c238cf9447ec0e45c10044ac53c",
+      "count": 1
+    },
+    {
+      "familyKey": "airpods-5",
+      "sourceUrl": "https://www.apple.com.cn/shop/buy-airpods/airpods-5",
+      "rawFile": "evidence/raw/2026-09-15/airpods-5.html",
+      "sha256": "cdac29f2fbe8be8d305bc87ac01c6f32e837f7e38fcf1e1725710c7918f33144",
+      "count": 2
+    },
+    {
+      "familyKey": "airpods-max-2",
+      "sourceUrl": "https://www.apple.com.cn/shop/buy-airpods/airpods-max-2",
+      "rawFile": "evidence/raw/2026-09-15/airpods-max-2.html",
+      "sha256": "f4121f0e56668d115dadacd6e48f515457191b36e2367a5c100c0192ca5bdc76",
+      "count": 5
+    },
+    {
+      "familyKey": "apple-vision-pro",
+      "sourceUrl": "https://www.apple.com.cn/shop/buy-vision/apple-vision-pro",
+      "rawFile": "evidence/raw/2026-09-15/apple-vision-pro.html",
+      "sha256": "ed6c37c8b7daa468ede730d0151a8921988228de57ef12a7055662eee0d945ef",
+      "count": 3
+    },
+    {
+      "familyKey": "homepod",
+      "sourceUrl": "https://www.apple.com.cn/shop/buy-homepod/homepod",
+      "rawFile": "evidence/raw/2026-09-15/homepod.html",
+      "sha256": "a2f3929131f9f85c1187d08e64409f49d2745d1ccf78ba321cd79e66b5fc3465",
+      "count": 2
+    },
+    {
+      "familyKey": "homepod-mini",
+      "sourceUrl": "https://www.apple.com.cn/shop/buy-homepod/homepod-mini",
+      "rawFile": "evidence/raw/2026-09-15/homepod-mini.html",
+      "sha256": "334768716068931ec44df6e14e3d5bade5141ecbfe846f2b98263a9f1c979a5d",
+      "count": 5
+    },
+    {
+      "familyKey": "homepod-mini-2",
+      "sourceUrl": "https://www.apple.com.cn/shop/buy-homepod/homepod-mini",
+      "rawFile": "evidence/raw/2026-10-14/homepod-mini-2.html",
+      "sha256": "c97fac38786ed796089564d7ec2a789d38734e78394304afa280277817a2ce46",
+      "count": 5
+    },
+    {
+      "familyKey": "iphone-duo",
+      "sourceUrl": "https://www.apple.com.cn/shop/buy-iphone/iphone-duo",
+      "rawFile": "evidence/raw/2026-10-14/iphone-duo.html",
+      "sha256": "a041b5a0a21702bdedb6d24a939639802cca70351903b01e28d90f3657bcad78",
+      "count": 8
+    },
+    {
+      "familyKey": "macbook-pro-proled-xdr",
+      "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr",
+      "rawFile": "evidence/catalog/2026-10-30/proled-research/buy-page.html",
+      "sha256": "6cdc39629b21d96b942fd1b63b66fed10243e8d2eda1b3d3b1fd9f5e2e974bc3",
+      "count": 15,
+      "selectedConfigurations": [
+        {
+          "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/14-inch-silver-standard-display-apple-m5-max-chip-18-core-cpu-32-core-gpu-36gb-memory-2tb-storage",
+          "sha256": "8e7ef662fc9191364af1253a8fb02b6941b2078747a00fa11298513f3e7dd116",
+          "checkedAt": "2026-10-30T03:50:50.593Z",
+          "partNumber": "MJ2J4CH/A",
+          "rawFile": "evidence/catalog/2026-10-30/proled-research/14-inch-silver-standard-display-apple-m5-max-chip-18-core-cpu-32-core-gpu-36gb-memory-2tb-storage.html"
+        },
+        {
+          "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/16-inch-silver-standard-display-apple-m5-max-chip-18-core-cpu-32-core-gpu-36gb-memory-2tb-storage",
+          "sha256": "8ac4cc613cb5b0cd9a7eb497d94cfb7f46b14ef708f52a26529512b9d2065c33",
+          "checkedAt": "2026-10-30T03:50:56.094Z",
+          "partNumber": "MJ2X4CH/A",
+          "rawFile": "evidence/catalog/2026-10-30/proled-research/16-inch-silver-standard-display-apple-m5-max-chip-18-core-cpu-32-core-gpu-36gb-memory-2tb-storage.html"
+        },
+        {
+          "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/14-inch-space-black-standard-display-apple-m5-max-chip-18-core-cpu-32-core-gpu-36gb-memory-2tb-storage",
+          "sha256": "bfe51815339daa966f2b380d17abcd223ec33172a78a82f633b26c41c91df280",
+          "checkedAt": "2026-10-30T03:51:01.623Z",
+          "partNumber": "MJ2M4CH/A",
+          "rawFile": "evidence/catalog/2026-10-30/proled-research/14-inch-space-black-standard-display-apple-m5-max-chip-18-core-cpu-32-core-gpu-36gb-memory-2tb-storage.html"
+        },
+        {
+          "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/14-inch-silver-standard-display-apple-m5-pro-chip-15-core-cpu-16-core-gpu-24gb-memory-1tb-storage",
+          "sha256": "2df93ec976df46b4b1f27dc02db8c65981f281286681788b118879600c0bcade",
+          "checkedAt": "2026-10-30T03:51:07.502Z",
+          "partNumber": "MJ2G4CH/A",
+          "rawFile": "evidence/catalog/2026-10-30/proled-research/14-inch-silver-standard-display-apple-m5-pro-chip-15-core-cpu-16-core-gpu-24gb-memory-1tb-storage.html"
+        },
+        {
+          "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/16-inch-silver-standard-display-apple-m5-max-chip-18-core-cpu-40-core-gpu-48gb-memory-2tb-storage",
+          "sha256": "e546aa2081b11cac44208b5beb823f47127e330b264fe1dcbd04fecbb77485dc",
+          "checkedAt": "2026-10-30T03:51:11.717Z",
+          "partNumber": "MJ2Y4CH/A",
+          "rawFile": "evidence/catalog/2026-10-30/proled-research/16-inch-silver-standard-display-apple-m5-max-chip-18-core-cpu-40-core-gpu-48gb-memory-2tb-storage.html"
+        },
+        {
+          "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/16-inch-silver-standard-display-apple-m5-pro-chip-18-core-cpu-20-core-gpu-24gb-memory-1tb-storage",
+          "sha256": "a53329298e75548280988f671c34013f0707d09ead2b6605da4499f083824f07",
+          "checkedAt": "2026-10-30T03:51:17.761Z",
+          "partNumber": "MJ2W4CH/A",
+          "rawFile": "evidence/catalog/2026-10-30/proled-research/16-inch-silver-standard-display-apple-m5-pro-chip-18-core-cpu-20-core-gpu-24gb-memory-1tb-storage.html"
+        },
+        {
+          "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/16-inch-space-black-standard-display-apple-m5-pro-chip-18-core-cpu-20-core-gpu-24gb-memory-1tb-storage",
+          "sha256": "ac13dd8933a68b06d62302684c6bd6a97733f4bb72b9d657aaa2f7ef75761317",
+          "checkedAt": "2026-10-30T03:51:23.372Z",
+          "partNumber": "MJ304CH/A",
+          "rawFile": "evidence/catalog/2026-10-30/proled-research/16-inch-space-black-standard-display-apple-m5-pro-chip-18-core-cpu-20-core-gpu-24gb-memory-1tb-storage.html"
+        },
+        {
+          "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/14-inch-silver-standard-display-apple-m5-pro-chip-18-core-cpu-20-core-gpu-48gb-memory-1tb-storage",
+          "sha256": "6293496c60f87b19a0c1fc35e6c42e2300aaa4d32b00d813b3b7c46d338f1f2b",
+          "checkedAt": "2026-10-30T03:49:55.782Z",
+          "partNumber": "MMF54CH/A",
+          "rawFile": "evidence/catalog/2026-10-30/proled-research/14-inch-silver-standard-display-apple-m5-pro-chip-18-core-cpu-20-core-gpu-48gb-memory-1tb-storage.html"
+        },
+        {
+          "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/16-inch-space-black-standard-display-apple-m5-max-chip-18-core-cpu-32-core-gpu-36gb-memory-2tb-storage",
+          "sha256": "5b979da256329ed396d9027046018dd1605c4292321749bc7af49ccb8d06a9e2",
+          "checkedAt": "2026-10-30T03:51:27.557Z",
+          "partNumber": "MJ314CH/A",
+          "rawFile": "evidence/catalog/2026-10-30/proled-research/16-inch-space-black-standard-display-apple-m5-max-chip-18-core-cpu-32-core-gpu-36gb-memory-2tb-storage.html"
+        },
+        {
+          "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/14-inch-space-black-standard-display-apple-m5-pro-chip-18-core-cpu-20-core-gpu-48gb-memory-1tb-storage",
+          "sha256": "b9a99d38437d69c17169de1a59ef1ce917ff603df4c624f2282a6c9702891d6a",
+          "checkedAt": "2026-10-30T03:50:00.534Z",
+          "partNumber": "MMF64CH/A",
+          "rawFile": "evidence/catalog/2026-10-30/proled-research/14-inch-space-black-standard-display-apple-m5-pro-chip-18-core-cpu-20-core-gpu-48gb-memory-1tb-storage.html"
+        },
+        {
+          "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/14-inch-space-black-nano-texture-display-apple-m5-pro-chip-15-core-cpu-16-core-gpu-24gb-memory-1tb-storage",
+          "sha256": "6cfbb267d1629aff18aa6a98c3436b2a137728559ab6dc97cf5569078adac072",
+          "checkedAt": "2026-10-30T03:51:34.385Z",
+          "partNumber": "MJ9X4CH/A",
+          "rawFile": "evidence/catalog/2026-10-30/proled-research/14-inch-space-black-nano-texture-display-apple-m5-pro-chip-15-core-cpu-16-core-gpu-24gb-memory-1tb-storage.html"
+        },
+        {
+          "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/16-inch-silver-standard-display-apple-m5-pro-chip-18-core-cpu-20-core-gpu-48gb-memory-1tb-storage",
+          "sha256": "fbb3167fdc675dd632629c3920331b64e798cd443f26008073233bcd21728ab9",
+          "checkedAt": "2026-10-30T03:50:05.532Z",
+          "partNumber": "MMF94CH/A",
+          "rawFile": "evidence/catalog/2026-10-30/proled-research/16-inch-silver-standard-display-apple-m5-pro-chip-18-core-cpu-20-core-gpu-48gb-memory-1tb-storage.html"
+        },
+        {
+          "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/16-inch-space-black-standard-display-apple-m5-pro-chip-18-core-cpu-20-core-gpu-48gb-memory-1tb-storage",
+          "sha256": "9e2cc430b476b2ad7518e1058588dd3f9209bd8146a7cf9be389b4ffce055982",
+          "checkedAt": "2026-10-30T03:50:09.975Z",
+          "partNumber": "MMFA4CH/A",
+          "rawFile": "evidence/catalog/2026-10-30/proled-research/16-inch-space-black-standard-display-apple-m5-pro-chip-18-core-cpu-20-core-gpu-48gb-memory-1tb-storage.html"
+        },
+        {
+          "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/16-inch-space-black-standard-display-apple-m5-max-chip-18-core-cpu-40-core-gpu-48gb-memory-2tb-storage",
+          "sha256": "3998d26ad189ae075d9b152ac90b53d90e7713b583e5349a6e188da0bf6abd94",
+          "checkedAt": "2026-10-30T03:51:44.390Z",
+          "partNumber": "MJ334CH/A",
+          "rawFile": "evidence/catalog/2026-10-30/proled-research/16-inch-space-black-standard-display-apple-m5-max-chip-18-core-cpu-40-core-gpu-48gb-memory-2tb-storage.html"
+        },
+        {
+          "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/14-inch-space-black-standard-display-apple-m5-pro-chip-15-core-cpu-16-core-gpu-24gb-memory-1tb-storage",
+          "sha256": "928b7cc684562409e649c1a63a2b51d65199c0b76357f1acf9b395ce10d72b3d",
+          "checkedAt": "2026-10-30T03:51:48.808Z",
+          "partNumber": "MJ2K4CH/A",
+          "rawFile": "evidence/catalog/2026-10-30/proled-research/14-inch-space-black-standard-display-apple-m5-pro-chip-15-core-cpu-16-core-gpu-24gb-memory-1tb-storage.html"
+        }
+      ]
+    }
+  ],
+  "galleries": [
+    {
+      "identity": "/shop/buy-mac/macbook-air|{\"chassis-dimensionScreensize\":\"15inch\",\"chassis-dimensionColor\":\"midnight\"}",
+      "requestUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_air%2Fselect&dm.chassis-dimensionColor=midnight&dm.processor-cpuCoreCount-gpuCoreCount=10-10&dm.chassis-dimensionScreensize=15inch",
+      "cacheFile": "e45c220361dd2b2eb1b8bafa.json",
+      "httpStatus": 200,
+      "sha256": "6b814b0ad43ba0c11932e1f7f310f0db69823b5e960849da369126bec3f7cae8",
+      "fetchedAt": "2026-09-15T06:38:18.583Z",
+      "imageKey": "macbook-air-summary-select-202601-15inch-midnight",
+      "matched": true
+    },
+    {
+      "identity": "/shop/buy-mac/macbook-air|{\"chassis-dimensionScreensize\":\"15inch\",\"chassis-dimensionColor\":\"skyblue\"}",
+      "requestUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_air%2Fselect&dm.chassis-dimensionColor=skyblue&dm.processor-cpuCoreCount-gpuCoreCount=10-10&dm.chassis-dimensionScreensize=15inch",
+      "cacheFile": "a41f4b3c0143548da8df8ce9.json",
+      "httpStatus": 200,
+      "sha256": "91bde70fd1ad40d7c710e9d5d8f3f04d1adee281207c66d00e92d1d817d74242",
+      "fetchedAt": "2026-09-15T06:38:20.196Z",
+      "imageKey": "macbook-air-summary-select-202601-15inch-skyblue",
+      "matched": true
+    },
+    {
+      "identity": "/shop/buy-mac/macbook-air|{\"chassis-dimensionScreensize\":\"13inch\",\"chassis-dimensionColor\":\"skyblue\"}",
+      "requestUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_air%2Fselect&dm.chassis-dimensionColor=skyblue&dm.processor-cpuCoreCount-gpuCoreCount=10-8&dm.chassis-dimensionScreensize=13inch",
+      "cacheFile": "9204071bfe44ff904bfd047e.json",
+      "httpStatus": 200,
+      "sha256": "d8bcc6861e31db92a46c07eb1f2fc0de67606eed1c0380bd4cefed2e3420d6d5",
+      "fetchedAt": "2026-09-15T06:38:21.494Z",
+      "imageKey": "macbook-air-summary-select-202601-13inch-skyblue",
+      "matched": true
+    },
+    {
+      "identity": "/shop/buy-mac/macbook-air|{\"chassis-dimensionScreensize\":\"15inch\",\"chassis-dimensionColor\":\"starlight\"}",
+      "requestUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_air%2Fselect&dm.chassis-dimensionColor=starlight&dm.processor-cpuCoreCount-gpuCoreCount=10-10&dm.chassis-dimensionScreensize=15inch",
+      "cacheFile": "d87f3dbca318b3e682f29126.json",
+      "httpStatus": 200,
+      "sha256": "99f1e165925d30216d6902dca81a0a25bcb2da06bd1144dd1319803bc8e53088",
+      "fetchedAt": "2026-09-15T06:38:22.797Z",
+      "imageKey": "macbook-air-summary-select-202601-15inch-starlight",
+      "matched": true
+    },
+    {
+      "identity": "/shop/buy-mac/macbook-air|{\"chassis-dimensionScreensize\":\"13inch\",\"chassis-dimensionColor\":\"midnight\"}",
+      "requestUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_air%2Fselect&dm.chassis-dimensionColor=midnight&dm.processor-cpuCoreCount-gpuCoreCount=10-8&dm.chassis-dimensionScreensize=13inch",
+      "cacheFile": "56c436bf8f39be6d62bf1a62.json",
+      "httpStatus": 200,
+      "sha256": "31208b4d5f6f022e5d835d6750a7d827f29f47a3efacfc4765b4ed322ef81c9c",
+      "fetchedAt": "2026-09-15T06:38:25.230Z",
+      "imageKey": "macbook-air-summary-select-202601-13inch-midnight",
+      "matched": true
+    },
+    {
+      "identity": "/shop/buy-mac/macbook-air|{\"chassis-dimensionScreensize\":\"13inch\",\"chassis-dimensionColor\":\"silver\"}",
+      "requestUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_air%2Fselect&dm.chassis-dimensionColor=silver&dm.processor-cpuCoreCount-gpuCoreCount=10-8&dm.chassis-dimensionScreensize=13inch",
+      "cacheFile": "23a906eb0058c4b23a6367dd.json",
+      "httpStatus": 200,
+      "sha256": "7f4e9a116eac5292c6e078f430e61ecd18f6cf9c01f18b52634a3ac097dee1e7",
+      "fetchedAt": "2026-09-15T06:38:26.581Z",
+      "imageKey": "macbook-air-summary-select-202601-13inch-silver",
+      "matched": true
+    },
+    {
+      "identity": "/shop/buy-mac/macbook-air|{\"chassis-dimensionScreensize\":\"13inch\",\"chassis-dimensionColor\":\"starlight\"}",
+      "requestUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_air%2Fselect&dm.chassis-dimensionColor=starlight&dm.processor-cpuCoreCount-gpuCoreCount=10-8&dm.chassis-dimensionScreensize=13inch",
+      "cacheFile": "f0d31a39d3536f51940eb73b.json",
+      "httpStatus": 200,
+      "sha256": "53563ec1b9a236a9db45956bd08d26e5ffbafdfb4814d03be9c8f54372b6a79a",
+      "fetchedAt": "2026-09-15T06:38:27.941Z",
+      "imageKey": "macbook-air-summary-select-202601-13inch-starlight",
+      "matched": true
+    },
+    {
+      "identity": "/shop/buy-mac/macbook-air|{\"chassis-dimensionScreensize\":\"15inch\",\"chassis-dimensionColor\":\"silver\"}",
+      "requestUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_air%2Fselect&dm.chassis-dimensionColor=silver&dm.processor-cpuCoreCount-gpuCoreCount=10-10&dm.chassis-dimensionScreensize=15inch",
+      "cacheFile": "9173b9b6305c29675b9e9cc9.json",
+      "httpStatus": 200,
+      "sha256": "e18fff2939df9d266e7584cf65bde7e7371077727a9c865007870f5bf57dbee8",
+      "fetchedAt": "2026-09-15T06:38:30.560Z",
+      "imageKey": "macbook-air-summary-select-202601-15inch-silver",
+      "matched": true
+    },
+    {
+      "identity": "/shop/buy-mac/macbook-neo|{\"chassis-dimensionColor\":\"citrus\",\"storage-dimensionCapacity\":\"256gb\"}",
+      "requestUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_neo%2Fselect&dm.chassis-dimensionColor=citrus&dm.storage-dimensionCapacity=256gb",
+      "cacheFile": "87a8d3b42e5ea9cb9128f9d9.json",
+      "httpStatus": 200,
+      "sha256": "cd997a86b1e17c3b994dc053c535f5e26c1524ac12cb9e422579b6fceaa06880",
+      "fetchedAt": "2026-09-15T06:38:40.431Z",
+      "imageKey": "macbook-neo-summary-select-202603-citrus-256gb",
+      "matched": true
+    },
+    {
+      "identity": "/shop/buy-mac/macbook-neo|{\"chassis-dimensionColor\":\"silver\",\"storage-dimensionCapacity\":\"512gb\"}",
+      "requestUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_neo%2Fselect&dm.chassis-dimensionColor=silver&dm.storage-dimensionCapacity=512gb",
+      "cacheFile": "4eec5db51a5da0bac566cfe6.json",
+      "httpStatus": 200,
+      "sha256": "99455b7a18149d54fdceab2f1e72a27a5dba5abb730e0e2a530cee0d35b6c48e",
+      "fetchedAt": "2026-09-15T06:38:41.693Z",
+      "imageKey": "macbook-neo-summary-select-202603-silver-512gb",
+      "matched": true
+    },
+    {
+      "identity": "/shop/buy-mac/macbook-neo|{\"chassis-dimensionColor\":\"silver\",\"storage-dimensionCapacity\":\"256gb\"}",
+      "requestUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_neo%2Fselect&dm.chassis-dimensionColor=silver&dm.storage-dimensionCapacity=256gb",
+      "cacheFile": "5df8a9bd1014c2a122ec060f.json",
+      "httpStatus": 200,
+      "sha256": "3e720b4dbe68ae953efe67555e644ec67daf3dad5f8733b85b4859e83e1b7b1c",
+      "fetchedAt": "2026-09-15T06:38:42.953Z",
+      "imageKey": "macbook-neo-summary-select-202603-silver-256gb",
+      "matched": true
+    },
+    {
+      "identity": "/shop/buy-mac/macbook-neo|{\"chassis-dimensionColor\":\"indigo\",\"storage-dimensionCapacity\":\"256gb\"}",
+      "requestUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_neo%2Fselect&dm.chassis-dimensionColor=indigo&dm.storage-dimensionCapacity=256gb",
+      "cacheFile": "9f10c03c87eee5dda7d03926.json",
+      "httpStatus": 200,
+      "sha256": "1cc9ef5f33178e94a207c833ecc47e6b63793641ee00b415fbe43d80e27f2df7",
+      "fetchedAt": "2026-09-15T06:38:44.248Z",
+      "imageKey": "macbook-neo-summary-select-202603-indigo-256gb",
+      "matched": true
+    },
+    {
+      "identity": "/shop/buy-mac/macbook-neo|{\"chassis-dimensionColor\":\"blush\",\"storage-dimensionCapacity\":\"256gb\"}",
+      "requestUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_neo%2Fselect&dm.chassis-dimensionColor=blush&dm.storage-dimensionCapacity=256gb",
+      "cacheFile": "0422d5e82928b66fb93b42d0.json",
+      "httpStatus": 200,
+      "sha256": "ebfc7d1fba89bf3ce6a6f8140cd9f87de88cbf7c6bb1eccde06b5f5c79631e84",
+      "fetchedAt": "2026-09-15T06:38:45.522Z",
+      "imageKey": "macbook-neo-summary-select-202603-blush-256gb",
+      "matched": true
+    },
+    {
+      "identity": "/shop/buy-mac/macbook-neo|{\"chassis-dimensionColor\":\"citrus\",\"storage-dimensionCapacity\":\"512gb\"}",
+      "requestUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_neo%2Fselect&dm.chassis-dimensionColor=citrus&dm.storage-dimensionCapacity=512gb",
+      "cacheFile": "3f420a57fb6342389887c77f.json",
+      "httpStatus": 200,
+      "sha256": "72c09dfe2a4a6a8163577c49de652e63ca276d8a8df53d71a4f2272f1dae6981",
+      "fetchedAt": "2026-09-15T06:38:46.777Z",
+      "imageKey": "macbook-neo-summary-select-202603-citrus-512gb",
+      "matched": true
+    },
+    {
+      "identity": "/shop/buy-mac/macbook-neo|{\"chassis-dimensionColor\":\"blush\",\"storage-dimensionCapacity\":\"512gb\"}",
+      "requestUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_neo%2Fselect&dm.chassis-dimensionColor=blush&dm.storage-dimensionCapacity=512gb",
+      "cacheFile": "4b3a8b829d043f04c13aba77.json",
+      "httpStatus": 200,
+      "sha256": "55bd288fcd24ecbff6bd21cf535a4d9240507a351351bd8777d92dd63d0fc073",
+      "fetchedAt": "2026-09-15T06:38:48.052Z",
+      "imageKey": "macbook-neo-summary-select-202603-blush-512gb",
+      "matched": true
+    },
+    {
+      "identity": "/shop/buy-mac/macbook-neo|{\"chassis-dimensionColor\":\"indigo\",\"storage-dimensionCapacity\":\"512gb\"}",
+      "requestUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_neo%2Fselect&dm.chassis-dimensionColor=indigo&dm.storage-dimensionCapacity=512gb",
+      "cacheFile": "a7cb54f85bcdf5d5e10e5485.json",
+      "httpStatus": 200,
+      "sha256": "668a7fde3405c67ecb14a7fcc9447604656a2dc8dfdc20d95a6d09cef19c8407",
+      "fetchedAt": "2026-09-15T06:38:49.314Z",
+      "imageKey": "macbook-neo-summary-select-202603-indigo-512gb",
+      "matched": true
+    },
+    {
+      "identity": "/shop/buy-mac/macbook-pro|{\"chassis-dimensionScreensize\":\"14inch\",\"chassis-dimensionColor\":\"silver\"}",
+      "requestUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_pro%2Fselect&dm.chassis-dimensionColor=silver&dm.processor-dimensionChip=m6&dm.processor-dimensionChip-cpuCoreCount-gpuCoreCount=m6-12-12&dm.display-dimensionFinish=standard&dm.chassis-dimensionScreensize=14inch",
+      "cacheFile": "1285a3ef183cdee5e2bfe77a.json",
+      "httpStatus": 200,
+      "sha256": "3584acd6f87e4f31e59f5e019075582d45350d933910d7fc3f6c7a359f747409",
+      "fetchedAt": "2026-10-28T01:58:05.506Z",
+      "imageKey": "mac-macbook-pro-summary-select-202610-14inch-silver",
+      "matched": true
+    },
+    {
+      "identity": "/shop/buy-mac/macbook-pro|{\"chassis-dimensionScreensize\":\"16inch\",\"chassis-dimensionColor\":\"spaceblack\"}",
+      "requestUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_pro%2Fselect&dm.chassis-dimensionColor=spaceblack&dm.processor-dimensionChip=m5max&dm.processor-dimensionChip-cpuCoreCount-gpuCoreCount=m5max-18-40&dm.display-dimensionFinish=standard&dm.chassis-dimensionScreensize=16inch",
+      "cacheFile": "3aa79c61cfe66dc1c9f0ad06.json",
+      "httpStatus": 200,
+      "sha256": "4399467f7f83b446c9570c7c42558573692a4938ee4c8e2d42994a7ee6eae19d",
+      "fetchedAt": "2026-10-28T01:58:06.555Z",
+      "imageKey": "mac-macbook-pro-summary-select-202610-16inch-spaceblack",
+      "matched": true
+    },
+    {
+      "identity": "/shop/buy-mac/macbook-pro|{\"chassis-dimensionScreensize\":\"14inch\",\"chassis-dimensionColor\":\"spaceblack\"}",
+      "requestUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_pro%2Fselect&dm.chassis-dimensionColor=spaceblack&dm.processor-dimensionChip=m5pro&dm.processor-dimensionChip-cpuCoreCount-gpuCoreCount=m5pro-15-16&dm.display-dimensionFinish=standard&dm.chassis-dimensionScreensize=14inch",
+      "cacheFile": "3111de14751d58f4cd1501df.json",
+      "httpStatus": 200,
+      "sha256": "2e014cfc5ec40cb5cf81a52dc6fe1b7fb5d0d8a3060cd06f637b15e2eb830d65",
+      "fetchedAt": "2026-10-28T01:58:07.601Z",
+      "imageKey": "mac-macbook-pro-summary-select-202610-14inch-spaceblack",
+      "matched": true
+    },
+    {
+      "identity": "/shop/buy-mac/macbook-pro|{\"chassis-dimensionScreensize\":\"16inch\",\"chassis-dimensionColor\":\"silver\"}",
+      "requestUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_pro%2Fselect&dm.chassis-dimensionColor=silver&dm.processor-dimensionChip=m5max&dm.processor-dimensionChip-cpuCoreCount-gpuCoreCount=m5max-18-32&dm.display-dimensionFinish=standard&dm.chassis-dimensionScreensize=16inch",
+      "cacheFile": "846401136a1a4463b8e1676e.json",
+      "httpStatus": 200,
+      "sha256": "c6405fd387536084555a3612640f45d884974c1ce2463c868e7ea04e2c93a896",
+      "fetchedAt": "2026-10-28T01:58:08.642Z",
+      "imageKey": "mac-macbook-pro-summary-select-202610-16inch-silver",
+      "matched": true
+    },
+    {
+      "identity": "/shop/buy-mac/imac|{\"chassis-dimensionColor\":\"green\",\"chassis-dimensionStandType\":\"desktop\",\"processor-cpuCoreCount-gpuCoreCount\":\"10-10\"}",
+      "requestUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fimac%2Fselect&dm.chassis-dimensionColor=green&dm.processor-cpuCoreCount-gpuCoreCount=10-10&dm.chassis-dimensionStandType=desktop",
+      "cacheFile": "81b00b60b4f5083ea380fe81.json",
+      "httpStatus": 200,
+      "sha256": "00da31543ab8519ba7721f99f322074b4451003c2e7afebe27dcbbbd1b96360b",
+      "fetchedAt": "2026-10-28T01:58:18.525Z",
+      "imageKey": "imac-summary-select-202610-green-10-10-desktop",
+      "matched": true
+    },
+    {
+      "identity": "/shop/buy-mac/imac|{\"chassis-dimensionColor\":\"pink\",\"chassis-dimensionStandType\":\"desktop\",\"processor-cpuCoreCount-gpuCoreCount\":\"12-12\"}",
+      "requestUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fimac%2Fselect&dm.chassis-dimensionColor=pink&dm.processor-cpuCoreCount-gpuCoreCount=12-12&dm.chassis-dimensionStandType=desktop",
+      "cacheFile": "118f9ba3597a832b428a5255.json",
+      "httpStatus": 200,
+      "sha256": "f65043059c776fa7af144b505d0bc91302978da13b8e068e4524b1483da9193b",
+      "fetchedAt": "2026-10-28T01:58:19.571Z",
+      "imageKey": "imac-summary-select-202610-pink-12-12-desktop",
+      "matched": true
+    },
+    {
+      "identity": "/shop/buy-mac/imac|{\"chassis-dimensionColor\":\"blue\",\"chassis-dimensionStandType\":\"desktop\",\"processor-cpuCoreCount-gpuCoreCount\":\"12-12\"}",
+      "requestUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fimac%2Fselect&dm.chassis-dimensionColor=blue&dm.processor-cpuCoreCount-gpuCoreCount=12-12&dm.chassis-dimensionStandType=desktop",
+      "cacheFile": "b42970681aae99af2d12f507.json",
+      "httpStatus": 200,
+      "sha256": "48e093f4b1ed4f70d3f1949e0b63eb8fff0b5f0af729c89c4447d4cc4b0a24fb",
+      "fetchedAt": "2026-10-28T01:58:20.613Z",
+      "imageKey": "imac-summary-select-202610-blue-12-12-desktop",
+      "matched": true
+    },
+    {
+      "identity": "/shop/buy-mac/imac|{\"chassis-dimensionColor\":\"green\",\"chassis-dimensionStandType\":\"desktop\",\"processor-cpuCoreCount-gpuCoreCount\":\"12-12\"}",
+      "requestUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fimac%2Fselect&dm.chassis-dimensionColor=green&dm.processor-cpuCoreCount-gpuCoreCount=12-12&dm.chassis-dimensionStandType=desktop",
+      "cacheFile": "00defc9a303b8af93e5383a1.json",
+      "httpStatus": 200,
+      "sha256": "317d6c03223679744d4b11c6b39acf405f82ca99af430c5808f54cf1fd38da39",
+      "fetchedAt": "2026-10-28T01:58:21.698Z",
+      "imageKey": "imac-summary-select-202610-green-12-12-desktop",
+      "matched": true
+    },
+    {
+      "identity": "/shop/buy-mac/imac|{\"chassis-dimensionColor\":\"blue\",\"chassis-dimensionStandType\":\"desktop\",\"processor-cpuCoreCount-gpuCoreCount\":\"10-10\"}",
+      "requestUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fimac%2Fselect&dm.chassis-dimensionColor=blue&dm.processor-cpuCoreCount-gpuCoreCount=10-10&dm.chassis-dimensionStandType=desktop",
+      "cacheFile": "db31c85ae89a6c6dbf93511e.json",
+      "httpStatus": 200,
+      "sha256": "cb3c7da5da3d517f9b54000bd5ae6c206518a976207945c1b1d5248b94c1772e",
+      "fetchedAt": "2026-10-28T01:58:22.770Z",
+      "imageKey": "imac-summary-select-202610-blue-10-10-desktop",
+      "matched": true
+    },
+    {
+      "identity": "/shop/buy-mac/imac|{\"chassis-dimensionColor\":\"silver\",\"chassis-dimensionStandType\":\"desktop\",\"processor-cpuCoreCount-gpuCoreCount\":\"12-12\"}",
+      "requestUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fimac%2Fselect&dm.chassis-dimensionColor=silver&dm.processor-cpuCoreCount-gpuCoreCount=12-12&dm.chassis-dimensionStandType=desktop",
+      "cacheFile": "84530021361158e0f950ea89.json",
+      "httpStatus": 200,
+      "sha256": "5170e454a4b98525ada1bfdf99038a87881672575a29a9671814fe7ebc979032",
+      "fetchedAt": "2026-10-28T01:58:23.875Z",
+      "imageKey": "imac-summary-select-202610-silver-12-12-desktop",
+      "matched": true
+    },
+    {
+      "identity": "/shop/buy-mac/imac|{\"chassis-dimensionColor\":\"silver\",\"chassis-dimensionStandType\":\"desktop\",\"processor-cpuCoreCount-gpuCoreCount\":\"10-10\"}",
+      "requestUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fimac%2Fselect&dm.chassis-dimensionColor=silver&dm.processor-cpuCoreCount-gpuCoreCount=10-10&dm.chassis-dimensionStandType=desktop",
+      "cacheFile": "beeecccdf27c81125ff62b10.json",
+      "httpStatus": 200,
+      "sha256": "65612cf7d670ebe8755ff809f4f480e3288cbcc3ebb8125e7940ecf9c243ce39",
+      "fetchedAt": "2026-10-28T01:58:24.918Z",
+      "imageKey": "imac-summary-select-202610-silver-10-10-desktop",
+      "matched": true
+    },
+    {
+      "identity": "/shop/buy-mac/imac|{\"chassis-dimensionColor\":\"pink\",\"chassis-dimensionStandType\":\"desktop\",\"processor-cpuCoreCount-gpuCoreCount\":\"10-10\"}",
+      "requestUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fimac%2Fselect&dm.chassis-dimensionColor=pink&dm.processor-cpuCoreCount-gpuCoreCount=10-10&dm.chassis-dimensionStandType=desktop",
+      "cacheFile": "f2bc87ef0940801e490e039e.json",
+      "httpStatus": 200,
+      "sha256": "869852df3c8acd9719ac9e0a9b235fa50bb9ebd9b94001127cac11e44f457b9f",
+      "fetchedAt": "2026-10-28T01:58:25.978Z",
+      "imageKey": "imac-summary-select-202610-pink-10-10-desktop",
+      "matched": true
+    },
+    {
+      "identity": "/shop/buy-mac/macbook-pro-proled-xdr|{\"chassis-dimensionScreensize\":\"14inch\",\"chassis-dimensionColor\":\"silver\"}",
+      "requestUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_pro_proled_xdr%2Fselect&dm.chassis-dimensionScreensize=14inch&dm.chassis-dimensionColor=silver&dm.display-dimensionFinish=standard&dm.processor-dimensionChip=m5pro&dm.processor-dimensionChip-cpuCoreCount-gpuCoreCount=m5pro-18-20&dm.memory-dimensionMemory=48gb&dm.storage-dimensionCapacity=1tb",
+      "cacheFile": "34703144fef144bf52924c03.json",
+      "httpStatus": 200,
+      "sha256": "6d06052db76a7c0ea6ad9d160a42aa6c53696772d91cff2111b9657dc90c47a3",
+      "fetchedAt": "2026-10-30T03:53:36.590Z",
+      "imageKey": "mac-macbook-pro-proled-summary-select-2026010-14inch-silver",
+      "matched": true,
+      "cacheDirectory": "evidence/raw/2026-10-30/proled-image-galleries"
+    },
+    {
+      "identity": "/shop/buy-mac/macbook-pro-proled-xdr|{\"chassis-dimensionScreensize\":\"16inch\",\"chassis-dimensionColor\":\"silver\"}",
+      "requestUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_pro_proled_xdr%2Fselect&dm.chassis-dimensionScreensize=16inch&dm.chassis-dimensionColor=silver&dm.display-dimensionFinish=standard&dm.processor-dimensionChip=m5pro&dm.processor-dimensionChip-cpuCoreCount-gpuCoreCount=m5pro-18-20&dm.memory-dimensionMemory=48gb&dm.storage-dimensionCapacity=1tb",
+      "cacheFile": "52ecdb84882bacda4ff2f63d.json",
+      "httpStatus": 200,
+      "sha256": "4e6402fcbbf21783c6739c48edfb4979d013bd8dca975f4cb33d459dc9fdcfca",
+      "fetchedAt": "2026-10-30T03:53:39.192Z",
+      "imageKey": "mac-macbook-pro-proled-summary-select-2026010-16inch-silver",
+      "matched": true,
+      "cacheDirectory": "evidence/raw/2026-10-30/proled-image-galleries"
+    },
+    {
+      "identity": "/shop/buy-mac/macbook-pro-proled-xdr|{\"chassis-dimensionScreensize\":\"14inch\",\"chassis-dimensionColor\":\"spaceblack\"}",
+      "requestUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_pro_proled_xdr%2Fselect&dm.chassis-dimensionScreensize=14inch&dm.chassis-dimensionColor=spaceblack&dm.display-dimensionFinish=standard&dm.processor-dimensionChip=m5pro&dm.processor-dimensionChip-cpuCoreCount-gpuCoreCount=m5pro-15-16&dm.memory-dimensionMemory=24gb&dm.storage-dimensionCapacity=1tb",
+      "cacheFile": "82352f94519f631d8d6a6db4.json",
+      "httpStatus": 200,
+      "sha256": "2144e1dfde02d290c2972e1068ef60ae34621588b107fab6792eb651d009e079",
+      "fetchedAt": "2026-10-30T03:53:41.910Z",
+      "imageKey": "mac-macbook-pro-proled-summary-select-2026010-14inch-spaceblack",
+      "matched": true,
+      "cacheDirectory": "evidence/raw/2026-10-30/proled-image-galleries"
+    },
+    {
+      "identity": "/shop/buy-mac/macbook-pro-proled-xdr|{\"chassis-dimensionScreensize\":\"16inch\",\"chassis-dimensionColor\":\"spaceblack\"}",
+      "requestUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_pro_proled_xdr%2Fselect&dm.chassis-dimensionScreensize=16inch&dm.chassis-dimensionColor=spaceblack&dm.display-dimensionFinish=standard&dm.processor-dimensionChip=m5max&dm.processor-dimensionChip-cpuCoreCount-gpuCoreCount=m5max-18-40&dm.memory-dimensionMemory=48gb&dm.storage-dimensionCapacity=2tb",
+      "cacheFile": "edaf7184372330ca95570716.json",
+      "httpStatus": 200,
+      "sha256": "a33856b703bd638aa34c8e1854c1ba7cabdf2205b84a874860366252902d0d23",
+      "fetchedAt": "2026-10-30T03:53:44.561Z",
+      "imageKey": "mac-macbook-pro-proled-summary-select-2026010-16inch-spaceblack",
+      "matched": true,
+      "cacheDirectory": "evidence/raw/2026-10-30/proled-image-galleries"
+    }
+  ],
+  "sourceEvidenceCarriedFrom": "evidence/catalog/2026-10-28/images.manifest.json",
+  "verificationReport": "evidence/catalog/2026-10-30/images.verification.json",
+  "verification": {
+    "uniqueImages": 118,
+    "httpVerified": 118,
+    "decodeVerified": true,
+    "byteHashesRechecked": 118
+  },
+  "note": "Existing image source mappings are byte-for-byte unchanged from the prior catalog; their original capture timestamps and hashes are retained. All 118 current original image files have HTTP/decode evidence and their saved byte hashes were rechecked.",
+  "mappingNote": "Original URLs and encoded image bytes are unchanged. Exact Mac Studio configurations share the already verified Mac Studio appearance; SKU membership has been rebuilt and all original/rendition hashes rechecked."
+}

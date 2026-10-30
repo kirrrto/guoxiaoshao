@@ -1,0 +1,34 @@
+[
+  {
+    "familyKey": "macbook-pro-proled-xdr",
+    "source": "evidence/catalog/2026-10-30/proled-research/buy-page.html",
+    "sha256": "6cdc39629b21d96b942fd1b63b66fed10243e8d2eda1b3d3b1fd9f5e2e974bc3",
+    "anchors": [
+      "<a href=\"            https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/14-inch-silver-standard-display-apple-m5-max-chip-18-core-cpu-32-core-gpu-36gb-memory-2tb-storage\n\" \n   >",
+      "<a href=\"            https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/16-inch-silver-standard-display-apple-m5-max-chip-18-core-cpu-32-core-gpu-36gb-memory-2tb-storage\n\" \n   >",
+      "<a href=\"            https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/14-inch-space-black-standard-display-apple-m5-max-chip-18-core-cpu-32-core-gpu-36gb-memory-2tb-storage\n\" \n   >",
+      "<a href=\"            https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/14-inch-silver-standard-display-apple-m5-pro-chip-15-core-cpu-16-core-gpu-24gb-memory-1tb-storage\n\" \n   >",
+      "<a href=\"            https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/16-inch-silver-standard-display-apple-m5-max-chip-18-core-cpu-40-core-gpu-48gb-memory-2tb-storage\n\" \n   >",
+      "<a href=\"            https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/16-inch-silver-standard-display-apple-m5-pro-chip-18-core-cpu-20-core-gpu-24gb-memory-1tb-storage\n\" \n   >",
+      "<a href=\"            https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/16-inch-space-black-standard-display-apple-m5-pro-chip-18-core-cpu-20-core-gpu-24gb-memory-1tb-storage\n\" \n   >",
+      "<a href=\"            https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/14-inch-silver-standard-display-apple-m5-pro-chip-18-core-cpu-20-core-gpu-48gb-memory-1tb-storage\n\" \n   >",
+      "<a href=\"            https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/16-inch-space-black-standard-display-apple-m5-max-chip-18-core-cpu-32-core-gpu-36gb-memory-2tb-storage\n\" \n   >",
+      "<a href=\"            https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/14-inch-space-black-standard-display-apple-m5-pro-chip-18-core-cpu-20-core-gpu-48gb-memory-1tb-storage\n\" \n   >",
+      "<a href=\"            https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/14-inch-space-black-nano-texture-display-apple-m5-pro-chip-15-core-cpu-16-core-gpu-24gb-memory-1tb-storage\n\" \n   >",
+      "<a href=\"            https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/16-inch-silver-standard-display-apple-m5-pro-chip-18-core-cpu-20-core-gpu-48gb-memory-1tb-storage\n\" \n   >",
+      "<a href=\"            https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/16-inch-space-black-standard-display-apple-m5-pro-chip-18-core-cpu-20-core-gpu-48gb-memory-1tb-storage\n\" \n   >",
+      "<a href=\"            https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/16-inch-space-black-standard-display-apple-m5-max-chip-18-core-cpu-40-core-gpu-48gb-memory-2tb-storage\n\" \n   >",
+      "<a href=\"            https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/14-inch-space-black-standard-display-apple-m5-pro-chip-15-core-cpu-16-core-gpu-24gb-memory-1tb-storage\n\" \n   >"
+    ]
+  },
+  {
+    "familyKey": "mac-studio",
+    "source": "evidence/catalog/2026-10-30/mac-studio-research/buy-page.html",
+    "sha256": "c021edfc1c89176c5ca39293b0f0abd49a36074c439e822f74ab9fc42a603921",
+    "anchors": [
+      "<a href=\"            https://www.apple.com.cn/shop/buy-mac/mac-studio/m5-max-chip-18-core-cpu-40-core-gpu-64gb-memory-1tb-storage\n\" \n   >",
+      "<a href=\"            https://www.apple.com.cn/shop/buy-mac/mac-studio/m5-max-chip-18-core-cpu-32-core-gpu-36gb-memory-512gb-storage\n\" \n   >",
+      "<a href=\"            https://www.apple.com.cn/shop/buy-mac/mac-studio/m5-ultra-chip-30-core-cpu-64-core-gpu-96gb-memory-1tb-storage\n\" \n   >"
+    ]
+  }
+]

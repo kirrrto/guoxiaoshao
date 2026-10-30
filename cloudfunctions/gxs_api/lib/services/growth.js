@@ -4,6 +4,7 @@ const { ApiError } = require('../errors');
 const { COLLECTIONS: C } = require('../collections');
 const { startOfDay, dayKey, addDays } = require('../time');
 const { accountKey, runtimeFor, EVENTS, REASONS, ENTRY_POINTS, PLANS, EVENT_RETENTION_DAYS, INTENT_DETAIL_DAYS } = require('../growth-policy');
+const { isProductIdentity, canQueryProduct } = require('../rules/product-target');
 
 const REPORT_LIMIT = 2000;
 const DAY = 86400000;
@@ -29,12 +30,12 @@ async function ingest(ctx, payload) {
     let target = null;
     if (input.eventName === 'target_committed') {
       const value = input.target;
-      if (!value || typeof value.partNumber !== 'string' || !/^[A-Za-z0-9/]{1,32}$/.test(value.partNumber)
+      if (!value || !isProductIdentity(value.partNumber)
         || !Array.isArray(value.storeNumbers) || value.storeNumbers.length < 1 || value.storeNumbers.length > 5
         || value.storeNumbers.some(number => !/^R\d{1,6}$/.test(number))) continue;
       const stores = [...new Set(value.storeNumbers)].sort();
       const [product, knownStores] = await Promise.all([ctx.repo.getProduct(value.partNumber), ctx.repo.getStores(stores)]);
-      if (!product || !product.supported || product.comingSoon || knownStores.length !== stores.length) continue;
+      if (!canQueryProduct(product) || product.comingSoon || knownStores.length !== stores.length) continue;
       target = { partNumber: product.partNumber, storeNumbers: stores };
     }
     const id = createHash('sha256').update(`${key}\n${input.eventId}`).digest('hex');

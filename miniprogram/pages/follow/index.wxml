@@ -1,6 +1,24 @@
 <page-meta page-style="{{(editing || authorizationOpen) ? 'overflow:hidden;' : ''}}" />
 <view class="page tab-page follow-page">
   <view wx:if="{{networkOffline}}" class="network-notice" aria-role="status">网络已断开，恢复后自动刷新</view>
+  <view class="page-heading whistle-heading">
+    <view class="whistle-heading-copy"><view class="page-title">我的小哨</view></view>
+    <button class="btn btn-ghost btn-sm compact-action" loading="{{refreshing}}" disabled="{{refreshing || saving}}" bindtap="onRefreshStatus">{{refreshing ? '读取中' : '刷新状态'}}</button>
+  </view>
+  <view class="card deadline-home">
+    <view class="section-heading"><text class="section-title">到期提醒</text><text class="small text-2">{{deadlineServiceLabel}}</text></view>
+    <view wx:if="{{deadlinesError}}" class="deadline-home-error" aria-role="alert"><text>{{deadlinesError}}</text><button class="ui-action" disabled="{{deadlinesLoading}}" bindtap="onRetryDeadlines">重试</button></view>
+    <view wx:elif="{{deadlinesLoading && !deadlinesLoaded}}" class="small text-2" aria-busy="true">正在读取到期事项…</view>
+    <view wx:elif="{{!deadlineCount}}" class="deadline-home-empty">会员续费、优惠券、保修和活动截止，记在一起。</view>
+    <view wx:if="{{deadlineCanOpen && deadlineRecordOnly}}" class="small text-2">可记录到期日期，微信通知尚未开启。</view>
+    <view wx:if="{{nextDeadline && deadlineCanOpen}}" class="deadline-home-next"><text class="bold">下一次计划提醒</text><text>{{nextDeadline.remindText}} · {{nextDeadline.title}}</text></view>
+    <view wx:for="{{deadlines}}" wx:key="id" class="deadline-home-row">
+      <view class="deadline-home-item"><text class="deadline-home-title">{{item.title}}</text><text class="deadline-home-date">{{item.dueText}}</text></view>
+      <view class="deadline-home-delivery"><text class="deadline-home-state deadline-home-state--{{item.tone}}">{{item.statusLabel}}</text><text>{{item.statusNote}}</text></view>
+    </view>
+    <button wx:if="{{deadlineCanOpen}}" class="btn btn-primary btn-block deadline-home-action" disabled="{{deadlinesLoading}}" bindtap="onOpenDeadlines">{{deadlineCount ? '管理到期事项（' + deadlineCount + '）' : '添加到期事项'}}</button>
+  </view>
+  <view class="section-heading inventory-home-heading"><text class="section-title">苹果库存</text><button class="ui-action" bindtap="onOpenInventory">查询库存</button></view>
   <view wx:if="{{loadError}}" class="card load-error" aria-role="alert">
     <view class="load-error-title">暂时没有连上</view>
     <view class="load-error-detail">{{loadError}}</view>
@@ -8,7 +26,6 @@
   </view>
 
   <block wx:elif="{{!ready}}">
-    <view class="page-heading whistle-heading"><view class="whistle-mark"><image class="whistle-heading-image" src="/images/brand/whistle-green.png" mode="aspectFit" aria-hidden="true" /></view><view class="whistle-heading-copy"><view class="page-title">小哨</view></view></view>
     <view class="skeleton" aria-busy="true">
       <view class="skeleton-card"><view class="skeleton-line skeleton-title"></view><view class="skeleton-line"></view><view class="skeleton-line skeleton-short"></view><view class="skeleton-bar"></view></view>
       <view class="loading-line">正在读取你的关注…</view>
@@ -16,10 +33,7 @@
   </block>
 
   <block wx:else>
-    <view class="page-heading whistle-heading">
-      <view class="whistle-heading-copy"><view class="page-title">我的小哨</view></view>
-      <button class="btn btn-ghost btn-sm compact-action" loading="{{refreshing}}" disabled="{{refreshing || saving}}" bindtap="onRefreshStatus">{{refreshing ? '读取中' : '刷新状态'}}</button>
-    </view>
+    <view wx:if="{{recentStock}}" class="inventory-home-recent"><text class="bold">最近库存记录</text><text>{{recentStock.title}}</text><text>{{recentStock.detail}}</text></view>
     <view class="follow-sync-bar" aria-role="status"><view class="follow-sync-copy"><text class="follow-sync-dot follow-sync-dot--{{liveSync.state}}"></text><text>{{liveSync.state === 'syncing' ? '正在更新页面' : liveSync.state === 'offline' ? '网络已断开' : liveSync.state === 'retrying' ? '连接暂时中断，稍后重试' : '页面自动更新'}}</text></view><view class="follow-sync-times"><text wx:if="{{liveSync.lastReadText}}" class="follow-sync-time">{{liveSync.lastReadText}}读取</text><text wx:if="{{liveSync.nextReadText}}" class="follow-sync-time">下次读取 {{liveSync.nextReadText}}</text></view></view>
     <view wx:if="{{stockOverview}}" class="follow-inventory-status"><text class="bold">{{stockOverview.label}}</text><text>{{stockOverview.detail}}</text></view>
     <view wx:if="{{refreshError}}" class="banner banner-warn" aria-role="alert">{{refreshError}}</view>

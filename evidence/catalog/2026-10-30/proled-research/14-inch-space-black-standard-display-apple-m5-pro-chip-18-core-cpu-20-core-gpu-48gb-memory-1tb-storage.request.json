@@ -1,0 +1,16 @@
+{
+  "requestUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/14-inch-space-black-standard-display-apple-m5-pro-chip-18-core-cpu-20-core-gpu-48gb-memory-1tb-storage",
+  "method": "GET",
+  "startedAt": "2026-10-30T03:49:57.811Z",
+  "retries": 0,
+  "httpStatus": 200,
+  "headers": {
+    "content-type": "text/html;charset=utf-8",
+    "date": "Fri, 30 Oct 2026 03:49:57 GMT",
+    "cache-control": "public, max-age=120, s-maxage=120"
+  },
+  "bytes": 349938,
+  "sha256": "b9a99d38437d69c17169de1a59ef1ce917ff603df4c624f2282a6c9702891d6a",
+  "elapsedMs": 2723,
+  "finishedAt": "2026-10-30T03:50:00.534Z"
+}

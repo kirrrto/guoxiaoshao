@@ -17,6 +17,7 @@ const { createCheckoutContext } = require('../../utils/checkout-context');
 const { activationStatus } = require('../../utils/activation-status');
 const { targetSignature } = require('../../utils/result-next-action');
 const conversion = require('../../utils/conversion-events');
+const { presentDeadline, deadlineError } = require('../../utils/deadlines');
 
 const FOLLOW_STATUS = {
   active: { label: '关注已开启', cls: 'ok' },
@@ -235,6 +236,16 @@ function confirmsSavedFollow(follow, payload) {
 Page({
   ...reminderPanelMethods,
   data: {
+    deadlines: [],
+    deadlineCount: 0,
+    deadlinesLoaded: false,
+    deadlinesLoading: false,
+    deadlinesError: '',
+    deadlineCanOpen: false,
+    deadlineServiceLabel: '读取中',
+    deadlineRecordOnly: false,
+    nextDeadline: null,
+    recentStock: null,
     networkOffline: false,
     ready: false,
     loadError: null,
@@ -279,6 +290,7 @@ Page({
 
   async onLoad(options) {
     if (this.pageRetired) return;
+    this.loadDeadlines();
     if (options && options.eid) getApp().captureAlert({ query: { eid: options.eid } });
     if (this.loadingBoot) return;
     this.loadStarted = true;
@@ -314,6 +326,9 @@ Page({
     if (this.pageRetired) return;
     syncTabBar(this, '/pages/follow/index');
     this.visible = true;
+    // Date reminders refresh once per visit, independently of the Apple poll.
+    if (this.deadlinesShown) this.loadDeadlines();
+    this.deadlinesShown = true;
     this.alertAccountUnconfirmed = true;
     this.watchLiveNetwork();
     this.syncAuthorizationOverlay();
@@ -339,6 +354,7 @@ Page({
   },
 
   onHide() {
+    this.retireDeadlineRead();
     releaseTabBar(this);
     this.nativePromptHiddenAt = getAuthorizationState().nativeBusy ? Date.now() : 0;
     this.visible = false; this.hideAuthorizationOverlay();
@@ -347,6 +363,7 @@ Page({
     this.setLiveSync('paused', '页面返回后会立即更新后台记录。');
   },
   onUnload() {
+    this.retireDeadlineRead();
     releaseTabBar(this);
     this.disposeAuthorizationPanel(); this.pageRetired = true; this.visible = false;
     this.serviceDetailsFocusEpoch = (this.serviceDetailsFocusEpoch || 0) + 1;
@@ -655,6 +672,15 @@ Page({
 
   applyBoot(boot, pageData = {}) {
     if (this.pageRetired) return;
+    let reloadDeadlines = false;
+    const hadDeadlineRead = Boolean(this.loadStarted || this.deadlineUserKey || this.deadlineReadPromise);
+    if (this.deadlineUserKey && boot.identity && this.deadlineUserKey !== boot.identity.userKey) {
+      this.retireDeadlineRead();
+      this.deadlineUserKey = null;
+      this.setData({ deadlines: [], deadlineCount: 0, deadlinesLoaded: false, deadlinesError: '', nextDeadline: null,
+        deadlineCanOpen: false, deadlineServiceLabel: '读取中', deadlineRecordOnly: false });
+      reloadDeadlines = hadDeadlineRead;
+    }
     const previousIdentity = this.accountSnapshot && this.accountSnapshot.identity;
     let restartAfterAccountChange = false;
     if (previousIdentity && boot.identity && previousIdentity.userKey !== boot.identity.userKey) {
@@ -663,6 +689,11 @@ Page({
         restartAfterAccountChange = true;
       }
       this.accountEpoch = (this.accountEpoch || 0) + 1;
+      this.retireDeadlineRead();
+      this.deadlineUserKey = null;
+      this.setData({ deadlines: [], deadlineCount: 0, deadlinesLoaded: false, deadlinesError: '', nextDeadline: null,
+        deadlineCanOpen: false, deadlineServiceLabel: '读取中', deadlineRecordOnly: false });
+      reloadDeadlines = hadDeadlineRead;
       this.statusRefreshEpoch = (this.statusRefreshEpoch || 0) + 1;
       this.editorEpoch = (this.editorEpoch || 0) + 1;
       // Inventory event IDs are shared across accounts. Retire every alert
@@ -678,6 +709,7 @@ Page({
       this.setData({ follows: [], followsLoaded: false, editing: false, saving: false, activation: null, authorizationOpen: false, authorizationFeedback: '', refreshing: false, refreshFeedback: '', refreshError: null, alert: null, alertBusy: false });
     }
     this.accountSnapshot = boot;
+    if (reloadDeadlines) this.loadDeadlines();
     this.features = boot.features || {};
     const notifications = boot.notifications || {};
     const subscription = restockSubscription(notifications, boot.subscriptions);
@@ -766,7 +798,14 @@ Page({
     const awaiting = monitored.filter(store => store.observationState === 'missing').length;
     const stockOverview = delayed ? { label: '库存更新有延迟', tone: 'warn', detail: `${delayed} 项门店结果待更新，已保留上次结果。` }
       : awaiting ? { label: '等待首次检查', tone: 'muted', detail: '关注已保存，无需重复添加。' } : null;
-    this.setData({ readiness, stockOverview, readinessTaskDetail: readinessTaskDetail(readiness), creditBoostTip: tip,
+    const recent = this.data.follows.filter(follow => !follow.latestRestricted && !follow.productRetired && !follow.limitPaused)
+      .flatMap(follow => (follow.stores || []).filter(store => !store.limitPaused && store.observationState === 'fresh'
+        && ['available', 'unavailable'].includes(store.status) && Number.isFinite(Date.parse(store.statusSince))
+        && Date.parse(store.statusSince) <= Date.parse(store.observedAt)).map(store => ({ follow, store })))
+      .sort((a, b) => Date.parse(b.store.statusSince) - Date.parse(a.store.statusSince))[0];
+    const recentStock = recent ? { title: recent.follow.productTitle,
+      detail: `${storeLabel(recent.store.storeNumber, recent.store.storeName)} · ${fmt.fmtDateTime(recent.store.statusSince)} 起记录为${recent.store.status === 'available' ? '可取货' : '不可取货'}` } : null;
+    this.setData({ readiness, stockOverview, recentStock, readinessTaskDetail: readinessTaskDetail(readiness), creditBoostTip: tip,
       primaryTopUp: !(readiness.ready && Number(this.data.subscription.credits) > 3) });
     this.refreshActivation();
   },
@@ -844,7 +883,7 @@ Page({
     const current = () => !this.pageRetired && epoch === this.statusRefreshEpoch;
     this.setData({ refreshing: true, refreshFeedback: '正在读取后台检测与提醒状态…', refreshError: null });
     try {
-      const result = await this.refreshLiveStatus();
+      const [result] = await Promise.all([this.refreshLiveStatus(), this.loadDeadlines()]);
       if (!current()) return;
       this.setData({ refreshFeedback: result.ok
         ? '状态已刷新，库存时间见各配置；查最新库存请使用卡片按钮。'
@@ -1163,4 +1202,67 @@ Page({
     this.setData({ loadError: null });
     return this.onLoad();
   },
+
+  retireDeadlineRead() {
+    this.deadlineReadEpoch = (this.deadlineReadEpoch || 0) + 1;
+    this.deadlineReadPromise = null;
+    if (this.data.deadlinesLoading) this.setData({ deadlinesLoading: false });
+  },
+
+  loadDeadlines() {
+    if (this.pageRetired || this.visible === false) return Promise.resolve(false);
+    if (this.deadlineReadPromise) return this.deadlineReadPromise;
+    const epoch = this.deadlineReadEpoch || 0;
+    const identity = () => {
+      const boot = getApp().globalData.bootstrap || this.accountSnapshot;
+      return boot && boot.identity && boot.identity.userKey || '';
+    };
+    const userKey = identity();
+    const current = () => !this.pageRetired && this.visible !== false && epoch === (this.deadlineReadEpoch || 0)
+      && (!userKey || !identity() || userKey === identity());
+    if (this.deadlineUserKey && userKey && this.deadlineUserKey !== userKey) {
+      this.setData({ deadlines: [], deadlineCount: 0, deadlinesLoaded: false, nextDeadline: null,
+        deadlineCanOpen: false, deadlineRecordOnly: false });
+    }
+    this.setData({ deadlinesLoading: true, deadlinesError: '', deadlineCanOpen: false, deadlineServiceLabel: '读取中' });
+    const pending = call('deadline.list').then(result => {
+      if (!current()) return false;
+      if (!result || !Array.isArray(result.items) || !result.userKey) throw Error('到期提醒暂未读取成功，请重试。');
+      if (identity() && result.userKey !== identity()) {
+        this.deadlineUserKey = null;
+        this.setData({ deadlines: [], deadlineCount: 0, deadlinesLoaded: false, nextDeadline: null,
+          deadlinesError: '账户已变化，请刷新状态后重新读取到期事项。', deadlineServiceLabel: '暂不可用' });
+        return false;
+      }
+      this.deadlineUserKey = result.userKey;
+      const items = result.items.map(item => presentDeadline(item));
+      const notificationsEnabled = Boolean(result.capability && result.capability.enabled);
+      const planned = items.filter(item => notificationsEnabled && item.delivery && item.delivery.status === 'scheduled' && Date.parse(item.remindAt) > Date.now())
+        .sort((a, b) => Date.parse(a.remindAt) - Date.parse(b.remindAt));
+      const upcoming = items.filter(item => !['accepted', 'missed'].includes(item.delivery && item.delivery.status))
+        .sort((a, b) => Date.parse(a.remindAt) - Date.parse(b.remindAt));
+      this.setData({ deadlines: (upcoming.length ? upcoming : items).slice(0, 3), deadlineCount: items.length,
+        deadlinesLoaded: true, deadlinesError: '', nextDeadline: planned[0] || null,
+        deadlineCanOpen: true, deadlineRecordOnly: !notificationsEnabled,
+        deadlineServiceLabel: notificationsEnabled ? '免费试用' : '仅保存事项' });
+      return true;
+    }).catch(error => {
+      if (current()) this.setData({ deadlinesError: deadlineError(error), deadlineCanOpen: false, deadlineServiceLabel: '暂不可用', nextDeadline: null });
+      return false;
+    }).finally(() => {
+      if (this.deadlineReadPromise === pending) {
+        this.deadlineReadPromise = null;
+        if (!this.pageRetired && this.visible !== false) this.setData({ deadlinesLoading: false });
+      }
+    });
+    this.deadlineReadPromise = pending;
+    return pending;
+  },
+
+  onOpenDeadlines() {
+    if (!this.data.deadlineCanOpen || this.data.deadlinesLoading || this.data.deadlinesError) return;
+    navigation.navigateTo({ url: '/pages/deadlines/index' });
+  },
+  onRetryDeadlines() { return this.loadDeadlines(); },
+  onOpenInventory() { switchToTab({ url: '/pages/query/index' }); },
 });

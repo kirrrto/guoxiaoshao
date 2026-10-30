@@ -22,6 +22,7 @@ const { upstreamGuardMethods, reserveAccountQuery, releaseAccountQuery } = requi
 const { queryTargetMethods } = require('./query-target');
 const { notificationTestMethods } = require('./notification-test');
 const { memberRecordMethods } = require('./member-records');
+const { deadlineMethods } = require('./deadline');
 const { growthMethods } = require('./growth');
 const subscriptionCredits = require('./subscription-credit-ledger');
 const { matchesNotificationTarget, nextFollowUpdatedAt } = require('../notification-target');
@@ -110,6 +111,7 @@ async function refundMembershipIn(tx, { orderId, nowIso, refundFen, providerData
 
 function atomicMethods(run, { readUpstreamBreaker } = {}) {
   return {
+    ...deadlineMethods(run),
     ensureMemberPlanMetadata: ({ userKey }) => run(async tx => {
       const user = await tx.get(C.users, userKey);
       if (user && await hydrateMemberPlansIn(tx, user)) await tx.put(C.users, user);

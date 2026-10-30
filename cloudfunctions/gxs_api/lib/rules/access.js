@@ -2,6 +2,7 @@
 const { isMember } = require('./membership');
 const { isLiveRestricted, isHistoryRestricted } = require('./new-product');
 const { resolveConfig, canAfford } = require('./quota');
+const { canQueryProduct } = require('./product-target');
 
 /**
  * Decide whether a live query may run and what it costs.
@@ -11,7 +12,7 @@ const { resolveConfig, canAfford } = require('./quota');
 function decideLiveQuery({ user, product, now, config }) {
   const cfg = resolveConfig(config && config.quota);
   if (!product) return { allowed: false, reason: 'unknown_product', cost: 0, member: false };
-  if (product.supported === false) return { allowed: false, reason: 'unsupported_product', cost: 0, member: false };
+  if (!canQueryProduct(product)) return { allowed: false, reason: 'unsupported_product', cost: 0, member: false };
   if (isMember(user, now)) return { allowed: true, reason: null, cost: 0, member: true };
   const restriction = isLiveRestricted(product, config && config.newProductWindows, now);
   if (restriction.restricted) {

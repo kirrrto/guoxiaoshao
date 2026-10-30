@@ -1,0 +1,993 @@
+{
+  "checkedAt": "2026-10-30T03:53:34.376Z",
+  "proled": {
+    "products": [
+      {
+        "partNumber": "MJ2J4CH/A",
+        "basePartNumber": "MJ2J4",
+        "category": "mac",
+        "familyKey": "macbook-pro-proled-xdr",
+        "familySlug": "macbook-pro-proled-xdr",
+        "model": "MacBook Pro (PROLED XDR 显示屏) 14 英寸",
+        "title": "MacBook Pro (PROLED XDR 显示屏) 14 英寸 M5 Max 18核CPU/32核GPU 36GB 2TB 标准玻璃 银色",
+        "titleSource": "selected_page_metrics_and_labels",
+        "englishName": "14-inch MacBook Pro with PROLED XDR Display - Silver",
+        "attributes": {
+          "screensize": "14 英寸",
+          "color": "银色",
+          "finish": "标准玻璃",
+          "chipName": "M5 Max",
+          "chip": "18核CPU/32核GPU",
+          "memory": "36GB",
+          "capacity": "2TB"
+        },
+        "dimensionValues": {
+          "chassis-dimensionScreensize": "14inch",
+          "chassis-dimensionColor": "silver",
+          "display-dimensionFinish": "standard",
+          "processor-dimensionChip": "m5max",
+          "processor-dimensionChip-cpuCoreCount-gpuCoreCount": "m5max-18-32",
+          "memory-dimensionMemory": "36gb",
+          "storage-dimensionCapacity": "2tb"
+        },
+        "priceCny": 36999,
+        "comingSoon": true,
+        "isCarrierDevice": false,
+        "upstreamContainer": "RO_MBP_OLED_M5_14INCH_SILVER_BET_ULT_2026",
+        "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/14-inch-silver-standard-display-apple-m5-max-chip-18-core-cpu-32-core-gpu-36gb-memory-2tb-storage",
+        "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-proled-summary-select-2026010-14inch-silver?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0L3EyS05IQ016T1FsVnB6OWhoM1hxNEk2ZGY4RUh6RDZiVERJYmJiZFFwUGdTdWhIbFJZa3pWS1JQUTZ3cHN3ZlNtTkdpWmFLNDhUNytnaWxtRDBHaEcyTE1mSHgwMHh1SlVoUDJNTksyTUZaelU0K0hWNDFNVnpTWUYxODRJTjJB&traceId=1",
+        "imageAlt": "配备 PROLED XDR 显示屏的银色 14 英寸 MacBook Pro，呈打开状态，内部视图，展示细窄的黑色显示屏边框、灵动岛、圆角设计和凸出的垫脚。银色，呈闭合状态，左侧外观，展示纤薄机身外形、MagSafe 3 端口、两个雷雳 5 端口以及耳机插孔。银色，呈闭合状态，右侧外观，展示纤薄机身外形、SDXC 卡插槽、雷雳 5 端口和 HDMI 端口。银色，顶面俯视外观，展示圆角设计以及机身中央的黑色亮面 Apple 标志。",
+        "imageWidth": 5120,
+        "imageHeight": 3280,
+        "imageKey": "mac-macbook-pro-proled-summary-select-2026010-14inch-silver",
+        "imageSource": "apple-gallery",
+        "imageSourceUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_pro_proled_xdr%2Fselect&dm.chassis-dimensionScreensize=14inch&dm.chassis-dimensionColor=silver&dm.display-dimensionFinish=standard&dm.processor-dimensionChip=m5pro&dm.processor-dimensionChip-cpuCoreCount-gpuCoreCount=m5pro-18-20&dm.memory-dimensionMemory=48gb&dm.storage-dimensionCapacity=1tb",
+        "imageOriginalUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-proled-summary-select-2026010-14inch-silver?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0L3EyS05IQ016T1FsVnB6OWhoM1hxNEk2ZGY4RUh6RDZiVERJYmJiZFFwUGdTdWhIbFJZa3pWS1JQUTZ3cHN3ZlNtTkdpWmFLNDhUNytnaWxtRDBHaEcyTE1mSHgwMHh1SlVoUDJNTksyTUZaelU0K0hWNDFNVnpTWUYxODRJTjJB&traceId=1",
+        "imageMatchDimensions": {
+          "chassis-dimensionScreensize": "14inch",
+          "chassis-dimensionColor": "silver"
+        }
+      },
+      {
+        "partNumber": "MJ2X4CH/A",
+        "basePartNumber": "MJ2X4",
+        "category": "mac",
+        "familyKey": "macbook-pro-proled-xdr",
+        "familySlug": "macbook-pro-proled-xdr",
+        "model": "MacBook Pro (PROLED XDR 显示屏) 16 英寸",
+        "title": "MacBook Pro (PROLED XDR 显示屏) 16 英寸 M5 Max 18核CPU/32核GPU 36GB 2TB 标准玻璃 银色",
+        "titleSource": "selected_page_metrics_and_labels",
+        "englishName": "16-inch MacBook Pro with PROLED XDR Display - Silver",
+        "attributes": {
+          "screensize": "16 英寸",
+          "color": "银色",
+          "finish": "标准玻璃",
+          "chipName": "M5 Max",
+          "chip": "18核CPU/32核GPU",
+          "memory": "36GB",
+          "capacity": "2TB"
+        },
+        "dimensionValues": {
+          "chassis-dimensionScreensize": "16inch",
+          "chassis-dimensionColor": "silver",
+          "display-dimensionFinish": "standard",
+          "processor-dimensionChip": "m5max",
+          "processor-dimensionChip-cpuCoreCount-gpuCoreCount": "m5max-18-32",
+          "memory-dimensionMemory": "36gb",
+          "storage-dimensionCapacity": "2tb"
+        },
+        "priceCny": 38999,
+        "comingSoon": true,
+        "isCarrierDevice": false,
+        "upstreamContainer": "RO_MBP_OLED_M5_16INCH_SILVER_BET_ULT_SUP_2026",
+        "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/16-inch-silver-standard-display-apple-m5-max-chip-18-core-cpu-32-core-gpu-36gb-memory-2tb-storage",
+        "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-proled-summary-select-2026010-16inch-silver?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0L3EyS05IQ016T1FsVnB6OWhoM1hxN1VpRURCbi8vL0U0UmFSMWFBTDEwbGdTdWhIbFJZa3pWS1JQUTZ3cHN3ZlNtTkdpWmFLNDhUNytnaWxtRDBHaEcyTE1mSHgwMHh1SlVoUDJNTksyTUZ4MDBLWFl1akxaVlQxSTNLdWUyeDNR&traceId=1",
+        "imageAlt": "配备 PROLED XDR 显示屏的银色 16 英寸 MacBook Pro，呈打开状态，内部视图，展示细窄的黑色显示屏边框、灵动岛、圆角设计和凸出的垫脚。银色，呈闭合状态，左侧外观，展示纤薄机身外形、MagSafe 3 端口、两个雷雳 5 端口以及耳机插孔。银色，呈闭合状态，右侧外观，展示纤薄机身外形、SDXC 卡插槽、雷雳 5 端口和 HDMI 端口。银色，顶面俯视外观，展示圆角设计以及机身中央的黑色亮面 Apple 标志。",
+        "imageWidth": 5120,
+        "imageHeight": 3280,
+        "imageKey": "mac-macbook-pro-proled-summary-select-2026010-16inch-silver",
+        "imageSource": "apple-gallery",
+        "imageSourceUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_pro_proled_xdr%2Fselect&dm.chassis-dimensionScreensize=16inch&dm.chassis-dimensionColor=silver&dm.display-dimensionFinish=standard&dm.processor-dimensionChip=m5pro&dm.processor-dimensionChip-cpuCoreCount-gpuCoreCount=m5pro-18-20&dm.memory-dimensionMemory=48gb&dm.storage-dimensionCapacity=1tb",
+        "imageOriginalUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-proled-summary-select-2026010-16inch-silver?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0L3EyS05IQ016T1FsVnB6OWhoM1hxN1VpRURCbi8vL0U0UmFSMWFBTDEwbGdTdWhIbFJZa3pWS1JQUTZ3cHN3ZlNtTkdpWmFLNDhUNytnaWxtRDBHaEcyTE1mSHgwMHh1SlVoUDJNTksyTUZ4MDBLWFl1akxaVlQxSTNLdWUyeDNR&traceId=1",
+        "imageMatchDimensions": {
+          "chassis-dimensionScreensize": "16inch",
+          "chassis-dimensionColor": "silver"
+        },
+        "upstreamTitle": "16 英寸 MacBook Pro (PROLED XDR 显示屏) - 银色",
+        "upstreamTitleCheckedAt": "2026-10-30T03:47:21.574Z"
+      },
+      {
+        "partNumber": "MJ2M4CH/A",
+        "basePartNumber": "MJ2M4",
+        "category": "mac",
+        "familyKey": "macbook-pro-proled-xdr",
+        "familySlug": "macbook-pro-proled-xdr",
+        "model": "MacBook Pro (PROLED XDR 显示屏) 14 英寸",
+        "title": "MacBook Pro (PROLED XDR 显示屏) 14 英寸 M5 Max 18核CPU/32核GPU 36GB 2TB 标准玻璃 深空黑色",
+        "titleSource": "selected_page_metrics_and_labels",
+        "englishName": "14-inch MacBook Pro with PROLED XDR Display - Space Black",
+        "attributes": {
+          "screensize": "14 英寸",
+          "color": "深空黑色",
+          "finish": "标准玻璃",
+          "chipName": "M5 Max",
+          "chip": "18核CPU/32核GPU",
+          "memory": "36GB",
+          "capacity": "2TB"
+        },
+        "dimensionValues": {
+          "chassis-dimensionScreensize": "14inch",
+          "chassis-dimensionColor": "spaceblack",
+          "display-dimensionFinish": "standard",
+          "processor-dimensionChip": "m5max",
+          "processor-dimensionChip-cpuCoreCount-gpuCoreCount": "m5max-18-32",
+          "memory-dimensionMemory": "36gb",
+          "storage-dimensionCapacity": "2tb"
+        },
+        "priceCny": 36999,
+        "comingSoon": true,
+        "isCarrierDevice": false,
+        "upstreamContainer": "RO_MBP_OLED_M5_14INCH_SPACEBLACK_BET_ULT_2026",
+        "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/14-inch-space-black-standard-display-apple-m5-max-chip-18-core-cpu-32-core-gpu-36gb-memory-2tb-storage",
+        "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-proled-summary-select-2026010-14inch-spaceblack?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0L3EyS05IQ016T1FsVnB6OWhoM1hxNEk2ZGY4RUh6RDZiVERJYmJiZFFwUGdIVEZ3M2ZYN1liNldGMXhjallWdGhIdUFTbXNvcW5NTGxOeDdEZ1ZpT01tUnpENUIyWHRhTlhpRFMzSXBkU2NvRmxoM2FzcVR4dWZibnd6N1JWQWZ4Y3ZsTExqb2ptdTVDWkRHS0xMaXFJ&traceId=1",
+        "imageAlt": "配备 PROLED XDR 显示屏的深空黑色 14 英寸 MacBook Pro，呈打开状态，内部视图，展示细窄的黑色显示屏边框、灵动岛、圆角设计和凸出的垫脚。深空黑色，呈闭合状态，左侧外观，展示纤薄机身外形、MagSafe 3 端口、两个雷雳 5 端口以及耳机插孔。深空黑色，呈闭合状态，右侧外观，展示纤薄机身外形、SDXC 卡插槽、雷雳 5 端口和 HDMI 端口。深空黑色，顶面俯视外观，展示圆角设计以及机身中央的黑色亮面 Apple 标志。",
+        "imageWidth": 5120,
+        "imageHeight": 3280,
+        "imageKey": "mac-macbook-pro-proled-summary-select-2026010-14inch-spaceblack",
+        "imageSource": "apple-gallery",
+        "imageSourceUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_pro_proled_xdr%2Fselect&dm.chassis-dimensionScreensize=14inch&dm.chassis-dimensionColor=spaceblack&dm.display-dimensionFinish=standard&dm.processor-dimensionChip=m5pro&dm.processor-dimensionChip-cpuCoreCount-gpuCoreCount=m5pro-15-16&dm.memory-dimensionMemory=24gb&dm.storage-dimensionCapacity=1tb",
+        "imageOriginalUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-proled-summary-select-2026010-14inch-spaceblack?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0L3EyS05IQ016T1FsVnB6OWhoM1hxNEk2ZGY4RUh6RDZiVERJYmJiZFFwUGdIVEZ3M2ZYN1liNldGMXhjallWdGhIdUFTbXNvcW5NTGxOeDdEZ1ZpT01tUnpENUIyWHRhTlhpRFMzSXBkU2NvRmxoM2FzcVR4dWZibnd6N1JWQWZ4Y3ZsTExqb2ptdTVDWkRHS0xMaXFJ&traceId=1",
+        "imageMatchDimensions": {
+          "chassis-dimensionScreensize": "14inch",
+          "chassis-dimensionColor": "spaceblack"
+        }
+      },
+      {
+        "partNumber": "MJ2G4CH/A",
+        "basePartNumber": "MJ2G4",
+        "category": "mac",
+        "familyKey": "macbook-pro-proled-xdr",
+        "familySlug": "macbook-pro-proled-xdr",
+        "model": "MacBook Pro (PROLED XDR 显示屏) 14 英寸",
+        "title": "MacBook Pro (PROLED XDR 显示屏) 14 英寸 M5 Pro 15核CPU/16核GPU 24GB 1TB 标准玻璃 银色",
+        "titleSource": "selected_page_metrics_and_labels",
+        "englishName": "14-inch MacBook Pro with PROLED XDR Display - Silver",
+        "attributes": {
+          "screensize": "14 英寸",
+          "color": "银色",
+          "finish": "标准玻璃",
+          "chipName": "M5 Pro",
+          "chip": "15核CPU/16核GPU",
+          "memory": "24GB",
+          "capacity": "1TB"
+        },
+        "dimensionValues": {
+          "chassis-dimensionScreensize": "14inch",
+          "chassis-dimensionColor": "silver",
+          "display-dimensionFinish": "standard",
+          "processor-dimensionChip": "m5pro",
+          "processor-dimensionChip-cpuCoreCount-gpuCoreCount": "m5pro-15-16",
+          "memory-dimensionMemory": "24gb",
+          "storage-dimensionCapacity": "1tb"
+        },
+        "priceCny": 22999,
+        "comingSoon": true,
+        "isCarrierDevice": false,
+        "upstreamContainer": "RO_MBP_OLED_M5_14INCH_SILVER_BET_ULT_2026",
+        "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/14-inch-silver-standard-display-apple-m5-pro-chip-15-core-cpu-16-core-gpu-24gb-memory-1tb-storage",
+        "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-proled-summary-select-2026010-14inch-silver?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0L3EyS05IQ016T1FsVnB6OWhoM1hxNEk2ZGY4RUh6RDZiVERJYmJiZFFwUGdTdWhIbFJZa3pWS1JQUTZ3cHN3ZlNtTkdpWmFLNDhUNytnaWxtRDBHaEcyTE1mSHgwMHh1SlVoUDJNTksyTUZaelU0K0hWNDFNVnpTWUYxODRJTjJB&traceId=1",
+        "imageAlt": "配备 PROLED XDR 显示屏的银色 14 英寸 MacBook Pro，呈打开状态，内部视图，展示细窄的黑色显示屏边框、灵动岛、圆角设计和凸出的垫脚。银色，呈闭合状态，左侧外观，展示纤薄机身外形、MagSafe 3 端口、两个雷雳 5 端口以及耳机插孔。银色，呈闭合状态，右侧外观，展示纤薄机身外形、SDXC 卡插槽、雷雳 5 端口和 HDMI 端口。银色，顶面俯视外观，展示圆角设计以及机身中央的黑色亮面 Apple 标志。",
+        "imageWidth": 5120,
+        "imageHeight": 3280,
+        "imageKey": "mac-macbook-pro-proled-summary-select-2026010-14inch-silver",
+        "imageSource": "apple-gallery",
+        "imageSourceUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_pro_proled_xdr%2Fselect&dm.chassis-dimensionScreensize=14inch&dm.chassis-dimensionColor=silver&dm.display-dimensionFinish=standard&dm.processor-dimensionChip=m5pro&dm.processor-dimensionChip-cpuCoreCount-gpuCoreCount=m5pro-18-20&dm.memory-dimensionMemory=48gb&dm.storage-dimensionCapacity=1tb",
+        "imageOriginalUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-proled-summary-select-2026010-14inch-silver?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0L3EyS05IQ016T1FsVnB6OWhoM1hxNEk2ZGY4RUh6RDZiVERJYmJiZFFwUGdTdWhIbFJZa3pWS1JQUTZ3cHN3ZlNtTkdpWmFLNDhUNytnaWxtRDBHaEcyTE1mSHgwMHh1SlVoUDJNTksyTUZaelU0K0hWNDFNVnpTWUYxODRJTjJB&traceId=1",
+        "imageMatchDimensions": {
+          "chassis-dimensionScreensize": "14inch",
+          "chassis-dimensionColor": "silver"
+        }
+      },
+      {
+        "partNumber": "MJ2Y4CH/A",
+        "basePartNumber": "MJ2Y4",
+        "category": "mac",
+        "familyKey": "macbook-pro-proled-xdr",
+        "familySlug": "macbook-pro-proled-xdr",
+        "model": "MacBook Pro (PROLED XDR 显示屏) 16 英寸",
+        "title": "MacBook Pro (PROLED XDR 显示屏) 16 英寸 M5 Max 18核CPU/40核GPU 48GB 2TB 标准玻璃 银色",
+        "titleSource": "selected_page_metrics_and_labels",
+        "englishName": "16-inch MacBook Pro with PROLED XDR Display - Silver",
+        "attributes": {
+          "screensize": "16 英寸",
+          "color": "银色",
+          "finish": "标准玻璃",
+          "chipName": "M5 Max",
+          "chip": "18核CPU/40核GPU",
+          "memory": "48GB",
+          "capacity": "2TB"
+        },
+        "dimensionValues": {
+          "chassis-dimensionScreensize": "16inch",
+          "chassis-dimensionColor": "silver",
+          "display-dimensionFinish": "standard",
+          "processor-dimensionChip": "m5max",
+          "processor-dimensionChip-cpuCoreCount-gpuCoreCount": "m5max-18-40",
+          "memory-dimensionMemory": "48gb",
+          "storage-dimensionCapacity": "2tb"
+        },
+        "priceCny": 43999,
+        "comingSoon": true,
+        "isCarrierDevice": false,
+        "upstreamContainer": "RO_MBP_OLED_M5_16INCH_SILVER_BET_ULT_SUP_2026",
+        "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/16-inch-silver-standard-display-apple-m5-max-chip-18-core-cpu-40-core-gpu-48gb-memory-2tb-storage",
+        "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-proled-summary-select-2026010-16inch-silver?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0L3EyS05IQ016T1FsVnB6OWhoM1hxN1VpRURCbi8vL0U0UmFSMWFBTDEwbGdTdWhIbFJZa3pWS1JQUTZ3cHN3ZlNtTkdpWmFLNDhUNytnaWxtRDBHaEcyTE1mSHgwMHh1SlVoUDJNTksyTUZ4MDBLWFl1akxaVlQxSTNLdWUyeDNR&traceId=1",
+        "imageAlt": "配备 PROLED XDR 显示屏的银色 16 英寸 MacBook Pro，呈打开状态，内部视图，展示细窄的黑色显示屏边框、灵动岛、圆角设计和凸出的垫脚。银色，呈闭合状态，左侧外观，展示纤薄机身外形、MagSafe 3 端口、两个雷雳 5 端口以及耳机插孔。银色，呈闭合状态，右侧外观，展示纤薄机身外形、SDXC 卡插槽、雷雳 5 端口和 HDMI 端口。银色，顶面俯视外观，展示圆角设计以及机身中央的黑色亮面 Apple 标志。",
+        "imageWidth": 5120,
+        "imageHeight": 3280,
+        "imageKey": "mac-macbook-pro-proled-summary-select-2026010-16inch-silver",
+        "imageSource": "apple-gallery",
+        "imageSourceUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_pro_proled_xdr%2Fselect&dm.chassis-dimensionScreensize=16inch&dm.chassis-dimensionColor=silver&dm.display-dimensionFinish=standard&dm.processor-dimensionChip=m5pro&dm.processor-dimensionChip-cpuCoreCount-gpuCoreCount=m5pro-18-20&dm.memory-dimensionMemory=48gb&dm.storage-dimensionCapacity=1tb",
+        "imageOriginalUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-proled-summary-select-2026010-16inch-silver?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0L3EyS05IQ016T1FsVnB6OWhoM1hxN1VpRURCbi8vL0U0UmFSMWFBTDEwbGdTdWhIbFJZa3pWS1JQUTZ3cHN3ZlNtTkdpWmFLNDhUNytnaWxtRDBHaEcyTE1mSHgwMHh1SlVoUDJNTksyTUZ4MDBLWFl1akxaVlQxSTNLdWUyeDNR&traceId=1",
+        "imageMatchDimensions": {
+          "chassis-dimensionScreensize": "16inch",
+          "chassis-dimensionColor": "silver"
+        }
+      },
+      {
+        "partNumber": "MJ2W4CH/A",
+        "basePartNumber": "MJ2W4",
+        "category": "mac",
+        "familyKey": "macbook-pro-proled-xdr",
+        "familySlug": "macbook-pro-proled-xdr",
+        "model": "MacBook Pro (PROLED XDR 显示屏) 16 英寸",
+        "title": "MacBook Pro (PROLED XDR 显示屏) 16 英寸 M5 Pro 18核CPU/20核GPU 24GB 1TB 标准玻璃 银色",
+        "titleSource": "selected_page_metrics_and_labels",
+        "englishName": "16-inch MacBook Pro with PROLED XDR Display - Silver",
+        "attributes": {
+          "screensize": "16 英寸",
+          "color": "银色",
+          "finish": "标准玻璃",
+          "chipName": "M5 Pro",
+          "chip": "18核CPU/20核GPU",
+          "memory": "24GB",
+          "capacity": "1TB"
+        },
+        "dimensionValues": {
+          "chassis-dimensionScreensize": "16inch",
+          "chassis-dimensionColor": "silver",
+          "display-dimensionFinish": "standard",
+          "processor-dimensionChip": "m5pro",
+          "processor-dimensionChip-cpuCoreCount-gpuCoreCount": "m5pro-18-20",
+          "memory-dimensionMemory": "24gb",
+          "storage-dimensionCapacity": "1tb"
+        },
+        "priceCny": 27999,
+        "comingSoon": true,
+        "isCarrierDevice": false,
+        "upstreamContainer": "RO_MBP_OLED_M5_16INCH_SILVER_BET_ULT_SUP_2026",
+        "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/16-inch-silver-standard-display-apple-m5-pro-chip-18-core-cpu-20-core-gpu-24gb-memory-1tb-storage",
+        "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-proled-summary-select-2026010-16inch-silver?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0L3EyS05IQ016T1FsVnB6OWhoM1hxN1VpRURCbi8vL0U0UmFSMWFBTDEwbGdTdWhIbFJZa3pWS1JQUTZ3cHN3ZlNtTkdpWmFLNDhUNytnaWxtRDBHaEcyTE1mSHgwMHh1SlVoUDJNTksyTUZ4MDBLWFl1akxaVlQxSTNLdWUyeDNR&traceId=1",
+        "imageAlt": "配备 PROLED XDR 显示屏的银色 16 英寸 MacBook Pro，呈打开状态，内部视图，展示细窄的黑色显示屏边框、灵动岛、圆角设计和凸出的垫脚。银色，呈闭合状态，左侧外观，展示纤薄机身外形、MagSafe 3 端口、两个雷雳 5 端口以及耳机插孔。银色，呈闭合状态，右侧外观，展示纤薄机身外形、SDXC 卡插槽、雷雳 5 端口和 HDMI 端口。银色，顶面俯视外观，展示圆角设计以及机身中央的黑色亮面 Apple 标志。",
+        "imageWidth": 5120,
+        "imageHeight": 3280,
+        "imageKey": "mac-macbook-pro-proled-summary-select-2026010-16inch-silver",
+        "imageSource": "apple-gallery",
+        "imageSourceUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_pro_proled_xdr%2Fselect&dm.chassis-dimensionScreensize=16inch&dm.chassis-dimensionColor=silver&dm.display-dimensionFinish=standard&dm.processor-dimensionChip=m5pro&dm.processor-dimensionChip-cpuCoreCount-gpuCoreCount=m5pro-18-20&dm.memory-dimensionMemory=48gb&dm.storage-dimensionCapacity=1tb",
+        "imageOriginalUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-proled-summary-select-2026010-16inch-silver?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0L3EyS05IQ016T1FsVnB6OWhoM1hxN1VpRURCbi8vL0U0UmFSMWFBTDEwbGdTdWhIbFJZa3pWS1JQUTZ3cHN3ZlNtTkdpWmFLNDhUNytnaWxtRDBHaEcyTE1mSHgwMHh1SlVoUDJNTksyTUZ4MDBLWFl1akxaVlQxSTNLdWUyeDNR&traceId=1",
+        "imageMatchDimensions": {
+          "chassis-dimensionScreensize": "16inch",
+          "chassis-dimensionColor": "silver"
+        }
+      },
+      {
+        "partNumber": "MJ304CH/A",
+        "basePartNumber": "MJ304",
+        "category": "mac",
+        "familyKey": "macbook-pro-proled-xdr",
+        "familySlug": "macbook-pro-proled-xdr",
+        "model": "MacBook Pro (PROLED XDR 显示屏) 16 英寸",
+        "title": "MacBook Pro (PROLED XDR 显示屏) 16 英寸 M5 Pro 18核CPU/20核GPU 24GB 1TB 标准玻璃 深空黑色",
+        "titleSource": "selected_page_metrics_and_labels",
+        "englishName": "16-inch MacBook Pro with PROLED XDR Display - Space Black",
+        "attributes": {
+          "screensize": "16 英寸",
+          "color": "深空黑色",
+          "finish": "标准玻璃",
+          "chipName": "M5 Pro",
+          "chip": "18核CPU/20核GPU",
+          "memory": "24GB",
+          "capacity": "1TB"
+        },
+        "dimensionValues": {
+          "chassis-dimensionScreensize": "16inch",
+          "chassis-dimensionColor": "spaceblack",
+          "display-dimensionFinish": "standard",
+          "processor-dimensionChip": "m5pro",
+          "processor-dimensionChip-cpuCoreCount-gpuCoreCount": "m5pro-18-20",
+          "memory-dimensionMemory": "24gb",
+          "storage-dimensionCapacity": "1tb"
+        },
+        "priceCny": 27999,
+        "comingSoon": true,
+        "isCarrierDevice": false,
+        "upstreamContainer": "RO_MBP_OLED_M5_16INCH_SPACEBLACK_BET_ULT_SUP_2026",
+        "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/16-inch-space-black-standard-display-apple-m5-pro-chip-18-core-cpu-20-core-gpu-24gb-memory-1tb-storage",
+        "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-proled-summary-select-2026010-16inch-spaceblack?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0L3EyS05IQ016T1FsVnB6OWhoM1hxN1VpRURCbi8vL0U0UmFSMWFBTDEwbGdIVEZ3M2ZYN1liNldGMXhjallWdGhIdUFTbXNvcW5NTGxOeDdEZ1ZpT01tUnpENUIyWHRhTlhpRFMzSXBkU2NvRmxoM2FzcVR4dWZibnd6N1JWQWY4YjgwMmpSSi96dVlXcjhmVE1GWXZF&traceId=1",
+        "imageAlt": "配备 PROLED XDR 显示屏的深空黑色 16 英寸 MacBook Pro，呈打开状态，内部视图，展示细窄的黑色显示屏边框、灵动岛、圆角设计和凸出的垫脚。深空黑色，呈闭合状态，左侧外观，展示纤薄机身外形、MagSafe 3 端口、两个雷雳 5 端口以及耳机插孔。深空黑色，呈闭合状态，右侧外观，展示纤薄机身外形、SDXC 卡插槽、雷雳 5 端口和 HDMI 端口。深空黑色，顶面俯视外观，展示圆角设计以及机身中央的黑色亮面 Apple 标志。",
+        "imageWidth": 5120,
+        "imageHeight": 3280,
+        "imageKey": "mac-macbook-pro-proled-summary-select-2026010-16inch-spaceblack",
+        "imageSource": "apple-gallery",
+        "imageSourceUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_pro_proled_xdr%2Fselect&dm.chassis-dimensionScreensize=16inch&dm.chassis-dimensionColor=spaceblack&dm.display-dimensionFinish=standard&dm.processor-dimensionChip=m5max&dm.processor-dimensionChip-cpuCoreCount-gpuCoreCount=m5max-18-40&dm.memory-dimensionMemory=48gb&dm.storage-dimensionCapacity=2tb",
+        "imageOriginalUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-proled-summary-select-2026010-16inch-spaceblack?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0L3EyS05IQ016T1FsVnB6OWhoM1hxN1VpRURCbi8vL0U0UmFSMWFBTDEwbGdIVEZ3M2ZYN1liNldGMXhjallWdGhIdUFTbXNvcW5NTGxOeDdEZ1ZpT01tUnpENUIyWHRhTlhpRFMzSXBkU2NvRmxoM2FzcVR4dWZibnd6N1JWQWY4YjgwMmpSSi96dVlXcjhmVE1GWXZF&traceId=1",
+        "imageMatchDimensions": {
+          "chassis-dimensionScreensize": "16inch",
+          "chassis-dimensionColor": "spaceblack"
+        }
+      },
+      {
+        "partNumber": "MMF54CH/A",
+        "basePartNumber": "MMF54",
+        "category": "mac",
+        "familyKey": "macbook-pro-proled-xdr",
+        "familySlug": "macbook-pro-proled-xdr",
+        "model": "MacBook Pro (PROLED XDR 显示屏) 14 英寸",
+        "title": "MacBook Pro (PROLED XDR 显示屏) 14 英寸 M5 Pro 18核CPU/20核GPU 48GB 1TB 标准玻璃 银色",
+        "titleSource": "selected_page_metrics_and_labels",
+        "englishName": "14-inch MacBook Pro with PROLED XDR Display - Silver",
+        "attributes": {
+          "screensize": "14 英寸",
+          "color": "银色",
+          "finish": "标准玻璃",
+          "chipName": "M5 Pro",
+          "chip": "18核CPU/20核GPU",
+          "memory": "48GB",
+          "capacity": "1TB"
+        },
+        "dimensionValues": {
+          "chassis-dimensionScreensize": "14inch",
+          "chassis-dimensionColor": "silver",
+          "display-dimensionFinish": "standard",
+          "processor-dimensionChip": "m5pro",
+          "processor-dimensionChip-cpuCoreCount-gpuCoreCount": "m5pro-18-20",
+          "memory-dimensionMemory": "48gb",
+          "storage-dimensionCapacity": "1tb"
+        },
+        "priceCny": 29999,
+        "comingSoon": true,
+        "isCarrierDevice": false,
+        "upstreamContainer": null,
+        "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/14-inch-silver-standard-display-apple-m5-pro-chip-18-core-cpu-20-core-gpu-48gb-memory-1tb-storage",
+        "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-proled-summary-select-2026010-14inch-silver?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0L3EyS05IQ016T1FsVnB6OWhoM1hxNEk2ZGY4RUh6RDZiVERJYmJiZFFwUGdTdWhIbFJZa3pWS1JQUTZ3cHN3ZlNtTkdpWmFLNDhUNytnaWxtRDBHaEcyTE1mSHgwMHh1SlVoUDJNTksyTUZaelU0K0hWNDFNVnpTWUYxODRJTjJB&traceId=1",
+        "imageAlt": "配备 PROLED XDR 显示屏的银色 14 英寸 MacBook Pro，呈打开状态，内部视图，展示细窄的黑色显示屏边框、灵动岛、圆角设计和凸出的垫脚。银色，呈闭合状态，左侧外观，展示纤薄机身外形、MagSafe 3 端口、两个雷雳 5 端口以及耳机插孔。银色，呈闭合状态，右侧外观，展示纤薄机身外形、SDXC 卡插槽、雷雳 5 端口和 HDMI 端口。银色，顶面俯视外观，展示圆角设计以及机身中央的黑色亮面 Apple 标志。",
+        "imageWidth": 5120,
+        "imageHeight": 3280,
+        "imageKey": "mac-macbook-pro-proled-summary-select-2026010-14inch-silver",
+        "imageSource": "apple-gallery",
+        "imageSourceUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_pro_proled_xdr%2Fselect&dm.chassis-dimensionScreensize=14inch&dm.chassis-dimensionColor=silver&dm.display-dimensionFinish=standard&dm.processor-dimensionChip=m5pro&dm.processor-dimensionChip-cpuCoreCount-gpuCoreCount=m5pro-18-20&dm.memory-dimensionMemory=48gb&dm.storage-dimensionCapacity=1tb",
+        "imageOriginalUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-proled-summary-select-2026010-14inch-silver?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0L3EyS05IQ016T1FsVnB6OWhoM1hxNEk2ZGY4RUh6RDZiVERJYmJiZFFwUGdTdWhIbFJZa3pWS1JQUTZ3cHN3ZlNtTkdpWmFLNDhUNytnaWxtRDBHaEcyTE1mSHgwMHh1SlVoUDJNTksyTUZaelU0K0hWNDFNVnpTWUYxODRJTjJB&traceId=1",
+        "imageMatchDimensions": {
+          "chassis-dimensionScreensize": "14inch",
+          "chassis-dimensionColor": "silver"
+        }
+      },
+      {
+        "partNumber": "MJ314CH/A",
+        "basePartNumber": "MJ314",
+        "category": "mac",
+        "familyKey": "macbook-pro-proled-xdr",
+        "familySlug": "macbook-pro-proled-xdr",
+        "model": "MacBook Pro (PROLED XDR 显示屏) 16 英寸",
+        "title": "MacBook Pro (PROLED XDR 显示屏) 16 英寸 M5 Max 18核CPU/32核GPU 36GB 2TB 标准玻璃 深空黑色",
+        "titleSource": "selected_page_metrics_and_labels",
+        "englishName": "16-inch MacBook Pro with PROLED XDR Display - Space Black",
+        "attributes": {
+          "screensize": "16 英寸",
+          "color": "深空黑色",
+          "finish": "标准玻璃",
+          "chipName": "M5 Max",
+          "chip": "18核CPU/32核GPU",
+          "memory": "36GB",
+          "capacity": "2TB"
+        },
+        "dimensionValues": {
+          "chassis-dimensionScreensize": "16inch",
+          "chassis-dimensionColor": "spaceblack",
+          "display-dimensionFinish": "standard",
+          "processor-dimensionChip": "m5max",
+          "processor-dimensionChip-cpuCoreCount-gpuCoreCount": "m5max-18-32",
+          "memory-dimensionMemory": "36gb",
+          "storage-dimensionCapacity": "2tb"
+        },
+        "priceCny": 38999,
+        "comingSoon": true,
+        "isCarrierDevice": false,
+        "upstreamContainer": "RO_MBP_OLED_M5_16INCH_SPACEBLACK_BET_ULT_SUP_2026",
+        "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/16-inch-space-black-standard-display-apple-m5-max-chip-18-core-cpu-32-core-gpu-36gb-memory-2tb-storage",
+        "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-proled-summary-select-2026010-16inch-spaceblack?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0L3EyS05IQ016T1FsVnB6OWhoM1hxN1VpRURCbi8vL0U0UmFSMWFBTDEwbGdIVEZ3M2ZYN1liNldGMXhjallWdGhIdUFTbXNvcW5NTGxOeDdEZ1ZpT01tUnpENUIyWHRhTlhpRFMzSXBkU2NvRmxoM2FzcVR4dWZibnd6N1JWQWY4YjgwMmpSSi96dVlXcjhmVE1GWXZF&traceId=1",
+        "imageAlt": "配备 PROLED XDR 显示屏的深空黑色 16 英寸 MacBook Pro，呈打开状态，内部视图，展示细窄的黑色显示屏边框、灵动岛、圆角设计和凸出的垫脚。深空黑色，呈闭合状态，左侧外观，展示纤薄机身外形、MagSafe 3 端口、两个雷雳 5 端口以及耳机插孔。深空黑色，呈闭合状态，右侧外观，展示纤薄机身外形、SDXC 卡插槽、雷雳 5 端口和 HDMI 端口。深空黑色，顶面俯视外观，展示圆角设计以及机身中央的黑色亮面 Apple 标志。",
+        "imageWidth": 5120,
+        "imageHeight": 3280,
+        "imageKey": "mac-macbook-pro-proled-summary-select-2026010-16inch-spaceblack",
+        "imageSource": "apple-gallery",
+        "imageSourceUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_pro_proled_xdr%2Fselect&dm.chassis-dimensionScreensize=16inch&dm.chassis-dimensionColor=spaceblack&dm.display-dimensionFinish=standard&dm.processor-dimensionChip=m5max&dm.processor-dimensionChip-cpuCoreCount-gpuCoreCount=m5max-18-40&dm.memory-dimensionMemory=48gb&dm.storage-dimensionCapacity=2tb",
+        "imageOriginalUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-proled-summary-select-2026010-16inch-spaceblack?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0L3EyS05IQ016T1FsVnB6OWhoM1hxN1VpRURCbi8vL0U0UmFSMWFBTDEwbGdIVEZ3M2ZYN1liNldGMXhjallWdGhIdUFTbXNvcW5NTGxOeDdEZ1ZpT01tUnpENUIyWHRhTlhpRFMzSXBkU2NvRmxoM2FzcVR4dWZibnd6N1JWQWY4YjgwMmpSSi96dVlXcjhmVE1GWXZF&traceId=1",
+        "imageMatchDimensions": {
+          "chassis-dimensionScreensize": "16inch",
+          "chassis-dimensionColor": "spaceblack"
+        }
+      },
+      {
+        "partNumber": "MMF64CH/A",
+        "basePartNumber": "MMF64",
+        "category": "mac",
+        "familyKey": "macbook-pro-proled-xdr",
+        "familySlug": "macbook-pro-proled-xdr",
+        "model": "MacBook Pro (PROLED XDR 显示屏) 14 英寸",
+        "title": "MacBook Pro (PROLED XDR 显示屏) 14 英寸 M5 Pro 18核CPU/20核GPU 48GB 1TB 标准玻璃 深空黑色",
+        "titleSource": "selected_page_metrics_and_labels",
+        "englishName": "14-inch MacBook Pro with PROLED XDR Display - Space Black",
+        "attributes": {
+          "screensize": "14 英寸",
+          "color": "深空黑色",
+          "finish": "标准玻璃",
+          "chipName": "M5 Pro",
+          "chip": "18核CPU/20核GPU",
+          "memory": "48GB",
+          "capacity": "1TB"
+        },
+        "dimensionValues": {
+          "chassis-dimensionScreensize": "14inch",
+          "chassis-dimensionColor": "spaceblack",
+          "display-dimensionFinish": "standard",
+          "processor-dimensionChip": "m5pro",
+          "processor-dimensionChip-cpuCoreCount-gpuCoreCount": "m5pro-18-20",
+          "memory-dimensionMemory": "48gb",
+          "storage-dimensionCapacity": "1tb"
+        },
+        "priceCny": 29999,
+        "comingSoon": true,
+        "isCarrierDevice": false,
+        "upstreamContainer": null,
+        "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/14-inch-space-black-standard-display-apple-m5-pro-chip-18-core-cpu-20-core-gpu-48gb-memory-1tb-storage",
+        "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-proled-summary-select-2026010-14inch-spaceblack?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0L3EyS05IQ016T1FsVnB6OWhoM1hxNEk2ZGY4RUh6RDZiVERJYmJiZFFwUGdIVEZ3M2ZYN1liNldGMXhjallWdGhIdUFTbXNvcW5NTGxOeDdEZ1ZpT01tUnpENUIyWHRhTlhpRFMzSXBkU2NvRmxoM2FzcVR4dWZibnd6N1JWQWZ4Y3ZsTExqb2ptdTVDWkRHS0xMaXFJ&traceId=1",
+        "imageAlt": "配备 PROLED XDR 显示屏的深空黑色 14 英寸 MacBook Pro，呈打开状态，内部视图，展示细窄的黑色显示屏边框、灵动岛、圆角设计和凸出的垫脚。深空黑色，呈闭合状态，左侧外观，展示纤薄机身外形、MagSafe 3 端口、两个雷雳 5 端口以及耳机插孔。深空黑色，呈闭合状态，右侧外观，展示纤薄机身外形、SDXC 卡插槽、雷雳 5 端口和 HDMI 端口。深空黑色，顶面俯视外观，展示圆角设计以及机身中央的黑色亮面 Apple 标志。",
+        "imageWidth": 5120,
+        "imageHeight": 3280,
+        "imageKey": "mac-macbook-pro-proled-summary-select-2026010-14inch-spaceblack",
+        "imageSource": "apple-gallery",
+        "imageSourceUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_pro_proled_xdr%2Fselect&dm.chassis-dimensionScreensize=14inch&dm.chassis-dimensionColor=spaceblack&dm.display-dimensionFinish=standard&dm.processor-dimensionChip=m5pro&dm.processor-dimensionChip-cpuCoreCount-gpuCoreCount=m5pro-15-16&dm.memory-dimensionMemory=24gb&dm.storage-dimensionCapacity=1tb",
+        "imageOriginalUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-proled-summary-select-2026010-14inch-spaceblack?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0L3EyS05IQ016T1FsVnB6OWhoM1hxNEk2ZGY4RUh6RDZiVERJYmJiZFFwUGdIVEZ3M2ZYN1liNldGMXhjallWdGhIdUFTbXNvcW5NTGxOeDdEZ1ZpT01tUnpENUIyWHRhTlhpRFMzSXBkU2NvRmxoM2FzcVR4dWZibnd6N1JWQWZ4Y3ZsTExqb2ptdTVDWkRHS0xMaXFJ&traceId=1",
+        "imageMatchDimensions": {
+          "chassis-dimensionScreensize": "14inch",
+          "chassis-dimensionColor": "spaceblack"
+        }
+      },
+      {
+        "partNumber": "MJ9X4CH/A",
+        "basePartNumber": "MJ9X4",
+        "category": "mac",
+        "familyKey": "macbook-pro-proled-xdr",
+        "familySlug": "macbook-pro-proled-xdr",
+        "model": "MacBook Pro (PROLED XDR 显示屏) 14 英寸",
+        "title": "MacBook Pro (PROLED XDR 显示屏) 14 英寸 M5 Pro 15核CPU/16核GPU 24GB 1TB 纳米纹理玻璃 深空黑色",
+        "titleSource": "selected_page_metrics_and_labels",
+        "englishName": "14-inch MacBook Pro with PROLED XDR Display - Space Black",
+        "attributes": {
+          "screensize": "14 英寸",
+          "color": "深空黑色",
+          "finish": "纳米纹理玻璃",
+          "chipName": "M5 Pro",
+          "chip": "15核CPU/16核GPU",
+          "memory": "24GB",
+          "capacity": "1TB"
+        },
+        "dimensionValues": {
+          "chassis-dimensionScreensize": "14inch",
+          "chassis-dimensionColor": "spaceblack",
+          "display-dimensionFinish": "nano_texture",
+          "processor-dimensionChip": "m5pro",
+          "processor-dimensionChip-cpuCoreCount-gpuCoreCount": "m5pro-15-16",
+          "memory-dimensionMemory": "24gb",
+          "storage-dimensionCapacity": "1tb"
+        },
+        "priceCny": 24124,
+        "comingSoon": true,
+        "isCarrierDevice": false,
+        "upstreamContainer": "RO_MBP_OLED_M5_14INCH_SPACEBLACK_BET_ULT_2026",
+        "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/14-inch-space-black-nano-texture-display-apple-m5-pro-chip-15-core-cpu-16-core-gpu-24gb-memory-1tb-storage",
+        "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-proled-summary-select-2026010-14inch-spaceblack?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0L3EyS05IQ016T1FsVnB6OWhoM1hxNEk2ZGY4RUh6RDZiVERJYmJiZFFwUGdIVEZ3M2ZYN1liNldGMXhjallWdGhIdUFTbXNvcW5NTGxOeDdEZ1ZpT01tUnpENUIyWHRhTlhpRFMzSXBkU2NvRmxoM2FzcVR4dWZibnd6N1JWQWZ4Y3ZsTExqb2ptdTVDWkRHS0xMaXFJ&traceId=1",
+        "imageAlt": "配备 PROLED XDR 显示屏的深空黑色 14 英寸 MacBook Pro，呈打开状态，内部视图，展示细窄的黑色显示屏边框、灵动岛、圆角设计和凸出的垫脚。深空黑色，呈闭合状态，左侧外观，展示纤薄机身外形、MagSafe 3 端口、两个雷雳 5 端口以及耳机插孔。深空黑色，呈闭合状态，右侧外观，展示纤薄机身外形、SDXC 卡插槽、雷雳 5 端口和 HDMI 端口。深空黑色，顶面俯视外观，展示圆角设计以及机身中央的黑色亮面 Apple 标志。",
+        "imageWidth": 5120,
+        "imageHeight": 3280,
+        "imageKey": "mac-macbook-pro-proled-summary-select-2026010-14inch-spaceblack",
+        "imageSource": "apple-gallery",
+        "imageSourceUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_pro_proled_xdr%2Fselect&dm.chassis-dimensionScreensize=14inch&dm.chassis-dimensionColor=spaceblack&dm.display-dimensionFinish=standard&dm.processor-dimensionChip=m5pro&dm.processor-dimensionChip-cpuCoreCount-gpuCoreCount=m5pro-15-16&dm.memory-dimensionMemory=24gb&dm.storage-dimensionCapacity=1tb",
+        "imageOriginalUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-proled-summary-select-2026010-14inch-spaceblack?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0L3EyS05IQ016T1FsVnB6OWhoM1hxNEk2ZGY4RUh6RDZiVERJYmJiZFFwUGdIVEZ3M2ZYN1liNldGMXhjallWdGhIdUFTbXNvcW5NTGxOeDdEZ1ZpT01tUnpENUIyWHRhTlhpRFMzSXBkU2NvRmxoM2FzcVR4dWZibnd6N1JWQWZ4Y3ZsTExqb2ptdTVDWkRHS0xMaXFJ&traceId=1",
+        "imageMatchDimensions": {
+          "chassis-dimensionScreensize": "14inch",
+          "chassis-dimensionColor": "spaceblack"
+        }
+      },
+      {
+        "partNumber": "MMF94CH/A",
+        "basePartNumber": "MMF94",
+        "category": "mac",
+        "familyKey": "macbook-pro-proled-xdr",
+        "familySlug": "macbook-pro-proled-xdr",
+        "model": "MacBook Pro (PROLED XDR 显示屏) 16 英寸",
+        "title": "MacBook Pro (PROLED XDR 显示屏) 16 英寸 M5 Pro 18核CPU/20核GPU 48GB 1TB 标准玻璃 银色",
+        "titleSource": "selected_page_metrics_and_labels",
+        "englishName": "16-inch MacBook Pro with PROLED XDR Display - Silver",
+        "attributes": {
+          "screensize": "16 英寸",
+          "color": "银色",
+          "finish": "标准玻璃",
+          "chipName": "M5 Pro",
+          "chip": "18核CPU/20核GPU",
+          "memory": "48GB",
+          "capacity": "1TB"
+        },
+        "dimensionValues": {
+          "chassis-dimensionScreensize": "16inch",
+          "chassis-dimensionColor": "silver",
+          "display-dimensionFinish": "standard",
+          "processor-dimensionChip": "m5pro",
+          "processor-dimensionChip-cpuCoreCount-gpuCoreCount": "m5pro-18-20",
+          "memory-dimensionMemory": "48gb",
+          "storage-dimensionCapacity": "1tb"
+        },
+        "priceCny": 32499,
+        "comingSoon": true,
+        "isCarrierDevice": false,
+        "upstreamContainer": null,
+        "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/16-inch-silver-standard-display-apple-m5-pro-chip-18-core-cpu-20-core-gpu-48gb-memory-1tb-storage",
+        "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-proled-summary-select-2026010-16inch-silver?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0L3EyS05IQ016T1FsVnB6OWhoM1hxN1VpRURCbi8vL0U0UmFSMWFBTDEwbGdTdWhIbFJZa3pWS1JQUTZ3cHN3ZlNtTkdpWmFLNDhUNytnaWxtRDBHaEcyTE1mSHgwMHh1SlVoUDJNTksyTUZ4MDBLWFl1akxaVlQxSTNLdWUyeDNR&traceId=1",
+        "imageAlt": "配备 PROLED XDR 显示屏的银色 16 英寸 MacBook Pro，呈打开状态，内部视图，展示细窄的黑色显示屏边框、灵动岛、圆角设计和凸出的垫脚。银色，呈闭合状态，左侧外观，展示纤薄机身外形、MagSafe 3 端口、两个雷雳 5 端口以及耳机插孔。银色，呈闭合状态，右侧外观，展示纤薄机身外形、SDXC 卡插槽、雷雳 5 端口和 HDMI 端口。银色，顶面俯视外观，展示圆角设计以及机身中央的黑色亮面 Apple 标志。",
+        "imageWidth": 5120,
+        "imageHeight": 3280,
+        "imageKey": "mac-macbook-pro-proled-summary-select-2026010-16inch-silver",
+        "imageSource": "apple-gallery",
+        "imageSourceUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_pro_proled_xdr%2Fselect&dm.chassis-dimensionScreensize=16inch&dm.chassis-dimensionColor=silver&dm.display-dimensionFinish=standard&dm.processor-dimensionChip=m5pro&dm.processor-dimensionChip-cpuCoreCount-gpuCoreCount=m5pro-18-20&dm.memory-dimensionMemory=48gb&dm.storage-dimensionCapacity=1tb",
+        "imageOriginalUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-proled-summary-select-2026010-16inch-silver?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0L3EyS05IQ016T1FsVnB6OWhoM1hxN1VpRURCbi8vL0U0UmFSMWFBTDEwbGdTdWhIbFJZa3pWS1JQUTZ3cHN3ZlNtTkdpWmFLNDhUNytnaWxtRDBHaEcyTE1mSHgwMHh1SlVoUDJNTksyTUZ4MDBLWFl1akxaVlQxSTNLdWUyeDNR&traceId=1",
+        "imageMatchDimensions": {
+          "chassis-dimensionScreensize": "16inch",
+          "chassis-dimensionColor": "silver"
+        }
+      },
+      {
+        "partNumber": "MMFA4CH/A",
+        "basePartNumber": "MMFA4",
+        "category": "mac",
+        "familyKey": "macbook-pro-proled-xdr",
+        "familySlug": "macbook-pro-proled-xdr",
+        "model": "MacBook Pro (PROLED XDR 显示屏) 16 英寸",
+        "title": "MacBook Pro (PROLED XDR 显示屏) 16 英寸 M5 Pro 18核CPU/20核GPU 48GB 1TB 标准玻璃 深空黑色",
+        "titleSource": "selected_page_metrics_and_labels",
+        "englishName": "16-inch MacBook Pro with PROLED XDR Display - Space Black",
+        "attributes": {
+          "screensize": "16 英寸",
+          "color": "深空黑色",
+          "finish": "标准玻璃",
+          "chipName": "M5 Pro",
+          "chip": "18核CPU/20核GPU",
+          "memory": "48GB",
+          "capacity": "1TB"
+        },
+        "dimensionValues": {
+          "chassis-dimensionScreensize": "16inch",
+          "chassis-dimensionColor": "spaceblack",
+          "display-dimensionFinish": "standard",
+          "processor-dimensionChip": "m5pro",
+          "processor-dimensionChip-cpuCoreCount-gpuCoreCount": "m5pro-18-20",
+          "memory-dimensionMemory": "48gb",
+          "storage-dimensionCapacity": "1tb"
+        },
+        "priceCny": 32499,
+        "comingSoon": true,
+        "isCarrierDevice": false,
+        "upstreamContainer": null,
+        "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/16-inch-space-black-standard-display-apple-m5-pro-chip-18-core-cpu-20-core-gpu-48gb-memory-1tb-storage",
+        "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-proled-summary-select-2026010-16inch-spaceblack?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0L3EyS05IQ016T1FsVnB6OWhoM1hxN1VpRURCbi8vL0U0UmFSMWFBTDEwbGdIVEZ3M2ZYN1liNldGMXhjallWdGhIdUFTbXNvcW5NTGxOeDdEZ1ZpT01tUnpENUIyWHRhTlhpRFMzSXBkU2NvRmxoM2FzcVR4dWZibnd6N1JWQWY4YjgwMmpSSi96dVlXcjhmVE1GWXZF&traceId=1",
+        "imageAlt": "配备 PROLED XDR 显示屏的深空黑色 16 英寸 MacBook Pro，呈打开状态，内部视图，展示细窄的黑色显示屏边框、灵动岛、圆角设计和凸出的垫脚。深空黑色，呈闭合状态，左侧外观，展示纤薄机身外形、MagSafe 3 端口、两个雷雳 5 端口以及耳机插孔。深空黑色，呈闭合状态，右侧外观，展示纤薄机身外形、SDXC 卡插槽、雷雳 5 端口和 HDMI 端口。深空黑色，顶面俯视外观，展示圆角设计以及机身中央的黑色亮面 Apple 标志。",
+        "imageWidth": 5120,
+        "imageHeight": 3280,
+        "imageKey": "mac-macbook-pro-proled-summary-select-2026010-16inch-spaceblack",
+        "imageSource": "apple-gallery",
+        "imageSourceUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_pro_proled_xdr%2Fselect&dm.chassis-dimensionScreensize=16inch&dm.chassis-dimensionColor=spaceblack&dm.display-dimensionFinish=standard&dm.processor-dimensionChip=m5max&dm.processor-dimensionChip-cpuCoreCount-gpuCoreCount=m5max-18-40&dm.memory-dimensionMemory=48gb&dm.storage-dimensionCapacity=2tb",
+        "imageOriginalUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-proled-summary-select-2026010-16inch-spaceblack?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0L3EyS05IQ016T1FsVnB6OWhoM1hxN1VpRURCbi8vL0U0UmFSMWFBTDEwbGdIVEZ3M2ZYN1liNldGMXhjallWdGhIdUFTbXNvcW5NTGxOeDdEZ1ZpT01tUnpENUIyWHRhTlhpRFMzSXBkU2NvRmxoM2FzcVR4dWZibnd6N1JWQWY4YjgwMmpSSi96dVlXcjhmVE1GWXZF&traceId=1",
+        "imageMatchDimensions": {
+          "chassis-dimensionScreensize": "16inch",
+          "chassis-dimensionColor": "spaceblack"
+        }
+      },
+      {
+        "partNumber": "MJ334CH/A",
+        "basePartNumber": "MJ334",
+        "category": "mac",
+        "familyKey": "macbook-pro-proled-xdr",
+        "familySlug": "macbook-pro-proled-xdr",
+        "model": "MacBook Pro (PROLED XDR 显示屏) 16 英寸",
+        "title": "MacBook Pro (PROLED XDR 显示屏) 16 英寸 M5 Max 18核CPU/40核GPU 48GB 2TB 标准玻璃 深空黑色",
+        "titleSource": "selected_page_metrics_and_labels",
+        "englishName": "16-inch MacBook Pro with PROLED XDR Display - Space Black",
+        "attributes": {
+          "screensize": "16 英寸",
+          "color": "深空黑色",
+          "finish": "标准玻璃",
+          "chipName": "M5 Max",
+          "chip": "18核CPU/40核GPU",
+          "memory": "48GB",
+          "capacity": "2TB"
+        },
+        "dimensionValues": {
+          "chassis-dimensionScreensize": "16inch",
+          "chassis-dimensionColor": "spaceblack",
+          "display-dimensionFinish": "standard",
+          "processor-dimensionChip": "m5max",
+          "processor-dimensionChip-cpuCoreCount-gpuCoreCount": "m5max-18-40",
+          "memory-dimensionMemory": "48gb",
+          "storage-dimensionCapacity": "2tb"
+        },
+        "priceCny": 43999,
+        "comingSoon": true,
+        "isCarrierDevice": false,
+        "upstreamContainer": "RO_MBP_OLED_M5_16INCH_SPACEBLACK_BET_ULT_SUP_2026",
+        "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/16-inch-space-black-standard-display-apple-m5-max-chip-18-core-cpu-40-core-gpu-48gb-memory-2tb-storage",
+        "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-proled-summary-select-2026010-16inch-spaceblack?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0L3EyS05IQ016T1FsVnB6OWhoM1hxN1VpRURCbi8vL0U0UmFSMWFBTDEwbGdIVEZ3M2ZYN1liNldGMXhjallWdGhIdUFTbXNvcW5NTGxOeDdEZ1ZpT01tUnpENUIyWHRhTlhpRFMzSXBkU2NvRmxoM2FzcVR4dWZibnd6N1JWQWY4YjgwMmpSSi96dVlXcjhmVE1GWXZF&traceId=1",
+        "imageAlt": "配备 PROLED XDR 显示屏的深空黑色 16 英寸 MacBook Pro，呈打开状态，内部视图，展示细窄的黑色显示屏边框、灵动岛、圆角设计和凸出的垫脚。深空黑色，呈闭合状态，左侧外观，展示纤薄机身外形、MagSafe 3 端口、两个雷雳 5 端口以及耳机插孔。深空黑色，呈闭合状态，右侧外观，展示纤薄机身外形、SDXC 卡插槽、雷雳 5 端口和 HDMI 端口。深空黑色，顶面俯视外观，展示圆角设计以及机身中央的黑色亮面 Apple 标志。",
+        "imageWidth": 5120,
+        "imageHeight": 3280,
+        "imageKey": "mac-macbook-pro-proled-summary-select-2026010-16inch-spaceblack",
+        "imageSource": "apple-gallery",
+        "imageSourceUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_pro_proled_xdr%2Fselect&dm.chassis-dimensionScreensize=16inch&dm.chassis-dimensionColor=spaceblack&dm.display-dimensionFinish=standard&dm.processor-dimensionChip=m5max&dm.processor-dimensionChip-cpuCoreCount-gpuCoreCount=m5max-18-40&dm.memory-dimensionMemory=48gb&dm.storage-dimensionCapacity=2tb",
+        "imageOriginalUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-proled-summary-select-2026010-16inch-spaceblack?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0L3EyS05IQ016T1FsVnB6OWhoM1hxN1VpRURCbi8vL0U0UmFSMWFBTDEwbGdIVEZ3M2ZYN1liNldGMXhjallWdGhIdUFTbXNvcW5NTGxOeDdEZ1ZpT01tUnpENUIyWHRhTlhpRFMzSXBkU2NvRmxoM2FzcVR4dWZibnd6N1JWQWY4YjgwMmpSSi96dVlXcjhmVE1GWXZF&traceId=1",
+        "imageMatchDimensions": {
+          "chassis-dimensionScreensize": "16inch",
+          "chassis-dimensionColor": "spaceblack"
+        }
+      },
+      {
+        "partNumber": "MJ2K4CH/A",
+        "basePartNumber": "MJ2K4",
+        "category": "mac",
+        "familyKey": "macbook-pro-proled-xdr",
+        "familySlug": "macbook-pro-proled-xdr",
+        "model": "MacBook Pro (PROLED XDR 显示屏) 14 英寸",
+        "title": "MacBook Pro (PROLED XDR 显示屏) 14 英寸 M5 Pro 15核CPU/16核GPU 24GB 1TB 标准玻璃 深空黑色",
+        "titleSource": "selected_page_metrics_and_labels",
+        "englishName": "14-inch MacBook Pro with PROLED XDR Display - Space Black",
+        "attributes": {
+          "screensize": "14 英寸",
+          "color": "深空黑色",
+          "finish": "标准玻璃",
+          "chipName": "M5 Pro",
+          "chip": "15核CPU/16核GPU",
+          "memory": "24GB",
+          "capacity": "1TB"
+        },
+        "dimensionValues": {
+          "chassis-dimensionScreensize": "14inch",
+          "chassis-dimensionColor": "spaceblack",
+          "display-dimensionFinish": "standard",
+          "processor-dimensionChip": "m5pro",
+          "processor-dimensionChip-cpuCoreCount-gpuCoreCount": "m5pro-15-16",
+          "memory-dimensionMemory": "24gb",
+          "storage-dimensionCapacity": "1tb"
+        },
+        "priceCny": 22999,
+        "comingSoon": true,
+        "isCarrierDevice": false,
+        "upstreamContainer": "RO_MBP_OLED_M5_14INCH_SPACEBLACK_BET_ULT_2026",
+        "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/14-inch-space-black-standard-display-apple-m5-pro-chip-15-core-cpu-16-core-gpu-24gb-memory-1tb-storage",
+        "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-proled-summary-select-2026010-14inch-spaceblack?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0L3EyS05IQ016T1FsVnB6OWhoM1hxNEk2ZGY4RUh6RDZiVERJYmJiZFFwUGdIVEZ3M2ZYN1liNldGMXhjallWdGhIdUFTbXNvcW5NTGxOeDdEZ1ZpT01tUnpENUIyWHRhTlhpRFMzSXBkU2NvRmxoM2FzcVR4dWZibnd6N1JWQWZ4Y3ZsTExqb2ptdTVDWkRHS0xMaXFJ&traceId=1",
+        "imageAlt": "配备 PROLED XDR 显示屏的深空黑色 14 英寸 MacBook Pro，呈打开状态，内部视图，展示细窄的黑色显示屏边框、灵动岛、圆角设计和凸出的垫脚。深空黑色，呈闭合状态，左侧外观，展示纤薄机身外形、MagSafe 3 端口、两个雷雳 5 端口以及耳机插孔。深空黑色，呈闭合状态，右侧外观，展示纤薄机身外形、SDXC 卡插槽、雷雳 5 端口和 HDMI 端口。深空黑色，顶面俯视外观，展示圆角设计以及机身中央的黑色亮面 Apple 标志。",
+        "imageWidth": 5120,
+        "imageHeight": 3280,
+        "imageKey": "mac-macbook-pro-proled-summary-select-2026010-14inch-spaceblack",
+        "imageSource": "apple-gallery",
+        "imageSourceUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_pro_proled_xdr%2Fselect&dm.chassis-dimensionScreensize=14inch&dm.chassis-dimensionColor=spaceblack&dm.display-dimensionFinish=standard&dm.processor-dimensionChip=m5pro&dm.processor-dimensionChip-cpuCoreCount-gpuCoreCount=m5pro-15-16&dm.memory-dimensionMemory=24gb&dm.storage-dimensionCapacity=1tb",
+        "imageOriginalUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-proled-summary-select-2026010-14inch-spaceblack?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0L3EyS05IQ016T1FsVnB6OWhoM1hxNEk2ZGY4RUh6RDZiVERJYmJiZFFwUGdIVEZ3M2ZYN1liNldGMXhjallWdGhIdUFTbXNvcW5NTGxOeDdEZ1ZpT01tUnpENUIyWHRhTlhpRFMzSXBkU2NvRmxoM2FzcVR4dWZibnd6N1JWQWZ4Y3ZsTExqb2ptdTVDWkRHS0xMaXFJ&traceId=1",
+        "imageMatchDimensions": {
+          "chassis-dimensionScreensize": "14inch",
+          "chassis-dimensionColor": "spaceblack"
+        },
+        "upstreamTitle": "14 英寸 MacBook Pro (PROLED XDR 显示屏) - 深空黑色",
+        "upstreamTitleCheckedAt": "2026-10-30T03:47:21.574Z"
+      }
+    ],
+    "sources": [
+      {
+        "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/14-inch-silver-standard-display-apple-m5-max-chip-18-core-cpu-32-core-gpu-36gb-memory-2tb-storage",
+        "sha256": "8e7ef662fc9191364af1253a8fb02b6941b2078747a00fa11298513f3e7dd116",
+        "checkedAt": "2026-10-30T03:50:50.593Z",
+        "partNumber": "MJ2J4CH/A"
+      },
+      {
+        "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/16-inch-silver-standard-display-apple-m5-max-chip-18-core-cpu-32-core-gpu-36gb-memory-2tb-storage",
+        "sha256": "8ac4cc613cb5b0cd9a7eb497d94cfb7f46b14ef708f52a26529512b9d2065c33",
+        "checkedAt": "2026-10-30T03:50:56.094Z",
+        "partNumber": "MJ2X4CH/A"
+      },
+      {
+        "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/14-inch-space-black-standard-display-apple-m5-max-chip-18-core-cpu-32-core-gpu-36gb-memory-2tb-storage",
+        "sha256": "bfe51815339daa966f2b380d17abcd223ec33172a78a82f633b26c41c91df280",
+        "checkedAt": "2026-10-30T03:51:01.623Z",
+        "partNumber": "MJ2M4CH/A"
+      },
+      {
+        "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/14-inch-silver-standard-display-apple-m5-pro-chip-15-core-cpu-16-core-gpu-24gb-memory-1tb-storage",
+        "sha256": "2df93ec976df46b4b1f27dc02db8c65981f281286681788b118879600c0bcade",
+        "checkedAt": "2026-10-30T03:51:07.502Z",
+        "partNumber": "MJ2G4CH/A"
+      },
+      {
+        "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/16-inch-silver-standard-display-apple-m5-max-chip-18-core-cpu-40-core-gpu-48gb-memory-2tb-storage",
+        "sha256": "e546aa2081b11cac44208b5beb823f47127e330b264fe1dcbd04fecbb77485dc",
+        "checkedAt": "2026-10-30T03:51:11.717Z",
+        "partNumber": "MJ2Y4CH/A"
+      },
+      {
+        "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/16-inch-silver-standard-display-apple-m5-pro-chip-18-core-cpu-20-core-gpu-24gb-memory-1tb-storage",
+        "sha256": "a53329298e75548280988f671c34013f0707d09ead2b6605da4499f083824f07",
+        "checkedAt": "2026-10-30T03:51:17.761Z",
+        "partNumber": "MJ2W4CH/A"
+      },
+      {
+        "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/16-inch-space-black-standard-display-apple-m5-pro-chip-18-core-cpu-20-core-gpu-24gb-memory-1tb-storage",
+        "sha256": "ac13dd8933a68b06d62302684c6bd6a97733f4bb72b9d657aaa2f7ef75761317",
+        "checkedAt": "2026-10-30T03:51:23.372Z",
+        "partNumber": "MJ304CH/A"
+      },
+      {
+        "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/14-inch-silver-standard-display-apple-m5-pro-chip-18-core-cpu-20-core-gpu-48gb-memory-1tb-storage",
+        "sha256": "6293496c60f87b19a0c1fc35e6c42e2300aaa4d32b00d813b3b7c46d338f1f2b",
+        "checkedAt": "2026-10-30T03:49:55.782Z",
+        "partNumber": "MMF54CH/A"
+      },
+      {
+        "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/16-inch-space-black-standard-display-apple-m5-max-chip-18-core-cpu-32-core-gpu-36gb-memory-2tb-storage",
+        "sha256": "5b979da256329ed396d9027046018dd1605c4292321749bc7af49ccb8d06a9e2",
+        "checkedAt": "2026-10-30T03:51:27.557Z",
+        "partNumber": "MJ314CH/A"
+      },
+      {
+        "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/14-inch-space-black-standard-display-apple-m5-pro-chip-18-core-cpu-20-core-gpu-48gb-memory-1tb-storage",
+        "sha256": "b9a99d38437d69c17169de1a59ef1ce917ff603df4c624f2282a6c9702891d6a",
+        "checkedAt": "2026-10-30T03:50:00.534Z",
+        "partNumber": "MMF64CH/A"
+      },
+      {
+        "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/14-inch-space-black-nano-texture-display-apple-m5-pro-chip-15-core-cpu-16-core-gpu-24gb-memory-1tb-storage",
+        "sha256": "6cfbb267d1629aff18aa6a98c3436b2a137728559ab6dc97cf5569078adac072",
+        "checkedAt": "2026-10-30T03:51:34.385Z",
+        "partNumber": "MJ9X4CH/A"
+      },
+      {
+        "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/16-inch-silver-standard-display-apple-m5-pro-chip-18-core-cpu-20-core-gpu-48gb-memory-1tb-storage",
+        "sha256": "fbb3167fdc675dd632629c3920331b64e798cd443f26008073233bcd21728ab9",
+        "checkedAt": "2026-10-30T03:50:05.532Z",
+        "partNumber": "MMF94CH/A"
+      },
+      {
+        "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/16-inch-space-black-standard-display-apple-m5-pro-chip-18-core-cpu-20-core-gpu-48gb-memory-1tb-storage",
+        "sha256": "9e2cc430b476b2ad7518e1058588dd3f9209bd8146a7cf9be389b4ffce055982",
+        "checkedAt": "2026-10-30T03:50:09.975Z",
+        "partNumber": "MMFA4CH/A"
+      },
+      {
+        "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/16-inch-space-black-standard-display-apple-m5-max-chip-18-core-cpu-40-core-gpu-48gb-memory-2tb-storage",
+        "sha256": "3998d26ad189ae075d9b152ac90b53d90e7713b583e5349a6e188da0bf6abd94",
+        "checkedAt": "2026-10-30T03:51:44.390Z",
+        "partNumber": "MJ334CH/A"
+      },
+      {
+        "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/14-inch-space-black-standard-display-apple-m5-pro-chip-15-core-cpu-16-core-gpu-24gb-memory-1tb-storage",
+        "sha256": "928b7cc684562409e649c1a63a2b51d65199c0b76357f1acf9b395ce10d72b3d",
+        "checkedAt": "2026-10-30T03:51:48.808Z",
+        "partNumber": "MJ2K4CH/A"
+      }
+    ],
+    "count": 15
+  },
+  "studio": {
+    "products": [
+      {
+        "partNumber": "MHQJ4CH/A",
+        "basePartNumber": "MHQJ4",
+        "category": "mac",
+        "familyKey": "mac-studio",
+        "familySlug": "mac-studio",
+        "model": "Mac Studio",
+        "title": "Mac Studio M5 Max 18核CPU/40核GPU 64GB 1TB",
+        "titleSource": "selected_page_metrics_and_labels",
+        "englishName": "Mac Studio",
+        "attributes": {
+          "chipName": "M5 Max",
+          "chip": "18核CPU/40核GPU",
+          "memory": "64GB",
+          "capacity": "1TB"
+        },
+        "dimensionValues": {
+          "processor-dimensionChip": "m5max",
+          "processor-dimensionChip-cpuCoreCount-gpuCoreCount": "m5max-18-40",
+          "memory-dimensionMemory": "64gb",
+          "storage-dimensionCapacity": "1tb"
+        },
+        "priceCny": 29749,
+        "comingSoon": false,
+        "isCarrierDevice": false,
+        "upstreamContainer": null,
+        "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/mac-studio/m5-max-chip-18-core-cpu-40-core-gpu-64gb-memory-1tb-storage",
+        "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-studio-summary-select-202608?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=emRVcS9veFo0VkhVdktxS2xhUkFyZlZlVVdoQ1hhSFNrUXBpcEw1S25KWjNCbndIdVVCNnVBajNrNndmZlg3UVpIdHlVTTFCN3h3M01Od0tUWEIraE5Yc2ltTjBFSkY0ekhDbC9IMldOR0lwMjNiL1RHMk9ZT3hiZUxzaUNnN0M&traceId=1",
+        "imageAlt": "Mac Studio，银色机身，正面外观展示两个 USB-C 端口、一个 SDXC 卡插槽，以及状态指示灯；背面外观展示铝金属散热孔，端口包括四个雷雳 5 端口、一个以太网端口、一个三针电源插口、两个 USB-A 端口、一个 HDMI 端口、一个耳机插孔，以及电源按钮；顶部俯视外观展示方形圆角机身设计，顶面居中有黑色亮面 Apple 标志。",
+        "imageWidth": 5120,
+        "imageHeight": 3280,
+        "imageKey": "mac-studio-summary-select-202608",
+        "imageSource": "apple-family-summary",
+        "imageSourceUrl": "https://www.apple.com.cn/shop/buy-mac/mac-studio/m5-max-chip-18-core-cpu-40-core-gpu-64gb-memory-1tb-storage",
+        "imageOriginalUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-studio-summary-select-202608?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=emRVcS9veFo0VkhVdktxS2xhUkFyZlZlVVdoQ1hhSFNrUXBpcEw1S25KWjNCbndIdVVCNnVBajNrNndmZlg3UVpIdHlVTTFCN3h3M01Od0tUWEIraE5Yc2ltTjBFSkY0ekhDbC9IMldOR0lwMjNiL1RHMk9ZT3hiZUxzaUNnN0M&traceId=1",
+        "imageMatchDimensions": {
+          "processor-dimensionChip": "m5max",
+          "processor-dimensionChip-cpuCoreCount-gpuCoreCount": "m5max-18-40",
+          "memory-dimensionMemory": "64gb",
+          "storage-dimensionCapacity": "1tb"
+        }
+      },
+      {
+        "partNumber": "MHL64CH/A",
+        "basePartNumber": "MHL64",
+        "category": "mac",
+        "familyKey": "mac-studio",
+        "familySlug": "mac-studio",
+        "model": "Mac Studio",
+        "title": "Mac Studio M5 Max 18核CPU/32核GPU 36GB 512GB",
+        "titleSource": "selected_page_metrics_and_labels",
+        "englishName": "Mac Studio",
+        "attributes": {
+          "chipName": "M5 Max",
+          "chip": "18核CPU/32核GPU",
+          "memory": "36GB",
+          "capacity": "512GB"
+        },
+        "dimensionValues": {
+          "processor-dimensionChip": "m5max",
+          "processor-dimensionChip-cpuCoreCount-gpuCoreCount": "m5max-18-32",
+          "memory-dimensionMemory": "36gb",
+          "storage-dimensionCapacity": "512gb"
+        },
+        "priceCny": 19999,
+        "comingSoon": false,
+        "isCarrierDevice": false,
+        "upstreamContainer": "RO_MACSTUDIO_M5MAX_M5ULTRA_BET_BES_2026",
+        "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/mac-studio/m5-max-chip-18-core-cpu-32-core-gpu-36gb-memory-512gb-storage",
+        "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-studio-summary-select-202608?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=emRVcS9veFo0VkhVdktxS2xhUkFyZlZlVVdoQ1hhSFNrUXBpcEw1S25KWjNCbndIdVVCNnVBajNrNndmZlg3UVpIdHlVTTFCN3h3M01Od0tUWEIraE5Yc2ltTjBFSkY0ekhDbC9IMldOR0lwMjNiL1RHMk9ZT3hiZUxzaUNnN0M&traceId=1",
+        "imageAlt": "Mac Studio，银色机身，正面外观展示两个 USB-C 端口、一个 SDXC 卡插槽，以及状态指示灯；背面外观展示铝金属散热孔，端口包括四个雷雳 5 端口、一个以太网端口、一个三针电源插口、两个 USB-A 端口、一个 HDMI 端口、一个耳机插孔，以及电源按钮；顶部俯视外观展示方形圆角机身设计，顶面居中有黑色亮面 Apple 标志。",
+        "imageWidth": 5120,
+        "imageHeight": 3280,
+        "imageKey": "mac-studio-summary-select-202608",
+        "imageSource": "apple-family-summary",
+        "imageSourceUrl": "https://www.apple.com.cn/shop/buy-mac/mac-studio/m5-max-chip-18-core-cpu-32-core-gpu-36gb-memory-512gb-storage",
+        "imageOriginalUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-studio-summary-select-202608?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=emRVcS9veFo0VkhVdktxS2xhUkFyZlZlVVdoQ1hhSFNrUXBpcEw1S25KWjNCbndIdVVCNnVBajNrNndmZlg3UVpIdHlVTTFCN3h3M01Od0tUWEIraE5Yc2ltTjBFSkY0ekhDbC9IMldOR0lwMjNiL1RHMk9ZT3hiZUxzaUNnN0M&traceId=1",
+        "imageMatchDimensions": {
+          "processor-dimensionChip": "m5max",
+          "processor-dimensionChip-cpuCoreCount-gpuCoreCount": "m5max-18-32",
+          "memory-dimensionMemory": "36gb",
+          "storage-dimensionCapacity": "512gb"
+        }
+      },
+      {
+        "partNumber": "MHL74CH/A",
+        "basePartNumber": "MHL74",
+        "category": "mac",
+        "familyKey": "mac-studio",
+        "familySlug": "mac-studio",
+        "model": "Mac Studio",
+        "title": "Mac Studio M5 Ultra 30核CPU/64核GPU 96GB 1TB",
+        "titleSource": "selected_page_metrics_and_labels",
+        "englishName": "Mac Studio",
+        "attributes": {
+          "chipName": "M5 Ultra",
+          "chip": "30核CPU/64核GPU",
+          "memory": "96GB",
+          "capacity": "1TB"
+        },
+        "dimensionValues": {
+          "processor-dimensionChip": "m5ultra",
+          "processor-dimensionChip-cpuCoreCount-gpuCoreCount": "m5ultra-30-64",
+          "memory-dimensionMemory": "96gb",
+          "storage-dimensionCapacity": "1tb"
+        },
+        "priceCny": 46999,
+        "comingSoon": false,
+        "isCarrierDevice": false,
+        "upstreamContainer": "RO_MACSTUDIO_M5MAX_M5ULTRA_BET_BES_2026",
+        "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/mac-studio/m5-ultra-chip-30-core-cpu-64-core-gpu-96gb-memory-1tb-storage",
+        "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-studio-summary-select-202608?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=emRVcS9veFo0VkhVdktxS2xhUkFyZlZlVVdoQ1hhSFNrUXBpcEw1S25KWjNCbndIdVVCNnVBajNrNndmZlg3UVpIdHlVTTFCN3h3M01Od0tUWEIraE5Yc2ltTjBFSkY0ekhDbC9IMldOR0lwMjNiL1RHMk9ZT3hiZUxzaUNnN0M&traceId=1",
+        "imageAlt": "Mac Studio，银色机身，正面外观展示两个 USB-C 端口、一个 SDXC 卡插槽，以及状态指示灯；背面外观展示铝金属散热孔，端口包括四个雷雳 5 端口、一个以太网端口、一个三针电源插口、两个 USB-A 端口、一个 HDMI 端口、一个耳机插孔，以及电源按钮；顶部俯视外观展示方形圆角机身设计，顶面居中有黑色亮面 Apple 标志。",
+        "imageWidth": 5120,
+        "imageHeight": 3280,
+        "imageKey": "mac-studio-summary-select-202608",
+        "imageSource": "apple-family-summary",
+        "imageSourceUrl": "https://www.apple.com.cn/shop/buy-mac/mac-studio/m5-ultra-chip-30-core-cpu-64-core-gpu-96gb-memory-1tb-storage",
+        "imageOriginalUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-studio-summary-select-202608?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=emRVcS9veFo0VkhVdktxS2xhUkFyZlZlVVdoQ1hhSFNrUXBpcEw1S25KWjNCbndIdVVCNnVBajNrNndmZlg3UVpIdHlVTTFCN3h3M01Od0tUWEIraE5Yc2ltTjBFSkY0ekhDbC9IMldOR0lwMjNiL1RHMk9ZT3hiZUxzaUNnN0M&traceId=1",
+        "imageMatchDimensions": {
+          "processor-dimensionChip": "m5ultra",
+          "processor-dimensionChip-cpuCoreCount-gpuCoreCount": "m5ultra-30-64",
+          "memory-dimensionMemory": "96gb",
+          "storage-dimensionCapacity": "1tb"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/mac-studio/m5-max-chip-18-core-cpu-40-core-gpu-64gb-memory-1tb-storage",
+        "sha256": "8fad2836a02afeadf65f692709bd85acf482e6a21e881e870a066c75f7344562",
+        "checkedAt": "2026-10-30T03:51:53.500Z",
+        "partNumber": "MHQJ4CH/A"
+      },
+      {
+        "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/mac-studio/m5-max-chip-18-core-cpu-32-core-gpu-36gb-memory-512gb-storage",
+        "sha256": "9c2f4696b21de5d3ded60ca5074fa9a34a160088c49468941dfbca4523f0bacd",
+        "checkedAt": "2026-10-30T03:51:59.278Z",
+        "partNumber": "MHL64CH/A"
+      },
+      {
+        "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/mac-studio/m5-ultra-chip-30-core-cpu-64-core-gpu-96gb-memory-1tb-storage",
+        "sha256": "d596a14d0e817e02b490bd0cc45a1a7bcef86f258e5fb3d6764b302e80d1cb1c",
+        "checkedAt": "2026-10-30T03:52:03.379Z",
+        "partNumber": "MHL74CH/A"
+      }
+    ],
+    "count": 3,
+    "matchesExistingCatalog": true
+  },
+  "images": {
+    "fetched": 4,
+    "evidence": [
+      {
+        "identity": "/shop/buy-mac/macbook-pro-proled-xdr|{\"chassis-dimensionScreensize\":\"14inch\",\"chassis-dimensionColor\":\"silver\"}",
+        "requestUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_pro_proled_xdr%2Fselect&dm.chassis-dimensionScreensize=14inch&dm.chassis-dimensionColor=silver&dm.display-dimensionFinish=standard&dm.processor-dimensionChip=m5pro&dm.processor-dimensionChip-cpuCoreCount-gpuCoreCount=m5pro-18-20&dm.memory-dimensionMemory=48gb&dm.storage-dimensionCapacity=1tb",
+        "cacheFile": "34703144fef144bf52924c03.json",
+        "httpStatus": 200,
+        "sha256": "6d06052db76a7c0ea6ad9d160a42aa6c53696772d91cff2111b9657dc90c47a3",
+        "fetchedAt": "2026-10-30T03:53:36.590Z",
+        "imageKey": "mac-macbook-pro-proled-summary-select-2026010-14inch-silver",
+        "matched": true
+      },
+      {
+        "identity": "/shop/buy-mac/macbook-pro-proled-xdr|{\"chassis-dimensionScreensize\":\"16inch\",\"chassis-dimensionColor\":\"silver\"}",
+        "requestUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_pro_proled_xdr%2Fselect&dm.chassis-dimensionScreensize=16inch&dm.chassis-dimensionColor=silver&dm.display-dimensionFinish=standard&dm.processor-dimensionChip=m5pro&dm.processor-dimensionChip-cpuCoreCount-gpuCoreCount=m5pro-18-20&dm.memory-dimensionMemory=48gb&dm.storage-dimensionCapacity=1tb",
+        "cacheFile": "52ecdb84882bacda4ff2f63d.json",
+        "httpStatus": 200,
+        "sha256": "4e6402fcbbf21783c6739c48edfb4979d013bd8dca975f4cb33d459dc9fdcfca",
+        "fetchedAt": "2026-10-30T03:53:39.192Z",
+        "imageKey": "mac-macbook-pro-proled-summary-select-2026010-16inch-silver",
+        "matched": true
+      },
+      {
+        "identity": "/shop/buy-mac/macbook-pro-proled-xdr|{\"chassis-dimensionScreensize\":\"14inch\",\"chassis-dimensionColor\":\"spaceblack\"}",
+        "requestUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_pro_proled_xdr%2Fselect&dm.chassis-dimensionScreensize=14inch&dm.chassis-dimensionColor=spaceblack&dm.display-dimensionFinish=standard&dm.processor-dimensionChip=m5pro&dm.processor-dimensionChip-cpuCoreCount-gpuCoreCount=m5pro-15-16&dm.memory-dimensionMemory=24gb&dm.storage-dimensionCapacity=1tb",
+        "cacheFile": "82352f94519f631d8d6a6db4.json",
+        "httpStatus": 200,
+        "sha256": "2144e1dfde02d290c2972e1068ef60ae34621588b107fab6792eb651d009e079",
+        "fetchedAt": "2026-10-30T03:53:41.910Z",
+        "imageKey": "mac-macbook-pro-proled-summary-select-2026010-14inch-spaceblack",
+        "matched": true
+      },
+      {
+        "identity": "/shop/buy-mac/macbook-pro-proled-xdr|{\"chassis-dimensionScreensize\":\"16inch\",\"chassis-dimensionColor\":\"spaceblack\"}",
+        "requestUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_pro_proled_xdr%2Fselect&dm.chassis-dimensionScreensize=16inch&dm.chassis-dimensionColor=spaceblack&dm.display-dimensionFinish=standard&dm.processor-dimensionChip=m5max&dm.processor-dimensionChip-cpuCoreCount-gpuCoreCount=m5max-18-40&dm.memory-dimensionMemory=48gb&dm.storage-dimensionCapacity=2tb",
+        "cacheFile": "edaf7184372330ca95570716.json",
+        "httpStatus": 200,
+        "sha256": "a33856b703bd638aa34c8e1854c1ba7cabdf2205b84a874860366252902d0d23",
+        "fetchedAt": "2026-10-30T03:53:44.561Z",
+        "imageKey": "mac-macbook-pro-proled-summary-select-2026010-16inch-spaceblack",
+        "matched": true
+      }
+    ],
+    "missing": []
+  },
+  "note": "Official configuration pages identify each retail SKU. ProLED remains coming soon and pickup-unverified; no cloud catalog writes or live monitoring enabled."
+}

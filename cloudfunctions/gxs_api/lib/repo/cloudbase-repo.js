@@ -299,6 +299,18 @@ function createCloudbaseRepo(db, { sleep = ms => new Promise(resolve => setTimeo
       return readOne(col(COLLECTIONS.queries).where({ userKey, kind: 'history', status: 'success', finishedAt: _.gte(startAt).and(_.lt(endAt)) }).orderBy('finishedAt', 'desc').orderBy('_id', 'desc'));
     },
 
+    // Deadline reminders are indexed independently from Apple follows.
+    async listDeadlines(userKey, limit = 20) {
+      return readAll(col(COLLECTIONS.deadlines).where({ userKey, status: 'active' }).orderBy('remindAt', 'asc').orderBy('_id', 'asc'), Math.min(20, limit));
+    },
+    async getDeadline(id) { return readOne(col(COLLECTIONS.deadlines).where({ _id: id })); },
+    async listDueDeadlines(nowIso, limit = 5) {
+      return readAll(col(COLLECTIONS.deadlines).where({ scheduleState: 'pending', nextAttemptAt: _.lte(nowIso) }).orderBy('nextAttemptAt', 'asc').orderBy('_id', 'asc'), Math.min(5, limit));
+    },
+    async listExpiredDeadlineClaims(nowIso, limit = 5) {
+      return readAll(col(COLLECTIONS.deadlines).where({ scheduleState: 'sending', leaseUntil: _.lte(nowIso) }).orderBy('leaseUntil', 'asc').orderBy('_id', 'asc'), Math.min(5, limit));
+    },
+
     // ---- follows --------------------------------------------------------
     async listFollows(userKey) {
       return readAll(col(COLLECTIONS.follows).where({ userKey, status: _.neq('removed') }).orderBy('createdAt', 'asc').orderBy('_id', 'asc'));

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "catalogSha256": "28652bb91eb6f47d5e4ce3ed1986a2af56a2f21d0c0fdc72fa9fad9d4075c2c6",
+  "catalogSha256": "ea2264bf5200b7dca4be6eb190d3bef03563b53adcc91b4dfd53be5a6a8bce9a",
   "encoder": {
     "pillow": "12.3.0",
     "opaque": {
@@ -2122,6 +2122,101 @@
       ]
     },
     {
+      "source": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-proled-summary-select-2026010-14inch-silver?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0L3EyS05IQ016T1FsVnB6OWhoM1hxNEk2ZGY4RUh6RDZiVERJYmJiZFFwUGdTdWhIbFJZa3pWS1JQUTZ3cHN3ZlNtTkdpWmFLNDhUNytnaWxtRDBHaEcyTE1mSHgwMHh1SlVoUDJNTksyTUZaelU0K0hWNDFNVnpTWUYxODRJTjJB&traceId=1",
+      "sourceSha256": "1cbe429dfc63c0cda0f7f6ede774b36a74e1838acaf50a4ed84e7f0f0541097d",
+      "sourceWidth": 5120,
+      "sourceHeight": 3280,
+      "parts": [
+        "MJ2G4CH/A",
+        "MJ2J4CH/A",
+        "MMF54CH/A"
+      ],
+      "renditions": [
+        {
+          "variant": "card",
+          "path": "/images/products/4889401bdfcc16bd707a-card.jpg",
+          "width": 96,
+          "height": 62,
+          "bytes": 1283,
+          "sha256": "190c76ef1a5034d8302aaba93c5bb199d07e8d9c13aef3e0f183b4116a4338bb",
+          "format": "JPEG",
+          "hasTransparency": false
+        }
+      ]
+    },
+    {
+      "source": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-proled-summary-select-2026010-14inch-spaceblack?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0L3EyS05IQ016T1FsVnB6OWhoM1hxNEk2ZGY4RUh6RDZiVERJYmJiZFFwUGdIVEZ3M2ZYN1liNldGMXhjallWdGhIdUFTbXNvcW5NTGxOeDdEZ1ZpT01tUnpENUIyWHRhTlhpRFMzSXBkU2NvRmxoM2FzcVR4dWZibnd6N1JWQWZ4Y3ZsTExqb2ptdTVDWkRHS0xMaXFJ&traceId=1",
+      "sourceSha256": "a4c627978941cdb139ebc7b9b986745979021d30bca569355a6b410005ba9e6a",
+      "sourceWidth": 5120,
+      "sourceHeight": 3280,
+      "parts": [
+        "MJ2K4CH/A",
+        "MJ2M4CH/A",
+        "MJ9X4CH/A",
+        "MMF64CH/A"
+      ],
+      "renditions": [
+        {
+          "variant": "card",
+          "path": "/images/products/1117cb2c9a0bd593a261-card.jpg",
+          "width": 96,
+          "height": 62,
+          "bytes": 1351,
+          "sha256": "6cfd26d40180ccd7703ed38187b0619165e23251950c46ceb2ede6d2b28953f0",
+          "format": "JPEG",
+          "hasTransparency": false
+        }
+      ]
+    },
+    {
+      "source": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-proled-summary-select-2026010-16inch-silver?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0L3EyS05IQ016T1FsVnB6OWhoM1hxN1VpRURCbi8vL0U0UmFSMWFBTDEwbGdTdWhIbFJZa3pWS1JQUTZ3cHN3ZlNtTkdpWmFLNDhUNytnaWxtRDBHaEcyTE1mSHgwMHh1SlVoUDJNTksyTUZ4MDBLWFl1akxaVlQxSTNLdWUyeDNR&traceId=1",
+      "sourceSha256": "8d43e419d37cd72202fd80489f4598b2aa09347e319420428dc816f16261f28e",
+      "sourceWidth": 5120,
+      "sourceHeight": 3280,
+      "parts": [
+        "MJ2W4CH/A",
+        "MJ2X4CH/A",
+        "MJ2Y4CH/A",
+        "MMF94CH/A"
+      ],
+      "renditions": [
+        {
+          "variant": "card",
+          "path": "/images/products/b633f4fd2b8d57493745-card.jpg",
+          "width": 96,
+          "height": 62,
+          "bytes": 1405,
+          "sha256": "8a00d6e7712ef27512d395b3cd49fe09d00ffde36c11a1b5ca3888bc22c0ec5c",
+          "format": "JPEG",
+          "hasTransparency": false
+        }
+      ]
+    },
+    {
+      "source": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-proled-summary-select-2026010-16inch-spaceblack?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0L3EyS05IQ016T1FsVnB6OWhoM1hxN1VpRURCbi8vL0U0UmFSMWFBTDEwbGdIVEZ3M2ZYN1liNldGMXhjallWdGhIdUFTbXNvcW5NTGxOeDdEZ1ZpT01tUnpENUIyWHRhTlhpRFMzSXBkU2NvRmxoM2FzcVR4dWZibnd6N1JWQWY4YjgwMmpSSi96dVlXcjhmVE1GWXZF&traceId=1",
+      "sourceSha256": "78601f2220b8746000676cf576d9d8b9f221ae8b68ea7ad348197d88aaae78b8",
+      "sourceWidth": 5120,
+      "sourceHeight": 3280,
+      "parts": [
+        "MJ304CH/A",
+        "MJ314CH/A",
+        "MJ334CH/A",
+        "MMFA4CH/A"
+      ],
+      "renditions": [
+        {
+          "variant": "card",
+          "path": "/images/products/b943c25769dea213ac31-card.jpg",
+          "width": 96,
+          "height": 62,
+          "bytes": 1501,
+          "sha256": "c88b1a7737d48e611c1d7f8bc8f49189f5376508a7be9ea6c04b0f2915854968",
+          "format": "JPEG",
+          "hasTransparency": false
+        }
+      ]
+    },
+    {
       "source": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-summary-select-202610-14inch-silver?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0MlllLy9mUUZibXJtaURkcVBmZXl6SWNoZVhpRkJSdlIvL2hEMTMybU9ocTA0NlFNZVBLdlJNcjRha3NVaFYxSG54TS9QOFlhVHZoV2xFZjU3V3B4aXVxVTZXZmg4WmZLbzB1RGYzRzRjYUZkclVOTnFnQW4rSWEvbldNb1dlYitn&traceId=1",
       "sourceSha256": "6c5301bb5efb3d6aab5e2b35775e88002b8c9040221e3cdeea8347ea1ef2d7ff",
       "sourceWidth": 5120,
@@ -2257,6 +2352,48 @@
       "sourceWidth": 5120,
       "sourceHeight": 3280,
       "parts": [
+        "CTO_0F6C48DC38AA2EA7108E822A92890313CBF7A1D6273A89C5044E807F85DC6DA8",
+        "CTO_1C31884C393B4D04DCDA6A420E59E0CF2666B24BADBB4CAB02C1E2C431424E9D",
+        "CTO_1D456548E39598F53D899DBB075D7D48A626019636929EC7F11C259C6837670B",
+        "CTO_2060F1C93C953C72105D1C83D7F7B9C1AF60C0AB26625C4C5448EBC5679291B5",
+        "CTO_2663BC272676032B8AE58942FDAE860441A36D2B65474446E5ED705A028BC689",
+        "CTO_274C2C5980C6F7D52DCD480EB66F66943BB1626DEC74F2D901BB316F0017DA74",
+        "CTO_30506D6BEEA94F9788F3316540C193403B4D0697E08544304DF8C9739F571D7A",
+        "CTO_37F98681E0BA22571AB395CE660E95E298B5B274A0621B12E4AE9171CFA4FD7D",
+        "CTO_3E2BE08F90A0C85550A03DCC607752B45944D5951247DA6ADF44045A7E303D9C",
+        "CTO_3ED55B73422BF7112C74AAD111412E2817CE192F63B8246A46A83789E2225D8E",
+        "CTO_3FC484D034200F3F197D2215EDDF4425FA8F426B283F16EAFFE17C68E5979C74",
+        "CTO_4B2052144E33CB115911067CF96211245B8D68A33EDC04C0D3863AF410C50624",
+        "CTO_4FC819836541C0D715C83D434BF454C5E60915AD83C43A628F4022EBCE674A14",
+        "CTO_530F838B2C14F71C108EBFB0AEF1FD2C519218F193181FB53257648E102C75AB",
+        "CTO_54140D5D8C66125430E7F71BE153501AE3294C30A786604E325F91DCE43EF8EF",
+        "CTO_61A6672C27C10AD6574C38DC5CDE5094D751A3B672A518C88A7FA281D6F37B88",
+        "CTO_646F980DA8E4E7F181D679DE44D6DF19CE156868832423526C76F261E1169104",
+        "CTO_67ECE9F16FAEF7B26C7307E3F6BBF356465CE0D3A97DBD57B392EC094D3D42D9",
+        "CTO_72D56271E473E9712FE68A46AFF498539D11683188F533269E2184BE05EEE51D",
+        "CTO_79C0B4AB0FC78A8CAF3B923CC1BF044AB8C128285D7524398948FF0935091BF7",
+        "CTO_79DAAC8E2F218C3F8D83B210DC2AADDFFEB1650A02A027CA63F8F0EE6A66A359",
+        "CTO_80D3EF03BAD149845760A87B412105816D70B4ED727864F7B77BA3A3094715DE",
+        "CTO_893F8D08EF6EA245A1635B5EC3F7867EFAE16446022ABFB981C60841944BAEA8",
+        "CTO_8CAE5E8AB20F71CA5283FBC2166165E0CCB05BBA04A7A69808064C3B0640D664",
+        "CTO_90A6B609060EF4C1D6D5EA5DA50EB5B0788A80DD1D3339562DEB9853AC760DD6",
+        "CTO_90AE300975D386C19CBFFA1F5C74B4C61FC8E164EC646C24CBB5A5E449A73188",
+        "CTO_93D9E91D01082BE40F11857C060164E66AF62850D20488E5FBFFFADAC361C966",
+        "CTO_93FE6C1233F297627B639BC07AFC2678EE612EC8C442340AAA76331D38FED1F6",
+        "CTO_9BB05670736811214DD689A0F1F70088EE8F37DF80DBF8415858263534AE78EA",
+        "CTO_A010F5C2983D23A77976D23A1C5163D53B77C84EB526F3BA8CE9B844E5F6B1B7",
+        "CTO_A158249653A94D74DC5382070E93B2AD9151F12C960A1023567AAD1502F44683",
+        "CTO_A4320834C3F714928B447F735D52BB046D29E8F89B3839B5D7F50029743E110A",
+        "CTO_BD4DFDF6A51235C7FDC3F419A918C89FBB02D3BC7B242F3D1650794B4FAA6E63",
+        "CTO_C18524559713B9ACAC9E87B44CFF34424202810B1A70C21BF6CCF31D3DE6CEB5",
+        "CTO_C3B71E8F5F134876123CB470BAADDC83448EC758650645665431402B8DB62B3A",
+        "CTO_C738856ACECFFCF4ED1B387971126D494D4CF4CCE2C544E9484D01B48951ED2B",
+        "CTO_CF9F5E8DD706A5B95EB3B55B44B6300A9F8B5D0BD95EB12744E4593E2036672D",
+        "CTO_D365903F6AE24608F3788EABE0E2CCE92E0AB491BF20DEFEA73E3B79D6B73BD3",
+        "CTO_D852FA29EC9D713081BC200FCF086CB2ACC6C182FE13659E658B429CBE238D2C",
+        "CTO_F3AB3DAC1DBC1BFF7F94C374F530EF242EC4E278E062C880194F3772136E07CE",
+        "CTO_F3F0E8C48AE2D8E6EC839443089DD598A200FFF895A1D3588FC25F7A2FC9CC2B",
+        "CTO_FE572490B55BDE0EB1DFF38062C6AB79375A5DA8A158171624F97A014726C1CE",
         "MHL64CH/A",
         "MHL74CH/A",
         "MHQJ4CH/A"
@@ -2656,8 +2793,14 @@
       ]
     }
   ],
-  "mappingSha256": "85a76a5433fd48ea5af0bca848dd4b94a9bc69692cc9f272ddf0a3b5e6f3439c",
-  "totalBytes": 139837,
-  "generatedAt": "2026-10-28T02:55:00.000Z",
-  "catalogImagesGeneratedAt": "2026-10-28T02:55:00.000Z"
+  "mappingSha256": "fa24b742e8a14609ad7fad1b18008b7c91493318f464246ba98aaef3533a7363",
+  "totalBytes": 145377,
+  "generatedAt": "2026-10-30T07:12:47.466Z",
+  "catalogImagesGeneratedAt": "2026-10-30T07:12:46.858Z",
+  "incrementalBuild": {
+    "reusedVerifiedAssets": 118,
+    "newlyEncodedAssets": 0,
+    "sourceHashesRechecked": true,
+    "reason": "Only exact-configuration membership changed; original and encoded image hashes were rechecked."
+  }
 }

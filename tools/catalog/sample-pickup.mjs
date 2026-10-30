@@ -9,6 +9,7 @@ import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
 import { sleep } from './lib/http.mjs';
+import { buildPickupVerification } from './lib/catalog-readiness.mjs';
 
 const require = createRequire(import.meta.url);
 const { fetchPickup, parseApplePickup } = require('../../cloudfunctions/gxs_api/lib/apple-pickup.js');
@@ -87,14 +88,10 @@ for (const result of results) for (const observation of result.observations) byP
 for (const family of catalog.families) {
   const pick = picks.find(p => p.family.familyKey === family.familyKey);
   const observation = pick?.product ? byPart.get(pick.product.partNumber) : null;
-  family.pickupVerification = {
-    checkedAt: new Date().toISOString(),
-    storeNumber,
-    sampledPartNumber: pick?.product?.partNumber ?? null,
-    status: observation ? observation.status : (pick?.skipped ?? 'not_sampled'),
-    reason: observation?.reason?.code ?? null,
-    verified: Boolean(observation && observation.status !== 'unknown'),
-  };
+  family.pickupVerification = buildPickupVerification({
+    observation, storeNumber, sampledPartNumber: pick?.product?.partNumber ?? null,
+    skipped: pick?.skipped ?? 'not_sampled', checkedAt: new Date().toISOString(),
+  });
 }
 for (const product of catalog.products) {
   const observation = byPart.get(product.partNumber);

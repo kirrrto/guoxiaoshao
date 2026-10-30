@@ -1,4 +1,5 @@
 const navigation = require('../../utils/navigation');
+const { canQuery, canMonitor } = require('../../utils/product-capabilities');
 const { call, newId, showError, toast } = require('../../utils/api');
 const { getBootstrap, getCatalog, invalidateBootstrap, subscribeCatalog, getFollows, publishQuota, subscribeQuota, publishQueryBalance } = require('../../utils/store');
 const fmt = require('../../utils/format');
@@ -58,10 +59,13 @@ function selectionDetails(selection, catalog, maxStores) {
   const stores = numbers.map(n => typeof n === 'string' && /^R\d{3}$/.test(n) && catalog && catalog.storeByNumber && Object.prototype.hasOwnProperty.call(catalog.storeByNumber, n) ? catalog.storeByNumber[n] : null).filter(Boolean);
   const validScope = Boolean(product && numbers.length && numbers.length <= maxStores
     && new Set(numbers).size === numbers.length && stores.length === numbers.length);
-  const unavailable = Boolean(validScope && (!product.supported || product.comingSoon));
+  const unavailable = Boolean(validScope && !canQuery(product));
   const valid = validScope && !unavailable;
   const cities = Array.from(new Set(stores.map(s => s.city).filter(Boolean)));
-  return { validScope, valid, notice: unavailable ? '配置已保存，尚未开始监测。取货查询和关注暂未开放。' : '请补全或核对配置与门店后查询。', summary: product ? {
+  const notice = product && product.targetType === 'apple_cto'
+    ? '官网定制款不支持 Apple Store 店内取货，请选择可查询的标准配置。'
+    : unavailable ? '配置已保存，尚未开始监测。取货查询和关注暂未开放。' : '请补全或核对配置与门店后查询。';
+  return { validScope, valid, notice, referenceOnly: Boolean(product && product.targetType === 'apple_cto'), summary: product ? {
     title: product.title || product.model || product.partNumber,
     imageUrl: product.imageUrl || '', imageDisplayUrl: productThumbnailUrl(product.imageUrl, 'card', product.partNumber), imageAlt: product.imageAlt || product.title || '',
     imageFitClass: productImageFit(product.imageUrl),
@@ -141,6 +145,8 @@ Page({
     catalogVersion: '',
     boot: null,
     selectionCanCollapse: false,
+    selectionSupportsFollow: false,
+    selectionReferenceOnly: false,
     selectionSummary: null,
     selectionNotice: '请补全或核对配置与门店后查询。',
     selectionImageFailed: false,
@@ -363,7 +369,7 @@ Page({
       return { restricted: true, notice: '已保留原配置与门店，请重新查询以确认当前账户可查看的库存。' };
     }
     const product = this.catalog && this.catalog.productByPart[snapshot.product.partNumber];
-    if (!product || !product.supported || product.comingSoon) return { restricted: true, notice: '该商品尚未开放取货查询，请核对当前配置。' };
+    if (!canQuery(product)) return { restricted: true, notice: '该商品尚未开放取货查询，请核对当前配置。' };
     if (this.querySnapshotPermissionDenied || snapshot.latestRestricted || (snapshot.results || []).some(row => row.restricted)) return { restricted: true, notice: '此结果的访问权限待确认，请重新查询；受限的旧观测暂不展示。' };
     if (!canOfferLiveChoices(product, account, Date.now())) return { restricted: true, notice: '当前账户暂不可查看此配置的实时库存，可查看有权限的历史记录或核对会员权益。' };
     return { restricted: false, notice: '' };
@@ -513,18 +519,20 @@ Page({
     if (this.pageRetired) return;
     const flags = this.features || {}, account = this.verifiedAccount();
     const product = this.catalog && this.selection && this.catalog.productByPart[this.selection.partNumber];
-    const restricted = Boolean(flags.resultNextAction && product && product.supported && account && !account.membership.active
+    const restricted = Boolean(flags.resultNextAction && canQuery(product) && account && !account.membership.active
       && Array.isArray(account.newProductWindows) && !canOfferLiveChoices(product, account, Date.now()));
     const state = { snapshot: this.querySnapshot && this.lastQueryUncertain ? { ...this.querySnapshot, ok: false } : this.querySnapshot,
       account, collector: this.data.collector, catalog: this.catalog };
     const access = this.resultAccess();
     const next = flags.resultNextAction ? resultNextAction(state) : null;
+    const resultProduct = this.data.result && this.data.result.product;
     let resumeSetup = false;
     if (flags.activationJourney && account && account.membership.active && this.catalog) {
       const restored = this.checkoutStore().restore(account.identity, this.catalog);
       resumeSetup = restored.status === 'ready';
     }
     this.setData({ nextAction: next && (!access.restricted || next.knownCount === 0 && ['offer', 'account', 'edit'].includes(next.action)) ? next : null,
+      resultSupportsFollow: canMonitor(resultProduct && this.catalog && this.catalog.productByPart[resultProduct.partNumber]),
       evidenceCard: flags.targetEvidence && !access.restricted ? targetEvidence(this.querySnapshot, account, this.catalog) : null,
       contextualCheckout: Boolean(flags.contextualCheckout), selectionRestricted: restricted, liveResultRestricted: access.restricted, resultAccessNotice: access.notice, resumeSetup });
   },
@@ -834,6 +842,8 @@ Page({
     const details = selectionDetails(selection, this.catalog, maxStores || 3);
     return {
       selectionCanCollapse: details.valid,
+      selectionSupportsFollow: canMonitor(selection && this.catalog && this.catalog.productByPart[selection.partNumber]),
+      selectionReferenceOnly: details.referenceOnly,
       selectionSummary: details.summary,
       selectionNotice: details.notice,
       selectionImageFailed: details.summary && this.data.selectionSummary && details.summary.imageUrl === this.data.selectionSummary.imageUrl ? this.data.selectionImageFailed : false,
@@ -947,7 +957,9 @@ Page({
     if (this.features && this.features.resultNextAction && this.data.selectionRestricted && targetKey(selection) === targetKey(this.selection)) return this.onFollowSelection();
     if (!selection.partNumber) return toast('请先选择具体配置');
     if (!selection.storeNumbers.length) return toast('请至少选择一家门店');
-    if (selection.product && !selection.product.supported) return toast('该配置暂不支持查询');
+    if (selection.product && !canQuery(selection.product)) {
+      return toast(selection.product.targetType === 'apple_cto' ? '官网定制款不支持 Apple Store 店内取货' : '该配置暂不支持查询');
+    }
     // Server balance is authoritative. A zero balance may be the debit from
     // the same uncertain request, which must still be allowed to resume.
     this.onSelectionInteraction();
@@ -1021,13 +1033,22 @@ Page({
     if (!boot) return toast('账户正在连接，请稍后再试');
     if (!selection.partNumber) return toast('请先选择具体配置');
     if (!selection.storeNumbers.length) return toast('请至少选择一家门店');
-    if (!selection.product || !selection.product.supported) return toast('该配置暂不支持关注');
+    if (!canMonitor(selection.product)) {
+      if (selection.product && selection.product.targetType === 'apple_cto') return toast('官网定制款不支持 Apple Store 店内取货');
+      if (canQuery(selection.product) && this.data.selectionRestricted) return this.onGoMine();
+      return toast('此配置可手动查询，自动关注暂未开放');
+    }
     this.navigateToFollow({ partNumber: selection.partNumber, storeNumbers: selection.storeNumbers, title: selection.product.title });
   },
 
   onAddFollow() {
     const { result } = this.data;
-    if (!result) return;
+    if (!result || !result.product) return;
+    // Result cards can be restored from an older snapshot. Prefer the current
+    // catalog capability, but never turn a missing cached catalog entry into a
+    // false "monitoring unavailable" for a product that was already followed.
+    const catalogProduct = this.catalog && this.catalog.productByPart && this.catalog.productByPart[result.product.partNumber];
+    if (!canMonitor(catalogProduct || result.product)) return toast('此配置可手动查询，自动关注暂未开放');
     this.navigateToFollow({ partNumber: result.product.partNumber, storeNumbers: result.results.map(r => r.storeNumber), title: result.product.title });
   },
 

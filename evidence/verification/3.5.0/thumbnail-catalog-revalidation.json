@@ -1,0 +1,9 @@
+{
+  "recordedAt": "2026-10-30T04:52:11.115Z",
+  "reason": "Catalog family metadata gained official CTO option ranges; exact SKU image mapping and recorded source hashes remain unchanged.",
+  "previousCatalogSha256": "083f3d57fd4e6e0d6be6ffe754e51af7c01688bbd68b403921c575c8482d38c0",
+  "catalogSha256": "99190a1c3aec1497b7a2990479519b745820bb0a82cd2f76b42277e07b8907bf",
+  "assets": 118,
+  "skus": 355,
+  "imageBytesUnchanged": true
+}

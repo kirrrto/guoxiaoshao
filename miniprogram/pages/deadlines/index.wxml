@@ -1,0 +1,40 @@
+<view class="page deadline-page">
+  <view class="page-heading"><view class="page-title">到期提醒</view><text class="small muted">{{loading ? '读取中' : !serviceAvailable ? '暂不可用' : capability.enabled ? '免费试用' : '仅保存事项'}}</text></view>
+  <view class="deadline-intro">把续费、优惠券和重要截止日记在这里。</view>
+  <view wx:if="{{error}}" class="banner banner-warn" aria-role="alert">{{error}}</view>
+  <view wx:if="{{feedback}}" class="deadline-feedback" aria-role="status">{{feedback}}</view>
+  <view wx:if="{{pending && !busy}}" class="banner banner-warn">
+    <view>原操作尚待确认，请先完成同步。</view>
+    <button class="btn btn-primary btn-block mt" loading="{{busy}}" disabled="{{busy}}" bindtap="onRetryPending">{{pendingLabel}}</button>
+  </view>
+  <view wx:if="{{loading && !ready}}" class="loading-line" aria-busy="true">正在读取到期事项…</view>
+  <button wx:elif="{{!serviceAvailable}}" class="btn btn-primary btn-block" loading="{{loading}}" disabled="{{loading || busy}}" bindtap="load">重新读取</button>
+  <block wx:if="{{ready}}">
+    <view wx:if="{{serviceAvailable && !capability.enabled}}" class="banner banner-info deadline-service-note">当前可保存事项，微信到期提醒尚未开启。到期前请主动查看。</view>
+    <view wx:if="{{editing}}" class="card deadline-editor">
+      <view class="card-title">{{editingId ? '编辑事项' : '添加到期事项'}}</view>
+      <view class="deadline-field"><text class="deadline-label">事项名称</text><input class="deadline-input" value="{{draft.title}}" maxlength="40" placeholder="例如：视频会员续费" placeholder-class="deadline-placeholder" aria-label="事项名称" data-field="title" bindinput="onField" disabled="{{busy || pending}}" /></view>
+      <view class="deadline-field"><text class="deadline-label">类型</text><picker mode="selector" range="{{categories}}" range-key="label" value="{{categoryIndex}}" bindchange="onCategory" disabled="{{busy || pending}}" aria-label="事项类型"><view class="deadline-picker"><text>{{categories[categoryIndex].label}}</text><view class="ui-chevron" aria-hidden="true"></view></view></picker></view>
+      <view class="deadline-field"><text class="deadline-label">到期日期</text><picker mode="date" value="{{draft.dueDate}}" data-field="dueDate" bindchange="onField" disabled="{{busy || pending}}" aria-label="到期日期"><view class="deadline-picker"><text>{{draft.dueDate}}</text><view class="ui-chevron" aria-hidden="true"></view></view></picker></view>
+      <view class="deadline-field"><text class="deadline-label">提前几天</text><input class="deadline-input" type="number" value="{{draft.advanceDays}}" maxlength="3" placeholder="0 为到期当天" placeholder-class="deadline-placeholder" aria-label="提前天数，0为当天，最多365天" data-field="advanceDays" bindinput="onField" disabled="{{busy || pending}}" /></view>
+      <view class="deadline-field"><text class="deadline-label">提醒时刻</text><picker mode="time" value="{{draft.remindTime}}" data-field="remindTime" bindchange="onField" disabled="{{busy || pending}}" aria-label="提醒时刻，北京时间"><view class="deadline-picker"><text>{{draft.remindTime}}</text><view class="ui-chevron" aria-hidden="true"></view></view></picker></view>
+      <view wx:if="{{previewTime}}" class="deadline-preview">计划 {{previewTime}} 提醒（北京时间）</view>
+      <view class="small muted">{{capability.enabled ? '保存后需允许一次微信提醒，修改后需重新授权。提醒遵循「我的」通知开关与免打扰设置，可能延后。' : '当前仅保存事项，不会发送微信通知。'}}</view>
+      <view wx:if="{{formError}}" class="small text-bad mt" aria-role="alert">{{formError}}</view>
+      <button wx:if="{{editConflict}}" class="btn btn-ghost btn-block mt" disabled="{{busy || pending || loading}}" bindtap="onReloadEditor">用最新内容替换草稿</button>
+      <view class="btn-row"><button class="btn btn-ghost" disabled="{{busy || pending}}" bindtap="onCancel">取消</button><button class="btn btn-primary" loading="{{busy}}" disabled="{{busy || pending || editConflict || !serviceAvailable}}" bindtap="onSave">{{busy ? '保存中' : '保存事项'}}</button></view>
+    </view>
+    <button wx:elif="{{serviceAvailable}}" class="btn btn-primary btn-block deadline-add" disabled="{{busy || pending || loading}}" bindtap="onNew">添加到期事项</button>
+    <view class="deadline-list-heading"><text class="bold">我的事项</text><text class="small muted">{{items.length}} / {{limit}}</text></view>
+    <view wx:if="{{!items.length}}" class="deadline-empty">还没有到期事项。先记下一张快过期的券，或下一次会员续费。</view>
+    <view wx:for="{{items}}" wx:key="id" class="card deadline-item">
+      <view class="deadline-item-title">{{item.title}}</view>
+      <view class="deadline-item-date">{{item.dueText}} · {{item.categoryLabel}}</view>
+      <view class="deadline-item-plan">计划提醒 {{item.remindText}}（北京时间）</view>
+      <view class="deadline-status deadline-status--{{item.tone}}">{{item.statusLabel}}</view>
+      <view class="small muted">{{item.statusNote}}</view>
+      <button wx:if="{{item.canAuthorize && capability.enabled && serviceAvailable}}" class="btn btn-primary btn-block mt" data-id="{{item.id}}" loading="{{busy}}" disabled="{{busy || pending}}" bindtap="onAuthorize">允许一次微信提醒</button>
+      <view class="deadline-item-actions"><button class="ui-action" data-id="{{item.id}}" disabled="{{busy || pending || !item.canEdit || !serviceAvailable}}" bindtap="onEdit" aria-label="{{'编辑' + item.title}}">编辑</button><button class="ui-action text-bad" data-id="{{item.id}}" disabled="{{busy || pending || !item.canEdit || !serviceAvailable}}" bindtap="onRemove" aria-label="{{'删除' + item.title}}">删除</button></view>
+    </view>
+  </block>
+</view>

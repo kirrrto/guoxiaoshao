@@ -1,0 +1,32 @@
+{
+  "output": "C:\\Users\\Administrator\\AppData\\Local\\Temp\\gxs-v350-preview",
+  "snapshots": 72,
+  "pages": [
+    "follow",
+    "deadlines"
+  ],
+  "scenarios": [
+    "v350-loading",
+    "v350-empty",
+    "v350-scheduled",
+    "v350-service-off",
+    "v350-needs-authorization",
+    "v350-authorization-elapsed",
+    "v350-delivery-results",
+    "v350-read-error",
+    "v350-apple-error",
+    "v350-editor",
+    "v350-editor-empty",
+    "v350-saving",
+    "v350-save-error",
+    "v350-edit-conflict",
+    "v350-longcontent"
+  ],
+  "widths": [
+    320,
+    375,
+    430
+  ],
+  "remoteImages": false,
+  "expressionErrors": 0
+}

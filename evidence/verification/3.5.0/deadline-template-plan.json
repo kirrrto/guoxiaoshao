@@ -1,0 +1,69 @@
+{
+  "purpose": "Offline review only; template ownership/category/content suitability remain subject to verification in the actual consumer app account.",
+  "deployed": false,
+  "deliveryEnabled": false,
+  "template": {
+    "templateId": "ciI4JTu358s2e_TEPLgB-9g26_CrHGcVga9fdSKG68Y",
+    "title": "日历事件提醒",
+    "type": 2,
+    "fields": [
+      "time2",
+      "thing3",
+      "time6",
+      "thing7",
+      "thing5"
+    ]
+  },
+  "proposedEvent": {
+    "action": "admin.updateConfig",
+    "payload": {
+      "patch": {
+        "deadlineReminders": {
+          "enabled": false,
+          "templateId": "ciI4JTu358s2e_TEPLgB-9g26_CrHGcVga9fdSKG68Y",
+          "miniprogramState": "formal",
+          "templateFields": {
+            "title": "thing3",
+            "date": "time2",
+            "time": "time6",
+            "category": "thing7",
+            "remark": "thing5"
+          }
+        }
+      }
+    }
+  },
+  "preview": {
+    "synthetic": true,
+    "templateId": "ciI4JTu358s2e_TEPLgB-9g26_CrHGcVga9fdSKG68Y",
+    "page": "pages/deadlines/index?id=preview-only",
+    "miniprogramState": "formal",
+    "data": {
+      "thing3": {
+        "value": "优惠券到期"
+      },
+      "time2": {
+        "value": "2030-01-02 23:59"
+      },
+      "time6": {
+        "value": "2030-01-01 09:00"
+      },
+      "thing7": {
+        "value": "优惠券"
+      },
+      "thing5": {
+        "value": "你设置的到期提醒"
+      }
+    }
+  },
+  "checksStillRequired": [
+    "consumer_template_ownership_and_category",
+    "template_semantic_suitability",
+    "sender_credentials_in_api_and_monitor",
+    "same_version_api_and_monitor",
+    "trusted_minute_trigger",
+    "real_user_subscription",
+    "platform_acceptance",
+    "real_device_receipt_and_page"
+  ]
+}

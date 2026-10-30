@@ -1,4 +1,5 @@
 const navigation = require('./navigation');
+const { isPublicTargetIdentity } = require('./product-capabilities');
 // Short-lived navigation intents only. Never store payments, balances or consent here.
 const MAX_AGE = 10 * 60 * 1000;
 const SOURCES = ['query', 'follow', 'mine', 'guide', 'history'];
@@ -21,7 +22,7 @@ function validIntent(value, owner = currentOwner()) {
 function stageHistoryContext({ from, target, requestId } = {}) {
   const ownerUserKey = currentOwner();
   if (!ownerUserKey || !['query', 'follow'].includes(from) || !target
-    || typeof target.partNumber !== 'string' || !/^[A-Za-z0-9/_-]{1,64}$/.test(target.partNumber)
+    || !isPublicTargetIdentity(target.partNumber)
     || !Array.isArray(target.storeNumbers) || target.storeNumbers.length > 10
     || target.storeNumbers.some(number => typeof number !== 'string' || !/^R\d{3}$/.test(number))
     || new Set(target.storeNumbers).size !== target.storeNumbers.length) return false;

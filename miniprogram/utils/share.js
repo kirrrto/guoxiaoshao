@@ -1,14 +1,15 @@
 /**
  * Shared WeChat share payload for consumer pages.
- * Share card: first followed product image when present; otherwise omit
- * imageUrl so WeChat captures the current page screenshot.
+ * Inventory share cards may use the selected product. The personal home always
+ * uses the brand image so a native screenshot cannot expose private deadlines.
  */
 const IMAGE = 'images/brand/logo-mint-144.png';
-const DEFAULT_TITLE = '果小哨 · 苹果直营店取货供应监测';
+const { isPublicTargetIdentity } = require('./product-capabilities');
+const DEFAULT_TITLE = '果小哨 · 记住到期日，留意库存变化';
 
 const PAGE_META = {
   '/pages/query/index': { title: '果小哨 · 查苹果直营店取货', query: 'from=share_query' },
-  '/pages/follow/index': { title: '果小哨 · 到货提醒，关注配置即可', query: 'from=share_follow' },
+  '/pages/follow/index': { title: DEFAULT_TITLE, query: 'from=share_follow' },
   '/pages/history/index': { title: '果小哨 · 看门店补货历史', query: 'from=share_history' },
   '/pages/mine/index': { title: '果小哨 · 取货信息查询与关注', query: 'from=share_mine' },
   '/pages/notice-board/index': { title: '果小哨 · 服务公告与说明', query: 'from=share_notice' },
@@ -39,6 +40,9 @@ function shareTitleFor(route, pageData) {
 }
 
 function shareAppMessage(route, pageData) {
+  if (route === '/pages/follow/index') return {
+    title: DEFAULT_TITLE, path: '/pages/follow/index?from=share_follow', imageUrl: IMAGE,
+  };
   const payload = {
     title: shareTitleFor(route, pageData),
     path: `/pages/query/index?${(PAGE_META[route] && PAGE_META[route].query) || 'from=share'}`,
@@ -66,7 +70,7 @@ function readSharedSelection(options) {
   try {
     const partNumber = decodeURIComponent(options.gxsPart);
     const storeNumbers = decodeURIComponent(options.gxsStores).split(',');
-    if (!/^[A-Za-z0-9/_-]{1,64}$/.test(partNumber) || storeNumbers.length < 1 || storeNumbers.length > 5
+    if (!isPublicTargetIdentity(partNumber) || storeNumbers.length < 1 || storeNumbers.length > 5
       || !storeNumbers.every(number => /^R\d{3}$/.test(number)) || new Set(storeNumbers).size !== storeNumbers.length) return null;
     return { partNumber, storeNumbers };
   } catch (e) { return null; }
@@ -91,7 +95,7 @@ function timelineImagePath() {
 function shareTimeline() {
   // Moments is a product intro card: brand logo, not device or page art.
   return {
-    title: '果小哨 · 查苹果直营店取货与到货提醒',
+    title: DEFAULT_TITLE,
     query: 'from=share_timeline',
     imageUrl: timelineImagePath(),
   };

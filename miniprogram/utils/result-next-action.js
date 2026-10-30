@@ -1,4 +1,5 @@
 const fmt = require('./format');
+const { canQuery, canMonitor } = require('./product-capabilities');
 const { canOfferLiveChoices } = require('./observation-insights');
 
 function targetSignature(target) {
@@ -14,7 +15,10 @@ function resultNextAction({ snapshot, account, collector, catalog, now = Date.no
   const target = { partNumber: snapshot.product.partNumber, storeNumbers: rows.map(row => row.storeNumber) };
   const base = { targetSignature: targetSignature(target), knownCount: 0, unknownCount: rows.length, action: 'retry',
     title: '当前取货状态待确认', detail: '继续查询原配置，结果不确定时会恢复原请求。', label: '继续查询原配置', tone: 'neutral' };
-  if (!product || !product.supported || product.comingSoon) return { ...base, action: 'edit', title: '此配置暂未开放查询', detail: '商品信息或取货服务尚待确认，可先查看新品准备信息。', label: '重新选择配置' };
+  if (!canQuery(product)) return { ...base, action: 'edit',
+    title: product && product.targetType === 'apple_cto' ? '官网定制款不支持店内取货' : '此配置暂未开放查询',
+    detail: product && product.targetType === 'apple_cto' ? '定制款仅作配置参考，请选择可查询的标准配置。' : '商品信息或取货服务尚待确认，可先查看新品准备信息。',
+    label: '重新选择配置' };
   if (!account || !account.membership) return { ...base, action: 'account', title: '正在确认账户权限', detail: '账户连接后可继续查看当前配置。', label: '重试账户连接' };
   if (snapshot.latestRestricted || rows.some(row => row.restricted)) return { ...base, action: 'account', title: '此结果的访问权限待确认', detail: '刷新账户权限后重新查询，不展示受限的旧观测。', label: '重试账户连接' };
   if (!canOfferLiveChoices(product, account, now)) return { ...base, action: 'offer', title: '此配置实时查询需会员',
@@ -28,6 +32,7 @@ function resultNextAction({ snapshot, account, collector, catalog, now = Date.no
   if (available.length) return { ...base, ...counts, action: 'guide', tone: 'available', title: `${available.length} 家门店有可取货观测`,
     detail: `${partial ? `另有 ${rows.length - known.length} 家待确认。` : ''}观测不锁库存，购买请在 Apple 官方渠道完成。`, label: '查看下单指引' };
   if (partial) return { ...base, ...counts, title: `${rows.length - known.length} 家门店仍待确认`, detail: '已有有效结果保留在下方，未知状态不等于无货。' };
+  if (!canMonitor(product)) return { ...base, ...counts, title: '本次暂无可取货观测', detail: '此配置可手动查询，自动关注暂未开放。' };
   if (!collector || !['running', 'idle'].includes(collector.state) || collector.observationStale) return { ...base, ...counts,
     title: '本次暂无可取货观测', detail: '后台检测状态待恢复；开通会员不会消除服务异常。' };
   const member = account.membership.active;

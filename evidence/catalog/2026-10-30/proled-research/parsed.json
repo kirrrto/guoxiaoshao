@@ -1,0 +1,602 @@
+{
+  "record": {
+    "requestUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr",
+    "method": "GET",
+    "startedAt": "2026-10-30T03:47:18.175Z",
+    "retries": 0,
+    "httpStatus": 200,
+    "headers": {
+      "content-type": "text/html;charset=utf-8",
+      "date": "Fri, 30 Oct 2026 03:47:17 GMT",
+      "cache-control": "public, max-age=108, s-maxage=120"
+    },
+    "bytes": 346724,
+    "sha256": "6cdc39629b21d96b942fd1b63b66fed10243e8d2eda1b3d3b1fd9f5e2e974bc3",
+    "elapsedMs": 2370,
+    "finishedAt": "2026-10-30T03:47:20.545Z"
+  },
+  "parsed": {
+    "supported": true,
+    "reason": null,
+    "layout": "configurator",
+    "pageTitle": "MacBook Pro (PROLED XDR 显示屏)",
+    "dimensions": [
+      "chassis-dimensionScreensize",
+      "chassis-dimensionColor",
+      "display-dimensionFinish",
+      "processor-dimensionChip",
+      "processor-dimensionChip-cpuCoreCount-gpuCoreCount"
+    ],
+    "products": [
+      {
+        "partNumber": "MJ2K4CH/A",
+        "basePartNumber": "MJ2K4",
+        "category": "mac",
+        "familyKey": "macbook-pro-proled-xdr",
+        "familySlug": "macbook-pro-proled-xdr",
+        "model": "MacBook Pro (PROLED XDR 显示屏) 14 英寸",
+        "title": "MacBook Pro (PROLED XDR 显示屏) 14 英寸 M5 Pro 15核CPU/16核GPU 标准玻璃 深空黑色",
+        "titleSource": "partial_page_labels",
+        "englishName": null,
+        "attributes": {
+          "screensize": "14 英寸",
+          "screensizeDetail": "可选配 M5 Pro 或 M5 Max 芯片。",
+          "color": "深空黑色",
+          "finish": "标准玻璃",
+          "finishDetail": "采用低反射率设计，可减少使用环境中的屏幕眩光。",
+          "chipName": "M5 Pro",
+          "chipNameDetail": "突破性的性能和速度，胜任各种高难度任务，是专业人士的工作利器。",
+          "chip": "15核CPU/16核GPU"
+        },
+        "dimensionValues": {
+          "chassis-dimensionColor": "spaceblack",
+          "processor-dimensionChip": "m5pro",
+          "processor-dimensionChip-cpuCoreCount-gpuCoreCount": "m5pro-15-16",
+          "display-dimensionFinish": "standard",
+          "chassis-dimensionScreensize": "14inch"
+        },
+        "priceCny": 22999,
+        "comingSoon": false,
+        "isCarrierDevice": false,
+        "upstreamContainer": "RO_MBP_OLED_M5_14INCH_SPACEBLACK_BET_ULT_2026",
+        "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr",
+        "imageRequest": {
+          "url": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_pro_proled_xdr%2Fselect&dm.chassis-dimensionColor=spaceblack&dm.processor-dimensionChip=m5pro&dm.processor-dimensionChip-cpuCoreCount-gpuCoreCount=m5pro-15-16&dm.display-dimensionFinish=standard&dm.chassis-dimensionScreensize=14inch",
+          "matchDimensions": {
+            "chassis-dimensionScreensize": "14inch",
+            "chassis-dimensionColor": "spaceblack"
+          },
+          "requiredDimensions": [
+            "chassis-dimensionScreensize",
+            "chassis-dimensionColor"
+          ],
+          "identity": "/shop/buy-mac/macbook-pro-proled-xdr|{\"chassis-dimensionScreensize\":\"14inch\",\"chassis-dimensionColor\":\"spaceblack\"}"
+        }
+      },
+      {
+        "partNumber": "MJ2X4CH/A",
+        "basePartNumber": "MJ2X4",
+        "category": "mac",
+        "familyKey": "macbook-pro-proled-xdr",
+        "familySlug": "macbook-pro-proled-xdr",
+        "model": "MacBook Pro (PROLED XDR 显示屏) 16 英寸",
+        "title": "MacBook Pro (PROLED XDR 显示屏) 16 英寸 M5 Max 18核CPU/32核GPU 标准玻璃 银色",
+        "titleSource": "partial_page_labels",
+        "englishName": null,
+        "attributes": {
+          "screensize": "16 英寸",
+          "screensizeDetail": "可选配 M5 Pro 或 M5 Max 芯片。",
+          "color": "银色",
+          "finish": "标准玻璃",
+          "finishDetail": "采用低反射率设计，可减少使用环境中的屏幕眩光。",
+          "chipName": "M5 Max",
+          "chipNameDetail": "Mac 专业笔电上的最强芯片，专攻各种超硬核的工作。",
+          "chip": "18核CPU/32核GPU"
+        },
+        "dimensionValues": {
+          "chassis-dimensionColor": "silver",
+          "processor-dimensionChip": "m5max",
+          "processor-dimensionChip-cpuCoreCount-gpuCoreCount": "m5max-18-32",
+          "display-dimensionFinish": "standard",
+          "chassis-dimensionScreensize": "16inch"
+        },
+        "priceCny": 38999,
+        "comingSoon": false,
+        "isCarrierDevice": false,
+        "upstreamContainer": "RO_MBP_OLED_M5_16INCH_SILVER_BET_ULT_SUP_2026",
+        "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr",
+        "imageRequest": {
+          "url": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_pro_proled_xdr%2Fselect&dm.chassis-dimensionColor=silver&dm.processor-dimensionChip=m5max&dm.processor-dimensionChip-cpuCoreCount-gpuCoreCount=m5max-18-32&dm.display-dimensionFinish=standard&dm.chassis-dimensionScreensize=16inch",
+          "matchDimensions": {
+            "chassis-dimensionScreensize": "16inch",
+            "chassis-dimensionColor": "silver"
+          },
+          "requiredDimensions": [
+            "chassis-dimensionScreensize",
+            "chassis-dimensionColor"
+          ],
+          "identity": "/shop/buy-mac/macbook-pro-proled-xdr|{\"chassis-dimensionScreensize\":\"16inch\",\"chassis-dimensionColor\":\"silver\"}"
+        }
+      },
+      {
+        "partNumber": "MJ2G4CH/A",
+        "basePartNumber": "MJ2G4",
+        "category": "mac",
+        "familyKey": "macbook-pro-proled-xdr",
+        "familySlug": "macbook-pro-proled-xdr",
+        "model": "MacBook Pro (PROLED XDR 显示屏) 14 英寸",
+        "title": "MacBook Pro (PROLED XDR 显示屏) 14 英寸 M5 Pro 15核CPU/16核GPU 标准玻璃 银色",
+        "titleSource": "partial_page_labels",
+        "englishName": null,
+        "attributes": {
+          "screensize": "14 英寸",
+          "screensizeDetail": "可选配 M5 Pro 或 M5 Max 芯片。",
+          "color": "银色",
+          "finish": "标准玻璃",
+          "finishDetail": "采用低反射率设计，可减少使用环境中的屏幕眩光。",
+          "chipName": "M5 Pro",
+          "chipNameDetail": "突破性的性能和速度，胜任各种高难度任务，是专业人士的工作利器。",
+          "chip": "15核CPU/16核GPU"
+        },
+        "dimensionValues": {
+          "chassis-dimensionColor": "silver",
+          "processor-dimensionChip": "m5pro",
+          "processor-dimensionChip-cpuCoreCount-gpuCoreCount": "m5pro-15-16",
+          "display-dimensionFinish": "standard",
+          "chassis-dimensionScreensize": "14inch"
+        },
+        "priceCny": 22999,
+        "comingSoon": false,
+        "isCarrierDevice": false,
+        "upstreamContainer": "RO_MBP_OLED_M5_14INCH_SILVER_BET_ULT_2026",
+        "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr",
+        "imageRequest": {
+          "url": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_pro_proled_xdr%2Fselect&dm.chassis-dimensionColor=silver&dm.processor-dimensionChip=m5pro&dm.processor-dimensionChip-cpuCoreCount-gpuCoreCount=m5pro-15-16&dm.display-dimensionFinish=standard&dm.chassis-dimensionScreensize=14inch",
+          "matchDimensions": {
+            "chassis-dimensionScreensize": "14inch",
+            "chassis-dimensionColor": "silver"
+          },
+          "requiredDimensions": [
+            "chassis-dimensionScreensize",
+            "chassis-dimensionColor"
+          ],
+          "identity": "/shop/buy-mac/macbook-pro-proled-xdr|{\"chassis-dimensionScreensize\":\"14inch\",\"chassis-dimensionColor\":\"silver\"}"
+        }
+      },
+      {
+        "partNumber": "MJ2M4CH/A",
+        "basePartNumber": "MJ2M4",
+        "category": "mac",
+        "familyKey": "macbook-pro-proled-xdr",
+        "familySlug": "macbook-pro-proled-xdr",
+        "model": "MacBook Pro (PROLED XDR 显示屏) 14 英寸",
+        "title": "MacBook Pro (PROLED XDR 显示屏) 14 英寸 M5 Max 18核CPU/32核GPU 标准玻璃 深空黑色",
+        "titleSource": "partial_page_labels",
+        "englishName": null,
+        "attributes": {
+          "screensize": "14 英寸",
+          "screensizeDetail": "可选配 M5 Pro 或 M5 Max 芯片。",
+          "color": "深空黑色",
+          "finish": "标准玻璃",
+          "finishDetail": "采用低反射率设计，可减少使用环境中的屏幕眩光。",
+          "chipName": "M5 Max",
+          "chipNameDetail": "Mac 专业笔电上的最强芯片，专攻各种超硬核的工作。",
+          "chip": "18核CPU/32核GPU"
+        },
+        "dimensionValues": {
+          "chassis-dimensionColor": "spaceblack",
+          "processor-dimensionChip": "m5max",
+          "processor-dimensionChip-cpuCoreCount-gpuCoreCount": "m5max-18-32",
+          "display-dimensionFinish": "standard",
+          "chassis-dimensionScreensize": "14inch"
+        },
+        "priceCny": 36999,
+        "comingSoon": false,
+        "isCarrierDevice": false,
+        "upstreamContainer": "RO_MBP_OLED_M5_14INCH_SPACEBLACK_BET_ULT_2026",
+        "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr",
+        "imageRequest": {
+          "url": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_pro_proled_xdr%2Fselect&dm.chassis-dimensionColor=spaceblack&dm.processor-dimensionChip=m5max&dm.processor-dimensionChip-cpuCoreCount-gpuCoreCount=m5max-18-32&dm.display-dimensionFinish=standard&dm.chassis-dimensionScreensize=14inch",
+          "matchDimensions": {
+            "chassis-dimensionScreensize": "14inch",
+            "chassis-dimensionColor": "spaceblack"
+          },
+          "requiredDimensions": [
+            "chassis-dimensionScreensize",
+            "chassis-dimensionColor"
+          ],
+          "identity": "/shop/buy-mac/macbook-pro-proled-xdr|{\"chassis-dimensionScreensize\":\"14inch\",\"chassis-dimensionColor\":\"spaceblack\"}"
+        }
+      },
+      {
+        "partNumber": "MJ2Y4CH/A",
+        "basePartNumber": "MJ2Y4",
+        "category": "mac",
+        "familyKey": "macbook-pro-proled-xdr",
+        "familySlug": "macbook-pro-proled-xdr",
+        "model": "MacBook Pro (PROLED XDR 显示屏) 16 英寸",
+        "title": "MacBook Pro (PROLED XDR 显示屏) 16 英寸 M5 Max 18核CPU/40核GPU 标准玻璃 银色",
+        "titleSource": "partial_page_labels",
+        "englishName": null,
+        "attributes": {
+          "screensize": "16 英寸",
+          "screensizeDetail": "可选配 M5 Pro 或 M5 Max 芯片。",
+          "color": "银色",
+          "finish": "标准玻璃",
+          "finishDetail": "采用低反射率设计，可减少使用环境中的屏幕眩光。",
+          "chipName": "M5 Max",
+          "chipNameDetail": "Mac 专业笔电上的最强芯片，专攻各种超硬核的工作。",
+          "chip": "18核CPU/40核GPU",
+          "chipDetail": "处理能力和图形渲染速度大幅提升，从运行大语言模型到剪辑 8K 视频，各种任务加速搞定。"
+        },
+        "dimensionValues": {
+          "chassis-dimensionColor": "silver",
+          "processor-dimensionChip": "m5max",
+          "processor-dimensionChip-cpuCoreCount-gpuCoreCount": "m5max-18-40",
+          "display-dimensionFinish": "standard",
+          "chassis-dimensionScreensize": "16inch"
+        },
+        "priceCny": 43999,
+        "comingSoon": false,
+        "isCarrierDevice": false,
+        "upstreamContainer": "RO_MBP_OLED_M5_16INCH_SILVER_BET_ULT_SUP_2026",
+        "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr",
+        "imageRequest": {
+          "url": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_pro_proled_xdr%2Fselect&dm.chassis-dimensionColor=silver&dm.processor-dimensionChip=m5max&dm.processor-dimensionChip-cpuCoreCount-gpuCoreCount=m5max-18-40&dm.display-dimensionFinish=standard&dm.chassis-dimensionScreensize=16inch",
+          "matchDimensions": {
+            "chassis-dimensionScreensize": "16inch",
+            "chassis-dimensionColor": "silver"
+          },
+          "requiredDimensions": [
+            "chassis-dimensionScreensize",
+            "chassis-dimensionColor"
+          ],
+          "identity": "/shop/buy-mac/macbook-pro-proled-xdr|{\"chassis-dimensionScreensize\":\"16inch\",\"chassis-dimensionColor\":\"silver\"}"
+        }
+      },
+      {
+        "partNumber": "MJ2J4CH/A",
+        "basePartNumber": "MJ2J4",
+        "category": "mac",
+        "familyKey": "macbook-pro-proled-xdr",
+        "familySlug": "macbook-pro-proled-xdr",
+        "model": "MacBook Pro (PROLED XDR 显示屏) 14 英寸",
+        "title": "MacBook Pro (PROLED XDR 显示屏) 14 英寸 M5 Max 18核CPU/32核GPU 标准玻璃 银色",
+        "titleSource": "partial_page_labels",
+        "englishName": null,
+        "attributes": {
+          "screensize": "14 英寸",
+          "screensizeDetail": "可选配 M5 Pro 或 M5 Max 芯片。",
+          "color": "银色",
+          "finish": "标准玻璃",
+          "finishDetail": "采用低反射率设计，可减少使用环境中的屏幕眩光。",
+          "chipName": "M5 Max",
+          "chipNameDetail": "Mac 专业笔电上的最强芯片，专攻各种超硬核的工作。",
+          "chip": "18核CPU/32核GPU"
+        },
+        "dimensionValues": {
+          "chassis-dimensionColor": "silver",
+          "processor-dimensionChip": "m5max",
+          "processor-dimensionChip-cpuCoreCount-gpuCoreCount": "m5max-18-32",
+          "display-dimensionFinish": "standard",
+          "chassis-dimensionScreensize": "14inch"
+        },
+        "priceCny": 36999,
+        "comingSoon": false,
+        "isCarrierDevice": false,
+        "upstreamContainer": "RO_MBP_OLED_M5_14INCH_SILVER_BET_ULT_2026",
+        "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr",
+        "imageRequest": {
+          "url": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_pro_proled_xdr%2Fselect&dm.chassis-dimensionColor=silver&dm.processor-dimensionChip=m5max&dm.processor-dimensionChip-cpuCoreCount-gpuCoreCount=m5max-18-32&dm.display-dimensionFinish=standard&dm.chassis-dimensionScreensize=14inch",
+          "matchDimensions": {
+            "chassis-dimensionScreensize": "14inch",
+            "chassis-dimensionColor": "silver"
+          },
+          "requiredDimensions": [
+            "chassis-dimensionScreensize",
+            "chassis-dimensionColor"
+          ],
+          "identity": "/shop/buy-mac/macbook-pro-proled-xdr|{\"chassis-dimensionScreensize\":\"14inch\",\"chassis-dimensionColor\":\"silver\"}"
+        }
+      },
+      {
+        "partNumber": "MJ314CH/A",
+        "basePartNumber": "MJ314",
+        "category": "mac",
+        "familyKey": "macbook-pro-proled-xdr",
+        "familySlug": "macbook-pro-proled-xdr",
+        "model": "MacBook Pro (PROLED XDR 显示屏) 16 英寸",
+        "title": "MacBook Pro (PROLED XDR 显示屏) 16 英寸 M5 Max 18核CPU/32核GPU 标准玻璃 深空黑色",
+        "titleSource": "partial_page_labels",
+        "englishName": null,
+        "attributes": {
+          "screensize": "16 英寸",
+          "screensizeDetail": "可选配 M5 Pro 或 M5 Max 芯片。",
+          "color": "深空黑色",
+          "finish": "标准玻璃",
+          "finishDetail": "采用低反射率设计，可减少使用环境中的屏幕眩光。",
+          "chipName": "M5 Max",
+          "chipNameDetail": "Mac 专业笔电上的最强芯片，专攻各种超硬核的工作。",
+          "chip": "18核CPU/32核GPU"
+        },
+        "dimensionValues": {
+          "chassis-dimensionColor": "spaceblack",
+          "processor-dimensionChip": "m5max",
+          "processor-dimensionChip-cpuCoreCount-gpuCoreCount": "m5max-18-32",
+          "display-dimensionFinish": "standard",
+          "chassis-dimensionScreensize": "16inch"
+        },
+        "priceCny": 38999,
+        "comingSoon": false,
+        "isCarrierDevice": false,
+        "upstreamContainer": "RO_MBP_OLED_M5_16INCH_SPACEBLACK_BET_ULT_SUP_2026",
+        "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr",
+        "imageRequest": {
+          "url": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_pro_proled_xdr%2Fselect&dm.chassis-dimensionColor=spaceblack&dm.processor-dimensionChip=m5max&dm.processor-dimensionChip-cpuCoreCount-gpuCoreCount=m5max-18-32&dm.display-dimensionFinish=standard&dm.chassis-dimensionScreensize=16inch",
+          "matchDimensions": {
+            "chassis-dimensionScreensize": "16inch",
+            "chassis-dimensionColor": "spaceblack"
+          },
+          "requiredDimensions": [
+            "chassis-dimensionScreensize",
+            "chassis-dimensionColor"
+          ],
+          "identity": "/shop/buy-mac/macbook-pro-proled-xdr|{\"chassis-dimensionScreensize\":\"16inch\",\"chassis-dimensionColor\":\"spaceblack\"}"
+        }
+      },
+      {
+        "partNumber": "MJ9X4CH/A",
+        "basePartNumber": "MJ9X4",
+        "category": "mac",
+        "familyKey": "macbook-pro-proled-xdr",
+        "familySlug": "macbook-pro-proled-xdr",
+        "model": "MacBook Pro (PROLED XDR 显示屏) 14 英寸",
+        "title": "MacBook Pro (PROLED XDR 显示屏) 14 英寸 M5 Pro 15核CPU/16核GPU 纳米纹理玻璃 深空黑色",
+        "titleSource": "partial_page_labels",
+        "englishName": null,
+        "attributes": {
+          "screensize": "14 英寸",
+          "screensizeDetail": "可选配 M5 Pro 或 M5 Max 芯片。",
+          "color": "深空黑色",
+          "finish": "纳米纹理玻璃",
+          "finishDetail": "进一步减少明亮光线下的屏幕反光和眩光。",
+          "chipName": "M5 Pro",
+          "chipNameDetail": "突破性的性能和速度，胜任各种高难度任务，是专业人士的工作利器。",
+          "chip": "15核CPU/16核GPU"
+        },
+        "dimensionValues": {
+          "chassis-dimensionColor": "spaceblack",
+          "processor-dimensionChip": "m5pro",
+          "processor-dimensionChip-cpuCoreCount-gpuCoreCount": "m5pro-15-16",
+          "display-dimensionFinish": "nano_texture",
+          "chassis-dimensionScreensize": "14inch"
+        },
+        "priceCny": 24124,
+        "comingSoon": false,
+        "isCarrierDevice": false,
+        "upstreamContainer": "RO_MBP_OLED_M5_14INCH_SPACEBLACK_BET_ULT_2026",
+        "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr",
+        "imageRequest": {
+          "url": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_pro_proled_xdr%2Fselect&dm.chassis-dimensionColor=spaceblack&dm.processor-dimensionChip=m5pro&dm.processor-dimensionChip-cpuCoreCount-gpuCoreCount=m5pro-15-16&dm.display-dimensionFinish=nano_texture&dm.chassis-dimensionScreensize=14inch",
+          "matchDimensions": {
+            "chassis-dimensionScreensize": "14inch",
+            "chassis-dimensionColor": "spaceblack"
+          },
+          "requiredDimensions": [
+            "chassis-dimensionScreensize",
+            "chassis-dimensionColor"
+          ],
+          "identity": "/shop/buy-mac/macbook-pro-proled-xdr|{\"chassis-dimensionScreensize\":\"14inch\",\"chassis-dimensionColor\":\"spaceblack\"}"
+        }
+      },
+      {
+        "partNumber": "MJ334CH/A",
+        "basePartNumber": "MJ334",
+        "category": "mac",
+        "familyKey": "macbook-pro-proled-xdr",
+        "familySlug": "macbook-pro-proled-xdr",
+        "model": "MacBook Pro (PROLED XDR 显示屏) 16 英寸",
+        "title": "MacBook Pro (PROLED XDR 显示屏) 16 英寸 M5 Max 18核CPU/40核GPU 标准玻璃 深空黑色",
+        "titleSource": "partial_page_labels",
+        "englishName": null,
+        "attributes": {
+          "screensize": "16 英寸",
+          "screensizeDetail": "可选配 M5 Pro 或 M5 Max 芯片。",
+          "color": "深空黑色",
+          "finish": "标准玻璃",
+          "finishDetail": "采用低反射率设计，可减少使用环境中的屏幕眩光。",
+          "chipName": "M5 Max",
+          "chipNameDetail": "Mac 专业笔电上的最强芯片，专攻各种超硬核的工作。",
+          "chip": "18核CPU/40核GPU",
+          "chipDetail": "处理能力和图形渲染速度大幅提升，从运行大语言模型到剪辑 8K 视频，各种任务加速搞定。"
+        },
+        "dimensionValues": {
+          "chassis-dimensionColor": "spaceblack",
+          "processor-dimensionChip": "m5max",
+          "processor-dimensionChip-cpuCoreCount-gpuCoreCount": "m5max-18-40",
+          "display-dimensionFinish": "standard",
+          "chassis-dimensionScreensize": "16inch"
+        },
+        "priceCny": 43999,
+        "comingSoon": false,
+        "isCarrierDevice": false,
+        "upstreamContainer": "RO_MBP_OLED_M5_16INCH_SPACEBLACK_BET_ULT_SUP_2026",
+        "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr",
+        "imageRequest": {
+          "url": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_pro_proled_xdr%2Fselect&dm.chassis-dimensionColor=spaceblack&dm.processor-dimensionChip=m5max&dm.processor-dimensionChip-cpuCoreCount-gpuCoreCount=m5max-18-40&dm.display-dimensionFinish=standard&dm.chassis-dimensionScreensize=16inch",
+          "matchDimensions": {
+            "chassis-dimensionScreensize": "16inch",
+            "chassis-dimensionColor": "spaceblack"
+          },
+          "requiredDimensions": [
+            "chassis-dimensionScreensize",
+            "chassis-dimensionColor"
+          ],
+          "identity": "/shop/buy-mac/macbook-pro-proled-xdr|{\"chassis-dimensionScreensize\":\"16inch\",\"chassis-dimensionColor\":\"spaceblack\"}"
+        }
+      },
+      {
+        "partNumber": "MJ304CH/A",
+        "basePartNumber": "MJ304",
+        "category": "mac",
+        "familyKey": "macbook-pro-proled-xdr",
+        "familySlug": "macbook-pro-proled-xdr",
+        "model": "MacBook Pro (PROLED XDR 显示屏) 16 英寸",
+        "title": "MacBook Pro (PROLED XDR 显示屏) 16 英寸 M5 Pro 18核CPU/20核GPU 标准玻璃 深空黑色",
+        "titleSource": "partial_page_labels",
+        "englishName": null,
+        "attributes": {
+          "screensize": "16 英寸",
+          "screensizeDetail": "可选配 M5 Pro 或 M5 Max 芯片。",
+          "color": "深空黑色",
+          "finish": "标准玻璃",
+          "finishDetail": "采用低反射率设计，可减少使用环境中的屏幕眩光。",
+          "chipName": "M5 Pro",
+          "chipNameDetail": "突破性的性能和速度，胜任各种高难度任务，是专业人士的工作利器。",
+          "chip": "18核CPU/20核GPU",
+          "chipDetail": "处理性能和图形渲染速度进一步提升，可胜任游戏、编程和创意工作等繁重任务。"
+        },
+        "dimensionValues": {
+          "chassis-dimensionColor": "spaceblack",
+          "processor-dimensionChip": "m5pro",
+          "processor-dimensionChip-cpuCoreCount-gpuCoreCount": "m5pro-18-20",
+          "display-dimensionFinish": "standard",
+          "chassis-dimensionScreensize": "16inch"
+        },
+        "priceCny": 27999,
+        "comingSoon": false,
+        "isCarrierDevice": false,
+        "upstreamContainer": "RO_MBP_OLED_M5_16INCH_SPACEBLACK_BET_ULT_SUP_2026",
+        "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr",
+        "imageRequest": {
+          "url": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_pro_proled_xdr%2Fselect&dm.chassis-dimensionColor=spaceblack&dm.processor-dimensionChip=m5pro&dm.processor-dimensionChip-cpuCoreCount-gpuCoreCount=m5pro-18-20&dm.display-dimensionFinish=standard&dm.chassis-dimensionScreensize=16inch",
+          "matchDimensions": {
+            "chassis-dimensionScreensize": "16inch",
+            "chassis-dimensionColor": "spaceblack"
+          },
+          "requiredDimensions": [
+            "chassis-dimensionScreensize",
+            "chassis-dimensionColor"
+          ],
+          "identity": "/shop/buy-mac/macbook-pro-proled-xdr|{\"chassis-dimensionScreensize\":\"16inch\",\"chassis-dimensionColor\":\"spaceblack\"}"
+        }
+      },
+      {
+        "partNumber": "MJ2W4CH/A",
+        "basePartNumber": "MJ2W4",
+        "category": "mac",
+        "familyKey": "macbook-pro-proled-xdr",
+        "familySlug": "macbook-pro-proled-xdr",
+        "model": "MacBook Pro (PROLED XDR 显示屏) 16 英寸",
+        "title": "MacBook Pro (PROLED XDR 显示屏) 16 英寸 M5 Pro 18核CPU/20核GPU 标准玻璃 银色",
+        "titleSource": "partial_page_labels",
+        "englishName": null,
+        "attributes": {
+          "screensize": "16 英寸",
+          "screensizeDetail": "可选配 M5 Pro 或 M5 Max 芯片。",
+          "color": "银色",
+          "finish": "标准玻璃",
+          "finishDetail": "采用低反射率设计，可减少使用环境中的屏幕眩光。",
+          "chipName": "M5 Pro",
+          "chipNameDetail": "突破性的性能和速度，胜任各种高难度任务，是专业人士的工作利器。",
+          "chip": "18核CPU/20核GPU",
+          "chipDetail": "处理性能和图形渲染速度进一步提升，可胜任游戏、编程和创意工作等繁重任务。"
+        },
+        "dimensionValues": {
+          "chassis-dimensionColor": "silver",
+          "processor-dimensionChip": "m5pro",
+          "processor-dimensionChip-cpuCoreCount-gpuCoreCount": "m5pro-18-20",
+          "display-dimensionFinish": "standard",
+          "chassis-dimensionScreensize": "16inch"
+        },
+        "priceCny": 27999,
+        "comingSoon": false,
+        "isCarrierDevice": false,
+        "upstreamContainer": "RO_MBP_OLED_M5_16INCH_SILVER_BET_ULT_SUP_2026",
+        "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr",
+        "imageRequest": {
+          "url": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_pro_proled_xdr%2Fselect&dm.chassis-dimensionColor=silver&dm.processor-dimensionChip=m5pro&dm.processor-dimensionChip-cpuCoreCount-gpuCoreCount=m5pro-18-20&dm.display-dimensionFinish=standard&dm.chassis-dimensionScreensize=16inch",
+          "matchDimensions": {
+            "chassis-dimensionScreensize": "16inch",
+            "chassis-dimensionColor": "silver"
+          },
+          "requiredDimensions": [
+            "chassis-dimensionScreensize",
+            "chassis-dimensionColor"
+          ],
+          "identity": "/shop/buy-mac/macbook-pro-proled-xdr|{\"chassis-dimensionScreensize\":\"16inch\",\"chassis-dimensionColor\":\"silver\"}"
+        }
+      }
+    ],
+    "rejected": [
+      {
+        "partNumber": "RO_MBP_OLED_M5_16INCH_SILVER_BET_ULT_SUP_2026",
+        "reason": "cto_only_base"
+      },
+      {
+        "partNumber": "RO_MBP_OLED_M5_14INCH_SILVER_BET_ULT_2026",
+        "reason": "cto_only_base"
+      },
+      {
+        "partNumber": "RO_MBP_OLED_M5_14INCH_SILVER_BET_ULT_2026",
+        "reason": "cto_only_base"
+      },
+      {
+        "partNumber": "RO_MBP_OLED_M5_14INCH_SILVER_BET_ULT_2026",
+        "reason": "cto_only_base"
+      },
+      {
+        "partNumber": "RO_MBP_OLED_M5_16INCH_SPACEBLACK_BET_ULT_SUP_2026",
+        "reason": "cto_only_base"
+      },
+      {
+        "partNumber": "RO_MBP_OLED_M5_14INCH_SILVER_BET_ULT_2026",
+        "reason": "cto_only_base"
+      },
+      {
+        "partNumber": "RO_MBP_OLED_M5_16INCH_SPACEBLACK_BET_ULT_SUP_2026",
+        "reason": "cto_only_base"
+      },
+      {
+        "partNumber": "RO_MBP_OLED_M5_14INCH_SILVER_BET_ULT_2026",
+        "reason": "cto_only_base"
+      },
+      {
+        "partNumber": "RO_MBP_OLED_M5_14INCH_SPACEBLACK_BET_ULT_2026",
+        "reason": "cto_only_base"
+      },
+      {
+        "partNumber": "RO_MBP_OLED_M5_16INCH_SPACEBLACK_BET_ULT_SUP_2026",
+        "reason": "cto_only_base"
+      },
+      {
+        "partNumber": "RO_MBP_OLED_M5_14INCH_SPACEBLACK_BET_ULT_2026",
+        "reason": "cto_only_base"
+      },
+      {
+        "partNumber": "RO_MBP_OLED_M5_14INCH_SPACEBLACK_BET_ULT_2026",
+        "reason": "cto_only_base"
+      },
+      {
+        "partNumber": "RO_MBP_OLED_M5_16INCH_SILVER_BET_ULT_SUP_2026",
+        "reason": "cto_only_base"
+      },
+      {
+        "partNumber": "RO_MBP_OLED_M5_14INCH_SPACEBLACK_BET_ULT_2026",
+        "reason": "cto_only_base"
+      },
+      {
+        "partNumber": "RO_MBP_OLED_M5_16INCH_SILVER_BET_ULT_SUP_2026",
+        "reason": "cto_only_base"
+      },
+      {
+        "partNumber": "RO_MBP_OLED_M5_14INCH_SPACEBLACK_BET_ULT_2026",
+        "reason": "cto_only_base"
+      },
+      {
+        "partNumber": "RO_MBP_OLED_M5_14INCH_SILVER_BET_ULT_2026",
+        "reason": "cto_only_base"
+      }
+    ]
+  }
+}

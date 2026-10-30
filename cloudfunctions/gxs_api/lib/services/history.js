@@ -8,6 +8,7 @@ const { targetKeyOf } = require('../engine/events');
 const { RETENTION_DAYS, retentionStart } = require('../engine/retention');
 const { ensureUser } = require('./users');
 const { completeTask } = require('./quota');
+const { isProductIdentity } = require('../rules/product-target');
 const ID_PATTERN = /^[A-Za-z0-9_-]{8,64}$/;
 function decodeCursor(value) {
   if (!value) return null;
@@ -47,7 +48,7 @@ async function list(ctx, payload) {
   const historyQueryId = typeof payload.historyQueryId === 'string' && ID_PATTERN.test(payload.historyQueryId) ? payload.historyQueryId : null;
   if (!historyQueryId) throw new ApiError('invalid_query_id', 'historyQueryId 需为 8–64 位字母数字标识');
   const partNumber = typeof payload.partNumber === 'string' ? payload.partNumber.trim() : '';
-  if (!/^[A-Z0-9]{5}CH\/A$/.test(partNumber)) throw new ApiError('invalid_part_number', '商品编号格式无效');
+  if (!isProductIdentity(partNumber)) throw new ApiError('invalid_part_number', '商品编号格式无效');
   const requestedDay = payload.dayKey === undefined ? dayKey(ctx.now) : payload.dayKey;
   const parsedDay = typeof requestedDay === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(requestedDay) ? new Date(`${requestedDay}T00:00:00Z`) : new Date(NaN);
   if (!Number.isFinite(parsedDay.getTime()) || parsedDay.toISOString().slice(0, 10) !== requestedDay || requestedDay > dayKey(ctx.now)) throw new ApiError('invalid_day', '请选择有效的历史日期');

@@ -1,5 +1,6 @@
 'use strict';
 const { fetchPickup } = require('../apple-pickup');
+const { isCtoPartNumber } = require('../rules/product-target');
 
 // Concurrent stores share two budget documents. Queue only local admission;
 // database transactions still arbitrate other repositories/instances.
@@ -24,9 +25,10 @@ function serialiseAdmission(repo, task, waitMs) {
   return expired ? Promise.race([next, expired]) : next;
 }
 
-async function guardedPickup({ repo, config, clock, fetchImpl, storeNumber, partNumbers, timeoutMs, source = 'manual', beforeRequest = async () => true, onBudget = () => {}, remainingMs = () => Infinity }) {
+async function guardedPickup({ repo, config, clock, fetchImpl, storeNumber, partNumbers, products = null, timeoutMs, source = 'manual', beforeRequest = async () => true, onBudget = () => {}, remainingMs = () => Infinity }) {
   const denied = (reason, retryAt) => ({ record: { httpStatus: null, budgetDenied: true, retryAt, error: { message: reason }, elapsedMs: 0 }, observations: partNumbers.map(partNumber => ({ storeNumber, partNumber, status: 'unknown', quote: null, storeName: null, productTitle: null, observedAt: clock().toISOString(), reason: { code: reason, message: '暂缓查询，请稍后重试' } })) });
   if (remainingMs() <= 1000) return denied('request_cancelled', clock().getTime() + 1000);
+  if (!products && partNumbers.some(isCtoPartNumber)) products = await repo.getProducts(partNumbers.filter(isCtoPartNumber));
   const autoShare = Math.min(0.95, Math.max(0.01, (config.collector.autoSharePercent || 80) / 100));
   const budget = await serialiseAdmission(repo, () => {
     // Waiting consumes the invocation/lease budget too. Do not reserve an
@@ -48,7 +50,7 @@ async function guardedPickup({ repo, config, clock, fetchImpl, storeNumber, part
   let result;
   try {
     result = await Promise.race([
-      fetchPickup({ storeNumber, partNumbers, fetchImpl, now: clock, timeoutMs }),
+      fetchPickup({ storeNumber, partNumbers, products: products || [], fetchImpl, now: clock, timeoutMs }),
       new Promise(resolve => { timer = setTimeout(() => resolve(fallback()), timeoutMs + 10); }),
     ]);
   } finally { clearTimeout(timer); }

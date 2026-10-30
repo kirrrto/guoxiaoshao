@@ -20,21 +20,43 @@
  */
 
 const PICKUP_ENDPOINT = 'https://www.apple.com.cn/shop/retail/pickup-message';
+const FULFILLMENT_ENDPOINT = 'https://www.apple.com.cn/shop/fulfillment-messages';
+const { isCtoPartNumber, resolvePickupTarget } = require('./rules/product-target');
 const STATUS_BY_DISPLAY = { available: 'available', unavailable: 'unavailable', ineligible: 'ineligible', default: 'pending' };
 const MAX_BYTES = 512 * 1024;
 
 const isRecord = value => value !== null && typeof value === 'object' && !Array.isArray(value);
 const nonemptyText = value => (typeof value === 'string' && value.trim() ? value : null);
 
-function buildPickupUrl(storeNumber, partNumbers) {
+function requestTargets(partNumbers, products = []) {
+  const byPart = new Map(products.map(product => [product.partNumber, product]));
+  return partNumbers.map(partNumber => {
+    if (isCtoPartNumber(partNumber) || partNumber.startsWith('CTO_')) {
+      const product = byPart.get(partNumber);
+      if (!product) throw new TypeError('missing_cto_catalog_product');
+      return resolvePickupTarget(product);
+    }
+    return { partNumber, targetType: 'retail', sourcePartNumber: partNumber, responseKey: partNumber };
+  });
+}
+
+function buildPickupUrl(storeNumber, partNumbers, products = []) {
   if (!nonemptyText(storeNumber)) throw new TypeError('storeNumber is required');
   if (!Array.isArray(partNumbers) || partNumbers.length === 0 || partNumbers.some(part => !nonemptyText(part))) {
     throw new TypeError('partNumbers must be a non-empty list of part numbers');
   }
-  const url = new URL(PICKUP_ENDPOINT);
-  url.searchParams.set('pl', 'true');
+  const targets = requestTargets(partNumbers, products);
+  const cto = targets.some(target => target.targetType === 'apple_cto');
+  // Each CTO target is one real request/budget reservation. Different variants
+  // of the same container cannot share an implicit base-part response.
+  if (cto && targets.length !== 1) throw new TypeError('cto_requires_individual_request');
+  const url = new URL(cto ? FULFILLMENT_ENDPOINT : PICKUP_ENDPOINT);
+  url.searchParams.set(cto ? 'fae' : 'pl', 'true');
   url.searchParams.set('mts.0', 'regular');
-  partNumbers.forEach((part, index) => url.searchParams.set(`parts.${index}`, part));
+  targets.forEach((target, index) => {
+    url.searchParams.set(`parts.${index}`, target.sourcePartNumber);
+    if (target.pickupTarget) url.searchParams.set(`option.${index}`, target.pickupTarget.optionIds.join(','));
+  });
   url.searchParams.set('store', storeNumber);
   return url;
 }
@@ -49,6 +71,9 @@ function parseApplePickup({ httpStatus, body, targets, observedAt }) {
     throw new TypeError('observedAt must be an explicit capture timestamp with a time zone');
   }
   const captureTime = new Date(observedAt).toISOString();
+  const resolved = targets.map(target => isCtoPartNumber(target.partNumber) ? resolvePickupTarget(target)
+    : { partNumber: target.partNumber, targetType: 'retail', sourcePartNumber: target.partNumber, responseKey: target.partNumber });
+  const hasCto = resolved.some(target => target.targetType === 'apple_cto');
   const observations = targets.map(({ storeNumber, partNumber }) => ({
     storeNumber,
     storeName: null,
@@ -77,28 +102,32 @@ function parseApplePickup({ httpStatus, body, targets, observedAt }) {
     if (typeof parsed.body.errorMessage !== 'string') return failAll('invalid_envelope', 'body.errorMessage has an unexpected type');
     if (parsed.body.errorMessage.trim()) return failAll('upstream_error', parsed.body.errorMessage);
   }
-  if (!Array.isArray(parsed.body.stores)) return failAll('missing_stores', 'Response has no stores array');
-  if (parsed.body.stores.length === 0) return failAll('empty_stores', 'Apple returned no stores; this is not an unavailable result');
+  const pickupBody = hasCto ? parsed.body.content && parsed.body.content.pickupMessage : parsed.body;
+  if (hasCto && !isRecord(pickupBody)) return failAll('missing_pickup_message', 'Response has no configured pickup message');
+  if (hasCto && pickupBody.errorMessage) return failAll('upstream_error', typeof pickupBody.errorMessage === 'string' ? pickupBody.errorMessage : 'Configured pickup returned an error');
+  if (!Array.isArray(pickupBody.stores)) return failAll('missing_stores', 'Response has no stores array');
+  if (pickupBody.stores.length === 0) return failAll('empty_stores', 'Apple returned no stores; this is not an unavailable result');
 
-  return observations.map(observation => {
+  return observations.map((observation, index) => {
+    const target = resolved[index];
     const fail = (code, message) => ({ ...observation, reason: { code, message } });
-    const matches = parsed.body.stores.filter(store => isRecord(store) && store.storeNumber === observation.storeNumber);
+    const matches = pickupBody.stores.filter(store => isRecord(store) && store.storeNumber === observation.storeNumber);
     if (matches.length !== 1) {
       return fail(matches.length ? 'duplicate_store' : 'missing_store',
         `Expected one result for store ${observation.storeNumber}; received ${matches.length}`);
     }
     const store = matches[0];
     observation.storeName = nonemptyText(store.storeName) ? store.storeName.trim() : null;
-    if (!isRecord(store.partsAvailability) || !Object.prototype.hasOwnProperty.call(store.partsAvailability, observation.partNumber)
-      || !isRecord(store.partsAvailability[observation.partNumber])) {
+    if (!isRecord(store.partsAvailability) || !Object.prototype.hasOwnProperty.call(store.partsAvailability, target.responseKey)
+      || !isRecord(store.partsAvailability[target.responseKey])) {
       return fail('missing_part', `No product result for ${observation.partNumber}`);
     }
-    const part = store.partsAvailability[observation.partNumber];
+    const part = store.partsAvailability[target.responseKey];
     const regular = isRecord(part.messageTypes && part.messageTypes.regular) ? part.messageTypes.regular : {};
     observation.pickupDisplay = typeof part.pickupDisplay === 'string' ? part.pickupDisplay : null;
     observation.quote = nonemptyText(part.pickupSearchQuote) || nonemptyText(regular.storePickupQuote);
     observation.productTitle = nonemptyText(regular.storePickupProductTitle);
-    if (part.partNumber !== undefined && part.partNumber !== observation.partNumber) {
+    if (part.partNumber !== undefined && part.partNumber !== target.sourcePartNumber && part.partNumber !== target.responseKey) {
       return fail('part_mismatch', 'Product partNumber does not match its availability map key');
     }
     if (!Object.prototype.hasOwnProperty.call(STATUS_BY_DISPLAY, observation.pickupDisplay)) {
@@ -114,8 +143,9 @@ function parseApplePickup({ httpStatus, body, targets, observedAt }) {
  * { record, observations }. Never throws for upstream failures: they become
  * `unknown` observations with a transport reason.
  */
-async function fetchPickup({ storeNumber, partNumbers, fetchImpl = fetch, now = () => new Date(), timeoutMs = 10000 }) {
-  const url = buildPickupUrl(storeNumber, partNumbers);
+async function fetchPickup({ storeNumber, partNumbers, products = [], fetchImpl = fetch, now = () => new Date(), timeoutMs = 10000 }) {
+  const url = buildPickupUrl(storeNumber, partNumbers, products);
+  const targets = requestTargets(partNumbers, products).map(target => ({ ...target, storeNumber }));
   const started = now();
   const record = {
     storeNumber,
@@ -155,7 +185,6 @@ async function fetchPickup({ storeNumber, partNumbers, fetchImpl = fetch, now = 
   const finished = now();
   record.elapsedMs = finished.getTime() - started.getTime();
   record.finishedAt = finished.toISOString();
-  const targets = partNumbers.map(partNumber => ({ storeNumber, partNumber }));
   const observations = record.error
     ? parseApplePickup({ httpStatus: 0, body: null, targets, observedAt: record.finishedAt })
       .map(observation => ({ ...observation, reason: { code: 'transport_error', message: record.error.message } }))
@@ -163,4 +192,4 @@ async function fetchPickup({ storeNumber, partNumbers, fetchImpl = fetch, now = 
   return { record, observations, bodyText };
 }
 
-module.exports = { PICKUP_ENDPOINT, STATUS_BY_DISPLAY, buildPickupUrl, parseApplePickup, fetchPickup };
+module.exports = { PICKUP_ENDPOINT, FULFILLMENT_ENDPOINT, STATUS_BY_DISPLAY, buildPickupUrl, parseApplePickup, fetchPickup };

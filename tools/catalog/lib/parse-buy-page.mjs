@@ -7,14 +7,16 @@
  *    `partNumber` + `dimensionXxx` keys; labels live in `displayValues`.
  *  - configurator pages (Mac): `products[]` carry `btrOrFdPartNumber` for
  *    preconfigured retail SKUs (CTO-only bases have null) and a `dimensions`
- *    map; labels live in `mainDisplayValues`. Memory/storage option codes are
- *    not resolvable from the page, so Mac titles are partial until the pickup
- *    API returns Apple's own product title.
+ *    map; labels live in `mainDisplayValues`. Cold-page option codes remain
+ *    partial. Warm configuration pages resolve their selected SKU through
+ *    metrics userSelections plus configDisplayValues, including retail SKUs
+ *    absent from the cold BTR list. Never infer memory from a nearby SKU.
  *
  * Nothing here is a supply signal; it only describes which retail SKUs exist.
  */
 
 import { imagePlan } from './product-images.mjs';
+import { retainPrelaunchRestriction } from './catalog-readiness.mjs';
 
 const decodeEntities = text => text
   .replace(/&nbsp;/g, ' ')
@@ -88,6 +90,48 @@ export function extractMetricsProducts(html) {
   } catch {
     return [];
   }
+}
+
+/** A warm Mac configuration can name retail SKUs absent from the cold BTR list. */
+export function parseSelectedMacConfiguration(html, { familyKey, familySlug = familyKey, sourceUrl, displayName }) {
+  const data = extractProductSelectionData(html);
+  const metricsScript = html.match(/<script type="application\/json" id="metrics">([\s\S]*?)<\/script>/);
+  let metrics;
+  try { metrics = metricsScript && JSON.parse(metricsScript[1]).data; } catch { return null; }
+  const selected = metrics && metrics.buyflow && metrics.buyflow.userSelections;
+  const items = metrics && metrics.products;
+  if (!data || !selected || !Array.isArray(items) || items.length !== 1) return null;
+  const metric = items[0], processor = selected.PROCESSOR;
+  if (metric.category !== 'mac' || !RETAIL_PART.test(metric.partNumber || '') || !processor
+      || !selected.MEMORY || !selected.STORAGE || !/^\d+$/.test(processor.cpuCoreCount || '') || !/^\d+$/.test(processor.gpuCoreCount || '')) return null;
+  const dimensionValues = {
+    ...(selected.SCREEN_SIZE ? { 'chassis-dimensionScreensize': selected.SCREEN_SIZE } : {}),
+    ...(selected.CHASSIS_COLOR ? { 'chassis-dimensionColor': selected.CHASSIS_COLOR } : {}),
+    ...(selected.DISPLAY_FINISH ? { 'display-dimensionFinish': selected.DISPLAY_FINISH } : {}),
+    'processor-dimensionChip': processor.dimensionChip,
+    'processor-dimensionChip-cpuCoreCount-gpuCoreCount': `${processor.dimensionChip}-${processor.cpuCoreCount}-${processor.gpuCoreCount}`,
+    'memory-dimensionMemory': selected.MEMORY.dimensionValue,
+    'storage-dimensionCapacity': selected.STORAGE.dimensionValue,
+  };
+  const attributes = {};
+  for (const [dimension, value] of Object.entries(dimensionValues)) {
+    const lines = readLabel(data.mainDisplayValues, data.configDisplayValues, dimension, value);
+    const key = shortKey(dimension);
+    if (!lines) return null; // Do not invent labels from a URL or option code.
+    attributes[key] = lines[0].replace(/\s*芯片$/, '').replace(/机型$/, '').replace(/\s*存储容量$/, '')
+      .replace(/^(\d+)\s+(GB|TB)\b/, '$1$2').trim();
+  }
+  if (!/^\d+(?:GB|TB)$/.test(attributes.memory) || !/^\d+(?:GB|TB)$/.test(attributes.capacity)) return null;
+  const model = [displayName, attributes.screensize].filter(Boolean).join(' ');
+  const raw = data.products.find(p => p.btrOrFdPartNumber === metric.partNumber) || {};
+  const picture = imagePlan({ data, gallery: extractBuyFlowGallery(html), raw, dimensionValues, sourceUrl });
+  // Gallery identity is the family and physical appearance, not a memory SKU.
+  if (picture.request) picture.request.identity = `${new URL(sourceUrl).pathname.split('/').slice(0, 4).join('/')}|${JSON.stringify(picture.request.matchDimensions)}`;
+  return { partNumber: metric.partNumber, basePartNumber: metric.partNumber.slice(0, 5), category: 'mac', familyKey, familySlug, model,
+    title: [model, ...TITLE_ORDER.map(key => attributes[key]).filter(Boolean)].join(' '), titleSource: 'selected_page_metrics_and_labels',
+    englishName: metric.name || null, attributes, dimensionValues, priceCny: Number.isFinite(metric.price && metric.price.fullPrice) ? metric.price.fullPrice : null,
+    comingSoon: Boolean(raw.comingSoon || raw.isComingSoon), isCarrierDevice: false, upstreamContainer: raw.aosContainerPartNumber || null,
+    sourceUrl, ...(picture.image || {}), ...(picture.request ? { imageRequest: picture.request } : {}) };
 }
 
 export function extractPageTitle(html) {
@@ -228,6 +272,13 @@ export function parseBuyPage(html, { category, familyKey, familySlug, sourceUrl,
       ...(picture.image || {}),
       ...(picture.request ? { imageRequest: picture.request } : {}),
     });
+  }
+  if (category === 'mac' && layout === 'configurator') {
+    const selected = parseSelectedMacConfiguration(html, { familyKey, familySlug, sourceUrl, displayName: baseName });
+    if (selected) {
+      const index = products.findIndex(product => product.partNumber === selected.partNumber);
+      if (index < 0) products.push(selected); else products[index] = retainPrelaunchRestriction(selected, products[index]);
+    }
   }
   const seen = new Set();
   const unique = products.filter(product => (seen.has(product.partNumber) ? false : (seen.add(product.partNumber), true)));

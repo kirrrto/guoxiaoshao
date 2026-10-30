@@ -8,14 +8,18 @@ import { pathToFileURL } from 'node:url';
 import { inspectMembershipLayout } from './membership-layout.mjs';
 import { inspectNotificationLayout } from './notification-layout.mjs';
 import { inspectStockLayout } from './stock-layout.mjs';
+import { inspectDeadlineLayout } from './deadline-layout.mjs';
+import { inspectConfigurationLayout } from './configuration-layout.mjs';
 const require = createRequire(import.meta.url);
 const args = process.argv.slice(2), directory = path.resolve(args[0] || path.join(os.tmpdir(), 'guoxiaoshao-ui-preview'));
 const colorScheme = args.includes('--dark') ? 'dark' : 'light';
 const membershipFontPreview = args.includes('--membership-fonts-only');
 const notificationFontPreview = args.includes('--notification-fonts-only');
 const stockFontPreview = args.includes('--stock-fonts-only');
+const deadlineFontPreview = args.includes('--v350-fonts-only');
 const stockFontScenarios = ['stock-old-expanded', 'stock-mixed-expanded', 'stock-unknown', 'stock-offline'];
-const fontPreview = membershipFontPreview || notificationFontPreview || stockFontPreview;
+const fontPreview = membershipFontPreview || notificationFontPreview || stockFontPreview || deadlineFontPreview;
+if (deadlineFontPreview && !JSON.parse(fs.readFileSync(path.join(directory, 'manifest.json'), 'utf8')).v350Preview) throw Error('--v350-fonts-only requires --v350-only');
 let playwright;
 try { playwright = require('playwright'); }
 catch { playwright = require(path.join(os.homedir(), '.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright')); }
@@ -33,7 +37,7 @@ function verifyPreviewSources() {
   }
 }
 verifyPreviewSources();
-const screenshotBase = membershipFontPreview ? 'screenshots-membership-fonts' : notificationFontPreview ? 'screenshots-notification-fonts' : stockFontPreview ? 'screenshots-stock-fonts' : 'screenshots';
+const screenshotBase = deadlineFontPreview ? 'screenshots-v350-fonts' : membershipFontPreview ? 'screenshots-membership-fonts' : notificationFontPreview ? 'screenshots-notification-fonts' : stockFontPreview ? 'screenshots-stock-fonts' : 'screenshots';
 const screenshots = path.join(directory, colorScheme === 'dark' ? `${screenshotBase}-dark` : screenshotBase); fs.mkdirSync(screenshots, { recursive: true });
 let browser;
 const configuredExecutable = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH;
@@ -86,7 +90,7 @@ try {
   if (notificationFontPreview && selected.length !== 12) throw Error('Notification font stress requires both widths and all six interaction states');
   if (stockFontPreview && (selected.length !== 8 || stockFontScenarios.some(scenario => [320, 375].some(width => !selected.some(item => item.scenario === scenario && item.width === width))))) throw Error('Stock font stress requires both widths and all four inventory states');
   for (const item of selected) {
-    await page.setViewportSize({ width: item.width, height: 900 });
+    await page.setViewportSize({ width: item.width, height: deadlineFontPreview ? 600 : 900 });
     await page.goto(pathToFileURL(path.join(directory, item.file)).href);
     await page.evaluate(() => document.fonts.ready);
     if (fontPreview) await page.evaluate(() => {
@@ -182,6 +186,11 @@ try {
     Object.assign(metrics, await page.evaluate(inspectMembershipLayout, item.expectedMembership || null));
     Object.assign(metrics, await page.evaluate(inspectNotificationLayout, item.expectedNotification || null));
     Object.assign(metrics, await page.evaluate(inspectStockLayout, item.expectedStock || null));
+    Object.assign(metrics, await page.evaluate(inspectDeadlineLayout, { saving: item.scenario === 'v350-saving', conflict: item.scenario === 'v350-edit-conflict', unavailable: item.fixture?.error || item.fixture?.loading }));
+    Object.assign(metrics, await page.evaluate(inspectConfigurationLayout, {
+      expected: item.scenario.startsWith('v350-mac-studio-') && Boolean(item.fixture?.sheet),
+      expanded: Boolean(item.fixture?.configurationsExpanded),
+    }));
     metrics.calendarLayoutErrors.push(...await page.evaluate(expectedLaunchPoster => {
       const errors = [], entry = document.querySelector('.query-guide-entry'), selection = document.querySelector('.selection-card');
       if (entry && selection && entry.getBoundingClientRect().bottom > selection.getBoundingClientRect().top + 1) errors.push('Calendar entry must precede the query selection card');
@@ -293,7 +302,7 @@ try {
     }
     const representative = item.width === 375 && ['member', 'free'].includes(item.scenario) || item.scenario.startsWith('sheet-') || item.width === 320 && ['longcontent', 'history-longcontent', 'history-balance-cap', 'operator-longcontent'].includes(item.scenario) || item.width === 375 && ['mine', 'follow'].includes(item.page) && item.scenario === 'expired' || item.width === 430 && item.page === 'query' && item.scenario === 'member' || item.width === 375 && item.scenario.startsWith('monitor-') || item.width === 375 && item.scenario.startsWith('history-') && (item.page === 'history' || item.scenario === 'history-free-first');
     if (representative || item.scenario.startsWith('onboarding-') && item.width === 375 || /^(?:payment|notification-test|alternatives|orders|nudge)-/.test(item.scenario)) { const name = item.file.replace('.html', '.png'); await page.screenshot({ path: path.join(screenshots, name), fullPage: true }); record.screenshot = name; }
-    if (item.fixture && [320, 375, 1024].includes(item.width) || item.scenario.startsWith('v3-') && [320, 375].includes(item.width) || item.scenario.startsWith('v2-') && (item.width === 375 || [320, 1024].includes(item.width) && (item.page === 'guide' || item.scenario.startsWith('v2-promotion-') || item.scenario === 'v2-calendar-modal') || item.width === 320 && ['v2-longcontent', 'v2-context-checkout'].includes(item.scenario) || item.width === 1024 && ['v2-member', 'v2-context-checkout'].includes(item.scenario))) {
+    if (item.fixture && [320, 375, 430, 1024].includes(item.width) || item.scenario.startsWith('v3-') && [320, 375].includes(item.width) || item.scenario.startsWith('v2-') && (item.width === 375 || [320, 1024].includes(item.width) && (item.page === 'guide' || item.scenario.startsWith('v2-promotion-') || item.scenario === 'v2-calendar-modal') || item.width === 320 && ['v2-longcontent', 'v2-context-checkout'].includes(item.scenario) || item.width === 1024 && ['v2-member', 'v2-context-checkout'].includes(item.scenario))) {
       const name = item.file.replace('.html', '.png');
       await page.screenshot({ path: path.join(screenshots, name), fullPage: true }); record.screenshot = name;
       const firstScreen = item.file.replace('.html', '-first-screen.png');
@@ -307,6 +316,11 @@ try {
         const offerScreenshot = item.file.replace('.html', '-offer.png');
         await page.locator('.membership-shop').evaluate(element => window.scrollTo(0, window.scrollY + element.getBoundingClientRect().top - 100));
         await page.locator('.membership-shop').screenshot({ path: path.join(screenshots, offerScreenshot) }); record.offerScreenshot = offerScreenshot;
+      }
+      if (item.fixture?.configurationsExpanded) {
+        await page.locator('.configuration-copy').scrollIntoViewIfNeeded();
+        const configurationScreenshot = item.file.replace('.html', '-configurations-end.png');
+        await page.screenshot({ path: path.join(screenshots, configurationScreenshot), fullPage: false }); record.configurationScreenshot = configurationScreenshot;
       }
       if (item.fixture?.sheet) {
         await page.locator('.config-sheet-panel .hot-city-chips').scrollIntoViewIfNeeded();
@@ -344,8 +358,8 @@ try {
   }
 } finally { await context.close(); await browser.close(); }
 verifyPreviewSources();
-report.summary = { total: report.snapshots.length, indexNavigationFailures: report.indexNavigation.invalidTargets.length + report.indexNavigation.missingTargets.length, expressionErrors: manifest.expressionErrors || 0, missingText: report.snapshots.filter(x => x.missingText.length).length, forbiddenText: report.snapshots.filter(x => x.forbiddenTextFound.length).length, horizontalOverflow: report.snapshots.filter(x => x.scrollWidth > x.width + 1 || x.overflow.length).length, clippedText: report.snapshots.filter(x => x.clippedText.length).length, failedImages: report.snapshots.flatMap(x => x.images).filter(x => !x.loaded).length, alternativeLayoutFailures: report.snapshots.filter(x => x.alternativeLayoutErrors.length).length, calendarLayoutFailures: report.snapshots.filter(x => x.calendarLayoutErrors.length).length, membershipLayoutFailures: report.snapshots.filter(x => x.membershipLayoutErrors.length).length, notificationLayoutFailures: report.snapshots.filter(x => x.notificationLayoutErrors.length).length, v3LayoutFailures: report.snapshots.filter(x => x.v3LayoutErrors.length).length, stockLayoutFailures: report.snapshots.filter(x => x.stockLayoutErrors.length).length, followFontFailures: report.snapshots.filter(x => x.followFontErrors.length).length };
-const reportBase = membershipFontPreview ? 'membership-font-metrics' : notificationFontPreview ? 'notification-font-metrics' : stockFontPreview ? 'layout-metrics-stock-fonts' : 'layout-metrics';
+report.summary = { total: report.snapshots.length, indexNavigationFailures: report.indexNavigation.invalidTargets.length + report.indexNavigation.missingTargets.length, expressionErrors: manifest.expressionErrors || 0, missingText: report.snapshots.filter(x => x.missingText.length).length, forbiddenText: report.snapshots.filter(x => x.forbiddenTextFound.length).length, horizontalOverflow: report.snapshots.filter(x => x.scrollWidth > x.width + 1 || x.overflow.length).length, clippedText: report.snapshots.filter(x => x.clippedText.length).length, failedImages: report.snapshots.flatMap(x => x.images).filter(x => !x.loaded).length, alternativeLayoutFailures: report.snapshots.filter(x => x.alternativeLayoutErrors.length).length, calendarLayoutFailures: report.snapshots.filter(x => x.calendarLayoutErrors.length).length, membershipLayoutFailures: report.snapshots.filter(x => x.membershipLayoutErrors.length).length, notificationLayoutFailures: report.snapshots.filter(x => x.notificationLayoutErrors.length).length, v3LayoutFailures: report.snapshots.filter(x => x.v3LayoutErrors.length).length, stockLayoutFailures: report.snapshots.filter(x => x.stockLayoutErrors.length).length, followFontFailures: report.snapshots.filter(x => x.followFontErrors.length).length, deadlineLayoutFailures: report.snapshots.filter(x => x.deadlineLayoutErrors.length).length, configurationLayoutFailures: report.snapshots.filter(x => x.configurationLayoutErrors.length).length };
+const reportBase = deadlineFontPreview ? 'layout-metrics-v350-fonts' : membershipFontPreview ? 'membership-font-metrics' : notificationFontPreview ? 'notification-font-metrics' : stockFontPreview ? 'layout-metrics-stock-fonts' : 'layout-metrics';
 fs.writeFileSync(path.join(directory, `${reportBase}${colorScheme === 'dark' ? '-dark' : ''}.json`), JSON.stringify(report, null, 2));
 console.log(JSON.stringify(report.summary));
-if (report.summary.indexNavigationFailures || report.summary.expressionErrors || report.summary.missingText || report.summary.forbiddenText || report.summary.horizontalOverflow || report.summary.clippedText || report.summary.failedImages || report.summary.alternativeLayoutFailures || report.summary.calendarLayoutFailures || report.summary.membershipLayoutFailures || report.summary.notificationLayoutFailures || report.summary.v3LayoutFailures || report.summary.stockLayoutFailures || report.summary.followFontFailures) process.exitCode = 1;
+if (report.summary.indexNavigationFailures || report.summary.expressionErrors || report.summary.missingText || report.summary.forbiddenText || report.summary.horizontalOverflow || report.summary.clippedText || report.summary.failedImages || report.summary.alternativeLayoutFailures || report.summary.calendarLayoutFailures || report.summary.membershipLayoutFailures || report.summary.notificationLayoutFailures || report.summary.v3LayoutFailures || report.summary.stockLayoutFailures || report.summary.followFontFailures || report.summary.deadlineLayoutFailures || report.summary.configurationLayoutFailures) process.exitCode = 1;

@@ -1,4 +1,5 @@
 const fmt = require('./format');
+const { canQuery } = require('./product-capabilities');
 const { storeLabel, storeLabelWithCity } = require('./store-label');
 
 const count = value => Number.isFinite(value) && value >= 0 ? Math.floor(value) : null;
@@ -65,7 +66,7 @@ function canOfferLiveChoices(product, account, now) {
 function availableStoreChoices(snapshot, catalog = {}, account, now = Date.now()) {
   const partNumber = snapshot && snapshot.product && snapshot.product.partNumber;
   const product = own(catalog.productByPart, partNumber);
-  if (!snapshot || snapshot.ok !== true || snapshot.latestRestricted || !product || !product.supported
+  if (!snapshot || snapshot.ok !== true || snapshot.latestRestricted || !product || !canQuery(product)
     || !canOfferLiveChoices(product, account, now)) return [];
   const seen = new Set();
   return (snapshot.results || []).reduce((choices, record) => {

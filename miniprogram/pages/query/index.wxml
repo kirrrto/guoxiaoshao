@@ -60,7 +60,7 @@
       <view wx:if="{{!selectionSummary}}" class="selection-empty">
         <button class="btn btn-primary btn-block" bindtap="onEditSelection">选择配置与门店</button>
       </view>
-      <view wx:elif="{{!selectionCanCollapse}}" class="banner banner-warn small mt">{{selectionNotice}}</view>
+      <view wx:elif="{{!selectionCanCollapse}}" class="banner {{selectionReferenceOnly ? 'banner-info' : 'banner-warn'}} small mt">{{selectionNotice}}</view>
     <view wx:if="{{!accountReady}}" class="banner banner-info small">{{accountError || '正在连接微信账户，可先选商品与门店。'}}<button wx:if="{{accountError}}" class="btn btn-outline btn-sm mt" bindtap="onRetryAccount">重试账户连接</button></view>
     <view wx:if="{{sharedTargetPending}}" class="banner banner-info small">
       <view>{{sharedTargetError || (sharedTargetReady ? (sharedTargetSource === 'follow' ? '关注配置已保留，可在当前操作结束后切换。' : '朋友分享的配置已保留，可在当前操作结束后切换。') : '配置暂未在商品目录中确认，当前选择已保留。')}}</view>
@@ -82,7 +82,7 @@
       <view wx:if="{{signinError}}" class="small text-bad mt" aria-role="alert">{{signinError}}</view>
       <view class="selection-utilities">
       <button wx:if="{{selectionRestricted}}" class="ui-action" hover-class="ui-control-pressed" bindtap="onSelectionHistory">查看可用历史</button>
-      <button wx:elif="{{selectionSummary && !result}}" class="ui-action mt selection-follow-action" disabled="{{!accountReady || querying || !selectionCanCollapse}}" bindtap="onFollowSelection"><image class="selection-whistle" src="/images/brand/whistle-green.png" mode="aspectFit" aria-hidden="true" /><text>{{boot.member ? '关注此配置' : (contextualCheckout ? '了解此配置关注服务' : '了解会员关注服务')}}</text></button>
+      <button wx:elif="{{selectionSummary && !result && selectionSupportsFollow}}" class="ui-action mt selection-follow-action" disabled="{{!accountReady || querying || !selectionCanCollapse}}" bindtap="onFollowSelection"><image class="selection-whistle" src="/images/brand/whistle-green.png" mode="aspectFit" aria-hidden="true" /><text>{{boot.member ? '关注此配置' : (contextualCheckout ? '了解此配置关注服务' : '了解会员关注服务')}}</text></button>
       <button class="ui-disclosure" hover-class="ui-control-pressed" bindtap="onToggleRules" aria-expanded="{{rulesExpanded}}"><text class="ui-disclosure-label">查询与提醒规则</text><view class="ui-disclosure-meta"><text>{{rulesExpanded ? '收起' : '展开'}}</text><text class="ui-chevron {{rulesExpanded ? 'ui-chevron--up' : 'ui-chevron--down'}}" aria-hidden="true"></text></view></button>
       </view>
       <view wx:if="{{accountReady && rulesExpanded}}" class="selection-rules">
@@ -148,7 +148,7 @@
       </view>
       <button wx:if="{{!liveResultRestricted && evidenceCard}}" class="ui-disclosure" hover-class="ui-control-pressed" bindtap="onToggleEvidence" aria-expanded="{{evidenceExpanded}}"><text class="ui-disclosure-label">记录详情与范围</text><view class="ui-disclosure-meta"><text>{{evidenceExpanded ? '收起' : '展开'}}</text><text class="ui-chevron {{evidenceExpanded ? 'ui-chevron--up' : 'ui-chevron--down'}}"></text></view></button>
       <view wx:if="{{evidenceExpanded && !liveResultRestricted && evidenceCard}}" class="target-evidence">
-        <view class="small bold">{{evidenceCard.title}}</view><view class="tiny muted mt">商品编码 {{result.product.partNumber}}</view>
+        <view class="small bold">{{evidenceCard.title}}</view><view wx:if="{{result.product.targetType !== 'apple_cto'}}" class="tiny muted mt">商品编码 {{result.product.partNumber}}</view>
         <view class="small text-2 mt">{{evidenceCard.time}}</view>
         <view class="small text-2 mt">{{evidenceCard.detail}} {{evidenceCard.note}}</view>
       </view>
@@ -211,7 +211,7 @@
         <view wx:if="{{alternativePreparedNotice}}" class="small text-2 mt" aria-role="status">{{alternativePreparedNotice}}</view>
       </view>
       <view class="btn-row result-actions">
-        <button wx:if="{{!nextAction || nextAction.action === 'guide'}}" class="btn btn-outline btn-sm" bindtap="onAddFollow">加入关注</button>
+        <button wx:if="{{resultSupportsFollow && (!nextAction || nextAction.action === 'guide')}}" class="btn btn-outline btn-sm" bindtap="onAddFollow">加入关注</button>
         <button class="btn btn-outline btn-sm {{querying || signing ? 'disabled' : ''}}" disabled="{{querying || signing || !accountReady}}" bindtap="onRequery" aria-label="重新查询此结果的配置与门店">{{querying ? '查询中…' : '重新查询'}}</button>
       </view>
     </view>

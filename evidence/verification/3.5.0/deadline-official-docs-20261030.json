@@ -1,0 +1,42 @@
+{
+  "checkedDate": "2026-10-30",
+  "method": "Direct HTTPS Invoke-WebRequest to official WeChat Markdown alternates",
+  "scope": "Public documentation only; no account template library, credentials, deployments, authorizations or real sends inspected",
+  "sources": [
+    {
+      "name": "send-message",
+      "url": "https://developers.weixin.qq.com/miniprogram/dev/server/API/mp-message-management/subscribe-message/api_sendmessage.md",
+      "httpStatus": 200,
+      "sha256": "bd2e96eabfe422523c21aacbd047aac563c384884434560b4bffcf1e905ad86a",
+      "bytes": 9459
+    },
+    {
+      "name": "request-subscribe",
+      "url": "https://developers.weixin.qq.com/miniprogram/dev/api/open-api/subscribe-message/wx.requestSubscribeMessage.md",
+      "httpStatus": 200,
+      "sha256": "4b048c3b1790160a10e0ce5436287022a227c50d2009e7d82bc28121d75f204a",
+      "bytes": 5536
+    },
+    {
+      "name": "message-overview",
+      "url": "https://developers.weixin.qq.com/miniprogram/dev/framework/open-ability/subscribe-message-overview.md",
+      "httpStatus": 200,
+      "sha256": "22d9ee2594d6f922eccb80a318bd8bc7f76f1de6caa5e8643645724610960bf8",
+      "bytes": 4020
+    },
+    {
+      "name": "template-keywords",
+      "url": "https://developers.weixin.qq.com/miniprogram/dev/server/API/mp-message-management/subscribe-message/api_getpubnewtemplatekeywords.md",
+      "httpStatus": 200,
+      "sha256": "bc3af7f71c92db2a346acae65ac9ebe21f54e1ea92b30b63986740df2e762760",
+      "bytes": 5085
+    },
+    {
+      "name": "category-templates",
+      "url": "https://developers.weixin.qq.com/miniprogram/dev/server/API/mp-message-management/subscribe-message/api_getpubnewtemplatetitles.md",
+      "httpStatus": 200,
+      "sha256": "dcf61e9d77d430b65fd922ebe698f2ca2c8396802f5f0a4cec1b7210d7a98cf6",
+      "bytes": 5253
+    }
+  ]
+}

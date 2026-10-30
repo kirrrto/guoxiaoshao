@@ -80,6 +80,21 @@
 .picker-current-summary { position: sticky; top: 0; z-index: 1; padding: 16rpx 0 22rpx; margin-bottom: 16rpx; background: var(--card); border-bottom: 1rpx solid var(--line); font-size: max(14px, 28rpx); line-height: 1.6; }
 .field-summary { border-bottom-style: dashed; }
 
+/* Official configuration ranges explain coverage without changing the SKU draft. */
+.configuration-scope { margin: 12px 0 4px; border-bottom: 1px solid var(--line); }
+.configuration-scope-heading { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 4px 12px; padding-bottom: 8px; }
+.configuration-action { box-sizing: border-box; display: flex; align-items: center; justify-content: center; width: auto; max-width: 100%; min-height: 44px; margin: 0; padding: 8px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface-soft); color: var(--green-dark); font-size: 12px; font-weight: 500; line-height: 1.5; white-space: normal; }
+.configuration-action::after { border: 0; }
+.configuration-action-disabled { opacity: 0.5; color: var(--text-2); background: var(--surface-soft); }
+.configuration-details { padding-bottom: 12px; }
+.configuration-option { padding: 12px 0; border-top: 1px solid var(--line); }
+.configuration-chip-name { margin-bottom: 6px; font-size: max(13px, 26rpx); font-weight: 600; line-height: 1.5; }
+.configuration-range { display: flex; gap: 12px; font-size: max(12px, 24rpx); line-height: 1.65; }
+.configuration-range-label { flex: 0 0 auto; color: var(--text-2); }
+.configuration-status { line-height: 1.6; margin: 4px 0 8px; }
+.configuration-copy { width: 100%; }
+.configuration-error { color: var(--bad); font-size: max(12px, 24rpx); line-height: 1.6; margin-top: 8px; }
+
 /* Keep choices within reach while preserving native-sized tap areas. */
 .picker-current-summary { padding: 8rpx 0 14rpx; margin-bottom: 14rpx; line-height: 1.4; }
 .picker-current-summary > .small { margin-top: 4rpx; }

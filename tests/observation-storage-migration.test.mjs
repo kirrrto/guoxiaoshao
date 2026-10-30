@@ -47,6 +47,17 @@ test('C13 default remains legacy; migration uses the last accepted Beijing day, 
   assert.equal(latest(empty), undefined, 'a missing target does not get invented zero-count history');
 });
 
+test('inventory migration accepts exact CTO target identities and still rejects malformed keys', async () => {
+  const cto = `CTO_${'A'.repeat(64)}`;
+  const report = await runInventoryMigration({ repo: createMemoryRepo(), envId: 'offline', dryRun: true,
+    targetKeys: [`R577|${cto}`], delayMs: 0 });
+  assert.equal(report.counts.waiting_for_first_sample, 1);
+  for (const targetKey of [`R577|CTO_${'A'.repeat(63)}`, `R577|${cto}X`, `XX|${cto}`, `R577|${cto}|extra`]) {
+    await assert.rejects(runInventoryMigration({ repo: createMemoryRepo(), envId: 'offline', dryRun: true,
+      targetKeys: [targetKey], delayMs: 0 }), /Explicit environment/);
+  }
+});
+
 test('C05-C08 fixed sample replay preserves statuses, confirmation, events, all counts and stopped final days', async () => {
   const legacy = createMemoryRepo(), embedded = createMemoryRepo();
   await record(legacy, 0); await record(embedded, 0); await transition(embedded);

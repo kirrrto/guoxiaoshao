@@ -1,0 +1,454 @@
+{
+  "version": "3.5.0",
+  "round": "user_corrections",
+  "recordedAt": "2026-10-30T04:54:45.128Z",
+  "status": "offline_scope_passed_with_documented_detector_warnings",
+  "publicationReady": false,
+  "preview": {
+    "directory": "C:\\Users\\ADMINI~1\\AppData\\Local\\Temp\\gxs-v350-corrections",
+    "generatedAt": "2026-10-30T04:52:34.759Z",
+    "fixedBusinessTime": "2026-10-30T07:00:00.000Z",
+    "sourceFiles": 244,
+    "sourceFingerprint": "c1a1ccc2adb36fdb8a6d731ada3d894c2c713c36a5b4d0d714bf649fc13114af",
+    "sourceFingerprintMethod": "SHA256(JSON.stringify(manifest.sourceHashes)); ordered UTF-8 JSON",
+    "sourceMismatches": [],
+    "pages": [
+      "query",
+      "follow",
+      "deadlines"
+    ],
+    "scenarioCount": 20,
+    "scenarios": [
+      "v350-query-first",
+      "v350-mac-studio-summary",
+      "v350-mac-studio-collapsed",
+      "v350-mac-studio-expanded",
+      "v350-loading",
+      "v350-empty",
+      "v350-scheduled",
+      "v350-service-off",
+      "v350-needs-authorization",
+      "v350-authorization-elapsed",
+      "v350-delivery-results",
+      "v350-read-error",
+      "v350-service-unavailable",
+      "v350-apple-error",
+      "v350-editor",
+      "v350-editor-empty",
+      "v350-saving",
+      "v350-save-error",
+      "v350-edit-conflict",
+      "v350-longcontent"
+    ],
+    "snapshots": 96,
+    "widths": [
+      320,
+      375,
+      430
+    ],
+    "expressionErrors": 0
+  },
+  "changesChecked": [
+    "app.json launch page and first native tab are query",
+    "Deadline loading/unavailable/read-failed states do not offer new/manage/save actions",
+    "Deadline service-readable but notifications-disabled state is explicitly record-only",
+    "Mac Studio MHQJ4CH/A uses actual catalog and actual query/follow selection-editor methods",
+    "Official configuration disclosure begins collapsed and uses actual onToggleConfigurations; expansion never changes selected retail SKU or stores",
+    "Expanded disclosure presents four official chip option groups as browsing metadata, with explicit pickup integration limitation"
+  ],
+  "layout": {
+    "total": 384,
+    "exitCodes": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "profiles": [
+      "light 1x",
+      "dark 1x",
+      "light 1.3x / 600px viewport",
+      "dark 1.3x / 600px viewport"
+    ],
+    "reports": [
+      {
+        "file": "layout-metrics.json",
+        "generatedAt": "2026-10-30T04:52:40.434Z",
+        "summary": {
+          "total": 96,
+          "indexNavigationFailures": 0,
+          "expressionErrors": 0,
+          "missingText": 0,
+          "forbiddenText": 0,
+          "horizontalOverflow": 0,
+          "clippedText": 0,
+          "failedImages": 0,
+          "alternativeLayoutFailures": 0,
+          "calendarLayoutFailures": 0,
+          "membershipLayoutFailures": 0,
+          "notificationLayoutFailures": 0,
+          "v3LayoutFailures": 0,
+          "stockLayoutFailures": 0,
+          "followFontFailures": 0,
+          "deadlineLayoutFailures": 0,
+          "configurationLayoutFailures": 0
+        }
+      },
+      {
+        "file": "layout-metrics-dark.json",
+        "generatedAt": "2026-10-30T04:52:39.070Z",
+        "summary": {
+          "total": 96,
+          "indexNavigationFailures": 0,
+          "expressionErrors": 0,
+          "missingText": 0,
+          "forbiddenText": 0,
+          "horizontalOverflow": 0,
+          "clippedText": 0,
+          "failedImages": 0,
+          "alternativeLayoutFailures": 0,
+          "calendarLayoutFailures": 0,
+          "membershipLayoutFailures": 0,
+          "notificationLayoutFailures": 0,
+          "v3LayoutFailures": 0,
+          "stockLayoutFailures": 0,
+          "followFontFailures": 0,
+          "deadlineLayoutFailures": 0,
+          "configurationLayoutFailures": 0
+        }
+      },
+      {
+        "file": "layout-metrics-v350-fonts.json",
+        "generatedAt": "2026-10-30T04:52:44.894Z",
+        "summary": {
+          "total": 96,
+          "indexNavigationFailures": 0,
+          "expressionErrors": 0,
+          "missingText": 0,
+          "forbiddenText": 0,
+          "horizontalOverflow": 0,
+          "clippedText": 0,
+          "failedImages": 0,
+          "alternativeLayoutFailures": 0,
+          "calendarLayoutFailures": 0,
+          "membershipLayoutFailures": 0,
+          "notificationLayoutFailures": 0,
+          "v3LayoutFailures": 0,
+          "stockLayoutFailures": 0,
+          "followFontFailures": 0,
+          "deadlineLayoutFailures": 0,
+          "configurationLayoutFailures": 0
+        }
+      },
+      {
+        "file": "layout-metrics-v350-fonts-dark.json",
+        "generatedAt": "2026-10-30T04:52:44.897Z",
+        "summary": {
+          "total": 96,
+          "indexNavigationFailures": 0,
+          "expressionErrors": 0,
+          "missingText": 0,
+          "forbiddenText": 0,
+          "horizontalOverflow": 0,
+          "clippedText": 0,
+          "failedImages": 0,
+          "alternativeLayoutFailures": 0,
+          "calendarLayoutFailures": 0,
+          "membershipLayoutFailures": 0,
+          "notificationLayoutFailures": 0,
+          "v3LayoutFailures": 0,
+          "stockLayoutFailures": 0,
+          "followFontFailures": 0,
+          "deadlineLayoutFailures": 0,
+          "configurationLayoutFailures": 0
+        }
+      }
+    ],
+    "checks": [
+      "visible text and forbidden claims",
+      "overflow and clipping",
+      "image failures",
+      "minimum 44px action area",
+      "minimum 12px functional text at 320px",
+      "accessible action/input names",
+      "saving and conflict control locks",
+      "unavailable-service gating",
+      "official configuration count and retained retail SKU"
+    ]
+  },
+  "nativeTabGeometry": {
+    "total": 426,
+    "exitCodes": [
+      0,
+      0
+    ],
+    "reports": [
+      {
+        "file": "native-tab-metrics.json",
+        "checkedAt": "2026-10-30T04:53:17.998Z",
+        "summary": {
+          "total": 213,
+          "failed": 0
+        }
+      },
+      {
+        "file": "native-tab-metrics-dark.json",
+        "checkedAt": "2026-10-30T04:53:17.630Z",
+        "summary": {
+          "total": 213,
+          "failed": 0
+        }
+      }
+    ],
+    "limitations": "HTML approximation of app.json/theme.json; 1x/1.3x text and 0/34px simulated safe area, not native WeChat behavior."
+  },
+  "colors": {
+    "total": 606,
+    "active": 596,
+    "exitCodes": [
+      0,
+      0
+    ],
+    "reports": [
+      {
+        "file": "theme-colors.json",
+        "checkedAt": "2026-10-30T04:53:54.231Z",
+        "summary": {
+          "total": 303,
+          "active": 298,
+          "belowTarget": 0,
+          "primaryMinimum": 5.357131444839318,
+          "selectedNavMinimum": 5.230867846703258,
+          "unsupportedMeasurements": 0
+        },
+        "passed": true
+      },
+      {
+        "file": "theme-colors-dark.json",
+        "checkedAt": "2026-10-30T04:53:54.213Z",
+        "summary": {
+          "total": 303,
+          "active": 298,
+          "belowTarget": 0,
+          "primaryMinimum": 5.357131444839318,
+          "selectedNavMinimum": 7.139531628869566,
+          "unsupportedMeasurements": 0
+        },
+        "passed": true
+      }
+    ],
+    "scope": "375px visible controls, displayed placeholders, and new official configuration headings/ranges; disabled controls recorded separately."
+  },
+  "detector": {
+    "runs": 1,
+    "command": ".agents/skills/impeccable/scripts/impeccable.cmd detect --json --viewport 375x900 --no-consent-hiding --no-overlay-hiding http://127.0.0.1:9116/query-v350-query-first-375.html http://127.0.0.1:9116/query-v350-mac-studio-expanded-375.html http://127.0.0.1:9116/follow-v350-service-unavailable-375.html http://127.0.0.1:9116/deadlines-v350-service-off-375.html",
+    "exitCode": 2,
+    "primaryWarnings": 13,
+    "rawReport": "impeccable-detect.json",
+    "rawExit": "impeccable-detect-exit.txt",
+    "stderr": "impeccable-detect.stderr.log",
+    "findings": [
+      {
+        "index": 1,
+        "antipattern": "tiny-text",
+        "severity": "warning",
+        "page": "query-v350-query-first-375.html",
+        "selector": "div.simulation",
+        "classification": "preview_only",
+        "disposition": "11px 离线说明条只存在于预览 HTML，不随小程序发布；保留原始告警。"
+      },
+      {
+        "index": 2,
+        "antipattern": "undersized-ui-text",
+        "severity": "warning",
+        "page": "query-v350-query-first-375.html",
+        "selector": "span.preview-native-tab-item.is-selected > span.preview-native-tab-label",
+        "classification": "native_preview_approximation",
+        "disposition": "10px 标签来自微信原生 tabBar 的 HTML 近似；四原生入口保持，真实可读性须微信开发者工具/真机验收，保留原始告警。"
+      },
+      {
+        "index": 3,
+        "antipattern": "undersized-ui-text",
+        "severity": "warning",
+        "page": "query-v350-query-first-375.html",
+        "selector": "span.preview-native-tab-item:nth-of-type(2) > span.preview-native-tab-label",
+        "classification": "native_preview_approximation",
+        "disposition": "10px 标签来自微信原生 tabBar 的 HTML 近似；四原生入口保持，真实可读性须微信开发者工具/真机验收，保留原始告警。"
+      },
+      {
+        "index": 4,
+        "antipattern": "undersized-ui-text",
+        "severity": "warning",
+        "page": "query-v350-query-first-375.html",
+        "selector": "span.preview-native-tab-item:nth-of-type(3) > span.preview-native-tab-label",
+        "classification": "native_preview_approximation",
+        "disposition": "10px 标签来自微信原生 tabBar 的 HTML 近似；四原生入口保持，真实可读性须微信开发者工具/真机验收，保留原始告警。"
+      },
+      {
+        "index": 5,
+        "antipattern": "undersized-ui-text",
+        "severity": "warning",
+        "page": "query-v350-query-first-375.html",
+        "selector": "span.preview-native-tab-item:nth-of-type(4) > span.preview-native-tab-label",
+        "classification": "native_preview_approximation",
+        "disposition": "10px 标签来自微信原生 tabBar 的 HTML 近似；四原生入口保持，真实可读性须微信开发者工具/真机验收，保留原始告警。"
+      },
+      {
+        "index": 6,
+        "antipattern": "tiny-text",
+        "severity": "warning",
+        "page": "query-v350-mac-studio-expanded-375.html",
+        "selector": "div.simulation",
+        "classification": "preview_only",
+        "disposition": "11px 离线说明条只存在于预览 HTML，不随小程序发布；保留原始告警。"
+      },
+      {
+        "index": 7,
+        "antipattern": "tiny-text",
+        "severity": "warning",
+        "page": "follow-v350-service-unavailable-375.html",
+        "selector": "div.simulation",
+        "classification": "preview_only",
+        "disposition": "11px 离线说明条只存在于预览 HTML，不随小程序发布；保留原始告警。"
+      },
+      {
+        "index": 8,
+        "antipattern": "undersized-ui-text",
+        "severity": "warning",
+        "page": "follow-v350-service-unavailable-375.html",
+        "selector": "span.preview-native-tab-item:nth-of-type(1) > span.preview-native-tab-label",
+        "classification": "native_preview_approximation",
+        "disposition": "10px 标签来自微信原生 tabBar 的 HTML 近似；四原生入口保持，真实可读性须微信开发者工具/真机验收，保留原始告警。"
+      },
+      {
+        "index": 9,
+        "antipattern": "undersized-ui-text",
+        "severity": "warning",
+        "page": "follow-v350-service-unavailable-375.html",
+        "selector": "span.preview-native-tab-item.is-selected > span.preview-native-tab-label",
+        "classification": "native_preview_approximation",
+        "disposition": "10px 标签来自微信原生 tabBar 的 HTML 近似；四原生入口保持，真实可读性须微信开发者工具/真机验收，保留原始告警。"
+      },
+      {
+        "index": 10,
+        "antipattern": "undersized-ui-text",
+        "severity": "warning",
+        "page": "follow-v350-service-unavailable-375.html",
+        "selector": "span.preview-native-tab-item:nth-of-type(3) > span.preview-native-tab-label",
+        "classification": "native_preview_approximation",
+        "disposition": "10px 标签来自微信原生 tabBar 的 HTML 近似；四原生入口保持，真实可读性须微信开发者工具/真机验收，保留原始告警。"
+      },
+      {
+        "index": 11,
+        "antipattern": "undersized-ui-text",
+        "severity": "warning",
+        "page": "follow-v350-service-unavailable-375.html",
+        "selector": "span.preview-native-tab-item:nth-of-type(4) > span.preview-native-tab-label",
+        "classification": "native_preview_approximation",
+        "disposition": "10px 标签来自微信原生 tabBar 的 HTML 近似；四原生入口保持，真实可读性须微信开发者工具/真机验收，保留原始告警。"
+      },
+      {
+        "index": 12,
+        "antipattern": "nested-cards",
+        "severity": "warning",
+        "page": "follow-v350-service-unavailable-375.html",
+        "selector": "div.follow-stock-panel.follow-stock-panel--ok",
+        "classification": "intentional_inventory_status_group",
+        "disposition": "原有精确 SKU 卡中的库存状态分组提供真实业务关联，按产品规范保留；未为消除 nested-cards 告警删除状态或产品身份。"
+      },
+      {
+        "index": 13,
+        "antipattern": "tiny-text",
+        "severity": "warning",
+        "page": "deadlines-v350-service-off-375.html",
+        "selector": "div.simulation",
+        "classification": "preview_only",
+        "disposition": "11px 离线说明条只存在于预览 HTML，不随小程序发布；保留原始告警。"
+      }
+    ],
+    "server": {
+      "bind": "127.0.0.1",
+      "port": 9116,
+      "pid": 45336,
+      "stopped": true,
+      "stopMethod": "Stopped only the known node.exe PID created for this run, then verified Get-CimInstance returned no process."
+    }
+  },
+  "screenshots": [
+    {
+      "file": "deadline-records-only-375-light.png",
+      "sha256": "bf83b4df8e5744f9ec0360289eef9b929f9076fd2f7d1aba0022a7d8661fb983"
+    },
+    {
+      "file": "deadline-unavailable-375-light.png",
+      "sha256": "d48b67787fbb51c94287d6537f05937405df4fa6083c18dc0277aa310b34974c"
+    },
+    {
+      "file": "follow-records-only-375-light.png",
+      "sha256": "49f47262521fe3beb9accad8d5fd2461008c8c5c3857d05469f5dcca4bc60e8c"
+    },
+    {
+      "file": "follow-unavailable-375-dark.png",
+      "sha256": "ff8b2678b8afcf4c62d1d4d20ebdb79e8970a65a990922ae8ca4378dd337ea89"
+    },
+    {
+      "file": "follow-unavailable-375-light.png",
+      "sha256": "d21036110dc450de0280bdac31a722e9fe2f3fa83d2f207a1d16dd19d6077fe3"
+    },
+    {
+      "file": "mac-studio-follow-expanded-320-dark.png",
+      "sha256": "8c8971529057285a8b69cf909f4fdf3e12ab5caa4d23d40486b6dfaa7e7fa08f"
+    },
+    {
+      "file": "mac-studio-follow-expanded-end-320-dark.png",
+      "sha256": "0a6a8afe1c165e0ed392c634f4f45ba77310f18a2218d1b9dfb55b51e9888636"
+    },
+    {
+      "file": "mac-studio-query-collapsed-320-light.png",
+      "sha256": "3fcbabd90354f3e014a60f04ecd84f1924dad87f4faf8daeadcf867e618f6c83"
+    },
+    {
+      "file": "mac-studio-query-expanded-375-light.png",
+      "sha256": "ab3a6ea88d41c8b7477949cc4604d60ad900e5a2a3a5fac467be224de5360578"
+    },
+    {
+      "file": "mac-studio-query-expanded-end-375-light.png",
+      "sha256": "c6f6b6d3117694a5be47b45bae20cf1d3e3058e788700bc72c71ccc08651ffbf"
+    },
+    {
+      "file": "query-first-375-dark.png",
+      "sha256": "faee61d22d2b0bf13ffc87d20bf0bb4b2849f751405d558e828be71675c6bf6a"
+    },
+    {
+      "file": "query-first-375-light.png",
+      "sha256": "40948a5b56fd77971e5c2524506588023ae27c9da8fa224514a0dbe95b5ec6a9"
+    }
+  ],
+  "verificationNotes": [
+    "Final source hashes include the last account-isolation, clipboard synchronous-failure, and class-only component-style fixes.",
+    "The previous ui/ directory belongs to the earlier product direction. This ui-corrections/ build and its fingerprint supersede it for the corrected first page and service/CTO states.",
+    "All API and inventory/reminder fixtures are synthetic. The cloud list or missing-table fix reported by the parent task is separate evidence; it does not turn these screenshots into a device or deployed-front-end check.",
+    "Additional 320/375/430, short-screen, loading, save, conflict and scroll-end screenshots remain in the temporary preview directory.",
+    "Target-picker expanded screenshots include the beginning and end of the scrollable body; the footer save action keeps the existing retail SKU."
+  ],
+  "notVerified": [
+    "WeChat Developer Tools compile and native picker/clipboard APIs",
+    "Real device font scaling, focus, screen reader, keyboard, safe areas and image decode",
+    "Cloud deployment/indexes/timer behavior or real user records",
+    "Actual notification authorization, acceptance and delivery",
+    "Upload, review and formal release"
+  ],
+  "toolValidation": {
+    "syntaxChecks": [
+      "node --check tools/ui-preview/build.mjs",
+      "node --check tools/ui-preview/check-layout.mjs"
+    ],
+    "syntaxExitCodes": [
+      0,
+      0
+    ],
+    "diffCheck": "git diff --check -- tools/ui-preview evidence/verification/3.5.0/ui-corrections",
+    "diffCheckExitCode": 0
+  },
+  "rollback": "Preview tooling and evidence only; reverting these changes does not mutate catalog, cloud data or user reminders."
+}

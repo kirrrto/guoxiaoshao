@@ -1,0 +1,16 @@
+{
+  "requestUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/16-inch-space-black-standard-display-apple-m5-max-chip-18-core-cpu-32-core-gpu-36gb-memory-2tb-storage",
+  "method": "GET",
+  "startedAt": "2026-10-30T03:51:25.380Z",
+  "retries": 0,
+  "httpStatus": 200,
+  "headers": {
+    "content-type": "text/html;charset=utf-8",
+    "date": "Fri, 30 Oct 2026 03:51:24 GMT",
+    "cache-control": "public, max-age=120, s-maxage=120"
+  },
+  "bytes": 349944,
+  "sha256": "5b979da256329ed396d9027046018dd1605c4292321749bc7af49ccb8d06a9e2",
+  "elapsedMs": 2177,
+  "finishedAt": "2026-10-30T03:51:27.557Z"
+}

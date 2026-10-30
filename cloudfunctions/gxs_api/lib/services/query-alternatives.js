@@ -4,6 +4,7 @@ const { isMember, accountLimits } = require('../rules/membership');
 const { resolvePlanMetadata } = require('../rules/member-plan');
 const { isLiveRestricted } = require('../rules/new-product');
 const { WINDOW_MS, sameVariant, storeChoices, freshAvailable } = require('../rules/query-alternatives');
+const { PRODUCT_IDENTITY_PATTERN, canQueryProduct } = require('../rules/product-target');
 function choices(values, pattern, label, maxChoices) {
   if (!Array.isArray(values) || values.length < 1 || values.length > maxChoices || new Set(values).size !== values.length
     || values.some(value => typeof value !== 'string' || !pattern.test(value))) throw new ApiError('invalid_alternative_scope', `${label}需选择 1–${maxChoices} 项，不能重复`);
@@ -16,7 +17,7 @@ async function alternatives(ctx, payload) {
   let [user, query] = await Promise.all([ctx.repo.getUser(ctx.identity.userKey), ctx.repo.getQuery(`${ctx.identity.userKey}|${payload.queryId}`)]);
   user = await resolvePlanMetadata(user, id => ctx.repo.getOrder(id));
   const limits = accountLimits(user, ctx.clock(), ctx.config);
-  const parts = choices(payload.partNumbers, /^[A-Z0-9]{5}CH\/A$/, '配置', limits.alternativeMaxColors);
+  const parts = choices(payload.partNumbers, PRODUCT_IDENTITY_PATTERN, '配置', limits.alternativeMaxColors);
   const numbers = choices(payload.storeNumbers, /^R\d{3}$/, '门店', limits.queryMaxStores);
   if (!user || !query || query.userKey !== user._id || query.kind !== 'live' || query.status !== 'success' || !query.response || query.response.ok !== true
     || !(query.member === true || Number(query.charged) > Number(query.response.refunded || 0))) throw new ApiError('alternatives_query_required', '需从本人刚完成的有效付费或会员查询查看备选');
@@ -29,7 +30,7 @@ async function alternatives(ctx, payload) {
   checkWindow();
   const [base, products, stores] = await Promise.all([ctx.repo.getProduct(query.partNumber), Promise.all(parts.map(part => ctx.repo.getProduct(part))), ctx.repo.listStores()]);
   const now = checkWindow();
-  const canRead = (product, time = now) => product && product.supported === true && !product.comingSoon
+  const canRead = (product, time = now) => canQueryProduct(product) && !product.comingSoon
     && (isMember(user, new Date(time)) || !isLiveRestricted(product, ctx.config.newProductWindows, new Date(time)).restricted);
   if (!canRead(base) || products.some(product => !canRead(product))) throw new ApiError('alternatives_restricted', '所选配置当前不支持查看，或处于新品会员限制期');
   if (products.some(product => !sameVariant(base, product))) throw new ApiError('alternative_variant_mismatch', '仅可选择同机型、同容量且其他配置相同的颜色');

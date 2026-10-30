@@ -8,13 +8,22 @@
 // Keep technical details and complete acceptance records in release documents.
 const RELEASE_NOTES = [
   {
+    version: '3.5.0',
+    title: '我的小哨与到期提醒',
+    dateText: '开发候选 · 2026-10-30',
+    highlights: [
+      '首页查库存，我的小哨集中看关注与到期事项。',
+      '新增免费到期提醒，保存与微信授权状态分开。',
+      'Mac 定制款不参与门店取货查询，仅列出配置参考。',
+    ],
+  },
+  {
     version: '3.4.3',
     title: 'Mac 选配与提醒体验优化',
     dateText: '版本记录 · 2026-10-28',
     highlights: [
       '同步新款 Mac，精确配置选择更稳，老款关注可直接改选。',
       '提醒记录按需加载，浅深色显示更清晰。',
-      '10 月 28 日会员礼遇面向符合条件的曾付费用户，到账以会员记录为准。',
     ],
   },
   {

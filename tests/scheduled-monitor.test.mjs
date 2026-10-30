@@ -165,6 +165,7 @@ test('production monitor entry publishes a fresh heartbeat when the platform tim
     'wx-server-sdk': { init() {}, getWXContext: () => ({}), database: () => { databaseCalls++; return {}; } },
     './lib/repo/cloudbase-repo': { createCloudbaseRepo: () => s.f.repo },
     './lib/engine/wechat-sender': { createWechatSender: () => null },
+    './lib/engine/deadline': require('../cloudfunctions/gxs_api/lib/engine/deadline'),
     './lib/engine/scheduled': { ...scheduled, runScheduled: options => scheduled.runScheduled({
       ...options, clock: () => new Date(s.f.state.now), log, sleep: async ms => s.f.advance(ms),
     }) },

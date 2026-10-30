@@ -30,24 +30,16 @@ const IPAD_MINI_CATALOG_NOTICE = Object.freeze({
   text: '苹果商店已上架新款 iPad mini（A20 Pro），老款取货接口已停用。果小哨已同步更新新款全系配置；原关注老款的用户请点「调整」改选新款。',
 });
 
-const MAC_LAUNCH_CELEBRATION_NOTICE = Object.freeze({
-  id: 'mac-launch-celebration-2026-10-28',
-  title: '庆祝苹果 Mac 新品发布 · 会员礼遇与目录更新',
-  kind: 'notice',
-  publishedAt: '2026-10-28T00:00:00+08:00',
-  startsAt: '2026-10-28T00:00:00+08:00',
-  expiresAt: '2026-11-06T23:59:59+08:00',
-  text: '新款 Mac 配置已更新。10 月 28 日会员礼遇将由后台向符合条件的曾付费用户自动发放 1 天会员，无需打开小程序；到账后可在「我的」会员记录查看。',
-});
+const RETIRED_NOTICE_TITLES = new Set(['庆祝苹果 Mac 新品发布 · 会员礼遇与目录更新']);
 
 const MAC_CATALOG_NOTICE = Object.freeze({
-  id: 'mac-catalog-2026-10-28',
-  title: '新款 MacBook Pro 与 iMac 目录更新说明',
+  id: 'mac-catalog-2026-10-30',
+  title: 'Mac 目录与定制款说明',
   kind: 'notice',
-  publishedAt: '2026-10-28T00:00:00+08:00',
-  startsAt: '2026-10-28T00:00:00+08:00',
+  publishedAt: '2026-10-30T00:00:00+08:00',
+  startsAt: '2026-10-30T00:00:00+08:00',
   expiresAt: '2026-11-06T23:59:59+08:00',
-  text: '苹果商店已上架新款 14 英寸 MacBook Pro（M6）与新款 iMac（M6），老款对应配置取货接口已停用。果小哨已同步更新新款配置；原关注老款的用户请点「调整」改选新款。',
+  text: '新款 MacBook Pro、iMac 与 Mac Studio 配置已同步。Mac Studio 官网定制款不支持 Apple Store 店内取货，仅在配置选择中以参考信息展示；标准配置的取货查询不受影响。',
 });
 
 function noticeExpiresAt(raw) {
@@ -63,8 +55,15 @@ function noticeExpiresAt(raw) {
 }
 
 /** Drop expired structured banners; legacy strings have no clock and stay until cleared. */
+function retiredNotice(raw) {
+  if (!raw) return false;
+  const title = typeof raw === 'object' && !Array.isArray(raw) && typeof raw.title === 'string' ? raw.title.trim() : '';
+  const text = typeof raw === 'string' ? raw : typeof raw.text === 'string' ? raw.text : '';
+  return RETIRED_NOTICE_TITLES.has(title) || /10 月 28 日会员礼遇/.test(text);
+}
+
 function liveAnnouncement(raw, now) {
-  if (!raw) return null;
+  if (!raw || retiredNotice(raw)) return null;
   if (typeof raw === 'string') return raw.trim() ? raw : null;
   if (typeof raw !== 'object' || Array.isArray(raw)) return null;
   const text = typeof raw.text === 'string' ? raw.text.trim() : '';
@@ -205,7 +204,7 @@ async function bootstrap(ctx) {
   ]);
   const { catalogMeta, collectorStatus } = metadata;
   const monitoring = monitoringSnapshot(ctx.config, collectorStatus, ctx.now);
-  const activeBuiltIns = [MAC_LAUNCH_CELEBRATION_NOTICE, MAC_CATALOG_NOTICE, IPAD_MINI_CATALOG_NOTICE, OUTAGE_COMPENSATION_NOTICE]
+  const activeBuiltIns = [MAC_CATALOG_NOTICE, IPAD_MINI_CATALOG_NOTICE, OUTAGE_COMPENSATION_NOTICE]
     .map(raw => ({ raw, live: liveAnnouncement(raw, ctx.now) }))
     .filter(item => item.live);
   const builtInNotice = activeBuiltIns[0] || null;

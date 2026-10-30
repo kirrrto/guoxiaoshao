@@ -6,12 +6,15 @@ import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 const require = createRequire(import.meta.url);
 const { MIGRATION_LEASE_ID } = require('../../cloudfunctions/gxs_api/lib/repo/observation-storage.js');
+const { isProductIdentity } = require('../../cloudfunctions/gxs_api/lib/rules/product-target.js');
 const digest = value => createHash('sha256').update(JSON.stringify(value)).digest('hex');
+const isTargetKey = value => typeof value === 'string' && /^R\d{3}\|/.test(value)
+  && isProductIdentity(value.slice(5));
 
 export async function runInventoryMigration({ repo, targetKeys, envId, action = 'migrate', dryRun = true, checkpoint = null,
   onCheckpoint = async () => {}, clock = () => new Date(), sleep = ms => new Promise(resolve => setTimeout(resolve, ms)), delayMs = 25 }) {
   if (!envId || !Array.isArray(targetKeys) || !targetKeys.length || targetKeys.length > 10000
-      || targetKeys.some(id => typeof id !== 'string' || !/^R\d{3}\|[A-Z0-9]{5}CH\/A$/.test(id))
+      || targetKeys.some(id => !isTargetKey(id))
       || !['migrate', 'rollback', 'archive'].includes(action) || !Number.isFinite(delayMs) || delayMs < 0) throw Error('Explicit environment, 1-10000 target IDs, valid action and delay are required');
   const targets = [...new Set(targetKeys)].sort();
   const identity = { envId, action, dryRun, targetsHash: digest(targets) };

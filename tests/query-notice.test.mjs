@@ -13,6 +13,15 @@ test('legacy string announcements stay until the operator clears them', () => {
   assert.equal(normalized.expiresAt, null);
 });
 
+test('a retired campaign is removed from old servers and cached bootstrap payloads', () => {
+  const retired = { id: 'mac-launch-celebration-2026-10-28', title: '庆祝苹果 Mac 新品发布 · 会员礼遇与目录更新',
+    text: '10 月 28 日会员礼遇', kind: 'notice', expiresAt: '2099-01-01T00:00:00+08:00' };
+  const legacyString = '新款 Mac 配置已更新。10 月 28 日会员礼遇将由后台向符合条件的曾付费用户自动发放 1 天会员。';
+  assert.equal(normalizeAnnouncement(retired, Date.now()), null);
+  assert.equal(normalizeAnnouncement(legacyString, Date.now()), null);
+  assert.deepEqual(liveNotices([retired, { text: legacyString, kind: 'notice' }], Date.now()), []);
+});
+
 test('structured announcements hide themselves after expiresAt without claiming recovery', () => {
   const raw = { text: '苹果官网维护中，预计于今晚20:20（北京时间）结束。', kind: 'maintenance', expiresAt: '2026-10-16T20:20:00+08:00' };
   assert.equal(normalizeAnnouncement(raw, NOW), null);
@@ -27,9 +36,9 @@ test('active maintenance banners render and win over collector noise', () => {
   assert.equal(notice.text, '苹果官网维护中');
 });
 
-test('ordinary launch notices yield to consent and faults while maintenance keeps priority', () => {
-  const { MAC_LAUNCH_CELEBRATION_NOTICE: announcement } = require('../miniprogram/utils/query-notice.js');
-  const now = Date.parse('2026-10-28T12:00:00+08:00');
+test('ordinary catalog notices yield to consent and faults while maintenance keeps priority', () => {
+  const { MAC_CATALOG_NOTICE: announcement } = require('../miniprogram/utils/query-notice.js');
+  const now = Date.parse('2026-10-30T12:00:00+08:00');
   const consent = { anyBlocked: true };
   const fault = { state: 'error', observationStale: true };
   assert.equal(resolveQueryNotice({ announcement, now, consent, collector: fault }).source, 'consent');
@@ -39,8 +48,8 @@ test('ordinary launch notices yield to consent and faults while maintenance keep
   }
   assert.equal(resolveQueryNotice({ announcement: { ...announcement, kind: 'maintenance' }, now, consent, collector: fault }).source, 'announcement');
   assert.equal(resolveQueryNotice({ announcement, now: Date.parse('2026-11-07T00:00:00+08:00'), collector: fault }).source, 'collector');
-  assert.equal(normalizeAnnouncement(announcement, Date.parse('2026-10-27T23:59:59+08:00')), null);
-  assert.doesNotMatch(announcement.text, /今日|全体会员|已发放|已赠送/);
+  assert.equal(normalizeAnnouncement(announcement, Date.parse('2026-10-29T23:59:59+08:00')), null);
+  assert.doesNotMatch(announcement.text, /会员礼遇|发放 1 天|已发放|已赠送/);
 });
 
 test('blocked WeChat subscribe permission is a recoverable query banner', () => {

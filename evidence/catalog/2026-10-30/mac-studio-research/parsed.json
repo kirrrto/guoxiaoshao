@@ -1,0 +1,96 @@
+{
+  "supported": true,
+  "reason": null,
+  "layout": "configurator",
+  "pageTitle": "Mac Studio",
+  "dimensions": [
+    "processor-dimensionChip",
+    "processor-dimensionChip-cpuCoreCount-gpuCoreCount"
+  ],
+  "products": [
+    {
+      "partNumber": "MHL74CH/A",
+      "basePartNumber": "MHL74",
+      "category": "mac",
+      "familyKey": "mac-studio",
+      "familySlug": "mac-studio",
+      "model": "Mac Studio",
+      "title": "Mac Studio M5 Ultra 30核CPU/64核GPU",
+      "titleSource": "partial_page_labels",
+      "englishName": null,
+      "attributes": {
+        "chipName": "M5 Ultra",
+        "chipNameDetail": "我们迄今最强大的芯片，性能颠覆想象，为各类要求极为严苛的专业工作而生。",
+        "chip": "30核CPU/64核GPU"
+      },
+      "dimensionValues": {
+        "processor-dimensionChip": "m5ultra",
+        "processor-dimensionChip-cpuCoreCount-gpuCoreCount": "m5ultra-30-64"
+      },
+      "priceCny": 46999,
+      "comingSoon": false,
+      "isCarrierDevice": false,
+      "upstreamContainer": "RO_MACSTUDIO_M5MAX_M5ULTRA_BET_BES_2026",
+      "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/mac-studio",
+      "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-studio-summary-select-202608?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=emRVcS9veFo0VkhVdktxS2xhUkFyZlZlVVdoQ1hhSFNrUXBpcEw1S25KWjNCbndIdVVCNnVBajNrNndmZlg3UVpIdHlVTTFCN3h3M01Od0tUWEIraE5Yc2ltTjBFSkY0ekhDbC9IMldOR0lwMjNiL1RHMk9ZT3hiZUxzaUNnN0M&traceId=1",
+      "imageAlt": "Mac Studio，银色机身，正面外观展示两个 USB-C 端口、一个 SDXC 卡插槽，以及状态指示灯；背面外观展示铝金属散热孔，端口包括四个雷雳 5 端口、一个以太网端口、一个三针电源插口、两个 USB-A 端口、一个 HDMI 端口、一个耳机插孔，以及电源按钮；顶部俯视外观展示方形圆角机身设计，顶面居中有黑色亮面 Apple 标志。",
+      "imageWidth": 5120,
+      "imageHeight": 3280,
+      "imageKey": "mac-studio-summary-select-202608",
+      "imageSource": "apple-family-summary",
+      "imageSourceUrl": "https://www.apple.com.cn/shop/buy-mac/mac-studio",
+      "imageOriginalUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-studio-summary-select-202608?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=emRVcS9veFo0VkhVdktxS2xhUkFyZlZlVVdoQ1hhSFNrUXBpcEw1S25KWjNCbndIdVVCNnVBajNrNndmZlg3UVpIdHlVTTFCN3h3M01Od0tUWEIraE5Yc2ltTjBFSkY0ekhDbC9IMldOR0lwMjNiL1RHMk9ZT3hiZUxzaUNnN0M&traceId=1",
+      "imageMatchDimensions": {
+        "processor-dimensionChip": "m5ultra",
+        "processor-dimensionChip-cpuCoreCount-gpuCoreCount": "m5ultra-30-64"
+      }
+    },
+    {
+      "partNumber": "MHL64CH/A",
+      "basePartNumber": "MHL64",
+      "category": "mac",
+      "familyKey": "mac-studio",
+      "familySlug": "mac-studio",
+      "model": "Mac Studio",
+      "title": "Mac Studio M5 Max 18核CPU/32核GPU",
+      "titleSource": "partial_page_labels",
+      "englishName": null,
+      "attributes": {
+        "chipName": "M5 Max",
+        "chipNameDetail": "惊人速度与实力，处理各种创意项目和专业工作得心应手。",
+        "chip": "18核CPU/32核GPU"
+      },
+      "dimensionValues": {
+        "processor-dimensionChip": "m5max",
+        "processor-dimensionChip-cpuCoreCount-gpuCoreCount": "m5max-18-32"
+      },
+      "priceCny": 19999,
+      "comingSoon": false,
+      "isCarrierDevice": false,
+      "upstreamContainer": "RO_MACSTUDIO_M5MAX_M5ULTRA_BET_BES_2026",
+      "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/mac-studio",
+      "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-studio-summary-select-202608?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=emRVcS9veFo0VkhVdktxS2xhUkFyZlZlVVdoQ1hhSFNrUXBpcEw1S25KWjNCbndIdVVCNnVBajNrNndmZlg3UVpIdHlVTTFCN3h3M01Od0tUWEIraE5Yc2ltTjBFSkY0ekhDbC9IMldOR0lwMjNiL1RHMk9ZT3hiZUxzaUNnN0M&traceId=1",
+      "imageAlt": "Mac Studio，银色机身，正面外观展示两个 USB-C 端口、一个 SDXC 卡插槽，以及状态指示灯；背面外观展示铝金属散热孔，端口包括四个雷雳 5 端口、一个以太网端口、一个三针电源插口、两个 USB-A 端口、一个 HDMI 端口、一个耳机插孔，以及电源按钮；顶部俯视外观展示方形圆角机身设计，顶面居中有黑色亮面 Apple 标志。",
+      "imageWidth": 5120,
+      "imageHeight": 3280,
+      "imageKey": "mac-studio-summary-select-202608",
+      "imageSource": "apple-family-summary",
+      "imageSourceUrl": "https://www.apple.com.cn/shop/buy-mac/mac-studio",
+      "imageOriginalUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-studio-summary-select-202608?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=emRVcS9veFo0VkhVdktxS2xhUkFyZlZlVVdoQ1hhSFNrUXBpcEw1S25KWjNCbndIdVVCNnVBajNrNndmZlg3UVpIdHlVTTFCN3h3M01Od0tUWEIraE5Yc2ltTjBFSkY0ekhDbC9IMldOR0lwMjNiL1RHMk9ZT3hiZUxzaUNnN0M&traceId=1",
+      "imageMatchDimensions": {
+        "processor-dimensionChip": "m5max",
+        "processor-dimensionChip-cpuCoreCount-gpuCoreCount": "m5max-18-32"
+      }
+    }
+  ],
+  "rejected": [
+    {
+      "partNumber": "RO_MACSTUDIO_M5MAX_M5ULTRA_BET_BES_2026",
+      "reason": "cto_only_base"
+    },
+    {
+      "partNumber": "RO_MACSTUDIO_M5MAX_M5ULTRA_BET_BES_2026",
+      "reason": "cto_only_base"
+    }
+  ]
+}

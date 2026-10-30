@@ -1,5 +1,5 @@
 {
-  "navigationBarTitleText": "果小哨 · 小哨提醒",
+  "navigationBarTitleText": "果小哨 · 我的小哨",
   "enablePullDownRefresh": true,
   "componentPlaceholder": {
     "target-picker": "view",

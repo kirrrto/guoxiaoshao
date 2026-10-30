@@ -3,6 +3,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { ApiError } = require('../errors');
 const { coordinates } = require('../rules/query-alternatives');
+const { isCtoPartNumber, resolvePickupTarget } = require('../rules/product-target');
 
 const BUNDLED_DIR = path.resolve(__dirname, '..', '..', 'catalog');
 
@@ -14,6 +15,10 @@ function readBundled(name) {
 
 /** Shape stored per SKU; the client gets the same fields. */
 function toProductDoc(product, family) {
+  const cto = isCtoPartNumber(product.partNumber);
+  const target = cto ? resolvePickupTarget(product) : null;
+  const supported = (cto ? Boolean(product.pickupVerification && product.pickupVerification.verified)
+    : Boolean(family && family.supported && family.pickupVerification && family.pickupVerification.verified)) && !product.comingSoon;
   return {
     _id: product.partNumber,
     partNumber: product.partNumber,
@@ -27,8 +32,12 @@ function toProductDoc(product, family) {
     attributes: Object.fromEntries(Object.entries(product.attributes || {}).filter(([key]) => !key.endsWith('Detail'))),
     priceCny: product.priceCny,
     comingSoon: Boolean(product.comingSoon),
-    supported: Boolean(family && family.supported && family.pickupVerification && family.pickupVerification.verified) && !product.comingSoon,
-    verificationStatus: family && family.pickupVerification ? family.pickupVerification.status : null,
+    supported,
+    monitorSupported: supported,
+    querySupported: cto ? product.querySupported === true && !product.comingSoon : supported,
+    ...(target ? { targetType: 'apple_cto', pickupTarget: target.pickupTarget } : {}),
+    verificationStatus: cto ? product.pickupVerification && product.pickupVerification.status || 'unverified'
+      : family && family.pickupVerification ? family.pickupVerification.status : null,
     sourceUrl: product.sourceUrl,
     imageUrl: product.imageUrl || null,
     imageAlt: product.imageAlt || null,
@@ -70,7 +79,8 @@ function buildFromBundled() {
       productsGeneratedAt: products.generatedAt,
       imagesGeneratedAt: products.imagesGeneratedAt || null,
       families: products.families.map(f => ({ familyKey: f.familyKey, category: f.category, displayName: f.displayName, supported: f.supported, verified: Boolean(f.pickupVerification && f.pickupVerification.verified), productCount: f.productCount, models: f.models || [],
-        ...(f.releaseDate ? { releaseDate: f.releaseDate, releaseSourceUrl: f.releaseSourceUrl } : {}) })),
+        ...(f.releaseDate ? { releaseDate: f.releaseDate, releaseSourceUrl: f.releaseSourceUrl } : {}),
+        ...(f.officialConfigurations ? { officialConfigurations: f.officialConfigurations } : {}) })),
       excludedFamilies: products.excludedFamilies || [],
       seededAt: null,
     },

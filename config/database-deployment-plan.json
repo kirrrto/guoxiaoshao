@@ -421,6 +421,43 @@
       ]
     },
     {
+      "collectionName": "gxs_deadlines",
+      "rules": {
+        "read": false,
+        "write": false
+      },
+      "indexes": [
+        {
+          "name": "user_status_remind_id",
+          "keys": {
+            "userKey": 1,
+            "status": 1,
+            "remindAt": 1,
+            "_id": 1
+          },
+          "unique": false
+        },
+        {
+          "name": "schedule_due_id",
+          "keys": {
+            "scheduleState": 1,
+            "nextAttemptAt": 1,
+            "_id": 1
+          },
+          "unique": false
+        },
+        {
+          "name": "schedule_lease_id",
+          "keys": {
+            "scheduleState": 1,
+            "leaseUntil": 1,
+            "_id": 1
+          },
+          "unique": false
+        }
+      ]
+    },
+    {
       "collectionName": "gxs_config",
       "rules": {
         "read": false,

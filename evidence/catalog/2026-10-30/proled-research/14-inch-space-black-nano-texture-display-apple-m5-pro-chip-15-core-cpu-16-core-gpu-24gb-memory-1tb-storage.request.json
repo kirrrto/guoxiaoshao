@@ -1,0 +1,16 @@
+{
+  "requestUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/14-inch-space-black-nano-texture-display-apple-m5-pro-chip-15-core-cpu-16-core-gpu-24gb-memory-1tb-storage",
+  "method": "GET",
+  "startedAt": "2026-10-30T03:51:29.632Z",
+  "retries": 0,
+  "httpStatus": 200,
+  "headers": {
+    "content-type": "text/html;charset=utf-8",
+    "date": "Fri, 30 Oct 2026 03:51:29 GMT",
+    "cache-control": "public, max-age=120, s-maxage=120"
+  },
+  "bytes": 349974,
+  "sha256": "6cfbb267d1629aff18aa6a98c3436b2a137728559ab6dc97cf5569078adac072",
+  "elapsedMs": 4753,
+  "finishedAt": "2026-10-30T03:51:34.385Z"
+}

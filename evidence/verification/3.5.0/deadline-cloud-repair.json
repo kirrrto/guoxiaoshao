@@ -1,0 +1,105 @@
+{
+  "recordedAt": "2026-10-30T04:49:09.512Z",
+  "environment": "flowermean-6gjaxfqhf6c13e88",
+  "scope": "Additive repair for the reported deadline.list failure; no function deployment, config enablement or synthetic user records.",
+  "before": {
+    "collection": {
+      "success": true,
+      "exists": false,
+      "requestId": "90436297-88fc-4b50-bdac-f7b60332ed3c",
+      "message": "云开发数据库集合不存在",
+      "collection": "gxs_deadlines",
+      "collectionName": "gxs_deadlines"
+    },
+    "errors": [
+      {
+        "requestId": "7c5a2f0a-54ee-4f52-bcbb-fc4be5af56c6",
+        "timestamp": "2026-10-30 12:41:48.437",
+        "message": "[gxs_api] deadline.list failed Error: collection.get:fail -502005 database collection not exists. [ResourceNotFound] Db or Table not exist: gxs_deadlines. Please check your request, but if the problem cannot be solved, contact us. 更多错误信息请访问：https://docs.cloudbase.net/error-code/basic/DATABASE_COLLECTION_NOT_EXIST"
+      },
+      {
+        "requestId": "5d4f5f5f-4260-48e0-9ea7-6a89292a73b3",
+        "timestamp": "2026-10-30 12:41:22.835",
+        "message": "[gxs_api] deadline.list failed Error: collection.get:fail -502005 database collection not exists. [ResourceNotFound] Db or Table not exist: gxs_deadlines. Please check your request, but if the problem cannot be solved, contact us. 更多错误信息请访问：https://docs.cloudbase.net/error-code/basic/DATABASE_COLLECTION_NOT_EXIST"
+      },
+      {
+        "requestId": "22335b21-8979-433a-94b0-9e870dfa3eb9",
+        "timestamp": "2026-10-30 12:41:17.810",
+        "message": "[gxs_api] deadline.list failed Error: collection.get:fail -502005 database collection not exists. [ResourceNotFound] Db or Table not exist: gxs_deadlines. Please check your request, but if the problem cannot be solved, contact us. 更多错误信息请访问：https://docs.cloudbase.net/error-code/basic/DATABASE_COLLECTION_NOT_EXIST"
+      },
+      {
+        "requestId": "acf8b712-f621-4ec9-b1e3-670c8b5c688b",
+        "timestamp": "2026-10-30 12:41:11.250",
+        "message": "[gxs_api] deadline.list failed Error: collection.get:fail -502005 database collection not exists. [ResourceNotFound] Db or Table not exist: gxs_deadlines. Please check your request, but if the problem cannot be solved, contact us. 更多错误信息请访问：https://docs.cloudbase.net/error-code/basic/DATABASE_COLLECTION_NOT_EXIST"
+      }
+    ]
+  },
+  "changes": [
+    {
+      "action": "createCollection",
+      "collection": "gxs_deadlines",
+      "requestId": "333ba251-7136-4ebd-9fba-b42c341dee80"
+    },
+    {
+      "action": "updateResourcePermission",
+      "permission": "ADMINONLY",
+      "requestId": "7e10e5be-0d30-4449-a53c-b2c4804c8ab0"
+    },
+    {
+      "action": "addIndexes",
+      "names": [
+        "user_status_remind_id",
+        "schedule_due_id",
+        "schedule_lease_id"
+      ],
+      "requestId": "88099ad5-cb11-4ebb-aec8-579b70c71dde"
+    }
+  ],
+  "after": {
+    "structure": {
+      "status": "fulfilled",
+      "value": {
+        "content": [
+          {
+            "type": "text",
+            "text": "{\n  \"success\": true,\n  \"requestId\": \"2e7350a8-86c4-404e-bc11-14ec3fc64653\",\n  \"indexNum\": 5,\n  \"indexes\": [\n    {\n      \"Name\": \"schedule_lease_id\",\n      \"Accesses\": {\n        \"Ops\": 0,\n        \"Since\": \"2026-10-30T12:48:07.279+08:00\"\n      },\n      \"Keys\": [\n        {\n          \"Name\": \"scheduleState\",\n          \"Direction\": \"1\"\n        },\n        {\n          \"Name\": \"leaseUntil\",\n          \"Direction\": \"1\"\n        },\n        {\n          \"Name\": \"_id\",\n          \"Direction\": \"1\"\n        }\n      ],\n      \"Size\": 8192,\n      \"Unique\": false,\n      \"Sparse\": false,\n      \"PartialFilterExpression\": \"\"\n    },\n    {\n      \"Name\": \"_id_\",\n      \"Accesses\": {\n        \"Ops\": 0,\n        \"Since\": \"2026-10-30T12:47:51.475+08:00\"\n      },\n      \"Keys\": [\n        {\n          \"Name\": \"_id\",\n          \"Direction\": \"1\"\n        }\n      ],\n      \"Size\": 4096,\n      \"Unique\": false,\n      \"Sparse\": false,\n      \"PartialFilterExpression\": \"\"\n    },\n    {\n      \"Name\": \"user_status_remind_id\",\n      \"Accesses\": {\n        \"Ops\": 1,\n        \"Since\": \"2026-10-30T12:48:07.256+08:00\"\n      },\n      \"Keys\": [\n        {\n          \"Name\": \"userKey\",\n          \"Direction\": \"1\"\n        },\n        {\n          \"Name\": \"status\",\n          \"Direction\": \"1\"\n        },\n        {\n          \"Name\": \"remindAt\",\n          \"Direction\": \"1\"\n        },\n        {\n          \"Name\": \"_id\",\n          \"Direction\": \"1\"\n        }\n      ],\n      \"Size\": 8192,\n      \"Unique\": false,\n      \"Sparse\": false,\n      \"PartialFilterExpression\": \"\"\n    },\n    {\n      \"Name\": \"_openid_1\",\n      \"Accesses\": {\n        \"Ops\": 0,\n        \"Since\": \"2026-10-30T12:47:51.481+08:00\"\n      },\n      \"Keys\": [\n        {\n          \"Name\": \"_openid\",\n          \"Direction\": \"1\"\n        }\n      ],\n      \"Size\": 8192,\n      \"Unique\": false,\n      \"Sparse\": false,\n      \"PartialFilterExpression\": \"\"\n    },\n    {\n      \"Name\": \"schedule_due_id\",\n      \"Accesses\": {\n        \"Ops\": 0,\n        \"Since\": \"2026-10-30T12:48:07.269+08:00\"\n      },\n      \"Keys\": [\n        {\n          \"Name\": \"scheduleState\",\n          \"Direction\": \"1\"\n        },\n        {\n          \"Name\": \"nextAttemptAt\",\n          \"Direction\": \"1\"\n        },\n        {\n          \"Name\": \"_id\",\n          \"Direction\": \"1\"\n        }\n      ],\n      \"Size\": 8192,\n      \"Unique\": false,\n      \"Sparse\": false,\n      \"PartialFilterExpression\": \"\"\n    }\n  ],\n  \"message\": \"获取云开发数据库集合信息成功\",\n  \"collection\": \"gxs_deadlines\",\n  \"collectionName\": \"gxs_deadlines\"\n}"
+          }
+        ]
+      }
+    },
+    "permissions": {
+      "status": "fulfilled",
+      "value": {
+        "content": [
+          {
+            "type": "text",
+            "text": "{\n  \"success\": true,\n  \"data\": {\n    \"action\": \"getResourcePermission\",\n    \"envId\": \"flowermean-6gjaxfqhf6c13e88\",\n    \"resourceType\": \"noSqlDatabase\",\n    \"resourceId\": \"gxs_deadlines\",\n    \"aclTag\": \"ADMINONLY\",\n    \"permissions\": [\n      {\n        \"Resource\": \"gxs_deadlines\",\n        \"Permission\": \"ADMINONLY\",\n        \"ResourceType\": \"collection\",\n        \"SecurityRule\": \"\"\n      }\n    ],\n    \"hints\": [],\n    \"raw\": {\n      \"RequestId\": \"f98b370d-4b3d-4527-a88f-de1ab12adc6a\",\n      \"Data\": {\n        \"TotalCount\": 1,\n        \"PermissionList\": [\n          {\n            \"Resource\": \"gxs_deadlines\",\n            \"Permission\": \"ADMINONLY\",\n            \"ResourceType\": \"collection\",\n            \"SecurityRule\": \"\"\n          }\n        ]\n      }\n    }\n  },\n  \"message\": \"资源权限查询成功\"\n}"
+          }
+        ]
+      }
+    },
+    "naturalReadResponses": [
+      {
+        "requestId": "06d92c55-0ecb-4023-b405-73edbda16db9",
+        "timestamp": "2026-10-30 12:48:15.814",
+        "ok": true,
+        "itemCount": 0,
+        "capability": {
+          "enabled": false,
+          "templateId": null,
+          "reason": "template_missing"
+        },
+        "serverTime": "2026-10-30T04:48:15.685Z"
+      }
+    ]
+  },
+  "verified": "Collection and indexes exist; client DB access denied; a naturally occurring deadline list response succeeded with 0 records and template_missing.",
+  "notVerified": [
+    "create/update/delete user journey on a real device",
+    "native subscription authorization",
+    "timer delivery",
+    "actual receipt",
+    "latest local frontend and backend changes deployed"
+  ],
+  "rollback": "Keep the added collection and indexes while any saved records may exist. No user records were created by this repair. Do not delete the collection as a routine rollback; disable the feature/notification configuration and retain records."
+}

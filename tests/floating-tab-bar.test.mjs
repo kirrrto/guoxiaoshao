@@ -18,8 +18,13 @@ function navigationRuntime(initialRoute = routes[0], options = {}) {
 test('the four routes and themed icons are registered with the native tab bar only', () => {
   const app = JSON.parse(fs.readFileSync(new URL('../miniprogram/app.json', import.meta.url)));
   assert.notEqual(app.tabBar.custom, true);
+  assert.equal(app.pages[0], 'pages/query/index', 'normal launch opens inventory query');
   assert.deepEqual(app.tabBar.list.map(tab => tab.pagePath), routes);
   assert.deepEqual(app.tabBar.list.map(tab => tab.text), ['查询', '小哨', '历史', '我的']);
+  const h = navigationRuntime();
+  h.stack.length = 0;
+  assert.equal(h.tabs.getCurrentTabPath(), '/pages/query/index', 'fallback selection agrees with normal launch');
+  assert.deepEqual(Array.from(h.tabs.TABS, tab => tab.pagePath.slice(1)), routes);
   for (const tab of app.tabBar.list) for (const name of ['iconPath', 'selectedIconPath'])
     assert.ok(fs.existsSync(new URL(`../miniprogram/${tab[name]}`, import.meta.url)));
   assert.equal(fs.existsSync(new URL('../miniprogram/custom-tab-bar', import.meta.url)), false,
@@ -69,9 +74,9 @@ test('failed navigation keeps the confirmed route and releases the lock for retr
 });
 
 test('real page navigation retains intent and caller failure cleanup while suppressing duplicate switches', () => {
-  const h = navigationRuntime(routes[1]);
+  const h = navigationRuntime('pages/follow/index');
   const page = h.rt.instance('pages/follow/index.js');
-  page.route = routes[1]; h.show(page);
+  page.route = 'pages/follow/index'; h.show(page);
   page.setData({ follows: [{ followId: 'saved-1', partNumber: 'SKU-1', stores: [{ storeNumber: 'R001' }] }] });
   const event = { currentTarget: { dataset: { id: 'saved-1' } } };
   page.onQueryFollow(event); page.onQueryFollow(event);

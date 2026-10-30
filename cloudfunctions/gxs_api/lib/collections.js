@@ -14,6 +14,7 @@ const COLLECTIONS = Object.freeze({
   growthAccounts: 'gxs_growth_accounts',
   notifications: 'gxs_notifications',
   notificationTests: 'gxs_notification_tests',
+  deadlines: 'gxs_deadlines',
   config: 'gxs_config',
   catalogStores: 'gxs_catalog_stores',
   catalogProducts: 'gxs_catalog_products',
@@ -21,6 +22,11 @@ const COLLECTIONS = Object.freeze({
 
 /** Index plan used by tools/db/create-collections and documented in docs/DATA_MODEL.md. */
 const INDEX_PLAN = Object.freeze({
+  [COLLECTIONS.deadlines]: [
+    { name: 'user_status_remind_id', keys: { userKey: 1, status: 1, remindAt: 1, _id: 1 }, unique: false },
+    { name: 'schedule_due_id', keys: { scheduleState: 1, nextAttemptAt: 1, _id: 1 }, unique: false },
+    { name: 'schedule_lease_id', keys: { scheduleState: 1, leaseUntil: 1, _id: 1 }, unique: false },
+  ],
   [COLLECTIONS.latest]: [
     { name: 'part_id', keys: { partNumber: 1, _id: 1 }, unique: false },
   ],

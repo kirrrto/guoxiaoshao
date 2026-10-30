@@ -1,0 +1,35 @@
+{
+  "checkedAt": "2026-10-30T04:47:08.647Z",
+  "scope": "2026-10-30 maintainer correction: inventory query remains the default home tab; My Sentinels remains the second native tab.",
+  "routes": [
+    "pages/query/index",
+    "pages/follow/index",
+    "pages/history/index",
+    "pages/mine/index"
+  ],
+  "checks": {
+    "nativePagesAndTabOrder": "miniprogram/app.json",
+    "programmaticFallbackAndTabOrder": "miniprogram/utils/tab-bar.js",
+    "normalLaunch": "App.onLaunch/onShow preserve requested routes; no forced redirect to follow.",
+    "missingPageRecovery": "Existing App.onPageNotFound already routes to inventory query.",
+    "releaseGate": "tools/release/check.mjs requires query as consumerPages[0].",
+    "tabIndexConsumers": "No production callers hardcode a navigation index; page callers navigate by explicit route."
+  },
+  "tests": {
+    "command": "node --test tests/floating-tab-bar.test.mjs tests/account-ux.test.mjs tests/startup-resilience.test.mjs tests/app-entry-recovery.test.mjs tests/query-onboarding-share.test.mjs tests/release-notes-ui.test.mjs tests/navigation-recovery.test.mjs",
+    "passed": 69,
+    "failed": 0,
+    "skipped": 0,
+    "durationMs": 682.6336,
+    "evidenceType": "Summary of observed command output; not a full raw test log."
+  },
+  "diffCheck": "git diff --check exited 0",
+  "usageImpact": "No additional API or timer. deadline.list is not called by inventory query startup.",
+  "notVerified": [
+    "Final combined offline preview after all ongoing changes",
+    "WeChat native first launch and tab switching",
+    "Device behavior",
+    "Cloud deployment",
+    "Upload or publication"
+  ]
+}

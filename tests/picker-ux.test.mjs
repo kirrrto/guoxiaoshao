@@ -19,7 +19,7 @@ function catalog() {
   for (const meta of products.families.filter(f => f.productCount > 0)) {
     let category = categories.find(c => c.key === meta.category);
     if (!category) { category = { key: meta.category, name: meta.category, families: [] }; categories.push(category); }
-    category.families.push({ familyKey: meta.familyKey, name: meta.displayName, supported: true, catalogOrder: products.families.indexOf(meta), products: products.products.filter(p => p.familyKey === meta.familyKey).map(p => ({ ...p, supported: true })) });
+    category.families.push({ ...meta, familyKey: meta.familyKey, name: meta.displayName, supported: true, catalogOrder: products.families.indexOf(meta), products: products.products.filter(p => p.familyKey === meta.familyKey).map(p => ({ ...p, supported: true })) });
   }
   const cities = [];
   for (const store of stores) {
@@ -54,7 +54,7 @@ test('current iPhone and Mac families show newer official announcements first', 
   const iphone = sortFamilies([...c.categories.find(c => c.key === 'iphone').families].reverse());
   assert.deepEqual(iphone.map(f => f.familyKey), ['iphone-duo', 'iphone-18-pro', 'iphone-17e', 'iphone-air', 'iphone-17', 'iphone-16']);
   const mac = sortFamilies(c.categories.find(c => c.key === 'mac').families);
-  assert.deepEqual(mac.map(f => f.familyKey), ['macbook-pro', 'imac', 'mac-mini', 'mac-studio', 'macbook-neo', 'macbook-air']);
+  assert.deepEqual(mac.map(f => f.familyKey), ['macbook-pro-proled-xdr', 'macbook-pro', 'imac', 'mac-mini', 'mac-studio', 'macbook-neo', 'macbook-air']);
   const ipad = sortFamilies(c.categories.find(c => c.key === 'ipad').families);
   assert.deepEqual(ipad.map(f => f.familyKey), ['ipad-mini', 'ipad-air', 'ipad-pro', 'ipad']);
   for (const key of new Set(products.products.map(p => p.familyKey))) assert.ok(FAMILY_RELEASES[key], `missing maintained announcement evidence: ${key}`);

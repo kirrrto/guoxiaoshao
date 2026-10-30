@@ -3,6 +3,25 @@
 .whistle-heading-image { display: block; width: 54rpx; height: 54rpx; }
 .whistle-heading-copy { flex: 1; min-width: 0; }
 .compact-action.btn { flex: none; width: auto; min-width: 64px; min-height: 44px; padding: 0 20rpx; }
+.deadline-home-empty { font-size: max(14px, 28rpx); color: var(--text-2); line-height: 1.6; }
+.deadline-home-next { display: flex; flex-direction: column; gap: 6rpx; padding-bottom: 16rpx; color: var(--text-2); font-size: max(12px, 26rpx); line-height: 1.6; overflow-wrap: anywhere; }
+.deadline-home-next .bold { color: var(--text); }
+.deadline-home-row { padding: 18rpx 0; border-top: 1rpx solid var(--line); }
+.deadline-home-item { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6rpx 16rpx; }
+.deadline-home-title { flex: 1 1 180rpx; min-width: 0; font-size: max(14px, 28rpx); line-height: 1.6; color: var(--text); font-weight: 600; overflow-wrap: anywhere; }
+.deadline-home-date { font-size: max(12px, 25rpx); line-height: 1.6; color: var(--text-2); }
+.deadline-home-delivery { display: flex; flex-direction: column; gap: 4rpx; margin-top: 4rpx; color: var(--text-2); font-size: max(12px, 25rpx); line-height: 1.6; overflow-wrap: anywhere; }
+.deadline-home-state { color: var(--text-2); }
+.deadline-home-state--ok { color: var(--green-dark); }
+.deadline-home-state--warn { color: var(--warn); }
+.deadline-home-state--bad { color: var(--bad); }
+.deadline-home-action.btn { min-height: 44px; height: auto; padding: 18rpx 24rpx; margin-top: 18rpx; line-height: 1.5; white-space: normal; }
+.deadline-home-error { display: flex; flex-wrap: wrap; gap: 12rpx; align-items: center; font-size: max(12px, 26rpx); line-height: 1.6; color: var(--warn); }
+.deadline-home-error > text { flex: 1 1 240rpx; overflow-wrap: anywhere; }
+.inventory-home-heading { margin-top: 34rpx; }
+.inventory-home-recent { display: flex; flex-direction: column; gap: 4rpx; padding-bottom: 24rpx; font-size: max(12px, 26rpx); line-height: 1.6; color: var(--text-2); overflow-wrap: anywhere; }
+.inventory-home-recent .bold { color: var(--text); }
+.follow-page .deadline-home .section-title, .follow-page .inventory-home-heading .section-title { font-size: max(14px, 28rpx); }
 .section-heading { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8rpx 16rpx; margin-bottom: 16rpx; }
 .section-title { color: var(--text); font-size: 32rpx; line-height: 1.5; font-weight: 650; }
 .follow-count { color: var(--text-2); font-size: 26rpx; margin-left: 12rpx; }

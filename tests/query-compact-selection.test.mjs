@@ -454,3 +454,23 @@ test('an older queued query focus cannot run after a newer explicit query has fi
   assert.notEqual(calls[0].payload.queryId, calls[1].payload.queryId);
   page.onUnload();
 });
+
+test('a saved custom CTO selection stays reference-only and cannot query or follow', async () => {
+  const cto = seed.products.find(product => product.targetType === 'apple_cto'
+    && product.attributes.memory === '36GB' && product.attributes.capacity === '1TB');
+  const memberBoot = () => ({ ...boot(), member: true, membership: { active: true } });
+  const { page, rt } = await opened({ value: { partNumber: cto.partNumber, storeNumbers: ['R577'] }, getBoot: memberBoot });
+  assert.equal(page.selection.partNumber, cto.partNumber);
+  assert.equal(page.data.selectionCanCollapse, false);
+  assert.equal(page.data.selectionSupportsFollow, false);
+  assert.equal(page.data.selectionReferenceOnly, true);
+  assert.equal(page.data.selectionSummary.title, cto.title);
+  assert.match(page.data.selectionNotice, /官网定制款不支持 Apple Store 店内取货/);
+  await page.onQuery();
+  assert.equal(rt.calls.filter(call => call.action === 'query.pickup').length, 0);
+  const message = rt.messages.at(-1);
+  assert.match(typeof message === 'string' ? message : message.title, /官网定制款不支持 Apple Store 店内取货/);
+  page.onAddFollow();
+  assert.equal(rt.app.globalData.pendingFollow, null);
+  page.onUnload();
+});

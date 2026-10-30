@@ -2,6 +2,7 @@ const { productThumbnailUrl } = require('../../utils/product-image-fit');
 /** Cascading filters use only model/attributes supplied by the catalog. */
 const { sortFamilies, sortModels, compareCapacities, storeMatches } = require('../../utils/catalog-order');
 const { currentCatalog } = require('../../utils/store');
+const { canQuery, canMonitor } = require('../../utils/product-capabilities');
 const { presentStore, storeLabelWithCity } = require('../../utils/store-label');
 const unique = items => [...new Set(items.filter(Boolean))];
 const memoryOf = p => (p.attributes || {}).memory || '';
@@ -12,7 +13,7 @@ const modelOf = p => p.model || p.familyName || p.familyKey;
 const configurationKeys = ['chipName', 'chip', 'finish', 'connection', 'charging'];
 const configurationLabelOf = p => configurationKeys.map(key => (p.attributes || {})[key]).filter(Boolean).join(' · ') || p.title;
 const selectionTitleOf = p => p.category === 'mac'
-  ? [modelOf(p), memoryOf(p), capacityOf(p), (p.attributes || {}).color].filter(Boolean).join(' · ') : p.title;
+  ? [modelOf(p), configurationLabelOf(p), memoryOf(p), capacityOf(p), (p.attributes || {}).color].filter(Boolean).join(' · ') : p.title;
 const specSummaryOf = p => {
   const a = p.attributes || {};
   if (!a.chipName && !a.chip && !a.memory && !a.finish && !a.connection) return '';
@@ -33,6 +34,7 @@ Component({
   data: { categories: [], categoryIndex: 0, families: [], familyNames: [], familyIndex: 0,
     models: [], modelIndex: 0, memories: [], memoryIndex: 0, capacities: [], capacityIndex: 0, colors: [], colorIndex: 0,
     candidates: [], productTitles: [], productIndex: 0, product: null, imageFailed: false,
+    officialConfiguration: null, configurationsExpanded: false, copyingConfigurationLink: false, configurationLinkError: '',
     cities: [], hotCities: [], cityIndex: 0, cityStores: [], selectedStores: [], selectionNote: '', searchKeyword: '', searchActive: false, searchResults: [] },
   lifetimes: {
     // Observers fire only for non-default values; load even if no version is bound.
@@ -74,9 +76,15 @@ Component({
         for (const category of catalog.categories) for (const family of category.families || []) for (const p of family.products || []) this.sourceProductByPart[p.partNumber] = p;
         this.catalogCategories = catalog.categories.map(c => {
           const families = sortFamilies(c.families || []);
-          return { ...c, families: this.data.supportedOnly
-            ? families.map(f => ({ ...f, products: (f.products || []).filter(p => p.supported), supported: true })).filter(f => f.products.length)
-            : families };
+          return { ...c, families: families.map(f => ({
+            ...f,
+            // Apple configured Macs are not eligible for in-store pickup. Keep
+            // them out of the selectable cascade, but retain their verified
+            // ranges in the reference-only disclosure below.
+            products: (f.products || []).filter(product => product.targetType !== 'apple_cto'
+              && (!this.data.supportedOnly || canMonitor(product))),
+            supported: this.data.supportedOnly ? true : f.supported,
+          })).filter(f => f.products.length) };
         }).filter(c => c.families.length);
         this.catalogCities = (catalog.cities || []).map(city => ({ ...city,
           stores: city.stores.map(s => presentStore({ ...s, city: s.city || city.city, province: s.province || city.province || '' })),
@@ -95,7 +103,7 @@ Component({
           this.currentCandidates = [];
           this.stage({ categoryIndex: 0, families: [], familyNames: [], familyIndex: 0, models: [], modelIndex: 0,
             memories: [], memoryIndex: 0, capacities: [], capacityIndex: 0, colors: [], colorIndex: 0, candidates: [], productTitles: [], productIndex: 0,
-            product: null, selectedStores: [], imageFailed: false, selectionNote: this.emptyCatalogNote() });
+            product: null, selectedStores: [], imageFailed: false, officialConfiguration: null, configurationsExpanded: false, configurationLinkError: '', selectionNote: this.emptyCatalogNote() });
         } else this.selectCategory(0, true);
         if (previous) this.applyValue(previous); else { this.selectCity(0); this.updateSearchResults(); this.emit(); }
       });
@@ -121,8 +129,9 @@ Component({
         // must never turn into the first selectable product without user input.
         this.unavailablePartNumber = value.partNumber;
         this.stage({ product: null });
-        note = this.data.supportedOnly && own(this.sourceProductByPart, value.partNumber)
-          ? '原配置暂未开放关注，请重新选择可用配置。' : '原配置已从目录移除，请重新选择。';
+        const saved = own(this.sourceProductByPart, value.partNumber) ? this.sourceProductByPart[value.partNumber] : null;
+        note = saved && saved.targetType === 'apple_cto' ? '此官网定制款不支持 Apple Store 店内取货，请选择可查询的标准配置。'
+          : this.data.supportedOnly && saved ? '原配置暂未开放关注，请重新选择可用配置。' : '原配置已从目录移除，请重新选择。';
       }
       if (!this.catalogCategories.length) note += this.emptyCatalogNote();
       const numbers = unique(Array.isArray(value.storeNumbers) ? value.storeNumbers : []);
@@ -144,7 +153,50 @@ Component({
       this.selectFamily(0, true); if (!silent) { this.updateFilters(wanted); this.emit(); }
     },
     currentAttributes() { return { model: this.read('models')[this.read('modelIndex')], memory: (this.read('memories') || [])[this.read('memoryIndex')], capacity: this.read('capacities')[this.read('capacityIndex')], color: this.read('colors')[this.read('colorIndex')], partNumber: (this.read('product') || {}).partNumber }; },
-    selectFamily(index, silent = false) { const wanted = silent ? {} : this.currentAttributes(); this.stage({ familyIndex: index, selectionNote: '' }); this.updateFilters(wanted); if (!silent) this.emit(); },
+    selectFamily(index, silent = false) {
+      const wanted = silent ? {} : this.currentAttributes();
+      this.stage({ familyIndex: index, selectionNote: '', configurationsExpanded: false, configurationLinkError: '' });
+      const category = this.catalogCategories[this.read('categoryIndex')];
+      const family = category && category.families[index];
+      const official = family && family.officialConfigurations;
+      // Browsing metadata never becomes a product or a selectable pickup target.
+      const chips = official && Array.isArray(official.chips) ? official.chips.filter(chip => chip.chipId && chip.chipName && chip.chip
+        && Array.isArray(chip.memoryValues) && chip.memoryValues.length && Array.isArray(chip.storageValues) && chip.storageValues.length) : [];
+      const officialUrl = official && typeof official.sourceUrl === 'string' && /^https:\/\/www\.apple\.com\.cn\/shop\/buy-mac\/[a-z0-9-]+$/.test(official.sourceUrl) ? official.sourceUrl : '';
+      const customCount = Object.values(this.sourceProductByPart || {}).filter(product =>
+        product.familyKey === (family && family.familyKey) && product.targetType === 'apple_cto').length;
+      this.stage({ officialConfiguration: chips.length && officialUrl ? {
+        familyKey: family.familyKey, sourceUrl: officialUrl, customCount,
+        supportedCount: family.products.filter(product => product.supported && !product.comingSoon).length,
+        chips: chips.map(chip => ({ chipId: chip.chipId, chipName: chip.chipName, chip: chip.chip,
+          memoryText: chip.memoryValues.join(' / '), storageText: chip.storageValues.join(' / ') })),
+      } : null });
+      this.updateFilters(wanted); if (!silent) this.emit();
+    },
+    onToggleConfigurations() {
+      if (this.isInteractionLocked() || !this.data.officialConfiguration) return;
+      this.setData({ configurationsExpanded: !this.data.configurationsExpanded });
+    },
+    onCopyConfigurationLink() {
+      const official = this.data.officialConfiguration;
+      if (this.isInteractionLocked() || this.data.copyingConfigurationLink || !official) return;
+      this.setData({ copyingConfigurationLink: true, configurationLinkError: '' });
+      let settled = false;
+      const finish = failed => {
+        if (settled) return;
+        settled = true;
+        const patch = { copyingConfigurationLink: false };
+        if (failed && this.data.officialConfiguration && this.data.officialConfiguration.sourceUrl === official.sourceUrl) patch.configurationLinkError = '复制失败，请重试。';
+        this.setData(patch);
+      };
+      try {
+        wx.setClipboardData({ data: official.sourceUrl,
+          success: () => { finish(false); wx.showToast({ title: '官网链接已复制', icon: 'success' }); },
+          fail: () => finish(true),
+          complete: () => finish(false),
+        });
+      } catch (_) { finish(true); }
+    },
     updateFilters(wanted) {
       this.unavailablePartNumber = null;
       const products = this.familyProducts();
@@ -197,7 +249,8 @@ Component({
         product: candidates[productIndex] ? this.publicProduct(candidates[productIndex]) : null, imageFailed: false });
     },
     publicProduct(p) { return { partNumber: p.partNumber, title: p.title, selectionTitle: selectionTitleOf(p), configurationLabel: configurationLabelOf(p), specSummary: specSummaryOf(p), model: p.model, familyName: p.familyName, category: p.category,
-      supported: Boolean(p.supported), comingSoon: p.comingSoon, priceCny: p.priceCny, verificationStatus: p.verificationStatus,
+      supported: canMonitor(p), querySupported: canQuery(p), monitorSupported: canMonitor(p), targetType: p.targetType || 'retail',
+      comingSoon: p.comingSoon, priceCny: p.priceCny, verificationStatus: p.verificationStatus,
       imageUrl: p.imageUrl || '', imageDisplayUrl: productThumbnailUrl(p.imageUrl, 'card', p.partNumber), imageAlt: p.imageAlt || p.title, attributes: p.attributes || {} }; },
     onCategoryTap(e) { if (this.isInteractionLocked()) return; this.batch(() => this.selectCategory(Number(e.currentTarget.dataset.index))); },
     onFamilyChange(e) { if (this.isInteractionLocked()) return; this.batch(() => this.selectFamily(Number(e.detail.value))); },

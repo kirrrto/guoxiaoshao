@@ -19,6 +19,7 @@ const FAMILY_RELEASES = {
   'ipad-mini': ['2026-10-26', 'https://www.apple.com.cn/newsroom/2026/10/apple-gives-ipad-mini-its-biggest-update-ever/'],
   'macbook-air': ['2026-03-03', 'https://www.apple.com/newsroom/2026/03/apple-introduces-the-new-macbook-air-with-m5/'],
   'macbook-pro': ['2026-10-27', 'https://www.apple.com.cn/newsroom/2026/10/apple-introduces-the-new-14-inch-macbook-pro-with-m6/'],
+  'macbook-pro-proled-xdr': ['2026-11-06', 'https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr'],
   'macbook-neo': ['2026-03-04', 'https://www.apple.com/newsroom/2026/03/say-hello-to-macbook-neo/'],
   'imac': ['2026-10-27', 'https://www.apple.com.cn/newsroom/2026/10/apple-unveils-new-imac-with-m6/'],
   'mac-mini': ['2026-08-25', 'https://www.apple.com/uk/newsroom/2026/08/apple-unveils-a-more-powerful-mac-mini-featuring-the-all-new-m6-and-m5-pro/'],

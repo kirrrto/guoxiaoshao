@@ -29,6 +29,7 @@ const DEFAULTS = Object.freeze({
   backoff: { baseMs: 2000, factor: 2, maxMs: 60000 },
   breaker: { failureThreshold: 5, windowMs: 30000, cooldownMs: 60000, maxCooldownMs: 10 * 60 * 1000 },
 });
+const { isCtoPartNumber } = require('../rules/product-target');
 
 const groupKeyOf = (storeNumber, partNumbers) => `${storeNumber}|${[...partNumbers].sort().join(',')}`;
 const phaseOfKey = (key, intervalMs) => {
@@ -50,9 +51,9 @@ function buildGroups(follows, maxPartsPerRequest = 20) {
     }
   }
   return [...byStore.entries()].flatMap(([storeNumber, parts]) => {
-    const partNumbers = [...parts].sort();
+    const partNumbers = [...parts].filter(part => !isCtoPartNumber(part)).sort();
     const size = Math.max(1, Math.min(50, Math.floor(maxPartsPerRequest) || 20));
-    const batches = [];
+    const batches = [...parts].filter(isCtoPartNumber).sort().map(part => ({ key: groupKeyOf(storeNumber, [part]), storeNumber, partNumbers: [part] }));
     for (let i = 0; i < partNumbers.length; i += size) {
       const batch = partNumbers.slice(i, i + size);
       batches.push({ key: groupKeyOf(storeNumber, batch), storeNumber, partNumbers: batch });

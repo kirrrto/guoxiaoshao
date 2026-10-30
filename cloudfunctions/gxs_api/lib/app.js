@@ -24,6 +24,7 @@ const notify = require('./services/notify');
 const notificationTest = require('./services/notification-test');
 const admin = require('./services/admin');
 const growth = require('./services/growth');
+const deadline = require('./services/deadline');
 
 const { version: VERSION } = require('../package.json');
 const defaultClock = () => new Date();
@@ -48,6 +49,11 @@ const ACTIONS = {
   'follow.pause': [follows.pause, true],
   'follow.resume': [follows.resume, true],
   'follow.remove': [follows.remove, true],
+  'deadline.list': [deadline.list, true],
+  'deadline.create': [deadline.create, true],
+  'deadline.update': [deadline.update, true],
+  'deadline.remove': [deadline.remove, true],
+  'deadline.authorize': [deadline.authorize, true],
   'member.status': [member.status, true],
   'member.createOrder': [member.createOrder, true],
   'member.checkOrder': [member.checkOrder, true],
@@ -106,6 +112,11 @@ function createHandler({ repo, fetchImpl, clock = defaultClock, log = console, a
         return envelope({ ok: false, error: { code: error.code, message: error.message, details: error.details } });
       }
       log.error(`[gxs_api] ${action} failed`, error && error.stack ? error.stack : error);
+      const databaseMessage = String(error && (error.errMsg || error.message) || '');
+      if (action && action.startsWith('deadline.') && /gxs_deadlines/.test(databaseMessage)
+        && /-502005|DATABASE_COLLECTION_NOT_EXIST|collection.*not exist/i.test(databaseMessage)) {
+        return envelope({ ok: false, error: { code: 'deadline_service_unavailable', message: '到期事项尚未开放，请稍后再试。', details: null } });
+      }
       return envelope({ ok: false, error: { code: 'internal_error', message: '服务暂时不可用，请稍后再试', details: null } });
     }
   };

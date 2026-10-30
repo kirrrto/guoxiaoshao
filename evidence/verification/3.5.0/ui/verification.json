@@ -1,0 +1,347 @@
+{
+  "version": "3.5.0",
+  "recordedAt": "2026-10-30T04:02:43.878Z",
+  "status": "offline_scope_passed_with_documented_detector_warnings",
+  "publicationReady": false,
+  "preview": {
+    "directory": "C:\\Users\\ADMINI~1\\AppData\\Local\\Temp\\gxs-v350-preview",
+    "generatedAt": "2026-10-30T03:59:00.456Z",
+    "fixedBusinessTime": "2026-10-30T07:00:00.000Z",
+    "pages": [
+      "follow",
+      "deadlines"
+    ],
+    "scenarios": [
+      "v350-loading",
+      "v350-empty",
+      "v350-scheduled",
+      "v350-service-off",
+      "v350-needs-authorization",
+      "v350-authorization-elapsed",
+      "v350-delivery-results",
+      "v350-read-error",
+      "v350-apple-error",
+      "v350-editor",
+      "v350-editor-empty",
+      "v350-saving",
+      "v350-save-error",
+      "v350-edit-conflict",
+      "v350-longcontent"
+    ],
+    "scenarioCount": 15,
+    "snapshotCount": 72,
+    "widths": [
+      320,
+      375,
+      430
+    ],
+    "expressionErrors": 0,
+    "sourceFiles": 244,
+    "sourceFingerprint": "c80ff359668dcc64a75e2ad9ddf1b2e1e45a1419a7c5d8a26289192a9076d02b",
+    "sourceFingerprintMethod": "SHA256(JSON.stringify(manifest.sourceHashes)); ordered UTF-8 JSON",
+    "sourceMismatches": []
+  },
+  "layout": {
+    "total": 288,
+    "exitCodes": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "profiles": [
+      "light 1x",
+      "dark 1x",
+      "light 1.3x font / 600px viewport",
+      "dark 1.3x font / 600px viewport"
+    ],
+    "reports": [
+      {
+        "file": "layout-metrics.json",
+        "generatedAt": "2026-10-30T03:59:08.055Z",
+        "summary": {
+          "total": 72,
+          "indexNavigationFailures": 0,
+          "expressionErrors": 0,
+          "missingText": 0,
+          "forbiddenText": 0,
+          "horizontalOverflow": 0,
+          "clippedText": 0,
+          "failedImages": 0,
+          "alternativeLayoutFailures": 0,
+          "calendarLayoutFailures": 0,
+          "membershipLayoutFailures": 0,
+          "notificationLayoutFailures": 0,
+          "v3LayoutFailures": 0,
+          "stockLayoutFailures": 0,
+          "followFontFailures": 0,
+          "deadlineLayoutFailures": 0
+        }
+      },
+      {
+        "file": "layout-metrics-dark.json",
+        "generatedAt": "2026-10-30T03:59:08.027Z",
+        "summary": {
+          "total": 72,
+          "indexNavigationFailures": 0,
+          "expressionErrors": 0,
+          "missingText": 0,
+          "forbiddenText": 0,
+          "horizontalOverflow": 0,
+          "clippedText": 0,
+          "failedImages": 0,
+          "alternativeLayoutFailures": 0,
+          "calendarLayoutFailures": 0,
+          "membershipLayoutFailures": 0,
+          "notificationLayoutFailures": 0,
+          "v3LayoutFailures": 0,
+          "stockLayoutFailures": 0,
+          "followFontFailures": 0,
+          "deadlineLayoutFailures": 0
+        }
+      },
+      {
+        "file": "layout-metrics-v350-fonts.json",
+        "generatedAt": "2026-10-30T03:59:08.020Z",
+        "summary": {
+          "total": 72,
+          "indexNavigationFailures": 0,
+          "expressionErrors": 0,
+          "missingText": 0,
+          "forbiddenText": 0,
+          "horizontalOverflow": 0,
+          "clippedText": 0,
+          "failedImages": 0,
+          "alternativeLayoutFailures": 0,
+          "calendarLayoutFailures": 0,
+          "membershipLayoutFailures": 0,
+          "notificationLayoutFailures": 0,
+          "v3LayoutFailures": 0,
+          "stockLayoutFailures": 0,
+          "followFontFailures": 0,
+          "deadlineLayoutFailures": 0
+        }
+      },
+      {
+        "file": "layout-metrics-v350-fonts-dark.json",
+        "generatedAt": "2026-10-30T03:59:08.071Z",
+        "summary": {
+          "total": 72,
+          "indexNavigationFailures": 0,
+          "expressionErrors": 0,
+          "missingText": 0,
+          "forbiddenText": 0,
+          "horizontalOverflow": 0,
+          "clippedText": 0,
+          "failedImages": 0,
+          "alternativeLayoutFailures": 0,
+          "calendarLayoutFailures": 0,
+          "membershipLayoutFailures": 0,
+          "notificationLayoutFailures": 0,
+          "v3LayoutFailures": 0,
+          "stockLayoutFailures": 0,
+          "followFontFailures": 0,
+          "deadlineLayoutFailures": 0
+        }
+      }
+    ],
+    "checks": [
+      "expected and forbidden content",
+      "horizontal overflow and clipped text",
+      "image load failures",
+      "44px minimum visible action hit area",
+      "12px minimum functional text at 320px",
+      "input accessible names",
+      "saving input/picker/button lock",
+      "revision conflict save lock and explicit draft reload"
+    ]
+  },
+  "nativeTabGeometry": {
+    "total": 324,
+    "exitCodes": [
+      0,
+      0
+    ],
+    "reports": [
+      {
+        "file": "native-tab-metrics.json",
+        "checkedAt": "2026-10-30T04:00:17.637Z",
+        "summary": {
+          "total": 162,
+          "failed": 0
+        }
+      },
+      {
+        "file": "native-tab-metrics-dark.json",
+        "checkedAt": "2026-10-30T04:00:17.199Z",
+        "summary": {
+          "total": 162,
+          "failed": 0
+        }
+      }
+    ],
+    "limitations": "HTML approximation based on actual app.json and theme.json, 1x/1.3x fonts and 0/34px simulated safe area. Does not validate native WeChat layout or API behavior."
+  },
+  "colors": {
+    "total": 368,
+    "active": 358,
+    "exitCodes": [
+      0,
+      0
+    ],
+    "reports": [
+      {
+        "file": "theme-colors.json",
+        "checkedAt": "2026-10-30T04:00:28.926Z",
+        "previewGeneratedAt": "2026-10-30T03:59:00.456Z",
+        "summary": {
+          "total": 184,
+          "active": 179,
+          "belowTarget": 0,
+          "primaryMinimum": 5.357131444839318,
+          "selectedNavMinimum": 5.230867846703258,
+          "unsupportedMeasurements": 0
+        },
+        "passed": true
+      },
+      {
+        "file": "theme-colors-dark.json",
+        "checkedAt": "2026-10-30T04:00:28.889Z",
+        "previewGeneratedAt": "2026-10-30T03:59:00.456Z",
+        "summary": {
+          "total": 184,
+          "active": 179,
+          "belowTarget": 0,
+          "primaryMinimum": 5.357131444839318,
+          "selectedNavMinimum": 7.139531628869566,
+          "unsupportedMeasurements": 0
+        },
+        "passed": true
+      }
+    ],
+    "method": "Computed browser styles on actual rendered WXML/WXSS translation; includes empty input placeholder and documents disabled controls separately."
+  },
+  "detector": {
+    "command": ".agents/skills/impeccable/scripts/impeccable.cmd detect --json --viewport 375x900 --no-consent-hiding --no-overlay-hiding http://127.0.0.1:9115/follow-v350-scheduled-375.html http://127.0.0.1:9115/deadlines-v350-editor-empty-375.html",
+    "runs": 1,
+    "exitCode": 2,
+    "rawReport": "impeccable-detect.json",
+    "stderr": "impeccable-detect.stderr.log",
+    "rawExitCode": "impeccable-detect-exit.txt",
+    "primaryWarnings": 8,
+    "findings": [
+      {
+        "index": 1,
+        "antipattern": "tiny-text",
+        "selector": "div.simulation",
+        "page": "follow-v350-scheduled-375.html",
+        "severity": "warning",
+        "classification": "preview_only",
+        "disposition": "保留原始告警。11px 离线说明条仅存在于预览 HTML，不发布到小程序。"
+      },
+      {
+        "index": 2,
+        "antipattern": "undersized-ui-text",
+        "selector": "span.preview-native-tab-item.is-selected > span.preview-native-tab-label",
+        "page": "follow-v350-scheduled-375.html",
+        "severity": "warning",
+        "classification": "native_preview_approximation",
+        "disposition": "保留原始告警。10px 标签是预览工具对微信原生 tabBar 的 HTML 近似；真实原生标签可读性仍需微信开发者工具和真机验证。"
+      },
+      {
+        "index": 3,
+        "antipattern": "undersized-ui-text",
+        "selector": "span.preview-native-tab-item:nth-of-type(2) > span.preview-native-tab-label",
+        "page": "follow-v350-scheduled-375.html",
+        "severity": "warning",
+        "classification": "native_preview_approximation",
+        "disposition": "保留原始告警。10px 标签是预览工具对微信原生 tabBar 的 HTML 近似；真实原生标签可读性仍需微信开发者工具和真机验证。"
+      },
+      {
+        "index": 4,
+        "antipattern": "undersized-ui-text",
+        "selector": "span.preview-native-tab-item:nth-of-type(3) > span.preview-native-tab-label",
+        "page": "follow-v350-scheduled-375.html",
+        "severity": "warning",
+        "classification": "native_preview_approximation",
+        "disposition": "保留原始告警。10px 标签是预览工具对微信原生 tabBar 的 HTML 近似；真实原生标签可读性仍需微信开发者工具和真机验证。"
+      },
+      {
+        "index": 5,
+        "antipattern": "undersized-ui-text",
+        "selector": "span.preview-native-tab-item:nth-of-type(4) > span.preview-native-tab-label",
+        "page": "follow-v350-scheduled-375.html",
+        "severity": "warning",
+        "classification": "native_preview_approximation",
+        "disposition": "保留原始告警。10px 标签是预览工具对微信原生 tabBar 的 HTML 近似；真实原生标签可读性仍需微信开发者工具和真机验证。"
+      },
+      {
+        "index": 6,
+        "antipattern": "nested-cards",
+        "selector": "div.follow-stock-panel.follow-stock-panel--ok",
+        "page": "follow-v350-scheduled-375.html",
+        "severity": "warning",
+        "classification": "intentional_inventory_status_group",
+        "disposition": "保留库存卡内原有语义状态分组，避免为消除 nested-cards 告警破坏精确 SKU 和库存状态关联；本轮新增到期区不引入这类嵌套。"
+      },
+      {
+        "index": 7,
+        "antipattern": "tiny-text",
+        "selector": "div.simulation",
+        "page": "deadlines-v350-editor-empty-375.html",
+        "severity": "warning",
+        "classification": "preview_only",
+        "disposition": "保留原始告警。11px 离线说明条仅存在于预览 HTML，不发布到小程序。"
+      },
+      {
+        "index": 8,
+        "antipattern": "nested-cards",
+        "selector": "div.deadline-field:nth-of-type(4) > div > div.deadline-picker",
+        "page": "deadlines-v350-editor-empty-375.html",
+        "severity": "warning",
+        "classification": "native_picker_control",
+        "disposition": "保留日期 picker 控件边界。这是原生输入控件的离线外壳，不是多层内容卡；触控尺寸、文字和占位内容另有实测。"
+      }
+    ],
+    "server": {
+      "bind": "127.0.0.1",
+      "port": 9115,
+      "pid": 38884,
+      "stopped": true,
+      "stopMethod": "Verified PID command line pointed to this preview; Stop-Process -Id 38884; final Get-CimInstance Win32_Process returned no process."
+    }
+  },
+  "screenshots": [
+    {
+      "file": "home-375-light.png",
+      "sha256": "ee75f88843755bd3bf95cc021ae072640be9345d46727ad9dcb2a34098d24994"
+    },
+    {
+      "file": "home-375-dark.png",
+      "sha256": "ef113933feb9396e34a25578290c0e72ef45c6801ad9291c764d723b1d9cc2ef"
+    },
+    {
+      "file": "deadline-editor-320-light.png",
+      "sha256": "0dee15e170f2e659a06ae9fa8f0fa48cacd926a4c6ca8361f9bc9f9f7a4593db"
+    },
+    {
+      "file": "deadline-editor-320-dark.png",
+      "sha256": "7dbb400f87beee217a13710518554217cc5e4eabaab6478601abddc8f2a230ef"
+    }
+  ],
+  "evidenceNotes": [
+    "Final reports and four screenshots were copied from the 2026-10-30T03:59:00.456Z preview build. Older intermediate reports were not used for final verification.",
+    "Other 320/375/430 and error/loading/save/conflict screenshots remain in the temporary preview directory.",
+    "The new-item editor screenshots show a manually filled draft before save.",
+    "All reminder and inventory UI data are synthetic fixtures. Save, failed-result recovery and revision-conflict states call actual page event methods with offline API replacements. No native authorization or cloud business write is invoked."
+  ],
+  "notVerified": [
+    "WeChat Developer Tools compilation and native picker dialogs",
+    "Real keyboard, focus, accessibility reading order, native navigation and device safe area",
+    "Device image decode, performance and large text behavior",
+    "CloudBase deployed functions/indexes/timer invocation and real account isolation",
+    "Actual subscription authorization, message acceptance or delivery",
+    "Upload, review, production release"
+  ],
+  "rollback": "Preview tooling and evidence only. Reverting tools/ui-preview changes removes these offline fixtures/checks; it does not alter cloud data, inventory monitoring or reminder records."
+}

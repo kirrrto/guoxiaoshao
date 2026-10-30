@@ -6,6 +6,7 @@ const { isDeepStrictEqual } = require('node:util');
 const { dayKey } = require('../time');
 const { applyObservation, targetKeyOf } = require('../engine/events');
 const { observationDayId, appendObservationDay } = require('../engine/observation-day');
+const { isProductIdentity } = require('../rules/product-target');
 const MIGRATION_LEASE_ID = 'inventory_storage_migration_lease';
 const revisionOf = value => Number.isSafeInteger(value) && value >= 0 ? value : 0;
 const storageOf = latest => latest && latest.observationStorage || { schemaVersion: 1, mode: 'legacy', revision: 0 };
@@ -141,7 +142,8 @@ function observationStorageMethods(run) {
     }),
 
     transitionObservationStorage: ({ targetKey, action = 'migrate', dryRun = true, migrationLease, nowIso }) => run(async tx => {
-      if (!/^(R\d{3})\|([A-Z0-9]{5}CH\/A)$/.test(targetKey || '') || !['migrate', 'rollback', 'archive'].includes(action)
+      const targetParts = typeof targetKey === 'string' ? targetKey.split('|') : [];
+      if (targetParts.length !== 2 || !/^R\d{3}$/.test(targetParts[0]) || !isProductIdentity(targetParts[1]) || !['migrate', 'rollback', 'archive'].includes(action)
           || !Number.isFinite(Date.parse(nowIso))) throw new ApiError('invalid_inventory_migration', '库存迁移参数无效');
       if (!dryRun) await assertMigrationLease(tx, migrationLease, nowIso);
       const latest = await tx.get(C.latest, targetKey), storage = storageOf(latest);

@@ -3,6 +3,7 @@ const cloud = require('wx-server-sdk');
 const { createCloudbaseRepo } = require('./lib/repo/cloudbase-repo');
 const { createWechatSender } = require('./lib/engine/wechat-sender');
 const { readTimerRuntime, isTrustedTimer, runBudgetMs, runScheduled } = require('./lib/engine/scheduled');
+const { runDeadlineReminders } = require('./lib/engine/deadline');
 const connection = require('./lib/connection');
 
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV, timeout: 8000 });
@@ -27,9 +28,22 @@ exports.main = async (event, context) => {
         runtimeKeyNames: Object.keys(process.env).filter(key => /SOURCE|TRIGGER|WX_CONTEXT/.test(key)),
       } : undefined };
   }
-  if (process.env.GXS_ENABLE_SCHEDULED_MONITOR !== 'true') return { ok: true, state: 'process_disabled', source: trustedContext.SOURCE, triggerSource: trustedRuntime.TRIGGER_SRC || null, runEnvironment: trustedRuntime.TENCENTCLOUD_RUNENV || null };
   const sender = createWechatSender({ appid: process.env.GXS_CONSUMER_APPID || '', appSecret: process.env.GXS_CONSUMER_APPSECRET || '',
     expectedAppid: connection.consumerAppid, fetchImpl: globalThis.fetch, timeoutMs: 5000 });
-  const result = await runScheduled({ repo: createCloudbaseRepo(cloud.database()), fetchImpl: globalThis.fetch, sendImpl: sender, maxRunMs: runBudgetMs(context) });
-  return { ok: true, ...result };
+  const repo = createCloudbaseRepo(cloud.database());
+  const budgetMs = runBudgetMs(context), deadlineAt = Date.now() + budgetMs;
+  // Dates do not depend on the Apple collector's lease, inventory switch or membership.
+  // Await both branches even if one fails; never abandon an in-flight message send.
+  const [inventory, deadlines] = await Promise.allSettled([
+    process.env.GXS_ENABLE_SCHEDULED_MONITOR === 'true'
+      ? runScheduled({ repo, fetchImpl: globalThis.fetch, sendImpl: sender, maxRunMs: budgetMs })
+      : Promise.resolve({ state: 'process_disabled' }),
+    runDeadlineReminders({ repo, sendImpl: sender, remainingMs: () => Math.max(0, deadlineAt - Date.now()) }),
+  ]);
+  if (inventory.status === 'rejected') throw inventory.reason;
+  if (deadlines.status === 'rejected') {
+    console.error('[gxs_deadline] scheduled pass failed');
+    return { ok: false, ...inventory.value, deadlines: { state: 'error' } };
+  }
+  return { ok: true, ...inventory.value, deadlines: deadlines.value };
 };

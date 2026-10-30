@@ -6,12 +6,13 @@ const { ensureUser } = require('./users');
 const { accountLimits } = require('../rules/membership');
 const { isRetiredPartNumber, retiredProductMessage } = require('../rules/follow-access');
 const { recordObservations } = require('../engine/observations');
+const { isProductIdentity } = require('../rules/product-target');
 const ID_PATTERN = /^[A-Za-z0-9_-]{8,64}$/;
 function validatePayload(ctx, payload, user) {
   const queryId = typeof payload.queryId === 'string' && ID_PATTERN.test(payload.queryId) ? payload.queryId : null;
   if (!queryId) throw new ApiError('invalid_query_id', 'queryId 需为 8–64 位字母数字标识');
   const partNumber = typeof payload.partNumber === 'string' ? payload.partNumber.trim() : '';
-  if (!/^[A-Z0-9]{5}CH\/A$/.test(partNumber)) throw new ApiError('invalid_part_number', '商品编号格式无效');
+  if (!isProductIdentity(partNumber)) throw new ApiError('invalid_part_number', '商品编号格式无效');
   if (isRetiredPartNumber(partNumber)) throw new ApiError('product_retired', retiredProductMessage(partNumber));
   const maxStores = accountLimits(user, ctx.now, ctx.config).queryMaxStores;
   const storeNumbers = Array.isArray(payload.storeNumbers) ? [...new Set(payload.storeNumbers.filter(s => typeof s === 'string' && /^R\d{3}$/.test(s)))] : [];
@@ -64,7 +65,7 @@ async function pickup(ctx, payload) {
   try {
     // Keep six seconds for recording/refund even after slow admission reads.
     const deadline = Math.min(startedAt + 14000, Date.now() + Math.max(0, remaining() - 6000));
-    const batches = await mapLimit(storeNumbers, 3, store => sharedQueryPickup(ctx, store, partNumber, deadline));
+    const batches = await mapLimit(storeNumbers, 3, store => sharedQueryPickup(ctx, store, partNumber, deadline, product));
     // A denied request is not an upstream observation and must not alter history.
     const recorded = batches.flatMap(batch => batch.record.budgetDenied
       ? batch.observations.map(observation => ({ observation, latest: null, events: [], outcome: 'not_sampled' }))

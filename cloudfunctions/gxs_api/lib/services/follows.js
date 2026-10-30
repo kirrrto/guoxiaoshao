@@ -5,6 +5,7 @@ const { isRetiredPartNumber, retiredProductMessage } = require('../rules/follow-
 const { isLiveRestricted } = require('../rules/new-product');
 const { targetKeyOf } = require('../engine/events');
 const { ensureUser } = require('./users');
+const { isProductIdentity, isCtoPartNumber, canMonitorProduct } = require('../rules/product-target');
 
 const ID_PATTERN = /^[A-Za-z0-9_-]{8,64}$/;
 
@@ -89,7 +90,7 @@ async function upsert(ctx, payload) {
   if (!canUseReminders(user, ctx.now)) throw new ApiError('member_required', '关注与到货提醒为会员专属，开通会员后可关注并接收微信提醒');
   const member = isMember(user, ctx.now);
   const partNumber = typeof payload.partNumber === 'string' ? payload.partNumber.trim() : '';
-  if (!/^[A-Z0-9]{5}CH\/A$/.test(partNumber)) throw new ApiError('invalid_part_number', '商品编号格式无效');
+  if (!isProductIdentity(partNumber)) throw new ApiError('invalid_part_number', '商品编号格式无效');
   if (isRetiredPartNumber(partNumber)) throw new ApiError('product_retired', retiredProductMessage(partNumber));
   const storeNumbers = Array.isArray(payload.storeNumbers) ? payload.storeNumbers.filter(s => typeof s === 'string' && /^R\d{3}$/.test(s)) : [];
   const rawId = typeof payload.followId === 'string' && payload.followId.startsWith(`${user._id}|`) ? payload.followId.slice(user._id.length + 1) : payload.followId;
@@ -98,7 +99,7 @@ async function upsert(ctx, payload) {
 
   const [product, stores, follows] = await Promise.all([ctx.repo.getProduct(partNumber), ctx.repo.getStores([...new Set(storeNumbers)]), ctx.repo.listFollows(user._id)]);
   if (!product) throw new ApiError('unknown_product', '该商品不在目录中');
-  if (!product.supported) throw new ApiError('unsupported_product', '该商品暂不支持监测');
+  if (!canMonitorProduct(product)) throw new ApiError('unsupported_product', '该商品暂不支持监测');
   if (stores.length !== new Set(storeNumbers).size) throw new ApiError('unknown_store', '存在未知门店编号');
 
   const recordId = `${user._id}|${followId}`;
@@ -145,6 +146,7 @@ async function setStatus(ctx, payload, status) {
   if (!follow || follow.userKey !== user._id || follow.status === 'removed') throw new ApiError('unknown_follow', '关注不存在');
   if (status === 'active' && isRetiredPartNumber(follow.partNumber)) throw new ApiError('product_retired', retiredProductMessage(follow.partNumber));
   if (status === 'active' && !canUseReminders(user, ctx.now)) throw new ApiError('member_required', '关注与到货提醒为会员专属，开通会员后可恢复监测');
+  if (status === 'active' && isCtoPartNumber(follow.partNumber) && !canMonitorProduct(await ctx.repo.getProduct(follow.partNumber))) throw new ApiError('unsupported_product', '该商品暂不支持监测');
   const updated = await ctx.repo.mutateFollow({ userKey: user._id, followId: recordId, status, nowIso: ctx.nowIso, knownFollows: await ctx.repo.listFollows(user._id) });
   if (status === 'removed') return { removed: true, followId };
   const [decorated] = await decorate(ctx, [updated], isMember(user, ctx.now), canUseReminders(user, ctx.now));

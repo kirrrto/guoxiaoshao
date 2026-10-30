@@ -18,7 +18,7 @@ function sharedBatch(latest) {
 }
 
 /** Cross-instance manual-query coalescing. A reused sample is never persisted again. */
-async function sharedQueryPickup(ctx, storeNumber, partNumber, deadline) {
+async function sharedQueryPickup(ctx, storeNumber, partNumber, deadline, product = null) {
   const freshnessMs = (ctx.config.query.sharedFreshnessSeconds || 0) * 1000;
   const ownerId = randomUUID();
   let claim;
@@ -42,7 +42,7 @@ async function sharedQueryPickup(ctx, storeNumber, partNumber, deadline) {
     const remaining = Math.max(1, deadline - Date.now());
     const timeoutMs = Math.max(1, Math.min(remaining, Number(ctx.config.query.upstreamTimeoutMs) || 8000, 12000));
     const batch = await guardedPickup({ repo: ctx.repo, config: ctx.config, clock: ctx.clock, fetchImpl: ctx.fetchImpl,
-      storeNumber, partNumbers: [partNumber], timeoutMs, remainingMs: () => Math.max(0, deadline - Date.now()),
+      storeNumber, partNumbers: [partNumber], products: product ? [product] : null, timeoutMs, remainingMs: () => Math.max(0, deadline - Date.now()),
       beforeRequest: async () => Date.now() < deadline });
     if (batch.record.budgetDenied) {
       blockedReason = batch.record.error.message;

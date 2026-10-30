@@ -1,0 +1,1565 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-10-30T04:47:03.689Z",
+  "familyKey": "mac-studio",
+  "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/mac-studio",
+  "specificationsUrl": "https://www.apple.com.cn/mac-studio/specs/",
+  "scope": "Public product configuration research only. No cart, checkout, account cookies or business data. No additional network requests after the first HTTP 541.",
+  "correction": "The existing three CH/A retail SKUs are a subset of the official Mac Studio configurations. They do not cover all configurable chip, memory and storage choices.",
+  "compatibility": [
+    {
+      "chip": "m5max-18-32",
+      "memory": [
+        "36gb"
+      ],
+      "storage": [
+        "512gb",
+        "1tb",
+        "2tb",
+        "4tb",
+        "8tb"
+      ],
+      "checkedAt": "2026-10-30T04:44:27.214Z",
+      "sourceUrl": "https://www.apple.com.cn/shop/api/cto/update-config?collection=MACSTUDIO_2026_COLLECTION&fae=true&sv.processor-dimensionChip=m5max&sv.processor-dimensionChip-cpuCoreCount-gpuCoreCount=m5max-18-32",
+      "note": "Compatible options returned with this chip selected. Upgrade options are excluded; these require a different chip."
+    },
+    {
+      "chip": "m5max-18-40",
+      "memory": [
+        "48gb",
+        "64gb",
+        "128gb"
+      ],
+      "storage": [
+        "512gb",
+        "1tb",
+        "2tb",
+        "4tb",
+        "8tb"
+      ],
+      "checkedAt": "2026-10-30T04:44:29.758Z",
+      "sourceUrl": "https://www.apple.com.cn/shop/api/cto/update-config?collection=MACSTUDIO_2026_COLLECTION&fae=true&sv.processor-dimensionChip=m5max&sv.processor-dimensionChip-cpuCoreCount-gpuCoreCount=m5max-18-40",
+      "note": "Compatible options returned with this chip selected. Upgrade options are excluded; these require a different chip."
+    },
+    {
+      "chip": "m5ultra-30-64",
+      "memory": [
+        "96gb",
+        "256gb"
+      ],
+      "storage": [
+        "1tb",
+        "2tb",
+        "4tb",
+        "8tb",
+        "16tb"
+      ],
+      "checkedAt": "2026-10-30T04:44:32.696Z",
+      "sourceUrl": "https://www.apple.com.cn/shop/api/cto/update-config?collection=MACSTUDIO_2026_COLLECTION&fae=true&sv.processor-dimensionChip=m5ultra&sv.processor-dimensionChip-cpuCoreCount-gpuCoreCount=m5ultra-30-64",
+      "note": "Compatible options returned with this chip selected. Upgrade options are excluded; these require a different chip."
+    },
+    {
+      "chip": "m5ultra-36-80",
+      "memory": [
+        "96gb",
+        "256gb",
+        "512gb"
+      ],
+      "storage": [
+        "1tb",
+        "2tb",
+        "4tb",
+        "8tb",
+        "16tb"
+      ],
+      "checkedAt": "2026-10-30T04:44:35.290Z",
+      "sourceUrl": "https://www.apple.com.cn/shop/api/cto/update-config?collection=MACSTUDIO_2026_COLLECTION&fae=true&sv.processor-dimensionChip=m5ultra&sv.processor-dimensionChip-cpuCoreCount-gpuCoreCount=m5ultra-36-80",
+      "note": "Compatible options returned with this chip selected. Upgrade options are excluded; these require a different chip."
+    }
+  ],
+  "configurationResponses": [
+    {
+      "chip": "m5max-18-32",
+      "sourceFile": "evidence/raw/2026-10-30/mac-studio-cto/m5max-18-32.json",
+      "request": {
+        "requestUrl": "https://www.apple.com.cn/shop/api/cto/update-config?collection=MACSTUDIO_2026_COLLECTION&fae=true&sv.processor-dimensionChip=m5max&sv.processor-dimensionChip-cpuCoreCount-gpuCoreCount=m5max-18-32",
+        "method": "GET",
+        "startedAt": "2026-10-30T04:44:25.141Z",
+        "finishedAt": "2026-10-30T04:44:27.214Z",
+        "retries": 0,
+        "httpStatus": 200,
+        "bytes": 4223,
+        "sha256": "4d9f9eeeb5a333e9df64574770f8cf9f72e086fadcec8e4c37be874b27016c7d"
+      },
+      "response": {
+        "head": {
+          "status": "200",
+          "data": {}
+        },
+        "body": {
+          "options": {
+            "processor-dimensionChip": {
+              "compatibleOptions": {
+                "m5max": {
+                  "isSelected": true,
+                  "isDefault": true,
+                  "isBlocked": false
+                },
+                "m5ultra": {
+                  "isSelected": false,
+                  "isDefault": false,
+                  "isBlocked": false
+                }
+              },
+              "upgradeOptions": {},
+              "hasChanged": false
+            },
+            "memory-dimensionMemory": {
+              "compatibleOptions": {
+                "36gb": {
+                  "priceDelta": "0_0",
+                  "isSelected": false,
+                  "isDefault": true,
+                  "isBlocked": false
+                }
+              },
+              "upgradeOptions": {
+                "48gb": {
+                  "isBlocked": false
+                },
+                "64gb": {
+                  "isBlocked": false
+                },
+                "96gb": {
+                  "isBlocked": false
+                },
+                "128gb": {
+                  "isBlocked": false
+                },
+                "256gb": {
+                  "isBlocked": false
+                },
+                "512gb": {
+                  "isBlocked": false
+                }
+              },
+              "hasChanged": false
+            },
+            "processor-dimensionChip-cpuCoreCount-gpuCoreCount": {
+              "compatibleOptions": {
+                "m5max-18-32": {
+                  "priceDelta": "0_0",
+                  "isSelected": true,
+                  "isDefault": true,
+                  "isBlocked": false
+                },
+                "m5max-18-40": {
+                  "priceDelta": "2250_00",
+                  "isSelected": false,
+                  "isDefault": false,
+                  "isBlocked": false
+                },
+                "m5ultra-30-64": {
+                  "priceDelta": "13500_00",
+                  "isSelected": false,
+                  "isDefault": false,
+                  "isBlocked": false
+                },
+                "m5ultra-36-80": {
+                  "priceDelta": "23250_00",
+                  "isSelected": false,
+                  "isDefault": false,
+                  "isBlocked": false
+                }
+              },
+              "upgradeOptions": {},
+              "hasChanged": false
+            },
+            "storage-dimensionCapacity": {
+              "compatibleOptions": {
+                "512gb": {
+                  "priceDelta": "0_0",
+                  "isSelected": false,
+                  "isDefault": true,
+                  "isBlocked": false
+                },
+                "1tb": {
+                  "priceDelta": "2250_00",
+                  "isSelected": false,
+                  "isDefault": false,
+                  "isBlocked": false
+                },
+                "2tb": {
+                  "priceDelta": "6000_00",
+                  "isSelected": false,
+                  "isDefault": false,
+                  "isBlocked": false
+                },
+                "4tb": {
+                  "priceDelta": "13500_00",
+                  "isSelected": false,
+                  "isDefault": false,
+                  "isBlocked": false
+                },
+                "8tb": {
+                  "priceDelta": "28500_00",
+                  "isSelected": false,
+                  "isDefault": false,
+                  "isBlocked": false
+                }
+              },
+              "upgradeOptions": {
+                "16tb": {
+                  "isBlocked": false
+                }
+              },
+              "hasChanged": false
+            },
+            "software_logic-preInstalledSoftware": {
+              "compatibleOptions": {
+                "none": {
+                  "priceDelta": "0_0",
+                  "isSelected": false,
+                  "isDefault": true,
+                  "isBlocked": false
+                },
+                "logic_pro": {
+                  "priceDelta": "1298_00",
+                  "isSelected": false,
+                  "isDefault": false,
+                  "isBlocked": false
+                }
+              },
+              "upgradeOptions": {},
+              "hasChanged": false
+            },
+            "software_final-preInstalledSoftware": {
+              "compatibleOptions": {
+                "none": {
+                  "priceDelta": "0_0",
+                  "isSelected": false,
+                  "isDefault": true,
+                  "isBlocked": false
+                },
+                "final_cut_pro": {
+                  "priceDelta": "1998_00",
+                  "isSelected": false,
+                  "isDefault": false,
+                  "isBlocked": false
+                }
+              },
+              "upgradeOptions": {},
+              "hasChanged": false
+            }
+          },
+          "prices": {
+            "6000_00": {
+              "displayPrice": "+ RMB 6,000",
+              "amount": 6000
+            },
+            "0_0": {
+              "displayPrice": "+ RMB 0",
+              "amount": 0
+            },
+            "28500_00": {
+              "displayPrice": "+ RMB 28,500",
+              "amount": 28500
+            },
+            "1998_00": {
+              "displayPrice": "+ RMB 1,998",
+              "amount": 1998
+            },
+            "1298_00": {
+              "displayPrice": "+ RMB 1,298",
+              "amount": 1298
+            },
+            "13500_00": {
+              "displayPrice": "+ RMB 13,500",
+              "amount": 13500
+            },
+            "23250_00": {
+              "displayPrice": "+ RMB 23,250",
+              "amount": 23250
+            },
+            "2250_00": {
+              "displayPrice": "+ RMB 2,250",
+              "amount": 2250
+            }
+          },
+          "selectedKits": {
+            "aosContainerPartNumber": "RO_MACSTUDIO_M5MAX_M5ULTRA_BET_BES_2026",
+            "type": "PRECONFIGURED_BTR",
+            "btrOrFdPartNumber": "MHL64CH/A",
+            "dimensions": {
+              "processor-dimensionChip": {
+                "dimensionValue": "m5max",
+                "partNumber": "065-CLPX"
+              },
+              "memory-dimensionMemory": {
+                "dimensionValue": "36gb",
+                "partNumber": "065-CLQ2"
+              },
+              "processor-dimensionChip-cpuCoreCount-gpuCoreCount": {
+                "dimensionValue": "m5max-18-32",
+                "partNumber": "065-CLPX"
+              },
+              "storage-dimensionCapacity": {
+                "dimensionValue": "512gb",
+                "partNumber": "065-CLQW"
+              },
+              "software_final-preInstalledSoftware": {
+                "dimensionValue": "none",
+                "partNumber": "065-CLTK"
+              },
+              "software_logic-preInstalledSoftware": {
+                "dimensionValue": "none",
+                "partNumber": "065-CLTM"
+              }
+            },
+            "productConfiguration": {
+              "memory": "065-CLQ2",
+              "thunderbolt": "065-CLT8",
+              "storage": "065-CLQW",
+              "ethernet_adapter": "065-CLT7",
+              "countrykit": "CH065-CLTW",
+              "software_final": "065-CLTK",
+              "processor": "065-CLPX",
+              "software_logic": "065-CLTM"
+            },
+            "priceData": {
+              "comparativeDisplayPrice": "<span>RMB 19,999</span> 起",
+              "amount": 19999,
+              "fullPrice-comparative": "<span class=\"as-pricepoint-fullprice\"><span class=\"nowrap\">RMB 19,999</span> 起</span>",
+              "financing": "或 RMB 834/月 (24 期) 起",
+              "currentPrice": {
+                "amount": "RMB 19,999",
+                "raw_amount": "19999.00"
+              },
+              "financing-comparative": "或 RMB 834/月 (24 期) 起",
+              "fullPrice": "<span class=\"as-pricepoint-fullprice\"><span class=\"nowrap\">RMB 19,999</span></span>",
+              "seoPrice": 19999
+            },
+            "priceDisplayOrder": {
+              "short": [
+                "fullPrice",
+                "financing"
+              ],
+              "full": [
+                "fullPrice-comparative",
+                "financing-comparative"
+              ]
+            }
+          },
+          "isReset": false,
+          "footnotes": {
+            "nextAvailableNumber": 1
+          }
+        }
+      }
+    },
+    {
+      "chip": "m5max-18-40",
+      "sourceFile": "evidence/raw/2026-10-30/mac-studio-cto/m5max-18-40.json",
+      "request": {
+        "requestUrl": "https://www.apple.com.cn/shop/api/cto/update-config?collection=MACSTUDIO_2026_COLLECTION&fae=true&sv.processor-dimensionChip=m5max&sv.processor-dimensionChip-cpuCoreCount-gpuCoreCount=m5max-18-40",
+        "method": "GET",
+        "startedAt": "2026-10-30T04:44:29.217Z",
+        "finishedAt": "2026-10-30T04:44:29.758Z",
+        "retries": 0,
+        "httpStatus": 200,
+        "bytes": 4525,
+        "sha256": "e40bee3abfc77a5d29f67c7da8787184c4e35035b20471636bb258285c80d1f4"
+      },
+      "response": {
+        "head": {
+          "status": "200",
+          "data": {}
+        },
+        "body": {
+          "options": {
+            "processor-dimensionChip": {
+              "compatibleOptions": {
+                "m5max": {
+                  "isSelected": true,
+                  "isDefault": true,
+                  "isBlocked": false
+                },
+                "m5ultra": {
+                  "isSelected": false,
+                  "isDefault": false,
+                  "isBlocked": false
+                }
+              },
+              "upgradeOptions": {},
+              "hasChanged": false
+            },
+            "memory-dimensionMemory": {
+              "compatibleOptions": {
+                "48gb": {
+                  "priceDelta": "0_0",
+                  "isSelected": false,
+                  "isDefault": true,
+                  "isBlocked": false
+                },
+                "64gb": {
+                  "priceDelta": "3000_00",
+                  "isSelected": false,
+                  "isDefault": false,
+                  "isBlocked": false
+                },
+                "128gb": {
+                  "priceDelta": "15000_00",
+                  "isSelected": false,
+                  "isDefault": false,
+                  "isBlocked": false
+                }
+              },
+              "upgradeOptions": {
+                "96gb": {
+                  "isBlocked": false
+                },
+                "256gb": {
+                  "isBlocked": false
+                },
+                "512gb": {
+                  "isBlocked": false
+                }
+              },
+              "hasChanged": false
+            },
+            "processor-dimensionChip-cpuCoreCount-gpuCoreCount": {
+              "compatibleOptions": {
+                "m5max-18-32": {
+                  "priceDelta": "-2250_00",
+                  "isSelected": false,
+                  "isDefault": true,
+                  "isBlocked": false
+                },
+                "m5max-18-40": {
+                  "priceDelta": "0_0",
+                  "isSelected": true,
+                  "isDefault": false,
+                  "isBlocked": false
+                },
+                "m5ultra-30-64": {
+                  "priceDelta": "11250_00",
+                  "isSelected": false,
+                  "isDefault": false,
+                  "isBlocked": false
+                },
+                "m5ultra-36-80": {
+                  "priceDelta": "21000_00",
+                  "isSelected": false,
+                  "isDefault": false,
+                  "isBlocked": false
+                }
+              },
+              "upgradeOptions": {},
+              "hasChanged": false
+            },
+            "storage-dimensionCapacity": {
+              "compatibleOptions": {
+                "512gb": {
+                  "priceDelta": "0_0",
+                  "isSelected": false,
+                  "isDefault": true,
+                  "isBlocked": false
+                },
+                "1tb": {
+                  "priceDelta": "2250_00",
+                  "isSelected": false,
+                  "isDefault": false,
+                  "isBlocked": false
+                },
+                "2tb": {
+                  "priceDelta": "6000_00",
+                  "isSelected": false,
+                  "isDefault": false,
+                  "isBlocked": false
+                },
+                "4tb": {
+                  "priceDelta": "13500_00",
+                  "isSelected": false,
+                  "isDefault": false,
+                  "isBlocked": false
+                },
+                "8tb": {
+                  "priceDelta": "28500_00",
+                  "isSelected": false,
+                  "isDefault": false,
+                  "isBlocked": false
+                }
+              },
+              "upgradeOptions": {
+                "16tb": {
+                  "isBlocked": false
+                }
+              },
+              "hasChanged": false
+            },
+            "software_logic-preInstalledSoftware": {
+              "compatibleOptions": {
+                "none": {
+                  "priceDelta": "0_0",
+                  "isSelected": false,
+                  "isDefault": true,
+                  "isBlocked": false
+                },
+                "logic_pro": {
+                  "priceDelta": "1298_00",
+                  "isSelected": false,
+                  "isDefault": false,
+                  "isBlocked": false
+                }
+              },
+              "upgradeOptions": {},
+              "hasChanged": false
+            },
+            "software_final-preInstalledSoftware": {
+              "compatibleOptions": {
+                "none": {
+                  "priceDelta": "0_0",
+                  "isSelected": false,
+                  "isDefault": true,
+                  "isBlocked": false
+                },
+                "final_cut_pro": {
+                  "priceDelta": "1998_00",
+                  "isSelected": false,
+                  "isDefault": false,
+                  "isBlocked": false
+                }
+              },
+              "upgradeOptions": {},
+              "hasChanged": false
+            }
+          },
+          "prices": {
+            "3000_00": {
+              "displayPrice": "+ RMB 3,000",
+              "amount": 3000
+            },
+            "0_0": {
+              "displayPrice": "+ RMB 0",
+              "amount": 0
+            },
+            "6000_00": {
+              "displayPrice": "+ RMB 6,000",
+              "amount": 6000
+            },
+            "28500_00": {
+              "displayPrice": "+ RMB 28,500",
+              "amount": 28500
+            },
+            "-2250_00": {
+              "displayPrice": "&minus; RMB 2,250",
+              "amount": -2250
+            },
+            "1998_00": {
+              "displayPrice": "+ RMB 1,998",
+              "amount": 1998
+            },
+            "15000_00": {
+              "displayPrice": "+ RMB 15,000",
+              "amount": 15000
+            },
+            "11250_00": {
+              "displayPrice": "+ RMB 11,250",
+              "amount": 11250
+            },
+            "1298_00": {
+              "displayPrice": "+ RMB 1,298",
+              "amount": 1298
+            },
+            "21000_00": {
+              "displayPrice": "+ RMB 21,000",
+              "amount": 21000
+            },
+            "2250_00": {
+              "displayPrice": "+ RMB 2,250",
+              "amount": 2250
+            },
+            "13500_00": {
+              "displayPrice": "+ RMB 13,500",
+              "amount": 13500
+            }
+          },
+          "selectedKits": {
+            "aosContainerPartNumber": "RO_MACSTUDIO_M5MAX_M5ULTRA_BET_BES_2026",
+            "type": "CONFIGURABLE",
+            "dimensions": {
+              "processor-dimensionChip": {
+                "dimensionValue": "m5max",
+                "partNumber": "065-CLPY"
+              },
+              "memory-dimensionMemory": {
+                "dimensionValue": "48gb",
+                "partNumber": "065-CLQ3"
+              },
+              "processor-dimensionChip-cpuCoreCount-gpuCoreCount": {
+                "dimensionValue": "m5max-18-40",
+                "partNumber": "065-CLPY"
+              },
+              "storage-dimensionCapacity": {
+                "dimensionValue": "512gb",
+                "partNumber": "065-CLQW"
+              },
+              "software_final-preInstalledSoftware": {
+                "dimensionValue": "none",
+                "partNumber": "065-CLTK"
+              },
+              "software_logic-preInstalledSoftware": {
+                "dimensionValue": "none",
+                "partNumber": "065-CLTM"
+              }
+            },
+            "productConfiguration": {
+              "memory": "065-CLQ3",
+              "thunderbolt": "065-CLT8",
+              "storage": "065-CLQW",
+              "ethernet_adapter": "065-CLT7",
+              "countrykit": "CH065-CLTW",
+              "software_final": "065-CLTK",
+              "processor": "065-CLPY",
+              "software_logic": "065-CLTM"
+            },
+            "priceData": {
+              "comparativeDisplayPrice": "<span>RMB 24,499</span> 起",
+              "amount": 24499,
+              "fullPrice-comparative": "<span class=\"as-pricepoint-fullprice\"><span class=\"nowrap\">RMB 24,499</span> 起</span>",
+              "financing": "或 RMB 1021/月 (24 期) 起",
+              "currentPrice": {
+                "amount": "RMB 24,499",
+                "raw_amount": "24499.00"
+              },
+              "financing-comparative": "或 RMB 1021/月 (24 期) 起",
+              "fullPrice": "<span class=\"as-pricepoint-fullprice\"><span class=\"nowrap\">RMB 24,499</span></span>",
+              "seoPrice": 24499
+            },
+            "priceDisplayOrder": {
+              "full": [
+                "fullPrice-comparative",
+                "financing-comparative"
+              ],
+              "short": [
+                "fullPrice",
+                "financing"
+              ]
+            }
+          },
+          "isReset": false,
+          "footnotes": {
+            "nextAvailableNumber": 1
+          }
+        }
+      }
+    },
+    {
+      "chip": "m5ultra-30-64",
+      "sourceFile": "evidence/raw/2026-10-30/mac-studio-cto/m5ultra-30-64.json",
+      "request": {
+        "requestUrl": "https://www.apple.com.cn/shop/api/cto/update-config?collection=MACSTUDIO_2026_COLLECTION&fae=true&sv.processor-dimensionChip=m5ultra&sv.processor-dimensionChip-cpuCoreCount-gpuCoreCount=m5ultra-30-64",
+        "method": "GET",
+        "startedAt": "2026-10-30T04:44:31.765Z",
+        "finishedAt": "2026-10-30T04:44:32.696Z",
+        "retries": 0,
+        "httpStatus": 200,
+        "bytes": 4351,
+        "sha256": "7ed32d24d427e241bf547f9778553ab7db5879a898c5ffa326174c1ee0705b53"
+      },
+      "response": {
+        "head": {
+          "status": "200",
+          "data": {}
+        },
+        "body": {
+          "options": {
+            "processor-dimensionChip": {
+              "compatibleOptions": {
+                "m5max": {
+                  "isSelected": false,
+                  "isDefault": false,
+                  "isBlocked": false
+                },
+                "m5ultra": {
+                  "isSelected": true,
+                  "isDefault": true,
+                  "isBlocked": false
+                }
+              },
+              "upgradeOptions": {},
+              "hasChanged": false
+            },
+            "memory-dimensionMemory": {
+              "compatibleOptions": {
+                "96gb": {
+                  "priceDelta": "0_0",
+                  "isSelected": false,
+                  "isDefault": true,
+                  "isBlocked": false
+                },
+                "256gb": {
+                  "priceDelta": "30000_00",
+                  "isSelected": false,
+                  "isDefault": false,
+                  "isBlocked": false
+                }
+              },
+              "upgradeOptions": {
+                "512gb": {
+                  "isBlocked": false
+                }
+              },
+              "hasChanged": false
+            },
+            "processor-dimensionChip-cpuCoreCount-gpuCoreCount": {
+              "compatibleOptions": {
+                "m5max-18-32": {
+                  "priceDelta": "-13500_00",
+                  "isSelected": false,
+                  "isDefault": false,
+                  "isBlocked": false
+                },
+                "m5max-18-40": {
+                  "priceDelta": "-11250_00",
+                  "isSelected": false,
+                  "isDefault": false,
+                  "isBlocked": false
+                },
+                "m5ultra-30-64": {
+                  "priceDelta": "0_0",
+                  "isSelected": true,
+                  "isDefault": true,
+                  "isBlocked": false
+                },
+                "m5ultra-36-80": {
+                  "priceDelta": "9750_00",
+                  "isSelected": false,
+                  "isDefault": false,
+                  "isBlocked": false
+                }
+              },
+              "upgradeOptions": {},
+              "hasChanged": false
+            },
+            "storage-dimensionCapacity": {
+              "compatibleOptions": {
+                "1tb": {
+                  "priceDelta": "0_0",
+                  "isSelected": false,
+                  "isDefault": true,
+                  "isBlocked": false
+                },
+                "2tb": {
+                  "priceDelta": "3750_00",
+                  "isSelected": false,
+                  "isDefault": false,
+                  "isBlocked": false
+                },
+                "4tb": {
+                  "priceDelta": "11250_00",
+                  "isSelected": false,
+                  "isDefault": false,
+                  "isBlocked": false
+                },
+                "8tb": {
+                  "priceDelta": "26250_00",
+                  "isSelected": false,
+                  "isDefault": false,
+                  "isBlocked": false
+                },
+                "16tb": {
+                  "priceDelta": "56250_00",
+                  "isSelected": false,
+                  "isDefault": false,
+                  "isBlocked": false
+                }
+              },
+              "upgradeOptions": {},
+              "hasChanged": false
+            },
+            "software_logic-preInstalledSoftware": {
+              "compatibleOptions": {
+                "none": {
+                  "priceDelta": "0_0",
+                  "isSelected": false,
+                  "isDefault": true,
+                  "isBlocked": false
+                },
+                "logic_pro": {
+                  "priceDelta": "1298_00",
+                  "isSelected": false,
+                  "isDefault": false,
+                  "isBlocked": false
+                }
+              },
+              "upgradeOptions": {},
+              "hasChanged": false
+            },
+            "software_final-preInstalledSoftware": {
+              "compatibleOptions": {
+                "none": {
+                  "priceDelta": "0_0",
+                  "isSelected": false,
+                  "isDefault": true,
+                  "isBlocked": false
+                },
+                "final_cut_pro": {
+                  "priceDelta": "1998_00",
+                  "isSelected": false,
+                  "isDefault": false,
+                  "isBlocked": false
+                }
+              },
+              "upgradeOptions": {},
+              "hasChanged": false
+            }
+          },
+          "prices": {
+            "56250_00": {
+              "displayPrice": "+ RMB 56,250",
+              "amount": 56250
+            },
+            "0_0": {
+              "displayPrice": "+ RMB 0",
+              "amount": 0
+            },
+            "-13500_00": {
+              "displayPrice": "&minus; RMB 13,500",
+              "amount": -13500
+            },
+            "30000_00": {
+              "displayPrice": "+ RMB 30,000",
+              "amount": 30000
+            },
+            "26250_00": {
+              "displayPrice": "+ RMB 26,250",
+              "amount": 26250
+            },
+            "9750_00": {
+              "displayPrice": "+ RMB 9,750",
+              "amount": 9750
+            },
+            "-11250_00": {
+              "displayPrice": "&minus; RMB 11,250",
+              "amount": -11250
+            },
+            "3750_00": {
+              "displayPrice": "+ RMB 3,750",
+              "amount": 3750
+            },
+            "1998_00": {
+              "displayPrice": "+ RMB 1,998",
+              "amount": 1998
+            },
+            "11250_00": {
+              "displayPrice": "+ RMB 11,250",
+              "amount": 11250
+            },
+            "1298_00": {
+              "displayPrice": "+ RMB 1,298",
+              "amount": 1298
+            }
+          },
+          "selectedKits": {
+            "aosContainerPartNumber": "RO_MACSTUDIO_M5MAX_M5ULTRA_BET_BES_2026",
+            "type": "PRECONFIGURED_BTR",
+            "btrOrFdPartNumber": "MHL74CH/A",
+            "dimensions": {
+              "processor-dimensionChip": {
+                "dimensionValue": "m5ultra",
+                "partNumber": "065-CLQ0"
+              },
+              "memory-dimensionMemory": {
+                "dimensionValue": "96gb",
+                "partNumber": "065-CLQ5"
+              },
+              "processor-dimensionChip-cpuCoreCount-gpuCoreCount": {
+                "dimensionValue": "m5ultra-30-64",
+                "partNumber": "065-CLQ0"
+              },
+              "storage-dimensionCapacity": {
+                "dimensionValue": "1tb",
+                "partNumber": "065-CLQX"
+              },
+              "software_final-preInstalledSoftware": {
+                "dimensionValue": "none",
+                "partNumber": "065-CLTK"
+              },
+              "software_logic-preInstalledSoftware": {
+                "dimensionValue": "none",
+                "partNumber": "065-CLTM"
+              }
+            },
+            "productConfiguration": {
+              "memory": "065-CLQ5",
+              "thunderbolt": "065-CLT9",
+              "storage": "065-CLQX",
+              "ethernet_adapter": "065-CLT7",
+              "countrykit": "CH065-CLTW",
+              "software_final": "065-CLTK",
+              "processor": "065-CLQ0",
+              "software_logic": "065-CLTM"
+            },
+            "priceData": {
+              "comparativeDisplayPrice": "<span>RMB 46,999</span> 起",
+              "amount": 46999,
+              "fullPrice-comparative": "<span class=\"as-pricepoint-fullprice\"><span class=\"nowrap\">RMB 46,999</span> 起</span>",
+              "financing": "或 RMB 1959/月 (24 期) 起",
+              "currentPrice": {
+                "amount": "RMB 46,999",
+                "raw_amount": "46999.00"
+              },
+              "financing-comparative": "或 RMB 1959/月 (24 期) 起",
+              "fullPrice": "<span class=\"as-pricepoint-fullprice\"><span class=\"nowrap\">RMB 46,999</span></span>",
+              "seoPrice": 46999
+            },
+            "priceDisplayOrder": {
+              "full": [
+                "fullPrice-comparative",
+                "financing-comparative"
+              ],
+              "short": [
+                "fullPrice",
+                "financing"
+              ]
+            }
+          },
+          "isReset": false,
+          "footnotes": {
+            "nextAvailableNumber": 1
+          }
+        }
+      }
+    },
+    {
+      "chip": "m5ultra-36-80",
+      "sourceFile": "evidence/raw/2026-10-30/mac-studio-cto/m5ultra-36-80.json",
+      "request": {
+        "requestUrl": "https://www.apple.com.cn/shop/api/cto/update-config?collection=MACSTUDIO_2026_COLLECTION&fae=true&sv.processor-dimensionChip=m5ultra&sv.processor-dimensionChip-cpuCoreCount-gpuCoreCount=m5ultra-36-80",
+        "method": "GET",
+        "startedAt": "2026-10-30T04:44:34.703Z",
+        "finishedAt": "2026-10-30T04:44:35.290Z",
+        "retries": 0,
+        "httpStatus": 200,
+        "bytes": 4449,
+        "sha256": "d00afe27b702fa26aa37ec87e2a3ebb244760f92db046c1b29fa90b7440f3d13"
+      },
+      "response": {
+        "head": {
+          "status": "200",
+          "data": {}
+        },
+        "body": {
+          "options": {
+            "processor-dimensionChip": {
+              "compatibleOptions": {
+                "m5max": {
+                  "isSelected": false,
+                  "isDefault": false,
+                  "isBlocked": false
+                },
+                "m5ultra": {
+                  "isSelected": true,
+                  "isDefault": true,
+                  "isBlocked": false
+                }
+              },
+              "upgradeOptions": {},
+              "hasChanged": false
+            },
+            "memory-dimensionMemory": {
+              "compatibleOptions": {
+                "96gb": {
+                  "priceDelta": "0_0",
+                  "isSelected": false,
+                  "isDefault": true,
+                  "isBlocked": false
+                },
+                "256gb": {
+                  "priceDelta": "30000_00",
+                  "isSelected": false,
+                  "isDefault": false,
+                  "isBlocked": false
+                },
+                "512gb": {
+                  "priceDelta": "116250_00",
+                  "isSelected": false,
+                  "isDefault": false,
+                  "isBlocked": false
+                }
+              },
+              "upgradeOptions": {},
+              "hasChanged": false
+            },
+            "processor-dimensionChip-cpuCoreCount-gpuCoreCount": {
+              "compatibleOptions": {
+                "m5max-18-32": {
+                  "priceDelta": "-23250_00",
+                  "isSelected": false,
+                  "isDefault": false,
+                  "isBlocked": false
+                },
+                "m5max-18-40": {
+                  "priceDelta": "-21000_00",
+                  "isSelected": false,
+                  "isDefault": false,
+                  "isBlocked": false
+                },
+                "m5ultra-30-64": {
+                  "priceDelta": "-9750_00",
+                  "isSelected": false,
+                  "isDefault": true,
+                  "isBlocked": false
+                },
+                "m5ultra-36-80": {
+                  "priceDelta": "0_0",
+                  "isSelected": true,
+                  "isDefault": false,
+                  "isBlocked": false
+                }
+              },
+              "upgradeOptions": {},
+              "hasChanged": false
+            },
+            "storage-dimensionCapacity": {
+              "compatibleOptions": {
+                "1tb": {
+                  "priceDelta": "0_0",
+                  "isSelected": false,
+                  "isDefault": true,
+                  "isBlocked": false
+                },
+                "2tb": {
+                  "priceDelta": "3750_00",
+                  "isSelected": false,
+                  "isDefault": false,
+                  "isBlocked": false
+                },
+                "4tb": {
+                  "priceDelta": "11250_00",
+                  "isSelected": false,
+                  "isDefault": false,
+                  "isBlocked": false
+                },
+                "8tb": {
+                  "priceDelta": "26250_00",
+                  "isSelected": false,
+                  "isDefault": false,
+                  "isBlocked": false
+                },
+                "16tb": {
+                  "priceDelta": "56250_00",
+                  "isSelected": false,
+                  "isDefault": false,
+                  "isBlocked": false
+                }
+              },
+              "upgradeOptions": {},
+              "hasChanged": false
+            },
+            "software_logic-preInstalledSoftware": {
+              "compatibleOptions": {
+                "none": {
+                  "priceDelta": "0_0",
+                  "isSelected": false,
+                  "isDefault": true,
+                  "isBlocked": false
+                },
+                "logic_pro": {
+                  "priceDelta": "1298_00",
+                  "isSelected": false,
+                  "isDefault": false,
+                  "isBlocked": false
+                }
+              },
+              "upgradeOptions": {},
+              "hasChanged": false
+            },
+            "software_final-preInstalledSoftware": {
+              "compatibleOptions": {
+                "none": {
+                  "priceDelta": "0_0",
+                  "isSelected": false,
+                  "isDefault": true,
+                  "isBlocked": false
+                },
+                "final_cut_pro": {
+                  "priceDelta": "1998_00",
+                  "isSelected": false,
+                  "isDefault": false,
+                  "isBlocked": false
+                }
+              },
+              "upgradeOptions": {},
+              "hasChanged": false
+            }
+          },
+          "prices": {
+            "56250_00": {
+              "displayPrice": "+ RMB 56,250",
+              "amount": 56250
+            },
+            "0_0": {
+              "displayPrice": "+ RMB 0",
+              "amount": 0
+            },
+            "-23250_00": {
+              "displayPrice": "&minus; RMB 23,250",
+              "amount": -23250
+            },
+            "30000_00": {
+              "displayPrice": "+ RMB 30,000",
+              "amount": 30000
+            },
+            "26250_00": {
+              "displayPrice": "+ RMB 26,250",
+              "amount": 26250
+            },
+            "3750_00": {
+              "displayPrice": "+ RMB 3,750",
+              "amount": 3750
+            },
+            "1998_00": {
+              "displayPrice": "+ RMB 1,998",
+              "amount": 1998
+            },
+            "-21000_00": {
+              "displayPrice": "&minus; RMB 21,000",
+              "amount": -21000
+            },
+            "11250_00": {
+              "displayPrice": "+ RMB 11,250",
+              "amount": 11250
+            },
+            "-9750_00": {
+              "displayPrice": "&minus; RMB 9,750",
+              "amount": -9750
+            },
+            "1298_00": {
+              "displayPrice": "+ RMB 1,298",
+              "amount": 1298
+            },
+            "116250_00": {
+              "displayPrice": "+ RMB 116,250",
+              "amount": 116250
+            }
+          },
+          "selectedKits": {
+            "aosContainerPartNumber": "RO_MACSTUDIO_M5MAX_M5ULTRA_BET_BES_2026",
+            "type": "CONFIGURABLE",
+            "dimensions": {
+              "processor-dimensionChip": {
+                "dimensionValue": "m5ultra",
+                "partNumber": "065-CLQ1"
+              },
+              "memory-dimensionMemory": {
+                "dimensionValue": "96gb",
+                "partNumber": "065-CLQ5"
+              },
+              "processor-dimensionChip-cpuCoreCount-gpuCoreCount": {
+                "dimensionValue": "m5ultra-36-80",
+                "partNumber": "065-CLQ1"
+              },
+              "storage-dimensionCapacity": {
+                "dimensionValue": "1tb",
+                "partNumber": "065-CLQX"
+              },
+              "software_final-preInstalledSoftware": {
+                "dimensionValue": "none",
+                "partNumber": "065-CLTK"
+              },
+              "software_logic-preInstalledSoftware": {
+                "dimensionValue": "none",
+                "partNumber": "065-CLTM"
+              }
+            },
+            "productConfiguration": {
+              "memory": "065-CLQ5",
+              "thunderbolt": "065-CLT9",
+              "storage": "065-CLQX",
+              "ethernet_adapter": "065-CLT7",
+              "countrykit": "CH065-CLTW",
+              "software_final": "065-CLTK",
+              "processor": "065-CLQ1",
+              "software_logic": "065-CLTM"
+            },
+            "priceData": {
+              "comparativeDisplayPrice": "<span>RMB 56,749</span> 起",
+              "amount": 56749,
+              "fullPrice-comparative": "<span class=\"as-pricepoint-fullprice\"><span class=\"nowrap\">RMB 56,749</span> 起</span>",
+              "financing": "或 RMB 2365/月 (24 期) 起",
+              "currentPrice": {
+                "amount": "RMB 56,749",
+                "raw_amount": "56749.00"
+              },
+              "financing-comparative": "或 RMB 2365/月 (24 期) 起",
+              "fullPrice": "<span class=\"as-pricepoint-fullprice\"><span class=\"nowrap\">RMB 56,749</span></span>",
+              "seoPrice": 56749
+            },
+            "priceDisplayOrder": {
+              "short": [
+                "fullPrice",
+                "financing"
+              ],
+              "full": [
+                "fullPrice-comparative",
+                "financing-comparative"
+              ]
+            }
+          },
+          "isReset": false,
+          "footnotes": {
+            "nextAvailableNumber": 1
+          }
+        }
+      }
+    }
+  ],
+  "selectedConfigurationSample": {
+    "sourceFile": "evidence/raw/2026-10-30/mac-studio-cto/m5ultra-36-80-512gb-16tb.json",
+    "request": {
+      "requestUrl": "https://www.apple.com.cn/shop/api/cto/update-config?collection=MACSTUDIO_2026_COLLECTION&fae=true&sv.processor-dimensionChip=m5ultra&sv.processor-dimensionChip-cpuCoreCount-gpuCoreCount=m5ultra-36-80&sv.memory-dimensionMemory=512gb&sv.storage-dimensionCapacity=16tb",
+      "method": "GET",
+      "startedAt": "2026-10-30T04:45:01.462Z",
+      "finishedAt": "2026-10-30T04:45:05.136Z",
+      "retries": 0,
+      "httpStatus": 200,
+      "bytes": 4514,
+      "sha256": "5d26f55936ed0c74f3a977e1cba9a97812de87d2eb276c9d6d60ef6b3524214d"
+    },
+    "response": {
+      "head": {
+        "status": "200",
+        "data": {}
+      },
+      "body": {
+        "options": {
+          "processor-dimensionChip": {
+            "compatibleOptions": {
+              "m5max": {
+                "isSelected": false,
+                "isDefault": false,
+                "isBlocked": false
+              },
+              "m5ultra": {
+                "isSelected": true,
+                "isDefault": true,
+                "isBlocked": false
+              }
+            },
+            "upgradeOptions": {},
+            "hasChanged": false
+          },
+          "memory-dimensionMemory": {
+            "compatibleOptions": {
+              "96gb": {
+                "priceDelta": "-116250_00",
+                "isSelected": false,
+                "isDefault": true,
+                "isBlocked": false
+              },
+              "256gb": {
+                "priceDelta": "-86250_00",
+                "isSelected": false,
+                "isDefault": false,
+                "isBlocked": false
+              },
+              "512gb": {
+                "priceDelta": "0_0",
+                "isSelected": true,
+                "isDefault": false,
+                "isBlocked": false
+              }
+            },
+            "upgradeOptions": {},
+            "hasChanged": false
+          },
+          "processor-dimensionChip-cpuCoreCount-gpuCoreCount": {
+            "compatibleOptions": {
+              "m5max-18-32": {
+                "priceDelta": "-23250_00",
+                "isSelected": false,
+                "isDefault": false,
+                "isBlocked": false
+              },
+              "m5max-18-40": {
+                "priceDelta": "-21000_00",
+                "isSelected": false,
+                "isDefault": false,
+                "isBlocked": false
+              },
+              "m5ultra-30-64": {
+                "priceDelta": "-9750_00",
+                "isSelected": false,
+                "isDefault": true,
+                "isBlocked": false
+              },
+              "m5ultra-36-80": {
+                "priceDelta": "0_0",
+                "isSelected": true,
+                "isDefault": false,
+                "isBlocked": false
+              }
+            },
+            "upgradeOptions": {},
+            "hasChanged": false
+          },
+          "storage-dimensionCapacity": {
+            "compatibleOptions": {
+              "1tb": {
+                "priceDelta": "-56250_00",
+                "isSelected": false,
+                "isDefault": true,
+                "isBlocked": false
+              },
+              "2tb": {
+                "priceDelta": "-52500_00",
+                "isSelected": false,
+                "isDefault": false,
+                "isBlocked": false
+              },
+              "4tb": {
+                "priceDelta": "-45000_00",
+                "isSelected": false,
+                "isDefault": false,
+                "isBlocked": false
+              },
+              "8tb": {
+                "priceDelta": "-30000_00",
+                "isSelected": false,
+                "isDefault": false,
+                "isBlocked": false
+              },
+              "16tb": {
+                "priceDelta": "0_0",
+                "isSelected": true,
+                "isDefault": false,
+                "isBlocked": false
+              }
+            },
+            "upgradeOptions": {},
+            "hasChanged": false
+          },
+          "software_logic-preInstalledSoftware": {
+            "compatibleOptions": {
+              "none": {
+                "priceDelta": "0_0",
+                "isSelected": false,
+                "isDefault": true,
+                "isBlocked": false
+              },
+              "logic_pro": {
+                "priceDelta": "1298_00",
+                "isSelected": false,
+                "isDefault": false,
+                "isBlocked": false
+              }
+            },
+            "upgradeOptions": {},
+            "hasChanged": false
+          },
+          "software_final-preInstalledSoftware": {
+            "compatibleOptions": {
+              "none": {
+                "priceDelta": "0_0",
+                "isSelected": false,
+                "isDefault": true,
+                "isBlocked": false
+              },
+              "final_cut_pro": {
+                "priceDelta": "1998_00",
+                "isSelected": false,
+                "isDefault": false,
+                "isBlocked": false
+              }
+            },
+            "upgradeOptions": {},
+            "hasChanged": false
+          }
+        },
+        "prices": {
+          "0_0": {
+            "displayPrice": "+ RMB 0",
+            "amount": 0
+          },
+          "-86250_00": {
+            "displayPrice": "&minus; RMB 86,250",
+            "amount": -86250
+          },
+          "-23250_00": {
+            "displayPrice": "&minus; RMB 23,250",
+            "amount": -23250
+          },
+          "-56250_00": {
+            "displayPrice": "&minus; RMB 56,250",
+            "amount": -56250
+          },
+          "1998_00": {
+            "displayPrice": "+ RMB 1,998",
+            "amount": 1998
+          },
+          "-116250_00": {
+            "displayPrice": "&minus; RMB 116,250",
+            "amount": -116250
+          },
+          "-30000_00": {
+            "displayPrice": "&minus; RMB 30,000",
+            "amount": -30000
+          },
+          "-21000_00": {
+            "displayPrice": "&minus; RMB 21,000",
+            "amount": -21000
+          },
+          "-52500_00": {
+            "displayPrice": "&minus; RMB 52,500",
+            "amount": -52500
+          },
+          "-9750_00": {
+            "displayPrice": "&minus; RMB 9,750",
+            "amount": -9750
+          },
+          "1298_00": {
+            "displayPrice": "+ RMB 1,298",
+            "amount": 1298
+          },
+          "-45000_00": {
+            "displayPrice": "&minus; RMB 45,000",
+            "amount": -45000
+          }
+        },
+        "selectedKits": {
+          "aosContainerPartNumber": "RO_MACSTUDIO_M5MAX_M5ULTRA_BET_BES_2026",
+          "type": "CONFIGURABLE",
+          "dimensions": {
+            "processor-dimensionChip": {
+              "dimensionValue": "m5ultra",
+              "partNumber": "065-CLQ1"
+            },
+            "memory-dimensionMemory": {
+              "dimensionValue": "512gb",
+              "partNumber": "065-CLQ8"
+            },
+            "processor-dimensionChip-cpuCoreCount-gpuCoreCount": {
+              "dimensionValue": "m5ultra-36-80",
+              "partNumber": "065-CLQ1"
+            },
+            "storage-dimensionCapacity": {
+              "dimensionValue": "16tb",
+              "partNumber": "065-CLT2"
+            },
+            "software_final-preInstalledSoftware": {
+              "dimensionValue": "none",
+              "partNumber": "065-CLTK"
+            },
+            "software_logic-preInstalledSoftware": {
+              "dimensionValue": "none",
+              "partNumber": "065-CLTM"
+            }
+          },
+          "productConfiguration": {
+            "memory": "065-CLQ8",
+            "thunderbolt": "065-CLT9",
+            "storage": "065-CLT2",
+            "ethernet_adapter": "065-CLT7",
+            "countrykit": "CH065-CLTW",
+            "software_final": "065-CLTK",
+            "processor": "065-CLQ1",
+            "software_logic": "065-CLTM"
+          },
+          "priceData": {
+            "comparativeDisplayPrice": "<span>RMB 229,249</span> 起",
+            "amount": 229249,
+            "fullPrice-comparative": "<span class=\"as-pricepoint-fullprice\"><span class=\"nowrap\">RMB 229,249</span> 起</span>",
+            "financing": "或 RMB 9553/月 (24 期) 起",
+            "currentPrice": {
+              "amount": "RMB 229,249",
+              "raw_amount": "229249.00"
+            },
+            "financing-comparative": "或 RMB 9553/月 (24 期) 起",
+            "fullPrice": "<span class=\"as-pricepoint-fullprice\"><span class=\"nowrap\">RMB 229,249</span></span>",
+            "seoPrice": 229249
+          },
+          "priceDisplayOrder": {
+            "full": [
+              "fullPrice-comparative",
+              "financing-comparative"
+            ],
+            "short": [
+              "fullPrice",
+              "financing"
+            ]
+          }
+        },
+        "isReset": false,
+        "footnotes": {
+          "nextAvailableNumber": 1
+        }
+      }
+    }
+  },
+  "protocolEvidence": {
+    "sourceUrl": "https://store.storeimages.cdn-apple.com/8756/store.apple.com/static-resources/rs-mac-2.36.4-70d64/dist/step1evolution.js",
+    "sha256": "a48126d75d09911cc412aa0955e27c878d297a05925dad153622381d53f447d2",
+    "httpStatus": 200,
+    "updateConfig": {
+      "method": "GET",
+      "endpoint": "/shop/api/cto/update-config",
+      "collection": "MACSTUDIO_2026_COLLECTION",
+      "selectedPrefix": "sv.",
+      "updatedPrefix": "uv.",
+      "response": "body.selectedKits contains the exact container, dimensions and productConfiguration option identifiers. body.options separates compatibleOptions from upgradeOptions."
+    },
+    "fulfillment": {
+      "method": "GET",
+      "endpoint": "/shop/fulfillment-messages?fae=true",
+      "parameters": [
+        "parts.0=<aosContainerPartNumber>",
+        "option.0=<comma-separated productConfiguration values>",
+        "mts.0=regular",
+        "store=<storeNumber>"
+      ],
+      "responseStructure": "body.content.pickupMessage; the frontend reconciles a configuration by container followed by sorted option values. The current retail adapter expects body.stores and does not send option.i.",
+      "evidenceModules": [
+        "58924: selected/updated dimension query prefixes",
+        "54325: fulfillment GET and response envelope",
+        "77536: parts.i/option.i serialization and configuration response key"
+      ]
+    }
+  },
+  "fulfillmentProbe": {
+    "sourceFile": "evidence/raw/2026-10-30/mac-studio-cto/fulfillment-max-48gb-512gb.json",
+    "request": {
+      "requestUrl": "https://www.apple.com.cn/shop/fulfillment-messages?fae=true&parts.0=RO_MACSTUDIO_M5MAX_M5ULTRA_BET_BES_2026&option.0=065-CLQ3%2C065-CLT8%2C065-CLQW%2C065-CLT7%2CCH065-CLTW%2C065-CLTK%2C065-CLPY%2C065-CLTM&mts.0=regular&store=R577",
+      "method": "GET",
+      "startedAt": "2026-10-30T04:45:07.481Z",
+      "finishedAt": "2026-10-30T04:45:09.435Z",
+      "retries": 0,
+      "httpStatus": 541,
+      "bytes": 128002,
+      "sha256": "1a4e8727e081b4d37934ad04ed3cf3ab6bb7066ce7fa6bb182a5a03505812ffe"
+    },
+    "response": null,
+    "outcome": "http_541",
+    "verificationStatus": "unverified",
+    "retryCount": 0,
+    "conclusion": "This response does not establish pickup availability, ineligibility or permanent lack of CTO support. The second planned sample was not sent."
+  },
+  "coverageBoundary": {
+    "memoryTiers": [
+      "36gb",
+      "48gb",
+      "64gb",
+      "96gb",
+      "128gb",
+      "256gb",
+      "512gb"
+    ],
+    "compatibleChipMemoryBranches": 9,
+    "storageCandidatesPerBranch": 5,
+    "candidateCombinations": 45,
+    "allCandidateCombinationsIndividuallyVerified": false,
+    "note": "45 is a candidate count derived from the returned chip compatibility lists, not a list of 45 independently verified SKU/configuration identifiers. Selected identifiers must be resolved and checked against the requested dimensions before use."
+  },
+  "integrationBoundary": "Keep the three existing retail SKUs and their individual support evidence. Publish official CTO configuration choices as separate metadata; do not invent CH/A numbers, reuse the common container as a unique SKU, or enable CTO query/follow until the adapter and exact response reconciliation have been validated."
+}

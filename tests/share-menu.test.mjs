@@ -41,10 +41,17 @@ test('every consumer tab page exposes onShareAppMessage and onShareTimeline', ()
     assert.equal(typeof page.onShareAppMessage, 'function', route);
     assert.equal(typeof page.onShareTimeline, 'function', route);
     const appShare = page.onShareAppMessage();
-    assert.ok(appShare && appShare.path.includes('/pages/query/index'));
+    assert.ok(appShare && appShare.path.includes(route.includes('/follow/') ? '/pages/follow/index' : '/pages/query/index'));
     const timeline = page.onShareTimeline();
     assert.equal(timeline.imageUrl, share.IMAGE);
   }
+});
+
+test('personal home shares the generic brand card and never private deadline titles or a page screenshot', () => {
+  const result = share.shareAppMessage('/pages/follow/index', { deadlines: [{ title: 'private coupon', dueDate: '2027-01-01' }], follows: [] });
+  assert.equal(result.imageUrl, share.IMAGE);
+  assert.equal(result.path, '/pages/follow/index?from=share_follow');
+  assert.ok(!JSON.stringify(result).includes('private'));
 });
 
 test('share menus come from the page handlers, not an invalid page json key', () => {

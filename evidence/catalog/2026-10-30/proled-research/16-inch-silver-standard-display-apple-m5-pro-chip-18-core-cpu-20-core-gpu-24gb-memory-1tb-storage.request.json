@@ -1,0 +1,16 @@
+{
+  "requestUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/16-inch-silver-standard-display-apple-m5-pro-chip-18-core-cpu-20-core-gpu-24gb-memory-1tb-storage",
+  "method": "GET",
+  "startedAt": "2026-10-30T03:51:13.732Z",
+  "retries": 0,
+  "httpStatus": 200,
+  "headers": {
+    "content-type": "text/html;charset=utf-8",
+    "date": "Fri, 30 Oct 2026 03:51:12 GMT",
+    "cache-control": "public, max-age=120, s-maxage=120"
+  },
+  "bytes": 349851,
+  "sha256": "a53329298e75548280988f671c34013f0707d09ead2b6605da4499f083824f07",
+  "elapsedMs": 4029,
+  "finishedAt": "2026-10-30T03:51:17.761Z"
+}

@@ -1,0 +1,3312 @@
+{
+  "generatedAt": "2026-10-30T03:59:00.456Z",
+  "source": "C:\\Users\\Administrator\\Downloads\\flower book\\guoxiaoshao-master\\guoxiaoshao-master\\miniprogram",
+  "sourceHashes": [
+    {
+      "file": "app.js",
+      "sha256": "b750b9b81862c306581194de23499b40c91604ce3dabf347d7df2d260c9391f3"
+    },
+    {
+      "file": "app.json",
+      "sha256": "7b41e3fdf3ee5b7f22bf853e9c9c323ceb2c77ac0a6b636b9db01e3f77cd2b66"
+    },
+    {
+      "file": "app.wxss",
+      "sha256": "2f290403f723b250a804af1c5994d77ff1863cae3002eaa1c66994373324b29a"
+    },
+    {
+      "file": "components/config-sheet/index.js",
+      "sha256": "a28ce23e09d8d4a05cd04813359b63b442f8efba8f59707870a32685a7f0fe44"
+    },
+    {
+      "file": "components/config-sheet/index.json",
+      "sha256": "035503c1a56d8b4b9227ce8bb9145fbd1ef8ec7dce59e55f9d5d55fb5eb7d566"
+    },
+    {
+      "file": "components/config-sheet/index.wxml",
+      "sha256": "779329e9d1847571110d152f613d4421ba4573b963cebf787bf52f41652c4a4e"
+    },
+    {
+      "file": "components/config-sheet/index.wxss",
+      "sha256": "7dda47a51398c084ff6fbc1c2a7ed901b97f2d148dcef0fcae4e3ba13f22e4d5"
+    },
+    {
+      "file": "components/reminder-authorization/index.js",
+      "sha256": "eb1d0921e2c6d9b7afbfe84e06697a8352c8f378e2bd556ede873fd0c4263e4c"
+    },
+    {
+      "file": "components/reminder-authorization/index.json",
+      "sha256": "3cac147888c7f1804ca5c8fd5aeca071cc29e1a776c6c7c6d52d823c4f568ef3"
+    },
+    {
+      "file": "components/reminder-authorization/index.wxml",
+      "sha256": "744b03a7726b2a4d3bd051ffb61271f5f9ac7eb54b62545e942098aa8f090302"
+    },
+    {
+      "file": "components/reminder-authorization/index.wxss",
+      "sha256": "9cb283ec1e6c56e059b6d6955ea3d5adfdbb10964cc8f7b523a5c050ad85dca6"
+    },
+    {
+      "file": "components/reminder-nudge/index.js",
+      "sha256": "e4d769e88f1e429a52846dcf2b803b276e4554a9dea665ee8b78eea994fb184b"
+    },
+    {
+      "file": "components/reminder-nudge/index.json",
+      "sha256": "3cac147888c7f1804ca5c8fd5aeca071cc29e1a776c6c7c6d52d823c4f568ef3"
+    },
+    {
+      "file": "components/reminder-nudge/index.wxml",
+      "sha256": "063fad2916e68799f6c69e2d0aa7ccc815bc519d9885ba1cc781ab0daafe1b92"
+    },
+    {
+      "file": "components/reminder-nudge/index.wxss",
+      "sha256": "c84a8eb5644cf1eb396f8eefe96c38473f7b2203d7de5e8ea8c0aa4f98d9a50e"
+    },
+    {
+      "file": "components/target-picker/index.js",
+      "sha256": "bd0392f9fc86be3d914679f1277c13c7bb12a32e65fd71a037d849e65c3c5ceb"
+    },
+    {
+      "file": "components/target-picker/index.json",
+      "sha256": "035503c1a56d8b4b9227ce8bb9145fbd1ef8ec7dce59e55f9d5d55fb5eb7d566"
+    },
+    {
+      "file": "components/target-picker/index.wxml",
+      "sha256": "744db2bad52c71be8a8cc23080bce452f13156e8b638243fe61bb81c7e349139"
+    },
+    {
+      "file": "components/target-picker/index.wxss",
+      "sha256": "dd956d6bbac561ddf26657bb50daee14c2f35349a8c62497520ac91f9afaa218"
+    },
+    {
+      "file": "config/catalog-seed.js",
+      "sha256": "54715fb587014197e4c0a3727b02f0a5386ef81de315271edc517b1325b53c6b"
+    },
+    {
+      "file": "config/cloud.js",
+      "sha256": "6ba9f31ce4a581a33cda1f9bc62514d85a39aa91a3b68d1c4148cfabf05d4c81"
+    },
+    {
+      "file": "config/product-images.js",
+      "sha256": "0b374a7103ae0d7ebd7523d015c0f43d26951ec754c2db6e1cc1f60341ee8ab2"
+    },
+    {
+      "file": "config/product-launches.js",
+      "sha256": "dd989ab3938eb4f191c51d5c9385b5f04206a01424b43dd08a8c8bea27a43c3e"
+    },
+    {
+      "file": "config/product-thumbnails.js",
+      "sha256": "73f7336c2b25a90c6e945e72fee27dddf4dfe671ccbe087a3c1298a9fb70e685"
+    },
+    {
+      "file": "config/release-notes.js",
+      "sha256": "3a6d2de3e6d8b784d0045f543190430c3508cfb9da442586031ec47b0990c4a0"
+    },
+    {
+      "file": "config/usage-guide.js",
+      "sha256": "b71a36245a536701f3f57d5e45fe2d981baf2259650946e7be7901df3135f2db"
+    },
+    {
+      "file": "config/version.js",
+      "sha256": "6c8ef95cb8d51cbfd9c4a5888dd752b28d13aa89a97ce61b8d830502ff1176ac"
+    },
+    {
+      "file": "images/brand/logo-mint-144.png",
+      "sha256": "667b346236310146cb2ac8c85cc343e44a40826e5189471ea6a71c49921fd986"
+    },
+    {
+      "file": "images/brand/whistle-green.png",
+      "sha256": "a182147a6e916dffe7c15e95bd4c4e1619472f2928581951faa4eccf92fe3fe9"
+    },
+    {
+      "file": "images/products/0130f46728258a31bc26-card.jpg",
+      "sha256": "375f0f97dfe23dad995b1920e261b38486c06388f2a881d14133f59c5e9fddcf"
+    },
+    {
+      "file": "images/products/01d8f0de8e6edbb202e5-card.png",
+      "sha256": "0aafcebfee07ed2e6c693479780a8d794466b154deaf03cf2aaf51ccd4432467"
+    },
+    {
+      "file": "images/products/07511cb81383c964fcf2-card.png",
+      "sha256": "1652ae599601306224aa04e3f1189320666980bdee4b726c56a55947caad12d9"
+    },
+    {
+      "file": "images/products/098843fd7259b13906a3-card.jpg",
+      "sha256": "ff3cad74e109a90a6ca70db4702de05db380a1aa53230326d43a56775b94e5f8"
+    },
+    {
+      "file": "images/products/0d51d4518e7f9539c0da-card.jpg",
+      "sha256": "0684672d4c65fc9edc799fda695384a36ec621db80784dfcb85934bbbf13a327"
+    },
+    {
+      "file": "images/products/0da5a9fd0b3fe50cf9fe-card.jpg",
+      "sha256": "58ed808d913027d0c2b60a0b562523de9ed7bede51a8bd9377984168b9d1c525"
+    },
+    {
+      "file": "images/products/0dffbbc495eff9563b28-card.jpg",
+      "sha256": "1fa397e22b70f8d0fc216cc45792af6be9015ec5d8bcdcc3a8c95d8e70567704"
+    },
+    {
+      "file": "images/products/0e26b797c0a5c108e2ea-card.png",
+      "sha256": "0d856653768d3621a7388e625f80c196d8b9baca2d78f23da2868dd474cf31f1"
+    },
+    {
+      "file": "images/products/1117cb2c9a0bd593a261-card.jpg",
+      "sha256": "6cfd26d40180ccd7703ed38187b0619165e23251950c46ceb2ede6d2b28953f0"
+    },
+    {
+      "file": "images/products/13177a965cc43a79e256-card.jpg",
+      "sha256": "588116c7c4562542ba34aed517ed8826a5265cb8bb133837b7065579bd98dc2b"
+    },
+    {
+      "file": "images/products/1c022e130430e540abec-card.jpg",
+      "sha256": "a38e20787574948dccf959ac853d1fae32e37cec7d3e354c84d02f7aa559ac6d"
+    },
+    {
+      "file": "images/products/1dc87fcd2d1409d07f82-card.jpg",
+      "sha256": "19d277c2723e819e43af3e7edf341591d5ae1ac4e14f6285bfcf43baa2272de9"
+    },
+    {
+      "file": "images/products/1de9a0cd7ece293c4445-card.png",
+      "sha256": "770b028fd07303bcc2323d0c3925cded67697e6e17456dd4402d6c8db45ee335"
+    },
+    {
+      "file": "images/products/1edca0003b15ea78e378-card.jpg",
+      "sha256": "a3a4a2c495cf7b240b8d6a746e7695a5532311891ce1d42fe4715c7c0053b345"
+    },
+    {
+      "file": "images/products/23a00718e67797d6328a-card.jpg",
+      "sha256": "8e5d64b19098788a65030999c26728a4bc12f3cc9333062f0732ccb842fd12fb"
+    },
+    {
+      "file": "images/products/2423a56b76054a9f6283-card.jpg",
+      "sha256": "b1d842674fbe480ba4032ea0a3a445600d21d5c537c777c3eb13a5f3aa6c7715"
+    },
+    {
+      "file": "images/products/27c190d53103f28ecc2e-card.png",
+      "sha256": "88849618df0f563505491d49ab030fe2d8b6446e098b6b0d0db385f06eeb55ce"
+    },
+    {
+      "file": "images/products/294849ca5d8591836437-card.png",
+      "sha256": "d5b32eaa65ac1bcd7d1b5c13d0252fa8c195d7230002f2d83bbeb3dced63e34d"
+    },
+    {
+      "file": "images/products/3009a5934756c8312f3f-card.jpg",
+      "sha256": "879202106a1d26d98b4e21cba38a18d2404b94106933fac38eae02ccc6c5f72d"
+    },
+    {
+      "file": "images/products/31cdecf2c4459a0e5586-card.jpg",
+      "sha256": "f8892949c2153e2ec85fa39d99da856581011565b30593d96f6f0248053f10af"
+    },
+    {
+      "file": "images/products/31d1fac04420158bc214-card.png",
+      "sha256": "0f60a8e2dbacb577f83ea64a99a6fd84eac6e818d5199ccdb5a8ee829d9acac3"
+    },
+    {
+      "file": "images/products/33129f967073e6a6d493-card.jpg",
+      "sha256": "a24c409d08e87d640c6b5c795f9bc9918fe05c25ca197e6dc1df555e7d116c77"
+    },
+    {
+      "file": "images/products/38541dd10a18c31b24f6-card.png",
+      "sha256": "0bc22938dd7bc03ca44b0512d17f73aa2e85c85e20e6ecc5dd91fe4cb1afdc79"
+    },
+    {
+      "file": "images/products/3c2aaaa0daac79cb5057-card.jpg",
+      "sha256": "ab98ee071fa9caa62dba8dd7061f0a664585029ea7148cdc47dc0f895c189b99"
+    },
+    {
+      "file": "images/products/3daa16e1d9e4619ac6b0-card.png",
+      "sha256": "ff10f5c4ba785028c85f282e5e6a19af135fa8d11aeac70dc60be5e543eeb091"
+    },
+    {
+      "file": "images/products/4294c546bd63c427ac8d-card.jpg",
+      "sha256": "4c354ffce4bb2afcd11bd8e89c7411f3ff61d8fe660869be0409d3faa198d5d6"
+    },
+    {
+      "file": "images/products/42ca330ac2d46be4fcba-card.jpg",
+      "sha256": "cfbea2c84c6615cd1f80d379911b1c00bd393136872e73684b4e84ef661bd403"
+    },
+    {
+      "file": "images/products/45317f1b211a1c7be9de-card.png",
+      "sha256": "e0a253da600f171a637c5c9060f77df3f62733abb4c52c610b7157de7e503291"
+    },
+    {
+      "file": "images/products/45e32e8c971048f586e2-card.jpg",
+      "sha256": "739f7d5b43a7a7d77af720cb630e94c2e9740bb92b939c242d2da972e1f34798"
+    },
+    {
+      "file": "images/products/4889401bdfcc16bd707a-card.jpg",
+      "sha256": "190c76ef1a5034d8302aaba93c5bb199d07e8d9c13aef3e0f183b4116a4338bb"
+    },
+    {
+      "file": "images/products/4a1634416eb87c129e12-card.png",
+      "sha256": "76b8e580f1caf7afb7175fe8654efa4d6e2a5e973916b25837be52bb5fafb297"
+    },
+    {
+      "file": "images/products/4a1634416eb87c129e12-poster.png",
+      "sha256": "93c3f8e60974605aacd47af6e780b2ec081c7f37e33f35f45f0ab7854f46c1a6"
+    },
+    {
+      "file": "images/products/4b14c3eb1354f6922780-card.png",
+      "sha256": "f1f994284d9717f75e544697291c197c253b44998f06c68357c3de3028c9fdb2"
+    },
+    {
+      "file": "images/products/4d0642cc24853d13629e-card.jpg",
+      "sha256": "d53df111097d1d40d3977f9f8c89998d4876eabc95d21dffddbf5e88b843b31f"
+    },
+    {
+      "file": "images/products/4fec6dac7c47fd1386f3-card.png",
+      "sha256": "2f8fb589ab5bf13f68ecd0889cf82634dfe17e23b53b563a86ee06f5eb076c6d"
+    },
+    {
+      "file": "images/products/531902edd044f5371a5b-card.png",
+      "sha256": "8ab84f57e22084b617a5fb439ed778d46f27a166160374f5abc0a3a0b05b7e91"
+    },
+    {
+      "file": "images/products/56f5902919cad4b88c3d-card.png",
+      "sha256": "cfe9a3a6c86a14ea15a0164e68a994dee9932027a6dbb80a461d2360ec44fd56"
+    },
+    {
+      "file": "images/products/5c5f42666fcca9c30066-card.jpg",
+      "sha256": "20db2bbc4a2eaaab4e13ef12e263041b7f77b7c7b72de11e53c331c6bab3cc79"
+    },
+    {
+      "file": "images/products/602cb908a47b4a43fedc-card.png",
+      "sha256": "86351fdadd83a002afd6b7d073bb4371dd0c623490cbffbe4f20bbda918f47e1"
+    },
+    {
+      "file": "images/products/6229e8793fed05f3cfdf-card.jpg",
+      "sha256": "b029f7e936c91a6ec87c9d7a5ad345de23efc1592a3da45ae567bd4bbb96bc60"
+    },
+    {
+      "file": "images/products/63c73982c4a1b2d17a5c-card.png",
+      "sha256": "bd3115d07b1beef681a7954fa99d2248620b54158b3b85b5e7e2124e501402f3"
+    },
+    {
+      "file": "images/products/640340718372f5ae18f8-card.jpg",
+      "sha256": "5308e5a5595f40d1430d3be7f5603938a63164c19ec0be613dbda58872182483"
+    },
+    {
+      "file": "images/products/670926dadec38a800459-card.png",
+      "sha256": "d923e6625aab38c68e8460a441f5509d4f9ec2c5383b10bf5aecc03ebd480e31"
+    },
+    {
+      "file": "images/products/6de52fd444f0941bba2e-card.png",
+      "sha256": "58822eb94f056795fd5f117890fce722a55eaf191ac8ea88b51a6bd1a013fffa"
+    },
+    {
+      "file": "images/products/7124ab49081687ce9699-card.png",
+      "sha256": "ad913c5de663dda7111f6861cab44fe94a6362a72fd1798c81525218b06cebf3"
+    },
+    {
+      "file": "images/products/7268604e48ff9fd5791b-card.png",
+      "sha256": "1777fd2046b18e1c1fd6ca119b83872c2d5a0da1193c7d0abf656690e645f478"
+    },
+    {
+      "file": "images/products/7388982910d84e287116-card.jpg",
+      "sha256": "6cc0cfe76e2fa94dd51ef82c6e748ac03bcd6756b6d7f9a6c050c32efc719892"
+    },
+    {
+      "file": "images/products/73f35e235f1cdfd1592d-card.png",
+      "sha256": "c581cb91a9d01889e589007fb134406896128d4913543fa252edfd59d2edda6d"
+    },
+    {
+      "file": "images/products/74fb34f80f99983dd4ff-card.png",
+      "sha256": "648bb1e6f43bcd335c80c976a1b456500eb403f7eda8490e84c9046c78a254f6"
+    },
+    {
+      "file": "images/products/76bd8031f36be2ca973f-card.png",
+      "sha256": "8982c98b238320a7eb4b2dc53f8821d89dac4933b95c289b6c6a8715d0ed1811"
+    },
+    {
+      "file": "images/products/781c797e850cfc2ce5ee-card.jpg",
+      "sha256": "988f9589d1681af9c0e025edb12dc5241e26e1653c443347bd34ad72cf1fc6f4"
+    },
+    {
+      "file": "images/products/78c9c6ff6da83f7b9f44-card.jpg",
+      "sha256": "f9bf5f71d925fcc1be21a51b0c4780290d87f00ecd79d256e203e3067d58be6c"
+    },
+    {
+      "file": "images/products/7ace05f18121744b7862-card.png",
+      "sha256": "b87560fb87453b5c616312b874c74623b73b89acd0178b71e7d403e65d345c34"
+    },
+    {
+      "file": "images/products/806c8d8e4031558d7329-card.png",
+      "sha256": "838147e987f92d5b46af4db353360c8d4acab35d16585eb2966f4200862e932a"
+    },
+    {
+      "file": "images/products/833db607967d3db1bf57-card.png",
+      "sha256": "474459a51632c4fb2d71e435a5f3304fe782271e0fef9cbf9f28557996e4d5b9"
+    },
+    {
+      "file": "images/products/83a551817f4599b8b22e-card.png",
+      "sha256": "c7a70dd8aa375e466cd3bafcec8f5a9c020e7501da3d6dd5ddf383fed9629b76"
+    },
+    {
+      "file": "images/products/887a0c923b0ceddadb30-card.jpg",
+      "sha256": "7f7cf152029ac95e1485ce16d6692a2474820c882e290819f5afdba9bec5717e"
+    },
+    {
+      "file": "images/products/8fb43e7f8306e159f637-card.jpg",
+      "sha256": "f4f43e4cacfa72bfcfd0e1918c1579d25538a72e619a10412286c5370e35ae52"
+    },
+    {
+      "file": "images/products/91ec0d2950aaa12e1675-card.jpg",
+      "sha256": "9f52dcacd7e43d1019050d88246f5648a77d942966448e547cf3c4b994f56d2f"
+    },
+    {
+      "file": "images/products/94bdee3972a448d8335f-card.png",
+      "sha256": "3873ab7a4dbc12c92d986cd229e82ac1a644ca4cea6d5acba1e0eadf5b7091ca"
+    },
+    {
+      "file": "images/products/96712c9c589cc44c4fc6-card.jpg",
+      "sha256": "637940e06516d6e383242651602513067c77cb5c24e13bfdcd66e57e175fcb35"
+    },
+    {
+      "file": "images/products/9b7a46201f8bd520f275-card.jpg",
+      "sha256": "9310fd2ede07cb70319f658859e372f7f7fcfe7a047a64fa40c93166054ba25e"
+    },
+    {
+      "file": "images/products/9b9c6116fb1cc23cdab3-card.png",
+      "sha256": "08920dfb1f457d1462db8d0624f1aed6f744ff5b3e40eccea060e45ff5932b08"
+    },
+    {
+      "file": "images/products/9d21e8a6e778821a0fcd-card.png",
+      "sha256": "bad9a3a9b1d50ad0e43032bf668a234110bb6212047f5c86bfc50c9f7753e9f5"
+    },
+    {
+      "file": "images/products/9d8bfeeb7fb51dbbf2b5-card.jpg",
+      "sha256": "db489d28242d8ffa8d1fe0e6299ae7dab1f8ebc08ffdc8651904e4d4f5230dca"
+    },
+    {
+      "file": "images/products/9d8ee211ca16f0216740-card.jpg",
+      "sha256": "e26d66ea1c0c0eeef2564a0c886cc8cc57719b5c834c072f9b73dbef2e4255d2"
+    },
+    {
+      "file": "images/products/9da63ab69602d7a55df9-card.jpg",
+      "sha256": "e59ed583aab9f7a5e2cedd36abe0f6ef3c057b8247ae1a281822b9576ceff8af"
+    },
+    {
+      "file": "images/products/9e2202b00c3b75a71541-card.jpg",
+      "sha256": "1ea6a5d2fede9cc5c92da0e7e01791a8f4402c4f1f8f46ef7e3100539b1759bb"
+    },
+    {
+      "file": "images/products/9f2f683a96c9b1ff699d-card.jpg",
+      "sha256": "a5089e92b2e6402d8a766b9709f5c108de1210b1ce599bd124442542a11212e6"
+    },
+    {
+      "file": "images/products/a1405f761b3267a6eae9-card.jpg",
+      "sha256": "ff11907f93fafa53b0db273cbc0bf887d804bc3fbe95f2931fe871a8f638a005"
+    },
+    {
+      "file": "images/products/a1996531574a397e9de4-card.jpg",
+      "sha256": "7c4cd866d24c9ad45545832d197cf79ab4c2222a36ce7c204279fc498cca9806"
+    },
+    {
+      "file": "images/products/a2c15e2e230f4497a93d-card.jpg",
+      "sha256": "9259df086471ac705f4abe8856f4a92bbd2c8b5a297d007cd2d7456b17aed992"
+    },
+    {
+      "file": "images/products/a3077fb68158b14e03ee-card.jpg",
+      "sha256": "9770c32a909697b6c65b4578ee930872be72ce78ffd1d2d9e27390be97bb0a8a"
+    },
+    {
+      "file": "images/products/a30de28737ae32710778-card.jpg",
+      "sha256": "79c4dd15811c7deb888f77f9d41811d5bbb0386b52299d78efea8f6b5391d2f3"
+    },
+    {
+      "file": "images/products/a336f3411bfe0502fed7-card.png",
+      "sha256": "590fa2cae60fd04bc42d2d64aebd3ba7f245727264fb52d543a6097485097e07"
+    },
+    {
+      "file": "images/products/a5431b7614b52500ec1c-card.jpg",
+      "sha256": "401e297c96a6626a141a8f152bcab8436a026e711765981c0bd582f977e093a7"
+    },
+    {
+      "file": "images/products/a5f5ebeba6aa80b6ce04-card.png",
+      "sha256": "11f1c0addcb28b1f9e3b8cfec96fbf978a6620354bebabc737a1da3fa220dd1b"
+    },
+    {
+      "file": "images/products/aafbdee028191839f4c6-card.jpg",
+      "sha256": "f4c4ca394f3e6d41618ad70150046ea36bb3127f2fea785c3b47d00cbf3ff04f"
+    },
+    {
+      "file": "images/products/b187dd94bc49d003e7c4-card.jpg",
+      "sha256": "87613e91411a77d989407d07b1e66dfadacfb5bcc1cc5b48865e850a66016c9a"
+    },
+    {
+      "file": "images/products/b26392fe42aa1c36c5fc-card.jpg",
+      "sha256": "aad4fa39049645241dc95cdaef52b60b50ebb6a816aad22f634a16ef1f74fd7c"
+    },
+    {
+      "file": "images/products/b3b3e6803c7950de3a8d-card.jpg",
+      "sha256": "d59745ad5f71776bf75db7dd0689b5ec3eec0d0d33f8fb372999f4234825447e"
+    },
+    {
+      "file": "images/products/b43c8438f0f5918d8ff2-card.jpg",
+      "sha256": "34071a1276495861354cdfb1bcfe63f5808c646693f0487c0194f7d1bad9f073"
+    },
+    {
+      "file": "images/products/b49f94ec6eb45471b282-card.jpg",
+      "sha256": "63c0911749cf692587b622afab6c03e31e747f566dd8569e401d7fdd2e49bae0"
+    },
+    {
+      "file": "images/products/b62a5807f6def38f2585-card.jpg",
+      "sha256": "19d21d7019c9a81f537d94590fece1d00dc10ac7a26af7816bff4d7edd5c5a5c"
+    },
+    {
+      "file": "images/products/b633f4fd2b8d57493745-card.jpg",
+      "sha256": "8a00d6e7712ef27512d395b3cd49fe09d00ffde36c11a1b5ca3888bc22c0ec5c"
+    },
+    {
+      "file": "images/products/b943c25769dea213ac31-card.jpg",
+      "sha256": "c88b1a7737d48e611c1d7f8bc8f49189f5376508a7be9ea6c04b0f2915854968"
+    },
+    {
+      "file": "images/products/babbb7de63fea99de227-card.jpg",
+      "sha256": "7db6b279179cc1b7a0193fdeb2250c771ea0c8a9008e06e44bcd8146c03f7c83"
+    },
+    {
+      "file": "images/products/bed52af081417045aa98-card.jpg",
+      "sha256": "4140f141ef1f3d05eca20ab27a6f7c32e5214058e59fa181497019388955c17d"
+    },
+    {
+      "file": "images/products/bf35168235111161a237-card.jpg",
+      "sha256": "c5b3b75ca35babf3c0bf95308bcc1776737a5afd9efab21bb7922f44eed7865e"
+    },
+    {
+      "file": "images/products/c233071627fa56f2813e-card.jpg",
+      "sha256": "793fd1befad150071ceb51db2a0dc2b0f7ac04b154a0584675493e0bbf385734"
+    },
+    {
+      "file": "images/products/c603d2d006e942a94c1b-card.jpg",
+      "sha256": "c2e14b62dab8f53bcd5ee55e52eebb2ad4715084e46bbda97ea2fd0700fb913f"
+    },
+    {
+      "file": "images/products/c73610b51bc8245e27e2-card.jpg",
+      "sha256": "9e91630c79ef6f02d7cdf3e03485524530b510ba517dd0c3d87cb3a4a43bdeef"
+    },
+    {
+      "file": "images/products/c97bea3d0e20e91e7e3f-card.jpg",
+      "sha256": "041d70f3e0f560c0cdd0f0e1ed225f0e2e98acf3281d3e5d57b1c9d3368a96a4"
+    },
+    {
+      "file": "images/products/cb858274e576d174ebb8-card.jpg",
+      "sha256": "6c80881a1af42ac3dee34325e23893e0770b42d36ea85eee2088ca7d15d8556f"
+    },
+    {
+      "file": "images/products/ce7e365754032c786821-card.png",
+      "sha256": "3d615b7e703bd26b4927dd47acda7bab9693f7f85e86e098d12d26a9206baee0"
+    },
+    {
+      "file": "images/products/cf1e9c2bab58cb974840-card.jpg",
+      "sha256": "172c18cee332fac5a3160fe0bd016dea142aca9e93c912b9e8add9743b14126d"
+    },
+    {
+      "file": "images/products/cf64cfac749ec433aeb5-card.jpg",
+      "sha256": "63203222147f65e8389a28dd2fe3c3989b6b20bfba3cae78999645c8d983b95a"
+    },
+    {
+      "file": "images/products/d2a1c4fce570c9b11358-card.png",
+      "sha256": "117e72ec20029aadd107908a58b0ab6f7d7699e1b9ff3bb67b735377ac273909"
+    },
+    {
+      "file": "images/products/d3e0160ba018c87aeb94-card.jpg",
+      "sha256": "aa6d80cac2e03cfcd77d85cb8526fc6f63af5b9eca80bfaddaa42208ef4880c1"
+    },
+    {
+      "file": "images/products/d49e5b65e6f5febbfa35-card.png",
+      "sha256": "6ab5982c9556f0a43e1563f652e2ddfe2ee02b73d5e422a27a0c6e99fd74dc97"
+    },
+    {
+      "file": "images/products/d63c67886b050d8095c5-card.jpg",
+      "sha256": "6cdb513a93c2800f87b354d22063d5b6fe9cdba476c177e46b09ca463dee8a02"
+    },
+    {
+      "file": "images/products/db00d788d35b1c295f5e-card.png",
+      "sha256": "2deb7d69fe577ad3ebda01075d9ebbad078ed9aa56a91b2a13e306494547c24b"
+    },
+    {
+      "file": "images/products/db96602cc12138ed1b33-card.jpg",
+      "sha256": "2620f2118edfb2bc5501bd0fe8637dd13e9e2b2e848392f143dc38fae08eec92"
+    },
+    {
+      "file": "images/products/dc09c1dcf85753c968eb-card.jpg",
+      "sha256": "c8345ebd3b0d58011a6afe99bb029f4e83fd058966d16ecf45997218569448ff"
+    },
+    {
+      "file": "images/products/e2d89ae2698754829740-card.png",
+      "sha256": "f39f6f084ffff8354b837f5d27734aef5bcbe518ddd68fa49ba7f3a7f3241661"
+    },
+    {
+      "file": "images/products/e6d04439462431bc4218-card.jpg",
+      "sha256": "060213610ec25de6b161ae57a6958947de93a02e4fd38a171aacba783f91d2bc"
+    },
+    {
+      "file": "images/products/e727362174c33a22e682-card.jpg",
+      "sha256": "1a0c2a67a4269d3fd52ec891c7f486cd7e16e60ea2167e3f61f09c09c784d914"
+    },
+    {
+      "file": "images/products/e8cacc9f64a366fb7455-card.png",
+      "sha256": "b483651cd7d86f65407512eb3ec8a160eb01a841c741a452d5100b92a4e003c5"
+    },
+    {
+      "file": "images/products/e952fff5d11f05e55ded-card.jpg",
+      "sha256": "25257a12753843642fb0ae8f5306235f28677d360d4b89dd163d0a10d3819012"
+    },
+    {
+      "file": "images/products/e97cb930b70f205caaa1-card.jpg",
+      "sha256": "156a2c9025079a98e7fbd57b962b12860dbfd43ae0be2cc487405f7c1e26ea2c"
+    },
+    {
+      "file": "images/products/f0f264e7b6e439cb8b07-card.jpg",
+      "sha256": "cd1b2ed195d60501906a93c5cbeb47db2f135b9262b734954bd54130c7de6875"
+    },
+    {
+      "file": "images/products/f18bac220be8fb9aa47a-card.jpg",
+      "sha256": "43d413c82515a8446c6c8298abe1fb6b6cdc0dd9b9f0c9eb7ba5f5cb82e75383"
+    },
+    {
+      "file": "images/products/f334d1feca0f84809c27-card.jpg",
+      "sha256": "8f09d22794c88d415c928c86be08285553664ebde48b1c6e6f4eed2108115dfd"
+    },
+    {
+      "file": "images/products/f543e398e1a12ce46f2d-card.jpg",
+      "sha256": "3b5a21e9c9ec24438699981064a8069bd905bc6102cc519d4180e448362961f1"
+    },
+    {
+      "file": "images/products/f9913e9933d4281da3f7-card.png",
+      "sha256": "8b8b473d51c9cff45fdb668524756a1486a3a34efe3145da5ac1c915cfc0711c"
+    },
+    {
+      "file": "images/products/fabc706ba6f87b85bf84-card.jpg",
+      "sha256": "355457172bacc6858caf35b03b0787e1cda941f039e1502f125a50896f8bf9ff"
+    },
+    {
+      "file": "images/products/fc04dca464ba1884845a-card.jpg",
+      "sha256": "a82ba45d1692447a0a18af543c717ac6e792b1787cff18fd126762dc29a8cd55"
+    },
+    {
+      "file": "images/products/fe8ead5db44576952a3f-card.png",
+      "sha256": "57132bad76b1e4ffadd2225ba849627d07450c2ff3ebad20b40c8d0202104718"
+    },
+    {
+      "file": "images/products/ff7aa768aae5a6b58d3e-card.png",
+      "sha256": "37c33e11b4f73ea50cc7351265ed091d431c7f1bc0c66932f97637fa0787573a"
+    },
+    {
+      "file": "images/tab/follow-active.png",
+      "sha256": "c4fafe6ccb237322b6d5ee0cdcbec14681029f1c699bee60d57b323a0b4d57cf"
+    },
+    {
+      "file": "images/tab/follow.png",
+      "sha256": "6d0c3d7bbb6e442c7528d10bdb4cd5bf59604335dea61b2172ab60b22cca5f74"
+    },
+    {
+      "file": "images/tab/history-active.png",
+      "sha256": "c6971950abe10c6dc9f3cdb9e52f00b751a78fa78480823bd8e0d551cf606fe3"
+    },
+    {
+      "file": "images/tab/history.png",
+      "sha256": "0257a7072ac7e30f7bc7f405bd698d70e76a6a33c2b9bdf5779f57804cf49ab3"
+    },
+    {
+      "file": "images/tab/mine-active.png",
+      "sha256": "d7d09d8b913e99e48242e5849746f120f6bcd3f1703d462daef8bcd808ae196b"
+    },
+    {
+      "file": "images/tab/mine.png",
+      "sha256": "abd6a6f2d9441877c2324c9068d43d4e4a58c7422f8544a1f43c9b13f4e4f086"
+    },
+    {
+      "file": "images/tab/query-active.png",
+      "sha256": "ee6abb91dcac5dbe8ddf36dac34a2790ea35f1db1d7786bbab6db75ea8e5307a"
+    },
+    {
+      "file": "images/tab/query.png",
+      "sha256": "74f132363e3a194fac5ed641140e8d64293435c447d723f6c8eb5927cdb84b7d"
+    },
+    {
+      "file": "images/ui/calendar.png",
+      "sha256": "242cf7ed062136cc8b04ffa7100f2e631086f6cca0f4183d4694f58e88a138dd"
+    },
+    {
+      "file": "images/ui/check.png",
+      "sha256": "4893614e586c91b789f37e02e4527dbbeceda15727aa4d1fe5389168fedf4d18"
+    },
+    {
+      "file": "images/ui/clock.png",
+      "sha256": "08dd8d873ca49f0d2527d3c15664cff2f6cb3582a59fdb143bb3e18149735516"
+    },
+    {
+      "file": "images/ui/device.png",
+      "sha256": "b3dc4f1f93428d22ad6d1ba872d8d65eedb75e12ccfc3dd45632e3ab206b6768"
+    },
+    {
+      "file": "images/ui/feedback.png",
+      "sha256": "3489ce75c8195a2dbcff50e534dee0e744135f0421958d6e3a47588074c97458"
+    },
+    {
+      "file": "images/ui/guide.png",
+      "sha256": "84088e3c0282cb6b1abe4e1423d8e091bafa59850602749dd5fb57e5615f15d2"
+    },
+    {
+      "file": "images/ui/info.png",
+      "sha256": "fdc285052cfd53fbbaaa05c4314e3f11d0c97b2f7f7b1421acc68fef3d393625"
+    },
+    {
+      "file": "images/ui/news.png",
+      "sha256": "de69f2069ef81b388d3c591c02d278684eb1821de7ff96ba952957f7b23b530e"
+    },
+    {
+      "file": "images/ui/notification.png",
+      "sha256": "d9e9ce1f3560c4553b03f8540b688d32eb858192cc21273c48806e291aa5ef89"
+    },
+    {
+      "file": "images/ui/privacy.png",
+      "sha256": "f2cdaeb49b174a413ef353c35680b4dd2fd66138efe36d1d641e5057f9a83c6d"
+    },
+    {
+      "file": "images/ui/receipt.png",
+      "sha256": "b4a08e65a5b22024bbfc59481bcc4768f85c6178f97a98ced524d575e45a8f39"
+    },
+    {
+      "file": "images/ui/store.png",
+      "sha256": "d6f935119ecd44eb88fcfe052c66d8e3fcd79975d8b7e2e28500e530585bde29"
+    },
+    {
+      "file": "images/ui/support.png",
+      "sha256": "8e8123269c270532976b891a810d2d23f17478016de7f7bbd25811d0e7ca5794"
+    },
+    {
+      "file": "images/ui/ticket.png",
+      "sha256": "149b4755da1dfab01cfa347bceb2f6e26bb63cb5b87bd5d856b64cce21c2356f"
+    },
+    {
+      "file": "pages/deadlines/index.js",
+      "sha256": "36a6acdc83b95e77f17ccf5c0b915f2be3a918487c474685d5b097ed29e7df2e"
+    },
+    {
+      "file": "pages/deadlines/index.json",
+      "sha256": "509dd48908d787b1fd03ecdf663f39bb272585b4ce73efda60074039474b7559"
+    },
+    {
+      "file": "pages/deadlines/index.wxml",
+      "sha256": "6b9b8a1fb933f15b004fdcd62d947e5f7a245a95282642f133b59fcf4b7a3d52"
+    },
+    {
+      "file": "pages/deadlines/index.wxss",
+      "sha256": "1375295cae455029a92d13a2199a9c24ca3bd24c5a885ef199c7f1aa2d1198ca"
+    },
+    {
+      "file": "pages/follow/index.js",
+      "sha256": "21c5442f618ad66c3e07a1ca4fa05a1609d318e0785a26bdb3f18f4863acd20e"
+    },
+    {
+      "file": "pages/follow/index.json",
+      "sha256": "9d64b45c816738e4dcb558fbad5db1aaee6e25b7cc56db4824a5e1d6abaafd40"
+    },
+    {
+      "file": "pages/follow/index.wxml",
+      "sha256": "cc4b0bd27d770246183048f39003b84ad22f42709d703061e90e78fac8571736"
+    },
+    {
+      "file": "pages/follow/index.wxss",
+      "sha256": "d986f983a20212c4f1c88e136e24586e7eb42b085d28ac1fccd3f3990ca4f697"
+    },
+    {
+      "file": "pages/guide/index.js",
+      "sha256": "912ea5e4f5cfca59376010abbee08b1131f632e0f80f4e2f3d7b2ccea9ca53d2"
+    },
+    {
+      "file": "pages/guide/index.json",
+      "sha256": "e7d97c431b996ee8cc525ac80ce16ab47b90860410e5440649d22ee3ee084ecc"
+    },
+    {
+      "file": "pages/guide/index.wxml",
+      "sha256": "69d6258cd1d98954d201c9f534255a7e511ae140133201868fb1ee26d104c9b1"
+    },
+    {
+      "file": "pages/guide/index.wxss",
+      "sha256": "940360fc85e010e9c4f6d53d6701c43c429bc808ae548a1e440a5161e7a29356"
+    },
+    {
+      "file": "pages/history/index.js",
+      "sha256": "2e12414e8fad5b0c64719c9129289c774f4a6afd0eb6e1c5efff00f4a8c73f52"
+    },
+    {
+      "file": "pages/history/index.json",
+      "sha256": "7896937c58d1f8a51a2577583ef12d55bece622eb70a02a41afe64c25b0ae3fc"
+    },
+    {
+      "file": "pages/history/index.wxml",
+      "sha256": "ede1a7bf1cbce9b76c57cbdebdf3049c9bd0b643e9ca81b57b452f11844ff864"
+    },
+    {
+      "file": "pages/history/index.wxss",
+      "sha256": "d04a9902fb2f67ff56fe48183b7f41fa4a6ac47b7540c0e4aaa30c8738d522f8"
+    },
+    {
+      "file": "pages/mine/index.js",
+      "sha256": "17b68a29d574a5ddf41763915544c7af423250aef26013b053735aa82305915b"
+    },
+    {
+      "file": "pages/mine/index.json",
+      "sha256": "d35e258b24ba6175ae6b6b2699184b973bd915e299c68f0c3a12680cb4a7dd8f"
+    },
+    {
+      "file": "pages/mine/index.wxml",
+      "sha256": "0cc74d00cfe9d1cdd5c47ffa74bc90cb6ac1b5febd2952ef8ce2206d7d79d28c"
+    },
+    {
+      "file": "pages/mine/index.wxss",
+      "sha256": "49d57c834dff12b49ff3c663f2f15eea11c80829faf959097664903fea1b6de9"
+    },
+    {
+      "file": "pages/notice-board/index.js",
+      "sha256": "0828ac6da85beb8a51caaa9d5444070a936419612c2f4b8ba1858ceaf4fe0201"
+    },
+    {
+      "file": "pages/notice-board/index.json",
+      "sha256": "47f93f10580ec6d415a10d342caf45da80dd1fcec05d3e084c560f93b472deae"
+    },
+    {
+      "file": "pages/notice-board/index.wxml",
+      "sha256": "516a55ef230c78a593e5c71a4608a23d007114c9da821b331ffb7cd5cdab501b"
+    },
+    {
+      "file": "pages/notice-board/index.wxss",
+      "sha256": "4447e5e0552730100399e9169b6056643fd952ecb5cc2f2660c2cbb27048231f"
+    },
+    {
+      "file": "pages/notification-test/index.js",
+      "sha256": "3a5bd1349d03af1b998a7d3159e68acc8956218af0ba1d834c443580ce687cbc"
+    },
+    {
+      "file": "pages/notification-test/index.json",
+      "sha256": "96024ef4f69bbdfa2932904081f742b2ba53d3ac5c0c4fb104f4a64219f69090"
+    },
+    {
+      "file": "pages/notification-test/index.wxml",
+      "sha256": "68749aaea02f873c979fb6e95e1c03b2bcd5f4c0357a652fe52300c3f507e6a3"
+    },
+    {
+      "file": "pages/notification-test/index.wxss",
+      "sha256": "66cb647194e80ebbe3e94baee2e74e399bcad0911c45fa215db5f5db0d10cdd6"
+    },
+    {
+      "file": "pages/query/index.js",
+      "sha256": "1405572eaa995aa0150868d0d1006f884c761db4da50da3868f516348d50efe5"
+    },
+    {
+      "file": "pages/query/index.json",
+      "sha256": "4606da8bdc23edcb9142e8d4ec07c1788c4cbf05a28ca7a0e7d7d1dcbc7b0df7"
+    },
+    {
+      "file": "pages/query/index.wxml",
+      "sha256": "37d67ebcf08d923fc89179b2703916401b5ce4d85ea9dcc2f1e40c2b31ddcf92"
+    },
+    {
+      "file": "pages/query/index.wxss",
+      "sha256": "e664c47db197e5166a3b5a513a17c3b830a96ee1639e225d1b4520e8b7695328"
+    },
+    {
+      "file": "sitemap.json",
+      "sha256": "58ff34e8389dae9a1a5b6b0d31fdf366b60fdc55d07de626e0eb0c1aaad61a50"
+    },
+    {
+      "file": "styles/common.wxss",
+      "sha256": "f1cec41806006f87e14778fee1f14f5c4000738b7beb47d7ff43739501b64cc4"
+    },
+    {
+      "file": "styles/launch-calendar.wxss",
+      "sha256": "075b5a7c51ade764013bfb4b0a0e867c7b9649716aff180f100b4f7d46ef7f67"
+    },
+    {
+      "file": "styles/reminder-center.wxss",
+      "sha256": "41118a93d41e4ef9024d2c7a2be30a6ba1fe76216114cd8116586ffc89ee52be"
+    },
+    {
+      "file": "theme.json",
+      "sha256": "4abf8797b5b93eb082e4fb2f17d2001540788a9ab9756ec6ccded40acedcb66a"
+    },
+    {
+      "file": "utils/activation-status.js",
+      "sha256": "60529ccbe43d7794cb40c55cacd572cd01122ce45a4e6d786c03d02c65b3691b"
+    },
+    {
+      "file": "utils/alternative-rules.js",
+      "sha256": "a9e110fdb9a121fb22b24f05f646e3ee20bf84ab57ad25a5637864767e7f6b44"
+    },
+    {
+      "file": "utils/api.js",
+      "sha256": "03254cce6fda52c53d4eca660f56f215d3f57405cc106abe3e15890312cbf5da"
+    },
+    {
+      "file": "utils/catalog-order.js",
+      "sha256": "ff547eccb2693a03ffed150175f63e85e88dc69be28a62f905ec619b37645780"
+    },
+    {
+      "file": "utils/checkout-context.js",
+      "sha256": "b2834d77c248279da760eb3e38e3a31d37f1432c11a8b0b935adedc74a19216b"
+    },
+    {
+      "file": "utils/conversion-events.js",
+      "sha256": "b6f9f622759be236741f1f8b250f90ae821d41783b82d39c5f297f0c7efd77ae"
+    },
+    {
+      "file": "utils/deadlines.js",
+      "sha256": "b81f3b82ac511f7124eb9c4599473f7f65f75851203b50321543e8e30a0b7581"
+    },
+    {
+      "file": "utils/dnd.js",
+      "sha256": "22e0bf1ee65813c32f0541c7249476875ed32e6b7b4d8caa2fbc27da7194ded1"
+    },
+    {
+      "file": "utils/format.js",
+      "sha256": "3505ae8029bf5492e2bb5a6bb962512b00e14e31cffbe18c127a4cb730825b5a"
+    },
+    {
+      "file": "utils/haptic.js",
+      "sha256": "4c895773aae6faffda4ceeb3a0164416cad31d0c248e3d973dd033a39e06eb6a"
+    },
+    {
+      "file": "utils/journey-context.js",
+      "sha256": "99dd0777faa898ec30e3f7e262963645b64ac4b137963aa16883aa3f53af6bac"
+    },
+    {
+      "file": "utils/launch-calendar.js",
+      "sha256": "8a6e36be6fd4d5d713f12bc1c36f7319fb403d5bfde1c90c75f6cc8f0badee1c"
+    },
+    {
+      "file": "utils/local-key.js",
+      "sha256": "1103dd5137f91e7141267e1ea9a4fd6b282d9d9def8289a83b9d31062590f49e"
+    },
+    {
+      "file": "utils/member-limits.js",
+      "sha256": "3a84c7d2314683b0dc62d806829cbc532422acfe71a28888ad0944d5f124e4ea"
+    },
+    {
+      "file": "utils/member-payment.js",
+      "sha256": "37a8e2791643f24a2d4d962aae21a6a3d6dc12354a869300f21335508ceac712"
+    },
+    {
+      "file": "utils/member-products.js",
+      "sha256": "8dde771bd110aec651d9644af6b9eefd5d902a17c84bc569f3cfd8c9c224cfd3"
+    },
+    {
+      "file": "utils/navigation.js",
+      "sha256": "80a402c5c4751d0dfc327da957f9b8bc9e1aa99f022ceb7d638e3e1d788df494"
+    },
+    {
+      "file": "utils/network.js",
+      "sha256": "12614c82c688dafc7d1d2363ad070d008c4414626626268dfda656a02f9c1ab2"
+    },
+    {
+      "file": "utils/notification-test-progress.js",
+      "sha256": "691e9a3787a936ab448ff4627fb3255b2979437712812a319bde36ce7b2c5d83"
+    },
+    {
+      "file": "utils/observation-insights.js",
+      "sha256": "8c15e6f1d314bb77439cb4c47e3a42e7c81ddbd5f18477fedbb76b961deac6f3"
+    },
+    {
+      "file": "utils/operation.js",
+      "sha256": "7b936944f7a904bc24a7b7e0c9d10c5b9ab6cdb4c44a95165e508430f1f78c8f"
+    },
+    {
+      "file": "utils/poll.js",
+      "sha256": "10ecabb717c07e2214b6cf796947d9ea7a4066b73c011b78b7232dfb9aa0a98f"
+    },
+    {
+      "file": "utils/product-image-fit.js",
+      "sha256": "6090d8fddbc2a7a5bf30eae760c8ddafa95cc2900340a90198a9f7b84a722fa0"
+    },
+    {
+      "file": "utils/product-launch.js",
+      "sha256": "78de29eaa02a46bd8ca43e0b25c8a9140c86f4f8913c67515a64030a6de7a57e"
+    },
+    {
+      "file": "utils/query-alternatives.js",
+      "sha256": "d775252b1ea4b0462aa10f31bcd1eeeaaae0373f3ed6a2ac693605aa1283116f"
+    },
+    {
+      "file": "utils/query-notice.js",
+      "sha256": "a4e5ff7d66f652aa94671bc953debe968d0578a91cd7f97058dafca1a8105b71"
+    },
+    {
+      "file": "utils/reminder-credits.js",
+      "sha256": "cdda9178a7e131c8a2b9a336898aee1a7943771d00f7fb31dfe97e56ebf27c93"
+    },
+    {
+      "file": "utils/reminder-nudge.js",
+      "sha256": "153593fed640d61fb69a8799b454138df35d3a02cbaa3d0c6e8ae86a96127987"
+    },
+    {
+      "file": "utils/reminder-panel.js",
+      "sha256": "1218d9eb1b18e83a4fe83904d1a55337ce91ee01d1c48b714f1ada43797ffc89"
+    },
+    {
+      "file": "utils/reminder-readiness.js",
+      "sha256": "2549a097f1b32c38c5bf96e1ac42de40709990dd78bc48383962c4962145f8ea"
+    },
+    {
+      "file": "utils/request-progress.js",
+      "sha256": "8f540e2c84cb4bcc8612e804d86a3826ec9970fd726bd5d40b6a6b80eddcc66e"
+    },
+    {
+      "file": "utils/result-next-action.js",
+      "sha256": "ee722257d145142d79159409f428f2cb2ff94ce297366945b4d60d38196d4a68"
+    },
+    {
+      "file": "utils/session.js",
+      "sha256": "3db4fdbab99b0ccde205391007f9d97936fb51f525e34e2e2bab688c6b71e58d"
+    },
+    {
+      "file": "utils/share.js",
+      "sha256": "a628583805d7ae8fbec8f155a1857d3774681bd7967b459e1c6fe77dec45384e"
+    },
+    {
+      "file": "utils/store-label.js",
+      "sha256": "653cead707aa476534e3e02c2aa683cec2eeb28965ddda78fc8081d49c4639e0"
+    },
+    {
+      "file": "utils/store.js",
+      "sha256": "a2d115e2f3764dd12f967072269080c4eb29ed955dc50daa013b852a5cb5d125"
+    },
+    {
+      "file": "utils/tab-bar.js",
+      "sha256": "cec7745b235c03764d28ac3c3189155bc53c0a0bb99a6a22745722c126a4a80c"
+    }
+  ],
+  "renderer": "offline WXML/WXSS approximation",
+  "previewDate": "2026-10-30T07:00:00.000Z",
+  "v2Features": null,
+  "v350Preview": true,
+  "membershipNativePreview": false,
+  "notificationTestPreview": false,
+  "buttonConstraintProfile": null,
+  "buttonConstraintCss": "",
+  "rpxRoundingProfile": null,
+  "remoteImages": false,
+  "launchCalendarImagePolicy": {
+    "mode": "offline-no-image-fallback",
+    "limitation": "Remote calendar images are removed only from preview fixtures to simulate the real no-image fallback. This offline preview does not verify remote images."
+  },
+  "expressionErrors": 0,
+  "snapshots": [
+    {
+      "page": "follow",
+      "scenario": "v350-loading",
+      "width": 320,
+      "file": "follow-v350-loading-320.html",
+      "tabPage": true,
+      "navigationHidden": false,
+      "previewDate": "2026-10-30T07:00:00.000Z",
+      "pickerSheet": false,
+      "fixture": {
+        "pages": [
+          "follow",
+          "deadlines"
+        ],
+        "loading": true
+      },
+      "expectedText": [
+        "我的小哨",
+        "免费试用",
+        "苹果库存",
+        "查询库存",
+        "正在读取到期事项"
+      ],
+      "forbiddenText": [
+        "全网比价",
+        "任意链接都能监控",
+        "微信消息已送达",
+        "下一次计划提醒"
+      ]
+    },
+    {
+      "page": "follow",
+      "scenario": "v350-loading",
+      "width": 375,
+      "file": "follow-v350-loading-375.html",
+      "tabPage": true,
+      "navigationHidden": false,
+      "previewDate": "2026-10-30T07:00:00.000Z",
+      "pickerSheet": false,
+      "fixture": {
+        "pages": [
+          "follow",
+          "deadlines"
+        ],
+        "loading": true
+      },
+      "expectedText": [
+        "我的小哨",
+        "免费试用",
+        "苹果库存",
+        "查询库存",
+        "正在读取到期事项"
+      ],
+      "forbiddenText": [
+        "全网比价",
+        "任意链接都能监控",
+        "微信消息已送达",
+        "下一次计划提醒"
+      ]
+    },
+    {
+      "page": "follow",
+      "scenario": "v350-loading",
+      "width": 430,
+      "file": "follow-v350-loading-430.html",
+      "tabPage": true,
+      "navigationHidden": false,
+      "previewDate": "2026-10-30T07:00:00.000Z",
+      "pickerSheet": false,
+      "fixture": {
+        "pages": [
+          "follow",
+          "deadlines"
+        ],
+        "loading": true
+      },
+      "expectedText": [
+        "我的小哨",
+        "免费试用",
+        "苹果库存",
+        "查询库存",
+        "正在读取到期事项"
+      ],
+      "forbiddenText": [
+        "全网比价",
+        "任意链接都能监控",
+        "微信消息已送达",
+        "下一次计划提醒"
+      ]
+    },
+    {
+      "page": "deadlines",
+      "scenario": "v350-loading",
+      "width": 320,
+      "file": "deadlines-v350-loading-320.html",
+      "tabPage": false,
+      "navigationHidden": false,
+      "previewDate": "2026-10-30T07:00:00.000Z",
+      "pickerSheet": false,
+      "fixture": {
+        "pages": [
+          "follow",
+          "deadlines"
+        ],
+        "loading": true
+      },
+      "expectedText": [
+        "到期提醒",
+        "免费试用",
+        "正在读取到期事项"
+      ],
+      "forbiddenText": [
+        "全网比价",
+        "任意链接都能监控",
+        "微信消息已送达",
+        "下一次计划提醒"
+      ]
+    },
+    {
+      "page": "deadlines",
+      "scenario": "v350-loading",
+      "width": 375,
+      "file": "deadlines-v350-loading-375.html",
+      "tabPage": false,
+      "navigationHidden": false,
+      "previewDate": "2026-10-30T07:00:00.000Z",
+      "pickerSheet": false,
+      "fixture": {
+        "pages": [
+          "follow",
+          "deadlines"
+        ],
+        "loading": true
+      },
+      "expectedText": [
+        "到期提醒",
+        "免费试用",
+        "正在读取到期事项"
+      ],
+      "forbiddenText": [
+        "全网比价",
+        "任意链接都能监控",
+        "微信消息已送达",
+        "下一次计划提醒"
+      ]
+    },
+    {
+      "page": "deadlines",
+      "scenario": "v350-loading",
+      "width": 430,
+      "file": "deadlines-v350-loading-430.html",
+      "tabPage": false,
+      "navigationHidden": false,
+      "previewDate": "2026-10-30T07:00:00.000Z",
+      "pickerSheet": false,
+      "fixture": {
+        "pages": [
+          "follow",
+          "deadlines"
+        ],
+        "loading": true
+      },
+      "expectedText": [
+        "到期提醒",
+        "免费试用",
+        "正在读取到期事项"
+      ],
+      "forbiddenText": [
+        "全网比价",
+        "任意链接都能监控",
+        "微信消息已送达",
+        "下一次计划提醒"
+      ]
+    },
+    {
+      "page": "follow",
+      "scenario": "v350-empty",
+      "width": 320,
+      "file": "follow-v350-empty-320.html",
+      "tabPage": true,
+      "navigationHidden": false,
+      "previewDate": "2026-10-30T07:00:00.000Z",
+      "pickerSheet": false,
+      "fixture": {
+        "pages": [
+          "follow",
+          "deadlines"
+        ],
+        "empty": true,
+        "enabled": false
+      },
+      "expectedText": [
+        "我的小哨",
+        "免费试用",
+        "苹果库存",
+        "查询库存",
+        "添加到期提醒"
+      ],
+      "forbiddenText": [
+        "全网比价",
+        "任意链接都能监控",
+        "微信消息已送达",
+        "下一次计划提醒"
+      ]
+    },
+    {
+      "page": "follow",
+      "scenario": "v350-empty",
+      "width": 375,
+      "file": "follow-v350-empty-375.html",
+      "tabPage": true,
+      "navigationHidden": false,
+      "previewDate": "2026-10-30T07:00:00.000Z",
+      "pickerSheet": false,
+      "fixture": {
+        "pages": [
+          "follow",
+          "deadlines"
+        ],
+        "empty": true,
+        "enabled": false
+      },
+      "expectedText": [
+        "我的小哨",
+        "免费试用",
+        "苹果库存",
+        "查询库存",
+        "添加到期提醒"
+      ],
+      "forbiddenText": [
+        "全网比价",
+        "任意链接都能监控",
+        "微信消息已送达",
+        "下一次计划提醒"
+      ]
+    },
+    {
+      "page": "follow",
+      "scenario": "v350-empty",
+      "width": 430,
+      "file": "follow-v350-empty-430.html",
+      "tabPage": true,
+      "navigationHidden": false,
+      "previewDate": "2026-10-30T07:00:00.000Z",
+      "pickerSheet": false,
+      "fixture": {
+        "pages": [
+          "follow",
+          "deadlines"
+        ],
+        "empty": true,
+        "enabled": false
+      },
+      "expectedText": [
+        "我的小哨",
+        "免费试用",
+        "苹果库存",
+        "查询库存",
+        "添加到期提醒"
+      ],
+      "forbiddenText": [
+        "全网比价",
+        "任意链接都能监控",
+        "微信消息已送达",
+        "下一次计划提醒"
+      ]
+    },
+    {
+      "page": "deadlines",
+      "scenario": "v350-empty",
+      "width": 320,
+      "file": "deadlines-v350-empty-320.html",
+      "tabPage": false,
+      "navigationHidden": false,
+      "previewDate": "2026-10-30T07:00:00.000Z",
+      "pickerSheet": false,
+      "fixture": {
+        "pages": [
+          "follow",
+          "deadlines"
+        ],
+        "empty": true,
+        "enabled": false
+      },
+      "expectedText": [
+        "到期提醒",
+        "免费试用",
+        "还没有到期事项"
+      ],
+      "forbiddenText": [
+        "全网比价",
+        "任意链接都能监控",
+        "微信消息已送达",
+        "下一次计划提醒"
+      ]
+    },
+    {
+      "page": "deadlines",
+      "scenario": "v350-empty",
+      "width": 375,
+      "file": "deadlines-v350-empty-375.html",
+      "tabPage": false,
+      "navigationHidden": false,
+      "previewDate": "2026-10-30T07:00:00.000Z",
+      "pickerSheet": false,
+      "fixture": {
+        "pages": [
+          "follow",
+          "deadlines"
+        ],
+        "empty": true,
+        "enabled": false
+      },
+      "expectedText": [
+        "到期提醒",
+        "免费试用",
+        "还没有到期事项"
+      ],
+      "forbiddenText": [
+        "全网比价",
+        "任意链接都能监控",
+        "微信消息已送达",
+        "下一次计划提醒"
+      ]
+    },
+    {
+      "page": "deadlines",
+      "scenario": "v350-empty",
+      "width": 430,
+      "file": "deadlines-v350-empty-430.html",
+      "tabPage": false,
+      "navigationHidden": false,
+      "previewDate": "2026-10-30T07:00:00.000Z",
+      "pickerSheet": false,
+      "fixture": {
+        "pages": [
+          "follow",
+          "deadlines"
+        ],
+        "empty": true,
+        "enabled": false
+      },
+      "expectedText": [
+        "到期提醒",
+        "免费试用",
+        "还没有到期事项"
+      ],
+      "forbiddenText": [
+        "全网比价",
+        "任意链接都能监控",
+        "微信消息已送达",
+        "下一次计划提醒"
+      ]
+    },
+    {
+      "page": "follow",
+      "scenario": "v350-scheduled",
+      "width": 320,
+      "file": "follow-v350-scheduled-320.html",
+      "tabPage": true,
+      "navigationHidden": false,
+      "previewDate": "2026-10-30T07:00:00.000Z",
+      "pickerSheet": false,
+      "fixture": {
+        "pages": [
+          "follow",
+          "deadlines"
+        ],
+        "enabled": true,
+        "status": "scheduled"
+      },
+      "expectedText": [
+        "我的小哨",
+        "免费试用",
+        "苹果库存",
+        "查询库存",
+        "周末优惠券",
+        "已安排提醒"
+      ],
+      "forbiddenText": [
+        "全网比价",
+        "任意链接都能监控",
+        "微信消息已送达"
+      ]
+    },
+    {
+      "page": "follow",
+      "scenario": "v350-scheduled",
+      "width": 375,
+      "file": "follow-v350-scheduled-375.html",
+      "tabPage": true,
+      "navigationHidden": false,
+      "previewDate": "2026-10-30T07:00:00.000Z",
+      "pickerSheet": false,
+      "fixture": {
+        "pages": [
+          "follow",
+          "deadlines"
+        ],
+        "enabled": true,
+        "status": "scheduled"
+      },
+      "expectedText": [
+        "我的小哨",
+        "免费试用",
+        "苹果库存",
+        "查询库存",
+        "周末优惠券",
+        "已安排提醒"
+      ],
+      "forbiddenText": [
+        "全网比价",
+        "任意链接都能监控",
+        "微信消息已送达"
+      ]
+    },
+    {
+      "page": "follow",
+      "scenario": "v350-scheduled",
+      "width": 430,
+      "file": "follow-v350-scheduled-430.html",
+      "tabPage": true,
+      "navigationHidden": false,
+      "previewDate": "2026-10-30T07:00:00.000Z",
+      "pickerSheet": false,
+      "fixture": {
+        "pages": [
+          "follow",
+          "deadlines"
+        ],
+        "enabled": true,
+        "status": "scheduled"
+      },
+      "expectedText": [
+        "我的小哨",
+        "免费试用",
+        "苹果库存",
+        "查询库存",
+        "周末优惠券",
+        "已安排提醒"
+      ],
+      "forbiddenText": [
+        "全网比价",
+        "任意链接都能监控",
+        "微信消息已送达"
+      ]
+    },
+    {
+      "page": "deadlines",
+      "scenario": "v350-scheduled",
+      "width": 320,
+      "file": "deadlines-v350-scheduled-320.html",
+      "tabPage": false,
+      "navigationHidden": false,
+      "previewDate": "2026-10-30T07:00:00.000Z",
+      "pickerSheet": false,
+      "fixture": {
+        "pages": [
+          "follow",
+          "deadlines"
+        ],
+        "enabled": true,
+        "status": "scheduled"
+      },
+      "expectedText": [
+        "到期提醒",
+        "免费试用",
+        "周末优惠券",
+        "已安排提醒"
+      ],
+      "forbiddenText": [
+        "全网比价",
+        "任意链接都能监控",
+        "微信消息已送达"
+      ]
+    },
+    {
+      "page": "deadlines",
+      "scenario": "v350-scheduled",
+      "width": 375,
+      "file": "deadlines-v350-scheduled-375.html",
+      "tabPage": false,
+      "navigationHidden": false,
+      "previewDate": "2026-10-30T07:00:00.000Z",
+      "pickerSheet": false,
+      "fixture": {
+        "pages": [
+          "follow",
+          "deadlines"
+        ],
+        "enabled": true,
+        "status": "scheduled"
+      },
+      "expectedText": [
+        "到期提醒",
+        "免费试用",
+        "周末优惠券",
+        "已安排提醒"
+      ],
+      "forbiddenText": [
+        "全网比价",
+        "任意链接都能监控",
+        "微信消息已送达"
+      ]
+    },
+    {
+      "page": "deadlines",
+      "scenario": "v350-scheduled",
+      "width": 430,
+      "file": "deadlines-v350-scheduled-430.html",
+      "tabPage": false,
+      "navigationHidden": false,
+      "previewDate": "2026-10-30T07:00:00.000Z",
+      "pickerSheet": false,
+      "fixture": {
+        "pages": [
+          "follow",
+          "deadlines"
+        ],
+        "enabled": true,
+        "status": "scheduled"
+      },
+      "expectedText": [
+        "到期提醒",
+        "免费试用",
+        "周末优惠券",
+        "已安排提醒"
+      ],
+      "forbiddenText": [
+        "全网比价",
+        "任意链接都能监控",
+        "微信消息已送达"
+      ]
+    },
+    {
+      "page": "follow",
+      "scenario": "v350-service-off",
+      "width": 320,
+      "file": "follow-v350-service-off-320.html",
+      "tabPage": true,
+      "navigationHidden": false,
+      "previewDate": "2026-10-30T07:00:00.000Z",
+      "pickerSheet": false,
+      "fixture": {
+        "pages": [
+          "follow",
+          "deadlines"
+        ],
+        "enabled": false,
+        "status": "not_enabled"
+      },
+      "expectedText": [
+        "我的小哨",
+        "免费试用",
+        "苹果库存",
+        "查询库存",
+        "周末优惠券",
+        "仅保存，微信提醒未开启"
+      ],
+      "forbiddenText": [
+        "全网比价",
+        "任意链接都能监控",
+        "微信消息已送达",
+        "下一次计划提醒"
+      ]
+    },
+    {
+      "page": "follow",
+      "scenario": "v350-service-off",
+      "width": 375,
+      "file": "follow-v350-service-off-375.html",
+      "tabPage": true,
+      "navigationHidden": false,
+      "previewDate": "2026-10-30T07:00:00.000Z",
+      "pickerSheet": false,
+      "fixture": {
+        "pages": [
+          "follow",
+          "deadlines"
+        ],
+        "enabled": false,
+        "status": "not_enabled"
+      },
+      "expectedText": [
+        "我的小哨",
+        "免费试用",
+        "苹果库存",
+        "查询库存",
+        "周末优惠券",
+        "仅保存，微信提醒未开启"
+      ],
+      "forbiddenText": [
+        "全网比价",
+        "任意链接都能监控",
+        "微信消息已送达",
+        "下一次计划提醒"
+      ]
+    },
+    {
+      "page": "follow",
+      "scenario": "v350-service-off",
+      "width": 430,
+      "file": "follow-v350-service-off-430.html",
+      "tabPage": true,
+      "navigationHidden": false,
+      "previewDate": "2026-10-30T07:00:00.000Z",
+      "pickerSheet": false,
+      "fixture": {
+        "pages": [
+          "follow",
+          "deadlines"
+        ],
+        "enabled": false,
+        "status": "not_enabled"
+      },
+      "expectedText": [
+        "我的小哨",
+        "免费试用",
+        "苹果库存",
+        "查询库存",
+        "周末优惠券",
+        "仅保存，微信提醒未开启"
+      ],
+      "forbiddenText": [
+        "全网比价",
+        "任意链接都能监控",
+        "微信消息已送达",
+        "下一次计划提醒"
+      ]
+    },
+    {
+      "page": "deadlines",
+      "scenario": "v350-service-off",
+      "width": 320,
+      "file": "deadlines-v350-service-off-320.html",
+      "tabPage": false,
+      "navigationHidden": false,
+      "previewDate": "2026-10-30T07:00:00.000Z",
+      "pickerSheet": false,
+      "fixture": {
+        "pages": [
+          "follow",
+          "deadlines"
+        ],
+        "enabled": false,
+        "status": "not_enabled"
+      },
+      "expectedText": [
+        "到期提醒",
+        "免费试用",
+        "周末优惠券",
+        "仅保存，微信提醒未开启"
+      ],
+      "forbiddenText": [
+        "全网比价",
+        "任意链接都能监控",
+        "微信消息已送达",
+        "下一次计划提醒"
+      ]
+    },
+    {
+      "page": "deadlines",
+      "scenario": "v350-service-off",
+      "width": 375,
+      "file": "deadlines-v350-service-off-375.html",
+      "tabPage": false,
+      "navigationHidden": false,
+      "previewDate": "2026-10-30T07:00:00.000Z",
+      "pickerSheet": false,
+      "fixture": {
+        "pages": [
+          "follow",
+          "deadlines"
+        ],
+        "enabled": false,
+        "status": "not_enabled"
+      },
+      "expectedText": [
+        "到期提醒",
+        "免费试用",
+        "周末优惠券",
+        "仅保存，微信提醒未开启"
+      ],
+      "forbiddenText": [
+        "全网比价",
+        "任意链接都能监控",
+        "微信消息已送达",
+        "下一次计划提醒"
+      ]
+    },
+    {
+      "page": "deadlines",
+      "scenario": "v350-service-off",
+      "width": 430,
+      "file": "deadlines-v350-service-off-430.html",
+      "tabPage": false,
+      "navigationHidden": false,
+      "previewDate": "2026-10-30T07:00:00.000Z",
+      "pickerSheet": false,
+      "fixture": {
+        "pages": [
+          "follow",
+          "deadlines"
+        ],
+        "enabled": false,
+        "status": "not_enabled"
+      },
+      "expectedText": [
+        "到期提醒",
+        "免费试用",
+        "周末优惠券",
+        "仅保存，微信提醒未开启"
+      ],
+      "forbiddenText": [
+        "全网比价",
+        "任意链接都能监控",
+        "微信消息已送达",
+        "下一次计划提醒"
+      ]
+    },
+    {
+      "page": "follow",
+      "scenario": "v350-needs-authorization",
+      "width": 320,
+      "file": "follow-v350-needs-authorization-320.html",
+      "tabPage": true,
+      "navigationHidden": false,
+      "previewDate": "2026-10-30T07:00:00.000Z",
+      "pickerSheet": false,
+      "fixture": {
+        "pages": [
+          "follow",
+          "deadlines"
+        ],
+        "enabled": true,
+        "status": "awaiting_authorization"
+      },
+      "expectedText": [
+        "我的小哨",
+        "免费试用",
+        "苹果库存",
+        "查询库存",
+        "周末优惠券",
+        "待授权微信提醒"
+      ],
+      "forbiddenText": [
+        "全网比价",
+        "任意链接都能监控",
+        "微信消息已送达",
+        "下一次计划提醒"
+      ]
+    },
+    {
+      "page": "follow",
+      "scenario": "v350-needs-authorization",
+      "width": 375,
+      "file": "follow-v350-needs-authorization-375.html",
+      "tabPage": true,
+      "navigationHidden": false,
+      "previewDate": "2026-10-30T07:00:00.000Z",
+      "pickerSheet": false,
+      "fixture": {
+        "pages": [
+          "follow",
+          "deadlines"
+        ],
+        "enabled": true,
+        "status": "awaiting_authorization"
+      },
+      "expectedText": [
+        "我的小哨",
+        "免费试用",
+        "苹果库存",
+        "查询库存",
+        "周末优惠券",
+        "待授权微信提醒"
+      ],
+      "forbiddenText": [
+        "全网比价",
+        "任意链接都能监控",
+        "微信消息已送达",
+        "下一次计划提醒"
+      ]
+    },
+    {
+      "page": "follow",
+      "scenario": "v350-needs-authorization",
+      "width": 430,
+      "file": "follow-v350-needs-authorization-430.html",
+      "tabPage": true,
+      "navigationHidden": false,
+      "previewDate": "2026-10-30T07:00:00.000Z",
+      "pickerSheet": false,
+      "fixture": {
+        "pages": [
+          "follow",
+          "deadlines"
+        ],
+        "enabled": true,
+        "status": "awaiting_authorization"
+      },
+      "expectedText": [
+        "我的小哨",
+        "免费试用",
+        "苹果库存",
+        "查询库存",
+        "周末优惠券",
+        "待授权微信提醒"
+      ],
+      "forbiddenText": [
+        "全网比价",
+        "任意链接都能监控",
+        "微信消息已送达",
+        "下一次计划提醒"
+      ]
+    },
+    {
+      "page": "deadlines",
+      "scenario": "v350-needs-authorization",
+      "width": 320,
+      "file": "deadlines-v350-needs-authorization-320.html",
+      "tabPage": false,
+      "navigationHidden": false,
+      "previewDate": "2026-10-30T07:00:00.000Z",
+      "pickerSheet": false,
+      "fixture": {
+        "pages": [
+          "follow",
+          "deadlines"
+        ],
+        "enabled": true,
+        "status": "awaiting_authorization"
+      },
+      "expectedText": [
+        "到期提醒",
+        "免费试用",
+        "周末优惠券",
+        "待授权微信提醒"
+      ],
+      "forbiddenText": [
+        "全网比价",
+        "任意链接都能监控",
+        "微信消息已送达",
+        "下一次计划提醒"
+      ]
+    },
+    {
+      "page": "deadlines",
+      "scenario": "v350-needs-authorization",
+      "width": 375,
+      "file": "deadlines-v350-needs-authorization-375.html",
+      "tabPage": false,
+      "navigationHidden": false,
+      "previewDate": "2026-10-30T07:00:00.000Z",
+      "pickerSheet": false,
+      "fixture": {
+        "pages": [
+          "follow",
+          "deadlines"
+        ],
+        "enabled": true,
+        "status": "awaiting_authorization"
+      },
+      "expectedText": [
+        "到期提醒",
+        "免费试用",
+        "周末优惠券",
+        "待授权微信提醒"
+      ],
+      "forbiddenText": [
+        "全网比价",
+        "任意链接都能监控",
+        "微信消息已送达",
+        "下一次计划提醒"
+      ]
+    },
+    {
+      "page": "deadlines",
+      "scenario": "v350-needs-authorization",
+      "width": 430,
+      "file": "deadlines-v350-needs-authorization-430.html",
+      "tabPage": false,
+      "navigationHidden": false,
+      "previewDate": "2026-10-30T07:00:00.000Z",
+      "pickerSheet": false,
+      "fixture": {
+        "pages": [
+          "follow",
+          "deadlines"
+        ],
+        "enabled": true,
+        "status": "awaiting_authorization"
+      },
+      "expectedText": [
+        "到期提醒",
+        "免费试用",
+        "周末优惠券",
+        "待授权微信提醒"
+      ],
+      "forbiddenText": [
+        "全网比价",
+        "任意链接都能监控",
+        "微信消息已送达",
+        "下一次计划提醒"
+      ]
+    },
+    {
+      "page": "follow",
+      "scenario": "v350-authorization-elapsed",
+      "width": 320,
+      "file": "follow-v350-authorization-elapsed-320.html",
+      "tabPage": true,
+      "navigationHidden": false,
+      "previewDate": "2026-10-30T07:00:00.000Z",
+      "pickerSheet": false,
+      "fixture": {
+        "pages": [
+          "follow",
+          "deadlines"
+        ],
+        "enabled": true,
+        "status": "awaiting_authorization",
+        "overdue": true
+      },
+      "expectedText": [
+        "我的小哨",
+        "免费试用",
+        "苹果库存",
+        "查询库存",
+        "周末优惠券",
+        "提醒时间已过"
+      ],
+      "forbiddenText": [
+        "全网比价",
+        "任意链接都能监控",
+        "微信消息已送达",
+        "允许一次微信提醒",
+        "下一次计划提醒"
+      ]
+    },
+    {
+      "page": "follow",
+      "scenario": "v350-authorization-elapsed",
+      "width": 375,
+      "file": "follow-v350-authorization-elapsed-375.html",
+      "tabPage": true,
+      "navigationHidden": false,
+      "previewDate": "2026-10-30T07:00:00.000Z",
+      "pickerSheet": false,
+      "fixture": {
+        "pages": [
+          "follow",
+          "deadlines"
+        ],
+        "enabled": true,
+        "status": "awaiting_authorization",
+        "overdue": true
+      },
+      "expectedText": [
+        "我的小哨",
+        "免费试用",
+        "苹果库存",
+        "查询库存",
+        "周末优惠券",
+        "提醒时间已过"
+      ],
+      "forbiddenText": [
+        "全网比价",
+        "任意链接都能监控",
+        "微信消息已送达",
+        "允许一次微信提醒",
+        "下一次计划提醒"
+      ]
+    },
+    {
+      "page": "follow",
+      "scenario": "v350-authorization-elapsed",
+      "width": 430,
+      "file": "follow-v350-authorization-elapsed-430.html",
+      "tabPage": true,
+      "navigationHidden": false,
+      "previewDate": "2026-10-30T07:00:00.000Z",
+      "pickerSheet": false,
+      "fixture": {
+        "pages": [
+          "follow",
+          "deadlines"
+        ],
+        "enabled": true,
+        "status": "awaiting_authorization",
+        "overdue": true
+      },
+      "expectedText": [
+        "我的小哨",
+        "免费试用",
+        "苹果库存",
+        "查询库存",
+        "周末优惠券",
+        "提醒时间已过"
+      ],
+      "forbiddenText": [
+        "全网比价",
+        "任意链接都能监控",
+        "微信消息已送达",
+        "允许一次微信提醒",
+        "下一次计划提醒"
+      ]
+    },
+    {
+      "page": "deadlines",
+      "scenario": "v350-authorization-elapsed",
+      "width": 320,
+      "file": "deadlines-v350-authorization-elapsed-320.html",
+      "tabPage": false,
+      "navigationHidden": false,
+      "previewDate": "2026-10-30T07:00:00.000Z",
+      "pickerSheet": false,
+      "fixture": {
+        "pages": [
+          "follow",
+          "deadlines"
+        ],
+        "enabled": true,
+        "status": "awaiting_authorization",
+        "overdue": true
+      },
+      "expectedText": [
+        "到期提醒",
+        "免费试用",
+        "周末优惠券",
+        "提醒时间已过"
+      ],
+      "forbiddenText": [
+        "全网比价",
+        "任意链接都能监控",
+        "微信消息已送达",
+        "允许一次微信提醒",
+        "下一次计划提醒"
+      ]
+    },
+    {
+      "page": "deadlines",
+      "scenario": "v350-authorization-elapsed",
+      "width": 375,
+      "file": "deadlines-v350-authorization-elapsed-375.html",
+      "tabPage": false,
+      "navigationHidden": false,
+      "previewDate": "2026-10-30T07:00:00.000Z",
+      "pickerSheet": false,
+      "fixture": {
+        "pages": [
+          "follow",
+          "deadlines"
+        ],
+        "enabled": true,
+        "status": "awaiting_authorization",
+        "overdue": true
+      },
+      "expectedText": [
+        "到期提醒",
+        "免费试用",
+        "周末优惠券",
+        "提醒时间已过"
+      ],
+      "forbiddenText": [
+        "全网比价",
+        "任意链接都能监控",
+        "微信消息已送达",
+        "允许一次微信提醒",
+        "下一次计划提醒"
+      ]
+    },
+    {
+      "page": "deadlines",
+      "scenario": "v350-authorization-elapsed",
+      "width": 430,
+      "file": "deadlines-v350-authorization-elapsed-430.html",
+      "tabPage": false,
+      "navigationHidden": false,
+      "previewDate": "2026-10-30T07:00:00.000Z",
+      "pickerSheet": false,
+      "fixture": {
+        "pages": [
+          "follow",
+          "deadlines"
+        ],
+        "enabled": true,
+        "status": "awaiting_authorization",
+        "overdue": true
+      },
+      "expectedText": [
+        "到期提醒",
+        "免费试用",
+        "周末优惠券",
+        "提醒时间已过"
+      ],
+      "forbiddenText": [
+        "全网比价",
+        "任意链接都能监控",
+        "微信消息已送达",
+        "允许一次微信提醒",
+        "下一次计划提醒"
+      ]
+    },
+    {
+      "page": "follow",
+      "scenario": "v350-delivery-results",
+      "width": 320,
+      "file": "follow-v350-delivery-results-320.html",
+      "tabPage": true,
+      "navigationHidden": false,
+      "previewDate": "2026-10-30T07:00:00.000Z",
+      "pickerSheet": false,
+      "fixture": {
+        "pages": [
+          "follow",
+          "deadlines"
+        ],
+        "enabled": true,
+        "statuses": [
+          "accepted",
+          "uncertain",
+          "missed"
+        ]
+      },
+      "expectedText": [
+        "我的小哨",
+        "免费试用",
+        "苹果库存",
+        "查询库存",
+        "视频会员续费",
+        "发送结果待确认"
+      ],
+      "forbiddenText": [
+        "全网比价",
+        "任意链接都能监控",
+        "微信消息已送达",
+        "下一次计划提醒"
+      ]
+    },
+    {
+      "page": "follow",
+      "scenario": "v350-delivery-results",
+      "width": 375,
+      "file": "follow-v350-delivery-results-375.html",
+      "tabPage": true,
+      "navigationHidden": false,
+      "previewDate": "2026-10-30T07:00:00.000Z",
+      "pickerSheet": false,
+      "fixture": {
+        "pages": [
+          "follow",
+          "deadlines"
+        ],
+        "enabled": true,
+        "statuses": [
+          "accepted",
+          "uncertain",
+          "missed"
+        ]
+      },
+      "expectedText": [
+        "我的小哨",
+        "免费试用",
+        "苹果库存",
+        "查询库存",
+        "视频会员续费",
+        "发送结果待确认"
+      ],
+      "forbiddenText": [
+        "全网比价",
+        "任意链接都能监控",
+        "微信消息已送达",
+        "下一次计划提醒"
+      ]
+    },
+    {
+      "page": "follow",
+      "scenario": "v350-delivery-results",
+      "width": 430,
+      "file": "follow-v350-delivery-results-430.html",
+      "tabPage": true,
+      "navigationHidden": false,
+      "previewDate": "2026-10-30T07:00:00.000Z",
+      "pickerSheet": false,
+      "fixture": {
+        "pages": [
+          "follow",
+          "deadlines"
+        ],
+        "enabled": true,
+        "statuses": [
+          "accepted",
+          "uncertain",
+          "missed"
+        ]
+      },
+      "expectedText": [
+        "我的小哨",
+        "免费试用",
+        "苹果库存",
+        "查询库存",
+        "视频会员续费",
+        "发送结果待确认"
+      ],
+      "forbiddenText": [
+        "全网比价",
+        "任意链接都能监控",
+        "微信消息已送达",
+        "下一次计划提醒"
+      ]
+    },
+    {
+      "page": "deadlines",
+      "scenario": "v350-delivery-results",
+      "width": 320,
+      "file": "deadlines-v350-delivery-results-320.html",
+      "tabPage": false,
+      "navigationHidden": false,
+      "previewDate": "2026-10-30T07:00:00.000Z",
+      "pickerSheet": false,
+      "fixture": {
+        "pages": [
+          "follow",
+          "deadlines"
+        ],
+        "enabled": true,
+        "statuses": [
+          "accepted",
+          "uncertain",
+          "missed"
+        ]
+      },
+      "expectedText": [
+        "到期提醒",
+        "免费试用",
+        "周末优惠券",
+        "微信已受理",
+        "已错过提醒时间",
+        "发送结果待确认"
+      ],
+      "forbiddenText": [
+        "全网比价",
+        "任意链接都能监控",
+        "微信消息已送达",
+        "下一次计划提醒"
+      ]
+    },
+    {
+      "page": "deadlines",
+      "scenario": "v350-delivery-results",
+      "width": 375,
+      "file": "deadlines-v350-delivery-results-375.html",
+      "tabPage": false,
+      "navigationHidden": false,
+      "previewDate": "2026-10-30T07:00:00.000Z",
+      "pickerSheet": false,
+      "fixture": {
+        "pages": [
+          "follow",
+          "deadlines"
+        ],
+        "enabled": true,
+        "statuses": [
+          "accepted",
+          "uncertain",
+          "missed"
+        ]
+      },
+      "expectedText": [
+        "到期提醒",
+        "免费试用",
+        "周末优惠券",
+        "微信已受理",
+        "已错过提醒时间",
+        "发送结果待确认"
+      ],
+      "forbiddenText": [
+        "全网比价",
+        "任意链接都能监控",
+        "微信消息已送达",
+        "下一次计划提醒"
+      ]
+    },
+    {
+      "page": "deadlines",
+      "scenario": "v350-delivery-results",
+      "width": 430,
+      "file": "deadlines-v350-delivery-results-430.html",
+      "tabPage": false,
+      "navigationHidden": false,
+      "previewDate": "2026-10-30T07:00:00.000Z",
+      "pickerSheet": false,
+      "fixture": {
+        "pages": [
+          "follow",
+          "deadlines"
+        ],
+        "enabled": true,
+        "statuses": [
+          "accepted",
+          "uncertain",
+          "missed"
+        ]
+      },
+      "expectedText": [
+        "到期提醒",
+        "免费试用",
+        "周末优惠券",
+        "微信已受理",
+        "已错过提醒时间",
+        "发送结果待确认"
+      ],
+      "forbiddenText": [
+        "全网比价",
+        "任意链接都能监控",
+        "微信消息已送达",
+        "下一次计划提醒"
+      ]
+    },
+    {
+      "page": "follow",
+      "scenario": "v350-read-error",
+      "width": 320,
+      "file": "follow-v350-read-error-320.html",
+      "tabPage": true,
+      "navigationHidden": false,
+      "previewDate": "2026-10-30T07:00:00.000Z",
+      "pickerSheet": false,
+      "fixture": {
+        "pages": [
+          "follow",
+          "deadlines"
+        ],
+        "error": true
+      },
+      "expectedText": [
+        "我的小哨",
+        "免费试用",
+        "苹果库存",
+        "查询库存",
+        "模拟错误：到期事项暂未读取成功"
+      ],
+      "forbiddenText": [
+        "全网比价",
+        "任意链接都能监控",
+        "微信消息已送达",
+        "下一次计划提醒"
+      ]
+    },
+    {
+      "page": "follow",
+      "scenario": "v350-read-error",
+      "width": 375,
+      "file": "follow-v350-read-error-375.html",
+      "tabPage": true,
+      "navigationHidden": false,
+      "previewDate": "2026-10-30T07:00:00.000Z",
+      "pickerSheet": false,
+      "fixture": {
+        "pages": [
+          "follow",
+          "deadlines"
+        ],
+        "error": true
+      },
+      "expectedText": [
+        "我的小哨",
+        "免费试用",
+        "苹果库存",
+        "查询库存",
+        "模拟错误：到期事项暂未读取成功"
+      ],
+      "forbiddenText": [
+        "全网比价",
+        "任意链接都能监控",
+        "微信消息已送达",
+        "下一次计划提醒"
+      ]
+    },
+    {
+      "page": "follow",
+      "scenario": "v350-read-error",
+      "width": 430,
+      "file": "follow-v350-read-error-430.html",
+      "tabPage": true,
+      "navigationHidden": false,
+      "previewDate": "2026-10-30T07:00:00.000Z",
+      "pickerSheet": false,
+      "fixture": {
+        "pages": [
+          "follow",
+          "deadlines"
+        ],
+        "error": true
+      },
+      "expectedText": [
+        "我的小哨",
+        "免费试用",
+        "苹果库存",
+        "查询库存",
+        "模拟错误：到期事项暂未读取成功"
+      ],
+      "forbiddenText": [
+        "全网比价",
+        "任意链接都能监控",
+        "微信消息已送达",
+        "下一次计划提醒"
+      ]
+    },
+    {
+      "page": "deadlines",
+      "scenario": "v350-read-error",
+      "width": 320,
+      "file": "deadlines-v350-read-error-320.html",
+      "tabPage": false,
+      "navigationHidden": false,
+      "previewDate": "2026-10-30T07:00:00.000Z",
+      "pickerSheet": false,
+      "fixture": {
+        "pages": [
+          "follow",
+          "deadlines"
+        ],
+        "error": true
+      },
+      "expectedText": [
+        "到期提醒",
+        "免费试用",
+        "模拟错误：到期事项暂未读取成功"
+      ],
+      "forbiddenText": [
+        "全网比价",
+        "任意链接都能监控",
+        "微信消息已送达",
+        "下一次计划提醒"
+      ]
+    },
+    {
+      "page": "deadlines",
+      "scenario": "v350-read-error",
+      "width": 375,
+      "file": "deadlines-v350-read-error-375.html",
+      "tabPage": false,
+      "navigationHidden": false,
+      "previewDate": "2026-10-30T07:00:00.000Z",
+      "pickerSheet": false,
+      "fixture": {
+        "pages": [
+          "follow",
+          "deadlines"
+        ],
+        "error": true
+      },
+      "expectedText": [
+        "到期提醒",
+        "免费试用",
+        "模拟错误：到期事项暂未读取成功"
+      ],
+      "forbiddenText": [
+        "全网比价",
+        "任意链接都能监控",
+        "微信消息已送达",
+        "下一次计划提醒"
+      ]
+    },
+    {
+      "page": "deadlines",
+      "scenario": "v350-read-error",
+      "width": 430,
+      "file": "deadlines-v350-read-error-430.html",
+      "tabPage": false,
+      "navigationHidden": false,
+      "previewDate": "2026-10-30T07:00:00.000Z",
+      "pickerSheet": false,
+      "fixture": {
+        "pages": [
+          "follow",
+          "deadlines"
+        ],
+        "error": true
+      },
+      "expectedText": [
+        "到期提醒",
+        "免费试用",
+        "模拟错误：到期事项暂未读取成功"
+      ],
+      "forbiddenText": [
+        "全网比价",
+        "任意链接都能监控",
+        "微信消息已送达",
+        "下一次计划提醒"
+      ]
+    },
+    {
+      "page": "follow",
+      "scenario": "v350-apple-error",
+      "width": 320,
+      "file": "follow-v350-apple-error-320.html",
+      "tabPage": true,
+      "navigationHidden": false,
+      "previewDate": "2026-10-30T07:00:00.000Z",
+      "pickerSheet": false,
+      "fixture": {
+        "pages": [
+          "follow"
+        ],
+        "enabled": true,
+        "status": "scheduled",
+        "appleError": true
+      },
+      "expectedText": [
+        "我的小哨",
+        "免费试用",
+        "苹果库存",
+        "查询库存",
+        "周末优惠券",
+        "已安排提醒",
+        "后台记录暂未更新",
+        "管理到期提醒"
+      ],
+      "forbiddenText": [
+        "全网比价",
+        "任意链接都能监控",
+        "微信消息已送达"
+      ]
+    },
+    {
+      "page": "follow",
+      "scenario": "v350-apple-error",
+      "width": 375,
+      "file": "follow-v350-apple-error-375.html",
+      "tabPage": true,
+      "navigationHidden": false,
+      "previewDate": "2026-10-30T07:00:00.000Z",
+      "pickerSheet": false,
+      "fixture": {
+        "pages": [
+          "follow"
+        ],
+        "enabled": true,
+        "status": "scheduled",
+        "appleError": true
+      },
+      "expectedText": [
+        "我的小哨",
+        "免费试用",
+        "苹果库存",
+        "查询库存",
+        "周末优惠券",
+        "已安排提醒",
+        "后台记录暂未更新",
+        "管理到期提醒"
+      ],
+      "forbiddenText": [
+        "全网比价",
+        "任意链接都能监控",
+        "微信消息已送达"
+      ]
+    },
+    {
+      "page": "follow",
+      "scenario": "v350-apple-error",
+      "width": 430,
+      "file": "follow-v350-apple-error-430.html",
+      "tabPage": true,
+      "navigationHidden": false,
+      "previewDate": "2026-10-30T07:00:00.000Z",
+      "pickerSheet": false,
+      "fixture": {
+        "pages": [
+          "follow"
+        ],
+        "enabled": true,
+        "status": "scheduled",
+        "appleError": true
+      },
+      "expectedText": [
+        "我的小哨",
+        "免费试用",
+        "苹果库存",
+        "查询库存",
+        "周末优惠券",
+        "已安排提醒",
+        "后台记录暂未更新",
+        "管理到期提醒"
+      ],
+      "forbiddenText": [
+        "全网比价",
+        "任意链接都能监控",
+        "微信消息已送达"
+      ]
+    },
+    {
+      "page": "deadlines",
+      "scenario": "v350-editor",
+      "width": 320,
+      "file": "deadlines-v350-editor-320.html",
+      "tabPage": false,
+      "navigationHidden": true,
+      "previewDate": "2026-10-30T07:00:00.000Z",
+      "pickerSheet": false,
+      "fixture": {
+        "pages": [
+          "deadlines"
+        ],
+        "enabled": true,
+        "empty": true,
+        "editor": true
+      },
+      "expectedText": [
+        "到期提醒",
+        "免费试用",
+        "事项名称",
+        "到期日期",
+        "提前几天",
+        "提醒时刻",
+        "2026-11-12 09:00",
+        "保存事项"
+      ],
+      "forbiddenText": [
+        "全网比价",
+        "任意链接都能监控",
+        "微信消息已送达",
+        "下一次计划提醒"
+      ]
+    },
+    {
+      "page": "deadlines",
+      "scenario": "v350-editor",
+      "width": 375,
+      "file": "deadlines-v350-editor-375.html",
+      "tabPage": false,
+      "navigationHidden": true,
+      "previewDate": "2026-10-30T07:00:00.000Z",
+      "pickerSheet": false,
+      "fixture": {
+        "pages": [
+          "deadlines"
+        ],
+        "enabled": true,
+        "empty": true,
+        "editor": true
+      },
+      "expectedText": [
+        "到期提醒",
+        "免费试用",
+        "事项名称",
+        "到期日期",
+        "提前几天",
+        "提醒时刻",
+        "2026-11-12 09:00",
+        "保存事项"
+      ],
+      "forbiddenText": [
+        "全网比价",
+        "任意链接都能监控",
+        "微信消息已送达",
+        "下一次计划提醒"
+      ]
+    },
+    {
+      "page": "deadlines",
+      "scenario": "v350-editor",
+      "width": 430,
+      "file": "deadlines-v350-editor-430.html",
+      "tabPage": false,
+      "navigationHidden": true,
+      "previewDate": "2026-10-30T07:00:00.000Z",
+      "pickerSheet": false,
+      "fixture": {
+        "pages": [
+          "deadlines"
+        ],
+        "enabled": true,
+        "empty": true,
+        "editor": true
+      },
+      "expectedText": [
+        "到期提醒",
+        "免费试用",
+        "事项名称",
+        "到期日期",
+        "提前几天",
+        "提醒时刻",
+        "2026-11-12 09:00",
+        "保存事项"
+      ],
+      "forbiddenText": [
+        "全网比价",
+        "任意链接都能监控",
+        "微信消息已送达",
+        "下一次计划提醒"
+      ]
+    },
+    {
+      "page": "deadlines",
+      "scenario": "v350-editor-empty",
+      "width": 320,
+      "file": "deadlines-v350-editor-empty-320.html",
+      "tabPage": false,
+      "navigationHidden": true,
+      "previewDate": "2026-10-30T07:00:00.000Z",
+      "pickerSheet": false,
+      "fixture": {
+        "pages": [
+          "deadlines"
+        ],
+        "enabled": true,
+        "empty": true,
+        "editor": true,
+        "blank": true
+      },
+      "expectedText": [
+        "到期提醒",
+        "免费试用",
+        "事项名称",
+        "到期日期",
+        "提前几天",
+        "提醒时刻",
+        "保存事项"
+      ],
+      "forbiddenText": [
+        "全网比价",
+        "任意链接都能监控",
+        "微信消息已送达",
+        "下一次计划提醒"
+      ]
+    },
+    {
+      "page": "deadlines",
+      "scenario": "v350-editor-empty",
+      "width": 375,
+      "file": "deadlines-v350-editor-empty-375.html",
+      "tabPage": false,
+      "navigationHidden": true,
+      "previewDate": "2026-10-30T07:00:00.000Z",
+      "pickerSheet": false,
+      "fixture": {
+        "pages": [
+          "deadlines"
+        ],
+        "enabled": true,
+        "empty": true,
+        "editor": true,
+        "blank": true
+      },
+      "expectedText": [
+        "到期提醒",
+        "免费试用",
+        "事项名称",
+        "到期日期",
+        "提前几天",
+        "提醒时刻",
+        "保存事项"
+      ],
+      "forbiddenText": [
+        "全网比价",
+        "任意链接都能监控",
+        "微信消息已送达",
+        "下一次计划提醒"
+      ]
+    },
+    {
+      "page": "deadlines",
+      "scenario": "v350-editor-empty",
+      "width": 430,
+      "file": "deadlines-v350-editor-empty-430.html",
+      "tabPage": false,
+      "navigationHidden": true,
+      "previewDate": "2026-10-30T07:00:00.000Z",
+      "pickerSheet": false,
+      "fixture": {
+        "pages": [
+          "deadlines"
+        ],
+        "enabled": true,
+        "empty": true,
+        "editor": true,
+        "blank": true
+      },
+      "expectedText": [
+        "到期提醒",
+        "免费试用",
+        "事项名称",
+        "到期日期",
+        "提前几天",
+        "提醒时刻",
+        "保存事项"
+      ],
+      "forbiddenText": [
+        "全网比价",
+        "任意链接都能监控",
+        "微信消息已送达",
+        "下一次计划提醒"
+      ]
+    },
+    {
+      "page": "deadlines",
+      "scenario": "v350-saving",
+      "width": 320,
+      "file": "deadlines-v350-saving-320.html",
+      "tabPage": false,
+      "navigationHidden": true,
+      "previewDate": "2026-10-30T07:00:00.000Z",
+      "pickerSheet": false,
+      "fixture": {
+        "pages": [
+          "deadlines"
+        ],
+        "enabled": true,
+        "empty": true,
+        "editor": true,
+        "saving": true
+      },
+      "expectedText": [
+        "到期提醒",
+        "免费试用",
+        "事项名称",
+        "到期日期",
+        "提前几天",
+        "提醒时刻",
+        "2026-11-12 09:00",
+        "保存中"
+      ],
+      "forbiddenText": [
+        "全网比价",
+        "任意链接都能监控",
+        "微信消息已送达",
+        "原操作尚待确认",
+        "确认原保存结果",
+        "下一次计划提醒"
+      ]
+    },
+    {
+      "page": "deadlines",
+      "scenario": "v350-saving",
+      "width": 375,
+      "file": "deadlines-v350-saving-375.html",
+      "tabPage": false,
+      "navigationHidden": true,
+      "previewDate": "2026-10-30T07:00:00.000Z",
+      "pickerSheet": false,
+      "fixture": {
+        "pages": [
+          "deadlines"
+        ],
+        "enabled": true,
+        "empty": true,
+        "editor": true,
+        "saving": true
+      },
+      "expectedText": [
+        "到期提醒",
+        "免费试用",
+        "事项名称",
+        "到期日期",
+        "提前几天",
+        "提醒时刻",
+        "2026-11-12 09:00",
+        "保存中"
+      ],
+      "forbiddenText": [
+        "全网比价",
+        "任意链接都能监控",
+        "微信消息已送达",
+        "原操作尚待确认",
+        "确认原保存结果",
+        "下一次计划提醒"
+      ]
+    },
+    {
+      "page": "deadlines",
+      "scenario": "v350-saving",
+      "width": 430,
+      "file": "deadlines-v350-saving-430.html",
+      "tabPage": false,
+      "navigationHidden": true,
+      "previewDate": "2026-10-30T07:00:00.000Z",
+      "pickerSheet": false,
+      "fixture": {
+        "pages": [
+          "deadlines"
+        ],
+        "enabled": true,
+        "empty": true,
+        "editor": true,
+        "saving": true
+      },
+      "expectedText": [
+        "到期提醒",
+        "免费试用",
+        "事项名称",
+        "到期日期",
+        "提前几天",
+        "提醒时刻",
+        "2026-11-12 09:00",
+        "保存中"
+      ],
+      "forbiddenText": [
+        "全网比价",
+        "任意链接都能监控",
+        "微信消息已送达",
+        "原操作尚待确认",
+        "确认原保存结果",
+        "下一次计划提醒"
+      ]
+    },
+    {
+      "page": "deadlines",
+      "scenario": "v350-save-error",
+      "width": 320,
+      "file": "deadlines-v350-save-error-320.html",
+      "tabPage": false,
+      "navigationHidden": true,
+      "previewDate": "2026-10-30T07:00:00.000Z",
+      "pickerSheet": false,
+      "fixture": {
+        "pages": [
+          "deadlines"
+        ],
+        "enabled": true,
+        "empty": true,
+        "editor": true,
+        "saveError": true
+      },
+      "expectedText": [
+        "到期提醒",
+        "免费试用",
+        "事项名称",
+        "到期日期",
+        "提前几天",
+        "提醒时刻",
+        "2026-11-12 09:00",
+        "保存事项",
+        "操作结果尚未确认",
+        "确认原保存结果"
+      ],
+      "forbiddenText": [
+        "全网比价",
+        "任意链接都能监控",
+        "微信消息已送达",
+        "下一次计划提醒"
+      ]
+    },
+    {
+      "page": "deadlines",
+      "scenario": "v350-save-error",
+      "width": 375,
+      "file": "deadlines-v350-save-error-375.html",
+      "tabPage": false,
+      "navigationHidden": true,
+      "previewDate": "2026-10-30T07:00:00.000Z",
+      "pickerSheet": false,
+      "fixture": {
+        "pages": [
+          "deadlines"
+        ],
+        "enabled": true,
+        "empty": true,
+        "editor": true,
+        "saveError": true
+      },
+      "expectedText": [
+        "到期提醒",
+        "免费试用",
+        "事项名称",
+        "到期日期",
+        "提前几天",
+        "提醒时刻",
+        "2026-11-12 09:00",
+        "保存事项",
+        "操作结果尚未确认",
+        "确认原保存结果"
+      ],
+      "forbiddenText": [
+        "全网比价",
+        "任意链接都能监控",
+        "微信消息已送达",
+        "下一次计划提醒"
+      ]
+    },
+    {
+      "page": "deadlines",
+      "scenario": "v350-save-error",
+      "width": 430,
+      "file": "deadlines-v350-save-error-430.html",
+      "tabPage": false,
+      "navigationHidden": true,
+      "previewDate": "2026-10-30T07:00:00.000Z",
+      "pickerSheet": false,
+      "fixture": {
+        "pages": [
+          "deadlines"
+        ],
+        "enabled": true,
+        "empty": true,
+        "editor": true,
+        "saveError": true
+      },
+      "expectedText": [
+        "到期提醒",
+        "免费试用",
+        "事项名称",
+        "到期日期",
+        "提前几天",
+        "提醒时刻",
+        "2026-11-12 09:00",
+        "保存事项",
+        "操作结果尚未确认",
+        "确认原保存结果"
+      ],
+      "forbiddenText": [
+        "全网比价",
+        "任意链接都能监控",
+        "微信消息已送达",
+        "下一次计划提醒"
+      ]
+    },
+    {
+      "page": "deadlines",
+      "scenario": "v350-edit-conflict",
+      "width": 320,
+      "file": "deadlines-v350-edit-conflict-320.html",
+      "tabPage": false,
+      "navigationHidden": true,
+      "previewDate": "2026-10-30T07:00:00.000Z",
+      "pickerSheet": false,
+      "fixture": {
+        "pages": [
+          "deadlines"
+        ],
+        "enabled": true,
+        "status": "scheduled",
+        "editor": true,
+        "conflict": true
+      },
+      "expectedText": [
+        "到期提醒",
+        "免费试用",
+        "事项名称",
+        "到期日期",
+        "提前几天",
+        "提醒时刻",
+        "2026-11-12 09:00",
+        "保存事项",
+        "草稿仍保留",
+        "用最新内容替换草稿"
+      ],
+      "forbiddenText": [
+        "全网比价",
+        "任意链接都能监控",
+        "微信消息已送达"
+      ]
+    },
+    {
+      "page": "deadlines",
+      "scenario": "v350-edit-conflict",
+      "width": 375,
+      "file": "deadlines-v350-edit-conflict-375.html",
+      "tabPage": false,
+      "navigationHidden": true,
+      "previewDate": "2026-10-30T07:00:00.000Z",
+      "pickerSheet": false,
+      "fixture": {
+        "pages": [
+          "deadlines"
+        ],
+        "enabled": true,
+        "status": "scheduled",
+        "editor": true,
+        "conflict": true
+      },
+      "expectedText": [
+        "到期提醒",
+        "免费试用",
+        "事项名称",
+        "到期日期",
+        "提前几天",
+        "提醒时刻",
+        "2026-11-12 09:00",
+        "保存事项",
+        "草稿仍保留",
+        "用最新内容替换草稿"
+      ],
+      "forbiddenText": [
+        "全网比价",
+        "任意链接都能监控",
+        "微信消息已送达"
+      ]
+    },
+    {
+      "page": "deadlines",
+      "scenario": "v350-edit-conflict",
+      "width": 430,
+      "file": "deadlines-v350-edit-conflict-430.html",
+      "tabPage": false,
+      "navigationHidden": true,
+      "previewDate": "2026-10-30T07:00:00.000Z",
+      "pickerSheet": false,
+      "fixture": {
+        "pages": [
+          "deadlines"
+        ],
+        "enabled": true,
+        "status": "scheduled",
+        "editor": true,
+        "conflict": true
+      },
+      "expectedText": [
+        "到期提醒",
+        "免费试用",
+        "事项名称",
+        "到期日期",
+        "提前几天",
+        "提醒时刻",
+        "2026-11-12 09:00",
+        "保存事项",
+        "草稿仍保留",
+        "用最新内容替换草稿"
+      ],
+      "forbiddenText": [
+        "全网比价",
+        "任意链接都能监控",
+        "微信消息已送达"
+      ]
+    },
+    {
+      "page": "follow",
+      "scenario": "v350-longcontent",
+      "width": 320,
+      "file": "follow-v350-longcontent-320.html",
+      "tabPage": true,
+      "navigationHidden": false,
+      "previewDate": "2026-10-30T07:00:00.000Z",
+      "pickerSheet": false,
+      "fixture": {
+        "pages": [
+          "follow",
+          "deadlines"
+        ],
+        "enabled": true,
+        "status": "scheduled",
+        "long": true
+      },
+      "expectedText": [
+        "我的小哨",
+        "免费试用",
+        "苹果库存",
+        "查询库存",
+        "家庭共享视频会员续费与跨设备权益确认提醒ABCDEFGHIJK",
+        "已安排提醒"
+      ],
+      "forbiddenText": [
+        "全网比价",
+        "任意链接都能监控",
+        "微信消息已送达"
+      ]
+    },
+    {
+      "page": "follow",
+      "scenario": "v350-longcontent",
+      "width": 375,
+      "file": "follow-v350-longcontent-375.html",
+      "tabPage": true,
+      "navigationHidden": false,
+      "previewDate": "2026-10-30T07:00:00.000Z",
+      "pickerSheet": false,
+      "fixture": {
+        "pages": [
+          "follow",
+          "deadlines"
+        ],
+        "enabled": true,
+        "status": "scheduled",
+        "long": true
+      },
+      "expectedText": [
+        "我的小哨",
+        "免费试用",
+        "苹果库存",
+        "查询库存",
+        "家庭共享视频会员续费与跨设备权益确认提醒ABCDEFGHIJK",
+        "已安排提醒"
+      ],
+      "forbiddenText": [
+        "全网比价",
+        "任意链接都能监控",
+        "微信消息已送达"
+      ]
+    },
+    {
+      "page": "follow",
+      "scenario": "v350-longcontent",
+      "width": 430,
+      "file": "follow-v350-longcontent-430.html",
+      "tabPage": true,
+      "navigationHidden": false,
+      "previewDate": "2026-10-30T07:00:00.000Z",
+      "pickerSheet": false,
+      "fixture": {
+        "pages": [
+          "follow",
+          "deadlines"
+        ],
+        "enabled": true,
+        "status": "scheduled",
+        "long": true
+      },
+      "expectedText": [
+        "我的小哨",
+        "免费试用",
+        "苹果库存",
+        "查询库存",
+        "家庭共享视频会员续费与跨设备权益确认提醒ABCDEFGHIJK",
+        "已安排提醒"
+      ],
+      "forbiddenText": [
+        "全网比价",
+        "任意链接都能监控",
+        "微信消息已送达"
+      ]
+    },
+    {
+      "page": "deadlines",
+      "scenario": "v350-longcontent",
+      "width": 320,
+      "file": "deadlines-v350-longcontent-320.html",
+      "tabPage": false,
+      "navigationHidden": false,
+      "previewDate": "2026-10-30T07:00:00.000Z",
+      "pickerSheet": false,
+      "fixture": {
+        "pages": [
+          "follow",
+          "deadlines"
+        ],
+        "enabled": true,
+        "status": "scheduled",
+        "long": true
+      },
+      "expectedText": [
+        "到期提醒",
+        "免费试用",
+        "家庭共享视频会员续费与跨设备权益确认提醒ABCDEFGHIJK",
+        "已安排提醒"
+      ],
+      "forbiddenText": [
+        "全网比价",
+        "任意链接都能监控",
+        "微信消息已送达"
+      ]
+    },
+    {
+      "page": "deadlines",
+      "scenario": "v350-longcontent",
+      "width": 375,
+      "file": "deadlines-v350-longcontent-375.html",
+      "tabPage": false,
+      "navigationHidden": false,
+      "previewDate": "2026-10-30T07:00:00.000Z",
+      "pickerSheet": false,
+      "fixture": {
+        "pages": [
+          "follow",
+          "deadlines"
+        ],
+        "enabled": true,
+        "status": "scheduled",
+        "long": true
+      },
+      "expectedText": [
+        "到期提醒",
+        "免费试用",
+        "家庭共享视频会员续费与跨设备权益确认提醒ABCDEFGHIJK",
+        "已安排提醒"
+      ],
+      "forbiddenText": [
+        "全网比价",
+        "任意链接都能监控",
+        "微信消息已送达"
+      ]
+    },
+    {
+      "page": "deadlines",
+      "scenario": "v350-longcontent",
+      "width": 430,
+      "file": "deadlines-v350-longcontent-430.html",
+      "tabPage": false,
+      "navigationHidden": false,
+      "previewDate": "2026-10-30T07:00:00.000Z",
+      "pickerSheet": false,
+      "fixture": {
+        "pages": [
+          "follow",
+          "deadlines"
+        ],
+        "enabled": true,
+        "status": "scheduled",
+        "long": true
+      },
+      "expectedText": [
+        "到期提醒",
+        "免费试用",
+        "家庭共享视频会员续费与跨设备权益确认提醒ABCDEFGHIJK",
+        "已安排提醒"
+      ],
+      "forbiddenText": [
+        "全网比价",
+        "任意链接都能监控",
+        "微信消息已送达"
+      ]
+    }
+  ]
+}

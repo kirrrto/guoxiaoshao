@@ -230,7 +230,7 @@ function indexCatalog(raw) {
     // repeat each product, so provenance/unused upstream metadata can exceed
     // WeChat's one-update payload limit when images are added.
     const product = {};
-    for (const key of ['partNumber', 'category', 'familyKey', 'familyName', 'model', 'title', 'attributes', 'priceCny', 'comingSoon', 'supported', 'verificationStatus', 'imageUrl', 'imageAlt']) {
+    for (const key of ['partNumber', 'category', 'familyKey', 'familyName', 'model', 'title', 'attributes', 'priceCny', 'comingSoon', 'supported', 'querySupported', 'monitorSupported', 'targetType', 'verificationStatus', 'imageUrl', 'imageAlt']) {
       if (source[key] !== undefined) product[key] = source[key];
     }
     const fallback = !product.imageUrl && getProductImages()[product.partNumber];

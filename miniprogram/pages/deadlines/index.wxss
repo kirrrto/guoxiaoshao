@@ -1,0 +1,31 @@
+@import "../../styles/common.wxss";
+.deadline-page { padding-bottom: calc(32px + env(safe-area-inset-bottom)); font-size: max(14px, 28rpx); }
+.deadline-page .loading-line, .deadline-page .banner { font-size: max(13px, 26rpx); }
+.deadline-page .page-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+.deadline-page .page-title { font-size: 24px; font-weight: 600; }
+.deadline-intro { color: var(--text-2); font-size: 14px; line-height: 1.6; margin-bottom: 20px; }
+.deadline-page .btn { min-height: 44px; height: auto; line-height: 1.5; padding-top: 12px; padding-bottom: 12px; font-size: max(14px, 28rpx); }
+.deadline-page .ui-action { min-height: 44px; min-width: 64px; font-size: max(13px, 26rpx); }
+.deadline-service-note, .deadline-feedback { margin-bottom: 16px; font-size: 14px; line-height: 1.6; }
+.deadline-feedback { color: var(--green-dark); }
+.deadline-editor { margin-top: 16px; }
+.deadline-field { margin-bottom: 18px; }
+.deadline-label { display: block; font-size: 14px; color: var(--text-2); margin-bottom: 6px; }
+.deadline-input, .deadline-picker { background: var(--surface-soft); border: 1px solid var(--line); border-radius: 10px; min-height: 48px; font-size: 16px; color: var(--text); padding: 0 12px; }
+.deadline-input { height: 48px; box-sizing: border-box; width: 100%; }
+.deadline-placeholder { color: var(--text-3); }
+.deadline-picker { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.deadline-preview { font-size: 14px; color: var(--text); margin: 20px 0 8px; line-height: 1.6; overflow-wrap: anywhere; }
+.deadline-add { margin: 16px 0 26px; }
+.deadline-list-heading { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin: 24px 0 12px; }
+.deadline-empty { padding: 16px 0; color: var(--text-2); font-size: 15px; line-height: 1.8; }
+.deadline-item-title { font-size: 18px; font-weight: 600; line-height: 1.5; overflow-wrap: anywhere; word-break: break-all; }
+.deadline-item-date, .deadline-item-plan { font-size: 14px; color: var(--text-2); margin-top: 8px; line-height: 1.6; }
+.deadline-status { font-size: 14px; font-weight: 600; margin: 16px 0 6px; }
+.deadline-status--ok { color: var(--green-dark); }
+.deadline-status--warn { color: var(--warn); }
+.deadline-status--bad { color: var(--bad); }
+.deadline-status--muted { color: var(--text-2); }
+.deadline-item-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 12px; padding-top: 8px; border-top: 1px solid var(--line); }
+.deadline-page button[disabled] { opacity: 0.6; }
+.deadline-page .text-bad { color: var(--bad); }

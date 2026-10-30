@@ -6,8 +6,8 @@
   "entryFiles": [
     {
       "path": "index.js",
-      "bytes": 2692,
-      "sha256": "765646e03ab9ee815de663e3ab1d6f0d08ab363541f5af5f0f1c820ad62aa18f"
+      "bytes": 3318,
+      "sha256": "947ae9f3fe165c5cb1a35c09a257ad7db1386ca269e0e3aafcf12c17dcfbfc22"
     }
   ],
   "external": [
@@ -18,13 +18,13 @@
   "files": [
     {
       "path": "apple-pickup.js",
-      "bytes": 8259,
-      "sha256": "dbd35fb494a68c82358c3c3a4f4e7e0de141e162d061c5e7f31b29c539a0cfed"
+      "bytes": 10396,
+      "sha256": "514d19a88bf54be2f014d60fb880fe2ad104b7d6ad16f4c871d4e01a9f730260"
     },
     {
       "path": "collections.js",
-      "bytes": 4673,
-      "sha256": "88f844aca3d1f6923d637b651fb5df9e5341f523f9c40e1e73f0e399ee500a71"
+      "bytes": 5048,
+      "sha256": "7448ccbaf4715beafc7647293734108112457b2811d00fb6a8a870dd438295f3"
     },
     {
       "path": "config-audit.js",
@@ -33,13 +33,18 @@
     },
     {
       "path": "config.js",
-      "bytes": 19482,
-      "sha256": "9fb4a34e4b4f93d034938830b21fbce8ae76e9d7c5002cff8813a223e704c91d"
+      "bytes": 22638,
+      "sha256": "a1ba7d10daf8ae4cb4093bf95a4052db20f7889539549e206b7324c73dcd263d"
     },
     {
       "path": "connection.js",
       "bytes": 539,
       "sha256": "8099a99c0454283891b5ca93e14c59e58f0b524d7a59d9543accf765fc57e694"
+    },
+    {
+      "path": "deadline.js",
+      "bytes": 5326,
+      "sha256": "d9a2ce26f50cc3f079e0e49805a61d173161803fcc7601cc0428ea4ff9a167ab"
     },
     {
       "path": "engine/capacity-budget.js",
@@ -48,13 +53,18 @@
     },
     {
       "path": "engine/collector.js",
-      "bytes": 29687,
-      "sha256": "dd44afbcaa1eabf83d86e474cd7c0afeaea5d41e2ce5333afe672a978daecb16"
+      "bytes": 30140,
+      "sha256": "876e9a32c241dd09215e34d60e61f7a0005933eccc4a0f970b4b95cd51d2ea3e"
     },
     {
       "path": "engine/current-availability.js",
       "bytes": 1600,
       "sha256": "be993d1f6a77b58ec3601f5e18633f1c5810c86c636b41a94784020b4701b7ef"
+    },
+    {
+      "path": "engine/deadline.js",
+      "bytes": 5014,
+      "sha256": "5fb7d5ed550846d0d10d55fd1bb07f9b44c7deabb10bf0f398ec4b4891a32137"
     },
     {
       "path": "engine/events.js",
@@ -63,8 +73,8 @@
     },
     {
       "path": "engine/guarded-pickup.js",
-      "bytes": 4140,
-      "sha256": "59875e168d36bfd77549316ee4cf5e4fc90368669859fc6b0b6e603ae331bd13"
+      "bytes": 4373,
+      "sha256": "910763f2fcc435be156b038d7e9a1b8802e47029df5787c90e3bca8f84db1de1"
     },
     {
       "path": "engine/lease.js",
@@ -103,13 +113,13 @@
     },
     {
       "path": "engine/scheduler.js",
-      "bytes": 29479,
-      "sha256": "81f16542f824c80ab525c0bb2028835042db2ab58bda61cd3b2f201734052a11"
+      "bytes": 29711,
+      "sha256": "6d2a1511e0f452353010072aa9cdd9def5f9c7ec4bd64facc91d2ab467d99ace"
     },
     {
       "path": "engine/wechat-sender.js",
-      "bytes": 5693,
-      "sha256": "b511e7f41b16a8e5c3f88f4b4b3780ac41662c6a24f2ec5b51a00e363640bb76"
+      "bytes": 5893,
+      "sha256": "70bebbe449d7020d24ed5951ee6d912fd5220ef476df4eb82b52c5cd1db7edd3"
     },
     {
       "path": "errors.js",
@@ -143,18 +153,23 @@
     },
     {
       "path": "repo/atomic-ops.js",
-      "bytes": 53837,
-      "sha256": "bbcea37c67d2ae82426a7c22d8033bf64bdfc428a0a41aaaabf74a4ab23400f6"
+      "bytes": 53917,
+      "sha256": "6fcc122f93c592fb5059620e44506deaa57a6a35563f33209ac6b47cc0cb6754"
     },
     {
       "path": "repo/cloudbase-repo.js",
-      "bytes": 27976,
-      "sha256": "e9109620d2e23509c243cac80fdae03daad0f6bb91fb1b0edf2ba928661469cb"
+      "bytes": 28847,
+      "sha256": "92faa6250c568e1db81882b3e0fc65bce5a5c289688e0716ff5d2729bd236302"
     },
     {
       "path": "repo/current-availability.js",
       "bytes": 4113,
       "sha256": "d3c773f1b2b2bf5c92452387bde0195fe5a8bcd1810aa11e1a98e411534da985"
+    },
+    {
+      "path": "repo/deadline.js",
+      "bytes": 9712,
+      "sha256": "00c5d86d2fa0beb0300330adcf0465a5597145eb22e61f96c914634652895a68"
     },
     {
       "path": "repo/growth.js",
@@ -178,8 +193,8 @@
     },
     {
       "path": "repo/observation-storage.js",
-      "bytes": 15080,
-      "sha256": "af2a33d8a006ccd040c092d7ebc3a521605529f75161922c50f455f700cb8598"
+      "bytes": 15274,
+      "sha256": "545e5da5c02f749f1eec7bde38ed0c7c20a2a1cdb8caaa12686d9e2fe9f31aaa"
     },
     {
       "path": "repo/query-target.js",
@@ -198,8 +213,8 @@
     },
     {
       "path": "rules/access.js",
-      "bytes": 2351,
-      "sha256": "fe8e23d3b3413526fcdf5a3f7d2e1308c09f6e30a2840a30071d078e199c4388"
+      "bytes": 2406,
+      "sha256": "e3f4ee9b48b259b019f12c38a9ce0b816789911a1d9549e6b9ffc57dcbe1c911"
     },
     {
       "path": "rules/dnd.js",
@@ -235,6 +250,11 @@
       "path": "rules/new-product.js",
       "bytes": 1870,
       "sha256": "a5b57d59e52ba1190a4e97ce19903d680f83b8ede1ec7088bcc5bdd840cc490a"
+    },
+    {
+      "path": "rules/product-target.js",
+      "bytes": 3430,
+      "sha256": "20bd1389d78f8bf1497d1b87a5285c6cd6f4b730b92b77318ef8be4af97d39c2"
     },
     {
       "path": "rules/quota.js",

@@ -33,6 +33,15 @@ const DEFAULTS = Object.freeze({
   newProductWindows: [],
   features: Object.fromEntries(FEATURE_KEYS.map(key => [key, false])),
   growthExperiment: { id: 'contextual-checkout', assignmentVersion: 1, mode: 'off', feature: 'contextualCheckout', allocationPercent: 0 },
+  // Independent from stock templates and paid stock-follow entitlements.
+  // Enable only after configuring a template approved for this actual use case.
+  deadlineReminders: {
+    // 2026-10-30 consumer template「日历事件提醒」. Delivery remains off until
+    // the same-version cloud functions, consumer credentials and a real user
+    // authorization have each been verified.
+    enabled: false, templateId: 'ciI4JTu358s2e_TEPLgB-9g26_CrHGcVga9fdSKG68Y', miniprogramState: 'formal',
+    templateFields: { title: 'thing3', date: 'time2', time: 'time6', category: 'thing7', remark: 'thing5' },
+  },
   notifications: {
     enabled: false,
     templateIds: {},
@@ -86,7 +95,7 @@ const DEFAULTS = Object.freeze({
   notices: [],
 });
 
-const EDITABLE = new Set(['quota', 'tasks', 'memberProduct', 'memberPlans', 'virtualPayment', 'memberRedemption', 'newProductWindows', 'notifications', 'collector', 'query', 'adminUserKeys', 'announcement', 'notices', 'features', 'growthExperiment']);
+const EDITABLE = new Set(['quota', 'tasks', 'memberProduct', 'memberPlans', 'virtualPayment', 'memberRedemption', 'newProductWindows', 'notifications', 'collector', 'query', 'adminUserKeys', 'announcement', 'notices', 'features', 'growthExperiment', 'deadlineReminders']);
 
 // A template library number is not an ID. Do not guess a fixed ID length.
 function isValidTemplateId(value) {
@@ -105,6 +114,13 @@ function mergeConfig(stored) {
   merged.notifications = { ...merged.notifications,
     templateFields: { ...DEFAULTS.notifications.templateFields, ...(merged.notifications.templateFields || {}) },
     soldoutFields: { ...DEFAULTS.notifications.soldoutFields, ...(merged.notifications.soldoutFields || {}) } };
+  const deadlineFields = merged.deadlineReminders.templateFields;
+  merged.deadlineReminders = { ...merged.deadlineReminders,
+    // A stored template mapping is authoritative. Do not merge old slots into
+    // a newly selected template: a surplus keyword makes WeChat reject 47003.
+    templateFields: deadlineFields && typeof deadlineFields === 'object' && !Array.isArray(deadlineFields)
+      ? Object.fromEntries(['title', 'date', 'time', 'category', 'remark'].map(key => [key, typeof deadlineFields[key] === 'string' ? deadlineFields[key] : '']))
+      : { ...DEFAULTS.deadlineReminders.templateFields } };
   if (merged.memberPlans && typeof merged.memberPlans === 'object' && !Array.isArray(merged.memberPlans)) {
     merged.memberPlans = { ...merged.memberPlans };
     for (const id of Object.keys(DEFAULTS.memberPlans)) {
@@ -128,6 +144,7 @@ function patchConfig(stored, patch) {
       next[key] = { ...next[key], ...value };
       if (key === 'notifications' && value.templateFields) next[key].templateFields = { ...(stored.notifications && stored.notifications.templateFields || {}), ...value.templateFields };
       if (key === 'notifications' && value.soldoutFields) next[key].soldoutFields = { ...(stored.notifications && stored.notifications.soldoutFields || {}), ...value.soldoutFields };
+      if (key === 'deadlineReminders' && value.templateFields) next[key].templateFields = { ...(stored.deadlineReminders && stored.deadlineReminders.templateFields || {}), ...value.templateFields };
       if (key === 'memberPlans') for (const [id, mapping] of Object.entries(value)) {
         if (mapping && typeof mapping === 'object' && !Array.isArray(mapping)) next[key][id] = { ...(stored.memberPlans && stored.memberPlans[id] || {}), ...mapping };
       }
@@ -141,6 +158,22 @@ function patchConfig(stored, patch) {
 function validateConfig(config) {
   const invalid = (field) => { throw new ApiError('invalid_config', `配置项无效：${field}`); };
   const integer = (value, min, max, field) => { if (!Number.isSafeInteger(value) || value < min || value > max) invalid(field); };
+  const deadlines = config.deadlineReminders;
+  if (!deadlines || typeof deadlines !== 'object' || Array.isArray(deadlines)
+    || Object.keys(deadlines).some(key => !['enabled', 'templateId', 'templateFields', 'miniprogramState'].includes(key))) invalid('deadlineReminders');
+  if (typeof deadlines.enabled !== 'boolean') invalid('deadlineReminders.enabled');
+  if (!['formal', 'trial', 'developer'].includes(deadlines.miniprogramState)) invalid('deadlineReminders.miniprogramState');
+  if (deadlines.templateId !== '' && !isValidTemplateId(deadlines.templateId) || deadlines.enabled && !isValidTemplateId(deadlines.templateId)) invalid('deadlineReminders.templateId');
+  if (deadlines.templateId && Object.values(config.notifications && config.notifications.templateIds || {}).includes(deadlines.templateId)) invalid('deadlineReminders.templateId');
+  const deadlineFields = deadlines.templateFields;
+  if (!deadlineFields || typeof deadlineFields !== 'object' || Array.isArray(deadlineFields)
+    || Object.keys(deadlineFields).some(key => !['title', 'date', 'time', 'category', 'remark'].includes(key))) invalid('deadlineReminders.templateFields');
+  if (!/^thing\d+$/.test(deadlineFields.title) || !/^(?:date|time)\d+$/.test(deadlineFields.date)
+    || deadlineFields.time !== '' && !/^time\d+$/.test(deadlineFields.time)
+    || deadlineFields.category !== '' && !/^thing\d+$/.test(deadlineFields.category)
+    || deadlineFields.remark !== '' && !/^thing\d+$/.test(deadlineFields.remark)) invalid('deadlineReminders.templateFields');
+  const deadlineKeys = Object.values(deadlineFields).filter(Boolean);
+  if (new Set(deadlineKeys).size !== deadlineKeys.length) invalid('deadlineReminders.templateFields');
   if (!config.features || typeof config.features !== 'object' || Array.isArray(config.features)
     || Object.keys(config.features).some(key => !FEATURE_KEYS.includes(key))) invalid('features');
   for (const key of FEATURE_KEYS) if (typeof config.features[key] !== 'boolean') invalid(`features.${key}`);

@@ -19,6 +19,7 @@ const { targetKeyOf } = require('./events');
 const { AUTO_SHARE, DAY_MS } = require('./capacity-budget');
 const { observationHealth } = require('./observation-health');
 const { currentAvailabilityEvent } = require('./current-availability');
+const { isCtoPartNumber, canMonitorProduct } = require('../rules/product-target');
 
 const NOTIFICATION_RECONCILE_INTERVAL_MS = 30000;
 const NOTIFICATION_PLAN_PAGE_SIZE = 50;
@@ -329,10 +330,13 @@ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = cons
     config = mergeConfig(stored);
     const follows = (await repo.listActiveFollows()).filter(f => !isRetiredPartNumber(f.partNumber));
     const users = await loadFollowUsers(repo, follows, clock());
+    const ctoParts = [...new Set(follows.map(follow => follow.partNumber).filter(isCtoPartNumber))];
+    const ctoProducts = new Map((ctoParts.length ? await repo.getProducts(ctoParts) : []).filter(Boolean).map(product => [product.partNumber, product]));
     const now = clock();
     const eligible = follows.flatMap(follow => {
       const user = users.get(follow.userKey);
       if (!user || !canUseReminders(user, now)) return [];
+      if (isCtoPartNumber(follow.partNumber) && !canMonitorProduct(ctoProducts.get(follow.partNumber))) return [];
       const allowance = followAllowance(user, follow, follows, now);
       return allowance.eligibleStoreNumbers.length ? [{ ...follow, storeNumbers: allowance.eligibleStoreNumbers }] : [];
     });

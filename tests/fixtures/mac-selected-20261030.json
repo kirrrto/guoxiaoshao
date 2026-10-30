@@ -1,0 +1,2276 @@
+[
+  {
+    "context": {
+      "familyKey": "macbook-pro-proled-xdr",
+      "displayName": "MacBook Pro (PROLED XDR 显示屏)",
+      "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/14-inch-silver-standard-display-apple-m5-max-chip-18-core-cpu-32-core-gpu-36gb-memory-2tb-storage"
+    },
+    "metrics": {
+      "data": {
+        "products": [
+          {
+            "sku": "MJ2J4",
+            "partNumber": "MJ2J4CH/A",
+            "price": {
+              "fullPrice": 36999
+            },
+            "category": "mac",
+            "name": "14-inch MacBook Pro with PROLED XDR Display - Silver"
+          }
+        ],
+        "buyflow": {
+          "userSelections": {
+            "STORAGE": {
+              "dimensionValue": "2tb",
+              "partNumber": "065-CMXH"
+            },
+            "SCREEN_SIZE": "14inch",
+            "MEMORY": {
+              "dimensionValue": "36gb",
+              "partNumber": "065-CMX9"
+            },
+            "CHASSIS_COLOR": "silver",
+            "KEYBOARD_LANGUAGE": {
+              "dimensionValue": "chn",
+              "partNumber": "CH065-CN2T"
+            },
+            "PROCESSOR": {
+              "dimensionChip": "m5max",
+              "cpuCoreCount": "18",
+              "gpuCoreCount": "32"
+            },
+            "DISPLAY_FINISH": "standard",
+            "LOGIC_PRO": {
+              "dimensionValue": "none",
+              "partNumber": "065-CN3W"
+            },
+            "FINAL_CUT_PRO": {
+              "dimensionValue": "none",
+              "partNumber": "065-CN3T"
+            },
+            "PROCESSOR_CHIP": "m5max",
+            "POWER_ADAPTER": {
+              "dimensionValue": "140w",
+              "partNumber": "065-CN05"
+            }
+          }
+        }
+      }
+    },
+    "selection": {
+      "products": [],
+      "mainDisplayValues": {
+        "chassis-dimensionScreensize": {
+          "14inch": {
+            "isBlocked": false,
+            "header": "14 英寸<as-footnote data-id=\"5769c3fd1d52d3649baa0102f11e6c5c\" data-assigned=\"true\"><sup data-autom=\"footnote-sub\" class=\"as-footnote\"><span class=\"visuallyhidden\">&nbsp;脚注&nbsp;</span>1</sup></as-footnote> <div class=\"form-label-small\">可选配 M5&nbsp;Pro 或 M5&nbsp;Max 芯片。</div>"
+          }
+        },
+        "chassis-dimensionColor": {
+          "silver": {
+            "image": {
+              "sources": [
+                {
+                  "srcSet": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mbp14-proled-silver-cto-hero-202610_SW_COLOR?wid=64&hei=64&fmt=jpeg&qlt=90&.v=TE5OaVRsVG04L0hwU2pDOTMzR2F0cXpxcWdRTUEvT1FiSU8rNkhvSVVPN0FDd29XbUJVbU9hVlRNU3h4dExEb0ZtUTlHSjRnUk0vdFNrRldLbk01bTRKWlgzZzdyUXEzcGE2bUxYbWVvdHJQSUFlM2swU0pQNGxFUnFIRmdVYXk",
+                  "type": "image/jpeg"
+                }
+              ],
+              "width": "32",
+              "height": "32",
+              "attrs": "",
+              "imageName": "mbp14-proled-silver-cto-hero-202610_SW_COLOR",
+              "originalImageName": "mbp14-proled-silver-cto-hero-202610_SW_COLOR",
+              "alt": "",
+              "noImage": false,
+              "deferSrc": false,
+              "singleElementSources": true,
+              "scaleFactor": "2x"
+            },
+            "isBlocked": false,
+            "header": "银色"
+          }
+        },
+        "display-dimensionFinish": {
+          "standard": {
+            "isBlocked": false,
+            "header": "标准玻璃 <div class=\"form-label-small\">采用低反射率设计，可减少使用环境中的屏幕眩光。</div>"
+          }
+        },
+        "processor-dimensionChip": {
+          "m5max": {
+            "dynamicFooter": {
+              "m5max-18-32": null,
+              "m5max-18-40": null,
+              "multioption": "{count} 种配置可选 (配备 16 核神经网络引擎)"
+            },
+            "isBlocked": false,
+            "header": "M5 Max 芯片<div class=\"form-label-small\">Mac 专业笔电上的最强芯片，专攻各种超硬核的工作。</div>"
+          }
+        },
+        "processor-dimensionChip-cpuCoreCount-gpuCoreCount": {
+          "m5max-18-32": {
+            "dimensionComponents": {
+              "dimensionChip": "m5max",
+              "gpuCoreCount": "32",
+              "cpuCoreCount": "18"
+            },
+            "isBlocked": false,
+            "header": "<span class=\"rf-dsupgrade-block\">18 核中央处理器、</span><span class=\"rf-dsupgrade-block\">32&nbsp;核图形处理器</span>"
+          }
+        }
+      },
+      "configDisplayValues": {
+        "memory-dimensionMemory": {
+          "36gb": {
+            "header": "36GB"
+          }
+        },
+        "storage-dimensionCapacity": {
+          "2tb": {
+            "header": "2TB"
+          }
+        }
+      }
+    }
+  },
+  {
+    "context": {
+      "familyKey": "macbook-pro-proled-xdr",
+      "displayName": "MacBook Pro (PROLED XDR 显示屏)",
+      "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/14-inch-silver-standard-display-apple-m5-pro-chip-15-core-cpu-16-core-gpu-24gb-memory-1tb-storage"
+    },
+    "metrics": {
+      "data": {
+        "products": [
+          {
+            "sku": "MJ2G4",
+            "partNumber": "MJ2G4CH/A",
+            "price": {
+              "fullPrice": 22999
+            },
+            "category": "mac",
+            "name": "14-inch MacBook Pro with PROLED XDR Display - Silver"
+          }
+        ],
+        "buyflow": {
+          "userSelections": {
+            "STORAGE": {
+              "dimensionValue": "1tb",
+              "partNumber": "065-CMXG"
+            },
+            "SCREEN_SIZE": "14inch",
+            "MEMORY": {
+              "dimensionValue": "24gb",
+              "partNumber": "065-CMX8"
+            },
+            "CHASSIS_COLOR": "silver",
+            "KEYBOARD_LANGUAGE": {
+              "dimensionValue": "chn",
+              "partNumber": "CH065-CN2T"
+            },
+            "PROCESSOR": {
+              "dimensionChip": "m5pro",
+              "cpuCoreCount": "15",
+              "gpuCoreCount": "16"
+            },
+            "DISPLAY_FINISH": "standard",
+            "LOGIC_PRO": {
+              "dimensionValue": "none",
+              "partNumber": "065-CN3W"
+            },
+            "FINAL_CUT_PRO": {
+              "dimensionValue": "none",
+              "partNumber": "065-CN3T"
+            },
+            "PROCESSOR_CHIP": "m5pro",
+            "POWER_ADAPTER": {
+              "dimensionValue": "70w",
+              "partNumber": "065-CN02"
+            }
+          }
+        }
+      }
+    },
+    "selection": {
+      "products": [],
+      "mainDisplayValues": {
+        "chassis-dimensionScreensize": {
+          "14inch": {
+            "isBlocked": false,
+            "header": "14 英寸<as-footnote data-id=\"5769c3fd1d52d3649baa0102f11e6c5c\" data-assigned=\"true\"><sup data-autom=\"footnote-sub\" class=\"as-footnote\"><span class=\"visuallyhidden\">&nbsp;脚注&nbsp;</span>1</sup></as-footnote> <div class=\"form-label-small\">可选配 M5&nbsp;Pro 或 M5&nbsp;Max 芯片。</div>"
+          }
+        },
+        "chassis-dimensionColor": {
+          "silver": {
+            "image": {
+              "sources": [
+                {
+                  "srcSet": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mbp14-proled-silver-cto-hero-202610_SW_COLOR?wid=64&hei=64&fmt=jpeg&qlt=90&.v=TE5OaVRsVG04L0hwU2pDOTMzR2F0cXpxcWdRTUEvT1FiSU8rNkhvSVVPN0FDd29XbUJVbU9hVlRNU3h4dExEb0ZtUTlHSjRnUk0vdFNrRldLbk01bTRKWlgzZzdyUXEzcGE2bUxYbWVvdHJQSUFlM2swU0pQNGxFUnFIRmdVYXk",
+                  "type": "image/jpeg"
+                }
+              ],
+              "width": "32",
+              "height": "32",
+              "attrs": "",
+              "imageName": "mbp14-proled-silver-cto-hero-202610_SW_COLOR",
+              "originalImageName": "mbp14-proled-silver-cto-hero-202610_SW_COLOR",
+              "alt": "",
+              "noImage": false,
+              "deferSrc": false,
+              "singleElementSources": true,
+              "scaleFactor": "2x"
+            },
+            "isBlocked": false,
+            "header": "银色"
+          }
+        },
+        "display-dimensionFinish": {
+          "standard": {
+            "isBlocked": false,
+            "header": "标准玻璃 <div class=\"form-label-small\">采用低反射率设计，可减少使用环境中的屏幕眩光。</div>"
+          }
+        },
+        "processor-dimensionChip": {
+          "m5pro": {
+            "dynamicFooter": {
+              "m5pro-15-16": "15 核中央处理器、16 核图形处理器、16 核神经网络引擎",
+              "m5pro-18-20": "18 核中央处理器、20 核图形处理器、16 核神经网络引擎",
+              "multioption": "{count} 种配置可选 (配备 16 核神经网络引擎)"
+            },
+            "isBlocked": false,
+            "header": "M5 Pro 芯片<div class=\"form-label-small\">突破性的性能和速度，胜任各种高难度任务，是专业人士的工作利器。</div>"
+          }
+        },
+        "processor-dimensionChip-cpuCoreCount-gpuCoreCount": {
+          "m5pro-15-16": {
+            "dimensionComponents": {
+              "dimensionChip": "m5pro",
+              "gpuCoreCount": "16",
+              "cpuCoreCount": "15"
+            },
+            "isBlocked": false,
+            "header": "<span class=\"rf-dsupgrade-block\">15 核中央处理器、</span><span class=\"rf-dsupgrade-block\">16&nbsp;核图形处理器</span>"
+          }
+        }
+      },
+      "configDisplayValues": {
+        "memory-dimensionMemory": {
+          "24gb": {
+            "header": "24GB"
+          }
+        },
+        "storage-dimensionCapacity": {
+          "1tb": {
+            "header": "1TB"
+          }
+        }
+      }
+    }
+  },
+  {
+    "context": {
+      "familyKey": "macbook-pro-proled-xdr",
+      "displayName": "MacBook Pro (PROLED XDR 显示屏)",
+      "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/14-inch-silver-standard-display-apple-m5-pro-chip-18-core-cpu-20-core-gpu-48gb-memory-1tb-storage"
+    },
+    "metrics": {
+      "data": {
+        "products": [
+          {
+            "sku": "MMF54",
+            "partNumber": "MMF54CH/A",
+            "price": {
+              "fullPrice": 29999
+            },
+            "category": "mac",
+            "name": "14-inch MacBook Pro with PROLED XDR Display - Silver"
+          }
+        ],
+        "buyflow": {
+          "userSelections": {
+            "STORAGE": {
+              "dimensionValue": "1tb",
+              "partNumber": "065-CMXG"
+            },
+            "SCREEN_SIZE": "14inch",
+            "MEMORY": {
+              "dimensionValue": "48gb",
+              "partNumber": "065-CMXC"
+            },
+            "CHASSIS_COLOR": "silver",
+            "KEYBOARD_LANGUAGE": {
+              "dimensionValue": "chn",
+              "partNumber": "CH065-CN2T"
+            },
+            "PROCESSOR": {
+              "dimensionChip": "m5pro",
+              "cpuCoreCount": "18",
+              "gpuCoreCount": "20"
+            },
+            "DISPLAY_FINISH": "standard",
+            "LOGIC_PRO": {
+              "dimensionValue": "none",
+              "partNumber": "065-CN3W"
+            },
+            "FINAL_CUT_PRO": {
+              "dimensionValue": "none",
+              "partNumber": "065-CN3T"
+            },
+            "PROCESSOR_CHIP": "m5pro",
+            "POWER_ADAPTER": {
+              "dimensionValue": "140w",
+              "partNumber": "065-CN05"
+            }
+          }
+        }
+      }
+    },
+    "selection": {
+      "products": [],
+      "mainDisplayValues": {
+        "chassis-dimensionScreensize": {
+          "14inch": {
+            "isBlocked": false,
+            "header": "14 英寸<as-footnote data-id=\"5769c3fd1d52d3649baa0102f11e6c5c\" data-assigned=\"true\"><sup data-autom=\"footnote-sub\" class=\"as-footnote\"><span class=\"visuallyhidden\">&nbsp;脚注&nbsp;</span>1</sup></as-footnote> <div class=\"form-label-small\">可选配 M5&nbsp;Pro 或 M5&nbsp;Max 芯片。</div>"
+          }
+        },
+        "chassis-dimensionColor": {
+          "silver": {
+            "image": {
+              "sources": [
+                {
+                  "srcSet": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mbp14-proled-silver-cto-hero-202610_SW_COLOR?wid=64&hei=64&fmt=jpeg&qlt=90&.v=TE5OaVRsVG04L0hwU2pDOTMzR2F0cXpxcWdRTUEvT1FiSU8rNkhvSVVPN0FDd29XbUJVbU9hVlRNU3h4dExEb0ZtUTlHSjRnUk0vdFNrRldLbk01bTRKWlgzZzdyUXEzcGE2bUxYbWVvdHJQSUFlM2swU0pQNGxFUnFIRmdVYXk",
+                  "type": "image/jpeg"
+                }
+              ],
+              "width": "32",
+              "height": "32",
+              "attrs": "",
+              "imageName": "mbp14-proled-silver-cto-hero-202610_SW_COLOR",
+              "originalImageName": "mbp14-proled-silver-cto-hero-202610_SW_COLOR",
+              "alt": "",
+              "noImage": false,
+              "deferSrc": false,
+              "singleElementSources": true,
+              "scaleFactor": "2x"
+            },
+            "isBlocked": false,
+            "header": "银色"
+          }
+        },
+        "display-dimensionFinish": {
+          "standard": {
+            "isBlocked": false,
+            "header": "标准玻璃 <div class=\"form-label-small\">采用低反射率设计，可减少使用环境中的屏幕眩光。</div>"
+          }
+        },
+        "processor-dimensionChip": {
+          "m5pro": {
+            "dynamicFooter": {
+              "m5pro-15-16": "15 核中央处理器、16 核图形处理器、16 核神经网络引擎",
+              "m5pro-18-20": "18 核中央处理器、20 核图形处理器、16 核神经网络引擎",
+              "multioption": "{count} 种配置可选 (配备 16 核神经网络引擎)"
+            },
+            "isBlocked": false,
+            "header": "M5 Pro 芯片<div class=\"form-label-small\">突破性的性能和速度，胜任各种高难度任务，是专业人士的工作利器。</div>"
+          }
+        },
+        "processor-dimensionChip-cpuCoreCount-gpuCoreCount": {
+          "m5pro-18-20": {
+            "dimensionComponents": {
+              "dimensionChip": "m5pro",
+              "gpuCoreCount": "20",
+              "cpuCoreCount": "18"
+            },
+            "isBlocked": false,
+            "header": "<span class=\"rf-dsupgrade-block\">18 核中央处理器、</span><span class=\"rf-dsupgrade-block\">20&nbsp;核图形处理器</span>\n<div class=\"form-label-small\">\n    处理性能和图形渲染速度进一步提升，可胜任游戏、编程和创意工作等繁重任务。\n</div>"
+          }
+        }
+      },
+      "configDisplayValues": {
+        "memory-dimensionMemory": {
+          "48gb": {
+            "header": "48GB"
+          }
+        },
+        "storage-dimensionCapacity": {
+          "1tb": {
+            "header": "1TB"
+          }
+        }
+      }
+    }
+  },
+  {
+    "context": {
+      "familyKey": "macbook-pro-proled-xdr",
+      "displayName": "MacBook Pro (PROLED XDR 显示屏)",
+      "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/14-inch-space-black-nano-texture-display-apple-m5-pro-chip-15-core-cpu-16-core-gpu-24gb-memory-1tb-storage"
+    },
+    "metrics": {
+      "data": {
+        "products": [
+          {
+            "sku": "MJ9X4",
+            "partNumber": "MJ9X4CH/A",
+            "price": {
+              "fullPrice": 24124
+            },
+            "category": "mac",
+            "name": "14-inch MacBook Pro with PROLED XDR Display - Space Black"
+          }
+        ],
+        "buyflow": {
+          "userSelections": {
+            "STORAGE": {
+              "dimensionValue": "1tb",
+              "partNumber": "065-CMXG"
+            },
+            "SCREEN_SIZE": "14inch",
+            "MEMORY": {
+              "dimensionValue": "24gb",
+              "partNumber": "065-CMX8"
+            },
+            "CHASSIS_COLOR": "spaceblack",
+            "KEYBOARD_LANGUAGE": {
+              "dimensionValue": "chn",
+              "partNumber": "CH065-CN2T"
+            },
+            "PROCESSOR": {
+              "dimensionChip": "m5pro",
+              "cpuCoreCount": "15",
+              "gpuCoreCount": "16"
+            },
+            "DISPLAY_FINISH": "nano_texture",
+            "LOGIC_PRO": {
+              "dimensionValue": "none",
+              "partNumber": "065-CN3W"
+            },
+            "FINAL_CUT_PRO": {
+              "dimensionValue": "none",
+              "partNumber": "065-CN3T"
+            },
+            "PROCESSOR_CHIP": "m5pro",
+            "POWER_ADAPTER": {
+              "dimensionValue": "70w",
+              "partNumber": "065-CN02"
+            }
+          }
+        }
+      }
+    },
+    "selection": {
+      "products": [],
+      "mainDisplayValues": {
+        "chassis-dimensionScreensize": {
+          "14inch": {
+            "isBlocked": false,
+            "header": "14 英寸<as-footnote data-id=\"5769c3fd1d52d3649baa0102f11e6c5c\" data-assigned=\"true\"><sup data-autom=\"footnote-sub\" class=\"as-footnote\"><span class=\"visuallyhidden\">&nbsp;脚注&nbsp;</span>1</sup></as-footnote> <div class=\"form-label-small\">可选配 M5&nbsp;Pro 或 M5&nbsp;Max 芯片。</div>"
+          }
+        },
+        "chassis-dimensionColor": {
+          "spaceblack": {
+            "image": {
+              "sources": [
+                {
+                  "srcSet": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mbp14-proled-spaceblack-cto-hero-202610_SW_COLOR?wid=64&hei=64&fmt=jpeg&qlt=90&.v=YVJLRGhvZm5jUVRsdXlRNVZURWhLV1kxRjdqOFRPaEZRbHFSd3lja3FFL2xZSUxLK0pMdDAvaTFaMzNib2c3RWhqSDhoNW8wc3l1V25TSU5vYVNENHI2TGhYaGhMVkJpQ2RGWWVURTZNbXh2ZkplcmpabHJhbzE3UitTbkJ2L0s",
+                  "type": "image/jpeg"
+                }
+              ],
+              "width": "32",
+              "height": "32",
+              "attrs": "",
+              "imageName": "mbp14-proled-spaceblack-cto-hero-202610_SW_COLOR",
+              "originalImageName": "mbp14-proled-spaceblack-cto-hero-202610_SW_COLOR",
+              "alt": "",
+              "noImage": false,
+              "deferSrc": false,
+              "singleElementSources": true,
+              "scaleFactor": "2x"
+            },
+            "isBlocked": false,
+            "header": "深空黑色"
+          }
+        },
+        "display-dimensionFinish": {
+          "nano_texture": {
+            "isBlocked": false,
+            "header": "纳米纹理玻璃 <div class=\"form-label-small\">进一步减少明亮光线下的屏幕反光和眩光。</div>"
+          }
+        },
+        "processor-dimensionChip": {
+          "m5pro": {
+            "dynamicFooter": {
+              "m5pro-15-16": "15 核中央处理器、16 核图形处理器、16 核神经网络引擎",
+              "m5pro-18-20": "18 核中央处理器、20 核图形处理器、16 核神经网络引擎",
+              "multioption": "{count} 种配置可选 (配备 16 核神经网络引擎)"
+            },
+            "isBlocked": false,
+            "header": "M5 Pro 芯片<div class=\"form-label-small\">突破性的性能和速度，胜任各种高难度任务，是专业人士的工作利器。</div>"
+          }
+        },
+        "processor-dimensionChip-cpuCoreCount-gpuCoreCount": {
+          "m5pro-15-16": {
+            "dimensionComponents": {
+              "dimensionChip": "m5pro",
+              "gpuCoreCount": "16",
+              "cpuCoreCount": "15"
+            },
+            "isBlocked": false,
+            "header": "<span class=\"rf-dsupgrade-block\">15 核中央处理器、</span><span class=\"rf-dsupgrade-block\">16&nbsp;核图形处理器</span>"
+          }
+        }
+      },
+      "configDisplayValues": {
+        "memory-dimensionMemory": {
+          "24gb": {
+            "header": "24GB"
+          }
+        },
+        "storage-dimensionCapacity": {
+          "1tb": {
+            "header": "1TB"
+          }
+        }
+      }
+    }
+  },
+  {
+    "context": {
+      "familyKey": "macbook-pro-proled-xdr",
+      "displayName": "MacBook Pro (PROLED XDR 显示屏)",
+      "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/14-inch-space-black-standard-display-apple-m5-max-chip-18-core-cpu-32-core-gpu-36gb-memory-2tb-storage"
+    },
+    "metrics": {
+      "data": {
+        "products": [
+          {
+            "sku": "MJ2M4",
+            "partNumber": "MJ2M4CH/A",
+            "price": {
+              "fullPrice": 36999
+            },
+            "category": "mac",
+            "name": "14-inch MacBook Pro with PROLED XDR Display - Space Black"
+          }
+        ],
+        "buyflow": {
+          "userSelections": {
+            "STORAGE": {
+              "dimensionValue": "2tb",
+              "partNumber": "065-CMXH"
+            },
+            "SCREEN_SIZE": "14inch",
+            "MEMORY": {
+              "dimensionValue": "36gb",
+              "partNumber": "065-CMX9"
+            },
+            "CHASSIS_COLOR": "spaceblack",
+            "KEYBOARD_LANGUAGE": {
+              "dimensionValue": "chn",
+              "partNumber": "CH065-CN2T"
+            },
+            "PROCESSOR": {
+              "dimensionChip": "m5max",
+              "cpuCoreCount": "18",
+              "gpuCoreCount": "32"
+            },
+            "DISPLAY_FINISH": "standard",
+            "LOGIC_PRO": {
+              "dimensionValue": "none",
+              "partNumber": "065-CN3W"
+            },
+            "FINAL_CUT_PRO": {
+              "dimensionValue": "none",
+              "partNumber": "065-CN3T"
+            },
+            "PROCESSOR_CHIP": "m5max",
+            "POWER_ADAPTER": {
+              "dimensionValue": "140w",
+              "partNumber": "065-CN05"
+            }
+          }
+        }
+      }
+    },
+    "selection": {
+      "products": [],
+      "mainDisplayValues": {
+        "chassis-dimensionScreensize": {
+          "14inch": {
+            "isBlocked": false,
+            "header": "14 英寸<as-footnote data-id=\"5769c3fd1d52d3649baa0102f11e6c5c\" data-assigned=\"true\"><sup data-autom=\"footnote-sub\" class=\"as-footnote\"><span class=\"visuallyhidden\">&nbsp;脚注&nbsp;</span>1</sup></as-footnote> <div class=\"form-label-small\">可选配 M5&nbsp;Pro 或 M5&nbsp;Max 芯片。</div>"
+          }
+        },
+        "chassis-dimensionColor": {
+          "spaceblack": {
+            "image": {
+              "sources": [
+                {
+                  "srcSet": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mbp14-proled-spaceblack-cto-hero-202610_SW_COLOR?wid=64&hei=64&fmt=jpeg&qlt=90&.v=YVJLRGhvZm5jUVRsdXlRNVZURWhLV1kxRjdqOFRPaEZRbHFSd3lja3FFL2xZSUxLK0pMdDAvaTFaMzNib2c3RWhqSDhoNW8wc3l1V25TSU5vYVNENHI2TGhYaGhMVkJpQ2RGWWVURTZNbXh2ZkplcmpabHJhbzE3UitTbkJ2L0s",
+                  "type": "image/jpeg"
+                }
+              ],
+              "width": "32",
+              "height": "32",
+              "attrs": "",
+              "imageName": "mbp14-proled-spaceblack-cto-hero-202610_SW_COLOR",
+              "originalImageName": "mbp14-proled-spaceblack-cto-hero-202610_SW_COLOR",
+              "alt": "",
+              "noImage": false,
+              "deferSrc": false,
+              "singleElementSources": true,
+              "scaleFactor": "2x"
+            },
+            "isBlocked": false,
+            "header": "深空黑色"
+          }
+        },
+        "display-dimensionFinish": {
+          "standard": {
+            "isBlocked": false,
+            "header": "标准玻璃 <div class=\"form-label-small\">采用低反射率设计，可减少使用环境中的屏幕眩光。</div>"
+          }
+        },
+        "processor-dimensionChip": {
+          "m5max": {
+            "dynamicFooter": {
+              "m5max-18-32": null,
+              "m5max-18-40": null,
+              "multioption": "{count} 种配置可选 (配备 16 核神经网络引擎)"
+            },
+            "isBlocked": false,
+            "header": "M5 Max 芯片<div class=\"form-label-small\">Mac 专业笔电上的最强芯片，专攻各种超硬核的工作。</div>"
+          }
+        },
+        "processor-dimensionChip-cpuCoreCount-gpuCoreCount": {
+          "m5max-18-32": {
+            "dimensionComponents": {
+              "dimensionChip": "m5max",
+              "gpuCoreCount": "32",
+              "cpuCoreCount": "18"
+            },
+            "isBlocked": false,
+            "header": "<span class=\"rf-dsupgrade-block\">18 核中央处理器、</span><span class=\"rf-dsupgrade-block\">32&nbsp;核图形处理器</span>"
+          }
+        }
+      },
+      "configDisplayValues": {
+        "memory-dimensionMemory": {
+          "36gb": {
+            "header": "36GB"
+          }
+        },
+        "storage-dimensionCapacity": {
+          "2tb": {
+            "header": "2TB"
+          }
+        }
+      }
+    }
+  },
+  {
+    "context": {
+      "familyKey": "macbook-pro-proled-xdr",
+      "displayName": "MacBook Pro (PROLED XDR 显示屏)",
+      "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/14-inch-space-black-standard-display-apple-m5-pro-chip-15-core-cpu-16-core-gpu-24gb-memory-1tb-storage"
+    },
+    "metrics": {
+      "data": {
+        "products": [
+          {
+            "sku": "MJ2K4",
+            "partNumber": "MJ2K4CH/A",
+            "price": {
+              "fullPrice": 22999
+            },
+            "category": "mac",
+            "name": "14-inch MacBook Pro with PROLED XDR Display - Space Black"
+          }
+        ],
+        "buyflow": {
+          "userSelections": {
+            "STORAGE": {
+              "dimensionValue": "1tb",
+              "partNumber": "065-CMXG"
+            },
+            "SCREEN_SIZE": "14inch",
+            "MEMORY": {
+              "dimensionValue": "24gb",
+              "partNumber": "065-CMX8"
+            },
+            "CHASSIS_COLOR": "spaceblack",
+            "KEYBOARD_LANGUAGE": {
+              "dimensionValue": "chn",
+              "partNumber": "CH065-CN2T"
+            },
+            "PROCESSOR": {
+              "dimensionChip": "m5pro",
+              "cpuCoreCount": "15",
+              "gpuCoreCount": "16"
+            },
+            "DISPLAY_FINISH": "standard",
+            "LOGIC_PRO": {
+              "dimensionValue": "none",
+              "partNumber": "065-CN3W"
+            },
+            "FINAL_CUT_PRO": {
+              "dimensionValue": "none",
+              "partNumber": "065-CN3T"
+            },
+            "PROCESSOR_CHIP": "m5pro",
+            "POWER_ADAPTER": {
+              "dimensionValue": "70w",
+              "partNumber": "065-CN02"
+            }
+          }
+        }
+      }
+    },
+    "selection": {
+      "products": [],
+      "mainDisplayValues": {
+        "chassis-dimensionScreensize": {
+          "14inch": {
+            "isBlocked": false,
+            "header": "14 英寸<as-footnote data-id=\"5769c3fd1d52d3649baa0102f11e6c5c\" data-assigned=\"true\"><sup data-autom=\"footnote-sub\" class=\"as-footnote\"><span class=\"visuallyhidden\">&nbsp;脚注&nbsp;</span>1</sup></as-footnote> <div class=\"form-label-small\">可选配 M5&nbsp;Pro 或 M5&nbsp;Max 芯片。</div>"
+          }
+        },
+        "chassis-dimensionColor": {
+          "spaceblack": {
+            "image": {
+              "sources": [
+                {
+                  "srcSet": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mbp14-proled-spaceblack-cto-hero-202610_SW_COLOR?wid=64&hei=64&fmt=jpeg&qlt=90&.v=YVJLRGhvZm5jUVRsdXlRNVZURWhLV1kxRjdqOFRPaEZRbHFSd3lja3FFL2xZSUxLK0pMdDAvaTFaMzNib2c3RWhqSDhoNW8wc3l1V25TSU5vYVNENHI2TGhYaGhMVkJpQ2RGWWVURTZNbXh2ZkplcmpabHJhbzE3UitTbkJ2L0s",
+                  "type": "image/jpeg"
+                }
+              ],
+              "width": "32",
+              "height": "32",
+              "attrs": "",
+              "imageName": "mbp14-proled-spaceblack-cto-hero-202610_SW_COLOR",
+              "originalImageName": "mbp14-proled-spaceblack-cto-hero-202610_SW_COLOR",
+              "alt": "",
+              "noImage": false,
+              "deferSrc": false,
+              "singleElementSources": true,
+              "scaleFactor": "2x"
+            },
+            "isBlocked": false,
+            "header": "深空黑色"
+          }
+        },
+        "display-dimensionFinish": {
+          "standard": {
+            "isBlocked": false,
+            "header": "标准玻璃 <div class=\"form-label-small\">采用低反射率设计，可减少使用环境中的屏幕眩光。</div>"
+          }
+        },
+        "processor-dimensionChip": {
+          "m5pro": {
+            "dynamicFooter": {
+              "m5pro-15-16": "15 核中央处理器、16 核图形处理器、16 核神经网络引擎",
+              "m5pro-18-20": "18 核中央处理器、20 核图形处理器、16 核神经网络引擎",
+              "multioption": "{count} 种配置可选 (配备 16 核神经网络引擎)"
+            },
+            "isBlocked": false,
+            "header": "M5 Pro 芯片<div class=\"form-label-small\">突破性的性能和速度，胜任各种高难度任务，是专业人士的工作利器。</div>"
+          }
+        },
+        "processor-dimensionChip-cpuCoreCount-gpuCoreCount": {
+          "m5pro-15-16": {
+            "dimensionComponents": {
+              "dimensionChip": "m5pro",
+              "gpuCoreCount": "16",
+              "cpuCoreCount": "15"
+            },
+            "isBlocked": false,
+            "header": "<span class=\"rf-dsupgrade-block\">15 核中央处理器、</span><span class=\"rf-dsupgrade-block\">16&nbsp;核图形处理器</span>"
+          }
+        }
+      },
+      "configDisplayValues": {
+        "memory-dimensionMemory": {
+          "24gb": {
+            "header": "24GB"
+          }
+        },
+        "storage-dimensionCapacity": {
+          "1tb": {
+            "header": "1TB"
+          }
+        }
+      }
+    }
+  },
+  {
+    "context": {
+      "familyKey": "macbook-pro-proled-xdr",
+      "displayName": "MacBook Pro (PROLED XDR 显示屏)",
+      "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/14-inch-space-black-standard-display-apple-m5-pro-chip-18-core-cpu-20-core-gpu-48gb-memory-1tb-storage"
+    },
+    "metrics": {
+      "data": {
+        "products": [
+          {
+            "sku": "MMF64",
+            "partNumber": "MMF64CH/A",
+            "price": {
+              "fullPrice": 29999
+            },
+            "category": "mac",
+            "name": "14-inch MacBook Pro with PROLED XDR Display - Space Black"
+          }
+        ],
+        "buyflow": {
+          "userSelections": {
+            "STORAGE": {
+              "dimensionValue": "1tb",
+              "partNumber": "065-CMXG"
+            },
+            "SCREEN_SIZE": "14inch",
+            "MEMORY": {
+              "dimensionValue": "48gb",
+              "partNumber": "065-CMXC"
+            },
+            "CHASSIS_COLOR": "spaceblack",
+            "KEYBOARD_LANGUAGE": {
+              "dimensionValue": "chn",
+              "partNumber": "CH065-CN2T"
+            },
+            "PROCESSOR": {
+              "dimensionChip": "m5pro",
+              "cpuCoreCount": "18",
+              "gpuCoreCount": "20"
+            },
+            "DISPLAY_FINISH": "standard",
+            "LOGIC_PRO": {
+              "dimensionValue": "none",
+              "partNumber": "065-CN3W"
+            },
+            "FINAL_CUT_PRO": {
+              "dimensionValue": "none",
+              "partNumber": "065-CN3T"
+            },
+            "PROCESSOR_CHIP": "m5pro",
+            "POWER_ADAPTER": {
+              "dimensionValue": "140w",
+              "partNumber": "065-CN05"
+            }
+          }
+        }
+      }
+    },
+    "selection": {
+      "products": [],
+      "mainDisplayValues": {
+        "chassis-dimensionScreensize": {
+          "14inch": {
+            "isBlocked": false,
+            "header": "14 英寸<as-footnote data-id=\"5769c3fd1d52d3649baa0102f11e6c5c\" data-assigned=\"true\"><sup data-autom=\"footnote-sub\" class=\"as-footnote\"><span class=\"visuallyhidden\">&nbsp;脚注&nbsp;</span>1</sup></as-footnote> <div class=\"form-label-small\">可选配 M5&nbsp;Pro 或 M5&nbsp;Max 芯片。</div>"
+          }
+        },
+        "chassis-dimensionColor": {
+          "spaceblack": {
+            "image": {
+              "sources": [
+                {
+                  "srcSet": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mbp14-proled-spaceblack-cto-hero-202610_SW_COLOR?wid=64&hei=64&fmt=jpeg&qlt=90&.v=YVJLRGhvZm5jUVRsdXlRNVZURWhLV1kxRjdqOFRPaEZRbHFSd3lja3FFL2xZSUxLK0pMdDAvaTFaMzNib2c3RWhqSDhoNW8wc3l1V25TSU5vYVNENHI2TGhYaGhMVkJpQ2RGWWVURTZNbXh2ZkplcmpabHJhbzE3UitTbkJ2L0s",
+                  "type": "image/jpeg"
+                }
+              ],
+              "width": "32",
+              "height": "32",
+              "attrs": "",
+              "imageName": "mbp14-proled-spaceblack-cto-hero-202610_SW_COLOR",
+              "originalImageName": "mbp14-proled-spaceblack-cto-hero-202610_SW_COLOR",
+              "alt": "",
+              "noImage": false,
+              "deferSrc": false,
+              "singleElementSources": true,
+              "scaleFactor": "2x"
+            },
+            "isBlocked": false,
+            "header": "深空黑色"
+          }
+        },
+        "display-dimensionFinish": {
+          "standard": {
+            "isBlocked": false,
+            "header": "标准玻璃 <div class=\"form-label-small\">采用低反射率设计，可减少使用环境中的屏幕眩光。</div>"
+          }
+        },
+        "processor-dimensionChip": {
+          "m5pro": {
+            "dynamicFooter": {
+              "m5pro-15-16": "15 核中央处理器、16 核图形处理器、16 核神经网络引擎",
+              "m5pro-18-20": "18 核中央处理器、20 核图形处理器、16 核神经网络引擎",
+              "multioption": "{count} 种配置可选 (配备 16 核神经网络引擎)"
+            },
+            "isBlocked": false,
+            "header": "M5 Pro 芯片<div class=\"form-label-small\">突破性的性能和速度，胜任各种高难度任务，是专业人士的工作利器。</div>"
+          }
+        },
+        "processor-dimensionChip-cpuCoreCount-gpuCoreCount": {
+          "m5pro-18-20": {
+            "dimensionComponents": {
+              "dimensionChip": "m5pro",
+              "gpuCoreCount": "20",
+              "cpuCoreCount": "18"
+            },
+            "isBlocked": false,
+            "header": "<span class=\"rf-dsupgrade-block\">18 核中央处理器、</span><span class=\"rf-dsupgrade-block\">20&nbsp;核图形处理器</span>\n<div class=\"form-label-small\">\n    处理性能和图形渲染速度进一步提升，可胜任游戏、编程和创意工作等繁重任务。\n</div>"
+          }
+        }
+      },
+      "configDisplayValues": {
+        "memory-dimensionMemory": {
+          "48gb": {
+            "header": "48GB"
+          }
+        },
+        "storage-dimensionCapacity": {
+          "1tb": {
+            "header": "1TB"
+          }
+        }
+      }
+    }
+  },
+  {
+    "context": {
+      "familyKey": "macbook-pro-proled-xdr",
+      "displayName": "MacBook Pro (PROLED XDR 显示屏)",
+      "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/16-inch-silver-standard-display-apple-m5-max-chip-18-core-cpu-32-core-gpu-36gb-memory-2tb-storage"
+    },
+    "metrics": {
+      "data": {
+        "products": [
+          {
+            "sku": "MJ2X4",
+            "partNumber": "MJ2X4CH/A",
+            "price": {
+              "fullPrice": 38999
+            },
+            "category": "mac",
+            "name": "16-inch MacBook Pro with PROLED XDR Display - Silver"
+          }
+        ],
+        "buyflow": {
+          "userSelections": {
+            "STORAGE": {
+              "dimensionValue": "2tb",
+              "partNumber": "065-CN4Y"
+            },
+            "SCREEN_SIZE": "16inch",
+            "MEMORY": {
+              "dimensionValue": "36gb",
+              "partNumber": "065-CN4Q"
+            },
+            "CHASSIS_COLOR": "silver",
+            "KEYBOARD_LANGUAGE": {
+              "dimensionValue": "chn",
+              "partNumber": "CH065-CN75"
+            },
+            "PROCESSOR": {
+              "dimensionChip": "m5max",
+              "cpuCoreCount": "18",
+              "gpuCoreCount": "32"
+            },
+            "DISPLAY_FINISH": "standard",
+            "LOGIC_PRO": {
+              "dimensionValue": "none",
+              "partNumber": "065-CN81"
+            },
+            "FINAL_CUT_PRO": {
+              "dimensionValue": "none",
+              "partNumber": "065-CN7Y"
+            },
+            "PROCESSOR_CHIP": "m5max",
+            "POWER_ADAPTER": {
+              "dimensionValue": "140w",
+              "partNumber": "065-CN69"
+            }
+          }
+        }
+      }
+    },
+    "selection": {
+      "products": [],
+      "mainDisplayValues": {
+        "chassis-dimensionScreensize": {
+          "16inch": {
+            "isBlocked": false,
+            "header": "16 英寸<as-footnote data-id=\"5769c3fd1d52d3649baa0102f11e6c5c\" data-assigned=\"true\"><sup data-autom=\"footnote-sub\" class=\"as-footnote\"><span class=\"visuallyhidden\">&nbsp;脚注&nbsp;</span>1</sup></as-footnote> <div class=\"form-label-small\">可选配 M5&nbsp;Pro 或 M5&nbsp;Max 芯片。</div>"
+          }
+        },
+        "chassis-dimensionColor": {
+          "silver": {
+            "image": {
+              "sources": [
+                {
+                  "srcSet": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mbp14-proled-silver-cto-hero-202610_SW_COLOR?wid=64&hei=64&fmt=jpeg&qlt=90&.v=TE5OaVRsVG04L0hwU2pDOTMzR2F0cXpxcWdRTUEvT1FiSU8rNkhvSVVPN0FDd29XbUJVbU9hVlRNU3h4dExEb0ZtUTlHSjRnUk0vdFNrRldLbk01bTRKWlgzZzdyUXEzcGE2bUxYbWVvdHJQSUFlM2swU0pQNGxFUnFIRmdVYXk",
+                  "type": "image/jpeg"
+                }
+              ],
+              "width": "32",
+              "height": "32",
+              "attrs": "",
+              "imageName": "mbp14-proled-silver-cto-hero-202610_SW_COLOR",
+              "originalImageName": "mbp14-proled-silver-cto-hero-202610_SW_COLOR",
+              "alt": "",
+              "noImage": false,
+              "deferSrc": false,
+              "singleElementSources": true,
+              "scaleFactor": "2x"
+            },
+            "isBlocked": false,
+            "header": "银色"
+          }
+        },
+        "display-dimensionFinish": {
+          "standard": {
+            "isBlocked": false,
+            "header": "标准玻璃 <div class=\"form-label-small\">采用低反射率设计，可减少使用环境中的屏幕眩光。</div>"
+          }
+        },
+        "processor-dimensionChip": {
+          "m5max": {
+            "dynamicFooter": {
+              "m5max-18-32": null,
+              "m5max-18-40": null,
+              "multioption": "{count} 种配置可选 (配备 16 核神经网络引擎)"
+            },
+            "isBlocked": false,
+            "header": "M5 Max 芯片<div class=\"form-label-small\">Mac 专业笔电上的最强芯片，专攻各种超硬核的工作。</div>"
+          }
+        },
+        "processor-dimensionChip-cpuCoreCount-gpuCoreCount": {
+          "m5max-18-32": {
+            "dimensionComponents": {
+              "dimensionChip": "m5max",
+              "gpuCoreCount": "32",
+              "cpuCoreCount": "18"
+            },
+            "isBlocked": false,
+            "header": "<span class=\"rf-dsupgrade-block\">18 核中央处理器、</span><span class=\"rf-dsupgrade-block\">32&nbsp;核图形处理器</span>"
+          }
+        }
+      },
+      "configDisplayValues": {
+        "memory-dimensionMemory": {
+          "36gb": {
+            "header": "36GB"
+          }
+        },
+        "storage-dimensionCapacity": {
+          "2tb": {
+            "header": "2TB"
+          }
+        }
+      }
+    }
+  },
+  {
+    "context": {
+      "familyKey": "macbook-pro-proled-xdr",
+      "displayName": "MacBook Pro (PROLED XDR 显示屏)",
+      "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/16-inch-silver-standard-display-apple-m5-max-chip-18-core-cpu-40-core-gpu-48gb-memory-2tb-storage"
+    },
+    "metrics": {
+      "data": {
+        "products": [
+          {
+            "sku": "MJ2Y4",
+            "partNumber": "MJ2Y4CH/A",
+            "price": {
+              "fullPrice": 43999
+            },
+            "category": "mac",
+            "name": "16-inch MacBook Pro with PROLED XDR Display - Silver"
+          }
+        ],
+        "buyflow": {
+          "userSelections": {
+            "STORAGE": {
+              "dimensionValue": "2tb",
+              "partNumber": "065-CN4Y"
+            },
+            "SCREEN_SIZE": "16inch",
+            "MEMORY": {
+              "dimensionValue": "48gb",
+              "partNumber": "065-CN4T"
+            },
+            "CHASSIS_COLOR": "silver",
+            "KEYBOARD_LANGUAGE": {
+              "dimensionValue": "chn",
+              "partNumber": "CH065-CN75"
+            },
+            "PROCESSOR": {
+              "dimensionChip": "m5max",
+              "cpuCoreCount": "18",
+              "gpuCoreCount": "40"
+            },
+            "DISPLAY_FINISH": "standard",
+            "LOGIC_PRO": {
+              "dimensionValue": "none",
+              "partNumber": "065-CN81"
+            },
+            "FINAL_CUT_PRO": {
+              "dimensionValue": "none",
+              "partNumber": "065-CN7Y"
+            },
+            "PROCESSOR_CHIP": "m5max",
+            "POWER_ADAPTER": {
+              "dimensionValue": "140w",
+              "partNumber": "065-CN69"
+            }
+          }
+        }
+      }
+    },
+    "selection": {
+      "products": [],
+      "mainDisplayValues": {
+        "chassis-dimensionScreensize": {
+          "16inch": {
+            "isBlocked": false,
+            "header": "16 英寸<as-footnote data-id=\"5769c3fd1d52d3649baa0102f11e6c5c\" data-assigned=\"true\"><sup data-autom=\"footnote-sub\" class=\"as-footnote\"><span class=\"visuallyhidden\">&nbsp;脚注&nbsp;</span>1</sup></as-footnote> <div class=\"form-label-small\">可选配 M5&nbsp;Pro 或 M5&nbsp;Max 芯片。</div>"
+          }
+        },
+        "chassis-dimensionColor": {
+          "silver": {
+            "image": {
+              "sources": [
+                {
+                  "srcSet": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mbp14-proled-silver-cto-hero-202610_SW_COLOR?wid=64&hei=64&fmt=jpeg&qlt=90&.v=TE5OaVRsVG04L0hwU2pDOTMzR2F0cXpxcWdRTUEvT1FiSU8rNkhvSVVPN0FDd29XbUJVbU9hVlRNU3h4dExEb0ZtUTlHSjRnUk0vdFNrRldLbk01bTRKWlgzZzdyUXEzcGE2bUxYbWVvdHJQSUFlM2swU0pQNGxFUnFIRmdVYXk",
+                  "type": "image/jpeg"
+                }
+              ],
+              "width": "32",
+              "height": "32",
+              "attrs": "",
+              "imageName": "mbp14-proled-silver-cto-hero-202610_SW_COLOR",
+              "originalImageName": "mbp14-proled-silver-cto-hero-202610_SW_COLOR",
+              "alt": "",
+              "noImage": false,
+              "deferSrc": false,
+              "singleElementSources": true,
+              "scaleFactor": "2x"
+            },
+            "isBlocked": false,
+            "header": "银色"
+          }
+        },
+        "display-dimensionFinish": {
+          "standard": {
+            "isBlocked": false,
+            "header": "标准玻璃 <div class=\"form-label-small\">采用低反射率设计，可减少使用环境中的屏幕眩光。</div>"
+          }
+        },
+        "processor-dimensionChip": {
+          "m5max": {
+            "dynamicFooter": {
+              "m5max-18-32": null,
+              "m5max-18-40": null,
+              "multioption": "{count} 种配置可选 (配备 16 核神经网络引擎)"
+            },
+            "isBlocked": false,
+            "header": "M5 Max 芯片<div class=\"form-label-small\">Mac 专业笔电上的最强芯片，专攻各种超硬核的工作。</div>"
+          }
+        },
+        "processor-dimensionChip-cpuCoreCount-gpuCoreCount": {
+          "m5max-18-40": {
+            "dimensionComponents": {
+              "dimensionChip": "m5max",
+              "gpuCoreCount": "40",
+              "cpuCoreCount": "18"
+            },
+            "footer": "选择此配置需要升级至 48GB 内存，Mac 总价会相应增加。",
+            "isBlocked": false,
+            "header": "<span class=\"rf-dsupgrade-block\">18 核中央处理器、</span><span class=\"rf-dsupgrade-block\">40&nbsp;核图形处理器</span>\n<div class=\"form-label-small\">\n    处理能力和图形渲染速度大幅提升，从运行大语言模型到剪辑 8K 视频，各种任务加速搞定。\n</div>"
+          }
+        }
+      },
+      "configDisplayValues": {
+        "memory-dimensionMemory": {
+          "48gb": {
+            "header": "48GB"
+          }
+        },
+        "storage-dimensionCapacity": {
+          "2tb": {
+            "header": "2TB"
+          }
+        }
+      }
+    }
+  },
+  {
+    "context": {
+      "familyKey": "macbook-pro-proled-xdr",
+      "displayName": "MacBook Pro (PROLED XDR 显示屏)",
+      "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/16-inch-silver-standard-display-apple-m5-pro-chip-18-core-cpu-20-core-gpu-24gb-memory-1tb-storage"
+    },
+    "metrics": {
+      "data": {
+        "products": [
+          {
+            "sku": "MJ2W4",
+            "partNumber": "MJ2W4CH/A",
+            "price": {
+              "fullPrice": 27999
+            },
+            "category": "mac",
+            "name": "16-inch MacBook Pro with PROLED XDR Display - Silver"
+          }
+        ],
+        "buyflow": {
+          "userSelections": {
+            "STORAGE": {
+              "dimensionValue": "1tb",
+              "partNumber": "065-CN4X"
+            },
+            "SCREEN_SIZE": "16inch",
+            "MEMORY": {
+              "dimensionValue": "24gb",
+              "partNumber": "065-CN4P"
+            },
+            "CHASSIS_COLOR": "silver",
+            "KEYBOARD_LANGUAGE": {
+              "dimensionValue": "chn",
+              "partNumber": "CH065-CN75"
+            },
+            "PROCESSOR": {
+              "dimensionChip": "m5pro",
+              "cpuCoreCount": "18",
+              "gpuCoreCount": "20"
+            },
+            "DISPLAY_FINISH": "standard",
+            "LOGIC_PRO": {
+              "dimensionValue": "none",
+              "partNumber": "065-CN81"
+            },
+            "FINAL_CUT_PRO": {
+              "dimensionValue": "none",
+              "partNumber": "065-CN7Y"
+            },
+            "PROCESSOR_CHIP": "m5pro",
+            "POWER_ADAPTER": {
+              "dimensionValue": "140w",
+              "partNumber": "065-CN69"
+            }
+          }
+        }
+      }
+    },
+    "selection": {
+      "products": [],
+      "mainDisplayValues": {
+        "chassis-dimensionScreensize": {
+          "16inch": {
+            "isBlocked": false,
+            "header": "16 英寸<as-footnote data-id=\"5769c3fd1d52d3649baa0102f11e6c5c\" data-assigned=\"true\"><sup data-autom=\"footnote-sub\" class=\"as-footnote\"><span class=\"visuallyhidden\">&nbsp;脚注&nbsp;</span>1</sup></as-footnote> <div class=\"form-label-small\">可选配 M5&nbsp;Pro 或 M5&nbsp;Max 芯片。</div>"
+          }
+        },
+        "chassis-dimensionColor": {
+          "silver": {
+            "image": {
+              "sources": [
+                {
+                  "srcSet": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mbp14-proled-silver-cto-hero-202610_SW_COLOR?wid=64&hei=64&fmt=jpeg&qlt=90&.v=TE5OaVRsVG04L0hwU2pDOTMzR2F0cXpxcWdRTUEvT1FiSU8rNkhvSVVPN0FDd29XbUJVbU9hVlRNU3h4dExEb0ZtUTlHSjRnUk0vdFNrRldLbk01bTRKWlgzZzdyUXEzcGE2bUxYbWVvdHJQSUFlM2swU0pQNGxFUnFIRmdVYXk",
+                  "type": "image/jpeg"
+                }
+              ],
+              "width": "32",
+              "height": "32",
+              "attrs": "",
+              "imageName": "mbp14-proled-silver-cto-hero-202610_SW_COLOR",
+              "originalImageName": "mbp14-proled-silver-cto-hero-202610_SW_COLOR",
+              "alt": "",
+              "noImage": false,
+              "deferSrc": false,
+              "singleElementSources": true,
+              "scaleFactor": "2x"
+            },
+            "isBlocked": false,
+            "header": "银色"
+          }
+        },
+        "display-dimensionFinish": {
+          "standard": {
+            "isBlocked": false,
+            "header": "标准玻璃 <div class=\"form-label-small\">采用低反射率设计，可减少使用环境中的屏幕眩光。</div>"
+          }
+        },
+        "processor-dimensionChip": {
+          "m5pro": {
+            "dynamicFooter": {
+              "m5pro-15-16": "15 核中央处理器、16 核图形处理器、16 核神经网络引擎",
+              "m5pro-18-20": "18 核中央处理器、20 核图形处理器、16 核神经网络引擎",
+              "multioption": "{count} 种配置可选 (配备 16 核神经网络引擎)"
+            },
+            "isBlocked": false,
+            "header": "M5 Pro 芯片<div class=\"form-label-small\">突破性的性能和速度，胜任各种高难度任务，是专业人士的工作利器。</div>"
+          }
+        },
+        "processor-dimensionChip-cpuCoreCount-gpuCoreCount": {
+          "m5pro-18-20": {
+            "dimensionComponents": {
+              "dimensionChip": "m5pro",
+              "gpuCoreCount": "20",
+              "cpuCoreCount": "18"
+            },
+            "isBlocked": false,
+            "header": "<span class=\"rf-dsupgrade-block\">18 核中央处理器、</span><span class=\"rf-dsupgrade-block\">20&nbsp;核图形处理器</span>\n<div class=\"form-label-small\">\n    处理性能和图形渲染速度进一步提升，可胜任游戏、编程和创意工作等繁重任务。\n</div>"
+          }
+        }
+      },
+      "configDisplayValues": {
+        "memory-dimensionMemory": {
+          "24gb": {
+            "header": "24GB"
+          }
+        },
+        "storage-dimensionCapacity": {
+          "1tb": {
+            "header": "1TB"
+          }
+        }
+      }
+    }
+  },
+  {
+    "context": {
+      "familyKey": "macbook-pro-proled-xdr",
+      "displayName": "MacBook Pro (PROLED XDR 显示屏)",
+      "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/16-inch-silver-standard-display-apple-m5-pro-chip-18-core-cpu-20-core-gpu-48gb-memory-1tb-storage"
+    },
+    "metrics": {
+      "data": {
+        "products": [
+          {
+            "sku": "MMF94",
+            "partNumber": "MMF94CH/A",
+            "price": {
+              "fullPrice": 32499
+            },
+            "category": "mac",
+            "name": "16-inch MacBook Pro with PROLED XDR Display - Silver"
+          }
+        ],
+        "buyflow": {
+          "userSelections": {
+            "STORAGE": {
+              "dimensionValue": "1tb",
+              "partNumber": "065-CN4X"
+            },
+            "SCREEN_SIZE": "16inch",
+            "MEMORY": {
+              "dimensionValue": "48gb",
+              "partNumber": "065-CN4T"
+            },
+            "CHASSIS_COLOR": "silver",
+            "KEYBOARD_LANGUAGE": {
+              "dimensionValue": "chn",
+              "partNumber": "CH065-CN75"
+            },
+            "PROCESSOR": {
+              "dimensionChip": "m5pro",
+              "cpuCoreCount": "18",
+              "gpuCoreCount": "20"
+            },
+            "DISPLAY_FINISH": "standard",
+            "LOGIC_PRO": {
+              "dimensionValue": "none",
+              "partNumber": "065-CN81"
+            },
+            "FINAL_CUT_PRO": {
+              "dimensionValue": "none",
+              "partNumber": "065-CN7Y"
+            },
+            "PROCESSOR_CHIP": "m5pro",
+            "POWER_ADAPTER": {
+              "dimensionValue": "140w",
+              "partNumber": "065-CN69"
+            }
+          }
+        }
+      }
+    },
+    "selection": {
+      "products": [],
+      "mainDisplayValues": {
+        "chassis-dimensionScreensize": {
+          "16inch": {
+            "isBlocked": false,
+            "header": "16 英寸<as-footnote data-id=\"5769c3fd1d52d3649baa0102f11e6c5c\" data-assigned=\"true\"><sup data-autom=\"footnote-sub\" class=\"as-footnote\"><span class=\"visuallyhidden\">&nbsp;脚注&nbsp;</span>1</sup></as-footnote> <div class=\"form-label-small\">可选配 M5&nbsp;Pro 或 M5&nbsp;Max 芯片。</div>"
+          }
+        },
+        "chassis-dimensionColor": {
+          "silver": {
+            "image": {
+              "sources": [
+                {
+                  "srcSet": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mbp14-proled-silver-cto-hero-202610_SW_COLOR?wid=64&hei=64&fmt=jpeg&qlt=90&.v=TE5OaVRsVG04L0hwU2pDOTMzR2F0cXpxcWdRTUEvT1FiSU8rNkhvSVVPN0FDd29XbUJVbU9hVlRNU3h4dExEb0ZtUTlHSjRnUk0vdFNrRldLbk01bTRKWlgzZzdyUXEzcGE2bUxYbWVvdHJQSUFlM2swU0pQNGxFUnFIRmdVYXk",
+                  "type": "image/jpeg"
+                }
+              ],
+              "width": "32",
+              "height": "32",
+              "attrs": "",
+              "imageName": "mbp14-proled-silver-cto-hero-202610_SW_COLOR",
+              "originalImageName": "mbp14-proled-silver-cto-hero-202610_SW_COLOR",
+              "alt": "",
+              "noImage": false,
+              "deferSrc": false,
+              "singleElementSources": true,
+              "scaleFactor": "2x"
+            },
+            "isBlocked": false,
+            "header": "银色"
+          }
+        },
+        "display-dimensionFinish": {
+          "standard": {
+            "isBlocked": false,
+            "header": "标准玻璃 <div class=\"form-label-small\">采用低反射率设计，可减少使用环境中的屏幕眩光。</div>"
+          }
+        },
+        "processor-dimensionChip": {
+          "m5pro": {
+            "dynamicFooter": {
+              "m5pro-15-16": "15 核中央处理器、16 核图形处理器、16 核神经网络引擎",
+              "m5pro-18-20": "18 核中央处理器、20 核图形处理器、16 核神经网络引擎",
+              "multioption": "{count} 种配置可选 (配备 16 核神经网络引擎)"
+            },
+            "isBlocked": false,
+            "header": "M5 Pro 芯片<div class=\"form-label-small\">突破性的性能和速度，胜任各种高难度任务，是专业人士的工作利器。</div>"
+          }
+        },
+        "processor-dimensionChip-cpuCoreCount-gpuCoreCount": {
+          "m5pro-18-20": {
+            "dimensionComponents": {
+              "dimensionChip": "m5pro",
+              "gpuCoreCount": "20",
+              "cpuCoreCount": "18"
+            },
+            "isBlocked": false,
+            "header": "<span class=\"rf-dsupgrade-block\">18 核中央处理器、</span><span class=\"rf-dsupgrade-block\">20&nbsp;核图形处理器</span>\n<div class=\"form-label-small\">\n    处理性能和图形渲染速度进一步提升，可胜任游戏、编程和创意工作等繁重任务。\n</div>"
+          }
+        }
+      },
+      "configDisplayValues": {
+        "memory-dimensionMemory": {
+          "48gb": {
+            "header": "48GB"
+          }
+        },
+        "storage-dimensionCapacity": {
+          "1tb": {
+            "header": "1TB"
+          }
+        }
+      }
+    }
+  },
+  {
+    "context": {
+      "familyKey": "macbook-pro-proled-xdr",
+      "displayName": "MacBook Pro (PROLED XDR 显示屏)",
+      "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/16-inch-space-black-standard-display-apple-m5-max-chip-18-core-cpu-32-core-gpu-36gb-memory-2tb-storage"
+    },
+    "metrics": {
+      "data": {
+        "products": [
+          {
+            "sku": "MJ314",
+            "partNumber": "MJ314CH/A",
+            "price": {
+              "fullPrice": 38999
+            },
+            "category": "mac",
+            "name": "16-inch MacBook Pro with PROLED XDR Display - Space Black"
+          }
+        ],
+        "buyflow": {
+          "userSelections": {
+            "STORAGE": {
+              "dimensionValue": "2tb",
+              "partNumber": "065-CN4Y"
+            },
+            "SCREEN_SIZE": "16inch",
+            "MEMORY": {
+              "dimensionValue": "36gb",
+              "partNumber": "065-CN4Q"
+            },
+            "CHASSIS_COLOR": "spaceblack",
+            "KEYBOARD_LANGUAGE": {
+              "dimensionValue": "chn",
+              "partNumber": "CH065-CN76"
+            },
+            "PROCESSOR": {
+              "dimensionChip": "m5max",
+              "cpuCoreCount": "18",
+              "gpuCoreCount": "32"
+            },
+            "DISPLAY_FINISH": "standard",
+            "LOGIC_PRO": {
+              "dimensionValue": "none",
+              "partNumber": "065-CN81"
+            },
+            "FINAL_CUT_PRO": {
+              "dimensionValue": "none",
+              "partNumber": "065-CN7Y"
+            },
+            "PROCESSOR_CHIP": "m5max",
+            "POWER_ADAPTER": {
+              "dimensionValue": "140w",
+              "partNumber": "065-CN69"
+            }
+          }
+        }
+      }
+    },
+    "selection": {
+      "products": [],
+      "mainDisplayValues": {
+        "chassis-dimensionScreensize": {
+          "16inch": {
+            "isBlocked": false,
+            "header": "16 英寸<as-footnote data-id=\"5769c3fd1d52d3649baa0102f11e6c5c\" data-assigned=\"true\"><sup data-autom=\"footnote-sub\" class=\"as-footnote\"><span class=\"visuallyhidden\">&nbsp;脚注&nbsp;</span>1</sup></as-footnote> <div class=\"form-label-small\">可选配 M5&nbsp;Pro 或 M5&nbsp;Max 芯片。</div>"
+          }
+        },
+        "chassis-dimensionColor": {
+          "spaceblack": {
+            "image": {
+              "sources": [
+                {
+                  "srcSet": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mbp14-proled-spaceblack-cto-hero-202610_SW_COLOR?wid=64&hei=64&fmt=jpeg&qlt=90&.v=YVJLRGhvZm5jUVRsdXlRNVZURWhLV1kxRjdqOFRPaEZRbHFSd3lja3FFL2xZSUxLK0pMdDAvaTFaMzNib2c3RWhqSDhoNW8wc3l1V25TSU5vYVNENHI2TGhYaGhMVkJpQ2RGWWVURTZNbXh2ZkplcmpabHJhbzE3UitTbkJ2L0s",
+                  "type": "image/jpeg"
+                }
+              ],
+              "width": "32",
+              "height": "32",
+              "attrs": "",
+              "imageName": "mbp14-proled-spaceblack-cto-hero-202610_SW_COLOR",
+              "originalImageName": "mbp14-proled-spaceblack-cto-hero-202610_SW_COLOR",
+              "alt": "",
+              "noImage": false,
+              "deferSrc": false,
+              "singleElementSources": true,
+              "scaleFactor": "2x"
+            },
+            "isBlocked": false,
+            "header": "深空黑色"
+          }
+        },
+        "display-dimensionFinish": {
+          "standard": {
+            "isBlocked": false,
+            "header": "标准玻璃 <div class=\"form-label-small\">采用低反射率设计，可减少使用环境中的屏幕眩光。</div>"
+          }
+        },
+        "processor-dimensionChip": {
+          "m5max": {
+            "dynamicFooter": {
+              "m5max-18-32": null,
+              "m5max-18-40": null,
+              "multioption": "{count} 种配置可选 (配备 16 核神经网络引擎)"
+            },
+            "isBlocked": false,
+            "header": "M5 Max 芯片<div class=\"form-label-small\">Mac 专业笔电上的最强芯片，专攻各种超硬核的工作。</div>"
+          }
+        },
+        "processor-dimensionChip-cpuCoreCount-gpuCoreCount": {
+          "m5max-18-32": {
+            "dimensionComponents": {
+              "dimensionChip": "m5max",
+              "gpuCoreCount": "32",
+              "cpuCoreCount": "18"
+            },
+            "isBlocked": false,
+            "header": "<span class=\"rf-dsupgrade-block\">18 核中央处理器、</span><span class=\"rf-dsupgrade-block\">32&nbsp;核图形处理器</span>"
+          }
+        }
+      },
+      "configDisplayValues": {
+        "memory-dimensionMemory": {
+          "36gb": {
+            "header": "36GB"
+          }
+        },
+        "storage-dimensionCapacity": {
+          "2tb": {
+            "header": "2TB"
+          }
+        }
+      }
+    }
+  },
+  {
+    "context": {
+      "familyKey": "macbook-pro-proled-xdr",
+      "displayName": "MacBook Pro (PROLED XDR 显示屏)",
+      "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/16-inch-space-black-standard-display-apple-m5-max-chip-18-core-cpu-40-core-gpu-48gb-memory-2tb-storage"
+    },
+    "metrics": {
+      "data": {
+        "products": [
+          {
+            "sku": "MJ334",
+            "partNumber": "MJ334CH/A",
+            "price": {
+              "fullPrice": 43999
+            },
+            "category": "mac",
+            "name": "16-inch MacBook Pro with PROLED XDR Display - Space Black"
+          }
+        ],
+        "buyflow": {
+          "userSelections": {
+            "STORAGE": {
+              "dimensionValue": "2tb",
+              "partNumber": "065-CN4Y"
+            },
+            "SCREEN_SIZE": "16inch",
+            "MEMORY": {
+              "dimensionValue": "48gb",
+              "partNumber": "065-CN4T"
+            },
+            "CHASSIS_COLOR": "spaceblack",
+            "KEYBOARD_LANGUAGE": {
+              "dimensionValue": "chn",
+              "partNumber": "CH065-CN76"
+            },
+            "PROCESSOR": {
+              "dimensionChip": "m5max",
+              "cpuCoreCount": "18",
+              "gpuCoreCount": "40"
+            },
+            "DISPLAY_FINISH": "standard",
+            "LOGIC_PRO": {
+              "dimensionValue": "none",
+              "partNumber": "065-CN81"
+            },
+            "FINAL_CUT_PRO": {
+              "dimensionValue": "none",
+              "partNumber": "065-CN7Y"
+            },
+            "PROCESSOR_CHIP": "m5max",
+            "POWER_ADAPTER": {
+              "dimensionValue": "140w",
+              "partNumber": "065-CN69"
+            }
+          }
+        }
+      }
+    },
+    "selection": {
+      "products": [],
+      "mainDisplayValues": {
+        "chassis-dimensionScreensize": {
+          "16inch": {
+            "isBlocked": false,
+            "header": "16 英寸<as-footnote data-id=\"5769c3fd1d52d3649baa0102f11e6c5c\" data-assigned=\"true\"><sup data-autom=\"footnote-sub\" class=\"as-footnote\"><span class=\"visuallyhidden\">&nbsp;脚注&nbsp;</span>1</sup></as-footnote> <div class=\"form-label-small\">可选配 M5&nbsp;Pro 或 M5&nbsp;Max 芯片。</div>"
+          }
+        },
+        "chassis-dimensionColor": {
+          "spaceblack": {
+            "image": {
+              "sources": [
+                {
+                  "srcSet": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mbp14-proled-spaceblack-cto-hero-202610_SW_COLOR?wid=64&hei=64&fmt=jpeg&qlt=90&.v=YVJLRGhvZm5jUVRsdXlRNVZURWhLV1kxRjdqOFRPaEZRbHFSd3lja3FFL2xZSUxLK0pMdDAvaTFaMzNib2c3RWhqSDhoNW8wc3l1V25TSU5vYVNENHI2TGhYaGhMVkJpQ2RGWWVURTZNbXh2ZkplcmpabHJhbzE3UitTbkJ2L0s",
+                  "type": "image/jpeg"
+                }
+              ],
+              "width": "32",
+              "height": "32",
+              "attrs": "",
+              "imageName": "mbp14-proled-spaceblack-cto-hero-202610_SW_COLOR",
+              "originalImageName": "mbp14-proled-spaceblack-cto-hero-202610_SW_COLOR",
+              "alt": "",
+              "noImage": false,
+              "deferSrc": false,
+              "singleElementSources": true,
+              "scaleFactor": "2x"
+            },
+            "isBlocked": false,
+            "header": "深空黑色"
+          }
+        },
+        "display-dimensionFinish": {
+          "standard": {
+            "isBlocked": false,
+            "header": "标准玻璃 <div class=\"form-label-small\">采用低反射率设计，可减少使用环境中的屏幕眩光。</div>"
+          }
+        },
+        "processor-dimensionChip": {
+          "m5max": {
+            "dynamicFooter": {
+              "m5max-18-32": null,
+              "m5max-18-40": null,
+              "multioption": "{count} 种配置可选 (配备 16 核神经网络引擎)"
+            },
+            "isBlocked": false,
+            "header": "M5 Max 芯片<div class=\"form-label-small\">Mac 专业笔电上的最强芯片，专攻各种超硬核的工作。</div>"
+          }
+        },
+        "processor-dimensionChip-cpuCoreCount-gpuCoreCount": {
+          "m5max-18-40": {
+            "dimensionComponents": {
+              "dimensionChip": "m5max",
+              "gpuCoreCount": "40",
+              "cpuCoreCount": "18"
+            },
+            "footer": "选择此配置需要升级至 48GB 内存，Mac 总价会相应增加。",
+            "isBlocked": false,
+            "header": "<span class=\"rf-dsupgrade-block\">18 核中央处理器、</span><span class=\"rf-dsupgrade-block\">40&nbsp;核图形处理器</span>\n<div class=\"form-label-small\">\n    处理能力和图形渲染速度大幅提升，从运行大语言模型到剪辑 8K 视频，各种任务加速搞定。\n</div>"
+          }
+        }
+      },
+      "configDisplayValues": {
+        "memory-dimensionMemory": {
+          "48gb": {
+            "header": "48GB"
+          }
+        },
+        "storage-dimensionCapacity": {
+          "2tb": {
+            "header": "2TB"
+          }
+        }
+      }
+    }
+  },
+  {
+    "context": {
+      "familyKey": "macbook-pro-proled-xdr",
+      "displayName": "MacBook Pro (PROLED XDR 显示屏)",
+      "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/16-inch-space-black-standard-display-apple-m5-pro-chip-18-core-cpu-20-core-gpu-24gb-memory-1tb-storage"
+    },
+    "metrics": {
+      "data": {
+        "products": [
+          {
+            "sku": "MJ304",
+            "partNumber": "MJ304CH/A",
+            "price": {
+              "fullPrice": 27999
+            },
+            "category": "mac",
+            "name": "16-inch MacBook Pro with PROLED XDR Display - Space Black"
+          }
+        ],
+        "buyflow": {
+          "userSelections": {
+            "STORAGE": {
+              "dimensionValue": "1tb",
+              "partNumber": "065-CN4X"
+            },
+            "SCREEN_SIZE": "16inch",
+            "MEMORY": {
+              "dimensionValue": "24gb",
+              "partNumber": "065-CN4P"
+            },
+            "CHASSIS_COLOR": "spaceblack",
+            "KEYBOARD_LANGUAGE": {
+              "dimensionValue": "chn",
+              "partNumber": "CH065-CN76"
+            },
+            "PROCESSOR": {
+              "dimensionChip": "m5pro",
+              "cpuCoreCount": "18",
+              "gpuCoreCount": "20"
+            },
+            "DISPLAY_FINISH": "standard",
+            "LOGIC_PRO": {
+              "dimensionValue": "none",
+              "partNumber": "065-CN81"
+            },
+            "FINAL_CUT_PRO": {
+              "dimensionValue": "none",
+              "partNumber": "065-CN7Y"
+            },
+            "PROCESSOR_CHIP": "m5pro",
+            "POWER_ADAPTER": {
+              "dimensionValue": "140w",
+              "partNumber": "065-CN69"
+            }
+          }
+        }
+      }
+    },
+    "selection": {
+      "products": [],
+      "mainDisplayValues": {
+        "chassis-dimensionScreensize": {
+          "16inch": {
+            "isBlocked": false,
+            "header": "16 英寸<as-footnote data-id=\"5769c3fd1d52d3649baa0102f11e6c5c\" data-assigned=\"true\"><sup data-autom=\"footnote-sub\" class=\"as-footnote\"><span class=\"visuallyhidden\">&nbsp;脚注&nbsp;</span>1</sup></as-footnote> <div class=\"form-label-small\">可选配 M5&nbsp;Pro 或 M5&nbsp;Max 芯片。</div>"
+          }
+        },
+        "chassis-dimensionColor": {
+          "spaceblack": {
+            "image": {
+              "sources": [
+                {
+                  "srcSet": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mbp14-proled-spaceblack-cto-hero-202610_SW_COLOR?wid=64&hei=64&fmt=jpeg&qlt=90&.v=YVJLRGhvZm5jUVRsdXlRNVZURWhLV1kxRjdqOFRPaEZRbHFSd3lja3FFL2xZSUxLK0pMdDAvaTFaMzNib2c3RWhqSDhoNW8wc3l1V25TSU5vYVNENHI2TGhYaGhMVkJpQ2RGWWVURTZNbXh2ZkplcmpabHJhbzE3UitTbkJ2L0s",
+                  "type": "image/jpeg"
+                }
+              ],
+              "width": "32",
+              "height": "32",
+              "attrs": "",
+              "imageName": "mbp14-proled-spaceblack-cto-hero-202610_SW_COLOR",
+              "originalImageName": "mbp14-proled-spaceblack-cto-hero-202610_SW_COLOR",
+              "alt": "",
+              "noImage": false,
+              "deferSrc": false,
+              "singleElementSources": true,
+              "scaleFactor": "2x"
+            },
+            "isBlocked": false,
+            "header": "深空黑色"
+          }
+        },
+        "display-dimensionFinish": {
+          "standard": {
+            "isBlocked": false,
+            "header": "标准玻璃 <div class=\"form-label-small\">采用低反射率设计，可减少使用环境中的屏幕眩光。</div>"
+          }
+        },
+        "processor-dimensionChip": {
+          "m5pro": {
+            "dynamicFooter": {
+              "m5pro-15-16": "15 核中央处理器、16 核图形处理器、16 核神经网络引擎",
+              "m5pro-18-20": "18 核中央处理器、20 核图形处理器、16 核神经网络引擎",
+              "multioption": "{count} 种配置可选 (配备 16 核神经网络引擎)"
+            },
+            "isBlocked": false,
+            "header": "M5 Pro 芯片<div class=\"form-label-small\">突破性的性能和速度，胜任各种高难度任务，是专业人士的工作利器。</div>"
+          }
+        },
+        "processor-dimensionChip-cpuCoreCount-gpuCoreCount": {
+          "m5pro-18-20": {
+            "dimensionComponents": {
+              "dimensionChip": "m5pro",
+              "gpuCoreCount": "20",
+              "cpuCoreCount": "18"
+            },
+            "isBlocked": false,
+            "header": "<span class=\"rf-dsupgrade-block\">18 核中央处理器、</span><span class=\"rf-dsupgrade-block\">20&nbsp;核图形处理器</span>\n<div class=\"form-label-small\">\n    处理性能和图形渲染速度进一步提升，可胜任游戏、编程和创意工作等繁重任务。\n</div>"
+          }
+        }
+      },
+      "configDisplayValues": {
+        "memory-dimensionMemory": {
+          "24gb": {
+            "header": "24GB"
+          }
+        },
+        "storage-dimensionCapacity": {
+          "1tb": {
+            "header": "1TB"
+          }
+        }
+      }
+    }
+  },
+  {
+    "context": {
+      "familyKey": "macbook-pro-proled-xdr",
+      "displayName": "MacBook Pro (PROLED XDR 显示屏)",
+      "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/16-inch-space-black-standard-display-apple-m5-pro-chip-18-core-cpu-20-core-gpu-48gb-memory-1tb-storage"
+    },
+    "metrics": {
+      "data": {
+        "products": [
+          {
+            "sku": "MMFA4",
+            "partNumber": "MMFA4CH/A",
+            "price": {
+              "fullPrice": 32499
+            },
+            "category": "mac",
+            "name": "16-inch MacBook Pro with PROLED XDR Display - Space Black"
+          }
+        ],
+        "buyflow": {
+          "userSelections": {
+            "STORAGE": {
+              "dimensionValue": "1tb",
+              "partNumber": "065-CN4X"
+            },
+            "SCREEN_SIZE": "16inch",
+            "MEMORY": {
+              "dimensionValue": "48gb",
+              "partNumber": "065-CN4T"
+            },
+            "CHASSIS_COLOR": "spaceblack",
+            "KEYBOARD_LANGUAGE": {
+              "dimensionValue": "chn",
+              "partNumber": "CH065-CN76"
+            },
+            "PROCESSOR": {
+              "dimensionChip": "m5pro",
+              "cpuCoreCount": "18",
+              "gpuCoreCount": "20"
+            },
+            "DISPLAY_FINISH": "standard",
+            "LOGIC_PRO": {
+              "dimensionValue": "none",
+              "partNumber": "065-CN81"
+            },
+            "FINAL_CUT_PRO": {
+              "dimensionValue": "none",
+              "partNumber": "065-CN7Y"
+            },
+            "PROCESSOR_CHIP": "m5pro",
+            "POWER_ADAPTER": {
+              "dimensionValue": "140w",
+              "partNumber": "065-CN69"
+            }
+          }
+        }
+      }
+    },
+    "selection": {
+      "products": [],
+      "mainDisplayValues": {
+        "chassis-dimensionScreensize": {
+          "16inch": {
+            "isBlocked": false,
+            "header": "16 英寸<as-footnote data-id=\"5769c3fd1d52d3649baa0102f11e6c5c\" data-assigned=\"true\"><sup data-autom=\"footnote-sub\" class=\"as-footnote\"><span class=\"visuallyhidden\">&nbsp;脚注&nbsp;</span>1</sup></as-footnote> <div class=\"form-label-small\">可选配 M5&nbsp;Pro 或 M5&nbsp;Max 芯片。</div>"
+          }
+        },
+        "chassis-dimensionColor": {
+          "spaceblack": {
+            "image": {
+              "sources": [
+                {
+                  "srcSet": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mbp14-proled-spaceblack-cto-hero-202610_SW_COLOR?wid=64&hei=64&fmt=jpeg&qlt=90&.v=YVJLRGhvZm5jUVRsdXlRNVZURWhLV1kxRjdqOFRPaEZRbHFSd3lja3FFL2xZSUxLK0pMdDAvaTFaMzNib2c3RWhqSDhoNW8wc3l1V25TSU5vYVNENHI2TGhYaGhMVkJpQ2RGWWVURTZNbXh2ZkplcmpabHJhbzE3UitTbkJ2L0s",
+                  "type": "image/jpeg"
+                }
+              ],
+              "width": "32",
+              "height": "32",
+              "attrs": "",
+              "imageName": "mbp14-proled-spaceblack-cto-hero-202610_SW_COLOR",
+              "originalImageName": "mbp14-proled-spaceblack-cto-hero-202610_SW_COLOR",
+              "alt": "",
+              "noImage": false,
+              "deferSrc": false,
+              "singleElementSources": true,
+              "scaleFactor": "2x"
+            },
+            "isBlocked": false,
+            "header": "深空黑色"
+          }
+        },
+        "display-dimensionFinish": {
+          "standard": {
+            "isBlocked": false,
+            "header": "标准玻璃 <div class=\"form-label-small\">采用低反射率设计，可减少使用环境中的屏幕眩光。</div>"
+          }
+        },
+        "processor-dimensionChip": {
+          "m5pro": {
+            "dynamicFooter": {
+              "m5pro-15-16": "15 核中央处理器、16 核图形处理器、16 核神经网络引擎",
+              "m5pro-18-20": "18 核中央处理器、20 核图形处理器、16 核神经网络引擎",
+              "multioption": "{count} 种配置可选 (配备 16 核神经网络引擎)"
+            },
+            "isBlocked": false,
+            "header": "M5 Pro 芯片<div class=\"form-label-small\">突破性的性能和速度，胜任各种高难度任务，是专业人士的工作利器。</div>"
+          }
+        },
+        "processor-dimensionChip-cpuCoreCount-gpuCoreCount": {
+          "m5pro-18-20": {
+            "dimensionComponents": {
+              "dimensionChip": "m5pro",
+              "gpuCoreCount": "20",
+              "cpuCoreCount": "18"
+            },
+            "isBlocked": false,
+            "header": "<span class=\"rf-dsupgrade-block\">18 核中央处理器、</span><span class=\"rf-dsupgrade-block\">20&nbsp;核图形处理器</span>\n<div class=\"form-label-small\">\n    处理性能和图形渲染速度进一步提升，可胜任游戏、编程和创意工作等繁重任务。\n</div>"
+          }
+        }
+      },
+      "configDisplayValues": {
+        "memory-dimensionMemory": {
+          "48gb": {
+            "header": "48GB"
+          }
+        },
+        "storage-dimensionCapacity": {
+          "1tb": {
+            "header": "1TB"
+          }
+        }
+      }
+    }
+  },
+  {
+    "context": {
+      "familyKey": "mac-studio",
+      "displayName": "Mac Studio",
+      "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/mac-studio/m5-max-chip-18-core-cpu-32-core-gpu-36gb-memory-512gb-storage"
+    },
+    "metrics": {
+      "data": {
+        "products": [
+          {
+            "sku": "MHL64",
+            "partNumber": "MHL64CH/A",
+            "price": {
+              "fullPrice": 19999
+            },
+            "category": "mac",
+            "name": "Mac Studio"
+          }
+        ],
+        "buyflow": {
+          "userSelections": {
+            "STORAGE": {
+              "dimensionValue": "512gb",
+              "partNumber": "065-CLQW"
+            },
+            "LOGIC_PRO": {
+              "dimensionValue": "none",
+              "partNumber": "065-CLTM"
+            },
+            "MEMORY": {
+              "dimensionValue": "36gb",
+              "partNumber": "065-CLQ2"
+            },
+            "PROCESSOR": {
+              "dimensionChip": "m5max",
+              "cpuCoreCount": "18",
+              "gpuCoreCount": "32"
+            },
+            "FINAL_CUT_PRO": {
+              "dimensionValue": "none",
+              "partNumber": "065-CLTK"
+            },
+            "PROCESSOR_CHIP": "m5max"
+          }
+        }
+      }
+    },
+    "selection": {
+      "products": [],
+      "mainDisplayValues": {
+        "processor-dimensionChip": {
+          "m5max": {
+            "dynamicFooter": {
+              "m5max-18-32": null,
+              "m5max-18-40": null,
+              "multioption": "{count} 种配置可选 (配备 16 核神经网络引擎)"
+            },
+            "isBlocked": false,
+            "header": "M5&nbsp;Max 芯片 <div class=\"form-label-small\">惊人速度与实力，处理各种创意项目和专业工作得心应手。</div>"
+          }
+        },
+        "processor-dimensionChip-cpuCoreCount-gpuCoreCount": {
+          "m5max-18-32": {
+            "dimensionComponents": {
+              "dimensionChip": "m5max",
+              "gpuCoreCount": "32",
+              "cpuCoreCount": "18"
+            },
+            "isBlocked": false,
+            "header": "<span class=\"rf-dsupgrade-block\">18&nbsp;核中央处理器、</span><span class=\"rf-dsupgrade-block\">32&nbsp;核图形处理器</span>"
+          }
+        }
+      },
+      "configDisplayValues": {
+        "memory-dimensionMemory": {
+          "36gb": {
+            "header": "36GB"
+          }
+        },
+        "storage-dimensionCapacity": {
+          "512gb": {
+            "header": "512GB"
+          }
+        }
+      }
+    }
+  },
+  {
+    "context": {
+      "familyKey": "mac-studio",
+      "displayName": "Mac Studio",
+      "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/mac-studio/m5-max-chip-18-core-cpu-40-core-gpu-64gb-memory-1tb-storage"
+    },
+    "metrics": {
+      "data": {
+        "products": [
+          {
+            "sku": "MHQJ4",
+            "partNumber": "MHQJ4CH/A",
+            "price": {
+              "fullPrice": 29749
+            },
+            "category": "mac",
+            "name": "Mac Studio"
+          }
+        ],
+        "buyflow": {
+          "userSelections": {
+            "STORAGE": {
+              "dimensionValue": "1tb",
+              "partNumber": "065-CLQX"
+            },
+            "LOGIC_PRO": {
+              "dimensionValue": "none",
+              "partNumber": "065-CLTM"
+            },
+            "MEMORY": {
+              "dimensionValue": "64gb",
+              "partNumber": "065-CLQ4"
+            },
+            "PROCESSOR": {
+              "dimensionChip": "m5max",
+              "cpuCoreCount": "18",
+              "gpuCoreCount": "40"
+            },
+            "FINAL_CUT_PRO": {
+              "dimensionValue": "none",
+              "partNumber": "065-CLTK"
+            },
+            "PROCESSOR_CHIP": "m5max"
+          }
+        }
+      }
+    },
+    "selection": {
+      "products": [],
+      "mainDisplayValues": {
+        "processor-dimensionChip": {
+          "m5max": {
+            "dynamicFooter": {
+              "m5max-18-32": null,
+              "m5max-18-40": null,
+              "multioption": "{count} 种配置可选 (配备 16 核神经网络引擎)"
+            },
+            "isBlocked": false,
+            "header": "M5&nbsp;Max 芯片 <div class=\"form-label-small\">惊人速度与实力，处理各种创意项目和专业工作得心应手。</div>"
+          }
+        },
+        "processor-dimensionChip-cpuCoreCount-gpuCoreCount": {
+          "m5max-18-40": {
+            "dimensionComponents": {
+              "dimensionChip": "m5max",
+              "gpuCoreCount": "40",
+              "cpuCoreCount": "18"
+            },
+            "footer": "选择此配置需要升级至 48GB 内存，Mac 总价会相应增加。",
+            "isBlocked": false,
+            "header": "<span class=\"rf-dsupgrade-block\">18&nbsp;核中央处理器、</span><span class=\"rf-dsupgrade-block\">40&nbsp;核图形处理器</span><div class=\"form-label-small\">处理性能和图形渲染速度进一步提升，并可加快大语言模型运行和 8K 视频剪辑等任务。</div>"
+          }
+        }
+      },
+      "configDisplayValues": {
+        "memory-dimensionMemory": {
+          "64gb": {
+            "header": "64GB"
+          }
+        },
+        "storage-dimensionCapacity": {
+          "1tb": {
+            "header": "1TB"
+          }
+        }
+      }
+    }
+  },
+  {
+    "context": {
+      "familyKey": "mac-studio",
+      "displayName": "Mac Studio",
+      "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/mac-studio/m5-ultra-chip-30-core-cpu-64-core-gpu-96gb-memory-1tb-storage"
+    },
+    "metrics": {
+      "data": {
+        "products": [
+          {
+            "sku": "MHL74",
+            "partNumber": "MHL74CH/A",
+            "price": {
+              "fullPrice": 46999
+            },
+            "category": "mac",
+            "name": "Mac Studio"
+          }
+        ],
+        "buyflow": {
+          "userSelections": {
+            "STORAGE": {
+              "dimensionValue": "1tb",
+              "partNumber": "065-CLQX"
+            },
+            "LOGIC_PRO": {
+              "dimensionValue": "none",
+              "partNumber": "065-CLTM"
+            },
+            "MEMORY": {
+              "dimensionValue": "96gb",
+              "partNumber": "065-CLQ5"
+            },
+            "PROCESSOR": {
+              "dimensionChip": "m5ultra",
+              "cpuCoreCount": "30",
+              "gpuCoreCount": "64"
+            },
+            "FINAL_CUT_PRO": {
+              "dimensionValue": "none",
+              "partNumber": "065-CLTK"
+            },
+            "PROCESSOR_CHIP": "m5ultra"
+          }
+        }
+      }
+    },
+    "selection": {
+      "products": [],
+      "mainDisplayValues": {
+        "processor-dimensionChip": {
+          "m5ultra": {
+            "dynamicFooter": {
+              "m5ultra-36-80": null,
+              "m5ultra-30-64": null,
+              "multioption": "{count} 种配置可选 (配备 32 核神经网络引擎)"
+            },
+            "isBlocked": false,
+            "header": "M5&nbsp;Ultra 芯片 <div class=\"form-label-small\">我们迄今最强大的芯片，性能颠覆想象，为各类要求极为严苛的专业工作而生。</div>"
+          }
+        },
+        "processor-dimensionChip-cpuCoreCount-gpuCoreCount": {
+          "m5ultra-30-64": {
+            "dimensionComponents": {
+              "dimensionChip": "m5ultra",
+              "gpuCoreCount": "64",
+              "cpuCoreCount": "30"
+            },
+            "isBlocked": false,
+            "header": "<span class=\"rf-dsupgrade-block\">30&nbsp;核中央处理器、</span><span class=\"rf-dsupgrade-block\">64&nbsp;核图形处理器</span>"
+          }
+        }
+      },
+      "configDisplayValues": {
+        "memory-dimensionMemory": {
+          "96gb": {
+            "header": "96GB"
+          }
+        },
+        "storage-dimensionCapacity": {
+          "1tb": {
+            "header": "1TB"
+          }
+        }
+      }
+    }
+  }
+]

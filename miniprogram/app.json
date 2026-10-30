@@ -6,7 +6,8 @@
     "pages/mine/index",
     "pages/notice-board/index",
     "pages/notification-test/index",
-    "pages/guide/index"
+    "pages/guide/index",
+    "pages/deadlines/index"
   ],
   "window": {
     "backgroundColor": "@pageBackground",

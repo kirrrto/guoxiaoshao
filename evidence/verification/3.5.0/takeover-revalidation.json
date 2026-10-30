@@ -1,0 +1,153 @@
+{
+  "schemaVersion": 2,
+  "checkedAt": "2026-10-30T07:51:29.172Z",
+  "scope": "Mac Studio 定制款参考隔离、过期公告清理、日历事件提醒模板映射与最终回归；本地/离线证据，不代表部署、真机或真实收信。",
+  "baseline": "7cc3827 + working tree (v3.5.0 candidate)",
+  "tests": {
+    "command": "node --test --test-reporter=spec \"tests/**/*.test.mjs\"",
+    "tests": 1875,
+    "passed": 1875,
+    "failed": 0,
+    "durationMs": 203623.2277
+  },
+  "sourceCheck": {
+    "command": "node tools/check-source.mjs",
+    "files": 635,
+    "javaScript": 451,
+    "json": 53,
+    "pages": 8,
+    "operatorPages": 1,
+    "errors": 0
+  },
+  "monitorBundle": {
+    "command": "node tools/build-monitor.mjs --check",
+    "passed": true,
+    "files": 50,
+    "sourceBytes": 374346,
+    "issues": 0
+  },
+  "releaseGate": {
+    "sourceChecksPassed": true,
+    "publicationReady": false,
+    "failedChecks": [
+      "known WeChat quality findings have passing current-version retest evidence"
+    ],
+    "openQualityFindings": [
+      "unused-channel-video",
+      "custom-tabbar-first-switch",
+      "oversized-product-image",
+      "legacy-product-image-format"
+    ]
+  },
+  "uiPreview": {
+    "command": "node tools/ui-preview/build.mjs --v350-only ...",
+    "snapshots": 96,
+    "sourceFiles": 245,
+    "sourceFingerprint": "1b3b1c8367fac0edd19e9ca26d466740168e61c7c172128367340d8c30cf50da",
+    "layoutChecks": {
+      "light": 96,
+      "dark": 96,
+      "fontStressLight": 96,
+      "fontStressDark": 96,
+      "failures": 0
+    },
+    "nativeTabChecks": {
+      "light": 213,
+      "dark": 213,
+      "failures": 0
+    },
+    "colorChecks": {
+      "light": {
+        "total": 303,
+        "active": 298,
+        "belowTarget": 0
+      },
+      "dark": {
+        "total": 303,
+        "active": 298,
+        "belowTarget": 0
+      }
+    },
+    "limitation": "Chromium WXML/WXSS approximation only; not WeChat native rendering or real-device acceptance."
+  },
+  "macStudio": {
+    "officialCombinations": 45,
+    "retailQueryable": 3,
+    "customReferenceOnly": 42,
+    "customQuerySupported": false,
+    "customMonitorSupported": false,
+    "customDisclosure": "4 chip groups with legal memory/storage ranges; no-pickup note is shown at the top of the expanded reference section.",
+    "liveProbe": {
+      "at": "2026-10-30T06:21:24.786Z",
+      "method": "GET",
+      "status": 541,
+      "contentType": "text/html",
+      "bytes": 128002,
+      "result": "Apple Page Not Found HTML, not a pickup observation; no retry and not interpreted as unavailable.",
+      "note": "A standard retail request to the same fulfillment-messages endpoint also returned 541 from this environment. Cloud runtime remains unverified."
+    }
+  },
+  "announcements": {
+    "retired": "10 月 28 日会员礼遇活动公告已从服务端内置公告、客户端离线兜底与旧缓存标题/正文中移除。",
+    "current": "Mac 目录与定制款说明；明确定制款不支持 Apple Store 店内取货，标准配置查询不受影响。",
+    "onThisDayProof": "query-notice.test.mjs 与 mac-catalog-and-gift-v343.test.mjs 覆盖旧服务端/缓存载荷过滤。"
+  },
+  "deadlineReminders": {
+    "runtimeEnabled": false,
+    "templateIdConfiguredInSource": true,
+    "templateTitle": "日历事件提醒",
+    "templateFields": {
+      "title": "thing3",
+      "date": "time2",
+      "time": "time6",
+      "category": "thing7",
+      "remark": "thing5"
+    },
+    "miniprogramState": "formal",
+    "typeAssumption": "Screenshot does not show template type; code assumes one-time subscription (type: 2).",
+    "missingBeforeEnable": [
+      "confirm one-time template type",
+      "same-version API and monitor deployment",
+      "consumer credentials in both functions",
+      "real user authorization",
+      "platform acceptance",
+      "device receipt and landing-page verification"
+    ],
+    "offlinePlan": "evidence/verification/3.5.0/deadline-template-plan.json",
+    "cloudEvidence": "evidence/verification/3.5.0/deadline-cloud-repair.json: 2026-10-30T12:48:15+08:00 read succeeded, capability.enabled=false, reason=template_missing",
+    "status": "保存记录可用；真实微信授权、定时发送、受理与收信未验证。"
+  },
+  "notVerified": [
+    "WeChat developer-tools compile for this exact source",
+    "real-device picker/gesture/accessibility behavior",
+    "cloud API and monitor deployment of this exact source",
+    "real deadline authorization and receipt",
+    "upload, review or release"
+  ],
+  "artifacts": {
+    "tests": {
+      "path": "evidence/verification/3.5.0/takeover-tests.log",
+      "sha256": "2731664f9de753b1570d7927c8914d07d20120d6c55cac654469ce7bc40d617c"
+    },
+    "releaseGate": {
+      "path": "evidence/verification/3.5.0/takeover-release-check.json",
+      "sha256": "aae24b70fc8ada1dceb1063c5c6638bcb901c25ea28695aaf0ee0b5a5c318dc2"
+    },
+    "uiManifest": {
+      "path": "evidence/verification/3.5.0/ui-takeover/manifest.json",
+      "sha256": "f2cfb9318569f58e2fd70f8da1a7f37b83be819c80f7f3e3236a1d46f1c07ea1"
+    },
+    "uiReferenceScreenshot": {
+      "path": "evidence/verification/3.5.0/ui-takeover/query-mac-studio-reference-375.png",
+      "sha256": "0bd994ddb8d0618f2bb6e366a9a761182589cd32455fdfb325eb23a0ff45dfc5"
+    },
+    "uiRetailScreenshot": {
+      "path": "evidence/verification/3.5.0/ui-takeover/query-mac-studio-retail-375.png",
+      "sha256": "de6cf64fb3846cdb2c10599b991c7f18bb1c0bde5fdd3208bbfeb299ebfa74eb"
+    },
+    "deadlinePlan": {
+      "path": "evidence/verification/3.5.0/deadline-template-plan.json",
+      "sha256": "f4f84dc8e0e08663610ea03646f676e5fe9fcb9c8b91164ea56a443cb5d1f969"
+    }
+  }
+}

@@ -56,6 +56,18 @@ jobs:
           node tools/ui-preview/check-picker-alignment.mjs output/ci-ui
           node tools/ui-preview/check-theme-colors.mjs output/ci-ui output/ci-colors
           node tools/ui-preview/check-theme-colors.mjs output/ci-ui output/ci-colors --dark
+      - name: Verify v3.5.0 deadline and configuration UI in offline Chromium
+        shell: bash
+        run: |
+          node tools/ui-preview/build.mjs --v350-only --out output/ci-ui-v350
+          node tools/ui-preview/check-layout.mjs output/ci-ui-v350
+          node tools/ui-preview/check-layout.mjs output/ci-ui-v350 --dark
+          node tools/ui-preview/check-layout.mjs output/ci-ui-v350 --v350-fonts-only
+          node tools/ui-preview/check-layout.mjs output/ci-ui-v350 --v350-fonts-only --dark
+          node tools/ui-preview/check-native-tabs.mjs output/ci-ui-v350
+          node tools/ui-preview/check-native-tabs.mjs output/ci-ui-v350 --dark
+          node tools/ui-preview/check-theme-colors.mjs output/ci-ui-v350 output/ci-colors-v350
+          node tools/ui-preview/check-theme-colors.mjs output/ci-ui-v350 output/ci-colors-v350 --dark
       - name: Check release candidate
         run: node tools/release/check.mjs --out output/ci-release.json
       - name: Preserve verification evidence even when release is blocked

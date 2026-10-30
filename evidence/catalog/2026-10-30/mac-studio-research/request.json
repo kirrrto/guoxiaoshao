@@ -1,0 +1,16 @@
+{
+  "requestUrl": "https://www.apple.com.cn/shop/buy-mac/mac-studio",
+  "method": "GET",
+  "startedAt": "2026-10-30T03:49:28.852Z",
+  "retries": 0,
+  "httpStatus": 200,
+  "headers": {
+    "content-type": "text/html;charset=utf-8",
+    "date": "Fri, 30 Oct 2026 03:49:29 GMT",
+    "cache-control": "public, max-age=56, s-maxage=56"
+  },
+  "bytes": 317088,
+  "sha256": "c021edfc1c89176c5ca39293b0f0abd49a36074c439e822f74ab9fc42a603921",
+  "elapsedMs": 3443,
+  "finishedAt": "2026-10-30T03:49:32.295Z"
+}

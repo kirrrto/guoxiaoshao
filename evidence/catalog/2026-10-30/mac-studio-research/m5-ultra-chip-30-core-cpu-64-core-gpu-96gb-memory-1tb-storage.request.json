@@ -1,0 +1,16 @@
+{
+  "requestUrl": "https://www.apple.com.cn/shop/buy-mac/mac-studio/m5-ultra-chip-30-core-cpu-64-core-gpu-96gb-memory-1tb-storage",
+  "method": "GET",
+  "startedAt": "2026-10-30T03:52:01.287Z",
+  "retries": 0,
+  "httpStatus": 200,
+  "headers": {
+    "content-type": "text/html;charset=utf-8",
+    "date": "Fri, 30 Oct 2026 03:51:59 GMT",
+    "cache-control": "public, max-age=120, s-maxage=120"
+  },
+  "bytes": 318686,
+  "sha256": "d596a14d0e817e02b490bd0cc45a1a7bcef86f258e5fb3d6764b302e80d1cb1c",
+  "elapsedMs": 2092,
+  "finishedAt": "2026-10-30T03:52:03.379Z"
+}

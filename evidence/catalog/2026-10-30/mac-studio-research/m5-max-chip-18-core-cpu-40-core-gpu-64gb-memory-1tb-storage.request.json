@@ -1,0 +1,16 @@
+{
+  "requestUrl": "https://www.apple.com.cn/shop/buy-mac/mac-studio/m5-max-chip-18-core-cpu-40-core-gpu-64gb-memory-1tb-storage",
+  "method": "GET",
+  "startedAt": "2026-10-30T03:51:50.832Z",
+  "retries": 0,
+  "httpStatus": 200,
+  "headers": {
+    "content-type": "text/html;charset=utf-8",
+    "date": "Fri, 30 Oct 2026 03:51:50 GMT",
+    "cache-control": "public, max-age=120, s-maxage=120"
+  },
+  "bytes": 318638,
+  "sha256": "8fad2836a02afeadf65f692709bd85acf482e6a21e881e870a066c75f7344562",
+  "elapsedMs": 2668,
+  "finishedAt": "2026-10-30T03:51:53.500Z"
+}
