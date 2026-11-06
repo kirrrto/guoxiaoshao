@@ -88,10 +88,7 @@
       <view wx:if="{{accountReady && rulesExpanded}}" class="selection-rules ui-reveal">
         <view class="selection-rule">
           <text class="selection-rule-label">关注提醒</text>
-          <view class="selection-rule-copy">
-            <view>直接关注，无需先查询。</view>
-            <view class="selection-rule-detail">{{boot.member ? '需微信授权及服务就绪。' : '关注与到货提醒为会员专属；免费用户可用查询次数实时看货。'}}</view>
-          </view>
+          <view class="selection-rule-copy">{{boot.member ? '直接关注，需微信授权及服务就绪。' : '关注与到货提醒为会员专属；免费用户可用查询次数实时看货。'}}</view>
         </view>
         <view class="selection-rule">
           <text class="selection-rule-label">取货结果</text>
@@ -99,11 +96,11 @@
         </view>
         <view class="selection-rule">
           <text class="selection-rule-label">查询规则</text>
-          <view class="selection-rule-copy">{{boot.member ? '会员查询不扣次；如遇限流请按提示稍后重试。' : '新有效结果扣 ' + boot.queryCost + ' 次；未取得有效结果自动返还，复用近期结果不扣次。'}}</view>
+          <view class="selection-rule-copy">{{boot.member ? '会员查询不扣次。' : '新有效结果扣 ' + boot.queryCost + ' 次，未取得结果自动返还，近期复用不扣次。'}}</view>
         </view>
         <view wx:if="{{!boot.member}}" class="selection-rule">
           <text class="selection-rule-label">新品限制</text>
-          <view class="selection-rule-copy">受限新品开售 30 天内，免费用户可查昨天及更早历史，暂不可实时查询。</view>
+          <view class="selection-rule-copy">受限新品开售 30 天内，免费用户仅可查昨天及更早历史。</view>
         </view>
       </view>
     </view>
@@ -159,7 +156,6 @@
       <button wx:if="{{storeChoices.length || alternativeColorChoices.length}}" class="ui-disclosure" hover-class="ui-control-pressed" bindtap="onToggleAlternatives" aria-expanded="{{alternativesExpanded}}"><text class="ui-disclosure-label">看看其他可接受配置</text><view class="ui-disclosure-meta"><text>{{alternativesExpanded ? '收起' : '展开'}}</text><text class="ui-chevron {{alternativesExpanded ? 'ui-chevron--up' : 'ui-chevron--down'}}"></text></view></button>
       <view wx:if="{{alternativesExpanded && storeChoices.length && !alternativeColorChoices.length}}" class="observed-store-choices">
         <view class="small bold">同一配置，可考虑的门店</view>
-        <view class="tiny muted mt">勾选后需手动查询，不会自动扣次或关注。</view>
         <button wx:for="{{storeChoices}}" wx:key="storeNumber" class="observed-store-choice {{item.selected ? 'observed-store-choice--selected' : ''}}" data-store="{{item.storeNumber}}" aria-pressed="{{item.selected}}" disabled="{{querying || signing || sheetVisible}}" bindtap="onToggleAcceptableStore">
           <view class="observed-store-choice-copy"><text>{{item.label}}</text><text class="tiny muted">观测 {{item.observedText}} · {{item.ageText}}</text></view><text class="small">{{item.selected ? '已勾选' : '可接受'}}</text>
         </button>
@@ -168,7 +164,7 @@
       </view>
       <view wx:if="{{alternativesExpanded && alternativeColorChoices.length && alternativeStoreChoices.length}}" class="observed-store-choices alternative-panel">
         <view class="alternative-heading">选择可接受的颜色与门店</view>
-        <view class="alternative-caption">近期记录不是新查询；勾选不扣次、不添加关注。</view>
+        <view class="alternative-caption">勾选不扣次，不自动添加关注。</view>
         <view class="alternative-section-title"><text>可接受的颜色</text><text class="alternative-count">{{alternativeParts.length}} / {{boot ? boot.alternativeMaxColors : 3}}</text></view>
         <view class="alternative-colors">
           <view wx:for="{{alternativeColorChoices}}" wx:key="partNumber" class="alternative-color-column">

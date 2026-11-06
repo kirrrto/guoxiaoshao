@@ -169,7 +169,6 @@
           <view class="redemption-title">兑换会员</view>
           <input class="redemption-input" type="text" value="{{redemptionCode}}" placeholder="请输入兑换码" placeholder-class="redemption-placeholder" maxlength="64" disabled="{{redeeming}}" confirm-type="done" adjust-position="{{true}}" cursor-spacing="24" bindinput="onRedemptionInput" bindconfirm="onRedeemCode" focus="{{redemptionOpen}}" />
           <button class="member-entry redemption-entry" disabled="{{subscribing || redeeming || paymentBusy || paymentChecking || !redemptionCode}}" bindtap="onRedeemCode">{{redeeming ? '兑换中，请稍候…' : '确认兑换'}}</button>
-          <view class="redemption-hint">同一账号重复提交不会重复增加会员时间。</view>
           <view wx:if="{{redemptionError}}" class="redemption-message redemption-message-error">{{redemptionError}}</view>
           <view wx:if="{{redemptionResult}}" class="redemption-message redemption-message-{{redemptionResult.kind}}"><view class="bold">{{redemptionResult.title}}</view><view class="mt">{{redemptionResult.detail}}</view></view>
           <button class="ui-action ui-action--neutral ui-action--block redemption-close" hover-class="ui-control-pressed" disabled="{{subscribing || redeeming}}" bindtap="onOpenRedemption">关闭</button>
@@ -217,7 +216,7 @@
         <view class="consent-recovery-desc">微信已拒绝以下消息；库存监测继续，但对应提醒暂无法接收。</view>
         <view class="consent-recovery-row" wx:for="{{consent.blocked}}" wx:key="id"><text class="consent-recovery-name">{{item.title}}</text><text class="consent-recovery-state">{{item.label}}</text></view>
         <button class="btn btn-primary btn-block consent-recovery-action" bindtap="onOpenSubscribeSetting">前往微信设置</button>
-        <view class="consent-recovery-steps">步骤：微信设置 → 订阅消息 → 改为「接收」→ 返回点「补充提醒次数」（开启权限不会自动加次数）。</view>
+        <view class="consent-recovery-steps">微信设置 → 订阅消息 → 改为「接收」后返回补充次数。</view>
       </view>
       <button class="btn btn-primary btn-block" disabled="{{paymentBusy || paymentChecking || paymentConfirming || paymentPendingId || redemptionOpen || redeeming || subscribing || authorization.storageBlocked}}" loading="{{subscribing}}" bindtap="onSubscribe">{{subscribing ? '等待微信授权…' : '补充提醒次数'}}</button>
       <view wx:if="{{authorizationFeedback}}" class="authorization-feedback" aria-live="polite">{{authorizationFeedback}}</view>
@@ -244,21 +243,14 @@
         </view>
         <button class="ui-action ui-action--block mt" disabled="{{savingSettings || dndPeriods.length >= maxDndPeriods}}" bindtap="onAddDndPeriod">＋ 新增免打扰时段（{{dndPeriods.length}} / {{maxDndPeriods}}）</button>
       </block>
-      <view class="tiny muted mt">北京时间每日生效，修改自动保存；结束后不补发旧提醒，起止相同＝全天。</view>
+      <view class="tiny muted mt">北京时间每日生效，结束后不补发旧提醒。</view>
       </block>
       <view wx:if="{{!paymentPendingId}}" class="member-notification-experience">
         <button class="ui-disclosure notification-test-entry" hover-class="ui-control-pressed" disabled="{{paymentBusy || paymentChecking || paymentConfirming}}" bindtap="onTestNotification"><image class="ui-icon" src="/images/ui/notification.png" mode="aspectFit" aria-hidden="true" /><view class="notification-test-copy"><text class="ui-disclosure-label">体验微信提醒</text></view><view class="ui-chevron" aria-hidden="true"></view></button>
       </view>
       <button id="notification-records" class="ui-disclosure ui-entry reminder-row" hover-class="ui-control-pressed" bindtap="onToggleNotifications" aria-expanded="{{showNotifications}}"><view class="ui-entry-main"><image class="ui-icon" src="/images/ui/clock.png" mode="aspectFit" aria-hidden="true" /><view class="ui-entry-copy"><text class="ui-disclosure-label">提醒记录</text><text wx:if="{{notifications.length}}" class="ui-entry-note">已显示 {{notifications.length}} 条</text></view></view><view class="ui-disclosure-meta"><text>{{showNotifications ? '收起' : '展开'}}</text><view class="ui-chevron {{showNotifications ? 'ui-chevron--up' : 'ui-chevron--down'}}" aria-hidden="true"></view></view></button>
-      <view wx:if="{{!showNotifications && notifications.length}}" class="notification-latest">
-        <view class="notification-latest-heading"><text>最近一次提醒</text><text class="pill pill-{{notifications[0].statusCls}} tiny">{{notifications[0].statusLabel}}</text></view>
-        <view class="notification-product">{{notifications[0].productTitle || notifications[0].partNumber}}</view>
-        <view class="tiny muted">{{notifications[0].storeName || notifications[0].storeNumber}} · {{notifications[0].timeText}}</view>
-        <view wx:if="{{notifications[0].reasonText || notifications[0].deliveryNote}}" class="notification-reason">{{notifications[0].reasonText || notifications[0].deliveryNote}}</view>
-      </view>
       <block wx:if="{{showNotifications}}">
       <view wx:if="{{notifications.length}}" class="notification-toolbar">
-        <text class="tiny muted notification-scope">清理仅隐藏本列表，不影响关注、已发消息与库存历史。</text>
         <button class="ui-action ui-action--neutral notification-button notification-clear" hover-class="ui-control-pressed" disabled="{{notificationActionBusy || notificationConfirming || !notificationsClearBefore}}" bindtap="onClearNotifications">{{notificationActionBusy === 'clear' ? '清空中…' : '清空'}}</button>
       </view>
       <view wx:if="{{notificationsLoading && !notifications.length}}" class="loading-line">正在加载提醒记录…</view>

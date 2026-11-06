@@ -1155,7 +1155,7 @@ for (const scenario of scenarios) {
         'payment-rules': ['一次性虚拟服务', '一经售出不予退款', '一次购买 7 天', '会员权益与购买规则'],
       }[scenario]] : redemptionPreview ? ['兑换会员', '付费购买暂未开放', { 'redemption-input': '确认兑换', 'redemption-loading': '兑换中，请稍候', 'redemption-error': '兑换码无效', 'redemption-success': '兑换成功', 'redemption-used': '此账号已兑换过', 'redemption-limited': '15 分钟后再试', 'redemption-empty': '确认兑换' }[scenario]] : stockPreview ? [p.title, '2 家门店',
         ...(stockScenarios[scenario].expanded ? ['收起详情', '单独查询库存', '调整', '查看供应历史', '删除关注'] : ['详情与管理']),
-        ...(member ? ['到货 42 次', '断货 41 次', '补充提醒次数', '查看提醒记录', '测试收信'] : []),
+        ...(member ? ['到货 42 次', '断货 41 次', '补充提醒次数'] : []),
         ...({ available: ['2 家可取货', '15 秒前检查', '查看取货信息'],
           unavailable: ['所选门店暂不可取货', '15 秒前检查'],
           old: ['上次 2 家可取货', '4 分钟前检查', '这是上次的结果，当前库存待确认。', '库存更新有延迟'],
@@ -1165,7 +1165,7 @@ for (const scenario of scenarios) {
           restricted: ['库存暂不可见', '当前权益暂不能查看此配置的库存。', '会员权益受限'],
         }[stockScenarios[scenario].mode]),
         ...(stockScenarios[scenario].mode === 'old' && stockScenarios[scenario].expanded ? ['上次有货', '09-15 14:56'] : []),
-        ...({ offline: ['网络已断开'], retrying: ['连接暂时中断，稍后重试'], syncing: ['正在更新页面'] }[stockScenarios[scenario].sync] || ['页面自动更新']),
+        ...({ offline: ['网络已断开'], retrying: ['连接暂时中断，稍后重试'], syncing: ['正在更新页面'] }[stockScenarios[scenario].sync] || []),
         ...(stockScenarios[scenario].authorizationPending ? ['待同步 +1', '重试同步', '网络较慢，授权记录尚未同步。'] : member ? ['微信提醒授权已备好'] : []),
       ] : scenario === 'loading' ? [{ query: '正在加载商品目录', follow: '正在读取你的关注', history: '正在加载商品目录', mine: '正在读取账户信息' }[pageName]]
         : scenario === 'error' ? [pageName === 'admin' ? '模拟错误：网络连接中断' : '模拟错误：云环境连接超时', '暂时没有连上', '重试']

@@ -30,8 +30,6 @@
 .deadline-home-error { display: flex; flex-wrap: wrap; gap: 12rpx; align-items: center; font-size: max(12px, 26rpx); line-height: 1.6; color: var(--warn); }
 .deadline-home-error > text { flex: 1 1 240rpx; overflow-wrap: anywhere; }
 .inventory-home-heading { margin-top: 34rpx; }
-.inventory-home-recent { display: flex; flex-direction: column; gap: 4rpx; padding-bottom: 24rpx; font-size: max(12px, 26rpx); line-height: 1.6; color: var(--text-2); overflow-wrap: anywhere; }
-.inventory-home-recent .bold { color: var(--text); }
 .follow-page .inventory-home-heading .section-title { font-size: max(18px, 36rpx); }
 .section-heading { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8rpx 16rpx; margin-bottom: 16rpx; }
 .section-title { color: var(--text); font-size: 32rpx; line-height: 1.5; font-weight: 650; }

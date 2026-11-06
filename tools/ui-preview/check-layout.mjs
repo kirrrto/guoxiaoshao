@@ -248,7 +248,7 @@ try {
       }).map(element => ({ class: element.className, text: element.textContent.trim(), fontSize: parseFloat(getComputedStyle(element).fontSize) }));
     }) : [];
     metrics.followFontErrors = metrics.followFunctionalText.filter(element => element.fontSize < 11.99).map(element => `${element.class || element.text}: ${element.fontSize}px below 12px`);
-    if (item.scenario === 'v343-retired-follow' && metrics.followFunctionalText.length !== 9) metrics.followFontErrors.push(`Expected 9 audited functional text nodes, received ${metrics.followFunctionalText.length}`);
+    if (item.scenario === 'v343-retired-follow' && metrics.followFunctionalText.length !== 6) metrics.followFontErrors.push(`Expected 6 audited functional text nodes, received ${metrics.followFunctionalText.length}`);
     const bodyText = await page.locator('body').innerText();
     const missingText = (item.expectedText || []).filter(text => !bodyText.replace(/\s+/g, '').includes(text.replace(/\s+/g, '')));
     const forbiddenTextFound = (item.forbiddenText || []).filter(text => bodyText.replace(/\s+/g, '').includes(text.replace(/\s+/g, '')));

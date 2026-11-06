@@ -39,5 +39,5 @@
     </view>
   </view>
   <button wx:if="{{section !== 'pickup' && !focusedFaq}}" class="btn btn-outline btn-block" bindtap="onReturnTask">{{returnLabel}}</button>
-  <view class="footer-note"><view>果小哨提供库存参考与提醒，购买请在 Apple 官方渠道完成。</view><view>官方取货帮助核对于 {{checkedOn}}。</view></view>
+  <view class="footer-note">库存仅供参考，购买请在 Apple 官方渠道完成（核对于 {{checkedOn}}）。</view>
 </view>

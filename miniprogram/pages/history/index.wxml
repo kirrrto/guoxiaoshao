@@ -41,8 +41,6 @@
       <view wx:if="{{selectionSummary}}" class="history-store-scope"><image class="ui-icon" src="/images/ui/store.png" mode="aspectFit" aria-hidden="true" /><text>{{selectionSummary.scopeText}}</text></view>
       <button wx:else class="btn btn-primary btn-block" hover-class="btn-primary-pressed" bindtap="onEditSelection">选择配置与门店</button>
 
-      <view wx:if="{{selectionSummary && accountReady && !boot.member}}" class="tiny text-2 history-restriction-note">受限新品仅可查昨天及更早记录。</view>
-
       <view wx:if="{{queryFailureMessage || restriction}}" class="banner banner-warn small mt" aria-role="alert">{{queryFailureMessage || restriction}}</view>
       <button wx:if="{{!boot.member && boot.balance < boot.historyCost}}" class="ui-action ui-action--block mb" hover-class="ui-control-pressed" bindtap="onGoMine"><text class="ui-action-label">去签到 / 查看次数</text><view class="ui-chevron" aria-hidden="true"></view></button>
 
@@ -63,7 +61,7 @@
 
       <view class="history-data-notice {{result.hasEventRecords ? 'history-data-notice--recorded' : ''}}">
         <view class="history-data-title">{{result.coverageTitle}}</view>
-        <view class="tiny text-2 history-data-detail">{{result.coverageNote}}</view>
+        <view wx:if="{{!result.hasEventRecords}}" class="tiny text-2 history-data-detail">{{result.coverageNote}}</view>
         <view wx:if="{{result.billingText}}" class="small history-billing-note history-data-detail">{{result.billingText}}</view>
       </view>
 
@@ -76,15 +74,14 @@
           <view class="event-main"><text class="small bold event-store">{{item.storeName}}</text><text class="pill pill-{{item.cls}} tiny event-status">{{item.label}}</text></view>
           <view class="tiny text-2 event-detail" wx:if="{{item.detailText}}">{{item.detailText}}</view>
           <view class="tiny muted event-detail" wx:if="{{item.quote}}">{{item.quote}}</view>
-          <view class="tiny muted event-source">来源：{{item.sourceText}}</view>
         </view>
       </view>
       <view wx:if="{{moreError}}" class="banner banner-warn small mt">{{moreError}}</view>
       <button wx:if="{{result.pagination.hasMore}}" class="btn btn-ghost btn-block mt" disabled="{{loadingMore}}" bindtap="onLoadMore">{{loadingMore ? '加载中…' : '加载更多（不额外扣次）'}}</button>
 
       <button class="ui-disclosure history-disclosure" hover-class="ui-control-pressed" bindtap="onToggleCoverage" aria-expanded="{{coverageExpanded}}"><text class="ui-disclosure-label">统计与观测凭据</text><view class="ui-disclosure-meta"><text>{{coverageExpanded ? '收起' : '展开'}}</text><view class="ui-chevron {{coverageExpanded ? 'ui-chevron--up' : 'ui-chevron--down'}}" aria-hidden="true"></view></view></button>
-      <view class="small text-2">{{result.coverageSummary}}</view>
       <view wx:if="{{coverageExpanded}}" class="ui-reveal">
+      <view class="small text-2">{{result.coverageSummary}}</view>
       <view class="history-insights">
         <view class="small bold">当天记录速览</view>
         <view class="tiny text-2 mt">{{result.insights.scopeText}}</view>
@@ -95,7 +92,6 @@
         </view>
         <view wx:if="{{result.insights.noRestockText}}" class="tiny muted mt">{{result.insights.noRestockText}}</view>
         <view class="tiny muted mt">{{result.insights.sampleWindowText}}</view>
-        <view class="tiny muted mt">时间为北京时间，仅供回看已记录变化，不预测下一次补货。</view>
       </view>
 
       <view wx:if="{{result.hasEventRecords}}" class="section-label">已记录事件统计</view>
@@ -114,7 +110,6 @@
         <view class="tiny text-2">有效 {{item.knownCount}} 次 · 未确认 {{item.unknownCount}} 次</view>
         <view class="tiny muted">首末观测 {{item.rangeText}}</view>
       </view>
-      <view class="tiny muted mt">首末观测间不代表连续监测；较早数据可能无采样摘要。</view>
       </view>
 
     </view>

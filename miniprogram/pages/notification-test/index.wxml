@@ -1,7 +1,7 @@
 <view class="test-page">
   <view class="test-hero">
     <view class="test-hero-icon"><image class="test-hero-art" src="/images/ui/notification.png" mode="aspectFit" aria-hidden="true" /></view>
-    <view class="test-hero-copy"><view class="test-title">体验微信提醒</view><view class="test-subtitle">授权、发送、查收，每一步都看得见</view></view>
+    <view class="test-hero-copy"><view class="test-title">体验微信提醒</view></view>
   </view>
   <view class="test-card test-main">
     <view class="test-progress" aria-label="微信提醒体验进度">
@@ -36,7 +36,6 @@
     <block wx:else>
       <view class="test-heading">先给自己发一条</view>
       <view class="test-copy">允许微信授权后，在「服务通知」中查收标注【测试】的消息。</view>
-      <view class="test-tag">仅体验提醒，不查询库存或创建监测</view>
     </block>
     <view wx:if="{{error}}" class="test-error" aria-role="alert">{{error}}</view>
     <view wx:if="{{operationNote}}" class="test-operation" aria-live="polite">{{operationNote}}</view>
@@ -63,7 +62,7 @@
     <view wx:if="{{showTestRules}}" class="test-rules">
       <view class="test-rule"><view class="test-rule-title">次数如何扣除</view><view>每条消耗 1 次签到／任务额度，会员同样扣次。明确发送失败自动退回；结果不明时暂不退回，不会重复发送。</view></view>
       <view class="test-rule"><view class="test-rule-title">授权与送达</view><view>微信授权次数与查询额度分开计算。微信受理不代表已送达，也不保证手机弹出横幅。</view></view>
-      <view class="test-rule"><view class="test-rule-title">正式提醒需要什么</view><view>测试不代表真实放货。正式到货和断货提醒需要会员、有效关注与微信授权。</view></view>
+      <view class="test-rule"><view class="test-rule-title">正式提醒需要什么</view><view>测试仅体验提醒，不查询库存或创建监测。正式到货和断货提醒需要会员、有效关注与微信授权。</view></view>
     </view>
   </view>
   <view class="test-tip">【测试】非真实放货 · 微信受理不等于已送达</view>

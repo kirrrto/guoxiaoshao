@@ -1,7 +1,7 @@
 {
   "scope": "Headless Chromium rendering WXML/WXSS with offline synthetic records. WeChat compilation, development preview, and physical-device results are separate.",
-  "sourceFingerprint": "sha256:e3f78026b0b2afbb56f363576402b1d41846a71d8f05e0f7d490aa58368472c3",
-  "uiSourceHash": "1b64798a3dfa089d08452ab1476cd808570f1606050eb7309f8b6b2962f3e33d",
+  "sourceFingerprint": "sha256:59e8c88aaf955f2f155f7874f575c513915ebb06c0588f505ded5f459ad0bf5b",
+  "uiSourceHash": "90eae8fa5daca910fb320204333aca34dfef5987401a3135508b5c39e4929e5d",
   "correctionsVerified": [
     {
       "page": "follow",
@@ -189,16 +189,16 @@
     "color": [
       [
         {
-          "total": 303,
-          "active": 298,
+          "total": 283,
+          "active": 278,
           "belowTarget": 0,
           "primaryMinimum": 5.357131444839318,
           "selectedNavMinimum": 5.230867846703258,
           "unsupportedMeasurements": 0
         },
         {
-          "total": 303,
-          "active": 298,
+          "total": 283,
+          "active": 278,
           "belowTarget": 0,
           "primaryMinimum": 5.357131444839318,
           "selectedNavMinimum": 7.139531628869566,
@@ -207,16 +207,16 @@
       ],
       [
         {
-          "total": 236,
-          "active": 236,
+          "total": 234,
+          "active": 234,
           "belowTarget": 0,
           "primaryMinimum": 5.357131444839318,
           "selectedNavMinimum": 5.230867846703258,
           "unsupportedMeasurements": 0
         },
         {
-          "total": 236,
-          "active": 236,
+          "total": 234,
+          "active": 234,
           "belowTarget": 0,
           "primaryMinimum": 5.357131444839318,
           "selectedNavMinimum": 7.139531628869566,

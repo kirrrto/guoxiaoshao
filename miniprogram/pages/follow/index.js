@@ -45,7 +45,7 @@ const DETECTION_DETAIL = {
   not_deployed: '后台检测服务尚未启动，已开启的关注会保留，无需重复操作。',
   disabled: '后台检测尚未开放，已开启的关注会保留。',
   idle: '后台服务已连接，当前尚未执行检测任务。',
-  running: '后台持续检测已开启关注的门店，离开小程序后仍由后台运行。',
+  running: '后台持续检测已开启关注的门店。',
   stale: '后台状态已过期，当前无法确认是否仍在检测。',
   stopped: '后台检测服务已停止，需恢复服务后才能自动发现补货。',
   paused: '后台检测暂时暂停，已开启的关注会保留。',
@@ -67,7 +67,7 @@ function deliveryView(notifications, templateIds) {
   if (!notifications.enabled) return { overallReady, label: '尚未开放', cls: 'warn', detail: DELIVERY_REASON.notifications_disabled };
   if (!senderReady && reason.startsWith('collector_')) return { overallReady, label: '发送状态待确认', cls: 'muted', detail: '暂未取得微信发送通道的有效状态，请稍后刷新确认。' };
   if (!senderReady) return { overallReady, label: '发送服务未就绪', cls: 'warn', detail };
-  return { overallReady, label: '发送服务已就绪', cls: 'ok', detail: '微信发送通道已连接。实际发送仍需库存、关注与有效授权等条件满足。' };
+  return { overallReady, label: '发送服务已就绪', cls: 'ok', detail: '微信发送通道已连接。' };
 }
 
 const FEEDBACK_TOAST = { bought: '恭喜买到！', missed: '已记录，继续为你盯着', skipped: '已记录，继续为你盯着' };
@@ -168,7 +168,7 @@ function presentFollow(follow, boot, catalog, collector) {
       : availableCount ? usable.filter(store => store.observationState === 'fresh' && store.status === 'available').map(store => store.storeLabel).join('、')
       : historicalAvailable ? '这是上次的结果，当前库存待确认。'
       : incomplete ? observationAt === null ? '关注已保存，有检测结果后会在这里显示。' : '最近未取得新的有效结果，不能据此判断无货。'
-      : follow.status === 'active' ? '有货后会更新这里，并按你的提醒设置发送消息。' : '自动检测已暂停，可恢复关注继续留意。',
+      : follow.status === 'active' ? usable.map(store => store.storeLabel).join('、') || '到货后按提醒设置发送微信通知。' : '自动检测已暂停，可恢复关注继续留意。',
     notificationExpectation: retired ? '老款无法恢复检测，请改选新款。'
       : follow.status !== 'active' ? '此配置未在监测，可在详情中恢复。'
       : availableCount ? '同一轮持续有货不重复提醒，可直接查看取货信息。'
@@ -245,7 +245,6 @@ Page({
     deadlineServiceLabel: '读取中',
     deadlineRecordOnly: false,
     nextDeadline: null,
-    recentStock: null,
     networkOffline: false,
     ready: false,
     loadError: null,
@@ -798,14 +797,7 @@ Page({
     const awaiting = monitored.filter(store => store.observationState === 'missing').length;
     const stockOverview = delayed ? { label: '库存更新有延迟', tone: 'warn', detail: `${delayed} 项门店结果待更新，已保留上次结果。` }
       : awaiting ? { label: '等待首次检查', tone: 'muted', detail: '关注已保存，无需重复添加。' } : null;
-    const recent = this.data.follows.filter(follow => !follow.latestRestricted && !follow.productRetired && !follow.limitPaused)
-      .flatMap(follow => (follow.stores || []).filter(store => !store.limitPaused && store.observationState === 'fresh'
-        && ['available', 'unavailable'].includes(store.status) && Number.isFinite(Date.parse(store.statusSince))
-        && Date.parse(store.statusSince) <= Date.parse(store.observedAt)).map(store => ({ follow, store })))
-      .sort((a, b) => Date.parse(b.store.statusSince) - Date.parse(a.store.statusSince))[0];
-    const recentStock = recent ? { title: recent.follow.productTitle,
-      detail: `${storeLabel(recent.store.storeNumber, recent.store.storeName)} · ${fmt.fmtDateTime(recent.store.statusSince)} 起记录为${recent.store.status === 'available' ? '可取货' : '不可取货'}` } : null;
-    this.setData({ readiness, stockOverview, recentStock, readinessTaskDetail: readinessTaskDetail(readiness), creditBoostTip: tip,
+    this.setData({ readiness, stockOverview, readinessTaskDetail: readinessTaskDetail(readiness), creditBoostTip: tip,
       primaryTopUp: !(readiness.ready && Number(this.data.subscription.credits) > 3) });
     this.refreshActivation();
   },

@@ -44,8 +44,7 @@
   </block>
 
   <block wx:else>
-    <view wx:if="{{recentStock}}" class="inventory-home-recent"><text class="bold">最近库存记录</text><text>{{recentStock.title}}</text><text>{{recentStock.detail}}</text></view>
-    <view class="follow-sync-bar" aria-role="status"><view class="follow-sync-copy"><text class="follow-sync-dot follow-sync-dot--{{liveSync.state}}"></text><text>{{liveSync.state === 'syncing' ? '正在更新页面' : liveSync.state === 'offline' ? '网络已断开' : liveSync.state === 'retrying' ? '连接暂时中断，稍后重试' : '页面自动更新'}}</text></view><view class="follow-sync-times"><text wx:if="{{liveSync.lastReadText}}" class="follow-sync-time">{{liveSync.lastReadText}}读取</text><text wx:if="{{liveSync.nextReadText}}" class="follow-sync-time">下次读取 {{liveSync.nextReadText}}</text></view></view>
+    <view wx:if="{{liveSync.state === 'syncing' || liveSync.state === 'offline' || liveSync.state === 'retrying'}}" class="follow-sync-bar" aria-role="status"><view class="follow-sync-copy"><text class="follow-sync-dot follow-sync-dot--{{liveSync.state}}"></text><text>{{liveSync.state === 'syncing' ? '正在更新页面' : liveSync.state === 'offline' ? '网络已断开' : '连接暂时中断，稍后重试'}}</text></view><view class="follow-sync-times"><text wx:if="{{liveSync.lastReadText}}" class="follow-sync-time">{{liveSync.lastReadText}}读取</text><text wx:if="{{liveSync.nextReadText}}" class="follow-sync-time">下次 {{liveSync.nextReadText}}</text></view></view>
     <view wx:if="{{stockOverview}}" class="follow-inventory-status"><text class="bold">{{stockOverview.label}}</text><text>{{stockOverview.detail}}</text></view>
     <view wx:if="{{refreshError}}" class="banner banner-warn" aria-role="alert">{{refreshError}}</view>
     <view wx:elif="{{refreshFeedback}}" class="follow-refresh-feedback" aria-role="status">{{refreshFeedback}}</view>
@@ -84,20 +83,15 @@
 
     <view id="reminder-health" class="card reminder-status-strip" aria-live="polite">
       <view class="reminder-status-row"><view class="reminder-status-copy"><text class="bold">{{readiness.code === 'ready' || readiness.code === 'restock_ready' ? '微信提醒授权已备好' : readiness.title}}</text><text wx:if="{{boot.member && subscription.templateCount}}" class="reminder-inline-balance">到货 {{subscription.credits}} 次{{authorization.pendingRestock ? '（待同步 +' + authorization.pendingRestock + '）' : ''}}<text wx:if="{{subscription.soldoutEnabled}}"> · 断货 {{subscription.soldoutCredits}} 次{{authorization.pendingSoldout ? '（待同步 +' + authorization.pendingSoldout + '）' : ''}}</text></text></view><button class="ui-action ui-action--neutral reminder-details-toggle" bindtap="onToggleServiceDetails" aria-expanded="{{showServiceDetails}}">{{showServiceDetails ? '收起' : '状态详情'}}<view class="ui-chevron {{showServiceDetails ? 'ui-chevron--up' : 'ui-chevron--down'}}"></view></button></view>
-      <view wx:if="{{readiness.activeCount > 0}}" class="reminder-health-summary">
-        <view class="reminder-health-item"><text class="reminder-health-label">后台检测</text><text class="reminder-health-value reminder-health-value--{{collector.cls}}">{{collector.label}}</text></view>
-        <view class="reminder-health-item"><text class="reminder-health-label">微信发送</text><text class="reminder-health-value reminder-health-value--{{delivery.cls}}">{{delivery.label}}</text></view>
-      </view>
       <view wx:if="{{!showServiceDetails && readiness.action === 'service'}}" class="reminder-health-warning" aria-role="status">{{readinessTaskDetail}}</view>
       <view wx:if="{{consent && consent.anyBlocked}}" class="consent-recovery" aria-role="status">
         <view class="consent-recovery-title">微信提醒权限未开启</view>
         <view class="consent-recovery-desc">微信已拒绝以下消息；库存监测继续，但对应提醒暂无法接收。</view>
         <view class="consent-recovery-row" wx:for="{{consent.blocked}}" wx:key="id"><text class="consent-recovery-name">{{item.title}}</text><text class="consent-recovery-state">{{item.label}}</text></view>
         <button class="btn btn-primary btn-block consent-recovery-action" bindtap="onOpenSubscribeSetting">前往微信设置</button>
-        <view class="consent-recovery-steps">步骤：微信设置 → 订阅消息 → 改为「接收」→ 返回点「补充提醒次数」（开启权限不会自动加次数）。</view>
+        <view class="consent-recovery-steps">微信设置 → 订阅消息 → 改为「接收」后返回补充次数。</view>
       </view>
       <button wx:if="{{boot.member && subscription.templateCount}}" class="btn {{primaryTopUp ? 'btn-primary' : 'btn-outline'}} btn-block reminder-direct-button" disabled="{{subscribing || authorization.storageBlocked || editing || saving}}" loading="{{subscribing}}" bindtap="onSubscribe">{{subscribing ? '等待微信授权…' : '补充提醒次数'}}</button>
-      <view class="reminder-shortcuts"><button class="ui-action ui-action--neutral" bindtap="onManageReminders">查看提醒记录</button><button class="ui-action ui-action--neutral" bindtap="onTestNotification">测试收信</button></view>
       <view wx:if="{{authorizationFeedback}}" class="authorization-feedback" aria-live="polite">{{authorizationFeedback}}</view>
       <view wx:if="{{subscriptionPending || authorization.errorMessage}}" class="authorization-sync-error" aria-role="status"><text>{{authorization.errorMessage || '微信已允许，次数待同步'}}</text><button class="ui-action" disabled="{{authorization.syncing}}" loading="{{authorization.syncing}}" bindtap="onRetryAuthorizationSync">重试同步</button></view>
       <button wx:if="{{!readiness.ready && readiness.action && readiness.action !== 'subscribe' && readiness.action !== 'add' && readiness.action !== 'follows'}}" class="ui-action mt" bindtap="onReadinessAction">{{readiness.actionLabel}}</button>
@@ -105,10 +99,9 @@
           <view wx:if="{{!readiness.ready}}" class="small text-2 mt">{{readinessTaskDetail}}</view>
           <view id="reminder-service-details" class="service-row"><view class="service-heading"><text class="service-title">后台检测</text><view class="pill pill-dot pill-{{collector.cls}}">{{collector.label}}</view></view><view class="service-detail">{{collector.detail}}</view></view>
           <view class="service-row"><view class="service-heading"><text class="service-title">消息发送</text><view class="pill pill-dot pill-{{delivery.cls}}">{{delivery.label}}</view></view><view class="service-detail">{{delivery.detail}}</view></view>
-          <view class="service-row"><text class="small text-2">{{boot.member ? '会员至 ' + boot.expiresText : (boot.expired ? '会员已到期' : '免费用户')}}</text><view class="service-detail">每条消息消耗对应类型 1 次授权；免打扰期间不发送，提示音随微信设置。</view><button class="ui-action" hover-class="ui-control-pressed" bindtap="onGoReminderSettings"><text class="ui-action-label">前往提醒设置</text><view class="ui-chevron" aria-hidden="true"></view></button></view>
+          <view class="service-row"><text class="small text-2">{{boot.member ? '会员至 ' + boot.expiresText : (boot.expired ? '会员已到期' : '免费用户')}}</text><view class="service-detail">每条提醒消耗 1 次授权，免打扰期间不发送。</view><button class="ui-action" hover-class="ui-control-pressed" bindtap="onGoReminderSettings"><text class="ui-action-label">前往提醒设置</text><view class="ui-chevron" aria-hidden="true"></view></button></view>
           <view class="status-footer"><text class="small text-2">{{refreshedText ? '页面读取 ' + refreshedText : ''}}</text><button class="ui-action" hover-class="ui-control-pressed" bindtap="onServiceDetails"><text class="ui-action-label">服务详情</text><view class="ui-chevron" aria-hidden="true"></view></button></view>
-          <view class="small text-2 subscription-rule">每配置最多 {{limits.maxStoresPerFollow}} 家门店，不同容量／颜色各占 1 个名额；有货变化提醒 1 次，同一轮不重复发。</view>
-          <button class="ui-action ui-action--block mt" bindtap="onManageReminders">管理提醒与免打扰</button>
+          <view class="reminder-shortcuts"><button class="ui-action ui-action--neutral" bindtap="onManageReminders">管理提醒记录</button><button class="ui-action ui-action--neutral" bindtap="onTestNotification">测试收信</button></view>
         </block>
     </view>
     <view class="follow-content">
@@ -162,7 +155,6 @@
       </view>
 
     </view>
-    <view class="footer-note">最近观测仅供参考，请以官网实际取货信息为准。</view>
   </block>
 </view>
 

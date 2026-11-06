@@ -1,6 +1,6 @@
 {
   "version": "3.6.0",
-  "checkedAt": "2026-11-06T07:46:52.981Z",
+  "checkedAt": "2026-11-06T08:16:07.581Z",
   "scope": "Offline compilation of packaged WXML and WXSS using the executable compilers bundled with WeChat DevTools. Historical sources excluded via project packOptions are omitted. Runtime, wxapkg, phones and upload are separate checks.",
   "workingDirectory": "miniprogram",
   "compilerDirectory": "WeChat DevTools/resources/app.asar.unpacked/node_modules/wcc-exec",
@@ -43,7 +43,7 @@
     },
     {
       "file": "./pages/deadlines/index.wxml",
-      "sha256": "4bcdbde836024a8038371c1c7ef0773825d72a2ffa6e68267105dd19610cdcb7"
+      "sha256": "6d68ae4044b568dc44f053f7520f3af3655d5a189395001ede29d432644d8264"
     },
     {
       "file": "./pages/deadlines/index.wxss",
@@ -51,15 +51,15 @@
     },
     {
       "file": "./pages/follow/index.wxml",
-      "sha256": "5c51a64bc8bed028888621fcb2ce70b331685b6a8b0438f08123eb118d051d80"
+      "sha256": "44bf8f8885dbb75b575bd1469a3c0c9f97ea082372802b9d3486254c14329747"
     },
     {
       "file": "./pages/follow/index.wxss",
-      "sha256": "7c50289f05bcb3ae5247bb952e96064f7d6349add54ad5ba327dadb4e9d18fce"
+      "sha256": "92352b9f8cd9d3b48d47987c6668cf22055e597111418e8dd03d3175a00f15cf"
     },
     {
       "file": "./pages/guide/index.wxml",
-      "sha256": "69d6258cd1d98954d201c9f534255a7e511ae140133201868fb1ee26d104c9b1"
+      "sha256": "558ec241917562bda9f77ac651b06a10a841028a6f096210248f9ca7e07141ea"
     },
     {
       "file": "./pages/guide/index.wxss",
@@ -67,7 +67,7 @@
     },
     {
       "file": "./pages/history/index.wxml",
-      "sha256": "63cbaef9191da2d1d9d146f8a12f99bb6b6492d815777ef2b270b095e477be84"
+      "sha256": "e74517a08017bdd173021a206033ed7932ef7dbe2e3eaf9d04a09d97ff3fbe27"
     },
     {
       "file": "./pages/history/index.wxss",
@@ -75,7 +75,7 @@
     },
     {
       "file": "./pages/mine/index.wxml",
-      "sha256": "10cc9834b22b1ecb14956ba2ca8a414aec580df41c1697bba19d7c992d08d9ec"
+      "sha256": "4842b56c13b556bfe21105ecc6ab6ef6b99671ff1fc8cb3cd2776e60c89c55e6"
     },
     {
       "file": "./pages/mine/index.wxss",
@@ -91,7 +91,7 @@
     },
     {
       "file": "./pages/notification-test/index.wxml",
-      "sha256": "68749aaea02f873c979fb6e95e1c03b2bcd5f4c0357a652fe52300c3f507e6a3"
+      "sha256": "00d56ef98e7275fb379b92ee3b5b384efe97084cd4b0d0ffc9a6d676739397f2"
     },
     {
       "file": "./pages/notification-test/index.wxss",
@@ -99,7 +99,7 @@
     },
     {
       "file": "./pages/query/index.wxml",
-      "sha256": "13ae24ddd59276cf4f540cb08d88f52491804a28e8398c0e2a1a233e63864188"
+      "sha256": "d30fd1997ec7b2d96809a5f30d94ec8c668f413b0f2ffab60ae7c0b528e6c7b2"
     },
     {
       "file": "./pages/query/index.wxss",
@@ -136,8 +136,8 @@
       ],
       "exitCode": 0,
       "diagnostic": "",
-      "outputBytes": 370283,
-      "outputSha256": "2ceb0b684aa00c5473c4fc198a5a170b36abb4f111504f648582792d751c6031"
+      "outputBytes": 363271,
+      "outputSha256": "98f44db595d58b8d93158619167a70252168a65d0b972a5743f90daac8e19fbf"
     },
     {
       "binary": "wcsc.exe",
@@ -165,8 +165,8 @@
       ],
       "exitCode": 0,
       "diagnostic": "",
-      "outputBytes": 186125,
-      "outputSha256": "687e7b908bf39754aba34840da2140cb8ef0056a17de3cfadd7312b36489642e"
+      "outputBytes": 185802,
+      "outputSha256": "12bbd67769c87d0b760995b134be8286769a3b1a27270ebcb4451ac5854838e7"
     }
   ],
   "excludedFiles": [
