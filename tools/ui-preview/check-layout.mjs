@@ -193,7 +193,7 @@ try {
     }));
     metrics.calendarLayoutErrors.push(...await page.evaluate(expectedLaunchPoster => {
       const errors = [], entry = document.querySelector('.query-guide-entry'), selection = document.querySelector('.selection-card');
-      if (entry && selection && entry.getBoundingClientRect().bottom > selection.getBoundingClientRect().top + 1) errors.push('Calendar entry must precede the query selection card');
+      if (entry && selection && selection.getBoundingClientRect().bottom > entry.getBoundingClientRect().top + 1) errors.push('Query selection and actions must precede the buying guide');
       for (const button of document.querySelectorAll('.selection-summary-change, .history-edit')) {
         const label = button.querySelector('.ui-action-label'), chevron = button.querySelector('.ui-chevron');
         if (label) {

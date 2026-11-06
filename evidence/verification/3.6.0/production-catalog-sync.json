@@ -1,0 +1,273 @@
+{
+  "environment": "flowermean-6gjaxfqhf6c13e88",
+  "authorization": "Maintainer approved a production catalog update for the 29 verified retail SKUs on 2026-11-06.",
+  "before": "2026-10-30T07:12:46.858Z|2026-09-15T02:43:32.425Z|2026-10-30T07:12:46.858Z",
+  "after": "2026-11-06T06:21:08.909Z|2026-09-15T02:43:32.425Z|2026-10-30T07:12:46.858Z",
+  "publishedAt": "2026-11-06T06:44:39.434Z",
+  "backup": {
+    "localFile": "output/catalog-v360-before.json",
+    "sha256": "e93fb56922ec11ab3d475127f50bd4ae37f03dc7b8f12dccc7f71a1312542b45",
+    "saved": "Full copies of 29 prior public catalog documents and the prior catalog metadata; excluded from the code package."
+  },
+  "writes": [
+    {
+      "collection": "gxs_catalog_products",
+      "family": "homepod-mini-2",
+      "modified": 5,
+      "requestId": "814eb7f6-98c3-41ed-94df-21cbc0ec7f64"
+    },
+    {
+      "collection": "gxs_catalog_products",
+      "family": "mac-mini",
+      "modified": 5,
+      "requestId": "5eb6ea50-a3c0-4340-9dc1-99e99a9bcceb"
+    },
+    {
+      "collection": "gxs_catalog_products",
+      "family": "mac-mini",
+      "modified": 1,
+      "requestId": "413bc547-f4ec-46d2-abf6-8500ce056c48"
+    },
+    {
+      "collection": "gxs_catalog_products",
+      "family": "mac-studio",
+      "modified": 1,
+      "requestId": "1553d15c-6f15-44f8-9fe7-3c384edc46ae"
+    },
+    {
+      "collection": "gxs_catalog_products",
+      "family": "mac-studio",
+      "modified": 2,
+      "requestId": "3654c490-889c-4614-94a2-ea59fd0a3a98"
+    },
+    {
+      "collection": "gxs_catalog_products",
+      "family": "macbook-pro-proled-xdr",
+      "modified": 5,
+      "requestId": "9c68231d-6305-417e-9362-78cbca0eace2"
+    },
+    {
+      "collection": "gxs_catalog_products",
+      "family": "macbook-pro-proled-xdr",
+      "modified": 10,
+      "requestId": "67d1611f-b9d0-45ec-93f1-71af002e4ce4"
+    }
+  ],
+  "scope": {
+    "unlockedProled": 15,
+    "verificationMetadataOnly": 14,
+    "cloudFunctionDeployments": 0,
+    "method": "Guarded updates matched existing IDs, family and prior flags. After readback of all 397 capability records, the catalog version, productsGeneratedAt, seededAt and PROLED family's verified flag were published with a compare-and-set on the original version."
+  },
+  "verificationBeforeVersionPublish": {
+    "size": 397,
+    "local": 397,
+    "diff": 0,
+    "requestId": "ef409377-f813-4d37-b73e-c72303b17e3d"
+  },
+  "metadataReceipt": "c4a401b6-daa3-4640-9438-b6347dd10946",
+  "postPublish": {
+    "verified": true,
+    "total": 15,
+    "meta": "35ef1322-cc70-4f08-8531-2df00d7d92de",
+    "products": "d67dd450-d912-47e5-8488-13e1002b409a"
+  },
+  "productionApi": {
+    "newVersionConditional": {
+      "ok": true,
+      "data": {
+        "unchanged": true,
+        "version": "2026-11-06T06:21:08.909Z|2026-09-15T02:43:32.425Z|2026-10-30T07:12:46.858Z"
+      },
+      "serverTime": "2026-11-06T06:44:53.216Z",
+      "requestId": "84fe0409-26ca-475b-8b4b-78f10316a9fa"
+    },
+    "upgradeFromPrevious": {
+      "requestId": "8a98a45d-c5cc-413f-b488-30d5cb02bdf2",
+      "ok": true,
+      "serverTime": "2026-11-06T06:45:06.236Z",
+      "version": "2026-11-06T06:21:08.909Z|2026-09-15T02:43:32.425Z|2026-10-30T07:12:46.858Z",
+      "productCount": 397,
+      "storeCount": 49,
+      "wanted": 29,
+      "mismatches": []
+    }
+  },
+  "skuDetails": [
+    {
+      "id": "MJ2J4CH/A",
+      "family": "macbook-pro-proled-xdr",
+      "from": "pending",
+      "to": "unavailable"
+    },
+    {
+      "id": "MJ2X4CH/A",
+      "family": "macbook-pro-proled-xdr",
+      "from": "pending",
+      "to": "available"
+    },
+    {
+      "id": "MJ2M4CH/A",
+      "family": "macbook-pro-proled-xdr",
+      "from": "pending",
+      "to": "unavailable"
+    },
+    {
+      "id": "MJ2G4CH/A",
+      "family": "macbook-pro-proled-xdr",
+      "from": "pending",
+      "to": "available"
+    },
+    {
+      "id": "MJ2Y4CH/A",
+      "family": "macbook-pro-proled-xdr",
+      "from": "pending",
+      "to": "available"
+    },
+    {
+      "id": "MJ2W4CH/A",
+      "family": "macbook-pro-proled-xdr",
+      "from": "pending",
+      "to": "available"
+    },
+    {
+      "id": "MJ304CH/A",
+      "family": "macbook-pro-proled-xdr",
+      "from": "pending",
+      "to": "available"
+    },
+    {
+      "id": "MMF54CH/A",
+      "family": "macbook-pro-proled-xdr",
+      "from": "pending",
+      "to": "unavailable"
+    },
+    {
+      "id": "MJ314CH/A",
+      "family": "macbook-pro-proled-xdr",
+      "from": "pending",
+      "to": "unavailable"
+    },
+    {
+      "id": "MMF64CH/A",
+      "family": "macbook-pro-proled-xdr",
+      "from": "pending",
+      "to": "available"
+    },
+    {
+      "id": "MJ9X4CH/A",
+      "family": "macbook-pro-proled-xdr",
+      "from": "pending",
+      "to": "unavailable"
+    },
+    {
+      "id": "MMF94CH/A",
+      "family": "macbook-pro-proled-xdr",
+      "from": "pending",
+      "to": "available"
+    },
+    {
+      "id": "MMFA4CH/A",
+      "family": "macbook-pro-proled-xdr",
+      "from": "pending",
+      "to": "available"
+    },
+    {
+      "id": "MJ334CH/A",
+      "family": "macbook-pro-proled-xdr",
+      "from": "pending",
+      "to": "available"
+    },
+    {
+      "id": "MJ2K4CH/A",
+      "family": "macbook-pro-proled-xdr",
+      "from": "pending",
+      "to": "available"
+    },
+    {
+      "id": "MHQK4CH/A",
+      "family": "mac-mini",
+      "from": "pending",
+      "to": "available"
+    },
+    {
+      "id": "MHQL4CH/A",
+      "family": "mac-mini",
+      "from": "pending",
+      "to": "available"
+    },
+    {
+      "id": "MHQM4CH/A",
+      "family": "mac-mini",
+      "from": "pending",
+      "to": "available"
+    },
+    {
+      "id": "MHQV4CH/A",
+      "family": "mac-mini",
+      "from": "pending",
+      "to": "unavailable"
+    },
+    {
+      "id": "MHQN4CH/A",
+      "family": "mac-mini",
+      "from": "pending",
+      "to": "available"
+    },
+    {
+      "id": "MHQU4CH/A",
+      "family": "mac-mini",
+      "from": "pending",
+      "to": "available"
+    },
+    {
+      "id": "MHL64CH/A",
+      "family": "mac-studio",
+      "from": "pending",
+      "to": "available"
+    },
+    {
+      "id": "MHQJ4CH/A",
+      "family": "mac-studio",
+      "from": "pending",
+      "to": "unavailable"
+    },
+    {
+      "id": "MHL74CH/A",
+      "family": "mac-studio",
+      "from": "pending",
+      "to": "unavailable"
+    },
+    {
+      "id": "MGHK4CH/A",
+      "family": "homepod-mini-2",
+      "from": "pending",
+      "to": "available"
+    },
+    {
+      "id": "MGKR4CH/A",
+      "family": "homepod-mini-2",
+      "from": "pending",
+      "to": "available"
+    },
+    {
+      "id": "MGHM4CH/A",
+      "family": "homepod-mini-2",
+      "from": "pending",
+      "to": "available"
+    },
+    {
+      "id": "MGHL4CH/A",
+      "family": "homepod-mini-2",
+      "from": "pending",
+      "to": "available"
+    },
+    {
+      "id": "MGHJ4CH/A",
+      "family": "homepod-mini-2",
+      "from": "pending",
+      "to": "available"
+    }
+  ],
+  "acceptance": "The two public catalog reads incur no user query credit. Device inventory queries, saved follows and delivery require separate evidence."
+}

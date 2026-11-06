@@ -8,6 +8,16 @@
 
 目录存在不代表门店支持或有货。后续图片核验、取货抽样和 `sync-to-function.mjs` 仍按各自证据执行。
 
+## 逐货号开放取货
+
+PROLED XDR MacBook Pro、HomePod mini 2、Mac mini 和 Mac Studio 已按标准零售货号逐项核验。维护配置中的 `pickupVerificationScope: "sku"` 要求每个零售商品携带与自身货号相符的核验记录。购买页规格刷新沿用同系列同货号的记录和原观测时间；新增货号需另行实测。现有规格页仍标为预售时继续禁用。Mac Studio 定制配置沿用独立的资格判断。
+
+复核时使用实际门店和明确列出的货号，通过 `fetchPickup` 发起有界、顺序的公开 GET。保留返回正文、请求开始/完成时间和 SHA-256，用 `parseApplePickup` 按门店与货号回放。`available`、`unavailable` 或 `ineligible` 是已识别的门店响应；`pending`、`unknown`、缺行或身份不符时保持该新货号关闭。订正目录时更新商品自己的 `pickupVerification`、系列样本摘要及目录 `generatedAt`，核准后才清除该货号的 `comingSoon`。图片来源与像素没有改动时保留原图片观测时间，并核验缩略图映射和字节哈希。
+
+运行 `node tools/catalog/sync-to-function.mjs` 生成 API 随包目录与客户端种子，再用 `node --test tests/retail-release-v360.test.mjs` 回放本批样本，运行 `node tools/assets/build-product-thumbnails.mjs --check` 校验图片。11 月 6 日的逐项回执、数据库升级前只读快照与结果汇总见[取货核验记录](../../evidence/pickup-samples/2026-11-06/release-readiness.json)。真实库存仍由每次查询或采集时的响应决定。
+
+日常 `sample-pickup.mjs` 跳过逐货号系列，整批成功才更新其他系列的抽样记录和目录版本。每次请求的正文单独留存，限流、响应异常和离线回放只输出诊断记录。旧日期的回放使用当时请求里的货号。普通 `catalog.get` 仅读取已导入的版本，目录发布使用管理员入口 `admin.seedCatalog`。
+
 ## 定制配置与零售 SKU 分开
 
 上述选中页补采解决标准零售 SKU 的遗漏，不等于覆盖全部 Mac 定制选项。Mac Studio 根页中的 `CONFIGURABLE` 底座没有 `btrOrFdPartNumber`，但官网仍允许选择不同芯片、内存和存储。不能因为解析器只收 `CH/A`，就把未输出的定制配置解释为官网不存在。

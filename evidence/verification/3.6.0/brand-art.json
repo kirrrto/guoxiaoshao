@@ -1,0 +1,14 @@
+{
+  "generator": "Codex built-in image generation",
+  "reference": "miniprogram/images/brand/logo-mint-144.png",
+  "prompt": "Use case: stylized-concept. Create one small editorial spot illustration for the empty configuration card of 果小哨, a Chinese store pickup inventory utility. Turn the reference mark's recognizable whistle silhouette (one circular body with a round air hole, short beak pointing up and right) into a tactile mint-green enamel sports whistle resting diagonally against one small, warm ivory folded cardboard pickup box. Make the whistle the clear hero, hole readable; subtle deep jade underside and softly lit beveled edges. Matte miniature product photography, compact attractive still life, gently elevated three-quarter view, square canvas, tight central composition, all contours in frame with a slim clear margin. Strong readable silhouette at a 76-pixel display size, balanced contrast on white and dark forest green. Isolate the two objects on a truly transparent background. No lettering, logos on box, notification symbols, sound strokes, scene, gradient backdrop, stickers, watermark, or interface elements. Use the reference only for the shape of the whistle; omit the square green icon background.",
+  "originalSha256": "a93547c23894196d10a8196ffb8b225d32b79bf1cd96c588624174b449bbf481",
+  "rendition": {
+    "file": "miniprogram/images/brand/pickup-whistle-v360.png",
+    "encoding": "Indexed PNG, alpha, 256 colours",
+    "width": 288,
+    "height": 205,
+    "bytes": 12515
+  },
+  "usage": "Decorative first-selection artwork only. SKU imagery comes from the catalog."
+}

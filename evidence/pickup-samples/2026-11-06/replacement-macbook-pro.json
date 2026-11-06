@@ -1,0 +1,103 @@
+{
+  "record": {
+    "storeNumber": "R577",
+    "partNumbers": [
+      "MHWT4CH/A",
+      "MHWW4CH/A",
+      "MJ2C4CH/A",
+      "MHWU4CH/A",
+      "MHWX4CH/A",
+      "MHWV4CH/A",
+      "MHWY4CH/A"
+    ],
+    "requestUrl": "https://www.apple.com.cn/shop/retail/pickup-message?pl=true&mts.0=regular&parts.0=MHWT4CH%2FA&parts.1=MHWW4CH%2FA&parts.2=MJ2C4CH%2FA&parts.3=MHWU4CH%2FA&parts.4=MHWX4CH%2FA&parts.5=MHWV4CH%2FA&parts.6=MHWY4CH%2FA&store=R577",
+    "startedAt": "2026-11-06T06:21:41.793Z",
+    "httpStatus": 200,
+    "bytes": 11336,
+    "elapsedMs": 1952,
+    "finishedAt": "2026-11-06T06:21:43.745Z",
+    "error": null,
+    "retryAfter": null
+  },
+  "bodyFile": "replacement-macbook-pro.body.json",
+  "sha256": "42269c92d9be43257f18818ff116d9811c157fad8b2c82c0580ba05a7edeaf10",
+  "observations": [
+    {
+      "storeNumber": "R577",
+      "storeName": "天环广场",
+      "partNumber": "MHWT4CH/A",
+      "status": "available",
+      "pickupDisplay": "available",
+      "quote": "今天可取货",
+      "productTitle": "14 英寸 MacBook Pro - 深空黑色",
+      "observedAt": "2026-11-06T06:21:43.745Z",
+      "reason": null
+    },
+    {
+      "storeNumber": "R577",
+      "storeName": "天环广场",
+      "partNumber": "MHWW4CH/A",
+      "status": "available",
+      "pickupDisplay": "available",
+      "quote": "今天可取货",
+      "productTitle": "14 英寸 MacBook Pro - 银色",
+      "observedAt": "2026-11-06T06:21:43.745Z",
+      "reason": null
+    },
+    {
+      "storeNumber": "R577",
+      "storeName": "天环广场",
+      "partNumber": "MJ2C4CH/A",
+      "status": "available",
+      "pickupDisplay": "available",
+      "quote": "今天可取货",
+      "productTitle": "14 英寸 MacBook Pro - 深空黑色",
+      "observedAt": "2026-11-06T06:21:43.745Z",
+      "reason": null
+    },
+    {
+      "storeNumber": "R577",
+      "storeName": "天环广场",
+      "partNumber": "MHWU4CH/A",
+      "status": "available",
+      "pickupDisplay": "available",
+      "quote": "今天可取货",
+      "productTitle": "14 英寸 MacBook Pro - 深空黑色",
+      "observedAt": "2026-11-06T06:21:43.745Z",
+      "reason": null
+    },
+    {
+      "storeNumber": "R577",
+      "storeName": "天环广场",
+      "partNumber": "MHWX4CH/A",
+      "status": "available",
+      "pickupDisplay": "available",
+      "quote": "今天可取货",
+      "productTitle": "14 英寸 MacBook Pro - 银色",
+      "observedAt": "2026-11-06T06:21:43.745Z",
+      "reason": null
+    },
+    {
+      "storeNumber": "R577",
+      "storeName": "天环广场",
+      "partNumber": "MHWV4CH/A",
+      "status": "available",
+      "pickupDisplay": "available",
+      "quote": "今天可取货",
+      "productTitle": "14 英寸 MacBook Pro - 深空黑色",
+      "observedAt": "2026-11-06T06:21:43.745Z",
+      "reason": null
+    },
+    {
+      "storeNumber": "R577",
+      "storeName": "天环广场",
+      "partNumber": "MHWY4CH/A",
+      "status": "available",
+      "pickupDisplay": "available",
+      "quote": "今天可取货",
+      "productTitle": "14 英寸 MacBook Pro - 银色",
+      "observedAt": "2026-11-06T06:21:43.745Z",
+      "reason": null
+    }
+  ]
+}

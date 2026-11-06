@@ -4,8 +4,11 @@
 .whistle-heading-copy { flex: 1; min-width: 0; }
 .compact-action.btn { flex: none; width: auto; min-width: 64px; min-height: 44px; padding: 0 20rpx; }
 .deadline-home-empty { font-size: max(14px, 28rpx); color: var(--text-2); line-height: 1.6; }
-.deadline-home-next { display: flex; flex-direction: column; gap: 6rpx; padding-bottom: 16rpx; color: var(--text-2); font-size: max(12px, 26rpx); line-height: 1.6; overflow-wrap: anywhere; }
-.deadline-home-next .bold { color: var(--text); }
+.deadline-heading-main { display: flex; flex: 1 1 auto; align-items: center; gap: 16rpx; min-width: 0; }
+.deadline-heading-icon { flex: none; width: 38px; height: 38px; padding: 9px; border-radius: 12px; background: var(--green-soft); }
+.deadline-service-label { margin-top: 2rpx; font-size: max(12px, 24rpx); color: var(--text-2); }
+.deadline-home-next { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4rpx 14rpx; margin-bottom: 10rpx; color: var(--text-2); font-size: max(12px, 25rpx); line-height: 1.5; overflow-wrap: anywhere; }
+.deadline-next-time { color: var(--text); font-size: max(16px, 32rpx); font-weight: 650; font-variant-numeric: tabular-nums; }
 .deadline-home-row { padding: 18rpx 0; border-top: 1rpx solid var(--line); }
 .deadline-home-item { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6rpx 16rpx; }
 .deadline-home-title { flex: 1 1 180rpx; min-width: 0; font-size: max(14px, 28rpx); line-height: 1.6; color: var(--text); font-weight: 600; overflow-wrap: anywhere; }

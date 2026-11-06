@@ -27,7 +27,7 @@
         <button class="ui-action history-edit" hover-class="ui-control-pressed" disabled="{{querying || loadingMore}}" bindtap="onEditSelection"><text class="ui-action-label">修改</text><view class="ui-chevron" aria-hidden="true"></view></button>
       </view>
       <view wx:if="{{selectionSummary}}" class="history-store-scope"><image class="ui-icon" src="/images/ui/store.png" mode="aspectFit" aria-hidden="true" /><text>{{selectionSummary.scopeText}}</text></view>
-      <view wx:else class="history-config-empty"><button class="ui-action ui-action--block" hover-class="ui-control-pressed" bindtap="onEditSelection"><text class="ui-action-label">选择配置与门店</text><view class="ui-chevron" aria-hidden="true"></view></button></view>
+      <view wx:else class="history-config-empty"><button class="btn btn-primary btn-block" hover-class="btn-primary-pressed" bindtap="onEditSelection">选择配置与门店</button></view>
 
       <view class="history-date-row" aria-label="选择日期，北京时间">
         <view class="history-date-shortcuts" aria-label="快捷选择日期">
@@ -46,7 +46,7 @@
       <view wx:if="{{queryFailureMessage || restriction}}" class="banner banner-warn small mt" aria-role="alert">{{queryFailureMessage || restriction}}</view>
       <button wx:if="{{!boot.member && boot.balance < boot.historyCost}}" class="ui-action ui-action--block mb" hover-class="ui-control-pressed" bindtap="onGoMine"><text class="ui-action-label">去签到 / 查看次数</text><view class="ui-chevron" aria-hidden="true"></view></button>
 
-      <button class="btn btn-primary btn-block mt {{querying ? 'disabled' : ''}}" loading="{{querying}}" disabled="{{querying || loadingMore || !accountReady || !selectionSummary || !selectionSummary.valid}}" bindtap="onQuery">
+      <button wx:if="{{selectionSummary}}" class="btn btn-primary btn-block mt {{querying ? 'disabled' : ''}}" hover-class="btn-primary-pressed" loading="{{querying}}" disabled="{{querying || loadingMore || !accountReady || !selectionSummary.valid}}" bindtap="onQuery">
         {{!accountReady ? '正在连接账户…' : (querying ? '加载中…' : '查看历史')}}
       </button>
       <view wx:if="{{querying}}" class="request-progress {{requestSlow ? 'request-progress--slow' : ''}}" aria-role="status">{{requestSlow ? requestProgressText : '正在读取所选日期的已记录变化。'}}</view>
@@ -56,13 +56,7 @@
 
     <view wx:if="{{restoreNotice}}" class="banner {{restoreWarning ? 'banner-warn' : 'banner-info'}} small">{{restoreNotice}}</view>
     <button wx:if="{{journeySource}}" class="ui-action ui-action--neutral mb" bindtap="onReturnJourney"><text class="ui-action-label">{{journeySource === 'follow' ? '返回小哨任务' : '返回原查询'}}</text><view class="ui-chevron" aria-hidden="true"></view></button>
-    <view wx:if="{{taskMessage || (accountReady && boot && boot.taskAvailable)}}" class="history-task-bar small">
-      <text class="history-task-note muted">{{taskMessage || ('今日浏览本页可领 +' + boot.taskReward + ' 次查询额度')}}</text>
-      <button wx:if="{{accountReady && boot && boot.taskAvailable}}" class="btn btn-primary btn-sm history-task-claim" loading="{{taskClaimLoading}}" disabled="{{browseLoading || taskClaimLoading}}" bindtap="onClaimTask">{{taskClaimLoading ? '领取中…' : (browseLoading ? '确认中…' : '领取奖励')}}</button>
-    </view>
-    <view wx:if="{{taskClaimError}}" class="banner banner-warn small" aria-role="alert">{{taskClaimError}}</view>
-    <view wx:if="{{browseError && !browseExpanded}}" class="banner banner-warn small">{{browseError}}<button class="btn btn-outline btn-sm mt" disabled="{{browseLoading}}" bindtap="onRetryBrowse">重新加载浏览记录</button></view>
-    <view wx:if="{{result}}" class="card history-result-card">
+    <view wx:if="{{result}}" class="card history-result-card ui-reveal">
       <view wx:if="{{queryFailureMessage}}" class="banner banner-warn small mb">本次查询未完成，下方保留上次查询结果。</view>
       <view wx:elif="{{resultTargetDifferent}}" class="banner banner-info small mb">下方为上次查询结果，当前条件尚未查询。</view>
       <view class="history-result-heading"><text class="history-result-date">{{result.dayText}}</text></view>
@@ -91,7 +85,7 @@
 
       <button class="ui-disclosure history-disclosure" hover-class="ui-control-pressed" bindtap="onToggleCoverage" aria-expanded="{{coverageExpanded}}"><text class="ui-disclosure-label">统计与观测凭据</text><view class="ui-disclosure-meta"><text>{{coverageExpanded ? '收起' : '展开'}}</text><view class="ui-chevron {{coverageExpanded ? 'ui-chevron--up' : 'ui-chevron--down'}}" aria-hidden="true"></view></view></button>
       <view class="small text-2">{{result.coverageSummary}}</view>
-      <block wx:if="{{coverageExpanded}}">
+      <view wx:if="{{coverageExpanded}}" class="ui-reveal">
       <view class="history-insights">
         <view class="small bold">当天记录速览</view>
         <view class="tiny text-2 mt">{{result.insights.scopeText}}</view>
@@ -122,11 +116,16 @@
         <view class="tiny muted">首末观测 {{item.rangeText}}</view>
       </view>
       <view class="tiny muted mt">首末观测间不代表连续监测；较早数据可能无采样摘要。</view>
-
-      </block>
+      </view>
 
     </view>
 
+    <view wx:if="{{taskMessage || (accountReady && boot && boot.taskAvailable)}}" class="history-task-bar small">
+      <text class="history-task-note muted">{{taskMessage || ('今日浏览本页可领 +' + boot.taskReward + ' 次查询额度')}}</text>
+      <button wx:if="{{accountReady && boot && boot.taskAvailable}}" class="btn btn-ghost btn-sm history-task-claim" loading="{{taskClaimLoading}}" disabled="{{browseLoading || taskClaimLoading}}" bindtap="onClaimTask">{{taskClaimLoading ? '领取中…' : (browseLoading ? '确认中…' : '领取奖励')}}</button>
+    </view>
+    <view wx:if="{{taskClaimError}}" class="banner banner-warn small" aria-role="alert">{{taskClaimError}}</view>
+    <view wx:if="{{browseError && !browseExpanded}}" class="banner banner-warn small">{{browseError}}<button class="btn btn-outline btn-sm mt" disabled="{{browseLoading}}" bindtap="onRetryBrowse">重新加载浏览记录</button></view>
     <view class="card history-tools-card">
     <view wx:if="{{result && result.latest.length}}" class="history-latest-card">
         <button class="ui-disclosure" bindtap="onToggleLatest" hover-class="ui-control-pressed" aria-expanded="{{latestExpanded}}"><text class="ui-disclosure-label">所选门店最近观测</text><view class="ui-disclosure-meta"><text>{{latestExpanded ? '收起' : '查看'}}</text><view class="ui-chevron {{latestExpanded ? 'ui-chevron--up' : 'ui-chevron--down'}}" aria-hidden="true"></view></view></button>

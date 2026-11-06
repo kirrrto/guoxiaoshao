@@ -1241,8 +1241,11 @@ Page({
         .sort((a, b) => Date.parse(a.remindAt) - Date.parse(b.remindAt));
       const upcoming = items.filter(item => !['accepted', 'missed'].includes(item.delivery && item.delivery.status))
         .sort((a, b) => Date.parse(a.remindAt) - Date.parse(b.remindAt));
-      this.setData({ deadlines: (upcoming.length ? upcoming : items).slice(0, 3), deadlineCount: items.length,
-        deadlinesLoaded: true, deadlinesError: '', nextDeadline: planned[0] || null,
+      const nextDeadline = planned[0] || null;
+      const preview = upcoming.length ? upcoming : items;
+      const ordered = nextDeadline ? [nextDeadline, ...preview.filter(item => item.id !== nextDeadline.id)] : preview;
+      this.setData({ deadlines: ordered.slice(0, 3), deadlineCount: items.length,
+        deadlinesLoaded: true, deadlinesError: '', nextDeadline,
         deadlineCanOpen: true, deadlineRecordOnly: !notificationsEnabled,
         deadlineServiceLabel: notificationsEnabled ? '免费试用' : '仅保存事项' });
       return true;

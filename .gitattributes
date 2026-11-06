@@ -1,0 +1,6 @@
+# These generated text files are verified against byte-level SHA-256 manifests.
+/catalog/products.json text eol=lf
+/catalog/stores.json text eol=lf
+/cloudfunctions/gxs_api/catalog/products.json text eol=lf
+/cloudfunctions/gxs_api/catalog/stores.json text eol=lf
+/miniprogram/config/product-thumbnails.js text eol=lf

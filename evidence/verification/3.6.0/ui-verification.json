@@ -1,0 +1,244 @@
+{
+  "scope": "Headless Chromium rendering WXML/WXSS with offline synthetic records; WeChat preview, simulator and physical-device checks have separate evidence.",
+  "sourceFingerprint": "sha256:e1f6cab6f59b40a40fd32251da546a5bdb4a2fb5dfe413f14a55162efef2538d",
+  "uiSourceHash": "a280e1e3ee9e2a78b4e1c2042433ac73bb180b9e847dc4c5bca3ea9a398c4466",
+  "previewChecks": {
+    "v360": {
+      "cases": 96,
+      "failures": 0,
+      "widths": [
+        320,
+        375,
+        430
+      ],
+      "stressedFont": "1.3x at 320px and 600px height",
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "reducedMotion": [
+        "reduce",
+        "no-preference"
+      ]
+    },
+    "v350Layouts": [
+      {
+        "file": "layout-metrics.json",
+        "summary": {
+          "total": 96,
+          "indexNavigationFailures": 0,
+          "expressionErrors": 0,
+          "missingText": 0,
+          "forbiddenText": 0,
+          "horizontalOverflow": 0,
+          "clippedText": 0,
+          "failedImages": 0,
+          "alternativeLayoutFailures": 0,
+          "calendarLayoutFailures": 0,
+          "membershipLayoutFailures": 0,
+          "notificationLayoutFailures": 0,
+          "v3LayoutFailures": 0,
+          "stockLayoutFailures": 0,
+          "followFontFailures": 0,
+          "deadlineLayoutFailures": 0,
+          "configurationLayoutFailures": 0
+        }
+      },
+      {
+        "file": "layout-metrics-dark.json",
+        "summary": {
+          "total": 96,
+          "indexNavigationFailures": 0,
+          "expressionErrors": 0,
+          "missingText": 0,
+          "forbiddenText": 0,
+          "horizontalOverflow": 0,
+          "clippedText": 0,
+          "failedImages": 0,
+          "alternativeLayoutFailures": 0,
+          "calendarLayoutFailures": 0,
+          "membershipLayoutFailures": 0,
+          "notificationLayoutFailures": 0,
+          "v3LayoutFailures": 0,
+          "stockLayoutFailures": 0,
+          "followFontFailures": 0,
+          "deadlineLayoutFailures": 0,
+          "configurationLayoutFailures": 0
+        }
+      },
+      {
+        "file": "layout-metrics-v350-fonts.json",
+        "summary": {
+          "total": 96,
+          "indexNavigationFailures": 0,
+          "expressionErrors": 0,
+          "missingText": 0,
+          "forbiddenText": 0,
+          "horizontalOverflow": 0,
+          "clippedText": 0,
+          "failedImages": 0,
+          "alternativeLayoutFailures": 0,
+          "calendarLayoutFailures": 0,
+          "membershipLayoutFailures": 0,
+          "notificationLayoutFailures": 0,
+          "v3LayoutFailures": 0,
+          "stockLayoutFailures": 0,
+          "followFontFailures": 0,
+          "deadlineLayoutFailures": 0,
+          "configurationLayoutFailures": 0
+        }
+      },
+      {
+        "file": "layout-metrics-v350-fonts-dark.json",
+        "summary": {
+          "total": 96,
+          "indexNavigationFailures": 0,
+          "expressionErrors": 0,
+          "missingText": 0,
+          "forbiddenText": 0,
+          "horizontalOverflow": 0,
+          "clippedText": 0,
+          "failedImages": 0,
+          "alternativeLayoutFailures": 0,
+          "calendarLayoutFailures": 0,
+          "membershipLayoutFailures": 0,
+          "notificationLayoutFailures": 0,
+          "v3LayoutFailures": 0,
+          "stockLayoutFailures": 0,
+          "followFontFailures": 0,
+          "deadlineLayoutFailures": 0,
+          "configurationLayoutFailures": 0
+        }
+      }
+    ],
+    "v343Layouts": [
+      {
+        "file": "layout-metrics.json",
+        "summary": {
+          "total": 156,
+          "indexNavigationFailures": 0,
+          "expressionErrors": 0,
+          "missingText": 0,
+          "forbiddenText": 0,
+          "horizontalOverflow": 0,
+          "clippedText": 0,
+          "failedImages": 0,
+          "alternativeLayoutFailures": 0,
+          "calendarLayoutFailures": 0,
+          "membershipLayoutFailures": 0,
+          "notificationLayoutFailures": 0,
+          "v3LayoutFailures": 0,
+          "stockLayoutFailures": 0,
+          "followFontFailures": 0,
+          "deadlineLayoutFailures": 0,
+          "configurationLayoutFailures": 0
+        }
+      },
+      {
+        "file": "layout-metrics-dark.json",
+        "summary": {
+          "total": 156,
+          "indexNavigationFailures": 0,
+          "expressionErrors": 0,
+          "missingText": 0,
+          "forbiddenText": 0,
+          "horizontalOverflow": 0,
+          "clippedText": 0,
+          "failedImages": 0,
+          "alternativeLayoutFailures": 0,
+          "calendarLayoutFailures": 0,
+          "membershipLayoutFailures": 0,
+          "notificationLayoutFailures": 0,
+          "v3LayoutFailures": 0,
+          "stockLayoutFailures": 0,
+          "followFontFailures": 0,
+          "deadlineLayoutFailures": 0,
+          "configurationLayoutFailures": 0
+        }
+      }
+    ],
+    "tabs": [
+      [
+        {
+          "total": 213,
+          "failed": 0
+        },
+        {
+          "total": 213,
+          "failed": 0
+        }
+      ],
+      [
+        {
+          "total": 372,
+          "failed": 0
+        },
+        {
+          "total": 372,
+          "failed": 0
+        }
+      ]
+    ],
+    "color": [
+      [
+        {
+          "total": 303,
+          "active": 298,
+          "belowTarget": 0,
+          "primaryMinimum": 5.357131444839318,
+          "selectedNavMinimum": 5.230867846703258,
+          "unsupportedMeasurements": 0
+        },
+        {
+          "total": 303,
+          "active": 298,
+          "belowTarget": 0,
+          "primaryMinimum": 5.357131444839318,
+          "selectedNavMinimum": 7.139531628869566,
+          "unsupportedMeasurements": 0
+        }
+      ],
+      [
+        {
+          "total": 236,
+          "active": 236,
+          "belowTarget": 0,
+          "primaryMinimum": 5.357131444839318,
+          "selectedNavMinimum": 5.230867846703258,
+          "unsupportedMeasurements": 0
+        },
+        {
+          "total": 236,
+          "active": 236,
+          "belowTarget": 0,
+          "primaryMinimum": 5.357131444839318,
+          "selectedNavMinimum": 7.139531628869566,
+          "unsupportedMeasurements": 0
+        }
+      ]
+    ],
+    "picker": {
+      "total": 120,
+      "failed": 0
+    }
+  },
+  "detector": {
+    "engine": "Impeccable 0.1.18",
+    "command": "detect --json --viewport 375x780 --no-consent-hiding --no-overlay-hiding <4 loopback fixtures>",
+    "exitCode": 2,
+    "raw": "impeccable-warnings.json",
+    "warnings": 22,
+    "previewChrome": 20,
+    "remaining": [
+      {
+        "rule": "nested-cards",
+        "selector": "div.follow-stock-panel.follow-stock-panel--ok"
+      },
+      {
+        "rule": "nested-cards",
+        "selector": "div.history-date-control"
+      }
+    ],
+    "disposition": "The offline notice and simulated native tab labels are preview-only. In-app groupings retain a dated inventory observation and a date selection control, respectively."
+  }
+}

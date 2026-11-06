@@ -1,6 +1,5 @@
 /* 查询页专用样式（公共样式见 app.wxss） */
-/* Purchase and pickup guide: a calm entry row below the heading. It stays
-   recognizable as a control without competing with the primary query action. */
+/* Purchase and pickup guide follows the inventory actions. */
 .query-guide-entry.query-guide-entry {
   gap: 12px;
   margin: 0 0 26rpx;
@@ -20,7 +19,6 @@
   .query-guide-entry.query-guide-entry { padding: 14px 18px; border-radius: 18px; }
   .query-guide-title { font-size: 16px; }
   .query-guide-note { font-size: 13px; }
-  .page .selection-card--empty > .card-title { font-size: 22px; }
 }
 .card-title text:first-child { flex: 1; min-width: 0; white-space: normal; }
 .target-row { padding: 14rpx 0; border-bottom: 2rpx solid var(--line); }
@@ -59,9 +57,21 @@
 .selection-summary-change .ui-action-label { flex: none; white-space: nowrap; word-break: keep-all; overflow-wrap: normal; }
 .selection-summary-stores { flex: 1 1 0; min-width: 0; color: var(--text-2); font-size: 24rpx; line-height: 1.6; overflow-wrap: anywhere; }
 .selection-done.btn { margin-top: 24rpx; }
-.selection-empty { padding: 0 0 8rpx; }
-/* Without a saved target the question itself is the card heading. */
-.selection-card--empty > .card-title { padding-bottom: 0; border-bottom: 0; margin-bottom: 10rpx; font-size: 36rpx; }
+.selection-empty { padding: 0 0 4rpx; }
+.pickup-intro {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+  margin: -24rpx -24rpx 22rpx;
+  padding: 20rpx 26rpx;
+  border-radius: 24rpx 24rpx 0 0;
+  background: var(--green-soft);
+}
+.pickup-intro-copy { flex: 1; min-width: 0; }
+.pickup-intro-title { font-size: clamp(21px, 46rpx, 26px); font-weight: 700; line-height: 1.35; color: var(--text); }
+.pickup-intro-quota { display: block; margin-top: 10rpx; font-size: max(12px, 25rpx); color: var(--text-2); }
+.pickup-intro-image { flex: none; display: block; width: clamp(84px, 24vw, 112px); height: clamp(84px, 24vw, 112px); }
 .selection-access-note { margin-top: 20rpx; font-size: 25rpx; line-height: 1.6; color: var(--text-2); }
 .selection-summary-title { font-size: 32rpx; }
 .selection-summary-city, .selection-summary-stores { font-size: 25rpx; }
@@ -82,9 +92,10 @@
 .result-product-time { margin-top: 8rpx; color: var(--text-3); font-size: 24rpx; font-size: max(12px, 24rpx); line-height: 1.6; overflow-wrap: anywhere; }
 
 /* 首页提示：添加到我的小程序 */
-.banner.add-tip { display: flex; align-items: flex-start; gap: 16rpx; }
+.banner.add-tip { display: flex; align-items: center; gap: 12rpx; padding-top: 0; padding-bottom: 0; }
 .add-tip-text { flex: 1; min-width: 0; }
-.add-tip-close { flex: none; font-size: 34rpx; line-height: 1.1; color: var(--text-3); }
+.add-tip-close { flex: none; width: 44px; min-height: 44px; margin: 0; padding: 0; border: 0; background: transparent; font-size: 20px; line-height: 44px; color: var(--text-2); }
+.add-tip-close::after { border: 0; }
 
 .observed-store-choices { margin-top: 24rpx; padding: 24rpx; border: 1rpx solid var(--line); border-radius: 20rpx; background: var(--surface-soft); line-height: 1.6; }
 .observed-store-choice { display: flex; align-items: center; justify-content: space-between; gap: 16rpx; width: 100%; min-height: 44px; margin-top: 16rpx; padding: 18rpx; background: var(--card); border: 1rpx solid var(--line); border-radius: 16rpx; color: var(--text); text-align: left; white-space: normal; line-height: 1.6; }
@@ -166,9 +177,9 @@
 
 /* Fixed slot on the right of the title block (announcement board). */
 .heading-notice-btn {
-  flex: 0 0 72rpx;
-  width: 72rpx;
-  height: 72rpx;
+  flex: 0 0 44px;
+  width: 44px;
+  height: 44px;
   margin: 0;
   padding: 0;
   border-radius: 18rpx;
@@ -208,7 +219,6 @@
 .query-page .selection-card > .card-title { padding-bottom: 14rpx; margin-bottom: 0; }
 .query-page .selection-card > .card-title > text:first-child { flex-basis: auto; }
 .query-page .selection-card > .card-title .sub { padding: 4rpx 12rpx; font-size: 12px; }
-.query-page .selection-card--empty > .card-title { font-size: 18px; padding-bottom: 10rpx; }
 .query-page .selection-summary { padding-top: 16rpx; }
 .query-page .selection-summary-image-box { width: 112rpx; height: 132rpx; flex-basis: 112rpx; border-radius: 16rpx; }
 .query-page .selection-summary-title { font-size: max(14px, 29rpx); line-height: 1.4; }
@@ -247,6 +257,7 @@
 
 @media (min-width: 600px) {
   .query-page .card { padding: 20px; border-radius: 16px; }
+  .query-page .pickup-intro { margin: -20px -20px 16px; padding: 12px 24px; border-radius: 16px 16px 0 0; }
   .query-page .selection-summary-image-box { width: 64px; height: 76px; flex-basis: 64px; }
   .query-page .result-product-media { width: 60px; height: 72px; flex-basis: 60px; }
   .query-page .selection-summary-title, .query-page .result-product-title { font-size: 17px; }

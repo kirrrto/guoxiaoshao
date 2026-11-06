@@ -1,0 +1,91 @@
+{
+  "record": {
+    "storeNumber": "R577",
+    "partNumbers": [
+      "MHQK4CH/A",
+      "MHQL4CH/A",
+      "MHQM4CH/A",
+      "MHQV4CH/A",
+      "MHQN4CH/A",
+      "MHQU4CH/A"
+    ],
+    "requestUrl": "https://www.apple.com.cn/shop/retail/pickup-message?pl=true&mts.0=regular&parts.0=MHQK4CH%2FA&parts.1=MHQL4CH%2FA&parts.2=MHQM4CH%2FA&parts.3=MHQV4CH%2FA&parts.4=MHQN4CH%2FA&parts.5=MHQU4CH%2FA&store=R577",
+    "startedAt": "2026-11-06T06:17:56.277Z",
+    "httpStatus": 200,
+    "bytes": 10267,
+    "elapsedMs": 837,
+    "finishedAt": "2026-11-06T06:17:57.114Z",
+    "error": null,
+    "retryAfter": null
+  },
+  "bodyFile": "mac-mini-1.body.json",
+  "sha256": "6923c2833dc41e8099214c73a179f70f7b39f6f58c9996fd762204b793fd5ffc",
+  "observations": [
+    {
+      "storeNumber": "R577",
+      "storeName": "天环广场",
+      "partNumber": "MHQK4CH/A",
+      "status": "available",
+      "pickupDisplay": "available",
+      "quote": "今天可取货",
+      "productTitle": "Mac mini",
+      "observedAt": "2026-11-06T06:17:57.114Z",
+      "reason": null
+    },
+    {
+      "storeNumber": "R577",
+      "storeName": "天环广场",
+      "partNumber": "MHQL4CH/A",
+      "status": "available",
+      "pickupDisplay": "available",
+      "quote": "今天可取货",
+      "productTitle": "Mac mini",
+      "observedAt": "2026-11-06T06:17:57.114Z",
+      "reason": null
+    },
+    {
+      "storeNumber": "R577",
+      "storeName": "天环广场",
+      "partNumber": "MHQM4CH/A",
+      "status": "available",
+      "pickupDisplay": "available",
+      "quote": "今天可取货",
+      "productTitle": "Mac mini",
+      "observedAt": "2026-11-06T06:17:57.114Z",
+      "reason": null
+    },
+    {
+      "storeNumber": "R577",
+      "storeName": "天环广场",
+      "partNumber": "MHQV4CH/A",
+      "status": "unavailable",
+      "pickupDisplay": "unavailable",
+      "quote": "暂无供应",
+      "productTitle": "Mac mini",
+      "observedAt": "2026-11-06T06:17:57.114Z",
+      "reason": null
+    },
+    {
+      "storeNumber": "R577",
+      "storeName": "天环广场",
+      "partNumber": "MHQN4CH/A",
+      "status": "available",
+      "pickupDisplay": "available",
+      "quote": "今天可取货",
+      "productTitle": "Mac mini",
+      "observedAt": "2026-11-06T06:17:57.114Z",
+      "reason": null
+    },
+    {
+      "storeNumber": "R577",
+      "storeName": "天环广场",
+      "partNumber": "MHQU4CH/A",
+      "status": "available",
+      "pickupDisplay": "available",
+      "quote": "今天可取货",
+      "productTitle": "Mac mini",
+      "observedAt": "2026-11-06T06:17:57.114Z",
+      "reason": null
+    }
+  ]
+}

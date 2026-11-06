@@ -94,7 +94,8 @@
       "url": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr",
       "include": true,
       "releaseDate": "2026-11-06",
-      "releaseSourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr"
+      "releaseSourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr",
+      "pickupVerificationScope": "sku"
     },
     {
       "category": "mac",
@@ -126,7 +127,8 @@
       "familyKey": "mac-mini",
       "displayName": "Mac mini",
       "url": "https://www.apple.com.cn/shop/buy-mac/mac-mini",
-      "include": true
+      "include": true,
+      "pickupVerificationScope": "sku"
     },
     {
       "category": "mac",
@@ -211,7 +213,8 @@
         "ctoConfigurations": 42,
         "configurationCheckedAt": "2026-10-30T05:40:50.339Z"
       },
-      "configurationCapture": "evidence/catalog/2026-10-30/mac-studio-configurations.json"
+      "configurationCapture": "evidence/catalog/2026-10-30/mac-studio-configurations.json",
+      "pickupVerificationScope": "sku"
     },
     {
       "category": "mac",
@@ -319,7 +322,8 @@
       "url": "https://www.apple.com.cn/shop/buy-homepod/homepod-mini",
       "include": true,
       "releaseDate": "2026-10-13",
-      "releaseSourceUrl": "https://www.apple.com.cn/newsroom/2026/10/apple-announces-the-next-generation-of-homepod-mini/"
+      "releaseSourceUrl": "https://www.apple.com.cn/newsroom/2026/10/apple-announces-the-next-generation-of-homepod-mini/",
+      "pickupVerificationScope": "sku"
     }
   ]
 }

@@ -1,0 +1,55 @@
+{
+  "record": {
+    "storeNumber": "R577",
+    "partNumbers": [
+      "MMFA4CH/A",
+      "MJ334CH/A",
+      "MJ2K4CH/A"
+    ],
+    "requestUrl": "https://www.apple.com.cn/shop/retail/pickup-message?pl=true&mts.0=regular&parts.0=MMFA4CH%2FA&parts.1=MJ334CH%2FA&parts.2=MJ2K4CH%2FA&store=R577",
+    "startedAt": "2026-11-06T06:17:50.221Z",
+    "httpStatus": 200,
+    "bytes": 7940,
+    "elapsedMs": 754,
+    "finishedAt": "2026-11-06T06:17:50.975Z",
+    "error": null,
+    "retryAfter": null
+  },
+  "bodyFile": "macbook-pro-proled-xdr-3.body.json",
+  "sha256": "1ccd4bac08278e190b72c2434305b4a154be8a66687f8a168d74ac52594bf282",
+  "observations": [
+    {
+      "storeNumber": "R577",
+      "storeName": "天环广场",
+      "partNumber": "MMFA4CH/A",
+      "status": "available",
+      "pickupDisplay": "available",
+      "quote": "今天可取货",
+      "productTitle": "16 英寸 MacBook Pro (PROLED XDR 显示屏) - 深空黑色",
+      "observedAt": "2026-11-06T06:17:50.975Z",
+      "reason": null
+    },
+    {
+      "storeNumber": "R577",
+      "storeName": "天环广场",
+      "partNumber": "MJ334CH/A",
+      "status": "available",
+      "pickupDisplay": "available",
+      "quote": "今天可取货",
+      "productTitle": "16 英寸 MacBook Pro (PROLED XDR 显示屏) - 深空黑色",
+      "observedAt": "2026-11-06T06:17:50.975Z",
+      "reason": null
+    },
+    {
+      "storeNumber": "R577",
+      "storeName": "天环广场",
+      "partNumber": "MJ2K4CH/A",
+      "status": "available",
+      "pickupDisplay": "available",
+      "quote": "今天可取货",
+      "productTitle": "14 英寸 MacBook Pro (PROLED XDR 显示屏) - 深空黑色",
+      "observedAt": "2026-11-06T06:17:50.975Z",
+      "reason": null
+    }
+  ]
+}

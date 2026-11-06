@@ -1,0 +1,262 @@
+{
+  "kind": "WeChat DevTools official automator; local-only transport and in-memory storage",
+  "testedAt": "2026-11-06T06:36:40.457Z",
+  "screens": [
+    "01-query.png",
+    "02-picker.png",
+    "03-selection.png",
+    "04-direct-follow.png",
+    "05-follow.png",
+    "06-history.png",
+    "07-mine.png"
+  ],
+  "events": [
+    {
+      "name": "query-ready-and-art",
+      "ok": true,
+      "elapsedMs": 10431,
+      "data": {
+        "page": "pages/query/index",
+        "viewport": {
+          "width": 430,
+          "height": 752
+        },
+        "hero": {
+          "width": 103.1875,
+          "height": 103.1875
+        },
+        "sdk": "3.17.3"
+      }
+    },
+    {
+      "name": "open-picker",
+      "ok": true,
+      "elapsedMs": 1528,
+      "data": {
+        "route": "pages/query/index",
+        "options": 19
+      }
+    },
+    {
+      "name": "save-config-and-store",
+      "ok": true,
+      "elapsedMs": 1548,
+      "data": {
+        "page": "pages/query/index",
+        "ready": true,
+        "accountReady": true,
+        "sheet": false,
+        "error": null,
+        "summary": "MacBook Pro (PROLED XDR 显示屏) 14 英寸 M5 Pro 15核CPU/16核GPU 24GB 1TB 纳米纹理玻璃 深空黑色",
+        "canFollow": true,
+        "actions": [
+          "user.bootstrap",
+          "catalog.get",
+          "follow.list"
+        ]
+      }
+    },
+    {
+      "name": "direct-follow-without-query",
+      "ok": true,
+      "elapsedMs": 1550,
+      "data": {
+        "page": "pages/follow/index",
+        "ready": true,
+        "editing": true,
+        "error": null,
+        "service": "仅保存事项",
+        "actions": [
+          "user.bootstrap",
+          "catalog.get",
+          "follow.list",
+          "deadline.list"
+        ]
+      }
+    },
+    {
+      "name": "follow-home",
+      "ok": true,
+      "elapsedMs": 4268,
+      "data": {
+        "page": "pages/follow/index",
+        "ready": true,
+        "editing": false,
+        "error": null,
+        "service": "仅保存事项",
+        "actions": [
+          "user.bootstrap",
+          "catalog.get",
+          "follow.list",
+          "deadline.list"
+        ]
+      }
+    },
+    {
+      "name": "history-and-conditions",
+      "ok": true,
+      "initialProbeError": "Cannot read properties of null (reading '$')",
+      "data": {
+        "route": "pages/history/index",
+        "validSavedSelection": "iPhone Duo 256GB 星光白色",
+        "closedCleanDraft": true,
+        "dirtyDiscardAutomation": "The DevTools simulator opened the discard prompt. The automation helper did not dismiss it; manual device acceptance remains open."
+      }
+    },
+    {
+      "name": "mine-and-release-notes",
+      "ok": true,
+      "elapsedMs": 8099,
+      "data": {
+        "route": "pages/mine/index",
+        "visible": "v3.6.0"
+      }
+    },
+    {
+      "name": "final-runtime-and-audit",
+      "ok": true,
+      "elapsedMs": 3259,
+      "data": {
+        "SDK": "3.17.3",
+        "platform": "devtools",
+        "actions": [
+          "user.bootstrap",
+          "catalog.get",
+          "follow.list",
+          "deadline.list",
+          "history.browse",
+          "notify.list",
+          "follow.list"
+        ],
+        "perf": [
+          {
+            "name": "evaluateScript",
+            "entryType": "script",
+            "duration": 4560
+          },
+          {
+            "name": "firstPaint",
+            "entryType": "render"
+          },
+          {
+            "name": "route",
+            "entryType": "navigation"
+          },
+          {
+            "name": "firstRender",
+            "entryType": "render",
+            "duration": 926
+          },
+          {
+            "name": "firstContentfulPaint",
+            "entryType": "render"
+          },
+          {
+            "name": "largestContentfulPaint",
+            "entryType": "render"
+          },
+          {
+            "name": "route",
+            "entryType": "navigation"
+          },
+          {
+            "name": "firstPaint",
+            "entryType": "render"
+          },
+          {
+            "name": "firstRender",
+            "entryType": "render",
+            "duration": 180
+          },
+          {
+            "name": "firstContentfulPaint",
+            "entryType": "render"
+          },
+          {
+            "name": "largestContentfulPaint",
+            "entryType": "render"
+          },
+          {
+            "name": "route",
+            "entryType": "navigation"
+          },
+          {
+            "name": "route",
+            "entryType": "navigation"
+          },
+          {
+            "name": "firstPaint",
+            "entryType": "render"
+          },
+          {
+            "name": "firstRender",
+            "entryType": "render",
+            "duration": 134
+          },
+          {
+            "name": "firstContentfulPaint",
+            "entryType": "render"
+          },
+          {
+            "name": "largestContentfulPaint",
+            "entryType": "render"
+          },
+          {
+            "name": "largestContentfulPaint",
+            "entryType": "render"
+          },
+          {
+            "name": "route",
+            "entryType": "navigation"
+          },
+          {
+            "name": "firstRender",
+            "entryType": "render",
+            "duration": 177
+          },
+          {
+            "name": "firstPaint",
+            "entryType": "render"
+          },
+          {
+            "name": "firstContentfulPaint",
+            "entryType": "render"
+          },
+          {
+            "name": "largestContentfulPaint",
+            "entryType": "render"
+          }
+        ]
+      }
+    },
+    {
+      "name": "official-stopAudits",
+      "ok": false,
+      "elapsedMs": 10005,
+      "error": "timeout waiting for automator response",
+      "retryError": "timeout waiting for automator response"
+    }
+  ],
+  "exceptions": [],
+  "logs": [],
+  "testedProduct": {
+    "partNumber": "MJ9X4CH/A",
+    "querySupported": true,
+    "monitorSupported": true,
+    "title": "MacBook Pro (PROLED XDR 显示屏) 14 英寸 · M5 Pro · 15核CPU/16核GPU · 纳米纹理玻璃 · 24GB · 1TB · 深空黑色"
+  },
+  "nativeTabBar": [
+    {
+      "key": "query",
+      "before": "pages/history/index",
+      "after": "pages/history/index",
+      "matched": false
+    }
+  ],
+  "devToolsVersion": "2.02.2611062",
+  "wechatideConsole": {
+    "ok": false,
+    "error": "wait WechatIDE authorization timeout",
+    "logsScope": "The automator exception and console listeners observed only the scripted runtime journey."
+  }
+}

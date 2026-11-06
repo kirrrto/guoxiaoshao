@@ -8,6 +8,15 @@
 // Keep technical details and complete acceptance records in release documents.
 const RELEASE_NOTES = [
   {
+    version: '3.6.0',
+    title: '新款 Mac 取货与查询页更新',
+    dateText: '发布候选 · 2026-11-06',
+    highlights: [
+      '新增 14 和 16 英寸 PROLED XDR MacBook Pro 共 15 款标准配置，可查询门店取货并按会员权益关注。',
+      '查询首页先选配置和门店，选购攻略移到选配下方。',
+    ],
+  },
+  {
     version: '3.5.0',
     title: '我的小哨与到期提醒',
     dateText: '开发候选 · 2026-10-30',

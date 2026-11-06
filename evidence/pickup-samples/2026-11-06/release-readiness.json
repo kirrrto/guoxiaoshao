@@ -1,0 +1,250 @@
+{
+  "catalogGeneratedAt": "2026-11-06T06:21:08.909Z",
+  "storeNumber": "R577",
+  "storeName": "广州天环广场",
+  "method": "Apple 中国公开零售取货接口。按精确门店与货号核对，仅记录请求时的状态；未写入生产库存或创建关注。",
+  "families": [
+    {
+      "familyKey": "macbook-pro-proled-xdr",
+      "enabledBefore": 0,
+      "enabledAfter": 15,
+      "requests": [
+        "macbook-pro-proled-xdr-1.json",
+        "macbook-pro-proled-xdr-2.json",
+        "macbook-pro-proled-xdr-3.json"
+      ],
+      "statusCounts": {
+        "unavailable": 5,
+        "available": 10
+      }
+    },
+    {
+      "familyKey": "homepod-mini-2",
+      "enabledBefore": 5,
+      "enabledAfter": 5,
+      "requests": [
+        "homepod-mini-2-1.json"
+      ],
+      "statusCounts": {
+        "available": 5
+      }
+    },
+    {
+      "familyKey": "mac-mini",
+      "enabledBefore": 6,
+      "enabledAfter": 6,
+      "requests": [
+        "mac-mini-1.json"
+      ],
+      "statusCounts": {
+        "available": 5,
+        "unavailable": 1
+      }
+    },
+    {
+      "familyKey": "mac-studio",
+      "enabledBefore": 3,
+      "enabledAfter": 3,
+      "requests": [
+        "mac-studio-1.json"
+      ],
+      "statusCounts": {
+        "available": 1,
+        "unavailable": 2
+      }
+    }
+  ],
+  "verifiedRetailSkus": 29,
+  "restoredRetailSkus": 15,
+  "unmodifiedCtoReferences": 42,
+  "productionBeforeRelease": {
+    "observedAt": "2026-11-06T06:20:59.638Z",
+    "environment": "flowermean-6gjaxfqhf6c13e88",
+    "databaseWriteOperations": 0,
+    "requests": [
+      {
+        "collection": "gxs_config",
+        "requestId": "3b026b0c-f978-4c64-906e-26b9b02a4dd2",
+        "rows": [
+          {
+            "_id": "catalog",
+            "seededAt": "2026-10-30T08:34:44.146Z",
+            "version": "2026-10-30T07:12:46.858Z|2026-09-15T02:43:32.425Z|2026-10-30T07:12:46.858Z"
+          }
+        ]
+      },
+      {
+        "collection": "gxs_config",
+        "requestId": "08fd7fe3-bad5-46fb-a8ee-be0a5c103fa5",
+        "rows": [
+          {
+            "_id": "runtime",
+            "collector": {
+              "enabled": true,
+              "intervalSeconds": 3
+            }
+          }
+        ]
+      },
+      {
+        "collection": "gxs_config",
+        "requestId": "ff2b0f7e-c9ba-4d04-b6b2-a8b88a333351",
+        "rows": [
+          {
+            "_id": "upstream_breaker",
+            "reason": null,
+            "until": null,
+            "updatedAt": "2026-11-06T06:10:06.382Z"
+          }
+        ]
+      },
+      {
+        "collection": "gxs_catalog_products",
+        "requestId": "ea603b4f-6385-4ab1-9d0e-9eda284a9135",
+        "rows": [
+          {
+            "_id": "MJ314CH/A",
+            "comingSoon": true,
+            "supported": false,
+            "verificationStatus": "pending"
+          },
+          {
+            "_id": "MJ2J4CH/A",
+            "comingSoon": true,
+            "supported": false,
+            "verificationStatus": "pending"
+          },
+          {
+            "_id": "MJ2W4CH/A",
+            "comingSoon": true,
+            "supported": false,
+            "verificationStatus": "pending"
+          },
+          {
+            "_id": "MJ304CH/A",
+            "comingSoon": true,
+            "supported": false,
+            "verificationStatus": "pending"
+          },
+          {
+            "_id": "MMF54CH/A",
+            "comingSoon": true,
+            "supported": false,
+            "verificationStatus": "pending"
+          },
+          {
+            "_id": "MJ2G4CH/A",
+            "comingSoon": true,
+            "supported": false,
+            "verificationStatus": "pending"
+          },
+          {
+            "_id": "MJ2X4CH/A",
+            "comingSoon": true,
+            "supported": false,
+            "verificationStatus": "pending"
+          },
+          {
+            "_id": "MJ2M4CH/A",
+            "comingSoon": true,
+            "supported": false,
+            "verificationStatus": "pending"
+          },
+          {
+            "_id": "MJ2Y4CH/A",
+            "comingSoon": true,
+            "supported": false,
+            "verificationStatus": "pending"
+          },
+          {
+            "_id": "MJ9X4CH/A",
+            "comingSoon": true,
+            "supported": false,
+            "verificationStatus": "pending"
+          },
+          {
+            "_id": "MJ2K4CH/A",
+            "comingSoon": true,
+            "supported": false,
+            "verificationStatus": "pending"
+          },
+          {
+            "_id": "MJ334CH/A",
+            "comingSoon": true,
+            "supported": false,
+            "verificationStatus": "pending"
+          },
+          {
+            "_id": "MMFA4CH/A",
+            "comingSoon": true,
+            "supported": false,
+            "verificationStatus": "pending"
+          },
+          {
+            "_id": "MMF94CH/A",
+            "comingSoon": true,
+            "supported": false,
+            "verificationStatus": "pending"
+          },
+          {
+            "_id": "MMF64CH/A",
+            "comingSoon": true,
+            "supported": false,
+            "verificationStatus": "pending"
+          }
+        ]
+      },
+      {
+        "collection": "gxs_config",
+        "requestId": "c7a9746e-e01f-49c7-bd51-c8c632cae15c",
+        "rows": [
+          {
+            "_id": "runtime",
+            "notifications": {
+              "enabled": true
+            }
+          }
+        ]
+      }
+    ],
+    "catalogPending": {
+      "requestId": "6d9a4027-5a1a-4b91-8d9c-daafadefc600",
+      "byFamilyAndSupported": {
+        "mac-mini:true": 6,
+        "mac-studio:true": 3,
+        "homepod-mini-2:true": 5,
+        "macbook-pro-proled-xdr:false": 15
+      }
+    }
+  },
+  "alreadySupportedReplacements": [
+    {
+      "familyKey": "macbook-pro",
+      "partNumbers": 7,
+      "receipt": "replacement-macbook-pro.json",
+      "httpStatus": 200,
+      "states": {
+        "available": 7
+      }
+    },
+    {
+      "familyKey": "imac",
+      "partNumbers": 17,
+      "receipt": "replacement-imac.json",
+      "httpStatus": 200,
+      "states": {
+        "available": 17
+      }
+    },
+    {
+      "familyKey": "ipad-mini",
+      "partNumbers": 20,
+      "receipt": "replacement-ipad-mini.json",
+      "httpStatus": 200,
+      "states": {
+        "available": 17,
+        "unavailable": 3
+      }
+    }
+  ]
+}

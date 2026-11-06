@@ -1,0 +1,21 @@
+{
+  "appSourceDigest": "08f65be85f60917b58a63addf87d5ffb302dd0deecae27ce74091c8accb73792",
+  "digestAlgorithm": "SHA-256; sorted mini-program relative path with LF, then each original file bytes",
+  "sourceEditsInTemporaryHarness": [
+    "app.js",
+    "pages/deadlines/index.js",
+    "pages/mine/index.js",
+    "pages/notification-test/index.js",
+    "utils/operation.js",
+    "utils/query-notice.js",
+    "utils/reminder-credits.js",
+    "utils/reminder-nudge.js",
+    "utils/session.js",
+    "utils/store.js"
+  ],
+  "extraTransportModules": [
+    "qa-fixture.js",
+    "qa-storage.js"
+  ],
+  "isolation": "ensureCloud returns only local allowlisted responses; unknown actions rejected. Storage reads and writes redirected to in-memory Map. The project under test uses the registered AppID in the desktop DevTools simulator and the real MiniProgram assets/pages/events. No production deployment, mutation, notification, or purchase."
+}

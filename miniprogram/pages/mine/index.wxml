@@ -311,11 +311,11 @@
       </block>
     </view>
 
-    <!-- 其他 -->
-    <view class="card">
+    <!-- 账户工具 -->
+    <view class="card account-tools">
       <button class="ui-disclosure ui-entry account-link" open-type="contact" session-from="gxs_mine" hover-class="ui-control-pressed"><view class="ui-entry-main"><image class="ui-icon" src="/images/ui/support.png" mode="aspectFit" aria-hidden="true" /><view class="ui-entry-copy"><text class="ui-disclosure-label">联系客服</text></view></view><view class="ui-chevron" aria-hidden="true"></view></button>
       <button class="ui-disclosure account-link" hover-class="ui-control-pressed" bindtap="onToggleReleaseNotes" aria-expanded="{{showReleaseNotes}}"><view class="ui-label-with-icon"><image class="ui-icon" src="/images/ui/news.png" mode="aspectFit" aria-hidden="true" /><text class="ui-disclosure-label">更新公告</text></view><view class="ui-disclosure-meta"><text>{{showReleaseNotes ? '收起' : '查看'}}</text><view class="ui-chevron {{showReleaseNotes ? 'ui-chevron--up' : 'ui-chevron--down'}}" aria-hidden="true"></view></view></button>
-      <view wx:if="{{showReleaseNotes}}" class="release-notes">
+      <view wx:if="{{showReleaseNotes}}" class="release-notes ui-reveal">
         <view class="release-pagination" aria-label="更新公告翻页">
           <button class="ui-action release-page-button" hover-class="ui-control-pressed" disabled="{{releaseNotesPage <= 1}}" bindtap="onPreviousReleaseNotes">上一页</button>
           <text class="release-page-count" aria-live="polite">{{releaseNotesPage}} / {{releaseNotesPageCount}}</text>
@@ -339,6 +339,7 @@
 
     <view class="footer-note">果小哨 {{versionLabel}}</view>
   </block>
+  <button wx:if="{{loadError || !ready}}" class="ui-action ui-action--neutral" hover-class="ui-control-pressed" bindtap="onPrivacy">隐私说明</button>
 </view>
 
 <reminder-nudge enabled="{{ready}}" blocked="{{authorizationOpen || redemptionOpen || redeeming || paymentBusy || paymentChecking || paymentPendingId || paymentConfirming || orderConfirming}}" />

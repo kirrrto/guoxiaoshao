@@ -150,6 +150,7 @@ Page({
     selectionSummary: null,
     selectionNotice: '请补全或核对配置与门店后查询。',
     selectionImageFailed: false,
+    introImageFailed: false,
     sheetVisible: false,
     draftValue: null,
     draftDirty: false,
@@ -900,6 +901,7 @@ Page({
   onToggleRules() { this.setData({ rulesExpanded: !this.data.rulesExpanded }); },
 
   onSelectionImageError() { this.setData({ selectionImageFailed: true }); },
+  onIntroImageError() { this.setData({ introImageFailed: true }); },
 
   readPickerSelection() {
     // The component coalesces change events until nextTick. A tap must use

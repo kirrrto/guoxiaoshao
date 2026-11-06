@@ -1,0 +1,55 @@
+{
+  "record": {
+    "storeNumber": "R577",
+    "partNumbers": [
+      "MHL64CH/A",
+      "MHQJ4CH/A",
+      "MHL74CH/A"
+    ],
+    "requestUrl": "https://www.apple.com.cn/shop/retail/pickup-message?pl=true&mts.0=regular&parts.0=MHL64CH%2FA&parts.1=MHQJ4CH%2FA&parts.2=MHL74CH%2FA&store=R577",
+    "startedAt": "2026-11-06T06:17:59.319Z",
+    "httpStatus": 200,
+    "bytes": 7662,
+    "elapsedMs": 2103,
+    "finishedAt": "2026-11-06T06:18:01.422Z",
+    "error": null,
+    "retryAfter": null
+  },
+  "bodyFile": "mac-studio-1.body.json",
+  "sha256": "14226ebe7d8cd4943c59380b889e4247bf51e63699de1d37185a6d4d50bf86e4",
+  "observations": [
+    {
+      "storeNumber": "R577",
+      "storeName": "天环广场",
+      "partNumber": "MHL64CH/A",
+      "status": "available",
+      "pickupDisplay": "available",
+      "quote": "今天可取货",
+      "productTitle": "Mac Studio",
+      "observedAt": "2026-11-06T06:18:01.422Z",
+      "reason": null
+    },
+    {
+      "storeNumber": "R577",
+      "storeName": "天环广场",
+      "partNumber": "MHQJ4CH/A",
+      "status": "unavailable",
+      "pickupDisplay": "unavailable",
+      "quote": "暂无供应",
+      "productTitle": "Mac Studio",
+      "observedAt": "2026-11-06T06:18:01.422Z",
+      "reason": null
+    },
+    {
+      "storeNumber": "R577",
+      "storeName": "天环广场",
+      "partNumber": "MHL74CH/A",
+      "status": "unavailable",
+      "pickupDisplay": "unavailable",
+      "quote": "暂无供应",
+      "productTitle": "Mac Studio",
+      "observedAt": "2026-11-06T06:18:01.422Z",
+      "reason": null
+    }
+  ]
+}

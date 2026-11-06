@@ -148,16 +148,11 @@ view, text { box-sizing: border-box; }
 
 /* 骨架屏：首屏数据回来之前占位，不留空白 */
 .skeleton-card { background: var(--card); border-radius: 34rpx; padding: 30rpx; margin-bottom: 26rpx; box-shadow: var(--shadow-soft); }
-.skeleton-line, .skeleton-bar {
-  background: linear-gradient(90deg, var(--skeleton-base) 25%, var(--skeleton-shine) 50%, var(--skeleton-base) 75%);
-  background-size: 400% 100%;
-  animation: skeleton-shine 1.4s ease-in-out infinite;
-}
+.skeleton-line, .skeleton-bar { background: var(--skeleton-shine); }
 .skeleton-line { height: 26rpx; border-radius: 13rpx; margin-top: 22rpx; }
 .skeleton-title { width: 42%; height: 34rpx; margin-top: 0; }
 .skeleton-short { width: 64%; }
 .skeleton-bar { height: 88rpx; border-radius: 999rpx; margin-top: 30rpx; }
-@keyframes skeleton-shine { from { background-position: 100% 0; } to { background-position: 0 0; } }
 
 /* Visible secondary controls share surfaces, borders and directional icons. */
 .ui-action.ui-action, .ui-disclosure.ui-disclosure {
@@ -191,7 +186,7 @@ view, text { box-sizing: border-box; }
 .ui-disclosure.ui-disclosure { display: flex; justify-content: space-between; width: 100%; margin-top: 20rpx; padding: 20rpx 22rpx; background: var(--surface-soft); border-color: var(--line); color: var(--text); text-align: left; }
 .ui-disclosure-label { flex: 1 1 0; font-weight: 500; }
 .ui-disclosure-meta { display: inline-flex; flex: 0 0 auto; align-items: center; gap: 14rpx; color: var(--green-dark); font-size: 24rpx; font-size: max(12px, 24rpx); font-weight: 600; }
-.ui-chevron { display: inline-block; flex: 0 0 auto; width: 12rpx; height: 12rpx; margin: 0 4rpx; border-right: 2rpx solid currentColor; border-top: 2rpx solid currentColor; transform: rotate(45deg); transition: transform 0.16s ease; }
+.ui-chevron { display: inline-block; flex: 0 0 auto; width: 12rpx; height: 12rpx; margin: 0 4rpx; border-right: 2rpx solid currentColor; border-top: 2rpx solid currentColor; transform: rotate(45deg); }
 .ui-chevron--down { transform: rotate(135deg); }
 .ui-chevron--up { transform: rotate(-45deg); }
 .ui-action.ui-control-pressed, .ui-disclosure.ui-control-pressed { background: var(--control-pressed); border-color: var(--green-dark); }
@@ -277,8 +272,19 @@ view, text, button, input, textarea, image, scroll-view, picker { box-sizing: bo
 .benefit-list > view:last-child { border-bottom: 0; }
 .onboarding { background: rgba(231, 248, 238, 0.82); }
 
-@media (prefers-reduced-motion: reduce) {
-  .skeleton-line, .skeleton-bar { animation: none; }
+/* Unsupported media queries and reduced motion both retain the visible, static state. */
+.btn.btn-primary-pressed { opacity: .84; }
+@keyframes panel-appear {
+  from { transform: translateY(4px); }
+  to { transform: translateY(0); }
+}
+@keyframes skeleton-pulse {
+  50% { opacity: .5; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .ui-reveal { animation: panel-appear 160ms ease-out; }
+  .ui-chevron { transition: transform 150ms ease-out; }
+  .skeleton-line, .skeleton-bar { animation: skeleton-pulse 1.2s ease-in-out 3; }
 }
 
 /* Keep large/desktop windows readable without treating an entire tablet as

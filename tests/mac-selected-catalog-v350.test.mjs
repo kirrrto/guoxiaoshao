@@ -47,18 +47,18 @@ test('selected Mac parsing refuses CTO identifiers and unresolved memory labels'
   assert.equal(parseSelectedMacConfiguration(html(missing), missing.context), null);
 });
 
-test('ProLED gallery, all catalog copies and pending pickup remain aligned without enabling query or monitoring', () => {
+test('ProLED gallery and the released SKU capabilities match across catalog copies', () => {
   const family = catalog.families.find(f => f.familyKey === familyKey);
   assert.equal(family.productCount, 15);
-  assert.equal(family.pickupVerification.status, 'pending');
-  assert.equal(family.pickupVerification.verified, false);
+  assert.equal(family.pickupVerificationScope, 'sku');
+  assert.equal(family.pickupVerification.verified, true);
   const source = catalog.products.filter(p => p.familyKey === familyKey);
   assert.equal(source.length, 15);
   for (const p of source) {
     const client = seed.products.find(row => row.partNumber === p.partNumber);
-    assert.equal(client.comingSoon, true);
-    assert.equal(client.supported, false);
-    assert.equal(client.verificationStatus, 'pending');
+    assert.equal(client.comingSoon, false);
+    assert.equal(client.supported, true);
+    assert.equal(client.verificationStatus, p.pickupVerification.status);
     assert.equal(client.title, p.title);
     assert.equal(images[p.partNumber].imageUrl, p.imageUrl);
     const asset = thumbnails.assets[thumbnails.byPart[p.partNumber]];
@@ -78,13 +78,14 @@ test('Mac Studio exact current official standard retail configurations match the
   }
 });
 
-test('each prelaunch ProLED SKU remains individually selectable for browsing without gaining support', () => {
+test('each released ProLED SKU is individually selectable for query and monitoring', () => {
   for (const p of seed.products.filter(p => p.familyKey === familyKey)) {
     const rt = runtime(), source = rt.load('utils/store.js').currentCatalog();
     const picker = rt.instance('components/target-picker/index.js', { value: { partNumber: p.partNumber, storeNumbers: ['R577'] }, maxStores: 3 });
     picker.onCatalog(source);
     assert.equal(picker.data.product.partNumber, p.partNumber);
-    assert.equal(picker.getSelection().product.supported, false);
+    assert.equal(picker.getSelection().product.querySupported, true);
+    assert.equal(picker.getSelection().product.monitorSupported, true);
     assert.equal(picker.data.product.attributes.memory, p.attributes.memory);
     assert.equal(new Set(picker.data.productTitles).size, picker.data.candidates.length);
   }
@@ -173,13 +174,14 @@ test('root and selected-page merges never remove a known prelaunch restriction',
 });
 
 test('captured ProLED refresh, pending sampling and generated seed retain all 15 prelaunch restrictions after the release date', async () => {
-  const family = catalog.families.find(f => f.familyKey === familyKey);
+  const family = { ...catalog.families.find(f => f.familyKey === familyKey), pickupVerificationScope: 'family' };
   const capture = JSON.parse(fs.readFileSync(new URL('../evidence/catalog/2026-10-30/proled-research/parsed.json', import.meta.url)));
   const pickup = JSON.parse(fs.readFileSync(new URL('../evidence/catalog/2026-10-30/proled-research/pickup.json', import.meta.url)));
   const selected = fixtures.filter(f => f.context.familyKey === familyKey);
   const refreshed = await collectSelectedMacPages(linkFixtures.find(f => f.familyKey === familyKey).anchors.join('\n'), family,
     structuredClone(capture.parsed || capture), { intervalMs: 0, fetcher: async url => ({ record: { httpStatus: 200 }, text: html(selected.find(f => f.context.sourceUrl === url)) }) });
-  const products = retainPrelaunchRestrictions(refreshed.products, catalog.products);
+  const held = refreshed.products.map(p => ({ ...p, comingSoon: true }));
+  const products = retainPrelaunchRestrictions(refreshed.products, held);
   assert.equal(products.length, 15);
   assert.ok(products.every(p => p.comingSoon));
   const observation = pickup.observations.find(o => o.partNumber === products[0].partNumber);
@@ -196,7 +198,7 @@ test('captured ProLED refresh, pending sampling and generated seed retain all 15
 });
 
 test('pending, unknown and absent samples cannot grant capabilities to new or unrestricted products', () => {
-  const family = catalog.families.find(f => f.familyKey === familyKey);
+  const family = { supported: true, familyKey };
   const product = parsed.find(p => p.familyKey === familyKey);
   const at = '2026-10-30T03:47:21.574Z';
   for (const status of ['pending', 'unknown', 'unexpected', null]) {

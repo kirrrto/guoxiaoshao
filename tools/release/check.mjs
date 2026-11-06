@@ -47,6 +47,9 @@ for (const name of ['gxs_api', 'cloudbase_auth', 'gxs_monitor']) {
 }
 check('system.ping uses the release version', require(path.join(root, 'cloudfunctions/gxs_api/lib/app.js')).VERSION === project.version);
 check('Mine page version label uses the release version', require(path.join(root, 'miniprogram/config/version.js')).VERSION === project.version);
+const { RELEASE_NOTES } = require(path.join(root, 'miniprogram/config/release-notes.js'));
+check('current in-app release summary is listed first and matches the build', RELEASE_NOTES[0]?.version === project.version
+  && RELEASE_NOTES.filter(note => note.version === project.version).length === 1);
 const timer = json('cloudfunctions/gxs_monitor/config.json').triggers;
 check('scheduled monitor has the expected minute trigger', timer.length === 1 && timer[0].name === 'gxs-monitor-minute' && timer[0].type === 'timer' && timer[0].config === '0 * * * * * *');
 const { isTrustedTimer } = require(path.join(root, 'cloudfunctions/gxs_monitor/lib/engine/scheduled.js'));
@@ -90,8 +93,54 @@ const customTabs = require(path.join(root, 'miniprogram/utils/tab-bar.js')).TABS
 check('native navigation avoids per-page custom tab component creation', app.tabBar.custom !== true && !fs.existsSync(path.join(root, 'miniprogram/custom-tab-bar')));
 check('navigation helpers match native tab routes, labels and icons', customTabs.length === app.tabBar.list.length && customTabs.every((tab, index) => ['pagePath', 'text', 'iconPath', 'selectedIconPath'].every(key => tab[key].replace(/^\//, '') === app.tabBar.list[index][key].replace(/^\//, ''))));
 let frontendBytes = 0, frontendFiles = 0, imageBytes = 0;
-function walk(dir) { for (const entry of fs.readdirSync(dir, { withFileTypes: true })) { if (entry.name === 'node_modules') continue; const file = path.join(dir, entry.name); if (entry.isDirectory()) walk(file); else { frontendFiles++; const size = fs.statSync(file).size; frontendBytes += size; if (/\.(?:png|jpg|jpeg|gif|svg)$/i.test(entry.name)) imageBytes += size; } } }
-walk(path.join(root, 'miniprogram'));
+const consumerRoot = path.join(root, 'miniprogram');
+const packOptions = json('project.config.json').packOptions;
+const exclusions = new Set(packOptions.ignore.map(rule => rule.value));
+const packagedFiles = [];
+const skippedFiles = [];
+const unexpectedFiles = [];
+let excludedBytes = 0;
+function walk(dir) {
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const file = path.join(dir, entry.name);
+    const relative = path.relative(consumerRoot, file).split(path.sep).join('/');
+    if (entry.isDirectory()) {
+      if (['node_modules', '.git', 'tests', 'output', 'evidence'].includes(entry.name)) unexpectedFiles.push(relative);
+      else walk(file);
+      continue;
+    }
+    const size = fs.statSync(file).size;
+    frontendFiles++;
+    frontendBytes += size;
+    if (/\.(?:png|jpe?g|gif|svg|webp)$/i.test(entry.name)) imageBytes += size;
+    if (exclusions.has(relative)) {
+      excludedBytes += size;
+      skippedFiles.push(relative);
+    } else {
+      packagedFiles.push(relative);
+      if (!/\.(?:js|json|wxml|wxss|wxs|png|jpe?g|gif|svg)$/i.test(relative)) unexpectedFiles.push(relative);
+    }
+  }
+}
+walk(consumerRoot);
+check('consumer packaging uses explicit existing file exclusions',
+  packOptions.ignore.every(rule => rule.type === 'file') && skippedFiles.length === exclusions.size);
+const themePath = app.themeLocation;
+check('the declared theme is present and is the only explicitly included consumer file',
+  app.darkmode === true && themePath === 'theme.json' && packagedFiles.includes(themePath)
+  && !exclusions.has(themePath) && packOptions.include.length === 1
+  && packOptions.include[0].type === 'file' && packOptions.include[0].value === themePath);
+check('consumer directory contains only reviewed runtime file types and no development folders', !unexpectedFiles.length);
+const excludedImports = [];
+for (const relative of packagedFiles.filter(file => /\.(?:js|wxss)$/.test(file))) {
+  const contents = fs.readFileSync(path.join(consumerRoot, relative), 'utf8');
+  const pattern = relative.endsWith('.js') ? /\brequire\(\s*['"](\.[^'"]+)['"]\s*\)/g : /@import\s+['"]([^'"]+)['"]/g;
+  for (const [, specifier] of contents.matchAll(pattern)) {
+    const target = specifier.startsWith('/') ? specifier.slice(1) : path.posix.join(path.posix.dirname(relative), specifier);
+    if (exclusions.has(target) || exclusions.has(target + '.js')) excludedImports.push({ relative, target });
+  }
+}
+check('packaged JS and WXSS do not import excluded historical calendar files', !excludedImports.length);
 const thumbnailCheck = spawnSync(process.execPath, [path.join(root, 'tools/assets/build-product-thumbnails.mjs'), '--check'], { encoding: 'utf8', windowsHide: true });
 check('verified local thumbnails cover the current catalog and match recorded asset hashes', thumbnailCheck.status === 0);
 check('frontend source and assets fit within the 1.5 MiB main-package budget before compilation', frontendBytes <= imagePolicy.mainPackageMaxBytes);
@@ -104,7 +153,7 @@ try {
   qualityGate = validateQualityFindings(json('config/wechat-quality-findings.json'), project.version, sourceFingerprint);
 } catch (error) { qualityGate = { passed: false, version: project.version, sourceFingerprint, blockers: [{ id: 'registry', code: 'quality_gate_read_error', message: error.message }] }; }
 check('known WeChat quality findings have passing current-version retest evidence', qualityGate.passed);
-const report = { checkedAt: new Date().toISOString(), version: project.version, scope: 'Local source and recorded quality evidence only; no cloud deployment, real-device retest, account-console inspection or submission', publicationReady: false, sourceChecksPassed, qualityGate, passed: checks.every(c => c.passed), checks, frontend: { files: frontendFiles, sourceBytes: frontendBytes, note: 'Source bytes, not the WeChat upload package size' }, externalReleaseChecks: [
+const report = { checkedAt: new Date().toISOString(), version: project.version, scope: 'Local source and recorded quality evidence only; no cloud deployment, real-device retest, account-console inspection or submission', publicationReady: false, sourceChecksPassed, qualityGate, passed: checks.every(c => c.passed), checks, frontend: { files: frontendFiles, sourceBytes: frontendBytes, imageBytes, imageMaxBytes: imagePolicy.imageMaxBytes, mainPackageMaxBytes: imagePolicy.mainPackageMaxBytes, note: 'Source bytes, not the WeChat upload package size' }, externalReleaseChecks: [
   { item: 'Consumer account eligibility, filing, categories and privacy declaration', status: 'requires account-console verification' },
   { item: 'Deploy cloudbase_auth, gxs_api and gxs_monitor; verify actual timer invocations', status: 'not checked by this local tool; consult the versioned cloud-deployment evidence' },
   { item: 'Apply database indexes/rules and seed verified catalog', status: 'not checked by this local tool; consult the versioned cloud-deployment evidence' },
@@ -114,9 +163,11 @@ const report = { checkedAt: new Date().toISOString(), version: project.version, 
   { item: 'Virtual payment callback, production credentials and real-device payment/refund', status: 'requires cloud gateway, credential and real-order verification; local mocks never prove a payment succeeded' },
   { item: '300 simultaneous querying members, with representative distinct targets and acceptable latency/freshness', status: 'requires real staging-cloud load acceptance; same-target memory tests and server request rates do not prove 300-user capacity' },
   { item: 'Actual observations across Beijing midnight and business-stall alert delivery/recovery', status: 'requires deployed observation evidence and a tested operator alert rule; a heartbeat or structured log alone is insufficient' },
-  { item: 'CloudBase lodash.set prototype pollution', status: 'removed from the deployable tree by overriding @cloudbase/database to 1.5.1 (bson only); npm audit reports 0 vulnerabilities in all three cloud functions' }
+  { item: 'Current dependency advisories', status: 'Run npm audit against the current registry for each deployable package; this preflight checks only installed packages and pinned locks' }
 ] };
 report.monitorBundle = monitorBundle;
+report.consumerPackage = { miniprogramRoot: 'miniprogram/', sourceFilesAfterExclusions: packagedFiles.length,
+  sourceBytesAfterExclusions: frontendBytes - excludedBytes, excludedBytes, excludedFiles: skippedFiles.sort(), unexpectedFiles, excludedImports };
 report.deliveryTargets = deliveryTargets;
 const outputAt = process.argv.indexOf('--out');
 if (outputAt !== -1) { const file = path.resolve(process.argv[outputAt + 1]); fs.mkdirSync(path.dirname(file), { recursive: true }); fs.writeFileSync(file, JSON.stringify(report, null, 2) + '\n'); }

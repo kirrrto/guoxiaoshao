@@ -68,6 +68,11 @@ jobs:
           node tools/ui-preview/check-native-tabs.mjs output/ci-ui-v350 --dark
           node tools/ui-preview/check-theme-colors.mjs output/ci-ui-v350 output/ci-colors-v350
           node tools/ui-preview/check-theme-colors.mjs output/ci-ui-v350 output/ci-colors-v350 --dark
+      - name: Verify v3.6.0 task layout, artwork and reduced motion
+        shell: bash
+        run: |
+          node tools/ui-preview/build.mjs --out output/ci-ui-v360-tabs
+          node tools/ui-preview/check-v360.mjs output/ci-ui-v350 output/ci-ui-v360-tabs output/ci-ui-v360-report.json
       - name: Check release candidate
         run: node tools/release/check.mjs --out output/ci-release.json
       - name: Preserve verification evidence even when release is blocked

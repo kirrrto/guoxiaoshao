@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "catalogSha256": "ea2264bf5200b7dca4be6eb190d3bef03563b53adcc91b4dfd53be5a6a8bce9a",
+  "catalogSha256": "dde4927161b6d54a726854e7e4ee1444333c45f7a11cd58e1effcd6e8650bb4e",
   "encoder": {
     "pillow": "12.3.0",
     "opaque": {

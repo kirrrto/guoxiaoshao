@@ -1,0 +1,175 @@
+{
+  "version": "3.6.0",
+  "checkedAt": "2026-11-06T06:37:21.858Z",
+  "scope": "Offline compilation of packaged WXML and WXSS using the executable compilers bundled with WeChat DevTools. Historical sources excluded via project packOptions are omitted. Runtime, wxapkg, phones and upload are separate checks.",
+  "workingDirectory": "miniprogram",
+  "compilerDirectory": "WeChat DevTools/resources/app.asar.unpacked/node_modules/wcc-exec",
+  "inputs": [
+    {
+      "file": "./components/config-sheet/index.wxml",
+      "sha256": "779329e9d1847571110d152f613d4421ba4573b963cebf787bf52f41652c4a4e"
+    },
+    {
+      "file": "./components/reminder-authorization/index.wxml",
+      "sha256": "744b03a7726b2a4d3bd051ffb61271f5f9ac7eb54b62545e942098aa8f090302"
+    },
+    {
+      "file": "./components/reminder-nudge/index.wxml",
+      "sha256": "063fad2916e68799f6c69e2d0aa7ccc815bc519d9885ba1cc781ab0daafe1b92"
+    },
+    {
+      "file": "./components/target-picker/index.wxml",
+      "sha256": "e189e4da2c4f5fd7b059894d4eeffb8d4f55625c901479343cf5a76d516cdc3d"
+    },
+    {
+      "file": "./pages/deadlines/index.wxml",
+      "sha256": "4bcdbde836024a8038371c1c7ef0773825d72a2ffa6e68267105dd19610cdcb7"
+    },
+    {
+      "file": "./pages/follow/index.wxml",
+      "sha256": "9b546f9413c0cceeb8b565dc120491d679226e3f306c4f997a63bcdf5638d959"
+    },
+    {
+      "file": "./pages/guide/index.wxml",
+      "sha256": "69d6258cd1d98954d201c9f534255a7e511ae140133201868fb1ee26d104c9b1"
+    },
+    {
+      "file": "./pages/history/index.wxml",
+      "sha256": "63913a69ad73b63d6008c2b385d6f20b3ce778e2cdc2d6ef17a5d572602ff4e4"
+    },
+    {
+      "file": "./pages/mine/index.wxml",
+      "sha256": "413f42dedd0207996982a58ffbdf84dca87a647ee9f8f232e690c4cef8e0c1bc"
+    },
+    {
+      "file": "./pages/notice-board/index.wxml",
+      "sha256": "516a55ef230c78a593e5c71a4608a23d007114c9da821b331ffb7cd5cdab501b"
+    },
+    {
+      "file": "./pages/notification-test/index.wxml",
+      "sha256": "68749aaea02f873c979fb6e95e1c03b2bcd5f4c0357a652fe52300c3f507e6a3"
+    },
+    {
+      "file": "./pages/query/index.wxml",
+      "sha256": "3fc17f1be8a88a27e0c40b8e6ccb43d39bd3cb03d598f09f66ddac8de28b40cc"
+    },
+    {
+      "file": "./app.wxss",
+      "sha256": "2f290403f723b250a804af1c5994d77ff1863cae3002eaa1c66994373324b29a"
+    },
+    {
+      "file": "./components/config-sheet/index.wxss",
+      "sha256": "7dda47a51398c084ff6fbc1c2a7ed901b97f2d148dcef0fcae4e3ba13f22e4d5"
+    },
+    {
+      "file": "./components/reminder-authorization/index.wxss",
+      "sha256": "9cb283ec1e6c56e059b6d6955ea3d5adfdbb10964cc8f7b523a5c050ad85dca6"
+    },
+    {
+      "file": "./components/reminder-nudge/index.wxss",
+      "sha256": "c84a8eb5644cf1eb396f8eefe96c38473f7b2203d7de5e8ea8c0aa4f98d9a50e"
+    },
+    {
+      "file": "./components/target-picker/index.wxss",
+      "sha256": "3e278038723bb5334a015b52033585467dae03054b0232cf7d0cd9cd4b4366a6"
+    },
+    {
+      "file": "./pages/deadlines/index.wxss",
+      "sha256": "1375295cae455029a92d13a2199a9c24ca3bd24c5a885ef199c7f1aa2d1198ca"
+    },
+    {
+      "file": "./pages/follow/index.wxss",
+      "sha256": "8e81d23c2f7d3e7c92de61b1fe3ca60f683c92b24684b4d21276738fa587ae92"
+    },
+    {
+      "file": "./pages/guide/index.wxss",
+      "sha256": "940360fc85e010e9c4f6d53d6701c43c429bc808ae548a1e440a5161e7a29356"
+    },
+    {
+      "file": "./pages/history/index.wxss",
+      "sha256": "0005f0d49abd72aa1caee85ff2d64dcdecf154b3df2f87d0505b31024484a294"
+    },
+    {
+      "file": "./pages/mine/index.wxss",
+      "sha256": "876f7a8d84fe9eb3bed2b20301dec2fed6956e9d3087363877e4d360bfdc9830"
+    },
+    {
+      "file": "./pages/notice-board/index.wxss",
+      "sha256": "4447e5e0552730100399e9169b6056643fd952ecb5cc2f2660c2cbb27048231f"
+    },
+    {
+      "file": "./pages/notification-test/index.wxss",
+      "sha256": "66cb647194e80ebbe3e94baee2e74e399bcad0911c45fa215db5f5db0d10cdd6"
+    },
+    {
+      "file": "./pages/query/index.wxss",
+      "sha256": "4c714120ba0787016edc5f4157ff17cdabe0d711d53fa4983b57755e72e2c27d"
+    },
+    {
+      "file": "./styles/common.wxss",
+      "sha256": "dfa9e5d021d88a44a13d1b46d1e8636639eb64fa435d2e8981e7e242f3f5a440"
+    },
+    {
+      "file": "./styles/reminder-center.wxss",
+      "sha256": "41118a93d41e4ef9024d2c7a2be30a6ba1fe76216114cd8116586ffc89ee52be"
+    }
+  ],
+  "inputHashNormalization": "UTF-8 text with CRLF normalized to LF",
+  "commands": [
+    {
+      "binary": "wcc.exe",
+      "sha256": "2ec832ea823c5f53e264230960637290a8cc7694773016b4c232a439193c9179",
+      "version": "v0.5vv_20211229_syb_scopedata",
+      "arguments": [
+        "./components/config-sheet/index.wxml",
+        "./components/reminder-authorization/index.wxml",
+        "./components/reminder-nudge/index.wxml",
+        "./components/target-picker/index.wxml",
+        "./pages/deadlines/index.wxml",
+        "./pages/follow/index.wxml",
+        "./pages/guide/index.wxml",
+        "./pages/history/index.wxml",
+        "./pages/mine/index.wxml",
+        "./pages/notice-board/index.wxml",
+        "./pages/notification-test/index.wxml",
+        "./pages/query/index.wxml"
+      ],
+      "exitCode": 0,
+      "diagnostic": "",
+      "outputBytes": 369848,
+      "outputSha256": "fa574109939369c6c3469d111a28422576af5051849d3cdb2ea80ae40529bdca"
+    },
+    {
+      "binary": "wcsc.exe",
+      "sha256": "23914ded6433a178c184e4e0fcdb077b499502b4e5a784a1f44f3db55699ce31",
+      "version": "v0.4me_20200724_db",
+      "arguments": [
+        "-js",
+        "-pc",
+        "13",
+        "./app.wxss",
+        "./components/config-sheet/index.wxss",
+        "./components/reminder-authorization/index.wxss",
+        "./components/reminder-nudge/index.wxss",
+        "./components/target-picker/index.wxss",
+        "./pages/deadlines/index.wxss",
+        "./pages/follow/index.wxss",
+        "./pages/guide/index.wxss",
+        "./pages/history/index.wxss",
+        "./pages/mine/index.wxss",
+        "./pages/notice-board/index.wxss",
+        "./pages/notification-test/index.wxss",
+        "./pages/query/index.wxss",
+        "./styles/common.wxss",
+        "./styles/reminder-center.wxss"
+      ],
+      "exitCode": 0,
+      "diagnostic": "",
+      "outputBytes": 190938,
+      "outputSha256": "527894ec9b14587c32bc59545172b59b9fb5b130868aa9082bbbaf75ea9951b7"
+    }
+  ],
+  "excludedFiles": [
+    "./styles/launch-calendar.wxss"
+  ]
+}

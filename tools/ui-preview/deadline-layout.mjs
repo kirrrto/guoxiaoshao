@@ -18,7 +18,7 @@ export function inspectDeadlineLayout({ saving = false, conflict = false, unavai
   for (const text of deadlineText) if (text.fontSize < 11.99) deadlineLayoutErrors.push(`Functional text ${text.label} is ${text.fontSize.toFixed(1)}px`);
   for (const input of document.querySelectorAll('.deadline-editor input')) if (!input.getAttribute('aria-label')) deadlineLayoutErrors.push('Deadline input is missing an accessible name');
   if (unavailable) {
-    for (const element of document.querySelectorAll('.deadline-home-action, .deadline-add, button[data-preview-action="onSave"]')) if (visible(element) && !disabled(element)) deadlineLayoutErrors.push('Unavailable service has an enabled create/manage/save action');
+    for (const element of document.querySelectorAll('button[data-preview-action="onOpenDeadlines"], .deadline-add, button[data-preview-action="onSave"]')) if (visible(element) && !disabled(element)) deadlineLayoutErrors.push('Unavailable service has an enabled create/manage/save action');
   }
   if (saving) {
     const editor = document.querySelector('.deadline-editor');

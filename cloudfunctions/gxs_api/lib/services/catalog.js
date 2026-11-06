@@ -17,8 +17,12 @@ function readBundled(name) {
 function toProductDoc(product, family) {
   const cto = isCtoPartNumber(product.partNumber);
   const target = cto ? resolvePickupTarget(product) : null;
-  const supported = (cto ? Boolean(product.pickupVerification && product.pickupVerification.verified)
-    : Boolean(family && family.supported && family.pickupVerification && family.pickupVerification.verified)) && !product.comingSoon;
+  const exactRetail = !cto && family && family.pickupVerificationScope === 'sku';
+  let verification = cto || exactRetail ? product.pickupVerification : family && family.pickupVerification;
+  if (exactRetail && verification && verification.sampledPartNumber !== product.partNumber) verification = null;
+  const verified = Boolean(verification && verification.verified);
+  const supported = verified && !product.comingSoon && (cto || Boolean(family && family.supported))
+    && (!exactRetail || ['available', 'unavailable', 'ineligible'].includes(verification.status));
   return {
     _id: product.partNumber,
     partNumber: product.partNumber,
@@ -36,8 +40,7 @@ function toProductDoc(product, family) {
     monitorSupported: supported,
     querySupported: cto ? product.querySupported === true && !product.comingSoon : supported,
     ...(target ? { targetType: 'apple_cto', pickupTarget: target.pickupTarget } : {}),
-    verificationStatus: cto ? product.pickupVerification && product.pickupVerification.status || 'unverified'
-      : family && family.pickupVerification ? family.pickupVerification.status : null,
+    verificationStatus: verification ? verification.status : (cto || exactRetail ? 'unverified' : null),
     sourceUrl: product.sourceUrl,
     imageUrl: product.imageUrl || null,
     imageAlt: product.imageAlt || null,
@@ -94,34 +97,27 @@ function catalogTimestamp(version) {
 }
 
 async function get(ctx, payload) {
-  let meta = await ctx.repo.getCatalogMeta();
+  const meta = await ctx.repo.getCatalogMeta();
+  if (!meta || !meta.version) throw new ApiError('catalog_empty', '目录尚未初始化，请稍后再试');
   const bundled = buildFromBundled();
-  const metaTime = catalogTimestamp(meta && meta.version);
-  const bundledTime = catalogTimestamp(bundled && bundled.meta && bundled.meta.version);
+  const metaTime = catalogTimestamp(meta.version);
+  const bundledTime = catalogTimestamp(bundled.meta.version);
   const databaseOlderThanBundle = Number.isFinite(metaTime) && Number.isFinite(bundledTime) && metaTime < bundledTime;
   if (databaseOlderThanBundle) {
-    try {
-      await seed(ctx);
-      meta = await ctx.repo.getCatalogMeta();
-    } catch (_) {
-      meta = bundled.meta;
-    }
+    // Only admin.seedCatalog can deploy a catalog. Its version is published
+    // last, so clients must not cache rows while an upgrade is incomplete.
+    throw new ApiError('catalog_updating', '商品目录正在更新，请稍后重试');
   }
-  if (payload && payload.ifVersion && meta && payload.ifVersion === meta.version) return { unchanged: true, version: meta.version };
-  let [stores, products] = await Promise.all([ctx.repo.listStores(), ctx.repo.listProducts()]);
-  if (databaseOlderThanBundle && (!meta || catalogTimestamp(meta.version) < bundledTime)) {
-    stores = bundled.stores;
-    products = bundled.products;
-    meta = bundled.meta;
-  }
+  if (payload && payload.ifVersion === meta.version) return { unchanged: true, version: meta.version };
+  const [stores, products] = await Promise.all([ctx.repo.listStores(), ctx.repo.listProducts()]);
   if (!stores.length || !products.length) throw new ApiError('catalog_empty', '目录尚未初始化，请稍后再试');
   const orderCategory = ['iphone', 'ipad', 'mac', 'watch', 'airpods', 'vision', 'homepod'];
   products.sort((a, b) => orderCategory.indexOf(a.category) - orderCategory.indexOf(b.category) || a.familyKey.localeCompare(b.familyKey) || (a.title || '').localeCompare(b.title || '', 'zh-Hans-CN'));
   stores.sort((a, b) => (a.province || '').localeCompare(b.province || '', 'zh-Hans-CN') || (a.city || '').localeCompare(b.city || '', 'zh-Hans-CN') || a.storeNumber.localeCompare(b.storeNumber));
   return {
-    version: meta ? meta.version : null,
-    families: meta ? meta.families : [],
-    excludedFamilies: meta ? meta.excludedFamilies : [],
+    version: meta.version,
+    families: meta.families || [],
+    excludedFamilies: meta.excludedFamilies || [],
     stores,
     products,
   };

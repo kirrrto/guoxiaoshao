@@ -279,14 +279,14 @@ function catalogTimestamp(version) {
   return /^\d{4}-\d{2}-\d{2}T/.test(head) ? Date.parse(head) : NaN;
 }
 
-function isOlderThanSeed(raw) {
+function isOlderThanCatalog(raw, version) {
   const rawTime = catalogTimestamp(raw && raw.version);
-  const seedTime = catalogTimestamp(getCatalogSeed().version);
-  return Number.isFinite(rawTime) && Number.isFinite(seedTime) && rawTime < seedTime;
+  const baseline = catalogTimestamp(version);
+  return Number.isFinite(rawTime) && Number.isFinite(baseline) && rawTime < baseline;
 }
 
 function validCatalog(raw) {
-  return Boolean(raw && Array.isArray(raw.products) && Array.isArray(raw.stores) && !isOlderThanSeed(raw));
+  return Boolean(raw && Array.isArray(raw.products) && Array.isArray(raw.stores) && !isOlderThanCatalog(raw, getCatalogSeed().version));
 }
 
 // The indexed catalog lives only in JavaScript memory. Pages bind its version
@@ -338,7 +338,8 @@ async function refreshCatalog({ force = false } = {}) {
       // An earlier request may finish after this session has been invalidated.
       // Its result must not publish, persist or reset the new session's timers.
       if (generation !== catalogGeneration) return app.globalData.catalog || indexCatalog(cachedCatalog() || getCatalogSeed());
-      const staleServer = Boolean(response && !response.unchanged && Array.isArray(response.products) && Array.isArray(response.stores) && isOlderThanSeed(response));
+      const staleServer = Boolean(response && !response.unchanged && Array.isArray(response.products) && Array.isArray(response.stores)
+        && (isOlderThanCatalog(response, version) || isOlderThanCatalog(response, getCatalogSeed().version)));
       if (!response || (!response.unchanged && !staleServer && !validCatalog(response))) throw new Error('商品目录暂时不可用，请稍后刷新');
       catalogCheckedAt = Date.now();
       catalogRetryAt = 0;
@@ -386,7 +387,7 @@ async function getCatalog({ force = false } = {}) {
   const catalog = currentCatalog();
   if (force) return refreshCatalog({ force: true });
   const expected = app.globalData.bootstrap && app.globalData.bootstrap.catalogVersion;
-  const expectedStale = Boolean(expected && isOlderThanSeed({ version: expected }));
+  const expectedStale = Boolean(expected && isOlderThanCatalog({ version: expected }, catalog.version));
   const now = Date.now();
   if (now >= catalogRetryAt && (catalogRetryAt > 0 || (expected && !expectedStale && expected !== catalog.version) || now - catalogCheckedAt >= CATALOG_TTL_MS)) {
     // Browse immediately; the server still validates supported SKU and limits.

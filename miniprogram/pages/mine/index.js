@@ -1533,10 +1533,20 @@ Page({
   },
 
   onPrivacy() {
+    if (this.pageRetired) return;
+    const hasContract = typeof wx.openPrivacyContract === 'function';
     wx.showModal({
       title: '隐私说明',
-      content: '果小哨仅使用微信提供的 OpenID 识别账号，不收集昵称、头像、手机号或位置信息。保存的数据包括：你的关注设置、查询与次数记录、订阅消息授权次数和提醒发送记录，仅用于提供本服务。你可以删除或清空个人提醒列表中的记录；这不会取消关注、撤回微信消息或删除库存历史。数据存储在腾讯云开发环境，不会向第三方提供。',
-      showCancel: false,
+      content: '果小哨通过微信账号标识识别你的账户，在腾讯云开发保存查询与额度、关注的配置和门店、提醒授权与发送记录、会员和订单信息，以及你填写的到期事项和时间。点击复制时，会将所选内容写入剪贴板。\n\n你可在「小哨」删除关注和到期事项，在「我的」清理提醒记录，或通过「意见反馈」联系开发者。',
+      showCancel: hasContract,
+      cancelText: '关闭',
+      confirmText: hasContract ? '微信指引' : '知道了',
+      success: result => {
+        if (!result.confirm || !hasContract || this.pageRetired) return;
+        wx.openPrivacyContract({ fail: () => {
+          if (!this.pageRetired) toast('暂时无法打开微信隐私指引，请稍后重试');
+        } });
+      },
     });
   },
 

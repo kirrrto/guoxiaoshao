@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "kind": "apple-product-target-catalog-cn",
-  "generatedAt": "2026-10-30T07:12:46.858Z",
+  "generatedAt": "2026-11-06T06:21:08.909Z",
   "note": "中国大陆官网标准零售 SKU 与逐项核实的 Mac Studio 定制配置。CTO_ 编号是完整官方配置的稳定内部身份，不是零售货号；官网定制 Mac 不支持 Apple Store 店内取货，定制项仅作配置参考，不参与取货查询或自动关注。",
   "families": [
     {
@@ -420,17 +420,31 @@
       ],
       "fetchedAt": "2026-10-30T03:53:34.376Z",
       "pickupVerification": {
-        "checkedAt": "2026-10-30T03:47:21.574Z",
+        "sampledPartNumber": "MJ2J4CH/A",
         "storeNumber": "R577",
-        "sampledPartNumber": "MJ2K4CH/A",
+        "checkedAt": "2026-11-06T06:17:44.935Z",
+        "status": "unavailable",
+        "verified": true,
         "sampledPartNumbers": [
-          "MJ2K4CH/A",
-          "MJ2X4CH/A"
+          "MJ2J4CH/A",
+          "MJ2X4CH/A",
+          "MJ2M4CH/A",
+          "MJ2G4CH/A",
+          "MJ2Y4CH/A",
+          "MJ2W4CH/A",
+          "MJ304CH/A",
+          "MMF54CH/A",
+          "MJ314CH/A",
+          "MMF64CH/A",
+          "MJ9X4CH/A",
+          "MMF94CH/A",
+          "MMFA4CH/A",
+          "MJ334CH/A",
+          "MJ2K4CH/A"
         ],
-        "status": "pending",
-        "reason": "pickup_not_open",
-        "verified": false
-      }
+        "reason": null
+      },
+      "pickupVerificationScope": "sku"
     },
     {
       "category": "mac",
@@ -568,13 +582,22 @@
       "fetchedAt": "2026-09-15T02:53:32.351Z",
       "sha256": "c5e6d25ce71664f7a22ae6723ddc4bcf082a7b260e4f880ed1f1c6f752574161",
       "pickupVerification": {
-        "checkedAt": "2026-09-15T03:04:32.095Z",
-        "storeNumber": "R577",
         "sampledPartNumber": "MHQK4CH/A",
-        "status": "pending",
-        "reason": null,
-        "verified": true
-      }
+        "storeNumber": "R577",
+        "checkedAt": "2026-11-06T06:17:57.114Z",
+        "status": "available",
+        "verified": true,
+        "sampledPartNumbers": [
+          "MHQK4CH/A",
+          "MHQL4CH/A",
+          "MHQM4CH/A",
+          "MHQV4CH/A",
+          "MHQN4CH/A",
+          "MHQU4CH/A"
+        ],
+        "reason": null
+      },
+      "pickupVerificationScope": "sku"
     },
     {
       "category": "mac",
@@ -598,12 +621,17 @@
       "fetchedAt": "2026-09-15T02:53:35.709Z",
       "sha256": "d356408e33c666443d55922a8ff761d941154681fd34e95a56dd6e77655b5906",
       "pickupVerification": {
-        "checkedAt": "2026-09-15T03:04:32.095Z",
-        "storeNumber": "R577",
         "sampledPartNumber": "MHL64CH/A",
-        "status": "pending",
-        "reason": null,
-        "verified": true
+        "storeNumber": "R577",
+        "checkedAt": "2026-11-06T06:18:01.422Z",
+        "status": "available",
+        "verified": true,
+        "sampledPartNumbers": [
+          "MHL64CH/A",
+          "MHQJ4CH/A",
+          "MHL74CH/A"
+        ],
+        "reason": null
       },
       "officialConfigurations": {
         "kind": "apple-cto-compatible-options",
@@ -681,7 +709,8 @@
         "retailConfigurations": 3,
         "ctoConfigurations": 42,
         "configurationCheckedAt": "2026-10-30T05:40:50.339Z"
-      }
+      },
+      "pickupVerificationScope": "sku"
     },
     {
       "category": "airpods",
@@ -878,9 +907,11 @@
       "fetchedAt": "2026-10-14T13:14:02.781Z",
       "sha256": "c97fac38786ed796089564d7ec2a789d38734e78394304afa280277817a2ce46",
       "pickupVerification": {
-        "checkedAt": "2026-10-14T13:14:37.043Z",
-        "storeNumber": "R577",
         "sampledPartNumber": "MGHK4CH/A",
+        "storeNumber": "R577",
+        "checkedAt": "2026-11-06T06:17:54.060Z",
+        "status": "available",
+        "verified": true,
         "sampledPartNumbers": [
           "MGHK4CH/A",
           "MGKR4CH/A",
@@ -888,10 +919,9 @@
           "MGHL4CH/A",
           "MGHJ4CH/A"
         ],
-        "status": "pending",
-        "reason": null,
-        "verified": true
-      }
+        "reason": null
+      },
+      "pickupVerificationScope": "sku"
     }
   ],
   "excludedFamilies": [
@@ -11762,7 +11792,7 @@
         "storage-dimensionCapacity": "2tb"
       },
       "priceCny": 36999,
-      "comingSoon": true,
+      "comingSoon": false,
       "isCarrierDevice": false,
       "upstreamContainer": "RO_MBP_OLED_M5_14INCH_SILVER_BET_ULT_2026",
       "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/14-inch-silver-standard-display-apple-m5-max-chip-18-core-cpu-32-core-gpu-36gb-memory-2tb-storage",
@@ -11777,7 +11807,16 @@
       "imageMatchDimensions": {
         "chassis-dimensionScreensize": "14inch",
         "chassis-dimensionColor": "silver"
-      }
+      },
+      "pickupVerification": {
+        "sampledPartNumber": "MJ2J4CH/A",
+        "storeNumber": "R577",
+        "checkedAt": "2026-11-06T06:17:44.935Z",
+        "status": "unavailable",
+        "verified": true
+      },
+      "upstreamTitle": "14 英寸 MacBook Pro (PROLED XDR 显示屏) - 银色",
+      "upstreamTitleCheckedAt": "2026-11-06T06:17:44.935Z"
     },
     {
       "partNumber": "MJ2X4CH/A",
@@ -11808,7 +11847,7 @@
         "storage-dimensionCapacity": "2tb"
       },
       "priceCny": 38999,
-      "comingSoon": true,
+      "comingSoon": false,
       "isCarrierDevice": false,
       "upstreamContainer": "RO_MBP_OLED_M5_16INCH_SILVER_BET_ULT_SUP_2026",
       "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/16-inch-silver-standard-display-apple-m5-max-chip-18-core-cpu-32-core-gpu-36gb-memory-2tb-storage",
@@ -11825,7 +11864,14 @@
         "chassis-dimensionColor": "silver"
       },
       "upstreamTitle": "16 英寸 MacBook Pro (PROLED XDR 显示屏) - 银色",
-      "upstreamTitleCheckedAt": "2026-10-30T03:47:21.574Z"
+      "upstreamTitleCheckedAt": "2026-11-06T06:17:44.935Z",
+      "pickupVerification": {
+        "sampledPartNumber": "MJ2X4CH/A",
+        "storeNumber": "R577",
+        "checkedAt": "2026-11-06T06:17:44.935Z",
+        "status": "available",
+        "verified": true
+      }
     },
     {
       "partNumber": "MJ2M4CH/A",
@@ -11856,7 +11902,7 @@
         "storage-dimensionCapacity": "2tb"
       },
       "priceCny": 36999,
-      "comingSoon": true,
+      "comingSoon": false,
       "isCarrierDevice": false,
       "upstreamContainer": "RO_MBP_OLED_M5_14INCH_SPACEBLACK_BET_ULT_2026",
       "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/14-inch-space-black-standard-display-apple-m5-max-chip-18-core-cpu-32-core-gpu-36gb-memory-2tb-storage",
@@ -11871,7 +11917,16 @@
       "imageMatchDimensions": {
         "chassis-dimensionScreensize": "14inch",
         "chassis-dimensionColor": "spaceblack"
-      }
+      },
+      "pickupVerification": {
+        "sampledPartNumber": "MJ2M4CH/A",
+        "storeNumber": "R577",
+        "checkedAt": "2026-11-06T06:17:44.935Z",
+        "status": "unavailable",
+        "verified": true
+      },
+      "upstreamTitle": "14 英寸 MacBook Pro (PROLED XDR 显示屏) - 深空黑色",
+      "upstreamTitleCheckedAt": "2026-11-06T06:17:44.935Z"
     },
     {
       "partNumber": "MJ2G4CH/A",
@@ -11902,7 +11957,7 @@
         "storage-dimensionCapacity": "1tb"
       },
       "priceCny": 22999,
-      "comingSoon": true,
+      "comingSoon": false,
       "isCarrierDevice": false,
       "upstreamContainer": "RO_MBP_OLED_M5_14INCH_SILVER_BET_ULT_2026",
       "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/14-inch-silver-standard-display-apple-m5-pro-chip-15-core-cpu-16-core-gpu-24gb-memory-1tb-storage",
@@ -11917,7 +11972,16 @@
       "imageMatchDimensions": {
         "chassis-dimensionScreensize": "14inch",
         "chassis-dimensionColor": "silver"
-      }
+      },
+      "pickupVerification": {
+        "sampledPartNumber": "MJ2G4CH/A",
+        "storeNumber": "R577",
+        "checkedAt": "2026-11-06T06:17:44.935Z",
+        "status": "available",
+        "verified": true
+      },
+      "upstreamTitle": "14 英寸 MacBook Pro (PROLED XDR 显示屏) - 银色",
+      "upstreamTitleCheckedAt": "2026-11-06T06:17:44.935Z"
     },
     {
       "partNumber": "MJ2Y4CH/A",
@@ -11948,7 +12012,7 @@
         "storage-dimensionCapacity": "2tb"
       },
       "priceCny": 43999,
-      "comingSoon": true,
+      "comingSoon": false,
       "isCarrierDevice": false,
       "upstreamContainer": "RO_MBP_OLED_M5_16INCH_SILVER_BET_ULT_SUP_2026",
       "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/16-inch-silver-standard-display-apple-m5-max-chip-18-core-cpu-40-core-gpu-48gb-memory-2tb-storage",
@@ -11963,7 +12027,16 @@
       "imageMatchDimensions": {
         "chassis-dimensionScreensize": "16inch",
         "chassis-dimensionColor": "silver"
-      }
+      },
+      "pickupVerification": {
+        "sampledPartNumber": "MJ2Y4CH/A",
+        "storeNumber": "R577",
+        "checkedAt": "2026-11-06T06:17:44.935Z",
+        "status": "available",
+        "verified": true
+      },
+      "upstreamTitle": "16 英寸 MacBook Pro (PROLED XDR 显示屏) - 银色",
+      "upstreamTitleCheckedAt": "2026-11-06T06:17:44.935Z"
     },
     {
       "partNumber": "MJ2W4CH/A",
@@ -11994,7 +12067,7 @@
         "storage-dimensionCapacity": "1tb"
       },
       "priceCny": 27999,
-      "comingSoon": true,
+      "comingSoon": false,
       "isCarrierDevice": false,
       "upstreamContainer": "RO_MBP_OLED_M5_16INCH_SILVER_BET_ULT_SUP_2026",
       "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/16-inch-silver-standard-display-apple-m5-pro-chip-18-core-cpu-20-core-gpu-24gb-memory-1tb-storage",
@@ -12009,7 +12082,16 @@
       "imageMatchDimensions": {
         "chassis-dimensionScreensize": "16inch",
         "chassis-dimensionColor": "silver"
-      }
+      },
+      "pickupVerification": {
+        "sampledPartNumber": "MJ2W4CH/A",
+        "storeNumber": "R577",
+        "checkedAt": "2026-11-06T06:17:44.935Z",
+        "status": "available",
+        "verified": true
+      },
+      "upstreamTitle": "16 英寸 MacBook Pro (PROLED XDR 显示屏) - 银色",
+      "upstreamTitleCheckedAt": "2026-11-06T06:17:44.935Z"
     },
     {
       "partNumber": "MJ304CH/A",
@@ -12040,7 +12122,7 @@
         "storage-dimensionCapacity": "1tb"
       },
       "priceCny": 27999,
-      "comingSoon": true,
+      "comingSoon": false,
       "isCarrierDevice": false,
       "upstreamContainer": "RO_MBP_OLED_M5_16INCH_SPACEBLACK_BET_ULT_SUP_2026",
       "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/16-inch-space-black-standard-display-apple-m5-pro-chip-18-core-cpu-20-core-gpu-24gb-memory-1tb-storage",
@@ -12055,7 +12137,16 @@
       "imageMatchDimensions": {
         "chassis-dimensionScreensize": "16inch",
         "chassis-dimensionColor": "spaceblack"
-      }
+      },
+      "pickupVerification": {
+        "sampledPartNumber": "MJ304CH/A",
+        "storeNumber": "R577",
+        "checkedAt": "2026-11-06T06:17:48.004Z",
+        "status": "available",
+        "verified": true
+      },
+      "upstreamTitle": "16 英寸 MacBook Pro (PROLED XDR 显示屏) - 深空黑色",
+      "upstreamTitleCheckedAt": "2026-11-06T06:17:48.004Z"
     },
     {
       "partNumber": "MMF54CH/A",
@@ -12086,7 +12177,7 @@
         "storage-dimensionCapacity": "1tb"
       },
       "priceCny": 29999,
-      "comingSoon": true,
+      "comingSoon": false,
       "isCarrierDevice": false,
       "upstreamContainer": null,
       "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/14-inch-silver-standard-display-apple-m5-pro-chip-18-core-cpu-20-core-gpu-48gb-memory-1tb-storage",
@@ -12101,7 +12192,16 @@
       "imageMatchDimensions": {
         "chassis-dimensionScreensize": "14inch",
         "chassis-dimensionColor": "silver"
-      }
+      },
+      "pickupVerification": {
+        "sampledPartNumber": "MMF54CH/A",
+        "storeNumber": "R577",
+        "checkedAt": "2026-11-06T06:17:48.004Z",
+        "status": "unavailable",
+        "verified": true
+      },
+      "upstreamTitle": "14 英寸 MacBook Pro (PROLED XDR 显示屏) - 银色",
+      "upstreamTitleCheckedAt": "2026-11-06T06:17:48.004Z"
     },
     {
       "partNumber": "MJ314CH/A",
@@ -12132,7 +12232,7 @@
         "storage-dimensionCapacity": "2tb"
       },
       "priceCny": 38999,
-      "comingSoon": true,
+      "comingSoon": false,
       "isCarrierDevice": false,
       "upstreamContainer": "RO_MBP_OLED_M5_16INCH_SPACEBLACK_BET_ULT_SUP_2026",
       "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/16-inch-space-black-standard-display-apple-m5-max-chip-18-core-cpu-32-core-gpu-36gb-memory-2tb-storage",
@@ -12147,7 +12247,16 @@
       "imageMatchDimensions": {
         "chassis-dimensionScreensize": "16inch",
         "chassis-dimensionColor": "spaceblack"
-      }
+      },
+      "pickupVerification": {
+        "sampledPartNumber": "MJ314CH/A",
+        "storeNumber": "R577",
+        "checkedAt": "2026-11-06T06:17:48.004Z",
+        "status": "unavailable",
+        "verified": true
+      },
+      "upstreamTitle": "16 英寸 MacBook Pro (PROLED XDR 显示屏) - 深空黑色",
+      "upstreamTitleCheckedAt": "2026-11-06T06:17:48.004Z"
     },
     {
       "partNumber": "MMF64CH/A",
@@ -12178,7 +12287,7 @@
         "storage-dimensionCapacity": "1tb"
       },
       "priceCny": 29999,
-      "comingSoon": true,
+      "comingSoon": false,
       "isCarrierDevice": false,
       "upstreamContainer": null,
       "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/14-inch-space-black-standard-display-apple-m5-pro-chip-18-core-cpu-20-core-gpu-48gb-memory-1tb-storage",
@@ -12193,7 +12302,16 @@
       "imageMatchDimensions": {
         "chassis-dimensionScreensize": "14inch",
         "chassis-dimensionColor": "spaceblack"
-      }
+      },
+      "pickupVerification": {
+        "sampledPartNumber": "MMF64CH/A",
+        "storeNumber": "R577",
+        "checkedAt": "2026-11-06T06:17:48.004Z",
+        "status": "available",
+        "verified": true
+      },
+      "upstreamTitle": "14 英寸 MacBook Pro (PROLED XDR 显示屏) - 深空黑色",
+      "upstreamTitleCheckedAt": "2026-11-06T06:17:48.004Z"
     },
     {
       "partNumber": "MJ9X4CH/A",
@@ -12224,7 +12342,7 @@
         "storage-dimensionCapacity": "1tb"
       },
       "priceCny": 24124,
-      "comingSoon": true,
+      "comingSoon": false,
       "isCarrierDevice": false,
       "upstreamContainer": "RO_MBP_OLED_M5_14INCH_SPACEBLACK_BET_ULT_2026",
       "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/14-inch-space-black-nano-texture-display-apple-m5-pro-chip-15-core-cpu-16-core-gpu-24gb-memory-1tb-storage",
@@ -12239,7 +12357,16 @@
       "imageMatchDimensions": {
         "chassis-dimensionScreensize": "14inch",
         "chassis-dimensionColor": "spaceblack"
-      }
+      },
+      "pickupVerification": {
+        "sampledPartNumber": "MJ9X4CH/A",
+        "storeNumber": "R577",
+        "checkedAt": "2026-11-06T06:17:48.004Z",
+        "status": "unavailable",
+        "verified": true
+      },
+      "upstreamTitle": "14 英寸 MacBook Pro (PROLED XDR 显示屏) - 深空黑色",
+      "upstreamTitleCheckedAt": "2026-11-06T06:17:48.004Z"
     },
     {
       "partNumber": "MMF94CH/A",
@@ -12270,7 +12397,7 @@
         "storage-dimensionCapacity": "1tb"
       },
       "priceCny": 32499,
-      "comingSoon": true,
+      "comingSoon": false,
       "isCarrierDevice": false,
       "upstreamContainer": null,
       "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/16-inch-silver-standard-display-apple-m5-pro-chip-18-core-cpu-20-core-gpu-48gb-memory-1tb-storage",
@@ -12285,7 +12412,16 @@
       "imageMatchDimensions": {
         "chassis-dimensionScreensize": "16inch",
         "chassis-dimensionColor": "silver"
-      }
+      },
+      "pickupVerification": {
+        "sampledPartNumber": "MMF94CH/A",
+        "storeNumber": "R577",
+        "checkedAt": "2026-11-06T06:17:48.004Z",
+        "status": "available",
+        "verified": true
+      },
+      "upstreamTitle": "16 英寸 MacBook Pro (PROLED XDR 显示屏) - 银色",
+      "upstreamTitleCheckedAt": "2026-11-06T06:17:48.004Z"
     },
     {
       "partNumber": "MMFA4CH/A",
@@ -12316,7 +12452,7 @@
         "storage-dimensionCapacity": "1tb"
       },
       "priceCny": 32499,
-      "comingSoon": true,
+      "comingSoon": false,
       "isCarrierDevice": false,
       "upstreamContainer": null,
       "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/16-inch-space-black-standard-display-apple-m5-pro-chip-18-core-cpu-20-core-gpu-48gb-memory-1tb-storage",
@@ -12331,7 +12467,16 @@
       "imageMatchDimensions": {
         "chassis-dimensionScreensize": "16inch",
         "chassis-dimensionColor": "spaceblack"
-      }
+      },
+      "pickupVerification": {
+        "sampledPartNumber": "MMFA4CH/A",
+        "storeNumber": "R577",
+        "checkedAt": "2026-11-06T06:17:50.975Z",
+        "status": "available",
+        "verified": true
+      },
+      "upstreamTitle": "16 英寸 MacBook Pro (PROLED XDR 显示屏) - 深空黑色",
+      "upstreamTitleCheckedAt": "2026-11-06T06:17:50.975Z"
     },
     {
       "partNumber": "MJ334CH/A",
@@ -12362,7 +12507,7 @@
         "storage-dimensionCapacity": "2tb"
       },
       "priceCny": 43999,
-      "comingSoon": true,
+      "comingSoon": false,
       "isCarrierDevice": false,
       "upstreamContainer": "RO_MBP_OLED_M5_16INCH_SPACEBLACK_BET_ULT_SUP_2026",
       "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/16-inch-space-black-standard-display-apple-m5-max-chip-18-core-cpu-40-core-gpu-48gb-memory-2tb-storage",
@@ -12377,7 +12522,16 @@
       "imageMatchDimensions": {
         "chassis-dimensionScreensize": "16inch",
         "chassis-dimensionColor": "spaceblack"
-      }
+      },
+      "pickupVerification": {
+        "sampledPartNumber": "MJ334CH/A",
+        "storeNumber": "R577",
+        "checkedAt": "2026-11-06T06:17:50.975Z",
+        "status": "available",
+        "verified": true
+      },
+      "upstreamTitle": "16 英寸 MacBook Pro (PROLED XDR 显示屏) - 深空黑色",
+      "upstreamTitleCheckedAt": "2026-11-06T06:17:50.975Z"
     },
     {
       "partNumber": "MJ2K4CH/A",
@@ -12408,7 +12562,7 @@
         "storage-dimensionCapacity": "1tb"
       },
       "priceCny": 22999,
-      "comingSoon": true,
+      "comingSoon": false,
       "isCarrierDevice": false,
       "upstreamContainer": "RO_MBP_OLED_M5_14INCH_SPACEBLACK_BET_ULT_2026",
       "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/14-inch-space-black-standard-display-apple-m5-pro-chip-15-core-cpu-16-core-gpu-24gb-memory-1tb-storage",
@@ -12425,7 +12579,14 @@
         "chassis-dimensionColor": "spaceblack"
       },
       "upstreamTitle": "14 英寸 MacBook Pro (PROLED XDR 显示屏) - 深空黑色",
-      "upstreamTitleCheckedAt": "2026-10-30T03:47:21.574Z"
+      "upstreamTitleCheckedAt": "2026-11-06T06:17:50.975Z",
+      "pickupVerification": {
+        "sampledPartNumber": "MJ2K4CH/A",
+        "storeNumber": "R577",
+        "checkedAt": "2026-11-06T06:17:50.975Z",
+        "status": "available",
+        "verified": true
+      }
     },
     {
       "partNumber": "MHWT4CH/A",
@@ -14755,7 +14916,7 @@
       "upstreamContainer": "RO_MACMINI_M6_GOO_BET_BES_2026",
       "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/mac-mini",
       "upstreamTitle": "Mac mini",
-      "upstreamTitleCheckedAt": "2026-09-15T03:02:23.190Z",
+      "upstreamTitleCheckedAt": "2026-11-06T06:17:57.114Z",
       "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-mini-summary-select-202608?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=WGZIRWwyZDVQaHBkK2N1VVlsMFNpcVhYSEpZZncrY29LOUl0SnVNSWR6V3RQaHRXQmg1Smw1K0VETVJwK2N3R3ZGdXpoZGFjcnJiZGtXTlNNRSszQWtINUVRZFo0U1ZpS3lla1FrVzlkclBZVGtLdlpieFJ0bE9GNURYSnYrUWw&traceId=1",
       "imageAlt": "Mac mini 银色机身，正面外观展示两个 USB-C 端口、状态指示灯和耳机插孔；背面外观展示端口包括一个两针电源插口、一个以太网端口、一个 HDMI 端口和三个雷雳 4 端口；顶部俯视外观展示方形圆角机身设计，顶面居中有黑色亮面 Apple 标志。",
       "imageWidth": 5120,
@@ -14767,6 +14928,13 @@
       "imageMatchDimensions": {
         "processor-dimensionChip": "m6",
         "processor-dimensionChip-cpuCoreCount-gpuCoreCount": "m6-12-12"
+      },
+      "pickupVerification": {
+        "sampledPartNumber": "MHQK4CH/A",
+        "storeNumber": "R577",
+        "checkedAt": "2026-11-06T06:17:57.114Z",
+        "status": "available",
+        "verified": true
       }
     },
     {
@@ -14808,7 +14976,16 @@
       "imageMatchDimensions": {
         "processor-dimensionChip": "m6",
         "processor-dimensionChip-cpuCoreCount-gpuCoreCount": "m6-12-12"
-      }
+      },
+      "pickupVerification": {
+        "sampledPartNumber": "MHQL4CH/A",
+        "storeNumber": "R577",
+        "checkedAt": "2026-11-06T06:17:57.114Z",
+        "status": "available",
+        "verified": true
+      },
+      "upstreamTitle": "Mac mini",
+      "upstreamTitleCheckedAt": "2026-11-06T06:17:57.114Z"
     },
     {
       "partNumber": "MHQM4CH/A",
@@ -14849,7 +15026,16 @@
       "imageMatchDimensions": {
         "processor-dimensionChip": "m6",
         "processor-dimensionChip-cpuCoreCount-gpuCoreCount": "m6-12-12"
-      }
+      },
+      "pickupVerification": {
+        "sampledPartNumber": "MHQM4CH/A",
+        "storeNumber": "R577",
+        "checkedAt": "2026-11-06T06:17:57.114Z",
+        "status": "available",
+        "verified": true
+      },
+      "upstreamTitle": "Mac mini",
+      "upstreamTitleCheckedAt": "2026-11-06T06:17:57.114Z"
     },
     {
       "partNumber": "MHQV4CH/A",
@@ -14890,7 +15076,16 @@
       "imageMatchDimensions": {
         "processor-dimensionChip": "m6",
         "processor-dimensionChip-cpuCoreCount-gpuCoreCount": "m6-12-12"
-      }
+      },
+      "pickupVerification": {
+        "sampledPartNumber": "MHQV4CH/A",
+        "storeNumber": "R577",
+        "checkedAt": "2026-11-06T06:17:57.114Z",
+        "status": "unavailable",
+        "verified": true
+      },
+      "upstreamTitle": "Mac mini",
+      "upstreamTitleCheckedAt": "2026-11-06T06:17:57.114Z"
     },
     {
       "partNumber": "MHQN4CH/A",
@@ -14932,7 +15127,16 @@
       "imageMatchDimensions": {
         "processor-dimensionChip": "m5pro",
         "processor-dimensionChip-cpuCoreCount-gpuCoreCount": "m5pro-15-16"
-      }
+      },
+      "pickupVerification": {
+        "sampledPartNumber": "MHQN4CH/A",
+        "storeNumber": "R577",
+        "checkedAt": "2026-11-06T06:17:57.114Z",
+        "status": "available",
+        "verified": true
+      },
+      "upstreamTitle": "Mac mini",
+      "upstreamTitleCheckedAt": "2026-11-06T06:17:57.114Z"
     },
     {
       "partNumber": "MHQU4CH/A",
@@ -14974,7 +15178,16 @@
       "imageMatchDimensions": {
         "processor-dimensionChip": "m5pro",
         "processor-dimensionChip-cpuCoreCount-gpuCoreCount": "m5pro-15-16"
-      }
+      },
+      "pickupVerification": {
+        "sampledPartNumber": "MHQU4CH/A",
+        "storeNumber": "R577",
+        "checkedAt": "2026-11-06T06:17:57.114Z",
+        "status": "available",
+        "verified": true
+      },
+      "upstreamTitle": "Mac mini",
+      "upstreamTitleCheckedAt": "2026-11-06T06:17:57.114Z"
     },
     {
       "partNumber": "MHL64CH/A",
@@ -15006,7 +15219,7 @@
       "upstreamContainer": "RO_MACSTUDIO_M5MAX_M5ULTRA_BET_BES_2026",
       "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/mac-studio",
       "upstreamTitle": "Mac Studio",
-      "upstreamTitleCheckedAt": "2026-09-15T03:02:23.190Z",
+      "upstreamTitleCheckedAt": "2026-11-06T06:18:01.422Z",
       "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-studio-summary-select-202608?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=emRVcS9veFo0VkhVdktxS2xhUkFyZlZlVVdoQ1hhSFNrUXBpcEw1S25KWjNCbndIdVVCNnVBajNrNndmZlg3UVpIdHlVTTFCN3h3M01Od0tUWEIraE5Yc2ltTjBFSkY0ekhDbC9IMldOR0lwMjNiL1RHMk9ZT3hiZUxzaUNnN0M&traceId=1",
       "imageAlt": "Mac Studio，银色机身，正面外观展示两个 USB-C 端口、一个 SDXC 卡插槽，以及状态指示灯；背面外观展示铝金属散热孔，端口包括四个雷雳 5 端口、一个以太网端口、一个三针电源插口、两个 USB-A 端口、一个 HDMI 端口、一个耳机插孔，以及电源按钮；顶部俯视外观展示方形圆角机身设计，顶面居中有黑色亮面 Apple 标志。",
       "imageWidth": 5120,
@@ -15018,6 +15231,13 @@
       "imageMatchDimensions": {
         "processor-dimensionChip": "m5max",
         "processor-dimensionChip-cpuCoreCount-gpuCoreCount": "m5max-18-32"
+      },
+      "pickupVerification": {
+        "sampledPartNumber": "MHL64CH/A",
+        "storeNumber": "R577",
+        "checkedAt": "2026-11-06T06:18:01.422Z",
+        "status": "available",
+        "verified": true
       }
     },
     {
@@ -15740,7 +15960,16 @@
       "imageMatchDimensions": {
         "processor-dimensionChip": "m5max",
         "processor-dimensionChip-cpuCoreCount-gpuCoreCount": "m5max-18-32"
-      }
+      },
+      "pickupVerification": {
+        "sampledPartNumber": "MHQJ4CH/A",
+        "storeNumber": "R577",
+        "checkedAt": "2026-11-06T06:18:01.422Z",
+        "status": "unavailable",
+        "verified": true
+      },
+      "upstreamTitle": "Mac Studio",
+      "upstreamTitleCheckedAt": "2026-11-06T06:18:01.422Z"
     },
     {
       "partNumber": "CTO_9BB05670736811214DD689A0F1F70088EE8F37DF80DBF8415858263534AE78EA",
@@ -16326,7 +16555,16 @@
       "imageMatchDimensions": {
         "processor-dimensionChip": "m5ultra",
         "processor-dimensionChip-cpuCoreCount-gpuCoreCount": "m5ultra-30-64"
-      }
+      },
+      "pickupVerification": {
+        "sampledPartNumber": "MHL74CH/A",
+        "storeNumber": "R577",
+        "checkedAt": "2026-11-06T06:18:01.422Z",
+        "status": "unavailable",
+        "verified": true
+      },
+      "upstreamTitle": "Mac Studio",
+      "upstreamTitleCheckedAt": "2026-11-06T06:18:01.422Z"
     },
     {
       "partNumber": "CTO_893F8D08EF6EA245A1635B5EC3F7867EFAE16446022ABFB981C60841944BAEA8",
@@ -18594,7 +18832,14 @@
         "dimensionColor": "white"
       },
       "upstreamTitle": "HomePod mini 2 - 白色",
-      "upstreamTitleCheckedAt": "2026-10-14T13:14:37.043Z"
+      "upstreamTitleCheckedAt": "2026-11-06T06:17:54.060Z",
+      "pickupVerification": {
+        "sampledPartNumber": "MGHK4CH/A",
+        "storeNumber": "R577",
+        "checkedAt": "2026-11-06T06:17:54.060Z",
+        "status": "available",
+        "verified": true
+      }
     },
     {
       "partNumber": "MGKR4CH/A",
@@ -18629,7 +18874,14 @@
         "dimensionColor": "pink"
       },
       "upstreamTitle": "HomePod mini 2 - 粉色",
-      "upstreamTitleCheckedAt": "2026-10-14T13:14:37.043Z"
+      "upstreamTitleCheckedAt": "2026-11-06T06:17:54.060Z",
+      "pickupVerification": {
+        "sampledPartNumber": "MGKR4CH/A",
+        "storeNumber": "R577",
+        "checkedAt": "2026-11-06T06:17:54.060Z",
+        "status": "available",
+        "verified": true
+      }
     },
     {
       "partNumber": "MGHM4CH/A",
@@ -18664,7 +18916,14 @@
         "dimensionColor": "blue"
       },
       "upstreamTitle": "HomePod mini 2 - 蓝色",
-      "upstreamTitleCheckedAt": "2026-10-14T13:14:37.043Z"
+      "upstreamTitleCheckedAt": "2026-11-06T06:17:54.060Z",
+      "pickupVerification": {
+        "sampledPartNumber": "MGHM4CH/A",
+        "storeNumber": "R577",
+        "checkedAt": "2026-11-06T06:17:54.060Z",
+        "status": "available",
+        "verified": true
+      }
     },
     {
       "partNumber": "MGHL4CH/A",
@@ -18699,7 +18958,14 @@
         "dimensionColor": "green"
       },
       "upstreamTitle": "HomePod mini 2 - 绿色",
-      "upstreamTitleCheckedAt": "2026-10-14T13:14:37.043Z"
+      "upstreamTitleCheckedAt": "2026-11-06T06:17:54.060Z",
+      "pickupVerification": {
+        "sampledPartNumber": "MGHL4CH/A",
+        "storeNumber": "R577",
+        "checkedAt": "2026-11-06T06:17:54.060Z",
+        "status": "available",
+        "verified": true
+      }
     },
     {
       "partNumber": "MGHJ4CH/A",
@@ -18734,7 +19000,14 @@
         "dimensionColor": "midnight"
       },
       "upstreamTitle": "HomePod mini 2 - 午夜色",
-      "upstreamTitleCheckedAt": "2026-10-14T13:14:37.043Z"
+      "upstreamTitleCheckedAt": "2026-11-06T06:17:54.060Z",
+      "pickupVerification": {
+        "sampledPartNumber": "MGHJ4CH/A",
+        "storeNumber": "R577",
+        "checkedAt": "2026-11-06T06:17:54.060Z",
+        "status": "available",
+        "verified": true
+      }
     },
     {
       "partNumber": "MK2Q4CH/A",

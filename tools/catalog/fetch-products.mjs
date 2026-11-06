@@ -13,7 +13,7 @@ import { parseBuyPage } from './lib/parse-buy-page.mjs';
 import { resolveProductImages } from './lib/resolve-images.mjs';
 import { collectSelectedMacPages, assertMacSkuCoverage } from './lib/selected-mac-pages.mjs';
 import { applyMacConfigurationCapture } from './lib/apply-mac-configurations.mjs';
-import { retainPrelaunchRestrictions } from './lib/catalog-readiness.mjs';
+import { exactRetailSummary, retainPrelaunchRestrictions } from './lib/catalog-readiness.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const offlineArg = process.argv.indexOf('--offline');
@@ -133,6 +133,9 @@ if (!stopped) for (const family of familyResults.filter(f => f.configurationCapt
     manifest.push({ familyKey: family.familyKey, configurationCapture: family.configurationCapture, parse: { supported: false, reason: error.message } });
     stopped = true; console.log(JSON.stringify({ family: family.familyKey, stopped: error.message })); break;
   }
+}
+for (const family of familyResults.filter(f => f.pickupVerificationScope === 'sku')) {
+  family.pickupVerification = exactRetailSummary(products.filter(p => p.familyKey === family.familyKey));
 }
 const duplicates = products.map(p => p.partNumber).filter((part, i, all) => all.indexOf(part) !== i);
 if (duplicates.length) throw new Error(`Duplicate part numbers across families: ${[...new Set(duplicates)].join(', ')}`);

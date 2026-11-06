@@ -1,0 +1,27 @@
+{
+  "version": "3.6.0",
+  "kind": "WeChat DevTools CLI preview",
+  "generatedAt": "2026-11-06T06:37:36.992Z",
+  "sourceFingerprint": "sha256:e1f6cab6f59b40a40fd32251da546a5bdb4a2fb5dfe413f14a55162efef2538d",
+  "mainPackage": {
+    "total": 1135713,
+    "packages": [
+      {
+        "name": "TOTAL",
+        "size": 1135713
+      }
+    ]
+  },
+  "previewCodeGenerated": true,
+  "previousAttempts": [
+    {
+      "errorCode": 800059,
+      "reason": "The preview service could not find the theme.json named by app.themeLocation."
+    },
+    {
+      "change": "Explicitly included theme.json in project.config.json packOptions.",
+      "previewBytes": 1135757
+    }
+  ],
+  "scope": "Development preview code generated for authorized WeChat testers to scan. Public testing, member trial assignment, store publication, production cloud deployment, on-device test results and review approval are separate."
+}

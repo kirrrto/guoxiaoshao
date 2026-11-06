@@ -36,18 +36,18 @@
     <!-- Pin tip belongs at the top of the content, not buried under query cards. -->
     <view wx:if="{{addTipVisible}}" class="banner banner-ok add-tip add-tip--top">
       <text class="add-tip-text">添加到「我的小程序」，微信下拉即可打开。</text>
-      <text class="add-tip-close tap-target" bindtap="onDismissAddTip" aria-role="button" aria-label="关闭提示">×</text>
+      <button class="add-tip-close" hover-class="ui-control-pressed" bindtap="onDismissAddTip" aria-label="关闭提示">×</button>
     </view>
-    <button class="ui-disclosure query-guide-entry" hover-class="ui-control-pressed" bindtap="onOpenGuide">
-      <view class="query-guide-icon" aria-hidden="true"><image class="ui-icon" src="/images/ui/guide.png" mode="aspectFit" /></view>
-      <view class="query-guide-copy">
-        <text class="query-guide-title">选购与取货攻略</text>
-      </view>
-      <view class="ui-chevron" aria-hidden="true"></view>
-    </button>
     <view class="card selection-card {{selectionSummary ? '' : 'selection-card--empty'}} {{result ? 'selection-card--has-result' : ''}}">
-      <view class="card-title">
-        <text>{{selectionSummary ? '当前查询配置' : '想查哪一款？'}}</text>
+      <view wx:if="{{!selectionSummary}}" class="pickup-intro">
+        <view class="pickup-intro-copy">
+          <view class="pickup-intro-title">想查哪一款？</view>
+          <text class="pickup-intro-quota">{{!accountReady ? '账户连接中' : (boot.member ? '会员查询不扣次数' : '剩余查询额度 ' + boot.balance + ' 次')}}</text>
+        </view>
+        <image wx:if="{{!introImageFailed}}" class="pickup-intro-image" src="/images/brand/pickup-whistle-v360.png" mode="aspectFit" aria-hidden="true" binderror="onIntroImageError" />
+      </view>
+      <view wx:else class="card-title">
+        <text>当前查询配置</text>
         <text class="sub">{{!accountReady ? '账户连接中' : (boot.member ? '会员 · 不扣次数' : '余 ' + boot.balance + ' 次')}}</text>
       </view>
       <view wx:if="{{selectionSummary}}" class="selection-summary">
@@ -58,7 +58,7 @@
         <view class="selection-summary-footer"><view class="selection-summary-stores">{{selectionSummary.storeLabel}}</view><button class="ui-action selection-summary-change" hover-class="ui-control-pressed" bindtap="onEditSelection"><text class="ui-action-label">修改</text><text class="ui-chevron" aria-hidden="true"></text></button></view>
       </view>
       <view wx:if="{{!selectionSummary}}" class="selection-empty">
-        <button class="btn btn-primary btn-block" bindtap="onEditSelection">选择配置与门店</button>
+        <button class="btn btn-primary btn-block" hover-class="btn-primary-pressed" bindtap="onEditSelection">选择配置与门店</button>
       </view>
       <view wx:elif="{{!selectionCanCollapse}}" class="banner {{selectionReferenceOnly ? 'banner-info' : 'banner-warn'}} small mt">{{selectionNotice}}</view>
     <view wx:if="{{!accountReady}}" class="banner banner-info small">{{accountError || '正在连接微信账户，可先选商品与门店。'}}<button wx:if="{{accountError}}" class="btn btn-outline btn-sm mt" bindtap="onRetryAccount">重试账户连接</button></view>
@@ -85,7 +85,7 @@
       <button wx:elif="{{selectionSummary && !result && selectionSupportsFollow}}" class="ui-action mt selection-follow-action" disabled="{{!accountReady || querying || !selectionCanCollapse}}" bindtap="onFollowSelection"><image class="selection-whistle" src="/images/brand/whistle-green.png" mode="aspectFit" aria-hidden="true" /><text>{{boot.member ? '关注此配置' : (contextualCheckout ? '了解此配置关注服务' : '了解会员关注服务')}}</text></button>
       <button class="ui-disclosure" hover-class="ui-control-pressed" bindtap="onToggleRules" aria-expanded="{{rulesExpanded}}"><text class="ui-disclosure-label">查询与提醒规则</text><view class="ui-disclosure-meta"><text>{{rulesExpanded ? '收起' : '展开'}}</text><text class="ui-chevron {{rulesExpanded ? 'ui-chevron--up' : 'ui-chevron--down'}}" aria-hidden="true"></text></view></button>
       </view>
-      <view wx:if="{{accountReady && rulesExpanded}}" class="selection-rules">
+      <view wx:if="{{accountReady && rulesExpanded}}" class="selection-rules ui-reveal">
         <view class="selection-rule">
           <text class="selection-rule-label">关注提醒</text>
           <view class="selection-rule-copy">
@@ -105,7 +105,7 @@
     </view>
 
 
-    <view wx:if="{{result}}" id="query-result" class="card query-result-card">
+    <view wx:if="{{result}}" id="query-result" class="card query-result-card ui-reveal">
       <view wx:if="{{queryFailureMessage}}" class="banner banner-warn small mb">本次查询未完成，下方保留上次查询结果。</view>
       <view wx:elif="{{resultTargetDifferent}}" class="result-target-note result-target-different">上次查询结果 · 与当前选择不同</view>
       <view class="result-product-row">
@@ -231,6 +231,11 @@
     </view>
 
     <button wx:if="{{boot && boot.followCount}}" class="ui-disclosure query-follow-entry" hover-class="ui-control-pressed" bindtap="onGoFollow"><view class="query-guide-copy"><text class="query-guide-title">继续查看{{followTargets.length ? ' · ' + followTargets[0].productTitle : '我的关注'}}</text><text class="query-guide-note">{{boot.followCount}} 个关注配置 · 到小哨查看任务</text></view><text class="ui-chevron"></text></button>
+    <button class="ui-disclosure query-guide-entry" hover-class="ui-control-pressed" bindtap="onOpenGuide">
+      <view class="query-guide-icon" aria-hidden="true"><image class="ui-icon" src="/images/ui/guide.png" mode="aspectFit" /></view>
+      <view class="query-guide-copy"><text class="query-guide-title">选购与取货攻略</text></view>
+      <view class="ui-chevron" aria-hidden="true"></view>
+    </button>
 
     <view class="card">
       <view class="row-between">

@@ -1,0 +1,91 @@
+{
+  "record": {
+    "storeNumber": "R577",
+    "partNumbers": [
+      "MJ2J4CH/A",
+      "MJ2X4CH/A",
+      "MJ2M4CH/A",
+      "MJ2G4CH/A",
+      "MJ2Y4CH/A",
+      "MJ2W4CH/A"
+    ],
+    "requestUrl": "https://www.apple.com.cn/shop/retail/pickup-message?pl=true&mts.0=regular&parts.0=MJ2J4CH%2FA&parts.1=MJ2X4CH%2FA&parts.2=MJ2M4CH%2FA&parts.3=MJ2G4CH%2FA&parts.4=MJ2Y4CH%2FA&parts.5=MJ2W4CH%2FA&store=R577",
+    "startedAt": "2026-11-06T06:17:41.930Z",
+    "httpStatus": 200,
+    "bytes": 10506,
+    "elapsedMs": 3005,
+    "finishedAt": "2026-11-06T06:17:44.935Z",
+    "error": null,
+    "retryAfter": null
+  },
+  "bodyFile": "macbook-pro-proled-xdr-1.body.json",
+  "sha256": "76721458bb174a778378e40a172865fcadc59533698978f9db11d6f314059e2c",
+  "observations": [
+    {
+      "storeNumber": "R577",
+      "storeName": "天环广场",
+      "partNumber": "MJ2J4CH/A",
+      "status": "unavailable",
+      "pickupDisplay": "unavailable",
+      "quote": "暂无供应",
+      "productTitle": "14 英寸 MacBook Pro (PROLED XDR 显示屏) - 银色",
+      "observedAt": "2026-11-06T06:17:44.935Z",
+      "reason": null
+    },
+    {
+      "storeNumber": "R577",
+      "storeName": "天环广场",
+      "partNumber": "MJ2X4CH/A",
+      "status": "available",
+      "pickupDisplay": "available",
+      "quote": "今天可取货",
+      "productTitle": "16 英寸 MacBook Pro (PROLED XDR 显示屏) - 银色",
+      "observedAt": "2026-11-06T06:17:44.935Z",
+      "reason": null
+    },
+    {
+      "storeNumber": "R577",
+      "storeName": "天环广场",
+      "partNumber": "MJ2M4CH/A",
+      "status": "unavailable",
+      "pickupDisplay": "unavailable",
+      "quote": "暂无供应",
+      "productTitle": "14 英寸 MacBook Pro (PROLED XDR 显示屏) - 深空黑色",
+      "observedAt": "2026-11-06T06:17:44.935Z",
+      "reason": null
+    },
+    {
+      "storeNumber": "R577",
+      "storeName": "天环广场",
+      "partNumber": "MJ2G4CH/A",
+      "status": "available",
+      "pickupDisplay": "available",
+      "quote": "今天可取货",
+      "productTitle": "14 英寸 MacBook Pro (PROLED XDR 显示屏) - 银色",
+      "observedAt": "2026-11-06T06:17:44.935Z",
+      "reason": null
+    },
+    {
+      "storeNumber": "R577",
+      "storeName": "天环广场",
+      "partNumber": "MJ2Y4CH/A",
+      "status": "available",
+      "pickupDisplay": "available",
+      "quote": "今天可取货",
+      "productTitle": "16 英寸 MacBook Pro (PROLED XDR 显示屏) - 银色",
+      "observedAt": "2026-11-06T06:17:44.935Z",
+      "reason": null
+    },
+    {
+      "storeNumber": "R577",
+      "storeName": "天环广场",
+      "partNumber": "MJ2W4CH/A",
+      "status": "available",
+      "pickupDisplay": "available",
+      "quote": "今天可取货",
+      "productTitle": "16 英寸 MacBook Pro (PROLED XDR 显示屏) - 银色",
+      "observedAt": "2026-11-06T06:17:44.935Z",
+      "reason": null
+    }
+  ]
+}

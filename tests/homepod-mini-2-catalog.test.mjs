@@ -26,12 +26,12 @@ test('HomePod mini 2 appears first in the real offline picker with five distinct
     assert.equal(selection.partNumber, product.partNumber);
     assert.equal(selection.product.priceCny, 1099);
     assert.equal(selection.product.supported, true);
-    assert.equal(selection.product.verificationStatus, 'pending');
+    assert.equal(selection.product.verificationStatus, 'available');
     assert.ok(selection.product.imageUrl.includes('202610'));
   }
 });
 
-test('cloud bundle has sourced generation metadata and all HomePod mini 2 SKUs match pending pickup evidence', () => {
+test('all five previously pending HomePod mini 2 SKUs now have individual recognized pickup responses', () => {
   const built = buildFromBundled();
   const family = built.meta.families.find(f => f.familyKey === 'homepod-mini-2');
   assert.equal(family.releaseDate, '2026-10-13');
@@ -41,5 +41,9 @@ test('cloud bundle has sourced generation metadata and all HomePod mini 2 SKUs m
   assert.equal(products.length, 5);
   assert.deepEqual(new Set(products.map(p => p.partNumber)), new Set(observations.map(o => o.partNumber)));
   assert.ok(observations.every(o => o.status === 'pending' && o.quote === '10 月 30 日可取货'));
-  assert.ok(products.every(p => p.supported && !p.comingSoon && p.verificationStatus === 'pending'));
+  const latest = JSON.parse(readFileSync(new URL('../evidence/pickup-samples/2026-11-06/homepod-mini-2-1.json', import.meta.url))).observations;
+  for (const product of products) {
+    assert.ok(product.supported && !product.comingSoon);
+    assert.equal(product.verificationStatus, latest.find(row => row.partNumber === product.partNumber).status);
+  }
 });

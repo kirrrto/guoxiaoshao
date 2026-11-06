@@ -16,6 +16,8 @@ test('home lists saved dates independently of Apple bootstrap and only schedules
   assert.equal(page.data.deadlineCount, 4);
   assert.equal(page.data.deadlines.length, 3);
   assert.equal(page.data.nextDeadline.id, 'next');
+  assert.equal(page.data.deadlines[0].id, 'next');
+  assert.equal(page.data.deadlines.filter(deadline => deadline.id === 'next').length, 1);
   assert.equal(rt.calls.filter(c => c.action === 'deadline.list').length, 1);
   page.onUnload();
 });
