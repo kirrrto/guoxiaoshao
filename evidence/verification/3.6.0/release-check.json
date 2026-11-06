@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-11-06T07:16:03.701Z",
+  "checkedAt": "2026-11-06T07:46:55.530Z",
   "version": "3.6.0",
   "scope": "Local source and recorded quality evidence only; no cloud deployment, real-device retest, account-console inspection or submission",
   "publicationReady": false,
@@ -7,7 +7,7 @@
   "qualityGate": {
     "passed": false,
     "version": "3.6.0",
-    "sourceFingerprint": "sha256:484a8430e6d3e8a00d9beec4091f676d0546672c63b292d69340cbc0b65e80f5",
+    "sourceFingerprint": "sha256:e3f78026b0b2afbb56f363576402b1d41846a71d8f05e0f7d490aa58368472c3",
     "blockers": [
       {
         "id": "unused-channel-video",
@@ -279,9 +279,9 @@
     }
   ],
   "frontend": {
-    "files": 246,
-    "sourceBytes": 1307740,
-    "imageBytes": 178761,
+    "files": 247,
+    "sourceBytes": 1322258,
+    "imageBytes": 190097,
     "imageMaxBytes": 204800,
     "mainPackageMaxBytes": 1572864,
     "note": "Source bytes, not the WeChat upload package size"
@@ -336,8 +336,8 @@
   },
   "consumerPackage": {
     "miniprogramRoot": "miniprogram/",
-    "sourceFilesAfterExclusions": 242,
-    "sourceBytesAfterExclusions": 1294536,
+    "sourceFilesAfterExclusions": 243,
+    "sourceBytesAfterExclusions": 1309054,
     "excludedBytes": 13204,
     "excludedFiles": [
       "config/product-launches.js",

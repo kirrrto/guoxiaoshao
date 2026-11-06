@@ -20,16 +20,29 @@
     <!-- 账户与会员摘要；提醒管理与查询体验额度各有独立区域。 -->
     <view id="membership-card" class="card membership-card {{membership.active ? 'membership-active' : ''}} {{contextualCheckout && checkoutTarget && !membership.active ? 'membership-contextual' : ''}}">
       <view wx:if="{{!contextualCheckout || !checkoutTarget || membership.active}}" class="account-header">
-        <view class="account-face">
-          <view class="account-header-content">
-            <text class="account-status {{membership.active ? 'account-status-member' : membership.expired ? 'account-status-expired' : 'account-status-free'}} {{membership.active && membership.planLabel === '会员' ? 'account-title' : ''}}">{{membership.active ? '会员已开通' : membership.expired ? '会员已到期' : '免费用户'}}</text>
-            <view wx:if="{{membership.active}}" class="member-overview">
+        <view wx:if="{{membership.active}}" class="member-pass {{membership.planId === 'member_365d' ? 'member-pass--annual' : membership.planId === 'member_trial' ? 'member-pass--trial' : ''}}">
+          <view class="member-pass-top">
+            <view class="account-header-content">
+              <text wx:if="{{membership.planLabel !== '会员'}}" class="account-status account-status-member">会员已开通</text>
               <view wx:if="{{membership.planLabel !== '会员'}}" class="account-title">{{membership.planLabel}}</view>
-              <view class="member-renewal">剩余 {{membership.daysLeft}} 天 · 至 {{membership.expiresShortText}}</view>
+              <view wx:else class="account-title account-status account-status-member">会员已开通</view>
             </view>
-            <view wx:else class="account-title">我的账户</view>
+            <view class="member-pass-seal" aria-hidden="true">
+              <image wx:if="{{membership.planId === 'member_trial'}}" class="account-logo member-pin" src="/images/brand/whistle-green.png" mode="aspectFit" aria-hidden="true" />
+              <image wx:else class="account-logo member-pin" src="/images/brand/member-whistle-pin.png" mode="aspectFit" aria-hidden="true" />
+            </view>
           </view>
+          <view wx:if="{{membership.expiresShortText || membership.daysLeft != null}}" class="member-overview">
+            <view wx:if="{{membership.expiresShortText}}" class="member-validity"><text class="member-validity-label">有效期至</text><text class="member-validity-date">{{membership.expiresShortText}}</text></view>
+            <text wx:if="{{membership.daysLeft != null}}" class="member-renewal">剩余 {{membership.daysLeft}} 天</text>
+          </view>
+        </view>
+        <view wx:else class="account-face">
           <image class="account-logo" src="/images/brand/logo-mint-144.png" mode="aspectFit" aria-hidden="true" />
+          <view class="account-header-content">
+            <view class="account-title">我的账户</view>
+            <text class="account-status {{membership.expired ? 'account-status-expired' : 'account-status-free'}}">{{membership.expired ? '会员已到期' : '免费用户'}}</text>
+          </view>
         </view>
         <view class="account-header-actions">
           <button class="ui-action ui-action--neutral identity-copy" hover-class="ui-control-pressed" bindtap="onCopyId" aria-label="复制用户编号"><text class="ui-action-label">用户 {{boot.identity.openidMasked}}</text><text class="identity-copy-label">复制</text></button>

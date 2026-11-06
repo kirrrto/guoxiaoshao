@@ -1,105 +1,105 @@
 {
   "version": "3.6.0",
-  "checkedAt": "2026-11-06T07:15:50.377Z",
+  "checkedAt": "2026-11-06T07:46:52.981Z",
   "scope": "Offline compilation of packaged WXML and WXSS using the executable compilers bundled with WeChat DevTools. Historical sources excluded via project packOptions are omitted. Runtime, wxapkg, phones and upload are separate checks.",
   "workingDirectory": "miniprogram",
   "compilerDirectory": "WeChat DevTools/resources/app.asar.unpacked/node_modules/wcc-exec",
   "inputs": [
     {
-      "file": "./components/config-sheet/index.wxml",
-      "sha256": "779329e9d1847571110d152f613d4421ba4573b963cebf787bf52f41652c4a4e"
-    },
-    {
-      "file": "./components/reminder-authorization/index.wxml",
-      "sha256": "744b03a7726b2a4d3bd051ffb61271f5f9ac7eb54b62545e942098aa8f090302"
-    },
-    {
-      "file": "./components/reminder-nudge/index.wxml",
-      "sha256": "063fad2916e68799f6c69e2d0aa7ccc815bc519d9885ba1cc781ab0daafe1b92"
-    },
-    {
-      "file": "./components/target-picker/index.wxml",
-      "sha256": "e189e4da2c4f5fd7b059894d4eeffb8d4f55625c901479343cf5a76d516cdc3d"
-    },
-    {
-      "file": "./pages/deadlines/index.wxml",
-      "sha256": "4bcdbde836024a8038371c1c7ef0773825d72a2ffa6e68267105dd19610cdcb7"
-    },
-    {
-      "file": "./pages/follow/index.wxml",
-      "sha256": "5c51a64bc8bed028888621fcb2ce70b331685b6a8b0438f08123eb118d051d80"
-    },
-    {
-      "file": "./pages/guide/index.wxml",
-      "sha256": "69d6258cd1d98954d201c9f534255a7e511ae140133201868fb1ee26d104c9b1"
-    },
-    {
-      "file": "./pages/history/index.wxml",
-      "sha256": "63cbaef9191da2d1d9d146f8a12f99bb6b6492d815777ef2b270b095e477be84"
-    },
-    {
-      "file": "./pages/mine/index.wxml",
-      "sha256": "b4bc7040db2bab36cbed538466ef593b8e8b095e1aff9c9a31ea58c19c1feeb9"
-    },
-    {
-      "file": "./pages/notice-board/index.wxml",
-      "sha256": "d11d3003186104d80745355bda328c579f9571c9cad349a4183ec9919d127d6a"
-    },
-    {
-      "file": "./pages/notification-test/index.wxml",
-      "sha256": "68749aaea02f873c979fb6e95e1c03b2bcd5f4c0357a652fe52300c3f507e6a3"
-    },
-    {
-      "file": "./pages/query/index.wxml",
-      "sha256": "13ae24ddd59276cf4f540cb08d88f52491804a28e8398c0e2a1a233e63864188"
-    },
-    {
       "file": "./app.wxss",
       "sha256": "5b3249c69013e27705dc7b6a2cefecf30e3e60f789d8d89ccfb29cb6bcdadd0a"
+    },
+    {
+      "file": "./components/config-sheet/index.wxml",
+      "sha256": "779329e9d1847571110d152f613d4421ba4573b963cebf787bf52f41652c4a4e"
     },
     {
       "file": "./components/config-sheet/index.wxss",
       "sha256": "7dda47a51398c084ff6fbc1c2a7ed901b97f2d148dcef0fcae4e3ba13f22e4d5"
     },
     {
+      "file": "./components/reminder-authorization/index.wxml",
+      "sha256": "744b03a7726b2a4d3bd051ffb61271f5f9ac7eb54b62545e942098aa8f090302"
+    },
+    {
       "file": "./components/reminder-authorization/index.wxss",
       "sha256": "9cb283ec1e6c56e059b6d6955ea3d5adfdbb10964cc8f7b523a5c050ad85dca6"
+    },
+    {
+      "file": "./components/reminder-nudge/index.wxml",
+      "sha256": "063fad2916e68799f6c69e2d0aa7ccc815bc519d9885ba1cc781ab0daafe1b92"
     },
     {
       "file": "./components/reminder-nudge/index.wxss",
       "sha256": "c84a8eb5644cf1eb396f8eefe96c38473f7b2203d7de5e8ea8c0aa4f98d9a50e"
     },
     {
+      "file": "./components/target-picker/index.wxml",
+      "sha256": "e189e4da2c4f5fd7b059894d4eeffb8d4f55625c901479343cf5a76d516cdc3d"
+    },
+    {
       "file": "./components/target-picker/index.wxss",
       "sha256": "3e278038723bb5334a015b52033585467dae03054b0232cf7d0cd9cd4b4366a6"
+    },
+    {
+      "file": "./pages/deadlines/index.wxml",
+      "sha256": "4bcdbde836024a8038371c1c7ef0773825d72a2ffa6e68267105dd19610cdcb7"
     },
     {
       "file": "./pages/deadlines/index.wxss",
       "sha256": "1375295cae455029a92d13a2199a9c24ca3bd24c5a885ef199c7f1aa2d1198ca"
     },
     {
+      "file": "./pages/follow/index.wxml",
+      "sha256": "5c51a64bc8bed028888621fcb2ce70b331685b6a8b0438f08123eb118d051d80"
+    },
+    {
       "file": "./pages/follow/index.wxss",
       "sha256": "7c50289f05bcb3ae5247bb952e96064f7d6349add54ad5ba327dadb4e9d18fce"
+    },
+    {
+      "file": "./pages/guide/index.wxml",
+      "sha256": "69d6258cd1d98954d201c9f534255a7e511ae140133201868fb1ee26d104c9b1"
     },
     {
       "file": "./pages/guide/index.wxss",
       "sha256": "940360fc85e010e9c4f6d53d6701c43c429bc808ae548a1e440a5161e7a29356"
     },
     {
+      "file": "./pages/history/index.wxml",
+      "sha256": "63cbaef9191da2d1d9d146f8a12f99bb6b6492d815777ef2b270b095e477be84"
+    },
+    {
       "file": "./pages/history/index.wxss",
       "sha256": "05c2186297b4f366a61fd4e92488102611a78eb92329eb6fd9399a1cb9f632db"
     },
     {
+      "file": "./pages/mine/index.wxml",
+      "sha256": "10cc9834b22b1ecb14956ba2ca8a414aec580df41c1697bba19d7c992d08d9ec"
+    },
+    {
       "file": "./pages/mine/index.wxss",
-      "sha256": "4e6d2075ca676027e619b85b0f287772f75702236275907676627b1321ef2132"
+      "sha256": "63808cf389cd658a310765d7c0351bbbbfbe93b563f5384ad46fe0ffed68d6c7"
+    },
+    {
+      "file": "./pages/notice-board/index.wxml",
+      "sha256": "d11d3003186104d80745355bda328c579f9571c9cad349a4183ec9919d127d6a"
     },
     {
       "file": "./pages/notice-board/index.wxss",
       "sha256": "983b90d995ca94126343afe856e557a6e40340313e58210aff3b5886575460c8"
     },
     {
+      "file": "./pages/notification-test/index.wxml",
+      "sha256": "68749aaea02f873c979fb6e95e1c03b2bcd5f4c0357a652fe52300c3f507e6a3"
+    },
+    {
       "file": "./pages/notification-test/index.wxss",
       "sha256": "66cb647194e80ebbe3e94baee2e74e399bcad0911c45fa215db5f5db0d10cdd6"
+    },
+    {
+      "file": "./pages/query/index.wxml",
+      "sha256": "13ae24ddd59276cf4f540cb08d88f52491804a28e8398c0e2a1a233e63864188"
     },
     {
       "file": "./pages/query/index.wxss",
@@ -136,8 +136,8 @@
       ],
       "exitCode": 0,
       "diagnostic": "",
-      "outputBytes": 368082,
-      "outputSha256": "25bf367c09cae9e218c9231cb4d513c5cfef321d453a77f8b8f6e12581817f32"
+      "outputBytes": 370283,
+      "outputSha256": "2ceb0b684aa00c5473c4fc198a5a170b36abb4f111504f648582792d751c6031"
     },
     {
       "binary": "wcsc.exe",
@@ -165,8 +165,8 @@
       ],
       "exitCode": 0,
       "diagnostic": "",
-      "outputBytes": 183973,
-      "outputSha256": "7603305bd8b533f10d6f56a0829e003c67f2edaa086de1b0451df92005a604d2"
+      "outputBytes": 186125,
+      "outputSha256": "687e7b908bf39754aba34840da2140cb8ef0056a17de3cfadd7312b36489642e"
     }
   ],
   "excludedFiles": [

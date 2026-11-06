@@ -1,14 +1,14 @@
 {
   "version": "3.6.0",
   "kind": "WeChat DevTools CLI preview",
-  "generatedAt": "2026-11-06T07:16:10.801Z",
-  "sourceFingerprint": "sha256:484a8430e6d3e8a00d9beec4091f676d0546672c63b292d69340cbc0b65e80f5",
+  "generatedAt": "2026-11-06T07:49:38.000Z",
+  "sourceFingerprint": "sha256:e3f78026b0b2afbb56f363576402b1d41846a71d8f05e0f7d490aa58368472c3",
   "mainPackage": {
-    "total": 1127125,
+    "total": 1141331,
     "packages": [
       {
         "name": "TOTAL",
-        "size": 1127125
+        "size": 1141331
       }
     ]
   },
@@ -31,6 +31,12 @@
     {
       "previewBytes": 1126914,
       "note": "Visual candidate before the 320px follow heading and landscape spacing corrections."
+    },
+    {
+      "sourceFingerprint": "sha256:484a8430e6d3e8a00d9beec4091f676d0546672c63b292d69340cbc0b65e80f5",
+      "generatedAt": "2026-11-06T07:16:10.801Z",
+      "previewBytes": 1127125,
+      "note": "Four-page redesign candidate before tiered membership pass differentiation."
     }
   ],
   "scope": "Development preview code generated for authorized WeChat testers to scan. Public testing, member trial assignment, store publication, production cloud deployment, on-device test results and review approval are separate."

@@ -145,7 +145,7 @@ const presentTasks = (tasks, quota) => (tasks || []).map(task => ({ ...task,
 }));
 const presentMembership = membership => ({ ...membership, expired: !membership.active && Boolean(membership.expiresAt),
   planLabel: ({ member_7d: '周卡会员', member_30d: '月卡会员', member_365d: '年卡会员', member_trial: '体验会员' })[membership.planId] || '会员',
-  daysLeft: membership.active ? Math.ceil(membership.remainingMs / 86400000) : 0,
+  daysLeft: membership.active && Number.isFinite(membership.remainingMs) ? Math.max(0, Math.ceil(membership.remainingMs / 86400000)) : null,
   enhancedExpiresText: membership.enhancedExpiresAt ? fmt.fmtDateTime(membership.enhancedExpiresAt) : '',
   annualExpiresText: membership.annualExpiresAt ? fmt.fmtDateTime(membership.annualExpiresAt) : '',
   expiresShortText: membership.expiresAt ? fmt.fmtDateTime(membership.expiresAt).slice(0, 16) : '',

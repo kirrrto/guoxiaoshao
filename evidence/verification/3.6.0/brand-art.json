@@ -10,5 +10,14 @@
     "height": 205,
     "bytes": 12515
   },
-  "usage": "Decorative first-selection artwork only. SKU imagery comes from the catalog."
+  "usage": "Decorative first-selection artwork only. SKU imagery comes from the catalog.",
+  "memberEmblem": {
+    "generator": "Codex built-in image generation",
+    "reference": "miniprogram/images/brand/whistle-green.png",
+    "design": "Die-cut satin champagne-gold whistle pin with a green enamel leaf, transparent background and the original brand silhouette.",
+    "originalSha256": "269d7369f8e897de5a92ab63371c94adba38ad54b9642bb4440695b9e402722e",
+    "file": "miniprogram/images/brand/member-whistle-pin.png",
+    "encoding": "224 x 224 indexed PNG with alpha, 11336 bytes",
+    "usage": "Decorative emblem on verified active membership cards except the trial variant. Entitlements and labels come from the account."
+  }
 }

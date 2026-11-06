@@ -1,7 +1,7 @@
 {
   "scope": "Headless Chromium rendering WXML/WXSS with offline synthetic records. WeChat compilation, development preview, and physical-device results are separate.",
-  "sourceFingerprint": "sha256:484a8430e6d3e8a00d9beec4091f676d0546672c63b292d69340cbc0b65e80f5",
-  "uiSourceHash": "d2f5a5f316003b037268a8acc4f005c103422a64df77e1c8ac766cc966165d41",
+  "sourceFingerprint": "sha256:e3f78026b0b2afbb56f363576402b1d41846a71d8f05e0f7d490aa58368472c3",
+  "uiSourceHash": "1b64798a3dfa089d08452ab1476cd808570f1606050eb7309f8b6b2962f3e33d",
   "correctionsVerified": [
     {
       "page": "follow",

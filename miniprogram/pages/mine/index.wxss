@@ -2,23 +2,67 @@
 .membership-card { --account-inset: 30rpx; --account-radius: var(--radius-card); }
 .account-face {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 56px;
-  align-items: start;
+  grid-template-columns: 56px minmax(0, 1fr);
+  align-items: center;
   gap: 14px;
-  margin: calc(0px - var(--account-inset)) calc(0px - var(--account-inset)) 0;
-  padding: 22px var(--account-inset);
-  border-radius: var(--account-radius) var(--account-radius) 0 0;
-  background: var(--cover-fill);
-  color: var(--cover-ink);
+  padding-bottom: 10px;
 }
 .account-logo { display: block; width: 56px; height: 56px; border-radius: 16px; }
 .account-header-content { min-width: 0; }
-.account-status { color: var(--cover-muted); font-size: clamp(13px, 24rpx, 14px); line-height: 1.5; }
-.account-status-member { color: #8DF2BA; }
-.account-status-expired { color: #FFDBA4; }
-.account-title { margin-top: 5px; font-size: clamp(27px, 58rpx, 34px); font-weight: 700; line-height: 1.3; overflow-wrap: anywhere; }
-.account-status.account-title { display: block; margin: 0; color: var(--cover-ink); }
-.member-renewal { margin-top: 8px; color: var(--cover-muted); font-size: clamp(13px, 24rpx, 14px); line-height: 1.5; font-variant-numeric: tabular-nums; }
+.account-status { color: var(--text-2); font-size: max(13px, 24rpx); line-height: 1.5; }
+.account-status-expired { color: var(--warn); }
+.account-title { color: var(--text); font-size: clamp(21px, 44rpx, 26px); font-weight: 650; line-height: 1.3; overflow-wrap: anywhere; }
+/* Only a verified active account receives a membership pass. */
+.member-pass {
+  --pass-paper: #172B27;
+  --pass-type: #FAE7BF;
+  --pass-detail: #D6D5C2;
+  --pass-rule: #716F55;
+  --pass-seal: #203630;
+  margin: calc(0px - var(--account-inset)) calc(0px - var(--account-inset)) 6px;
+  padding: 16px clamp(16px, 4.5vw, 24px) 14px;
+  color: var(--pass-type);
+  background: var(--pass-paper);
+  border: 1px solid var(--pass-rule);
+  border-radius: var(--account-radius);
+}
+.member-pass--annual {
+  --pass-paper: #EDDCB7;
+  --pass-type: #282B20;
+  --pass-detail: #534B37;
+  --pass-rule: #9B875D;
+  --pass-seal: #263931;
+}
+.member-pass--trial {
+  --pass-paper: #D7E6DE;
+  --pass-type: #16392D;
+  --pass-detail: #385747;
+  --pass-rule: #839D90;
+  --pass-seal: #ECF4EF;
+}
+.member-pass-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.member-pass-top .account-header-content { flex: 1; }
+.member-pass .account-status { color: var(--pass-detail); }
+.member-pass .account-title { color: var(--pass-type); font-size: clamp(28px, 7.8vw, 39px); font-weight: 650; line-height: 1.25; }
+.member-pass .account-status + .account-title { margin-top: 5px; }
+.member-pass-seal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: clamp(76px, 22vw, 104px);
+  height: clamp(76px, 22vw, 104px);
+  background: var(--pass-seal);
+  border: 1px solid var(--pass-rule);
+  border-radius: 50%;
+}
+.member-pass .member-pin { width: 82%; height: 82%; border-radius: 0; }
+.member-pass--trial .member-pin { width: 76%; height: 76%; }
+.member-overview { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 5px 12px; margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--pass-rule); }
+.member-validity { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; }
+.member-validity-label, .member-renewal { color: var(--pass-detail); font-size: max(12px, 23rpx); line-height: 1.5; }
+.member-validity-date { color: var(--pass-type); font-size: max(13px, 25rpx); font-weight: 600; }
+.member-renewal, .member-validity-date { font-variant-numeric: tabular-nums; }
 .account-header-actions {
   display: flex;
   flex-wrap: wrap;
@@ -330,6 +374,20 @@
 .quota-card--member .balance { font-size:36rpx; }
 
 @media (prefers-color-scheme: dark) {
+  .member-pass--annual {
+    --pass-paper: #413727;
+    --pass-type: #FFE5AA;
+    --pass-detail: #E9D7B1;
+    --pass-rule: #8E7851;
+    --pass-seal: #232F27;
+  }
+  .member-pass--trial {
+    --pass-paper: #243C32;
+    --pass-type: #E0F2E7;
+    --pass-detail: #BED7CA;
+    --pass-rule: #658472;
+    --pass-seal: #D6E6DD;
+  }
   .notification-button.notification-delete { color: var(--bad); border-color: rgba(242, 155, 147, 0.28); background: var(--bad-soft); }
   /* Keep the same brand fill and readable foreground in both themes. */
   .member-entry.payment-entry, .member-entry.redemption-entry { background: var(--action-fill); color: var(--action-text); }
