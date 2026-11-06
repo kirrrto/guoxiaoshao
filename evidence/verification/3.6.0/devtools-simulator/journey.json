@@ -258,5 +258,7 @@
     "ok": false,
     "error": "wait WechatIDE authorization timeout",
     "logsScope": "The automator exception and console listeners observed only the scripted runtime journey."
-  }
+  },
+  "candidateSourceFingerprint": "sha256:e1f6cab6f59b40a40fd32251da546a5bdb4a2fb5dfe413f14a55162efef2538d",
+  "scope": "First v3.6.0 preview candidate only. Interaction evidence predates the notice cleanup and four-page redesign."
 }

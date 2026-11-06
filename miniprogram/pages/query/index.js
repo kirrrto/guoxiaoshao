@@ -12,7 +12,7 @@ const { syncTabBar, switchToTab, releaseTabBar } = require('../../utils/tab-bar'
 const { shareAppMessage, shareTimeline, readSharedSelection } = require('../../utils/share');
 const { monitorPollDelay } = require('../../utils/poll');
 const { topUpReminderCredit, buildConsentReport, openSubscribeSettings } = require('../../utils/reminder-credits');
-const { resolveQueryNotice, normalizeAnnouncement, liveNotices, hasLiveNoticeContent, noticeUnreadCount, withOutageCompensationNotice } = require('../../utils/query-notice');
+const { resolveQueryNotice, noticeUnreadCount, nextNoticeChangeAt } = require('../../utils/query-notice');
 const { confirmTap } = require('../../utils/haptic');
 const { productImageFit, withImageFit, productThumbnailUrl } = require('../../utils/product-image-fit');
 const { availableStoreChoices } = require('../../utils/observation-insights');
@@ -24,15 +24,6 @@ const conversion = require('../../utils/conversion-events');
 
 const SELECTION_KEY = 'gxs_query_selection_v1';
 const RESULT_KEY = 'gxs_query_result_v1';
-const ADD_TIP_KEY = 'gxs_add_tip_dismissed_v1';
-
-/** From the second launch on, suggest pinning the app until the user closes the tip. */
-async function shouldShowAddTip() {
-  const app = getApp();
-  if (app && app.launchCountReady) await app.launchCountReady;
-  if (!app || app.globalData.singlePage || (app.globalData.launchCount || 0) < 2) return false;
-  return !(await readSession(ADD_TIP_KEY));
-}
 
 function targetKey(target) {
   const numbers = Array.isArray(target && target.storeNumbers) ? target.storeNumbers : [];
@@ -65,8 +56,14 @@ function selectionDetails(selection, catalog, maxStores) {
   const notice = product && product.targetType === 'apple_cto'
     ? '官网定制款不支持 Apple Store 店内取货，请选择可查询的标准配置。'
     : unavailable ? '配置已保存，尚未开始监测。取货查询和关注暂未开放。' : '请补全或核对配置与门店后查询。';
+  const title = product && (product.title || product.model || product.partNumber) || '';
+  const model = (product && product.model || '').trim();
+  const normalizedTitle = title.replace(/\s+/g, ' ').trim();
+  const hasModelPrefix = Boolean(model && normalizedTitle.startsWith(model + ' '));
   return { validScope, valid, notice, referenceOnly: Boolean(product && product.targetType === 'apple_cto'), summary: product ? {
-    title: product.title || product.model || product.partNumber,
+    title,
+    displayName: hasModelPrefix ? model : title,
+    configuration: hasModelPrefix ? normalizedTitle.slice(model.length).trim() : '',
     imageUrl: product.imageUrl || '', imageDisplayUrl: productThumbnailUrl(product.imageUrl, 'card', product.partNumber), imageAlt: product.imageAlt || product.title || '',
     imageFitClass: productImageFit(product.imageUrl),
     cityLabel: `${cities.join('、') || '已选'} · ${stores.length} 家门店`,
@@ -169,11 +166,9 @@ Page({
     queryFailureMessage: '',
     restrictionReason: null,
     collector: null,
-    announcement: null,
     queryNotice: null,
     noticeDot: false,
     followTargets: [],
-    addTipVisible: false,
     sharedSelection: false,
     sharedTargetPending: false,
     sharedTargetReady: false,
@@ -257,7 +252,6 @@ Page({
         resultTargetDifferent: resultHasDifferentTarget(result, selection),
         sharedSelection: false,
       });
-      shouldShowAddTip().then(visible => { if (!this.pageRetired) this.setData({ addTipVisible: visible }); });
       this.resolveSharedTarget();
       try {
         const boot = await account;
@@ -277,6 +271,7 @@ Page({
     if (this.pageRetired) return;
     syncTabBar(this, '/pages/query/index');
     this.visible = true;
+    if (this.accountSnapshot) this.updateQueryNotices();
     this.visibilityEpoch = (this.visibilityEpoch || 0) + 1;
     this.consumePendingSharedTarget();
     if (!this.data.ready) return;
@@ -294,6 +289,7 @@ Page({
   onHide() {
     releaseTabBar(this);
     this.visible = false;
+    clearTimeout(this.noticeTimer);
     this.visibilityEpoch = (this.visibilityEpoch || 0) + 1;
     this.stopFollowPolling();
   },
@@ -303,6 +299,7 @@ Page({
     stopProgress(this);
     this.pageRetired = true;
     this.visible = false;
+    clearTimeout(this.noticeTimer);
     this.visibilityEpoch = (this.visibilityEpoch || 0) + 1;
     this.stopFollowPolling();
     if (this.unsubscribeCatalog) this.unsubscribeCatalog();
@@ -323,11 +320,6 @@ Page({
 
   onAddToFavorites() {
     return { title: '果小哨 · 门店取货查询' };
-  },
-
-  onDismissAddTip() {
-    this.setData({ addTipVisible: false });
-    writeSession(ADD_TIP_KEY, true);
   },
 
   /** Called by the tab bar when the phone reconnects. */
@@ -427,9 +419,8 @@ Page({
     return pending;
   },
 
-  applyBoot(rawBoot) {
+  applyBoot(boot) {
     if (this.pageRetired) return;
-    const boot = withOutageCompensationNotice(rawBoot);
     const previousKey = this.accountSnapshot && this.accountSnapshot.identity && this.accountSnapshot.identity.userKey;
     const currentKey = boot.identity && boot.identity.userKey;
     if (previousKey && previousKey !== currentKey) {
@@ -470,12 +461,24 @@ Page({
         signedInToday: boot.quota.signedInToday,
       },
       collector: { ...boot.collector, ...fmt.collectorMeta(boot.collector.state) },
-      announcement: normalizeAnnouncement(boot.announcement) ? (typeof boot.announcement === 'string' ? boot.announcement : (boot.announcement && boot.announcement.text) || null) : null,
-      queryNotice: this.buildQueryNotice(boot),
-      noticeDot: noticeUnreadCount({ announcement: boot.announcement, notices: boot.notices }) > 0,
     });
+    this.updateQueryNotices();
     this.refreshStoreChoices();
     this.refreshJourney();
+  },
+
+  updateQueryNotices() {
+    clearTimeout(this.noticeTimer);
+    if (!this.accountSnapshot || this.pageRetired) return;
+    const now = Date.now();
+    this.setData({
+      queryNotice: this.buildQueryNotice(this.accountSnapshot),
+      noticeDot: noticeUnreadCount(this.accountSnapshot, now) > 0,
+    });
+    const next = nextNoticeChangeAt(this.accountSnapshot, now);
+    if (this.visible && next !== null) {
+      this.noticeTimer = setTimeout(() => this.updateQueryNotices(), Math.min(2147483647, Math.max(1, next - now)));
+    }
   },
 
   onOpenNoticeBoard() {
@@ -491,6 +494,7 @@ Page({
     });
     return resolveQueryNotice({
       announcement: noticeBoot.announcement,
+      notices: noticeBoot.notices,
       consent,
       collector: noticeBoot.collector,
     });

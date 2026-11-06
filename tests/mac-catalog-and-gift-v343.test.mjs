@@ -6,7 +6,7 @@ import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import { createFixture, userKeyOf, PRODUCTS, STORES } from './helpers/fixture.mjs';
 import { runtime } from './helpers/miniprogram-runtime.mjs';
-import { v343DefaultDate, v343Scenarios, v343TextExpectations } from '../tools/ui-preview/v343-scenarios.mjs';
+import { v343BoardNotice, v343DefaultDate, v343Scenarios, v343TextExpectations } from '../tools/ui-preview/v343-scenarios.mjs';
 
 const require = createRequire(import.meta.url);
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -26,9 +26,6 @@ const {
 const { createCollector } = require('../cloudfunctions/gxs_api/lib/engine/collector');
 const { sortFamilies } = require('../miniprogram/utils/catalog-order');
 const {
-  MAC_CATALOG_NOTICE,
-  IPAD_MINI_CATALOG_NOTICE,
-  withOutageCompensationNotice,
   resolveQueryNotice, normalizeAnnouncement, liveNotices,
 } = require('../miniprogram/utils/query-notice');
 
@@ -368,60 +365,29 @@ test('background monitor loadFollowUsers extends paid member duration on 2026-10
   assert.equal(giftRow.titleText, '1 天会员 · 新品礼遇');
 });
 
-test('expired celebration banner is gone while the current Mac catalog note surfaces in bootstrap, query banner, and notice-board', async () => {
+test('old Mac campaign copy in cloud configuration and cached payloads does not reappear beside current operator notices', async () => {
   const now = '2026-10-30T04:00:00.000Z';
-  const f = createFixture({ start: now });
+  const old = { id: 'mac-catalog-2026-10-30', title: 'Mac 目录与定制款说明', text: '已结束的目录说明', kind: 'notice' };
+  const staleGift = '新款 Mac 配置已更新。10 月 28 日会员礼遇将由后台自动发放 1 天会员。';
+  const current = { id: 'opening-hours', title: '门店营业时间', text: '门店营业时间已调整。', kind: 'notice' };
+  const f = createFixture({ start: now, config: { announcement: staleGift, notices: [old, current] } });
   const boot = ok(await f.call('user.bootstrap'));
-  assert.ok(boot.announcement);
-  assert.equal(boot.announcement.title, MAC_CATALOG_NOTICE.title);
-  assert.equal(boot.announcement.kind, 'notice');
-  assert.match(boot.announcement.text, /Mac Studio 官网定制款不支持 Apple Store 店内取货/);
-  assert.doesNotMatch(boot.announcement.text, /会员礼遇|发放 1 天会员|10 月 28 日/);
+  assert.equal(boot.announcement, null);
+  assert.deepEqual(boot.notices.map(n => n.id), [current.id]);
 
-  // The primary banner is not repeated as a notice row; other current notices remain.
-  assert.ok(Array.isArray(boot.notices));
-  assert.ok(!boot.notices.some(n => n.id === MAC_CATALOG_NOTICE.id));
-  assert.ok(boot.notices.some(n => n.id === IPAD_MINI_CATALOG_NOTICE.id));
-
-  const queryBanner = resolveQueryNotice({
-    announcement: boot.announcement,
-    now: Date.parse(now),
-  });
-  assert.ok(queryBanner);
-  assert.equal(queryBanner.tone, 'info');
-  assert.match(queryBanner.text, /定制款不支持 Apple Store 店内取货/);
-
-  const fallbackPayload = withOutageCompensationNotice(
-    { serverTime: now, announcement: null, notices: [] },
-    Date.parse(now),
-  );
-  assert.equal(fallbackPayload.announcement.title, MAC_CATALOG_NOTICE.title);
-  assert.ok(!fallbackPayload.notices.some(n => n.id === MAC_CATALOG_NOTICE.id));
-  assert.ok(fallbackPayload.notices.some(n => n.id === IPAD_MINI_CATALOG_NOTICE.id));
-
-  const rt = runtime(async action => {
-    if (action === 'user.bootstrap') return boot;
-    return {};
-  });
+  const rt = runtime(async () => ({ ...boot, announcement: staleGift, notices: [old, current] }));
   const board = rt.instance('pages/notice-board/index.js');
   await board.load();
-  assert.equal(board.data.hasContent, true);
-  assert.ok(board.data.items.some(n => n.title === MAC_CATALOG_NOTICE.title && n.tone === 'info'));
-  assert.ok(!board.data.items.some(n => /会员礼遇/.test(n.title + n.text)));
-
-  const stale = createFixture({ start: now, config: {
-    announcement: '新款 Mac 配置已更新。10 月 28 日会员礼遇将由后台自动发放 1 天会员。',
-  } });
-  const staleBoot = ok(await stale.call('user.bootstrap'));
-  assert.equal(staleBoot.announcement.title, MAC_CATALOG_NOTICE.title);
-  assert.doesNotMatch(JSON.stringify(staleBoot.announcement), /会员礼遇/);
+  assert.deepEqual(Array.from(board.data.items, n => n.title), [current.title]);
+  assert.equal(board.data.items[0].text, current.text);
+  board.onUnload();
 });
 
 test('legacy CI activity fixtures assert current announcements, reject retired copy and keep exact expiry behavior', async () => {
   for (const [name, fixture] of Object.entries(v343Scenarios).filter(([, f]) => Object.hasOwn(f, 'banner'))) {
     const now = Date.parse(fixture.date || v343DefaultDate);
-    const f = createFixture({ start: fixture.serverTime || new Date(now).toISOString() });
-    const boot = withOutageCompensationNotice(ok(await f.call('user.bootstrap')), now);
+    const f = createFixture({ start: fixture.serverTime || new Date(now).toISOString(), config: { announcement: v343BoardNotice } });
+    const boot = ok(await f.call('user.bootstrap'));
     const announcement = normalizeAnnouncement(boot.announcement, now);
     const notices = liveNotices(boot.notices, now);
     const text = [announcement && announcement.title, announcement && announcement.text, ...notices.flatMap(n => [n.title, n.text])].filter(Boolean).join('\n') || '暂无有效公告';

@@ -59,7 +59,7 @@ test('a stalled cloud connection gives up after 10 seconds and the next call sta
   await assert.rejects(failed, error => error.code === 'cloud_init_failed' && /网络不太稳定/.test(error.message));
 });
 
-test('an unknown page opens the home tab and launches are counted for the add-to-app tip', () => {
+test('an unknown page opens the home tab and launch avoids the retired add-to-app counter', () => {
   const rt = runtime();
   rt.load('app.js');
   const relaunch = [];
@@ -68,8 +68,7 @@ test('an unknown page opens the home tab and launches are counted for the add-to
   assert.deepEqual(relaunch, ['/pages/query/index']);
   rt.app.onLaunch({ scene: 1001, query: {} });
   rt.app.onLaunch({ scene: 1001, query: {} });
-  assert.equal(rt.app.globalData.launchCount, 2);
-  assert.equal(rt.storage.get('gxs_launch_count_v1'), 2);
+  assert.equal(rt.storage.has('gxs_launch_count_v1'), false);
 });
 
 test('the visible page shows an offline notice and reloads once the phone reconnects', () => {
@@ -111,26 +110,15 @@ test('pages reload their failed or unconnected parts when the network returns', 
   assert.equal(retried, 1);
 });
 
-test('from the second launch the home page suggests adding the app until the tip is closed', async () => {
-  const open = async launchCount => {
-    const rt = runtime(async action => action === 'user.bootstrap' ? boot() : action === 'catalog.get' ? { unchanged: true } : {});
-    rt.app.globalData.launchCount = launchCount;
-    return rt;
-  };
-  const first = await open(1);
-  const page = first.instance('pages/query/index.js');
+test('returning to the query page offers native favorites without asking to pin the app', async () => {
+  const rt = runtime(async action => action === 'user.bootstrap' ? boot() : action === 'catalog.get' ? { unchanged: true } : {});
+  rt.storage.set('gxs_launch_count_v1', 8);
+  const page = rt.instance('pages/query/index.js');
   await page.onLoad();
-  assert.equal(page.data.addTipVisible, false, 'not on the very first launch');
-  const second = await open(2);
-  const again = second.instance('pages/query/index.js');
-  await again.onLoad();
-  assert.equal(again.data.addTipVisible, true);
-  again.onDismissAddTip();
-  assert.equal(again.data.addTipVisible, false);
-  const reopened = second.instance('pages/query/index.js');
-  await reopened.onLoad();
-  assert.equal(reopened.data.addTipVisible, false, 'closing the tip is remembered');
-  assert.equal(again.onAddToFavorites().title, '果小哨 · 门店取货查询');
+  assert.ok(!page.data.addTipVisible);
+  assert.equal(page.onAddToFavorites().title, '果小哨 · 门店取货查询');
+  assert.equal(rt.storage.get('gxs_launch_count_v1'), 8);
+  page.onUnload();
 });
 
 test('the Mine page shows the release version and names trial or develop builds', () => {

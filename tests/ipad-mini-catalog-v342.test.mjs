@@ -15,8 +15,6 @@ const {
 } = require('../cloudfunctions/gxs_api/lib/rules/follow-access');
 const { createCollector } = require('../cloudfunctions/gxs_api/lib/engine/collector');
 const {
-  IPAD_MINI_CATALOG_NOTICE,
-  withOutageCompensationNotice,
   resolveQueryNotice,
 } = require('../miniprogram/utils/query-notice');
 const { reasonText } = require('../miniprogram/utils/format');
@@ -149,7 +147,7 @@ test('retired iPad mini SKUs are blocked from queries/follows, surfaced as pause
   assert.match(page.data.follows[0].monitoringText, /改选新款配置/);
 });
 
-test('catalog seed with prune removes retired SKUs and iPad mini notice is active during the announcement window', async () => {
+test('catalog seed with prune removes retired SKUs without re-publishing the retired campaign', async () => {
   const f = createFixture({
     start: '2026-10-27T04:00:00.000Z',
     products: [{ _id: 'MXN63CH/A', partNumber: 'MXN63CH/A', familyKey: 'ipad-mini', title: 'Old iPad mini', supported: true }],
@@ -163,18 +161,9 @@ test('catalog seed with prune removes retired SKUs and iPad mini notice is activ
 
   const boot = await f.call('user.bootstrap');
   assert.equal(boot.ok, true);
-  assert.equal(boot.data.announcement.title, IPAD_MINI_CATALOG_NOTICE.title);
-  assert.equal(boot.data.announcement.text, IPAD_MINI_CATALOG_NOTICE.text);
-  const patched = withOutageCompensationNotice(
-    { ...boot.data, announcement: null },
-    f.state.now.getTime(),
-  );
-  assert.equal(patched.announcement.id, IPAD_MINI_CATALOG_NOTICE.id);
-  const banner = resolveQueryNotice({ announcement: boot.data.announcement, now: f.state.now.getTime() });
-  assert.equal(banner.text, IPAD_MINI_CATALOG_NOTICE.text);
-
-  const afterExpiry = Date.parse('2026-11-08T00:00:00+08:00');
-  assert.equal(resolveQueryNotice({ announcement: boot.data.announcement, now: afterExpiry }), null);
+  assert.equal(boot.data.announcement, null);
+  assert.deepEqual(boot.data.notices, []);
+  assert.equal(resolveQueryNotice({ announcement: boot.data.announcement, now: f.state.now.getTime() }), null);
 
   // Stale timestamped catalog in local storage or on an un-seeded server never overwrites the newer packaged seed.
   const staleCatalog = {

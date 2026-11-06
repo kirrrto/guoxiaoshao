@@ -1,13 +1,11 @@
 const cloudConfig = require('./config/cloud');
 const { readSharedSelection } = require('./utils/share');
-const { readSession, writeSession } = require('./utils/session');
 const { VERSION } = require('./config/version');
 const { reLaunch, getNavigationContext } = require('./utils/navigation');
 
 // The shared environment's auth hook can stall on a weak network. Give up after
 // this long so pages show a retry instead of waiting forever; the next call retries.
 const CLOUD_INIT_TIMEOUT_MS = 10000;
-const LAUNCH_COUNT_KEY = 'gxs_launch_count_v1';
 
 function yieldTurn() {
   // nextTick splits the SDK work into separate script tasks. A microtask is
@@ -72,7 +70,6 @@ App({
     pendingAlert: null,
     handledAlerts: [],
     singlePage: false,
-    launchCount: 0,
     lastQuery: null,
   },
 
@@ -80,7 +77,6 @@ App({
     this.runtimeVisibility = 'launching';
     // Opened from a Moments share (scene 1154): a preview without cloud access.
     this.globalData.singlePage = Boolean(options && options.scene === 1154);
-    this.launchCountReady = this.countLaunch();
     this.captureAlert(options);
     this.captureSharedTarget(options);
     if (!this.globalData.singlePage) {
@@ -93,20 +89,6 @@ App({
   /** An old shared link may name a page that no longer exists: open the home tab instead. */
   onPageNotFound() {
     reLaunch({ url: '/pages/query/index' });
-  },
-
-  countLaunch() {
-    const remember = value => {
-      const count = (Number(value) || 0) + 1;
-      this.globalData.launchCount = count;
-      writeSession(LAUNCH_COUNT_KEY, count);
-      return count;
-    };
-    if (typeof wx.getStorage === 'function') return readSession(LAUNCH_COUNT_KEY).then(remember);
-    // Compatibility fallback only; supported WeChat clients use the async API.
-    try {
-      return Promise.resolve(remember(wx.getStorageSync(LAUNCH_COUNT_KEY)));
-    } catch (e) { this.globalData.launchCount = 1; return Promise.resolve(1); }
   },
 
   // Users can change "总是保持以上选择" in WeChat settings while the app is hidden.

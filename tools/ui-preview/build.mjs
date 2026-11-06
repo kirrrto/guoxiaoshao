@@ -889,6 +889,13 @@ for (const scenario of scenarios) {
       }
       if (alternativesPreview || historyDataPreview || v2Preview && !scenario.startsWith('v331-history-claim-') && !['v2-new-product', 'v2-restricted', 'v2-paid-unconfigured'].includes(scenario) || ['member', 'longcontent', 'expired', 'empty'].includes(scenario)) await page.onQuery();
     }
+    if (historyTaskPreview && pageName === 'history') {
+      if (page.data.browseExpanded || !previewCalls.some(call => call.action === 'history.browse')) throw Error('History browse fixtures require a collapsed panel and a real browse request');
+      const requestsBeforeOpening = previewCalls.length;
+      page.onToggleBrowse();
+      if (!page.data.browseExpanded || previewCalls.length !== requestsBeforeOpening) throw Error('Opening recent conditions must expose the existing browse state without another request');
+      if (previewCalls.some(call => call.action === 'history.list' || call.action === 'query.pickup')) throw Error('Browsing recent history must not trigger a paid query');
+    }
     if (v2Preview && pageName === 'query') page.refreshJourney();
     if (alternativesPreview) {
       if (page.data.alternativesExpanded) throw Error('Alternative choices must start collapsed');
@@ -993,7 +1000,7 @@ for (const scenario of scenarios) {
         if (page.data.activation?.action === 'tasks') throw Error('Completed setup must leave the follow task list visible without a duplicate activation card');
         if (scenario === 'v2-member' && page.data.readiness?.code !== 'low_credit') throw Error('Member fixture must retain the sold-out low-credit warning');
         expectedV2Text = ['关注配置', ...({
-          'v2-free': ['给心仪的配置留个小哨'], 'v2-member': ['断货提醒只剩 2 次', '补充提醒次数'],
+          'v2-free': ['暂无库存关注'], 'v2-member': ['断货提醒只剩 2 次', '补充提醒次数'],
           'v2-unknown': ['库存待确认'], 'v2-stale': ['库存待确认'], 'v2-restricted': ['库存暂不可见'],
           'v2-service-down': ['后台状态已过期'], 'v2-paid-unconfigured': ['会员已生效，继续设置关注'],
           'v2-longcontent': [p.title],
@@ -1100,7 +1107,7 @@ for (const scenario of scenarios) {
         'notification-test-rules': ['会员同样扣次', '明确发送失败自动退回', '结果不明时暂不退回', '不会重复发送', '不查询库存或创建监测', '正式到货和断货提醒需要会员、有效关注与微信授权', '微信授权次数与查询额度分开计算', '不保证手机弹出横幅'],
         'notification-test-needs-authorization': ['尚未获得微信授权', '本次未扣次数'],
         'notification-test-uncertain-received': ['结果尚未确认', '原测试结果仍未知，扣次记录保留', '再次体验会新建测试，另消耗 1 次', '不会重复发送', '重新授权新测试'],
-      }[scenario]] : adminPreview ? { 'operator-ready': ['运行统计', '128'], 'operator-denied': ['当前账号没有管理权限', '重新检查'], 'operator-loading': ['校验权限'], 'operator-error': ['权限检查失败', '重新检查'], 'operator-longcontent': ['运行统计', '查询结果', '运营查询长文本换行验收'], 'operator-saving': ['已修改', '保存配置'] }[scenario] : historyTaskPreview ? pageName === 'history' ? ['最近浏览', '浏览不扣次数', p.title, ...{
+      }[scenario]] : adminPreview ? { 'operator-ready': ['运行统计', '128'], 'operator-denied': ['当前账号没有管理权限', '重新检查'], 'operator-loading': ['校验权限'], 'operator-error': ['权限检查失败', '重新检查'], 'operator-longcontent': ['运行统计', '查询结果', '运营查询长文本换行验收'], 'operator-saving': ['已修改', '保存配置'] }[scenario] : historyTaskPreview ? pageName === 'history' ? ['恢复最近浏览条件', '收起', p.title, ...{
         'history-member-reward': ['今日浏览任务完成，+1 次', '已计入次数明细'],
         'history-free-first': ['还没有浏览记录', '今日浏览任务完成，+1 次', '余 1 次'],
         'history-read-error': ['浏览记录加载或奖励确认未完成', '重新加载'],
@@ -1162,9 +1169,9 @@ for (const scenario of scenarios) {
         ...(stockScenarios[scenario].authorizationPending ? ['待同步 +1', '重试同步', '网络较慢，授权记录尚未同步。'] : member ? ['微信提醒授权已备好'] : []),
       ] : scenario === 'loading' ? [{ query: '正在加载商品目录', follow: '正在读取你的关注', history: '正在加载商品目录', mine: '正在读取账户信息' }[pageName]]
         : scenario === 'error' ? [pageName === 'admin' ? '模拟错误：网络连接中断' : '模拟错误：云环境连接超时', '暂时没有连上', '重试']
-        : pageName === 'mine' ? [member ? '果小哨会员' : expired ? '会员已到期' : '让小哨持续帮你留意', ...(page.data.showPurchaseShop ? page.data.membership.active ? ['延长会员', '升级套餐'] : ['开通会员'] : ['会员购买暂不可用，现有会员权益不受影响。']), '会员权益与购买规则', '提醒记录', ...(reminderPreview && reminderRecords.length ? ['删除记录', scenario === 'reminder-clearing' ? '清空中' : '清空'] : [])]
+        : pageName === 'mine' ? [member ? '果小哨会员' : expired ? '会员已到期' : '会员权益', ...(page.data.showPurchaseShop ? page.data.membership.active ? ['延长会员', '升级套餐'] : ['开通会员'] : ['会员购买暂不可用，现有会员权益不受影响。']), '会员权益与购买规则', '提醒记录', ...(reminderPreview && reminderRecords.length ? ['删除记录', scenario === 'reminder-clearing' ? '清空中' : '清空'] : [])]
         : pageName === 'follow' && follows.length ? [p.title, '2 家门店', ...(page.data.follows.some(follow => follow.detailsExpanded) ? [stores[0].name, '收起详情', '调整', '查看供应历史', '删除关注'] : ['详情与管理']), ...(sheetPreview ? ['调整关注', '选商品', '选门店', '已选 2 家门店', p.title + ' · 2 家门店', scenario === 'sheet-saving' ? '正在保存' : '保存关注'] : [])]
-        : pageName === 'follow' ? ['给心仪的配置留个小哨']
+        : pageName === 'follow' ? ['暂无库存关注']
         : pageName === 'admin' ? ['运行统计', '128'] : [p.title, ...(sheetPreview ? ['选商品', '选门店', '已选 2 家门店', '保存选择'] : [])];
       if (adminPreview && ['operator-ready', 'operator-longcontent'].includes(scenario)) expectedText.push('成功查询 56', '查看提醒详情 12', '测试通知：28 条／20 人', '各行为分别计数', ...(scenario === 'operator-longcontent' ? ['以上不是完整统计'] : []));
       if (sheetPreview) {

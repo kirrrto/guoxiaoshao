@@ -3,6 +3,9 @@
 
 page {
   /* Preserve the brand fill; text needs a darker shade on light surfaces. */
+  --cover-fill: #103D32;
+  --cover-ink: #F5FFF9;
+  --cover-muted: #C5DDCF;
   --green: #00C375;
   --green-dark: #007A49;
   --green-ink: #073C2C;
@@ -46,6 +49,7 @@ page {
    its end, so the light theme above stays exactly as designed. */
 @media (prefers-color-scheme: dark) {
   page {
+    --cover-fill: #17392F;
     --green-dark: #56DDA4;
     --green-soft: rgba(0, 195, 117, 0.16);
     --green-mist: #101713;

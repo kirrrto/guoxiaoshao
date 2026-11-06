@@ -3,7 +3,6 @@
 .notice-heading .brand-page-copy { flex: 1; min-width: 0; }
 .notice-heading .ui-action { flex: none; }
 .notice-service-footer { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12rpx; margin-top: 16rpx; }
-.notice-section-title { margin: 28rpx 6rpx 16rpx; font-size: 28rpx; font-weight: 600; color: var(--text-2); }
 .notice-card-meta { display: flex; flex-wrap: wrap; gap: 8rpx 16rpx; margin-bottom: 14rpx; font-size: 22rpx; line-height: 1.6; color: var(--text-2); }
 
 .empty-notice-title {
@@ -38,13 +37,6 @@
   min-width: 0;
 }
 
-.notice-card-stamp {
-  flex: 0 0 auto;
-  font-size: 22rpx;
-  color: var(--text-2);
-  line-height: 1.4;
-}
-
 .notice-card-text {
   font-size: 27rpx;
   line-height: 1.7;
@@ -56,8 +48,3 @@
 .notice-card--info .notice-card-title { color: var(--green-dark); }
 .notice-card--ok .notice-card-title { color: var(--green-dark); }
 .notice-card--warn .notice-card-title { color: var(--warn); }
-
-.notice-foot {
-  margin: 8rpx 8rpx 0;
-  line-height: 1.6;
-}

@@ -8,7 +8,7 @@ const boot = () => ({ identity: { userKey: 'performance-user' }, membership: { a
   limits: { queryMaxStores: 3, maxFollows: 3, maxStoresPerFollow: 3 },
   collector: { state: 'not_deployed' }, notifications: { templateIds: {} }, tasks: [], memberProduct: {} });
 
-test('native launch yields cloud SDK work and uses asynchronous launch storage while callers share the connection', async () => {
+test('native launch yields cloud SDK work and skips obsolete launch-counter storage while callers share the connection', async () => {
   const rt = runtime(), tasks = [], reads = [], writes = [];
   let constructed = 0;
   rt.wx.nextTick = callback => tasks.push(callback);
@@ -21,11 +21,8 @@ test('native launch yields cloud SDK work and uses asynchronous launch storage w
   const pending = rt.app.ensureCloud();
   assert.equal(pending, rt.app.cloudReady);
   assert.equal(constructed, 0, 'SDK construction does not run in the launch/show synchronous task');
-  assert.equal(reads.length, 1);
-  reads[0].success({ data: 1 });
-  await rt.app.launchCountReady;
-  assert.equal(rt.app.globalData.launchCount, 2);
-  assert.equal(writes[0].data, 2);
+  assert.equal(reads.length, 0);
+  assert.equal(writes.length, 0);
   for (let turn = 0; turn < 8 && !rt.app.globalData.cloud; turn += 1) {
     const batch = tasks.splice(0);
     for (const task of batch) task();

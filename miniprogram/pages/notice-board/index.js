@@ -1,6 +1,6 @@
 const navigation = require('../../utils/navigation');
 const { getBootstrap } = require('../../utils/store');
-const { normalizeAnnouncement, liveNotices, markNoticesSeen, parseTime, noticeExpiresAt, withOutageCompensationNotice } = require('../../utils/query-notice');
+const { normalizeAnnouncement, liveNotices, markNoticesSeen, parseTime, nextNoticeChangeAt } = require('../../utils/query-notice');
 const fmt = require('../../utils/format');
 const { shareAppMessage, shareTimeline } = require('../../utils/share');
 
@@ -28,18 +28,15 @@ Page({
       text: notice.text,
       tone: notice.kind === 'recovery' ? 'ok' : ['warn', 'maintenance'].includes(notice.kind) ? 'warn' : 'info',
       publishedAt: formatPublishedAt(notice.publishedAt || notice.startsAt),
-      stamp: notice.expiresAt ? `展示至 ${formatPublishedAt(notice.expiresAt)}` : '服务说明',
+      stamp: notice.expiresAt ? `展示至 ${formatPublishedAt(notice.expiresAt)}` : '',
     })).sort((a, b) => b.publishedAt.localeCompare(a.publishedAt));
     this.setData({ items, hasContent: items.length > 0 });
     if (this.visible !== false) markNoticesSeen({ announcement: boot.announcement, notices: boot.notices }, now);
     this.stopExpiryTimer();
     // Local expiry does not trigger a cloud request. Also include future notices.
-    const rawRows = [boot.announcement, ...(Array.isArray(boot.notices) ? boot.notices : [])];
-    const boundaries = rawRows.filter(row => row && typeof row === 'object')
-      .reduce((all, row) => all.concat([parseTime(row.startsAt), noticeExpiresAt(row)]), [])
-      .filter(stamp => Number.isFinite(stamp) && stamp > now);
-    if (this.visible !== false && boundaries.length) {
-      this.expiryTimer = setTimeout(() => this.renderNotices(), Math.min(60000, Math.max(1, Math.min(...boundaries) - now)));
+    const next = nextNoticeChangeAt(boot, now);
+    if (this.visible !== false && next !== null) {
+      this.expiryTimer = setTimeout(() => this.renderNotices(), Math.min(2147483647, next - now));
     }
   },
   async load(force = false) {
@@ -47,17 +44,15 @@ Page({
     this.loadingNotices = true;
     this.setData({ refreshing: true });
     try {
-      const boot = withOutageCompensationNotice(await getBootstrap(force ? { force: true } : {}));
+      const boot = await getBootstrap(force ? { force: true } : {});
       if (this.pageRetired) return;
       this.noticePayload = boot;
       const collector = boot.collector || {};
       const observationStale = Boolean(collector.observationStale);
       const state = collector.state || (observationStale ? 'stale' : null);
-      const meta = fmt.collectorMeta(observationStale && state === 'running' ? 'running' : observationStale ? 'stale' : state);
+      const meta = fmt.collectorMeta(state);
       // Delay is explained here (公告), not as a query-page alarm banner.
-      const detail = observationStale
-        ? '部分库存观测更新延迟，可下拉刷新；各配置最新时间请到「小哨」查看。'
-        : state === 'running' ? '检测服务运行正常，各配置库存时间请到「小哨」查看。' : '请到「小哨」查看受影响配置与处理入口。';
+      const detail = observationStale ? '部分库存观测更新延迟。' : '';
       this.setData({ ready: true, loadError: '', refreshedText: fmt.fmtTime(Date.now()),
         service: state || observationStale ? { label: meta.label, tone: observationStale && meta.cls === 'ok' ? 'warn' : meta.cls, detail } : null });
       this.renderNotices();

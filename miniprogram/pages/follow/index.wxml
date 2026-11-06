@@ -6,25 +6,28 @@
     <button class="btn btn-ghost btn-sm compact-action" loading="{{refreshing}}" disabled="{{refreshing || saving}}" bindtap="onRefreshStatus">{{refreshing ? '读取中' : '刷新状态'}}</button>
   </view>
   <view class="card deadline-home">
-    <view class="section-heading deadline-home-heading">
+    <view class="deadline-home-heading">
       <view class="deadline-heading-main">
-        <image class="deadline-heading-icon" src="/images/ui/calendar.png" mode="aspectFit" aria-hidden="true" />
-        <view><view class="section-title">到期提醒</view><view class="deadline-service-label">{{deadlineServiceLabel}}</view></view>
+        <view class="deadline-calendar-tile" aria-hidden="true"><image class="deadline-heading-icon" src="/images/ui/calendar.png" mode="aspectFit" /></view>
+        <view class="section-title">到期提醒</view>
       </view>
+      <text class="deadline-service-label">{{deadlineServiceLabel}}</text>
+    </view>
+    <view class="deadline-agenda">
+      <view wx:if="{{deadlinesError}}" class="deadline-home-error" aria-role="alert"><text>{{deadlinesError}}</text><button class="ui-action" disabled="{{deadlinesLoading}}" bindtap="onRetryDeadlines">重试</button></view>
+      <view wx:elif="{{deadlinesLoading && !deadlinesLoaded}}" class="small text-2" aria-busy="true">正在读取到期事项…</view>
+      <view wx:elif="{{!deadlineCount}}" class="deadline-home-empty">暂无到期事项</view>
+      <view wx:if="{{deadlineCanOpen && deadlineRecordOnly}}" class="small text-2 deadline-record-only">微信通知尚未开启。</view>
+      <view wx:for="{{deadlines}}" wx:key="id" class="deadline-home-row">
+        <view wx:if="{{deadlineCanOpen && nextDeadline && item.id === nextDeadline.id}}" class="deadline-home-next">
+          <text>下一次计划提醒</text><text class="deadline-next-time">{{item.remindText}}</text>
+        </view>
+        <view class="deadline-home-item"><text class="deadline-home-title">{{item.title}}</text><text class="deadline-home-date">{{item.dueText}}</text></view>
+        <view class="deadline-home-delivery"><text class="deadline-home-state deadline-home-state--{{item.tone}}">{{item.statusLabel}}</text><text>{{item.statusNote}}</text></view>
+      </view>
+      <button wx:if="{{deadlineCanOpen && !deadlineCount}}" class="btn btn-primary btn-block deadline-home-action" hover-class="btn-primary-pressed" disabled="{{deadlinesLoading}}" bindtap="onOpenDeadlines">添加到期事项</button>
       <button wx:if="{{deadlineCanOpen && deadlineCount}}" class="ui-action deadline-home-manage" hover-class="ui-control-pressed" disabled="{{deadlinesLoading}}" bindtap="onOpenDeadlines" aria-label="管理到期事项，共 {{deadlineCount}} 条">管理到期事项（{{deadlineCount}}）<view class="ui-chevron" aria-hidden="true"></view></button>
     </view>
-    <view wx:if="{{deadlinesError}}" class="deadline-home-error" aria-role="alert"><text>{{deadlinesError}}</text><button class="ui-action" disabled="{{deadlinesLoading}}" bindtap="onRetryDeadlines">重试</button></view>
-    <view wx:elif="{{deadlinesLoading && !deadlinesLoaded}}" class="small text-2" aria-busy="true">正在读取到期事项…</view>
-    <view wx:elif="{{!deadlineCount}}" class="deadline-home-empty">会员续费、优惠券、保修和活动截止，记在一起。</view>
-    <view wx:if="{{deadlineCanOpen && deadlineRecordOnly}}" class="small text-2">可记录到期日期，微信通知尚未开启。</view>
-    <view wx:for="{{deadlines}}" wx:key="id" class="deadline-home-row">
-      <view wx:if="{{deadlineCanOpen && nextDeadline && item.id === nextDeadline.id}}" class="deadline-home-next">
-        <text>下一次计划提醒</text><text class="deadline-next-time">{{item.remindText}}</text>
-      </view>
-      <view class="deadline-home-item"><text class="deadline-home-title">{{item.title}}</text><text class="deadline-home-date">{{item.dueText}}</text></view>
-      <view class="deadline-home-delivery"><text class="deadline-home-state deadline-home-state--{{item.tone}}">{{item.statusLabel}}</text><text>{{item.statusNote}}</text></view>
-    </view>
-    <button wx:if="{{deadlineCanOpen && !deadlineCount}}" class="btn btn-primary btn-block deadline-home-action" hover-class="btn-primary-pressed" disabled="{{deadlinesLoading}}" bindtap="onOpenDeadlines">添加到期事项</button>
   </view>
   <view class="section-heading inventory-home-heading"><text class="section-title">苹果库存</text><button class="ui-action" bindtap="onOpenInventory">查询库存</button></view>
   <view wx:if="{{loadError}}" class="card load-error" aria-role="alert">
@@ -117,8 +120,8 @@
         <view wx:if="{{!followsLoaded}}" class="card loading-line" aria-busy="true">正在确认已保存的关注…</view>
         <view wx:elif="{{!follows.length}}" class="card empty follow-empty">
           <view class="empty-symbol"><image class="empty-whistle" src="/images/brand/whistle-green.png" mode="aspectFit" aria-hidden="true" /></view>
-          <view class="empty-title">给心仪的配置留个小哨</view>
-          <view class="small mt">{{boot.member ? '选好型号、容量、颜色和门店后，后台帮你留意变化。' : '关注与到货提醒为会员专属；免费用户可用查询次数实时看货。'}}</view>
+          <view class="empty-title">暂无库存关注</view>
+          <view wx:if="{{!boot.member}}" class="small mt">关注与到货提醒为会员专属，免费用户可按次查询。</view>
           <button class="btn btn-primary btn-block" bindtap="onAdd">{{boot.member ? '添加关注' : '了解会员'}}</button>
         </view>
 

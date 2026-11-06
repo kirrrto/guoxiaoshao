@@ -6,7 +6,6 @@ import { runtime } from './helpers/miniprogram-runtime.mjs';
 
 const require = createRequire(import.meta.url);
 const { loadFollowUsers } = require('../cloudfunctions/gxs_api/lib/rules/follow-access');
-const { OUTAGE_COMPENSATION_NOTICE, withOutageCompensationNotice } = require('../miniprogram/utils/query-notice.js');
 
 const DAY = 86400000;
 const OUTAGE_TIME = '2026-10-21T04:00:00.000Z'; // 2026-10-21 12:00:00+08:00
@@ -166,7 +165,7 @@ test('free users opening the app on 2026-10-21 automatically receive 1-day trial
   assert.equal(upgraded.membership.remainingMs, 31 * DAY);
 });
 
-test('outage compensation and notice are active on 2026-10-21 and inactive on other dates', async t => {
+test('historical compensation remains effective only on its original day without reviving its expired notice', async t => {
   const before = createFixture({ start: BEFORE_OUTAGE });
   const bootBefore = ok(await before.call('user.bootstrap'));
   assert.equal(bootBefore.membership.active, false);
@@ -176,31 +175,22 @@ test('outage compensation and notice are active on 2026-10-21 and inactive on ot
   const during = createFixture({ start: OUTAGE_TIME, config: { collector: { enabled: true } } });
   const bootDuring = ok(await during.call('user.bootstrap'));
   assert.equal(bootDuring.membership.active, true);
-  assert.equal(bootDuring.announcement.kind, 'recovery');
-  assert.equal(bootDuring.announcement.title, '服务恢复与会员时长补偿');
-  assert.match(bootDuring.announcement.text, /顺延 1 天会员时长/);
-  assert.match(bootDuring.announcement.text, /1 天体验会员/);
-
-  // A dated recovery announcement is not evidence that a worker is healthy.
-  // This fixture initially has no collector checkpoint, so the actual service
-  // warning takes priority while the notice remains available on its board.
-  let nowMs = Date.parse(OUTAGE_TIME);
+  assert.equal(bootDuring.announcement, null);
+  assert.deepEqual(bootDuring.notices, []);
+  // Neither the historical grant nor an old client cache proves a successful recovery.
+  const nowMs = Date.parse(OUTAGE_TIME);
   t.mock.method(Date, 'now', () => nowMs);
   const rt = runtime(async () => ({ ...bootDuring, announcement: null, notices: [] }));
   const queryPage = rt.instance('pages/query/index.js');
-  queryPage.applyBoot(withOutageCompensationNotice({ ...bootDuring, announcement: null, notices: [] }, nowMs));
+  queryPage.applyBoot(bootDuring);
   assert.equal(bootDuring.collector.state, 'not_deployed');
-  assert.equal(queryPage.data.queryNotice.source, 'collector');
-  assert.equal(queryPage.data.queryNotice.tone, 'warn');
-  assert.doesNotMatch(queryPage.data.queryNotice.text, /已恢复/);
+  assert.equal(queryPage.data.queryNotice, null, 'an undeployed worker cannot establish an Apple API fault');
 
   await during.repo.saveCollectorStatus({ state: 'running', updatedAt: OUTAGE_TIME });
   const recoveredBoot = ok(await during.call('user.bootstrap'));
   assert.equal(recoveredBoot.collector.state, 'running');
-  queryPage.applyBoot(withOutageCompensationNotice({ ...recoveredBoot, announcement: null, notices: [] }, nowMs));
-  assert.equal(queryPage.data.queryNotice.source, 'announcement');
-  assert.equal(queryPage.data.queryNotice.tone, 'ok');
-  assert.match(queryPage.data.queryNotice.text, /顺延 1 天会员时长/);
+  queryPage.applyBoot(recoveredBoot);
+  assert.equal(queryPage.data.queryNotice, null);
 
   // A new failure supersedes an older recovery message immediately.
   await during.repo.saveCollectorStatus({ state: 'error', updatedAt: OUTAGE_TIME });
@@ -211,8 +201,7 @@ test('outage compensation and notice are active on 2026-10-21 and inactive on ot
 
   const boardPage = rt.instance('pages/notice-board/index.js');
   await boardPage.onLoad();
-  assert.equal(boardPage.data.items.length, 1);
-  assert.equal(boardPage.data.items[0].title, '服务恢复与会员时长补偿');
+  assert.equal(boardPage.data.items.length, 0);
   boardPage.onUnload();
 
   // After 2026-10-21 23:59:59+08:00, neither compensation nor notice is active

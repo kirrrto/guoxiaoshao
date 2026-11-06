@@ -6,10 +6,11 @@
 
 const SEEN_KEY = 'gxs_notice_seen_v1';
 const SEEN_MAX = 40;
-// Retired campaign copy can still arrive from an older service or client
-// bootstrap cache. Suppress the exact former title so it cannot reappear as a
-// current banner after the built-in notice has been removed.
-const RETIRED_NOTICE_TITLES = new Set(['庆祝苹果 Mac 新品发布 · 会员礼遇与目录更新']);
+// Older services and cached bootstraps may return these retired announcements.
+const RETIRED_NOTICE_IDS = new Set([
+  'mac-launch-celebration-2026-10-28', 'mac-catalog-2026-10-30',
+  'ipad-mini-catalog-2026-10-27', 'outage-compensation-2026-10-21',
+]);
 
 function parseTime(value) {
   if (typeof value === 'number' && Number.isFinite(value)) return value;
@@ -33,12 +34,16 @@ function noticeExpiresAt(raw) {
   return configured === null ? confirmedEnd : Math.min(configured, confirmedEnd);
 }
 
-/** Accept legacy strings and structured { text, kind, startsAt, expiresAt }. */
 function retiredNotice(raw) {
   if (!raw) return false;
-  const title = typeof raw === 'object' && !Array.isArray(raw) && typeof raw.title === 'string' ? raw.title.trim() : '';
-  const text = typeof raw === 'string' ? raw : typeof raw.text === 'string' ? raw.text : '';
-  return RETIRED_NOTICE_TITLES.has(title) || /10 月 28 日会员礼遇/.test(text);
+  if (RETIRED_NOTICE_IDS.has(raw.id)) return true;
+  if (raw.kind === 'maintenance' || raw.kind === 'warn') return false;
+  const text = typeof raw === 'string' ? raw.trim() : typeof raw.text === 'string' ? raw.text.trim() : '';
+  return raw.title === '庆祝苹果 Mac 新品发布 · 会员礼遇与目录更新'
+    || text.includes('10 月 28 日会员礼遇')
+    || text.startsWith('因昨晚服务器故障，目前查询与监测服务已恢复。今日（10 月 21 日）')
+    || text.startsWith('苹果商店已上架新款 iPad mini（A20 Pro），老款取货接口已停用。')
+    || text.startsWith('新款 MacBook Pro、iMac 与 Mac Studio 配置已同步。Mac Studio 官网定制款');
 }
 
 function normalizeAnnouncement(raw, now = Date.now()) {
@@ -64,56 +69,6 @@ function normalizeAnnouncement(raw, now = Date.now()) {
   };
 }
 
-const TONE = { notice: 'info', maintenance: 'info', recovery: 'ok', warn: 'warn' };
-
-const OUTAGE_COMPENSATION_NOTICE = Object.freeze({
-  id: 'outage-compensation-2026-10-21',
-  title: '服务恢复与会员时长补偿',
-  kind: 'recovery',
-  publishedAt: '2026-10-21T00:00:00+08:00',
-  startsAt: '2026-10-21T00:00:00+08:00',
-  expiresAt: '2026-10-21T23:59:59+08:00',
-  text: '因昨晚服务器故障，目前查询与监测服务已恢复。今日（10 月 21 日）已为会员及曾付费用户自动顺延 1 天会员时长，免费用户今日打开自动获赠 1 天体验会员，可在「我的」查看。',
-});
-
-const IPAD_MINI_CATALOG_NOTICE = Object.freeze({
-  id: 'ipad-mini-catalog-2026-10-27',
-  title: '新款 iPad mini 目录更新说明',
-  kind: 'notice',
-  publishedAt: '2026-10-27T00:00:00+08:00',
-  startsAt: '2026-10-27T00:00:00+08:00',
-  expiresAt: '2026-11-06T23:59:59+08:00',
-  text: '苹果商店已上架新款 iPad mini（A20 Pro），老款取货接口已停用。果小哨已同步更新新款全系配置；原关注老款的用户请点「调整」改选新款。',
-});
-
-const MAC_CATALOG_NOTICE = Object.freeze({
-  id: 'mac-catalog-2026-10-30',
-  title: 'Mac 目录与定制款说明',
-  kind: 'notice',
-  publishedAt: '2026-10-30T00:00:00+08:00',
-  startsAt: '2026-10-30T00:00:00+08:00',
-  expiresAt: '2026-11-06T23:59:59+08:00',
-  text: '新款 MacBook Pro、iMac 与 Mac Studio 配置已同步。Mac Studio 官网定制款不支持 Apple Store 店内取货，仅在配置选择中以参考信息展示；标准配置的取货查询不受影响。',
-});
-
-function withOutageCompensationNotice(payload, now = Date.now()) {
-  if (!payload || typeof payload !== 'object' || typeof payload.serverTime !== 'string') return payload;
-  const serverNow = parseTime(payload.serverTime);
-  if (serverNow === null) return payload;
-  const checkTime = Number.isFinite(now) ? now : serverNow;
-  const activeBuiltIns = [MAC_CATALOG_NOTICE, IPAD_MINI_CATALOG_NOTICE, OUTAGE_COMPENSATION_NOTICE]
-    .filter(notice => normalizeAnnouncement(notice, serverNow) && normalizeAnnouncement(notice, checkTime));
-  const builtIn = activeBuiltIns[0] || null;
-  if (!builtIn) return payload;
-  const activeAnnouncement = normalizeAnnouncement(payload.announcement, checkTime);
-  const announcement = activeAnnouncement ? payload.announcement : builtIn;
-  const rawNotices = Array.isArray(payload.notices) ? payload.notices : [];
-  const boardBuiltIns = (activeAnnouncement && activeAnnouncement.text !== builtIn.text ? activeBuiltIns : activeBuiltIns.slice(1))
-    .filter(notice => !rawNotices.some(item => item && item.id === notice.id));
-  const notices = boardBuiltIns.length ? [...boardBuiltIns, ...rawNotices] : rawNotices;
-  return { ...payload, announcement, notices };
-}
-
 /** Extra operator texts for the notice board; empty/expired rows are dropped. */
 function liveNotices(raw, now = Date.now()) {
   if (!Array.isArray(raw)) return [];
@@ -136,6 +91,19 @@ function liveNotices(raw, now = Date.now()) {
 
 function hasLiveNoticeContent({ announcement, notices } = {}, now = Date.now()) {
   return Boolean(normalizeAnnouncement(announcement, now) || liveNotices(notices, now).length);
+}
+
+// Re-evaluate visible rows locally at their next start or expiry.
+function nextNoticeChangeAt(payload = {}, now = Date.now()) {
+  let next = Infinity;
+  const rows = [payload.announcement, ...(Array.isArray(payload.notices) ? payload.notices : [])];
+  for (const row of rows) {
+    if (!row || typeof row !== 'object' || !row.text || retiredNotice(row)) continue;
+    for (const time of [parseTime(row.startsAt), noticeExpiresAt(row)]) {
+      if (time > now && time < next) next = time;
+    }
+  }
+  return next === Infinity ? null : next;
 }
 
 /** An edit to the same notice must become unread again, including announcements. */
@@ -193,13 +161,15 @@ function markNoticesSeen(payload, now = Date.now()) {
 
 /**
  * Pick the single banner for the query notice region.
- * Priority: maintenance/warning → consent → actual fault → ordinary notice.
+ * Priority: maintenance/warning → consent → actual fault. Other notices stay on the board.
  * Expired announcements never claim the service recovered.
  */
-function resolveQueryNotice({ announcement, now = Date.now(), consent = null, collector = null } = {}) {
-  const active = normalizeAnnouncement(announcement, now);
-  if (active && ['maintenance', 'warn'].includes(active.kind)) {
-    return { tone: TONE[active.kind] || 'info', text: active.text, source: 'announcement', kind: active.kind };
+function resolveQueryNotice({ announcement, notices, now = Date.now(), consent = null, collector = null } = {}) {
+  const urgent = notice => notice && (notice.kind === 'maintenance' || notice.kind === 'warn');
+  const banner = normalizeAnnouncement(announcement, now);
+  const active = urgent(banner) ? banner : liveNotices(notices, now).find(urgent);
+  if (active) {
+    return { tone: active.kind === 'warn' ? 'warn' : 'info', text: active.text, source: 'announcement', kind: active.kind };
   }
   if (consent && consent.anyBlocked) {
     const names = (consent.blocked || []).map(item => item.title).join('、') || '微信提醒';
@@ -211,11 +181,12 @@ function resolveQueryNotice({ announcement, now = Date.now(), consent = null, co
     };
   }
   const state = collector && collector.state;
-  const stale = Boolean(collector && collector.observationStale);
-  const serviceUp = state === 'running' || state === 'idle';
   // Observation delay is a service-status detail (公告页), not a query-page
   // banner. Only a real upstream/collector fault earns the loud warning.
-  if (!serviceUp && (stale || state)) {
+  if (state === 'no_lease' || state === 'stopped') {
+    return { tone: 'warn', text: '后台监测已中断，已关注配置的库存观测可能延迟。', source: 'collector', action: 'refresh' };
+  }
+  if (['throttled', 'error', 'failed'].includes(state)) {
     return {
       tone: 'warn',
       text: '取货接口状态异常，查询结果可能不完整或失败。以实际查询返回和苹果官网为准。',
@@ -223,12 +194,11 @@ function resolveQueryNotice({ announcement, now = Date.now(), consent = null, co
       action: 'refresh',
     };
   }
-  return active ? { tone: TONE[active.kind] || 'info', text: active.text, source: 'announcement', kind: active.kind } : null;
+  return null;
 }
 
 module.exports = {
-  OUTAGE_COMPENSATION_NOTICE, IPAD_MINI_CATALOG_NOTICE, MAC_CATALOG_NOTICE,
-  withOutageCompensationNotice,
+  nextNoticeChangeAt,
   parseTime, noticeExpiresAt, normalizeAnnouncement, liveNotices, hasLiveNoticeContent, resolveQueryNotice,
   noticeFingerprint, noticeUnreadCount, markNoticesSeen,
 };

@@ -1,7 +1,7 @@
 .history-page { padding-left: 24rpx; padding-right: 24rpx; }
 .history-page .card { padding: 24rpx; margin-bottom: 20rpx; border-radius: 24rpx; }
 .history-heading { display: flex; justify-content: space-between; align-items: center; gap: 16rpx; margin: 0 6rpx 22rpx; }
-.history-heading .page-title { font-size: 38rpx; letter-spacing: 0; }
+.history-heading .page-title { font-size: max(22px, 46rpx); letter-spacing: 0; font-weight: 700; }
 .history-explain.ui-action { flex: none; gap: 8rpx; padding: 10rpx 14rpx; }
 .history-explain .ui-icon { width: 16px; height: 16px; }
 .history-config-summary { display: flex; align-items: center; gap: 18rpx; }
@@ -14,22 +14,22 @@
 .history-store-scope { display: flex; align-items: flex-start; gap: 10rpx; margin-top: 16rpx; font-size: max(12px, 24rpx); line-height: 1.55; color: var(--text-2); }
 .history-store-scope .ui-icon { width: 16px; height: 16px; margin-top: 2rpx; }
 .history-store-scope > text { flex: 1; min-width: 0; overflow-wrap: anywhere; }
-.history-config-empty { padding: 6rpx 0; }
-.history-date-row { display: flex; align-items: stretch; gap: 12rpx; margin-top: 20rpx; padding-top: 20rpx; border-top: 1rpx solid var(--line); }
-.history-date-shortcuts { display: flex; gap: 8rpx; flex: none; }
-.history-date-chip.ui-action { justify-content: center; min-width: 44px; min-height: 44px; padding: 8rpx 10rpx; border-radius: 16rpx; font-size: max(12px, 24rpx); }
-.history-date-chip--selected.ui-action { color: var(--green-dark); border-color: var(--control-line); background: var(--green-soft); font-weight: 600; }
-.history-date-picker { display: block; flex: 1; min-width: 0; }
-.history-date-control { display: flex; align-items: center; justify-content: space-between; gap: 10rpx; min-height: 44px; height: 100%; box-sizing: border-box; padding: 10rpx 14rpx; border: 1rpx solid var(--line); border-radius: 16rpx; background: var(--surface-soft); color: var(--text-2); }
+.history-date-row { display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 16rpx 18rpx; margin-bottom: 24rpx; padding: 6rpx 0 24rpx; border-bottom: 2rpx solid var(--text); }
+.history-date-picker { display: block; flex: 1 1 330rpx; min-width: 0; }
+.history-date-control { display: flex; flex-direction: column; align-items: flex-start; gap: 6rpx; min-height: 44px; color: var(--text); }
+.history-date-caption, .history-date-line { display: flex; align-items: center; gap: 12rpx; }
+.history-date-caption { color: var(--text-2); font-size: max(12px, 24rpx); }
 .history-date-control .ui-icon { width: 16px; height: 16px; }
-.history-date-control .ui-chevron { width: 6px; height: 6px; }
-.history-date-value { flex: 1; min-width: 0; color: var(--text); font-size: max(12px, 25rpx); font-weight: 600; line-height: 1.5; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.history-date-control .ui-chevron { width: 8px; height: 8px; color: var(--green-dark); }
+.history-date-value { color: var(--text); font-size: max(24px, 50rpx); font-weight: 650; line-height: 1.25; font-variant-numeric: tabular-nums; }
+.history-date-shortcuts { display: flex; flex: none; padding: 4rpx; border-radius: 18rpx; background: var(--surface-soft); }
+.history-date-chip.ui-action { justify-content: center; min-width: 44px; min-height: 44px; padding: 8rpx 12rpx; border: 0; border-radius: 14rpx; background: transparent; font-size: max(12px, 24rpx); }
+.history-date-chip--selected.ui-action { color: var(--card); background: var(--green-dark); font-weight: 600; }
 .history-date-control--disabled { opacity: .55; }
 .history-restriction-note { margin-top: 12rpx; }
-.history-selection-card > .btn-primary { margin-top: 20rpx; }
+.history-selection-card > .btn-primary.mt { margin-top: 20rpx; }
 .history-query-cost { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 6rpx 16rpx; margin-top: 14rpx; font-size: max(12px, 24rpx); line-height: 1.5; color: var(--text-2); }
 .history-query-cost > text:first-child { color: var(--green-dark); }
-.history-scope-note { margin-top: 8rpx; line-height: 1.5; }
 .history-task-bar { display: flex; align-items: center; justify-content: space-between; gap: 16rpx; margin: 0 4rpx 20rpx; padding: 14rpx 18rpx; border-radius: 16rpx; background: var(--surface-soft); border: 1rpx solid var(--line); }
 .history-task-note { flex: 1; min-width: 0; margin: 0; line-height: 1.5; }
 .history-task-claim.btn { flex: none; width: auto; height: auto; min-height: 44px; margin: 0; padding: 6rpx 16rpx; font-size: max(12px, 24rpx); line-height: 1.45; }
@@ -74,8 +74,8 @@
 .history-recent-copy { flex: 1; min-width: 0; overflow-wrap: anywhere; }
 .history-restore { flex: 0 0 auto; min-width: 76px; max-width: 44%; }
 @media (max-width: 340px) {
-  .history-date-control { gap: 8rpx; padding-left: 10rpx; padding-right: 10rpx; }
-  .history-date-control .ui-icon { display: none; }
+  .history-date-row { align-items: flex-start; }
+  .history-date-picker { flex-basis: 100%; }
   .history-config-summary { gap: 14rpx; }
   .history-product-media { width: 72rpx; height: 88rpx; }
   .history-product-image { width: 64rpx; height: 80rpx; }

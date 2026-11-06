@@ -1,15 +1,22 @@
 .whistle-heading { display: flex; align-items: center; gap: 20rpx; }
-.whistle-mark { display: flex; align-items: center; justify-content: center; flex: 0 0 80rpx; width: 80rpx; height: 80rpx; border-radius: 24rpx; background: var(--green-soft); }
-.whistle-heading-image { display: block; width: 54rpx; height: 54rpx; }
+.whistle-heading .page-title { font-size: max(22px, 46rpx); font-weight: 700; }
 .whistle-heading-copy { flex: 1; min-width: 0; }
 .compact-action.btn { flex: none; width: auto; min-width: 64px; min-height: 44px; padding: 0 20rpx; }
-.deadline-home-empty { font-size: max(14px, 28rpx); color: var(--text-2); line-height: 1.6; }
-.deadline-heading-main { display: flex; flex: 1 1 auto; align-items: center; gap: 16rpx; min-width: 0; }
-.deadline-heading-icon { flex: none; width: 38px; height: 38px; padding: 9px; border-radius: 12px; background: var(--green-soft); }
-.deadline-service-label { margin-top: 2rpx; font-size: max(12px, 24rpx); color: var(--text-2); }
+.follow-page .card.deadline-home { overflow: hidden; padding: 0; }
+.deadline-home-heading { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12rpx 20rpx; padding: 28rpx; background: var(--cover-fill); color: var(--cover-ink); }
+.deadline-heading-main { display: flex; align-items: center; gap: 18rpx; min-width: 0; }
+.deadline-calendar-tile { display: flex; align-items: center; justify-content: center; flex: none; width: 70rpx; height: 70rpx; border-radius: 16rpx; background: var(--cover-ink); }
+.deadline-heading-icon { display: block; width: 38rpx; height: 38rpx; }
+.follow-page .deadline-home-heading .section-title { color: inherit; font-size: max(20px, 40rpx); }
+.deadline-service-label { color: var(--cover-muted); font-size: max(12px, 24rpx); line-height: 1.5; }
+.deadline-agenda { padding: 22rpx 28rpx; }
+.deadline-home-empty { font-size: max(14px, 28rpx); color: var(--text); line-height: 1.6; }
+.deadline-record-only { margin-bottom: 12rpx; }
+.deadline-home-empty + .deadline-record-only { margin: 6rpx 0 0; }
 .deadline-home-next { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4rpx 14rpx; margin-bottom: 10rpx; color: var(--text-2); font-size: max(12px, 25rpx); line-height: 1.5; overflow-wrap: anywhere; }
 .deadline-next-time { color: var(--text); font-size: max(16px, 32rpx); font-weight: 650; font-variant-numeric: tabular-nums; }
-.deadline-home-row { padding: 18rpx 0; border-top: 1rpx solid var(--line); }
+.deadline-home-row { padding: 20rpx 0; border-top: 1rpx solid var(--line); }
+.deadline-home-row:first-child { padding-top: 0; border-top: 0; }
 .deadline-home-item { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6rpx 16rpx; }
 .deadline-home-title { flex: 1 1 180rpx; min-width: 0; font-size: max(14px, 28rpx); line-height: 1.6; color: var(--text); font-weight: 600; overflow-wrap: anywhere; }
 .deadline-home-date { font-size: max(12px, 25rpx); line-height: 1.6; color: var(--text-2); }
@@ -19,12 +26,13 @@
 .deadline-home-state--warn { color: var(--warn); }
 .deadline-home-state--bad { color: var(--bad); }
 .deadline-home-action.btn { min-height: 44px; height: auto; padding: 18rpx 24rpx; margin-top: 18rpx; line-height: 1.5; white-space: normal; }
+.deadline-home-manage.ui-action { width: 100%; justify-content: space-between; padding-left: 20rpx; padding-right: 20rpx; }
 .deadline-home-error { display: flex; flex-wrap: wrap; gap: 12rpx; align-items: center; font-size: max(12px, 26rpx); line-height: 1.6; color: var(--warn); }
 .deadline-home-error > text { flex: 1 1 240rpx; overflow-wrap: anywhere; }
 .inventory-home-heading { margin-top: 34rpx; }
 .inventory-home-recent { display: flex; flex-direction: column; gap: 4rpx; padding-bottom: 24rpx; font-size: max(12px, 26rpx); line-height: 1.6; color: var(--text-2); overflow-wrap: anywhere; }
 .inventory-home-recent .bold { color: var(--text); }
-.follow-page .deadline-home .section-title, .follow-page .inventory-home-heading .section-title { font-size: max(14px, 28rpx); }
+.follow-page .inventory-home-heading .section-title { font-size: max(18px, 36rpx); }
 .section-heading { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8rpx 16rpx; margin-bottom: 16rpx; }
 .section-title { color: var(--text); font-size: 32rpx; line-height: 1.5; font-weight: 650; }
 .follow-count { color: var(--text-2); font-size: 26rpx; margin-left: 12rpx; }

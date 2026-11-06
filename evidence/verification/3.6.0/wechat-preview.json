@@ -1,14 +1,14 @@
 {
   "version": "3.6.0",
   "kind": "WeChat DevTools CLI preview",
-  "generatedAt": "2026-11-06T06:37:36.992Z",
-  "sourceFingerprint": "sha256:e1f6cab6f59b40a40fd32251da546a5bdb4a2fb5dfe413f14a55162efef2538d",
+  "generatedAt": "2026-11-06T07:16:10.801Z",
+  "sourceFingerprint": "sha256:484a8430e6d3e8a00d9beec4091f676d0546672c63b292d69340cbc0b65e80f5",
   "mainPackage": {
-    "total": 1135713,
+    "total": 1127125,
     "packages": [
       {
         "name": "TOTAL",
-        "size": 1135713
+        "size": 1127125
       }
     ]
   },
@@ -21,6 +21,16 @@
     {
       "change": "Explicitly included theme.json in project.config.json packOptions.",
       "previewBytes": 1135757
+    },
+    {
+      "sourceFingerprint": "sha256:e1f6cab6f59b40a40fd32251da546a5bdb4a2fb5dfe413f14a55162efef2538d",
+      "generatedAt": "2026-11-06T06:37:36.992Z",
+      "previewBytes": 1135713,
+      "note": "First candidate, before notice cleanup and the four-page redesign."
+    },
+    {
+      "previewBytes": 1126914,
+      "note": "Visual candidate before the 320px follow heading and landscape spacing corrections."
     }
   ],
   "scope": "Development preview code generated for authorized WeChat testers to scan. Public testing, member trial assignment, store publication, production cloud deployment, on-device test results and review approval are separate."

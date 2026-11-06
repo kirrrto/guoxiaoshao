@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-11-06T06:37:26.549Z",
+  "checkedAt": "2026-11-06T07:16:03.701Z",
   "version": "3.6.0",
   "scope": "Local source and recorded quality evidence only; no cloud deployment, real-device retest, account-console inspection or submission",
   "publicationReady": false,
@@ -7,7 +7,7 @@
   "qualityGate": {
     "passed": false,
     "version": "3.6.0",
-    "sourceFingerprint": "sha256:e1f6cab6f59b40a40fd32251da546a5bdb4a2fb5dfe413f14a55162efef2538d",
+    "sourceFingerprint": "sha256:484a8430e6d3e8a00d9beec4091f676d0546672c63b292d69340cbc0b65e80f5",
     "blockers": [
       {
         "id": "unused-channel-video",
@@ -280,7 +280,7 @@
   ],
   "frontend": {
     "files": 246,
-    "sourceBytes": 1320000,
+    "sourceBytes": 1307740,
     "imageBytes": 178761,
     "imageMaxBytes": 204800,
     "mainPackageMaxBytes": 1572864,
@@ -337,7 +337,7 @@
   "consumerPackage": {
     "miniprogramRoot": "miniprogram/",
     "sourceFilesAfterExclusions": 242,
-    "sourceBytesAfterExclusions": 1306796,
+    "sourceBytesAfterExclusions": 1294536,
     "excludedBytes": 13204,
     "excludedFiles": [
       "config/product-launches.js",

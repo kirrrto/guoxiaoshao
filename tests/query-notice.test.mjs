@@ -36,20 +36,21 @@ test('active maintenance banners render and win over collector noise', () => {
   assert.equal(notice.text, '苹果官网维护中');
 });
 
-test('ordinary catalog notices yield to consent and faults while maintenance keeps priority', () => {
-  const { MAC_CATALOG_NOTICE: announcement } = require('../miniprogram/utils/query-notice.js');
+test('ordinary notices stay on the board; faults and consent appear on the home page and maintenance takes priority', () => {
+  const announcement = { text: '门店营业时间已调整。', kind: 'notice', startsAt: '2026-10-30T00:00:00+08:00' };
   const now = Date.parse('2026-10-30T12:00:00+08:00');
   const consent = { anyBlocked: true };
   const fault = { state: 'error', observationStale: true };
   assert.equal(resolveQueryNotice({ announcement, now, consent, collector: fault }).source, 'consent');
   assert.equal(resolveQueryNotice({ announcement, now, collector: fault }).source, 'collector');
   for (const state of ['running', 'idle']) {
-    assert.equal(resolveQueryNotice({ announcement, now, collector: { state, observationStale: true } }).source, 'announcement');
+    assert.equal(resolveQueryNotice({ announcement, now, collector: { state, observationStale: true } }), null);
   }
   assert.equal(resolveQueryNotice({ announcement: { ...announcement, kind: 'maintenance' }, now, consent, collector: fault }).source, 'announcement');
   assert.equal(resolveQueryNotice({ announcement, now: Date.parse('2026-11-07T00:00:00+08:00'), collector: fault }).source, 'collector');
   assert.equal(normalizeAnnouncement(announcement, Date.parse('2026-10-29T23:59:59+08:00')), null);
-  assert.doesNotMatch(announcement.text, /会员礼遇|发放 1 天|已发放|已赠送/);
+  assert.equal(hasLiveNoticeContent({ announcement }, now), true);
+  assert.equal(noticeUnreadCount({ announcement }, now), 1);
 });
 
 test('blocked WeChat subscribe permission is a recoverable query banner', () => {
@@ -124,4 +125,14 @@ test('opening the notice board clears the red dot until a new notice appears', (
   } finally {
     global.wx = previous;
   }
+});
+
+test('a live maintenance row surfaces above an ordinary banner and yields to a configured urgent banner', () => {
+  const general = { kind: 'notice', text: '普通公告' };
+  const urgent = { kind: 'maintenance', text: '正在维护' };
+  const expired = { text: '过期告警', kind: 'warn', expiresAt: new Date(NOW).toISOString() };
+  const payload = { announcement: general, notices: [general, expired, urgent], consent: { anyBlocked: true }, now: NOW };
+  assert.equal(resolveQueryNotice(payload).text, urgent.text);
+  assert.equal(resolveQueryNotice({...payload, announcement: { kind: 'warn', text: '优先告警' }}).text, '优先告警');
+  assert.equal(resolveQueryNotice({...payload, notices: [general, expired]}).source, 'consent');
 });

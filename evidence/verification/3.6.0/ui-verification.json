@@ -1,7 +1,14 @@
 {
-  "scope": "Headless Chromium rendering WXML/WXSS with offline synthetic records; WeChat preview, simulator and physical-device checks have separate evidence.",
-  "sourceFingerprint": "sha256:e1f6cab6f59b40a40fd32251da546a5bdb4a2fb5dfe413f14a55162efef2538d",
-  "uiSourceHash": "a280e1e3ee9e2a78b4e1c2042433ac73bb180b9e847dc4c5bca3ea9a398c4466",
+  "scope": "Headless Chromium rendering WXML/WXSS with offline synthetic records. WeChat compilation, development preview, and physical-device results are separate.",
+  "sourceFingerprint": "sha256:484a8430e6d3e8a00d9beec4091f676d0546672c63b292d69340cbc0b65e80f5",
+  "uiSourceHash": "d2f5a5f316003b037268a8acc4f005c103422a64df77e1c8ac766cc966165d41",
+  "correctionsVerified": [
+    {
+      "page": "follow",
+      "issue": "At a 320px viewport the deadline title was reduced to 11.9467px by a later page-level rule; 13 states failed in each theme.",
+      "resolution": "The header now retains its 20px minimum. Both 96-case v350 layout suites pass at the original thresholds."
+    }
+  ],
   "previewChecks": {
     "v360": {
       "cases": 96,
@@ -227,18 +234,14 @@
     "command": "detect --json --viewport 375x780 --no-consent-hiding --no-overlay-hiding <4 loopback fixtures>",
     "exitCode": 2,
     "raw": "impeccable-warnings.json",
-    "warnings": 22,
+    "warnings": 21,
     "previewChrome": 20,
     "remaining": [
       {
         "rule": "nested-cards",
         "selector": "div.follow-stock-panel.follow-stock-panel--ok"
-      },
-      {
-        "rule": "nested-cards",
-        "selector": "div.history-date-control"
       }
     ],
-    "disposition": "The offline notice and simulated native tab labels are preview-only. In-app groupings retain a dated inventory observation and a date selection control, respectively."
+    "disposition": "The 11px offline notice and 10px simulated native-tab labels belong to the browser fixture. The inventory panel intentionally groups the observation and its status within the followed configuration."
   }
 }

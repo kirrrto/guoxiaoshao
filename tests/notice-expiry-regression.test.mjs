@@ -5,7 +5,7 @@ import { createFixture } from './helpers/fixture.mjs';
 import { runtime } from './helpers/miniprogram-runtime.mjs';
 
 const require = createRequire(import.meta.url);
-const { normalizeAnnouncement, liveNotices, noticeUnreadCount, resolveQueryNotice } = require('../miniprogram/utils/query-notice.js');
+const { normalizeAnnouncement, liveNotices, noticeUnreadCount, resolveQueryNotice, nextNoticeChangeAt } = require('../miniprogram/utils/query-notice.js');
 const END = Date.parse('2026-10-16T20:20:00+08:00');
 const oldNotice = { id: 'unknown-production-id', title: '接口限流说明',
   publishedAt: '2026-10-16T14:00:00+08:00', kind: 'warn',
@@ -90,4 +90,47 @@ test('an already open board removes the legacy row at its inferred end without a
   assert.equal(rt.calls.length, calls);
   page.onUnload();
   assert.equal(rt.timers.size, 0);
+});
+
+test('the three retired campaigns are suppressed in both legacy payload shapes without hiding a new maintenance warning', async () => {
+  const now = Date.parse('2026-11-06T06:00:00Z');
+  const retired = [
+    ['mac-catalog-2026-10-30', '新款 MacBook Pro、iMac 与 Mac Studio 配置已同步。Mac Studio 官网定制款不支持门店取货。'],
+    ['ipad-mini-catalog-2026-10-27', '苹果商店已上架新款 iPad mini（A20 Pro），老款取货接口已停用。'],
+    ['outage-compensation-2026-10-21', '因昨晚服务器故障，目前查询与监测服务已恢复。今日（10 月 21 日）已为会员延长时长。'],
+  ];
+  const fresh = { id: 'maintenance-november', title: '服务恢复与会员时长补偿', text: '晚间维护，会员可在结束后重试。', kind: 'maintenance' };
+  for (const [id, text] of retired) {
+    const raw = { id, text: '缓存内的旧活动', expiresAt: new Date(now + 10000).toISOString() };
+    const server = await bootstrap([raw, fresh], now, text);
+    assert.equal(server.announcement, null);
+    assert.deepEqual(server.notices.map(item => item.id), [fresh.id]);
+    const oldCache = { announcement: text, notices: [raw] };
+    assert.equal(normalizeAnnouncement(text, now), null);
+    assert.equal(liveNotices(oldCache.notices, now).length, 0);
+    assert.equal(noticeUnreadCount(oldCache, now), 0);
+    assert.equal(nextNoticeChangeAt(oldCache, now), null);
+  }
+  assert.equal(normalizeAnnouncement(fresh, now).text, fresh.text);
+  assert.equal(resolveQueryNotice({ announcement: fresh, now }).source, 'announcement');
+});
+
+test('an open query page clears the unread dot and urgent banner precisely at expiry without another network call', async t => {
+  let now = END - 1000;
+  t.mock.method(Date, 'now', () => now);
+  const rt = runtime(), page = rt.instance('pages/query/index.js');
+  page.visible = true;
+  page.accountSnapshot = { collector: {state: 'running'}, announcement: {kind: 'warn', text: '临时维护', expiresAt: new Date(END).toISOString()} };
+  page.updateQueryNotices();
+  assert.equal(page.data.noticeDot, true);
+  assert.equal(page.data.queryNotice.text, '临时维护');
+  assert.equal(rt.timers.get(page.noticeTimer).ms, 1000);
+  const calls = rt.calls.length;
+  now = END;
+  await rt.nextTimer();
+  assert.equal(page.data.noticeDot, false);
+  assert.equal(page.data.queryNotice, null);
+  assert.equal(rt.calls.length, calls);
+  assert.equal(rt.timers.size, 0);
+  page.onUnload();
 });

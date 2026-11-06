@@ -10,37 +10,11 @@ const { paymentProduct, paymentProducts } = require('../payment/service');
 const { runtimeFor } = require('../growth-policy');
 const { validateDndPeriods, MAX_DND_PERIODS } = require('../rules/dnd');
 
-const OUTAGE_COMPENSATION_NOTICE = Object.freeze({
-  id: 'outage-compensation-2026-10-21',
-  title: '服务恢复与会员时长补偿',
-  kind: 'recovery',
-  publishedAt: '2026-10-21T00:00:00+08:00',
-  startsAt: '2026-10-21T00:00:00+08:00',
-  expiresAt: '2026-10-21T23:59:59+08:00',
-  text: '因昨晚服务器故障，目前查询与监测服务已恢复。今日（10 月 21 日）已为会员及曾付费用户自动顺延 1 天会员时长，免费用户今日打开自动获赠 1 天体验会员，可在「我的」查看。',
-});
-
-const IPAD_MINI_CATALOG_NOTICE = Object.freeze({
-  id: 'ipad-mini-catalog-2026-10-27',
-  title: '新款 iPad mini 目录更新说明',
-  kind: 'notice',
-  publishedAt: '2026-10-27T00:00:00+08:00',
-  startsAt: '2026-10-27T00:00:00+08:00',
-  expiresAt: '2026-11-06T23:59:59+08:00',
-  text: '苹果商店已上架新款 iPad mini（A20 Pro），老款取货接口已停用。果小哨已同步更新新款全系配置；原关注老款的用户请点「调整」改选新款。',
-});
-
-const RETIRED_NOTICE_TITLES = new Set(['庆祝苹果 Mac 新品发布 · 会员礼遇与目录更新']);
-
-const MAC_CATALOG_NOTICE = Object.freeze({
-  id: 'mac-catalog-2026-10-30',
-  title: 'Mac 目录与定制款说明',
-  kind: 'notice',
-  publishedAt: '2026-10-30T00:00:00+08:00',
-  startsAt: '2026-10-30T00:00:00+08:00',
-  expiresAt: '2026-11-06T23:59:59+08:00',
-  text: '新款 MacBook Pro、iMac 与 Mac Studio 配置已同步。Mac Studio 官网定制款不支持 Apple Store 店内取货，仅在配置选择中以参考信息展示；标准配置的取货查询不受影响。',
-});
+// Older services and cached bootstraps may return these retired announcements.
+const RETIRED_NOTICE_IDS = new Set([
+  'mac-launch-celebration-2026-10-28', 'mac-catalog-2026-10-30',
+  'ipad-mini-catalog-2026-10-27', 'outage-compensation-2026-10-21',
+]);
 
 function noticeExpiresAt(raw) {
   const configured = raw.expiresAt ? Date.parse(raw.expiresAt) : NaN;
@@ -54,12 +28,16 @@ function noticeExpiresAt(raw) {
   return Number.isFinite(configured) && configured < Date.parse(confirmedEnd) ? raw.expiresAt : confirmedEnd;
 }
 
-/** Drop expired structured banners; legacy strings have no clock and stay until cleared. */
 function retiredNotice(raw) {
   if (!raw) return false;
-  const title = typeof raw === 'object' && !Array.isArray(raw) && typeof raw.title === 'string' ? raw.title.trim() : '';
-  const text = typeof raw === 'string' ? raw : typeof raw.text === 'string' ? raw.text : '';
-  return RETIRED_NOTICE_TITLES.has(title) || /10 月 28 日会员礼遇/.test(text);
+  if (RETIRED_NOTICE_IDS.has(raw.id)) return true;
+  if (raw.kind === 'maintenance' || raw.kind === 'warn') return false;
+  const text = typeof raw === 'string' ? raw.trim() : typeof raw.text === 'string' ? raw.text.trim() : '';
+  return raw.title === '庆祝苹果 Mac 新品发布 · 会员礼遇与目录更新'
+    || text.includes('10 月 28 日会员礼遇')
+    || text.startsWith('因昨晚服务器故障，目前查询与监测服务已恢复。今日（10 月 21 日）')
+    || text.startsWith('苹果商店已上架新款 iPad mini（A20 Pro），老款取货接口已停用。')
+    || text.startsWith('新款 MacBook Pro、iMac 与 Mac Studio 配置已同步。Mac Studio 官网定制款');
 }
 
 function liveAnnouncement(raw, now) {
@@ -204,21 +182,6 @@ async function bootstrap(ctx) {
   ]);
   const { catalogMeta, collectorStatus } = metadata;
   const monitoring = monitoringSnapshot(ctx.config, collectorStatus, ctx.now);
-  const activeBuiltIns = [MAC_CATALOG_NOTICE, IPAD_MINI_CATALOG_NOTICE, OUTAGE_COMPENSATION_NOTICE]
-    .map(raw => ({ raw, live: liveAnnouncement(raw, ctx.now) }))
-    .filter(item => item.live);
-  const builtInNotice = activeBuiltIns[0] || null;
-  const configuredBanner = liveAnnouncement(ctx.config.announcement, ctx.now);
-  const configuredNotices = liveNotices(ctx.config.notices, ctx.now);
-  const announcement = configuredBanner || (builtInNotice ? {
-    ...builtInNotice.live,
-    title: builtInNotice.raw.title,
-    publishedAt: builtInNotice.raw.publishedAt,
-  } : null);
-  const extraBuiltIns = (configuredBanner ? activeBuiltIns : activeBuiltIns.slice(1))
-    .filter(item => !configuredNotices.some(row => row.id === item.raw.id))
-    .map(item => ({ id: item.raw.id, title: item.raw.title, publishedAt: item.raw.publishedAt, ...item.live }));
-  const notices = extraBuiltIns.length ? [...extraBuiltIns, ...configuredNotices] : configuredNotices;
   return {
     collector: monitoring.collector,
     serverTime: ctx.nowIso,
@@ -237,8 +200,8 @@ async function bootstrap(ctx) {
     settings: user.settings,
     subscriptions: user.subscriptions || {},
     catalogVersion: catalogMeta ? catalogMeta.version : null,
-    announcement,
-    notices,
+    announcement: liveAnnouncement(ctx.config.announcement, ctx.now),
+    notices: liveNotices(ctx.config.notices, ctx.now),
     ...runtimeFor(ctx.config, user._id),
   };
 }

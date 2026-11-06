@@ -11,17 +11,15 @@
   <block wx:else>
     <view wx:if="{{service}}" class="card notice-service">
       <view class="notice-card-head"><text class="notice-card-title">后台最近状态</text><view class="pill pill-{{service.tone}}">{{service.label}}</view></view>
-      <view class="small text-2">{{loadError ? '当前未能更新，以下为上次读取的服务状态。' : service.detail}}</view>
+      <view wx:if="{{loadError || service.detail}}" class="small text-2">{{loadError ? '当前未能更新，以下为上次读取的服务状态。' : service.detail}}</view>
       <view class="notice-service-footer"><text class="tiny muted">读取于 {{refreshedText}}</text><button class="ui-action" bindtap="onGoFollows">查看我的小哨</button></view>
     </view>
-    <view class="notice-section-title">服务说明</view>
     <view wx:if="{{!hasContent && !loadError}}" class="card empty-notice"><view class="empty-notice-title">暂无有效公告</view></view>
     <view wx:for="{{items}}" wx:key="key" class="card notice-card notice-card--{{item.tone}}">
       <view class="notice-card-head"><text class="notice-card-title">{{item.title}}</text></view>
-      <view class="notice-card-meta"><text wx:if="{{item.publishedAt}}">发布 {{item.publishedAt}}</text><text>{{item.stamp}}</text></view>
+      <view wx:if="{{item.publishedAt || item.stamp}}" class="notice-card-meta"><text wx:if="{{item.publishedAt}}">发布 {{item.publishedAt}}</text><text wx:if="{{item.stamp}}">{{item.stamp}}</text></view>
       <view class="notice-card-text">{{item.text}}</view>
     </view>
-    <view class="notice-foot tiny muted">发布时间不代表当前故障，实时库存与观测时间请看对应配置。</view>
     <button class="btn btn-outline btn-block mt" bindtap="onGoHelp">没有收到提醒？查看排查步骤</button>
   </block>
 </view>

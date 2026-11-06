@@ -1,6 +1,6 @@
 {
   "version": "3.6.0",
-  "checkedAt": "2026-11-06T06:37:21.858Z",
+  "checkedAt": "2026-11-06T07:15:50.377Z",
   "scope": "Offline compilation of packaged WXML and WXSS using the executable compilers bundled with WeChat DevTools. Historical sources excluded via project packOptions are omitted. Runtime, wxapkg, phones and upload are separate checks.",
   "workingDirectory": "miniprogram",
   "compilerDirectory": "WeChat DevTools/resources/app.asar.unpacked/node_modules/wcc-exec",
@@ -27,7 +27,7 @@
     },
     {
       "file": "./pages/follow/index.wxml",
-      "sha256": "9b546f9413c0cceeb8b565dc120491d679226e3f306c4f997a63bcdf5638d959"
+      "sha256": "5c51a64bc8bed028888621fcb2ce70b331685b6a8b0438f08123eb118d051d80"
     },
     {
       "file": "./pages/guide/index.wxml",
@@ -35,15 +35,15 @@
     },
     {
       "file": "./pages/history/index.wxml",
-      "sha256": "63913a69ad73b63d6008c2b385d6f20b3ce778e2cdc2d6ef17a5d572602ff4e4"
+      "sha256": "63cbaef9191da2d1d9d146f8a12f99bb6b6492d815777ef2b270b095e477be84"
     },
     {
       "file": "./pages/mine/index.wxml",
-      "sha256": "413f42dedd0207996982a58ffbdf84dca87a647ee9f8f232e690c4cef8e0c1bc"
+      "sha256": "b4bc7040db2bab36cbed538466ef593b8e8b095e1aff9c9a31ea58c19c1feeb9"
     },
     {
       "file": "./pages/notice-board/index.wxml",
-      "sha256": "516a55ef230c78a593e5c71a4608a23d007114c9da821b331ffb7cd5cdab501b"
+      "sha256": "d11d3003186104d80745355bda328c579f9571c9cad349a4183ec9919d127d6a"
     },
     {
       "file": "./pages/notification-test/index.wxml",
@@ -51,11 +51,11 @@
     },
     {
       "file": "./pages/query/index.wxml",
-      "sha256": "3fc17f1be8a88a27e0c40b8e6ccb43d39bd3cb03d598f09f66ddac8de28b40cc"
+      "sha256": "13ae24ddd59276cf4f540cb08d88f52491804a28e8398c0e2a1a233e63864188"
     },
     {
       "file": "./app.wxss",
-      "sha256": "2f290403f723b250a804af1c5994d77ff1863cae3002eaa1c66994373324b29a"
+      "sha256": "5b3249c69013e27705dc7b6a2cefecf30e3e60f789d8d89ccfb29cb6bcdadd0a"
     },
     {
       "file": "./components/config-sheet/index.wxss",
@@ -79,7 +79,7 @@
     },
     {
       "file": "./pages/follow/index.wxss",
-      "sha256": "8e81d23c2f7d3e7c92de61b1fe3ca60f683c92b24684b4d21276738fa587ae92"
+      "sha256": "7c50289f05bcb3ae5247bb952e96064f7d6349add54ad5ba327dadb4e9d18fce"
     },
     {
       "file": "./pages/guide/index.wxss",
@@ -87,15 +87,15 @@
     },
     {
       "file": "./pages/history/index.wxss",
-      "sha256": "0005f0d49abd72aa1caee85ff2d64dcdecf154b3df2f87d0505b31024484a294"
+      "sha256": "05c2186297b4f366a61fd4e92488102611a78eb92329eb6fd9399a1cb9f632db"
     },
     {
       "file": "./pages/mine/index.wxss",
-      "sha256": "876f7a8d84fe9eb3bed2b20301dec2fed6956e9d3087363877e4d360bfdc9830"
+      "sha256": "4e6d2075ca676027e619b85b0f287772f75702236275907676627b1321ef2132"
     },
     {
       "file": "./pages/notice-board/index.wxss",
-      "sha256": "4447e5e0552730100399e9169b6056643fd952ecb5cc2f2660c2cbb27048231f"
+      "sha256": "983b90d995ca94126343afe856e557a6e40340313e58210aff3b5886575460c8"
     },
     {
       "file": "./pages/notification-test/index.wxss",
@@ -103,7 +103,7 @@
     },
     {
       "file": "./pages/query/index.wxss",
-      "sha256": "4c714120ba0787016edc5f4157ff17cdabe0d711d53fa4983b57755e72e2c27d"
+      "sha256": "d092dee43412a3011b2033c39984137f750fd7163037b02e2e55121f2988deab"
     },
     {
       "file": "./styles/common.wxss",
@@ -136,8 +136,8 @@
       ],
       "exitCode": 0,
       "diagnostic": "",
-      "outputBytes": 369848,
-      "outputSha256": "fa574109939369c6c3469d111a28422576af5051849d3cdb2ea80ae40529bdca"
+      "outputBytes": 368082,
+      "outputSha256": "25bf367c09cae9e218c9231cb4d513c5cfef321d453a77f8b8f6e12581817f32"
     },
     {
       "binary": "wcsc.exe",
@@ -165,8 +165,8 @@
       ],
       "exitCode": 0,
       "diagnostic": "",
-      "outputBytes": 190938,
-      "outputSha256": "527894ec9b14587c32bc59545172b59b9fb5b130868aa9082bbbaf75ea9951b7"
+      "outputBytes": 183973,
+      "outputSha256": "7603305bd8b533f10d6f56a0829e003c67f2edaa086de1b0451df92005a604d2"
     }
   ],
   "excludedFiles": [
