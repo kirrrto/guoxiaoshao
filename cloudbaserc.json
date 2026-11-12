@@ -5,18 +5,16 @@
     {
       "name": "gxs_api",
       "timeout": 60,
-      "envVariables": {},
-      "runtime": "Nodejs20.19",
-      "installDependency": true,
-      "ignore": ["node_modules/**", ".cloudbase_temp/**"]
+      "runtime": "Nodejs18.15",
+      "installDependency": false,
+      "ignore": [".cloudbase_temp/**", ".git/**"]
     },
     {
       "name": "gxs_monitor",
       "timeout": 60,
-      "envVariables": {},
       "runtime": "Nodejs20.19",
-      "installDependency": true,
-      "ignore": ["node_modules/**", ".cloudbase_temp/**"]
+      "installDependency": false,
+      "ignore": [".cloudbase_temp/**", ".git/**"]
     }
   ]
 }

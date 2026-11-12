@@ -7,6 +7,7 @@ import { spawnSync } from 'node:child_process';
 import { checkMonitorBundle } from '../lib/monitor-bundle.mjs';
 import { fingerprintQualitySource, validateQualityFindings } from './quality-findings.mjs';
 import { hasConsumerEntry } from './consumer-entry.mjs';
+import { compareInstalledDependencies } from './installed-dependencies.mjs';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const require = createRequire(import.meta.url);
 const json = file => JSON.parse(fs.readFileSync(path.join(root, file), 'utf8'));
@@ -32,6 +33,19 @@ check('local private config does not bypass domain validation', !fs.existsSync(p
 const connection = json('config/cloudbase.connection.json');
 const miniConnection = require(path.join(root, 'miniprogram/config/cloud.js'));
 const backendConnection = require(path.join(root, 'cloudfunctions/gxs_api/lib/connection.js'));
+const deploy = json('cloudbaserc.json');
+check('business deployment bundles locked dependencies and preserves live runtime settings',
+  deploy.envId === connection.envId && deploy.functionRoot === 'cloudfunctions'
+  && deploy.functions.length === 2 && ['gxs_api', 'gxs_monitor'].every(name => {
+    const fn = deploy.functions.find(f => f.name === name);
+    return fn?.installDependency === false && fn.envVariables === undefined
+      && fn.runtime === (name === 'gxs_api' ? 'Nodejs18.15' : 'Nodejs20.19')
+      && fn.ignore.every(rule => ['.cloudbase_temp/**', '.git/**'].includes(rule));
+  }));
+for (const name of ['gxs_api', 'gxs_monitor']) {
+  const deps = compareInstalledDependencies(path.join(root, 'cloudfunctions', name));
+  check(`${name}: all installed production dependencies match the lock file`, deps.passed);
+}
 for (const name of ['gxs_api', 'cloudbase_auth', 'gxs_monitor']) {
   const pkg = json(`cloudfunctions/${name}/package.json`), lock = json(`cloudfunctions/${name}/package-lock.json`);
   check(`${name}: package and lock versions match release ${project.version}`, pkg.version === project.version && lock.version === project.version && lock.packages[''].version === project.version);

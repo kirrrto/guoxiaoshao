@@ -33,15 +33,16 @@ async function mapLimit(items, concurrency, fn) {
 function presentResult({ observation, latest, events, outcome, reused }, nowMs) {
   // Corrupt future timestamps cannot overrule a real response obtained now.
   const validLatest = latest && Number.isFinite(Date.parse(latest.observedAt)) && Date.parse(latest.observedAt) <= nowMs;
-  const superseded = outcome === 'stale' && validLatest;
-  const current = superseded ? { ...observation, status: latest.unknownSince ? 'unknown' : latest.status, quote: latest.quote, observedAt: latest.observedAt, reason: latest.lastReason || null } : observation;
+  const superseded = (outcome === 'stale' || outcome === 'duplicate') && validLatest;
+  const current = superseded ? { ...observation, status: latest.unknownSince ? 'unknown' : latest.status,
+    quote: latest.unknownSince ? null : latest.quote, observedAt: latest.observedAt, reason: latest.lastReason || null } : observation;
   return {
     storeNumber: observation.storeNumber, storeName: observation.storeName || (latest && latest.storeName) || null,
     partNumber: observation.partNumber, status: current.status, quote: current.quote,
     productTitle: observation.productTitle || (latest && latest.productTitle) || null,
     observedAt: current.observedAt, reason: current.reason, statusSince: validLatest ? latest.statusSince : null,
     superseded: Boolean(superseded),
-    reused: Boolean(reused),
+    reused: Boolean(reused || (superseded && current.status !== 'unknown')),
     events: events.map(e => ({ type: e.type, detectedAt: e.detectedAt })),
   };
 }
@@ -105,10 +106,13 @@ async function pickup(ctx, payload, { existingOnly = false, maxCost } = {}) {
     const recorded = batches.flatMap(batch => batch.record.budgetDenied
       ? batch.observations.map(observation => ({ observation, latest: null, events: [], outcome: 'not_sampled' }))
       : batch.recorded);
-    const allUnknown = recorded.length === 0 || recorded.every(r => r.observation.status === 'unknown');
-    const allShared = recorded.length > 0 && recorded.every(r => r.reused);
-    const sharedResult = recorded.some(r => r.reused);
-    const hasNewValidResult = recorded.some(r => !r.reused && r.observation.status !== 'unknown');
+    // A manual reply may lose the persistence race to a later automatic sample.
+    // Settle the query using the exact same observations the user receives.
+    const results = recorded.map(item => presentResult(item, ctx.clock().getTime()));
+    const allUnknown = results.every(r => r.status === 'unknown');
+    const allShared = results.length > 0 && results.every(r => r.reused);
+    const sharedResult = results.some(r => r.reused);
+    const hasNewValidResult = results.some(r => !r.reused && r.status !== 'unknown');
     refund = !hasNewValidResult;
     const retryAt = Math.max(0, ...batches.map(batch => Number(batch.record.retryAt) || 0));
     const guardReason = batches.find(batch => batch.record.budgetDenied)?.record.error.message
@@ -118,9 +122,9 @@ async function pickup(ctx, payload, { existingOnly = false, maxCost } = {}) {
     response = { ok: !allUnknown, reason: allUnknown ? reason : null, queryId,
       sharedResult, allShared, billingReason: refund && sharedResult ? 'shared_result_no_charge' : refund ? 'no_valid_result' : null,
       budgetScope: guardReason === 'daily_budget' ? 'daily' : guardReason === 'minute_budget' ? 'minute' : guardReason === 'capacity_wait' ? 'continuous' : null,
-      retryAfterMs: Math.max(0, retryAt - ctx.clock().getTime()), partial: !allUnknown && recorded.some(item => item.observation.status === 'unknown'),
+      retryAfterMs: Math.max(0, retryAt - ctx.clock().getTime()), partial: !allUnknown && results.some(item => item.status === 'unknown'),
       product: { partNumber: product.partNumber, title: product.title, model: product.model, familyName: product.familyName },
-      results: recorded.map(item => presentResult(item, ctx.clock().getTime())), queriedAt: ctx.nowIso,
+      results, queriedAt: ctx.nowIso,
       transport: batches.map((batch, i) => ({ storeNumber: storeNumbers[i], httpStatus: batch.record.httpStatus, elapsedMs: batch.record.elapsedMs, error: batch.record.error ? batch.record.error.message : null })),
     };
   } catch (error) {

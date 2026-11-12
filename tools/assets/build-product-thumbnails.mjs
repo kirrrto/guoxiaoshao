@@ -40,13 +40,21 @@ if (args.includes('--check')) {
   if (manifest.encoder.transparent.alphaSnap.length !== 2) throw Error('thumbnail_encoder_policy_mismatch:alphaSnap');
   if (manifest.catalogSha256 !== hash(await readFile(resolve(root, 'catalog/products.json')))) throw Error('thumbnail_catalog_changed');
   if (manifest.mappingSha256 !== hash(await readFile(resolve(root, destinations.mapping)))) throw Error('thumbnail_mapping_changed');
+  // The consumer package uses explicit file exclusions (also checked at
+  // release). An on-disk image can decode successfully and still be omitted.
+  const project = JSON.parse(await readFile(resolve(root, 'project.config.json'), 'utf8'));
+  const ignored = project.packOptions?.ignore || [];
+  if (ignored.some(rule => rule.type !== 'file' || typeof rule.value !== 'string')) throw Error('thumbnail_package_exclusions_unverified');
+  const excludedFiles = new Set(ignored.map(rule => resolve(root, project.miniprogramRoot, rule.value)));
   let totalBytes = 0;
   // Packaged renditions must be phone-decodable: WeChat documents <image webp>
   // for network resources only, and packaged WebP failed in phone previews.
   const signatures = { PNG: ['.png', bytes => bytes.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]))],
     JPEG: ['.jpg', bytes => bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff] };
   for (const entry of manifest.assets) for (const rendition of entry.renditions) {
-    const bytes = await readFile(resolve(root, 'miniprogram', rendition.path.slice(1)));
+    const imagePath = resolve(root, 'miniprogram', rendition.path.slice(1));
+    if (excludedFiles.has(imagePath)) throw Error(`thumbnail_excluded_from_package:${rendition.path}`);
+    const bytes = await readFile(imagePath);
     const [extension, matches] = signatures[rendition.format] || [];
     if (!matches || !rendition.path.endsWith(extension) || !matches(bytes) || rendition.format !== (rendition.hasTransparency ? 'PNG' : 'JPEG')) throw Error(`unsupported_thumbnail_format:${rendition.path}`);
     if (hash(bytes) !== rendition.sha256 || bytes.length !== rendition.bytes) throw Error(`invalid_thumbnail:${rendition.path}`);
@@ -71,7 +79,7 @@ if (args.includes('--check')) {
     if (/\.(?:png|jpg|jpeg|gif|svg)$/i.test(file)) imageBytes += (await stat(resolve(root, 'miniprogram', file))).size;
   }
   if (imageBytes > policy.imageMaxBytes) throw Error(`image_package_budget:${imageBytes}`);
-  console.log(JSON.stringify({ checked: manifest.assets.length, skus: Object.keys(mapping.byPart).length, totalBytes, mainPackageRawBytes }));
+  console.log(JSON.stringify({ checked: manifest.assets.length, verifiedPackageRenditions: knownPaths.size, skus: Object.keys(mapping.byPart).length, totalBytes, mainPackageRawBytes }));
 } else {
   const cache = resolve(root, 'output/product-image-sources');
   await mkdir(cache, { recursive: true });

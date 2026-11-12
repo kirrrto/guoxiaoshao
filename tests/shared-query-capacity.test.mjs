@@ -90,6 +90,49 @@ test('a corrupt future available sample cannot replace a freshly fetched unavail
   assert.equal(latest.statusConfirmed, false, 'repair starts a fresh, unconfirmed observation streak');
 });
 
+for (const { name, autoStatus, laterMs, stores, expected, charged } of [
+  { name: 'later unknown', autoStatus: 'unknown', laterMs: 2, stores: ['R577'], expected: ['unknown'], charged: 0 },
+  { name: 'same-time known', autoStatus: 'unavailable', laterMs: 0, stores: ['R577'], expected: ['unavailable'], charged: 0 },
+  { name: 'one fresh store with one later unknown', autoStatus: 'unknown', laterMs: 2, stores: ['R577', 'R639'], expected: ['unknown', 'available'], charged: 1 },
+]) {
+  test(`manual pickup settles the persisted results after an automatic race: ${name}`, async () => {
+    const fetchImpl = fakeFetch(() => ({ display: 'available' }));
+    const f = createFixture({ config, fetchImpl });
+    ok(await f.call('user.bootstrap', {}));
+    ok(await f.call('quota.signin', {}));
+    const balance = (await f.repo.getUser(userKeyOf())).quota.balance;
+    const record = f.repo.recordObservation;
+    const target = { storeNumber: 'R577', partNumber: 'MXXX1CH/A', source: 'auto' };
+    await record({ observation: { ...target, status: 'available', quote: '旧的取货承诺',
+      observedAt: new Date(f.state.now.getTime() - 15000).toISOString() } });
+    f.repo.recordObservation = async args => {
+      if (args.observation.storeNumber === target.storeNumber) {
+        f.advance(laterMs);
+        await record({ observation: { ...target, status: autoStatus, observedAt: f.state.now.toISOString() } });
+      }
+      return record(args);
+    };
+    const request = payload('race-settlement', stores);
+    const result = ok(await f.call('query.pickup', request));
+    assert.deepEqual(result.results.map(row => row.status), expected);
+    assert.equal(result.results[0].superseded, true);
+    assert.equal(result.results[0].reused, autoStatus !== 'unknown');
+    assert.equal(result.results[0].quote, null);
+    assert.equal(result.ok, expected.some(status => status !== 'unknown'));
+    assert.equal(result.partial, expected.length === 2);
+    assert.equal(result.charged - result.refunded, charged);
+    assert.equal(result.balance, balance - charged);
+    const replay = ok(await f.call('query.pickup', request));
+    assert.equal(replay.replayed, true);
+    assert.deepEqual(replay.results, result.results);
+    assert.equal(replay.balance, balance - charged);
+    assert.equal(fetchImpl.calls.length, stores.length);
+    const [latest] = await f.repo.getLatest(['R577|MXXX1CH/A']);
+    assert.equal(latest.source, 'auto');
+    assert.equal(latest.sampleCount, 2);
+  });
+}
+
 test('cached valid results plus a failed fresh store do not consume a free query credit', async () => {
   const fetchImpl = fakeFetch({ R639: { status: 500, body: 'unavailable' } });
   const f = createFixture({ config, fetchImpl });

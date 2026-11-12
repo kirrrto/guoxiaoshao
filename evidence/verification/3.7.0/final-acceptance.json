@@ -1,0 +1,203 @@
+{
+  "version": "3.7.0",
+  "dateBeijing": "2026-11-13",
+  "baseCommit": "57e389418ae3db245ea1f5668e3f0e1715356dd9",
+  "sourceFingerprint": "sha256:8524b68336fb1f4019610409ce733a15759fc9cc4738d241db832cd902d45e20",
+  "candidateQuerySourceSha256": "8569a14f53296dde171f28d5e01e2fdb1e6ddd1505982ba8684d0441bb74090d",
+  "outcome": "Experience upload is appropriate. Formal release acceptance is not complete.",
+  "source": {
+    "tests": {
+      "tests": 1970,
+      "pass": 1970,
+      "fail": 0,
+      "skipped": 0
+    },
+    "sourceChecksPassed": 64,
+    "monitorBundleFiles": 50,
+    "candidateDependencyAudit": [
+      {
+        "directory": "cloudfunctions/gxs_api",
+        "publishedAdvisories": 0
+      },
+      {
+        "directory": "cloudfunctions/gxs_monitor",
+        "publishedAdvisories": 0
+      },
+      {
+        "directory": "cloudfunctions/cloudbase_auth",
+        "publishedAdvisories": 0
+      },
+      {
+        "directory": "tools/collector",
+        "publishedAdvisories": 0
+      },
+      {
+        "directory": ".",
+        "publishedAdvisories": 0
+      }
+    ]
+  },
+  "native": {
+    "checkedAt": "2026-11-12T17:15:02.433Z",
+    "devtoolsVersion": "2.02.2611122",
+    "sdk": "3.17.3",
+    "tabs": [
+      "pages/query/index",
+      "pages/follow/index",
+      "pages/history/index",
+      "pages/mine/index"
+    ],
+    "checks": {
+      "catalogAccountAndRules": true,
+      "followAndDeadlinesRead": true,
+      "historyDateRoundTrip": true,
+      "membershipAndReminderSettings": true
+    },
+    "transportFaultInjection": {
+      "errCode": -601008,
+      "readRecovered": true,
+      "readAttempts": 2,
+      "paidAttempts": 1,
+      "productionPaidQueries": 0
+    }
+  },
+  "images": {
+    "catalogSkus": 397,
+    "count": 119,
+    "allDecoded": true,
+    "officialDeviceResult": false
+  },
+  "quality": {
+    "openIds": [
+      "unused-channel-video",
+      "custom-tabbar-first-switch",
+      "oversized-product-image",
+      "legacy-product-image-format"
+    ],
+    "emptySdkControls": [
+      "3.17.3",
+      "3.17.5",
+      "3.17.6"
+    ],
+    "officialReportMatchedToCandidate": false,
+    "frontendUploadMatchedToCandidate": false,
+    "deviceReceiptProven": false
+  },
+  "cloudBeforeHotfix": {
+    "checkedAt": "2026-11-12T17:16:00.363Z",
+    "functions": [
+      {
+        "name": "gxs_api",
+        "version": "3.7.0",
+        "sourceCompared": 85,
+        "trackedFilesDifferingFromCandidate": [
+          "lib/services/query.js"
+        ],
+        "matchedInstalledPaths": 97,
+        "comparedDependencyFiles": 5762,
+        "minutes": 10,
+        "successfulNaturalTimerInvocations": 2
+      },
+      {
+        "name": "gxs_monitor",
+        "version": "3.7.0",
+        "sourceCompared": 55,
+        "trackedFilesDifferingFromCandidate": [],
+        "matchedInstalledPaths": 97,
+        "comparedDependencyFiles": 5762,
+        "minutes": 10,
+        "successfulNaturalTimerInvocations": 10
+      }
+    ],
+    "monitorGroups": 20,
+    "monitorObservations": 44,
+    "monitorIntervalSeconds": 60,
+    "availableRecheckSeconds": 0,
+    "availableDuringRead": 3,
+    "sharedAuthorization": "Preserved as requested, including existing two-application policy and known legacy dependency advisories."
+  },
+  "preparedApiZip": {
+    "zipSha256": "ff0d7e073639cadc738bdbbda88ff3153925f5a132e68fc1e5e417a271936d85",
+    "size": 7811054,
+    "release": "3.7.0",
+    "dependencies": 97,
+    "sourceMatch": true,
+    "triggerAndLockMatch": true
+  },
+  "threeStoreCapacity": {
+    "inputs": "collector-capacity-input.json",
+    "requirements": {
+      "members": 300,
+      "storesPerMember": 3,
+      "distinctTargets": 900,
+      "maxRequestsPerMinute": 600
+    },
+    "productionTraffic": 0,
+    "runs": [
+      {
+        "clock": "advancing local Date.now, fixed simulated cloud observation time",
+        "completeQueries": 185,
+        "partialQueries": 1,
+        "notCompleted": 114,
+        "knownTargets": 556,
+        "netMemberDebits": 0
+      },
+      {
+        "clock": "Date.now frozen, as in existing capacity contract, no application deadline consumption by test harness",
+        "completeQueries": 199,
+        "partialQueries": 1,
+        "notCompleted": 100,
+        "knownTargets": 599,
+        "netMemberDebits": 0
+      }
+    ],
+    "productionLoadProven": false
+  },
+  "residual": [
+    "No current official WeChat report linked to this exact client upload",
+    "Physical phone receipt unverified for this candidate",
+    "300 representative simultaneous queries not satisfied in multi-store simulation",
+    "Continuous three-second checks for available targets not enabled in production"
+  ],
+  "cloudAfterHotfix": {
+    "function": "gxs_api",
+    "submittedAt": "2026-11-12T17:23:28.174Z",
+    "activeReadBackAt": "2026-11-12T17:23:57.027Z",
+    "cloudArchiveSha256": "1c7a160aaf4f32c3fd3a1ec58eb0b1074b236314bfd8cc7265781af341cb3436",
+    "retainedBackupSha256": "0b5672952097740525aad36f429d989c78c58c618521a040edc407e673aa1809",
+    "source": {
+      "sourceFiles": 85,
+      "sourceDifferences": [],
+      "includesLockAndConfig": true,
+      "expectedDependencyPaths": 97,
+      "matchedDependencyPaths": 97,
+      "dependencyFiles": 5762,
+      "dependencyFilesDiffer": 0,
+      "excludedDependencyMetadata": [
+        ".bin",
+        ".package-lock.json"
+      ],
+      "packageVersion": "3.7.0"
+    },
+    "settingsEnvironmentAndTriggersUnchanged": true,
+    "otherFunctionUpdates": 0,
+    "realAccountAfterDeployment": {
+      "passed": true,
+      "sessionStart": "2026-11-12T17:24:17.061Z",
+      "sdk": "3.17.3",
+      "checks": {
+        "catalogAccountAndRules": true,
+        "followAndDeadlinesRead": true,
+        "historyDateRoundTrip": true,
+        "membershipAndReminderSettings": true
+      }
+    },
+    "naturalTimer": {
+      "startedAt": "2026-11-12T17:25:01.813Z",
+      "finishedAt": "2026-11-12T17:25:12.797Z",
+      "source": "TRIGGER_TIMER",
+      "platformStatus": 200,
+      "businessState": "completed"
+    }
+  }
+}
