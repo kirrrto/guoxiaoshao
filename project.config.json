@@ -1,5 +1,8 @@
 {
   "miniprogramRoot": "miniprogram/",
+  "watchOptions": {
+    "ignore": ["output/**"]
+  },
   "cloudfunctionRoot": "cloudfunctions/",
   "setting": {
     "urlCheck": true,

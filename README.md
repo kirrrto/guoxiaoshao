@@ -87,7 +87,7 @@
 
 ## 本地开发与检查
 
-微信开发者工具导入含有 [project.config.json](project.config.json) 的仓库目录；该文件的 `miniprogramRoot` 指向 [miniprogram/app.json](miniprogram/app.json) 所在目录。若提示「在项目根目录未找到 app.json」，先核对实际导入目录和本地私有配置；两者都正确仍报错时，关闭项目、在开发者工具 CLI 运行 `reset-fileutils` 后重新打开。勿在仓库外层复制一份 app.json。运营工具单独导入 [tools/admin-miniprogram](tools/admin-miniprogram/README.md)，服务端仍校验管理员身份。
+微信开发者工具导入含有 [project.config.json](project.config.json) 的仓库目录；该文件的 `miniprogramRoot` 指向 [miniprogram/app.json](miniprogram/app.json) 所在目录。若提示「在项目根目录未找到 app.json」，先核对实际导入目录和本地私有配置。若磁盘上的入口存在，关闭并重新打开该工程，使文件监听器重新扫描。工程的 `watchOptions.ignore` 会排除 `output/**` 下的部署归档和测试产物。若重开仍报错，可运行开发者工具 CLI 的 `reset-fileutils` 后再打开。运营工具单独导入 [tools/admin-miniprogram](tools/admin-miniprogram/README.md)，服务端仍校验管理员身份。
 
 ```powershell
 npm ci
