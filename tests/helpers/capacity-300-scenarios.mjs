@@ -6,18 +6,26 @@ import { createFixture, fakeFetch, operatorContext, userContext, PRODUCTS, STORE
 const require = createRequire(import.meta.url);
 const { createHandler } = require('../../cloudfunctions/gxs_api/lib/app');
 const { guardedPickup } = require('../../cloudfunctions/gxs_api/lib/engine/guarded-pickup');
-const { mergeConfig } = require('../../cloudfunctions/gxs_api/lib/config');
+const { DEFAULTS, mergeConfig, validateConfig } = require('../../cloudfunctions/gxs_api/lib/config');
 const { COLLECTIONS: C } = require('../../cloudfunctions/gxs_api/lib/collections');
 const { CAPACITY_ID, capacityLimits } = require('../../cloudfunctions/gxs_api/lib/engine/capacity-budget');
 const quiet = { error() {}, warn() {}, info() {} };
 export const CLIENTS = 300;
 export const slowUpstreamMs = 2500;
-const config = { collector: { budgetMode: 'continuous', enabled: true }, query: { sharedFreshnessSeconds: 10 } };
+function simulationConfig(collector = {}) {
+  if (!collector || typeof collector !== 'object' || Array.isArray(collector)
+    || Object.entries(collector).some(([key, value]) => !Object.hasOwn(DEFAULTS.collector, key)
+      || typeof value !== typeof DEFAULTS.collector[key])) {
+    throw new Error('Expected a collector-only JSON object containing recognized collector settings');
+  }
+  return validateConfig(mergeConfig({ collector: { budgetMode: 'continuous', enabled: true, ...collector }, query: { sharedFreshnessSeconds: 10 } }));
+}
 const requireOk = result => { if (!result.ok) throw new Error(`fixture/API rejection: ${result.error?.code}`); return result.data; };
 const partOf = i => `M${String(i).padStart(4, '0')}CH/A`;
 const percentile = (values, fraction) => [...values].sort((a, b) => a - b)[Math.min(values.length - 1, Math.floor(values.length * fraction))] || 0;
 
-export async function capacityFixture({ latencyMs = 0, start = '2026-10-01T12:00:00.000Z' } = {}) {
+export async function capacityFixture({ latencyMs = 0, start = '2026-10-01T12:00:00.000Z', collector } = {}) {
+  const config = simulationConfig(collector);
   const fastFetch = fakeFetch(() => ({ display: 'available' }));
   const fetchImpl = async (...args) => { if (latencyMs) await delay(latencyMs); return fastFetch(...args); };
   fetchImpl.calls = fastFetch.calls;
@@ -42,7 +50,7 @@ export async function capacityFixture({ latencyMs = 0, start = '2026-10-01T12:00
     else counters.denied[result.reason] = (counters.denied[result.reason] || 0) + 1;
     return result;
   };
-  return { f, contexts, fetchImpl, counters, config: mergeConfig(config) };
+  return { f, contexts, fetchImpl, counters, config };
 }
 
 function publicCapacity(s) {
@@ -67,13 +75,19 @@ export async function queryWave(s, { name, distinct = false, stores = ['R577'], 
   }));
   const reasons = {};
   for (const { result } of rows) if (!result.ok) reasons[result.reason] = (reasons[result.reason] || 0) + 1;
+  const transportErrors = {};
+  for (const { result } of rows) {
+    for (const entry of result.transport || []) {
+      if (entry.error) transportErrors[entry.error] = (transportErrors[entry.error] || 0) + 1;
+    }
+  }
   const results = rows.flatMap(row => row.result.results || []);
   const samples = s.fetchImpl.calls.slice(beforeCalls);
   const uniqueRequests = new Set(samples.map(call => `${call.storeNumber}|${call.parts.slice().sort().join(',')}`));
   const summary = { name, clients: CLIENTS, simulatedAt: s.f.state.now.toISOString(), requestedTargetReads: CLIENTS * stores.length,
     distinctRequestedTargets: (distinct ? CLIENTS : 1) * stores.length,
     successfulQueries: rows.filter(row => row.result.ok).length, fullySuccessfulQueries: rows.filter(row => row.result.ok && !row.result.partial).length,
-    partialQueries: rows.filter(row => row.result.partial).length, busyOrFailedQueries: rows.filter(row => !row.result.ok).length, reasons,
+    partialQueries: rows.filter(row => row.result.partial).length, busyOrFailedQueries: rows.filter(row => !row.result.ok).length, reasons, transportErrors,
     knownTargetReads: results.filter(row => row.status !== 'unknown').length, reusedTargetReads: results.filter(row => row.reused).length,
     upstreamHttp: samples.length, duplicateTargetHttpWithinWave: samples.length - uniqueRequests.size,
     targetClaimCalls: s.counters.targetClaims - beforeClaims, budgetChecks: s.counters.budgetChecks - beforeBudgetChecks,
@@ -86,8 +100,8 @@ export async function queryWave(s, { name, distinct = false, stores = ['R577'], 
   return summary;
 }
 
-export async function runBurstScenario({ name, distinct = false, stores = ['R577'], latencyMs = 0 } = {}) {
-  const s = await capacityFixture({ latencyMs });
+export async function runBurstScenario({ name, distinct = false, stores = ['R577'], latencyMs = 0, collector } = {}) {
+  const s = await capacityFixture({ latencyMs, collector });
   const report = await queryWave(s, { name, distinct, stores });
   const latest = [...s.f.repo.tables.get(C.latest).values()];
   return { ...report, simulatedUpstreamLatencyMs: latencyMs, persistedSamples: latest.reduce((sum, item) => sum + item.sampleCount, 0),
@@ -95,8 +109,8 @@ export async function runBurstScenario({ name, distinct = false, stores = ['R577
     all300ImmediateResults: report.fullySuccessfulQueries === CLIENTS };
 }
 
-export async function runSustainedScenario() {
-  const s = await capacityFixture({ start: '2026-10-01T15:59:00.000Z' });
+export async function runSustainedScenario({ collector } = {}) {
+  const s = await capacityFixture({ start: '2026-10-01T15:59:00.000Z', collector });
   const limits = s.config.collector;
   const start = s.f.state.now.getTime();
   const autoWave = () => Promise.all(Array.from({ length: CLIENTS }, (_, i) => guardedPickup({ repo: s.f.repo, config: s.config,
@@ -110,13 +124,13 @@ export async function runSustainedScenario() {
     const [manual, automatic] = await Promise.all([queryWave(s, { name: 'sustained', distinct: true, wave }), autoWave()]);
     const capacity = publicCapacity(s);
     waves.push({ wave, elapsedSimulatedSeconds: (s.f.state.now.getTime() - start) / 1000,
-      manualSuccess: manual.successfulQueries, manualBusy: manual.busyOrFailedQueries, manualReasons: manual.reasons,
+      manualSuccess: manual.successfulQueries, manualBusy: manual.busyOrFailedQueries, manualReasons: manual.reasons, manualTransportErrors: manual.transportErrors,
       autoSuccess: automatic.filter(batch => !batch.record.budgetDenied).length, autoBusy: automatic.filter(batch => batch.record.budgetDenied).length,
       netQuotaDebit: manual.netQuotaDebit, totalUpstreamHttp: s.fetchImpl.calls.length - beforeHttp, ...capacity });
     if (wave < waveCount - 1) s.f.advance(45000);
   }
   const elapsedMs = s.f.state.now.getTime() - start;
-  const rates = capacityLimits(limits.maxRequestsPerMinute, limits.maxRequestsPerDay);
+  const rates = capacityLimits(limits.maxRequestsPerMinute, limits.maxRequestsPerDay, limits.autoSharePercent / 100);
   return { name: 'continuous-300-manual-plus-300-auto-every-45s', clients: CLIENTS,
     simulatedSeconds: elapsedMs / 1000, crossesBeijingMidnight: true, coldHandlersPerWave: CLIENTS,
     totalManualQueries: CLIENTS * waves.length, totalAutomaticAdmissionAttempts: CLIENTS * waves.length,
@@ -129,7 +143,7 @@ export async function runSustainedScenario() {
     netQuotaDebit: waves.reduce((sum, wave) => sum + wave.netQuotaDebit, 0), counters: s.counters, ...publicCapacity(s), waves };
 }
 
-export async function runCapacity300({ onScenario = () => {} } = {}) {
+export async function runCapacity300({ onScenario = () => {}, collector } = {}) {
   const scenarios = [];
   for (const scenario of [
     { name: 'same-target-fast' },
@@ -137,12 +151,12 @@ export async function runCapacity300({ onScenario = () => {} } = {}) {
     { name: 'same-three-stores', stores: ['R577', 'R639', 'R320'] },
     { name: 'distinct-300-targets', distinct: true },
     { name: 'distinct-900-targets', distinct: true, stores: ['R577', 'R639', 'R320'] },
-  ]) { const report = await runBurstScenario(scenario); scenarios.push(report); await onScenario(report); }
-  const sustained = await runSustainedScenario(); scenarios.push(sustained); await onScenario(sustained);
+  ]) { const report = await runBurstScenario({ ...scenario, collector }); scenarios.push(report); await onScenario(report); }
+  const sustained = await runSustainedScenario({ collector }); scenarios.push(sustained); await onScenario(sustained);
   return { generatedAt: new Date().toISOString(), kind: 'offline-contract-simulation', productionRequests: 0,
     limitations: ['300 simulated distinct membership contexts, not real user identities or real payments',
       'In-memory transactions serialize; CloudBase conflicts, serverless quotas and real latency are not measured',
       'HTTP is stubbed. Local wall latency is diagnostic, not a production SLO',
       'Sustained automatic demand uses the real admission guard under synthetic pressure, not a forecast of scheduler traffic'],
-    config: mergeConfig(config).collector, scenarios };
+    config: simulationConfig(collector).collector, scenarios };
 }

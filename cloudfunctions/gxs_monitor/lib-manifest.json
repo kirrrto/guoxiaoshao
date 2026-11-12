@@ -153,8 +153,8 @@
     },
     {
       "path": "repo/atomic-ops.js",
-      "bytes": 53917,
-      "sha256": "6fcc122f93c592fb5059620e44506deaa57a6a35563f33209ac6b47cc0cb6754"
+      "bytes": 54271,
+      "sha256": "6f0f873886ae0b0e182f666bd5e6ddde5c2c3a3eb718fec3063680e27473110b"
     },
     {
       "path": "repo/cloudbase-repo.js",

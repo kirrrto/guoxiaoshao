@@ -24,7 +24,7 @@ function verifySources() {
   }
 }
 verifySources();
-const samples = manifest.snapshots.filter(item => item.width === 375 && (['free', 'member', 'sheet-edit', 'sheet-search'].includes(item.scenario) || item.scenario.startsWith('v343-') || item.scenario.startsWith('v350-')) && item.page !== 'admin');
+const samples = manifest.snapshots.filter(item => item.width === 375 && (['free', 'member', 'sheet-edit', 'sheet-search'].includes(item.scenario) || item.page === 'query' && item.scenario === 'longcontent' || item.scenario.startsWith('v343-') || item.scenario.startsWith('v350-')) && item.page !== 'admin');
 if (!samples.length) throw Error('No matching color samples in preview manifest');
 const executablePath = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH || ['C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe', 'C:/Program Files/Google/Chrome/Application/chrome.exe'].find(file => fs.existsSync(file));
 const browser = await playwright.chromium.launch({ headless: true, ...(executablePath ? { executablePath } : {}) });
@@ -35,7 +35,7 @@ try {
   for (const item of samples) {
     await page.goto(pathToFileURL(path.join(directory, item.file)).href);
     const controls = await page.evaluate(() => {
-      const selector = 'button:not(.preview-native-tab-item), .preview-native-tab-label, .settings-link, .service-link, .retry-link, .chip.on, .segment.on, .scroll-tabs .tab.on, [style*="color: var(--green-dark)"], input[placeholder], textarea[placeholder], .configuration-scope .small, .configuration-chip-name, .configuration-range > span';
+      const selector = 'button:not(.preview-native-tab-item), .preview-native-tab-label, .settings-link, .service-link, .retry-link, .chip.on, .segment.on, .scroll-tabs .tab.on, [style*="color: var(--green-dark)"], input[placeholder], textarea[placeholder], .configuration-scope .small, .configuration-chip-name, .configuration-range > span, .result-product-placeholder';
       const controls = [...document.querySelectorAll(selector)].filter(e => e.getBoundingClientRect().width && (e.matches('input, textarea') ? !e.value && e.getAttribute('placeholder')?.trim() : e.textContent.trim()));
       const data = controls.map((element, index) => {
         element.dataset.colorAudit = index;

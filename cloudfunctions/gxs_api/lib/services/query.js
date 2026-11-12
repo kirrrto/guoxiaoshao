@@ -3,21 +3,24 @@ const { randomUUID } = require('node:crypto');
 const { ApiError } = require('../errors');
 const { sharedQueryPickup } = require('../engine/shared-query');
 const { ensureUser } = require('./users');
-const { accountLimits } = require('../rules/membership');
+const { accountLimits, ANNUAL_LIMITS } = require('../rules/membership');
 const { isRetiredPartNumber, retiredProductMessage } = require('../rules/follow-access');
 const { recordObservations } = require('../engine/observations');
 const { isProductIdentity } = require('../rules/product-target');
 const ID_PATTERN = /^[A-Za-z0-9_-]{8,64}$/;
-function validatePayload(ctx, payload, user) {
+function validatePayload(ctx, payload, user, existingOnly = false) {
   const queryId = typeof payload.queryId === 'string' && ID_PATTERN.test(payload.queryId) ? payload.queryId : null;
   if (!queryId) throw new ApiError('invalid_query_id', 'queryId 需为 8–64 位字母数字标识');
   const partNumber = typeof payload.partNumber === 'string' ? payload.partNumber.trim() : '';
   if (!isProductIdentity(partNumber)) throw new ApiError('invalid_part_number', '商品编号格式无效');
   if (isRetiredPartNumber(partNumber)) throw new ApiError('product_retired', retiredProductMessage(partNumber));
+  // Cap catalog reads at the largest supported scope. The transaction enforces
+  // the current user's limit for new IDs after checking for a matching old ID.
   const maxStores = accountLimits(user, ctx.now, ctx.config).queryMaxStores;
   const storeNumbers = Array.isArray(payload.storeNumbers) ? [...new Set(payload.storeNumbers.filter(s => typeof s === 'string' && /^R\d{3}$/.test(s)))] : [];
   if (storeNumbers.length === 0) throw new ApiError('no_stores', '请至少选择一家门店');
-  if (storeNumbers.length > maxStores) throw new ApiError('too_many_stores', `单次最多查询 ${maxStores} 家门店`);
+  if ((existingOnly || storeNumbers.length > maxStores) && storeNumbers.length !== payload.storeNumbers.length) throw new ApiError('invalid_query_id', '旧查询门店不匹配，请核对原配置。');
+  if (storeNumbers.length > ANNUAL_LIMITS.maxStoresPerFollow) throw new ApiError('too_many_stores', `单次最多查询 ${maxStores} 家门店`);
   return { queryId, partNumber, storeNumbers };
 }
 async function mapLimit(items, concurrency, fn) {
@@ -42,10 +45,42 @@ function presentResult({ observation, latest, events, outcome, reused }, nowMs) 
     events: events.map(e => ({ type: e.type, detectedAt: e.detectedAt })),
   };
 }
-async function pickup(ctx, payload) {
+// Read only. Look up the exact historical key inside the authenticated user's
+// namespace. Missing, foreign and mismatched requests disclose the same status.
+async function recovery(ctx, payload) {
+  if (payload.expectedUserKey !== ctx.identity.userKey) throw new ApiError('query_recovery_account', '账号已变化，请重新核对旧查询。');
+  const { queryId, kind, partNumber, storeNumbers, dayKey } = payload;
+  if (!['live', 'history'].includes(kind) || typeof queryId !== 'string' || !ID_PATTERN.test(queryId)
+      || !isProductIdentity(partNumber) || !Array.isArray(storeNumbers) || storeNumbers.length > 100
+      || storeNumbers.some(s => typeof s !== 'string' || !/^R\d{3}$/.test(s)) || new Set(storeNumbers).size !== storeNumbers.length
+      || (kind === 'live' ? !storeNumbers.length || dayKey !== undefined : !/^\d{4}-\d{2}-\d{2}$/.test(dayKey))) {
+    throw new ApiError('invalid_query_id', '旧查询条件无效，请核对原配置。');
+  }
+  const id = kind === 'history' ? `${ctx.identity.userKey}|history|${queryId}` : `${ctx.identity.userKey}|${queryId}`;
+  const record = await ctx.repo.getQuery(id);
+  const matched = record && record.userKey === ctx.identity.userKey && record.kind === kind && record.queryId === queryId
+    && record.partNumber === partNumber && (kind !== 'history' || record.dayKey === dayKey)
+    && Array.isArray(record.storeNumbers) && JSON.stringify([...record.storeNumbers].sort()) === JSON.stringify([...storeNumbers].sort());
+  return { userKey: ctx.identity.userKey, status: matched ? 'matched' : 'missing' };
+}
+
+async function resumeLegacy(ctx, payload) {
+  if (payload.expectedUserKey !== ctx.identity.userKey) throw new ApiError('query_recovery_account', '账号已变化，请重新核对旧查询。');
+  if (!['live', 'history'].includes(payload.kind) || !['resume', 'start'].includes(payload.mode)) throw new ApiError('invalid_query_id', '旧查询操作无效。');
+  const existingOnly = payload.mode === 'resume';
+  if (!existingOnly && (!Number.isSafeInteger(payload.maxCost) || payload.maxCost < 0)) throw new ApiError('invalid_query_id', '请重新确认查询费用。');
+  const limits = { existingOnly, maxCost: payload.maxCost };
+  return payload.kind === 'live' ? pickup(ctx, payload, limits)
+    : require('./history').list(ctx, { ...payload, historyQueryId: payload.queryId }, limits);
+}
+
+async function pickup(ctx, payload, { existingOnly = false, maxCost } = {}) {
+  if (payload.expectedUserKey !== undefined && payload.expectedUserKey !== ctx.identity.userKey) {
+    throw new ApiError('query_account_changed', '账号已变化，请下拉刷新后再查询。');
+  }
   const startedAt = Date.now();
   const user = await ensureUser(ctx);
-  const { queryId, partNumber, storeNumbers } = validatePayload(ctx, payload, user);
+  const { queryId, partNumber, storeNumbers } = validatePayload(ctx, payload, user, existingOnly);
   const [product, stores] = await Promise.all([ctx.repo.getProduct(partNumber), ctx.repo.getStores(storeNumbers)]);
   if (!product) throw new ApiError('unknown_product', '该商品不在目录中');
   if (stores.length !== storeNumbers.length) throw new ApiError('unknown_store', '存在未知门店编号');
@@ -57,7 +92,7 @@ async function pickup(ctx, payload) {
   if (remaining() <= 7000) throw new ApiError('query_in_progress', '连接耗时较长，本次未继续查询；原编号已保留，请重试确认原结果',
     { reason: 'request_budget_exhausted' });
   const ownerId = randomUUID(); const recordId = `${user._id}|${queryId}`;
-  const begun = await ctx.repo.beginQuery({ record: { _id: recordId, userKey: user._id, queryId, kind: 'live', partNumber, storeNumbers }, product, config: ctx.config, ownerId, nowIso: ctx.nowIso });
+  const begun = await ctx.repo.beginQuery({ record: { _id: recordId, userKey: user._id, queryId, kind: 'live', partNumber, storeNumbers }, product, config: ctx.config, ownerId, nowIso: ctx.nowIso, existingOnly, maxCost });
   if (begun.replayed) return { ...begun.record.response, balance: begun.balance, quotaRevision: begun.quotaRevision, replayed: true };
   if (begun.busy) return { ok: false, reason: 'query_in_progress', queryId, retryAfterMs: begun.retryAfterMs, balance: begun.balance, quotaRevision: begun.quotaRevision };
   if (begun.denied) return { ok: false, reason: begun.denied.reason, retryAfterMs: begun.denied.retryAfterMs || null, restrictionEndsAt: begun.denied.restrictionEndsAt || null, cost: begun.denied.cost, balance: begun.balance, quotaRevision: begun.quotaRevision };
@@ -101,4 +136,4 @@ async function recent(ctx, payload) {
   const list = await ctx.repo.listQueries(user._id, Math.min(Number(payload.limit) || 10, 50));
   return { queries: list.filter(q => q.kind === 'live').map(q => ({ queryId: q.queryId, partNumber: q.partNumber, storeNumbers: q.storeNumbers, status: q.status, createdAt: q.createdAt, summary: q.response ? (q.response.results || []).map(r => ({ storeNumber: r.storeNumber, storeName: r.storeName, status: r.status })) : [], productTitle: q.response && q.response.product ? q.response.product.title : null })) };
 }
-module.exports = { pickup, recent, recordObservations, validatePayload };
+module.exports = { pickup, recent, recovery, resumeLegacy, recordObservations, validatePayload };

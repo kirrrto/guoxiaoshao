@@ -1,0 +1,10 @@
+{
+  "enabled": true,
+  "intervalSeconds": 3,
+  "maxRequestsPerMinute": 600,
+  "maxRequestsPerDay": 800000,
+  "autoSharePercent": 80,
+  "cadenceMode": "fixed",
+  "budgetMode": "continuous",
+  "availableIntervalSeconds": 0
+}

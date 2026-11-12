@@ -75,12 +75,14 @@ test('zero-balance recovery and store reordering retain the original uncertain q
 });
 
 test('history pagination retains the original request and merges unique events', async () => {
-  const response = (payload, next) => ({ ok: true, product: product(payload.partNumber), balance: 4, dayKey: payload.dayKey, latest: [], summary: { available: 2, restocks: 0, recoveries: 0, ended: 0 },
+  const response = (payload, next) => ({ ok: true, product: product(payload.partNumber), balance: 4, quotaRevision: 1, dayKey: payload.dayKey, latest: [], summary: { available: 2, restocks: 0, recoveries: 0, ended: 0 },
     events: [{ id: next ? 'e2' : 'e1', type: 'first_seen_available', detectedAt: new Date().toISOString(), storeNumber: 'R001' }], pagination: { nextCursor: next ? null : 'cursor1', hasMore: !next, total: 2 } });
-  const rt = runtime(async (action, payload) => action === 'history.list' ? response(payload, Boolean(payload.cursor)) : {});
+  const rt = runtime(async (action, payload) => ['history.list', 'history.page'].includes(action) ? response(payload, Boolean(payload.cursor)) : {});
   const page = rt.instance('pages/history/index.js'); Object.assign(page.data, { boot: { member: true } }); page.selection = selection('SKU-A'); page.catalog = catalog();
+  page.accountSnapshot = boot();
   await page.onQuery(); page.onPickerChange({ detail: selection('SKU-B') }); await page.onLoadMore();
-  const calls = rt.calls.filter(c => c.action === 'history.list');
+  const calls = rt.calls.filter(c => ['history.list', 'history.page'].includes(c.action));
+  assert.equal(calls[1].action, 'history.page'); assert.equal(calls[1].payload.expectedUserKey, boot().identity.userKey);
   assert.equal(calls[0].payload.historyQueryId, calls[1].payload.historyQueryId); assert.equal(calls[1].payload.partNumber, 'SKU-A');
   assert.equal(page.data.result.events.length, 2); assert.equal(page.data.result.pagination.hasMore, false);
 });
@@ -164,7 +166,7 @@ test('history uses server full-result last-hour count when only one page is load
 test('active saved follows separate the user switch from a missing collector', async () => {
   const rt = runtime(async () => ({ follows: [{ followId: 'f1', status: 'active', stores: [] }], limits: {} }));
   const page = rt.instance('pages/follow/index.js'); page.data.boot = { member: true }; page.data.collector = { state: 'not_deployed' };
-  await page.loadFollows(); assert.equal(page.data.follows[0].statusLabel, '关注已开启'); assert.match(page.data.follows[0].monitoringText, /后台检测情况见上方/); assert.doesNotMatch(page.data.follows[0].statusLabel, /监测中|等待启动/);
+  await page.loadFollows(); assert.equal(page.data.follows[0].statusLabel, '关注已开启'); assert.match(page.data.follows[0].monitoringText, /后台检测情况可在「状态详情」查看/); assert.doesNotMatch(page.data.follows[0].statusLabel, /监测中|等待启动/);
 });
 
 test('pull-to-refresh formats follows using the newly fetched membership state', async () => {

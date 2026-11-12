@@ -24,17 +24,29 @@
       "versionConfirmation": "Maintainer confirmed the new channel-video findings belong to the current online 3.4.0 on 2026-10-26; task link observed in browser inventory, report contents could not be read",
       "exactSdkVersion": null,
       "executionTime": null
+    },
+    {
+      "kind": "maintainer-reported-finding",
+      "findingId": "unused-channel-video",
+      "reference": "docs/WECHAT_CHANNEL_VIDEO_3.7.0.md",
+      "reportedPages": ["pages/follow/index", "pages/history/index", "pages/mine/index", "pages/guide/index"],
+      "reportedCountPerPage": 1,
+      "reportedVersion": null,
+      "taskId": null,
+      "exactSdkVersion": null,
+      "executionTime": null,
+      "codePackageIdentity": null
     }
   ],
   "findings": [
     {
       "id": "unused-channel-video",
-      "title": "四个主页面被报告声明了未使用的 channel-video 组件",
+      "title": "小哨、历史、我的和攻略页被报告声明了未使用的 channel-video 组件",
       "reportedVersion": "3.3.1",
       "status": "open",
-      "latestReportedVersion": "3.4.0",
-      "latestReportRef": "docs/RUNTIME_QUALITY_2026-10-26.md",
-      "localReproductionRef": "evidence/verification/3.4.0-runtime/channel-video-sdk-reproduction.json"
+      "latestReportedVersion": null,
+      "latestReportRef": "docs/WECHAT_CHANNEL_VIDEO_3.7.0.md",
+      "localReproductionRef": "evidence/verification/3.7.0/channel-video-local.json"
     },
     {
       "id": "custom-tabbar-first-switch",

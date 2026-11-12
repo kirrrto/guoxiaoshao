@@ -1,5 +1,5 @@
 const { call, showError, toast } = require('../../utils/api');
-const { getBootstrap, getCatalog, invalidateBootstrap, publishQuota, getQuotaGeneration, subscribeCatalog, subscribeQuota, currentQuota, publishQueryBalance } = require('../../utils/store');
+const { getBootstrap, getCatalog, invalidateBootstrap, quotaAccountMatches, publishQuota, getQuotaGeneration, subscribeCatalog, subscribeQuota, currentQuota, publishQueryBalance } = require('../../utils/store');
 const fmt = require('../../utils/format');
 const { storeLabel } = require('../../utils/store-label');
 const { localKey } = require('../../utils/local-key');
@@ -16,6 +16,7 @@ const SELECTION_KEY = 'gxs_history_selection_v1';
 const SOURCE_TEXT = { auto: '自动监测', manual: '手动查询' };
 
 function queryFailureNotice(error) {
+  if (error && ['query_account_changed', 'history_page_account', 'query_recovery_unavailable', 'query_recovery_missing', 'query_recovery_account', 'query_cost_changed'].includes(error.code)) return error.message;
   if (error && error.code === 'offline') return '网络已断开，联网后可重试；上次结果保留。';
   if (operation.uncertain(error)) return '结果尚未确认，再次查询相同条件会恢复原请求，不重复扣次。';
   const code = error && error.code, mapped = fmt.reasonText(code);
@@ -304,7 +305,7 @@ Page({
       stores: target.storeNumbers.map(number => this.catalog.storeByNumber[number]) };
     this.selectionNeedsReview = false;
     this.restrictionReason = null;
-    this.setData({ dayKey, selectionSummary: summary, journeySource: intent.from,
+    this.setData({ dayKey, selectionSummary: summary, legacyQueryPending: !!this.legacyHistoryId(this.selection, dayKey), journeySource: intent.from,
       restriction: null, queryFailureMessage: '', restoreWarning: false,
       resultTargetDifferent: this.hasDifferentResult(this.selection, dayKey),
       restoreNotice: `已带入${intent.from === 'follow' ? '关注' : '查询'}配置与门店，尚未查询，也未扣次。${this.data.boot.member ? '' : '默认选择昨天，可自行修改日期。'}` });
@@ -319,7 +320,7 @@ Page({
     const expired = dayKey < earliestDay || dayKey > today;
     // Do not silently replace an explicitly selected date with the oldest
     // retained date. That would change the intent of the next charged query.
-    this.setData({ today, yesterday: fmt.fmtDate(Date.now() - 86400000), earliestDay, dayKey, resultTargetDifferent: this.hasDifferentResult(this.selection, dayKey),
+    this.setData({ today, yesterday: fmt.fmtDate(Date.now() - 86400000), earliestDay, dayKey, legacyQueryPending: !!this.legacyHistoryId(this.selection, dayKey), resultTargetDifferent: this.hasDifferentResult(this.selection, dayKey),
       ...(expired ? { restoreWarning: true, restoreNotice: `所选日期已超出最近 ${fmt.RETENTION_DAYS} 天范围，请重新选择日期；当前条件未自动更改。` } : {}) });
   },
 
@@ -419,7 +420,7 @@ Page({
     const summary = selectionSummary(e.detail, this.catalog);
     this.selectionNeedsReview = Boolean(e.detail.partNumber && (!summary || !summary.valid));
     this.restrictionReason = null;
-    this.setData({ restriction: null, queryFailureMessage: '', selectionSummary: summary, resultTargetDifferent: this.hasDifferentResult(e.detail) });
+    this.setData({ restriction: null, queryFailureMessage: '', selectionSummary: summary, legacyQueryPending: !!this.legacyHistoryId(e.detail), resultTargetDifferent: this.hasDifferentResult(e.detail) });
     const restored = this.restoredSelection;
     if (!restored || restored.partNumber !== e.detail.partNumber || JSON.stringify(restored.storeNumbers.slice().sort()) !== JSON.stringify((e.detail.storeNumbers || []).slice().sort())) {
       this.restoredSelection = null;
@@ -433,7 +434,7 @@ Page({
     this.dateExplicit = true;
     this.restoredSelection = null;
     this.restrictionReason = null;
-    this.setData({ dayKey: e.detail.value, restriction: null, queryFailureMessage: '', restoreNotice: null, restoreWarning: false, resultTargetDifferent: this.hasDifferentResult(this.selection, e.detail.value) });
+    this.setData({ dayKey: e.detail.value, legacyQueryPending: !!this.legacyHistoryId(this.selection, e.detail.value), restriction: null, queryFailureMessage: '', restoreNotice: null, restoreWarning: false, resultTargetDifferent: this.hasDifferentResult(this.selection, e.detail.value) });
   },
 
   onQuickDate(e) {
@@ -493,6 +494,12 @@ Page({
   onToggleCoverage() { this.setData({ coverageExpanded: !this.data.coverageExpanded }); },
   onToggleLatest() { this.refreshObservationSnapshot(); this.setData({ latestExpanded: !this.data.latestExpanded }); },
 
+  legacyHistoryId(selection = this.selection, dayKey = this.data.dayKey) {
+    if (!selection || !selection.partNumber) return null;
+    const owner = this.accountSnapshot && this.accountSnapshot.identity && this.accountSnapshot.identity.userKey;
+    return operation.legacyId('h', { partNumber: selection.partNumber, storeNumbers: selection.storeNumbers, dayKey }, owner);
+  },
+
   async onQuery() {
     if (this.pageRetired || this.data.sheetVisible) return;
     if (this.data.querying || this.data.loadingMore) return;
@@ -503,6 +510,7 @@ Page({
     const { boot, dayKey } = this.data, selection = this.selection;
     const accountEpoch = this.accountEpoch || 0;
     const owner = this.accountSnapshot && this.accountSnapshot.identity && this.accountSnapshot.identity.userKey;
+    if (!quotaAccountMatches(owner)) return toast('账号已变化，请下拉刷新后再查询。');
     if (!selection.partNumber) return toast('请先选择具体配置');
     if (dayKey < fmt.retentionStartKey() || dayKey > fmt.todayKey()) return toast('所选日期已超出保留范围，请重新选择日期');
     // Let the server distinguish insufficient funds from an already-debited
@@ -511,9 +519,14 @@ Page({
     this.setData({ querying: true, restriction: null, queryFailureMessage: '', restoreNotice: null, restoreWarning: false });
     startProgress(this, '仍在加载所选日期记录，请勿重复点击；上次结果会保留。');
     const payload = { partNumber: selection.partNumber, storeNumbers: selection.storeNumbers.slice(), dayKey };
-    const historyQueryId = operation.begin('h', payload, owner);
+    let historyQueryId;
     try {
-      const response = await call('history.list', { historyQueryId, ...payload });
+      const legacy = this.legacyHistoryId(selection, dayKey);
+      const recovery = legacy && await operation.verifyLegacy('h', payload, owner, { cost: boot.historyCost, member: boot.member,
+        isCurrent: () => !this.pageRetired && accountEpoch === (this.accountEpoch || 0) });
+      if (legacy && !recovery) return;
+      historyQueryId = recovery ? recovery.queryId : operation.begin('h', payload, owner);
+      const response = recovery ? await call('query.resumeLegacy', recovery) : await call('history.list', { historyQueryId, ...payload, ...(owner ? { expectedUserKey: owner } : {}) });
       if (accountEpoch !== (this.accountEpoch || 0)) return;
       if (response.reason === 'query_in_progress') {
         if (!this.pageRetired) {
@@ -522,7 +535,7 @@ Page({
         }
         return;
       }
-      operation.finish('h', historyQueryId);
+      operation.finish('h', historyQueryId, owner, response.ok || Array.isArray(response.events));
       if (invalidateBootstrap(owner) === false) return;
       const quota = publishQueryBalance(response, owner);
       if (quota.needsRefresh) getBootstrap({ force: true }).then(boot => this.applyBoot(boot)).catch(() => {});
@@ -537,18 +550,18 @@ Page({
         }
         return;
       }
-      this.historyRequest = { historyQueryId, ...payload };
+      this.historyRequest = { historyQueryId, ...payload, expectedUserKey: owner };
       this.historySnapshot = response;
       this.setData({ result: presentHistory(response, this.catalog, this.historyRequest), ...balancePatch, queryFailureMessage: '', moreError: null, coverageExpanded: false, resultTargetDifferent: this.hasDifferentResult() });
       if (boot.taskAvailable) this.completeTask();
     } catch (error) {
       if (accountEpoch !== (this.accountEpoch || 0)) return;
-      if (!operation.uncertain(error)) operation.finish('h', historyQueryId);
+      if (historyQueryId && !operation.uncertain(error)) operation.finish('h', historyQueryId, owner, false);
       if (this.pageRetired) return;
       const message = queryFailureNotice(error);
       this.setData({ restriction: message, queryFailureMessage: message });
     } finally {
-      if (!this.pageRetired && accountEpoch === (this.accountEpoch || 0)) { stopProgress(this); this.setData({ querying: false, requestSlow: false }); }
+      if (!this.pageRetired && accountEpoch === (this.accountEpoch || 0)) { stopProgress(this); this.setData({ querying: false, requestSlow: false, legacyQueryPending: !!this.legacyHistoryId() }); }
     }
   },
 
@@ -556,15 +569,24 @@ Page({
     if (this.pageRetired || this.data.loadingMore || this.data.querying || !this.historyRequest || !this.data.result.pagination.hasMore) return;
     this.setData({ loadingMore: true, moreError: null });
     const accountEpoch = this.accountEpoch || 0, request = this.historyRequest;
+    const wrongAccount = () => !request.expectedUserKey || (currentOwner() && currentOwner() !== request.expectedUserKey);
     try {
-      const response = await call('history.list', { ...this.historyRequest, cursor: this.data.result.pagination.nextCursor });
+      if (wrongAccount()) throw Object.assign(Error('账号已变化，请重新打开历史记录。'), { code: 'history_page_account' });
+      const response = await call('history.page', { ...request, cursor: this.data.result.pagination.nextCursor });
       if (this.pageRetired || accountEpoch !== (this.accountEpoch || 0) || request !== this.historyRequest) return;
+      if (wrongAccount()) throw Object.assign(Error('账号已变化，请重新打开历史记录。'), { code: 'history_page_account' });
       if (!response.ok) throw new Error(fmt.reasonText(response.reason));
       const events = [...this.historySnapshot.events, ...response.events];
       const seen = new Set();
       this.historySnapshot = { ...response, events: events.filter(e => { if (seen.has(e.id)) return false; seen.add(e.id); return true; }) };
       this.setData({ result: presentHistory(this.historySnapshot, this.catalog, this.historyRequest) });
-    } catch (error) { if (!this.pageRetired && accountEpoch === (this.accountEpoch || 0)) this.setData({ moreError: error.message || '加载失败，请重试。' }); }
+    } catch (error) {
+      if (this.pageRetired || accountEpoch !== (this.accountEpoch || 0) || request !== this.historyRequest) return;
+      if (error.code === 'history_page_account') {
+        this.historyRequest = null; this.historySnapshot = null;
+        this.setData({ result: null, restriction: error.message, resultTargetDifferent: false });
+      } else this.setData({ moreError: error.code === 'unknown_action' ? '历史续页服务暂不可用，本次未扣次，请稍后重试。' : error.message || '加载失败，请重试。' });
+    }
     finally { if (!this.pageRetired && accountEpoch === (this.accountEpoch || 0)) this.setData({ loadingMore: false }); }
   },
 

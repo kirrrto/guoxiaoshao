@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 import { checkMonitorBundle } from '../lib/monitor-bundle.mjs';
 import { fingerprintQualitySource, validateQualityFindings } from './quality-findings.mjs';
+import { hasConsumerEntry } from './consumer-entry.mjs';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const require = createRequire(import.meta.url);
 const json = file => JSON.parse(fs.readFileSync(path.join(root, file), 'utf8'));
@@ -25,6 +26,8 @@ check('README identifies and links the current release', readme.split(/\r?\n/)[0
 check('current release note identifies the same version', fs.existsSync(path.join(root, releaseNote)) && fs.readFileSync(path.join(root, releaseNote), 'utf8').split(/\r?\n/)[0] === `# 果小哨 v${project.version} 发布说明`);
 check('release development config validates request domains', json('project.config.json').setting.urlCheck === true);
 const privateConfigPath = path.join(root, 'project.private.config.json');
+check('DevTools project root and local overrides resolve the consumer miniprogram/app.json',
+  hasConsumerEntry(root, json('project.config.json'), fs.existsSync(privateConfigPath) ? json('project.private.config.json') : {}));
 check('local private config does not bypass domain validation', !fs.existsSync(privateConfigPath) || json('project.private.config.json').setting?.urlCheck !== false);
 const connection = json('config/cloudbase.connection.json');
 const miniConnection = require(path.join(root, 'miniprogram/config/cloud.js'));

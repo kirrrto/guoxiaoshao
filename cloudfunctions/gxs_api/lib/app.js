@@ -41,8 +41,11 @@ const ACTIONS = {
   'quota.ledger': [quota.ledger, true],
   'query.pickup': [query.pickup, true],
   'query.recent': [query.recent, true],
+  'query.recovery': [query.recovery, true],
+  'query.resumeLegacy': [query.resumeLegacy, true],
   'query.alternatives': [queryAlternatives.alternatives, true],
   'history.list': [history.list, true],
+  'history.page': [history.page, true],
   'history.browse': [history.browse, true],
   'follow.list': [follows.list, true],
   'follow.upsert': [follows.upsert, true],
@@ -95,8 +98,18 @@ function createHandler({ repo, fetchImpl, clock = defaultClock, log = console, a
     const envelope = (body) => ({ ...body, serverTime: nowIso, requestId });
 
     try {
-      const entry = action && ACTIONS[action];
+      const entry = action && Object.prototype.hasOwnProperty.call(ACTIONS, action) && ACTIONS[action];
       if (!entry) throw new ApiError('unknown_action', `未知操作：${String(action)}`);
+      const trace = event.clientTraceId;
+      if (typeof trace === 'string' && trace.length === 16 && !/[^0-9a-f]/.test(trace)) {
+        // Log on receipt, even if later work times out before a response reaches
+        // the SDK. Keep caller-provided payloads and identities out of this log.
+        try {
+          const safeId = typeof requestId === 'string' && requestId.length > 0 && requestId.length <= 128 && !/[^a-zA-Z0-9_-]/.test(requestId);
+          const written = log.info('[gxs] api_attempt', { action, clientTraceId: trace, requestId: safeId ? requestId : null });
+          if (written && typeof written.catch === 'function') written.catch(() => {});
+        } catch { /* Diagnostics cannot delay or reject the action. */ }
+      }
       const stored = await repo.getConfig();
       const config = mergeConfig(stored);
       const identity = resolveIdentity(wxContext || {}, { allowedAppids, adminUserKeys: config.adminUserKeys });

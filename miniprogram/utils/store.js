@@ -24,6 +24,7 @@ const CATEGORY_NAME = { iphone: 'iPhone', ipad: 'iPad', mac: 'Mac', watch: 'Watc
 
 let bootstrapPromise = null;
 let bootstrapGeneration = 0;
+let verifiedBootstrapGeneration = -1;
 let bootstrapFetchedAt = 0;
 let latestQuota = null;
 let quotaOwner = null;
@@ -76,9 +77,18 @@ async function refreshBootstrap() {
   if (bootstrapPromise) return bootstrapPromise;
   const app = getApp();
   const generation = bootstrapGeneration;
+  const recoverCurrentAccount = owner => {
+    if (bootstrapPromise) return bootstrapPromise;
+    const cached = app.globalData.bootstrap;
+    // A confirmed write can retire the read while leaving the previous
+    // account in cache. Only a newer server read or matching response identity
+    // can confirm that cache for callers awaiting account verification.
+    const sameOwner = owner && cached && cached.identity && owner === cached.identity.userKey;
+    return getBootstrap({ force: verifiedBootstrapGeneration <= generation && !sameOwner });
+  };
   const pending = call('user.bootstrap').then(data => {
-    if (generation !== bootstrapGeneration) return getBootstrap();
     const owner = data.identity && data.identity.userKey;
+    if (generation !== bootstrapGeneration) return recoverCurrentAccount(owner);
     if (owner && quotaOwner && owner !== quotaOwner) {
       latestQuota = null;
       latestBalance = null;
@@ -90,11 +100,12 @@ async function refreshBootstrap() {
       data = { ...data, quota: currentQuota() };
     }
     app.globalData.bootstrap = data; bootstrapFetchedAt = Date.now();
+    verifiedBootstrapGeneration = generation;
     try { require('./conversion-events').configure(data); }
     catch (error) { console.error('[gxs] conversion configuration', error); }
     return data;
   }, error => {
-    if (generation !== bootstrapGeneration) return getBootstrap();
+    if (generation !== bootstrapGeneration) return recoverCurrentAccount();
     throw error;
   });
   bootstrapPromise = pending;
@@ -151,7 +162,8 @@ function rememberQuota(quota) {
 }
 
 /** Latest full quota metadata with the newest confirmed balance projected onto it. */
-function currentQuota() {
+function currentQuota(owner) {
+  if (owner && !quotaAccountMatches(owner)) return null;
   return latestQuota ? { ...latestQuota, ...(latestBalance ? { balance: latestBalance.balance } : {}) } : null;
 }
 
@@ -414,4 +426,4 @@ async function getCatalog({ force = false } = {}) {
   return catalog;
 }
 
-module.exports = { getBootstrap, refreshBootstrap, invalidateBootstrap, publishSettings, publishQuota, publishQueryBalance, currentQuota, subscribeQuota, publishSubscriptions, subscribeSubscriptions, getQuotaGeneration, getCatalog, refreshCatalog, currentCatalog, subscribeCatalog, getFollows, invalidateFollows, resetSession, CATEGORY_NAME };
+module.exports = { getBootstrap, refreshBootstrap, invalidateBootstrap, quotaAccountMatches, publishSettings, publishQuota, publishQueryBalance, currentQuota, subscribeQuota, publishSubscriptions, subscribeSubscriptions, getQuotaGeneration, getCatalog, refreshCatalog, currentCatalog, subscribeCatalog, getFollows, invalidateFollows, resetSession, CATEGORY_NAME };

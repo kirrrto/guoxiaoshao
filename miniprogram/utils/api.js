@@ -10,7 +10,7 @@ class ApiError extends Error {
 }
 
 // Reads that are safe to repeat: a dropped connection retries once before the page sees it.
-const RETRYABLE_READS = new Set(['system.ping', 'user.bootstrap', 'catalog.get', 'follow.list', 'deadline.list', 'notify.list', 'notify.detail', 'member.status', 'quota.ledger', 'query.recent']);
+const RETRYABLE_READS = new Set(['system.ping', 'user.bootstrap', 'catalog.get', 'follow.list', 'deadline.list', 'notify.list', 'notify.detail', 'member.status', 'quota.ledger', 'query.recent', 'query.alternatives', 'query.recovery', 'history.page']);
 const RETRY_DELAY_MS = 800;
 // A platform request can lose both callbacks. Without our own deadline every
 // caller shares a permanently pending account/catalog promise, including Retry.
@@ -19,10 +19,16 @@ const RETRY_DELAY_MS = 800;
 const READ_TIMEOUT_MS = 12000;
 const WRITE_TIMEOUT_MS = 35000;
 const pendingReads = new Map();
+let readGeneration = 0;
 
-function resetPendingReads() { pendingReads.clear(); }
+function resetPendingReads() { readGeneration++; pendingReads.clear(); }
 
-function callWithDeadline(cloud, action, payload) {
+function newClientTraceId() {
+  const word = () => Math.floor(Math.random() * 0x100000000).toString(16).padStart(8, '0');
+  return word() + word();
+}
+
+function callWithDeadline(cloud, action, payload, clientTraceId) {
   return new Promise((resolve, reject) => {
     const timer = setTimeout(() => {
       const error = new Error('cloud.callFunction timeout');
@@ -33,7 +39,7 @@ function callWithDeadline(cloud, action, payload) {
     },
       RETRYABLE_READS.has(action) ? READ_TIMEOUT_MS : WRITE_TIMEOUT_MS);
     let request;
-    try { request = cloud.callFunction({ name: cloudConfig.apiFunction, data: { action, payload } }); }
+    try { request = cloud.callFunction({ name: cloudConfig.apiFunction, data: { action, payload, clientTraceId } }); }
     catch (error) { clearTimeout(timer); reject(error); return; }
     Promise.resolve(request)
       .then(value => { clearTimeout(timer); resolve(value); }, error => { clearTimeout(timer); reject(error); });
@@ -53,16 +59,19 @@ function call(action, payload = {}) {
 }
 
 async function callWithRetry(action, payload) {
+  const generation = readGeneration;
   try {
     return await callOnce(action, payload, 1);
   } catch (error) {
-    if (!RETRYABLE_READS.has(action) || !error || !error.retryable) throw error;
+    if (!RETRYABLE_READS.has(action) || !error || !error.retryable || generation !== readGeneration) throw error;
     await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS));
-    return callOnce(action, payload, 2);
+    // A new account or confirmed write may have retired this read during backoff.
+    if (generation !== readGeneration) throw error;
+    return callOnce(action, payload, 2, { generation, error });
   }
 }
 
-async function callOnce(action, payload, attempt) {
+async function callOnce(action, payload, attempt, retry) {
   const app = getApp();
   if (app.globalData && app.globalData.singlePage) throw new ApiError('single_page_mode', '朋友圈中只能预览。点击屏幕下方「前往小程序」即可查询和关注。');
   if (!isOnline()) throw new ApiError('offline', '当前网络已断开，请联网后重试。');
@@ -70,17 +79,26 @@ async function callOnce(action, payload, attempt) {
   let cloud;
   try {
     cloud = await (app.ensureCloud ? app.ensureCloud() : app.cloudReady);
+    if (!cloud || typeof cloud.callFunction !== 'function') throw Error('云服务连接尚未就绪，请重试');
   } catch (error) {
     const reason = app.globalData.cloudError || errorMessage(error);
-    throw transportError('cloud_init_failed', /超时|timeout|network|request:fail/i.test(reason) ? '网络不太稳定，暂时连不上服务，请检查网络后重试' : `云环境初始化失败：${reason}`,
+    throw transportError('cloud_init_failed', /超时|timeout|timed\s*out|network|request:fail/i.test(reason) ? '网络不太稳定，暂时连不上服务，请检查网络后重试' : `云环境初始化失败：${reason}`,
       error, { action, phase: 'cloud_init', attempt, startedAt });
+  }
+  if (retry && retry.generation !== readGeneration) throw retry.error;
+  // A different tab can verify another account while shared-cloud setup is
+  // pending. The server checks the same owner against the actual WX context.
+  if ((action === 'query.pickup' || action === 'history.list') && payload.expectedUserKey
+    && !require('./store').quotaAccountMatches(payload.expectedUserKey)) {
+    throw new ApiError('query_account_changed', '账号已变化，请下拉刷新后再查询。');
   }
   let response;
   startedAt = Date.now();
+  const clientTraceId = newClientTraceId();
   try {
-    response = await callWithDeadline(cloud, action, payload);
+    response = await callWithDeadline(cloud, action, payload, clientTraceId);
   } catch (error) {
-    throw transportError('call_failed', friendlyCallError(error), error, { action, phase: 'call_function', attempt, startedAt });
+    throw transportError('call_failed', friendlyCallError(error), error, { action, phase: 'call_function', attempt, startedAt, clientTraceId });
   }
   const result = response && response.result;
   if (!result || typeof result !== 'object') throw new ApiError('bad_response', '服务返回格式异常');
@@ -93,26 +111,35 @@ async function callOnce(action, payload, attempt) {
 
 function errorMessage(error) { return String((error && (error.errMsg || error.message)) || error); }
 
+function transportMessage(error) {
+  // Some SDK errors shorten errMsg to “请求超时” but retain the numeric code
+  // and request ID in Error.message or the first line of the native stack.
+  return [errorMessage(error), error && error.message, error && typeof error.stack === 'string' && error.stack.split('\n', 1)[0]]
+    .filter(value => typeof value === 'string').join(' ');
+}
+
 function transportCode(error) {
   const raw = error && error.errCode;
   if (raw !== undefined && raw !== null && /^-?\d+$/.test(String(raw))) return Number(raw);
-  const match = errorMessage(error).match(/(?:^|[^\d])(-\d{4,})(?=[^\d]|$)/);
+  const message = transportMessage(error);
+  const match = message.match(/\berrCode\s*[:=]\s*(-\d+)\b/i) || message.match(/(?:^|\s)(-\d{4,})\b/);
   return match ? Number(match[1]) : null;
 }
 
 /** Keep enough context to locate a failing action without recording account data or payloads. */
 function transportError(code, message, original, context) {
-  const msg = errorMessage(original), errCode = transportCode(original);
+  const msg = transportMessage(original), errCode = transportCode(original);
   const match = msg.match(/(?:requestID|requestId|request_id)\s*[:=]\s*([a-zA-Z0-9_-]+)/i);
   const requestId = original && (original.requestID || original.requestId) || (match && match[1]);
   const details = { action: context.action, phase: context.phase, attempt: context.attempt,
     durationMs: Math.max(0, Date.now() - context.startedAt), errCode,
-    requestId: typeof requestId === 'string' && /^[a-zA-Z0-9_-]{1,128}$/.test(requestId) ? requestId : null };
+    requestId: typeof requestId === 'string' && requestId.length > 0 && requestId.length <= 128 && !/[^a-zA-Z0-9_-]/.test(requestId) ? requestId : null,
+    ...(context.clientTraceId ? { clientTraceId: context.clientTraceId } : {}) };
   const error = new ApiError(code, message, details);
   // An authorization/configuration failure is not repaired by repeating it.
   // Unknown failures remain visible for an explicit user retry.
   error.retryable = !(original && original.localDeadline) && errCode !== -601017 && !/not allowed|permission denied|access denied/i.test(msg)
-    && ([-601008, -404006].includes(errCode) || /超时|timeout|timed out|empty poll result base resp|request:fail|network|ERR_INTERNET|ERR_NAME|ERR_CONNECTION|offline/i.test(msg));
+    && ([-601008, -404006].includes(errCode) || /超时|timeout|timed\s*out|empty poll result base resp|request:fail|network|ERR_INTERNET|ERR_NAME|ERR_CONNECTION|offline/i.test(msg));
   try {
     const log = typeof wx.getRealtimeLogManager === 'function' ? wx.getRealtimeLogManager() : null;
     if (log && typeof log.warn === 'function') log.warn('[gxs] api_failure', details);
@@ -121,11 +148,11 @@ function transportError(code, message, original, context) {
 }
 
 function friendlyCallError(error) {
-  const msg = `${transportCode(error) || ''} ${errorMessage(error)}`;
+  const msg = `${transportCode(error) || ''} ${transportMessage(error)}`;
   if (/-601017|not allowed/i.test(msg)) return '共享环境拒绝了当前小程序（cloudbase_auth 未放行）';
   if (/-601022|-601023/.test(msg)) return '资源方 cloudbase_auth 调用失败，请检查其部署';
   if (/-404006|empty poll result base resp/i.test(msg)) return '连接暂时中断，结果尚未确认，请重试。';
-  if (/-601008|timeout|timed out/i.test(msg)) return '请求超时，请稍后重试';
+  if (/-601008\b|超时|timeout|timed\s*out/i.test(msg)) return '请求超时，请稍后重试';
   if (/request:fail|network|ERR_INTERNET|ERR_NAME|ERR_CONNECTION|offline/i.test(msg)) return '网络连接不稳定，请检查网络后重试';
   return `调用失败：${errorMessage(error)}`;
 }

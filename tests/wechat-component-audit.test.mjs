@@ -2,7 +2,8 @@ import fs from 'node:fs';
 import crypto from 'node:crypto';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { runComponentAudit } from '../tools/quality/wechat-component-audit.mjs';
+import { fileURLToPath } from 'node:url';
+import { runComponentAudit, sourceScan } from '../tools/quality/wechat-component-audit.mjs';
 
 // These test the original 3.17.3 callback's filtering behavior, not WeChat cloud results.
 const evidence = JSON.parse(fs.readFileSync(new URL('../evidence/verification/3.3.1-quality/channel-video-sdk-reproduction.json', import.meta.url), 'utf8'));
@@ -26,4 +27,18 @@ test('WeChat audit continues to report a truly unused business component', () =>
 
 test('WeChat audit excludes a business component after the original creation hook observes it', () => {
   assert.deepEqual(reported(['wx-view', 'components/used/index'], ['components/used/index']), []);
+});
+
+test('reported project routes retain their WXML components without adding a video alias or dummy to silence the SDK audit', () => {
+  const root = new URL('../', import.meta.url), project = new URL('miniprogram/', root);
+  assert.deepEqual(sourceScan(fileURLToPath(root)).channelVideoMentions, []);
+  const app = JSON.parse(fs.readFileSync(new URL('app.json', project), 'utf8'));
+  for (const name of ['follow', 'history', 'mine', 'guide']) {
+    const route = 'pages/' + name + '/index';
+    assert.ok(app.pages.includes(route));
+    const config = JSON.parse(fs.readFileSync(new URL(route + '.json', project), 'utf8'));
+    const template = fs.readFileSync(new URL(route + '.wxml', project), 'utf8').replace(/<!--[\s\S]*?-->/g, '');
+    const scriptTags = new Set(Array.from(template.matchAll(/<([\w-]+)(?:\s|\/?>)/g), match => match[1]));
+    for (const alias of Object.keys(config.usingComponents || {})) assert.ok(scriptTags.has(alias), route + ': ' + alias);
+  }
 });

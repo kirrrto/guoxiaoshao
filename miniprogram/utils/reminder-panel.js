@@ -219,9 +219,9 @@ const reminderPanelMethods = {
   applyCredits(subscriptions) {
     if (this.pageRetired || !accountMatches(this) || !this.data.boot || !this.data.boot.templateIds.length) return;
     const credits = restockSubscription({ templateIds: { restock: this.data.boot.templateIds[0] } }, subscriptions).credits;
-    const soldoutCredits = soldoutSubscription({ templateIds: { soldout: this.data.boot.soldoutId } }, subscriptions).credits;
-    if (credits !== this.data.subscription.credits || soldoutCredits !== this.data.subscription.soldoutCredits) {
-      this.setData({ 'subscription.credits': credits, 'subscription.soldoutCredits': soldoutCredits });
+    const soldout = soldoutSubscription({ templateIds: { soldout: this.data.boot.soldoutId } }, subscriptions);
+    if (credits !== this.data.subscription.credits || soldout.credits !== this.data.subscription.soldoutCredits || soldout.chosen !== this.data.subscription.soldoutChosen) {
+      this.setData({ 'subscription.credits': credits, 'subscription.soldoutCredits': soldout.credits, 'subscription.soldoutChosen': soldout.chosen });
       this.refreshReadiness();
     }
   },

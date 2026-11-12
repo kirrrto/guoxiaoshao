@@ -1,7 +1,9 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
+import os from 'node:os';
 import vm from 'node:vm';
+import { execFileSync } from 'node:child_process';
 import { createRequire } from 'node:module';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { fingerprintQualitySource } from '../release/quality-findings.mjs';
@@ -62,7 +64,9 @@ export function runComponentAudit(callbacks, componentNames, usedNames = []) {
 }
 
 function discoverSdk(version) {
-  const directory = path.join(process.env.LOCALAPPDATA || '', '微信开发者工具', 'User Data');
+  const directory = process.platform === 'darwin'
+    ? path.join(os.homedir(), 'Library', 'Application Support', '微信开发者工具')
+    : path.join(process.env.LOCALAPPDATA || '', '微信开发者工具', 'User Data');
   if (fs.existsSync(directory)) {
     for (const entry of fs.readdirSync(directory).sort()) {
       const candidate = path.join(directory, entry, 'WeappVendor', `${version}.wxvpkg`);
@@ -72,7 +76,28 @@ function discoverSdk(version) {
   throw new Error(`SDK ${version} not found; pass --sdk <local wxvpkg>`);
 }
 
-function sourceScan(root) {
+// WCC compiles business WXML. SDK-owned registration happens later in WAWebview.
+// Capture both inputs so a source-only absence cannot stand in for compiled output.
+export function inspectReportedTemplates(root, wcc) {
+  const directory = path.join(root, 'miniprogram');
+  const app = JSON.parse(fs.readFileSync(path.join(directory, 'app.json'), 'utf8'));
+  const pages = [];
+  for (const name of ['follow', 'history', 'mine', 'guide']) {
+    const route = `pages/${name}/index`;
+    if (!app.pages.includes(route)) throw Error(`Reported route missing from app.json: ${route}`);
+    const pageConfig = fs.readFileSync(path.join(directory, route + '.json'), 'utf8');
+    const aliases = Object.keys(JSON.parse(pageConfig).usingComponents || {});
+    const template = fs.readFileSync(path.join(directory, route + '.wxml'), 'utf8');
+    const compiled = execFileSync(wcc, ['./' + route + '.wxml'], { cwd: directory, encoding: 'utf8' });
+    const elementTags = new Set(Array.from(compiled.matchAll(/\b_(?:n\(|mz\(z,)'([^']+)'/g), match => match[1]));
+    const compiledBusinessTags = aliases.filter(tag => elementTags.has(tag));
+    pages.push({ route, pageConfigSha256: sha256(pageConfig), templateSha256: sha256(template), compiledSha256: sha256(compiled),
+      pageComponentAliases: aliases, compiledBusinessTags, hasChannelVideoInCompiledTemplate: /\b(?:wx-)?channel-video\b/.test(compiled) });
+  }
+  return { compilerSha256: sha256(fs.readFileSync(wcc)), globalComponentAliases: Object.keys(app.usingComponents || {}), pages };
+}
+
+export function sourceScan(root) {
   const declarations = [], mentions = [];
   let scannedFiles = 0;
   const walk = directory => {
@@ -101,8 +126,8 @@ async function main() {
   const options = {};
   for (let i = 2; i < process.argv.length; i += 2) {
     const key = process.argv[i];
-    if (!['--sdk', '--browser', '--playwright', '--out', '--root'].includes(key) || !process.argv[i + 1]) {
-      throw new Error('Usage: node tools/quality/wechat-component-audit.mjs [--sdk file.wxvpkg] [--browser executable] [--playwright package-directory] [--out report.json] [--root project]');
+    if (!['--sdk', '--wcc', '--browser', '--playwright', '--out', '--root'].includes(key) || !process.argv[i + 1]) {
+      throw new Error('Usage: node tools/quality/wechat-component-audit.mjs [--sdk file.wxvpkg] [--wcc native-compiler] [--browser executable] [--playwright package-directory] [--out report.json] [--root project]');
     }
     options[key.slice(2)] = process.argv[i + 1];
   }
@@ -116,6 +141,7 @@ async function main() {
   const originalAudit = extractUnusedComponentCallbacks(audit);
   const sourceFingerprint = fingerprintQualitySource(root);
   const projectSourceScan = sourceScan(root);
+  const projectTemplateCompilation = options.wcc ? inspectReportedTemplates(root, path.resolve(options.wcc)) : null;
   let chromium;
   try { ({ chromium } = require(options.playwright ? path.resolve(options.playwright) : 'playwright')); }
   catch { throw new Error('Playwright is required for the isolated browser probe; pass --playwright <installed package-directory>'); }
@@ -164,27 +190,29 @@ async function main() {
     const actual = runComponentAudit(originalAudit.callbacks, fixture.declared, fixture.used).flatMap(item => item.payload.component.split(' <br/> '));
     return { ...fixture, actual, passed: JSON.stringify(actual) === JSON.stringify(fixture.expected) };
   });
-  const marker = 'const Cm=Je("channel-video")';
-  const registrationOffset = runtime.indexOf(marker);
+  const registration = /const [\w$]+\s*=\s*[\w$]+\(["']channel-video["']\)/.exec(runtime);
+  const registrationOffset = registration ? registration.index : -1;
   const defectReproduced = runtimeResult.channelVideoRegistryKeys.includes('channel-video')
     && runtimeResult.channelVideoRegistryKeys.includes('wx-channel-video')
     && runtimeResult.emitted.some(item => item.payload.component.split(' <br/> ').includes('channel-video'));
   const report = {
     schemaVersion: 1, kind: 'isolated-sdk-reproduction-not-wechat-cloud-verification',
+    generatedAt: new Date().toISOString(), configuredSdkVersion: version,
     status: defectReproduced ? 'platform defect pending WeChat verification' : 'not reproduced locally; pending WeChat verification',
     defectReproduced, wechatVerificationPassed: false,
     sdk: { version: metadata.version, updateTime: metadata.updateTime, packageSha256: sha256(buffer), runtimeSha256: sha256(runtime), auditSha256: sha256(audit) },
-    registration: { file: 'WAWebview.js', charOffset: registrationOffset, byteOffset: registrationOffset < 0 ? null : Buffer.byteLength(runtime.slice(0, registrationOffset)), marker },
+    registration: { file: 'WAWebview.js', charOffset: registrationOffset, byteOffset: registrationOffset < 0 ? null : Buffer.byteLength(runtime.slice(0, registrationOffset)), marker: registration ? registration[0] : null },
     originalAudit: { file: 'WAProgneWebview.js', ...originalAudit },
     runtimeResult, controls, pageErrors, bridgeWarnings: [...new Set(bridgeWarnings)].sort(),
-    sourceFingerprint, projectSourceScan,
+    sourceFingerprint, projectSourceScan, projectTemplateCompilation,
     limitations: ['Only the unmodified SDK is loaded in a local empty browser page.', 'Callbacks use a local lifecycle harness; this is not a complete native project build.', 'Source fingerprint does not establish the uploaded WeChat package identity.', 'No installed SDK, project registry, renderer, or quality-finding status is modified.'],
   };
   const output = path.resolve(options.out || path.join(root, 'output/wechat-component-audit.json'));
   fs.mkdirSync(path.dirname(output), { recursive: true });
   fs.writeFileSync(output, JSON.stringify(report, null, 2) + '\n');
   console.log(JSON.stringify({ report: path.relative(root, output).replaceAll('\\', '/'), sdkVersion: metadata.version, componentCount: runtimeResult.componentCount, emitted: runtimeResult.emitted, controlsPassed: controls.every(item => item.passed), wechatVerificationPassed: false }, null, 2));
-  if (controls.some(item => !item.passed)) process.exitCode = 1;
+  if (controls.some(item => !item.passed) || projectSourceScan.channelVideoMentions.length ||
+    projectTemplateCompilation?.pages.some(page => page.hasChannelVideoInCompiledTemplate || page.compiledBusinessTags.length !== page.pageComponentAliases.length)) process.exitCode = 1;
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {

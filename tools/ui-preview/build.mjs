@@ -889,6 +889,13 @@ for (const scenario of scenarios) {
       }
       if (alternativesPreview || historyDataPreview || v2Preview && !scenario.startsWith('v331-history-claim-') && !['v2-new-product', 'v2-restricted', 'v2-paid-unconfigured'].includes(scenario) || ['member', 'longcontent', 'expired', 'empty'].includes(scenario)) await page.onQuery();
     }
+    if (baselinePreview && pageName === 'query' && scenario === 'longcontent') {
+      // Keep the previous result on screen after changing its store scope, then
+      // trigger the actual image error handler to exercise the fallback label.
+      page.onPickerChange({ detail: { ...selected, stores: selected.stores.slice(0, 1), storeNumbers: selected.storeNumbers.slice(0, 1) } });
+      page.onResultImageError();
+      if (!page.data.resultTargetDifferent || page.data.result.product.imageDisplayUrl) throw Error('Missing previous-result photo fixture');
+    }
     if (historyTaskPreview && pageName === 'history') {
       if (page.data.browseExpanded || !previewCalls.some(call => call.action === 'history.browse')) throw Error('History browse fixtures require a collapsed panel and a real browse request');
       const requestsBeforeOpening = previewCalls.length;

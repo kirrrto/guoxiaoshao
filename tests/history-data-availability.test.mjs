@@ -95,6 +95,7 @@ test('an empty page in a nonempty history uses the full total and is not refunde
   const f = await funded();
   await f.repo.saveEvents([event('status-change', '01')]);
   const cursor = Buffer.from(JSON.stringify({ detectedAt: '2026-09-14T00:00:00.000Z', id: 'before-events' })).toString('base64url');
+  assert.equal((await history(f)).charged, 1, 'the initial query owns the charge');
   const response = await history(f, { cursor });
   assert.equal(response.events.length, 0);
   assert.equal(response.pagination.total, 1);

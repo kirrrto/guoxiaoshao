@@ -122,3 +122,63 @@ test('switching accounts after invalidation clears both quota revisions and conf
   assert.equal(store.publishQueryBalance({ balance: 7, quotaRevision: 23 }, 'alice').accepted, false);
   assert.deepEqual(copy(rt.app.globalData.bootstrap.quota), values.bob);
 });
+
+test('an old-account quota update during a forced identity read cannot serve its cached account', async () => {
+  const dayKey = new Date(Date.now() + 8 * 3600000).toISOString().slice(0, 10);
+  const snapshot = (owner, balance) => ({ ...boot(quota(balance, 1, { dayKey })), identity: { userKey: owner } });
+  let owner = 'alice', unblock;
+  const rt = runtime(async action => {
+    if (action === 'follow.list') return { follows: [owner] };
+    const response = snapshot(owner, owner === 'alice' ? 5 : 0);
+    if (owner === 'bob' && !unblock) await new Promise(resolve => { unblock = resolve; });
+    return response;
+  });
+  const store = rt.load('utils/store.js');
+  await store.getBootstrap();
+  await store.getFollows();
+  owner = 'bob';
+  const checking = store.getBootstrap({ force: true });
+  store.publishQuota(quota(6, 2, { dayKey }), 'alice');
+  unblock();
+  assert.equal((await checking).identity.userKey, 'bob');
+  assert.equal(store.currentQuota().balance, 0);
+  assert.equal(rt.app.globalData.bootstrap.identity.userKey, 'bob');
+  assert.deepEqual(copy((await store.getFollows()).follows), ['bob']);
+  assert.equal(store.publishQuota(quota(7, 3, { dayKey }), 'alice'), false);
+});
+
+test('a retired identity read joins the newer in-flight read before returning an account', async () => {
+  const dayKey = new Date(Date.now() + 8 * 3600000).toISOString().slice(0, 10);
+  const account = owner => ({ ...boot(quota(1, 1, { dayKey })), identity: { userKey: owner } });
+  const pending = [];
+  const rt = runtime(() => new Promise(resolve => pending.push(resolve)));
+  const store = rt.load('utils/store.js');
+  const initial = store.getBootstrap();
+  pending[0](account('alice'));
+  await initial;
+  const older = store.getBootstrap({ force: true });
+  store.publishQueryBalance({ balance: 0, quotaRevision: 2 }, 'alice');
+  const newer = store.getBootstrap({ force: true });
+  pending[1](account('alice'));
+  await new Promise(resolve => setImmediate(resolve));
+  pending[2](account('bob'));
+  assert.deepEqual((await Promise.all([older, newer])).map(value => value.identity.userKey), ['bob', 'bob']);
+  assert.equal(pending.length, 3);
+});
+
+test('a failed identity refresh after a quota update does not confirm the cached account', async () => {
+  const dayKey = new Date(Date.now() + 8 * 3600000).toISOString().slice(0, 10);
+  let calls = 0, fail;
+  const rt = runtime(async () => {
+    if (++calls === 1) return { ...boot(quota(1, 1, { dayKey })), identity: { userKey: 'alice' } };
+    if (calls === 2) return new Promise((resolve, reject) => { fail = reject; });
+    throw Error('account offline');
+  });
+  const store = rt.load('utils/store.js');
+  await store.getBootstrap();
+  const checking = store.getBootstrap({ force: true });
+  store.publishQuota(quota(2, 2, { dayKey }), 'alice');
+  fail(Error('account offline'));
+  await assert.rejects(checking, /account offline/);
+  assert.equal(calls, 3);
+});

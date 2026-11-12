@@ -1,0 +1,211 @@
+{
+  "kind": "offline-original-sdk-empty-page-and-registry-controls",
+  "sourceFingerprint": "sha256:5b822bcb4ea6177ae81c637f603aa951f2bff9a990849554deab2cf1848eb650",
+  "wechatVerificationPassed": false,
+  "probes": [
+    {
+      "generatedAt": "2026-11-12T15:49:27.186Z",
+      "sdk": {
+        "version": "3.17.3",
+        "updateTime": "2026.10.9 19:51:01",
+        "packageSha256": "ac2c6879a5b623b9caedf50077d0ebd6a5b36199724dd393b107519a745ff370",
+        "runtimeSha256": "51c8013a237fec0a6eed42b09da7b28bc6256e7ea8b843eba7dfc7ceb43839ba",
+        "auditSha256": "ff8abfcb03245b7f309b714f3f81e495bd149fe19fed2d059d48529b4108742a"
+      },
+      "registration": {
+        "file": "WAWebview.js",
+        "charOffset": 2201938,
+        "byteOffset": 2227347,
+        "marker": "const Cm=Je(\"channel-video\")"
+      },
+      "auditCallbackSha256": "4a74c1867587fb33e4fdf176e34bd24455e33523eb6f559b28c181b242849db1",
+      "emptyPage": {
+        "componentCount": 155,
+        "channelVideoRegistryKeys": [
+          "channel-video",
+          "wx-channel-video"
+        ],
+        "emitted": [
+          {
+            "event": "unused-component-data",
+            "payload": {
+              "page": "pages/empty/index",
+              "component": "channel-video",
+              "len": 1
+            }
+          }
+        ]
+      },
+      "controls": [
+        {
+          "name": "ordinary builtins excluded",
+          "actual": [],
+          "expected": [],
+          "passed": true
+        },
+        {
+          "name": "unprefixed builtin alias reported",
+          "actual": [
+            "channel-video"
+          ],
+          "expected": [
+            "channel-video"
+          ],
+          "passed": true
+        },
+        {
+          "name": "unused business component reported",
+          "actual": [
+            "components/unused/index"
+          ],
+          "expected": [
+            "components/unused/index"
+          ],
+          "passed": true
+        },
+        {
+          "name": "instantiated business component excluded",
+          "actual": [],
+          "expected": [],
+          "passed": true
+        }
+      ]
+    },
+    {
+      "generatedAt": "2026-11-12T15:49:27.190Z",
+      "sdk": {
+        "version": "3.17.5",
+        "updateTime": "2026.10.26 13:43:01",
+        "packageSha256": "62516353cb6e85dfe680d80b3ea81c435b2ff8d7093ed55d023e68979e21b91b",
+        "runtimeSha256": "c992e0ce942bca6e9f9ca41d654bc47afecb1b2f615dcc7fbca0d82340e46598",
+        "auditSha256": "ff8abfcb03245b7f309b714f3f81e495bd149fe19fed2d059d48529b4108742a"
+      },
+      "registration": {
+        "file": "WAWebview.js",
+        "charOffset": 2224543,
+        "byteOffset": 2249990,
+        "marker": "const Gm=tt(\"channel-video\")"
+      },
+      "auditCallbackSha256": "4a74c1867587fb33e4fdf176e34bd24455e33523eb6f559b28c181b242849db1",
+      "emptyPage": {
+        "componentCount": 156,
+        "channelVideoRegistryKeys": [
+          "channel-video",
+          "wx-channel-video"
+        ],
+        "emitted": [
+          {
+            "event": "unused-component-data",
+            "payload": {
+              "page": "pages/empty/index",
+              "component": "channel-video",
+              "len": 1
+            }
+          }
+        ]
+      },
+      "controls": [
+        {
+          "name": "ordinary builtins excluded",
+          "actual": [],
+          "expected": [],
+          "passed": true
+        },
+        {
+          "name": "unprefixed builtin alias reported",
+          "actual": [
+            "channel-video"
+          ],
+          "expected": [
+            "channel-video"
+          ],
+          "passed": true
+        },
+        {
+          "name": "unused business component reported",
+          "actual": [
+            "components/unused/index"
+          ],
+          "expected": [
+            "components/unused/index"
+          ],
+          "passed": true
+        },
+        {
+          "name": "instantiated business component excluded",
+          "actual": [],
+          "expected": [],
+          "passed": true
+        }
+      ]
+    },
+    {
+      "generatedAt": "2026-11-12T15:49:27.186Z",
+      "sdk": {
+        "version": "3.17.6",
+        "updateTime": "2026.11.10 22:16:56",
+        "packageSha256": "b81d2039c9be3ae57c3631b01c8787089f50cc01db3e4ef4d0e6e12dbb4001e5",
+        "runtimeSha256": "3d5d4a041acdc6cc067498ee5324fcf44a35b1f8fae3cd3906508a54f04393f8",
+        "auditSha256": "ff8abfcb03245b7f309b714f3f81e495bd149fe19fed2d059d48529b4108742a"
+      },
+      "registration": {
+        "file": "WAWebview.js",
+        "charOffset": 2239004,
+        "byteOffset": 2264479,
+        "marker": "const $m=tt(\"channel-video\")"
+      },
+      "auditCallbackSha256": "4a74c1867587fb33e4fdf176e34bd24455e33523eb6f559b28c181b242849db1",
+      "emptyPage": {
+        "componentCount": 158,
+        "channelVideoRegistryKeys": [
+          "channel-video",
+          "wx-channel-video"
+        ],
+        "emitted": [
+          {
+            "event": "unused-component-data",
+            "payload": {
+              "page": "pages/empty/index",
+              "component": "channel-video",
+              "len": 1
+            }
+          }
+        ]
+      },
+      "controls": [
+        {
+          "name": "ordinary builtins excluded",
+          "actual": [],
+          "expected": [],
+          "passed": true
+        },
+        {
+          "name": "unprefixed builtin alias reported",
+          "actual": [
+            "channel-video"
+          ],
+          "expected": [
+            "channel-video"
+          ],
+          "passed": true
+        },
+        {
+          "name": "unused business component reported",
+          "actual": [
+            "components/unused/index"
+          ],
+          "expected": [
+            "components/unused/index"
+          ],
+          "passed": true
+        },
+        {
+          "name": "instantiated business component excluded",
+          "actual": [],
+          "expected": [],
+          "passed": true
+        }
+      ]
+    }
+  ]
+}

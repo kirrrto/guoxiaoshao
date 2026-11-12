@@ -38,3 +38,35 @@ test('a warm entry from Moments preview starts normal cloud access without requi
   const result = await rt.load('utils/api.js').call('user.bootstrap');
   assert.equal(result.recovered, true);
 });
+
+test('opening the guide from a cold launch never starts shared cloud authentication', async () => {
+  const rt = runtime(undefined, { realApi: true });
+  let connections = 0;
+  rt.wx.cloud = { Cloud: class { init() { connections++; return Promise.reject(new Error('unexpected guide authentication')); } } };
+  rt.load('app.js');
+  rt.app.onLaunch({ path: 'pages/guide/index', scene: 1001 });
+  rt.app.onShow({ path: 'pages/guide/index', scene: 1001 });
+  const guide = rt.instance('pages/guide/index.js');
+  guide.onLoad({});
+  guide.onShow();
+  await Promise.resolve();
+  assert.equal(connections, 0);
+  assert.equal(rt.app.cloudReady, undefined);
+});
+
+test('a known offline cold launch waits for connectivity before attempting authentication', async () => {
+  const rt = runtime(undefined, { realApi: true });
+  let changed;
+  rt.wx.getNetworkType = ({ success }) => success({ networkType: 'none' });
+  rt.wx.onNetworkStatusChange = callback => { changed = callback; };
+  rt.load('app.js');
+  let calls = 0;
+  rt.app.ensureCloud = async () => { calls++; return { callFunction: async () => ({ result: { ok: true, data: true } }) }; };
+  rt.app.onLaunch({ path: 'pages/query/index' });
+  const api = rt.load('utils/api.js');
+  await assert.rejects(api.call('user.bootstrap'), error => error.code === 'offline');
+  assert.equal(calls, 0);
+  changed({ isConnected: true });
+  assert.equal(await api.call('user.bootstrap'), true);
+  assert.equal(calls, 1);
+});

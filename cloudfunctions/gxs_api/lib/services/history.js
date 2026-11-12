@@ -44,7 +44,25 @@ async function browse(ctx) {
   const reward = task ? await completeTask(completed, { taskId: 'view_history' }) : null;
   return { recentViews, browsedAt: completed.nowIso, task: reward };
 }
-async function list(ctx, payload) {
+async function page(ctx, payload) {
+  if (payload.expectedUserKey !== ctx.identity.userKey) throw new ApiError('history_page_account', '账号已变化，请重新打开历史记录。');
+  if (!payload.cursor) throw new ApiError('invalid_cursor', '分页位置无效，请重新打开历史记录。');
+  return list(ctx, payload);
+}
+
+async function completedQuery(ctx, record, user) {
+  const existing = await ctx.repo.getQuery(record._id);
+  if (!existing || existing.userKey !== user._id || existing.kind !== 'history' || existing.queryId !== record.queryId
+    || existing.partNumber !== record.partNumber || existing.dayKey !== record.dayKey || !Array.isArray(existing.storeNumbers)
+    || JSON.stringify([...existing.storeNumbers].sort()) !== JSON.stringify([...record.storeNumbers].sort())
+    || existing.status === 'pending' || !existing.response || !existing.response.ok || !existing.response.pagination) {
+    throw new ApiError('history_page_missing', '原历史记录无法续载，本次未扣次。');
+  }
+  return { replayed: true, record: existing, balance: user.quota.balance, quotaRevision: Number.isInteger(user.quota.revision) ? user.quota.revision : 0 };
+}
+
+async function list(ctx, payload, { existingOnly = false, maxCost } = {}) {
+  if (payload.expectedUserKey !== undefined && payload.expectedUserKey !== ctx.identity.userKey) throw new ApiError('history_page_account', '账号已变化，请重新打开历史记录。');
   const historyQueryId = typeof payload.historyQueryId === 'string' && ID_PATTERN.test(payload.historyQueryId) ? payload.historyQueryId : null;
   if (!historyQueryId) throw new ApiError('invalid_query_id', 'historyQueryId 需为 8–64 位字母数字标识');
   const partNumber = typeof payload.partNumber === 'string' ? payload.partNumber.trim() : '';
@@ -57,7 +75,8 @@ async function list(ctx, payload) {
   if (storeNumbers.length > 10) throw new ApiError('too_many_stores', '历史查询最多选择 10 家门店');
   const limit = Math.min(200, Math.max(1, Math.floor(Number(payload.limit) || 100)));
   const cursor = decodeCursor(payload.cursor);
-  const user = await ensureUser(ctx);
+  const user = cursor ? await ctx.repo.getUser(ctx.identity.userKey) : await ensureUser(ctx);
+  if (!user) throw new ApiError('history_page_missing', '原历史记录无法续载，本次未扣次。');
   const [product, stores] = await Promise.all([ctx.repo.getProduct(partNumber), ctx.repo.getStores(storeNumbers)]);
   if (!product) throw new ApiError('unknown_product', '该商品不在目录中');
   if (stores.length !== storeNumbers.length) throw new ApiError('unknown_store', '存在未知门店编号');
@@ -68,7 +87,11 @@ async function list(ctx, payload) {
   const exposeLatest = member || !isLiveRestricted(product, ctx.config.newProductWindows, ctx.now).restricted;
   const recordId = `${user._id}|history|${historyQueryId}`;
   const ownerId = randomUUID();
-  const begun = await ctx.repo.beginQuery({ record: { _id: recordId, userKey: user._id, queryId: historyQueryId, kind: 'history', partNumber, storeNumbers, dayKey: requestedDay }, product, config: ctx.config, ownerId, nowIso: ctx.nowIso });
+  const record = { _id: recordId, userKey: user._id, queryId: historyQueryId, kind: 'history', partNumber, storeNumbers, dayKey: requestedDay };
+  // A cursor may read only a completed snapshot, including for older clients
+  // that still use history.list. It cannot open, take over or debit a request.
+  const begun = cursor ? await completedQuery(ctx, record, user)
+    : await ctx.repo.beginQuery({ record, product, config: ctx.config, ownerId, nowIso: ctx.nowIso, existingOnly, maxCost });
   if (begun.busy) return { ok: false, reason: 'query_in_progress', historyQueryId, retryAfterMs: begun.retryAfterMs, balance: begun.balance, quotaRevision: begun.quotaRevision };
   if (begun.denied) return { ok: false, reason: begun.denied.reason, restrictionEndsAt: begun.denied.restrictionEndsAt || null, cost: begun.denied.cost, balance: begun.balance, quotaRevision: begun.quotaRevision };
   if (begun.replayed && (!cursor || begun.record.response.pagination && begun.record.response.pagination.total === 0)) return { ...begun.record.response, balance: begun.balance, quotaRevision: begun.quotaRevision, latest: exposeLatest ? presentLatest(begun.record.response.latest || [], ctx) : [], latestRestricted: !exposeLatest, replayed: true };
@@ -115,4 +138,4 @@ function presentLatest(latest, ctx) {
     return { storeNumber: l.storeNumber, storeName: l.storeName, status: isStale ? 'unknown' : l.status, lastKnownStatus: l.lastKnownStatus || l.status, isStale, statusSince: l.statusSince, observedAt: l.observedAt, knownAt: l.knownAt, unknownSince: l.unknownSince, quote: l.quote };
   });
 }
-module.exports = { list, browse };
+module.exports = { list, page, browse };

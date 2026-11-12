@@ -72,3 +72,14 @@ test('a numeric timeout code can identify an SDK stack without replacing its dia
   assert.equal(warnings.length, 1);
   assert.equal(warnings[0][1].detail, sdkFrames);
 });
+
+test('both reported native stack formats retain a cloud timeout without masking application frames', () => {
+  const { rt, errors, warnings } = reportingRuntime();
+  const androidStack = 'Error: 请求超时\n    at success (https://lib/WACloud.js:1:266614)\n    at h (https://lib/WAServiceMainContext.js:1:178935)';
+  const iosStack = timeout + '\nsuccess@https://lib/WACloud.js:1:266619\nh@https://lib/WAServiceMainContext.js:1:178940';
+  rt.app.onError(iosStack);
+  rt.app.onUnhandledRejection({ reason: { message: timeout, stack: androidStack } });
+  rt.app.onUnhandledRejection({ reason: { message: timeout, stack: androidStack + '\n    at load (pages/mine/index.js:10:5)' } });
+  assert.equal(warnings.length, 2);
+  assert.equal(errors.length, 1);
+});

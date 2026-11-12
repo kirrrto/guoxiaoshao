@@ -2,6 +2,7 @@ const cloudConfig = require('./config/cloud');
 const { readSharedSelection } = require('./utils/share');
 const { VERSION } = require('./config/version');
 const { reLaunch, getNavigationContext } = require('./utils/navigation');
+const { isOnline } = require('./utils/network');
 
 // The shared environment's auth hook can stall on a weak network. Give up after
 // this long so pages show a retry instead of waiting forever; the next call retries.
@@ -51,9 +52,13 @@ const APP_FRAME = /(?:^|[/\\(\s])(?:app\.js\b|(?:pages|utils|components|config|c
 function isSdkTimeout(detail, text) {
   if (APP_FRAME.test(text)) return false;
   let errCode;
-  try { errCode = Number(detail && detail.errCode); } catch (_) { /* Retain the error if its code cannot be read. */ }
+  let message = '';
+  try {
+    errCode = Number(detail && detail.errCode);
+    if (detail && typeof detail.message === 'string') message = detail.message;
+  } catch (_) { /* The stack may still identify the error. */ }
   const knownTimeout = errCode === -601008
-    || /(?:^|[^\d])-601008(?!\d)|server-side request timed\s*out/i.test(text);
+    || /(?:^|[^\d])-601008(?!\d)|server-side request timed\s*out/i.test(text + '\n' + message);
   if (!knownTimeout) return false;
   const frames = text.split(/\r?\n/).filter(line => /(?:^\s*at\s|@|\.js:\d+)/.test(line));
   return frames.length > 0 && frames.every(line => BASE_LIB_FRAME.test(line));
@@ -79,10 +84,7 @@ App({
     this.globalData.singlePage = Boolean(options && options.scene === 1154);
     this.captureAlert(options);
     this.captureSharedTarget(options);
-    if (!this.globalData.singlePage) {
-      this.cloudReady = this.ensureCloud();
-      this.cloudReady.catch(() => {});
-    }
+    this.prepareEntryCloud(options);
     this.watchForUpdate();
   },
 
@@ -98,13 +100,21 @@ App({
     // Do not infer a transition from missing options (ordinary native returns).
     if (this.globalData.singlePage && options && Number.isInteger(options.scene) && options.scene !== 1154) {
       this.globalData.singlePage = false;
-      this.cloudReady = this.ensureCloud();
-      this.cloudReady.catch(() => {});
+      this.prepareEntryCloud(options);
     }
     this.captureAlert(options); this.captureSharedTarget(options); this.refreshConsentLater();
   },
 
   onHide() { this.runtimeVisibility = 'background'; },
+
+  prepareEntryCloud(options) {
+    const path = options && options.path;
+    // The guide renders from the bundled catalog. Its first later business
+    // action can establish a connection through the usual API client.
+    if (this.globalData.singlePage || path === 'pages/guide/index' || path === '/pages/guide/index' || !isOnline()) return;
+    this.cloudReady = this.ensureCloud();
+    this.cloudReady.catch(() => {});
+  },
 
   // Android WebView may not re-evaluate prefers-color-scheme media queries when
   // the system theme changes. Force every live page to re-render so CSS picks up
@@ -212,12 +222,15 @@ App({
     const init = typeof wx.nextTick === 'function'
       ? new Promise(resolve => wx.nextTick(resolve)).then(() => this.initCloud(generation))
       : this.initCloud(generation);
-    init.catch(() => {});
     // A late success still stores the cloud for the next call (initCloud sets it).
     const pending = new Promise((resolve, reject) => {
       const timer = setTimeout(() => {
         if (generation === this.cloudInitGeneration) this.globalData.cloudError = '连接云环境超时，请检查网络后重试';
-        reject(new Error('cloud_init_timeout'));
+        // The bridge may still finish the original authentication. A local
+        // deadline must not automatically open another connection underneath it.
+        const error = new Error('cloud_init_timeout');
+        error.localDeadline = true;
+        reject(error);
       }, CLOUD_INIT_TIMEOUT_MS);
       init.then(cloud => { clearTimeout(timer); resolve(cloud); }, error => { clearTimeout(timer); reject(error); });
     });
@@ -252,7 +265,7 @@ App({
     try {
       let cloud;
       if (selfAppid && selfAppid === cloudConfig.resourceAppid) {
-        wx.cloud.init({ env: cloudConfig.resourceEnv, traceUser: true });
+        await wx.cloud.init({ env: cloudConfig.resourceEnv, traceUser: true });
         cloud = wx.cloud;
       } else {
         cloud = new wx.cloud.Cloud({ resourceAppid: cloudConfig.resourceAppid, resourceEnv: cloudConfig.resourceEnv });
@@ -269,7 +282,7 @@ App({
       return cloud;
     } catch (error) {
       if (generation === this.cloudInitGeneration) this.globalData.cloudError = (error && (error.errMsg || error.message)) || String(error);
-      console.error('[gxs] cloud init failed', error);
+      if (!isSdkTimeout(error, errorText(error))) console.error('[gxs] cloud init failed', error);
       throw error;
     }
   },

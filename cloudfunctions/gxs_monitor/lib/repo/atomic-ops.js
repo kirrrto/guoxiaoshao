@@ -336,6 +336,7 @@ function atomicMethods(run, { readUpstreamBreaker } = {}) {
         await tx.put(C.queries, resumed);
         return { record: resumed, ...quotaBalance(user), recovered: true };
       }
+      if (args.existingOnly) throw new ApiError('query_recovery_missing', '旧查询记录暂未找到，本次未扣次，请重新核对。');
       if (record.kind === 'live') {
         if (await hydrateMemberPlansIn(tx, user)) await tx.put(C.users, user);
         const maxStores = accountLimits(user, new Date(nowIso), config).queryMaxStores;
@@ -345,6 +346,9 @@ function atomicMethods(run, { readUpstreamBreaker } = {}) {
         ? decideHistoryQuery({ user, product, requestedDayKey: record.dayKey, now: new Date(nowIso), config })
         : decideLiveQuery({ user, product, now: new Date(nowIso), config });
       if (!decision.allowed) return { denied: decision, ...quotaBalance(user) };
+      if (args.maxCost !== undefined && decision.cost > args.maxCost) {
+        throw new ApiError('query_cost_changed', '查询费用已变化，本次未扣次，请刷新账户后重新确认。');
+      }
       const guarded = await reserveAccountQuery(tx, { record, ownerId, nowIso, leaseMs, config });
       if (guarded) return { denied: guarded, ...quotaBalance(user) };
       if (decision.cost > 0) {

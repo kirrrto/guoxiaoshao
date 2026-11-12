@@ -1,7 +1,7 @@
 const navigation = require('../../utils/navigation');
 const { canQuery, canMonitor } = require('../../utils/product-capabilities');
 const { call, newId, showError, toast } = require('../../utils/api');
-const { getBootstrap, getCatalog, invalidateBootstrap, subscribeCatalog, getFollows, publishQuota, subscribeQuota, publishQueryBalance } = require('../../utils/store');
+const { getBootstrap, getCatalog, invalidateBootstrap, quotaAccountMatches, subscribeCatalog, getFollows, publishQuota, currentQuota, subscribeQuota, publishQueryBalance } = require('../../utils/store');
 const fmt = require('../../utils/format');
 const { storeLabel, storeLabelWithCity } = require('../../utils/store-label');
 const { localKey } = require('../../utils/local-key');
@@ -48,26 +48,28 @@ function selectionDetails(selection, catalog, maxStores) {
   const product = selection && catalog && catalog.productByPart && Object.prototype.hasOwnProperty.call(catalog.productByPart, selection.partNumber) ? catalog.productByPart[selection.partNumber] : null;
   const numbers = Array.isArray(selection && selection.storeNumbers) ? selection.storeNumbers : [];
   const stores = numbers.map(n => typeof n === 'string' && /^R\d{3}$/.test(n) && catalog && catalog.storeByNumber && Object.prototype.hasOwnProperty.call(catalog.storeByNumber, n) ? catalog.storeByNumber[n] : null).filter(Boolean);
-  const validScope = Boolean(product && numbers.length && numbers.length <= maxStores
-    && new Set(numbers).size === numbers.length && stores.length === numbers.length);
+  const exactScope = Boolean(product && numbers.length && new Set(numbers).size === numbers.length && stores.length === numbers.length);
+  const overStoreLimit = exactScope && numbers.length > maxStores && canQuery(product);
+  const validScope = exactScope && numbers.length <= maxStores;
   const unavailable = Boolean(validScope && !canQuery(product));
   const valid = validScope && !unavailable;
   const cities = Array.from(new Set(stores.map(s => s.city).filter(Boolean)));
   const notice = product && product.targetType === 'apple_cto'
     ? '官网定制款不支持 Apple Store 店内取货，请选择可查询的标准配置。'
+    : overStoreLimit ? `当前单次最多查询 ${maxStores} 家门店，请修改选择后发起新查询。`
     : unavailable ? '配置已保存，尚未开始监测。取货查询和关注暂未开放。' : '请补全或核对配置与门店后查询。';
   const title = product && (product.title || product.model || product.partNumber) || '';
   const model = (product && product.model || '').trim();
   const normalizedTitle = title.replace(/\s+/g, ' ').trim();
   const hasModelPrefix = Boolean(model && normalizedTitle.startsWith(model + ' '));
-  return { validScope, valid, notice, referenceOnly: Boolean(product && product.targetType === 'apple_cto'), summary: product ? {
+  return { validScope, valid, overStoreLimit, notice, referenceOnly: Boolean(product && product.targetType === 'apple_cto'), summary: product ? {
     title,
     displayName: hasModelPrefix ? model : title,
     configuration: hasModelPrefix ? normalizedTitle.slice(model.length).trim() : '',
     imageUrl: product.imageUrl || '', imageDisplayUrl: productThumbnailUrl(product.imageUrl, 'card', product.partNumber), imageAlt: product.imageAlt || product.title || '',
     imageFitClass: productImageFit(product.imageUrl),
     cityLabel: `${cities.join('、') || '已选'} · ${stores.length} 家门店`,
-    storeLabel: numbers.length !== stores.length || new Set(numbers).size !== numbers.length || numbers.length > maxStores
+    storeLabel: numbers.length !== stores.length || new Set(numbers).size !== numbers.length
       ? '已保存门店信息发生变化，请修改后查询'
       : stores.map(s => cities.length > 1 ? storeLabelWithCity(s.storeNumber, s.name, s.city) : storeLabel(s.storeNumber, s.name)).join('、'),
   } : null };
@@ -109,6 +111,7 @@ function queryNotice(response) {
 }
 
 function queryFailureNotice(error) {
+  if (error && ['query_account_changed', 'query_recovery_unavailable', 'query_recovery_missing', 'query_recovery_account', 'query_cost_changed'].includes(error.code)) return error.message;
   if (error && error.code === 'offline') return '网络已断开，联网后可重试；上次结果保留。';
   if (operation.uncertain(error)) return '本次结果尚未确认。再次查询相同目标会恢复原请求，不重复扣次。';
   const code = error && error.code, mapped = fmt.reasonText(code);
@@ -154,6 +157,7 @@ Page({
     rulesExpanded: false,
     querying: false,
     selectionQueryPending: false,
+    limitedQueryRecovery: false,
     requestSlow: false,
     requestProgressText: '',
     refreshing: false,
@@ -812,7 +816,11 @@ Page({
       if (epoch !== (this.accountEpoch || 0)) return;
       if (!result || !result.quota) throw new Error('签到结果尚未确认，请重试');
       // The shared store rejects stale revisions and updates other open pages too.
-      if (publishQuota(result.quota, owner) === false) return;
+      if (!publishQuota(result.quota, owner)) {
+        const newer = currentQuota(owner);
+        if (!newer) return;
+        this.applyQuota(newer);
+      }
       if (this.pageRetired) return;
       if (result.granted > 0) { confirmTap(); toast(`签到成功 +${result.granted} 次`, 'success'); }
       else if (result.reason === 'already_signed_in') toast('今天已签到');
@@ -848,8 +856,11 @@ Page({
 
   selectionView(selection, maxStores = this.data.boot ? this.data.boot.maxStores : 3) {
     const details = selectionDetails(selection, this.catalog, maxStores || 3);
+    const owner = this.accountSnapshot && this.accountSnapshot.identity && this.accountSnapshot.identity.userKey;
     return {
+      limitedQueryRecovery: Boolean(owner && details.overStoreLimit && this.hasPendingQuery(selection)),
       selectionQueryPending: details.valid && this.hasPendingQuery(selection),
+      legacyQueryPending: details.valid && !!this.legacyQueryId(selection),
       selectionCanCollapse: details.valid,
       selectionSupportsFollow: canMonitor(selection && this.catalog && this.catalog.productByPart[selection.partNumber]),
       selectionReferenceOnly: details.referenceOnly,
@@ -864,6 +875,12 @@ Page({
     if (!selection || !selection.partNumber) return false;
     const owner = this.accountSnapshot && this.accountSnapshot.identity && this.accountSnapshot.identity.userKey;
     return operation.hasPending('q', { partNumber: selection.partNumber, storeNumbers: selection.storeNumbers }, owner);
+  },
+
+  legacyQueryId(selection) {
+    if (!selection || !selection.partNumber) return null;
+    const owner = this.accountSnapshot && this.accountSnapshot.identity && this.accountSnapshot.identity.userKey;
+    return operation.legacyId('q', { partNumber: selection.partNumber, storeNumbers: selection.storeNumbers }, owner);
   },
 
   onSelectionInteraction() { this.selectionInteractionEpoch = (this.selectionInteractionEpoch || 0) + 1; },
@@ -949,7 +966,10 @@ Page({
   async onQuery() {
     if (this.pageRetired || this.data.sheetVisible || this.data.signing || this.data.querying) return;
     const selection = this.readPickerSelection();
-    if (this.selectionNeedsReview) return toast(this.data.selectionNotice || '请先修改并核对已保存的配置与门店');
+    if (this.selectionNeedsReview) {
+      if (this.data.limitedQueryRecovery) return this.performQuery(selection);
+      return toast(this.data.selectionNotice || '请先修改并核对已保存的配置与门店');
+    }
     // Must run inside the tap, before any await (WeChat gesture rule).
     topUpReminderCredit();
     return this.performQuery(selection);
@@ -969,9 +989,12 @@ Page({
     const boot = this.data.boot;
     const accountEpoch = this.accountEpoch || 0;
     const accountUserKey = this.accountSnapshot && this.accountSnapshot.identity && this.accountSnapshot.identity.userKey;
+    if (!quotaAccountMatches(accountUserKey)) return toast('账号已变化，请下拉刷新后再查询。');
     if (this.features && this.features.resultNextAction && this.data.selectionRestricted && targetKey(selection) === targetKey(this.selection)) return this.onFollowSelection();
     if (!selection.partNumber) return toast('请先选择具体配置');
     if (!selection.storeNumbers.length) return toast('请至少选择一家门店');
+    const existingOnly = selection.storeNumbers.length > boot.maxStores;
+    if (existingOnly && !this.selectionView(selection).limitedQueryRecovery) return toast(`当前单次最多查询 ${boot.maxStores} 家门店，请修改选择。`);
     if (selection.product && !canQuery(selection.product)) {
       return toast(selection.product.targetType === 'apple_cto' ? '官网定制款不支持 Apple Store 店内取货' : '该配置暂不支持查询');
     }
@@ -983,9 +1006,15 @@ Page({
     const focus = { visible: Boolean(this.visible), visibilityEpoch: this.visibilityEpoch || 0,
       interactionEpoch: this.selectionInteractionEpoch || 0, queryEpoch: this.queryFocusEpoch = (this.queryFocusEpoch || 0) + 1 };
     const payload = { partNumber: selection.partNumber, storeNumbers: selection.storeNumbers.slice() };
-    const queryId = operation.begin('q', payload, accountUserKey);
+    let queryId;
     try {
-      const response = await call('query.pickup', { queryId, ...payload });
+      const verify = existingOnly || this.legacyQueryId(selection);
+      const recovery = verify && await operation.verifyLegacy('q', payload, accountUserKey, { cost: boot.queryCost, member: boot.member, existingOnly,
+        isCurrent: () => !this.pageRetired && accountEpoch === (this.accountEpoch || 0) });
+      if (verify && !recovery) return;
+      queryId = recovery ? recovery.queryId : operation.begin('q', payload, accountUserKey);
+      const response = recovery ? await call('query.resumeLegacy', recovery)
+        : await call('query.pickup', { queryId, ...payload, ...(accountUserKey ? { expectedUserKey: accountUserKey } : {}) });
       if (accountEpoch !== (this.accountEpoch || 0)) return;
       if (response.reason === 'query_in_progress') {
         if (!this.pageRetired) {
@@ -994,7 +1023,7 @@ Page({
         }
         return;
       }
-      operation.finish('q', queryId);
+      operation.finish('q', queryId, accountUserKey, response.ok || !!response.results);
       if (invalidateBootstrap(accountUserKey) === false) return;
       const quota = publishQueryBalance(response, accountUserKey);
       if (quota.needsRefresh) getBootstrap({ force: true }).then(boot => this.applyBoot(boot)).catch(() => {});
@@ -1030,7 +1059,7 @@ Page({
       if (response.refunded) toast(response.ok && (response.allShared || response.billingReason === 'shared_result_no_charge') ? '已展示最近核实的结果，本次未扣次' : '本次未取得有效结果，已返还次数');
       if (response.ok && result.results.length) { confirmTap(); this.focusQueryResult(focus); }
     } catch (error) {
-      if (!operation.uncertain(error)) operation.finish('q', queryId);
+      if (queryId && !operation.uncertain(error)) operation.finish('q', queryId, accountUserKey, false);
       if (this.pageRetired || accountEpoch !== (this.accountEpoch || 0)) return;
       this.lastQueryUncertain = true;
       this.refreshJourney();
@@ -1039,7 +1068,8 @@ Page({
     } finally {
       if (!this.pageRetired && accountEpoch === (this.accountEpoch || 0)) {
         stopProgress(this);
-        this.setData({ querying: false, requestSlow: false, selectionQueryPending: this.hasPendingQuery(this.selection) });
+        this.setData({ querying: false, requestSlow: false, selectionQueryPending: this.hasPendingQuery(this.selection), legacyQueryPending: !!this.legacyQueryId(this.selection),
+          limitedQueryRecovery: this.selectionView(this.selection).limitedQueryRecovery });
       }
     }
   },

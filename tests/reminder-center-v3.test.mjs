@@ -70,6 +70,11 @@ test('mine emphasizes top-up only for actionable low balances and treats sold-ou
   const cases = [
     [boot(), false, '到货授权充足'],
     [boot(undefined, true, balances(5, 0)), false, '到货授权充足'],
+    [boot(undefined, true, { RESTOCK: { credits: 5 }, SOLDOUT: { credits: 0, accepted: 2 } }), true, '断货暂无次数'],
+    [boot(undefined, true, { RESTOCK: { credits: 0 }, SOLDOUT: { credits: 0, accepted: 2 } }), true, '到货、断货暂无次数'],
+    [boot(undefined, true, { RESTOCK: { credits: 1 }, SOLDOUT: { credits: 0, accepted: 2 } }), true, '到货次数较少，断货暂无次数'],
+    [boot(undefined, true, { RESTOCK: { credits: 5 }, SOLDOUT: { credits: 0, needsReauthorization: true } }), true, '断货暂无次数'],
+    [boot(undefined, true, { RESTOCK: { credits: 5 }, SOLDOUT: { credits: 0, accepted: 2, lastResult: 'reject' } }), false, '到货授权充足'],
     [boot(undefined, true, balances(5, 1)), true, '断货次数较少'],
     [boot(undefined, true, balances(2, 0)), true, '到货次数较少'],
     [boot(undefined, true, balances(0, 3)), true, '到货暂无次数'],
@@ -85,6 +90,25 @@ test('mine emphasizes top-up only for actionable low balances and treats sold-ou
     assert.equal(s.mine.data.reminderTopUpNeeded, emphasized, label);
     assert.equal(s.mine.data.reminderCenterStatus, label);
   }
+  assert.equal(s.prompts(), 0);
+});
+
+test('consuming the last chosen sold-out authorization is visible on both pages until replenishment', () => {
+  const s = setup({ snapshot: boot(undefined, true, balances(5, 1)) });
+  s.follow.setData({ followsLoaded: true, follows: [{ status: 'active', stores: [] }] });
+  const update = (credits, lastResult) => s.rt.load('utils/store.js').publishSubscriptions({
+    RESTOCK: { credits: 5 }, SOLDOUT: { credits, accepted: 1, lastResult },
+  });
+  update(0, 'accept');
+  assert.equal(s.mine.data.reminderCenterStatus, '断货暂无次数');
+  assert.equal(s.mine.data.reminderTopUpNeeded, true);
+  assert.equal(s.follow.data.readiness.title, '断货提醒暂无次数');
+  assert.equal(s.follow.data.primaryTopUp, true);
+  update(0, 'reject');
+  assert.equal(s.mine.data.reminderTopUpNeeded, false, 'the same balance can now belong to a declined optional alert');
+  update(4, 'accept');
+  assert.equal(s.mine.data.reminderTopUpNeeded, false);
+  assert.equal(s.follow.data.primaryTopUp, false);
   assert.equal(s.prompts(), 0);
 });
 

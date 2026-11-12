@@ -53,7 +53,7 @@ test('a configured template can be authorized by a tap before sending is enabled
     rt.wx.requestSubscribeMessage = async options => { prompts++; assert.deepEqual(copy(options.tmplIds), ['restock-A']); return { 'restock-A': 'accept' }; };
     const page = pageFor(rt, data);
     assert.equal(prompts, 0); assert.equal(rt.calls.length, 0);
-    assert.match(page.data.readiness.detail, /可先点击下方「增加提醒次数」/);
+    assert.match(page.data.readiness.detail, /可先点击「补充提醒次数」/);
     await page.onSubscribe(); await settle();
     assert.equal(prompts, 1, reason);
     const requests = rt.calls.filter(call => call.action === 'notify.recordSubscription');

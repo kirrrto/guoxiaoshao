@@ -42,6 +42,35 @@ test('late cloud success is reusable when no replacement attempt has started', a
   assert.equal(rt.app.globalData.cloudError, null);
 });
 
+test('the local authentication deadline does not start another native init for each waiting read', async () => {
+  const { rt, attempts } = connectionRuntime();
+  const api = rt.load('utils/api.js');
+  const requests = Promise.allSettled([api.call('user.bootstrap'), api.call('follow.list')]);
+  assert.equal(attempts.length, 1);
+  await rt.nextTimer();
+  await settle();
+  assert.equal(rt.timers.size, 0, 'pending native authentication must not schedule automatic retries');
+  const responses = await requests;
+  assert.ok(responses.every(result => result.status === 'rejected' && result.reason.code === 'cloud_init_failed' && !result.reason.retryable));
+  attempts[0].pending.resolve();
+  await settle();
+  assert.equal(await rt.app.ensureCloud(), attempts[0]);
+});
+
+test('an asynchronous failure from the resource owner SDK is observed before publishing its connection', async () => {
+  const rt = runtime(undefined, { realApi: true }), init = deferred();
+  const config = rt.load('config/cloud.js');
+  rt.wx.getAccountInfoSync = () => ({ miniProgram: { appId: config.resourceAppid } });
+  rt.wx.cloud = { init: () => init.promise };
+  rt.load('app.js');
+  const ready = rt.app.ensureCloud();
+  await settle();
+  assert.equal(rt.app.globalData.cloud, null);
+  init.reject(Object.assign(new Error('请求超时'), { errCode: -601008 }));
+  await assert.rejects(ready, error => error.errCode === -601008);
+  assert.equal(rt.app.globalData.cloud, null);
+});
+
 for (const errMsg of ['cloud.callFunction:fail -601017 not allowed', 'cloud.callFunction:fail unknown configuration failure']) {
   test(`a safe read does not replay a non-transient failure: ${errMsg}`, async () => {
     const rt = runtime(undefined, { realApi: true }); let calls = 0;

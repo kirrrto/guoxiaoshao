@@ -24,7 +24,7 @@ test('a live collector heartbeat cannot claim readiness when actual stock observ
   assert.match(page.data.collector.detail, /观测.*更新/);
   assert.equal(page.data.delivery.label, '发送状态待确认', 'legacy stock errors do not prove a sender failure');
   assert.match(page.data.delivery.detail, /发送通道.*状态/);
-  assert.match(page.data.follows[0].monitoringText, /后台检测情况见上方/);
+  assert.match(page.data.follows[0].monitoringText, /后台检测情况可在「状态详情」查看/);
 });
 
 test('personal readiness distinguishes loading, no follows and all paused from healthy shared services', () => {

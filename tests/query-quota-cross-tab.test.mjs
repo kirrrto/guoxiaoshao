@@ -7,6 +7,29 @@ const deferred = () => { let resolve, reject; const promise = new Promise((done,
 const settle = async () => { for (let i = 0; i < 6; i++) await new Promise(resolve => setImmediate(resolve)); };
 const ok = result => { assert.equal(result.ok, true, JSON.stringify(result.error)); return result.data; };
 
+test('sign-in confirms the reward and shows the latest same-account quota when another tab refreshed first', async () => {
+  const f = createFixture(), committed = deferred(), delivery = deferred();
+  const rt = runtime(async (action, payload) => {
+    const result = ok(await f.call(action, payload));
+    if (action === 'quota.signin') { committed.resolve(result); await delivery.promise; }
+    return result;
+  });
+  const page = rt.instance('pages/query/index.js'), store = rt.load('utils/store.js');
+  await page.onLoad({});
+  const signing = page.onSignin();
+  const reward = await committed.promise;
+  ok(await f.call('admin.grantCredits', { userKey: userKeyOf(), grantId: 'signup-balance-race', amount: 1 }, operatorContext()));
+  const newer = await store.getBootstrap({ force: true });
+  assert.ok(newer.quota.revision > reward.quota.revision);
+  delivery.resolve();
+  await signing;
+  assert.equal(page.data.boot.signedInToday, true);
+  assert.equal(page.data.boot.balance, newer.quota.balance);
+  assert.equal(rt.messages.filter(value => value === '签到成功 +1 次').length, 1);
+  assert.equal(rt.calls.filter(item => item.action === 'quota.signin').length, 1);
+  page.onUnload();
+});
+
 for (const kind of ['query', 'mine']) {
   test(`${kind}: late sign-in cannot publish the old account balance or unlock the new sign-in`, async () => {
     const f = createFixture(), base = ok(await f.call('user.bootstrap'));

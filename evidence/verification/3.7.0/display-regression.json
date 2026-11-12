@@ -1,0 +1,35 @@
+{
+  "kind": "offline-page-regression",
+  "sourceFingerprint": "sha256:5b822bcb4ea6177ae81c637f603aa951f2bff9a990849554deab2cf1848eb650",
+  "generatedAt": "2026-11-12T15:50:10.986Z",
+  "tests": {
+    "command": "node --test tests/reminder-center-v3.test.mjs tests/reminder-nudge.test.mjs tests/personal-reminder-readiness.test.mjs tests/frontend-regression.test.mjs tests/follow-subscription-frontend.test.mjs tests/wechat-component-audit.test.mjs tests/wechat-quality-findings.test.mjs tests/query-store-limit-recovery.test.mjs",
+    "passed": 102,
+    "failed": 0
+  },
+  "sample": "375px, runtime image error after changing store scope, previous result retained",
+  "schemeReports": [
+    {
+      "scheme": "light",
+      "activeMeasurements": 119,
+      "failedMeasurements": 0,
+      "missingPhoto": {
+        "scenario": "longcontent",
+        "label": "暂无图片",
+        "minRatio": 5.329014322328539,
+        "threshold": 4.5
+      }
+    },
+    {
+      "scheme": "dark",
+      "activeMeasurements": 119,
+      "failedMeasurements": 0,
+      "missingPhoto": {
+        "scenario": "longcontent",
+        "label": "暂无图片",
+        "minRatio": 7.075047324073819,
+        "threshold": 4.5
+      }
+    }
+  ]
+}

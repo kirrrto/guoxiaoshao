@@ -87,17 +87,18 @@ test('storage recovery state follows the full localKey scope', () => {
   assert.equal(operations.begin('q', target), first);
 });
 
-test('a member of another account cannot see or adopt a saved query; an upgrade can recover an unowned legacy ID', () => {
+test('beginning an ordinary account request never grants it ownership of an unverified legacy ID', () => {
   const rt = runtime(), ops = rt.load('utils/operation.js');
   rt.storage.set('gxs_pending_q_v1', { id: 'legacy-operation', fingerprint: JSON.stringify(target) });
   assert.equal(ops.hasPending('q', target, 'alice'), true);
-  assert.equal(ops.begin('q', target, 'alice'), 'legacy-operation');
-  assert.equal(ops.hasPending('q', target, 'bob'), false);
+  const alice = ops.begin('q', target, 'alice');
+  assert.notEqual(alice, 'legacy-operation');
+  assert.equal(ops.legacyId('q', target, 'bob'), 'legacy-operation');
   const other = ops.begin('q', target, 'bob');
   assert.notEqual(other, 'legacy-operation');
-  ops.finish('q', other);
-  assert.equal(ops.hasPending('q', target, 'bob'), false);
-  assert.equal(ops.begin('q', target, 'alice'), 'legacy-operation');
+  ops.finish('q', other, 'bob');
+  assert.equal(ops.legacyId('q', target, 'bob'), 'legacy-operation');
+  assert.equal(ops.begin('q', target, 'alice'), alice);
 });
 
 test('zero credits after a lost response still exposes the same-SKU/store recovery button after cold start', async () => {

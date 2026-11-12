@@ -1,4 +1,4 @@
-const { activeDnd, LOW_CREDITS } = require('./reminder-readiness');
+const { activeDnd, LOW_CREDITS, soldoutSubscription } = require('./reminder-readiness');
 const { localKey } = require('./local-key');
 
 // Stable across application releases. A new version never resets this cooldown.
@@ -23,11 +23,11 @@ function nudgeFor({ boot, follows, blocked = false, pending = false, busy = fals
   const restock = subscriptions[templates.restock] || {}, soldout = subscriptions[templates.soldout] || {};
   const platformSettings = consentSetting && consentSetting.itemSettings || {};
   const rejected = (id, sub) => ['reject', 'ban'].includes(platformSettings[id]) || ['reject', 'ban'].includes(sub.lastResult);
-  const restockCount = subscriptionCount(restock), soldoutCount = subscriptionCount(soldout);
+  const restockCount = subscriptionCount(restock);
+  const { credits: soldoutCount, chosen } = soldoutSubscription(notifications, subscriptions);
   const needs = [];
   if (!rejected(templates.restock, restock) && (restock.needsReauthorization || restockCount <= LOW_CREDITS)) needs.push('到货');
-  const choseSoldout = Boolean(soldoutCount > 0 || soldout.needsReauthorization || Number(soldout.accepted) > 0 || soldout.lastResult === 'accept');
-  if (templates.soldout && choseSoldout && !rejected(templates.soldout, soldout)
+  if (templates.soldout && chosen && !rejected(templates.soldout, soldout)
     && (soldout.needsReauthorization || soldoutCount <= LOW_CREDITS)) needs.push('断货');
   if (!needs.length) return null;
   const templateIds = [...new Set([templates.restock, templates.soldout].filter(id => typeof id === 'string' && id.trim()))];

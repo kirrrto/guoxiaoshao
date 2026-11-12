@@ -46,7 +46,7 @@
       <view wx:if="{{selectionSummary}}" class="history-query-row">
         <view wx:if="{{accountReady}}" class="history-query-cost"><text>{{boot.member ? '会员查询不扣次数' : '消耗 ' + boot.historyCost + ' 次 · 余 ' + boot.balance + ' 次'}}</text><text wx:if="{{!boot.member}}">无事件自动退还</text></view>
         <button class="btn btn-primary history-query-submit {{querying ? 'disabled' : ''}}" hover-class="btn-primary-pressed" loading="{{querying}}" disabled="{{querying || loadingMore || !accountReady || !selectionSummary.valid}}" bindtap="onQuery">
-          {{!accountReady ? '正在连接账户…' : (querying ? '加载中…' : '查看历史')}}
+          {{!accountReady ? '正在连接账户…' : (querying ? '加载中…' : legacyQueryPending ? '核对上次查询' : '查看历史')}}
         </button>
       </view>
       <view wx:if="{{querying}}" class="request-progress {{requestSlow ? 'request-progress--slow' : ''}}" aria-role="status">{{requestSlow ? requestProgressText : '正在读取所选日期的已记录变化。'}}</view>

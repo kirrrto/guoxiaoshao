@@ -1,0 +1,256 @@
+{
+  "candidate": "3.7.0",
+  "kind": "offline-contract-simulation-comparison",
+  "configObservationUtc": "2026-11-12T15:33:32Z",
+  "configObservation": "Read-only projection of production collector budget, sharing and cadence. Continuous availability interval absent in the runtime document and observed as zero through the effective configuration. No user data imported.",
+  "command": "node tools/run-capacity-300.mjs output/v3.7.0/capacity-configured-details.json --collector-config evidence/verification/3.7.0/collector-capacity-input.json",
+  "defaultContract": {
+    "at": "2026-11-12T15:07:49.607Z",
+    "maxPerMinute": 60,
+    "sustainedPerDay": 10000,
+    "autoSharePercent": 80,
+    "productionRequests": 0,
+    "scenarios": [
+      {
+        "scenario": "same-target-fast",
+        "full": 300,
+        "partial": 0,
+        "failed": 0,
+        "knownTargetReads": 300,
+        "http": 1,
+        "netDebits": 0,
+        "p95LocalMs": 3704
+      },
+      {
+        "scenario": "same-target-slow",
+        "full": 300,
+        "partial": 0,
+        "failed": 0,
+        "knownTargetReads": 300,
+        "http": 1,
+        "netDebits": 0,
+        "p95LocalMs": 5205
+      },
+      {
+        "scenario": "same-three-stores",
+        "full": 300,
+        "partial": 0,
+        "failed": 0,
+        "knownTargetReads": 900,
+        "http": 3,
+        "netDebits": 0,
+        "p95LocalMs": 5322
+      },
+      {
+        "scenario": "distinct-300-targets",
+        "full": 59,
+        "partial": 0,
+        "failed": 241,
+        "knownTargetReads": 59,
+        "http": 59,
+        "netDebits": 0,
+        "p95LocalMs": 3756
+      },
+      {
+        "scenario": "distinct-900-targets",
+        "full": 19,
+        "partial": 1,
+        "failed": 280,
+        "knownTargetReads": 59,
+        "http": 59,
+        "netDebits": 0,
+        "p95LocalMs": 9673
+      },
+      {
+        "scenario": "continuous-300-manual-plus-300-auto-every-45s",
+        "syntheticSeconds": 135,
+        "manualAttempts": 1200,
+        "manualSuccess": 4,
+        "manualFailed": 1196,
+        "automaticAttempts": 1200,
+        "automaticSuccess": 71,
+        "http": 75,
+        "netDebits": 0,
+        "overRefillEnvelope": false,
+        "anyMinuteExceeded": false,
+        "invalidTokenBalance": false,
+        "deniedBudget": {
+          "capacity_wait": 1426,
+          "minute_budget": 600
+        }
+      }
+    ]
+  },
+  "observedConfigFirstRun": {
+    "at": "2026-11-12T15:36:50.117Z",
+    "maxPerMinute": 600,
+    "sustainedPerDay": 800000,
+    "autoSharePercent": 80,
+    "productionRequests": 0,
+    "scenarios": [
+      {
+        "scenario": "same-target-fast",
+        "full": 300,
+        "partial": 0,
+        "failed": 0,
+        "knownTargetReads": 300,
+        "http": 1,
+        "netDebits": 0,
+        "p95LocalMs": 2545
+      },
+      {
+        "scenario": "same-target-slow",
+        "full": 300,
+        "partial": 0,
+        "failed": 0,
+        "knownTargetReads": 300,
+        "http": 1,
+        "netDebits": 0,
+        "p95LocalMs": 4974
+      },
+      {
+        "scenario": "same-three-stores",
+        "full": 300,
+        "partial": 0,
+        "failed": 0,
+        "knownTargetReads": 900,
+        "http": 3,
+        "netDebits": 0,
+        "p95LocalMs": 5463
+      },
+      {
+        "scenario": "distinct-300-targets",
+        "full": 300,
+        "partial": 0,
+        "failed": 0,
+        "knownTargetReads": 300,
+        "http": 300,
+        "netDebits": 0,
+        "p95LocalMs": 6396
+      },
+      {
+        "scenario": "distinct-900-targets",
+        "full": 184,
+        "partial": 1,
+        "failed": 115,
+        "knownTargetReads": 554,
+        "http": 554,
+        "netDebits": 0,
+        "p95LocalMs": 15821
+      },
+      {
+        "scenario": "continuous-300-manual-plus-300-auto-every-45s",
+        "syntheticSeconds": 135,
+        "manualAttempts": 1200,
+        "manualSuccess": 323,
+        "manualFailed": 877,
+        "automaticAttempts": 1200,
+        "automaticSuccess": 1080,
+        "http": 1403,
+        "netDebits": 0,
+        "overRefillEnvelope": false,
+        "anyMinuteExceeded": false,
+        "invalidTokenBalance": false,
+        "deniedBudget": {
+          "capacity_wait": 400,
+          "minute_budget": 420
+        }
+      }
+    ]
+  },
+  "observedConfigSecondRun": {
+    "at": "2026-11-12T15:38:43.279Z",
+    "maxPerMinute": 600,
+    "sustainedPerDay": 800000,
+    "autoSharePercent": 80,
+    "productionRequests": 0,
+    "scenarios": [
+      {
+        "scenario": "same-target-fast",
+        "full": 300,
+        "partial": 0,
+        "failed": 0,
+        "knownTargetReads": 300,
+        "http": 1,
+        "netDebits": 0,
+        "p95LocalMs": 2571,
+        "transportErrors": {}
+      },
+      {
+        "scenario": "same-target-slow",
+        "full": 300,
+        "partial": 0,
+        "failed": 0,
+        "knownTargetReads": 300,
+        "http": 1,
+        "netDebits": 0,
+        "p95LocalMs": 5009,
+        "transportErrors": {}
+      },
+      {
+        "scenario": "same-three-stores",
+        "full": 300,
+        "partial": 0,
+        "failed": 0,
+        "knownTargetReads": 900,
+        "http": 3,
+        "netDebits": 0,
+        "p95LocalMs": 5318,
+        "transportErrors": {}
+      },
+      {
+        "scenario": "distinct-300-targets",
+        "full": 300,
+        "partial": 0,
+        "failed": 0,
+        "knownTargetReads": 300,
+        "http": 300,
+        "netDebits": 0,
+        "p95LocalMs": 6007,
+        "transportErrors": {}
+      },
+      {
+        "scenario": "distinct-900-targets",
+        "full": 162,
+        "partial": 1,
+        "failed": 137,
+        "knownTargetReads": 488,
+        "http": 488,
+        "netDebits": 0,
+        "p95LocalMs": 16431,
+        "transportErrors": {
+          "request_cancelled": 412
+        }
+      },
+      {
+        "scenario": "continuous-300-manual-plus-300-auto-every-45s",
+        "syntheticSeconds": 135,
+        "manualAttempts": 1200,
+        "manualSuccess": 306,
+        "manualFailed": 894,
+        "automaticAttempts": 1200,
+        "automaticSuccess": 1080,
+        "http": 1386,
+        "netDebits": 0,
+        "overRefillEnvelope": false,
+        "anyMinuteExceeded": false,
+        "invalidTokenBalance": false,
+        "deniedBudget": {
+          "capacity_wait": 360,
+          "minute_budget": 420
+        },
+        "manualTransportErrors": {
+          "capacity_wait": 360,
+          "minute_budget": 300,
+          "request_cancelled": 234
+        }
+      }
+    ]
+  },
+  "limitations": [
+    "Three-store distinct scenario requests 300 different retail SKUs across the same three stores = 900 exact targets. Manual pickup currently sends one HTTP request per store and SKU. A full 600-token burst with an idle automatic lane allows at most 599 such manual requests at the fixed simulated time.",
+    "The full-table copying in-memory transactions compete for CPU against the real local query deadline. Difference between repeat runs is not an estimate of actual cloud or Apple latency. request_cancelled denotes local request time budget exhausted.",
+    "Synthetic monitoring admission pressure in the four-wave case does not replay the production scheduler. This test does not measure consecutive successful production observation intervals.",
+    "Zero production load, real users, payments or Apple traffic. These results do not demonstrate CloudBase transaction behavior under load, authorized upstream throughput, or handset delivery."
+  ]
+}

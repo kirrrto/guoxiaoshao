@@ -1,0 +1,81 @@
+{
+  "candidate": "3.7.0",
+  "checkedAt": "2026-11-12T15:51:16.017Z",
+  "sourceFingerprint": "sha256:5b822bcb4ea6177ae81c637f603aa951f2bff9a990849554deab2cf1848eb650",
+  "runtimeReports": {
+    "reportedApp": "3.6.0",
+    "client": "8.0.80",
+    "sdk": {
+      "file": "WACloud.js",
+      "sha256": "14ce8322352b2687692d8573f204c02d6653c81bd432e5b2ae36a7d41494892d",
+      "reportedLine": 1,
+      "columns": [
+        266614,
+        266619
+      ],
+      "observation": "Both locations are in the same generic native nonzero response error constructor. No business action is identified by these stacks."
+    },
+    "distinctEvents": 3,
+    "platforms": {
+      "iOS": 2,
+      "Android": 1
+    },
+    "aggregateReadOnlyLogReview": {
+      "matchedSuccessfulNeighboringGatewayAndFunctionCalls": 9,
+      "longestGatewayMs": 11681,
+      "correspondingFunctionMs": 286,
+      "failedCallMatchedByRequestId": false
+    }
+  },
+  "offlineTests": {
+    "total": 1965,
+    "passed": 1965,
+    "failed": 0,
+    "skipped": 0,
+    "cancelled": 0
+  },
+  "nativeSimulator": {
+    "checkedAt": "2026-11-12T15:49:30.344Z",
+    "platform": "devtools",
+    "SDKVersion": "3.17.6",
+    "loadedRoute": "pages/query/index",
+    "realAccountBootstrap": true,
+    "scope": "Native WeChat simulator. First page opened the real authorized account. The SDK failure injections below reached only an in-memory transport; no paid query was sent.",
+    "readRecovered": true,
+    "readAttempts": 2,
+    "paidAttempts": 1,
+    "distinctClientTraceIds": 3,
+    "observedTransportCode": -601008
+  },
+  "offlineLayout": {
+    "renderer": "Offline Chromium with synthetic data",
+    "sourceHash": "d55fcc765c2e04ab62d4e87a559ee6273485e6ff0882658f69643d9cf17f61bb",
+    "cases": 96,
+    "failures": 0
+  },
+  "sourceChecks": {
+    "passed": true,
+    "passedChecks": 61,
+    "monitorBundle": {
+      "passed": true,
+      "files": 50,
+      "sourceBytes": 375645,
+      "issues": []
+    }
+  },
+  "wechatQuality": {
+    "passed": false,
+    "open": [
+      "unused-channel-video",
+      "custom-tabbar-first-switch",
+      "oversized-product-image",
+      "legacy-product-image-format"
+    ]
+  },
+  "publicationReady": false,
+  "limitations": [
+    "The error injections target the actual SDK stack formats through a simulated transport in the WeChat simulator, not an iOS or Android device.",
+    "The originating request ID was not available for the 3.6.0 incidents.",
+    "No new cloud deployment, WeChat upload, phone notification receipt, production load test or official candidate-specific quality retest is included."
+  ]
+}

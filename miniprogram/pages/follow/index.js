@@ -104,7 +104,7 @@ function presentFollow(follow, boot, catalog, collector) {
     : follow.status === 'limit_paused' ? '配置已保留，可在会员权益中查看可用名额并恢复' : '';
   if (!retired && follow.status === 'active') {
     if (!canRemind(boot)) { status.cls = 'warn'; monitoringText = '会员未生效，当前不参与自动检测'; }
-    else if (!collector || collector.state !== 'running' || collector.observationStale) monitoringText = '关注已保存，后台检测情况见上方';
+    else if (!collector || collector.state !== 'running' || collector.observationStale) monitoringText = '关注已保存，后台检测情况可在「状态详情」查看';
   }
   const product = catalog && catalog.productByPart && catalog.productByPart[follow.partNumber];
   const stores = (follow.stores || []).map(s => ({ ...s, storeName: storeLabel(s.storeNumber, s.storeName), storeLabel: storeLabelWithCity(s.storeNumber, s.storeName, s.city), ...fmt.stockObservation(s, now, { restricted: follow.latestRestricted }),
@@ -716,7 +716,7 @@ Page({
     const delivery = deliveryView(notifications, templateIds);
     const member = boot.membership.active, expired = !member && Boolean(boot.membership.expiresAt);
     // Sell-out alerts are a member feature on their own template, requested in the same prompt.
-    const soldout = member && templateIds.length ? soldoutSubscription(notifications, boot.subscriptions) : { templateId: null, credits: 0 };
+    const soldout = member && templateIds.length ? soldoutSubscription(notifications, boot.subscriptions) : { templateId: null, credits: 0, chosen: false };
     this.settings = boot.settings || { notifyEnabled: true };
     this.setData({
       // Follow and WeChat reminders are member-only; free accounts only get query credits.
@@ -726,7 +726,7 @@ Page({
         updatedText: collector.updatedAt ? fmt.fmtDateTime(collector.updatedAt) : null, batchText: collector.lastBatchAt ? fmt.fmtDateTime(collector.lastBatchAt) : null },
       delivery,
       limits: boot.limits || this.data.limits,
-      subscription: { ...subscription, soldoutEnabled: Boolean(soldout.templateId), soldoutCredits: soldout.credits },
+      subscription: { ...subscription, soldoutEnabled: Boolean(soldout.templateId), soldoutCredits: soldout.credits, soldoutChosen: soldout.chosen },
       subscriptionPending: getAuthorizationState().pendingCount > 0,
       ...pageData,
     });
@@ -797,7 +797,7 @@ Page({
     const stockOverview = delayed ? { label: '库存更新有延迟', tone: 'warn', detail: `${delayed} 项门店结果待更新，已保留上次结果。` }
       : awaiting ? { label: '等待首次检查', tone: 'muted', detail: '关注已保存，无需重复添加。' } : null;
     this.setData({ readiness, stockOverview, readinessTaskDetail: readinessTaskDetail(readiness), creditBoostTip: tip,
-      primaryTopUp: !(readiness.ready && Number(this.data.subscription.credits) > 3) });
+      primaryTopUp: !(readiness.ready && Number(this.data.subscription.credits) > 3) || Boolean(readiness.code === 'low_credit' && this.data.subscription.soldoutChosen && !consent.soldoutBlocked) });
     this.refreshActivation();
   },
 
@@ -1047,7 +1047,7 @@ Page({
     // on Android — the dialog stays silent. Point at the real tap button instead.
     wx.showModal({
       title: this.data.subscription.soldoutEnabled ? '开启到货和断货提醒' : '开启补货提醒',
-      content: `${this.data.subscription.soldoutEnabled ? '一个按钮同时申请到货和断货提醒；两项都选择「允许」，各增加 1 次。也可以只允许其中一项。' : '每点一次「允许」增加 1 次到货提醒，可以连续授权多次累加。'}建议连续授权累加到 10 次以上。点下方「补充提醒次数」按钮后，微信会弹出授权。`,
+      content: `${this.data.subscription.soldoutEnabled ? '一个按钮同时申请到货和断货提醒；两项都选择「允许」，各增加 1 次。也可以只允许其中一项。' : '每点一次「允许」增加 1 次到货提醒，可以连续授权多次累加。'}建议连续授权累加到 10 次以上。点「补充提醒次数」后，微信会弹出授权。`,
       confirmText: '知道了',
       showCancel: false,
     });

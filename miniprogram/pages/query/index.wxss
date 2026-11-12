@@ -41,6 +41,7 @@
 .result-product-row { display: flex; align-items: center; gap: 22rpx; padding: 4rpx 0 24rpx; border-bottom: 1rpx solid var(--line); }
 .result-product-media { display: flex; align-items: center; justify-content: center; flex: 0 0 168rpx; width: 168rpx; height: 200rpx; background: var(--image-tile); border-radius: var(--radius-action); overflow: hidden; }
 .result-product-image { display: block; width: 100%; height: 100%; }
+.result-product-media--empty { background: var(--card); }
 .product-image-fit-pro { transform: translateY(-3.8%) scale(1.43); }
 .product-image-fit-max { transform: translateY(.3%) scale(1.31); }
 .result-product-placeholder { color: var(--text-3); font-size: max(12px, 24rpx); line-height: 1.5; text-align: center; }

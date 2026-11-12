@@ -592,7 +592,7 @@ Page({
       quota: boot.quota,
       tasks: presentTasks(boot.tasks, boot.quota),
       settings,
-      subscription: { ...subscription, soldoutEnabled: Boolean(soldout.templateId), soldoutCredits: soldout.credits },
+      subscription: { ...subscription, soldoutEnabled: Boolean(soldout.templateId), soldoutCredits: soldout.credits, soldoutChosen: soldout.chosen },
       ...this.presentDnd(settings),
       testReturnAvailable: Boolean(peekTestReturn()),
     });
@@ -1479,9 +1479,11 @@ Page({
       : !boot.notifications || !boot.notifications.enabled || boot.notifications.deliveryReady !== true ? '发送服务待恢复'
       : '';
     const restockLow = subscription.credits <= LOW_CREDITS;
-    const soldoutLow = subscription.soldoutEnabled && subscription.soldoutCredits > 0 && subscription.soldoutCredits <= LOW_CREDITS;
-    const status = unavailable || (!subscription.credits ? '到货暂无次数' : restockLow ? '到货次数较少'
-      : soldoutLow ? '断货次数较少' : '到货授权充足');
+    const soldoutLow = subscription.soldoutChosen && !consent.soldoutBlocked && subscription.soldoutCredits <= LOW_CREDITS;
+    const soldoutEmpty = soldoutLow && !subscription.soldoutCredits;
+    const status = unavailable || (!subscription.credits ? (soldoutEmpty ? '到货、断货暂无次数' : '到货暂无次数')
+      : soldoutEmpty ? (restockLow ? '到货次数较少，断货暂无次数' : '断货暂无次数')
+      : restockLow ? '到货次数较少' : soldoutLow ? '断货次数较少' : '到货授权充足');
     const reminderTopUpNeeded = !unavailable && !consent.anyBlocked && (restockLow || !!soldoutLow);
     if (this.data.reminderCenterStatus !== status || this.data.reminderTopUpNeeded !== reminderTopUpNeeded) {
       this.setData({ reminderCenterStatus: status, reminderTopUpNeeded });

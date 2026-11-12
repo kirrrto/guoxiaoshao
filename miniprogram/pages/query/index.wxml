@@ -67,11 +67,12 @@
       <view wx:if="{{selectionRestricted}}" class="banner banner-info small mt">此配置实时查询需会员，免费用户可查有权限的历史记录。</view>
       <button wx:if="{{selectionRestricted}}" class="btn btn-primary btn-block mt" disabled="{{!accountReady || !selectionCanCollapse}}" bindtap="onFollowSelection">查看此配置会员权益</button>
       <button wx:elif="{{restrictionReason === 'new_product_restricted'}}" class="btn btn-primary btn-block mt" bindtap="onEditSelection">改查其他配置</button>
+      <button wx:elif="{{limitedQueryRecovery}}" class="btn btn-primary btn-block mt" loading="{{querying}}" disabled="{{!accountReady || querying || signing}}" bindtap="onQuery">{{querying ? '核对中…' : '核对上次查询'}}</button>
       <button wx:elif="{{selectionSummary && !selectionCanCollapse}}" class="btn btn-primary btn-block mt" bindtap="onEditSelection">核对或修改选择</button>
       <button wx:elif="{{selectionSummary && accountReady && !selectionQueryPending && !boot.member && boot.balance < boot.queryCost && !boot.signedInToday}}" class="btn btn-primary btn-block mt" loading="{{signing}}" disabled="{{signing || querying}}" bindtap="onSignin">{{signing ? '签到中…' : '签到领取查询次数'}}</button>
       <button wx:elif="{{selectionSummary && accountReady && !selectionQueryPending && !boot.member && boot.balance < boot.queryCost}}" class="btn btn-primary btn-block mt" bindtap="onGoMine">查看查询与体验次数</button>
       <button wx:elif="{{selectionSummary}}" class="query-submit btn btn-block mt {{accountReady && selectionCanCollapse && !selectionQueryPending && result && !resultTargetDifferent && !resultIsCache && !queryFailureMessage && !liveResultRestricted && nextAction && nextAction.knownCount && nextAction.unknownCount === 0 && nextAction.action !== 'retry' ? 'btn-outline' : 'btn-primary'}} {{querying || signing ? 'disabled' : ''}}" loading="{{querying}}" disabled="{{querying || signing || !accountReady || !selectionCanCollapse}}" bindtap="onQuery">
-        {{!accountReady ? '正在连接账户…' : (querying ? '查询中…' : selectionQueryPending ? '继续上次查询' : (boot.member ? '立即查询' : '立即查询（消耗 ' + boot.queryCost + ' 次）'))}}
+        {{!accountReady ? '正在连接账户…' : (querying ? '查询中…' : legacyQueryPending ? '核对上次查询' : selectionQueryPending ? '继续上次查询' : (boot.member ? '立即查询' : '立即查询（消耗 ' + boot.queryCost + ' 次）'))}}
       </button>
       <view wx:if="{{querying}}" class="request-progress {{requestSlow ? 'request-progress--slow' : ''}}" aria-role="status">{{requestSlow ? requestProgressText : '正在核实所选门店，结果将标注各店时间。'}}</view>
       <view wx:if="{{signinError}}" class="small text-bad mt" aria-role="alert">{{signinError}}</view>
@@ -92,7 +93,7 @@
         <view wx:if="{{!liveResultRestricted}}" class="result-product-time">查询时间 {{result.queriedText}}</view>
       </view>
       <view wx:if="{{resultTargetDifferent || !selectionCanCollapse || !selectionSummary}}" class="result-product-row">
-        <view class="result-product-media">
+        <view class="result-product-media {{!result.product.imageDisplayUrl ? 'result-product-media--empty' : ''}}">
           <image wx:if="{{result.product.imageDisplayUrl}}" class="result-product-image {{result.product.imageFitClass}}" src="{{result.product.imageDisplayUrl}}" webp="{{true}}" mode="aspectFit" aria-label="{{result.product.imageAlt || result.product.title}}" binderror="onResultImageError" />
           <view wx:else class="result-product-placeholder">暂无图片</view>
         </view>
