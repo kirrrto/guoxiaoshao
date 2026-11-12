@@ -293,9 +293,8 @@ function createScheduler(options) {
     // complete known batch explicitly confirmed as persisted may restore it.
     entry.available = false;
     entry.availableObservedAt = null;
-    // Admission/lease transactions can delay the real HTTP start after tick().
-    // Completion is a conservative bound for it, so no later batch or cold
-    // start can squeeze the actual store requests below the required spacing.
+    // Admission can delay HTTP after tick(). Keep a conservative checkpoint
+    // while persistence is pending or the transport has no usable start time.
     storeLastRequestAt.set(group.storeNumber, Math.max(storeLastRequestAt.get(group.storeNumber) ?? -Infinity, finishedMs));
     if (health.lastRequestAt !== null) addSample(health.requestInterval, nowMs - health.lastRequestAt);
     health.lastRequestAt = nowMs;
@@ -333,6 +332,14 @@ function createScheduler(options) {
       if (succeeded && outcome && outcome.persisted === true && observations.some(observation => observation.status === 'available')) {
         entry.available = true;
         entry.availableObservedAt = finishedMs;
+        if (opts.availableIntervalMs > 0 && typeof record.startedAt === 'string') {
+          // The pickup transport captures an ISO timestamp immediately before
+          // fetch. Space a verified available store's requests start-to-start.
+          const startedMs = Date.parse(record.startedAt);
+          if (startedMs >= nowMs && startedMs <= finishedMs && new Date(startedMs).toISOString() === record.startedAt) {
+            storeLastRequestAt.set(group.storeNumber, startedMs);
+          }
+        }
       }
       // A status change keeps this store on the fast cadence until it stays quiet.
       if (outcome && outcome.changed && opts.burstIntervalMs > 0) entry.burstUntil = finishedMs + opts.burstQuietMs;
