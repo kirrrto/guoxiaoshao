@@ -1,0 +1,107 @@
+{
+  "version": "3.7.0",
+  "clientFingerprint": "sha256:c000a6c07a13f212c1bf5ab257772167ecdc6f7b86faa9d4005b364c8366abc5",
+  "latestConsumerCheckAtUTC": "2026-11-12T15:14:49.868Z",
+  "source": {
+    "tests": 1916,
+    "passed": 1916,
+    "skipped": 0,
+    "releasePreflightPassed": 60,
+    "monitorBundlePassed": true,
+    "lockedPackagesAudited": 4,
+    "knownDependencyAdvisories": 0
+  },
+  "consumer": {
+    "developerUploadConfirmed": true,
+    "uploadedBytes": 1117600,
+    "testedProjectMatchedUploadSource": true,
+    "simulatorSdk": "3.17.3",
+    "nativeChecks": {
+      "catalog": true,
+      "queryRulesRoundTrip": true,
+      "accountBootstrap": true,
+      "historyDateRoundTrip": true,
+      "followDataRead": true,
+      "deadlineDataRead": true,
+      "membershipBootstrap": true,
+      "notificationSettingsRoundTrip": true,
+      "actualViewVersion": "3.7.0"
+    },
+    "controlledMemberQuery": {
+      "exactSkuAndStore": true,
+      "cachedPageResult": false,
+      "confirmedRows": 1,
+      "charged": 0,
+      "balanceUnchanged": true,
+      "observedAtUTC": "2026-11-12T15:14:47.171Z"
+    }
+  },
+  "existingProduction": {
+    "checkedAtUTC": "2026-11-12T15:12:32.600Z",
+    "functions": [
+      {
+        "name": "gxs_api",
+        "version": "3.5.0",
+        "state": "Active",
+        "matchesCandidate": false
+      },
+      {
+        "name": "gxs_monitor",
+        "version": "3.5.0",
+        "state": "Active",
+        "matchesCandidate": false
+      },
+      {
+        "name": "cloudbase_auth",
+        "version": "3.4.0",
+        "state": "UpdateFailed",
+        "matchesCandidate": false
+      }
+    ],
+    "automaticObservationAtUTC": "2026-11-12T15:09:25.438Z",
+    "observedSource": "auto",
+    "scheduleIntervalSeconds": 60,
+    "availableRecheckSeconds": 0,
+    "controlledPhoneReceiptVerified": false
+  },
+  "simulatedCapacity": {
+    "productionRequests": 0,
+    "requestsPerMinuteBudget": 60,
+    "requestsPerDayBudget": 10000,
+    "scenarios": [
+      {
+        "name": "same-target-fast",
+        "clients": 300,
+        "fullySuccessful": 300,
+        "busy": 0,
+        "reasons": {},
+        "upstreamRequests": 1,
+        "netQuotaDebit": 0
+      },
+      {
+        "name": "distinct-300-targets",
+        "clients": 300,
+        "fullySuccessful": 59,
+        "busy": 241,
+        "reasons": {
+          "upstream_budget_limited": 241
+        },
+        "upstreamRequests": 59,
+        "netQuotaDebit": 0
+      }
+    ]
+  },
+  "release": {
+    "officialQualityBlockers": [
+      "unused-channel-video",
+      "custom-tabbar-first-switch",
+      "oversized-product-image",
+      "legacy-product-image-format"
+    ],
+    "publicationReady": false,
+    "productionAcceptancePassed": false,
+    "candidateCloudDeployment": false,
+    "wechatSubmittedForReview": false,
+    "wechatPublicRelease": false
+  }
+}
