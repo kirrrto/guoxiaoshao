@@ -8,10 +8,10 @@ const { localKey } = require('./local-key');
 // alive. A full app restart cannot recover an ID that storage failed to save.
 const pendingByKey = new Map();
 
-function current(key) {
+function current(key, peek = false) {
   if (pendingByKey.has(key)) return pendingByKey.get(key);
   let saved;
-  try { saved = wx.getStorageSync(key); } catch (e) { /* recover in memory */ }
+  try { saved = wx.getStorageSync(key); } catch (e) { if (peek) return []; }
   const entries = saved && Array.isArray(saved.pending) ? saved.pending : saved ? [saved] : [];
   const pending = entries.filter(item => item && typeof item.id === 'string' && typeof item.fingerprint === 'string');
   pendingByKey.set(key, pending);
@@ -28,14 +28,28 @@ function persist(key, entries, latest) {
   } catch (e) { /* in-memory recovery remains available */ }
 }
 
-function begin(kind, payload) {
-  const key = localKey(`gxs_pending_${kind}_v1`);
+function targetFingerprint(payload) {
   const normalized = { ...payload };
   if (Array.isArray(normalized.storeNumbers)) normalized.storeNumbers = [...new Set(normalized.storeNumbers)].sort();
-  const fingerprint = JSON.stringify(Object.keys(normalized).sort().reduce((out, field) => { out[field] = normalized[field]; return out; }, {}));
+  return JSON.stringify(Object.keys(normalized).sort().reduce((out, field) => { out[field] = normalized[field]; return out; }, {}));
+}
+
+function lookup(entries, fingerprint, owner) {
+  return entries.find(item => item.fingerprint === fingerprint && item.owner === owner)
+    || entries.find(item => item.fingerprint === fingerprint && !item.owner);
+}
+
+function hasPending(kind, payload, owner) {
+  return Boolean(lookup(current(localKey(`gxs_pending_${kind}_v1`), true), targetFingerprint(payload), owner));
+}
+
+function begin(kind, payload, owner) {
+  const key = localKey(`gxs_pending_${kind}_v1`);
+  const fingerprint = targetFingerprint(payload);
   const entries = current(key);
-  let pending = entries.find(item => item.fingerprint === fingerprint);
+  let pending = lookup(entries, fingerprint, owner);
   if (!pending) { pending = { id: newId(kind), fingerprint }; entries.push(pending); }
+  if (owner) pending.owner = owner;
   // A retry also persists the retained ID if storage has recovered meanwhile.
   persist(key, entries, pending);
   return pending.id;
@@ -55,4 +69,4 @@ function uncertain(error) {
   return !error || ['offline', 'cloud_init_failed', 'call_failed', 'bad_response', 'internal_error', 'query_in_progress', 'request_in_progress', 'request_budget_exhausted', 'busy'].includes(error.code);
 }
 
-module.exports = { begin, finish, uncertain };
+module.exports = { begin, hasPending, finish, uncertain };

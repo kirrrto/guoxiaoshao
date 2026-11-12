@@ -281,7 +281,7 @@ Page({
         taskAvailable: Boolean(task) && !boot.quota.tasksDoneToday.includes('view_history'),
         taskReward: task ? task.reward : 0,
       },
-      collector: { ...boot.collector, ...fmt.collectorMeta(boot.collector.state) },
+      collector: { ...boot.collector, ...fmt.collectorMeta(boot.collector && boot.collector.state) },
     });
     this.consumeJourneyTarget();
   },
@@ -336,6 +336,7 @@ Page({
   async readBrowse() {
     this.setData({ browseLoading: true, browseError: null });
     const accountEpoch = this.accountEpoch || 0;
+    const owner = this.accountSnapshot && this.accountSnapshot.identity && this.accountSnapshot.identity.userKey;
     const quotaGeneration = getQuotaGeneration();
     try {
       const result = await call('history.browse');
@@ -350,7 +351,8 @@ Page({
         if (accountEpoch !== (this.accountEpoch || 0)) return;
         reward = { ...reward, quota: fresh.quota };
       }
-      const accepted = reward && reward.quota ? publishQuota(reward.quota) : false;
+      if (owner && currentOwner() && currentOwner() !== owner) return;
+      const accepted = reward && reward.quota ? publishQuota(reward.quota, owner) : false;
       if (this.pageRetired) return;
       const products = this.catalog && this.catalog.productByPart || {};
       this.browseDay = fmt.todayKey();
@@ -500,6 +502,7 @@ Page({
     if (this.selectionNeedsReview) return toast('请先修改并核对已保存的配置与门店');
     const { boot, dayKey } = this.data, selection = this.selection;
     const accountEpoch = this.accountEpoch || 0;
+    const owner = this.accountSnapshot && this.accountSnapshot.identity && this.accountSnapshot.identity.userKey;
     if (!selection.partNumber) return toast('请先选择具体配置');
     if (dayKey < fmt.retentionStartKey() || dayKey > fmt.todayKey()) return toast('所选日期已超出保留范围，请重新选择日期');
     // Let the server distinguish insufficient funds from an already-debited
@@ -508,7 +511,7 @@ Page({
     this.setData({ querying: true, restriction: null, queryFailureMessage: '', restoreNotice: null, restoreWarning: false });
     startProgress(this, '仍在加载所选日期记录，请勿重复点击；上次结果会保留。');
     const payload = { partNumber: selection.partNumber, storeNumbers: selection.storeNumbers.slice(), dayKey };
-    const historyQueryId = operation.begin('h', payload);
+    const historyQueryId = operation.begin('h', payload, owner);
     try {
       const response = await call('history.list', { historyQueryId, ...payload });
       if (accountEpoch !== (this.accountEpoch || 0)) return;
@@ -520,8 +523,8 @@ Page({
         return;
       }
       operation.finish('h', historyQueryId);
-      invalidateBootstrap();
-      const quota = publishQueryBalance(response);
+      if (invalidateBootstrap(owner) === false) return;
+      const quota = publishQueryBalance(response, owner);
       if (quota.needsRefresh) getBootstrap({ force: true }).then(boot => this.applyBoot(boot)).catch(() => {});
       if (this.pageRetired) return;
       const balancePatch = quota.balance === null ? {} : { 'boot.balance': quota.balance };
@@ -580,10 +583,11 @@ Page({
     if (this.pageRetired) return;
     if (this.taskClaimPending) return this.taskClaimPending;
     const accountEpoch = this.accountEpoch || 0;
+    const owner = this.accountSnapshot && this.accountSnapshot.identity && this.accountSnapshot.identity.userKey;
     this.setData({ taskClaimLoading: true, taskClaimError: null });
     const pending = call('quota.completeTask', { taskId: 'view_history' }).then(data => {
       if (this.pageRetired || accountEpoch !== (this.accountEpoch || 0)) return;
-      const accepted = publishQuota(data.quota);
+      const accepted = publishQuota(data.quota, owner);
       if (accepted) this.applyTaskReward({ ...data, quota: currentQuota() || data.quota });
     }).catch(() => {
       if (!this.pageRetired && accountEpoch === (this.accountEpoch || 0)) this.setData({ taskClaimError: '浏览奖励暂未确认，请重新领取；不会重复发奖。' });

@@ -36,6 +36,21 @@ async function historyLatest(latest, extra = {}, handler) {
   return { page, rt };
 }
 
+test('query and history show clock-inconsistent stock as unknown and hide any prior positive result', async t => {
+  t.mock.method(Date, 'now', () => baseTime);
+  const rows = [
+    observation({ status: 'available', observedAt: at(30000) }),
+    observation({ status: 'available', storeNumber: 'R002', observedAt: at(-10000), knownAt: at(-1000) }),
+  ];
+  const { page: query } = await querySummary(rows);
+  const { page: history } = await historyLatest(rows);
+  for (const row of [...query.data.followTargets, ...history.data.result.latest]) {
+    assert.equal(row.observationState, 'unknown');
+    assert.equal(row.lastKnownText, null);
+    assert.equal(row.statusLabel, '观测时间待核对');
+  }
+});
+
 test('query monitored summary marks the 2–5 minute sample as historical, without changing its timestamp', async t => {
   t.mock.method(Date, 'now', () => baseTime + 180000);
   const { page } = await querySummary([observation()]);

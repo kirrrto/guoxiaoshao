@@ -34,26 +34,21 @@
       </button>
     </view>
     <view class="card selection-card">
-      <view wx:if="{{!selectionSummary}}" class="pickup-cover pickup-intro">
-        <view class="pickup-intro-copy">
-          <text class="pickup-quota">{{!accountReady ? '账户连接中' : (boot.member ? '会员查询不扣次' : '剩余 ' + boot.balance + ' 次查询')}}</text>
-          <view class="pickup-intro-title">想查哪一款？</view>
-        </view>
-        <image wx:if="{{!introImageFailed}}" class="pickup-intro-image" src="/images/brand/pickup-whistle-v360.png" mode="aspectFit" aria-hidden="true" binderror="onIntroImageError" />
+      <view wx:if="{{!selectionSummary}}" class="pickup-intro">
+        <view class="pickup-intro-title">想查哪一款？</view>
+        <text class="pickup-quota">{{!accountReady ? '账户连接中' : (boot.member ? '会员查询不扣次' : '剩余 ' + boot.balance + ' 次查询')}}</text>
       </view>
       <view wx:else class="selection-summary">
-        <view class="pickup-cover">
-          <text class="pickup-quota">{{!accountReady ? '账户连接中' : (boot.member ? '会员查询不扣次' : '剩余 ' + boot.balance + ' 次查询')}}</text>
-          <view class="selection-summary-product">
-            <view class="selection-summary-copy">
-              <text class="selection-summary-title">{{selectionSummary.displayName}}</text>
-              <text wx:if="{{selectionSummary.configuration}}" class="selection-summary-spec"> {{selectionSummary.configuration}}</text>
-            </view>
-            <view wx:if="{{selectionSummary.imageDisplayUrl && !selectionImageFailed}}" class="selection-summary-image-box"><image class="selection-summary-image {{selectionSummary.imageFitClass}}" src="{{selectionSummary.imageDisplayUrl}}" webp="{{true}}" mode="aspectFit" aria-hidden="true" binderror="onSelectionImageError" /></view>
+        <view class="selection-summary-product">
+          <view wx:if="{{selectionSummary.imageDisplayUrl && !selectionImageFailed}}" class="selection-summary-image-box"><image class="selection-summary-image {{selectionSummary.imageFitClass}}" src="{{selectionSummary.imageDisplayUrl}}" webp="{{true}}" mode="aspectFit" aria-hidden="true" binderror="onSelectionImageError" /></view>
+          <view class="selection-summary-copy">
+            <text class="selection-summary-title">{{selectionSummary.displayName}}</text>
+            <text wx:if="{{selectionSummary.configuration}}" class="selection-summary-spec">{{selectionSummary.configuration}}</text>
+            <text class="pickup-quota">{{!accountReady ? '账户连接中' : (boot.member ? '会员查询不扣次' : '剩余 ' + boot.balance + ' 次查询')}}</text>
           </view>
         </view>
         <view class="selection-summary-footer">
-          <view class="selection-summary-location"><text class="selection-summary-city">{{selectionSummary.cityLabel}}</text><text class="selection-summary-stores">{{selectionSummary.storeLabel}}</text></view>
+          <view class="selection-summary-location"><text class="selection-summary-stores">{{selectionSummary.storeLabel}}</text><text class="selection-summary-city">{{selectionSummary.cityLabel}}</text></view>
           <button class="ui-action selection-summary-change" hover-class="ui-control-pressed" bindtap="onEditSelection"><text class="ui-action-label">修改</text><text class="ui-chevron" aria-hidden="true"></text></button>
         </view>
       </view>
@@ -61,71 +56,51 @@
         <button class="btn btn-primary btn-block" hover-class="btn-primary-pressed" bindtap="onEditSelection">选择配置与门店</button>
       </view>
       <view wx:elif="{{!selectionCanCollapse}}" class="banner {{selectionReferenceOnly ? 'banner-info' : 'banner-warn'}} small mt">{{selectionNotice}}</view>
-    <view wx:if="{{!accountReady}}" class="banner banner-info small">{{accountError || '正在连接微信账户，可先选商品与门店。'}}<button wx:if="{{accountError}}" class="btn btn-outline btn-sm mt" bindtap="onRetryAccount">重试账户连接</button></view>
-    <view wx:if="{{sharedTargetPending}}" class="banner banner-info small">
-      <view>{{sharedTargetError || (sharedTargetReady ? (sharedTargetSource === 'follow' ? '关注配置已保留，可在当前操作结束后切换。' : '朋友分享的配置已保留，可在当前操作结束后切换。') : '配置暂未在商品目录中确认，当前选择已保留。')}}</view>
-      <button class="btn btn-outline btn-sm mt" loading="{{loadingSharedTarget}}" disabled="{{sheetVisible || querying || signing || loadingSharedTarget}}" bindtap="onLoadSharedTarget">{{loadingSharedTarget ? '正在确认…' : (sharedTargetReady ? '载入配置' : '刷新目录并重试')}}</button>
-      <button class="ui-action mt" bindtap="onDismissSharedTarget">保留当前选择</button>
-    </view>
+      <view wx:if="{{!accountReady}}" class="banner banner-info small">{{accountError || '正在连接微信账户，可先选商品与门店。'}}<button wx:if="{{accountError}}" class="btn btn-outline btn-sm mt" bindtap="onRetryAccount">重试账户连接</button></view>
+      <view wx:if="{{sharedTargetPending}}" class="banner banner-info small">
+        <view>{{sharedTargetError || (sharedTargetReady ? (sharedTargetSource === 'follow' ? '关注配置已保留，可在当前操作结束后切换。' : '朋友分享的配置已保留，可在当前操作结束后切换。') : '配置暂未在商品目录中确认，当前选择已保留。')}}</view>
+        <button class="btn btn-outline btn-sm mt" loading="{{loadingSharedTarget}}" disabled="{{sheetVisible || querying || signing || loadingSharedTarget}}" bindtap="onLoadSharedTarget">{{loadingSharedTarget ? '正在确认…' : (sharedTargetReady ? '载入配置' : '刷新目录并重试')}}</button>
+        <button class="ui-action mt" bindtap="onDismissSharedTarget">保留当前选择</button>
+      </view>
 
       <view wx:if="{{queryFailureMessage || restriction}}" class="banner banner-warn small mt" aria-role="alert">{{queryFailureMessage || restriction}}</view>
       <view wx:if="{{selectionRestricted}}" class="banner banner-info small mt">此配置实时查询需会员，免费用户可查有权限的历史记录。</view>
       <button wx:if="{{selectionRestricted}}" class="btn btn-primary btn-block mt" disabled="{{!accountReady || !selectionCanCollapse}}" bindtap="onFollowSelection">查看此配置会员权益</button>
       <button wx:elif="{{restrictionReason === 'new_product_restricted'}}" class="btn btn-primary btn-block mt" bindtap="onEditSelection">改查其他配置</button>
       <button wx:elif="{{selectionSummary && !selectionCanCollapse}}" class="btn btn-primary btn-block mt" bindtap="onEditSelection">核对或修改选择</button>
-      <button wx:elif="{{selectionSummary && accountReady && !boot.member && boot.balance < boot.queryCost && !boot.signedInToday}}" class="btn btn-primary btn-block mt" loading="{{signing}}" disabled="{{signing || querying}}" bindtap="onSignin">{{signing ? '签到中…' : '签到领取查询次数'}}</button>
-      <button wx:elif="{{selectionSummary && accountReady && !boot.member && boot.balance < boot.queryCost}}" class="btn btn-primary btn-block mt" bindtap="onGoMine">查看查询与体验次数</button>
-      <button wx:elif="{{selectionSummary}}" class="btn btn-primary btn-block mt {{querying || signing ? 'disabled' : ''}}" loading="{{querying}}" disabled="{{querying || signing || !accountReady || !selectionCanCollapse}}" bindtap="onQuery">
-        {{!accountReady ? '正在连接账户…' : (querying ? '查询中…' : (boot.member ? '立即查询' : '立即查询（消耗 ' + boot.queryCost + ' 次）'))}}
+      <button wx:elif="{{selectionSummary && accountReady && !selectionQueryPending && !boot.member && boot.balance < boot.queryCost && !boot.signedInToday}}" class="btn btn-primary btn-block mt" loading="{{signing}}" disabled="{{signing || querying}}" bindtap="onSignin">{{signing ? '签到中…' : '签到领取查询次数'}}</button>
+      <button wx:elif="{{selectionSummary && accountReady && !selectionQueryPending && !boot.member && boot.balance < boot.queryCost}}" class="btn btn-primary btn-block mt" bindtap="onGoMine">查看查询与体验次数</button>
+      <button wx:elif="{{selectionSummary}}" class="query-submit btn btn-block mt {{accountReady && selectionCanCollapse && !selectionQueryPending && result && !resultTargetDifferent && !resultIsCache && !queryFailureMessage && !liveResultRestricted && nextAction && nextAction.knownCount && nextAction.unknownCount === 0 && nextAction.action !== 'retry' ? 'btn-outline' : 'btn-primary'}} {{querying || signing ? 'disabled' : ''}}" loading="{{querying}}" disabled="{{querying || signing || !accountReady || !selectionCanCollapse}}" bindtap="onQuery">
+        {{!accountReady ? '正在连接账户…' : (querying ? '查询中…' : selectionQueryPending ? '继续上次查询' : (boot.member ? '立即查询' : '立即查询（消耗 ' + boot.queryCost + ' 次）'))}}
       </button>
       <view wx:if="{{querying}}" class="request-progress {{requestSlow ? 'request-progress--slow' : ''}}" aria-role="status">{{requestSlow ? requestProgressText : '正在核实所选门店，结果将标注各店时间。'}}</view>
       <view wx:if="{{signinError}}" class="small text-bad mt" aria-role="alert">{{signinError}}</view>
-      <view class="selection-utilities">
-      <button wx:if="{{selectionRestricted}}" class="ui-action" hover-class="ui-control-pressed" bindtap="onSelectionHistory">查看可用历史</button>
-      <button wx:elif="{{selectionSummary && !result && selectionSupportsFollow}}" class="ui-action mt selection-follow-action" disabled="{{!accountReady || querying || !selectionCanCollapse}}" bindtap="onFollowSelection"><image class="selection-whistle" src="/images/brand/whistle-green.png" mode="aspectFit" aria-hidden="true" /><text>{{boot.member ? '关注此配置' : (contextualCheckout ? '了解此配置关注服务' : '了解会员关注服务')}}</text></button>
-      <button class="ui-disclosure" hover-class="ui-control-pressed" bindtap="onToggleRules" aria-expanded="{{rulesExpanded}}"><text class="ui-disclosure-label">查询与提醒规则</text><view class="ui-disclosure-meta"><text>{{rulesExpanded ? '收起' : '展开'}}</text><text class="ui-chevron {{rulesExpanded ? 'ui-chevron--up' : 'ui-chevron--down'}}" aria-hidden="true"></text></view></button>
-      </view>
-      <view wx:if="{{accountReady && rulesExpanded}}" class="selection-rules ui-reveal">
-        <view class="selection-rule">
-          <text class="selection-rule-label">关注提醒</text>
-          <view class="selection-rule-copy">{{boot.member ? '直接关注，需微信授权及服务就绪。' : '关注与到货提醒为会员专属；免费用户可用查询次数实时看货。'}}</view>
-        </view>
-        <view class="selection-rule">
-          <text class="selection-rule-label">取货结果</text>
-          <view class="selection-rule-copy">按门店显示可取货状态，以下单时为准。<text wx:if="{{collector}}">监测状态：{{collector.label}}。</text></view>
-        </view>
-        <view class="selection-rule">
-          <text class="selection-rule-label">查询规则</text>
-          <view class="selection-rule-copy">{{boot.member ? '会员查询不扣次。' : '新有效结果扣 ' + boot.queryCost + ' 次，未取得结果自动返还，近期复用不扣次。'}}</view>
-        </view>
-        <view wx:if="{{!boot.member}}" class="selection-rule">
-          <text class="selection-rule-label">新品限制</text>
-          <view class="selection-rule-copy">受限新品开售 30 天内，免费用户仅可查昨天及更早历史。</view>
-        </view>
+      <view wx:if="{{selectionRestricted || (selectionSummary && (!result || resultTargetDifferent) && selectionSupportsFollow)}}" class="selection-utilities">
+        <button wx:if="{{selectionRestricted}}" class="ui-action" hover-class="ui-control-pressed" bindtap="onSelectionHistory">查看可用历史</button>
+        <button wx:else class="ui-action selection-follow-action" hover-class="ui-control-pressed" disabled="{{!accountReady || querying || !selectionCanCollapse}}" bindtap="onFollowSelection"><text>{{boot.member ? '关注此配置' : (contextualCheckout ? '了解此配置关注服务' : '了解会员关注服务')}}</text></button>
       </view>
     </view>
 
-
     <view wx:if="{{result}}" id="query-result" class="card query-result-card ui-reveal">
-      <view wx:if="{{queryFailureMessage}}" class="banner banner-warn small mb">本次查询未完成，下方保留上次查询结果。</view>
+      <view wx:if="{{queryFailureMessage}}" class="banner banner-warn small mb">{{resultTargetDifferent ? '本次查询未完成，下方为其他配置或门店的上次结果。' : '本次查询未完成，下方保留上次查询结果。'}}</view>
       <view wx:elif="{{resultTargetDifferent}}" class="result-target-note result-target-different">上次查询结果 · 与当前选择不同</view>
-      <view class="result-product-row">
+      <view class="result-receipt">
+        <view class="result-receipt-line">
+          <text class="result-receipt-title">{{resultIsCache ? '上次保存的结果' : (queryFailureMessage || resultTargetDifferent ? '上次查询结果' : (result.allShared ? '近期核实结果' : '本次查询结果'))}}</text>
+          <text wx:if="{{!liveResultRestricted && result.product.targetType !== 'apple_cto' && result.product.partNumber}}" class="result-product-part">货号 <text class="mono">{{result.product.partNumber}}</text></text>
+        </view>
+        <view wx:if="{{!liveResultRestricted}}" class="result-product-time">查询时间 {{result.queriedText}}</view>
+      </view>
+      <view wx:if="{{resultTargetDifferent || !selectionCanCollapse || !selectionSummary}}" class="result-product-row">
         <view class="result-product-media">
           <image wx:if="{{result.product.imageDisplayUrl}}" class="result-product-image {{result.product.imageFitClass}}" src="{{result.product.imageDisplayUrl}}" webp="{{true}}" mode="aspectFit" aria-label="{{result.product.imageAlt || result.product.title}}" binderror="onResultImageError" />
           <view wx:else class="result-product-placeholder">暂无图片</view>
         </view>
         <view class="result-product-copy">
           <view class="result-product-title">{{result.product.title}}</view>
-          <view class="result-product-meta"><text class="pill pill-muted">{{resultIsCache ? '上次保存的结果' : (result.allShared ? '近期核实结果' : '本次查询结果')}}</text></view>
-          <view wx:if="{{!liveResultRestricted}}" class="result-product-time">查询时间 {{result.queriedText}}</view>
         </view>
       </view>
       <view wx:if="{{liveResultRestricted && resultAccessNotice}}" class="banner banner-info small mt" aria-role="status">{{resultAccessNotice}}</view>
-      <view wx:if="{{nextAction}}" class="result-next-action result-next-action--{{nextAction.tone}}" aria-live="polite">
-        <view class="journey-title">{{nextAction.title}}</view>
-        <view class="small text-2 mt">{{nextAction.detail}}</view>
-        <button class="btn btn-primary btn-block mt" disabled="{{querying || signing || sheetVisible || !accountReady}}" bindtap="onNextAction">{{nextAction.label}}</button>
-      </view>
       <view wx:for="{{liveResultRestricted ? [] : result.results}}" wx:key="storeNumber" class="list-item result-store {{item.pickupReady ? 'result-store--available' : ''}}">
         <view class="row-between result-store-heading">
           <view class="result-store-name">
@@ -147,9 +122,14 @@
           <text wx:for="{{item.events}}" wx:for-item="ev" wx:key="type" class="pill pill-{{ev.cls}} tiny">{{ev.label}}</text>
         </view>
       </view>
+      <view wx:if="{{nextAction}}" class="result-next-action result-next-action--{{nextAction.tone}}" aria-live="polite">
+        <view class="journey-title">{{nextAction.title}}</view>
+        <view class="small text-2 mt">{{nextAction.detail}}</view>
+        <button class="btn btn-primary btn-block mt" disabled="{{querying || signing || sheetVisible || !accountReady}}" bindtap="onNextAction">{{nextAction.label}}</button>
+      </view>
       <button wx:if="{{!liveResultRestricted && evidenceCard}}" class="ui-disclosure" hover-class="ui-control-pressed" bindtap="onToggleEvidence" aria-expanded="{{evidenceExpanded}}"><text class="ui-disclosure-label">记录详情与范围</text><view class="ui-disclosure-meta"><text>{{evidenceExpanded ? '收起' : '展开'}}</text><text class="ui-chevron {{evidenceExpanded ? 'ui-chevron--up' : 'ui-chevron--down'}}"></text></view></button>
       <view wx:if="{{evidenceExpanded && !liveResultRestricted && evidenceCard}}" class="target-evidence">
-        <view class="small bold">{{evidenceCard.title}}</view><view wx:if="{{result.product.targetType !== 'apple_cto'}}" class="tiny muted mt">商品编码 {{result.product.partNumber}}</view>
+        <view class="small bold">{{evidenceCard.title}}</view>
         <view class="small text-2 mt">{{evidenceCard.time}}</view>
         <view class="small text-2 mt">{{evidenceCard.detail}} {{evidenceCard.note}}</view>
       </view>
@@ -164,7 +144,7 @@
       </view>
       <view wx:if="{{alternativesExpanded && alternativeColorChoices.length && alternativeStoreChoices.length}}" class="observed-store-choices alternative-panel">
         <view class="alternative-heading">选择可接受的颜色与门店</view>
-        <view class="alternative-caption">勾选不扣次，不自动添加关注。</view>
+        <view class="alternative-caption">同机型、同容量可换颜色。勾选不扣次，不自动添加关注。</view>
         <view class="alternative-section-title"><text>可接受的颜色</text><text class="alternative-count">{{alternativeParts.length}} / {{boot ? boot.alternativeMaxColors : 3}}</text></view>
         <view class="alternative-colors">
           <view wx:for="{{alternativeColorChoices}}" wx:key="partNumber" class="alternative-color-column">
@@ -175,7 +155,7 @@
         </view>
         <view class="alternative-section-title"><text>可接受的门店</text><text class="alternative-count">{{alternativeStores.length}} / {{boot ? boot.maxStores : 3}}</text></view>
         <picker mode="selector" range="{{alternativeCityNames}}" value="{{alternativeCityIndex}}" disabled="{{alternativeLoading || querying || signing || sheetVisible}}" bindchange="onAlternativeCityChange">
-          <view class="ui-disclosure alternative-city-picker" aria-role="button" aria-label="{{'切换城市，当前' + alternativeCity}}"><text class="ui-disclosure-label">{{alternativeCity}}</text><view class="ui-disclosure-meta"><view class="ui-chevron ui-chevron--down" aria-hidden="true"></view></view></view>
+          <view class="ui-disclosure alternative-city-picker" aria-role="button" aria-label="{{'切换城市，当前' + alternativeCity}}"><text class="ui-disclosure-label">{{alternativeCity}}</text><view class="ui-disclosure-meta"><text>切换城市</text><view class="ui-chevron ui-chevron--down" aria-hidden="true"></view></view></view>
         </picker>
         <view class="alternative-stores">
           <button wx:for="{{alternativeVisibleStores}}" wx:key="storeNumber" class="alternative-store {{item.selected ? 'alternative-store--selected' : ''}}" hover-class="ui-control-pressed" data-kind="store" data-value="{{item.storeNumber}}" aria-pressed="{{item.selected}}" disabled="{{alternativeLoading || querying || signing || sheetVisible}}" bindtap="onToggleAlternative">
@@ -183,7 +163,7 @@
           </button>
         </view>
         <view wx:if="{{alternativeSelectedStores.length}}" class="alternative-selected-stores">
-          <view class="tiny muted">已选门店</view>
+          <view class="tiny muted">{{alternativeCityNames.length > 1 ? '已选门店 · 可跨城市选择' : '已选门店'}}</view>
           <view class="alternative-selected-list"><button wx:for="{{alternativeSelectedStores}}" wx:key="storeNumber" class="alternative-selected-store" hover-class="ui-control-pressed" data-kind="store" data-value="{{item.storeNumber}}" aria-label="{{'移除' + item.label}}" disabled="{{alternativeLoading || querying || signing || sheetVisible}}" bindtap="onToggleAlternative"><text>{{item.label}}</text><text aria-hidden="true">×</text></button></view>
         </view>
         <view class="alternative-summary" aria-live="polite">{{alternativeSelectionSummary}}</view>
@@ -236,6 +216,25 @@
         <text class="query-link-meta">{{followTargets.length === 1 && boot.followCount === 1 ? followTargets[0].productTitle : boot.followCount + ' 个配置'}}</text>
         <view class="ui-chevron" aria-hidden="true"></view>
       </button>
+      <button class="ui-disclosure query-rules-entry" hover-class="ui-control-pressed" bindtap="onToggleRules" aria-expanded="{{rulesExpanded}}"><image class="ui-icon" src="/images/ui/info.png" mode="aspectFit" aria-hidden="true" /><text class="query-guide-title">查询与提醒规则</text><view class="ui-disclosure-meta"><text>{{rulesExpanded ? '收起' : '展开'}}</text><text class="ui-chevron {{rulesExpanded ? 'ui-chevron--up' : 'ui-chevron--down'}}" aria-hidden="true"></text></view></button>
+      <view wx:if="{{accountReady && rulesExpanded}}" class="selection-rules ui-reveal">
+        <view class="selection-rule">
+          <text class="selection-rule-label">关注提醒</text>
+          <view class="selection-rule-copy">{{boot.member ? '直接关注，需微信授权及服务就绪。' : '关注与到货提醒为会员专属；免费用户可用查询次数实时看货。'}}</view>
+        </view>
+        <view class="selection-rule">
+          <text class="selection-rule-label">取货结果</text>
+          <view class="selection-rule-copy">按门店显示可取货状态，以下单时为准。<text wx:if="{{collector}}">监测状态：{{collector.label}}。</text></view>
+        </view>
+        <view class="selection-rule">
+          <text class="selection-rule-label">查询规则</text>
+          <view class="selection-rule-copy">{{boot.member ? '会员查询不扣次。' : '新有效结果扣 ' + boot.queryCost + ' 次，未取得结果自动返还，近期复用不扣次。'}}</view>
+        </view>
+        <view wx:if="{{!boot.member}}" class="selection-rule">
+          <text class="selection-rule-label">新品限制</text>
+          <view class="selection-rule-copy">受限新品开售 30 天内，免费用户仅可查昨天及更早历史。</view>
+        </view>
+      </view>
       <button class="ui-disclosure query-guide-entry" hover-class="ui-control-pressed" bindtap="onOpenGuide">
         <image class="ui-icon" src="/images/ui/guide.png" mode="aspectFit" aria-hidden="true" />
         <text class="query-guide-title">选购与取货攻略</text>

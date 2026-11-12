@@ -65,6 +65,29 @@ test('both page templates bind the visible top-up button directly and expose syn
   }
 });
 
+test('mine emphasizes top-up only for actionable low balances and treats sold-out as optional', () => {
+  const s = setup();
+  const cases = [
+    [boot(), false, '到货授权充足'],
+    [boot(undefined, true, balances(5, 0)), false, '到货授权充足'],
+    [boot(undefined, true, balances(5, 1)), true, '断货次数较少'],
+    [boot(undefined, true, balances(2, 0)), true, '到货次数较少'],
+    [boot(undefined, true, balances(0, 3)), true, '到货暂无次数'],
+    [{ ...boot(undefined, true, balances(0)), settings: { notifyEnabled: false } }, false, '提醒已关闭'],
+    [{ ...boot(undefined, true, balances(0)), notifications: { ...boot().notifications, deliveryReady: false } }, false, '发送服务待恢复'],
+    [{ ...boot(), collector: null }, false, '后台状态待确认'],
+    [{ ...boot(), collector: { state: 'running', observationStale: true },
+      notifications: { ...boot().notifications, senderReady: true, deliveryReady: false } }, false, '后台状态待确认'],
+    [boot(undefined, false), false, '会员可开启持续提醒'],
+  ];
+  for (const [snapshot, emphasized, label] of cases) {
+    s.changeAccount(snapshot);
+    assert.equal(s.mine.data.reminderTopUpNeeded, emphasized, label);
+    assert.equal(s.mine.data.reminderCenterStatus, label);
+  }
+  assert.equal(s.prompts(), 0);
+});
+
 test('both reminder centers open without native authorization and only the explicit authorize action prompts', async () => {
   for (const target of ['mine', 'follow']) {
     const s = setup(), page = s[target];

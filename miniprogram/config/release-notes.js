@@ -8,6 +8,15 @@
 // Keep technical details and complete acceptance records in release documents.
 const RELEASE_NOTES = [
   {
+    version: '3.7.0',
+    title: '门店取货、提醒和会员卡更新',
+    dateText: '版本记录 · 2026-11-12',
+    highlights: [
+      '查完直接看各店的取货状态与观测时间，切换配置后仍可辨认上一次的结果。',
+      '小哨优先显示下一次提醒。会员卡保留果哨标志，到货、断货的可用次数分别显示。',
+    ],
+  },
+  {
     version: '3.6.0',
     title: '新款 Mac 取货与页面改版',
     dateText: '发布候选 · 2026-11-06',

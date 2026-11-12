@@ -1,6 +1,6 @@
 const navigation = require('../../utils/navigation');
 const { reminderPanelMethods } = require('../../utils/reminder-panel');
-const { restockSubscription, soldoutSubscription, activeDnd } = require('../../utils/reminder-readiness');
+const { restockSubscription, soldoutSubscription, activeDnd, LOW_CREDITS } = require('../../utils/reminder-readiness');
 const { getAuthorizationState, buildConsentReport } = require('../../utils/reminder-credits');
 const { dndPeriods, dndSummary, dndStatus, MAX_DND_PERIODS, validateDndPeriods } = require('../../utils/dnd');
 const { peekTestReturn, peekTestReturnUrl, consumeTestReturnUrl } = require('../../utils/journey-context');
@@ -209,7 +209,7 @@ Page({
     settings: null,
     dndPeriods: [], dndSummary: '', dndStatus: '', maxDndPeriods: MAX_DND_PERIODS,
     authorizationOpen: false, subscribing: false, subscriptionPending: false,
-    authorization: {}, authorizationFeedback: '', subscription: {}, reminderCenterStatus: '', consent: null,
+    authorization: {}, authorizationFeedback: '', subscription: {}, reminderCenterStatus: '', reminderTopUpNeeded: false, consent: null,
     testReturnAvailable: false,
     showLedger: false,
     ledger: [],
@@ -536,7 +536,7 @@ Page({
       this.ordersLoadedAt = 0;
       this.hiddenOrderIds = new Set();
       this.failedOrderAction = null;
-      this.setData({ savingSettings: false });
+      this.setData({ savingSettings: false, signing: false });
       this.setData({ orders: [], ordersClearableCount: 0, ordersClearUnavailable: false, orderActionBusy: '', orderDeletingId: '', orderConfirming: false,
         ordersLoading: false, ordersError: null, ordersActionError: null, ordersActionNote: '',
         checkoutTarget: null, checkoutMessage: '', showPurchaseFeedback: false, purchaseFeedbackSent: false });
@@ -579,7 +579,7 @@ Page({
         memberProducts: products,
         memberProduct: selected,
         priceText: fmt.fen(selected.priceFen),
-        collector: { ...boot.collector, ...fmt.collectorMeta(boot.collector.state) },
+        collector: { ...boot.collector, ...fmt.collectorMeta(boot.collector && boot.collector.state) },
         followCount: boot.followCount,
         freeReminder: false,
         limits: boot.limits,
@@ -1231,16 +1231,17 @@ Page({
     if (this.pageRetired || this.data.signing) return;
     topUpReminderCredit();
     const session = this.pageSession || 0;
+    const owner = this.orderAccount();
     this.setData({ signing: true });
     try {
       const data = await call('quota.signin');
       if (!this.isCurrentSession(session)) return;
+      if (invalidateBootstrap(owner) === false) return;
       if (data.granted > 0) { confirmTap(); toast(`签到成功 +${data.granted} 次`, 'success'); }
       else if (data.reason === 'already_signed_in') toast('今天已签到');
       else if (data.reason === 'daily_cap_reached') toast('今日获取次数已达上限');
       else if (data.reason === 'balance_cap_reached') toast(`余额已达上限 ${data.quota.balanceCap} 次`);
-      invalidateBootstrap();
-      if (publishQuota(data.quota) !== false) this.setData({ quota: currentQuota() || data.quota });
+      if (publishQuota(data.quota, owner) !== false) this.setData({ quota: currentQuota() || data.quota });
     } catch (error) {
       if (this.isCurrentSession(session)) showError(error);
     } finally {
@@ -1469,16 +1470,22 @@ Page({
       soldoutTitle: '库存不足提醒',
     }) : { anyBlocked: false, restockBlocked: false, blocked: [] };
     if (JSON.stringify(this.data.consent || null) !== JSON.stringify(consent)) this.setData({ consent });
-    const status = !this.data.boot.member ? '会员可开启持续提醒'
+    const unavailable = !this.data.boot.member ? '会员可开启持续提醒'
       : this.data.settings && !this.data.settings.notifyEnabled ? '提醒已关闭'
       : activeDnd(this.data.settings) ? '当前免打扰'
       : !subscription.templateCount ? '提醒服务待配置'
       : consent.restockBlocked ? '微信权限未开启'
-      : boot.notifications && (!boot.notifications.enabled || boot.notifications.deliveryReady !== true) ? '发送服务待恢复'
       : !boot.collector || !['running', 'idle'].includes(boot.collector.state) || boot.collector.observationStale ? '后台状态待确认'
-      : !subscription.credits ? '到货暂无次数'
-      : subscription.credits <= 2 ? '到货次数较少' : '到货授权充足';
-    if (this.data.reminderCenterStatus !== status) this.setData({ reminderCenterStatus: status });
+      : !boot.notifications || !boot.notifications.enabled || boot.notifications.deliveryReady !== true ? '发送服务待恢复'
+      : '';
+    const restockLow = subscription.credits <= LOW_CREDITS;
+    const soldoutLow = subscription.soldoutEnabled && subscription.soldoutCredits > 0 && subscription.soldoutCredits <= LOW_CREDITS;
+    const status = unavailable || (!subscription.credits ? '到货暂无次数' : restockLow ? '到货次数较少'
+      : soldoutLow ? '断货次数较少' : '到货授权充足');
+    const reminderTopUpNeeded = !unavailable && !consent.anyBlocked && (restockLow || !!soldoutLow);
+    if (this.data.reminderCenterStatus !== status || this.data.reminderTopUpNeeded !== reminderTopUpNeeded) {
+      this.setData({ reminderCenterStatus: status, reminderTopUpNeeded });
+    }
     const quietStatus = dndStatus(this.data.settings && this.data.settings.dnd);
     if (quietStatus !== this.data.dndStatus) this.setData({ dndStatus: quietStatus });
     this.scheduleDndClock();

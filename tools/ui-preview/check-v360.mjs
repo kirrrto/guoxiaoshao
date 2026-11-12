@@ -62,9 +62,9 @@ try {
             const moving = reducedMotion === 'no-preference';
             checks.fits = document.documentElement.scrollWidth <= innerWidth + 1;
             if (name === 'query-v350-query-first') {
-              const art = find('.pickup-intro-image');
-              checks.artDecoded = Boolean(art?.complete && art.naturalWidth && art.getAttribute('aria-hidden') === 'true');
-              checks.copyClearOfArt = rect('.pickup-intro-copy')?.right <= rect('.pickup-intro-image')?.left + 1;
+              checks.textOnlyIntro = !find('.selection-card img') && Boolean(find('.pickup-intro-title')?.textContent.trim());
+              checks.quotaBeforeAction = Boolean(find('.pickup-quota')?.textContent.trim()) &&
+                before('.pickup-intro-title', '.pickup-quota') && before('.pickup-quota', '.selection-empty button');
               checks.firstAction = target('.selection-empty button') && before('.selection-empty button', '.query-guide-entry');
               checks.aboveTab = before('.selection-empty button', '.preview-native-tabbar');
             } else if (name === 'query-v350-mac-studio-summary') {
@@ -78,10 +78,19 @@ try {
                 const row = find('.deadline-next-time')?.closest('.deadline-home-row');
                 checks.planInContext = Boolean(row?.querySelector('.deadline-home-date') && row?.querySelector('.deadline-home-state'));
                 checks.fixtureTitleOccursOnce = find('.deadline-home').innerText.split('周末优惠券').length === 2;
+                checks.followBeforeRoutineAuthorization = before('.follow-stock-time', '.reminder-status-strip');
+                checks.whistleMark = Boolean(find('.whistle-mark')?.naturalWidth);
+                const pickup = find('.follow-primary-actions button');
+                const add = find('.follow-add-footer button');
+                checks.pickupProminent = Boolean(pickup && add && getComputedStyle(pickup).backgroundColor !== getComputedStyle(add).backgroundColor);
               }
             } else if (name === 'mine-member') {
               const links = Array.from(document.querySelectorAll('.account-tools > button'));
               checks.toolsReachable = links.length >= 3 && links.every(el => el.getBoundingClientRect().height >= 44);
+              checks.memberBrand = find('.member-pass-brand')?.naturalWidth === 96;
+              checks.unconfiguredReminder = target('.mine-reminder-action') &&
+                find('.mine-reminder-action').textContent.trim() === '查看服务说明' &&
+                !find('.mine-reminder-action--primary');
             } else if (name === 'query-loading') {
               const css = getComputedStyle(find('.skeleton-line'));
               checks.boundedLoading = moving ? css.animationName !== 'none' && Number.isFinite(Number(css.animationIterationCount)) : css.animationName === 'none';
@@ -90,6 +99,14 @@ try {
               const panel = history ? '.history-result-card' : '.query-result-card';
               checks.resultOrder = history ? before(panel, '.history-browse-card') : before(panel, '.query-guide-entry');
               checks.motion = moving ? anim(panel) !== 'none' : anim(panel) === 'none';
+              if (history) {
+                const events = [...document.querySelectorAll('.history-result-card .event')];
+                checks.sameTimeEvents = events.length === 2 && document.querySelectorAll('.event-time').length === 1 &&
+                  events.every(event => event.querySelector('.event-store')?.textContent.trim() && event.querySelector('.event-status')?.textContent.trim());
+              } else {
+                checks.matchingTargetReceipt = Boolean(find('.result-product-part')?.textContent.trim()) &&
+                  !find('.result-product-row') && before('.result-product-time', '.result-store');
+              }
             }
             return checks;
           }, { name, reducedMotion });

@@ -6,6 +6,8 @@
 
 `logo-member-black-gold-master.png` 为原始 PNG；`logo-member-black-gold-512.png` 为等比缩放备用版；`logo-member-black-gold-200.png` 为用户后台要求的上传版，200 × 200 像素、37,214 字节，低于 200 KB。缩放版本无裁切或重绘。
 
+2026-11-12 将此标用于「我的」页的有效会员卡。卡面专用 PNG 由母版等比缩至 104px，四边各去掉 4px 外部留白，再以 95 质量的 PNG 调色板编码。96px 资源占 3,341 字节，在套餐标题旁以 32px 显示。果叶、哨身和两道声线完整保留。[卡面资源](../../miniprogram/images/brand/logo-member-black-gold-96.png)
+
 ## 最终提示词
 
 Use case: precise-object-edit.

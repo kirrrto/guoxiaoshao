@@ -19,12 +19,12 @@
   <block wx:else>
     <view wx:if="{{refreshing || refreshMessage}}" class="refresh-feedback" aria-role="status">{{refreshing ? '正在更新账户与页面…' : refreshMessage}}</view>
     <view wx:if="{{!accountReady}}" class="banner banner-info small">{{accountError || '正在连接微信账户，你可以先选择查询条件。'}}<button wx:if="{{accountError}}" class="btn btn-outline btn-sm mt" bindtap="onRetryAccount">重试账户连接</button></view>
-    <view class="page-heading history-heading"><view><view class="page-title">供应历史</view></view><button class="ui-action ui-action--neutral history-explain" hover-class="ui-control-pressed" bindtap="onExplain"><image class="ui-icon" src="/images/ui/info.png" mode="aspectFit" aria-hidden="true" /><text class="ui-action-label">数据说明</text></button></view>
+    <view class="page-heading history-heading"><view><view class="page-title">供应历史</view></view><button class="ui-action ui-action--neutral history-explain" hover-class="ui-control-pressed" bindtap="onExplain"><text class="ui-action-label">数据说明</text></button></view>
     <view class="card history-selection-card">
       <view class="history-date-row" aria-label="选择日期，北京时间">
         <picker class="history-date-picker" disabled="{{querying || loadingMore}}" mode="date" value="{{dayKey}}" start="{{earliestDay}}" end="{{today}}" bindchange="onDateChange">
           <view class="history-date-control {{querying || loadingMore ? 'history-date-control--disabled' : ''}}" hover-class="ui-control-pressed" aria-role="button" aria-label="选择日期，当前{{dayKey}}，北京时间" aria-disabled="{{querying || loadingMore}}">
-            <view class="history-date-caption"><image class="ui-icon" src="/images/ui/calendar.png" mode="aspectFit" aria-hidden="true" /><text>查询日期</text></view>
+            <text class="history-date-caption">查询日期 · 北京时间</text>
             <view class="history-date-line"><text class="history-date-value">{{dayKey}}</text><view class="ui-chevron ui-chevron--down" aria-hidden="true"></view></view>
           </view>
         </picker>
@@ -35,20 +35,21 @@
       </view>
       <view wx:if="{{selectionSummary}}" class="history-config-summary">
         <view class="history-product-media"><image wx:if="{{selectionSummary.imageDisplayUrl && selectionSummary.imageUrl !== failedSelectionImageUrl}}" class="history-product-image" src="{{selectionSummary.imageDisplayUrl}}" webp="{{true}}" mode="aspectFit" data-src="{{selectionSummary.imageUrl}}" binderror="onSelectionImageError" aria-label="{{selectionSummary.title}}" /><image wx:else class="history-product-placeholder" src="/images/ui/device.png" mode="aspectFit" aria-hidden="true" /></view>
-        <view class="history-config-copy"><view class="history-config-title">{{selectionSummary.title}}</view></view>
+        <view class="history-config-copy"><view class="history-config-title">{{selectionSummary.title}}</view><view class="history-store-scope">{{selectionSummary.scopeText}}</view></view>
         <button class="ui-action history-edit" hover-class="ui-control-pressed" disabled="{{querying || loadingMore}}" bindtap="onEditSelection"><text class="ui-action-label">修改</text><view class="ui-chevron" aria-hidden="true"></view></button>
       </view>
-      <view wx:if="{{selectionSummary}}" class="history-store-scope"><image class="ui-icon" src="/images/ui/store.png" mode="aspectFit" aria-hidden="true" /><text>{{selectionSummary.scopeText}}</text></view>
       <button wx:else class="btn btn-primary btn-block" hover-class="btn-primary-pressed" bindtap="onEditSelection">选择配置与门店</button>
 
       <view wx:if="{{queryFailureMessage || restriction}}" class="banner banner-warn small mt" aria-role="alert">{{queryFailureMessage || restriction}}</view>
       <button wx:if="{{!boot.member && boot.balance < boot.historyCost}}" class="ui-action ui-action--block mb" hover-class="ui-control-pressed" bindtap="onGoMine"><text class="ui-action-label">去签到 / 查看次数</text><view class="ui-chevron" aria-hidden="true"></view></button>
 
-      <button wx:if="{{selectionSummary}}" class="btn btn-primary btn-block mt {{querying ? 'disabled' : ''}}" hover-class="btn-primary-pressed" loading="{{querying}}" disabled="{{querying || loadingMore || !accountReady || !selectionSummary.valid}}" bindtap="onQuery">
-        {{!accountReady ? '正在连接账户…' : (querying ? '加载中…' : '查看历史')}}
-      </button>
+      <view wx:if="{{selectionSummary}}" class="history-query-row">
+        <view wx:if="{{accountReady}}" class="history-query-cost"><text>{{boot.member ? '会员查询不扣次数' : '消耗 ' + boot.historyCost + ' 次 · 余 ' + boot.balance + ' 次'}}</text><text wx:if="{{!boot.member}}">无事件自动退还</text></view>
+        <button class="btn btn-primary history-query-submit {{querying ? 'disabled' : ''}}" hover-class="btn-primary-pressed" loading="{{querying}}" disabled="{{querying || loadingMore || !accountReady || !selectionSummary.valid}}" bindtap="onQuery">
+          {{!accountReady ? '正在连接账户…' : (querying ? '加载中…' : '查看历史')}}
+        </button>
+      </view>
       <view wx:if="{{querying}}" class="request-progress {{requestSlow ? 'request-progress--slow' : ''}}" aria-role="status">{{requestSlow ? requestProgressText : '正在读取所选日期的已记录变化。'}}</view>
-      <view wx:if="{{selectionSummary && accountReady}}" class="history-query-cost"><text>{{boot.member ? '会员查询不扣次数' : '消耗 ' + boot.historyCost + ' 次 · 余 ' + boot.balance + ' 次'}}</text><text wx:if="{{!boot.member}}">无事件自动退还</text></view>
     </view>
 
     <view wx:if="{{restoreNotice}}" class="banner {{restoreWarning ? 'banner-warn' : 'banner-info'}} small">{{restoreNotice}}</view>
@@ -56,11 +57,10 @@
     <view wx:if="{{result}}" class="card history-result-card ui-reveal">
       <view wx:if="{{queryFailureMessage}}" class="banner banner-warn small mb">本次查询未完成，下方保留上次查询结果。</view>
       <view wx:elif="{{resultTargetDifferent}}" class="banner banner-info small mb">下方为上次查询结果，当前条件尚未查询。</view>
-      <view class="history-result-heading"><text class="history-result-date">{{result.dayText}}</text></view>
+      <view class="history-result-heading"><view class="history-data-title">{{result.coverageTitle}}</view><text class="history-result-date">{{result.dayText}}</text></view>
       <view class="history-result-target">{{result.product.title}}</view>
 
-      <view class="history-data-notice {{result.hasEventRecords ? 'history-data-notice--recorded' : ''}}">
-        <view class="history-data-title">{{result.coverageTitle}}</view>
+      <view wx:if="{{!result.hasEventRecords || result.billingText}}" class="history-data-notice">
         <view wx:if="{{!result.hasEventRecords}}" class="tiny text-2 history-data-detail">{{result.coverageNote}}</view>
         <view wx:if="{{result.billingText}}" class="small history-billing-note history-data-detail">{{result.billingText}}</view>
       </view>
@@ -68,10 +68,10 @@
       <view wx:if="{{result.insights.lastRestockText}}" class="small text-2 mt">{{result.insights.lastRestockText}}</view>
       <view wx:if="{{result.latestRestricted}}" class="banner banner-info small mt">当前配置处于免费用户新品限制期，本页仅提供所选日期历史，不显示当前库存。</view>
       <view wx:if="{{result.hasEventRecords}}" class="history-timeline-heading"><text>变化时间轴</text><text class="tiny muted">已加载 {{result.events.length}} / {{result.pagination.total}}</text></view>
-      <view wx:for="{{result.events}}" wx:key="id" class="event {{index === result.events.length - 1 ? 'event--last' : ''}}">
-        <view class="event-rail"><view class="event-time mono">{{item.timeText}}</view><view class="event-dot event-dot--{{item.cls}}" aria-hidden="true"></view></view>
+      <view wx:for="{{result.events}}" wx:key="id" class="event">
+        <view wx:if="{{index === 0 || item.timeText === '—' || item.timeText !== result.events[index - 1].timeText}}" class="event-time">{{item.timeText}}</view>
         <view class="event-body">
-          <view class="event-main"><text class="small bold event-store">{{item.storeName}}</text><text class="pill pill-{{item.cls}} tiny event-status">{{item.label}}</text></view>
+          <view class="event-main"><text class="event-store">{{item.storeName}}</text><text class="event-status event-status--{{item.cls}}">{{item.label}}</text></view>
           <view class="tiny text-2 event-detail" wx:if="{{item.detailText}}">{{item.detailText}}</view>
           <view class="tiny muted event-detail" wx:if="{{item.quote}}">{{item.quote}}</view>
         </view>
@@ -81,6 +81,7 @@
 
       <button class="ui-disclosure history-disclosure" hover-class="ui-control-pressed" bindtap="onToggleCoverage" aria-expanded="{{coverageExpanded}}"><text class="ui-disclosure-label">统计与观测凭据</text><view class="ui-disclosure-meta"><text>{{coverageExpanded ? '收起' : '展开'}}</text><view class="ui-chevron {{coverageExpanded ? 'ui-chevron--up' : 'ui-chevron--down'}}" aria-hidden="true"></view></view></button>
       <view wx:if="{{coverageExpanded}}" class="ui-reveal">
+      <view wx:if="{{result.hasEventRecords}}" class="small text-2">{{result.coverageNote}}</view>
       <view class="small text-2">{{result.coverageSummary}}</view>
       <view class="history-insights">
         <view class="small bold">当天记录速览</view>

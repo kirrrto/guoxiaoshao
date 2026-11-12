@@ -125,30 +125,36 @@ function fen(amount) {
 
 function observation(iso, now = Date.now()) {
   const age = now - Date.parse(iso);
-  const stale = !Number.isFinite(age) || age > 120000;
+  const stale = !Number.isFinite(age) || age < 0 || age > 120000;
   return { stale, observedText: iso ? fmtDateTime(iso) : '尚无观测', freshnessText: stale ? '观测已过期，请刷新后确认' : '最近观测，以官网实际取货为准' };
 }
 
 /** Use one decision for the stock badge, freshness note and historical value. */
 function stockObservation(record = {}, now = Date.now(), options = {}) {
-  const base = { statusLabel: '状态待确认', statusCls: 'unknown', stale: false, observedText: '尚无观测',
+  const base = { statusLabel: '状态待确认', statusCls: 'unknown', stale: false, timeUncertain: false, observedText: '尚无观测',
     freshnessText: '', lastKnownText: null, sinceText: null, observationNote: null, observationState: 'unknown' };
   if (options.restricted) return { ...base, statusLabel: '会员权益受限', statusCls: 'muted', observedText: '未展示实时库存',
     freshnessText: '当前账号暂不能查看该新品的实时库存。', observationState: 'restricted' };
   const observed = Date.parse(record.observedAt);
   if (!Number.isFinite(observed)) return { ...base, statusLabel: '等待首次观测', statusCls: 'muted',
     freshnessText: '还没有有效观测，查询后可查看结果。', observationState: 'missing' };
-  const timing = observation(record.observedAt, now);
+  const knownAt = record.knownAt == null ? observed : Date.parse(record.knownAt);
+  if (observed > now || !Number.isFinite(knownAt) || knownAt > observed) {
+    return { ...base, timeUncertain: true, stale: true, statusLabel: '观测时间待核对', observedText: fmtDateTime(record.observedAt),
+      freshnessText: '这条观测的时间尚未确认，请刷新后再判断取货状态。' };
+  }
+  const observedText = fmtDateTime(record.observedAt);
+  const stale = observation(record.knownAt || record.observedAt, now).stale;
   const known = value => value !== 'unknown' && Object.prototype.hasOwnProperty.call(STATUS_META, value);
   const unknown = record.isStale === true || Boolean(record.unknownSince) || !known(record.status);
   const previous = known(record.lastKnownStatus) ? record.lastKnownStatus : known(record.status) ? record.status : null;
-  if (timing.stale || unknown) return { ...base, stale: timing.stale || record.isStale === true || Boolean(record.unknownSince), observedText: timing.observedText,
-    statusLabel: timing.stale ? '待更新' : '状态待确认', observationState: timing.stale ? 'stale' : 'unknown',
-    freshnessText: timing.stale ? '观测已过期，当前库存待新观测确认。' : '最近一次检查未取得有效库存，请等待新观测。',
+  if (stale || unknown) return { ...base, stale: stale || record.isStale === true || Boolean(record.unknownSince), observedText,
+    statusLabel: stale ? '待更新' : '状态待确认', observationState: stale ? 'stale' : 'unknown',
+    freshnessText: stale ? '观测已过期，当前库存待新观测确认。' : '最近一次检查未取得有效库存，请等待新观测。',
     lastKnownText: previous ? `上次有效结果：${statusMeta(previous).label}（仅供参考）` : null };
   const elapsed = observed - Date.parse(record.statusSince);
   return { ...base, statusLabel: statusMeta(record.status).label, statusCls: statusMeta(record.status).cls,
-    observedText: timing.observedText, freshnessText: timing.freshnessText, observationState: 'fresh',
+    observedText, freshnessText: '最近观测，以官网实际取货为准', observationState: 'fresh',
     sinceText: Number.isFinite(elapsed) && elapsed >= 1000 ? duration(elapsed) : null,
     observationNote: Number.isFinite(elapsed) && elapsed >= 0 && elapsed < 1000 ? '本次状态刚记录，时长待后续观测确认。' : null };
 }

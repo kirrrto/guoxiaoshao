@@ -104,3 +104,21 @@ test('session reset releases both balance and metadata revision history', () => 
   assert.equal(store.currentQuota().balance, 0);
   assert.equal(store.publishQueryBalance({ balance: 1, quotaRevision: 1 }).balance, 1);
 });
+
+test('switching accounts after invalidation clears both quota revisions and confirmed follow snapshots', async () => {
+  let owner = 'alice';
+  const values = { alice: quota(9, 20, { signedInToday: true }), bob: quota(0, 1) };
+  const rt = runtime(async action => action === 'follow.list' ? { follows: [owner] } : { ...boot(values[owner]), identity: { userKey: owner } });
+  const store = rt.load('utils/store.js');
+  await store.getBootstrap();
+  assert.deepEqual(copy((await store.getFollows()).follows), ['alice']);
+  store.publishQueryBalance({ balance: 8, quotaRevision: 21 }, owner);
+  store.invalidateBootstrap();
+  owner = 'bob';
+  assert.deepEqual(copy((await store.getBootstrap()).quota), values.bob);
+  assert.deepEqual(copy((await store.getFollows()).follows), ['bob']);
+  assert.equal(store.invalidateBootstrap('alice'), false);
+  assert.equal(store.publishQuota(quota(10, 22), 'alice'), false);
+  assert.equal(store.publishQueryBalance({ balance: 7, quotaRevision: 23 }, 'alice').accepted, false);
+  assert.deepEqual(copy(rt.app.globalData.bootstrap.quota), values.bob);
+});

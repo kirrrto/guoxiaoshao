@@ -43,6 +43,20 @@ test('missing and restricted observations have distinct explanations without lea
   assert.equal(restricted.lastKnownText, null); assert.equal(restricted.sinceText, null);
 });
 
+test('future checks and mismatched confirmation times never produce current or historical availability', () => {
+  const at = offset => new Date(now + offset).toISOString();
+  for (const times of [{ observedAt: at(1) }, { observedAt: at(-10000), knownAt: at(-1000) }, { observedAt: at(0), knownAt: 'invalid' }]) {
+    const view = fmt.stockObservation({ status: 'available', ...times }, now);
+    assert.equal(view.observationState, 'unknown');
+    assert.equal(view.lastKnownText, null);
+    assert.equal(view.timeUncertain, true);
+  }
+  const old = fmt.stockObservation({ status: 'available', observedAt: at(0), knownAt: at(-120001) }, now);
+  assert.equal(old.observationState, 'stale');
+  assert.match(old.lastKnownText, /可取货/);
+  assert.equal(fmt.stockObservation({ status: 'available', observedAt: at(0), knownAt: at(-120000) }, now).observationState, 'fresh');
+});
+
 test('follow polling expires the retained badge even when refreshing the account fails', async () => {
   const rt = runtime(async () => { throw Error('offline'); });
   const page = rt.instance('pages/follow/index.js');

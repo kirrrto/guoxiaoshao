@@ -70,11 +70,9 @@ function availableStoreChoices(snapshot, catalog = {}, account, now = Date.now()
     || !canOfferLiveChoices(product, account, now)) return [];
   const seen = new Set();
   return (snapshot.results || []).reduce((choices, record) => {
-    const store = own(catalog.storeByNumber, record.storeNumber), observed = Date.parse(record.observedAt), age = now - observed;
-    const knownAge = record.knownAt ? now - Date.parse(record.knownAt) : age;
+    const store = own(catalog.storeByNumber, record.storeNumber);
     if (!store || !/^R\d{3}$/.test(record.storeNumber) || seen.has(record.storeNumber) || record.status !== 'available'
-      || record.isStale || record.unknownSince || record.restricted || !Number.isFinite(age) || age < 0 || age > 120000
-      || !Number.isFinite(knownAge) || knownAge < 0 || knownAge > 120000) return choices;
+      || fmt.stockObservation(record, now, { restricted: record.restricted }).observationState !== 'fresh') return choices;
     seen.add(record.storeNumber);
     choices.push({ storeNumber: record.storeNumber, label: storeLabelWithCity(record.storeNumber, store.name, store.city),
       observedText: fmt.fmtDateTime(record.observedAt), ageText: fmt.relative(record.observedAt, now) });

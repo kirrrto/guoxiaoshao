@@ -147,13 +147,13 @@ Page({
     selectionSummary: null,
     selectionNotice: '请补全或核对配置与门店后查询。',
     selectionImageFailed: false,
-    introImageFailed: false,
     sheetVisible: false,
     draftValue: null,
     draftDirty: false,
     draftSummary: '',
     rulesExpanded: false,
     querying: false,
+    selectionQueryPending: false,
     requestSlow: false,
     requestProgressText: '',
     refreshing: false,
@@ -430,7 +430,7 @@ Page({
       this.followSnapshot = null;
       this.alternativeResponse = null;
       this.querySnapshotNeedsRequery = Boolean(this.querySnapshot);
-      this.setData({ querying: false, alternativeLoading: false, liveResultRestricted: true, nextAction: null, evidenceCard: null, storeChoices: [], followTargets: [],
+      this.setData({ querying: false, signing: false, signinError: null, alternativeLoading: false, liveResultRestricted: true, nextAction: null, evidenceCard: null, storeChoices: [], followTargets: [],
         alternativeMatches: [], acceptedStoreNumbers: [], restriction: null, queryFailureMessage: '', restrictionReason: null });
     }
     this.accountVerificationPending = false;
@@ -460,7 +460,7 @@ Page({
         followCount: boot.followCount || 0,
         signedInToday: boot.quota.signedInToday,
       },
-      collector: { ...boot.collector, ...fmt.collectorMeta(boot.collector.state) },
+      collector: { ...boot.collector, ...fmt.collectorMeta(boot.collector && boot.collector.state) },
     });
     this.updateQueryNotices();
     this.refreshStoreChoices();
@@ -804,21 +804,24 @@ Page({
     if (this.pageRetired || this.data.signing || this.data.querying || !this.data.accountReady
       || !this.data.boot || this.data.boot.member || this.data.boot.signedInToday) return;
     this.onSelectionInteraction();
+    const epoch = this.accountEpoch || 0;
+    const owner = this.accountSnapshot && this.accountSnapshot.identity && this.accountSnapshot.identity.userKey;
     this.setData({ signing: true, signinError: null });
     try {
       const result = await call('quota.signin');
+      if (epoch !== (this.accountEpoch || 0)) return;
       if (!result || !result.quota) throw new Error('签到结果尚未确认，请重试');
       // The shared store rejects stale revisions and updates other open pages too.
-      publishQuota(result.quota);
+      if (publishQuota(result.quota, owner) === false) return;
       if (this.pageRetired) return;
       if (result.granted > 0) { confirmTap(); toast(`签到成功 +${result.granted} 次`, 'success'); }
       else if (result.reason === 'already_signed_in') toast('今天已签到');
       else if (result.reason === 'daily_cap_reached') toast('今日获取次数已达上限');
       else if (result.reason === 'balance_cap_reached') toast('查询次数已达余额上限');
     } catch (error) {
-      if (!this.pageRetired) this.setData({ signinError: '签到暂未确认，请重试；同一天不会重复领取。' });
+      if (!this.pageRetired && epoch === (this.accountEpoch || 0)) this.setData({ signinError: '签到暂未确认，请重试；同一天不会重复领取。' });
     } finally {
-      if (!this.pageRetired) this.setData({ signing: false });
+      if (!this.pageRetired && epoch === (this.accountEpoch || 0)) this.setData({ signing: false });
     }
   },
 
@@ -846,6 +849,7 @@ Page({
   selectionView(selection, maxStores = this.data.boot ? this.data.boot.maxStores : 3) {
     const details = selectionDetails(selection, this.catalog, maxStores || 3);
     return {
+      selectionQueryPending: details.valid && this.hasPendingQuery(selection),
       selectionCanCollapse: details.valid,
       selectionSupportsFollow: canMonitor(selection && this.catalog && this.catalog.productByPart[selection.partNumber]),
       selectionReferenceOnly: details.referenceOnly,
@@ -854,6 +858,12 @@ Page({
       selectionImageFailed: details.summary && this.data.selectionSummary && details.summary.imageUrl === this.data.selectionSummary.imageUrl ? this.data.selectionImageFailed : false,
       resultTargetDifferent: resultHasDifferentTarget(this.data.result, selection),
     };
+  },
+
+  hasPendingQuery(selection) {
+    if (!selection || !selection.partNumber) return false;
+    const owner = this.accountSnapshot && this.accountSnapshot.identity && this.accountSnapshot.identity.userKey;
+    return operation.hasPending('q', { partNumber: selection.partNumber, storeNumbers: selection.storeNumbers }, owner);
   },
 
   onSelectionInteraction() { this.selectionInteractionEpoch = (this.selectionInteractionEpoch || 0) + 1; },
@@ -905,7 +915,6 @@ Page({
   onToggleRules() { this.setData({ rulesExpanded: !this.data.rulesExpanded }); },
 
   onSelectionImageError() { this.setData({ selectionImageFailed: true }); },
-  onIntroImageError() { this.setData({ introImageFailed: true }); },
 
   readPickerSelection() {
     // The component coalesces change events until nextTick. A tap must use
@@ -974,7 +983,7 @@ Page({
     const focus = { visible: Boolean(this.visible), visibilityEpoch: this.visibilityEpoch || 0,
       interactionEpoch: this.selectionInteractionEpoch || 0, queryEpoch: this.queryFocusEpoch = (this.queryFocusEpoch || 0) + 1 };
     const payload = { partNumber: selection.partNumber, storeNumbers: selection.storeNumbers.slice() };
-    const queryId = operation.begin('q', payload);
+    const queryId = operation.begin('q', payload, accountUserKey);
     try {
       const response = await call('query.pickup', { queryId, ...payload });
       if (accountEpoch !== (this.accountEpoch || 0)) return;
@@ -986,8 +995,8 @@ Page({
         return;
       }
       operation.finish('q', queryId);
-      invalidateBootstrap();
-      const quota = publishQueryBalance(response);
+      if (invalidateBootstrap(accountUserKey) === false) return;
+      const quota = publishQueryBalance(response, accountUserKey);
       if (quota.needsRefresh) getBootstrap({ force: true }).then(boot => this.applyBoot(boot)).catch(() => {});
       if (this.pageRetired) return;
       const balancePatch = quota.balance === null ? {} : { 'boot.balance': quota.balance };
@@ -1028,7 +1037,10 @@ Page({
       const message = queryFailureNotice(error);
       this.setData({ restriction: message, queryFailureMessage: message });
     } finally {
-      if (!this.pageRetired && accountEpoch === (this.accountEpoch || 0)) { stopProgress(this); this.setData({ querying: false, requestSlow: false }); }
+      if (!this.pageRetired && accountEpoch === (this.accountEpoch || 0)) {
+        stopProgress(this);
+        this.setData({ querying: false, requestSlow: false, selectionQueryPending: this.hasPendingQuery(this.selection) });
+      }
     }
   },
 

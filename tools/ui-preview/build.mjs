@@ -1146,7 +1146,7 @@ for (const scenario of scenarios) {
         'payment-monthly': ['立即开通 · ¥14.99', '30 天'],
         'payment-annual': ['立即开通 · ¥129.00', '365 天'],
         'payment-pending-monthly': ['30 天会员 · ¥19.90', 'offline-original-monthly-order', '支付正在确认中', '查询支付结果'],
-        'payment-member': ['剩余18天·至2026-10-03 15:00', '延长会员', '升级套餐'],
+        'payment-member': ['有效期至 2026-10-03 15:00', '剩余 18 天', '延长会员', '升级套餐'],
         'payment-expired': ['会员已到期', '已于2026-09-10', '监测与提醒停止', '关注配置与次数仍保留', '立即开通'],
         'payment-upgrade-monthly': ['确认购买 · ¥14.99', '在原到期时间后增加 30 天', '预计到期 2026-11-02', '按所选套餐全价购买', '不抵扣差价'],
         'payment-upgrade-annual': ['确认购买 · ¥129.00', '在原到期时间后增加 365 天', '预计到期 2027-10-03', '按所选套餐全价购买', '不抵扣差价'],
@@ -1169,7 +1169,7 @@ for (const scenario of scenarios) {
         ...(stockScenarios[scenario].authorizationPending ? ['待同步 +1', '重试同步', '网络较慢，授权记录尚未同步。'] : member ? ['微信提醒授权已备好'] : []),
       ] : scenario === 'loading' ? [{ query: '正在加载商品目录', follow: '正在读取你的关注', history: '正在加载商品目录', mine: '正在读取账户信息' }[pageName]]
         : scenario === 'error' ? [pageName === 'admin' ? '模拟错误：网络连接中断' : '模拟错误：云环境连接超时', '暂时没有连上', '重试']
-        : pageName === 'mine' ? [member ? '果小哨会员' : expired ? '会员已到期' : '会员权益', ...(page.data.showPurchaseShop ? page.data.membership.active ? ['延长会员', '升级套餐'] : ['开通会员'] : ['会员购买暂不可用，现有会员权益不受影响。']), '会员权益与购买规则', '提醒记录', ...(reminderPreview && reminderRecords.length ? ['删除记录', scenario === 'reminder-clearing' ? '清空中' : '清空'] : [])]
+        : pageName === 'mine' ? [member ? '会员已开通' : expired ? '会员已到期' : '会员权益', ...(page.data.showPurchaseShop ? page.data.membership.active ? ['延长会员', '升级套餐'] : ['开通会员'] : ['会员购买暂不可用，现有会员权益不受影响。']), '会员权益与购买规则', '提醒记录', ...(reminderPreview && reminderRecords.length ? ['删除记录', scenario === 'reminder-clearing' ? '清空中' : '清空'] : [])]
         : pageName === 'follow' && follows.length ? [p.title, '2 家门店', ...(page.data.follows.some(follow => follow.detailsExpanded) ? [stores[0].name, '收起详情', '调整', '查看供应历史', '删除关注'] : ['详情与管理']), ...(sheetPreview ? ['调整关注', '选商品', '选门店', '已选 2 家门店', p.title + ' · 2 家门店', scenario === 'sheet-saving' ? '正在保存' : '保存关注'] : [])]
         : pageName === 'follow' ? ['暂无库存关注']
         : pageName === 'admin' ? ['运行统计', '128'] : [p.title, ...(sheetPreview ? ['选商品', '选门店', '已选 2 家门店', '保存选择'] : [])];

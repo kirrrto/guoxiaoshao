@@ -7,13 +7,14 @@ const account = () => ({ identity: { userKey: 'account:v3-query' }, membership: 
   quota: { balance: 0, queryCost: 1 }, limits: { queryMaxStores: 4 }, collector: { state: 'running' },
   features: { resultNextAction: true, targetEvidence: true }, followCount: 0 });
 
-function resultPage() {
+function resultPage(now = Date.now()) {
   const rt = runtime(), page = rt.instance('pages/query/index.js');
   const catalog = rt.load('utils/store.js').currentCatalog();
   const product = catalog.products.find(item => item.supported && !item.comingSoon);
   const stores = Object.keys(catalog.storeByNumber).slice(0, 4);
-  const snapshot = { ok: true, product, queriedAt: new Date().toISOString(),
-    results: stores.map(storeNumber => ({ storeNumber, status: 'available', observedAt: new Date().toISOString() })) };
+  const observedAt = new Date(now).toISOString();
+  const snapshot = { ok: true, product, queriedAt: observedAt,
+    results: stores.map(storeNumber => ({ storeNumber, status: 'available', observedAt })) };
   page.catalog = catalog;
   page.selection = { partNumber: catalog.products.find(item => item.partNumber !== product.partNumber).partNumber, storeNumbers: [stores[1]] };
   page.accountSnapshot = account(); page.features = account().features; page.querySnapshot = snapshot;
@@ -91,9 +92,9 @@ test('available history receives only the chosen target and waits for an explici
 });
 
 test('query presentation places only fresh available stores first without changing the retained query', t => {
-  let now = Date.now();
+  let now = Date.parse('2026-10-01T00:00:00Z');
   t.mock.method(Date, 'now', () => now);
-  const { rt, page, snapshot } = resultPage();
+  const { rt, page, snapshot } = resultPage(now);
   snapshot.results[0].status = 'unavailable';
   snapshot.results[1].status = 'unknown';
   snapshot.results[2].observedAt = new Date(now - 180000).toISOString();
@@ -103,6 +104,10 @@ test('query presentation places only fresh available stores first without changi
   assert.deepEqual(copy(page.data.result.results.map(row => row.storeNumber)), [ids[3], ids[0], ids[1], ids[2]]);
   assert.deepEqual(copy(page.data.result.results.map(row => row.pickupReady)), [true, false, false, false]);
   assert.deepEqual(copy(snapshot), original, 'display ordering must preserve the original request and observation times');
+  now -= 1;
+  page.refreshQuerySnapshot();
+  assert.deepEqual(copy(page.data.result.results.map(row => row.storeNumber)), ids);
+  assert.ok(page.data.result.results.every(row => !row.pickupReady), 'even a one-millisecond future observation is unconfirmed');
   now += 180000;
   page.refreshQuerySnapshot();
   assert.deepEqual(copy(page.data.result.results.map(row => row.storeNumber)), ids);

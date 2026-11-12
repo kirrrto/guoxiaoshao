@@ -87,6 +87,66 @@ test('storage recovery state follows the full localKey scope', () => {
   assert.equal(operations.begin('q', target), first);
 });
 
+test('a member of another account cannot see or adopt a saved query; an upgrade can recover an unowned legacy ID', () => {
+  const rt = runtime(), ops = rt.load('utils/operation.js');
+  rt.storage.set('gxs_pending_q_v1', { id: 'legacy-operation', fingerprint: JSON.stringify(target) });
+  assert.equal(ops.hasPending('q', target, 'alice'), true);
+  assert.equal(ops.begin('q', target, 'alice'), 'legacy-operation');
+  assert.equal(ops.hasPending('q', target, 'bob'), false);
+  const other = ops.begin('q', target, 'bob');
+  assert.notEqual(other, 'legacy-operation');
+  ops.finish('q', other);
+  assert.equal(ops.hasPending('q', target, 'bob'), false);
+  assert.equal(ops.begin('q', target, 'alice'), 'legacy-operation');
+});
+
+test('zero credits after a lost response still exposes the same-SKU/store recovery button after cold start', async () => {
+  const fetchImpl = fakeFetch({ R577: { display: 'available' } });
+  const f = createFixture({ config: { query: { sharedFreshnessSeconds: 10 } }, fetchImpl });
+  ok(await f.call('quota.signin'));
+  const product = PRODUCTS.find(value => value.partNumber === target.partNumber);
+  let attempts = 0;
+  function client() {
+    const rt = runtime(async (action, payload) => {
+      const result = ok(await f.call(action, payload));
+      if (action === 'query.pickup' && ++attempts === 1) throw Object.assign(Error('response lost'), { code: 'call_failed' });
+      return result;
+    });
+    const page = rt.instance('pages/query/index.js');
+    page.catalog = { productByPart: { [product.partNumber]: product }, storeByNumber: Object.fromEntries(STORES.map(s => [s.storeNumber,s])) };
+    page.selection = { ...target, product };
+    return { rt, page };
+  }
+  const a = client();
+  a.page.applyBoot(ok(await f.call('user.bootstrap')));
+  assert.equal(a.page.data.boot.balance, 1);
+  await a.page.onQuery();
+  assert.equal(a.page.data.selectionQueryPending, true);
+  const id = a.rt.calls.find(c => c.action === 'query.pickup').payload.queryId;
+
+  f.advance(11000);
+  const b = client();
+  for (const [key, value] of a.rt.storage) b.rt.storage.set(key, value);
+  b.page.applyBoot(ok(await f.call('user.bootstrap')));
+  assert.equal(b.page.data.boot.balance, 0);
+  assert.equal(b.page.data.selectionQueryPending, true);
+  const source = fs.readFileSync(new URL('../miniprogram/pages/query/index.wxml', import.meta.url), 'utf8');
+  const actionRows = source.slice(source.indexOf('<button wx:if="{{selectionRestricted}}"'), source.indexOf('<view wx:if="{{querying}}" class="request-progress'));
+  const actions = [...actionRows.matchAll(/<button wx:(?:if|elif)="\{\{(.*?)\}\}"[^>]*?bindtap="(\w+)"/g)];
+  const binding = () => actions.find(([, condition]) => vm.runInNewContext(condition, { ...b.page.data }))?.[2];
+  assert.equal(binding(), 'onQuery');
+  b.page.onPickerChange({ detail: { ...target, product, storeNumbers: ['R639'] } });
+  assert.equal(b.page.data.selectionQueryPending, false);
+  assert.equal(binding(), 'onGoMine');
+  b.page.onPickerChange({ detail: { ...target, product } });
+  await b.page[binding()]();
+  assert.equal(b.page.data.result.replayed, true);
+  assert.equal(b.rt.calls.find(c => c.action === 'query.pickup').payload.queryId, id);
+  assert.equal(b.page.data.selectionQueryPending, false);
+  assert.equal((await f.repo.listLedger(userKeyOf())).filter(entry => entry.type === 'query_debit').length, 1);
+  assert.equal(fetchImpl.calls.length, 1);
+});
+
 test('a lost committed query response with unavailable storage retries without a second debit', async () => {
   const fetchImpl = fakeFetch({ R577: { display: 'available' } });
   const f = createFixture({ config: { query: { sharedFreshnessSeconds: 10 } }, fetchImpl });

@@ -1,0 +1,85 @@
+{
+  "release": "3.7.0",
+  "checkedAt": "2026-11-12T15:10:34.510Z",
+  "runtime": "v22.22.3",
+  "scope": "Isolated Node page harness and repository business services using in-memory dependencies.",
+  "verified": [
+    "A lost response after a last-credit debit is recoverable from the query page after restart with zero credits. The same SKU and store set reuse the original billing operation. A different store does not offer that recovery. Service executed one upstream call and one debit.",
+    "A different account bootstrap discards quota and follow cache belonging to the previous account. Delayed balance and quota updates for the old account cannot replace the current account state.",
+    "Unparseable, out-of-order or future success timestamps cannot produce an available status. Freshness uses the time of the confirmed result for query, follow, history and alternative-store actions.",
+    "An absent collector object does not interrupt bootstrap of query, history or member pages. Notification readiness distinguishes unconfirmed monitoring state from a known sender failure."
+  ],
+  "regression": {
+    "command": "node --test tests/operation-storage-recovery.test.mjs tests/query-quota-cross-tab.test.mjs tests/query-quota-ordering.test.mjs tests/reminder-center-v3.test.mjs tests/stock-observation-pages.test.mjs tests/stock-observation.test.mjs",
+    "tests": 75,
+    "pass": 75,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "extendedRuns": {
+    "frontendObservationQuotaReminder": {
+      "tests": 148,
+      "pass": 148,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "selectionOperationAndAccountRecovery": {
+      "tests": 61,
+      "pass": 61,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "monitorSubscriptionPaymentAndTransactions": {
+      "tests": 321,
+      "pass": 321,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    }
+  },
+  "excludedFromThisOfflineEvidence": [
+    "Cloud deployment parity and fresh automatic production samples",
+    "WeChat production subscribe-message send and actual receipt on a handset",
+    "Real membership payment and refund"
+  ],
+  "productionLoad": "No new cloud calls, background requests, polling, collection changes or migrations. Switching accounts invalidates cached follows and fetches them on the next requested read.",
+  "sourceSha256": {
+    "miniprogram/pages/follow/index.js": "ef3076a567f98768e869120b3a8a4868c16a5a7a3919ae2077c2c26c03b49417",
+    "miniprogram/pages/history/index.js": "226f5ef1618dd54aa4780c98d84a41b0bd5cac89d0a4c21bed818d9f10ba74be",
+    "miniprogram/pages/mine/index.js": "bd4a1c23fa976de0fab1882af9038d313157151b36c384f446c11ef1d902663f",
+    "miniprogram/pages/notification-test/index.js": "3be34960339dcfed11dee844acfc9935d3b9ae69e45bfb8412c7bb0c8a91ae77",
+    "miniprogram/pages/query/index.js": "ca652097f0cb3121d7558eb4e503c56cf48cf0a61d74ac8152b24ec443be674c",
+    "miniprogram/pages/query/index.wxml": "f37e9e386c2421a1fd93835b8a9b2cd23e8f7638e4c82fa6eb78b0b540e6dec9",
+    "miniprogram/utils/format.js": "645e5cdb940999be796b4258cc6a49d89bf3c1cf9655243a9c5214339ccebfb1",
+    "miniprogram/utils/observation-insights.js": "dc7de3d9c618725df42ca4b4544583766efcc27b9694f480ebc19c817d265b64",
+    "miniprogram/utils/operation.js": "9650025c55881f4b8249c1595fc8ca8d65663a7a4add00a02c5c06dba034c0d9",
+    "miniprogram/utils/result-next-action.js": "1003983a2a773d24f92d58deb4677d791ebdfd9d3bedea3d8bf125d9aa447afb",
+    "miniprogram/utils/store.js": "5f02b39c91f8022748e0638fcddad210dd013dea2def573c58560520aa5ed516",
+    "tests/operation-storage-recovery.test.mjs": "52e68e5f8c6d46d8cf20c6a353da4d7685805b171fbfe50b9a4918c7d7f733d3",
+    "tests/query-quota-cross-tab.test.mjs": "4bdad87de6974bd6d7bc6cf27f88557d7607bb35eb3552a4ba6863c962ee4fff",
+    "tests/query-quota-ordering.test.mjs": "bff223517f3abf599e55a79337326a48dba90f73f44a982f764023a017b9e7d7",
+    "tests/reminder-center-v3.test.mjs": "7a71720ec0a7c8f990e0e3e24f3376884fffc4e70d468c6341ba5f0bc1bd7fce",
+    "tests/stock-observation-pages.test.mjs": "15863946d13e762bc567a392c8a912f516c1b2c3f49bb0cc62a9150b2e5f8cf2",
+    "tests/stock-observation.test.mjs": "03e1f25d42c99b13a08f99b1231824bb80cfd6217319549ff2e4246c815de269",
+    "tests/v3-query-journey.test.mjs": "967fcfe2a95fa88c96a6ce745bbfedd0bb5f50714e6bdbaa07d163d535af51d4"
+  },
+  "clockBoundary": {
+    "command": "node --test tests/v3-query-journey.test.mjs",
+    "isolatedRepetitions": 25,
+    "testsPerRun": 6,
+    "totalPassed": 150,
+    "totalFailed": 0,
+    "cases": [
+      "same instant: fresh available store first",
+      "one millisecond in the future: no pickup action",
+      "expired: no pickup action"
+    ]
+  }
+}

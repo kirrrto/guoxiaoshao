@@ -108,14 +108,13 @@ function presentFollow(follow, boot, catalog, collector) {
   }
   const product = catalog && catalog.productByPart && catalog.productByPart[follow.partNumber];
   const stores = (follow.stores || []).map(s => ({ ...s, storeName: storeLabel(s.storeNumber, s.storeName), storeLabel: storeLabelWithCity(s.storeNumber, s.storeName, s.city), ...fmt.stockObservation(s, now, { restricted: follow.latestRestricted }),
-    ...(Date.parse(s.observedAt) > now ? { observationState: 'unknown', statusLabel: '观测时间待核对', statusCls: 'unknown', freshnessText: '这条观测的时间尚未确认，请刷新后再判断取货状态。' } : {}),
     ...(s.limitPaused ? { statusLabel: follow.limitPaused ? '配置超出套餐名额' : '超出套餐门店上限', statusCls: 'muted',
       freshnessText: follow.limitPaused ? '配置和门店已保留，恢复配置名额后继续检测。' : '门店已保留，当前暂停检测；月卡支持 4 家门店，年卡支持 5 家。' } : {}) })).map(store => {
     const observed = Date.parse(store.observedAt);
     const validTime = Number.isFinite(observed) && observed <= now;
     const previous = store.lastKnownStatus || store.status;
     if (retired && store.observationState === 'fresh') store = { ...store, observationState: 'stale' };
-    const historical = validTime && ['stale', 'unknown'].includes(store.observationState);
+    const historical = validTime && !store.timeUncertain && ['stale', 'unknown'].includes(store.observationState);
     const knownAt = Date.parse(store.knownAt);
     return { ...store,
       compactStatus: store.limitPaused ? '已暂停' : historical && previous === 'available' ? '上次有货'
@@ -126,7 +125,7 @@ function presentFollow(follow, boot, catalog, collector) {
       lastResultTimeText: historical && Number.isFinite(knownAt) && knownAt < observed && knownAt <= now
         ? `上次有效结果 ${fmt.fmtDateTime(store.knownAt).slice(5, 16)}` : '',
       compactNote: store.limitPaused || store.observationState === 'restricted' ? store.freshnessText
-        : Number.isFinite(observed) && observed > now ? '设备与检测时间不一致，当前库存待确认。'
+        : store.timeUncertain ? '观测时间待核对，当前库存待确认。'
         : store.observationState === 'unknown' ? '本次检查未取得有效库存' : '',
     };
   });
@@ -135,7 +134,7 @@ function presentFollow(follow, boot, catalog, collector) {
   const splitColor = color && title.endsWith(color);
   const usable = stores.filter(store => !store.limitPaused);
   const availableCount = usable.filter(store => store.observationState === 'fresh' && store.status === 'available').length;
-  const historicalAvailableStores = usable.filter(store => !['fresh', 'restricted'].includes(store.observationState)
+  const historicalAvailableStores = usable.filter(store => !store.timeUncertain && !['fresh', 'restricted'].includes(store.observationState)
     && Number.isFinite(Date.parse(store.observedAt)) && Date.parse(store.observedAt) <= now
     && (store.lastKnownStatus === 'available' || (!store.lastKnownStatus && store.status === 'available')));
   const historicalAvailable = historicalAvailableStores.length;
@@ -149,7 +148,7 @@ function presentFollow(follow, boot, catalog, collector) {
   const observationAt = observed.length ? Math.min(...observed) : null;
   const stockLabel = follow.latestRestricted ? '库存暂不可见' : follow.limitPaused ? '监测已暂停'
     : availableCount ? `${availableCount} 家可取货` : historicalAvailable ? `上次 ${historicalAvailable} 家可取货`
-    : usable.some(store => Date.parse(store.observedAt) > now) ? '检查时间待核对'
+    : usable.some(store => store.timeUncertain) ? '检查时间待核对'
     : incomplete ? usable.every(store => !store.observedAt) ? '等待首次检查' : '库存待确认' : '所选门店暂不可取货';
   return {
     ...follow,

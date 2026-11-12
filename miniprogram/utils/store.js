@@ -26,6 +26,7 @@ let bootstrapPromise = null;
 let bootstrapGeneration = 0;
 let bootstrapFetchedAt = 0;
 let latestQuota = null;
+let quotaOwner = null;
 // A query returns only balance + revision, not signin/task metadata. Track it
 // separately so a later-arriving full quota can still fill that metadata in.
 let latestBalance = null;
@@ -52,7 +53,7 @@ function resetSession() {
   invalidateBootstrap(); invalidateFollows();
   try { require('./conversion-events').configure(null); }
   catch (error) { console.error('[gxs] conversion configuration', error); }
-  latestQuota = null; latestBalance = null;
+  latestQuota = null; latestBalance = null; quotaOwner = null;
   bootstrapFetchedAt = 0; catalogCheckedAt = 0; catalogRetryAt = 0; catalogPromise = null; catalogGeneration += 1;
   const app = getApp(); app.globalData.catalog = null; app.globalData.lastQuery = null; app.globalData.pendingFollow = null;
 }
@@ -77,6 +78,13 @@ async function refreshBootstrap() {
   const generation = bootstrapGeneration;
   const pending = call('user.bootstrap').then(data => {
     if (generation !== bootstrapGeneration) return getBootstrap();
+    const owner = data.identity && data.identity.userKey;
+    if (owner && quotaOwner && owner !== quotaOwner) {
+      latestQuota = null;
+      latestBalance = null;
+      invalidateFollows();
+    }
+    if (owner) quotaOwner = owner;
     if (data.quota) {
       if (!isOlderQuota(data.quota)) rememberQuota(data.quota);
       data = { ...data, quota: currentQuota() };
@@ -94,7 +102,14 @@ async function refreshBootstrap() {
   finally { if (bootstrapPromise === pending) bootstrapPromise = null; }
 }
 
-function invalidateBootstrap() {
+function quotaAccountMatches(owner) {
+  const cached = getApp().globalData.bootstrap;
+  const current = cached && cached.identity && cached.identity.userKey || quotaOwner;
+  return !owner || !current || owner === current;
+}
+
+function invalidateBootstrap(owner) {
+  if (owner && !quotaAccountMatches(owner)) return false;
   bootstrapGeneration += 1;
   if (typeof resetPendingReads === 'function') resetPendingReads();
   bootstrapPromise = null;
@@ -147,8 +162,9 @@ function broadcastQuota(quota) {
   for (const listener of quotaListeners) { try { listener(quota); } catch (e) { console.error('[gxs] quota listener', e); } }
 }
 
-function publishQuota(quota) {
-  if (isOlderQuota(quota)) return false;
+function publishQuota(quota, owner) {
+  if (!quotaAccountMatches(owner) || isOlderQuota(quota)) return false;
+  if (owner) quotaOwner = owner;
   rememberQuota(quota);
   // Cancel older account reads so returning to Mine cannot repaint a pre-reward
   // balance. Broadcast even when no complete bootstrap is currently cached.
@@ -160,7 +176,9 @@ function publishQuota(quota) {
 }
 
 /** Publish a query's atomic balance snapshot without inventing full quota metadata. */
-function publishQueryBalance(response) {
+function publishQueryBalance(response, owner) {
+  if (owner && !quotaAccountMatches(owner)) return { balance: null, accepted: false, needsRefresh: false };
+  if (owner) quotaOwner = owner;
   const versioned = response && validBalance(response.balance) && validRevision(response.quotaRevision);
   if (!versioned) {
     // Old deployed functions cannot establish ordering. Preserve observed quota

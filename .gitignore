@@ -45,6 +45,11 @@ evidence/**/*.zip
 !evidence/design/2026-10-28/native-store-search-dark.png
 !evidence/design/2026-10-28/native-retired-follow-light.png
 
+# Public, synthetic screenshots referenced by the 3.7.0 design handoff.
+!evidence/design/3.7.0/four-tabs.png
+!evidence/design/3.7.0/member-comparison.png
+!evidence/design/3.7.0/dark.png
+
 # Raw upstream captures (large HTML/JSON bodies); hashes live in evidence/**/manifest files
 evidence/raw/
 

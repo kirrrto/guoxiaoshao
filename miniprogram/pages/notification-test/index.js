@@ -96,8 +96,8 @@ Page({
   },
   applyResult(result, context = this.accountContext()) {
     if (!this.contextCurrent(context) || result.userKey && result.userKey !== context.owner) return false;
-    if (result.quota) publishQuota(result.quota);
-    const balance = publishQueryBalance(result).balance;
+    if (result.quota) publishQuota(result.quota, context.owner);
+    const balance = publishQueryBalance(result, context.owner).balance;
     if (this.retired) return;
     const test = result.test || null;
     const [statusTitle, statusNote] = test ? STATUS[test.status] || ['测试状态待确认', '请刷新查看原测试。'] : ['', ''];

@@ -23,8 +23,7 @@ function resultNextAction({ snapshot, account, collector, catalog, now = Date.no
   if (snapshot.latestRestricted || rows.some(row => row.restricted)) return { ...base, action: 'account', title: '此结果的访问权限待确认', detail: '刷新账户权限后重新查询，不展示受限的旧观测。', label: '重试账户连接' };
   if (!canOfferLiveChoices(product, account, now)) return { ...base, action: 'offer', title: '此配置实时查询需会员',
     detail: '免费用户仍可按现有规则查看有权限的历史记录。', label: '查看此配置会员权益' };
-  const known = rows.filter(row => fmt.stockObservation(row, now).observationState === 'fresh'
-    && Date.parse(row.observedAt) <= now && (!row.knownAt || Date.parse(row.knownAt) <= now));
+  const known = rows.filter(row => fmt.stockObservation(row, now).observationState === 'fresh');
   const available = known.filter(row => row.status === 'available');
   const partial = known.length < rows.length;
   const counts = { knownCount: known.length, unknownCount: rows.length - known.length };

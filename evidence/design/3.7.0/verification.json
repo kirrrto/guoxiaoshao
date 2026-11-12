@@ -1,0 +1,339 @@
+{
+  "version": "3.7.0",
+  "date": "2026-11-12",
+  "scope": "Local WeChat simulator, native compiler, offline Chromium. Synthetic product, account and alert data.",
+  "native": {
+    "platform": {
+      "model": "iPhone 14/15 Pro Max",
+      "width": 430,
+      "height": 752,
+      "SDKVersion": "3.17.3",
+      "pixelRatio": 3,
+      "theme": "light"
+    },
+    "sourceHashes": [
+      {
+        "file": "app.wxss",
+        "sha256": "85867d3441e76a19dcbf5f87e2104f6adcacb1495b36f12b18847e3d9e668635"
+      },
+      {
+        "file": "theme.json",
+        "sha256": "bb4e7c7daba3988cd0ec4c46dd572217ad9b71e6a5f151ae236bac414cee3a53"
+      },
+      {
+        "file": "styles/common.wxss",
+        "sha256": "ad70b776b1660dfd7aabb97a1ef3fe71be2d46db1b35e2c4d74e956e80908b71"
+      },
+      {
+        "file": "styles/reminder-center.wxss",
+        "sha256": "41118a93d41e4ef9024d2c7a2be30a6ba1fe76216114cd8116586ffc89ee52be"
+      },
+      {
+        "file": "images/brand/logo-mint-144.png",
+        "sha256": "667b346236310146cb2ac8c85cc343e44a40826e5189471ea6a71c49921fd986"
+      },
+      {
+        "file": "images/brand/logo-member-black-gold-96.png",
+        "sha256": "df455804c4410018aa2e382a22c011cd3681147812a5db6ab2db9afc671cc167"
+      },
+      {
+        "file": "images/products/f9913e9933d4281da3f7-card.png",
+        "sha256": "8b8b473d51c9cff45fdb668524756a1486a3a34efe3145da5ac1c915cfc0711c"
+      },
+      {
+        "file": "pages/query/index.wxml",
+        "sha256": "f37e9e386c2421a1fd93835b8a9b2cd23e8f7638e4c82fa6eb78b0b540e6dec9"
+      },
+      {
+        "file": "pages/query/index.wxss",
+        "sha256": "3af1c9002371c8304de2bf55f5406b4458e99441b2615e05581ca7310436097c"
+      },
+      {
+        "file": "pages/query/index.json",
+        "sha256": "4606da8bdc23edcb9142e8d4ec07c1788c4cbf05a28ca7a0e7d7d1dcbc7b0df7"
+      },
+      {
+        "file": "pages/follow/index.wxml",
+        "sha256": "fe4a41c3250da3e9511a80732602caa7f3c7824d6af43501c10ed6f85395af15"
+      },
+      {
+        "file": "pages/follow/index.wxss",
+        "sha256": "f8c08cbf84ba2f72ad29c2ad968013fd00bf8cd0d3cada710a35feb957745171"
+      },
+      {
+        "file": "pages/follow/index.json",
+        "sha256": "9d64b45c816738e4dcb558fbad5db1aaee6e25b7cc56db4824a5e1d6abaafd40"
+      },
+      {
+        "file": "pages/history/index.wxml",
+        "sha256": "7e8fb8284a69e0e49185f89ea1b561913689c75bee1454e4302713ebb778b281"
+      },
+      {
+        "file": "pages/history/index.wxss",
+        "sha256": "d68824f14c04febf756de582c1adcef60dd859d51fb44d39742879f7c207542d"
+      },
+      {
+        "file": "pages/history/index.json",
+        "sha256": "7896937c58d1f8a51a2577583ef12d55bece622eb70a02a41afe64c25b0ae3fc"
+      },
+      {
+        "file": "pages/mine/index.wxml",
+        "sha256": "351cd6494788109f9d9ba55b83396f2a5714b766699d2e1194ed7c4a26b4e40e"
+      },
+      {
+        "file": "pages/mine/index.wxss",
+        "sha256": "31b4675ae3baad2896b8ece815b7e850335a55ced62df65cc5c482eb442705aa"
+      },
+      {
+        "file": "pages/mine/index.json",
+        "sha256": "d35e258b24ba6175ae6b6b2699184b973bd915e299c68f0c3a12680cb4a7dd8f"
+      }
+    ],
+    "cases": [
+      {
+        "page": "query",
+        "controls": [
+          {
+            "selector": ".selection-summary-change",
+            "width": 58,
+            "height": 44
+          },
+          {
+            "selector": ".query-submit",
+            "width": 362,
+            "height": 44
+          },
+          {
+            "selector": ".result-next-action .btn",
+            "width": 362,
+            "height": 44
+          },
+          {
+            "selector": ".query-rules-entry",
+            "width": 362,
+            "height": 48
+          }
+        ],
+        "computedStyles": {
+          ".query-submit": "rgb(238, 240, 237)",
+          ".result-next-action .btn": "rgb(0, 195, 117)"
+        },
+        "counts": {
+          ".selection-summary-image": 1,
+          ".result-product-row": 0,
+          ".result-store": 2
+        }
+      },
+      {
+        "page": "follow",
+        "controls": [
+          {
+            "selector": ".deadline-home-manage",
+            "width": 150.3671875,
+            "height": 44
+          },
+          {
+            "selector": ".follow-primary-actions .btn",
+            "width": 360,
+            "height": 44
+          },
+          {
+            "selector": ".follow-add-footer .btn",
+            "width": 394,
+            "height": 55
+          },
+          {
+            "selector": ".follow-detail-entry",
+            "width": 360,
+            "height": 44
+          },
+          {
+            "selector": ".reminder-details-toggle",
+            "width": 84,
+            "height": 44
+          }
+        ],
+        "computedStyles": {
+          ".follow-add-footer .btn": "rgb(238, 240, 237)",
+          ".follow-primary-actions .btn": "rgb(0, 195, 117)"
+        },
+        "counts": {
+          ".follow-available": 1,
+          ".deadline-home-row": 1
+        }
+      },
+      {
+        "page": "history",
+        "controls": [
+          {
+            "selector": ".history-date-control",
+            "width": 254,
+            "height": 64.421875
+          },
+          {
+            "selector": ".history-date-chip",
+            "width": 44,
+            "height": 44
+          },
+          {
+            "selector": ".history-edit",
+            "width": 56,
+            "height": 44
+          },
+          {
+            "selector": ".history-query-submit",
+            "width": 100,
+            "height": 44
+          },
+          {
+            "selector": ".history-disclosure",
+            "width": 360,
+            "height": 44
+          }
+        ],
+        "computedStyles": {},
+        "counts": {
+          ".event-time": 2,
+          ".event-body": 3
+        }
+      },
+      {
+        "page": "mine",
+        "controls": [
+          {
+            "selector": ".identity-copy",
+            "width": 126.875,
+            "height": 44
+          },
+          {
+            "selector": ".member-record-shortcut",
+            "width": 68,
+            "height": 44
+          },
+          {
+            "selector": ".mine-reminder-action",
+            "width": 108,
+            "height": 44
+          },
+          {
+            "selector": ".account-tools .ui-disclosure",
+            "width": 360,
+            "height": 48
+          }
+        ],
+        "computedStyles": {
+          ".member-pass": "rgb(255, 255, 255)"
+        },
+        "counts": {
+          ".reminder-balance": 2,
+          ".member-pass-brand": 1
+        }
+      }
+    ],
+    "compile": [
+      {
+        "compiler": "wcc",
+        "files": 12,
+        "exit": 0
+      },
+      {
+        "compiler": "wcsc",
+        "files": 15,
+        "exit": 0
+      }
+    ]
+  },
+  "offline": {
+    "sourceHash": "06a277a88366e20bc42f34e21122fc28af2cc4c95da8c75c26d8800c91011f57",
+    "taskLayouts": 96,
+    "scope": "320px at 130%, 375px and 430px, light/dark, reduced-motion and default",
+    "failures": 0,
+    "packageLayouts": [
+      {
+        "total": 120,
+        "indexNavigationFailures": 0,
+        "expressionErrors": 0,
+        "missingText": 0,
+        "forbiddenText": 0,
+        "horizontalOverflow": 0,
+        "clippedText": 0,
+        "failedImages": 0,
+        "alternativeLayoutFailures": 0,
+        "calendarLayoutFailures": 0,
+        "membershipLayoutFailures": 0,
+        "notificationLayoutFailures": 0,
+        "v3LayoutFailures": 0,
+        "stockLayoutFailures": 0,
+        "followFontFailures": 0,
+        "deadlineLayoutFailures": 0,
+        "configurationLayoutFailures": 0
+      },
+      {
+        "total": 120,
+        "indexNavigationFailures": 0,
+        "expressionErrors": 0,
+        "missingText": 0,
+        "forbiddenText": 0,
+        "horizontalOverflow": 0,
+        "clippedText": 0,
+        "failedImages": 0,
+        "alternativeLayoutFailures": 0,
+        "calendarLayoutFailures": 0,
+        "membershipLayoutFailures": 0,
+        "notificationLayoutFailures": 0,
+        "v3LayoutFailures": 0,
+        "stockLayoutFailures": 0,
+        "followFontFailures": 0,
+        "deadlineLayoutFailures": 0,
+        "configurationLayoutFailures": 0
+      }
+    ],
+    "accountLayouts": 70,
+    "accountStates": [
+      "v3-member-trial",
+      "v3-member-weekly",
+      "v3-member-monthly",
+      "v3-member-annual",
+      "payment-member",
+      "payment-ready",
+      "payment-expired"
+    ],
+    "accountFailures": 0,
+    "minimumTextContrast": 5.412,
+    "memberSurfaceByTheme": {
+      "light": [
+        "rgb(255, 255, 255)"
+      ],
+      "dark": [
+        "rgb(24, 29, 26)"
+      ]
+    },
+    "annualStatus": [
+      {
+        "scheme": "light",
+        "bg": "rgb(255, 255, 255)",
+        "fg": "rgb(114, 86, 37)",
+        "contrast": 6.833
+      },
+      {
+        "scheme": "dark",
+        "bg": "rgb(24, 29, 26)",
+        "fg": "rgb(216, 196, 148)",
+        "contrast": 9.958
+      }
+    ]
+  },
+  "impeccable": {
+    "version": "0.1.18",
+    "exit": 2,
+    "scope": "Four 375px HTML previews",
+    "selectors": {
+      "div.simulation": 4,
+      "span.preview-native-tab-item.is-selected > span.preview-native-tab-label": 4,
+      "span.preview-native-tab-item:nth-of-type(2) > span.preview-native-tab-label": 3,
+      "span.preview-native-tab-item:nth-of-type(3) > span.preview-native-tab-label": 3,
+      "span.preview-native-tab-item:nth-of-type(4) > span.preview-native-tab-label": 3,
+      "span.preview-native-tab-item:nth-of-type(1) > span.preview-native-tab-label": 3
+    }
+  }
+}

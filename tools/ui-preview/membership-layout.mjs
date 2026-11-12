@@ -55,14 +55,30 @@ export function inspectMembershipLayout(expected = null) {
       else {
         if (!membership?.contains(header)) errors.push('Account header is not inside the membership card');
         const logo = header.querySelector('.account-logo'), copy = header.querySelector('.account-header-content');
-        if (!visible(logo) || !logo.complete || !logo.naturalWidth) errors.push('Account logo is missing or not loaded');
+        if (expected.active) {
+          const pass = header.querySelector('.member-pass');
+          if (!visible(pass) || !visible(pass.querySelector('.account-title'))) errors.push('Active membership title is missing');
+          if (pass && membership && getComputedStyle(pass).backgroundColor !== getComputedStyle(membership).backgroundColor) {
+            errors.push('Membership identity must share the account surface in both themes');
+          }
+          const mark = pass?.querySelector('img.member-pass-brand');
+          if (!visible(mark) || !mark.complete || mark.naturalWidth !== 96 || mark.naturalHeight !== 96 || mark.getAttribute('aria-label') !== '果小哨会员标志') {
+            errors.push('Active membership brand mark is missing, unnamed or not decoded');
+          } else {
+            const box = bounds(mark);
+            if (box.width < 30 || box.width > 36 || !close(box.width, box.height)) errors.push('Membership brand mark must be a 30–36px square');
+            for (const text of pass.querySelectorAll('.account-title, .account-status, .member-validity-date, .member-renewal')) {
+              if (overlaps(box, bounds(text))) errors.push('Membership brand mark overlaps account information');
+            }
+          }
+        } else if (!visible(logo) || !logo.complete || !logo.naturalWidth) errors.push('Account logo is missing or not loaded');
         if (!visible(copy) || bounds(copy).width < 130) errors.push('Account heading is a narrow text column');
         const status = header.querySelector('.account-status') || (expected.active ? header.querySelector('.account-brand') : null);
         if (!visible(status) || expected.active && !status.textContent.includes('会员') || !visible(header.querySelector('.identity-copy'))) errors.push('Account status or identity-copy control is missing');
         if (expected.accountState) {
           const statusText = { member: '会员已开通', expired: '会员已到期', free: '免费用户' }[expected.accountState];
           if (!badge || badge.textContent.trim() !== statusText || !badge.classList.contains(`account-status-${expected.accountState}`)) errors.push(`Account badge does not identify ${expected.accountState} membership`);
-          if (!logo || bounds(logo).width < 55.5 || bounds(logo).height < 55.5) errors.push('Account logo is smaller than the 56px brand size');
+          if (!expected.active && (!logo || bounds(logo).width < 55.5 || bounds(logo).height < 55.5)) errors.push('Account logo is smaller than the 56px brand size');
         }
         if (logo && copy && overlaps(bounds(logo), bounds(copy))) errors.push('Account logo overlaps account information');
       }

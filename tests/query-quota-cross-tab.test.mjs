@@ -7,6 +7,38 @@ const deferred = () => { let resolve, reject; const promise = new Promise((done,
 const settle = async () => { for (let i = 0; i < 6; i++) await new Promise(resolve => setImmediate(resolve)); };
 const ok = result => { assert.equal(result.ok, true, JSON.stringify(result.error)); return result.data; };
 
+for (const kind of ['query', 'mine']) {
+  test(`${kind}: late sign-in cannot publish the old account balance or unlock the new sign-in`, async () => {
+    const f = createFixture(), base = ok(await f.call('user.bootstrap'));
+    let owner = 'alice';
+    const answers = { alice: deferred(), bob: deferred() };
+    const rt = runtime(async action => {
+      if (action === 'user.bootstrap') return { ...base, identity: { ...base.identity, userKey: owner },
+        quota: { ...base.quota, balance: owner === 'alice' ? 8 : 0, revision: owner === 'alice' ? 9 : 0 } };
+      if (action === 'quota.signin') return answers[owner].promise;
+      throw Error(action);
+    });
+    const page = rt.instance(`pages/${kind}/index.js`), store = rt.load('utils/store.js');
+    page.applyBoot(await store.getBootstrap());
+    const first = page.onSignin();
+    assert.equal(page.data.signing, true);
+    owner = 'bob';
+    page.applyBoot(await store.getBootstrap({ force: true }));
+    assert.equal(page.data.signing, false);
+    const second = page.onSignin();
+    answers.alice.resolve({ granted: 1, quota: { ...base.quota, balance: 9, revision: 10 } });
+    await first;
+    assert.equal(page.data.signing, true);
+    assert.equal(store.currentQuota().balance, 0);
+    assert.equal(rt.messages.includes('签到成功 +1 次'), false);
+    answers.bob.resolve({ granted: 1, quota: { ...base.quota, balance: 1, revision: 1 } });
+    await second;
+    assert.equal(page.data.signing, false);
+    assert.equal(store.currentQuota().balance, 1);
+    assert.equal(rt.messages.filter(item => item === '签到成功 +1 次').length, 1);
+  });
+}
+
 for (const kind of ['query', 'history']) {
   for (const firstCommit of ['query', 'signin']) {
     test(`${kind}: reversed ${firstCommit}-first responses retain balance and signin metadata across open tabs`, async t => {
