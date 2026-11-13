@@ -14,7 +14,7 @@
 
 - 最终本地测试：Node 24.22.1，1803/1803 通过，0 失败、0 跳过。主预览450张/900项浅深布局、公告18张/36项浅深布局、1416项底栏、1728项弹层几何、120项排列、894条颜色记录均通过。详细日志哈希与依赖见[正式版定稿本地证据](../../../evidence/verification/3.4.3-release/local-verification.json)。
 - 最终前端指纹：`sha256:0cb18a94e14cb94070253f63d2af5cb249f4c43a9d5cb0c75066e43da0576012`；前端源码235文件、1,209,648 B，实际上传包体待微信工具核验。
-- GitHub 同步目标：[`kirrrto/guoxiaoshao` 的 master](https://github.com/kirrrto/guoxiaoshao/tree/master)，源码版本标签 [`v3.4.3`](https://github.com/kirrrto/guoxiaoshao/tree/v3.4.3)。提交、推送与 CI 的最终真实结果在本次交付中按远端 SHA 核对；标签不代表微信已经发布。
+- GitHub 同步目标：[`kirrrto/guoxiaoshao` 的 master](https://github.com/kirrrto/guoxiaoshao/tree/master)，源码版本标签 [`v3.4.3`](https://github.com/kirrrto/guoxiaoshao/tree/065542fdb047d1618469b01f0edb079cb9cc5038)。提交、推送与 CI 的最终真实结果在本次交付中按远端 SHA 核对；标签不代表微信已经发布。
 - 本地发布检查51/52：源码项通过，4个 open 微信 finding 仍使严格检查退出1。GitHub CI 同样保留这一阻断，不以版本定稿、测试通过或 GitHub 标签替代真机证据。
 - 云端补验（北京时间 2026-10-28 17:31–17:35）：两个缺失索引已新增并回读；云端三函数130个运行源码文件与 `065542f` 一致，故本次没有重复部署。API ping、目录条件读取和两集合游标首/续页读取通过；实际 scheduled 监测状态持续更新。详见[云端兼容性证据](../../../evidence/verification/3.4.3-cloud/compatibility-verification.json)。用户业务闭环、微信开发包/质检/真机证据仍待取得。
 - 正式发布的实际时间与对应上传包：待微信发布后登记。
