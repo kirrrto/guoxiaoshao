@@ -1,19 +1,43 @@
 {
   "version": "3.7.0",
   "dateBeijing": "2026-11-13",
-  "baseCommit": "57e389418ae3db245ea1f5668e3f0e1715356dd9",
-  "sourceFingerprint": "sha256:8524b68336fb1f4019610409ce733a15759fc9cc4738d241db832cd902d45e20",
+  "baseCommit": "83eecb5130e048378a832f9128448ced81d4df8b",
+  "preUploadBaseCommit": "57e389418ae3db245ea1f5668e3f0e1715356dd9",
+  "sourceFingerprint": "sha256:e7f9a3c0bcac599ee8dd56e1e01456addde313e1e39cb79d2985eb5118dbdab2",
+  "wechatUpload2047SourceFingerprint": "sha256:8524b68336fb1f4019610409ce733a15759fc9cc4738d241db832cd902d45e20",
   "candidateQuerySourceSha256": "8569a14f53296dde171f28d5e01e2fdb1e6ddd1505982ba8684d0441bb74090d",
   "outcome": "Experience upload is appropriate. Formal release acceptance is not complete.",
+  "postUploadCommits": [
+    {
+      "commit": "fc3998c88889d012216ad0439eeccfff0f2bd599",
+      "summary": "Honor per-group availability intervals from actual HTTP request starts across burst expiry and restarts; syncs to gxs_api and gxs_monitor on next cloud deployment"
+    },
+    {
+      "commit": "83eecb5130e048378a832f9128448ced81d4df8b",
+      "summary": "Move retired launch calendar files out of miniprogram/ and empty packOptions.ignore; 242 packaged runtime files (1287570 bytes) remain byte-identical"
+    }
+  ],
   "source": {
+    "checkedAt": "2026-11-13T14:38:52.113Z",
+    "checkFiles": 652,
     "tests": {
-      "tests": 1970,
-      "pass": 1970,
+      "tests": 1975,
+      "pass": 1975,
       "fail": 0,
       "skipped": 0
     },
-    "sourceChecksPassed": 64,
-    "monitorBundleFiles": 50,
+    "sourceChecksPassed": 63,
+    "totalPreflightChecks": 64,
+    "monitorBundle": {
+      "files": 50,
+      "bytes": 377497
+    },
+    "consumerPackage": {
+      "files": 242,
+      "bytes": 1287570,
+      "excludedFiles": [],
+      "excludedBytes": 0
+    },
     "candidateDependencyAudit": [
       {
         "directory": "cloudfunctions/gxs_api",
