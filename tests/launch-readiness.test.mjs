@@ -5,7 +5,7 @@ import { createRequire } from 'node:module';
 import { checkLaunchReadiness } from '../tools/catalog/check-launch-readiness.mjs';
 const require = createRequire(import.meta.url);
 const catalog = JSON.parse(fs.readFileSync(new URL('../catalog/products.json', import.meta.url), 'utf8'));
-const launches = require('../miniprogram/config/product-launches');
+const launches = require('../catalog/product-launches');
 
 test('launch check accurately leaves eight unsampled Duo variants unavailable regardless of calendar', () => {
   // Preserve the pre-verification case even after the bundled catalog refreshes.

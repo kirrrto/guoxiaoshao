@@ -142,6 +142,6 @@ test('all product image templates bind only display resources and opt into WeCha
     }
   }
   assert.equal(images, 6);
-  const calendar = require('../miniprogram/utils/launch-calendar').calendarView(require('../miniprogram/config/product-launches')[0]);
+  const calendar = require('./helpers/legacy-launch-calendar/launch-calendar').calendarView(require('../catalog/product-launches')[0]);
   assert.match(calendar.imageDisplayUrl, /-poster\.(?:png|jpg)$/);
 });

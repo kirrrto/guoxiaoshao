@@ -3,8 +3,8 @@ import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
 import { runtime } from './helpers/miniprogram-runtime.mjs';
 const require = createRequire(import.meta.url);
-const { activeCalendars, calendarView, guideNote, shouldOpenCalendar, withFollowReadiness } = require('../miniprogram/utils/launch-calendar');
-const entry = require('../miniprogram/config/product-launches')[0];
+const { activeCalendars, calendarView, guideNote, shouldOpenCalendar, withFollowReadiness } = require('./helpers/legacy-launch-calendar/launch-calendar');
+const entry = require('../catalog/product-launches')[0];
 const now = Date.parse('2026-10-11T08:00:00Z');
 const calendar = calendarView(entry, now);
 

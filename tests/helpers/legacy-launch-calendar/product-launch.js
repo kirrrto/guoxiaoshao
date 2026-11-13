@@ -1,4 +1,4 @@
-const launches = require('../config/product-launches');
+const launches = require('../../../catalog/product-launches');
 function launchView(catalog, selection, now = Date.now()) {
   const product = selection && catalog && catalog.productByPart && catalog.productByPart[selection.partNumber];
   const entry = launches.find(item => (!product || product.familyKey === item.familyKey) && now < Date.parse(item.displayUntil));

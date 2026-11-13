@@ -84,7 +84,7 @@ if (args.includes('--check')) {
   const cache = resolve(root, 'output/product-image-sources');
   await mkdir(cache, { recursive: true });
   const sourceDirs = [value('--source-dir'), resolve(root, report.assetDirectory), cache].filter(Boolean);
-  const posterUrls = new Set(require(resolve(root, 'miniprogram/config/product-launches.js')).map(entry => entry.imageUrl).filter(Boolean));
+  const posterUrls = new Set(require(resolve(root, 'catalog/product-launches.js')).map(entry => entry.imageUrl).filter(Boolean));
   const entries = [];
   for (const entry of report.entries) {
     let sourcePath;

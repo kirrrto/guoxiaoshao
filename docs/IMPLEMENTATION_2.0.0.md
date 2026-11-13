@@ -37,7 +37,7 @@
 - [Apple 中国大陆取货帮助](https://www.apple.com.cn/shop/help/shipping_delivery)：2026-10-11 核验官方门店选择、订单取货通知及取货信息要求，攻略采用简要自主表述，用户可主动复制官方帮助链接。
 - [微信官方 API 类型 SignData](https://github.com/wechat-miniprogram/api-typings/blob/master/types/wx/lib.wx.api.d.ts)：2026-10-11 核验 `goodsPrice` 与 `activitySellingPrice` 的标准价和优惠实际下单价含义；签名及客户端透传按该契约实现。真实优惠订单回调与查单仍待平台验收。
 
-新品日期使用独立的 `miniprogram/config/product-launches.js` 事实登记，不把目录 `supported` 或 `comingSoon` 随日期改写。新增未来产品时必须登记来源、核验日期及展示期限，商品取货能力走现有目录采样与验证流程。
+新品日期使用独立的[事实登记](../catalog/product-launches.js)，不把目录 `supported` 或 `comingSoon` 随日期改写。新增未来产品时必须登记来源、核验日期及展示期限，商品取货能力走现有目录采样与验证流程。
 
 ## 输入证据与源码基线
 

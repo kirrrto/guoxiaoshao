@@ -93,6 +93,6 @@
 
 ## 新品上线本地检查
 
-`node tools/catalog/check-launch-readiness.mjs --as-of=2026-10-11` 只读取本地目录与 `miniprogram/config/product-launches.js`，检查官方域名、明确北京时间、日期有效性、源/云函数目录同步以及真实目录投影；输出 `evidence/verification/2.0.0/launch-readiness.json`。不会联网核实网页、修改目录、访问生产或按日期自动开放查询。
+`node tools/catalog/check-launch-readiness.mjs --as-of=2026-10-11` 只读取本地目录与[新品日期登记](../catalog/product-launches.js)，检查官方域名、明确北京时间、日期有效性、源/云函数目录同步以及真实目录投影；输出 `evidence/verification/2.0.0/launch-readiness.json`。不会联网核实网页、修改目录、访问生产或按日期自动开放查询。
 
 本轮结果：Duo 共 8 个 SKU 全部 `comingSoon: true`、运行时投影 `supported: false`，取货采样为空，明确未开放查询/监测。原始 family 的 `supported: true` 是目录候选元信息；实际服务支持还必须通过 `pickupVerification.verified` 和每 SKU 非 `comingSoon` 的现有检查。工具不会把所有未开放产品当测试失败，也不会把工具通过解释为新品服务已就绪。

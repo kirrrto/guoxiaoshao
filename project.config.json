@@ -54,12 +54,7 @@
   "compileType": "miniprogram",
   "srcMiniprogramRoot": "miniprogram/",
   "packOptions": {
-    "ignore": [
-      { "type": "file", "value": "config/product-launches.js" },
-      { "type": "file", "value": "utils/launch-calendar.js" },
-      { "type": "file", "value": "utils/product-launch.js" },
-      { "type": "file", "value": "styles/launch-calendar.wxss" }
-    ],
+    "ignore": [],
     "include": [
       { "type": "file", "value": "theme.json" }
     ]

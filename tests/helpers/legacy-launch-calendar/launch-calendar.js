@@ -1,6 +1,6 @@
-const launches = require('../config/product-launches');
-const { fmtDate, fmtTime } = require('./format');
-const { productThumbnailUrl } = require('./product-image-fit');
+const launches = require('../../../catalog/product-launches');
+const { fmtDate, fmtTime } = require('../../../miniprogram/utils/format');
+const { productThumbnailUrl } = require('../../../miniprogram/utils/product-image-fit');
 
 // Calendar dates are editorial information. They never enable a product or a
 // monitor, and UTC arithmetic keeps weekday placement identical on all devices.

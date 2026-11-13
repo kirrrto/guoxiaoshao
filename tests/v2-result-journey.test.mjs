@@ -5,7 +5,7 @@ import { runtime } from './helpers/miniprogram-runtime.mjs';
 const require = createRequire(import.meta.url);
 const { resultNextAction, targetEvidence } = require('../miniprogram/utils/result-next-action');
 const { activationStatus } = require('../miniprogram/utils/activation-status');
-const { launchView } = require('../miniprogram/utils/product-launch');
+const { launchView } = require('./helpers/legacy-launch-calendar/product-launch');
 const now = Date.parse('2026-10-11T06:00:00.000Z');
 const product = { partNumber: 'SKU-A', title: '测试配置', supported: true, familyKey: 'iphone-18-pro' };
 const catalog = { version: 'v2-test', productByPart: { 'SKU-A': product }, storeByNumber: { R001: { storeNumber: 'R001', name: '测试门店' } } };

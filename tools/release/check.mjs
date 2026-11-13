@@ -157,7 +157,7 @@ for (const relative of packagedFiles.filter(file => /\.(?:js|wxss)$/.test(file))
     if (exclusions.has(target) || exclusions.has(target + '.js')) excludedImports.push({ relative, target });
   }
 }
-check('packaged JS and WXSS do not import excluded historical calendar files', !excludedImports.length);
+check('packaged JS and WXSS do not import excluded files', !excludedImports.length);
 const thumbnailCheck = spawnSync(process.execPath, [path.join(root, 'tools/assets/build-product-thumbnails.mjs'), '--check'], { encoding: 'utf8', windowsHide: true });
 check('verified local thumbnails cover the current catalog and match recorded asset hashes', thumbnailCheck.status === 0);
 check('frontend source and assets fit within the 1.5 MiB main-package budget before compilation', frontendBytes <= imagePolicy.mainPackageMaxBytes);

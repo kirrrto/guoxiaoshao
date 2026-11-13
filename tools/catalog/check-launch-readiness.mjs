@@ -75,7 +75,7 @@ function main() {
   const catalogFile = path.join(root, 'catalog/products.json');
   const bundleFile = path.join(root, 'cloudfunctions/gxs_api/catalog/products.json');
   const raw = fs.readFileSync(catalogFile);
-  const report = checkLaunchReadiness({ catalog: JSON.parse(raw), launches: require('../../miniprogram/config/product-launches'), asOf });
+  const report = checkLaunchReadiness({ catalog: JSON.parse(raw), launches: require('../../catalog/product-launches'), asOf });
   const hash = data => createHash('sha256').update(data).digest('hex');
   report.catalogSha256 = hash(raw);
   report.cloudBundleMatchesLocal = fs.existsSync(bundleFile) && hash(fs.readFileSync(bundleFile)) === report.catalogSha256;
