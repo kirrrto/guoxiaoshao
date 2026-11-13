@@ -104,7 +104,7 @@
       "3.17.6"
     ],
     "officialReportMatchedToCandidate": false,
-    "frontendUploadMatchedToCandidate": false,
+    "frontendUploadMatchedToCandidate": true,
     "deviceReceiptProven": false
   },
   "cloudBeforeHotfix": {
@@ -223,5 +223,56 @@
       "platformStatus": 200,
       "businessState": "completed"
     }
+  },
+  "cloudCurrentDeployment": {
+    "reason": "Restored InstallDependency=FALSE and locked 97-package node_modules for gxs_api and gxs_monitor after DevTools cloud-install drift, and synced PR #10 scheduler.js to both functions.",
+    "deployedAtBeijing": "2026-11-13 23:43-23:45",
+    "functions": {
+      "gxs_api": {
+        "serverModTimeBeijing": "2026-11-13 23:43:42",
+        "cloudArchiveSha256": "c625be5f9bc2f52f75998fc7e75516ecb7091d3e82e05248cc1beedc8fd9e59f",
+        "installDependency": "FALSE",
+        "sourceFiles": 85,
+        "sourceDifferences": [],
+        "matchedDependencyPaths": 97,
+        "dependencyFiles": 5762,
+        "dependencyFilesDiffer": 0,
+        "hasLodashSet": false,
+        "naturalTimer": {
+          "startedAt": "2026-11-13T15:45:01.421Z",
+          "finishedAt": "2026-11-13T15:45:13.219Z",
+          "platformStatus": 200,
+          "businessState": "completed",
+          "scanned": 10
+        }
+      },
+      "gxs_monitor": {
+        "serverModTimeBeijing": "2026-11-13 23:45:05",
+        "cloudArchiveSha256": "e911778c47b6dfee7b036017a500703f275a53173b13836ec2907aec1884b725",
+        "installDependency": "FALSE",
+        "sourceFiles": 55,
+        "sourceDifferences": [],
+        "matchedDependencyPaths": 97,
+        "dependencyFiles": 5762,
+        "dependencyFilesDiffer": 0,
+        "hasLodashSet": false,
+        "naturalTimerLatest": {
+          "startedAt": "2026-11-13T15:49:00.590Z",
+          "finishedAt": "2026-11-13T15:49:17.245Z",
+          "platformStatus": 200,
+          "businessState": "running",
+          "scanned": 20,
+          "observations": 44
+        }
+      }
+    }
+  },
+  "frontendUpload": {
+    "method": "WeChat DevTools CLI upload",
+    "uploadedAtUtc": "2026-11-13T15:45:54Z",
+    "version": "3.7.0",
+    "sourceFingerprint": "sha256:e7f9a3c0bcac599ee8dd56e1e01456addde313e1e39cb79d2985eb5118dbdab2",
+    "compiledUploadBytes": 1127884,
+    "compiledUploadDisplaySize": "1.1 MB"
   }
 }
