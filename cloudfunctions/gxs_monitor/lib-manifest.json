@@ -113,8 +113,8 @@
     },
     {
       "path": "engine/scheduler.js",
-      "bytes": 30142,
-      "sha256": "b709754d10d59035beb19d43ec822e932796654d9864db15581750091110a9f2"
+      "bytes": 31563,
+      "sha256": "85b4ee152a87deea1362b1d2acf2902971d749662f52d0e8dff511bb72b2dbdf"
     },
     {
       "path": "engine/wechat-sender.js",

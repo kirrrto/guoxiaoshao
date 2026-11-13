@@ -74,6 +74,47 @@ test('three-second availability spacing starts at the actual HTTP call after bud
   await collector.lease.release();
 });
 
+test('fixed phases and restarts respect the actual group start; the shorter burst is used only while active', async () => {
+  const steady = { changed: false, delay: 3000 };
+  const active = { changed: true, delay: 2000 };
+  const expired = { changed: true, quietMs: 1000, delay: 3000 };
+  for (const scenario of [steady, active, expired]) {
+    for (const restart of [false, true]) {
+      let now = 10000;
+      const starts = [];
+      const options = { clock: () => new Date(now), fixedCadence: true, intervalMs: 60000,
+        availableIntervalMs: 3000, burstIntervalMs: 2000, burstQuietMs: scenario.quietMs ?? 20000,
+        fetchPickup: async () => {
+          if (!starts.length) now += 1100;
+          const startedAt = new Date(now).toISOString();
+          starts.push(now);
+          now += 800;
+          return { record: { startedAt }, observations: [{ status: 'available' }] };
+        }, onBatch: async () => ({ persisted: true, changed: scenario.changed }) };
+      const open = () => { const s = createScheduler(options); s.setTargets(groups); return s; };
+      let scheduler = open();
+      // Delay this normal slot so the next fixed phase is 2 seconds after HTTP starts.
+      now += scheduler.snapshot().targets[0].dueInMs + options.intervalMs - 3100;
+      const first = now + 1100;
+      await Promise.all(scheduler.tick());
+      const expected = first + scenario.delay;
+      assert.deepEqual(starts, [first]);
+      if (restart) {
+        const saved = structuredClone(scheduler.checkpoint());
+        scheduler = open();
+        scheduler.restore(saved);
+      }
+      assert.equal(scheduler.snapshot().targets[0].health.lastRequestAt, first);
+      assert.equal(scheduler.nextDueInMs(), expected - now);
+      now = expected - 1; await Promise.all(scheduler.tick());
+      assert.deepEqual(starts, [first]);
+      now = expected; await Promise.all(scheduler.tick());
+      assert.deepEqual(starts, [first, expected]);
+      assert.equal(scheduler.snapshot().targets[0].health.requestInterval.sumMs, scenario.delay);
+    }
+  }
+});
+
 test('store spacing keeps the completion bound outside a verified available response', async () => {
   const startStamp = new Date(1000).toISOString();
   for (const scenario of [
@@ -94,6 +135,29 @@ test('store spacing keeps the completion bound outside a verified available resp
     await Promise.all(scheduler.tick());
     assert.deepEqual(scheduler.checkpoint().storeLastRequestAt, [['R577', 1800]], JSON.stringify(scenario));
     if (scenario.httpStatus === 429) assert.equal(scheduler.nextDueInMs(), 10000);
+  }
+});
+
+test('without a valid HTTP start, an available group uses the completion bound across restarts', async () => {
+  for (const startedAt of [undefined, 'invalid']) {
+    let now = 10000;
+    const options = { clock: () => new Date(now), intervalMs: 60000, burstIntervalMs: 2000, availableIntervalMs: 3000,
+      fetchPickup: async () => { now += 1900; return { record: { startedAt }, observations: [{ status: 'available' }] }; },
+      onBatch: async () => ({ persisted: true, changed: false }) };
+    const open = () => { const s = createScheduler(options); s.setTargets(groups); return s; };
+    const warm = open();
+    await Promise.all(warm.tick());
+    assert.equal(warm.nextDueInMs(), 3000);
+    const saved = structuredClone(warm.checkpoint());
+    const cold = open();
+    cold.restore(saved); assert.equal(cold.nextDueInMs(), 3000);
+    delete saved.targets[0].availableRequestAt;
+    const legacy = open();
+    legacy.restore(saved); assert.equal(legacy.nextDueInMs(), 3000);
+    now = 14899;
+    for (const scheduler of [warm, cold, legacy]) assert.equal(scheduler.tick().length, 0);
+    now = 14900;
+    const requests = cold.tick(); assert.equal(requests.length, 1); await Promise.all(requests);
   }
 });
 

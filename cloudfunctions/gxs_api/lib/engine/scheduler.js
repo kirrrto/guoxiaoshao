@@ -139,11 +139,25 @@ function createScheduler(options) {
     return fast ? Math.min(normalDue, requestedAt + fast) : normalDue;
   }
 
-  function dueAt(entry) {
+  function storeDueAt(entry) {
     const previous = storeLastRequestAt.get(entry.group.storeNumber);
     const fast = [opts.burstIntervalMs, opts.availableIntervalMs].filter(value => value > 0);
     const spacing = fast.length ? Math.min(opts.intervalMs, ...fast) : 0;
-    return Math.max(entry.nextDueAt, entry.guardUntil || 0, admissionUntil, previous === undefined ? 0 : previous + spacing);
+    return previous === undefined ? 0 : previous + spacing;
+  }
+
+  function dueAt(entry, nowMs) {
+    const earliest = Math.max(entry.nextDueAt, entry.guardUntil || 0, admissionUntil, storeDueAt(entry));
+    if (!entry.available || !opts.availableIntervalMs || !Number.isFinite(entry.availableRequestAt)) return earliest;
+    // A fixed phase or another SKU's shorter store spacing cannot shorten
+    // this group's interval. A change burst may, if still active at dispatch.
+    const requested = entry.availableRequestAt;
+    const normalOrAvailable = Math.min(opts.intervalMs, opts.availableIntervalMs);
+    if (opts.burstIntervalMs > 0) {
+      const burstDue = Math.max(earliest, requested + Math.min(normalOrAvailable, opts.burstIntervalMs));
+      if (entry.burstUntil > Math.max(nowMs, burstDue)) return burstDue;
+    }
+    return Math.max(earliest, requested + normalOrAvailable);
   }
 
   function configure({ intervalMs, maxConcurrency, timeoutMs, burstIntervalMs, burstQuietMs, availableIntervalMs, fixedCadence } = {}) {
@@ -190,7 +204,7 @@ function createScheduler(options) {
       if (!groups.has(group.key)) {
         const trackedAt = clock().getTime();
         const nextDueAt = opts.fixedCadence ? slotAfter(group.key, trackedAt) : 0;
-        groups.set(group.key, { group, trackedAt, nextDueAt, plannedAt: null, scheduleDelayMs: 0, inFlight: false, failures: 0, burstUntil: 0, available: false, availableObservedAt: null, health: emptyHealth() });
+        groups.set(group.key, { group, trackedAt, nextDueAt, plannedAt: null, scheduleDelayMs: 0, inFlight: false, failures: 0, burstUntil: 0, available: false, availableObservedAt: null, availableRequestAt: null, health: emptyHealth() });
       }
     }
     for (const key of [...groups.keys()]) if (!keep.has(key)) groups.delete(key);
@@ -255,7 +269,7 @@ function createScheduler(options) {
   async function dispatch(entry, nowMs) {
     const { group, health } = entry;
     entry.inFlight = true;
-    // Schedule metrics: planned slot vs actual request start (tick time).
+    // Until the transport reports its start, the tick is our best estimate.
     entry.plannedAt = Number.isFinite(entry.nextDueAt) ? entry.nextDueAt : nowMs;
     entry.scheduleDelayMs = Math.max(0, nowMs - entry.plannedAt);
     const wasProbe = breaker.state === 'half_open';
@@ -293,11 +307,17 @@ function createScheduler(options) {
     // complete known batch explicitly confirmed as persisted may restore it.
     entry.available = false;
     entry.availableObservedAt = null;
+    entry.availableRequestAt = null;
     // Admission can delay HTTP after tick(). Keep a conservative checkpoint
     // while persistence is pending or the transport has no usable start time.
     storeLastRequestAt.set(group.storeNumber, Math.max(storeLastRequestAt.get(group.storeNumber) ?? -Infinity, finishedMs));
-    if (health.lastRequestAt !== null) addSample(health.requestInterval, nowMs - health.lastRequestAt);
-    health.lastRequestAt = nowMs;
+    // The transport stamps its own HTTP call after budget/lease admission.
+    const startedMs = typeof record.startedAt === 'string' ? Date.parse(record.startedAt) : NaN;
+    const hasStart = startedMs >= nowMs && startedMs <= finishedMs && new Date(startedMs).toISOString() === record.startedAt;
+    const requestAt = hasStart ? startedMs : nowMs;
+    entry.scheduleDelayMs = Math.max(0, requestAt - entry.plannedAt);
+    if (health.lastRequestAt !== null) addSample(health.requestInterval, requestAt - health.lastRequestAt);
+    health.lastRequestAt = requestAt;
     health.requests += 1;
     addSample(health.latency, Number.isFinite(record.elapsedMs) ? record.elapsedMs : finishedMs - nowMs);
     const succeeded = observations.length > 0 && observations.every(o => o.status !== 'unknown');
@@ -332,20 +352,14 @@ function createScheduler(options) {
       if (succeeded && outcome && outcome.persisted === true && observations.some(observation => observation.status === 'available')) {
         entry.available = true;
         entry.availableObservedAt = finishedMs;
-        if (opts.availableIntervalMs > 0 && typeof record.startedAt === 'string') {
-          // The pickup transport captures an ISO timestamp immediately before
-          // fetch. Space a verified available store's requests start-to-start.
-          const startedMs = Date.parse(record.startedAt);
-          if (startedMs >= nowMs && startedMs <= finishedMs && new Date(startedMs).toISOString() === record.startedAt) {
-            storeLastRequestAt.set(group.storeNumber, startedMs);
-          }
-        }
+        entry.availableRequestAt = hasStart ? requestAt : finishedMs;
+        if (opts.availableIntervalMs > 0 && hasStart) storeLastRequestAt.set(group.storeNumber, requestAt);
       }
       // A status change keeps this store on the fast cadence until it stays quiet.
       if (outcome && outcome.changed && opts.burstIntervalMs > 0) entry.burstUntil = finishedMs + opts.burstQuietMs;
       // Burst mode only ever brings the next check forward, never later than the normal cadence.
       const fast = fastInterval(entry, finishedMs);
-      if (succeeded && fast > 0) entry.nextDueAt = Math.min(entry.nextDueAt, Math.max(nowMs + fast, finishedMs));
+      if (succeeded && fast > 0) entry.nextDueAt = Math.min(entry.nextDueAt, Math.max(requestAt + fast, finishedMs));
     } catch (error) {
       health.persistenceFailed = true;
       health.persistenceFailures += 1;
@@ -393,13 +407,13 @@ function createScheduler(options) {
     const inFlight = pending.size;
     let slots = Math.max(0, opts.maxConcurrency - inFlight);
     const started = [];
-    const due = [...groups.values()].filter(e => !e.inFlight && dueAt(e) <= nowMs).sort((a, b) => a.nextDueAt - b.nextDueAt || a.group.key.localeCompare(b.group.key));
+    const due = [...groups.values()].filter(e => !e.inFlight && dueAt(e, nowMs) <= nowMs).sort((a, b) => a.nextDueAt - b.nextDueAt || a.group.key.localeCompare(b.group.key));
     for (const entry of due) {
       if (slots <= 0) break;
       // A store may have multiple SKU batches or a changed group key after a
       // follow refresh. They share one request cadence and never overlap.
       const storeNumber = entry.group.storeNumber;
-      if (activeStores.has(storeNumber) || dueAt(entry) > nowMs) continue;
+      if (activeStores.has(storeNumber) || dueAt(entry, nowMs) > nowMs) continue;
       if (!breakerAllows(nowMs)) break;
       slots -= 1;
       activeStores.add(storeNumber);
@@ -416,10 +430,10 @@ function createScheduler(options) {
   function snapshot() {
     const nowMs = clock().getTime();
     const targets = [...groups.values()].map(e => {
-      const storeDelayed = admissionUntil <= nowMs && e.nextDueAt <= nowMs && (e.guardUntil || 0) <= nowMs && dueAt(e) > nowMs;
+      const storeDelayed = admissionUntil <= nowMs && e.nextDueAt <= nowMs && (e.guardUntil || 0) <= nowMs && storeDueAt(e) > nowMs;
       return {
         key: e.group.key, storeNumber: e.group.storeNumber, partNumbers: e.group.partNumbers, trackedAt: e.trackedAt,
-        inFlight: e.inFlight, dueInMs: Math.max(0, dueAt(e) - nowMs), storeDelayed,
+        inFlight: e.inFlight, dueInMs: Math.max(0, dueAt(e, nowMs) - nowMs), storeDelayed,
         storeDelayReason: storeDelayed ? 'store_serial_or_spacing' : null,
         plannedAt: Number.isFinite(e.plannedAt) ? e.plannedAt : null,
         scheduleDelayMs: Number.isFinite(e.scheduleDelayMs) ? e.scheduleDelayMs : 0,
@@ -436,7 +450,7 @@ function createScheduler(options) {
   // starts. Otherwise each minute would bypass Retry-After and start again at
   // the first target, starving later stores when a scan reaches its deadline.
   function checkpoint() {
-    return { version: 1, intervalMs: opts.intervalMs, breaker: { ...breaker, failures: [...breaker.failures], probeInFlight: false }, admissionUntil, admissionReason, storeLastRequestAt: [...storeLastRequestAt], targets: [...groups.values()].map(e => ({ key: e.group.key, trackedAt: e.trackedAt, nextDueAt: e.nextDueAt, guardUntil: e.guardUntil || 0, guardReason: e.guardReason || null, failures: e.failures, burstUntil: e.burstUntil || 0, available: e.available, availableObservedAt: e.availableObservedAt, health: e.health })) };
+    return { version: 1, intervalMs: opts.intervalMs, breaker: { ...breaker, failures: [...breaker.failures], probeInFlight: false }, admissionUntil, admissionReason, storeLastRequestAt: [...storeLastRequestAt], targets: [...groups.values()].map(e => ({ key: e.group.key, trackedAt: e.trackedAt, nextDueAt: e.nextDueAt, guardUntil: e.guardUntil || 0, guardReason: e.guardReason || null, failures: e.failures, burstUntil: e.burstUntil || 0, available: e.available, availableObservedAt: e.availableObservedAt, availableRequestAt: e.availableRequestAt, health: e.health })) };
   }
 
   function restore(saved, previousIntervalMs) {
@@ -483,6 +497,14 @@ function createScheduler(options) {
         && entry.health.lastPersistedSuccessAt === item.availableObservedAt && !entry.health.persistenceFailed
         && (entry.health.lastFailureAt === null || entry.health.lastFailureAt <= item.availableObservedAt);
       entry.availableObservedAt = entry.available ? item.availableObservedAt : null;
+      // Old checkpoints only prove when the available response completed.
+      if (entry.available) {
+        const start = item.availableRequestAt;
+        entry.availableRequestAt = Number.isFinite(start) && start >= entry.health.lastRequestAt && start <= item.availableObservedAt
+          ? start : item.availableObservedAt;
+      } else {
+        entry.availableRequestAt = null;
+      }
       // Current target count/runtime settings may shorten a capacity-scaled
       // cadence. Restoring the old normal due time used to postpone healthy
       // no-stock targets by several extra minutes after capacity was freed.
@@ -545,7 +567,7 @@ function createScheduler(options) {
     resume: () => { paused = false; },
     nextDueInMs: () => {
       const nowMs = clock().getTime();
-      const pending = [...groups.values()].filter(e => !e.inFlight && !activeStores.has(e.group.storeNumber)).map(dueAt);
+      const pending = [...groups.values()].filter(e => !e.inFlight && !activeStores.has(e.group.storeNumber)).map(entry => dueAt(entry, nowMs));
       const nextTargetAt = pending.length ? Math.min(...pending) : nowMs + opts.intervalMs;
       return Math.max(0, Math.max(nextTargetAt, admissionUntil, breaker.state === 'open' ? breaker.until || 0 : 0) - nowMs);
     },
