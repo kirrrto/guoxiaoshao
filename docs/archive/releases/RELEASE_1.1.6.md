@@ -56,7 +56,7 @@
 - 原有库存监测于 12:33 真实定时运行，结果 `running`，扫描 2 个目标、记录 2 次观测、产生 0 个事件、发送 0 条消息。此结果仅证明该轮运行，不能用于证明订阅消息已送达。
 - 微信消息推送 URL 已于 14:39 通过 GET 校验（HTTP 200 回显数字 `echostr`，34ms）。安全模式 POST 发货／退款通知尚未用真实加密报文验收。
 
-部署及运行证据见 [cloud-deployment.json](../evidence/verification/1.1.6-payment/cloud-deployment.json)、[代码一致性](../evidence/verification/1.1.6-payment/cloud-code-integrity.json)、[HTTP 拒绝验证](../evidence/verification/1.1.6-payment/cloud-http-negative.json) 与 [URL 校验](../evidence/verification/1.1.6-payment/cloud-url-verification.json)。配置项和操作步骤见 [虚拟支付配置说明](VIRTUAL_PAYMENT_SETUP.md)。
+部署及运行证据见 [cloud-deployment.json](../../../evidence/verification/1.1.6-payment/cloud-deployment.json)、[代码一致性](../../../evidence/verification/1.1.6-payment/cloud-code-integrity.json)、[HTTP 拒绝验证](../../../evidence/verification/1.1.6-payment/cloud-http-negative.json) 与 [URL 校验](../../../evidence/verification/1.1.6-payment/cloud-url-verification.json)。配置项和操作步骤见 [虚拟支付配置说明](../../VIRTUAL_PAYMENT_SETUP.md)。
 
 ## 本地验证
 
@@ -66,7 +66,7 @@
 - 支付前端专项覆盖取消、防双击、按账号恢复、查单结果未知、页面生命周期、旧 iOS、平台待确认、服务端确认开通及退款展示。
 - 离线支付布局覆盖 9 种状态 × 320／375／430 像素，共 **27 个场景**；兑换回归另有 **21 个场景**。两组均无表达式错误、缺字、横向溢出、文字裁切或坏图。
 
-离线截图与边界说明见 [支付前端验收记录](../evidence/verification/virtual-payment-2026-09-20/README.md)。桩测试及浏览器布局不等于微信原生收银台、安全区域或真实支付链路验收。
+离线截图与边界说明见 [支付前端验收记录](../../../evidence/verification/virtual-payment-2026-09-20/README.md)。桩测试及浏览器布局不等于微信原生收银台、安全区域或真实支付链路验收。
 
 ## 开放购买的验收进度
 

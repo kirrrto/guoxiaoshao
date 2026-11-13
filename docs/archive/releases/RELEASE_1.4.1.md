@@ -2,7 +2,7 @@
 
 日期：2026-09-28。基于正式 v1.4.0 和 `57185d6` 的稳定性修复，版本号统一为 **v1.4.1**。本版修复操作和监测边界，不改变 7 元／7 天会员商品、身份来源及支付权益规则。
 
-开源许可补充（2026-09-28）：仓库已公开，新增 [MIT License](../LICENSE)、[第三方说明](../THIRD_PARTY_NOTICES.md) 和 npm 许可元数据。许可补充沿用 v1.4.1，不触发云函数部署；下方云包一致性证据记录的是此前业务修复部署时的文件状态，新增的 package 许可字段尚未部署。
+开源许可补充（2026-09-28）：仓库已公开，新增 [MIT License](../../../LICENSE)、[第三方说明](../../../THIRD_PARTY_NOTICES.md) 和 npm 许可元数据。许可补充沿用 v1.4.1，不触发云函数部署；下方云包一致性证据记录的是此前业务修复部署时的文件状态，新增的 package 许可字段尚未部署。
 
 ## 最终评审与修复
 
@@ -39,7 +39,7 @@
 - 发布检查：**34/34 通过**；monitor 29 个运行依赖与 canonical 源码一致。
 - 微信官方本地编译器：6 个 WXML、8 个 WXSS 全部通过。
 - 320／375／430px 共 51 个监测界面预览：无表达式错误、缺失文本、横向溢出或文字裁切；另验证 18 个浅色／深色授权入口场景，详情收起后按钮仍可见。已查看代表性页面。该预览为浏览器近似，不替代微信真机。
-- 脱敏结果：[本地验证](../evidence/verification/1.4.1/validation.json)、[发布门禁](../evidence/verification/1.4.1/release-check.json)。
+- 脱敏结果：[本地验证](../../../evidence/verification/1.4.1/validation.json)、[发布门禁](../../../evidence/verification/1.4.1/release-check.json)。
 
 ### 已完成的云端更新
 
@@ -48,8 +48,8 @@
 - 10:30:13 的真实 `system.ping` 返回 1.4.1。
 - 更新后的两轮真实定时调用于 10:30:23 和 10:31:14 完成，均返回 running，各采集 9 条观测，耗时分别 17.265 秒、14.044 秒，未达到执行期限。
 - 10:31:14 的心跳为 running，发送鉴权 authReady=true。没有伪造库存或强制发送测试消息，手机送达仍单独验收。
-- 发现运行配置遗漏了断货模板，且仍使用 30 分钟冷却。10:33:59 通过带鉴权和审计的 `admin.updateConfig` 应用原 v1.4.0 配置：保留到货模板，补齐已记录的断货模板与字段，冷却改为 0。其他通知设置、会员、兑换、权限及采集配置保持一致。会员需要授权断货模板；配置接受不证明手机送达。见 [配置证据](../evidence/verification/1.4.1/notification-config.json)。
-- 证据：[部署配置](../evidence/verification/1.4.1/cloud-deployment.json)、[云包一致性](../evidence/verification/1.4.1/cloud-integrity.json)、[真实监测](../evidence/verification/1.4.1/cloud-monitor-health.json)。
+- 发现运行配置遗漏了断货模板，且仍使用 30 分钟冷却。10:33:59 通过带鉴权和审计的 `admin.updateConfig` 应用原 v1.4.0 配置：保留到货模板，补齐已记录的断货模板与字段，冷却改为 0。其他通知设置、会员、兑换、权限及采集配置保持一致。会员需要授权断货模板；配置接受不证明手机送达。见 [配置证据](../../../evidence/verification/1.4.1/notification-config.json)。
+- 证据：[部署配置](../../../evidence/verification/1.4.1/cloud-deployment.json)、[云包一致性](../../../evidence/verification/1.4.1/cloud-integrity.json)、[真实监测](../../../evidence/verification/1.4.1/cloud-monitor-health.json)。
 
 ### 前端与 GitHub
 
@@ -74,4 +74,4 @@
 
 ## 回退与边界
 
-部署前保留三项函数归档，更新保留环境变量、运行时、超时和定时触发器。不需要批量迁移账户或订单。未采集的历史无法恢复为真实记录。回退注意事项见 [版本管理](VERSION_CONTROL.md)。
+部署前保留三项函数归档，更新保留环境变量、运行时、超时和定时触发器。不需要批量迁移账户或订单。未采集的历史无法恢复为真实记录。回退注意事项见 [版本管理](../../VERSION_CONTROL.md)。

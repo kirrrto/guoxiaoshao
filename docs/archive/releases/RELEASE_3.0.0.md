@@ -18,7 +18,7 @@
 - 历史以紧凑条件区和供应事件时间轴呈现，保留成本、余额和观测覆盖限制，不改成个人查询记录。下单指南、历史条件与测试签到回程保留原目标或原请求，不自动重复查询、扣次或发送。
 - 既有 `resultNextAction` 等产品开关保持原配置；本轮没有新增旅程采集事件、提高采集频率或宣称转化与性能提升。
 
-详细需求对应、兼容规则与交接见 [V3_IMPLEMENTATION_2026-10-15.md](V3_IMPLEMENTATION_2026-10-15.md)。
+详细需求对应、兼容规则与交接见 [V3_IMPLEMENTATION_2026-10-15.md](../../V3_IMPLEMENTATION_2026-10-15.md)。
 
 ## 本轮指南入口、保存流程与跨城选择
 
@@ -36,7 +36,7 @@
 
 最新源码全套测试 **1447/1447 通过**、源码检查 0 错误、发布检查 **48/48 通过**且 `publicationReady=false`。主流程浅/深色 **564 项**、会员按钮宽度压力浅/深色 **240 项**、1.3 倍字体 **6 项**均通过，共 **810 项浏览器近似渲染检查**。已查看会员双按钮、免费入口及三个档位升级页截图；未进行微信真机付款、云部署或前端上传。
 
-证据：[会员入口修订](../evidence/verification/v3-member-actions-20261015/summary.json)。预览：[会员双按钮](../output/v3.0.0-member-actions.png)、[免费开通入口](../output/v3.0.0-free-entry.png)、[月卡升级页](../output/v3.0.0-upgrade-monthly.png)。下方数字保留为此前源码快照。
+证据：[会员入口修订](../../../evidence/verification/v3-member-actions-20261015/summary.json)。预览：[会员双按钮](../../../output/v3.0.0-member-actions.png)、[免费开通入口](../../../output/v3.0.0-free-entry.png)、[月卡升级页](../../../output/v3.0.0-upgrade-monthly.png)。下方数字保留为此前源码快照。
 
 ## 此前指南、保存与跨城修订验证
 
@@ -46,15 +46,15 @@
 - 页面近似渲染：主流程 240、配置面板 48、备选门店 36 个场景，浅色与深色共 **648 项通过**。跨城场景覆盖 320/375/430px，包含合肥 1 家门店及北京 6 家门店。
 - 已人工查看查询页置顶入口、海报后接攻略、直接攻略、配置一次保存、跨城已选门店和删除重复说明后的截图。真实海报图片网络加载成功；其余库存、时间及账户等场景数据为本地测试样例，不是生产观测。
 
-本轮证据见 [一次保存、指南与跨城选择验证](../evidence/verification/v3-single-save-guide-20261015/summary.json)。本地验证已完成，微信真机及生产发布仍待分别验证。
+本轮证据见 [一次保存、指南与跨城选择验证](../../../evidence/verification/v3-single-save-guide-20261015/summary.json)。本地验证已完成，微信真机及生产发布仍待分别验证。
 
-可查看 [置顶日历入口](../output/v3.0.0-query-calendar-top.png)、[海报与攻略](../output/v3.0.0-guide-poster.png)、[直接攻略](../output/v3.0.0-guide-direct.png)、[一次保存配置](../output/v3.0.0-picker-single-save.png)、[跨城备选门店](../output/v3.0.0-alternatives-beijing.png)、[精简提醒卡片](../output/v3.0.0-reminder-clean.png)。以下保留此前源码快照及其验证数字，与本轮结果分开记录。
+可查看 [置顶日历入口](../../../output/v3.0.0-query-calendar-top.png)、[海报与攻略](../../../output/v3.0.0-guide-poster.png)、[直接攻略](../../../output/v3.0.0-guide-direct.png)、[一次保存配置](../../../output/v3.0.0-picker-single-save.png)、[跨城备选门店](../../../output/v3.0.0-alternatives-beijing.png)、[精简提醒卡片](../../../output/v3.0.0-reminder-clean.png)。以下保留此前源码快照及其验证数字，与本轮结果分开记录。
 
 ## 此前选择器对齐修订验证
 
 该阶段将产品类别改为三列等宽、名称完整居中，容量和颜色使用等宽网格，勾选标记预留固定位置。颜色按型号统一排序后筛选当前容量实际存在的组合，iPhone 17 在 256GB / 512GB 间切换时保留颜色、对应 SKU 和门店选择。其额外配置确认流程已由本轮一次保存流程取代。
 
-该历史快照全套测试 **1431/1431 通过**，源码检查 0 错误。配置面板浅色/深色 **192 项**及容量切换、选中状态、1.3 倍字体的几何对照 **48 项**通过，覆盖 320/375/390/430px 和查询、关注、历史三个入口。见 [选择器修订证据](../evidence/verification/v3-picker-alignment-20261015/summary.json)、[256GB 预览](../output/v3.0.0-picker-256.png)、[512GB 预览](../output/v3.0.0-picker-512.png)。这些结果对应当时源码，不覆盖本轮入口分流及去除额外确认；仍为本地浏览器近似渲染，未上传或完成微信真机验收。
+该历史快照全套测试 **1431/1431 通过**，源码检查 0 错误。配置面板浅色/深色 **192 项**及容量切换、选中状态、1.3 倍字体的几何对照 **48 项**通过，覆盖 320/375/390/430px 和查询、关注、历史三个入口。见 [选择器修订证据](../../../evidence/verification/v3-picker-alignment-20261015/summary.json)、[256GB 预览](../../../output/v3.0.0-picker-256.png)、[512GB 预览](../../../output/v3.0.0-picker-512.png)。这些结果对应当时源码，不覆盖本轮入口分流及去除额外确认；仍为本地浏览器近似渲染，未上传或完成微信真机验收。
 
 ## 此前直接授权修订验证
 
@@ -64,9 +64,9 @@
 - 该阶段页面近似渲染：主旅程/免打扰/直接授权 234 个场景、备选 30 个、历史事件 18 个、展开关注与观测 15 个，浅色与深色共 **594 项通过**；覆盖 320、375、390、430、768、1024px。无缺失文案、横向溢出或文字裁切。
 - 浮动导航：**882 项通过**，包含安全区模拟、放大字体与弹层隐藏检查。已人工查看查询、关注、历史与原页授权重试截图，并确认所用商品图片正常加载。直接授权、付款互斥、账号切换、原生窗口返回及观测过期也有运行时回归。
 
-该阶段完整证据见 [直接授权与界面修订验证](../evidence/verification/v3-direct-reminders-20261015/summary.json)，同目录保存测试日志与布局报告。源码逐文件哈希随证据留存；浏览器预览不代表微信真机。[首轮 v3 验证](../evidence/verification/v3-20261015/summary.json) 也保留为此前快照，两者均不替代本轮入口与保存流程的最终验证。
+该阶段完整证据见 [直接授权与界面修订验证](../../../evidence/verification/v3-direct-reminders-20261015/summary.json)，同目录保存测试日志与布局报告。源码逐文件哈希随证据留存；浏览器预览不代表微信真机。[首轮 v3 验证](../../../evidence/verification/v3-20261015/summary.json) 也保留为此前快照，两者均不替代本轮入口与保存流程的最终验证。
 
-可查看该阶段 [关注页预览](../output/v3.0.0-refined-follow.png)、[查询页预览](../output/v3.0.0-refined-query.png)、[原页同步重试](../output/v3.0.0-refined-authorization-retry.png)，以及首轮 [多段免打扰预览](../output/v3.0.0-dnd-preview.png)。当前改动可审阅 [源代码差异](../output/v3.0.0-changes.diff) 与 [变更文件清单](../output/v3.0.0-changed-files.json)。
+可查看该阶段 [关注页预览](../../../output/v3.0.0-refined-follow.png)、[查询页预览](../../../output/v3.0.0-refined-query.png)、[原页同步重试](../../../output/v3.0.0-refined-authorization-retry.png)，以及首轮 [多段免打扰预览](../../../output/v3.0.0-dnd-preview.png)。当前改动可审阅 [源代码差异](../../../output/v3.0.0-changes.diff) 与 [变更文件清单](../../../output/v3.0.0-changed-files.json)。
 
 ## 发布确认与剩余验证
 

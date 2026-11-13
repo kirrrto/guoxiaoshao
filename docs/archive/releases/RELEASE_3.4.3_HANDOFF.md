@@ -2,21 +2,21 @@
 
 记录日期：2026-10-28（北京时间）。维护者已选择本版作为 **3.4.3 正式发布源码**；这表示发布版本与源码方向已确定，**尚不表示微信正式上线**。GitHub 同步、云函数部署、数据库操作、微信上传、提审与正式发布分别留证。本文不推测云配置已改变，也不将既往本地结果登记为本轮生产验收。
 
-变更内容见 [发布说明](RELEASE_3.4.3.md)，实现和方案取舍见 [优化执行记录](OPTIMIZATION_3.4.3_PROGRESS.md) 与 [设计审查记录](DESIGN_REVIEW_3.4.3_20261028.md)。
+变更内容见 [发布说明](RELEASE_3.4.3.md)，实现和方案取舍见 [优化执行记录](../../OPTIMIZATION_3.4.3_PROGRESS.md) 与 [设计审查记录](../../DESIGN_REVIEW_3.4.3_20261028.md)。
 
 ## 已有本地依据与本轮待补记录
 
 根 package/lock、三云函数 `cloudbase_auth`、`gxs_api`、`gxs_monitor` 的 package/lock、可选 collector、前端版本与交付目标均为 3.4.3。微信工程 `libVersion: 3.17.3` 是基础库版本，不随产品版本改成 3.4.3。
 
-上一轮本地验证记录时间为 **2026-10-28T08:54:54.804Z**：Node 24.22.1 全量 **1803/1803 通过，0 失败、0 跳过**，源码和 monitor 同步检查通过，`publicationReady:false`。原始摘要、日志哈希及验证范围见 [上一轮本地证据](../evidence/verification/3.4.3-design/local-verification.json)。该记录的前端指纹为 `sha256:7ae69180501091bae90a29ec1c610f17c329724640d2860af3968b9fd03c4b16`；它是上一轮证据的绑定对象，不自动代表本轮最终上传源码。
+上一轮本地验证记录时间为 **2026-10-28T08:54:54.804Z**：Node 24.22.1 全量 **1803/1803 通过，0 失败、0 跳过**，源码和 monitor 同步检查通过，`publicationReady:false`。原始摘要、日志哈希及验证范围见 [上一轮本地证据](../../../evidence/verification/3.4.3-design/local-verification.json)。该记录的前端指纹为 `sha256:7ae69180501091bae90a29ec1c610f17c329724640d2860af3968b9fd03c4b16`；它是上一轮证据的绑定对象，不自动代表本轮最终上传源码。
 
-本轮发布收尾已补齐锁定浏览器依赖、不可跳过的浏览器回归、持续 UI 检查和失败时仍保存 CI 产物；实现方式参考 [Playwright 官方 CI 文档](https://playwright.dev/docs/ci)。精选设计截图与 Web 参照源码 ZIP 已纳入[可复用附件](../evidence/design/2026-10-28/README.md)。源码定稿与微信上线继续分别记录：
+本轮发布收尾已补齐锁定浏览器依赖、不可跳过的浏览器回归、持续 UI 检查和失败时仍保存 CI 产物；实现方式参考 [Playwright 官方 CI 文档](https://playwright.dev/docs/ci)。精选设计截图与 Web 参照源码 ZIP 已纳入[可复用附件](../../../evidence/design/2026-10-28/README.md)。源码定稿与微信上线继续分别记录：
 
-- 最终本地测试：Node 24.22.1，1803/1803 通过，0 失败、0 跳过。主预览450张/900项浅深布局、公告18张/36项浅深布局、1416项底栏、1728项弹层几何、120项排列、894条颜色记录均通过。详细日志哈希与依赖见[正式版定稿本地证据](../evidence/verification/3.4.3-release/local-verification.json)。
+- 最终本地测试：Node 24.22.1，1803/1803 通过，0 失败、0 跳过。主预览450张/900项浅深布局、公告18张/36项浅深布局、1416项底栏、1728项弹层几何、120项排列、894条颜色记录均通过。详细日志哈希与依赖见[正式版定稿本地证据](../../../evidence/verification/3.4.3-release/local-verification.json)。
 - 最终前端指纹：`sha256:0cb18a94e14cb94070253f63d2af5cb249f4c43a9d5cb0c75066e43da0576012`；前端源码235文件、1,209,648 B，实际上传包体待微信工具核验。
 - GitHub 同步目标：[`kirrrto/guoxiaoshao` 的 master](https://github.com/kirrrto/guoxiaoshao/tree/master)，源码版本标签 [`v3.4.3`](https://github.com/kirrrto/guoxiaoshao/tree/v3.4.3)。提交、推送与 CI 的最终真实结果在本次交付中按远端 SHA 核对；标签不代表微信已经发布。
 - 本地发布检查51/52：源码项通过，4个 open 微信 finding 仍使严格检查退出1。GitHub CI 同样保留这一阻断，不以版本定稿、测试通过或 GitHub 标签替代真机证据。
-- 云端补验（北京时间 2026-10-28 17:31–17:35）：两个缺失索引已新增并回读；云端三函数130个运行源码文件与 `065542f` 一致，故本次没有重复部署。API ping、目录条件读取和两集合游标首/续页读取通过；实际 scheduled 监测状态持续更新。详见[云端兼容性证据](../evidence/verification/3.4.3-cloud/compatibility-verification.json)。用户业务闭环、微信开发包/质检/真机证据仍待取得。
+- 云端补验（北京时间 2026-10-28 17:31–17:35）：两个缺失索引已新增并回读；云端三函数130个运行源码文件与 `065542f` 一致，故本次没有重复部署。API ping、目录条件读取和两集合游标首/续页读取通过；实际 scheduled 监测状态持续更新。详见[云端兼容性证据](../../../evidence/verification/3.4.3-cloud/compatibility-verification.json)。用户业务闭环、微信开发包/质检/真机证据仍待取得。
 - 正式发布的实际时间与对应上传包：待微信发布后登记。
 
 ## 正式上线前必须完成
@@ -25,13 +25,13 @@
 
 - [ ] 用最终源码在微信开发者工具实际编译，记录基础库、编译结果、上传包体与源码指纹。检查 WXSS `max()`、组件样式隔离、原生 picker/input、搜索占位、保存锁与恢复、首次 tab 切换和图片加载。
 - [ ] 在 iOS/Android 真机核对小屏、大字号、浅深色、键盘、安全区和弹层滚动，检查取消/失败重试与读屏名称、禁用状态。12px 字号和 44px 点击区域是离线检查下限，不是原生验收结论。
-- [ ] 用当前 3.4.3 版本、最终源码指纹、任务 ID、设备和执行时间的新证据逐项复验 [四项仍为 open 的微信 finding](../config/wechat-quality-findings.json)：`unused-channel-video`、`custom-tabbar-first-switch`、`oversized-product-image`、`legacy-product-image-format`。没有对应证据前不关闭 finding，也不将本地 release check 的阻断项改为通过。
+- [ ] 用当前 3.4.3 版本、最终源码指纹、任务 ID、设备和执行时间的新证据逐项复验 [四项仍为 open 的微信 finding](../../../config/wechat-quality-findings.json)：`unused-channel-video`、`custom-tabbar-first-switch`、`oversized-product-image`、`legacy-product-image-format`。没有对应证据前不关闭 finding，也不将本地 release check 的阻断项改为通过。
 
-现有 114 份图片产物覆盖 340 个 SKU，上一轮本地资产/预算检查已通过。缺少 102 份原图限制的是**完整可重复重建**，不等于现有图片不可用，也不能据此推定真机清晰。发布前仍需核对真机加载、清晰度及图片相关 finding；原图补全和后续重新编码按 [图片流程](PRODUCT_IMAGES.md) 单独处理。
+现有 114 份图片产物覆盖 340 个 SKU，上一轮本地资产/预算检查已通过。缺少 102 份原图限制的是**完整可重复重建**，不等于现有图片不可用，也不能据此推定真机清晰。发布前仍需核对真机加载、清晰度及图片相关 finding；原图补全和后续重新编码按 [图片流程](../../PRODUCT_IMAGES.md) 单独处理。
 
 ### 兼容部署、索引与实际服务
 
-- [ ] 核对目标环境、当前函数/runner 版本、运行中的 writer、必要备份和回退材料，记录真实结果。当前 [数据库部署计划](../config/database-deployment-plan.json) 的 `deployed:false` 不代表已经执行。
+- [ ] 核对目标环境、当前函数/runner 版本、运行中的 writer、必要备份和回退材料，记录真实结果。当前 [数据库部署计划](../../../config/database-deployment-plan.json) 的 `deployed:false` 不代表已经执行。
 - [x] 本轮已创建并回读 `gxs_latest.part_id`（`partNumber, _id`）和 `gxs_observation_days.part_day_id`（`partNumber, dayKey, _id`），均为非唯一升序索引，保留全部旧索引；实际首/续页查询成功，回读访问计数分别为4和3。此状态只针对这两个索引，不将整个数据库部署计划改记为完成。新 coverage reader 在 **legacy 模式也会使用这些 keyset 查询**。
 - [ ] 完成 `gxs_api`、`gxs_monitor` 及实际运行的 runner 的兼容代码部署与指纹核对；未运行 runner 也记录可核对的状态。同时核对 `cloudbase_auth` 与目标版本，根据实际差异决定更新范围，不假定三函数已一致。
 - [ ] 在实际环境验证串行事务、冲突/失败恢复、历史读取/翻页、查询、关注保存与退役改选、会员展示、提醒视图、采集时效及定时调用。验证涉及真实赠礼、付款、退款或收信时，按具体授权范围执行并单独保存账本/回执，不能以 mock、发送受理或页面刷新代替。
@@ -56,7 +56,7 @@
 6. **用对应包完成微信验收。** 体验包、真机及四项 finding 复验都绑定当前源码，实际上传、提审、审核与正式发布分别登记。只有微信正式发布完成后更新“已发布”状态。
 7. **分阶段推进独立任务。** embedded 迁移和后台全量赠礼按下节各自的前置条件执行，不把代码发布自动记为数据迁移或全量发放完成。
 
-具体操作参数与恢复方法以 [库存迁移 runbook](INVENTORY_STORAGE_MIGRATION_3.4.3.md) 和 [赠礼 runbook](LAUNCH_GIFT_20261028_RUNBOOK.md) 为准；本文没有执行这些步骤。
+具体操作参数与恢复方法以 [库存迁移 runbook](../../INVENTORY_STORAGE_MIGRATION_3.4.3.md) 和 [赠礼 runbook](../../LAUNCH_GIFT_20261028_RUNBOOK.md) 为准；本文没有执行这些步骤。
 
 ## 可以分阶段完成的事项
 

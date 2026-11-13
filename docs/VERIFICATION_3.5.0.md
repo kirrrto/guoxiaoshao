@@ -8,7 +8,7 @@
 
 复用既有主绿、系统中文字体、WXML/WXSS、语义变量和四个原生入口。使用 Impeccable 的既有界面扩展与独立审查流程，没有更换设计身份。原生 WXML/WXSS 无完整 detector 覆盖；机械检测只针对源码派生的 HTML，结论受此范围限制。
 
-Apple 新品目录、ProLED 15 项标准零售 SKU、Mac Studio 45 项精确配置及完整可选配置边界，见 [发布说明](RELEASE_3.5.0.md#apple-新品与可观测边界)、[零售配置证据](../evidence/catalog/2026-10-30/mac-selected-configurations.json)、[Mac Studio 定制配置证据](../evidence/catalog/2026-10-30/mac-studio-cto-research.json) 与 [逐项配置采集](../evidence/catalog/2026-10-30/mac-studio-configurations.json)。45 项包含 3 个标准零售 SKU 与 42 个定制配置；预售目录不因日期到来自动开放监测。
+Apple 新品目录、ProLED 15 项标准零售 SKU、Mac Studio 45 项精确配置及完整可选配置边界，见 [发布说明](archive/releases/RELEASE_3.5.0.md#apple-新品与可观测边界)、[零售配置证据](../evidence/catalog/2026-10-30/mac-selected-configurations.json)、[Mac Studio 定制配置证据](../evidence/catalog/2026-10-30/mac-studio-cto-research.json) 与 [逐项配置采集](../evidence/catalog/2026-10-30/mac-studio-configurations.json)。45 项包含 3 个标准零售 SKU 与 42 个定制配置；预售目录不因日期到来自动开放监测。
 
 Mac Studio 补充核验使用 1 次公开前端脚本 GET、5 次公开兼容选项 GET，全部返回 HTTP 200；随后 40 次受限配置 GET 解析完整配置。四种芯片的实际兼容选项覆盖 36/48/64/96/128/256/512GB 七档内存和最高 16TB 存储；完整矩阵见发布说明，另确认 Ultra 36/80、512GB、16TB 的精确官方选项 ID。导入器只接受逐项请求与响应维度一致、选项未阻断且容器身份完整的 45 项，缺项、重复或自动改写依赖都会停止。定制款不支持 Apple Store 店内取货，仅作参考展示；首次定制取货 GET 返回 HTTP 541（Apple 404 页面），接手复核以 `pl=true` 再验证一次仍为 541，标准零售请求在同一环境也返回 541，不能作为有货或无货结论。所有请求均不涉及购物、购买、账号 cookie 或 token。
 
@@ -104,4 +104,4 @@ Mac Studio 补充核验使用 1 次公开前端脚本 GET、5 次公开兼容选
 
 本轮代理未部署函数、未上传微信、未提审或正式发布；仅补齐上述到期集合、私有权限与索引，没有修改通知配置、会员账本或真实采集目标，没有执行真实付款、赠礼或消息发送。云端已有的 API 更新不等于本地后续修正已部署。取货证据包括 PROLED 两个零售配置的只读抽样，以及 Mac Studio 一次返回 HTTP 541 的定制取货请求；后者保持未验证，不能解释为缺货或永久不支持。
 
-用量影响、无旧数据迁移、通知禁用开关与保留幂等回执的回退顺序见 [发布说明](RELEASE_3.5.0.md#可靠性与用量)。新功能不通过降低 Apple 采样频率或遗漏 unknown 节约用量，当前没有真实降费结论。
+用量影响、无旧数据迁移、通知禁用开关与保留幂等回执的回退顺序见 [发布说明](archive/releases/RELEASE_3.5.0.md#可靠性与用量)。新功能不通过降低 Apple 采样频率或遗漏 unknown 节约用量，当前没有真实降费结论。

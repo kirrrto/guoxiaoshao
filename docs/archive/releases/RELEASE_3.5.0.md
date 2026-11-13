@@ -35,7 +35,7 @@
 
 官网为定制配置使用携带 `parts.i`、`option.i` 与 `mts.i` 的 `fulfillment-messages` 协议；零售取货适配器只传商品编号，响应结构不同。该适配器与精确身份核对仍保留作未来兼容验证，但定制 Mac 不支持 Apple Store 店内取货，客户端不会把定制配置作为查询目标。2026-10-30 对标准零售和定制容器的只读请求均返回 HTTP 541（Apple 404 页面），不能解释为有货或无货。标准零售查询继续使用已验证的零售路径；定制配置只显示官网范围、复制链接和“不支持店内取货”说明。
 
-官方选中页解析、逐项来源与零售 SKU 对比保存在 [目录复核记录](../evidence/catalog/2026-10-30/mac-selected-configurations.json)。Mac Studio 完整选项、兼容约束、配置标识与 HTTP 541 边界另见 [定制配置复核记录](../evidence/catalog/2026-10-30/mac-studio-cto-research.json)。原始购买页及取货响应见 `evidence/catalog/2026-10-30/proled-research/` 与 `evidence/raw/2026-10-30/mac-studio-cto/`；记录只含公开产品参数，不含账号 cookie 或 token。本轮没有写入云端商品集合，也没有改变生产采集目标。
+官方选中页解析、逐项来源与零售 SKU 对比保存在 [目录复核记录](../../../evidence/catalog/2026-10-30/mac-selected-configurations.json)。Mac Studio 完整选项、兼容约束、配置标识与 HTTP 541 边界另见 [定制配置复核记录](../../../evidence/catalog/2026-10-30/mac-studio-cto-research.json)。原始购买页及取货响应见 `evidence/catalog/2026-10-30/proled-research/` 与 `evidence/raw/2026-10-30/mac-studio-cto/`；记录只含公开产品参数，不含账号 cookie 或 token。本轮没有写入云端商品集合，也没有改变生产采集目标。
 
 ## 可靠性与用量
 
@@ -55,4 +55,4 @@
 
 ## 实际验证与待验
 
-最新发版代码审查已修复六项授权、发送边界、目录维护与 CI 问题，并更新受漏洞影响的传递依赖。最终全量 1896 项通过，三个云函数及可选采集器生产依赖审计均为 0；发布检查仍为 `publicationReady: false`。维护者确认仅同步 GitHub 源码候选并补充 v3.5.0 CI，不部署、不上传微信、不创建正式 Release。完整本地结果、目录证据和最终限制见 [本轮验证记录](VERIFICATION_3.5.0.md)。本次数据库修复与成功读取证据见 [deadline-cloud-repair.json](../evidence/verification/3.5.0/deadline-cloud-repair.json)。2026-10-30 接手复核的测试、离线预览、取货异常与发布门禁摘要见 [takeover-revalidation.json](../evidence/verification/3.5.0/takeover-revalidation.json)：全量 1875 项通过，源码检查通过，门禁仍因四项历史微信质检复验保持 `publicationReady: false`。微信原生编译、真机键盘/读屏/返回、真实到期提醒收信、最终同版云函数部署、微信上传与正式发布仍需分别验收。本地测试和 Chromium 近似预览不能替代这些步骤。
+最新发版代码审查已修复六项授权、发送边界、目录维护与 CI 问题，并更新受漏洞影响的传递依赖。最终全量 1896 项通过，三个云函数及可选采集器生产依赖审计均为 0；发布检查仍为 `publicationReady: false`。维护者确认仅同步 GitHub 源码候选并补充 v3.5.0 CI，不部署、不上传微信、不创建正式 Release。完整本地结果、目录证据和最终限制见 [本轮验证记录](../../VERIFICATION_3.5.0.md)。本次数据库修复与成功读取证据见 [deadline-cloud-repair.json](../../../evidence/verification/3.5.0/deadline-cloud-repair.json)。2026-10-30 接手复核的测试、离线预览、取货异常与发布门禁摘要见 [takeover-revalidation.json](../../../evidence/verification/3.5.0/takeover-revalidation.json)：全量 1875 项通过，源码检查通过，门禁仍因四项历史微信质检复验保持 `publicationReady: false`。微信原生编译、真机键盘/读屏/返回、真实到期提醒收信、最终同版云函数部署、微信上传与正式发布仍需分别验收。本地测试和 Chromium 近似预览不能替代这些步骤。

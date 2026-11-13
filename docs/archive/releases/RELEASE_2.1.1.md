@@ -16,7 +16,7 @@
 ## 保留的业务规则
 
 - 仍使用微信官方虚拟支付 `wx.requestVirtualPayment`（道具直购 `short_series_goods`），签名下单、查单、发货推送、退款、定时对账与历史 v1–v4 订单快照逻辑未改。
-- 价格口径不变：周卡 700 分、月卡 1499 分、年卡 12900 分（实付）；划线价 30／360 元仅界面展示。详见 [支付配置说明](VIRTUAL_PAYMENT_SETUP.md)。
+- 价格口径不变：周卡 700 分、月卡 1499 分、年卡 12900 分（实付）；划线价 30／360 元仅界面展示。详见 [支付配置说明](../../VIRTUAL_PAYMENT_SETUP.md)。
 - 兑换码、会员权益顺延、购买记录、微信提醒与关注配置不受本版影响。
 
 ## 本地验证
@@ -36,5 +36,5 @@
 
 ## 相关证据
 
-- 交付说明：[payment-compliance-delivery.md](../evidence/verification/payment-compliance-delivery.md)
-- 界面三态快照：[payment-compliance-ui-states.json](../evidence/verification/payment-compliance-ui-states.json)
+- 交付说明：[payment-compliance-delivery.md](../../../evidence/verification/payment-compliance-delivery.md)
+- 界面三态快照：[payment-compliance-ui-states.json](../../../evidence/verification/payment-compliance-ui-states.json)

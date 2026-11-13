@@ -26,6 +26,6 @@
 - [Impeccable 实际使用记录](impeccable-actual-use.json)：固定官方 skill 与 engine，含原生审查、HTML 检测、原始告警和修复闭环。WXML 不受 engine 自动源码扫描支持。
 - [长期设计规范](../../../DESIGN.md)
 - [完整设计审查](../../../docs/DESIGN_REVIEW_3.4.3_20261028.md)
-- [正式发布交接](../../../docs/RELEASE_3.4.3_HANDOFF.md)
+- [正式发布交接](../../../docs/archive/releases/RELEASE_3.4.3_HANDOFF.md)
 
 `artifact-manifest.json` 和两个设计验证 JSON 保留上一轮当地执行时的路径与哈希，是历史证据。发布收尾新增的 GitHub 附件、当前源码指纹和验证数据见本轮发布交接，不将旧前端指纹用于关闭当前微信 finding。

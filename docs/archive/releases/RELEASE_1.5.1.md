@@ -20,11 +20,11 @@
 - 运营配置保存携带版本，服务端拒绝缺版本的旧客户端及陈旧保存，旧编辑器不能无意把已修复的容量模式写回。仅可信云端运维脚本保留无版本兼容。
 - 三云函数、消费者前端和常驻采集候选使用 1.5.1；新增实际下载云包的内容比对，避免只凭版本号验收。
 
-具体复现、交叉审查、依赖风险与验证结果见 [1.5.1 审查记录](AUDIT_1.5.1.md)。用户可见更新公告已登记，但公告不表示候选已经正式发布。
+具体复现、交叉审查、依赖风险与验证结果见 [1.5.1 审查记录](../../AUDIT_1.5.1.md)。用户可见更新公告已登记，但公告不表示候选已经正式发布。
 
 ## 300 人目标与已知缺口
 
-维护者确认要求：**至少 300 人同时点击查询、全部关注每分钟检测一轮、有货时每 3 秒复查状态**。相同目标共享成功只证明去重场景；不同目标会消耗不同的新采集请求。当前容量和分钟定时运行方式没有达到整组标准，不能把返回“稍后再试”计作成功，也不能简单调大保护参数来承诺扩容。具体下界、架构差距和验收顺序见 [容量与检测频率验收](CAPACITY_ACCEPTANCE_1.5.1.md)。
+维护者确认要求：**至少 300 人同时点击查询、全部关注每分钟检测一轮、有货时每 3 秒复查状态**。相同目标共享成功只证明去重场景；不同目标会消耗不同的新采集请求。当前容量和分钟定时运行方式没有达到整组标准，不能把返回“稍后再试”计作成功，也不能简单调大保护参数来承诺扩容。具体下界、架构差距和验收顺序见 [容量与检测频率验收](../../CAPACITY_ACCEPTANCE_1.5.1.md)。
 
 **本次发布接受上述缺口继续推进**，缺口保持可见：
 
@@ -47,7 +47,7 @@
 | SHA-256 | `54920a7fe6101be20452ec57e255bfb04771ba9d45ed4803d8ca305ed720a6e2` |
 | 内容核对 | 325 个代码文件与 Git blob 哈希一致，0 不匹配、0 不安全条目 |
 
-文件级哈希见 [候选内容哈希](../evidence/verification/1.5.1/candidate-content-hashes.json)。部署后仍须用 `verify-deployment.mjs` 比对实际下载包，不能只凭版本号。GitHub 同步暂缓，本地提交尚未推送。
+文件级哈希见 [候选内容哈希](../../../evidence/verification/1.5.1/candidate-content-hashes.json)。部署后仍须用 `verify-deployment.mjs` 比对实际下载包，不能只凭版本号。GitHub 同步暂缓，本地提交尚未推送。
 
 ## 发布顺序与核对
 
@@ -81,12 +81,12 @@
 
 ## 本地交付证据
 
-- [完整自动测试结果](../evidence/verification/1.5.1/final-tests.json)：保存最终通过数及本机完整日志的 SHA-256，覆盖真实服务入口、模拟支付、并发、容量和失败恢复；不是生产压力测试。
-- [源码检查](../evidence/verification/1.5.1/source-check.json)：360 个文件、247 个 JavaScript、40 个 JSON，错误 0。
-- [发布预检](../evidence/verification/1.5.1/release-preflight.json)：45 项通过；[monitor 依赖闭包](../evidence/verification/1.5.1/monitor-bundle.json) 为 33 文件，生成内容一致。
-- [微信原生预览](../evidence/verification/1.5.1/native-preview.json)：消费者包编译成功，651017 bytes。此处不把预览写成正式上传或手机实测。
-- [独立依赖安装](../evidence/verification/1.5.1/dependency-packages.json)：根目录与四个 SDK 包干净安装成功、锁文件不变、无本地链接。SDK 仍存在一条 `lodash.set` 公告依赖链，共四个 high 包条目；业务未使用 realtime watch，不表示风险消除。
-- [300 人离线指标](../evidence/verification/1.5.1/capacity-300-after.json)、[候选内容哈希](../evidence/verification/1.5.1/candidate-content-hashes.json) 与 [验收状态](../evidence/verification/1.5.1/acceptance-status.json) 分别记录实际边界。
+- [完整自动测试结果](../../../evidence/verification/1.5.1/final-tests.json)：保存最终通过数及本机完整日志的 SHA-256，覆盖真实服务入口、模拟支付、并发、容量和失败恢复；不是生产压力测试。
+- [源码检查](../../../evidence/verification/1.5.1/source-check.json)：360 个文件、247 个 JavaScript、40 个 JSON，错误 0。
+- [发布预检](../../../evidence/verification/1.5.1/release-preflight.json)：45 项通过；[monitor 依赖闭包](../../../evidence/verification/1.5.1/monitor-bundle.json) 为 33 文件，生成内容一致。
+- [微信原生预览](../../../evidence/verification/1.5.1/native-preview.json)：消费者包编译成功，651017 bytes。此处不把预览写成正式上传或手机实测。
+- [独立依赖安装](../../../evidence/verification/1.5.1/dependency-packages.json)：根目录与四个 SDK 包干净安装成功、锁文件不变、无本地链接。SDK 仍存在一条 `lodash.set` 公告依赖链，共四个 high 包条目；业务未使用 realtime watch，不表示风险消除。
+- [300 人离线指标](../../../evidence/verification/1.5.1/capacity-300-after.json)、[候选内容哈希](../../../evidence/verification/1.5.1/candidate-content-hashes.json) 与 [验收状态](../../../evidence/verification/1.5.1/acceptance-status.json) 分别记录实际边界。
 - 源码候选包：`output/release-1.5.1/guoxiaoshao-1.5.1-candidate-ca5d943.zip`，SHA-256 `54920a7fe6101be20452ec57e255bfb04771ba9d45ed4803d8ca305ed720a6e2`；归档核对见同目录 `archive-verification.json`。
 
 ## 回退边界
