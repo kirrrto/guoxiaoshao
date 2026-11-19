@@ -11,6 +11,7 @@
  * the worker passes the sender authenticated for the consumer mini program.
  */
 const { NOTIFIABLE_TYPES, targetKeyOf } = require('./events');
+const { subscriptionResponseCode } = require('./wechat-sender');
 const { canUseReminders, reminderBlockReason, isMember, followAllowance } = require('../rules/membership');
 const { loadFollowPolicy } = require('../rules/follow-access');
 const { suppressDndEvent } = require('../rules/dnd');
@@ -244,11 +245,11 @@ async function sendTask({ task, config, sendImpl, repo, now, ownerId = 'notifier
   let outcome;
   try {
     const response = await sendImpl({ touser: user.openid, appid: user.appid, ...buildMessage(task, config), miniprogramState: config.notifications.miniprogramState || 'formal', lang: 'zh_CN' }, { timeoutMs });
-    const code = response && (response.errCode ?? response.errcode);
-    if (code === undefined || !Number.isFinite(Number(code))) outcome = { status: TASK_STATUS.uncertain, reason: 'invalid_platform_response' };
-    else if (Number(code) === 0) outcome = { status: TASK_STATUS.accepted, reason: null };
-    else outcome = { status: TASK_STATUS.failed, reason: Number(code) === 43101 ? 'subscription_authorization_expired' : `wx_${Number(code)}`,
-      retryable: [-1, 40001, 40014, 42001, 45009, 45011].includes(Number(code)) };
+    const code = subscriptionResponseCode(response);
+    if (code === null) outcome = { status: TASK_STATUS.uncertain, reason: 'invalid_platform_response' };
+    else if (code === 0) outcome = { status: TASK_STATUS.accepted, reason: null };
+    else outcome = { status: TASK_STATUS.failed, reason: code === 43101 ? 'subscription_authorization_expired' : `wx_${code}`,
+      retryable: [-1, 40001, 40014, 42001, 45009, 45011].includes(code) };
   } catch (error) {
     // Unknown exceptions after handing off may already have delivered. Only an
     // adapter explicitly proving the send never started can release the credit.

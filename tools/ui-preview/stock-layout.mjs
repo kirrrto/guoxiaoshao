@@ -8,6 +8,9 @@ export function inspectStockLayout(expected = null) {
   if (text('.follow-stock-label') !== expected.headline) errors.push('Stock headline confuses current availability with a previous result');
   if (text('.follow-stock-time') !== expected.headlineAge) errors.push('Stock headline age does not belong to its displayed result');
   if (card.querySelectorAll('.store-row').length !== (expected.expanded ? 2 : 0)) errors.push('Store details do not respect the requested disclosure state');
+  for (const label of card.querySelectorAll('.store-name, .store-heading .pill, .store-observation, .store-detail-note')) {
+    if (parseFloat(getComputedStyle(label).fontSize) < 11.99) errors.push(`Store observation text is below 12px: ${label.className}`);
+  }
   if (Boolean(card.querySelector('.follow-partial-note')) !== expected.partial) errors.push('Mixed fresh and stale stores lost their partial-result note');
   if (Boolean(card.querySelector('[data-preview-action="onPickupInfo"]')) !== expected.pickupAvailable) errors.push('Pickup action must require a fresh available store');
   if (card.classList.contains('follow-available') !== expected.pickupAvailable) errors.push('Historical availability must not receive the current-stock emphasis');

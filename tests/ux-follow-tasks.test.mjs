@@ -188,6 +188,58 @@ test('duplicate delete taps share one confirmation and a confirmed delete is not
   assert.equal(page.data.followBusyId, '');
 });
 
+test('a delete confirmation from a hidden page or previous account cannot submit a new removal', async () => {
+  for (const change of ['hide', 'switch', 'sharedAccount']) {
+    const rt = runtime(), page = pageFor(rt, [follow('alice-id')]);
+    const alice = { ...boot(), identity: { userKey: 'alice' } };
+    const bob = { ...boot(), identity: { userKey: 'bob' } };
+    rt.app.globalData.bootstrap = alice; page.applyBoot(alice);
+    const tap = { currentTarget: { dataset: { id: 'alice-id' } } };
+    page.onRemove(tap);
+    const oldModal = rt.messages.at(-1);
+    if (change === 'hide') {
+      page.onHide(); page.visible = true; page.onRemove(tap);
+      assert.notEqual(rt.messages.at(-1), oldModal);
+    } else {
+      rt.app.globalData.bootstrap = bob;
+      if (change === 'switch') page.applyBoot(bob);
+    }
+    await oldModal.success({ confirm: true });
+    assert.equal(rt.calls.some(call => call.action === 'follow.remove'), false, change);
+  }
+});
+
+test('a late pause or delete cannot lock a new account or report its errors there', async () => {
+  for (const action of ['follow.pause', 'follow.remove']) {
+    let rejectAlice, finishBob;
+    const rt = runtime((type, { followId }) => {
+      if (type === 'follow.list') return { follows: [follow('bob-id', { status: 'paused' })] };
+      if (followId === 'alice-id') return new Promise((_, reject) => { rejectAlice = reject; });
+      return new Promise(resolve => { finishBob = resolve; });
+    });
+    const page = pageFor(rt, [follow('alice-id')]);
+    const assume = userKey => {
+      const account = { ...boot(), identity: { userKey } };
+      rt.app.globalData.bootstrap = account; page.applyBoot(account);
+    };
+    assume('alice');
+    const tap = id => ({ currentTarget: { dataset: { id } } });
+    let pending;
+    if (action === 'follow.remove') { page.onRemove(tap('alice-id')); pending = rt.messages.at(-1).success({ confirm: true }); }
+    else pending = page.onToggle(tap('alice-id'));
+    assume('bob');
+    page.setData({ follows: [follow('bob-id')] });
+    const current = page.onToggle(tap('bob-id'));
+    assert.equal(page.data.followBusyId, 'bob-id');
+    rejectAlice(Error('old account offline')); await pending;
+    assert.equal(page.data.followBusyId, 'bob-id');
+    assert.equal(page.data.followActionError, '');
+    finishBob({ follow: follow('bob-id', { status: 'paused' }) });
+    await current;
+    assert.equal(page.data.followBusyId, '');
+  }
+});
+
 test('an uncertain pause keeps the last confirmed card and gives a state check instead of an optimistic success', async () => {
   const rt = runtime(async () => { throw Object.assign(Error('transport timeout'), { code: 'call_failed' }); });
   const page = pageFor(rt, [follow('a')]);

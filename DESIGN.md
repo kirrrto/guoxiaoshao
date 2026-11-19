@@ -4,43 +4,49 @@ description: 以清晰层级和原生控件完成选配、库存查询、关注�
 colors:
   primary: "#00C375"
   primary-ink: "#073C2C"
-  accent-text: "#007A49"
-  background: "#F3F4F2"
+  accent-text: "#006B3F"
+  background: "#F4F4F2"
   card: "#FFFFFF"
-  control: "#EEF0ED"
-  control-pressed: "#E3E6E2"
-  surface-soft: "#F4F5F3"
-  text: "#121814"
-  text-secondary: "#565F59"
-  text-muted: "#656D68"
-  line: "#E7E9E6"
+  card-elevated: "#FFFFFF"
+  control: "#EFEFED"
+  control-pressed: "#E5E5E2"
+  surface-soft: "#F6F6F4"
+  text: "#111412"
+  text-secondary: "#545956"
+  text-muted: "#626764"
+  line: "#ECECEA"
   warning: "#895806"
   warning-surface: "#FBF1DC"
   danger: "#A83E3E"
   danger-surface: "#FBECEC"
-  dark-background: "#0E1210"
-  dark-card: "#181D1A"
+  dark-background: "#0B0D0C"
+  dark-card: "#171A18"
+  dark-card-elevated: "#1F2320"
   dark-text: "#EEF2EF"
-  dark-text-secondary: "#B4BDB7"
-  dark-text-muted: "#A0A9A3"
-  dark-accent-text: "#56DDA4"
+  dark-text-secondary: "#B7C0BB"
+  dark-text-muted: "#9BA59F"
+  dark-accent-text: "#5CE0A8"
 typography:
   body:
     fontFamily: '-apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", Helvetica, sans-serif'
-    fontSize: "28rpx"
+    fontSize: "max(14px, 30rpx)"
     lineHeight: 1.5
   title:
-    fontSize: "32rpx"
+    fontSize: "max(20px, 40rpx)"
     fontWeight: 600
   label:
     fontSize: "max(12px, 24rpx)"
 rounded:
-  card: "32rpx"
-  action: "24rpx"
+  card: "28rpx"
+  inner: "20rpx"
+  action: "22rpx"
+  chip: "999rpx"
 spacing:
   page-inline: "32rpx"
-  card-padding: "30rpx"
+  card-padding: "32rpx"
   card-gap: "26rpx"
+  section-gap: "40rpx"
+  row-gap: "28rpx"
   action-gap: "16rpx"
 components:
   button-primary:
@@ -62,7 +68,7 @@ components:
 
 保留现有绿色、中文系统字体和微信原生交互。让商品配置、库存观测与下一步操作各有清晰位置；优先使用层级、间距和一致控件，减少不必要的次要标签与重复说明。简洁不能删去影响购买、授权、到期、退款或库存判断的事实。
 
-本规范于 2026-10-28 按 3.4.3 原生 WXML/WXSS 合并更新，2026-10-30 按 3.5.0 本地候选补充首页顺序及到期提醒状态规范，供后续界面工作持续沿用。前置颜色、文字与形状取自 [app.wxss](miniprogram/app.wxss) 和 [common.wxss](miniprogram/styles/common.wxss)；新增样式复用这些语义变量，修改公共值时同步核对规范。隔离组件的局部样式和深色覆盖仍需分别检查。
+本规范于 2026-10-28 按 3.4.3 原生 WXML/WXSS 合并更新，2026-10-30 按 3.5.0 本地候选补充首页顺序及到期提醒状态规范，2026-11-14 按 [视觉精细化方案](docs/VISUAL_REFINEMENT_BRIEF.md) 同步字号阶梯、三层按钮、细线分组、等宽数字及四处受控渐变/毛玻璃质感规范，供后续界面工作持续沿用。前置颜色、文字与形状取自 [app.wxss](miniprogram/app.wxss) 和 [common.wxss](miniprogram/styles/common.wxss)；新增样式复用这些语义变量，修改公共值时同步核对规范。隔离组件的局部样式和深色覆盖仍需分别检查。
 
 实际参考为 [shadcn/create preset b2BnwlLhw](https://ui.shadcn.com/create?preset=b2BnwlLhw)：Vega、Neutral、Emerald、medium radius、Noto Sans、Lucide。已在真实浏览器配置并导出 [preset](evidence/design/2026-10-28/shadcn-preset.json) 与 [CSS](evidence/design/2026-10-28/shadcn-preset.css)，随后用固定 shadcn 4.23.0 在独立目录生成 Vite 参照，构建并比对浅深色共 63 个变量，差异为零；命令、版本、[源码归档](evidence/design/2026-10-28/shadcn-reference-source.zip) 的重建方法与哈希见 [验证记录](evidence/design/2026-10-28/shadcn-cli-verification.json)。采用其控件层级、成对语义颜色和状态组织；小程序继续使用自己的颜色、字体、原生组件及精确 SKU，不移植 React、Tailwind、OKLCH 或 Web DOM 状态规则。Web 参照本身不证明微信实现通过验收。
 
@@ -83,18 +89,18 @@ components:
 
 主绿用于主要操作、当前选中及有依据的状态；中性色承载内容和分组。语义色按前景与背景成对选择，不能只替换填充色。
 
-- `--action-fill` / `--action-text` 定义主按钮，`--green-dark` 用于浅色表面的强调文字。保持两者分工，不能统一改成绿底白字。
+- `--action-fill` / `--action-text` 定义主按钮，`--green-dark` 用于浅色表面的状态胶囊与辅助文字强调，不将卡片大标题、门店标题或库存数字整段染绿。保持主按钮与强调文字的分工，不能统一改成绿底白字。
 - Web 预设的 `primary` 首先是填充角色，不能直接当作普通文字色。本次独立参照的深色检查已暴露这种误用；标题和普通标签使用其前景语义，不能以主题变量成功生成或完全一致推定对比度合格。
-- `--green-mist` 是页面底色，`--card` 是内容面，`--surface-soft` 是次级分组，`--line` 是边界。避免同一段信息重复套卡片。
-- `--text`、`--text-2`、`--text-3` 区分正文与辅助信息；有货、未知、陈旧、故障和暂停仍须有文字或图形表达，颜色不能独自传递含义。
+- `--green-mist` 是页面底色（浅 `#F4F4F2` / 深 `#0B0D0C`），`--card` 是内容面，`--card-elevated` 是抽屉与弹窗浮层表面，`--surface-soft` 仅保留在真正需要块面提示的说明区，`--line` 是行内与统计格细线边界。避免在同一卡片内部套多层灰色圆角小卡。
+- `--text`、`--text-2`、`--text-3` 区分正文与辅助信息；状态胶囊区分三层视觉权重（实心圆点+浅绿底表就绪/有货、空心圆点+中性底表未启用/失败、虚线环+透明底表警告/暂停），颜色不独自传递含义。
 - 警示使用 `--warn` / `--warn-soft`，错误或删除使用 `--bad` / `--bad-soft`。普通活动不占用故障视觉优先级。
 - 深色跟随系统主题。使用现有主题覆盖，并在实际叠加后的背景上检查正文、按钮、占位文字和状态颜色；浅色通过不能推定深色通过。
 
 ## Typography
 
-正文、标题、按钮和数据沿用同一套系统字体。SKU 等需要逐字符辨识的信息可使用项目现有等宽样式；不要因 Web 参照使用 Noto Sans 而给小程序引入新字体资源。
+正文、标题、按钮和数据沿用同一套系统字体。SKU、货号、时间、额度和统计数字统一启用 `font-variant-numeric: tabular-nums` 以消除数字宽度抖动；不要因 Web 参照使用 Noto Sans 而给小程序引入新字体资源。
 
-标题用字重和少量字号差建立层级，辅助文字保持可读。基础字号见前置 tokens；会随屏宽缩小的 `rpx` 文字，在受影响的功能区域使用已有的 `max(px, rpx)` 下限，避免靠缩字塞下内容。抽屉底部摘要、关注卡片的状态、观测时间、反馈及展开入口等功能文字，在 320px 离线场景下至少保持 12 CSS px；主要选项和输入优先沿用组件中更大的字号。
+标题与大号数值使用 `600` 半粗字重配合明确字号阶梯（`--fs-display` / `--fs-title` / `--fs-headline` / `--fs-body` / `--fs-sub` / `--fs-caption`），辅助文字保持可读。会随屏宽缩小的 `rpx` 文字，在受影响的功能区域使用已有的 `max(px, rpx)` 下限，避免靠缩字塞下内容。抽屉底部摘要、关注卡片的状态、观测时间、反馈及展开入口等功能文字，在 320px 离线场景下至少保持 12 CSS px；主要选项和输入优先沿用组件中更大的字号。
 
 12px 是当前离线检查的最低门槛，不是推荐正文大小，也不代表所有旧页面或微信真机已满足可读性要求。长配置、长门店名、1.3 倍字号需要换行和布局调整；关键事实不能仅靠截断展示。
 
@@ -112,13 +118,19 @@ components:
 
 ## Elevation & Depth
 
-公共卡片用 32rpx 圆角、无描边的白色表面和轻阴影。深色模式用卡面与页面底色的明度差分层；细线仅分隔相邻信息行。抽屉与遮罩表达临时操作层，不能用重阴影或装饰性渐变补救信息层级。
+公共卡片用 `--radius-card`（`28rpx`）圆角、极细浅灰描边与轻阴影 `--shadow`。深色模式使用 `--green-mist`（`#0B0D0C`）→ `--card`（`#171A18`）→ `--card-elevated`（`#1F2320`）的明度差分层；相邻数据、折叠条目和统计列以 `1rpx solid var(--line)` 的 Inset-grouped 细线分隔，代替灰底套灰卡。抽屉与弹窗表达临时操作层，不能用重阴影或装饰性渐变补救信息层级。
 
-保持静态页面表面，不依赖整页滤镜、动画渐变或背景模糊；按下、展开和加载反馈应短且服务状态变化，不为装饰增加云请求或轮询。深色阴影和遮罩需要独立查看，不能让正文与底层内容混成一层。
+仅在以下四处语义明确的位置克制使用渐变与 `@supports` 毛玻璃，并必须先声明纯色回退（不使用整页滤镜或动态背景模糊）：
+1. **页首标题区**（`.page-heading`）：先声明 `background: var(--green-mist)`，在 `@supports ((-webkit-backdrop-filter: blur(20px)) or (backdrop-filter: blur(20px)))` 下叠加 `--header-glass` 与 `backdrop-filter: saturate(180%) blur(20px)`；页首保持普通文档流（不设 `position: sticky`），避免滑动遮挡与点击偏移。
+2. **模态遮罩**（`.config-sheet-scrim`、`.redemption-mask`）：先声明 `background: rgba(0, 0, 0, 0.45)`，在 `@supports` 下叠加 `rgba(0, 0, 0, 0.36)` 与 `backdrop-filter: blur(8px)`，面板本体升至 `--card-elevated`。
+3. 有效会员卡保留黑金哨标。年卡使用暖金渐变 `--member-card-annual-gradient`，其他有效会员使用绿灰渐变 `--member-card-gradient`。档位来自服务端。所有渐变都叠在普通卡面色之上，免费及已到期账户沿用纯色卡面。
+4. **商品图展台**（`.product-image-box`、`.result-product-media`、`.follow-image`、`.history-product-media`、`.checkout-image`）：使用居中径向渐变 `--image-tile-gradient`（浅灰过渡，深色收敛低对比），空态 `.result-product-media--empty` 恢复卡片纯色。
+
+按下、展开和加载反馈应克制且服务状态变化（主按钮支持 `scale(0.98)` 按下反馈并在 `prefers-reduced-motion: reduce` 下关闭），不为装饰增加云请求或轮询。深色阴影和遮罩需要独立查看，不能让正文与底层内容混成一层。
 
 ## Shapes
 
-卡片和主操作复用 `--radius-card`、`--radius-action`；选项、搜索框、内部分组沿用各组件现有较小圆角。用一致形状让按钮、可选项和静态标签容易区分，不把所有信息都做成胶囊或可点击卡片。
+卡片和主操作复用 `--radius-card`（`28rpx`）、`--radius-inner`（`20rpx`）、`--radius-action`（`22rpx`）与 `--radius-chip`（`999rpx`）。用一致形状让按钮、分段筛选胶囊和静态状态标签容易区分，不把所有信息都做成胶囊或可点击卡片。
 
 列表内部分隔使用 `--line`；选中的规格或门店保留其选中标记。图片保持比例，加载失败使用明确占位；深色商品图底板保留现有对比度处理，不用裁切掩盖图片缺失或替代配置差异。
 
@@ -126,7 +138,7 @@ components:
 
 ### Buttons and selection controls
 
-主操作沿用主题绿实心按钮。修改、展开和跳转按钮使用无描边的中性底色 `--control-fill`、深色文字与方向箭头，按下时切换为 `--control-pressed`。保留默认、按下、选中、禁用、加载和错误反馈；有键盘或读屏入口时检查相应焦点和名称。禁用和加载不接受重复提交，处理函数再次校验，不只改变外观。
+主操作沿用主题绿实心按钮（`.btn-primary`，按下为 `.btn-primary-pressed`）。按钮收拢为三个明确层级：主实心操作（`.btn-primary`）、白底描边次操作（`.btn-outline`）和透明无边框文本操作（`.btn-text` 及 `.ui-action` 透明行内编辑入口），移除额外灰底胶囊次级样式并保持最小 `44px` 可点击高度。保留默认、按下、选中、禁用、加载和错误反馈；有键盘或读屏入口时检查相应焦点和名称。禁用和加载不接受重复提交，处理函数再次校验，不只改变外观。
 
 原生 `view` 充当选择或清空控件时，使用微信支持的 `aria-role`、`aria-label`、`aria-disabled` 等语义；可访问名称说明当前选中与动作。装饰图形隐藏于读屏。离线 DOM 的 role 映射只辅助检查，不能替代原生可访问性验证。
 

@@ -2,6 +2,15 @@ const { call, showError, toast } = require('../../utils/api');
 const fmt = require('../../utils/format');
 const operation = require('../../utils/operation');
 
+function settleGrant(kind, id, data, validResult) {
+  if (!data || typeof data.applied !== 'boolean' || !validResult) {
+    throw Error('发放结果尚未确认，请按原内容重试以核对结果。');
+  }
+  if (operation.finish(kind, id)) return true;
+  wx.showModal({ title: '发放结果已确认', content: '本机操作编号清理状态未知。请通过「查用户」核对记录，勿重复发放。', showCancel: false });
+  return false;
+}
+
 const minutes = ms => (Number.isFinite(ms) ? (ms < 60000 ? `${Math.round(ms / 1000)} 秒` : `${Math.round(ms / 6000) / 10} 分钟`) : '—');
 const percent = share => (Number.isFinite(share) ? `${Math.round(share * 1000) / 10}%` : '—');
 
@@ -64,6 +73,8 @@ Page({
     growth: null,
     configText: '',
     configDirty: false,
+    configLoading: false,
+    configLoaded: false,
     saving: false,
     grant: { userKey: '', days: '30', amount: '5', note: '' },
     lookup: null,
@@ -82,32 +93,46 @@ Page({
 
   async checkAccess() {
     if (this.loadingBoot) return;
+    const generation = this._accessGeneration;
     this.loadingBoot = true;
     this.setData({ allowed: false, checked: false, accessError: null });
     try {
       // This separate operator project still requires server authorization.
       // Developer-tool operators may have no consumer user identity.
       const stats = await call('admin.stats');
+      if (this._accessGeneration !== generation) return;
       this.setData({ checked: true, allowed: true, accessError: null, stats: { ...stats, serverTimeText: fmt.fmtDateTime(stats.serverTime) } });
-      if (!this.data.configDirty) await this.loadConfig();
+      if (!this.data.configDirty && !this.data.saving) await this.loadConfig();
     } catch (error) {
-      this.clearAccess(error);
-    } finally { this.loadingBoot = false; }
+      if (this._accessGeneration === generation) this.clearAccess(error);
+    } finally {
+      if (this._accessGeneration === generation) this.loadingBoot = false;
+    }
   },
 
   clearAccess(error) {
+    // Invalidate replies from the previous authorization even if access is later restored.
+    this._accessGeneration = {};
+    this.loadingBoot = false;
     this._configRevision = null;
+    this._configRead = null;
+    this._lookupRequest = null;
     const denied = error && ['forbidden', 'user_required', 'app_not_allowed'].includes(error.code);
-    this.setData({ allowed: false, checked: Boolean(error), stats: null, insights: null, growth: null, configText: '', configDirty: false, lookup: null, lookupText: '', grant: { userKey: '', days: '30', amount: '5', note: '' }, accessError: error ? (denied ? '当前账号没有管理权限，请由项目所有者在云端配置授权。' : '权限检查失败，请稍后重试。') : null });
+    this.setData({ allowed: false, checked: Boolean(error), stats: null, insights: null, growth: null, configText: '', configDirty: false, configLoaded: false, configLoading: false, lookup: null, lookupText: '', grant: { userKey: '', days: '30', amount: '5', note: '' }, accessError: error ? (denied ? '当前账号没有管理权限，请由项目所有者在云端配置授权。' : '权限检查失败，请稍后重试。') : null });
   },
 
-  async callAdmin(action, payload) {
+  async callAdmin(action, payload, applyResult) {
     if (!this.data.allowed) throw Object.assign(new Error('当前账号没有管理权限。'), { code: 'forbidden' });
-    try { return await call(action, payload); }
+    const generation = this._accessGeneration;
+    let data;
+    try { data = await call(action, payload); }
     catch (error) {
-      if (['forbidden', 'user_required', 'app_not_allowed'].includes(error.code)) this.clearAccess(error);
+      if (this._accessGeneration === generation && ['forbidden', 'user_required', 'app_not_allowed'].includes(error.code)) this.clearAccess(error);
       throw error;
     }
+    if (this._accessGeneration !== generation || !this.data.allowed) throw Error('权限状态已变化，请重新核对操作结果。');
+    if (applyResult) applyResult(data);
+    return data;
   },
 
   onRetryAccess() {
@@ -116,46 +141,60 @@ Page({
 
   async loadStats() {
     if (!this.data.allowed) return;
-    try { const stats = await this.callAdmin('admin.stats'); this.setData({ stats: { ...stats, serverTimeText: fmt.fmtDateTime(stats.serverTime) } }); } catch (error) { showError(error); }
+    try {
+      await this.callAdmin('admin.stats', {}, stats => this.setData({ stats: { ...stats, serverTimeText: fmt.fmtDateTime(stats.serverTime) } }));
+    } catch (error) { showError(error); }
   },
 
   async onLoadInsights() {
     if (!this.data.allowed || this.data.busy) return;
     this.setData({ busy: 'insights' });
     try {
-      const data = await this.callAdmin('admin.insights', { days: 7 });
-      this.setData({ insights: { lines: insightLines(data), sinceText: fmt.fmtDateTime(data.since) } });
+      await this.callAdmin('admin.insights', { days: 7 }, data =>
+        this.setData({ insights: { lines: insightLines(data), sinceText: fmt.fmtDateTime(data.since) } }));
     } catch (error) { showError(error); }
     finally { this.setData({ busy: '' }); }
   },
 
   async loadConfig() {
-    if (!this.data.allowed) return;
+    if (!this.data.allowed || this.data.configLoading) return;
+    const read = {};
+    this._configRead = read;
+    this.setData({ configLoading: true });
     try {
-    const { config, revision } = await this.callAdmin('admin.getConfig');
-    const editable = {};
-    for (const key of EDITABLE_KEYS) editable[key] = config[key];
-    this._configRevision = Number.isSafeInteger(revision) && revision >= 0 ? revision : null;
-    this.setData({ configText: JSON.stringify(editable, null, 2), configDirty: false });
-    } catch (error) { showError(error); }
+      const { config, revision } = await this.callAdmin('admin.getConfig');
+      if (!this.data.allowed || this._configRead !== read) return;
+      const editable = {};
+      for (const key of EDITABLE_KEYS) editable[key] = config[key];
+      this._configRevision = Number.isSafeInteger(revision) && revision >= 0 ? revision : null;
+      this.setData({ configText: JSON.stringify(editable, null, 2), configDirty: false, configLoaded: this._configRevision !== null });
+    } catch (error) {
+      showError(error);
+    } finally {
+      if (this._configRead === read) this.setData({ configLoading: false });
+    }
+  },
+
+  onReloadConfig() {
+    if (!this.data.saving) return this.loadConfig();
   },
 
   async onLoadGrowth() {
     if (!this.data.allowed || this.data.busy) return;
     this.setData({ busy: 'growth' });
     try {
-      const data = await this.callAdmin('admin.growth', { days: 30 });
-      this.setData({ growth: { lines: growthLines(data) } });
+      await this.callAdmin('admin.growth', { days: 30 }, data => this.setData({ growth: { lines: growthLines(data) } }));
     } catch (error) { showError(error); }
     finally { this.setData({ busy: '' }); }
   },
 
   onConfigInput(e) {
+    if (!this.data.allowed || this.data.configLoading || this.data.saving) return;
     this.setData({ configText: e.detail.value, configDirty: true });
   },
 
   async onSaveConfig() {
-    if (!this.data.allowed || this.data.saving) return;
+    if (!this.data.allowed || this.data.saving || this.data.configLoading || !this.data.configDirty) return;
     let patch;
     try {
       patch = JSON.parse(this.data.configText);
@@ -170,6 +209,8 @@ Page({
     this.setData({ saving: true });
     try {
       await this.callAdmin('admin.updateConfig', { patch: filtered, expectedRevision: this._configRevision });
+      this._configRevision = null;
+      this.setData({ configLoaded: false, configDirty: false });
       toast('配置已保存', 'success');
       await this.loadConfig();
     } catch (error) {
@@ -180,23 +221,29 @@ Page({
   },
 
   onGrantInput(e) {
-    this.setData({ [`grant.${e.currentTarget.dataset.field}`]: e.detail.value });
+    const field = e.currentTarget.dataset.field;
+    const value = e.detail.value;
+    if (field === 'userKey' && value.trim() !== this.data.grant.userKey.trim()) {
+      this._lookupRequest = null;
+      this.setData({ 'grant.userKey': value, lookup: null, lookupText: '' });
+    } else {
+      this.setData({ [`grant.${field}`]: value });
+    }
   },
 
   async onGrantMembership() {
     if (!this.data.allowed || this.data.busy) return;
     const { userKey, days, note } = this.data.grant;
-    if (!userKey) return toast('请输入 userKey');
-    if (!Number.isSafeInteger(Number(days)) || Number(days) <= 0) return toast('会员天数须为正整数');
+    if (!userKey.trim()) return toast('请输入 userKey');
+    if (!Number.isSafeInteger(Number(days)) || Number(days) <= 0 || Number(days) > 3650) return toast('会员天数须为 1–3650 的整数');
     this.setData({ busy: 'membership' });
     const payload = { userKey: userKey.trim(), days: Number(days), note };
-    const grantId = operation.begin('gm', payload);
     try {
+      const grantId = operation.begin('gm', payload);
       const data = await this.callAdmin('admin.grantMembership', { ...payload, grantId });
-      operation.finish('gm');
+      if (!settleGrant('gm', grantId, data, data && Number.isFinite(Date.parse(data.expiresAt)))) return;
       wx.showModal({ title: data.applied ? '已发放会员' : '已存在（幂等）', content: `有效期至 ${fmt.fmtDateTime(data.expiresAt)}`, showCancel: false });
     } catch (error) {
-      if (!operation.uncertain(error)) operation.finish('gm');
       showError(error);
     } finally {
       this.setData({ busy: '' });
@@ -206,17 +253,16 @@ Page({
   async onGrantCredits() {
     if (!this.data.allowed || this.data.busy) return;
     const { userKey, amount, note } = this.data.grant;
-    if (!userKey) return toast('请输入 userKey');
-    if (!Number.isSafeInteger(Number(amount)) || Number(amount) === 0) return toast('次数须为非零整数');
+    if (!userKey.trim()) return toast('请输入 userKey');
+    if (!/^-?\d+$/.test(String(amount).trim()) || Number(amount) === 0 || Math.abs(Number(amount)) > 1000) return toast('次数须为非零整数，单笔最多 1000 次');
     this.setData({ busy: 'credits' });
     const payload = { userKey: userKey.trim(), amount: Number(amount), note };
-    const grantId = operation.begin('gc', payload);
     try {
+      const grantId = operation.begin('gc', payload);
       const data = await this.callAdmin('admin.grantCredits', { ...payload, grantId });
-      operation.finish('gc');
-      toast(`已发放，余额 ${data.balance}`, 'success');
+      if (!settleGrant('gc', grantId, data, data && Number.isSafeInteger(data.balance))) return;
+      toast(`${data.applied ? '已发放' : '已处理'}，余额 ${data.balance}`, 'success');
     } catch (error) {
-      if (!operation.uncertain(error)) operation.finish('gc');
       showError(error);
     } finally {
       this.setData({ busy: '' });
@@ -225,11 +271,14 @@ Page({
 
   async onLookup() {
     if (!this.data.allowed || this.data.busy) return;
-    const { userKey } = this.data.grant;
+    const userKey = this.data.grant.userKey.trim();
     if (!userKey) return toast('请输入 userKey');
+    const request = {};
+    this._lookupRequest = request;
     this.setData({ busy: 'lookup' });
     try {
-      const data = await this.callAdmin('admin.lookupUser', { userKey: userKey.trim() });
+      const data = await this.callAdmin('admin.lookupUser', { userKey });
+      if (!this.data.allowed || this._lookupRequest !== request) return;
       this.setData({ lookup: data, lookupText: JSON.stringify(data, null, 2) });
     } catch (error) {
       showError(error);
@@ -259,6 +308,6 @@ Page({
   },
 
   onCopyLookup() {
-    wx.setClipboardData({ data: this.data.lookupText, success: () => toast('已复制') });
+    if (this.data.allowed && this.data.lookupText) wx.setClipboardData({ data: this.data.lookupText, success: () => toast('已复制') });
   },
 });

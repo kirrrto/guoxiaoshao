@@ -49,6 +49,11 @@ evidence/**/*.zip
 !evidence/design/3.7.0/four-tabs.png
 !evidence/design/3.7.0/member-comparison.png
 !evidence/design/3.7.0/dark.png
+!evidence/design/3.7.0/review-four-tabs-20261119.png
+!evidence/design/2026-11-14-visual-upgrade/four-tabs.png
+!evidence/design/2026-11-14-visual-upgrade/dark.png
+!evidence/design/2026-11-14-visual-upgrade/member-comparison.png
+!evidence/design/2026-11-14-visual-upgrade/guide-refined.png
 
 # Raw upstream captures (large HTML/JSON bodies); hashes live in evidence/**/manifest files
 evidence/raw/

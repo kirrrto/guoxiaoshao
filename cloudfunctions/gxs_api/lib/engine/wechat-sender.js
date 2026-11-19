@@ -1,5 +1,20 @@
 'use strict';
 
+// WeChat HTTP and SDK adapters use different casing for the same integer.
+// Missing or contradictory evidence must preserve an uncertain send outcome.
+function subscriptionResponseCode(response) {
+  if (!response || typeof response !== 'object' || Array.isArray(response)) return null;
+  let result = null;
+  for (const raw of [response.errcode, response.errCode]) {
+    if (raw == null) continue;
+    if (typeof raw !== 'number' && !(typeof raw === 'string' && /^-?\d+$/.test(raw))) return null;
+    const code = Number(raw);
+    if (!Number.isSafeInteger(code) || (result !== null && result !== code)) return null;
+    result = code;
+  }
+  return result;
+}
+
 /** Consumer-app credentials, never the resource environment's implicit app. */
 function createWechatSender({ appid, appSecret, expectedAppid, fetchImpl = globalThis.fetch, clock = () => new Date(), timeoutMs = 8000 }) {
   let token = null;
@@ -76,7 +91,8 @@ function createWechatSender({ appid, appSecret, expectedAppid, fetchImpl = globa
       });
       if (!response.ok) throw Object.assign(new Error('wechat_message_http_error'), { code: 'wechat_message_http_error' });
       const result = await response.json();
-      if ([40001, 40014, 42001].includes(Number(result && result.errcode))) failAuth(`wechat_token_${Number(result.errcode)}`);
+      const code = subscriptionResponseCode(result);
+      if (accessToken === token && [40001, 40014, 42001].includes(code)) failAuth(`wechat_token_${code}`);
       return result;
     } catch {
       throw Object.assign(new Error('wechat_message_transport_uncertain'), { code: 'wechat_message_transport_uncertain' });
@@ -97,4 +113,4 @@ function createWechatSender({ appid, appSecret, expectedAppid, fetchImpl = globa
   return send;
 }
 
-module.exports = { createWechatSender };
+module.exports = { createWechatSender, subscriptionResponseCode };

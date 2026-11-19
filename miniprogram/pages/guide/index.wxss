@@ -1,6 +1,6 @@
 @import '../../styles/common.wxss';
 .guide-page { max-width: 960px; margin: 0 auto; padding-bottom: calc(40rpx + env(safe-area-inset-bottom)); }
-.guide-section-title { font-size: 32rpx; font-weight: 650; line-height: 1.45; }
+.guide-section-title { font-size: var(--fs-headline); font-weight: 600; line-height: 1.45; }
 
 /* Four stages read as one stepper inside the card they control. */
 .guide-steps-heading { margin-bottom: 22rpx; }
@@ -21,9 +21,9 @@ button.guide-stepper-item.guide-stepper-item--on { color: var(--green-dark); fon
 .guide-step-copy { flex: 1; min-width: 0; }
 .guide-step-title { font-size: 29rpx; font-weight: 600; line-height: 1.5; }
 .guide-step-copy .small { line-height: 1.65; }
-.guide-answer { padding: 0 22rpx 22rpx; line-height: 1.65; }
+.guide-reminder-check .ui-action { background: var(--card); border: 1px solid var(--line); }
+.guide-answer { padding: 4rpx 0 22rpx; line-height: 1.65; }
 .guide-page .btn { height: auto; min-height: 44px; line-height: 1.5; padding: 20rpx 26rpx; white-space: normal; }
-.guide-page .footer-note { line-height: 1.7; }
 .guide-target, .guide-focused-help { overflow-wrap: anywhere; }
 .guide-focused-help .small { line-height: 1.75; }
 
@@ -36,6 +36,6 @@ button.guide-stepper-item.guide-stepper-item--on { color: var(--green-dark); fon
   .guide-step { gap: 12px; margin: 22px 0; }
   .guide-step-number { width: 24px; height: 24px; font-size: 14px; }
   .guide-step-title { font-size: 17px; }
-  .guide-answer { padding: 0 14px 14px; }
+  .guide-answer { padding: 4px 0 14px; }
   .guide-page .btn { padding: 12px 18px; }
 }

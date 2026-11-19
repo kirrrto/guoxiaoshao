@@ -194,6 +194,19 @@ test('parallel dispatchers send a due reminder once and accepted never implies a
   assert.equal(f.repo.tables.get(C.notifications).size, 0);
 });
 
+test('a malformed delivery acknowledgment leaves the deadline uncertain and never resends', async () => {
+  for (const response of [{ errcode: false }, { errCode: ' ' }, 0]) {
+    const f = fixture({ send: async () => response });
+    const item = await f.create(); await f.authorize(item); f.advance(3600000);
+    const stats = await f.run();
+    assert.equal(stats.uncertain, 1);
+    const delivery = ok(await f.call('deadline.list')).items[0].delivery;
+    assert.equal(delivery.status, 'uncertain'); assert.equal(delivery.reason, 'invalid_platform_response');
+    assert.equal(delivery.acceptedAt, null);
+    await f.run(); assert.equal(f.messages.length, 1);
+  }
+});
+
 test('transport ambiguity is never automatically retried and uncertain history can be deleted', async () => {
   const f = fixture({ send: async () => { throw Error('network timeout after handoff'); } }), item = await f.create();
   await f.authorize(item); f.advance(3600000); await f.run(); await f.run();

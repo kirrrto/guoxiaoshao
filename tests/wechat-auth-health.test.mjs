@@ -3,13 +3,22 @@ import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
 
 const require = createRequire(import.meta.url);
-const { createWechatSender } = require('../cloudfunctions/gxs_api/lib/engine/wechat-sender');
+const { createWechatSender, subscriptionResponseCode } = require('../cloudfunctions/gxs_api/lib/engine/wechat-sender');
 const APPID = 'wx-test-consumer';
 const SECRET = 'fake-secret-that-must-not-enter-health';
 const TOKEN = 'fake-token-that-must-not-enter-health';
 const message = { appid: APPID, touser: 'test-openid', templateId: 'test-template', page: 'pages/follow/index', data: {} };
 const response = payload => ({ ok: true, json: async () => payload });
 const options = fetchImpl => ({ appid: APPID, expectedAppid: APPID, appSecret: SECRET, fetchImpl });
+
+test('subscription acknowledgments accept consistent integer codes from either WeChat adapter', () => {
+  assert.equal(subscriptionResponseCode({ errCode: '0' }), 0);
+  assert.equal(subscriptionResponseCode({ errcode: -1, errCode: '-1' }), -1);
+  assert.equal(subscriptionResponseCode({ errcode: '43101' }), 43101);
+  for (const response of [{ errcode: 0, errCode: 43101 }, { errcode: [] }, { errcode: 1.5 }, { errcode: '1e2' }]) {
+    assert.equal(subscriptionResponseCode(response), null);
+  }
+});
 
 function assertSanitized(value) {
   const serialized = JSON.stringify(value);
@@ -128,6 +137,29 @@ test('concurrent probes and a real send share one pending token acquisition', as
   assert.equal(messages[0].body.touser, message.touser);
   assert.equal(messages[0].body.template_id, message.templateId);
   assertSanitized(sender.getHealth());
+});
+
+test('a delayed rejection of an old token leaves the freshly verified sender ready', async () => {
+  let tokenRequests = 0, messageRequests = 0;
+  let signalStarted, finishFirst;
+  const firstStarted = new Promise(resolve => { signalStarted = resolve; });
+  const firstResponse = new Promise(resolve => { finishFirst = resolve; });
+  const sender = createWechatSender(options(async url => {
+    if (url.endsWith('/stable_token')) return response({ access_token: `token-${++tokenRequests}`, expires_in: 7200 });
+    if (++messageRequests === 1) { signalStarted(); return firstResponse; }
+    return response({ errcode: 42001 });
+  }));
+  const first = sender(message);
+  await firstStarted;
+  await sender(message); // Same old token expires while the first request is in flight.
+  assert.equal(sender.getHealth().authReady, false);
+  assert.equal((await sender.probe()).authReady, true);
+  finishFirst(response({ errcode: 42001 }));
+  assert.equal((await first).errcode, 42001);
+  assert.equal(sender.getHealth().authReady, true);
+  await sender.probe();
+  assert.equal(tokenRequests, 2);
+  assert.equal(messageRequests, 2);
 });
 
 test('token expiry removes ready status without contacting any endpoint from getHealth', async () => {

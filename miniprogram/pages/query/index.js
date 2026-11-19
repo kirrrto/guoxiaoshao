@@ -834,7 +834,7 @@ Page({
   },
 
   async onRetryAccount() {
-    if (this.pageRetired || this.connectingAccount) return;
+    if (this.pageRetired || this.connectingAccount || this.refreshPending || this.data.signing || this.data.querying) return;
     this.connectingAccount = true;
     this.beginAccountVerification();
     try { this.applyBoot(await getBootstrap({ force: true })); if (!this.pageRetired) this.startFollowPolling(); }
@@ -964,7 +964,7 @@ Page({
   },
 
   async onQuery() {
-    if (this.pageRetired || this.data.sheetVisible || this.data.signing || this.data.querying) return;
+    if (this.pageRetired || this.accountVerificationPending || this.data.sheetVisible || this.data.signing || this.data.querying) return;
     const selection = this.readPickerSelection();
     if (this.selectionNeedsReview) {
       if (this.data.limitedQueryRecovery) return this.performQuery(selection);
@@ -976,7 +976,7 @@ Page({
   },
 
   onRequery() {
-    if (this.pageRetired || this.data.signing || this.data.querying || this.data.sheetVisible) return;
+    if (this.pageRetired || this.accountVerificationPending || this.data.signing || this.data.querying || this.data.sheetVisible) return;
     const result = this.data.result;
     if (!result) return;
     topUpReminderCredit();
@@ -984,7 +984,7 @@ Page({
   },
 
   async performQuery(selection) {
-    if (this.pageRetired || this.data.querying || this.data.signing) return;
+    if (this.pageRetired || this.accountVerificationPending || this.data.querying || this.data.signing) return;
     if (!this.data.boot) return toast('账户正在连接，请稍后再试');
     const boot = this.data.boot;
     const accountEpoch = this.accountEpoch || 0;

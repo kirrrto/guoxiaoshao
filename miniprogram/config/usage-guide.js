@@ -1,15 +1,13 @@
-// Original product guidance; external pickup steps checked against Apple China
-// shopping help on 2026-10-11. Do not promise stock reservations or delivery.
+// Pickup instructions refer to the Apple China store. Stock observations do not reserve an item.
 module.exports = {
-  checkedOn: '2026-10-11',
   stages: [
     { id: 'prepare', label: '选购准备', title: '先选好想要的配置', note: '提前确认目标配置与取货门店。', action: 'query', actionText: '去选择配置与门店', steps: [
       { title: '确定型号、颜色与容量', text: '在 Apple 官方渠道核对配置与售价，提前备好 Apple 账户、取货人信息与付款方式。' },
       { title: '选择方便前往的门店', text: '在果小哨选中对应配置与门店；标为「尚未开放取货」的配置需等待接口开放。' },
-      { title: '先看一次查询结果', text: '同时看状态与观测时间：「待确认」不等于无货，「可取货」也不代表已锁定库存。' },
+      { title: '查询或直接关注', text: '选好配置和门店即可直接关注。查询时请看门店观测时间：「待确认」不等于无货，「可取货」也不会锁定库存。' },
     ] },
     { id: 'monitor', label: '开启小哨', title: '让提醒真正准备好', note: '开通会员后，保存关注并完成微信授权。', action: 'follow', actionText: '去检查小哨状态', steps: [
-      { title: '保存想关注的配置', text: '在「小哨」启用关注（周卡 3×3、月卡 4×4、年卡 5×5），当前名额可在「我的」查看。' },
+      { title: '保存想关注的配置', text: '在「小哨」启用关注。「我的」会员卡会显示可关注的配置数，以及每个配置可选的门店数。' },
       { title: '允许微信提醒', text: '主动点击「补充提醒次数」授权接收；微信提醒授权与查询次数分开计算。' },
       { title: '检查提醒条件', text: '确认关注已开启、会员有效、授权充足且不在免打扰时段；可发测试消息验证（扣 1 次查询额度）。' },
     ] },

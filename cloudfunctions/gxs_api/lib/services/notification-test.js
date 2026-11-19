@@ -3,7 +3,7 @@ const { randomUUID } = require('node:crypto');
 const { ApiError } = require('../errors');
 const { ensureUser, quotaSnapshot } = require('./users');
 const { isValidTemplateId } = require('../config');
-const { createWechatSender } = require('../engine/wechat-sender');
+const { createWechatSender, subscriptionResponseCode } = require('../engine/wechat-sender');
 const { buildMessage } = require('../engine/notifier');
 const PAGE = 'pages/notification-test/index';
 const validId = value => typeof value === 'string' && /^[A-Za-z0-9_-]{8,64}$/.test(value);
@@ -90,11 +90,10 @@ async function send(ctx, payload) {
     if (timeoutMs < 1000) throw { definitelyNotSent: true, code: 'test_send_deadline' };
     const response = await sender({ ...testMessage(begun.record, ctx.config), appid: user.appid, touser: user.openid,
       miniprogramState: ctx.config.notifications.miniprogramState || 'formal', lang: 'zh_CN' }, { timeoutMs });
-    const code = response && (response.errcode ?? response.errCode);
-    const validCode = (typeof code === 'number' || typeof code === 'string' && /^-?\d+$/.test(code)) && Number.isSafeInteger(Number(code));
-    outcome = !validCode ? { status: 'uncertain', reason: 'invalid_platform_response' }
-      : Number(code) === 0 ? { status: 'accepted', reason: null }
-      : { status: 'failed', reason: Number(code) === 43101 ? 'needs_authorization' : `wx_${Number(code)}` };
+    const code = subscriptionResponseCode(response);
+    outcome = code === null ? { status: 'uncertain', reason: 'invalid_platform_response' }
+      : code === 0 ? { status: 'accepted', reason: null }
+      : { status: 'failed', reason: code === 43101 ? 'needs_authorization' : `wx_${code}` };
   } catch (error) {
     outcome = { status: error && error.definitelyNotSent ? 'failed' : 'uncertain', reason: error && error.definitelyNotSent ? 'not_sent' : 'transport_unknown' };
   }

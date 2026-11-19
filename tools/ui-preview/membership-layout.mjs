@@ -58,8 +58,14 @@ export function inspectMembershipLayout(expected = null) {
         if (expected.active) {
           const pass = header.querySelector('.member-pass');
           if (!visible(pass) || !visible(pass.querySelector('.account-title'))) errors.push('Active membership title is missing');
-          if (pass && membership && getComputedStyle(pass).backgroundColor !== getComputedStyle(membership).backgroundColor) {
-            errors.push('Membership identity must share the account surface in both themes');
+          if (pass && membership) {
+            const surface = getComputedStyle(membership), inner = getComputedStyle(pass);
+            if (inner.backgroundColor !== 'rgba(0, 0, 0, 0)' || inner.backgroundImage !== 'none' || surface.backgroundColor === 'rgba(0, 0, 0, 0)') {
+              errors.push('Membership identity needs one card with a solid fallback behind its gradient');
+            }
+            if (membership.classList.contains('membership-annual') !== (expected.currentPlanId === 'member_365d')) {
+              errors.push('The gold annual card must follow the current plan');
+            }
           }
           const mark = pass?.querySelector('img.member-pass-brand');
           if (!visible(mark) || !mark.complete || mark.naturalWidth !== 96 || mark.naturalHeight !== 96 || mark.getAttribute('aria-label') !== '果小哨会员标志') {

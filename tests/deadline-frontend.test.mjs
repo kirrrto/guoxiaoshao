@@ -59,11 +59,101 @@ test('storage failure prevents a write whose recovery identity cannot be persist
   assert.equal(page.data.busy, false); assert.ok(page.data.formError);
 });
 
+test('unreadable recovery storage cannot enable a new write over an earlier pending operation', async () => {
+  const { rt, page } = await setup();
+  const earlier = { action: 'deadline.create', payload: { expectedUserKey: 'alice', requestId: 'earlier' } };
+  rt.wx.setStorageSync('gxs_deadline_pending_v1', { alice: earlier });
+  const read = rt.wx.getStorageSync;
+  rt.wx.getStorageSync = () => { throw Error('storage unavailable'); };
+  await page.load();
+  assert.equal(page.data.serviceAvailable, false);
+  rt.wx.getStorageSync = read;
+  fill(page); await page.onSave();
+  assert.equal(rt.calls.some(call => call.action === 'deadline.create'), false);
+  await page.load();
+  assert.equal(page.data.serviceAvailable, true);
+  assert.equal(page.data.pending, true);
+  assert.equal(page.pendingOperation.payload.requestId, earlier.payload.requestId);
+});
+
 test('a definitive save error remains visible after refreshing and preserves the draft', async () => {
   const { page } = await setup(action => action === 'deadline.list' ? list() : Promise.reject(Object.assign(Error('提醒已变化，请刷新后重试'), { code: 'deadline_revision_conflict' })));
   fill(page); await page.onSave();
   assert.equal(page.data.pending, false); assert.equal(page.data.editing, true);
   assert.match(page.data.error, /提醒已变化/); assert.equal(page.data.draft.title, '会员续费');
+});
+
+test('saving a duplicate title offers WeChat authorization for the saved record only', async () => {
+  const older = { ...item, title: '会员续费' };
+  const saved = { ...older, id: 'deadline_two', revision: 2 };
+  const { page, rt } = await setup(action => action === 'deadline.list' ? list([older, saved])
+    : { userKey: 'alice', item: saved });
+  fill(page);
+  await page.onSave();
+  const modal = rt.messages.find(message => message.title === '开启微信提醒');
+  assert.ok(modal);
+  modal.success({ confirm: true });
+  await settle();
+  const auth = rt.calls.find(call => call.action === 'deadline.authorize');
+  assert.equal(auth.payload.id, saved.id);
+  assert.equal(auth.payload.revision, saved.revision);
+});
+
+test('a rejected save, newer revision or hidden page never offers a different reminder', async () => {
+  const saved = { ...item, title: '会员续费' };
+  for (const scenario of ['rejected', 'newRevision', 'hidden']) {
+    const write = deferred();
+    const current = { ...saved, revision: scenario === 'newRevision' ? 2 : 1 };
+    const { page, rt } = await setup(action => action === 'deadline.list' ? list([current]) : write.promise);
+    fill(page);
+    const saving = page.onSave();
+    if (scenario === 'hidden') page.onHide();
+    if (scenario === 'rejected') write.reject(Object.assign(Error('已达上限'), { code: 'deadline_limit' }));
+    else write.resolve({ userKey: 'alice', item: saved });
+    await saving;
+    assert.equal(rt.messages.some(message => message.title === '开启微信提醒'), false, scenario);
+  }
+});
+
+test('changing accounts before confirming a saved reminder never opens the native permission prompt', async () => {
+  const saved = { ...item, title: '会员续费' };
+  const { page, rt } = await setup(action => action === 'deadline.list' ? list([saved])
+    : { userKey: 'alice', item: saved });
+  fill(page); await page.onSave();
+  const modal = rt.messages.find(message => message.title === '开启微信提醒');
+  assert.ok(modal);
+  let nativePrompts = 0;
+  rt.wx.requestSubscribeMessage = () => { nativePrompts++; };
+  rt.app.globalData.bootstrap = { identity: { userKey: 'bob' } };
+  modal.success({ confirm: true });
+  page.onAuthorize({ currentTarget: { dataset: { id: saved.id } } });
+  assert.equal(nativePrompts, 0);
+});
+
+test('storage cleanup failures retain the original deadline operation for a safe retry', async () => {
+  for (const rejectWrite of [false, true]) {
+    const { page, rt } = await setup(action => {
+      if (action === 'deadline.list') return list();
+      if (rejectWrite) throw Object.assign(Error('已达上限'), { code: 'deadline_limit' });
+      return { userKey: 'alice', item };
+    });
+    const save = rt.wx.setStorageSync;
+    let storageFull = true;
+    rt.wx.setStorageSync = (key, value) => {
+      if (storageFull && !value.alice) throw Error('storage full');
+      save(key, value);
+    };
+    fill(page); await page.onSave();
+    assert.ok(page.data.pending);
+    assert.equal(page.data.busy, false);
+    assert.match(page.data.error, /存储/);
+    const requestId = page.pendingOperation.payload.requestId;
+    storageFull = false;
+    await page.onRetryPending();
+    const writes = rt.calls.filter(call => call.action === 'deadline.create');
+    assert.deepEqual(writes.map(call => call.payload.requestId), [requestId, requestId]);
+    assert.equal(page.data.pending, false);
+  }
 });
 
 test('native authorization is called synchronously from the tap and a failed sync reuses the original result without a second prompt', async () => {
@@ -204,6 +294,51 @@ test('a definitive authorization rejection clears the receipt and shows the serv
   assert.equal(page.data.pending, false); assert.equal(page.data.busy, false);
   assert.equal(rt.storage.get('gxs_deadline_pending_v1').alice, undefined);
   assert.match(page.data.error, /提醒已变化/);
+});
+
+test('a deadline delete confirmation expires on hide, refresh, or account change', async () => {
+  const tap = { currentTarget: { dataset: { id: item.id } } };
+  for (const change of ['hide', 'reload', 'switch']) {
+    const { page, rt } = await setup(() => list([item]));
+    page.onRemove(tap);
+    const modal = rt.messages.at(-1);
+    if (change === 'hide') page.onHide();
+    else if (change === 'reload') await page.load();
+    else rt.app.globalData.bootstrap = { identity: { userKey: 'bob' } };
+    modal.success({ confirm: true }); await settle();
+    assert.equal(rt.calls.some(call => call.action === 'deadline.remove'), false, change);
+  }
+});
+
+test('an old deadline delete confirmation cannot replace an unconfirmed save receipt', async () => {
+  const { page, rt } = await setup(action => {
+    if (action === 'deadline.list') return list([item]);
+    throw Object.assign(Error('timeout'), { code: 'call_failed' });
+  });
+  page.onRemove({ currentTarget: { dataset: { id: item.id } } });
+  const modal = rt.messages.at(-1);
+  fill(page); await page.onSave();
+  const original = JSON.stringify(page.pendingOperation);
+  assert.equal(page.pendingOperation.action, 'deadline.create');
+  modal.success({ confirm: true }); await settle();
+  assert.equal(rt.calls.some(call => call.action === 'deadline.remove'), false);
+  assert.equal(JSON.stringify(rt.storage.get('gxs_deadline_pending_v1').alice), original);
+});
+
+test('repeat taps share one deadline delete confirmation and a fresh confirmation can delete once', async () => {
+  const { page, rt } = await setup(action => action === 'deadline.list' ? list([item]) : {});
+  const tap = { currentTarget: { dataset: { id: item.id } } };
+  page.onRemove(tap); page.onRemove(tap);
+  assert.equal(rt.messages.length, 1);
+  const first = rt.messages[0];
+  page.onHide(); await page.onShow(); page.onRemove(tap);
+  const fresh = rt.messages.at(-1);
+  assert.notEqual(first, fresh);
+  first.success({ confirm: true }); first.fail({});
+  assert.equal(rt.calls.some(call => call.action === 'deadline.remove'), false);
+  fresh.success({ confirm: true }); await settle(); fresh.success({ confirm: true });
+  assert.deepEqual(rt.calls.filter(call => call.action === 'deadline.remove').map(call => call.payload),
+    [{ id: item.id, revision: item.revision, expectedUserKey: 'alice' }]);
 });
 
 test('missing native callbacks time out after 30 seconds and permit refresh after a page return', async () => {

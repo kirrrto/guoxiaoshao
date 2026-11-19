@@ -202,7 +202,7 @@
       <view wx:if="{{queryNotice}}" class="banner banner-{{queryNotice.tone === 'ok' ? 'ok' : queryNotice.tone === 'warn' ? 'warn' : 'info'}} small">
         <text>{{queryNotice.text}}</text>
         <button wx:if="{{queryNotice.action === 'open_settings'}}" class="ui-action" bindtap="onOpenSubscribeSetting">前往微信设置</button>
-        <button wx:elif="{{queryNotice.action === 'refresh'}}" class="ui-action" bindtap="onRequery">刷新状态</button>
+        <button wx:elif="{{queryNotice.action === 'refresh'}}" class="ui-action" loading="{{!accountReady && !accountError}}" disabled="{{querying || signing || refreshing || (!accountReady && !accountError)}}" bindtap="onRetryAccount">刷新状态</button>
       </view>
     </view>
     <view wx:if="{{resumeSetup}}" class="card journey-resume">

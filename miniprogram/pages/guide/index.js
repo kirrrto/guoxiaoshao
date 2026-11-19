@@ -7,6 +7,17 @@ const { VERSION } = require('../../config/version');
 const { shareAppMessage, shareTimeline } = require('../../utils/share');
 const SECTIONS = ['pickup', 'notification', 'membership', 'prepare', 'monitor', 'faq', 'history'];
 const ERROR_CODES = ['needs_authorization', 'subscription_rejected', 'subscription_disabled', 'notification_test_account_changed', 'call_failed', 'test_request_timeout', 'insufficient_credits'];
+const orderingStage = guide.stages.find(stage => stage.id === 'notice');
+const pickupOrderingStage = {
+  ...orderingStage,
+  title: '核对配置，前往官方下单',
+  note: '适用于 Apple 中国大陆官方商店；门店可取货情况以结账页面为准。',
+  steps: [{ title: '核对配置、门店与观测时间', text: '选择与查询结果相同的型号、容量和颜色，并确认目标门店。供应可能已变化，果小哨不会锁定库存。' }, ...orderingStage.steps.slice(1)],
+  pickupSteps: guide.stages.find(stage => stage.id === 'pickup').steps,
+};
+function findStage(id, section) {
+  return section === 'pickup' && id === 'notice' ? pickupOrderingStage : guide.stages.find(stage => stage.id === id);
+}
 function readGuideTarget(options) {
   if (typeof options.gxsPart !== 'string' || options.gxsPart.length > 80 || typeof options.gxsStores !== 'string' || options.gxsStores.length > 160) return null;
   try {
@@ -20,17 +31,13 @@ function readGuideTarget(options) {
 
 Page({
   data: { stages: guide.stages, stage: guide.stages[0], stageId: 'prepare', faqs: guide.faqs,
-    faqOpen: '', checkedOn: guide.checkedOn,
-    section: '', focusedFaq: null, targetSummary: null, returnLabel: '返回提醒中心', pickupSteps: guide.stages.find(item => item.id === 'pickup').steps },
+    faqOpen: '', section: '', focusedFaq: null, targetSummary: null, returnLabel: '返回提醒中心' },
   onLoad(options = {}) {
     // Previously shared calendar links now lead directly to the buying guide.
     const section = options.section === 'calendar' ? 'prepare' : SECTIONS.includes(options.section) ? options.section : '';
     const stageId = section === 'pickup' ? 'notice' : section === 'notification' || section === 'monitor' ? 'monitor'
       : section === 'prepare' ? 'prepare' : options.stage;
-    let stage = guide.stages.find(item => item.id === stageId) || guide.stages[0];
-    if (section === 'pickup') stage = { ...stage, title: '核对配置，前往官方下单',
-      note: '适用于 Apple 中国大陆官方商店；门店可取货情况以结账页面为准。',
-      steps: [{ title: '核对配置、门店与观测时间', text: '选择与查询结果相同的型号、容量和颜色，并确认目标门店。供应可能已变化，果小哨不会锁定库存。' }, ...stage.steps.slice(1)] };
+    const stage = findStage(stageId, section) || guide.stages[0];
     this.returnSource = sourceOf(options.from);
     this.returnOwner = currentOwner();
     this.sharedTarget = readGuideTarget(options);
@@ -57,7 +64,7 @@ Page({
     this.setData({ targetSummary: valid ? { title: product.title, stores: target.storeNumbers.map(number => storeLabel(number, stores[number].name)).join('、') } : null });
   },
   onSelectStage(event) {
-    const stage = guide.stages.find(item => item.id === event.currentTarget.dataset.id);
+    const stage = findStage(event.currentTarget.dataset.id, this.data.section);
     if (stage) this.setData({ stage, stageId: stage.id });
   },
   onToggleFaq(event) {

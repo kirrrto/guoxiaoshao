@@ -1,0 +1,489 @@
+{
+  "version": "3.7.0",
+  "checkedAt": "2026-11-19T15:44:55.005Z",
+  "scope": "Local retest of the four WeChat quality findings. No cloud-test task, real-device capture, new upload, or release.",
+  "devTools": "2.02.2611132",
+  "baselines": {
+    "uploaded": {
+      "revision": "71079f7748fd8f25b4fad0bd8b5c9fd7e0db09c6",
+      "uploadedAtUtc": "2026-11-13T15:45:54Z",
+      "compiledBytes": 1127884,
+      "sourceFingerprint": "sha256:e7f9a3c0bcac599ee8dd56e1e01456addde313e1e39cb79d2985eb5118dbdab2"
+    },
+    "working": {
+      "sourceFingerprint": "sha256:a473b8e8e69d4fcbcdea37890df16765eb1b53cb3197a90dbd475e0163dcd6b4",
+      "includesUncommittedChanges": true
+    }
+  },
+  "findings": {
+    "unused-channel-video": {
+      "compiledBusinessTagCounts": {
+        "pages/follow/index": 4,
+        "pages/history/index": 3,
+        "pages/mine/index": 3,
+        "pages/guide/index": 0
+      },
+      "compiledPagesWithChannelVideo": 0,
+      "emptyPageSdkControls": [
+        {
+          "sdk": "3.17.3",
+          "sourceFingerprint": "sha256:e7f9a3c0bcac599ee8dd56e1e01456addde313e1e39cb79d2985eb5118dbdab2",
+          "output": {
+            "page": "pages/empty/index",
+            "component": "channel-video",
+            "len": 1
+          },
+          "passingPositiveAndNegativeControls": 4
+        },
+        {
+          "sdk": "3.17.3",
+          "sourceFingerprint": "sha256:a473b8e8e69d4fcbcdea37890df16765eb1b53cb3197a90dbd475e0163dcd6b4",
+          "output": {
+            "page": "pages/empty/index",
+            "component": "channel-video",
+            "len": 1
+          },
+          "passingPositiveAndNegativeControls": 4
+        },
+        {
+          "sdk": "3.17.5",
+          "sourceFingerprint": "sha256:a473b8e8e69d4fcbcdea37890df16765eb1b53cb3197a90dbd475e0163dcd6b4",
+          "output": {
+            "page": "pages/empty/index",
+            "component": "channel-video",
+            "len": 1
+          },
+          "passingPositiveAndNegativeControls": 4
+        },
+        {
+          "sdk": "3.17.6",
+          "sourceFingerprint": "sha256:a473b8e8e69d4fcbcdea37890df16765eb1b53cb3197a90dbd475e0163dcd6b4",
+          "output": {
+            "page": "pages/empty/index",
+            "component": "channel-video",
+            "len": 1
+          },
+          "passingPositiveAndNegativeControls": 4
+        }
+      ],
+      "conclusion": "The flagged component is reproducible on the SDK control page with no app code. The tested business templates do not declare or compile it."
+    },
+    "custom-tabbar-first-switch": {
+      "routes": {
+        "uploaded": {
+          "simulatorSdk": "3.17.3",
+          "readyTabRoutes": [
+            "pages/query/index",
+            "pages/follow/index",
+            "pages/history/index",
+            "pages/mine/index",
+            "pages/query/index"
+          ],
+          "guideRoute": "pages/guide/index",
+          "offlineGeometry": {
+            "light": {
+              "total": 336,
+              "failed": 0
+            },
+            "dark": {
+              "total": 336,
+              "failed": 0
+            }
+          },
+          "offlineDirectedSwitches": 12,
+          "unrequestedTabBarVisibilityCommands": 0,
+          "pixelExactComparison": [
+            {
+              "from": "query",
+              "to": "follow",
+              "samples": 6,
+              "exactlyMatchingEitherEndpoint": 4,
+              "finalSelectionCorrect": true
+            },
+            {
+              "from": "follow",
+              "to": "history",
+              "samples": 6,
+              "exactlyMatchingEitherEndpoint": 6,
+              "finalSelectionCorrect": true
+            },
+            {
+              "from": "history",
+              "to": "mine",
+              "samples": 6,
+              "exactlyMatchingEitherEndpoint": 6,
+              "finalSelectionCorrect": true
+            },
+            {
+              "from": "mine",
+              "to": "query",
+              "samples": 6,
+              "exactlyMatchingEitherEndpoint": 6,
+              "finalSelectionCorrect": true
+            }
+          ],
+          "visibleIconAndLabelSamples": 20,
+          "minIconMaskOverlap": 1,
+          "minLabelMaskOverlap": 1,
+          "maxSampleGapMs": 1534
+        },
+        "working": {
+          "simulatorSdk": "3.17.3",
+          "readyTabRoutes": [
+            "pages/query/index",
+            "pages/follow/index",
+            "pages/history/index",
+            "pages/mine/index",
+            "pages/query/index"
+          ],
+          "guideRoute": "pages/guide/index",
+          "offlineGeometry": {
+            "light": {
+              "total": 336,
+              "failed": 0
+            },
+            "dark": {
+              "total": 336,
+              "failed": 0
+            }
+          },
+          "offlineDirectedSwitches": 12,
+          "unrequestedTabBarVisibilityCommands": 0,
+          "pixelExactComparison": [
+            {
+              "from": "query",
+              "to": "follow",
+              "samples": 6,
+              "exactlyMatchingEitherEndpoint": 3,
+              "finalSelectionCorrect": true
+            },
+            {
+              "from": "follow",
+              "to": "history",
+              "samples": 6,
+              "exactlyMatchingEitherEndpoint": 6,
+              "finalSelectionCorrect": true
+            },
+            {
+              "from": "history",
+              "to": "mine",
+              "samples": 6,
+              "exactlyMatchingEitherEndpoint": 6,
+              "finalSelectionCorrect": true
+            },
+            {
+              "from": "mine",
+              "to": "query",
+              "samples": 6,
+              "exactlyMatchingEitherEndpoint": 6,
+              "finalSelectionCorrect": true
+            }
+          ],
+          "visibleIconAndLabelSamples": 20,
+          "minIconMaskOverlap": 1,
+          "minLabelMaskOverlap": 1,
+          "maxSampleGapMs": 1533
+        }
+      },
+      "method": "First visits after freshly opening the project in WeChat DevTools. Compared fixed crops of the four icons and labels with the source and destination tab, including intermediate samples. Pixel differences are reported separately from visibility. The capture cadence cannot rule out a single-frame flash on a phone.",
+      "firstQueryToFollow": {
+        "method": "Measured selected-state RGB changes for query/follow icon and label regions separately, comparing to settled pre/post colors. All text and icon silhouettes remained visible. DevTools capture gap exceeds the duration of individual display frames.",
+        "results": {
+          "uploaded": {
+            "samples": 5,
+            "sampledMsWithNewLabelAndPreviousIcon": [
+              912,
+              1844
+            ],
+            "finalLabelAndIconCorrect": true,
+            "allFourIconsAndLabelsVisible": true
+          },
+          "working": {
+            "samples": 5,
+            "sampledMsWithNewLabelAndPreviousIcon": [
+              911
+            ],
+            "finalLabelAndIconCorrect": true,
+            "allFourIconsAndLabelsVisible": true
+          },
+          "emptyPages": {
+            "samples": 5,
+            "sampledMsWithNewLabelAndPreviousIcon": [
+              999
+            ],
+            "finalLabelAndIconCorrect": true,
+            "allFourIconsAndLabelsVisible": true
+          },
+          "emptyPagesWithEightDecodedNativeIcons": {
+            "samples": 5,
+            "sampledMsWithNewLabelAndPreviousIcon": [],
+            "finalLabelAndIconCorrect": true,
+            "allFourIconsAndLabelsVisible": true
+          }
+        },
+        "control": "Four otherwise empty pages, no page logic, network calls, custom tab bar, or navigation code; used the same packaged native tab icons, colors and routes. The separate preload control fully decoded all eight native tab images before the first switch.",
+        "timedControls": {
+          "method": "Fresh DevTools projects for each run. The same four empty pages, same eight icons and same native-tab settings were used for all arms. The preload arm waited for wx.getImageInfo on all eight tab icons; the placebo arm did the same number of local image reads on an unrelated product image. All arms targeted the same app-launch age for each group. The 500 ms series uses a reference picture from the same source to allow switching before the screenshot API finishes its first capture. A zero count means no mismatch was seen at the sampled instants.",
+          "trials": [
+            {
+              "arm": "preload",
+              "switchAfterLaunchMs": 504,
+              "sampleCompletionMsAfterSwitch": [
+                1020,
+                1908,
+                2752,
+                3586
+              ],
+              "framesWithNewLabelAndPriorIcon": 0
+            },
+            {
+              "arm": "untreated",
+              "switchAfterLaunchMs": 504,
+              "sampleCompletionMsAfterSwitch": [
+                1066,
+                1892,
+                2736,
+                3596
+              ],
+              "framesWithNewLabelAndPriorIcon": 0
+            },
+            {
+              "arm": "placebo",
+              "switchAfterLaunchMs": 502,
+              "sampleCompletionMsAfterSwitch": [
+                937,
+                1827,
+                2691,
+                3576
+              ],
+              "framesWithNewLabelAndPriorIcon": 0
+            },
+            {
+              "arm": "untreated",
+              "switchAfterLaunchMs": 505,
+              "sampleCompletionMsAfterSwitch": [
+                994,
+                1855,
+                2716,
+                3588
+              ],
+              "framesWithNewLabelAndPriorIcon": 0
+            },
+            {
+              "arm": "preload",
+              "switchAfterLaunchMs": 505,
+              "sampleCompletionMsAfterSwitch": [
+                993,
+                1851,
+                2718,
+                3578
+              ],
+              "framesWithNewLabelAndPriorIcon": 0
+            },
+            {
+              "arm": "untreated",
+              "switchAfterLaunchMs": 1406,
+              "sampleCompletionMsAfterSwitch": [
+                962,
+                1837,
+                2711,
+                3572
+              ],
+              "framesWithNewLabelAndPriorIcon": 0
+            },
+            {
+              "arm": "preload",
+              "switchAfterLaunchMs": 1402,
+              "sampleCompletionMsAfterSwitch": [
+                946,
+                1834,
+                2686,
+                3537
+              ],
+              "framesWithNewLabelAndPriorIcon": 0
+            },
+            {
+              "arm": "placebo",
+              "switchAfterLaunchMs": 1403,
+              "sampleCompletionMsAfterSwitch": [
+                1121,
+                2015,
+                2888,
+                3738
+              ],
+              "framesWithNewLabelAndPriorIcon": 0
+            },
+            {
+              "arm": "preload",
+              "switchAfterLaunchMs": 1421,
+              "sampleCompletionMsAfterSwitch": [
+                1062,
+                1960,
+                2902,
+                3751
+              ],
+              "framesWithNewLabelAndPriorIcon": 0
+            },
+            {
+              "arm": "untreated",
+              "switchAfterLaunchMs": 1404,
+              "sampleCompletionMsAfterSwitch": [
+                999,
+                1876,
+                2727,
+                3568
+              ],
+              "framesWithNewLabelAndPriorIcon": 0
+            },
+            {
+              "arm": "placebo",
+              "switchAfterLaunchMs": 4203,
+              "sampleCompletionMsAfterSwitch": [
+                1042,
+                1909,
+                2766,
+                3617
+              ],
+              "framesWithNewLabelAndPriorIcon": 0
+            },
+            {
+              "arm": "preload",
+              "switchAfterLaunchMs": 4203,
+              "sampleCompletionMsAfterSwitch": [
+                978,
+                1839,
+                2708,
+                3573
+              ],
+              "framesWithNewLabelAndPriorIcon": 0
+            },
+            {
+              "arm": "untreated",
+              "switchAfterLaunchMs": 4204,
+              "sampleCompletionMsAfterSwitch": [
+                933,
+                1815,
+                2671,
+                3542
+              ],
+              "framesWithNewLabelAndPriorIcon": 0
+            },
+            {
+              "arm": "untreated",
+              "switchAfterLaunchMs": 4204,
+              "sampleCompletionMsAfterSwitch": [
+                941,
+                1824,
+                2766,
+                3636
+              ],
+              "framesWithNewLabelAndPriorIcon": 0
+            },
+            {
+              "arm": "preload",
+              "switchAfterLaunchMs": 4205,
+              "sampleCompletionMsAfterSwitch": [
+                986,
+                1849,
+                2683,
+                3521
+              ],
+              "framesWithNewLabelAndPriorIcon": 0
+            },
+            {
+              "arm": "placebo",
+              "switchAfterLaunchMs": 4208,
+              "sampleCompletionMsAfterSwitch": [
+                1123,
+                1983,
+                2943,
+                3792
+              ],
+              "framesWithNewLabelAndPriorIcon": 0
+            }
+          ]
+        },
+        "conclusion": "A transient icon/label color mismatch appeared in the app and an empty native-tab fixture. At matched navigation ages of about 0.5, 1.4 and 4.2 s, none of the 16 control trials sampled the mismatch, including runs without preloading. A benefit from adding startup image reads was not established. Check live native rendering on phones."
+      }
+    },
+    "oversized-product-image": {
+      "mappedSkuCount": 397,
+      "packagedImageCount": 119,
+      "packagedTotalBytes": 145377,
+      "cardCount": 118,
+      "maxCardEdgePx": 96,
+      "cardByteRange": [
+        466,
+        2145
+      ],
+      "historicalSource": {
+        "width": 940,
+        "height": 1112,
+        "bytes": 684465
+      },
+      "currentCard": {
+        "width": 81,
+        "height": 96,
+        "bytes": 1098,
+        "format": "PNG"
+      }
+    },
+    "legacy-product-image-format": {
+      "actualFormats": {
+        "JPEG": 76,
+        "PNG": 43
+      },
+      "localPackOptionsFilesAccepted": 119,
+      "decoded": 119,
+      "wxGetImageInfo": {
+        "uploaded": {
+          "count": 119,
+          "failed": [],
+          "types": [
+            "jpeg",
+            "png"
+          ],
+          "historical": {
+            "name": "294849ca5d8591836437-card.png",
+            "w": 81,
+            "h": 96,
+            "type": "png"
+          }
+        },
+        "working": {
+          "count": 119,
+          "failed": [],
+          "types": [
+            "jpeg",
+            "png"
+          ],
+          "historical": {
+            "name": "294849ca5d8591836437-card.png",
+            "w": 81,
+            "h": 96,
+            "type": "png"
+          }
+        }
+      },
+      "manifestSha256": "d43c30245439d98d69890b7a5b8996ad65d8a7430e3537037ad3eb6e6318bf9e"
+    }
+  },
+  "workingTreeChecks": {
+    "tests": 1976,
+    "passed": 1976,
+    "failed": 0,
+    "skipped": 0,
+    "cancelled": 0,
+    "sourceChecksPassed": true,
+    "openOfficialFindings": [
+      "unused-channel-video",
+      "custom-tabbar-first-switch",
+      "oversized-product-image",
+      "legacy-product-image-format"
+    ]
+  },
+  "remaining": [
+    "Select the intended build by upload time and run a WeChat quality task against that build. Retain task ID, report, devices and SDK versions.",
+    "On the same experience build, record cold launch and the first query → follow → history → mine → query switches on iOS and Android. Check for disappearance and an icon retaining its prior selection color after the label changes. Visually inspect iPhone Duo starlight in the selector, query and follow views."
+  ]
+}

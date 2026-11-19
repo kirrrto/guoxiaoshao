@@ -1,23 +1,22 @@
 .notice-page { padding-bottom: 40rpx; }
 .notice-heading { display: flex; align-items: center; gap: 16rpx; }
 .notice-heading .brand-page-copy { flex: 1; min-width: 0; }
-.notice-heading .ui-action { flex: none; }
+.notice-heading .ui-action { flex: none; background: transparent; color: var(--text-2); padding: 8rpx 4rpx; }
 .notice-service-footer { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12rpx; margin-top: 16rpx; }
-.notice-card-meta { display: flex; flex-wrap: wrap; gap: 8rpx 16rpx; margin-bottom: 14rpx; font-size: 22rpx; line-height: 1.6; color: var(--text-2); }
+.notice-card-meta { display: flex; flex-wrap: wrap; gap: 8rpx 16rpx; margin-bottom: 14rpx; font-size: max(12px, 22rpx); line-height: 1.6; color: var(--text-2); }
 
 .empty-notice-title {
   font-size: 32rpx;
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.5;
   margin-bottom: 8rpx;
 }
 
 .notice-card {
   margin-bottom: 16rpx;
-  border-left: 6rpx solid var(--green-dark);
 }
 .notice-card--warn {
-  border-left-color: var(--warn);
+  border-left: 4rpx solid var(--warn);
 }
 
 .notice-card-head {
@@ -31,20 +30,19 @@
 
 .notice-card-title {
   font-size: 30rpx;
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.5;
+  color: var(--text);
   flex: 1 1 auto;
   min-width: 0;
 }
 
 .notice-card-text {
-  font-size: 27rpx;
+  font-size: max(12px, 27rpx);
   line-height: 1.7;
   color: var(--text);
   overflow-wrap: anywhere;
   white-space: pre-wrap;
 }
 
-.notice-card--info .notice-card-title { color: var(--green-dark); }
-.notice-card--ok .notice-card-title { color: var(--green-dark); }
 .notice-card--warn .notice-card-title { color: var(--warn); }

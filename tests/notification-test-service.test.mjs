@@ -52,7 +52,7 @@ for (const outcome of [{ response: { errcode: 43101 }, reason: 'needs_authorizat
   });
 }
 
-for (const response of [null, {}, { errcode: null }, { errcode: '' }, { errcode: false }]) {
+for (const response of [null, 0, {}, { errcode: null }, { errcode: '' }, { errcode: false }]) {
   test(`malformed provider response ${JSON.stringify(response)} stays uncertain without a refund or resend`, async () => {
     const f = await notificationFixture({ send: async () => response }); await f.authorize();
     const result = ok(await f.call('notificationTest.send', { requestId: REQUEST }));

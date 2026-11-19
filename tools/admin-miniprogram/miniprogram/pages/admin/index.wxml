@@ -35,20 +35,20 @@
     <view class="card">
       <view class="card-title"><text>真实付费与首付队列（近 30 天）</text></view>
       <view wx:if="{{!growth}}" class="small muted">按真实订单证据、首个有效目标和成熟观察期核对；仅按需读取，不影响用户查询。</view>
-      <view wx:for="{{growth.lines}}" wx:key="*this" class="small">{{item}}</view>
+      <block wx:else><view wx:for="{{growth.lines}}" wx:key="*this" class="small">{{item}}</view></block>
       <view class="btn-row wrap"><button class="btn btn-ghost btn-sm" disabled="{{!!busy}}" bindtap="onLoadGrowth">{{busy === 'growth' ? '读取中…' : '读取增长报表'}}</button></view>
     </view>
 
     <view class="card">
       <view class="card-title"><text>用户操作</text></view>
       <view class="input-row">
-        <input class="input" value="{{grant.userKey}}" placeholder="userKey（appid:openid）" data-field="userKey" bindinput="onGrantInput" />
+        <input class="input" value="{{grant.userKey}}" aria-label="目标用户标识" placeholder="userKey（appid:openid）" data-field="userKey" bindinput="onGrantInput" />
       </view>
       <view class="input-row">
-        <input class="input" type="number" value="{{grant.days}}" placeholder="会员天数" data-field="days" bindinput="onGrantInput" />
-        <input class="input" type="digit" value="{{grant.amount}}" placeholder="次数（可负）" data-field="amount" bindinput="onGrantInput" />
+        <input class="input" type="number" value="{{grant.days}}" aria-label="发放会员天数" placeholder="会员天数" data-field="days" bindinput="onGrantInput" />
+        <input class="input" type="text" value="{{grant.amount}}" aria-label="调整次数，可输入负数" placeholder="次数（可负）" data-field="amount" bindinput="onGrantInput" />
       </view>
-      <input class="input" value="{{grant.note}}" placeholder="备注（可选）" data-field="note" bindinput="onGrantInput" />
+      <input class="input" value="{{grant.note}}" aria-label="发放备注，可选" placeholder="备注（可选）" data-field="note" bindinput="onGrantInput" />
       <view class="btn-row wrap">
         <button class="btn btn-primary btn-sm {{busy === 'membership' ? 'disabled' : ''}}" disabled="{{busy === 'membership'}}" bindtap="onGrantMembership">发放会员</button>
         <button class="btn btn-ghost btn-sm {{busy === 'credits' ? 'disabled' : ''}}" disabled="{{busy === 'credits'}}" bindtap="onGrantCredits">发放次数</button>
@@ -57,7 +57,7 @@
       <block wx:if="{{lookup}}">
         <view class="row-between mt">
           <text class="small muted">查询结果</text>
-          <text class="small link" bindtap="onCopyLookup">复制</text>
+          <button class="btn btn-ghost" size="mini" aria-label="复制查询结果" bindtap="onCopyLookup">复制</button>
         </view>
         <scroll-view scroll-y class="json-box"><text class="mono tiny" user-select>{{lookupText}}</text></scroll-view>
       </block>
@@ -66,12 +66,12 @@
     <view class="card">
       <view class="card-title">
         <text>运行配置</text>
-        <text class="sub">{{configDirty ? '已修改' : '与云端一致'}}</text>
+        <text class="sub">{{saving ? '保存中' : configLoading ? '读取中' : configDirty ? '已修改' : configLoaded ? '已读取' : '等待读取配置'}}</text>
       </view>
-      <textarea class="config-editor mono" value="{{configText}}" maxlength="-1" bindinput="onConfigInput" auto-height></textarea>
+      <textarea class="config-editor mono" value="{{configText}}" maxlength="-1" aria-label="运行配置 JSON" disabled="{{saving || configLoading}}" bindinput="onConfigInput" auto-height></textarea>
       <view class="btn-row">
-        <button class="btn btn-outline btn-sm" bindtap="loadConfig">重新加载</button>
-        <button class="btn btn-primary btn-sm {{saving || !configDirty ? 'disabled' : ''}}" disabled="{{saving || !configDirty}}" bindtap="onSaveConfig">保存配置</button>
+        <button class="btn btn-outline btn-sm" disabled="{{saving || configLoading}}" bindtap="onReloadConfig">{{configDirty ? '重载并替换草稿' : '重新加载'}}</button>
+        <button class="btn btn-primary btn-sm" disabled="{{saving || configLoading || !configLoaded || !configDirty}}" bindtap="onSaveConfig">保存配置</button>
       </view>
       <view class="tiny muted mt">可编辑：quota / tasks / memberProduct / memberPlans / memberRedemption / newProductWindows / notifications / collector / query / announcement / notices / features / growthExperiment。保存后立即生效。announcement 可用 null 或 {"text":"…","kind":"maintenance","expiresAt":"ISO"}；notices 为公告板列表，每项含 text/title/kind/startsAt/expiresAt，到期自动隐藏。expiresAt 到期后用户端自动隐藏。2.0 新入口与采集默认关闭；实验需先完成 A/A 核验，最多一个主链路实验。管理员名单仅由云端配置管理。</view>
     </view>

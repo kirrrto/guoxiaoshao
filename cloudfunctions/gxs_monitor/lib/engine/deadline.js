@@ -2,6 +2,7 @@
 const { randomUUID } = require('node:crypto');
 const { mergeConfig } = require('../config');
 const { capability } = require('../deadline');
+const { subscriptionResponseCode } = require('./wechat-sender');
 
 const BATCH_LIMIT = 5;
 const CATEGORY_LABELS = Object.freeze({ membership: '会员续费', coupon: '优惠券', warranty: '保修到期', event: '活动截止', other: '其他' });
@@ -59,9 +60,8 @@ async function runDeadlineReminders({ repo, sendImpl, clock = () => new Date(), 
     else {
       try {
         const response = await sendImpl(buildDeadlineMessage(verified.record, verified.user, verified.config), { timeoutMs: Math.floor(budget), deadlineAt: dueAt });
-        const raw = response && (response.errCode ?? response.errcode);
-        const code = raw === undefined || raw === null || raw === '' ? NaN : Number(raw);
-        outcome = !Number.isFinite(code) ? { status: 'uncertain', reason: 'invalid_platform_response' }
+        const code = subscriptionResponseCode(response);
+        outcome = code === null ? { status: 'uncertain', reason: 'invalid_platform_response' }
           : code === 0 ? { status: 'accepted', reason: null }
             : { status: 'failed', reason: code === 43101 ? 'subscription_authorization_expired' : `wx_${code}` };
       } catch (error) {

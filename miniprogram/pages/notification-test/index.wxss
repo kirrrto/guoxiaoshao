@@ -3,9 +3,9 @@
 .test-hero-icon { display: flex; align-items: center; justify-content: center; flex: none; width: 52px; height: 52px; background: var(--green-soft); border: 1px solid var(--control-line); border-radius: 16px; }
 .test-hero-art { display: block; width: 28px; height: 28px; }
 .test-hero-copy { min-width: 0; }
-.test-title { font-size: 22px; font-weight: 700; line-height: 1.4; color: var(--text); }
+.test-title { font-size: 22px; font-weight: 600; line-height: 1.4; color: var(--text); }
 .test-subtitle { margin-top: 5px; font-size: 13px; line-height: 1.6; color: var(--text-2); }
-.test-card { box-sizing: border-box; background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 20px; margin-bottom: 14px; min-width: 0; }
+.test-card { box-sizing: border-box; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius-card); padding: 20px; margin-bottom: 14px; min-width: 0; box-shadow: var(--shadow); }
 .test-heading { font-size: 18px; line-height: 1.5; font-weight: 650; color: var(--text); }
 .test-copy { color: var(--text-2); font-size: 14px; line-height: 1.7; margin-top: 10px; overflow-wrap: anywhere; }
 .test-tag { margin-top: 12px; color: var(--green-dark); font-size: 12px; line-height: 1.6; }
@@ -31,7 +31,7 @@
 /* Outrank WeChat button:not([size=mini]) while preserving native tap semantics. */
 .test-page .test-primary, .test-page .test-secondary, .test-page .test-disclosure { box-sizing: border-box; display: flex; align-items: center; justify-content: center; width: 100%; max-width: 100%; min-width: 0; min-height: 46px; height: auto; margin: 0; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; font-size: 14px; font-weight: 600; line-height: 1.5; white-space: normal; overflow-wrap: anywhere; }
 .test-page .test-primary { color: var(--action-text); background: var(--action-fill); border-color: transparent; }
-.test-page .test-secondary { color: var(--text); background: var(--surface-soft); }
+.test-page .test-secondary { color: var(--text); background: var(--card); border: 1px solid var(--line); }
 .test-primary::after, .test-secondary::after, .test-disclosure::after { border: 0; }
 .test-page .test-primary[disabled], .test-page .test-secondary[disabled] { opacity: .55; }
 .test-page .test-check, .test-page .test-signin { margin-top: 10px; }
@@ -45,14 +45,14 @@
 .test-page .test-choice-selected { color: var(--green-dark); border-color: var(--green-dark); background: var(--green-soft); }
 .test-feedback-note { margin-top: 10px; color: var(--text-2); font-size: 13px; line-height: 1.65; }
 .test-page .test-return { margin-top: 16px; }
-.test-page .test-disclosure { justify-content: space-between; gap: 12px; background: var(--surface-soft); color: var(--text); font-weight: 500; text-align: left; }
+.test-page .test-disclosure { justify-content: space-between; gap: 12px; border: 0; border-top: 1px solid var(--line); border-radius: 0; padding: 14px 0; background: transparent; color: var(--text); font-weight: 500; text-align: left; }
 .test-disclosure-label { flex: 1; min-width: 0; }
 .test-page .test-disclosure .ui-chevron { flex: none; }
 .test-troubleshooting .test-disclosure { margin-top: 12px; font-size: 14px; }
 .test-help-steps { margin-top: 12px; color: var(--text-2); font-size: 13px; line-height: 1.7; }
 .test-help-step + .test-help-step { margin-top: 10px; }
 .test-rules-card { padding: 8px; }
-.test-page .test-rules-toggle { background: transparent; border-color: transparent; }
+.test-page .test-rules-toggle { background: transparent; border: 0; border-top: 0; padding: 8px 4px; }
 .test-disclosure-meta { display: flex; align-items: center; gap: 10px; flex: none; color: var(--green-dark); font-size: 12px; }
 .test-rules { padding: 4px 12px 12px; }
 .test-rule { color: var(--text-2); font-size: 13px; line-height: 1.75; }

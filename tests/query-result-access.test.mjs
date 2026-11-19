@@ -195,3 +195,44 @@ test('inventory rows, observation time and evidence all obey the independent acc
   assert.match(template, /wx:if="\{\{!liveResultRestricted && evidenceCard\}\}"/);
   assert.match(template, /liveResultRestricted && resultAccessNotice/);
 });
+
+test('the service notice refreshes monitoring status without a stock query, with or without an earlier result', async () => {
+  const wxml = fs.readFileSync(new URL('../miniprogram/pages/query/index.wxml', import.meta.url), 'utf8');
+  const button = wxml.match(/<button\b[^>]*queryNotice\.action === 'refresh'[^>]*>/)[0];
+  const refreshHandler = button.match(/bindtap="(\w+)"/)[1];
+  const requeryButton = wxml.match(/<button\b[^>]*aria-label="重新查询此结果的配置与门店"[^>]*>/)[0];
+  const requeryHandler = requeryButton.match(/bindtap="(\w+)"/)[1];
+  for (const hasSnapshot of [true, false]) {
+    let finishStatus;
+    const status = new Promise(resolve => { finishStatus = resolve; });
+    const rt = runtime(action => action === 'user.bootstrap' ? status : values.snapshot);
+    const values = fixture(rt), page = rt.instance('pages/query/index.js');
+    page.catalog = values.catalog;
+    page.selection = values.selection;
+    page.data.ready = true;
+    if (hasSnapshot) {
+      page.querySnapshot = values.snapshot;
+      page.querySnapshotOwner = 'account:alice';
+      page.data.result = structuredClone(values.snapshot);
+    }
+    page.applyBoot(boot('account:alice', true, { collector: { state: 'stopped' } }));
+    assert.equal(page.data.queryNotice.action, 'refresh');
+    const first = page[refreshHandler](), second = page[refreshHandler]();
+    assert.deepEqual(rt.calls.map(c => c.action), ['user.bootstrap']);
+    assert.equal(page.data.liveResultRestricted, true);
+    if (hasSnapshot) await page[requeryHandler](); // A tap queued before permission masking reached the screen.
+    finishStatus(boot('account:bob'));
+    await Promise.all([first, second]);
+    assert.equal(page.data.queryNotice, null);
+    assert.equal(page.accountSnapshot.identity.userKey, 'account:bob');
+    assert.equal(page.data.liveResultRestricted, true);
+    assert.deepEqual(rt.calls.map(c => c.action), ['user.bootstrap']);
+    if (hasSnapshot) {
+      await page[requeryHandler]();
+      const requests = rt.calls.filter(c => c.action === 'query.pickup');
+      assert.equal(requests.length, 1);
+      assert.equal(requests[0].payload.expectedUserKey, 'account:bob');
+    }
+    page.onUnload();
+  }
+});

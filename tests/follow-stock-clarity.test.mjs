@@ -28,6 +28,8 @@ test('paid users with plenty of authorization still see their own four-minute st
   assert.match(row.stockDetail, /当前库存待确认/);
   assert.equal(row.stores[0].compactStatus, '上次有货');
   assert.equal(row.stores[0].compactNote, '', 'the same stale warning need not repeat for every store');
+  const aged = present([store('R001', 240000, { status: 'unknown', isStale: true, lastKnownStatus: 'available', knownAt: iso(240000) })]).row.stores[0];
+  assert.equal(aged.compactNote, '', 'a server-masked old result does not prove that another check failed');
 });
 
 test('partial current availability is timed from its matching store and keeps the stale remainder visible', t => {
@@ -46,6 +48,7 @@ test('a failed recent check cannot make the last valid in-stock result look rece
   assert.equal(row.observationAge, '5 分钟前检查');
   assert.match(row.stores[0].checkText, /^15 秒前检查/);
   assert.match(row.stores[0].lastResultTimeText, /10:40/);
+  assert.equal(row.stores[0].compactNote, '本次检查未取得有效库存');
   assert.equal(row.hasAvailable, false);
   assert.equal(present([store('R001', 15000, { status: 'unknown', lastKnownStatus: 'available' })]).row.observationAge, '', 'legacy records without a known timestamp must not invent one');
 });

@@ -143,7 +143,19 @@ test('pickup guide validates its public target and returns without overwriting q
   assert.equal(page.data.stageId, 'notice');
   assert.equal(page.data.targetSummary.title, product.title);
   assert.equal(page.sharedTarget.storeNumbers.length, 4);
-  assert.equal(page.data.pickupSteps.length, 3);
+  assert.equal(page.data.stage.pickupSteps.length, 3);
+  const originalNotice = copy(page.data.stage);
+  const selectStage = id => page.onSelectStage({ currentTarget: { dataset: { id } } });
+  for (const id of ['prepare', 'monitor', 'pickup']) {
+    selectStage(id);
+    assert.equal(page.data.stage.id, id);
+    assert.equal(page.data.stage.pickupSteps, undefined, 'only the ordering stage also shows the pickup steps');
+  }
+  selectStage('notice');
+  assert.deepEqual(copy(page.data.stage), originalNotice, 'returning to ordering restores the exact-target instructions');
+  const generic = rt.instance('pages/guide/index.js');
+  generic.onLoad({ stage: 'notice' });
+  assert.equal(generic.data.stage.pickupSteps, undefined);
   page.onReturnTask();
   assert.deepEqual(navigations, ['/pages/query/index']);
   assert.equal(rt.storage.size, 0); assert.equal(rt.calls.length, 0);

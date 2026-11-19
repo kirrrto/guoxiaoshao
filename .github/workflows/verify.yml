@@ -73,6 +73,15 @@ jobs:
         run: |
           node tools/ui-preview/build.mjs --out output/ci-ui-v360-tabs
           node tools/ui-preview/check-v360.mjs output/ci-ui-v350 output/ci-ui-v360-tabs output/ci-ui-v360-report.json
+      - name: Verify membership, stock details, authorization prompts and operator screens
+        shell: bash
+        run: |
+          for group in v2 stock nudge admin; do
+            dir="$RUNNER_TEMP/ui-$group"
+            node tools/ui-preview/build.mjs "--$group-only" --out "$dir"
+            node tools/ui-preview/check-layout.mjs "$dir"
+            node tools/ui-preview/check-layout.mjs "$dir" --dark
+          done
       - name: Check release candidate
         run: node tools/release/check.mjs --out output/ci-release.json
       - name: Preserve verification evidence even when release is blocked

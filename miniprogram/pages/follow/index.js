@@ -3,7 +3,7 @@ const { reminderPanelMethods } = require('../../utils/reminder-panel');
 const { stageHistoryContext } = require('../../utils/journey-context');
 const { productThumbnailUrl } = require('../../utils/product-image-fit');
 const { call, newId, showError, toast } = require('../../utils/api');
-const { getBootstrap, getCatalog, refreshBootstrap, invalidateBootstrap, subscribeCatalog, getFollows, invalidateFollows, subscribeSubscriptions } = require('../../utils/store');
+const { getBootstrap, getCatalog, refreshBootstrap, invalidateBootstrap, subscribeCatalog, getFollows, invalidateFollows, subscribeSubscriptions, quotaAccountMatches } = require('../../utils/store');
 const fmt = require('../../utils/format');
 const { storeLabel, storeLabelWithCity } = require('../../utils/store-label');
 const { syncTabBar, switchToTab, releaseTabBar } = require('../../utils/tab-bar');
@@ -116,6 +116,9 @@ function presentFollow(follow, boot, catalog, collector) {
     if (retired && store.observationState === 'fresh') store = { ...store, observationState: 'stale' };
     const historical = validTime && !store.timeUncertain && ['stale', 'unknown'].includes(store.observationState);
     const knownAt = Date.parse(store.knownAt);
+    // The API can also mask an aged successful check as 'unknown'. Only a
+    // recorded failure or a newer unknown check establishes a failed attempt.
+    const failedCheck = store.unknownSince || (store.status === 'unknown' && Number.isFinite(knownAt) && knownAt < observed);
     return { ...store,
       compactStatus: store.limitPaused ? '已暂停' : historical && previous === 'available' ? '上次有货'
         : historical && previous === 'unavailable' ? '上次无货' : store.statusLabel,
@@ -126,7 +129,7 @@ function presentFollow(follow, boot, catalog, collector) {
         ? `上次有效结果 ${fmt.fmtDateTime(store.knownAt).slice(5, 16)}` : '',
       compactNote: store.limitPaused || store.observationState === 'restricted' ? store.freshnessText
         : store.timeUncertain ? '观测时间待核对，当前库存待确认。'
-        : store.observationState === 'unknown' ? '本次检查未取得有效库存' : '',
+        : store.observationState === 'unknown' || (historical && failedCheck) ? '本次检查未取得有效库存' : '',
     };
   });
   const color = product && product.attributes && product.attributes.color || '';
@@ -352,6 +355,7 @@ Page({
   },
 
   onHide() {
+    this.removeConfirmation = null;
     this.retireDeadlineRead();
     releaseTabBar(this);
     this.nativePromptHiddenAt = getAuthorizationState().nativeBusy ? Date.now() : 0;
@@ -687,6 +691,7 @@ Page({
         restartAfterAccountChange = true;
       }
       this.accountEpoch = (this.accountEpoch || 0) + 1;
+      this.removeConfirmation = null;
       this.retireDeadlineRead();
       this.deadlineUserKey = null;
       this.setData({ deadlines: [], deadlineCount: 0, deadlinesLoaded: false, deadlinesError: '', nextDeadline: null,
@@ -704,7 +709,8 @@ Page({
       getApp().globalData.handledAlerts = [];
       this.invalidateFollowRead();
       this.editorSelection = null;
-      this.setData({ follows: [], followsLoaded: false, editing: false, saving: false, activation: null, authorizationOpen: false, authorizationFeedback: '', refreshing: false, refreshFeedback: '', refreshError: null, alert: null, alertBusy: false });
+      this.setData({ follows: [], followsLoaded: false, editing: false, saving: false, followBusyId: '', followActionId: '', followActionError: '',
+        activation: null, authorizationOpen: false, authorizationFeedback: '', refreshing: false, refreshFeedback: '', refreshError: null, alert: null, alertBusy: false });
     }
     this.accountSnapshot = boot;
     if (reloadDeadlines) this.loadDeadlines();
@@ -1054,76 +1060,77 @@ Page({
   },
 
   async onToggle(e) {
-    if (this.toggling || this.pageRetired || this.data.saving || this.data.followBusyId) return;
+    if (this.removeConfirmation || this.pageRetired || this.data.saving || this.data.followBusyId) return;
     if (!canRemind(this.data.boot)) { this.showMemberModal(); return; }
     const { id, status } = e.currentTarget.dataset;
     const existing = this.data.follows.find(follow => follow.followId === id);
     if (!existing) return;
     if (existing.productRetired || existing.statusReason === 'product_retired') return toast('老款已下架，请改选新款');
     if (existing.limitPaused || existing.status === 'limit_paused') return this.showMemberModal();
-    this.toggling = true;
     const nextStatus = (existing.status || status) === 'active' ? 'paused' : 'active';
+    return this.changeFollowStatus(id, nextStatus);
+  },
+
+  async changeFollowStatus(id, nextStatus) {
+    const owner = this.accountSnapshot && this.accountSnapshot.identity && this.accountSnapshot.identity.userKey;
+    const epoch = this.accountEpoch || 0;
+    const current = () => epoch === (this.accountEpoch || 0) && quotaAccountMatches(owner);
+    if (!current() || this.data.saving || this.data.followBusyId) return;
+    const removing = nextStatus === 'removed';
+    const action = removing ? 'follow.remove' : nextStatus === 'paused' ? 'follow.pause' : 'follow.resume';
     this.setData({ followBusyId: id, followActionId: '', followActionError: '' });
     try {
-      const result = await call(nextStatus === 'paused' ? 'follow.pause' : 'follow.resume', { followId: id });
+      const result = await call(action, { followId: id });
+      if (!current()) return;
       this.invalidateFollowRead();
       if (this.pageRetired) return;
-      const acknowledged = result && result.follow && result.follow.followId === id && result.follow.status === nextStatus;
+      const acknowledged = removing ? result && result.removed === true && result.followId === id
+        : result && result.follow && result.follow.followId === id && result.follow.status === nextStatus;
       if (acknowledged) {
-        this.setData({ follows: this.data.follows.map(follow => follow.followId === id ? presentFollow({ ...result.follow, detailsExpanded: follow.detailsExpanded }, this.data.boot, this.catalog, this.data.collector) : follow) });
+        const follows = removing ? this.data.follows.filter(follow => follow.followId !== id)
+          : this.data.follows.map(follow => follow.followId === id ? presentFollow({ ...result.follow, detailsExpanded: follow.detailsExpanded }, this.data.boot, this.catalog, this.data.collector) : follow);
+        this.setData({ follows });
         this.refreshReadiness();
       }
+      if (removing) refreshBootstrap().catch(() => {});
       if (this.visible === false) return;
       try { await this.loadFollows(); }
       catch (error) {
-        if (!this.pageRetired) this.setData({ refreshError: acknowledged ? `${nextStatus === 'paused' ? '已暂停' : '已恢复'}关注，最新观测读取失败，请刷新确认。` : '操作已提交，当前状态待确认，请刷新查看。' });
+        if (this.pageRetired || !current()) return;
+        const confirmedMessage = removing ? '关注已删除，列表刷新失败，请下拉刷新。'
+          : `${nextStatus === 'paused' ? '已暂停' : '已恢复'}关注，最新观测读取失败，请刷新确认。`;
+        const unconfirmedMessage = removing ? '删除操作已提交，结果待确认，请刷新查看。' : '操作已提交，当前状态待确认，请刷新查看。';
+        this.setData({ refreshError: acknowledged ? confirmedMessage : unconfirmedMessage });
       }
     } catch (error) {
+      if (!current()) return;
       this.invalidateFollowRead();
       if (!this.pageRetired) {
-        this.setData({ followActionId: id, followActionError: followActionError(error, '操作') });
+        this.setData({ followActionId: id, followActionError: followActionError(error, removing ? '删除' : '操作') });
         if (this.visible !== false) showError(error);
       }
-    } finally { this.toggling = false; if (!this.pageRetired) this.setData({ followBusyId: '' }); }
+    } finally { if (!this.pageRetired && epoch === (this.accountEpoch || 0)) this.setData({ followBusyId: '' }); }
   },
 
   onRemove(e) {
-    if (this.pageRetired || this.data.saving || this.data.followBusyId || this.removing) return;
+    if (this.pageRetired || this.visible === false || this.data.saving || this.data.followBusyId || this.removeConfirmation) return;
     const id = e.currentTarget.dataset.id;
     if (!this.data.follows.some(follow => follow.followId === id)) return;
-    this.removing = true;
+    const owner = this.accountSnapshot && this.accountSnapshot.identity && this.accountSnapshot.identity.userKey;
+    if (!quotaAccountMatches(owner)) return;
+    const confirmation = { id };
+    this.removeConfirmation = confirmation;
     wx.showModal({
       title: '删除关注',
       content: '删除后停止这条关注并释放名额，已产生的历史记录会保留。',
       confirmColor: '#D64545',
-      success: async r => {
-        if (!r.confirm || this.pageRetired) { this.removing = false; return; }
-        this.setData({ followBusyId: id, followActionId: '', followActionError: '' });
-        try {
-          const result = await call('follow.remove', { followId: id });
-          this.invalidateFollowRead();
-          if (this.pageRetired) return;
-          const acknowledged = result && result.removed === true && result.followId === id;
-          if (acknowledged) {
-            this.setData({ follows: this.data.follows.filter(follow => follow.followId !== id) });
-            this.refreshReadiness();
-          }
-          refreshBootstrap().catch(() => {});
-          if (this.visible === false) return;
-          try { await this.loadFollows(); }
-          catch (error) { if (!this.pageRetired) this.setData({ refreshError: acknowledged ? '关注已删除，列表刷新失败，请下拉刷新。' : '删除操作已提交，结果待确认，请刷新查看。' }); }
-        } catch (error) {
-          this.invalidateFollowRead();
-          if (!this.pageRetired) {
-            this.setData({ followActionId: id, followActionError: followActionError(error, '删除') });
-            if (this.visible !== false) showError(error);
-          }
-        } finally {
-          this.removing = false;
-          if (!this.pageRetired) this.setData({ followBusyId: '' });
-        }
+      success: r => {
+        if (this.removeConfirmation !== confirmation) return;
+        this.removeConfirmation = null;
+        if (!r.confirm || this.pageRetired || this.visible === false || !quotaAccountMatches(owner)) return;
+        return this.changeFollowStatus(id, 'removed');
       },
-      fail: () => { this.removing = false; },
+      fail: () => { if (this.removeConfirmation === confirmation) this.removeConfirmation = null; },
     });
   },
 

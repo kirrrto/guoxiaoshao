@@ -13,7 +13,7 @@ Page({
     categories: CATEGORIES, categoryIndex: 0, earliestDate: '', previewTime: '', pending: false, pendingLabel: '' },
   onLoad() { this.retired = false; this.epoch = 0; },
   onShow() { navigation.confirmNavigation('pages/deadlines/index'); this.visible = true; return this.load(); },
-  onHide() { this.visible = false; },
+  onHide() { this.visible = false; this.removeConfirmation = null; },
   onUnload() { this.retireNativeAuthorization(); this.retired = true; this.epoch += 1; },
   retireNativeAuthorization() {
     if (this.nativeAuthorization) clearTimeout(this.nativeAuthorization.timer);
@@ -23,7 +23,7 @@ Page({
   async onPullDownRefresh() { try { await this.load(); } finally { wx.stopPullDownRefresh(); } },
   readPending() {
     try { const all = wx.getStorageSync(PENDING_KEY) || {}; return all[this.owner] || null; }
-    catch (_) { throw new Error('无法保存操作记录，请检查手机存储后重试。'); }
+    catch (_) { throw new Error('无法读取操作记录，请检查手机存储后重试。'); }
   },
   persistPending(value) {
     const all = wx.getStorageSync(PENDING_KEY) || {};
@@ -31,6 +31,13 @@ Page({
     wx.setStorageSync(PENDING_KEY, all);
     this.pendingOperation = value;
     this.setData({ pending: Boolean(value), pendingLabel: value && value.action === 'deadline.authorize' ? '同步原授权' : '确认原保存结果' });
+  },
+  clearConfirmedOperation() {
+    try { this.persistPending(null); return true; }
+    catch (_) {
+      this.setData({ error: '操作记录暂时无法清理，请检查手机存储后重试。原操作编号已保留。' });
+      return false;
+    }
   },
   async load(options = {}) {
     if (this.retired) return;
@@ -42,6 +49,7 @@ Page({
       this.setData({ items: [], ready: false, editing: false, pending: false, busy: false, editConflict: false, draft: makeDraft(), feedback: '' });
     }
     if (this.loadingPromise || this.data.busy) return this.loadingPromise;
+    this.removeConfirmation = null;
     const epoch = ++this.epoch;
     this.setData({ loading: true, serviceAvailable: false, ...(options.keepError ? {} : { error: '' }) });
     const work = (async () => {
@@ -60,13 +68,16 @@ Page({
             error: '账户已变化，请返回「我的」刷新后重新打开到期事项。' });
           return;
         }
-        if (this.owner && this.owner !== result.userKey) this.setData({ editing: false, draft: makeDraft(), feedback: '' });
+        if (this.owner && this.owner !== result.userKey) {
+          this.pendingOperation = null;
+          this.setData({ editing: false, draft: makeDraft(), feedback: '', pending: false, pendingLabel: '' });
+        }
         this.owner = result.userKey;
         this.setData({ items: result.items.map(item => presentDeadline(item)), limit: result.limit,
-          capability: result.capability, ready: true, serviceAvailable: true });
+          capability: result.capability, ready: true });
         const pending = this.readPending();
         this.pendingOperation = pending;
-        this.setData({ pending: Boolean(pending), pendingLabel: pending && pending.action === 'deadline.authorize' ? '同步原授权' : '确认原保存结果' });
+        this.setData({ serviceAvailable: true, pending: Boolean(pending), pendingLabel: pending && pending.action === 'deadline.authorize' ? '同步原授权' : '确认原保存结果' });
       } catch (error) { if (!this.retired && epoch === this.epoch) this.setData({ error: friendlyError(error) }); }
       finally { if (!this.retired && epoch === this.epoch) this.setData({ loading: false }); }
     })();
@@ -119,17 +130,18 @@ Page({
     else payload.requestId = this.saveRequestId || (this.saveRequestId = newId('deadline'));
     try { this.persistPending({ action, payload }); }
     catch (error) { this.setData({ formError: friendlyError(error) }); return; }
-    await this.performPending();
-    // After a successful save, ask whether to enable the one-time WeChat reminder.
-    if (this.data.capability.enabled && !this.data.pending && this.owner && typeof wx.requestSubscribeMessage === 'function') {
-      const saved = this.data.items.find(row => row.title === payload.title && row.canAuthorize);
-      if (saved) this.promptAuthorization(saved);
-    }
+    const receipt = await this.performPending();
+    if (receipt && receipt.userKey === payload.expectedUserKey && receipt.item) this.promptAuthorization(receipt.item, receipt.userKey);
   },
-  promptAuthorization(item) {
+  promptAuthorization(item, owner) {
+    const epoch = this.epoch;
+    if (!this.visible || !this.current(epoch, owner) || !this.data.serviceAvailable || !this.data.capability.enabled
+      || this.data.pending || typeof wx.requestSubscribeMessage !== 'function') return;
+    // A different deadline can have the same title, or this revision can already have changed elsewhere.
+    if (!this.data.items.some(row => row.id === item.id && row.revision === item.revision && row.canAuthorize)) return;
     wx.showModal({ title: '开启微信提醒', content: '是否允许一次微信到期提醒？修改内容后需重新授权。', confirmText: '开启', cancelText: '暂不',
       success: res => {
-        if (!res.confirm) return;
+        if (!res.confirm || !this.visible || !this.current(epoch, owner)) return;
         this.onAuthorize({ currentTarget: { dataset: { id: item.id } } });
       } });
   },
@@ -139,15 +151,16 @@ Page({
     const epoch = this.epoch, owner = this.owner;
     if (!this.current(epoch, owner)) return;
     this.setData({ busy: true, error: '', formError: '' });
+    let receipt;
     try {
-      await call(operation.action, operation.payload);
+      receipt = await call(operation.action, operation.payload);
       if (!this.current(epoch, owner)) return;
-      this.persistPending(null);
+      if (!this.clearConfirmedOperation()) return;
       this.setData({ editing: false, feedback: operation.action === 'deadline.authorize' ? '授权结果已同步，请查看事项状态。' : operation.action === 'deadline.remove' ? '事项已删除。' : '已保存。微信提醒状态见下方事项。' });
     } catch (error) {
       if (!this.current(epoch, owner)) return;
       const retry = needsPendingRetry(error);
-      if (!retry) this.persistPending(null);
+      if (!retry && !this.clearConfirmedOperation()) return;
       this.setData({ error: retry ? (error && error.code === 'offline' ? '当前网络已断开，请联网后点击「' : '操作结果尚未确认，请点击「')
         + this.data.pendingLabel + '」重试；原操作已保留。' : friendlyError(error) });
       if (operation.action === 'deadline.update' && error && error.code === 'deadline_revision_conflict') this.setData({
@@ -155,10 +168,11 @@ Page({
       });
     } finally { if (this.current(epoch, owner)) this.setData({ busy: false }); }
     if (this.current(epoch, owner) && !this.data.pending) await this.load({ keepError: true });
+    return receipt;
   },
   onRetryPending() { return this.performPending(); },
   onAuthorize(event) {
-    if (this.retired || this.data.busy || this.data.pending || !this.data.capability.enabled || !this.owner || !this.data.serviceAvailable) return;
+    if (!this.owner || !this.current(this.epoch, this.owner) || this.data.busy || this.data.pending || !this.data.capability.enabled || !this.data.serviceAvailable) return;
     const item = this.data.items.find(row => row.id === event.currentTarget.dataset.id);
     if (!item || !item.canAuthorize) return;
     if (typeof wx.requestSubscribeMessage !== 'function') { this.setData({ error: '当前微信版本不支持订阅提醒，请更新微信。' }); return; }
@@ -193,16 +207,22 @@ Page({
     } catch (error) { failure(error); }
   },
   onRemove(event) {
-    if (this.data.busy || this.data.pending || !this.data.serviceAvailable) return;
+    if (!this.visible || this.retired || this.removeConfirmation || this.data.busy || this.data.pending || !this.data.serviceAvailable) return;
     const item = this.data.items.find(row => row.id === event.currentTarget.dataset.id);
     if (!item || !item.canEdit) return;
     const epoch = this.epoch, owner = this.owner;
+    const confirmation = { id: item.id };
+    this.removeConfirmation = confirmation;
     wx.showModal({ title: '删除到期事项', content: '删除“' + item.title + '”及其待发提醒？', confirmText: '删除',
       success: result => {
-        if (!result.confirm || !this.current(epoch, owner) || this.data.busy || !this.data.serviceAvailable) return;
+        if (this.removeConfirmation !== confirmation) return;
+        this.removeConfirmation = null;
+        if (!result.confirm || !this.visible || !this.current(epoch, owner) || this.data.busy || this.data.pending || !this.data.serviceAvailable) return;
         try { this.persistPending({ action: 'deadline.remove', payload: { id: item.id, revision: item.revision, expectedUserKey: owner } }); }
         catch (error) { this.setData({ error: friendlyError(error) }); return; }
         this.performPending();
-      } });
+      },
+      fail: () => { if (this.removeConfirmation === confirmation) this.removeConfirmation = null; },
+    });
   },
 });

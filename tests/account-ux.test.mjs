@@ -185,6 +185,66 @@ test('an operator editor cannot save without a version supplied by the configura
   assert.match(rt.messages.at(-1), /重新加载|版本/);
 });
 
+test('operator config input, reload and save cannot race a pending config request', async () => {
+  let resolveUpdate, resolveRead, reads = 0;
+  const rt = runtime('admin', async action => {
+    if (action === 'admin.stats') return {};
+    if (action === 'admin.updateConfig') return new Promise(resolve => { resolveUpdate = resolve; });
+    if (++reads === 1) return { config: { announcement: 'initial' }, revision: 2 };
+    return new Promise(resolve => { resolveRead = resolve; });
+  });
+  await rt.page.onLoad();
+  const text = JSON.stringify({ announcement: 'submitted' });
+  const edit = value => rt.page.onConfigInput({ detail: { value } });
+  edit(text);
+  const saving = rt.page.onSaveConfig();
+  edit('late edit');
+  await rt.page.onReloadConfig();
+  assert.equal(rt.page.data.configText, text);
+  assert.equal(reads, 1);
+  resolveUpdate({});
+  await new Promise(resolve => setImmediate(resolve));
+  await rt.page.onSaveConfig();
+  await rt.page.onReloadConfig();
+  assert.equal(reads, 2);
+  resolveRead({ config: { announcement: 'submitted' }, revision: 3 });
+  await saving;
+  assert.equal(rt.page.data.configLoaded, true);
+  assert.equal(rt.page.data.configDirty, false);
+  const reload = rt.page.onReloadConfig();
+  edit('event arriving after reload began');
+  assert.equal(rt.page.data.configDirty, false);
+  await rt.page.onSaveConfig();
+  assert.equal(rt.calls.filter(c => c.action === 'admin.updateConfig').length, 1);
+  rt.page.clearAccess(forbidden());
+  resolveRead({ config: { announcement: 'stale response' }, revision: 3 });
+  await reload;
+  assert.equal(rt.page.data.configText, '');
+  assert.equal(rt.page.data.configLoaded, false);
+});
+
+test('changing the grant target clears previous lookup data and ignores the old response', async () => {
+  let completeLookup;
+  const rt = runtime('admin', action => {
+    if (action === 'admin.lookupUser') return new Promise(resolve => { completeLookup = resolve; });
+    return action === 'admin.stats' ? {} : { config: {}, revision: 1 };
+  });
+  await rt.page.onLoad();
+  const setTarget = value => rt.page.onGrantInput({ currentTarget: { dataset: { field: 'userKey' } }, detail: { value } });
+  setTarget('consumer:first');
+  const pending = rt.page.onLookup();
+  setTarget('consumer:second');
+  completeLookup({ userKey: 'consumer:first' });
+  await pending;
+  assert.equal(rt.page.data.lookup, null);
+  const retry = rt.page.onLookup();
+  completeLookup({ userKey: 'consumer:second' });
+  await retry;
+  assert.ok(rt.page.data.lookupText.includes('consumer:second'));
+  setTarget('');
+  assert.equal(rt.page.data.lookupText, '');
+});
+
 test('operator project is physically outside the consumer upload root and has all local dependencies', () => {
   const repo = path.dirname(root);
   const project = JSON.parse(fs.readFileSync(path.join(repo, 'project.config.json'), 'utf8'));

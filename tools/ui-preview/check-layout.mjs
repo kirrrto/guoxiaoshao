@@ -183,8 +183,38 @@ try {
       }
       return { viewport: width, scrollWidth: document.documentElement.scrollWidth, bodyHeight: document.body.scrollHeight, overflow, clippedText, images, alternativeGeometry, alternativeLayoutErrors, calendarLayoutErrors };
     });
+    if (item.page === 'admin') {
+      metrics.operatorControlErrors = await page.evaluate(saving => {
+        const errors = [];
+        for (const control of document.querySelectorAll('button, input, textarea')) {
+          const label = control.getAttribute('aria-label') || control.textContent.trim();
+          const rect = control.getBoundingClientRect();
+          if (!label || rect.width < 43.99 || rect.height < 43.99 || parseFloat(getComputedStyle(control).fontSize) < 11.99) {
+            errors.push(`Undersized or unnamed control: ${label}`);
+          }
+        }
+        if (saving && !['textarea', '[data-preview-action="onReloadConfig"]', '[data-preview-action="onSaveConfig"]'].every(selector => document.querySelector(selector)?.disabled)) {
+          errors.push('The editor, reload and save controls must lock together while saving');
+        }
+        return errors;
+      }, item.scenario === 'operator-saving');
+    }
     Object.assign(metrics, await page.evaluate(inspectMembershipLayout, item.expectedMembership || null));
     Object.assign(metrics, await page.evaluate(inspectNotificationLayout, item.expectedNotification || null));
+    if (item.scenario.startsWith('nudge-')) {
+      metrics.notificationLayoutErrors.push(...await page.evaluate(() => {
+        const dialog = document.querySelector('.reminder-dialog');
+        if (!dialog) return ['Reminder authorization dialog is missing'];
+        const errors = [];
+        for (const button of dialog.querySelectorAll('button')) {
+          if (button.getBoundingClientRect().height < 43.5) errors.push(`Reminder action is shorter than 44px: ${button.textContent.trim()}`);
+        }
+        for (const element of dialog.querySelectorAll('.reminder-detail, .reminder-footnote')) {
+          if (parseFloat(getComputedStyle(element).fontSize) < 11.99) errors.push(`Reminder explanation is below 12px: ${element.className}`);
+        }
+        return errors;
+      }));
+    }
     Object.assign(metrics, await page.evaluate(inspectStockLayout, item.expectedStock || null));
     Object.assign(metrics, await page.evaluate(inspectDeadlineLayout, { saving: item.scenario === 'v350-saving', conflict: item.scenario === 'v350-edit-conflict', unavailable: item.fixture?.error || item.fixture?.loading }));
     Object.assign(metrics, await page.evaluate(inspectConfigurationLayout, {
@@ -359,6 +389,10 @@ try {
 } finally { await context.close(); await browser.close(); }
 verifyPreviewSources();
 report.summary = { total: report.snapshots.length, indexNavigationFailures: report.indexNavigation.invalidTargets.length + report.indexNavigation.missingTargets.length, expressionErrors: manifest.expressionErrors || 0, missingText: report.snapshots.filter(x => x.missingText.length).length, forbiddenText: report.snapshots.filter(x => x.forbiddenTextFound.length).length, horizontalOverflow: report.snapshots.filter(x => x.scrollWidth > x.width + 1 || x.overflow.length).length, clippedText: report.snapshots.filter(x => x.clippedText.length).length, failedImages: report.snapshots.flatMap(x => x.images).filter(x => !x.loaded).length, alternativeLayoutFailures: report.snapshots.filter(x => x.alternativeLayoutErrors.length).length, calendarLayoutFailures: report.snapshots.filter(x => x.calendarLayoutErrors.length).length, membershipLayoutFailures: report.snapshots.filter(x => x.membershipLayoutErrors.length).length, notificationLayoutFailures: report.snapshots.filter(x => x.notificationLayoutErrors.length).length, v3LayoutFailures: report.snapshots.filter(x => x.v3LayoutErrors.length).length, stockLayoutFailures: report.snapshots.filter(x => x.stockLayoutErrors.length).length, followFontFailures: report.snapshots.filter(x => x.followFontErrors.length).length, deadlineLayoutFailures: report.snapshots.filter(x => x.deadlineLayoutErrors.length).length, configurationLayoutFailures: report.snapshots.filter(x => x.configurationLayoutErrors.length).length };
+if (report.snapshots.some(item => item.page === 'admin')) {
+  report.summary.operatorControlFailures = report.snapshots.filter(item => item.operatorControlErrors.length).length;
+  if (report.summary.operatorControlFailures) process.exitCode = 1;
+}
 const reportBase = deadlineFontPreview ? 'layout-metrics-v350-fonts' : membershipFontPreview ? 'membership-font-metrics' : notificationFontPreview ? 'notification-font-metrics' : stockFontPreview ? 'layout-metrics-stock-fonts' : 'layout-metrics';
 fs.writeFileSync(path.join(directory, `${reportBase}${colorScheme === 'dark' ? '-dark' : ''}.json`), JSON.stringify(report, null, 2));
 console.log(JSON.stringify(report.summary));

@@ -49,6 +49,18 @@ test('a newly saved follow receives current confirmed availability without waiti
   assert.equal(s.f.repo.tables.get(C.events).size, 0, 'current-state delivery does not invent a restock in stock history');
 });
 
+test('a malformed delivery acknowledgment preserves the uncertain stock alert without a second send', async () => {
+  for (const response of [null, { errcode: false }, { errCode: ' ' }]) {
+    const s = await setup({ senderResult: response });
+    await s.drain();
+    assert.equal(s.tasks()[0].status, 'uncertain');
+    assert.equal(s.tasks()[0].reason, 'invalid_platform_response');
+    await s.drain(31000);
+    assert.equal(s.sends.length, 1);
+    assert.equal((await s.f.repo.getUser(userKeyOf())).subscriptions.TPL.credits, 2);
+  }
+});
+
 test('resume and replenishing consent recover continued availability missed while paused or lacking credits', async () => {
   for (const reason of ['paused', 'no_credit']) {
     const s = await setup({ credits: reason === 'no_credit' ? 0 : 3, status: reason === 'paused' ? 'paused' : 'active' });

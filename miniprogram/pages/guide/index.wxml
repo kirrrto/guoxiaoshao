@@ -18,7 +18,11 @@
     </view>
     <view class="guide-stage-copy"><view class="guide-section-title">{{stage.title}}</view><view class="small text-2 mt">{{stage.note}}</view></view>
     <view wx:for="{{stage.steps}}" wx:key="title" class="guide-step"><view class="guide-step-number">{{index + 1}}</view><view class="guide-step-copy"><view class="guide-step-title">{{item.title}}</view><view class="small text-2 mt">{{item.text}}</view></view></view>
-    <block wx:if="{{section === 'pickup'}}"><view class="guide-section-title">下单后如何取货</view><view wx:for="{{pickupSteps}}" wx:key="title" class="guide-step"><view class="guide-step-number">{{index + 4}}</view><view class="guide-step-copy"><view class="guide-step-title">{{item.title}}</view><view class="small text-2 mt">{{item.text}}</view></view></view><button class="btn btn-primary btn-block" bindtap="onReturnTask">{{returnLabel}}</button></block>
+    <block wx:if="{{stage.pickupSteps}}">
+      <view class="guide-section-title">下单后如何取货</view>
+      <view wx:for="{{stage.pickupSteps}}" wx:key="title" class="guide-step"><view class="guide-step-number">{{stage.steps.length + index + 1}}</view><view class="guide-step-copy"><view class="guide-step-title">{{item.title}}</view><view class="small text-2 mt">{{item.text}}</view></view></view>
+      <button class="btn btn-primary btn-block" bindtap="onReturnTask">{{returnLabel}}</button>
+    </block>
     <button wx:else class="btn btn-primary btn-block" bindtap="onStageAction">{{stage.actionText}}</button>
   </view>
 
@@ -38,6 +42,5 @@
       <view class="ui-disclosure-group-item"><button class="ui-disclosure ui-entry" hover-class="ui-control-pressed" bindtap="onCopyDiagnostics"><view class="ui-entry-copy"><text class="ui-disclosure-label">复制诊断摘要</text><text class="ui-entry-note">仅含版本、平台、固定错误码、页面与时间</text></view><view class="ui-chevron" aria-hidden="true"></view></button></view>
     </view>
   </view>
-  <button wx:if="{{section !== 'pickup' && !focusedFaq}}" class="btn btn-outline btn-block" bindtap="onReturnTask">{{returnLabel}}</button>
-  <view class="footer-note">库存仅供参考，购买请在 Apple 官方渠道完成（核对于 {{checkedOn}}）。</view>
+  <button wx:if="{{!stage.pickupSteps && !focusedFaq}}" class="btn btn-outline btn-block" bindtap="onReturnTask">{{returnLabel}}</button>
 </view>

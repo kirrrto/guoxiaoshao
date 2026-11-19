@@ -5,33 +5,53 @@
    Brand green fills the primary action and marks positive states only. */
 page {
   --green: #00C375;
-  --green-dark: #007A49;
+  --green-dark: #006B3F;
+  --accent-text: #006B3F;
   --green-ink: #073C2C;
   --green-soft: rgba(0, 195, 117, 0.10);
-  --green-mist: #F3F4F2;
-  --text: #121814;
-  --text-2: #565F59;
-  --text-3: #656D68;
-  --line: #E7E9E6;
+  --green-mist: #F4F4F2;
+  --text: #111412;
+  --text-2: #545956;
+  --text-3: #626764;
+  --line: #ECECEA;
   --card: #FFFFFF;
-  --surface-soft: #F4F5F3;
+  --card-elevated: #FFFFFF;
+  --surface-soft: #F6F6F4;
   --glass-line: transparent;
-  --shadow-soft: 0 1px 2px rgba(18, 24, 20, 0.04), 0 6px 20px rgba(18, 24, 20, 0.04);
+  --shadow-soft: 0 1px 2px rgba(17, 20, 18, 0.04), 0 8px 24px rgba(17, 20, 18, 0.05);
+  --shadow: var(--shadow-soft);
   --action-fill: var(--green);
   --action-text: var(--green-ink);
-  --control-fill: #EEF0ED;
+  --control-fill: #EFEFED;
   --control-line: transparent;
-  --control-pressed: #E3E6E2;
-  --radius-card: 32rpx;
-  --radius-action: 24rpx;
+  --control-pressed: #E5E5E2;
+  --header-glass: rgba(244, 244, 242, 0.82);
+  --member-card-gradient: linear-gradient(135deg, #FFFFFF 0%, #F4F7F5 100%);
+  --member-card-annual-gradient: linear-gradient(135deg, #FFFFFF 0%, #F7F3EA 100%);
+  --image-tile: #F6F6F4;
+  --image-tile-gradient: radial-gradient(circle at 50% 40%, #FFFFFF 0%, #F0F0EE 100%);
+  --fs-display: max(26px, 56rpx);
+  --fs-title: max(20px, 40rpx);
+  --fs-headline: max(16px, 34rpx);
+  --fs-body: max(14px, 30rpx);
+  --fs-sub: max(13px, 26rpx);
+  --fs-caption: max(12px, 24rpx);
+  --fs-section: max(12px, 24rpx);
+  --radius-card: 28rpx;
+  --radius-inner: 20rpx;
+  --radius-action: 22rpx;
+  --radius-chip: 999rpx;
+  --space-page: 32rpx;
+  --space-card: 32rpx;
+  --space-section: 40rpx;
+  --space-row: 28rpx;
   --warn: #895806;
   --warn-soft: #FBF1DC;
   --bad: #A83E3E;
   --bad-soft: #FBECEC;
-  --info-soft: #F4F5F3;
-  --skeleton-base: #EEF0ED;
-  --skeleton-shine: #E7E9E6;
-  --image-tile: #F4F5F3;
+  --info-soft: #F6F6F4;
+  --skeleton-base: #EFEFED;
+  --skeleton-shine: #E5E5E2;
   background-color: var(--green-mist);
   background-image: none;
   min-height: 100%;
@@ -45,30 +65,37 @@ page {
    Only colors change. */
 @media (prefers-color-scheme: dark) {
   page {
-    --green-dark: #56DDA4;
-    --green-soft: rgba(0, 195, 117, 0.14);
-    --green-mist: #0E1210;
     --text: #EEF2EF;
-    --text-2: #B4BDB7;
-    --text-3: #A0A9A3;
-    --line: rgba(255, 255, 255, 0.08);
-    --card: #181D1A;
-    --control-fill: rgba(255, 255, 255, 0.07);
+    --text-2: #B7C0BB;
+    --text-3: #9BA59F;
+    --green-dark: #5CE0A8;
+    --accent-text: #5CE0A8;
+    --green-soft: rgba(0, 195, 117, 0.14);
+    --green-mist: #0B0D0C;
+    --line: rgba(255, 255, 255, 0.07);
+    --card: #171A18;
+    --card-elevated: #1F2320;
+    --control-fill: rgba(255, 255, 255, 0.09);
     --control-line: transparent;
-    --control-pressed: rgba(255, 255, 255, 0.12);
-    --surface-soft: rgba(255, 255, 255, 0.05);
+    --control-pressed: rgba(255, 255, 255, 0.14);
+    --surface-soft: #202422;
     --glass-line: transparent;
     --shadow-soft: none;
+    --shadow: none;
+    --header-glass: rgba(11, 13, 12, 0.82);
+    --member-card-gradient: linear-gradient(135deg, #171A18 0%, #1C231F 100%);
+    --member-card-annual-gradient: linear-gradient(135deg, #1F2320 0%, #241F17 100%);
     --warn: #E8B15C;
     --warn-soft: rgba(232, 177, 92, 0.12);
     --bad: #F29B93;
     --bad-soft: rgba(242, 155, 147, 0.12);
-    --info-soft: rgba(255, 255, 255, 0.05);
+    --info-soft: #202422;
     --skeleton-base: rgba(255, 255, 255, 0.05);
     --skeleton-shine: rgba(255, 255, 255, 0.09);
     /* Product photos are shot for light backgrounds: a dimmed light tile keeps
        dark devices on transparent images visible without a glaring white box. */
     --image-tile: #DCE1DE;
+    --image-tile-gradient: radial-gradient(circle at 50% 40%, #E6EBE8 0%, #D4DAD6 100%);
     background-image: none;
   }
 }

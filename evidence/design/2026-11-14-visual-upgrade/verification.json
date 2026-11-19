@@ -1,0 +1,189 @@
+{
+  "date": "2026-11-14",
+  "version": "3.7.0",
+  "scope": "Full V3.7.0 visual refinement across all 8 consumer pages (query, follow, history, mine, guide, notice-board, notification-test, deadlines), shared styles, config-sheet, reminder-center, outdated footer/date copy cleanup, and dark-mode tests. Offline Chromium preview & Node unit tests only; no WeChat DevTools simulator compile, physical device test, cloud deployment, or release upload.",
+  "sourceHashes": {
+    "miniprogram/app.wxss": "a80d9a0e3fe3f49ed52fbb479c5be8018f10405b77ca2016f04fd22477cf3a02",
+    "miniprogram/theme.json": "e88e9abc6ead1905bd22416dd8b1cc5c643a393349848261b196c0e4ae46eeec",
+    "miniprogram/styles/common.wxss": "545c5af06c552ea08e698cb06ea114f364f3ce00de7856769ba5c6386812771b",
+    "miniprogram/styles/reminder-center.wxss": "df8d25e95e55ae26bd7659bab2dda4de7852f9830d17b588d21fefe4daa27862",
+    "miniprogram/components/config-sheet/index.wxss": "f8e4e86dc0b88b9b6df2ca07cccd8b4d0f30024e0899c3425b2fda90306a417d",
+    "miniprogram/pages/query/index.wxss": "78cb66eafe2acd395b565d4247c94c4cffeb6dfc8208070b343f3ba9103e4431",
+    "miniprogram/pages/follow/index.wxss": "3388de9f17326bcf3ab62bd3a5d0c6273e6472101b66e6c3c16ab65029c0afd6",
+    "miniprogram/pages/history/index.wxss": "ebc7cb0a4a6d014ba7b72cc8a92e9625850f25f83ecfa37f59bc435a923e456a",
+    "miniprogram/pages/mine/index.wxss": "48fb2deb3c51a251508e1586e6502c309f74f2b0e2958507764e463eac50af39",
+    "miniprogram/pages/guide/index.wxml": "819a7bb21cdce0eea5316ea6e4c9302a88456e4245265c18e48ce548f59fc08f",
+    "miniprogram/pages/guide/index.wxss": "8056cd38729093c36321cc6af452e34435ce33f7e0204e1b2646c346288927c0",
+    "miniprogram/pages/notice-board/index.wxss": "71749d35497e2ff936348c881359a9a04553cdbaf8703b06996e9a6abcfa3591",
+    "miniprogram/pages/notification-test/index.wxss": "002022b5090c0c8d3b3b19689b985f0c047910342a92e0cc005901a65e2d76cd",
+    "miniprogram/pages/deadlines/index.wxss": "b3b2d38e7bea874ffb448832c81418f40af0728b6e6c76c999e730c958a14d6c",
+    "miniprogram/config/usage-guide.js": "956d05cc373e6072ca87e0da052a197e44ff7d6a5355f7d0a9d1ae13e510e6e0",
+    "miniprogram/config/release-notes.js": "2d61c71b0f6a913e8ded2215c85425c02d2ebce24c7c0203071f3bdb1426c064",
+    "DESIGN.md": "82f9a01f972901ecc2229cc4215518a34ffbfda573f5cd377cb780071387145e",
+    "tests/dark-mode.test.mjs": "3d9c465538d2aad69cf4ca158dbabf8c401be65da4663365f380d815b0042af9"
+  },
+  "checks": [
+    {
+      "command": "npm test",
+      "exitCode": 0,
+      "summary": {
+        "tests": 1976,
+        "pass": 1976,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      }
+    },
+    {
+      "command": "npm run check",
+      "exitCode": 0,
+      "summary": {
+        "files": 653,
+        "javaScript": 465,
+        "json": 53,
+        "pages": 8,
+        "operatorPages": 1,
+        "errors": []
+      }
+    },
+    {
+      "command": "node tools/build-monitor.mjs --check",
+      "exitCode": 0,
+      "summary": {
+        "passed": true,
+        "files": 50,
+        "sourceBytes": 377497,
+        "issues": []
+      }
+    },
+    {
+      "command": "node tools/release/check.mjs",
+      "exitCode": 1,
+      "summary": {
+        "sourceChecksPassed": true,
+        "monitorBundlePassed": true,
+        "sourceFingerprint": "sha256:a473b8e8e69d4fcbcdea37890df16765eb1b53cb3197a90dbd475e0163dcd6b4",
+        "publicationReady": false,
+        "passed": false,
+        "qualityGatePassed": false,
+        "openQualityBlockers": [
+          "unused-channel-video",
+          "custom-tabbar-first-switch",
+          "oversized-product-image",
+          "legacy-product-image-format"
+        ],
+        "note": "All local source, lockfile, packaging, and asset checks passed; exit code 1 reflects only the 4 pre-existing WeChat quality findings since 3.3.1 awaiting DevTools/real-device retest evidence."
+      }
+    },
+    {
+      "command": "node tools/ui-preview/check-v360.mjs output/refine/v350 output/refine/tabs output/refine/four-pages.json",
+      "exitCode": 0,
+      "summary": {
+        "measured": 96,
+        "failures": 0
+      }
+    },
+    {
+      "command": "node tools/ui-preview/check-layout.mjs output/refine/member",
+      "exitCode": 0,
+      "summary": {
+        "total": 120,
+        "failures": 0,
+        "membershipLayoutFailures": 0
+      }
+    },
+    {
+      "command": "node tools/ui-preview/check-layout.mjs output/refine/member --dark",
+      "exitCode": 0,
+      "summary": {
+        "total": 120,
+        "failures": 0,
+        "membershipLayoutFailures": 0
+      }
+    },
+    {
+      "command": "node tools/ui-preview/check-layout.mjs output/refine/tabs",
+      "exitCode": 0,
+      "summary": {
+        "total": 84,
+        "failures": 0
+      }
+    },
+    {
+      "command": "node tools/ui-preview/check-layout.mjs output/refine/tabs --dark",
+      "exitCode": 0,
+      "summary": {
+        "total": 84,
+        "failures": 0
+      }
+    },
+    {
+      "command": "node tools/ui-preview/check-layout.mjs output/refine/v350",
+      "exitCode": 0,
+      "summary": {
+        "total": 96,
+        "failures": 0
+      }
+    },
+    {
+      "command": "node tools/ui-preview/check-layout.mjs output/refine/notify",
+      "exitCode": 0,
+      "summary": {
+        "total": 160,
+        "failures": 0,
+        "notificationLayoutFailures": 0
+      }
+    },
+    {
+      "command": "node tools/ui-preview/check-layout.mjs output/refine/notify --dark",
+      "exitCode": 0,
+      "summary": {
+        "total": 160,
+        "failures": 0,
+        "notificationLayoutFailures": 0
+      }
+    },
+    {
+      "command": "node tools/ui-preview/check-layout.mjs output/refine/v2",
+      "exitCode": 1,
+      "summary": {
+        "total": 318,
+        "horizontalOverflow": 0,
+        "clippedText": 0,
+        "failedImages": 0,
+        "missingText": 48,
+        "note": "Zero layout/overflow/clipping/image errors; missingText: 48 are pre-existing legacy v2 preview assertions ('mine:保存后持续检测' and 'guide:从选择配置，到收到提醒后下单')."
+      }
+    },
+    {
+      "command": "node tools/ui-preview/check-theme-colors.mjs output/refine/tabs output/refine/colors-light",
+      "exitCode": 0,
+      "summary": {
+        "total": 119,
+        "active": 119,
+        "belowTarget": 0,
+        "primaryMinimum": 5.357131444839318,
+        "selectedNavMinimum": 6.6144767624920755,
+        "unsupportedMeasurements": 0
+      }
+    },
+    {
+      "command": "node tools/ui-preview/check-theme-colors.mjs output/refine/tabs output/refine/colors-dark --dark",
+      "exitCode": 0,
+      "summary": {
+        "total": 119,
+        "active": 119,
+        "belowTarget": 0,
+        "primaryMinimum": 5.357131444839318,
+        "selectedNavMinimum": 7.5689595934714635,
+        "unsupportedMeasurements": 0
+      }
+    }
+  ],
+  "notExecuted": {
+    "impeccableCliDetect": "Bundled .agents/skills/impeccable/scripts/impeccable is non-executable (-rw-rw-r--) and impeccable.cmd targets Windows engine binary; not executed on this macOS host.",
+    "wechatDevTools": "Not executed in this CLI session (未验证).",
+    "physicalDevice": "Not tested on iOS or Android physical devices (未验证)."
+  }
+}

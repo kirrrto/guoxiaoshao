@@ -670,7 +670,7 @@ for (const scenario of scenarios) {
       activity: { successfulQueryUsers: 56, followUsers: 24, acceptedAlertUsers: 18, openedAlertUsers: 12, boughtUsers: 8 },
       notificationTests: { total: 28, users: 20, byStatus: { accepted: 24, failed: 2, uncertain: 2 }, feedback: { received: 15, not_received: 3 } },
     };
-    if (action === 'admin.getConfig') return { config: { announcement: '离线模拟预览', quota: { balanceCap: 10 }, notifications: { enabled: false }, memberProduct: { enabled: false } } };
+    if (action === 'admin.getConfig') return { revision: 1, config: { announcement: '离线模拟预览', quota: { balanceCap: 10 }, notifications: { enabled: false }, memberProduct: { enabled: false } } };
     return {};
   }, { paymentScenario: paymentPreview ? scenario : '' });
   if (scenario.startsWith('v3-authorization-')) rt.wx.requestSubscribeMessage = async ({ tmplIds }) => {
@@ -1016,7 +1016,8 @@ for (const scenario of scenarios) {
         expectedV2Text = ['微信提醒', '查询与体验次数', '提醒记录', '联系客服', '会员权益与购买规则'];
         if (['v2-context-checkout', 'v2-paid-unconfigured', 'v2-longcontent'].includes(scenario)) {
           if (!page.data.checkoutTarget) throw Error(`${scenario}: membership page lost checkout context`);
-          expectedV2Text.push(p.title, '保存后持续检测');
+          expectedV2Text.push(p.title, page.data.checkoutTarget.storeText,
+            member ? '会员已生效 · 继续设置关注' : '准备关注的配置');
         }
         expectedV2Text.push(member ? '会员已开通' : page.data.membershipUpgradeOpen ? `确认购买 ${page.data.boot.memberProduct.days} 天会员` : '开通会员');
         if (scenario.startsWith('v3-member-')) expectedV2Text.push('延长会员', '升级套餐');
@@ -1035,7 +1036,7 @@ for (const scenario of scenarios) {
         if (scenario === 'v2-guide-calendar' || scenario === 'v3-guide-calendar-expanded') {
           if (page.data.section !== 'prepare' || page.data.stageId !== 'prepare') throw Error('Old calendar links must open buying preparation');
         }
-        expectedV2Text.push('选购与取货攻略', '从选择配置，到收到提醒后下单');
+        expectedV2Text.push('选购与取货攻略', '选购准备', '开启小哨', '收到提醒', '完成取货');
         forbiddenText.push('新品发售日历', '本次发售不再提醒', '开启预购');
         if (scenario === 'v2-guide-faq') {
           if (page.data.faqOpen !== 'notification') throw Error('Guide notification FAQ did not expand');
@@ -1114,7 +1115,7 @@ for (const scenario of scenarios) {
         'notification-test-rules': ['会员同样扣次', '明确发送失败自动退回', '结果不明时暂不退回', '不会重复发送', '不查询库存或创建监测', '正式到货和断货提醒需要会员、有效关注与微信授权', '微信授权次数与查询额度分开计算', '不保证手机弹出横幅'],
         'notification-test-needs-authorization': ['尚未获得微信授权', '本次未扣次数'],
         'notification-test-uncertain-received': ['结果尚未确认', '原测试结果仍未知，扣次记录保留', '再次体验会新建测试，另消耗 1 次', '不会重复发送', '重新授权新测试'],
-      }[scenario]] : adminPreview ? { 'operator-ready': ['运行统计', '128'], 'operator-denied': ['当前账号没有管理权限', '重新检查'], 'operator-loading': ['校验权限'], 'operator-error': ['权限检查失败', '重新检查'], 'operator-longcontent': ['运行统计', '查询结果', '运营查询长文本换行验收'], 'operator-saving': ['已修改', '保存配置'] }[scenario] : historyTaskPreview ? pageName === 'history' ? ['恢复最近浏览条件', '收起', p.title, ...{
+      }[scenario]] : adminPreview ? { 'operator-ready': ['运行统计', '128'], 'operator-denied': ['当前账号没有管理权限', '重新检查'], 'operator-loading': ['校验权限'], 'operator-error': ['权限检查失败', '重新检查'], 'operator-longcontent': ['运行统计', '查询结果', '运营查询长文本换行验收'], 'operator-saving': ['保存中', '重载并替换草稿', '保存配置'] }[scenario] : historyTaskPreview ? pageName === 'history' ? ['恢复最近浏览条件', '收起', p.title, ...{
         'history-member-reward': ['今日浏览任务完成，+1 次', '已计入次数明细'],
         'history-free-first': ['还没有浏览记录', '今日浏览任务完成，+1 次', '余 1 次'],
         'history-read-error': ['浏览记录加载或奖励确认未完成', '重新加载'],
@@ -1180,7 +1181,7 @@ for (const scenario of scenarios) {
         : pageName === 'follow' && follows.length ? [p.title, '2 家门店', ...(page.data.follows.some(follow => follow.detailsExpanded) ? [stores[0].name, '收起详情', '调整', '查看供应历史', '删除关注'] : ['详情与管理']), ...(sheetPreview ? ['调整关注', '选商品', '选门店', '已选 2 家门店', p.title + ' · 2 家门店', scenario === 'sheet-saving' ? '正在保存' : '保存关注'] : [])]
         : pageName === 'follow' ? ['暂无库存关注']
         : pageName === 'admin' ? ['运行统计', '128'] : [p.title, ...(sheetPreview ? ['选商品', '选门店', '已选 2 家门店', '保存选择'] : [])];
-      if (adminPreview && ['operator-ready', 'operator-longcontent'].includes(scenario)) expectedText.push('成功查询 56', '查看提醒详情 12', '测试通知：28 条／20 人', '各行为分别计数', ...(scenario === 'operator-longcontent' ? ['以上不是完整统计'] : []));
+      if (adminPreview && ['operator-ready', 'operator-longcontent'].includes(scenario)) expectedText.push('成功查询 56', '已确认呈现详情 12', '测试通知：28 条／20 人', '各行为分别计数', ...(scenario === 'operator-longcontent' ? ['以上不是完整统计'] : []));
       if (sheetPreview) {
         const pickerLimit = pageName === 'history' ? 10 : pageName === 'follow' ? page.data.limits.maxStoresPerFollow : page.data.boot.maxStores;
         expectedText.push(`当前最多 ${pickerLimit} 家`, p.partNumber);
@@ -1233,6 +1234,7 @@ for (const scenario of scenarios) {
       const expectedMembership = (membershipNativePreview || v2Preview || baselinePreview && !['error', 'loading'].includes(scenario)) && pageName === 'mine' ? {
         accountHeader: !page.data.contextualCheckout || !page.data.checkoutTarget || page.data.membership.active,
         active: page.data.membership.active,
+        currentPlanId: page.data.membership.planId,
         accountState: page.data.membership.active ? 'member' : page.data.membership.expired ? 'expired' : 'free',
         packages: !page.data.paymentPendingId && page.data.membershipUpgradeOpen ? page.data.displayMemberProducts.length : 0,
         planIds: !page.data.paymentPendingId && page.data.membershipUpgradeOpen ? page.data.displayMemberProducts.map(item => item.planId) : [],

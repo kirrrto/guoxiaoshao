@@ -12,7 +12,7 @@
 .account-status-expired { color: var(--warn); }
 .account-title { color: var(--text); font-size: clamp(21px, 44rpx, 26px); font-weight: 650; line-height: 1.3; overflow-wrap: anywhere; }
 /* 身份、有效期和实际名额共享账户卡片的表面。 */
-.member-pass { padding: 4rpx 0 0; background: var(--card); }
+.member-pass { padding: 4rpx 0 0; background-color: transparent; }
 .member-pass-heading { display: flex; align-items: center; gap: 10px; }
 .member-pass-brand { display: block; flex: 0 0 32px; width: 32px; height: 32px; border-radius: 7px; }
 .member-pass .account-header-content {
@@ -24,7 +24,7 @@
   gap: 4rpx 20rpx;
 }
 .member-pass .account-status-member { color: var(--green-dark); }
-.member-pass--annual .account-status-member { color: #725625; }
+.membership-annual .account-status-member { color: #725625; }
 .member-pass .account-title {
   color: var(--text);
   font-size: clamp(25px, 7vw, 32px);
@@ -74,9 +74,9 @@
 .member-core-label { color: var(--text-2); font-size: max(12px, 24rpx); overflow-wrap: anywhere; }
 .member-core-value { color: var(--text); font-size: max(14px, 28rpx); font-weight: 650; }
 .member-benefit-plans { display: flex; flex-wrap: wrap; gap: 16rpx; margin-top: 20rpx; }
-.member-benefit-plan { box-sizing: border-box; display: flex; flex: 1 1 180rpx; flex-direction: column; gap: 8rpx; min-width: 0; padding: 20rpx; border-radius: 20rpx; background: var(--surface-soft); }
+.member-benefit-plan { box-sizing: border-box; display: flex; flex: 1 1 180rpx; flex-direction: column; gap: 8rpx; min-width: 0; padding: 20rpx; border: 1px solid var(--line); border-radius: var(--radius-inner); background: var(--card); }
 .member-benefit-plan-label { color: var(--text-2); font-size: max(12px, 24rpx); font-weight: 600; line-height: 1.5; overflow-wrap: anywhere; }
-.member-benefit-plan-amount { font-size: 44rpx; font-weight: 700; color: var(--text); line-height: 1.4; }
+.member-benefit-plan-amount { font-size: 44rpx; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--text); line-height: 1.4; }
 .member-benefit-plan-unit { font-size: max(12px, 24rpx); font-weight: 400; color: var(--text-2); }
 .member-benefit-plan-detail { font-size: max(12px, 24rpx); color: var(--text-2); line-height: 1.6; }
 .member-benefit-note { display: flex; flex-direction: column; gap: 6rpx; padding: 18rpx 4rpx 2rpx; font-size: max(12px, 24rpx); line-height: 1.6; color: var(--text-2); }
@@ -87,7 +87,7 @@
 .membership-rule-copy { color: var(--text-2); font-size: max(12px, 24rpx); line-height: 1.7; overflow-wrap: anywhere; }
 /* Membership selection stays above detailed rules and remains legible on 320px screens. */
 .membership-member-actions { display: flex; gap: 16rpx; margin-top: 28rpx; min-width: 0; }
-.membership-manage { box-sizing: border-box; display: flex; align-items: center; justify-content: center; flex: 1 1 0; min-width: 0; min-height: 44px; margin: 0; padding: 18rpx 14rpx; border: 0; border-radius: var(--radius-action); background: var(--control-fill); color: var(--text); font-size: max(14px, 28rpx); font-weight: 600; line-height: 1.5; white-space: normal; }
+.membership-manage { box-sizing: border-box; display: flex; align-items: center; justify-content: center; flex: 1 1 0; min-width: 0; min-height: 44px; margin: 0; padding: 18rpx 14rpx; border: 1px solid var(--line); border-radius: var(--radius-action); background: var(--card); color: var(--text); font-size: max(14px, 28rpx); font-weight: 500; line-height: 1.5; white-space: normal; }
 .membership-manage.ui-control-pressed { background: var(--control-pressed); }
 .membership-member-actions .membership-manage { width: auto; min-width: 0; max-width: 100%; margin: 0; }
 .membership-manage::after, .membership-shop-close::after { border: 0; }
@@ -96,14 +96,14 @@
 .membership-shop { margin-top: 28rpx; padding-top: 26rpx; border-top: 1rpx solid var(--line); }
 .membership-shop-heading { display: flex; align-items: center; justify-content: space-between; gap: 16rpx; min-width: 0; }
 .membership-shop-title { font-size: 29rpx; font-weight: 650; color: var(--text); }
-.membership-shop-close.ui-action { flex: none; min-height: 44px; margin: -10rpx 0; padding: 10rpx 20rpx; font-size: max(12px, 24rpx); line-height: 1.5; }
+.membership-shop-close.ui-action { flex: none; min-height: 44px; margin: -10rpx 0; padding: 8rpx 4rpx; background: transparent; color: var(--text-2); font-size: max(12px, 24rpx); line-height: 1.5; }
 .membership-shop-heading + .membership-caption { margin-top: 8rpx; }
 .membership-packages { display: flex; flex-direction: column; gap: 14rpx; margin-top: 18rpx; min-width: 0; }
-.membership-package { box-sizing: border-box; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 10rpx 16rpx; width: 100%; min-width: 0; margin: 0; padding: 22rpx; border: 1px solid transparent; border-radius: 20rpx; background: var(--surface-soft); color: var(--text); text-align: left; line-height: 1.5; }
+.membership-package { box-sizing: border-box; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 10rpx 16rpx; width: 100%; min-width: 0; margin: 0; padding: 22rpx; border: 1px solid var(--line); border-radius: var(--radius-inner); background: var(--card); color: var(--text); text-align: left; line-height: 1.5; }
 /* WeChat 3.17.3 sets button:not([size=mini]) to 184px with auto inline margins. */
 .membership-packages .membership-package { box-sizing: border-box; width: 100%; min-width: 0; max-width: 100%; margin: 0; }
 .membership-package::after { border: 0; }
-.membership-package-selected { border-color: var(--text); background: var(--surface-soft); }
+.membership-package-selected { border-color: var(--green-dark); background: var(--card); }
 .membership-package[disabled] { color: var(--text-2); }
 .membership-package-name { font-size: max(14px, 29rpx); font-weight: 650; }
 .membership-package-duration { color: var(--text-2); font-size: max(14px, 28rpx); white-space: normal; }
@@ -121,7 +121,7 @@
 .membership-recommended-tag { display: inline-block; box-sizing: border-box; font-size: max(12px, 24rpx); font-weight: 600; line-height: 1.45; color: var(--text-2); }
 .membership-daily-price { margin-top: 8rpx; color: var(--text-2); font-size: max(12px, 23rpx); white-space: normal; }
 .membership-promotion-deadline { margin-top: 18rpx; color: var(--text-2); font-size: max(12px, 24rpx); line-height: 1.65; }
-.member-record-shortcut.ui-action { flex: none; margin: 0; min-height: 44px; padding: 8rpx 14rpx; font-size: max(12px, 24rpx); }
+.member-record-shortcut.ui-action { flex: none; margin: 0; min-height: 44px; padding: 8rpx 4rpx; background: transparent; color: var(--text-2); font-size: max(12px, 24rpx); }
 .membership-pending-caption { color: var(--text-2); }
 .membership-extension { margin-top: 24rpx; padding: 22rpx 24rpx; border-radius: 20rpx; background: var(--surface-soft); }
 .membership-extension-label { color: var(--text-2); font-size: max(13px, 25rpx); font-weight: 600; line-height: 1.6; }
@@ -137,8 +137,8 @@
 .mine-reminder-summary { flex: 1 1 104px; min-width: 0; }
 .mine-reminder-summary .card-title { margin: 0; }
 .mine-reminder-status { margin-top: 4px; color: var(--text-2); font-size: max(13px, 25rpx); line-height: 1.5; }
-.mine-reminder-heading .mine-reminder-action { flex: 0 1 auto; margin: 0; min-height: 44px; max-width: 100%; }
-.mine-reminder-heading .mine-reminder-action--primary { color: var(--action-text); background: var(--action-fill); }
+.mine-reminder-heading .mine-reminder-action { flex: 0 1 auto; margin: 0; min-height: 44px; max-width: 100%; background: var(--card); border: 1px solid var(--line); }
+.mine-reminder-heading .mine-reminder-action--primary { color: var(--action-text); background: var(--action-fill); border-color: transparent; }
 .mine-reminder-heading .mine-reminder-action--primary.ui-control-pressed { opacity: .84; }
 .mine-reminder-heading .mine-reminder-action[disabled] { color: var(--text-3); background: var(--surface-soft); }
 .reminder-card .reminder-balances { gap: 0; margin: 0 0 18px; }
@@ -172,8 +172,11 @@
 .member-entry.redemption-entry::after, .member-entry.payment-entry::after { display: none; border: 0; }
 .member-entry.payment-entry[disabled], .member-entry.redemption-entry[disabled] { background: var(--control-fill); color: var(--text-3); }
 .redemption-panel { margin-top: 22rpx; padding: 24rpx; background: var(--surface-soft); border-radius: 26rpx; min-width: 0; }
-.redemption-mask { position: fixed; left: 0; top: 0; right: 0; bottom: 0; z-index: 1000; background: rgba(12, 28, 22, 0.42); display: flex; align-items: center; justify-content: center; padding: 32rpx; }
-.redemption-modal { width: 100%; max-width: 640rpx; max-height: 80vh; overflow-y: auto; background: var(--card); border-radius: 28rpx; padding: 32rpx 28rpx 24rpx; box-sizing: border-box; }
+.redemption-mask { position: fixed; left: 0; top: 0; right: 0; bottom: 0; z-index: 1000; background: rgba(0, 0, 0, 0.45); display: flex; align-items: center; justify-content: center; padding: 32rpx; }
+@supports ((-webkit-backdrop-filter: blur(8px)) or (backdrop-filter: blur(8px))) {
+  .redemption-mask { background: rgba(0, 0, 0, 0.36); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+}
+.redemption-modal { width: 100%; max-width: 640rpx; max-height: 80vh; overflow-y: auto; background: var(--card-elevated, var(--card)); border-radius: var(--radius-card); padding: 32rpx 28rpx 24rpx; box-sizing: border-box; }
 .redemption-title { color: var(--text); font-size: 28rpx; font-weight: 600; line-height: 1.5; }
 .redemption-input { box-sizing: border-box; display: block; width: 100%; min-width: 0; max-width: 100%; height: 92rpx; padding: 20rpx; margin-bottom: 20rpx; border: 1rpx solid var(--line); border-radius: 20rpx; background: var(--surface-soft); color: var(--text); font-size: 30rpx; line-height: 1.5; }
 .redemption-placeholder { color: var(--text-3); font-size: max(12px, 26rpx); }
@@ -235,9 +238,9 @@
 .release-note-highlight > text { flex: 1; min-width: 0; overflow-wrap: anywhere; }
 .release-note-caption { margin-top: 16rpx; font-size: max(12px, 24rpx); line-height: 1.6; color: var(--text-3); overflow-wrap: anywhere; }
 .release-pagination { display: flex; align-items: center; justify-content: space-between; gap: 16rpx; margin-bottom: 24rpx; }
-.release-page-button.ui-action { flex: 1 1 0%; min-width: 0; min-height: 44px; padding: 12rpx; font-size: max(12px, 24rpx); }
+.release-page-button.ui-action { flex: 1 1 0%; min-width: 0; min-height: 44px; padding: 12rpx; border: 1px solid var(--line); background: var(--card); font-size: max(12px, 24rpx); }
 .release-page-count { flex: none; min-width: 72rpx; color: var(--text-2); text-align: center; font-size: max(12px, 24rpx); font-variant-numeric: tabular-nums; }
-.release-notes-collapse.ui-action { margin-top: 20rpx; min-height: 44px; font-size: 26rpx; }
+.release-notes-collapse.ui-action { margin-top: 20rpx; min-height: 44px; background: transparent; font-size: 26rpx; }
 .redemption-close.ui-action { margin-top: 16rpx; }
 
 .order-record-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12rpx; padding: 20rpx 0 8rpx; }
@@ -267,7 +270,7 @@
 .checkout-context { margin-top: 24rpx; padding: 24rpx; border-radius: 22rpx; background: var(--surface-soft); }
 .checkout-eyebrow { color: var(--text-2); font-size: max(13px, 26rpx); font-weight: 650; line-height: 1.5; }
 .checkout-target { display: flex; align-items: center; gap: 20rpx; margin-top: 18rpx; min-width: 0; }
-.checkout-image { flex: none; width: 104rpx; height: 112rpx; border-radius: 16rpx; background: var(--image-tile); }
+.checkout-image { flex: none; width: 104rpx; height: 112rpx; border-radius: var(--radius-inner); background-color: var(--image-tile); background-image: var(--image-tile-gradient); }
 .checkout-target-copy { flex: 1; min-width: 0; }
 .checkout-target-title { color: var(--text); font-size: max(16px, 32rpx); font-weight: 650; line-height: 1.5; overflow-wrap: anywhere; }
 .checkout-stores { margin-top: 8rpx; font-size: max(13px, 26rpx); line-height: 1.65; color: var(--text-2); overflow-wrap: anywhere; }
@@ -276,7 +279,7 @@
 .checkout-term { display: inline-block; max-width: 100%; }
 .checkout-problem { margin-top: 12rpx; color: var(--text); font-size: max(14px, 28rpx); line-height: 1.7; }
 .checkout-secondary, .checkout-feedback { display: flex; flex-wrap: wrap; gap: 14rpx; margin-top: 20rpx; }
-.checkout-secondary .ui-action, .checkout-feedback .ui-action { min-height: 44px; margin: 0; }
+.checkout-secondary .ui-action, .checkout-feedback .ui-action { min-height: 44px; margin: 0; background: var(--card); border: 1px solid var(--line); }
 .membership-task-label { display: block; margin-bottom: 12rpx; color: var(--green-dark); font-size: max(12px, 24rpx); line-height: 1.5; }
 .membership-packages-context { flex-wrap: wrap; }
 .membership-packages-context .membership-package { min-width: 0; }
@@ -352,6 +355,9 @@
 .dnd-status-note { padding-top:14rpx; font-size:max(12px,26rpx); line-height:1.6; color:var(--text-2); }
 .quota-card--member .balance { font-size:36rpx; }
 
+.membership-card.membership-active { background-image: var(--member-card-gradient); }
+.membership-card.membership-annual { background-image: var(--member-card-annual-gradient); }
+
 @media (prefers-color-scheme: dark) {
-  .member-pass--annual .account-status-member { color: #D8C494; }
+  .membership-annual .account-status-member { color: #D8C494; }
 }
