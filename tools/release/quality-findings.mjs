@@ -30,7 +30,20 @@ export function fingerprintQualitySource(root) {
   return `sha256:${hash.digest('hex')}`;
 }
 
-export function validateQualityFindings(registry, version, sourceFingerprint) {
+/** Release notes declare the current consumer source in their introduction, above the dated sections. */
+export function releaseNoteMatchesSource(note, sourceFingerprint) {
+  const introduction = note.split(/^#{2,6}[ \t]+/m, 1)[0];
+  const declarations = introduction.split(/\r?\n/).filter(line => line.startsWith('本次消费端源码指纹'));
+  if (declarations.length !== 1 || !validFingerprint(sourceFingerprint)) return false;
+  const declared = /^本次消费端源码指纹为\s*`([^`]+)`/u.exec(declarations[0]);
+  return declared?.[1] === sourceFingerprint && !declarations[0].slice(declared[0].length).includes('sha256:');
+}
+
+// Original platform reports identified these four findings. A passing retest
+// closes the entry in the registry; it does not remove the historical ID.
+const reportedFindingIds = ['unused-channel-video', 'custom-tabbar-first-switch', 'oversized-product-image', 'legacy-product-image-format'];
+
+export function validateQualityFindings(registry, version, sourceFingerprint, requiredIds = reportedFindingIds) {
   const blockers = [];
   const block = (id, code, message) => blockers.push({ id, code, message });
   if (!nonempty(version)) block('registry', 'invalid_version', 'The current release version is required.');
@@ -69,6 +82,9 @@ export function validateQualityFindings(registry, version, sourceFingerprint) {
       || !Array.isArray(evidence.devices) || !evidence.devices.length || !evidence.devices.every(nonempty)) {
       block(id, 'incomplete_retest_evidence', 'Passing retest evidence needs passed:true, a reportRef, taskId and nonempty devices.');
     }
+  }
+  for (const id of requiredIds) {
+    if (!seen.has(id)) block(id, 'missing_reported_finding', 'Retain the reported finding and record its current retest evidence.');
   }
   return { passed: blockers.length === 0, version, sourceFingerprint, blockers };
 }

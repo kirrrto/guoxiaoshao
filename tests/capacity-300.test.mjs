@@ -1,6 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { CLIENTS, slowUpstreamMs, runBurstScenario, runSustainedScenario } from './helpers/capacity-300-scenarios.mjs';
+import { guardedPickup } from '../cloudfunctions/gxs_api/lib/engine/guarded-pickup.js';
+import { mergeConfig } from '../cloudfunctions/gxs_api/lib/config.js';
+import { createFixture, fakeFetch } from './helpers/fixture.mjs';
+import { CLIENTS, slowUpstreamMs, runBurstScenario, runSustainedScenario, summarizeAutomaticAttempts } from './helpers/capacity-300-scenarios.mjs';
 
 function useContractClock(t) {
   // Full-table copies in the in-memory repository measure the host CPU, not
@@ -50,6 +53,26 @@ for (const stores of [['R577'], ['R577', 'R639', 'R320']]) {
   });
 }
 
+test('automatic capacity counts known observations, unknown responses and denied requests separately', async () => {
+  const fetchImpl = fakeFetch({
+    R001: { display: 'available' }, R002: { display: 'unavailable' },
+    R003: { display: 'default' }, R004: { display: 'ineligible' },
+    R005: { display: 'unrecognized' }, R006: { error: 'simulated network loss' },
+  });
+  const config = mergeConfig({ collector: { budgetMode: 'daily', maxRequestsPerMinute: 6 } });
+  const f = createFixture({ fetchImpl, config });
+  const attempts = [];
+  for (const storeNumber of ['R001', 'R002', 'R003', 'R004', 'R005', 'R006', 'R007']) {
+    attempts.push(await guardedPickup({ repo: f.repo, config, fetchImpl, clock: () => f.state.now,
+      source: 'auto', storeNumber, partNumbers: ['MXXX1CH/A'], timeoutMs: 100 }));
+  }
+  assert.equal(fetchImpl.calls.length, 6);
+  assert.equal(attempts[4].record.httpStatus, 200);
+  assert.equal(attempts[5].observations[0].reason.code, 'transport_error');
+  assert.equal(attempts[6].observations[0].reason.code, 'minute_budget');
+  assert.deepEqual(summarizeAutomaticAttempts(attempts), { autoSuccess: 4, autoUnknown: 2, autoBusy: 1 });
+});
+
 test('300 competing members and automatic demand stay within shared capacity across cold handlers and Beijing midnight', async t => {
   useContractClock(t);
   const report = await runSustainedScenario();
@@ -59,6 +82,9 @@ test('300 competing members and automatic demand stay within shared capacity acr
   assert.equal(report.anyMinuteExceeded, false, diagnostic);
   assert.equal(report.netQuotaDebit, 0, diagnostic);
   assert.ok(report.manualSuccess > 0, diagnostic); assert.ok(report.autoSuccess > 0, diagnostic);
+  assert.equal(report.autoUnknown, 0, diagnostic);
+  assert.equal(report.autoSuccess + report.autoUnknown + report.autoBusy, report.totalAutomaticAdmissionAttempts, diagnostic);
+  for (const wave of report.waves) assert.equal(wave.autoSuccess + wave.autoUnknown + wave.autoBusy, CLIENTS, diagnostic);
   assert.equal(report.days.length, 2, diagnostic);
   assert.equal(report.totalHttp, report.counters.admitted.manual + report.counters.admitted.auto, diagnostic);
 });

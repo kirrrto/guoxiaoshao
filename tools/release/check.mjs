@@ -5,7 +5,7 @@ import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 import { checkMonitorBundle } from '../lib/monitor-bundle.mjs';
-import { fingerprintQualitySource, validateQualityFindings } from './quality-findings.mjs';
+import { fingerprintQualitySource, releaseNoteMatchesSource, validateQualityFindings } from './quality-findings.mjs';
 import { hasConsumerEntry } from './consumer-entry.mjs';
 import { compareInstalledDependencies } from './installed-dependencies.mjs';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
@@ -23,8 +23,10 @@ check('release acceptance requirements are explicit and not marked as production
   && deliveryTargets.followAvailableRecheckSeconds === 3 && deliveryTargets.productionAcceptancePassed === false);
 const readme = fs.readFileSync(path.join(root, 'README.md'), 'utf8');
 const releaseNote = `docs/RELEASE_${project.version}.md`;
+const releaseNotePath = path.join(root, releaseNote);
+const releaseNoteText = fs.existsSync(releaseNotePath) ? fs.readFileSync(releaseNotePath, 'utf8') : '';
 check('README identifies and links the current release', readme.split(/\r?\n/)[0] === `# 果小哨 · v${project.version}` && readme.includes(`](${releaseNote})`));
-check('current release note identifies the same version', fs.existsSync(path.join(root, releaseNote)) && fs.readFileSync(path.join(root, releaseNote), 'utf8').split(/\r?\n/)[0] === `# 果小哨 v${project.version} 发布说明`);
+check('current release note identifies the same version', releaseNoteText.split(/\r?\n/)[0] === `# 果小哨 v${project.version} 发布说明`);
 check('release development config validates request domains', json('project.config.json').setting.urlCheck === true);
 const privateConfigPath = path.join(root, 'project.private.config.json');
 check('DevTools project root and local overrides resolve the consumer miniprogram/app.json',
@@ -162,13 +164,14 @@ const thumbnailCheck = spawnSync(process.execPath, [path.join(root, 'tools/asset
 check('verified local thumbnails cover the current catalog and match recorded asset hashes', thumbnailCheck.status === 0);
 check('frontend source and assets fit within the 1.5 MiB main-package budget before compilation', frontendBytes <= imagePolicy.mainPackageMaxBytes);
 check('image assets fit within the 200 KB WeChat quality audit recommendation', imageBytes <= imagePolicy.imageMaxBytes);
-const sourceChecksPassed = checks.every(c => c.passed);
 let qualityGate;
 let sourceFingerprint = null;
 try {
   sourceFingerprint = fingerprintQualitySource(root);
   qualityGate = validateQualityFindings(json('config/wechat-quality-findings.json'), project.version, sourceFingerprint);
 } catch (error) { qualityGate = { passed: false, version: project.version, sourceFingerprint, blockers: [{ id: 'registry', code: 'quality_gate_read_error', message: error.message }] }; }
+check('current release note declares the matching consumer source fingerprint', releaseNoteMatchesSource(releaseNoteText, sourceFingerprint));
+const sourceChecksPassed = checks.every(c => c.passed);
 check('known WeChat quality findings have passing current-version retest evidence', qualityGate.passed);
 const report = { checkedAt: new Date().toISOString(), version: project.version, scope: 'Local source and recorded quality evidence only; no cloud deployment, real-device retest, account-console inspection or submission', publicationReady: false, sourceChecksPassed, qualityGate, passed: checks.every(c => c.passed), checks, frontend: { files: frontendFiles, sourceBytes: frontendBytes, imageBytes, imageMaxBytes: imagePolicy.imageMaxBytes, mainPackageMaxBytes: imagePolicy.mainPackageMaxBytes, note: 'Source bytes, not the WeChat upload package size' }, externalReleaseChecks: [
   { item: 'Consumer account eligibility, filing, categories and privacy declaration', status: 'requires account-console verification' },

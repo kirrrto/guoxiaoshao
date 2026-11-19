@@ -10,6 +10,8 @@
 
 每次交付包含小修小补的新版时，递增补丁号（如 `3.7.0 → 3.7.1`）。用 `node tools/release/bump-version.mjs <新版本>` 同步版本，再更新「我的 → 更新公告」、README 和本版发布说明。历史上传回执、部署记录与质检报告保留实际对应的版本。
 
+发布说明先写当前能做什么、正式发布还缺什么。将本包指纹单独登记在前言，沿用 [3.7.1 发布说明](docs/RELEASE_3.7.1.md) 的格式。`node tools/release/check.mjs` 会计算本地消费端指纹并与前言核对。
+
 ## 持续沿用的设计规范
 
 - [DESIGN.md](DESIGN.md) 是后续界面修改的长期基准，[ui-quality.mdc](.cursor/rules/ui-quality.mdc) 提供每次更新的检查入口。按现有实现合并维护规范，不因外部模板或工具升级替换产品身份；[PRODUCT.md](PRODUCT.md) 中尚未确认的上下文不自动补写。

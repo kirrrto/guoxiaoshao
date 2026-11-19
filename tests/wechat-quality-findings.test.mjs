@@ -3,16 +3,29 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
-import { fingerprintQualitySource, validateQualityFindings } from '../tools/release/quality-findings.mjs';
+import { fingerprintQualitySource, releaseNoteMatchesSource, validateQualityFindings } from '../tools/release/quality-findings.mjs';
 
 const version = '3.3.1';
 const sourceFingerprint = `sha256:${'a'.repeat(64)}`;
-const validate = (value, currentVersion = version, fingerprint = sourceFingerprint) => validateQualityFindings(value, currentVersion, fingerprint);
+const validate = (value, currentVersion = version, fingerprint = sourceFingerprint) => validateQualityFindings(value, currentVersion, fingerprint, []);
 const registry = finding => ({ schemaVersion: 1, findings: [{ id: 'example-finding', reportedVersion: version, status: 'open', ...finding }] });
 const passingEvidence = () => ({ version, sourceFingerprint, reportRef: 'test-fixture/retest-report.json', taskId: 'fixture-task', devices: ['fixture iOS device', 'fixture Android device'], passed: true });
 
-test('all four current findings remain open blockers when the release version changes', () => {
+test('the project registry retains every historically reported finding, even after closure', () => {
   const expected = ['unused-channel-video', 'custom-tabbar-first-switch', 'oversized-product-image', 'legacy-product-image-format'];
+  const actual = JSON.parse(fs.readFileSync(new URL('../config/wechat-quality-findings.json', import.meta.url), 'utf8'));
+  for (const id of expected) assert.ok(actual.findings.some(finding => finding.id === id), id);
+  const closed = actual.findings.map(finding => ({ ...finding, status: 'closed', evidence: passingEvidence() }));
+  assert.equal(validateQualityFindings({ ...actual, findings: closed }, version, sourceFingerprint).passed, true);
+  for (const id of expected) {
+    const partial = { ...actual, findings: closed.filter(finding => finding.id !== id) };
+    const result = validateQualityFindings(partial, version, sourceFingerprint);
+    assert.deepEqual(result.blockers.map(issue => [issue.id, issue.code]), [[id, 'missing_reported_finding']]);
+  }
+});
+
+test('open findings remain blockers when the release version changes', () => {
+  const expected = ['a', 'b'];
   const findings = { schemaVersion: 1, findings: expected.map(id => ({ id, reportedVersion: version, status: 'open' })) };
   for (const currentVersion of [version, '3.3.2', '4.0.0']) {
     const result = validate(findings, currentVersion);
@@ -111,4 +124,20 @@ test('source fingerprints include nested source paths, image bytes and the WeCha
   const before = fingerprintQualitySource(directory);
   fs.renameSync(path.join(directory, 'miniprogram/nested/index.wxml'), path.join(directory, 'miniprogram/nested/renamed.wxml'));
   assert.notEqual(fingerprintQualitySource(directory), before);
+});
+
+test('the current release declares one consumer fingerprint independently of historical evidence', t => {
+  const root = sourceFixture(t, sourceFiles());
+  const fp = fingerprintQualitySource(root);
+  const line = `本次消费端源码指纹为 \`${fp}\`，供上传后关联微信质检报告。`;
+  const history = `## 历史记录\r\n上次上传的源码指纹为 \`${sourceFingerprint}\`。`;
+  const note = [`# 果小哨 v${version} 发布说明`, '', line, '', history].join('\r\n');
+  assert.ok(releaseNoteMatchesSource(note, fp));
+  for (const text of ['', history, history + '\n' + line, note.replace(line, ''), note.replace(line, line + '\n' + line),
+    note.replace(line, line + ' 或 `' + sourceFingerprint + '`')]) {
+    assert.equal(releaseNoteMatchesSource(text, fp), false);
+  }
+  fs.appendFileSync(path.join(root, 'miniprogram/app.js'), 'module.exports = { visible: true };\n');
+  assert.equal(releaseNoteMatchesSource(note, fingerprintQualitySource(root)), false);
+  assert.equal(releaseNoteMatchesSource(note, null), false);
 });

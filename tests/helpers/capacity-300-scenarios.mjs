@@ -6,6 +6,7 @@ import { createFixture, fakeFetch, operatorContext, userContext, PRODUCTS, STORE
 const require = createRequire(import.meta.url);
 const { createHandler } = require('../../cloudfunctions/gxs_api/lib/app');
 const { guardedPickup } = require('../../cloudfunctions/gxs_api/lib/engine/guarded-pickup');
+const { KNOWN_STATUSES } = require('../../cloudfunctions/gxs_api/lib/engine/events');
 const { DEFAULTS, mergeConfig, validateConfig } = require('../../cloudfunctions/gxs_api/lib/config');
 const { COLLECTIONS: C } = require('../../cloudfunctions/gxs_api/lib/collections');
 const { CAPACITY_ID, capacityLimits } = require('../../cloudfunctions/gxs_api/lib/engine/capacity-budget');
@@ -88,7 +89,7 @@ export async function queryWave(s, { name, distinct = false, stores = ['R577'], 
     distinctRequestedTargets: (distinct ? CLIENTS : 1) * stores.length,
     successfulQueries: rows.filter(row => row.result.ok).length, fullySuccessfulQueries: rows.filter(row => row.result.ok && !row.result.partial).length,
     partialQueries: rows.filter(row => row.result.partial).length, busyOrFailedQueries: rows.filter(row => !row.result.ok).length, reasons, transportErrors,
-    knownTargetReads: results.filter(row => row.status !== 'unknown').length, reusedTargetReads: results.filter(row => row.reused).length,
+    knownTargetReads: results.filter(row => KNOWN_STATUSES.has(row.status)).length, reusedTargetReads: results.filter(row => row.reused).length,
     upstreamHttp: samples.length, duplicateTargetHttpWithinWave: samples.length - uniqueRequests.size,
     targetClaimCalls: s.counters.targetClaims - beforeClaims, budgetChecks: s.counters.budgetChecks - beforeBudgetChecks,
     netQuotaDebit: rows.reduce((sum, row) => sum + (row.result.charged || 0) - (row.result.refunded || 0), 0),
@@ -109,6 +110,16 @@ export async function runBurstScenario({ name, distinct = false, stores = ['R577
     all300ImmediateResults: report.fullySuccessfulQueries === CLIENTS };
 }
 
+export function summarizeAutomaticAttempts(batches) {
+  const counts = { autoSuccess: 0, autoUnknown: 0, autoBusy: 0 };
+  for (const { record, observations } of batches) {
+    if (record.budgetDenied) counts.autoBusy++;
+    else if (observations.length && observations.every(row => KNOWN_STATUSES.has(row.status))) counts.autoSuccess++;
+    else counts.autoUnknown++;
+  }
+  return counts;
+}
+
 export async function runSustainedScenario({ collector } = {}) {
   const s = await capacityFixture({ start: '2026-10-01T15:59:00.000Z', collector });
   const limits = s.config.collector;
@@ -125,7 +136,7 @@ export async function runSustainedScenario({ collector } = {}) {
     const capacity = publicCapacity(s);
     waves.push({ wave, elapsedSimulatedSeconds: (s.f.state.now.getTime() - start) / 1000,
       manualSuccess: manual.successfulQueries, manualBusy: manual.busyOrFailedQueries, manualReasons: manual.reasons, manualTransportErrors: manual.transportErrors,
-      autoSuccess: automatic.filter(batch => !batch.record.budgetDenied).length, autoBusy: automatic.filter(batch => batch.record.budgetDenied).length,
+      ...summarizeAutomaticAttempts(automatic),
       netQuotaDebit: manual.netQuotaDebit, totalUpstreamHttp: s.fetchImpl.calls.length - beforeHttp, ...capacity });
     if (wave < waveCount - 1) s.f.advance(45000);
   }
@@ -135,7 +146,9 @@ export async function runSustainedScenario({ collector } = {}) {
     simulatedSeconds: elapsedMs / 1000, crossesBeijingMidnight: true, coldHandlersPerWave: CLIENTS,
     totalManualQueries: CLIENTS * waves.length, totalAutomaticAdmissionAttempts: CLIENTS * waves.length,
     manualSuccess: waves.reduce((sum, wave) => sum + wave.manualSuccess, 0), manualBusy: waves.reduce((sum, wave) => sum + wave.manualBusy, 0),
-    autoSuccess: waves.reduce((sum, wave) => sum + wave.autoSuccess, 0), totalHttp: s.fetchImpl.calls.length,
+    autoSuccess: waves.reduce((sum, wave) => sum + wave.autoSuccess, 0),
+    autoUnknown: waves.reduce((sum, wave) => sum + wave.autoUnknown, 0),
+    autoBusy: waves.reduce((sum, wave) => sum + wave.autoBusy, 0), totalHttp: s.fetchImpl.calls.length,
     sharedRefillEnvelope: rates.capacities.shared + elapsedMs * rates.rates.shared,
     overRefillEnvelope: s.fetchImpl.calls.length > Math.floor(rates.capacities.shared + elapsedMs * rates.rates.shared + 1e-8),
     invalidTokenBalance: waves.some(wave => Object.values(wave.tokens || {}).some(value => !Number.isFinite(value) || value < -1e-8)),
