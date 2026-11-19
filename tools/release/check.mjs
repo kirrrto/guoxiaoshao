@@ -172,7 +172,7 @@ try {
 check('known WeChat quality findings have passing current-version retest evidence', qualityGate.passed);
 const report = { checkedAt: new Date().toISOString(), version: project.version, scope: 'Local source and recorded quality evidence only; no cloud deployment, real-device retest, account-console inspection or submission', publicationReady: false, sourceChecksPassed, qualityGate, passed: checks.every(c => c.passed), checks, frontend: { files: frontendFiles, sourceBytes: frontendBytes, imageBytes, imageMaxBytes: imagePolicy.imageMaxBytes, mainPackageMaxBytes: imagePolicy.mainPackageMaxBytes, note: 'Source bytes, not the WeChat upload package size' }, externalReleaseChecks: [
   { item: 'Consumer account eligibility, filing, categories and privacy declaration', status: 'requires account-console verification' },
-  { item: 'Deploy cloudbase_auth, gxs_api and gxs_monitor; verify actual timer invocations', status: 'not checked by this local tool; consult the versioned cloud-deployment evidence' },
+  { item: 'Verify deployed gxs_api and gxs_monitor packages, timer invocations and existing shared application access', status: 'requires cloud verification; consult the versioned deployment evidence' },
   { item: 'Apply database indexes/rules and seed verified catalog', status: 'not checked by this local tool; consult the versioned cloud-deployment evidence' },
   { item: 'Real-account signin, quota, history and reminder deletion/clear', status: 'requires deployed-cloud acceptance' },
   { item: 'iOS and Android layout, images, failure recovery and package size', status: 'requires physical-device acceptance' },

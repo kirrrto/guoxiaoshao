@@ -8,6 +8,15 @@
 // Keep technical details and complete acceptance records in release documents.
 const RELEASE_NOTES = [
   {
+    version: '3.7.1',
+    title: '状态刷新与到期提醒修复',
+    dateText: '版本记录 · 2026-11-20',
+    highlights: [
+      '查询遇到异常时，刷新状态不消耗查询次数。小哨会区分最近一次检查和上次有效库存。',
+      '同名到期事项也能分别授权提醒。会员卡配色按套餐区分，保留果哨标志。',
+    ],
+  },
+  {
     version: '3.7.0',
     title: '门店取货、提醒和会员卡更新',
     dateText: '版本记录 · 2026-11-14',
