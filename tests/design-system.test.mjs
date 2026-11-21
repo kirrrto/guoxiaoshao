@@ -24,7 +24,8 @@ const stripComments = css => css.replace(/\/\*[\s\S]*?\*\//g, '');
 /** Innermost blocks only: `{ selector, declarations: [[property, value]] }`. */
 function rules(css) {
   const found = [];
-  const source = stripComments(css);
+  // An @import ends at its semicolon. It is not part of the next rule's selector.
+  const source = stripComments(css).replace(/^\s*@import\s+(?:"[^"]+"|'[^']+')\s*;/gm, '');
   let start = 0, selector = '';
   for (let index = 0; index < source.length; index += 1) {
     const char = source[index];
@@ -71,8 +72,12 @@ test('type: six sizes, two weights, three line heights — nothing else', () => 
     value => /^var\(--lh-(tight|snug|normal)\)$/.test(value) || ['1', 'inherit'].includes(value)), [],
   'line-height must be a --lh-* token');
   assert.deepEqual(violations(everyDeclaration.filter(item => item.property === 'font'), () => false), [], 'no font shorthand');
-  assert.deepEqual(violations(everyDeclaration.filter(item => item.property === 'font-family'), () => false), [],
-    'the system font stack is declared once on page');
+  const fontFamilies = everyDeclaration.filter(item => item.property === 'font-family');
+  assert.deepEqual(fontFamilies.map(({ file, selector }) => [file, selector]), [['app.wxss', 'page']],
+    'only the global page may declare the system font stack');
+  assert.match(fontFamilies[0].value, /^-apple-system,.*"PingFang SC".*sans-serif$/);
+  assert.deepEqual(rules('@import "shared.wxss";\n.first { font-size: 99px; }')[0],
+    { selector: '.first', declarations: [['font-size', '99px']] });
 });
 
 test('color: values live in app.wxss tokens; pages and components only reference them', () => {
