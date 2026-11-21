@@ -4,7 +4,7 @@
   <view class="config-sheet-panel" style="bottom: {{keyboardHeight}}px; max-height: calc(100vh - {{keyboardHeight}}px - max(12px, env(safe-area-inset-top)));" aria-role="dialog" aria-modal="true" aria-label="{{title}}">
     <view class="config-sheet-header">
       <view class="config-sheet-heading"><view class="config-sheet-title">{{title}}</view></view>
-      <button class="config-sheet-close" disabled="{{busy}}" bindtap="onCloseTap" aria-label="关闭配置面板">×</button>
+      <button class="config-sheet-close {{busy ? 'config-sheet-close--busy' : ''}}" disabled="{{busy}}" bindtap="onCloseTap" aria-label="关闭配置面板"><view class="ui-close" aria-hidden="true"></view></button>
     </view>
     <scroll-view class="config-sheet-body" scroll-y enhanced show-scrollbar="{{true}}"><view class="config-sheet-content">
       <view wx:if="{{subtitle}}" class="config-sheet-subtitle">{{subtitle}}</view>

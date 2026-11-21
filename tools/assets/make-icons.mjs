@@ -23,6 +23,7 @@ const SS = 4;
 // Keep the existing brand asset separate from functional icon contrast.
 const ACTIVE = [0x00, 0x8f, 0x59];
 const BRAND_GREEN = [0x00, 0xc3, 0x75];
+const PASS_GOLD = [0xea, 0xcb, 0x85];
 const INACTIVE = [0x6c, 0x81, 0x79];
 
 const dist = (x, y, cx, cy) => Math.hypot(x - cx, y - cy);
@@ -98,11 +99,6 @@ const UI_ICONS = {
     strokePath([[23, 12], [58, 12], [58, 69], [51, 64], [44, 69], [37, 64], [30, 69], [23, 64], [23, 12]]),
     segment(33, 27, 48, 27, 6), segment(33, 40, 48, 40, 6), segment(33, 53, 42, 53, 6),
   ),
-  // 权益与规则：盾牌配确认勾；仅作分组装饰，不替代服务状态。
-  shield: union(
-    strokePath([[40.5, 11], [64, 20], [62, 43], [55, 57], [40.5, 69], [26, 57], [19, 43], [17, 20], [40.5, 11]]),
-    strokePath([[29, 38], [38, 47], [52, 31]]),
-  ),
   // 微信提醒：圆顶铃铛；声音及真实送达仍由旁边文案说明。
   notification: union(
     clip(ring(40.5, 34, 19, 6), (x, y) => y <= 34),
@@ -155,19 +151,22 @@ const UI_ICONS = {
   ),
 };
 
-function render(shape, rgb) {
-  const raw = Buffer.alloc((SIZE * 4 + 1) * SIZE);
-  for (let py = 0; py < SIZE; py++) {
-    raw[py * (SIZE * 4 + 1)] = 0; // filter: none
-    for (let px = 0; px < SIZE; px++) {
+// scale > 1 rasterises the same 81-unit shape onto a larger canvas for marks
+// that are displayed bigger than an icon.
+function render(shape, rgb, scale = 1) {
+  const size = SIZE * scale;
+  const raw = Buffer.alloc((size * 4 + 1) * size);
+  for (let py = 0; py < size; py++) {
+    raw[py * (size * 4 + 1)] = 0; // filter: none
+    for (let px = 0; px < size; px++) {
       let hits = 0;
       for (let sy = 0; sy < SS; sy++) {
         for (let sx = 0; sx < SS; sx++) {
-          if (shape(px + (sx + 0.5) / SS, py + (sy + 0.5) / SS)) hits++;
+          if (shape((px + (sx + 0.5) / SS) / scale, (py + (sy + 0.5) / SS) / scale)) hits++;
         }
       }
       const alpha = Math.round((hits / (SS * SS)) * 255);
-      const offset = py * (SIZE * 4 + 1) + 1 + px * 4;
+      const offset = py * (size * 4 + 1) + 1 + px * 4;
       raw[offset] = rgb[0];
       raw[offset + 1] = rgb[1];
       raw[offset + 2] = rgb[2];
@@ -186,10 +185,10 @@ function chunk(type, data) {
   return Buffer.concat([length, body, crc]);
 }
 
-function png(raw) {
+function png(raw, scale = 1) {
   const ihdr = Buffer.alloc(13);
-  ihdr.writeUInt32BE(SIZE, 0);
-  ihdr.writeUInt32BE(SIZE, 4);
+  ihdr.writeUInt32BE(SIZE * scale, 0);
+  ihdr.writeUInt32BE(SIZE * scale, 4);
   ihdr[8] = 8; // bit depth
   ihdr[9] = 6; // RGBA
   ihdr[10] = 0;
@@ -218,3 +217,7 @@ const brandDir = path.join(root, 'miniprogram', 'images', 'brand');
 fs.mkdirSync(brandDir, { recursive: true });
 fs.writeFileSync(path.join(brandDir, 'whistle-green.png'), png(render(whistle, BRAND_GREEN)));
 console.log('wrote brand/whistle-green.png');
+// 会员卡水印：同一口哨图形的 3 倍栅格（243px），金色取自会员版标志。
+// 透明度由样式控制，图形本身不含渐变或阴影。
+fs.writeFileSync(path.join(brandDir, 'whistle-pass.png'), png(render(whistle, PASS_GOLD, 3), 3));
+console.log('wrote brand/whistle-pass.png');

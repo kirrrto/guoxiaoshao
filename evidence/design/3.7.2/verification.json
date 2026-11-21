@@ -1,0 +1,39 @@
+{
+  "version": "3.7.2",
+  "date": "2026-11-21",
+  "consumerSourceFingerprint": "sha256:f036f76ce56a81c392081ef5cb32eacd19de1bb233d3e6a101e422ab3bba244b",
+  "renderer": "Offline Chromium with synthetic preview fixtures",
+  "screenshots": {
+    "dark.png": "0fbfe16552f13821aa524be9b1a31034af583839268b86a69bb3fa06d4ab10ac",
+    "four-tabs.png": "742fe95dbab99fd6db5cdf63e60bffbc7f92f98f027cce54578516b8fe2b9d2c",
+    "membership-paywall.png": "6977748bbe477ecc43b70a9bb6fa46c8ba62bbad75895c84c3e7125351c9af53",
+    "membership-rules.png": "e94f179a4a866c6e576fdb0500f6b0f8905a623cd935ff427060914e94cfa356"
+  },
+  "largeFont": {
+    "widths": [
+      320,
+      375
+    ],
+    "fontScale": 1.3,
+    "schemes": [
+      "light",
+      "dark"
+    ],
+    "casesPerScheme": 10
+  },
+  "taskLayout": {
+    "cases": 96,
+    "failures": 0
+  },
+  "physicalDeviceTested": false,
+  "smoke": {
+    "fixtureGroups": 9,
+    "browserCommands": 30,
+    "layoutCases": 1524,
+    "simulatedNativeTabChecks": 1170,
+    "pickerAlignmentChecks": 120,
+    "contrastRecords": 986,
+    "activeContrastSamples": 976,
+    "minimumPrimaryContrast": 5.357
+  }
+}

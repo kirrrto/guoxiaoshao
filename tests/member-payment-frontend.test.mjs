@@ -23,9 +23,10 @@ test('purchase notice is a non-refundable one-time virtual service and empty not
   assert.equal(purchaseNotice({}), DEFAULT_PURCHASE_NOTICE);
 });
 
-function runtime({ storage = new Map(), handler, platform = 'android', supported = true, login, cashier, nextProduct = product, account = 'wx-app:account-a', onDiagnostic, onPriceChanged } = {}) {
+function runtime({ storage = new Map(), getStorage, handler, platform = 'android', supported = true, login, cashier, nextProduct = product, account = 'wx-app:account-a', onDiagnostic, onPriceChanged } = {}) {
   const calls = [], logins = [], payments = [], resolved = [], updates = [], timers = new Map(); let sequence = 0, timerId = 0;
   const wx = {
+    getStorage,
     getDeviceInfo: () => ({ platform }), canIUse: () => supported,
     getStorageSync: key => storage.get(key), setStorageSync: (key, value) => storage.set(key, structuredClone(value)), removeStorageSync: key => storage.delete(key),
     login: options => { logins.push(options); if (login) return login(options); options.success({ code: 'one-time-login-code' }); },
@@ -44,6 +45,37 @@ function runtime({ storage = new Map(), handler, platform = 'android', supported
   return { controller, calls, logins, payments, resolved, updates, timers, wx, storage,
     state: () => controller.getState(), async runTimer() { const [id, value] = timers.entries().next().value || []; if (!value) return false; timers.delete(id); value.fn(); await tick(); return true; } };
 }
+
+test('switching accounts hides the old order immediately and locks buying until the new account storage read completes', async () => {
+  const reads = [], rt = runtime({ getStorage: options => reads.push(options) });
+  reads.shift().success({ data: { orderId: 'account-a-existing' } });
+  assert.equal(rt.state().paymentPendingId, 'account-a-existing');
+  rt.controller.sync({ userKey: 'account-b' }, product);
+  assert.equal(rt.state().paymentPendingId, '');
+  assert.equal(rt.state().paymentBusy, true);
+  await rt.controller.show();
+  await rt.controller.buy();
+  assert.equal(rt.calls.length, 0);
+  assert.equal(rt.logins.length, 0);
+  assert.equal(rt.storage.size, 0);
+  reads.shift().success({ data: { orderId: 'account-b-existing' } });
+  await tick();
+  assert.equal(rt.state().paymentBusy, false);
+  assert.deepEqual(rt.calls.map(c => [c.action, c.payload.orderId]), [['member.checkOrder', 'account-b-existing']]);
+  assert.equal(rt.payments.length, 0);
+});
+
+test('a failed asynchronous storage read cannot let a new purchase overwrite an earlier order', async () => {
+  const key = STORAGE_PREFIX + encodeURIComponent('wx-app:account-a');
+  const storage = new Map([[key, { orderId: 'previous-pending-order' }]]);
+  const rt = runtime({ storage, getStorage: options => options.fail({ errMsg: 'getStorage:fail' }) });
+  await rt.controller.show();
+  await rt.controller.buy();
+  assert.deepEqual(rt.calls.map(c => [c.action, c.payload.orderId]), [['member.checkOrder', 'previous-pending-order']]);
+  assert.equal(rt.storage.get(key).orderId, 'previous-pending-order');
+  assert.equal(rt.payments.length, 0);
+  assert.equal(rt.logins.length, 0);
+});
 
 test('cashier success never grants membership; server signatures are passed byte-for-byte and only the order reference is stored', async () => {
   const rt = runtime(); await rt.controller.show(); await rt.controller.buy();

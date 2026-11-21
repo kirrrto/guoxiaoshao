@@ -1,14 +1,31 @@
-.reminder-overlay { position: fixed; inset: 0; z-index: 1300; display: flex; align-items: center; justify-content: center; padding: 36rpx; box-sizing: border-box; background: rgba(10, 24, 17, .42); }
-.reminder-dialog { width: 100%; max-width: 640rpx; box-sizing: border-box; padding: 36rpx; border: 1rpx solid var(--line, #E2E9E5); border-radius: 28rpx; background: var(--card, #FFFFFF); color: var(--text, #182A23); }
-.reminder-eyebrow { font-size: max(12px, 24rpx); color: var(--text-2, #52665B); margin-bottom: 12rpx; }
-.reminder-title { font-size: 36rpx; line-height: 1.4; font-weight: 700; }
-.reminder-counts { display: flex; gap: 16rpx; margin-top: 28rpx; }
-.reminder-count { flex: 1; display: flex; justify-content: space-between; align-items: center; padding: 18rpx; border-radius: 16rpx; background: var(--surface-soft, #F2F6F4); font-size: max(12px, 26rpx); color: var(--text-2, #52665B); }
-.reminder-number { font-size: 36rpx; font-weight: 700; color: var(--text, #182A23); }
-.reminder-unit { font-size: max(12px, 24rpx); font-weight: 400; }
-.reminder-detail { margin: 24rpx 0; font-size: max(12px, 26rpx); line-height: 1.6; color: var(--text-2, #52665B); }
-.reminder-dialog .reminder-allow, .reminder-dialog .reminder-later { border: 0; min-width: 0; max-width: 100%; width: 100%; margin: 0; min-height: max(44px, 88rpx); display: flex; align-items: center; justify-content: center; padding: 16rpx 24rpx; box-sizing: border-box; border-radius: 20rpx; font-size: max(14px, 28rpx); line-height: 1.5; font-weight: 600; }
-.reminder-allow { color: var(--green-ink, #073C2C); background: var(--green, #00C375); }
-.reminder-dialog .reminder-later { margin-top: 16rpx; color: var(--text-2, #52665B); background: var(--surface-soft, #F2F6F4); }
-.reminder-allow::after, .reminder-later::after { border: none; }
-.reminder-footnote { margin-top: 18rpx; text-align: center; font-size: max(12px, 22rpx); color: var(--text-3, #5C6E65); }
+/* 隔离组件：只用类选择器，令牌经继承取自页面。 */
+.reminder-overlay { position: fixed; inset: 0; z-index: 1300; display: flex; align-items: center; justify-content: center; padding: var(--sp-24); box-sizing: border-box; background: var(--scrim); }
+.reminder-dialog { box-sizing: border-box; width: 100%; max-width: 320px; padding: var(--sp-24) var(--sp-20) var(--sp-16); border-radius: var(--radius-tray); background: var(--elevated); color: var(--text); }
+.reminder-title { font-size: var(--fs-headline); font-weight: 600; line-height: var(--lh-snug); }
+.reminder-counts { display: flex; gap: var(--sp-8); margin-top: var(--sp-16); }
+.reminder-count { display: flex; flex: 1 1 0; align-items: baseline; justify-content: space-between; padding: var(--sp-12); border-radius: var(--radius-control); background: var(--surface); color: var(--text-2); font-size: var(--fs-sub); }
+.reminder-number { color: var(--text); font-size: var(--fs-title); font-weight: 600; line-height: var(--lh-tight); }
+.reminder-unit { color: var(--text-2); font-size: var(--fs-sub); font-weight: 400; }
+.reminder-detail { margin: var(--sp-16) 0; color: var(--text-2); font-size: var(--fs-sub); line-height: var(--lh-normal); }
+/* 三个类压过原生按钮的禁用配色；组件样式不使用属性选择器。 */
+.reminder-overlay .reminder-dialog .reminder-allow, .reminder-overlay .reminder-dialog .reminder-later {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  min-height: var(--btn-height);
+  margin: 0;
+  padding: var(--sp-12) var(--sp-20);
+  border: 0;
+  border-radius: var(--radius-control);
+  font-size: var(--fs-body);
+  font-weight: 600;
+  line-height: var(--lh-snug);
+}
+.reminder-overlay .reminder-dialog .reminder-allow { background: var(--green); color: var(--green-ink); }
+.reminder-overlay .reminder-dialog .reminder-busy { opacity: 0.5; }
+.reminder-overlay .reminder-dialog .reminder-later { margin-top: var(--sp-4); background: transparent; color: var(--text-2); font-weight: 400; }
+.reminder-footnote { color: var(--text-3); font-size: var(--fs-caption); text-align: center; }

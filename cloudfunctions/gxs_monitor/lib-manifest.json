@@ -118,8 +118,8 @@
     },
     {
       "path": "engine/wechat-sender.js",
-      "bytes": 6613,
-      "sha256": "207a2d2a5f84f5598d2f8b75d008522fe68ca47b21991707799246b5a22c68bc"
+      "bytes": 7572,
+      "sha256": "e8cd8b1ba10364e43d947d2c44d83320169b2dc18f465620431356206b05c406"
     },
     {
       "path": "errors.js",
@@ -153,13 +153,13 @@
     },
     {
       "path": "repo/atomic-ops.js",
-      "bytes": 54271,
-      "sha256": "6f0f873886ae0b0e182f666bd5e6ddde5c2c3a3eb718fec3063680e27473110b"
+      "bytes": 54786,
+      "sha256": "727758449e9ea4e354f7bf40f5c8bc96d4315e2c6232d00282d4652717c21417"
     },
     {
       "path": "repo/cloudbase-repo.js",
-      "bytes": 28847,
-      "sha256": "92faa6250c568e1db81882b3e0fc65bce5a5c289688e0716ff5d2729bd236302"
+      "bytes": 28909,
+      "sha256": "4b10eed201cf5893542bab051eef3dbeddc26b1eab3c7d0b963a5bbb79854a04"
     },
     {
       "path": "repo/current-availability.js",

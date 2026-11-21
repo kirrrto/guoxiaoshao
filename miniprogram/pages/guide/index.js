@@ -31,7 +31,7 @@ function readGuideTarget(options) {
 
 Page({
   data: { stages: guide.stages, stage: guide.stages[0], stageId: 'prepare', faqs: guide.faqs,
-    faqOpen: '', section: '', focusedFaq: null, targetSummary: null, returnLabel: '返回提醒中心' },
+    faqOpen: '', section: '', focusedFaq: null, allowanceFaq: null, targetSummary: null, returnLabel: '返回提醒中心' },
   onLoad(options = {}) {
     // Previously shared calendar links now lead directly to the buying guide.
     const section = options.section === 'calendar' ? 'prepare' : SECTIONS.includes(options.section) ? options.section : '';
@@ -45,7 +45,8 @@ Page({
     const faqId = section === 'faq' ? 'notification' : section;
     this.setData({ stage, stageId: stage.id,
       section, focusedFaq: guide.faqs.find(item => item.id === faqId) || null,
-      returnLabel: { query: '返回原查询', follow: '返回小哨任务', history: '返回历史', mine: '返回提醒中心', guide: '返回提醒中心' }[this.returnSource],
+      allowanceFaq: section === 'membership' ? guide.faqs.find(item => item.id === 'slots') : null,
+      returnLabel: { query: '返回原查询', follow: '返回小哨任务', history: '返回历史', mine: section === 'membership' ? '返回会员套餐' : '返回提醒中心', guide: '返回提醒中心' }[this.returnSource],
       faqOpen: guide.faqs.some(item => item.id === faqId) ? faqId : '' });
     this.refreshTarget(currentCatalog());
   },
@@ -78,7 +79,16 @@ Page({
   onTestNotification() { navigation.navigateTo({ url: '/pages/notification-test/index?from=guide' }); },
   onCheckReminders() { if (navigation.isNavigating()) return; getApp().globalData.pendingMineSection = 'reminder-center'; navigation.switchTab({ url: '/pages/mine/index' }); },
   onCheckFollows() { navigation.switchTab({ url: '/pages/follow/index' }); },
-  onReturnTask() { returnToSource(this.returnSource === 'guide' ? 'mine' : this.returnSource, this.returnOwner); },
+  onReturnTask() {
+    if (this.data.section === 'membership' && this.returnSource === 'mine' && this.returnOwner === currentOwner()) {
+      const pages = typeof getCurrentPages === 'function' ? getCurrentPages() : [];
+      const previous = pages[pages.length - 2];
+      if (previous && previous.route === 'pages/mine/index') navigation.navigateBack({ delta: 1 });
+      else this.onGoMine();
+      return;
+    }
+    returnToSource(this.returnSource === 'guide' ? 'mine' : this.returnSource, this.returnOwner);
+  },
   onGoMine() { if (navigation.isNavigating()) return; getApp().globalData.pendingMineSection = 'membership-card'; navigation.switchTab({ url: '/pages/mine/index' }); },
   onCopyDiagnostics() {
     // Only this explicit tap reads device metadata and writes the clipboard.

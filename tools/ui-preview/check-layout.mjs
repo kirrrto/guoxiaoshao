@@ -19,19 +19,31 @@ const stockFontPreview = args.includes('--stock-fonts-only');
 const deadlineFontPreview = args.includes('--v350-fonts-only');
 const stockFontScenarios = ['stock-old-expanded', 'stock-mixed-expanded', 'stock-unknown', 'stock-offline'];
 const fontPreview = membershipFontPreview || notificationFontPreview || stockFontPreview || deadlineFontPreview;
-if (deadlineFontPreview && !JSON.parse(fs.readFileSync(path.join(directory, 'manifest.json'), 'utf8')).v350Preview) throw Error('--v350-fonts-only requires --v350-only');
 let playwright;
 try { playwright = require('playwright'); }
 catch { playwright = require(path.join(os.homedir(), '.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright')); }
 const manifest = JSON.parse(fs.readFileSync(path.join(directory, 'manifest.json'), 'utf8'));
+if (!Array.isArray(manifest.snapshots) || !manifest.snapshots.length) throw Error('No layout snapshots in preview manifest');
+if (!Array.isArray(manifest.sourceHashes) || !manifest.sourceHashes.length) throw Error('Preview source hashes missing; rebuild before layout verification.');
+if (deadlineFontPreview && !manifest.v350Preview) throw Error('--v350-fonts-only requires --v350-only');
 if (membershipFontPreview && !manifest.membershipNativePreview) throw Error('--membership-fonts-only requires a --membership-native-only build');
 if (membershipFontPreview && args.includes('--images-only')) throw Error('--membership-fonts-only cannot be combined with --images-only');
 if (notificationFontPreview && !manifest.notificationTestPreview) throw Error('--notification-fonts-only requires a --notification-test-only build');
 if (notificationFontPreview && (membershipFontPreview || args.includes('--images-only'))) throw Error('--notification-fonts-only cannot be combined with another filter');
 if (stockFontPreview && (membershipFontPreview || notificationFontPreview || args.includes('--images-only'))) throw Error('--stock-fonts-only cannot be combined with another filter');
 if (stockFontPreview && (!manifest.snapshots.length || manifest.snapshots.some(item => item.page !== 'follow' || !item.expectedStock))) throw Error('--stock-fonts-only requires a --stock-only build');
+const membershipFontScenarios = ['payment-ready', 'payment-expired', 'payment-annual', 'payment-upgrade-monthly', 'payment-upgrade-annual'];
+const selected = membershipFontPreview
+  ? manifest.snapshots.filter(item => [320, 375].includes(item.width) && membershipFontScenarios.includes(item.scenario))
+  : notificationFontPreview ? manifest.snapshots.filter(item => [320, 375].includes(item.width) && ['notification-test-ready', 'notification-test-accepted', 'notification-test-authorized', 'notification-test-pending-other', 'notification-test-not-received', 'notification-test-rules'].includes(item.scenario))
+  : stockFontPreview ? manifest.snapshots.filter(item => [320, 375].includes(item.width) && stockFontScenarios.includes(item.scenario))
+  : args.includes('--images-only') ? manifest.snapshots.filter(item => item.page === 'query' && ['member', 'longcontent'].includes(item.scenario)) : manifest.snapshots;
+if (!selected.length) throw Error('No layout snapshots match the requested checks');
+if (membershipFontPreview && membershipFontScenarios.some(scenario => [320, 375].some(width => !selected.some(item => item.scenario === scenario && item.width === width)))) throw Error('Membership font stress requires both widths and all five account states');
+if (notificationFontPreview && selected.length !== 12) throw Error('Notification font stress requires both widths and all six interaction states');
+if (stockFontPreview && (selected.length !== 8 || stockFontScenarios.some(scenario => [320, 375].some(width => !selected.some(item => item.scenario === scenario && item.width === width))))) throw Error('Stock font stress requires both widths and all four inventory states');
 function verifyPreviewSources() {
-  for (const source of manifest.sourceHashes || []) {
+  for (const source of manifest.sourceHashes) {
     const current = crypto.createHash('sha256').update(fs.readFileSync(path.join(manifest.source, source.file))).digest('hex');
     if (current !== source.sha256) throw Error(`Preview source changed: ${source.file}. Re-run build.mjs before layout verification.`);
   }
@@ -81,14 +93,6 @@ try {
   const invalidTargets = indexTargets.filter(target => !manifest.snapshots.some(item => item.page === target.page && item.scenario === target.scenario && item.width === target.width && item.file === target.file) || !fs.existsSync(path.join(directory, target.file)));
   const missingTargets = manifest.snapshots.filter(item => !indexTargets.some(target => target.file === item.file));
   report.indexNavigation = { total: indexTargets.length, invalidTargets, missingTargets };
-  const selected = membershipFontPreview
-    ? manifest.snapshots.filter(item => [320, 375].includes(item.width) && ['payment-ready', 'payment-upgrade-monthly', 'payment-expired'].includes(item.scenario))
-    : notificationFontPreview ? manifest.snapshots.filter(item => [320, 375].includes(item.width) && ['notification-test-ready', 'notification-test-accepted', 'notification-test-authorized', 'notification-test-pending-other', 'notification-test-not-received', 'notification-test-rules'].includes(item.scenario))
-    : stockFontPreview ? manifest.snapshots.filter(item => [320, 375].includes(item.width) && stockFontScenarios.includes(item.scenario))
-    : args.includes('--images-only') ? manifest.snapshots.filter(item => item.page === 'query' && ['member', 'longcontent'].includes(item.scenario)) : manifest.snapshots;
-  if (membershipFontPreview && selected.length !== 6) throw Error('Membership font stress requires both widths and all three account states');
-  if (notificationFontPreview && selected.length !== 12) throw Error('Notification font stress requires both widths and all six interaction states');
-  if (stockFontPreview && (selected.length !== 8 || stockFontScenarios.some(scenario => [320, 375].some(width => !selected.some(item => item.scenario === scenario && item.width === width))))) throw Error('Stock font stress requires both widths and all four inventory states');
   for (const item of selected) {
     await page.setViewportSize({ width: item.width, height: deadlineFontPreview ? 600 : 900 });
     await page.goto(pathToFileURL(path.join(directory, item.file)).href);
@@ -199,7 +203,7 @@ try {
         return errors;
       }, item.scenario === 'operator-saving');
     }
-    Object.assign(metrics, await page.evaluate(inspectMembershipLayout, item.expectedMembership || null));
+    Object.assign(metrics, await page.evaluate(inspectMembershipLayout, item.expectedMembership ? { ...item.expectedMembership, fontScale: report.fontScale } : null));
     Object.assign(metrics, await page.evaluate(inspectNotificationLayout, item.expectedNotification || null));
     if (item.scenario.startsWith('nudge-')) {
       metrics.notificationLayoutErrors.push(...await page.evaluate(() => {
@@ -305,7 +309,7 @@ try {
         record.notesScreenshot = name;
       }
     }
-    if (item.width === 375 && ['payment-ready', 'payment-member', 'payment-benefits', 'payment-rules'].includes(item.scenario)) {
+    if (item.width === 375 && ['payment-ready', 'payment-member', 'payment-expired', 'payment-upgrade-annual'].includes(item.scenario)) {
       const name = item.file.replace('.html', '-membership.png');
       await page.locator('.membership-card').screenshot({ path: path.join(screenshots, name) });
       record.membershipScreenshot = name;
@@ -374,7 +378,7 @@ try {
     if (item.width === 375 && ['orders-single', 'orders-pending', 'orders-error'].includes(item.scenario)) {
       // A full-page capture pins the floating tab bar at the first viewport's
       // bottom. Also inspect the records at a real scroll position.
-      await page.locator('.order-record-toolbar').evaluate(element => window.scrollTo(0, window.scrollY + element.getBoundingClientRect().top - 80));
+      await page.locator('[data-preview-action="onToggleOrders"]').evaluate(element => window.scrollTo(0, window.scrollY + element.getBoundingClientRect().top - 80));
       const name = item.file.replace('.html', '-records.png');
       await page.screenshot({ path: path.join(screenshots, name), fullPage: false });
       record.recordsScreenshot = name;

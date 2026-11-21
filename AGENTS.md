@@ -14,8 +14,8 @@
 
 ## 持续沿用的设计规范
 
-- [DESIGN.md](DESIGN.md) 是后续界面修改的长期基准，[ui-quality.mdc](.cursor/rules/ui-quality.mdc) 提供每次更新的检查入口。按现有实现合并维护规范，不因外部模板或工具升级替换产品身份；[PRODUCT.md](PRODUCT.md) 中尚未确认的上下文不自动补写。
-- shadcn/create preset `b2BnwlLhw` 已实际配置、导出并在独立 Web 项目验证，证据链接保存在 DESIGN.md。沿用的是层级、成对语义色和控件状态；小程序继续保留主绿、系统中文字体、四个原生 tab、直接关注和精确 SKU，不直接引入 React/Tailwind/OKLCH。
+- [DESIGN.md](DESIGN.md) 是后续界面修改的长期基准；硬规则由 [`tests/design-system.test.mjs`](tests/design-system.test.mjs) 对照 [`miniprogram/app.wxss`](miniprogram/app.wxss) 机械执行。改令牌必须同步改规范与测试。[ui-quality.mdc](.cursor/rules/ui-quality.mdc) 提供每次更新的检查入口。按现有实现合并维护规范，不因外部模板或工具升级替换产品身份；[PRODUCT.md](PRODUCT.md) 中尚未确认的上下文不自动补写。
+- 令牌法：六级字号、两种字重、白底浅灰托盘、主绿操作、黑金通行证。沿用层级与成对语义色；小程序继续保留主绿、系统中文字体、四个原生 tab、直接关注和精确 SKU，不引入 React/Tailwind/OKLCH/rpx/毛玻璃。历史 shadcn 参照仅作思想来源。
 - 界面变更复用既有组件与语义变量，检查真实可点击范围、可访问名称、占位文字、保存中锁定和错误恢复。44px 点击区域、320px 下 12px 功能文字等是离线检查下限，必须与微信原生/真机验证分开记录。
 
 ## 每次更新的体验与用量检查

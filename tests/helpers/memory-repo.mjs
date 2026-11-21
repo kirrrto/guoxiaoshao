@@ -137,7 +137,10 @@ export function createMemoryRepo(seed = {}) {
     },
     async getQuery(id) { return get(COLLECTIONS.queries, id); },
     async saveQuery(query) { put(COLLECTIONS.queries, query); },
-    async listQueries(userKey, limit) { return all(COLLECTIONS.queries).filter(q => q.userKey === userKey).sort(byDesc('createdAt')).slice(0, limit || 20); },
+    async listQueries(userKey, limit, kind) {
+      return all(COLLECTIONS.queries).filter(q => q.userKey === userKey && (!kind || q.kind === kind))
+        .sort((a, b) => byDesc('createdAt')(a, b) || byDesc('_id')(a, b)).slice(0, limit || 20);
+    },
     async listRecentHistoryViews(userKey, limit = 20) {
       return all(COLLECTIONS.queries).filter(query => query.userKey === userKey && query.kind === 'history' && query.status === 'success')
         .sort((a, b) => byDesc('finishedAt')(a, b) || byDesc('_id')(a, b)).slice(0, limit)

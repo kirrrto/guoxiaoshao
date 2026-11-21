@@ -1,47 +1,30 @@
-.reminder-balances { display:flex; gap:16rpx; margin:16rpx 0 20rpx; padding:14rpx 0; border-top:1rpx solid var(--line); border-bottom:1rpx solid var(--line); }
-.reminder-balance { flex:1; min-width:0; display:flex; flex-direction:column; gap:6rpx; padding:4rpx 18rpx 4rpx 0; border-radius:0; border-right:1rpx solid var(--line); background:transparent; }
-.reminder-balance:last-child { border-right:0; padding-right:0; }
-.reminder-balance-label,.reminder-balance-pending { font-size:max(12px, 26rpx); color:var(--text-2); line-height:1.5; overflow-wrap:anywhere; }
-.reminder-balance-value { font-size:36rpx; color:var(--text); font-weight:600; font-variant-numeric:tabular-nums; line-height:1.5; overflow-wrap:anywhere; }
-.authorization-feedback,.authorization-hint { margin-top:16rpx; font-size:max(12px, 26rpx); line-height:1.65; color:var(--text-2); }
-.authorization-feedback { color:var(--green-dark); }
-.authorization-sync-error { display:flex; gap:12rpx; align-items:center; flex-wrap:wrap; padding:16rpx; margin-top:16rpx; border-radius:16rpx; background:var(--warn-soft); color:var(--warn); font-size:max(12px, 26rpx); line-height:1.6; }
-.authorization-sync-error > text { flex:1 1 240rpx; min-width:0; overflow-wrap:anywhere; }
+/* 提醒授权：「我的」、小哨页与授权面板共用。 */
+.reminder-balances { display: flex; gap: var(--sp-16); margin-bottom: var(--sp-16); }
+.reminder-balance { display: flex; flex: 1 1 0; flex-direction: column; gap: var(--sp-2); min-width: 0; }
+.reminder-balance + .reminder-balance { padding-left: var(--sp-16); border-left: 1px solid var(--line); }
+.reminder-balance-label, .reminder-balance-pending { color: var(--text-2); font-size: var(--fs-sub); overflow-wrap: anywhere; }
+.reminder-balance-value { font-size: var(--fs-title); font-weight: 600; line-height: var(--lh-tight); }
 
-.consent-recovery {
-  margin-top: 12rpx;
-  padding: 20rpx;
-  border-radius: 16rpx;
-  background: var(--warn-soft);
-  border: 1px solid var(--warn);
-}
-.consent-recovery-title {
-  font-size: 30rpx;
-  font-weight: 700;
-  color: var(--warn);
-  line-height: 1.5;
-}
-.consent-recovery-desc {
-  margin-top: 8rpx;
-  font-size: max(12px, 25rpx);
-  color: var(--text-2);
-  line-height: 1.6;
-}
-.consent-recovery-row {
+.authorization-feedback { margin-top: var(--sp-12); color: var(--green-text); font-size: var(--fs-sub); }
+.authorization-hint { margin-top: var(--sp-12); color: var(--text-2); font-size: var(--fs-sub); }
+.authorization-sync-error {
   display: flex;
-  justify-content: space-between;
-  gap: 16rpx;
-  margin-top: 12rpx;
-  font-size: max(12px, 27rpx);
-  line-height: 1.5;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--sp-8);
+  margin-top: var(--sp-12);
+  padding: var(--sp-12);
+  border-radius: var(--radius-control);
+  background: var(--warn-soft);
+  color: var(--warn);
+  font-size: var(--fs-sub);
 }
-.consent-recovery-name { color: var(--text); flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
-.consent-recovery-state { color: var(--warn); font-weight: 650; flex: 0 0 auto; }
-.consent-recovery-action { margin-top: 16rpx; min-height: 44px; }
-.consent-recovery-steps {
-  margin-top: 12rpx;
-  font-size: max(12px, 23rpx);
-  color: var(--text-2);
-  line-height: 1.6;
-}
-.authorization-panel .btn { min-height:48px; white-space:normal; line-height:1.5; }
+.authorization-sync-error > text { flex: 1 1 120px; min-width: 0; overflow-wrap: anywhere; }
+
+.consent-recovery { margin-top: var(--sp-12); padding: var(--sp-16); border-radius: var(--radius-control); background: var(--warn-soft); }
+.consent-recovery-title { color: var(--warn); font-weight: 600; }
+.consent-recovery-desc, .consent-recovery-steps { margin-top: var(--sp-4); color: var(--text-2); font-size: var(--fs-sub); }
+.consent-recovery-row { display: flex; justify-content: space-between; gap: var(--sp-12); margin-top: var(--sp-8); font-size: var(--fs-sub); }
+.consent-recovery-name { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
+.consent-recovery-state { flex: none; color: var(--warn); font-weight: 600; }
+.consent-recovery-action.btn { margin-top: var(--sp-12); }

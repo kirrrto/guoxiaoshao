@@ -224,7 +224,7 @@ test('a new membership offers to continue the configuration a free user tried to
   assert.match(modals.at(-1).content, /iPhone 18 Pro Max 1TB/);
   assert.equal(app.globalData.pendingMemberFollow, null, 'offered once');
   modals.at(-1).success({ confirm: true });
-  assert.deepEqual(clone(app.globalData.pendingFollow), { partNumber: 'MJYH4CH/A', storeNumbers: ['R577'] });
+  assert.deepEqual(clone(app.globalData.pendingFollow), { partNumber: 'MJYH4CH/A', storeNumbers: ['R577'], userKey: 'real:user' });
   assert.deepEqual(tabs, ['/pages/follow/index']);
   // An already-used code activates nothing, so the kept target stays for a later purchase.
   const kept = { globalData: { pendingMemberFollow: { partNumber: 'MJYH4CH/A', storeNumbers: ['R577'], title: 'x' } } };

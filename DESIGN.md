@@ -1,189 +1,215 @@
 ---
 name: 果小哨
-description: 以清晰层级和原生控件完成选配、库存查询、关注与提醒
+description: 白底托盘、六级字号、主绿操作与黑金通行证——用布局传达信息
 colors:
-  primary: "#00C375"
-  primary-ink: "#073C2C"
-  accent-text: "#006B3F"
-  background: "#F4F4F2"
-  card: "#FFFFFF"
-  card-elevated: "#FFFFFF"
-  control: "#EFEFED"
-  control-pressed: "#E5E5E2"
-  surface-soft: "#F6F6F4"
+  background: "#FFFFFF"
+  surface: "#F5F5F3"
+  surface-top: "#FFFFFF"
+  elevated: "#FFFFFF"
+  pressed: "#E8E8E5"
   text: "#111412"
   text-secondary: "#545956"
   text-muted: "#626764"
-  line: "#ECECEA"
+  line: "rgba(17, 20, 18, 0.08)"
+  primary: "#00C375"
+  primary-ink: "#073C2C"
+  accent-text: "#006B3F"
   warning: "#895806"
   warning-surface: "#FBF1DC"
   danger: "#A83E3E"
   danger-surface: "#FBECEC"
+  pass: "#151816"
+  pass-gold: "#E9CE9A"
   dark-background: "#0B0D0C"
-  dark-card: "#171A18"
-  dark-card-elevated: "#1F2320"
+  dark-surface: "#171A18"
+  dark-surface-top: "#252927"
+  dark-elevated: "#1F2320"
   dark-text: "#EEF2EF"
   dark-text-secondary: "#B7C0BB"
   dark-text-muted: "#9BA59F"
   dark-accent-text: "#5CE0A8"
 typography:
-  body:
-    fontFamily: '-apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", Helvetica, sans-serif'
-    fontSize: "max(14px, 30rpx)"
-    lineHeight: 1.5
-  title:
-    fontSize: "max(20px, 40rpx)"
-    fontWeight: 600
-  label:
-    fontSize: "max(12px, 24rpx)"
+  fontFamily: '-apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", Helvetica, sans-serif'
+  display: "28px / 600"
+  title: "22px / 600"
+  headline: "17px / 600"
+  body: "15px / 400"
+  sub: "13px / 400"
+  caption: "12px / 400"
+  weights: "400 | 600"
+  lineHeights: "1.25 | 1.4 | 1.5"
 rounded:
-  card: "28rpx"
-  inner: "20rpx"
-  action: "22rpx"
-  chip: "999rpx"
-spacing:
-  page-inline: "32rpx"
-  card-padding: "32rpx"
-  card-gap: "26rpx"
-  section-gap: "40rpx"
-  row-gap: "28rpx"
-  action-gap: "16rpx"
+  tray: "16px"
+  control: "12px"
+  tile: "10px"
+  pill: "999px"
+spacing: "2 4 8 12 16 20 24 32 40 px"
 components:
   button-primary:
     backgroundColor: "{colors.primary}"
     textColor: "{colors.primary-ink}"
-    rounded: "{rounded.action}"
-  card:
-    backgroundColor: "{colors.card}"
-    textColor: "{colors.text}"
-    rounded: "{rounded.card}"
-    padding: "{spacing.card-padding}"
+  tray:
+    backgroundColor: "{colors.surface}"
+    rounded: "{rounded.tray}"
+  pass:
+    backgroundColor: "{colors.pass}"
+    accent: "{colors.pass-gold}"
 ---
 
 # 果小哨设计基准
 
+> **令牌与规则以源码为准。** 颜色、字号、间距定义在 [`miniprogram/app.wxss`](miniprogram/app.wxss)；公共组件在 [`miniprogram/styles/common.wxss`](miniprogram/styles/common.wxss)；可执行约束在 [`tests/design-system.test.mjs`](tests/design-system.test.mjs)。改令牌必须同步改本文件与测试。本文件约束后续界面维护（含其他模型），不授权生产部署。
+
 ## Overview
 
-**Creative North Star: "让布局本身来传达信息"**
+**Creative North Star:「让布局本身来传达信息」**
 
-保留现有绿色、中文系统字体和微信原生交互。让商品配置、库存观测与下一步操作各有清晰位置；优先使用层级、间距和一致控件，减少不必要的次要标签与重复说明。简洁不能删去影响购买、授权、到期、退款或库存判断的事实。
+果小哨是微信里的工作台：查门店取货、留意补货、记住到期。界面追求**高级、简洁、有哨标气质**——不是靠装饰，而是靠统一的字号阶梯、克制的绿色、干净的托盘，以及会员页那一张黑金通行证。
 
-本规范于 2026-10-28 按 3.4.3 原生 WXML/WXSS 合并更新，2026-10-30 按 3.5.0 本地候选补充首页顺序及到期提醒状态规范，2026-11-14 按 [视觉精细化方案](docs/VISUAL_REFINEMENT_BRIEF.md) 同步字号阶梯、三层按钮、细线分组、等宽数字及四处受控渐变/毛玻璃质感规范，供后续界面工作持续沿用。前置颜色、文字与形状取自 [app.wxss](miniprogram/app.wxss) 和 [common.wxss](miniprogram/styles/common.wxss)；新增样式复用这些语义变量，修改公共值时同步核对规范。隔离组件的局部样式和深色覆盖仍需分别检查。
+保留：主绿 `#00C375`、系统中文字体、四个原生 tab、精确 SKU、直接关注路径、影响购买/退款/授权/库存判断的事实。
+拒绝：网页式通栏横线、卡片套卡片、页内自造字号、冗长规则段落、绿字大标题、字符充当图标。
 
-实际参考为 [shadcn/create preset b2BnwlLhw](https://ui.shadcn.com/create?preset=b2BnwlLhw)：Vega、Neutral、Emerald、medium radius、Noto Sans、Lucide。已在真实浏览器配置并导出 [preset](evidence/design/2026-10-28/shadcn-preset.json) 与 [CSS](evidence/design/2026-10-28/shadcn-preset.css)，随后用固定 shadcn 4.23.0 在独立目录生成 Vite 参照，构建并比对浅深色共 63 个变量，差异为零；命令、版本、[源码归档](evidence/design/2026-10-28/shadcn-reference-source.zip) 的重建方法与哈希见 [验证记录](evidence/design/2026-10-28/shadcn-cli-verification.json)。采用其控件层级、成对语义颜色和状态组织；小程序继续使用自己的颜色、字体、原生组件及精确 SKU，不移植 React、Tailwind、OKLCH 或 Web DOM 状态规则。Web 参照本身不证明微信实现通过验收。
+本规范于 2026-11-21 按当前消费端源码重写，与 V3.7.2 界面重构一并生效。历史 shadcn 参照仅说明「层级与语义色」的思想来源，**不得**把 React / Tailwind / OKLCH / Noto Sans / Lucide 带进小程序。
 
-同时保留 [规范草稿 PR #7](https://github.com/kirrrto/guoxiaoshao/pull/7) 中适用的方法；本地采用不代表远端合并。后续复核以当前源码、渲染结果与会话授权为准，不把外部方案当作实施事实。
+## 硬规则（改界面前先读）
 
-## 四个主入口
+这些规则由 `tests/design-system.test.mjs` 机械执行。违反即失败，不要为了「好看一点」绕过。
 
-果小哨同时帮用户查门店库存、留意补货和记住到期事项。查询页借用取货凭条的排版来对应货号、门店与观测时间。小哨首页以最近提醒和关注目标为主，供应历史按时间阅读，会员卡沿用产品自己的标志。浅深色遵循相同顺序。[四页截图与本轮验收](evidence/design/3.7.0/README.md)
-
-- **查询**　首次使用时展示当前额度和「选择配置与门店」。选好后展示机型、规格、商品图和门店，可直接关注。结果与当前 SKU、门店集合一致时，接着读货号、查询时间和门店观测。有可执行的下一步时，让它成为主操作。条件变更或身份待核对时，旧结果展示自己的商品与门店。
-- **小哨**　绿色哨标随「我的小哨」出现。到期事项突出下一次计划提醒时间，同时写明事项、到期日和微信状态。授权正常时先读库存关注和真实观测时间，需要处理的授权排在关注列表前。库存为空时突出「添加关注」，列表内已有可取货观测时突出「查看取货信息」。服务未开时写明仅保存。
-- **历史**　日期选择和「今天」「昨天」组成一行，允许窄屏换行。结果按实际观测时间和门店对齐，同秒的多店事件共享时间标签。没有事件时保留观测范围和计次说明。
-- **我的**　套餐、有效期和已用名额读作一组，使用当前主题的账户卡底色。有效会员保留 32px 黑金果小哨标志，普通账户使用绿色主标。年卡的「会员已开通」在浅色使用深金墨色，深色使用浅金。付款、购买记录与授权各有明确入口。[会员版标识原稿](docs/brand/logo-member-generation.md)
-- **公告与文案**　普通公告放在公告页。首页只提示有效的维护、告警、需要恢复的微信授权及实际服务故障。到期或撤下的活动不点亮红点。保留扣次、库存时效、授权与退款事实。
-- **动态**　展开详情用 160ms 过渡，启用减少动态时直接显示。
+1. **字号只有六级**：`--fs-display` 28 · `--fs-title` 22 · `--fs-headline` 17 · `--fs-body` 15 · `--fs-sub` 13 · `--fs-caption` 12。页面与组件的 `font-size` 只能写 `var(--fs-*)`，禁止 `clamp`、`rpx`、裸 `px`、`max()`。
+2. **字重只有两种**：`400` 与 `600`。不要 `500` / `650` / `700`。
+3. **行高只有三档**：`--lh-tight` 1.25 · `--lh-snug` 1.4 · `--lh-normal` 1.5。
+4. **字体栈只在 `page` 声明一次**；别处不写 `font-family` / `font` 简写。等宽数字用 `font-variant-numeric: tabular-nums`（已在 `page`），货号不要换 Menlo。
+5. **颜色只引用令牌**；字面色值只能出现在 `app.wxss` 的 token 定义里。深色只改 `app.wxss` 的 `@media (prefers-color-scheme: dark)`，页面不得再写一套 dark 覆盖。
+6. **间距只走 `--sp-*`**：2 / 4 / 8 / 12 / 16 / 20 / 24 / 32 / 40。允许 `calc(var(--sp-N) * -1)` 与 `+ env(safe-area-inset-bottom)`。
+7. **圆角只走 `--radius-*`**：tray 16 · control 12 · tile 10 · pill。
+8. **托盘不投影**；唯一允许的阴影是抽屉 `--shadow-sheet`。浅色托盘无描边，靠 `--surface` 与白底分层。
+9. **不用 `rpx`、不用 `!important`、不用毛玻璃 blur、不用装饰性渐变**（渐变只能作为已命名令牌，如 `--pass-fill`）。
+10. **按钮三级**：主 `.btn-primary`（绿底墨绿字）· 次 `.btn`（中性填充）· 文字 `.btn-text`。已退役：`btn-outline` / `btn-ghost` / `btn-neutral` / `ui-action--neutral`。
+11. **图标用边框绘制或 PNG**：`ui-chevron` / `ui-check` / `ui-plus` / `ui-close`；模板里禁止 `› ✓ ＋ ✕` 等字符图标。
+12. **展开入口不写「展开 / 收起 / 查看」文案**——方向标已经说明状态。
+13. **触控高度**：主按钮 `--btn-height` 48px；通用点击区至少 `--tap` 44px。
+14. **绿色分工**：`--green` 只做填充；可读绿字用 `--green-text`；绿底上的字用 `--green-ink`。禁止 `color: var(--green)`，禁止把标题/门店名整段染绿。
 
 ## Colors
 
-主绿用于主要操作、当前选中及有依据的状态；中性色承载内容和分组。语义色按前景与背景成对选择，不能只替换填充色。
+白底页面 + 浅灰托盘承载内容。绿色是动作色，不是氛围色。
 
-- `--action-fill` / `--action-text` 定义主按钮，`--green-dark` 用于浅色表面的状态胶囊与辅助文字强调，不将卡片大标题、门店标题或库存数字整段染绿。保持主按钮与强调文字的分工，不能统一改成绿底白字。
-- Web 预设的 `primary` 首先是填充角色，不能直接当作普通文字色。本次独立参照的深色检查已暴露这种误用；标题和普通标签使用其前景语义，不能以主题变量成功生成或完全一致推定对比度合格。
-- `--green-mist` 是页面底色（浅 `#F4F4F2` / 深 `#0B0D0C`），`--card` 是内容面，`--card-elevated` 是抽屉与弹窗浮层表面，`--surface-soft` 仅保留在真正需要块面提示的说明区，`--line` 是行内与统计格细线边界。避免在同一卡片内部套多层灰色圆角小卡。
-- `--text`、`--text-2`、`--text-3` 区分正文与辅助信息；状态胶囊区分三层视觉权重（实心圆点+浅绿底表就绪/有货、空心圆点+中性底表未启用/失败、虚线环+透明底表警告/暂停），颜色不独自传递含义。
-- 警示使用 `--warn` / `--warn-soft`，错误或删除使用 `--bad` / `--bad-soft`。普通活动不占用故障视觉优先级。
-- 深色跟随系统主题。使用现有主题覆盖，并在实际叠加后的背景上检查正文、按钮、占位文字和状态颜色；浅色通过不能推定深色通过。
+| 令牌 | 用途 |
+| --- | --- |
+| `--bg` | 页面与导航栏底 |
+| `--surface` | 内容托盘（`.card`） |
+| `--surface-top` | 托盘上的控件、选中套餐行 |
+| `--elevated` | 抽屉 / 弹窗浮层 |
+| `--pressed` | 按下态 |
+| `--text` / `--text-2` / `--text-3` | 正文 / 次要 / 辅助 |
+| `--green` / `--green-ink` / `--green-text` / `--green-soft` | 主按钮填充 / 按钮字 / 状态字 / 浅绿底 |
+| `--warn*` / `--bad*` | 警示与错误，成对使用 |
+| `--pass*` | **全站唯一深色物件**：会员通行证 |
+
+**会员通行证**是品牌签名：深墨底、可选暖金字（年卡剩余天数）、金色对勾。金色 `--pass-gold` 不得出现在通行证以外。有效会员与未开通权益展台共用 `.member-pass` 材质；年卡仅用金色强调剩余天数，不为整页换金皮。
+
+深色模式跟随系统。主绿填充 `--green` 与墨字 `--green-ink` 两模式相同；其余表面与文字在 dark 块中覆盖。`theme.json` 的导航/页面底必须等于对应模式的 `--bg`。
 
 ## Typography
 
-正文、标题、按钮和数据沿用同一套系统字体。SKU、货号、时间、额度和统计数字统一启用 `font-variant-numeric: tabular-nums` 以消除数字宽度抖动；不要因 Web 参照使用 Noto Sans 而给小程序引入新字体资源。
+一张图上的字号角色必须一眼能数清：
 
-标题与大号数值使用 `600` 半粗字重配合明确字号阶梯（`--fs-display` / `--fs-title` / `--fs-headline` / `--fs-body` / `--fs-sub` / `--fs-caption`），辅助文字保持可读。会随屏宽缩小的 `rpx` 文字，在受影响的功能区域使用已有的 `max(px, rpx)` 下限，避免靠缩字塞下内容。抽屉底部摘要、关注卡片的状态、观测时间、反馈及展开入口等功能文字，在 320px 离线场景下至少保持 12 CSS px；主要选项和输入优先沿用组件中更大的字号。
+- **Display 28**：极少用（大日期等）
+- **Title 22**：页标题、账户身份、余额主数
+- **Headline 17**：卡标题、套餐名、主按钮字
+- **Body 15**：默认正文、列表行
+- **Sub 13**：次要说明、行内动作
+- **Caption 12**：脚注、标签、下限可读字
 
-12px 是当前离线检查的最低门槛，不是推荐正文大小，也不代表所有旧页面或微信真机已满足可读性要求。长配置、长门店名、1.3 倍字号需要换行和布局调整；关键事实不能仅靠截断展示。
+标题与数字用 `600`，说明用 `400`。不要为「更高级」加第三种字重。
 
 ## Layout
 
-3.7.0 四个入口共用内容卡片的表面与对齐方式。查询、关注与历史的商品图居左，规格居右。小哨按事项归组显示提醒时间与授权状态。历史把日期、配置与查询操作放进同一组。会员卡的有效期和实际权益在购买记录前连续呈现。[四页与会员主题实测](evidence/design/3.7.0/README.md)
+四个原生 tab：查询 · 小哨 · 历史 · 我的。默认进查询；保留「不必先查询即可关注」。
 
-四个原生 tab 依次为查询、小哨、历史、我的，默认进入库存查询；保留无需先查询即可直接关注的路径。第二个入口「我的小哨」以独立分组承载到期事项与 Apple 库存关注；两类事项各自展示真实状态和管理入口。页面按“当前选择或状态 → 主要操作 → 可展开详情”组织；会员区优先核心权益、当前套餐与实际名额，规则按组折叠。
+页面结构：**当前状态 → 主操作 → 可展开详情**。
+托盘（`.card`）是一组内容的唯一容器——**禁止托盘内再套灰色圆角小卡**。组内用 `1px solid var(--line)` 分隔。
 
-复用公共页边距、卡片间距和操作间距，不为单个页面另造一套密度。行内容允许收缩或换行；窄屏按实际可用宽度调整选项列数。抽屉正文独立滚动，摘要和操作区域保持可见，并考虑键盘、短窗口和底部安全区，不能遮挡保存或关闭入口。
+- **查询**：取货凭条式阅读——配置、门店、观测时间、下一步。
+- **小哨**：到期事项突出下次提醒；库存关注突出真实观测与可执行动作。
+- **历史**：日期与「今天 / 昨天」同行；事件按观测时间轴阅读。
+- **我的**：首屏是身份 + 通行证（或权益展台）+ 一个主 CTA；套餐列表仅在开通/续费时展开；规则与 FAQ 进帮助入口，不在购买按钮旁堆说明书。
 
-常用选项、主操作及清空搜索等小动作，以真实可点击区域至少 44 × 44 CSS px 作为离线检查门槛。不能只增大图标或在 CSS 中声明高度而不检查渲染后的尺寸。44px 门槛与 12px 文字下限均须在微信开发者工具及真机复验，不是原生认证。
-
-至少检查受影响路径在 320/375/430px、浅深色、1.3 倍字号、短窗口、键盘及安全区下的离线近似结果。具体覆盖与未验证项写进本次交付记录，不把这些场景列为已通过的默认结论。
+窄屏（320）、浅/深色、1.3 倍字号、键盘与安全区要在离线预览与真机分别记录；本规范的 44px / 12px 是离线下限，不是微信认证。
 
 ## Elevation & Depth
 
-公共卡片用 `--radius-card`（`28rpx`）圆角、极细浅灰描边与轻阴影 `--shadow`。深色模式使用 `--green-mist`（`#0B0D0C`）→ `--card`（`#171A18`）→ `--card-elevated`（`#1F2320`）的明度差分层；相邻数据、折叠条目和统计列以 `1rpx solid var(--line)` 的 Inset-grouped 细线分隔，代替灰底套灰卡。抽屉与弹窗表达临时操作层，不能用重阴影或装饰性渐变补救信息层级。
+分层靠明度，不靠描边叠阴影：
 
-仅在以下四处语义明确的位置克制使用渐变与 `@supports` 毛玻璃，并必须先声明纯色回退（不使用整页滤镜或动态背景模糊）：
-1. **页首标题区**（`.page-heading`）：先声明 `background: var(--green-mist)`，在 `@supports ((-webkit-backdrop-filter: blur(20px)) or (backdrop-filter: blur(20px)))` 下叠加 `--header-glass` 与 `backdrop-filter: saturate(180%) blur(20px)`；页首保持普通文档流（不设 `position: sticky`），避免滑动遮挡与点击偏移。
-2. **模态遮罩**（`.config-sheet-scrim`、`.redemption-mask`）：先声明 `background: rgba(0, 0, 0, 0.45)`，在 `@supports` 下叠加 `rgba(0, 0, 0, 0.36)` 与 `backdrop-filter: blur(8px)`，面板本体升至 `--card-elevated`。
-3. 有效会员卡保留黑金哨标。年卡使用暖金渐变 `--member-card-annual-gradient`，其他有效会员使用绿灰渐变 `--member-card-gradient`。档位来自服务端。所有渐变都叠在普通卡面色之上，免费及已到期账户沿用纯色卡面。
-4. **商品图展台**（`.product-image-box`、`.result-product-media`、`.follow-image`、`.history-product-media`、`.checkout-image`）：使用居中径向渐变 `--image-tile-gradient`（浅灰过渡，深色收敛低对比），空态 `.result-product-media--empty` 恢复卡片纯色。
+- 浅色：白底 → 浅灰托盘；托盘无边框、无投影。
+- 深色：`--bg` → `--surface` → `--elevated` / `--surface-top`。
+- 抽屉从底部升起，使用 `--shadow-sheet`；遮罩用 `--scrim`。
 
-按下、展开和加载反馈应克制且服务状态变化（主按钮支持 `scale(0.98)` 按下反馈并在 `prefers-reduced-motion: reduce` 下关闭），不为装饰增加云请求或轮询。深色阴影和遮罩需要独立查看，不能让正文与底层内容混成一层。
-
-## Shapes
-
-卡片和主操作复用 `--radius-card`（`28rpx`）、`--radius-inner`（`20rpx`）、`--radius-action`（`22rpx`）与 `--radius-chip`（`999rpx`）。用一致形状让按钮、分段筛选胶囊和静态状态标签容易区分，不把所有信息都做成胶囊或可点击卡片。
-
-列表内部分隔使用 `--line`；选中的规格或门店保留其选中标记。图片保持比例，加载失败使用明确占位；深色商品图底板保留现有对比度处理，不用裁切掩盖图片缺失或替代配置差异。
+按下反馈：主按钮轻微 `scale(0.985)` + 降透明度；`prefers-reduced-motion: reduce` 时取消位移类动效。展开用 `.ui-reveal`（约 200ms）。有货哨点可用 `.ui-live-dot` 扩散三次后静止——**这是唯一的品牌动效签名**，不要给每个区块加入场动画。
 
 ## Components
 
-### Buttons and selection controls
+### 按钮与行内动作
 
-主操作沿用主题绿实心按钮（`.btn-primary`，按下为 `.btn-primary-pressed`）。按钮收拢为三个明确层级：主实心操作（`.btn-primary`）、白底描边次操作（`.btn-outline`）和透明无边框文本操作（`.btn-text` 及 `.ui-action` 透明行内编辑入口），移除额外灰底胶囊次级样式并保持最小 `44px` 可点击高度。保留默认、按下、选中、禁用、加载和错误反馈；有键盘或读屏入口时检查相应焦点和名称。禁用和加载不接受重复提交，处理函数再次校验，不只改变外观。
+| 类 | 角色 |
+| --- | --- |
+| `.btn.btn-primary` | 唯一主操作 |
+| `.btn` | 次操作（中性填充） |
+| `.btn-text` | 低优先级文字操作 |
+| `.ui-action` | 行内小动作；`--plain` 透明底 |
+| `.ui-disclosure` | 列表展开行；右侧方向标 |
 
-原生 `view` 充当选择或清空控件时，使用微信支持的 `aria-role`、`aria-label`、`aria-disabled` 等语义；可访问名称说明当前选中与动作。装饰图形隐藏于读屏。离线 DOM 的 role 映射只辅助检查，不能替代原生可访问性验证。
+禁用与加载必须同时锁住外观与处理函数。原生 `view` 充当控件时补齐 `aria-role` / `aria-label` / `aria-disabled`。
 
-### Inputs and configuration sheet
+### 表单与选配抽屉
 
-门店输入提供可访问名称、清空动作、空结果和就地错误。WXML 用 `placeholder-class` 声明占位样式；离线转换必须正确映射到占位文字并单独检查明暗主题对比度，不能拿输入框正文颜色代替占位颜色。
+保存才提交；取消保留原稿。保存中同步锁定 picker 与输入。失败保留可恢复草稿。占位用 `placeholder-class`，深浅色分别检查对比度。
 
-选配抽屉中，同值点击保留精确配置；切换维度只在合法候选中保留偏好，确需回退时就地说明。Mac 标签优先表达芯片、核心与玻璃差异，完整 SKU 和配置有一处可查，不把不同 SKU 合并为同名。
+### 关注卡与库存状态
 
-保存才提交，取消保留原目标。保存开始时同步锁定 picker 及输入，再传播禁用状态，避免异步属性更新的间隙继续改写草稿；成功、失败和关闭后的释放按实际流程处理。失败保留可恢复的草稿与明确重试动作，不能把一次失败显示成已保存。
+先读配置身份与观测，再读动作。有货 / 无货 / 未知 / 陈旧 / 失败含义不得合并。观测时间是库存时间，不是页面刷新时间。查询、关注、监测、授权、受理、收信分步表达。
 
-### Follow cards and inventory states
+### 到期提醒
 
-卡片首先显示配置身份、库存观测及可执行动作。活跃、普通暂停、到期、名额受限与退役分别表达；暂停仍占已保存配置名额。退役提供改选、删除、历史，不承诺恢复，处理函数再次校验能力。
+名称、到期日、计划提醒（北京时间）、状态分列。微信「已受理」≠ 已送达。服务未开时写「仅保存」，不包装成「免费试用」话术掩盖发送状态。
 
-有货、确定无货、未知、陈旧、读取失败保持不同含义，显示真实观测时间；刷新页面的时间不能替代库存观测时间。观测迟滞不能直接宣称接口故障。查询、关注、后台监测、微信授权、发送受理和真实收信分别表达，不能由前一步推定后一步成功。
+### 会员与购买
 
-### Deadline reminders
+- 当前套餐以服务端 `planId` 为准，不按剩余天数猜档。
+- 通行证卡面：有效期、剩余天数、已用名额；名额格可点进关注。
+- 未开通：同一材质上三条权益 +「开通会员」。
+- 套餐行：名 + 时长 + 一句名额 + 价（原价删除线、日均可在窄屏隐藏）；选中行抬起为 `--surface-top`。
+- 购买按钮旁只保留退款与不自动续费两句；名额细则走「名额与续费常见问题」。
+- 价格、时长、名额、退款以服务端与当前条款为准。
 
-到期事项首先显示名称、到期日期、计划提醒时间和当前提醒状态。计划时间明确使用北京时间；「仅保存」「待授权」「已安排」「正在确认发送」「微信已受理」「发送失败」「结果待确认」及「错过提醒时间」分别表达，复用现有正文、主绿、警示和错误语义色，不能只靠颜色区分。微信受理不能显示成已送达；通知关闭或免打扰造成的延后须给出当前原因。
+### 公告与更新记录
 
-手动表单保留名称、类型、到期日期、提前天数与提醒时刻，以及有可访问名称的原生输入和 picker。保存事项与允许一次微信提醒是独立动作；服务未开启时明确仅保存，修改后需重新授权。保存中和原操作待确认时同时锁住输入与相关动作，处理函数再次校验；失败保留草稿，结果不确定时给出确认原保存结果或同步原授权的入口。修订冲突保留原草稿，由用户明确载入最新内容后重新修改，不静默覆盖。
-
-读取或保存服务不可用时，不显示可添加事项的主操作；读取成功但微信通知未开启时使用「仅保存事项」，不以「免费试用」掩盖发送状态。重新读取失败可以保留同账号草稿，但需恢复成功后才能提交；服务端身份与缓存身份冲突时立即清除私人展示，原账号的待确认记录仅按账号保留在本地。
-
-商品配置范围与已接入的库存目标分别表达。Mac Studio 的 45 个官网组合中，3 个标准零售 SKU 进入取货查询；42 个官网定制款不支持 Apple Store 店内取货，只在「查看定制款配置」折叠区按芯片列出合法内存与存储范围，明确写“仅作配置参考”，不进入查询、关注或提醒候选。内部 CTO 标识不与零售货号混用，也不展示给用户当作货号；展开或复制官网链接不改变当前标准 SKU，也不发出库存查询。
-
-### Membership, notices and history
-
-当前套餐按服务端 `planId` 与真实数据展示，不按剩余天数或额度猜档位。购买前保留价格、时长、实际名额、续费及退款关键规则；提醒授权和到期规则保持可访问。新品礼遇的个人“已到账”只来自实际发放凭证，资格或公告不等于到账。
-
-维护或警告可以优先，普通活动不能遮住授权恢复或真实故障。我的页提醒折叠时刷新首屏，展开按新快照游标继续，不拼接旧尾页。版本公告遵守 [文案规则](.cursor/rules/product-copy.mdc)：用户可感知的变化、简短小结、每页三个版本及明确分页操作。
+普通公告在公告页。首页只提示有效维护、告警、待恢复授权与真实故障。更新公告每页 3 个版本，有「上一页 / 下一页 / 收起」按钮样式入口（见 [product-copy.mdc](.cursor/rules/product-copy.mdc)）。
 
 ## Do's and Don'ts
 
 ### Do
 
-- **Do** 先读 [PRODUCT.md](PRODUCT.md)、本规范和 [持续检查流程](docs/IMPECCABLE_WORKFLOW.md)，复用当前组件与语义变量，在变更范围内核对层级、文案、状态、适配和一致性。
-- **Do** 让布局解释关系，把必要规则放到合适层级；在失败、空、未知、陈旧、加载及真实成功状态下逐一核对文案与动作。
-- **Do** 对参考方案和工具输出独立复核，记录采用、调整或不实施的理由；新增设计规范只收录已确认的产品约束与源码事实。
-- **Do** 在 [本轮优化进度](docs/OPTIMIZATION_3.4.3_PROGRESS.md) 或后续交付记录保存实际测试、证据位置和未验证项，分别陈述离线预览、微信编译、真机、云端、真实支付/收信、上传与发布。
+- 先读 [PRODUCT.md](PRODUCT.md)、本文件与 [持续检查流程](docs/IMPECCABLE_WORKFLOW.md)。
+- 只引用 `app.wxss` 令牌；改公共值后跑 `node --test tests/design-system.test.mjs`。
+- 让布局解释关系；规则放进折叠或帮助页；保留购买/授权/退款/时效关键句。
+- 状态同时用文案 + 形态（实心点 / 空心点 / 虚线环），不只靠颜色。
+- 离线预览、微信编译、真机、云端、真实收信与发布**分别陈述**。
 
 ### Don't
 
-- **Don't** 用重复说明、装饰性徽章或另一套控件语言增加阅读负担；也不要为简洁删去影响购买、退款、授权、库存时效或恢复操作的关键事实。
-- **Don't** 将 Web 的字体、配色值、框架或 DOM 行为直接移入小程序，或把独立参照页的构建、截图和检测结果当作原生验收。
-- **Don't** 以减少采样、遗漏 unknown、缓存发送资格或虚构已完成状态制造体验或用量收益。
-- **Don't** 用离线字号、点击区域、颜色检查或 Impeccable 检测的通过结论关闭微信原生质检问题；本规范本身也不授权生产发放、部署、上传、合并或真实业务操作。
+- 不要在页面里发明第七种字号、第三种字重、或新的圆角体系。
+- 不要用重复说明、装饰徽章、网页通栏线、毛玻璃堆高级感。
+- 不要为简洁删掉影响判断的事实；也不要用少采样 / 缓存资格制造「更干净」的假状态。
+- 不要把 Web 字体、框架或检测截图当成原生验收。
+- 不要把本规范当成生产发放、上传或合并的授权。
+
+## 维护检查清单
+
+改任何 WXML/WXSS 后：
+
+1. `node --test tests/design-system.test.mjs`
+2. 受影响路径的离线预览（320 / 375 / 深色）
+3. 核对：首屏是否仍一眼可读；规则是否仍可访问；绿是否仍只出现在动作与就绪态
+
+证据目录与版本说明随发布包登记；未在真机验证的项必须写明「未验证」。

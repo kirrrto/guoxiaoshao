@@ -660,8 +660,9 @@ Page({
   },
 
   openPendingEditor(pending) {
+    const identity = this.accountSnapshot && this.accountSnapshot.identity;
+    if (pending.userKey && (!identity || pending.userKey !== identity.userKey)) return;
     if (pending.checkoutRevision) {
-      const identity = this.accountSnapshot && this.accountSnapshot.identity;
       const restored = this.checkoutStore().restore(identity, this.catalog);
       if (restored.status !== 'ready' || restored.context.revision !== pending.checkoutRevision
         || restored.context.targetSignature !== pending.checkoutSignature || restored.context.targetSignature !== targetSignature(pending)) {

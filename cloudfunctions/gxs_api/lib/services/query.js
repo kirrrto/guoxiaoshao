@@ -137,7 +137,8 @@ async function pickup(ctx, payload, { existingOnly = false, maxCost } = {}) {
 }
 async function recent(ctx, payload) {
   const user = await ensureUser(ctx);
-  const list = await ctx.repo.listQueries(user._id, Math.min(Number(payload.limit) || 10, 50));
-  return { queries: list.filter(q => q.kind === 'live').map(q => ({ queryId: q.queryId, partNumber: q.partNumber, storeNumbers: q.storeNumbers, status: q.status, createdAt: q.createdAt, summary: q.response ? (q.response.results || []).map(r => ({ storeNumber: r.storeNumber, storeName: r.storeName, status: r.status })) : [], productTitle: q.response && q.response.product ? q.response.product.title : null })) };
+  const limit = Math.max(1, Math.min(50, Math.floor(Number(payload.limit) || 10)));
+  const list = await ctx.repo.listQueries(user._id, limit, 'live');
+  return { queries: list.map(q => ({ queryId: q.queryId, partNumber: q.partNumber, storeNumbers: q.storeNumbers, status: q.status, createdAt: q.createdAt, summary: q.response ? (q.response.results || []).map(r => ({ storeNumber: r.storeNumber, storeName: r.storeName, status: r.status })) : [], productTitle: q.response && q.response.product ? q.response.product.title : null })) };
 }
 module.exports = { pickup, recent, recovery, resumeLegacy, recordObservations, validatePayload };

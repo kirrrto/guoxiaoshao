@@ -109,6 +109,19 @@ async function refundMembershipIn(tx, { orderId, nowIso, refundFen, providerData
   return { order: refunded, applied: true, revokedMs: removedMs, expiresAt: user && user.membership.expiresAt };
 }
 
+async function visibleNotification(tx, userKey, taskId) {
+  const task = await tx.get(C.notifications, taskId);
+  if (task && task.userKey === userKey && !task.userHiddenAt) {
+    const view = await tx.get(C.config, viewId(userKey));
+    // Newer rows use their insertion sequence; older rows use their creation time.
+    const cleared = view && (task.viewSequence != null
+      ? task.viewSequence <= (view.clearedThroughSequence || 0)
+      : view.legacyClearBefore && task.createdAt <= view.legacyClearBefore);
+    if (!cleared) return task;
+  }
+  throw new ApiError('notification_not_found', '这条提醒已过期或已删除');
+}
+
 function atomicMethods(run, { readUpstreamBreaker } = {}) {
   return {
     ...deadlineMethods(run),
@@ -441,9 +454,10 @@ function atomicMethods(run, { readUpstreamBreaker } = {}) {
       return next;
     }),
 
+    getVisibleNotification: (userKey, taskId) => run(tx => visibleNotification(tx, userKey, taskId)),
+
     recordNotificationOpen: ({ userKey, taskId, nowIso }) => run(async tx => {
-      const task = await tx.get(C.notifications, taskId);
-      if (!task || task.userKey !== userKey || task.userHiddenAt) return { recorded: false };
+      const task = await visibleNotification(tx, userKey, taskId);
       if (task.firstPresentedAt) return { recorded: false, firstOpenedAt: task.firstOpenedAt, firstPresentedAt: task.firstPresentedAt };
       // Preserve legacy read-time telemetry separately. 1.6.0 only records a
       // presentation when a visible page acknowledges successful rendering.
@@ -453,8 +467,7 @@ function atomicMethods(run, { readUpstreamBreaker } = {}) {
     }),
 
     recordNotificationFeedback: ({ userKey, taskId, outcome, nowIso, knownFollows = [] }) => run(async tx => {
-      const task = await tx.get(C.notifications, taskId);
-      if (!task || task.userKey !== userKey || task.userHiddenAt) throw new ApiError('notification_not_found', '这条提醒已过期或已删除');
+      const task = await visibleNotification(tx, userKey, taskId);
       if (!['bought', 'missed', 'skipped'].includes(outcome)) throw new ApiError('invalid_feedback', '请选择有效的反馈');
       const follow = outcome === 'bought' && task.followId ? await tx.get(C.follows, task.followId) : null;
       const paused = Boolean(follow && follow.status === 'active' && matchesNotificationTarget(task, follow));

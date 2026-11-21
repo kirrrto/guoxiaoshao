@@ -170,9 +170,33 @@ test('guide opens the requested allowed help and ignores arbitrary sections and 
   assert.equal(page.data.focusedFaq.id, 'notification'); assert.equal(page.data.stageId, 'monitor');
   page.onLoad({ section: 'membership', from: 'mine' });
   assert.equal(page.data.focusedFaq.id, 'membership');
+  assert.equal(page.data.allowanceFaq.id, 'slots');
   page.onLoad({ section: '<script>', from: '../../admin' });
   assert.equal(page.data.focusedFaq, null); assert.equal(page.returnSource, 'mine');
   assert.equal(rt.calls.length, 0);
+});
+
+test('membership FAQ returns to the original checkout, with account-safe and shared-link fallbacks', () => {
+  for (const mode of ['checkout', 'shared', 'account-changed']) {
+    const pages = mode === 'shared' ? [] : [{ route: 'pages/mine/index' }, { route: 'pages/guide/index' }];
+    const rt = runtime(undefined, { getCurrentPages: () => pages });
+    owner(rt);
+    const calls = [];
+    rt.wx.navigateBack = options => calls.push(['back', options.delta]);
+    rt.wx.switchTab = options => calls.push(['tab', options.url]);
+    const page = rt.instance('pages/guide/index.js');
+    page.onLoad({ section: 'membership', from: 'mine' });
+    assert.equal(page.data.returnLabel, '返回会员套餐');
+    if (mode === 'account-changed') owner(rt, 'bob');
+    page.onReturnTask();
+    if (mode === 'checkout') {
+      assert.deepEqual(calls, [['back', 1]]);
+      assert.notEqual(rt.app.globalData.pendingMineSection, 'reminder-center');
+    } else {
+      assert.deepEqual(calls, [['tab', '/pages/mine/index']]);
+      assert.equal(rt.app.globalData.pendingMineSection, mode === 'shared' ? 'membership-card' : 'reminder-center');
+    }
+  }
 });
 
 test('diagnostic copy is explicit and has exactly the fixed fields without untrusted source text', () => {

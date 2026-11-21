@@ -6,7 +6,6 @@ const { isValidTemplateId } = require('../config');
 const { canUseReminders, isMember } = require('../rules/membership');
 const { isLiveRestricted } = require('../rules/new-product');
 const { targetKeyOf } = require('../engine/events');
-const { RETENTION_DAYS } = require('../engine/retention');
 const follows = require('./follows');
 const { matchesNotificationTarget } = require('../notification-target');
 
@@ -66,19 +65,18 @@ async function clear(ctx, payload) {
   return ctx.repo.clearNotificationView({ userKey: user._id, before: payload.before, nowIso: ctx.nowIso });
 }
 
-/** Task IDs embed the caller's account, so only the caller's own alert can be read. */
-async function ownAlert(ctx, payload) {
+/** Task IDs embed the caller's account. The repository checks visibility at read/write time. */
+async function alertKey(ctx, payload) {
   const user = await ensureUser(ctx);
   const eventId = typeof payload.eventId === 'string' ? payload.eventId.trim() : '';
   if (!eventId || eventId.length > 256) throw new ApiError('invalid_notification_id', '请选择有效的提醒');
-  const task = await ctx.repo.getNotification(`${user._id}|${eventId}`);
-  if (!task || task.userKey !== user._id || task.userHiddenAt) throw new ApiError('notification_not_found', `这条提醒已超过 ${RETENTION_DAYS} 天或已删除`);
-  return { user, task };
+  return { user, taskId: `${user._id}|${eventId}` };
 }
 
 /** The alert a WeChat message opens, with the target's current observation. */
 async function detail(ctx, payload) {
-  const { user, task } = await ownAlert(ctx, payload);
+  const { user, taskId } = await alertKey(ctx, payload);
+  const task = await ctx.repo.getVisibleNotification(user._id, taskId);
   const [latest, product, follow] = await Promise.all([
     ctx.repo.getLatest([targetKeyOf(task.storeNumber, task.partNumber)]),
     ctx.repo.getProduct(task.partNumber),
@@ -96,15 +94,15 @@ async function detail(ctx, payload) {
 
 /** A visible client confirms it rendered the detail; reads alone are not views. */
 async function open(ctx, payload) {
-  const { user, task } = await ownAlert(ctx, payload);
-  return ctx.repo.recordNotificationOpen({ userKey: user._id, taskId: task._id, nowIso: ctx.nowIso });
+  const { user, taskId } = await alertKey(ctx, payload);
+  return ctx.repo.recordNotificationOpen({ userKey: user._id, taskId, nowIso: ctx.nowIso });
 }
 
 /** Only the unchanged follow opened by this alert may be paused with the feedback. */
 async function feedback(ctx, payload) {
-  const { user, task } = await ownAlert(ctx, payload);
+  const { user, taskId } = await alertKey(ctx, payload);
   if (!FEEDBACK.includes(payload.outcome)) throw new ApiError('invalid_feedback', '请选择有效的反馈');
-  return ctx.repo.recordNotificationFeedback({ userKey: user._id, taskId: task._id, outcome: payload.outcome, nowIso: ctx.nowIso,
+  return ctx.repo.recordNotificationFeedback({ userKey: user._id, taskId, outcome: payload.outcome, nowIso: ctx.nowIso,
     knownFollows: payload.outcome === 'bought' ? await ctx.repo.listFollows(user._id) : [] });
 }
 

@@ -1,0 +1,210 @@
+{
+  "version": "3.7.2",
+  "checkedOn": "2026-11-21",
+  "consumerSourceFingerprint": "sha256:f036f76ce56a81c392081ef5cb32eacd19de1bb233d3e6a101e422ab3bba244b",
+  "tests": {
+    "total": 2034,
+    "passed": 2034,
+    "failed": 0,
+    "skipped": 0
+  },
+  "source": {
+    "files": 659,
+    "javaScript": 469,
+    "json": 53,
+    "pages": 8,
+    "operatorPages": 1,
+    "errors": []
+  },
+  "preflight": {
+    "sourcePassed": true,
+    "passedChecks": 65,
+    "checks": 66,
+    "blockedFindings": [
+      "unused-channel-video",
+      "custom-tabbar-first-switch",
+      "oversized-product-image",
+      "legacy-product-image-format"
+    ],
+    "publicationReady": false
+  },
+  "frontend": {
+    "files": 243,
+    "sourceBytes": 1253743,
+    "imageBytes": 172134,
+    "imageMaxBytes": 204800,
+    "mainPackageMaxBytes": 1572864,
+    "note": "Source bytes, not the WeChat upload package size"
+  },
+  "monitor": {
+    "passed": true,
+    "files": 50,
+    "sourceBytes": 379682,
+    "issues": []
+  },
+  "dependencyAdvisories": {
+    "root": 0,
+    "gxs_api": 0,
+    "gxs_monitor": 0,
+    "cloudbase_auth": 0,
+    "collector": 0
+  },
+  "componentAudit": {
+    "sdk": "3.17.3",
+    "businessSourceMentions": [],
+    "compiledPages": [
+      {
+        "route": "pages/follow/index",
+        "channelVideo": false
+      },
+      {
+        "route": "pages/history/index",
+        "channelVideo": false
+      },
+      {
+        "route": "pages/mine/index",
+        "channelVideo": false
+      },
+      {
+        "route": "pages/guide/index",
+        "channelVideo": false
+      }
+    ],
+    "isolatedSdkReproduced": true,
+    "controlsPassed": true,
+    "platformRetested": false
+  },
+  "compilers": {
+    "wcc": {
+      "files": 12,
+      "code": 0,
+      "bytes": 343995
+    },
+    "wcsc": {
+      "files": 15,
+      "code": 0,
+      "bytes": 18299
+    }
+  },
+  "simulator": {
+    "scope": "WeChat DevTools simulator. Isolated copy rejects ensureCloud before every connection. No account/payment/delivery acceptance.",
+    "pages": [
+      {
+        "route": "pages/query/index",
+        "ready": true,
+        "loadError": false,
+        "stack": 1
+      },
+      {
+        "route": "pages/follow/index",
+        "ready": false,
+        "loadError": true,
+        "stack": 1
+      },
+      {
+        "route": "pages/history/index",
+        "ready": true,
+        "loadError": false,
+        "stack": 1
+      },
+      {
+        "route": "pages/mine/index",
+        "ready": false,
+        "loadError": true,
+        "stack": 1
+      },
+      {
+        "route": "pages/query/index",
+        "ready": true,
+        "loadError": false,
+        "stack": 1
+      }
+    ],
+    "sdk": "3.17.3",
+    "platform": "devtools",
+    "version": "3.7.2",
+    "guide": "pages/guide/index",
+    "images": {
+      "count": 119,
+      "failed": []
+    },
+    "passed": true
+  },
+  "capacity": {
+    "productionRequests": 0,
+    "config": {
+      "enabled": true,
+      "intervalSeconds": 3,
+      "burstIntervalSeconds": 2,
+      "burstQuietSeconds": 20,
+      "availableIntervalSeconds": 0,
+      "maxConcurrency": 2,
+      "continuityGapMs": 300000,
+      "maxRequestsPerMinute": 600,
+      "maxRequestsPerDay": 800000,
+      "budgetMode": "continuous",
+      "cadenceMode": "fixed",
+      "autoSharePercent": 80,
+      "maxPartsPerRequest": 20,
+      "statusStaleAfterSeconds": 30
+    },
+    "scenarios": [
+      {
+        "name": "same-target-fast",
+        "clients": 300,
+        "fullySuccessfulQueries": 300,
+        "partialQueries": 0,
+        "busyOrFailedQueries": 0,
+        "upstreamHttp": 1,
+        "netQuotaDebit": 0
+      },
+      {
+        "name": "same-target-slow",
+        "clients": 300,
+        "fullySuccessfulQueries": 300,
+        "partialQueries": 0,
+        "busyOrFailedQueries": 0,
+        "upstreamHttp": 1,
+        "netQuotaDebit": 0
+      },
+      {
+        "name": "same-three-stores",
+        "clients": 300,
+        "fullySuccessfulQueries": 300,
+        "partialQueries": 0,
+        "busyOrFailedQueries": 0,
+        "upstreamHttp": 3,
+        "netQuotaDebit": 0
+      },
+      {
+        "name": "distinct-300-targets",
+        "clients": 300,
+        "fullySuccessfulQueries": 300,
+        "partialQueries": 0,
+        "busyOrFailedQueries": 0,
+        "upstreamHttp": 300,
+        "netQuotaDebit": 0
+      },
+      {
+        "name": "distinct-900-targets",
+        "clients": 300,
+        "fullySuccessfulQueries": 178,
+        "partialQueries": 1,
+        "busyOrFailedQueries": 121,
+        "upstreamHttp": 535,
+        "netQuotaDebit": 0
+      },
+      {
+        "name": "continuous-300-manual-plus-300-auto-every-45s",
+        "clients": 300,
+        "netQuotaDebit": 0,
+        "totalManualQueries": 1200,
+        "manualSuccess": 323,
+        "manualBusy": 877,
+        "autoSuccess": 1080,
+        "autoBusy": 120,
+        "totalHttp": 1403
+      }
+    ]
+  }
+}

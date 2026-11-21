@@ -5,7 +5,7 @@ alwaysApply: true
 
 每次更新按 [AGENTS.md](../../AGENTS.md) 和 [持续检查流程](../../docs/IMPECCABLE_WORKFLOW.md) 判断本次体验与用量影响；涉及界面时读 [PRODUCT.md](../../PRODUCT.md) 与 [DESIGN.md](../../DESIGN.md)。纯内部工作可说明不适用，不扩大需求。
 
-[DESIGN.md](../../DESIGN.md) 是后续界面维护的长期基准：复用现有语义颜色、字体、间距和组件状态，修改公共规范时按当前源码与实测合并更新。它记录了实际 shadcn/create preset `b2BnwlLhw` 的 Web 参照及证据；采用层级、成对语义色和状态组织，小程序保留系统中文字体、主绿、四个原生入口、精确 SKU 与直接关注路径，不移植 React/Tailwind/OKLCH。
+[DESIGN.md](../../DESIGN.md) 是后续界面维护的长期基准：六级字号、两种字重、白底浅灰托盘、主绿操作、黑金通行证；令牌定义在 [`miniprogram/app.wxss`](../../miniprogram/app.wxss)，硬规则由 [`tests/design-system.test.mjs`](../../tests/design-system.test.mjs) 执行。修改公共规范时按当前源码与实测同步更新 DESIGN.md 与测试。小程序保留系统中文字体、主绿、四个原生入口、精确 SKU 与直接关注路径；禁止引入 React/Tailwind/OKLCH/rpx/毛玻璃与页内自造字号。
 
 在本次受影响路径内落实以下检查，实际结果按证据记录：
 

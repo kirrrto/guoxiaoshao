@@ -1,48 +1,12 @@
-.notice-page { padding-bottom: 40rpx; }
-.notice-heading { display: flex; align-items: center; gap: 16rpx; }
-.notice-heading .brand-page-copy { flex: 1; min-width: 0; }
-.notice-heading .ui-action { flex: none; background: transparent; color: var(--text-2); padding: 8rpx 4rpx; }
-.notice-service-footer { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12rpx; margin-top: 16rpx; }
-.notice-card-meta { display: flex; flex-wrap: wrap; gap: 8rpx 16rpx; margin-bottom: 14rpx; font-size: max(12px, 22rpx); line-height: 1.6; color: var(--text-2); }
-
-.empty-notice-title {
-  font-size: 32rpx;
-  font-weight: 600;
-  line-height: 1.5;
-  margin-bottom: 8rpx;
-}
-
-.notice-card {
-  margin-bottom: 16rpx;
-}
-.notice-card--warn {
-  border-left: 4rpx solid var(--warn);
-}
-
-.notice-card-head {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16rpx;
-  margin-bottom: 10rpx;
-}
-
-.notice-card-title {
-  font-size: 30rpx;
-  font-weight: 600;
-  line-height: 1.5;
-  color: var(--text);
-  flex: 1 1 auto;
-  min-width: 0;
-}
-
-.notice-card-text {
-  font-size: max(12px, 27rpx);
-  line-height: 1.7;
-  color: var(--text);
-  overflow-wrap: anywhere;
-  white-space: pre-wrap;
-}
-
+/* 公告与服务。 */
+.notice-card-head { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--sp-8) var(--sp-12); }
+.notice-card-title { flex: 1 1 auto; min-width: 0; font-size: var(--fs-headline); font-weight: 600; line-height: var(--lh-snug); }
+.notice-card-meta { display: flex; flex-wrap: wrap; gap: var(--sp-2) var(--sp-12); margin-top: var(--sp-2); color: var(--text-3); font-size: var(--fs-caption); }
+.notice-card-text { margin-top: var(--sp-8); color: var(--text-2); font-size: var(--fs-sub); line-height: var(--lh-normal); overflow-wrap: anywhere; white-space: pre-wrap; }
+.notice-service-footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--sp-8); margin-top: var(--sp-12); }
+.notice-service-footer .notice-card-meta { margin-top: 0; }
+.empty-notice-title { color: var(--text-2); }
+/* 警示类公告整块换成警示底色，不用侧边色条。 */
+.notice-card--warn.card { background: var(--warn-soft); }
 .notice-card--warn .notice-card-title { color: var(--warn); }
+.notice-card--warn .notice-card-text { color: var(--text); }

@@ -8,6 +8,15 @@
 // Keep technical details and complete acceptance records in release documents.
 const RELEASE_NOTES = [
   {
+    version: '3.7.2',
+    title: '会员选购与提醒更新',
+    dateText: '版本记录 · 2026-11-21',
+    highlights: [
+      '会员卡集中显示有效期和名额，开通前可对照套餐价格与权益。',
+      '切换账号后，购买页会先核对当前账号的待确认订单。清空提醒后，旧消息卡片无法再暂停关注。',
+    ],
+  },
+  {
     version: '3.7.1',
     title: '状态刷新与到期提醒修复',
     dateText: '版本记录 · 2026-11-20',

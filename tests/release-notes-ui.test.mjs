@@ -64,10 +64,10 @@ test('release pages cover every known version once in newest-first order without
 
 test('closing and reopening release notes resets the first page without changing payment or settings', () => {
   const rt = runtime(), mine = rt.instance('pages/mine/index.js');
-  mine.setData({ paymentPendingId: 'existing-payment', paymentBusy: true, showPurchaseRules: true,
+  mine.setData({ paymentPendingId: 'existing-payment', paymentBusy: true, showQuotaDetails: true,
     settings: { notifyEnabled: false }, orders: [{ orderId: 'already-paid' }] });
   const protectedFields = () => copy({ paymentPendingId: mine.data.paymentPendingId, paymentBusy: mine.data.paymentBusy,
-    showPurchaseRules: mine.data.showPurchaseRules, settings: mine.data.settings, orders: mine.data.orders });
+    showQuotaDetails: mine.data.showQuotaDetails, settings: mine.data.settings, orders: mine.data.orders });
   const original = protectedFields();
   mine.onToggleReleaseNotes(); mine.onNextReleaseNotes();
   assert.equal(mine.data.releaseNotesPage, 2);

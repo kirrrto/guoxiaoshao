@@ -9,6 +9,23 @@ const { createCloudbaseRepo } = require('../cloudfunctions/gxs_api/lib/repo/clou
 const { hashCode, attemptsId } = require('../cloudfunctions/gxs_api/lib/member-redemption.js');
 const ok = result => { assert.equal(result.ok, true, JSON.stringify(result.error)); return result.data; };
 const payload = { queryId: 'atomic-query-001', partNumber: 'MXXX1CH/A', storeNumbers: ['R577'] };
+
+test('recent pickup queries apply the requested limit to live records for the current user', async () => {
+  const f = createFixture();
+  const rows = [
+    ['09', undefined], ['08', 'live', userKeyOf('another-account')], ['07', 'history'], ['06', 'history'],
+    ['05', 'live'], ['04', 'history'], ['03', 'live'], ['02', 'live'],
+  ];
+  for (const [minute, kind, userKey = userKeyOf()] of rows) {
+    const queryId = `recent-${minute}`;
+    f.repo.insert(C.queries, { ...payload, _id: queryId, queryId, ...(kind ? { kind } : {}), userKey,
+      status: 'success', createdAt: `2026-09-15T01:${minute}:00.000Z` });
+  }
+  for (const [limit, expected] of [[2, ['recent-05', 'recent-03']], [1.9, ['recent-05']], [-3, ['recent-05']]]) {
+    const result = ok(await f.call('query.recent', { limit }));
+    assert.deepEqual(result.queries.map(query => query.queryId), expected);
+  }
+});
 const observation = (at, status = 'available') => ({ storeNumber: 'R577', partNumber: 'MXXX1CH/A', status, observedAt: at, source: 'manual', quote: status });
 const debitCount = async f => (await f.repo.listLedger(userKeyOf())).filter(x => x.type === 'query_debit').length;
 

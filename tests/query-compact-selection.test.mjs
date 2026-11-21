@@ -8,7 +8,7 @@ const seed = require('../miniprogram/config/catalog-seed.js');
 const product = seed.products.find(p => p.model === 'iPhone 18 Pro' && p.attributes.capacity === '512GB' && p.attributes.color === '银色');
 const otherProduct = seed.products.find(p => p.model === 'iPhone 18 Pro Max' && p.attributes.capacity === '512GB' && p.attributes.color === '银色');
 const saved = () => ({ partNumber: product.partNumber, storeNumbers: ['R577', 'R639'] });
-const boot = () => ({ membership: { active: false }, quota: { balance: 4, queryCost: 1, signedInToday: true },
+const boot = () => ({ identity: { userKey: 'account-a' }, membership: { active: false }, quota: { balance: 4, queryCost: 1, signedInToday: true },
   limits: { queryMaxStores: 3 }, collector: { state: 'running' }, followCount: 0 });
 const copy = value => JSON.parse(JSON.stringify(value));
 const response = payload => ({ ok: true, product: seed.products.find(p => p.partNumber === payload.partNumber), balance: 3, quotaRevision: 1,
@@ -140,7 +140,7 @@ test('old results are marked separately and their requery and follow retain thei
   assert.deepEqual(copy(page.data.result.results.map(row => row.storeNumber)), original.storeNumbers);
   page.data.boot.member = true;
   page.onAddFollow();
-  assert.deepEqual(copy(rt.app.globalData.pendingFollow), original);
+  assert.deepEqual(copy(rt.app.globalData.pendingFollow), { ...original, userKey: 'account-a' });
   await page.onRequery();
   const call = rt.calls.find(call => call.action === 'query.pickup');
   assert.equal(call.payload.partNumber, original.partNumber);

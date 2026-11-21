@@ -154,6 +154,14 @@ function createPaymentController({ wx: wxApi, call, onUpdate, onResolved, onDiag
   const current = version => !disposed && generation === version;
   const key = () => STORAGE_PREFIX + encodeURIComponent(account);
   const stopPolling = () => { pollGeneration++; if (timer !== null) clearTimer(timer); timer = null; checking = false; emit({ paymentChecking: false }); };
+  const restoreOrder = stored => {
+    if (!stored || typeof stored.orderId !== 'string' || !ORDER_ID.test(stored.orderId)) return false;
+    pendingId = stored.orderId;
+    pendingPlanId = ['member_30d', 'member_365d'].includes(stored.planId) ? stored.planId : 'member_7d';
+    pendingPriceFen = Number.isSafeInteger(stored.expectedPriceFen) && stored.expectedPriceFen > 0 ? stored.expectedPriceFen : null;
+    emit({ paymentPendingId: pendingId, paymentPendingPlanId: pendingPlanId, paymentMessage: '发现一笔待确认订单，可以查询支付结果。' });
+    return true;
+  };
   const forget = () => {
     try { wxApi.removeStorageSync(key()); } catch (_) { /* A restored terminal order is safely checked again. */ }
     pendingId = ''; pendingPlanId = ''; pendingPriceFen = null; emit({ paymentPendingId: '', paymentPendingPlanId: '', paymentOrderSummary: '', paymentCanRetry: false });
@@ -226,6 +234,14 @@ function createPaymentController({ wx: wxApi, call, onUpdate, onResolved, onDiag
   async function buy() {
     if (disposed || !account || busy || checking) return;
     const version = generation;
+    if (!pendingId) {
+      // A missing/failed startup read is not proof that the order slot is empty.
+      // Recheck on an explicit purchase before replacing the only recovery reference.
+      let stored;
+      try { stored = wxApi.getStorageSync(key()); }
+      catch (_) { emit({ paymentError: '暂时无法读取本机订单，请稍后重试。' }); return; }
+      if (restoreOrder(stored)) { await check({ automatic: true }); return; }
+    }
     const selectedPlanId = planId(product);
     // Existing orders keep their frozen terms. Never fake product readiness:
     // platform suspension still blocks the cashier, while plan-level disable
@@ -377,18 +393,15 @@ function createPaymentController({ wx: wxApi, call, onUpdate, onResolved, onDiag
       product = nextProduct || {};
       const nextAccount = identity && typeof identity.userKey === 'string' ? identity.userKey : '';
       if (nextAccount === account || disposed) return;
-      stopPolling(); generation++; account = nextAccount; busy = false; pendingId = ''; pendingPlanId = ''; pendingPriceFen = null;
+      stopPolling(); generation++; account = nextAccount; busy = Boolean(account); pendingId = ''; pendingPlanId = ''; pendingPriceFen = null;
+      emit({ ...INITIAL, paymentBusy: busy });
       const version = generation;
       const apply = stored => {
         if (disposed || version !== generation) return;
-        if (stored && ORDER_ID.test(stored.orderId)) {
-          pendingId = stored.orderId;
-          pendingPlanId = ['member_30d', 'member_365d'].includes(stored.planId) ? stored.planId : 'member_7d';
-          pendingPriceFen = Number.isSafeInteger(stored.expectedPriceFen) && stored.expectedPriceFen > 0 ? stored.expectedPriceFen : null;
-        }
-        state = { ...INITIAL };
-        emit({ paymentPendingId: pendingId, paymentPendingPlanId: pendingPlanId, paymentMessage: pendingId ? '发现一笔待确认订单，可以查询支付结果。' : '' });
-        if (visible && pendingId && !busy && !checking) check({ automatic: true });
+        restoreOrder(stored);
+        busy = false;
+        emit({ paymentBusy: false });
+        if (visible && pendingId && !checking) check({ automatic: true });
       };
       if (!account) { apply(null); return; }
       // Startup must not block on getStorageSync. Callers without the async API keep the immediate read.

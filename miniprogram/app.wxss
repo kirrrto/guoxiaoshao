@@ -1,101 +1,123 @@
-/* 果小哨 · 页面全局样式。隔离组件使用独立的 class 样式。 */
+/* 果小哨设计体系 · 令牌层。规范见 DESIGN.md，约束由 tests/design-system.test.mjs 执行。
+   页面与组件只引用这里的令牌：不写色值、不写 rpx、不自造字号与间距。 */
 @import "styles/common.wxss";
 
-/* Neutral paper surface, borderless white cards, type-led hierarchy.
-   Brand green fills the primary action and marks positive states only. */
 page {
-  --green: #00C375;
-  --green-dark: #006B3F;
-  --accent-text: #006B3F;
-  --green-ink: #073C2C;
-  --green-soft: rgba(0, 195, 117, 0.10);
-  --green-mist: #F4F4F2;
+  /* 表面：白色页面，内容放在浅灰托盘里；托盘上的控件回到白色。 */
+  --bg: #FFFFFF;
+  --surface: #F5F5F3;
+  --surface-top: #FFFFFF;
+  --elevated: #FFFFFF;
+  --pressed: #E8E8E5;
+  --control: var(--surface);
+  --scrim: rgba(0, 0, 0, 0.45);
+  --line: rgba(17, 20, 18, 0.08);
+
+  /* 文字：一级墨色，两级灰阶。 */
   --text: #111412;
   --text-2: #545956;
   --text-3: #626764;
-  --line: #ECECEA;
-  --card: #FFFFFF;
-  --card-elevated: #FFFFFF;
-  --surface-soft: #F6F6F4;
-  --glass-line: transparent;
-  --shadow-soft: 0 1px 2px rgba(17, 20, 18, 0.04), 0 8px 24px rgba(17, 20, 18, 0.05);
-  --shadow: var(--shadow-soft);
-  --action-fill: var(--green);
-  --action-text: var(--green-ink);
-  --control-fill: #EFEFED;
-  --control-line: transparent;
-  --control-pressed: #E5E5E2;
-  --header-glass: rgba(244, 244, 242, 0.82);
-  --member-card-gradient: linear-gradient(135deg, #FFFFFF 0%, #F4F7F5 100%);
-  --member-card-annual-gradient: linear-gradient(135deg, #FFFFFF 0%, #F7F3EA 100%);
-  --image-tile: #F6F6F4;
-  --image-tile-gradient: radial-gradient(circle at 50% 40%, #FFFFFF 0%, #F0F0EE 100%);
-  --fs-display: max(26px, 56rpx);
-  --fs-title: max(20px, 40rpx);
-  --fs-headline: max(16px, 34rpx);
-  --fs-body: max(14px, 30rpx);
-  --fs-sub: max(13px, 26rpx);
-  --fs-caption: max(12px, 24rpx);
-  --fs-section: max(12px, 24rpx);
-  --radius-card: 28rpx;
-  --radius-inner: 20rpx;
-  --radius-action: 22rpx;
-  --radius-chip: 999rpx;
-  --space-page: 32rpx;
-  --space-card: 32rpx;
-  --space-section: 40rpx;
-  --space-row: 28rpx;
+
+  /* 绿色只用于主操作与「有货 / 已就绪」。绿底上的文字用 --green-ink，不用白色。 */
+  --green: #00C375;
+  --green-ink: #073C2C;
+  --green-text: #006B3F;
+  --green-soft: rgba(0, 195, 117, 0.12);
+
+  /* 语义色成对使用：前景配同名 soft 底。 */
   --warn: #895806;
   --warn-soft: #FBF1DC;
   --bad: #A83E3E;
   --bad-soft: #FBECEC;
-  --info-soft: #F6F6F4;
-  --skeleton-base: #EFEFED;
-  --skeleton-shine: #E5E5E2;
-  background-color: var(--green-mist);
-  background-image: none;
+
+  /* 会员卡：全站唯一的深色物件，金色只出现在这里。 */
+  --pass: #151816;
+  --pass-fill: linear-gradient(135deg, #20241F 0%, #101311 100%);
+  --pass-edge: transparent;
+  --pass-text: #F4F5F3;
+  --pass-text-2: rgba(244, 245, 243, 0.66);
+  --pass-line: rgba(244, 245, 243, 0.12);
+  --pass-gold: #E9CE9A;
+
+  /* 商品图托：与托盘上的控件同色，深色模式保留浅底以看清深色机身。 */
+  --image-tile: #FFFFFF;
+  --image-blend: normal;
+  --icon-filter: grayscale(1);
+  --skeleton: rgba(17, 20, 18, 0.07);
+
+  /* 字号六级、字重两种（400 / 600）、行高三档。 */
+  --fs-display: 28px;
+  --fs-title: 22px;
+  --fs-headline: 17px;
+  --fs-body: 15px;
+  --fs-sub: 13px;
+  --fs-caption: 12px;
+  --lh-tight: 1.25;
+  --lh-snug: 1.4;
+  --lh-normal: 1.5;
+
+  /* 间距阶梯（数字即像素）。 */
+  --sp-2: 2px;
+  --sp-4: 4px;
+  --sp-8: 8px;
+  --sp-12: 12px;
+  --sp-16: 16px;
+  --sp-20: 20px;
+  --sp-24: 24px;
+  --sp-32: 32px;
+  --sp-40: 40px;
+
+  /* 圆角：托盘、控件、小托、胶囊。 */
+  --radius-tray: 16px;
+  --radius-control: 12px;
+  --radius-tile: 10px;
+  --radius-pill: 999px;
+
+  /* 尺寸与动效。 */
+  --tap: 44px;
+  --btn-height: 48px;
+  --shadow-sheet: 0 -8px 32px rgba(0, 0, 0, 0.12);
+  --ping-from: 0 0 0 0 rgba(0, 195, 117, 0.45);
+  --ping-to: 0 0 0 10px rgba(0, 195, 117, 0);
+  --ease: cubic-bezier(0.2, 0, 0, 1);
+  --dur-fast: 120ms;
+  --dur: 200ms;
+
   min-height: 100%;
+  background-color: var(--bg);
   color: var(--text);
-  font-size: 28rpx;
-  line-height: 1.5;
   font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", Helvetica, sans-serif;
+  font-size: var(--fs-body);
+  font-variant-numeric: tabular-nums;
+  line-height: var(--lh-normal);
 }
 
-/* Dark mode follows the phone's system theme (app.json darkmode + theme.json).
-   Only colors change. */
+/* 深色模式跟随系统（app.json darkmode + theme.json），只改颜色令牌。 */
 @media (prefers-color-scheme: dark) {
   page {
+    --bg: #0B0D0C;
+    --surface: #171A18;
+    --surface-top: #252927;
+    --elevated: #1F2320;
+    --pressed: #2E3230;
+    --scrim: rgba(0, 0, 0, 0.6);
+    --line: rgba(255, 255, 255, 0.08);
     --text: #EEF2EF;
     --text-2: #B7C0BB;
     --text-3: #9BA59F;
-    --green-dark: #5CE0A8;
-    --accent-text: #5CE0A8;
-    --green-soft: rgba(0, 195, 117, 0.14);
-    --green-mist: #0B0D0C;
-    --line: rgba(255, 255, 255, 0.07);
-    --card: #171A18;
-    --card-elevated: #1F2320;
-    --control-fill: rgba(255, 255, 255, 0.09);
-    --control-line: transparent;
-    --control-pressed: rgba(255, 255, 255, 0.14);
-    --surface-soft: #202422;
-    --glass-line: transparent;
-    --shadow-soft: none;
-    --shadow: none;
-    --header-glass: rgba(11, 13, 12, 0.82);
-    --member-card-gradient: linear-gradient(135deg, #171A18 0%, #1C231F 100%);
-    --member-card-annual-gradient: linear-gradient(135deg, #1F2320 0%, #241F17 100%);
+    --green-text: #5CE0A8;
+    --green-soft: rgba(0, 195, 117, 0.16);
     --warn: #E8B15C;
-    --warn-soft: rgba(232, 177, 92, 0.12);
+    --warn-soft: rgba(232, 177, 92, 0.14);
     --bad: #F29B93;
-    --bad-soft: rgba(242, 155, 147, 0.12);
-    --info-soft: #202422;
-    --skeleton-base: rgba(255, 255, 255, 0.05);
-    --skeleton-shine: rgba(255, 255, 255, 0.09);
-    /* Product photos are shot for light backgrounds: a dimmed light tile keeps
-       dark devices on transparent images visible without a glaring white box. */
+    --bad-soft: rgba(242, 155, 147, 0.14);
+    --pass: #1B1F1C;
+    --pass-fill: linear-gradient(135deg, #262B26 0%, #171A18 100%);
+    --pass-edge: rgba(233, 206, 154, 0.22);
     --image-tile: #DCE1DE;
-    --image-tile-gradient: radial-gradient(circle at 50% 40%, #E6EBE8 0%, #D4DAD6 100%);
-    background-image: none;
+    --image-blend: multiply;
+    --icon-filter: grayscale(1) brightness(2.1);
+    --skeleton: rgba(255, 255, 255, 0.07);
+    --shadow-sheet: 0 -8px 32px rgba(0, 0, 0, 0.5);
   }
 }

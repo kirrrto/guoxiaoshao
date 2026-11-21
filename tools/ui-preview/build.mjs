@@ -300,9 +300,9 @@ const buttonConstraintCss = membershipNativePreview
   : v2Preview ? ':where(.history-task-bar) button:not([size=mini]){width:184px;margin-left:auto;margin-right:auto;}' : '';
 const widths = [320, 375, 430], scenarios = adminPreview ? ['operator-ready', 'operator-denied', 'operator-loading', 'operator-error', 'operator-longcontent', 'operator-saving'] : historyTaskPreview ? ['history-member-reward', 'history-free-first', 'history-read-error', 'history-balance-cap', 'history-completed', 'history-longcontent', 'history-loading'] : monitoringPreview ? ['monitor-template-missing', 'monitor-ready-authorized', 'monitor-needs-authorization', 'monitor-stale', 'monitor-disabled', 'monitor-expired-paused'] : redemptionPreview ? ['redemption-input', 'redemption-loading', 'redemption-error', 'redemption-success', 'redemption-used', 'redemption-limited', 'redemption-empty'] : stockPreview ? Object.keys(stockScenarios) : reminderPreview ? ['reminders', 'reminder-empty', 'reminder-loading', 'reminder-deleting', 'reminder-clearing', 'reminder-error', 'reminder-more-error', 'longcontent'] : ['free', 'member', 'expired', 'empty', 'error', 'loading', 'longcontent'];
 if (historyDataPreview) scenarios.splice(0, scenarios.length, 'history-no-data', 'history-unknown-only', 'history-observed-no-events', 'history-events-only', 'history-observed-events', 'history-partial-stores');
-if (paymentPreview) scenarios.splice(0, scenarios.length, 'payment-ready', 'payment-renew', 'payment-blocked', 'payment-old-ios', 'payment-pending', 'payment-cancelled', 'payment-error', 'payment-fulfilled', 'payment-partial-refund', 'payment-monthly', 'payment-annual', 'payment-pending-monthly', 'payment-member', 'payment-upgrade-monthly', 'payment-upgrade-annual', 'payment-member-pending-monthly', 'payment-benefits', 'payment-rules');
+if (paymentPreview) scenarios.splice(0, scenarios.length, 'payment-ready', 'payment-renew', 'payment-blocked', 'payment-old-ios', 'payment-pending', 'payment-cancelled', 'payment-error', 'payment-fulfilled', 'payment-partial-refund', 'payment-monthly', 'payment-annual', 'payment-pending-monthly', 'payment-member', 'payment-upgrade-monthly', 'payment-upgrade-annual', 'payment-member-pending-monthly');
 if (membershipNativePreview) {
-  scenarios.splice(0, scenarios.length, 'payment-ready', 'payment-monthly', 'payment-annual', 'payment-member', 'payment-expired', 'payment-renew', 'payment-upgrade-monthly', 'payment-upgrade-annual', 'payment-pending-monthly', 'payment-member-pending-monthly', 'payment-benefits', 'payment-rules');
+  scenarios.splice(0, scenarios.length, 'payment-ready', 'payment-monthly', 'payment-annual', 'payment-member', 'payment-expired', 'payment-renew', 'payment-upgrade-monthly', 'payment-upgrade-annual', 'payment-pending-monthly', 'payment-member-pending-monthly');
   widths.splice(0, widths.length, 320, 360, 375, 390, 393, 414, 430, 480, 768, 1024);
 }
 if (orderRecordsPreview) scenarios.splice(0, scenarios.length, 'orders-single', 'orders-deleting', 'orders-clearing', 'orders-error', 'orders-pending', 'orders-empty', 'orders-legacy');
@@ -780,8 +780,6 @@ for (const scenario of scenarios) {
     }
     if (pageName === 'mine' && paymentPreview) {
       if (!page.data.membership.active && !page.data.paymentPendingId) page.onOpenMembershipRenew();
-      if (scenario === 'payment-benefits') page.onToggleMembershipRules();
-      if (scenario === 'payment-rules') page.onTogglePurchaseRules();
       if (scenario === 'payment-renew') page.onOpenMembershipRenew();
       if (['payment-upgrade-monthly', 'payment-upgrade-annual'].includes(scenario)) {
         page.onOpenMembershipUpgrade();
@@ -794,7 +792,7 @@ for (const scenario of scenarios) {
       }
     }
     if (baselinePreview && pageName === 'mine' && !['error', 'loading'].includes(scenario)) {
-      if (page.data.showPurchaseShop || page.data.membershipUpgradeOpen || page.data.displayMemberProducts.length || page.data.showPurchaseRules)
+      if (page.data.showPurchaseShop || page.data.membershipUpgradeOpen || page.data.displayMemberProducts.length)
         throw Error('Disabled membership fixture must retain its unavailable notice and closed purchase controls');
     }
     if (baselinePreview && pageName === 'follow' && scenario === 'longcontent') {
@@ -1013,13 +1011,13 @@ for (const scenario of scenarios) {
           'v2-longcontent': [p.title],
         }[scenario] || [])];
       } else if (pageName === 'mine') {
-        expectedV2Text = ['微信提醒', '查询与体验次数', '提醒记录', '联系客服', '会员权益与购买规则'];
+        expectedV2Text = ['微信提醒', '查询与体验次数', '提醒记录', '联系客服', '购买记录'];
         if (['v2-context-checkout', 'v2-paid-unconfigured', 'v2-longcontent'].includes(scenario)) {
           if (!page.data.checkoutTarget) throw Error(`${scenario}: membership page lost checkout context`);
           expectedV2Text.push(p.title, page.data.checkoutTarget.storeText,
-            member ? '会员已生效 · 继续设置关注' : '准备关注的配置');
+            member ? '会员已生效 · 继续设置关注' : '为这款持续留意');
         }
-        expectedV2Text.push(member ? '会员已开通' : page.data.membershipUpgradeOpen ? `确认购买 ${page.data.boot.memberProduct.days} 天会员` : '开通会员');
+        expectedV2Text.push(member ? (page.data.membership.planLabel !== '会员' ? page.data.membership.planLabel : '会员已开通') : page.data.membershipUpgradeOpen ? `确认购买 ${page.data.boot.memberProduct.days} 天会员` : '开通会员');
         if (scenario.startsWith('v3-member-')) expectedV2Text.push('延长会员', '升级套餐');
         if (scenario.startsWith('v3-upgrade-')) {
           const expectedPlans = scenario.endsWith('weekly') ? ['member_30d', 'member_365d'] : scenario.endsWith('monthly') ? ['member_365d'] : [];
@@ -1028,7 +1026,7 @@ for (const scenario of scenarios) {
         }
         if (scenario.startsWith('v2-promotion-')) {
           expectedV2Text.push('月卡', '年卡');
-          expectedV2Text.push('优惠价', '¥30.00', '¥360.00', '¥14.99', '¥129.00');
+          expectedV2Text.push('¥30.00', '¥360.00', '¥14.99', '¥129.00');
           forbiddenText.push('限时优惠', '优惠至', '之后 ¥30.00', '之后 ¥360.00');
         }
       } else if (pageName === 'guide') {
@@ -1115,7 +1113,7 @@ for (const scenario of scenarios) {
         'notification-test-rules': ['会员同样扣次', '明确发送失败自动退回', '结果不明时暂不退回', '不会重复发送', '不查询库存或创建监测', '正式到货和断货提醒需要会员、有效关注与微信授权', '微信授权次数与查询额度分开计算', '不保证手机弹出横幅'],
         'notification-test-needs-authorization': ['尚未获得微信授权', '本次未扣次数'],
         'notification-test-uncertain-received': ['结果尚未确认', '原测试结果仍未知，扣次记录保留', '再次体验会新建测试，另消耗 1 次', '不会重复发送', '重新授权新测试'],
-      }[scenario]] : adminPreview ? { 'operator-ready': ['运行统计', '128'], 'operator-denied': ['当前账号没有管理权限', '重新检查'], 'operator-loading': ['校验权限'], 'operator-error': ['权限检查失败', '重新检查'], 'operator-longcontent': ['运行统计', '查询结果', '运营查询长文本换行验收'], 'operator-saving': ['保存中', '重载并替换草稿', '保存配置'] }[scenario] : historyTaskPreview ? pageName === 'history' ? ['恢复最近浏览条件', '收起', p.title, ...{
+      }[scenario]] : adminPreview ? { 'operator-ready': ['运行统计', '128'], 'operator-denied': ['当前账号没有管理权限', '重新检查'], 'operator-loading': ['校验权限'], 'operator-error': ['权限检查失败', '重新检查'], 'operator-longcontent': ['运行统计', '查询结果', '运营查询长文本换行验收'], 'operator-saving': ['保存中', '重载并替换草稿', '保存配置'] }[scenario] : historyTaskPreview ? pageName === 'history' ? ['恢复最近浏览条件', p.title, ...{
         'history-member-reward': ['今日浏览任务完成，+1 次', '已计入次数明细'],
         'history-free-first': ['还没有浏览记录', '今日浏览任务完成，+1 次', '余 1 次'],
         'history-read-error': ['浏览记录加载或奖励确认未完成', '重新加载'],
@@ -1123,7 +1121,7 @@ for (const scenario of scenarios) {
         'history-completed': ['今日浏览任务已完成', '奖励已计入次数明细'],
         'history-longcontent': ['各地门店已有记录', '3 家门店', '今日浏览任务完成，+1 次'],
         'history-loading': ['正在加载浏览记录'],
-      }[scenario]] : ['每日体验任务', '次数明细', '浏览一次历史记录', ...(scenario === 'history-balance-cap' ? ['已浏览·待领取', '暂无记录'] : ['history-read-error', 'history-loading'].includes(scenario) ? ['去完成', '暂无记录'] : ['已完成', '体验任务', '+1'])]
+      }[scenario]] : ['今日已获', '余额上限', '次数明细', '浏览一次历史记录', ...(scenario === 'history-balance-cap' ? ['已浏览·待领取', '暂无记录'] : ['history-read-error', 'history-loading'].includes(scenario) ? ['去完成', '暂无记录'] : ['已完成', '体验任务', '+1'])]
           : monitoringPreview ? [...(follows.length ? [p.title, '调整', '详情与管理'] : []), ...(scenario.startsWith('monitor-dual-') ? ['到货', '断货'] : ['后台检测', '消息发送']), '微信提醒', ...{
         'monitor-template-missing': ['监测服务运行中', '模板尚未配置', '关注已开启', '查看原因'],
         'monitor-ready-authorized': ['监测服务运行中', '发送服务已就绪', '提醒次数只剩 1 次', '增加提醒次数', '关注已开启'],
@@ -1145,9 +1143,9 @@ for (const scenario of scenarios) {
         'monitor-dual-native': ['待同步', '到货 8 次', '断货 5 次'],
         'monitor-dual-sync-error': ['待同步', '重试同步', '增加提醒次数'],
         'monitor-dual-storage-error': ['授权暂存在本次运行', '重试同步'],
-      }[scenario]] : paymentPreview ? ['兑换码开通', ...(page.data.paymentPendingId ? ['继续处理原订单', '查询支付结果', '继续支付这笔订单', '放弃这笔订单'] : page.data.membershipUpgradeOpen ? page.data.displayMemberProducts.flatMap(item => [item.nameText, item.priceText, ...(item.standardPriceText ? [item.standardPriceText, '优惠价'] : [])]) : ['延长会员']), ...{
-        'payment-ready': ['立即开通', '选择会员时长', '付款确认后生效'], 'payment-renew': ['延长会员', '确认续费', '在原到期时间后增加 7 天'],
-        'payment-blocked': ['付费购买暂未开放'], 'payment-old-ios': ['iOS 15'],
+      }[scenario]] : paymentPreview ? ['兑换码开通', ...(page.data.paymentPendingId ? ['继续处理原订单', '查询支付结果', '继续支付这笔订单', '放弃这笔订单'] : page.data.membershipUpgradeOpen ? page.data.displayMemberProducts.flatMap(item => [item.nameText, item.priceText, ...(item.standardPriceText ? [item.standardPriceText] : [])]) : page.data.showPurchaseShop ? [page.data.membership.active ? '延长会员' : '开通会员'] : ['会员购买暂不可用，现有会员权益不受影响。']), ...{
+        'payment-ready': ['立即开通', '选择套餐', '付款确认后生效', '一经售出不予退款', '不自动续费'], 'payment-renew': ['延长会员', '确认续费', '在原到期时间后增加 7 天'],
+        'payment-blocked': ['果小哨会员'], 'payment-old-ios': ['果小哨会员'],
         'payment-pending': ['支付正在确认中', '查询支付结果'], 'payment-cancelled': ['已取消本次支付', '请查询订单状态', '查询支付结果'],
         'payment-error': ['支付结果暂未确认', '查询支付结果'], 'payment-fulfilled': ['支付已确认，会员已开通', '已开通'],
         'payment-partial-refund': ['订单已部分退款', '部分退款', '已退款 ¥3.50'],
@@ -1159,9 +1157,7 @@ for (const scenario of scenarios) {
         'payment-upgrade-monthly': ['确认购买 · ¥14.99', '在原到期时间后增加 30 天', '预计到期 2026-11-02', '按所选套餐全价购买', '不抵扣差价'],
         'payment-upgrade-annual': ['确认购买 · ¥129.00', '在原到期时间后增加 365 天', '预计到期 2027-10-03', '按所选套餐全价购买', '不抵扣差价'],
         'payment-member-pending-monthly': ['30 天会员 · ¥19.90', 'offline-original-monthly-order', '继续处理原订单', '查询支付结果'],
-        'payment-benefits': ['会员权益', '周卡', '月卡', '年卡', '新品'],
-        'payment-rules': ['一次性虚拟服务', '一经售出不予退款', '一次购买 7 天', '会员权益与购买规则'],
-      }[scenario]] : redemptionPreview ? ['兑换会员', '付费购买暂未开放', { 'redemption-input': '确认兑换', 'redemption-loading': '兑换中，请稍候', 'redemption-error': '兑换码无效', 'redemption-success': '兑换成功', 'redemption-used': '此账号已兑换过', 'redemption-limited': '15 分钟后再试', 'redemption-empty': '确认兑换' }[scenario]] : stockPreview ? [p.title, '2 家门店',
+      }[scenario]] : redemptionPreview ? ['兑换会员', '会员购买暂不可用，现有会员权益不受影响。', { 'redemption-input': '确认兑换', 'redemption-loading': '兑换中，请稍候', 'redemption-error': '兑换码无效', 'redemption-success': '兑换成功', 'redemption-used': '此账号已兑换过', 'redemption-limited': '15 分钟后再试', 'redemption-empty': '确认兑换' }[scenario]] : stockPreview ? [p.title, '2 家门店',
         ...(stockScenarios[scenario].expanded ? ['收起详情', '单独查询库存', '调整', '查看供应历史', '删除关注'] : ['详情与管理']),
         ...(member ? ['到货 42 次', '断货 41 次', '补充提醒次数'] : []),
         ...({ available: ['2 家可取货', '15 秒前检查', '查看取货信息'],
@@ -1177,7 +1173,7 @@ for (const scenario of scenarios) {
         ...(stockScenarios[scenario].authorizationPending ? ['待同步 +1', '重试同步', '网络较慢，授权记录尚未同步。'] : member ? ['微信提醒授权已备好'] : []),
       ] : scenario === 'loading' ? [{ query: '正在加载商品目录', follow: '正在读取你的关注', history: '正在加载商品目录', mine: '正在读取账户信息' }[pageName]]
         : scenario === 'error' ? [pageName === 'admin' ? '模拟错误：网络连接中断' : '模拟错误：云环境连接超时', '暂时没有连上', '重试']
-        : pageName === 'mine' ? [member ? '会员已开通' : expired ? '会员已到期' : '会员权益', ...(page.data.showPurchaseShop ? page.data.membership.active ? ['延长会员', '升级套餐'] : ['开通会员'] : ['会员购买暂不可用，现有会员权益不受影响。']), '会员权益与购买规则', '提醒记录', ...(reminderPreview && reminderRecords.length ? ['删除记录', scenario === 'reminder-clearing' ? '清空中' : '清空'] : [])]
+        : pageName === 'mine' ? [member ? (page.data.membership.planLabel !== '会员' ? page.data.membership.planLabel : '会员已开通') : expired ? '会员已到期' : '免费用户', ...(member || page.data.paymentPendingId ? [] : ['果小哨会员']), ...(page.data.paymentPendingId ? [] : page.data.showPurchaseShop ? page.data.membership.active ? ['延长会员', '升级套餐'] : ['开通会员'] : ['会员购买暂不可用，现有会员权益不受影响。']), '提醒记录', ...(reminderPreview && reminderRecords.length ? ['删除记录', scenario === 'reminder-clearing' ? '清空中' : '清空'] : [])]
         : pageName === 'follow' && follows.length ? [p.title, '2 家门店', ...(page.data.follows.some(follow => follow.detailsExpanded) ? [stores[0].name, '收起详情', '调整', '查看供应历史', '删除关注'] : ['详情与管理']), ...(sheetPreview ? ['调整关注', '选商品', '选门店', '已选 2 家门店', p.title + ' · 2 家门店', scenario === 'sheet-saving' ? '正在保存' : '保存关注'] : [])]
         : pageName === 'follow' ? ['暂无库存关注']
         : pageName === 'admin' ? ['运行统计', '128'] : [p.title, ...(sheetPreview ? ['选商品', '选门店', '已选 2 家门店', '保存选择'] : [])];
@@ -1209,7 +1205,7 @@ for (const scenario of scenarios) {
         ...page.data.visibleReleaseNotes.map(entry => `v${entry.version}`), '上一页', '下一页', '收起',
         ...(page.data.releaseNotesPage === 1 ? ['当前版本'] : []),
       ] : ['查看']));
-      if (orderRecordsPreview) expectedText.push('会员记录', ...{
+      if (orderRecordsPreview) expectedText.push('购买记录', ...{
         'orders-single': ['订单号：grant_', '删除记录', '清空当前显示的记录'],
         'orders-deleting': ['删除中…', '支付状态待确认，暂不可清理'],
         'orders-clearing': ['清空中…', '支付状态待确认，暂不可清理'],
@@ -1234,13 +1230,13 @@ for (const scenario of scenarios) {
       const expectedMembership = (membershipNativePreview || v2Preview || baselinePreview && !['error', 'loading'].includes(scenario)) && pageName === 'mine' ? {
         accountHeader: !page.data.contextualCheckout || !page.data.checkoutTarget || page.data.membership.active,
         active: page.data.membership.active,
+        offer: !page.data.membership.active && !page.data.paymentPendingId && (!page.data.contextualCheckout || !page.data.checkoutTarget),
         currentPlanId: page.data.membership.planId,
         accountState: page.data.membership.active ? 'member' : page.data.membership.expired ? 'expired' : 'free',
         packages: !page.data.paymentPendingId && page.data.membershipUpgradeOpen ? page.data.displayMemberProducts.length : 0,
         planIds: !page.data.paymentPendingId && page.data.membershipUpgradeOpen ? page.data.displayMemberProducts.map(item => item.planId) : [],
         entryActions: page.data.showPurchaseShop && !page.data.paymentPendingId && !page.data.membershipUpgradeOpen ? page.data.membership.active ? ['延长会员', '升级套餐'] : ['开通会员'] : [],
-        utilityLinks: 7,
-        notificationEntryInMembership: false,
+        utilityLinks: 8,
       } : undefined;
       const expectedNotification = notificationTestPreview ? {
         loading: page.data.loading, ready: page.data.ready, busy: page.data.busy,

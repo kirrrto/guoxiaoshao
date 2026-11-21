@@ -42,33 +42,18 @@ function releaseNotesPage(page = 1) {
   return { releaseNotesPage: bounded, visibleReleaseNotes: RELEASE_NOTES.slice((bounded - 1) * RELEASE_NOTES_PAGE_SIZE, bounded * RELEASE_NOTES_PAGE_SIZE) };
 }
 
-/** Group only equal server-advertised allowances, without inferring a user's plan. */
-function membershipBenefitPlans(products) {
-  const groups = [];
-  const bounded = (value, maximum) => Number.isInteger(value) && value >= 1 && value <= maximum ? value : 3;
-  for (const product of products) {
-    const limits = product.limits || {}, configs = bounded(limits.maxFollows, 5), stores = bounded(limits.maxStoresPerFollow, 5);
-    const key = `${configs}:${stores}`, existing = groups.find(group => group.key === key);
-    if (existing) {
-      if (!existing.names.includes(product.nameText)) existing.names.push(product.nameText);
-    } else groups.push({ key, names: [product.nameText], configs, stores, enhanced: configs > 3 || stores > 3 });
-  }
-  return groups.map(({ names, ...group }) => ({ ...group, label: names.join(' / ') }));
-}
-
 function presentMemberProduct(item) {
   const promotion = item.promotion || {};
   const discounted = promotion.active === true && Number.isSafeInteger(item.standardPriceFen)
     && item.standardPriceFen > item.priceFen;
   return { ...item, priceText: fmt.fen(item.priceFen), standardPriceText: discounted ? fmt.fen(item.standardPriceFen) : '',
     promotionText: discounted ? '优惠价' : '',
-    recommendedText: item.planId === 'member_30d' ? '主力推荐' : '',
+    recommendedText: item.planId === 'member_30d' ? '推荐' : '',
     dailyPriceText: `约 ¥${(item.priceFen / item.days / 100).toFixed(2)} / 天`,
     benefitText: productBenefit(item),
     benefitShort: `${item.limits && item.limits.maxFollows || 3} 配置 × ${item.limits && item.limits.maxStoresPerFollow || 3} 门店`,
     nameText: item.days === 365 ? '年卡' : item.days === 30 ? '月卡' : item.days === 7 ? '周卡' : '会员',
     durationText: `${item.days} 天`,
-    taskLabel: item.planId === 'member_7d' ? '短期等货' : item.planId === 'member_30d' ? '持续关注' : '长期使用',
     available: paymentAvailability(item, wx).ready };
 }
 
@@ -215,9 +200,6 @@ Page({
     ledger: [],
     orders: [],
     showOrders: false,
-    showMembershipRules: false,
-    showPurchaseRules: false,
-    membershipBenefitPlans: [],
     membershipUpgradeEmptyText: '',
     membershipUpgradeOpen: false,
     showPurchaseShop: false,
@@ -569,7 +551,6 @@ Page({
       purchaseMode,
       membershipUpgradeEmptyText: membership.planId === 'member_365d' ? '你已是年卡会员，当前没有更高档套餐。' : '暂时没有可升级的套餐，可继续延长会员。',
       membershipUpgradePreview: renewalPreview(selected, membership),
-      membershipBenefitPlans: membershipBenefitPlans(products),
       boot: {
         identity: boot.identity,
         member: membership.active, templateIds: subscription.templateIds, soldoutId: soldout.templateId,
@@ -1060,7 +1041,7 @@ Page({
       success: r => {
         if (!r.confirm || this.pageRetired || this.pageVisible === false || generation !== (this.paymentConsentGeneration || 0)
           || account !== (this.data.boot && this.data.boot.identity && this.data.boot.identity.userKey)) return;
-        app.globalData.pendingFollow = { partNumber: intent.partNumber, storeNumbers: intent.storeNumbers.slice() };
+        app.globalData.pendingFollow = { partNumber: intent.partNumber, storeNumbers: intent.storeNumbers.slice(), userKey: account };
         switchToTab({ url: '/pages/follow/index' });
       },
     });
@@ -1253,12 +1234,9 @@ Page({
     switchToTab({ url: '/pages/history/index' });
   },
 
-  onToggleMembershipRules() {
-    if (!this.pageRetired) this.setData({ showMembershipRules: !this.data.showMembershipRules, showPurchaseRules: !this.data.showMembershipRules });
-  },
-
-  onTogglePurchaseRules() {
-    if (!this.pageRetired) this.setData({ showPurchaseRules: !this.data.showPurchaseRules });
+  /** Allowance, renewal and reminder-credit rules live in the guide's FAQ. */
+  onMembershipHelp() {
+    if (!this.pageRetired) navigation.navigateTo({ url: '/pages/guide/index?section=membership&from=mine' });
   },
 
   onToggleReleaseNotes() {
@@ -1296,7 +1274,6 @@ Page({
     const section = getApp().globalData.pendingMineSection;
     if (!['reminder-center', 'reminder-settings', 'membership-card', 'quota-card', 'notification-records'].includes(section)) return;
     if (section === 'reminder-settings') this.setData({ showReminderSettings: true });
-    if (section === 'membership-card') this.setData({ showMembershipRules: true, showPurchaseRules: true });
     if (section === 'quota-card') this.setData({ showQuotaDetails: true });
     if (section === 'notification-records') {
       this.setData({ showNotifications: true });

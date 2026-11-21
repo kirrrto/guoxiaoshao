@@ -31,8 +31,9 @@ for (const [path, action] of [['pages/query/index.js', 'query.pickup'], ['pages/
 
 test('follow-from-query transfers the current picker selection before its deferred change event', () => {
   const { rt, page } = setup('pages/query/index.js');
+  page.accountSnapshot = { identity: { userKey: 'account-a' } };
   page.onFollowSelection();
-  assert.deepEqual(copy(rt.app.globalData.pendingFollow), { partNumber: 'MFHE4CH/A', storeNumbers: ['R765'] });
+  assert.deepEqual(copy(rt.app.globalData.pendingFollow), { partNumber: 'MFHE4CH/A', storeNumbers: ['R765'], userKey: 'account-a' });
 });
 
 test('saving the query sheet confirms its latest selection', () => {

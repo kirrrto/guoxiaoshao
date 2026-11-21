@@ -154,7 +154,6 @@ Page({
     draftValue: null,
     draftDirty: false,
     draftSummary: '',
-    rulesExpanded: false,
     querying: false,
     selectionQueryPending: false,
     limitedQueryRecovery: false,
@@ -169,7 +168,6 @@ Page({
     restriction: null,
     queryFailureMessage: '',
     restrictionReason: null,
-    collector: null,
     queryNotice: null,
     noticeDot: false,
     followTargets: [],
@@ -387,7 +385,7 @@ Page({
       if (!this.verifiedAccount() || !boot || !boot.member || !boot.followCount) {
         this.followSnapshot = null;
         if (this.data.followTargets.length) this.setData({ followTargets: [] });
-        this.followTimer = setTimeout(tick, monitorPollDelay(this.data.collector));
+        this.followTimer = setTimeout(tick, monitorPollDelay(this.collector));
         return;
       }
       if (this.followSnapshot) this.setData({ followTargets: presentFollowTargets(this.followSnapshot) });
@@ -398,7 +396,7 @@ Page({
           this.setData({ followTargets: presentFollowTargets(data.follows) });
         }
       } catch (e) { /* Keep the last task label; live status is shown on the follow page. */ }
-      if (this.visible && epoch === this.followEpoch) this.followTimer = setTimeout(tick, monitorPollDelay(this.data.collector));
+      if (this.visible && epoch === this.followEpoch) this.followTimer = setTimeout(tick, monitorPollDelay(this.collector));
     };
     tick();
   },
@@ -440,6 +438,8 @@ Page({
     this.accountVerificationPending = false;
     this.accountSnapshot = boot;
     this.features = boot.features || {};
+    // Collector state only drives polling cadence and next-action logic; the page does not render it.
+    this.collector = { ...boot.collector, ...fmt.collectorMeta(boot.collector && boot.collector.state) };
     this.alternativeAccount = { membership: boot.membership, newProductWindows: boot.newProductWindows, limits: boot.limits };
     const maxStores = boot.limits ? boot.limits.queryMaxStores : 3;
     const summary = this.selectionView(this.selection, maxStores);
@@ -464,7 +464,6 @@ Page({
         followCount: boot.followCount || 0,
         signedInToday: boot.quota.signedInToday,
       },
-      collector: { ...boot.collector, ...fmt.collectorMeta(boot.collector && boot.collector.state) },
     });
     this.updateQueryNotices();
     this.refreshStoreChoices();
@@ -531,7 +530,7 @@ Page({
     const restricted = Boolean(flags.resultNextAction && canQuery(product) && account && !account.membership.active
       && Array.isArray(account.newProductWindows) && !canOfferLiveChoices(product, account, Date.now()));
     const state = { snapshot: this.querySnapshot && this.lastQueryUncertain ? { ...this.querySnapshot, ok: false } : this.querySnapshot,
-      account, collector: this.data.collector, catalog: this.catalog };
+      account, collector: this.collector, catalog: this.catalog };
     const access = this.resultAccess();
     const next = flags.resultNextAction ? resultNextAction(state) : null;
     const resultProduct = this.data.result && this.data.result.product;
@@ -929,7 +928,6 @@ Page({
     conversion.track('target_committed', { partNumber: selection.partNumber, storeNumbers: selection.storeNumbers.slice(), entryPoint: 'query_selection' });
   },
 
-  onToggleRules() { this.setData({ rulesExpanded: !this.data.rulesExpanded }); },
 
   onSelectionImageError() { this.setData({ selectionImageFailed: true }); },
 
@@ -1101,9 +1099,11 @@ Page({
   },
 
   navigateToFollow(target) {
-    if (navigation.isNavigating()) return;
+    if (this.pageRetired || navigation.isNavigating()) return;
     const boot = this.data.boot;
-    if (!boot) return toast('账户正在连接，请稍后再试');
+    const identity = this.accountSnapshot && this.accountSnapshot.identity;
+    if (!boot || !identity || !identity.userKey || this.accountVerificationPending) return toast('账户正在连接，请稍后再试');
+    const userKey = identity.userKey;
     this.onSelectionInteraction();
     if (this.features && this.features.contextualCheckout && this.accountSnapshot && this.catalog) {
       const resultTarget = this.data.result && targetSignature({ partNumber: this.data.result.product.partNumber, storeNumbers: this.data.result.results.map(row => row.storeNumber) });
@@ -1123,12 +1123,22 @@ Page({
     if (!boot.member) {
       // Keep the intent: 「我的」 offers to continue with it once membership is active.
       const app = getApp();
-      app.globalData.pendingMemberFollow = { partNumber: target.partNumber, storeNumbers: target.storeNumbers.slice(), title: target.title || target.partNumber };
-      wx.showModal({ title: '关注与到货提醒为会员专属', content: '周卡 3 个配置、每配置 3 家门店；月卡 4 个配置、每配置 4 家门店；年卡 5 个配置、每配置 5 家门店。提醒需微信授权。开通后会继续为你关注这个配置。', confirmText: '去开通',
-        success: r => { if (r.confirm) switchToTab({ url: '/pages/mine/index' }); else app.globalData.pendingMemberFollow = null; } });
+      const intent = { partNumber: target.partNumber, storeNumbers: target.storeNumbers.slice(), title: target.title || target.partNumber,
+        userKey, createdAt: Date.now() };
+      app.globalData.pendingMemberFollow = intent;
+      const discard = () => { if (app.globalData.pendingMemberFollow === intent) app.globalData.pendingMemberFollow = null; };
+      const visibility = this.visibilityEpoch;
+      wx.showModal({ title: '关注与到货提醒为会员专属', content: '开通后，请确认门店并保存关注。接收微信提醒还需授权。各套餐名额可在下一页查看。', confirmText: '去开通',
+        success: r => {
+          if (app.globalData.pendingMemberFollow !== intent) return;
+          const current = this.accountSnapshot && this.accountSnapshot.identity;
+          if (!r.confirm || this.pageRetired || this.visible === false || visibility !== this.visibilityEpoch
+            || this.accountVerificationPending || !current || current.userKey !== userKey) return discard();
+          switchToTab({ url: '/pages/mine/index' });
+        }, fail: discard });
       return;
     }
-    getApp().globalData.pendingFollow = { partNumber: target.partNumber, storeNumbers: target.storeNumbers.slice() };
+    getApp().globalData.pendingFollow = { partNumber: target.partNumber, storeNumbers: target.storeNumbers.slice(), userKey };
     switchToTab({ url: '/pages/follow/index' });
   },
 

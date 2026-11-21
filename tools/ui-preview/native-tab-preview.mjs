@@ -5,7 +5,7 @@ import path from 'node:path';
 export function nativeTabPreview(config, theme, mini, selected, hidden) {
   if (selected < 0) return { markup: '', css: '' };
   const value = (item, mode) => typeof item === 'string' && item.startsWith('@') ? theme?.[mode]?.[item.slice(1)] : item;
-  const colors = mode => `.preview-native-tabbar{background:${value(config.backgroundColor, mode)};color:${value(config.color, mode)};border-top-color:${value(config.borderStyle, mode) === 'white' ? '#d8d8d8' : '#333'}}.preview-native-tabbar .is-selected{color:${value(config.selectedColor, mode)}}`;
+  const colors = mode => `.preview-native-tabbar{background:${value(config.backgroundColor, mode)};color:${value(config.color, mode)};border-top-color:${value(config.borderStyle, mode) === 'white' ? '#d8d8d8' : 'rgba(0,0,0,.33)'}}.preview-native-tabbar .is-selected{color:${value(config.selectedColor, mode)}}`;
   const markup = `<nav class="preview-native-tabbar" aria-label="原生底栏离线示意" ${hidden ? 'hidden' : ''}>${config.list.map((tab, index) => {
     const icon = fs.readFileSync(path.join(mini, index === selected ? tab.selectedIconPath : tab.iconPath)).toString('base64');
     return `<span class="preview-native-tab-item${index === selected ? ' is-selected' : ''}"><img src="data:image/png;base64,${icon}" alt=""><span class="preview-native-tab-label">${tab.text}</span></span>`;

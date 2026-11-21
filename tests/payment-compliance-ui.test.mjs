@@ -138,7 +138,7 @@ test('payment-unavailable page hides every purchase entry and keeps membership b
   assert.equal(page.data.membershipUpgradeOpen, false);
   assert.equal(page.data.boot.paymentReady, false);
   assert.equal(page.data.membership.active, true, 'existing membership stays visible');
-  assert.ok(Array.isArray(page.data.membershipBenefitPlans));
+  assert.equal(page.data.boot.memberProducts.length, 3, 'plan facts stay readable for the pass and support');
   page.onOpenMembershipRenew();
   assert.equal(page.data.membershipUpgradeOpen, false);
   page.onOpenMembershipUpgrade();

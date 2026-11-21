@@ -61,7 +61,7 @@ export async function prepareV343Page({ fixture, page, pageName, follows }) {
 export function v343TextExpectations({ fixture, pageName, product }) {
   if (fixture.sheet) return { expected: [product.title, product.partNumber, '选商品', '选门店', '具体配置', '上海', '北京', '深圳', '广州', '杭州', '成都'], forbidden: ['确认此配置', '配置待确认'] };
   if (fixture.retired) return { expected: ['老款已停止检测', '改选新款', '删除关注'], forbidden: ['单独查询库存', '恢复关注', '暂停关注'] };
-  if (fixture.records) return { expected: ['购买与开通记录', ...(fixture.records === 'free' ? ['1 天会员 · 平台发放'] : ['1 天会员 · 新品礼遇', '已退款 ¥7.00'])], forbidden: fixture.records === 'free' ? ['新品礼遇', 'grant_launch_20261028'] : [] };
+  if (fixture.records) return { expected: ['购买记录', ...(fixture.records === 'free' ? ['1 天会员 · 平台发放'] : ['1 天会员 · 新品礼遇', '已退款 ¥7.00'])], forbidden: fixture.records === 'free' ? ['新品礼遇', 'grant_launch_20261028'] : [] };
   const now = Date.parse(fixture.date || v343DefaultDate);
   const live = now >= Date.parse(v343BoardNotice.startsAt) && now < Date.parse(v343BoardNotice.expiresAt);
   const forbidden = ['庆祝苹果 Mac 新品发布', '会员礼遇将由后台', 'Mac 目录与定制款说明', '新款 iPad mini 目录更新说明'];

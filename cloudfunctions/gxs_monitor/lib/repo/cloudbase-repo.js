@@ -284,8 +284,9 @@ function createCloudbaseRepo(db, { sleep = ms => new Promise(resolve => setTimeo
       const { _id, ...data } = query;
       await col(COLLECTIONS.queries).doc(_id).set({ data });
     },
-    async listQueries(userKey, limit) {
-      return readAll(col(COLLECTIONS.queries).where({ userKey }).orderBy('createdAt', 'desc').orderBy('_id', 'desc'), limit || 20);
+    async listQueries(userKey, limit, kind) {
+      const filter = kind ? { userKey, kind } : { userKey };
+      return readAll(col(COLLECTIONS.queries).where(filter).orderBy('createdAt', 'desc').orderBy('_id', 'desc'), limit || 20);
     },
     async listRecentHistoryViews(userKey, limit = 20) {
       return readAll(col(COLLECTIONS.queries).where({ userKey, kind: 'history', status: 'success' })

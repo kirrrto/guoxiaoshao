@@ -133,6 +133,41 @@ test('failed detail reads never invent an opening and explicit presentation rema
   failWith(await f.call('notify.open', { eventId: EVENT }), 'notification_not_found');
 });
 
+test('cleared alerts cannot reopen, record a view or pause a follow, including legacy rows', async () => {
+  for (const legacy of [false, true]) {
+    const { f } = await alerted();
+    const taskId = `${userKeyOf()}|${EVENT}`;
+    if (legacy) await f.repo.updateNotification(taskId, { viewSequence: null });
+    const before = ok(await f.call('notify.list')).clearBefore;
+    ok(await f.call('notify.clear', { before }));
+    for (const action of ['notify.detail', 'notify.open', 'notify.feedback']) {
+      failWith(await f.call(action, { eventId: EVENT, outcome: 'bought' }), 'notification_not_found');
+    }
+    assert.equal((await f.repo.getFollow(FOLLOW)).status, 'active');
+    const cleared = await f.repo.getNotification(taskId);
+    assert.equal(cleared.firstPresentedAt, undefined);
+    assert.equal(cleared.feedback, undefined);
+    assert.equal(cleared.status, 'accepted');
+    // Newly inserted alerts can have the exact same creation time as a cleared one.
+    const eventId = 'later-event';
+    await f.repo.saveNotification({ ...cleared, _id: `${userKeyOf()}|${eventId}`, eventId });
+    assert.equal(ok(await f.call('notify.detail', { eventId })).notification.eventId, eventId);
+  }
+});
+
+test('clearing while feedback is pending prevents the later transaction from pausing the follow', async () => {
+  const { f } = await alerted();
+  const before = ok(await f.call('notify.list')).clearBefore;
+  const saveFeedback = f.repo.recordNotificationFeedback;
+  f.repo.recordNotificationFeedback = async args => {
+    ok(await f.call('notify.clear', { before }));
+    return saveFeedback(args);
+  };
+  failWith(await f.call('notify.feedback', { eventId: EVENT, outcome: 'bought' }), 'notification_not_found');
+  assert.equal((await f.repo.getFollow(FOLLOW)).status, 'active');
+  assert.equal((await f.repo.getNotification(`${userKeyOf()}|${EVENT}`)).feedback, undefined);
+});
+
 test('legacy read telemetry is preserved but never reported as a 1.6.0 rendered presentation', async () => {
   const { f } = await alerted();
   const taskId = `${userKeyOf()}|${EVENT}`, legacyAt = f.state.now.toISOString();

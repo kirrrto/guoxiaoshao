@@ -218,18 +218,21 @@ test('a deadline reached during credit reservation prevents the send and restore
   assert.equal((await s.f.repo.getUser(userKeyOf())).subscriptions.TPL.credits, 4);
 });
 
-test('consumer message token and send requests share the per-attempt time budget', async t => {
+test('a reminder spends elapsed token time before starting its bounded message request', async t => {
   let now = Date.parse('2026-09-15T02:00:00Z');
-  const timeouts = [];
+  const timeouts = new WeakMap();
   const nativeTimeout = AbortSignal.timeout;
-  t.mock.method(AbortSignal, 'timeout', ms => { timeouts.push(ms); return nativeTimeout(ms); });
+  t.mock.method(AbortSignal, 'timeout', ms => {
+    const signal = nativeTimeout(ms); timeouts.set(signal, ms); return signal;
+  });
   const sender = createWechatSender({ appid: 'wx-test', expectedAppid: 'wx-test', appSecret: 'fixture-secret', clock: () => new Date(now),
-    fetchImpl: async url => {
+    fetchImpl: async (url, { signal }) => {
       if (url.endsWith('/stable_token')) { now += 300; return { ok: true, json: async () => ({ access_token: 'fixture-token', expires_in: 7200 }) }; }
+      assert.equal(timeouts.get(signal), 200, 'the message uses only what remains of the 500ms caller budget');
       return { ok: true, json: async () => ({ errcode: 0 }) };
     } });
-  await sender({ appid: 'wx-test', touser: 'fixture-user', templateId: 'TPL', data: {} }, { timeoutMs: 500 });
-  assert.deepEqual(timeouts, [500, 200]);
+  const reply = await sender({ appid: 'wx-test', touser: 'fixture-user', templateId: 'TPL', data: {} }, { timeoutMs: 500 });
+  assert.equal(reply.errcode, 0);
 });
 
 test('split SKU groups share the same-store interval across target changes and cold starts', async () => {

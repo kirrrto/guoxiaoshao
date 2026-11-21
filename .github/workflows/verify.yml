@@ -82,6 +82,12 @@ jobs:
             node tools/ui-preview/check-layout.mjs "$dir"
             node tools/ui-preview/check-layout.mjs "$dir" --dark
           done
+      - name: Check membership checkout at large font sizes
+        shell: bash
+        run: |
+          node tools/ui-preview/build.mjs --membership-native-only --out "$RUNNER_TEMP/ui-membership"
+          node tools/ui-preview/check-layout.mjs "$RUNNER_TEMP/ui-membership" --membership-fonts-only
+          node tools/ui-preview/check-layout.mjs "$RUNNER_TEMP/ui-membership" --membership-fonts-only --dark
       - name: Check release candidate
         run: node tools/release/check.mjs --out output/ci-release.json
       - name: Preserve verification evidence even when release is blocked

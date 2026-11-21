@@ -1,5 +1,7 @@
 # 果小哨视觉升级任务书：从「整洁」到「高级」（基于 v3.7.0）
 
+> **已归档。** 2026-11-21 起以 [DESIGN.md](../DESIGN.md) 与 [`tests/design-system.test.mjs`](../tests/design-system.test.mjs) 为准。本文中的 `rpx`、毛玻璃四处例外、旧令牌名（如 `--green-mist` / `--radius-card`）均已废止，勿再按本文实施。
+
 这份任务书记录 2026-11-14 改版的起点。后续开发以 [DESIGN.md](../DESIGN.md) 的现行规范为准。本轮目标是在保留品牌主色、业务事实和交互路径的前提下，改善四个主页面的视觉层级。
 
 - 基线：`master`（v3.7.0，提交 `71079f7` 及之后）

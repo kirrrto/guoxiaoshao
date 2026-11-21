@@ -57,6 +57,7 @@ function resetSession() {
   latestQuota = null; latestBalance = null; quotaOwner = null;
   bootstrapFetchedAt = 0; catalogCheckedAt = 0; catalogRetryAt = 0; catalogPromise = null; catalogGeneration += 1;
   const app = getApp(); app.globalData.catalog = null; app.globalData.lastQuery = null; app.globalData.pendingFollow = null;
+  app.globalData.pendingMemberFollow = null;
 }
 async function getFollows({ force = false } = {}) {
   if (!force && followSnapshot && Date.now() - followFetchedAt < 15000) return followSnapshot;
@@ -92,6 +93,8 @@ async function refreshBootstrap() {
     if (owner && quotaOwner && owner !== quotaOwner) {
       latestQuota = null;
       latestBalance = null;
+      app.globalData.pendingMemberFollow = null;
+      app.globalData.pendingFollow = null;
       invalidateFollows();
     }
     if (owner) quotaOwner = owner;

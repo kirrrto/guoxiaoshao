@@ -1,13 +1,13 @@
 {
   "light": {
-    "navBackground": "#F4F4F2",
+    "navBackground": "#FFFFFF",
     "navTextStyle": "black",
-    "pageBackground": "#F4F4F2",
+    "pageBackground": "#FFFFFF",
     "pullTextStyle": "dark",
     "tabColor": "#545956",
     "tabSelectedColor": "#006B3F",
     "tabBackground": "#FFFFFF",
-    "tabBorderStyle": "white"
+    "tabBorderStyle": "black"
   },
   "dark": {
     "navBackground": "#0B0D0C",

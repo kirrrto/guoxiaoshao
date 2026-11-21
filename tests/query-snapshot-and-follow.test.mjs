@@ -100,8 +100,9 @@ test('selected-target follow uses current selection while result-card follow kee
   const rt = runtime(), page = rt.instance('pages/query/index.js'), navigations = [], pendingSwitches = [];
   rt.wx.switchTab = value => { navigations.push(value.url); pendingSwitches.push(value); };
   Object.assign(page.data, { boot: { member: true }, result: response() }); page.selection = selection('SKU-B', ['R002']);
+  page.accountSnapshot = { identity: { userKey: 'account-a' } };
   page.onFollowSelection();
-  assert.deepEqual(copy(rt.app.globalData.pendingFollow), { partNumber: 'SKU-B', storeNumbers: ['R002'] });
+  assert.deepEqual(copy(rt.app.globalData.pendingFollow), { partNumber: 'SKU-B', storeNumbers: ['R002'], userKey: 'account-a' });
   page.selection.storeNumbers.push('R003');
   assert.deepEqual(copy(rt.app.globalData.pendingFollow.storeNumbers), ['R002'], 'the editor receives a copy of the selected stores');
   // These are independent entries: finish the first native navigation before
@@ -110,26 +111,63 @@ test('selected-target follow uses current selection while result-card follow kee
   const result = { errMsg: 'switchTab:ok' };
   pendingSwitches[0].success?.(result); pendingSwitches[0].complete?.(result);
   page.onAddFollow();
-  assert.deepEqual(copy(rt.app.globalData.pendingFollow), { partNumber: 'SKU-A', storeNumbers: ['R001'] });
+  assert.deepEqual(copy(rt.app.globalData.pendingFollow), { partNumber: 'SKU-A', storeNumbers: ['R001'], userKey: 'account-a' });
   assert.deepEqual(navigations, ['/pages/follow/index', '/pages/follow/index']);
   pendingSwitches[1].success?.(result); pendingSwitches[1].complete?.(result);
   assert.equal(rt.calls.length, 0, 'adding a follow must not first perform a charged stock query');
+});
+
+test('only the account that selected a direct follow can open the pending editor', () => {
+  const rt = runtime(), page = rt.instance('pages/follow/index.js');
+  const target = { partNumber: 'SKU-A', storeNumbers: ['R001'], userKey: 'account-a' };
+  const edits = [];
+  page.openEditor = options => edits.push(options);
+  page.accountSnapshot = { identity: { userKey: 'account-b' } };
+  page.openPendingEditor(target);
+  assert.equal(edits.length, 0);
+  page.accountSnapshot.identity.userKey = target.userKey;
+  page.openPendingEditor(target);
+  assert.equal(edits.length, 1);
 });
 
 test('free users are guided to membership without opening the follow editor', () => {
   const rt = runtime(), page = rt.instance('pages/query/index.js'), navigations = [];
   rt.wx.switchTab = value => navigations.push(value.url);
   Object.assign(page.data, { boot: { member: false } }); page.selection = selection();
+  page.accountSnapshot = { identity: { userKey: 'account-a' } };
   page.onFollowSelection();
   assert.equal(rt.app.globalData.pendingFollow, null);
   assert.equal(rt.messages[0].title, '关注与到货提醒为会员专属');
+  assert.equal(rt.messages[0].content, '开通后，请确认门店并保存关注。接收微信提醒还需授权。各套餐名额可在下一页查看。');
   assert.equal(rt.app.globalData.pendingMemberFollow.partNumber, 'SKU-A');
+  assert.equal(rt.app.globalData.pendingMemberFollow.userKey, 'account-a');
+  assert.ok(Number.isFinite(rt.app.globalData.pendingMemberFollow.createdAt));
   assert.equal(navigations.length, 0);
   rt.messages[0].success({ confirm: true });
   assert.deepEqual(navigations, ['/pages/mine/index']);
   assert.equal(rt.calls.length, 0);
   // Declining drops the kept target.
   page.onFollowSelection(); rt.messages.at(-1).success({ confirm: false });
+  assert.equal(rt.app.globalData.pendingMemberFollow, null);
+});
+
+test('late membership modals cannot navigate for another account or erase a newer target', () => {
+  const rt = runtime(), page = rt.instance('pages/query/index.js'), navigations = [];
+  rt.wx.switchTab = value => navigations.push(value.url);
+  page.data.boot = { member: false };
+  page.accountSnapshot = { identity: { userKey: 'account-a' } };
+  page.selection = selection();
+  page.onFollowSelection();
+  page.accountSnapshot = { identity: { userKey: 'account-b' } };
+  rt.messages[0].success({ confirm: true });
+  assert.deepEqual(navigations, []);
+  assert.equal(rt.app.globalData.pendingMemberFollow, null);
+  page.onFollowSelection();
+  page.selection = selection('SKU-B', ['R002']);
+  page.onFollowSelection();
+  rt.messages[1].success({ confirm: false });
+  assert.equal(rt.app.globalData.pendingMemberFollow.partNumber, 'SKU-B');
+  rt.messages[2].fail();
   assert.equal(rt.app.globalData.pendingMemberFollow, null);
 });
 

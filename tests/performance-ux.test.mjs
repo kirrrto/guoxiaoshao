@@ -131,7 +131,7 @@ test('visible follow reads cap their delay at 30 seconds while query uses the mo
   assert.deepEqual([...followRt.timers.values()].map(timer => timer.ms), [30000]);
   follow.onHide(); assert.equal(followRt.timers.size, 0);
   const queryRt = runtime(), query = queryRt.instance('pages/query/index.js');
-  query.data.collector = collector; query.visible = true; query.startFollowPolling();
+  query.collector = collector; query.visible = true; query.startFollowPolling();
   assert.deepEqual([...queryRt.timers.values()].map(timer => timer.ms), [50000]);
   query.onHide(); assert.equal(queryRt.timers.size, 0);
 });

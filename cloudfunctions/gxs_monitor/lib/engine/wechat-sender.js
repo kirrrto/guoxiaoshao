@@ -40,13 +40,14 @@ function createWechatSender({ appid, appSecret, expectedAppid, fetchImpl = globa
     authState = 'failed'; authCheckedAt = clock().toISOString(); lastErrorCode = code;
   }
 
-  async function getToken(requestTimeoutMs = timeoutMs) {
-    if (token && clock().getTime() < tokenExpiresAt) return token;
-    if (tokenRequest) return tokenRequest;
-    tokenRequest = (async () => {
+  function startTokenRequest() {
+    const request = { controller: new AbortController(), waiters: 0 };
+    tokenRequest = request;
+    const networkTimer = setTimeout(() => request.controller.abort(), timeoutMs);
+    request.promise = (async () => {
       try {
         const response = await fetchImpl('https://api.weixin.qq.com/cgi-bin/stable_token', {
-          method: 'POST', headers: { 'Content-Type': 'application/json' }, redirect: 'error', signal: AbortSignal.timeout(requestTimeoutMs),
+          method: 'POST', headers: { 'Content-Type': 'application/json' }, redirect: 'error', signal: request.controller.signal,
           body: JSON.stringify({ grant_type: 'client_credential', appid, secret: appSecret, force_refresh: false }),
         });
         if (!response.ok) throw notSent('wechat_token_http_error');
@@ -57,6 +58,7 @@ function createWechatSender({ appid, appSecret, expectedAppid, fetchImpl = globa
         }
         const expiresAt = clock().getTime() + Math.max(1, Number(result.expires_in) - 120) * 1000;
         if (!Number.isFinite(new Date(expiresAt).getTime())) throw notSent('wechat_token_invalid_response');
+        if (tokenRequest !== request) throw notSent('wechat_send_deadline');
         token = result.access_token;
         tokenExpiresAt = expiresAt;
         authState = 'ready'; authCheckedAt = clock().toISOString(); lastErrorCode = null;
@@ -65,11 +67,34 @@ function createWechatSender({ appid, appSecret, expectedAppid, fetchImpl = globa
         // Token acquisition never calls the message endpoint. Do not expose a
         // fetch error containing a URL, access token or credential in logs.
         const code = error && error.definitelyNotSent && /^wechat_token_(?:http_error|invalid_response|-?\d{1,8})$/.test(error.code) ? error.code : 'wechat_token_transport_error';
-        failAuth(code);
+        if (tokenRequest === request) failAuth(code);
         throw notSent(code);
-      } finally { tokenRequest = null; }
+      } finally {
+        clearTimeout(networkTimer);
+        if (tokenRequest === request) tokenRequest = null;
+      }
     })();
-    return tokenRequest;
+    return request;
+  }
+
+  async function getToken(requestTimeoutMs = timeoutMs) {
+    if (token && clock().getTime() < tokenExpiresAt) return token;
+    const request = tokenRequest || startTokenRequest();
+    request.waiters++;
+    let timer;
+    try {
+      // Each caller owns its waiting budget, including the one that starts the request.
+      return await Promise.race([request.promise, new Promise((_, reject) => {
+        timer = setTimeout(() => reject(notSent('wechat_send_deadline')), requestTimeoutMs);
+      })]);
+    } finally {
+      clearTimeout(timer);
+      request.waiters--;
+      if (request.waiters === 0 && tokenRequest === request) {
+        tokenRequest = null;
+        request.controller.abort();
+      }
+    }
   }
 
   const send = async (message, { timeoutMs: requestedTimeout = timeoutMs, deadlineAt = Infinity } = {}) => {
@@ -107,7 +132,7 @@ function createWechatSender({ appid, appSecret, expectedAppid, fetchImpl = globa
   send.probe = async ({ timeoutMs: requestedTimeout = timeoutMs } = {}) => {
     if (disabledReason) return getHealth();
     const boundedTimeout = Math.max(1, Math.min(timeoutMs, Number.isFinite(requestedTimeout) ? Math.floor(requestedTimeout) : timeoutMs));
-    try { await getToken(boundedTimeout); } catch { /* getToken records a redacted failure */ }
+    try { await getToken(boundedTimeout); } catch { /* Only a failure of the shared request changes auth health. */ }
     return getHealth();
   };
   return send;

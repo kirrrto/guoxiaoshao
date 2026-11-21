@@ -139,6 +139,92 @@ test('concurrent probes and a real send share one pending token acquisition', as
   assertSanitized(sender.getHealth());
 });
 
+test('a short send deadline expires independently of an in-flight token probe', async () => {
+  let releaseToken;
+  const tokenGate = new Promise(resolve => { releaseToken = resolve; });
+  const calls = [];
+  const sender = createWechatSender(options(async url => {
+    calls.push(url);
+    if (url.endsWith('/stable_token')) { await tokenGate; return response({ access_token: TOKEN, expires_in: 7200 }); }
+    return response({ errcode: 0 });
+  }));
+  const probe = sender.probe({ timeoutMs: 5000 });
+  const sending = sender(message, { timeoutMs: 20 });
+  let timer;
+  try {
+    const outcome = await Promise.race([
+      sending.then(() => 'sent', error => error),
+      new Promise(resolve => { timer = setTimeout(() => resolve('still waiting'), 500); }),
+    ]);
+    assert.equal(outcome.code, 'wechat_send_deadline');
+    assert.equal(outcome.definitelyNotSent, true);
+    assert.equal(calls.length, 1, 'the short caller never reaches the message endpoint');
+  } finally {
+    clearTimeout(timer);
+    releaseToken();
+    await sending.catch(() => {});
+  }
+  assert.equal((await probe).authReady, true);
+  assert.equal((await sender(message)).errcode, 0);
+  assert.equal(calls.length, 2, 'later sends reuse the original successful token request');
+});
+
+test('a short first caller can time out while a later caller completes with the same token request', async () => {
+  let complete, transportSignal;
+  let tokens = 0, messages = 0;
+  const sender = createWechatSender(options(async (url, { signal }) => {
+    if (!url.endsWith('/stable_token')) { messages++; return response({ errcode: 0 }); }
+    tokens++;
+    transportSignal = signal;
+    return new Promise((resolve, reject) => {
+      complete = () => resolve(response({ access_token: TOKEN, expires_in: 7200 }));
+      signal.addEventListener('abort', () => reject(new Error('aborted')), { once: true });
+    });
+  }));
+  const short = sender(message, { timeoutMs: 20 });
+  const long = sender(message, { timeoutMs: 5000 });
+  await assert.rejects(short, error => error.code === 'wechat_send_deadline' && error.definitelyNotSent);
+  assert.equal(transportSignal.aborted, false);
+  assert.equal(sender.getHealth().authState, 'unchecked');
+  complete();
+  assert.equal((await long).errcode, 0);
+  assert.equal(sender.getHealth().authReady, true);
+  assert.equal(tokens, 1); assert.equal(messages, 1);
+});
+
+test('a rejected shared token request clears its cache and lets the next caller recover', async () => {
+  let rejectToken, calls = 0;
+  const sender = createWechatSender(options(async () => {
+    if (++calls === 1) return new Promise((_, reject) => { rejectToken = reject; });
+    return response({ access_token: TOKEN, expires_in: 7200 });
+  }));
+  const first = sender.probe();
+  const second = sender(message);
+  rejectToken(new Error('token provider unavailable'));
+  await assert.rejects(second, error => error.code === 'wechat_token_transport_error' && error.definitelyNotSent);
+  assert.equal((await first).authState, 'failed');
+  assert.equal((await sender.probe()).authReady, true);
+  assert.equal(calls, 2);
+});
+
+test('a delayed outcome of a cancelled token request cannot overwrite or detach a newer request', async () => {
+  for (const abandonedResult of [{ errcode: 40125 }, { access_token: 'old', expires_in: 7200 }]) {
+    const requests = [];
+    const sender = createWechatSender(options(async () =>
+      new Promise(resolve => requests.push(resolve))));
+    assert.equal((await sender.probe({ timeoutMs: 10 })).authState, 'unchecked');
+    const next = sender.probe();
+    requests[0](response(abandonedResult));
+    await new Promise(resolve => setImmediate(resolve));
+    assert.equal(sender.getHealth().authState, 'unchecked');
+    const joined = sender.probe();
+    assert.equal(requests.length, 2);
+    requests[1](response({ access_token: TOKEN, expires_in: 7200 }));
+    const [one, two] = await Promise.all([next, joined]);
+    assert.equal(one.authReady, true); assert.equal(two.authReady, true);
+  }
+});
+
 test('a delayed rejection of an old token leaves the freshly verified sender ready', async () => {
   let tokenRequests = 0, messageRequests = 0;
   let signalStarted, finishFirst;
@@ -201,14 +287,22 @@ test('message token rejection invalidates authentication and never retries the m
   }
 });
 
-test('a bounded token-only probe aborts its request and reports failure without leaking transport details', async () => {
+test('the last short token-only probe cancels the unused request and leaves authentication unverified', async () => {
   let aborted = 0;
   const sender = createWechatSender({ ...options(abortableFetch(() => { aborted++; })), timeoutMs: 2000 });
   const health = await sender.probe({ timeoutMs: 20 });
   assert.equal(aborted, 1);
-  assert.equal(health.authState, 'failed');
+  assert.equal(health.authState, 'unchecked');
   assert.equal(health.authReady, false);
-  assert.equal(health.reason, 'consumer_auth_failed');
+  assert.equal(health.reason, 'consumer_auth_unchecked');
+  assert.equal(health.lastErrorCode, null);
+  assertSanitized(health);
+});
+
+test('when the shared network deadline expires, the actual token failure is recorded', async () => {
+  const sender = createWechatSender({ ...options(abortableFetch(() => {})), timeoutMs: 25 });
+  const health = await sender.probe();
+  assert.equal(health.authState, 'failed');
   assert.equal(health.lastErrorCode, 'wechat_token_transport_error');
   assertSanitized(health);
 });
