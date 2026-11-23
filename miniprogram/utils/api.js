@@ -11,7 +11,7 @@ class ApiError extends Error {
 }
 
 // Reads that are safe to repeat: a dropped connection retries once before the page sees it.
-const RETRYABLE_READS = new Set(['system.ping', 'user.bootstrap', 'catalog.get', 'market.catalog', 'market.follows', 'follow.list', 'deadline.list', 'notify.list', 'notify.detail', 'member.status', 'quota.ledger', 'query.recent', 'query.alternatives', 'query.recovery', 'history.page']);
+const RETRYABLE_READS = new Set(['system.ping', 'user.bootstrap', 'catalog.get', 'market.catalog', 'market.follows', 'follow.list', 'deadline.list', 'notify.list', 'notify.detail', 'member.status', 'query.recent', 'query.alternatives', 'query.recovery', 'history.page']);
 const RETRY_DELAY_MS = 800;
 // A platform request can lose both callbacks. Without our own deadline every
 // caller shares a permanently pending account/catalog promise, including Retry.

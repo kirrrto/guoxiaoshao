@@ -135,8 +135,7 @@ test('new accounts have no history entry and opening a legacy link does not crea
   await f.repo.updateUser(userKeyOf(), { membership: { expiresAt: '2027-01-01T00:00:00Z' } });
   const rt = runtime(apiOf(f));
   const mine = rt.instance('pages/mine/index.js');
-  await mine.onLoad(); await mine.onToggleLedger();
-  assert.equal(mine.data.ledger.length, 0);
+  await mine.onLoad();
   let route;
   rt.wx.navigateTo = options => { route = options.url; };
   mine.onOpenPendingReward(); assert.equal(route, undefined); assert.equal(mine.data.tasks.length, 0); mine.onHide();
@@ -148,37 +147,32 @@ test('new accounts have no history entry and opening a legacy link does not crea
   await mine.onShow();
   assert.equal(mine.data.quota.balance, 0);
   assert.deepEqual(copy(mine.data.tasks), []);
-  assert.deepEqual(copy(mine.data.ledger), []);
+  assert.equal(rt.calls.some(c => c.action === 'quota.ledger'), false);
   assert.equal(rt.calls.filter(c => c.action === 'history.list').length, 0, 'a task tab visit must never start a charged query');
 });
 
-test('a late reward updates Mine immediately and older bootstrap/ledger responses cannot undo it', async () => {
+test('a late reward updates Mine immediately and an older bootstrap response cannot undo it', async () => {
   const f = createFixture();
   await seedPendingBrowse(f);
-  const api = apiOf(f), oldBoot = deferred(), oldLedger = deferred();
-  let blockBoot = false, blockLedger = false;
+  const api = apiOf(f), oldBoot = deferred();
+  let blockBoot = false;
   const rt = runtime(async (action, payload) => {
     if (action === 'user.bootstrap' && blockBoot) { blockBoot = false; return oldBoot.promise; }
-    if (action === 'quota.ledger' && blockLedger) { blockLedger = false; return oldLedger.promise; }
     return api(action, payload);
   });
   const mine = rt.instance('pages/mine/index.js'); await mine.onLoad();
   const before = copy(rt.app.globalData.bootstrap);
   blockBoot = true;
   const waitingBootstrap = rt.load('utils/store.js').getBootstrap({ force: true });
-  blockLedger = true;
-  const waitingLedger = mine.onToggleLedger();
   const history = rt.instance('pages/history/index.js'); history.applyBoot(before); history.catalog = { productByPart: {} };
   await history.loadBrowse();
-  oldBoot.resolve(before); oldLedger.resolve({ entries: [] });
-  await waitingLedger; const fresh = await waitingBootstrap;
-  // The visible Mine listener starts a second ledger request after the reward.
-  await mine.loadLedger();
+  oldBoot.resolve(before);
+  const fresh = await waitingBootstrap;
   assert.equal(fresh.quota.balance, 1);
   assert.equal(mine.data.quota.balance, 1);
   assert.equal(mine.data.tasks.some(task => task.claimable), false);
-  assert.equal(mine.data.ledger.length, 1);
-  assert.equal(mine.data.ledger[0].deltaText, '+1');
+  assert.equal(rt.calls.some(c => c.action === 'quota.ledger'), false);
+  assert.equal((await f.repo.listLedger(userKeyOf())).length, 1);
 });
 
 test('failed history landing allows retry without minting evidence for a new visitor', async () => {

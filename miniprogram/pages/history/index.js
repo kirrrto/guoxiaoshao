@@ -325,8 +325,7 @@ Page(require('../../utils/language').page('history', {
     try {
       const result = await call('history.browse');
       if (accountEpoch !== (this.accountEpoch || 0)) return;
-      // Publish confirmed reward even if the visitor has switched tabs. Mine
-      // subscribes to this snapshot and refreshes an already open ledger.
+      // Publish confirmed rewards to the balance even after the visitor switches tabs.
       let reward = result.task;
       if (reward && quotaGeneration !== getQuotaGeneration()) {
         // A paid query/sign-in may have finished while this browse response was
@@ -388,13 +387,13 @@ Page(require('../../utils/language').page('history', {
   applyTaskReward(result) {
     const done = result.quota.tasksDoneToday.includes('view_history');
     const messages = {
-      already_completed: '今日浏览任务已完成，奖励已计入次数明细。',
+      already_completed: '今日浏览奖励已领取。',
       daily_cap_reached: '已完成浏览，今日获取次数已达上限，暂未增加奖励。',
       balance_cap_reached: `已完成浏览，余额已达 ${result.quota.balanceCap} 次上限；使用次数后可返回领取。`,
       reward_disabled: '浏览已完成，当前体验任务奖励暂未开放。',
     };
     this.setData({ 'boot.taskAvailable': !done && result.reason !== 'reward_disabled', 'boot.balance': result.quota.balance, taskClaimError: null,
-      taskMessage: result.granted > 0 ? `今日浏览任务完成，+${result.granted} 次，已计入次数明细。` : messages[result.reason] || (done ? messages.already_completed : '奖励暂未确认，请重试。') });
+      taskMessage: result.granted > 0 ? `查询次数 +${result.granted}。` : messages[result.reason] || (done ? messages.already_completed : '奖励暂未确认，请重试。') });
     if (result.granted > 0) toast(`体验任务完成，+${result.granted} 次`, 'success');
   },
 

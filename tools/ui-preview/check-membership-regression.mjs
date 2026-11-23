@@ -42,11 +42,11 @@ try {
   }
   const controls = [
     ['184px centered packages', () => document.querySelectorAll('.membership-package').forEach(e => { e.style.setProperty('width', '184px', 'important'); e.style.setProperty('margin-inline', 'auto', 'important'); }), /does not fill its container/],
-    ['narrow internal text', () => document.querySelectorAll('.membership-package').forEach(e => e.style.setProperty('grid-template-columns', '32px minmax(0, 1fr)', 'important')), /narrow text column/],
+    ['narrow plan heading', () => document.querySelector('.membership-package-heading').style.setProperty('max-width', '32px', 'important'), /heading is a narrow text column/],
     ['missing utility icon', () => document.querySelector('.account-link img').remove(), /missing a visible loaded icon/],
-    ['experience in wrong card', () => document.querySelector('.quota-card').append(document.querySelector('.member-notification-experience')), /inside membership/],
-    ['hidden experience cost', () => { document.querySelector('.notification-test-note').style.display = 'none'; }, /cost, authorization or test-message facts/],
-    ['oversized primary action', () => document.querySelector('.payment-entry').style.setProperty('font-size', '44px', 'important'), /font is oversized/],
+    ['pass mark moved to the query balance', () => document.querySelector('.quota-summary').append(document.querySelector('.member-pass-watermark')), /pass watermark did not load/i],
+    ['hidden plan price', () => { document.querySelector('.membership-package-pricing').style.display = 'none'; }, /missing visible pricing/],
+    ['oversized primary action', () => document.querySelector('.payment-entry').style.setProperty('font-size', '44px', 'important'), /Text is off the type scale: 44px/],
   ];
   for (const [name, mutate, expected] of controls) {
     const errors = await inspect(ready, mutate);

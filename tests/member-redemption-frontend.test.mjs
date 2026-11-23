@@ -160,25 +160,23 @@ test('redemption deep link opens for a real account and ignores request data in 
   assert.equal(ordinary.calls.some(c => c.action === 'member.redeemCode'), false);
 });
 
-test('unloaded page ignores late settings, quota, ledger and reminder mutations', async () => {
-  const settings = deferred(), signin = deferred(), ledger = deferred(), deleting = deferred();
+test('unloaded page ignores late settings, quota and reminder mutations', async () => {
+  const settings = deferred(), signin = deferred(), deleting = deferred();
   const rt = runtime({ app: { globalData: { bootstrap: boot() } }, getBoot: async () => boot(), handler: action => {
     if (action === 'user.updateSettings') return settings.promise;
     if (action === 'quota.signin') return signin.promise;
-    if (action === 'quota.ledger') return ledger.promise;
     if (action === 'notify.delete') return deleting.promise;
     return { notifications: [{ id: 'real-notice' }] };
   } });
   rt.page.data.notifications = [{ id: 'real-notice' }];
-  const oldSettings = rt.page.saveSettings({ notifyEnabled: false }), oldSignin = rt.page.onSignin(), oldLedger = rt.page.onToggleLedger();
+  const oldSettings = rt.page.saveSettings({ notifyEnabled: false }), oldSignin = rt.page.onSignin();
   const oldDelete = rt.page.applyNotificationAction({ type: 'delete', id: 'real-notice' });
   rt.page.onUnload();
   const snapshot = clone(rt.page.data);
   settings.resolve({ settings: { notifyEnabled: false, dnd: { enabled: true, startMinute: 0, endMinute: 0 } } });
   signin.resolve({ granted: 1, quota: { balance: 99 } });
-  ledger.resolve({ entries: [{ id: 'late-ledger', type: 'signin_reward', delta: 1 }] });
   deleting.resolve({ deleted: true });
-  await Promise.all([oldSettings, oldSignin, oldLedger, oldDelete]);
+  await Promise.all([oldSettings, oldSignin, oldDelete]);
   assert.deepEqual(rt.page.data, snapshot);
   assert.deepEqual(rt.invalidated, []);
   assert.deepEqual(rt.toasts, []);

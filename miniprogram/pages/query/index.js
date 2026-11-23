@@ -1177,6 +1177,19 @@ Page(require('../../utils/language').page('query', {
     switchToTab({ url: '/pages/mine/index' });
   },
 
+  onViewQueryBalance() {
+    if (this.pageRetired || this.visible === false || navigation.isNavigating()) return;
+    const state = getApp().globalData;
+    state.pendingMineSection = 'quota-card';
+    const clearTarget = () => {
+      if (state.pendingMineSection === 'quota-card') state.pendingMineSection = null;
+    };
+    if (!switchToTab({ url: '/pages/mine/index', fail: () => {
+      clearTarget();
+      toast('页面切换未完成，请重试');
+    } })) clearTarget();
+  },
+
   onRetryLoad() {
     this.setData({ loadError: null });
     this.onLoad();

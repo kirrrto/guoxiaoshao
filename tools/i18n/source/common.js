@@ -1,4 +1,7 @@
 module.exports = {
+  '签到与查询余额': 'Check-in and search credits',
+  '在「我的」可以直接签到，查看剩余查询次数。': 'Check in and see your remaining search credits in Me.',
+  '次数明细已移除，签到后余额会自动更新。': 'Credit history has been removed. Your balance updates when you check in.',
   '其他站点查询与关注': 'Regional stock checks and watches',
   '弱网下查询日本、台湾和香港门店，也能看到本次查询的有效结果。': 'You can now see valid pickup results for Japan, Taiwan and Hong Kong even on a slow connection.',
   '同一配置可逐店管理关注，也可更改该配置的提醒语言。': 'Manage individual stores in a watch and change its alert language.',
@@ -6,7 +9,7 @@ module.exports = {
   '站点关注与每日签到': 'Regional watches and daily check-in',
   '版本记录 · 2026-11-24': 'Version record · 2026-11-24',
   '月卡、年卡可免扣次查询日本、台湾和香港的门店库存，也可直接关注。': 'Monthly and annual passes include stock checks in Japan, Taiwan and Hong Kong at no credit cost. You can also watch a store.',
-  '每日签到可攒 1 次查询，最多 10 次，点「次数明细」可看扣次和退款记录。': 'Check in for one search credit a day and save up to 10. Tap Credit history to see credits spent and refunded.',
+  '每日签到可攒 1 次查询，最多 10 次。本版新增了扣次和退款记录。': 'Daily check-in earned one search credit, up to 10. This version added a record of credits spent and refunded.',
   '库存只自动刷新仍有人关注的配置和门店。': 'Stock refreshes automatically only for products and stores with an active watch.',
   '大陆门店查询': 'Mainland store pickup',
   '大陆站更新了 MacBook Pro 配置，移除了第一代 HomePod mini，二代五种颜色仍可查询。': 'Mainland stores have updated MacBook Pro configurations. The original HomePod mini has been removed, and all five HomePod mini 2 finishes are still listed.',

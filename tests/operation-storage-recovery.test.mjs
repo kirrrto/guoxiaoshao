@@ -139,7 +139,15 @@ test('zero credits after a lost response still exposes the same-SKU/store recove
   assert.equal(binding(), 'onQuery');
   b.page.onPickerChange({ detail: { ...target, product, storeNumbers: ['R639'] } });
   assert.equal(b.page.data.selectionQueryPending, false);
-  assert.equal(binding(), 'onGoMine');
+  let destination;
+  b.rt.wx.switchTab = options => { destination = options.url; options.success(); options.complete(); };
+  b.page[binding()]();
+  assert.equal(destination, '/pages/mine/index');
+  const mine = b.rt.instance('pages/mine/index.js');
+  let anchor;
+  b.rt.wx.pageScrollTo = options => { anchor = options.selector; };
+  await mine.onLoad();
+  assert.equal(anchor, '#quota-card');
   b.page.onPickerChange({ detail: { ...target, product } });
   await b.page[binding()]();
   assert.equal(b.page.data.result.replayed, true);

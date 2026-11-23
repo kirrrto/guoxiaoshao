@@ -54,7 +54,7 @@ node tools/ui-preview/check-layout.mjs tmp/ui-membership-native --membership-fon
 
 源码校验包含小程序 JS/JSON/WXML/WXSS 和本地图像资产；检查前后任一文件变化都必须重新构建，避免使用旧图标或旧页面截图。
 
-`check-membership-regression` 在两个正常状态通过后，只在临时浏览器 DOM 中制造六种错误：184px居中套餐、内部窄列、缺失入口图标、提醒体验移错卡片、隐藏消耗说明和主按钮巨字，要求检查器全部拒绝。它不修改源码和生成的 HTML，结果另存 `membership-checker-selftest.json`。
+`check-membership-regression` 先验证两个正常状态，再在临时浏览器 DOM 中模拟六种错误，包括 184px 居中套餐、套餐标题过窄、入口缺少图标、会员标志移入余额卡、套餐价格隐藏和主按钮字号过大。结果保存在 `membership-checker-selftest.json`，每个错误都须触发对应检查。
 
 `check-layout --membership-fonts-only` 对 320/375 宽度的免费购买、会员升级、会员到期六案增加 1.3×字号与行高，仍使用全部布局和套餐内部断言；记录在 `membership-font-metrics.json` 和 `screenshots-membership-fonts/`，不覆盖常规快照。可追加 `--dark` 验证深色。这只模拟浏览器字号压力，不能替代微信字体设置实测。
 

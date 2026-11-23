@@ -8,6 +8,15 @@
 // Keep technical details and complete acceptance records in release documents.
 const RELEASE_NOTES = [
   {
+    version: '3.8.6',
+    title: '签到与查询余额',
+    dateText: '版本记录 · 2026-11-24',
+    highlights: [
+      '在「我的」可以直接签到，查看剩余查询次数。',
+      '次数明细已移除，签到后余额会自动更新。',
+    ],
+  },
+  {
     version: '3.8.5',
     title: '其他站点查询与关注',
     dateText: '版本记录 · 2026-11-24',
@@ -23,7 +32,7 @@ const RELEASE_NOTES = [
     dateText: '版本记录 · 2026-11-24',
     highlights: [
       '月卡、年卡可免扣次查询日本、台湾和香港的门店库存，也可直接关注。',
-      '每日签到可攒 1 次查询，最多 10 次，点「次数明细」可看扣次和退款记录。',
+      '每日签到可攒 1 次查询，最多 10 次。本版新增了扣次和退款记录。',
       '库存只自动刷新仍有人关注的配置和门店。',
     ],
   },

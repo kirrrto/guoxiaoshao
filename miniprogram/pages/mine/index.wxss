@@ -203,25 +203,18 @@
 .record-error > text:first-child { flex: 1 1 110px; min-width: 0; }
 .record-empty-whistle { display: block; width: 32px; height: 32px; margin: 0 auto var(--sp-8); opacity: 0.5; }
 
-/* ── 查询与体验次数 ───────────────────────────────────── */
+/* ── 查询次数与签到 ───────────────────────────────────── */
 .quota-summary { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-12); }
 .quota-summary-copy { flex: 1 1 0; min-width: 0; }
 .quota-summary .card-title { margin-bottom: var(--sp-2); }
-.quota-balance { color: var(--text-2); font-size: var(--fs-sub); }
 .balance { color: var(--text); font-size: var(--fs-title); font-weight: 600; line-height: var(--lh-tight); }
 .quota-signin.btn { flex: none; }
 .signin-done { display: inline-flex; flex: none; align-items: center; gap: var(--sp-8); min-height: var(--tap); color: var(--text-3); font-size: var(--fs-sub); }
 .signin-done .ui-check { margin: 0 var(--sp-2) var(--sp-2); }
-.quota-caps { padding: var(--sp-4) 0 var(--sp-12); color: var(--text-2); font-size: var(--fs-sub); }
-.task { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--sp-8); min-height: 52px; padding: var(--sp-4) 0; border-top: 1px solid var(--line); }
+.task { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--sp-8); min-height: 52px; padding: var(--sp-4) 0; }
+.ui-disclosure + .task { border-top: 1px solid var(--line); }
 .task-copy { flex: 1 1 110px; min-width: 0; }
 .task-reward { color: var(--text-3); font-size: var(--fs-sub); }
-.ledger-row { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-12); padding: var(--sp-12) 0; border-top: 1px solid var(--line); }
-.ledger-copy { display: flex; flex: 1 1 0; flex-direction: column; min-width: 0; }
-.ledger-time { color: var(--text-3); font-size: var(--fs-caption); }
-.ledger-delta { flex: none; font-weight: 600; }
-.plus { color: var(--green-text); }
-.minus { color: var(--text-2); }
 
 /* ── 账户工具：购买记录与更新公告就地展开 ──────────────── */
 .order-records { padding-bottom: var(--sp-4); }

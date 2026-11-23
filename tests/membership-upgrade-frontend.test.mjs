@@ -138,10 +138,10 @@ test('annual products advertise five configurations by five stores and current p
 test('changing account clears the latest-notification preview and ignores a previous-account response', async () => {
   let finishRead;
   const { page, boot } = account(true, action => action === 'notify.list' ? new Promise(resolve => { finishRead = resolve; }) : {});
-  page.setData({ notifications: [{ id: 'previous-account-reminder', status: 'accepted' }], ledger: [{ id: 'old-ledger' }] });
+  page.setData({ notifications: [{ id: 'previous-account-reminder', status: 'accepted' }] });
   const pending = page.loadNotifications({ force: true });
   page.applyBoot({ ...boot, identity: { userKey: 'another-member' } });
-  assert.equal(page.data.notifications.length, 0); assert.equal(page.data.ledger.length, 0);
+  assert.equal(page.data.notifications.length, 0);
   finishRead({ notifications: [{ id: 'stale-account-reminder', status: 'accepted' }], hasMore: false });
   await pending;
   assert.equal(page.data.notifications.length, 0, 'a late reminder read belongs to the previous account');

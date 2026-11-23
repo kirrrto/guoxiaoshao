@@ -1,6 +1,6 @@
 {
   "name": "gxs_monitor",
-  "version": "3.8.5",
+  "version": "3.8.6",
   "license": "MIT",
   "private": true,
   "description": "果小哨每分钟补货监测与订阅通知定时云函数",
