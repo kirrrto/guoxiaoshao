@@ -74,7 +74,7 @@
         </view>
         <view wx:if="{{membership.annualExpiresText}}" class="member-enhanced">{{i18n.m(ui,'年卡 5 配置 × 5 门店权益至 {0}',[(membership.annualExpiresText)])}}</view>
         <view wx:elif="{{membership.enhancedExpiresText}}" class="member-enhanced">{{i18n.m(ui,'额外名额有效至 {0}',[(membership.enhancedExpiresText)])}}</view>
-        <button wx:if="{{membership.enhanced}}" class="ui-action ui-action--plain member-regional-link" hover-class="member-delivery-pressed" disabled="{{paymentBusy || paymentChecking || paymentConfirming}}" bindtap="onOpenRegionalWatches"><text class="ui-action-label">{{i18n.t(ui,'关注日本、台湾和香港门店')}}</text><view class="ui-chevron" aria-hidden="true"></view></button>
+        <button wx:if="{{membership.enhanced}}" class="ui-action ui-action--plain member-regional-link" hover-class="member-delivery-pressed" disabled="{{paymentBusy || paymentChecking || paymentConfirming}}" bindtap="onOpenRegionalWatches"><text class="ui-action-label">{{i18n.t(ui,'查询或关注日本、台湾和香港门店')}}</text><view class="ui-chevron" aria-hidden="true"></view></button>
       </view>
       <view wx:elif="{{!paymentPendingId && (!contextualCheckout || !checkoutTarget)}}" class="member-pass member-vip-offer">
         <image class="member-pass-watermark" src="/images/brand/whistle-pass.png" mode="aspectFit" aria-hidden="true" />
@@ -120,7 +120,7 @@
               <text class="membership-package-benefit membership-package-scope">{{i18n.t(ui,item.watchScope)}}</text>
             </button>
           </view>
-          <view class="small text-2 mt">{{i18n.t(ui,'各站点共用关注名额。其他站点开放监测后开始检查库存，微信到货提醒需另行授权。')}}</view>
+          <view class="small text-2 mt">{{i18n.t(ui,'各站点共用关注名额。其他站点开放监测后，系统会自动检查已关注的配置，微信到货提醒需另行授权。')}}</view>
           <view wx:if="{{membership.active && membershipUpgradePreview}}" class="membership-extension">
             <text class="membership-extension-detail">{{i18n.t(ui,(membershipUpgradePreview.extensionText))}}</text>
             <text wx:if="{{membershipUpgradePreview.expiresAtText}}" class="membership-extension-date">{{i18n.m(ui,'预计到期 {0}',[(membershipUpgradePreview.expiresAtText)])}}</text>

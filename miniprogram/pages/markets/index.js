@@ -1,7 +1,7 @@
 const language = require('../../utils/language');
 const { call } = require('../../utils/api');
 const { decodeMarketCatalog } = require('../../utils/market-catalog');
-const { bootstrapNow, getBootstrap, quotaAccountMatches, publishQueryBalance, publishQuota, currentQuota, subscribeQuota } = require('../../utils/store');
+const { bootstrapNow, getBootstrap, currentQuotaOwner, publishQueryBalance, publishQuota, currentQuota, subscribeQuota } = require('../../utils/store');
 const { readSession, writeSession } = require('../../utils/session');
 const operation = require('../../utils/operation');
 const { syncTabBar, releaseTabBar } = require('../../utils/tab-bar');
@@ -194,12 +194,14 @@ Page(require('../../utils/language').page('markets', {
   },
   targetKey() { return [this.market, this.part, this.store].join('|'); },
   payload() { return { market: this.market, partNumber: this.selectedProduct?.partNumber || '', storeNumbers: [this.store] }; },
-  isAccount(owner = this.owner) { return Boolean(owner && owner === this.owner && quotaAccountMatches(owner)); },
-  queryOpen(site) {
+  isAccount(owner = this.owner) { return Boolean(owner && owner === this.owner && owner === currentQuotaOwner()); },
+  queryOpen(site, access) {
     if (!site) return false;
     if (site.enabled) return true;
-    const preview = this.accountReady && this.isAccount() && this.boot?.regionalQueryPreview;
-    return Array.isArray(preview) && preview.includes(site.code) && this.boot.membership.isTester === true;
+    if (!this.accountReady || !this.isAccount() || this.boot?.identity?.userKey !== this.owner) return false;
+    const rights = access || regionalAccess(this.boot.membership, null, bootstrapNow(this.boot));
+    const markets = rights.tester ? this.boot.regionalQueryPreview : rights.memberQuery && this.boot.regionalMemberQueryMarkets;
+    return Array.isArray(markets) && markets.includes(site.code);
   },
 
   paint() {
@@ -216,13 +218,14 @@ Page(require('../../utils/language').page('markets', {
     this.selectedProduct = product;
     const choices = this.activeChoices;
     const accountReady = this.visible && this.accountReady && this.isAccount();
-    const queryEnabled = this.queryOpen(site) && product?.querySupported === true;
     const quota = accountReady && (currentQuota(this.owner) || this.boot.quota);
     const now = bootstrapNow(this.boot);
     const access = regionalAccess(accountReady && this.boot.membership, product, now);
+    const queryEnabled = this.queryOpen(site, access) && product?.querySupported === true;
     const launchRestricted = Boolean(accountReady && product?.querySupported && access.launchRestricted);
     const costText = quota && (access.tester ? c.tester : access.member ? c.member : c.cost.replace('{balance}', quota.balance));
-    const receipt = accountReady && !launchRestricted && receiptView(this.snapshot, store, lang, now);
+    const receipt = accountReady && !launchRestricted && (queryEnabled || !this.snapshot?.requiresAccountAccess)
+      && receiptView(this.snapshot, store, lang, now, !queryEnabled);
     const opening = launchRestricted && localTime(product.freeQueryStartsAt, store?.timeZone);
     const launchNotice = launchRestricted ? c.launchGate + (opening ? ' ' + c.unlockAt.replace('{date}', opening.slice(0,10)) : '') : '';
     const showSignin = Boolean(quota && !access.member && !quota.signedInToday);
@@ -247,7 +250,7 @@ Page(require('../../utils/language').page('markets', {
       queryLabel: busyHere ? c.checking : pending ? c.resume : c.query, busyHere: !!busyHere,
       canQuery: Boolean(accountReady && !this.queryToken && !this.signinToken && !this.data.networkOffline
         && (pending || (queryEnabled && !launchRestricted && (access.member || quota.balance >= 1)))),
-      receipt: receipt || null, queryError: accountReady && c[this.queryError] || '',
+      receipt: receipt || null, queryError: accountReady && (queryEnabled || this.queryError !== 'closed') && c[this.queryError] || '',
       billingText: accountReady && this.billing != null ? (this.billing ? c.charged.replace('{charged}', this.billing) : c.noDebit) : '',
       alertTime: accountReady && this.alert && store ? localTime(this.alert.detectedAt, store.timeZone) : '',
       alertMissing: Boolean(accountReady && this.alertMissing),
@@ -382,7 +385,8 @@ Page(require('../../utils/language').page('markets', {
       }
       const observed = row && Date.parse(row.observedAt);
       if (response.ok && row && STOCK_STATES.includes(row.status) && Number.isFinite(observed) && observed <= bootstrapNow(this.boot)) {
-        this.snapshot = { status: row.status, observedAt: row.observedAt };
+        this.snapshot = { status: row.status, observedAt: row.observedAt,
+          requiresAccountAccess: !site.enabled && response.replayed !== true };
       } else {
         this.queryError = messageKey(response.reason || (row && row.reason));
         if (response.reason === 'new_product_restricted') this.snapshot = null;

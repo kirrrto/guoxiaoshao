@@ -53,7 +53,7 @@ function presentMemberProduct(item) {
     dailyPriceText: `约 ¥${(item.priceFen / item.days / 100).toFixed(2)} / 天`,
     benefitText: productBenefit(item),
     benefitShort: `${item.limits && item.limits.maxFollows || 3} 配置 × ${item.limits && item.limits.maxStoresPerFollow || 3} 门店`,
-    watchScope: ['member_30d', 'member_365d'].includes(item.planId) ? '可关注大陆、日本、台湾和香港门店' : '可关注中国大陆门店',
+    watchScope: ['member_30d', 'member_365d'].includes(item.planId) ? '可查询和关注大陆、日本、台湾和香港门店' : '可关注中国大陆门店',
     nameText: ({ member_7d: '周卡', member_30d: '月卡', member_365d: '年卡' })[item.planId] || '会员',
     durationText: `${item.days} 天`,
     available: paymentAvailability(item, wx).ready };

@@ -20,7 +20,7 @@ const { mergeConfig, patchConfig } = require('../config');
 const { assertConfigEditor, makeConfigAudit } = require('../config-audit');
 const { CAMPAIGN, MAX_FAILURES, LOCK_MS, CLAIMS_ID, matchesCodeHash, attemptsId } = require('../member-redemption');
 const { upstreamGuardMethods, reserveAccountQuery, releaseAccountQuery } = require('./upstream-guard');
-const { canPreviewMarket } = require('../rules/regional-query-preview');
+const { canReadMarket, canPreviewMarket } = require('../rules/regional-query-access');
 const { testAccountConfigIn } = require('./test-account-config');
 const { queryTargetMethods } = require('./query-target');
 const { notificationTestMethods } = require('./notification-test');
@@ -348,23 +348,37 @@ function atomicMethods(run, { readUpstreamBreaker } = {}) {
       const { record, product, ownerId, nowIso, leaseMs = 25000 } = args;
       let user = await tx.get(C.users, record.userKey);
       if (!user) throw new ApiError('user_missing', '用户不存在');
-      const config = await testAccountConfigIn(tx, user, args.config);
       const existing = await tx.get(C.queries, record._id);
       const privatePreview = Boolean(args.preview || existing?.privatePreview);
-      const previewRevoked = privatePreview && !canPreviewMarket(record.market, user, config);
       if (existing) {
         // Legacy records are bound by their actual request fields as well.
         const signature = q => JSON.stringify([q.kind, q.market || 'CN', q.partNumber, [...q.storeNumbers].sort(), q.kind === 'history' ? q.dayKey : null]);
         if (signature(existing) !== signature(record)) throw new ApiError('query_id_conflict', '该查询编号已用于其他条件，请重新查询');
         if (existing.status !== 'pending' && existing.response) return { replayed: true, record: existing, ...quotaBalance(user) };
         if (existing.leaseUntil && existing.leaseUntil > nowIso) return { busy: true, record: existing, retryAfterMs: Date.parse(existing.leaseUntil) - Date.parse(nowIso), ...quotaBalance(user) };
-        // A closed site's private route cannot take over a previously paid public request.
-        if (previewRevoked || (privatePreview && existing.charged > 0)) {
-          return { replayed: true, ...await closeExpiredQuery(tx, existing, user, nowIso, 'market_disabled') };
+      }
+      // Replay remains available to the receipt owner. Recheck site, entitlement
+      // and grants before a new request or an expired lease can start work.
+      if (!existing && args.existingOnly) throw new ApiError('query_recovery_missing', '旧查询记录暂未找到，本次未扣次，请重新核对。');
+      const needsPlan = record.kind === 'market' || (!existing && record.kind === 'live') || existing?.isTester;
+      if (needsPlan && await hydrateMemberPlansIn(tx, user)) await tx.put(C.users, user);
+      let config, pricingTime = new Date(nowIso);
+      if (record.kind === 'market') {
+        const runtime = await tx.get(C.config, 'runtime');
+        config = { ...args.config, internationalMarkets: runtime?.internationalMarkets, adminUserKeys: runtime?.adminUserKeys };
+        if (args.clock) pricingTime = args.clock();
+        const enabled = privatePreview ? canPreviewMarket(record.market, user, config) : canReadMarket(record.market, user, config, pricingTime);
+        const paidPublicReceipt = existing?.charged > 0 && (privatePreview || config.internationalMarkets?.[record.market] !== true);
+        if (!enabled || paidPublicReceipt) {
+          if (existing) return { replayed: true, ...await closeExpiredQuery(tx, existing, user, nowIso, 'market_disabled') };
+          throw new ApiError('market_disabled', '该站点尚未开放实时查询。');
         }
+      } else {
+        config = await testAccountConfigIn(tx, user, args.config);
+      }
+      if (existing) {
         if (record.kind === 'market' || existing.isTester) {
-          if (await hydrateMemberPlansIn(tx, user)) await tx.put(C.users, user);
-          const params = { user, product, now: new Date(nowIso), config };
+          const params = { user, product, now: pricingTime, config };
           if (record.kind !== 'history' && record.storeNumbers.length > accountLimits(user, params.now, config).queryMaxStores) {
             return { replayed: true, ...await closeExpiredQuery(tx, existing, user, nowIso, 'too_many_stores') };
           }
@@ -389,16 +403,13 @@ function atomicMethods(run, { readUpstreamBreaker } = {}) {
         await tx.put(C.queries, resumed);
         return { record: resumed, ...quotaBalance(user), recovered: true };
       }
-      if (previewRevoked) throw new ApiError('market_disabled', '该站点尚未开放实时查询。');
-      if (args.existingOnly) throw new ApiError('query_recovery_missing', '旧查询记录暂未找到，本次未扣次，请重新核对。');
       if (record.kind === 'live' || record.kind === 'market') {
-        if (await hydrateMemberPlansIn(tx, user)) await tx.put(C.users, user);
-        const maxStores = accountLimits(user, new Date(nowIso), config).queryMaxStores;
+        const maxStores = accountLimits(user, pricingTime, config).queryMaxStores;
         if (record.storeNumbers.length > maxStores) throw new ApiError('too_many_stores', `单次最多查询 ${maxStores} 家门店`);
       }
       const decision = record.kind === 'history'
         ? decideHistoryQuery({ user, product, requestedDayKey: record.dayKey, now: new Date(nowIso), config })
-        : record.kind === 'market' ? decideMarketQuery({ user, product, now: new Date(nowIso), config })
+        : record.kind === 'market' ? decideMarketQuery({ user, product, now: pricingTime, config })
         : decideLiveQuery({ user, product, now: new Date(nowIso), config });
       if (!decision.allowed) return { denied: decision, ...quotaBalance(user) };
       if (args.maxCost !== undefined && decision.cost > args.maxCost) {

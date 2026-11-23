@@ -1,7 +1,8 @@
 'use strict';
 // These guards run in the same database used by both API and monitor instances.
 const { createHash, randomUUID } = require('node:crypto');
-const { canPreviewMarket } = require('../rules/regional-query-preview');
+const { regionalQueryDenial } = require('./query-target');
+const { canPreviewMarket } = require('../rules/regional-query-access');
 const { COLLECTIONS: C } = require('../collections');
 const { dayKey, endOfDay } = require('../time');
 const { CAPACITY_ID, AUTO_SHARE, reserveCapacity } = require('../engine/capacity-budget');
@@ -45,7 +46,7 @@ function upstreamGuardMethods(run, { readUpstreamBreaker } = {}) {
       collector: await tx.get(C.config, 'collector_status'),
     })),
     // Legacy method name retained; this is now the shared manual + auto budget.
-    consumeCollectorBudget: ({ now, maxRequestsPerMinute, maxRequestsPerDay, budgetMode = 'continuous', source = 'manual', autoShare = AUTO_SHARE, market = null, previewUser = null, selectWatchedParts }) => run(async tx => {
+    consumeCollectorBudget: ({ now, maxRequestsPerMinute, maxRequestsPerDay, budgetMode = 'continuous', source = 'manual', autoShare = AUTO_SHARE, market = null, previewUser = null, regionalQuery = null, selectWatchedParts }) => run(async tx => {
       source = source === 'auto' ? 'auto' : 'manual';
       const nowMs = Date.parse(now);
       const prefix = market ? 'market_' + market + '_' : '';
@@ -55,9 +56,13 @@ function upstreamGuardMethods(run, { readUpstreamBreaker } = {}) {
       // waiting for admission. Check the authoritative flags before reserving.
       if (market) {
         marketMonitoringEnabled = runtime?.collector?.enabled === true && runtime?.internationalMonitoring?.[market] === true;
-        const manualEnabled = previewUser ? canPreviewMarket(market, previewUser, runtime) : runtime?.internationalMarkets?.[market] === true;
-        const enabled = source === 'auto' ? marketMonitoringEnabled : manualEnabled;
-        if (!enabled) return { allowed: false, reason: 'market_disabled', retryAt: 0 };
+        if (source === 'auto' || previewUser) {
+          const enabled = source === 'auto' ? marketMonitoringEnabled : canPreviewMarket(market, previewUser, runtime);
+          if (!enabled) return { allowed: false, reason: 'market_disabled', retryAt: 0 };
+        } else {
+          const reason = await regionalQueryDenial(tx, market, runtime, now, regionalQuery);
+          if (reason) return { allowed: false, reason, retryAt: 0 };
+        }
       }
       const breakerId = prefix + 'upstream_breaker';
       const breaker = await tx.get(C.config, breakerId) || { _id: breakerId, generation: 0, trips: 0 };

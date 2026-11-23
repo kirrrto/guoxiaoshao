@@ -73,8 +73,8 @@
     },
     {
       "path": "engine/guarded-pickup.js",
-      "bytes": 6829,
-      "sha256": "1ac86c90b9cf5c5ce281931f6da980d5fdf8c2cda6090c655bb5be6f9cac25c1"
+      "bytes": 6907,
+      "sha256": "26778781dbb7116e7ef67f0987a33478a30810104730819b810ff0654c2b53e5"
     },
     {
       "path": "engine/lease.js",
@@ -178,8 +178,8 @@
     },
     {
       "path": "repo/atomic-ops.js",
-      "bytes": 58579,
-      "sha256": "d4ef6a7ef46648b0743f743425754ccff3b603f2a56a37b4056707164736da70"
+      "bytes": 59232,
+      "sha256": "a0edbc0255a571e17da121f7df8ed5bbcaec47976ac269126d86d8ab0d465383"
     },
     {
       "path": "repo/cloudbase-repo.js",
@@ -228,8 +228,8 @@
     },
     {
       "path": "repo/query-target.js",
-      "bytes": 2748,
-      "sha256": "aafb499cf3f4a333389ddfeb2a81f9a375b7739e9932db9221e85576af3e6bae"
+      "bytes": 4105,
+      "sha256": "4db6f339a89c848808b85b060b6cc9075b763267b3a6d1042246656875542081"
     },
     {
       "path": "repo/subscription-credit-ledger.js",
@@ -243,8 +243,8 @@
     },
     {
       "path": "repo/upstream-guard.js",
-      "bytes": 11779,
-      "sha256": "596b177a7b50342fa83766fbddd77cf000fca815de878b99840767316f00bc3a"
+      "bytes": 11990,
+      "sha256": "83919d6b5a23dc155fbaa24cd914cc0141dfa5f8e8499a424b441d1aa1da221a"
     },
     {
       "path": "rules/access.js",
@@ -302,9 +302,9 @@
       "sha256": "49c35d82451c72585c4f308c2e8b4e9403bfb1eb37d201cc51a6423467d9543d"
     },
     {
-      "path": "rules/regional-query-preview.js",
-      "bytes": 319,
-      "sha256": "a492fb54159cc70c3663984f3bfa4d77bfb3facd63cde0db77b2490ba7262ef1"
+      "path": "rules/regional-query-access.js",
+      "bytes": 559,
+      "sha256": "34822dc283b03a95e1903af9fafccd6c2ee684bd0f8234ba5f6b2c07db30580c"
     },
     {
       "path": "time.js",

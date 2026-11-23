@@ -4,7 +4,7 @@ const { ApiError } = require('../errors');
 const { sharedQueryPickup } = require('../engine/shared-query');
 const { ensureUser } = require('./users');
 const { queryCostLimit } = require('../rules/access');
-const { canPreviewMarket } = require('../rules/regional-query-preview');
+const { canReadMarket, canPreviewMarket } = require('../rules/regional-query-access');
 const { accountLimits, ANNUAL_LIMITS } = require('../rules/membership');
 const { isRetiredPartNumber, retiredProductMessage } = require('../rules/follow-access');
 const { recordObservations } = require('../engine/observations');
@@ -136,16 +136,15 @@ async function marketPickup(ctx, payload) {
   }
   const product = findMarketProduct(market, partNumber);
   const listed = product?.querySupported && site.stores.some(store => store.storeNumber === storeNumbers[0]);
-  const caller = { _id: ctx.identity.userKey, appid: ctx.identity.appid, openid: ctx.identity.openid };
-  const publicQuery = ctx.config.internationalMarkets?.[market] === true;
-  const preview = !publicQuery && canPreviewMarket(market, caller, ctx.config);
-  if (!listed || (!publicQuery && !preview)) {
-    const unavailable = listed ? new ApiError('market_disabled', '该站点尚未开放实时查询。')
-      : new ApiError('invalid_market_target', '请在当前站点重新选择商品与门店。');
-    return settleUnavailablePickup(ctx, { market, queryId, partNumber, storeNumbers }, unavailable);
-  }
+  const target = { market, queryId, partNumber, storeNumbers };
+  if (!listed) return settleUnavailablePickup(ctx, target, new ApiError('invalid_market_target', '请在当前站点重新选择商品与门店。'));
   const user = await ensureUser(ctx);
-  const reply = await executePickup(ctx, { user, product, queryId, partNumber, storeNumbers, startedAt, market, maxCost: preview ? 0 : maxCost, preview });
+  const publicQuery = ctx.config.internationalMarkets?.[market] === true;
+  const preview = !publicQuery && canPreviewMarket(market, user, ctx.config);
+  if (!preview && !canReadMarket(market, user, ctx.config, ctx.clock())) {
+    return settleUnavailablePickup(ctx, target, new ApiError('market_disabled', '该站点尚未开放实时查询。'));
+  }
+  const reply = await executePickup(ctx, { user, product, queryId, partNumber, storeNumbers, startedAt, market, maxCost: publicQuery ? maxCost : 0, preview });
   return { ...reply, market, queryId };
 }
 
@@ -182,7 +181,7 @@ async function executePickup(ctx, { user, product, queryId, partNumber, storeNum
     { reason: 'request_budget_exhausted' });
   const ownerId = randomUUID(); const recordId = `${user._id}|${queryId}`;
   const scope = market ? { kind: 'market', market } : { kind: 'live' };
-  const begun = await ctx.repo.beginQuery({ record: { _id: recordId, userKey: user._id, queryId, ...scope, partNumber, storeNumbers }, product, config: ctx.config, ownerId, nowIso: ctx.nowIso, existingOnly, maxCost, preview });
+  const begun = await ctx.repo.beginQuery({ record: { _id: recordId, userKey: user._id, queryId, ...scope, partNumber, storeNumbers }, product, config: ctx.config, ownerId, nowIso: market ? ctx.clock().toISOString() : ctx.nowIso, clock: market ? ctx.clock : undefined, existingOnly, maxCost, preview });
   if (begun.replayed) return { ...begun.record.response, balance: begun.balance, quotaRevision: begun.quotaRevision, replayed: true };
   if (begun.busy) return { ok: false, reason: 'query_in_progress', queryId, retryAfterMs: begun.retryAfterMs, balance: begun.balance, quotaRevision: begun.quotaRevision };
   if (begun.denied) return { ok: false, reason: begun.denied.reason, retryAfterMs: begun.denied.retryAfterMs || null, restrictionEndsAt: begun.denied.restrictionEndsAt || null, cost: begun.denied.cost, balance: begun.balance, quotaRevision: begun.quotaRevision };
@@ -191,7 +190,8 @@ async function executePickup(ctx, { user, product, queryId, partNumber, storeNum
     // Keep six seconds for recording/refund even after slow admission reads.
     const deadline = Math.min(startedAt + 14000, Date.now() + Math.max(0, remaining() - 6000));
     const previewUser = begun.record.privatePreview ? user : null;
-    const batches = await mapLimit(storeNumbers, 3, store => sharedQueryPickup(ctx, store, partNumber, deadline, product, market, previewUser));
+    const regionalQuery = market && !previewUser ? { userKey: user._id, charged: begun.record.charged, product, clock: ctx.clock } : null;
+    const batches = await mapLimit(storeNumbers, 3, store => sharedQueryPickup(ctx, store, partNumber, deadline, product, market, previewUser, regionalQuery));
     // A denied request is not an upstream observation and must not alter history.
     const recorded = batches.flatMap(batch => batch.record.budgetDenied
       ? batch.observations.map(observation => ({ observation, latest: null, events: [], outcome: 'not_sampled' }))
@@ -209,7 +209,7 @@ async function executePickup(ctx, { user, product, queryId, partNumber, storeNum
     const retryAt = Math.max(0, ...batches.map(batch => Number(batch.record.retryAt) || 0));
     const guardReason = batches.find(batch => batch.record.budgetDenied)?.record.error.message
       || (retryAt > ctx.clock().getTime() ? 'upstream_paused' : null);
-    const reason = ['upstream_paused', 'query_refresh_pending', 'upstream_unavailable', 'market_disabled'].includes(guardReason) ? guardReason
+    const reason = ['upstream_paused', 'query_refresh_pending', 'upstream_unavailable', 'market_disabled', 'new_product_restricted', 'query_cost_changed'].includes(guardReason) ? guardReason
       : ['daily_budget', 'minute_budget', 'capacity_wait'].includes(guardReason) ? 'upstream_budget_limited' : 'upstream_unavailable';
     response = { ok: !allUnknown, reason: allUnknown ? reason : null, queryId,
       sharedResult, allShared, billingReason: refund && sharedResult ? 'shared_result_no_charge' : refund ? 'no_valid_result' : null,

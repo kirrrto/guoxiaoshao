@@ -76,9 +76,9 @@
         <view class="market-result-product">{{product.label}}</view>
         <view>{{store.label}}</view><view class="market-meta">{{alertTime}}</view>
       </view>
-      <view wx:if="{{product.querySupported || pending}}" id="market-result" class="card markets-result {{!enabled || receipt || queryError || busyHere ? '' : 'markets-result--empty'}}" aria-live="polite">
+      <view wx:if="{{accountReady && (product.querySupported || pending)}}" id="market-result" class="card markets-result {{!enabled || receipt || queryError || busyHere ? '' : 'markets-result--empty'}}" aria-live="polite">
         <view class="card-title">{{c.results}}</view>
-        <block wx:if="{{!enabled}}">
+        <block wx:if="{{!enabled && !pending}}">
           <view class="market-closed">{{c.closed}}</view>
           <button class="ui-action mt" bindtap="onPullDownRefresh">{{c.refreshed}}</button>
         </block>

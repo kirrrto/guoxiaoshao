@@ -1,7 +1,7 @@
 'use strict';
 const { ApiError } = require('../errors');
 const { dayKey } = require('../time');
-const { PREVIEW_MARKETS } = require('../rules/regional-query-preview');
+const { MEMBER_QUERY_MARKETS } = require('../rules/regional-query-access');
 const { membershipSnapshot, accountLimits } = require('../rules/membership');
 const { ensurePlanMetadata, ensureOutageCompensation, ensureLaunchCelebrationGift } = require('../rules/member-plan');
 const { resolveConfig, legacyTaskEvidence } = require('../rules/quota');
@@ -193,7 +193,8 @@ async function bootstrap(ctx) {
     serverTime: ctx.nowIso,
     identity: { appid: ctx.identity.appid, userKey: ctx.identity.userKey, openidMasked: maskOpenid(ctx.identity.openid), crossAccount: ctx.identity.crossAccount, isAdmin: ctx.identity.isAdmin },
     membership,
-    ...(membership.isTester ? { regionalQueryPreview: PREVIEW_MARKETS } : {}),
+    ...(membership.enhanced && !membership.isTester ? { regionalMemberQueryMarkets: MEMBER_QUERY_MARKETS } : {}),
+    ...(membership.isTester ? { regionalQueryPreview: MEMBER_QUERY_MARKETS } : {}),
     quota,
     tasks: quota.tasksViewedToday.length && !quota.tasksDoneToday.includes('view_history')
       ? ctx.config.tasks.filter(task => task.id === 'view_history' && task.reward > 0) : [],

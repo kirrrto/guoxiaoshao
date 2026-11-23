@@ -21,7 +21,7 @@ const COPY = {
     launchGate: '新品开售前及开售后前 30 天，查询需有效周卡、月卡或年卡。', unlockAt: '{date} 起可使用查询次数（门店当地时间）。',
     signin: '签到领取查询次数', signed: '今天已签到', granted: '签到成功，增加 {n} 次查询', dailyCap: '今日领取次数已达上限',
     balanceCap: '查询次数已达余额上限', signinUnknown: '签到结果尚未确认，可重试；同一天不会重复领取。',
-    closed: '此站点尚未开放库存查询', empty: '查询后可查看所选门店的自提状态。',
+    closed: '当前账号暂时无法查询此站点的库存。', empty: '查询后可查看所选门店的自提状态。',
     current: '最近查询', previous: '上次有效结果', available: '可自提', unavailable: '暂不可自提',
     pending: '尚未开放自提', ineligible: '此配置不支持自提', unknown: '暂无法查询',
     unavailableService: '暂时无法确认门店库存，请稍后重试。',
@@ -48,7 +48,7 @@ const COPY = {
     launchGate: 'Before launch and for the first 30 days on sale, checks require a weekly, monthly or annual pass.', unlockAt: 'Query credits can be used from {date} (store local time).',
     signin: 'Check in for query credits', signed: 'Already checked in today', granted: 'Checked in · Credits added: {n}', dailyCap: 'Daily credit limit reached',
     balanceCap: 'Credit balance limit reached', signinUnknown: 'Check-in is unconfirmed. Retry safely. Credits are awarded once per day.',
-    closed: 'Pickup checks are not yet open in this region.', empty: 'Check this store to see pickup availability.',
+    closed: 'Pickup checks are currently unavailable for your account in this region.', empty: 'Check this store to see pickup availability.',
     current: 'Last checked', previous: 'Last known result', available: 'Available for pickup', unavailable: 'Not available for pickup',
     pending: 'Pickup not yet open', ineligible: 'Ineligible for pickup', unknown: 'Status unavailable',
     unavailableService: 'Could not confirm pickup availability. Try again later.',
@@ -132,7 +132,9 @@ function regionalAccess(membership, product, now = Date.now()) {
   const launchUntil = Date.parse(product?.freeQueryStartsAt);
   const launch = !Number.isFinite(launchUntil) || now < launchUntil;
   const tester = member && membership.isTester === true;
-  return { member, tester, canWatch: tester || plan === 'member_30d' || plan === 'member_365d',
+  const monthlyOrAnnual = plan === 'member_30d' || plan === 'member_365d';
+  return { member, tester, canWatch: tester || monthlyOrAnnual,
+    memberQuery: monthlyOrAnnual && expiry > now && enhanced > now,
     launchRestricted: launch && !tester && !['member_7d','member_30d','member_365d'].includes(plan),
     nextPlanChange: Math.min(...[expiry,enhanced,annual].filter(stamp => stamp > now)),
     nextLaunchChange: launchUntil > now ? launchUntil : Infinity };
@@ -184,11 +186,11 @@ function localTime(iso, timeZone) {
   return new Date(stamp + offset * 3600000).toISOString().slice(0, 19).replace('T', ' ') + (offset ? ' UTC+' + offset : ' UTC');
 }
 
-function receiptView(snapshot, store, lang, now = Date.now()) {
+function receiptView(snapshot, store, lang, now = Date.now(), previousOnly = false) {
   if (!snapshot || !store) return null;
   const { status, observedAt } = snapshot;
   const c = COPY[lang];
-  const previous = snapshot.supersededByFailure || observation(observedAt, now).stale;
+  const previous = previousOnly || snapshot.supersededByFailure || observation(observedAt, now).stale;
   return { status: c[status], tone: previous ? 'muted' : status === 'available' ? 'ok' : status === 'pending' ? 'warn' : 'muted',
     time: localTime(observedAt, store.timeZone), timeLabel: previous ? c.previous : c.current,
     previous, store: store.label };

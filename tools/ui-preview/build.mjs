@@ -433,6 +433,11 @@ for (const scenario of scenarios) {
     collector: { state: scenario === 'expired' ? 'stale' : 'not_deployed' }, memberProduct: { id: 'vip666', title: '7 天会员', days: 7, priceFen: 700, enabled: paymentPreview && scenario !== 'payment-blocked', paymentReady: paymentPreview && scenario !== 'payment-blocked', iosEnabled: true, note: '该产品为一次性虚拟服务，一经售出不予退款。一次购买 7 天，已有会员按剩余有效期顺延，不自动续费。', paymentReason: '购买开放后可在此开通会员。' },
     notifications: { enabled: false, templateIds: {} }, subscriptions: {}, settings: { notifyEnabled: true, dnd: { enabled: true, startMinute: 1380, endMinute: 480 } },
     limits: { maxFollows: 3, maxStoresPerFollow: 3, queryMaxStores: 3 }, followCount: scenario === 'empty' ? 0 : 1, catalogVersion: 'offline-preview' };
+  if (marketsPreview && marketScenarios[scenario].memberQuery) {
+    bootstrap.regionalMemberQueryMarkets = ['JP', 'TW', 'HK'];
+    bootstrap.membership.enhancedExpiresAt = bootstrap.membership.expiresAt;
+    if (bootstrap.membership.planId === 'member_365d') bootstrap.membership.annualExpiresAt = bootstrap.membership.expiresAt;
+  }
   if (v2Preview) {
     bootstrap.features = { contextualCheckout: true, resultNextAction: true, activationJourney: true, targetEvidence: true, growthEvents: false, experimentAssignments: true, launchGuide: true };
     bootstrap.quota.balance = 3;

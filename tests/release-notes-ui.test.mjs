@@ -47,6 +47,7 @@ test('customer release notes exclude personal testing privileges, including hist
   }
   assert.ok(!RELEASE_NOTES.some(row => row.version === '3.8.2'));
   const candidate = RELEASE_NOTES.find(row => row.version === '3.8.3');
+  assert.ok(candidate.highlights.some(text => text.includes('月卡、年卡可免扣次查询日本、台湾和香港')));
   assert.ok(candidate.highlights.some(text => text.includes('扣次和退款记录')));
 });
 

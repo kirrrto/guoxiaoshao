@@ -5,9 +5,9 @@ export const marketScenarios = {
   'tw-english': { market: 'TW', model: 'iPhone 18 Pro Max', color: '银色', language: 'en',
     expected: ['Regional stores', 'iPhone 18 Pro Max', 'Silver', 'Not available for pickup', 'UTC+8'] },
   'hk-unknown': { market: 'HK', unknown: true, expected: ['暂时无法确认门店库存', '本次未扣次'] },
-  'jp-closed': { market: 'JP', closed: true, expected: ['关注此配置', '可先保存关注，本站尚未开启自动监测。', '此站点尚未开放库存查询'] },
-  'tw-closed-saved': { market: 'TW', closed: true, watch: true, expected: ['已保存关注，本站尚未开启自动监测', '暂停', '取消关注'] },
-  'hk-closed-paused': { market: 'HK', closed: true, watch: true, paused: true, language: 'en', expected: ['Paused', 'Resume', 'Remove'] },
+  'jp-closed': { market: 'JP', closed: true, expected: ['关注此配置', '可先保存关注，本站尚未开启自动监测。', '当前账号暂时无法查询此站点的库存。'] },
+  'tw-closed-saved': { market: 'TW', closed: true, memberQuery: true, available: true, watch: true, expected: ['会员查询不扣次', '可自提', '已保存关注，本站尚未开启自动监测', '暂停', '取消关注'] },
+  'hk-closed-paused': { market: 'HK', closed: true, memberQuery: true, plan: 'member_365d', watch: true, paused: true, language: 'en', expected: ['Included with membership', 'Not available for pickup', 'Paused', 'Resume', 'Remove'] },
   'tw-watch': { market: 'TW', watch: true, available: true, expected: ['我的站点关注', '已开启关注', '取消关注'] },
   'hk-launch-free': { market: 'HK', plan: null, date: '2026-10-10T03:00:00Z', blocked: true,
     expected: ['查询需有效周卡、月卡或年卡', '2026-10-18', '签到领取查询次数'] },
@@ -57,5 +57,5 @@ export async function prepareMarket(page, fixture) {
   }
   if (fixture.watch) page.onSelectWatch({ currentTarget: { dataset: { id: page.data.watchRows[0].id } } });
   if (fixture.language === 'en') page.onLanguage();
-  if (!fixture.closed) await page.onQuery();
+  if (!fixture.closed || fixture.memberQuery) await page.onQuery();
 }

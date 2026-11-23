@@ -57,7 +57,7 @@ module.exports = {
   "关注和微信提醒是什么关系？": "How do watches and WeChat alerts work together?",
   "大陆门店需有效会员，其他站点需有效月卡或年卡。保存关注后，接收微信消息还需单独授权。关注期间也可手动查询门店取货情况。": "Mainland watches require an active membership. Regional watches require an active monthly or annual pass. After saving a watch, allow WeChat messages separately. You can also check stores manually.",
   "其他站点的查询和关注需要哪种会员？": "Which plans support regional checks and watches?",
-  "当地新品开售满 30 天前，有效周卡、月卡、年卡可查。第 31 天起，有效会员免扣；普通用户可用签到次数查询，每次新有效结果扣 1 次。开售日期待核实时，暂按新品规则。关注与到货提醒需有效月卡或年卡。": "An active weekly, monthly or annual pass is required until 30 days after local sales begin. From day 31, all active members check for free. Other accounts spend one check-in credit per new valid result. The launch rule also applies while the local sale date is unverified. Watches and restock alerts require an active monthly or annual pass.",
+  "有效月卡和年卡可免扣次数查询三个站点，也可关注门店配置。站点开放公众查询后，周卡可查新品。当地开售第 31 天起，其他有效会员也可免扣次查询，免费用户每次取得新有效结果使用 1 次签到额度。开售日期待核实时按新品规则。": "An active monthly or annual pass includes stock checks and watches in all three regions. Where public checks are open, a weekly pass covers new releases. From day 31 of local sales, other active members can also check for free. Free accounts spend one check-in credit per new valid result. New-release rules apply until the local sale date is verified.",
   "其他站点的关注和到货提醒需要有效月卡或年卡。": "Regional watches and restock alerts require an active monthly or annual pass.",
   "微信提醒次数怎么计算？": "How are WeChat alert permissions used?",
   "每条到货或断货提醒各用 1 次微信授权，免打扰时段不发送；授权次数与查询次数分开计算。": "Each restock or sold-out message uses one matching permission. Messages are paused during quiet hours. Check credits are counted separately.",

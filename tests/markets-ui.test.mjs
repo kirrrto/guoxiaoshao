@@ -97,7 +97,7 @@ test('uncertain request retains its ID across markets and can settle after rollo
   let first = true;
   const { page, rt, state } = await setup({ 'market.pickup': p => {
     if (first) { first = false; throw Object.assign(Error(), { code: 'call_failed' }); }
-    return receipt(p, { charged: 1, refunded: 1 });
+    return receipt(p, { charged: 1, refunded: 1, replayed: true });
   } });
   await page.onQuery();
   assert.equal(page.data.queryLabel, '核对上次查询');
@@ -108,6 +108,7 @@ test('uncertain request retains its ID across markets and can settle after rollo
   const attempts = rt.calls.filter(c => c.action === 'market.pickup');
   assert.equal(attempts[0].payload.queryId, attempts[1].payload.queryId);
   assert.equal(page.data.billingText, '本次未扣次');
+  assert.equal(page.data.receipt.previous, true);
   assert.equal(page.data.canQuery, false);
 });
 test('unknown, old and invalid observations never become a fresh availability claim', async () => {
@@ -140,7 +141,7 @@ test('member can watch before querying and independently pause, resume or remove
   rt.messages.at(-1).success({confirm:false}); assert.equal(page.data.watchRows.length,1);
   assert.equal(rt.calls.filter(c => c.action==='market.pickup').length,0);
 });
-test('closed market does not start new inventory requests, account changes clear last private result', async () => {
+test('an older API without account-level permissions cannot enable new checks in a closed region', async () => {
   const { page, rt, state } = await setup({}, {}, {enabled:false});
   assert.equal(page.data.canQuery,false); await page.onQuery(); assert.equal(rt.calls.filter(c => c.action === 'market.pickup').length,0);
   state.enabled = true; await page.onPullDownRefresh(); await page.onQuery();
@@ -149,7 +150,7 @@ test('closed market does not start new inventory requests, account changes clear
   assert.equal(page.data.receipt,null); assert.equal(page.owner,'Bob');
 });
 
-test('the Taiwan selection on a closed public site is queryable only for the signed-in preview account', async () => {
+test('a private Taiwan preview stays scoped to the verified tester account', async () => {
   const { page, rt, state } = await setup({
     'user.bootstrap': (_, s) => ({
       identity: { userKey: s.owner }, membership: { active: true, isTester: s.owner === 'Alice' },
@@ -171,6 +172,63 @@ test('the Taiwan selection on a closed public site is queryable only for the sig
   assert.equal(page.data.watchEnabled, false);
   await page.onQuery();
   assert.equal(rt.calls.filter(x => x.action === 'market.pickup').length, 1);
+});
+test('monthly and annual customers manually check all three regions through the page while public checks and monitoring are closed', async () => {
+  for (const planId of ['member_30d', 'member_365d']) {
+    const expiry = new Date(Date.now() + 86400000).toISOString();
+    const { page, rt } = await setup({ 'user.bootstrap': () => ({
+      identity: { userKey: 'Alice' }, serverTime: new Date().toISOString(),
+      membership: { active: true, planId, expiresAt: expiry, enhancedExpiresAt: expiry, annualExpiresAt: planId === 'member_365d' ? expiry : null },
+      regionalMemberQueryMarkets: ['JP', 'TW', 'HK'], quota: { balance: 0, revision: 1 }, notifications: {}, subscriptions: {},
+    }) }, {}, { enabled: false });
+    const calls = () => rt.calls.filter(row => row.action === 'market.pickup');
+    for (const [index, site] of MARKETS.entries()) {
+      page.onMarket(tap({ market: site.code }));
+      assert.equal(calls().length, index);
+      assert.equal(page.data.enabled, true);
+      assert.equal(page.data.canQuery, true);
+      assert.equal(page.data.costText, '会员查询不扣次');
+      assert.equal(page.data.watchEnabled, true);
+      assert.equal(page.data.alertTemplate, '');
+      await page.onQuery();
+      assert.equal(calls().length, index + 1);
+      assert.deepEqual(calls().at(-1).payload.storeNumbers, [page.data.store.id]);
+      assert.equal(calls().at(-1).payload.market, site.code);
+      assert.equal(calls().at(-1).payload.maxCost, 0);
+      assert.equal(page.data.receipt.status, '可自提');
+    }
+    assert.equal(rt.calls.some(row => ['market.watch', 'notify.recordSubscription', 'quota.signin'].includes(row.action)), false);
+    page.onUnload();
+  }
+});
+
+test('a paid grant is scoped to its regions, account and server-time expiry, including an uncertain in-flight result', async t => {
+  const now = Date.parse('2027-01-02T00:00:00Z'), serverNow = now + 3600000;
+  t.mock.timers.enable({ apis: ['Date'], now });
+  const expires = new Date(serverNow + 500).toISOString(), gate = deferred();
+  const { page, rt, state } = await setup({
+    'user.bootstrap': (_, s) => ({
+      identity: { userKey: s.owner }, serverTime: new Date(serverNow + Date.now() - now).toISOString(),
+      membership: { active: true, planId: s.planId, expiresAt: new Date(serverNow + 86400000).toISOString(), enhancedExpiresAt: expires },
+      regionalMemberQueryMarkets: ['TW'], quota: { balance: 0 }, notifications: {}, subscriptions: {},
+    }),
+    'market.pickup': async p => { await gate.promise; return receipt(p); },
+  }, {}, { planId: 'member_30d', enabled: false });
+  assert.equal(page.data.canQuery, false);
+  page.onMarket(tap({ market: 'TW' }));
+  assert.equal(page.data.canQuery, true);
+  const running = page.onQuery();
+  t.mock.timers.tick(500); gate.resolve(); await running;
+  assert.equal(page.data.enabled, false);
+  assert.equal(page.data.receipt, null);
+  await page.onQuery();
+  assert.equal(rt.calls.filter(row => row.action === 'market.pickup').length, 1);
+  rt.load('utils/store.js').resetSession(); page.paint();
+  assert.equal(page.data.accountReady, false);
+  page.onHide(); state.owner = 'Bob'; state.planId = 'member_7d'; await page.onShow();
+  assert.equal(page.data.enabled, false);
+  assert.equal(page.data.receipt, null);
+  page.onUnload();
 });
 test('notification destination uses only authorized exact detail and never queries or debits on open', async () => {
   const n = { market:'TW', partNumber: MARKETS[1].products[5].partNumber, storeNumber:'R713', eventId:'alert1', detectedAt:new Date().toISOString() };
