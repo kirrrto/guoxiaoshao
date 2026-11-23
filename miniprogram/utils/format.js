@@ -124,9 +124,14 @@ function fen(amount) {
 }
 
 const STOCK_FRESH_MS = 120000;
-function observation(iso, now = Date.now()) {
+function plausibleObservation(iso, now, leadMs = 0) {
+  const at = Date.parse(iso);
+  return Number.isFinite(at) && at <= now + leadMs;
+}
+
+function observation(iso, now = Date.now(), leadMs = 0) {
   const age = now - Date.parse(iso);
-  const stale = !Number.isFinite(age) || age < 0 || age > STOCK_FRESH_MS;
+  const stale = !Number.isFinite(age) || age < -leadMs || age > STOCK_FRESH_MS;
   return { stale, observedText: iso ? fmtDateTime(iso) : '尚无观测', freshnessText: stale ? '观测已过期，请刷新后确认' : '最近观测，以官网实际取货为准' };
 }
 
@@ -170,4 +175,4 @@ function stockObservation(record = {}, now = Date.now(), options = {}) {
     observationNote: Number.isFinite(elapsed) && elapsed >= 0 && elapsed < 1000 ? '本次状态刚记录，时长待后续观测确认。' : null };
 }
 
-module.exports = { fmtTime, fmtDate, fmtDateTime, todayKey, RETENTION_DAYS, retentionStartKey, relative, duration, statusMeta, eventMeta, reasonText, collectorMeta, fen, observation, stockObservation, pickupExpiry };
+module.exports = { fmtTime, fmtDate, fmtDateTime, todayKey, RETENTION_DAYS, retentionStartKey, relative, duration, statusMeta, eventMeta, reasonText, collectorMeta, fen, observation, plausibleObservation, stockObservation, pickupExpiry };

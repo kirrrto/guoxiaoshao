@@ -1,3 +1,4 @@
+import { registeredPages } from '../tools/lib/mini-packages.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -249,7 +250,7 @@ test('operator project is physically outside the consumer upload root and has al
   const repo = path.dirname(root);
   const project = JSON.parse(fs.readFileSync(path.join(repo, 'project.config.json'), 'utf8'));
   const app = JSON.parse(fs.readFileSync(path.join(root, 'app.json'), 'utf8'));
-  assert.deepEqual(app.pages, ['pages/query/index', 'pages/follow/index', 'pages/markets/index', 'pages/mine/index', 'pages/history/index', 'pages/notice-board/index', 'pages/notification-test/index', 'pages/guide/index', 'pages/deadlines/index']);
+  assert.deepEqual(registeredPages(app), ['pages/query/index', 'pages/follow/index', 'pages/markets/index', 'pages/mine/index', 'pages/history/index', 'pages/notice-board/index', 'pages/notification-test/index', 'pages/guide/index', 'pages/deadlines/index']);
   assert.equal(app.tabBar.list.some(tab => tab.pagePath === 'pages/notification-test/index'), false, 'notification test is a separate page with native back navigation');
   assert.equal(project.miniprogramRoot, 'miniprogram/');
   assert.equal(fs.existsSync(path.join(root, 'pages/admin')), false);

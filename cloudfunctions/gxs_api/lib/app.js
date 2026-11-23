@@ -19,7 +19,7 @@ const query = require('./services/query');
 const queryAlternatives = require('./services/query-alternatives');
 const history = require('./services/history');
 const follows = require('./services/follows');
-const { marketFollows, marketWatch, marketWatchStatus } = require('./services/market-follows');
+const { marketFollows, marketWatch, marketWatchStatus, marketEditWatch } = require('./services/market-follows');
 const member = require('./services/member');
 const notify = require('./services/notify');
 const notificationTest = require('./services/notification-test');
@@ -42,6 +42,7 @@ const ACTIONS = {
   'market.follows': [marketFollows, true],
   'market.watch': [marketWatch, true],
   'market.watchStatus': [marketWatchStatus, true],
+  'market.editWatch': [marketEditWatch, true],
   'quota.signin': [quota.signin, true],
   'quota.completeTask': [quota.completeTask, true],
   'quota.ledger': [quota.ledger, true],

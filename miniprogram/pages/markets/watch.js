@@ -7,6 +7,9 @@ const { switchToTab } = require('../../utils/tab-bar');
 const WORDS = {
   'zh-CN': {
     watch: '关注此配置', watching: '已关注', title: '我的站点关注', pause: '暂停', resume: '恢复', remove: '取消关注',
+    addHere: '将此门店加入关注', addStore: '添加门店', manage: '管理', collapse: '收起', removeStore: '移除', removeWatch: '取消整条关注',
+    removeStoreTitle: '移除这家门店？', edited: '关注已更新', changed: '关注已变化，请核对后再修改。',
+    lastStore: '如需移除最后一家门店，请取消整条关注。',
     removeTitle: '取消这条关注？', cancel: '保留', saved: '关注已保存', active: '已开启关注', paused: '已暂停', expired: '会员已到期',
     limit_paused: '已超出名额', stopped: '本站尚未开启自动监测', savedStopped: '已保存关注，本站尚未开启自动监测',
     canSave: '可先保存关注，本站尚未开启自动监测。', closedMembership: '月卡、年卡可先保存关注。本站尚未开启自动监测。', noSender: '本站微信提醒暂未就绪',
@@ -22,6 +25,9 @@ const WORDS = {
   },
   en: {
     watch: 'Watch configuration', watching: 'Watching', title: 'My regional watches', pause: 'Pause', resume: 'Resume', remove: 'Remove',
+    addHere: 'Add this store to watch', addStore: 'Add store', manage: 'Manage', collapse: 'Collapse', removeStore: 'Remove', removeWatch: 'Remove watch',
+    removeStoreTitle: 'Remove this store?', edited: 'Watch updated', changed: 'This watch changed. Check its current settings.',
+    lastStore: 'To remove the last store, remove the watch.',
     removeTitle: 'Remove this watch?', cancel: 'Keep watch', saved: 'Watch saved', active: 'Watch enabled', paused: 'Paused', expired: 'Membership expired',
     limit_paused: 'Over plan limit', stopped: 'Monitoring is not yet open in this region.', savedStopped: 'Watch saved. Monitoring is not active in this region.',
     canSave: 'You can save a watch now. Monitoring is not active in this region.', closedMembership: 'Monthly and annual pass holders can save watches here. Monitoring is not active in this region.', noSender: 'WeChat alerts are not ready in this region.',
@@ -55,8 +61,15 @@ function watchView(page, site, ready, eligiblePlan) {
       && Array.isArray(f.eligibleStoreNumbers) && !f.eligibleStoreNumbers.includes(page.store);
     const monitoring = home?.monitorEnabled && list.monitoring?.[f.market];
     const status = !member && f.status === 'active' ? w.plan_required : f.status === 'active' && overLimit ? w.limit_paused : f.status === 'active' && !monitoring ? w.savedStopped : w[f.status] || w.stopped;
-    return { id: f.followId, name, product: p && p.label || f.partNumber, stores: stores.map(number => choices && choices.stores.find(s => s.id === number)?.label || number).join(' · '),
-      imageDisplayUrl: p && p.imageDisplayUrl || '', status, canResume: Boolean(member && p?.monitorSupported && registrationOpen(list, home)), pauseTo: (f.savedStatus || f.status) === 'paused' ? 'active' : 'paused',
+    const selectedStores = stores.map(number => ({ id: number, label: choices?.stores.find(s => s.id === number)?.label || number }));
+    const editing = list.watchEditing === true && page.editingWatch === f.followId;
+    const canResume = Boolean(member && p?.monitorSupported && registrationOpen(list, home));
+    const additionalStores = editing && canResume && !f.limitPaused && stores.length < list.limits?.maxStoresPerFollow
+      ? choices.stores.filter(store => !stores.includes(store.id)) : [];
+    return { id: f.followId, name, product: p && p.label || f.partNumber, stores: selectedStores.map(s => s.label).join(' · '),
+      market: f.market, partNumber: f.partNumber, revision: f.updatedAt || null, editing,
+      ...(editing ? { selectedStores, additionalStores: additionalStores.length ? [{ id: '', location: w.addStore }, ...additionalStores] : [] } : {}),
+      imageDisplayUrl: p && p.imageDisplayUrl || '', status, canResume, pauseTo: (f.savedStatus || f.status) === 'paused' ? 'active' : 'paused',
       selected: f.market === page.market && f.partNumber === page.part && stores.includes(page.store), language: f.language === 'en' ? 'en' : 'zh-CN' };
   });
   const target = rows.find(row => row.selected), product = page.selectedProduct;
@@ -83,7 +96,11 @@ function watchView(page, site, ready, eligiblePlan) {
   else if (target && !service && site.monitorStale === false && Number.isFinite(site.monitorIntervalMs) && site.monitorIntervalMs > 60000) {
     service = w.interval.replace('{n}', Math.ceil(site.monitorIntervalMs / 6000) / 10);
   }
+  const sameConfiguration = rows.find(row => row.market === page.market && row.partNumber === page.part);
   return { w, watchRows: rows, targetWatch: target || null, watchBusy: !!page.watchToken, watchLoaded: !!list,
+    watchEditing: list?.watchEditing === true, editLanguages: [w.zh, w.en], canEditLanguage: !!member,
+    watchFeedbackId: rows.some(row => row.id === page.watchFeedbackId) ? page.watchFeedbackId : '',
+    watchLabel: sameConfiguration ? w.addHere : w.watch,
     showWatch: !!(member && canWatch), membershipLink: !!(ready && !member && canWatch),
     watchEnabled: !!(ready && member && list && canWatch && !target && !page.watchToken), watchService: service,
     watchError: ready && w[page.watchError] || '', watchMessage: ready && !(service === w.savedStopped && page.watchMessage === 'saved') && w[page.watchMessage] || '',
@@ -111,7 +128,31 @@ const methods = {
   },
   onWatch() {
     if (!this.data.watchEnabled) return;
-    return this.writeWatch('market.watch', { ...this.payload(), language: this.lang });
+    const target = this.payload();
+    const existing = this.data.watchRows.find(row => row.market === target.market && row.partNumber === target.partNumber);
+    return this.writeWatch('market.watch', { ...target, language: this.lang, ...(existing && this.data.watchEditing ? { expectedUpdatedAt: existing.revision } : {}) });
+  },
+  onManageWatch(e) {
+    const id = e.currentTarget.dataset.id;
+    if (!this.visible || !this.isAccount() || !this.data.watchEditing || this.watchToken || !this.data.watchRows.some(row => row.id === id)) return;
+    this.editingWatch = this.editingWatch === id ? null : id;
+    this.paint();
+  },
+  onEditWatch(e) {
+    const { id, field, store } = e.currentTarget.dataset;
+    const row = this.data.watchRows.find(item => item.id === id && item.editing);
+    if (!row || !this.data.watchEditing || !this.visible || !this.accountReady || !this.isAccount() || this.watchToken || this.data.networkOffline) return;
+    const expectedUpdatedAt = row.revision;
+    if (field === 'add') {
+      const choice = row.additionalStores[Number(e.detail.value)];
+      if (choice?.id) return this.writeWatch('market.watch', { market: row.market, partNumber: row.partNumber, storeNumbers: [choice.id], language: row.language, expectedUpdatedAt });
+    } else if (field === 'language' && this.data.canEditLanguage) {
+      const language = ['zh-CN', 'en'][Number(e.detail.value)];
+      if (language && language !== row.language) return this.writeWatch('market.editWatch', { followId: id, language, expectedUpdatedAt });
+    } else if (field === 'remove' && row.selectedStores.length > 1) {
+      const selected = row.selectedStores.find(item => item.id === store);
+      if (selected) this.confirmWatchChange(row, this.data.w.removeStoreTitle, selected.label, this.data.w.removeStore, 'market.editWatch', { removeStore: store });
+    }
   },
   onViewMembership() { if (this.visible && this.data.membershipLink) switchToTab({ url: '/pages/mine/index' }); },
   onSelectWatch(e) {
@@ -127,21 +168,27 @@ const methods = {
     const { id, status } = e.currentTarget.dataset;
     const row = this.data.watchRows.find(row => row.id === id);
     if (!row || this.watchToken || !this.accountReady || !this.visible || !this.isAccount()) return;
-    if (status === row.pauseTo && (status === 'paused' || row.canResume)) return this.writeWatch('market.watchStatus', { followId: id, status });
-    if (status !== 'removed' || this.watchConfirmation) return;
+    if (status === row.pauseTo && (status === 'paused' || row.canResume)) return this.writeWatch('market.watchStatus', { followId: id, status, ...(this.data.watchEditing ? { expectedUpdatedAt: row.revision } : {}) });
+    if (status === 'removed') this.confirmWatchChange(row, this.data.w.removeTitle, row.stores, this.data.w.remove, 'market.watchStatus', { status });
+  },
+  confirmWatchChange(row, title, stores, confirmText, action, payload) {
+    if (this.watchConfirmation) return;
     const owner = this.owner, token = {};
     this.watchConfirmation = token;
-    languageUI.modal({ title: this.data.w.removeTitle, content: [row.name, row.product, row.stores].join(' · '), confirmText: this.data.w.remove,
+    languageUI.modal({ title, content: [row.name, row.product, stores].join(' · '), confirmText,
       cancelText: this.data.w.cancel, success: res => {
         if (this.watchConfirmation !== token) return;
         this.watchConfirmation = null;
-        if (res.confirm && this.visible && this.isAccount(owner) && this.data.watchRows.some(r => r.id === id)) this.writeWatch('market.watchStatus', { followId: id, status });
+        if (res.confirm && this.visible && this.isAccount(owner) && this.data.watchRows.some(r => r.id === row.id))
+          return this.writeWatch(action, { followId: row.id, ...payload, ...(this.data.watchEditing ? { expectedUpdatedAt: row.revision } : {}) });
       }, fail: () => { if (this.watchConfirmation === token) this.watchConfirmation = null; } });
   },
   async writeWatch(action, payload) {
     if (this.watchToken || this.pageRetired || !this.visible || !this.accountReady || !this.isAccount() || this.data.networkOffline) return;
     const owner = this.owner, scope = this.scope, token = {};
     this.watchToken = token;
+    const editor = this.data.watchRows.find(row => row.editing && row.market === payload.market && row.partNumber === payload.partNumber);
+    this.watchFeedbackId = payload.followId || editor?.id || null;
     this.watchError = this.watchMessage = '';
     this.watchRead = (this.watchRead || 0) + 1;
     this.paint();
@@ -151,10 +198,13 @@ const methods = {
       const request = call(action, { ...payload, expectedUserKey: owner });
       const response = await (changesSlots ? trackFollowCountWrite(owner, request) : request);
       if (!response || !response.follow || !response.follow.followId) throw Error('Invalid receipt');
-      if (!this.pageRetired && this.isAccount(owner) && this.scope === scope && action === 'market.watch') this.watchMessage = 'saved';
+      if (!this.pageRetired && this.isAccount(owner) && this.scope === scope) {
+        if (action === 'market.watch') this.watchMessage = 'saved';
+        if (action === 'market.editWatch') this.watchMessage = 'edited';
+      }
     } catch (error) {
       const key = { member_required: 'membership', market_watch_plan_required: 'membership', too_many_follows: 'limit', too_many_stores: 'storesLimit',
-        plan_limit: 'limit', market_monitoring_disabled: 'stopped', market_disabled: 'disabled' }[error.code];
+        plan_limit: 'limit', market_monitoring_disabled: 'stopped', market_disabled: 'disabled', watch_changed: 'changed', unknown_follow: 'changed', last_watch_store: 'lastStore' }[error.code];
       if (!this.pageRetired && this.isAccount(owner) && this.scope === scope) this.watchMessage = key || 'unavailable';
     } finally {
       if (this.watchToken === token && this.isAccount(owner) && !this.pageRetired) {
@@ -163,8 +213,12 @@ const methods = {
         await this.loadWatches();
         if (this.watchToken === token) {
           this.watchToken = null;
-          if (action === 'market.watch' && this.scope === scope && this.isAccount(owner) && this.data.targetWatch && this.watchMessage === 'unavailable') {
-            this.watchMessage = 'saved';
+          if (this.scope === scope && this.watchMessage === 'unavailable') {
+            const rows = this.watchList?.follows || [];
+            if (action === 'market.watch' && rows.some(row => row.market === payload.market && row.partNumber === payload.partNumber
+              && payload.storeNumbers.every(store => row.storeNumbers.includes(store)))) this.watchMessage = 'saved';
+            const row = rows.find(item => item.followId === payload.followId);
+            if (action === 'market.editWatch' && row && (payload.language ? row.language === payload.language : !row.storeNumbers.includes(payload.removeStore))) this.watchMessage = 'edited';
           }
         }
         this.paint();
@@ -175,7 +229,7 @@ const methods = {
     const id = this.data.alertTemplate, owner = this.owner, scope = this.scope;
     if (!this.visible || !this.accountReady || !id || !this.isAccount(owner) || this.watchToken) return;
     const token = {};
-    this.watchToken = token; this.watchMessage = '';
+    this.watchToken = token; this.watchMessage = ''; this.watchFeedbackId = null;
     this.paint();
     try {
       const result = await requestReminderAuthorization([id]);

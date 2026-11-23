@@ -1,3 +1,4 @@
+import { registeredPages } from './lib/mini-packages.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -42,7 +43,7 @@ for (const file of files) {
   }
 }
 const app = JSON.parse(fs.readFileSync(path.join(root, 'miniprogram/app.json'), 'utf8'));
-for (const page of app.pages) for (const ext of ['.js', '.json', '.wxml', '.wxss']) {
+for (const page of registeredPages(app)) for (const ext of ['.js', '.json', '.wxml', '.wxss']) {
   if (!fs.existsSync(path.join(root, 'miniprogram', `${page}${ext}`))) errors.push(`Missing page resource ${page}${ext}`);
 }
 const adminRoot = path.join(root, 'tools/admin-miniprogram/miniprogram');
@@ -50,5 +51,5 @@ const adminApp = JSON.parse(fs.readFileSync(path.join(adminRoot, 'app.json'), 'u
 for (const page of adminApp.pages) for (const ext of ['.js', '.json', '.wxml', '.wxss']) {
   if (!fs.existsSync(path.join(adminRoot, `${page}${ext}`))) errors.push(`Missing operator page resource ${page}${ext}`);
 }
-console.log(JSON.stringify({ files: files.length, javaScript: jsCount, json: jsonCount, pages: app.pages.length, operatorPages: adminApp.pages.length, errors }, null, 2));
+console.log(JSON.stringify({ files: files.length, javaScript: jsCount, json: jsonCount, pages: registeredPages(app).length, operatorPages: adminApp.pages.length, errors }, null, 2));
 if (errors.length) process.exitCode = 1;

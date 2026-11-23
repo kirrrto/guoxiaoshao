@@ -35,6 +35,7 @@
 .market-watch-copy { flex: 1; display: flex; flex-direction: column; min-width: 0; }
 .market-watch-title { font-size: var(--fs-body); font-weight: 600; }
 .market-watch-actions { margin-top: var(--sp-8); }
+.market-watch-editor { margin-top: var(--sp-8); border-top: 1px solid var(--line); }
 @media (min-width: 900px) {
   .markets-workspace { display: grid; grid-template-columns: minmax(300px, 0.85fr) minmax(0, 1.5fr); gap: var(--sp-24); align-items: start; }
   .markets-result--empty { display: block; }

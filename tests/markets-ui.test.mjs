@@ -52,7 +52,7 @@ test('regional page loads directory on demand and maps model/finish/storage/stor
   assert.equal(call.payload.storeNumbers[0], MARKETS[1].stores[1].storeNumber);
   assert.equal(call.payload.expectedUserKey, 'Alice'); assert.equal(call.payload.maxCost, 0);
   assert.equal(page.data.receipt.status, '可自提');
-  page.onLanguage(); assert.equal(page.data.receipt.status, 'Available for pickup');
+  rt.load('utils/language.js').setLanguage('en'); assert.equal(page.data.receipt.status, 'Available for pickup');
   assert.equal(rt.storage.get('gxs_markets_region_v1'), 'TW');
   assert.equal(rt.storage.get('gxs_ui_language_v1'), 'en');
 });
@@ -85,7 +85,7 @@ test('the editor, receipt and saved watch share exact local artwork; a late imag
   page.onProductImageError(tap({ src: black }));
   assert.equal(page.data.product.imageDisplayUrl, otherFinish);
   assert.equal(page.data.watchRows[0].imageDisplayUrl, '');
-  page.onLanguage(); page.onMarket(tap({ market: 'TW' })); selectModelFinish('iPhone 18 Pro','黑色');
+  rt.load('utils/language.js').setLanguage('en'); page.onMarket(tap({ market: 'TW' })); selectModelFinish('iPhone 18 Pro','黑色');
   assert.equal(page.data.product.imageDisplayUrl, '');
   assert.ok(page.data.product.label && page.data.canQuery);
   assert.equal(rt.calls.filter(c => c.action === 'market.pickup').length, 0);
@@ -130,7 +130,7 @@ test('member can watch before querying and independently pause, resume or remove
     'market.watch': (p,s) => { const follow = { ...p, followId: 'f1', status:'active', savedStatus:'active' }; s.rows.push(follow); return {follow}; },
     'market.watchStatus': (p,s) => { const f = s.rows[0]; f.savedStatus = f.status = p.status; return {follow:f}; },
   });
-  page.onLanguage(); await page.onWatch();
+  rt.load('utils/language.js').setLanguage('en'); await page.onWatch();
   assert.equal(page.data.watchRows.length,1); assert.equal(page.data.targetLanguage,'English');
   assert.equal(page.data.watchService,'English WeChat alerts are not yet available.');
   assert.equal(page.data.alertTemplate,'');
@@ -200,6 +200,37 @@ test('monthly and annual customers manually check all three regions through the 
     assert.equal(rt.calls.some(row => ['market.watch', 'notify.recordSubscription', 'quota.signin'].includes(row.action)), false);
     page.onUnload();
   }
+});
+
+test('a slow bootstrap cannot hide a charged regional receipt or its notification', async t => {
+  t.mock.timers.enable({ apis: ['Date'], now: Date.parse('2027-01-20T00:00:00Z') });
+  const site = MARKETS[1], product = site.products[0], store = site.stores[0];
+  let offset = 0;
+  const observedAt = () => new Date(Date.now() + offset).toISOString();
+  const { page, rt } = await setup({
+    'user.bootstrap': () => {
+      const serverTime = new Date().toISOString();
+      t.mock.timers.tick(7000);
+      return { identity: { userKey: 'Alice' }, serverTime, membership: { active: false },
+        quota: { balance: 1, revision: 1 }, notifications: {}, subscriptions: {} };
+    },
+    'market.pickup': p => receipt(p, { charged: 1, balance: 0, quotaRevision: 2, results: [{
+      market: p.market, partNumber: p.partNumber, storeNumber: p.storeNumbers[0], status: 'available', observedAt: observedAt(),
+    }] }),
+    'notify.detail': () => ({ notification: { market: site.code, storeNumber: store.storeNumber, partNumber: product.partNumber,
+      detectedAt: observedAt(), eventId: 'alert1' } }),
+    'notify.open': () => ({}),
+  }, { eid: 'alert1', market: site.code, partNumber: product.partNumber, storeNumber: store.storeNumber });
+  const openedAlert = Boolean(page.data.alertTime);
+  await page.onQuery();
+  assert.deepEqual({ openedAlert, status: page.data.receipt?.status, balance: rt.app.globalData.bootstrap.quota.balance },
+    { openedAlert: true, status: '可自提', balance: 0 });
+  assert.equal(page.data.receipt.previous, false);
+  assert.equal(rt.calls.filter(call => call.action === 'market.pickup').length, 1);
+  offset = 600000;
+  await page.openAlert('alert1');
+  assert.equal(page.data.alertMissing, true);
+  page.onUnload();
 });
 
 test('a paid grant is scoped to its regions, account and server-time expiry, including an uncertain in-flight result', async t => {
@@ -306,7 +337,7 @@ test('monthly and annual members can save, pause, and resume across three closed
     }
     assert.equal(rt.calls.filter(c => c.action === 'market.watch').length, 3);
     assert.equal(rt.calls.filter(c => c.action === 'market.pickup' || c.action === 'notify.recordSubscription').length, 0);
-    page.onLanguage(); assert.equal(page.data.targetWatch.status, 'Watch saved. Monitoring is not active in this region.');
+    rt.load('utils/language.js').setLanguage('en'); assert.equal(page.data.targetWatch.status, 'Watch saved. Monitoring is not active in this region.');
   }
 });
 
@@ -428,7 +459,7 @@ test('a late receipt for a different WeChat user cannot update a watch or debit 
 });
 
 test('regional labels and the current station cadence follow the selected market and page language', async () => {
-  const { page, state, handlers } = await setup();
+  const { page, state, handlers, rt } = await setup();
   const catalog = handlers['market.catalog'];
   handlers['market.catalog'] = () => ({ markets: catalog().markets.map(row => ({...row, monitorStale:false,
     monitorIntervalMs: row.code === 'JP' ? 120000 : 60000 })) });
@@ -440,7 +471,7 @@ test('regional labels and the current station cadence follow the selected market
   page.onMarket(tap({market:'JP'}));
   await page.onPullDownRefresh();
   assert.equal(page.data.c.title,'其他站点');assert.equal(page.data.c.sites,'选择地区');
-  assert.match(page.data.watchService,/2 分钟/);page.onLanguage();assert.equal(page.data.c.title,'Regional stores');
+  assert.match(page.data.watchService,/2 分钟/);rt.load('utils/language.js').setLanguage('en');assert.equal(page.data.c.title,'Regional stores');
   assert.match(page.data.watchService,/2 minutes/);page.onMarket(tap({market:'TW'}));assert.equal(page.data.watchService,'');
   handlers['market.catalog'] = () => ({markets:catalog().markets.map(m=>({...m,monitorStale:true,monitorIntervalMs:180000}))});
   await page.onPullDownRefresh();assert.match(page.data.watchService,/unconfirmed/);assert.doesNotMatch(page.data.watchService,/minutes/);
@@ -478,7 +509,7 @@ test('regional check-in uses the shared daily quota, renders the account-confirm
   assert.equal(page.data.signinMessage,'签到成功，增加 1 次查询');assert.equal(page.data.canQuery,true);
   assert.equal(page.data.showSignin,false);assert.equal(page.data.maxCost,1);
   assert.equal(rt.app.globalData.bootstrap.quota.balance,1);
-  page.onLanguage();assert.equal(page.data.signinMessage,'Checked in · Credits added: 1');
+  rt.load('utils/language.js').setLanguage('en');assert.equal(page.data.signinMessage,'Checked in · Credits added: 1');
   await page.onQuery();assert.equal(rt.calls.find(c=>c.action==='market.pickup').payload.maxCost,1);
 });
 
@@ -526,7 +557,7 @@ test('mixed categories keep regional IDs and real variants while reference-only 
   const chooseCategory=code=>choice('category',page.data.categories.findIndex(row=>row.id===code));
   chooseCategory('mac');assert.equal(page.data.product.modelLabel,'Mac 测试机型');assert.equal(page.data.colors.length,0);assert.equal(page.data.capacities.length,0);
   assert.deepEqual(Array.from(page.data.variants,x=>x.id),['LOCAL-A','LOCAL-B']);
-  choice('variant',1);assert.equal(page.data.product.id,'LOCAL-B');page.onLanguage();
+  choice('variant',1);assert.equal(page.data.product.id,'LOCAL-B');rt.load('utils/language.js').setLanguage('en');
   assert.equal(page.data.variants[1].label,'24GB memory');
   assert.equal(page.data.modelLabels[page.data.modelIndex],'Mac test model');assert.equal(page.data.product.modelLabel,'Mac test model');
   await page.onQuery();assert.equal(rt.calls.find(c=>c.action==='market.pickup').payload.partNumber,'LOCAL-B');
@@ -582,7 +613,7 @@ test('every published regional configuration is reachable and distinguishable in
     return index;
   };
   for (const lang of ['zh-CN','en']) {
-    if (page.data.lang !== lang) page.onLanguage();
+    if (page.data.lang !== lang) rt.load('utils/language.js').setLanguage(lang);
     for (const site of MARKETS) {
       page.onMarket(tap({market:site.code}));
       assert.equal(page.data.categories.length,7);
@@ -649,7 +680,7 @@ test('switching Japan–Hong Kong keeps the verified iPad configuration, resets 
   page.onMarket(tap({market:'HK'}));
   assert.equal(page.part,hongKong.partNumber);assert.equal(page.store,hk.stores[0].storeNumber);
   assert.equal(page.data.receipt,null);assert.equal(page.data.billingText,'');assert.equal(page.data.selectionNotice,'');
-  page.onLanguage();page.onMarket(tap({market:'JP'}));
+  rt.load('utils/language.js').setLanguage('en');page.onMarket(tap({market:'JP'}));
   assert.equal(page.part,target.partNumber);assert.equal(page.store,jp.stores[0].storeNumber);
   assert.equal(rt.calls.filter(call=>call.action==='market.pickup').length,1);
   assert.equal(rt.calls.filter(call=>call.action==='market.watch').length,0);
@@ -667,7 +698,7 @@ test('a region with different or ambiguous Mac options retains the model or cate
   const {page,rt}=await setup({'market.catalog':()=>({markets})});
   page.onMarket(tap({market:'TW'}));
   assert.equal(page.part,'T1');assert.equal(page.data.product.model,'Mac mini');assert.ok(page.data.selectionNotice);
-  page.onLanguage();assert.match(page.data.selectionNotice,/local configuration/);
+  rt.load('utils/language.js').setLanguage('en');assert.match(page.data.selectionNotice,/local configuration/);
   page.onMarket(tap({market:'HK'}));
   assert.equal(page.data.product.category,'mac');assert.equal(page.data.product.model,'Mac Studio');assert.ok(page.data.selectionNotice);
   page.launchTarget={market:'TW',partNumber:'T2',storeNumber:tw.stores.at(-1).storeNumber};await page.onShow();
@@ -688,8 +719,53 @@ test('an active administrator test account can check a new release and watch wit
   assert.equal(page.data.watchEnabled, true);
   assert.equal(page.data.membershipLink, false);
   assert.equal(page.data.costText, '库存查询不扣次数');
-  page.onLanguage();
+  rt.load('utils/language.js').setLanguage('en');
   assert.equal(page.data.costText, 'No credits needed for stock checks');
   await page.onQuery();
   assert.equal(rt.calls.find(c => c.action === 'market.pickup').payload.maxCost, 0);
+});
+
+test('the regional watch editor adds and removes individual stores and changes only that watch’s alert language', async () => {
+  const cloud = createFixture({ start: new Date().toISOString() });
+  await cloud.call('user.bootstrap');
+  await cloud.repo.updateUser(userKeyOf(), { membership: marketMembership(cloud.state.now, 'member_30d') });
+  let loseEdit = false;
+  const rt = runtime(async (action, payload) => {
+    const result = await cloud.call(action, payload);
+    if (!result.ok) throw Object.assign(Error(result.error.message), result.error);
+    if (action === 'market.editWatch' && loseEdit) throw Error('lost reply');
+    return result.data;
+  });
+  const page = rt.instance('pages/markets/index.js');
+  page.onLoad({ market: 'HK' }); await page.onShow();
+  await page.onWatch();
+  const id = page.data.targetWatch.id;
+  page.onManageWatch(tap({ id }));
+  const row = () => page.data.watchRows.find(item => item.id === id);
+  const edit = (field, value, store) => page.onEditWatch({ ...tap({ id, field, store }), detail: { value } });
+  assert.equal(row().editing, true);
+  const firstStore = row().selectedStores[0].id, second = row().additionalStores[1].id;
+  await edit('add', 0);
+  assert.equal(row().selectedStores.length, 1);
+  await edit('add', 1);
+  assert.ok(row().selectedStores.some(s => s.id === second));
+  loseEdit = true;
+  await edit('language', 1);
+  assert.equal(row().language, 'en');
+  assert.equal(page.data.lang, 'zh-CN');
+  assert.equal(page.data.targetLanguage, '英语');
+  assert.equal(page.data.watchMessage, '关注已更新');
+  loseEdit = false;
+  edit('remove', null, firstStore);
+  await rt.messages.at(-1).success({ confirm: false });
+  assert.equal(row().selectedStores.length, 2);
+  edit('remove', null, firstStore);
+  await rt.messages.at(-1).success({ confirm: true });
+  assert.deepEqual(Array.from(row().selectedStores, s => s.id), [second]);
+  assert.equal(page.data.watchLabel, '将此门店加入关注');
+  assert.equal(page.data.watchRows.length, 1);
+  assert.equal(rt.calls.some(c => ['market.pickup', 'notify.recordSubscription'].includes(c.action)), false);
+  page.onHide();
+  assert.equal(page.editingWatch, null);
+  page.onUnload();
 });

@@ -1,4 +1,8 @@
 module.exports = {
+  '其他站点查询与关注': 'Regional stock checks and watches',
+  '弱网下查询日本、台湾和香港门店，也能看到本次查询的有效结果。': 'You can now see valid pickup results for Japan, Taiwan and Hong Kong even on a slow connection.',
+  '同一配置可逐店管理关注，也可更改该配置的提醒语言。': 'Manage individual stores in a watch and change its alert language.',
+  '英文到货提醒会优先显示可辨认的商品与门店名称。': 'English restock alerts show recognizable product and store names.',
   '站点关注与每日签到': 'Regional watches and daily check-in',
   '版本记录 · 2026-11-24': 'Version record · 2026-11-24',
   '月卡、年卡可免扣次查询日本、台湾和香港的门店库存，也可直接关注。': 'Monthly and annual passes include stock checks in Japan, Taiwan and Hong Kong at no credit cost. You can also watch a store.',

@@ -54,7 +54,68 @@ async function setup(market, mode, response = () => ({ display: 'available' })) 
   return { f, parts, store, owners, add, change, collector, upstream, tick };
 }
 
+test('an exhausted regional budget needs no follow or user reads and cannot take a half-open probe', async () => {
+  const f = createFixture({ config: { collector: { enabled: true }, internationalMonitoring: { TW: true } } });
+  const now = f.state.now.toISOString(), table = f.repo.tables.get(C.config);
+  const budgetId = 'market_TW_collector_budget_' + dayKey(now);
+  const breaker = { _id: 'market_TW_upstream_breaker', until: Date.parse(now) - 1, generation: 2, trips: 1 };
+  table.set(breaker._id, breaker);
+  for (const [dayCount, minuteCount, reason] of [[6, 6, 'minute_budget'], [8, 1, 'auto_budget_reserved'], [10, 2, 'daily_budget']]) {
+    const counters = { _id: budgetId, dayCount, autoCount: dayCount, minuteCount, minuteKey: now.slice(0, 16) };
+    table.set(budgetId, counters);
+    const result = await f.repo.consumeCollectorBudget({ now, source: 'auto', market: 'TW', budgetMode: 'daily',
+      maxRequestsPerMinute: 6, maxRequestsPerDay: 10, selectWatchedParts: () => assert.fail('read watch documents after a hard limit') });
+    assert.equal(result.reason, reason);
+    assert.deepEqual(table.get(budgetId), counters);
+    assert.deepEqual(table.get(breaker._id), breaker);
+  }
+});
+
+test('continuous throttling checks one live witness for fairness; actual admission still checks every part', async () => {
+  const { f, parts, owners, add, collector, upstream, tick } = await setup('CN', 'resident');
+  await add(parts[0], owners[0]); await add(parts[1], owners[1]);
+  const cfg = await f.repo.getConfig();
+  await f.repo.saveConfig({ ...cfg, collector: { ...cfg.collector, maxRequestsPerMinute: 1, budgetMode: 'continuous' } });
+  await collector.refreshTargets();
+  const now = f.state.now.toISOString(), table = f.repo.tables.get(C.config);
+  const budgetId = 'collector_budget_' + dayKey(now);
+  table.set(budgetId, { _id: budgetId, dayCount: 1, minuteCount: 1, minuteKey: now.slice(0, 16) });
+  const read = [], admit = f.repo.consumeCollectorBudget.bind(f.repo);
+  f.repo.consumeCollectorBudget = args => admit({ ...args, selectWatchedParts: (tx, ...rest) => args.selectWatchedParts({
+    ...tx, get: (collection, id) => { read.push(collection); return tx.get(collection, id); },
+  }, ...rest) });
+  await tick();
+  assert.deepEqual(read, [C.follows, C.users]);
+  assert.equal(upstream.calls.length, 0);
+  assert.equal(table.get('upstream_capacity').lastDemandAt.auto, Date.parse(now));
+  f.advance(120000); read.length = 0;
+  await tick();
+  assert.deepEqual(read.sort(), [C.follows, C.follows, C.users, C.users].sort());
+  assert.deepEqual(upstream.calls.map(call => call.parts.sort()), [[...parts].sort()]);
+});
+
 for (const [market, mode] of [['CN','resident'], ['TW','scheduled']]) {
+  test(market + ' a sole watcher whose membership expires during the final database reads cannot trigger pickup', async () => {
+    const { f, parts, add, collector, upstream, tick } = await setup(market, mode);
+    await add(parts[0]);
+    await f.repo.updateUser(userKeyOf(), { membership: marketMembership(f.state.now, 'member_30d', 5) });
+    await collector.refreshTargets();
+    const admit = f.repo.consumeCollectorBudget.bind(f.repo);
+    let userRead = false;
+    f.repo.consumeCollectorBudget = args => admit({ ...args, selectWatchedParts: (tx, ...rest) => args.selectWatchedParts({
+      ...tx, get: async (collection, id) => {
+        const row = await tx.get(collection, id);
+        if (!userRead && collection === C.users) { userRead = true; f.advance(5); }
+        return row;
+      },
+    }, ...rest) });
+    await tick();
+    assert.equal(userRead, true);
+    assert.equal(upstream.calls.length, 0);
+    const prefix = market === 'CN' ? '' : 'market_' + market + '_';
+    assert.equal(f.repo.tables.get(C.config).has(prefix + 'collector_budget_' + dayKey(f.state.now)), false);
+  });
+
   test(market + ' rechecks each watched SKU after admission and never polls a paused or removed last watch', async () => {
     const { f, parts, store, add, change, collector, upstream, tick } = await setup(market, mode);
     const removed = await add(parts[0]), paused = await add(parts[1]);

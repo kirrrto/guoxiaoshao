@@ -97,7 +97,7 @@ function createWechatSender({ appid, appSecret, expectedAppid, fetchImpl = globa
     }
   }
 
-  const send = async (message, { timeoutMs: requestedTimeout = timeoutMs, deadlineAt = Infinity } = {}) => {
+  const send = async (message, { timeoutMs: requestedTimeout = timeoutMs, deadlineAt = Infinity, afterTokenRefresh } = {}) => {
     if (disabledReason) throw notSent(disabledReason);
     if (message.appid !== appid) throw notSent('consumer_appid_mismatch');
     const boundedTimeout = Math.max(1, Math.min(timeoutMs, Number.isFinite(requestedTimeout) ? Math.floor(requestedTimeout) : timeoutMs));
@@ -105,7 +105,21 @@ function createWechatSender({ appid, appSecret, expectedAppid, fetchImpl = globa
     const deadline = Math.min(startedAt + boundedTimeout, deadlineAt);
     const tokenTimeout = Math.floor(deadline - startedAt);
     if (tokenTimeout < 1) throw notSent('wechat_send_deadline');
-    const accessToken = await getToken(tokenTimeout);
+    const cachedToken = startedAt < tokenExpiresAt ? token : null;
+    const accessToken = cachedToken || await getToken(tokenTimeout);
+    if (!cachedToken && afterTokenRefresh) {
+      const remaining = Math.floor(deadline - clock().getTime());
+      if (remaining < 1) throw notSent('wechat_send_deadline');
+      let timer, ready;
+      try {
+        ready = await Promise.race([afterTokenRefresh(), new Promise((_, reject) => {
+          timer = setTimeout(() => reject(notSent('wechat_send_deadline')), remaining);
+        })]);
+      } catch (error) {
+        throw notSent(error?.code === 'wechat_send_deadline' ? 'wechat_send_deadline' : 'wechat_preflight_unavailable');
+      } finally { clearTimeout(timer); }
+      if (!ready) throw notSent('wechat_preflight_cancelled');
+    }
     const messageTimeout = Math.floor(deadline - clock().getTime());
     if (messageTimeout < 1) throw notSent('wechat_send_deadline');
     try {

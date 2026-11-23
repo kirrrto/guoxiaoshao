@@ -6,8 +6,8 @@ const MARKETS = ['JP', 'TW', 'HK'];
 const CATEGORY_NAMES = { iphone: 'iPhone', ipad: 'iPad', mac: 'Mac', watch: 'Apple Watch', airpods: 'AirPods', vision: 'Apple Vision Pro', homepod: 'HomePod' };
 const COPY = {
   'zh-CN': {
-    title: '其他站点', language: 'English', languageLabel: 'Switch the app to English',
-    sites: '选择地区', configuration: '商品配置', model: '机型', color: '颜色', capacity: '容量', store: 'Apple 直营店', results: '门店自提',
+    title: '其他站点',
+    sites: '选择地区', model: '机型', color: '颜色', capacity: '容量', store: 'Apple 直营店', results: '门店自提',
     category: '产品类别', variant: '具体配置', reference: '此配置尚未确认当地货号，暂不支持库存查询或关注。',
     regionChanged: '已换至本站配置，请核对规格与门店。',
     watchCase: '需在 Apple 选定表壳和表带后才能确定整表货号。此处仅展示表壳，暂不支持查询或关注。',
@@ -33,8 +33,8 @@ const COPY = {
     noDebit: '本次未扣次', charged: '使用 {charged} 次', refreshed: '刷新站点',
   },
   en: {
-    title: 'Regional stores', language: '简体中文', languageLabel: '将小程序切换为简体中文',
-    sites: 'Choose a region', configuration: 'Configuration', model: 'Model', color: 'Finish', capacity: 'Storage', store: 'Apple Store', results: 'Store pickup',
+    title: 'Regional stores',
+    sites: 'Choose a region', model: 'Model', color: 'Finish', capacity: 'Storage', store: 'Apple Store', results: 'Store pickup',
     category: 'Category', variant: 'Configuration options', reference: 'A local part number has yet to be confirmed. Stock checks and watches are unavailable.',
     regionChanged: 'A local configuration is selected. Check its specifications and store.',
     watchCase: 'Apple assigns a part number after you select a case and a band. This listing shows the case only, so stock checks and watches are unavailable.',
@@ -186,11 +186,11 @@ function localTime(iso, timeZone) {
   return new Date(stamp + offset * 3600000).toISOString().slice(0, 19).replace('T', ' ') + (offset ? ' UTC+' + offset : ' UTC');
 }
 
-function receiptView(snapshot, store, lang, now = Date.now(), previousOnly = false) {
+function receiptView(snapshot, store, lang, now = Date.now(), previousOnly = false, leadMs = 0) {
   if (!snapshot || !store) return null;
   const { status, observedAt } = snapshot;
   const c = COPY[lang];
-  const previous = previousOnly || snapshot.supersededByFailure || observation(observedAt, now).stale;
+  const previous = previousOnly || snapshot.supersededByFailure || observation(observedAt, now, leadMs).stale;
   return { status: c[status], tone: previous ? 'muted' : status === 'available' ? 'ok' : status === 'pending' ? 'warn' : 'muted',
     time: localTime(observedAt, store.timeZone), timeLabel: previous ? c.previous : c.current,
     previous, store: store.label };

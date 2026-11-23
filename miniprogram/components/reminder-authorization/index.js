@@ -1,4 +1,4 @@
-Component(require('../../utils/language').component({
+Component(require('../../utils/language').component('reminder-authorization', {
   options: { styleIsolation: 'apply-shared' },
   properties: {
     subscription: { type: Object, value: {} }, authorization: { type: Object, value: {} },

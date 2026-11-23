@@ -1,3 +1,4 @@
+import { registeredPages } from '../tools/lib/mini-packages.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -43,7 +44,7 @@ test('retired test cache never replaces real-account recovery IDs or saved resul
 test('upload directory contains neither the retired page nor a sandbox execution path', () => {
   const mini=new URL('../miniprogram/',import.meta.url);
   const app=JSON.parse(fs.readFileSync(new URL('app.json',mini),'utf8'));
-  assert.equal(app.pages.some(p=>p.includes('acceptance')),false);
+  assert.equal(registeredPages(app).some(p=>p.includes('acceptance')),false);
   assert.equal(fs.existsSync(new URL('utils/acceptance.js',mini)),false);
   for(const ext of ['js','json','wxml','wxss']) assert.equal(fs.existsSync(new URL(`pages/acceptance/index.${ext}`,mini)),false);
   for(const file of fs.readdirSync(mini,{recursive:true}).filter(p=>/\.(js|wxml)$/.test(p))) {

@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import { createRequire } from 'node:module';
+import { packageRoot } from '../lib/mini-packages.mjs';
 import { boundedGet, sleep } from '../catalog/lib/http.mjs';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const require = createRequire(import.meta.url), args = process.argv.slice(2);
@@ -76,15 +77,16 @@ if (args.includes('--check')) {
     if (!asset || asset.source !== product.imageUrl || !asset.card) throw Error(`missing_thumbnail:${product.partNumber}`);
     if (!knownPaths.has(asset.card) || (asset.poster && !knownPaths.has(asset.poster))) throw Error(`unverified_thumbnail_path:${product.partNumber}`);
   }
-  const packageBytes = async directory => (await Promise.all((await readdir(directory, { withFileTypes: true })).map(async entry => entry.isDirectory() ? packageBytes(resolve(directory, entry.name)) : (await stat(resolve(directory, entry.name))).size))).reduce((sum, bytes) => sum + bytes, 0);
-  const packagedWebp = (await readdir(resolve(root, 'miniprogram'), { recursive: true })).filter(file => /\.webp$/i.test(file));
-  if (packagedWebp.length) throw Error(`packaged_webp:${packagedWebp[0]}`);
-  const mainPackageRawBytes = await packageBytes(resolve(root, 'miniprogram'));
-  if (mainPackageRawBytes > policy.mainPackageMaxBytes) throw Error(`main_package_budget:${mainPackageRawBytes}`);
-  let imageBytes = 0;
+  const app = JSON.parse(await readFile(resolve(root, 'miniprogram/app.json'), 'utf8'));
+  let imageBytes = 0, mainPackageRawBytes = 0;
   for (const file of await readdir(resolve(root, 'miniprogram'), { recursive: true })) {
-    if (/\.(?:png|jpg|jpeg|gif|svg)$/i.test(file)) imageBytes += (await stat(resolve(root, 'miniprogram', file))).size;
+    const item = await stat(resolve(root, 'miniprogram', file));
+    if (!item.isFile()) continue;
+    if (/\.webp$/i.test(file)) throw Error(`packaged_webp:${file}`);
+    if (!packageRoot(app, file.replaceAll('\\', '/'))) mainPackageRawBytes += item.size;
+    if (/\.(?:png|jpg|jpeg|gif|svg)$/i.test(file)) imageBytes += item.size;
   }
+  if (mainPackageRawBytes > policy.mainPackageMaxBytes) throw Error(`main_package_budget:${mainPackageRawBytes}`);
   if (imageBytes > policy.imageMaxBytes) throw Error(`image_package_budget:${imageBytes}`);
   console.log(JSON.stringify({ checked: manifest.assets.length, verifiedPackageRenditions: knownPaths.size, skus: Object.keys(mapping.byPart).length, totalBytes, mainPackageRawBytes }));
 } else {

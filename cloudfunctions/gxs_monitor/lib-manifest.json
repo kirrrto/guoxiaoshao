@@ -53,8 +53,8 @@
     },
     {
       "path": "engine/collector.js",
-      "bytes": 35144,
-      "sha256": "50d8157fa71ac96f5b6bc5f2bd4d35470422ccee1b05be184eb4bae33be7d5ea"
+      "bytes": 35742,
+      "sha256": "99c0c506fc1da1f0e19556e5b444b23dbce8788eb4aa0d425e402d2579dc20af"
     },
     {
       "path": "engine/current-availability.js",
@@ -88,8 +88,8 @@
     },
     {
       "path": "engine/notifier.js",
-      "bytes": 21042,
-      "sha256": "9887947d497fccf2042ca3be8cf40389e425c09870adfde5c3204e1058483da7"
+      "bytes": 23054,
+      "sha256": "41a710120bf852420b8111127b67fdf390cfa539248819d4112445f67b493770"
     },
     {
       "path": "engine/observation-day.js",
@@ -123,8 +123,8 @@
     },
     {
       "path": "engine/wechat-sender.js",
-      "bytes": 7572,
-      "sha256": "e8cd8b1ba10364e43d947d2c44d83320169b2dc18f465620431356206b05c406"
+      "bytes": 8327,
+      "sha256": "fe391f3948f530ffbf27248a67af42b486393060bce21a199dc9dd191b0f5190"
     },
     {
       "path": "errors.js",
@@ -178,8 +178,8 @@
     },
     {
       "path": "repo/atomic-ops.js",
-      "bytes": 59232,
-      "sha256": "a0edbc0255a571e17da121f7df8ed5bbcaec47976ac269126d86d8ab0d465383"
+      "bytes": 61476,
+      "sha256": "0129fe08a4758e533e5499c73958a32b3a471fe2a9e97a66dc30be1fcaebc1a6"
     },
     {
       "path": "repo/cloudbase-repo.js",
@@ -243,8 +243,8 @@
     },
     {
       "path": "repo/upstream-guard.js",
-      "bytes": 11990,
-      "sha256": "83919d6b5a23dc155fbaa24cd914cc0141dfa5f8e8499a424b441d1aa1da221a"
+      "bytes": 12353,
+      "sha256": "126b477f25a5e5c4fd24595fa1f6d85a8d274b0215ed80717016ab7260177d74"
     },
     {
       "path": "rules/access.js",

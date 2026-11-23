@@ -4,7 +4,6 @@
   <view class="page-heading">
     <image class="page-mark" src="/images/brand/logo-mint-144.png" mode="aspectFit" aria-hidden="true" />
     <view class="page-title">{{c.title}}</view>
-    <button class="ui-action ui-action--plain" bindtap="onLanguage" aria-label="{{c.languageLabel}}">{{c.language}}</button>
   </view>
   <view wx:if="{{catalogError}}" class="card" aria-role="alert">
     <view>{{catalogError}}</view>
@@ -22,7 +21,7 @@
           <view wx:if="{{product.imageDisplayUrl}}" class="product-tile market-product-tile market-product-tile--main">
             <image src="{{product.imageDisplayUrl}}" mode="aspectFit" aria-hidden="true" data-src="{{product.imageDisplayUrl}}" binderror="onProductImageError" />
           </view>
-          <view class="market-product-copy"><view class="card-title">{{c.configuration}}</view><text wx:if="{{product.partNumber}}" class="market-local-sku" user-select>{{product.partNumber}}</text></view>
+          <view class="market-product-copy"><view class="card-title">{{product.label}}</view><text wx:if="{{product.partNumber}}" class="market-local-sku" user-select>{{product.partNumber}}</text></view>
         </view>
         <view wx:if="{{selectionNotice}}" class="market-meta mt" aria-role="status">{{selectionNotice}}</view>
         <picker wx:if="{{categories.length > 1}}" mode="selector" range="{{categories}}" range-key="label" value="{{categoryIndex}}" data-field="category" bindchange="onChoice" aria-label="{{c.category + ' ' + categories[categoryIndex].label}}">
@@ -57,7 +56,7 @@
         <view wx:elif="{{!accountReady}}" class="small muted mt" aria-role="status">{{c.accountLoading}}</view>
         <block wx:if="{{accountReady && watchLoaded}}">
           <button wx:if="{{!targetWatch && showWatch}}" class="btn btn-block mt {{!enabled && !pending ? 'btn-primary' : ''}}" disabled="{{!watchEnabled || networkOffline}}" loading="{{watchBusy}}"
-            hover-class="{{!enabled && !pending ? 'btn-primary-pressed' : 'ui-control-pressed'}}" bindtap="onWatch">{{w.watch}}</button>
+            hover-class="{{!enabled && !pending ? 'btn-primary-pressed' : 'ui-control-pressed'}}" bindtap="onWatch">{{watchLabel}}</button>
           <view wx:if="{{watchService}}" class="market-meta mt" aria-live="polite">{{watchService}}</view>
           <button wx:if="{{membershipLink}}" class="ui-action mt" bindtap="onViewMembership">{{w.memberAction}}</button>
           <view wx:if="{{targetWatch}}" class="market-meta mt">{{w.notifyLanguage}} · {{targetLanguage}}</view>
@@ -66,7 +65,7 @@
           <button wx:if="{{allowSettings}}" class="btn btn-block mt" bindtap="onOpenSettings">{{w.settings}}</button>
         </block>
         <view wx:if="{{watchError}}" class="market-retry" aria-role="alert"><text>{{watchError}}</text><button class="ui-action" bindtap="loadWatches">{{w.refreshing}}</button></view>
-        <view wx:if="{{watchMessage}}" class="market-meta mt" aria-live="polite">{{watchMessage}}</view>
+        <view wx:if="{{watchMessage && !watchFeedbackId}}" class="market-meta mt" aria-live="polite">{{watchMessage}}</view>
       </view>
     </view>
     <view class="markets-details">
@@ -109,8 +108,23 @@
           <text class="market-meta">{{item.status}}</text>
           <view class="market-watch-actions">
             <button class="ui-action" disabled="{{watchBusy || networkOffline || (item.pauseTo === 'active' && !item.canResume)}}" data-id="{{item.id}}" data-status="{{item.pauseTo}}" bindtap="onWatchStatus">{{item.pauseTo === 'paused' ? w.pause : w.resume}}</button>
-            <button class="ui-action ui-action--plain" disabled="{{watchBusy || networkOffline}}" data-id="{{item.id}}" data-status="removed" bindtap="onWatchStatus">{{w.remove}}</button>
+            <button wx:if="{{watchEditing}}" class="ui-action" disabled="{{watchBusy}}" data-id="{{item.id}}" aria-expanded="{{item.editing}}" bindtap="onManageWatch">{{item.editing ? w.collapse : w.manage}}</button>
+            <button wx:else class="ui-action ui-action--plain" disabled="{{watchBusy || networkOffline}}" data-id="{{item.id}}" data-status="removed" bindtap="onWatchStatus">{{w.remove}}</button>
           </view>
+          <view wx:if="{{item.editing}}" class="market-watch-editor">
+            <view wx:for="{{item.selectedStores}}" wx:for-item="savedStore" wx:key="id" class="market-field">
+              <text>{{savedStore.label}}</text>
+              <button wx:if="{{item.selectedStores.length > 1}}" class="ui-action ui-action--plain" disabled="{{watchBusy || networkOffline}}" data-id="{{item.id}}" data-store="{{savedStore.id}}" data-field="remove" aria-label="{{w.removeStore + ' ' + savedStore.label}}" bindtap="onEditWatch">{{w.removeStore}}</button>
+            </view>
+            <picker wx:if="{{item.additionalStores.length}}" mode="selector" range="{{item.additionalStores}}" range-key="location" value="{{0}}" disabled="{{watchBusy || networkOffline}}" data-id="{{item.id}}" data-field="add" bindchange="onEditWatch" aria-label="{{w.addStore}}">
+              <view class="market-field"><text>{{w.addStore}}</text><view class="ui-chevron ui-chevron--down" aria-hidden="true" /></view>
+            </picker>
+            <picker wx:if="{{canEditLanguage}}" mode="selector" range="{{editLanguages}}" value="{{item.language === 'en' ? 1 : 0}}" disabled="{{watchBusy || networkOffline}}" data-id="{{item.id}}" data-field="language" bindchange="onEditWatch" aria-label="{{w.notifyLanguage + ' ' + (item.language === 'en' ? w.en : w.zh)}}">
+              <view class="market-field"><text>{{w.notifyLanguage}}</text><view class="market-field-value"><text>{{item.language === 'en' ? w.en : w.zh}}</text><view class="ui-chevron ui-chevron--down" aria-hidden="true" /></view></view>
+            </picker>
+            <button class="ui-action ui-action--plain mt" disabled="{{watchBusy || networkOffline}}" data-id="{{item.id}}" data-status="removed" bindtap="onWatchStatus">{{w.removeWatch}}</button>
+          </view>
+          <view wx:if="{{watchMessage && watchFeedbackId === item.id}}" class="market-meta mt" aria-live="polite">{{watchMessage}}</view>
         </view>
       </view>
     </view>

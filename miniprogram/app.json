@@ -3,12 +3,14 @@
     "pages/query/index",
     "pages/follow/index",
     "pages/markets/index",
-    "pages/mine/index",
-    "pages/history/index",
-    "pages/notice-board/index",
-    "pages/notification-test/index",
-    "pages/guide/index",
-    "pages/deadlines/index"
+    "pages/mine/index"
+  ],
+  "subPackages": [
+    { "root": "pages/history", "pages": ["index"] },
+    { "root": "pages/notice-board", "pages": ["index"] },
+    { "root": "pages/notification-test", "pages": ["index"] },
+    { "root": "pages/guide", "pages": ["index"] },
+    { "root": "pages/deadlines", "pages": ["index"] }
   ],
   "window": {
     "backgroundColor": "@pageBackground",

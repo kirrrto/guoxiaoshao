@@ -1,3 +1,4 @@
+import { registeredPages } from '../tools/lib/mini-packages.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -239,7 +240,7 @@ test('isolated picker styles contain only class selectors and no imported global
 test('all page event handlers exist; WXML expressions have no XML entity operators; UTF-8 is valid', () => {
   const roots = [root, path.resolve(root, '../tools/admin-miniprogram/miniprogram')];
   for (const pageRoot of roots) {
-    const pages = JSON.parse(fs.readFileSync(path.join(pageRoot, 'app.json'), 'utf8')).pages;
+    const pages = registeredPages(JSON.parse(fs.readFileSync(path.join(pageRoot, 'app.json'), 'utf8')));
     assert.ok(pages.length, `${pageRoot}: no pages registered`);
     for (const route of pages) {
       const rt = runtime(undefined, { root: pageRoot }), page = rt.instance(`${route}.js`);

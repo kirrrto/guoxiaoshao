@@ -18,7 +18,7 @@ async function checkFixture(t) {
   const catalog = JSON.parse(await fs.readFile(path.join(root, 'catalog/products.json'), 'utf8'));
   // Each negative run uses the real command in an isolated checkout skeleton.
   // No product images or source files in the working checkout are modified.
-  for (const file of [script, 'tools/catalog/lib/http.mjs', policyPath, 'catalog/products.json', manifestPath, 'project.config.json',
+  for (const file of [script, 'tools/lib/mini-packages.mjs', 'miniprogram/app.json', 'tools/catalog/lib/http.mjs', policyPath, 'catalog/products.json', manifestPath, 'project.config.json',
     'miniprogram/config/product-thumbnails.js', `evidence/catalog/${catalog.imagesGeneratedAt.slice(0, 10)}/images.verification.json`]) {
     const target = path.join(directory, file);
     await fs.mkdir(path.dirname(target), { recursive: true });

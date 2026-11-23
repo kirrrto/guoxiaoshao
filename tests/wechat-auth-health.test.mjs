@@ -11,6 +11,23 @@ const message = { appid: APPID, touser: 'test-openid', templateId: 'test-templat
 const response = payload => ({ ok: true, json: async () => payload });
 const options = fetchImpl => ({ appid: APPID, expectedAppid: APPID, appSecret: SECRET, fetchImpl });
 
+test('a late regional check after token refresh cannot post past the deadline, and a cached token adds no check', async () => {
+  const paths = [];
+  const sender = createWechatSender({ ...options(async url => {
+    const path = new URL(url).pathname;
+    paths.push(path);
+    return response(path.endsWith('stable_token') ? { access_token: TOKEN, expires_in: 7200 } : { errcode: 0 });
+  }), clock: () => new Date('2026-11-24T00:00:00Z') });
+  let finish;
+  await assert.rejects(sender(message, { timeoutMs: 20, afterTokenRefresh: () => new Promise(resolve => { finish = resolve; }) }),
+    err => err.definitelyNotSent && err.code === 'wechat_send_deadline');
+  finish(true);
+  await Promise.resolve();
+  assert.deepEqual(paths, ['/cgi-bin/stable_token']);
+  assert.equal((await sender(message, { afterTokenRefresh: () => assert.fail('cached token was already ready') })).errcode, 0);
+  assert.deepEqual(paths, ['/cgi-bin/stable_token', '/cgi-bin/message/subscribe/send']);
+});
+
 test('subscription acknowledgments accept consistent integer codes from either WeChat adapter', () => {
   assert.equal(subscriptionResponseCode({ errCode: '0' }), 0);
   assert.equal(subscriptionResponseCode({ errcode: -1, errCode: '-1' }), -1);

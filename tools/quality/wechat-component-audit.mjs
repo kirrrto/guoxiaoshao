@@ -1,3 +1,4 @@
+import { registeredPages } from '../lib/mini-packages.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
@@ -84,7 +85,7 @@ export function inspectReportedTemplates(root, wcc) {
   const pages = [];
   for (const name of ['follow', 'history', 'mine', 'guide']) {
     const route = `pages/${name}/index`;
-    if (!app.pages.includes(route)) throw Error(`Reported route missing from app.json: ${route}`);
+    if (!registeredPages(app).includes(route)) throw Error(`Reported route missing from app.json: ${route}`);
     const pageConfig = fs.readFileSync(path.join(directory, route + '.json'), 'utf8');
     const aliases = Object.keys(JSON.parse(pageConfig).usingComponents || {});
     const template = fs.readFileSync(path.join(directory, route + '.wxml'), 'utf8');

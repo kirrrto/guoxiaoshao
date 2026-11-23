@@ -144,3 +144,33 @@ test('an old mainland notification link cannot present a regional receipt as a m
   assert.equal(page.presentedAlertId, undefined);
   assert.deepEqual(rt.calls.map(call => call.action), ['notify.detail']);
 });
+
+test('regional watch edits keep independent settings and protect concurrent changes and the last store', async () => {
+  const f = await memberFixture(), payload = target('TW');
+  const [first, second] = findMarket('TW').stores.map(s => s.storeNumber);
+  const { follow } = ok(await f.call('market.watch', { ...payload, storeNumbers: [first, second] }));
+  const edit = patch => f.call('market.editWatch', { followId: follow.followId, expectedUserKey: actor, expectedUpdatedAt: follow.updatedAt, ...patch });
+  assert.equal((await edit({ language: 'other' })).error.code, 'invalid_language');
+  assert.equal((await edit({ language: 'en', removeStore: first })).error.code, 'invalid_payload');
+  assert.equal((await edit({ language: 'en', expectedUserKey: 'changed' })).error.code, 'market_account_changed');
+  const edits = await Promise.all([edit({ language: 'en' }), edit({ removeStore: second })]);
+  assert.deepEqual(edits.map(r => r.ok).sort(), [false, true]);
+  assert.equal(edits.find(r => !r.ok).error.code, 'watch_changed');
+  const current = ok(await f.call('market.follows')).follows[0];
+  const update = current.language === 'en' ? { removeStore: second } : { language: 'en' };
+  const edited = ok(await edit({ ...update, expectedUpdatedAt: current.updatedAt })).follow;
+  assert.deepEqual([edited.storeNumbers, edited.language, edited.savedStatus], [[first], 'en', 'active']);
+  assert.equal((await edit({ removeStore: first, expectedUpdatedAt: edited.updatedAt })).error.code, 'last_watch_store');
+  const staleAdd = await f.call('market.watch', { ...payload, storeNumbers: [second], expectedUpdatedAt: follow.updatedAt });
+  assert.equal(staleAdd.error.code, 'watch_changed');
+  const staleRemoval = await f.call('market.watchStatus', { expectedUserKey: actor, followId: follow.followId, status: 'removed', expectedUpdatedAt: follow.updatedAt });
+  assert.equal(staleRemoval.error.code, 'watch_changed');
+
+  ok(await f.call('market.watch', { ...payload, storeNumbers: [second] }));
+  const { follow: paused } = ok(await f.call('market.watchStatus', { expectedUserKey: actor, followId: follow.followId, status: 'paused' }));
+  f.advance(2 * 86400000);
+  assert.equal((await edit({ language: 'zh-CN', expectedUpdatedAt: paused.updatedAt })).error.code, 'market_watch_plan_required');
+  const reduced = ok(await edit({ removeStore: first, expectedUpdatedAt: paused.updatedAt })).follow;
+  assert.deepEqual([reduced.storeNumbers, reduced.language, reduced.savedStatus], [[second], 'en', 'paused']);
+  assert.equal(ok(await f.call('market.follows')).savedCount, 1);
+});

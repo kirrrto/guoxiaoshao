@@ -23,7 +23,7 @@ const specSummaryOf = p => {
 };
 const own = (source, key) => Object.prototype.hasOwnProperty.call(source, key);
 const HOT_CITY_NAMES = ['上海', '北京', '深圳', '广州', '杭州', '成都'];
-Component(require('../../utils/language').component({
+Component(require('../../utils/language').component('target-picker', {
   properties: {
     // Pages bind only the catalog version. The indexed catalog is read from the
     // session store, so the full product list never crosses the render bridge.

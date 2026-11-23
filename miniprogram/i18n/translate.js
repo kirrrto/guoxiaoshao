@@ -31,10 +31,13 @@ function captures(value, rule) {
   }
   return start===value.length ? args : null;
 }
-function lookup(I,value,depth) {
+function lookup(I,value,depth,used) {
   if (!I || typeof value!=='string' || value==='') return value;
   var exact=I.words[value];
-  if (typeof exact==='string') return exact;
+  if (typeof exact==='string') {
+    if (used) used(value,exact);
+    return exact;
+  }
   if (depth>=3) return value;
   var ideograph=false;
   for (var h=0;h<value.length;h++) { var code=value.charCodeAt(h); if (code>=11904 && code<=40959) { ideograph=true; break; } }
@@ -42,7 +45,7 @@ function lookup(I,value,depth) {
   for(var j=0;j<I.patterns.length;j++){
     var rule=I.patterns[j], matched=captures(value,rule);
     if(!matched) continue;
-    for(var k=0;k<matched.length;k++) matched[k]=lookup(I,matched[k],depth+1);
+    for(var k=0;k<matched.length;k++) matched[k]=lookup(I,matched[k],depth+1,used);
     return format(rule.value,matched);
   }
   var separators=['\n',' · ',' / ','、','：','。','；'];
@@ -50,12 +53,12 @@ function lookup(I,value,depth) {
   for(var n=0;n<separators.length;n++){
     var units=value.split(separators[n]);
     if (units.length<2) continue;
-    for(var u=0;u<units.length;u++) units[u]=lookup(I,units[u],depth+1);
+    for(var u=0;u<units.length;u++) units[u]=lookup(I,units[u],depth+1,used);
     return units.join(joins[n]);
   }
   return value;
 }
-function text(I,value){return lookup(I,value,0);}
+function text(I,value,used){return lookup(I,value,0,used);}
 function msg(I,key,args) {
   var values=[];
   for (var j=0;j<args.length;j++) values[j]=text(I,args[j]);

@@ -40,6 +40,12 @@ const followIndexEntry = follow => ({
 const quotaBalance = user => ({ balance: user.quota.balance,
   quotaRevision: Number.isInteger(user.quota.revision) ? user.quota.revision : 0 });
 
+function assertWatchRevision(follow, expected) {
+  if (expected !== undefined && (!follow || (follow.updatedAt || null) !== expected)) {
+    throw new ApiError('watch_changed', '关注已更新，请核对后再修改');
+  }
+}
+
 async function hydrateMemberPlansIn(tx, user) {
   if (!needsPlanMetadata(user)) return false;
   user.membership = (await resolvePlanMetadata(user, id => tx.get(C.orders, id))).membership;
@@ -463,6 +469,29 @@ function atomicMethods(run, { readUpstreamBreaker } = {}) {
 
     ...observationStorageMethods(run),
 
+    editMarketWatch: ({ userKey, id, market, expectedUpdatedAt, removeStore, language, nowIso }) => run(async tx => {
+      const existing = await tx.get(C.follows, id);
+      if (!existing || existing.userKey !== userKey || existing.market !== market || existing.status === 'removed') throw new ApiError('unknown_follow', '关注不存在');
+      assertWatchRevision(existing, expectedUpdatedAt);
+      let patch;
+      if (removeStore !== undefined) {
+        if (!existing.storeNumbers.includes(removeStore)) return existing;
+        if (existing.storeNumbers.length === 1) throw new ApiError('last_watch_store', '如需移除最后一家门店，请取消整条关注');
+        patch = { storeNumbers: existing.storeNumbers.filter(number => number !== removeStore) };
+      } else {
+        const user = await tx.get(C.users, userKey);
+        if (!user) throw new ApiError('user_missing', '用户不存在');
+        await hydrateMemberPlansIn(tx, user);
+        if (!canWatchMarkets(user, new Date(nowIso), await testAccountConfigIn(tx, user))) throw new ApiError('market_watch_plan_required', '其他站点的关注和到货提醒需要有效月卡或年卡。');
+        if ((existing.language || 'zh-CN') === language) return existing;
+        patch = { language };
+      }
+      // Store and language changes do not change the account's slot index.
+      const updated = { ...existing, ...patch, updatedAt: nextFollowUpdatedAt(existing, nowIso) };
+      await tx.put(C.follows, updated);
+      return updated;
+    }),
+
     mutateFollow: args => run(async tx => {
       const { userKey, follow, followId, status, nowIso, knownFollows = [] } = args;
       const user = await tx.get(C.users, userKey);
@@ -472,6 +501,7 @@ function atomicMethods(run, { readUpstreamBreaker } = {}) {
       const existing = await tx.get(C.follows, id);
       const market = args.market || 'CN';
       if (existing && (existing.userKey !== userKey || (existing.market || 'CN') !== market)) throw new ApiError('unknown_follow', '关注不存在');
+      if (market !== 'CN') assertWatchRevision(existing, args.expectedUpdatedAt);
       const knownIndex = [...new Map([...knownFollows, ...(user.followIndex || [])].map(f => [f._id, f])).values()];
       const at = new Date(nowIso);
       const config = await testAccountConfigIn(tx, user);
@@ -667,6 +697,13 @@ function atomicMethods(run, { readUpstreamBreaker } = {}) {
       await tx.put(C.notifications, claimed);
       return { claimed: true, task: claimed };
     }),
+
+    // The final regional send decision must see the watch revision and the
+    // inventory observation together, even when either changes during a read.
+    getRegionalNotificationTarget: ({ followId, market, storeNumber, partNumber }) => run(async tx => ({
+      follow: await tx.get(C.follows, followId),
+      latest: await tx.get(C.latest, targetKeyOf(storeNumber, partNumber, market)),
+    })),
 
     reserveSubscriptionCredit: ({ userKey, templateId, taskId, now, cooldownMinutes = 30, targetKey }) => run(async tx => {
       const task = await tx.get(C.notifications, taskId);

@@ -3,7 +3,7 @@ const { nudgeFor, claimNudge } = require('../../utils/reminder-nudge');
 const { readPending, isSubscriptionBusy, getConsentSetting, getAuthorizationState, syncPendingAuthorization, requestReminderAuthorization, consentLockState, refreshConsentSettingAsync, showConsentSettingsGuide } = require('../../utils/reminder-credits');
 const { toast } = require('../../utils/api');
 
-Component(require('../../utils/language').component({
+Component(require('../../utils/language').component('reminder-nudge', {
   properties: {
     enabled: { type: Boolean, value: false },
     blocked: { type: Boolean, value: false },

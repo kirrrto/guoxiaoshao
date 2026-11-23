@@ -1,7 +1,7 @@
 const languageUI = require('../../utils/language');
 const { setTabBarOverlay } = require('../../utils/tab-bar');
 
-Component(require('../../utils/language').component({
+Component(require('../../utils/language').component('config-sheet', {
   options: { multipleSlots: true, styleIsolation: 'apply-shared' },
   properties: {
     visible: { type: Boolean, value: false, observer: 'onVisible' },

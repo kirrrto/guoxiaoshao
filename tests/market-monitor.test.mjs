@@ -6,6 +6,8 @@ import { marketMembership } from './helpers/market-membership.mjs';
 
 const require = createRequire(import.meta.url);
 const { runScheduled } = require('../cloudfunctions/gxs_api/lib/engine/scheduled');
+const { sendTask } = require('../cloudfunctions/gxs_api/lib/engine/notifier');
+const { createWechatSender } = require('../cloudfunctions/gxs_api/lib/engine/wechat-sender');
 const { applyObservation, targetKeyOf } = require('../cloudfunctions/gxs_api/lib/engine/events');
 const { COLLECTIONS } = require('../cloudfunctions/gxs_api/lib/collections');
 const log = { info() {}, warn() {}, error() {} };
@@ -71,6 +73,56 @@ test('monthly and annual members can save all three regions before monitoring st
     assert.equal(messages.length, 0);
   }
 });
+
+for (const stage of ['final database read', 'WeChat token refresh', 'message already posted']) {
+  test('a language edit during ' + stage + ' respects the message handoff and its original credit', async () => {
+    const { f, pass, plan, upstream } = await setup();
+    await pass();
+    plan.R128.display = 'available';
+    f.advance(60000); await pass();
+    f.advance(60000);
+    await runScheduled({ repo: f.repo, fetchImpl: upstream, clock: () => f.state.now, log });
+    const [task] = await f.repo.listPendingNotifications({ limit: 10 });
+    assert.equal(task.market, 'JP');
+    const config = await f.repo.getConfig(), user = await f.repo.getUser(userKeyOf());
+    let edits = 0, posts = 0;
+    const edit = async () => {
+      const result = await f.call('market.editWatch', { expectedUserKey: userKeyOf(), followId: task.followId,
+        expectedUpdatedAt: task.targetSnapshot.updatedAt, language: 'zh-CN' });
+      assert.equal(result.ok, true, JSON.stringify(result.error));
+      edits++;
+    };
+    if (stage === 'final database read') {
+      const getConfig = f.repo.getConfig;
+      let reads = 0;
+      f.repo.getConfig = async () => {
+        if (++reads === 2) { f.repo.getConfig = getConfig; await edit(); }
+        return getConfig();
+      };
+    }
+    const sender = createWechatSender({ appid: user.appid, expectedAppid: user.appid, appSecret: 'test-secret',
+      clock: () => f.state.now, fetchImpl: async url => {
+        if (url.endsWith('/stable_token')) {
+          if (stage === 'WeChat token refresh') await edit();
+          return Response.json({ access_token: 'test-token', expires_in: 3600 });
+        }
+        assert.match(new URL(url).pathname, /message\/subscribe\/send$/);
+        posts++;
+        if (stage === 'message already posted') { await edit(); throw Error('reply lost'); }
+        return Response.json({ errcode: 0 });
+      } });
+    const send = () => sendTask({ task, config, repo: f.repo, sendImpl: sender, now: f.state.now, clock: () => f.state.now });
+    const result = await send();
+    assert.equal(edits, 1);
+    const dispatched = stage === 'message already posted';
+    assert.equal(result.status, dispatched ? 'uncertain' : 'skipped');
+    if (!dispatched) assert.equal(result.reason, 'follow_not_active');
+    await send();
+    assert.equal(posts, dispatched ? 1 : 0);
+    const subs = (await f.repo.getUser(userKeyOf())).subscriptions;
+    assert.deepEqual([subs.TPL_EN.credits, subs.TPL_ZH.credits], [dispatched ? 4 : 5, 5]);
+  });
+}
 
 test('a designated admin without a membership monitors regional stock and spends only actual WeChat authorizations', async t => {
   const { f, pass, messages, plan } = await setupTestAdmin(t);
@@ -264,3 +316,43 @@ test('a regional tier downgrade after planning stops delivery and the next tick 
   assert.deepEqual((await f.repo.getCollectorStatus()).markets, {});
   assert.equal((await f.repo.listFollows(userKeyOf())).length, 3);
 });
+
+for (const edit of ['language', 'removeStore']) {
+  test('a confirmed regional restock rechecks a watch ' + edit + ' edit after reserving the old template credit', async () => {
+    const { f, pass, plan, messages, upstream } = await setup({ internationalQueryLimits: { maxRequestsPerMinute: 30, maxRequestsPerDay: 20000 } });
+    const { findMarket } = require('../cloudfunctions/gxs_api/lib/markets');
+    const [market, store, partNumber] = sites[0];
+    const other = findMarket(market).stores.find(s => s.storeNumber !== store).storeNumber;
+    plan[other] = { display: 'unavailable' };
+    const saved = await f.call('market.watch', { expectedUserKey: userKeyOf(), market, partNumber, storeNumbers: [other] });
+    assert.equal(saved.ok, true);
+    const follow = saved.data.follow;
+    await pass();
+    plan[store].display = 'available';
+    f.advance(60000); await pass();
+    let reservations = 0;
+    const reserve = f.repo.reserveSubscriptionCredit;
+    f.repo.reserveSubscriptionCredit = async args => {
+      const result = await reserve(args);
+      assert.equal(result.reserved, true);
+      reservations++;
+      const reply = await f.call('market.editWatch', { expectedUserKey: userKeyOf(), followId: follow.followId,
+        expectedUpdatedAt: follow.updatedAt, [edit]: edit === 'language' ? 'zh-CN' : store });
+      assert.equal(reply.ok, true, JSON.stringify(reply.error));
+      return result;
+    };
+    f.advance(60000); await pass();
+    assert.equal(reservations, 1);
+    assert.equal(messages.length, 0);
+    const user = await f.repo.getUser(userKeyOf());
+    assert.deepEqual([user.subscriptions.TPL_EN.credits, user.subscriptions.TPL_ZH.credits], [5,5]);
+    const rows = await f.repo.listNotifications(userKeyOf(), 10);
+    assert.ok(rows.some(n => n.market === market && n.status === 'skipped' && n.reason === 'follow_not_active'));
+    if (edit === 'removeStore') {
+      const count = () => upstream.calls.filter(c => c.storeNumber === store).length;
+      const before = count();
+      f.advance(60000); await pass();
+      assert.equal(count(), before);
+    }
+  });
+}

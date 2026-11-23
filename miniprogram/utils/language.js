@@ -64,13 +64,19 @@ function setLanguage(value) {
   writeSession(KEY,value);
   return true;
 }
-function attach(instance, route) {
+function attach(instance, scope, route) {
   if (!instance._applyLanguage) {
     instance._applyLanguage = () => {
       const lang = getLanguage();
       const changed = instance._interfaceLanguage !== lang;
       const patch = {};
-      if (changed && route !== 'markets' && (instance.data.ui || lang === 'en')) patch.ui = lang === 'en' ? dictionary() : null;
+      if (changed && scope !== 'markets') {
+        if (lang === 'en') patch.ui = require('../i18n/view').attachView(instance, scope, dictionary());
+        else if (instance.data.ui) {
+          instance._detachLanguageView?.();
+          patch.ui = null;
+        }
+      }
       if ('uiLanguage' in instance.data && instance.data.uiLanguage !== lang) patch.uiLanguage = lang;
       if ('uiLanguagePreference' in instance.data && instance.data.uiLanguagePreference !== preference) patch.uiLanguagePreference = preference;
       instance._interfaceLanguage = lang;
@@ -84,21 +90,39 @@ function attach(instance, route) {
   restore();
 }
 function detach(instance) {
+  instance._detachLanguageView?.();
   listeners.delete(instance._applyLanguage);
   instance._applyLanguage = null;
+  instance._interfaceLanguage = null;
   if (visiblePage === instance) visiblePage = null;
 }
 function page(route, definition) {
   return { ...definition, data: { ...(route === 'markets' ? {} : { ui:null }), ...definition.data },
-    onLoad(...args) { attach(this,route); return definition.onLoad?.apply(this,args); },
-    onShow(...args) { visiblePage = this; attach(this,route); return definition.onShow?.apply(this,args); },
+    onLoad(...args) { attach(this,route,route); return definition.onLoad?.apply(this,args); },
+    onShow(...args) { visiblePage = this; attach(this,route,route); return definition.onShow?.apply(this,args); },
     onHide(...args) { if (visiblePage === this) visiblePage = null; return definition.onHide?.apply(this,args); },
     onUnload(...args) { detach(this); return definition.onUnload?.apply(this,args); } };
 }
-function component(definition) {
+function component(scope, definition) {
   const lifetimes = definition.lifetimes || {};
+  const properties = definition.properties || {};
+  const keys = Object.keys(properties).filter(key => ['string', 'object'].includes(typeof properties[key].value));
+  // Native parent bindings can update object subfields without calling this
+  // component's setData. Observe those subfields, not the ui data we publish.
+  const observed = keys.map(key => typeof properties[key].value === 'string' ? key : key + '.**').join(', ');
+  const observers = { ...definition.observers };
+  const original = observers[observed];
+  if (keys.length) observers[observed] = function (...args) {
+    if (this._updateLanguageProperties) {
+      const props = {};
+      for (const key of keys) props[key] = this.data[key];
+      this._updateLanguageProperties(props);
+    }
+    original?.apply(this, args);
+  };
   return { ...definition, data: { ui:null, ...definition.data },
-    lifetimes: { ...lifetimes, attached(...args) { attach(this); return lifetimes.attached?.apply(this,args); },
+    observers,
+    lifetimes: { ...lifetimes, attached(...args) { attach(this,scope); return lifetimes.attached?.apply(this,args); },
       detached(...args) { detach(this); return lifetimes.detached?.apply(this,args); } } };
 }
 function modal(options, { localizedContent = false } = {}) {

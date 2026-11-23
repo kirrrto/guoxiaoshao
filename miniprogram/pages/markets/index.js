@@ -1,7 +1,8 @@
 const language = require('../../utils/language');
 const { call } = require('../../utils/api');
 const { decodeMarketCatalog } = require('../../utils/market-catalog');
-const { bootstrapNow, getBootstrap, currentQuotaOwner, publishQueryBalance, publishQuota, currentQuota, subscribeQuota } = require('../../utils/store');
+const { plausibleObservation } = require('../../utils/format');
+const { bootstrapNow, observationLeadMs, getBootstrap, currentQuotaOwner, publishQueryBalance, publishQuota, currentQuota, subscribeQuota } = require('../../utils/store');
 const { readSession, writeSession } = require('../../utils/session');
 const operation = require('../../utils/operation');
 const { syncTabBar, releaseTabBar } = require('../../utils/tab-bar');
@@ -48,6 +49,7 @@ Page(require('../../utils/language').page('markets', {
   },
   onHide() {
     this.visible = false;
+    this.editingWatch = this.watchConfirmation = null;
     this.accountReady = false;
     clearTimeout(this.expiryTimer);
     releaseTabBar(this);
@@ -87,6 +89,7 @@ Page(require('../../utils/language').page('markets', {
             this.queryToken = null;
             this.watchToken = null;
             this.watchConfirmation = null;
+            this.editingWatch = this.watchFeedbackId = null;
             this.watchList = null;
             this.watchError = '';
             this.alert = null;
@@ -140,8 +143,8 @@ Page(require('../../utils/language').page('markets', {
       const n = detail && detail.notification;
       const site = n && this.sites.find(s => s.code === n.market);
       if (!site || n.eventId !== eid || !site.products.some(p => p.partNumber === n.partNumber)
-        || !site.stores.some(s => s.storeNumber === n.storeNumber) || !Number.isFinite(Date.parse(n.detectedAt))
-        || Date.parse(n.detectedAt) > bootstrapNow(this.boot)) throw Error('Invalid alert target');
+        || !site.stores.some(s => s.storeNumber === n.storeNumber)
+        || !plausibleObservation(n.detectedAt, bootstrapNow(this.boot), observationLeadMs(this.boot))) throw Error('Invalid alert target');
       this.applySelection({ market: n.market, partNumber: n.partNumber, storeNumber: n.storeNumber });
       this.alert = { eventId: eid, detectedAt: n.detectedAt };
       this.paint();
@@ -225,7 +228,7 @@ Page(require('../../utils/language').page('markets', {
     const launchRestricted = Boolean(accountReady && product?.querySupported && access.launchRestricted);
     const costText = quota && (access.tester ? c.tester : access.member ? c.member : c.cost.replace('{balance}', quota.balance));
     const receipt = accountReady && !launchRestricted && (queryEnabled || !this.snapshot?.requiresAccountAccess)
-      && receiptView(this.snapshot, store, lang, now, !queryEnabled);
+      && receiptView(this.snapshot, store, lang, now, !queryEnabled, observationLeadMs(this.boot));
     const opening = launchRestricted && localTime(product.freeQueryStartsAt, store?.timeZone);
     const launchNotice = launchRestricted ? c.launchGate + (opening ? ' ' + c.unlockAt.replace('{date}', opening.slice(0,10)) : '') : '';
     const showSignin = Boolean(quota && !access.member && !quota.signedInToday);
@@ -302,7 +305,6 @@ Page(require('../../utils/language').page('markets', {
     this.optionCache.clear();
     this.paint();
   },
-  onLanguage() { language.setLanguage(this.lang === 'en' ? 'zh-CN' : 'en'); },
   onInterfaceLanguage(lang) {
     this.lang = lang;
     if (this.preference && !this.pageRetired) this.paint();
@@ -383,8 +385,8 @@ Page(require('../../utils/language').page('markets', {
       if (Number.isSafeInteger(response.charged) && Number.isSafeInteger(response.refunded) && response.reason !== 'query_in_progress') {
         this.billing = Math.max(0, response.charged - response.refunded);
       }
-      const observed = row && Date.parse(row.observedAt);
-      if (response.ok && row && STOCK_STATES.includes(row.status) && Number.isFinite(observed) && observed <= bootstrapNow(this.boot)) {
+      if (response.ok && row && STOCK_STATES.includes(row.status)
+        && plausibleObservation(row.observedAt, bootstrapNow(this.boot), observationLeadMs(this.boot))) {
         this.snapshot = { status: row.status, observedAt: row.observedAt,
           requiresAccountAccess: !site.enabled && response.replayed !== true };
       } else {

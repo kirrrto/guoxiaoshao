@@ -68,14 +68,7 @@ function upstreamGuardMethods(run, { readUpstreamBreaker } = {}) {
       const breaker = await tx.get(C.config, breakerId) || { _id: breakerId, generation: 0, trips: 0 };
       if (breaker.until > nowMs) return { allowed: false, reason: 'upstream_paused', retryAt: breaker.until };
       if (breaker.probeUntil > nowMs) return { allowed: false, reason: 'upstream_paused', retryAt: breaker.probeUntil };
-      let watchedParts;
-      if (selectWatchedParts) {
-        if (runtime?.collector?.enabled !== true) return { allowed: false, reason: 'collector_disabled', retryAt: 0 };
-        const selected = await selectWatchedParts(tx, runtime, new Date(now));
-        if (selected.reload) return { allowed: false, reason: 'watch_candidates_changed', retryAt: 0 };
-        if (!selected.parts.length) return { allowed: false, reason: 'no_active_watch', retryAt: 0 };
-        watchedParts = selected.parts;
-      }
+      if (selectWatchedParts && runtime?.collector?.enabled !== true) return { allowed: false, reason: 'collector_disabled', retryAt: 0 };
       const date = dayKey(now);
       const id = prefix + `collector_budget_${date}`;
       const minuteKey = new Date(now).toISOString().slice(0, 16);
@@ -83,7 +76,8 @@ function upstreamGuardMethods(run, { readUpstreamBreaker } = {}) {
       const minuteCount = current.minuteKey === minuteKey ? current.minuteCount || 0 : 0;
       const sourceCounts = { auto: current.autoCount || 0, manual: current.manualCount || 0 };
       const minuteManual = current.minuteKey === minuteKey ? current.minuteManual || 0 : 0;
-      let detail = { budgetMode, source, sourceCounts };
+      const minuteFull = minuteCount >= maxRequestsPerMinute;
+      let capacity, detail = { budgetMode, source, sourceCounts };
       if (budgetMode === 'daily') {
         // Explicit compatibility/cost-control mode. This is the only mode that
         // can stop all queries until the next Beijing calendar day.
@@ -101,17 +95,28 @@ function upstreamGuardMethods(run, { readUpstreamBreaker } = {}) {
           return { allowed: false, reason: 'daily_budget', retryAt: endOfDay(date).getTime(), minuteCount, dayCount: current.dayCount, ...detail };
         }
       } else {
-        const capacity = reserveCapacity(await tx.get(C.config, prefix + CAPACITY_ID), { nowMs, maxRequestsPerMinute, maxRequestsPerDay, source, autoShare,
-          legacyDayCount: current.dayCount, consume: minuteCount < maxRequestsPerMinute });
-        await tx.put(C.config, { ...capacity.state, _id: prefix + CAPACITY_ID });
+        capacity = reserveCapacity(await tx.get(C.config, prefix + CAPACITY_ID), { nowMs, maxRequestsPerMinute, maxRequestsPerDay, source, autoShare,
+          legacyDayCount: current.dayCount, consume: !minuteFull });
         detail = { ...capacity.detail, sourceCounts };
-        if (!capacity.allowed && minuteCount < maxRequestsPerMinute) {
+      }
+      const minuteDenial = minuteFull ? { allowed: false, reason: 'minute_budget', retryAt: Math.floor(nowMs / 60000) * 60000 + 60000, minuteCount, dayCount: current.dayCount, ...detail } : null;
+      if (minuteDenial && !capacity) return minuteDenial;
+      let watchedParts;
+      if (selectWatchedParts) {
+        // An exhausted continuous budget still registers actual demand for lane
+        // fairness. One live witness suffices when no Apple request can start.
+        const selected = await selectWatchedParts(tx, runtime, { anyOnly: Boolean(capacity && (!capacity.allowed || minuteFull)) });
+        if (selected.reload) return { allowed: false, reason: 'watch_candidates_changed', retryAt: 0 };
+        if (!selected.parts.length) return { allowed: false, reason: 'no_active_watch', retryAt: 0 };
+        watchedParts = selected.parts;
+      }
+      if (capacity) {
+        await tx.put(C.config, { ...capacity.state, _id: prefix + CAPACITY_ID });
+        if (!capacity.allowed && !minuteFull) {
           return { allowed: false, reason: 'capacity_wait', retryAt: capacity.retryAt, minuteCount, dayCount: current.dayCount, ...detail };
         }
       }
-      if (minuteCount >= maxRequestsPerMinute) {
-        return { allowed: false, reason: 'minute_budget', retryAt: Math.floor(nowMs / 60000) * 60000 + 60000, minuteCount, dayCount: current.dayCount, ...detail };
-      }
+      if (minuteDenial) return minuteDenial;
       const token = { id: randomUUID(), ...(market ? { market } : {}), generation: breaker.generation || 0, probe: Boolean(breaker.until), expiresAt: nowMs + 30000 };
       if (token.probe) await tx.put(C.config, { ...breaker, probeId: token.id, probeUntil: nowMs + 30000, updatedAt: now });
       sourceCounts[source] += 1;

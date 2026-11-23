@@ -84,9 +84,9 @@ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = cons
     });
     let refreshed = false;
     return {
-      async select(tx, runtime, at) {
+      async select(tx, runtime, { anyOnly = false } = {}) {
         const accounts = new Map();
-        const matched = await Promise.all(partNumbers.map(async (part, index) => {
+        const eligiblePart = async (part, index) => {
           // One witness usually suffices, even for a product watched by
           // thousands of members. Rediscover fresh owners if that one is gone.
           for (const { id, userKey, policy } of candidates[index]) {
@@ -95,6 +95,9 @@ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = cons
               || (follow.market || 'CN') !== region || !follow.storeNumbers.includes(storeNumber)) continue;
             if (!accounts.has(userKey)) accounts.set(userKey, tx.get(C.users, userKey));
             const user = await accounts.get(userKey);
+            // A slow or retried transaction can outlive the membership that
+            // scheduled it. Check the owner's current term after the reads.
+            const at = clock();
             if (!user || !canUseReminders(user, at, runtime)) continue;
             // Current writes update the index in the same transaction as the
             // watch. Older incomplete indexes use the ordered policy loaded at discovery.
@@ -105,9 +108,15 @@ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = cons
               .eligibleStoreNumbers.includes(storeNumber)) return part;
           }
           return null;
-        }));
+        };
+        if (anyOnly && partNumbers.length) {
+          const first = await eligiblePart(partNumbers[0], 0);
+          if (first) return { parts: [first], reload: false };
+        }
+        // If the first witness has left, check the rest together as usual.
+        const matched = await Promise.all(partNumbers.map((part, index) => anyOnly && index === 0 ? null : eligiblePart(part, index)));
         const parts = matched.filter(Boolean);
-        return { parts, reload: !refreshed && parts.length !== partNumbers.length };
+        return { parts, reload: !refreshed && (anyOnly ? !parts.length : parts.length !== partNumbers.length) };
       },
       async refresh() {
         // The last known watcher may have been replaced since planning. One

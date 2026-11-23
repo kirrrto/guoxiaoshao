@@ -8,6 +8,16 @@
 // Keep technical details and complete acceptance records in release documents.
 const RELEASE_NOTES = [
   {
+    version: '3.8.5',
+    title: '其他站点查询与关注',
+    dateText: '版本记录 · 2026-11-24',
+    highlights: [
+      '弱网下查询日本、台湾和香港门店，也能看到本次查询的有效结果。',
+      '同一配置可逐店管理关注，也可更改该配置的提醒语言。',
+      '英文到货提醒会优先显示可辨认的商品与门店名称。',
+    ],
+  },
+  {
     version: '3.8.3',
     title: '站点关注与每日签到',
     dateText: '版本记录 · 2026-11-24',

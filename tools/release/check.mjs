@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 import { checkMonitorBundle } from '../lib/monitor-bundle.mjs';
 import { fingerprintQualitySource, releaseNoteMatchesSource, validateQualityFindings } from './quality-findings.mjs';
+import { packageRoot, registeredPages } from '../lib/mini-packages.mjs';
 import { hasConsumerEntry } from './consumer-entry.mjs';
 import { compareInstalledDependencies } from './installed-dependencies.mjs';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
@@ -89,8 +90,8 @@ const mainRoutes = ['query', 'follow', 'markets', 'mine'].map(name => `pages/${n
 const supportingRoutes = ['history', 'notice-board', 'notification-test', 'guide', 'deadlines'].map(name => `pages/${name}/index`);
 check('consumer opens mainland query, offers three regional markets in the third tab and retains legacy deep links', consumerApp.pages[0] === mainRoutes[0]
   && JSON.stringify(consumerApp.tabBar.list.map(tab => tab.pagePath)) === JSON.stringify(mainRoutes)
-  && consumerApp.pages.length === mainRoutes.length + supportingRoutes.length
-  && [...mainRoutes, ...supportingRoutes].every(route => consumerApp.pages.includes(route)) && !fs.existsSync(path.join(root, 'miniprogram/pages/admin')));
+  && JSON.stringify(consumerApp.pages) === JSON.stringify(mainRoutes) && registeredPages(consumerApp).length === mainRoutes.length + supportingRoutes.length
+  && [...mainRoutes, ...supportingRoutes].every(route => registeredPages(consumerApp).includes(route)) && !fs.existsSync(path.join(root, 'miniprogram/pages/admin')));
 const adminProject = json('tools/admin-miniprogram/project.config.json');
 const adminApp = json('tools/admin-miniprogram/miniprogram/app.json');
 check('operator project is separate and uses the existing resource AppID', adminProject.appid === connection.resourceAppid && adminProject.miniprogramRoot === 'miniprogram/' && adminProject.setting.urlCheck === true && adminApp.pages.length === 1 && adminApp.pages[0] === 'pages/admin/index');
@@ -114,8 +115,8 @@ const { isTrustedPaymentTimer, CALLBACK_PATH } = require(path.join(root, 'cloudf
 check('payment recovery timer is five minutes and rejects client-triggered scans', paymentTimer.length === 1 && paymentTimer[0].name === 'gxs-payment-reconcile-five-minutes' && paymentTimer[0].config === '0 */5 * * * * *' && !isTrustedPaymentTimer({ Type: 'Timer', TriggerName: paymentTimer[0].name }, { SOURCE: 'wx_client', OPENID: 'untrusted' }, {}));
 check('payment HTTP ingress uses its exact callback path', CALLBACK_PATH === '/payment/callback');
 const app = json('miniprogram/app.json');
-check('acceptance page and mock runtime absent from mini program', !app.pages.some(page => /acceptance/.test(page)) && !fs.existsSync(path.join(root, 'miniprogram/utils/acceptance.js')) && !['.js','.json','.wxml','.wxss'].some(ext => fs.existsSync(path.join(root, 'miniprogram/pages/acceptance/index' + ext))));
-check('tab icons and page resources exist', app.pages.every(page => ['.js','.wxml','.wxss','.json'].every(ext => fs.existsSync(path.join(root, 'miniprogram', page + ext)))) && app.tabBar.list.every(tab => [tab.iconPath,tab.selectedIconPath].every(icon => fs.existsSync(path.join(root,'miniprogram',icon)))));
+check('acceptance page and mock runtime absent from mini program', !registeredPages(app).some(page => /acceptance/.test(page)) && !fs.existsSync(path.join(root, 'miniprogram/utils/acceptance.js')) && !['.js','.json','.wxml','.wxss'].some(ext => fs.existsSync(path.join(root, 'miniprogram/pages/acceptance/index' + ext))));
+check('tab icons and page resources exist', registeredPages(app).every(page => ['.js','.wxml','.wxss','.json'].every(ext => fs.existsSync(path.join(root, 'miniprogram', page + ext)))) && app.tabBar.list.every(tab => [tab.iconPath,tab.selectedIconPath].every(icon => fs.existsSync(path.join(root,'miniprogram',icon)))));
 const customTabs = require(path.join(root, 'miniprogram/utils/tab-bar.js')).TABS;
 check('native navigation avoids per-page custom tab component creation', app.tabBar.custom !== true && !fs.existsSync(path.join(root, 'miniprogram/custom-tab-bar')));
 check('navigation helpers match native tab routes, labels and icons', customTabs.length === app.tabBar.list.length && customTabs.every((tab, index) => ['pagePath', 'text', 'iconPath', 'selectedIconPath'].every(key => tab[key].replace(/^\//, '') === app.tabBar.list[index][key].replace(/^\//, ''))));
@@ -123,6 +124,7 @@ let frontendBytes = 0, frontendFiles = 0, imageBytes = 0;
 const consumerRoot = path.join(root, 'miniprogram');
 const packOptions = json('project.config.json').packOptions;
 const exclusions = new Set(packOptions.ignore.map(rule => rule.value));
+const mainAndSubpackageBytes = { '': 0 };
 const packagedFiles = [];
 const skippedFiles = [];
 const unexpectedFiles = [];
@@ -139,6 +141,8 @@ function walk(dir) {
     const size = fs.statSync(file).size;
     frontendFiles++;
     frontendBytes += size;
+    const bundle = packageRoot(app, relative);
+    mainAndSubpackageBytes[bundle] = (mainAndSubpackageBytes[bundle] || 0) + size;
     if (/\.(?:png|jpe?g|gif|svg|webp)$/i.test(entry.name)) imageBytes += size;
     if (exclusions.has(relative)) {
       excludedBytes += size;
@@ -158,19 +162,30 @@ check('the declared theme is present and is the only explicitly included consume
   && !exclusions.has(themePath) && packOptions.include.length === 1
   && packOptions.include[0].type === 'file' && packOptions.include[0].value === themePath);
 check('consumer directory contains only reviewed runtime file types and no development folders', !unexpectedFiles.length);
-const excludedImports = [];
-for (const relative of packagedFiles.filter(file => /\.(?:js|wxss)$/.test(file))) {
+const excludedImports = [], crossPackageImports = [];
+for (const relative of packagedFiles.filter(file => /\.(?:js|wxs|json|wxml|wxss)$/.test(file))) {
   const contents = fs.readFileSync(path.join(consumerRoot, relative), 'utf8');
-  const pattern = relative.endsWith('.js') ? /\brequire\(\s*['"](\.[^'"]+)['"]\s*\)/g : /@import\s+['"]([^'"]+)['"]/g;
-  for (const [, specifier] of contents.matchAll(pattern)) {
+  let references;
+  if (relative.endsWith('.json')) references = Object.values(JSON.parse(contents).usingComponents || {});
+  else {
+    const pattern = relative.endsWith('.wxss') ? /(?:@import\s+['"]|url\(\s*['"]?)([^'"\s)]+)['"]?/g
+      : relative.endsWith('.wxml') ? /<(?:import|include|wxs|image|cover-image)\b[^>]*?\bsrc\s*=\s*['"]([^'"]+)['"]/g
+      : /\brequire\(\s*['"]([^'"]+)['"]\s*\)/g;
+    references = Array.from(contents.matchAll(pattern), match => match[1]);
+  }
+  for (const specifier of references) {
+    if (specifier.includes('://') || specifier.startsWith('data:') || specifier.includes('{{')) continue;
     const target = specifier.startsWith('/') ? specifier.slice(1) : path.posix.join(path.posix.dirname(relative), specifier);
     if (exclusions.has(target) || exclusions.has(target + '.js')) excludedImports.push({ relative, target });
+    const targetBundle = packageRoot(app, target);
+    if (targetBundle && targetBundle !== packageRoot(app, relative)) crossPackageImports.push({ relative, target });
   }
 }
-check('packaged JS and WXSS do not import excluded files', !excludedImports.length);
+check('packaged dependencies do not use excluded files or synchronous imports from another subpackage', !excludedImports.length && !crossPackageImports.length);
 const thumbnailCheck = spawnSync(process.execPath, [path.join(root, 'tools/assets/build-product-thumbnails.mjs'), '--check'], { encoding: 'utf8', windowsHide: true });
 check('verified local thumbnails cover the current catalog and match recorded asset hashes', thumbnailCheck.status === 0);
-check('frontend source and assets fit within the 1.5 MiB main-package budget before compilation', frontendBytes <= imagePolicy.mainPackageMaxBytes);
+check('frontend source and assets fit within the 1.5 MiB main-package budget before compilation', mainAndSubpackageBytes[''] <= imagePolicy.mainPackageMaxBytes);
+check('each on-demand package also fits the project source-size budget', Object.values(mainAndSubpackageBytes).every(bytes => bytes <= imagePolicy.mainPackageMaxBytes));
 check('image assets fit within the 200 KB WeChat quality audit recommendation', imageBytes <= imagePolicy.imageMaxBytes);
 let qualityGate;
 let sourceFingerprint = null;
@@ -181,7 +196,7 @@ try {
 check('current release note declares the matching consumer source fingerprint', releaseNoteMatchesSource(releaseNoteText, sourceFingerprint));
 const sourceChecksPassed = checks.every(c => c.passed);
 check('known WeChat quality findings have passing current-version retest evidence', qualityGate.passed);
-const report = { checkedAt: new Date().toISOString(), version: project.version, scope: 'Local source and recorded quality evidence only; no cloud deployment, real-device retest, account-console inspection or submission', publicationReady: false, sourceChecksPassed, qualityGate, passed: checks.every(c => c.passed), checks, frontend: { files: frontendFiles, sourceBytes: frontendBytes, imageBytes, imageMaxBytes: imagePolicy.imageMaxBytes, mainPackageMaxBytes: imagePolicy.mainPackageMaxBytes, note: 'Source bytes, not the WeChat upload package size' }, externalReleaseChecks: [
+const report = { checkedAt: new Date().toISOString(), version: project.version, scope: 'Local source and recorded quality evidence only; no cloud deployment, real-device retest, account-console inspection or submission', publicationReady: false, sourceChecksPassed, qualityGate, passed: checks.every(c => c.passed), checks, frontend: { files: frontendFiles, sourceBytes: frontendBytes, mainPackageSourceBytes: mainAndSubpackageBytes[''], subpackageSourceBytes: Object.fromEntries(Object.entries(mainAndSubpackageBytes).filter(([name]) => name)), imageBytes, imageMaxBytes: imagePolicy.imageMaxBytes, mainPackageMaxBytes: imagePolicy.mainPackageMaxBytes, note: 'Source bytes, not the WeChat upload package size' }, externalReleaseChecks: [
   { item: 'Consumer account eligibility, filing, categories and privacy declaration', status: 'requires account-console verification' },
   { item: 'Verify deployed gxs_api and gxs_monitor packages, timer invocations and existing shared application access', status: 'requires cloud verification; consult the versioned deployment evidence' },
   { item: 'Apply database indexes/rules and seed verified catalog', status: 'not checked by this local tool; consult the versioned cloud-deployment evidence' },
@@ -195,7 +210,7 @@ const report = { checkedAt: new Date().toISOString(), version: project.version, 
 ] };
 report.monitorBundle = monitorBundle;
 report.consumerPackage = { miniprogramRoot: 'miniprogram/', sourceFilesAfterExclusions: packagedFiles.length,
-  sourceBytesAfterExclusions: frontendBytes - excludedBytes, excludedBytes, excludedFiles: skippedFiles.sort(), unexpectedFiles, excludedImports };
+  sourceBytesAfterExclusions: frontendBytes - excludedBytes, excludedBytes, excludedFiles: skippedFiles.sort(), unexpectedFiles, excludedImports, crossPackageImports };
 report.deliveryTargets = deliveryTargets;
 const outputAt = process.argv.indexOf('--out');
 if (outputAt !== -1) { const file = path.resolve(process.argv[outputAt + 1]); fs.mkdirSync(path.dirname(file), { recursive: true }); fs.writeFileSync(file, JSON.stringify(report, null, 2) + '\n'); }

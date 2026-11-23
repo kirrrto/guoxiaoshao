@@ -1,3 +1,4 @@
+import { registeredPages } from '../tools/lib/mini-packages.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -48,7 +49,7 @@ test('a delayed saved preference cannot overwrite a newer selection and an expli
 test('all consumer pages and controls participate in language changes and the renderers stay in sync', () => {
   const root=new URL('../miniprogram/',import.meta.url);
   const app=JSON.parse(fs.readFileSync(new URL('app.json',root)));
-  for(const route of app.pages) {
+  for(const route of registeredPages(app)) {
     const js=fs.readFileSync(new URL(route+'.js',root),'utf8');
     assert.match(js,/utils\/language/);
     if(!route.includes('/markets/')) assert.match(fs.readFileSync(new URL(route+'.wxml',root),'utf8'),/i18n\/render\.wxs/);
@@ -57,8 +58,57 @@ test('all consumer pages and controls participate in language changes and the re
     assert.match(fs.readFileSync(new URL('components/'+name+'/index.wxml',root),'utf8'),/i18n\/render\.wxs/);
   }
   assert.equal(fs.readFileSync(new URL('i18n/translate.js',root),'utf8'),fs.readFileSync(new URL('i18n/render.wxs',root),'utf8'));
-  const dictionary=require('../miniprogram/i18n/dictionary').english();
-  assert.ok(Buffer.byteLength(JSON.stringify(dictionary))<1024*1024,'one native view update must fit the bridge');
+});
+
+test('English sends scoped dictionaries on every surface, including dynamic SKU, native property, and language updates', () => {
+  const rt = runtime();
+  const lang = rt.load('utils/language.js');
+  const render = rt.load('i18n/translate.js');
+  const scopes = rt.load('i18n/en.js')[2];
+  lang.setLanguage('en');
+  for (const scope of Object.keys(scopes)) {
+    // Exercise exactly what a view sends, excluding unrelated page service calls.
+    const page = lang.page(scope, { data: {} });
+    page.setData = function(patch, callback) {
+      for (const [key, value] of Object.entries(patch)) {
+        if (key === 'ui.words') this.data.ui.words = value;
+        else this.data[key] = value;
+      }
+      callback?.call(this);
+    };
+    page.onLoad();
+    assert.ok(Buffer.byteLength(JSON.stringify({ ui: page.data.ui })) < 64 * 1024, scope);
+    assert.equal(page.data.ui.words['iPhone 18 Pro Max 1TB 勃艮第酒红色'], undefined);
+    let returned = false;
+    const privateTitle = '张三自己写的活动 456';
+    const label = 'iPhone 18 Pro Max 1TB 勃艮第酒红色';
+    page.setData({ rows: [{ label, title: privateTitle }] }, () => { returned = true; });
+    assert.equal(returned, true);
+    assert.equal(render.t(page.data.ui, label), lang.t(label));
+    assert.equal(render.t(page.data.ui, privateTitle), privateTitle);
+    assert.equal(Object.hasOwn(page.data.ui.words, privateTitle), false);
+    page.setData({ rows: [] });
+    assert.equal(page.data.ui.words[label], undefined, 'replaced collections release their SKU entries');
+    page.onUnload();
+  }
+  const comp = rt.instance('components/reminder-authorization/index.js', { subscription: { title: '浅金色' } });
+  comp.lifetimes.attached.call(comp);
+  assert.equal(render.t(comp.data.ui, '浅金色'), 'Light Gold');
+  comp.setData({ 'subscription.title': '桃粉色', 'subscription.second': '浅金色' });
+  assert.equal(render.t(comp.data.ui, '桃粉色'), 'Blush');
+  assert.equal(render.t(comp.data.ui, '浅金色'), 'Light Gold');
+  comp.setData({ 'subscription.second': '' });
+  assert.equal(Object.hasOwn(comp.data.ui.words, '浅金色'), false);
+  const observed = Object.keys(comp.observers).find(key => key.includes('subscription.**'));
+  comp.data.subscription.title = '浅粉色';
+  comp.observers[observed].call(comp);
+  assert.equal(render.t(comp.data.ui, '浅粉色'), 'Soft Pink');
+  assert.equal(Object.hasOwn(comp.data.ui.words, '桃粉色'), false);
+  lang.setLanguage('zh-CN');
+  assert.equal(comp.data.ui, null);
+  lang.setLanguage('en');
+  assert.equal(render.t(comp.data.ui, '浅粉色'), 'Soft Pink');
+  comp.lifetimes.detached.call(comp);
 });
 
 test('WeChat WXS numeric array indices preserve slot values on both sides of the language switch', () => {

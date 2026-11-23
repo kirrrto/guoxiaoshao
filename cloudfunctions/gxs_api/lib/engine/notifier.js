@@ -106,14 +106,35 @@ function buildTasks({ events, follows, users, config, now }) {
 
 const plainText = value => String(value || '').replace(/<[^>]+>/g, '').replace(/[\x00-\x1f\x7f]/g, ' ').replace(/\s+/g, ' ').trim();
 const clip = (value, max) => Array.from(plainText(value)).slice(0, max).join('') || '—';
+const fitsThing = value => value && Array.from(value).length <= 20;
 
 /** Keep the exact capacity and colour together; use SKU if a full descriptor cannot fit. */
 function compactProduct(task) {
   const title = plainText(task.productTitle);
   const compact = title.replace(/(\d+(?:\.\d+)?)\s*GB\b/gi, '$1G').replace(/(\d+(?:\.\d+)?)\s*TB\b/gi, '$1T').replace(/Pro\s+Max/g, 'ProMax');
   const withoutBrand = compact.replace(/^iPhone\s*/i, '').replace(/勃艮第酒红色/g, '酒红色');
-  const candidate = [title, compact, withoutBrand].find(value => value && Array.from(value).length <= 20);
+  const candidate = [title, compact, withoutBrand].find(fitsThing);
   return candidate || clip(task.partNumber || title, 20);
+}
+
+function englishRegionalProduct(product, partNumber) {
+  if (!product) return clip(partNumber, 20);
+  const title = compactProduct({ productTitle: product.titleEn, partNumber });
+  if (title !== partNumber) return title;
+  const model = plainText(product.modelEn || product.model);
+  if (product.category === 'iphone' && product.capacity && product.colorEn) {
+    const phone = model.replace(/^iPhone /, '').replace(' Pro Max', 'PM');
+    const storage = product.capacity.replace(/([GT])B$/, '$1');
+    const label = [phone, storage, product.colorEn].join(' ');
+    if (fitsThing(label)) return label;
+  }
+  // Model plus the full local SKU distinguishes glass, radio, chip and GPU
+  // configurations even when their English titles cannot fit the template.
+  const short = model.replace(/ \(PROLED XDR\)/, '').replace('MacBook Air', 'MBA').replace('MacBook Pro', 'MBP')
+    .replace('Studio Display XDR', 'Studio XDR').replace('Studio Display', 'Display');
+  const labels = [model, short, short.replace(/\s+(?=\d)/g, ''), short.replace(/\s+/g, ''), model.split(' ')[0]]
+    .map(name => name + ' ' + partNumber);
+  return labels.find(fitsThing) || clip(partNumber, 20);
 }
 
 /** WeChat rejects overlong thing fields; keep all values within the documented limits. */
@@ -143,15 +164,16 @@ function buildMessage(task, config) {
       : fields.quantity && fields.quantity.startsWith('phrase') ? '有现货' : '有现货，具体数量以门店为准',
   };
   if (regional) {
-    const market = require('../markets').findMarket(task.market);
+    const { findMarket, findMarketProduct } = require('../markets');
+    const market = findMarket(task.market);
     const store = market?.stores.find(item => item.storeNumber === task.storeNumber);
-    const product = market?.products.find(item => item.partNumber === task.partNumber);
-    values.store = clip(`${english ? market?.nameEn : market?.name} · ${(english ? store?.nameEn : store?.name) || task.storeNumber}`, 20);
     if (english) {
-      values.product = compactProduct({ ...task, productTitle: product?.titleEn || task.partNumber });
+      const storeName = store?.nameEn || task.storeNumber;
+      values.store = [`${task.market} · ${storeName}`, storeName].find(fitsThing) || clip(task.storeNumber, 20);
+      values.product = englishRegionalProduct(findMarketProduct(task.market, task.partNumber), task.partNumber);
       values.status = fields.status?.startsWith('phrase') ? 'Ready' : 'Available for pickup';
       if (fields.quantity) values.quantity = fields.quantity.startsWith('phrase') ? 'Ready' : 'Available for pickup';
-    }
+    } else values.store = clip(`${market?.name || task.market} · ${store?.name || task.storeNumber}`, 20);
   }
   const data = {};
   for (const [slot, key] of Object.entries(fields)) if (key) data[key] = { value: values[slot] };
@@ -267,29 +289,44 @@ async function sendTask({ task, config, sendImpl, repo, now, ownerId = 'notifier
   // Renew before rereading policy and stock: awaiting renewal after these
   // snapshots would allow a newly paused follow or unknown sample to be sent.
   const leaseReady = await canStart();
-  user = await repo.getUser(task.userKey);
-  follow = await repo.getFollow(task.followId);
-  user = await loadFollowPolicy(repo, user, follow ? [follow] : [], clock());
-  config = mergeConfig(await repo.getConfig());
-  const [currentLatest] = await repo.getLatest([targetKeyOf(task.storeNumber, task.partNumber, task.market)]);
-  const ready = leaseReady && claimAlive() && sendBudgetMs() > 1000;
-  const finalReason = skipReason({ task, user, follow, config, now: clock(), senderAppid: sendImpl.appid || config.notifications.consumerAppId })
-    || observationSkipReason(task, currentLatest, clock(), config);
-  if (!ready || finalReason) {
+  const regional = Boolean(task.market && task.market !== 'CN');
+  const verify = async () => {
+    user = await repo.getUser(task.userKey);
+    if (!regional) follow = await repo.getFollow(task.followId);
+    user = await loadFollowPolicy(repo, user, follow ? [follow] : [], clock());
+    config = mergeConfig(await repo.getConfig());
+    let currentLatest;
+    if (regional) {
+      ({ follow, latest: currentLatest } = await repo.getRegionalNotificationTarget(task));
+    } else {
+      [currentLatest] = await repo.getLatest([targetKeyOf(task.storeNumber, task.partNumber, task.market)]);
+    }
+    return skipReason({ task, user, follow, config, now: clock(), senderAppid: sendImpl.appid || config.notifications.consumerAppId })
+      || observationSkipReason(task, currentLatest, clock(), config);
+  };
+  const finishWithoutSend = async reason => {
     await release();
     if (!claimAlive()) return await repo.getNotification(task._id) || task;
-    return finalReason ? finish({ status: TASK_STATUS.skipped, reason: finalReason, sentAt: null }) : defer();
-  }
+    return reason ? finish({ status: TASK_STATUS.skipped, reason, sentAt: null }) : defer();
+  };
+  const finalReason = await verify();
+  if (!leaseReady || !claimAlive() || sendBudgetMs() <= 1000 || finalReason) return finishWithoutSend(finalReason);
   const timeoutMs = Math.max(1, Math.min(8000, Math.floor(sendBudgetMs()) - 1000));
+  let tokenWaitReason;
+  const afterTokenRefresh = regional ? async () => {
+    tokenWaitReason = await verify();
+    return !tokenWaitReason && claimAlive() && sendBudgetMs() > 1000;
+  } : undefined;
   let outcome;
   try {
-    const response = await sendImpl({ touser: user.openid, appid: user.appid, ...buildMessage(task, config), miniprogramState: config.notifications.miniprogramState || 'formal', lang: task.market && task.language === 'en' ? 'en' : 'zh_CN' }, { timeoutMs });
+    const response = await sendImpl({ touser: user.openid, appid: user.appid, ...buildMessage(task, config), miniprogramState: config.notifications.miniprogramState || 'formal', lang: task.market && task.language === 'en' ? 'en' : 'zh_CN' }, { timeoutMs, afterTokenRefresh });
     const code = subscriptionResponseCode(response);
     if (code === null) outcome = { status: TASK_STATUS.uncertain, reason: 'invalid_platform_response' };
     else if (code === 0) outcome = { status: TASK_STATUS.accepted, reason: null };
     else outcome = { status: TASK_STATUS.failed, reason: code === 43101 ? 'subscription_authorization_expired' : `wx_${code}`,
       retryable: [-1, 40001, 40014, 42001, 45009, 45011].includes(code) };
   } catch (error) {
+    if (regional && error?.definitelyNotSent && error.code === 'wechat_preflight_cancelled') return finishWithoutSend(tokenWaitReason);
     // Unknown exceptions after handing off may already have delivered. Only an
     // adapter explicitly proving the send never started can release the credit.
     outcome = { status: error && error.definitelyNotSent ? TASK_STATUS.failed : TASK_STATUS.uncertain,

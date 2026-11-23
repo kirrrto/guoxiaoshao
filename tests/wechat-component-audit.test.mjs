@@ -1,3 +1,4 @@
+import { registeredPages } from '../tools/lib/mini-packages.mjs';
 import fs from 'node:fs';
 import crypto from 'node:crypto';
 import test from 'node:test';
@@ -35,7 +36,7 @@ test('reported project routes retain their WXML components without adding a vide
   const app = JSON.parse(fs.readFileSync(new URL('app.json', project), 'utf8'));
   for (const name of ['follow', 'history', 'mine', 'guide']) {
     const route = 'pages/' + name + '/index';
-    assert.ok(app.pages.includes(route));
+    assert.ok(registeredPages(app).includes(route));
     const config = JSON.parse(fs.readFileSync(new URL(route + '.json', project), 'utf8'));
     const template = fs.readFileSync(new URL(route + '.wxml', project), 'utf8').replace(/<!--[\s\S]*?-->/g, '');
     const scriptTags = new Set(Array.from(template.matchAll(/<([\w-]+)(?:\s|\/?>)/g), match => match[1]));

@@ -148,7 +148,9 @@ assert manifest['totalBytes'] <= policy['thumbnailMaxBytes'], 'thumbnail_package
 # Validate the projected package before replacing working renditions or removing old ones.
 sizes = {p: p.stat().st_size for p in (root / 'miniprogram').rglob('*') if p.is_file() and p not in stale_files}
 sizes.update({p: len(data) for p, data in outputs.items()})
-package_bytes = sum(sizes.values())
+app_dir = root / 'miniprogram'
+sub_roots = [app_dir / group['root'] for group in json.loads((app_dir / 'app.json').read_text('utf-8')).get('subPackages', [])]
+package_bytes = sum(size for p, size in sizes.items() if not any(sub in p.parents for sub in sub_roots))
 assert package_bytes <= policy['mainPackageMaxBytes'], f'main_package_budget:{package_bytes}'
 image_bytes = sum(size for p, size in sizes.items() if p.suffix.lower() in ('.png', '.jpg', '.jpeg', '.gif', '.svg'))
 assert image_bytes <= policy['imageMaxBytes'], f'image_package_budget:{image_bytes}'

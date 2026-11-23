@@ -775,7 +775,10 @@ for (const scenario of scenarios) {
     // Notification feedback requires a visible page, just like an actual tap
     // in WeChat. onLoad alone now intentionally represents a hidden preload.
     if (!v350Fixture?.loading && (languagePreview || marketsPreview || v350Preview || alternativesPreview || notificationTestPreview || v2Preview || v343Preview) && scenario !== 'notification-test-loading' && typeof page.onShow === 'function') await page.onShow();
-    if (marketsPreview) await prepareMarket(page, marketScenarios[scenario]);
+    if (marketsPreview) {
+      if (marketScenarios[scenario].language === 'en') rt.load('utils/language.js').setLanguage('en');
+      await prepareMarket(page, marketScenarios[scenario]);
+    }
     if (desktopPreview && pageName === 'follow' && scenario === 'longcontent') {
       const requestsBefore = previewCalls.length;
       page.onSelectFollow({ currentTarget: { dataset: { id: 'f-desktop-second' } } });

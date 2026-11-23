@@ -107,6 +107,7 @@ async function refreshBootstrap() {
     const sameOwner = owner && cached && cached.identity && owner === cached.identity.userKey;
     return getBootstrap({ force: verifiedBootstrapGeneration <= generation && !sameOwner });
   };
+  const startedAt = Date.now();
   const pending = call('user.bootstrap').then(data => {
     const owner = data.identity && data.identity.userKey;
     if (generation !== bootstrapGeneration) return recoverCurrentAccount(owner);
@@ -123,7 +124,7 @@ async function refreshBootstrap() {
       data = { ...data, quota: currentQuota() };
     }
     app.globalData.bootstrap = data; bootstrapFetchedAt = Date.now();
-    serverClock = { owner, at: Date.parse(data.serverTime), received: bootstrapFetchedAt };
+    serverClock = { owner, at: Date.parse(data.serverTime), received: bootstrapFetchedAt, roundTripMs: Math.max(0, bootstrapFetchedAt - startedAt) };
     verifiedBootstrapGeneration = generation;
     try { require('./conversion-events').configure(data); }
     catch (error) { console.error('[gxs] conversion configuration', error); }
@@ -140,6 +141,14 @@ async function refreshBootstrap() {
 function bootstrapNow(boot, localNow = Date.now()) {
   return serverClock && boot?.identity?.userKey === serverClock.owner && Number.isFinite(serverClock.at)
     ? serverClock.at + (localNow - serverClock.received) : localNow;
+}
+
+// Server time was sampled during bootstrap. Only a displayed observation may
+// lead that estimate by the measured round trip plus a small clock difference.
+function observationLeadMs(boot) {
+  const roundTrip = serverClock && serverClock.owner === boot?.identity?.userKey && Number.isFinite(serverClock.at)
+    ? serverClock.roundTripMs : 0;
+  return Math.min(30000, roundTrip + 2000);
 }
 
 function currentQuotaOwner() {
@@ -465,4 +474,4 @@ async function getCatalog({ force = false } = {}) {
   return catalog;
 }
 
-module.exports = { bootstrapNow, getBootstrap, refreshBootstrap, invalidateBootstrap, currentQuotaOwner, quotaAccountMatches, publishSettings, publishQuota, publishQueryBalance, currentQuota, subscribeQuota, publishSubscriptions, subscribeSubscriptions, getQuotaGeneration, getCatalog, refreshCatalog, currentCatalog, subscribeCatalog, getFollows, invalidateFollows, trackFollowCountWrite, resetSession, CATEGORY_NAME };
+module.exports = { bootstrapNow, observationLeadMs, getBootstrap, refreshBootstrap, invalidateBootstrap, currentQuotaOwner, quotaAccountMatches, publishSettings, publishQuota, publishQueryBalance, currentQuota, subscribeQuota, publishSubscriptions, subscribeSubscriptions, getQuotaGeneration, getCatalog, refreshCatalog, currentCatalog, subscribeCatalog, getFollows, invalidateFollows, trackFollowCountWrite, resetSession, CATEGORY_NAME };
