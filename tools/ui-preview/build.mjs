@@ -1073,7 +1073,7 @@ for (const scenario of scenarios) {
           'v2-longcontent': [p.title],
         }[scenario] || [])];
       } else if (pageName === 'mine') {
-        expectedV2Text = ['微信提醒', '查询与体验次数', '提醒记录', '联系客服', '购买记录'];
+        expectedV2Text = ['微信提醒', '剩余查询次数', '提醒记录', '联系客服', '购买记录'];
         if (['v2-context-checkout', 'v2-paid-unconfigured', 'v2-longcontent'].includes(scenario)) {
           if (!page.data.checkoutTarget) throw Error(`${scenario}: membership page lost checkout context`);
           expectedV2Text.push(p.title, page.data.checkoutTarget.storeText,

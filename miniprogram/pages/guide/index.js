@@ -1,5 +1,5 @@
 const navigation = require('../../utils/navigation');
-const guide = require('../../config/usage-guide');
+const guide = require('./usage-guide');
 const { currentCatalog, subscribeCatalog } = require('../../utils/store');
 const { storeLabel } = require('../../utils/store-label');
 const { sourceOf, currentOwner, returnToSource } = require('../../utils/journey-context');

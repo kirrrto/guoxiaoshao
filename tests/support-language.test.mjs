@@ -5,7 +5,7 @@ import { createFixture } from './helpers/fixture.mjs';
 
 const require = createRequire(import.meta.url);
 const { RELEASE_NOTES } = require('../miniprogram/config/release-notes');
-const guide = require('../miniprogram/config/usage-guide');
+const guide = require('../miniprogram/pages/guide/usage-guide');
 const { english } = require('../miniprogram/i18n/dictionary');
 const { t, m } = require('../miniprogram/i18n/translate');
 const { resolveQueryNotice, liveNotices, noticeFingerprint } = require('../miniprogram/utils/query-notice');

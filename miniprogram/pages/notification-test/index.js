@@ -3,7 +3,7 @@ const { call, newId, showError } = require('../../utils/api');
 const { publishQuota, publishQueryBalance, resetSession } = require('../../utils/store');
 const { sourceOf, stageTestReturn, returnToSource } = require('../../utils/journey-context');
 const { shareAppMessage, shareTimeline } = require('../../utils/share');
-const { testProgress } = require('../../utils/notification-test-progress');
+const { testProgress } = require('./notification-test-progress');
 const ID = /^[A-Za-z0-9_-]{8,64}$/;
 const CALL_TIMEOUT_MS = 20000;
 function callTest(action, payload) {

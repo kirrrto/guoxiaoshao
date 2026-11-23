@@ -8,6 +8,7 @@ import { checkMonitorBundle } from '../lib/monitor-bundle.mjs';
 import { fingerprintQualitySource, releaseNoteMatchesSource, validateQualityFindings } from './quality-findings.mjs';
 import { packageRoot, registeredPages } from '../lib/mini-packages.mjs';
 import { hasConsumerEntry } from './consumer-entry.mjs';
+import { analyzePackageImports } from './package-imports.mjs';
 import { compareInstalledDependencies } from './installed-dependencies.mjs';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const require = createRequire(import.meta.url);
@@ -162,26 +163,10 @@ check('the declared theme is present and is the only explicitly included consume
   && !exclusions.has(themePath) && packOptions.include.length === 1
   && packOptions.include[0].type === 'file' && packOptions.include[0].value === themePath);
 check('consumer directory contains only reviewed runtime file types and no development folders', !unexpectedFiles.length);
-const excludedImports = [], crossPackageImports = [];
-for (const relative of packagedFiles.filter(file => /\.(?:js|wxs|json|wxml|wxss)$/.test(file))) {
-  const contents = fs.readFileSync(path.join(consumerRoot, relative), 'utf8');
-  let references;
-  if (relative.endsWith('.json')) references = Object.values(JSON.parse(contents).usingComponents || {});
-  else {
-    const pattern = relative.endsWith('.wxss') ? /(?:@import\s+['"]|url\(\s*['"]?)([^'"\s)]+)['"]?/g
-      : relative.endsWith('.wxml') ? /<(?:import|include|wxs|image|cover-image)\b[^>]*?\bsrc\s*=\s*['"]([^'"]+)['"]/g
-      : /\brequire\(\s*['"]([^'"]+)['"]\s*\)/g;
-    references = Array.from(contents.matchAll(pattern), match => match[1]);
-  }
-  for (const specifier of references) {
-    if (specifier.includes('://') || specifier.startsWith('data:') || specifier.includes('{{')) continue;
-    const target = specifier.startsWith('/') ? specifier.slice(1) : path.posix.join(path.posix.dirname(relative), specifier);
-    if (exclusions.has(target) || exclusions.has(target + '.js')) excludedImports.push({ relative, target });
-    const targetBundle = packageRoot(app, target);
-    if (targetBundle && targetBundle !== packageRoot(app, relative)) crossPackageImports.push({ relative, target });
-  }
-}
-check('packaged dependencies do not use excluded files or synchronous imports from another subpackage', !excludedImports.length && !crossPackageImports.length);
+const imports = analyzePackageImports(app, packagedFiles, exclusions, file => fs.readFileSync(path.join(consumerRoot, file), 'utf8'));
+check('packaged dependencies do not use excluded files or synchronous imports from another subpackage', !imports.excludedImports.length && !imports.crossPackageImports.length);
+check('local script imports resolve and every main-package script is reachable from a main-package entry',
+  !imports.missingScriptImports.length && !imports.misplacedMainScripts.length);
 const thumbnailCheck = spawnSync(process.execPath, [path.join(root, 'tools/assets/build-product-thumbnails.mjs'), '--check'], { encoding: 'utf8', windowsHide: true });
 check('verified local thumbnails cover the current catalog and match recorded asset hashes', thumbnailCheck.status === 0);
 check('frontend source and assets fit within the 1.5 MiB main-package budget before compilation', mainAndSubpackageBytes[''] <= imagePolicy.mainPackageMaxBytes);
@@ -210,7 +195,8 @@ const report = { checkedAt: new Date().toISOString(), version: project.version, 
 ] };
 report.monitorBundle = monitorBundle;
 report.consumerPackage = { miniprogramRoot: 'miniprogram/', sourceFilesAfterExclusions: packagedFiles.length,
-  sourceBytesAfterExclusions: frontendBytes - excludedBytes, excludedBytes, excludedFiles: skippedFiles.sort(), unexpectedFiles, excludedImports, crossPackageImports };
+  sourceBytesAfterExclusions: frontendBytes - excludedBytes, excludedBytes, excludedFiles: skippedFiles.sort(), unexpectedFiles,
+  ...imports };
 report.deliveryTargets = deliveryTargets;
 const outputAt = process.argv.indexOf('--out');
 if (outputAt !== -1) { const file = path.resolve(process.argv[outputAt + 1]); fs.mkdirSync(path.dirname(file), { recursive: true }); fs.writeFileSync(file, JSON.stringify(report, null, 2) + '\n'); }
