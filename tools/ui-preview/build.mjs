@@ -15,6 +15,8 @@ const adminPreview = process.argv.includes('--admin-only');
 const v2Preview = process.argv.includes('--v2-only');
 const v343Preview = process.argv.includes('--v343-only');
 const v350Preview = process.argv.includes('--v350-only');
+const desktopPreview = process.argv.includes('--desktop-only');
+if (desktopPreview && process.argv.some(arg => arg !== '--desktop-only' && /^--.*-only$/.test(arg))) throw Error('--desktop-only cannot be combined with another scenario group');
 if (v350Preview && process.argv.some(arg => arg !== '--v350-only' && /^--.*-only$/.test(arg))) throw Error('--v350-only cannot be combined with another scenario group');
 if (v343Preview && process.argv.some(arg => arg !== '--v343-only' && /^--.*-only$/.test(arg))) throw Error('--v343-only cannot be combined with another scenario group');
 const baselinePreview = !process.argv.some(arg => /^--.*-only$/.test(arg));
@@ -50,6 +52,10 @@ function sandbox(handler, { paymentScenario } = {}) {
   const app = { globalData: {} };
   const api = { call: handler, newId: p => `${p}-preview-${++seq}`, toast() {}, showError() {} };
   const wx = { getStorageSync: k => storage.get(k), setStorageSync: (k, v) => storage.set(k, v), removeStorageSync: k => storage.delete(k), nextTick: fn => queueMicrotask(fn), showToast() {}, showModal: options => { if (options && typeof options.success === 'function') options.success({ confirm: true, cancel: false }); }, stopPullDownRefresh() {}, switchTab() {}, pageScrollTo() {} };
+  const keyboardListeners = new Set();
+  wx.onKeyboardHeightChange = fn => keyboardListeners.add(fn);
+  wx.offKeyboardHeightChange = fn => keyboardListeners.delete(fn);
+  const emitKeyboardHeight = height => keyboardListeners.forEach(fn => fn({ height }));
   // These functions are local preview stubs, never connected to WeChat.
   Object.assign(wx, { getDeviceInfo: () => ({ platform: 'ios', system: paymentScenario === 'payment-old-ios' ? 'iOS 14.8' : 'iOS 18.0' }),
     getAppBaseInfo: () => ({ SDKVersion: '3.10.0', version: '8.0.68' }), canIUse: () => true,
@@ -75,7 +81,7 @@ function sandbox(handler, { paymentScenario } = {}) {
     p.triggerEvent = () => {};
     return p;
   }
-  return { load: relative => load(path.join(mini, relative)), instantiate, app, storage, wx };
+  return { load: relative => load(path.join(mini, relative)), instantiate, app, storage, wx, emitKeyboardHeight };
 }
 
 function parse(source) {
@@ -158,7 +164,12 @@ function renderNode(node, scope, context) {
       if (['id', 'wx:if'].includes(key) || key.startsWith('bind')) continue;
       props[key.replace(/-([a-z])/g, (_, c) => c.toUpperCase())] = evaluate(value, scope);
     }
-    const sheet = context.rt.instantiate('components/config-sheet/index.js', { ...props, keyboardHeight: context.keyboardHeight || 0 });
+    const sheet = context.rt.instantiate('components/config-sheet/index.js', props);
+    if (context.keyboardHeight) {
+      sheet.syncKeyboard();
+      context.rt.emitKeyboardHeight(context.keyboardHeight);
+      sheet.unbindKeyboard();
+    }
     const slots = {};
     for (const child of node.children) {
       const slot = child.attrs && child.attrs.slot || 'default';
@@ -368,6 +379,12 @@ if (v343Preview) {
 }
 if (v350Preview) scenarios.splice(0, scenarios.length, ...Object.keys(v350Scenarios));
 const names = v350Preview ? { query: '查询', follow: '我的小哨', deadlines: '到期提醒' } : nudgePreview ? { mine: '我的' } : alternativesPreview ? { query: '查询' } : notificationTestPreview ? { 'notification-test': '体验微信提醒' } : adminPreview ? { admin: '运营工具' } : onboardingPreview ? { query: '查询' } : paymentPreview || orderRecordsPreview ? { mine: '我的' } : historyDataPreview ? { history: '历史' } : historyTaskPreview ? { history: '历史', mine: '我的' } : stockPreview || monitoringPreview ? { follow: '小哨提醒' } : reminderPreview || redemptionPreview || releaseNotesPreview ? { mine: '我的' } : { query: '查询', follow: '小哨提醒', history: '历史', mine: '我的' };
+if (desktopPreview) {
+  delete names.history;
+  delete names.mine;
+  scenarios.splice(0, scenarios.length, 'free', 'member', 'longcontent');
+  widths.splice(0, widths.length, 375, 900, 1024, 1440, 899, 320); // Cross the native editor breakpoint in both directions.
+}
 if (v2Preview) names.guide = '使用攻略';
 if (v2Preview) names['notice-board'] = '公告与服务';
 if (v343Preview) names['notice-board'] = '公告与服务';
@@ -491,6 +508,13 @@ for (const scenario of scenarios) {
     response.latest = [{ ...response.results[0], status: 'unavailable' }];
   }
   const follows = scenario === 'empty' || scenario === 'free' ? [] : [{ followId: 'f-preview', partNumber: p.partNumber, productTitle: p.title, status: expired ? 'expired' : 'active', statusReason: expired ? 'membership_expired' : null, stores: response.results }];
+  if (desktopPreview && follows.length) {
+    const second = products.find(item => item.category !== p.category && item.supported && item.title !== p.title);
+    if (!second) throw Error('Desktop follow fixture needs two distinct products');
+    follows.push({ followId: 'f-desktop-second', partNumber: second.partNumber, productTitle: second.title,
+      status: 'paused', stores: response.results.slice(0, 1) });
+    bootstrap.followCount = follows.length;
+  }
   if (v350Fixture?.empty) follows.length = 0;
   if (v350Preview && follows.length) follows[0].stores = follows[0].stores.map((row, index) => ({ ...row, status: index ? 'unavailable' : 'available', observedAt: new Date(now.getTime() - 15000).toISOString(), statusSince: new Date(now.getTime() - 60000).toISOString() }));
   if (v343Fixture?.retired) Object.assign(follows[0], { partNumber: 'offline-retired-mac', productTitle: '旧款 MacBook Pro 14 英寸', status: 'paused', statusReason: 'product_retired', productRetired: true,
@@ -708,6 +732,11 @@ for (const scenario of scenarios) {
     // Notification feedback requires a visible page, just like an actual tap
     // in WeChat. onLoad alone now intentionally represents a hidden preload.
     if (!v350Fixture?.loading && (v350Preview || alternativesPreview || notificationTestPreview || v2Preview || v343Preview) && scenario !== 'notification-test-loading' && typeof page.onShow === 'function') await page.onShow();
+    if (desktopPreview && pageName === 'follow' && scenario === 'longcontent') {
+      const requestsBefore = previewCalls.length;
+      page.onSelectFollow({ currentTarget: { dataset: { id: 'f-desktop-second' } } });
+      if (previewCalls.length !== requestsBefore) throw Error('Selecting a desktop follow must only use its loaded data');
+    }
     if (v2Preview && pageName === 'mine') await page.restoreCheckoutContext();
     if (scenario.startsWith('v3-dnd-')) {
       page.onToggleReminderSettings();
@@ -879,7 +908,7 @@ for (const scenario of scenarios) {
       if (scenario === 'reminder-more-error') page.setData({ notificationsMoreError: '更早的提醒加载失败，请重试。' });
     }
     const selected = { partNumber: p.partNumber, product: p, storeNumbers: stores.slice(0, cityPreview ? 1 : 2).map(s => s.storeNumber), stores: stores.slice(0, cityPreview ? 1 : 2) };
-    if ((pageName === 'query' || pageName === 'history') && !v350Fixture?.queryEmpty && !['loading', 'v2-calendar-modal'].includes(scenario)) {
+    if ((pageName === 'query' || pageName === 'history') && !v350Fixture?.queryEmpty && !(desktopPreview && scenario === 'free') && !['loading', 'v2-calendar-modal'].includes(scenario)) {
       page.setData({ pickerValue: { partNumber: p.partNumber, storeNumbers: selected.storeNumbers }, dayKey: v343Preview || v350Preview ? new Date(now.getTime() + 8 * 3600000).toISOString().slice(0, 10) : v2Preview ? '2026-10-11' : '2026-09-15' });
       page.onPickerChange({ detail: selected });
       if (pageName === 'query') {
@@ -957,6 +986,7 @@ for (const scenario of scenarios) {
       sharedTargetError: scenario === 'onboarding-share-error' ? '商品目录刷新失败，可稍后重试，当前选择已保留。' : null,
     });
     if (scenario === 'error') { if (pageName === 'admin') page.setData({ allowed: false, checked: true, accessError: '模拟错误：网络连接中断，无法完成权限校验。请检查网络后重新加载。' }); else page.setData({ loadError: '模拟错误：云环境连接超时。请检查网络或稍后重试。request-id-abcdefghijklmnopqrstuvwxyz0123456789' }); }
+    if (desktopPreview && pageName === 'query' && scenario === 'longcontent') page.onEditSelection();
     if (sheetScenario) {
       if (pageName === 'follow') {
         page.onEdit({ currentTarget: { dataset: { id: follows[0].followId } } });
@@ -1065,20 +1095,22 @@ for (const scenario of scenarios) {
     }
     const ast = parse(fs.readFileSync(path.join(mini, `pages/${pageName}/index.wxml`), 'utf8'));
     const nudge = nudgePreview ? { title: scenario === 'nudge-both' ? '补充到货和断货提醒次数' : '补充到货提醒次数', restockCount: 1, soldoutCount: scenario === 'nudge-both' ? 0 : 15, soldoutEnabled: scenario !== 'nudge-one', detail: '已有次数会保留。每项选择「允许」增加 1 次，消息发送后消耗对应次数。' } : null;
-    const rendered = renderNode(ast, page.data, { rt, nudge, keyboardHeight: scenario === 'sheet-keyboard' ? 280 : 0, pickerSearch: scenario === 'sheet-search' ? '上海' : '', pickerConfigurationsExpanded: v350Fixture?.sheet ? Boolean(v350Fixture.configurationsExpanded) : undefined });
-    if (alternativesPreview && !rendered.includes('选择可接受的颜色与门店')) throw Error('Manual alternative choices were hidden');
     const componentCss = adminPreview ? '' : cssFile('components/target-picker/index.wxss').replace(/\/\*[\s\S]*?\*\//g, '').replace(/([^{}]+)\{/g, (_, selectors) => selectors.trim().startsWith('@') ? `${selectors}{` : selectors.split(',').map(selector => `.component-target-picker ${selector.trim()}`).join(',') + '{');
     const tabIndex = appConfig.tabBar.list.findIndex(tab => tab.pagePath === `pages/${pageName}/index`);
-    const navigationHidden = Boolean(page.data.sheetVisible || page.data.editing || page.data.redemptionOpen || page.data.calendarOpen || page.data.authorizationOpen);
     if (appConfig.tabBar.custom) throw Error('This preview models native navigation; custom tab components require their own renderer.');
-    const nativeTabs = nativeTabPreview(appConfig.tabBar, theme, mini, tabIndex, navigationHidden);
-    const tabCss = nativeTabs.css;
-    const rawCss = `${buttonConstraintCss}\n${cssFile('app.wxss')}\n${cssFile(`pages/${pageName}/index.wxss`)}\n${componentCss}\n${adminPreview ? '' : cssFile('components/config-sheet/index.wxss') + cssFile('components/reminder-nudge/index.wxss') + cssFile('components/reminder-authorization/index.wxss')}\n${tabCss}`;
+    const rawCss = `${buttonConstraintCss}\n${cssFile('app.wxss')}\n${cssFile(`pages/${pageName}/index.wxss`)}\n${componentCss}\n${adminPreview ? '' : cssFile('components/config-sheet/index.wxss') + cssFile('components/reminder-nudge/index.wxss') + cssFile('components/reminder-authorization/index.wxss')}`;
+    const renderSnapshot = () => renderNode(ast, page.data, { rt, nudge, keyboardHeight: scenario === 'sheet-keyboard' ? 280 : 0, pickerSearch: scenario === 'sheet-search' ? '上海' : '', pickerConfigurationsExpanded: v350Fixture?.sheet ? Boolean(v350Fixture.configurationsExpanded) : undefined });
+    const staticSnapshot = page.onResize ? null : renderSnapshot();
     for (const width of widths) {
-      const css = htmlPlaceholderSelectors(htmlElementSelectors(rawCss.replace(/(-?[\d.]+)rpx/g, (_, value) => { const pixels = Number(value) * width / 750; return `${roundRpx ? Math.round(pixels) : pixels}px`; })));
+      if (page.onResize) page.onResize({ size: { windowWidth: width } });
+      const rendered = staticSnapshot ?? renderSnapshot();
+      if (alternativesPreview && !rendered.includes('选择可接受的颜色与门店')) throw Error('Manual alternative choices were hidden');
+      const navigationHidden = Boolean((page.data.sheetVisible && !page.data.wideQueryLayout) || page.data.editing || page.data.redemptionOpen || page.data.calendarOpen || page.data.authorizationOpen);
+      const nativeTabs = nativeTabPreview(appConfig.tabBar, theme, mini, tabIndex, navigationHidden);
+      const css = htmlPlaceholderSelectors(htmlElementSelectors((rawCss + '\n' + nativeTabs.css).replace(/(-?[\d.]+)rpx/g, (_, value) => { const pixels = Number(value) * width / 750; return `${roundRpx ? Math.round(pixels) : pixels}px`; })));
       const filename = `${pageName}-${scenario}-${width}.html`;
       const tabbar = nativeTabs.markup;
-      const body = `<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${names[pageName]} · ${scenario} · ${width}px 离线预览</title><style>html{width:${width}px;max-width:100%;margin:0 auto}body{margin:0}button,input,textarea{font:inherit}button{cursor:default}img{display:block}input[type=checkbox]{width:36px;height:22px;flex:none;accent-color:#1ba35a}.simulation{position:sticky;top:0;z-index:10;padding:8px 12px;background:#fff2ce;color:#705000;font:11px/1.5 sans-serif;border-bottom:1px solid #ead49c}.native-nav{text-align:center;padding:16px;font:600 15px sans-serif}${navCss('light')}${theme ? `@media (prefers-color-scheme: dark){${navCss('dark')}}` : ''}${css}</style><div class="simulation">离线模拟 · ${width}px · ${scenario}${membershipNativePreview || notificationTestPreview ? ' · 184px按钮级联压力' : ''} · 使用实际 WXML/WXSS；不代表微信实测或实时库存</div><div class="native-nav">果小哨 · ${names[pageName]}</div>${rendered}${tabbar}<script>window.previewAudit=()=>({width:innerWidth,scrollWidth:document.documentElement.scrollWidth,overflow:[...document.querySelectorAll('body *')].filter(e=>{const r=e.getBoundingClientRect();return r.width&&r.right>document.documentElement.clientWidth+1&&getComputedStyle(e.parentElement).overflowX!=='auto'}).map(e=>({tag:e.tagName,class:e.className,right:e.getBoundingClientRect().right,text:e.textContent.slice(0,60)}))});</script></html>`;
+      const body = `<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${names[pageName]} · ${scenario} · ${width}px 离线预览</title><style>html{width:${desktopPreview ? '100%' : width + 'px'};max-width:100%;margin:0 auto}body{margin:0}button,input,textarea{font:inherit}button{cursor:default}img{display:block}input[type=checkbox]{width:36px;height:22px;flex:none;accent-color:#1ba35a}.simulation{position:sticky;top:0;z-index:10;padding:8px 12px;background:#fff2ce;color:#705000;font:11px/1.5 sans-serif;border-bottom:1px solid #ead49c}.native-nav{text-align:center;padding:16px;font:600 15px sans-serif}${navCss('light')}${theme ? `@media (prefers-color-scheme: dark){${navCss('dark')}}` : ''}${css}</style><div class="simulation">离线模拟 · ${width}px · ${scenario}${membershipNativePreview || notificationTestPreview ? ' · 184px按钮级联压力' : ''} · 使用实际 WXML/WXSS；不代表微信实测或实时库存</div><div class="native-nav">果小哨 · ${names[pageName]}</div>${rendered}${tabbar}<script>window.previewAudit=()=>({width:innerWidth,scrollWidth:document.documentElement.scrollWidth,overflow:[...document.querySelectorAll('body *')].filter(e=>{const r=e.getBoundingClientRect();return r.width&&r.right>document.documentElement.clientWidth+1&&getComputedStyle(e.parentElement).overflowX!=='auto'}).map(e=>({tag:e.tagName,class:e.className,right:e.getBoundingClientRect().right,text:e.textContent.slice(0,60)}))});</script></html>`;
       fs.writeFileSync(path.join(out, filename), body, 'utf8');
       const expectedText = v350Preview ? [...v350Text.expected] : v343Preview ? [...v343Text.expected] : v2Preview ? expectedV2Text : alternativesPreview ? [p.title,
         '选择可接受的颜色与门店', '同机型、同容量', ...(cityPreview ? [] : ['同城门店']), '勾选不扣次', '切换城市',
@@ -1259,7 +1291,7 @@ for (const scenario of scenarios) {
 }
 const sourceHashes = fs.readdirSync(mini, { recursive: true }).filter(file => /\.(?:js|json|wxml|wxss|png|svg|webp|jpe?g|gif)$/i.test(file)).sort()
   .map(file => ({ file: file.replaceAll('\\', '/'), sha256: crypto.createHash('sha256').update(fs.readFileSync(path.join(mini, file))).digest('hex') }));
-fs.writeFileSync(path.join(out, 'manifest.json'), JSON.stringify({ generatedAt: new Date().toISOString(), source: mini, sourceHashes, renderer: 'offline WXML/WXSS approximation', previewDate: defaultPreviewDate.toISOString(), v2Features: v2Preview ? { contextualCheckout: true, resultNextAction: true, activationJourney: true, targetEvidence: true, growthEvents: false, experimentAssignments: true, launchGuide: true } : null, v350Preview, membershipNativePreview, notificationTestPreview, buttonConstraintProfile, buttonConstraintCss, rpxRoundingProfile, remoteImages: allowRemoteImages,
+fs.writeFileSync(path.join(out, 'manifest.json'), JSON.stringify({ generatedAt: new Date().toISOString(), source: mini, sourceHashes, renderer: 'offline WXML/WXSS approximation', previewDate: defaultPreviewDate.toISOString(), v2Features: v2Preview ? { contextualCheckout: true, resultNextAction: true, activationJourney: true, targetEvidence: true, growthEvents: false, experimentAssignments: true, launchGuide: true } : null, v350Preview, desktopPreview, membershipNativePreview, notificationTestPreview, buttonConstraintProfile, buttonConstraintCss, rpxRoundingProfile, remoteImages: allowRemoteImages,
   launchCalendarImagePolicy: { mode: allowRemoteImages ? 'remote-images-enabled' : 'offline-no-image-fallback', limitation: allowRemoteImages ? 'The build retains remote URLs; only a subsequent image-loading check can report whether they load.' : 'Remote calendar images are removed only from preview fixtures to simulate the real no-image fallback. This offline preview does not verify remote images.' },
   expressionErrors: evaluationErrors.length, snapshots: manifest }, null, 2));
 fs.writeFileSync(path.join(out, 'evaluation-errors.json'), JSON.stringify(evaluationErrors, null, 2));

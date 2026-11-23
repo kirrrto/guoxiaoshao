@@ -2,6 +2,15 @@
 
 运行 `node tools/ui-preview/build.mjs --out <输出目录>`，打开生成的 `index.html`。
 
+## 查询与小哨的桌面分栏
+
+```sh
+node tools/ui-preview/build.mjs --desktop-only --out output/ui-desktop
+node tools/ui-preview/check-desktop-split.mjs output/ui-desktop output/desktop-layout.json
+```
+
+检查器在同一浏览器窗口调整宽度，覆盖 320、375、899、900、1024 和 1440px 的浅色与深色布局。查询编辑器随微信的 `onResize` 改变交互方式，预览按每个宽度执行实际页面回调，再测量表单与库存结果的位置。小哨场景通过真实选择事件切换到第二件商品，核对商品名称、选中状态和可见详情。桌面版微信的窗口、键盘与焦点行为另行实机验证。
+
 v3.3.1 使用微信原生 `tabBar`。离线工具从实际 `app.json`、`theme.json` 和图标生成底栏示意，模拟 50px 导航高度及 0/34px 安全区对内容视口的占用，不再渲染已删除的自定义底栏组件。`check-native-tabs.mjs` 检查四个触控区、当前页选中、字体压力、末尾内容可滚动到导航上方及弹层期间隐藏；它不能验证微信原生首帧、切页闪烁、API 桥接时序或真机安全区。
 
 ## V3.5.0 我的小哨与到期提醒
@@ -233,10 +242,11 @@ node tools/ui-preview/check-layout.mjs output/alternatives-rounded --dark
 
 `--release-notes-only` 使用页面实际展开事件展示“我的 → 更新公告”，覆盖免费、会员和长内容三种状态 × 三种宽度，共 9 个快照。可配合 `check-layout.mjs` 的浅色与 `--dark` 检查全部版本条目和换行。
 
-`--sheets-only` 生成查询、小哨、历史三个入口的配置面板，覆盖编辑、模拟键盘、长内容和保存中四种状态 × 三种宽度，共 36 个快照。使用实际 `config-sheet`、`target-picker` 的 WXML/WXSS 和选项数据；支持默认与具名 slot 的布局近似。原生返回拦截、输入法、slot 实例查找及触摸行为仍需真机检查。
+`--sheets-only` 生成查询、小哨、历史三个入口的配置面板，覆盖编辑、模拟键盘、长内容、保存中和搜索五种状态，以及 320 至 1024px 七种宽度，共 105 个快照。预览读取实际 `config-sheet`、`target-picker` 的 WXML/WXSS 和选项数据。几何检查覆盖两种窗口高度和安全区，验证弹层与桌面嵌入式表单的控件可达性。原生返回拦截、输入法、slot 实例查找及触摸行为仍需真机检查。
 
 ```powershell
 node tools/ui-preview/build.mjs --sheets-only --out output/ux-r1/sheets
+node tools/ui-preview/check-sheet-layout.mjs output/ux-r1/sheets
 node tools/ui-preview/check-layout.mjs output/ux-r1/sheets
 node tools/ui-preview/check-layout.mjs output/ux-r1/sheets --dark
 node tools/ui-preview/check-theme-colors.mjs output/ux-r1/pages output/ux-r1

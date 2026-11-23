@@ -21,6 +21,29 @@ function setup(handler) {
   return { rt, page, count: action => rt.calls.filter(call => call.action === action).length };
 }
 
+test('a message selects its exact saved follow, and an explicit new selection retires the old alert', async () => {
+  const late = deferred();
+  let reads = 0;
+  const response = { ...detail('SKU'), follow: { followId: 'b', status: 'active' } };
+  const s = setup(action => action === 'notify.detail' ? ++reads === 1 ? response : late.promise : {});
+  s.page.setData({ followsLoaded: true, follows: [{ followId: 'a' }, { followId: 'b' }], selectedFollowId: 'a' });
+  await s.page.loadAlert(EVENT);
+  assert.equal(s.page.data.selectedFollowId, 'b');
+  s.page.onSelectFollow({ currentTarget: { dataset: { id: 'a' } } });
+  assert.equal(s.page.data.alert, null);
+  const pending = s.page.loadAlert(EVENT);
+  s.page.onSelectFollow({ currentTarget: { dataset: { id: 'a' } } });
+  late.resolve(response);
+  await pending;
+  assert.equal(s.page.data.selectedFollowId, 'a');
+  assert.equal(s.page.data.alert, null);
+  s.page.applyBoot(boot('bob'));
+  assert.equal(s.page.data.selectedFollowId, '');
+  s.page.onSelectFollow({ currentTarget: { dataset: { id: 'a' } } });
+  assert.equal(s.page.data.selectedFollowId, '');
+  s.page.onUnload();
+});
+
 test('switching accounts clears a displayed alert and permits the new owner to open the same stock event', async () => {
   let owner = 'alice';
   const s = setup(action => action === 'notify.detail' ? detail(owner) : {});

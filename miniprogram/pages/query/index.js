@@ -150,6 +150,7 @@ Page({
     selectionSummary: null,
     selectionNotice: '请补全或核对配置与门店后查询。',
     selectionImageFailed: false,
+    wideQueryLayout: false,
     sheetVisible: false,
     draftValue: null,
     draftDirty: false,
@@ -271,6 +272,7 @@ Page({
 
   async onShow() {
     if (this.pageRetired) return;
+    this.updateQueryLayout();
     syncTabBar(this, '/pages/query/index');
     this.visible = true;
     if (this.accountSnapshot) this.updateQueryNotices();
@@ -286,6 +288,21 @@ Page({
       getCatalog();
     } catch (e) { if (!this.pageRetired) this.setData({ accountError: '账户连接失败，库存权限尚未核验，请检查网络后重试。' }); }
     this.startFollowPolling({ skipInitialActions: true });
+  },
+
+  onResize(event) {
+    this.updateQueryLayout(event && event.size && event.size.windowWidth);
+  },
+
+  updateQueryLayout(windowWidth) {
+    if (this.pageRetired) return;
+    if (!Number.isFinite(windowWidth)) {
+      try { windowWidth = wx.getWindowInfo().windowWidth; }
+      catch (_) { return; }
+    }
+    if (!Number.isFinite(windowWidth) || windowWidth <= 0) return;
+    const wideQueryLayout = windowWidth >= 900;
+    if (wideQueryLayout !== this.data.wideQueryLayout) this.setData({ wideQueryLayout });
   },
 
   onHide() {
@@ -942,7 +959,7 @@ Page({
   focusQueryResult(context) {
     if (typeof wx.nextTick !== 'function' || typeof wx.pageScrollTo !== 'function') return;
     const canFocus = () => {
-      if (!context.visible || !this.visible || context.visibilityEpoch !== (this.visibilityEpoch || 0)
+      if (this.data.wideQueryLayout || !context.visible || !this.visible || context.visibilityEpoch !== (this.visibilityEpoch || 0)
         || context.interactionEpoch !== (this.selectionInteractionEpoch || 0) || context.queryEpoch !== this.queryFocusEpoch) return false;
       if (typeof getCurrentPages === 'function') {
         try {
@@ -1088,6 +1105,7 @@ Page({
   },
 
   onAddFollow() {
+    if (this.data.sheetVisible || this.data.querying || this.data.signing) return;
     const { result } = this.data;
     if (!result || !result.product) return;
     // Result cards can be restored from an older snapshot. Prefer the current

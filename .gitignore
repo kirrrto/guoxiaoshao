@@ -55,6 +55,8 @@ evidence/**/*.zip
 !evidence/design/3.7.2/dark.png
 !evidence/design/3.7.2/membership-paywall.png
 !evidence/design/3.7.2/membership-rules.png
+!evidence/design/3.7.3/query-desktop.png
+!evidence/design/3.7.3/follow-desktop.png
 !evidence/design/2026-11-14-visual-upgrade/four-tabs.png
 !evidence/design/2026-11-14-visual-upgrade/dark.png
 !evidence/design/2026-11-14-visual-upgrade/member-comparison.png

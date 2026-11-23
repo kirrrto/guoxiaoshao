@@ -45,6 +45,31 @@ function openRealPicker(kind) {
   return { ...fixture, original, snapshot, picker, sheet, flushPickerEvents() { while (ticks.length) ticks.shift()(); } };
 }
 
+test('resizing an open query editor retains its unsaved SKU and displayed result until explicit save', () => {
+  const { rt, page, original, snapshot, picker, sheet, flushPickerEvents } = openRealPicker('query');
+  rt.wx.getWindowInfo = () => ({ windowWidth: 1024 });
+  page.updateQueryLayout();
+  assert.equal(page.data.wideQueryLayout, true);
+  const draft = picker.getSelection();
+  for (const width of [899, 900, 1280, 375, 1024]) {
+    page.onResize({ size: { windowWidth: width } });
+    assert.equal(page.data.wideQueryLayout, width >= 900);
+    assert.equal(page.data.sheetVisible, true);
+    assert.equal(page.selection.partNumber, original.partNumber);
+    assert.equal(picker.getSelection().partNumber, draft.partNumber);
+    assert.equal(page.data.result, snapshot);
+    page.onRequery();
+    page.onAddFollow();
+  }
+  assert.equal(rt.app.globalData.pendingFollow, null);
+  sheet.onConfirm();
+  flushPickerEvents();
+  assert.equal(page.selection.partNumber, draft.partNumber);
+  assert.equal(page.data.result, snapshot);
+  assert.equal(page.data.resultTargetDifferent, true);
+  assert.equal(rt.calls.length, 0);
+});
+
 for (const kind of ['query', 'history']) {
   test(`${kind} switches iPhone 17 to Duo in the real picker and commits with one bottom save`, () => {
     const { rt, page, catalog, original, snapshot, picker, sheet, flushPickerEvents } = openRealPicker(kind);

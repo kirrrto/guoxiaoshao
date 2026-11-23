@@ -14,6 +14,14 @@ view, text, button, input, textarea, image, scroll-view, picker { box-sizing: bo
 /* 原生底栏自己占位，tab 页只留呼吸空间。 */
 .page.tab-page { padding-bottom: var(--sp-24); }
 
+@media (min-width: 900px) {
+  .page.desktop-split-page {
+    max-width: 1200px;
+    padding-left: var(--sp-24);
+    padding-right: var(--sp-24);
+  }
+}
+
 .page-heading {
   display: flex;
   align-items: center;

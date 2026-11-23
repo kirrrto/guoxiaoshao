@@ -40,7 +40,10 @@ function inspectSheet({ keyboardHeight = 0, scenario = '', pageName = '' } = {})
     return { x: r.x, y: r.y, width: r.width, height: r.height, right: r.right, bottom: r.bottom };
   };
   const bounds = box(panel), bodyBounds = box(body), issues = [];
-  if (bounds.x < -1 || bounds.right > innerWidth + 1 || bounds.y < -1 || bounds.bottom > innerHeight - keyboardHeight + 1) issues.push('panel exceeds usable viewport');
+  const dock = panel.closest('.config-sheet-root--docked'), docked = Boolean(dock);
+  if (bounds.x < -1 || bounds.right > innerWidth + 1) issues.push('panel exceeds viewport width');
+  if (!docked && (bounds.y < -1 || bounds.bottom > innerHeight - keyboardHeight + 1)) issues.push('modal exceeds usable viewport height');
+  if (docked && Math.abs(bounds.y - box(dock).y) > 1) issues.push('keyboard offsets the inline editor');
   if (innerWidth >= 600 && bounds.width > 641) issues.push('wide panel has no readable width limit');
   if (bodyBounds.height < 44) issues.push('form scroll area collapsed below one touch target');
   if (bodyBounds.y < bounds.y || bodyBounds.bottom > bounds.bottom + 1) issues.push('form outside panel');
@@ -51,7 +54,11 @@ function inspectSheet({ keyboardHeight = 0, scenario = '', pageName = '' } = {})
     controls[selector] = { ...rect, fontSize: parseFloat(getComputedStyle(element).fontSize) };
     if (rect.width < 43.5 || rect.height < 43.5) issues.push(`${selector}: small touch target`);
     if (rect.x < bounds.x - 1 || rect.right > bounds.right + 1 || rect.y < bounds.y - 1 || rect.bottom > bounds.bottom + 1) issues.push(`${selector}: clipped`);
-    if (!element.contains(document.elementFromPoint(rect.x + rect.width / 2, rect.y + rect.height / 2))) issues.push(`${selector}: covered`);
+    // A short desktop window scrolls the whole page to reach embedded form actions.
+    if (docked) element.scrollIntoView({ block: 'center' });
+    const hitBox = box(element);
+    if (!element.contains(document.elementFromPoint(hitBox.x + hitBox.width / 2, hitBox.y + hitBox.height / 2))) issues.push(`${selector}: covered`);
+    if (docked) window.scrollTo(0, 0);
   }
   const titleFont = parseFloat(getComputedStyle(panel.querySelector('.config-sheet-title')).fontSize);
   if (innerWidth >= 600 && (titleFont > 27 || controls['.config-sheet-confirm'].fontSize > 22)) issues.push('wide sheet typography scales with viewport');
@@ -70,7 +77,7 @@ function inspectSheet({ keyboardHeight = 0, scenario = '', pageName = '' } = {})
       if (document.elementFromPoint(rect.x + rect.width / 2, y) !== search) { issues.push('search input covered by sticky content'); break; }
     }
   }
-  if (panel.getAttribute('role') !== 'dialog' || !panel.getAttribute('aria-label')) issues.push('dialog role/name missing from preview');
+  if (panel.getAttribute('role') !== (docked ? 'group' : 'dialog') || !panel.getAttribute('aria-label')) issues.push('editor role/name missing from preview');
   if (search && search.getAttribute('aria-label') !== '搜索城市、商场或门店') issues.push('search accessible name missing from preview');
   if (scenario === 'sheet-search') {
     const clear = panel.querySelector('.search-clear');
@@ -90,7 +97,7 @@ function inspectSheet({ keyboardHeight = 0, scenario = '', pageName = '' } = {})
     if (!choices.length || choices.some(element => element.getAttribute('aria-disabled') !== 'true')) issues.push('saving choices did not expose disabled state');
   }
   body.scrollTop = 0;
-  return { bounds, body: bodyBounds, bodyScrollHeight: body.scrollHeight, scrollEnd, titleFont, controls, issues };
+  return { docked, bounds, body: bodyBounds, bodyScrollHeight: body.scrollHeight, scrollEnd, titleFont, controls, issues };
 }
 
 try {
@@ -124,7 +131,10 @@ try {
       window.sheetReflowReference = { panel: document.querySelector('.config-sheet-panel'), input: document.querySelector('.search-input'), selection: [...document.querySelectorAll('.picker .chip.on')].map(e => e.textContent).join('|') };
       window.sheetReflowReference.input.value = '广州';
     });
-    for (const [width, height] of [[768, 500], [1024, 500], [320, 900], [375, 900]]) {
+    // The query editor changes native modal state at 900px. check-desktop-split
+    // covers that transition with the page's actual onResize state.
+    const modalWidths = pageName === 'query' ? [600, 768] : [768, 1024];
+    for (const [width, height] of [[modalWidths[0], 500], [modalWidths[1], 500], [320, 900], [375, 900]]) {
       const html = fs.readFileSync(path.join(directory, find(width).file), 'utf8');
       await page.setViewportSize({ width, height });
       await page.evaluate(html => {

@@ -88,6 +88,7 @@ function presentAlert({ notification: n, latest, follow }, now = Date.now()) {
     nowCls: current.statusCls,
     nowText: current.observationState === 'fresh' ? '最近观测 ' + current.observedText : current.freshnessText,
     feedback: n.feedback || null,
+    followId: follow && follow.followId || '',
     followActive: Boolean(follow && follow.status === 'active'),
   };
 }
@@ -161,6 +162,7 @@ function presentFollow(follow, boot, catalog, collector) {
     editLabel: retired ? '改选新款' : '调整',
     cardTitle: splitColor ? title.slice(0, -color.length).trim() : title,
     cardSubtitle: splitColor ? color : '',
+    storeSummary: stores.map(store => store.storeLabel).join('、'),
     observationLabel: stockLabel,
     observationTone: availableCount ? 'ok' : incomplete ? 'warn' : 'muted',
     observationIncomplete: availableCount > 0 && incomplete,
@@ -190,6 +192,11 @@ function presentFollow(follow, boot, catalog, collector) {
     detailsExpanded: follow.detailsExpanded === true,
     stores,
   };
+}
+
+function selectedFollowId(follows, preferred) {
+  if (follows.some(follow => follow.followId === preferred)) return preferred;
+  return follows.length ? follows[0].followId : '';
 }
 
 // A refresh changes content, not where the user was looking. New rows are appended.
@@ -254,6 +261,7 @@ Page({
     boot: null,
     collector: null,
     follows: [],
+    selectedFollowId: '',
     followsLoaded: false,
     limits: { maxFollows: 3, maxStoresPerFollow: 3 },
     editing: false,
@@ -544,7 +552,9 @@ Page({
     try {
       const data = await call('notify.detail', { eventId });
       if (current()) {
-        this.setData({ alert: presentAlert(data) }, () => {
+        const targetId = data.follow && data.follow.followId;
+        const matchingTarget = targetId && (!this.data.followsLoaded || this.data.follows.some(follow => follow.followId === targetId));
+        this.setData({ alert: presentAlert(data), ...(matchingTarget ? { selectedFollowId: targetId } : {}) }, () => {
           if (!current()) return;
           const app = getApp();
           if (!app.globalData.handledAlerts.includes(eventId)) app.globalData.handledAlerts.push(eventId);
@@ -710,7 +720,7 @@ Page({
       getApp().globalData.handledAlerts = [];
       this.invalidateFollowRead();
       this.editorSelection = null;
-      this.setData({ follows: [], followsLoaded: false, editing: false, saving: false, followBusyId: '', followActionId: '', followActionError: '',
+      this.setData({ follows: [], selectedFollowId: '', followsLoaded: false, editing: false, saving: false, followBusyId: '', followActionId: '', followActionError: '',
         activation: null, authorizationOpen: false, authorizationFeedback: '', refreshing: false, refreshFeedback: '', refreshError: null, alert: null, alertBusy: false });
     }
     this.accountSnapshot = boot;
@@ -757,7 +767,8 @@ Page({
       if (options.beforePresent) await options.beforePresent;
       if (this.pageRetired || this.visible === false || generation !== (this.followReadGeneration || 0)) return false;
       const incoming = data.follows.filter(f => f.status !== 'removed').map(f => presentFollow(f, this.data.boot || {}, this.catalog, this.data.collector));
-      this.setData({ follows: retainFollowOrder(incoming, this.data.follows), followsLoaded: true, limits: data.limits, loadError: null, refreshError: null, followActionError: '', followActionId: '', refreshedText: fmt.fmtTime(Date.now()) });
+      const follows = retainFollowOrder(incoming, this.data.follows);
+      this.setData({ follows, selectedFollowId: selectedFollowId(follows, this.data.selectedFollowId), followsLoaded: true, limits: data.limits, loadError: null, refreshError: null, followActionError: '', followActionId: '', refreshedText: fmt.fmtTime(Date.now()) });
       this.lastLocalPresentationAt = Date.now();
       this.startObservationClock();
       this.refreshReadiness();
@@ -871,7 +882,13 @@ Page({
       if (!this.visible || getApp().globalData.pendingFollowFocus !== pending) return;
       getApp().globalData.pendingFollowFocus = null;
       const index = pending.partNumber ? this.data.follows.findIndex(f => f.partNumber === pending.partNumber) : -1;
-      wx.pageScrollTo({ selector: index >= 0 ? '#follow-entry-' + index : '#' + pending.section, duration: 240 });
+      if (index < 0) return wx.pageScrollTo({ selector: '#' + pending.section, duration: 240 });
+      const id = this.data.follows[index].followId;
+      this.setData({ selectedFollowId: id }, () => {
+        if (!this.visible || this.data.selectedFollowId !== id) return;
+        const activeIndex = this.data.follows.findIndex(follow => follow.followId === id);
+        if (activeIndex >= 0) wx.pageScrollTo({ selector: '#follow-entry-' + activeIndex, duration: 240 });
+      });
     });
   },
 
@@ -1023,7 +1040,8 @@ Page({
       else follows.push(follow);
       const sameEditor = epoch === this.editorEpoch;
       if (sameEditor) { this.editorSelection = null; this.editorBaseline = null; }
-      this.setData({ follows, ...(sameEditor ? { editing: false, editorCanSave: false, editorDirty: false } : {}) });
+      this.setData({ follows, selectedFollowId: sameEditor ? follow.followId : selectedFollowId(follows, this.data.selectedFollowId),
+        ...(sameEditor ? { editing: false, editorCanSave: false, editorDirty: false } : {}) });
       this.refreshReadiness();
       if (sameEditor && this.visible !== false) {
         confirmTap();
@@ -1090,7 +1108,7 @@ Page({
       if (acknowledged) {
         const follows = removing ? this.data.follows.filter(follow => follow.followId !== id)
           : this.data.follows.map(follow => follow.followId === id ? presentFollow({ ...result.follow, detailsExpanded: follow.detailsExpanded }, this.data.boot, this.catalog, this.data.collector) : follow);
-        this.setData({ follows });
+        this.setData({ follows, selectedFollowId: selectedFollowId(follows, this.data.selectedFollowId) });
         this.refreshReadiness();
       }
       if (removing) refreshBootstrap().catch(() => {});
@@ -1135,9 +1153,19 @@ Page({
     });
   },
 
+  onSelectFollow(e) {
+    if (this.pageRetired || this.visible === false || this.data.editing || this.data.saving) return;
+    const id = e.currentTarget.dataset.id;
+    const index = this.data.follows.findIndex(follow => follow.followId === id);
+    if (index < 0) return;
+    if (this.data.alert && this.data.alert.followId !== id) this.onCloseAlert();
+    this.setData({ selectedFollowId: id, [`follows[${index}].detailsExpanded`]: true });
+  },
+
   onToggleFollowDetails(e) {
     const index = this.data.follows.findIndex(follow => follow.followId === e.currentTarget.dataset.id);
-    if (index >= 0) this.setData({ [`follows[${index}].detailsExpanded`]: !this.data.follows[index].detailsExpanded });
+    if (index >= 0) this.setData({ selectedFollowId: this.data.follows[index].followId,
+      [`follows[${index}].detailsExpanded`]: !this.data.follows[index].detailsExpanded });
   },
 
   onQueryFollow(e) {

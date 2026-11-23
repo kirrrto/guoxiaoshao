@@ -41,7 +41,24 @@
 .config-sheet-content { padding: var(--sp-12) var(--sp-16) var(--sp-16); }
 .config-sheet-footer { flex: none; padding: var(--sp-12) var(--sp-16) calc(var(--sp-12) + env(safe-area-inset-bottom)); border-top: 1px solid var(--line); background: var(--elevated); }
 .config-sheet-keyboard { padding-bottom: var(--sp-12); }
+@media (max-height: 600px) {
+  .config-sheet-keyboard { padding-top: var(--sp-4); padding-bottom: var(--sp-4); }
+}
 .config-sheet-summary { margin-top: var(--sp-16); padding-top: var(--sp-12); border-top: 1px solid var(--line); color: var(--text-2); font-size: var(--fs-sub); overflow-wrap: anywhere; }
 @media (min-width: 600px) {
   .config-sheet-panel { width: calc(100% - 48px); max-width: 600px; margin-left: auto; margin-right: auto; }
 }
+
+/* 宽窗口中，选择器嵌在查询条件栏；结果与页面仍可独立阅读。 */
+.config-sheet-root--docked { position: static; }
+.config-sheet-root--docked .config-sheet-panel {
+  position: relative;
+  width: 100%;
+  max-width: none;
+  height: min(76vh, 720px);
+  border-radius: var(--radius-tray);
+  background: var(--surface);
+  box-shadow: none;
+  --control: var(--surface-top);
+}
+.config-sheet-root--docked .config-sheet-footer { background: var(--surface); }

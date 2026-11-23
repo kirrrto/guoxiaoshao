@@ -143,6 +143,7 @@ test('returning from a reminder focuses the matching configuration after load wi
   page.consumePendingFocus(); assert.equal(scrolls.length, 0);
   await page.loadFollows();
   assert.equal(scrolls[0].selector, '#follow-entry-1');
+  assert.equal(page.data.selectedFollowId, page.data.follows[1].followId);
   assert.deepEqual(rt.calls.map(c => c.action), ['follow.list']);
   assert.equal(page.data.follows[1].status, 'paused');
   assert.equal(rt.app.globalData.pendingFollowFocus, null);

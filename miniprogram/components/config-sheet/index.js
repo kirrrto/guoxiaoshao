@@ -4,6 +4,7 @@ Component({
   options: { multipleSlots: true, styleIsolation: 'apply-shared' },
   properties: {
     visible: { type: Boolean, value: false, observer: 'onVisible' },
+    docked: { type: Boolean, value: false, observer: 'onDocked' },
     title: { type: String, value: '选择配置与门店' },
     subtitle: { type: String, value: '' },
     confirmText: { type: String, value: '保存选择' },
@@ -34,7 +35,7 @@ Component({
     show() {
       this.pageHidden = false;
       this.syncKeyboard();
-      if (this.data.visible) { this.setTabHidden(true); this.armNativeGuard(); }
+      if (this.data.visible && !this.data.docked) { this.setTabHidden(true); this.armNativeGuard(); }
     },
     hide() {
       this.pageHidden = true;
@@ -48,10 +49,10 @@ Component({
   },
   methods: {
     bindKeyboard() {
-      if (this.keyboardListener || this.retired || this.pageHidden || !this.data.visible) return;
+      if (this.keyboardListener || this.retired || this.pageHidden || !this.data.visible || this.data.docked) return;
       if (typeof wx.onKeyboardHeightChange !== 'function' || typeof wx.offKeyboardHeightChange !== 'function') return;
       this.keyboardListener = event => {
-        if (!this.retired && !this.pageHidden && this.data.visible) this.setData({ keyboardHeight: Math.max(0, Number(event.height) || 0) });
+        if (!this.retired && !this.pageHidden && this.data.visible && !this.data.docked) this.setData({ keyboardHeight: Math.max(0, Number(event.height) || 0) });
       };
       wx.onKeyboardHeightChange(this.keyboardListener);
     },
@@ -60,17 +61,22 @@ Component({
       this.keyboardListener = null;
     },
     syncKeyboard() {
-      if (!this.retired && !this.pageHidden && this.data.visible) this.bindKeyboard();
+      if (!this.retired && !this.pageHidden && this.data.visible && !this.data.docked) this.bindKeyboard();
       else this.unbindKeyboard();
     },
     onVisible(visible) {
       this.closeEpoch = (this.closeEpoch || 0) + 1;
       this.confirmingClose = false;
+      this.syncPresentation(visible);
+    },
+    onDocked() { this.syncPresentation(this.data.visible); },
+    syncPresentation(visible) {
+      const modal = Boolean(visible && !this.data.docked && !this.pageHidden && !this.retired);
       this.syncKeyboard();
-      this.setTabHidden(Boolean(visible));
+      this.setTabHidden(modal);
       this.guardEpoch = (this.guardEpoch || 0) + 1;
-      this.setData({ nativeGuardShow: Boolean(visible && this.data.nativeGuardSupported && !this.pageHidden) });
-      if (!visible && this.data.keyboardHeight) this.setData({ keyboardHeight: 0 });
+      this.setData({ nativeGuardShow: Boolean(modal && this.data.nativeGuardSupported) });
+      if (!modal && this.data.keyboardHeight) this.setData({ keyboardHeight: 0 });
     },
     setTabHidden(hidden) {
       if (hidden) {
@@ -90,7 +96,7 @@ Component({
     },
     stopTouch() {},
     armNativeGuard() {
-      if (!this.data.nativeGuardSupported || this.retired || this.pageHidden || !this.data.visible || this.data.nativeGuardShow) return;
+      if (!this.data.nativeGuardSupported || this.retired || this.pageHidden || this.data.docked || !this.data.visible || this.data.nativeGuardShow) return;
       const epoch = this.guardEpoch = (this.guardEpoch || 0) + 1;
       // A native back leaves the virtual container without updating our bound
       // property. Toggle it across a render tick so a cancelled close is guarded
@@ -101,7 +107,7 @@ Component({
       if (typeof wx.nextTick === 'function') wx.nextTick(arm); else setTimeout(arm, 0);
     },
     onNativeLeave() {
-      if (!this.data.visible || this.retired || this.pageHidden || !this.data.nativeGuardShow) return;
+      if (!this.data.visible || this.retired || this.pageHidden || this.data.docked || !this.data.nativeGuardShow) return;
       this.setData({ nativeGuardShow: false });
       this.armNativeGuard();
       this.onCloseTap();

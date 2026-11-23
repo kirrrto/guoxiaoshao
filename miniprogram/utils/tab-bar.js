@@ -78,7 +78,7 @@ function updateVisibility(page) {
   if (visiblePage !== page) return;
   const state = page.data || {};
   applyNativeVisibility(Boolean(page._tabKeyboardOpen
-    || state.sheetVisible || state.editing || state.redemptionOpen || state.calendarOpen || state.authorizationOpen
+    || (state.sheetVisible && !state.wideQueryLayout) || state.editing || state.redemptionOpen || state.calendarOpen || state.authorizationOpen
     || page._tabOverlayLocks && page._tabOverlayLocks.size));
 }
 

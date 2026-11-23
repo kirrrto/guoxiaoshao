@@ -1,5 +1,5 @@
 <page-meta page-style="color-scheme:{{_themeMode || 'light'}};{{(editing || authorizationOpen) ? 'overflow:hidden;' : ''}}" />
-<view class="page tab-page follow-page">
+<view class="page tab-page follow-page desktop-split-page">
   <view wx:if="{{networkOffline}}" class="network-notice" aria-role="status">网络已断开，恢复后自动刷新</view>
   <view class="page-heading whistle-heading">
     <image class="page-mark page-mark-glyph whistle-mark" src="/images/brand/whistle-green.png" mode="aspectFit" aria-hidden="true" />
@@ -7,157 +7,176 @@
     <button class="ui-action ui-action--plain compact-action" hover-class="ui-control-pressed" loading="{{refreshing}}" disabled="{{refreshing || saving}}" bindtap="onRefreshStatus">{{refreshing ? '读取中' : '刷新状态'}}</button>
   </view>
 
-  <!-- 到期提醒：下一次计划提醒时间在前，事项与微信状态在后。 -->
-  <view class="card deadline-home">
-    <view class="deadline-home-heading">
-      <view class="deadline-heading-copy"><view class="card-title section-title">到期提醒</view><text class="deadline-service-label">{{deadlineServiceLabel}}</text></view>
-      <button wx:if="{{deadlineCanOpen && !deadlineCount}}" class="btn btn-sm {{deadlineRecordOnly && follows.length ? '' : 'btn-primary'}} deadline-home-action" hover-class="btn-primary-pressed" disabled="{{deadlinesLoading}}" bindtap="onOpenDeadlines">添加到期事项</button>
-      <button wx:if="{{deadlineCanOpen && deadlineCount}}" class="ui-action ui-action--plain deadline-home-manage" hover-class="ui-control-pressed" disabled="{{deadlinesLoading}}" bindtap="onOpenDeadlines" aria-label="管理到期事项，共 {{deadlineCount}} 条">管理到期事项（{{deadlineCount}}）<view class="ui-chevron" aria-hidden="true"></view></button>
-    </view>
-    <view class="deadline-agenda">
-      <view wx:if="{{deadlinesError}}" class="deadline-home-error" aria-role="alert"><text>{{deadlinesError}}</text><button class="ui-action" hover-class="ui-control-pressed" disabled="{{deadlinesLoading}}" bindtap="onRetryDeadlines">重试</button></view>
-      <view wx:elif="{{deadlinesLoading && !deadlinesLoaded}}" class="deadline-home-empty" aria-busy="true">正在读取到期事项…</view>
-      <view wx:elif="{{!deadlineCount}}" class="deadline-home-empty">暂无到期事项</view>
-      <view wx:if="{{deadlineCanOpen && deadlineRecordOnly}}" class="deadline-record-only">微信通知尚未开启。</view>
-      <view wx:for="{{deadlines}}" wx:key="id" class="deadline-home-row">
-        <view class="deadline-home-item"><text class="deadline-home-title">{{item.title}}</text><text class="deadline-home-date">{{item.dueText}}</text></view>
-        <view wx:if="{{deadlineCanOpen && nextDeadline && item.id === nextDeadline.id}}" class="deadline-home-next">
-          <text>下一次计划提醒</text><text class="deadline-next-time">{{item.remindText}}</text>
+  <view class="follow-workspace">
+    <view class="follow-sidebar">
+      <view wx:if="{{ready && followsLoaded && follows.length && !loadError}}" class="follow-list-pane">
+        <view class="section-heading follow-list-heading"><text class="section-title">已保存的关注</text></view>
+        <view class="card follow-list">
+          <button wx:for="{{follows}}" wx:key="followId" class="follow-list-choice {{(item.followId === selectedFollowId) ? 'follow-list-choice--selected' : ''}}" hover-class="ui-control-pressed" data-id="{{item.followId}}" aria-pressed="{{item.followId === selectedFollowId}}" aria-label="{{item.cardTitle + (item.cardSubtitle ? '，' + item.cardSubtitle : '') + (item.storeSummary ? '，' + item.storeSummary : '') + (item.followId === selectedFollowId ? '，已选' : '')}}" bindtap="onSelectFollow">
+            <view class="follow-choice-copy">
+              <text class="follow-choice-title">{{item.cardTitle}}</text>
+              <text wx:if="{{item.cardSubtitle}}" class="follow-choice-meta">{{item.cardSubtitle}}</text>
+              <text wx:if="{{item.storeSummary}}" class="follow-choice-meta">{{item.storeSummary}}</text>
+            </view>
+            <view wx:if="{{item.followId === selectedFollowId}}" class="ui-check" aria-hidden="true"></view>
+          </button>
         </view>
-        <view class="deadline-home-delivery"><text class="deadline-home-state deadline-home-state--{{item.tone}}">{{item.statusLabel}}</text><text>{{item.statusNote}}</text></view>
+      </view>
+      <!-- 到期提醒：下一次计划提醒时间在前，事项与微信状态在后。 -->
+      <view class="card deadline-home">
+        <view class="deadline-home-heading">
+          <view class="deadline-heading-copy"><view class="card-title section-title">到期提醒</view><text class="deadline-service-label">{{deadlineServiceLabel}}</text></view>
+          <button wx:if="{{deadlineCanOpen && !deadlineCount}}" class="btn btn-sm {{deadlineRecordOnly && follows.length ? '' : 'btn-primary'}} deadline-home-action" hover-class="btn-primary-pressed" disabled="{{deadlinesLoading}}" bindtap="onOpenDeadlines">添加到期事项</button>
+          <button wx:if="{{deadlineCanOpen && deadlineCount}}" class="ui-action ui-action--plain deadline-home-manage" hover-class="ui-control-pressed" disabled="{{deadlinesLoading}}" bindtap="onOpenDeadlines" aria-label="管理到期事项，共 {{deadlineCount}} 条">管理到期事项（{{deadlineCount}}）<view class="ui-chevron" aria-hidden="true"></view></button>
+        </view>
+        <view class="deadline-agenda">
+          <view wx:if="{{deadlinesError}}" class="deadline-home-error" aria-role="alert"><text>{{deadlinesError}}</text><button class="ui-action" hover-class="ui-control-pressed" disabled="{{deadlinesLoading}}" bindtap="onRetryDeadlines">重试</button></view>
+          <view wx:elif="{{deadlinesLoading && !deadlinesLoaded}}" class="deadline-home-empty" aria-busy="true">正在读取到期事项…</view>
+          <view wx:elif="{{!deadlineCount}}" class="deadline-home-empty">暂无到期事项</view>
+          <view wx:if="{{deadlineCanOpen && deadlineRecordOnly}}" class="deadline-record-only">微信通知尚未开启。</view>
+          <view wx:for="{{deadlines}}" wx:key="id" class="deadline-home-row">
+            <view class="deadline-home-item"><text class="deadline-home-title">{{item.title}}</text><text class="deadline-home-date">{{item.dueText}}</text></view>
+            <view wx:if="{{deadlineCanOpen && nextDeadline && item.id === nextDeadline.id}}" class="deadline-home-next">
+              <text>下一次计划提醒</text><text class="deadline-next-time">{{item.remindText}}</text>
+            </view>
+            <view class="deadline-home-delivery"><text class="deadline-home-state deadline-home-state--{{item.tone}}">{{item.statusLabel}}</text><text>{{item.statusNote}}</text></view>
+          </view>
+        </view>
       </view>
     </view>
-  </view>
 
-  <view class="section-heading inventory-home-heading">
-    <view class="inventory-heading-copy">
-      <text class="section-title">苹果库存</text>
-      <text wx:if="{{ready && followsLoaded && !loadError}}" class="inventory-allowance">关注配置{{boot.member ? '已用 ' + follows.length + ' / ' + limits.maxFollows + ' 个名额' : ' ' + follows.length + ' 个'}}</text>
-    </view>
-    <button class="ui-action ui-action--plain" hover-class="ui-control-pressed" bindtap="onOpenInventory">查询库存</button>
-  </view>
-  <view wx:if="{{loadError}}" class="card load-error" aria-role="alert">
-    <view class="load-error-title">暂时没有连上</view>
-    <view class="load-error-detail">{{loadError}}</view>
-    <button class="btn btn-primary btn-block" bindtap="onRetryLoad">重试</button>
-  </view>
-
-  <block wx:elif="{{!ready}}">
-    <view class="skeleton" aria-busy="true">
-      <view class="skeleton-card"><view class="skeleton-line skeleton-title"></view><view class="skeleton-line"></view><view class="skeleton-line skeleton-short"></view><view class="skeleton-bar"></view></view>
-      <view class="loading-line">正在读取你的关注…</view>
-    </view>
-  </block>
-
-  <block wx:else>
-    <view wx:if="{{liveSync.state === 'syncing' || liveSync.state === 'offline' || liveSync.state === 'retrying'}}" class="follow-sync-bar" aria-role="status"><view class="follow-sync-copy"><text class="follow-sync-dot follow-sync-dot--{{liveSync.state}}"></text><text>{{liveSync.state === 'syncing' ? '正在更新页面' : liveSync.state === 'offline' ? '网络已断开' : '连接暂时中断，稍后重试'}}</text></view><view class="follow-sync-times"><text wx:if="{{liveSync.lastReadText}}" class="follow-sync-time">{{liveSync.lastReadText}}读取</text><text wx:if="{{liveSync.nextReadText}}" class="follow-sync-time">下次 {{liveSync.nextReadText}}</text></view></view>
-    <view wx:if="{{stockOverview}}" class="follow-inventory-status follow-inventory-status--{{stockOverview.tone}}"><text class="bold">{{stockOverview.label}}</text><text>{{stockOverview.detail}}</text></view>
-    <view wx:if="{{refreshError}}" class="banner banner-warn" aria-role="alert">{{refreshError}}</view>
-    <view wx:elif="{{refreshFeedback}}" class="follow-refresh-feedback" aria-role="status">{{refreshFeedback}}</view>
-    <view wx:if="{{activation}}" class="card activation-card" aria-live="polite">
-      <view class="card-title activation-title">{{activation.title}}</view>
-      <view wx:if="{{activation.targetTitle}}" class="bold">{{activation.targetTitle}}</view>
-      <view class="activation-steps"><view wx:for="{{activation.steps}}" wx:key="id" class="activation-step {{item.done ? 'activation-step--done' : ''}}"><view class="activation-dot"><view wx:if="{{item.done}}" class="ui-check" aria-hidden="true"></view><text wx:else>{{index + 1}}</text></view><text>{{item.label}}</text></view></view>
-      <view class="small text-2">{{activation.detail}}</view>
-      <button wx:if="{{activation.action}}" class="btn btn-block mt" hover-class="ui-control-pressed" disabled="{{saving || editing || refreshing || subscribing}}" bindtap="onActivationAction">{{activation.actionLabel}}</button>
-    </view>
-
-    <view wx:if="{{alert}}" id="restock-alert" class="card alert-card">
-      <view class="card-title"><text>{{alert.soldOut ? '断货提醒' : '到货提醒'}}</text><button class="ui-action ui-action--plain" hover-class="ui-control-pressed" bindtap="onCloseAlert">关闭</button></view>
-      <view wx:if="{{alert.loading}}" class="loading-line">正在读取这条提醒…</view>
-      <view wx:elif="{{alert.error}}">
-        <view class="small text-2" aria-role="alert">{{alert.error}}</view>
-        <button wx:if="{{alert.retryable}}" class="btn btn-block mt" hover-class="ui-control-pressed" bindtap="onRetryAlert">重新读取这条提醒</button>
+    <view class="follow-detail-pane">
+      <view class="section-heading inventory-home-heading">
+        <view class="inventory-heading-copy">
+          <text class="section-title">苹果库存</text>
+          <text wx:if="{{ready && followsLoaded && !loadError}}" class="inventory-allowance">关注配置{{boot.member ? '已用 ' + follows.length + ' / ' + limits.maxFollows + ' 个名额' : ' ' + follows.length + ' 个'}}</text>
+        </view>
+        <button class="ui-action ui-action--plain" hover-class="ui-control-pressed" bindtap="onOpenInventory">查询库存</button>
       </view>
+      <view wx:if="{{loadError}}" class="card load-error" aria-role="alert">
+        <view class="load-error-title">暂时没有连上</view>
+        <view class="load-error-detail">{{loadError}}</view>
+        <button class="btn btn-primary btn-block" bindtap="onRetryLoad">重试</button>
+      </view>
+
+      <block wx:elif="{{!ready}}">
+        <view class="skeleton" aria-busy="true">
+          <view class="skeleton-card"><view class="skeleton-line skeleton-title"></view><view class="skeleton-line"></view><view class="skeleton-line skeleton-short"></view><view class="skeleton-bar"></view></view>
+          <view class="loading-line">正在读取你的关注…</view>
+        </view>
+      </block>
+
       <block wx:else>
-        <text class="alert-product" user-select>{{alert.productTitle}}</text>
-        <text class="alert-meta mono" user-select>{{alert.partNumber}} · Apple {{alert.storeName}}</text>
-        <view class="alert-row"><text class="text-2">{{alert.eventLabel}}</text><text>{{alert.foundText}}（{{alert.agoText}}）</text></view>
-        <view class="alert-row"><text class="text-2">最近状态</text><view class="pill pill-dot pill-{{alert.nowCls}}">{{alert.nowLabel}}</view></view>
-        <view class="alert-explanation">{{alert.nowText}}。请以官网实际取货信息为准。</view>
-        <button class="btn btn-primary btn-block mt" hover-class="btn-primary-pressed" bindtap="onCopyAlert">复制型号和门店</button>
-        <view wx:if="{{!alert.soldOut}}" class="alert-feedback">
-          <text class="small text-2">{{alert.feedback === 'bought' ? '已记录买到反馈' : (alert.feedback ? '已记录你的反馈' : '买到了吗？')}}</text>
-          <view wx:if="{{alert.feedback !== 'bought'}}" class="alert-feedback-actions">
-            <button class="ui-action" hover-class="ui-control-pressed" data-outcome="bought" disabled="{{alertBusy}}" bindtap="onAlertFeedback">{{alert.followActive ? '买到了，暂停此关注' : '买到了'}}</button>
-            <button class="ui-action" hover-class="ui-control-pressed" data-outcome="missed" disabled="{{alertBusy}}" bindtap="onAlertFeedback">没抢到</button>
-            <button class="ui-action" hover-class="ui-control-pressed" data-outcome="skipped" disabled="{{alertBusy}}" bindtap="onAlertFeedback">没去买</button>
+        <view wx:if="{{liveSync.state === 'syncing' || liveSync.state === 'offline' || liveSync.state === 'retrying'}}" class="follow-sync-bar" aria-role="status"><view class="follow-sync-copy"><text class="follow-sync-dot follow-sync-dot--{{liveSync.state}}"></text><text>{{liveSync.state === 'syncing' ? '正在更新页面' : liveSync.state === 'offline' ? '网络已断开' : '连接暂时中断，稍后重试'}}</text></view><view class="follow-sync-times"><text wx:if="{{liveSync.lastReadText}}" class="follow-sync-time">{{liveSync.lastReadText}}读取</text><text wx:if="{{liveSync.nextReadText}}" class="follow-sync-time">下次 {{liveSync.nextReadText}}</text></view></view>
+        <view wx:if="{{stockOverview}}" class="follow-inventory-status follow-inventory-status--{{stockOverview.tone}}"><text class="bold">{{stockOverview.label}}</text><text>{{stockOverview.detail}}</text></view>
+        <view wx:if="{{refreshError}}" class="banner banner-warn" aria-role="alert">{{refreshError}}</view>
+        <view wx:elif="{{refreshFeedback}}" class="follow-refresh-feedback" aria-role="status">{{refreshFeedback}}</view>
+        <view wx:if="{{activation}}" class="card activation-card" aria-live="polite">
+          <view class="card-title activation-title">{{activation.title}}</view>
+          <view wx:if="{{activation.targetTitle}}" class="bold">{{activation.targetTitle}}</view>
+          <view class="activation-steps"><view wx:for="{{activation.steps}}" wx:key="id" class="activation-step {{item.done ? 'activation-step--done' : ''}}"><view class="activation-dot"><view wx:if="{{item.done}}" class="ui-check" aria-hidden="true"></view><text wx:else>{{index + 1}}</text></view><text>{{item.label}}</text></view></view>
+          <view class="small text-2">{{activation.detail}}</view>
+          <button wx:if="{{activation.action}}" class="btn btn-block mt" hover-class="ui-control-pressed" disabled="{{saving || editing || refreshing || subscribing}}" bindtap="onActivationAction">{{activation.actionLabel}}</button>
+        </view>
+
+        <view wx:if="{{alert}}" id="restock-alert" class="card alert-card">
+          <view class="card-title"><text>{{alert.soldOut ? '断货提醒' : '到货提醒'}}</text><button class="ui-action ui-action--plain" hover-class="ui-control-pressed" bindtap="onCloseAlert">关闭</button></view>
+          <view wx:if="{{alert.loading}}" class="loading-line">正在读取这条提醒…</view>
+          <view wx:elif="{{alert.error}}">
+            <view class="small text-2" aria-role="alert">{{alert.error}}</view>
+            <button wx:if="{{alert.retryable}}" class="btn btn-block mt" hover-class="ui-control-pressed" bindtap="onRetryAlert">重新读取这条提醒</button>
+          </view>
+          <block wx:else>
+            <text class="alert-product" user-select>{{alert.productTitle}}</text>
+            <text class="alert-meta mono" user-select>{{alert.partNumber}} · Apple {{alert.storeName}}</text>
+            <view class="alert-row"><text class="text-2">{{alert.eventLabel}}</text><text>{{alert.foundText}}（{{alert.agoText}}）</text></view>
+            <view class="alert-row"><text class="text-2">最近状态</text><view class="pill pill-dot pill-{{alert.nowCls}}">{{alert.nowLabel}}</view></view>
+            <view class="alert-explanation">{{alert.nowText}}。请以官网实际取货信息为准。</view>
+            <button class="btn btn-primary btn-block mt" hover-class="btn-primary-pressed" bindtap="onCopyAlert">复制型号和门店</button>
+            <view wx:if="{{!alert.soldOut}}" class="alert-feedback">
+              <text class="small text-2">{{alert.feedback === 'bought' ? '已记录买到反馈' : (alert.feedback ? '已记录你的反馈' : '买到了吗？')}}</text>
+              <view wx:if="{{alert.feedback !== 'bought'}}" class="alert-feedback-actions">
+                <button class="ui-action" hover-class="ui-control-pressed" data-outcome="bought" disabled="{{alertBusy}}" bindtap="onAlertFeedback">{{alert.followActive ? '买到了，暂停此关注' : '买到了'}}</button>
+                <button class="ui-action" hover-class="ui-control-pressed" data-outcome="missed" disabled="{{alertBusy}}" bindtap="onAlertFeedback">没抢到</button>
+                <button class="ui-action" hover-class="ui-control-pressed" data-outcome="skipped" disabled="{{alertBusy}}" bindtap="onAlertFeedback">没去买</button>
+              </view>
+            </view>
+          </block>
+        </view>
+
+        <view class="follow-content">
+          <view id="follow-configurations" class="follow-configurations">
+            <view wx:if="{{!followsLoaded}}" class="card loading-line" aria-busy="true">正在确认已保存的关注…</view>
+            <view wx:elif="{{!follows.length}}" class="card follow-empty">
+              <view class="card-title empty-title">暂无库存关注</view>
+              <view wx:if="{{!boot.member}}" class="small text-2">关注与到货提醒为会员专属，免费用户可按次查询。</view>
+              <button class="btn btn-primary btn-block" hover-class="btn-primary-pressed" bindtap="onAdd">{{boot.member ? '添加关注' : '了解会员'}}</button>
+            </view>
+
+            <!-- 关注卡：配置身份 → 状态与观测时间 → 下一步；有货时整张卡转绿。 -->
+            <view wx:for="{{follows}}" wx:key="followId" id="follow-entry-{{index}}" class="card follow {{(item.followId === selectedFollowId) ? 'follow--selected' : ''}} {{item.hasAvailable ? 'follow-available' : ''}}">
+              <view class="follow-product">
+                <view wx:if="{{item.imageDisplayUrl}}" class="product-tile follow-image"><image src="{{item.imageDisplayUrl}}" webp="{{true}}" mode="aspectFit" aria-label="{{item.imageAlt}}" data-index="{{index}}" binderror="onFollowImageError" /></view>
+                <view wx:else class="product-tile follow-image follow-image-placeholder"><image class="ui-icon" src="/images/ui/device.png" mode="aspectFit" aria-hidden="true" /></view>
+                <view class="follow-head"><view class="follow-title"><text class="bold">{{item.cardTitle}}</text></view><text wx:if="{{item.cardSubtitle}}" class="follow-variant">{{item.cardSubtitle}}</text><text class="follow-status follow-status--{{item.statusCls}}"><text class="follow-status-dot"></text>{{item.statusLabel}}</text></view>
+              </view>
+              <view wx:if="{{item.monitoringText}}" class="follow-note">{{item.monitoringText}}</view>
+              <view class="follow-stock-panel follow-stock-panel--{{item.observationTone}}">
+                <view class="follow-stock-heading"><view class="follow-stock-state"><view wx:if="{{item.hasAvailable}}" class="ui-live-dot" aria-hidden="true"></view><text class="follow-stock-label">{{item.observationLabel}}</text></view><text wx:if="{{item.observationAge}}" class="follow-stock-time">{{item.observationAge}}</text></view>
+                <view class="follow-stock-detail">{{item.stockDetail}}</view>
+                <view wx:if="{{item.observationIncomplete}}" class="follow-partial-note">另 {{item.pendingStoreCount}} 家门店待更新</view>
+              </view>
+              <view wx:if="{{item.hasAvailable}}" class="follow-primary-actions">
+                <button class="btn btn-primary btn-block" hover-class="btn-primary-pressed" data-id="{{item.followId}}" bindtap="onPickupInfo">查看取货信息</button>
+              </view>
+              <button class="follow-detail-entry" hover-class="ui-control-pressed" aria-expanded="{{item.detailsExpanded}}" data-id="{{item.followId}}" bindtap="onToggleFollowDetails"><text class="follow-detail-count">{{item.stores.length}} 家门店</text><view class="follow-detail-label"><text>{{item.detailsExpanded ? '收起详情' : '详情与管理'}}</text><view class="ui-chevron {{item.detailsExpanded ? 'ui-chevron--up' : 'ui-chevron--down'}}" aria-hidden="true"></view></view></button>
+              <view wx:if="{{item.detailsExpanded}}" class="follow-details ui-reveal">
+                <view wx:for="{{item.stores}}" wx:for-item="s" wx:key="storeNumber" class="store-row">
+                  <view class="store-heading"><text class="store-name">{{s.storeLabel}}</text><view class="pill pill-dot pill-{{s.observationState === 'fresh' && s.status === 'unavailable' ? 'muted' : s.compactTone}}">{{s.compactStatus}}</view></view>
+                  <view class="store-observation">{{s.checkText}}</view>
+                  <view wx:if="{{s.lastResultTimeText}}" class="store-detail-note">{{s.lastResultTimeText}}</view>
+                  <view wx:if="{{s.compactNote}}" class="store-detail-note">{{s.compactNote}}</view>
+                </view>
+                <view wx:if="{{followActionId === item.followId && followActionError}}" class="follow-action-error" aria-role="alert"><text>{{followActionError}}</text><button class="ui-action" hover-class="ui-control-pressed" loading="{{refreshing}}" disabled="{{refreshing}}" bindtap="onRefreshStatus">刷新状态</button></view>
+                <view class="btn-row follow-actions">
+                  <button wx:if="{{item.canQuery}}" class="btn follow-optional-query" hover-class="ui-control-pressed" data-id="{{item.followId}}" disabled="{{saving || editing}}" bindtap="onQueryFollow">单独查询库存</button>
+                  <button class="btn" hover-class="ui-control-pressed" disabled="{{saving || followBusyId}}" data-id="{{item.followId}}" bindtap="onEdit">{{item.editLabel}}</button>
+                  <button wx:if="{{item.limitPaused}}" class="btn" hover-class="ui-control-pressed" disabled="{{saving || followBusyId}}" bindtap="showMemberModal">查看套餐</button>
+                  <button wx:elif="{{boot.member && item.canToggle}}" class="btn" hover-class="ui-control-pressed" loading="{{followBusyId === item.followId}}" disabled="{{saving || followBusyId}}" data-id="{{item.followId}}" data-status="{{item.status}}" bindtap="onToggle">{{item.status === 'active' ? '暂停' : '恢复'}}</button>
+                </view>
+                <view class="follow-management"><button class="ui-action ui-action--plain" hover-class="ui-control-pressed" data-id="{{item.followId}}" bindtap="onViewHistory">查看供应历史</button><text class="follow-part mono" user-select>{{item.partNumber}}</text><button class="ui-action ui-action--plain ui-action--danger danger-action" hover-class="ui-control-pressed" disabled="{{saving || followBusyId}}" data-id="{{item.followId}}" bindtap="onRemove">删除关注</button></view>
+              </view>
+            </view>
+            <view wx:if="{{followsLoaded && follows.length}}" class="follow-add-footer"><button class="btn btn-block" hover-class="ui-control-pressed" disabled="{{saving || followBusyId}}" bindtap="onAdd"><view class="ui-plus" aria-hidden="true"></view><text>添加关注</text></button></view>
+          </view>
+
+          <view id="reminder-health" class="card reminder-status-strip {{readiness.ready && !primaryTopUp && !subscriptionPending && !authorization.errorMessage && !authorizationFeedback && !(consent && consent.anyBlocked) ? 'reminder-status-routine' : ''}}" aria-live="polite">
+            <view class="reminder-status-row"><view class="reminder-status-copy"><text class="bold">{{readiness.code === 'ready' || readiness.code === 'restock_ready' ? '微信提醒授权已备好' : readiness.title}}</text><text wx:if="{{boot.member && subscription.templateCount}}" class="reminder-inline-balance">到货 {{subscription.credits}} 次{{authorization.pendingRestock ? '（待同步 +' + authorization.pendingRestock + '）' : ''}}<text wx:if="{{subscription.soldoutEnabled}}"> · 断货 {{subscription.soldoutCredits}} 次{{authorization.pendingSoldout ? '（待同步 +' + authorization.pendingSoldout + '）' : ''}}</text></text></view><button class="ui-action ui-action--plain reminder-details-toggle" hover-class="ui-control-pressed" bindtap="onToggleServiceDetails" aria-expanded="{{showServiceDetails}}">{{showServiceDetails ? '收起' : '状态详情'}}<view class="ui-chevron {{showServiceDetails ? 'ui-chevron--up' : 'ui-chevron--down'}}" aria-hidden="true"></view></button></view>
+            <view wx:if="{{!showServiceDetails && readiness.action === 'service'}}" class="reminder-health-warning" aria-role="status">{{readinessTaskDetail}}</view>
+            <view wx:if="{{consent && consent.anyBlocked}}" class="consent-recovery" aria-role="status">
+              <view class="consent-recovery-title">微信提醒权限未开启</view>
+              <view class="consent-recovery-desc">微信已拒绝以下消息；库存监测继续，但对应提醒暂无法接收。</view>
+              <view class="consent-recovery-row" wx:for="{{consent.blocked}}" wx:key="id"><text class="consent-recovery-name">{{item.title}}</text><text class="consent-recovery-state">{{item.label}}</text></view>
+              <button class="btn btn-primary btn-block consent-recovery-action" bindtap="onOpenSubscribeSetting">前往微信设置</button>
+              <view class="consent-recovery-steps">微信设置 → 订阅消息 → 改为「接收」后返回补充次数。</view>
+            </view>
+            <button wx:if="{{boot.member && subscription.templateCount}}" class="btn {{primaryTopUp ? 'btn-primary btn-block' : 'btn-sm reminder-direct-compact'}} reminder-direct-button" hover-class="btn-primary-pressed" disabled="{{subscribing || authorization.storageBlocked || editing || saving}}" loading="{{subscribing}}" bindtap="onSubscribe">{{subscribing ? '等待微信授权…' : '补充提醒次数'}}</button>
+            <view wx:if="{{authorizationFeedback}}" class="authorization-feedback" aria-live="polite">{{authorizationFeedback}}</view>
+            <view wx:if="{{subscriptionPending || authorization.errorMessage}}" class="authorization-sync-error" aria-role="status"><text>{{authorization.errorMessage || '微信已允许，次数待同步'}}</text><button class="ui-action" disabled="{{authorization.syncing}}" loading="{{authorization.syncing}}" bindtap="onRetryAuthorizationSync">重试同步</button></view>
+            <button wx:if="{{!readiness.ready && readiness.action && readiness.action !== 'subscribe' && readiness.action !== 'add' && readiness.action !== 'follows'}}" class="btn btn-sm mt" hover-class="ui-control-pressed" bindtap="onReadinessAction">{{readiness.actionLabel}}</button>
+            <view wx:if="{{showServiceDetails}}" class="service-details ui-reveal">
+              <view wx:if="{{!readiness.ready}}" class="service-detail">{{readinessTaskDetail}}</view>
+              <view id="reminder-service-details" class="service-row"><view class="service-heading"><text class="service-title">后台检测</text><view class="pill pill-dot pill-{{collector.cls}}">{{collector.label}}</view></view><view class="service-detail">{{collector.detail}}</view></view>
+              <view class="service-row"><view class="service-heading"><text class="service-title">消息发送</text><view class="pill pill-dot pill-{{delivery.cls}}">{{delivery.label}}</view></view><view class="service-detail">{{delivery.detail}}</view></view>
+              <view class="service-row"><view class="service-heading"><text class="service-title">{{boot.member ? '会员至 ' + boot.expiresText : (boot.expired ? '会员已到期' : '免费用户')}}</text><button class="ui-action ui-action--plain" hover-class="ui-control-pressed" bindtap="onGoReminderSettings"><text class="ui-action-label">前往提醒设置</text><view class="ui-chevron" aria-hidden="true"></view></button></view><view class="service-detail">每条提醒消耗 1 次授权，免打扰期间不发送。</view></view>
+              <view class="status-footer"><text class="service-detail">{{refreshedText ? '页面读取 ' + refreshedText : ''}}</text><button class="ui-action ui-action--plain" hover-class="ui-control-pressed" bindtap="onServiceDetails"><text class="ui-action-label">服务详情</text><view class="ui-chevron" aria-hidden="true"></view></button></view>
+              <view class="reminder-shortcuts"><button class="ui-action" hover-class="ui-control-pressed" bindtap="onManageReminders">管理提醒记录</button><button class="ui-action" hover-class="ui-control-pressed" bindtap="onTestNotification">测试收信</button></view>
+            </view>
           </view>
         </view>
       </block>
     </view>
-
-    <view class="follow-content">
-      <view id="follow-configurations" class="follow-configurations">
-        <view wx:if="{{!followsLoaded}}" class="card loading-line" aria-busy="true">正在确认已保存的关注…</view>
-        <view wx:elif="{{!follows.length}}" class="card follow-empty">
-          <view class="card-title empty-title">暂无库存关注</view>
-          <view wx:if="{{!boot.member}}" class="small text-2">关注与到货提醒为会员专属，免费用户可按次查询。</view>
-          <button class="btn btn-primary btn-block" hover-class="btn-primary-pressed" bindtap="onAdd">{{boot.member ? '添加关注' : '了解会员'}}</button>
-        </view>
-
-        <!-- 关注卡：配置身份 → 状态与观测时间 → 下一步；有货时整张卡转绿。 -->
-        <view wx:for="{{follows}}" wx:key="followId" id="follow-entry-{{index}}" class="card follow {{item.hasAvailable ? 'follow-available' : ''}}">
-          <view class="follow-product">
-            <view wx:if="{{item.imageDisplayUrl}}" class="product-tile follow-image"><image src="{{item.imageDisplayUrl}}" webp="{{true}}" mode="aspectFit" aria-label="{{item.imageAlt}}" data-index="{{index}}" binderror="onFollowImageError" /></view>
-            <view wx:else class="product-tile follow-image follow-image-placeholder"><image class="ui-icon" src="/images/ui/device.png" mode="aspectFit" aria-hidden="true" /></view>
-            <view class="follow-head"><view class="follow-title"><text class="bold">{{item.cardTitle}}</text></view><text wx:if="{{item.cardSubtitle}}" class="follow-variant">{{item.cardSubtitle}}</text><text class="follow-status follow-status--{{item.statusCls}}"><text class="follow-status-dot"></text>{{item.statusLabel}}</text></view>
-          </view>
-          <view wx:if="{{item.monitoringText}}" class="follow-note">{{item.monitoringText}}</view>
-          <view class="follow-stock-panel follow-stock-panel--{{item.observationTone}}">
-            <view class="follow-stock-heading"><view class="follow-stock-state"><view wx:if="{{item.hasAvailable}}" class="ui-live-dot" aria-hidden="true"></view><text class="follow-stock-label">{{item.observationLabel}}</text></view><text wx:if="{{item.observationAge}}" class="follow-stock-time">{{item.observationAge}}</text></view>
-            <view class="follow-stock-detail">{{item.stockDetail}}</view>
-            <view wx:if="{{item.observationIncomplete}}" class="follow-partial-note">另 {{item.pendingStoreCount}} 家门店待更新</view>
-          </view>
-          <view wx:if="{{item.hasAvailable}}" class="follow-primary-actions">
-            <button class="btn btn-primary btn-block" hover-class="btn-primary-pressed" data-id="{{item.followId}}" bindtap="onPickupInfo">查看取货信息</button>
-          </view>
-          <button class="follow-detail-entry" hover-class="ui-control-pressed" aria-expanded="{{item.detailsExpanded}}" data-id="{{item.followId}}" bindtap="onToggleFollowDetails"><text class="follow-detail-count">{{item.stores.length}} 家门店</text><view class="follow-detail-label"><text>{{item.detailsExpanded ? '收起详情' : '详情与管理'}}</text><view class="ui-chevron {{item.detailsExpanded ? 'ui-chevron--up' : 'ui-chevron--down'}}" aria-hidden="true"></view></view></button>
-          <view wx:if="{{item.detailsExpanded}}" class="follow-details ui-reveal">
-            <view wx:for="{{item.stores}}" wx:for-item="s" wx:key="storeNumber" class="store-row">
-              <view class="store-heading"><text class="store-name">{{s.storeLabel}}</text><view class="pill pill-dot pill-{{s.observationState === 'fresh' && s.status === 'unavailable' ? 'muted' : s.compactTone}}">{{s.compactStatus}}</view></view>
-              <view class="store-observation">{{s.checkText}}</view>
-              <view wx:if="{{s.lastResultTimeText}}" class="store-detail-note">{{s.lastResultTimeText}}</view>
-              <view wx:if="{{s.compactNote}}" class="store-detail-note">{{s.compactNote}}</view>
-            </view>
-            <view wx:if="{{followActionId === item.followId && followActionError}}" class="follow-action-error" aria-role="alert"><text>{{followActionError}}</text><button class="ui-action" hover-class="ui-control-pressed" loading="{{refreshing}}" disabled="{{refreshing}}" bindtap="onRefreshStatus">刷新状态</button></view>
-            <view class="btn-row follow-actions">
-              <button wx:if="{{item.canQuery}}" class="btn follow-optional-query" hover-class="ui-control-pressed" data-id="{{item.followId}}" disabled="{{saving || editing}}" bindtap="onQueryFollow">单独查询库存</button>
-              <button class="btn" hover-class="ui-control-pressed" disabled="{{saving || followBusyId}}" data-id="{{item.followId}}" bindtap="onEdit">{{item.editLabel}}</button>
-              <button wx:if="{{item.limitPaused}}" class="btn" hover-class="ui-control-pressed" disabled="{{saving || followBusyId}}" bindtap="showMemberModal">查看套餐</button>
-              <button wx:elif="{{boot.member && item.canToggle}}" class="btn" hover-class="ui-control-pressed" loading="{{followBusyId === item.followId}}" disabled="{{saving || followBusyId}}" data-id="{{item.followId}}" data-status="{{item.status}}" bindtap="onToggle">{{item.status === 'active' ? '暂停' : '恢复'}}</button>
-            </view>
-            <view class="follow-management"><button class="ui-action ui-action--plain" hover-class="ui-control-pressed" data-id="{{item.followId}}" bindtap="onViewHistory">查看供应历史</button><text class="follow-part mono" user-select>{{item.partNumber}}</text><button class="ui-action ui-action--plain ui-action--danger danger-action" hover-class="ui-control-pressed" disabled="{{saving || followBusyId}}" data-id="{{item.followId}}" bindtap="onRemove">删除关注</button></view>
-          </view>
-        </view>
-        <view wx:if="{{followsLoaded && follows.length}}" class="follow-add-footer"><button class="btn btn-block" hover-class="ui-control-pressed" disabled="{{saving || followBusyId}}" bindtap="onAdd"><view class="ui-plus" aria-hidden="true"></view><text>添加关注</text></button></view>
-      </view>
-
-      <view id="reminder-health" class="card reminder-status-strip {{readiness.ready && !primaryTopUp && !subscriptionPending && !authorization.errorMessage && !authorizationFeedback && !(consent && consent.anyBlocked) ? 'reminder-status-routine' : ''}}" aria-live="polite">
-        <view class="reminder-status-row"><view class="reminder-status-copy"><text class="bold">{{readiness.code === 'ready' || readiness.code === 'restock_ready' ? '微信提醒授权已备好' : readiness.title}}</text><text wx:if="{{boot.member && subscription.templateCount}}" class="reminder-inline-balance">到货 {{subscription.credits}} 次{{authorization.pendingRestock ? '（待同步 +' + authorization.pendingRestock + '）' : ''}}<text wx:if="{{subscription.soldoutEnabled}}"> · 断货 {{subscription.soldoutCredits}} 次{{authorization.pendingSoldout ? '（待同步 +' + authorization.pendingSoldout + '）' : ''}}</text></text></view><button class="ui-action ui-action--plain reminder-details-toggle" hover-class="ui-control-pressed" bindtap="onToggleServiceDetails" aria-expanded="{{showServiceDetails}}">{{showServiceDetails ? '收起' : '状态详情'}}<view class="ui-chevron {{showServiceDetails ? 'ui-chevron--up' : 'ui-chevron--down'}}" aria-hidden="true"></view></button></view>
-        <view wx:if="{{!showServiceDetails && readiness.action === 'service'}}" class="reminder-health-warning" aria-role="status">{{readinessTaskDetail}}</view>
-        <view wx:if="{{consent && consent.anyBlocked}}" class="consent-recovery" aria-role="status">
-          <view class="consent-recovery-title">微信提醒权限未开启</view>
-          <view class="consent-recovery-desc">微信已拒绝以下消息；库存监测继续，但对应提醒暂无法接收。</view>
-          <view class="consent-recovery-row" wx:for="{{consent.blocked}}" wx:key="id"><text class="consent-recovery-name">{{item.title}}</text><text class="consent-recovery-state">{{item.label}}</text></view>
-          <button class="btn btn-primary btn-block consent-recovery-action" bindtap="onOpenSubscribeSetting">前往微信设置</button>
-          <view class="consent-recovery-steps">微信设置 → 订阅消息 → 改为「接收」后返回补充次数。</view>
-        </view>
-        <button wx:if="{{boot.member && subscription.templateCount}}" class="btn {{primaryTopUp ? 'btn-primary btn-block' : 'btn-sm reminder-direct-compact'}} reminder-direct-button" hover-class="btn-primary-pressed" disabled="{{subscribing || authorization.storageBlocked || editing || saving}}" loading="{{subscribing}}" bindtap="onSubscribe">{{subscribing ? '等待微信授权…' : '补充提醒次数'}}</button>
-        <view wx:if="{{authorizationFeedback}}" class="authorization-feedback" aria-live="polite">{{authorizationFeedback}}</view>
-        <view wx:if="{{subscriptionPending || authorization.errorMessage}}" class="authorization-sync-error" aria-role="status"><text>{{authorization.errorMessage || '微信已允许，次数待同步'}}</text><button class="ui-action" disabled="{{authorization.syncing}}" loading="{{authorization.syncing}}" bindtap="onRetryAuthorizationSync">重试同步</button></view>
-        <button wx:if="{{!readiness.ready && readiness.action && readiness.action !== 'subscribe' && readiness.action !== 'add' && readiness.action !== 'follows'}}" class="btn btn-sm mt" hover-class="ui-control-pressed" bindtap="onReadinessAction">{{readiness.actionLabel}}</button>
-        <view wx:if="{{showServiceDetails}}" class="service-details ui-reveal">
-          <view wx:if="{{!readiness.ready}}" class="service-detail">{{readinessTaskDetail}}</view>
-          <view id="reminder-service-details" class="service-row"><view class="service-heading"><text class="service-title">后台检测</text><view class="pill pill-dot pill-{{collector.cls}}">{{collector.label}}</view></view><view class="service-detail">{{collector.detail}}</view></view>
-          <view class="service-row"><view class="service-heading"><text class="service-title">消息发送</text><view class="pill pill-dot pill-{{delivery.cls}}">{{delivery.label}}</view></view><view class="service-detail">{{delivery.detail}}</view></view>
-          <view class="service-row"><view class="service-heading"><text class="service-title">{{boot.member ? '会员至 ' + boot.expiresText : (boot.expired ? '会员已到期' : '免费用户')}}</text><button class="ui-action ui-action--plain" hover-class="ui-control-pressed" bindtap="onGoReminderSettings"><text class="ui-action-label">前往提醒设置</text><view class="ui-chevron" aria-hidden="true"></view></button></view><view class="service-detail">每条提醒消耗 1 次授权，免打扰期间不发送。</view></view>
-          <view class="status-footer"><text class="service-detail">{{refreshedText ? '页面读取 ' + refreshedText : ''}}</text><button class="ui-action ui-action--plain" hover-class="ui-control-pressed" bindtap="onServiceDetails"><text class="ui-action-label">服务详情</text><view class="ui-chevron" aria-hidden="true"></view></button></view>
-          <view class="reminder-shortcuts"><button class="ui-action" hover-class="ui-control-pressed" bindtap="onManageReminders">管理提醒记录</button><button class="ui-action" hover-class="ui-control-pressed" bindtap="onTestNotification">测试收信</button></view>
-        </view>
-      </view>
-    </view>
-  </block>
+  </view>
 </view>
 
 <config-sheet wx:if="{{editing}}" id="follow-config-sheet" visible="{{editing}}" title="{{editor.isNew ? '添加关注' : '调整关注'}}" confirm-text="保存关注" busy="{{saving}}" disabled="{{!editorCanSave}}" dirty="{{editorDirty}}" summary="{{editorSummary}}" external-close="{{true}}" bindconfirm="onSave" bindrequestclose="onRequestCloseEditor" bindclose="onCancelEdit">

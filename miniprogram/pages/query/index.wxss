@@ -1,5 +1,30 @@
 /* 查询页。公共组件见 styles/common.wxss，令牌见 app.wxss。 */
 
+.query-result-empty { display: none; }
+.query-empty-note { margin-top: var(--sp-8); color: var(--text-2); font-size: var(--fs-sub); }
+
+@media (min-width: 900px) {
+  .query-workspace, .query-skeleton {
+    display: grid;
+    grid-template-columns: minmax(300px, 0.85fr) minmax(0, 1.5fr);
+    column-gap: var(--sp-24);
+    align-items: start;
+  }
+  .query-workspace {
+    grid-template-areas: "network network" "refresh refresh" "heading heading" "selection results" "support results";
+    grid-template-rows: auto auto auto max-content 1fr;
+  }
+  .query-workspace > .network-notice { grid-area: network; }
+  .query-workspace > .refresh-feedback { grid-area: refresh; }
+  .query-workspace > .page-heading { grid-area: heading; }
+  .selection-card, .query-editor-slot { grid-area: selection; }
+  .query-workspace--editing .selection-card { display: none; }
+  .query-workspace--editing .query-editor-slot { margin-bottom: var(--sp-12); }
+  .query-result-card, .query-result-empty { grid-area: results; }
+  .query-result-empty { display: block; }
+  .query-support { grid-area: support; min-width: 0; }
+}
+
 /* ── 页首：公告入口 ───────────────────────────────────── */
 .page-heading .heading-notice-btn {
   position: relative;

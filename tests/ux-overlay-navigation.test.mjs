@@ -24,6 +24,30 @@ test('leaving or disposing a redemption page releases the native overlay', () =>
   }
 });
 
+test('resizing a visible query sheet releases and reacquires modal navigation and native back', async () => {
+  const page = { route: 'pages/query/index', data: { sheetVisible: true }, setData(patch) { Object.assign(this.data, patch); } };
+  const rt = runtime(undefined, { getCurrentPages: () => [page] });
+  const native = nativeTabBar(rt), tabs = rt.load('utils/tab-bar.js');
+  tabs.syncTabBar(page, page.route);
+  const sheet = rt.instance('components/config-sheet/index.js', { visible: true, nativeGuardSupported: true });
+  const events = [];
+  sheet.triggerEvent = name => events.push(name);
+  sheet.onVisible(true);
+  for (const docked of [false, true, false, true]) {
+    page.data.wideQueryLayout = docked;
+    sheet.data.docked = docked;
+    sheet.onDocked();
+    while (await rt.nextTimer()) {}
+    assert.equal(native.hidden, !docked);
+    assert.equal(sheet.data.nativeGuardShow, !docked);
+    assert.equal(Boolean(sheet.keyboardListener), !docked);
+    if (docked) {
+      sheet.onNativeLeave();
+      assert.equal(events.length, 0);
+    }
+  }
+});
+
 test('closing a previous page sheet cannot expose the next page editor', async () => {
   const page = { route: 'pages/query/index', data: { sheetVisible: true }, setData(patch) { Object.assign(this.data, patch); } };
   let currentPage = page;

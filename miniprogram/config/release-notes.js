@@ -8,6 +8,15 @@
 // Keep technical details and complete acceptance records in release documents.
 const RELEASE_NOTES = [
   {
+    version: '3.7.3',
+    title: '宽窗口双栏',
+    dateText: '版本记录 · 2026-11-23',
+    highlights: [
+      '拉宽窗口可在查询页左边选配置和门店，右边看取货结果。',
+      '在小哨左边切换关注的商品，右边可查看对应的库存和提醒状态。',
+    ],
+  },
+  {
     version: '3.7.2',
     title: '会员选购与提醒更新',
     dateText: '版本记录 · 2026-11-21',

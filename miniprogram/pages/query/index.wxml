@@ -1,5 +1,5 @@
-<page-meta page-style="color-scheme:{{_themeMode || 'light'}};{{sheetVisible ? 'overflow:hidden;' : ''}}" />
-<view class="page tab-page query-page">
+<page-meta page-style="color-scheme:{{_themeMode || 'light'}};{{sheetVisible && !wideQueryLayout ? 'overflow:hidden;' : ''}}" />
+<view class="page tab-page query-page desktop-split-page {{ready && !loadError ? 'query-workspace' : ''}} {{sheetVisible && wideQueryLayout ? 'query-workspace--editing' : ''}}">
   <view wx:if="{{networkOffline}}" class="network-notice" aria-role="status">网络已断开，恢复后自动刷新</view>
   <view wx:if="{{loadError}}" class="card load-error" aria-role="alert">
     <view class="load-error-title">暂时没有连上</view>
@@ -16,7 +16,7 @@
         <view wx:if="{{noticeDot}}" class="heading-notice-dot" aria-hidden="true"></view>
       </button>
     </view>
-    <view class="skeleton" aria-busy="true">
+    <view class="skeleton query-skeleton" aria-busy="true">
       <view class="skeleton-card"><view class="skeleton-line skeleton-title"></view><view class="skeleton-line"></view><view class="skeleton-line skeleton-short"></view><view class="skeleton-bar"></view></view>
       <view class="skeleton-card"><view class="skeleton-line skeleton-title"></view><view class="skeleton-line"></view><view class="skeleton-line skeleton-short"></view></view>
       <view class="loading-line">正在加载商品目录…</view>
@@ -83,6 +83,12 @@
       </view>
     </view>
 
+    <view class="query-editor-slot">
+      <config-sheet id="query-config-sheet" visible="{{sheetVisible}}" docked="{{wideQueryLayout}}" title="选择配置与门店" confirm-text="保存选择" summary="{{draftSummary}}" dirty="{{draftDirty}}" external-close="{{true}}" bindconfirm="onDoneSelection" bindrequestclose="onRequestCloseSelection" bindclose="onCloseSelection">
+        <target-picker wx:if="{{sheetVisible}}" id="query-target-picker" catalog-version="{{catalogVersion}}" value="{{draftValue}}" max-stores="{{boot ? boot.maxStores : 3}}" in-sheet="{{true}}" bindchange="onDraftChange" />
+      </config-sheet>
+    </view>
+
     <!-- 查询结果：每家门店一行，状态与观测时间成对出现。 -->
     <view wx:if="{{result}}" id="query-result" class="card query-result-card ui-reveal">
       <view wx:if="{{queryFailureMessage}}" class="banner banner-warn mb">{{resultTargetDifferent ? '本次查询未完成，下方为其他配置或门店的上次结果。' : '本次查询未完成，下方保留上次查询结果。'}}</view>
@@ -94,7 +100,7 @@
         </view>
         <view wx:if="{{!liveResultRestricted}}" class="result-product-time">查询时间 {{result.queriedText}}</view>
       </view>
-      <view wx:if="{{resultTargetDifferent || !selectionCanCollapse || !selectionSummary}}" class="result-product-row">
+      <view wx:if="{{resultTargetDifferent || !selectionCanCollapse || !selectionSummary || (sheetVisible && wideQueryLayout)}}" class="result-product-row">
         <view class="product-tile result-product-media {{!result.product.imageDisplayUrl ? 'result-product-media--empty' : ''}}">
           <image wx:if="{{result.product.imageDisplayUrl}}" class="result-product-image {{result.product.imageFitClass}}" src="{{result.product.imageDisplayUrl}}" webp="{{true}}" mode="aspectFit" aria-label="{{result.product.imageAlt || result.product.title}}" binderror="onResultImageError" />
           <view wx:else class="result-product-placeholder">暂无图片</view>
@@ -194,39 +200,42 @@
         <view wx:if="{{alternativePreparedNotice}}" class="small text-2 mt" aria-role="status">{{alternativePreparedNotice}}</view>
       </view>
       <view class="btn-row result-actions">
-        <button wx:if="{{resultSupportsFollow && (!nextAction || nextAction.action === 'guide')}}" class="btn" hover-class="ui-control-pressed" bindtap="onAddFollow">加入关注</button>
-        <button class="btn {{querying || signing ? 'disabled' : ''}}" hover-class="ui-control-pressed" disabled="{{querying || signing || !accountReady}}" bindtap="onRequery" aria-label="重新查询此结果的配置与门店">{{querying ? '查询中…' : '重新查询'}}</button>
+        <button wx:if="{{resultSupportsFollow && (!nextAction || nextAction.action === 'guide')}}" class="btn" hover-class="ui-control-pressed" disabled="{{sheetVisible || querying || signing}}" bindtap="onAddFollow">加入关注</button>
+        <button class="btn {{querying || signing ? 'disabled' : ''}}" hover-class="ui-control-pressed" disabled="{{querying || signing || !accountReady || sheetVisible}}" bindtap="onRequery" aria-label="重新查询此结果的配置与门店">{{querying ? '查询中…' : '重新查询'}}</button>
       </view>
     </view>
 
-    <view class="query-notice-region" aria-live="polite">
-      <view wx:if="{{sharedSelection}}" class="banner banner-info">{{sharedTargetSource === 'follow' ? '已带入关注配置，点击查询确认最新库存。' : '已载入朋友分享的配置与门店。点击查询，获取当前取货信息。'}}</view>
-      <view wx:if="{{queryNotice}}" class="banner banner-{{queryNotice.tone === 'ok' ? 'ok' : queryNotice.tone === 'warn' ? 'warn' : 'info'}} query-notice">
-        <text>{{queryNotice.text}}</text>
-        <button wx:if="{{queryNotice.action === 'open_settings'}}" class="ui-action" bindtap="onOpenSubscribeSetting">前往微信设置</button>
-        <button wx:elif="{{queryNotice.action === 'refresh'}}" class="ui-action" loading="{{!accountReady && !accountError}}" disabled="{{querying || signing || refreshing || (!accountReady && !accountError)}}" bindtap="onRetryAccount">刷新状态</button>
-      </view>
-    </view>
-    <view wx:if="{{resumeSetup}}" class="card journey-resume">
-      <view class="journey-title">会员已生效，继续完成关注设置</view>
-      <button class="btn btn-primary btn-block mt" hover-class="btn-primary-pressed" bindtap="onContinueSetup">继续设置</button>
+    <view wx:else class="card query-result-empty">
+      <view class="result-receipt-title">门店取货结果</view>
+      <view class="query-empty-note" aria-role="status">{{querying ? '正在核实所选门店…' : (queryFailureMessage ? '本次查询未取得门店结果。' : (selectionSummary ? '尚无此配置的查询结果。' : '选好配置和门店后，可查询各店取货情况。'))}}</view>
     </view>
 
-    <view class="card card-list query-links">
-      <button wx:if="{{boot && boot.followCount}}" class="ui-disclosure query-follow-entry" hover-class="ui-control-pressed" bindtap="onGoFollow">
-        <view class="ui-label-with-icon"><image class="ui-icon query-follow-icon" src="/images/brand/whistle-green.png" mode="aspectFit" aria-hidden="true" /><text class="ui-disclosure-label query-guide-title">我的关注</text></view>
-        <view class="ui-disclosure-meta"><text class="query-link-meta">{{followTargets.length === 1 && boot.followCount === 1 ? followTargets[0].productTitle : boot.followCount + ' 个配置'}}</text><view class="ui-chevron" aria-hidden="true"></view></view>
-      </button>
-      <button class="ui-disclosure query-guide-entry" hover-class="ui-control-pressed" bindtap="onOpenGuide">
-        <view class="ui-label-with-icon"><image class="ui-icon" src="/images/ui/guide.png" mode="aspectFit" aria-hidden="true" /><text class="ui-disclosure-label query-guide-title">选购与取货攻略</text></view>
-        <view class="ui-chevron" aria-hidden="true"></view>
-      </button>
+    <view class="query-support">
+      <view class="query-notice-region" aria-live="polite">
+        <view wx:if="{{sharedSelection}}" class="banner banner-info">{{sharedTargetSource === 'follow' ? '已带入关注配置，点击查询确认最新库存。' : '已载入朋友分享的配置与门店。点击查询，获取当前取货信息。'}}</view>
+        <view wx:if="{{queryNotice}}" class="banner banner-{{queryNotice.tone === 'ok' ? 'ok' : queryNotice.tone === 'warn' ? 'warn' : 'info'}} query-notice">
+          <text>{{queryNotice.text}}</text>
+          <button wx:if="{{queryNotice.action === 'open_settings'}}" class="ui-action" bindtap="onOpenSubscribeSetting">前往微信设置</button>
+          <button wx:elif="{{queryNotice.action === 'refresh'}}" class="ui-action" loading="{{!accountReady && !accountError}}" disabled="{{querying || signing || refreshing || (!accountReady && !accountError)}}" bindtap="onRetryAccount">刷新状态</button>
+        </view>
+      </view>
+      <view wx:if="{{resumeSetup}}" class="card journey-resume">
+        <view class="journey-title">会员已生效，继续完成关注设置</view>
+        <button class="btn btn-primary btn-block mt" hover-class="btn-primary-pressed" bindtap="onContinueSetup">继续设置</button>
+      </view>
+
+      <view class="card card-list query-links">
+        <button wx:if="{{boot && boot.followCount}}" class="ui-disclosure query-follow-entry" hover-class="ui-control-pressed" bindtap="onGoFollow">
+          <view class="ui-label-with-icon"><image class="ui-icon query-follow-icon" src="/images/brand/whistle-green.png" mode="aspectFit" aria-hidden="true" /><text class="ui-disclosure-label query-guide-title">我的关注</text></view>
+          <view class="ui-disclosure-meta"><text class="query-link-meta">{{followTargets.length === 1 && boot.followCount === 1 ? followTargets[0].productTitle : boot.followCount + ' 个配置'}}</text><view class="ui-chevron" aria-hidden="true"></view></view>
+        </button>
+        <button class="ui-disclosure query-guide-entry" hover-class="ui-control-pressed" bindtap="onOpenGuide">
+          <view class="ui-label-with-icon"><image class="ui-icon" src="/images/ui/guide.png" mode="aspectFit" aria-hidden="true" /><text class="ui-disclosure-label query-guide-title">选购与取货攻略</text></view>
+          <view class="ui-chevron" aria-hidden="true"></view>
+        </button>
+      </view>
     </view>
   </block>
 </view>
-
-<config-sheet id="query-config-sheet" visible="{{sheetVisible}}" title="选择配置与门店" confirm-text="保存选择" summary="{{draftSummary}}" dirty="{{draftDirty}}" external-close="{{true}}" bindconfirm="onDoneSelection" bindrequestclose="onRequestCloseSelection" bindclose="onCloseSelection">
-  <target-picker wx:if="{{sheetVisible}}" id="query-target-picker" catalog-version="{{catalogVersion}}" value="{{draftValue}}" max-stores="{{boot ? boot.maxStores : 3}}" in-sheet="{{true}}" bindchange="onDraftChange" />
-</config-sheet>
 
 <reminder-nudge enabled="{{ready}}" blocked="{{!accountReady || querying || signing || sheetVisible || alternativeLoading}}" />

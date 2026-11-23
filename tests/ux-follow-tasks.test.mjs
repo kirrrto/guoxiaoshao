@@ -85,6 +85,35 @@ test('automatic follow refresh updates observations without reordering existing 
   assert.equal(page.data.follows[1].stores[0].status, 'unavailable');
 });
 
+test('selecting a saved follow uses its ID, opens its own details and survives refresh without a stock query', async () => {
+  const rows = [follow('a'), follow('b', { partNumber: 'a', stores: [{ storeNumber: 'R688', storeName: '另一家门店' }] })];
+  const rt = runtime(() => ({ follows: rows, limits: boot().limits }));
+  const page = pageFor(rt);
+  await page.loadFollows({ force: true });
+  assert.equal(page.data.selectedFollowId, 'a');
+  page.onToggleFollowDetails({ currentTarget: { dataset: { id: 'b' } } });
+  assert.equal(page.data.selectedFollowId, 'b', 'widening a phone view retains the configuration just opened');
+  page.onToggleFollowDetails({ currentTarget: { dataset: { id: 'b' } } });
+  page.onSelectFollow({ currentTarget: { dataset: { id: 'b' } } });
+  page.onSelectFollow({ currentTarget: { dataset: { id: 'gone' } } });
+  assert.equal(page.data.selectedFollowId, 'b');
+  assert.equal(page.data.follows[1].detailsExpanded, true);
+  assert.match(page.data.follows[1].storeSummary, /另一家门店/);
+  assert.deepEqual(rt.calls.map(call => call.action), ['follow.list']);
+  rows.reverse();
+  rows[0] = { ...rows[0], status: 'paused' };
+  await page.loadFollows({ force: true });
+  assert.equal(page.data.selectedFollowId, 'b');
+  assert.equal(page.data.follows[1].status, 'paused');
+  rows.shift();
+  await page.loadFollows({ force: true });
+  assert.equal(page.data.selectedFollowId, 'a');
+  rows.pop();
+  await page.loadFollows({ force: true });
+  assert.equal(page.data.selectedFollowId, '');
+  page.onUnload();
+});
+
 test('editing a middle card preserves its position after confirmation even when the refresh is offline', async () => {
   const rt = runtime(async (action, payload) => {
     if (action === 'follow.upsert') return { follow: follow(payload.followId, { partNumber: payload.partNumber, stores: payload.storeNumbers.map(storeNumber => ({ storeNumber })) }) };
@@ -97,6 +126,7 @@ test('editing a middle card preserves its position after confirmation even when 
   await page.onSave();
   assert.deepEqual(copy(page.data.follows.map(item => item.followId)), ['a', 'b', 'c']);
   assert.equal(page.data.follows[1].stores[0].storeNumber, 'R688');
+  assert.equal(page.data.selectedFollowId, 'b');
   assert.equal(page.data.follows[1].detailsExpanded, true);
   assert.equal(page.data.editing, false);
   assert.match(page.data.refreshError, /已保存.*刷新失败/);

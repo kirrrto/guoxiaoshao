@@ -2,6 +2,7 @@
 
 /* 小哨页。公共组件见 styles/common.wxss，令牌见 app.wxss。 */
 .compact-action.ui-action { flex: none; }
+.follow-list-pane { display: none; }
 
 /* ── 到期提醒 ─────────────────────────────────────────── */
 .deadline-home-heading { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--sp-8) var(--sp-12); margin-bottom: var(--sp-8); }
@@ -148,3 +149,42 @@
 .status-footer .service-detail { margin-top: 0; }
 .reminder-shortcuts { display: flex; flex-wrap: wrap; gap: var(--sp-8); margin-top: var(--sp-8); }
 .reminder-shortcuts .ui-action { flex: 1 1 auto; }
+
+@media (min-width: 900px) {
+  .follow-workspace {
+    display: grid;
+    grid-template-columns: minmax(300px, 0.85fr) minmax(0, 1.5fr);
+    align-items: start;
+    gap: var(--sp-24);
+  }
+  .follow-sidebar, .follow-detail-pane { min-width: 0; }
+  .follow-list-pane { display: block; }
+  .follow-workspace .inventory-home-heading, .follow-list-heading { margin-top: 0; }
+  .follow-list { padding: var(--sp-8); }
+  .follow-list .follow-list-choice {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sp-12);
+    width: 100%;
+    min-height: var(--tap);
+    margin: 0;
+    padding: var(--sp-12);
+    border: 0;
+    border-radius: var(--radius-control);
+    background: transparent;
+    color: var(--text);
+    font-size: var(--fs-body);
+    font-weight: 400;
+    line-height: var(--lh-snug);
+    text-align: left;
+  }
+  .follow-list .follow-list-choice::after { border: 0; }
+  .follow-list .follow-list-choice--selected { background: var(--surface-top); }
+  .follow-choice-copy { display: flex; flex: 1 1 0; flex-direction: column; gap: var(--sp-2); min-width: 0; }
+  .follow-choice-title { font-weight: 600; }
+  .follow-choice-meta { color: var(--text-2); font-size: var(--fs-sub); }
+  .follow-configurations { order: 0; }
+  .follow-configurations .follow { display: none; }
+  .follow-configurations .follow--selected { display: block; }
+}
