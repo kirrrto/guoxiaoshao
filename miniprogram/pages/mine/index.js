@@ -213,6 +213,8 @@ Page(require('../../utils/language').page('mine', {
     testReturnAvailable: false,
     showLedger: false,
     ledger: [],
+    ledgerLoading: false,
+    ledgerError: null,
     orders: [],
     showOrders: false,
     membershipUpgradeEmptyText: '',
@@ -222,7 +224,6 @@ Page(require('../../utils/language').page('mine', {
     purchaseUnavailableNote: '',
     purchaseMode: 'purchase',
     membershipUpgradePreview: null,
-    showQuotaDetails: false,
     showReminderSettings: false,
     showNotifications: false,
     ordersLoading: false,
@@ -284,7 +285,8 @@ Page(require('../../utils/language').page('mine', {
     this.pageRetired = false;
     this.pageVisible = true;
     if (!this.unsubscribeQuota) this.unsubscribeQuota = subscribeQuota(quota => {
-      if (this.pageRetired) return;
+      if (this.pageRetired || !this.orderAccount() || this.orderAccount() !== currentQuotaOwner()) return;
+      this.invalidateLedger();
       this.setData({ quota, tasks: presentTasks(this.quotaTasks, quota) });
       if (this.pageVisible && this.data.showLedger) this.loadLedger();
     });
@@ -331,6 +333,10 @@ Page(require('../../utils/language').page('mine', {
     this.orderConsentGeneration = (this.orderConsentGeneration || 0) + 1;
     this.paymentConsentGeneration = (this.paymentConsentGeneration || 0) + 1;
     this.pageVisible = false;
+    if (this.data.showLedger || this.ledgerRead || this.data.ledger.length) {
+      this.invalidateLedger();
+      this.setData({ showLedger: false, ledger: [], ledgerLoading: false, ledgerError: null });
+    }
     if (this.notificationReadPromise) {
       this.invalidateNotificationRead();
       this.setData({ notificationsLoading: false, notificationsLoadingMore: false });
@@ -352,7 +358,7 @@ Page(require('../../utils/language').page('mine', {
     this.pageRetired = true;
     this.pageVisible = false;
     if (this.paymentController) this.paymentController.dispose();
-    this.ledgerGeneration = (this.ledgerGeneration || 0) + 1;
+    this.invalidateLedger();
     if (this.unsubscribeQuota) { this.unsubscribeQuota(); this.unsubscribeQuota = null; }
     this.pageSession = (this.pageSession || 0) + 1;
     this.accountGeneration = (this.accountGeneration || 0) + 1;
@@ -390,7 +396,7 @@ Page(require('../../utils/language').page('mine', {
       this.setData({ ready: true, loadError: null, refreshError: null }, () => this.observeMembershipOffer());
       this.consumePendingSection();
       const pending = [this.loadNotifications({ force })];
-      if (this.data.showLedger) pending.push(this.loadLedger());
+      if (this.data.showLedger) pending.push(this.loadLedger({ force }));
       if (this.data.showOrders && !skipOrders) pending.push(this.loadOrders({ force }));
       await Promise.all(pending);
     } catch (error) {
@@ -520,6 +526,9 @@ Page(require('../../utils/language').page('mine', {
   applyBoot(boot) {
     this.quotaTasks = boot.tasks || [];
     const accountChanged = !this.data.boot || this.data.boot.identity.userKey !== boot.identity.userKey;
+    if (accountChanged || this.data.quota?.revision !== boot.quota?.revision || this.data.quota?.balance !== boot.quota?.balance) {
+      this.invalidateLedger();
+    }
     if (accountChanged) invalidateFollows();
     if (accountChanged) this.paymentConsentGeneration = (this.paymentConsentGeneration || 0) + 1;
     if (accountChanged) {
@@ -528,10 +537,10 @@ Page(require('../../utils/language').page('mine', {
       this.notificationsNextCursor = null;
       this.failedNotificationAction = null;
       this.confirmingNotificationClear = null;
-      this.ledgerGeneration = (this.ledgerGeneration || 0) + 1;
       this.setData({ notifications: [], notificationsLoading: false, notificationsError: null, notificationsLoadingMore: false,
         notificationsMoreError: null, notificationsHasMore: false, notificationsPaginationKnown: false, notificationsClearBefore: null,
-        notificationActionBusy: '', notificationDeletingId: '', notificationConfirming: false, notificationsActionError: null, ledger: [] });
+        notificationActionBusy: '', notificationDeletingId: '', notificationConfirming: false, notificationsActionError: null,
+        showLedger: false, ledger: [], ledgerLoading: false, ledgerError: null });
       this.checkoutGeneration = (this.checkoutGeneration || 0) + 1;
       this.checkoutContext = null;
       this.userSelectedPlan = false;
@@ -1291,10 +1300,6 @@ Page(require('../../utils/language').page('mine', {
     this.setData(releaseNotesPage(this.data.releaseNotesPage + 1));
   },
 
-  onToggleQuotaDetails() {
-    if (!this.pageRetired) this.setData({ showQuotaDetails: !this.data.showQuotaDetails });
-  },
-
   onToggleReminderSettings() {
     if (!this.pageRetired) this.setData({ showReminderSettings: !this.data.showReminderSettings });
   },
@@ -1311,7 +1316,6 @@ Page(require('../../utils/language').page('mine', {
     const section = getApp().globalData.pendingMineSection;
     if (!['reminder-center', 'reminder-settings', 'membership-card', 'quota-card', 'notification-records'].includes(section)) return;
     if (section === 'reminder-settings') this.setData({ showReminderSettings: true });
-    if (section === 'quota-card') this.setData({ showQuotaDetails: true });
     if (section === 'notification-records') {
       this.setData({ showNotifications: true });
       this.loadNotifications();
@@ -1372,18 +1376,49 @@ Page(require('../../utils/language').page('mine', {
     return this.loadLedger();
   },
 
-  async loadLedger() {
-    if (this.pageRetired) return;
-    const session = this.pageSession || 0;
-    const generation = (this.ledgerGeneration || 0) + 1;
-    this.ledgerGeneration = generation;
-    try {
-      const data = await call('quota.ledger', { limit: 30 });
-      if (!this.isCurrentSession(session) || generation !== this.ledgerGeneration) return;
-      this.setData({ ledger: data.entries.map(e => ({ ...e, label: LEDGER_TEXT[e.type] || e.type, timeText: fmt.fmtDateTime(e.createdAt), deltaText: (e.delta > 0 ? '+' : '') + e.delta })) });
-    } catch (error) {
-      if (this.isCurrentSession(session) && generation === this.ledgerGeneration) showError(error);
+  invalidateLedger() {
+    this.ledgerRead = null;
+    this.ledgerLoadedAt = 0;
+  },
+
+  onRetryLedger() {
+    if (!this.data.showLedger || this.pageRetired) return;
+    if (this.data.ledgerError === 'account') return this.refresh({ quiet: true, force: true });
+    return this.loadLedger({ force: true });
+  },
+
+  loadLedger({ force = false } = {}) {
+    if (this.pageRetired || this.pageVisible === false || !this.data.showLedger) return;
+    const owner = this.orderAccount();
+    if (!owner || owner !== currentQuotaOwner()) {
+      this.invalidateLedger();
+      this.setData({ ledger: [], ledgerLoading: false, ledgerError: 'account' });
+      return;
     }
+    if (this.ledgerRead) return this.ledgerRead;
+    if (!force && this.ledgerLoadedAt && Date.now() - this.ledgerLoadedAt < SECONDARY_CACHE_MS) return;
+    this.setData({ ledgerLoading: true, ledgerError: null });
+    const pending = call('quota.ledger', { limit: 30, expectedUserKey: owner }).then(data => {
+      if (this.ledgerRead !== pending) return;
+      if (owner !== currentQuotaOwner()) {
+        this.ledgerLoadedAt = 0;
+        this.setData({ ledger: [], ledgerError: 'account' });
+        return;
+      }
+      this.setData({ ledger: data.entries.map(e => ({ ...e, label: LEDGER_TEXT[e.type] || e.type, timeText: fmt.fmtDateTime(e.createdAt), deltaText: (e.delta > 0 ? '+' : '') + e.delta })) });
+      this.ledgerLoadedAt = Date.now();
+    }).catch(error => {
+      if (this.ledgerRead !== pending) return;
+      const changed = owner !== currentQuotaOwner() || error?.code === 'ledger_account_changed';
+      this.ledgerLoadedAt = 0;
+      this.setData(changed ? { ledger: [], ledgerError: 'account' } : { ledgerError: 'read' });
+    }).finally(() => {
+      if (this.ledgerRead !== pending) return;
+      this.ledgerRead = null;
+      this.setData({ ledgerLoading: false });
+    });
+    this.ledgerRead = pending;
+    return pending;
   },
 
   async saveSettings(patch) {

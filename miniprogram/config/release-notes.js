@@ -8,12 +8,12 @@
 // Keep technical details and complete acceptance records in release documents.
 const RELEASE_NOTES = [
   {
-    version: '3.8.4',
+    version: '3.8.3',
     title: '站点关注与每日签到',
     dateText: '版本记录 · 2026-11-24',
     highlights: [
-      '月卡和年卡可直接关注日本、台湾和香港门店，选购套餐时可查看名额。',
-      '每日签到可领 1 次查询，最多攒 10 次。',
+      '月卡和年卡可关注日本、台湾和香港门店，选购时可查看名额。',
+      '每日签到可攒 1 次查询，最多 10 次，点「次数明细」可看扣次和退款记录。',
       '库存只自动刷新仍有人关注的配置和门店。',
     ],
   },

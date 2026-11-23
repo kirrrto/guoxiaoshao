@@ -13,6 +13,22 @@ const failWith = (result, code) => {
   return result.error;
 };
 
+test('credit history uses the authenticated account and rejects a stale screen before looking up its ledger', async () => {
+  const f = createFixture();
+  ok(await f.call('quota.signin'));
+  const other = userContext('other-ledger-owner');
+  const reads = [];
+  const list = f.repo.listLedger.bind(f.repo);
+  f.repo.listLedger = (key, options) => { reads.push(key); return list(key, options); };
+  failWith(await f.call('quota.ledger', { expectedUserKey: userKeyOf() }, other), 'ledger_account_changed');
+  assert.deepEqual(reads, []);
+  const mine = ok(await f.call('quota.ledger', { expectedUserKey: userKeyOf() }));
+  assert.equal(mine.entries[0].type, 'signin_reward');
+  const legacy = ok(await f.call('quota.ledger', {}, other));
+  assert.deepEqual(legacy.entries, []);
+  assert.deepEqual(reads, [userKeyOf(), userKeyOf(other.FROM_OPENID)]);
+});
+
 test('ping works without a user; user actions require a mini-program identity', async () => {
   const f = createFixture();
   const ping = ok(await f.call('system.ping', {}, operatorContext()));

@@ -45,7 +45,9 @@ test('customer release notes exclude personal testing privileges, including hist
     const publicCopy = [row.title, ...row.highlights, row.note || ''].join(' ');
     assert.doesNotMatch(publicCopy, /指定(?:管理员|测试账号)|管理员功能测试|个人测试权限|开发者专属权益/);
   }
-  assert.ok(!RELEASE_NOTES.some(row => ['3.8.2', '3.8.3'].includes(row.version)));
+  assert.ok(!RELEASE_NOTES.some(row => row.version === '3.8.2'));
+  const candidate = RELEASE_NOTES.find(row => row.version === '3.8.3');
+  assert.ok(candidate.highlights.some(text => text.includes('扣次和退款记录')));
 });
 
 test('release pages cover every known version once in newest-first order without growing the rendered list', () => {
@@ -73,10 +75,10 @@ test('release pages cover every known version once in newest-first order without
 
 test('closing and reopening release notes resets the first page without changing payment or settings', () => {
   const rt = runtime(), mine = rt.instance('pages/mine/index.js');
-  mine.setData({ paymentPendingId: 'existing-payment', paymentBusy: true, showQuotaDetails: true,
+  mine.setData({ paymentPendingId: 'existing-payment', paymentBusy: true, showLedger: true,
     settings: { notifyEnabled: false }, orders: [{ orderId: 'already-paid' }] });
   const protectedFields = () => copy({ paymentPendingId: mine.data.paymentPendingId, paymentBusy: mine.data.paymentBusy,
-    showQuotaDetails: mine.data.showQuotaDetails, settings: mine.data.settings, orders: mine.data.orders });
+    showLedger: mine.data.showLedger, settings: mine.data.settings, orders: mine.data.orders });
   const original = protectedFields();
   mine.onToggleReleaseNotes(); mine.onNextReleaseNotes();
   assert.equal(mine.data.releaseNotesPage, 2);

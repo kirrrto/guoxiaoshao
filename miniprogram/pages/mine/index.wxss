@@ -204,7 +204,7 @@
 .record-empty-whistle { display: block; width: 32px; height: 32px; margin: 0 auto var(--sp-8); opacity: 0.5; }
 
 /* ── 查询与体验次数 ───────────────────────────────────── */
-.quota-summary { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-12); padding-bottom: var(--sp-12); }
+.quota-summary { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-12); }
 .quota-summary-copy { flex: 1 1 0; min-width: 0; }
 .quota-summary .card-title { margin-bottom: var(--sp-2); }
 .quota-balance { color: var(--text-2); font-size: var(--fs-sub); }

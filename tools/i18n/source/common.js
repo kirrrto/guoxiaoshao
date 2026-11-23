@@ -1,8 +1,8 @@
 module.exports = {
   '站点关注与每日签到': 'Regional watches and daily check-in',
   '版本记录 · 2026-11-24': 'Version record · 2026-11-24',
-  '月卡和年卡可直接关注日本、台湾和香港门店，选购套餐时可查看名额。': 'With a monthly or annual pass, watch products at stores in Japan, Taiwan and Hong Kong. See the watch limits when choosing a pass.',
-  '每日签到可领 1 次查询，最多攒 10 次。': 'Check in daily for one search credit. Save up to 10 credits.',
+  '月卡和年卡可关注日本、台湾和香港门店，选购时可查看名额。': 'Monthly and annual passes include watches in Japan, Taiwan and Hong Kong. Watch limits appear when you choose a pass.',
+  '每日签到可攒 1 次查询，最多 10 次，点「次数明细」可看扣次和退款记录。': 'Check in for one search credit a day and save up to 10. Tap Credit history to see credits spent and refunded.',
   '库存只自动刷新仍有人关注的配置和门店。': 'Stock refreshes automatically only for products and stores with an active watch.',
   '大陆门店查询': 'Mainland store pickup',
   '大陆站更新了 MacBook Pro 配置，移除了第一代 HomePod mini，二代五种颜色仍可查询。': 'Mainland stores have updated MacBook Pro configurations. The original HomePod mini has been removed, and all five HomePod mini 2 finishes are still listed.',

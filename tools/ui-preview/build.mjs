@@ -486,6 +486,12 @@ for (const scenario of scenarios) {
     bootstrap.tasks = [{ id: 'view_history', title: '旧版待领奖励', reward: 1 }];
   }
   const ledgerEntries = scenario === 'history-completed' ? [{ id: 'preview-task-ledger', type: 'task_reward', delta: 1, createdAt: now.toISOString() }] : [];
+  if (scenario === 'history-longcontent' || languagePreview && scenario === 'member') {
+    ledgerEntries.push(
+      { id: 'preview-refund', type: 'query_refund', delta: 1, createdAt: now.toISOString() },
+      { id: 'preview-debit', type: 'query_debit', delta: -1, createdAt: new Date(now.getTime() - 1000).toISOString() },
+    );
+  }
   const completeHistoryTask = () => {
     let granted = 0, reason = 'already_completed';
     if (!bootstrap.quota.tasksViewedToday.includes('view_history')) return { granted: 0, reason: 'reward_disabled', quota: copy(bootstrap.quota) };
@@ -685,7 +691,11 @@ for (const scenario of scenarios) {
       if (scenario === 'v331-history-claim-error') throw Error('offline history reward confirmation failed');
       return completeHistoryTask();
     }
-    if (action === 'quota.ledger') return { balance: bootstrap.quota.balance, entries: copy(ledgerEntries) };
+    if (action === 'quota.ledger') {
+      if (scenario === 'history-loading') return new Promise(() => {});
+      if (scenario === 'history-read-error') throw Error('offline ledger read failed');
+      return { balance: bootstrap.quota.balance, entries: copy(ledgerEntries) };
+    }
     if (action === 'member.status') return { orders: orderRecordsPreview || v343Preview ? copy(recordOrders) : previewOrder.orderId ? [copy(previewOrder)] : [] };
     if (action === 'member.deleteRecord' || action === 'member.clearRecords') {
       if (scenario === 'orders-error') throw Error('offline preview timeout');
@@ -825,7 +835,15 @@ for (const scenario of scenarios) {
         || Boolean(page.data.taskClaimError) !== (scenario === 'v331-history-claim-error')) throw Error('History claim fixture failed to enter its requested claim state');
     }
     // Mine sections are collapsed by default; open the ones each audit checks.
-    if (pageName === 'mine' && historyTaskPreview) { page.setData({ showQuotaDetails: true }); await page.onToggleLedger(); }
+    if (pageName === 'mine' && (historyTaskPreview || languagePreview)) {
+      const reads = () => previewCalls.filter(call => call.action === 'quota.ledger').length;
+      if (reads() || page.data.showLedger) throw Error('Credit history must wait for an explicit tap');
+      if (!['free', 'history-free-first'].includes(scenario)) {
+        const opened = page.onToggleLedger();
+        if (scenario !== 'history-loading') await opened;
+        if (!page.data.showLedger || reads() !== 1) throw Error('One tap must open credit history with one read');
+      }
+    }
     if (pageName === 'mine' && orderRecordsPreview) {
       await page.onToggleOrders();
       if (scenario === 'orders-pending') {
@@ -1123,6 +1141,10 @@ for (const scenario of scenarios) {
       if (previewCalls.some(item => item.action === 'growth.ingest')) throw Error('Layout fixtures must keep event ingestion disabled');
     }
     if (pageName === 'follow' || pageName === 'query') forbiddenText.push('查看供应历史', '查看可用历史');
+    if (pageName === 'mine' && (historyTaskPreview || languagePreview)) {
+      forbiddenText.push(languagePreview ? 'Credit details' : '查询次数明细');
+      if (historyTaskPreview && ['history-free-first', 'history-read-error', 'history-loading'].includes(scenario)) forbiddenText.push('暂无记录');
+    }
     if (historyTaskPreview && ['history-free-first', 'history-longcontent', 'history-read-error', 'history-loading'].includes(scenario)) {
       forbiddenText.push('浏览一次历史记录', '领取奖励', '已计入次数明细', '旧版浏览奖励待领取');
     }
@@ -1187,7 +1209,11 @@ for (const scenario of scenarios) {
         'history-completed': ['今日浏览任务已完成', '奖励已计入次数明细'],
         'history-longcontent': ['各地门店已有记录', '3 家门店'],
         'history-loading': ['正在加载浏览记录'],
-      }[scenario]] : ['每日签到可得 1 次，最多累计 10 次。', '次数明细', ...(scenario === 'history-balance-cap' ? ['余额已满，今日用次后可领', '暂无记录'] : ['history-member-reward', 'history-completed'].includes(scenario) ? ['+1'] : ['暂无记录'])]
+      }[scenario]] : ['每日签到可得 1 次，最多累计 10 次。', '次数明细', ...{
+        'history-free-first': [], 'history-read-error': ['次数明细暂时无法读取', '重试加载'], 'history-loading': ['正在加载…'],
+        'history-balance-cap': ['余额已满，今日用次后可领', '暂无记录'],
+        'history-member-reward': ['+1'], 'history-completed': ['+1'], 'history-longcontent': ['查询次数返还', '+1', '实时查询', '-1'],
+      }[scenario]]
           : monitoringPreview ? [...(follows.length ? [p.title, '调整', '详情与管理'] : []), ...(scenario.startsWith('monitor-dual-') ? ['到货', '断货'] : ['后台检测', '消息发送']), '微信提醒', ...{
         'monitor-template-missing': ['监测服务运行中', '模板尚未配置', '关注已开启', '查看原因'],
         'monitor-ready-authorized': ['监测服务运行中', '发送服务已就绪', '提醒次数只剩 1 次', '增加提醒次数', '关注已开启'],
@@ -1245,6 +1271,11 @@ for (const scenario of scenarios) {
         : desktopPreview && pageName === 'query' && scenario === 'free' ? ['想查哪一款？', '选择配置与门店']
         : pageName === 'admin' ? ['运行统计', '128'] : [p.title, ...(sheetPreview ? ['选商品', '选门店', '已选 2 家门店', '保存选择'] : [])];
       if (adminPreview && ['operator-ready', 'operator-longcontent'].includes(scenario)) expectedText.push('成功查询 56', '已确认呈现详情 12', '测试通知：28 条／20 人', '各行为分别计数', ...(scenario === 'operator-longcontent' ? ['以上不是完整统计'] : []));
+      if (languagePreview && pageName === 'mine') {
+        for (const source of ['每日签到可得 1 次，最多累计 10 次。', '次数明细', ...(scenario === 'member' ? ['查询次数返还', '实时查询', '+1', '-1'] : [])]) {
+          expectedText.push(rt.load('utils/language.js').t(source));
+        }
+      }
       if (sheetPreview) {
         const pickerLimit = pageName === 'history' ? 10 : pageName === 'follow' ? page.data.limits.maxStoresPerFollow : page.data.boot.maxStores;
         expectedText.push(`当前最多 ${pickerLimit} 家`, p.partNumber);

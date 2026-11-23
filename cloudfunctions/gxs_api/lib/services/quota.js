@@ -53,6 +53,9 @@ async function completeTask(ctx, payload) {
 }
 
 async function ledger(ctx, payload) {
+  if (payload.expectedUserKey !== undefined && payload.expectedUserKey !== ctx.identity.userKey) {
+    throw new ApiError('ledger_account_changed', '微信账号已变化，请刷新后重新操作');
+  }
   const user = await ensureUser(ctx);
   const limit = Math.min(Math.max(Number(payload.limit) || 30, 1), 100);
   const entries = await ctx.repo.listLedger(user._id, { limit });
