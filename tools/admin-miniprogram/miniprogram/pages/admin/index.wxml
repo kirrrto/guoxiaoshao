@@ -73,7 +73,8 @@
         <button class="btn btn-outline btn-sm" disabled="{{saving || configLoading}}" bindtap="onReloadConfig">{{configDirty ? '重载并替换草稿' : '重新加载'}}</button>
         <button class="btn btn-primary btn-sm" disabled="{{saving || configLoading || !configLoaded || !configDirty}}" bindtap="onSaveConfig">保存配置</button>
       </view>
-      <view class="tiny muted mt">可编辑：quota / tasks / memberProduct / memberPlans / memberRedemption / newProductWindows / notifications / collector / query / announcement / notices / features / growthExperiment。保存后立即生效。announcement 可设为 null 或含 text、kind、expiresAt 的对象。notices 为公告板列表，可设 title、startsAt、expiresAt，到期自动隐藏。两处均可填 titleEn、textEn，缺少译文时英文界面标注并显示原文。2.0 新入口与采集默认关闭；实验需先完成 A/A 核验，最多一个主链路实验。管理员名单仅由云端配置管理。</view>
+      <view class="tiny muted mt">其他站点按 JP、TW、HK 分别设置。internationalMarkets 控制公开查询，internationalMonitoring 控制后台监测，internationalNotifications 控制微信提醒。保存后立即生效。</view>
+      <view class="tiny muted mt">签到固定每日 1 次，最多累计 10 次。可编辑：quota（仅 queryCost 和 historyCost） / memberProduct / memberPlans / memberRedemption / newProductWindows / notifications / collector / query / internationalQueryLimits / announcement / notices / features / growthExperiment。announcement 可设为 null 或含 text、kind、expiresAt 的对象。notices 为公告板列表，可设 title、startsAt、expiresAt，到期自动隐藏。两处均可填 titleEn、textEn，缺少译文时英文界面标注并显示原文。2.0 新入口与采集默认关闭；实验需先完成 A/A 核验，最多一个主链路实验。管理员名单仅由云端配置管理。</view>
     </view>
   </block>
 </view>

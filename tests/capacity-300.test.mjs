@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { guardedPickup } from '../cloudfunctions/gxs_api/lib/engine/guarded-pickup.js';
 import { mergeConfig } from '../cloudfunctions/gxs_api/lib/config.js';
 import { createFixture, fakeFetch } from './helpers/fixture.mjs';
-import { CLIENTS, slowUpstreamMs, runBurstScenario, runSustainedScenario, summarizeAutomaticAttempts } from './helpers/capacity-300-scenarios.mjs';
+import { CLIENTS, slowUpstreamMs, runBurstScenario, runSustainedScenario, simulatedWatchDemand, summarizeAutomaticAttempts } from './helpers/capacity-300-scenarios.mjs';
 
 function useContractClock(t) {
   // Full-table copies in the in-memory repository measure the host CPU, not
@@ -59,12 +59,14 @@ test('automatic capacity counts known observations, unknown responses and denied
     R003: { display: 'default' }, R004: { display: 'ineligible' },
     R005: { display: 'unrecognized' }, R006: { error: 'simulated network loss' },
   });
-  const config = mergeConfig({ collector: { budgetMode: 'daily', maxRequestsPerMinute: 6 } });
+  const config = mergeConfig({ collector: { enabled: true, budgetMode: 'daily', maxRequestsPerMinute: 6 } });
   const f = createFixture({ fetchImpl, config });
   const attempts = [];
-  for (const storeNumber of ['R001', 'R002', 'R003', 'R004', 'R005', 'R006', 'R007']) {
+  const watchedStores = ['R001', 'R002', 'R003', 'R004', 'R005', 'R006', 'R007'];
+  const watchDemand = simulatedWatchDemand(watchedStores, 'MXXX1CH/A');
+  for (const storeNumber of watchedStores) {
     attempts.push(await guardedPickup({ repo: f.repo, config, fetchImpl, clock: () => f.state.now,
-      source: 'auto', storeNumber, partNumbers: ['MXXX1CH/A'], timeoutMs: 100 }));
+      source: 'auto', watchDemand, storeNumber, partNumbers: ['MXXX1CH/A'], timeoutMs: 100 }));
   }
   assert.equal(fetchImpl.calls.length, 6);
   assert.equal(attempts[4].record.httpStatus, 200);

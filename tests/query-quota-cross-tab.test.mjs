@@ -35,10 +35,13 @@ for (const kind of ['query', 'mine']) {
     const f = createFixture(), base = ok(await f.call('user.bootstrap'));
     let owner = 'alice';
     const answers = { alice: deferred(), bob: deferred() };
-    const rt = runtime(async action => {
+    const rt = runtime(async (action, payload) => {
       if (action === 'user.bootstrap') return { ...base, identity: { ...base.identity, userKey: owner },
         quota: { ...base.quota, balance: owner === 'alice' ? 8 : 0, revision: owner === 'alice' ? 9 : 0 } };
-      if (action === 'quota.signin') return answers[owner].promise;
+      if (action === 'quota.signin') {
+        assert.equal(payload.expectedUserKey, owner);
+        return answers[owner].promise;
+      }
       throw Error(action);
     });
     const page = rt.instance(`pages/${kind}/index.js`), store = rt.load('utils/store.js');
@@ -59,6 +62,20 @@ for (const kind of ['query', 'mine']) {
     assert.equal(page.data.signing, false);
     assert.equal(store.currentQuota().balance, 1);
     assert.equal(rt.messages.filter(item => item === '签到成功 +1 次').length, 1);
+  });
+  test(`${kind}: a cached page cannot dispatch sign-in after its verified account is cleared`, async () => {
+    const f = createFixture(), base = ok(await f.call('user.bootstrap'));
+    const rt = runtime(async action => {
+      if (action === 'user.bootstrap') return base;
+      if (action === 'notify.list') return { notifications: [] };
+      throw Error(action);
+    });
+    const page = rt.instance(`pages/${kind}/index.js`), store = rt.load('utils/store.js');
+    page.applyBoot(await store.getBootstrap());
+    store.resetSession();
+    await page.onSignin();
+    assert.equal(rt.calls.filter(call => call.action === 'quota.signin').length, 0);
+    assert.equal(rt.calls.filter(call => call.action === 'user.bootstrap').length, 2, 'a fresh account read makes the next tap possible');
   });
 }
 

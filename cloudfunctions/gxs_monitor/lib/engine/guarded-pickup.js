@@ -33,7 +33,7 @@ function serialiseAdmission(repo, market, task, waitMs) {
   return expired ? Promise.race([next, expired]) : next;
 }
 
-async function guardedPickup({ repo, config, clock, fetchImpl, storeNumber, partNumbers, products = null, timeoutMs, market = null, source = 'manual', previewUser = null, beforeRequest = async () => true, onBudget = () => {}, remainingMs = () => Infinity }) {
+async function guardedPickup({ repo, config, clock, fetchImpl, storeNumber, partNumbers, products = null, timeoutMs, market = null, source = 'manual', previewUser = null, beforeRequest = async () => true, watchDemand, onBudget = () => {}, remainingMs = () => Infinity }) {
   const denied = (reason, retryAt) => ({ record: { httpStatus: null, budgetDenied: true, retryAt, error: { message: reason }, elapsedMs: 0 }, observations: partNumbers.map(partNumber => ({ storeNumber, partNumber, status: 'unknown', quote: null, storeName: null, productTitle: null, observedAt: clock().toISOString(), reason: { code: reason, message: '暂缓查询，请稍后重试' } })) });
   if (remainingMs() <= 1000) return denied('request_cancelled', clock().getTime() + 1000);
   if (market === null && partNumbers.some(isRetiredPartNumber)) return denied('product_retired', 0);
@@ -45,19 +45,38 @@ async function guardedPickup({ repo, config, clock, fetchImpl, storeNumber, part
     if (!site.stores.some(store => store.storeNumber === storeNumber) || !Array.isArray(partNumbers) || !partNumbers.length
       || partNumbers.some(part => !findMarketProduct(market, part)?.[source === 'auto' ? 'monitorSupported' : 'querySupported'])) return denied('invalid_market_target', 0);
   }
+  const demand = watchDemand?.(storeNumber, partNumbers, market);
+  if (source === 'auto' && typeof demand?.select !== 'function') return denied('watch_check_unavailable', clock().getTime() + 1000);
   if (!products && partNumbers.some(isCtoPartNumber)) products = await repo.getProducts(partNumbers.filter(isCtoPartNumber));
   const autoShare = Math.min(0.95, Math.max(0.01, (config.collector.autoSharePercent || 80) / 100));
-  const budget = await serialiseAdmission(repo, market, () => {
+  const reserve = async () => {
+    if (demand && !await beforeRequest()) return null;
     // Waiting consumes the invocation/lease budget too. Do not reserve an
     // expired request, and choose its calendar day only when it reaches the head.
     if (remainingMs() <= 1000) return null;
     const limits = market ? config.internationalQueryLimits : config.collector;
-    return repo.consumeCollectorBudget({ now: clock().toISOString(), maxRequestsPerMinute: limits.maxRequestsPerMinute, maxRequestsPerDay: limits.maxRequestsPerDay, budgetMode: market ? 'daily' : config.collector.budgetMode, source, autoShare, market, previewUser });
-  }, remainingMs() - 1000);
+    return repo.consumeCollectorBudget({ now: clock().toISOString(), maxRequestsPerMinute: limits.maxRequestsPerMinute, maxRequestsPerDay: limits.maxRequestsPerDay, budgetMode: market ? 'daily' : config.collector.budgetMode, source, autoShare, market, previewUser, selectWatchedParts: demand?.select });
+  };
+  let budget;
+  try {
+    budget = await serialiseAdmission(repo, market, reserve, remainingMs() - 1000);
+    if (demand && budget?.reason === 'watch_candidates_changed') {
+      if (!await demand.refresh()) return denied('no_active_watch', clock().getTime() + 1000);
+      budget = await serialiseAdmission(repo, market, reserve, remainingMs() - 1000);
+    }
+  } catch (error) {
+    if (!demand) throw error;
+    return denied('watch_check_unavailable', clock().getTime() + 1000);
+  }
   if (!budget) return denied('request_cancelled', clock().getTime() + 1000);
-  onBudget(budget);
+  const { watchedParts, ...usage } = budget;
+  if (!['no_active_watch', 'collector_disabled'].includes(budget.reason)) onBudget(watchedParts ? usage : budget);
   if (!budget.allowed) return denied(budget.reason, budget.retryAt);
-  if (!await beforeRequest()) return denied('request_cancelled', clock().getTime() + 1000);
+  if (!demand && !await beforeRequest()) return denied('request_cancelled', clock().getTime() + 1000);
+  if (demand) {
+    if (!Array.isArray(watchedParts) || !watchedParts.length) return denied('watch_check_unavailable', clock().getTime() + 1000);
+    partNumbers = watchedParts;
+  }
   if (budget.token.probe && budget.token.expiresAt <= clock().getTime()) return denied('request_cancelled', clock().getTime() + 1000);
   // Transactions above consume invocation time too. Bound the actual network
   // request only now and leave a second for outcome/observation persistence.

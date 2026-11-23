@@ -10,7 +10,8 @@ const { storeLabel, storeLabelWithCity } = require('../../utils/store-label');
 const { syncTabBar, switchToTab, releaseTabBar } = require('../../utils/tab-bar');
 const { restockSubscription, soldoutSubscription, reminderReadiness, canRemind, creditBoostTip } = require('../../utils/reminder-readiness');
 const { shareAppMessage, shareTimeline } = require('../../utils/share');
-const { followPollDelay } = require('../../utils/poll');
+const { hasActiveStockTarget, followPollDelay } = require('../../utils/poll');
+const ACCOUNT_REFRESH_ERROR = '库存记录已更新，账户与提醒条件暂未更新；将自动重试。';
 const { isOnline, subscribeNetwork } = require('../../utils/network');
 const { getAuthorizationState, subscribeAuthorizationState, requestReminderAuthorization, syncPendingAuthorization, topUpReminderCredit, buildConsentReport, openSubscribeSettings } = require('../../utils/reminder-credits');
 const { confirmTap } = require('../../utils/haptic');
@@ -469,16 +470,26 @@ Page(require('../../utils/language').page('follow', {
     this.resumeAuthorizationSync();
     if (this.data.loadError) return this.onRetryLoad();
     if (!this.data.ready) return;
+    if (!this.shouldPollStock()) { this.setLiveSync('paused', ''); return this.retryAlertIdentity(); }
     this.liveFailures = 0;
     return this.refreshLiveStatus();
   },
 
-  stopPolling() { this.pollEpoch = (this.pollEpoch || 0) + 1; if (this.pollTimer) clearTimeout(this.pollTimer); this.pollTimer = null; },
+  stopPolling() {
+    this.pollEpoch = (this.pollEpoch || 0) + 1;
+    clearTimeout(this.pollTimer); this.pollTimer = null;
+    clearTimeout(this.alertIdentityTimer); this.alertIdentityTimer = null;
+  },
+  shouldPollStock() {
+    // Read the list once on entry. A confirmed empty or inactive list needs no timer.
+    return !this.data.followsLoaded || (canRemind(this.data.boot) && hasActiveStockTarget(this.data.follows));
+  },
   startPolling() {
     this.stopPolling();
     if (this.pageRetired || !this.visible) return;
     this.startObservationClock();
     this.watchLiveNetwork();
+    if (!this.shouldPollStock()) { this.setLiveSync('paused', ''); this.retryAlertIdentity(true); return; }
     if (!isOnline()) { this.setLiveSync('offline', '网络已断开，保留上次记录；联网后自动更新。'); return; }
     const delay = followPollDelay(this.data.collector, this.liveFailures || 0);
     const epoch = this.pollEpoch;
@@ -488,7 +499,7 @@ Page(require('../../utils/language').page('follow', {
       : '自动读取后台记录，不消耗查询次数；库存时间见各门店。', Date.now() + delay);
     this.pollTimer = setTimeout(() => {
       this.pollTimer = null;
-      if (!this.visible || this.pageRetired || epoch !== this.pollEpoch) return;
+      if (!this.visible || this.pageRetired || epoch !== this.pollEpoch || !this.shouldPollStock()) return;
       return this.refreshLiveStatus();
     }, delay);
   },
@@ -531,7 +542,7 @@ Page(require('../../utils/language').page('follow', {
       this.lastLocalPresentationAt = Date.now();
       this.liveFailures = followError || accountError ? (this.liveFailures || 0) + 1 : 0;
       if (followError) this.setData({ refreshError: '后台记录暂未更新，保留上次观测；联网时会自动重试。' });
-      else if (accountError) this.setData({ refreshError: '库存记录已更新，账户与提醒条件暂未更新；将自动重试。' });
+      else if (accountError) this.setData({ refreshError: ACCOUNT_REFRESH_ERROR });
       if (!accountError && this.visible) this.recordAlertOpen();
       return { ok: !followError, accountError, error: followError };
     }).finally(() => {
@@ -594,15 +605,52 @@ Page(require('../../utils/language').page('follow', {
     return this.loadAlert(alert.eventId);
   },
 
+  alertIdentityConfirmed() {
+    const cachedKey = getApp().globalData.bootstrap?.identity?.userKey;
+    return !this.alertAccountUnconfirmed && (!cachedKey || cachedKey === this.accountSnapshot?.identity?.userKey);
+  },
+
+  retryAlertIdentity(delayed = false) {
+    const eventId = this.presentedAlertId, accountEpoch = this.accountEpoch || 0;
+    const readEpoch = this.alertReadEpoch, visit = this.lifecycleEpoch;
+    const current = () => this.visible && !this.pageRetired && !this.liveRefreshPromise
+      && eventId && this.data.alert?.eventId === eventId && !this.data.alert.loading && !this.data.alert.error
+      && !this.acknowledgedAlerts?.has(eventId) && this.alertReadEpoch === readEpoch
+      && (this.accountEpoch || 0) === accountEpoch && this.lifecycleEpoch === visit && isOnline();
+    if (!current() || this.alertIdentityConfirmed() || this.shouldPollStock()) return;
+    if (this.alertIdentityRead) return this.alertIdentityRead;
+    if (delayed) {
+      if (!this.alertIdentityTimer) this.alertIdentityTimer = setTimeout(() => {
+        this.alertIdentityTimer = null;
+        return this.retryAlertIdentity();
+      }, followPollDelay(this.data.collector, this.liveFailures));
+      return;
+    }
+    clearTimeout(this.alertIdentityTimer); this.alertIdentityTimer = null;
+    const pending = getBootstrap({ force: true }).then(boot => {
+      if (!current()) return;
+      this.applyBoot(boot);
+      this.liveFailures = 0;
+      if (this.data.refreshError === ACCOUNT_REFRESH_ERROR) this.setData({ refreshError: null });
+      // A different account needs its own list. A same-account acknowledgment needs only identity.
+      if (accountEpoch !== (this.accountEpoch || 0)) return this.loadFollows({ force: true }).finally(() => {
+        if (!this.data.followsLoaded) this.startPolling();
+      });
+      return this.recordAlertOpen();
+    }).catch(() => { if (current()) this.liveFailures = (this.liveFailures || 0) + 1; })
+      .finally(() => {
+        if (this.alertIdentityRead !== pending) return;
+        this.alertIdentityRead = null;
+        this.retryAlertIdentity(true);
+      });
+    this.alertIdentityRead = pending;
+    return pending;
+  },
+
   recordAlertOpen() {
     const alert = this.data.alert, eventId = this.presentedAlertId;
-    const identityConfirmed = () => {
-      const cached = getApp().globalData.bootstrap;
-      const cachedKey = cached && cached.identity && cached.identity.userKey;
-      const pageKey = this.accountSnapshot && this.accountSnapshot.identity && this.accountSnapshot.identity.userKey;
-      return !this.alertAccountUnconfirmed && (!cachedKey || cachedKey === pageKey);
-    };
-    if (this.pageRetired || this.visible !== true || !identityConfirmed() || !eventId || !alert || alert.eventId !== eventId || alert.loading || alert.error) return;
+    if (this.pageRetired || this.visible !== true || !eventId || !alert || alert.eventId !== eventId || alert.loading || alert.error) return;
+    if (!this.alertIdentityConfirmed()) { this.retryAlertIdentity(true); return; }
     if (!this.acknowledgedAlerts) this.acknowledgedAlerts = new Set();
     const accountEpoch = this.accountEpoch || 0;
     const readEpoch = this.alertReadEpoch || 0;
@@ -615,7 +663,7 @@ Page(require('../../utils/language').page('follow', {
     // Analytics is independent of displaying stock or recording feedback. A
     // failed acknowledgment can retry on the next visible visit, never in a loop.
     return Promise.resolve().then(() => {
-      if (!currentAccount() || !this.visible || !identityConfirmed() || readEpoch !== (this.alertReadEpoch || 0)
+      if (!currentAccount() || !this.visible || !this.alertIdentityConfirmed() || readEpoch !== (this.alertReadEpoch || 0)
         || this.presentedAlertId !== eventId || !this.data.alert || this.data.alert.eventId !== eventId) return;
       work.sent = true;
       return call('notify.open', { eventId });
@@ -624,6 +672,7 @@ Page(require('../../utils/language').page('follow', {
   },
 
   onCloseAlert() {
+    clearTimeout(this.alertIdentityTimer); this.alertIdentityTimer = null;
     this.alertReadEpoch = (this.alertReadEpoch || 0) + 1;
     this.presentedAlertId = null; this.alertFeedbackWork = null;
     this.setData({ alert: null, alertBusy: false });
@@ -793,6 +842,8 @@ Page(require('../../utils/language').page('follow', {
       this.startObservationClock();
       this.refreshReadiness();
       this.consumePendingFocus();
+      // A local save or resume can introduce the first active target while this tab stays open.
+      if (this.visible && !this.loadingBoot && !this.liveRefreshPromise && (!this.pollTimer || !this.shouldPollStock())) this.startPolling();
       return true;
     });
     this.followsPromise = pending;

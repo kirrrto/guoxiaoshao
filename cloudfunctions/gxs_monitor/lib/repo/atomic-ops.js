@@ -7,7 +7,7 @@ const { COLLECTIONS: C } = require('../collections');
 const { ApiError } = require('../errors');
 const { dayKey } = require('../time');
 const { decideLiveQuery, decideMarketQuery, decideHistoryQuery } = require('../rules/access');
-const { grantableAmount, ledgerIds } = require('../rules/quota');
+const { DEFAULT_CONFIG: QUOTA_DEFAULTS, grantableAmount, legacyTaskEvidence, ledgerIds } = require('../rules/quota');
 const { isMember, hasAdminTestAccess, hasFreeReminder, canUseReminders, canWatchMarkets, validateFollowLimits, memberLimits, accountLimits, followAllowance, planSnapshot } = require('../rules/membership');
 const { OUTAGE_COMPENSATION_ORDER_ID, purchasedPlan, needsPlanMetadata, resolvePlanMetadata, needsOutageCompensation } = require('../rules/member-plan');
 const membershipEntitlements = require('../rules/membership-entitlements');
@@ -305,21 +305,6 @@ function atomicMethods(run, { readUpstreamBreaker } = {}) {
       return result;
     }),
 
-    recordHistoryBrowse: ({ userKey, nowIso }) => run(async tx => {
-      const user = await tx.get(C.users, userKey);
-      if (!user) throw new ApiError('user_missing', '用户不存在');
-      const previous = user.taskEvidence && user.taskEvidence.history_browse;
-      const today = dayKey(nowIso);
-      if (!previous || previous.dayKey < today) {
-        user.taskEvidence = { ...user.taskEvidence, history_browse: { dayKey: today, completedAt: nowIso } };
-        // Browsed-but-capped is also visible quota state. Version this marker so
-        // an older zero-grant response cannot erase the completed browse label.
-        user.quota = { ...user.quota, revision: (Number.isInteger(user.quota.revision) ? user.quota.revision : 0) + 1 };
-        await tx.put(C.users, user);
-      }
-      return { dayKey: today };
-    }),
-
     grantReward: args => run(async tx => {
       const { entry, config, reward, grantedToday = 0 } = args;
       const user = await tx.get(C.users, entry.userKey);
@@ -327,19 +312,26 @@ function atomicMethods(run, { readUpstreamBreaker } = {}) {
       const existing = await tx.get(C.ledger, entry._id);
       if (existing) return { applied: false, amount: 0, reason: 'already_completed', balance: user.quota.balance };
       if (entry.type === 'task_reward') {
-        const evidence = args.evidenceQueryId ? await tx.get(C.queries, args.evidenceQueryId) : null;
-        const browse = user.taskEvidence && user.taskEvidence.history_browse;
-        const browsed = args.evidenceBrowseDay === entry.dayKey && browse && browse.dayKey === entry.dayKey && Number.isFinite(Date.parse(browse.completedAt)) && dayKey(browse.completedAt) === entry.dayKey;
-        const queried = evidence && evidence.userKey === entry.userKey && evidence.kind === 'history' && evidence.status === 'success' && evidence.response && evidence.response.ok === true && Number.isFinite(Date.parse(evidence.finishedAt)) && dayKey(evidence.finishedAt) === entry.dayKey;
-        if (entry.taskId !== 'view_history' || (!browsed && !queried)) throw new ApiError('task_not_completed', '请先打开历史页并完成加载');
+        const proof = legacyTaskEvidence(user, entry.dayKey);
+        if (!proof || entry.taskId !== 'view_history') return { applied: false, amount: 0, reason: 'reward_disabled', balance: user.quota.balance };
+        if (proof.evidenceQueryId) {
+          const evidence = await tx.get(C.queries, proof.evidenceQueryId);
+          if (!evidence || evidence.userKey !== entry.userKey || evidence.kind !== 'history' || evidence.status !== 'success'
+            || !evidence.response?.ok || !Number.isFinite(Date.parse(evidence.finishedAt)) || dayKey(evidence.finishedAt) !== entry.dayKey) {
+            throw new ApiError('task_not_completed', '旧版奖励缺少已完成的历史查询记录');
+          }
+        }
       }
       if (reward === 0) return { applied: false, amount: 0, reason: 'reward_disabled', balance: user.quota.balance };
       const tracked = user.quota.rewardDay === entry.dayKey ? user.quota.grantedToday || 0 : 0;
       const persistedSummary = user.quota.dailyRewardSnapshot;
       const summaries = [persistedSummary, args.rewardSnapshot].filter(s => s && s.dayKey === entry.dayKey);
       const total = Math.max(tracked, grantedToday, ...summaries.map(s => s.grantedToday || 0));
-      const amount = grantableAmount({ balance: user.quota.balance, grantedToday: total, reward }, config);
-      if (!amount) return { applied: false, amount: 0, reason: total >= config.dailyGrantCap ? 'daily_cap_reached' : 'balance_cap_reached', balance: user.quota.balance };
+      // The sign-in ledger ID enforces one per Beijing day, even after a legacy award or refund.
+      const signin = entry.type === 'signin_reward';
+      const amount = signin ? Math.max(0, Math.min(QUOTA_DEFAULTS.signinReward, QUOTA_DEFAULTS.balanceCap - user.quota.balance))
+        : grantableAmount({ balance: user.quota.balance, grantedToday: total, reward }, config);
+      if (!amount) return { applied: false, amount: 0, reason: !signin && total >= config.dailyGrantCap ? 'daily_cap_reached' : 'balance_cap_reached', balance: user.quota.balance };
       const result = await applyLedgerIn(tx, { ...entry, delta: amount });
       result.user.quota = { ...result.user.quota, rewardDay: entry.dayKey, grantedToday: total + amount };
       const summary = { version: 1, dayKey: entry.dayKey, grantedToday: total + amount,
@@ -446,13 +438,6 @@ function atomicMethods(run, { readUpstreamBreaker } = {}) {
         ...(record.kind === 'live' ? { finishedAt: nowIso,
           alternativesExpiresAt: response.ok && (record.member || record.charged > refunded) ? new Date(Date.parse(nowIso) + 120000).toISOString() : null } : {}) };
       const completed = { ...record, status: final.ok ? 'success' : 'failed', response: final, finishedAt: nowIso, leaseUntil: null };
-      if (completed.kind === 'history' && completed.status === 'success') {
-        const previous = user.taskEvidence && user.taskEvidence.view_history;
-        if (!previous || previous.completedAt <= nowIso) {
-          user.taskEvidence = { ...user.taskEvidence, view_history: { queryId: id, dayKey: dayKey(nowIso), completedAt: nowIso } };
-          await tx.put(C.users, user);
-        }
-      }
       await tx.put(C.queries, completed);
       return { completed: true, record: completed, response: final };
     }),

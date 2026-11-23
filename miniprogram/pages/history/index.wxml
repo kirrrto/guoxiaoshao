@@ -116,7 +116,7 @@
     </view>
 
     <view wx:if="{{taskMessage || (accountReady && boot && boot.taskAvailable)}}" class="history-task-bar">
-      <text class="history-task-note">{{i18n.t(ui,(taskMessage || ('今日浏览本页可领 +' + boot.taskReward + ' 次查询额度')))}}</text>
+      <text class="history-task-note">{{i18n.t(ui,(taskMessage || '旧版浏览奖励待领取'))}}</text>
       <button wx:if="{{accountReady && boot && boot.taskAvailable}}" class="btn btn-sm history-task-claim" hover-class="ui-control-pressed" loading="{{taskClaimLoading}}" disabled="{{browseLoading || taskClaimLoading}}" bindtap="onClaimTask">{{i18n.t(ui,(taskClaimLoading ? '领取中…' : (browseLoading ? '确认中…' : '领取奖励')))}}</button>
     </view>
     <view wx:if="{{taskClaimError}}" class="banner banner-warn" aria-role="alert">{{i18n.t(ui,(taskClaimError))}}</view>

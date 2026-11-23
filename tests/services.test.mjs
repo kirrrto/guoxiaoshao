@@ -55,14 +55,49 @@ test('sign-in grants once per Beijing day and respects caps', async () => {
   assert.equal(second.reason, 'already_signed_in');
   assert.equal(ok(await f.call('history.list', { historyQueryId: 'reward-history-01', partNumber: 'MXXX1CH/A', storeNumbers: ['R577'] })).ok, true);
   const task = ok(await f.call('quota.completeTask', { taskId: 'view_history' }));
-  assert.equal(task.granted, 1);
-  assert.equal(task.quota.balance, 2);
-  assert.equal(task.quota.grantedToday, 2);
+  assert.equal(task.granted, 0);
+  assert.equal(task.quota.balance, 1);
+  assert.equal(task.quota.grantedToday, 1);
   failWith(await f.call('quota.completeTask', { taskId: 'made_up' }), 'unknown_task');
   f.advance(24 * 60 * 60 * 1000);
   const nextDay = ok(await f.call('quota.signin'));
   assert.equal(nextDay.granted, 1);
-  assert.equal(nextDay.quota.balance, 3);
+  assert.equal(nextDay.quota.balance, 2);
+});
+
+test('legacy zero earning limits cannot disable daily check-in across Beijing midnight', async () => {
+  const f = createFixture({ start: '2026-11-23T15:59:59.999Z', config: { quota: { dailyGrantCap: 0, signinReward: 0, balanceCap: 2 } } });
+  const signin = async () => ok(await f.call('quota.signin'));
+  const first = await signin();
+  assert.deepEqual([first.granted, first.quota.balance, first.quota.dailyGrantCap, first.quota.balanceCap], [1, 1, 1, 10]);
+  assert.equal((await signin()).reason, 'already_signed_in');
+  f.advance(1);
+  const second = await signin();
+  assert.deepEqual([second.granted, second.quota.balance, second.quota.grantedToday], [1, 2, 1]);
+  assert.equal((await signin()).granted, 0);
+});
+
+test('check-in caps new credits at ten, preserves pending refunds and works again after spending', { timeout: 5000 }, async () => {
+  let started, finish;
+  const admitted = new Promise(resolve => { started = resolve; });
+  const f = createFixture({ config: { quota: { balanceCap: 50, signinReward: 8, dailyGrantCap: 0 } }, fetchImpl: async () => {
+    started();
+    await new Promise(resolve => { finish = resolve; });
+    throw Error('temporary upstream outage');
+  } });
+  ok(await f.call('user.bootstrap'));
+  await f.repo.updateUser(userKeyOf(), { quota: { balance: 10 } });
+  assert.equal(ok(await f.call('quota.signin')).reason, 'balance_cap_reached');
+  const pending = f.call('query.pickup', { queryId: 'query-refund-at-cap', partNumber: 'MXXX1CH/A', storeNumbers: ['R577'] });
+  await admitted;
+  const grants = await Promise.all(Array.from({ length: 5 }, () => f.call('quota.signin')));
+  assert.deepEqual(grants.map(ok).map(r => r.granted).sort(), [0, 0, 0, 0, 1]);
+  finish();
+  const refunded = ok(await pending);
+  assert.deepEqual([refunded.refunded, refunded.balance], [1, 11]);
+  f.advance(86400000);
+  const over = ok(await f.call('quota.signin'));
+  assert.deepEqual([over.reason, over.quota.balance, over.quota.signedInToday, over.quota.balanceCap], ['balance_cap_reached', 11, false, 10]);
 });
 
 test('live query: free user pays once per queryId, replays are free, empty balance is refused', async () => {
@@ -266,8 +301,8 @@ test('admin: config patches are whitelisted and non-admins are rejected', async 
   failWith(await f.call('admin.getConfig', {}), 'forbidden');
   failWith(await f.call('admin.updateConfig', { patch: { evil: true } }, operatorContext()), 'invalid_config_key');
   failWith(await f.call('admin.updateConfig', { patch: { newProductWindows: [{ familyKey: 'x', releaseAt: 'bad' }] } }, operatorContext()), 'invalid_release_window');
-  const updated = ok(await f.call('admin.updateConfig', { patch: { quota: { balanceCap: 20 }, adminUserKeys: [userKeyOf()] } }, operatorContext()));
-  assert.equal(updated.config.quota.balanceCap, 20);
+  const updated = ok(await f.call('admin.updateConfig', { patch: { quota: { historyCost: 2 }, adminUserKeys: [userKeyOf()] } }, operatorContext()));
+  assert.equal(updated.config.quota.historyCost, 2);
   assert.equal(updated.config.quota.queryCost, 1, 'defaults survive partial patches');
   const asPromotedUser = ok(await f.call('admin.getConfig', {}));
   assert.deepEqual(asPromotedUser.config.adminUserKeys, [userKeyOf()]);

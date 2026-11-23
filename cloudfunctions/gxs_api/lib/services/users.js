@@ -4,7 +4,7 @@ const { dayKey } = require('../time');
 const { PREVIEW_MARKETS } = require('../rules/regional-query-preview');
 const { membershipSnapshot, accountLimits } = require('../rules/membership');
 const { ensurePlanMetadata, ensureOutageCompensation, ensureLaunchCelebrationGift } = require('../rules/member-plan');
-const { resolveConfig } = require('../rules/quota');
+const { resolveConfig, legacyTaskEvidence } = require('../rules/quota');
 const { maskOpenid } = require('../identity');
 const { monitoringSnapshot } = require('../monitor-readiness');
 const { paymentProduct, paymentProducts } = require('../payment/service');
@@ -133,17 +133,18 @@ async function quotaSnapshot(ctx, user) {
       tasksDoneToday: [...new Set(entries.filter(e => e.type === 'task_reward').map(e => e.taskId))],
     };
   }
+  const legacyEvidence = legacyTaskEvidence(user, today);
   return {
     balance: (user.quota && user.quota.balance) || 0,
     revision: user.quota && Number.isInteger(user.quota.revision) ? user.quota.revision : 0,
     grantedToday: Math.max(summary.grantedToday || 0, user.quota && user.quota.rewardDay === today ? user.quota.grantedToday || 0 : 0),
-    dailyGrantCap: cfg.dailyGrantCap,
+    dailyGrantCap: legacyEvidence ? cfg.dailyGrantCap : cfg.signinReward,
     balanceCap: cfg.balanceCap,
     queryCost: cfg.queryCost,
     historyCost: cfg.historyCost,
     signedInToday: summary.signedInToday,
     tasksDoneToday: summary.tasksDoneToday,
-    tasksViewedToday: ['history_browse', 'view_history'].some(key => user.taskEvidence && user.taskEvidence[key] && user.taskEvidence[key].dayKey === today) ? ['view_history'] : [],
+    tasksViewedToday: legacyEvidence ? ['view_history'] : [],
     dayKey: today,
   };
 }
@@ -194,7 +195,8 @@ async function bootstrap(ctx) {
     membership,
     ...(membership.isTester ? { regionalQueryPreview: PREVIEW_MARKETS } : {}),
     quota,
-    tasks: ctx.config.tasks,
+    tasks: quota.tasksViewedToday.length && !quota.tasksDoneToday.includes('view_history')
+      ? ctx.config.tasks.filter(task => task.id === 'view_history' && task.reward > 0) : [],
     followCount: follows.filter(f => (!f.market || f.market === 'CN') && (f.status === 'active' || f.status === 'paused')).length,
     otherMarketFollowCount: follows.filter(f => f.market && f.market !== 'CN' && (f.status === 'active' || f.status === 'paused')).length,
     memberProduct: paymentProduct(ctx),

@@ -18,7 +18,7 @@ function bindOwner(t) {
   });
 }
 
-test('only the bound admin can manually check a closed regional site, with a private receipt and no watches', async t => {
+test('only the bound admin can manually check a closed regional site and the private query never creates a watch', async t => {
   bindOwner(t);
   const fetchImpl = fakeFetch(() => ({ display: 'unavailable' }));
   const f = createFixture({ config: { adminUserKeys: [owner, userKeyOf(other)], query: { sharedFreshnessSeconds: 30 } }, fetchImpl });
@@ -34,7 +34,7 @@ test('only the bound admin can manually check a closed regional site, with a pri
   assert.equal(ok(await f.call('market.pickup', tw)).replayed, true);
   assert.deepEqual(await f.repo.getLatest([shared._id]), [shared]);
   assert.deepEqual(await f.repo.listEventsByTargets([shared._id]), []);
-  assert.equal((await f.call('market.watch', tw)).error.code, 'market_monitoring_disabled');
+  assert.deepEqual(ok(await f.call('market.follows')).follows, []);
   const impostor = { ...tw, expectedUserKey: userKeyOf(other), preview: true, previewUser: boot.identity, isTester: true };
   assert.equal((await f.call('market.pickup', impostor, userContext(other))).error.code, 'market_disabled');
   assert.equal(fetchImpl.calls.length, 1);
@@ -118,7 +118,7 @@ test('only the server-bound consumer administrator gets non-expiring test access
   assert.deepEqual((await f.repo.getUser(owner)).membership, user.membership);
 });
 
-test('tester can query and watch new products at zero balance; revocation and site switches still apply', async t => {
+test('tester can query and watch new products at zero balance; revocation removes watch access', async t => {
   bindOwner(t);
   const fetchImpl = fakeFetch(() => ({ display: 'available' }));
   const f = createFixture({ fetchImpl, config: { adminUserKeys: [owner], internationalMarkets: { JP: true },
@@ -139,7 +139,9 @@ test('tester can query and watch new products at zero balance; revocation and si
   assert.equal(ok(await f.call('market.follows')).canWatch, false);
   assert.equal((await f.call('market.watch', jp)).error.code, 'market_watch_plan_required');
   await f.repo.saveConfig({ ...runtime, internationalMarkets: { JP: false } });
-  assert.equal((await f.call('market.watch', jp)).error.code, 'market_monitoring_disabled');
+  assert.equal(ok(await f.call('market.watch', jp)).follow.status, 'active');
+  const list = ok(await f.call('market.follows'));
+  assert.deepEqual([list.monitoring.JP, list.notifications.JP], [false, false]);
   assert.deepEqual(await f.repo.listLedger(owner), []);
 });
 

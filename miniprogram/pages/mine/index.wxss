@@ -77,6 +77,9 @@
 .member-delivery-total { color: var(--pass-text-2); font-size: var(--fs-sub); font-weight: 400; white-space: pre; }
 .member-delivery-value .ui-chevron { align-self: center; margin-left: var(--sp-8); color: var(--pass-text-2); }
 .member-enhanced { position: relative; margin-top: var(--sp-8); color: var(--pass-text-2); font-size: var(--fs-caption); }
+.member-pass .member-regional-link.ui-action { position: relative; padding-left: 0; color: var(--pass-text); }
+.member-pass .member-regional-link[disabled] { color: var(--pass-text-2); }
+.member-regional-link.member-delivery-pressed { opacity: 0.6; }
 
 .member-delivery-action.btn { margin-bottom: var(--sp-12); }
 .membership-member-actions { display: flex; gap: var(--sp-8); margin: 0 0 var(--sp-12); }
@@ -92,7 +95,7 @@
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
-  gap: var(--sp-12);
+  gap: var(--sp-2) var(--sp-12);
   width: 100%;
   max-width: 100%;
   min-width: 0;
@@ -120,6 +123,7 @@
 .membership-package-name-line { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2) var(--sp-8); min-width: 0; }
 .membership-package-name { font-size: var(--fs-headline); font-weight: 600; }
 .membership-package-duration, .membership-package-benefit { color: var(--text-2); font-size: var(--fs-sub); }
+.membership-package-scope { grid-column: 2 / -1; }
 .membership-recommended-tag { padding: 0 var(--sp-8); border-radius: var(--radius-pill); background: var(--green-soft); color: var(--green-text); font-size: var(--fs-caption); font-weight: 600; line-height: var(--lh-normal); }
 .membership-package-pricing { display: flex; flex-direction: column; align-items: flex-end; gap: var(--sp-2); min-width: 0; }
 .membership-package-price { font-size: var(--fs-headline); font-weight: 600; white-space: nowrap; }

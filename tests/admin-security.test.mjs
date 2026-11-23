@@ -24,9 +24,9 @@ test('listed administrators can edit business settings but cannot appoint, clear
     assert.equal((await f.repo.getConfig()).announcement, undefined);
   }
   assert.equal(records(f).length, 0);
-  const allowed = await clientUpdate(f, { quota: { balanceCap: 25 } });
+  const allowed = await clientUpdate(f, { quota: { historyCost: 2 } });
   assert.equal(allowed.ok, true);
-  assert.equal(allowed.data.config.quota.balanceCap, 25);
+  assert.equal(allowed.data.config.quota.historyCost, 2);
   assert.equal(records(f)[0].actor.type, 'admin_user');
 });
 

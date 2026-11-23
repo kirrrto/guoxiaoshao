@@ -90,7 +90,7 @@ function notificationTestMethods(transaction, applyLedgerIn) {
       if (cost > maxCost) throw new ApiError('query_cost_changed', '测试费用已变化，请重新确认，本次未扣次。');
       let currentUser = user;
       if (cost) {
-        if (!Number.isInteger(user.quota.balance) || user.quota.balance < cost) throw new ApiError('insufficient_credits', '测试需要 1 次签到或任务获得的次数，请先获取次数');
+        if (!Number.isInteger(user.quota.balance) || user.quota.balance < cost) throw new ApiError('insufficient_credits', '测试需要 1 次查询次数，请先签到领取');
         const debit = await applyLedgerIn(tx, { _id: `${userKey}|notification_test|${requestId}|debit`, userKey,
           type: 'notification_test_debit', delta: -cost, testRequestId: requestId, refId: requestId, dayKey: dayKey(nowIso), createdAt: nowIso });
         currentUser = debit.user;

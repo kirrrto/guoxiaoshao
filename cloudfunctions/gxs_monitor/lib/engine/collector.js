@@ -8,6 +8,7 @@
  * a fake clock and a simulated upstream; `run()` is the production loop.
  */
 const { mergeConfig } = require('../config');
+const { COLLECTIONS: C } = require('../collections');
 const { canUseReminders, followAllowance } = require('../rules/membership');
 const { loadFollowUsers, isRetiredMainlandTarget } = require('../rules/follow-access');
 const { guardedPickup } = require('./guarded-pickup');
@@ -34,6 +35,7 @@ const WAITING_CONFIRMATION_LIMIT = 4096;
 
 function createCollector({ repo, fetchImpl, clock = () => new Date(), log = console, sendImpl = null, ownerId = `collector-${process.pid}-${Date.now()}`, sleep = ms => new Promise(resolve => setTimeout(resolve, ms)), refreshEveryMs = 10000, statusEveryMs = 5000, mode = 'resident', minimumIntervalMs = 0, statusTtlMs = 0, shouldContinue = () => true, remainingMs = () => Infinity }) {
   let config = mergeConfig(null);
+  let plannedWatchers = new Map();
   let lastRefreshAt = -Infinity;
   let lastStatusAt = -Infinity;
   let lastSenderProbeAt = -Infinity;
@@ -52,7 +54,7 @@ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = cons
   const lease = createLeaseKeeper({ repo, ownerId, ttlMs: 15000, clock, log });
   // Renewal transactions can consume part of their own TTL. Bound external
   // work by the lease actually returned, not its nominal 15-second duration.
-  const remainingWorkMs = () => lease.isHeld()
+  const remainingWorkMs = () => !stopping && shouldContinue() && lease.isHeld()
     ? Math.max(0, Math.min(remainingMs(), Date.parse(lease.expiresAt()) - clock().getTime())) : 0;
   const scheduler = createScheduler({
     clock,
@@ -60,7 +62,7 @@ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = cons
     alignIntervalMs: mode === 'scheduled' ? 60000 : 0,
     fetchPickup: async ({ storeNumber, partNumbers, timeoutMs }) => {
       if (stopping || !lease.isHeld()) return { record: { httpStatus: null, error: { message: 'lease_lost' } }, observations: [] };
-      return guardedPickup({ repo, config, clock, fetchImpl, storeNumber, partNumbers, timeoutMs, source: 'auto', remainingMs: remainingWorkMs,
+      return guardedPickup({ repo, config, clock, fetchImpl, storeNumber, partNumbers, timeoutMs, source: 'auto', remainingMs: remainingWorkMs, watchDemand,
         onBudget: value => { budget = value; }, beforeRequest: async () => !stopping && shouldContinue() && await lease.renew() && lease.isHeld() && shouldContinue() });
     },
     onBatch: handleBatch,
@@ -68,9 +70,62 @@ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = cons
 
   const marketMonitor = createMarketMonitor({ clock, mode, log, shouldContinue: () => !stopping && shouldContinue() && lease.isHeld(),
     onBatch: handleBatch,
-    fetchPickup: target => guardedPickup({ repo, config, clock, fetchImpl, ...target, source: 'auto', remainingMs: remainingWorkMs,
+    fetchPickup: target => guardedPickup({ repo, config, clock, fetchImpl, ...target, source: 'auto', remainingMs: remainingWorkMs, watchDemand,
       beforeRequest: async () => !stopping && shouldContinue() && await lease.renew() && shouldContinue() }),
   });
+
+  // The queue is a hint. The budget transaction must find one currently
+  // eligible owner for each store/SKU before reserving an outbound request.
+  function watchDemand(storeNumber, partNumbers, market) {
+    const region = market || 'CN';
+    let candidates = partNumbers.map(part => {
+      const owner = plannedWatchers.get(targetKeyOf(storeNumber, part, region));
+      return owner ? [owner] : [];
+    });
+    let refreshed = false;
+    return {
+      async select(tx, runtime, at) {
+        const accounts = new Map();
+        const matched = await Promise.all(partNumbers.map(async (part, index) => {
+          // One witness usually suffices, even for a product watched by
+          // thousands of members. Rediscover fresh owners if that one is gone.
+          for (const { id, userKey, policy } of candidates[index]) {
+            const follow = await tx.get(C.follows, id);
+            if (!follow || follow.status !== 'active' || follow.userKey !== userKey || follow.partNumber !== part
+              || (follow.market || 'CN') !== region || !follow.storeNumbers.includes(storeNumber)) continue;
+            if (!accounts.has(userKey)) accounts.set(userKey, tx.get(C.users, userKey));
+            const user = await accounts.get(userKey);
+            if (!user || !canUseReminders(user, at, runtime)) continue;
+            // Current writes update the index in the same transaction as the
+            // watch. Older incomplete indexes use the ordered policy loaded at discovery.
+            const currentIndex = user.followIndex;
+            const currentPolicy = Array.isArray(currentIndex) && currentIndex.some(row => row._id === id) && currentIndex.every(row => Number.isFinite(Date.parse(row.createdAt)))
+              ? currentIndex.map(row => ({ ...row, userKey })) : policy;
+            if (followAllowance({ ...user, _followPolicy: currentPolicy }, follow, [], at, runtime)
+              .eligibleStoreNumbers.includes(storeNumber)) return part;
+          }
+          return null;
+        }));
+        const parts = matched.filter(Boolean);
+        return { parts, reload: !refreshed && parts.length !== partNumbers.length };
+      },
+      async refresh() {
+        // The last known watcher may have been replaced since planning. One
+        // bounded rediscovery by indexed SKU also preserves shared watches.
+        lastRefreshAt = -Infinity;
+        const follows = await repo.listActivePickupFollows(storeNumber, partNumbers, region);
+        const now = clock();
+        const [users, currentConfig] = await Promise.all([loadFollowUsers(repo, follows, now), repo.getConfig()]);
+        candidates = partNumbers.map(part => follows.filter(f => {
+          const user = users.get(f.userKey);
+          return f.partNumber === part && user && canUseReminders(user, now, currentConfig)
+            && followAllowance(user, f, follows, now, currentConfig).eligibleStoreNumbers.includes(storeNumber);
+        }).map(f => ({ id: f._id, userKey: f.userKey, policy: users.get(f.userKey)._followPolicy })));
+        refreshed = true;
+        return candidates.some(rows => rows.length);
+      },
+    };
+  }
 
   function ctx() {
     const now = clock();
@@ -352,6 +407,15 @@ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = cons
       const allowance = followAllowance(user, follow, follows, now, config);
       return allowance.eligibleStoreNumbers.length ? [{ ...follow, storeNumbers: allowance.eligibleStoreNumbers }] : [];
     });
+    plannedWatchers = new Map();
+    for (const follow of eligible) {
+      for (const store of follow.storeNumbers) {
+        const key = targetKeyOf(store, follow.partNumber, follow.market || 'CN');
+        if (!plannedWatchers.has(key)) plannedWatchers.set(key, {
+          id: follow._id, userKey: follow.userKey, policy: users.get(follow.userKey)._followPolicy,
+        });
+      }
+    }
     marketMonitor.configure(eligible, config);
     const groups = config.collector.enabled ? buildGroups(eligible.filter(follow => !follow.market || follow.market === 'CN'), config.collector.maxPartsPerRequest || 20) : [];
     // Continuous monitoring in both modes fits the sustainable automatic lane,

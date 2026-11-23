@@ -9,6 +9,7 @@ const { targetKeyOf } = require('../engine/events');
 const { RETENTION_DAYS, retentionStart } = require('../engine/retention');
 const { ensureUser } = require('./users');
 const { completeTask } = require('./quota');
+const { legacyTaskEvidence } = require('../rules/quota');
 const { isProductIdentity } = require('../rules/product-target');
 const ID_PATTERN = /^[A-Za-z0-9_-]{8,64}$/;
 function decodeCursor(value) {
@@ -36,13 +37,10 @@ async function browse(ctx) {
     seen.add(key); return true;
   }).slice(0, 3).map(query => ({ partNumber: query.partNumber, dayKey: query.dayKey,
     storeNumbers: query.storeNumbers || [], viewedAt: query.finishedAt || query.createdAt }));
-  // Only a successful server read creates proof. Empty history is a valid read;
-  // failed reads never reach this transaction. Use the completion business day.
   const now = ctx.clock();
   const completed = { ...ctx, now, nowIso: now.toISOString() };
-  await ctx.repo.recordHistoryBrowse({ userKey: user._id, nowIso: completed.nowIso });
   const task = (ctx.config.tasks || []).find(item => item.id === 'view_history');
-  const reward = task ? await completeTask(completed, { taskId: 'view_history' }) : null;
+  const reward = task && legacyTaskEvidence(user, dayKey(now)) ? await completeTask(completed, { taskId: 'view_history' }) : null;
   return { recentViews, browsedAt: completed.nowIso, task: reward };
 }
 async function page(ctx, payload) {

@@ -46,6 +46,32 @@ async function setupTestAdmin(t) {
   return setup({ adminUserKeys: [userKeyOf()] }, null);
 }
 
+test('monthly and annual members can save all three regions before monitoring starts; the timer picks up the saved watches when enabled', async () => {
+  const off = { JP: false, TW: false, HK: false };
+  for (const planId of ['member_30d', 'member_365d']) {
+    const { f, messages, pass, upstream } = await setup({
+      internationalMarkets: off, internationalMonitoring: off, internationalNotifications: off,
+    }, planId);
+    const list = (await f.call('market.follows')).data;
+    assert.deepEqual([list.watchRegistrationOpen, list.canWatch, list.savedCount], [true, true, 3]);
+    assert.deepEqual(list.monitoring, off);
+    assert.deepEqual(list.notifications, off);
+    await pass();
+    assert.equal(upstream.calls.length, 0);
+    assert.equal(messages.length, 0);
+    const config = await f.repo.getConfig();
+    await f.repo.saveConfig({ ...config, collector: { ...config.collector, enabled: false }, internationalMonitoring: all, internationalNotifications: all });
+    const globallyStopped = (await f.call('market.follows')).data;
+    assert.deepEqual(globallyStopped.monitoring, off);
+    assert.deepEqual(globallyStopped.notifications, off);
+    await f.repo.saveConfig({ ...config, internationalMonitoring: { ...off, TW: true } });
+    f.advance(60000); await pass();
+    assert.deepEqual(upstream.calls.map(c => c.storeNumber), ['R713']);
+    assert.equal((await f.call('market.follows')).data.savedCount, 3);
+    assert.equal(messages.length, 0);
+  }
+});
+
 test('a designated admin without a membership monitors regional stock and spends only actual WeChat authorizations', async t => {
   const { f, pass, messages, plan } = await setupTestAdmin(t);
   await f.repo.updateUser(userKeyOf(), { subscriptions: { TPL_EN: { credits: 1 }, TPL_ZH: { credits: 0 } } });

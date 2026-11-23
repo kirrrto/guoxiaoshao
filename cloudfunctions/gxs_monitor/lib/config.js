@@ -4,7 +4,8 @@
  * document. Operators change behaviour through admin.updateConfig without
  * redeploying. Fields listed in EDITABLE may be patched by admins.
  */
-const { DEFAULT_CONFIG: QUOTA_DEFAULTS } = require('./rules/quota');
+const { DEFAULT_CONFIG: QUOTA_DEFAULTS, resolveConfig } = require('./rules/quota');
+const { isDeepStrictEqual } = require('node:util');
 const { ApiError } = require('./errors');
 const { FEATURE_KEYS, UI_FEATURES } = require('./growth-policy');
 const { MARKETS } = require('./markets');
@@ -134,6 +135,7 @@ function mergeConfig(stored) {
       if (plan && typeof plan === 'object' && !Array.isArray(plan)) merged.memberPlans[id] = { ...DEFAULTS.memberPlans[id], ...plan };
     }
   }
+  merged.quota = resolveConfig(merged.quota);
   return merged;
 }
 
@@ -143,6 +145,16 @@ function patchConfig(stored, patch) {
   const next = { ...stored };
   for (const [key, value] of Object.entries(patch)) {
     if (!EDITABLE.has(key)) throw new ApiError('invalid_config_key', `不可修改的配置项：${key}`);
+    if (key === 'quota' && (!value || typeof value !== 'object' || Array.isArray(value)
+      || ['signinReward', 'balanceCap'].some(field => field in value && value[field] !== QUOTA_DEFAULTS[field]))) {
+      throw new ApiError('invalid_config', '每日签到固定增加 1 次，查询次数最多累计 10 次。');
+    }
+    // Older operator clients resend the whole configuration. Allow unchanged
+    // legacy fields, but preserve the original terms of outstanding claims.
+    if ((key === 'tasks' && !isDeepStrictEqual(value, stored?.tasks ?? DEFAULTS.tasks))
+      || (key === 'quota' && ['taskReward', 'dailyGrantCap'].some(field => field in value && value[field] !== (stored?.quota?.[field] ?? QUOTA_DEFAULTS[field])))) {
+      throw new ApiError('invalid_config', '旧版浏览奖励已停止新增。');
+    }
     // Announcement is one banner, not a mergeable map: a new object replaces
     // the previous text/expiry so stale copy cannot linger through a partial patch.
     if (key === 'announcement' || key === 'notices') { next[key] = value; continue; }

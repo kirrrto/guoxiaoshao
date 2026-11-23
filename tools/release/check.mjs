@@ -67,8 +67,11 @@ for (const name of ['gxs_api', 'cloudbase_auth', 'gxs_monitor']) {
 check('system.ping uses the release version', require(path.join(root, 'cloudfunctions/gxs_api/lib/app.js')).VERSION === project.version);
 check('Mine page version label uses the release version', require(path.join(root, 'miniprogram/config/version.js')).VERSION === project.version);
 const { RELEASE_NOTES } = require(path.join(root, 'miniprogram/config/release-notes.js'));
-check('current in-app release summary is listed first and matches the build', RELEASE_NOTES[0]?.version === project.version
-  && RELEASE_NOTES.filter(note => note.version === project.version).length === 1);
+const currentPublicNotes = RELEASE_NOTES.filter(note => note.version === project.version);
+const internalOnly = releaseNoteText.split(/^## /m, 1)[0].split(/\r?\n/).includes('本版仅含内部维护，无公开更新小结。');
+check('current build has a public summary or an explicit internal-only release note', internalOnly
+  ? currentPublicNotes.length === 0
+  : currentPublicNotes.length === 1 && RELEASE_NOTES[0].version === project.version);
 const timer = json('cloudfunctions/gxs_monitor/config.json').triggers;
 check('scheduled monitor has the expected minute trigger', timer.length === 1 && timer[0].name === 'gxs-monitor-minute' && timer[0].type === 'timer' && timer[0].config === '0 * * * * * *');
 const { isTrustedTimer } = require(path.join(root, 'cloudfunctions/gxs_monitor/lib/engine/scheduled.js'));

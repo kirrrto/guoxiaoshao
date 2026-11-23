@@ -1,7 +1,8 @@
 'use strict';
+const { dayKey } = require('../time');
 /**
- * Free-user query credits. Credits are granted by daily sign-in and one daily
- * experience task, capped per day and per balance. Every change is recorded
+ * Query credits accrue by daily sign-in. Older task awards can settle only
+ * against proof created before that program ended. Every change is recorded
  * in an idempotent ledger keyed by a deterministic id, so repeated or
  * concurrent requests can never grant or debit twice.
  */
@@ -16,7 +17,18 @@ const DEFAULT_CONFIG = Object.freeze({
 });
 
 function resolveConfig(config) {
-  return { ...DEFAULT_CONFIG, ...(config || {}) };
+  return { ...DEFAULT_CONFIG, ...(config || {}), signinReward: DEFAULT_CONFIG.signinReward, balanceCap: DEFAULT_CONFIG.balanceCap };
+}
+
+// A prior build wrote one of these markers only after the history read succeeded.
+// A current successful read must never create new eligibility.
+function legacyTaskEvidence(user, day) {
+  const evidence = user.taskEvidence || {};
+  const valid = marker => marker?.dayKey === day && Number.isFinite(Date.parse(marker.completedAt))
+    && dayKey(marker.completedAt) === day;
+  if (valid(evidence.history_browse)) return { evidenceBrowseDay: day };
+  if (valid(evidence.view_history) && evidence.view_history.queryId) return { evidenceQueryId: evidence.view_history.queryId };
+  return null;
 }
 
 /**
@@ -44,4 +56,4 @@ function canAfford(balance, cost) {
   return Number.isInteger(balance) && balance >= cost;
 }
 
-module.exports = { DEFAULT_CONFIG, resolveConfig, grantableAmount, ledgerIds, canAfford };
+module.exports = { DEFAULT_CONFIG, resolveConfig, legacyTaskEvidence, grantableAmount, ledgerIds, canAfford };

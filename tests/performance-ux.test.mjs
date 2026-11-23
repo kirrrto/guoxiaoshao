@@ -123,7 +123,7 @@ test('visible pages poll once per monitor minute, shortly after the recorded nex
   assert.equal(monitorPollDelay(null, now), 60000);
 });
 
-test('visible follow reads cap their delay at 30 seconds while query uses the monitor cadence', t => {
+test('visible follow reads cap their delay at 30 seconds and the query tab stays idle without watches', t => {
   t.mock.method(Date, 'now', () => Date.parse('2026-09-23T04:00:30.000Z'));
   const collector = { state: 'running', nextRunAt: '2026-09-23T04:01:00.000Z' };
   const followRt = runtime(), follow = followRt.instance('pages/follow/index.js');
@@ -132,7 +132,8 @@ test('visible follow reads cap their delay at 30 seconds while query uses the mo
   follow.onHide(); assert.equal(followRt.timers.size, 0);
   const queryRt = runtime(), query = queryRt.instance('pages/query/index.js');
   query.collector = collector; query.visible = true; query.startFollowPolling();
-  assert.deepEqual([...queryRt.timers.values()].map(timer => timer.ms), [50000]);
+  assert.equal(queryRt.timers.size, 0);
+  assert.equal(queryRt.calls.length, 0);
   query.onHide(); assert.equal(queryRt.timers.size, 0);
 });
 

@@ -10,7 +10,7 @@ const deferred = () => {
 const copy = value => JSON.parse(JSON.stringify(value));
 const account = userKey => ({
   identity: { userKey }, membership: { active: false },
-  quota: { balance: 5, revision: 1, historyCost: 1, tasksDoneToday: [] },
+  quota: { balance: 5, revision: 1, historyCost: 1, tasksDoneToday: [], tasksViewedToday: ['view_history'] },
   tasks: [{ id: 'view_history', reward: 1 }], collector: { state: 'running' },
 });
 const reward = (balance = 6) => ({

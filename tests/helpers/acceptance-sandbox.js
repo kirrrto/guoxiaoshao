@@ -34,7 +34,8 @@ function member(state) { return Boolean(state.expiresAt && Date.parse(state.expi
 function membership(state) { return { active: member(state), expiresAt: state.expiresAt, remainingMs: Math.max(0, Date.parse(state.expiresAt) - Date.now()) || 0 }; }
 function quota(state) {
   const entries = state.ledger.filter(entry => entry.dayKey === day());
-  return { ...QUOTA, balance: state.balance, dayKey: day(), grantedToday: entries.filter(e => ['signin_reward', 'task_reward'].includes(e.type)).reduce((sum, e) => sum + e.delta, 0),
+  return { ...QUOTA, dailyGrantCap: state.historyCompletedDay === day() ? QUOTA.dailyGrantCap : QUOTA.signinReward,
+    balance: state.balance, dayKey: day(), grantedToday: entries.filter(e => ['signin_reward', 'task_reward'].includes(e.type)).reduce((sum, e) => sum + e.delta, 0),
     signedInToday: entries.some(e => e.type === 'signin_reward'), tasksDoneToday: entries.filter(e => e.type === 'task_reward').map(e => e.taskId) };
 }
 function getCatalog() { return require('../../miniprogram/config/catalog-seed'); }
@@ -69,7 +70,6 @@ function request(state, action, id, payload, run) {
   // Access denials do not create completed requests in the real service.
   if (response.ok === false && !Object.prototype.hasOwnProperty.call(response, 'charged')) return response;
   state.requests[key] = { signature, response: copy(response), createdAt: iso() };
-  if (action === 'history.list' && response.ok) state.historyCompletedDay = day();
   const keys = Object.keys(state.requests).filter(key => state.requests[key].response);
   // Keep the ID binding after discarding an old response so retries never pay twice.
   if (keys.length > 200) state.requests[keys[0]].response = null;
@@ -125,7 +125,7 @@ function presentFollow(state, follow) {
 }
 function bootstrap(state) {
   return { acceptance: true, serverTime: iso(), identity: { userKey: 'acceptance:local-user', openidMasked: '验收模拟账号', isAdmin: false, crossAccount: false },
-    membership: membership(state), quota: quota(state), tasks: [{ id: 'view_history', title: '完成一次历史查询', reward: 1 }], followCount: state.follows.filter(f => f.status !== 'removed').length,
+    membership: membership(state), quota: quota(state), tasks: [], followCount: state.follows.filter(f => f.status !== 'removed').length,
     settings: state.settings, subscriptions: state.subscriptions, memberProduct: { title: '30 天会员', days: 30, priceFen: 900, enabled: false, paymentReady: false, paymentReason: 'payment_not_enabled' },
     limits: LIMITS, notifications: { enabled: true, templateIds: { restock: TEMPLATE_ID } }, collector: { state: 'acceptance', acceptance: true, updatedAt: iso() },
     newProductWindows: state.restrictNewProducts ? [{ familyKey: getCatalog().families[0].familyKey, releaseAt: new Date(Date.now() - DAY_MS).toISOString() }] : [],
@@ -134,7 +134,7 @@ function bootstrap(state) {
 function reward(state, task) {
   const q = quota(state);
   const already = task ? q.tasksDoneToday.includes('view_history') : q.signedInToday;
-  if (task && !already && state.historyCompletedDay !== day() && !Object.keys(state.requests).some(key => key.startsWith('history.list:') && state.requests[key].response && state.requests[key].response.ok && day(state.requests[key].createdAt) === day())) fail('task_not_completed', '请先完成一次历史查询。');
+  if (task && !already && state.historyCompletedDay !== day()) return { granted: 0, reason: 'reward_disabled', quota: q };
   const granted = already ? 0 : Math.max(0, Math.min(1, q.dailyGrantCap - q.grantedToday, q.balanceCap - q.balance));
   if (granted) addLedger(state, task ? 'task_reward' : 'signin_reward', granted, task ? { taskId: 'view_history' } : {});
   return { granted, reason: granted ? null : already ? (task ? 'already_completed' : 'already_signed_in') : q.balance >= q.balanceCap ? 'balance_cap_reached' : 'daily_cap_reached', quota: quota(state) };
@@ -314,6 +314,7 @@ async function handle(action, payload = {}) {
     case 'quota.ledger': result = { entries: state.ledger.slice(0, payload.limit || 30) }; break;
     case 'query.pickup': result = request(state, action, payload.queryId, payload, () => runQuery(state, payload, false)); break;
     case 'history.list': result = historyQuery(state, payload); break;
+    case 'history.browse': result = { recentViews: [], browsedAt: iso(), task: state.historyCompletedDay === day() ? reward(state, true) : null }; break;
     case 'query.recent': result = { queries: [] }; break;
     case 'follow.list': result = { member: member(state), limits: LIMITS, follows: state.follows.filter(f => f.status !== 'removed').map(f => presentFollow(state, f)) }; break;
     case 'follow.upsert': result = followUpsert(state, payload); break;

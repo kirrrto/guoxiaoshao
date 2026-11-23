@@ -24,7 +24,8 @@ async function memberFixture() {
 
 test('only verified market targets can be watched, under the signed-in account and current plan', async () => {
   const f = createFixture();
-  assert.equal((await f.call('market.watch', target('JP'))).error.code, 'market_monitoring_disabled');
+  assert.equal((await f.call('market.watch', target('JP'))).error.code, 'market_watch_plan_required');
+  assert.equal((await f.call('market.watch', { ...target('JP'), market: 'US' })).error.code, 'unknown_market');
   await f.repo.saveConfig({ ...await f.repo.getConfig(), internationalMarkets: enabled });
   assert.equal((await f.call('market.watch', target('JP'))).error.code, 'market_watch_plan_required');
   assert.equal((await f.call('market.watch', { ...target('HK'), language: 'ja' })).error.code, 'invalid_language');
@@ -59,7 +60,7 @@ test('saving additional stores is atomic and idempotent, preserving original lan
   assert.equal((await f.call('follow.remove', { followId: first.followId })).error.code, 'unknown_follow');
   assert.equal((await f.call('market.watchStatus', { ...status, expectedUserKey: userKeyOf('bob') }, userContext('bob'))).error.code, 'unknown_follow');
   await f.repo.saveConfig({ ...await f.repo.getConfig(), internationalMonitoring: {}, internationalMarkets: {} });
-  assert.equal((await f.call('market.watchStatus', { ...status, status: 'active' })).error.code, 'market_monitoring_disabled');
+  assert.equal(ok(await f.call('market.watchStatus', { ...status, status: 'active' })).follow.status, 'active');
   await f.repo.updateUser(actor, { membership: { expiresAt: '2020-01-01T00:00:00Z' } });
   for (let i = 0; i < 2; i++) assert.equal(ok(await f.call('market.watchStatus', { ...status, status: 'removed' })).follow.status, 'removed');
   assert.equal(ok(await f.call('market.follows')).savedCount, 0);
@@ -91,6 +92,7 @@ test('domestic and market saves share one transactional slot limit while each in
 
 test('a regional watch survives a downgrade; only a current monthly or annual pass can add, resume or use it', async () => {
   const f = await memberFixture();
+  await f.repo.saveConfig({ ...await f.repo.getConfig(), internationalMarkets: {}, internationalMonitoring: {} });
   const watch = ok(await f.call('market.watch', target('JP'))).follow;
   const state = status => ({ expectedUserKey: actor, followId: watch.followId, status });
   for (const lower of ['member_7d','member_trial']) {

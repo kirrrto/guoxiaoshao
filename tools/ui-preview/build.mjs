@@ -429,7 +429,7 @@ for (const scenario of scenarios) {
   if (!p) throw Error(`Missing catalog product for ${scenario}`);
   if (scenario === 'v2-new-product') Object.assign(p, { supported: false, comingSoon: true });
   const bootstrap = { identity: { userKey: 'preview:offline-user', openidMasked: 'preview…0001', isAdmin: true }, membership: { active: member, planId: marketsPreview ? marketMember(scenario) : (languagePreview && member ? 'member_30d' : undefined), remainingMs: member ? 18 * 86400000 : 0, expiresAt: member ? new Date(now.getTime() + 18 * 86400000).toISOString() : expired ? '2026-09-10T07:00:00Z' : null },
-    quota: { balance: member ? 5 : 0, revision: 0, grantedToday: 0, dailyGrantCap: 2, balanceCap: 10, queryCost: 1, historyCost: 1, signedInToday: false, tasksDoneToday: [], tasksViewedToday: [] }, tasks: [{ id: 'view_history', title: '浏览一次历史记录', reward: 1 }],
+    quota: { balance: member ? 5 : 0, revision: 0, grantedToday: 0, dailyGrantCap: 2, balanceCap: 10, queryCost: 1, historyCost: 1, signedInToday: false, tasksDoneToday: [], tasksViewedToday: [] }, tasks: [],
     collector: { state: scenario === 'expired' ? 'stale' : 'not_deployed' }, memberProduct: { id: 'vip666', title: '7 天会员', days: 7, priceFen: 700, enabled: paymentPreview && scenario !== 'payment-blocked', paymentReady: paymentPreview && scenario !== 'payment-blocked', iosEnabled: true, note: '该产品为一次性虚拟服务，一经售出不予退款。一次购买 7 天，已有会员按剩余有效期顺延，不自动续费。', paymentReason: '购买开放后可在此开通会员。' },
     notifications: { enabled: false, templateIds: {} }, subscriptions: {}, settings: { notifyEnabled: true, dnd: { enabled: true, startMinute: 1380, endMinute: 480 } },
     limits: { maxFollows: 3, maxStoresPerFollow: 3, queryMaxStores: 3 }, followCount: scenario === 'empty' ? 0 : 1, catalogVersion: 'offline-preview' };
@@ -481,15 +481,20 @@ for (const scenario of scenarios) {
     balance: bootstrap.quota.balance, quotaRevision: bootstrap.quota.revision, quota: copy(bootstrap.quota), test: copy(notificationTest) });
   const paidMembership = { active: true, expiresAt: scenario === 'payment-partial-refund' ? '2026-09-18T19:00:00Z' : '2026-09-22T07:00:00Z', remainingMs: (scenario === 'payment-partial-refund' ? 3.5 : 7) * 86400000 };
   if (scenario === 'history-completed') Object.assign(bootstrap.quota, { balance: 1, revision: 1, grantedToday: 1, tasksDoneToday: ['view_history'], tasksViewedToday: ['view_history'] });
+  if (['history-member-reward', 'history-balance-cap'].includes(scenario) || scenario.startsWith('v331-history-claim-')) {
+    bootstrap.quota.tasksViewedToday = ['view_history'];
+    bootstrap.tasks = [{ id: 'view_history', title: '旧版待领奖励', reward: 1 }];
+  }
   const ledgerEntries = scenario === 'history-completed' ? [{ id: 'preview-task-ledger', type: 'task_reward', delta: 1, createdAt: now.toISOString() }] : [];
   const completeHistoryTask = () => {
     let granted = 0, reason = 'already_completed';
-    bootstrap.quota.tasksViewedToday = ['view_history'];
+    if (!bootstrap.quota.tasksViewedToday.includes('view_history')) return { granted: 0, reason: 'reward_disabled', quota: copy(bootstrap.quota) };
     if (!bootstrap.quota.tasksDoneToday.includes('view_history')) {
       if (bootstrap.quota.balance >= bootstrap.quota.balanceCap) reason = 'balance_cap_reached';
       else {
         granted = 1; reason = 'granted';
         bootstrap.quota = { ...bootstrap.quota, balance: bootstrap.quota.balance + 1, revision: bootstrap.quota.revision + 1, grantedToday: 1, tasksDoneToday: ['view_history'] };
+        bootstrap.tasks = [];
         ledgerEntries.push({ id: 'preview-task-ledger', type: 'task_reward', delta: 1, createdAt: now.toISOString() });
       }
     }
@@ -673,7 +678,7 @@ for (const scenario of scenarios) {
     if (action === 'history.browse') {
       if (scenario === 'history-read-error') throw Error('offline history browse response failed');
       if (scenario === 'history-loading') return new Promise(() => {});
-      return { recentViews, browsedAt: now.toISOString(), task: completeHistoryTask() };
+      return { recentViews, browsedAt: now.toISOString(), task: bootstrap.quota.tasksViewedToday.includes('view_history') ? completeHistoryTask() : null };
     }
     if (action === 'quota.completeTask') {
       if (scenario === 'v331-history-claim-loading') return new Promise(() => {});
@@ -1118,8 +1123,8 @@ for (const scenario of scenarios) {
       if (previewCalls.some(item => item.action === 'growth.ingest')) throw Error('Layout fixtures must keep event ingestion disabled');
     }
     if (pageName === 'follow' || pageName === 'query') forbiddenText.push('查看供应历史', '查看可用历史');
-    if (historyTaskPreview && pageName === 'mine' && ['history-read-error', 'history-loading'].includes(scenario)) {
-      forbiddenText.push('浏览一次历史记录', '去完成');
+    if (historyTaskPreview && ['history-free-first', 'history-longcontent', 'history-read-error', 'history-loading'].includes(scenario)) {
+      forbiddenText.push('浏览一次历史记录', '领取奖励', '已计入次数明细', '旧版浏览奖励待领取');
     }
     const ast = parse(fs.readFileSync(path.join(mini, `pages/${pageName}/index.wxml`), 'utf8'));
     const nudge = nudgePreview ? { title: scenario === 'nudge-both' ? '补充到货和断货提醒次数' : '补充到货提醒次数', restockCount: 1, soldoutCount: scenario === 'nudge-both' ? 0 : 15, soldoutEnabled: scenario !== 'nudge-one', detail: '已有次数会保留。每项选择「允许」增加 1 次，消息发送后消耗对应次数。' } : null;
@@ -1176,13 +1181,13 @@ for (const scenario of scenarios) {
         'notification-test-uncertain-received': ['结果尚未确认', '原测试结果仍未知，扣次记录保留', '再次体验会新建测试，另消耗 1 次', '不会重复发送', '重新授权新测试'],
       }[scenario]] : adminPreview ? { 'operator-ready': ['运行统计', '128'], 'operator-denied': ['当前账号没有管理权限', '重新检查'], 'operator-loading': ['校验权限'], 'operator-error': ['权限检查失败', '重新检查'], 'operator-longcontent': ['运行统计', '查询结果', '运营查询长文本换行验收'], 'operator-saving': ['保存中', '重载并替换草稿', '保存配置'] }[scenario] : historyTaskPreview ? pageName === 'history' ? ['恢复最近浏览条件', p.title, ...{
         'history-member-reward': ['今日浏览任务完成，+1 次', '已计入次数明细'],
-        'history-free-first': ['还没有浏览记录', '今日浏览任务完成，+1 次', '余 1 次'],
+        'history-free-first': ['还没有浏览记录', '余 0 次'],
         'history-read-error': ['浏览记录加载或奖励确认未完成', '重新加载'],
         'history-balance-cap': ['余额已达 10 次上限', '使用次数后可返回领取'],
         'history-completed': ['今日浏览任务已完成', '奖励已计入次数明细'],
-        'history-longcontent': ['各地门店已有记录', '3 家门店', '今日浏览任务完成，+1 次'],
+        'history-longcontent': ['各地门店已有记录', '3 家门店'],
         'history-loading': ['正在加载浏览记录'],
-      }[scenario]] : ['今日已获', '余额上限', '次数明细', ...(scenario === 'history-balance-cap' ? ['浏览一次历史记录', '余额已满，今日用次后可领', '暂无记录'] : ['history-read-error', 'history-loading'].includes(scenario) ? ['暂无记录'] : ['浏览一次历史记录', '已完成', '体验任务', '+1'])]
+      }[scenario]] : ['每日签到可得 1 次，最多累计 10 次。', '次数明细', ...(scenario === 'history-balance-cap' ? ['余额已满，今日用次后可领', '暂无记录'] : ['history-member-reward', 'history-completed'].includes(scenario) ? ['+1'] : ['暂无记录'])]
           : monitoringPreview ? [...(follows.length ? [p.title, '调整', '详情与管理'] : []), ...(scenario.startsWith('monitor-dual-') ? ['到货', '断货'] : ['后台检测', '消息发送']), '微信提醒', ...{
         'monitor-template-missing': ['监测服务运行中', '模板尚未配置', '关注已开启', '查看原因'],
         'monitor-ready-authorized': ['监测服务运行中', '发送服务已就绪', '提醒次数只剩 1 次', '增加提醒次数', '关注已开启'],

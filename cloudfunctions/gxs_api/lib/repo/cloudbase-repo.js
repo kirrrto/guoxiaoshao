@@ -330,6 +330,11 @@ function createCloudbaseRepo(db, { sleep = ms => new Promise(resolve => setTimeo
     async listActiveFollows() {
       return readAll(col(COLLECTIONS.follows).where({ status: 'active' }).orderBy('_id', 'asc'));
     },
+    async listActivePickupFollows(storeNumber, partNumbers, market) {
+      // Use the existing status_part index on the exceptional rediscovery path.
+      const rows = await readAll(col(COLLECTIONS.follows).where({ status: 'active', partNumber: _.in(partNumbers) }));
+      return rows.filter(follow => (follow.market || 'CN') === market && follow.storeNumbers.includes(storeNumber));
+    },
     async getUsers(userKeys) {
       if (!userKeys.length) return [];
       return readIds(COLLECTIONS.users, userKeys);

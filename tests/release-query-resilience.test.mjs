@@ -50,7 +50,9 @@ for (const outcome of ['events', 'empty', 'failed']) {
 test('cleanup failure after a persisted shared refresh keeps the successful result and idempotent billing', async () => {
   const fetchImpl = fakeFetch({ R577: { display: 'available' } });
   const f = createFixture({ config, fetchImpl });
-  ok(await f.call('quota.signin'));
+  assert.equal(ok(await f.call('quota.signin')).granted, 1);
+  f.advance(86400000);
+  assert.equal(ok(await f.call('quota.signin')).granted, 1);
   f.repo.releaseQueryTarget = async () => { throw new Error('temporary cleanup outage'); };
   const result = ok(await f.call('query.pickup', query));
   assert.equal(result.ok, true);
@@ -61,7 +63,6 @@ test('cleanup failure after a persisted shared refresh keeps the successful resu
   assert.equal(replay.ok, true);
   assert.equal(replay.replayed, true);
   assert.equal(fetchImpl.calls.length, 1);
-  ok(await f.call('history.browse'));
   const shared = ok(await f.call('query.pickup', { ...query, queryId: 'release-resilience-002' }));
   assert.equal(shared.ok, true);
   assert.equal(shared.allShared, true);

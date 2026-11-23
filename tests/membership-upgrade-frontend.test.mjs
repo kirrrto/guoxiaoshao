@@ -71,6 +71,27 @@ test('member purchase cards describe server-issued limits without inferring righ
   assert.match(renewalPreview(products[2], boot.membership).description, /3 个配置.*3 家门店/, 'legacy server snapshots cannot be upgraded solely by a 365-day label');
 });
 
+test('only monthly and annual offers include regional watches, and only entitled accounts can open the shortcut', () => {
+  const { page, boot, rt } = account();
+  boot.memberProducts = products.map(product => ({ ...product, days: 365 }));
+  const destinations = [];
+  rt.wx.switchTab = options => { destinations.push(options.url); options.success?.({}); options.complete?.({}); };
+  page.applyBoot(boot);
+  assert.deepEqual(Array.from(page.data.boot.memberProducts, p => [p.nameText, p.watchScope]), [
+    ['周卡', '可关注中国大陆门店'], ['月卡', '可关注大陆、日本、台湾和香港门店'], ['年卡', '可关注大陆、日本、台湾和香港门店'],
+  ]);
+  page.onOpenRegionalWatches();
+  for (const planId of ['member_30d', 'member_365d']) {
+    page.applyBoot({ ...boot, membership: { ...boot.membership, planId, enhanced: true } });
+    page.onOpenRegionalWatches();
+    page.setData({ paymentBusy: true });
+    page.onOpenRegionalWatches();
+    page.setData({ paymentBusy: false });
+  }
+  assert.deepEqual(destinations, ['/pages/markets/index', '/pages/markets/index']);
+  assert.equal(rt.calls.length, 0);
+});
+
 test('each plan row shows its own advertised allowance while the current account keeps its own actual limit', () => {
   const { page, boot } = account();
   boot.memberProducts = products.map((product, index) => ({ ...product, limits: { maxFollows: index ? 4 : 3, maxStoresPerFollow: index ? 4 : 3 } }));

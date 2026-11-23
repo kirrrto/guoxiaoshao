@@ -6,7 +6,7 @@ const { getAuthorizationState, buildConsentReport } = require('../../utils/remin
 const { dndPeriods, dndSummary, dndStatus, MAX_DND_PERIODS, validateDndPeriods } = require('../../utils/dnd');
 const { peekTestReturn, peekTestReturnUrl, consumeTestReturnUrl } = require('../../utils/journey-context');
 const { call, showError, toast, newId } = require('../../utils/api');
-const { getBootstrap, getCatalog, currentCatalog, getFollows, invalidateBootstrap, invalidateFollows, publishSettings, publishQuota, subscribeQuota, currentQuota } = require('../../utils/store');
+const { getBootstrap, getCatalog, currentCatalog, getFollows, invalidateBootstrap, invalidateFollows, publishSettings, publishQuota, subscribeQuota, currentQuota, currentQuotaOwner } = require('../../utils/store');
 const { topUpReminderCredit } = require('../../utils/reminder-credits');
 const { confirmTap } = require('../../utils/haptic');
 const { VERSION } = require('../../config/version');
@@ -53,7 +53,8 @@ function presentMemberProduct(item) {
     dailyPriceText: `约 ¥${(item.priceFen / item.days / 100).toFixed(2)} / 天`,
     benefitText: productBenefit(item),
     benefitShort: `${item.limits && item.limits.maxFollows || 3} 配置 × ${item.limits && item.limits.maxStoresPerFollow || 3} 门店`,
-    nameText: item.days === 365 ? '年卡' : item.days === 30 ? '月卡' : item.days === 7 ? '周卡' : '会员',
+    watchScope: ['member_30d', 'member_365d'].includes(item.planId) ? '可关注大陆、日本、台湾和香港门店' : '可关注中国大陆门店',
+    nameText: ({ member_7d: '周卡', member_30d: '月卡', member_365d: '年卡' })[item.planId] || '会员',
     durationText: `${item.days} 天`,
     available: paymentAvailability(item, wx).ready };
 }
@@ -127,14 +128,12 @@ const ORDER_STATUS = { created: '待支付', paid: '开通确认中', fulfilled:
 const SECONDARY_CACHE_MS = 30000;
 function presentTasks(tasks, quota) {
   const task = (tasks || []).find(item => item.id === 'view_history');
-  if (!task) return [];
-  if (quota.tasksDoneToday.includes(task.id)) return [{ ...task, done: true }];
-  if (!(quota.tasksViewedToday || []).includes(task.id)) return [];
+  if (!task || quota.tasksDoneToday.includes(task.id) || !(quota.tasksViewedToday || []).includes(task.id)) return [];
   let pendingLabel = '';
   if (!task.reward) pendingLabel = '奖励未开放';
   else if (quota.grantedToday >= quota.dailyGrantCap) pendingLabel = '今日领取已达上限';
   else if (quota.balance >= quota.balanceCap) pendingLabel = '余额已满，今日用次后可领';
-  return [{ ...task, done: false, claimable: !pendingLabel, pendingLabel }];
+  return [{ ...task, title: '旧版浏览奖励待领取', claimable: !pendingLabel, pendingLabel }];
 }
 const presentMembership = membership => ({ ...membership, expired: !membership.active && Boolean(membership.expiresAt),
   planLabel: membership.isTester ? '管理员测试账号' : ({ member_7d: '周卡会员', member_30d: '月卡会员', member_365d: '年卡会员', member_trial: '体验会员' })[membership.planId] || '会员',
@@ -385,7 +384,7 @@ Page(require('../../utils/language').page('mine', {
 
   async refreshAccount({ quiet, force, skipOrders, generation }) {
     try {
-      const boot = await getBootstrap({ force });
+      const boot = await getBootstrap({ force, afterFollowWrites: true });
       if (this.pageRetired || generation !== (this.accountGeneration || 0)) return;
       this.applyBoot(boot);
       this.setData({ ready: true, loadError: null, refreshError: null }, () => this.observeMembershipOffer());
@@ -837,6 +836,12 @@ Page(require('../../utils/language').page('mine', {
     switchToTab({ url: '/pages/' + route + '/index' });
   },
 
+  onOpenRegionalWatches() {
+    const { membership, paymentBusy, paymentChecking, paymentConfirming } = this.data;
+    if (this.pageRetired || !membership?.active || !membership.enhanced || paymentBusy || paymentChecking || paymentConfirming) return;
+    switchToTab({ url: '/pages/markets/index' });
+  },
+
   ensurePaymentController() {
     if (!this.paymentController) {
       this.paymentController = createPaymentController({ wx, call, makeId: typeof newId === 'function' ? () => newId('member') : undefined,
@@ -1239,14 +1244,15 @@ Page(require('../../utils/language').page('mine', {
   },
 
   async onSignin() {
-    if (this.pageRetired || this.data.signing) return;
+    if (this.pageRetired || this.pageVisible === false || this.data.signing) return;
+    const owner = this.orderAccount();
+    if (!owner || owner !== currentQuotaOwner()) return this.refresh({ quiet: true, force: true });
     topUpReminderCredit();
     const session = this.pageSession || 0;
-    const owner = this.orderAccount();
     this.setData({ signing: true });
     try {
-      const data = await call('quota.signin');
-      if (!this.isCurrentSession(session)) return;
+      const data = await call('quota.signin', { expectedUserKey: owner });
+      if (!this.isCurrentSession(session) || owner !== currentQuotaOwner()) return;
       if (invalidateBootstrap(owner) === false) return;
       if (data.granted > 0) { confirmTap(); toast(`签到成功 +${data.granted} 次`, 'success'); }
       else if (data.reason === 'already_signed_in') toast('今天已签到');
@@ -1254,7 +1260,7 @@ Page(require('../../utils/language').page('mine', {
       else if (data.reason === 'balance_cap_reached') toast(`余额已达上限 ${data.quota.balanceCap} 次`);
       if (publishQuota(data.quota, owner) !== false) this.setData({ quota: currentQuota() || data.quota });
     } catch (error) {
-      if (this.isCurrentSession(session)) showError(error);
+      if (this.isCurrentSession(session) && owner === currentQuotaOwner()) showError(error);
     } finally {
       if (this.isCurrentSession(session)) this.setData({ signing: false });
     }

@@ -43,6 +43,7 @@ let catalogStoragePromise = null;
 const catalogListeners = new Set();
 const quotaListeners = new Set();
 const subscriptionListeners = new Set();
+const pendingFollowCountWrites = new Set();
 const BOOTSTRAP_TTL_MS = 30000;
 const CATALOG_TTL_MS = 5 * 60000;
 let followSnapshot = null;
@@ -51,6 +52,22 @@ let followFetchedAt = 0;
 let followGeneration = 0;
 
 function invalidateFollows() { if (typeof resetPendingReads === 'function') resetPendingReads(); followGeneration += 1; followSnapshot = null; followPromise = null; }
+async function trackFollowCountWrite(owner, request) {
+  const write = { owner, request };
+  pendingFollowCountWrites.add(write);
+  let mayHaveChanged = true;
+  try { return await request; }
+  catch (error) {
+    mayHaveChanged = !error?.code || require('./operation').uncertain(error);
+    throw error;
+  } finally {
+    pendingFollowCountWrites.delete(write);
+    if (mayHaveChanged && quotaOwner === owner) {
+      invalidateBootstrap(owner);
+      invalidateFollows();
+    }
+  }
+}
 function resetSession() {
   serverClock = null;
   if (typeof resetPendingReads === 'function') resetPendingReads();
@@ -125,9 +142,13 @@ function bootstrapNow(boot, localNow = Date.now()) {
     ? serverClock.at + (localNow - serverClock.received) : localNow;
 }
 
-function quotaAccountMatches(owner) {
+function currentQuotaOwner() {
   const cached = getApp().globalData.bootstrap;
-  const current = cached && cached.identity && cached.identity.userKey || quotaOwner;
+  return cached ? cached.identity?.userKey || null : quotaOwner;
+}
+
+function quotaAccountMatches(owner) {
+  const current = currentQuotaOwner() || quotaOwner;
   return !owner || !current || owner === current;
 }
 
@@ -245,7 +266,12 @@ function subscribeQuota(listener) {
   return () => quotaListeners.delete(listener);
 }
 
-async function getBootstrap({ force = false } = {}) {
+async function getBootstrap({ force = false, afterFollowWrites = false } = {}) {
+  // Mine can open before a save returns. Its count must come from a read after the write settles.
+  if (afterFollowWrites && pendingFollowCountWrites.size) {
+    const pending = [...pendingFollowCountWrites].filter(write => write.owner === quotaOwner);
+    await Promise.all(pending.map(write => write.request.catch(() => {})));
+  }
   const app = getApp();
   const cached = app.globalData.bootstrap;
   const localNow = Date.now(), now = bootstrapNow(cached, localNow);
@@ -439,4 +465,4 @@ async function getCatalog({ force = false } = {}) {
   return catalog;
 }
 
-module.exports = { bootstrapNow, getBootstrap, refreshBootstrap, invalidateBootstrap, quotaAccountMatches, publishSettings, publishQuota, publishQueryBalance, currentQuota, subscribeQuota, publishSubscriptions, subscribeSubscriptions, getQuotaGeneration, getCatalog, refreshCatalog, currentCatalog, subscribeCatalog, getFollows, invalidateFollows, resetSession, CATEGORY_NAME };
+module.exports = { bootstrapNow, getBootstrap, refreshBootstrap, invalidateBootstrap, currentQuotaOwner, quotaAccountMatches, publishSettings, publishQuota, publishQueryBalance, currentQuota, subscribeQuota, publishSubscriptions, subscribeSubscriptions, getQuotaGeneration, getCatalog, refreshCatalog, currentCatalog, subscribeCatalog, getFollows, invalidateFollows, trackFollowCountWrite, resetSession, CATEGORY_NAME };

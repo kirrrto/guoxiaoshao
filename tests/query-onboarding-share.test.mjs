@@ -14,7 +14,7 @@ const settle = async () => { for (let i = 0; i < 5; i++) await new Promise(resol
 
 async function opened({ signin, query, catalog, options, saved, cached, realApp = false, member = false, accountQuota = quota() } = {}) {
   const rt = runtime(async (action, payload) => {
-    if (action === 'user.bootstrap') return { membership: { active: member }, quota: copy(accountQuota),
+    if (action === 'user.bootstrap') return { identity: { userKey: 'consumer:onboarding' }, membership: { active: member }, quota: copy(accountQuota),
       limits: { queryMaxStores: 3 }, collector: { state: 'running' }, followCount: 0 };
     if (action === 'catalog.get') return catalog ? catalog(payload) : { unchanged: true };
     if (action === 'quota.signin') return signin(payload);

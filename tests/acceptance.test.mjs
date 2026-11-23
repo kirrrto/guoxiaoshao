@@ -45,21 +45,23 @@ test('acceptance stays off by default and release/trial builds ignore forged sto
   assert.ok(s.writes.every(key => key === 'gxs_acceptance_v1'));
 });
 
-test('free acceptance signup, charged history task, exhausted balance match production quota defaults', async () => {
+test('daily sign-in funds one query and browsing or querying history earns no new credit', async () => {
   const { api } = sandbox(); api.configure('free');
   assert.deepEqual(copy(api.QUOTA), { ...realQuota.DEFAULT_CONFIG });
-  assert.equal((await api.handle('user.bootstrap')).quota.balance, 0);
+  const initial = await api.handle('user.bootstrap');
+  assert.equal(initial.quota.balance, 0);
+  assert.equal(initial.quota.dailyGrantCap, 1);
+  assert.equal(initial.quota.balanceCap, 10);
+  assert.equal(initial.tasks.length, 0);
   assert.equal((await api.handle('quota.signin')).granted, 1);
   assert.equal((await api.handle('quota.signin')).granted, 0);
   const history = await api.handle('history.list', { historyQueryId: 'history-task-001', partNumber: parts[0], storeNumbers: [stores[0]], dayKey: '2026-09-14' });
   assert.equal(history.charged, 1); assert.equal(history.balance, 0);
-  assert.equal((await api.handle('quota.completeTask', { taskId: 'view_history' })).granted, 1);
+  assert.equal((await api.handle('history.browse')).task, null);
   assert.equal((await api.handle('quota.completeTask', { taskId: 'view_history' })).granted, 0);
-  const query = await api.handle('query.pickup', { queryId: 'query-free-001', partNumber: parts[0], storeNumbers: [stores[0]] });
-  assert.equal(query.charged, 1); assert.equal(query.balance, 0);
   const denied = await api.handle('query.pickup', { queryId: 'query-free-002', partNumber: parts[0], storeNumbers: [stores[0]] });
   assert.equal(denied.reason, 'insufficient_credits');
-  assert.equal((await api.handle('user.bootstrap')).quota.grantedToday, 2);
+  assert.equal((await api.handle('user.bootstrap')).quota.grantedToday, 1);
 });
 
 test('failed queries refund once and repeated request IDs cannot debit or change target twice', async () => {
@@ -247,7 +249,7 @@ test('access denial can retry after sign-in and evicted acceptance responses can
   api.configure('free');
   await assert.rejects(api.handle('history.list', request), { code: 'acceptance_snapshot_expired' });
   assert.equal((await api.handle('quota.ledger')).entries.filter(e => e.type === 'history_debit').length, 1);
-  assert.equal((await api.handle('quota.completeTask', { taskId: 'view_history' })).granted, 1, 'eviction preserves the server-like daily completion proof');
+  assert.equal((await api.handle('quota.completeTask', { taskId: 'view_history' })).reason, 'reward_disabled');
 });
 
 test('acceptance reminder pagination and single deletion preserve the internal record and newer arrivals', async () => {

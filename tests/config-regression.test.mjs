@@ -7,7 +7,7 @@ test('invalid runtime values cannot corrupt quota, collector limits or notificat
   const f = createFixture();
   const before = await f.repo.getConfig();
   for (const patch of [
-    { quota: { queryCost: -1 } }, { quota: { balanceCap: '10' } },
+    { quota: { queryCost: -1 } }, { quota: { balanceCap: '10' } }, { quota: { balanceCap: 11 } }, { quota: { signinReward: 2 } },
     { collector: { intervalSeconds: 0 } }, { collector: { maxConcurrency: 999 } },
     { notifications: { enabled: true } },
     { notifications: { templateFields: { product: 'time1' } } },
@@ -24,10 +24,11 @@ test('invalid runtime values cannot corrupt quota, collector limits or notificat
 
 test('partial configuration patches preserve previously configured siblings', async () => {
   const f = createFixture({ config: { quota: { queryCost: 2, balanceCap: 12 }, collector: { intervalSeconds: 10 }, notifications: { templateFields: { product: 'thing5' } } } });
-  const result = await f.call('admin.updateConfig', { patch: { quota: { balanceCap: 20 }, collector: { maxConcurrency: 1 }, notifications: { templateFields: { time: 'time6' } } } }, operatorContext());
+  const result = await f.call('admin.updateConfig', { patch: { quota: { historyCost: 3 }, collector: { maxConcurrency: 1 }, notifications: { templateFields: { time: 'time6' } } } }, operatorContext());
   assert.equal(result.ok, true, JSON.stringify(result.error));
   assert.equal(result.data.config.quota.queryCost, 2);
-  assert.equal(result.data.config.quota.balanceCap, 20);
+  assert.equal(result.data.config.quota.balanceCap, 10, 'a stored legacy cap cannot increase the active allowance');
+  assert.equal(result.data.config.quota.historyCost, 3);
   assert.equal(result.data.config.collector.intervalSeconds, 10);
   assert.equal(result.data.config.collector.maxConcurrency, 1);
   assert.equal(result.data.config.notifications.templateFields.product, 'thing5');

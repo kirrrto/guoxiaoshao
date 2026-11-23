@@ -13,6 +13,12 @@ const { CAPACITY_ID, capacityLimits } = require('../../cloudfunctions/gxs_api/li
 const quiet = { error() {}, warn() {}, info() {} };
 export const CLIENTS = 300;
 export const slowUpstreamMs = 2500;
+// These capacity scenarios model known, watched stores. The collector tests
+// exercise changes of ownership and the database-backed membership decision.
+export function simulatedWatchDemand(stores, part) {
+  const watched = new Set(stores);
+  return (store, parts) => ({ select: () => ({ parts: watched.has(store) ? parts.filter(p => p === part) : [] }) });
+}
 function simulationConfig(collector = {}) {
   if (!collector || typeof collector !== 'object' || Array.isArray(collector)
     || Object.entries(collector).some(([key, value]) => !Object.hasOwn(DEFAULTS.collector, key)
@@ -124,8 +130,10 @@ export async function runSustainedScenario({ collector } = {}) {
   const s = await capacityFixture({ start: '2026-10-01T15:59:00.000Z', collector });
   const limits = s.config.collector;
   const start = s.f.state.now.getTime();
-  const autoWave = () => Promise.all(Array.from({ length: CLIENTS }, (_, i) => guardedPickup({ repo: s.f.repo, config: s.config,
-    clock: () => new Date(s.f.state.now), fetchImpl: s.fetchImpl, storeNumber: `R${String(i).padStart(3, '0')}`, partNumbers: ['AU000CH/A'], timeoutMs: 8000, source: 'auto' })));
+  const watchedStores = Array.from({ length: CLIENTS }, (_, i) => 'R' + String(i).padStart(3, '0'));
+  const watchDemand = simulatedWatchDemand(watchedStores, 'AU000CH/A');
+  const autoWave = () => Promise.all(watchedStores.map(storeNumber => guardedPickup({ repo: s.f.repo, config: s.config,
+    clock: () => new Date(s.f.state.now), fetchImpl: s.fetchImpl, storeNumber, partNumbers: ['AU000CH/A'], timeoutMs: 8000, source: 'auto', watchDemand })));
   const waves = [];
   // Four bounded waves test conservation and midnight without turning the
   // eager-copy in-memory transaction model into a misleading CPU benchmark.

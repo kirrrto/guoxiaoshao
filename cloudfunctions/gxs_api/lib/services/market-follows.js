@@ -25,10 +25,12 @@ async function marketFollows(ctx, payload = {}) {
   checkOwner(ctx, payload, false);
   const user = await ensureUser(ctx);
   const all = await ctx.repo.listFollows(user._id);
-  const switches = group => Object.fromEntries(MARKETS.map(({ code }) => [code, group[code] === true]));
+  const { collector, notifications, internationalMonitoring, internationalNotifications } = ctx.config;
+  const monitoring = Object.fromEntries(MARKETS.map(({ code }) => [code, collector.enabled && internationalMonitoring[code] === true]));
   return { follows: all.filter(follow => findMarket(follow.market)).map(follow => present(user, follow, all, ctx)),
     savedCount: all.length, limits: memberLimits(user, ctx.now, ctx.config), canWatch: canWatchMarkets(user, ctx.now, ctx.config),
-    monitoring: switches(ctx.config.internationalMonitoring), notifications: switches(ctx.config.internationalNotifications) };
+    watchRegistrationOpen: true, monitoring,
+    notifications: Object.fromEntries(MARKETS.map(({ code }) => [code, monitoring[code] && notifications.enabled && internationalNotifications[code] === true])) };
 }
 
 function requireTarget(region, partNumber, storeNumbers) {
@@ -43,7 +45,7 @@ function requireTarget(region, partNumber, storeNumbers) {
 async function marketWatch(ctx, payload) {
   checkOwner(ctx, payload, true);
   const region = findMarket(payload.market);
-  if (!region || (ctx.config.internationalMarkets[region.code] !== true && ctx.config.internationalMonitoring[region.code] !== true)) throw new ApiError('market_monitoring_disabled', '此站点尚未开放关注');
+  if (!region) throw new ApiError('unknown_market', '该站点不在支持范围内。');
   const product = requireTarget(region, payload.partNumber, payload.storeNumbers);
   const language = payload.language === undefined ? 'zh-CN' : payload.language;
   if (language !== 'zh-CN' && language !== 'en') throw new ApiError('invalid_language', '请选择支持的提醒语言');
@@ -67,10 +69,7 @@ async function marketWatchStatus(ctx, payload) {
   const existing = await ctx.repo.getFollow(id);
   const region = existing && findMarket(existing.market);
   if (!region || existing.userKey !== user._id) throw new ApiError('unknown_follow', '关注不存在');
-  if (payload.status === 'active') {
-    if (ctx.config.internationalMarkets[region.code] !== true && ctx.config.internationalMonitoring[region.code] !== true) throw new ApiError('market_monitoring_disabled', '此站点的监测暂未开放');
-    requireTarget(region, existing.partNumber, existing.storeNumbers);
-  }
+  if (payload.status === 'active') requireTarget(region, existing.partNumber, existing.storeNumbers);
   const all = await ctx.repo.listFollows(user._id);
   const saved = await ctx.repo.mutateFollow({ userKey: user._id, followId: id, status: payload.status, market: region.code, nowIso: ctx.nowIso, knownFollows: all });
   return { follow: present(user, saved, all, ctx) };

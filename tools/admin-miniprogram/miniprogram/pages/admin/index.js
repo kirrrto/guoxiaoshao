@@ -38,7 +38,7 @@ function insightLines(data) {
   ];
 }
 
-const EDITABLE_KEYS = ['quota', 'tasks', 'memberProduct', 'memberPlans', 'memberRedemption', 'newProductWindows', 'notifications', 'collector', 'query',
+const EDITABLE_KEYS = ['quota', 'memberProduct', 'memberPlans', 'memberRedemption', 'newProductWindows', 'notifications', 'collector', 'query',
   'internationalMarkets', 'internationalMonitoring', 'internationalNotifications', 'internationalQueryLimits', 'announcement', 'notices', 'features', 'growthExperiment'];
 
 function growthLines(data) {
@@ -167,6 +167,7 @@ Page({
       if (!this.data.allowed || this._configRead !== read) return;
       const editable = {};
       for (const key of EDITABLE_KEYS) editable[key] = config[key];
+      if (config.quota) editable.quota = { queryCost: config.quota.queryCost, historyCost: config.quota.historyCost };
       this._configRevision = Number.isSafeInteger(revision) && revision >= 0 ? revision : null;
       this.setData({ configText: JSON.stringify(editable, null, 2), configDirty: false, configLoaded: this._configRevision !== null });
     } catch (error) {

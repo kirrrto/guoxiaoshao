@@ -73,7 +73,9 @@ test('查询和签到可补充授权；刷新状态始终只读，不打断用�
     const follow = setup({ member, handler: async action => action === 'user.bootstrap' ? boot() : { follows: [], limits: {} } });
     await follow.rt.instance('pages/follow/index.js').onRefreshStatus();
     const mine = setup({ member, handler: async () => ({ granted: 1, quota: { balance: 2 } }) });
-    await mine.rt.instance('pages/mine/index.js').onSignin();
+    const minePage = mine.rt.instance('pages/mine/index.js');
+    minePage.setData({ boot: { identity: mine.rt.app.globalData.bootstrap.identity } });
+    await minePage.onSignin();
     assert.deepEqual([query.prompts(), follow.prompts(), mine.prompts()], member ? [1, 0, 1] : [0, 0, 0], `member=${member}`);
   }
 });

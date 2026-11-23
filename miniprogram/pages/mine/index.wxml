@@ -74,6 +74,7 @@
         </view>
         <view wx:if="{{membership.annualExpiresText}}" class="member-enhanced">{{i18n.m(ui,'年卡 5 配置 × 5 门店权益至 {0}',[(membership.annualExpiresText)])}}</view>
         <view wx:elif="{{membership.enhancedExpiresText}}" class="member-enhanced">{{i18n.m(ui,'额外名额有效至 {0}',[(membership.enhancedExpiresText)])}}</view>
+        <button wx:if="{{membership.enhanced}}" class="ui-action ui-action--plain member-regional-link" hover-class="member-delivery-pressed" disabled="{{paymentBusy || paymentChecking || paymentConfirming}}" bindtap="onOpenRegionalWatches"><text class="ui-action-label">{{i18n.t(ui,'关注日本、台湾和香港门店')}}</text><view class="ui-chevron" aria-hidden="true"></view></button>
       </view>
       <view wx:elif="{{!paymentPendingId && (!contextualCheckout || !checkoutTarget)}}" class="member-pass member-vip-offer">
         <image class="member-pass-watermark" src="/images/brand/whistle-pass.png" mode="aspectFit" aria-hidden="true" />
@@ -106,7 +107,7 @@
         </view>
         <block wx:if="{{displayMemberProducts.length}}">
           <view class="membership-packages {{contextualCheckout && !membership.active ? 'membership-packages-context' : ''}}" aria-label="{{i18n.t(ui,'选择会员套餐')}}">
-            <button wx:for="{{displayMemberProducts}}" wx:key="planId" class="membership-package {{selectedPlanId === item.planId ? 'membership-package-selected' : ''}}" hover-class="membership-package-pressed" data-plan-id="{{item.planId}}" disabled="{{subscribing || redeeming || paymentBusy || paymentChecking || paymentPendingId || paymentConfirming}}" bindtap="onSelectMemberProduct" aria-label="{{i18n.t(ui,(item.nameText + '，' + item.durationText + '，' + item.benefitShort + (item.standardPriceText ? '，优惠价' + item.priceText + '，标准价' + item.standardPriceText : '，' + item.priceText) + (selectedPlanId === item.planId ? '，已选' : '')))}}">
+            <button wx:for="{{displayMemberProducts}}" wx:key="planId" class="membership-package {{selectedPlanId === item.planId ? 'membership-package-selected' : ''}}" hover-class="membership-package-pressed" data-plan-id="{{item.planId}}" disabled="{{subscribing || redeeming || paymentBusy || paymentChecking || paymentPendingId || paymentConfirming}}" bindtap="onSelectMemberProduct" aria-label="{{i18n.t(ui,item.nameText)}} · {{i18n.t(ui,item.durationText)}} · {{i18n.t(ui,item.benefitShort)}} · {{i18n.t(ui,item.watchScope)}} · {{item.standardPriceText ? i18n.m(ui,'优惠价{0}，标准价{1}',[item.priceText,item.standardPriceText]) : item.priceText}}{{selectedPlanId === item.planId ? i18n.t(ui,'，已选') : ''}}">
               <view class="membership-package-radio" aria-hidden="true"><view class="ui-check"></view></view>
               <view class="membership-package-heading">
                 <view class="membership-package-name-line"><text class="membership-package-name">{{i18n.t(ui,(item.nameText))}}</text><text class="membership-package-duration">{{i18n.t(ui,(item.durationText))}}</text><text wx:if="{{item.recommendedText}}" class="membership-recommended-tag">{{i18n.t(ui,(item.recommendedText))}}</text></view>
@@ -116,9 +117,10 @@
                 <text class="membership-package-price">{{i18n.t(ui,(item.priceText))}}</text>
                 <view class="membership-package-price-note"><text wx:if="{{item.standardPriceText}}" class="membership-standard-price">{{i18n.t(ui,(item.standardPriceText))}}</text><text wx:if="{{item.dailyPriceText}}" class="membership-daily-price">{{i18n.t(ui,(item.dailyPriceText))}}</text></view>
               </view>
+              <text class="membership-package-benefit membership-package-scope">{{i18n.t(ui,item.watchScope)}}</text>
             </button>
           </view>
-          <view class="small text-2 mt">{{i18n.t(ui,(selectedPlanId === 'member_30d' || selectedPlanId === 'member_365d' ? '其他站点可查新品，也可关注门店库存。' : '其他站点可查新品。关注门店库存需月卡或年卡。'))}}</view>
+          <view class="small text-2 mt">{{i18n.t(ui,'各站点共用关注名额。其他站点开放监测后开始检查库存，微信到货提醒需另行授权。')}}</view>
           <view wx:if="{{membership.active && membershipUpgradePreview}}" class="membership-extension">
             <text class="membership-extension-detail">{{i18n.t(ui,(membershipUpgradePreview.extensionText))}}</text>
             <text wx:if="{{membershipUpgradePreview.expiresAtText}}" class="membership-extension-date">{{i18n.m(ui,'预计到期 {0}',[(membershipUpgradePreview.expiresAtText)])}}</text>
@@ -247,11 +249,10 @@
       </view>
       <button class="ui-disclosure quota-row" hover-class="ui-control-pressed" bindtap="onToggleQuotaDetails" aria-expanded="{{showQuotaDetails}}"><text class="ui-disclosure-label">{{i18n.t(ui,'查询次数明细')}}</text><view class="ui-chevron {{showQuotaDetails ? 'ui-chevron--up' : 'ui-chevron--down'}}" aria-hidden="true"></view></button>
       <view wx:if="{{showQuotaDetails}}" class="quota-details ui-reveal">
-        <view class="quota-caps">{{i18n.m(ui,'今日已获 {0} / {1} 次，余额上限 {2} 次',[(quota.grantedToday),(quota.dailyGrantCap),(quota.balanceCap)])}}</view>
+        <view class="quota-caps">{{i18n.t(ui,'每日签到可得 1 次，最多累计 10 次。')}}</view>
         <view wx:for="{{tasks}}" wx:key="id" class="task">
           <view class="task-copy"><text>{{i18n.t(ui,(item.title))}}</text></view>
-          <text wx:if="{{item.done}}" class="pill pill-ok">{{i18n.t(ui,'已完成')}}</text>
-          <button wx:elif="{{item.claimable}}" class="ui-action" hover-class="ui-control-pressed" bindtap="onOpenPendingReward"><text class="ui-action-label">{{i18n.t(ui,'领取奖励')}}</text><view class="ui-chevron" aria-hidden="true"></view></button>
+          <button wx:if="{{item.claimable}}" class="ui-action" hover-class="ui-control-pressed" bindtap="onOpenPendingReward"><text class="ui-action-label">{{i18n.t(ui,'领取奖励')}}</text><view class="ui-chevron" aria-hidden="true"></view></button>
           <text wx:else class="task-reward">{{i18n.t(ui,(item.pendingLabel))}}</text>
         </view>
         <button class="ui-disclosure quota-row" hover-class="ui-control-pressed" bindtap="onToggleLedger" aria-expanded="{{showLedger}}"><text class="ui-disclosure-label">{{i18n.t(ui,'次数明细')}}</text><view class="ui-chevron {{showLedger ? 'ui-chevron--up' : 'ui-chevron--down'}}" aria-hidden="true"></view></button>

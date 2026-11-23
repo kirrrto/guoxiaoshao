@@ -45,15 +45,15 @@ function upstreamGuardMethods(run, { readUpstreamBreaker } = {}) {
       collector: await tx.get(C.config, 'collector_status'),
     })),
     // Legacy method name retained; this is now the shared manual + auto budget.
-    consumeCollectorBudget: ({ now, maxRequestsPerMinute, maxRequestsPerDay, budgetMode = 'continuous', source = 'manual', autoShare = AUTO_SHARE, market = null, previewUser = null }) => run(async tx => {
+    consumeCollectorBudget: ({ now, maxRequestsPerMinute, maxRequestsPerDay, budgetMode = 'continuous', source = 'manual', autoShare = AUTO_SHARE, market = null, previewUser = null, selectWatchedParts }) => run(async tx => {
       source = source === 'auto' ? 'auto' : 'manual';
       const nowMs = Date.parse(now);
       const prefix = market ? 'market_' + market + '_' : '';
       let marketMonitoringEnabled = false;
+      const runtime = market || selectWatchedParts ? await tx.get(C.config, 'runtime') : null;
       // Regional rollouts can be stopped while a timer or manual request is
       // waiting for admission. Check the authoritative flags before reserving.
       if (market) {
-        const runtime = await tx.get(C.config, 'runtime');
         marketMonitoringEnabled = runtime?.collector?.enabled === true && runtime?.internationalMonitoring?.[market] === true;
         const manualEnabled = previewUser ? canPreviewMarket(market, previewUser, runtime) : runtime?.internationalMarkets?.[market] === true;
         const enabled = source === 'auto' ? marketMonitoringEnabled : manualEnabled;
@@ -63,6 +63,14 @@ function upstreamGuardMethods(run, { readUpstreamBreaker } = {}) {
       const breaker = await tx.get(C.config, breakerId) || { _id: breakerId, generation: 0, trips: 0 };
       if (breaker.until > nowMs) return { allowed: false, reason: 'upstream_paused', retryAt: breaker.until };
       if (breaker.probeUntil > nowMs) return { allowed: false, reason: 'upstream_paused', retryAt: breaker.probeUntil };
+      let watchedParts;
+      if (selectWatchedParts) {
+        if (runtime?.collector?.enabled !== true) return { allowed: false, reason: 'collector_disabled', retryAt: 0 };
+        const selected = await selectWatchedParts(tx, runtime, new Date(now));
+        if (selected.reload) return { allowed: false, reason: 'watch_candidates_changed', retryAt: 0 };
+        if (!selected.parts.length) return { allowed: false, reason: 'no_active_watch', retryAt: 0 };
+        watchedParts = selected.parts;
+      }
       const date = dayKey(now);
       const id = prefix + `collector_budget_${date}`;
       const minuteKey = new Date(now).toISOString().slice(0, 16);
@@ -104,7 +112,8 @@ function upstreamGuardMethods(run, { readUpstreamBreaker } = {}) {
       sourceCounts[source] += 1;
       await tx.put(C.config, { ...current, ...(market ? { market, kind: 'market_budget', minuteManual: minuteManual + (source === 'manual' ? 1 : 0) } : {}), minuteKey, minuteCount: minuteCount + 1, dayCount: current.dayCount + 1,
         autoCount: sourceCounts.auto, manualCount: sourceCounts.manual, updatedAt: now, expiresAt: new Date(nowMs + 7 * 86400000).toISOString() });
-      return { allowed: true, reason: null, minuteCount: minuteCount + 1, dayCount: current.dayCount + 1, ...detail, token };
+      return { allowed: true, reason: null, minuteCount: minuteCount + 1, dayCount: current.dayCount + 1, ...detail, token,
+        ...(watchedParts ? { watchedParts } : {}) };
     }),
     recordUpstreamOutcome: async ({ token, record, success, now }) => {
       const breakerId = token && token.market ? 'market_' + token.market + '_upstream_breaker' : 'upstream_breaker';

@@ -33,8 +33,8 @@
     },
     {
       "path": "config.js",
-      "bytes": 24810,
-      "sha256": "e20b56276ca184e1734fddb4b537f93bb40eda414e97d7910e8244c0f6f3b281"
+      "bytes": 25746,
+      "sha256": "8ae330df8a792ef380244a58fcc03d6cc2e2ea5a9b1b93d0f285404e60bda9c7"
     },
     {
       "path": "connection.js",
@@ -53,8 +53,8 @@
     },
     {
       "path": "engine/collector.js",
-      "bytes": 31471,
-      "sha256": "448bff05ca219faf05610278fa4758db051f124c86e005e02c1c3e25e44cf105"
+      "bytes": 35144,
+      "sha256": "50d8157fa71ac96f5b6bc5f2bd4d35470422ccee1b05be184eb4bae33be7d5ea"
     },
     {
       "path": "engine/current-availability.js",
@@ -73,8 +73,8 @@
     },
     {
       "path": "engine/guarded-pickup.js",
-      "bytes": 5762,
-      "sha256": "9040e1ebe7bdc3030fdba24fb7f1c9be4187050c70cffa5d1596b5d4c41ad950"
+      "bytes": 6829,
+      "sha256": "1ac86c90b9cf5c5ce281931f6da980d5fdf8c2cda6090c655bb5be6f9cac25c1"
     },
     {
       "path": "engine/lease.js",
@@ -178,13 +178,13 @@
     },
     {
       "path": "repo/atomic-ops.js",
-      "bytes": 59595,
-      "sha256": "d78a2f77136c347e7046349f1fec255ce5bdc0e2c56988bc1092bf6d64b76692"
+      "bytes": 58579,
+      "sha256": "d4ef6a7ef46648b0743f743425754ccff3b603f2a56a37b4056707164736da70"
     },
     {
       "path": "repo/cloudbase-repo.js",
-      "bytes": 29267,
-      "sha256": "c88d4f517174cb57668fc4a564c9443f61d3f0fac74563fb66f9ff8e9bb068e6"
+      "bytes": 29661,
+      "sha256": "2f07aee6817d6d68cb4126626631355857027a4b71da66cf6c1cc52772e6b400"
     },
     {
       "path": "repo/current-availability.js",
@@ -213,8 +213,8 @@
     },
     {
       "path": "repo/notification-test.js",
-      "bytes": 8927,
-      "sha256": "7e2ecb21f24eec6d7e03a6d1d1b062b062f53b9c04aa18a7b8207e530600c67e"
+      "bytes": 8909,
+      "sha256": "c81ce9967a3fc01e06829d424c12831f83a5c01d29f3e38586a7491708d157df"
     },
     {
       "path": "repo/observation-storage.js",
@@ -243,8 +243,8 @@
     },
     {
       "path": "repo/upstream-guard.js",
-      "bytes": 11165,
-      "sha256": "4ad2e7c13dc68cba10f7cc1a8e2b659b53cac1dfdd9519c8950a2b3455de6be5"
+      "bytes": 11779,
+      "sha256": "596b177a7b50342fa83766fbddd77cf000fca815de878b99840767316f00bc3a"
     },
     {
       "path": "rules/access.js",
@@ -298,8 +298,8 @@
     },
     {
       "path": "rules/quota.js",
-      "bytes": 1704,
-      "sha256": "3d959021c4a34b5d0cd0326a7f696d56cfb0c8e99e6536c05985f2d2fe80c9d3"
+      "bytes": 2436,
+      "sha256": "49c35d82451c72585c4f308c2e8b4e9403bfb1eb37d201cc51a6423467d9543d"
     },
     {
       "path": "rules/regional-query-preview.js",

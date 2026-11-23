@@ -157,6 +157,10 @@ export function createMemoryRepo(seed = {}) {
     async getFollow(id) { return get(COLLECTIONS.follows, id); },
     async saveFollow(follow) { put(COLLECTIONS.follows, follow); },
     async listActiveFollows() { return all(COLLECTIONS.follows).filter(f => f.status === 'active'); },
+    async listActivePickupFollows(storeNumber, partNumbers, market) {
+      return all(COLLECTIONS.follows).filter(f => f.status === 'active' && (f.market || 'CN') === market
+        && partNumbers.includes(f.partNumber) && f.storeNumbers.includes(storeNumber));
+    },
     async getUsers(userKeys) { return userKeys.map(k => get(COLLECTIONS.users, k)).filter(Boolean); },
     async getOrder(id) { return get(COLLECTIONS.orders, id); },
     async getOrderByOutTradeNo(outTradeNo) { return all(COLLECTIONS.orders).find(order => order.outTradeNo === outTradeNo) || null; },

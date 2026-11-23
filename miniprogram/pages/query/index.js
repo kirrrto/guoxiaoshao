@@ -2,7 +2,7 @@ const languageUI = require('../../utils/language');
 const navigation = require('../../utils/navigation');
 const { canQuery, canMonitor } = require('../../utils/product-capabilities');
 const { call, newId, showError, toast } = require('../../utils/api');
-const { getBootstrap, getCatalog, invalidateBootstrap, quotaAccountMatches, subscribeCatalog, getFollows, publishQuota, currentQuota, subscribeQuota, publishQueryBalance } = require('../../utils/store');
+const { getBootstrap, getCatalog, invalidateBootstrap, currentQuotaOwner, quotaAccountMatches, subscribeCatalog, getFollows, publishQuota, currentQuota, subscribeQuota, publishQueryBalance } = require('../../utils/store');
 const fmt = require('../../utils/format');
 const { storeLabel, storeLabelWithCity } = require('../../utils/store-label');
 const { localKey } = require('../../utils/local-key');
@@ -11,7 +11,7 @@ const operation = require('../../utils/operation');
 const { startProgress, stopProgress } = require('../../utils/request-progress');
 const { syncTabBar, switchToTab, releaseTabBar } = require('../../utils/tab-bar');
 const { shareAppMessage, shareTimeline, readSharedSelection } = require('../../utils/share');
-const { monitorPollDelay } = require('../../utils/poll');
+const { hasActiveStockTarget, monitorPollDelay } = require('../../utils/poll');
 const { topUpReminderCredit, buildConsentReport, openSubscribeSettings } = require('../../utils/reminder-credits');
 const { resolveQueryNotice, noticeUnreadCount, nextNoticeChangeAt } = require('../../utils/query-notice');
 const { confirmTap } = require('../../utils/haptic');
@@ -416,7 +416,6 @@ Page(require('../../utils/language').page('query', {
       if (!this.verifiedAccount() || !boot || !boot.member || !boot.followCount) {
         this.followSnapshot = null;
         if (this.data.followTargets.length) this.setData({ followTargets: [] });
-        this.followTimer = setTimeout(tick, monitorPollDelay(this.collector));
         return;
       }
       if (this.followSnapshot) this.setData({ followTargets: presentFollowTargets(this.followSnapshot) });
@@ -425,6 +424,7 @@ Page(require('../../utils/language').page('query', {
         if (this.visible && epoch === this.followEpoch) {
           this.followSnapshot = data.follows;
           this.setData({ followTargets: presentFollowTargets(data.follows) });
+          if (!hasActiveStockTarget(data.follows)) return;
         }
       } catch (e) { /* Keep the last task label; live status is shown on the follow page. */ }
       if (this.visible && epoch === this.followEpoch) this.followTimer = setTimeout(tick, monitorPollDelay(this.collector));
@@ -830,13 +830,14 @@ Page(require('../../utils/language').page('query', {
   async onSignin() {
     if (this.pageRetired || this.data.signing || this.data.querying || !this.data.accountReady
       || !this.data.boot || this.data.boot.member || this.data.boot.signedInToday) return;
+    const owner = this.verifiedAccount()?.identity?.userKey;
+    if (!owner || owner !== currentQuotaOwner()) return this.onRetryAccount();
     this.onSelectionInteraction();
     const epoch = this.accountEpoch || 0;
-    const owner = this.accountSnapshot && this.accountSnapshot.identity && this.accountSnapshot.identity.userKey;
     this.setData({ signing: true, signinError: null });
     try {
-      const result = await call('quota.signin');
-      if (epoch !== (this.accountEpoch || 0)) return;
+      const result = await call('quota.signin', { expectedUserKey: owner });
+      if (epoch !== (this.accountEpoch || 0) || owner !== currentQuotaOwner()) return;
       if (!result || !result.quota) throw new Error('签到结果尚未确认，请重试');
       // The shared store rejects stale revisions and updates other open pages too.
       if (!publishQuota(result.quota, owner)) {
@@ -850,7 +851,7 @@ Page(require('../../utils/language').page('query', {
       else if (result.reason === 'daily_cap_reached') toast('今日获取次数已达上限');
       else if (result.reason === 'balance_cap_reached') toast('查询次数已达余额上限');
     } catch (error) {
-      if (!this.pageRetired && epoch === (this.accountEpoch || 0)) this.setData({ signinError: '签到暂未确认，请重试；同一天不会重复领取。' });
+      if (!this.pageRetired && epoch === (this.accountEpoch || 0) && owner === currentQuotaOwner()) this.setData({ signinError: '签到暂未确认，请重试；同一天不会重复领取。' });
     } finally {
       if (!this.pageRetired && epoch === (this.accountEpoch || 0)) this.setData({ signing: false });
     }

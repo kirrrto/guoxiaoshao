@@ -385,7 +385,8 @@ test('real wx-server-sdk 4.0.2 adapter preserves transaction results, null/objec
     assert.equal(committed[C.users].user.membership.expiresAt, '2026-10-15T02:00:00.000Z');
     await repo.beginQuery({ record: { ...record, _id: 'history', kind: 'history', dayKey: '2026-09-14' }, product: PRODUCTS[1], config: mergeConfig(null), ownerId: 'history-worker', nowIso });
     await repo.finishQuery({ id: 'history', ownerId: 'history-worker', response: { ok: true, events: [] }, refund: false, nowIso });
-    assert.equal(committed[C.users].user.taskEvidence.view_history.queryId, 'history');
+    assert.equal(committed[C.users].user.taskEvidence, undefined);
+    committed[C.users].user.taskEvidence = { view_history: { queryId: 'history', dayKey: '2026-09-15', completedAt: nowIso } };
     assert.equal((await repo.findCompletedHistoryQuery('user', { startAt: '2026-09-14T16:00:00.000Z', endAt: '2026-09-15T16:00:00.000Z' }))._id, 'history');
     const reward = await repo.grantReward({ entry: { _id: 'reward-history', userKey: 'user', type: 'task_reward', taskId: 'view_history', dayKey: '2026-09-15', createdAt: nowIso }, config: mergeConfig(null).quota, reward: 1, evidenceQueryId: 'history', rewardSnapshot: { dayKey: '2026-09-15', grantedToday: 0, signedInToday: false, tasksDoneToday: [] } });
     assert.equal(reward.amount, 1);

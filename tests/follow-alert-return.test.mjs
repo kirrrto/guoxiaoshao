@@ -90,8 +90,41 @@ test('automatic retry can acknowledge the same visible card once identity recove
   await s.page.loadAlert(EVENT); await s.page.onShow();
   assert.equal(s.opens(), 0);
   restored = true;
-  const poll = s.rt.timers.get(s.page.pollTimer); assert.ok(poll);
-  s.rt.timers.delete(s.page.pollTimer); await poll.fn(); await settle();
+  const before = s.rt.calls.length;
+  const retry = s.rt.timers.get(s.page.alertIdentityTimer); assert.ok(retry);
+  assert.equal(s.page.pollTimer, null, 'there are no inventory targets');
+  s.rt.timers.delete(s.page.alertIdentityTimer); await retry.fn(); await settle();
   assert.equal(s.opens(), 1); assert.equal(s.page.acknowledgedAlerts.has(EVENT), true);
+  assert.deepEqual(s.rt.calls.slice(before).map(call => call.action), ['user.bootstrap', 'notify.open']);
+  assert.equal(s.page.alertIdentityTimer, null); assert.equal(s.page.pollTimer, null);
+  s.page.onUnload();
+});
+
+test('a closed alert or hidden tab retires a pending identity retry without an acknowledgment or more polling', async () => {
+  for (const retire of ['onCloseAlert', 'onHide', 'onUnload']) {
+    const recovered = deferred(); let restoring = false;
+    const s = setup(() => { if (!restoring) throw Error('identity unavailable'); return recovered.promise; });
+    await s.page.loadAlert(EVENT); await s.page.onShow();
+    restoring = true;
+    const retry = s.page.onNetworkRestored();
+    s.page.onNetworkRestored();
+    assert.equal(s.rt.calls.filter(c => c.action === 'user.bootstrap').length, 2);
+    s.page[retire]();
+    recovered.resolve(boot('alice')); await retry; await settle();
+    assert.equal(s.opens(), 0); assert.equal(s.page.pollTimer, null); assert.equal(s.page.alertIdentityTimer, null);
+    if (retire !== 'onUnload') s.page.onUnload();
+  }
+});
+
+test('a detail that arrives after the failed refresh still recovers identity and drops the card on an account switch', async () => {
+  const card = deferred(); let restored = false;
+  const s = setup(() => { if (!restored) throw Error('identity unavailable'); return boot('bob'); }, { 'notify.detail': () => card.promise });
+  const opening = s.page.loadAlert(EVENT);
+  await s.page.onShow(); assert.ok(!s.page.alertIdentityTimer);
+  card.resolve(detail); await opening;
+  const retry = s.rt.timers.get(s.page.alertIdentityTimer); assert.ok(retry);
+  restored = true;
+  s.rt.timers.delete(s.page.alertIdentityTimer); await retry.fn(); await settle();
+  assert.equal(s.page.data.alert, null); assert.equal(s.opens(), 0); assert.equal(s.page.pollTimer, null);
   s.page.onUnload();
 });

@@ -29,14 +29,23 @@ test('release notes identify the build version without confusing its development
   const { RELEASE_NOTES } = rt.load('config/release-notes.js');
   assert.equal(mine.data.version, VERSION);
   assert.match(mine.data.versionLabel, /体验版/);
-  const current = mine.data.visibleReleaseNotes.filter(entry => entry.version === mine.data.version);
-  assert.equal(current.length, 1, 'the current build must have exactly one matching change record');
-  assert.ok(current[0].title);
-  assert.ok(current[0].highlights.length > 0);
+  const latestPublicNote = mine.data.visibleReleaseNotes[0];
+  assert.ok(latestPublicNote.title);
+  assert.ok(latestPublicNote.highlights.length > 0);
   assert.equal(new Set(RELEASE_NOTES.map(entry => entry.version)).size, RELEASE_NOTES.length);
   assert.deepEqual(mine.data.visibleReleaseNotes.map(entry => entry.version), Array.from(RELEASE_NOTES.slice(0, 3), entry => entry.version));
   assert.equal(mine.data.releaseNotesPage, 1);
   assert.equal(mine.data.releaseNotesPageCount, Math.ceil(RELEASE_NOTES.length / 3));
+});
+
+test('customer release notes exclude personal testing privileges, including historical entries', () => {
+  const rt = runtime();
+  const { RELEASE_NOTES } = rt.load('config/release-notes.js');
+  for (const row of RELEASE_NOTES) {
+    const publicCopy = [row.title, ...row.highlights, row.note || ''].join(' ');
+    assert.doesNotMatch(publicCopy, /指定(?:管理员|测试账号)|管理员功能测试|个人测试权限|开发者专属权益/);
+  }
+  assert.ok(!RELEASE_NOTES.some(row => ['3.8.2', '3.8.3'].includes(row.version)));
 });
 
 test('release pages cover every known version once in newest-first order without growing the rendered list', () => {

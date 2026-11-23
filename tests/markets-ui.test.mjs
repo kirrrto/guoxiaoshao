@@ -3,6 +3,7 @@ import test from 'node:test';
 import { createRequire } from 'node:module';
 import { runtime } from './helpers/miniprogram-runtime.mjs';
 import { createFixture, userKeyOf } from './helpers/fixture.mjs';
+import { marketMembership } from './helpers/market-membership.mjs';
 const require = createRequire(import.meta.url);
 const { MARKETS } = require('../cloudfunctions/gxs_api/lib/markets');
 const { localTime } = require('../miniprogram/pages/markets/presentation');
@@ -15,7 +16,7 @@ async function setup(extra = {}, options = {}, seed = {}) {
       notifications: { enabled: true, senderReady: true, templateIds: { restock: 'chinese' } }, subscriptions: {}, settings: {} }),
     'market.catalog': () => ({ markets: MARKETS.map(m => ({ ...m, enabled: state.enabled, monitorEnabled: state.enabled,
       notificationsEnabled: state.enabled, notificationsEnabledEn: false })) }),
-    'market.follows': () => ({ follows: state.rows, monitoring: { JP: true, TW: true, HK: true }, notifications: { JP: true, TW: true, HK: true } }),
+    'market.follows': () => ({ follows: state.rows, watchRegistrationOpen: true, monitoring: { JP: true, TW: true, HK: true }, notifications: { JP: true, TW: true, HK: true } }),
     'market.pickup': p => receipt(p),
     ...extra,
   };
@@ -158,7 +159,8 @@ test('the Taiwan selection on a closed public site is queryable only for the sig
   }, { market: 'TW', partNumber: 'MJY04ZP/A', storeNumber: 'R694' }, { enabled: false });
   assert.equal(page.data.enabled, true);
   assert.equal(page.data.canQuery, true);
-  assert.equal(page.data.showWatch, false);
+  assert.equal(page.data.watchEnabled, true);
+  assert.equal(page.data.alertTemplate, '');
   await page.onQuery();
   const { market, partNumber, storeNumbers, maxCost } = rt.calls.find(x => x.action === 'market.pickup').payload;
   assert.deepEqual([market, partNumber, ...storeNumbers, maxCost], ['TW', 'MJY04ZP/A', 'R694', 0]);
@@ -166,6 +168,7 @@ test('the Taiwan selection on a closed public site is queryable only for the sig
   page.onHide(); state.owner = 'Bob'; rt.load('utils/store.js').resetSession(); await page.onShow();
   assert.equal(page.data.receipt, null);
   assert.equal(page.data.enabled, false);
+  assert.equal(page.data.watchEnabled, false);
   await page.onQuery();
   assert.equal(rt.calls.filter(x => x.action === 'market.pickup').length, 1);
 });
@@ -212,6 +215,149 @@ test('market flags and membership are independent: browse a closed market and wa
   state.member=false;await page.onPullDownRefresh();
   assert.equal(page.data.watchEnabled,false); assert.equal(page.data.membershipLink,true);
   await page.onWatch();assert.equal(rt.calls.filter(c=>c.action==='market.watch').length,0);
+});
+
+test('monthly and annual members can save, pause, and resume across three closed sites without a pickup or alert request', async () => {
+  for (const planId of ['member_30d', 'member_365d']) {
+    const { page, rt } = await setup({
+      'market.watch': (p, s) => {
+        const follow = { ...p, followId: p.market, status: 'active', savedStatus: 'active' };
+        s.rows.push(follow);
+        return { follow };
+      },
+      'market.watchStatus': (p, s) => {
+        const follow = s.rows.find(row => row.followId === p.followId);
+        follow.status = follow.savedStatus = p.status;
+        return { follow };
+      },
+    }, {}, { planId, enabled: false });
+    for (const site of MARKETS) {
+      page.onMarket(tap({ market: site.code }));
+      assert.equal(page.data.canQuery, false);
+      assert.equal(page.data.watchEnabled, true);
+      assert.equal(page.data.watchService, '可先保存关注，本站尚未开启自动监测。');
+      await page.onWatch();
+      assert.equal(page.data.targetWatch.status, '已保存关注，本站尚未开启自动监测');
+      assert.equal(page.data.watchEnabled, false);
+      await page.onAuthorize();
+      assert.equal(page.data.alertTemplate, '');
+      await page.onWatchStatus(tap({ id: site.code, status: 'paused' }));
+      assert.equal(page.data.targetWatch.status, '已暂停');
+      await page.onWatchStatus(tap({ id: site.code, status: 'active' }));
+      assert.equal(page.data.targetWatch.status, '已保存关注，本站尚未开启自动监测');
+    }
+    assert.equal(rt.calls.filter(c => c.action === 'market.watch').length, 3);
+    assert.equal(rt.calls.filter(c => c.action === 'market.pickup' || c.action === 'notify.recordSubscription').length, 0);
+    page.onLanguage(); assert.equal(page.data.targetWatch.status, 'Watch saved. Monitoring is not active in this region.');
+  }
+});
+
+test('closed regions disclose the monitoring limit before purchase and keep legacy API saves gated', async () => {
+  const { page, state, rt, handlers } = await setup({}, {}, { enabled: false, planId: 'member_7d' });
+  assert.equal(page.data.membershipLink, true);
+  assert.equal(page.data.watchEnabled, false);
+  assert.equal(page.data.watchService, '月卡、年卡可先保存关注。本站尚未开启自动监测。');
+  await page.onWatch();
+  assert.equal(rt.calls.some(call => call.action === 'market.watch'), false);
+  state.planId = 'member_365d';
+  handlers['market.follows'] = () => ({ follows: [] });
+  await page.onPullDownRefresh();
+  assert.equal(page.data.watchEnabled, false);
+  await page.onWatch(); assert.equal(rt.calls.some(call => call.action === 'market.watch'), false);
+  state.enabled = true; await page.onPullDownRefresh(); assert.ok(page.data.watchEnabled);
+});
+
+test('a failed watch read offers a retry and a lost save response is reconciled from the exact saved watch', async () => {
+  let offline = true;
+  const { page, rt } = await setup({
+    'market.follows': (_, s) => {
+      if (offline) throw Error('offline');
+      return { follows: s.rows, watchRegistrationOpen: true };
+    },
+    'market.watch': (p, s) => {
+      s.rows.push({ ...p, followId: 'saved-tw', status: 'active' });
+      throw Error('response lost');
+    },
+  }, { market: 'TW' }, { enabled: false });
+  assert.equal(page.data.watchLoaded, false);
+  assert.equal(page.data.watchEnabled, false);
+  assert.equal(page.data.watchError, '暂时无法读取关注，请刷新重试。');
+  offline = false;
+  await page.loadWatches();
+  assert.equal(page.data.watchEnabled, true);
+  await page.onWatch();
+  assert.equal(page.data.targetWatch.id, 'saved-tw');
+  assert.equal(page.data.watchService, '已保存关注，本站尚未开启自动监测');
+  assert.equal(page.data.watchMessage, '');
+  await page.onWatch();
+  assert.equal(rt.calls.filter(c => c.action === 'market.watch').length, 1);
+});
+
+test('the membership card reads committed slots when switching away during a regional save or removal, including a lost reply', async () => {
+  const cloud = createFixture({ start: new Date().toISOString() });
+  await cloud.call('user.bootstrap');
+  await cloud.repo.updateUser(userKeyOf(), { membership: marketMembership(cloud.state.now, 'member_30d') });
+  let hold, loseReply = false;
+  const rt = runtime(async (action, payload) => {
+    if (hold && ['market.watch', 'market.watchStatus'].includes(action)) await hold.promise;
+    const result = await cloud.call(action, payload);
+    assert.ok(result.ok, JSON.stringify(result.error));
+    if (loseReply && action === 'market.watch') throw Object.assign(Error('response lost'), { code: 'call_failed' });
+    return result.data;
+  });
+  const page = rt.instance('pages/markets/index.js');
+  page.onLoad(); await page.onShow();
+  const mine = rt.instance('pages/mine/index.js'); await mine.onLoad(); mine.onHide();
+  assert.equal(mine.data.boot.followCount, 0);
+  const reads = () => rt.calls.filter(row => row.action === 'user.bootstrap').length;
+  const before = reads();
+  hold = deferred(); loseReply = true;
+  const saving = page.onWatch(); page.onHide();
+  const entering = mine.onShow();
+  hold.resolve(); await Promise.all([saving, entering]);
+  assert.equal(mine.data.boot.followCount, 1);
+  assert.equal(reads(), before + 1);
+  mine.onHide(); loseReply = false; hold = null;
+  await page.onShow();
+  const id = page.data.targetWatch.id;
+  await page.onWatchStatus(tap({ id, status: 'paused' }));
+  await page.onWatchStatus(tap({ id, status: 'active' }));
+  page.onChoice({ ...tap({ field: 'store' }), detail: { value: 1 } });
+  await page.onWatch();
+  await mine.onShow();
+  assert.equal(mine.data.boot.followCount, 1);
+  assert.equal(reads(), before + 1, 'pause, resume and adding another store use the same slot');
+  mine.onHide(); hold = deferred();
+  const removal = page.writeWatch('market.watchStatus', { followId: id, status: 'removed' });
+  page.onHide(); page.onUnload();
+  const back = mine.onShow();
+  hold.resolve(); await Promise.all([removal, back]);
+  assert.equal(mine.data.boot.followCount, 0);
+  assert.equal(reads(), before + 2);
+});
+
+test('refused writes keep the confirmed account count; a late regional receipt cannot invalidate the next account', async () => {
+  let refused = true;
+  const hold = deferred();
+  const { page, rt, state } = await setup({
+    'market.watch': async () => {
+      if (refused) throw Object.assign(Error('limit'), { code: 'too_many_follows' });
+      await hold.promise;
+      return { follow: { followId: 'alice-watch' } };
+    },
+  }, {}, { enabled: false });
+  const store = rt.load('utils/store.js');
+  const alice = await store.getBootstrap();
+  await page.onWatch();
+  assert.strictEqual(await store.getBootstrap(), alice);
+  refused = false;
+  const saving = page.onWatch();
+  page.onHide();
+  state.owner = 'Bob'; store.resetSession(); await page.onShow();
+  const bob = await store.getBootstrap({ afterFollowWrites: true });
+  assert.equal(bob.identity.userKey, 'Bob');
+  hold.resolve(); await saving;
+  assert.strictEqual(await store.getBootstrap(), bob);
 });
 
 test('a late receipt for a different WeChat user cannot update a watch or debit display', async () => {

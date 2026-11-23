@@ -23,7 +23,7 @@ function runtime({ handler = async action => action === 'member.status' ? { orde
   let definition;
   const calls = [], invalidated = [], bootstrapCalls = [], toasts = [], errors = [];
   const api = { call: async (action, payload = {}) => { calls.push({ action, payload: clone(payload) }); return handler(action, payload); }, showError: value => errors.push(value), toast: value => toasts.push(value) };
-  const store = { getBootstrap: async options => { bootstrapCalls.push(options); return getBoot(options); },
+  const store = { currentQuotaOwner: () => app?.globalData?.bootstrap?.identity?.userKey, getBootstrap: async options => { bootstrapCalls.push(options); return getBoot(options); },
     invalidateBootstrap: () => invalidated.push('bootstrap'), invalidateFollows: () => invalidated.push('follows'), publishQuota() {}, subscribeQuota: () => () => {} };
   const wx = { stopPullDownRefresh() {}, ...wxExtra };
   vm.runInNewContext(fs.readFileSync(path.join(root, 'pages/mine/index.js'), 'utf8'), { console, Date, Promise, Map, Set, wx, getApp: app ? () => app : undefined, Page: value => { definition = value; },

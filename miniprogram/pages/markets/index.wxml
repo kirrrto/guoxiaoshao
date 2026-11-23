@@ -56,15 +56,16 @@
         <view wx:if="{{accountError}}" class="market-retry"><text>{{c.accountError}}</text><button class="ui-action" bindtap="onPullDownRefresh">{{c.retry}}</button></view>
         <view wx:elif="{{!accountReady}}" class="small muted mt" aria-role="status">{{c.accountLoading}}</view>
         <block wx:if="{{accountReady && watchLoaded}}">
-          <button wx:if="{{!targetWatch && showWatch}}" class="btn btn-block mt" disabled="{{!watchEnabled || networkOffline}}" loading="{{watchBusy}}"
-            hover-class="ui-control-pressed" bindtap="onWatch">{{w.watch}}</button>
-          <view wx:if="{{watchService}}" class="market-meta mt">{{watchService}}</view>
+          <button wx:if="{{!targetWatch && showWatch}}" class="btn btn-block mt {{!enabled && !pending ? 'btn-primary' : ''}}" disabled="{{!watchEnabled || networkOffline}}" loading="{{watchBusy}}"
+            hover-class="{{!enabled && !pending ? 'btn-primary-pressed' : 'ui-control-pressed'}}" bindtap="onWatch">{{w.watch}}</button>
+          <view wx:if="{{watchService}}" class="market-meta mt" aria-live="polite">{{watchService}}</view>
           <button wx:if="{{membershipLink}}" class="ui-action mt" bindtap="onViewMembership">{{w.memberAction}}</button>
           <view wx:if="{{targetWatch}}" class="market-meta mt">{{w.notifyLanguage}} · {{targetLanguage}}</view>
           <view wx:if="{{creditText}}" class="market-meta">{{creditText}}</view>
           <button wx:if="{{alertTemplate}}" class="btn btn-block mt" disabled="{{watchBusy || networkOffline}}" bindtap="onAuthorize">{{w.grant}}</button>
           <button wx:if="{{allowSettings}}" class="btn btn-block mt" bindtap="onOpenSettings">{{w.settings}}</button>
         </block>
+        <view wx:if="{{watchError}}" class="market-retry" aria-role="alert"><text>{{watchError}}</text><button class="ui-action" bindtap="loadWatches">{{w.refreshing}}</button></view>
         <view wx:if="{{watchMessage}}" class="market-meta mt" aria-live="polite">{{watchMessage}}</view>
       </view>
     </view>
@@ -95,7 +96,6 @@
         <view wx:elif="{{enabled && !queryError}}" class="market-meta mt">{{busyHere ? c.checking : c.empty}}</view>
         <view wx:if="{{billingText}}" class="market-meta mt">{{billingText}}</view>
       </view>
-      <view wx:if="{{watchError}}" class="card market-retry"><text>{{watchError}}</text><button class="ui-action" bindtap="loadWatches">{{w.refreshing}}</button></view>
       <view wx:if="{{watchRows.length}}" class="card markets-watchlist">
         <view class="card-title">{{w.title}}</view>
         <view wx:for="{{watchRows}}" wx:key="id" class="market-watch">

@@ -15,55 +15,88 @@ const apiOf = fixture => async (action, payload) => {
   return response.data;
 };
 
-test('free landing browse rewards zero-balance users and members even with no history, without a query debit', async () => {
+async function seedPendingBrowse(f) {
+  ok(await f.call('user.bootstrap'));
+  const completedAt = f.state.now.toISOString();
+  const dayKey = new Date(f.state.now.getTime() + 8 * 3600000).toISOString().slice(0, 10);
+  await f.repo.updateUser(userKeyOf(), { taskEvidence: { history_browse: { dayKey, completedAt } } });
+}
+
+test('new users and members can browse archived history without creating reward evidence or a debit', async () => {
   for (const member of [false, true]) {
     const f = createFixture();
     ok(await f.call('user.bootstrap'));
     if (member) await f.repo.updateUser(userKeyOf(), { membership: { expiresAt: '2027-01-01T00:00:00Z' } });
-    const first = ok(await f.call('history.browse'));
-    assert.deepEqual(first.recentViews, []);
-    assert.equal(first.task.granted, 1);
-    assert.equal(first.task.quota.balance, 1);
-    assert.deepEqual(first.task.quota.tasksDoneToday, ['view_history']);
-    assert.equal((await f.repo.listQueries(userKeyOf(), 20)).length, 0);
-    assert.deepEqual((await f.repo.listLedger(userKeyOf())).map(e => [e.type, e.delta]), [['task_reward', 1]]);
-    assert.equal(ok(await f.call('history.browse')).task.granted, 0);
-    assert.equal(ok(await f.call('quota.completeTask', { taskId: 'view_history' })).granted, 0);
+    for (const result of await Promise.all(Array.from({ length: 8 }, () => f.call('history.browse')))) {
+      assert.deepEqual(ok(result).recentViews, []);
+      assert.equal(ok(result).task, null);
+    }
+    const me = ok(await f.call('user.bootstrap'));
+    assert.deepEqual([me.quota.balance, me.quota.tasksDoneToday, me.quota.tasksViewedToday, me.tasks], [0, [], [], []]);
+    assert.equal((await f.repo.getUser(userKeyOf())).taskEvidence, undefined);
+    assert.deepEqual(await f.repo.listQueries(userKeyOf(), 20), []);
+    assert.deepEqual(await f.repo.listLedger(userKeyOf()), []);
+    const attempted = ok(await f.call('quota.completeTask', { taskId: 'view_history', visited: true, evidenceBrowseDay: '2026-09-15' }));
+    assert.deepEqual([attempted.granted, attempted.reason], [0, 'reward_disabled']);
   }
 });
 
-test('concurrent page visits share one Beijing-day reward and the next day may grant once again', async () => {
+test('concurrent legacy claim and browse requests settle an existing reward only once', async () => {
   const f = createFixture();
-  const results = await Promise.all(Array.from({ length: 8 }, () => f.call('history.browse')));
-  assert.equal(results.reduce((n, value) => n + ok(value).task.granted, 0), 1);
+  await seedPendingBrowse(f);
+  const claims = await Promise.all(Array.from({ length: 8 }, (_, i) => i % 2
+    ? f.call('history.browse').then(r => ok(r).task)
+    : f.call('quota.completeTask', { taskId: 'view_history' }).then(ok)));
+  assert.equal(claims.reduce((n, claim) => n + (claim?.granted || 0), 0), 1);
+  assert.deepEqual((await f.repo.listLedger(userKeyOf())).map(e => [e.type, e.delta]), [['task_reward', 1]]);
+  assert.deepEqual(ok(await f.call('user.bootstrap')).tasks, []);
+  assert.equal(ok(await f.call('quota.completeTask', { taskId: 'view_history' })).reason, 'already_completed');
   f.advance(86400000);
-  assert.equal((await f.call('quota.completeTask', { taskId: 'view_history' })).error.code, 'task_not_completed');
-  assert.equal(ok(await f.call('history.browse')).task.granted, 1);
-  assert.equal(ok(await f.call('user.bootstrap')).quota.balance, 2);
-  assert.equal((await f.repo.listLedger(userKeyOf())).length, 2);
+  assert.equal(ok(await f.call('history.browse')).task, null);
+  assert.equal(ok(await f.call('quota.completeTask', { taskId: 'view_history' })).granted, 0);
+  assert.equal(ok(await f.call('user.bootstrap')).quota.balance, 1);
 });
 
-test('history landing proves the server completion date when reading crosses midnight', async () => {
+test('a successful new archived history query records its receipt without establishing an old reward', async () => {
+  const f = createFixture();
+  ok(await f.call('user.bootstrap'));
+  await f.repo.updateUser(userKeyOf(), { membership: { expiresAt: '2027-01-01T00:00:00Z' } });
+  const target = { partNumber: 'MXXX1CH/A', storeNumbers: ['R577'], dayKey: '2026-09-14' };
+  await f.repo.saveEvents([{ _id: 'archived-history-event', partNumber: target.partNumber, storeNumber: 'R577', dayKey: target.dayKey,
+    detectedAt: '2026-09-14T01:00:00.000Z', type: 'restock_confirmed' }]);
+  const query = ok(await f.call('history.list', { ...target, historyQueryId: 'archive-history-request' }));
+  assert.equal(query.ok, true);
+  assert.equal((await f.repo.getUser(userKeyOf())).taskEvidence, undefined);
+  assert.equal(ok(await f.call('history.browse')).task, null);
+  assert.equal(ok(await f.call('quota.completeTask', { taskId: 'view_history' })).reason, 'reward_disabled');
+  assert.deepEqual(await f.repo.listLedger(userKeyOf()), []);
+});
+
+test('a legacy entitlement from yesterday cannot be refreshed by crossing Beijing midnight while browsing', async () => {
   const f = createFixture({ start: '2026-09-15T15:59:59.900Z' });
+  await seedPendingBrowse(f);
   const list = f.repo.listRecentHistoryViews;
   f.repo.listRecentHistoryViews = async (...args) => { const values = await list(...args); f.advance(200); return values; };
   const result = ok(await f.call('history.browse'));
-  assert.equal(result.task.quota.dayKey, '2026-09-16');
-  assert.equal((await f.repo.listLedger(userKeyOf()))[0].dayKey, '2026-09-16');
+  assert.equal(result.task, null);
+  assert.equal((await f.repo.getUser(userKeyOf())).taskEvidence.history_browse.dayKey, '2026-09-15');
+  assert.deepEqual(await f.repo.listLedger(userKeyOf()), []);
 });
 
-test('failed landing reads and failed evidence commits cannot reward; retry can finish once', async () => {
+test('a failed read or reward commit keeps the old evidence usable for exactly one retry', async () => {
   for (const stage of ['read', 'commit']) {
     const f = createFixture();
+    await seedPendingBrowse(f);
+    const oldEvidence = (await f.repo.getUser(userKeyOf())).taskEvidence;
     const list = f.repo.listRecentHistoryViews;
     if (stage === 'read') f.repo.listRecentHistoryViews = async () => { throw Error('database unavailable'); };
-    else f.repo.transactionWriteHook = async (table, doc) => { if (table === C.users && doc.taskEvidence?.history_browse) throw Error('write failed'); };
+    else f.repo.transactionWriteHook = async table => { if (table === C.ledger) throw Error('write failed'); };
     assert.equal((await f.call('history.browse')).ok, false);
-    assert.equal((await f.repo.getUser(userKeyOf())).taskEvidence, undefined);
-    assert.equal((await f.repo.listLedger(userKeyOf())).length, 0);
-    assert.equal((await f.call('quota.completeTask', { taskId: 'view_history', visited: true, evidenceBrowseDay: '2026-09-15' })).error.code, 'task_not_completed');
+    assert.deepEqual((await f.repo.getUser(userKeyOf())).taskEvidence, oldEvidence);
+    assert.deepEqual(await f.repo.listLedger(userKeyOf()), []);
     f.repo.listRecentHistoryViews = list; f.repo.transactionWriteHook = null;
     assert.equal(ok(await f.call('history.browse')).task.granted, 1);
+    assert.equal(ok(await f.call('quota.completeTask', { taskId: 'view_history' })).granted, 0);
   }
 });
 
@@ -82,10 +115,11 @@ test('free landing exposes only the caller viewing conditions, never paid stock 
 
 test('disabled or capped browse rewards never fabricate a +1 entry and a balance cap can be retried later', async () => {
   const disabled = createFixture({ config: { tasks: [{ id: 'view_history', title: '浏览历史', reward: 0 }] } });
-  assert.equal(ok(await disabled.call('history.browse')).task.reason, 'reward_disabled');
+  await seedPendingBrowse(disabled);
+  assert.equal(ok(await disabled.call('quota.completeTask', { taskId: 'view_history' })).reason, 'reward_disabled');
   assert.equal((await disabled.repo.listLedger(userKeyOf())).length, 0);
   const f = createFixture();
-  ok(await f.call('user.bootstrap'));
+  await seedPendingBrowse(f);
   await f.repo.updateUser(userKeyOf(), { quota: { balance: 10 } });
   const capped = ok(await f.call('history.browse'));
   assert.equal(capped.task.reason, 'balance_cap_reached');
@@ -95,7 +129,7 @@ test('disabled or capped browse rewards never fabricate a +1 entry and a balance
   assert.equal(ok(await f.call('history.browse')).task.granted, 1);
 });
 
-test('new accounts have no history entry; a legacy link still credits and refreshes its open ledger', async () => {
+test('new accounts have no history entry and opening a legacy link does not create a reward', async () => {
   const f = createFixture();
   ok(await f.call('user.bootstrap'));
   await f.repo.updateUser(userKeyOf(), { membership: { expiresAt: '2027-01-01T00:00:00Z' } });
@@ -109,17 +143,18 @@ test('new accounts have no history entry; a legacy link still credits and refres
   const history = rt.instance('pages/history/index.js');
   await history.onLoad(); await history.loadBrowse();
   assert.equal(history.data.browse.recentViews.length, 0);
-  assert.match(history.data.taskMessage, /\+1/);
+  assert.equal(history.data.taskMessage, null);
   assert.equal(history.data.boot.taskAvailable, false);
   await mine.onShow();
-  assert.equal(mine.data.quota.balance, 1);
-  assert.equal(mine.data.tasks[0].done, true);
-  assert.equal(mine.data.ledger[0].deltaText, '+1');
+  assert.equal(mine.data.quota.balance, 0);
+  assert.deepEqual(copy(mine.data.tasks), []);
+  assert.deepEqual(copy(mine.data.ledger), []);
   assert.equal(rt.calls.filter(c => c.action === 'history.list').length, 0, 'a task tab visit must never start a charged query');
 });
 
 test('a late reward updates Mine immediately and older bootstrap/ledger responses cannot undo it', async () => {
   const f = createFixture();
+  await seedPendingBrowse(f);
   const api = apiOf(f), oldBoot = deferred(), oldLedger = deferred();
   let blockBoot = false, blockLedger = false;
   const rt = runtime(async (action, payload) => {
@@ -141,25 +176,26 @@ test('a late reward updates Mine immediately and older bootstrap/ledger response
   await mine.loadLedger();
   assert.equal(fresh.quota.balance, 1);
   assert.equal(mine.data.quota.balance, 1);
-  assert.equal(mine.data.tasks[0].done, true);
+  assert.equal(mine.data.tasks.some(task => task.claimable), false);
   assert.equal(mine.data.ledger.length, 1);
   assert.equal(mine.data.ledger[0].deltaText, '+1');
 });
 
-test('failed history landing visibly offers retry and does not mark the task complete', async () => {
+test('failed history landing allows retry without minting evidence for a new visitor', async () => {
   const f = createFixture(); const list = f.repo.listRecentHistoryViews;
   f.repo.listRecentHistoryViews = async () => { throw Error('unavailable'); };
   const rt = runtime(apiOf(f)); const history = rt.instance('pages/history/index.js');
   await history.onLoad(); await history.loadBrowse();
   assert.match(history.data.browseError, /重试/);
   assert.equal(history.data.browse, null);
-  assert.equal(history.data.boot.taskAvailable, true);
+  assert.equal(history.data.boot.taskAvailable, false);
   assert.equal(history.data.boot.balance, 0);
   f.repo.listRecentHistoryViews = list;
   await history.onRetryBrowse();
   assert.equal(history.data.browseError, null);
   assert.equal(history.data.boot.taskAvailable, false);
-  assert.equal(history.data.boot.balance, 1);
+  assert.equal(history.data.boot.balance, 0);
+  assert.deepEqual(await f.repo.listLedger(userKeyOf()), []);
 });
 
 test('restock detail labels an observation gap without calling it unavailable duration', async () => {
@@ -172,6 +208,7 @@ test('restock detail labels an observation gap without calling it unavailable du
 
 test('delayed browse reward cannot restore credits after a newer explicit paid history query', async t => {
   const f = createFixture(), api = apiOf(f), late = deferred();
+  await seedPendingBrowse(f);
   t.mock.method(Date, 'now', () => f.state.now.getTime());
   // A paid lookup needs an actual saved event; empty histories are refunded.
   await f.repo.saveEvents([{ _id: 'paid-history-race-event', partNumber: 'MXXX1CH/A', storeNumber: 'R577', dayKey: '2026-09-14', detectedAt: '2026-09-14T01:00:00.000Z', type: 'restock_confirmed' }]);
@@ -199,6 +236,7 @@ test('delayed browse reward cannot restore credits after a newer explicit paid h
 
 test('quota revisions reject out-of-order mutations even when timestamps are identical', async () => {
   const f = createFixture(), rt = runtime(apiOf(f)), store = rt.load('utils/store.js');
+  await seedPendingBrowse(f);
   await store.getBootstrap();
   const browse = ok(await f.call('history.browse'));
   const signin = ok(await f.call('quota.signin'));
@@ -208,27 +246,27 @@ test('quota revisions reject out-of-order mutations even when timestamps are ide
   assert.equal((await store.getBootstrap()).quota.balance, 2);
 });
 
-test('a capped browse has a newer revision even without a ledger entry', async () => {
-  const f = createFixture(); ok(await f.call('user.bootstrap'));
+test('repeated visits while capped preserve old evidence without changing the quota revision', async () => {
+  const f = createFixture(); await seedPendingBrowse(f);
   await f.repo.updateUser(userKeyOf(), { quota: { balance: 10 } });
   const rt = runtime(apiOf(f)), store = rt.load('utils/store.js');
   const before = await store.getBootstrap();
   const browse = ok(await f.call('history.browse'));
   assert.equal(browse.task.granted, 0);
-  assert.ok(browse.task.quota.revision > before.quota.revision);
+  assert.equal(browse.task.quota.revision, before.quota.revision);
   assert.equal(store.publishQuota(browse.task.quota), true);
-  assert.equal(store.publishQuota(before.quota), false);
+  assert.equal((await f.repo.listLedger(userKeyOf())).length, 0);
   assert.deepEqual(copy((await store.getBootstrap()).quota.tasksViewedToday), ['view_history']);
 });
 
 test('Mine shows successful browsing separately from an unclaimed capped reward', async () => {
   for (const quota of [{ balance: 10, grantedToday: 0 }, { balance: 1, rewardDay: '2026-09-15', grantedToday: 2 }]) {
-    const f = createFixture(); ok(await f.call('user.bootstrap'));
+    const f = createFixture(); await seedPendingBrowse(f);
     await f.repo.updateUser(userKeyOf(), { quota });
     const rt = runtime(apiOf(f)); const mine = rt.instance('pages/mine/index.js'); await mine.onLoad();
     const history = rt.instance('pages/history/index.js'); history.applyBoot(await rt.load('utils/store.js').getBootstrap());
     await history.loadBrowse();
-    assert.equal(mine.data.tasks[0].done, false);
+    assert.equal(mine.data.tasks[0].title, '旧版浏览奖励待领取');
     assert.equal(mine.data.tasks[0].pendingLabel, quota.balance === 10 ? '余额已满，今日用次后可领' : '今日领取已达上限');
     assert.equal(mine.data.tasks[0].claimable, false);
     let target;

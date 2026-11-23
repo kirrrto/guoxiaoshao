@@ -8,6 +8,11 @@ const SETTLE_MS = 20000;
 const MIN_DELAY_MS = 5000;
 const FOLLOW_READ_MAX_MS = 30000;
 
+function hasActiveStockTarget(follows) {
+  return follows.some(follow => follow.status === 'active' && !follow.productRetired && !follow.limitPaused
+    && !follow.latestRestricted && follow.stores?.some(store => !store.limitPaused));
+}
+
 function monitorPollDelay(collector, now = Date.now()) {
   const nextRunAt = collector && Date.parse(collector.nextRunAt);
   if (!Number.isFinite(nextRunAt)) return MONITOR_PERIOD_MS;
@@ -27,4 +32,4 @@ function followPollDelay(collector, failures = 0, now = Date.now()) {
   return Math.min(FOLLOW_READ_MAX_MS, monitorPollDelay(collector, now));
 }
 
-module.exports = { monitorPollDelay, followPollDelay, MONITOR_PERIOD_MS, FOLLOW_READ_MAX_MS };
+module.exports = { hasActiveStockTarget, monitorPollDelay, followPollDelay, MONITOR_PERIOD_MS, FOLLOW_READ_MAX_MS };

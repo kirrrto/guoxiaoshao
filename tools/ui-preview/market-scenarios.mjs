@@ -5,7 +5,9 @@ export const marketScenarios = {
   'tw-english': { market: 'TW', model: 'iPhone 18 Pro Max', color: '银色', language: 'en',
     expected: ['Regional stores', 'iPhone 18 Pro Max', 'Silver', 'Not available for pickup', 'UTC+8'] },
   'hk-unknown': { market: 'HK', unknown: true, expected: ['暂时无法确认门店库存', '本次未扣次'] },
-  'jp-closed': { market: 'JP', closed: true, expected: ['此站点尚未开放库存查询'] },
+  'jp-closed': { market: 'JP', closed: true, expected: ['关注此配置', '可先保存关注，本站尚未开启自动监测。', '此站点尚未开放库存查询'] },
+  'tw-closed-saved': { market: 'TW', closed: true, watch: true, expected: ['已保存关注，本站尚未开启自动监测', '暂停', '取消关注'] },
+  'hk-closed-paused': { market: 'HK', closed: true, watch: true, paused: true, language: 'en', expected: ['Paused', 'Resume', 'Remove'] },
   'tw-watch': { market: 'TW', watch: true, available: true, expected: ['我的站点关注', '已开启关注', '取消关注'] },
   'hk-launch-free': { market: 'HK', plan: null, date: '2026-10-10T03:00:00Z', blocked: true,
     expected: ['查询需有效周卡、月卡或年卡', '2026-10-18', '签到领取查询次数'] },
@@ -31,9 +33,9 @@ export function marketFixture(action, payload, scenario, now) {
   if (action === 'market.catalog') return { markets: catalog.MARKETS.map(m => ({ ...m, enabled: enabled[m.code],
     monitorEnabled: enabled[m.code], notificationsEnabled: enabled[m.code], notificationsEnabledEn: false,
     monitorStale: false, monitorIntervalMs: 60000, monitorLastSuccessAt: now.toISOString() })) };
-  if (action === 'market.follows') return { monitoring: enabled, notifications: enabled,
-    follows: fixture.watch ? [{ followId: 'offline-tw-watch', market: site.code, partNumber: site.products[0].partNumber,
-      storeNumbers: [site.stores[0].storeNumber], eligibleStoreNumbers: [site.stores[0].storeNumber], status: 'active', language: 'zh-CN' }] : [] };
+  if (action === 'market.follows') return { watchRegistrationOpen: true, monitoring: enabled, notifications: enabled,
+    follows: fixture.watch ? [{ followId: 'offline-' + site.code + '-watch', market: site.code, partNumber: site.products[0].partNumber,
+      storeNumbers: [site.stores[0].storeNumber], eligibleStoreNumbers: [site.stores[0].storeNumber], status: fixture.paused ? 'paused' : 'active', language: fixture.language || 'zh-CN' }] : [] };
   if (action === 'market.pickup' && fixture.blocked) throw Error('The preview issued a blocked pickup check');
   if (action === 'market.pickup') return { ok: !fixture.unknown, market: site.code, queryId: payload.queryId, charged: 0, refunded: 0,
     balance: 5, quotaRevision: 1, reason: fixture.unknown ? 'upstream_unavailable' : null,
@@ -53,6 +55,7 @@ export async function prepareMarket(page, fixture) {
     page.onChoice({ currentTarget: { dataset: { field: 'model' } }, detail: { value: page.data.models.indexOf(fixture.model) } });
     page.onChoice({ currentTarget: { dataset: { field: 'color' } }, detail: { value: page.data.colors.findIndex(row => row.id === fixture.color) } });
   }
+  if (fixture.watch) page.onSelectWatch({ currentTarget: { dataset: { id: page.data.watchRows[0].id } } });
   if (fixture.language === 'en') page.onLanguage();
   if (!fixture.closed) await page.onQuery();
 }

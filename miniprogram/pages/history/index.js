@@ -278,7 +278,7 @@ Page(require('../../utils/language').page('history', {
     }
     this.accountSnapshot = boot;
     this.refreshDateWindow();
-    const task = (boot.tasks || []).find(t => t.id === 'view_history' && t.reward > 0);
+    const task = (boot.quota.tasksViewedToday || []).includes('view_history') && (boot.tasks || []).find(t => t.id === 'view_history' && t.reward > 0);
     const membershipRestoresAccess = boot.membership.active
       && ['insufficient_credits', 'new_product_history_restricted'].includes(this.restrictionReason);
     if (membershipRestoresAccess) this.restrictionReason = null;

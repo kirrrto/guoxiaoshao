@@ -19,6 +19,45 @@ function setup(handler) {
   return { rt, page, actions: () => rt.calls.map(call => call.action) };
 }
 
+test('idle, paused and ineligible lists stop automatic reads; saving the first active target starts them again', async () => {
+  let rows = [];
+  const f = setup(action => action === 'user.bootstrap' ? boot() : { follows: rows, limits: boot().limits });
+  for (const state of ['empty', 'paused', 'limit_paused', 'expired', 'retired', 'no_stores']) {
+    const item = follows().follows[0];
+    if (state === 'retired') item.productRetired = true;
+    else if (state === 'no_stores') item.stores[0].limitPaused = true;
+    else item.status = state;
+    rows = state === 'empty' ? [] : [item];
+    await f.page.refreshLiveStatus();
+    assert.equal(f.page.pollTimer, null, state);
+    const reads = f.actions().length;
+    f.page.setLiveSync('offline', '');
+    await f.page.onNetworkRestored();
+    assert.equal(f.page.data.liveSync.state, 'paused', state);
+    assert.equal(f.actions().length, reads, state);
+  }
+  rows = follows().follows;
+  await f.page.loadFollows({ force: true });
+  assert.ok(f.page.pollTimer);
+  rows = [];
+  await f.page.loadFollows({ force: true });
+  assert.equal(f.page.pollTimer, null);
+  f.page.onUnload();
+});
+
+test('the query tab stops polling after its first read finds only paused watches', async () => {
+  const row = { ...follows().follows[0], status: 'paused' };
+  const rt = runtime(async () => ({ follows: [row] }));
+  const page = rt.instance('pages/query/index.js');
+  page.visible = true;
+  page.setData({ accountReady: true, boot: { member: true, followCount: 1 } });
+  page.accountSnapshot = boot();
+  page.startFollowPolling(); await settle();
+  assert.deepEqual(rt.calls.map(c => c.action), ['follow.list']);
+  assert.equal(page.followTimer, null);
+  page.onUnload();
+});
+
 test('an automatic record update changes the same followed product from no stock to pickup without a manual query', async t => {
   let now = Date.now(), status = 'unavailable';
   t.mock.method(Date, 'now', () => now);

@@ -1,6 +1,6 @@
 const languageUI = require('../../utils/language');
 const { call } = require('../../utils/api');
-const { getBootstrap, invalidateFollows } = require('../../utils/store');
+const { getBootstrap, invalidateFollows, trackFollowCountWrite } = require('../../utils/store');
 const { requestReminderAuthorization, templateConsent, openSubscribeSettings } = require('../../utils/reminder-credits');
 const { switchToTab } = require('../../utils/tab-bar');
 
@@ -8,7 +8,8 @@ const WORDS = {
   'zh-CN': {
     watch: '关注此配置', watching: '已关注', title: '我的站点关注', pause: '暂停', resume: '恢复', remove: '取消关注',
     removeTitle: '取消这条关注？', cancel: '保留', saved: '关注已保存', active: '已开启关注', paused: '已暂停', expired: '会员已到期',
-    limit_paused: '已超出名额', stopped: '本站尚未开启自动监测', noSender: '本站微信提醒暂未就绪',
+    limit_paused: '已超出名额', stopped: '本站尚未开启自动监测', savedStopped: '已保存关注，本站尚未开启自动监测',
+    canSave: '可先保存关注，本站尚未开启自动监测。', closedMembership: '月卡、年卡可先保存关注。本站尚未开启自动监测。', noSender: '本站微信提醒暂未就绪',
     enTemplate: '英文微信提醒暂未开放', zhTemplate: '中文微信提醒暂未开放', membership: '其他站点的关注与提醒需有效月卡或年卡。', memberAction: '查看会员权益',
     plan_required: '已保留关注，需月卡或年卡恢复监测',
     observationLate: '最近一次后台检查尚未确认', interval: '本站后台检查间隔约 {n} 分钟',
@@ -22,7 +23,8 @@ const WORDS = {
   en: {
     watch: 'Watch configuration', watching: 'Watching', title: 'My regional watches', pause: 'Pause', resume: 'Resume', remove: 'Remove',
     removeTitle: 'Remove this watch?', cancel: 'Keep watch', saved: 'Watch saved', active: 'Watch enabled', paused: 'Paused', expired: 'Membership expired',
-    limit_paused: 'Over plan limit', stopped: 'Monitoring is not yet open in this region.', noSender: 'WeChat alerts are not ready in this region.',
+    limit_paused: 'Over plan limit', stopped: 'Monitoring is not yet open in this region.', savedStopped: 'Watch saved. Monitoring is not active in this region.',
+    canSave: 'You can save a watch now. Monitoring is not active in this region.', closedMembership: 'Monthly and annual pass holders can save watches here. Monitoring is not active in this region.', noSender: 'WeChat alerts are not ready in this region.',
     enTemplate: 'English WeChat alerts are not yet available.', zhTemplate: 'Chinese WeChat alerts are not yet available.', membership: 'Regional watches and alerts require an active monthly or annual pass.', memberAction: 'View membership',
     plan_required: 'Watch saved. A monthly or annual pass is required to resume monitoring.',
     observationLate: 'The latest background check is unconfirmed.', interval: 'Background checks in this region run about every {n} minutes.',
@@ -34,6 +36,11 @@ const WORDS = {
     notice: 'Pickup alert', alertMissing: 'This alert is unavailable.', en: 'English', zh: 'Simplified Chinese', notifyLanguage: 'Alert language',
   },
 };
+
+function registrationOpen(list, site) {
+  // Older APIs accepted saves only while public queries or monitoring were open.
+  return Boolean(site && (list?.watchRegistrationOpen ?? (site.enabled || site.monitorEnabled)) === true);
+}
 
 function watchView(page, site, ready, eligiblePlan) {
   const lang = page.lang || 'zh-CN', w = WORDS[lang], list = ready && page.watchList;
@@ -47,24 +54,25 @@ function watchView(page, site, ready, eligiblePlan) {
     const overLimit = f.market === page.market && f.partNumber === page.part && stores.includes(page.store)
       && Array.isArray(f.eligibleStoreNumbers) && !f.eligibleStoreNumbers.includes(page.store);
     const monitoring = home?.monitorEnabled && list.monitoring?.[f.market];
-    const status = !member && f.status === 'active' ? w.plan_required : f.status === 'active' && overLimit ? w.limit_paused : f.status === 'active' && !monitoring ? w.stopped : w[f.status] || w.stopped;
+    const status = !member && f.status === 'active' ? w.plan_required : f.status === 'active' && overLimit ? w.limit_paused : f.status === 'active' && !monitoring ? w.savedStopped : w[f.status] || w.stopped;
     return { id: f.followId, name, product: p && p.label || f.partNumber, stores: stores.map(number => choices && choices.stores.find(s => s.id === number)?.label || number).join(' · '),
-      imageDisplayUrl: p && p.imageDisplayUrl || '', status, canResume: !!member, pauseTo: (f.savedStatus || f.status) === 'paused' ? 'active' : 'paused',
+      imageDisplayUrl: p && p.imageDisplayUrl || '', status, canResume: Boolean(member && p?.monitorSupported && registrationOpen(list, home)), pauseTo: (f.savedStatus || f.status) === 'paused' ? 'active' : 'paused',
       selected: f.market === page.market && f.partNumber === page.part && stores.includes(page.store), language: f.language === 'en' ? 'en' : 'zh-CN' };
   });
   const target = rows.find(row => row.selected), product = page.selectedProduct;
-  const canWatch = site && (site.enabled || site.monitorEnabled) && product?.monitorSupported;
+  const canWatch = product?.monitorSupported && registrationOpen(list, site);
+  const monitoring = site?.monitorEnabled && list?.monitoring?.[page.market];
   const notifyLanguage = target ? target.language : lang;
   const boot = ready && page.boot, notify = boot && boot.notifications || {};
   const id = notify.templateIds && notify.templateIds[notifyLanguage === 'en' ? 'restockEn' : 'restock'];
   const credits = boot && boot.subscriptions && boot.subscriptions[id]?.credits || 0;
   const consentBlocked = ['ban', 'reject', 'main_switch_off'].includes(templateConsent(id));
   let service = '';
-  if (ready && !member && (canWatch || target)) service = w.membership;
+  if (ready && !member && (canWatch || target)) service = monitoring ? w.membership : w.closedMembership;
   else if (!canWatch && !target && site?.enabled && product?.querySupported) service = w.disabled;
   else if (target && target.pauseTo === 'active') service = w.paused;
   else if (target && target.status !== w.active) service = target.status;
-  else if (list && canWatch && (!site.monitorEnabled || !list.monitoring?.[page.market])) service = w.stopped;
+  else if (list && canWatch && !monitoring) service = w.canSave;
   else if (target && !id) service = notifyLanguage === 'en' ? w.enTemplate : w.zhTemplate;
   else if (target && (!list.notifications?.[page.market] || !(notifyLanguage === 'en' ? site?.notificationsEnabledEn : site?.notificationsEnabled)
     || notify.enabled !== true || !(notify.senderReady ?? notify.deliveryReady))) service = w.noSender;
@@ -78,7 +86,7 @@ function watchView(page, site, ready, eligiblePlan) {
   return { w, watchRows: rows, targetWatch: target || null, watchBusy: !!page.watchToken, watchLoaded: !!list,
     showWatch: !!(member && canWatch), membershipLink: !!(ready && !member && canWatch),
     watchEnabled: !!(ready && member && list && canWatch && !target && !page.watchToken), watchService: service,
-    watchError: ready && w[page.watchError] || '', watchMessage: ready && w[page.watchMessage] || '',
+    watchError: ready && w[page.watchError] || '', watchMessage: ready && !(service === w.savedStopped && page.watchMessage === 'saved') && w[page.watchMessage] || '',
     creditText: canSubscribe ? w.uses.replace('{n}', credits) : '', alertTemplate: canSubscribe ? id : '',
     allowSettings: Boolean(target && service === w.blocked), targetLanguage: notifyLanguage === 'en' ? w.en : w.zh,
   };
@@ -137,8 +145,11 @@ const methods = {
     this.watchError = this.watchMessage = '';
     this.watchRead = (this.watchRead || 0) + 1;
     this.paint();
+    const changesSlots = payload.status === 'removed' || (action === 'market.watch'
+      && !this.watchList?.follows.some(follow => follow.market === payload.market && follow.partNumber === payload.partNumber && follow.status !== 'removed'));
     try {
-      const response = await call(action, { ...payload, expectedUserKey: owner });
+      const request = call(action, { ...payload, expectedUserKey: owner });
+      const response = await (changesSlots ? trackFollowCountWrite(owner, request) : request);
       if (!response || !response.follow || !response.follow.followId) throw Error('Invalid receipt');
       if (!this.pageRetired && this.isAccount(owner) && this.scope === scope && action === 'market.watch') this.watchMessage = 'saved';
     } catch (error) {
@@ -148,9 +159,14 @@ const methods = {
     } finally {
       if (this.watchToken === token && this.isAccount(owner) && !this.pageRetired) {
         // Even a lost write reply may have committed. Do not join a list read started before that write.
-        invalidateFollows();
+        if (!changesSlots) invalidateFollows();
         await this.loadWatches();
-        if (this.watchToken === token) this.watchToken = null;
+        if (this.watchToken === token) {
+          this.watchToken = null;
+          if (action === 'market.watch' && this.scope === scope && this.isAccount(owner) && this.data.targetWatch && this.watchMessage === 'unavailable') {
+            this.watchMessage = 'saved';
+          }
+        }
         this.paint();
       }
     }

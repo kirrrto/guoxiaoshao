@@ -8,21 +8,21 @@ const { ledgerIds } = require('../cloudfunctions/gxs_api/lib/rules/quota.js');
 const ok = result => { assert.equal(result.ok, true, JSON.stringify(result.error)); return result.data; };
 const historyRequest = { historyQueryId: 'reward-proof-001', partNumber: 'MXXX1CH/A', storeNumbers: ['R577'], dayKey: '2026-09-14' };
 
-test('task reports need a successful server history query; unsupported configured tasks do not grant', async () => {
+test('a fresh history query cannot earn credits and unsupported configured tasks do not grant', async () => {
   const f = createFixture({ config: { quota: { historyCost: 0 }, tasks: [{ id: 'view_history', title: '浏览历史', reward: 1 }, { id: 'client_says_done', title: '未实现任务', reward: 9 }] } });
   const denied = await f.call('quota.completeTask', { taskId: 'view_history', completed: true, historyQueryId: 'fake-proof' });
-  assert.equal(denied.error.code, 'task_not_completed');
+  assert.equal(ok(denied).reason, 'reward_disabled');
   assert.equal((await f.call('quota.completeTask', { taskId: 'client_says_done' })).error.code, 'task_not_supported');
   assert.equal((await f.repo.getUser(userKeyOf())).quota.balance, 0);
   assert.equal(ok(await f.call('history.list', historyRequest)).ok, true);
   const stored = await f.repo.getUser(userKeyOf());
-  assert.equal(stored.taskEvidence.view_history.dayKey, '2026-09-15', 'completion date, not the requested historical date, proves the task');
+  assert.equal(stored.taskEvidence, undefined);
   const grants = await Promise.all(Array.from({ length: 8 }, () => f.call('quota.completeTask', { taskId: 'view_history' })));
-  assert.equal(grants.reduce((sum, result) => sum + ok(result).granted, 0), 1);
-  assert.equal((await f.repo.getUser(userKeyOf())).quota.balance, 1);
+  assert.equal(grants.reduce((sum, result) => sum + ok(result).granted, 0), 0);
+  assert.equal((await f.repo.getUser(userKeyOf())).quota.balance, 0);
   f.advance(86400000);
   assert.equal(ok(await f.call('history.list', historyRequest)).replayed, true);
-  assert.equal((await f.call('quota.completeTask', { taskId: 'view_history' })).error.code, 'task_not_completed', 'replaying yesterday\'s completed request does not create a new completion');
+  assert.equal(ok(await f.call('quota.completeTask', { taskId: 'view_history' })).reason, 'reward_disabled', 'replaying a completed query never creates a new award');
 });
 
 test('task proof rejects pending, failed, live, other-user, previous-day and invalid response records', async () => {
@@ -43,35 +43,29 @@ test('task proof rejects pending, failed, live, other-user, previous-day and inv
   }
 });
 
-test('legacy proof is found by Beijing completion day and rechecked after the lookup', async () => {
+test('a completed history record alone is insufficient; the old same-day marker must match', async () => {
   const f = createFixture();
   ok(await f.call('user.bootstrap'));
   const record = { _id: 'legacy-history', userKey: userKeyOf(), kind: 'history', status: 'success', response: { ok: true }, finishedAt: '2026-09-14T16:00:00.000Z' };
   await f.repo.saveQuery(record);
-  const find = f.repo.findCompletedHistoryQuery;
-  f.repo.findCompletedHistoryQuery = async (...args) => {
-    const result = await find(...args);
-    await f.repo.saveQuery({ ...record, status: 'failed', response: { ok: false } });
-    return result;
-  };
-  assert.equal((await f.call('quota.completeTask', { taskId: 'view_history' })).error.code, 'task_not_completed');
-  f.repo.findCompletedHistoryQuery = find;
-  await f.repo.saveQuery(record);
+  assert.equal(ok(await f.call('quota.completeTask', { taskId: 'view_history' })).reason, 'reward_disabled');
+  await f.repo.updateUser(userKeyOf(), { taskEvidence: { view_history: { dayKey: '2026-09-15', completedAt: record.finishedAt, queryId: record._id } } });
   assert.equal(ok(await f.call('quota.completeTask', { taskId: 'view_history' })).granted, 1);
+  assert.equal(ok(await f.call('quota.completeTask', { taskId: 'view_history' })).reason, 'already_completed');
 });
 
-test('zero rewards stay disabled instead of falling back to the configured default', async () => {
+test('disabled legacy tasks stay closed, and a stale runtime override cannot disable daily check-in', async () => {
   const f = createFixture({ config: { quota: { historyCost: 0, taskReward: 8, signinReward: 0 }, tasks: [{ id: 'view_history', title: '浏览历史', reward: 0 }] } });
   assert.equal(ok(await f.call('history.list', historyRequest)).ok, true);
   const result = ok(await f.call('quota.completeTask', { taskId: 'view_history' }));
   assert.equal(result.granted, 0);
   assert.equal(result.reason, 'reward_disabled');
-  assert.equal(ok(await f.call('quota.signin')).reason, 'reward_disabled');
-  assert.equal((await f.repo.getUser(userKeyOf())).quota.balance, 0);
-  assert.deepEqual(await f.repo.listLedger(userKeyOf()), []);
+  assert.equal(ok(await f.call('quota.signin')).granted, 1);
+  assert.equal((await f.repo.getUser(userKeyOf())).quota.balance, 1);
+  assert.deepEqual((await f.repo.listLedger(userKeyOf())).map(e => e.type), ['signin_reward']);
 });
 
-test('failure to commit a successful history response also rolls back its task proof', async () => {
+test('failure to commit a history response refunds its cost without creating new task proof', async () => {
   const f = createFixture();
   ok(await f.call('quota.signin'));
   f.repo.transactionWriteHook = async (table, doc) => { if (table === C.queries && doc.status === 'success') throw new Error('completion storage unavailable'); };
@@ -79,12 +73,13 @@ test('failure to commit a successful history response also rolls back its task p
   assert.equal(result.ok, false);
   assert.equal(result.refunded, 1);
   assert.equal((await f.repo.getUser(userKeyOf())).taskEvidence, undefined);
-  assert.equal((await f.call('quota.completeTask', { taskId: 'view_history' })).error.code, 'task_not_completed');
+  assert.equal(ok(await f.call('quota.completeTask', { taskId: 'view_history' })).reason, 'reward_disabled');
 });
 
 test('bootstrap uses server summaries without skipping fresh identity, status or query recovery reads', async () => {
   const f = createFixture({ config: { quota: { historyCost: 0 } } });
   ok(await f.call('history.list', historyRequest));
+  await f.repo.updateUser(userKeyOf(), { taskEvidence: { history_browse: { dayKey: '2026-09-15', completedAt: f.state.now.toISOString() } } });
   const grants = await Promise.all([f.call('quota.signin'), f.call('quota.completeTask', { taskId: 'view_history' })]);
   assert.equal(grants.reduce((sum, result) => sum + ok(result).granted, 0), 2);
   const reads = [];
