@@ -73,8 +73,8 @@
     },
     {
       "path": "engine/guarded-pickup.js",
-      "bytes": 5541,
-      "sha256": "42a870a4ce804376d723087a807cd37e72648b77c9f1a4fdd4f626b0ed87c32f"
+      "bytes": 5762,
+      "sha256": "9040e1ebe7bdc3030fdba24fb7f1c9be4187050c70cffa5d1596b5d4c41ad950"
     },
     {
       "path": "engine/lease.js",
@@ -178,8 +178,8 @@
     },
     {
       "path": "repo/atomic-ops.js",
-      "bytes": 58848,
-      "sha256": "f25a0eaebb192cea4334b5197ef8acf7f204b1d9f3df71c274d10ae9621ac5d9"
+      "bytes": 59595,
+      "sha256": "d78a2f77136c347e7046349f1fec255ce5bdc0e2c56988bc1092bf6d64b76692"
     },
     {
       "path": "repo/cloudbase-repo.js",
@@ -243,8 +243,8 @@
     },
     {
       "path": "repo/upstream-guard.js",
-      "bytes": 10964,
-      "sha256": "6932604a31aa816d0cf5e59c7f839f3ff91b332c3dea9187c046fd6662f700b0"
+      "bytes": 11165,
+      "sha256": "4ad2e7c13dc68cba10f7cc1a8e2b659b53cac1dfdd9519c8950a2b3455de6be5"
     },
     {
       "path": "rules/access.js",
@@ -300,6 +300,11 @@
       "path": "rules/quota.js",
       "bytes": 1704,
       "sha256": "3d959021c4a34b5d0cd0326a7f696d56cfb0c8e99e6536c05985f2d2fe80c9d3"
+    },
+    {
+      "path": "rules/regional-query-preview.js",
+      "bytes": 319,
+      "sha256": "a492fb54159cc70c3663984f3bfa4d77bfb3facd63cde0db77b2490ba7262ef1"
     },
     {
       "path": "time.js",

@@ -8,6 +8,15 @@
 // Keep technical details and complete acceptance records in release documents.
 const RELEASE_NOTES = [
   {
+    version: '3.8.3',
+    title: '地区库存查询测试',
+    dateText: '版本记录 · 2026-11-23',
+    highlights: [
+      '指定测试账号可在日本、台湾和香港站点开放前查询所选门店的取货情况。',
+      '单次测试查询免扣次数，查询结果仅该账号可见。',
+    ],
+  },
+  {
     version: '3.8.2',
     title: '管理员功能测试',
     dateText: '版本记录 · 2026-11-23',

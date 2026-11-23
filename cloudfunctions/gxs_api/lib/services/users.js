@@ -1,6 +1,7 @@
 'use strict';
 const { ApiError } = require('../errors');
 const { dayKey } = require('../time');
+const { PREVIEW_MARKETS } = require('../rules/regional-query-preview');
 const { membershipSnapshot, accountLimits } = require('../rules/membership');
 const { ensurePlanMetadata, ensureOutageCompensation, ensureLaunchCelebrationGift } = require('../rules/member-plan');
 const { resolveConfig } = require('../rules/quota');
@@ -185,11 +186,13 @@ async function bootstrap(ctx) {
   ]);
   const { catalogMeta, collectorStatus } = metadata;
   const monitoring = monitoringSnapshot(ctx.config, collectorStatus, ctx.now);
+  const membership = membershipSnapshot(user, ctx.now, ctx.config);
   return {
     collector: monitoring.collector,
     serverTime: ctx.nowIso,
     identity: { appid: ctx.identity.appid, userKey: ctx.identity.userKey, openidMasked: maskOpenid(ctx.identity.openid), crossAccount: ctx.identity.crossAccount, isAdmin: ctx.identity.isAdmin },
-    membership: membershipSnapshot(user, ctx.now, ctx.config),
+    membership,
+    ...(membership.isTester ? { regionalQueryPreview: PREVIEW_MARKETS } : {}),
     quota,
     tasks: ctx.config.tasks,
     followCount: follows.filter(f => (!f.market || f.market === 'CN') && (f.status === 'active' || f.status === 'paused')).length,

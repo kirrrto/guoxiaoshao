@@ -1,4 +1,7 @@
 module.exports = {
+  '地区库存查询测试': 'Regional pickup preview',
+  '指定测试账号可在日本、台湾和香港站点开放前查询所选门店的取货情况。': 'The designated tester can check pickup at a selected store in Japan, Taiwan or Hong Kong before public access opens.',
+  '单次测试查询免扣次数，查询结果仅该账号可见。': 'Preview checks use no credits. Only the tester can see their results.',
   '管理员功能测试': 'Administrator testing',
   '指定管理员可直接测试门店查询和库存关注，无需购买会员。': 'The designated administrator can test store pickup searches and inventory watches without buying a pass.',
   '在「我的」可以查看测试身份、可关注的配置数和门店数。': 'Me shows the test account status and the number of configurations and stores it can watch.',

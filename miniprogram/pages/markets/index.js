@@ -178,7 +178,7 @@ Page(require('../../utils/language').page('markets', {
     this.part = (matchedProduct || options.products.find(p => p.querySupported) || options.products[0])?.id || '';
     this.store = (matchedStore || site.stores[0]).storeNumber;
     if (prevKey !== this.targetKey()) this.clearTarget();
-    else if (!site.enabled && this.snapshot) this.snapshot.supersededByFailure = true;
+    else if (!this.queryOpen(site) && this.snapshot) this.snapshot.supersededByFailure = true;
     if (fromLink && (!matchedProduct || !matchedStore)) this.queryError = 'invalid';
   },
   clearTarget() {
@@ -195,6 +195,12 @@ Page(require('../../utils/language').page('markets', {
   targetKey() { return [this.market, this.part, this.store].join('|'); },
   payload() { return { market: this.market, partNumber: this.selectedProduct?.partNumber || '', storeNumbers: [this.store] }; },
   isAccount(owner = this.owner) { return Boolean(owner && owner === this.owner && quotaAccountMatches(owner)); },
+  queryOpen(site) {
+    if (!site) return false;
+    if (site.enabled) return true;
+    const preview = this.accountReady && this.isAccount() && this.boot?.regionalQueryPreview;
+    return Array.isArray(preview) && preview.includes(site.code) && this.boot.membership.isTester === true;
+  },
 
   paint() {
     if (this.pageRetired) return;
@@ -210,6 +216,7 @@ Page(require('../../utils/language').page('markets', {
     this.selectedProduct = product;
     const choices = this.activeChoices;
     const accountReady = this.visible && this.accountReady && this.isAccount();
+    const queryEnabled = this.queryOpen(site) && product?.querySupported === true;
     const quota = accountReady && (currentQuota(this.owner) || this.boot.quota);
     const now = bootstrapNow(this.boot);
     const access = regionalAccess(accountReady && this.boot.membership, product, now);
@@ -231,7 +238,7 @@ Page(require('../../utils/language').page('markets', {
       variantIndex: product ? choices.variants.findIndex(row => row.id === product.id) : 0,
       modelIndex: product ? choices.models.indexOf(product.model) : 0,
       colorIndex: product ? choices.colors.findIndex(color => color.id === product.color) : 0,
-      storeIndex, enabled: Boolean(site?.enabled && product?.querySupported), pending: !!pending, loading: !!this.loading,
+      storeIndex, enabled: queryEnabled, pending: !!pending, loading: !!this.loading,
       catalogError: c[this.catalogError] || '', accountReady: !!accountReady, accountError: !!this.accountError,
       launchNotice, showSignin, signing: !!this.signinToken,
       signinMessage: accountReady && outcome ? c[outcome.key].replace('{n}', outcome.n || 0) : quota && !access.member && quota.signedInToday ? c.signed : '',
@@ -239,7 +246,7 @@ Page(require('../../utils/language').page('markets', {
       costText: costText || '', maxCost: quota ? (access.member ? 0 : 1) : null,
       queryLabel: busyHere ? c.checking : pending ? c.resume : c.query, busyHere: !!busyHere,
       canQuery: Boolean(accountReady && !this.queryToken && !this.signinToken && !this.data.networkOffline
-        && (pending || (site?.enabled && product?.querySupported && !launchRestricted && (access.member || quota.balance >= 1)))),
+        && (pending || (queryEnabled && !launchRestricted && (access.member || quota.balance >= 1)))),
       receipt: receipt || null, queryError: accountReady && c[this.queryError] || '',
       billingText: accountReady && this.billing != null ? (this.billing ? c.charged.replace('{charged}', this.billing) : c.noDebit) : '',
       alertTime: accountReady && this.alert && store ? localTime(this.alert.detectedAt, store.timeZone) : '',
@@ -349,7 +356,7 @@ Page(require('../../utils/language').page('markets', {
     const owner = this.owner, site = this.site();
     this.paint();
     if (!this.visible || !site || !this.accountReady || !this.isAccount(owner) || !this.data.canQuery) return;
-    if (!site.enabled && !operation.hasPending('mq', this.payload(), owner)) return;
+    if (!this.queryOpen(site) && !operation.hasPending('mq', this.payload(), owner)) return;
     const target = this.payload(), token = { scope: this.scope, visit: this.visit };
     const currentTarget = () => !this.pageRetired && this.scope === token.scope && this.isAccount(owner);
     const maxCost = this.data.maxCost;
@@ -379,7 +386,7 @@ Page(require('../../utils/language').page('markets', {
       } else {
         this.queryError = messageKey(response.reason || (row && row.reason));
         if (response.reason === 'new_product_restricted') this.snapshot = null;
-        if (['new_product_restricted', 'query_cost_changed'].includes(response.reason)) await this.refresh(true);
+        if (['market_disabled', 'new_product_restricted', 'query_cost_changed'].includes(response.reason)) await this.refresh(true);
       }
     } catch (error) {
       if (!operation.uncertain(error)) operation.finish('mq', queryId, owner, false);

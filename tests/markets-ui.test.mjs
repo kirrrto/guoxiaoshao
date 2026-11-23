@@ -147,6 +147,28 @@ test('closed market does not start new inventory requests, account changes clear
   page.onHide(); state.owner='Bob'; rt.load('utils/store.js').resetSession(); await page.onShow();
   assert.equal(page.data.receipt,null); assert.equal(page.owner,'Bob');
 });
+
+test('the Taiwan selection on a closed public site is queryable only for the signed-in preview account', async () => {
+  const { page, rt, state } = await setup({
+    'user.bootstrap': (_, s) => ({
+      identity: { userKey: s.owner }, membership: { active: true, isTester: s.owner === 'Alice' },
+      ...(s.owner === 'Alice' ? { regionalQueryPreview: ['JP', 'TW', 'HK'] } : {}),
+      quota: { balance: 0, revision: 1 }, notifications: {}, subscriptions: {}, settings: {},
+    }),
+  }, { market: 'TW', partNumber: 'MJY04ZP/A', storeNumber: 'R694' }, { enabled: false });
+  assert.equal(page.data.enabled, true);
+  assert.equal(page.data.canQuery, true);
+  assert.equal(page.data.showWatch, false);
+  await page.onQuery();
+  const { market, partNumber, storeNumbers, maxCost } = rt.calls.find(x => x.action === 'market.pickup').payload;
+  assert.deepEqual([market, partNumber, ...storeNumbers, maxCost], ['TW', 'MJY04ZP/A', 'R694', 0]);
+  assert.ok(page.data.receipt);
+  page.onHide(); state.owner = 'Bob'; rt.load('utils/store.js').resetSession(); await page.onShow();
+  assert.equal(page.data.receipt, null);
+  assert.equal(page.data.enabled, false);
+  await page.onQuery();
+  assert.equal(rt.calls.filter(x => x.action === 'market.pickup').length, 1);
+});
 test('notification destination uses only authorized exact detail and never queries or debits on open', async () => {
   const n = { market:'TW', partNumber: MARKETS[1].products[5].partNumber, storeNumber:'R713', eventId:'alert1', detectedAt:new Date().toISOString() };
   let cleared = false;

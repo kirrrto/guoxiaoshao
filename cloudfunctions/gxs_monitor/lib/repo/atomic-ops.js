@@ -20,6 +20,7 @@ const { mergeConfig, patchConfig } = require('../config');
 const { assertConfigEditor, makeConfigAudit } = require('../config-audit');
 const { CAMPAIGN, MAX_FAILURES, LOCK_MS, CLAIMS_ID, matchesCodeHash, attemptsId } = require('../member-redemption');
 const { upstreamGuardMethods, reserveAccountQuery, releaseAccountQuery } = require('./upstream-guard');
+const { canPreviewMarket } = require('../rules/regional-query-preview');
 const { testAccountConfigIn } = require('./test-account-config');
 const { queryTargetMethods } = require('./query-target');
 const { notificationTestMethods } = require('./notification-test');
@@ -357,12 +358,18 @@ function atomicMethods(run, { readUpstreamBreaker } = {}) {
       if (!user) throw new ApiError('user_missing', '用户不存在');
       const config = await testAccountConfigIn(tx, user, args.config);
       const existing = await tx.get(C.queries, record._id);
+      const privatePreview = Boolean(args.preview || existing?.privatePreview);
+      const previewRevoked = privatePreview && !canPreviewMarket(record.market, user, config);
       if (existing) {
         // Legacy records are bound by their actual request fields as well.
         const signature = q => JSON.stringify([q.kind, q.market || 'CN', q.partNumber, [...q.storeNumbers].sort(), q.kind === 'history' ? q.dayKey : null]);
         if (signature(existing) !== signature(record)) throw new ApiError('query_id_conflict', '该查询编号已用于其他条件，请重新查询');
         if (existing.status !== 'pending' && existing.response) return { replayed: true, record: existing, ...quotaBalance(user) };
         if (existing.leaseUntil && existing.leaseUntil > nowIso) return { busy: true, record: existing, retryAfterMs: Date.parse(existing.leaseUntil) - Date.parse(nowIso), ...quotaBalance(user) };
+        // A closed site's private route cannot take over a previously paid public request.
+        if (previewRevoked || (privatePreview && existing.charged > 0)) {
+          return { replayed: true, ...await closeExpiredQuery(tx, existing, user, nowIso, 'market_disabled') };
+        }
         if (record.kind === 'market' || existing.isTester) {
           if (await hydrateMemberPlansIn(tx, user)) await tx.put(C.users, user);
           const params = { user, product, now: new Date(nowIso), config };
@@ -381,7 +388,7 @@ function atomicMethods(run, { readUpstreamBreaker } = {}) {
         }
         // A crashed worker is fenced out. Its debit belongs to this same request;
         // recovery is allowed even when the debit used the user's last credit.
-        const resumed = { ...existing, status: 'pending', ownerId, leaseUntil: new Date(Date.parse(nowIso) + leaseMs).toISOString(), attempts: (existing.attempts || 1) + 1 };
+        const resumed = { ...existing, ...(privatePreview ? { privatePreview: true } : {}), status: 'pending', ownerId, leaseUntil: new Date(Date.parse(nowIso) + leaseMs).toISOString(), attempts: (existing.attempts || 1) + 1 };
         const guarded = await reserveAccountQuery(tx, { record, ownerId, nowIso, leaseMs, config });
         // Admission can delay recovery but cannot settle the debit already
         // attached to this ID. Keep clients on the original pending intent.
@@ -390,6 +397,7 @@ function atomicMethods(run, { readUpstreamBreaker } = {}) {
         await tx.put(C.queries, resumed);
         return { record: resumed, ...quotaBalance(user), recovered: true };
       }
+      if (previewRevoked) throw new ApiError('market_disabled', '该站点尚未开放实时查询。');
       if (args.existingOnly) throw new ApiError('query_recovery_missing', '旧查询记录暂未找到，本次未扣次，请重新核对。');
       if (record.kind === 'live' || record.kind === 'market') {
         if (await hydrateMemberPlansIn(tx, user)) await tx.put(C.users, user);
@@ -414,7 +422,7 @@ function atomicMethods(run, { readUpstreamBreaker } = {}) {
         if (!debit.applied) throw new ApiError('query_id_conflict', '原查询记录已到期，请重新发起查询。');
         user = debit.user;
       }
-      const pending = { ...record, ...(hasAdminTestAccess(user, config) ? { isTester: true } : {}), charged: decision.cost, member: decision.member, status: 'pending', ownerId, leaseUntil: new Date(Date.parse(nowIso) + leaseMs).toISOString(), attempts: 1, createdAt: nowIso, finishedAt: null, response: null };
+      const pending = { ...record, ...(privatePreview ? { privatePreview: true } : {}), ...(hasAdminTestAccess(user, config) ? { isTester: true } : {}), charged: decision.cost, member: decision.member, status: 'pending', ownerId, leaseUntil: new Date(Date.parse(nowIso) + leaseMs).toISOString(), attempts: 1, createdAt: nowIso, finishedAt: null, response: null };
       await tx.put(C.queries, pending);
       return { record: pending, ...quotaBalance(user) };
     }),

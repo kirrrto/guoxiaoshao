@@ -1,6 +1,7 @@
 'use strict';
 const { fetchPickup } = require('../apple-pickup');
 const { isCtoPartNumber } = require('../rules/product-target');
+const { canPreviewMarket } = require('../rules/regional-query-preview');
 const { findMarket, findMarketProduct } = require('../markets');
 const { isRetiredPartNumber } = require('../rules/follow-access');
 
@@ -32,14 +33,15 @@ function serialiseAdmission(repo, market, task, waitMs) {
   return expired ? Promise.race([next, expired]) : next;
 }
 
-async function guardedPickup({ repo, config, clock, fetchImpl, storeNumber, partNumbers, products = null, timeoutMs, market = null, source = 'manual', beforeRequest = async () => true, onBudget = () => {}, remainingMs = () => Infinity }) {
+async function guardedPickup({ repo, config, clock, fetchImpl, storeNumber, partNumbers, products = null, timeoutMs, market = null, source = 'manual', previewUser = null, beforeRequest = async () => true, onBudget = () => {}, remainingMs = () => Infinity }) {
   const denied = (reason, retryAt) => ({ record: { httpStatus: null, budgetDenied: true, retryAt, error: { message: reason }, elapsedMs: 0 }, observations: partNumbers.map(partNumber => ({ storeNumber, partNumber, status: 'unknown', quote: null, storeName: null, productTitle: null, observedAt: clock().toISOString(), reason: { code: reason, message: '暂缓查询，请稍后重试' } })) });
   if (remainingMs() <= 1000) return denied('request_cancelled', clock().getTime() + 1000);
   if (market === null && partNumbers.some(isRetiredPartNumber)) return denied('product_retired', 0);
   if (market !== null) {
     const site = findMarket(market);
     const flags = source === 'auto' ? config.internationalMonitoring : config.internationalMarkets;
-    if (!site || flags?.[market] !== true) return denied('market_disabled', 0);
+    const enabled = previewUser ? source === 'manual' && canPreviewMarket(market, previewUser, config) : flags?.[market] === true;
+    if (!site || !enabled) return denied('market_disabled', 0);
     if (!site.stores.some(store => store.storeNumber === storeNumber) || !Array.isArray(partNumbers) || !partNumbers.length
       || partNumbers.some(part => !findMarketProduct(market, part)?.[source === 'auto' ? 'monitorSupported' : 'querySupported'])) return denied('invalid_market_target', 0);
   }
@@ -50,7 +52,7 @@ async function guardedPickup({ repo, config, clock, fetchImpl, storeNumber, part
     // expired request, and choose its calendar day only when it reaches the head.
     if (remainingMs() <= 1000) return null;
     const limits = market ? config.internationalQueryLimits : config.collector;
-    return repo.consumeCollectorBudget({ now: clock().toISOString(), maxRequestsPerMinute: limits.maxRequestsPerMinute, maxRequestsPerDay: limits.maxRequestsPerDay, budgetMode: market ? 'daily' : config.collector.budgetMode, source, autoShare, market });
+    return repo.consumeCollectorBudget({ now: clock().toISOString(), maxRequestsPerMinute: limits.maxRequestsPerMinute, maxRequestsPerDay: limits.maxRequestsPerDay, budgetMode: market ? 'daily' : config.collector.budgetMode, source, autoShare, market, previewUser });
   }, remainingMs() - 1000);
   if (!budget) return denied('request_cancelled', clock().getTime() + 1000);
   onBudget(budget);

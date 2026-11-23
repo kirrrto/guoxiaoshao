@@ -18,6 +18,82 @@ function bindOwner(t) {
   });
 }
 
+test('only the bound admin can manually check a closed regional site, with a private receipt and no watches', async t => {
+  bindOwner(t);
+  const fetchImpl = fakeFetch(() => ({ display: 'unavailable' }));
+  const f = createFixture({ config: { adminUserKeys: [owner, userKeyOf(other)], query: { sharedFreshnessSeconds: 30 } }, fetchImpl });
+  const boot = ok(await f.call('user.bootstrap'));
+  assert.deepEqual(boot.regionalQueryPreview, ['JP', 'TW', 'HK']);
+  assert.equal(ok(await f.call('user.bootstrap', {}, userContext(other))).regionalQueryPreview, undefined);
+  const tw = { market: 'TW', partNumber: 'MJY04ZP/A', storeNumbers: ['R694'], queryId: 'taipei-private-query', expectedUserKey: owner, maxCost: 0 };
+  const shared = { _id: 'TW|R694|MJY04ZP/A', market: 'TW', storeNumber: 'R694', partNumber: tw.partNumber,
+    status: 'available', observedAt: f.state.now.toISOString() };
+  await f.repo.saveLatest(shared);
+  const response = ok(await f.call('market.pickup', tw));
+  assert.deepEqual([response.ok, response.results[0].status, response.results[0].storeNumber, response.charged], [true, 'unavailable', 'R694', 0]);
+  assert.equal(ok(await f.call('market.pickup', tw)).replayed, true);
+  assert.deepEqual(await f.repo.getLatest([shared._id]), [shared]);
+  assert.deepEqual(await f.repo.listEventsByTargets([shared._id]), []);
+  assert.equal((await f.call('market.watch', tw)).error.code, 'market_monitoring_disabled');
+  const impostor = { ...tw, expectedUserKey: userKeyOf(other), preview: true, previewUser: boot.identity, isTester: true };
+  assert.equal((await f.call('market.pickup', impostor, userContext(other))).error.code, 'market_disabled');
+  assert.equal(fetchImpl.calls.length, 1);
+  assert.equal(ok(await f.call('market.catalog', {}, userContext(other))).markets.some(site => site.enabled || site.monitorEnabled || site.notificationsEnabled), false);
+});
+
+test('revocation before regional upstream admission blocks the preview and preserves the query balance', async t => {
+  bindOwner(t);
+  const fetchImpl = fakeFetch(() => ({ display: 'available' }));
+  const f = createFixture({ config: { adminUserKeys: [owner] }, fetchImpl });
+  ok(await f.call('user.bootstrap'));
+  const admit = f.repo.consumeCollectorBudget.bind(f.repo);
+  f.repo.consumeCollectorBudget = async args => {
+    await f.repo.saveConfig({ ...await f.repo.getConfig(), adminUserKeys: [] });
+    return admit(args);
+  };
+  const tw = { market: 'TW', partNumber: 'MJY04ZP/A', storeNumbers: ['R694'], queryId: 'private-revoked-query', expectedUserKey: owner, maxCost: 0 };
+  const result = ok(await f.call('market.pickup', tw));
+  assert.deepEqual([result.ok, result.reason, result.charged], [false, 'market_disabled', 0]);
+  assert.equal(fetchImpl.calls.length, 0);
+  assert.equal((await f.repo.listLedger(owner)).length, 0);
+});
+
+test('an interrupted private query keeps its private receipt when the site opens before recovery', async t => {
+  bindOwner(t);
+  const fetchImpl = fakeFetch(() => ({ display: 'available' }));
+  const f = createFixture({ config: { adminUserKeys: [owner] }, fetchImpl });
+  const query = { market: 'TW', partNumber: 'MJY04ZP/A', storeNumbers: ['R694'], queryId: 'recover-private-taipei', expectedUserKey: owner, maxCost: 0 };
+  const begin = f.repo.beginQuery.bind(f.repo);
+  f.repo.beginQuery = async args => { await begin(args); throw Error('interrupted after admission'); };
+  assert.equal((await f.call('market.pickup', query)).ok, false);
+  assert.equal(fetchImpl.calls.length, 0);
+  f.repo.beginQuery = begin;
+  f.advance(60000);
+  await f.repo.saveConfig({ ...await f.repo.getConfig(), internationalMarkets: { TW: true } });
+  const receipt = ok(await f.call('market.pickup', query));
+  assert.deepEqual([receipt.ok, receipt.results[0].status, receipt.charged], [true, 'available', 0]);
+  assert.equal(fetchImpl.calls.length, 1);
+  assert.deepEqual(await f.repo.getLatest(['TW|R694|MJY04ZP/A']), []);
+});
+
+test('closing a site refunds an interrupted paid query even if the caller now has private test access', async t => {
+  bindOwner(t);
+  const fetchImpl = fakeFetch(() => ({ display: 'available' }));
+  const f = createFixture({ start: '2026-11-23T02:00:00Z', config: { internationalMarkets: { TW: true } }, fetchImpl });
+  ok(await f.call('quota.signin'));
+  const query = { market: 'TW', partNumber: 'MJY04ZP/A', storeNumbers: ['R694'], queryId: 'recover-paid-taipei', expectedUserKey: owner, maxCost: 1 };
+  const begin = f.repo.beginQuery.bind(f.repo);
+  f.repo.beginQuery = async args => { await begin(args); throw Error('interrupted after admission'); };
+  assert.equal((await f.call('market.pickup', query)).ok, false);
+  assert.equal((await f.repo.getUser(owner)).quota.balance, 0);
+  f.repo.beginQuery = begin;
+  f.advance(60000);
+  await f.repo.saveConfig({ ...await f.repo.getConfig(), internationalMarkets: { TW: false }, adminUserKeys: [owner] });
+  const receipt = ok(await f.call('market.pickup', { ...query, maxCost: 0 }));
+  assert.deepEqual([receipt.ok, receipt.reason, receipt.refunded, receipt.balance], [false, 'market_disabled', 1, 1]);
+  assert.equal(fetchImpl.calls.length, 0);
+});
+
 test('only the server-bound consumer administrator gets non-expiring test access and no paid order', async t => {
   bindOwner(t);
   const f = createFixture({ config: { adminUserKeys: [owner, userKeyOf(other), userKeyOf(undefined, RESOURCE_APPID)] } });
