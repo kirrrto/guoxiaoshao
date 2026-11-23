@@ -1,3 +1,5 @@
+import followAccess from '../../../cloudfunctions/gxs_api/lib/rules/follow-access.js';
+
 export function clientCatalogSource(built) {
   // Public catalog only. Account data and permissions must always come from the server.
   const fields = ['partNumber', 'category', 'familyKey', 'familyName', 'model', 'title', 'attributes', 'priceCny', 'comingSoon', 'supported', 'querySupported', 'monitorSupported', 'targetType', 'verificationStatus'];
@@ -23,6 +25,7 @@ export function clientCatalogSource(built) {
 const D = ${JSON.stringify(packed)};
 module.exports = {
   version: D.v,
+  retiredPartNumbers: ${JSON.stringify([...followAccess.RETIRED_PART_NUMBERS].sort())},
   families: D.f,
   stores: D.st.map(([storeNumber, name, city, province, slug]) => ({ storeNumber, name, city, province, slug })),
   products: D.p.map(([partNumber, g, title, a, priceCny, fl, s]) => {

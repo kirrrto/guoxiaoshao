@@ -9,7 +9,7 @@
  */
 const { mergeConfig } = require('../config');
 const { canUseReminders, followAllowance } = require('../rules/membership');
-const { loadFollowUsers, isRetiredPartNumber } = require('../rules/follow-access');
+const { loadFollowUsers, isRetiredMainlandTarget } = require('../rules/follow-access');
 const { guardedPickup } = require('./guarded-pickup');
 const { createScheduler, buildGroups } = require('./scheduler');
 const { createMarketMonitor } = require('./market-monitor');
@@ -113,6 +113,7 @@ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = cons
    * sample → available" is not a new restock. Returns 'confirmed', 'noise' or 'waiting'.
    */
   async function confirmation(event, latest) {
+    if (isRetiredMainlandTarget(event)) return 'noise';
     const previousWasUnconfirmed = since => event.previousStatusConfirmed === false
       || (event.previousStatusConfirmed == null && since && event.previousKnownAt === since);
     if (event.type === 'became_unavailable' && previousWasUnconfirmed(event.availableSince)) return 'noise';
@@ -176,7 +177,7 @@ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = cons
           continue;
         }
         if (!snapshot && state === 'confirmed') {
-          const follows = (await repo.listActiveFollows()).filter(f => !isRetiredPartNumber(f.partNumber));
+          const follows = (await repo.listActiveFollows()).filter(f => !isRetiredMainlandTarget(f));
           snapshot = { follows, users: await loadFollowUsers(repo, follows, clock()) };
         }
         const tasks = state === 'confirmed' ? buildTasks({ events: [event], ...snapshot, config: planningConfig, now })
@@ -214,7 +215,7 @@ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = cons
   async function planCurrentAvailability(planningConfig, planningSnapshot) {
     if (!planningConfig.notifications.enabled || !shouldContinue()
       || remainingWorkMs() <= 4000 || clock().getTime() - lastAvailabilityPlanAt < 30000) return;
-    const follows = (planningSnapshot ? planningSnapshot.follows : await repo.listActiveFollows()).filter(f => !isRetiredPartNumber(f.partNumber));
+    const follows = (planningSnapshot ? planningSnapshot.follows : await repo.listActiveFollows()).filter(f => !isRetiredMainlandTarget(f));
     const users = planningSnapshot ? planningSnapshot.users : await loadFollowUsers(repo, follows, clock());
     // Page the account/target pairs, not database reads per displayed follow.
     // The cursor is persisted in scheduled heartbeats so a large set of paid
@@ -339,7 +340,7 @@ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = cons
   async function refreshTargets() {
     const stored = await repo.getConfig();
     config = mergeConfig(stored);
-    const follows = (await repo.listActiveFollows()).filter(f => !isRetiredPartNumber(f.partNumber));
+    const follows = (await repo.listActiveFollows()).filter(f => !isRetiredMainlandTarget(f));
     const users = await loadFollowUsers(repo, follows, clock());
     const ctoParts = [...new Set(follows.map(follow => follow.partNumber).filter(isCtoPartNumber))];
     const ctoProducts = new Map((ctoParts.length ? await repo.getProducts(ctoParts) : []).filter(Boolean).map(product => [product.partNumber, product]));

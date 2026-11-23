@@ -1,6 +1,7 @@
 'use strict';
 const { dayKey, toDate } = require('../time');
 const { planForTerms, planIdOfOrder, snapshotTermsValid } = require('../payment/plans');
+const { GIFT_SOURCE, giftRecordId, verifiedGiftPlan } = require('./owner-annual-gift');
 
 const OUTAGE_COMPENSATION_DAY = '2026-10-21';
 const OUTAGE_COMPENSATION_ORDER_ID = 'grant_outage_20261021';
@@ -34,8 +35,11 @@ async function resolvePlanMetadata(user, getOrder) {
   const segments = [];
   for (const segment of ledger.segments) {
     const { planId: existingPlanId, ...saved } = segment;
-    const order = segment.source === 'virtual_payment' && segment.orderId ? await getOrder(segment.orderId) : null;
+    const ownerGift = segment.source === GIFT_SOURCE && segment.orderId === giftRecordId(user._id);
+    const needsReceipt = ownerGift || segment.source === 'virtual_payment';
+    const order = needsReceipt && segment.orderId ? await getOrder(segment.orderId) : null;
     const planId = segment.source === 'virtual_payment' ? purchasedPlan(order, user)
+      : ownerGift ? verifiedGiftPlan(order, user)
       : ['service_compensation', 'trial_compensation'].includes(segment.source) ? existingPlanId : null;
     segments.push({ ...saved, ...(planId ? { planId } : {}) });
   }

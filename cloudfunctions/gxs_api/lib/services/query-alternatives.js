@@ -1,4 +1,5 @@
 'use strict';
+const { isRetiredPartNumber } = require('../rules/follow-access');
 const { ApiError } = require('../errors');
 const { isMember, accountLimits } = require('../rules/membership');
 const { resolvePlanMetadata } = require('../rules/member-plan');
@@ -30,7 +31,7 @@ async function alternatives(ctx, payload) {
   checkWindow();
   const [base, products, stores] = await Promise.all([ctx.repo.getProduct(query.partNumber), Promise.all(parts.map(part => ctx.repo.getProduct(part))), ctx.repo.listStores()]);
   const now = checkWindow();
-  const canRead = (product, time = now) => canQueryProduct(product) && !product.comingSoon
+  const canRead = (product, time = now) => canQueryProduct(product) && !isRetiredPartNumber(product.partNumber) && !product.comingSoon
     && (isMember(user, new Date(time)) || !isLiveRestricted(product, ctx.config.newProductWindows, new Date(time)).restricted);
   if (!canRead(base) || products.some(product => !canRead(product))) throw new ApiError('alternatives_restricted', '所选配置当前不支持查看，或处于新品会员限制期');
   if (products.some(product => !sameVariant(base, product))) throw new ApiError('alternative_variant_mismatch', '仅可选择同机型、同容量且其他配置相同的颜色');

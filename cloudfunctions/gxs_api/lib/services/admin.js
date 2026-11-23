@@ -64,6 +64,18 @@ async function grantMembership(ctx, payload) {
   return { applied: result.applied, expiresAt: refreshed.membership.expiresAt, orderId };
 }
 
+async function grantOwnerAnnualPass(ctx, payload) {
+  if (!ctx.identity.isOperator) throw new ApiError('forbidden', '年卡赠送需由云端运维执行');
+  if (Object.keys(payload).length) throw new ApiError('invalid_payload', '此操作不接受参数');
+  try {
+    return await ctx.repo.grantOwnerAnnualPass({ userKey: ctx.ownerAnnualGiftUserKey, nowIso: ctx.nowIso });
+  } catch (error) {
+    if (error instanceof ApiError) throw error;
+    // A database error can contain document IDs, including the recipient.
+    throw new ApiError('owner_gift_unconfirmed', '赠送结果尚未确认，可重试核对原记录');
+  }
+}
+
 async function grantCredits(ctx, payload) {
   requireAdmin(ctx);
   const userKey = typeof payload.userKey === 'string' ? payload.userKey : null;
@@ -251,4 +263,4 @@ async function lookupUser(ctx, payload) {
   return { user: { userKey: user._id, createdAt: user.createdAt, lastSeenAt: user.lastSeenAt, membership: user.membership, quota: user.quota, settings: user.settings, subscriptions: user.subscriptions }, follows };
 }
 
-module.exports = { getConfig, paymentStatus, updateConfig, seedCatalog, grantMembership, grantCredits, stats, capacity, insights, lookupUser };
+module.exports = { getConfig, paymentStatus, updateConfig, seedCatalog, grantMembership, grantOwnerAnnualPass, grantCredits, stats, capacity, insights, lookupUser };

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "catalogSha256": "dde4927161b6d54a726854e7e4ee1444333c45f7a11cd58e1effcd6e8650bb4e",
+  "catalogSha256": "531506ac2780c96002b34a182baf69950d2c4cf21b5bd5443aefa219ae7c4487",
   "encoder": {
     "pillow": "12.3.0",
     "opaque": {
@@ -194,27 +194,6 @@
       ]
     },
     {
-      "source": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/homepod-mini-select-blue-202110_FV1?wid=1868&hei=880&fmt=jpeg&qlt=90&.v=K2c3bEwyaWVDeDZkdHpLbHkwcGVSclkzcFgyeERHUEhNbTRTQzNiY2JCUmg5UEh1YlAveUJWditPbXN3blRmVi91YlVrZnFCSWZSZ3JZTTVzMlVYL3VyZmlwalNjK0xoZU01QWVTSzVKTGFobC9icnR2UFRDanJjclFrY21xTzM",
-      "sourceSha256": "8b8aa4868a9037cac4537769bc4ea9fbe3597072a0d9f277b9ecd9c47d505847",
-      "sourceWidth": 1868,
-      "sourceHeight": 880,
-      "parts": [
-        "MJ2J3CH/A"
-      ],
-      "renditions": [
-        {
-          "variant": "card",
-          "path": "/images/products/1c022e130430e540abec-card.jpg",
-          "width": 96,
-          "height": 45,
-          "bytes": 625,
-          "sha256": "a38e20787574948dccf959ac853d1fae32e37cec7d3e354c84d02f7aa559ac6d",
-          "format": "JPEG",
-          "hasTransparency": false
-        }
-      ]
-    },
-    {
       "source": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/homepod-mini-select-blue-202610_FV1?wid=1868&hei=880&fmt=jpeg&qlt=90&.v=K2c3bEwyaWVDeDZkdHpLbHkwcGVScXc1YnoxZGlJcWhmYnNWOWJuYkpDUmg5UEh1YlAveUJWditPbXN3blRmVi91YlVrZnFCSWZSZ3JZTTVzMlVYL29lZWZNakozTlo4c2tlc21wdGxDT3RLYXh2a0FSeEQ0SHoxUWtrbWl6dVA",
       "sourceSha256": "0af50fb4398f98d64393a1bb72951cfeade5ce1e4ea947f09a9da80cc242f943",
       "sourceWidth": 1868,
@@ -257,27 +236,6 @@
       ]
     },
     {
-      "source": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/homepod-mini-select-midnight-202407_FV1?wid=1868&hei=880&fmt=jpeg&qlt=90&.v=K2c3bEwyaWVDeDZkdHpLbHkwcGVSaFRaZXZublY0K2p0Ri9sOWcwbVh6aVUvTHBkeUd0RmJJUmY3SGlWbDc5azN6WWY5a1JiR3h2V2h5Mis1dmgwRVVkbTFFQitQQWRJRHBZb055K1dRU3lmeDZEeWhOM2xFeWZvZFNjaEtlTDY",
-      "sourceSha256": "aed836d6b39d18c1963316e2dbee0ad318940127496879d83a60fbc28a918fb7",
-      "sourceWidth": 1868,
-      "sourceHeight": 880,
-      "parts": [
-        "MTJU3CH/A"
-      ],
-      "renditions": [
-        {
-          "variant": "card",
-          "path": "/images/products/781c797e850cfc2ce5ee-card.jpg",
-          "width": 96,
-          "height": 45,
-          "bytes": 595,
-          "sha256": "988f9589d1681af9c0e025edb12dc5241e26e1653c443347bd34ad72cf1fc6f4",
-          "format": "JPEG",
-          "hasTransparency": false
-        }
-      ]
-    },
-    {
       "source": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/homepod-mini-select-midnight-202610_FV1?wid=1868&hei=880&fmt=jpeg&qlt=90&.v=K2c3bEwyaWVDeDZkdHpLbHkwcGVSaFRaZXZublY0K2p0Ri9sOWcwbVh6amwzc0hqbklCSmJHNTA2MnByUFJuSTN6WWY5a1JiR3h2V2h5Mis1dmgwRVRnQ1lhSmZUdzRUK1crYTlZTFpSRDlhblNYU3dVRzd1b3FleHZaelNicXk",
       "sourceSha256": "b8145dbed36aec7411969cbebac4dd0f2ca848e094961f4d27e522a7b8c2df41",
       "sourceWidth": 1868,
@@ -293,27 +251,6 @@
           "height": 45,
           "bytes": 607,
           "sha256": "2620f2118edfb2bc5501bd0fe8637dd13e9e2b2e848392f143dc38fae08eec92",
-          "format": "JPEG",
-          "hasTransparency": false
-        }
-      ]
-    },
-    {
-      "source": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/homepod-mini-select-orange-202110_FV1?wid=1868&hei=880&fmt=jpeg&qlt=90&.v=K2c3bEwyaWVDeDZkdHpLbHkwcGVSckhndCtsZnAwTnFpWXhSS0Y4SW9oQzB3REtrUExnSnVSelpEdXZEbDh6emh2cmVWZlJxS3lEakdTNUJ0b3RabElLTjQxSElFZVJPbjF4NEwzYXFKTE95SFNiTHNadFZ3VHN2dGIxVHpXci8",
-      "sourceSha256": "73d85ff7f703ae18f9b51290cd0415889865a1e18fbfd57588abc2e0d4e8dd6b",
-      "sourceWidth": 1868,
-      "sourceHeight": 880,
-      "parts": [
-        "MJ2K3CH/A"
-      ],
-      "renditions": [
-        {
-          "variant": "card",
-          "path": "/images/products/bf35168235111161a237-card.jpg",
-          "width": 96,
-          "height": 45,
-          "bytes": 605,
-          "sha256": "c5b3b75ca35babf3c0bf95308bcc1776737a5afd9efab21bb7922f44eed7865e",
           "format": "JPEG",
           "hasTransparency": false
         }
@@ -341,27 +278,6 @@
       ]
     },
     {
-      "source": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/homepod-mini-select-white-202110_FV1?wid=1868&hei=880&fmt=jpeg&qlt=90&.v=K2c3bEwyaWVDeDZkdHpLbHkwcGVSaVh3VWtBWGpRcmhqdHlJNjVOT2QyekxCM1gvWjZsdy9IamM4SVJ5RVlRQWk3aEZ4ZFFGenkvaGw2NzRqZXFWbnd4dUs1S2RxNkNHMld1Nks2b2VOWGcyNjc2RUJPVExpR2EzRzRZNXFETUw",
-      "sourceSha256": "66be95f923b00e6bb0e8a7b50d115c2a6687096df2f3dc16d332fdc170371a37",
-      "sourceWidth": 1868,
-      "sourceHeight": 880,
-      "parts": [
-        "MHY53CH/A"
-      ],
-      "renditions": [
-        {
-          "variant": "card",
-          "path": "/images/products/e6d04439462431bc4218-card.jpg",
-          "width": 96,
-          "height": 45,
-          "bytes": 470,
-          "sha256": "060213610ec25de6b161ae57a6958947de93a02e4fd38a171aacba783f91d2bc",
-          "format": "JPEG",
-          "hasTransparency": false
-        }
-      ]
-    },
-    {
       "source": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/homepod-mini-select-white-202610_FV1?wid=1868&hei=880&fmt=jpeg&qlt=90&.v=K2c3bEwyaWVDeDZkdHpLbHkwcGVScUNNeFgzb01NZmZpZzZSMGM2UHlLYkxCM1gvWjZsdy9IamM4SVJ5RVlRQWk3aEZ4ZFFGenkvaGw2NzRqZXFWbnd0QXVzNitnN1V2S2Y5d3JYSkZKdmE1N1BYU0VVSUxkRXBtTThsd0FWQWE",
       "sourceSha256": "91aed5ab97ba0ea586c54cba74b7b7bfdf899d1b05f32e5fbce39a48d0d581cc",
       "sourceWidth": 1868,
@@ -377,27 +293,6 @@
           "height": 45,
           "bytes": 466,
           "sha256": "7f7cf152029ac95e1485ce16d6692a2474820c882e290819f5afdba9bec5717e",
-          "format": "JPEG",
-          "hasTransparency": false
-        }
-      ]
-    },
-    {
-      "source": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/homepod-mini-select-yellow-202110_FV1?wid=1868&hei=880&fmt=jpeg&qlt=90&.v=K2c3bEwyaWVDeDZkdHpLbHkwcGVSaE4velBNdHlNczA1bWJLdHU3d0dhTzB3REtrUExnSnVSelpEdXZEbDh6emh2cmVWZlJxS3lEakdTNUJ0b3RabElLTjQxSElFZVJPbjF4NEwzYXFKTFBnTDQxbmJZbXlOVlovRDA5RFZoczQ",
-      "sourceSha256": "121b4fee46e44b9674a764c140335735142d8b42f0b9554cb646eec75c56274b",
-      "sourceWidth": 1868,
-      "sourceHeight": 880,
-      "parts": [
-        "MJ2L3CH/A"
-      ],
-      "renditions": [
-        {
-          "variant": "card",
-          "path": "/images/products/9d8ee211ca16f0216740-card.jpg",
-          "width": 96,
-          "height": 45,
-          "bytes": 569,
-          "sha256": "e26d66ea1c0c0eeef2564a0c886cc8cc57719b5c834c072f9b73dbef2e4255d2",
           "format": "JPEG",
           "hasTransparency": false
         }
@@ -2123,7 +2018,7 @@
     },
     {
       "source": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-proled-summary-select-2026010-14inch-silver?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0L3EyS05IQ016T1FsVnB6OWhoM1hxNEk2ZGY4RUh6RDZiVERJYmJiZFFwUGdTdWhIbFJZa3pWS1JQUTZ3cHN3ZlNtTkdpWmFLNDhUNytnaWxtRDBHaEcyTE1mSHgwMHh1SlVoUDJNTksyTUZaelU0K0hWNDFNVnpTWUYxODRJTjJB&traceId=1",
-      "sourceSha256": "1cbe429dfc63c0cda0f7f6ede774b36a74e1838acaf50a4ed84e7f0f0541097d",
+      "sourceSha256": "80440ee1da1a4f550f1c9ca7f044c57bd4aa40c2a825852a990ecce1167c2bf3",
       "sourceWidth": 5120,
       "sourceHeight": 3280,
       "parts": [
@@ -2137,8 +2032,8 @@
           "path": "/images/products/4889401bdfcc16bd707a-card.jpg",
           "width": 96,
           "height": 62,
-          "bytes": 1283,
-          "sha256": "190c76ef1a5034d8302aaba93c5bb199d07e8d9c13aef3e0f183b4116a4338bb",
+          "bytes": 1287,
+          "sha256": "1c46ad51092e9bada11eadfa02f05aca3cbdefc1e57bc32f0d383cb7f336b7a3",
           "format": "JPEG",
           "hasTransparency": false
         }
@@ -2146,7 +2041,7 @@
     },
     {
       "source": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-proled-summary-select-2026010-14inch-spaceblack?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0L3EyS05IQ016T1FsVnB6OWhoM1hxNEk2ZGY4RUh6RDZiVERJYmJiZFFwUGdIVEZ3M2ZYN1liNldGMXhjallWdGhIdUFTbXNvcW5NTGxOeDdEZ1ZpT01tUnpENUIyWHRhTlhpRFMzSXBkU2NvRmxoM2FzcVR4dWZibnd6N1JWQWZ4Y3ZsTExqb2ptdTVDWkRHS0xMaXFJ&traceId=1",
-      "sourceSha256": "a4c627978941cdb139ebc7b9b986745979021d30bca569355a6b410005ba9e6a",
+      "sourceSha256": "0029c751c9840e8f713dc9b5f3f843ec1700122db18e54b418f2740f603c4a24",
       "sourceWidth": 5120,
       "sourceHeight": 3280,
       "parts": [
@@ -2161,8 +2056,8 @@
           "path": "/images/products/1117cb2c9a0bd593a261-card.jpg",
           "width": 96,
           "height": 62,
-          "bytes": 1351,
-          "sha256": "6cfd26d40180ccd7703ed38187b0619165e23251950c46ceb2ede6d2b28953f0",
+          "bytes": 1356,
+          "sha256": "50127565f041cb358e4a416cd76368e042c0f6ca00c2e6ecc0cec759bdaace82",
           "format": "JPEG",
           "hasTransparency": false
         }
@@ -2223,12 +2118,10 @@
       "sourceHeight": 3280,
       "parts": [
         "MGDN4CH/A",
-        "MGDP4CH/A",
         "MGDQ4CH/A",
         "MHWW4CH/A",
         "MHWX4CH/A",
-        "MHWY4CH/A",
-        "MJLV4CH/A"
+        "MHWY4CH/A"
       ],
       "renditions": [
         {
@@ -2250,14 +2143,11 @@
       "sourceHeight": 3280,
       "parts": [
         "MGDR4CH/A",
-        "MGDT4CH/A",
         "MGDU4CH/A",
-        "MGXX4CH/A",
         "MHWT4CH/A",
         "MHWU4CH/A",
         "MHWV4CH/A",
-        "MJ2C4CH/A",
-        "MJLW4CH/A"
+        "MJ2C4CH/A"
       ],
       "renditions": [
         {
@@ -2278,10 +2168,8 @@
       "sourceWidth": 5120,
       "sourceHeight": 3280,
       "parts": [
-        "MGE44CH/A",
-        "MGE64CH/A",
-        "MGE74CH/A",
-        "MGE94CH/A"
+        "MMFJ4CH/A",
+        "MMFK4CH/A"
       ],
       "renditions": [
         {
@@ -2302,10 +2190,8 @@
       "sourceWidth": 5120,
       "sourceHeight": 3280,
       "parts": [
-        "MGEA4CH/A",
-        "MGEC4CH/A",
-        "MGED4CH/A",
-        "MGEE4CH/A"
+        "MMFM4CH/A",
+        "MMFN4CH/A"
       ],
       "renditions": [
         {
@@ -2793,14 +2679,13 @@
       ]
     }
   ],
-  "mappingSha256": "fa24b742e8a14609ad7fad1b18008b7c91493318f464246ba98aaef3533a7363",
-  "totalBytes": 145377,
-  "generatedAt": "2026-10-30T07:12:47.466Z",
-  "catalogImagesGeneratedAt": "2026-10-30T07:12:46.858Z",
+  "mappingSha256": "7337b75a226ad46945004b7b1759311c21b64bce8b038174bb353bc97327b945",
+  "totalBytes": 142522,
   "incrementalBuild": {
-    "reusedVerifiedAssets": 118,
-    "newlyEncodedAssets": 0,
-    "sourceHashesRechecked": true,
-    "reason": "Only exact-configuration membership changed; original and encoded image hashes were rechecked."
-  }
+    "reusedVerifiedAssets": 111,
+    "newlyEncodedAssets": 2,
+    "sourceHashesRechecked": true
+  },
+  "catalogImagesGeneratedAt": "2026-11-23T14:53:54.847Z",
+  "generatedAt": "2026-11-23T14:58:53.538Z"
 }

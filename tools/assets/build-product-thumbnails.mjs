@@ -40,6 +40,13 @@ if (args.includes('--check')) {
   if (manifest.encoder.transparent.alphaSnap.length !== 2) throw Error('thumbnail_encoder_policy_mismatch:alphaSnap');
   if (manifest.catalogSha256 !== hash(await readFile(resolve(root, 'catalog/products.json')))) throw Error('thumbnail_catalog_changed');
   if (manifest.mappingSha256 !== hash(await readFile(resolve(root, destinations.mapping)))) throw Error('thumbnail_mapping_changed');
+  const verified = new Map(report.entries.map(entry => [entry.imageUrl, entry]));
+  for (const asset of manifest.assets) {
+    const original = verified.get(asset.source);
+    if (!original || original.record.sha256 !== asset.sourceSha256 || original.decoded.width !== asset.sourceWidth
+      || original.decoded.height !== asset.sourceHeight) throw Error('thumbnail_original_changed:' + asset.source);
+  }
+  if (Object.keys(mapping.byPart).length !== catalog.products.length) throw Error('unexpected_thumbnail_sku');
   // The consumer package uses explicit file exclusions (also checked at
   // release). An on-disk image can decode successfully and still be omitted.
   const project = JSON.parse(await readFile(resolve(root, 'project.config.json'), 'utf8'));
@@ -86,7 +93,10 @@ if (args.includes('--check')) {
   const sourceDirs = [value('--source-dir'), resolve(root, report.assetDirectory), cache].filter(Boolean);
   const posterUrls = new Set(require(resolve(root, 'catalog/product-launches.js')).map(entry => entry.imageUrl).filter(Boolean));
   const entries = [];
+  const activeParts = new Set(catalog.products.map(product => product.partNumber));
   for (const entry of report.entries) {
+    const parts = entry.products.filter(product => activeParts.has(product.partNumber)).map(product => product.partNumber).sort();
+    if (!parts.length && !posterUrls.has(entry.imageUrl)) continue;
     let sourcePath;
     for (const dir of sourceDirs) {
       const candidate = resolve(dir, entry.assetFile);
@@ -102,14 +112,15 @@ if (args.includes('--check')) {
       await sleep(150);
     }
     entries.push({ sourcePath, source: entry.imageUrl, sourceSha256: entry.record.sha256, sourceWidth: entry.decoded.width, sourceHeight: entry.decoded.height,
-      parts: entry.products.map(product => product.partNumber).sort(), poster: posterUrls.has(entry.imageUrl) });
+      parts, poster: posterUrls.has(entry.imageUrl) });
     if (entries.length % 20 === 0) console.log(`Verified ${entries.length}/${report.entries.length} originals`);
   }
   for (const url of posterUrls) if (!entries.some(entry => entry.source === url)) throw Error('poster_missing_verified_original');
   entries.sort((a, b) => a.source < b.source ? -1 : a.source > b.source ? 1 : 0);
   const planPath = resolve(cache, 'build-plan.json');
   if (!entries.length) throw Error('empty_thumbnail_sample');
-  await writeFile(planPath, JSON.stringify({ root, destinations, policy, catalogSha256: hash(await readFile(resolve(root, 'catalog/products.json'))), entries }));
+  await writeFile(planPath, JSON.stringify({ root, destinations, policy, catalogImagesGeneratedAt: catalog.imagesGeneratedAt,
+    catalogSha256: hash(await readFile(resolve(root, 'catalog/products.json'))), entries }));
   const python = value('--python') || process.env.PYTHON || 'python';
   const built = spawnSync(python, [resolve(root, 'tools/assets/encode-product-thumbnails.py'), planPath], { stdio: 'inherit', windowsHide: true });
   if (built.error) throw built.error;

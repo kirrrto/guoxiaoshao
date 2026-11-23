@@ -5,7 +5,7 @@ const { isRetiredPartNumber, retiredProductMessage } = require('../rules/follow-
 const { isLiveRestricted } = require('../rules/new-product');
 const { targetKeyOf } = require('../engine/events');
 const { ensureUser } = require('./users');
-const { isProductIdentity, isCtoPartNumber, canMonitorProduct } = require('../rules/product-target');
+const { isProductIdentity, canMonitorProduct } = require('../rules/product-target');
 
 const ID_PATTERN = /^[A-Za-z0-9_-]{8,64}$/;
 
@@ -34,26 +34,26 @@ function present(follow, latestByKey, storesByNumber, product, ctx, member = tru
         storeNumber,
         storeName: store ? store.name : (!latestRestricted && latest && latest.storeName) || storeNumber,
         city: store ? store.city : null,
-        ...presentLatest(latest, ctx, latestRestricted),
+        ...presentLatest(latest, ctx, latestRestricted, productRetired),
       };
     }),
   };
 }
 
 /** One target's latest observation as pages show it; restricted or stale samples read as unknown. */
-function presentLatest(sample, ctx, restricted = false) {
+function presentLatest(sample, ctx, restricted = false, archived = false) {
   const latest = restricted ? null : sample;
   const sampleAge = latest ? ctx.now.getTime() - Date.parse(latest.knownAt || latest.observedAt) : NaN;
   const stale = latest && (latest.unknownSince || !Number.isFinite(sampleAge) || sampleAge < 0 || sampleAge > ctx.config.collector.continuityGapMs);
   return {
-    status: restricted || stale ? 'unknown' : latest ? latest.status : null,
-    isStale: Boolean(stale),
+    status: archived ? null : restricted || stale ? 'unknown' : latest ? latest.status : null,
+    isStale: Boolean(stale || (archived && latest)),
     lastKnownStatus: latest ? latest.status : null,
     statusSince: latest ? latest.statusSince : null,
     observedAt: latest ? latest.observedAt : null,
     knownAt: latest ? latest.knownAt || null : null,
     unknownSince: latest ? latest.unknownSince : null,
-    quote: latest ? latest.quote : null,
+    quote: latest && !archived ? latest.quote : null,
   };
 }
 
@@ -147,7 +147,7 @@ async function setStatus(ctx, payload, status) {
   if (!follow || (follow.market && follow.market !== 'CN') || follow.userKey !== user._id || follow.status === 'removed') throw new ApiError('unknown_follow', '关注不存在');
   if (status === 'active' && isRetiredPartNumber(follow.partNumber)) throw new ApiError('product_retired', retiredProductMessage(follow.partNumber));
   if (status === 'active' && !canUseReminders(user, ctx.now)) throw new ApiError('member_required', '关注与到货提醒为会员专属，开通会员后可恢复监测');
-  if (status === 'active' && isCtoPartNumber(follow.partNumber) && !canMonitorProduct(await ctx.repo.getProduct(follow.partNumber))) throw new ApiError('unsupported_product', '该商品暂不支持监测');
+  if (status === 'active' && !canMonitorProduct(await ctx.repo.getProduct(follow.partNumber))) throw new ApiError('unsupported_product', '该商品暂不支持监测');
   const updated = await ctx.repo.mutateFollow({ userKey: user._id, followId: recordId, status, nowIso: ctx.nowIso, knownFollows: await ctx.repo.listFollows(user._id) });
   if (status === 'removed') return { removed: true, followId };
   const [decorated] = await decorate(ctx, [updated], isMember(user, ctx.now), canUseReminders(user, ctx.now));

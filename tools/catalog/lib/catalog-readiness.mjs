@@ -33,3 +33,19 @@ export function buildPickupVerification({ observation, storeNumber, sampledPartN
     verified: Boolean(observation && ['available', 'unavailable', 'ineligible'].includes(observation.status)),
   };
 }
+
+// The source catalog can outlive a change to the storefront family list.
+// Reject stale family rows and orphaned products before publishing either seed.
+export function assertActiveCatalogFamilies(catalog, familyConfig) {
+  const enabled = new Set(familyConfig.families.filter(family => family.include).map(family => family.familyKey));
+  const published = new Set(catalog.families.map(family => family.familyKey));
+  for (const key of published) {
+    if (!enabled.has(key)) throw Error('inactive_catalog_family:' + key);
+  }
+  for (const key of enabled) {
+    if (!published.has(key)) throw Error('missing_catalog_family:' + key);
+  }
+  for (const product of catalog.products) {
+    if (!published.has(product.familyKey)) throw Error('orphan_catalog_product:' + product.partNumber);
+  }
+}

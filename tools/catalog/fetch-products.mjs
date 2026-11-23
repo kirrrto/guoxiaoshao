@@ -13,7 +13,7 @@ import { parseBuyPage } from './lib/parse-buy-page.mjs';
 import { resolveProductImages } from './lib/resolve-images.mjs';
 import { collectSelectedMacPages, assertMacSkuCoverage } from './lib/selected-mac-pages.mjs';
 import { applyMacConfigurationCapture } from './lib/apply-mac-configurations.mjs';
-import { exactRetailSummary, retainPrelaunchRestrictions } from './lib/catalog-readiness.mjs';
+import { assertActiveCatalogFamilies, exactRetailSummary, retainPrelaunchRestrictions } from './lib/catalog-readiness.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const offlineArg = process.argv.indexOf('--offline');
@@ -161,6 +161,7 @@ const catalog = {
   products,
 };
 if (!only && !stopped) {
+  assertActiveCatalogFamilies(catalog, config);
   await writeFile(resolve(root, 'catalog', 'products.json'), JSON.stringify(catalog, null, 2) + '\n');
 } else {
   await writeFile(resolve(evidenceDir, `products.partial.${Date.now()}.json`), JSON.stringify(catalog, null, 2) + '\n');

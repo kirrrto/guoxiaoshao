@@ -1,4 +1,8 @@
 module.exports = {
+  '大陆门店查询': 'Mainland store pickup',
+  '大陆站更新了 MacBook Pro 配置，移除了第一代 HomePod mini，二代五种颜色仍可查询。': 'Mainland stores have updated MacBook Pro configurations. The original HomePod mini has been removed, and all five HomePod mini 2 finishes are still listed.',
+  '商品下架后停止监测，之前已扣次的未完成查询仍可核对退款。': 'Monitoring stops when a product is discontinued. You can still reconcile a previous unfinished check and recover its credit.',
+  '第一代 HomePod mini 已下架，请改选 HomePod mini 2': 'The original HomePod mini is discontinued. Choose HomePod mini 2.',
   '日本、台湾、香港可按品类查询 iPhone、iPad、Mac 等商品，月卡和年卡可关注到货。': 'Check pickup by category, including iPhone, iPad and Mac, in Japan, Taiwan and Hong Kong. Monthly and annual passes include restock watches.',
   '全小程序支持中文和英文，默认随微信语言，也可在「我的」切换。': 'Use Chinese or English throughout the app. Follow WeChat by default or choose a language in Me.',
   '其他站点': 'Regions', '查询': 'Search', '小哨': 'Watches', '我的': 'Me', '历史': 'History',

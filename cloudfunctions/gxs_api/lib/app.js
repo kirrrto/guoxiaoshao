@@ -86,6 +86,7 @@ const ACTIONS = {
   'admin.updateConfig': [admin.updateConfig, false],
   'admin.seedCatalog': [admin.seedCatalog, false],
   'admin.grantMembership': [admin.grantMembership, false],
+  'admin.grantOwnerAnnualPass': [admin.grantOwnerAnnualPass, false],
   'admin.grantCredits': [admin.grantCredits, false],
   'admin.stats': [admin.stats, false],
   'admin.capacity': [admin.capacity, false],
@@ -94,7 +95,7 @@ const ACTIONS = {
   'admin.lookupUser': [admin.lookupUser, false],
 };
 
-function createHandler({ repo, fetchImpl, clock = defaultClock, log = console, allowedAppids = connection.allowedAppids, requestIdOf = () => null, paymentEnv, paymentProvider, notificationTestSender, notificationEnv, remainingMs = () => Infinity }) {
+function createHandler({ repo, fetchImpl, clock = defaultClock, log = console, allowedAppids = connection.allowedAppids, requestIdOf = () => null, paymentEnv, paymentProvider, notificationTestSender, notificationEnv, ownerAnnualGiftUserKey = process.env.GXS_OWNER_ANNUAL_GIFT_USER_KEY, remainingMs = () => Infinity }) {
   return async function handle(event, wxContext) {
     const now = clock();
     const nowIso = now.toISOString();
@@ -122,7 +123,7 @@ function createHandler({ repo, fetchImpl, clock = defaultClock, log = console, a
       if (!identity.appAllowed) throw new ApiError('app_not_allowed', '该小程序未被允许访问');
       const [handler, requiresUser] = entry;
       if (requiresUser && !identity.userKey) throw new ApiError('user_required', '该操作需要小程序用户身份');
-      const ctx = { repo, config, identity, now, nowIso, clock, fetchImpl, log, requestId, paymentEnv, paymentProvider, notificationTestSender, notificationEnv, remainingMs,
+      const ctx = { repo, config, identity, now, nowIso, clock, fetchImpl, log, requestId, paymentEnv, paymentProvider, notificationTestSender, notificationEnv, ownerAnnualGiftUserKey, remainingMs,
         paymentCacheAllowed: clock === defaultClock };
       const data = await handler(ctx, payload);
       return envelope({ ok: true, data });

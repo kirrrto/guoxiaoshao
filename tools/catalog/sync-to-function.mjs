@@ -8,10 +8,15 @@ import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
+import { assertActiveCatalogFamilies } from './lib/catalog-readiness.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const source = path.join(root, 'catalog');
 const target = path.join(root, 'cloudfunctions', 'gxs_api', 'catalog');
+assertActiveCatalogFamilies(
+  JSON.parse(fs.readFileSync(path.join(source, 'products.json'), 'utf8')),
+  JSON.parse(fs.readFileSync(path.join(root, 'tools/catalog/families.json'), 'utf8')),
+);
 fs.mkdirSync(target, { recursive: true });
 
 const manifest = { syncedAt: new Date().toISOString(), files: {} };

@@ -6,6 +6,27 @@ const EVENT = 'R577|MJYH4CH/A|restock_confirmed|2026-09-15T02:00:00.000Z';
 const boot = () => ({ membership: { active: true, expiresAt: '2027-01-01T00:00:00Z' }, notifications: { enabled: true, deliveryReady: true, templateIds: { restock: 'restock-A' } },
   collector: { state: 'running' }, subscriptions: {}, settings: { notifyEnabled: true, dnd: { enabled: false } }, limits: { maxFollows: 3, maxStoresPerFollow: 3 } });
 
+test('a historical HomePod alert from an older backend never shows live stock or asks for more reminder authorizations', async () => {
+  const stamp = new Date().toISOString();
+  const detail = { notification: { eventId: EVENT, eventType: 'restock_confirmed', partNumber: 'MJ2J3CH/A', storeNumber: 'R577', detectedAt: stamp },
+    latest: { status: 'available', observedAt: stamp }, follow: { followId: 'old-watch', status: 'active' } };
+  const rt = runtime(async action => action === 'notify.detail' ? detail : boot());
+  rt.load('app.js');
+  const page = rt.instance('pages/follow/index.js');
+  await page.loadAlert(EVENT);
+  assert.equal(page.data.alert.archived, true);
+  assert.equal(page.data.alert.nowLabel, '监测已停止');
+  assert.equal(page.data.alert.followActive, false);
+  let nativeGrants = 0;
+  rt.wx.requestSubscribeMessage = () => { nativeGrants++; };
+  rt.wx.setClipboardData = ({ success }) => success();
+  page.onCopyAlert();
+  assert.equal(rt.messages.at(-1), '已复制型号和门店');
+  await page.onAlertFeedback({ currentTarget: { dataset: { outcome: 'missed' } } });
+  assert.equal(nativeGrants, 0);
+  assert.equal(rt.calls.filter(call => call.action === 'notify.feedback').length, 0);
+});
+
 test('a restock message opens that alert on the follow page once, with current stock, copy and feedback', async () => {
   const now = Date.now();
   const detail = { notification: { eventId: EVENT, status: 'accepted', eventType: 'restock_confirmed', partNumber: 'MJYH4CH/A', storeNumber: 'R577', storeName: '天环广场',

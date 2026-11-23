@@ -11,6 +11,26 @@ const failWith = (result, code) => { assert.equal(result.ok, false); assert.equa
 const FOLLOW = `${userKeyOf()}|f-0001-aaaa`;
 const EVENT = 'R577|MJYH4CH/A|restock_confirmed|2026-09-15T02:00:00.000Z';
 
+test('an archived mainland notification preserves its event and last sample without offering current pickup or pausing the watch on feedback', async () => {
+  const f = createFixture({ config });
+  ok(await f.call('user.bootstrap'));
+  const userKey = userKeyOf(), partNumber = 'MJ2J3CH/A', stamp = f.state.now.toISOString();
+  const eventId = 'retired-homepod-notice';
+  await f.repo.saveFollow({ _id: FOLLOW, userKey, partNumber, storeNumbers: ['R577'], status: 'active', updatedAt: stamp });
+  await f.repo.saveNotification({ _id: userKey + '|' + eventId, userKey, followId: FOLLOW, eventId,
+    eventType: 'restock_confirmed', status: 'accepted', partNumber, storeNumber: 'R577', detectedAt: stamp, createdAt: stamp,
+    targetSnapshot: { partNumber, storeNumbers: ['R577'], updatedAt: stamp } });
+  await f.repo.recordObservation({ observation: { storeNumber: 'R577', partNumber, status: 'available', source: 'auto', observedAt: stamp, quote: '今天可取货' } });
+  const detail = ok(await f.call('notify.detail', { eventId }));
+  assert.equal(detail.notification.detectedAt, stamp);
+  assert.equal(detail.follow.status, 'paused');
+  assert.deepEqual([detail.latest.productRetired, detail.latest.status, detail.latest.quote, detail.latest.lastKnownStatus, detail.latest.observedAt],
+    [true, null, null, 'available', stamp]);
+  const saved = ok(await f.call('notify.feedback', { eventId, outcome: 'bought' }));
+  assert.equal(saved.paused, false);
+  assert.equal((await f.repo.getFollow(FOLLOW)).status, 'active');
+});
+
 async function alerted() {
   const f = createFixture({ config });
   ok(await f.call('user.bootstrap'));

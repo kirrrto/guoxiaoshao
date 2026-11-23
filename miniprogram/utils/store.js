@@ -5,6 +5,7 @@
 const { call, resetPendingReads } = require('./api');
 const { sortFamilies } = require('./catalog-order');
 const { presentStore } = require('./store-label');
+const { isRetiredMainlandProduct } = require('./retired-products');
 const { readSession, writeSession } = require('./session');
 
 let productImagesCache = null;
@@ -267,7 +268,7 @@ function indexCatalog(raw) {
     familyNames[family.familyKey] = family.displayName || family.name || family.familyKey;
     familyMetadata[family.familyKey] = { ...family, catalogOrder };
   });
-  const products = (raw.products || []).map(source => {
+  const products = (raw.products || []).filter(product => !isRetiredMainlandProduct(product.partNumber)).map(source => {
     // Only send fields used by the UI through setData. Indexed lookup maps
     // repeat each product, so provenance/unused upstream metadata can exceed
     // WeChat's one-update payload limit when images are added.

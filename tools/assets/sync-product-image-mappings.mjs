@@ -15,6 +15,39 @@ const reportFile=`evidence/catalog/${day}/images.verification.json`, report=read
 const imageManifestFile=`evidence/catalog/${day}/images.manifest.json`, imageManifest=read(imageManifestFile);
 const thumbnailFile='miniprogram/config/product-thumbnails.js', mapping=require(resolve(root,thumbnailFile));
 const manifestFile='evidence/assets/product-thumbnails.manifest.json', manifest=read(manifestFile);
+function writeOriginalMappings() {
+  const imagePrefix = 'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/';
+  const pagePrefix = 'https://www.apple.com.cn/shop/buy-';
+  const entries = [], byPart = {}, indices = new Map();
+  for (const product of catalog.products) {
+    const entry = [product.imageUrl.startsWith(imagePrefix) ? product.imageUrl.slice(imagePrefix.length) : product.imageUrl,
+      product.imageAlt, product.imageWidth, product.imageHeight, product.imageSource,
+      product.imageSourceUrl.startsWith(pagePrefix) ? product.imageSourceUrl.slice(pagePrefix.length) : product.imageSourceUrl];
+    const key = JSON.stringify(entry);
+    if (!indices.has(key)) {
+      indices.set(key, entries.length);
+      entries.push(entry);
+    }
+    byPart[product.partNumber] = indices.get(key);
+  }
+  const file = resolve(root, 'miniprogram/config/product-images.js');
+  const code = fs.readFileSync(file, 'utf8');
+  const start = code.indexOf('const E = '), end = code.indexOf('const out = {}');
+  if (start < 0 || end < start) throw Error('unsupported_image_mapping_format');
+  const packed = 'const E = ' + JSON.stringify(entries) + ';\nconst B = ' + JSON.stringify(byPart) + ';\n';
+  fs.writeFileSync(file, code.slice(0, start) + packed + code.slice(end));
+}
+
+// A full thumbnail build already updates packaged renditions and their receipts.
+if (process.argv.includes('--originals-only')) {
+  const verifiedParts = new Map(report.entries.filter(entry => entry.record.httpStatus === 200 && entry.decoded)
+    .flatMap(entry => entry.products.map(product => [product.partNumber, entry.imageUrl])));
+  if (!report.decodeVerified || !catalog.products.every(product => verifiedParts.get(product.partNumber) === product.imageUrl)) {
+    throw Error('catalog_image_not_verified');
+  }
+  writeOriginalMappings();
+  process.exit(0);
+}
 const groups=new Map();
 for(const p of catalog.products){if(!groups.has(p.imageUrl))groups.set(p.imageUrl,[]);groups.get(p.imageUrl).push(p);}
 for(const [url,products] of groups){
@@ -32,19 +65,10 @@ write(reportFile,report);
 imageManifest.generatedAt=catalog.imagesGeneratedAt;imageManifest.products=catalog.count;imageManifest.mapped=catalog.imageCount;
 for(const source of imageManifest.sources){source.count=catalog.products.filter(p=>p.familyKey===source.familyKey).length;}
 const studioSource=imageManifest.sources.find(s=>s.familyKey==='mac-studio');
-if(studioSource)studioSource.configurationEvidence=`evidence/catalog/${day}/mac-studio-configurations.json`;
+if(studioSource && !studioSource.configurationEvidence && fs.existsSync(resolve(root, 'evidence/catalog/'+day+'/mac-studio-configurations.json')))studioSource.configurationEvidence=`evidence/catalog/${day}/mac-studio-configurations.json`;
 imageManifest.mappingNote='Original URLs and encoded image bytes are unchanged. Exact Mac Studio configurations share the already verified Mac Studio appearance; SKU membership has been rebuilt and all original/rendition hashes rechecked.';
 write(imageManifestFile,imageManifest);
-const U='https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/', S='https://www.apple.com.cn/shop/buy-';
-const E=[], B={}, index=new Map();
-for(const p of catalog.products){
-  const entry=[p.imageUrl.startsWith(U)?p.imageUrl.slice(U.length):p.imageUrl,p.imageAlt,p.imageWidth,p.imageHeight,p.imageSource,p.imageSourceUrl.startsWith(S)?p.imageSourceUrl.slice(S.length):p.imageSourceUrl];
-  const key=JSON.stringify(entry);if(!index.has(key)){index.set(key,E.length);E.push(entry);}B[p.partNumber]=index.get(key);
-}
-const imagesFile=resolve(root,'miniprogram/config/product-images.js'),code=fs.readFileSync(imagesFile,'utf8');
-const start=code.indexOf('const E = '),end=code.indexOf('const out = {}');
-if(start<0||end<start)throw Error('unsupported_image_mapping_format');
-fs.writeFileSync(imagesFile,code.slice(0,start)+`const E = ${JSON.stringify(E)};\nconst B = ${JSON.stringify(B)};\n`+code.slice(end));
+writeOriginalMappings();
 mapping.byPart=Object.fromEntries(catalog.products.map(p=>{const index=mapping.assets.findIndex(a=>a.source===p.imageUrl);if(index<0)throw Error('missing_thumbnail');return[p.partNumber,index];}));
 fs.writeFileSync(resolve(root,thumbnailFile),'// Generated from verified original image and exact configuration mappings.\nmodule.exports = '+JSON.stringify(mapping)+';\n');
 manifest.catalogSha256=hash(fs.readFileSync(resolve(root,'catalog/products.json')));

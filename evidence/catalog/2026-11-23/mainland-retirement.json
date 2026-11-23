@@ -1,0 +1,638 @@
+{
+  "scope": "中国大陆源目录和门店取货能力核对。已检查全部 24 个不同的已配置或待退役的购买页 URL。Mac 定制参考配置沿用已有核验，不进入门店取货请求。",
+  "date": "2026-11-23",
+  "catalogGeneratedAt": "2026-11-23T14:53:54.847Z",
+  "counts": {
+    "activeFamilies": 23,
+    "activeProducts": 383,
+    "retail": 341,
+    "customReferences": 42
+  },
+  "decisions": {
+    "retiredFirstGenerationHomePodMini": [
+      "MJ2J3CH/A",
+      "MJ2L3CH/A",
+      "MTJU3CH/A",
+      "MHY53CH/A",
+      "MJ2K3CH/A"
+    ],
+    "retiredEmptyIpadPage": "ipad-10-2",
+    "retiredMacBookPro": [
+      "MJLW4CH/A",
+      "MJLV4CH/A",
+      "MGDT4CH/A",
+      "MGDP4CH/A",
+      "MGXX4CH/A",
+      "MGEA4CH/A",
+      "MGE44CH/A",
+      "MGEC4CH/A",
+      "MGE64CH/A",
+      "MGED4CH/A",
+      "MGE74CH/A",
+      "MGEE4CH/A",
+      "MGE94CH/A"
+    ],
+    "newMacBookPro": [
+      {
+        "partNumber": "MMFM4CH/A",
+        "title": "MacBook Pro 16 英寸 M5 Pro 18核CPU/20核GPU 24GB 1TB 标准显示屏 深空黑色",
+        "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro/16-inch-space-black-standard-display-apple-m5-pro-chip-18-core-cpu-20-core-gpu-24gb-memory-1tb-storage",
+        "sourceBodySha256": "61f750e9beeab3010d2bb650e4d7965dec8f0433b685f8ee4eabcc8031fe2a95",
+        "artwork": "mac-macbook-pro-summary-select-202610-16inch-spaceblack"
+      },
+      {
+        "partNumber": "MMFN4CH/A",
+        "title": "MacBook Pro 16 英寸 M5 Max 18核CPU/32核GPU 36GB 2TB 标准显示屏 深空黑色",
+        "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro/16-inch-space-black-standard-display-apple-m5-max-chip-18-core-cpu-32-core-gpu-36gb-memory-2tb-storage",
+        "sourceBodySha256": "fc2236dcadae06369ac867e2fcd0a841f43a43f281f25e3ef7239ac98903df56",
+        "artwork": "mac-macbook-pro-summary-select-202610-16inch-spaceblack"
+      },
+      {
+        "partNumber": "MMFJ4CH/A",
+        "title": "MacBook Pro 16 英寸 M5 Pro 18核CPU/20核GPU 24GB 1TB 标准显示屏 银色",
+        "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro/16-inch-silver-standard-display-apple-m5-pro-chip-18-core-cpu-20-core-gpu-24gb-memory-1tb-storage",
+        "sourceBodySha256": "765058614f51c44172a35d483645416e8b52c4d756bddeb64761b6510ce11235",
+        "artwork": "mac-macbook-pro-summary-select-202610-16inch-silver"
+      },
+      {
+        "partNumber": "MMFK4CH/A",
+        "title": "MacBook Pro 16 英寸 M5 Max 18核CPU/32核GPU 36GB 2TB 标准显示屏 银色",
+        "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro/16-inch-silver-standard-display-apple-m5-max-chip-18-core-cpu-32-core-gpu-36gb-memory-2tb-storage",
+        "sourceBodySha256": "041e5a90684cb4c1902abd6d8ce1017a958e7a56b670b8183e6b5c61a57ff0e2",
+        "artwork": "mac-macbook-pro-summary-select-202610-16inch-silver"
+      }
+    ],
+    "reason": "第一代 HomePod mini 和以上旧 MacBook Pro 已同时离开当期官方购买选型，逐个取货没有门店行，分组返回无效商品。新老 MacBook Pro 同时核对全部 15 个官方标准配置链接及当地取货状态。10.2 英寸 iPad 原购买页永久跳转，原目录没有其货号。"
+  },
+  "families": [
+    {
+      "familyKey": "macbook-pro",
+      "url": "https://www.apple.com.cn/shop/buy-mac/macbook-pro",
+      "httpStatus": 200,
+      "observedAt": "2026-11-23T14:49:50.293Z",
+      "bodySha256": "093eefc7bef0417099bd9a4217bdaef369c0b2c6e4d6657a89b6640784da5c0a",
+      "pageTitle": "MacBook Pro (Liquid 视网膜 XDR 显示屏)",
+      "rootProductCount": 11,
+      "rootLinkedStandardConfigurations": 15,
+      "additionalEvidence": [
+        {
+          "partNumber": "MGDR4CH/A",
+          "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro/14-inch-space-black-standard-display-apple-m5-pro-chip-15-core-cpu-16-core-gpu-24gb-memory-1tb-storage",
+          "sourceBodySha256": "f10c8a813f147cda1933d843618ccf9df602fb102ed072ead915e5f8cc4fafe6"
+        },
+        {
+          "partNumber": "MHWU4CH/A",
+          "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro/14-inch-space-black-standard-display-apple-m6-chip-12-core-cpu-12-core-gpu-24gb-memory-1tb-storage",
+          "sourceBodySha256": "fc30d4cf135e8f99e72bd048cfb0efbd86ef513cb2b52479e474e6992e78c6d5"
+        },
+        {
+          "partNumber": "MMFM4CH/A",
+          "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro/16-inch-space-black-standard-display-apple-m5-pro-chip-18-core-cpu-20-core-gpu-24gb-memory-1tb-storage",
+          "sourceBodySha256": "61f750e9beeab3010d2bb650e4d7965dec8f0433b685f8ee4eabcc8031fe2a95"
+        },
+        {
+          "partNumber": "MJ2C4CH/A",
+          "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro/14-inch-space-black-nano-texture-display-apple-m6-chip-12-core-cpu-12-core-gpu-16gb-memory-1tb-storage",
+          "sourceBodySha256": "9be2040922ce9baff8e53fa2ff01a87ba40d0d10e1a2fa73849ccb2791bd3cef"
+        },
+        {
+          "partNumber": "MGDU4CH/A",
+          "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro/14-inch-space-black-standard-display-apple-m5-max-chip-18-core-cpu-32-core-gpu-36gb-memory-2tb-storage",
+          "sourceBodySha256": "83efb72e6f6f07befa95415d1d7d06c80504bd55db0bc2452660e6189936d32a"
+        },
+        {
+          "partNumber": "MHWX4CH/A",
+          "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro/14-inch-silver-standard-display-apple-m6-chip-12-core-cpu-12-core-gpu-24gb-memory-1tb-storage",
+          "sourceBodySha256": "d950559590f515220764de48f503e68b387d771e4018ad58b46a1a9e837442e5"
+        },
+        {
+          "partNumber": "MHWV4CH/A",
+          "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro/14-inch-space-black-standard-display-apple-m6-chip-12-core-cpu-12-core-gpu-32gb-memory-1tb-storage",
+          "sourceBodySha256": "938a02c536f09557178d146af76655ec1e80a4b446b86a4649e23882be90660e"
+        },
+        {
+          "partNumber": "MHWT4CH/A",
+          "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro/14-inch-space-black-standard-display-apple-m6-chip-12-core-cpu-12-core-gpu-16gb-memory-1tb-storage",
+          "sourceBodySha256": "c2a5ba5f361c12953ba8993622dd305e3335352da7793380b5a02cdb60535fb5"
+        },
+        {
+          "partNumber": "MMFN4CH/A",
+          "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro/16-inch-space-black-standard-display-apple-m5-max-chip-18-core-cpu-32-core-gpu-36gb-memory-2tb-storage",
+          "sourceBodySha256": "fc2236dcadae06369ac867e2fcd0a841f43a43f281f25e3ef7239ac98903df56"
+        },
+        {
+          "partNumber": "MGDQ4CH/A",
+          "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro/14-inch-silver-standard-display-apple-m5-max-chip-18-core-cpu-32-core-gpu-36gb-memory-2tb-storage",
+          "sourceBodySha256": "d01397c021915f53b6f3922c545c28d091f6734f664c755d5501abfaebd7acc0"
+        },
+        {
+          "partNumber": "MMFJ4CH/A",
+          "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro/16-inch-silver-standard-display-apple-m5-pro-chip-18-core-cpu-20-core-gpu-24gb-memory-1tb-storage",
+          "sourceBodySha256": "765058614f51c44172a35d483645416e8b52c4d756bddeb64761b6510ce11235"
+        },
+        {
+          "partNumber": "MMFK4CH/A",
+          "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro/16-inch-silver-standard-display-apple-m5-max-chip-18-core-cpu-32-core-gpu-36gb-memory-2tb-storage",
+          "sourceBodySha256": "041e5a90684cb4c1902abd6d8ce1017a958e7a56b670b8183e6b5c61a57ff0e2"
+        },
+        {
+          "partNumber": "MHWY4CH/A",
+          "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro/14-inch-silver-standard-display-apple-m6-chip-12-core-cpu-12-core-gpu-32gb-memory-1tb-storage",
+          "sourceBodySha256": "4da37e16ac501ab2c0de73dad745ac8e9739374d77e4c00c38b789fafeddf184"
+        },
+        {
+          "partNumber": "MHWW4CH/A",
+          "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro/14-inch-silver-standard-display-apple-m6-chip-12-core-cpu-12-core-gpu-16gb-memory-1tb-storage",
+          "sourceBodySha256": "5349630fe54b3a900fb8e130c60e411a6f3f2556116fa239928cf898d58ae05b"
+        },
+        {
+          "partNumber": "MGDN4CH/A",
+          "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro/14-inch-silver-standard-display-apple-m5-pro-chip-15-core-cpu-16-core-gpu-24gb-memory-1tb-storage",
+          "sourceBodySha256": "69148cc78573a4649b7844c7170cd0635484cf95b88b881bdd435bc7d6d98575"
+        }
+      ],
+      "retainedRetailSkus": 15
+    },
+    {
+      "familyKey": "ipad-10-2",
+      "url": "https://www.apple.com.cn/shop/buy-ipad/ipad-10-2",
+      "httpStatus": 301,
+      "location": "https://www.apple.com.cn/ipad",
+      "observedAt": "2026-11-23T14:49:52.066Z",
+      "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "retainedRetailSkus": 0
+    },
+    {
+      "familyKey": "homepod-mini-2",
+      "url": "https://www.apple.com.cn/shop/buy-homepod/homepod-mini",
+      "httpStatus": 200,
+      "observedAt": "2026-11-23T14:49:54.263Z",
+      "bodySha256": "59cbdef9d6ccd230764f6224f5d28230a680a63943994aee50db912edea6022d",
+      "pageTitle": "HomePod mini 2",
+      "rootProductCount": 5,
+      "retainedRetailSkus": 5
+    },
+    {
+      "familyKey": "iphone-18-pro",
+      "url": "https://www.apple.com.cn/shop/buy-iphone/iphone-18-pro",
+      "httpStatus": 200,
+      "observedAt": "2026-11-23T14:49:56.254Z",
+      "bodySha256": "43d9577fd8e1b3022ef0cbdbe4afc073c23610a5ad1b15cb498c13f85394771f",
+      "pageTitle": "iPhone 18 Pro 和 iPhone 18 Pro Max",
+      "rootProductCount": 32,
+      "retainedRetailSkus": 32
+    },
+    {
+      "familyKey": "iphone-air",
+      "url": "https://www.apple.com.cn/shop/buy-iphone/iphone-air",
+      "httpStatus": 200,
+      "observedAt": "2026-11-23T14:49:59.477Z",
+      "bodySha256": "eb1cf8e4423b22067330e68156a45492369dcd2bafc09e404f56608f40888b06",
+      "pageTitle": "iPhone Air",
+      "rootProductCount": 12,
+      "retainedRetailSkus": 12
+    },
+    {
+      "familyKey": "iphone-duo",
+      "url": "https://www.apple.com.cn/shop/buy-iphone/iphone-duo",
+      "httpStatus": 200,
+      "observedAt": "2026-11-23T14:50:01.433Z",
+      "bodySha256": "64f5046ee6530b259d6974dfde0af128efe5e1ba59688ce0c5f1b278524611af",
+      "pageTitle": "iPhone Duo",
+      "rootProductCount": 8,
+      "retainedRetailSkus": 8
+    },
+    {
+      "familyKey": "iphone-17",
+      "url": "https://www.apple.com.cn/shop/buy-iphone/iphone-17",
+      "httpStatus": 200,
+      "observedAt": "2026-11-23T14:50:03.428Z",
+      "bodySha256": "bcca19d4fbc0538e27bd19d3157195487d60c17daeab087d50763da9ac763ab3",
+      "pageTitle": "iPhone 17",
+      "rootProductCount": 10,
+      "retainedRetailSkus": 10
+    },
+    {
+      "familyKey": "iphone-17e",
+      "url": "https://www.apple.com.cn/shop/buy-iphone/iphone-17e",
+      "httpStatus": 200,
+      "observedAt": "2026-11-23T14:50:06.419Z",
+      "bodySha256": "973632f832419735e208d91a3b3d21659bb6876003d11b3e22ab6769544d5354",
+      "pageTitle": "iPhone 17e",
+      "rootProductCount": 6,
+      "retainedRetailSkus": 6
+    },
+    {
+      "familyKey": "iphone-16",
+      "url": "https://www.apple.com.cn/shop/buy-iphone/iphone-16",
+      "httpStatus": 200,
+      "observedAt": "2026-11-23T14:50:08.144Z",
+      "bodySha256": "5896474bd52a1191dee812faa5c753a34a0d25cbfb630901a0be10f44adc9f73",
+      "pageTitle": "iPhone 16",
+      "rootProductCount": 5,
+      "retainedRetailSkus": 5
+    },
+    {
+      "familyKey": "ipad-pro",
+      "url": "https://www.apple.com.cn/shop/buy-ipad/ipad-pro",
+      "httpStatus": 200,
+      "observedAt": "2026-11-23T14:50:14.105Z",
+      "bodySha256": "d4b5db380a69c774110307b961a99bfc54b0f37d96203ffd3650485f27811e0f",
+      "pageTitle": "iPad Pro",
+      "rootProductCount": 48,
+      "retainedRetailSkus": 48
+    },
+    {
+      "familyKey": "ipad-air",
+      "url": "https://www.apple.com.cn/shop/buy-ipad/ipad-air",
+      "httpStatus": 200,
+      "observedAt": "2026-11-23T14:50:19.672Z",
+      "bodySha256": "b63c07210dbbd6bf2ae9738015911f69e6b4fe2aa04ea6ba70bc64c4bfc13c7d",
+      "pageTitle": "iPad Air",
+      "rootProductCount": 64,
+      "retainedRetailSkus": 64
+    },
+    {
+      "familyKey": "ipad",
+      "url": "https://www.apple.com.cn/shop/buy-ipad/ipad",
+      "httpStatus": 200,
+      "observedAt": "2026-11-23T14:50:21.663Z",
+      "bodySha256": "e6a5a0f5d05a2718d99927bd91c4dc93bf542efb0c4ff086cd0b8238bebf87f7",
+      "pageTitle": "iPad",
+      "rootProductCount": 24,
+      "retainedRetailSkus": 24
+    },
+    {
+      "familyKey": "ipad-mini",
+      "url": "https://www.apple.com.cn/shop/buy-ipad/ipad-mini",
+      "httpStatus": 200,
+      "observedAt": "2026-11-23T14:50:24.589Z",
+      "bodySha256": "4ae848f7a72f87b5a33c9f9803187cf3ebc61c80d8cd9cebd83fc33875f71d9f",
+      "pageTitle": "iPad mini",
+      "rootProductCount": 20,
+      "retainedRetailSkus": 20
+    },
+    {
+      "familyKey": "macbook-air",
+      "url": "https://www.apple.com.cn/shop/buy-mac/macbook-air",
+      "httpStatus": 200,
+      "observedAt": "2026-11-23T14:50:26.362Z",
+      "bodySha256": "4503269dea2c56e6cd515e5d4acc4b5e852dfe2ce97bc24f674082c5a1c47806",
+      "pageTitle": "MacBook Air",
+      "rootProductCount": 8,
+      "rootLinkedStandardConfigurations": 30,
+      "additionalEvidence": [
+        {
+          "partNumber": "MDHJ4CH/A",
+          "pickupStatus": "available"
+        },
+        {
+          "partNumber": "MDHF4CH/A",
+          "pickupStatus": "available"
+        },
+        {
+          "partNumber": "MDHC4CH/A",
+          "pickupStatus": "unavailable"
+        },
+        {
+          "partNumber": "MDH84CH/A",
+          "pickupStatus": "available"
+        },
+        {
+          "partNumber": "MGP94CH/A",
+          "pickupStatus": "available"
+        },
+        {
+          "partNumber": "MGP84CH/A",
+          "pickupStatus": "available"
+        },
+        {
+          "partNumber": "MGP74CH/A",
+          "pickupStatus": "unavailable"
+        },
+        {
+          "partNumber": "MDHK4CH/A",
+          "pickupStatus": "available"
+        },
+        {
+          "partNumber": "MDHG4CH/A",
+          "pickupStatus": "available"
+        },
+        {
+          "partNumber": "MDHD4CH/A",
+          "pickupStatus": "available"
+        },
+        {
+          "partNumber": "MDH94CH/A",
+          "pickupStatus": "unavailable"
+        },
+        {
+          "partNumber": "MDVT4CH/A",
+          "pickupStatus": "available"
+        },
+        {
+          "partNumber": "MDVK4CH/A",
+          "pickupStatus": "available"
+        },
+        {
+          "partNumber": "MDVE4CH/A",
+          "pickupStatus": "available"
+        },
+        {
+          "partNumber": "MDVA4CH/A",
+          "pickupStatus": "available"
+        },
+        {
+          "partNumber": "MGPE4CH/A",
+          "pickupStatus": "available"
+        },
+        {
+          "partNumber": "MGPD4CH/A",
+          "pickupStatus": "available"
+        },
+        {
+          "partNumber": "MGPC4CH/A",
+          "pickupStatus": "available"
+        },
+        {
+          "partNumber": "MDVU4CH/A",
+          "pickupStatus": "available"
+        },
+        {
+          "partNumber": "MDVN4CH/A",
+          "pickupStatus": "available"
+        },
+        {
+          "partNumber": "MDVF4CH/A",
+          "pickupStatus": "available"
+        },
+        {
+          "partNumber": "MDVC4CH/A",
+          "pickupStatus": "available"
+        }
+      ],
+      "retainedRetailSkus": 30
+    },
+    {
+      "familyKey": "macbook-pro-proled-xdr",
+      "url": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr",
+      "httpStatus": 200,
+      "observedAt": "2026-11-23T14:50:28.368Z",
+      "bodySha256": "fc32ee02a402ff448a2191a8dd501af791dc63f97a3326ac89b23e1b9f1dfc7d",
+      "pageTitle": "MacBook Pro (PROLED XDR 显示屏)",
+      "rootProductCount": 11,
+      "rootLinkedStandardConfigurations": 15,
+      "additionalEvidence": [
+        {
+          "partNumber": "MJ2J4CH/A",
+          "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/14-inch-silver-standard-display-apple-m5-max-chip-18-core-cpu-32-core-gpu-36gb-memory-2tb-storage",
+          "evidence": "same_verified_catalog_url_still_linked"
+        },
+        {
+          "partNumber": "MJ2X4CH/A",
+          "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/16-inch-silver-standard-display-apple-m5-max-chip-18-core-cpu-32-core-gpu-36gb-memory-2tb-storage",
+          "evidence": "same_verified_catalog_url_still_linked"
+        },
+        {
+          "partNumber": "MJ2M4CH/A",
+          "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/14-inch-space-black-standard-display-apple-m5-max-chip-18-core-cpu-32-core-gpu-36gb-memory-2tb-storage",
+          "evidence": "same_verified_catalog_url_still_linked"
+        },
+        {
+          "partNumber": "MJ2G4CH/A",
+          "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/14-inch-silver-standard-display-apple-m5-pro-chip-15-core-cpu-16-core-gpu-24gb-memory-1tb-storage",
+          "evidence": "same_verified_catalog_url_still_linked"
+        },
+        {
+          "partNumber": "MJ2Y4CH/A",
+          "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/16-inch-silver-standard-display-apple-m5-max-chip-18-core-cpu-40-core-gpu-48gb-memory-2tb-storage",
+          "evidence": "same_verified_catalog_url_still_linked"
+        },
+        {
+          "partNumber": "MJ2W4CH/A",
+          "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/16-inch-silver-standard-display-apple-m5-pro-chip-18-core-cpu-20-core-gpu-24gb-memory-1tb-storage",
+          "evidence": "same_verified_catalog_url_still_linked"
+        },
+        {
+          "partNumber": "MJ304CH/A",
+          "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/16-inch-space-black-standard-display-apple-m5-pro-chip-18-core-cpu-20-core-gpu-24gb-memory-1tb-storage",
+          "evidence": "same_verified_catalog_url_still_linked"
+        },
+        {
+          "partNumber": "MMF54CH/A",
+          "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/14-inch-silver-standard-display-apple-m5-pro-chip-18-core-cpu-20-core-gpu-48gb-memory-1tb-storage",
+          "evidence": "same_verified_catalog_url_still_linked"
+        },
+        {
+          "partNumber": "MJ314CH/A",
+          "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/16-inch-space-black-standard-display-apple-m5-max-chip-18-core-cpu-32-core-gpu-36gb-memory-2tb-storage",
+          "evidence": "same_verified_catalog_url_still_linked"
+        },
+        {
+          "partNumber": "MMF64CH/A",
+          "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/14-inch-space-black-standard-display-apple-m5-pro-chip-18-core-cpu-20-core-gpu-48gb-memory-1tb-storage",
+          "evidence": "same_verified_catalog_url_still_linked"
+        },
+        {
+          "partNumber": "MJ9X4CH/A",
+          "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/14-inch-space-black-nano-texture-display-apple-m5-pro-chip-15-core-cpu-16-core-gpu-24gb-memory-1tb-storage",
+          "evidence": "same_verified_catalog_url_still_linked"
+        },
+        {
+          "partNumber": "MMF94CH/A",
+          "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/16-inch-silver-standard-display-apple-m5-pro-chip-18-core-cpu-20-core-gpu-48gb-memory-1tb-storage",
+          "evidence": "same_verified_catalog_url_still_linked"
+        },
+        {
+          "partNumber": "MMFA4CH/A",
+          "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/16-inch-space-black-standard-display-apple-m5-pro-chip-18-core-cpu-20-core-gpu-48gb-memory-1tb-storage",
+          "evidence": "same_verified_catalog_url_still_linked"
+        },
+        {
+          "partNumber": "MJ334CH/A",
+          "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/16-inch-space-black-standard-display-apple-m5-max-chip-18-core-cpu-40-core-gpu-48gb-memory-2tb-storage",
+          "evidence": "same_verified_catalog_url_still_linked"
+        },
+        {
+          "partNumber": "MJ2K4CH/A",
+          "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro-proled-xdr/14-inch-space-black-standard-display-apple-m5-pro-chip-15-core-cpu-16-core-gpu-24gb-memory-1tb-storage",
+          "evidence": "same_verified_catalog_url_still_linked"
+        }
+      ],
+      "retainedRetailSkus": 15
+    },
+    {
+      "familyKey": "macbook-neo",
+      "url": "https://www.apple.com.cn/shop/buy-mac/macbook-neo",
+      "httpStatus": 200,
+      "observedAt": "2026-11-23T14:50:31.013Z",
+      "bodySha256": "54db359c735690e47a0c4e38372b7a4258e74a7be3b888eff6ecaf73676998c9",
+      "pageTitle": "MacBook Neo",
+      "rootProductCount": 8,
+      "rootLinkedStandardConfigurations": 8,
+      "additionalEvidence": [],
+      "retainedRetailSkus": 8
+    },
+    {
+      "familyKey": "imac",
+      "url": "https://www.apple.com.cn/shop/buy-mac/imac",
+      "httpStatus": 200,
+      "observedAt": "2026-11-23T14:50:34.924Z",
+      "bodySha256": "2fb3180a0c7daec0c733d9772c137d79384926b8102fb2f04d3d0c3b873af3df",
+      "pageTitle": "iMac",
+      "rootProductCount": 8,
+      "rootLinkedStandardConfigurations": 17,
+      "additionalEvidence": [
+        {
+          "partNumber": "MH2U4CH/A",
+          "pickupStatus": "available"
+        },
+        {
+          "partNumber": "MH1Q4CH/A",
+          "pickupStatus": "available"
+        },
+        {
+          "partNumber": "MH1J4CH/A",
+          "pickupStatus": "available"
+        },
+        {
+          "partNumber": "MH1F4CH/A",
+          "pickupStatus": "available"
+        },
+        {
+          "partNumber": "MH154CH/A",
+          "pickupStatus": "available"
+        },
+        {
+          "partNumber": "MH1R4CH/A",
+          "pickupStatus": "available"
+        },
+        {
+          "partNumber": "MH1N4CH/A",
+          "pickupStatus": "available"
+        },
+        {
+          "partNumber": "MH1G4CH/A",
+          "pickupStatus": "available"
+        },
+        {
+          "partNumber": "MH164CH/A",
+          "pickupStatus": "available"
+        }
+      ],
+      "retainedRetailSkus": 17
+    },
+    {
+      "familyKey": "mac-mini",
+      "url": "https://www.apple.com.cn/shop/buy-mac/mac-mini",
+      "httpStatus": 200,
+      "observedAt": "2026-11-23T14:50:36.615Z",
+      "bodySha256": "472b7411ccd561d95e489e970da71a7a786dd484816c352501de34430763595b",
+      "pageTitle": "Mac mini",
+      "rootProductCount": 2,
+      "rootLinkedStandardConfigurations": 6,
+      "additionalEvidence": [
+        {
+          "partNumber": "MHQN4CH/A",
+          "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/mac-mini/m5-pro-chip-15-core-cpu-16-core-gpu-24gb-memory-512gb-storage",
+          "sourceBodySha256": "e33117007418858e2bcdbec74d4942a798f4ffffac78002b0f256c8c1e0de8ba"
+        },
+        {
+          "partNumber": "MHQM4CH/A",
+          "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/mac-mini/m6-chip-12-core-cpu-12-core-gpu-24gb-memory-512gb-storage",
+          "sourceBodySha256": "baa9f29f8c3ae3442c8393f65e871f43384eb7585479b7bcce4833fcf14776e8"
+        },
+        {
+          "partNumber": "MHQK4CH/A",
+          "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/mac-mini/m6-chip-12-core-cpu-12-core-gpu-16gb-memory-256gb-storage",
+          "sourceBodySha256": "c2552af0bac75c67d0b42b389c2b5af951f7b5287045351c7fc598baf42fbad6"
+        },
+        {
+          "partNumber": "MHQL4CH/A",
+          "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/mac-mini/m6-chip-12-core-cpu-12-core-gpu-16gb-memory-512gb-storage",
+          "sourceBodySha256": "73f1b5386f93e7fcb81cfec30adac258ed98d230f690896c8ca86062234b3f7c"
+        },
+        {
+          "partNumber": "MHQU4CH/A",
+          "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/mac-mini/m5-pro-chip-18-core-cpu-20-core-gpu-64gb-memory-1tb-storage",
+          "sourceBodySha256": "f0100457883cfc6d6ae6fb59b3e44050abe26465c085f56efb1102616de97d26"
+        },
+        {
+          "partNumber": "MHQV4CH/A",
+          "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/mac-mini/m6-chip-12-core-cpu-12-core-gpu-32gb-memory-1tb-storage",
+          "sourceBodySha256": "c8a2d6a78e5b07f86ded86c9e2e6c50639feea013ca044eba582f564d06f45dd"
+        }
+      ],
+      "retainedRetailSkus": 6
+    },
+    {
+      "familyKey": "mac-studio",
+      "url": "https://www.apple.com.cn/shop/buy-mac/mac-studio",
+      "httpStatus": 200,
+      "observedAt": "2026-11-23T14:50:38.306Z",
+      "bodySha256": "9180a8ddaddb22b8ead2aba061a7d0612bf9696a1d60f0b29928f4ffd60c7b4f",
+      "pageTitle": "Mac Studio",
+      "rootProductCount": 2,
+      "rootLinkedStandardConfigurations": 3,
+      "additionalEvidence": [
+        {
+          "partNumber": "MHQJ4CH/A",
+          "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/mac-studio/m5-max-chip-18-core-cpu-40-core-gpu-64gb-memory-1tb-storage",
+          "sourceBodySha256": "11c24405c799cc40a16725beb2279eec7584e2f2a3ed0c8a572f97456c4b91b9"
+        }
+      ],
+      "retainedRetailSkus": 3
+    },
+    {
+      "familyKey": "airpods-pro-3",
+      "url": "https://www.apple.com.cn/shop/buy-airpods/airpods-pro-3",
+      "httpStatus": 200,
+      "observedAt": "2026-11-23T14:50:40.023Z",
+      "bodySha256": "9cda8126259aa127036a834fb2fd652486f40df2b78b9b95ba85de223d179758",
+      "pageTitle": "AirPods Pro 3",
+      "rootProductCount": 1,
+      "retainedRetailSkus": 1
+    },
+    {
+      "familyKey": "airpods-5",
+      "url": "https://www.apple.com.cn/shop/buy-airpods/airpods-5",
+      "httpStatus": 200,
+      "observedAt": "2026-11-23T14:50:41.742Z",
+      "bodySha256": "5d47ec744391533c2ca13b8b54cd317f563a763ffffd03ee65b054afd9aa0f0a",
+      "pageTitle": "AirPods 5",
+      "rootProductCount": 2,
+      "retainedRetailSkus": 2
+    },
+    {
+      "familyKey": "airpods-max-2",
+      "url": "https://www.apple.com.cn/shop/buy-airpods/airpods-max-2",
+      "httpStatus": 200,
+      "observedAt": "2026-11-23T14:50:43.656Z",
+      "bodySha256": "490999ea21212d49e6241cd9bd6fe39a554c78e713f5de26f9eb56f58749e5f7",
+      "pageTitle": "AirPods Max 2",
+      "rootProductCount": 5,
+      "retainedRetailSkus": 5
+    },
+    {
+      "familyKey": "apple-vision-pro",
+      "url": "https://www.apple.com.cn/shop/buy-vision/apple-vision-pro",
+      "httpStatus": 200,
+      "observedAt": "2026-11-23T14:50:45.343Z",
+      "bodySha256": "6b3ea101ee2750daae4184db276072d18c67ffa7ae67490406420fa7701b0fd0",
+      "pageTitle": "Apple Vision Pro",
+      "rootProductCount": 3,
+      "retainedRetailSkus": 3
+    },
+    {
+      "familyKey": "homepod",
+      "url": "https://www.apple.com.cn/shop/buy-homepod/homepod",
+      "httpStatus": 200,
+      "observedAt": "2026-11-23T14:50:47.487Z",
+      "bodySha256": "6b034c3779c0e7f523e86bac2a1393a954295bd2edee58564510d70bb543ba82",
+      "pageTitle": "HomePod",
+      "rootProductCount": 2,
+      "retainedRetailSkus": 2
+    }
+  ],
+  "pickupEvidence": "../../pickup-samples/2026-11-23/mainland-retirement.json"
+}

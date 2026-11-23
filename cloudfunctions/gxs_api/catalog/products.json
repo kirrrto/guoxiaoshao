@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "kind": "apple-product-target-catalog-cn",
-  "generatedAt": "2026-11-06T06:21:08.909Z",
+  "generatedAt": "2026-11-23T14:53:54.847Z",
   "note": "中国大陆官网标准零售 SKU 与逐项核实的 Mac Studio 定制配置。CTO_ 编号是完整官方配置的稳定内部身份，不是零售货号；官网定制 Mac 不支持 Apple Store 店内取货，定制项仅作配置参考，不参与取货查询或自动关注。",
   "families": [
     {
@@ -297,24 +297,6 @@
     },
     {
       "category": "ipad",
-      "familyKey": "ipad-10-2",
-      "displayName": "iPad (10.2 英寸)",
-      "url": "https://www.apple.com.cn/shop/buy-ipad/ipad-10-2",
-      "include": true,
-      "supported": false,
-      "reason": "http_301",
-      "productCount": 0,
-      "pickupVerification": {
-        "checkedAt": "2026-09-15T03:04:32.095Z",
-        "storeNumber": "R577",
-        "sampledPartNumber": null,
-        "status": "not_sampled",
-        "reason": null,
-        "verified": false
-      }
-    },
-    {
-      "category": "ipad",
       "familyKey": "ipad-mini",
       "displayName": "iPad mini",
       "url": "https://www.apple.com.cn/shop/buy-ipad/ipad-mini",
@@ -463,29 +445,42 @@
         "processor-dimensionChip",
         "processor-dimensionChip-cpuCoreCount-gpuCoreCount"
       ],
-      "productCount": 24,
+      "productCount": 15,
       "ctoOnlyBases": 19,
       "models": [
         "MacBook Pro 14 英寸",
         "MacBook Pro 16 英寸"
       ],
-      "fetchedAt": "2026-10-28T01:57:45.228Z",
-      "sha256": "45a93ed245c73d7c91035611d07322f8723ec5172fe1cb793215735d88d7f60c",
+      "fetchedAt": "2026-11-23T14:49:50.293Z",
+      "sha256": "093eefc7bef0417099bd9a4217bdaef369c0b2c6e4d6657a89b6640784da5c0a",
       "releaseDate": "2026-10-27",
       "releaseSourceUrl": "https://www.apple.com.cn/newsroom/2026/10/apple-introduces-the-new-14-inch-macbook-pro-with-m6/",
       "pickupVerification": {
-        "checkedAt": "2026-10-28T02:05:33.833Z",
+        "checkedAt": "2026-11-23T14:53:23.045Z",
         "storeNumber": "R577",
         "sampledPartNumber": "MHWT4CH/A",
+        "status": "available",
+        "reason": null,
+        "verified": true,
         "sampledPartNumbers": [
           "MHWT4CH/A",
           "MHWW4CH/A",
-          "MJ2C4CH/A"
-        ],
-        "status": "ineligible",
-        "reason": null,
-        "verified": true
-      }
+          "MJ2C4CH/A",
+          "MHWU4CH/A",
+          "MHWX4CH/A",
+          "MHWV4CH/A",
+          "MHWY4CH/A",
+          "MGDR4CH/A",
+          "MGDN4CH/A",
+          "MGDU4CH/A",
+          "MGDQ4CH/A",
+          "MMFM4CH/A",
+          "MMFN4CH/A",
+          "MMFJ4CH/A",
+          "MMFK4CH/A"
+        ]
+      },
+      "pickupVerificationScope": "sku"
     },
     {
       "category": "mac",
@@ -857,35 +852,6 @@
     },
     {
       "category": "homepod",
-      "familyKey": "homepod-mini",
-      "displayName": "HomePod mini",
-      "url": "https://www.apple.com.cn/shop/buy-homepod/homepod-mini",
-      "include": true,
-      "supported": true,
-      "reason": null,
-      "layout": "selector",
-      "pageTitle": "HomePod mini",
-      "dimensions": [
-        "dimensionColor"
-      ],
-      "productCount": 5,
-      "ctoOnlyBases": 0,
-      "models": [
-        "HomePod mini"
-      ],
-      "fetchedAt": "2026-09-15T02:53:59.476Z",
-      "sha256": "334768716068931ec44df6e14e3d5bade5141ecbfe846f2b98263a9f1c979a5d",
-      "pickupVerification": {
-        "checkedAt": "2026-09-15T03:04:32.095Z",
-        "storeNumber": "R577",
-        "sampledPartNumber": "MJ2J3CH/A",
-        "status": "unavailable",
-        "reason": null,
-        "verified": true
-      }
-    },
-    {
-      "category": "homepod",
       "familyKey": "homepod-mini-2",
       "displayName": "HomePod mini 2",
       "url": "https://www.apple.com.cn/shop/buy-homepod/homepod-mini",
@@ -973,9 +939,23 @@
       "displayName": "Apple Watch Hermès Ultra",
       "url": "https://www.apple.com.cn/shop/buy-watch/apple-watch-hermes-ultra",
       "excludeReason": "特别版本，首版不纳入"
+    },
+    {
+      "category": "ipad",
+      "familyKey": "ipad-10-2",
+      "displayName": "iPad (10.2 英寸)",
+      "url": "https://www.apple.com.cn/shop/buy-ipad/ipad-10-2",
+      "excludeReason": "原购买页已永久跳转至 iPad 分类页，没有可供选配的商品。"
+    },
+    {
+      "category": "homepod",
+      "familyKey": "homepod-mini",
+      "displayName": "HomePod mini",
+      "url": "https://www.apple.com.cn/shop/buy-homepod/homepod-mini",
+      "excludeReason": "官网购买页只列 HomePod mini 2 的五款货号，第一代已退出在售目录。"
     }
   ],
-  "count": 397,
+  "count": 383,
   "products": [
     {
       "partNumber": "MJYH4CH/A",
@@ -12625,7 +12605,7 @@
       "upstreamContainer": "RO_MBP_M6_14INCH_SPACEBLACK_BET_BES_ULT_2026",
       "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro",
       "upstreamTitle": "14 英寸 MacBook Pro - 深空黑色",
-      "upstreamTitleCheckedAt": "2026-10-28T02:05:33.833Z",
+      "upstreamTitleCheckedAt": "2026-11-23T14:53:23.045Z",
       "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-summary-select-202610-14inch-spaceblack?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0MlllLy9mUUZibXJtaURkcVBmZXl6SVhMNEtUU24xZENXTzcvK0NLTmNHR3FUbGFVTWR0Ti93a3VSRzN5cEpVUnl6S3hTY3gyZUhtbmsvOWVKOWJVV3RybkIybk5RZmlyRnNkQjBrajdkK0xuSG1ZcEJ0aXBsSUdYZUdaU0svM2pB&traceId=1",
       "imageAlt": "深空黑色 14 英寸 MacBook Pro，呈打开状态，内部视图，展示细窄的黑色显示屏边框、圆角设计和凸出的垫脚。深空黑色，呈闭合状态，左侧外观，展示纤薄机身外形、MagSafe 3 端口、两个雷雳 5 端口以及耳机插孔。深空黑色，呈闭合状态，右侧外观，展示纤薄机身外形、SDXC 卡插槽、雷雳 5 端口和 HDMI 端口。深空黑色，顶面俯视外观，展示圆角设计以及机身中央的黑色亮面 Apple 标志。",
       "imageWidth": 5120,
@@ -12637,6 +12617,14 @@
       "imageMatchDimensions": {
         "chassis-dimensionScreensize": "14inch",
         "chassis-dimensionColor": "spaceblack"
+      },
+      "pickupVerification": {
+        "checkedAt": "2026-11-23T14:53:23.045Z",
+        "storeNumber": "R577",
+        "sampledPartNumber": "MHWT4CH/A",
+        "status": "available",
+        "reason": null,
+        "verified": true
       }
     },
     {
@@ -12676,7 +12664,7 @@
       "upstreamContainer": "RO_MBP_M6_14INCH_SILVER_BET_BES_ULT_2026",
       "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro",
       "upstreamTitle": "14 英寸 MacBook Pro - 银色",
-      "upstreamTitleCheckedAt": "2026-10-28T02:05:33.833Z",
+      "upstreamTitleCheckedAt": "2026-11-23T14:53:23.045Z",
       "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-summary-select-202610-14inch-silver?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0MlllLy9mUUZibXJtaURkcVBmZXl6SWNoZVhpRkJSdlIvL2hEMTMybU9ocTA0NlFNZVBLdlJNcjRha3NVaFYxSG54TS9QOFlhVHZoV2xFZjU3V3B4aXVxVTZXZmg4WmZLbzB1RGYzRzRjYUZkclVOTnFnQW4rSWEvbldNb1dlYitn&traceId=1",
       "imageAlt": "银色 14 英寸 MacBook Pro，呈打开状态，内部视图，展示细窄的黑色显示屏边框、圆角设计和凸出的垫脚。银色，呈闭合状态，左侧外观，展示纤薄机身外形、MagSafe 3 端口、两个雷雳 5 端口以及耳机插孔。银色，呈闭合状态，右侧外观，展示纤薄机身外形、SDXC 卡插槽、雷雳 5 端口和 HDMI 端口。银色，顶面俯视外观，展示圆角设计以及机身中央的黑色亮面 Apple 标志。",
       "imageWidth": 5120,
@@ -12688,6 +12676,14 @@
       "imageMatchDimensions": {
         "chassis-dimensionScreensize": "14inch",
         "chassis-dimensionColor": "silver"
+      },
+      "pickupVerification": {
+        "checkedAt": "2026-11-23T14:53:23.045Z",
+        "storeNumber": "R577",
+        "sampledPartNumber": "MHWW4CH/A",
+        "status": "available",
+        "reason": null,
+        "verified": true
       }
     },
     {
@@ -12727,7 +12723,7 @@
       "upstreamContainer": "RO_MBP_M6_14INCH_SPACEBLACK_BET_BES_ULT_2026",
       "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro",
       "upstreamTitle": "14 英寸 MacBook Pro - 深空黑色",
-      "upstreamTitleCheckedAt": "2026-10-28T02:05:33.833Z",
+      "upstreamTitleCheckedAt": "2026-11-23T14:53:19.125Z",
       "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-summary-select-202610-14inch-spaceblack?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0MlllLy9mUUZibXJtaURkcVBmZXl6SVhMNEtUU24xZENXTzcvK0NLTmNHR3FUbGFVTWR0Ti93a3VSRzN5cEpVUnl6S3hTY3gyZUhtbmsvOWVKOWJVV3RybkIybk5RZmlyRnNkQjBrajdkK0xuSG1ZcEJ0aXBsSUdYZUdaU0svM2pB&traceId=1",
       "imageAlt": "深空黑色 14 英寸 MacBook Pro，呈打开状态，内部视图，展示细窄的黑色显示屏边框、圆角设计和凸出的垫脚。深空黑色，呈闭合状态，左侧外观，展示纤薄机身外形、MagSafe 3 端口、两个雷雳 5 端口以及耳机插孔。深空黑色，呈闭合状态，右侧外观，展示纤薄机身外形、SDXC 卡插槽、雷雳 5 端口和 HDMI 端口。深空黑色，顶面俯视外观，展示圆角设计以及机身中央的黑色亮面 Apple 标志。",
       "imageWidth": 5120,
@@ -12739,6 +12735,14 @@
       "imageMatchDimensions": {
         "chassis-dimensionScreensize": "14inch",
         "chassis-dimensionColor": "spaceblack"
+      },
+      "pickupVerification": {
+        "checkedAt": "2026-11-23T14:53:19.125Z",
+        "storeNumber": "R577",
+        "sampledPartNumber": "MJ2C4CH/A",
+        "status": "available",
+        "reason": null,
+        "verified": true
       }
     },
     {
@@ -12788,7 +12792,17 @@
       "imageMatchDimensions": {
         "chassis-dimensionScreensize": "14inch",
         "chassis-dimensionColor": "spaceblack"
-      }
+      },
+      "pickupVerification": {
+        "checkedAt": "2026-11-23T14:53:19.125Z",
+        "storeNumber": "R577",
+        "sampledPartNumber": "MHWU4CH/A",
+        "status": "available",
+        "reason": null,
+        "verified": true
+      },
+      "upstreamTitle": "14 英寸 MacBook Pro - 深空黑色",
+      "upstreamTitleCheckedAt": "2026-11-23T14:53:19.125Z"
     },
     {
       "partNumber": "MHWX4CH/A",
@@ -12837,7 +12851,17 @@
       "imageMatchDimensions": {
         "chassis-dimensionScreensize": "14inch",
         "chassis-dimensionColor": "silver"
-      }
+      },
+      "pickupVerification": {
+        "checkedAt": "2026-11-23T14:53:19.125Z",
+        "storeNumber": "R577",
+        "sampledPartNumber": "MHWX4CH/A",
+        "status": "available",
+        "reason": null,
+        "verified": true
+      },
+      "upstreamTitle": "14 英寸 MacBook Pro - 银色",
+      "upstreamTitleCheckedAt": "2026-11-23T14:53:19.125Z"
     },
     {
       "partNumber": "MHWV4CH/A",
@@ -12886,7 +12910,17 @@
       "imageMatchDimensions": {
         "chassis-dimensionScreensize": "14inch",
         "chassis-dimensionColor": "spaceblack"
-      }
+      },
+      "pickupVerification": {
+        "checkedAt": "2026-11-23T14:53:23.045Z",
+        "storeNumber": "R577",
+        "sampledPartNumber": "MHWV4CH/A",
+        "status": "available",
+        "reason": null,
+        "verified": true
+      },
+      "upstreamTitle": "14 英寸 MacBook Pro - 深空黑色",
+      "upstreamTitleCheckedAt": "2026-11-23T14:53:23.045Z"
     },
     {
       "partNumber": "MHWY4CH/A",
@@ -12935,7 +12969,17 @@
       "imageMatchDimensions": {
         "chassis-dimensionScreensize": "14inch",
         "chassis-dimensionColor": "silver"
-      }
+      },
+      "pickupVerification": {
+        "checkedAt": "2026-11-23T14:53:23.045Z",
+        "storeNumber": "R577",
+        "sampledPartNumber": "MHWY4CH/A",
+        "status": "available",
+        "reason": null,
+        "verified": true
+      },
+      "upstreamTitle": "14 英寸 MacBook Pro - 银色",
+      "upstreamTitleCheckedAt": "2026-11-23T14:53:23.045Z"
     },
     {
       "partNumber": "MGDR4CH/A",
@@ -12975,7 +13019,7 @@
       "upstreamContainer": "RO_MBP_M5PRO_M5MAX_14INCH_SPACEBLACK_BT_BS_UT_2026",
       "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro",
       "upstreamTitle": "14 英寸 MacBook Pro - 深空黑色",
-      "upstreamTitleCheckedAt": "2026-09-15T03:02:23.190Z",
+      "upstreamTitleCheckedAt": "2026-11-23T14:53:19.125Z",
       "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-summary-select-202610-14inch-spaceblack?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0MlllLy9mUUZibXJtaURkcVBmZXl6SVhMNEtUU24xZENXTzcvK0NLTmNHR3FUbGFVTWR0Ti93a3VSRzN5cEpVUnl6S3hTY3gyZUhtbmsvOWVKOWJVV3RybkIybk5RZmlyRnNkQjBrajdkK0xuSG1ZcEJ0aXBsSUdYZUdaU0svM2pB&traceId=1",
       "imageAlt": "深空黑色 14 英寸 MacBook Pro，呈打开状态，内部视图，展示细窄的黑色显示屏边框、圆角设计和凸出的垫脚。深空黑色，呈闭合状态，左侧外观，展示纤薄机身外形、MagSafe 3 端口、两个雷雳 5 端口以及耳机插孔。深空黑色，呈闭合状态，右侧外观，展示纤薄机身外形、SDXC 卡插槽、雷雳 5 端口和 HDMI 端口。深空黑色，顶面俯视外观，展示圆角设计以及机身中央的黑色亮面 Apple 标志。",
       "imageWidth": 5120,
@@ -12987,6 +13031,14 @@
       "imageMatchDimensions": {
         "chassis-dimensionScreensize": "14inch",
         "chassis-dimensionColor": "spaceblack"
+      },
+      "pickupVerification": {
+        "checkedAt": "2026-11-23T14:53:19.125Z",
+        "storeNumber": "R577",
+        "sampledPartNumber": "MGDR4CH/A",
+        "status": "available",
+        "reason": null,
+        "verified": true
       }
     },
     {
@@ -13037,257 +13089,17 @@
       "imageMatchDimensions": {
         "chassis-dimensionScreensize": "14inch",
         "chassis-dimensionColor": "silver"
-      }
-    },
-    {
-      "partNumber": "MJLW4CH/A",
-      "basePartNumber": "MJLW4",
-      "category": "mac",
-      "familyKey": "macbook-pro",
-      "familySlug": "macbook-pro",
-      "model": "MacBook Pro 14 英寸",
-      "title": "MacBook Pro 14 英寸 M5 Pro 15核CPU/16核GPU 24GB 2TB 标准显示屏 深空黑色",
-      "titleSource": "page_labels",
-      "englishName": "14-inch MacBook Pro - Space Black",
-      "attributes": {
-        "screensize": "14 英寸",
-        "screensizeDetail": "可选配 M6、M5 Pro 或 M5 Max 芯片。",
-        "color": "深空黑色",
-        "finish": "标准显示屏",
-        "finishDetail": "采用低反射率设计，可减少使用环境中的屏幕眩光。",
-        "chipName": "M5 Pro",
-        "chipNameDetail": "带来更出色的性能表现，还可选配更大的内存，可胜任更高难度的工作任务。",
-        "chip": "15核CPU/16核GPU",
-        "chipDetail": "15 核中央处理器、16 核图形处理器",
-        "memory": "24GB",
-        "capacity": "2TB"
       },
-      "dimensionValues": {
-        "chassis-dimensionColor": "spaceblack",
-        "processor-dimensionChip": "m5pro",
-        "processor-dimensionChip-cpuCoreCount-gpuCoreCount": "m5pro-15-16",
-        "display-dimensionFinish": "standard",
-        "chassis-dimensionScreensize": "14inch",
-        "storage-dimensionCapacity": "2tb",
-        "memory-dimensionMemory": "24gb"
+      "pickupVerification": {
+        "checkedAt": "2026-11-23T14:53:25.670Z",
+        "storeNumber": "R577",
+        "sampledPartNumber": "MGDN4CH/A",
+        "status": "available",
+        "reason": null,
+        "verified": true
       },
-      "priceCny": 23749,
-      "comingSoon": false,
-      "isCarrierDevice": false,
-      "upstreamContainer": "RO_MBP_M6_14INCH_SPACEBLACK_BET_BES_ULT_2026",
-      "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro",
-      "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-summary-select-202610-14inch-spaceblack?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0MlllLy9mUUZibXJtaURkcVBmZXl6SVhMNEtUU24xZENXTzcvK0NLTmNHR3FUbGFVTWR0Ti93a3VSRzN5cEpVUnl6S3hTY3gyZUhtbmsvOWVKOWJVV3RybkIybk5RZmlyRnNkQjBrajdkK0xuSG1ZcEJ0aXBsSUdYZUdaU0svM2pB&traceId=1",
-      "imageAlt": "深空黑色 14 英寸 MacBook Pro，呈打开状态，内部视图，展示细窄的黑色显示屏边框、圆角设计和凸出的垫脚。深空黑色，呈闭合状态，左侧外观，展示纤薄机身外形、MagSafe 3 端口、两个雷雳 5 端口以及耳机插孔。深空黑色，呈闭合状态，右侧外观，展示纤薄机身外形、SDXC 卡插槽、雷雳 5 端口和 HDMI 端口。深空黑色，顶面俯视外观，展示圆角设计以及机身中央的黑色亮面 Apple 标志。",
-      "imageWidth": 5120,
-      "imageHeight": 3280,
-      "imageKey": "mac-macbook-pro-summary-select-202610-14inch-spaceblack",
-      "imageSource": "apple-gallery",
-      "imageSourceUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_pro%2Fselect&dm.chassis-dimensionColor=spaceblack&dm.processor-dimensionChip=m5pro&dm.processor-dimensionChip-cpuCoreCount-gpuCoreCount=m5pro-15-16&dm.display-dimensionFinish=standard&dm.chassis-dimensionScreensize=14inch",
-      "imageOriginalUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-summary-select-202610-14inch-spaceblack?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0MlllLy9mUUZibXJtaURkcVBmZXl6SVhMNEtUU24xZENXTzcvK0NLTmNHR3FUbGFVTWR0Ti93a3VSRzN5cEpVUnl6S3hTY3gyZUhtbmsvOWVKOWJVV3RybkIybk5RZmlyRnNkQjBrajdkK0xuSG1ZcEJ0aXBsSUdYZUdaU0svM2pB&traceId=1",
-      "imageMatchDimensions": {
-        "chassis-dimensionScreensize": "14inch",
-        "chassis-dimensionColor": "spaceblack"
-      }
-    },
-    {
-      "partNumber": "MJLV4CH/A",
-      "basePartNumber": "MJLV4",
-      "category": "mac",
-      "familyKey": "macbook-pro",
-      "familySlug": "macbook-pro",
-      "model": "MacBook Pro 14 英寸",
-      "title": "MacBook Pro 14 英寸 M5 Pro 15核CPU/16核GPU 24GB 2TB 标准显示屏 银色",
-      "titleSource": "page_labels",
-      "englishName": "14-inch MacBook Pro - Silver",
-      "attributes": {
-        "screensize": "14 英寸",
-        "screensizeDetail": "可选配 M6、M5 Pro 或 M5 Max 芯片。",
-        "color": "银色",
-        "finish": "标准显示屏",
-        "finishDetail": "采用低反射率设计，可减少使用环境中的屏幕眩光。",
-        "chipName": "M5 Pro",
-        "chipNameDetail": "带来更出色的性能表现，还可选配更大的内存，可胜任更高难度的工作任务。",
-        "chip": "15核CPU/16核GPU",
-        "chipDetail": "15 核中央处理器、16 核图形处理器",
-        "memory": "24GB",
-        "capacity": "2TB"
-      },
-      "dimensionValues": {
-        "chassis-dimensionColor": "silver",
-        "processor-dimensionChip": "m5pro",
-        "processor-dimensionChip-cpuCoreCount-gpuCoreCount": "m5pro-15-16",
-        "display-dimensionFinish": "standard",
-        "chassis-dimensionScreensize": "14inch",
-        "storage-dimensionCapacity": "2tb",
-        "memory-dimensionMemory": "24gb"
-      },
-      "priceCny": 23749,
-      "comingSoon": false,
-      "isCarrierDevice": false,
-      "upstreamContainer": "RO_MBP_M6_14INCH_SILVER_BET_BES_ULT_2026",
-      "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro",
-      "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-summary-select-202610-14inch-silver?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0MlllLy9mUUZibXJtaURkcVBmZXl6SWNoZVhpRkJSdlIvL2hEMTMybU9ocTA0NlFNZVBLdlJNcjRha3NVaFYxSG54TS9QOFlhVHZoV2xFZjU3V3B4aXVxVTZXZmg4WmZLbzB1RGYzRzRjYUZkclVOTnFnQW4rSWEvbldNb1dlYitn&traceId=1",
-      "imageAlt": "银色 14 英寸 MacBook Pro，呈打开状态，内部视图，展示细窄的黑色显示屏边框、圆角设计和凸出的垫脚。银色，呈闭合状态，左侧外观，展示纤薄机身外形、MagSafe 3 端口、两个雷雳 5 端口以及耳机插孔。银色，呈闭合状态，右侧外观，展示纤薄机身外形、SDXC 卡插槽、雷雳 5 端口和 HDMI 端口。银色，顶面俯视外观，展示圆角设计以及机身中央的黑色亮面 Apple 标志。",
-      "imageWidth": 5120,
-      "imageHeight": 3280,
-      "imageKey": "mac-macbook-pro-summary-select-202610-14inch-silver",
-      "imageSource": "apple-gallery",
-      "imageSourceUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_pro%2Fselect&dm.chassis-dimensionColor=silver&dm.processor-dimensionChip=m6&dm.processor-dimensionChip-cpuCoreCount-gpuCoreCount=m6-12-12&dm.display-dimensionFinish=standard&dm.chassis-dimensionScreensize=14inch",
-      "imageOriginalUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-summary-select-202610-14inch-silver?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0MlllLy9mUUZibXJtaURkcVBmZXl6SWNoZVhpRkJSdlIvL2hEMTMybU9ocTA0NlFNZVBLdlJNcjRha3NVaFYxSG54TS9QOFlhVHZoV2xFZjU3V3B4aXVxVTZXZmg4WmZLbzB1RGYzRzRjYUZkclVOTnFnQW4rSWEvbldNb1dlYitn&traceId=1",
-      "imageMatchDimensions": {
-        "chassis-dimensionScreensize": "14inch",
-        "chassis-dimensionColor": "silver"
-      }
-    },
-    {
-      "partNumber": "MGDT4CH/A",
-      "basePartNumber": "MGDT4",
-      "category": "mac",
-      "familyKey": "macbook-pro",
-      "familySlug": "macbook-pro",
-      "model": "MacBook Pro 14 英寸",
-      "title": "MacBook Pro 14 英寸 M5 Pro 18核CPU/20核GPU 24GB 2TB 标准显示屏 深空黑色",
-      "titleSource": "page_labels",
-      "englishName": "14-inch MacBook Pro - Space Black",
-      "attributes": {
-        "screensize": "14 英寸",
-        "screensizeDetail": "可选配 M6、M5 Pro 或 M5 Max 芯片。",
-        "color": "深空黑色",
-        "finish": "标准显示屏",
-        "finishDetail": "采用低反射率设计，可减少使用环境中的屏幕眩光。",
-        "chipName": "M5 Pro",
-        "chipNameDetail": "带来更出色的性能表现，还可选配更大的内存，可胜任更高难度的工作任务。",
-        "chip": "18核CPU/20核GPU",
-        "chipDetail": "处理性能和图形渲染速度进一步提升，可胜任游戏、编程和创意工作等繁重任务。",
-        "memory": "24GB",
-        "capacity": "2TB"
-      },
-      "dimensionValues": {
-        "chassis-dimensionColor": "spaceblack",
-        "processor-dimensionChip": "m5pro",
-        "processor-dimensionChip-cpuCoreCount-gpuCoreCount": "m5pro-18-20",
-        "display-dimensionFinish": "standard",
-        "chassis-dimensionScreensize": "14inch",
-        "storage-dimensionCapacity": "2tb",
-        "memory-dimensionMemory": "24gb"
-      },
-      "priceCny": 25999,
-      "comingSoon": false,
-      "isCarrierDevice": false,
-      "upstreamContainer": "RO_MBP_M6_14INCH_SPACEBLACK_BET_BES_ULT_2026",
-      "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro",
-      "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-summary-select-202610-14inch-spaceblack?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0MlllLy9mUUZibXJtaURkcVBmZXl6SVhMNEtUU24xZENXTzcvK0NLTmNHR3FUbGFVTWR0Ti93a3VSRzN5cEpVUnl6S3hTY3gyZUhtbmsvOWVKOWJVV3RybkIybk5RZmlyRnNkQjBrajdkK0xuSG1ZcEJ0aXBsSUdYZUdaU0svM2pB&traceId=1",
-      "imageAlt": "深空黑色 14 英寸 MacBook Pro，呈打开状态，内部视图，展示细窄的黑色显示屏边框、圆角设计和凸出的垫脚。深空黑色，呈闭合状态，左侧外观，展示纤薄机身外形、MagSafe 3 端口、两个雷雳 5 端口以及耳机插孔。深空黑色，呈闭合状态，右侧外观，展示纤薄机身外形、SDXC 卡插槽、雷雳 5 端口和 HDMI 端口。深空黑色，顶面俯视外观，展示圆角设计以及机身中央的黑色亮面 Apple 标志。",
-      "imageWidth": 5120,
-      "imageHeight": 3280,
-      "imageKey": "mac-macbook-pro-summary-select-202610-14inch-spaceblack",
-      "imageSource": "apple-gallery",
-      "imageSourceUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_pro%2Fselect&dm.chassis-dimensionColor=spaceblack&dm.processor-dimensionChip=m5pro&dm.processor-dimensionChip-cpuCoreCount-gpuCoreCount=m5pro-15-16&dm.display-dimensionFinish=standard&dm.chassis-dimensionScreensize=14inch",
-      "imageOriginalUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-summary-select-202610-14inch-spaceblack?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0MlllLy9mUUZibXJtaURkcVBmZXl6SVhMNEtUU24xZENXTzcvK0NLTmNHR3FUbGFVTWR0Ti93a3VSRzN5cEpVUnl6S3hTY3gyZUhtbmsvOWVKOWJVV3RybkIybk5RZmlyRnNkQjBrajdkK0xuSG1ZcEJ0aXBsSUdYZUdaU0svM2pB&traceId=1",
-      "imageMatchDimensions": {
-        "chassis-dimensionScreensize": "14inch",
-        "chassis-dimensionColor": "spaceblack"
-      }
-    },
-    {
-      "partNumber": "MGDP4CH/A",
-      "basePartNumber": "MGDP4",
-      "category": "mac",
-      "familyKey": "macbook-pro",
-      "familySlug": "macbook-pro",
-      "model": "MacBook Pro 14 英寸",
-      "title": "MacBook Pro 14 英寸 M5 Pro 18核CPU/20核GPU 24GB 2TB 标准显示屏 银色",
-      "titleSource": "page_labels",
-      "englishName": "14-inch MacBook Pro - Silver",
-      "attributes": {
-        "screensize": "14 英寸",
-        "screensizeDetail": "可选配 M6、M5 Pro 或 M5 Max 芯片。",
-        "color": "银色",
-        "finish": "标准显示屏",
-        "finishDetail": "采用低反射率设计，可减少使用环境中的屏幕眩光。",
-        "chipName": "M5 Pro",
-        "chipNameDetail": "带来更出色的性能表现，还可选配更大的内存，可胜任更高难度的工作任务。",
-        "chip": "18核CPU/20核GPU",
-        "chipDetail": "处理性能和图形渲染速度进一步提升，可胜任游戏、编程和创意工作等繁重任务。",
-        "memory": "24GB",
-        "capacity": "2TB"
-      },
-      "dimensionValues": {
-        "chassis-dimensionColor": "silver",
-        "processor-dimensionChip": "m5pro",
-        "processor-dimensionChip-cpuCoreCount-gpuCoreCount": "m5pro-18-20",
-        "display-dimensionFinish": "standard",
-        "chassis-dimensionScreensize": "14inch",
-        "storage-dimensionCapacity": "2tb",
-        "memory-dimensionMemory": "24gb"
-      },
-      "priceCny": 25999,
-      "comingSoon": false,
-      "isCarrierDevice": false,
-      "upstreamContainer": "RO_MBP_M6_14INCH_SILVER_BET_BES_ULT_2026",
-      "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro",
-      "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-summary-select-202610-14inch-silver?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0MlllLy9mUUZibXJtaURkcVBmZXl6SWNoZVhpRkJSdlIvL2hEMTMybU9ocTA0NlFNZVBLdlJNcjRha3NVaFYxSG54TS9QOFlhVHZoV2xFZjU3V3B4aXVxVTZXZmg4WmZLbzB1RGYzRzRjYUZkclVOTnFnQW4rSWEvbldNb1dlYitn&traceId=1",
-      "imageAlt": "银色 14 英寸 MacBook Pro，呈打开状态，内部视图，展示细窄的黑色显示屏边框、圆角设计和凸出的垫脚。银色，呈闭合状态，左侧外观，展示纤薄机身外形、MagSafe 3 端口、两个雷雳 5 端口以及耳机插孔。银色，呈闭合状态，右侧外观，展示纤薄机身外形、SDXC 卡插槽、雷雳 5 端口和 HDMI 端口。银色，顶面俯视外观，展示圆角设计以及机身中央的黑色亮面 Apple 标志。",
-      "imageWidth": 5120,
-      "imageHeight": 3280,
-      "imageKey": "mac-macbook-pro-summary-select-202610-14inch-silver",
-      "imageSource": "apple-gallery",
-      "imageSourceUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_pro%2Fselect&dm.chassis-dimensionColor=silver&dm.processor-dimensionChip=m6&dm.processor-dimensionChip-cpuCoreCount-gpuCoreCount=m6-12-12&dm.display-dimensionFinish=standard&dm.chassis-dimensionScreensize=14inch",
-      "imageOriginalUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-summary-select-202610-14inch-silver?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0MlllLy9mUUZibXJtaURkcVBmZXl6SWNoZVhpRkJSdlIvL2hEMTMybU9ocTA0NlFNZVBLdlJNcjRha3NVaFYxSG54TS9QOFlhVHZoV2xFZjU3V3B4aXVxVTZXZmg4WmZLbzB1RGYzRzRjYUZkclVOTnFnQW4rSWEvbldNb1dlYitn&traceId=1",
-      "imageMatchDimensions": {
-        "chassis-dimensionScreensize": "14inch",
-        "chassis-dimensionColor": "silver"
-      }
-    },
-    {
-      "partNumber": "MGXX4CH/A",
-      "basePartNumber": "MGXX4",
-      "category": "mac",
-      "familyKey": "macbook-pro",
-      "familySlug": "macbook-pro",
-      "model": "MacBook Pro 14 英寸",
-      "title": "MacBook Pro 14 英寸 M5 Pro 18核CPU/20核GPU 48GB 2TB 纳米纹理显示屏 深空黑色",
-      "titleSource": "page_labels",
-      "englishName": "14-inch MacBook Pro - Space Black",
-      "attributes": {
-        "screensize": "14 英寸",
-        "screensizeDetail": "可选配 M6、M5 Pro 或 M5 Max 芯片。",
-        "color": "深空黑色",
-        "finish": "纳米纹理显示屏",
-        "finishDetail": "进一步减少明亮光线下的屏幕反光和眩光。",
-        "chipName": "M5 Pro",
-        "chipNameDetail": "带来更出色的性能表现，还可选配更大的内存，可胜任更高难度的工作任务。",
-        "chip": "18核CPU/20核GPU",
-        "chipDetail": "处理性能和图形渲染速度进一步提升，可胜任游戏、编程和创意工作等繁重任务。",
-        "memory": "48GB",
-        "capacity": "2TB"
-      },
-      "dimensionValues": {
-        "chassis-dimensionColor": "spaceblack",
-        "processor-dimensionChip": "m5pro",
-        "processor-dimensionChip-cpuCoreCount-gpuCoreCount": "m5pro-18-20",
-        "display-dimensionFinish": "nano_texture",
-        "chassis-dimensionScreensize": "14inch",
-        "storage-dimensionCapacity": "2tb",
-        "memory-dimensionMemory": "48gb"
-      },
-      "priceCny": 31624,
-      "comingSoon": false,
-      "isCarrierDevice": false,
-      "upstreamContainer": "RO_MBP_M6_14INCH_SPACEBLACK_BET_BES_ULT_2026",
-      "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro",
-      "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-summary-select-202610-14inch-spaceblack?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0MlllLy9mUUZibXJtaURkcVBmZXl6SVhMNEtUU24xZENXTzcvK0NLTmNHR3FUbGFVTWR0Ti93a3VSRzN5cEpVUnl6S3hTY3gyZUhtbmsvOWVKOWJVV3RybkIybk5RZmlyRnNkQjBrajdkK0xuSG1ZcEJ0aXBsSUdYZUdaU0svM2pB&traceId=1",
-      "imageAlt": "深空黑色 14 英寸 MacBook Pro，呈打开状态，内部视图，展示细窄的黑色显示屏边框、圆角设计和凸出的垫脚。深空黑色，呈闭合状态，左侧外观，展示纤薄机身外形、MagSafe 3 端口、两个雷雳 5 端口以及耳机插孔。深空黑色，呈闭合状态，右侧外观，展示纤薄机身外形、SDXC 卡插槽、雷雳 5 端口和 HDMI 端口。深空黑色，顶面俯视外观，展示圆角设计以及机身中央的黑色亮面 Apple 标志。",
-      "imageWidth": 5120,
-      "imageHeight": 3280,
-      "imageKey": "mac-macbook-pro-summary-select-202610-14inch-spaceblack",
-      "imageSource": "apple-gallery",
-      "imageSourceUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_pro%2Fselect&dm.chassis-dimensionColor=spaceblack&dm.processor-dimensionChip=m5pro&dm.processor-dimensionChip-cpuCoreCount-gpuCoreCount=m5pro-15-16&dm.display-dimensionFinish=standard&dm.chassis-dimensionScreensize=14inch",
-      "imageOriginalUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-summary-select-202610-14inch-spaceblack?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0MlllLy9mUUZibXJtaURkcVBmZXl6SVhMNEtUU24xZENXTzcvK0NLTmNHR3FUbGFVTWR0Ti93a3VSRzN5cEpVUnl6S3hTY3gyZUhtbmsvOWVKOWJVV3RybkIybk5RZmlyRnNkQjBrajdkK0xuSG1ZcEJ0aXBsSUdYZUdaU0svM2pB&traceId=1",
-      "imageMatchDimensions": {
-        "chassis-dimensionScreensize": "14inch",
-        "chassis-dimensionColor": "spaceblack"
-      }
+      "upstreamTitle": "14 英寸 MacBook Pro - 银色",
+      "upstreamTitleCheckedAt": "2026-11-23T14:53:25.670Z"
     },
     {
       "partNumber": "MGDU4CH/A",
@@ -13337,7 +13149,17 @@
       "imageMatchDimensions": {
         "chassis-dimensionScreensize": "14inch",
         "chassis-dimensionColor": "spaceblack"
-      }
+      },
+      "pickupVerification": {
+        "checkedAt": "2026-11-23T14:53:19.125Z",
+        "storeNumber": "R577",
+        "sampledPartNumber": "MGDU4CH/A",
+        "status": "available",
+        "reason": null,
+        "verified": true
+      },
+      "upstreamTitle": "14 英寸 MacBook Pro - 深空黑色",
+      "upstreamTitleCheckedAt": "2026-11-23T14:53:19.125Z"
     },
     {
       "partNumber": "MGDQ4CH/A",
@@ -13387,407 +13209,241 @@
       "imageMatchDimensions": {
         "chassis-dimensionScreensize": "14inch",
         "chassis-dimensionColor": "silver"
-      }
+      },
+      "pickupVerification": {
+        "checkedAt": "2026-11-23T14:53:23.045Z",
+        "storeNumber": "R577",
+        "sampledPartNumber": "MGDQ4CH/A",
+        "status": "unavailable",
+        "reason": null,
+        "verified": true
+      },
+      "upstreamTitle": "14 英寸 MacBook Pro - 银色",
+      "upstreamTitleCheckedAt": "2026-11-23T14:53:23.045Z"
     },
     {
-      "partNumber": "MGEA4CH/A",
-      "basePartNumber": "MGEA4",
+      "partNumber": "MMFM4CH/A",
+      "basePartNumber": "MMFM4",
       "category": "mac",
       "familyKey": "macbook-pro",
       "familySlug": "macbook-pro",
       "model": "MacBook Pro 16 英寸",
       "title": "MacBook Pro 16 英寸 M5 Pro 18核CPU/20核GPU 24GB 1TB 标准显示屏 深空黑色",
-      "titleSource": "page_labels",
+      "titleSource": "selected_page_metrics_and_labels",
       "englishName": "16-inch MacBook Pro - Space Black",
       "attributes": {
         "screensize": "16 英寸",
-        "screensizeDetail": "可选配 M5 Pro 或 M5 Max 芯片。",
         "color": "深空黑色",
         "finish": "标准显示屏",
-        "finishDetail": "采用低反射率设计，可减少使用环境中的屏幕眩光。",
         "chipName": "M5 Pro",
-        "chipNameDetail": "带来更出色的性能表现，还可选配更大的内存，可胜任更高难度的工作任务。",
         "chip": "18核CPU/20核GPU",
-        "chipDetail": "处理性能和图形渲染速度进一步提升，可胜任游戏、编程和创意工作等繁重任务。",
         "memory": "24GB",
         "capacity": "1TB"
       },
       "dimensionValues": {
+        "chassis-dimensionScreensize": "16inch",
         "chassis-dimensionColor": "spaceblack",
+        "display-dimensionFinish": "standard",
         "processor-dimensionChip": "m5pro",
         "processor-dimensionChip-cpuCoreCount-gpuCoreCount": "m5pro-18-20",
-        "display-dimensionFinish": "standard",
-        "chassis-dimensionScreensize": "16inch",
-        "storage-dimensionCapacity": "1tb",
-        "memory-dimensionMemory": "24gb"
+        "memory-dimensionMemory": "24gb",
+        "storage-dimensionCapacity": "1tb"
       },
       "priceCny": 24999,
       "comingSoon": false,
       "isCarrierDevice": false,
       "upstreamContainer": "RO_MBP_M5PRO_M5MAX_16INCH_SPACEBLACK_BT_UT_SP_2026",
-      "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro",
+      "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro/16-inch-space-black-standard-display-apple-m5-pro-chip-18-core-cpu-20-core-gpu-24gb-memory-1tb-storage",
       "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-summary-select-202610-16inch-spaceblack?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0MlllLy9mUUZibXJtaURkcVBmZXl6SitVelBVd1haTHZ5UWJDbThRTWVBL3FUbGFVTWR0Ti93a3VSRzN5cEpVUnl6S3hTY3gyZUhtbmsvOWVKOWJVV3RybkIybk5RZmlyRnNkQjBrajdkK0xianpPQ21PaU5sL3Q3NFE4NXFUb1ZB&traceId=1",
       "imageAlt": "深空黑色 16 英寸 MacBook Pro，设备呈展开状态，展示显示屏；侧面外观展示纤薄外形，右侧端口包括 SDXC 卡插槽、雷雳 5 端口和 HDMI 端口，左侧端口包括 MagSafe 3 端口、两个雷雳 5 端口和耳机插孔；顶部俯视外观，展示圆角设计、机身中央的黑色亮面 Apple 标志。",
       "imageWidth": 5120,
       "imageHeight": 3280,
       "imageKey": "mac-macbook-pro-summary-select-202610-16inch-spaceblack",
       "imageSource": "apple-gallery",
-      "imageSourceUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_pro%2Fselect&dm.chassis-dimensionColor=spaceblack&dm.processor-dimensionChip=m5max&dm.processor-dimensionChip-cpuCoreCount-gpuCoreCount=m5max-18-40&dm.display-dimensionFinish=standard&dm.chassis-dimensionScreensize=16inch",
+      "imageSourceUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_pro%2Fselect&dm.chassis-dimensionScreensize=16inch&dm.chassis-dimensionColor=spaceblack&dm.display-dimensionFinish=standard&dm.processor-dimensionChip=m5max&dm.processor-dimensionChip-cpuCoreCount-gpuCoreCount=m5max-18-32&dm.memory-dimensionMemory=36gb&dm.storage-dimensionCapacity=2tb",
       "imageOriginalUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-summary-select-202610-16inch-spaceblack?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0MlllLy9mUUZibXJtaURkcVBmZXl6SitVelBVd1haTHZ5UWJDbThRTWVBL3FUbGFVTWR0Ti93a3VSRzN5cEpVUnl6S3hTY3gyZUhtbmsvOWVKOWJVV3RybkIybk5RZmlyRnNkQjBrajdkK0xianpPQ21PaU5sL3Q3NFE4NXFUb1ZB&traceId=1",
       "imageMatchDimensions": {
         "chassis-dimensionScreensize": "16inch",
         "chassis-dimensionColor": "spaceblack"
-      }
+      },
+      "pickupVerification": {
+        "checkedAt": "2026-11-23T14:52:40.711Z",
+        "storeNumber": "R577",
+        "sampledPartNumber": "MMFM4CH/A",
+        "status": "available",
+        "reason": null,
+        "verified": true
+      },
+      "upstreamTitle": "16 英寸 MacBook Pro - 深空黑色",
+      "upstreamTitleCheckedAt": "2026-11-23T14:52:40.711Z"
     },
     {
-      "partNumber": "MGE44CH/A",
-      "basePartNumber": "MGE44",
-      "category": "mac",
-      "familyKey": "macbook-pro",
-      "familySlug": "macbook-pro",
-      "model": "MacBook Pro 16 英寸",
-      "title": "MacBook Pro 16 英寸 M5 Pro 18核CPU/20核GPU 24GB 1TB 标准显示屏 银色",
-      "titleSource": "page_labels",
-      "englishName": "16-inch MacBook Pro - Silver",
-      "attributes": {
-        "screensize": "16 英寸",
-        "screensizeDetail": "可选配 M5 Pro 或 M5 Max 芯片。",
-        "color": "银色",
-        "finish": "标准显示屏",
-        "finishDetail": "采用低反射率设计，可减少使用环境中的屏幕眩光。",
-        "chipName": "M5 Pro",
-        "chipNameDetail": "带来更出色的性能表现，还可选配更大的内存，可胜任更高难度的工作任务。",
-        "chip": "18核CPU/20核GPU",
-        "chipDetail": "处理性能和图形渲染速度进一步提升，可胜任游戏、编程和创意工作等繁重任务。",
-        "memory": "24GB",
-        "capacity": "1TB"
-      },
-      "dimensionValues": {
-        "chassis-dimensionColor": "silver",
-        "processor-dimensionChip": "m5pro",
-        "processor-dimensionChip-cpuCoreCount-gpuCoreCount": "m5pro-18-20",
-        "display-dimensionFinish": "standard",
-        "chassis-dimensionScreensize": "16inch",
-        "storage-dimensionCapacity": "1tb",
-        "memory-dimensionMemory": "24gb"
-      },
-      "priceCny": 24999,
-      "comingSoon": false,
-      "isCarrierDevice": false,
-      "upstreamContainer": "RO_MBP_M5PRO_M5MAX_16INCH_SILVER_BT_UT_SP_2026",
-      "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro",
-      "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-summary-select-202610-16inch-silver?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0MlllLy9mUUZibXJtaURkcVBmZXl6SkZZcWljV0g1eGg4Rk5WSmEyY2h2ZTA0NlFNZVBLdlJNcjRha3NVaFYxSG54TS9QOFlhVHZoV2xFZjU3V3B4aXRNZUhzbVArbEt2TUhwTUpUcjdscHRkN1JMWS9GcS9EM0huU0pNWFFBb1Bn&traceId=1",
-      "imageAlt": "银色 16 英寸 MacBook Pro，设备呈展开状态，展示显示屏；侧面外观展示纤薄外形，右侧端口包括 SDXC 卡插槽、雷雳 5 端口和 HDMI 端口，左侧端口包括 MagSafe 3 端口、两个雷雳 5 端口和耳机插孔；顶部俯视外观，展示圆角设计、机身中央的黑色亮面 Apple 标志。",
-      "imageWidth": 5120,
-      "imageHeight": 3280,
-      "imageKey": "mac-macbook-pro-summary-select-202610-16inch-silver",
-      "imageSource": "apple-gallery",
-      "imageSourceUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_pro%2Fselect&dm.chassis-dimensionColor=silver&dm.processor-dimensionChip=m5max&dm.processor-dimensionChip-cpuCoreCount-gpuCoreCount=m5max-18-32&dm.display-dimensionFinish=standard&dm.chassis-dimensionScreensize=16inch",
-      "imageOriginalUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-summary-select-202610-16inch-silver?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0MlllLy9mUUZibXJtaURkcVBmZXl6SkZZcWljV0g1eGg4Rk5WSmEyY2h2ZTA0NlFNZVBLdlJNcjRha3NVaFYxSG54TS9QOFlhVHZoV2xFZjU3V3B4aXRNZUhzbVArbEt2TUhwTUpUcjdscHRkN1JMWS9GcS9EM0huU0pNWFFBb1Bn&traceId=1",
-      "imageMatchDimensions": {
-        "chassis-dimensionScreensize": "16inch",
-        "chassis-dimensionColor": "silver"
-      }
-    },
-    {
-      "partNumber": "MGEC4CH/A",
-      "basePartNumber": "MGEC4",
-      "category": "mac",
-      "familyKey": "macbook-pro",
-      "familySlug": "macbook-pro",
-      "model": "MacBook Pro 16 英寸",
-      "title": "MacBook Pro 16 英寸 M5 Pro 18核CPU/20核GPU 48GB 1TB 标准显示屏 深空黑色",
-      "titleSource": "page_labels",
-      "englishName": "16-inch MacBook Pro - Space Black",
-      "attributes": {
-        "screensize": "16 英寸",
-        "screensizeDetail": "可选配 M5 Pro 或 M5 Max 芯片。",
-        "color": "深空黑色",
-        "finish": "标准显示屏",
-        "finishDetail": "采用低反射率设计，可减少使用环境中的屏幕眩光。",
-        "chipName": "M5 Pro",
-        "chipNameDetail": "带来更出色的性能表现，还可选配更大的内存，可胜任更高难度的工作任务。",
-        "chip": "18核CPU/20核GPU",
-        "chipDetail": "处理性能和图形渲染速度进一步提升，可胜任游戏、编程和创意工作等繁重任务。",
-        "memory": "48GB",
-        "capacity": "1TB"
-      },
-      "dimensionValues": {
-        "chassis-dimensionColor": "spaceblack",
-        "processor-dimensionChip": "m5pro",
-        "processor-dimensionChip-cpuCoreCount-gpuCoreCount": "m5pro-18-20",
-        "display-dimensionFinish": "standard",
-        "chassis-dimensionScreensize": "16inch",
-        "storage-dimensionCapacity": "1tb",
-        "memory-dimensionMemory": "48gb"
-      },
-      "priceCny": 29499,
-      "comingSoon": false,
-      "isCarrierDevice": false,
-      "upstreamContainer": "RO_MBP_M5PRO_M5MAX_16INCH_SPACEBLACK_BT_UT_SP_2026",
-      "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro",
-      "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-summary-select-202610-16inch-spaceblack?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0MlllLy9mUUZibXJtaURkcVBmZXl6SitVelBVd1haTHZ5UWJDbThRTWVBL3FUbGFVTWR0Ti93a3VSRzN5cEpVUnl6S3hTY3gyZUhtbmsvOWVKOWJVV3RybkIybk5RZmlyRnNkQjBrajdkK0xianpPQ21PaU5sL3Q3NFE4NXFUb1ZB&traceId=1",
-      "imageAlt": "深空黑色 16 英寸 MacBook Pro，设备呈展开状态，展示显示屏；侧面外观展示纤薄外形，右侧端口包括 SDXC 卡插槽、雷雳 5 端口和 HDMI 端口，左侧端口包括 MagSafe 3 端口、两个雷雳 5 端口和耳机插孔；顶部俯视外观，展示圆角设计、机身中央的黑色亮面 Apple 标志。",
-      "imageWidth": 5120,
-      "imageHeight": 3280,
-      "imageKey": "mac-macbook-pro-summary-select-202610-16inch-spaceblack",
-      "imageSource": "apple-gallery",
-      "imageSourceUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_pro%2Fselect&dm.chassis-dimensionColor=spaceblack&dm.processor-dimensionChip=m5max&dm.processor-dimensionChip-cpuCoreCount-gpuCoreCount=m5max-18-40&dm.display-dimensionFinish=standard&dm.chassis-dimensionScreensize=16inch",
-      "imageOriginalUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-summary-select-202610-16inch-spaceblack?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0MlllLy9mUUZibXJtaURkcVBmZXl6SitVelBVd1haTHZ5UWJDbThRTWVBL3FUbGFVTWR0Ti93a3VSRzN5cEpVUnl6S3hTY3gyZUhtbmsvOWVKOWJVV3RybkIybk5RZmlyRnNkQjBrajdkK0xianpPQ21PaU5sL3Q3NFE4NXFUb1ZB&traceId=1",
-      "imageMatchDimensions": {
-        "chassis-dimensionScreensize": "16inch",
-        "chassis-dimensionColor": "spaceblack"
-      }
-    },
-    {
-      "partNumber": "MGE64CH/A",
-      "basePartNumber": "MGE64",
-      "category": "mac",
-      "familyKey": "macbook-pro",
-      "familySlug": "macbook-pro",
-      "model": "MacBook Pro 16 英寸",
-      "title": "MacBook Pro 16 英寸 M5 Pro 18核CPU/20核GPU 48GB 1TB 标准显示屏 银色",
-      "titleSource": "page_labels",
-      "englishName": "16-inch MacBook Pro - Silver",
-      "attributes": {
-        "screensize": "16 英寸",
-        "screensizeDetail": "可选配 M5 Pro 或 M5 Max 芯片。",
-        "color": "银色",
-        "finish": "标准显示屏",
-        "finishDetail": "采用低反射率设计，可减少使用环境中的屏幕眩光。",
-        "chipName": "M5 Pro",
-        "chipNameDetail": "带来更出色的性能表现，还可选配更大的内存，可胜任更高难度的工作任务。",
-        "chip": "18核CPU/20核GPU",
-        "chipDetail": "处理性能和图形渲染速度进一步提升，可胜任游戏、编程和创意工作等繁重任务。",
-        "memory": "48GB",
-        "capacity": "1TB"
-      },
-      "dimensionValues": {
-        "chassis-dimensionColor": "silver",
-        "processor-dimensionChip": "m5pro",
-        "processor-dimensionChip-cpuCoreCount-gpuCoreCount": "m5pro-18-20",
-        "display-dimensionFinish": "standard",
-        "chassis-dimensionScreensize": "16inch",
-        "storage-dimensionCapacity": "1tb",
-        "memory-dimensionMemory": "48gb"
-      },
-      "priceCny": 29499,
-      "comingSoon": false,
-      "isCarrierDevice": false,
-      "upstreamContainer": "RO_MBP_M5PRO_M5MAX_16INCH_SILVER_BT_UT_SP_2026",
-      "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro",
-      "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-summary-select-202610-16inch-silver?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0MlllLy9mUUZibXJtaURkcVBmZXl6SkZZcWljV0g1eGg4Rk5WSmEyY2h2ZTA0NlFNZVBLdlJNcjRha3NVaFYxSG54TS9QOFlhVHZoV2xFZjU3V3B4aXRNZUhzbVArbEt2TUhwTUpUcjdscHRkN1JMWS9GcS9EM0huU0pNWFFBb1Bn&traceId=1",
-      "imageAlt": "银色 16 英寸 MacBook Pro，设备呈展开状态，展示显示屏；侧面外观展示纤薄外形，右侧端口包括 SDXC 卡插槽、雷雳 5 端口和 HDMI 端口，左侧端口包括 MagSafe 3 端口、两个雷雳 5 端口和耳机插孔；顶部俯视外观，展示圆角设计、机身中央的黑色亮面 Apple 标志。",
-      "imageWidth": 5120,
-      "imageHeight": 3280,
-      "imageKey": "mac-macbook-pro-summary-select-202610-16inch-silver",
-      "imageSource": "apple-gallery",
-      "imageSourceUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_pro%2Fselect&dm.chassis-dimensionColor=silver&dm.processor-dimensionChip=m5max&dm.processor-dimensionChip-cpuCoreCount-gpuCoreCount=m5max-18-32&dm.display-dimensionFinish=standard&dm.chassis-dimensionScreensize=16inch",
-      "imageOriginalUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-summary-select-202610-16inch-silver?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0MlllLy9mUUZibXJtaURkcVBmZXl6SkZZcWljV0g1eGg4Rk5WSmEyY2h2ZTA0NlFNZVBLdlJNcjRha3NVaFYxSG54TS9QOFlhVHZoV2xFZjU3V3B4aXRNZUhzbVArbEt2TUhwTUpUcjdscHRkN1JMWS9GcS9EM0huU0pNWFFBb1Bn&traceId=1",
-      "imageMatchDimensions": {
-        "chassis-dimensionScreensize": "16inch",
-        "chassis-dimensionColor": "silver"
-      }
-    },
-    {
-      "partNumber": "MGED4CH/A",
-      "basePartNumber": "MGED4",
+      "partNumber": "MMFN4CH/A",
+      "basePartNumber": "MMFN4",
       "category": "mac",
       "familyKey": "macbook-pro",
       "familySlug": "macbook-pro",
       "model": "MacBook Pro 16 英寸",
       "title": "MacBook Pro 16 英寸 M5 Max 18核CPU/32核GPU 36GB 2TB 标准显示屏 深空黑色",
-      "titleSource": "page_labels",
+      "titleSource": "selected_page_metrics_and_labels",
       "englishName": "16-inch MacBook Pro - Space Black",
       "attributes": {
         "screensize": "16 英寸",
-        "screensizeDetail": "可选配 M5 Pro 或 M5 Max 芯片。",
         "color": "深空黑色",
         "finish": "标准显示屏",
-        "finishDetail": "采用低反射率设计，可减少使用环境中的屏幕眩光。",
         "chipName": "M5 Max",
-        "chipNameDetail": "Mac 专业笔电上的最强芯片，专攻各种格外艰巨的工作。",
         "chip": "18核CPU/32核GPU",
-        "chipDetail": "18 核中央处理器、32 核图形处理器",
         "memory": "36GB",
         "capacity": "2TB"
       },
       "dimensionValues": {
+        "chassis-dimensionScreensize": "16inch",
         "chassis-dimensionColor": "spaceblack",
+        "display-dimensionFinish": "standard",
         "processor-dimensionChip": "m5max",
         "processor-dimensionChip-cpuCoreCount-gpuCoreCount": "m5max-18-32",
-        "display-dimensionFinish": "standard",
-        "chassis-dimensionScreensize": "16inch",
-        "storage-dimensionCapacity": "2tb",
-        "memory-dimensionMemory": "36gb"
+        "memory-dimensionMemory": "36gb",
+        "storage-dimensionCapacity": "2tb"
       },
       "priceCny": 35999,
       "comingSoon": false,
       "isCarrierDevice": false,
       "upstreamContainer": "RO_MBP_M5PRO_M5MAX_16INCH_SPACEBLACK_BT_UT_SP_2026",
-      "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro",
+      "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro/16-inch-space-black-standard-display-apple-m5-max-chip-18-core-cpu-32-core-gpu-36gb-memory-2tb-storage",
       "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-summary-select-202610-16inch-spaceblack?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0MlllLy9mUUZibXJtaURkcVBmZXl6SitVelBVd1haTHZ5UWJDbThRTWVBL3FUbGFVTWR0Ti93a3VSRzN5cEpVUnl6S3hTY3gyZUhtbmsvOWVKOWJVV3RybkIybk5RZmlyRnNkQjBrajdkK0xianpPQ21PaU5sL3Q3NFE4NXFUb1ZB&traceId=1",
       "imageAlt": "深空黑色 16 英寸 MacBook Pro，设备呈展开状态，展示显示屏；侧面外观展示纤薄外形，右侧端口包括 SDXC 卡插槽、雷雳 5 端口和 HDMI 端口，左侧端口包括 MagSafe 3 端口、两个雷雳 5 端口和耳机插孔；顶部俯视外观，展示圆角设计、机身中央的黑色亮面 Apple 标志。",
       "imageWidth": 5120,
       "imageHeight": 3280,
       "imageKey": "mac-macbook-pro-summary-select-202610-16inch-spaceblack",
       "imageSource": "apple-gallery",
-      "imageSourceUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_pro%2Fselect&dm.chassis-dimensionColor=spaceblack&dm.processor-dimensionChip=m5max&dm.processor-dimensionChip-cpuCoreCount-gpuCoreCount=m5max-18-40&dm.display-dimensionFinish=standard&dm.chassis-dimensionScreensize=16inch",
+      "imageSourceUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_pro%2Fselect&dm.chassis-dimensionScreensize=16inch&dm.chassis-dimensionColor=spaceblack&dm.display-dimensionFinish=standard&dm.processor-dimensionChip=m5max&dm.processor-dimensionChip-cpuCoreCount-gpuCoreCount=m5max-18-32&dm.memory-dimensionMemory=36gb&dm.storage-dimensionCapacity=2tb",
       "imageOriginalUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-summary-select-202610-16inch-spaceblack?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0MlllLy9mUUZibXJtaURkcVBmZXl6SitVelBVd1haTHZ5UWJDbThRTWVBL3FUbGFVTWR0Ti93a3VSRzN5cEpVUnl6S3hTY3gyZUhtbmsvOWVKOWJVV3RybkIybk5RZmlyRnNkQjBrajdkK0xianpPQ21PaU5sL3Q3NFE4NXFUb1ZB&traceId=1",
       "imageMatchDimensions": {
         "chassis-dimensionScreensize": "16inch",
         "chassis-dimensionColor": "spaceblack"
-      }
+      },
+      "pickupVerification": {
+        "checkedAt": "2026-11-23T14:52:40.711Z",
+        "storeNumber": "R577",
+        "sampledPartNumber": "MMFN4CH/A",
+        "status": "available",
+        "reason": null,
+        "verified": true
+      },
+      "upstreamTitle": "16 英寸 MacBook Pro - 深空黑色",
+      "upstreamTitleCheckedAt": "2026-11-23T14:52:40.711Z"
     },
     {
-      "partNumber": "MGE74CH/A",
-      "basePartNumber": "MGE74",
+      "partNumber": "MMFJ4CH/A",
+      "basePartNumber": "MMFJ4",
+      "category": "mac",
+      "familyKey": "macbook-pro",
+      "familySlug": "macbook-pro",
+      "model": "MacBook Pro 16 英寸",
+      "title": "MacBook Pro 16 英寸 M5 Pro 18核CPU/20核GPU 24GB 1TB 标准显示屏 银色",
+      "titleSource": "selected_page_metrics_and_labels",
+      "englishName": "16-inch MacBook Pro - Silver",
+      "attributes": {
+        "screensize": "16 英寸",
+        "color": "银色",
+        "finish": "标准显示屏",
+        "chipName": "M5 Pro",
+        "chip": "18核CPU/20核GPU",
+        "memory": "24GB",
+        "capacity": "1TB"
+      },
+      "dimensionValues": {
+        "chassis-dimensionScreensize": "16inch",
+        "chassis-dimensionColor": "silver",
+        "display-dimensionFinish": "standard",
+        "processor-dimensionChip": "m5pro",
+        "processor-dimensionChip-cpuCoreCount-gpuCoreCount": "m5pro-18-20",
+        "memory-dimensionMemory": "24gb",
+        "storage-dimensionCapacity": "1tb"
+      },
+      "priceCny": 24999,
+      "comingSoon": false,
+      "isCarrierDevice": false,
+      "upstreamContainer": "RO_MBP_M5PRO_M5MAX_16INCH_SILVER_BT_UT_SP_2026",
+      "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro/16-inch-silver-standard-display-apple-m5-pro-chip-18-core-cpu-20-core-gpu-24gb-memory-1tb-storage",
+      "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-summary-select-202610-16inch-silver?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0MlllLy9mUUZibXJtaURkcVBmZXl6SkZZcWljV0g1eGg4Rk5WSmEyY2h2ZTA0NlFNZVBLdlJNcjRha3NVaFYxSG54TS9QOFlhVHZoV2xFZjU3V3B4aXRNZUhzbVArbEt2TUhwTUpUcjdscHRkN1JMWS9GcS9EM0huU0pNWFFBb1Bn&traceId=1",
+      "imageAlt": "银色 16 英寸 MacBook Pro，设备呈展开状态，展示显示屏；侧面外观展示纤薄外形，右侧端口包括 SDXC 卡插槽、雷雳 5 端口和 HDMI 端口，左侧端口包括 MagSafe 3 端口、两个雷雳 5 端口和耳机插孔；顶部俯视外观，展示圆角设计、机身中央的黑色亮面 Apple 标志。",
+      "imageWidth": 5120,
+      "imageHeight": 3280,
+      "imageKey": "mac-macbook-pro-summary-select-202610-16inch-silver",
+      "imageSource": "apple-gallery",
+      "imageSourceUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_pro%2Fselect&dm.chassis-dimensionScreensize=16inch&dm.chassis-dimensionColor=silver&dm.display-dimensionFinish=standard&dm.processor-dimensionChip=m5max&dm.processor-dimensionChip-cpuCoreCount-gpuCoreCount=m5max-18-32&dm.memory-dimensionMemory=36gb&dm.storage-dimensionCapacity=2tb",
+      "imageOriginalUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-summary-select-202610-16inch-silver?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0MlllLy9mUUZibXJtaURkcVBmZXl6SkZZcWljV0g1eGg4Rk5WSmEyY2h2ZTA0NlFNZVBLdlJNcjRha3NVaFYxSG54TS9QOFlhVHZoV2xFZjU3V3B4aXRNZUhzbVArbEt2TUhwTUpUcjdscHRkN1JMWS9GcS9EM0huU0pNWFFBb1Bn&traceId=1",
+      "imageMatchDimensions": {
+        "chassis-dimensionScreensize": "16inch",
+        "chassis-dimensionColor": "silver"
+      },
+      "pickupVerification": {
+        "checkedAt": "2026-11-23T14:52:40.711Z",
+        "storeNumber": "R577",
+        "sampledPartNumber": "MMFJ4CH/A",
+        "status": "available",
+        "reason": null,
+        "verified": true
+      },
+      "upstreamTitle": "16 英寸 MacBook Pro - 银色",
+      "upstreamTitleCheckedAt": "2026-11-23T14:52:40.711Z"
+    },
+    {
+      "partNumber": "MMFK4CH/A",
+      "basePartNumber": "MMFK4",
       "category": "mac",
       "familyKey": "macbook-pro",
       "familySlug": "macbook-pro",
       "model": "MacBook Pro 16 英寸",
       "title": "MacBook Pro 16 英寸 M5 Max 18核CPU/32核GPU 36GB 2TB 标准显示屏 银色",
-      "titleSource": "page_labels",
+      "titleSource": "selected_page_metrics_and_labels",
       "englishName": "16-inch MacBook Pro - Silver",
       "attributes": {
         "screensize": "16 英寸",
-        "screensizeDetail": "可选配 M5 Pro 或 M5 Max 芯片。",
         "color": "银色",
         "finish": "标准显示屏",
-        "finishDetail": "采用低反射率设计，可减少使用环境中的屏幕眩光。",
         "chipName": "M5 Max",
-        "chipNameDetail": "Mac 专业笔电上的最强芯片，专攻各种格外艰巨的工作。",
         "chip": "18核CPU/32核GPU",
-        "chipDetail": "18 核中央处理器、32 核图形处理器",
         "memory": "36GB",
         "capacity": "2TB"
       },
       "dimensionValues": {
+        "chassis-dimensionScreensize": "16inch",
         "chassis-dimensionColor": "silver",
+        "display-dimensionFinish": "standard",
         "processor-dimensionChip": "m5max",
         "processor-dimensionChip-cpuCoreCount-gpuCoreCount": "m5max-18-32",
-        "display-dimensionFinish": "standard",
-        "chassis-dimensionScreensize": "16inch",
-        "storage-dimensionCapacity": "2tb",
-        "memory-dimensionMemory": "36gb"
+        "memory-dimensionMemory": "36gb",
+        "storage-dimensionCapacity": "2tb"
       },
       "priceCny": 35999,
       "comingSoon": false,
       "isCarrierDevice": false,
       "upstreamContainer": "RO_MBP_M5PRO_M5MAX_16INCH_SILVER_BT_UT_SP_2026",
-      "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro",
+      "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro/16-inch-silver-standard-display-apple-m5-max-chip-18-core-cpu-32-core-gpu-36gb-memory-2tb-storage",
       "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-summary-select-202610-16inch-silver?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0MlllLy9mUUZibXJtaURkcVBmZXl6SkZZcWljV0g1eGg4Rk5WSmEyY2h2ZTA0NlFNZVBLdlJNcjRha3NVaFYxSG54TS9QOFlhVHZoV2xFZjU3V3B4aXRNZUhzbVArbEt2TUhwTUpUcjdscHRkN1JMWS9GcS9EM0huU0pNWFFBb1Bn&traceId=1",
       "imageAlt": "银色 16 英寸 MacBook Pro，设备呈展开状态，展示显示屏；侧面外观展示纤薄外形，右侧端口包括 SDXC 卡插槽、雷雳 5 端口和 HDMI 端口，左侧端口包括 MagSafe 3 端口、两个雷雳 5 端口和耳机插孔；顶部俯视外观，展示圆角设计、机身中央的黑色亮面 Apple 标志。",
       "imageWidth": 5120,
       "imageHeight": 3280,
       "imageKey": "mac-macbook-pro-summary-select-202610-16inch-silver",
       "imageSource": "apple-gallery",
-      "imageSourceUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_pro%2Fselect&dm.chassis-dimensionColor=silver&dm.processor-dimensionChip=m5max&dm.processor-dimensionChip-cpuCoreCount-gpuCoreCount=m5max-18-32&dm.display-dimensionFinish=standard&dm.chassis-dimensionScreensize=16inch",
+      "imageSourceUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_pro%2Fselect&dm.chassis-dimensionScreensize=16inch&dm.chassis-dimensionColor=silver&dm.display-dimensionFinish=standard&dm.processor-dimensionChip=m5max&dm.processor-dimensionChip-cpuCoreCount-gpuCoreCount=m5max-18-32&dm.memory-dimensionMemory=36gb&dm.storage-dimensionCapacity=2tb",
       "imageOriginalUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-summary-select-202610-16inch-silver?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0MlllLy9mUUZibXJtaURkcVBmZXl6SkZZcWljV0g1eGg4Rk5WSmEyY2h2ZTA0NlFNZVBLdlJNcjRha3NVaFYxSG54TS9QOFlhVHZoV2xFZjU3V3B4aXRNZUhzbVArbEt2TUhwTUpUcjdscHRkN1JMWS9GcS9EM0huU0pNWFFBb1Bn&traceId=1",
       "imageMatchDimensions": {
         "chassis-dimensionScreensize": "16inch",
         "chassis-dimensionColor": "silver"
-      }
-    },
-    {
-      "partNumber": "MGEE4CH/A",
-      "basePartNumber": "MGEE4",
-      "category": "mac",
-      "familyKey": "macbook-pro",
-      "familySlug": "macbook-pro",
-      "model": "MacBook Pro 16 英寸",
-      "title": "MacBook Pro 16 英寸 M5 Max 18核CPU/40核GPU 48GB 2TB 标准显示屏 深空黑色",
-      "titleSource": "page_labels",
-      "englishName": "16-inch MacBook Pro - Space Black",
-      "attributes": {
-        "screensize": "16 英寸",
-        "screensizeDetail": "可选配 M5 Pro 或 M5 Max 芯片。",
-        "color": "深空黑色",
-        "finish": "标准显示屏",
-        "finishDetail": "采用低反射率设计，可减少使用环境中的屏幕眩光。",
-        "chipName": "M5 Max",
-        "chipNameDetail": "Mac 专业笔电上的最强芯片，专攻各种格外艰巨的工作。",
-        "chip": "18核CPU/40核GPU",
-        "chipDetail": "处理性能和图形渲染速度进一步提升，并可加快大语言模型运行和 8K 视频剪辑等任务。",
-        "memory": "48GB",
-        "capacity": "2TB"
       },
-      "dimensionValues": {
-        "chassis-dimensionColor": "spaceblack",
-        "processor-dimensionChip": "m5max",
-        "processor-dimensionChip-cpuCoreCount-gpuCoreCount": "m5max-18-40",
-        "display-dimensionFinish": "standard",
-        "chassis-dimensionScreensize": "16inch",
-        "storage-dimensionCapacity": "2tb",
-        "memory-dimensionMemory": "48gb"
+      "pickupVerification": {
+        "checkedAt": "2026-11-23T14:52:40.711Z",
+        "storeNumber": "R577",
+        "sampledPartNumber": "MMFK4CH/A",
+        "status": "available",
+        "reason": null,
+        "verified": true
       },
-      "priceCny": 40999,
-      "comingSoon": false,
-      "isCarrierDevice": false,
-      "upstreamContainer": "RO_MBP_M5PRO_M5MAX_16INCH_SPACEBLACK_BT_UT_SP_2026",
-      "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro",
-      "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-summary-select-202610-16inch-spaceblack?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0MlllLy9mUUZibXJtaURkcVBmZXl6SitVelBVd1haTHZ5UWJDbThRTWVBL3FUbGFVTWR0Ti93a3VSRzN5cEpVUnl6S3hTY3gyZUhtbmsvOWVKOWJVV3RybkIybk5RZmlyRnNkQjBrajdkK0xianpPQ21PaU5sL3Q3NFE4NXFUb1ZB&traceId=1",
-      "imageAlt": "深空黑色 16 英寸 MacBook Pro，设备呈展开状态，展示显示屏；侧面外观展示纤薄外形，右侧端口包括 SDXC 卡插槽、雷雳 5 端口和 HDMI 端口，左侧端口包括 MagSafe 3 端口、两个雷雳 5 端口和耳机插孔；顶部俯视外观，展示圆角设计、机身中央的黑色亮面 Apple 标志。",
-      "imageWidth": 5120,
-      "imageHeight": 3280,
-      "imageKey": "mac-macbook-pro-summary-select-202610-16inch-spaceblack",
-      "imageSource": "apple-gallery",
-      "imageSourceUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_pro%2Fselect&dm.chassis-dimensionColor=spaceblack&dm.processor-dimensionChip=m5max&dm.processor-dimensionChip-cpuCoreCount-gpuCoreCount=m5max-18-40&dm.display-dimensionFinish=standard&dm.chassis-dimensionScreensize=16inch",
-      "imageOriginalUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-summary-select-202610-16inch-spaceblack?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0MlllLy9mUUZibXJtaURkcVBmZXl6SitVelBVd1haTHZ5UWJDbThRTWVBL3FUbGFVTWR0Ti93a3VSRzN5cEpVUnl6S3hTY3gyZUhtbmsvOWVKOWJVV3RybkIybk5RZmlyRnNkQjBrajdkK0xianpPQ21PaU5sL3Q3NFE4NXFUb1ZB&traceId=1",
-      "imageMatchDimensions": {
-        "chassis-dimensionScreensize": "16inch",
-        "chassis-dimensionColor": "spaceblack"
-      }
-    },
-    {
-      "partNumber": "MGE94CH/A",
-      "basePartNumber": "MGE94",
-      "category": "mac",
-      "familyKey": "macbook-pro",
-      "familySlug": "macbook-pro",
-      "model": "MacBook Pro 16 英寸",
-      "title": "MacBook Pro 16 英寸 M5 Max 18核CPU/40核GPU 48GB 2TB 标准显示屏 银色",
-      "titleSource": "page_labels",
-      "englishName": "16-inch MacBook Pro - Silver",
-      "attributes": {
-        "screensize": "16 英寸",
-        "screensizeDetail": "可选配 M5 Pro 或 M5 Max 芯片。",
-        "color": "银色",
-        "finish": "标准显示屏",
-        "finishDetail": "采用低反射率设计，可减少使用环境中的屏幕眩光。",
-        "chipName": "M5 Max",
-        "chipNameDetail": "Mac 专业笔电上的最强芯片，专攻各种格外艰巨的工作。",
-        "chip": "18核CPU/40核GPU",
-        "chipDetail": "处理性能和图形渲染速度进一步提升，并可加快大语言模型运行和 8K 视频剪辑等任务。",
-        "memory": "48GB",
-        "capacity": "2TB"
-      },
-      "dimensionValues": {
-        "chassis-dimensionColor": "silver",
-        "processor-dimensionChip": "m5max",
-        "processor-dimensionChip-cpuCoreCount-gpuCoreCount": "m5max-18-40",
-        "display-dimensionFinish": "standard",
-        "chassis-dimensionScreensize": "16inch",
-        "storage-dimensionCapacity": "2tb",
-        "memory-dimensionMemory": "48gb"
-      },
-      "priceCny": 40999,
-      "comingSoon": false,
-      "isCarrierDevice": false,
-      "upstreamContainer": "RO_MBP_M5PRO_M5MAX_16INCH_SILVER_BT_UT_SP_2026",
-      "sourceUrl": "https://www.apple.com.cn/shop/buy-mac/macbook-pro",
-      "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-summary-select-202610-16inch-silver?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0MlllLy9mUUZibXJtaURkcVBmZXl6SkZZcWljV0g1eGg4Rk5WSmEyY2h2ZTA0NlFNZVBLdlJNcjRha3NVaFYxSG54TS9QOFlhVHZoV2xFZjU3V3B4aXRNZUhzbVArbEt2TUhwTUpUcjdscHRkN1JMWS9GcS9EM0huU0pNWFFBb1Bn&traceId=1",
-      "imageAlt": "银色 16 英寸 MacBook Pro，设备呈展开状态，展示显示屏；侧面外观展示纤薄外形，右侧端口包括 SDXC 卡插槽、雷雳 5 端口和 HDMI 端口，左侧端口包括 MagSafe 3 端口、两个雷雳 5 端口和耳机插孔；顶部俯视外观，展示圆角设计、机身中央的黑色亮面 Apple 标志。",
-      "imageWidth": 5120,
-      "imageHeight": 3280,
-      "imageKey": "mac-macbook-pro-summary-select-202610-16inch-silver",
-      "imageSource": "apple-gallery",
-      "imageSourceUrl": "https://www.apple.com.cn/shop/api/kit-product-gallery?fae=true&node=home%2Fshop_mac%2Ffamily%2Fmacbook_pro%2Fselect&dm.chassis-dimensionColor=silver&dm.processor-dimensionChip=m5max&dm.processor-dimensionChip-cpuCoreCount-gpuCoreCount=m5max-18-32&dm.display-dimensionFinish=standard&dm.chassis-dimensionScreensize=16inch",
-      "imageOriginalUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-macbook-pro-summary-select-202610-16inch-silver?wid=5120&hei=3280&fmt=p-jpg&qlt=80&.v=aXlkdGF0T0RUUVdDckNLaUc0OEE0MlllLy9mUUZibXJtaURkcVBmZXl6SkZZcWljV0g1eGg4Rk5WSmEyY2h2ZTA0NlFNZVBLdlJNcjRha3NVaFYxSG54TS9QOFlhVHZoV2xFZjU3V3B4aXRNZUhzbVArbEt2TUhwTUpUcjdscHRkN1JMWS9GcS9EM0huU0pNWFFBb1Bn&traceId=1",
-      "imageMatchDimensions": {
-        "chassis-dimensionScreensize": "16inch",
-        "chassis-dimensionColor": "silver"
-      }
+      "upstreamTitle": "16 英寸 MacBook Pro - 银色",
+      "upstreamTitleCheckedAt": "2026-11-23T14:52:40.711Z"
     },
     {
       "partNumber": "MHFF4CH/A",
@@ -18633,173 +18289,6 @@
       }
     },
     {
-      "partNumber": "MJ2J3CH/A",
-      "basePartNumber": "MJ2J3",
-      "category": "homepod",
-      "familyKey": "homepod-mini",
-      "familySlug": "homepod-mini",
-      "model": "HomePod mini",
-      "title": "HomePod mini 蓝色",
-      "titleSource": "page_labels",
-      "englishName": "HomePod mini - Blue",
-      "attributes": {
-        "color": "蓝色"
-      },
-      "dimensionValues": {
-        "dimensionColor": "blue"
-      },
-      "priceCny": 999,
-      "comingSoon": false,
-      "isCarrierDevice": false,
-      "upstreamContainer": null,
-      "sourceUrl": "https://www.apple.com.cn/shop/buy-homepod/homepod-mini",
-      "upstreamTitle": "HomePod mini - 蓝色",
-      "upstreamTitleCheckedAt": "2026-09-15T03:02:45.191Z",
-      "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/homepod-mini-select-blue-202110_FV1?wid=1868&hei=880&fmt=jpeg&qlt=90&.v=K2c3bEwyaWVDeDZkdHpLbHkwcGVSclkzcFgyeERHUEhNbTRTQzNiY2JCUmg5UEh1YlAveUJWditPbXN3blRmVi91YlVrZnFCSWZSZ3JZTTVzMlVYL3VyZmlwalNjK0xoZU01QWVTSzVKTGFobC9icnR2UFRDanJjclFrY21xTzM",
-      "imageAlt": "蓝色 HomePod mini",
-      "imageWidth": 1868,
-      "imageHeight": 880,
-      "imageKey": "homepod-mini-select-blue-202110_FV1",
-      "imageSource": "apple-selector",
-      "imageSourceUrl": "https://www.apple.com.cn/shop/buy-homepod/homepod-mini",
-      "imageOriginalUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/homepod-mini-select-blue-202110_FV1?wid=1868&hei=880&fmt=jpeg&qlt=90&.v=K2c3bEwyaWVDeDZkdHpLbHkwcGVSclkzcFgyeERHUEhNbTRTQzNiY2JCUmg5UEh1YlAveUJWditPbXN3blRmVi91YlVrZnFCSWZSZ3JZTTVzMlVYL3VyZmlwalNjK0xoZU01QWVTSzVKTGFobC9icnR2UFRDanJjclFrY21xTzM",
-      "imageMatchDimensions": {
-        "dimensionColor": "blue"
-      }
-    },
-    {
-      "partNumber": "MJ2L3CH/A",
-      "basePartNumber": "MJ2L3",
-      "category": "homepod",
-      "familyKey": "homepod-mini",
-      "familySlug": "homepod-mini",
-      "model": "HomePod mini",
-      "title": "HomePod mini 黄色",
-      "titleSource": "page_labels",
-      "englishName": "HomePod mini - Yellow",
-      "attributes": {
-        "color": "黄色"
-      },
-      "dimensionValues": {
-        "dimensionColor": "yellow"
-      },
-      "priceCny": 999,
-      "comingSoon": false,
-      "isCarrierDevice": false,
-      "upstreamContainer": null,
-      "sourceUrl": "https://www.apple.com.cn/shop/buy-homepod/homepod-mini",
-      "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/homepod-mini-select-yellow-202110_FV1?wid=1868&hei=880&fmt=jpeg&qlt=90&.v=K2c3bEwyaWVDeDZkdHpLbHkwcGVSaE4velBNdHlNczA1bWJLdHU3d0dhTzB3REtrUExnSnVSelpEdXZEbDh6emh2cmVWZlJxS3lEakdTNUJ0b3RabElLTjQxSElFZVJPbjF4NEwzYXFKTFBnTDQxbmJZbXlOVlovRDA5RFZoczQ",
-      "imageAlt": "黄色 HomePod mini",
-      "imageWidth": 1868,
-      "imageHeight": 880,
-      "imageKey": "homepod-mini-select-yellow-202110_FV1",
-      "imageSource": "apple-selector",
-      "imageSourceUrl": "https://www.apple.com.cn/shop/buy-homepod/homepod-mini",
-      "imageOriginalUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/homepod-mini-select-yellow-202110_FV1?wid=1868&hei=880&fmt=jpeg&qlt=90&.v=K2c3bEwyaWVDeDZkdHpLbHkwcGVSaE4velBNdHlNczA1bWJLdHU3d0dhTzB3REtrUExnSnVSelpEdXZEbDh6emh2cmVWZlJxS3lEakdTNUJ0b3RabElLTjQxSElFZVJPbjF4NEwzYXFKTFBnTDQxbmJZbXlOVlovRDA5RFZoczQ",
-      "imageMatchDimensions": {
-        "dimensionColor": "yellow"
-      }
-    },
-    {
-      "partNumber": "MTJU3CH/A",
-      "basePartNumber": "MTJU3",
-      "category": "homepod",
-      "familyKey": "homepod-mini",
-      "familySlug": "homepod-mini",
-      "model": "HomePod mini",
-      "title": "HomePod mini 午夜色",
-      "titleSource": "page_labels",
-      "englishName": "HomePod mini - Midnight",
-      "attributes": {
-        "color": "午夜色"
-      },
-      "dimensionValues": {
-        "dimensionColor": "midnight"
-      },
-      "priceCny": 999,
-      "comingSoon": false,
-      "isCarrierDevice": false,
-      "upstreamContainer": null,
-      "sourceUrl": "https://www.apple.com.cn/shop/buy-homepod/homepod-mini",
-      "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/homepod-mini-select-midnight-202407_FV1?wid=1868&hei=880&fmt=jpeg&qlt=90&.v=K2c3bEwyaWVDeDZkdHpLbHkwcGVSaFRaZXZublY0K2p0Ri9sOWcwbVh6aVUvTHBkeUd0RmJJUmY3SGlWbDc5azN6WWY5a1JiR3h2V2h5Mis1dmgwRVVkbTFFQitQQWRJRHBZb055K1dRU3lmeDZEeWhOM2xFeWZvZFNjaEtlTDY",
-      "imageAlt": "午夜色 HomePod mini",
-      "imageWidth": 1868,
-      "imageHeight": 880,
-      "imageKey": "homepod-mini-select-midnight-202407_FV1",
-      "imageSource": "apple-selector",
-      "imageSourceUrl": "https://www.apple.com.cn/shop/buy-homepod/homepod-mini",
-      "imageOriginalUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/homepod-mini-select-midnight-202407_FV1?wid=1868&hei=880&fmt=jpeg&qlt=90&.v=K2c3bEwyaWVDeDZkdHpLbHkwcGVSaFRaZXZublY0K2p0Ri9sOWcwbVh6aVUvTHBkeUd0RmJJUmY3SGlWbDc5azN6WWY5a1JiR3h2V2h5Mis1dmgwRVVkbTFFQitQQWRJRHBZb055K1dRU3lmeDZEeWhOM2xFeWZvZFNjaEtlTDY",
-      "imageMatchDimensions": {
-        "dimensionColor": "midnight"
-      }
-    },
-    {
-      "partNumber": "MHY53CH/A",
-      "basePartNumber": "MHY53",
-      "category": "homepod",
-      "familyKey": "homepod-mini",
-      "familySlug": "homepod-mini",
-      "model": "HomePod mini",
-      "title": "HomePod mini 白色",
-      "titleSource": "page_labels",
-      "englishName": "HomePod mini - White",
-      "attributes": {
-        "color": "白色"
-      },
-      "dimensionValues": {
-        "dimensionColor": "white"
-      },
-      "priceCny": 999,
-      "comingSoon": false,
-      "isCarrierDevice": false,
-      "upstreamContainer": null,
-      "sourceUrl": "https://www.apple.com.cn/shop/buy-homepod/homepod-mini",
-      "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/homepod-mini-select-white-202110_FV1?wid=1868&hei=880&fmt=jpeg&qlt=90&.v=K2c3bEwyaWVDeDZkdHpLbHkwcGVSaVh3VWtBWGpRcmhqdHlJNjVOT2QyekxCM1gvWjZsdy9IamM4SVJ5RVlRQWk3aEZ4ZFFGenkvaGw2NzRqZXFWbnd4dUs1S2RxNkNHMld1Nks2b2VOWGcyNjc2RUJPVExpR2EzRzRZNXFETUw",
-      "imageAlt": "白色 HomePod mini",
-      "imageWidth": 1868,
-      "imageHeight": 880,
-      "imageKey": "homepod-mini-select-white-202110_FV1",
-      "imageSource": "apple-selector",
-      "imageSourceUrl": "https://www.apple.com.cn/shop/buy-homepod/homepod-mini",
-      "imageOriginalUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/homepod-mini-select-white-202110_FV1?wid=1868&hei=880&fmt=jpeg&qlt=90&.v=K2c3bEwyaWVDeDZkdHpLbHkwcGVSaVh3VWtBWGpRcmhqdHlJNjVOT2QyekxCM1gvWjZsdy9IamM4SVJ5RVlRQWk3aEZ4ZFFGenkvaGw2NzRqZXFWbnd4dUs1S2RxNkNHMld1Nks2b2VOWGcyNjc2RUJPVExpR2EzRzRZNXFETUw",
-      "imageMatchDimensions": {
-        "dimensionColor": "white"
-      }
-    },
-    {
-      "partNumber": "MJ2K3CH/A",
-      "basePartNumber": "MJ2K3",
-      "category": "homepod",
-      "familyKey": "homepod-mini",
-      "familySlug": "homepod-mini",
-      "model": "HomePod mini",
-      "title": "HomePod mini 橙色",
-      "titleSource": "page_labels",
-      "englishName": "HomePod mini - Orange",
-      "attributes": {
-        "color": "橙色"
-      },
-      "dimensionValues": {
-        "dimensionColor": "orange"
-      },
-      "priceCny": 999,
-      "comingSoon": false,
-      "isCarrierDevice": false,
-      "upstreamContainer": null,
-      "sourceUrl": "https://www.apple.com.cn/shop/buy-homepod/homepod-mini",
-      "imageUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/homepod-mini-select-orange-202110_FV1?wid=1868&hei=880&fmt=jpeg&qlt=90&.v=K2c3bEwyaWVDeDZkdHpLbHkwcGVSckhndCtsZnAwTnFpWXhSS0Y4SW9oQzB3REtrUExnSnVSelpEdXZEbDh6emh2cmVWZlJxS3lEakdTNUJ0b3RabElLTjQxSElFZVJPbjF4NEwzYXFKTE95SFNiTHNadFZ3VHN2dGIxVHpXci8",
-      "imageAlt": "橙色 HomePod mini",
-      "imageWidth": 1868,
-      "imageHeight": 880,
-      "imageKey": "homepod-mini-select-orange-202110_FV1",
-      "imageSource": "apple-selector",
-      "imageSourceUrl": "https://www.apple.com.cn/shop/buy-homepod/homepod-mini",
-      "imageOriginalUrl": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/homepod-mini-select-orange-202110_FV1?wid=1868&hei=880&fmt=jpeg&qlt=90&.v=K2c3bEwyaWVDeDZkdHpLbHkwcGVSckhndCtsZnAwTnFpWXhSS0Y4SW9oQzB3REtrUExnSnVSelpEdXZEbDh6emh2cmVWZlJxS3lEakdTNUJ0b3RabElLTjQxSElFZVJPbjF4NEwzYXFKTE95SFNiTHNadFZ3VHN2dGIxVHpXci8",
-      "imageMatchDimensions": {
-        "dimensionColor": "orange"
-      }
-    },
-    {
       "partNumber": "MGHK4CH/A",
       "basePartNumber": "MGHK4",
       "category": "homepod",
@@ -19322,6 +18811,6 @@
     "stopped": false,
     "note": "每个系列抽样 1 个 SKU，验证取货接口是否识别该 SKU；结果只说明接口可查询，不代表当前供货情况长期有效。pending 表示上游提示尚未开放取货。"
   },
-  "imagesGeneratedAt": "2026-10-30T07:12:46.858Z",
-  "imageCount": 397
+  "imagesGeneratedAt": "2026-11-23T14:53:54.847Z",
+  "imageCount": 383
 }

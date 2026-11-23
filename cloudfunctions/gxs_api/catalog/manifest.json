@@ -1,13 +1,13 @@
 {
-  "syncedAt": "2026-11-06T06:21:09.015Z",
+  "syncedAt": "2026-11-23T14:53:54.880Z",
   "files": {
     "stores.json": {
       "bytes": 16090,
       "sha256": "ff62ad48138c04eac7fd6f4ad93895bacc260e0f87b881cc433a0501a6b2d5c6"
     },
     "products.json": {
-      "bytes": 1086833,
-      "sha256": "dde4927161b6d54a726854e7e4ee1444333c45f7a11cd58e1effcd6e8650bb4e"
+      "bytes": 1049877,
+      "sha256": "531506ac2780c96002b34a182baf69950d2c4cf21b5bd5443aefa219ae7c4487"
     }
   }
 }

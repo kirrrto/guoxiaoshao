@@ -69,7 +69,8 @@
       "familyKey": "ipad-10-2",
       "displayName": "iPad (10.2 英寸)",
       "url": "https://www.apple.com.cn/shop/buy-ipad/ipad-10-2",
-      "include": true
+      "include": false,
+      "excludeReason": "原购买页已永久跳转至 iPad 分类页，没有可供选配的商品。"
     },
     {
       "category": "ipad",
@@ -103,6 +104,7 @@
       "displayName": "MacBook Pro",
       "url": "https://www.apple.com.cn/shop/buy-mac/macbook-pro",
       "include": true,
+      "pickupVerificationScope": "sku",
       "releaseDate": "2026-10-27",
       "releaseSourceUrl": "https://www.apple.com.cn/newsroom/2026/10/apple-introduces-the-new-14-inch-macbook-pro-with-m6/"
     },
@@ -313,7 +315,7 @@
       "displayName": "HomePod mini",
       "url": "https://www.apple.com.cn/shop/buy-homepod/homepod-mini",
       "include": false,
-      "excludeReason": "官网购买页已切换为 HomePod mini 2；旧款现有目录保留，后续全量采集不再从同一页面重复生成旧款"
+      "excludeReason": "官网购买页只列 HomePod mini 2 的五款货号，第一代已退出在售目录。"
     },
     {
       "category": "homepod",

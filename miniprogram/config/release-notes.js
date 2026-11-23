@@ -8,6 +8,15 @@
 // Keep technical details and complete acceptance records in release documents.
 const RELEASE_NOTES = [
   {
+    version: '3.8.1',
+    title: '大陆门店查询',
+    dateText: '版本记录 · 2026-11-23',
+    highlights: [
+      '大陆站更新了 MacBook Pro 配置，移除了第一代 HomePod mini，二代五种颜色仍可查询。',
+      '商品下架后停止监测，之前已扣次的未完成查询仍可核对退款。',
+    ],
+  },
+  {
     version: '3.8.0',
     title: '其他站点',
     dateText: '版本记录 · 2026-11-23',

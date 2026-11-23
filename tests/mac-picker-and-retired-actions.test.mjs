@@ -20,7 +20,8 @@ test('every nonfirst Mac SKU in each ambiguous filter group survives same-value 
     groups.set(key, [...(groups.get(key) || []), product]);
   }
   const ambiguous = [...groups.values()].filter(group => group.length > 1);
-  assert.equal(ambiguous.length, 11, 'all ambiguous groups include the ProLED standard and nano-texture pair');
+  assert.ok(ambiguous.some(group => group[0].familyKey === 'macbook-pro-proled-xdr'
+    && new Set(group.map(p => p.attributes.finish)).size > 1), 'an in-stock model represents different display finishes');
   for (const group of ambiguous) for (const product of group.slice(1)) {
     const { rt, picker, catalog: source } = pickerFor(product.partNumber);
     for (const [method, index] of [['onMemoryChange', picker.data.memoryIndex], ['onCapacityChange', picker.data.capacityIndex]]) {
@@ -96,7 +97,8 @@ test('retired follow actions cannot resume/query stale events, and edit retains 
 });
 
 test('ordinary pause, expiry and limit pause retain distinct actions; paused configurations still fill slots', async () => {
-  const { rt, page } = followPage([saved({ followId: 'paused' }), saved({ followId: 'expired', status: 'expired' }), saved({ followId: 'limit', status: 'limit_paused', limitPaused: true })]);
+  const current = patch => saved({partNumber: 'MH2U4CH/A', ...patch});
+  const { rt, page } = followPage([current({ followId: 'paused' }), current({ followId: 'expired', status: 'expired' }), current({ followId: 'limit', status: 'limit_paused', limitPaused: true })]);
   assert.equal(page.data.follows[0].canToggle, true);
   assert.equal(page.data.follows[1].canToggle, true);
   assert.equal(page.data.follows[2].canToggle, false);
@@ -109,6 +111,39 @@ test('ordinary pause, expiry and limit pause retain distinct actions; paused con
   modal.success({ confirm: true });
   assert.ok(page.data.follows.every(row => row.detailsExpanded));
   assert.equal(page.data.editing, false);
+});
+
+test('archived HomePod watches stay readable without promising new checks, even when an earlier server omitted retirement flags', async () => {
+  const original = 'MJ2J3CH/A';
+  const { rt, page } = followPage([saved({ partNumber: original, status: 'active', productTitle: 'HomePod mini',
+    stores: [{ storeNumber: 'R577', status: null, lastKnownStatus: 'available', isStale: true, observedAt: new Date().toISOString() },
+      { storeNumber: 'R639' }] })]);
+  const row = page.data.follows[0];
+  assert.equal(row.productRetired, true);
+  assert.equal(row.status, 'paused');
+  assert.equal(row.canToggle, false);
+  assert.equal(row.canQuery, false);
+  assert.equal(row.hasAvailable, false);
+  assert.equal(row.stores[0].compactStatus, '上次有货');
+  assert.equal(row.stores[1].compactStatus, '暂无历史库存记录');
+  assert.equal(row.stores[1].checkText, '');
+  await page.onToggle(tap('retired', { status: 'paused' }));
+  page.onQueryFollow(tap('retired'));
+  assert.equal(rt.calls.length, 0);
+
+  // A restored cache (or an older remote still carrying withdrawn rows) must
+  // not reopen this SKU in pickers even if its catalog timestamp is newer.
+  const seed = rt.load('config/catalog-seed.js'), mini2 = seed.products.find(p => p.familyKey === 'homepod-mini-2');
+  const obsolete = { ...mini2, partNumber: original, familyKey: 'homepod-mini', model: 'HomePod mini' };
+  const raw = { ...plain(seed), version: '2030-01-01T00:00:00Z|legacy', products: [obsolete, mini2] };
+  const cold = runtime(async () => raw);
+  cold.wx.setStorageSync('gxs_catalog_v1', raw);
+  const store = cold.load('utils/store.js');
+  for (const catalog of [store.currentCatalog(), await store.getCatalog({ force: true })]) {
+    assert.deepEqual(plain(catalog.products.map(p => p.partNumber)), [mini2.partNumber]);
+    assert.equal(catalog.productByPart[original], undefined);
+    assert.equal(catalog.categories[0].families[0].familyKey, 'homepod-mini-2');
+  }
 });
 
 test('retired replacement requires an explicit catalog choice and saves the original follow identity and stores', async () => {

@@ -2,6 +2,7 @@
 const { fetchPickup } = require('../apple-pickup');
 const { isCtoPartNumber } = require('../rules/product-target');
 const { findMarket, findMarketProduct } = require('../markets');
+const { isRetiredPartNumber } = require('../rules/follow-access');
 
 // Only requests for the same storefront contend on the same budget documents.
 // A slow regional transaction must not delay other storefronts in this instance.
@@ -34,6 +35,7 @@ function serialiseAdmission(repo, market, task, waitMs) {
 async function guardedPickup({ repo, config, clock, fetchImpl, storeNumber, partNumbers, products = null, timeoutMs, market = null, source = 'manual', beforeRequest = async () => true, onBudget = () => {}, remainingMs = () => Infinity }) {
   const denied = (reason, retryAt) => ({ record: { httpStatus: null, budgetDenied: true, retryAt, error: { message: reason }, elapsedMs: 0 }, observations: partNumbers.map(partNumber => ({ storeNumber, partNumber, status: 'unknown', quote: null, storeName: null, productTitle: null, observedAt: clock().toISOString(), reason: { code: reason, message: '暂缓查询，请稍后重试' } })) });
   if (remainingMs() <= 1000) return denied('request_cancelled', clock().getTime() + 1000);
+  if (market === null && partNumbers.some(isRetiredPartNumber)) return denied('product_retired', 0);
   if (market !== null) {
     const site = findMarket(market);
     const flags = source === 'auto' ? config.internationalMonitoring : config.internationalMarkets;

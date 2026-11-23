@@ -13,7 +13,7 @@
 const { NOTIFIABLE_TYPES, targetKeyOf } = require('./events');
 const { subscriptionResponseCode } = require('./wechat-sender');
 const { canUseReminders, reminderBlockReason, isMember, followAllowance } = require('../rules/membership');
-const { loadFollowPolicy } = require('../rules/follow-access');
+const { loadFollowPolicy, isRetiredMainlandTarget } = require('../rules/follow-access');
 const { suppressDndEvent } = require('../rules/dnd');
 const { isValidTemplateId } = require('../config');
 const { targetSnapshot } = require('../notification-target');
@@ -61,6 +61,7 @@ function buildTasks({ events, follows, users, config, now }) {
     if (!kind) continue;
     const market = event.market || 'CN';
     const regional = market !== 'CN';
+    if (isRetiredMainlandTarget(event)) continue;
     if (regional && (event.type !== 'restock_confirmed' || event.previousStatus !== 'unavailable'
       || !marketDeliveryEnabled(config, market) || !marketTargetListed(event))) continue;
     // Sold-out alerts are optional: without their own template none are planned.
@@ -173,6 +174,7 @@ function skipReason({ task, user, follow, config, now, senderAppid }) {
   const settings = user && user.settings;
   if (!config.notifications.enabled) return 'notifications_disabled';
   const kind = alertKind(task.eventType) || 'restock';
+  if (isRetiredMainlandTarget(task)) return 'product_retired';
   if (task.market && task.market !== 'CN') {
     if (!marketDeliveryEnabled(config, task.market) || task.eventType !== 'restock_confirmed') return 'market_notifications_disabled';
     if (!marketTargetListed(task)) return 'invalid_market_target';

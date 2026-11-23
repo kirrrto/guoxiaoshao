@@ -53,8 +53,8 @@
     },
     {
       "path": "engine/collector.js",
-      "bytes": 31384,
-      "sha256": "833b541e3434886fc591204e59ef08f679ddef50d0712201051a61f02c376dd4"
+      "bytes": 31423,
+      "sha256": "52c901587af8ba986c7a77aa9e16d0f39609a5037999846c7e6681f1127f99e5"
     },
     {
       "path": "engine/current-availability.js",
@@ -73,8 +73,8 @@
     },
     {
       "path": "engine/guarded-pickup.js",
-      "bytes": 5373,
-      "sha256": "885ba2e83f7bf9671d2bc070c3f447eca2224cfc83874205198a91d4646f4658"
+      "bytes": 5541,
+      "sha256": "42a870a4ce804376d723087a807cd37e72648b77c9f1a4fdd4f626b0ed87c32f"
     },
     {
       "path": "engine/lease.js",
@@ -88,8 +88,8 @@
     },
     {
       "path": "engine/notifier.js",
-      "bytes": 20985,
-      "sha256": "0771926c5b75adfb669345c85b3701ad64d65e6eb7d0fe1c911f020941aa4c83"
+      "bytes": 21123,
+      "sha256": "f52215ef7a44d40b27948a2a091b96d3f1f7b014dcbde38183a476ed6812668e"
     },
     {
       "path": "engine/observation-day.js",
@@ -144,7 +144,7 @@
     {
       "path": "market-products.json",
       "bytes": 205604,
-      "sha256": "b9d1606c7e6b8a382e081d945b7918de854f65d9b13ccee43a08b2deca32797a"
+      "sha256": "6da260e2c9be05cd68360015f8ad215249ebface442740cacfbe15fd7ed79b01"
     },
     {
       "path": "market-stores.json",
@@ -178,8 +178,8 @@
     },
     {
       "path": "repo/atomic-ops.js",
-      "bytes": 57597,
-      "sha256": "ba273c24c517a592066a94b968323befaa8867bd522f18a0f17ff719d5581001"
+      "bytes": 57870,
+      "sha256": "07ee03d8157366c8d4501f955bea1d551bbc767dd6e221f01199cbc47a0a9d4b"
     },
     {
       "path": "repo/cloudbase-repo.js",
@@ -222,6 +222,11 @@
       "sha256": "58a56aea3dd7fe5a431e0aad5dcf411d4aa9786163f8567b05255408a37280bc"
     },
     {
+      "path": "repo/owner-annual-gift.js",
+      "bytes": 3207,
+      "sha256": "afb1be5e8ff45c7472fdf823e278ed59fa17bab96505b1b687e56144ef2a8b6d"
+    },
+    {
       "path": "repo/query-target.js",
       "bytes": 2748,
       "sha256": "aafb499cf3f4a333389ddfeb2a81f9a375b7739e9932db9221e85576af3e6bae"
@@ -248,8 +253,8 @@
     },
     {
       "path": "rules/follow-access.js",
-      "bytes": 3426,
-      "sha256": "f3c0ec53ed1337f3b496566698d340c75040d481ab7461a01d67e8dbccd8bd01"
+      "bytes": 4290,
+      "sha256": "69511c55b6b7a41f8ee53002ddaca2ebe3479eb58a4cf7bb300c789e09bde983"
     },
     {
       "path": "rules/launch-gift.js",
@@ -258,8 +263,8 @@
     },
     {
       "path": "rules/member-plan.js",
-      "bytes": 5299,
-      "sha256": "99af9a0c8eee5a41a8830220d890b8611fb17199f53e205c87d1c8b89ae06640"
+      "bytes": 5589,
+      "sha256": "34748162155311901eff49ff220b3922ce81d6c14013c8990ec01555388a1dad"
     },
     {
       "path": "rules/membership-entitlements.js",
@@ -268,13 +273,18 @@
     },
     {
       "path": "rules/membership.js",
-      "bytes": 6705,
-      "sha256": "225a0eb878dd8ae16dc77caf413df25acf4edea2f12bf324af58bf8147b1a1ba"
+      "bytes": 6936,
+      "sha256": "36eddbd3b1843bb87d56c8257cf2bf594e8eda08743da82305d5ac74bbc00c2d"
     },
     {
       "path": "rules/new-product.js",
       "bytes": 1870,
       "sha256": "a5b57d59e52ba1190a4e97ce19903d680f83b8ede1ec7088bcc5bdd840cc490a"
+    },
+    {
+      "path": "rules/owner-annual-gift.js",
+      "bytes": 1554,
+      "sha256": "9fc15f3bece2ce1d4455c7b9ebeef72f4fc45d392d1e5af8dd1d51bba8ee5e6e"
     },
     {
       "path": "rules/product-target.js",

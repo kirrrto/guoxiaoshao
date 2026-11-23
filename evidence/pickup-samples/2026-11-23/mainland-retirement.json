@@ -1,0 +1,957 @@
+{
+  "date": "2026-11-23",
+  "scope": "由开发机按公开中国大陆 Apple Store 取货请求抽查广州天环广场 R577。只读，没有调用生产云函数或使用用户账号。状态是采样时刻的观测。",
+  "requests": [
+    {
+      "purpose": "retired_homepod_group",
+      "storeNumber": "R577",
+      "url": "https://www.apple.com.cn/shop/retail/pickup-message?pl=true&mts.0=regular&parts.0=MJ2J3CH%2FA&parts.1=MJ2L3CH%2FA&parts.2=MTJU3CH%2FA&parts.3=MHY53CH%2FA&parts.4=MJ2K3CH%2FA&store=R577",
+      "startedAt": "2026-11-23T14:50:48.993Z",
+      "finishedAt": "2026-11-23T14:50:49.893Z",
+      "httpStatus": 200,
+      "bytes": 543,
+      "bodySha256": "b39b191bb02d494aa89df68da0ccc5cc17b445246fefd5ab666955a9a01d5c85",
+      "observations": [
+        {
+          "partNumber": "MJ2J3CH/A",
+          "status": "unknown",
+          "reason": {
+            "code": "upstream_error",
+            "message": "Product(s) Invalid or not buyable"
+          }
+        },
+        {
+          "partNumber": "MJ2L3CH/A",
+          "status": "unknown",
+          "reason": {
+            "code": "upstream_error",
+            "message": "Product(s) Invalid or not buyable"
+          }
+        },
+        {
+          "partNumber": "MTJU3CH/A",
+          "status": "unknown",
+          "reason": {
+            "code": "upstream_error",
+            "message": "Product(s) Invalid or not buyable"
+          }
+        },
+        {
+          "partNumber": "MHY53CH/A",
+          "status": "unknown",
+          "reason": {
+            "code": "upstream_error",
+            "message": "Product(s) Invalid or not buyable"
+          }
+        },
+        {
+          "partNumber": "MJ2K3CH/A",
+          "status": "unknown",
+          "reason": {
+            "code": "upstream_error",
+            "message": "Product(s) Invalid or not buyable"
+          }
+        }
+      ]
+    },
+    {
+      "purpose": "current_homepod_mini_2",
+      "storeNumber": "R577",
+      "url": "https://www.apple.com.cn/shop/retail/pickup-message?pl=true&mts.0=regular&parts.0=MGHK4CH%2FA&parts.1=MGKR4CH%2FA&parts.2=MGHM4CH%2FA&parts.3=MGHL4CH%2FA&parts.4=MGHJ4CH%2FA&store=R577",
+      "startedAt": "2026-11-23T14:50:51.398Z",
+      "finishedAt": "2026-11-23T14:50:51.810Z",
+      "httpStatus": 200,
+      "bytes": 9604,
+      "bodySha256": "f2e73c6813bd56d5ac0a296caea5251c2dd700e6bf6f70d33d226f5a5ed6ae83",
+      "observations": [
+        {
+          "partNumber": "MGHK4CH/A",
+          "status": "available",
+          "pickupDisplay": "available"
+        },
+        {
+          "partNumber": "MGKR4CH/A",
+          "status": "available",
+          "pickupDisplay": "available"
+        },
+        {
+          "partNumber": "MGHM4CH/A",
+          "status": "available",
+          "pickupDisplay": "available"
+        },
+        {
+          "partNumber": "MGHL4CH/A",
+          "status": "available",
+          "pickupDisplay": "available"
+        },
+        {
+          "partNumber": "MGHJ4CH/A",
+          "status": "available",
+          "pickupDisplay": "available"
+        }
+      ]
+    },
+    {
+      "purpose": "retired_homepod_individual",
+      "storeNumber": "R577",
+      "url": "https://www.apple.com.cn/shop/retail/pickup-message?pl=true&mts.0=regular&parts.0=MJ2J3CH%2FA&store=R577",
+      "startedAt": "2026-11-23T14:51:29.766Z",
+      "finishedAt": "2026-11-23T14:51:31.559Z",
+      "httpStatus": 200,
+      "bytes": 57,
+      "bodySha256": "89e4129122e535472ede59ea0d84725b57ff5fa9076f3c6916cf74e12388a43a",
+      "observations": [
+        {
+          "partNumber": "MJ2J3CH/A",
+          "status": "unknown",
+          "reason": {
+            "code": "missing_stores",
+            "message": "Response has no stores array"
+          }
+        }
+      ]
+    },
+    {
+      "purpose": "retired_homepod_individual",
+      "storeNumber": "R577",
+      "url": "https://www.apple.com.cn/shop/retail/pickup-message?pl=true&mts.0=regular&parts.0=MJ2L3CH%2FA&store=R577",
+      "startedAt": "2026-11-23T14:51:33.063Z",
+      "finishedAt": "2026-11-23T14:51:34.623Z",
+      "httpStatus": 200,
+      "bytes": 57,
+      "bodySha256": "89e4129122e535472ede59ea0d84725b57ff5fa9076f3c6916cf74e12388a43a",
+      "observations": [
+        {
+          "partNumber": "MJ2L3CH/A",
+          "status": "unknown",
+          "reason": {
+            "code": "missing_stores",
+            "message": "Response has no stores array"
+          }
+        }
+      ]
+    },
+    {
+      "purpose": "retired_homepod_individual",
+      "storeNumber": "R577",
+      "url": "https://www.apple.com.cn/shop/retail/pickup-message?pl=true&mts.0=regular&parts.0=MTJU3CH%2FA&store=R577",
+      "startedAt": "2026-11-23T14:51:36.125Z",
+      "finishedAt": "2026-11-23T14:51:36.427Z",
+      "httpStatus": 200,
+      "bytes": 57,
+      "bodySha256": "89e4129122e535472ede59ea0d84725b57ff5fa9076f3c6916cf74e12388a43a",
+      "observations": [
+        {
+          "partNumber": "MTJU3CH/A",
+          "status": "unknown",
+          "reason": {
+            "code": "missing_stores",
+            "message": "Response has no stores array"
+          }
+        }
+      ]
+    },
+    {
+      "purpose": "retired_homepod_individual",
+      "storeNumber": "R577",
+      "url": "https://www.apple.com.cn/shop/retail/pickup-message?pl=true&mts.0=regular&parts.0=MHY53CH%2FA&store=R577",
+      "startedAt": "2026-11-23T14:51:37.929Z",
+      "finishedAt": "2026-11-23T14:51:38.137Z",
+      "httpStatus": 200,
+      "bytes": 57,
+      "bodySha256": "89e4129122e535472ede59ea0d84725b57ff5fa9076f3c6916cf74e12388a43a",
+      "observations": [
+        {
+          "partNumber": "MHY53CH/A",
+          "status": "unknown",
+          "reason": {
+            "code": "missing_stores",
+            "message": "Response has no stores array"
+          }
+        }
+      ]
+    },
+    {
+      "purpose": "retired_homepod_individual",
+      "storeNumber": "R577",
+      "url": "https://www.apple.com.cn/shop/retail/pickup-message?pl=true&mts.0=regular&parts.0=MJ2K3CH%2FA&store=R577",
+      "startedAt": "2026-11-23T14:51:39.639Z",
+      "finishedAt": "2026-11-23T14:51:39.865Z",
+      "httpStatus": 200,
+      "bytes": 57,
+      "bodySha256": "89e4129122e535472ede59ea0d84725b57ff5fa9076f3c6916cf74e12388a43a",
+      "observations": [
+        {
+          "partNumber": "MJ2K3CH/A",
+          "status": "unknown",
+          "reason": {
+            "code": "missing_stores",
+            "message": "Response has no stores array"
+          }
+        }
+      ]
+    },
+    {
+      "purpose": "retired_mac_group",
+      "storeNumber": "R577",
+      "url": "https://www.apple.com.cn/shop/retail/pickup-message?pl=true&mts.0=regular&parts.0=MJLW4CH%2FA&parts.1=MJLV4CH%2FA&parts.2=MGDT4CH%2FA&parts.3=MGDP4CH%2FA&parts.4=MGXX4CH%2FA&store=R577",
+      "startedAt": "2026-11-23T14:52:19.660Z",
+      "finishedAt": "2026-11-23T14:52:20.664Z",
+      "httpStatus": 200,
+      "bytes": 57,
+      "bodySha256": "89e4129122e535472ede59ea0d84725b57ff5fa9076f3c6916cf74e12388a43a",
+      "observations": [
+        {
+          "partNumber": "MJLW4CH/A",
+          "status": "unknown",
+          "reason": {
+            "code": "missing_stores",
+            "message": "Response has no stores array"
+          }
+        },
+        {
+          "partNumber": "MJLV4CH/A",
+          "status": "unknown",
+          "reason": {
+            "code": "missing_stores",
+            "message": "Response has no stores array"
+          }
+        },
+        {
+          "partNumber": "MGDT4CH/A",
+          "status": "unknown",
+          "reason": {
+            "code": "missing_stores",
+            "message": "Response has no stores array"
+          }
+        },
+        {
+          "partNumber": "MGDP4CH/A",
+          "status": "unknown",
+          "reason": {
+            "code": "missing_stores",
+            "message": "Response has no stores array"
+          }
+        },
+        {
+          "partNumber": "MGXX4CH/A",
+          "status": "unknown",
+          "reason": {
+            "code": "missing_stores",
+            "message": "Response has no stores array"
+          }
+        }
+      ]
+    },
+    {
+      "purpose": "retired_mac_group",
+      "storeNumber": "R577",
+      "url": "https://www.apple.com.cn/shop/retail/pickup-message?pl=true&mts.0=regular&parts.0=MGEA4CH%2FA&parts.1=MGE44CH%2FA&parts.2=MGEC4CH%2FA&parts.3=MGE64CH%2FA&parts.4=MGED4CH%2FA&store=R577",
+      "startedAt": "2026-11-23T14:52:22.167Z",
+      "finishedAt": "2026-11-23T14:52:23.227Z",
+      "httpStatus": 200,
+      "bytes": 57,
+      "bodySha256": "89e4129122e535472ede59ea0d84725b57ff5fa9076f3c6916cf74e12388a43a",
+      "observations": [
+        {
+          "partNumber": "MGEA4CH/A",
+          "status": "unknown",
+          "reason": {
+            "code": "missing_stores",
+            "message": "Response has no stores array"
+          }
+        },
+        {
+          "partNumber": "MGE44CH/A",
+          "status": "unknown",
+          "reason": {
+            "code": "missing_stores",
+            "message": "Response has no stores array"
+          }
+        },
+        {
+          "partNumber": "MGEC4CH/A",
+          "status": "unknown",
+          "reason": {
+            "code": "missing_stores",
+            "message": "Response has no stores array"
+          }
+        },
+        {
+          "partNumber": "MGE64CH/A",
+          "status": "unknown",
+          "reason": {
+            "code": "missing_stores",
+            "message": "Response has no stores array"
+          }
+        },
+        {
+          "partNumber": "MGED4CH/A",
+          "status": "unknown",
+          "reason": {
+            "code": "missing_stores",
+            "message": "Response has no stores array"
+          }
+        }
+      ]
+    },
+    {
+      "purpose": "retired_mac_group",
+      "storeNumber": "R577",
+      "url": "https://www.apple.com.cn/shop/retail/pickup-message?pl=true&mts.0=regular&parts.0=MGE74CH%2FA&parts.1=MGEE4CH%2FA&parts.2=MGE94CH%2FA&store=R577",
+      "startedAt": "2026-11-23T14:52:24.728Z",
+      "finishedAt": "2026-11-23T14:52:25.008Z",
+      "httpStatus": 200,
+      "bytes": 57,
+      "bodySha256": "89e4129122e535472ede59ea0d84725b57ff5fa9076f3c6916cf74e12388a43a",
+      "observations": [
+        {
+          "partNumber": "MGE74CH/A",
+          "status": "unknown",
+          "reason": {
+            "code": "missing_stores",
+            "message": "Response has no stores array"
+          }
+        },
+        {
+          "partNumber": "MGEE4CH/A",
+          "status": "unknown",
+          "reason": {
+            "code": "missing_stores",
+            "message": "Response has no stores array"
+          }
+        },
+        {
+          "partNumber": "MGE94CH/A",
+          "status": "unknown",
+          "reason": {
+            "code": "missing_stores",
+            "message": "Response has no stores array"
+          }
+        }
+      ]
+    },
+    {
+      "purpose": "crosscheck_current_macbook-air",
+      "storeNumber": "R577",
+      "url": "https://www.apple.com.cn/shop/retail/pickup-message?pl=true&mts.0=regular&parts.0=MDHJ4CH%2FA&parts.1=MDHF4CH%2FA&parts.2=MDHC4CH%2FA&parts.3=MDH84CH%2FA&parts.4=MGP94CH%2FA&store=R577",
+      "startedAt": "2026-11-23T14:52:26.511Z",
+      "finishedAt": "2026-11-23T14:52:27.007Z",
+      "httpStatus": 200,
+      "bytes": 9549,
+      "bodySha256": "2dd7ebf4e7cdab20d265449ffd7ccb7b38f8086d90a70e6f4090cde920d96a7a",
+      "observations": [
+        {
+          "partNumber": "MDHJ4CH/A",
+          "status": "available",
+          "pickupDisplay": "available"
+        },
+        {
+          "partNumber": "MDHF4CH/A",
+          "status": "available",
+          "pickupDisplay": "available"
+        },
+        {
+          "partNumber": "MDHC4CH/A",
+          "status": "unavailable",
+          "pickupDisplay": "unavailable"
+        },
+        {
+          "partNumber": "MDH84CH/A",
+          "status": "available",
+          "pickupDisplay": "available"
+        },
+        {
+          "partNumber": "MGP94CH/A",
+          "status": "available",
+          "pickupDisplay": "available"
+        }
+      ]
+    },
+    {
+      "purpose": "crosscheck_current_macbook-air",
+      "storeNumber": "R577",
+      "url": "https://www.apple.com.cn/shop/retail/pickup-message?pl=true&mts.0=regular&parts.0=MGP84CH%2FA&parts.1=MGP74CH%2FA&parts.2=MDHK4CH%2FA&parts.3=MDHG4CH%2FA&parts.4=MDHD4CH%2FA&store=R577",
+      "startedAt": "2026-11-23T14:52:28.510Z",
+      "finishedAt": "2026-11-23T14:52:29.047Z",
+      "httpStatus": 200,
+      "bytes": 9551,
+      "bodySha256": "7b26bf8383d5cb3f0fd62e1d85b3f697dfd4b016c5b313fe206d6acd4c485166",
+      "observations": [
+        {
+          "partNumber": "MGP84CH/A",
+          "status": "available",
+          "pickupDisplay": "available"
+        },
+        {
+          "partNumber": "MGP74CH/A",
+          "status": "unavailable",
+          "pickupDisplay": "unavailable"
+        },
+        {
+          "partNumber": "MDHK4CH/A",
+          "status": "available",
+          "pickupDisplay": "available"
+        },
+        {
+          "partNumber": "MDHG4CH/A",
+          "status": "available",
+          "pickupDisplay": "available"
+        },
+        {
+          "partNumber": "MDHD4CH/A",
+          "status": "available",
+          "pickupDisplay": "available"
+        }
+      ]
+    },
+    {
+      "purpose": "crosscheck_current_macbook-air",
+      "storeNumber": "R577",
+      "url": "https://www.apple.com.cn/shop/retail/pickup-message?pl=true&mts.0=regular&parts.0=MDH94CH%2FA&parts.1=MDVT4CH%2FA&parts.2=MDVK4CH%2FA&parts.3=MDVE4CH%2FA&parts.4=MDVA4CH%2FA&store=R577",
+      "startedAt": "2026-11-23T14:52:30.550Z",
+      "finishedAt": "2026-11-23T14:52:31.048Z",
+      "httpStatus": 200,
+      "bytes": 9545,
+      "bodySha256": "3374aafe988a617856da25fd44625a1ce5508b5ce9fbc43101f87e14335a9ee4",
+      "observations": [
+        {
+          "partNumber": "MDH94CH/A",
+          "status": "unavailable",
+          "pickupDisplay": "unavailable"
+        },
+        {
+          "partNumber": "MDVT4CH/A",
+          "status": "available",
+          "pickupDisplay": "available"
+        },
+        {
+          "partNumber": "MDVK4CH/A",
+          "status": "available",
+          "pickupDisplay": "available"
+        },
+        {
+          "partNumber": "MDVE4CH/A",
+          "status": "available",
+          "pickupDisplay": "available"
+        },
+        {
+          "partNumber": "MDVA4CH/A",
+          "status": "available",
+          "pickupDisplay": "available"
+        }
+      ]
+    },
+    {
+      "purpose": "crosscheck_current_macbook-air",
+      "storeNumber": "R577",
+      "url": "https://www.apple.com.cn/shop/retail/pickup-message?pl=true&mts.0=regular&parts.0=MGPE4CH%2FA&parts.1=MGPD4CH%2FA&parts.2=MGPC4CH%2FA&parts.3=MDVU4CH%2FA&parts.4=MDVN4CH%2FA&store=R577",
+      "startedAt": "2026-11-23T14:52:32.551Z",
+      "finishedAt": "2026-11-23T14:52:33.077Z",
+      "httpStatus": 200,
+      "bytes": 9595,
+      "bodySha256": "763fdc1c5c6dfa9c7f7129cdd6a29689750acd46202dd6bb59ab21ca7e598a00",
+      "observations": [
+        {
+          "partNumber": "MGPE4CH/A",
+          "status": "available",
+          "pickupDisplay": "available"
+        },
+        {
+          "partNumber": "MGPD4CH/A",
+          "status": "available",
+          "pickupDisplay": "available"
+        },
+        {
+          "partNumber": "MGPC4CH/A",
+          "status": "available",
+          "pickupDisplay": "available"
+        },
+        {
+          "partNumber": "MDVU4CH/A",
+          "status": "available",
+          "pickupDisplay": "available"
+        },
+        {
+          "partNumber": "MDVN4CH/A",
+          "status": "available",
+          "pickupDisplay": "available"
+        }
+      ]
+    },
+    {
+      "purpose": "crosscheck_current_macbook-air",
+      "storeNumber": "R577",
+      "url": "https://www.apple.com.cn/shop/retail/pickup-message?pl=true&mts.0=regular&parts.0=MDVF4CH%2FA&parts.1=MDVC4CH%2FA&store=R577",
+      "startedAt": "2026-11-23T14:52:34.581Z",
+      "finishedAt": "2026-11-23T14:52:34.909Z",
+      "httpStatus": 200,
+      "bytes": 6989,
+      "bodySha256": "b1cbc13821f0253d3b5c84464a8d7d76632ddab3ffcb5a349f2a09e360892650",
+      "observations": [
+        {
+          "partNumber": "MDVF4CH/A",
+          "status": "available",
+          "pickupDisplay": "available"
+        },
+        {
+          "partNumber": "MDVC4CH/A",
+          "status": "available",
+          "pickupDisplay": "available"
+        }
+      ]
+    },
+    {
+      "purpose": "crosscheck_current_imac",
+      "storeNumber": "R577",
+      "url": "https://www.apple.com.cn/shop/retail/pickup-message?pl=true&mts.0=regular&parts.0=MH2U4CH%2FA&parts.1=MH1Q4CH%2FA&parts.2=MH1J4CH%2FA&parts.3=MH1F4CH%2FA&parts.4=MH154CH%2FA&store=R577",
+      "startedAt": "2026-11-23T14:52:36.413Z",
+      "finishedAt": "2026-11-23T14:52:36.927Z",
+      "httpStatus": 200,
+      "bytes": 9486,
+      "bodySha256": "a18ca33499bd531f0e81db4b63768f453b535910e05e365269f116638125fd32",
+      "observations": [
+        {
+          "partNumber": "MH2U4CH/A",
+          "status": "available",
+          "pickupDisplay": "available"
+        },
+        {
+          "partNumber": "MH1Q4CH/A",
+          "status": "available",
+          "pickupDisplay": "available"
+        },
+        {
+          "partNumber": "MH1J4CH/A",
+          "status": "available",
+          "pickupDisplay": "available"
+        },
+        {
+          "partNumber": "MH1F4CH/A",
+          "status": "available",
+          "pickupDisplay": "available"
+        },
+        {
+          "partNumber": "MH154CH/A",
+          "status": "available",
+          "pickupDisplay": "available"
+        }
+      ]
+    },
+    {
+      "purpose": "crosscheck_current_imac",
+      "storeNumber": "R577",
+      "url": "https://www.apple.com.cn/shop/retail/pickup-message?pl=true&mts.0=regular&parts.0=MH1R4CH%2FA&parts.1=MH1N4CH%2FA&parts.2=MH1G4CH%2FA&parts.3=MH164CH%2FA&store=R577",
+      "startedAt": "2026-11-23T14:52:38.429Z",
+      "finishedAt": "2026-11-23T14:52:38.904Z",
+      "httpStatus": 200,
+      "bytes": 8638,
+      "bodySha256": "f6ab1e7845e3c9262b6f93d3ba489d1379044e5680810fc848b3d67ea20fd4c0",
+      "observations": [
+        {
+          "partNumber": "MH1R4CH/A",
+          "status": "available",
+          "pickupDisplay": "available"
+        },
+        {
+          "partNumber": "MH1N4CH/A",
+          "status": "available",
+          "pickupDisplay": "available"
+        },
+        {
+          "partNumber": "MH1G4CH/A",
+          "status": "available",
+          "pickupDisplay": "available"
+        },
+        {
+          "partNumber": "MH164CH/A",
+          "status": "available",
+          "pickupDisplay": "available"
+        }
+      ]
+    },
+    {
+      "purpose": "new_macbook_pro",
+      "storeNumber": "R577",
+      "url": "https://www.apple.com.cn/shop/retail/pickup-message?pl=true&mts.0=regular&parts.0=MMFK4CH%2FA&parts.1=MMFN4CH%2FA&parts.2=MMFJ4CH%2FA&parts.3=MMFM4CH%2FA&store=R577",
+      "startedAt": "2026-11-23T14:52:40.200Z",
+      "finishedAt": "2026-11-23T14:52:40.711Z",
+      "httpStatus": 200,
+      "bytes": 8728,
+      "bodySha256": "47c67f8548c71ad31c6cd30bd8997e4d00f659f88bfa9d03e8e1ddcef6ae58a6",
+      "observations": [
+        {
+          "partNumber": "MMFK4CH/A",
+          "status": "available",
+          "pickupDisplay": "available"
+        },
+        {
+          "partNumber": "MMFN4CH/A",
+          "status": "available",
+          "pickupDisplay": "available"
+        },
+        {
+          "partNumber": "MMFJ4CH/A",
+          "status": "available",
+          "pickupDisplay": "available"
+        },
+        {
+          "partNumber": "MMFM4CH/A",
+          "status": "available",
+          "pickupDisplay": "available"
+        }
+      ]
+    },
+    {
+      "purpose": "retired_mac_individual",
+      "storeNumber": "R577",
+      "url": "https://www.apple.com.cn/shop/retail/pickup-message?pl=true&mts.0=regular&parts.0=MJLW4CH%2FA&store=R577",
+      "startedAt": "2026-11-23T14:52:42.266Z",
+      "finishedAt": "2026-11-23T14:52:42.520Z",
+      "httpStatus": 200,
+      "bytes": 57,
+      "bodySha256": "89e4129122e535472ede59ea0d84725b57ff5fa9076f3c6916cf74e12388a43a",
+      "observations": [
+        {
+          "partNumber": "MJLW4CH/A",
+          "status": "unknown",
+          "reason": {
+            "code": "missing_stores",
+            "message": "Response has no stores array"
+          }
+        }
+      ]
+    },
+    {
+      "purpose": "retired_mac_individual",
+      "storeNumber": "R577",
+      "url": "https://www.apple.com.cn/shop/retail/pickup-message?pl=true&mts.0=regular&parts.0=MJLV4CH%2FA&store=R577",
+      "startedAt": "2026-11-23T14:52:44.073Z",
+      "finishedAt": "2026-11-23T14:52:44.321Z",
+      "httpStatus": 200,
+      "bytes": 57,
+      "bodySha256": "89e4129122e535472ede59ea0d84725b57ff5fa9076f3c6916cf74e12388a43a",
+      "observations": [
+        {
+          "partNumber": "MJLV4CH/A",
+          "status": "unknown",
+          "reason": {
+            "code": "missing_stores",
+            "message": "Response has no stores array"
+          }
+        }
+      ]
+    },
+    {
+      "purpose": "retired_mac_individual",
+      "storeNumber": "R577",
+      "url": "https://www.apple.com.cn/shop/retail/pickup-message?pl=true&mts.0=regular&parts.0=MGDT4CH%2FA&store=R577",
+      "startedAt": "2026-11-23T14:52:45.875Z",
+      "finishedAt": "2026-11-23T14:52:46.133Z",
+      "httpStatus": 200,
+      "bytes": 57,
+      "bodySha256": "89e4129122e535472ede59ea0d84725b57ff5fa9076f3c6916cf74e12388a43a",
+      "observations": [
+        {
+          "partNumber": "MGDT4CH/A",
+          "status": "unknown",
+          "reason": {
+            "code": "missing_stores",
+            "message": "Response has no stores array"
+          }
+        }
+      ]
+    },
+    {
+      "purpose": "retired_mac_individual",
+      "storeNumber": "R577",
+      "url": "https://www.apple.com.cn/shop/retail/pickup-message?pl=true&mts.0=regular&parts.0=MGDP4CH%2FA&store=R577",
+      "startedAt": "2026-11-23T14:52:47.686Z",
+      "finishedAt": "2026-11-23T14:52:48.006Z",
+      "httpStatus": 200,
+      "bytes": 57,
+      "bodySha256": "89e4129122e535472ede59ea0d84725b57ff5fa9076f3c6916cf74e12388a43a",
+      "observations": [
+        {
+          "partNumber": "MGDP4CH/A",
+          "status": "unknown",
+          "reason": {
+            "code": "missing_stores",
+            "message": "Response has no stores array"
+          }
+        }
+      ]
+    },
+    {
+      "purpose": "retired_mac_individual",
+      "storeNumber": "R577",
+      "url": "https://www.apple.com.cn/shop/retail/pickup-message?pl=true&mts.0=regular&parts.0=MGXX4CH%2FA&store=R577",
+      "startedAt": "2026-11-23T14:52:49.559Z",
+      "finishedAt": "2026-11-23T14:52:49.837Z",
+      "httpStatus": 200,
+      "bytes": 57,
+      "bodySha256": "89e4129122e535472ede59ea0d84725b57ff5fa9076f3c6916cf74e12388a43a",
+      "observations": [
+        {
+          "partNumber": "MGXX4CH/A",
+          "status": "unknown",
+          "reason": {
+            "code": "missing_stores",
+            "message": "Response has no stores array"
+          }
+        }
+      ]
+    },
+    {
+      "purpose": "retired_mac_individual",
+      "storeNumber": "R577",
+      "url": "https://www.apple.com.cn/shop/retail/pickup-message?pl=true&mts.0=regular&parts.0=MGEA4CH%2FA&store=R577",
+      "startedAt": "2026-11-23T14:52:51.391Z",
+      "finishedAt": "2026-11-23T14:52:51.627Z",
+      "httpStatus": 200,
+      "bytes": 57,
+      "bodySha256": "89e4129122e535472ede59ea0d84725b57ff5fa9076f3c6916cf74e12388a43a",
+      "observations": [
+        {
+          "partNumber": "MGEA4CH/A",
+          "status": "unknown",
+          "reason": {
+            "code": "missing_stores",
+            "message": "Response has no stores array"
+          }
+        }
+      ]
+    },
+    {
+      "purpose": "retired_mac_individual",
+      "storeNumber": "R577",
+      "url": "https://www.apple.com.cn/shop/retail/pickup-message?pl=true&mts.0=regular&parts.0=MGE44CH%2FA&store=R577",
+      "startedAt": "2026-11-23T14:52:53.179Z",
+      "finishedAt": "2026-11-23T14:52:53.434Z",
+      "httpStatus": 200,
+      "bytes": 57,
+      "bodySha256": "89e4129122e535472ede59ea0d84725b57ff5fa9076f3c6916cf74e12388a43a",
+      "observations": [
+        {
+          "partNumber": "MGE44CH/A",
+          "status": "unknown",
+          "reason": {
+            "code": "missing_stores",
+            "message": "Response has no stores array"
+          }
+        }
+      ]
+    },
+    {
+      "purpose": "retired_mac_individual",
+      "storeNumber": "R577",
+      "url": "https://www.apple.com.cn/shop/retail/pickup-message?pl=true&mts.0=regular&parts.0=MGEC4CH%2FA&store=R577",
+      "startedAt": "2026-11-23T14:52:54.987Z",
+      "finishedAt": "2026-11-23T14:52:55.253Z",
+      "httpStatus": 200,
+      "bytes": 57,
+      "bodySha256": "89e4129122e535472ede59ea0d84725b57ff5fa9076f3c6916cf74e12388a43a",
+      "observations": [
+        {
+          "partNumber": "MGEC4CH/A",
+          "status": "unknown",
+          "reason": {
+            "code": "missing_stores",
+            "message": "Response has no stores array"
+          }
+        }
+      ]
+    },
+    {
+      "purpose": "retired_mac_individual",
+      "storeNumber": "R577",
+      "url": "https://www.apple.com.cn/shop/retail/pickup-message?pl=true&mts.0=regular&parts.0=MGE64CH%2FA&store=R577",
+      "startedAt": "2026-11-23T14:52:56.806Z",
+      "finishedAt": "2026-11-23T14:52:57.024Z",
+      "httpStatus": 200,
+      "bytes": 57,
+      "bodySha256": "89e4129122e535472ede59ea0d84725b57ff5fa9076f3c6916cf74e12388a43a",
+      "observations": [
+        {
+          "partNumber": "MGE64CH/A",
+          "status": "unknown",
+          "reason": {
+            "code": "missing_stores",
+            "message": "Response has no stores array"
+          }
+        }
+      ]
+    },
+    {
+      "purpose": "retired_mac_individual",
+      "storeNumber": "R577",
+      "url": "https://www.apple.com.cn/shop/retail/pickup-message?pl=true&mts.0=regular&parts.0=MGED4CH%2FA&store=R577",
+      "startedAt": "2026-11-23T14:52:58.577Z",
+      "finishedAt": "2026-11-23T14:52:58.842Z",
+      "httpStatus": 200,
+      "bytes": 57,
+      "bodySha256": "89e4129122e535472ede59ea0d84725b57ff5fa9076f3c6916cf74e12388a43a",
+      "observations": [
+        {
+          "partNumber": "MGED4CH/A",
+          "status": "unknown",
+          "reason": {
+            "code": "missing_stores",
+            "message": "Response has no stores array"
+          }
+        }
+      ]
+    },
+    {
+      "purpose": "retired_mac_individual",
+      "storeNumber": "R577",
+      "url": "https://www.apple.com.cn/shop/retail/pickup-message?pl=true&mts.0=regular&parts.0=MGE74CH%2FA&store=R577",
+      "startedAt": "2026-11-23T14:53:00.394Z",
+      "finishedAt": "2026-11-23T14:53:00.610Z",
+      "httpStatus": 200,
+      "bytes": 57,
+      "bodySha256": "89e4129122e535472ede59ea0d84725b57ff5fa9076f3c6916cf74e12388a43a",
+      "observations": [
+        {
+          "partNumber": "MGE74CH/A",
+          "status": "unknown",
+          "reason": {
+            "code": "missing_stores",
+            "message": "Response has no stores array"
+          }
+        }
+      ]
+    },
+    {
+      "purpose": "retired_mac_individual",
+      "storeNumber": "R577",
+      "url": "https://www.apple.com.cn/shop/retail/pickup-message?pl=true&mts.0=regular&parts.0=MGEE4CH%2FA&store=R577",
+      "startedAt": "2026-11-23T14:53:02.164Z",
+      "finishedAt": "2026-11-23T14:53:02.416Z",
+      "httpStatus": 200,
+      "bytes": 57,
+      "bodySha256": "89e4129122e535472ede59ea0d84725b57ff5fa9076f3c6916cf74e12388a43a",
+      "observations": [
+        {
+          "partNumber": "MGEE4CH/A",
+          "status": "unknown",
+          "reason": {
+            "code": "missing_stores",
+            "message": "Response has no stores array"
+          }
+        }
+      ]
+    },
+    {
+      "purpose": "retired_mac_individual",
+      "storeNumber": "R577",
+      "url": "https://www.apple.com.cn/shop/retail/pickup-message?pl=true&mts.0=regular&parts.0=MGE94CH%2FA&store=R577",
+      "startedAt": "2026-11-23T14:53:03.969Z",
+      "finishedAt": "2026-11-23T14:53:04.229Z",
+      "httpStatus": 200,
+      "bytes": 57,
+      "bodySha256": "89e4129122e535472ede59ea0d84725b57ff5fa9076f3c6916cf74e12388a43a",
+      "observations": [
+        {
+          "partNumber": "MGE94CH/A",
+          "status": "unknown",
+          "reason": {
+            "code": "missing_stores",
+            "message": "Response has no stores array"
+          }
+        }
+      ]
+    },
+    {
+      "purpose": "retained_macbook_pro",
+      "storeNumber": "R577",
+      "url": "https://www.apple.com.cn/shop/retail/pickup-message?pl=true&mts.0=regular&parts.0=MGDR4CH%2FA&parts.1=MHWU4CH%2FA&parts.2=MJ2C4CH%2FA&parts.3=MGDU4CH%2FA&parts.4=MHWX4CH%2FA&store=R577",
+      "startedAt": "2026-11-23T14:53:17.169Z",
+      "finishedAt": "2026-11-23T14:53:19.125Z",
+      "httpStatus": 200,
+      "bytes": 9604,
+      "bodySha256": "bd2b95665f39184d88e5569727000ea3a7b77407fa1a66ce800276c29ab999fd",
+      "observations": [
+        {
+          "partNumber": "MGDR4CH/A",
+          "status": "available",
+          "pickupDisplay": "available"
+        },
+        {
+          "partNumber": "MHWU4CH/A",
+          "status": "available",
+          "pickupDisplay": "available"
+        },
+        {
+          "partNumber": "MJ2C4CH/A",
+          "status": "available",
+          "pickupDisplay": "available"
+        },
+        {
+          "partNumber": "MGDU4CH/A",
+          "status": "available",
+          "pickupDisplay": "available"
+        },
+        {
+          "partNumber": "MHWX4CH/A",
+          "status": "available",
+          "pickupDisplay": "available"
+        }
+      ]
+    },
+    {
+      "purpose": "retained_macbook_pro",
+      "storeNumber": "R577",
+      "url": "https://www.apple.com.cn/shop/retail/pickup-message?pl=true&mts.0=regular&parts.0=MHWV4CH%2FA&parts.1=MHWT4CH%2FA&parts.2=MGDQ4CH%2FA&parts.3=MHWY4CH%2FA&parts.4=MHWW4CH%2FA&store=R577",
+      "startedAt": "2026-11-23T14:53:20.678Z",
+      "finishedAt": "2026-11-23T14:53:23.045Z",
+      "httpStatus": 200,
+      "bytes": 9553,
+      "bodySha256": "f077803b0bc55f7f39c2c42ce6b3e12bbf10675be1a8929d7dde8b5646f2d9a5",
+      "observations": [
+        {
+          "partNumber": "MHWV4CH/A",
+          "status": "available",
+          "pickupDisplay": "available"
+        },
+        {
+          "partNumber": "MHWT4CH/A",
+          "status": "available",
+          "pickupDisplay": "available"
+        },
+        {
+          "partNumber": "MGDQ4CH/A",
+          "status": "unavailable",
+          "pickupDisplay": "unavailable"
+        },
+        {
+          "partNumber": "MHWY4CH/A",
+          "status": "available",
+          "pickupDisplay": "available"
+        },
+        {
+          "partNumber": "MHWW4CH/A",
+          "status": "available",
+          "pickupDisplay": "available"
+        }
+      ]
+    },
+    {
+      "purpose": "retained_macbook_pro",
+      "storeNumber": "R577",
+      "url": "https://www.apple.com.cn/shop/retail/pickup-message?pl=true&mts.0=regular&parts.0=MGDN4CH%2FA&store=R577",
+      "startedAt": "2026-11-23T14:53:24.599Z",
+      "finishedAt": "2026-11-23T14:53:25.670Z",
+      "httpStatus": 200,
+      "bytes": 6172,
+      "bodySha256": "4a9989e48a0a1a26d1c70b5dab8b5b5ee687254c510b234dd397b90b9a4ca432",
+      "observations": [
+        {
+          "partNumber": "MGDN4CH/A",
+          "status": "available",
+          "pickupDisplay": "available"
+        }
+      ]
+    }
+  ]
+}

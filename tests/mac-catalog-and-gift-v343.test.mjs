@@ -95,26 +95,30 @@ const NEW_IMAC_M6_SKUS = [
   'MH1R4CH/A', 'MH1N4CH/A', 'MH1G4CH/A', 'MH164CH/A',
 ];
 
-test('v3.4.3 catalog syncs all 88 standard Mac SKUs (including M6 MacBook Pro & M6 iMac), memory/storage attributes, thumbnails, and picker selection', () => {
+test('current standard Mac catalog keeps memory, storage, thumbnails and picker selection aligned after retail replacements', () => {
   const mbpFamily = catalog.families.find(f => f.familyKey === 'macbook-pro');
   const imacFamily = catalog.families.find(f => f.familyKey === 'imac');
   assert.ok(mbpFamily);
   assert.ok(imacFamily);
   assert.equal(mbpFamily.releaseDate, '2026-10-27');
   assert.equal(imacFamily.releaseDate, '2026-10-27');
-  assert.equal(mbpFamily.productCount, 24);
+  assert.equal(mbpFamily.productCount, 15);
   assert.equal(imacFamily.productCount, 17);
 
   const mbpProducts = catalog.products.filter(p => p.familyKey === 'macbook-pro');
   const imacProducts = catalog.products.filter(p => p.familyKey === 'imac');
-  assert.equal(mbpProducts.length, 24);
+  assert.equal(mbpProducts.length, 15);
   assert.equal(imacProducts.length, 17);
-  assert.deepEqual(mbpProducts.slice(0, 7).map(p => p.partNumber), NEW_MBP_M6_SKUS);
+  const availableParts = new Set(mbpProducts.map(p => p.partNumber));
+  for (const part of [...NEW_MBP_M6_SKUS, 'MMFJ4CH/A', 'MMFK4CH/A', 'MMFM4CH/A', 'MMFN4CH/A']) {
+    assert.ok(availableParts.has(part), 'current MacBook Pro missing ' + part);
+    assert.equal(isRetiredPartNumber(part), false);
+  }
   assert.deepEqual(imacProducts.map(p => p.partNumber), NEW_IMAC_M6_SKUS);
 
   // Every Mac SKU across all 6 Mac families has memory, capacity, chipName, chip, and descriptive title
   const macProducts = catalog.products.filter(p => p.category === 'mac' && p.familyKey !== 'macbook-pro-proled-xdr' && p.targetType !== 'apple_cto');
-  assert.equal(macProducts.length, 88);
+  assert.equal(macProducts.length, 79);
   for (const prod of macProducts) {
     const part = prod.partNumber;
     assert.ok(prod.attributes.memory, `missing memory on ${part}`);
@@ -160,16 +164,16 @@ test('v3.4.3 catalog syncs all 88 standard Mac SKUs (including M6 MacBook Pro & 
   picker.onFamilyChange({ detail: { value: picker.data.families.findIndex(f => f.familyKey === 'macbook-pro') } });
   picker.onMemoryTap({ currentTarget: { dataset: { index: picker.data.memories.indexOf('16GB') } } });
 
-  // 1. MacBook Pro 14-inch: memories 16GB/24GB/32GB/36GB/48GB, capacities 1TB/2TB
+  // The current 14-inch retail selection offers 1TB and 2TB at different memory sizes.
   assert.equal(picker.data.families[picker.data.familyIndex].familyKey, 'macbook-pro');
-  assert.deepEqual(JSON.parse(JSON.stringify(picker.data.memories)), ['16GB', '24GB', '32GB', '36GB', '48GB']);
+  assert.deepEqual(JSON.parse(JSON.stringify(picker.data.memories)), ['16GB', '24GB', '32GB', '36GB']);
   assert.deepEqual(JSON.parse(JSON.stringify(picker.data.capacities)), ['1TB', '2TB']);
   assert.match(picker.data.product.specSummary, /M6 · 12核CPU\/12核GPU · 16GB \+ 1TB/);
   picker.onMemoryTap({ currentTarget: { dataset: { index: picker.data.memories.indexOf('24GB') } } });
   assert.equal(picker.data.product.attributes.memory, '24GB');
   assert.equal(picker.data.product.attributes.capacity, '1TB');
   picker.onCapacityTap({ currentTarget: { dataset: { index: picker.data.capacities.indexOf('2TB') } } });
-  assert.equal(picker.data.product.attributes.memory, '24GB');
+  assert.equal(picker.data.product.attributes.memory, '36GB');
   assert.equal(picker.data.product.attributes.capacity, '2TB');
 
   // 2. iMac: memories 16GB/24GB, capacities 256GB/512GB
@@ -177,6 +181,7 @@ test('v3.4.3 catalog syncs all 88 standard Mac SKUs (including M6 MacBook Pro & 
   picker.onFamilyChange({ detail: { value: imacFamIdx } });
   assert.deepEqual(JSON.parse(JSON.stringify(picker.data.memories)), ['16GB', '24GB']);
   assert.deepEqual(JSON.parse(JSON.stringify(picker.data.capacities)), ['256GB', '512GB']);
+  picker.onMemoryTap({ currentTarget: { dataset: { index: picker.data.memories.indexOf('24GB') } } });
   assert.match(picker.data.product.specSummary, /M6 · 12核CPU\/12核GPU · 24GB \+ 512GB/);
   picker.onMemoryTap({ currentTarget: { dataset: { index: picker.data.memories.indexOf('16GB') } } });
   picker.onCapacityTap({ currentTarget: { dataset: { index: picker.data.capacities.indexOf('256GB') } } });

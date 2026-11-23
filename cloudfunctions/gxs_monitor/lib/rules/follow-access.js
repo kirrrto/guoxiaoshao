@@ -18,17 +18,31 @@ const RETIRED_MAC_PART_NUMBERS = new Set([
   'MDE14CH/A', 'MEQJ4CH/A', 'MDE54CH/A',
   'MWUG3CH/A', 'MWUC3CH/A', 'MWV43CH/A', 'MWUE3CH/A',
   'MWUF3CH/A', 'MWUY3CH/A', 'MWV13CH/A', 'MWUU3CH/A',
+  // No longer listed or returned for pickup by the mainland store on 2026-11-23.
+  'MJLW4CH/A', 'MJLV4CH/A', 'MGDT4CH/A', 'MGDP4CH/A', 'MGXX4CH/A',
+  'MGEA4CH/A', 'MGE44CH/A', 'MGEC4CH/A', 'MGE64CH/A',
+  'MGED4CH/A', 'MGE74CH/A', 'MGEE4CH/A', 'MGE94CH/A',
+]);
+// Original HomePod mini finishes withdrawn from Apple's mainland store.
+// HomePod mini 2 uses a different set of retail numbers.
+const RETIRED_HOMEPOD_MINI_PART_NUMBERS = new Set([
+  'MJ2J3CH/A', 'MJ2L3CH/A', 'MTJU3CH/A', 'MHY53CH/A', 'MJ2K3CH/A',
 ]);
 const RETIRED_PART_NUMBERS = new Set([
   ...RETIRED_IPAD_MINI_PART_NUMBERS,
   ...RETIRED_MAC_PART_NUMBERS,
+  ...RETIRED_HOMEPOD_MINI_PART_NUMBERS,
 ]);
 const RETIRED_PRODUCT_MESSAGE = '老款 iPad mini 已下架且官方取货接口停用，请改选新款配置';
 const RETIRED_MAC_PRODUCT_MESSAGE = '老款 Mac 已下架且官方取货接口停用，请改选新款配置';
 const isRetiredPartNumber = partNumber => RETIRED_PART_NUMBERS.has(String(partNumber || '').trim());
-const retiredProductMessage = partNumber => RETIRED_MAC_PART_NUMBERS.has(String(partNumber || '').trim())
-  ? RETIRED_MAC_PRODUCT_MESSAGE
-  : RETIRED_PRODUCT_MESSAGE;
+const isRetiredMainlandTarget = ({ market, partNumber }) => (!market || market === 'CN') && isRetiredPartNumber(partNumber);
+function retiredProductMessage(partNumber) {
+  const part = String(partNumber || '').trim();
+  if (RETIRED_HOMEPOD_MINI_PART_NUMBERS.has(part)) return '第一代 HomePod mini 已下架，请改选 HomePod mini 2';
+  if (RETIRED_MAC_PART_NUMBERS.has(part)) return RETIRED_MAC_PRODUCT_MESSAGE;
+  return RETIRED_PRODUCT_MESSAGE;
+}
 
 /** A read-time snapshot only; never persist the attached follow policy. */
 async function loadFollowPolicy(repo, user, fallback = [], now = new Date()) {
@@ -65,5 +79,6 @@ module.exports = {
   RETIRED_PRODUCT_MESSAGE,
   RETIRED_MAC_PRODUCT_MESSAGE,
   isRetiredPartNumber,
+  isRetiredMainlandTarget,
   retiredProductMessage,
 };

@@ -2,6 +2,7 @@ const languageUI = require('../../utils/language');
 const navigation = require('../../utils/navigation');
 const { reminderPanelMethods } = require('../../utils/reminder-panel');
 const { productThumbnailUrl } = require('../../utils/product-image-fit');
+const { isRetiredMainlandProduct } = require('../../utils/retired-products');
 const { call, newId, showError, toast } = require('../../utils/api');
 const { getBootstrap, getCatalog, refreshBootstrap, invalidateBootstrap, subscribeCatalog, getFollows, invalidateFollows, subscribeSubscriptions, quotaAccountMatches } = require('../../utils/store');
 const fmt = require('../../utils/format');
@@ -71,10 +72,15 @@ function deliveryView(notifications, templateIds) {
 }
 
 const FEEDBACK_TOAST = { bought: '恭喜买到！', missed: '已记录，继续为你盯着', skipped: '已记录，继续为你盯着' };
+const ARCHIVED_STATUS = { available: '上次有货', unavailable: '上次无货', ineligible: '上次不支持取货', pending: '上次尚未开放取货' };
+function isRetiredFollow(follow) {
+  return Boolean(follow.productRetired || follow.statusReason === 'product_retired' || isRetiredMainlandProduct(follow.partNumber, follow.market));
+}
 
 /** The alert a WeChat message opened: when it was found and what the store shows now. */
 function presentAlert({ notification: n, latest, follow }, now = Date.now()) {
   const current = fmt.stockObservation(latest || {}, now, { restricted: Boolean(latest && latest.restricted) });
+  const archived = Boolean(latest && latest.productRetired) || isRetiredMainlandProduct(n.partNumber, n.market);
   return {
     eventId: n.eventId,
     productTitle: n.productTitle,
@@ -84,25 +90,24 @@ function presentAlert({ notification: n, latest, follow }, now = Date.now()) {
     soldOut: n.eventType === 'became_unavailable',
     foundText: fmt.fmtDateTime(n.detectedAt),
     agoText: fmt.relative(n.detectedAt, now),
-    nowLabel: current.statusLabel,
-    nowCls: current.statusCls,
-    nowText: current.observationState === 'fresh' ? '最近观测 ' + current.observedText : current.freshnessText,
+    archived,
+    nowLabel: archived ? '监测已停止' : current.statusLabel,
+    nowCls: archived ? 'muted' : current.statusCls,
+    nowText: archived ? '此配置已下架，这是当时的提醒记录。' : current.observationState === 'fresh' ? '最近观测 ' + current.observedText : current.freshnessText,
     feedback: n.feedback || null,
     followId: follow && follow.followId || '',
-    followActive: Boolean(follow && follow.status === 'active'),
+    followActive: Boolean(!archived && follow && follow.status === 'active'),
   };
 }
 
 function presentFollow(follow, boot, catalog, collector) {
   const now = Date.now();
   const status = { ...(FOLLOW_STATUS[follow.status] || { label: follow.status, cls: 'muted' }) };
-  const retired = Boolean(follow.productRetired || follow.statusReason === 'product_retired');
+  const retired = isRetiredFollow(follow);
   if (follow.status === 'paused' && ['member_expired', 'membership_expired'].includes(follow.statusReason)) status.label = '会员到期，已暂停';
   if (follow.status === 'expired') status.label = '会员已到期，监测已停止';
   if (retired) { status.label = '老款已下架，请改选新款'; status.cls = 'warn'; }
-  let monitoringText = retired
-    ? '老款官方取货接口已停用，请改选新款配置'
-    : follow.status === 'limit_paused' ? '配置已保留，可在会员权益中查看可用名额并恢复' : '';
+  let monitoringText = !retired && follow.status === 'limit_paused' ? '配置已保留，可在会员权益中查看可用名额并恢复' : '';
   if (!retired && follow.status === 'active') {
     if (!canRemind(boot)) { status.cls = 'warn'; monitoringText = '会员未生效，当前不参与自动检测'; }
     else if (!collector || collector.state !== 'running' || collector.observationStale) monitoringText = '关注已保存，后台检测情况可在「状态详情」查看';
@@ -121,14 +126,15 @@ function presentFollow(follow, boot, catalog, collector) {
     // recorded failure or a newer unknown check establishes a failed attempt.
     const failedCheck = store.unknownSince || (store.status === 'unknown' && Number.isFinite(knownAt) && knownAt < observed);
     return { ...store,
-      compactStatus: store.limitPaused ? '已暂停' : historical && previous === 'available' ? '上次有货'
+      compactStatus: retired && store.observationState !== 'restricted' ? (historical && ARCHIVED_STATUS[previous] || '暂无历史库存记录')
+        : store.limitPaused ? '已暂停' : historical && previous === 'available' ? '上次有货'
         : historical && previous === 'unavailable' ? '上次无货' : store.statusLabel,
-      compactTone: historical ? 'muted' : store.statusCls,
+      compactTone: retired || historical ? 'muted' : store.statusCls,
       checkText: store.observationState === 'restricted' ? '实时库存暂不可见' : validTime ? `${fmt.relative(store.observedAt, now)}检查 · ${fmt.fmtDateTime(store.observedAt).slice(5, 16)}`
-        : Number.isFinite(observed) ? '检查时间待核对' : '等待首次检查',
+        : Number.isFinite(observed) ? '检查时间待核对' : retired ? '' : '等待首次检查',
       lastResultTimeText: historical && Number.isFinite(knownAt) && knownAt < observed && knownAt <= now
         ? `上次有效结果 ${fmt.fmtDateTime(store.knownAt).slice(5, 16)}` : '',
-      compactNote: store.limitPaused || store.observationState === 'restricted' ? store.freshnessText
+      compactNote: retired ? '' : store.limitPaused || store.observationState === 'restricted' ? store.freshnessText
         : store.timeUncertain ? '观测时间待核对，当前库存待确认。'
         : store.observationState === 'unknown' || (historical && failedCheck) ? '本次检查未取得有效库存' : '',
     };
@@ -152,10 +158,12 @@ function presentFollow(follow, boot, catalog, collector) {
   const observationAt = observed.length ? Math.min(...observed) : null;
   const stockLabel = follow.latestRestricted ? '库存暂不可见' : follow.limitPaused ? '监测已暂停'
     : availableCount ? `${availableCount} 家可取货` : historicalAvailable ? `上次 ${historicalAvailable} 家可取货`
+    : retired ? (observationAt === null ? '暂无历史库存记录' : '历史库存记录')
     : usable.some(store => store.timeUncertain) ? '检查时间待核对'
     : incomplete ? usable.every(store => !store.observedAt) ? '等待首次检查' : '库存待确认' : '所选门店暂不可取货';
   return {
     ...follow,
+    status: retired ? 'paused' : follow.status,
     productRetired: retired,
     canToggle: !retired && !follow.limitPaused && follow.status !== 'limit_paused',
     canQuery: !retired,
@@ -164,7 +172,7 @@ function presentFollow(follow, boot, catalog, collector) {
     cardSubtitle: splitColor ? color : '',
     storeSummary: stores.map(store => store.storeLabel).join('、'),
     observationLabel: stockLabel,
-    observationTone: availableCount ? 'ok' : incomplete ? 'warn' : 'muted',
+    observationTone: retired ? 'muted' : availableCount ? 'ok' : incomplete ? 'warn' : 'muted',
     observationIncomplete: availableCount > 0 && incomplete,
     stockDetail: retired ? '老款已停止检测，已有结果仅供回看。'
       : follow.latestRestricted ? '当前权益暂不能查看此配置的库存。'
@@ -178,7 +186,7 @@ function presentFollow(follow, boot, catalog, collector) {
       : availableCount ? '同一轮持续有货不重复提醒，可直接查看取货信息。'
       : incomplete ? '后台检测结果会自动同步，无需手动查询。'
       : '确认有货且提醒条件满足后，将发送微信提醒。',
-    observationTime: observationAt === null ? '等待观测' : fmt.fmtDateTime(observationAt).slice(5, 16),
+    observationTime: observationAt === null ? (retired ? '暂无历史库存记录' : '等待观测') : fmt.fmtDateTime(observationAt).slice(5, 16),
     observationAge: observationAt === null || (!availableCount && historicalAvailable && observed.length !== headlineStores.length)
       ? '' : `${fmt.relative(new Date(observationAt).toISOString(), now)}检查`,
     pendingStoreCount: usable.filter(store => store.observationState !== 'fresh').length,
@@ -624,17 +632,17 @@ Page(require('../../utils/language').page('follow', {
   onCopyAlert() {
     const alert = this.data.alert;
     if (!alert || !alert.partNumber) return;
-    topUpReminderCredit();
+    if (!alert.archived) topUpReminderCredit();
     wx.setClipboardData({
       data: `${alert.productTitle}\n型号：${alert.partNumber}\n门店：Apple ${alert.storeName}`,
-      success: () => toast('已复制，可到 Apple Store App 下单'),
+      success: () => toast(alert.archived ? '已复制型号和门店' : '已复制，可到 Apple Store App 下单'),
       fail: () => toast('复制失败，请长按文字手动复制'),
     });
   },
 
   async onAlertFeedback(e) {
     const alert = this.data.alert, outcome = e.currentTarget.dataset.outcome;
-    if (this.pageRetired || !alert || !alert.eventId || this.data.alertBusy) return;
+    if (this.pageRetired || !alert || !alert.eventId || alert.archived || this.data.alertBusy) return;
     topUpReminderCredit();
     const accountEpoch = this.accountEpoch || 0, readEpoch = this.alertReadEpoch || 0;
     const work = {};
@@ -1031,6 +1039,7 @@ Page(require('../../utils/language').page('follow', {
     const picker = typeof this.selectComponent === 'function' && this.selectComponent('#follow-target-picker');
     const selection = picker && typeof picker.getSelection === 'function' ? picker.getSelection() : this.editorSelection;
     if (!selection || !selection.partNumber) return toast('请选择具体配置');
+    if (isRetiredMainlandProduct(selection.partNumber)) return toast('老款已下架，请改选新款');
     if (!selection.product || !selection.product.supported) return toast('此配置暂未开放监测');
     if (!Array.isArray(selection.storeNumbers) || !selection.storeNumbers.length) return toast('请至少选择一家门店');
     if (selection.storeNumbers.length > this.data.limits.maxStoresPerFollow) return toast(`当前套餐每个配置最多 ${this.data.limits.maxStoresPerFollow} 家门店，请手动移除超出的门店后保存`);
@@ -1103,7 +1112,7 @@ Page(require('../../utils/language').page('follow', {
     const { id, status } = e.currentTarget.dataset;
     const existing = this.data.follows.find(follow => follow.followId === id);
     if (!existing) return;
-    if (existing.productRetired || existing.statusReason === 'product_retired') return toast('老款已下架，请改选新款');
+    if (isRetiredFollow(existing)) return toast('老款已下架，请改选新款');
     if (existing.limitPaused || existing.status === 'limit_paused') return this.showMemberModal();
     const nextStatus = (existing.status || status) === 'active' ? 'paused' : 'active';
     return this.changeFollowStatus(id, nextStatus);
@@ -1191,7 +1200,7 @@ Page(require('../../utils/language').page('follow', {
     if (this.pageRetired || this.data.editing || this.data.saving) return;
     const follow = this.data.follows.find(item => item.followId === e.currentTarget.dataset.id);
     if (!follow || !follow.stores.length) return;
-    if (follow.productRetired || follow.statusReason === 'product_retired') return toast('老款已下架，请改选新款');
+    if (isRetiredFollow(follow)) return toast('老款已下架，请改选新款');
     const app = getApp();
     const target = { partNumber: follow.partNumber, storeNumbers: follow.stores.filter(store => !store.limitPaused).map(store => store.storeNumber), source: 'follow' };
     if (!target.storeNumbers.length) return this.showMemberModal();

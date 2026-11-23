@@ -3,15 +3,26 @@ import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
 import { readFileSync } from 'node:fs';
 import { runtime } from './helpers/miniprogram-runtime.mjs';
+import { assertActiveCatalogFamilies } from '../tools/catalog/lib/catalog-readiness.mjs';
 const require = createRequire(import.meta.url);
 const { buildFromBundled } = require('../cloudfunctions/gxs_api/lib/services/catalog');
+
+test('publishing rejects a disabled family or a retired product left behind in the active catalog', () => {
+  const config = require('../tools/catalog/families.json');
+  const live = require('../catalog/products.json');
+  assert.doesNotThrow(() => assertActiveCatalogFamilies(live, config));
+  const retired = { familyKey: 'homepod-mini', partNumber: 'MJ2J3CH/A' };
+  assert.throws(() => assertActiveCatalogFamilies({ ...live, products: [...live.products, retired] }, config), /orphan_catalog_product/);
+  assert.throws(() => assertActiveCatalogFamilies({ ...live, families: [...live.families, retired] }, config), /inactive_catalog_family/);
+});
 
 test('HomePod mini 2 appears first in the real offline picker with five distinct supported colors', () => {
   const rt = runtime();
   const catalog = rt.load('utils/store.js').currentCatalog();
   const category = catalog.categories.find(c => c.key === 'homepod');
   assert.equal(category.families[0].familyKey, 'homepod-mini-2');
-  assert.ok(category.families.some(f => f.familyKey === 'homepod-mini'));
+  assert.ok(!category.families.some(f => f.familyKey === 'homepod-mini'));
+  assert.ok(!catalog.categories.flatMap(group => group.families).some(f => f.familyKey === 'ipad-10-2'));
   const picker = rt.instance('components/target-picker/index.js');
   picker.data.supportedOnly = true;
   picker.data.catalog = catalog;

@@ -56,17 +56,19 @@ test('all 29 previously pending retail identities replay and match individual bu
     }
   }
   assert.equal(current.size, 29);
-  assert.equal(seed.products.filter(p => p.querySupported).length, 355);
-  assert.equal(seed.products.filter(p => p.targetType === 'apple_cto' && !p.querySupported && !p.monitorSupported).length, 42);
+  const published = require('../evidence/catalog/2026-11-23/mainland-retirement.json').counts;
+  assert.equal(seed.products.filter(p => p.querySupported).length, published.retail);
+  assert.equal(seed.products.filter(p => p.targetType === 'apple_cto' && !p.querySupported && !p.monitorSupported).length, published.customReferences);
 });
 
-test('44 replacement SKUs already in service replay by exact identity and remain separate from retired products', () => {
+test('44 historical replacement observations replay by exact identity and the current seed excludes subsequent retirements', () => {
   const observations = summary.alreadySupportedReplacements.flatMap(group => replay(group.receipt));
   assert.equal(new Set(observations.map(o => o.partNumber)).size, 44);
   for (const o of observations) {
     const p = seed.products.find(row => row.partNumber === o.partNumber);
-    assert.ok(!isRetiredPartNumber(o.partNumber) && p.querySupported && p.monitorSupported);
     assert.ok(['available', 'unavailable', 'ineligible'].includes(o.status));
+    if (isRetiredPartNumber(o.partNumber)) assert.equal(p, undefined, o.partNumber);
+    else assert.ok(p?.querySupported && p.monitorSupported, o.partNumber);
   }
 });
 

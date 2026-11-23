@@ -1,6 +1,7 @@
 'use strict';
 const { toDate, addDays } = require('../time');
 const { settle } = require('./membership-entitlements');
+const { GIFT_SOURCE, ANNUAL_PLAN, giftRecordId } = require('./owner-annual-gift');
 
 /** Weekly/gifted memberships retain their original 3 configuration allowance. */
 const LIMITS = Object.freeze({
@@ -19,7 +20,8 @@ function planSnapshot(user, now) {
   for (const segment of membership.entitlements.segments) {
     cursor += segment.remainingMs;
     if (segment.source === 'trial_compensation' && !planId) planId = 'member_trial';
-    if (!['virtual_payment', 'service_compensation'].includes(segment.source)) continue;
+    const ownerGift = segment.source === GIFT_SOURCE && segment.planId === ANNUAL_PLAN && segment.orderId === giftRecordId(user._id);
+    if (!ownerGift && !['virtual_payment', 'service_compensation'].includes(segment.source)) continue;
     if (segment.planId === 'member_7d' && (!planId || planId === 'member_trial')) planId = segment.planId;
     if (['member_30d', 'member_365d'].includes(segment.planId)) {
       enhancedUntil = cursor;

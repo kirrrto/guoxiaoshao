@@ -144,7 +144,10 @@ test('retired iPad mini SKUs are blocked from queries/follows, surfaced as pause
   page.catalog = { productByPart: {}, storeByNumber: { R577: { name: '天环广场', city: '广州' } } };
   await page.loadFollows();
   assert.equal(page.data.follows[0].statusLabel, '老款已下架，请改选新款');
-  assert.match(page.data.follows[0].monitoringText, /改选新款配置/);
+  assert.equal(page.data.follows[0].editLabel, '改选新款');
+  assert.equal(page.data.follows[0].canQuery, false);
+  assert.equal(page.data.follows[0].canToggle, false);
+  assert.match(page.data.follows[0].stockDetail, /仅供回看/);
 });
 
 test('catalog seed with prune removes retired SKUs without re-publishing the retired campaign', async () => {

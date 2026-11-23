@@ -1,4 +1,5 @@
 'use strict';
+const { isRetiredMainlandTarget } = require('../rules/follow-access');
 const { ApiError } = require('../errors');
 const { ensureUser } = require('./users');
 const { encodeToken, decodeToken } = require('../notification-view');
@@ -81,6 +82,7 @@ async function detail(ctx, payload) {
   const { user, taskId } = await alertKey(ctx, payload);
   const task = await ctx.repo.getVisibleNotification(user._id, taskId);
   const regional = Boolean(task.market && task.market !== 'CN');
+  const productRetired = isRetiredMainlandTarget(task);
   const regionalRestricted = regional && !canWatchMarkets(user, ctx.now);
   const [latest, product, follow] = await Promise.all([
     regionalRestricted ? [] : ctx.repo.getLatest([targetKeyOf(task.storeNumber, task.partNumber, task.market)]),
@@ -93,8 +95,8 @@ async function detail(ctx, payload) {
     notification: { eventId: task.eventId, ...(task.market ? { market: task.market } : {}), status: task.status, eventType: task.eventType, partNumber: task.partNumber, storeNumber: task.storeNumber,
       storeName: task.storeName || null, productTitle: product ? product.title : task.productTitle || task.partNumber,
       detectedAt: task.detectedAt, sentAt: task.sentAt || null, feedback: task.feedback ? task.feedback.outcome : null },
-    latest: { restricted, ...follows.presentLatest(latest[0] || null, ctx, restricted) },
-    follow: matchesNotificationTarget(task, follow) ? { followId: follow._id, status: follow.status } : null,
+    latest: { restricted, ...(productRetired ? { productRetired } : {}), ...follows.presentLatest(latest[0] || null, ctx, restricted, productRetired) },
+    follow: matchesNotificationTarget(task, follow) ? { followId: follow._id, status: productRetired ? 'paused' : follow.status } : null,
   };
 }
 

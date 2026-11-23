@@ -170,6 +170,7 @@
 - `admin.getConfig/updateConfig`：读取配置；更新时在服务端事务内重新读取 runtime、合并本次 patch、校验并写入。并发局部修改不会覆盖其他更新或把已关闭的兑换重新打开。支付开关可在完成外部配置后启用，商品必须匹配 7 天、700 分；密钥缺失时仍不能生成收银参数。`virtualPayment` 仅接受 OfferID、商品 ID 和 iOS 开关，不保存密钥。
 - `admin.seedCatalog`：将函数包内目录写入云端，属于实际数据操作，不在本轮本地验收中执行。
 - `admin.grantMembership/grantCredits`：传目标 userKey、days 或 amount、grantId、可选 note；幂等且校验冲突参数。
+- `admin.grantOwnerAnnualPass` 由可信云端运维传空对象调用。受赠账号由 `gxs_api` 的专用环境变量绑定，账本记录 365 天的年卡赠送，价格为零。返回当前会员档位、期限和名额。重复调用核对同一受赠决定。 [发放与回读步骤](RELEASE_3.8.1.md)
 - `admin.stats/lookupUser`：运行统计、用户与关注查询。
 - `admin.capacity`：`{}`。经现有 `gxs_api` 管理员鉴权只读查询容量配置、最近监测状态、当天预占计数和查询复用抽样；不预占/补充容量、不探测上游、不创建用户，不返回用户身份或目标列表。`mode/maxRequestsPerMinute/sustainedDailyTarget` 来自配置，`hardDailyLimit` 只在 daily 模式返回。`uniqueGroups/plannedIntervalSeconds` 来自最近 collector_status，必须结合 `collectorStatusUpdatedAt/collectorStatusStale` 判断是否仍可用。`normalCadenceSeconds` 为配置常规间隔与运行模式下限的较大值，`configuredNormalRequestsPerDay` 为该间隔下的估计采集需求，`autoRequestsPerDay` 为自动来源份额；`aboveAutoCapacity=true` 表示配置期望的常规采集需求超过自动份额，需要接受调度降速或验证后扩容，不表示已发生超额 HTTP。
 - `admin.insights`：`{ days? }`（1–10，默认 7）。统计最近事件与提醒（各最多 2000 条，超过时 `truncated=true`）：`availability` 为 became_unavailable 事件的可取货时长（count、p50Ms、p90Ms、maxMs、分段 buckets）；`alerts` 为提醒任务总数、按状态与未发送原因计数、`noCreditShare`（因没有授权次数未发送的占比）、`sendDelay`（已受理提醒从发现到发出的延迟）；`feedback` 为「买到了吗」回答数与买到占比。

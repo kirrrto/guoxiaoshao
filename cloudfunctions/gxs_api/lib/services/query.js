@@ -16,7 +16,6 @@ function validatePayload(ctx, payload, user, existingOnly = false) {
   if (!queryId) throw new ApiError('invalid_query_id', 'queryId 需为 8–64 位字母数字标识');
   const partNumber = typeof payload.partNumber === 'string' ? payload.partNumber.trim() : '';
   if (!isProductIdentity(partNumber)) throw new ApiError('invalid_part_number', '商品编号格式无效');
-  if (isRetiredPartNumber(partNumber)) throw new ApiError('product_retired', retiredProductMessage(partNumber));
   // Cap catalog reads at the largest supported scope. The transaction enforces
   // the current user's limit for new IDs after checking for a matching old ID.
   const maxStores = accountLimits(user, ctx.now, ctx.config).queryMaxStores;
@@ -85,9 +84,11 @@ async function pickup(ctx, payload, { existingOnly = false, maxCost } = {}) {
   const startedAt = Date.now();
   const user = await ensureUser(ctx);
   const { queryId, partNumber, storeNumbers } = validatePayload(ctx, payload, user, existingOnly);
+  const target = { queryId, partNumber, storeNumbers: payload.storeNumbers };
+  if (isRetiredPartNumber(partNumber)) return settleUnavailablePickup(ctx, target, new ApiError('product_retired', retiredProductMessage(partNumber)));
   const [product, stores] = await Promise.all([ctx.repo.getProduct(partNumber), ctx.repo.getStores(storeNumbers)]);
-  if (!product) throw new ApiError('unknown_product', '该商品不在目录中');
-  if (stores.length !== storeNumbers.length) throw new ApiError('unknown_store', '存在未知门店编号');
+  if (!product) return settleUnavailablePickup(ctx, target, new ApiError('unknown_product', '该商品不在目录中'));
+  if (stores.length !== storeNumbers.length) return settleUnavailablePickup(ctx, target, new ApiError('unknown_store', '存在未知门店编号'));
   return executePickup(ctx, { user, product, queryId, partNumber, storeNumbers, startedAt, existingOnly, maxCost });
 }
 
@@ -133,29 +134,36 @@ async function marketPickup(ctx, payload) {
   const product = findMarketProduct(market, partNumber);
   const listed = product?.querySupported && site.stores.some(store => store.storeNumber === storeNumbers[0]);
   if (!listed || ctx.config.internationalMarkets?.[market] !== true) {
-    // An exact old receipt may outlive its SKU, store, or rollout switch.
-    // Only settle or replay; never start another query on this path.
     const unavailable = listed ? new ApiError('market_disabled', '该站点尚未开放实时查询。')
       : new ApiError('invalid_market_target', '请在当前站点重新选择商品与门店。');
-    const id = ctx.identity.userKey + '|' + queryId;
-    let record = await ctx.repo.getQuery(id);
-    if (!record || record.userKey !== ctx.identity.userKey || record.queryId !== queryId || record.kind !== 'market'
-      || record.market !== market || record.partNumber !== partNumber || record.storeNumbers?.length !== 1
-      || record.storeNumbers[0] !== storeNumbers[0]) throw unavailable;
-    if (record.status === 'pending') {
-      if (record.leaseUntil <= ctx.nowIso) {
-        await ctx.repo.expireQuery({ id, userKey: ctx.identity.userKey, nowIso: ctx.nowIso, staleBefore: ctx.nowIso });
-        record = await ctx.repo.getQuery(id);
-      }
-      if (record?.status === 'pending') return { market, queryId, ok: false, reason: 'query_in_progress', retryAfterMs: Math.max(1000, Date.parse(record.leaseUntil) - ctx.now.getTime()) };
-    }
-    if (!record?.response) throw unavailable;
-    const owner = await ctx.repo.getUser(ctx.identity.userKey);
-    return { ...record.response, market, queryId, balance: owner.quota.balance, quotaRevision: owner.quota.revision || 0, replayed: true };
+    return settleUnavailablePickup(ctx, { market, queryId, partNumber, storeNumbers }, unavailable);
   }
   const user = await ensureUser(ctx);
   const reply = await executePickup(ctx, { user, product, queryId, partNumber, storeNumbers, startedAt, market, maxCost });
   return { ...reply, market, queryId };
+}
+
+// Delisting must never start another fetch or lose a debit already attached
+// to an exact, owner-bound request. The expiry transaction fences late workers.
+async function settleUnavailablePickup(ctx, { market, queryId, partNumber, storeNumbers }, unavailable) {
+  const userKey = ctx.identity.userKey;
+  const id = userKey + '|' + queryId;
+  let record = await ctx.repo.getQuery(id);
+  if (!record || record.userKey !== userKey || record.queryId !== queryId || record.kind !== (market ? 'market' : 'live')
+    || (record.market || 'CN') !== (market || 'CN') || record.partNumber !== partNumber || !Array.isArray(record.storeNumbers)
+    || record.storeNumbers.length !== storeNumbers.length || new Set(storeNumbers).size !== storeNumbers.length
+    || !storeNumbers.every(store => record.storeNumbers.includes(store))) throw unavailable;
+  const scope = market ? { market, queryId } : { queryId };
+  if (record.status === 'pending') {
+    if (record.leaseUntil <= ctx.nowIso) {
+      await ctx.repo.expireQuery({ id, userKey, nowIso: ctx.nowIso, staleBefore: ctx.nowIso });
+      record = await ctx.repo.getQuery(id);
+    }
+    if (record?.status === 'pending') return { ...scope, ok: false, reason: 'query_in_progress', retryAfterMs: Math.max(1000, Date.parse(record.leaseUntil) - ctx.now.getTime()) };
+  }
+  if (!record?.response) throw unavailable;
+  const owner = await ctx.repo.getUser(userKey);
+  return { ...record.response, ...scope, balance: owner.quota.balance, quotaRevision: owner.quota.revision || 0, replayed: true };
 }
 
 async function executePickup(ctx, { user, product, queryId, partNumber, storeNumbers, startedAt, market = null, existingOnly = false, maxCost }) {

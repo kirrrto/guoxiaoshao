@@ -1,5 +1,20 @@
 // English surface copy for stock checks, watches, history and configuration controls.
 module.exports = {
+  // Saved watches and past notifications keep their original product titles after catalog retirement.
+  "MacBook Pro 14 英寸 M5 Pro 15核CPU/16核GPU 24GB 2TB 标准显示屏 深空黑色": "14-inch MacBook Pro M5 Pro 15-core CPU/16-core GPU 24GB 2TB Standard display Space Black",
+  "MacBook Pro 14 英寸 M5 Pro 15核CPU/16核GPU 24GB 2TB 标准显示屏 银色": "14-inch MacBook Pro M5 Pro 15-core CPU/16-core GPU 24GB 2TB Standard display Silver",
+  "MacBook Pro 14 英寸 M5 Pro 18核CPU/20核GPU 24GB 2TB 标准显示屏 深空黑色": "14-inch MacBook Pro M5 Pro 18-core CPU/20-core GPU 24GB 2TB Standard display Space Black",
+  "MacBook Pro 14 英寸 M5 Pro 18核CPU/20核GPU 24GB 2TB 标准显示屏 银色": "14-inch MacBook Pro M5 Pro 18-core CPU/20-core GPU 24GB 2TB Standard display Silver",
+  "MacBook Pro 14 英寸 M5 Pro 18核CPU/20核GPU 48GB 2TB 纳米纹理显示屏 深空黑色": "14-inch MacBook Pro M5 Pro 18-core CPU/20-core GPU 48GB 2TB Nano-texture display Space Black",
+  "MacBook Pro 16 英寸 M5 Pro 18核CPU/20核GPU 48GB 1TB 标准显示屏 深空黑色": "16-inch MacBook Pro M5 Pro 18-core CPU/20-core GPU 48GB 1TB Standard display Space Black",
+  "MacBook Pro 16 英寸 M5 Pro 18核CPU/20核GPU 48GB 1TB 标准显示屏 银色": "16-inch MacBook Pro M5 Pro 18-core CPU/20-core GPU 48GB 1TB Standard display Silver",
+  "MacBook Pro 16 英寸 M5 Max 18核CPU/40核GPU 48GB 2TB 标准显示屏 深空黑色": "16-inch MacBook Pro M5 Max 18-core CPU/40-core GPU 48GB 2TB Standard display Space Black",
+  "MacBook Pro 16 英寸 M5 Max 18核CPU/40核GPU 48GB 2TB 标准显示屏 银色": "16-inch MacBook Pro M5 Max 18-core CPU/40-core GPU 48GB 2TB Standard display Silver",
+  "HomePod mini 蓝色": "HomePod mini - Blue",
+  "HomePod mini 黄色": "HomePod mini - Yellow",
+  "HomePod mini 午夜色": "HomePod mini - Midnight",
+  "HomePod mini 白色": "HomePod mini - White",
+  "HomePod mini 橙色": "HomePod mini - Orange",
   // pages/query/index.wxml
   "网络已断开，恢复后自动刷新": "Offline. This page will refresh when you reconnect.",
   "暂时没有连上": "Could not connect",
@@ -342,6 +357,12 @@ module.exports = {
   "已暂停": "Paused",
   "上次有货": "Previously available",
   "上次无货": "Previously unavailable",
+  "上次不支持取货": "Previously ineligible for pickup",
+  "上次尚未开放取货": "Pickup had not yet opened",
+  "监测已停止": "Monitoring has ended",
+  "历史库存记录": "Past stock records",
+  "暂无历史库存记录": "No past stock records",
+  "此配置已下架，这是当时的提醒记录。": "This configuration was discontinued. This is the original alert.",
   "实时库存暂不可见": "Live stock unavailable",
   "{0}检查 · {1}": "Checked {0} · {1}",
   "检查时间待核对": "Check time unconfirmed",

@@ -14,6 +14,7 @@ const membershipEntitlements = require('../rules/membership-entitlements');
 const { targetKeyOf } = require('../engine/events');
 const { observationStorageMethods } = require('./observation-storage');
 const { launchGiftMethods } = require('./launch-gift');
+const { grantOwnerAnnualPassIn } = require('./owner-annual-gift');
 const { viewId, newView, decodeToken } = require('../notification-view');
 const { mergeConfig, patchConfig } = require('../config');
 const { assertConfigEditor, makeConfigAudit } = require('../config-audit');
@@ -21,6 +22,7 @@ const { CAMPAIGN, MAX_FAILURES, LOCK_MS, CLAIMS_ID, matchesCodeHash, attemptsId 
 const { upstreamGuardMethods, reserveAccountQuery, releaseAccountQuery } = require('./upstream-guard');
 const { queryTargetMethods } = require('./query-target');
 const { notificationTestMethods } = require('./notification-test');
+const { isRetiredMainlandTarget } = require('../rules/follow-access');
 const { memberRecordMethods } = require('./member-records');
 const { deadlineMethods } = require('./deadline');
 const { growthMethods } = require('./growth');
@@ -196,6 +198,7 @@ function atomicMethods(run, { readUpstreamBreaker } = {}) {
       return user;
     }),
     ...launchGiftMethods(run, { hydrateMemberPlansIn }),
+    grantOwnerAnnualPass: args => run(tx => grantOwnerAnnualPassIn(tx, args, hydrateMemberPlansIn)),
     ...notificationTestMethods(run, applyLedgerIn),
     ...memberRecordMethods(run),
     acquireLease: ({ id, ownerId, now, expiresAt }) => run(async tx => {
@@ -514,7 +517,7 @@ function atomicMethods(run, { readUpstreamBreaker } = {}) {
     recordNotificationFeedback: ({ userKey, taskId, outcome, nowIso, knownFollows = [] }) => run(async tx => {
       const task = await visibleNotification(tx, userKey, taskId);
       if (!['bought', 'missed', 'skipped'].includes(outcome)) throw new ApiError('invalid_feedback', '请选择有效的反馈');
-      const follow = outcome === 'bought' && task.followId ? await tx.get(C.follows, task.followId) : null;
+      const follow = outcome === 'bought' && task.followId && !isRetiredMainlandTarget(task) ? await tx.get(C.follows, task.followId) : null;
       const paused = Boolean(follow && follow.status === 'active' && matchesNotificationTarget(task, follow));
       if (paused) {
         const user = await tx.get(C.users, userKey);
