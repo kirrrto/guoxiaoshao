@@ -16,6 +16,7 @@ function callTest(action, payload) {
 function errorText(error, stage) {
   const code = error && error.code;
   if (code === 'notification_test_account_changed') return '微信账号已变化，本次操作已停止。请刷新后重新确认测试。';
+  if (code === 'query_cost_changed') return '本次测试费用已变化。请查看原测试结果，核对次数后再继续。';
   if (code === 'unknown_action') return '测试通知服务尚未更新完成，请稍后再试。原测试编号已保留。';
   if (code === 'test_storage_unavailable') return '测试通知服务尚未准备好，请稍后点击「查看原测试结果」重试。';
   if (['call_failed', 'cloud_init_failed', 'test_request_timeout', 'bad_response'].includes(code)) return stage === 'status'
@@ -37,7 +38,7 @@ const STATUS = {
 };
 
 Page(require('../../utils/language').page('notification-test', {
-  data: { loading: true, busy: false, ready: false, balance: 0, test: null, progress: testProgress(null), statusTitle: '', statusNote: '', error: null, canContinue: false, pendingOther: false, blocked: false, feedbackNote: '', operationNote: '', checkNote: '', showTestRules: false, showTroubleshooting: false, returnLabel: '返回提醒中心' },
+  data: { loading: true, busy: false, ready: false, cost: 1, balance: 0, test: null, progress: testProgress(null), statusTitle: '', statusNote: '', error: null, canContinue: false, pendingOther: false, blocked: false, feedbackNote: '', operationNote: '', checkNote: '', showTestRules: false, showTroubleshooting: false, returnLabel: '返回提醒中心' },
   async onLoad(options = {}) {
     this.retired = false;
     this.visible = false;
@@ -72,7 +73,7 @@ Page(require('../../utils/language').page('notification-test', {
       // account's durable intent in its own cache for an explicit later return.
       if ((this.quotaOwner || this.userKey) && (this.quotaOwner || this.userKey) !== userKey && this.bootstrapOwner() !== userKey) resetSession();
       this.accountEpoch += 1; this.userKey = userKey; this.pending = null; this.openedRecorded = false;
-      this.setData({ canContinue: false, pendingOther: false, test: null, progress: testProgress(null), balance: 0, blocked: false, statusTitle: '', statusNote: '', feedbackNote: '' });
+      this.setData({ canContinue: false, pendingOther: false, test: null, progress: testProgress(null), cost: 1, balance: 0, blocked: false, statusTitle: '', statusNote: '', feedbackNote: '' });
     }
     if (!this.returnOwner) this.returnOwner = userKey;
     if (this.returnOwner !== userKey) {
@@ -91,7 +92,7 @@ Page(require('../../utils/language').page('notification-test', {
     this.accountEpoch += 1; this.statusReadEpoch = (this.statusReadEpoch || 0) + 1;
     this.userKey = null; this.pending = null; this.storageKey = null; this.statusLoading = false;
     this.setData({ busy: false, ready: false, canContinue: false, pendingOther: false,
-      test: null, progress: testProgress(null), balance: 0, blocked: false, statusTitle: '', statusNote: '', feedbackNote: '', operationNote: '',
+      test: null, progress: testProgress(null), cost: 1, balance: 0, blocked: false, statusTitle: '', statusNote: '', feedbackNote: '', operationNote: '',
       error: errorText({ code: 'notification_test_account_changed' }) });
   },
   applyResult(result, context = this.accountContext()) {
@@ -100,14 +101,18 @@ Page(require('../../utils/language').page('notification-test', {
     const balance = publishQueryBalance(result, context.owner).balance;
     if (this.retired) return;
     const test = result.test || null;
-    const [statusTitle, statusNote] = test ? STATUS[test.status] || ['测试状态待确认', '请刷新查看原测试。'] : ['', ''];
+    let [statusTitle, statusNote] = test ? STATUS[test.status] || ['测试状态待确认', '请刷新查看原测试。'] : ['', ''];
+    if (test?.status === 'authorized' && this.data.cost === 0) statusNote = '本次测试不扣次数。';
+    if (test?.status === 'failed' && !test.refunded) statusTitle = '发送失败';
+    if (test?.status === 'uncertain' && test.charged === 0) statusNote = '消息可能已经发送，请先查收微信「服务通知」。';
+    if (test?.reason === 'needs_authorization') statusNote = test.refunded ? '微信授权已失效，1 次额度已退回。请重新允许订阅消息后再测试。' : '微信授权已失效，请重新允许订阅消息后再测试。';
+    if (test?.reason === 'authorization_expired') statusNote = '原授权已过期或模板已更新，尚未扣次。请重新授权一条测试。';
     const blocked = Boolean(test && (test.status === 'sending' || test.status === 'uncertain' && !test.feedback));
     const viewedId = this.routeRequestId || test && test.requestId;
     const pendingOther = Boolean(!blocked && this.pending && this.pending.decision === 'accept' && viewedId && this.pending.requestId !== viewedId);
     const matching = Boolean(this.pending && (!test || test.requestId === this.pending.requestId));
     const canContinue = Boolean(matching && !pendingOther && this.pending.decision === 'accept' && (!test || test.status === 'authorized'));
-    this.setData({ test, progress: testProgress(test), statusTitle, statusNote: test && test.reason === 'needs_authorization' ? '微信授权已失效，1 次额度已退回。请重新允许订阅消息后再测试。'
-      : test && test.reason === 'authorization_expired' ? '原授权已过期或模板已更新，尚未扣次。请重新授权一条测试。' : statusNote,
+    this.setData({ test, progress: testProgress(test), statusTitle, statusNote,
       balance: balance === null ? this.data.balance : balance, blocked, canContinue, pendingOther,
       feedbackNote: test && test.feedback === 'received' ? '已记录：你确认收到了测试消息。'
         : test && test.feedback === 'not_received' ? '已记录：暂未收到。可按下方方法排查。' : '' }, () => this.recordTestOpen());
@@ -147,7 +152,7 @@ Page(require('../../utils/language').page('notification-test', {
       if (!this.pending && result.test && result.test.status === 'authorized' && ID.test(result.test.requestId)) {
         this.savePending({ requestId: result.test.requestId, templateId: result.templateId, decision: 'accept' });
       }
-      this.setData({ ready: result.ready, error: result.ready ? null : '微信通知测试暂未开放，请稍后再试。' });
+      this.setData({ ready: result.ready, cost: result.cost === 0 ? 0 : 1, error: result.ready ? null : '微信通知测试暂未开放，请稍后再试。' });
       this.applyResult(result, context);
       if (manual) this.setData({ checkNote: result.test ? `已刷新：${this.data.statusTitle}。`
         : this.pending && this.pending.decision === 'accept' ? '尚未查到这次测试记录。原编号已保留；可点击「继续原测试」提交已授权的测试。'
@@ -193,7 +198,7 @@ Page(require('../../utils/language').page('notification-test', {
   },
   onStart() {
     if (this.retired || !this.visible || this.data.busy || this.data.loading || !this.data.ready || this.data.blocked || this.data.canContinue || this.data.pendingOther) return Promise.resolve();
-    if (this.data.balance < 1) { showError(Error('测试需要 1 次额度，请到「我的」查看签到和余额。')); return Promise.resolve(); }
+    if (this.data.balance < this.data.cost) { showError(Error('测试需要 1 次额度，请到「我的」查看签到和余额。')); return Promise.resolve(); }
     this.setData({ busy: true, error: null, checkNote: '', operationNote: '请在微信提示中确认授权…' });
     this.pendingStage = 'authorize';
     const context = this.accountContext();
@@ -212,7 +217,7 @@ Page(require('../../utils/language').page('notification-test', {
     let pending;
     try {
       this.routeRequestId = null;
-      pending = { requestId: newId('test'), templateId: this.templateId, decision: null };
+      pending = { requestId: newId('test'), maxCost: this.data.cost, templateId: this.templateId, decision: null };
       if (!this.savePending(pending, context)) { finish(); return Promise.resolve(); }
     } catch (error) {
       fail(error);
@@ -253,13 +258,21 @@ Page(require('../../utils/language').page('notification-test', {
     if (!this.applyResult(authorized, context) || pending.decision !== 'accept' || !this.visible) return;
     // A retry reuses the exact ID. The server never resends a claimed request.
     this.pendingStage = 'send'; this.setData({ operationNote: '正在发送并确认测试消息…' });
-    this.applyResult(await callTest('notificationTest.send', { requestId: pending.requestId, expectedUserKey: context.owner }), context);
+    try {
+      this.applyResult(await callTest('notificationTest.send', { requestId: pending.requestId, expectedUserKey: context.owner, maxCost: pending.maxCost }), context);
+    } catch (error) {
+      if (error?.code === 'query_cost_changed' && this.contextCurrent(context)) this.setData({ ready: false });
+      throw error;
+    }
   },
   async onContinue() {
     if (this.retired || !this.visible || this.data.busy || this.data.loading || !this.data.ready || this.data.blocked || !this.data.canContinue) return;
     this.setData({ busy: true, error: null, checkNote: '' });
     const context = this.accountContext();
-    try { await this.submitPending(context); }
+    try {
+      if (this.pending && this.pending.maxCost !== this.data.cost) this.savePending({ ...this.pending, maxCost: this.data.cost }, context);
+      await this.submitPending(context);
+    }
     catch (error) { if (this.contextCurrent(context)) {
       if (error && error.code === 'notification_test_account_changed') this.stopChangedAccount();
       else this.setData({ error: errorText(error, this.pendingStage) });

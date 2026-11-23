@@ -12,7 +12,7 @@
  */
 const { NOTIFIABLE_TYPES, targetKeyOf } = require('./events');
 const { subscriptionResponseCode } = require('./wechat-sender');
-const { canUseReminders, reminderBlockReason, isMember, followAllowance } = require('../rules/membership');
+const { canUseReminders, reminderBlockReason, followAllowance } = require('../rules/membership');
 const { loadFollowPolicy, isRetiredMainlandTarget } = require('../rules/follow-access');
 const { suppressDndEvent } = require('../rules/dnd');
 const { isValidTemplateId } = require('../config');
@@ -74,8 +74,8 @@ function buildTasks({ events, follows, users, config, now }) {
       const user = users.get(follow.userKey);
       const language = regional && follow.language === 'en' ? 'en' : 'zh-CN';
       const templateId = templateIdFor(kind, config, language);
-      // The free alert is a restock alert; sold-out alerts are a member feature.
-      if (kind === 'soldout' && user && !isMember(user, now)) continue;
+      const remindersAllowed = user && canUseReminders(user, now, config);
+      if (kind === 'soldout' && user && !remindersAllowed) continue;
       const base = {
         _id: taskId(follow.userKey, event._id), userKey: follow.userKey, followId: follow._id, eventId: event._id, eventType: event.type,
         partNumber: event.partNumber, storeNumber: event.storeNumber, storeName: event.storeName || null, productTitle: event.productTitle || follow.productTitle || null,
@@ -89,9 +89,9 @@ function buildTasks({ events, follows, users, config, now }) {
       if (!config.notifications.enabled) { skip('notifications_disabled'); continue; }
       if (!isValidTemplateId(templateId)) { skip('template_missing'); continue; }
       if (!user) { skip('user_missing'); continue; }
-      if (!canUseReminders(user, now)) { skip(reminderBlockReason(user)); continue; }
+      if (!remindersAllowed) { skip(reminderBlockReason(user)); continue; }
       if (follow.status !== 'active') { skip('follow_not_active'); continue; }
-      const allowance = followAllowance(user, follow, follows, now);
+      const allowance = followAllowance(user, follow, follows, now, config);
       if (!allowance.eligibleStoreNumbers.includes(event.storeNumber)) { skip(allowance.marketPlanRequired ? 'market_watch_plan_required' : 'plan_limit'); continue; }
       if (user.settings && user.settings.notifyEnabled === false) { skip('user_disabled'); continue; }
       const dnd = user.settings && user.settings.dnd;
@@ -183,12 +183,11 @@ function skipReason({ task, user, follow, config, now, senderAppid }) {
   }
   if (!isValidTemplateId(task.templateId) || templateIdFor(kind, config, task.language) !== task.templateId) return 'template_changed';
   if (!user) return 'member_expired';
-  if (!canUseReminders(user, now)) return reminderBlockReason(user);
-  if (kind === 'soldout' && !isMember(user, now)) return 'member_expired';
+  if (!canUseReminders(user, now, config)) return reminderBlockReason(user);
   if (senderAppid && user.appid !== senderAppid) return 'consumer_appid_mismatch';
   if (!user.openid) return 'openid_missing';
   if (!follow || follow.status !== 'active' || follow.userKey !== task.userKey || follow.partNumber !== task.partNumber || !follow.storeNumbers.includes(task.storeNumber)) return 'follow_not_active';
-  const allowance = followAllowance(user, follow, [follow], now);
+  const allowance = followAllowance(user, follow, [follow], now, config);
   if (!allowance.eligibleStoreNumbers.includes(task.storeNumber)) return allowance.marketPlanRequired ? 'market_watch_plan_required' : 'plan_limit';
   if (settings && settings.notifyEnabled === false) return 'user_disabled';
   if (suppressDndEvent(settings && settings.dnd, now, task.detectedAt)) return 'dnd';

@@ -1,4 +1,7 @@
 module.exports = {
+  '管理员功能测试': 'Administrator testing',
+  '指定管理员可直接测试门店查询和库存关注，无需购买会员。': 'The designated administrator can test store pickup searches and inventory watches without buying a pass.',
+  '在「我的」可以查看测试身份、可关注的配置数和门店数。': 'Me shows the test account status and the number of configurations and stores it can watch.',
   '大陆门店查询': 'Mainland store pickup',
   '大陆站更新了 MacBook Pro 配置，移除了第一代 HomePod mini，二代五种颜色仍可查询。': 'Mainland stores have updated MacBook Pro configurations. The original HomePod mini has been removed, and all five HomePod mini 2 finishes are still listed.',
   '商品下架后停止监测，之前已扣次的未完成查询仍可核对退款。': 'Monitoring stops when a product is discontinued. You can still reconcile a previous unfinished check and recover its credit.',

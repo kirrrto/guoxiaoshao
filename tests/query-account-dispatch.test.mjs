@@ -82,3 +82,29 @@ for (const kind of ['query', 'history']) {
     });
   }
 }
+
+for (const [kind, action] of [['query', 'query.pickup'], ['history', 'history.list']]) {
+  test(kind + ' enforces the zero price shown before administrator test access is revoked', async () => {
+    const f = createFixture({ start: new Date().toISOString(), fetchImpl: fakeFetch({ R577: { display: 'available' } }) });
+    const context = userContext(alice);
+    unwrap(await f.call('quota.signin', {}, context));
+    const rt = runtime(async (op, payload) => {
+      const response = await f.call(op, payload, context);
+      if (!response.ok) throw Object.assign(Error(response.error.message), { code: response.error.code });
+      return response.data;
+    });
+    const page = rt.instance('pages/' + kind + '/index.js');
+    const product = PRODUCTS.find(p => p.partNumber === target.partNumber);
+    page.catalog = { productByPart: { [target.partNumber]: product }, storeByNumber: { R577: STORES[0] } };
+    page.selection = { ...target, product };
+    const boot = await rt.load('utils/store.js').getBootstrap();
+    const balance = boot.quota.balance;
+    assert.ok(balance > 0);
+    page.applyBoot({ ...boot, membership: { active: true, isTester: true, planId: null, expiresAt: null, remainingMs: 0 } });
+    await page.onQuery();
+    assert.equal(rt.calls.find(c => c.action === action).payload.maxCost, 0);
+    assert.match(page.data.queryFailureMessage, /费用已变化/);
+    assert.equal(page.data.boot.member, false);
+    assert.equal((await f.repo.getUser(userKeyOf(alice))).quota.balance, balance);
+  });
+}

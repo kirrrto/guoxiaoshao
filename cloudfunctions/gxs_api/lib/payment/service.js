@@ -156,7 +156,7 @@ async function withOrderLease(ctx, id, work) {
 async function resultOf(ctx, order, providerState, canPrepare = false) {
   const user = await ctx.repo.getUser(order.userKey);
   if (!user) throw new ApiError('user_missing', '用户不存在');
-  return { order, membership: membershipSnapshot(user, nowOf(ctx)), providerState, canPrepare };
+  return { order, membership: membershipSnapshot(user, nowOf(ctx), ctx.config), providerState, canPrepare };
 }
 
 async function reconcileLocked(ctx, inputOrder, { acknowledge = true, permitUnprepared = false } = {}) {

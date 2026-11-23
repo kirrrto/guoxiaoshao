@@ -207,3 +207,24 @@ test('a lost committed query remains recoverable after another target is queried
   assert.equal((await f.repo.listLedger(userKeyOf())).filter(entry => entry.type === 'query_debit').length, 2);
   assert.equal((await f.repo.getUser(userKeyOf())).quota.balance, 3);
 });
+
+for (const kind of ['q', 'h', 'mq']) {
+  test(`${kind} retains the lowest confirmed cost across retries and older account-bound records`, () => {
+    const first = runtime(), ops = first.load('utils/operation.js');
+    const original = ops.beginQuery(kind, target, 'alice', 3);
+    assert.equal(original.maxCost, 3);
+    assert.equal(ops.beginQuery(kind, target, 'alice', 0).id, original.id);
+    const reopened = runtime();
+    for (const [key, value] of first.storage) reopened.storage.set(key, JSON.parse(JSON.stringify(value)));
+    const restored = reopened.load('utils/operation.js');
+    const retry = restored.beginQuery(kind, target, 'alice', 5);
+    assert.equal(retry.id, original.id);
+    assert.equal(retry.maxCost, 0);
+    const old = restored.begin(kind, target, 'bob');
+    const legacy = restored.beginQuery(kind, target, 'bob', 3);
+    assert.equal(legacy.id, old);
+    assert.equal(legacy.maxCost, 0, 'a recovery without saved consent may not spend');
+    restored.finish(kind, old, 'bob');
+    assert.equal(restored.beginQuery(kind, target, 'bob', 3).maxCost, 3);
+  });
+}

@@ -190,3 +190,22 @@ test('iOS product disable blocks only that terminal purchase path', () => {
   assert.equal(paymentAvailability({ ...readyPlan, iosEnabled: false }, ios).ready, false);
   assert.equal(paymentAvailability(readyPlan, ios).ready, true);
 });
+
+test('the dedicated test account sees its actual limits without an expiry or a new purchase', async () => {
+  const { page, rt } = pageRuntime();
+  const membership = { active: true, isTester: true, planId: null, remainingMs: 0, expiresAt: null, enhanced: true };
+  page.applyBoot(bootWith([readyPlan], { membership, limits: { maxFollows: 5, maxStoresPerFollow: 5 } }));
+  page.setData({ ready: true });
+  assert.equal(page.data.membership.planLabel, '管理员测试账号');
+  assert.equal(page.data.membership.daysLeft, null);
+  assert.equal(page.data.boot.limits.maxFollows, 5);
+  assert.equal(page.data.showPurchaseShop, false);
+  page.onOpenMembershipRenew();
+  page.onOpenRedemption();
+  await page.onBuyMembership();
+  assert.equal(page.data.membershipUpgradeOpen, false);
+  assert.equal(page.data.redemptionOpen, false);
+  assert.equal(rt.calls.some(c => c.action === 'member.createOrder'), false);
+  page.applyBoot(bootWith([readyPlan]));
+  assert.equal(page.data.showPurchaseShop, true, 'fresh account data restores the ordinary entry points');
+});

@@ -48,7 +48,7 @@
 
       <view wx:if="{{selectionSummary}}" class="history-query-row">
         <button class="btn btn-primary btn-block history-query-submit {{querying ? 'disabled' : ''}}" hover-class="btn-primary-pressed" loading="{{querying}}" disabled="{{querying || loadingMore || !accountReady || !selectionSummary.valid}}" bindtap="onQuery">{{i18n.t(ui,(!accountReady ? '正在连接账户…' : (querying ? '加载中…' : legacyQueryPending ? '核对上次查询' : '查看历史')))}}</button>
-        <view wx:if="{{accountReady}}" class="history-query-cost"><text>{{i18n.t(ui,(boot.member ? '会员查询不扣次数' : '消耗 ' + boot.historyCost + ' 次 · 余 ' + boot.balance + ' 次'))}}</text><text wx:if="{{!boot.member}}"> {{i18n.t(ui,'· 无事件自动退还')}}</text></view>
+        <view wx:if="{{accountReady}}" class="history-query-cost"><text>{{i18n.t(ui,(boot.isTester ? '库存查询不扣次数' : boot.member ? '会员查询不扣次数' : '消耗 ' + boot.historyCost + ' 次 · 余 ' + boot.balance + ' 次'))}}</text><text wx:if="{{!boot.member}}"> {{i18n.t(ui,'· 无事件自动退还')}}</text></view>
       </view>
       <view wx:if="{{querying}}" class="request-progress {{requestSlow ? 'request-progress--slow' : ''}}" aria-role="status">{{i18n.t(ui,(requestSlow ? requestProgressText : '正在读取所选日期的已记录变化。'))}}</view>
     </view>

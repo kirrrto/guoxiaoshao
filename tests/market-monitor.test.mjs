@@ -16,7 +16,7 @@ const sites = [
   ['HK', 'R409', 'MJRP4ZA/A', 'zh-CN'],
 ];
 
-async function setup(config = {}) {
+async function setup(config = {}, planId = 'member_365d') {
   const plan = { R128: { display: 'unavailable' }, R713: { display: 'unavailable' }, R409: { display: 'available' } };
   const upstream = fakeFetch(plan);
   const f = createFixture({ start: '2026-11-23T14:59:00Z', fetchImpl: upstream, config: {
@@ -24,7 +24,7 @@ async function setup(config = {}) {
     notifications: { enabled: true, templateIds: { restock: 'TPL_ZH', restockEn: 'TPL_EN' } }, ...config,
   } });
   await f.call('user.bootstrap');
-  await f.repo.updateUser(userKeyOf(), { membership: marketMembership(f.state.now, 'member_365d'),
+  await f.repo.updateUser(userKeyOf(), { membership: planId ? marketMembership(f.state.now, planId) : {},
     subscriptions: { TPL_ZH: { credits: 5 }, TPL_EN: { credits: 5 } }, settings: { notifyEnabled: true, dnd: { enabled: false } } });
   for (const [market, store, partNumber, language] of sites) {
     const result = await f.call('market.watch', { market, partNumber, language, storeNumbers: [store], expectedUserKey: userKeyOf() });
@@ -35,6 +35,56 @@ async function setup(config = {}) {
     sendImpl: async m => { messages.push(m); return { errcode: 0 }; } });
   return { f, messages, pass, upstream, plan };
 }
+
+async function setupTestAdmin(t) {
+  const previous = process.env.GXS_TEST_ADMIN_USER_KEY;
+  process.env.GXS_TEST_ADMIN_USER_KEY = userKeyOf();
+  t.after(() => {
+    if (previous === undefined) delete process.env.GXS_TEST_ADMIN_USER_KEY;
+    else process.env.GXS_TEST_ADMIN_USER_KEY = previous;
+  });
+  return setup({ adminUserKeys: [userKeyOf()] }, null);
+}
+
+test('a designated admin without a membership monitors regional stock and spends only actual WeChat authorizations', async t => {
+  const { f, pass, messages, plan } = await setupTestAdmin(t);
+  await f.repo.updateUser(userKeyOf(), { subscriptions: { TPL_EN: { credits: 1 }, TPL_ZH: { credits: 0 } } });
+  await pass();
+  for (const [market] of sites) assert.equal((await f.repo.getCollectorStatus()).markets[market].groupCount, 1);
+  plan.R128.display = plan.R713.display = 'available';
+  f.advance(60000); await pass();
+  f.advance(60000); await pass();
+  assert.deepEqual(messages.map(m => m.templateId), ['TPL_EN']);
+  const user = await f.repo.getUser(userKeyOf());
+  assert.equal(user.subscriptions.TPL_EN.credits, 0);
+  assert.deepEqual(user.membership, {});
+  const notifications = await f.repo.listNotifications(userKeyOf(), 10);
+  assert.ok(notifications.some(n => n.market === 'TW' && n.reason === 'no_subscription_credit'));
+});
+
+test('revoking the designated admin after credit reservation stops delivery and restores the authorization', async t => {
+  const { f, pass, messages, upstream, plan } = await setupTestAdmin(t);
+  await pass();
+  plan.R128.display = 'available';
+  f.advance(60000); await pass();
+  const reserve = f.repo.reserveSubscriptionCredit;
+  f.repo.reserveSubscriptionCredit = async args => {
+    const result = await reserve(args);
+    assert.equal(result.reserved, true);
+    await f.repo.saveConfig({ ...await f.repo.getConfig(), adminUserKeys: [] });
+    return result;
+  };
+  f.advance(60000); await pass();
+  assert.equal(messages.length, 0);
+  assert.equal((await f.repo.getUser(userKeyOf())).subscriptions.TPL_EN.credits, 5);
+  const notifications = await f.repo.listNotifications(userKeyOf(), 10);
+  assert.ok(notifications.some(n => n.market === 'JP' && n.reason === 'membership_required'));
+  const samples = upstream.calls.length;
+  f.advance(60000); await pass();
+  assert.equal(upstream.calls.length, samples);
+  assert.deepEqual((await f.repo.getCollectorStatus()).markets, {});
+  assert.equal((await f.repo.listFollows(userKeyOf())).length, 3);
+});
 
 test('regional minute ticks keep the mainland queue independent, separate local days and deliver each confirmed restock once', async () => {
   const { f, messages, pass, upstream, plan } = await setup();

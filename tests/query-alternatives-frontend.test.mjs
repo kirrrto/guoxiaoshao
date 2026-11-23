@@ -386,12 +386,13 @@ test('manual alternatives require an explicitly selected color and valid store c
 });
 
 test('members use the same explicit manual query without spending finite credits', async t => {
-  const { f, page } = await queried(t, null, { member: true });
+  const { f, rt, page } = await queried(t, null, { member: true });
   page.onToggleAlternative(event('part', BLACK));
   const balance = page.data.boot.balance;
   await page.onQueryAlternative({ currentTarget: { dataset: { part: BLACK } } });
   assert.equal(page.data.result.product.partNumber, BLACK);
   assert.equal(page.data.boot.balance, balance);
+  assert.deepEqual(rt.calls.filter(c => c.action === 'query.pickup').map(c => c.payload.maxCost), [0, 0]);
   assert.equal((await f.repo.getUser(userKeyOf())).quota.balance, balance);
   page.onUnload();
 });

@@ -52,15 +52,34 @@ function legacyId(kind, payload, owner) {
 }
 
 function begin(kind, payload, owner) {
+  return beginPending(kind, payload, owner).id;
+}
+
+function beginQuery(kind, payload, owner, displayedCost) {
+  const maxCost = Number.isSafeInteger(displayedCost) && displayedCost >= 0 ? displayedCost : 0;
+  const entry = beginPending(kind, payload, owner, maxCost);
+  return { id: entry.id, maxCost: entry.maxCost };
+}
+
+function beginPending(kind, payload, owner, maxCost) {
   const key = localKey(`gxs_pending_${kind}_v1`);
   const fingerprint = targetFingerprint(payload);
   const entries = current(key);
   let pending = entries.find(item => item.fingerprint === fingerprint && item.owner === owner);
-  if (!pending) { pending = { id: newId(kind), fingerprint, currentFormat: true }; entries.push(pending); }
+  if (!pending) {
+    pending = { id: newId(kind), fingerprint, currentFormat: true };
+    if (maxCost !== undefined) pending.maxCost = maxCost;
+    entries.push(pending);
+  } else if (maxCost !== undefined) {
+    // A lost request can replay its receipt. Legacy entries without consent
+    // metadata may recover their ID but cannot authorize a new debit.
+    const prior = Number.isSafeInteger(pending.maxCost) && pending.maxCost >= 0 ? pending.maxCost : 0;
+    pending.maxCost = Math.min(prior, maxCost);
+  }
   if (owner) pending.owner = owner;
   // A retry also persists the retained ID if storage has recovered meanwhile.
   persist(key, entries, pending);
-  return pending.id;
+  return pending;
 }
 
 const VERIFY_FAILED = '旧查询暂时无法核对，本次未扣次，请稍后再试。';
@@ -75,8 +94,11 @@ async function verifyLegacy(kind, payload, owner, { cost, member, isCurrent, exi
   if (!entry || !currentAccount()) return null;
   const scope = { ...payload, kind: kind === 'q' ? 'live' : 'history', queryId: entry.id, expectedUserKey: owner };
   if (existingOnly && entry.owner === owner) return { ...scope, mode: 'resume' };
-  if (entry.owner === owner && entry.legacyMode) return { ...scope, mode: entry.legacyMode,
-    ...(entry.legacyMode === 'start' ? { maxCost: entry.maxCost } : {}) };
+  if (entry.owner === owner && entry.legacyMode) {
+    if (entry.legacyMode !== 'start') return { ...scope, mode: entry.legacyMode };
+    const retained = beginQuery(kind, payload, owner, member ? 0 : cost);
+    return { ...scope, mode: 'start', maxCost: retained.maxCost };
+  }
   let result;
   try { result = await call('query.recovery', scope); }
   catch (_) { throw Object.assign(Error(VERIFY_FAILED), { code: 'query_recovery_unavailable' }); }
@@ -129,4 +151,4 @@ function uncertain(error) {
     'query_account_changed', 'history_page_account', 'query_recovery_account'].includes(error.code);
 }
 
-module.exports = { begin, hasPending, legacyId, verifyLegacy, finish, uncertain };
+module.exports = { begin, beginQuery, hasPending, legacyId, verifyLegacy, finish, uncertain };

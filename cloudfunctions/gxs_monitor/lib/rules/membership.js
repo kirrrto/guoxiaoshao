@@ -1,5 +1,6 @@
 'use strict';
 const { toDate, addDays } = require('../time');
+const { consumerAppid } = require('../connection');
 const { settle } = require('./membership-entitlements');
 const { GIFT_SOURCE, ANNUAL_PLAN, giftRecordId } = require('./owner-annual-gift');
 
@@ -12,6 +13,22 @@ const LIMITS = Object.freeze({
 const ENHANCED_LIMITS = Object.freeze({ ...LIMITS, maxFollows: 4, maxStoresPerFollow: 4 });
 const ANNUAL_LIMITS = Object.freeze({ ...ENHANCED_LIMITS, maxFollows: 5, maxStoresPerFollow: 5 });
 const limitsForPlan = planId => planId === 'member_365d' ? ANNUAL_LIMITS : planId === 'member_30d' ? ENHANCED_LIMITS : LIMITS;
+
+// The environment pins one consumer account. The runtime admin list controls
+// its revocable test access without changing any payment or membership ledger.
+function isBoundTestAccount(user) {
+  const target = process.env.GXS_TEST_ADMIN_USER_KEY;
+  return Boolean(target && user?.appid === consumerAppid && typeof user.openid === 'string'
+    && user.openid.length > 0 && user._id === target && target === consumerAppid + ':' + user.openid);
+}
+
+function hasAdminTestAccess(user, config) {
+  return isBoundTestAccount(user) && Array.isArray(config?.adminUserKeys) && config.adminUserKeys.includes(user._id);
+}
+
+function hasMemberAccess(user, now, config) {
+  return isMember(user, now) || hasAdminTestAccess(user, config);
+}
 
 function planSnapshot(user, now) {
   if (!isMember(user, now)) return { planId: null, enhanced: false, enhancedExpiresAt: null, annualExpiresAt: null };
@@ -33,18 +50,19 @@ function planSnapshot(user, now) {
     annualExpiresAt: annualUntil === null ? null : new Date(annualUntil).toISOString() };
 }
 
-function memberLimits(user, now) {
+function memberLimits(user, now, config) {
+  if (hasAdminTestAccess(user, config)) return ANNUAL_LIMITS;
   const limits = limitsForPlan(planSnapshot(user, now).planId);
   return isMember(user, now) ? limits : { ...limits, maxFollows: 0 };
 }
 
-// Only verified, still-effective monthly/annual benefits include regional watches.
-function canWatchMarkets(user, now) {
-  return planSnapshot(user, now).enhanced;
+// Regional watches are available to monthly/annual members and the designated test account.
+function canWatchMarkets(user, now, config) {
+  return hasAdminTestAccess(user, config) || planSnapshot(user, now).enhanced;
 }
 
 function accountLimits(user, now, config) {
-  const limits = memberLimits(user, now);
+  const limits = memberLimits(user, now, config);
   const base = Math.min(3, Math.max(1, Number(config && config.query && config.query.maxStores) || 3));
   return { ...limits, queryMaxStores: base < 3 ? base : limits.maxStoresPerFollow,
     // The annual expansion adds stores, not extra alternative-color choices.
@@ -52,16 +70,16 @@ function accountLimits(user, now, config) {
 }
 
 /** Saved slots have stable ownership even if the user pauses or edits a follow. */
-function followAllowance(user, follow, follows, now) {
-  if (follow.market && follow.market !== 'CN' && !canWatchMarkets(user, now)) {
+function followAllowance(user, follow, follows, now, config) {
+  if (follow.market && follow.market !== 'CN' && !canWatchMarkets(user, now, config)) {
     return { limitPaused: false, marketPlanRequired: true, eligibleStoreNumbers: [] };
   }
-  const limits = memberLimits(user, now);
+  const limits = memberLimits(user, now, config);
   const sorted = (user && user._followPolicy || follows || []).filter(item => item.userKey === follow.userKey && item.status !== 'removed')
     .slice().sort((a, b) => String(a.createdAt || '').localeCompare(String(b.createdAt || '')) || a._id.localeCompare(b._id));
   const position = sorted.findIndex(item => item._id === follow._id);
   const allowed = position >= 0 && position < limits.maxFollows;
-  return { limitPaused: isMember(user, now) && !allowed,
+  return { limitPaused: hasMemberAccess(user, now, config) && !allowed,
     eligibleStoreNumbers: allowed ? follow.storeNumbers.slice(0, limits.maxStoresPerFollow) : [] };
 }
 
@@ -89,7 +107,11 @@ function extendMembership(user, days, now) {
   return addDays(base, days);
 }
 
-function membershipSnapshot(user, now) {
+function membershipSnapshot(user, now, config) {
+  if (hasAdminTestAccess(user, config)) return {
+    active: true, isTester: true, expiresAt: null, remainingMs: 0, planId: null,
+    enhanced: true, enhancedExpiresAt: null, annualExpiresAt: null, limits: ANNUAL_LIMITS,
+  };
   const expiresAt = membershipExpiresAt(user);
   const active = isMember(user, now);
   return {
@@ -117,17 +139,17 @@ function validateFollowLimits(follows, candidate, maxFollows = LIMITS.maxFollows
 }
 
 /**
- * Follow and WeChat reminders are member-only. Free accounts only receive
- * query trial credits; there is no free follow or free restock alert.
+ * Free accounts receive query credits. The designated test account uses its
+ * explicit access check and never receives a free reminder allowance.
  */
 const FREE_REMINDER_FOLLOWS = 0;
 function hasFreeReminder() {
   return false;
 }
 
-/** Only members may follow products or receive WeChat restock/sold-out alerts. */
-function canUseReminders(user, now) {
-  return isMember(user, now);
+/** Eligibility to follow is separate from the customer's WeChat consent. */
+function canUseReminders(user, now, config) {
+  return hasMemberAccess(user, now, config);
 }
 
 /** Why an account cannot be alerted: follow and reminders require an active membership. */
@@ -135,4 +157,4 @@ function reminderBlockReason(user) {
   return user && user.membership && user.membership.expiresAt ? 'member_expired' : 'membership_required';
 }
 
-module.exports = { LIMITS, ENHANCED_LIMITS, ANNUAL_LIMITS, limitsForPlan, FREE_REMINDER_FOLLOWS, isMember, hasFreeReminder, canUseReminders, canWatchMarkets, reminderBlockReason, extendMembership, membershipSnapshot, membershipExpiresAt, validateFollowLimits, planSnapshot, memberLimits, accountLimits, followAllowance };
+module.exports = { isBoundTestAccount, hasAdminTestAccess, hasMemberAccess, LIMITS, ENHANCED_LIMITS, ANNUAL_LIMITS, limitsForPlan, FREE_REMINDER_FOLLOWS, isMember, hasFreeReminder, canUseReminders, canWatchMarkets, reminderBlockReason, extendMembership, membershipSnapshot, membershipExpiresAt, validateFollowLimits, planSnapshot, memberLimits, accountLimits, followAllowance };

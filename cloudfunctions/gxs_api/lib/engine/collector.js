@@ -223,10 +223,10 @@ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = cons
     const candidates = follows.flatMap(follow => {
       if (follow.market && follow.market !== 'CN') return [];
       const user = users.get(follow.userKey);
-      if (!user || !canUseReminders(user, clock())) return [];
+      if (!user || !canUseReminders(user, clock(), planningConfig)) return [];
       const templateId = planningConfig.notifications.templateIds.restock;
       if (!user.subscriptions || !user.subscriptions[templateId] || user.subscriptions[templateId].credits <= 0) return [];
-      return followAllowance(user, follow, follows, clock()).eligibleStoreNumbers.map(storeNumber => ({
+      return followAllowance(user, follow, follows, clock(), planningConfig).eligibleStoreNumbers.map(storeNumber => ({
         id: `${follow.userKey}|${storeNumber}|${follow.partNumber}`, follow, storeNumber,
       }));
     }).sort((a, b) => a.id < b.id ? -1 : a.id > b.id ? 1 : 0);
@@ -347,9 +347,9 @@ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = cons
     const now = clock();
     const eligible = follows.flatMap(follow => {
       const user = users.get(follow.userKey);
-      if (!user || !canUseReminders(user, now)) return [];
+      if (!user || !canUseReminders(user, now, config)) return [];
       if (isCtoPartNumber(follow.partNumber) && !canMonitorProduct(ctoProducts.get(follow.partNumber))) return [];
-      const allowance = followAllowance(user, follow, follows, now);
+      const allowance = followAllowance(user, follow, follows, now, config);
       return allowance.eligibleStoreNumbers.length ? [{ ...follow, storeNumbers: allowance.eligibleStoreNumbers }] : [];
     });
     marketMonitor.configure(eligible, config);

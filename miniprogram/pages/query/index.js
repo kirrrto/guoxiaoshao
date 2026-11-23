@@ -101,6 +101,7 @@ function queryNotice(response) {
   const retryHint = dailyBudget ? ' 预计北京时间次日 00:00 可重试。' : response.retryAfterMs > 0
     ? ` 预计约 ${response.retryAfterMs >= 60000 ? Math.ceil(response.retryAfterMs / 60000) + ' 分钟' : Math.ceil(response.retryAfterMs / 1000) + ' 秒'}后可重试。` : '';
   if (!response.ok) {
+    if (response.reason === 'query_cost_changed') return '查询费用已变化，本次未扣次，请刷新账户后重新确认。';
     const mapped = fmt.reasonText(response.reason);
     const reason = dailyBudget ? '今日实时查询暂时不可用，本次未扣次。'
       : mapped && mapped !== response.reason ? mapped : '本次查询未完成，请稍后重试。';
@@ -485,7 +486,7 @@ Page(require('../../utils/language').page('query', {
       evidenceCard: null,
       ...(membershipRestoresAccess ? { restriction: null, queryFailureMessage: '', restrictionReason: null } : {}),
       boot: {
-        member: boot.membership.active,
+        member: boot.membership.active, isTester: boot.membership.isTester === true,
         freeReminder: false,
         balance: boot.quota.balance,
         queryCost: boot.quota.queryCost,
@@ -1033,9 +1034,10 @@ Page(require('../../utils/language').page('query', {
       const recovery = verify && await operation.verifyLegacy('q', payload, accountUserKey, { cost: boot.queryCost, member: boot.member, existingOnly,
         isCurrent: () => !this.pageRetired && accountEpoch === (this.accountEpoch || 0) });
       if (verify && !recovery) return;
-      queryId = recovery ? recovery.queryId : operation.begin('q', payload, accountUserKey);
+      const pending = !recovery && operation.beginQuery('q', payload, accountUserKey, boot.member ? 0 : boot.queryCost);
+      queryId = recovery ? recovery.queryId : pending.id;
       const response = recovery ? await call('query.resumeLegacy', recovery)
-        : await call('query.pickup', { queryId, ...payload, ...(accountUserKey ? { expectedUserKey: accountUserKey } : {}) });
+        : await call('query.pickup', { queryId, ...payload, maxCost: pending.maxCost, ...(accountUserKey ? { expectedUserKey: accountUserKey } : {}) });
       if (accountEpoch !== (this.accountEpoch || 0)) return;
       if (response.reason === 'query_in_progress') {
         if (!this.pageRetired) {
@@ -1058,7 +1060,7 @@ Page(require('../../utils/language').page('query', {
         this.setData({ restriction: message, queryFailureMessage: message,
           restrictionReason: sameTarget ? response.reason : null, ...balancePatch });
         this.refreshJourney();
-        if (boot.member && ['insufficient_credits', 'new_product_restricted'].includes(response.reason)) {
+        if (response.reason === 'query_cost_changed' || boot.member && ['insufficient_credits', 'new_product_restricted'].includes(response.reason)) {
           try { this.applyBoot(await getBootstrap({ force: true })); } catch (error) { /* keep the confirmed denial until the account reconnects */ }
         }
         return;
@@ -1087,6 +1089,9 @@ Page(require('../../utils/language').page('query', {
       this.refreshJourney();
       const message = queryFailureNotice(error);
       this.setData({ restriction: message, queryFailureMessage: message });
+      if (error?.code === 'query_cost_changed') {
+        try { this.applyBoot(await getBootstrap({ force: true })); } catch (_) { /* The next tap retains the displayed ceiling. */ }
+      }
     } finally {
       if (!this.pageRetired && accountEpoch === (this.accountEpoch || 0)) {
         stopProgress(this);

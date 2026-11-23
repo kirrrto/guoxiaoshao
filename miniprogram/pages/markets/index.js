@@ -214,7 +214,7 @@ Page(require('../../utils/language').page('markets', {
     const now = bootstrapNow(this.boot);
     const access = regionalAccess(accountReady && this.boot.membership, product, now);
     const launchRestricted = Boolean(accountReady && product?.querySupported && access.launchRestricted);
-    const costText = quota && (access.member ? c.member : c.cost.replace('{balance}', quota.balance));
+    const costText = quota && (access.tester ? c.tester : access.member ? c.member : c.cost.replace('{balance}', quota.balance));
     const receipt = accountReady && !launchRestricted && receiptView(this.snapshot, store, lang, now);
     const opening = launchRestricted && localTime(product.freeQueryStartsAt, store?.timeZone);
     const launchNotice = launchRestricted ? c.launchGate + (opening ? ' ' + c.unlockAt.replace('{date}', opening.slice(0,10)) : '') : '';
@@ -359,9 +359,10 @@ Page(require('../../utils/language').page('markets', {
     this.billing = null;
     if (this.snapshot) this.snapshot.supersededByFailure = true;
     this.paint();
-    const queryId = operation.begin('mq', target, owner);
+    const pending = operation.beginQuery('mq', target, owner, maxCost);
+    const queryId = pending.id;
     try {
-      const response = await call('market.pickup', { ...target, queryId, expectedUserKey: owner, maxCost });
+      const response = await call('market.pickup', { ...target, queryId, expectedUserKey: owner, maxCost: pending.maxCost });
       if (!response || response.market !== target.market || response.queryId !== queryId) throw { code: 'bad_response' };
       const row = Array.isArray(response.results) && response.results.find(item => item && item.market === target.market
         && item.partNumber === target.partNumber && item.storeNumber === target.storeNumbers[0]);

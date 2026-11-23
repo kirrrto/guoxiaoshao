@@ -2,7 +2,8 @@
 const { randomUUID } = require('node:crypto');
 const { ApiError } = require('../errors');
 const { dayKey } = require('../time');
-const { isMember } = require('../rules/membership');
+const { queryCostLimit } = require('../rules/access');
+const { hasMemberAccess } = require('../rules/membership');
 const { isLiveRestricted, isHistoryRestricted } = require('../rules/new-product');
 const { targetKeyOf } = require('../engine/events');
 const { RETENTION_DAYS, retentionStart } = require('../engine/retention');
@@ -61,7 +62,8 @@ async function completedQuery(ctx, record, user) {
   return { replayed: true, record: existing, balance: user.quota.balance, quotaRevision: Number.isInteger(user.quota.revision) ? user.quota.revision : 0 };
 }
 
-async function list(ctx, payload, { existingOnly = false, maxCost } = {}) {
+async function list(ctx, payload, { existingOnly = false } = {}) {
+  const maxCost = queryCostLimit(payload.maxCost);
   if (payload.expectedUserKey !== undefined && payload.expectedUserKey !== ctx.identity.userKey) throw new ApiError('history_page_account', '账号已变化，请重新打开历史记录。');
   const historyQueryId = typeof payload.historyQueryId === 'string' && ID_PATTERN.test(payload.historyQueryId) ? payload.historyQueryId : null;
   if (!historyQueryId) throw new ApiError('invalid_query_id', 'historyQueryId 需为 8–64 位字母数字标识');
@@ -80,7 +82,7 @@ async function list(ctx, payload, { existingOnly = false, maxCost } = {}) {
   const [product, stores] = await Promise.all([ctx.repo.getProduct(partNumber), ctx.repo.getStores(storeNumbers)]);
   if (!product) throw new ApiError('unknown_product', '该商品不在目录中');
   if (stores.length !== storeNumbers.length) throw new ApiError('unknown_store', '存在未知门店编号');
-  const member = isMember(user, ctx.now);
+  const member = hasMemberAccess(user, ctx.now, ctx.config);
   const restriction = isHistoryRestricted(product, ctx.config.newProductWindows, requestedDay, ctx.now);
   if (!member && restriction.restricted) return { ok: false, reason: 'new_product_history_restricted', restrictionEndsAt: restriction.endsAt, cost: 0, balance: user.quota.balance,
     quotaRevision: Number.isInteger(user.quota.revision) ? user.quota.revision : 0 };

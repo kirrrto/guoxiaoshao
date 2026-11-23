@@ -697,3 +697,14 @@ test('login failure can cancel its uncreated intent and then buy a different pla
   assert.equal(created.payload.planId, 'member_365d');
   assert.equal(rt.payments.length, 1);
 });
+
+test('an older fulfilled order can be reconciled while the account uses administrator test access', async () => {
+  const membership = { active: true, isTester: true, remainingMs: 0, expiresAt: null, planId: null };
+  const rt = runtime({ handler: (action, payload) => action === 'member.createOrder'
+    ? { ok: true, order: { orderId: payload.orderId }, payment: null }
+    : { order: { orderId: payload.orderId, status: 'fulfilled', fulfilledAt: '2026-09-20T00:00:00Z' }, membership } });
+  await rt.controller.show(); await rt.controller.buy();
+  assert.equal(rt.state().paymentPendingId, '');
+  assert.equal(rt.state().paymentMessage, '这笔订单已付款。');
+  assert.equal(rt.resolved[0].activated, false);
+});

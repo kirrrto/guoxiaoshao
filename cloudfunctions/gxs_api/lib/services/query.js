@@ -3,6 +3,7 @@ const { randomUUID } = require('node:crypto');
 const { ApiError } = require('../errors');
 const { sharedQueryPickup } = require('../engine/shared-query');
 const { ensureUser } = require('./users');
+const { queryCostLimit } = require('../rules/access');
 const { accountLimits, ANNUAL_LIMITS } = require('../rules/membership');
 const { isRetiredPartNumber, retiredProductMessage } = require('../rules/follow-access');
 const { recordObservations } = require('../engine/observations');
@@ -72,12 +73,13 @@ async function resumeLegacy(ctx, payload) {
   if (!['live', 'history'].includes(payload.kind) || !['resume', 'start'].includes(payload.mode)) throw new ApiError('invalid_query_id', '旧查询操作无效。');
   const existingOnly = payload.mode === 'resume';
   if (!existingOnly && (!Number.isSafeInteger(payload.maxCost) || payload.maxCost < 0)) throw new ApiError('invalid_query_id', '请重新确认查询费用。');
-  const limits = { existingOnly, maxCost: payload.maxCost };
+  const limits = { existingOnly };
   return payload.kind === 'live' ? pickup(ctx, payload, limits)
     : require('./history').list(ctx, { ...payload, historyQueryId: payload.queryId }, limits);
 }
 
-async function pickup(ctx, payload, { existingOnly = false, maxCost } = {}) {
+async function pickup(ctx, payload, { existingOnly = false } = {}) {
+  const maxCost = queryCostLimit(payload.maxCost);
   if (payload.expectedUserKey !== undefined && payload.expectedUserKey !== ctx.identity.userKey) {
     throw new ApiError('query_account_changed', '账号已变化，请下拉刷新后再查询。');
   }
@@ -121,12 +123,12 @@ async function marketCatalog(ctx, payload = {}) {
 
 async function marketPickup(ctx, payload) {
   const startedAt = Date.now();
-  const { market, partNumber, storeNumbers, queryId, maxCost } = payload;
+  const { market, partNumber, storeNumbers, queryId } = payload;
   const site = findMarket(market);
   if (!site) throw new ApiError('unknown_market', '该站点不在支持范围内。');
   if (payload.expectedUserKey !== ctx.identity.userKey) throw new ApiError('query_account_changed', '账号已变化，请重新确认查询。');
   if (typeof queryId !== 'string' || !ID_PATTERN.test(queryId)) throw new ApiError('invalid_query_id', '查询编号无效。');
-  if (maxCost !== undefined && (!Number.isSafeInteger(maxCost) || maxCost < 0)) throw new ApiError('invalid_payload', '查询费用无效。');
+  const maxCost = queryCostLimit(payload.maxCost);
   if (typeof partNumber !== 'string' || !/^[A-Z0-9]{5,16}\/A$/.test(partNumber) || !Array.isArray(storeNumbers)
     || storeNumbers.length !== 1 || typeof storeNumbers[0] !== 'string' || !/^R\d{3}$/.test(storeNumbers[0])) {
     throw new ApiError('invalid_market_target', '请在当前站点重新选择商品与门店。');

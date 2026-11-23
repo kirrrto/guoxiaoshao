@@ -46,7 +46,7 @@
             <view wx:if="{{checkoutTarget.imageDisplayUrl}}" class="product-tile checkout-image"><image src="{{checkoutTarget.imageDisplayUrl}}" webp="{{true}}" mode="aspectFit" aria-hidden="true" binderror="onCheckoutImageError" /></view>
             <view class="checkout-target-copy"><view class="checkout-target-title">{{i18n.t(ui,(checkoutTarget.title))}}</view><view class="checkout-stores">{{i18n.t(ui,(checkoutTarget.storeText))}}</view></view>
           </view>
-          <button wx:if="{{membership.active}}" class="btn btn-primary btn-block mt" disabled="{{paymentBusy || paymentChecking || paymentConfirming}}" bindtap="onContinueCheckout">{{i18n.t(ui,'会员已生效 · 继续设置关注')}}</button>
+          <button wx:if="{{membership.active}}" class="btn btn-primary btn-block mt" disabled="{{paymentBusy || paymentChecking || paymentConfirming}}" bindtap="onContinueCheckout">{{i18n.t(ui,membership.isTester ? '继续设置关注' : '会员已生效 · 继续设置关注')}}</button>
         </block>
         <view wx:if="{{checkoutMessage}}" class="checkout-problem">{{i18n.t(ui,(checkoutMessage))}}</view>
         <button wx:if="{{checkoutMessage || membership.active}}" class="btn btn-block mt" hover-class="ui-control-pressed" disabled="{{paymentBusy || paymentConfirming}}" bindtap="onReturnToQuery">{{i18n.t(ui,(checkoutMessage ? '重新确认配置与门店' : '返回查询'))}}</button>
@@ -57,7 +57,8 @@
       <!-- 会员卡：未开通时是权益，已开通时是有效期与实际名额。 -->
       <view wx:if="{{membership.active}}" class="member-pass">
         <image class="member-pass-watermark" src="/images/brand/whistle-pass.png" mode="aspectFit" aria-hidden="true" />
-        <view wx:if="{{membership.expiresShortText || membership.daysLeft != null}}" class="member-overview">
+        <view wx:if="{{membership.isTester}}" class="member-overview"><text class="member-renewal">{{i18n.t(ui,'库存查询不扣次数')}}</text></view>
+        <view wx:elif="{{membership.expiresShortText || membership.daysLeft != null}}" class="member-overview">
           <text wx:if="{{membership.daysLeft != null}}" class="member-renewal">{{i18n.m(ui,'剩余 {0} 天',[(membership.daysLeft)])}}</text>
           <view wx:if="{{membership.expiresShortText}}" class="member-validity"><text class="member-validity-label">{{i18n.t(ui,'有效期至')}} </text><text class="member-validity-date">{{i18n.t(ui,(membership.expiresShortText))}}</text></view>
         </view>
@@ -72,7 +73,7 @@
           </view>
         </view>
         <view wx:if="{{membership.annualExpiresText}}" class="member-enhanced">{{i18n.m(ui,'年卡 5 配置 × 5 门店权益至 {0}',[(membership.annualExpiresText)])}}</view>
-        <view wx:elif="{{membership.enhanced}}" class="member-enhanced">{{i18n.m(ui,'额外名额有效至 {0}',[(membership.enhancedExpiresText)])}}</view>
+        <view wx:elif="{{membership.enhancedExpiresText}}" class="member-enhanced">{{i18n.m(ui,'额外名额有效至 {0}',[(membership.enhancedExpiresText)])}}</view>
       </view>
       <view wx:elif="{{!paymentPendingId && (!contextualCheckout || !checkoutTarget)}}" class="member-pass member-vip-offer">
         <image class="member-pass-watermark" src="/images/brand/whistle-pass.png" mode="aspectFit" aria-hidden="true" />
@@ -92,7 +93,7 @@
         <button class="btn membership-manage" hover-class="ui-control-pressed" disabled="{{subscribing || redeeming || paymentBusy || paymentChecking || paymentConfirming}}" bindtap="onOpenMembershipUpgrade">{{i18n.t(ui,'升级套餐')}}</button>
       </view>
       <button wx:if="{{showPurchaseShop && !membership.active && !membershipUpgradeOpen && !paymentPendingId && (contextualCheckout && checkoutTarget)}}" class="btn btn-primary btn-block mt" hover-class="btn-primary-pressed" disabled="{{subscribing || paymentBusy || paymentChecking || paymentConfirming || redeeming}}" bindtap="onOpenMembershipRenew">{{i18n.t(ui,'开通会员')}}</button>
-      <view wx:if="{{!showPurchaseShop && !paymentPendingId}}" class="payment-note purchase-unavailable-note">{{i18n.t(ui,(purchaseUnavailableNote))}}</view>
+      <view wx:if="{{!showPurchaseShop && !membership.isTester && !paymentPendingId}}" class="payment-note purchase-unavailable-note">{{i18n.t(ui,(purchaseUnavailableNote))}}</view>
 
       <view wx:if="{{showPurchaseShop && !paymentPendingId && membershipUpgradeOpen}}" id="membership-offer" class="membership-shop">
         <view class="section-heading membership-shop-heading">
@@ -289,7 +290,7 @@
         </view>
         <button wx:if="{{orders.length}}" class="btn btn-text btn-block order-record-button order-record-clear" hover-class="ui-control-pressed" disabled="{{!ordersClearableCount || orderActionBusy || orderConfirming}}" bindtap="onClearOrders">{{i18n.t(ui,(orderActionBusy === 'clear' ? '清空中…' : '清空当前显示的记录'))}}</button>
       </view>
-      <button class="ui-disclosure account-link" hover-class="ui-control-pressed" bindtap="onOpenRedemption" disabled="{{subscribing}}"><view class="ui-label-with-icon"><image class="ui-icon" src="/images/ui/ticket.png" mode="aspectFit" aria-hidden="true" /><text class="ui-disclosure-label">{{i18n.t(ui,'兑换码开通')}}</text></view><view class="ui-chevron" aria-hidden="true"></view></button>
+      <button wx:if="{{!membership.isTester}}" class="ui-disclosure account-link" hover-class="ui-control-pressed" bindtap="onOpenRedemption" disabled="{{subscribing}}"><view class="ui-label-with-icon"><image class="ui-icon" src="/images/ui/ticket.png" mode="aspectFit" aria-hidden="true" /><text class="ui-disclosure-label">{{i18n.t(ui,'兑换码开通')}}</text></view><view class="ui-chevron" aria-hidden="true"></view></button>
       <button class="ui-disclosure account-link" hover-class="ui-control-pressed" bindtap="onToggleReleaseNotes" aria-expanded="{{showReleaseNotes}}"><view class="ui-label-with-icon"><image class="ui-icon" src="/images/ui/news.png" mode="aspectFit" aria-hidden="true" /><text class="ui-disclosure-label">{{i18n.t(ui,'更新公告')}}</text></view><view class="ui-chevron {{showReleaseNotes ? 'ui-chevron--up' : 'ui-chevron--down'}}" aria-hidden="true"></view></button>
       <view wx:if="{{showReleaseNotes}}" class="release-notes ui-reveal">
         <view wx:for="{{visibleReleaseNotes}}" wx:key="version" class="release-note">

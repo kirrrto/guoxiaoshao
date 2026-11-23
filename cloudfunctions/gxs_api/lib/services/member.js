@@ -16,7 +16,7 @@ async function status(ctx) {
   const user = await ensureUser(ctx);
   const orders = await ctx.repo.listOrders(user._id, 10);
   return {
-    membership: membershipSnapshot(user, ctx.now),
+    membership: membershipSnapshot(user, ctx.now, ctx.config),
     product: paymentService.paymentProduct(ctx),
     products: paymentService.paymentProducts(ctx),
     payment: paymentService.paymentProviderFor(ctx).getReadiness(),
@@ -104,7 +104,7 @@ async function redeemCode(ctx, payload) {
   // Wrong attempts must commit before returning an API error; throwing inside
   // the transaction would roll back the anti-guessing counter.
   if (result.error) throw new ApiError(result.error.code, result.error.message, result.error.details);
-  return { redeemed: true, alreadyRedeemed: result.alreadyRedeemed, membership: membershipSnapshot(result.user, ctx.now) };
+  return { redeemed: true, alreadyRedeemed: result.alreadyRedeemed, membership: membershipSnapshot(result.user, ctx.now, ctx.config) };
 }
 
 /**

@@ -43,22 +43,23 @@
       <button wx:if="{{pendingOther}}" class="btn btn-primary btn-block test-primary" hover-class="btn-primary-pressed" bindtap="onViewPending" disabled="{{busy || loading}}">{{i18n.t(ui,'查看另一个待确认测试')}}</button>
       <block wx:elif="{{canContinue}}">
         <view class="test-action-caption">{{i18n.t(ui,'继续这次测试，无需再次授权')}}</view>
-        <button class="btn btn-primary btn-block test-primary" hover-class="btn-primary-pressed" bindtap="onContinue" disabled="{{busy || loading || !ready || blocked}}" loading="{{busy}}">{{i18n.t(ui,'继续原测试 · 本次最多 1 次')}}</button>
+        <button class="btn btn-primary btn-block test-primary" hover-class="btn-primary-pressed" bindtap="onContinue" disabled="{{busy || loading || !ready || blocked}}" loading="{{busy}}">{{i18n.t(ui,cost === 0 ? '继续原测试 · 不扣次' : '继续原测试 · 本次最多 1 次')}}</button>
       </block>
       <block wx:elif="{{!blocked}}">
-        <view class="test-cost"><text>{{i18n.t(ui,'每条消耗')}} <text class="test-cost-number">{{i18n.t(ui,'1 次')}}</text>{{i18n.t(ui,'查询／体验次数')}}</text><text>{{i18n.m(ui,'可用 {0} 次',[(balance)])}}</text></view>
-        <view wx:if="{{test && test.status === 'uncertain' && test.feedback}}" class="test-action-caption">{{i18n.t(ui,'原测试结果仍未知，扣次记录保留。再次体验会新建测试，另消耗 1 次。')}}</view>
-        <button class="btn btn-block {{test && (test.status === 'accepted' || test.status === 'uncertain') ? 'test-secondary test-again' : 'btn-primary test-primary'}}" hover-class="btn-primary-pressed" bindtap="onStart" disabled="{{busy || loading || !ready || balance < 1}}" loading="{{busy}}">{{i18n.t(ui,(test && test.status === 'uncertain' ? '重新授权新测试 · 1 次' : (test && test.status === 'accepted' ? '再体验一条 · 1 次' : '授权并发送测试 · 1 次')))}}</button>
-        <view wx:if="{{!test}}" class="test-action-caption">{{i18n.t(ui,'免费用户也可体验，会员同样消耗 1 次额度。')}}</view>
+        <view wx:if="{{cost === 0}}" class="test-cost">{{i18n.t(ui,'本次测试不扣次数。')}}</view>
+        <view wx:else class="test-cost"><text>{{i18n.t(ui,'每条消耗')}} <text class="test-cost-number">{{i18n.t(ui,'1 次')}}</text>{{i18n.t(ui,'查询／体验次数')}}</text><text>{{i18n.m(ui,'可用 {0} 次',[(balance)])}}</text></view>
+        <view wx:if="{{test && test.status === 'uncertain' && test.feedback}}" class="test-action-caption">{{i18n.t(ui,cost === 0 ? '原测试结果仍未知。再次体验会新建测试。' : '原测试结果仍未知，扣次记录保留。再次体验会新建测试，另消耗 1 次。')}}</view>
+        <button class="btn btn-block {{test && (test.status === 'accepted' || test.status === 'uncertain') ? 'test-secondary test-again' : 'btn-primary test-primary'}}" hover-class="btn-primary-pressed" bindtap="onStart" disabled="{{busy || loading || !ready || balance < cost}}" loading="{{busy}}">{{i18n.t(ui,(test && test.status === 'uncertain' ? (cost === 0 ? '重新授权新测试' : '重新授权新测试 · 1 次') : test && test.status === 'accepted' ? (cost === 0 ? '再体验一条' : '再体验一条 · 1 次') : (cost === 0 ? '授权并发送测试' : '授权并发送测试 · 1 次')))}}</button>
+        <view wx:if="{{!test && cost > 0}}" class="test-action-caption">{{i18n.t(ui,'免费用户也可体验，会员同样消耗 1 次额度。')}}</view>
       </block>
       <button wx:if="{{test || error || !ready || canContinue || pendingOther}}" class="btn btn-block test-secondary test-check" hover-class="ui-control-pressed" bindtap="onCheck" disabled="{{busy || loading}}">{{i18n.t(ui,(loading ? '读取中…' : '查看原测试结果'))}}</button>
-      <button wx:if="{{ready && balance < 1 && !blocked && !canContinue && !pendingOther}}" class="btn btn-block test-secondary test-signin" hover-class="ui-control-pressed" bindtap="onGoMine">{{i18n.t(ui,'去「我的」签到获取次数')}}</button>
+      <button wx:if="{{ready && balance < cost && !blocked && !canContinue && !pendingOther}}" class="btn btn-block test-secondary test-signin" hover-class="ui-control-pressed" bindtap="onGoMine">{{i18n.t(ui,'去「我的」签到获取次数')}}</button>
     </view>
   </view>
   <view class="card card-list test-card test-rules-card">
     <button class="ui-disclosure test-disclosure test-rules-toggle" hover-class="ui-control-pressed" bindtap="onToggleTestRules" aria-expanded="{{showTestRules}}"><text class="ui-disclosure-label">{{i18n.t(ui,'体验说明')}}</text><view class="ui-chevron {{showTestRules ? 'ui-chevron--up' : 'ui-chevron--down'}}" aria-hidden="true"></view></button>
     <view wx:if="{{showTestRules}}" class="test-rules">
-      <view class="test-rule"><view class="test-rule-title">{{i18n.t(ui,'次数如何扣除')}}</view><view>{{i18n.t(ui,'每条消耗 1 次签到／任务额度，会员同样扣次。明确发送失败自动退回；结果不明时暂不退回，不会重复发送。')}}</view></view>
+      <view class="test-rule"><view class="test-rule-title">{{i18n.t(ui,'次数如何扣除')}}</view><view>{{i18n.t(ui,cost === 0 ? '本次测试不扣次数。' : '每条消耗 1 次签到／任务额度，会员同样扣次。明确发送失败自动退回；结果不明时暂不退回，不会重复发送。')}}</view></view>
       <view class="test-rule"><view class="test-rule-title">{{i18n.t(ui,'授权与送达')}}</view><view>{{i18n.t(ui,'微信授权次数与查询额度分开计算。微信受理不代表已送达，也不保证手机弹出横幅。')}}</view></view>
       <view class="test-rule"><view class="test-rule-title">{{i18n.t(ui,'正式提醒需要什么')}}</view><view>{{i18n.t(ui,'测试仅体验提醒，不查询库存或创建监测。正式到货和断货提醒需要会员、有效关注与微信授权。')}}</view></view>
     </view>

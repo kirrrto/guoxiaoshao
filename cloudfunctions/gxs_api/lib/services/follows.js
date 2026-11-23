@@ -1,6 +1,6 @@
 'use strict';
 const { ApiError } = require('../errors');
-const { isMember, canUseReminders, validateFollowLimits, memberLimits, followAllowance } = require('../rules/membership');
+const { hasMemberAccess, canUseReminders, validateFollowLimits, memberLimits, followAllowance } = require('../rules/membership');
 const { isRetiredPartNumber, retiredProductMessage } = require('../rules/follow-access');
 const { isLiveRestricted } = require('../rules/new-product');
 const { targetKeyOf } = require('../engine/events');
@@ -74,11 +74,11 @@ async function decorate(ctx, follows, member = true, active = member) {
 async function list(ctx) {
   const user = await ensureUser(ctx);
   const follows = await ctx.repo.listFollows(user._id);
-  const member = isMember(user, ctx.now);
+  const member = hasMemberAccess(user, ctx.now, ctx.config);
   const domestic = follows.filter(follow => !follow.market || follow.market === 'CN');
   const presented = await decorate(ctx, domestic, member, member);
-  return { otherMarketCount: follows.length - domestic.length, member, freeReminder: false, limits: memberLimits(user, ctx.now), follows: presented.map((row, i) => {
-    const allowance = followAllowance(user, domestic[i], follows, ctx.now);
+  return { otherMarketCount: follows.length - domestic.length, member, freeReminder: false, limits: memberLimits(user, ctx.now, ctx.config), follows: presented.map((row, i) => {
+    const allowance = followAllowance(user, domestic[i], follows, ctx.now, ctx.config);
     return { ...row, ...allowance,
       ...(row.productRetired ? {} : allowance.limitPaused ? { status: 'limit_paused', statusReason: 'plan_limit' } : {}),
       stores: row.stores.map(store => ({ ...store, limitPaused: member && !allowance.eligibleStoreNumbers.includes(store.storeNumber) })) };
@@ -88,8 +88,8 @@ async function list(ctx) {
 /** Create or edit a follow using this account's current paid-plan allowance. */
 async function upsert(ctx, payload) {
   const user = await ensureUser(ctx);
-  if (!canUseReminders(user, ctx.now)) throw new ApiError('member_required', '关注与到货提醒为会员专属，开通会员后可关注并接收微信提醒');
-  const member = isMember(user, ctx.now);
+  if (!canUseReminders(user, ctx.now, ctx.config)) throw new ApiError('member_required', '关注与到货提醒为会员专属，开通会员后可关注并接收微信提醒');
+  const member = hasMemberAccess(user, ctx.now, ctx.config);
   const partNumber = typeof payload.partNumber === 'string' ? payload.partNumber.trim() : '';
   if (!isProductIdentity(partNumber)) throw new ApiError('invalid_part_number', '商品编号格式无效');
   if (isRetiredPartNumber(partNumber)) throw new ApiError('product_retired', retiredProductMessage(partNumber));
@@ -106,8 +106,8 @@ async function upsert(ctx, payload) {
   const recordId = `${user._id}|${followId}`;
   const existing = follows.find(f => f._id === recordId) || null;
   const others = follows.filter(f => f._id !== recordId && f.status !== 'removed');
-  const limits = memberLimits(user, ctx.now);
-  if (existing && followAllowance(user, existing, follows, ctx.now).limitPaused) throw new ApiError('plan_limit', '该配置超出当前套餐名额，请先移除其他配置或选择支持更多配置的套餐');
+  const limits = memberLimits(user, ctx.now, ctx.config);
+  if (existing && followAllowance(user, existing, follows, ctx.now, ctx.config).limitPaused) throw new ApiError('plan_limit', '该配置超出当前套餐名额，请先移除其他配置或选择支持更多配置的套餐');
   const check = validateFollowLimits(others, { partNumber, storeNumbers }, existing ? Math.max(limits.maxFollows, others.length + 1) : limits.maxFollows, limits.maxStoresPerFollow);
   if (!check.ok) throw new ApiError(check.reason, followLimitMessage(check.reason, limits));
 
@@ -146,11 +146,11 @@ async function setStatus(ctx, payload, status) {
   const follow = await ctx.repo.getFollow(recordId);
   if (!follow || (follow.market && follow.market !== 'CN') || follow.userKey !== user._id || follow.status === 'removed') throw new ApiError('unknown_follow', '关注不存在');
   if (status === 'active' && isRetiredPartNumber(follow.partNumber)) throw new ApiError('product_retired', retiredProductMessage(follow.partNumber));
-  if (status === 'active' && !canUseReminders(user, ctx.now)) throw new ApiError('member_required', '关注与到货提醒为会员专属，开通会员后可恢复监测');
+  if (status === 'active' && !canUseReminders(user, ctx.now, ctx.config)) throw new ApiError('member_required', '关注与到货提醒为会员专属，开通会员后可恢复监测');
   if (status === 'active' && !canMonitorProduct(await ctx.repo.getProduct(follow.partNumber))) throw new ApiError('unsupported_product', '该商品暂不支持监测');
   const updated = await ctx.repo.mutateFollow({ userKey: user._id, followId: recordId, status, nowIso: ctx.nowIso, knownFollows: await ctx.repo.listFollows(user._id) });
   if (status === 'removed') return { removed: true, followId };
-  const [decorated] = await decorate(ctx, [updated], isMember(user, ctx.now), canUseReminders(user, ctx.now));
+  const [decorated] = await decorate(ctx, [updated], hasMemberAccess(user, ctx.now, ctx.config), canUseReminders(user, ctx.now, ctx.config));
   return { follow: decorated };
 }
 

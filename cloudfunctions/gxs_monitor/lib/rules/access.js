@@ -1,8 +1,15 @@
 'use strict';
-const { isMember, planSnapshot } = require('./membership');
+const { hasMemberAccess, hasAdminTestAccess, isMember, planSnapshot } = require('./membership');
 const { isLiveRestricted, isHistoryRestricted } = require('./new-product');
 const { resolveConfig, canAfford } = require('./quota');
+const { ApiError } = require('../errors');
 const { canQueryProduct } = require('./product-target');
+
+// Older clients omit the ceiling. A supplied zero is a firm no-charge agreement.
+function queryCostLimit(value) {
+  if (value !== undefined && (!Number.isSafeInteger(value) || value < 0)) throw new ApiError('invalid_payload', '查询费用无效。');
+  return value;
+}
 
 /**
  * Decide whether a live query may run and what it costs.
@@ -13,7 +20,7 @@ function decideLiveQuery({ user, product, now, config }) {
   const cfg = resolveConfig(config && config.quota);
   if (!product) return { allowed: false, reason: 'unknown_product', cost: 0, member: false };
   if (!canQueryProduct(product)) return { allowed: false, reason: 'unsupported_product', cost: 0, member: false };
-  if (isMember(user, now)) return { allowed: true, reason: null, cost: 0, member: true };
+  if (hasMemberAccess(user, now, config)) return { allowed: true, reason: null, cost: 0, member: true };
   const restriction = isLiveRestricted(product, config && config.newProductWindows, now);
   if (restriction.restricted) {
     return { allowed: false, reason: 'new_product_restricted', cost: 0, member: false, restrictionEndsAt: restriction.endsAt };
@@ -23,8 +30,9 @@ function decideLiveQuery({ user, product, now, config }) {
   return { allowed: true, reason: null, cost: cfg.queryCost, member: false };
 }
 
-function decideMarketQuery({ user, product, now }) {
+function decideMarketQuery({ user, product, now, config }) {
   if (!product || !canQueryProduct(product)) return { allowed: false, reason: 'unsupported_product', cost: 0, member: false };
+  if (hasAdminTestAccess(user, config)) return { allowed: true, reason: null, cost: 0, member: true };
   const member = isMember(user, now);
   const opensAt = Date.parse(product.freeQueryStartsAt);
   if (!Number.isFinite(opensAt) || now.getTime() < opensAt) {
@@ -39,7 +47,7 @@ function decideMarketQuery({ user, product, now }) {
 
 function decideHistoryQuery({ user, product, requestedDayKey, now, config, alreadyCharged }) {
   const cfg = resolveConfig(config && config.quota);
-  if (isMember(user, now)) return { allowed: true, reason: null, cost: 0, member: true };
+  if (hasMemberAccess(user, now, config)) return { allowed: true, reason: null, cost: 0, member: true };
   if (product) {
     const restriction = isHistoryRestricted(product, config && config.newProductWindows, requestedDayKey, now);
     if (restriction.restricted) {
@@ -52,4 +60,4 @@ function decideHistoryQuery({ user, product, requestedDayKey, now, config, alrea
   return { allowed: true, reason: null, cost: cfg.historyCost, member: false };
 }
 
-module.exports = { decideLiveQuery, decideMarketQuery, decideHistoryQuery };
+module.exports = { queryCostLimit, decideLiveQuery, decideMarketQuery, decideHistoryQuery };

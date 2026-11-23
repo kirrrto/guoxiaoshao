@@ -8,6 +8,15 @@
 // Keep technical details and complete acceptance records in release documents.
 const RELEASE_NOTES = [
   {
+    version: '3.8.2',
+    title: '管理员功能测试',
+    dateText: '版本记录 · 2026-11-23',
+    highlights: [
+      '指定管理员可直接测试门店查询和库存关注，无需购买会员。',
+      '在「我的」可以查看测试身份、可关注的配置数和门店数。',
+    ],
+  },
+  {
     version: '3.8.1',
     title: '大陆门店查询',
     dateText: '版本记录 · 2026-11-23',

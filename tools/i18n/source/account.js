@@ -4,6 +4,10 @@
 module.exports = {
   // Membership and account controls
   '会员': 'Membership',
+  '这笔订单已付款。': 'This order has been paid.',
+  '这笔订单已部分退款。': 'This order was partially refunded.',
+  '管理员测试账号': 'Administrator test account',
+  '查询不扣次': 'No credit required',
   '会员已开通': 'Membership active',
   '会员已到期': 'Membership expired',
   '免费用户': 'Free account',

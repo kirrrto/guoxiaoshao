@@ -452,3 +452,18 @@ test('a region with different or ambiguous Mac options retains the model or cate
   assert.equal(matchRegionalProduct(previous,[row('A','mac mini Wi-Fi  Silver')]).exact,true);
   assert.equal(matchRegionalProduct(previous,[row('A','Mac mini Wi-Fi Silver'),row('B','Mac mini Wi-Fi Silver')]).exact,false);
 });
+
+test('an active administrator test account can check a new release and watch without buying a plan', async () => {
+  const { page, rt } = await setup({ 'user.bootstrap': () => ({
+    identity: { userKey: 'Alice' }, membership: { active: true, isTester: true, planId: null, expiresAt: null },
+    quota: { balance: 0, revision: 1 }, notifications: {}, subscriptions: {}, settings: {},
+  }) });
+  assert.equal(page.data.canQuery, true);
+  assert.equal(page.data.watchEnabled, true);
+  assert.equal(page.data.membershipLink, false);
+  assert.equal(page.data.costText, '库存查询不扣次数');
+  page.onLanguage();
+  assert.equal(page.data.costText, 'No credits needed for stock checks');
+  await page.onQuery();
+  assert.equal(rt.calls.find(c => c.action === 'market.pickup').payload.maxCost, 0);
+});

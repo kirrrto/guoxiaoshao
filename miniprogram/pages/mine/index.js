@@ -137,8 +137,8 @@ function presentTasks(tasks, quota) {
   return [{ ...task, done: false, claimable: !pendingLabel, pendingLabel }];
 }
 const presentMembership = membership => ({ ...membership, expired: !membership.active && Boolean(membership.expiresAt),
-  planLabel: ({ member_7d: '周卡会员', member_30d: '月卡会员', member_365d: '年卡会员', member_trial: '体验会员' })[membership.planId] || '会员',
-  daysLeft: membership.active && Number.isFinite(membership.remainingMs) ? Math.max(0, Math.ceil(membership.remainingMs / 86400000)) : null,
+  planLabel: membership.isTester ? '管理员测试账号' : ({ member_7d: '周卡会员', member_30d: '月卡会员', member_365d: '年卡会员', member_trial: '体验会员' })[membership.planId] || '会员',
+  daysLeft: !membership.isTester && membership.active && Number.isFinite(membership.remainingMs) ? Math.max(0, Math.ceil(membership.remainingMs / 86400000)) : null,
   enhancedExpiresText: membership.enhancedExpiresAt ? fmt.fmtDateTime(membership.enhancedExpiresAt) : '',
   annualExpiresText: membership.annualExpiresAt ? fmt.fmtDateTime(membership.annualExpiresAt) : '',
   expiresShortText: membership.expiresAt ? fmt.fmtDateTime(membership.expiresAt).slice(0, 16) : '',
@@ -565,7 +565,7 @@ Page(require('../../utils/language').page('mine', {
       || products.find(item => item.planId === (this.paymentPendingPlanId || this.data.selectedPlanId))
       || products[0] || boot.memberProduct;
     const availability = paymentAvailability(selected, wx);
-    const showPurchaseShop = gate.showShop || hasPendingOrder;
+    const showPurchaseShop = !membership.isTester && (gate.showShop || hasPendingOrder);
     this.setData({
       selectedPlanId: planId(selected),
       showPurchaseShop,
@@ -644,7 +644,7 @@ Page(require('../../utils/language').page('mine', {
   },
 
   canChangeMembershipPurchase() {
-    return !this.pageRetired && this.data.ready && this.data.boot && this.data.membership
+    return !this.pageRetired && this.data.ready && this.data.boot && this.data.membership && !this.data.membership.isTester
       && !this.isNativeAuthorizationBusy() && !this.data.redeeming && !this.data.paymentBusy && !this.data.paymentChecking && !this.data.paymentPendingId && !this.data.paymentConfirming;
   },
 
@@ -997,6 +997,7 @@ Page(require('../../utils/language').page('mine', {
 
   onOpenRedemption() {
     if (this.pageRetired || this.isNativeAuthorizationBusy() || this.data.redeeming || this.data.paymentBusy || this.data.paymentChecking || this.data.paymentConfirming) return;
+    if (this.data.membership?.isTester && !this.data.redemptionOpen) return;
     const open = !this.data.redemptionOpen;
     this.setData({ redemptionOpen: open, redemptionCode: '', redemptionError: null, redemptionResult: null });
     this.setTabBarOverlay(open);
@@ -1013,6 +1014,7 @@ Page(require('../../utils/language').page('mine', {
 
   async onRedeemCode() {
     if (this.pageRetired || this.isNativeAuthorizationBusy() || this.data.redeeming || this.data.paymentBusy || this.data.paymentChecking || this.data.paymentConfirming) return;
+    if (this.data.membership?.isTester) return;
     const code = this.data.redemptionCode.trim();
     if (!code) { this.setData({ redemptionError: '请输入兑换码。' }); return; }
     // Suspend order polling while another server-side membership change runs.

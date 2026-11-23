@@ -1,6 +1,7 @@
 'use strict';
 const { randomUUID } = require('node:crypto');
 const { ApiError } = require('../errors');
+const { hasAdminTestAccess } = require('../rules/membership');
 const { ensureUser, quotaSnapshot } = require('./users');
 const { isValidTemplateId } = require('../config');
 const { createWechatSender, subscriptionResponseCode } = require('../engine/wechat-sender');
@@ -49,7 +50,7 @@ async function status(ctx, payload) {
     value = await ctx.repo.retireNotificationTestAuthorization({ userKey: user._id, requestId: value.record.requestId, nowIso: ctx.nowIso });
   }
   const current = await ctx.repo.getUser(user._id);
-  return { ...present(value, user._id), ...ready, cost: 1, quota: await quotaSnapshot(ctx, current) };
+  return { ...present(value, user._id), ...ready, cost: hasAdminTestAccess(current, ctx.config) ? 0 : 1, quota: await quotaSnapshot(ctx, current) };
 }
 async function authorize(ctx, payload) {
   assertExpectedAccount(ctx, payload);
@@ -80,7 +81,8 @@ async function send(ctx, payload) {
   // settlement. Replays above remain readable without beginning another send.
   if (remaining() <= 9000) throw new ApiError('request_budget_exhausted', '连接耗时较长，本次尚未发起发送或扣次，请继续原测试');
   const ownerId = randomUUID();
-  const begun = await ctx.repo.beginNotificationTest({ userKey: user._id, requestId: id, templateId: ready.templateId, ownerId, nowIso: ctx.clock().toISOString() });
+  if (payload.maxCost !== undefined && ![0, 1].includes(payload.maxCost)) throw new ApiError('invalid_payload', '请重新确认本次测试费用');
+  const begun = await ctx.repo.beginNotificationTest({ userKey: user._id, requestId: id, templateId: ready.templateId, ownerId, maxCost: payload.maxCost, nowIso: ctx.clock().toISOString() });
   if (!begun.acquired) return present(begun, user._id);
   let outcome;
   try {

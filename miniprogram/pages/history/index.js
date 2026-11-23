@@ -19,7 +19,8 @@ const SELECTION_KEY = 'gxs_history_selection_v1';
 const SOURCE_TEXT = { auto: '自动监测', manual: '手动查询' };
 
 function queryFailureNotice(error) {
-  if (error && ['query_account_changed', 'history_page_account', 'query_recovery_unavailable', 'query_recovery_missing', 'query_recovery_account', 'query_cost_changed'].includes(error.code)) return error.message;
+  if (error?.code === 'query_cost_changed') return error.message || '查询费用已变化，本次未扣次，请刷新账户后重新确认。';
+  if (error && ['query_account_changed', 'history_page_account', 'query_recovery_unavailable', 'query_recovery_missing', 'query_recovery_account'].includes(error.code)) return error.message;
   if (error && error.code === 'offline') return '网络已断开，联网后可重试；上次结果保留。';
   if (operation.uncertain(error)) return '结果尚未确认，再次查询相同条件会恢复原请求，不重复扣次。';
   const code = error && error.code, mapped = fmt.reasonText(code);
@@ -286,7 +287,7 @@ Page(require('../../utils/language').page('history', {
       accountError: null,
       ...(membershipRestoresAccess ? { restriction: null, queryFailureMessage: '' } : {}),
       boot: {
-        member: boot.membership.active,
+        member: boot.membership.active, isTester: boot.membership.isTester === true,
         balance: boot.quota.balance,
         historyCost: boot.quota.historyCost,
         taskAvailable: Boolean(task) && !boot.quota.tasksDoneToday.includes('view_history'),
@@ -507,8 +508,9 @@ Page(require('../../utils/language').page('history', {
       const recovery = legacy && await operation.verifyLegacy('h', payload, owner, { cost: boot.historyCost, member: boot.member,
         isCurrent: () => !this.pageRetired && accountEpoch === (this.accountEpoch || 0) });
       if (legacy && !recovery) return;
-      historyQueryId = recovery ? recovery.queryId : operation.begin('h', payload, owner);
-      const response = recovery ? await call('query.resumeLegacy', recovery) : await call('history.list', { historyQueryId, ...payload, ...(owner ? { expectedUserKey: owner } : {}) });
+      const pending = !recovery && operation.beginQuery('h', payload, owner, boot.member ? 0 : boot.historyCost);
+      historyQueryId = recovery ? recovery.queryId : pending.id;
+      const response = recovery ? await call('query.resumeLegacy', recovery) : await call('history.list', { historyQueryId, ...payload, maxCost: pending.maxCost, ...(owner ? { expectedUserKey: owner } : {}) });
       if (accountEpoch !== (this.accountEpoch || 0)) return;
       if (response.reason === 'query_in_progress') {
         if (!this.pageRetired) {
@@ -527,7 +529,7 @@ Page(require('../../utils/language').page('history', {
         this.restrictionReason = response.reason;
         const message = queryFailureNotice({ code: response.reason });
         this.setData({ restriction: message, queryFailureMessage: message, ...balancePatch });
-        if (boot.member && ['insufficient_credits', 'new_product_history_restricted'].includes(response.reason)) {
+        if (response.reason === 'query_cost_changed' || boot.member && ['insufficient_credits', 'new_product_history_restricted'].includes(response.reason)) {
           try { this.applyBoot(await getBootstrap({ force: true })); } catch (error) { /* keep the confirmed denial until the account reconnects */ }
         }
         return;
@@ -542,6 +544,9 @@ Page(require('../../utils/language').page('history', {
       if (this.pageRetired) return;
       const message = queryFailureNotice(error);
       this.setData({ restriction: message, queryFailureMessage: message });
+      if (error?.code === 'query_cost_changed') {
+        try { this.applyBoot(await getBootstrap({ force: true })); } catch (_) { /* The next tap retains the displayed ceiling. */ }
+      }
     } finally {
       if (!this.pageRetired && accountEpoch === (this.accountEpoch || 0)) { stopProgress(this); this.setData({ querying: false, requestSlow: false, legacyQueryPending: !!this.legacyHistoryId() }); }
     }

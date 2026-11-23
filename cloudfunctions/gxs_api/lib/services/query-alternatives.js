@@ -1,7 +1,7 @@
 'use strict';
 const { isRetiredPartNumber } = require('../rules/follow-access');
 const { ApiError } = require('../errors');
-const { isMember, accountLimits } = require('../rules/membership');
+const { hasMemberAccess, accountLimits } = require('../rules/membership');
 const { resolvePlanMetadata } = require('../rules/member-plan');
 const { isLiveRestricted } = require('../rules/new-product');
 const { WINDOW_MS, sameVariant, storeChoices, freshAvailable } = require('../rules/query-alternatives');
@@ -22,6 +22,7 @@ async function alternatives(ctx, payload) {
   const numbers = choices(payload.storeNumbers, /^R\d{3}$/, '门店', limits.queryMaxStores);
   if (!user || !query || query.userKey !== user._id || query.kind !== 'live' || query.status !== 'success' || !query.response || query.response.ok !== true
     || !(query.member === true || Number(query.charged) > Number(query.response.refunded || 0))) throw new ApiError('alternatives_query_required', '需从本人刚完成的有效付费或会员查询查看备选');
+  if (query.isTester && !hasMemberAccess(user, ctx.clock(), ctx.config)) throw new ApiError('alternatives_restricted', '账户权限已变化，请重新确认查询。');
   const finished = Date.parse(query.finishedAt), expires = finished + WINDOW_MS;
   const checkWindow = () => {
     const now = ctx.clock().getTime();
@@ -32,7 +33,7 @@ async function alternatives(ctx, payload) {
   const [base, products, stores] = await Promise.all([ctx.repo.getProduct(query.partNumber), Promise.all(parts.map(part => ctx.repo.getProduct(part))), ctx.repo.listStores()]);
   const now = checkWindow();
   const canRead = (product, time = now) => canQueryProduct(product) && !isRetiredPartNumber(product.partNumber) && !product.comingSoon
-    && (isMember(user, new Date(time)) || !isLiveRestricted(product, ctx.config.newProductWindows, new Date(time)).restricted);
+    && (hasMemberAccess(user, new Date(time), ctx.config) || !isLiveRestricted(product, ctx.config.newProductWindows, new Date(time)).restricted);
   if (!canRead(base) || products.some(product => !canRead(product))) throw new ApiError('alternatives_restricted', '所选配置当前不支持查看，或处于新品会员限制期');
   if (products.some(product => !sameVariant(base, product))) throw new ApiError('alternative_variant_mismatch', '仅可选择同机型、同容量且其他配置相同的颜色');
   const allowedStores = storeChoices(stores, query.storeNumbers, limits.queryMaxStores);

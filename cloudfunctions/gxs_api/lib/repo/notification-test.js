@@ -2,6 +2,8 @@
 const { createHash } = require('node:crypto');
 const { COLLECTIONS: C } = require('../collections');
 const { ApiError, isMissingCollectionError } = require('../errors');
+const { hasAdminTestAccess } = require('../rules/membership');
+const { testAccountConfigIn } = require('./test-account-config');
 const { dayKey } = require('../time');
 const idOf = (userKey, requestId) => `test_${createHash('sha256').update(`${userKey}|${requestId}`).digest('hex')}`;
 const snapshot = (record, user) => ({ record, balance: user.quota.balance, quotaRevision: Number.isInteger(user.quota.revision) ? user.quota.revision : 0 });
@@ -38,7 +40,7 @@ function notificationTestMethods(transaction, applyLedgerIn) {
     }),
     openNotificationTest: ({ userKey, requestId, nowIso, presented = false }) => run(async tx => {
       const { user, record } = await read(tx, userKey, requestId, nowIso);
-      if (!record || record.charged !== 1 || !['sending', 'accepted', 'uncertain'].includes(record.status)
+      if (!record || !(record.charged === 1 || record.charged === 0 && record.isTester === true) || !['sending', 'accepted', 'uncertain'].includes(record.status)
         || (presented ? record.firstPresentedAt : record.firstOpenedAt)) return snapshot(record, user);
       // 1.5.3 uses opened=true while loading; only the new presented protocol
       // confirms a visible render. Keep both signals distinct during rollout.
@@ -68,7 +70,7 @@ function notificationTestMethods(transaction, applyLedgerIn) {
       await tx.put(C.users, { ...user, notificationTestLatestId: record._id });
       return snapshot(record, user);
     }),
-    beginNotificationTest: ({ userKey, requestId, templateId, ownerId, nowIso }) => run(async tx => {
+    beginNotificationTest: ({ userKey, requestId, templateId, ownerId, nowIso, maxCost = 1 }) => run(async tx => {
       const { user, record } = await read(tx, userKey, requestId, nowIso);
       if (!record) throw new ApiError('test_not_found', '请先授权这次测试');
       if (record.status !== 'authorized') return { ...snapshot(record, user), acquired: false };
@@ -84,14 +86,20 @@ function notificationTestMethods(transaction, applyLedgerIn) {
       if (active && (active.status === 'sending' || active.status === 'uncertain' && !active.feedback)) {
         throw new ApiError('test_result_uncertain', '上一条测试结果尚未确认，请先查看并反馈原测试，暂不重复发送');
       }
-      if (!Number.isInteger(user.quota.balance) || user.quota.balance < 1) throw new ApiError('insufficient_credits', '测试需要 1 次签到或任务获得的次数，请先获取次数');
-      const charged = await applyLedgerIn(tx, { _id: `${userKey}|notification_test|${requestId}|debit`, userKey,
-        type: 'notification_test_debit', delta: -1, testRequestId: requestId, refId: requestId, dayKey: dayKey(nowIso), createdAt: nowIso });
-      const sending = { ...record, status: 'sending', charged: 1, ownerId, attempts: 1,
+      const cost = hasAdminTestAccess(user, await testAccountConfigIn(tx, user)) ? 0 : 1;
+      if (cost > maxCost) throw new ApiError('query_cost_changed', '测试费用已变化，请重新确认，本次未扣次。');
+      let currentUser = user;
+      if (cost) {
+        if (!Number.isInteger(user.quota.balance) || user.quota.balance < cost) throw new ApiError('insufficient_credits', '测试需要 1 次签到或任务获得的次数，请先获取次数');
+        const debit = await applyLedgerIn(tx, { _id: `${userKey}|notification_test|${requestId}|debit`, userKey,
+          type: 'notification_test_debit', delta: -cost, testRequestId: requestId, refId: requestId, dayKey: dayKey(nowIso), createdAt: nowIso });
+        currentUser = debit.user;
+      }
+      const sending = { ...record, status: 'sending', ...(cost === 0 ? { isTester: true } : {}), charged: cost, ownerId, attempts: 1,
         leaseUntil: new Date(Date.parse(nowIso) + 60000).toISOString(), sendStartedAt: nowIso };
       await tx.put(C.notificationTests, sending);
-      await tx.put(C.users, { ...charged.user, notificationTestLatestId: record._id, notificationTestSendingId: record._id });
-      return { ...snapshot(sending, charged.user), acquired: true };
+      await tx.put(C.users, { ...currentUser, notificationTestLatestId: record._id, notificationTestSendingId: record._id });
+      return { ...snapshot(sending, currentUser), acquired: true };
     }),
     finishNotificationTest: ({ userKey, requestId, ownerId, status, reason, nowIso }) => run(async tx => {
       const { user, record } = await read(tx, userKey, requestId, nowIso);

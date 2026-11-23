@@ -53,7 +53,7 @@
           <button class="ui-action ui-action--plain selection-summary-change" hover-class="ui-control-pressed" bindtap="onEditSelection"><text class="ui-action-label">{{i18n.t(ui,'修改')}}</text><text class="ui-chevron" aria-hidden="true"></text></button>
         </view>
       </view>
-      <text class="pickup-quota">{{i18n.t(ui,(!accountReady ? '账户连接中' : (boot.member ? '会员查询不扣次' : '剩余 ' + boot.balance + ' 次查询')))}}</text>
+      <text class="pickup-quota">{{i18n.t(ui,(!accountReady ? '账户连接中' : (boot.isTester ? '库存查询不扣次数' : boot.member ? '会员查询不扣次' : '剩余 ' + boot.balance + ' 次查询')))}}</text>
       <view wx:if="{{!selectionSummary}}" class="selection-empty">
         <button class="btn btn-primary btn-block" hover-class="btn-primary-pressed" bindtap="onEditSelection">{{i18n.t(ui,'选择配置与门店')}}</button>
       </view>
@@ -179,8 +179,8 @@
         <view class="alternative-summary" aria-live="polite">{{i18n.t(ui,(alternativeSelectionSummary))}}</view>
         <view wx:if="{{alternativeSelectedColors.length}}" class="alternative-query-list">
           <view wx:for="{{alternativeSelectedColors}}" wx:key="partNumber" class="alternative-query-row">
-            <view class="alternative-query-copy"><text class="alternative-query-color">{{i18n.t(ui,(item.label))}}</text><text class="alternative-query-hint">{{i18n.t(ui,(!accountReady ? '账户连接中' : (boot.member ? '会员不扣次' : '消耗 ' + boot.queryCost + ' 次')))}}</text></view>
-            <button class="alternative-query-button" hover-class="btn-primary-pressed" data-part="{{item.partNumber}}" aria-label="{{i18n.t(ui,('查询' + item.label + '，' + (!accountReady ? '账户连接中' : (boot.member ? '会员不扣次' : '消耗 ' + boot.queryCost + ' 次'))))}}" disabled="{{!alternativeStores.length || !accountReady || alternativeLoading || querying || signing || sheetVisible}}" loading="{{querying && alternativeQueryPart === item.partNumber}}" bindtap="onQueryAlternative">{{i18n.t(ui,(querying && alternativeQueryPart === item.partNumber ? '查询中' : '查询'))}}</button>
+            <view class="alternative-query-copy"><text class="alternative-query-color">{{i18n.t(ui,(item.label))}}</text><text class="alternative-query-hint">{{i18n.t(ui,(!accountReady ? '账户连接中' : (boot.isTester ? '查询不扣次' : boot.member ? '会员不扣次' : '消耗 ' + boot.queryCost + ' 次')))}}</text></view>
+            <button class="alternative-query-button" hover-class="btn-primary-pressed" data-part="{{item.partNumber}}" aria-label="{{i18n.t(ui,('查询' + item.label + '，' + (!accountReady ? '账户连接中' : (boot.isTester ? '查询不扣次' : boot.member ? '会员不扣次' : '消耗 ' + boot.queryCost + ' 次'))))}}" disabled="{{!alternativeStores.length || !accountReady || alternativeLoading || querying || signing || sheetVisible}}" loading="{{querying && alternativeQueryPart === item.partNumber}}" bindtap="onQueryAlternative">{{i18n.t(ui,(querying && alternativeQueryPart === item.partNumber ? '查询中' : '查询'))}}</button>
           </view>
         </view>
         <view wx:if="{{alternativeQueryNote}}" class="alternative-empty" aria-role="status">{{i18n.t(ui,(alternativeQueryNote))}}</view>
@@ -222,7 +222,7 @@
         </view>
       </view>
       <view wx:if="{{resumeSetup}}" class="card journey-resume">
-        <view class="journey-title">{{i18n.t(ui,'会员已生效，继续完成关注设置')}}</view>
+        <view class="journey-title">{{i18n.t(ui,boot.isTester ? '继续完成关注设置' : '会员已生效，继续完成关注设置')}}</view>
         <button class="btn btn-primary btn-block mt" hover-class="btn-primary-pressed" bindtap="onContinueSetup">{{i18n.t(ui,'继续设置')}}</button>
       </view>
 

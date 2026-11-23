@@ -8,7 +8,7 @@ const { ApiError } = require('../errors');
 const { dayKey } = require('../time');
 const { decideLiveQuery, decideMarketQuery, decideHistoryQuery } = require('../rules/access');
 const { grantableAmount, ledgerIds } = require('../rules/quota');
-const { isMember, hasFreeReminder, canUseReminders, canWatchMarkets, validateFollowLimits, memberLimits, accountLimits, followAllowance, planSnapshot } = require('../rules/membership');
+const { isMember, hasAdminTestAccess, hasFreeReminder, canUseReminders, canWatchMarkets, validateFollowLimits, memberLimits, accountLimits, followAllowance, planSnapshot } = require('../rules/membership');
 const { OUTAGE_COMPENSATION_ORDER_ID, purchasedPlan, needsPlanMetadata, resolvePlanMetadata, needsOutageCompensation } = require('../rules/member-plan');
 const membershipEntitlements = require('../rules/membership-entitlements');
 const { targetKeyOf } = require('../engine/events');
@@ -20,6 +20,7 @@ const { mergeConfig, patchConfig } = require('../config');
 const { assertConfigEditor, makeConfigAudit } = require('../config-audit');
 const { CAMPAIGN, MAX_FAILURES, LOCK_MS, CLAIMS_ID, matchesCodeHash, attemptsId } = require('../member-redemption');
 const { upstreamGuardMethods, reserveAccountQuery, releaseAccountQuery } = require('./upstream-guard');
+const { testAccountConfigIn } = require('./test-account-config');
 const { queryTargetMethods } = require('./query-target');
 const { notificationTestMethods } = require('./notification-test');
 const { isRetiredMainlandTarget } = require('../rules/follow-access');
@@ -351,9 +352,10 @@ function atomicMethods(run, { readUpstreamBreaker } = {}) {
     }),
 
     beginQuery: args => run(async tx => {
-      const { record, product, config, ownerId, nowIso, leaseMs = 25000 } = args;
+      const { record, product, ownerId, nowIso, leaseMs = 25000 } = args;
       let user = await tx.get(C.users, record.userKey);
       if (!user) throw new ApiError('user_missing', '用户不存在');
+      const config = await testAccountConfigIn(tx, user, args.config);
       const existing = await tx.get(C.queries, record._id);
       if (existing) {
         // Legacy records are bound by their actual request fields as well.
@@ -361,9 +363,14 @@ function atomicMethods(run, { readUpstreamBreaker } = {}) {
         if (signature(existing) !== signature(record)) throw new ApiError('query_id_conflict', '该查询编号已用于其他条件，请重新查询');
         if (existing.status !== 'pending' && existing.response) return { replayed: true, record: existing, ...quotaBalance(user) };
         if (existing.leaseUntil && existing.leaseUntil > nowIso) return { busy: true, record: existing, retryAfterMs: Date.parse(existing.leaseUntil) - Date.parse(nowIso), ...quotaBalance(user) };
-        if (record.kind === 'market') {
+        if (record.kind === 'market' || existing.isTester) {
           if (await hydrateMemberPlansIn(tx, user)) await tx.put(C.users, user);
-          const decision = decideMarketQuery({ user, product, now: new Date(nowIso) });
+          const params = { user, product, now: new Date(nowIso), config };
+          if (record.kind !== 'history' && record.storeNumbers.length > accountLimits(user, params.now, config).queryMaxStores) {
+            return { replayed: true, ...await closeExpiredQuery(tx, existing, user, nowIso, 'too_many_stores') };
+          }
+          const decision = record.kind === 'market' ? decideMarketQuery(params) : record.kind === 'history'
+            ? decideHistoryQuery({ ...params, requestedDayKey: record.dayKey }) : decideLiveQuery(params);
           // The original debit can already contain the account's last credit.
           // Only a lost entitlement or an unapproved higher cost prevents recovery.
           const ineligible = !decision.allowed && decision.reason !== 'insufficient_credits';
@@ -391,7 +398,7 @@ function atomicMethods(run, { readUpstreamBreaker } = {}) {
       }
       const decision = record.kind === 'history'
         ? decideHistoryQuery({ user, product, requestedDayKey: record.dayKey, now: new Date(nowIso), config })
-        : record.kind === 'market' ? decideMarketQuery({ user, product, now: new Date(nowIso) })
+        : record.kind === 'market' ? decideMarketQuery({ user, product, now: new Date(nowIso), config })
         : decideLiveQuery({ user, product, now: new Date(nowIso), config });
       if (!decision.allowed) return { denied: decision, ...quotaBalance(user) };
       if (args.maxCost !== undefined && decision.cost > args.maxCost) {
@@ -407,7 +414,7 @@ function atomicMethods(run, { readUpstreamBreaker } = {}) {
         if (!debit.applied) throw new ApiError('query_id_conflict', '原查询记录已到期，请重新发起查询。');
         user = debit.user;
       }
-      const pending = { ...record, charged: decision.cost, member: decision.member, status: 'pending', ownerId, leaseUntil: new Date(Date.parse(nowIso) + leaseMs).toISOString(), attempts: 1, createdAt: nowIso, finishedAt: null, response: null };
+      const pending = { ...record, ...(hasAdminTestAccess(user, config) ? { isTester: true } : {}), charged: decision.cost, member: decision.member, status: 'pending', ownerId, leaseUntil: new Date(Date.parse(nowIso) + leaseMs).toISOString(), attempts: 1, createdAt: nowIso, finishedAt: null, response: null };
       await tx.put(C.queries, pending);
       return { record: pending, ...quotaBalance(user) };
     }),
@@ -463,17 +470,18 @@ function atomicMethods(run, { readUpstreamBreaker } = {}) {
       if (existing && (existing.userKey !== userKey || (existing.market || 'CN') !== market)) throw new ApiError('unknown_follow', '关注不存在');
       const knownIndex = [...new Map([...knownFollows, ...(user.followIndex || [])].map(f => [f._id, f])).values()];
       const at = new Date(nowIso);
-      const limits = memberLimits(user, at);
+      const config = await testAccountConfigIn(tx, user);
+      const limits = memberLimits(user, at, config);
       const savedFollows = (await Promise.all(knownIndex.map(item => tx.get(C.follows, item._id))))
         .filter(f => f && f.userKey === userKey && f.status !== 'removed');
       const index = savedFollows.map(followIndexEntry);
       if (follow || status === 'active') {
-        if (market !== 'CN' && !canWatchMarkets(user, at)) throw new ApiError('market_watch_plan_required', '其他站点的关注和到货提醒需要有效月卡或年卡。');
-        if (!canUseReminders(user, at)) throw new ApiError('member_required', '关注与到货提醒为会员专属，开通会员后可新增或恢复关注');
+        if (market !== 'CN' && !canWatchMarkets(user, at, config)) throw new ApiError('market_watch_plan_required', '其他站点的关注和到货提醒需要有效月卡或年卡。');
+        if (!canUseReminders(user, at, config)) throw new ApiError('member_required', '关注与到货提醒为会员专属，开通会员后可新增或恢复关注');
       }
       let next;
       if (follow) {
-        if (existing && existing.status !== 'removed' && followAllowance(user, existing, savedFollows, at).limitPaused) throw new ApiError('plan_limit', '该配置超出当前套餐名额，请先移除其他配置或选择支持更多配置的套餐');
+        if (existing && existing.status !== 'removed' && followAllowance(user, existing, savedFollows, at, config).limitPaused) throw new ApiError('plan_limit', '该配置超出当前套餐名额，请先移除其他配置或选择支持更多配置的套餐');
         const others = index.filter(f => f._id !== id && f.status !== 'removed');
         // Adding another store on the international page extends the same SKU.
         // Merge against the transactional document so concurrent saves cannot drop a store.
@@ -490,7 +498,7 @@ function atomicMethods(run, { readUpstreamBreaker } = {}) {
       } else {
         if (market !== 'CN' && existing && status === existing.status && status !== 'active') return existing;
         if (!existing || existing.userKey !== userKey || existing.status === 'removed') throw new ApiError('unknown_follow', '关注不存在');
-        if (status === 'active' && followAllowance(user, existing, savedFollows, at).limitPaused) throw new ApiError('plan_limit', '该配置超出当前套餐名额，请先移除其他配置或选择支持更多配置的套餐');
+        if (status === 'active' && followAllowance(user, existing, savedFollows, at, config).limitPaused) throw new ApiError('plan_limit', '该配置超出当前套餐名额，请先移除其他配置或选择支持更多配置的套餐');
         if (market !== 'CN' && existing.status === status) return existing;
         next = { ...existing, status, statusReason: status === 'active' ? null : 'user', updatedAt: nowIso };
       }
@@ -667,7 +675,9 @@ function atomicMethods(run, { readUpstreamBreaker } = {}) {
         return { reserved: !task.subscriptionReleased && !invalidated, reason: invalidated ? 'subscription_authorization_expired' : task.subscriptionReleased ? 'credit_released' : null, replayed: true };
       }
       // The one free alert is locked to a single task so concurrent events cannot send two.
-      const free = !isMember(user, new Date(now));
+      // A cached planning decision cannot reserve a credit after admin access is revoked.
+      const at = new Date(now);
+      const free = !isMember(user, at) && !canUseReminders(user, at, await testAccountConfigIn(tx, user));
       if (free && !hasFreeReminder(user, new Date(now))) return { reserved: false, reason: 'free_reminder_used' };
       if (free && user.freeReminderTaskId && user.freeReminderTaskId !== taskId) {
         const locked = await tx.get(C.notifications, user.freeReminderTaskId);

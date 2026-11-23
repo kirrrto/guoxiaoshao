@@ -4,7 +4,7 @@ const { ApiError } = require('../errors');
 const { ensureUser } = require('./users');
 const { encodeToken, decodeToken } = require('../notification-view');
 const { isValidTemplateId } = require('../config');
-const { canUseReminders, canWatchMarkets, isMember } = require('../rules/membership');
+const { canUseReminders, canWatchMarkets, hasMemberAccess } = require('../rules/membership');
 const { isLiveRestricted } = require('../rules/new-product');
 const { targetKeyOf } = require('../engine/events');
 const follows = require('./follows');
@@ -33,7 +33,7 @@ async function recordSubscription(ctx, payload) {
     throw new ApiError('invalid_subscription_result', '只接受当前配置模板的 accept、reject 或 ban 结果');
   }
   // WeChat reminders are member-only; the notifier enforces the same rule.
-  if (!canUseReminders(user, ctx.now)) throw new ApiError('membership_required', '微信提醒为会员专属，开通会员并授权后可接收到货和断货提醒');
+  if (!canUseReminders(user, ctx.now, ctx.config)) throw new ApiError('membership_required', '微信提醒为会员专属，开通会员并授权后可接收到货和断货提醒');
   return ctx.repo.recordSubscriptionGrant({ userKey: user._id, requestId: payload.requestId, templateIds, results, now: ctx.nowIso });
 }
 
@@ -83,14 +83,14 @@ async function detail(ctx, payload) {
   const task = await ctx.repo.getVisibleNotification(user._id, taskId);
   const regional = Boolean(task.market && task.market !== 'CN');
   const productRetired = isRetiredMainlandTarget(task);
-  const regionalRestricted = regional && !canWatchMarkets(user, ctx.now);
+  const regionalRestricted = regional && !canWatchMarkets(user, ctx.now, ctx.config);
   const [latest, product, follow] = await Promise.all([
     regionalRestricted ? [] : ctx.repo.getLatest([targetKeyOf(task.storeNumber, task.partNumber, task.market)]),
     regional ? require('../markets').findMarket(task.market)?.products.find(p => p.partNumber === task.partNumber) : ctx.repo.getProduct(task.partNumber),
     task.followId ? ctx.repo.getFollow(task.followId) : null,
   ]);
   const restricted = regional ? regionalRestricted
-    : !isMember(user, ctx.now) && isLiveRestricted(product || { partNumber: task.partNumber }, ctx.config.newProductWindows, ctx.now).restricted;
+    : !hasMemberAccess(user, ctx.now, ctx.config) && isLiveRestricted(product || { partNumber: task.partNumber }, ctx.config.newProductWindows, ctx.now).restricted;
   return {
     notification: { eventId: task.eventId, ...(task.market ? { market: task.market } : {}), status: task.status, eventType: task.eventType, partNumber: task.partNumber, storeNumber: task.storeNumber,
       storeName: task.storeName || null, productTitle: product ? product.title : task.productTitle || task.partNumber,

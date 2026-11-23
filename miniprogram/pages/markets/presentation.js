@@ -17,7 +17,7 @@ const COPY = {
     query: '查询自提状态', checking: '查询中…', resume: '核对上次查询', retry: '重试',
     loading: '正在读取站点…', offline: '网络已断开', catalogError: '站点目录暂时无法读取，请重试。',
     accountError: '暂时无法确认账户，请重试。', accountLoading: '正在确认查询额度…',
-    member: '会员查询不扣次', cost: '本次查询使用 1 次，剩余 {balance} 次',
+    tester: '库存查询不扣次数', member: '会员查询不扣次', cost: '本次查询使用 1 次，剩余 {balance} 次',
     launchGate: '新品开售前及开售后前 30 天，查询需有效周卡、月卡或年卡。', unlockAt: '{date} 起可使用查询次数（门店当地时间）。',
     signin: '签到领取查询次数', signed: '今天已签到', granted: '签到成功，增加 {n} 次查询', dailyCap: '今日领取次数已达上限',
     balanceCap: '查询次数已达余额上限', signinUnknown: '签到结果尚未确认，可重试；同一天不会重复领取。',
@@ -44,7 +44,7 @@ const COPY = {
     query: 'Check pickup', checking: 'Checking…', resume: 'Check previous request', retry: 'Retry',
     loading: 'Loading regions…', offline: 'You are offline', catalogError: 'Could not load the store directory. Try again.',
     accountError: 'Could not verify your account. Try again.', accountLoading: 'Checking your credits…',
-    member: 'Included with membership', cost: '1 credit per check · {balance} remaining',
+    tester: 'No credits needed for stock checks', member: 'Included with membership', cost: '1 credit per check · {balance} remaining',
     launchGate: 'Before launch and for the first 30 days on sale, checks require a weekly, monthly or annual pass.', unlockAt: 'Query credits can be used from {date} (store local time).',
     signin: 'Check in for query credits', signed: 'Already checked in today', granted: 'Checked in · Credits added: {n}', dailyCap: 'Daily credit limit reached',
     balanceCap: 'Credit balance limit reached', signinUnknown: 'Check-in is unconfirmed. Retry safely. Credits are awarded once per day.',
@@ -131,8 +131,9 @@ function regionalAccess(membership, product, now = Date.now()) {
   if (plan === 'member_30d' && enhanced <= now) plan = '';
   const launchUntil = Date.parse(product?.freeQueryStartsAt);
   const launch = !Number.isFinite(launchUntil) || now < launchUntil;
-  return { member, canWatch: plan === 'member_30d' || plan === 'member_365d',
-    launchRestricted: launch && !['member_7d','member_30d','member_365d'].includes(plan),
+  const tester = member && membership.isTester === true;
+  return { member, tester, canWatch: tester || plan === 'member_30d' || plan === 'member_365d',
+    launchRestricted: launch && !tester && !['member_7d','member_30d','member_365d'].includes(plan),
     nextPlanChange: Math.min(...[expiry,enhanced,annual].filter(stamp => stamp > now)),
     nextLaunchChange: launchUntil > now ? launchUntil : Infinity };
 }

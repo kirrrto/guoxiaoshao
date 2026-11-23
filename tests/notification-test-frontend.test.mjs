@@ -298,3 +298,35 @@ test('feedback for an unresolved send preserves another pending authorization fo
   await page.onContinue(); assert.equal(page.data.test.requestId, 'next-local-authorized-001');
   assert.equal(f.messages.length, 2); assert.equal(page.data.balance, 0);
 });
+
+test('zero-credit tests request native consent and refresh their price before retrying a revoked exemption', async () => {
+  const owner = 'test-owner';
+  let cost = 0, prompts = 0;
+  const attempts = [];
+  const rt = runtime(async (action, payload) => {
+    const result = { userKey: owner, balance: 0, quotaRevision: 1 };
+    if (action === 'notificationTest.status') return { ...result, ready: true, templateId: TEMPLATE, cost };
+    if (action === 'notificationTest.authorize') return { ...result, test: { requestId: payload.requestId, status: 'authorized' } };
+    assert.equal(action, 'notificationTest.send');
+    attempts.push({ requestId: payload.requestId, maxCost: payload.maxCost });
+    if (cost > payload.maxCost) throw Object.assign(Error('fee changed'), { code: 'query_cost_changed' });
+    return { ...result, test: { requestId: payload.requestId, status: 'failed', reason: 'needs_authorization', charged: 0, refunded: 0 } };
+  });
+  rt.wx.requestSubscribeMessage = async () => { prompts++; return { [TEMPLATE]: 'accept' }; };
+  const page = rt.instance('pages/notification-test/index.js');
+  await page.onLoad(); await page.onShow();
+  await page.onStart();
+  assert.equal(prompts, 1);
+  assert.equal(attempts[0].maxCost, 0);
+  assert.equal(page.data.statusTitle, '发送失败');
+  assert.doesNotMatch(page.data.statusNote, /已退回/);
+  cost = 1;
+  await page.onStart();
+  assert.equal(attempts[1].maxCost, 0);
+  assert.equal(page.data.ready, false);
+  await page.onContinue();
+  assert.equal(attempts.length, 2);
+  await page.onCheck();
+  assert.equal(page.data.cost, 1);
+  assert.equal(page.data.canContinue, true);
+});

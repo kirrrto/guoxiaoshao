@@ -141,8 +141,15 @@ function cashierFailureText() {
 }
 
 function membershipValid(value) {
+  if (value?.isTester === true) return value.active === true && value.planId === null && value.remainingMs === 0 && value.expiresAt === null;
   return value && typeof value.active === 'boolean' && Number.isFinite(value.remainingMs) && value.remainingMs >= 0 && (!value.active || value.remainingMs > 0)
     && (Number.isFinite(Date.parse(value.expiresAt)) || (!value.active && value.expiresAt === null));
+}
+
+function fulfilledOrderMessage(order, membership, paidMessage) {
+  if (membership.isTester) return order.status === 'partially_refunded' ? '这笔订单已部分退款。' : '这笔订单已付款。';
+  if (!membership.active) return '这笔订单已处理，当前会员未生效或已到期。';
+  return order.status === 'partially_refunded' ? '订单已部分退款，会员有效期已按服务端结果更新。' : paidMessage;
 }
 
 function createPaymentController({ wx: wxApi, call, onUpdate, onResolved, onDiagnostic = () => {}, onPriceChanged = () => {}, setTimer = setTimeout, clearTimer = clearTimeout, makeId = () => `pay-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 12)}` }) {
@@ -202,7 +209,7 @@ function createPaymentController({ wx: wxApi, call, onUpdate, onResolved, onDiag
       if (delivered && membershipValid(membership)) {
         const activated = membership.active && membership.remainingMs > 0 && Number.isFinite(Date.parse(membership.expiresAt));
         forget();
-        emit({ paymentMessage: activated ? order.status === 'partially_refunded' ? '订单已部分退款，会员有效期已按服务端结果更新。' : '支付已确认，会员已开通。' : '这笔订单已处理，当前会员未生效或已到期。', paymentError: '' });
+        emit({ paymentMessage: fulfilledOrderMessage(order, membership, '支付已确认，会员已开通。'), paymentError: '' });
         outcome = 'resolved';
         await onResolved({ order, membership, activated });
       } else if (['refunded', 'cancelled', 'failed'].includes(order.status) || order.abandoned === true) {
@@ -362,9 +369,8 @@ function createPaymentController({ wx: wxApi, call, onUpdate, onResolved, onDiag
       if (!order || order.orderId !== orderId) throw { code: 'payment_check_pending' };
       if (['fulfilled', 'partially_refunded'].includes(order.status) && Number.isFinite(Date.parse(order.fulfilledAt)) && membershipValid(membership)) {
         forget();
-        emit({ paymentMessage: membership.active ? order.status === 'partially_refunded' ? '订单已部分退款，会员有效期已按服务端结果更新。' : '这笔订单已付款，会员已开通。'
-          : '这笔订单已处理，当前会员未生效或已到期。', paymentError: '' });
-        await onResolved({ order, membership, activated: membership.active });
+        emit({ paymentMessage: fulfilledOrderMessage(order, membership, '这笔订单已付款，会员已开通。'), paymentError: '' });
+        await onResolved({ order, membership, activated: membership.active && !membership.isTester });
       } else if (order.status === 'paid') {
         emit({ paymentMessage: '这笔订单已付款，正在开通会员，请稍后查询。', paymentError: '' });
       } else if ((order.status === 'created' && order.abandoned === true) || ['refunded', 'cancelled', 'failed'].includes(order.status)) {

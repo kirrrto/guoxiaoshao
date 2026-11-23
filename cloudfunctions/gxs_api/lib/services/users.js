@@ -189,7 +189,7 @@ async function bootstrap(ctx) {
     collector: monitoring.collector,
     serverTime: ctx.nowIso,
     identity: { appid: ctx.identity.appid, userKey: ctx.identity.userKey, openidMasked: maskOpenid(ctx.identity.openid), crossAccount: ctx.identity.crossAccount, isAdmin: ctx.identity.isAdmin },
-    membership: membershipSnapshot(user, ctx.now),
+    membership: membershipSnapshot(user, ctx.now, ctx.config),
     quota,
     tasks: ctx.config.tasks,
     followCount: follows.filter(f => (!f.market || f.market === 'CN') && (f.status === 'active' || f.status === 'paused')).length,
