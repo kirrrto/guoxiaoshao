@@ -15,6 +15,7 @@ async function setup(extra = {}, options = {}, seed = {}) {
     'user.bootstrap': () => ({ identity: { userKey: state.owner }, membership: { active: state.member, planId: state.planId || 'member_30d' }, quota: { balance: state.balance ?? 3, queryCost: 1, revision: 1 },
       notifications: { enabled: true, senderReady: true, templateIds: { restock: 'chinese' } }, subscriptions: {}, settings: {} }),
     'market.catalog': () => ({ markets: MARKETS.map(m => ({ ...m, enabled: state.enabled, monitorEnabled: state.enabled,
+      memberQueryAvailable: state.memberQueryAvailable,
       notificationsEnabled: state.enabled, notificationsEnabledEn: false })) }),
     'market.follows': () => ({ follows: state.rows, watchRegistrationOpen: true, monitoring: { JP: true, TW: true, HK: true }, notifications: { JP: true, TW: true, HK: true } }),
     'market.pickup': p => receipt(p),
@@ -98,12 +99,13 @@ test('uncertain request retains its ID across markets and can settle after rollo
   const { page, rt, state } = await setup({ 'market.pickup': p => {
     if (first) { first = false; throw Object.assign(Error(), { code: 'call_failed' }); }
     return receipt(p, { charged: 1, refunded: 1, replayed: true });
-  } });
+  } }, {}, { member: false, memberQueryAvailable: true });
   await page.onQuery();
   assert.equal(page.data.queryLabel, '核对上次查询');
   page.onMarket(tap({ market: 'TW' })); page.onMarket(tap({ market: 'JP' }));
   state.enabled = false; await page.onPullDownRefresh();
   assert.equal(page.data.enabled, false); assert.ok(page.data.canQuery);
+  assert.equal(page.data.queryPassRequired, false, 'a pending receipt can be recovered even after public access closes');
   await page.onQuery();
   const attempts = rt.calls.filter(c => c.action === 'market.pickup');
   assert.equal(attempts[0].payload.queryId, attempts[1].payload.queryId);
@@ -150,6 +152,89 @@ test('an older API without account-level permissions cannot enable new checks in
   assert.equal(page.data.receipt,null); assert.equal(page.owner,'Bob');
 });
 
+test('free and weekly customers can inspect the regional query requirement in either language without spending or searching', async () => {
+  for (const [lang, member] of [['zh-CN', false], ['en', true]]) {
+    const { page, rt } = await setup({}, {}, { enabled: false, memberQueryAvailable: true, member, planId: 'member_7d', balance: 4 });
+    rt.load('utils/language.js').setLanguage(lang);
+    const destinations = [];
+    rt.wx.switchTab = options => { destinations.push(options.url); options.success({}); options.complete({}); };
+    const reads = rt.calls.length;
+    for (const site of MARKETS) {
+      page.onMarket(tap({ market: site.code }));
+      assert.equal(page.data.queryPassRequired, true);
+      assert.equal(page.data.canQuery, false);
+      await page.onQuery();
+      page.onQueryPassInfo();
+      const modal = rt.messages.at(-1);
+      assert.match(modal.content, lang === 'en' ? /monthly.*annual/i : /月卡.*年卡/);
+      modal.success({ confirm: false, cancel: true });
+      modal.complete?.({});
+    }
+    assert.deepEqual(destinations, []);
+    page.onQueryPassInfo();
+    const accepted = rt.messages.at(-1);
+    accepted.success({ confirm: true });
+    accepted.complete?.({});
+    assert.deepEqual(destinations, ['/pages/mine/index']);
+    assert.equal(rt.app.globalData.pendingMineSection, 'membership-card');
+    assert.equal(rt.calls.length, reads);
+    assert.equal(rt.app.globalData.bootstrap.quota.balance, 4);
+    page.onUnload();
+  }
+});
+
+test('only a supported product in a verified members-only region shows the query membership prompt', async () => {
+  const { page, rt, state, handlers } = await setup({}, {}, { enabled: false, member: false });
+  const noPrompt = () => {
+    assert.equal(page.data.queryPassRequired, false);
+    const messages = rt.messages.length;
+    page.onQueryPassInfo();
+    assert.equal(rt.messages.length, messages);
+  };
+  noPrompt();
+  state.memberQueryAvailable = false;
+  await page.onPullDownRefresh();
+  noPrompt();
+  state.memberQueryAvailable = true;
+  await page.onPullDownRefresh();
+  assert.equal(page.data.queryPassRequired, true);
+  page.onQueryPassInfo();
+  const modal = rt.messages.at(-1);
+  state.enabled = true;
+  await page.onPullDownRefresh();
+  noPrompt();
+  modal.success({ confirm: true });
+  modal.complete?.({});
+  assert.notEqual(rt.app.globalData.pendingMineSection, 'membership-card');
+  state.enabled = false;
+  await page.onPullDownRefresh();
+  page.setData({ networkOffline: true });
+  page.paint();
+  noPrompt();
+  page.setData({ networkOffline: false });
+  page.paint();
+  const watchCategory = page.data.categories.findIndex(row => row.id === 'watch');
+  page.onChoice({ ...tap({ field: 'category' }), detail: { value: watchCategory } });
+  assert.equal(page.data.product.querySupported, false);
+  noPrompt();
+  page.onChoice({ ...tap({ field: 'category' }), detail: { value: 0 } });
+  const bootstrap = handlers['user.bootstrap'];
+  const expiry = new Date(Date.now() + 86400000).toISOString();
+  handlers['user.bootstrap'] = (payload, account) => ({
+    ...bootstrap(payload, account),
+    membership: { active: true, planId: 'member_30d', expiresAt: expiry, enhancedExpiresAt: expiry },
+  });
+  await page.onPullDownRefresh();
+  assert.equal(page.data.canQuery, false, 'a directory capability never authorizes a customer');
+  noPrompt(); // The customer already holds a pass; missing account permissions need a retry.
+  handlers['user.bootstrap'] = () => { throw Error('account unavailable'); };
+  await page.onPullDownRefresh();
+  assert.equal(page.data.accountError, true);
+  noPrompt();
+  assert.equal(rt.calls.some(call => call.action === 'market.pickup'), false);
+  page.onUnload();
+});
+
 test('a private Taiwan preview stays scoped to the verified tester account', async () => {
   const { page, rt, state } = await setup({
     'user.bootstrap': (_, s) => ({
@@ -180,13 +265,14 @@ test('monthly and annual customers manually check all three regions through the 
       identity: { userKey: 'Alice' }, serverTime: new Date().toISOString(),
       membership: { active: true, planId, expiresAt: expiry, enhancedExpiresAt: expiry, annualExpiresAt: planId === 'member_365d' ? expiry : null },
       regionalMemberQueryMarkets: ['JP', 'TW', 'HK'], quota: { balance: 0, revision: 1 }, notifications: {}, subscriptions: {},
-    }) }, {}, { enabled: false });
+    }) }, {}, { enabled: false, memberQueryAvailable: true });
     const calls = () => rt.calls.filter(row => row.action === 'market.pickup');
     for (const [index, site] of MARKETS.entries()) {
       page.onMarket(tap({ market: site.code }));
       assert.equal(calls().length, index);
       assert.equal(page.data.enabled, true);
       assert.equal(page.data.canQuery, true);
+      assert.equal(page.data.queryPassRequired, false);
       assert.equal(page.data.costText, '会员查询不扣次');
       assert.equal(page.data.watchEnabled, true);
       assert.equal(page.data.alertTemplate, '');
@@ -514,7 +600,7 @@ test('regional check-in uses the shared daily quota, renders the account-confirm
 });
 
 test('a weekly member can check a launch but can only pause or delete a previously saved regional watch', async () => {
-  const {page,state,handlers,rt}=await setup({}, {}, { planId:'member_7d' });
+  const {page,state,handlers,rt}=await setup({}, {}, { planId:'member_7d', memberQueryAvailable:true });
   const fixture=handlers['market.catalog'];
   handlers['market.catalog']=()=>({markets:fixture().markets.map(m=>({...m,products:m.products.map(p=>({...p, freeQueryStartsAt:'2099-12-01T15:00:00Z'}))}))});
   const query=page.payload(); state.rows=[{...query, followId:'old',status:'plan_required',savedStatus:'paused'}];
@@ -522,6 +608,7 @@ test('a weekly member can check a launch but can only pause or delete a previous
   assert.equal(page.data.watchRows[0].canResume,false);
   await page.onWatchStatus(tap({id:'old',status:'active'}));assert.equal(rt.calls.some(c=>c.action==='market.watchStatus'),false);
   state.planId='gift';await page.onPullDownRefresh(); assert.equal(page.data.canQuery,false);
+  assert.equal(page.data.queryPassRequired,false);
   assert.match(page.data.launchNotice,/2099-12-02/);assert.match(page.data.launchNotice,/周卡、月卡或年卡/);
   await page.onQuery();assert.equal(rt.calls.some(c=>c.action==='market.pickup'),false);
 });

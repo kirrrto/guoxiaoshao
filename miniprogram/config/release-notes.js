@@ -8,6 +8,15 @@
 // Keep technical details and complete acceptance records in release documents.
 const RELEASE_NOTES = [
   {
+    version: '3.8.7',
+    title: '站点查询权限提示',
+    dateText: '版本记录 · 2026-11-24',
+    highlights: [
+      '其他站点仅向月卡、年卡开放查询时，页面会显示所需会员。',
+      '查询受限时，点查询可查看会员说明，不消耗查询次数。',
+    ],
+  },
+  {
     version: '3.8.6',
     title: '签到与查询余额',
     dateText: '版本记录 · 2026-11-24',

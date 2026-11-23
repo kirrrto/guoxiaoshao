@@ -188,7 +188,7 @@ try {
       return { viewport: width, scrollWidth: document.documentElement.scrollWidth, bodyHeight: document.body.scrollHeight, overflow, clippedText, images, alternativeGeometry, alternativeLayoutErrors, calendarLayoutErrors };
     });
     if (item.page === 'markets') {
-      metrics.marketLayoutErrors = await page.evaluate(expectImage => {
+      metrics.marketLayoutErrors = await page.evaluate(({ expectImage, expectPassInfo }) => {
         const errors = [];
         const bounds = selector => document.querySelector(selector)?.getBoundingClientRect();
         const controls = bounds('.markets-controls'), details = bounds('.markets-details');
@@ -211,12 +211,14 @@ try {
           }
         }
         if (tile && !tile.querySelector('img')) errors.push('Empty regional product tile');
+        const passInfo = document.querySelector('button[data-preview-action="onQueryPassInfo"]');
+        if (Boolean(passInfo) !== expectPassInfo || passInfo?.disabled) errors.push('The monthly or annual access prompt must be tappable only in its members-only scenario');
         for (const control of document.querySelectorAll('.markets-page button, .market-field')) {
           const rect = control.getBoundingClientRect();
           if (rect.width < 43.99 || rect.height < 43.99) errors.push('Undersized control: ' + control.textContent.trim());
         }
         return errors;
-      }, item.expectedMarketImage ?? true);
+      }, { expectImage: item.expectedMarketImage ?? true, expectPassInfo: item.expectedQueryPassPrompt === true });
     }
     if (item.page === 'admin') {
       metrics.operatorControlErrors = await page.evaluate(saving => {

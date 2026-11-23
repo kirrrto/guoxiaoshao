@@ -1333,7 +1333,8 @@ for (const scenario of scenarios) {
         authorizationPending: Boolean(stockScenarios[scenario].authorizationPending),
       } : undefined;
       const expectedLaunchPoster = pageName === 'guide' ? false : undefined;
-      manifest.push({ page: pageName, scenario, width, file: filename, tabPage: tabIndex >= 0, navigationHidden, previewDate: now.toISOString(), pickerSheet: sheetScenario, fixture: v350Fixture || v343Fixture, expectedText, forbiddenText, expectedAlternativeCounts, expectedDndPeriodCount, expectedReleaseNoteCount, expectedMembership, expectedNotification, expectedStock, expectedLaunchPoster, ...(pageName === 'markets' ? { expectedMarketImage: Boolean(page.data.product?.imageDisplayUrl) } : {}) });
+      const expectedQueryPassPrompt = marketsPreview && marketScenarios[scenario].expectPassPrompt === true;
+      manifest.push({ page: pageName, scenario, width, file: filename, tabPage: tabIndex >= 0, navigationHidden, previewDate: now.toISOString(), pickerSheet: sheetScenario, fixture: v350Fixture || v343Fixture, expectedText, forbiddenText, expectedAlternativeCounts, expectedDndPeriodCount, expectedReleaseNoteCount, expectedMembership, expectedNotification, expectedStock, expectedLaunchPoster, ...(pageName === 'markets' ? { expectedMarketImage: Boolean(page.data.product?.imageDisplayUrl), expectedQueryPassPrompt } : {}) });
     }
   }
 }

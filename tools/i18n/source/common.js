@@ -1,4 +1,7 @@
 module.exports = {
+  '站点查询权限提示': 'Access to regional stock checks',
+  '其他站点仅向月卡、年卡开放查询时，页面会显示所需会员。': 'If a region limits stock checks to monthly and annual pass holders, you’ll see which passes qualify.',
+  '查询受限时，点查询可查看会员说明，不消耗查询次数。': 'When access is restricted, tap the check button to view pass details without using a search credit.',
   '签到与查询余额': 'Check-in and search credits',
   '在「我的」可以直接签到，查看剩余查询次数。': 'Check in and see your remaining search credits in Me.',
   '次数明细已移除，签到后余额会自动更新。': 'Credit history has been removed. Your balance updates when you check in.',

@@ -49,6 +49,7 @@ Page(require('../../utils/language').page('markets', {
   },
   onHide() {
     this.visible = false;
+    this.queryPassPrompt = null;
     this.editingWatch = this.watchConfirmation = null;
     this.accountReady = false;
     clearTimeout(this.expiryTimer);
@@ -186,6 +187,7 @@ Page(require('../../utils/language').page('markets', {
   },
   clearTarget() {
     this.scope++;
+    this.queryPassPrompt = null;
     this.snapshot = null;
     this.alert = null;
     this.alertMissing = false;
@@ -234,6 +236,9 @@ Page(require('../../utils/language').page('markets', {
     const showSignin = Boolean(quota && !access.member && !quota.signedInToday);
     const outcome = this.signinOutcome;
     const pending = site && product?.querySupported && accountReady && operation.hasPending('mq', this.payload(), this.owner);
+    const queryPassRequired = Boolean(accountReady && typeof this.boot.membership.active === 'boolean'
+      && product?.querySupported && site.enabled === false && site.memberQueryAvailable === true
+      && !access.hasRegionalPass && !access.tester && !pending && !this.data.networkOffline);
     const busyHere = this.queryToken && this.queryToken.scope === this.scope;
     const { w, ...watchState } = watch.view(this, site, accountReady, access.canWatch);
     const copy = this.data.w && lang === this.data.lang ? {} : { c, w, lang };
@@ -244,7 +249,7 @@ Page(require('../../utils/language').page('markets', {
       variantIndex: product ? choices.variants.findIndex(row => row.id === product.id) : 0,
       modelIndex: product ? choices.models.indexOf(product.model) : 0,
       colorIndex: product ? choices.colors.findIndex(color => color.id === product.color) : 0,
-      storeIndex, enabled: queryEnabled, pending: !!pending, loading: !!this.loading,
+      storeIndex, enabled: queryEnabled, queryPassRequired, pending: !!pending, loading: !!this.loading,
       catalogError: c[this.catalogError] || '', accountReady: !!accountReady, accountError: !!this.accountError,
       launchNotice, showSignin, signing: !!this.signinToken,
       signinMessage: accountReady && outcome ? c[outcome.key].replace('{n}', outcome.n || 0) : quota && !access.member && quota.signedInToday ? c.signed : '',
@@ -356,6 +361,24 @@ Page(require('../../utils/language').page('markets', {
       this.clearTarget();
       this.paint();
     }
+  },
+  onQueryPassInfo() {
+    this.paint();
+    if (!this.visible || this.pageRetired || !this.data.queryPassRequired || this.queryPassPrompt) return;
+    const owner = this.owner, token = {};
+    this.queryPassPrompt = token;
+    const c = this.data.c;
+    language.modal({ title: c.query, content: c.passOnly, confirmText: c.viewPass,
+      success: result => {
+        if (this.queryPassPrompt !== token) return;
+        this.queryPassPrompt = null;
+        if (result.confirm && this.visible && !this.pageRetired && this.isAccount(owner)) {
+          this.paint();
+          if (this.data.queryPassRequired) this.onViewMembership();
+        }
+      },
+      fail: () => { if (this.queryPassPrompt === token) this.queryPassPrompt = null; },
+    }, { localizedContent: true });
   },
   async onQuery() {
     const owner = this.owner, site = this.site();

@@ -4,7 +4,7 @@ const { ApiError } = require('../errors');
 const { sharedQueryPickup } = require('../engine/shared-query');
 const { ensureUser } = require('./users');
 const { queryCostLimit } = require('../rules/access');
-const { canReadMarket, canPreviewMarket } = require('../rules/regional-query-access');
+const { MEMBER_QUERY_MARKETS, canReadMarket, canPreviewMarket } = require('../rules/regional-query-access');
 const { accountLimits, ANNUAL_LIMITS } = require('../rules/membership');
 const { isRetiredPartNumber, retiredProductMessage } = require('../rules/follow-access');
 const { recordObservations } = require('../engine/observations');
@@ -115,7 +115,8 @@ async function marketCatalog(ctx, payload = {}) {
     const monitorStale = !(workerReady && monitorIntervalMs && region.state === 'running' && region.health?.state === 'healthy'
       && Number.isFinite(observed) && observed <= ctx.now.getTime() && !(region.admissionUntil > ctx.now.getTime()));
     const { products, ...metadata } = site;
-    return { ...metadata, ...(compact ? { productRows: catalog.regions[site.code] } : { products }), enabled: config.internationalMarkets?.[site.code] === true, monitorEnabled,
+    return { ...metadata, ...(compact ? { productRows: catalog.regions[site.code] } : { products }),
+      enabled: config.internationalMarkets?.[site.code] === true, memberQueryAvailable: MEMBER_QUERY_MARKETS.includes(site.code), monitorEnabled,
       monitorIntervalMs, monitorStale, monitorLastSuccessAt: Number.isFinite(observed) && observed <= ctx.now.getTime() ? new Date(observed).toISOString() : null,
       notificationsEnabled: notify && isValidTemplateId(ids.restock),
       notificationsEnabledEn: notify && isValidTemplateId(ids.restockEn) && ![ids.restock, ids.soldout, ids.soldoutEn, config.deadlineReminders.templateId].includes(ids.restockEn) };

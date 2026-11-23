@@ -6,6 +6,10 @@ export const marketScenarios = {
     expected: ['Regional stores', 'iPhone 18 Pro Max', 'Silver', 'Not available for pickup', 'UTC+8'] },
   'hk-unknown': { market: 'HK', unknown: true, expected: ['暂时无法确认门店库存', '本次未扣次'] },
   'jp-closed': { market: 'JP', closed: true, expected: ['关注此配置', '可先保存关注，本站尚未开启自动监测。', '当前账号暂时无法查询此站点的库存。'] },
+  'tw-monthly-required': { market: 'TW', closed: true, plan: null, blocked: true, expectPassPrompt: true,
+    expected: ['本站目前仅限有效月卡或年卡会员查询。', '查询自提状态'] },
+  'hk-monthly-required-en': { market: 'HK', closed: true, plan: 'member_7d', blocked: true, expectPassPrompt: true, language: 'en',
+    expected: ['Stock checks here require an active monthly or annual pass.', 'Check pickup'] },
   'tw-closed-saved': { market: 'TW', closed: true, memberQuery: true, available: true, watch: true, expected: ['会员查询不扣次', '可自提', '已保存关注，本站尚未开启自动监测', '暂停', '管理'] },
   'hk-closed-paused': { market: 'HK', closed: true, memberQuery: true, plan: 'member_365d', watch: true, edit: true, paused: true, language: 'en', expected: ['Included with membership', 'Not available for pickup', 'Paused', 'Resume', 'Add store', 'Alert language', 'Remove'] },
   'tw-watch': { market: 'TW', watch: true, edit: true, available: true, expected: ['我的站点关注', '已开启关注', '移除', '提醒语言', '取消整条关注'] },
@@ -31,6 +35,7 @@ export function marketFixture(action, payload, scenario, now) {
   const site = catalog.findMarket(fixture.market);
   const enabled = Object.fromEntries(catalog.MARKETS.map(m => [m.code, !(fixture.closed && m.code === site.code)]));
   if (action === 'market.catalog') return { markets: catalog.MARKETS.map(m => ({ ...m, enabled: enabled[m.code],
+    memberQueryAvailable: fixture.expectPassPrompt || fixture.memberQuery,
     monitorEnabled: enabled[m.code], notificationsEnabled: enabled[m.code], notificationsEnabledEn: false,
     monitorStale: false, monitorIntervalMs: 60000, monitorLastSuccessAt: now.toISOString() })) };
   if (action === 'market.follows') return { watchRegistrationOpen: true, watchEditing: true, limits: { maxStoresPerFollow: 4 }, monitoring: enabled, notifications: enabled,

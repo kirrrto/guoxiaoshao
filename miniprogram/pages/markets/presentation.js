@@ -15,6 +15,7 @@ const COPY = {
     custom: '此配置需在 Apple 官网定制，尚无可核对的标准零售货号，暂不支持查询或关注。',
     noColor: '未指定颜色', noCapacity: '未指定容量',
     query: '查询自提状态', checking: '查询中…', resume: '核对上次查询', retry: '重试',
+    passOnly: '本站目前仅限有效月卡或年卡会员查询。', viewPass: '查看会员',
     loading: '正在读取站点…', offline: '网络已断开', catalogError: '站点目录暂时无法读取，请重试。',
     accountError: '暂时无法确认账户，请重试。', accountLoading: '正在确认查询额度…',
     tester: '库存查询不扣次数', member: '会员查询不扣次', cost: '本次查询使用 1 次，剩余 {balance} 次',
@@ -42,6 +43,7 @@ const COPY = {
     custom: 'Configure this model on the Apple website. It has no verified standard retail part number for stock checks or watches.',
     noColor: 'No finish specified', noCapacity: 'No storage specified',
     query: 'Check pickup', checking: 'Checking…', resume: 'Check previous request', retry: 'Retry',
+    passOnly: 'Stock checks here require an active monthly or annual pass.', viewPass: 'Passes',
     loading: 'Loading regions…', offline: 'You are offline', catalogError: 'Could not load the store directory. Try again.',
     accountError: 'Could not verify your account. Try again.', accountLoading: 'Checking your credits…',
     tester: 'No credits needed for stock checks', member: 'Included with membership', cost: '1 credit per check · {balance} remaining',
@@ -133,7 +135,7 @@ function regionalAccess(membership, product, now = Date.now()) {
   const launch = !Number.isFinite(launchUntil) || now < launchUntil;
   const tester = member && membership.isTester === true;
   const monthlyOrAnnual = plan === 'member_30d' || plan === 'member_365d';
-  return { member, tester, canWatch: tester || monthlyOrAnnual,
+  return { member, tester, hasRegionalPass: monthlyOrAnnual, canWatch: tester || monthlyOrAnnual,
     memberQuery: monthlyOrAnnual && expiry > now && enhanced > now,
     launchRestricted: launch && !tester && !['member_7d','member_30d','member_365d'].includes(plan),
     nextPlanChange: Math.min(...[expiry,enhanced,annual].filter(stamp => stamp > now)),

@@ -86,6 +86,21 @@ test('monthly and annual customers can check each closed storefront during launc
   for (const name of ['follows', 'notifications', 'ledger']) assert.equal(await f.repo.count(COLLECTIONS[name]), 0, name);
 });
 
+test('both market directory formats explain paid access to a free customer without granting a query', async () => {
+  const f = setup();
+  const free = await customer(f, 'directory-free');
+  for (const payload of [{}, { format: 'compact-v1' }]) {
+    const { markets } = ok(await f.call('market.catalog', payload, free.actor));
+    assert.deepEqual(markets.map(site => [site.code, site.enabled, site.memberQueryAvailable]),
+      Object.keys(targets).map(market => [market, false, true]));
+  }
+  const boot = ok(await f.call('user.bootstrap', {}, free.actor));
+  assert.equal(boot.regionalMemberQueryMarkets, undefined);
+  assert.equal((await check(f, free, 'TW', 'paid-info-is-not-access', 1)).error.code, 'market_disabled');
+  assert.equal(f.state.fetchImpl.calls.length, 0);
+  assert.equal(await f.repo.count(COLLECTIONS.ledger), 0);
+});
+
 test('private tester access does not advertise a paid membership to an account with no paid pass', async t => {
   const f = setup();
   const tester = await customer(f, 'regional-preview-only');

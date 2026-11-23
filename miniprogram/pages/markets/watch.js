@@ -3,6 +3,7 @@ const { call } = require('../../utils/api');
 const { getBootstrap, invalidateFollows, trackFollowCountWrite } = require('../../utils/store');
 const { requestReminderAuthorization, templateConsent, openSubscribeSettings } = require('../../utils/reminder-credits');
 const { switchToTab } = require('../../utils/tab-bar');
+const { isNavigating } = require('../../utils/navigation');
 
 const WORDS = {
   'zh-CN': {
@@ -154,7 +155,17 @@ const methods = {
       if (selected) this.confirmWatchChange(row, this.data.w.removeStoreTitle, selected.label, this.data.w.removeStore, 'market.editWatch', { removeStore: store });
     }
   },
-  onViewMembership() { if (this.visible && this.data.membershipLink) switchToTab({ url: '/pages/mine/index' }); },
+  onViewMembership() {
+    if (!this.visible || this.pageRetired || !this.accountReady || !this.isAccount() || isNavigating()
+      || !(this.data.membershipLink || this.data.queryPassRequired)) return;
+    const state = getApp().globalData;
+    const clearTarget = () => { if (state.pendingMineSection === 'membership-card') state.pendingMineSection = null; };
+    state.pendingMineSection = 'membership-card';
+    if (!switchToTab({ url: '/pages/mine/index', fail: () => {
+      clearTarget();
+      languageUI.toast({ title: '页面切换未完成，请重试', icon: 'none' });
+    } })) clearTarget();
+  },
   onSelectWatch(e) {
     if (!this.visible || !this.accountReady || !this.isAccount()) return;
     const follow = this.watchList?.follows.find(row => row.followId === e.currentTarget.dataset.id);
