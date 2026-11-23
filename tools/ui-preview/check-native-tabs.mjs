@@ -46,6 +46,13 @@ try {
           if (Number(element.dataset.baseLine)) element.style.lineHeight = Number(element.dataset.baseLine) * fontScale + 'px';
         });
         document.documentElement.style.setProperty('--preview-native-safe', `${simulatedSafeArea}px`);
+        // Scroll each independent area too. A nested scroll-view's unscrolled
+        // last row can have a DOM rect below the page even though it is clipped.
+        const pageElements = [...document.querySelectorAll('.tab-page *')];
+        const scrollers = pageElements.filter(el => el.clientHeight > 0 && el.scrollHeight > el.clientHeight + 1
+          && ['auto', 'scroll'].includes(getComputedStyle(el).overflowY));
+        const originalPositions = scrollers.map(el => el.scrollTop);
+        for (const el of scrollers) el.scrollTop = el.scrollHeight;
         window.scrollTo(0, document.documentElement.scrollHeight);
         const rect = element => { const b = element.getBoundingClientRect(); return { left: b.left, top: b.top, right: b.right, bottom: b.bottom, width: b.width, height: b.height }; };
         const bar = document.querySelector('.preview-native-tabbar');
@@ -62,7 +69,14 @@ try {
           if (!element.contains(document.elementFromPoint((r.left + r.right) / 2, (r.top + r.bottom) / 2))) issues.push('item blocked by overlay');
           return { bounds: r, icon, label };
         });
-        const content = [...document.querySelectorAll('.tab-page *')].filter(element => !element.children.length && element.getClientRects().length && (element.textContent.trim() || element.tagName === 'IMG'));
+        const content = pageElements.filter(element => !element.children.length && element.getClientRects().length && (element.textContent.trim() || element.tagName === 'IMG'));
+        const scrollAreas = scrollers.map(element => {
+          const bottom = element.getBoundingClientRect().top + element.clientTop + element.clientHeight;
+          const children = content.filter(child => element.contains(child));
+          const lastBottom = Math.max(0, ...children.map(child => child.getBoundingClientRect().bottom));
+          if (children.length && lastBottom > bottom + 1) issues.push('last content cannot scroll into its own scroll area');
+          return { className: element.className, scrollTop: element.scrollTop, bottom, lastBottom };
+        });
         const lastContentBottom = Math.max(0, ...content.map(element => element.getBoundingClientRect().bottom));
         if (lastContentBottom > bounds.top - 8) issues.push('last content cannot scroll clear of native bar');
         if (document.documentElement.scrollWidth > innerWidth + 1) issues.push('horizontal overflow');
@@ -71,7 +85,8 @@ try {
           const range = document.createRange(); range.selectNodeContents(label);
           if (range.getClientRects().length > 1 || label.scrollWidth > label.clientWidth + 1) issues.push('selection edit button wrapped');
         }
-        return { bounds, items: itemMetrics, lastContentBottom, issues };
+        scrollers.forEach((element, index) => { element.scrollTop = originalPositions[index]; });
+        return { bounds, items: itemMetrics, scrollAreas, lastContentBottom, issues };
       }, { fontScale, simulatedSafeArea });
       records.push({ page: item.page, scenario: item.scenario, width: item.width, fontScale, simulatedSafeArea, ...metrics });
       if (item.width === 375 && item.scenario === 'member' && fontScale === 1 && simulatedSafeArea === 34) {
