@@ -1,7 +1,19 @@
+import { runtime } from './miniprogram-runtime.mjs';
+
+const localeModules = new WeakMap();
+
 // Payment, redemption and account-record tests intentionally isolate reminder
 // authorization. Full queue/panel behavior runs in miniprogram-runtime tests.
 // Do not load these WeChat-dependent modules through Node's host require.
-export function isolatedAccountUi(name) {
+export function isolatedAccountUi(name, wx) {
+  if (name.endsWith('/language')) {
+    if (!localeModules.has(wx)) {
+      const local = runtime();
+      Object.assign(local.wx, wx);
+      localeModules.set(wx, local.load('utils/language.js'));
+    }
+    return localeModules.get(wx);
+  }
   if (name.endsWith('/reminder-panel')) return { reminderPanelMethods: {
     observeAuthorization() {}, applyAuthorizationState() {}, resumeAuthorizationSync() {}, disposeAuthorizationPanel() {},
     syncAuthorizationOverlay() {}, hideAuthorizationOverlay() {}, isAuthorizationAccountCurrent: () => true,

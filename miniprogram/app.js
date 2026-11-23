@@ -1,3 +1,4 @@
+const languageUI = require('./utils/language');
 const cloudConfig = require('./config/cloud');
 const { readSharedSelection, readMarketTarget } = require('./utils/share');
 const { VERSION } = require('./config/version');
@@ -96,6 +97,7 @@ App({
 
   // Users can change "总是保持以上选择" in WeChat settings while the app is hidden.
   onShow(options) {
+    languageUI.refreshDeviceLanguage();
     this.runtimeVisibility = 'foreground';
     // A warm entry from the Moments preview must regain normal cloud access.
     // Do not infer a transition from missing options (ordinary native returns).
@@ -178,7 +180,7 @@ App({
     try { manager = wx.getUpdateManager(); } catch (e) { return; }
     if (!manager || typeof manager.onUpdateReady !== 'function') return;
     manager.onUpdateReady(() => {
-      wx.showModal({
+      languageUI.modal({
         title: '发现新版本',
         content: '新版本已下载完成，重启小程序即可使用。',
         confirmText: '立即重启',

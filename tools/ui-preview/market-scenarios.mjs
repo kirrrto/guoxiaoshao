@@ -7,7 +7,22 @@ export const marketScenarios = {
   'hk-unknown': { market: 'HK', unknown: true, expected: ['暂时无法确认门店库存', '本次未扣次'] },
   'jp-closed': { market: 'JP', closed: true, expected: ['此站点尚未开放库存查询'] },
   'tw-watch': { market: 'TW', watch: true, available: true, expected: ['我的站点关注', '已开启关注', '取消关注'] },
+  'hk-launch-free': { market: 'HK', plan: null, date: '2026-10-10T03:00:00Z', blocked: true,
+    expected: ['查询需有效周卡、月卡或年卡', '2026-10-18', '签到领取查询次数'] },
+  'jp-launch-weekly': { market: 'JP', plan: 'member_7d', date: '2026-10-10T03:00:00Z', language: 'en', available: true,
+    expected: ['Available for pickup', 'Included with membership', 'Regional watches and alerts require an active monthly or annual pass.'] },
+  'tw-checkin': { market: 'TW', plan: null, date: '2026-10-17T16:00:00Z', blocked: true,
+    expected: ['本次查询使用 1 次，剩余 0 次', '签到领取查询次数'] },
+  'hk-mac': { market: 'HK', category: 'mac', language: 'en', available: true,
+    expected: ['Mac', 'Category', 'Available for pickup', 'UTC+8'] },
+  'jp-ipad': { market: 'JP', category: 'ipad', available: true, expected: ['iPad', '产品类别', '可自提', 'UTC+9'] },
+  'tw-watch-reference': { market: 'TW', category: 'watch', blocked: true, expected: ['Apple Watch', '产品类别'] },
 };
+
+export function marketMember(scenario) {
+  const fixture = marketScenarios[scenario];
+  return Object.hasOwn(fixture, 'plan') ? fixture.plan : 'member_30d';
+}
 
 export function marketFixture(action, payload, scenario, now) {
   const fixture = marketScenarios[scenario];
@@ -19,6 +34,7 @@ export function marketFixture(action, payload, scenario, now) {
   if (action === 'market.follows') return { monitoring: enabled, notifications: enabled,
     follows: fixture.watch ? [{ followId: 'offline-tw-watch', market: site.code, partNumber: site.products[0].partNumber,
       storeNumbers: [site.stores[0].storeNumber], eligibleStoreNumbers: [site.stores[0].storeNumber], status: 'active', language: 'zh-CN' }] : [] };
+  if (action === 'market.pickup' && fixture.blocked) throw Error('The preview issued a blocked pickup check');
   if (action === 'market.pickup') return { ok: !fixture.unknown, market: site.code, queryId: payload.queryId, charged: 0, refunded: 0,
     balance: 5, quotaRevision: 1, reason: fixture.unknown ? 'upstream_unavailable' : null,
     results: [{ market: site.code, partNumber: payload.partNumber, storeNumber: payload.storeNumbers[0],
@@ -28,6 +44,11 @@ export function marketFixture(action, payload, scenario, now) {
 
 export async function prepareMarket(page, fixture) {
   page.onMarket({ currentTarget: { dataset: { market: fixture.market } } });
+  if (fixture.category) {
+    const index = page.data.categories.findIndex(item => item.id === fixture.category);
+    if (index < 0) throw Error('Missing category in regional picker: '+fixture.category);
+    page.onChoice({ currentTarget: { dataset: { field: 'category' } }, detail: { value: index } });
+  }
   if (fixture.model) {
     page.onChoice({ currentTarget: { dataset: { field: 'model' } }, detail: { value: page.data.models.indexOf(fixture.model) } });
     page.onChoice({ currentTarget: { dataset: { field: 'color' } }, detail: { value: page.data.colors.findIndex(row => row.id === fixture.color) } });

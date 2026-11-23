@@ -1,6 +1,6 @@
 'use strict';
 
-const { MARKETS } = require('../markets');
+const { MARKETS, findMarketProduct } = require('../markets');
 const { buildGroups, createScheduler } = require('./scheduler');
 const { observationHealth } = require('./observation-health');
 
@@ -16,7 +16,7 @@ function createMarketMonitor({ clock, mode, fetchPickup, onBatch, log, shouldCon
     for (const market of MARKETS) {
       const enabled = config.collector.enabled && config.internationalMonitoring?.[market.code] === true;
       const targets = enabled ? follows.filter(follow => follow.market === market.code
-        && market.products.some(product => product.partNumber === follow.partNumber)).map(follow => ({
+        && findMarketProduct(market.code, follow.partNumber)?.monitorSupported).map(follow => ({
           ...follow, storeNumbers: follow.storeNumbers.filter(id => market.stores.some(store => store.storeNumber === id)),
         })) : [];
       const groups = buildGroups(targets, config.collector.maxPartsPerRequest || 20);

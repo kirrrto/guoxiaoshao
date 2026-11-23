@@ -36,6 +36,11 @@ function memberLimits(user, now) {
   return isMember(user, now) ? limits : { ...limits, maxFollows: 0 };
 }
 
+// Only verified, still-effective monthly/annual benefits include regional watches.
+function canWatchMarkets(user, now) {
+  return planSnapshot(user, now).enhanced;
+}
+
 function accountLimits(user, now, config) {
   const limits = memberLimits(user, now);
   const base = Math.min(3, Math.max(1, Number(config && config.query && config.query.maxStores) || 3));
@@ -46,6 +51,9 @@ function accountLimits(user, now, config) {
 
 /** Saved slots have stable ownership even if the user pauses or edits a follow. */
 function followAllowance(user, follow, follows, now) {
+  if (follow.market && follow.market !== 'CN' && !canWatchMarkets(user, now)) {
+    return { limitPaused: false, marketPlanRequired: true, eligibleStoreNumbers: [] };
+  }
   const limits = memberLimits(user, now);
   const sorted = (user && user._followPolicy || follows || []).filter(item => item.userKey === follow.userKey && item.status !== 'removed')
     .slice().sort((a, b) => String(a.createdAt || '').localeCompare(String(b.createdAt || '')) || a._id.localeCompare(b._id));
@@ -125,4 +133,4 @@ function reminderBlockReason(user) {
   return user && user.membership && user.membership.expiresAt ? 'member_expired' : 'membership_required';
 }
 
-module.exports = { LIMITS, ENHANCED_LIMITS, ANNUAL_LIMITS, limitsForPlan, FREE_REMINDER_FOLLOWS, isMember, hasFreeReminder, canUseReminders, reminderBlockReason, extendMembership, membershipSnapshot, membershipExpiresAt, validateFollowLimits, planSnapshot, memberLimits, accountLimits, followAllowance };
+module.exports = { LIMITS, ENHANCED_LIMITS, ANNUAL_LIMITS, limitsForPlan, FREE_REMINDER_FOLLOWS, isMember, hasFreeReminder, canUseReminders, canWatchMarkets, reminderBlockReason, extendMembership, membershipSnapshot, membershipExpiresAt, validateFollowLimits, planSnapshot, memberLimits, accountLimits, followAllowance };

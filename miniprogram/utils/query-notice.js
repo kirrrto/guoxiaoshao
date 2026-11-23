@@ -66,6 +66,8 @@ function normalizeAnnouncement(raw, now = Date.now()) {
     text, kind, startsAt, expiresAt,
     publishedAt: typeof raw.publishedAt === 'string' && raw.publishedAt.trim() ? raw.publishedAt.trim() : '',
     title: typeof raw.title === 'string' && raw.title.trim() ? raw.title.trim() : '',
+    ...(typeof raw.titleEn === 'string' && raw.titleEn.trim() ? { titleEn: raw.titleEn.trim() } : {}),
+    ...(typeof raw.textEn === 'string' && raw.textEn.trim() ? { textEn: raw.textEn.trim() } : {}),
   };
 }
 
@@ -78,12 +80,7 @@ function liveNotices(raw, now = Date.now()) {
     if (!normalized) continue;
     out.push({
       id: typeof item.id === 'string' && item.id.trim() ? item.id.trim() : '',
-      title: typeof item.title === 'string' && item.title.trim() ? item.title.trim() : '',
-      publishedAt: typeof item.publishedAt === 'string' && item.publishedAt.trim() ? item.publishedAt.trim() : '',
-      text: normalized.text,
-      kind: normalized.kind,
-      startsAt: normalized.startsAt,
-      expiresAt: normalized.expiresAt,
+      title: '', publishedAt: '', ...normalized,
     });
   }
   return out;
@@ -109,8 +106,10 @@ function nextNoticeChangeAt(payload = {}, now = Date.now()) {
 /** An edit to the same notice must become unread again, including announcements. */
 function noticeFingerprint(item) {
   const value = item || {};
-  const content = JSON.stringify([value.id || '', value.title || '', value.text || '', value.kind || '',
-    value.publishedAt || '', value.startsAt || '', value.expiresAt || '']);
+  const fields = [value.id || '', value.title || '', value.text || '', value.kind || '',
+    value.publishedAt || '', value.startsAt || '', value.expiresAt || ''];
+  if (value.titleEn || value.textEn) fields.push(value.titleEn || '', value.textEn || '');
+  const content = JSON.stringify(fields);
   let hash = 2166136261;
   for (let index = 0; index < content.length; index++) hash = Math.imul(hash ^ content.charCodeAt(index), 16777619);
   return `v2:${content.length}:${(hash >>> 0).toString(16)}`;
@@ -155,8 +154,9 @@ function noticeUnreadCount(payload, now = Date.now()) {
 function markNoticesSeen(payload, now = Date.now()) {
   const current = collectNoticeFingerprints(payload, now);
   if (!current.length) return 0;
-  const merged = [...readSeenFingerprints(), ...current];
-  return writeSeenFingerprints([...new Set(merged)]).length;
+  const previous = readSeenFingerprints();
+  const merged = [...new Set([...previous, ...current])];
+  return merged.length === previous.length ? previous.length : writeSeenFingerprints(merged).length;
 }
 
 /**
@@ -169,7 +169,8 @@ function resolveQueryNotice({ announcement, notices, now = Date.now(), consent =
   const banner = normalizeAnnouncement(announcement, now);
   const active = urgent(banner) ? banner : liveNotices(notices, now).find(urgent);
   if (active) {
-    return { tone: active.kind === 'warn' ? 'warn' : 'info', text: active.text, source: 'announcement', kind: active.kind };
+    return { tone: active.kind === 'warn' ? 'warn' : 'info', text: active.text,
+      ...(active.textEn ? { textEn: active.textEn } : {}), source: 'announcement', kind: active.kind };
   }
   if (consent && consent.anyBlocked) {
     const names = (consent.blocked || []).map(item => item.title).join('、') || '微信提醒';

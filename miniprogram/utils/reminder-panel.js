@@ -1,3 +1,4 @@
+const languageUI = require('./language');
 const { subscribeSubscriptions } = require('./store');
 const { restockSubscription, soldoutSubscription, canRemind } = require('./reminder-readiness');
 const { getAuthorizationState, subscribeAuthorizationState, requestReminderAuthorization, syncPendingAuthorization, whenAuthorizationReady, consentLockState, refreshConsentSetting, refreshConsentSettingAsync, showConsentSettingsGuide, buildConsentReport, openSubscribeSettings, getConsentSetting } = require('./reminder-credits');
@@ -154,7 +155,7 @@ const reminderPanelMethods = {
     if (!accountMatches(this)) { toast('正在确认账户，请稍后再试'); return Promise.resolve(); }
     const tmplIds = this.data.boot.requestIds || this.data.boot.templateIds || [];
     if (!tmplIds.length) {
-      wx.showModal({ title: '提醒暂未开放', content: this.data.boot.notificationReason || '尚未配置可用的订阅消息模板。可在关注页查看已有观测，页面可见时约每分钟刷新。', showCancel: false });
+      languageUI.modal({ title: '提醒暂未开放', content: this.data.boot.notificationReason || '尚未配置可用的订阅消息模板。可在关注页查看已有观测，页面可见时约每分钟刷新。', showCancel: false });
       return Promise.resolve();
     }
     if (!canRemind(this.data.boot)) { this.showMemberModal(); return Promise.resolve(); }

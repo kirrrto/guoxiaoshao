@@ -1,3 +1,4 @@
+const languageUI = require('./language');
 const { VERSION } = require('../config/version');
 
 // Every programmatic navigation shares this lock, including links outside the
@@ -86,7 +87,7 @@ function navigate(method, options = {}) {
     reportFailure(context, error, options.url);
     if (typeof options.fail === 'function') invoke(options.fail, error);
     else {
-      try { wx.showToast({ title: '页面切换未完成，请重试', icon: 'none' }); }
+      try { languageUI.toast({ title: '页面切换未完成，请重试', icon: 'none' }); }
       catch (_) { /* A failing native bridge must still release the lock. */ }
     }
   };

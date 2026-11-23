@@ -1,3 +1,4 @@
+const languageUI = require('../../utils/language');
 const navigation = require('../../utils/navigation');
 const { canQuery, canMonitor } = require('../../utils/product-capabilities');
 const { call, newId, showError, toast } = require('../../utils/api');
@@ -135,7 +136,7 @@ function presentFollowTargets(follows) {
     })), []);
 }
 
-Page({
+Page(require('../../utils/language').page('query', {
   data: {
     networkOffline: false,
     ready: false,
@@ -306,6 +307,7 @@ Page({
   },
 
   onHide() {
+    clearTimeout(this.pickupExpiryTimer);
     releaseTabBar(this);
     this.visible = false;
     clearTimeout(this.noticeTimer);
@@ -314,6 +316,7 @@ Page({
   },
 
   onUnload() {
+    clearTimeout(this.pickupExpiryTimer);
     releaseTabBar(this);
     stopProgress(this);
     this.pageRetired = true;
@@ -352,11 +355,21 @@ Page({
     // Re-evaluate a saved observation locally. Reading it must never perform
     // another charged query or replace its original observation timestamp.
     if (this.querySnapshot && this.data.result) {
-      this.setData({ 'result.results': presentResults(this.querySnapshot, this.catalog) });
+      const rows = presentResults(this.querySnapshot, this.catalog);
+      this.setData({ 'result.results': rows });
+      this.schedulePickupExpiry(rows);
     }
     if (!refreshActions || this.accountVerificationPending) return;
     this.refreshStoreChoices();
     this.refreshJourney();
+  },
+
+  schedulePickupExpiry(rows) {
+    clearTimeout(this.pickupExpiryTimer);
+    const next = fmt.pickupExpiry(rows);
+    if (this.visible && !this.pageRetired && Number.isFinite(next)) {
+      this.pickupExpiryTimer = setTimeout(() => this.refreshQuerySnapshot(), Math.max(1, next - Date.now()));
+    }
   },
 
   beginAccountVerification() {
@@ -1063,6 +1076,7 @@ Page({
       this.setData({ result, resultIsCache: false, liveResultRestricted: true, nextAction: null, evidenceCard: null, resultTargetDifferent: resultHasDifferentTarget(result, this.selection), ...balancePatch, restriction: queryNotice(response), queryFailureMessage: '', acceptedStoreNumbers: [], alternativeNotice: '' });
       this.refreshStoreChoices();
       this.refreshJourney();
+      this.schedulePickupExpiry(result.results);
       writeSession(localKey(RESULT_KEY), { ...response, accountUserKey: accountUserKey || null });
       if (response.refunded) toast(response.ok && (response.allShared || response.billingReason === 'shared_result_no_charge') ? '已展示最近核实的结果，本次未扣次' : '本次未取得有效结果，已返还次数');
       if (response.ok && result.results.length) { confirmTap(); this.focusQueryResult(focus); }
@@ -1139,7 +1153,7 @@ Page({
       app.globalData.pendingMemberFollow = intent;
       const discard = () => { if (app.globalData.pendingMemberFollow === intent) app.globalData.pendingMemberFollow = null; };
       const visibility = this.visibilityEpoch;
-      wx.showModal({ title: '关注与到货提醒为会员专属', content: '开通后，请确认门店并保存关注。接收微信提醒还需授权。各套餐名额可在下一页查看。', confirmText: '去开通',
+      languageUI.modal({ title: '关注与到货提醒为会员专属', content: '开通后，请确认门店并保存关注。接收微信提醒还需授权。各套餐名额可在下一页查看。', confirmText: '去开通',
         success: r => {
           if (app.globalData.pendingMemberFollow !== intent) return;
           const current = this.accountSnapshot && this.accountSnapshot.identity;
@@ -1161,4 +1175,4 @@ Page({
     this.setData({ loadError: null });
     this.onLoad();
   },
-});
+}));

@@ -1,7 +1,7 @@
 'use strict';
 const { fetchPickup } = require('../apple-pickup');
 const { isCtoPartNumber } = require('../rules/product-target');
-const { findMarket } = require('../markets');
+const { findMarket, findMarketProduct } = require('../markets');
 
 // Only requests for the same storefront contend on the same budget documents.
 // A slow regional transaction must not delay other storefronts in this instance.
@@ -39,7 +39,7 @@ async function guardedPickup({ repo, config, clock, fetchImpl, storeNumber, part
     const flags = source === 'auto' ? config.internationalMonitoring : config.internationalMarkets;
     if (!site || flags?.[market] !== true) return denied('market_disabled', 0);
     if (!site.stores.some(store => store.storeNumber === storeNumber) || !Array.isArray(partNumbers) || !partNumbers.length
-      || partNumbers.some(part => !site.products.some(product => product.partNumber === part))) return denied('invalid_market_target', 0);
+      || partNumbers.some(part => !findMarketProduct(market, part)?.[source === 'auto' ? 'monitorSupported' : 'querySupported'])) return denied('invalid_market_target', 0);
   }
   if (!products && partNumbers.some(isCtoPartNumber)) products = await repo.getProducts(partNumbers.filter(isCtoPartNumber));
   const autoShare = Math.min(0.95, Math.max(0.01, (config.collector.autoSharePercent || 80) / 100));

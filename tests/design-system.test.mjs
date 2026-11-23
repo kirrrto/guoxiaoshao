@@ -121,7 +121,7 @@ test('space, shape and depth come from the scale', () => {
     value => parts(value).every(part => /^(?:0|inherit|\d+(?:\.\d+)?%|var\(--radius-(?:tray|control|tile|pill)\))$/.test(part))), [],
   'border-radius uses --radius-* tokens');
   assert.deepEqual(violations(everyDeclaration.filter(item => item.property === 'box-shadow'),
-    value => /^(?:none|var\(--(?:shadow-sheet|ping-from|ping-to)\))$/.test(value)), [], 'trays cast no shadow; only the sheet does');
+    value => /^(?:none|var\(--shadow-sheet\))$/.test(value)), [], 'trays cast no shadow; only the sheet does');
   const all = styles.map(file => [file, stripComments(read(file))]);
   for (const [file, css] of all) {
     assert.doesNotMatch(css, /\d(?:rpx)\b/, `${file}: sizes are px tokens, not rpx`);
@@ -197,5 +197,7 @@ test('motion is limited to state changes and stops for reduced motion', () => {
   assert.deepEqual(animated, ['styles/common.wxss · .ui-reveal', 'styles/common.wxss · .skeleton-line, .skeleton-bar', 'styles/common.wxss · .ui-live-dot']);
   const guarded = common.slice(common.indexOf('@media (prefers-reduced-motion: no-preference)'));
   for (const name of ['.ui-reveal', '.skeleton-line', '.ui-live-dot']) assert.ok(guarded.includes(name), `${name} animates only without a reduced-motion preference`);
-  assert.doesNotMatch(common, /animation:[^;]*infinite/);
+  const looping = rules(common).filter(rule => rule.declarations.some(([property,value]) => property === 'animation' && value.includes('infinite')));
+  assert.deepEqual(looping.map(rule => rule.selector), ['.ui-live-dot']);
+  assert.match(guarded, /\.ui-live-dot\s*\{\s*animation:\s*stock-breathe 2\.8s ease-in-out infinite/);
 });

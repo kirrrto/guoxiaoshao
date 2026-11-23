@@ -26,6 +26,7 @@ let bootstrapPromise = null;
 let bootstrapGeneration = 0;
 let verifiedBootstrapGeneration = -1;
 let bootstrapFetchedAt = 0;
+let serverClock = null;
 let latestQuota = null;
 let quotaOwner = null;
 // A query returns only balance + revision, not signin/task metadata. Track it
@@ -50,6 +51,7 @@ let followGeneration = 0;
 
 function invalidateFollows() { if (typeof resetPendingReads === 'function') resetPendingReads(); followGeneration += 1; followSnapshot = null; followPromise = null; }
 function resetSession() {
+  serverClock = null;
   if (typeof resetPendingReads === 'function') resetPendingReads();
   invalidateBootstrap(); invalidateFollows();
   try { require('./conversion-events').configure(null); }
@@ -103,6 +105,7 @@ async function refreshBootstrap() {
       data = { ...data, quota: currentQuota() };
     }
     app.globalData.bootstrap = data; bootstrapFetchedAt = Date.now();
+    serverClock = { owner, at: Date.parse(data.serverTime), received: bootstrapFetchedAt };
     verifiedBootstrapGeneration = generation;
     try { require('./conversion-events').configure(data); }
     catch (error) { console.error('[gxs] conversion configuration', error); }
@@ -114,6 +117,11 @@ async function refreshBootstrap() {
   bootstrapPromise = pending;
   try { return await pending; }
   finally { if (bootstrapPromise === pending) bootstrapPromise = null; }
+}
+
+function bootstrapNow(boot, localNow = Date.now()) {
+  return serverClock && boot?.identity?.userKey === serverClock.owner && Number.isFinite(serverClock.at)
+    ? serverClock.at + (localNow - serverClock.received) : localNow;
 }
 
 function quotaAccountMatches(owner) {
@@ -239,12 +247,13 @@ function subscribeQuota(listener) {
 async function getBootstrap({ force = false } = {}) {
   const app = getApp();
   const cached = app.globalData.bootstrap;
-  const now = Date.now();
+  const localNow = Date.now(), now = bootstrapNow(cached, localNow);
   const beijingDay = new Date(now + 8 * 3600000).toISOString().slice(0, 10);
-  const expiry = cached && cached.membership && Date.parse(cached.membership.expiresAt);
-  const expired = cached && cached.membership && cached.membership.active && Number.isFinite(expiry) && now >= expiry;
+  const member = cached?.membership;
+  const tierExpiry = member?.planId === 'member_365d' ? member.annualExpiresAt : member?.planId === 'member_30d' ? member.enhancedExpiresAt : null;
+  const expired = member?.active && [member.expiresAt, tierExpiry].some(value => Date.parse(value) <= now);
   const changedDay = cached && cached.quota && cached.quota.dayKey && cached.quota.dayKey !== beijingDay;
-  if (!force && cached && now - bootstrapFetchedAt < BOOTSTRAP_TTL_MS && !expired && !changedDay) return cached;
+  if (!force && cached && localNow - bootstrapFetchedAt < BOOTSTRAP_TTL_MS && !expired && !changedDay) return cached;
   if (!force && bootstrapPromise) return bootstrapPromise;
   return refreshBootstrap();
 }
@@ -429,4 +438,4 @@ async function getCatalog({ force = false } = {}) {
   return catalog;
 }
 
-module.exports = { getBootstrap, refreshBootstrap, invalidateBootstrap, quotaAccountMatches, publishSettings, publishQuota, publishQueryBalance, currentQuota, subscribeQuota, publishSubscriptions, subscribeSubscriptions, getQuotaGeneration, getCatalog, refreshCatalog, currentCatalog, subscribeCatalog, getFollows, invalidateFollows, resetSession, CATEGORY_NAME };
+module.exports = { bootstrapNow, getBootstrap, refreshBootstrap, invalidateBootstrap, quotaAccountMatches, publishSettings, publishQuota, publishQueryBalance, currentQuota, subscribeQuota, publishSubscriptions, subscribeSubscriptions, getQuotaGeneration, getCatalog, refreshCatalog, currentCatalog, subscribeCatalog, getFollows, invalidateFollows, resetSession, CATEGORY_NAME };

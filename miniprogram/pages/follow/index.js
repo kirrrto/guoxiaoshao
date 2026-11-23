@@ -1,3 +1,4 @@
+const languageUI = require('../../utils/language');
 const navigation = require('../../utils/navigation');
 const { reminderPanelMethods } = require('../../utils/reminder-panel');
 const { productThumbnailUrl } = require('../../utils/product-image-fit');
@@ -241,7 +242,7 @@ function confirmsSavedFollow(follow, payload) {
   return actual.length === expected.length && actual.every((number, index) => number === expected[index]);
 }
 
-Page({
+Page(require('../../utils/language').page('follow', {
   ...reminderPanelMethods,
   data: {
     deadlines: [],
@@ -418,21 +419,28 @@ Page({
   stopObservationClock() {
     if (this.observationTimer) clearTimeout(this.observationTimer);
     this.observationTimer = null;
+    this.nextObservationClock = null;
   },
 
   startObservationClock() {
-    if (this.observationTimer || this.pageRetired || !this.visible || !this.data.follows.length) return;
+    if (this.pageRetired || !this.visible || !this.data.follows.length) return;
+    const now = Date.now();
+    const expiry = Math.min(...this.data.follows.map(row => fmt.pickupExpiry(row.stores)));
+    const next = Math.min(now + 30000, expiry);
+    if (this.observationTimer && this.nextObservationClock <= next) return;
+    this.stopObservationClock();
+    this.nextObservationClock = next;
     // This clock only ages local records. A disconnected phone or a long
     // network retry delay must never leave a once-fresh stock badge fresh.
     this.observationTimer = setTimeout(() => {
       this.observationTimer = null;
       if (this.pageRetired || !this.visible) return;
-      if (!this.lastLocalPresentationAt || Date.now() - this.lastLocalPresentationAt >= 1000) {
+      if (Date.now() >= expiry || !this.lastLocalPresentationAt || Date.now() - this.lastLocalPresentationAt >= 1000) {
         this.refreshFollowPresentation();
         this.lastLocalPresentationAt = Date.now();
       }
       this.startObservationClock();
-    }, 30000);
+    }, Math.max(1, next - now));
   },
 
   retireLiveRead() {
@@ -928,7 +936,7 @@ Page({
 
   onServiceDetails() {
     const { collector, delivery } = this.data;
-    wx.showModal({ title: '检测与消息服务', content: `${collector.label}\n${collector.detail}${collector.updatedText ? '\n最近状态：' + collector.updatedText : ''}${collector.batchText ? '\n最近检测：' + collector.batchText : ''}\n\n${delivery.label}\n${delivery.detail}\n\n页面可见且联网时，通常每 30 秒读取一次已有记录；读取失败时会逐步延后重试。后台采集速度与页面刷新不同，请查看各门店的实际观测时间。`, showCancel: false });
+    languageUI.modal({ title: '检测与消息服务', content: `${collector.label}\n${collector.detail}${collector.updatedText ? '\n最近状态：' + collector.updatedText : ''}${collector.batchText ? '\n最近检测：' + collector.batchText : ''}\n\n${delivery.label}\n${delivery.detail}\n\n页面可见且联网时，通常每 30 秒读取一次已有记录；读取失败时会逐步延后重试。后台采集速度与页面刷新不同，请查看各门店的实际观测时间。`, showCancel: false });
   },
 
   openEditor({ followId, pickerValue, isNew }) {
@@ -946,7 +954,7 @@ Page({
 
   showMemberModal() {
     const product = this.data.boot.memberProduct || {};
-    wx.showModal({
+    languageUI.modal({
       title: '关注与到货提醒为会员专属',
       content: `周卡 3 个配置、每配置 3 家门店；月卡 4 个配置、每配置 4 家门店；年卡 5 个配置、每配置 5 家门店。会员可累加到货和断货提醒次数。免费用户可用查询次数实时看货。${product.paymentReady ? '' : '\n\n会员购买暂未开放，可在「我的」查看状态。'}`,
       confirmText: '前往我的',
@@ -962,7 +970,7 @@ Page({
     if (!this.data.boot.member) return this.showMemberModal();
     if (!this.data.followsLoaded) return toast('正在确认已有关注，请稍后再试');
     const saved = this.data.follows.length + this.data.otherMarketCount;
-    if (saved >= this.data.limits.maxFollows) return wx.showModal({
+    if (saved >= this.data.limits.maxFollows) return languageUI.modal({
       title: '配置名额已满', content: `已保存 ${saved} 个配置，当前最多 ${this.data.limits.maxFollows} 个。${this.data.otherMarketCount ? '其他站点的关注共用这些名额。' : ''}暂停的配置也占名额。`,
       confirmText: this.data.otherMarketCount ? '其他站点' : '管理关注', cancelText: '取消',
       success: result => {
@@ -998,7 +1006,7 @@ Page({
     if (sheet && typeof sheet.requestClose === 'function') return sheet.requestClose(dirty);
     if (!dirty) return this.onCancelEdit();
     const epoch = this.editorEpoch;
-    wx.showModal({ title: '放弃这次修改？', content: '已保存的关注不会改变。', confirmText: '放弃修改', cancelText: '继续编辑', success: result => { if (result.confirm && epoch === this.editorEpoch) this.onCancelEdit(); } });
+    languageUI.modal({ title: '放弃这次修改？', content: '已保存的关注不会改变。', confirmText: '放弃修改', cancelText: '继续编辑', success: result => { if (result.confirm && epoch === this.editorEpoch) this.onCancelEdit(); } });
   },
 
   onEditorChange(e) {
@@ -1081,7 +1089,7 @@ Page({
     if (!this.data.boot.templateIds.length || this.data.delivery.cls !== 'ok' || this.data.delivery.overallReady === false) return;
     // showModal's confirm is not a user gesture for wx.requestSubscribeMessage
     // on Android — the dialog stays silent. Point at the real tap button instead.
-    wx.showModal({
+    languageUI.modal({
       title: this.data.subscription.soldoutEnabled ? '开启到货和断货提醒' : '开启补货提醒',
       content: `${this.data.subscription.soldoutEnabled ? '一个按钮同时申请到货和断货提醒；两项都选择「允许」，各增加 1 次。也可以只允许其中一项。' : '每点一次「允许」增加 1 次到货提醒，可以连续授权多次累加。'}建议连续授权累加到 10 次以上。点「补充提醒次数」后，微信会弹出授权。`,
       confirmText: '知道了',
@@ -1150,7 +1158,7 @@ Page({
     if (!quotaAccountMatches(owner)) return;
     const confirmation = { id };
     this.removeConfirmation = confirmation;
-    wx.showModal({
+    languageUI.modal({
       title: '删除关注',
       content: '删除后停止这条关注并释放名额，已产生的历史记录会保留。',
       confirmColor: '#D64545',
@@ -1205,7 +1213,7 @@ Page({
     const stores = current.stores.filter(store => !store.limitPaused && store.observationState === 'fresh' && store.status === 'available');
     this.refreshFollowPresentation();
     if (!stores.length) return toast('这条记录已过期，当前取货情况待确认');
-    wx.showModal({ title: '最近观测可取货', content: `${follow.productTitle}\n${stores.map(store => `${store.storeLabel}\n观测 ${store.observedText}${typeof store.quote === 'string' && store.quote ? '\n' + store.quote : ''}`).join('\n\n')}\n\n库存可能变化，请在 Apple Store App 或官网确认。`, confirmText: '复制配置', cancelText: '返回', success: result => {
+    languageUI.modal({ title: '最近观测可取货', content: `${follow.productTitle}\n${stores.map(store => `${store.storeLabel}\n观测 ${store.observedText}${typeof store.quote === 'string' && store.quote ? '\n' + store.quote : ''}`).join('\n\n')}\n\n库存可能变化，请在 Apple Store App 或官网确认。`, confirmText: '复制配置', cancelText: '返回', success: result => {
       if (result.confirm && !this.pageRetired) wx.setClipboardData({ data: `${follow.productTitle}\n型号：${follow.partNumber}\n门店：${stores.map(store => store.storeLabel).join('、')}`, success: () => toast('已复制型号和门店'), fail: () => toast('复制失败，请重试') });
     } });
   },
@@ -1299,4 +1307,4 @@ Page({
   },
   onRetryDeadlines() { return this.loadDeadlines(); },
   onOpenInventory() { switchToTab({ url: '/pages/query/index' }); },
-});
+}));

@@ -1,159 +1,160 @@
+<wxs module="i18n" src="../../i18n/render.wxs" />
 <page-meta page-style="color-scheme:{{_themeMode || 'light'}};{{sheetVisible ? 'overflow:hidden;' : ''}}" />
 <view class="page history-page">
-  <view wx:if="{{networkOffline}}" class="network-notice" aria-role="status">网络已断开，恢复后自动刷新</view>
+  <view wx:if="{{networkOffline}}" class="network-notice" aria-role="status">{{i18n.t(ui,'网络已断开，恢复后自动刷新')}}</view>
   <view wx:if="{{loadError}}" class="card load-error" aria-role="alert">
-    <view class="load-error-title">暂时没有连上</view>
-    <view class="load-error-detail">{{loadError}}</view>
-    <button class="btn btn-primary btn-block" bindtap="onRetryLoad">重试</button>
+    <view class="load-error-title">{{i18n.t(ui,'暂时没有连上')}}</view>
+    <view class="load-error-detail">{{i18n.t(ui,(loadError))}}</view>
+    <button class="btn btn-primary btn-block" bindtap="onRetryLoad">{{i18n.t(ui,'重试')}}</button>
   </view>
 
   <block wx:elif="{{!ready}}">
-    <view class="page-heading history-heading"><view class="page-title">供应历史</view></view>
+    <view class="page-heading history-heading"><view class="page-title">{{i18n.t(ui,'供应历史')}}</view></view>
     <view class="skeleton" aria-busy="true">
       <view class="skeleton-card"><view class="skeleton-line skeleton-title"></view><view class="skeleton-line"></view><view class="skeleton-line skeleton-short"></view><view class="skeleton-bar"></view></view>
       <view class="skeleton-card"><view class="skeleton-line skeleton-title"></view><view class="skeleton-line"></view><view class="skeleton-line skeleton-short"></view></view>
-      <view class="loading-line">正在加载商品目录…</view>
+      <view class="loading-line">{{i18n.t(ui,'正在加载商品目录…')}}</view>
     </view>
   </block>
 
   <block wx:else>
-    <view wx:if="{{refreshing || refreshMessage}}" class="refresh-feedback" aria-role="status">{{refreshing ? '正在更新账户与页面…' : refreshMessage}}</view>
-    <view wx:if="{{!accountReady}}" class="banner banner-info">{{accountError || '正在连接微信账户，你可以先选择查询条件。'}}<button wx:if="{{accountError}}" class="btn btn-sm mt" bindtap="onRetryAccount">重试账户连接</button></view>
-    <view class="page-heading history-heading"><view class="page-title">供应历史</view><button class="ui-action ui-action--plain history-explain" hover-class="ui-control-pressed" bindtap="onExplain"><text class="ui-action-label">数据说明</text></button></view>
+    <view wx:if="{{refreshing || refreshMessage}}" class="refresh-feedback" aria-role="status">{{i18n.t(ui,(refreshing ? '正在更新账户与页面…' : refreshMessage))}}</view>
+    <view wx:if="{{!accountReady}}" class="banner banner-info">{{i18n.t(ui,(accountError || '正在连接微信账户，你可以先选择查询条件。'))}}<button wx:if="{{accountError}}" class="btn btn-sm mt" bindtap="onRetryAccount">{{i18n.t(ui,'重试账户连接')}}</button></view>
+    <view class="page-heading history-heading"><view class="page-title">{{i18n.t(ui,'供应历史')}}</view><button class="ui-action ui-action--plain history-explain" hover-class="ui-control-pressed" bindtap="onExplain"><text class="ui-action-label">{{i18n.t(ui,'数据说明')}}</text></button></view>
 
     <!-- 日期、配置与查询操作是同一组条件。 -->
     <view class="card history-selection-card">
-      <view class="history-date-row" aria-label="选择日期，北京时间">
+      <view class="history-date-row" aria-label="{{i18n.t(ui,'选择日期，北京时间')}}">
         <picker class="history-date-picker" disabled="{{querying || loadingMore}}" mode="date" value="{{dayKey}}" start="{{earliestDay}}" end="{{today}}" bindchange="onDateChange">
-          <view class="history-date-control {{querying || loadingMore ? 'history-date-control--disabled' : ''}}" hover-class="history-date-pressed" aria-role="button" aria-label="选择日期，当前{{dayKey}}，北京时间" aria-disabled="{{querying || loadingMore}}">
-            <view class="history-date-line"><text class="history-date-value">{{dayKey}}</text><view class="ui-chevron ui-chevron--down" aria-hidden="true"></view></view>
-            <text class="history-date-caption">北京时间</text>
+          <view class="history-date-control {{querying || loadingMore ? 'history-date-control--disabled' : ''}}" hover-class="history-date-pressed" aria-role="button" aria-label="{{i18n.m(ui,'选择日期，当前{0}，北京时间',[(dayKey)])}}" aria-disabled="{{querying || loadingMore}}">
+            <view class="history-date-line"><text class="history-date-value">{{i18n.t(ui,(dayKey))}}</text><view class="ui-chevron ui-chevron--down" aria-hidden="true"></view></view>
+            <text class="history-date-caption">{{i18n.t(ui,'北京时间')}}</text>
           </view>
         </picker>
-        <view class="history-date-shortcuts" aria-label="快捷选择日期">
-          <button class="history-date-chip {{dayKey === today ? 'history-date-chip--selected' : ''}}" aria-pressed="{{dayKey === today}}" disabled="{{querying || loadingMore}}" bindtap="onQuickDate" data-day="today">今天</button>
-          <button class="history-date-chip {{dayKey === yesterday ? 'history-date-chip--selected' : ''}}" aria-pressed="{{dayKey === yesterday}}" disabled="{{querying || loadingMore}}" bindtap="onQuickDate" data-day="yesterday">昨天</button>
+        <view class="history-date-shortcuts" aria-label="{{i18n.t(ui,'快捷选择日期')}}">
+          <button class="history-date-chip {{dayKey === today ? 'history-date-chip--selected' : ''}}" aria-pressed="{{dayKey === today}}" disabled="{{querying || loadingMore}}" bindtap="onQuickDate" data-day="today">{{i18n.t(ui,'今天')}}</button>
+          <button class="history-date-chip {{dayKey === yesterday ? 'history-date-chip--selected' : ''}}" aria-pressed="{{dayKey === yesterday}}" disabled="{{querying || loadingMore}}" bindtap="onQuickDate" data-day="yesterday">{{i18n.t(ui,'昨天')}}</button>
         </view>
       </view>
       <view wx:if="{{selectionSummary}}" class="history-config-summary">
-        <view class="product-tile history-product-media"><image wx:if="{{selectionSummary.imageDisplayUrl && selectionSummary.imageUrl !== failedSelectionImageUrl}}" class="history-product-image" src="{{selectionSummary.imageDisplayUrl}}" webp="{{true}}" mode="aspectFit" data-src="{{selectionSummary.imageUrl}}" binderror="onSelectionImageError" aria-label="{{selectionSummary.title}}" /><image wx:else class="ui-icon history-product-placeholder" src="/images/ui/device.png" mode="aspectFit" aria-hidden="true" /></view>
-        <view class="history-config-copy"><view class="history-config-title">{{selectionSummary.title}}</view><view class="history-store-scope">{{selectionSummary.scopeText}}</view></view>
-        <button class="ui-action ui-action--plain history-edit" hover-class="ui-control-pressed" disabled="{{querying || loadingMore}}" bindtap="onEditSelection"><text class="ui-action-label">修改</text><view class="ui-chevron" aria-hidden="true"></view></button>
+        <view class="product-tile history-product-media"><image wx:if="{{selectionSummary.imageDisplayUrl && selectionSummary.imageUrl !== failedSelectionImageUrl}}" class="history-product-image" src="{{selectionSummary.imageDisplayUrl}}" webp="{{true}}" mode="aspectFit" data-src="{{selectionSummary.imageUrl}}" binderror="onSelectionImageError" aria-label="{{i18n.t(ui,(selectionSummary.title))}}" /><image wx:else class="ui-icon history-product-placeholder" src="/images/ui/device.png" mode="aspectFit" aria-hidden="true" /></view>
+        <view class="history-config-copy"><view class="history-config-title">{{i18n.t(ui,(selectionSummary.title))}}</view><view class="history-store-scope">{{i18n.t(ui,(selectionSummary.scopeText))}}</view></view>
+        <button class="ui-action ui-action--plain history-edit" hover-class="ui-control-pressed" disabled="{{querying || loadingMore}}" bindtap="onEditSelection"><text class="ui-action-label">{{i18n.t(ui,'修改')}}</text><view class="ui-chevron" aria-hidden="true"></view></button>
       </view>
-      <button wx:else class="btn btn-primary btn-block" hover-class="btn-primary-pressed" bindtap="onEditSelection">选择配置与门店</button>
+      <button wx:else class="btn btn-primary btn-block" hover-class="btn-primary-pressed" bindtap="onEditSelection">{{i18n.t(ui,'选择配置与门店')}}</button>
 
-      <view wx:if="{{queryFailureMessage || restriction}}" class="banner banner-warn mt" aria-role="alert">{{queryFailureMessage || restriction}}</view>
-      <button wx:if="{{!boot.member && boot.balance < boot.historyCost}}" class="btn btn-block mt" hover-class="ui-control-pressed" bindtap="onGoMine">去签到 / 查看次数</button>
+      <view wx:if="{{queryFailureMessage || restriction}}" class="banner banner-warn mt" aria-role="alert">{{i18n.t(ui,(queryFailureMessage || restriction))}}</view>
+      <button wx:if="{{!boot.member && boot.balance < boot.historyCost}}" class="btn btn-block mt" hover-class="ui-control-pressed" bindtap="onGoMine">{{i18n.t(ui,'去签到 / 查看次数')}}</button>
 
       <view wx:if="{{selectionSummary}}" class="history-query-row">
-        <button class="btn btn-primary btn-block history-query-submit {{querying ? 'disabled' : ''}}" hover-class="btn-primary-pressed" loading="{{querying}}" disabled="{{querying || loadingMore || !accountReady || !selectionSummary.valid}}" bindtap="onQuery">{{!accountReady ? '正在连接账户…' : (querying ? '加载中…' : legacyQueryPending ? '核对上次查询' : '查看历史')}}</button>
-        <view wx:if="{{accountReady}}" class="history-query-cost"><text>{{boot.member ? '会员查询不扣次数' : '消耗 ' + boot.historyCost + ' 次 · 余 ' + boot.balance + ' 次'}}</text><text wx:if="{{!boot.member}}"> · 无事件自动退还</text></view>
+        <button class="btn btn-primary btn-block history-query-submit {{querying ? 'disabled' : ''}}" hover-class="btn-primary-pressed" loading="{{querying}}" disabled="{{querying || loadingMore || !accountReady || !selectionSummary.valid}}" bindtap="onQuery">{{i18n.t(ui,(!accountReady ? '正在连接账户…' : (querying ? '加载中…' : legacyQueryPending ? '核对上次查询' : '查看历史')))}}</button>
+        <view wx:if="{{accountReady}}" class="history-query-cost"><text>{{i18n.t(ui,(boot.member ? '会员查询不扣次数' : '消耗 ' + boot.historyCost + ' 次 · 余 ' + boot.balance + ' 次'))}}</text><text wx:if="{{!boot.member}}"> {{i18n.t(ui,'· 无事件自动退还')}}</text></view>
       </view>
-      <view wx:if="{{querying}}" class="request-progress {{requestSlow ? 'request-progress--slow' : ''}}" aria-role="status">{{requestSlow ? requestProgressText : '正在读取所选日期的已记录变化。'}}</view>
+      <view wx:if="{{querying}}" class="request-progress {{requestSlow ? 'request-progress--slow' : ''}}" aria-role="status">{{i18n.t(ui,(requestSlow ? requestProgressText : '正在读取所选日期的已记录变化。'))}}</view>
     </view>
 
-    <view wx:if="{{restoreNotice}}" class="banner {{restoreWarning ? 'banner-warn' : 'banner-info'}}">{{restoreNotice}}</view>
+    <view wx:if="{{restoreNotice}}" class="banner {{restoreWarning ? 'banner-warn' : 'banner-info'}}">{{i18n.t(ui,(restoreNotice))}}</view>
 
     <!-- 结果按实际观测时间排列，同一时刻的多店事件共用时间标签。 -->
     <view wx:if="{{result}}" class="card card-rows-end history-result-card ui-reveal">
-      <view wx:if="{{queryFailureMessage}}" class="banner banner-warn mb">本次查询未完成，下方保留上次查询结果。</view>
-      <view wx:elif="{{resultTargetDifferent}}" class="banner banner-info mb">下方为上次查询结果，当前条件尚未查询。</view>
-      <view class="history-result-heading"><view class="history-data-title">{{result.coverageTitle}}</view><text class="history-result-date">{{result.dayText}}</text></view>
-      <view class="history-result-target">{{result.product.title}}</view>
+      <view wx:if="{{queryFailureMessage}}" class="banner banner-warn mb">{{i18n.t(ui,'本次查询未完成，下方保留上次查询结果。')}}</view>
+      <view wx:elif="{{resultTargetDifferent}}" class="banner banner-info mb">{{i18n.t(ui,'下方为上次查询结果，当前条件尚未查询。')}}</view>
+      <view class="history-result-heading"><view class="history-data-title">{{i18n.t(ui,(result.coverageTitle))}}</view><text class="history-result-date">{{i18n.t(ui,(result.dayText))}}</text></view>
+      <view class="history-result-target">{{i18n.t(ui,(result.product.title))}}</view>
 
       <view wx:if="{{!result.hasEventRecords || result.billingText}}" class="history-data-notice">
-        <view wx:if="{{!result.hasEventRecords}}" class="history-data-detail">{{result.coverageNote}}</view>
-        <view wx:if="{{result.billingText}}" class="history-billing-note history-data-detail">{{result.billingText}}</view>
+        <view wx:if="{{!result.hasEventRecords}}" class="history-data-detail">{{i18n.t(ui,(result.coverageNote))}}</view>
+        <view wx:if="{{result.billingText}}" class="history-billing-note history-data-detail">{{i18n.t(ui,(result.billingText))}}</view>
       </view>
 
-      <view wx:if="{{result.insights.lastRestockText}}" class="history-last-restock">{{result.insights.lastRestockText}}</view>
-      <view wx:if="{{result.latestRestricted}}" class="banner banner-info mt">当前配置处于免费用户新品限制期，本页仅提供所选日期历史，不显示当前库存。</view>
-      <view wx:if="{{result.hasEventRecords}}" class="history-timeline-heading"><text>变化时间轴</text><text class="history-timeline-count">已加载 {{result.events.length}} / {{result.pagination.total}}</text></view>
+      <view wx:if="{{result.insights.lastRestockText}}" class="history-last-restock">{{i18n.t(ui,(result.insights.lastRestockText))}}</view>
+      <view wx:if="{{result.latestRestricted}}" class="banner banner-info mt">{{i18n.t(ui,'当前配置处于免费用户新品限制期，本页仅提供所选日期历史，不显示当前库存。')}}</view>
+      <view wx:if="{{result.hasEventRecords}}" class="history-timeline-heading"><text>{{i18n.t(ui,'变化时间轴')}}</text><text class="history-timeline-count">{{i18n.m(ui,'已加载 {0} / {1}',[(result.events.length),(result.pagination.total)])}}</text></view>
       <view wx:for="{{result.events}}" wx:key="id" class="event">
-        <view wx:if="{{index === 0 || item.timeText === '—' || item.timeText !== result.events[index - 1].timeText}}" class="event-time">{{item.timeText}}</view>
+        <view wx:if="{{index === 0 || item.timeText === '—' || item.timeText !== result.events[index - 1].timeText}}" class="event-time">{{i18n.t(ui,(item.timeText))}}</view>
         <view class="event-body">
-          <view class="event-main"><text class="event-store">{{item.storeName}}</text><text class="event-status event-status--{{item.cls}}">{{item.label}}</text></view>
-          <view class="event-detail" wx:if="{{item.detailText}}">{{item.detailText}}</view>
-          <view class="event-detail event-quote" wx:if="{{item.quote}}">{{item.quote}}</view>
+          <view class="event-main"><text class="event-store">{{i18n.t(ui,(item.storeName))}}</text><text class="event-status event-status--{{item.cls}}">{{i18n.t(ui,(item.label))}}</text></view>
+          <view class="event-detail" wx:if="{{item.detailText}}">{{i18n.t(ui,(item.detailText))}}</view>
+          <view class="event-detail event-quote" wx:if="{{item.quote}}">{{i18n.t(ui,(item.quote))}}</view>
         </view>
       </view>
-      <view wx:if="{{moreError}}" class="banner banner-warn mt">{{moreError}}</view>
-      <button wx:if="{{result.pagination.hasMore}}" class="btn btn-block mt" hover-class="ui-control-pressed" disabled="{{loadingMore}}" bindtap="onLoadMore">{{loadingMore ? '加载中…' : '加载更多（不额外扣次）'}}</button>
+      <view wx:if="{{moreError}}" class="banner banner-warn mt">{{i18n.t(ui,(moreError))}}</view>
+      <button wx:if="{{result.pagination.hasMore}}" class="btn btn-block mt" hover-class="ui-control-pressed" disabled="{{loadingMore}}" bindtap="onLoadMore">{{i18n.t(ui,(loadingMore ? '加载中…' : '加载更多（不额外扣次）'))}}</button>
 
-      <button class="ui-disclosure history-disclosure" hover-class="ui-control-pressed" bindtap="onToggleCoverage" aria-expanded="{{coverageExpanded}}"><text class="ui-disclosure-label">统计与观测凭据</text><view class="ui-chevron {{coverageExpanded ? 'ui-chevron--up' : 'ui-chevron--down'}}" aria-hidden="true"></view></button>
+      <button class="ui-disclosure history-disclosure" hover-class="ui-control-pressed" bindtap="onToggleCoverage" aria-expanded="{{coverageExpanded}}"><text class="ui-disclosure-label">{{i18n.t(ui,'统计与观测凭据')}}</text><view class="ui-chevron {{coverageExpanded ? 'ui-chevron--up' : 'ui-chevron--down'}}" aria-hidden="true"></view></button>
       <view wx:if="{{coverageExpanded}}" class="history-coverage ui-reveal">
-        <view wx:if="{{result.hasEventRecords}}" class="small text-2">{{result.coverageNote}}</view>
-        <view class="small text-2">{{result.coverageSummary}}</view>
+        <view wx:if="{{result.hasEventRecords}}" class="small text-2">{{i18n.t(ui,(result.coverageNote))}}</view>
+        <view class="small text-2">{{i18n.t(ui,(result.coverageSummary))}}</view>
         <view class="history-insights">
-          <view class="bold">当天记录速览</view>
-          <view class="small text-2 mt">{{result.insights.scopeText}}</view>
-          <view class="small mt">{{result.insights.recordedText}}</view>
-          <view class="tiny muted mt">{{result.insights.pageText}}</view>
+          <view class="bold">{{i18n.t(ui,'当天记录速览')}}</view>
+          <view class="small text-2 mt">{{i18n.t(ui,(result.insights.scopeText))}}</view>
+          <view class="small mt">{{i18n.t(ui,(result.insights.recordedText))}}</view>
+          <view class="tiny muted mt">{{i18n.t(ui,(result.insights.pageText))}}</view>
           <view wx:if="{{result.insights.timeBands.length}}" class="history-time-bands">
-            <view wx:for="{{result.insights.timeBands}}" wx:key="label" class="history-time-band"><text class="bold">{{item.count}} 条</text><text class="tiny muted">{{item.label}}</text></view>
+            <view wx:for="{{result.insights.timeBands}}" wx:key="label" class="history-time-band"><text class="bold">{{i18n.m(ui,'{0} 条',[(item.count)])}}</text><text class="tiny muted">{{i18n.t(ui,(item.label))}}</text></view>
           </view>
-          <view wx:if="{{result.insights.noRestockText}}" class="tiny muted mt">{{result.insights.noRestockText}}</view>
-          <view class="tiny muted mt">{{result.insights.sampleWindowText}}</view>
+          <view wx:if="{{result.insights.noRestockText}}" class="tiny muted mt">{{i18n.t(ui,(result.insights.noRestockText))}}</view>
+          <view class="tiny muted mt">{{i18n.t(ui,(result.insights.sampleWindowText))}}</view>
         </view>
 
-        <view wx:if="{{result.hasEventRecords}}" class="section-label">已记录事件统计</view>
+        <view wx:if="{{result.hasEventRecords}}" class="section-label">{{i18n.t(ui,'已记录事件统计')}}</view>
         <view wx:if="{{result.hasEventRecords}}" class="stat-row">
-          <view class="stat"><view class="num">{{result.summary.available}}</view><view class="lbl">首次可取货</view></view>
-          <view class="stat"><view class="num">{{result.summary.restocks}}</view><view class="lbl">确认补货</view></view>
-          <view class="stat"><view class="num">{{result.summary.recoveries}}</view><view class="lbl">恢复</view></view>
-          <view class="stat"><view class="num">{{result.summary.ended}}</view><view class="lbl">供应结束</view></view>
+          <view class="stat"><view class="num">{{i18n.t(ui,(result.summary.available))}}</view><view class="lbl">{{i18n.t(ui,'首次可取货')}}</view></view>
+          <view class="stat"><view class="num">{{i18n.t(ui,(result.summary.restocks))}}</view><view class="lbl">{{i18n.t(ui,'确认补货')}}</view></view>
+          <view class="stat"><view class="num">{{i18n.t(ui,(result.summary.recoveries))}}</view><view class="lbl">{{i18n.t(ui,'恢复')}}</view></view>
+          <view class="stat"><view class="num">{{i18n.t(ui,(result.summary.ended))}}</view><view class="lbl">{{i18n.t(ui,'供应结束')}}</view></view>
         </view>
-        <view wx:if="{{result.hasEventRecords && result.lastHour !== null}}" class="small text-2 mt">{{(result.lastHourComplete ? '' : '已加载记录中，') + result.lastHourWindowText + '记录到确认补货 ' + result.lastHour + ' 次'}}</view>
+        <view wx:if="{{result.hasEventRecords && result.lastHour !== null}}" class="small text-2 mt">{{i18n.t(ui,((result.lastHourComplete ? '' : '已加载记录中，') + result.lastHourWindowText + '记录到确认补货 ' + result.lastHour + ' 次'))}}</view>
 
-        <view wx:if="{{result.coverageCheckedText}}" class="tiny muted mt">采样摘要单独更新于 {{result.coverageCheckedText}}</view>
+        <view wx:if="{{result.coverageCheckedText}}" class="tiny muted mt">{{i18n.m(ui,'采样摘要单独更新于 {0}',[(result.coverageCheckedText)])}}</view>
         <view wx:for="{{result.coverageStores}}" wx:key="storeNumber" class="history-coverage-row">
-          <view class="bold">{{item.storeName}}</view>
-          <view class="small text-2">有效 {{item.knownCount}} 次 · 未确认 {{item.unknownCount}} 次</view>
-          <view class="tiny muted">首末观测 {{item.rangeText}}</view>
+          <view class="bold">{{i18n.t(ui,(item.storeName))}}</view>
+          <view class="small text-2">{{i18n.m(ui,'有效 {0} 次 · 未确认 {1} 次',[(item.knownCount),(item.unknownCount)])}}</view>
+          <view class="tiny muted">{{i18n.m(ui,'首末观测 {0}',[(item.rangeText)])}}</view>
         </view>
       </view>
     </view>
 
     <view wx:if="{{taskMessage || (accountReady && boot && boot.taskAvailable)}}" class="history-task-bar">
-      <text class="history-task-note">{{taskMessage || ('今日浏览本页可领 +' + boot.taskReward + ' 次查询额度')}}</text>
-      <button wx:if="{{accountReady && boot && boot.taskAvailable}}" class="btn btn-sm history-task-claim" hover-class="ui-control-pressed" loading="{{taskClaimLoading}}" disabled="{{browseLoading || taskClaimLoading}}" bindtap="onClaimTask">{{taskClaimLoading ? '领取中…' : (browseLoading ? '确认中…' : '领取奖励')}}</button>
+      <text class="history-task-note">{{i18n.t(ui,(taskMessage || ('今日浏览本页可领 +' + boot.taskReward + ' 次查询额度')))}}</text>
+      <button wx:if="{{accountReady && boot && boot.taskAvailable}}" class="btn btn-sm history-task-claim" hover-class="ui-control-pressed" loading="{{taskClaimLoading}}" disabled="{{browseLoading || taskClaimLoading}}" bindtap="onClaimTask">{{i18n.t(ui,(taskClaimLoading ? '领取中…' : (browseLoading ? '确认中…' : '领取奖励')))}}</button>
     </view>
-    <view wx:if="{{taskClaimError}}" class="banner banner-warn" aria-role="alert">{{taskClaimError}}</view>
-    <view wx:if="{{browseError && !browseExpanded}}" class="banner banner-warn">{{browseError}}<button class="btn btn-sm mt" disabled="{{browseLoading}}" bindtap="onRetryBrowse">重新加载浏览记录</button></view>
+    <view wx:if="{{taskClaimError}}" class="banner banner-warn" aria-role="alert">{{i18n.t(ui,(taskClaimError))}}</view>
+    <view wx:if="{{browseError && !browseExpanded}}" class="banner banner-warn">{{i18n.t(ui,(browseError))}}<button class="btn btn-sm mt" disabled="{{browseLoading}}" bindtap="onRetryBrowse">{{i18n.t(ui,'重新加载浏览记录')}}</button></view>
 
     <view class="card card-list history-tools-card">
       <view wx:if="{{result && result.latest.length}}" class="history-latest-card">
-        <button class="ui-disclosure" bindtap="onToggleLatest" hover-class="ui-control-pressed" aria-expanded="{{latestExpanded}}"><text class="ui-disclosure-label">所选门店最近观测</text><view class="ui-chevron {{latestExpanded ? 'ui-chevron--up' : 'ui-chevron--down'}}" aria-hidden="true"></view></button>
+        <button class="ui-disclosure" bindtap="onToggleLatest" hover-class="ui-control-pressed" aria-expanded="{{latestExpanded}}"><text class="ui-disclosure-label">{{i18n.t(ui,'所选门店最近观测')}}</text><view class="ui-chevron {{latestExpanded ? 'ui-chevron--up' : 'ui-chevron--down'}}" aria-hidden="true"></view></button>
         <view wx:if="{{latestExpanded}}" class="history-latest-panel">
-          <view class="latest-service"><text class="small text-2">服务当前状态</text><view class="pill pill-dot pill-{{collector.cls}}">{{collector.label}}</view></view>
+          <view class="latest-service"><text class="small text-2">{{i18n.t(ui,'服务当前状态')}}</text><view class="pill pill-dot pill-{{collector.cls}}">{{i18n.t(ui,(collector.label))}}</view></view>
           <view wx:for="{{result.latest}}" wx:key="storeNumber" class="latest-row">
             <view class="latest-copy">
-              <text class="bold">{{item.storeName}}</text>
-              <view wx:if="{{item.observedText}}" class="latest-meta">{{item.observedText}}<text wx:if="{{item.sinceText}}"> · 距本轮首次记录 {{item.sinceText}}</text></view>
-              <view wx:if="{{item.observationNote}}" class="latest-meta">{{item.observationNote}}</view>
-              <view wx:if="{{item.lastKnownText}}" class="latest-meta">{{item.lastKnownText}}</view>
-              <view wx:if="{{item.freshnessText}}" class="latest-meta {{item.observationState === 'fresh' ? '' : 'stale-note'}}">{{item.freshnessText}}</view>
+              <text class="bold">{{i18n.t(ui,(item.storeName))}}</text>
+              <view wx:if="{{item.observedText}}" class="latest-meta">{{i18n.t(ui,(item.observedText))}}<text wx:if="{{item.sinceText}}"> {{i18n.m(ui,'· 距本轮首次记录 {0}',[(item.sinceText)])}}</text></view>
+              <view wx:if="{{item.observationNote}}" class="latest-meta">{{i18n.t(ui,(item.observationNote))}}</view>
+              <view wx:if="{{item.lastKnownText}}" class="latest-meta">{{i18n.t(ui,(item.lastKnownText))}}</view>
+              <view wx:if="{{item.freshnessText}}" class="latest-meta {{item.observationState === 'fresh' ? '' : 'stale-note'}}">{{i18n.t(ui,(item.freshnessText))}}</view>
             </view>
-            <view class="pill pill-dot pill-{{item.observationState === 'fresh' && item.status === 'unavailable' ? 'muted' : item.statusCls}}">{{item.statusLabel}}</view>
+            <view class="pill pill-dot pill-{{item.observationState === 'fresh' && item.status === 'unavailable' ? 'muted' : item.statusCls}}">{{i18n.t(ui,(item.statusLabel))}}</view>
           </view>
         </view>
       </view>
       <view class="history-browse-card">
-        <button class="ui-disclosure" hover-class="ui-control-pressed" bindtap="onToggleBrowse" aria-expanded="{{browseExpanded}}"><text class="ui-disclosure-label">恢复最近浏览条件</text><view class="ui-chevron {{browseExpanded ? 'ui-chevron--up' : 'ui-chevron--down'}}" aria-hidden="true"></view></button>
+        <button class="ui-disclosure" hover-class="ui-control-pressed" bindtap="onToggleBrowse" aria-expanded="{{browseExpanded}}"><text class="ui-disclosure-label">{{i18n.t(ui,'恢复最近浏览条件')}}</text><view class="ui-chevron {{browseExpanded ? 'ui-chevron--up' : 'ui-chevron--down'}}" aria-hidden="true"></view></button>
         <view wx:if="{{browseExpanded}}" class="history-browse-panel">
-          <view wx:if="{{browseLoading && !browse}}" class="small muted">正在加载浏览记录…</view>
+          <view wx:if="{{browseLoading && !browse}}" class="small muted">{{i18n.t(ui,'正在加载浏览记录…')}}</view>
           <block wx:if="{{browse}}">
-            <view wx:if="{{!browse.recentViews.length}}" class="small text-2">还没有浏览记录</view>
-            <view wx:for="{{browse.recentViews}}" wx:key="index" class="history-recent"><view class="history-recent-copy"><view>{{item.title}}</view><view class="latest-meta">{{item.dayKey}} · {{item.scopeText}}</view></view><button class="ui-action history-restore" hover-class="ui-control-pressed" data-index="{{index}}" disabled="{{querying || loadingMore}}" bindtap="onRestoreBrowse"><text class="ui-action-label">恢复条件</text></button></view>
+            <view wx:if="{{!browse.recentViews.length}}" class="small text-2">{{i18n.t(ui,'还没有浏览记录')}}</view>
+            <view wx:for="{{browse.recentViews}}" wx:key="index" class="history-recent"><view class="history-recent-copy"><view>{{i18n.t(ui,(item.title))}}</view><view class="latest-meta">{{i18n.m(ui,'{0} · {1}',[(item.dayKey),(item.scopeText)])}}</view></view><button class="ui-action history-restore" hover-class="ui-control-pressed" data-index="{{index}}" disabled="{{querying || loadingMore}}" bindtap="onRestoreBrowse"><text class="ui-action-label">{{i18n.t(ui,'恢复条件')}}</text></button></view>
           </block>
-          <view wx:if="{{browseError}}" class="banner banner-warn mt">{{browseError}}<button class="btn btn-sm mt" disabled="{{browseLoading}}" bindtap="onRetryBrowse">重新加载</button></view>
+          <view wx:if="{{browseError}}" class="banner banner-warn mt">{{i18n.t(ui,(browseError))}}<button class="btn btn-sm mt" disabled="{{browseLoading}}" bindtap="onRetryBrowse">{{i18n.t(ui,'重新加载')}}</button></view>
         </view>
       </view>
     </view>
   </block>
 </view>
 
-<config-sheet id="history-config-sheet" visible="{{sheetVisible}}" title="选择历史查询条件" subtitle="保存选择不会扣次" confirm-text="保存选择" summary="{{draftSummary}}" dirty="{{draftDirty}}" external-close="{{true}}" bindconfirm="onDoneSelection" bindrequestclose="onRequestCloseSelection" bindclose="onCloseSelection">
+<config-sheet id="history-config-sheet" visible="{{sheetVisible}}" title="{{i18n.t(ui,'选择历史查询条件')}}" subtitle="保存选择不会扣次" confirm-text="{{i18n.t(ui,'保存选择')}}" summary="{{draftSummary}}" dirty="{{draftDirty}}" external-close="{{true}}" bindconfirm="onDoneSelection" bindrequestclose="onRequestCloseSelection" bindclose="onCloseSelection">
   <target-picker wx:if="{{sheetVisible}}" id="history-target-picker" catalog-version="{{catalogVersion}}" value="{{draftValue}}" max-stores="{{10}}" stores-optional="{{true}}" in-sheet="{{true}}" bindchange="onDraftChange" />
 </config-sheet>
 

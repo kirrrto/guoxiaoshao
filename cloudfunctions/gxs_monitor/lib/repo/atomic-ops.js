@@ -6,9 +6,9 @@ const { isDeepStrictEqual } = require('node:util');
 const { COLLECTIONS: C } = require('../collections');
 const { ApiError } = require('../errors');
 const { dayKey } = require('../time');
-const { decideLiveQuery, decideHistoryQuery } = require('../rules/access');
+const { decideLiveQuery, decideMarketQuery, decideHistoryQuery } = require('../rules/access');
 const { grantableAmount, ledgerIds } = require('../rules/quota');
-const { isMember, hasFreeReminder, canUseReminders, validateFollowLimits, memberLimits, accountLimits, followAllowance, planSnapshot } = require('../rules/membership');
+const { isMember, hasFreeReminder, canUseReminders, canWatchMarkets, validateFollowLimits, memberLimits, accountLimits, followAllowance, planSnapshot } = require('../rules/membership');
 const { OUTAGE_COMPENSATION_ORDER_ID, purchasedPlan, needsPlanMetadata, resolvePlanMetadata, needsOutageCompensation } = require('../rules/member-plan');
 const membershipEntitlements = require('../rules/membership-entitlements');
 const { targetKeyOf } = require('../engine/events');
@@ -61,6 +61,21 @@ async function applyLedgerIn(tx, entry) {
   await tx.put(C.ledger, stored);
   await tx.put(C.users, user);
   return { applied: true, entry: stored, balance: after, user };
+}
+
+async function closeExpiredQuery(tx, record, user, nowIso, reason = 'query_expired', restrictionEndsAt) {
+  const refunded = record.charged || 0;
+  if (refunded > 0) {
+    const result = await applyLedgerIn(tx, { _id: `${record.userKey}|${record.kind === 'history' ? 'history' : 'query'}|${record.queryId}|refund`,
+      userKey: record.userKey, type: 'query_refund', delta: refunded, dayKey: dayKey(nowIso), createdAt: nowIso, refId: record.queryId });
+    user = result.user;
+  }
+  const response = { ok: false, reason, queryId: record.queryId, historyQueryId: record.kind === 'history' ? record.queryId : null,
+    results: [], events: [], latest: [], charged: record.charged, refunded, ...quotaBalance(user), member: record.member, queriedAt: record.createdAt,
+    ...(restrictionEndsAt !== undefined ? { restrictionEndsAt } : {}) };
+  const closed = { ...record, status: 'failed', finishedAt: nowIso, leaseUntil: null, response };
+  await tx.put(C.queries, closed);
+  return { record: closed, refunded, ...quotaBalance(user) };
 }
 
 async function fulfilMembershipIn(tx, user, order, source, nowIso) {
@@ -343,6 +358,17 @@ function atomicMethods(run, { readUpstreamBreaker } = {}) {
         if (signature(existing) !== signature(record)) throw new ApiError('query_id_conflict', '该查询编号已用于其他条件，请重新查询');
         if (existing.status !== 'pending' && existing.response) return { replayed: true, record: existing, ...quotaBalance(user) };
         if (existing.leaseUntil && existing.leaseUntil > nowIso) return { busy: true, record: existing, retryAfterMs: Date.parse(existing.leaseUntil) - Date.parse(nowIso), ...quotaBalance(user) };
+        if (record.kind === 'market') {
+          if (await hydrateMemberPlansIn(tx, user)) await tx.put(C.users, user);
+          const decision = decideMarketQuery({ user, product, now: new Date(nowIso) });
+          // The original debit can already contain the account's last credit.
+          // Only a lost entitlement or an unapproved higher cost prevents recovery.
+          const ineligible = !decision.allowed && decision.reason !== 'insufficient_credits';
+          if (ineligible || decision.cost > existing.charged) {
+            const closed = await closeExpiredQuery(tx, existing, user, nowIso, ineligible ? decision.reason : 'query_cost_changed', decision.restrictionEndsAt);
+            return { replayed: true, ...closed };
+          }
+        }
         // A crashed worker is fenced out. Its debit belongs to this same request;
         // recovery is allowed even when the debit used the user's last credit.
         const resumed = { ...existing, status: 'pending', ownerId, leaseUntil: new Date(Date.parse(nowIso) + leaseMs).toISOString(), attempts: (existing.attempts || 1) + 1 };
@@ -362,6 +388,7 @@ function atomicMethods(run, { readUpstreamBreaker } = {}) {
       }
       const decision = record.kind === 'history'
         ? decideHistoryQuery({ user, product, requestedDayKey: record.dayKey, now: new Date(nowIso), config })
+        : record.kind === 'market' ? decideMarketQuery({ user, product, now: new Date(nowIso) })
         : decideLiveQuery({ user, product, now: new Date(nowIso), config });
       if (!decision.allowed) return { denied: decision, ...quotaBalance(user) };
       if (args.maxCost !== undefined && decision.cost > args.maxCost) {
@@ -415,16 +442,9 @@ function atomicMethods(run, { readUpstreamBreaker } = {}) {
     expireQuery: ({ id, userKey, nowIso, staleBefore }) => run(async tx => {
       const record = await tx.get(C.queries, id);
       if (!record || record.userKey !== userKey || record.status !== 'pending' || !record.leaseUntil || record.leaseUntil > staleBefore) return { expired: false };
-      let user = await tx.get(C.users, userKey);
-      let refunded = 0;
-      if (record.charged > 0) {
-        const result = await applyLedgerIn(tx, { _id: `${userKey}|${record.kind === 'history' ? 'history' : 'query'}|${record.queryId}|refund`, userKey, type: 'query_refund', delta: record.charged, dayKey: dayKey(nowIso), createdAt: nowIso, refId: record.queryId });
-        user = result.user;
-        refunded = record.charged;
-      }
-      const response = { ok: false, reason: 'query_expired', queryId: record.queryId, historyQueryId: record.kind === 'history' ? record.queryId : null, results: [], events: [], latest: [], charged: record.charged, refunded, ...quotaBalance(user), member: record.member, queriedAt: record.createdAt };
-      await tx.put(C.queries, { ...record, status: 'failed', finishedAt: nowIso, leaseUntil: null, response });
-      return { expired: true, refunded, ...quotaBalance(user) };
+      const user = await tx.get(C.users, userKey);
+      const { refunded, balance, quotaRevision } = await closeExpiredQuery(tx, record, user, nowIso);
+      return { expired: true, refunded, balance, quotaRevision };
     }),
 
     ...observationStorageMethods(run),
@@ -444,7 +464,10 @@ function atomicMethods(run, { readUpstreamBreaker } = {}) {
       const savedFollows = (await Promise.all(knownIndex.map(item => tx.get(C.follows, item._id))))
         .filter(f => f && f.userKey === userKey && f.status !== 'removed');
       const index = savedFollows.map(followIndexEntry);
-      if ((follow || status === 'active') && !canUseReminders(user, at)) throw new ApiError('member_required', '关注与到货提醒为会员专属，开通会员后可新增或恢复关注');
+      if (follow || status === 'active') {
+        if (market !== 'CN' && !canWatchMarkets(user, at)) throw new ApiError('market_watch_plan_required', '其他站点的关注和到货提醒需要有效月卡或年卡。');
+        if (!canUseReminders(user, at)) throw new ApiError('member_required', '关注与到货提醒为会员专属，开通会员后可新增或恢复关注');
+      }
       let next;
       if (follow) {
         if (existing && existing.status !== 'removed' && followAllowance(user, existing, savedFollows, at).limitPaused) throw new ApiError('plan_limit', '该配置超出当前套餐名额，请先移除其他配置或选择支持更多配置的套餐');

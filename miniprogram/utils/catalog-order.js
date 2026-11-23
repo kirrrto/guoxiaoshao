@@ -134,8 +134,17 @@ function storeMatches(store, query) {
   const terms = text(query).toLowerCase().split(/\s+/).map(normalizeSearch).filter(Boolean);
   if (!terms.length) return true;
   const fields = [store.city, store.province, store.name, store.officialName, store.address, store.storeNumber].map(normalizeSearch);
+  const translated = [];
+  if (terms.some(term => /[a-z]/.test(term))) {
+    const english = require('../i18n/catalog-locations');
+    for (const label of [store.city, store.province, store.name, store.officialName]) {
+      if (english[label]) translated.push(...english[label].split(/\s+/).map(normalizeSearch), normalizeSearch(english[label]));
+    }
+  }
   const aliases = CITY_ALIASES[store.city] || [];
-  return terms.every(term => fields.some(field => field.includes(term)) || aliases.some(alias => term.length <= 2 ? alias === term : alias.startsWith(term)) || (term.length > 2 && normalizeSearch(store.slug).includes(term)));
+  return terms.every(term => fields.some(field => field.includes(term))
+    || translated.some(word => term.length <= 2 ? word === term : word.includes(term))
+    || aliases.some(alias => term.length <= 2 ? alias === term : alias.startsWith(term)) || (term.length > 2 && normalizeSearch(store.slug).includes(term)));
 }
 
 module.exports = { capacityBytes, compareCapacities, sortFamilies, sortModels, storeMatches, CITY_ALIASES, FAMILY_RELEASES };

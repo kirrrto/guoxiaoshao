@@ -35,7 +35,7 @@ function runtime({ catalogRead = async () => catalog, callRead = async () => ({}
       : name.endsWith('/store') ? { getCatalog: catalogRead, currentCatalog: () => current, invalidateBootstrap() {}, invalidateFollows() {} }
       : name.endsWith('/conversion-events') ? { track: (name, fields) => events.push({ name, fields }) }
       : name.endsWith('/tab-bar') ? navigation
-      : isolatedAccountUi(name) || require(path.resolve(path.dirname(source), name)) });
+      : isolatedAccountUi(name, wx) || require(path.resolve(path.dirname(source), name)) });
   const page = { ...definition, data: structuredClone(definition.data), pageVisible: true,
     setData(patch, done) { Object.assign(this.data, patch); if (done) done(); } };
   const context = createCheckoutContext({ wx });

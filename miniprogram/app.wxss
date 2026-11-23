@@ -77,8 +77,6 @@ page {
   --tap: 44px;
   --btn-height: 48px;
   --shadow-sheet: 0 -8px 32px rgba(0, 0, 0, 0.12);
-  --ping-from: 0 0 0 0 rgba(0, 195, 117, 0.45);
-  --ping-to: 0 0 0 10px rgba(0, 195, 117, 0);
   --ease: cubic-bezier(0.2, 0, 0, 1);
   --dur-fast: 120ms;
   --dur: 200ms;

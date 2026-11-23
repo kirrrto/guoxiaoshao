@@ -1,5 +1,5 @@
 'use strict';
-const { isMember } = require('./membership');
+const { isMember, planSnapshot } = require('./membership');
 const { isLiveRestricted, isHistoryRestricted } = require('./new-product');
 const { resolveConfig, canAfford } = require('./quota');
 const { canQueryProduct } = require('./product-target');
@@ -23,6 +23,20 @@ function decideLiveQuery({ user, product, now, config }) {
   return { allowed: true, reason: null, cost: cfg.queryCost, member: false };
 }
 
+function decideMarketQuery({ user, product, now }) {
+  if (!product || !canQueryProduct(product)) return { allowed: false, reason: 'unsupported_product', cost: 0, member: false };
+  const member = isMember(user, now);
+  const opensAt = Date.parse(product.freeQueryStartsAt);
+  if (!Number.isFinite(opensAt) || now.getTime() < opensAt) {
+    const tier = planSnapshot(user, now).planId;
+    if (!['member_7d', 'member_30d', 'member_365d'].includes(tier)) return { allowed: false, reason: 'new_product_restricted',
+      restrictionEndsAt: Number.isFinite(opensAt) ? new Date(opensAt).toISOString() : null, cost: 0, member };
+  }
+  if (member) return { allowed: true, reason: null, cost: 0, member };
+  const allowed = canAfford(user?.quota?.balance || 0, 1);
+  return { allowed, reason: allowed ? null : 'insufficient_credits', cost: 1, member: false };
+}
+
 function decideHistoryQuery({ user, product, requestedDayKey, now, config, alreadyCharged }) {
   const cfg = resolveConfig(config && config.quota);
   if (isMember(user, now)) return { allowed: true, reason: null, cost: 0, member: true };
@@ -38,4 +52,4 @@ function decideHistoryQuery({ user, product, requestedDayKey, now, config, alrea
   return { allowed: true, reason: null, cost: cfg.historyCost, member: false };
 }
 
-module.exports = { decideLiveQuery, decideHistoryQuery };
+module.exports = { decideLiveQuery, decideMarketQuery, decideHistoryQuery };

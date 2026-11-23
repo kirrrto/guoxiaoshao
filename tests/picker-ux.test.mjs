@@ -2,13 +2,12 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
-import vm from 'node:vm';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
+import { runtime } from './helpers/miniprogram-runtime.mjs';
 
 const require = createRequire(import.meta.url);
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const componentPath = path.join(root, 'miniprogram/components/target-picker/index.js');
 const { compareCapacities, capacityBytes, sortFamilies, sortModels, storeMatches, CITY_ALIASES, FAMILY_RELEASES } = require('../miniprogram/utils/catalog-order');
 const products = JSON.parse(fs.readFileSync(path.join(root, 'catalog/products.json'), 'utf8'));
 const stores = JSON.parse(fs.readFileSync(path.join(root, 'catalog/stores.json'), 'utf8')).stores;
@@ -31,13 +30,14 @@ function catalog() {
 }
 
 function picker(value = null, options = {}) {
-  let definition; const toasts = [], updates = [], c = options.catalog || catalog();
-  vm.runInNewContext(fs.readFileSync(componentPath, 'utf8'), { Component: d => { definition = d; }, require: createRequire(componentPath), console, setTimeout,
-    wx: { showToast: data => toasts.push(data), nextTick: fn => fn() } }, { filename: componentPath });
-  const instance = { ...definition.methods, data: { ...plain(definition.data), catalog: c, value, maxStores: 3, supportedOnly: Boolean(options.supportedOnly) },
-    setData(data) { updates.push(plain(data)); Object.assign(this.data, data); }, triggerEvent(name, detail) { this.lastEvent = plain({ name, detail }); } };
+  const rt = runtime(), updates = [], c = options.catalog || catalog();
+  rt.wx.nextTick = fn => fn();
+  const instance = rt.instance('components/target-picker/index.js', { catalog: c, value, maxStores: 3, supportedOnly: Boolean(options.supportedOnly) });
+  const setData = instance.setData.bind(instance);
+  instance.setData = data => { updates.push(plain(data)); setData(data); };
+  instance.triggerEvent = (name, detail) => { instance.lastEvent = plain({ name, detail }); };
   instance.onCatalog(c);
-  return { instance, c, toasts, updates };
+  return { instance, c, toasts: rt.messages, updates };
 }
 const tapStore = (picker, storeNumber) => picker.onStoreTap({ currentTarget: { dataset: { store: storeNumber } } });
 const search = (picker, value) => picker.onSearchInput({ detail: { value } });

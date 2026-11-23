@@ -1,3 +1,4 @@
+const languageUI = require('../../utils/language');
 const { call, showError, toast } = require('../../utils/api');
 const { getBootstrap, getCatalog, invalidateBootstrap, quotaAccountMatches, publishQuota, getQuotaGeneration, subscribeCatalog, subscribeQuota, currentQuota, publishQueryBalance } = require('../../utils/store');
 const fmt = require('../../utils/format');
@@ -111,7 +112,7 @@ function presentHistory(response, catalog, request) {
   };
 }
 
-Page({
+Page(require('../../utils/language').page('history', {
   data: {
     networkOffline: false,
     ready: false,
@@ -607,7 +608,7 @@ Page({
     // The link is visible before the account connects; boot is null until then.
     const boot = this.data.boot;
     const costText = boot && Number.isFinite(boot.historyCost) ? `需有 ${boot.historyCost} 次余额` : '需有足够余额';
-    wx.showModal({
+    languageUI.modal({
       title: '数据说明',
       content: `1. 数据范围：保留近 ${fmt.RETENTION_DAYS} 天实际查询与监测记录；未采集时段不补录，无事件不代表无货。\n2. 统计说明：首末观测间不代表连续覆盖；首次可取货与中断恢复不等同确认补货。\n3. 计次与权限：免费用户查询${costText}（无事件自动退还，分页不扣次）；受限新品开售 30 天内仅会员可查今天。`,
       showCancel: false,
@@ -626,4 +627,4 @@ Page({
     if (this.data.loadError) return this.onRetryLoad();
     if (this.data.ready && !this.data.accountReady) return this.onRetryAccount();
   },
-});
+}));

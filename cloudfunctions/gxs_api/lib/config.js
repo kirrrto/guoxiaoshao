@@ -164,6 +164,12 @@ function patchConfig(stored, patch) {
 function validateConfig(config) {
   const invalid = (field) => { throw new ApiError('invalid_config', `配置项无效：${field}`); };
   const integer = (value, min, max, field) => { if (!Number.isSafeInteger(value) || value < min || value > max) invalid(field); };
+  const validateNoticeTranslations = (row, name) => {
+    for (const [key, max] of [['titleEn', 120], ['textEn', 2000]]) {
+      const value = row[key];
+      if (value != null && (typeof value !== 'string' || value.length > max || /[\x00-\x1f\x7f]/.test(value))) invalid(`${name}.${key}`);
+    }
+  };
   for (const field of ['internationalMarkets', 'internationalMonitoring', 'internationalNotifications']) {
     const flags = config[field];
     if (!flags || typeof flags !== 'object' || Array.isArray(flags)
@@ -296,12 +302,14 @@ function validateConfig(config) {
       const a = config.announcement;
       const text = typeof a.text === 'string' ? a.text : '';
       if (!text || text.length > 1000 || /[\x00-\x1f\x7f]/.test(text)) invalid('announcement.text');
+      if (a.title != null && (typeof a.title !== 'string' || a.title.length > 40)) invalid('announcement.title');
+      validateNoticeTranslations(a, 'announcement');
       if (a.kind !== undefined && !['notice', 'maintenance', 'recovery', 'warn'].includes(a.kind)) invalid('announcement.kind');
       for (const field of ['startsAt', 'expiresAt']) {
         if (a[field] !== undefined && a[field] !== null && !Number.isFinite(Date.parse(a[field]))) invalid(`announcement.${field}`);
       }
       if (a.startsAt && a.expiresAt && Date.parse(a.startsAt) >= Date.parse(a.expiresAt)) invalid('announcement.expiresAt');
-      if (Object.keys(a).some(key => !['text', 'kind', 'startsAt', 'expiresAt'].includes(key))) invalid('announcement');
+      if (Object.keys(a).some(key => !['title', 'titleEn', 'text', 'textEn', 'kind', 'startsAt', 'expiresAt'].includes(key))) invalid('announcement');
     } else invalid('announcement');
   }
   if (!Array.isArray(config.notices)) invalid('notices');
@@ -310,6 +318,7 @@ function validateConfig(config) {
     if (!item || typeof item !== 'object' || Array.isArray(item)) invalid('notices');
     const text = typeof item.text === 'string' ? item.text : '';
     if (!text || text.length > 1000 || /[\x00-\x1f\x7f]/.test(text)) invalid('notices.text');
+    validateNoticeTranslations(item, 'notices');
     if (item.id !== undefined && item.id !== null && (typeof item.id !== 'string' || item.id.length > 64)) invalid('notices.id');
     if (item.title !== undefined && item.title !== null && (typeof item.title !== 'string' || item.title.length > 40)) invalid('notices.title');
     if (item.publishedAt !== undefined && item.publishedAt !== null && (typeof item.publishedAt !== 'string' || item.publishedAt.length > 32)) invalid('notices.publishedAt');

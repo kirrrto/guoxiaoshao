@@ -1,9 +1,9 @@
 'use strict';
 const { createHash } = require('node:crypto');
 const { ApiError } = require('../errors');
-const { MARKETS, findMarket } = require('../markets');
+const { MARKETS, findMarket, findMarketProduct } = require('../markets');
 const { ensureUser } = require('./users');
-const { isMember, memberLimits, followAllowance } = require('../rules/membership');
+const { isMember, canWatchMarkets, memberLimits, followAllowance } = require('../rules/membership');
 
 function checkOwner(ctx, payload, required) {
   if ((required || payload.expectedUserKey !== undefined) && payload.expectedUserKey !== ctx.identity.userKey) {
@@ -14,6 +14,7 @@ function checkOwner(ctx, payload, required) {
 function present(user, follow, all, ctx) {
   const allowance = followAllowance(user, follow, all, ctx.now);
   const status = follow.status === 'active' && !isMember(user, ctx.now) ? 'expired'
+    : follow.status === 'active' && allowance.marketPlanRequired ? 'plan_required'
     : follow.status === 'active' && allowance.limitPaused ? 'limit_paused' : follow.status;
   return { followId: follow._id, market: follow.market, partNumber: follow.partNumber,
     storeNumbers: follow.storeNumbers, status, savedStatus: follow.status, language: follow.language || 'zh-CN',
@@ -26,13 +27,13 @@ async function marketFollows(ctx, payload = {}) {
   const all = await ctx.repo.listFollows(user._id);
   const switches = group => Object.fromEntries(MARKETS.map(({ code }) => [code, group[code] === true]));
   return { follows: all.filter(follow => findMarket(follow.market)).map(follow => present(user, follow, all, ctx)),
-    savedCount: all.length, limits: memberLimits(user, ctx.now),
+    savedCount: all.length, limits: memberLimits(user, ctx.now), canWatch: canWatchMarkets(user, ctx.now),
     monitoring: switches(ctx.config.internationalMonitoring), notifications: switches(ctx.config.internationalNotifications) };
 }
 
 function requireTarget(region, partNumber, storeNumbers) {
-  const product = region && region.products.find(product => product.partNumber === partNumber && product.monitorSupported);
-  if (!product) throw new ApiError('unknown_product', '该站点不支持关注此配置');
+  const product = region && findMarketProduct(region.code, partNumber);
+  if (!product?.monitorSupported) throw new ApiError('unknown_product', '该站点不支持关注此配置');
   if (!Array.isArray(storeNumbers) || !storeNumbers.length || storeNumbers.length > region.stores.length
     || !storeNumbers.every(number => region.stores.some(store => store.storeNumber === number))
     || new Set(storeNumbers).size !== storeNumbers.length) throw new ApiError('unknown_store', '请选择此站点目录内的门店');

@@ -18,10 +18,13 @@ function runtime(handler) {
   let definition;
   const calls = [], modals = [], toasts = [];
   const api = { call: async (action, payload) => { calls.push({ action, payload: clone(payload) }); return handler(action, payload); }, toast: value => toasts.push(value), showError() {} };
-  const wx = { showModal: modal => modals.push(modal) };
+  const locale = fullRuntime();
+  const wx = locale.wx;
+  wx.showModal = modal => modals.push(modal);
   vm.runInNewContext(fs.readFileSync(path.join(root, 'pages/mine/index.js'), 'utf8'), {
     console, Date, Promise, Map, Set, wx, Page: value => { definition = value; },
     require: name => name.endsWith('/api') ? api : name.endsWith('/store') ? { getBootstrap() {}, invalidateBootstrap() {} }
+      : name.endsWith('/language') ? locale.load('utils/language.js')
       : require(path.resolve(root, 'pages/mine', name)),
   });
   const page = { ...definition, data: clone(definition.data) };

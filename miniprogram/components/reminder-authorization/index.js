@@ -1,4 +1,4 @@
-Component({
+Component(require('../../utils/language').component({
   options: { styleIsolation: 'apply-shared' },
   properties: {
     subscription: { type: Object, value: {} }, authorization: { type: Object, value: {} },
@@ -8,4 +8,4 @@ Component({
     onAuthorize() { if (!this.data.busy && !this.data.authorization.storageBlocked) this.triggerEvent('authorize'); },
     onRetry() { if (!this.data.authorization.syncing) this.triggerEvent('retry'); },
   },
-});
+}));

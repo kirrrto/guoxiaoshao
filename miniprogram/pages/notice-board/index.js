@@ -9,7 +9,7 @@ function formatPublishedAt(value) {
   return parsed === null ? '' : fmt.fmtDateTime(parsed).slice(0, 16);
 }
 
-Page({
+Page(require('../../utils/language').page('notice-board', {
   data: { ready: false, refreshing: false, loadError: '', items: [], hasContent: false, refreshedText: '', service: null },
   onLoad() { this.visible = true; return this.load(); },
   onShow() { navigation.confirmNavigation('pages/notice-board/index'); this.visible = true; if (this.noticePayload) this.renderNotices(); if (this.data.ready) return this.load(); },
@@ -25,7 +25,9 @@ Page({
     const items = rows.map((notice, index) => ({
       key: `${notice.id || 'notice'}-${index}`,
       title: notice.title || (notice.kind === 'maintenance' ? '服务公告' : notice.kind === 'recovery' ? '恢复说明' : '服务说明'),
+      hasOriginalTitle: Boolean(notice.title), titleEn: notice.titleEn || '',
       text: notice.text,
+      textEn: notice.textEn || '',
       tone: notice.kind === 'recovery' ? 'ok' : ['warn', 'maintenance'].includes(notice.kind) ? 'warn' : 'info',
       publishedAt: formatPublishedAt(notice.publishedAt || notice.startsAt),
       stamp: notice.expiresAt ? `展示至 ${formatPublishedAt(notice.expiresAt)}` : '',
@@ -71,4 +73,4 @@ Page({
   onGoHelp() { navigation.navigateTo({ url: '/pages/guide/index?section=notification&from=mine' }); },
   onShareAppMessage() { return shareAppMessage('/pages/notice-board/index', this.data); },
   onShareTimeline() { return shareTimeline('/pages/notice-board/index', this.data); },
-});
+}));

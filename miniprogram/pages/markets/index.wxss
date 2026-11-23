@@ -14,7 +14,6 @@
 .market-product-copy { min-width: 0; }
 .market-product-tile { width: 48px; height: 48px; }
 .market-product-tile--main { width: 64px; height: 64px; }
-.market-product-tile image { transform: scale(1.2); }
 .market-local-sku { color: var(--text-3); font-size: var(--fs-sub); }
 .market-capacities, .market-watch-actions { display: flex; flex-wrap: wrap; gap: var(--sp-4); }
 .market-capacities .market-capacity { min-height: var(--tap); padding: var(--sp-8); background: transparent; }
@@ -25,7 +24,7 @@
 .market-closed { color: var(--text-2); }
 .market-retry { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-8); margin-top: var(--sp-8); }
 .markets-result--empty { display: none; }
-.market-result-status { margin: var(--sp-12) 0 var(--sp-8); font-size: var(--fs-title); font-weight: 600; line-height: var(--lh-tight); }
+.market-result-status { display: flex; align-items: center; gap: var(--sp-8); margin: var(--sp-12) 0 var(--sp-8); font-size: var(--fs-title); font-weight: 600; line-height: var(--lh-tight); }
 .market-result-status--ok { color: var(--green-text); }
 .market-result-product, .market-issue { margin-top: var(--sp-8); }
 .market-issue { color: var(--warn); }

@@ -1,15 +1,16 @@
+const languageUI = require('../../utils/language');
 const { call } = require('../../utils/api');
 const { getBootstrap, invalidateFollows } = require('../../utils/store');
 const { requestReminderAuthorization, templateConsent, openSubscribeSettings } = require('../../utils/reminder-credits');
 const { switchToTab } = require('../../utils/tab-bar');
-const { selections } = require('./presentation');
 
 const WORDS = {
   'zh-CN': {
     watch: '关注此配置', watching: '已关注', title: '我的站点关注', pause: '暂停', resume: '恢复', remove: '取消关注',
     removeTitle: '取消这条关注？', cancel: '保留', saved: '关注已保存', active: '已开启关注', paused: '已暂停', expired: '会员已到期',
     limit_paused: '已超出名额', stopped: '本站尚未开启自动监测', noSender: '本站微信提醒暂未就绪',
-    enTemplate: '英文微信提醒暂未开放', zhTemplate: '中文微信提醒暂未开放', membership: '关注和提醒需会员', memberAction: '查看会员权益',
+    enTemplate: '英文微信提醒暂未开放', zhTemplate: '中文微信提醒暂未开放', membership: '其他站点的关注与提醒需有效月卡或年卡。', memberAction: '查看会员权益',
+    plan_required: '已保留关注，需月卡或年卡恢复监测',
     observationLate: '最近一次后台检查尚未确认', interval: '本站后台检查间隔约 {n} 分钟',
     unavailable: '暂时无法更改关注，请刷新后确认。', listError: '暂时无法读取关注，请刷新重试。',
     limit: '关注名额已满，请先取消一条关注。', storesLimit: '此配置已达门店上限。', refreshing: '刷新关注', disabled: '此配置暂不支持关注',
@@ -22,7 +23,8 @@ const WORDS = {
     watch: 'Watch configuration', watching: 'Watching', title: 'My regional watches', pause: 'Pause', resume: 'Resume', remove: 'Remove',
     removeTitle: 'Remove this watch?', cancel: 'Keep watch', saved: 'Watch saved', active: 'Watch enabled', paused: 'Paused', expired: 'Membership expired',
     limit_paused: 'Over plan limit', stopped: 'Monitoring is not yet open in this region.', noSender: 'WeChat alerts are not ready in this region.',
-    enTemplate: 'English WeChat alerts are not yet available.', zhTemplate: 'Chinese WeChat alerts are not yet available.', membership: 'Watches and alerts require membership.', memberAction: 'View membership',
+    enTemplate: 'English WeChat alerts are not yet available.', zhTemplate: 'Chinese WeChat alerts are not yet available.', membership: 'Regional watches and alerts require an active monthly or annual pass.', memberAction: 'View membership',
+    plan_required: 'Watch saved. A monthly or annual pass is required to resume monitoring.',
     observationLate: 'The latest background check is unconfirmed.', interval: 'Background checks in this region run about every {n} minutes.',
     unavailable: 'Could not confirm the change. Refresh your watches.', listError: 'Could not load your watches. Try again.',
     limit: 'Your watch list is full. Remove a watch to make room.', storesLimit: 'The store limit for this configuration is reached.', refreshing: 'Refresh watches', disabled: 'Watching is unavailable for this configuration.',
@@ -33,34 +35,33 @@ const WORDS = {
   },
 };
 
-function watchView(page, site, ready) {
+function watchView(page, site, ready, eligiblePlan) {
   const lang = page.lang || 'zh-CN', w = WORDS[lang], list = ready && page.watchList;
-  const choicesByRegion = new Map();
+  const member = eligiblePlan && list?.canWatch !== false;
   const rows = (list && list.follows || []).filter(f => f && f.status !== 'removed').map(f => {
     const home = (page.sites || []).find(s => s.code === f.market);
-    if (home && !choicesByRegion.has(home.code)) choicesByRegion.set(home.code, selections(home, lang, page.failedImages));
-    const choices = home && choicesByRegion.get(home.code);
-    const p = choices && choices.products.find(p => p.id === f.partNumber);
+    const choices = home && page.optionsFor(home, lang);
+    const p = choices && choices.byId.get(f.partNumber);
     const stores = Array.isArray(f.storeNumbers) ? f.storeNumbers : [];
     const name = home && ((lang === 'en' && home.nameEn) || home.name) || f.market;
     const overLimit = f.market === page.market && f.partNumber === page.part && stores.includes(page.store)
       && Array.isArray(f.eligibleStoreNumbers) && !f.eligibleStoreNumbers.includes(page.store);
     const monitoring = home?.monitorEnabled && list.monitoring?.[f.market];
-    const status = f.status === 'active' && overLimit ? w.limit_paused : f.status === 'active' && !monitoring ? w.stopped : w[f.status] || w.stopped;
+    const status = !member && f.status === 'active' ? w.plan_required : f.status === 'active' && overLimit ? w.limit_paused : f.status === 'active' && !monitoring ? w.stopped : w[f.status] || w.stopped;
     return { id: f.followId, name, product: p && p.label || f.partNumber, stores: stores.map(number => choices && choices.stores.find(s => s.id === number)?.label || number).join(' · '),
-      imageDisplayUrl: p && p.imageDisplayUrl || '', status, pauseTo: (f.savedStatus || f.status) === 'paused' ? 'active' : 'paused',
+      imageDisplayUrl: p && p.imageDisplayUrl || '', status, canResume: !!member, pauseTo: (f.savedStatus || f.status) === 'paused' ? 'active' : 'paused',
       selected: f.market === page.market && f.partNumber === page.part && stores.includes(page.store), language: f.language === 'en' ? 'en' : 'zh-CN' };
   });
-  const target = rows.find(row => row.selected), product = site && site.products.find(p => p.partNumber === page.part);
-  const canWatch = site && (site.enabled || site.monitorEnabled) && product && product.monitorSupported !== false;
+  const target = rows.find(row => row.selected), product = page.selectedProduct;
+  const canWatch = site && (site.enabled || site.monitorEnabled) && product?.monitorSupported;
   const notifyLanguage = target ? target.language : lang;
   const boot = ready && page.boot, notify = boot && boot.notifications || {};
   const id = notify.templateIds && notify.templateIds[notifyLanguage === 'en' ? 'restockEn' : 'restock'];
-  const member = boot && boot.membership.active, credits = boot && boot.subscriptions && boot.subscriptions[id]?.credits || 0;
+  const credits = boot && boot.subscriptions && boot.subscriptions[id]?.credits || 0;
   const consentBlocked = ['ban', 'reject', 'main_switch_off'].includes(templateConsent(id));
   let service = '';
   if (ready && !member && (canWatch || target)) service = w.membership;
-  else if (!canWatch && !target && site?.enabled) service = w.disabled;
+  else if (!canWatch && !target && site?.enabled && product?.querySupported) service = w.disabled;
   else if (target && target.pauseTo === 'active') service = w.paused;
   else if (target && target.status !== w.active) service = target.status;
   else if (list && canWatch && (!site.monitorEnabled || !list.monitoring?.[page.market])) service = w.stopped;
@@ -118,11 +119,11 @@ const methods = {
     const { id, status } = e.currentTarget.dataset;
     const row = this.data.watchRows.find(row => row.id === id);
     if (!row || this.watchToken || !this.accountReady || !this.visible || !this.isAccount()) return;
-    if (status === row.pauseTo) return this.writeWatch('market.watchStatus', { followId: id, status });
+    if (status === row.pauseTo && (status === 'paused' || row.canResume)) return this.writeWatch('market.watchStatus', { followId: id, status });
     if (status !== 'removed' || this.watchConfirmation) return;
     const owner = this.owner, token = {};
     this.watchConfirmation = token;
-    wx.showModal({ title: this.data.w.removeTitle, content: [row.name, row.product, row.stores].join(' · '), confirmText: this.data.w.remove,
+    languageUI.modal({ title: this.data.w.removeTitle, content: [row.name, row.product, row.stores].join(' · '), confirmText: this.data.w.remove,
       cancelText: this.data.w.cancel, success: res => {
         if (this.watchConfirmation !== token) return;
         this.watchConfirmation = null;
@@ -141,7 +142,7 @@ const methods = {
       if (!response || !response.follow || !response.follow.followId) throw Error('Invalid receipt');
       if (!this.pageRetired && this.isAccount(owner) && this.scope === scope && action === 'market.watch') this.watchMessage = 'saved';
     } catch (error) {
-      const key = { member_required: 'membership', too_many_follows: 'limit', too_many_stores: 'storesLimit',
+      const key = { member_required: 'membership', market_watch_plan_required: 'membership', too_many_follows: 'limit', too_many_stores: 'storesLimit',
         plan_limit: 'limit', market_monitoring_disabled: 'stopped', market_disabled: 'disabled' }[error.code];
       if (!this.pageRetired && this.isAccount(owner) && this.scope === scope) this.watchMessage = key || 'unavailable';
     } finally {

@@ -188,27 +188,35 @@ try {
       return { viewport: width, scrollWidth: document.documentElement.scrollWidth, bodyHeight: document.body.scrollHeight, overflow, clippedText, images, alternativeGeometry, alternativeLayoutErrors, calendarLayoutErrors };
     });
     if (item.page === 'markets') {
-      metrics.marketLayoutErrors = await page.evaluate(() => {
+      metrics.marketLayoutErrors = await page.evaluate(expectImage => {
         const errors = [];
         const bounds = selector => document.querySelector(selector)?.getBoundingClientRect();
         const controls = bounds('.markets-controls'), details = bounds('.markets-details');
         if (!controls || !details) return ['Missing market configuration or result'];
+        const editor = bounds('.markets-editor');
+        if (!editor || !editor.width || !editor.height) errors.push('The selected regional configuration must have a visible editor');
         if (innerWidth >= 900 ? details.left < controls.right || Math.abs(controls.top - details.top) > 1 : details.top < controls.bottom - 1) {
           errors.push('Configuration and results must stack below 900px and sit side by side above it');
         }
         if (document.querySelectorAll('.markets-region').length !== 3 || document.querySelectorAll('.markets-region--selected').length !== 1) {
           errors.push('Exactly one of the three regions must be selected');
         }
-        const thumbnail = document.querySelector('.markets-editor img');
-        if (!thumbnail || !thumbnail.src.startsWith('data:image/') || !thumbnail.complete || thumbnail.naturalWidth === 0) {
-          errors.push('The selected regional configuration must render a decoded packaged product thumbnail');
+        const tile = document.querySelector('.markets-editor .market-product-tile');
+        if (Boolean(tile) !== expectImage) errors.push('Product tile must match available artwork');
+        for (const image of document.querySelectorAll('.market-product-tile img')) {
+          if (!image.src.startsWith('data:image/') || !image.complete || !image.naturalWidth) errors.push('Invalid packaged regional product thumbnail');
+          const frame = image.parentElement.getBoundingClientRect(), media = image.getBoundingClientRect();
+          if (media.left < frame.left - 1 || media.top < frame.top - 1 || media.right > frame.right + 1 || media.bottom > frame.bottom + 1) {
+            errors.push('The entire product image must fit inside its tile');
+          }
         }
+        if (tile && !tile.querySelector('img')) errors.push('Empty regional product tile');
         for (const control of document.querySelectorAll('.markets-page button, .market-field')) {
           const rect = control.getBoundingClientRect();
           if (rect.width < 43.99 || rect.height < 43.99) errors.push('Undersized control: ' + control.textContent.trim());
         }
         return errors;
-      });
+      }, item.expectedMarketImage ?? true);
     }
     if (item.page === 'admin') {
       metrics.operatorControlErrors = await page.evaluate(saving => {

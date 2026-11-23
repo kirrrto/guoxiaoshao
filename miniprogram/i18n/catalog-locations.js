@@ -1,0 +1,25 @@
+// Display and search names for locations in the bundled mainland Apple Store directory.
+// Store numbers and native picker values stay in the original catalog.
+module.exports = {
+  上海: 'Shanghai', 北京: 'Beijing', 深圳: 'Shenzhen', 广州: 'Guangzhou', 杭州: 'Hangzhou', 成都: 'Chengdu',
+  合肥: 'Hefei', 重庆: 'Chongqing', 福州: 'Fuzhou', 厦门: 'Xiamen', 南宁: 'Nanning', 郑州: 'Zhengzhou',
+  武汉: 'Wuhan', 长沙: 'Changsha', 南京: 'Nanjing', 苏州: 'Suzhou', 无锡: 'Wuxi', 大连: 'Dalian',
+  沈阳: 'Shenyang', 济南: 'Jinan', 青岛: 'Qingdao', 天津: 'Tianjin', 昆明: 'Kunming', 宁波: 'Ningbo', 温州: 'Wenzhou',
+  安徽: 'Anhui', 福建: 'Fujian', 广东: 'Guangdong', 广西壮族自治区: 'Guangxi', 河南: 'Henan', 湖北: 'Hubei',
+  湖南: 'Hunan', 江苏: 'Jiangsu', 辽宁: 'Liaoning', 山东: 'Shandong', 四川: 'Sichuan', 云南: 'Yunnan', 浙江: 'Zhejiang',
+  合肥万象城: 'MixC Hefei', 三里屯: 'Sanlitun', 西单大悦城: 'Xidan Joy City', 王府井: 'Wangfujing',
+  华贸购物中心: 'China Central Mall', 朝阳大悦城: 'Chaoyang Joy City', 北京荟聚: 'Livat Beijing',
+  重庆北城天街: 'Paradise Walk Chongqing', 解放碑: 'Jiefangbei', 重庆万象城: 'MixC Chongqing',
+  泰禾广场: 'Tahoe Plaza', 厦门新生活广场: 'Xiamen Lifestyle Center', 天环广场: 'Parc Central',
+  珠江新城: 'Zhujiang New Town', 深圳益田假日广场: 'Holiday Plaza Shenzhen', 深圳万象城: 'MixC Shenzhen',
+  前海壹方城: 'Uniwalk Qianhai', 南宁万象城: 'MixC Nanning', 郑州万象城: 'MixC Zhengzhou',
+  '武汉武商 MALL': 'Wuhan Wushang Mall', 长沙国金中心: 'Changsha IFS', 新街口: 'Xinjiekou', 虹悦城: 'Wonder City',
+  玄武湖: 'Xuanwu Lake', 苏州中心商场: 'Suzhou Center Mall', 无锡恒隆广场: 'Center 66 Wuxi',
+  大连恒隆广场: 'Olympia 66 Dalian', 中街大悦城: 'Zhongjie Joy City', 沈阳万象城: 'MixC Shenyang',
+  济南恒隆广场: 'Parc 66 Jinan', 青岛万象城: 'MixC Qingdao', 南京东路: 'Nanjing East', 浦东: 'Pudong',
+  香港广场: 'Hong Kong Plaza', '上海环贸 iapm': 'Shanghai iapm', 五角场: 'Wujiaochang', 静安: 'Jing’an',
+  环球港: 'Global Harbor', 七宝: 'Qibao', 成都万象城: 'MixC Chengdu', 成都太古里: 'Taikoo Li Chengdu',
+  天津恒隆广场: 'Riverside 66 Tianjin', 天津大悦城: 'Tianjin Joy City', 天津万象城: 'MixC Tianjin',
+  昆明顺城购物中心: 'Kunming Shuncheng Shopping Centre', 西湖: 'West Lake', 杭州万象城: 'MixC Hangzhou',
+  天一广场: 'Tianyi Square', 温州万象城: 'MixC Wenzhou',
+};

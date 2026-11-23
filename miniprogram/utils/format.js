@@ -123,10 +123,21 @@ function fen(amount) {
   return Number.isFinite(amount) ? `¥${(amount / 100).toFixed(2)}` : '—';
 }
 
+const STOCK_FRESH_MS = 120000;
 function observation(iso, now = Date.now()) {
   const age = now - Date.parse(iso);
-  const stale = !Number.isFinite(age) || age < 0 || age > 120000;
+  const stale = !Number.isFinite(age) || age < 0 || age > STOCK_FRESH_MS;
   return { stale, observedText: iso ? fmtDateTime(iso) : '尚无观测', freshnessText: stale ? '观测已过期，请刷新后确认' : '最近观测，以官网实际取货为准' };
+}
+
+function pickupExpiry(records) {
+  let earliest = Infinity;
+  for (const record of records || []) {
+    if (record.status !== 'available' || record.observationState !== 'fresh') continue;
+    const when = Date.parse(record.knownAt || record.observedAt) + STOCK_FRESH_MS + 1;
+    if (Number.isFinite(when)) earliest = Math.min(earliest, when);
+  }
+  return earliest;
 }
 
 /** Use one decision for the stock badge, freshness note and historical value. */
@@ -159,4 +170,4 @@ function stockObservation(record = {}, now = Date.now(), options = {}) {
     observationNote: Number.isFinite(elapsed) && elapsed >= 0 && elapsed < 1000 ? '本次状态刚记录，时长待后续观测确认。' : null };
 }
 
-module.exports = { fmtTime, fmtDate, fmtDateTime, todayKey, RETENTION_DAYS, retentionStartKey, relative, duration, statusMeta, eventMeta, reasonText, collectorMeta, fen, observation, stockObservation };
+module.exports = { fmtTime, fmtDate, fmtDateTime, todayKey, RETENTION_DAYS, retentionStartKey, relative, duration, statusMeta, eventMeta, reasonText, collectorMeta, fen, observation, stockObservation, pickupExpiry };

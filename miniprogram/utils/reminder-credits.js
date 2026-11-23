@@ -1,3 +1,4 @@
+const languageUI = require('./language');
 /**
  * One native "允许" grants one send per accepted template. Native requests
  * only originate in real tap handlers; the queue synchronizes results,
@@ -305,17 +306,17 @@ function openSubscribeSettings(onReturned) {
     });
   };
   if (typeof wx.openSetting !== 'function') {
-    wx.showToast({ title: '请从微信右上角菜单进入设置', icon: 'none' });
+    languageUI.toast({ title: '请从微信右上角菜单进入设置', icon: 'none' });
     return;
   }
   try {
     wx.openSetting({
       withSubscriptions: true,
       success() { done(); },
-      fail() { wx.showToast({ title: '请从微信右上角菜单进入设置', icon: 'none' }); done(); },
+      fail() { languageUI.toast({ title: '请从微信右上角菜单进入设置', icon: 'none' }); done(); },
     });
   } catch (_) {
-    wx.showToast({ title: '请从微信右上角菜单进入设置', icon: 'none' });
+    languageUI.toast({ title: '请从微信右上角菜单进入设置', icon: 'none' });
     done();
   }
 }
@@ -346,7 +347,7 @@ function showConsentSettingsGuide(lockState) {
       ? '相关订阅消息被拒绝或已关闭，微信不会再弹出授权。请到设置中打开后，再回来增加提醒次数。'
       : '你之前选过「不允许」且勾选了「总是保持以上选择」，微信会直接返回不允许、不再弹窗。请到设置里改为允许，再回来点「补充提醒次数」。';
   const guide = '可点「前往设置」，或手动打开小程序右上角「···」→ 设置 → 订阅消息。开启后仍需点「补充提醒次数」，由微信确认才会加次数。';
-  wx.showModal({
+  languageUI.modal({
     title,
     content: `${content}\n\n${guide}`,
     confirmText: '前往设置',

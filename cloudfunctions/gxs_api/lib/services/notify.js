@@ -3,7 +3,7 @@ const { ApiError } = require('../errors');
 const { ensureUser } = require('./users');
 const { encodeToken, decodeToken } = require('../notification-view');
 const { isValidTemplateId } = require('../config');
-const { canUseReminders, isMember } = require('../rules/membership');
+const { canUseReminders, canWatchMarkets, isMember } = require('../rules/membership');
 const { isLiveRestricted } = require('../rules/new-product');
 const { targetKeyOf } = require('../engine/events');
 const follows = require('./follows');
@@ -80,12 +80,15 @@ async function alertKey(ctx, payload) {
 async function detail(ctx, payload) {
   const { user, taskId } = await alertKey(ctx, payload);
   const task = await ctx.repo.getVisibleNotification(user._id, taskId);
+  const regional = Boolean(task.market && task.market !== 'CN');
+  const regionalRestricted = regional && !canWatchMarkets(user, ctx.now);
   const [latest, product, follow] = await Promise.all([
-    ctx.repo.getLatest([targetKeyOf(task.storeNumber, task.partNumber, task.market)]),
-    task.market && task.market !== 'CN' ? require('../markets').findMarket(task.market)?.products.find(p => p.partNumber === task.partNumber) : ctx.repo.getProduct(task.partNumber),
+    regionalRestricted ? [] : ctx.repo.getLatest([targetKeyOf(task.storeNumber, task.partNumber, task.market)]),
+    regional ? require('../markets').findMarket(task.market)?.products.find(p => p.partNumber === task.partNumber) : ctx.repo.getProduct(task.partNumber),
     task.followId ? ctx.repo.getFollow(task.followId) : null,
   ]);
-  const restricted = !isMember(user, ctx.now) && isLiveRestricted(product || { partNumber: task.partNumber }, ctx.config.newProductWindows, ctx.now).restricted;
+  const restricted = regional ? regionalRestricted
+    : !isMember(user, ctx.now) && isLiveRestricted(product || { partNumber: task.partNumber }, ctx.config.newProductWindows, ctx.now).restricted;
   return {
     notification: { eventId: task.eventId, ...(task.market ? { market: task.market } : {}), status: task.status, eventType: task.eventType, partNumber: task.partNumber, storeNumber: task.storeNumber,
       storeName: task.storeName || null, productTitle: product ? product.title : task.productTitle || task.partNumber,

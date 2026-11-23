@@ -191,7 +191,7 @@ test('coming-soon selection with valid stores explains service availability whil
 test('inventory rows, observation time and evidence all obey the independent access mask in the actual template', () => {
   const template = fs.readFileSync(new URL('../miniprogram/pages/query/index.wxml', import.meta.url), 'utf8');
   assert.match(template, /wx:for="\{\{liveResultRestricted \? \[\] : result\.results\}\}"/);
-  assert.match(template, /wx:if="\{\{!liveResultRestricted\}\}"[^>]*>查询时间/);
+  assert.match(template, /wx:if="\{\{!liveResultRestricted\}\}"[^>]*>\{\{i18n\.m\(ui,'查询时间 \{0\}',\[\(result\.queriedText\)\]\)\}\}/);
   assert.match(template, /wx:if="\{\{!liveResultRestricted && evidenceCard\}\}"/);
   assert.match(template, /liveResultRestricted && resultAccessNotice/);
 });
@@ -200,7 +200,7 @@ test('the service notice refreshes monitoring status without a stock query, with
   const wxml = fs.readFileSync(new URL('../miniprogram/pages/query/index.wxml', import.meta.url), 'utf8');
   const button = wxml.match(/<button\b[^>]*queryNotice\.action === 'refresh'[^>]*>/)[0];
   const refreshHandler = button.match(/bindtap="(\w+)"/)[1];
-  const requeryButton = wxml.match(/<button\b[^>]*aria-label="重新查询此结果的配置与门店"[^>]*>/)[0];
+  const requeryButton = wxml.match(/<button\b[^>]*aria-label="\{\{i18n\.t\(ui,'重新查询此结果的配置与门店'\)\}\}"[^>]*>/)[0];
   const requeryHandler = requeryButton.match(/bindtap="(\w+)"/)[1];
   for (const hasSnapshot of [true, false]) {
     let finishStatus;

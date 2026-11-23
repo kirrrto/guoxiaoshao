@@ -1,16 +1,18 @@
 'use strict';
 const stores = require('./market-stores.json');
-const products = require('./market-products.json');
-// Only verified local retail targets. Never derive a regional SKU from another region.
-const MARKETS = [
+const catalog = require('./market-products.json');
+const { unpackProducts } = require('./market-catalog');
+
+const regions = [
   { code: 'JP', name: '日本', nameEn: 'Japan', timeZone: 'Asia/Tokyo' },
   { code: 'TW', name: '台湾', nameEn: 'Taiwan', timeZone: 'Asia/Taipei' },
   { code: 'HK', name: '香港', nameEn: 'Hong Kong', timeZone: 'Asia/Hong_Kong' },
-].map(({ code, name, nameEn, timeZone }) => ({
-  code, name, nameEn, timeZone,
-  products: products[code].map(product => ({ ...product, category: 'iphone', familyKey: 'iphone-18-pro',
-    familyName: 'iPhone 18 Pro / Pro Max', supported: true, querySupported: true, monitorSupported: true })),
-  stores: stores[code],
-}));
-const findMarket = code => MARKETS.find(market => market.code === code);
-module.exports = { MARKETS, findMarket };
+];
+const MARKETS = regions.map(site => ({ ...site, stores: stores[site.code],
+  products: unpackProducts(catalog.regions[site.code], catalog.values) }));
+const byRegion = new Map(MARKETS.map(site => [site.code, site]));
+const retailParts = new Map(MARKETS.map(site => [site.code,
+  new Map(site.products.filter(product => product.partNumber).map(product => [product.partNumber, product]))]));
+const findMarket = code => byRegion.get(code);
+const findMarketProduct = (code, partNumber) => retailParts.get(code)?.get(partNumber);
+module.exports = { MARKETS, findMarket, findMarketProduct, catalog };

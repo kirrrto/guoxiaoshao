@@ -53,9 +53,10 @@ function buildPickupUrl(storeNumber, partNumbers, products = [], market = null) 
   let endpoint = cto ? FULFILLMENT_ENDPOINT : PICKUP_ENDPOINT;
   if (market !== null) {
     // The standalone mainland catalog sampler does not load regional catalogs.
-    const site = require('./markets').findMarket(market);
+    const { findMarket, findMarketProduct } = require('./markets');
+    const site = findMarket(market);
     if (!site || cto || !site.stores.some(s => s.storeNumber === storeNumber)
-      || !partNumbers.every(part => site.products.some(p => p.partNumber === part))) throw new TypeError('invalid_market_target');
+      || !partNumbers.every(part => findMarketProduct(market, part)?.querySupported)) throw new TypeError('invalid_market_target');
     endpoint = 'https://www.apple.com/' + site.code.toLowerCase() + '/shop/retail/pickup-message';
   }
   const url = new URL(endpoint);

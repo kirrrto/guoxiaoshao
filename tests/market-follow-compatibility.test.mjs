@@ -1,4 +1,5 @@
 import test from 'node:test';
+import { marketMembership } from './helpers/market-membership.mjs';
 import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
 import { createFixture, userContext, userKeyOf } from './helpers/fixture.mjs';
@@ -17,7 +18,7 @@ const target = code => {
 async function memberFixture() {
   const f = createFixture({ config: { internationalMonitoring: enabled, internationalMarkets: enabled } });
   ok(await f.call('user.bootstrap'));
-  await f.repo.updateUser(actor, { membership: { expiresAt: '2027-01-01T00:00:00Z' } });
+  await f.repo.updateUser(actor, { membership: marketMembership(f.state.now, 'member_30d') });
   return f;
 }
 
@@ -25,7 +26,7 @@ test('only verified market targets can be watched, under the signed-in account a
   const f = createFixture();
   assert.equal((await f.call('market.watch', target('JP'))).error.code, 'market_monitoring_disabled');
   await f.repo.saveConfig({ ...await f.repo.getConfig(), internationalMarkets: enabled });
-  assert.equal((await f.call('market.watch', target('JP'))).error.code, 'member_required');
+  assert.equal((await f.call('market.watch', target('JP'))).error.code, 'market_watch_plan_required');
   assert.equal((await f.call('market.watch', { ...target('HK'), language: 'ja' })).error.code, 'invalid_language');
   assert.equal((await f.call('market.watch', { ...target('HK'), partNumber: target('JP').partNumber })).error.code, 'unknown_product');
   assert.equal((await f.call('market.watch', { ...target('HK'), storeNumbers: target('TW').storeNumbers })).error.code, 'unknown_store');
@@ -46,7 +47,8 @@ test('saving additional stores is atomic and idempotent, preserving original lan
   assert.equal(list.savedCount, 1);
   assert.equal(list.follows[0].language, 'en');
   assert.deepEqual(list.follows[0].storeNumbers, jp.stores.slice(0, 3).map(s => s.storeNumber).sort());
-  assert.equal((await f.call('market.watch', { ...payload, storeNumbers: [jp.stores[3].storeNumber] })).error.code, 'too_many_stores');
+  ok(await f.call('market.watch', { ...payload, storeNumbers: [jp.stores[3].storeNumber] }));
+  assert.equal((await f.call('market.watch', { ...payload, storeNumbers: [jp.stores[4].storeNumber] })).error.code, 'too_many_stores');
   const status = { expectedUserKey: actor, followId: first.followId, status: 'paused' };
   const { follow: paused } = ok(await f.call('market.watchStatus', status));
   const { follow: replay } = ok(await f.call('market.watch', payload));
@@ -68,22 +70,44 @@ test('domestic and market saves share one transactional slot limit while each in
   const cn = { followId: 'domestic-001', partNumber: 'MXXX1CH/A', storeNumbers: ['R577'] };
   const { follow } = ok(await f.call('follow.upsert', cn));
   ok(await f.call('market.watch', target('JP')));
+  ok(await f.call('market.watch', { ...target('JP'), partNumber: findMarket('JP').products[1].partNumber }));
   const last = await Promise.all([f.call('market.watch', target('HK')), f.call('market.watch', target('TW'))]);
   assert.equal(last.filter(res => res.ok).length, 1);
   assert.equal(last.find(res => !res.ok).error.code, 'too_many_follows');
   const { follows, otherMarketCount } = ok(await f.call('follow.list'));
   assert.equal(follows.length, 1);
   assert.equal(follows[0].followId, follow.followId);
-  assert.equal(otherMarketCount, 2);
-  assert.equal(ok(await f.call('market.follows')).follows.length, 2);
+  assert.equal(otherMarketCount, 3);
+  assert.equal(ok(await f.call('market.follows')).follows.length, 3);
   const boot = ok(await f.call('user.bootstrap'));
   assert.equal(boot.followCount, 1);
-  assert.equal(boot.otherMarketFollowCount, 2);
+  assert.equal(boot.otherMarketFollowCount, 3);
   assert.equal((await f.call('market.watchStatus', { expectedUserKey: actor, followId: follow.followId, status: 'removed' })).error.code, 'unknown_follow');
   assert.equal((await f.call('follow.upsert', { ...cn, partNumber: 'MYYY2CH/A', followId: 'domestic-002' })).error.code, 'too_many_follows');
   const sameSku = { market: 'TW', partNumber: 'X', storeNumbers: ['R001'] };
   assert.equal(validateFollowLimits([{ ...sameSku, market: 'HK' }], sameSku).ok, true);
   assert.equal(validateFollowLimits([sameSku], sameSku).reason, 'duplicate_part_number');
+});
+
+test('a regional watch survives a downgrade; only a current monthly or annual pass can add, resume or use it', async () => {
+  const f = await memberFixture();
+  const watch = ok(await f.call('market.watch', target('JP'))).follow;
+  const state = status => ({ expectedUserKey: actor, followId: watch.followId, status });
+  for (const lower of ['member_7d','member_trial']) {
+    await f.repo.updateUser(actor, { membership: marketMembership(f.state.now, lower, 100 * 86400000) });
+    const snapshots = ok(await f.call('market.follows'));
+    assert.equal(snapshots.canWatch, false);
+    assert.deepEqual([snapshots.follows[0].status, snapshots.follows[0].savedStatus, snapshots.follows[0].eligibleStoreNumbers], ['plan_required','active',[]]);
+    assert.equal((await f.call('market.watch', target('TW'))).error.code, 'market_watch_plan_required');
+    ok(await f.call('market.watchStatus', state('paused')));
+    assert.equal((await f.call('market.watchStatus', state('active'))).error.code, 'market_watch_plan_required');
+    await f.repo.updateUser(actor, { membership: marketMembership(f.state.now, 'member_365d', 2000) });
+    const yes = ok(await f.call('market.watchStatus', state('active'))).follow;
+    assert.deepEqual(yes.eligibleStoreNumbers, watch.storeNumbers);
+  }
+  f.advance(2000);
+  assert.equal(ok(await f.call('market.follows')).follows[0].status, 'expired');
+  assert.equal(ok(await f.call('market.watchStatus', state('removed'))).follow.status, 'removed');
 });
 
 test('international notification entries stay in the markets tab on cold and warm launches', () => {

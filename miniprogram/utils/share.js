@@ -1,3 +1,4 @@
+const { t } = require('./language');
 /**
  * Shared WeChat share payload for consumer pages.
  * Inventory share cards may use the selected product. The personal home always
@@ -41,13 +42,13 @@ function shareTitleFor(route, pageData) {
 
 function shareAppMessage(route, pageData) {
   if (route === '/pages/markets/index') return {
-    title: PAGE_META[route].title, path: '/pages/markets/index?from=share_markets', imageUrl: IMAGE,
+    title: t(PAGE_META[route].title), path: '/pages/markets/index?from=share_markets', imageUrl: IMAGE,
   };
   if (route === '/pages/follow/index') return {
-    title: DEFAULT_TITLE, path: '/pages/follow/index?from=share_follow', imageUrl: IMAGE,
+    title: t(DEFAULT_TITLE), path: '/pages/follow/index?from=share_follow', imageUrl: IMAGE,
   };
   const payload = {
-    title: shareTitleFor(route, pageData),
+    title: t(shareTitleFor(route, pageData)),
     path: `/pages/query/index?${(PAGE_META[route] && PAGE_META[route].query) || 'from=share'}`,
   };
   if (route === '/pages/query/index') {
@@ -116,7 +117,7 @@ function timelineImagePath() {
 function shareTimeline() {
   // Moments is a product intro card: brand logo, not device or page art.
   return {
-    title: DEFAULT_TITLE,
+    title: t(DEFAULT_TITLE),
     query: 'from=share_timeline',
     imageUrl: timelineImagePath(),
   };

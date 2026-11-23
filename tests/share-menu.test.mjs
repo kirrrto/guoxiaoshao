@@ -34,6 +34,23 @@ test('query share title reflects selected product when present', () => {
   assert.ok(title.includes('iPhone 18 Pro Max 512GB 冰川蓝色'));
 });
 
+test('English share cards localize public product titles and keep personal watches private', () => {
+  const rt = runtime();
+  rt.wx.getAppBaseInfo = () => ({ language: 'en-US' });
+  const local = rt.load('utils/share.js');
+  const card = local.shareAppMessage('/pages/query/index', {
+    selection: { product: { title: 'iPhone 18 Pro' } },
+  });
+  assert.equal(card.title, 'Guoxiaoshao · Check pickup for iPhone 18 Pro');
+  const personal = local.shareAppMessage('/pages/follow/index', { deadlines: [{ title: 'Private' }] });
+  assert.equal(personal.title, local.shareTimeline().title);
+  assert.match(personal.title, /^Guoxiaoshao/);
+  assert.equal(personal.imageUrl, local.IMAGE);
+  for (const route of Object.keys(local.PAGE_META)) {
+    assert.doesNotMatch(local.shareAppMessage(route, {}).title, /[\u3400-\u9fff]/u, route);
+  }
+});
+
 test('every consumer tab page exposes onShareAppMessage and onShareTimeline', () => {
   for (const route of ['pages/query/index.js', 'pages/follow/index.js', 'pages/markets/index.js', 'pages/mine/index.js']) {
     const rt = runtime();

@@ -1,19 +1,20 @@
+<wxs module="i18n" src="../../i18n/render.wxs" />
 <page-container wx:if="{{nativeGuardSupported && !docked}}" show="{{nativeGuardShow}}" overlay="{{false}}" duration="{{0}}" position="bottom" close-on-slide-down="{{false}}" custom-style="height:1px;min-height:0;background:transparent;pointer-events:none;" bindafterleave="onNativeLeave" aria-hidden="true" />
 <view wx:if="{{visible}}" class="config-sheet-root {{docked ? 'config-sheet-root--docked' : ''}}">
   <view wx:if="{{!docked}}" class="config-sheet-scrim" catchtap="onCloseTap" catchtouchmove="stopTouch" aria-hidden="true"></view>
-  <view class="config-sheet-panel" style="{{docked ? '' : 'bottom: ' + keyboardHeight + 'px; max-height: calc(100vh - ' + keyboardHeight + 'px - max(12px, env(safe-area-inset-top)));'}}" aria-role="{{docked ? 'group' : 'dialog'}}" aria-modal="{{!docked}}" aria-label="{{title}}">
+  <view class="config-sheet-panel" style="{{docked ? '' : 'bottom: ' + keyboardHeight + 'px; max-height: calc(100vh - ' + keyboardHeight + 'px - max(12px, env(safe-area-inset-top)));'}}" aria-role="{{docked ? 'group' : 'dialog'}}" aria-modal="{{!docked}}" aria-label="{{i18n.t(ui,(title))}}">
     <view class="config-sheet-header">
-      <view class="config-sheet-heading"><view class="config-sheet-title">{{title}}</view></view>
-      <button class="config-sheet-close {{busy ? 'config-sheet-close--busy' : ''}}" disabled="{{busy}}" bindtap="onCloseTap" aria-label="关闭配置面板"><view class="ui-close" aria-hidden="true"></view></button>
+      <view class="config-sheet-heading"><view class="config-sheet-title">{{i18n.t(ui,(title))}}</view></view>
+      <button class="config-sheet-close {{busy ? 'config-sheet-close--busy' : ''}}" disabled="{{busy}}" bindtap="onCloseTap" aria-label="{{i18n.t(ui,'关闭配置面板')}}"><view class="ui-close" aria-hidden="true"></view></button>
     </view>
     <scroll-view class="config-sheet-body" scroll-y enhanced show-scrollbar="{{true}}"><view class="config-sheet-content">
-      <view wx:if="{{subtitle}}" class="config-sheet-subtitle">{{subtitle}}</view>
+      <view wx:if="{{subtitle}}" class="config-sheet-subtitle">{{i18n.t(ui,(subtitle))}}</view>
       <slot />
-      <view wx:if="{{summary}}" class="config-sheet-summary">{{summary}}</view>
+      <view wx:if="{{summary}}" class="config-sheet-summary">{{i18n.t(ui,(summary))}}</view>
     </view></scroll-view>
     <view class="config-sheet-footer {{keyboardHeight ? 'config-sheet-keyboard' : ''}}">
       <slot name="notice" />
-      <button class="btn btn-primary btn-block config-sheet-confirm" disabled="{{busy || disabled}}" loading="{{busy}}" bindtap="onConfirm">{{busy ? '正在保存…' : confirmText}}</button>
+      <button class="btn btn-primary btn-block config-sheet-confirm" disabled="{{busy || disabled}}" loading="{{busy}}" bindtap="onConfirm">{{i18n.t(ui,(busy ? '正在保存…' : confirmText))}}</button>
     </view>
   </view>
 </view>

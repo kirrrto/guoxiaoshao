@@ -1,0 +1,130 @@
+{
+  "date": "2026-11-23",
+  "method": "GET",
+  "scope": "开发机使用果小哨的取货适配器，对三个 Apple 当地公开取货接口各发起一次请求，每次查询一家门店的五个货号。请求无需账户，未访问果小哨生产云环境。结果对应下列 UTC 时间的单次观测。",
+  "requests": [
+    {
+      "market": "JP",
+      "storeNumber": "R711",
+      "storeName": "京都",
+      "requestUrl": "https://www.apple.com/jp/shop/retail/pickup-message?pl=true&mts.0=regular&parts.0=MJXG4J%2FA&parts.1=MDWU4J%2FA&parts.2=MDHH4J%2FA&parts.3=MFHP4J%2FA&parts.4=MDEW4J%2FA&store=R711",
+      "startedAt": "2026-11-23T14:35:15.579Z",
+      "finishedAt": "2026-11-23T14:35:16.098Z",
+      "elapsedMs": 519,
+      "httpStatus": 200,
+      "bytes": 9640,
+      "contentKind": "json",
+      "error": null,
+      "retryAfter": null,
+      "observations": [
+        {
+          "category": "iphone",
+          "partNumber": "MJXG4J/A",
+          "status": "available"
+        },
+        {
+          "category": "ipad",
+          "partNumber": "MDWU4J/A",
+          "status": "ineligible"
+        },
+        {
+          "category": "mac",
+          "partNumber": "MDHH4J/A",
+          "status": "available"
+        },
+        {
+          "category": "airpods",
+          "partNumber": "MFHP4J/A",
+          "status": "available"
+        },
+        {
+          "category": "homepod",
+          "partNumber": "MDEW4J/A",
+          "status": "unavailable"
+        }
+      ]
+    },
+    {
+      "market": "TW",
+      "storeNumber": "R694",
+      "storeName": "信義 A13",
+      "requestUrl": "https://www.apple.com/tw/shop/retail/pickup-message?pl=true&mts.0=regular&parts.0=MJRP4ZP%2FA&parts.1=MDWK4TA%2FA&parts.2=MDH74TA%2FA&parts.3=MFHP4TA%2FA&parts.4=MDEW4TA%2FA&store=R694",
+      "startedAt": "2026-11-23T14:35:16.099Z",
+      "finishedAt": "2026-11-23T14:35:16.597Z",
+      "elapsedMs": 498,
+      "httpStatus": 200,
+      "bytes": 9899,
+      "contentKind": "json",
+      "error": null,
+      "retryAfter": null,
+      "observations": [
+        {
+          "category": "iphone",
+          "partNumber": "MJRP4ZP/A",
+          "status": "available"
+        },
+        {
+          "category": "ipad",
+          "partNumber": "MDWK4TA/A",
+          "status": "available"
+        },
+        {
+          "category": "mac",
+          "partNumber": "MDH74TA/A",
+          "status": "available"
+        },
+        {
+          "category": "airpods",
+          "partNumber": "MFHP4TA/A",
+          "status": "available"
+        },
+        {
+          "category": "homepod",
+          "partNumber": "MDEW4TA/A",
+          "status": "available"
+        }
+      ]
+    },
+    {
+      "market": "HK",
+      "storeNumber": "R409",
+      "storeName": "铜锣湾",
+      "requestUrl": "https://www.apple.com/hk/shop/retail/pickup-message?pl=true&mts.0=regular&parts.0=MJY04ZA%2FA&parts.1=MDWU4ZP%2FA&parts.2=MGP84ZP%2FA&parts.3=MFHP4ZP%2FA&parts.4=MDEW4ZP%2FA&store=R409",
+      "startedAt": "2026-11-23T14:35:16.597Z",
+      "finishedAt": "2026-11-23T14:35:17.011Z",
+      "elapsedMs": 414,
+      "httpStatus": 200,
+      "bytes": 8567,
+      "contentKind": "json",
+      "error": null,
+      "retryAfter": null,
+      "observations": [
+        {
+          "category": "iphone",
+          "partNumber": "MJY04ZA/A",
+          "status": "available"
+        },
+        {
+          "category": "ipad",
+          "partNumber": "MDWU4ZP/A",
+          "status": "ineligible"
+        },
+        {
+          "category": "mac",
+          "partNumber": "MGP84ZP/A",
+          "status": "available"
+        },
+        {
+          "category": "airpods",
+          "partNumber": "MFHP4ZP/A",
+          "status": "available"
+        },
+        {
+          "category": "homepod",
+          "partNumber": "MDEW4ZP/A",
+          "status": "ineligible"
+        }
+      ]
+    }
+  ]
+}

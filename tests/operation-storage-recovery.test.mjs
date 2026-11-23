@@ -73,6 +73,7 @@ test('storage recovery state follows the full localKey scope', () => {
     require(name) {
       if (name === './api') return { newId: kind => `${kind}-scoped-${++sequence}` };
       if (name === './local-key') return { localKey: key => `${scope}:${key}` };
+      if (name === './language') return { modal() { throw Error('Storage recovery should not request confirmation'); } };
       throw Error(`unexpected module: ${name}`);
     },
   });

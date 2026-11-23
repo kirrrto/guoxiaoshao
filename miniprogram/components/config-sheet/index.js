@@ -1,6 +1,7 @@
+const languageUI = require('../../utils/language');
 const { setTabBarOverlay } = require('../../utils/tab-bar');
 
-Component({
+Component(require('../../utils/language').component({
   options: { multipleSlots: true, styleIsolation: 'apply-shared' },
   properties: {
     visible: { type: Boolean, value: false, observer: 'onVisible' },
@@ -122,7 +123,7 @@ Component({
       if (!dirty) { this.triggerEvent('close'); return; }
       this.confirmingClose = true;
       const epoch = this.closeEpoch;
-      wx.showModal({ title: '放弃这次修改？', content: '已保存的配置会保留，这次未保存的选择将丢弃。',
+      languageUI.modal({ title: '放弃这次修改？', content: '已保存的配置会保留，这次未保存的选择将丢弃。',
         confirmText: '放弃修改', cancelText: '继续编辑',
         success: result => {
           if (this.retired || epoch !== this.closeEpoch || !this.data.visible) return;
@@ -136,4 +137,4 @@ Component({
       if (!this.data.busy && !this.data.disabled && !this.confirmingClose) this.triggerEvent('confirm');
     },
   },
-});
+}));

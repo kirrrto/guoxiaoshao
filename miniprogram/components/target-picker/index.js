@@ -1,3 +1,4 @@
+const languageUI = require('../../utils/language');
 const { productThumbnailUrl } = require('../../utils/product-image-fit');
 /** Cascading filters use only model/attributes supplied by the catalog. */
 const { sortFamilies, sortModels, compareCapacities, storeMatches } = require('../../utils/catalog-order');
@@ -22,7 +23,7 @@ const specSummaryOf = p => {
 };
 const own = (source, key) => Object.prototype.hasOwnProperty.call(source, key);
 const HOT_CITY_NAMES = ['上海', '北京', '深圳', '广州', '杭州', '成都'];
-Component({
+Component(require('../../utils/language').component({
   properties: {
     // Pages bind only the catalog version. The indexed catalog is read from the
     // session store, so the full product list never crosses the render bridge.
@@ -191,7 +192,7 @@ Component({
       };
       try {
         wx.setClipboardData({ data: official.sourceUrl,
-          success: () => { finish(false); wx.showToast({ title: '官网链接已复制', icon: 'success' }); },
+          success: () => { finish(false); languageUI.toast({ title: '官网链接已复制', icon: 'success' }); },
           fail: () => finish(true),
           complete: () => finish(false),
         });
@@ -310,7 +311,7 @@ Component({
       const store = typeof number === 'string' && own(this.storeByNumber, number) ? this.storeByNumber[number] : null; if (!store) return;
       const selected = this.data.selectedStores.slice(); const index = selected.findIndex(s => s.storeNumber === store.storeNumber);
       if (index >= 0) selected.splice(index, 1); else {
-        if (selected.length >= this.data.maxStores) { wx.showToast({ title: `最多选择 ${this.data.maxStores} 家门店`, icon: 'none' }); return; }
+        if (selected.length >= this.data.maxStores) { languageUI.toast({ title: `最多选择 ${this.data.maxStores} 家门店`, icon: 'none' }); return; }
         selected.push({ storeNumber: store.storeNumber, name: store.name, city: store.city, label: storeLabelWithCity(store.storeNumber, store.name, store.city) });
       }
       this.batch(() => { this.stage({ selectedStores: selected }); this.selectCity(this.data.cityIndex); this.updateSearchResults(); this.emit(); });
@@ -338,4 +339,4 @@ Component({
       if (typeof wx.nextTick === 'function') wx.nextTick(notify); else setTimeout(notify, 0);
     },
   },
-});
+}));

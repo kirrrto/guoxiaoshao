@@ -17,7 +17,10 @@ function ledgerEntry(ctx, user, { _id, type, delta, extra }) {
 }
 
 /** Daily sign-in: +1 credit, once per Beijing day, subject to caps. */
-async function signin(ctx) {
+async function signin(ctx, payload = {}) {
+  if (payload.expectedUserKey !== undefined && payload.expectedUserKey !== ctx.identity.userKey) {
+    throw new ApiError('signin_account_changed', '账号已变化，请刷新后重新签到。');
+  }
   const user = await ensureUser(ctx);
   const cfg = resolveConfig(ctx.config.quota);
   const snapshot = await quotaSnapshot(ctx, user);

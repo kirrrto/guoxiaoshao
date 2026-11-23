@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
 import { createFixture, fakeFetch, userKeyOf } from './helpers/fixture.mjs';
+import { marketMembership } from './helpers/market-membership.mjs';
 
 const require = createRequire(import.meta.url);
 const { runScheduled } = require('../cloudfunctions/gxs_api/lib/engine/scheduled');
@@ -23,7 +24,7 @@ async function setup(config = {}) {
     notifications: { enabled: true, templateIds: { restock: 'TPL_ZH', restockEn: 'TPL_EN' } }, ...config,
   } });
   await f.call('user.bootstrap');
-  await f.repo.updateUser(userKeyOf(), { membership: { expiresAt: '2027-01-01T00:00:00Z', planId: 'annual' },
+  await f.repo.updateUser(userKeyOf(), { membership: marketMembership(f.state.now, 'member_365d'),
     subscriptions: { TPL_ZH: { credits: 5 }, TPL_EN: { credits: 5 } }, settings: { notifyEnabled: true, dnd: { enabled: false } } });
   for (const [market, store, partNumber, language] of sites) {
     const result = await f.call('market.watch', { market, partNumber, language, storeNumbers: [store], expectedUserKey: userKeyOf() });
@@ -139,4 +140,51 @@ test('a pending/ineligible or unknown stock state cannot produce an overseas res
   }
   assert.notEqual(targetKeyOf('R128','SKU','JP'), targetKeyOf('R128','SKU','HK'));
   assert.notEqual(targetKeyOf('R128','SKU','JP'), targetKeyOf('R128','SKU'));
+});
+
+test('a withdrawn regional store or product cannot create a restock task or send one queued before delisting', () => {
+  const { buildTasks, skipReason } = require('../cloudfunctions/gxs_api/lib/engine/notifier');
+  const config = {collector:{enabled:true},notifications:{enabled:true,templateIds:{restock:'OK'}},
+    internationalMonitoring:{JP:true},internationalNotifications:{JP:true}};
+  const now = new Date('2026-11-23T02:00:00Z');
+  for (const target of [{partNumber:'MFHE4J/A',storeNumber:'R128'}, {partNumber:'MJR54J/A',storeNumber:'R999'}]) {
+    const event={...target,market:'JP',type:'restock_confirmed',previousStatus:'unavailable',detectedAt:now.toISOString()};
+    const follow={market:'JP',partNumber:target.partNumber,storeNumbers:[target.storeNumber],userKey:'owner',status:'active'};
+    assert.deepEqual(buildTasks({events:[event],follows:[follow],users:new Map(),config,now}),[]);
+    assert.equal(skipReason({task:{...event,eventType:event.type},follow,config,now}),'invalid_market_target');
+  }
+});
+
+test('a regional tier downgrade after planning stops delivery and the next tick removes regional targets without deleting watches', async () => {
+  const { f, messages, pass, upstream, plan } = await setup();
+  await pass();
+  f.advance(60000); plan.R128.display = 'available'; await pass();
+  const reserve = f.repo.reserveSubscriptionCredit;
+  f.repo.reserveSubscriptionCredit = async args => {
+    const reservation = await reserve(args);
+    await f.repo.updateUser(userKeyOf(), { membership: marketMembership(f.state.now, 'member_7d') });
+    return reservation;
+  };
+  f.advance(60000); await pass();
+  assert.equal(messages.length, 0);
+  assert.equal((await f.repo.getUser(userKeyOf())).subscriptions.TPL_EN.credits, 5);
+  const history = await f.repo.listNotifications(userKeyOf(), 10);
+  const receipt = history.find(n => n.market === 'JP' && n.reason === 'market_watch_plan_required');
+  assert.ok(receipt);
+  const before = upstream.calls.length;
+  const readLatest = f.repo.getLatest;
+  let latestReads = 0;
+  f.repo.getLatest = async keys => { latestReads++; return readLatest(keys); };
+  const wallet = (await f.repo.getUser(userKeyOf())).quota.balance;
+  const payload = { eventId: receipt.eventId, expectedUserKey: userKeyOf() };
+  const detail = await f.call('notify.detail', payload);
+  assert.equal(detail.data.notification.eventId, receipt.eventId);
+  assert.equal(detail.data.latest.restricted, true);
+  assert.equal(latestReads, 0);
+  assert.equal((await f.call('notify.open', payload)).ok, true);
+  assert.equal((await f.repo.getUser(userKeyOf())).quota.balance, wallet);
+  f.advance(60000); await pass();
+  assert.equal(upstream.calls.length, before);
+  assert.deepEqual((await f.repo.getCollectorStatus()).markets, {});
+  assert.equal((await f.repo.listFollows(userKeyOf())).length, 3);
 });

@@ -76,7 +76,7 @@ jobs:
       - name: Verify membership, stock details, authorization prompts and operator screens
         shell: bash
         run: |
-          for group in v2 stock nudge admin markets; do
+          for group in v2 stock nudge admin markets language; do
             dir="$RUNNER_TEMP/ui-$group"
             node tools/ui-preview/build.mjs "--$group-only" --out "$dir"
             node tools/ui-preview/check-layout.mjs "$dir"
@@ -96,6 +96,10 @@ jobs:
           node tools/ui-preview/build.mjs --sheets-only --out "$RUNNER_TEMP/ui-sheets"
           node tools/ui-preview/check-sheet-layout.mjs "$RUNNER_TEMP/ui-sheets"
           cp "$RUNNER_TEMP/ui-sheets/sheet-layout-metrics.json" output/ci-sheet-layout.json
+      - name: Verify regional store catalogs
+        run: node tools/catalog/build-market-catalog.mjs --check
+      - name: Verify packaged English translations
+        run: node tools/i18n/build.mjs --check
       - name: Check release candidate
         run: node tools/release/check.mjs --out output/ci-release.json
       - name: Preserve verification evidence even when release is blocked

@@ -304,16 +304,16 @@ view, text, button, input, textarea, image, scroll-view, picker { box-sizing: bo
   50% { opacity: 0.5; }
 }
 /* 哨响：小哨刚看到有货时，状态点向外扩散三次后静止。 */
-@keyframes whistle-ping {
-  0% { box-shadow: var(--ping-from); }
-  100% { box-shadow: var(--ping-to); }
+@keyframes stock-breathe {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: .62; transform: scale(.86); }
 }
-.ui-live-dot { flex: none; width: 10px; height: 10px; border-radius: 50%; background: var(--green); }
+.ui-live-dot { display: inline-block; flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--green); }
 @media (prefers-reduced-motion: no-preference) {
   .ui-reveal { animation: panel-appear var(--dur) var(--ease); }
   .ui-chevron { transition: transform var(--dur) var(--ease); }
   .skeleton-line, .skeleton-bar { animation: skeleton-pulse 1.2s ease-in-out 3; }
-  .ui-live-dot { animation: whistle-ping 1.6s var(--ease) 3; }
+  .ui-live-dot { animation: stock-breathe 2.8s ease-in-out infinite; }
 }
 @media (prefers-reduced-motion: reduce) {
   .btn.btn, .ui-action.ui-action, .ui-disclosure.ui-disclosure { transition: none; }

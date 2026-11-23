@@ -41,6 +41,12 @@ function marketDeliveryEnabled(config, market) {
   return config.collector.enabled && config.internationalMonitoring?.[market] === true && config.internationalNotifications?.[market] === true;
 }
 
+function marketTargetListed({ market, partNumber, storeNumber }) {
+  const { findMarket, findMarketProduct } = require('../markets');
+  return Boolean(findMarketProduct(market, partNumber)?.monitorSupported
+    && findMarket(market)?.stores.some(store => store.storeNumber === storeNumber));
+}
+
 const DEFAULT_FIELDS = Object.freeze({ product: 'thing1', store: 'thing2', time: 'time3', status: 'thing4' });
 
 /**
@@ -55,7 +61,8 @@ function buildTasks({ events, follows, users, config, now }) {
     if (!kind) continue;
     const market = event.market || 'CN';
     const regional = market !== 'CN';
-    if (regional && (event.type !== 'restock_confirmed' || event.previousStatus !== 'unavailable' || !marketDeliveryEnabled(config, market))) continue;
+    if (regional && (event.type !== 'restock_confirmed' || event.previousStatus !== 'unavailable'
+      || !marketDeliveryEnabled(config, market) || !marketTargetListed(event))) continue;
     // Sold-out alerts are optional: without their own template none are planned.
     if (kind === 'soldout' && !isValidTemplateId(templateIdFor(kind, config))) continue;
     const matching = follows.filter(f => (f.market || 'CN') === market && f.partNumber === event.partNumber && f.storeNumbers.includes(event.storeNumber));
@@ -83,7 +90,8 @@ function buildTasks({ events, follows, users, config, now }) {
       if (!user) { skip('user_missing'); continue; }
       if (!canUseReminders(user, now)) { skip(reminderBlockReason(user)); continue; }
       if (follow.status !== 'active') { skip('follow_not_active'); continue; }
-      if (!followAllowance(user, follow, follows, now).eligibleStoreNumbers.includes(event.storeNumber)) { skip('plan_limit'); continue; }
+      const allowance = followAllowance(user, follow, follows, now);
+      if (!allowance.eligibleStoreNumbers.includes(event.storeNumber)) { skip(allowance.marketPlanRequired ? 'market_watch_plan_required' : 'plan_limit'); continue; }
       if (user.settings && user.settings.notifyEnabled === false) { skip('user_disabled'); continue; }
       const dnd = user.settings && user.settings.dnd;
       if (suppressDndEvent(dnd, now, event.detectedAt)) { skip('dnd'); continue; }
@@ -167,6 +175,7 @@ function skipReason({ task, user, follow, config, now, senderAppid }) {
   const kind = alertKind(task.eventType) || 'restock';
   if (task.market && task.market !== 'CN') {
     if (!marketDeliveryEnabled(config, task.market) || task.eventType !== 'restock_confirmed') return 'market_notifications_disabled';
+    if (!marketTargetListed(task)) return 'invalid_market_target';
     if (task.market !== follow?.market || (follow.language || 'zh-CN') !== (task.language || 'zh-CN')
       || !require('../notification-target').matchesNotificationTarget(task, follow)) return 'follow_not_active';
   }
@@ -177,7 +186,8 @@ function skipReason({ task, user, follow, config, now, senderAppid }) {
   if (senderAppid && user.appid !== senderAppid) return 'consumer_appid_mismatch';
   if (!user.openid) return 'openid_missing';
   if (!follow || follow.status !== 'active' || follow.userKey !== task.userKey || follow.partNumber !== task.partNumber || !follow.storeNumbers.includes(task.storeNumber)) return 'follow_not_active';
-  if (!followAllowance(user, follow, [follow], now).eligibleStoreNumbers.includes(task.storeNumber)) return 'plan_limit';
+  const allowance = followAllowance(user, follow, [follow], now);
+  if (!allowance.eligibleStoreNumbers.includes(task.storeNumber)) return allowance.marketPlanRequired ? 'market_watch_plan_required' : 'plan_limit';
   if (settings && settings.notifyEnabled === false) return 'user_disabled';
   if (suppressDndEvent(settings && settings.dnd, now, task.detectedAt)) return 'dnd';
   const detectedAt = Date.parse(task.detectedAt);

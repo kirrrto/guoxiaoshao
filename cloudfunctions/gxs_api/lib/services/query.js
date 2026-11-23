@@ -7,7 +7,7 @@ const { accountLimits, ANNUAL_LIMITS } = require('../rules/membership');
 const { isRetiredPartNumber, retiredProductMessage } = require('../rules/follow-access');
 const { recordObservations } = require('../engine/observations');
 const { isProductIdentity } = require('../rules/product-target');
-const { MARKETS, findMarket } = require('../markets');
+const { MARKETS, findMarket, findMarketProduct, catalog } = require('../markets');
 const { isValidTemplateId } = require('../config');
 const { monitoringSnapshot } = require('../monitor-readiness');
 const ID_PATTERN = /^[A-Za-z0-9_-]{8,64}$/;
@@ -91,7 +91,7 @@ async function pickup(ctx, payload, { existingOnly = false, maxCost } = {}) {
   return executePickup(ctx, { user, product, queryId, partNumber, storeNumbers, startedAt, existingOnly, maxCost });
 }
 
-async function marketCatalog(ctx) {
+async function marketCatalog(ctx, payload = {}) {
   const config = ctx.config;
   const ids = config.notifications.templateIds || {};
   let status = null;
@@ -101,7 +101,8 @@ async function marketCatalog(ctx) {
   }
   const worker = status && monitoringSnapshot(config, status, ctx.now).collector;
   const workerReady = worker && !worker.stale && !['error', 'not_deployed', 'no_lease', 'stopped', 'disabled'].includes(worker.state);
-  return { markets: MARKETS.map(site => {
+  const compact = payload.format === 'compact-v1';
+  return { ...(compact ? { format: catalog.format, values: catalog.values } : {}), markets: MARKETS.map(site => {
     const monitorEnabled = config.collector.enabled === true && config.internationalMonitoring?.[site.code] === true;
     const notify = monitorEnabled && config.notifications.enabled === true && config.internationalNotifications?.[site.code] === true;
     const region = monitorEnabled && status?.markets?.[site.code];
@@ -109,7 +110,8 @@ async function marketCatalog(ctx) {
     const observed = region ? Date.parse(region.lastSuccessAt) : NaN;
     const monitorStale = !(workerReady && monitorIntervalMs && region.state === 'running' && region.health?.state === 'healthy'
       && Number.isFinite(observed) && observed <= ctx.now.getTime() && !(region.admissionUntil > ctx.now.getTime()));
-    return { ...site, enabled: config.internationalMarkets?.[site.code] === true, monitorEnabled,
+    const { products, ...metadata } = site;
+    return { ...metadata, ...(compact ? { productRows: catalog.regions[site.code] } : { products }), enabled: config.internationalMarkets?.[site.code] === true, monitorEnabled,
       monitorIntervalMs, monitorStale, monitorLastSuccessAt: Number.isFinite(observed) && observed <= ctx.now.getTime() ? new Date(observed).toISOString() : null,
       notificationsEnabled: notify && isValidTemplateId(ids.restock),
       notificationsEnabledEn: notify && isValidTemplateId(ids.restockEn) && ![ids.restock, ids.soldout, ids.soldoutEn, config.deadlineReminders.templateId].includes(ids.restockEn) };
@@ -124,16 +126,22 @@ async function marketPickup(ctx, payload) {
   if (payload.expectedUserKey !== ctx.identity.userKey) throw new ApiError('query_account_changed', '账号已变化，请重新确认查询。');
   if (typeof queryId !== 'string' || !ID_PATTERN.test(queryId)) throw new ApiError('invalid_query_id', '查询编号无效。');
   if (maxCost !== undefined && (!Number.isSafeInteger(maxCost) || maxCost < 0)) throw new ApiError('invalid_payload', '查询费用无效。');
-  const product = site.products.find(item => item.partNumber === partNumber);
-  if (!product || !Array.isArray(storeNumbers) || storeNumbers.length !== 1
-    || !site.stores.some(store => store.storeNumber === storeNumbers[0])) throw new ApiError('invalid_market_target', '请在当前站点重新选择商品与门店。');
-  if (ctx.config.internationalMarkets?.[market] !== true) {
-    // Closing a storefront must not strand or recharge an already-debited request.
-    // A disabled market can replay/settle an existing receipt, never restart HTTP.
+  if (typeof partNumber !== 'string' || !/^[A-Z0-9]{5,16}\/A$/.test(partNumber) || !Array.isArray(storeNumbers)
+    || storeNumbers.length !== 1 || typeof storeNumbers[0] !== 'string' || !/^R\d{3}$/.test(storeNumbers[0])) {
+    throw new ApiError('invalid_market_target', '请在当前站点重新选择商品与门店。');
+  }
+  const product = findMarketProduct(market, partNumber);
+  const listed = product?.querySupported && site.stores.some(store => store.storeNumber === storeNumbers[0]);
+  if (!listed || ctx.config.internationalMarkets?.[market] !== true) {
+    // An exact old receipt may outlive its SKU, store, or rollout switch.
+    // Only settle or replay; never start another query on this path.
+    const unavailable = listed ? new ApiError('market_disabled', '该站点尚未开放实时查询。')
+      : new ApiError('invalid_market_target', '请在当前站点重新选择商品与门店。');
     const id = ctx.identity.userKey + '|' + queryId;
     let record = await ctx.repo.getQuery(id);
-    if (!record || record.kind !== 'market' || record.market !== market || record.partNumber !== partNumber
-      || record.storeNumbers?.length !== 1 || record.storeNumbers[0] !== storeNumbers[0]) throw new ApiError('market_disabled', '该站点尚未开放实时查询。');
+    if (!record || record.userKey !== ctx.identity.userKey || record.queryId !== queryId || record.kind !== 'market'
+      || record.market !== market || record.partNumber !== partNumber || record.storeNumbers?.length !== 1
+      || record.storeNumbers[0] !== storeNumbers[0]) throw unavailable;
     if (record.status === 'pending') {
       if (record.leaseUntil <= ctx.nowIso) {
         await ctx.repo.expireQuery({ id, userKey: ctx.identity.userKey, nowIso: ctx.nowIso, staleBefore: ctx.nowIso });
@@ -141,7 +149,7 @@ async function marketPickup(ctx, payload) {
       }
       if (record?.status === 'pending') return { market, queryId, ok: false, reason: 'query_in_progress', retryAfterMs: Math.max(1000, Date.parse(record.leaseUntil) - ctx.now.getTime()) };
     }
-    if (!record?.response) throw new ApiError('market_disabled', '该站点尚未开放实时查询。');
+    if (!record?.response) throw unavailable;
     const owner = await ctx.repo.getUser(ctx.identity.userKey);
     return { ...record.response, market, queryId, balance: owner.quota.balance, quotaRevision: owner.quota.revision || 0, replayed: true };
   }

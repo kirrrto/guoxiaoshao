@@ -45,6 +45,10 @@ function productThumbnailUrl(imageUrl, variant = 'card', partNumber = '') {
 // Local SKUs differ by region. Only the verified model and exterior finish identify shared artwork.
 function regionalProductThumbnail(product) {
   if (!product || !product.model) return '';
+  if (product.artworkPart) {
+    const local = productThumbnailUrl('', 'card', product.artworkPart);
+    if (local) return local;
+  }
   const finish = finishLabels.get(product.color || product.colorEn);
   if (!finish || (product.colorEn && finishLabels.get(product.colorEn) !== finish)) return '';
   loadDisplayAssets();

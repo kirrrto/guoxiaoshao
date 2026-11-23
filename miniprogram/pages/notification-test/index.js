@@ -36,7 +36,7 @@ const STATUS = {
   uncertain: ['结果尚未确认', '消息可能已经发送，本次暂不退次数，也不会重复发送。请检查微信「服务通知」并反馈。'],
 };
 
-Page({
+Page(require('../../utils/language').page('notification-test', {
   data: { loading: true, busy: false, ready: false, balance: 0, test: null, progress: testProgress(null), statusTitle: '', statusNote: '', error: null, canContinue: false, pendingOther: false, blocked: false, feedbackNote: '', operationNote: '', checkNote: '', showTestRules: false, showTroubleshooting: false, returnLabel: '返回提醒中心' },
   async onLoad(options = {}) {
     this.retired = false;
@@ -304,4 +304,4 @@ Page({
   onShareTimeline() {
     return shareTimeline('/pages/notification-test/index');
   },
-});
+}));

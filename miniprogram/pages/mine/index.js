@@ -1,3 +1,4 @@
+const languageUI = require('../../utils/language');
 const navigation = require('../../utils/navigation');
 const { reminderPanelMethods } = require('../../utils/reminder-panel');
 const { restockSubscription, soldoutSubscription, activeDnd, LOW_CREDITS } = require('../../utils/reminder-readiness');
@@ -97,6 +98,7 @@ const SKIP_REASON = {
   event_expired: '补货信息已过时，本次未发送',
   event_superseded: '库存状态已变化，本次旧提醒未发送',
   event_unconfirmed: '库存状态尚未重新确认，本次未发送',
+  invalid_market_target: '商品或门店已移出站点目录，本次未发送',
   event_invalid_time: '提醒时间异常，本次未发送',
   lease_lost: '提醒服务暂时中断，本次未发送',
   missing_task_or_user: '提醒或账号信息暂时无法确认',
@@ -186,9 +188,13 @@ const presentNotification = notification => {
     timeText: fmt.fmtDateTime(notification.sentAt || notification.createdAt) + (marketName ? ' 北京时间' : ''), eventLabel: eventKnown ? fmt.eventMeta(notification.eventType).label : '补货提醒' };
 };
 
-Page({
+Page(require('../../utils/language').page('mine', {
   ...reminderPanelMethods,
   data: {
+    uiLanguage: 'zh-CN',
+    uiLanguagePreference: 'system',
+    languageLabels: ['跟随系统', '简体中文', 'English'],
+    englishLanguageLabels: ['System default', '简体中文', 'English'],
     networkOffline: false,
     ready: false,
     loadError: null,
@@ -265,6 +271,14 @@ Page({
     showPurchaseFeedback: false,
     purchaseFeedbackSent: false,
     purchaseFeedbackOptions: PURCHASE_FEEDBACK,
+  },
+
+  onLanguageChoice(event) {
+    if (this.pageRetired) return;
+    const choice = event && event.detail && event.detail.value;
+    if (!['0', '1', '2', 0, 1, 2].includes(choice)) return;
+    const preference = ['system', 'zh-CN', 'en'][choice];
+    if (languageUI.getLanguagePreference() !== preference) languageUI.setLanguage(preference);
   },
 
   async onLoad(options = {}) {
@@ -437,7 +451,7 @@ Page({
     try {
       confirmed = await new Promise(resolve => {
         if (typeof wx.showModal !== 'function') return resolve(false);
-        wx.showModal({ title: type === 'clear' ? '清空当前显示的记录' : '删除这条会员记录',
+        languageUI.modal({ title: type === 'clear' ? '清空当前显示的记录' : '删除这条会员记录',
           content: type === 'clear'
             ? `将移除当前显示的 ${action.ids.length} 条可清理记录。待确认订单和其他记录会保留。仅隐藏个人记录，不影响会员权益、支付核对或后台账务。`
             : '仅从你的会员记录中隐藏这一条，不影响会员权益、支付核对或后台账务。',
@@ -906,7 +920,7 @@ Page({
         const settle = value => { if (!settled) { settled = true; resolve(value); } };
         const canTime = typeof setTimeout === 'function' && typeof clearTimeout === 'function';
         const timer = canTime ? setTimeout(() => settle(false), 15000) : null;
-        wx.showModal({
+        languageUI.modal({
           title: '购买须知',
           content: `${packageText}\n\n${notice}${extensionNotice}${intent ? '\n\n开通后继续设置关注：' + intent.title + (intent.storeText ? '\n门店：' + intent.storeText : '') + '\n提醒需你主动授权，保存前可再次确认。' : ''}\n\n确认即表示已阅读并同意上述说明。`,
           confirmText: '同意购买',
@@ -960,7 +974,7 @@ Page({
         const settle = value => { if (!settled) { settled = true; resolve(value); } };
         const canTime = typeof setTimeout === 'function' && typeof clearTimeout === 'function';
         const timer = canTime ? setTimeout(() => settle(false), 15000) : null;
-        wx.showModal({
+        languageUI.modal({
           title: '放弃这笔订单',
           content: '放弃前会先向微信核对一次：已付款会直接开通会员，确认没有付款才会放弃，之后可以重新购买。',
           confirmText: '确认放弃',
@@ -1047,7 +1061,7 @@ Page({
     const account = this.data.boot && this.data.boot.identity && this.data.boot.identity.userKey;
     const generation = this.paymentConsentGeneration || 0;
     app.globalData.pendingMemberFollow = null;
-    wx.showModal({
+    languageUI.modal({
       title: '会员已开通',
       content: `继续关注「${intent.title}」？可在关注页确认门店后保存。`,
       confirmText: '去关注',
@@ -1154,7 +1168,7 @@ Page({
     this.setData({ notificationConfirming: true });
     let confirmed = false;
     try {
-      confirmed = await new Promise(resolve => wx.showModal({
+      confirmed = await new Promise(resolve => languageUI.modal({
         title: action.type === 'clear' ? '清空提醒记录' : '删除这条提醒记录',
         content: action.type === 'clear'
           ? '将清空本次列表加载时已有的全部个人提醒记录，包括尚未加载的更早记录。后来新到的提醒会保留。不会取消关注、撤回微信消息或删除库存历史。'
@@ -1308,7 +1322,7 @@ Page({
     if (!notification) return;
     const action = notificationAdvice(notification).action;
     if (action === 'uncertain') {
-      wx.showModal({ title: '发送结果尚未确认', content: '这条消息可能已交给微信，但服务未取得明确结果。请先检查微信中的订阅消息；为避免重复打扰，不会自动重发这条旧提醒。新的补货变化仍按当前设置处理。', showCancel: false });
+      languageUI.modal({ title: '发送结果尚未确认', content: '这条消息可能已交给微信，但服务未取得明确结果。请先检查微信中的订阅消息；为避免重复打扰，不会自动重发这条旧提醒。新的补货变化仍按当前设置处理。', showCancel: false });
       return;
     }
     if (action === 'explain') {
@@ -1317,7 +1331,7 @@ Page({
         event_superseded: `发送前再次检查时，库存状态已变化，因此这条旧提醒未发送，未消耗提醒次数。可到${inventoryPage}查看新的观测。`,
         event_unconfirmed: '发送前未能再次确认库存状态，因此本次未发送，未消耗提醒次数。后台恢复有效观测后，新的变化仍按当前设置处理。',
         event_invalid_time: `这条提醒的记录时间异常，无法确认信息是否及时，因此本次未发送，未消耗提醒次数。可到${inventoryPage}查看新的观测。` };
-      wx.showModal({ title: '本次未发送原因', content: explanations[notification.reason], showCancel: false });
+      languageUI.modal({ title: '本次未发送原因', content: explanations[notification.reason], showCancel: false });
       return;
     }
     if (action === 'settings' || action === 'membership') {
@@ -1538,7 +1552,7 @@ Page({
   },
 
   onDisclaimer() {
-    wx.showModal({
+    languageUI.modal({
       title: '免责声明',
       content: '果小哨仅汇总苹果官网公开的门店取货信息，不代表 Apple 官方，不保证信息的实时性与准确性；请以苹果官网或门店实际情况为准。本工具不参与任何交易。',
       showCancel: false,
@@ -1548,9 +1562,9 @@ Page({
   onPrivacy() {
     if (this.pageRetired) return;
     const hasContract = typeof wx.openPrivacyContract === 'function';
-    wx.showModal({
+    languageUI.modal({
       title: '隐私说明',
-      content: '果小哨通过微信账号标识识别你的账户，在腾讯云开发保存查询与额度、关注的配置和门店、提醒授权与发送记录、会员和订单信息，以及你填写的到期事项和时间。点击复制时，会将所选内容写入剪贴板。\n\n你可在「小哨」删除关注和到期事项，在「我的」清理提醒记录，或通过「意见反馈」联系开发者。',
+      content: '果小哨通过微信账号标识识别你的账户，在腾讯云开发保存查询与额度、关注的配置和门店、提醒授权与发送记录、会员和订单信息，以及你填写的到期事项和时间。点击复制时，会将所选内容写入剪贴板。\n\n你可在「小哨」删除大陆门店关注和到期事项，在「其他站点」删除对应站点的关注，在「我的」清理提醒记录，或通过「意见反馈」联系开发者。',
       showCancel: hasContract,
       cancelText: '关闭',
       confirmText: hasContract ? '微信指引' : '知道了',
@@ -1588,4 +1602,4 @@ Page({
     if (this.data.loadError) return this.onRetryLoad();
     if (this.data.ready) return this.refresh({ quiet: true, force: true });
   },
-});
+}));

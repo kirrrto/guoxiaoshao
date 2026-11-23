@@ -52,7 +52,10 @@ function liveAnnouncement(raw, now) {
   const t = now instanceof Date ? now.getTime() : Number.isFinite(now) ? now : Date.now();
   if (Number.isFinite(startsAt) && t < startsAt) return null;
   if (Number.isFinite(expiresAt) && t >= expiresAt) return null;
-  return { text, kind: ['notice', 'maintenance', 'recovery', 'warn'].includes(raw.kind) ? raw.kind : 'notice', startsAt: raw.startsAt || null, expiresAt: expiry };
+  return { text, kind: ['notice', 'maintenance', 'recovery', 'warn'].includes(raw.kind) ? raw.kind : 'notice', startsAt: raw.startsAt || null, expiresAt: expiry,
+    ...(typeof raw.title === 'string' && raw.title.trim() ? { title: raw.title.trim().slice(0, 40) } : {}),
+    ...(typeof raw.titleEn === 'string' && raw.titleEn.trim() ? { titleEn: raw.titleEn.trim().slice(0, 120) } : {}),
+    ...(typeof raw.textEn === 'string' && raw.textEn.trim() ? { textEn: raw.textEn.trim().slice(0, 2000) } : {}) };
 }
 
 /** Notice-board rows; same expiry rules as the banner announcement. */

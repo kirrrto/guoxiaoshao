@@ -1,3 +1,4 @@
+const languageUI = require('./language');
 const { newId, call } = require('./api');
 const { localKey } = require('./local-key');
 
@@ -88,7 +89,7 @@ async function verifyLegacy(kind, payload, owner, { cost, member, isCurrent, exi
   if (result.status === 'missing') {
     if (existingOnly) throw Object.assign(Error('当前账号未查到这次查询，请按当前上限调整门店。本次未扣次。'), { code: 'query_recovery_missing' });
     if (!Number.isSafeInteger(maxCost) || maxCost < 0) throw Object.assign(Error(VERIFY_FAILED), { code: 'query_recovery_unavailable' });
-    const confirmed = await new Promise(resolve => wx.showModal({ title: '当前账号暂未查到上次请求',
+    const confirmed = await new Promise(resolve => languageUI.modal({ title: '当前账号暂未查到上次请求',
       content: member ? '核对未扣次。要发起一次会员免费查询吗？' : `核对未扣次。要发起一次消耗 ${cost} 次的新查询吗？`,
       confirmText: '发起查询', cancelText: '稍后核对', success: res => resolve(!!res.confirm), fail: () => resolve(false) }));
     if (!confirmed || !currentAccount()) return null;

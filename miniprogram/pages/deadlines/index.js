@@ -1,3 +1,4 @@
+const languageUI = require('../../utils/language');
 const { call, newId } = require('../../utils/api');
 const { CATEGORIES, makeDraft, validateDraft, presentDeadline, dateTime, remindAt, deadlineError } = require('../../utils/deadlines');
 const navigation = require('../../utils/navigation');
@@ -7,7 +8,7 @@ function cachedOwner() { const boot = getApp().globalData.bootstrap; return boot
 const friendlyError = deadlineError;
 // A retry that never reached the server cannot resolve an earlier write or discard a native authorization receipt.
 function needsPendingRetry(error) { return !error || ['call_failed', 'bad_response', 'cloud_init_failed', 'internal_error', 'offline', 'single_page_mode'].includes(error.code); }
-Page({
+Page(require('../../utils/language').page('deadlines', {
   data: { loading: true, ready: false, serviceAvailable: false, busy: false, items: [], limit: 20, capability: { enabled: false },
     error: '', formError: '', feedback: '', editing: false, editingId: '', editConflict: false, draft: makeDraft(),
     categories: CATEGORIES, categoryIndex: 0, earliestDate: '', previewTime: '', pending: false, pendingLabel: '' },
@@ -139,7 +140,7 @@ Page({
       || this.data.pending || typeof wx.requestSubscribeMessage !== 'function') return;
     // A different deadline can have the same title, or this revision can already have changed elsewhere.
     if (!this.data.items.some(row => row.id === item.id && row.revision === item.revision && row.canAuthorize)) return;
-    wx.showModal({ title: '开启微信提醒', content: '是否允许一次微信到期提醒？修改内容后需重新授权。', confirmText: '开启', cancelText: '暂不',
+    languageUI.modal({ title: '开启微信提醒', content: '是否允许一次微信到期提醒？修改内容后需重新授权。', confirmText: '开启', cancelText: '暂不',
       success: res => {
         if (!res.confirm || !this.visible || !this.current(epoch, owner)) return;
         this.onAuthorize({ currentTarget: { dataset: { id: item.id } } });
@@ -213,7 +214,8 @@ Page({
     const epoch = this.epoch, owner = this.owner;
     const confirmation = { id: item.id };
     this.removeConfirmation = confirmation;
-    wx.showModal({ title: '删除到期事项', content: '删除“' + item.title + '”及其待发提醒？', confirmText: '删除',
+    const content = languageUI.t('删除“{0}”及其待发提醒？').replace('{0}', () => item.title);
+    languageUI.modal({ title: '删除到期事项', content, confirmText: '删除',
       success: result => {
         if (this.removeConfirmation !== confirmation) return;
         this.removeConfirmation = null;
@@ -223,6 +225,6 @@ Page({
         this.performPending();
       },
       fail: () => { if (this.removeConfirmation === confirmation) this.removeConfirmation = null; },
-    });
+    }, { localizedContent: true });
   },
-});
+}));

@@ -29,7 +29,7 @@ function readGuideTarget(options) {
   } catch (_) { return null; }
 }
 
-Page({
+Page(require('../../utils/language').page('guide', {
   data: { stages: guide.stages, stage: guide.stages[0], stageId: 'prepare', faqs: guide.faqs,
     faqOpen: '', section: '', focusedFaq: null, allowanceFaq: null, targetSummary: null, returnLabel: '返回提醒中心' },
   onLoad(options = {}) {
@@ -106,4 +106,4 @@ Page({
   onShareTimeline() {
     return shareTimeline('/pages/guide/index', this.data);
   },
-});
+}));

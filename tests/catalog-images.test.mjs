@@ -150,29 +150,80 @@ test('retained HTTP and decode evidence covers every unique URL and every SKU in
   assert.deepEqual(new Set(manifest.sources.map(s => s.familyKey)), new Set(catalog.families.map(f => f.familyKey)));
 });
 
-test('each regional SKU uses the exact existing mainland thumbnail for its model and finish, independently of storage and language', () => {
-  const { MARKETS } = require('../cloudfunctions/gxs_api/lib/markets.js');
+test('regional Pro and Pro Max retain all eight verified finishes across capacities and storefronts', () => {
+  const { MARKETS, findMarketProduct } = require('../cloudfunctions/gxs_api/lib/markets.js');
   const { selections } = require('../miniprogram/pages/markets/presentation.js');
-  const { withImageFit } = require('../miniprogram/utils/product-image-fit.js');
-  const expected = new Map();
+  const { withImageFit, regionalProductThumbnail } = require('../miniprogram/utils/product-image-fit.js');
+  const expected = new Map(), configurations = new Set();
   for (const product of catalog.products.filter(p => p.familyKey === 'iphone-18-pro')) {
-    const key = product.model + '|' + product.attributes.color;
-    const url = withImageFit(product).imageDisplayUrl;
-    assert.match(url, /^\/images\/products\//);
-    if (expected.has(key)) assert.equal(url, expected.get(key), key);
-    expected.set(key, url);
+    const appearance = product.model + '|' + product.attributes.color;
+    const image = withImageFit(product).imageDisplayUrl;
+    assert.match(image, /^\/images\/products\//);
+    if (expected.has(appearance)) assert.equal(image, expected.get(appearance), appearance);
+    expected.set(appearance, image);
+    configurations.add(appearance + '|' + product.attributes.capacity);
   }
   assert.equal(expected.size, 8);
-  assert.equal(new Set(expected.values()).size, 8, 'each appearance has its own thumbnail');
+  assert.equal(new Set(expected.values()).size, 8);
+  const black256 = { JP: 'MJR54J/A', TW: 'MJRP4ZP/A', HK: 'MJRP4ZA/A' };
   for (const market of MARKETS) {
+    const pro = market.products.filter(row => row.familyKey === 'iphone-18-pro');
     for (const lang of ['zh-CN', 'en']) {
-      const { products } = selections(market, lang);
-      assert.equal(products.length, 32);
+      const { products } = selections({ ...market, products: pro }, lang);
+      assert.deepEqual(new Set(products.map(row => [row.model, row.color, row.capacity].join('|'))), configurations);
+      const black = products.find(row => row.model === 'iPhone 18 Pro' && row.color === '黑色' && row.capacity === '256GB');
+      assert.equal(black.id, black256[market.code]);
+      assert.equal(black.partNumber, black.id);
       for (const view of products) {
-        const image = expected.get(view.model + '|' + view.color);
-        assert.ok(image);
-        assert.equal(view.imageDisplayUrl, image, market.code + '/' + view.id + '/' + lang);
+        const key = view.model + '|' + view.color;
+        assert.equal(view.imageDisplayUrl, expected.get(key), market.code + '/' + view.id + '/' + lang);
+        assert.equal(regionalProductThumbnail({ model: view.model, color: view.color }), expected.get(key), 'legacy catalog without an artwork mapping');
       }
     }
+    for (const [code, part] of Object.entries(black256)) {
+      assert.equal(Boolean(findMarketProduct(market.code, part)), code === market.code, 'a shared picture must not share a regional stock target');
+    }
   }
+});
+
+test('regional image mappings reuse packaged product artwork and degrade to text for unverified appearances', () => {
+  const { MARKETS } = require('../cloudfunctions/gxs_api/lib/markets.js');
+  const { selections } = require('../miniprogram/pages/markets/presentation.js');
+  const { withImageFit, regionalProductThumbnail } = require('../miniprogram/utils/product-image-fit.js');
+  const mainland = new Map(catalog.products.map(product => [product.partNumber, product]));
+  for (const market of MARKETS) {
+    const presentations = ['zh-CN', 'en'].map(lang =>
+      new Map(selections(market, lang).products.map(view => [view.id, view])));
+    const mappedFamilies = new Set();
+    for (const product of market.products) {
+      const id = product.partNumber || product.id;
+      let image = '';
+      if (product.artworkPart) {
+        const original = mainland.get(product.artworkPart);
+        assert.ok(original, market.code + '/' + id);
+        assert.equal(original.familyKey, product.familyKey, id);
+        if (product.color) assert.equal(original.attributes.color, product.color, id);
+        if (product.familyKey === 'ipad-air' || product.familyKey === 'macbook-air') {
+          assert.equal(product.model, original.model.replace(/ 英寸$/, '″'), 'match the screen size as well as the finish: ' + id);
+        }
+        image = withImageFit(original).imageDisplayUrl;
+        assert.match(image, /^\/images\/products\//, id);
+        mappedFamilies.add(product.familyKey);
+      } else if (product.familyKey === 'iphone-18-pro') {
+        continue; // Verified legacy fallback is exercised above.
+      }
+      for (const views of presentations) {
+        const view = views.get(id);
+        assert.equal(view.partNumber, product.partNumber || '', id);
+        assert.equal(view.imageDisplayUrl, image, market.code + '/' + id);
+      }
+    }
+    for (const family of ['ipad-air', 'macbook-air', 'airpods-max-2', 'homepod']) {
+      assert.ok(mappedFamilies.has(family), market.code + '/' + family);
+    }
+  }
+  // A newer catalog or cached row can have no mapping, or inconsistent finish labels.
+  // An incidental match on a stock ID or a finish alone must never select another product's picture.
+  assert.equal(regionalProductThumbnail({ model: 'Studio Display', color: 'Silver', partNumber: catalog.products[0].partNumber }), '');
+  assert.equal(regionalProductThumbnail({ model: 'iPhone 18 Pro', color: '银色', colorEn: 'Black' }), '');
 });

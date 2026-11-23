@@ -1,3 +1,4 @@
+const languageUI = require('./language');
 const cloudConfig = require('../config/cloud');
 const { isOnline } = require('./network');
 
@@ -88,7 +89,7 @@ async function callOnce(action, payload, attempt, retry) {
   if (retry && retry.generation !== readGeneration) throw retry.error;
   // A different tab can verify another account while shared-cloud setup is
   // pending. The server checks the same owner against the actual WX context.
-  if ((action === 'query.pickup' || action === 'history.list' || action.startsWith('market.') || action === 'notify.detail' || action === 'notify.open') && payload.expectedUserKey
+  if ((action === 'query.pickup' || action === 'quota.signin' || action === 'history.list' || action.startsWith('market.') || action === 'notify.detail' || action === 'notify.open') && payload.expectedUserKey
     && !require('./store').quotaAccountMatches(payload.expectedUserKey)) {
     throw new ApiError('query_account_changed', '账号已变化，请下拉刷新后再查询。');
   }
@@ -164,13 +165,13 @@ function newId(prefix) {
 }
 
 function toast(message, icon = 'none') {
-  wx.showToast({ title: message, icon, duration: 2200 });
+  languageUI.toast({ title: message, icon, duration: 2200 });
 }
 
 function showError(error) {
   const message = error && error.message ? error.message : '操作失败';
-  if (message.length > 24) wx.showModal({ title: '操作未完成', content: message, showCancel: false });
-  else wx.showToast({ title: message, icon: 'none', duration: 2600 });
+  if (message.length > 24) languageUI.modal({ title: '操作未完成', content: message, showCancel: false });
+  else languageUI.toast({ title: message, icon: 'none', duration: 2600 });
 }
 
 module.exports = { call, ApiError, newId, toast, showError, resetPendingReads };

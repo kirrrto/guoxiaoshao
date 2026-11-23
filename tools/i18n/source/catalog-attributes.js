@@ -1,0 +1,17 @@
+module.exports = {
+  '{0}（{1}）': '{0} ({1})',
+  '苹果直营店': 'Apple Store',
+  '勃艮第酒红色': 'Burgundy', '银色': 'Silver', '黑色': 'Black', '冰川蓝色': 'Glacier',
+  '天蓝色': 'Sky Blue', '浅金色': 'Light Gold', '深空黑色': 'Space Black', '云白色': 'Cloud White',
+  '鼠尾草绿色': 'Sage', '白色': 'White', '薰衣草紫色': 'Lavender', '青雾蓝色': 'Mist Blue',
+  '浅粉色': 'Soft Pink', '群青色': 'Ultramarine', '粉色': 'Pink', '深青色': 'Teal', '深空灰色': 'Space Gray',
+  '星光色': 'Starlight', '紫色': 'Purple', '蓝色': 'Blue', '黄色': 'Yellow', '午夜色': 'Midnight',
+  '靛蓝色': 'Indigo', '柑橘黄色': 'Citrus', '桃粉色': 'Blush', '绿色': 'Green', '橙色': 'Orange',
+  '夜空色': 'Night Sky', '星光白色': 'Star White', '无线局域网': 'Wi-Fi', '无线局域网 + 蜂窝网络': 'Wi-Fi + Cellular',
+  '标准玻璃': 'Standard glass', '纳米纹理玻璃': 'Nano-texture glass',
+  '标准显示屏': 'Standard display', '纳米纹理显示屏': 'Nano-texture display', 'PROLED XDR 显示屏': 'PROLED XDR display',
+  "(配无线充电盒)": "with Wireless Charging Case",
+  'AirPods 5 (配无线充电盒)': 'AirPods 5 with Wireless Charging Case',
+  'MacBook Pro (PROLED XDR 显示屏)': 'MacBook Pro with PROLED XDR display',
+  'iPad (10.2 英寸)': '10.2-inch iPad', '{0} 英寸': '{0}-inch', '{0}核CPU/{1}核GPU': '{0}-core CPU / {1}-core GPU',
+};
