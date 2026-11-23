@@ -132,14 +132,14 @@ async function quotaSnapshot(ctx, user) {
   return {
     balance: (user.quota && user.quota.balance) || 0,
     revision: user.quota && Number.isInteger(user.quota.revision) ? user.quota.revision : 0,
-    grantedToday: summary.grantedToday,
+    grantedToday: Math.max(summary.grantedToday || 0, user.quota && user.quota.rewardDay === today ? user.quota.grantedToday || 0 : 0),
     dailyGrantCap: cfg.dailyGrantCap,
     balanceCap: cfg.balanceCap,
     queryCost: cfg.queryCost,
     historyCost: cfg.historyCost,
     signedInToday: summary.signedInToday,
     tasksDoneToday: summary.tasksDoneToday,
-    tasksViewedToday: user.taskEvidence && user.taskEvidence.history_browse && user.taskEvidence.history_browse.dayKey === today ? ['view_history'] : [],
+    tasksViewedToday: ['history_browse', 'view_history'].some(key => user.taskEvidence && user.taskEvidence[key] && user.taskEvidence[key].dayKey === today) ? ['view_history'] : [],
     dayKey: today,
   };
 }
@@ -189,7 +189,8 @@ async function bootstrap(ctx) {
     membership: membershipSnapshot(user, ctx.now),
     quota,
     tasks: ctx.config.tasks,
-    followCount: follows.filter(f => f.status === 'active' || f.status === 'paused').length,
+    followCount: follows.filter(f => (!f.market || f.market === 'CN') && (f.status === 'active' || f.status === 'paused')).length,
+    otherMarketFollowCount: follows.filter(f => f.market && f.market !== 'CN' && (f.status === 'active' || f.status === 'paused')).length,
     memberProduct: paymentProduct(ctx),
     memberProducts: paymentProducts(ctx),
     newProductWindows: ctx.config.newProductWindows,

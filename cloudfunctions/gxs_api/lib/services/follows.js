@@ -75,9 +75,10 @@ async function list(ctx) {
   const user = await ensureUser(ctx);
   const follows = await ctx.repo.listFollows(user._id);
   const member = isMember(user, ctx.now);
-  const presented = await decorate(ctx, follows, member, member);
-  return { member, freeReminder: false, limits: memberLimits(user, ctx.now), follows: presented.map((row, i) => {
-    const allowance = followAllowance(user, follows[i], follows, ctx.now);
+  const domestic = follows.filter(follow => !follow.market || follow.market === 'CN');
+  const presented = await decorate(ctx, domestic, member, member);
+  return { otherMarketCount: follows.length - domestic.length, member, freeReminder: false, limits: memberLimits(user, ctx.now), follows: presented.map((row, i) => {
+    const allowance = followAllowance(user, domestic[i], follows, ctx.now);
     return { ...row, ...allowance,
       ...(row.productRetired ? {} : allowance.limitPaused ? { status: 'limit_paused', statusReason: 'plan_limit' } : {}),
       stores: row.stores.map(store => ({ ...store, limitPaused: member && !allowance.eligibleStoreNumbers.includes(store.storeNumber) })) };
@@ -143,7 +144,7 @@ async function setStatus(ctx, payload, status) {
   const followId = typeof payload.followId === 'string' ? payload.followId : '';
   const recordId = followId.startsWith(`${user._id}|`) ? followId : `${user._id}|${followId}`;
   const follow = await ctx.repo.getFollow(recordId);
-  if (!follow || follow.userKey !== user._id || follow.status === 'removed') throw new ApiError('unknown_follow', '关注不存在');
+  if (!follow || (follow.market && follow.market !== 'CN') || follow.userKey !== user._id || follow.status === 'removed') throw new ApiError('unknown_follow', '关注不存在');
   if (status === 'active' && isRetiredPartNumber(follow.partNumber)) throw new ApiError('product_retired', retiredProductMessage(follow.partNumber));
   if (status === 'active' && !canUseReminders(user, ctx.now)) throw new ApiError('member_required', '关注与到货提醒为会员专属，开通会员后可恢复监测');
   if (status === 'active' && isCtoPartNumber(follow.partNumber) && !canMonitorProduct(await ctx.repo.getProduct(follow.partNumber))) throw new ApiError('unsupported_product', '该商品暂不支持监测');

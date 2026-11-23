@@ -67,7 +67,7 @@
       </view>
 
       <view wx:if="{{queryFailureMessage || restriction}}" class="banner banner-warn mt" aria-role="alert">{{queryFailureMessage || restriction}}</view>
-      <view wx:if="{{selectionRestricted}}" class="banner banner-info mt">此配置实时查询需会员，免费用户可查有权限的历史记录。</view>
+      <view wx:if="{{selectionRestricted}}" class="banner banner-info mt">此配置的实时库存仅向会员开放。</view>
       <button wx:if="{{selectionRestricted}}" class="btn btn-primary btn-block mt" disabled="{{!accountReady || !selectionCanCollapse}}" bindtap="onFollowSelection">查看此配置会员权益</button>
       <button wx:elif="{{restrictionReason === 'new_product_restricted'}}" class="btn btn-primary btn-block mt" bindtap="onEditSelection">改查其他配置</button>
       <button wx:elif="{{limitedQueryRecovery}}" class="btn btn-primary btn-block mt" loading="{{querying}}" disabled="{{!accountReady || querying || signing}}" bindtap="onQuery">{{querying ? '核对中…' : '核对上次查询'}}</button>
@@ -77,9 +77,8 @@
       <button wx:elif="{{selectionSummary}}" class="query-submit btn btn-block mt {{accountReady && selectionCanCollapse && !selectionQueryPending && result && !resultTargetDifferent && !resultIsCache && !queryFailureMessage && !liveResultRestricted && nextAction && nextAction.knownCount && nextAction.unknownCount === 0 && nextAction.action !== 'retry' ? '' : 'btn-primary'}} {{querying || signing ? 'disabled' : ''}}" hover-class="btn-primary-pressed" loading="{{querying}}" disabled="{{querying || signing || !accountReady || !selectionCanCollapse}}" bindtap="onQuery">{{!accountReady ? '正在连接账户…' : (querying ? '查询中…' : legacyQueryPending ? '核对上次查询' : selectionQueryPending ? '继续上次查询' : (boot.member ? '立即查询' : '立即查询（消耗 ' + boot.queryCost + ' 次）'))}}</button>
       <view wx:if="{{querying}}" class="request-progress {{requestSlow ? 'request-progress--slow' : ''}}" aria-role="status">{{requestSlow ? requestProgressText : '正在核实所选门店，结果将标注各店时间。'}}</view>
       <view wx:if="{{signinError}}" class="small text-bad mt" aria-role="alert">{{signinError}}</view>
-      <view wx:if="{{selectionRestricted || (selectionSummary && (!result || resultTargetDifferent) && selectionSupportsFollow)}}" class="selection-utilities">
-        <button wx:if="{{selectionRestricted}}" class="btn btn-block" hover-class="ui-control-pressed" bindtap="onSelectionHistory">查看可用历史</button>
-        <button wx:else class="btn btn-block selection-follow-action" hover-class="ui-control-pressed" disabled="{{!accountReady || querying || !selectionCanCollapse}}" bindtap="onFollowSelection"><text>{{boot.member ? '关注此配置' : (contextualCheckout ? '了解此配置关注服务' : '了解会员关注服务')}}</text></button>
+      <view wx:if="{{!selectionRestricted && selectionSummary && (!result || resultTargetDifferent) && selectionSupportsFollow}}" class="selection-utilities">
+        <button class="btn btn-block selection-follow-action" hover-class="ui-control-pressed" disabled="{{!accountReady || querying || !selectionCanCollapse}}" bindtap="onFollowSelection"><text>{{boot.member ? '关注此配置' : (contextualCheckout ? '了解此配置关注服务' : '了解会员关注服务')}}</text></button>
       </view>
     </view>
 

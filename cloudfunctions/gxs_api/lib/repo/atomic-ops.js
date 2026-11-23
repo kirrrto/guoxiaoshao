@@ -28,6 +28,11 @@ const subscriptionCredits = require('./subscription-credit-ledger');
 const { matchesNotificationTarget, nextFollowUpdatedAt } = require('../notification-target');
 const { currentAvailabilityMethods, cooldownIdFor, availabilitySince, sameAvailability } = require('./current-availability');
 
+const followIndexEntry = follow => ({
+  _id: follow._id, partNumber: follow.partNumber, status: follow.status, createdAt: follow.createdAt,
+  ...(follow.market ? { market: follow.market } : {}),
+});
+
 const quotaBalance = user => ({ balance: user.quota.balance,
   quotaRevision: Number.isInteger(user.quota.revision) ? user.quota.revision : 0 });
 
@@ -334,7 +339,7 @@ function atomicMethods(run, { readUpstreamBreaker } = {}) {
       const existing = await tx.get(C.queries, record._id);
       if (existing) {
         // Legacy records are bound by their actual request fields as well.
-        const signature = q => JSON.stringify([q.kind, q.partNumber, [...q.storeNumbers].sort(), q.kind === 'history' ? q.dayKey : null]);
+        const signature = q => JSON.stringify([q.kind, q.market || 'CN', q.partNumber, [...q.storeNumbers].sort(), q.kind === 'history' ? q.dayKey : null]);
         if (signature(existing) !== signature(record)) throw new ApiError('query_id_conflict', '该查询编号已用于其他条件，请重新查询');
         if (existing.status !== 'pending' && existing.response) return { replayed: true, record: existing, ...quotaBalance(user) };
         if (existing.leaseUntil && existing.leaseUntil > nowIso) return { busy: true, record: existing, retryAfterMs: Date.parse(existing.leaseUntil) - Date.parse(nowIso), ...quotaBalance(user) };
@@ -350,7 +355,7 @@ function atomicMethods(run, { readUpstreamBreaker } = {}) {
         return { record: resumed, ...quotaBalance(user), recovered: true };
       }
       if (args.existingOnly) throw new ApiError('query_recovery_missing', '旧查询记录暂未找到，本次未扣次，请重新核对。');
-      if (record.kind === 'live') {
+      if (record.kind === 'live' || record.kind === 'market') {
         if (await hydrateMemberPlansIn(tx, user)) await tx.put(C.users, user);
         const maxStores = accountLimits(user, new Date(nowIso), config).queryMaxStores;
         if (record.storeNumbers.length > maxStores) throw new ApiError('too_many_stores', `单次最多查询 ${maxStores} 家门店`);
@@ -366,7 +371,11 @@ function atomicMethods(run, { readUpstreamBreaker } = {}) {
       if (guarded) return { denied: guarded, ...quotaBalance(user) };
       if (decision.cost > 0) {
         const id = record.kind === 'history' ? ledgerIds.historyDebit(user._id, record.queryId) : ledgerIds.queryDebit(user._id, record.queryId);
-        user = (await applyLedgerIn(tx, { _id: id, userKey: user._id, type: record.kind === 'history' ? 'history_debit' : 'query_debit', delta: -decision.cost, dayKey: dayKey(nowIso), createdAt: nowIso, refId: record.queryId, partNumber: record.partNumber })).user;
+        const debit = await applyLedgerIn(tx, { _id: id, userKey: user._id, type: record.kind === 'history' ? 'history_debit' : 'query_debit', delta: -decision.cost, dayKey: dayKey(nowIso), createdAt: nowIso, refId: record.queryId, partNumber: record.partNumber });
+        // Settled receipts age out before immutable ledger entries. An old debit
+        // must never become the refundable payment for a new execution.
+        if (!debit.applied) throw new ApiError('query_id_conflict', '原查询记录已到期，请重新发起查询。');
+        user = debit.user;
       }
       const pending = { ...record, charged: decision.cost, member: decision.member, status: 'pending', ownerId, leaseUntil: new Date(Date.parse(nowIso) + leaseMs).toISOString(), attempts: 1, createdAt: nowIso, finishedAt: null, response: null };
       await tx.put(C.queries, pending);
@@ -427,28 +436,41 @@ function atomicMethods(run, { readUpstreamBreaker } = {}) {
       await hydrateMemberPlansIn(tx, user);
       const id = follow ? follow._id : followId;
       const existing = await tx.get(C.follows, id);
+      const market = args.market || 'CN';
+      if (existing && (existing.userKey !== userKey || (existing.market || 'CN') !== market)) throw new ApiError('unknown_follow', '关注不存在');
       const knownIndex = [...new Map([...knownFollows, ...(user.followIndex || [])].map(f => [f._id, f])).values()];
       const at = new Date(nowIso);
       const limits = memberLimits(user, at);
       const savedFollows = (await Promise.all(knownIndex.map(item => tx.get(C.follows, item._id))))
         .filter(f => f && f.userKey === userKey && f.status !== 'removed');
-      const index = savedFollows.map(f => ({ _id: f._id, partNumber: f.partNumber, status: f.status, createdAt: f.createdAt }));
+      const index = savedFollows.map(followIndexEntry);
       if ((follow || status === 'active') && !canUseReminders(user, at)) throw new ApiError('member_required', '关注与到货提醒为会员专属，开通会员后可新增或恢复关注');
       let next;
       if (follow) {
         if (existing && existing.status !== 'removed' && followAllowance(user, existing, savedFollows, at).limitPaused) throw new ApiError('plan_limit', '该配置超出当前套餐名额，请先移除其他配置或选择支持更多配置的套餐');
         const others = index.filter(f => f._id !== id && f.status !== 'removed');
-        const check = validateFollowLimits(others, follow, existing && existing.status !== 'removed' ? Math.max(limits.maxFollows, others.length + 1) : limits.maxFollows, limits.maxStoresPerFollow);
+        // Adding another store on the international page extends the same SKU.
+        // Merge against the transactional document so concurrent saves cannot drop a store.
+        const mergeStores = market !== 'CN' && existing && existing.status !== 'removed';
+        const candidate = mergeStores ? { ...follow, storeNumbers: [...new Set([...existing.storeNumbers, ...follow.storeNumbers])].sort() } : follow;
+        const check = validateFollowLimits(others, candidate, existing && existing.status !== 'removed' ? Math.max(limits.maxFollows, others.length + 1) : limits.maxFollows, limits.maxStoresPerFollow);
         if (!check.ok) throw new ApiError(check.reason, `关注设置超过限制：最多 ${limits.maxFollows} 个配置，每个配置最多 ${limits.maxStoresPerFollow} 家门店`);
-        next = { ...follow, storeNumbers: check.storeNumbers, createdAt: existing ? existing.createdAt : follow.createdAt };
+        if (mergeStores) {
+          if (isDeepStrictEqual(existing.storeNumbers, check.storeNumbers)) return existing;
+          next = { ...existing, storeNumbers: check.storeNumbers };
+        } else {
+          next = { ...follow, storeNumbers: check.storeNumbers, createdAt: existing && (market === 'CN' || existing.status !== 'removed') ? existing.createdAt : follow.createdAt };
+        }
       } else {
+        if (market !== 'CN' && existing && status === existing.status && status !== 'active') return existing;
         if (!existing || existing.userKey !== userKey || existing.status === 'removed') throw new ApiError('unknown_follow', '关注不存在');
         if (status === 'active' && followAllowance(user, existing, savedFollows, at).limitPaused) throw new ApiError('plan_limit', '该配置超出当前套餐名额，请先移除其他配置或选择支持更多配置的套餐');
+        if (market !== 'CN' && existing.status === status) return existing;
         next = { ...existing, status, statusReason: status === 'active' ? null : 'user', updatedAt: nowIso };
       }
       next.updatedAt = nextFollowUpdatedAt(existing, nowIso);
       user.followIndex = index.filter(f => f._id !== id);
-      if (next.status !== 'removed') user.followIndex.push({ _id: id, partNumber: next.partNumber, status: next.status, createdAt: next.createdAt });
+      if (next.status !== 'removed') user.followIndex.push(followIndexEntry(next));
       await tx.put(C.users, user);
       await tx.put(C.follows, next);
       return next;
@@ -474,8 +496,8 @@ function atomicMethods(run, { readUpstreamBreaker } = {}) {
       if (paused) {
         const user = await tx.get(C.users, userKey);
         if (!user) throw new ApiError('user_missing', '用户不存在');
-        const index = user.followIndex || knownFollows.filter(f => f.status !== 'removed').map(f => ({ _id: f._id, partNumber: f.partNumber, status: f.status }));
-        user.followIndex = [...index.filter(f => f._id !== follow._id), { _id: follow._id, partNumber: follow.partNumber, status: 'paused', createdAt: follow.createdAt }];
+        const index = user.followIndex || knownFollows.filter(f => f.status !== 'removed').map(followIndexEntry);
+        user.followIndex = [...index.filter(f => f._id !== follow._id), followIndexEntry({ ...follow, status: 'paused' })];
         await tx.put(C.users, user);
         await tx.put(C.follows, { ...follow, status: 'paused', statusReason: 'user', updatedAt: nextFollowUpdatedAt(follow, nowIso) });
       }

@@ -17,19 +17,6 @@ function historyFixture() {
   return { rt, page, catalog, target, nav: rt.load('utils/journey-context.js') };
 }
 
-test('history handoff copies the original target once and never queries or debits on arrival', () => {
-  const { rt, page, target, nav } = historyFixture();
-  assert.equal(nav.stageHistoryContext({ from: 'follow', target, requestId: 'follow-request-001' }), true);
-  target.storeNumbers.push('R999');
-  page.consumeJourneyTarget();
-  assert.equal(page.data.journeySource, 'follow');
-  assert.equal(page.selection.storeNumbers.length, 2, 'the handoff owns an immutable copy');
-  assert.equal(page.data.dayKey, rt.load('utils/format.js').fmtDate(Date.now() - 86400000));
-  assert.match(page.data.restoreNotice, /尚未查询，也未扣次/);
-  assert.equal(nav.consumeHistoryContext(), null);
-  assert.equal(rt.calls.length, 0);
-});
-
 test('history shortcut dates only change filters and mark old results independently', () => {
   const { rt, page, target } = historyFixture();
   page.selection = target;
@@ -45,42 +32,17 @@ test('history shortcut dates only change filters and mark old results independen
   assert.equal(rt.calls.length, 0);
 });
 
-test('history handoffs reject changed accounts, expired intents and arbitrary route values', t => {
-  const { rt, page, target, nav } = historyFixture();
-  assert.equal(nav.stageHistoryContext({ from: '../../admin', target }), false);
-  assert.equal(nav.stageHistoryContext({ from: 'query', target: { ...target, storeNumbers: ['__proto__'] } }), false);
-  nav.stageHistoryContext({ from: 'query', target }); owner(rt, 'bob');
-  page.consumeJourneyTarget();
-  assert.equal(page.selection.partNumber, null);
-  owner(rt);
-  const now = Date.now(); t.mock.method(Date, 'now', () => now);
-  nav.stageHistoryContext({ from: 'query', target });
-  Date.now.mock.mockImplementation(() => now + 600001);
-  assert.equal(nav.consumeHistoryContext(), null);
-  assert.equal(rt.calls.length, 0);
-});
-
-test('history handoff waits for the editor and rejects removed catalog entries without widening scope', () => {
-  const { rt, page, target, nav } = historyFixture();
-  nav.stageHistoryContext({ from: 'query', target });
-  page.data.sheetVisible = true; page.consumeJourneyTarget();
-  assert.equal(page.selection.partNumber, null);
-  delete page.catalog.storeByNumber[target.storeNumbers[0]];
-  page.data.sheetVisible = false; page.consumeJourneyTarget();
-  assert.equal(page.selection.partNumber, null);
-  assert.equal(page.data.restoreWarning, true);
-  assert.match(page.data.restoreNotice, /当前条件未改变/);
-  assert.equal(rt.calls.length, 0);
-});
-
-test('a new history target preserves the old result under its own request label', () => {
-  const { page, target, nav } = historyFixture();
-  page.historyRequest = { partNumber: 'OLD', storeNumbers: [], dayKey: page.data.dayKey };
-  page.data.result = { product: { title: 'Old result' } };
-  nav.stageHistoryContext({ from: 'query', target }); page.consumeJourneyTarget();
-  assert.equal(page.data.result.product.title, 'Old result');
-  assert.equal(page.data.resultTargetDifferent, true);
-  assert.equal(page.historyRequest.partNumber, 'OLD');
+test('a legacy help return opens history as a non-tab route and keeps a previous page intact', () => {
+  for (const previous of ['pages/history/index', 'pages/query/index']) {
+    const rt = runtime(undefined, { getCurrentPages: () => [{ route: previous }, { route: 'pages/guide/index' }] });
+    owner(rt); const paths = [];
+    rt.wx.navigateBack = options => paths.push(options.delta);
+    rt.wx.navigateTo = options => paths.push(options.url);
+    rt.wx.switchTab = () => assert.fail('history is no longer a native tab');
+    rt.load('utils/journey-context.js').returnToSource('history', 'alice');
+    assert.deepEqual(paths, [previous.includes('history') ? 1 : '/pages/history/index']);
+    assert.equal(rt.calls.length, 0);
+  }
 });
 
 test('sign-in return carries only the original request and an allowed source, once, for its account', () => {

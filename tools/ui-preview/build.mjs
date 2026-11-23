@@ -10,11 +10,15 @@ import { nativeTabPreview } from './native-tab-preview.mjs';
 import { v343DefaultDate, v343Scenarios, configureV343Bootstrap, v343Orders, prepareV343Page, v343TextExpectations } from './v343-scenarios.mjs';
 import { v350DefaultDate, v350Scenarios, v350DeadlineResponse, prepareV350Page, v350TextExpectations } from './v350-scenarios.mjs';
 
+import { marketScenarios, marketFixture, prepareMarket } from './market-scenarios.mjs';
+
 const project = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const adminPreview = process.argv.includes('--admin-only');
 const v2Preview = process.argv.includes('--v2-only');
 const v343Preview = process.argv.includes('--v343-only');
 const v350Preview = process.argv.includes('--v350-only');
+const marketsPreview = process.argv.includes('--markets-only');
+if (marketsPreview && process.argv.some(arg => arg !== '--markets-only' && /^--.*-only$/.test(arg))) throw Error('--markets-only cannot be combined with another scenario group');
 const desktopPreview = process.argv.includes('--desktop-only');
 if (desktopPreview && process.argv.some(arg => arg !== '--desktop-only' && /^--.*-only$/.test(arg))) throw Error('--desktop-only cannot be combined with another scenario group');
 if (v350Preview && process.argv.some(arg => arg !== '--v350-only' && /^--.*-only$/.test(arg))) throw Error('--v350-only cannot be combined with another scenario group');
@@ -38,7 +42,7 @@ const allowRemoteImages = process.argv.includes('--remote-images');
 // is not a claim about any particular WeChat renderer's conversion rules.
 const roundRpx = process.argv.includes('--round-rpx');
 const rpxRoundingProfile = roundRpx ? 'whole CSS pixel rounding stress; not a WeChat renderer implementation' : null;
-const defaultPreviewDate = new Date(v350Preview ? v350DefaultDate : v343Preview ? v343DefaultDate : v2Preview ? '2026-10-11T07:00:00.000Z' : '2026-09-15T07:00:00.000Z');
+const defaultPreviewDate = new Date(marketsPreview ? '2026-11-23T07:00:00.000Z' : v350Preview ? v350DefaultDate : v343Preview ? v343DefaultDate : v2Preview ? '2026-10-11T07:00:00.000Z' : '2026-09-15T07:00:00.000Z');
 let now = defaultPreviewDate;
 class PreviewDate extends Date {
   constructor(...args) { super(...(args.length ? args : [now.getTime()])); }
@@ -310,6 +314,10 @@ const buttonConstraintCss = membershipNativePreview
   : alternativesPreview ? ':where(.alternative-panel) button:not([size=mini]){width:184px;min-width:min-content;margin-left:auto;margin-right:auto;}'
   : v2Preview ? ':where(.history-task-bar) button:not([size=mini]){width:184px;margin-left:auto;margin-right:auto;}' : '';
 const widths = [320, 375, 430], scenarios = adminPreview ? ['operator-ready', 'operator-denied', 'operator-loading', 'operator-error', 'operator-longcontent', 'operator-saving'] : historyTaskPreview ? ['history-member-reward', 'history-free-first', 'history-read-error', 'history-balance-cap', 'history-completed', 'history-longcontent', 'history-loading'] : monitoringPreview ? ['monitor-template-missing', 'monitor-ready-authorized', 'monitor-needs-authorization', 'monitor-stale', 'monitor-disabled', 'monitor-expired-paused'] : redemptionPreview ? ['redemption-input', 'redemption-loading', 'redemption-error', 'redemption-success', 'redemption-used', 'redemption-limited', 'redemption-empty'] : stockPreview ? Object.keys(stockScenarios) : reminderPreview ? ['reminders', 'reminder-empty', 'reminder-loading', 'reminder-deleting', 'reminder-clearing', 'reminder-error', 'reminder-more-error', 'longcontent'] : ['free', 'member', 'expired', 'empty', 'error', 'loading', 'longcontent'];
+if (marketsPreview) {
+  scenarios.splice(0, scenarios.length, ...Object.keys(marketScenarios));
+  widths.splice(0, widths.length, 320, 375, 430, 899, 900, 1200);
+}
 if (historyDataPreview) scenarios.splice(0, scenarios.length, 'history-no-data', 'history-unknown-only', 'history-observed-no-events', 'history-events-only', 'history-observed-events', 'history-partial-stores');
 if (paymentPreview) scenarios.splice(0, scenarios.length, 'payment-ready', 'payment-renew', 'payment-blocked', 'payment-old-ios', 'payment-pending', 'payment-cancelled', 'payment-error', 'payment-fulfilled', 'payment-partial-refund', 'payment-monthly', 'payment-annual', 'payment-pending-monthly', 'payment-member', 'payment-upgrade-monthly', 'payment-upgrade-annual', 'payment-member-pending-monthly');
 if (membershipNativePreview) {
@@ -378,7 +386,7 @@ if (v343Preview) {
   widths.splice(0, widths.length, 320, 375, 390, 430, 768, 1024);
 }
 if (v350Preview) scenarios.splice(0, scenarios.length, ...Object.keys(v350Scenarios));
-const names = v350Preview ? { query: '查询', follow: '我的小哨', deadlines: '到期提醒' } : nudgePreview ? { mine: '我的' } : alternativesPreview ? { query: '查询' } : notificationTestPreview ? { 'notification-test': '体验微信提醒' } : adminPreview ? { admin: '运营工具' } : onboardingPreview ? { query: '查询' } : paymentPreview || orderRecordsPreview ? { mine: '我的' } : historyDataPreview ? { history: '历史' } : historyTaskPreview ? { history: '历史', mine: '我的' } : stockPreview || monitoringPreview ? { follow: '小哨提醒' } : reminderPreview || redemptionPreview || releaseNotesPreview ? { mine: '我的' } : { query: '查询', follow: '小哨提醒', history: '历史', mine: '我的' };
+const names = marketsPreview ? { markets: '其他站点' } : v350Preview ? { query: '查询', follow: '我的小哨', deadlines: '到期提醒' } : nudgePreview ? { mine: '我的' } : alternativesPreview ? { query: '查询' } : notificationTestPreview ? { 'notification-test': '体验微信提醒' } : adminPreview ? { admin: '运营工具' } : onboardingPreview ? { query: '查询' } : paymentPreview || orderRecordsPreview ? { mine: '我的' } : historyDataPreview ? { history: '历史' } : historyTaskPreview ? { history: '历史', mine: '我的' } : stockPreview || monitoringPreview ? { follow: '小哨提醒' } : reminderPreview || redemptionPreview || releaseNotesPreview ? { mine: '我的' } : { query: '查询', follow: '小哨提醒', history: '历史', mine: '我的' };
 if (desktopPreview) {
   delete names.history;
   delete names.mine;
@@ -404,7 +412,7 @@ for (const scenario of scenarios) {
   now = v343Fixture?.date ? new Date(v343Fixture.date) : scenario.startsWith('v2-promotion-expired-') ? new Date('2026-11-30T16:00:00.000Z') : defaultPreviewDate;
   const products = copy(baseProducts);
   if (['longcontent', 'history-longcontent', 'sheet-longcontent', 'v2-longcontent'].includes(scenario)) { const p = products.find(p => p.partNumber === sample.partNumber); p.title += ' · 超长商品名称与配置说明用于检查换行及小屏布局 ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; }
-  const p = scenario === 'v2-new-product' ? products.find(item => item.familyKey === 'iphone-duo') : products.find(p => p.partNumber === (v350Fixture?.partNumber || v343Fixture?.partNumber || sample.partNumber)), member = v350Preview || v343Preview || (v2Preview ? ['v2-member', 'v2-paid-unconfigured', 'v2-longcontent'].includes(scenario) || scenario.startsWith('v3-') : nudgePreview ? true : alternativesPreview ? scenario !== 'alternatives-free' : historyTaskPreview ? ['history-member-reward', 'history-longcontent'].includes(scenario) : monitoringPreview ? !['monitor-expired-paused', 'monitor-free-account'].includes(scenario) : stockPreview ? scenario !== 'stock-restricted' : ['member', 'longcontent'].includes(scenario)), expired = scenario === 'expired' || scenario === 'monitor-expired-paused';
+  const p = scenario === 'v2-new-product' ? products.find(item => item.familyKey === 'iphone-duo') : products.find(p => p.partNumber === (v350Fixture?.partNumber || v343Fixture?.partNumber || sample.partNumber)), member = marketsPreview || v350Preview || v343Preview || (v2Preview ? ['v2-member', 'v2-paid-unconfigured', 'v2-longcontent'].includes(scenario) || scenario.startsWith('v3-') : nudgePreview ? true : alternativesPreview ? scenario !== 'alternatives-free' : historyTaskPreview ? ['history-member-reward', 'history-longcontent'].includes(scenario) : monitoringPreview ? !['monitor-expired-paused', 'monitor-free-account'].includes(scenario) : stockPreview ? scenario !== 'stock-restricted' : ['member', 'longcontent'].includes(scenario)), expired = scenario === 'expired' || scenario === 'monitor-expired-paused';
   if (!p) throw Error(`Missing catalog product for ${scenario}`);
   if (scenario === 'v2-new-product') Object.assign(p, { supported: false, comingSoon: true });
   const bootstrap = { identity: { userKey: 'preview:offline-user', openidMasked: 'preview…0001', isAdmin: true }, membership: { active: member, remainingMs: member ? 18 * 86400000 : 0, expiresAt: member ? new Date(now.getTime() + 18 * 86400000).toISOString() : expired ? '2026-09-10T07:00:00Z' : null },
@@ -603,6 +611,7 @@ for (const scenario of scenarios) {
   const rt = sandbox(async (action, payload) => {
     previewCalls.push({ action, payload });
     if (action === 'user.bootstrap') return copy(bootstrap);
+    if (marketsPreview && action.startsWith('market.')) return marketFixture(action, payload, scenario, now);
     if (action === 'deadline.list') {
       if (v350Fixture?.error) throw Object.assign(Error('模拟错误：到期事项暂未读取成功'), { code: v350Fixture.errorCode || 'call_failed' });
       const result = v350DeadlineResponse(v350Fixture || { empty: true, enabled: false }, bootstrap.identity.userKey, now);
@@ -712,7 +721,7 @@ for (const scenario of scenarios) {
     rt.wx.getSetting = options => options.success({ subscriptionsSetting: { mainSwitch: true, itemSettings: { 'offline-v343-restock': v343Fixture.consentRejected ? 'reject' : 'accept', 'offline-v343-soldout': 'accept' } } });
     rt.load('utils/reminder-credits.js').refreshConsentSetting();
   }
-  const catalog = adminPreview || notificationTestPreview ? null : await rt.load('utils/store.js').getCatalog({ force: true });
+  const catalog = marketsPreview || adminPreview || notificationTestPreview ? null : await rt.load('utils/store.js').getCatalog({ force: true });
   if (v2Preview && ['v2-paid-unconfigured', 'v2-context-checkout', 'v2-longcontent'].includes(scenario)) {
     const saved = rt.load('utils/checkout-context.js').createCheckoutContext({ wx: rt.wx, now: () => now.getTime() })
       .save(bootstrap.identity, { partNumber: p.partNumber, storeNumbers: stores.slice(0, 2).map(store => store.storeNumber) }, catalog, { entryPoint: 'query_result' });
@@ -731,7 +740,8 @@ for (const scenario of scenarios) {
       : scenario === 'notification-test-pending-other' ? { requestId: notificationTest.requestId } : undefined);
     // Notification feedback requires a visible page, just like an actual tap
     // in WeChat. onLoad alone now intentionally represents a hidden preload.
-    if (!v350Fixture?.loading && (v350Preview || alternativesPreview || notificationTestPreview || v2Preview || v343Preview) && scenario !== 'notification-test-loading' && typeof page.onShow === 'function') await page.onShow();
+    if (!v350Fixture?.loading && (marketsPreview || v350Preview || alternativesPreview || notificationTestPreview || v2Preview || v343Preview) && scenario !== 'notification-test-loading' && typeof page.onShow === 'function') await page.onShow();
+    if (marketsPreview) await prepareMarket(page, marketScenarios[scenario]);
     if (desktopPreview && pageName === 'follow' && scenario === 'longcontent') {
       const requestsBefore = previewCalls.length;
       page.onSelectFollow({ currentTarget: { dataset: { id: 'f-desktop-second' } } });
@@ -1021,7 +1031,7 @@ for (const scenario of scenarios) {
           'v2-member': ['2 家门店有可取货观测', '查看下单指引', '加入关注', '购买请在 Apple 官方渠道完成'],
           'v2-unknown': ['当前取货状态待确认', '继续查询原配置'],
           'v2-stale': ['当前取货状态待确认', '继续查询原配置'],
-          'v2-restricted': ['此配置实时查询需会员', '查看此配置会员权益'],
+          'v2-restricted': ['此配置的实时库存仅向会员开放', '查看此配置会员权益'],
           'v2-service-down': ['本次暂无可取货观测', '开通会员不会消除服务异常'],
           'v2-paid-unconfigured': ['会员已生效，继续完成关注设置', '继续设置'],
           'v2-new-product': ['iPhone Duo', '配置已保存', '尚未开始监测', '取货查询和关注暂未开放'],
@@ -1093,6 +1103,10 @@ for (const scenario of scenarios) {
       }
       if (previewCalls.some(item => item.action === 'growth.ingest')) throw Error('Layout fixtures must keep event ingestion disabled');
     }
+    if (pageName === 'follow' || pageName === 'query') forbiddenText.push('查看供应历史', '查看可用历史');
+    if (historyTaskPreview && pageName === 'mine' && ['history-read-error', 'history-loading'].includes(scenario)) {
+      forbiddenText.push('浏览一次历史记录', '去完成');
+    }
     const ast = parse(fs.readFileSync(path.join(mini, `pages/${pageName}/index.wxml`), 'utf8'));
     const nudge = nudgePreview ? { title: scenario === 'nudge-both' ? '补充到货和断货提醒次数' : '补充到货提醒次数', restockCount: 1, soldoutCount: scenario === 'nudge-both' ? 0 : 15, soldoutEnabled: scenario !== 'nudge-one', detail: '已有次数会保留。每项选择「允许」增加 1 次，消息发送后消耗对应次数。' } : null;
     const componentCss = adminPreview ? '' : cssFile('components/target-picker/index.wxss').replace(/\/\*[\s\S]*?\*\//g, '').replace(/([^{}]+)\{/g, (_, selectors) => selectors.trim().startsWith('@') ? `${selectors}{` : selectors.split(',').map(selector => `.component-target-picker ${selector.trim()}`).join(',') + '{');
@@ -1110,9 +1124,9 @@ for (const scenario of scenarios) {
       const css = htmlPlaceholderSelectors(htmlElementSelectors((rawCss + '\n' + nativeTabs.css).replace(/(-?[\d.]+)rpx/g, (_, value) => { const pixels = Number(value) * width / 750; return `${roundRpx ? Math.round(pixels) : pixels}px`; })));
       const filename = `${pageName}-${scenario}-${width}.html`;
       const tabbar = nativeTabs.markup;
-      const body = `<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${names[pageName]} · ${scenario} · ${width}px 离线预览</title><style>html{width:${desktopPreview ? '100%' : width + 'px'};max-width:100%;margin:0 auto}body{margin:0}button,input,textarea{font:inherit}button{cursor:default}img{display:block}input[type=checkbox]{width:36px;height:22px;flex:none;accent-color:#1ba35a}.simulation{position:sticky;top:0;z-index:10;padding:8px 12px;background:#fff2ce;color:#705000;font:11px/1.5 sans-serif;border-bottom:1px solid #ead49c}.native-nav{text-align:center;padding:16px;font:600 15px sans-serif}${navCss('light')}${theme ? `@media (prefers-color-scheme: dark){${navCss('dark')}}` : ''}${css}</style><div class="simulation">离线模拟 · ${width}px · ${scenario}${membershipNativePreview || notificationTestPreview ? ' · 184px按钮级联压力' : ''} · 使用实际 WXML/WXSS；不代表微信实测或实时库存</div><div class="native-nav">果小哨 · ${names[pageName]}</div>${rendered}${tabbar}<script>window.previewAudit=()=>({width:innerWidth,scrollWidth:document.documentElement.scrollWidth,overflow:[...document.querySelectorAll('body *')].filter(e=>{const r=e.getBoundingClientRect();return r.width&&r.right>document.documentElement.clientWidth+1&&getComputedStyle(e.parentElement).overflowX!=='auto'}).map(e=>({tag:e.tagName,class:e.className,right:e.getBoundingClientRect().right,text:e.textContent.slice(0,60)}))});</script></html>`;
+      const body = `<!doctype html><html lang="${pageName === 'markets' && page.data.lang === 'en' ? 'en' : 'zh-CN'}"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${names[pageName]} · ${scenario} · ${width}px 离线预览</title><style>html{width:${desktopPreview ? '100%' : width + 'px'};max-width:100%;margin:0 auto}body{margin:0}button,input,textarea{font:inherit}button{cursor:default}img{display:block}input[type=checkbox]{width:36px;height:22px;flex:none;accent-color:#1ba35a}.simulation{position:sticky;top:0;z-index:10;padding:8px 12px;background:#fff2ce;color:#705000;font:11px/1.5 sans-serif;border-bottom:1px solid #ead49c}.native-nav{text-align:center;padding:16px;font:600 15px sans-serif}${navCss('light')}${theme ? `@media (prefers-color-scheme: dark){${navCss('dark')}}` : ''}${css}</style><div class="simulation">离线模拟 · ${width}px · ${scenario}${membershipNativePreview || notificationTestPreview ? ' · 184px按钮级联压力' : ''} · 使用实际 WXML/WXSS；不代表微信实测或实时库存</div><div class="native-nav">果小哨 · ${html(pageName === 'markets' ? page.data.c.title : names[pageName])}</div>${rendered}${tabbar}<script>window.previewAudit=()=>({width:innerWidth,scrollWidth:document.documentElement.scrollWidth,overflow:[...document.querySelectorAll('body *')].filter(e=>{const r=e.getBoundingClientRect();return r.width&&r.right>document.documentElement.clientWidth+1&&getComputedStyle(e.parentElement).overflowX!=='auto'}).map(e=>({tag:e.tagName,class:e.className,right:e.getBoundingClientRect().right,text:e.textContent.slice(0,60)}))});</script></html>`;
       fs.writeFileSync(path.join(out, filename), body, 'utf8');
-      const expectedText = v350Preview ? [...v350Text.expected] : v343Preview ? [...v343Text.expected] : v2Preview ? expectedV2Text : alternativesPreview ? [p.title,
+      const expectedText = marketsPreview ? marketScenarios[scenario].expected : v350Preview ? [...v350Text.expected] : v343Preview ? [...v343Text.expected] : v2Preview ? expectedV2Text : alternativesPreview ? [p.title,
         '选择可接受的颜色与门店', '同机型、同容量', ...(cityPreview ? [] : ['同城门店']), '勾选不扣次', '切换城市',
         ...{
           'alternatives-default': ['先选可接受的颜色', '本次查询门店'],
@@ -1153,7 +1167,7 @@ for (const scenario of scenarios) {
         'history-completed': ['今日浏览任务已完成', '奖励已计入次数明细'],
         'history-longcontent': ['各地门店已有记录', '3 家门店', '今日浏览任务完成，+1 次'],
         'history-loading': ['正在加载浏览记录'],
-      }[scenario]] : ['今日已获', '余额上限', '次数明细', '浏览一次历史记录', ...(scenario === 'history-balance-cap' ? ['已浏览·待领取', '暂无记录'] : ['history-read-error', 'history-loading'].includes(scenario) ? ['去完成', '暂无记录'] : ['已完成', '体验任务', '+1'])]
+      }[scenario]] : ['今日已获', '余额上限', '次数明细', ...(scenario === 'history-balance-cap' ? ['浏览一次历史记录', '余额已满，今日用次后可领', '暂无记录'] : ['history-read-error', 'history-loading'].includes(scenario) ? ['暂无记录'] : ['浏览一次历史记录', '已完成', '体验任务', '+1'])]
           : monitoringPreview ? [...(follows.length ? [p.title, '调整', '详情与管理'] : []), ...(scenario.startsWith('monitor-dual-') ? ['到货', '断货'] : ['后台检测', '消息发送']), '微信提醒', ...{
         'monitor-template-missing': ['监测服务运行中', '模板尚未配置', '关注已开启', '查看原因'],
         'monitor-ready-authorized': ['监测服务运行中', '发送服务已就绪', '提醒次数只剩 1 次', '增加提醒次数', '关注已开启'],
@@ -1190,7 +1204,7 @@ for (const scenario of scenarios) {
         'payment-upgrade-annual': ['确认购买 · ¥129.00', '在原到期时间后增加 365 天', '预计到期 2027-10-03', '按所选套餐全价购买', '不抵扣差价'],
         'payment-member-pending-monthly': ['30 天会员 · ¥19.90', 'offline-original-monthly-order', '继续处理原订单', '查询支付结果'],
       }[scenario]] : redemptionPreview ? ['兑换会员', '会员购买暂不可用，现有会员权益不受影响。', { 'redemption-input': '确认兑换', 'redemption-loading': '兑换中，请稍候', 'redemption-error': '兑换码无效', 'redemption-success': '兑换成功', 'redemption-used': '此账号已兑换过', 'redemption-limited': '15 分钟后再试', 'redemption-empty': '确认兑换' }[scenario]] : stockPreview ? [p.title, '2 家门店',
-        ...(stockScenarios[scenario].expanded ? ['收起详情', '单独查询库存', '调整', '查看供应历史', '删除关注'] : ['详情与管理']),
+        ...(stockScenarios[scenario].expanded ? ['收起详情', '单独查询库存', '调整', '删除关注'] : ['详情与管理']),
         ...(member ? ['到货 42 次', '断货 41 次', '补充提醒次数'] : []),
         ...({ available: ['2 家可取货', '15 秒前检查', '查看取货信息'],
           unavailable: ['所选门店暂不可取货', '15 秒前检查'],
@@ -1206,8 +1220,9 @@ for (const scenario of scenarios) {
       ] : scenario === 'loading' ? [{ query: '正在加载商品目录', follow: '正在读取你的关注', history: '正在加载商品目录', mine: '正在读取账户信息' }[pageName]]
         : scenario === 'error' ? [pageName === 'admin' ? '模拟错误：网络连接中断' : '模拟错误：云环境连接超时', '暂时没有连上', '重试']
         : pageName === 'mine' ? [member ? (page.data.membership.planLabel !== '会员' ? page.data.membership.planLabel : '会员已开通') : expired ? '会员已到期' : '免费用户', ...(member || page.data.paymentPendingId ? [] : ['果小哨会员']), ...(page.data.paymentPendingId ? [] : page.data.showPurchaseShop ? page.data.membership.active ? ['延长会员', '升级套餐'] : ['开通会员'] : ['会员购买暂不可用，现有会员权益不受影响。']), '提醒记录', ...(reminderPreview && reminderRecords.length ? ['删除记录', scenario === 'reminder-clearing' ? '清空中' : '清空'] : [])]
-        : pageName === 'follow' && follows.length ? [p.title, '2 家门店', ...(page.data.follows.some(follow => follow.detailsExpanded) ? [stores[0].name, '收起详情', '调整', '查看供应历史', '删除关注'] : ['详情与管理']), ...(sheetPreview ? ['调整关注', '选商品', '选门店', '已选 2 家门店', p.title + ' · 2 家门店', scenario === 'sheet-saving' ? '正在保存' : '保存关注'] : [])]
+        : pageName === 'follow' && follows.length ? [p.title, '2 家门店', ...(page.data.follows.some(follow => follow.detailsExpanded) ? [stores[0].name, '收起详情', '调整', '删除关注'] : ['详情与管理']), ...(sheetPreview ? ['调整关注', '选商品', '选门店', '已选 2 家门店', p.title + ' · 2 家门店', scenario === 'sheet-saving' ? '正在保存' : '保存关注'] : [])]
         : pageName === 'follow' ? ['暂无库存关注']
+        : desktopPreview && pageName === 'query' && scenario === 'free' ? ['想查哪一款？', '选择配置与门店']
         : pageName === 'admin' ? ['运行统计', '128'] : [p.title, ...(sheetPreview ? ['选商品', '选门店', '已选 2 家门店', '保存选择'] : [])];
       if (adminPreview && ['operator-ready', 'operator-longcontent'].includes(scenario)) expectedText.push('成功查询 56', '已确认呈现详情 12', '测试通知：28 条／20 人', '各行为分别计数', ...(scenario === 'operator-longcontent' ? ['以上不是完整统计'] : []));
       if (sheetPreview) {

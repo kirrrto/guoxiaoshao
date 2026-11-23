@@ -6,7 +6,7 @@ const { targetKeyOf } = require('./events');
 // Their identity stays fixed for the whole availability episode, while the
 // displayed time is the fresh sample which actually justified the reminder.
 function currentAvailabilityEvent(latest, config, now) {
-  if (!latest || latest.status !== 'available' || latest.unknownSince) return null;
+  if (!latest || (latest.market && latest.market !== 'CN') || latest.status !== 'available' || latest.unknownSince) return null;
   const observedAt = Date.parse(latest.observedAt);
   const knownAt = Date.parse(latest.knownAt);
   const since = Date.parse(latest.statusSince);

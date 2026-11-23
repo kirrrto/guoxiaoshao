@@ -383,7 +383,7 @@ Page({
     const product = this.catalog && this.catalog.productByPart[snapshot.product.partNumber];
     if (!canQuery(product)) return { restricted: true, notice: '该商品尚未开放取货查询，请核对当前配置。' };
     if (this.querySnapshotPermissionDenied || snapshot.latestRestricted || (snapshot.results || []).some(row => row.restricted)) return { restricted: true, notice: '此结果的访问权限待确认，请重新查询；受限的旧观测暂不展示。' };
-    if (!canOfferLiveChoices(product, account, Date.now())) return { restricted: true, notice: '当前账户暂不可查看此配置的实时库存，可查看有权限的历史记录或核对会员权益。' };
+    if (!canOfferLiveChoices(product, account, Date.now())) return { restricted: true, notice: '当前账户暂不可查看此配置的实时库存，可改选其他配置或核对会员权益。' };
     return { restricted: false, notice: '' };
   },
 
@@ -571,13 +571,6 @@ Page({
   onToggleAlternatives() { this.setData({ alternativesExpanded: !this.data.alternativesExpanded }); },
   onToggleEvidence() { this.setData({ evidenceExpanded: !this.data.evidenceExpanded }); },
   onGoFollow() { switchToTab({ url: '/pages/follow/index' }); },
-
-  onSelectionHistory() {
-    if (navigation.isNavigating()) return;
-    const { stageHistoryContext } = require('../../utils/journey-context');
-    if (!stageHistoryContext({ from: 'query', target: this.selection })) return toast('请先确认账户与查询配置');
-    switchToTab({ url: '/pages/history/index' });
-  },
 
   onNextAction() {
     if (this.pageRetired || this.data.querying || this.data.signing || this.data.sheetVisible) return;

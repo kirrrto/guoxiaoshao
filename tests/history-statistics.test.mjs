@@ -16,7 +16,7 @@ const event = (id, detectedAt, extra = {}) => ({ _id: id, partNumber, storeNumbe
 // the in-memory service fixture implementation.
 function eventDatabase(rows) {
   const compare = op => value => ({ op, value });
-  const command = { lte: compare('lte'), gte: compare('gte'), lt: compare('lt'), in: compare('in'), and: value => ({ op: 'and', value }), or: value => ({ op: 'or', value }) };
+  const command = { lte: compare('lte'), gte: compare('gte'), lt: compare('lt'), in: compare('in'), exists: compare('exists'), and: value => ({ op: 'and', value }), or: value => ({ op: 'or', value }) };
   function matches(row, condition) {
     if (condition.op === 'and') return condition.value.every(c => matches(row, c));
     if (condition.op === 'or') return condition.value.some(c => matches(row, c));
@@ -26,6 +26,7 @@ function eventDatabase(rows) {
       if (expected.op === 'gte') return row[key] >= expected.value;
       if (expected.op === 'lt') return row[key] < expected.value;
       if (expected.op === 'in') return expected.value.includes(row[key]);
+      if (expected.op === 'exists') return Object.hasOwn(row, key) === expected.value;
       throw Error(`Unknown comparison ${expected.op}`);
     });
   }
@@ -67,6 +68,26 @@ test('production history adapter counts the full rolling hour across Beijing mid
   assert.equal(allStores.summary.lastHourRestocks, 5);
   const oldDay = await repo.getEventHistory({ ...request, dayKey: '2026-09-15' });
   assert.equal(oldDay.summary.lastHourRestocks, 0, 'an older-day response must not include today activity');
+});
+
+test('mainland history reports include old unscoped rows and exclude regional rows before limits, paging and counts', async () => {
+  const rows = [
+    event('regional-first', cutoff, { market: 'TW' }),
+    event('mainland-scoped', '2026-09-15T16:18:00.000Z', { market: 'CN' }),
+    event('old-unscoped', '2026-09-15T16:15:00.000Z'),
+    event('past-region', '2026-09-15T15:50:00.000Z', { market: 'JP' }),
+    event('past-unscoped', '2026-09-15T15:40:00.000Z'),
+  ];
+  const f = createFixture(); await f.repo.saveEvents(rows);
+  for (const repo of [f.repo, createCloudbaseRepo(eventDatabase(rows))]) {
+    const request = { partNumber, storeNumbers: [], dayKey: '2026-09-16', snapshotAt: cutoff, limit: 1 };
+    assert.deepEqual((await repo.listEvents(request)).map(e => e._id), ['mainland-scoped']);
+    const first = await repo.getEventHistory(request);
+    assert.deepEqual([first.events[0]._id, first.total, first.summary.restocks, first.summary.lastHourRestocks], ['mainland-scoped', 2, 2, 3]);
+    const next = await repo.getEventHistory({ ...request, includeCounts: false, cursor: { detectedAt: first.events[0].detectedAt, id: first.events[0]._id } });
+    assert.deepEqual(next.events.map(e => e._id), ['old-unscoped']);
+    assert.equal(next.hasMore, false);
+  }
 });
 
 test('past-day new-product history does not reveal restricted current-day activity through the rolling counter', async () => {

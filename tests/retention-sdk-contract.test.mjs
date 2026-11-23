@@ -31,15 +31,15 @@ test('pinned SDK retention builds bounded budget queries and keeps every deletio
     const result = await repo.purgeExpiredData({ firstDay, cutoffIso });
     assert.deepEqual(result.errors, {});
     assert.deepEqual(result.removed, { events: 1, queries: 1, notifications: 1, targetHealth: 1,
-      subscriptionGrants: 1, queryGuards: 1, queryTargets: 1, budgets: 3 });
-    assert.equal(requests.length, 10);
+      subscriptionGrants: 1, queryGuards: 1, queryTargets: 1, marketBudgets: 1, budgets: 3 });
+    assert.equal(requests.length, 11);
     const queryFor = collection => requests.find(row => row.collection === collection).query;
     assert.deepEqual(queryFor(C.events), { dayKey: { $lt: firstDay } });
     assert.deepEqual(queryFor(C.queries), { createdAt: { $lt: cutoffIso }, status: { $ne: 'pending' } });
     assert.deepEqual(queryFor(C.notifications), { createdAt: { $lt: cutoffIso }, status: { $nin: ['pending', 'sending'] } });
     assert.deepEqual(queryFor(C.health), { recordedAt: { $lt: cutoffIso } });
     const configRequests = requests.filter(row => row.collection === C.config);
-    for (const [kind, field] of [['subscription_grant', 'createdAt'], ['query_guard', 'updatedAt'], ['query_target', 'updatedAt']]) {
+    for (const [kind, field] of [['subscription_grant', 'createdAt'], ['query_guard', 'updatedAt'], ['query_target', 'updatedAt'], ['market_budget', 'updatedAt']]) {
       assert.deepEqual(configRequests.find(row => row.query.kind === kind).query, { kind, [field]: { $lt: cutoffIso } });
     }
     const batches = configRequests.filter(row => row.query._id).map(row => row.query._id.$in);
@@ -54,7 +54,7 @@ test('pinned SDK retention builds bounded budget queries and keeps every deletio
 
     requests.length = 0; rejectEvents = true;
     const partial = await repo.purgeExpiredData({ firstDay, cutoffIso });
-    assert.equal(requests.length, 10, 'one rejected collection must not prevent the remaining cleanup');
+    assert.equal(requests.length, 11, 'one rejected collection must not prevent the remaining cleanup');
     assert.match(partial.errors.events, /offline event cleanup rejected/);
     assert.deepEqual(Object.keys(partial.errors), ['events']);
     assert.equal(partial.removed.events, 0);

@@ -7,6 +7,9 @@ const { accountLimits, ANNUAL_LIMITS } = require('../rules/membership');
 const { isRetiredPartNumber, retiredProductMessage } = require('../rules/follow-access');
 const { recordObservations } = require('../engine/observations');
 const { isProductIdentity } = require('../rules/product-target');
+const { MARKETS, findMarket } = require('../markets');
+const { isValidTemplateId } = require('../config');
+const { monitoringSnapshot } = require('../monitor-readiness');
 const ID_PATTERN = /^[A-Za-z0-9_-]{8,64}$/;
 function validatePayload(ctx, payload, user, existingOnly = false) {
   const queryId = typeof payload.queryId === 'string' && ID_PATTERN.test(payload.queryId) ? payload.queryId : null;
@@ -85,6 +88,69 @@ async function pickup(ctx, payload, { existingOnly = false, maxCost } = {}) {
   const [product, stores] = await Promise.all([ctx.repo.getProduct(partNumber), ctx.repo.getStores(storeNumbers)]);
   if (!product) throw new ApiError('unknown_product', '该商品不在目录中');
   if (stores.length !== storeNumbers.length) throw new ApiError('unknown_store', '存在未知门店编号');
+  return executePickup(ctx, { user, product, queryId, partNumber, storeNumbers, startedAt, existingOnly, maxCost });
+}
+
+async function marketCatalog(ctx) {
+  const config = ctx.config;
+  const ids = config.notifications.templateIds || {};
+  let status = null;
+  if (config.collector.enabled && MARKETS.some(site => config.internationalMonitoring?.[site.code] === true)) {
+    try { status = await ctx.repo.getCollectorStatus(); }
+    catch { ctx.log?.warn?.('[markets] monitoring status unavailable'); }
+  }
+  const worker = status && monitoringSnapshot(config, status, ctx.now).collector;
+  const workerReady = worker && !worker.stale && !['error', 'not_deployed', 'no_lease', 'stopped', 'disabled'].includes(worker.state);
+  return { markets: MARKETS.map(site => {
+    const monitorEnabled = config.collector.enabled === true && config.internationalMonitoring?.[site.code] === true;
+    const notify = monitorEnabled && config.notifications.enabled === true && config.internationalNotifications?.[site.code] === true;
+    const region = monitorEnabled && status?.markets?.[site.code];
+    const monitorIntervalMs = region && Number.isSafeInteger(region.intervalMs) && region.intervalMs >= 60000 ? region.intervalMs : null;
+    const observed = region ? Date.parse(region.lastSuccessAt) : NaN;
+    const monitorStale = !(workerReady && monitorIntervalMs && region.state === 'running' && region.health?.state === 'healthy'
+      && Number.isFinite(observed) && observed <= ctx.now.getTime() && !(region.admissionUntil > ctx.now.getTime()));
+    return { ...site, enabled: config.internationalMarkets?.[site.code] === true, monitorEnabled,
+      monitorIntervalMs, monitorStale, monitorLastSuccessAt: Number.isFinite(observed) && observed <= ctx.now.getTime() ? new Date(observed).toISOString() : null,
+      notificationsEnabled: notify && isValidTemplateId(ids.restock),
+      notificationsEnabledEn: notify && isValidTemplateId(ids.restockEn) && ![ids.restock, ids.soldout, ids.soldoutEn, config.deadlineReminders.templateId].includes(ids.restockEn) };
+  }) };
+}
+
+async function marketPickup(ctx, payload) {
+  const startedAt = Date.now();
+  const { market, partNumber, storeNumbers, queryId, maxCost } = payload;
+  const site = findMarket(market);
+  if (!site) throw new ApiError('unknown_market', '该站点不在支持范围内。');
+  if (payload.expectedUserKey !== ctx.identity.userKey) throw new ApiError('query_account_changed', '账号已变化，请重新确认查询。');
+  if (typeof queryId !== 'string' || !ID_PATTERN.test(queryId)) throw new ApiError('invalid_query_id', '查询编号无效。');
+  if (maxCost !== undefined && (!Number.isSafeInteger(maxCost) || maxCost < 0)) throw new ApiError('invalid_payload', '查询费用无效。');
+  const product = site.products.find(item => item.partNumber === partNumber);
+  if (!product || !Array.isArray(storeNumbers) || storeNumbers.length !== 1
+    || !site.stores.some(store => store.storeNumber === storeNumbers[0])) throw new ApiError('invalid_market_target', '请在当前站点重新选择商品与门店。');
+  if (ctx.config.internationalMarkets?.[market] !== true) {
+    // Closing a storefront must not strand or recharge an already-debited request.
+    // A disabled market can replay/settle an existing receipt, never restart HTTP.
+    const id = ctx.identity.userKey + '|' + queryId;
+    let record = await ctx.repo.getQuery(id);
+    if (!record || record.kind !== 'market' || record.market !== market || record.partNumber !== partNumber
+      || record.storeNumbers?.length !== 1 || record.storeNumbers[0] !== storeNumbers[0]) throw new ApiError('market_disabled', '该站点尚未开放实时查询。');
+    if (record.status === 'pending') {
+      if (record.leaseUntil <= ctx.nowIso) {
+        await ctx.repo.expireQuery({ id, userKey: ctx.identity.userKey, nowIso: ctx.nowIso, staleBefore: ctx.nowIso });
+        record = await ctx.repo.getQuery(id);
+      }
+      if (record?.status === 'pending') return { market, queryId, ok: false, reason: 'query_in_progress', retryAfterMs: Math.max(1000, Date.parse(record.leaseUntil) - ctx.now.getTime()) };
+    }
+    if (!record?.response) throw new ApiError('market_disabled', '该站点尚未开放实时查询。');
+    const owner = await ctx.repo.getUser(ctx.identity.userKey);
+    return { ...record.response, market, queryId, balance: owner.quota.balance, quotaRevision: owner.quota.revision || 0, replayed: true };
+  }
+  const user = await ensureUser(ctx);
+  const reply = await executePickup(ctx, { user, product, queryId, partNumber, storeNumbers, startedAt, market, maxCost });
+  return { ...reply, market, queryId };
+}
+
+async function executePickup(ctx, { user, product, queryId, partNumber, storeNumbers, startedAt, market = null, existingOnly = false, maxCost }) {
   const remaining = () => typeof ctx.remainingMs === 'function' ? ctx.remainingMs() : Infinity;
   // Slow configuration/account/catalog reads used to be followed by another
   // full 14-second fetch window, exceeding the invocation limit after debit.
@@ -93,7 +159,8 @@ async function pickup(ctx, payload, { existingOnly = false, maxCost } = {}) {
   if (remaining() <= 7000) throw new ApiError('query_in_progress', '连接耗时较长，本次未继续查询；原编号已保留，请重试确认原结果',
     { reason: 'request_budget_exhausted' });
   const ownerId = randomUUID(); const recordId = `${user._id}|${queryId}`;
-  const begun = await ctx.repo.beginQuery({ record: { _id: recordId, userKey: user._id, queryId, kind: 'live', partNumber, storeNumbers }, product, config: ctx.config, ownerId, nowIso: ctx.nowIso, existingOnly, maxCost });
+  const scope = market ? { kind: 'market', market } : { kind: 'live' };
+  const begun = await ctx.repo.beginQuery({ record: { _id: recordId, userKey: user._id, queryId, ...scope, partNumber, storeNumbers }, product, config: ctx.config, ownerId, nowIso: ctx.nowIso, existingOnly, maxCost });
   if (begun.replayed) return { ...begun.record.response, balance: begun.balance, quotaRevision: begun.quotaRevision, replayed: true };
   if (begun.busy) return { ok: false, reason: 'query_in_progress', queryId, retryAfterMs: begun.retryAfterMs, balance: begun.balance, quotaRevision: begun.quotaRevision };
   if (begun.denied) return { ok: false, reason: begun.denied.reason, retryAfterMs: begun.denied.retryAfterMs || null, restrictionEndsAt: begun.denied.restrictionEndsAt || null, cost: begun.denied.cost, balance: begun.balance, quotaRevision: begun.quotaRevision };
@@ -101,14 +168,16 @@ async function pickup(ctx, payload, { existingOnly = false, maxCost } = {}) {
   try {
     // Keep six seconds for recording/refund even after slow admission reads.
     const deadline = Math.min(startedAt + 14000, Date.now() + Math.max(0, remaining() - 6000));
-    const batches = await mapLimit(storeNumbers, 3, store => sharedQueryPickup(ctx, store, partNumber, deadline, product));
+    const batches = await mapLimit(storeNumbers, 3, store => sharedQueryPickup(ctx, store, partNumber, deadline, product, market));
     // A denied request is not an upstream observation and must not alter history.
     const recorded = batches.flatMap(batch => batch.record.budgetDenied
       ? batch.observations.map(observation => ({ observation, latest: null, events: [], outcome: 'not_sampled' }))
       : batch.recorded);
     // A manual reply may lose the persistence race to a later automatic sample.
     // Settle the query using the exact same observations the user receives.
-    const results = recorded.map(item => presentResult(item, ctx.clock().getTime()));
+    const results = recorded.map(item => ({
+      ...presentResult(item, ctx.clock().getTime()), ...(market ? { market } : {}),
+    }));
     const allUnknown = results.every(r => r.status === 'unknown');
     const allShared = results.length > 0 && results.every(r => r.reused);
     const sharedResult = results.some(r => r.reused);
@@ -117,7 +186,7 @@ async function pickup(ctx, payload, { existingOnly = false, maxCost } = {}) {
     const retryAt = Math.max(0, ...batches.map(batch => Number(batch.record.retryAt) || 0));
     const guardReason = batches.find(batch => batch.record.budgetDenied)?.record.error.message
       || (retryAt > ctx.clock().getTime() ? 'upstream_paused' : null);
-    const reason = ['upstream_paused', 'query_refresh_pending', 'upstream_unavailable'].includes(guardReason) ? guardReason
+    const reason = ['upstream_paused', 'query_refresh_pending', 'upstream_unavailable', 'market_disabled'].includes(guardReason) ? guardReason
       : ['daily_budget', 'minute_budget', 'capacity_wait'].includes(guardReason) ? 'upstream_budget_limited' : 'upstream_unavailable';
     response = { ok: !allUnknown, reason: allUnknown ? reason : null, queryId,
       sharedResult, allShared, billingReason: refund && sharedResult ? 'shared_result_no_charge' : refund ? 'no_valid_result' : null,
@@ -141,4 +210,4 @@ async function recent(ctx, payload) {
   const list = await ctx.repo.listQueries(user._id, limit, 'live');
   return { queries: list.map(q => ({ queryId: q.queryId, partNumber: q.partNumber, storeNumbers: q.storeNumbers, status: q.status, createdAt: q.createdAt, summary: q.response ? (q.response.results || []).map(r => ({ storeNumber: r.storeNumber, storeName: r.storeName, status: r.status })) : [], productTitle: q.response && q.response.product ? q.response.product.title : null })) };
 }
-module.exports = { pickup, recent, recovery, resumeLegacy, recordObservations, validatePayload };
+module.exports = { pickup, marketCatalog, marketPickup, recent, recovery, resumeLegacy, recordObservations, validatePayload };

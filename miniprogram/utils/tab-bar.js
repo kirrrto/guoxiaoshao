@@ -5,7 +5,7 @@ const navigation = require('./navigation');
 const TABS = [
   { pagePath: '/pages/query/index', text: '查询', iconPath: '/images/tab/query.png', selectedIconPath: '/images/tab/query-active.png' },
   { pagePath: '/pages/follow/index', text: '小哨', iconPath: '/images/tab/follow.png', selectedIconPath: '/images/tab/follow-active.png' },
-  { pagePath: '/pages/history/index', text: '历史', iconPath: '/images/tab/history.png', selectedIconPath: '/images/tab/history-active.png' },
+  { pagePath: '/pages/markets/index', text: '其他站点', iconPath: '/images/tab/markets.png', selectedIconPath: '/images/tab/markets-active.png' },
   { pagePath: '/pages/mine/index', text: '我的', iconPath: '/images/tab/mine.png', selectedIconPath: '/images/tab/mine-active.png' },
 ];
 
@@ -83,7 +83,7 @@ function updateVisibility(page) {
 }
 
 function setTabBarOverlay(page, hidden, owner = 'page') {
-  if (!page) return;
+  if (!page || (page.route && tabIndex(page.route) < 0)) return;
   if (!page._tabOverlayLocks) page._tabOverlayLocks = new Set();
   if (hidden) page._tabOverlayLocks.add(owner); else page._tabOverlayLocks.delete(owner);
   // A property observer may run before onShow, but must never control a

@@ -1,0 +1,107 @@
+<page-meta page-style="color-scheme:{{_themeMode || 'light'}};" />
+<view class="page tab-page desktop-split-page markets-page">
+  <view wx:if="{{networkOffline}}" class="network-notice" aria-role="status">{{c.offline}}</view>
+  <view class="page-heading">
+    <image class="page-mark" src="/images/brand/logo-mint-144.png" mode="aspectFit" aria-hidden="true" />
+    <view class="page-title">{{c.title}}</view>
+    <button class="ui-action ui-action--plain" bindtap="onLanguage" aria-label="{{c.languageLabel}}">{{c.language}}</button>
+  </view>
+  <view wx:if="{{catalogError}}" class="card" aria-role="alert">
+    <view>{{catalogError}}</view>
+    <button class="btn btn-sm mt" bindtap="onPullDownRefresh">{{c.retry}}</button>
+  </view>
+  <view wx:elif="{{loading}}" class="loading-line" aria-live="polite">{{c.loading}}</view>
+  <view wx:elif="{{product && store}}" class="markets-workspace">
+    <view class="markets-controls">
+      <view class="markets-regions" aria-label="{{c.sites}}">
+        <button wx:for="{{sites}}" wx:key="code" class="markets-region {{market === item.code ? 'markets-region--selected' : ''}}"
+          hover-class="ui-control-pressed" aria-pressed="{{market === item.code}}" data-market="{{item.code}}" bindtap="onMarket">{{item.label}}</button>
+      </view>
+      <view class="card markets-editor">
+        <view class="market-product-line">
+          <view wx:if="{{product.imageDisplayUrl}}" class="product-tile market-product-tile market-product-tile--main">
+            <image src="{{product.imageDisplayUrl}}" mode="aspectFit" aria-hidden="true" data-src="{{product.imageDisplayUrl}}" binderror="onProductImageError" />
+          </view>
+          <view class="market-product-copy"><view class="card-title">{{c.configuration}}</view><text class="market-local-sku" user-select>{{product.id}}</text></view>
+        </view>
+        <picker disabled="{{models.length <= 1}}" mode="selector" range="{{models}}" value="{{modelIndex}}" data-field="model" bindchange="onChoice" aria-label="{{c.model + ' ' + product.model}}">
+          <view class="market-field"><text class="market-label">{{c.model}}</text><view class="market-field-value"><text>{{product.model}}</text><view wx:if="{{models.length > 1}}" class="ui-chevron ui-chevron--down" aria-hidden="true" /></view></view>
+        </picker>
+        <picker disabled="{{colors.length <= 1}}" mode="selector" range="{{colors}}" range-key="label" value="{{colorIndex}}" data-field="color" bindchange="onChoice" aria-label="{{c.color + ' ' + product.colorLabel}}">
+          <view class="market-field"><text class="market-label">{{c.color}}</text><view class="market-field-value"><text>{{product.colorLabel}}</text><view wx:if="{{colors.length > 1}}" class="ui-chevron ui-chevron--down" aria-hidden="true" /></view></view>
+        </picker>
+        <view class="market-storage" aria-label="{{c.capacity}}">
+          <text class="market-label">{{c.capacity}}</text>
+          <view class="market-capacities"><button wx:for="{{capacities}}" wx:key="id" class="ui-action market-capacity {{item.id === product.id ? 'market-capacity--selected' : ''}}"
+            hover-class="ui-control-pressed" aria-pressed="{{item.id === product.id}}" data-id="{{item.id}}" bindtap="onCapacity">{{item.label}}</button></view>
+        </view>
+        <picker disabled="{{stores.length <= 1}}" mode="selector" range="{{stores}}" range-key="location" value="{{storeIndex}}" data-field="store" bindchange="onChoice" aria-label="{{c.store + ' ' + store.location}}">
+          <view class="market-field market-store"><text class="market-label">{{c.store}}</text><view class="market-field-value"><text>{{store.location}}</text><view wx:if="{{stores.length > 1}}" class="ui-chevron ui-chevron--down" aria-hidden="true" /></view></view>
+        </picker>
+        <view wx:if="{{enabled || pending}}" class="market-actions">
+          <text wx:if="{{accountReady && enabled}}" class="market-meta">{{costText}}</text>
+          <button class="btn btn-primary btn-block" disabled="{{!canQuery || networkOffline}}" loading="{{busyHere}}" hover-class="btn-primary-pressed" bindtap="onQuery">{{queryLabel}}</button>
+        </view>
+        <view wx:if="{{accountError}}" class="market-retry"><text>{{c.accountError}}</text><button class="ui-action" bindtap="onPullDownRefresh">{{c.retry}}</button></view>
+        <view wx:elif="{{!accountReady}}" class="small muted mt" aria-role="status">{{c.accountLoading}}</view>
+        <block wx:if="{{accountReady && watchLoaded}}">
+          <button wx:if="{{!targetWatch && showWatch}}" class="btn btn-block mt" disabled="{{!watchEnabled || networkOffline}}" loading="{{watchBusy}}"
+            hover-class="ui-control-pressed" bindtap="onWatch">{{w.watch}}</button>
+          <view wx:if="{{watchService}}" class="market-meta mt">{{watchService}}</view>
+          <button wx:if="{{membershipLink}}" class="ui-action mt" bindtap="onViewMembership">{{w.memberAction}}</button>
+          <view wx:if="{{targetWatch}}" class="market-meta mt">{{w.notifyLanguage}} · {{targetLanguage}}</view>
+          <view wx:if="{{creditText}}" class="market-meta">{{creditText}}</view>
+          <button wx:if="{{alertTemplate}}" class="btn btn-block mt" disabled="{{watchBusy || networkOffline}}" bindtap="onAuthorize">{{w.grant}}</button>
+          <button wx:if="{{allowSettings}}" class="btn btn-block mt" bindtap="onOpenSettings">{{w.settings}}</button>
+        </block>
+        <view wx:if="{{watchMessage}}" class="market-meta mt" aria-live="polite">{{watchMessage}}</view>
+      </view>
+    </view>
+    <view class="markets-details">
+      <view wx:if="{{alertMissing}}" class="banner banner-warn">{{w.alertMissing}}</view>
+      <view wx:if="{{alertTime}}" class="card">
+        <view class="card-title">{{w.notice}}</view>
+        <view class="market-result-product">{{product.label}}</view>
+        <view>{{store.label}}</view><view class="market-meta">{{alertTime}}</view>
+      </view>
+      <view id="market-result" class="card markets-result {{!enabled || receipt || queryError || busyHere ? '' : 'markets-result--empty'}}" aria-live="polite">
+        <view class="card-title">{{c.results}}</view>
+        <block wx:if="{{!enabled}}">
+          <view class="market-closed">{{c.closed}}</view>
+          <button class="ui-action mt" bindtap="onPullDownRefresh">{{c.refreshed}}</button>
+        </block>
+        <view wx:if="{{queryError}}" class="market-issue">{{queryError}}</view>
+        <block wx:if="{{receipt}}">
+          <view class="market-result-status {{receipt.tone === 'ok' ? 'market-result-status--ok' : ''}}">{{receipt.previous ? receipt.timeLabel + ' · ' : ''}}{{receipt.status}}</view>
+          <view class="market-product-line">
+            <view wx:if="{{product.imageDisplayUrl}}" class="product-tile market-product-tile">
+              <image src="{{product.imageDisplayUrl}}" mode="aspectFit" aria-hidden="true" data-src="{{product.imageDisplayUrl}}" binderror="onProductImageError" />
+            </view>
+            <view class="market-product-copy"><view>{{product.label}}</view><view>{{receipt.store}}</view></view>
+          </view>
+          <view class="market-meta">{{receipt.previous ? '' : receipt.timeLabel + ' · '}}{{receipt.time}}</view>
+        </block>
+        <view wx:elif="{{enabled && !queryError}}" class="market-meta mt">{{busyHere ? c.checking : c.empty}}</view>
+        <view wx:if="{{billingText}}" class="market-meta mt">{{billingText}}</view>
+      </view>
+      <view wx:if="{{watchError}}" class="card market-retry"><text>{{watchError}}</text><button class="ui-action" bindtap="loadWatches">{{w.refreshing}}</button></view>
+      <view wx:if="{{watchRows.length}}" class="card markets-watchlist">
+        <view class="card-title">{{w.title}}</view>
+        <view wx:for="{{watchRows}}" wx:key="id" class="market-watch">
+          <button class="market-watch-target" hover-class="ui-control-pressed" bindtap="onSelectWatch" data-id="{{item.id}}" aria-pressed="{{item.selected}}">
+            <view wx:if="{{item.imageDisplayUrl}}" class="product-tile market-product-tile">
+              <image src="{{item.imageDisplayUrl}}" mode="aspectFit" aria-hidden="true" data-src="{{item.imageDisplayUrl}}" binderror="onProductImageError" />
+            </view>
+            <view class="market-watch-copy"><text class="market-watch-title">{{item.product}}</text><text class="market-meta">{{item.name}} · {{item.stores}}</text></view>
+            <view class="ui-chevron" aria-hidden="true" />
+          </button>
+          <text class="market-meta">{{item.status}}</text>
+          <view class="market-watch-actions">
+            <button class="ui-action" disabled="{{watchBusy || networkOffline}}" data-id="{{item.id}}" data-status="{{item.pauseTo}}" bindtap="onWatchStatus">{{item.pauseTo === 'paused' ? w.pause : w.resume}}</button>
+            <button class="ui-action ui-action--plain" disabled="{{watchBusy || networkOffline}}" data-id="{{item.id}}" data-status="removed" bindtap="onWatchStatus">{{w.remove}}</button>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

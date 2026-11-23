@@ -47,7 +47,7 @@ async function list(ctx, payload) {
   const { items, hasMore } = await ctx.repo.listVisibleNotifications({ userKey: user._id, view, snapshot, cursor, limit });
   const last = items[items.length - 1];
   return {
-    notifications: items.map(n => ({ id: n._id, status: n.status, reason: n.reason || null, eventType: n.eventType, partNumber: n.partNumber, storeNumber: n.storeNumber, storeName: n.storeName || null, productTitle: n.productTitle || null, createdAt: n.createdAt, sentAt: n.sentAt || null })),
+    notifications: items.map(n => ({ id: n._id, ...(n.market ? { market: n.market, eventId: n.eventId } : {}), status: n.status, reason: n.reason || null, eventType: n.eventType, partNumber: n.partNumber, storeNumber: n.storeNumber, storeName: n.storeName || null, productTitle: n.productTitle || null, createdAt: n.createdAt, sentAt: n.sentAt || null })),
     nextCursor: hasMore && last ? encodeToken('cursor', { at: snapshot.at, sequence: snapshot.sequence, createdAt: last.createdAt, id: last._id }, view) : null,
     hasMore,
     clearBefore: encodeToken('clear', { at: snapshot.at, sequence: snapshot.sequence }, view),
@@ -67,6 +67,9 @@ async function clear(ctx, payload) {
 
 /** Task IDs embed the caller's account. The repository checks visibility at read/write time. */
 async function alertKey(ctx, payload) {
+  if (payload.expectedUserKey !== undefined && payload.expectedUserKey !== ctx.identity.userKey) {
+    throw new ApiError('notification_account_changed', '账号已变化，请重新打开提醒。');
+  }
   const user = await ensureUser(ctx);
   const eventId = typeof payload.eventId === 'string' ? payload.eventId.trim() : '';
   if (!eventId || eventId.length > 256) throw new ApiError('invalid_notification_id', '请选择有效的提醒');
@@ -78,13 +81,13 @@ async function detail(ctx, payload) {
   const { user, taskId } = await alertKey(ctx, payload);
   const task = await ctx.repo.getVisibleNotification(user._id, taskId);
   const [latest, product, follow] = await Promise.all([
-    ctx.repo.getLatest([targetKeyOf(task.storeNumber, task.partNumber)]),
-    ctx.repo.getProduct(task.partNumber),
+    ctx.repo.getLatest([targetKeyOf(task.storeNumber, task.partNumber, task.market)]),
+    task.market && task.market !== 'CN' ? require('../markets').findMarket(task.market)?.products.find(p => p.partNumber === task.partNumber) : ctx.repo.getProduct(task.partNumber),
     task.followId ? ctx.repo.getFollow(task.followId) : null,
   ]);
   const restricted = !isMember(user, ctx.now) && isLiveRestricted(product || { partNumber: task.partNumber }, ctx.config.newProductWindows, ctx.now).restricted;
   return {
-    notification: { eventId: task.eventId, status: task.status, eventType: task.eventType, partNumber: task.partNumber, storeNumber: task.storeNumber,
+    notification: { eventId: task.eventId, ...(task.market ? { market: task.market } : {}), status: task.status, eventType: task.eventType, partNumber: task.partNumber, storeNumber: task.storeNumber,
       storeName: task.storeName || null, productTitle: product ? product.title : task.productTitle || task.partNumber,
       detectedAt: task.detectedAt, sentAt: task.sentAt || null, feedback: task.feedback ? task.feedback.outcome : null },
     latest: { restricted, ...follows.presentLatest(latest[0] || null, ctx, restricted) },

@@ -18,8 +18,8 @@
   "files": [
     {
       "path": "apple-pickup.js",
-      "bytes": 10396,
-      "sha256": "514d19a88bf54be2f014d60fb880fe2ad104b7d6ad16f4c871d4e01a9f730260"
+      "bytes": 10978,
+      "sha256": "1c3afda9259be59092fca85db7c1358375d20b0a4370815bd68531af516dfdfa"
     },
     {
       "path": "collections.js",
@@ -33,8 +33,8 @@
     },
     {
       "path": "config.js",
-      "bytes": 22637,
-      "sha256": "44beeaffc7a93b53dfe8bf291de9f4b7448a026b5bc0a63b767285bf51634b70"
+      "bytes": 24262,
+      "sha256": "ad8cf0efaa5bb8a71cc15a2ae2c39b4576e1af9bffb03e781ab888597ac861d4"
     },
     {
       "path": "connection.js",
@@ -53,13 +53,13 @@
     },
     {
       "path": "engine/collector.js",
-      "bytes": 30140,
-      "sha256": "876e9a32c241dd09215e34d60e61f7a0005933eccc4a0f970b4b95cd51d2ea3e"
+      "bytes": 31384,
+      "sha256": "833b541e3434886fc591204e59ef08f679ddef50d0712201051a61f02c376dd4"
     },
     {
       "path": "engine/current-availability.js",
-      "bytes": 1600,
-      "sha256": "be993d1f6a77b58ec3601f5e18633f1c5810c86c636b41a94784020b4701b7ef"
+      "bytes": 1645,
+      "sha256": "e249ded293ba75a75e9f368828e6fc9ffd28a46dc2372837e5f3d27a5816cfc4"
     },
     {
       "path": "engine/deadline.js",
@@ -68,13 +68,13 @@
     },
     {
       "path": "engine/events.js",
-      "bytes": 7843,
-      "sha256": "10fcd67adf812c26689ea3b17716d0cbc8f6066e3a41742e7c670c3133e25c20"
+      "bytes": 8446,
+      "sha256": "6195555f8a3ef98c37590bd4fd7dc9062a0d86d7b7c8e9cd64056fb23f62c13f"
     },
     {
       "path": "engine/guarded-pickup.js",
-      "bytes": 4373,
-      "sha256": "910763f2fcc435be156b038d7e9a1b8802e47029df5787c90e3bca8f84db1de1"
+      "bytes": 5320,
+      "sha256": "c70497247a1450d5838bab9ab6ade8f9a9d02fb4dc050d06eceb4243efdfbffb"
     },
     {
       "path": "engine/lease.js",
@@ -82,14 +82,19 @@
       "sha256": "d3d2767d50bd502eb90e2e9ecb1eb03f68dcb8dbb11177406fb1d3b0c200a6c7"
     },
     {
+      "path": "engine/market-monitor.js",
+      "bytes": 4892,
+      "sha256": "25609728fb225a3a26780c7ca0aaf7daac4aa33883f17f3ecd68b20a5150f6e3"
+    },
+    {
       "path": "engine/notifier.js",
-      "bytes": 18015,
-      "sha256": "b978ff163d2d5e008ec6b3ddeda7a67c9bc28548b2f2c6a31fabdb83c1d39e71"
+      "bytes": 20397,
+      "sha256": "73da52f7ade61eb2cf7721a1bc6a2a1a23a60aa8d53b5eecae934f31abf4e707"
     },
     {
       "path": "engine/observation-day.js",
-      "bytes": 2853,
-      "sha256": "c6e93a5be2e61dc27c0c37c8537618e73c883764c2ed94515c3879acdf7838ff"
+      "bytes": 3311,
+      "sha256": "6109c205004fd9ecdd00fa99af9d8fbea83e71a14f8c9a6c224341e3c2968570"
     },
     {
       "path": "engine/observation-health.js",
@@ -108,13 +113,13 @@
     },
     {
       "path": "engine/scheduled.js",
-      "bytes": 9954,
-      "sha256": "4cb64f53a626e8fb23bc0d28b93a6f694ad3cbf7323280bc627307f9dd4556dc"
+      "bytes": 10734,
+      "sha256": "0da7a4167104a3be2601e39af5b62dbee16cc15aa3e8089fd1d28aeb5ae9f181"
     },
     {
       "path": "engine/scheduler.js",
-      "bytes": 31563,
-      "sha256": "85b4ee152a87deea1362b1d2acf2902971d749662f52d0e8dff511bb72b2dbdf"
+      "bytes": 34437,
+      "sha256": "17638eed493758262b151d5de83c6588249a655c0f3587b3fbae7051ff407e67"
     },
     {
       "path": "engine/wechat-sender.js",
@@ -132,14 +137,29 @@
       "sha256": "59efd44968a2aebb3d11d5e4c49b2d7e0c7d6e8354951b7689c512b39277806a"
     },
     {
+      "path": "market-products.json",
+      "bytes": 20461,
+      "sha256": "2c8747cb2c95d2f4dabd437dca8498893fc2c390029c4f597af90ac8399bcb53"
+    },
+    {
+      "path": "market-stores.json",
+      "bytes": 2698,
+      "sha256": "46540d7103ffcd7aba01b8d8b2ea1e3b4c342f2aea6f1e78c06e305e31b3431f"
+    },
+    {
+      "path": "markets.js",
+      "bytes": 893,
+      "sha256": "075d5209e4a31db4a4881f7413a7873913276832b55e7009a8801ad209e0e0e0"
+    },
+    {
       "path": "member-redemption.js",
       "bytes": 1289,
       "sha256": "b056fd588e6ccc40436d552523d9ab798e49b176feabe1d7b285491b737a6505"
     },
     {
       "path": "notification-target.js",
-      "bytes": 1617,
-      "sha256": "6b3fa390471f3dce27cfd7b695c204e9b1d2e946b86321b64991c8653117eff7"
+      "bytes": 1798,
+      "sha256": "621e2d615c2969e17846a53b657a7c8845699b6eb8070d0e83fc78267d57d788"
     },
     {
       "path": "notification-view.js",
@@ -153,13 +173,13 @@
     },
     {
       "path": "repo/atomic-ops.js",
-      "bytes": 54786,
-      "sha256": "727758449e9ea4e354f7bf40f5c8bc96d4315e2c6232d00282d4652717c21417"
+      "bytes": 56170,
+      "sha256": "66fda86920f2b781976ed657a31b08c1aa51e6b14836d47446e57f8a3adcfcd9"
     },
     {
       "path": "repo/cloudbase-repo.js",
-      "bytes": 28909,
-      "sha256": "4b10eed201cf5893542bab051eef3dbeddc26b1eab3c7d0b963a5bbb79854a04"
+      "bytes": 29267,
+      "sha256": "c88d4f517174cb57668fc4a564c9443f61d3f0fac74563fb66f9ff8e9bb068e6"
     },
     {
       "path": "repo/current-availability.js",
@@ -193,13 +213,13 @@
     },
     {
       "path": "repo/observation-storage.js",
-      "bytes": 15274,
-      "sha256": "545e5da5c02f749f1eec7bde38ed0c7c20a2a1cdb8caaa12686d9e2fe9f31aaa"
+      "bytes": 15651,
+      "sha256": "58a56aea3dd7fe5a431e0aad5dcf411d4aa9786163f8567b05255408a37280bc"
     },
     {
       "path": "repo/query-target.js",
-      "bytes": 2497,
-      "sha256": "34e58a36fdbf0cf4274277fea1cf013106a5ff048620c38c8547e5d71c2a4d65"
+      "bytes": 2748,
+      "sha256": "aafb499cf3f4a333389ddfeb2a81f9a375b7739e9932db9221e85576af3e6bae"
     },
     {
       "path": "repo/subscription-credit-ledger.js",
@@ -208,8 +228,8 @@
     },
     {
       "path": "repo/upstream-guard.js",
-      "bytes": 9131,
-      "sha256": "498c72087b9606864bc76e34e118591e7d739fce7e74536a5fa5ec8b3189bef7"
+      "bytes": 10964,
+      "sha256": "6932604a31aa816d0cf5e59c7f839f3ff91b332c3dea9187c046fd6662f700b0"
     },
     {
       "path": "rules/access.js",
@@ -243,8 +263,8 @@
     },
     {
       "path": "rules/membership.js",
-      "bytes": 6291,
-      "sha256": "916681add08a41857e52621b0a20ae196ad2e7a3d76096da6c5694444ed5f20b"
+      "bytes": 6349,
+      "sha256": "bbe3c0a311479a130f10963f4105cbc1b129ec3468f46d46a8853878bd7016df"
     },
     {
       "path": "rules/new-product.js",

@@ -49,7 +49,7 @@
       <view class="section-heading inventory-home-heading">
         <view class="inventory-heading-copy">
           <text class="section-title">苹果库存</text>
-          <text wx:if="{{ready && followsLoaded && !loadError}}" class="inventory-allowance">关注配置{{boot.member ? '已用 ' + follows.length + ' / ' + limits.maxFollows + ' 个名额' : ' ' + follows.length + ' 个'}}</text>
+          <text wx:if="{{ready && followsLoaded && !loadError}}" class="inventory-allowance">关注配置{{boot.member ? '已用 ' + (follows.length + otherMarketCount) + ' / ' + limits.maxFollows + ' 个名额' : ' ' + follows.length + ' 个'}}</text>
         </view>
         <button class="ui-action ui-action--plain" hover-class="ui-control-pressed" bindtap="onOpenInventory">查询库存</button>
       </view>
@@ -108,9 +108,10 @@
           <view id="follow-configurations" class="follow-configurations">
             <view wx:if="{{!followsLoaded}}" class="card loading-line" aria-busy="true">正在确认已保存的关注…</view>
             <view wx:elif="{{!follows.length}}" class="card follow-empty">
-              <view class="card-title empty-title">暂无库存关注</view>
+              <view class="card-title empty-title">{{otherMarketCount ? '暂无中国大陆库存关注' : '暂无库存关注'}}</view>
               <view wx:if="{{!boot.member}}" class="small text-2">关注与到货提醒为会员专属，免费用户可按次查询。</view>
               <button class="btn btn-primary btn-block" hover-class="btn-primary-pressed" bindtap="onAdd">{{boot.member ? '添加关注' : '了解会员'}}</button>
+              <button wx:if="{{otherMarketCount}}" class="ui-action" hover-class="ui-control-pressed" bindtap="openMarkets">查看其他站点的关注</button>
             </view>
 
             <!-- 关注卡：配置身份 → 状态与观测时间 → 下一步；有货时整张卡转绿。 -->
@@ -144,7 +145,7 @@
                   <button wx:if="{{item.limitPaused}}" class="btn" hover-class="ui-control-pressed" disabled="{{saving || followBusyId}}" bindtap="showMemberModal">查看套餐</button>
                   <button wx:elif="{{boot.member && item.canToggle}}" class="btn" hover-class="ui-control-pressed" loading="{{followBusyId === item.followId}}" disabled="{{saving || followBusyId}}" data-id="{{item.followId}}" data-status="{{item.status}}" bindtap="onToggle">{{item.status === 'active' ? '暂停' : '恢复'}}</button>
                 </view>
-                <view class="follow-management"><button class="ui-action ui-action--plain" hover-class="ui-control-pressed" data-id="{{item.followId}}" bindtap="onViewHistory">查看供应历史</button><text class="follow-part mono" user-select>{{item.partNumber}}</text><button class="ui-action ui-action--plain ui-action--danger danger-action" hover-class="ui-control-pressed" disabled="{{saving || followBusyId}}" data-id="{{item.followId}}" bindtap="onRemove">删除关注</button></view>
+                <view class="follow-management"><text class="follow-part mono" user-select>{{item.partNumber}}</text><button class="ui-action ui-action--plain ui-action--danger danger-action" hover-class="ui-control-pressed" disabled="{{saving || followBusyId}}" data-id="{{item.followId}}" bindtap="onRemove">删除关注</button></view>
               </view>
             </view>
             <view wx:if="{{followsLoaded && follows.length}}" class="follow-add-footer"><button class="btn btn-block" hover-class="ui-control-pressed" disabled="{{saving || followBusyId}}" bindtap="onAdd"><view class="ui-plus" aria-hidden="true"></view><text>添加关注</text></button></view>

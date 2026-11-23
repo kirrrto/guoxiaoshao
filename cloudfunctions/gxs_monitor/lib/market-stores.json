@@ -1,0 +1,27 @@
+{
+  "JP": [
+    {"storeNumber": "R711", "name": "京都", "nameEn": "Kyoto", "city": "京都", "cityEn": "Kyoto", "timeZone": "Asia/Tokyo"},
+    {"storeNumber": "R768", "name": "梅田", "nameEn": "Umeda", "city": "大阪", "cityEn": "Osaka", "timeZone": "Asia/Tokyo"},
+    {"storeNumber": "R091", "name": "心斎橋", "nameEn": "Shinsaibashi", "city": "大阪", "cityEn": "Osaka", "timeZone": "Asia/Tokyo"},
+    {"storeNumber": "R005", "name": "名古屋栄", "nameEn": "Nagoya Sakae", "city": "名古屋", "cityEn": "Nagoya", "timeZone": "Asia/Tokyo"},
+    {"storeNumber": "R079", "name": "銀座", "nameEn": "Ginza", "city": "东京", "cityEn": "Tokyo", "timeZone": "Asia/Tokyo"},
+    {"storeNumber": "R718", "name": "丸の内", "nameEn": "Marunouchi", "city": "东京", "cityEn": "Tokyo", "timeZone": "Asia/Tokyo"},
+    {"storeNumber": "R128", "name": "新宿", "nameEn": "Shinjuku", "city": "东京", "cityEn": "Tokyo", "timeZone": "Asia/Tokyo"},
+    {"storeNumber": "R119", "name": "渋谷", "nameEn": "Shibuya", "city": "东京", "cityEn": "Tokyo", "timeZone": "Asia/Tokyo"},
+    {"storeNumber": "R224", "name": "表参道", "nameEn": "Omotesando", "city": "东京", "cityEn": "Tokyo", "timeZone": "Asia/Tokyo"},
+    {"storeNumber": "R710", "name": "川崎", "nameEn": "Kawasaki", "city": "川崎", "cityEn": "Kawasaki", "timeZone": "Asia/Tokyo"},
+    {"storeNumber": "R048", "name": "福岡", "nameEn": "Fukuoka", "city": "福冈", "cityEn": "Fukuoka", "timeZone": "Asia/Tokyo"}
+  ],
+  "TW": [
+    {"storeNumber": "R694", "name": "信義 A13", "nameEn": "Xinyi A13", "city": "台北", "cityEn": "Taipei", "timeZone": "Asia/Taipei"},
+    {"storeNumber": "R713", "name": "台北 101", "nameEn": "Taipei 101", "city": "台北", "cityEn": "Taipei", "timeZone": "Asia/Taipei"}
+  ],
+  "HK": [
+    {"storeNumber": "R409", "name": "铜锣湾", "nameEn": "Causeway Bay", "city": "香港", "cityEn": "Hong Kong", "timeZone": "Asia/Hong_Kong"},
+    {"storeNumber": "R428", "name": "国际金融中心", "nameEn": "ifc mall", "city": "香港", "cityEn": "Hong Kong", "timeZone": "Asia/Hong_Kong"},
+    {"storeNumber": "R485", "name": "又一城", "nameEn": "Festival Walk", "city": "香港", "cityEn": "Hong Kong", "timeZone": "Asia/Hong_Kong"},
+    {"storeNumber": "R673", "name": "apm 香港", "nameEn": "apm Hong Kong", "city": "香港", "cityEn": "Hong Kong", "timeZone": "Asia/Hong_Kong"},
+    {"storeNumber": "R610", "name": "新城市广场", "nameEn": "New Town Plaza", "city": "香港", "cityEn": "Hong Kong", "timeZone": "Asia/Hong_Kong"},
+    {"storeNumber": "R499", "name": "广东道", "nameEn": "Canton Road", "city": "香港", "cityEn": "Hong Kong", "timeZone": "Asia/Hong_Kong"}
+  ]
+}

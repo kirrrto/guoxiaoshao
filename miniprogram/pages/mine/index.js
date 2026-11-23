@@ -123,11 +123,17 @@ function notificationReasonText(reason, status) {
 
 const ORDER_STATUS = { created: '待支付', paid: '开通确认中', fulfilled: '已开通', partially_refunded: '部分退款', refunded: '已退款', cancelled: '已取消', failed: '支付失败' };
 const SECONDARY_CACHE_MS = 30000;
-const presentTasks = (tasks, quota) => (tasks || []).map(task => ({ ...task,
-  done: quota.tasksDoneToday.includes(task.id),
-  pendingLabel: (quota.tasksViewedToday || []).includes(task.id)
-    ? quota.grantedToday >= quota.dailyGrantCap ? '已浏览·今日上限' : task.reward === 0 ? '已浏览·奖励未开放' : '已浏览·待领取' : '',
-}));
+function presentTasks(tasks, quota) {
+  const task = (tasks || []).find(item => item.id === 'view_history');
+  if (!task) return [];
+  if (quota.tasksDoneToday.includes(task.id)) return [{ ...task, done: true }];
+  if (!(quota.tasksViewedToday || []).includes(task.id)) return [];
+  let pendingLabel = '';
+  if (!task.reward) pendingLabel = '奖励未开放';
+  else if (quota.grantedToday >= quota.dailyGrantCap) pendingLabel = '今日领取已达上限';
+  else if (quota.balance >= quota.balanceCap) pendingLabel = '余额已满，今日用次后可领';
+  return [{ ...task, done: false, claimable: !pendingLabel, pendingLabel }];
+}
 const presentMembership = membership => ({ ...membership, expired: !membership.active && Boolean(membership.expiresAt),
   planLabel: ({ member_7d: '周卡会员', member_30d: '月卡会员', member_365d: '年卡会员', member_trial: '体验会员' })[membership.planId] || '会员',
   daysLeft: membership.active && Number.isFinite(membership.remainingMs) ? Math.max(0, Math.ceil(membership.remainingMs / 86400000)) : null,
@@ -167,13 +173,17 @@ function presentOrder(order) {
 
 const minuteToTime = m => `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;
 const timeToMinute = t => { const parts = t.split(':').map(Number); return parts[0] * 60 + parts[1]; };
+const MARKET_LABELS = { JP: '日本', TW: '台湾', HK: '香港' };
+const marketLabel = market => hasKey(MARKET_LABELS, market) ? MARKET_LABELS[market] : '';
 const presentNotification = notification => {
   const meta = hasKey(NOTIFY_STATUS, notification.status) ? NOTIFY_STATUS[notification.status] : { label: '状态待确认', cls: 'muted' };
   const eventKnown = ['first_seen_available', 'restock_confirmed', 'recovered_available', 'current_available', 'became_unavailable', 'status_changed'].includes(notification.eventType);
-  return { ...notification, storeName: storeLabel(notification.storeNumber, notification.storeName), ...notificationAdvice(notification), statusLabel: meta.label, statusCls: meta.cls,
+  const marketName = marketLabel(notification.market);
+  const storeName = marketName ? marketName + ' · ' + (notification.storeName || notification.storeNumber) : storeLabel(notification.storeNumber, notification.storeName);
+  return { ...notification, storeName, ...notificationAdvice(notification), statusLabel: meta.label, statusCls: meta.cls,
     deliveryNote: notification.status === 'accepted' ? '微信已受理，请到微信「服务通知」查收；受理不代表已送达。' : '',
     reasonText: notificationReasonText(notification.reason, notification.status),
-    timeText: fmt.fmtDateTime(notification.sentAt || notification.createdAt), eventLabel: eventKnown ? fmt.eventMeta(notification.eventType).label : '补货提醒' };
+    timeText: fmt.fmtDateTime(notification.sentAt || notification.createdAt) + (marketName ? ' 北京时间' : ''), eventLabel: eventKnown ? fmt.eventMeta(notification.eventType).label : '补货提醒' };
 };
 
 Page({
@@ -262,7 +272,7 @@ Page({
     this.pageVisible = true;
     if (!this.unsubscribeQuota) this.unsubscribeQuota = subscribeQuota(quota => {
       if (this.pageRetired) return;
-      this.setData({ quota, tasks: presentTasks(this.data.tasks, quota) });
+      this.setData({ quota, tasks: presentTasks(this.quotaTasks, quota) });
       if (this.pageVisible && this.data.showLedger) this.loadLedger();
     });
     this.setData({ redemptionOpen: options.openRedemption === '1' });
@@ -495,6 +505,7 @@ Page({
   },
 
   applyBoot(boot) {
+    this.quotaTasks = boot.tasks || [];
     const accountChanged = !this.data.boot || this.data.boot.identity.userKey !== boot.identity.userKey;
     if (accountChanged) invalidateFollows();
     if (accountChanged) this.paymentConsentGeneration = (this.paymentConsentGeneration || 0) + 1;
@@ -561,7 +572,8 @@ Page({
         memberProduct: selected,
         priceText: fmt.fen(selected.priceFen),
         collector: { ...boot.collector, ...fmt.collectorMeta(boot.collector && boot.collector.state) },
-        followCount: boot.followCount,
+        followCount: (boot.followCount || 0) + (boot.otherMarketFollowCount || 0),
+        domesticFollowCount: boot.followCount || 0,
         freeReminder: false,
         limits: boot.limits,
         paymentReady: availability.ready,
@@ -718,7 +730,7 @@ Page({
             if (Array.isArray(listing && listing.follows)) {
               const saved = listing.follows.filter(item => item.status !== 'removed');
               const existing = saved.some(item => item.partNumber === restored.context.partNumber);
-              neededConfigs = Math.max(savedCount, saved.length) + (existing ? 0 : 1);
+              neededConfigs = Math.max(savedCount, saved.length + (listing.otherMarketCount || 0)) + (existing ? 0 : 1);
             }
           } catch (_) { /* Preserve the selection until saved follows can be verified. */ }
         }
@@ -806,7 +818,9 @@ Page({
 
   onOpenFollows() {
     if (this.pageRetired || this.data.paymentBusy || this.data.paymentChecking || this.data.paymentConfirming) return;
-    switchToTab({ url: this.data.boot && this.data.boot.followCount > 0 ? '/pages/follow/index' : '/pages/query/index' });
+    const boot = this.data.boot;
+    const route = boot && boot.followCount > 0 ? (boot.domesticFollowCount ? 'follow' : 'markets') : 'query';
+    switchToTab({ url: '/pages/' + route + '/index' });
   },
 
   ensurePaymentController() {
@@ -1230,8 +1244,9 @@ Page({
     }
   },
 
-  onGoHistory() {
-    switchToTab({ url: '/pages/history/index' });
+  onOpenPendingReward() {
+    if (this.pageRetired || !this.data.tasks.some(task => task.id === 'view_history' && task.claimable)) return;
+    navigation.navigateTo({ url: '/pages/history/index' });
   },
 
   /** Allowance, renewal and reminder-credit rules live in the guide's FAQ. */
@@ -1297,10 +1312,11 @@ Page({
       return;
     }
     if (action === 'explain') {
-      const explanations = { already_notified: '同一配置与门店的这一轮有货已处理过提醒，本次不重复发送，也不消耗提醒次数。确认断货后再次到货时，会按有效授权与提醒设置处理。', cooldown: '短时间内同一配置与门店的重复变化会合并控制提醒频率。本次未发送，之后的新变化仍按有效授权与提醒设置处理。', event_expired: '这次取货变化已经超过发送时限，为避免用旧信息打扰你，本次不发送。可到小哨页查看新的观测。', credit_released: '本次提醒已取消，预留的授权次数已恢复。这条旧提醒不会重新发送。',
-        event_superseded: '发送前再次检查时，库存状态已变化，因此这条旧提醒未发送，未消耗提醒次数。可到小哨页查看新的观测。',
+      const inventoryPage = marketLabel(notification.market) ? '「其他站点」' : '小哨页';
+      const explanations = { already_notified: '同一配置与门店的这一轮有货已处理过提醒，本次不重复发送，也不消耗提醒次数。确认断货后再次到货时，会按有效授权与提醒设置处理。', cooldown: '短时间内同一配置与门店的重复变化会合并控制提醒频率。本次未发送，之后的新变化仍按有效授权与提醒设置处理。', event_expired: `这次取货变化已经超过发送时限，为避免用旧信息打扰你，本次不发送。可到${inventoryPage}查看新的观测。`, credit_released: '本次提醒已取消，预留的授权次数已恢复。这条旧提醒不会重新发送。',
+        event_superseded: `发送前再次检查时，库存状态已变化，因此这条旧提醒未发送，未消耗提醒次数。可到${inventoryPage}查看新的观测。`,
         event_unconfirmed: '发送前未能再次确认库存状态，因此本次未发送，未消耗提醒次数。后台恢复有效观测后，新的变化仍按当前设置处理。',
-        event_invalid_time: '这条提醒的记录时间异常，无法确认信息是否及时，因此本次未发送，未消耗提醒次数。可到小哨页查看新的观测。' };
+        event_invalid_time: `这条提醒的记录时间异常，无法确认信息是否及时，因此本次未发送，未消耗提醒次数。可到${inventoryPage}查看新的观测。` };
       wx.showModal({ title: '本次未发送原因', content: explanations[notification.reason], showCancel: false });
       return;
     }
@@ -1310,6 +1326,17 @@ Page({
       return;
     }
     if (['authorization', 'follow', 'service'].includes(action)) {
+      if (marketLabel(notification.market)) {
+        if (navigation.isNavigating()) return;
+        const app = getApp();
+        const target = { market: notification.market, partNumber: notification.partNumber, storeNumber: notification.storeNumber };
+        app.globalData.pendingMarketTarget = target;
+        if (!switchToTab({ url: '/pages/markets/index', fail: () => {
+          if (app.globalData.pendingMarketTarget === target) app.globalData.pendingMarketTarget = null;
+          toast('页面切换未完成，请重试');
+        } })) app.globalData.pendingMarketTarget = null;
+        return;
+      }
       getApp().globalData.pendingFollowFocus = { section: action === 'follow' ? 'follow-configurations' : 'reminder-health', partNumber: action === 'follow' ? notification.partNumber : null };
       switchToTab({ url: '/pages/follow/index' });
     }

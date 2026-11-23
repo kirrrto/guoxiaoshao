@@ -74,13 +74,13 @@
         <image class="member-pass-watermark" src="/images/brand/whistle-pass.png" mode="aspectFit" aria-hidden="true" />
         <view class="member-pass-title member-card-heading">果小哨会员</view>
         <view class="member-pass-benefits" aria-label="会员核心权益">
-          <view class="member-pass-benefit"><view class="ui-check" aria-hidden="true"></view><text>查询与历史不扣次数</text></view>
+          <view class="member-pass-benefit"><view class="ui-check" aria-hidden="true"></view><text>库存查询不扣次数</text></view>
           <view class="member-pass-benefit"><view class="ui-check" aria-hidden="true"></view><text>可授权接收取货变化提醒</text></view>
           <view class="member-pass-benefit"><view class="ui-check" aria-hidden="true"></view><text>新品开售 30 天内实时查询</text></view>
         </view>
         <button wx:if="{{showPurchaseShop && !membershipUpgradeOpen}}" class="btn btn-primary btn-block member-vip-cta" hover-class="btn-primary-pressed" disabled="{{subscribing || paymentBusy || paymentChecking || paymentConfirming || redeeming}}" bindtap="onOpenMembershipRenew">开通会员</button>
       </view>
-      <view wx:elif="{{!paymentPendingId}}" class="checkout-core-benefits">会员查询与历史不扣次。保存关注并授权后，提醒服务可用时会发送取货变化消息。</view>
+      <view wx:elif="{{!paymentPendingId}}" class="checkout-core-benefits">会员库存查询不扣次。保存关注并授权后，提醒服务可用时会发送取货变化消息。</view>
 
       <button wx:if="{{membership.active && !boot.followCount}}" class="btn btn-primary btn-block member-delivery-action" hover-class="btn-primary-pressed" disabled="{{paymentBusy || paymentChecking || paymentConfirming}}" bindtap="onOpenFollows">添加第一个关注</button>
       <view wx:if="{{showPurchaseShop && membership.active && !membershipUpgradeOpen && !paymentPendingId}}" class="membership-member-actions">
@@ -239,13 +239,14 @@
         <button wx:if="{{!quota.signedInToday}}" class="btn btn-sm quota-signin {{signing ? 'disabled' : ''}}" hover-class="ui-control-pressed" disabled="{{signing}}" bindtap="onSignin">{{signing ? '签到中…' : '每日签到'}}</button>
         <view wx:else class="signin-done"><view class="ui-check" aria-hidden="true"></view><text>今日已签到</text></view>
       </view>
-      <button class="ui-disclosure quota-row" hover-class="ui-control-pressed" bindtap="onToggleQuotaDetails" aria-expanded="{{showQuotaDetails}}"><text class="ui-disclosure-label">次数任务与明细</text><view class="ui-chevron {{showQuotaDetails ? 'ui-chevron--up' : 'ui-chevron--down'}}" aria-hidden="true"></view></button>
+      <button class="ui-disclosure quota-row" hover-class="ui-control-pressed" bindtap="onToggleQuotaDetails" aria-expanded="{{showQuotaDetails}}"><text class="ui-disclosure-label">查询次数明细</text><view class="ui-chevron {{showQuotaDetails ? 'ui-chevron--up' : 'ui-chevron--down'}}" aria-hidden="true"></view></button>
       <view wx:if="{{showQuotaDetails}}" class="quota-details ui-reveal">
         <view class="quota-caps">今日已获 {{quota.grantedToday}} / {{quota.dailyGrantCap}} 次，余额上限 {{quota.balanceCap}} 次</view>
         <view wx:for="{{tasks}}" wx:key="id" class="task">
-          <view class="task-copy"><text>{{item.title}}</text><text class="task-reward"> +{{item.reward}} 次</text></view>
+          <view class="task-copy"><text>{{item.title}}</text></view>
           <text wx:if="{{item.done}}" class="pill pill-ok">已完成</text>
-          <button wx:else class="ui-action" hover-class="ui-control-pressed" bindtap="onGoHistory"><text class="ui-action-label">{{item.pendingLabel || '去完成'}}</text><view class="ui-chevron" aria-hidden="true"></view></button>
+          <button wx:elif="{{item.claimable}}" class="ui-action" hover-class="ui-control-pressed" bindtap="onOpenPendingReward"><text class="ui-action-label">领取奖励</text><view class="ui-chevron" aria-hidden="true"></view></button>
+          <text wx:else class="task-reward">{{item.pendingLabel}}</text>
         </view>
         <button class="ui-disclosure quota-row" hover-class="ui-control-pressed" bindtap="onToggleLedger" aria-expanded="{{showLedger}}"><text class="ui-disclosure-label">次数明细</text><view class="ui-chevron {{showLedger ? 'ui-chevron--up' : 'ui-chevron--down'}}" aria-hidden="true"></view></button>
         <block wx:if="{{showLedger}}">

@@ -41,6 +41,39 @@ const follows = [
   { userKey: 'u2', partNumber: 'BBBBBCH/A', storeNumbers: ['R577'] },
 ];
 
+test('a one-shot confirmation targets only its SKU group ahead of a backlog, never overlaps or repeats after unknown', async () => {
+  let release;
+  const blocked = new Promise(resolve => { release = resolve; });
+  const h = harness({ options: { intervalMs: 180000, maxConcurrency: 1, confirmationMaxAgeMs: 120000 },
+    upstream: (_store, _parts, count) => count === 2 ? { hang: blocked, status: 'unknown' } : {} });
+  const original = { storeNumbers: ['Z'], partNumber: 'P2' };
+  h.scheduler.setTargets(buildGroups([original]));
+  await h.runTick();
+  const targets = buildGroups([original, { storeNumbers: ['Z'], partNumber: 'P1' },
+    { storeNumbers: Array.from({ length: 12 }, (_, i) => 'A' + i), partNumber: 'P2' }], 1);
+  h.scheduler.setTargets(targets);
+  const time = h.state.nowMs;
+  const ask = () => h.scheduler.scheduleConfirmation('Z', 'P2', time, time + 60000, time + 120000);
+  ask(); ask();
+  h.advance(60000);
+  const jobs = h.scheduler.tick();
+  assert.equal(jobs.length, 1);
+  assert.deepEqual(h.calls[1], { storeNumber: 'Z', partNumbers: ['P2'], at: h.state.nowMs });
+  ask();
+  assert.equal(h.scheduler.tick().length, 0);
+  release(); await Promise.all(jobs);
+  ask();
+  assert.equal(h.scheduler.tick({ confirmationsOnly: true }).length, 0);
+  const restarted = harness({ options: { intervalMs: 180000, maxConcurrency: 1, confirmationMaxAgeMs: 120000 } });
+  restarted.state.nowMs = h.state.nowMs;
+  restarted.scheduler.setTargets(targets);
+  restarted.scheduler.restore(h.scheduler.checkpoint());
+  restarted.scheduler.scheduleConfirmation('Z', 'P2', time, time + 60000, time + 120000);
+  assert.equal(restarted.scheduler.tick({ confirmationsOnly: true }).length, 0);
+  await restarted.runTick();
+  assert.ok(restarted.calls[0].storeNumber.startsWith('A'), 'ordinary coverage proceeds once the priority attempt has completed');
+});
+
 test('capacity recovery time survives cadence changes, hurry and scheduler cold starts', async () => {
   let nowMs = base, calls = 0;
   const group = buildGroups([{ partNumber: 'AAAAACH/A', storeNumbers: ['R577'] }]);

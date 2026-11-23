@@ -40,7 +40,7 @@ function requestTargets(partNumbers, products = []) {
   });
 }
 
-function buildPickupUrl(storeNumber, partNumbers, products = []) {
+function buildPickupUrl(storeNumber, partNumbers, products = [], market = null) {
   if (!nonemptyText(storeNumber)) throw new TypeError('storeNumber is required');
   if (!Array.isArray(partNumbers) || partNumbers.length === 0 || partNumbers.some(part => !nonemptyText(part))) {
     throw new TypeError('partNumbers must be a non-empty list of part numbers');
@@ -50,7 +50,15 @@ function buildPickupUrl(storeNumber, partNumbers, products = []) {
   // Each CTO target is one real request/budget reservation. Different variants
   // of the same container cannot share an implicit base-part response.
   if (cto && targets.length !== 1) throw new TypeError('cto_requires_individual_request');
-  const url = new URL(cto ? FULFILLMENT_ENDPOINT : PICKUP_ENDPOINT);
+  let endpoint = cto ? FULFILLMENT_ENDPOINT : PICKUP_ENDPOINT;
+  if (market !== null) {
+    // The standalone mainland catalog sampler does not load regional catalogs.
+    const site = require('./markets').findMarket(market);
+    if (!site || cto || !site.stores.some(s => s.storeNumber === storeNumber)
+      || !partNumbers.every(part => site.products.some(p => p.partNumber === part))) throw new TypeError('invalid_market_target');
+    endpoint = 'https://www.apple.com/' + site.code.toLowerCase() + '/shop/retail/pickup-message';
+  }
+  const url = new URL(endpoint);
   url.searchParams.set(cto ? 'fae' : 'pl', 'true');
   url.searchParams.set('mts.0', 'regular');
   targets.forEach((target, index) => {
@@ -143,8 +151,8 @@ function parseApplePickup({ httpStatus, body, targets, observedAt }) {
  * { record, observations }. Never throws for upstream failures: they become
  * `unknown` observations with a transport reason.
  */
-async function fetchPickup({ storeNumber, partNumbers, products = [], fetchImpl = fetch, now = () => new Date(), timeoutMs = 10000 }) {
-  const url = buildPickupUrl(storeNumber, partNumbers, products);
+async function fetchPickup({ storeNumber, partNumbers, products = [], market = null, fetchImpl = fetch, now = () => new Date(), timeoutMs = 10000 }) {
+  const url = buildPickupUrl(storeNumber, partNumbers, products, market);
   const targets = requestTargets(partNumbers, products).map(target => ({ ...target, storeNumber }));
   const started = now();
   const record = {
@@ -163,7 +171,7 @@ async function fetchPickup({ storeNumber, partNumbers, products = [], fetchImpl 
   try {
     const response = await fetchImpl(url, {
       method: 'GET',
-      headers: { Accept: 'application/json', 'Accept-Language': 'zh-CN,zh;q=0.9' },
+      headers: market ? { Accept: 'application/json' } : { Accept: 'application/json', 'Accept-Language': 'zh-CN,zh;q=0.9' },
       redirect: 'manual',
       signal: AbortSignal.timeout(timeoutMs),
     });

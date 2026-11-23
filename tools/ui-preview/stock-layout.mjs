@@ -14,9 +14,10 @@ export function inspectStockLayout(expected = null) {
   if (Boolean(card.querySelector('.follow-partial-note')) !== expected.partial) errors.push('Mixed fresh and stale stores lost their partial-result note');
   if (Boolean(card.querySelector('[data-preview-action="onPickupInfo"]')) !== expected.pickupAvailable) errors.push('Pickup action must require a fresh available store');
   if (card.classList.contains('follow-available') !== expected.pickupAvailable) errors.push('Historical availability must not receive the current-stock emphasis');
-  for (const action of ['onQueryFollow', 'onEdit', 'onViewHistory', 'onRemove']) {
+  for (const action of ['onQueryFollow', 'onEdit', 'onRemove']) {
     if (Boolean(card.querySelector(`[data-preview-action="${action}"]`)) !== expected.expanded) errors.push(`Management action ${action} does not follow the detail disclosure`);
   }
+  if (card.querySelector('[data-preview-action="onViewHistory"]')) errors.push('Retired history action is still present');
   if (Boolean(document.querySelector('[data-preview-action="onRetryAuthorizationSync"]')) !== expected.authorizationPending) errors.push('Authorization sync recovery does not match pending grants');
   if (card.querySelector('.follow-summary, .follow-summary-grid')) errors.push('Stock card reintroduced the redundant reminder summary');
   const button = card.querySelector('[data-preview-action="onToggleFollowDetails"]');

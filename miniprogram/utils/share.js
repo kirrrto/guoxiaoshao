@@ -10,7 +10,7 @@ const DEFAULT_TITLE = '果小哨 · 记住到期日，留意库存变化';
 const PAGE_META = {
   '/pages/query/index': { title: '果小哨 · 查苹果直营店取货', query: 'from=share_query' },
   '/pages/follow/index': { title: DEFAULT_TITLE, query: 'from=share_follow' },
-  '/pages/history/index': { title: '果小哨 · 看门店补货历史', query: 'from=share_history' },
+  '/pages/markets/index': { title: '果小哨 · 其他站点取货查询', query: 'from=share_markets' },
   '/pages/mine/index': { title: '果小哨 · 取货信息查询与关注', query: 'from=share_mine' },
   '/pages/notice-board/index': { title: '果小哨 · 服务公告与说明', query: 'from=share_notice' },
   '/pages/guide/index': { title: '果小哨 · 选购与取货攻略', query: 'from=share_guide' },
@@ -40,6 +40,9 @@ function shareTitleFor(route, pageData) {
 }
 
 function shareAppMessage(route, pageData) {
+  if (route === '/pages/markets/index') return {
+    title: PAGE_META[route].title, path: '/pages/markets/index?from=share_markets', imageUrl: IMAGE,
+  };
   if (route === '/pages/follow/index') return {
     title: DEFAULT_TITLE, path: '/pages/follow/index?from=share_follow', imageUrl: IMAGE,
   };
@@ -76,6 +79,24 @@ function readSharedSelection(options) {
   } catch (e) { return null; }
 }
 
+// WeChat can pass either decoded options or an encoded notification URL.
+function readMarketTarget(query) {
+  if (!query || !['JP', 'TW', 'HK'].includes(query.market)) return null;
+  if (typeof query.partNumber !== 'string' || query.partNumber.length > 80 || typeof query.storeNumber !== 'string' || !/^R\d{3}$/.test(query.storeNumber)) return null;
+  try {
+    const partNumber = decodeURIComponent(query.partNumber);
+    if (!/^[A-Za-z0-9]{4,16}\/A$/.test(partNumber)) return null;
+    const target = { market: query.market, partNumber, storeNumber: query.storeNumber };
+    if (query.eid !== undefined) {
+      if (typeof query.eid !== 'string' || query.eid.length > 768) return null;
+      const eid = decodeURIComponent(query.eid);
+      if (!eid || eid.length > 256 || /[\s\x00-\x1f]/.test(eid)) return null;
+      target.eid = eid;
+    }
+    return target;
+  } catch (_) { return null; }
+}
+
 // iOS WeChat left the Moments card blank for a code-package path that Android
 // showed. A copied user-data file is an ordinary local file on both platforms.
 const TIMELINE_FILE = 'gxs-share-logo-v1.png';
@@ -101,4 +122,4 @@ function shareTimeline() {
   };
 }
 
-module.exports = { IMAGE, DEFAULT_TITLE, PAGE_META, shareTitleFor, firstFollowImage, shareAppMessage, shareTimeline, readSharedSelection };
+module.exports = { IMAGE, DEFAULT_TITLE, PAGE_META, shareTitleFor, firstFollowImage, shareAppMessage, shareTimeline, readSharedSelection, readMarketTarget };

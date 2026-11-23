@@ -10,7 +10,7 @@ class ApiError extends Error {
 }
 
 // Reads that are safe to repeat: a dropped connection retries once before the page sees it.
-const RETRYABLE_READS = new Set(['system.ping', 'user.bootstrap', 'catalog.get', 'follow.list', 'deadline.list', 'notify.list', 'notify.detail', 'member.status', 'quota.ledger', 'query.recent', 'query.alternatives', 'query.recovery', 'history.page']);
+const RETRYABLE_READS = new Set(['system.ping', 'user.bootstrap', 'catalog.get', 'market.catalog', 'market.follows', 'follow.list', 'deadline.list', 'notify.list', 'notify.detail', 'member.status', 'quota.ledger', 'query.recent', 'query.alternatives', 'query.recovery', 'history.page']);
 const RETRY_DELAY_MS = 800;
 // A platform request can lose both callbacks. Without our own deadline every
 // caller shares a permanently pending account/catalog promise, including Retry.
@@ -88,7 +88,7 @@ async function callOnce(action, payload, attempt, retry) {
   if (retry && retry.generation !== readGeneration) throw retry.error;
   // A different tab can verify another account while shared-cloud setup is
   // pending. The server checks the same owner against the actual WX context.
-  if ((action === 'query.pickup' || action === 'history.list') && payload.expectedUserKey
+  if ((action === 'query.pickup' || action === 'history.list' || action.startsWith('market.') || action === 'notify.detail' || action === 'notify.open') && payload.expectedUserKey
     && !require('./store').quotaAccountMatches(payload.expectedUserKey)) {
     throw new ApiError('query_account_changed', '账号已变化，请下拉刷新后再查询。');
   }

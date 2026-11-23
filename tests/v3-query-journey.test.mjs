@@ -79,18 +79,6 @@ test('alternatives and evidence start folded and disclosure taps have no busines
   assert.equal(rt.calls.length, 0); assert.deepEqual(copy(page.selection), before);
 });
 
-test('available history receives only the chosen target and waits for an explicit history request', () => {
-  const { rt, page } = resultPage();
-  const paths = []; rt.wx.switchTab = ({ url }) => paths.push(url);
-  rt.app.globalData.bootstrap = account();
-  page.onSelectionHistory();
-  assert.deepEqual(paths, ['/pages/history/index']);
-  const intent = rt.load('utils/journey-context.js').consumeHistoryContext();
-  assert.deepEqual(copy(intent.target), copy(page.selection));
-  assert.equal(intent.from, 'query');
-  assert.equal(rt.calls.length, 0);
-});
-
 test('query presentation places only fresh available stores first without changing the retained query', t => {
   let now = Date.parse('2026-10-01T00:00:00Z');
   t.mock.method(Date, 'now', () => now);

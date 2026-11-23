@@ -1,5 +1,5 @@
 const cloudConfig = require('./config/cloud');
-const { readSharedSelection } = require('./utils/share');
+const { readSharedSelection, readMarketTarget } = require('./utils/share');
 const { VERSION } = require('./config/version');
 const { reLaunch, getNavigationContext } = require('./utils/navigation');
 const { isOnline } = require('./utils/network');
@@ -72,6 +72,7 @@ App({
     catalog: null,
     pendingFollow: null,
     pendingSharedTarget: null,
+    pendingMarketTarget: null,
     pendingAlert: null,
     handledAlerts: [],
     singlePage: false,
@@ -145,6 +146,10 @@ App({
 
   /** Existing tab pages receive warm launch parameters through App.onShow. */
   captureSharedTarget(options) {
+    if (options && typeof options.path === 'string' && options.path.replace(/^\//, '') === 'pages/markets/index') {
+      if (options.query && (options.query.eid || options.query.market)) this.globalData.pendingMarketTarget = readMarketTarget(options.query);
+      return;
+    }
     if (!options || (options.path && (typeof options.path !== 'string' || options.path.replace(/^\//, '') !== 'pages/query/index'))) return;
     const target = readSharedSelection(options.query);
     if (target) this.globalData.pendingSharedTarget = target;
@@ -153,6 +158,7 @@ App({
   /** A restock message opens pages/follow/index?eid=…; the follow page shows that alert once. */
   captureAlert(options) {
     if (options && options.path && (typeof options.path !== 'string' || options.path.replace(/^\//, '') !== 'pages/follow/index')) return;
+    if (options && options.query && options.query.market && options.query.market !== 'CN') return;
     const raw = options && options.query && options.query.eid;
     if (typeof raw !== 'string' || !raw) return;
     let eventId = raw;

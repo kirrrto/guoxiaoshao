@@ -123,6 +123,24 @@ test('expired platform authorization leads back to authorization without automat
   assert.equal(prompts, 0); assert.equal(rt.calls.length, 0);
 });
 
+test('a regional alert routes its owner to the matching site when follow authorization has expired', () => {
+  const rt = runtime(), mine = rt.instance('pages/mine/index.js'), routes = [];
+  rt.wx.switchTab = options => routes.push(options.url);
+  const target = { market: 'JP', partNumber: 'MG854J/A', storeNumber: 'R128' };
+  mine.setData({ notifications: [
+    { id: 'stale', ...target, status: 'skipped', reason: 'event_expired' },
+    { id: 'auth', ...target, status: 'failed', reason: 'subscription_authorization_expired' },
+  ] });
+  const tap = id => mine.onNotificationAction({ currentTarget: { dataset: { id } } });
+  tap('stale');
+  assert.match(rt.messages.at(-1).content, /「其他站点」/);
+  tap('auth');
+  assert.equal(routes[0], '/pages/markets/index');
+  assert.deepEqual(JSON.parse(JSON.stringify(rt.app.globalData.pendingMarketTarget)), target);
+  assert.equal(rt.app.globalData.pendingFollowFocus, undefined);
+  assert.equal(rt.calls.length, 0);
+});
+
 test('settings deep link survives a cold page and a deferred callback after hiding cannot scroll another page', () => {
   const rt = runtime(), mine = rt.instance('pages/mine/index.js'), pending = [], scrolls = [];
   rt.wx.nextTick = fn => pending.push(fn); rt.wx.pageScrollTo = value => scrolls.push(value);

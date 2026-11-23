@@ -76,7 +76,7 @@ jobs:
       - name: Verify membership, stock details, authorization prompts and operator screens
         shell: bash
         run: |
-          for group in v2 stock nudge admin; do
+          for group in v2 stock nudge admin markets; do
             dir="$RUNNER_TEMP/ui-$group"
             node tools/ui-preview/build.mjs "--$group-only" --out "$dir"
             node tools/ui-preview/check-layout.mjs "$dir"

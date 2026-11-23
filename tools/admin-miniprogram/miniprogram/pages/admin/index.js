@@ -38,7 +38,8 @@ function insightLines(data) {
   ];
 }
 
-const EDITABLE_KEYS = ['quota', 'tasks', 'memberProduct', 'memberPlans', 'memberRedemption', 'newProductWindows', 'notifications', 'collector', 'query', 'announcement', 'notices', 'features', 'growthExperiment'];
+const EDITABLE_KEYS = ['quota', 'tasks', 'memberProduct', 'memberPlans', 'memberRedemption', 'newProductWindows', 'notifications', 'collector', 'query',
+  'internationalMarkets', 'internationalMonitoring', 'internationalNotifications', 'internationalQueryLimits', 'announcement', 'notices', 'features', 'growthExperiment'];
 
 function growthLines(data) {
   const f = data.finance, c = data.cohort, coverage = data.coverage;

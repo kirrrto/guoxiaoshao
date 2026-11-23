@@ -19,11 +19,14 @@
 const KNOWN = new Set(['available', 'unavailable', 'ineligible', 'pending']);
 const DEFAULT_OPTIONS = Object.freeze({ continuityGapMs: 5 * 60 * 1000 });
 
-const targetKeyOf = (storeNumber, partNumber) => `${storeNumber}|${partNumber}`;
+// Keep existing mainland document IDs readable by older clients and workers.
+const targetKeyOf = (storeNumber, partNumber, market = 'CN') =>
+  market === 'CN' ? `${storeNumber}|${partNumber}` : `${market}|${storeNumber}|${partNumber}`;
 
 function emptyLatest(observation) {
   return {
-    _id: targetKeyOf(observation.storeNumber, observation.partNumber),
+    _id: targetKeyOf(observation.storeNumber, observation.partNumber, observation.market),
+    ...(observation.market ? { market: observation.market } : {}),
     storeNumber: observation.storeNumber,
     partNumber: observation.partNumber,
     status: null,
@@ -48,6 +51,7 @@ function makeEvent(latest, observation, type, extra) {
   return {
     _id: `${latest._id}|${type}|${observation.observedAt}`,
     targetKey: latest._id,
+    ...(latest.market ? { market: latest.market } : {}),
     storeNumber: latest.storeNumber,
     partNumber: latest.partNumber,
     type,
@@ -107,12 +111,15 @@ function applyObservation(previous, observation, options) {
   const previousAvailabilitySince = latest.availabilityEpisodeSince
     || (previousStatus === 'available' ? latest.statusSince : null);
 
+  const regional = latest.market && latest.market !== 'CN';
   if (previousStatus === null) {
-    if (observation.status === 'available') events.push(makeEvent(latest, observation, 'first_seen_available', { gapMs: null }));
+    if (!regional && observation.status === 'available') events.push(makeEvent(latest, observation, 'first_seen_available', { gapMs: null }));
     latest.statusSince = observation.observedAt;
   } else if (previousStatus !== observation.status) {
     if (observation.status === 'available') {
-      events.push(makeEvent(latest, observation, hadGap ? 'recovered_available' : 'restock_confirmed', {
+      // In regional markets only a directly observed unavailable → available
+      // transition establishes a restock. First, pending and recovery are baselines.
+      if (!regional || (!hadGap && previousStatus === 'unavailable')) events.push(makeEvent(latest, observation, hadGap ? 'recovered_available' : 'restock_confirmed', {
         gapMs,
         unknownCount: latest.unknownCount || 0,
         nonAvailableSince: latest.statusSince,

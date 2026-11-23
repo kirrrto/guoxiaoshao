@@ -71,8 +71,10 @@ const ICONS = {
   query: union(ring(35, 35, 19, 7), segment(48, 48, 67, 67, 8)),
   // 小哨：口哨，与页面提醒图形共用同一形状。
   follow: whistle,
-  // 历史：时钟
-  history: union(ring(40.5, 40.5, 27, 7), segment(40.5, 40.5, 40.5, 23, 6), segment(40.5, 40.5, 53, 47, 6)),
+  // 其他站点图标的经线与赤道。
+  markets: union(ring(40.5, 40.5, 27, 6), segment(15, 40.5, 66, 40.5, 5),
+    subtract((x, y) => Math.hypot((x - 40.5) / 14, (y - 40.5) / 27) <= 1,
+      (x, y) => Math.hypot((x - 40.5) / 9, (y - 40.5) / 24) < 1)),
   // 我的：人像
   mine: union(circle(40.5, 27, 13), clip(circle(40.5, 70, 25), (x, y) => y <= 66)),
 };

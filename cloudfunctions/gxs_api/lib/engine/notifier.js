@@ -31,9 +31,14 @@ function alertKind(type) {
   return null;
 }
 
-function templateIdFor(kind, config) {
+function templateIdFor(kind, config, language) {
   const ids = config.notifications.templateIds || {};
+  if (language === 'en') return kind === 'restock' ? ids.restockEn || null : null;
   return ids[kind] || null;
+}
+
+function marketDeliveryEnabled(config, market) {
+  return config.collector.enabled && config.internationalMonitoring?.[market] === true && config.internationalNotifications?.[market] === true;
 }
 
 const DEFAULT_FIELDS = Object.freeze({ product: 'thing1', store: 'thing2', time: 'time3', status: 'thing4' });
@@ -48,21 +53,26 @@ function buildTasks({ events, follows, users, config, now }) {
   for (const event of events) {
     const kind = alertKind(event.type);
     if (!kind) continue;
-    const templateId = templateIdFor(kind, config);
+    const market = event.market || 'CN';
+    const regional = market !== 'CN';
+    if (regional && (event.type !== 'restock_confirmed' || event.previousStatus !== 'unavailable' || !marketDeliveryEnabled(config, market))) continue;
     // Sold-out alerts are optional: without their own template none are planned.
-    if (kind === 'soldout' && !isValidTemplateId(templateId)) continue;
-    const matching = follows.filter(f => f.partNumber === event.partNumber && f.storeNumbers.includes(event.storeNumber));
+    if (kind === 'soldout' && !isValidTemplateId(templateIdFor(kind, config))) continue;
+    const matching = follows.filter(f => (f.market || 'CN') === market && f.partNumber === event.partNumber && f.storeNumbers.includes(event.storeNumber));
     const seen = new Set();
     for (const follow of matching) {
-      if (seen.has(follow.userKey)) continue;
+      if (seen.has(follow.userKey) || (regional && Date.parse(follow.createdAt) > Date.parse(event.detectedAt))) continue;
       seen.add(follow.userKey);
       const user = users.get(follow.userKey);
+      const language = regional && follow.language === 'en' ? 'en' : 'zh-CN';
+      const templateId = templateIdFor(kind, config, language);
       // The free alert is a restock alert; sold-out alerts are a member feature.
       if (kind === 'soldout' && user && !isMember(user, now)) continue;
       const base = {
         _id: taskId(follow.userKey, event._id), userKey: follow.userKey, followId: follow._id, eventId: event._id, eventType: event.type,
         partNumber: event.partNumber, storeNumber: event.storeNumber, storeName: event.storeName || null, productTitle: event.productTitle || follow.productTitle || null,
         targetSnapshot: targetSnapshot(follow),
+        ...(regional ? { market, language } : {}),
         detectedAt: event.detectedAt, stockStatusSince: event.stockStatusSince || event.detectedAt,
         availabilityEpisodeSince: event.availabilityEpisodeSince || event.stockStatusSince || event.detectedAt,
         createdAt: now.toISOString(), templateId: templateId || null, status: TASK_STATUS.pending, reason: null, sentAt: null, attempts: 0,
@@ -100,18 +110,20 @@ function compactProduct(task) {
 /** WeChat rejects overlong thing fields; keep all values within the documented limits. */
 function buildMessage(task, config) {
   const time = new Date(task.detectedAt);
-  const beijing = new Date(time.getTime() + 8 * 60 * 60 * 1000);
-  const hh = String(beijing.getUTCHours()).padStart(2, '0');
-  const mm = String(beijing.getUTCMinutes()).padStart(2, '0');
-  const ss = String(beijing.getUTCSeconds()).padStart(2, '0');
+  const regional = task.market && task.market !== 'CN';
+  const english = regional && task.language === 'en';
+  const local = new Date(time.getTime() + (task.market === 'JP' ? 9 : 8) * 3600000);
+  const hh = String(local.getUTCHours()).padStart(2, '0');
+  const mm = String(local.getUTCMinutes()).padStart(2, '0');
+  const ss = String(local.getUTCSeconds()).padStart(2, '0');
   const wording = { first_seen_available: '发现可取货', restock_confirmed: '确认补货', recovered_available: '恢复可取货', current_available: '当前可取货' }[task.eventType] || '可取货';
   const soldOut = alertKind(task.eventType) === 'soldout';
   const fields = { ...DEFAULT_FIELDS, ...((soldOut ? config.notifications.soldoutFields : config.notifications.templateFields) || {}) };
-  const page = config.notifications.page || 'pages/follow/index';
+  const page = regional ? `pages/markets/index?market=${task.market}&partNumber=${encodeURIComponent(task.partNumber)}&storeNumber=${encodeURIComponent(task.storeNumber)}` : config.notifications.page || 'pages/follow/index';
   const values = {
     product: compactProduct(task),
     store: clip(task.storeName || task.storeNumber, 20),
-    time: `${beijing.getUTCFullYear()}年${beijing.getUTCMonth() + 1}月${beijing.getUTCDate()}日 ${hh}:${mm}:${ss}`,
+    time: english ? local.toISOString().slice(0, 19).replace('T', ' ') : `${local.getUTCFullYear()}年${local.getUTCMonth() + 1}月${local.getUTCDate()}日 ${hh}:${mm}:${ss}`,
     // Template 524 calls this slot "预约项目". Describe the real watch item,
     // without fabricating an order, reservation or a successful purchase.
     status: soldOut ? (fields.status && fields.status.startsWith('phrase') ? '已断货' : '已断货，本轮补货结束')
@@ -121,6 +133,17 @@ function buildMessage(task, config) {
     quantity: soldOut ? (!fields.quantity ? null : fields.quantity.startsWith('number') ? '0' : fields.quantity.startsWith('phrase') ? '无货' : '暂无现货')
       : fields.quantity && fields.quantity.startsWith('phrase') ? '有现货' : '有现货，具体数量以门店为准',
   };
+  if (regional) {
+    const market = require('../markets').findMarket(task.market);
+    const store = market?.stores.find(item => item.storeNumber === task.storeNumber);
+    const product = market?.products.find(item => item.partNumber === task.partNumber);
+    values.store = clip(`${english ? market?.nameEn : market?.name} · ${(english ? store?.nameEn : store?.name) || task.storeNumber}`, 20);
+    if (english) {
+      values.product = compactProduct({ ...task, productTitle: product?.titleEn || task.partNumber });
+      values.status = fields.status?.startsWith('phrase') ? 'Ready' : 'Available for pickup';
+      if (fields.quantity) values.quantity = fields.quantity.startsWith('phrase') ? 'Ready' : 'Available for pickup';
+    }
+  }
   const data = {};
   for (const [slot, key] of Object.entries(fields)) if (key) data[key] = { value: values[slot] };
   return {
@@ -142,7 +165,12 @@ function skipReason({ task, user, follow, config, now, senderAppid }) {
   const settings = user && user.settings;
   if (!config.notifications.enabled) return 'notifications_disabled';
   const kind = alertKind(task.eventType) || 'restock';
-  if (!isValidTemplateId(task.templateId) || templateIdFor(kind, config) !== task.templateId) return 'template_changed';
+  if (task.market && task.market !== 'CN') {
+    if (!marketDeliveryEnabled(config, task.market) || task.eventType !== 'restock_confirmed') return 'market_notifications_disabled';
+    if (task.market !== follow?.market || (follow.language || 'zh-CN') !== (task.language || 'zh-CN')
+      || !require('../notification-target').matchesNotificationTarget(task, follow)) return 'follow_not_active';
+  }
+  if (!isValidTemplateId(task.templateId) || templateIdFor(kind, config, task.language) !== task.templateId) return 'template_changed';
   if (!user) return 'member_expired';
   if (!canUseReminders(user, now)) return reminderBlockReason(user);
   if (kind === 'soldout' && !isMember(user, now)) return 'member_expired';
@@ -203,13 +231,13 @@ async function sendTask({ task, config, sendImpl, repo, now, ownerId = 'notifier
   // The old owner must neither send nor turn that durable barrier into pending.
   if (!claimAlive()) return await repo.getNotification(task._id) || task;
   if (reason) return finish({ status: TASK_STATUS.skipped, reason, sentAt: null });
-  const [latest] = await repo.getLatest([targetKeyOf(task.storeNumber, task.partNumber)]);
+  const [latest] = await repo.getLatest([targetKeyOf(task.storeNumber, task.partNumber, task.market)]);
   if (!claimAlive()) return await repo.getNotification(task._id) || task;
   const observationReason = observationSkipReason(task, latest, clock(), config);
   if (observationReason) return finish({ status: TASK_STATUS.skipped, reason: observationReason, sentAt: null });
   if (!await canStart()) return defer();
   // Restock and sold-out alerts cool down separately, so one never blocks the other.
-  const targetKey = `${alertKind(task.eventType) === 'soldout' ? 'soldout|' : ''}${task.storeNumber}|${task.partNumber}`;
+  const targetKey = `${alertKind(task.eventType) === 'soldout' ? 'soldout|' : ''}${targetKeyOf(task.storeNumber, task.partNumber, task.market)}`;
   const reservation = await repo.reserveSubscriptionCredit({ userKey: task.userKey, templateId: task.templateId, taskId: task._id, now: now.toISOString(), targetKey, cooldownMinutes: config.notifications.cooldownMinutes || 0 });
   if (!reservation.reserved) return finish({ status: TASK_STATUS.skipped, reason: reservation.reason || 'no_subscription_credit', sentAt: null });
   const release = async () => {
@@ -232,7 +260,7 @@ async function sendTask({ task, config, sendImpl, repo, now, ownerId = 'notifier
   follow = await repo.getFollow(task.followId);
   user = await loadFollowPolicy(repo, user, follow ? [follow] : [], clock());
   config = mergeConfig(await repo.getConfig());
-  const [currentLatest] = await repo.getLatest([targetKeyOf(task.storeNumber, task.partNumber)]);
+  const [currentLatest] = await repo.getLatest([targetKeyOf(task.storeNumber, task.partNumber, task.market)]);
   const ready = leaseReady && claimAlive() && sendBudgetMs() > 1000;
   const finalReason = skipReason({ task, user, follow, config, now: clock(), senderAppid: sendImpl.appid || config.notifications.consumerAppId })
     || observationSkipReason(task, currentLatest, clock(), config);
@@ -244,7 +272,7 @@ async function sendTask({ task, config, sendImpl, repo, now, ownerId = 'notifier
   const timeoutMs = Math.max(1, Math.min(8000, Math.floor(sendBudgetMs()) - 1000));
   let outcome;
   try {
-    const response = await sendImpl({ touser: user.openid, appid: user.appid, ...buildMessage(task, config), miniprogramState: config.notifications.miniprogramState || 'formal', lang: 'zh_CN' }, { timeoutMs });
+    const response = await sendImpl({ touser: user.openid, appid: user.appid, ...buildMessage(task, config), miniprogramState: config.notifications.miniprogramState || 'formal', lang: task.market && task.language === 'en' ? 'en' : 'zh_CN' }, { timeoutMs });
     const code = subscriptionResponseCode(response);
     if (code === null) outcome = { status: TASK_STATUS.uncertain, reason: 'invalid_platform_response' };
     else if (code === 0) outcome = { status: TASK_STATUS.accepted, reason: null };

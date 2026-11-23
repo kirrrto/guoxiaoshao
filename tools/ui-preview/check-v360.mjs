@@ -100,6 +100,7 @@ try {
               checks.resultOrder = history ? before(panel, '.history-browse-card') : before(panel, '.query-guide-entry');
               checks.motion = moving ? anim(panel) !== 'none' : anim(panel) === 'none';
               if (history) {
+                checks.legacyNonTab = !find('.preview-native-tabbar');
                 const events = [...document.querySelectorAll('.history-result-card .event')];
                 checks.sameTimeEvents = events.length === 2 && document.querySelectorAll('.event-time').length === 1 &&
                   events.every(event => event.querySelector('.event-store')?.textContent.trim() && event.querySelector('.event-status')?.textContent.trim());

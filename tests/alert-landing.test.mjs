@@ -42,6 +42,9 @@ test('the alert opens the follow page on that event, readable only by its own ac
   assert.equal(detail.latest.status, 'available');
   assert.equal(detail.latest.restricted, false);
   assert.deepEqual(detail.follow, { followId: FOLLOW, status: 'active' });
+  failWith(await f.call('notify.detail', { eventId, expectedUserKey: userKeyOf('different') }), 'notification_account_changed');
+  failWith(await f.call('notify.open', { eventId, expectedUserKey: userKeyOf('different') }), 'notification_account_changed');
+  ok(await f.call('notify.detail', { eventId, expectedUserKey: userKeyOf() }));
   failWith(await f.call('notify.detail', { eventId }, userContext('oOTHER00000000000000000001')), 'notification_not_found');
   failWith(await f.call('notify.detail', { eventId: '' }), 'invalid_notification_id');
   await f.repo.updateNotification(`${userKeyOf()}|${EVENT}`, { userHiddenAt: f.state.now.toISOString() });

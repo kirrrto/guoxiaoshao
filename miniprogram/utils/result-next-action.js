@@ -22,7 +22,7 @@ function resultNextAction({ snapshot, account, collector, catalog, now = Date.no
   if (!account || !account.membership) return { ...base, action: 'account', title: '正在确认账户权限', detail: '账户连接后可继续查看当前配置。', label: '重试账户连接' };
   if (snapshot.latestRestricted || rows.some(row => row.restricted)) return { ...base, action: 'account', title: '此结果的访问权限待确认', detail: '刷新账户权限后重新查询，不展示受限的旧观测。', label: '重试账户连接' };
   if (!canOfferLiveChoices(product, account, now)) return { ...base, action: 'offer', title: '此配置实时查询需会员',
-    detail: '免费用户仍可按现有规则查看有权限的历史记录。', label: '查看此配置会员权益' };
+    detail: '可改选其他配置，或查看本配置的会员权益。', label: '查看此配置会员权益' };
   const known = rows.filter(row => fmt.stockObservation(row, now).observationState === 'fresh');
   const available = known.filter(row => row.status === 'available');
   const partial = known.length < rows.length;

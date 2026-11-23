@@ -2,8 +2,9 @@
   "pages": [
     "pages/query/index",
     "pages/follow/index",
-    "pages/history/index",
+    "pages/markets/index",
     "pages/mine/index",
+    "pages/history/index",
     "pages/notice-board/index",
     "pages/notification-test/index",
     "pages/guide/index",
@@ -24,7 +25,7 @@
     "list": [
       { "pagePath": "pages/query/index", "text": "查询", "iconPath": "images/tab/query.png", "selectedIconPath": "images/tab/query-active.png" },
       { "pagePath": "pages/follow/index", "text": "小哨", "iconPath": "images/tab/follow.png", "selectedIconPath": "images/tab/follow-active.png" },
-      { "pagePath": "pages/history/index", "text": "历史", "iconPath": "images/tab/history.png", "selectedIconPath": "images/tab/history-active.png" },
+      { "pagePath": "pages/markets/index", "text": "其他站点", "iconPath": "images/tab/markets.png", "selectedIconPath": "images/tab/markets-active.png" },
       { "pagePath": "pages/mine/index", "text": "我的", "iconPath": "images/tab/mine.png", "selectedIconPath": "images/tab/mine-active.png" }
     ]
   },

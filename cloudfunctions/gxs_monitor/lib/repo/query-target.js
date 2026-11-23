@@ -1,20 +1,22 @@
 'use strict';
 const { createHash } = require('node:crypto');
 const { COLLECTIONS: C } = require('../collections');
+const { targetKeyOf } = require('../engine/events');
 
-const queryTargetId = (storeNumber, partNumber) => `query_target_${createHash('sha256').update(`${storeNumber}|${partNumber}`).digest('hex')}`;
+const queryTargetId = (storeNumber, partNumber, market) => `query_target_${createHash('sha256').update(targetKeyOf(storeNumber, partNumber, market || 'CN')).digest('hex')}`;
 const KNOWN = new Set(['available', 'unavailable', 'ineligible', 'pending']);
 
 function queryTargetMethods(run) {
   return {
-    claimQueryTarget: ({ storeNumber, partNumber, ownerId, nowIso, maxAgeMs, budgetMode, leaseMs = 25000 }) => run(async tx => {
+    claimQueryTarget: ({ storeNumber, partNumber, market = null, ownerId, nowIso, maxAgeMs, budgetMode, leaseMs = 25000 }) => run(async tx => {
       const now = Date.parse(nowIso);
-      const latest = await tx.get(C.latest, `${storeNumber}|${partNumber}`);
+      const latest = await tx.get(C.latest, targetKeyOf(storeNumber, partNumber, market || 'CN'));
       const age = latest ? now - Date.parse(latest.observedAt) : Infinity;
       // Reuse only an actual, still-fresh known sample. Never revive a sample
       // superseded by an unknown observation or a timestamp from the future.
-      if (latest && KNOWN.has(latest.status) && !latest.unknownSince && age >= 0 && age < maxAgeMs) return { latest };
-      const id = queryTargetId(storeNumber, partNumber);
+      if (latest && (!market || latest.market === market && latest.storeNumber === storeNumber && latest.partNumber === partNumber)
+        && KNOWN.has(latest.status) && !latest.unknownSince && age >= 0 && age < maxAgeMs) return { latest };
+      const id = queryTargetId(storeNumber, partNumber, market);
       const current = await tx.get(C.config, id);
       // A target may retain the previous policy until midnight after the runtime
       // switches to continuous capacity. Retire only that old daily-cap wait;

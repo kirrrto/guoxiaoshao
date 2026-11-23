@@ -77,7 +77,7 @@ function eventMeta(type) {
 }
 
 const REASON_TEXT = {
-  insufficient_credits: '查询次数不足，请先签到或完成任务获取次数',
+  insufficient_credits: '查询次数不足，可到「我的」查看签到和余额',
   new_product_restricted: '新品开售 30 天内，免费用户暂不能实时查询该机型',
   new_product_history_restricted: '新品开售 30 天内，免费用户只能查看昨天及更早的历史',
   unsupported_product: '该配置暂未通过取货接口验证，不能作为监测选项',

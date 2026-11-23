@@ -63,6 +63,10 @@ async function transactionGet(transaction, collection, id) {
 function createCloudbaseRepo(db, { sleep = ms => new Promise(resolve => setTimeout(resolve, ms)), random = Math.random } = {}) {
   const _ = db.command;
   const col = name => db.collection(name);
+  // Historical consumer reports belong to CN. Legacy observations have no
+  // market field; scope every page and count before sorting or applying limits.
+  const mainlandEvents = condition => col(COLLECTIONS.events).where(_.and([condition,
+    _.or([{ market: _.exists(false) }, { market: null }, { market: 'CN' }])]));
   const transaction = body => db.runTransaction(async transaction => {
     const cache = new Map();
     const get = async (collection, id) => {
@@ -243,13 +247,13 @@ function createCloudbaseRepo(db, { sleep = ms => new Promise(resolve => setTimeo
     async listEvents({ partNumber, storeNumbers, dayKey, limit }) {
       const where = { partNumber, dayKey };
       if (storeNumbers && storeNumbers.length) where.storeNumber = _.in(storeNumbers);
-      return readAll(col(COLLECTIONS.events).where(where).orderBy('detectedAt', 'desc').orderBy('_id', 'desc'), limit || 100);
+      return readAll(mainlandEvents(where).orderBy('detectedAt', 'desc').orderBy('_id', 'desc'), limit || 100);
     },
     async getEventHistory({ partNumber, storeNumbers, dayKey, cursor, limit = 100, snapshotAt, includeCounts = true }) {
       const base = { partNumber, dayKey, detectedAt: _.lte(snapshotAt) };
       if (storeNumbers.length) base.storeNumber = _.in(storeNumbers);
       const where = cursor ? _.and([base, _.or([{ detectedAt: _.lt(cursor.detectedAt) }, { detectedAt: cursor.detectedAt, _id: _.lt(cursor.id) }])]) : base;
-      const read = readAll(col(COLLECTIONS.events).where(where).orderBy('detectedAt', 'desc').orderBy('_id', 'desc'), limit + 1);
+      const read = readAll(mainlandEvents(where).orderBy('detectedAt', 'desc').orderBy('_id', 'desc'), limit + 1);
       // Later pages reuse the first page's frozen total and summary; skip the 6–7 count queries.
       if (!includeCounts) {
         const rows = await read;
@@ -262,9 +266,9 @@ function createCloudbaseRepo(db, { sleep = ms => new Promise(resolve => setTimeo
       const hourDays = dayKey === beijingDayKey(snapshotAt) ? [...new Set([beijingDayKey(hourStart), dayKey])] : [];
       const [rows, total, ...counts] = await Promise.all([
         read,
-        col(COLLECTIONS.events).where(base).count(),
-        ...['first_seen_available', 'restock_confirmed', 'recovered_available', 'became_unavailable'].map(type => col(COLLECTIONS.events).where({ ...base, type }).count()),
-        Promise.all(hourDays.map(hourDay => col(COLLECTIONS.events).where(_.and([{ ...base, dayKey: hourDay, type: 'restock_confirmed' }, { detectedAt: _.gte(hourStart) }])).count()))
+        mainlandEvents(base).count(),
+        ...['first_seen_available', 'restock_confirmed', 'recovered_available', 'became_unavailable'].map(type => mainlandEvents({ ...base, type }).count()),
+        Promise.all(hourDays.map(hourDay => mainlandEvents(_.and([{ ...base, dayKey: hourDay, type: 'restock_confirmed' }, { detectedAt: _.gte(hourStart) }])).count()))
           .then(parts => ({ total: parts.reduce((sum, part) => sum + part.total, 0) })),
       ]);
       return { events: rows.slice(0, limit), hasMore: rows.length > limit, total: total.total, summary: Object.fromEntries(['available', 'restocks', 'recoveries', 'ended', 'lastHourRestocks'].map((key, i) => [key, counts[i].total])) };
@@ -495,6 +499,7 @@ function createCloudbaseRepo(db, { sleep = ms => new Promise(resolve => setTimeo
         subscriptionGrants: [col(COLLECTIONS.config).where({ kind: 'subscription_grant', createdAt: _.lt(cutoffIso) })],
         queryGuards: [col(COLLECTIONS.config).where({ kind: 'query_guard', updatedAt: _.lt(cutoffIso) })],
         queryTargets: [col(COLLECTIONS.config).where({ kind: 'query_target', updatedAt: _.lt(cutoffIso) })],
+        marketBudgets: [col(COLLECTIONS.config).where({ kind: 'market_budget', updatedAt: _.lt(cutoffIso) })],
         budgets: byIds(COLLECTIONS.config, budgetIds),
       };
       const removed = {}, errors = {};

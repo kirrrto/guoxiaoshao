@@ -7,6 +7,7 @@
 const { DEFAULT_CONFIG: QUOTA_DEFAULTS } = require('./rules/quota');
 const { ApiError } = require('./errors');
 const { FEATURE_KEYS, UI_FEATURES } = require('./growth-policy');
+const { MARKETS } = require('./markets');
 
 const DEFAULTS = Object.freeze({
   quota: { ...QUOTA_DEFAULTS },
@@ -31,6 +32,11 @@ const DEFAULTS = Object.freeze({
   // redemptions granted before the cap existed.
   memberRedemption: { enabled: true, maxClaims: 20 },
   newProductWindows: [],
+  internationalMarkets: Object.fromEntries(MARKETS.map(market => [market.code, false])),
+  internationalMonitoring: Object.fromEntries(MARKETS.map(market => [market.code, false])),
+  internationalNotifications: Object.fromEntries(MARKETS.map(market => [market.code, false])),
+  // Regional manual + automatic requests share these caps per storefront.
+  internationalQueryLimits: { maxRequestsPerMinute: 6, maxRequestsPerDay: 7200 },
   features: Object.fromEntries(FEATURE_KEYS.map(key => [key, false])),
   growthExperiment: { id: 'contextual-checkout', assignmentVersion: 1, mode: 'off', feature: 'contextualCheckout', allocationPercent: 0 },
   // Independent from stock templates and paid stock-follow entitlements.
@@ -95,7 +101,7 @@ const DEFAULTS = Object.freeze({
   notices: [],
 });
 
-const EDITABLE = new Set(['quota', 'tasks', 'memberProduct', 'memberPlans', 'virtualPayment', 'memberRedemption', 'newProductWindows', 'notifications', 'collector', 'query', 'adminUserKeys', 'announcement', 'notices', 'features', 'growthExperiment', 'deadlineReminders']);
+const EDITABLE = new Set(['quota', 'tasks', 'memberProduct', 'memberPlans', 'virtualPayment', 'memberRedemption', 'newProductWindows', 'notifications', 'collector', 'query', 'internationalMarkets', 'internationalMonitoring', 'internationalNotifications', 'internationalQueryLimits', 'adminUserKeys', 'announcement', 'notices', 'features', 'growthExperiment', 'deadlineReminders']);
 
 // A template library number is not an ID. Do not guess a fixed ID length.
 function isValidTemplateId(value) {
@@ -158,6 +164,17 @@ function patchConfig(stored, patch) {
 function validateConfig(config) {
   const invalid = (field) => { throw new ApiError('invalid_config', `配置项无效：${field}`); };
   const integer = (value, min, max, field) => { if (!Number.isSafeInteger(value) || value < min || value > max) invalid(field); };
+  for (const field of ['internationalMarkets', 'internationalMonitoring', 'internationalNotifications']) {
+    const flags = config[field];
+    if (!flags || typeof flags !== 'object' || Array.isArray(flags)
+      || Object.keys(flags).some(code => !MARKETS.some(m => m.code === code))
+      || MARKETS.some(m => typeof flags[m.code] !== 'boolean')) invalid(field);
+  }
+  const limits = config.internationalQueryLimits;
+  if (!limits || typeof limits !== 'object' || Array.isArray(limits)
+    || Object.keys(limits).some(key => !['maxRequestsPerMinute', 'maxRequestsPerDay'].includes(key))) invalid('internationalQueryLimits');
+  integer(limits.maxRequestsPerMinute, 1, 6000, 'internationalQueryLimits.maxRequestsPerMinute');
+  integer(limits.maxRequestsPerDay, 1, 10000000, 'internationalQueryLimits.maxRequestsPerDay');
   const deadlines = config.deadlineReminders;
   if (!deadlines || typeof deadlines !== 'object' || Array.isArray(deadlines)
     || Object.keys(deadlines).some(key => !['enabled', 'templateId', 'templateFields', 'miniprogramState'].includes(key))) invalid('deadlineReminders');
@@ -238,6 +255,9 @@ function validateConfig(config) {
   if (typeof config.notifications.page !== 'string' || !/^pages\/[a-zA-Z0-9_/-]+$/.test(config.notifications.page)) invalid('notifications.page');
   const templates = config.notifications.templateIds;
   if (!templates || typeof templates !== 'object' || Array.isArray(templates) || Object.values(templates).some(id => !isValidTemplateId(id))) invalid('notifications.templateIds');
+  for (const kind of ['restockEn', 'soldoutEn']) {
+    if (templates[kind] && Object.entries(templates).some(([other, id]) => other !== kind && id === templates[kind])) invalid('notifications.templateIds.' + kind);
+  }
   if (config.notifications.enabled && !templates.restock) invalid('notifications.templateIds.restock');
   if (typeof config.notifications.templateTitle !== 'string' || config.notifications.templateTitle.length > 50 || /[\x00-\x1f\x7f]/.test(config.notifications.templateTitle)) invalid('notifications.templateTitle');
   if (!['stock_status', 'watch_item'].includes(config.notifications.contentMode)) invalid('notifications.contentMode');

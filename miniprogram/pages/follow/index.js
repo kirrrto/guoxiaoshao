@@ -1,6 +1,5 @@
 const navigation = require('../../utils/navigation');
 const { reminderPanelMethods } = require('../../utils/reminder-panel');
-const { stageHistoryContext } = require('../../utils/journey-context');
 const { productThumbnailUrl } = require('../../utils/product-image-fit');
 const { call, newId, showError, toast } = require('../../utils/api');
 const { getBootstrap, getCatalog, refreshBootstrap, invalidateBootstrap, subscribeCatalog, getFollows, invalidateFollows, subscribeSubscriptions, quotaAccountMatches } = require('../../utils/store');
@@ -261,6 +260,7 @@ Page({
     boot: null,
     collector: null,
     follows: [],
+    otherMarketCount: 0,
     selectedFollowId: '',
     followsLoaded: false,
     limits: { maxFollows: 3, maxStoresPerFollow: 3 },
@@ -552,6 +552,10 @@ Page({
     try {
       const data = await call('notify.detail', { eventId });
       if (current()) {
+        if (data.notification && data.notification.market && data.notification.market !== 'CN') {
+          this.setData({ alert: { eventId, error: '请从「其他站点」查看这条提醒对应的门店。', retryable: false } });
+          return;
+        }
         const targetId = data.follow && data.follow.followId;
         const matchingTarget = targetId && (!this.data.followsLoaded || this.data.follows.some(follow => follow.followId === targetId));
         this.setData({ alert: presentAlert(data), ...(matchingTarget ? { selectedFollowId: targetId } : {}) }, () => {
@@ -720,7 +724,7 @@ Page({
       getApp().globalData.handledAlerts = [];
       this.invalidateFollowRead();
       this.editorSelection = null;
-      this.setData({ follows: [], selectedFollowId: '', followsLoaded: false, editing: false, saving: false, followBusyId: '', followActionId: '', followActionError: '',
+      this.setData({ follows: [], otherMarketCount: 0, selectedFollowId: '', followsLoaded: false, editing: false, saving: false, followBusyId: '', followActionId: '', followActionError: '',
         activation: null, authorizationOpen: false, authorizationFeedback: '', refreshing: false, refreshFeedback: '', refreshError: null, alert: null, alertBusy: false });
     }
     this.accountSnapshot = boot;
@@ -768,7 +772,7 @@ Page({
       if (this.pageRetired || this.visible === false || generation !== (this.followReadGeneration || 0)) return false;
       const incoming = data.follows.filter(f => f.status !== 'removed').map(f => presentFollow(f, this.data.boot || {}, this.catalog, this.data.collector));
       const follows = retainFollowOrder(incoming, this.data.follows);
-      this.setData({ follows, selectedFollowId: selectedFollowId(follows, this.data.selectedFollowId), followsLoaded: true, limits: data.limits, loadError: null, refreshError: null, followActionError: '', followActionId: '', refreshedText: fmt.fmtTime(Date.now()) });
+      this.setData({ follows, otherMarketCount: data.otherMarketCount || 0, selectedFollowId: selectedFollowId(follows, this.data.selectedFollowId), followsLoaded: true, limits: data.limits, loadError: null, refreshError: null, followActionError: '', followActionId: '', refreshedText: fmt.fmtTime(Date.now()) });
       this.lastLocalPresentationAt = Date.now();
       this.startObservationClock();
       this.refreshReadiness();
@@ -950,15 +954,22 @@ Page({
     });
   },
 
+  openMarkets() { return switchToTab({ url: '/pages/markets/index' }); },
+
   onAdd() {
     if (this.data.saving || this.data.followBusyId) return;
     if (!this.data.boot) return toast('正在读取账户，请稍后再试');
     if (!this.data.boot.member) return this.showMemberModal();
     if (!this.data.followsLoaded) return toast('正在确认已有关注，请稍后再试');
-    if (this.data.follows.length >= this.data.limits.maxFollows) return wx.showModal({
-      title: '配置名额已满', content: `已保存 ${this.data.follows.length} 个配置，当前最多 ${this.data.limits.maxFollows} 个。暂停的配置也占名额，可调整或删除已有关注。`,
-      confirmText: '管理关注', cancelText: '取消',
-      success: result => { if (result.confirm && !this.pageRetired) this.setData({ follows: this.data.follows.map(follow => ({ ...follow, detailsExpanded: true })) }); },
+    const saved = this.data.follows.length + this.data.otherMarketCount;
+    if (saved >= this.data.limits.maxFollows) return wx.showModal({
+      title: '配置名额已满', content: `已保存 ${saved} 个配置，当前最多 ${this.data.limits.maxFollows} 个。${this.data.otherMarketCount ? '其他站点的关注共用这些名额。' : ''}暂停的配置也占名额。`,
+      confirmText: this.data.otherMarketCount ? '其他站点' : '管理关注', cancelText: '取消',
+      success: result => {
+        if (!result.confirm || this.pageRetired) return;
+        if (this.data.otherMarketCount) this.openMarkets();
+        else this.setData({ follows: this.data.follows.map(follow => ({ ...follow, detailsExpanded: true })) });
+      },
     });
     this.openEditor({ followId: newId('f'), pickerValue: null, isNew: true });
   },
@@ -1199,13 +1210,6 @@ Page({
     } });
   },
 
-  onViewHistory(e) {
-    if (navigation.isNavigating()) return;
-    const follow = this.data.follows.find(item => item.followId === e.currentTarget.dataset.id);
-    if (this.pageRetired || !follow) return;
-    if (!stageHistoryContext({ from: 'follow', target: { partNumber: follow.partNumber, storeNumbers: follow.stores.map(store => store.storeNumber) } })) return toast('请刷新账户后再查看历史');
-    switchToTab({ url: '/pages/history/index' });
-  },
   onManageReminders() {
     if (navigation.isNavigating()) return;
     getApp().globalData.pendingMineSection = 'reminder-center';

@@ -12,6 +12,7 @@ const { canUseReminders, followAllowance } = require('../rules/membership');
 const { loadFollowUsers, isRetiredPartNumber } = require('../rules/follow-access');
 const { guardedPickup } = require('./guarded-pickup');
 const { createScheduler, buildGroups } = require('./scheduler');
+const { createMarketMonitor } = require('./market-monitor');
 const { createLeaseKeeper } = require('./lease');
 const { recordObservations } = require('./observations');
 const { buildTasks, sendTask, TASK_STATUS } = require('./notifier');
@@ -65,6 +66,12 @@ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = cons
     onBatch: handleBatch,
   });
 
+  const marketMonitor = createMarketMonitor({ clock, mode, log, shouldContinue: () => !stopping && shouldContinue() && lease.isHeld(),
+    onBatch: handleBatch,
+    fetchPickup: target => guardedPickup({ repo, config, clock, fetchImpl, ...target, source: 'auto', remainingMs: remainingWorkMs,
+      beforeRequest: async () => !stopping && shouldContinue() && await lease.renew() && shouldContinue() }),
+  });
+
   function ctx() {
     const now = clock();
     return { repo, config, now, nowIso: now.toISOString(), clock, log, collectorOwnerId: ownerId };
@@ -84,14 +91,15 @@ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = cons
     if (stopping || !await lease.renew()) throw new Error('collector_lease_lost');
     const recorded = await recordObservations(ctx(), observations, 'auto');
     const applied = recorded.filter(result => !['stale', 'duplicate'].includes(result.outcome));
-    if (applied.length) {
+    const regional = observations[0]?.market && observations[0].market !== 'CN';
+    if (applied.length && !regional) {
       stats.batches += 1;
       stats.observations += applied.length;
       stats.lastBatchAt = clock().toISOString();
     }
     const events = recorded.flatMap(r => r.events).length;
     stats.events += events;
-    if (applied.some(result => result.latest && result.latest.status === 'available')) lastAvailabilityPlanAt = -Infinity;
+    if (!regional && applied.some(result => result.latest && result.latest.status === 'available')) lastAvailabilityPlanAt = -Infinity;
     await flushOrKickNotifications();
     // Any status change puts this store on the fast cadence (see scheduler burst mode).
     return { changed: events > 0, persisted: observations.length > 0 && applied.length === observations.length };
@@ -109,7 +117,7 @@ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = cons
       || (event.previousStatusConfirmed == null && since && event.previousKnownAt === since);
     if (event.type === 'became_unavailable' && previousWasUnconfirmed(event.availableSince)) return 'noise';
     if (['restock_confirmed', 'recovered_available'].includes(event.type) && event.nonAvailableSince && previousWasUnconfirmed(event.nonAvailableSince)
-      && await repo.getEvent(`${targetKeyOf(event.storeNumber, event.partNumber)}|became_unavailable|${event.nonAvailableSince}`)) return 'noise';
+      && await repo.getEvent(`${targetKeyOf(event.storeNumber, event.partNumber, event.market)}|became_unavailable|${event.nonAvailableSince}`)) return 'noise';
     if (!latest || latest.statusSince !== event.detectedAt || latest.status !== event.status) return latest ? 'noise' : 'waiting';
     // Two valid samples must be consecutive. An unknown result interrupts the
     // streak; merely recovering the same last-known status is not confirmation.
@@ -145,19 +153,21 @@ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = cons
       const events = usePrefetched ? prefetchedEvents : page === 0 ? await firstEventPage(since)
         : await repo.listUnprocessedEvents({ limit: NOTIFICATION_PLAN_PAGE_SIZE, since, cursor: stats.notificationEventCursor });
       if (!events.length) { stats.notificationEventCursor = null; break; }
-      const latestByKey = new Map((await repo.getLatest([...new Set(events.map(e => targetKeyOf(e.storeNumber, e.partNumber)))])).map(l => [l._id, l]));
+      const latestByKey = new Map((await repo.getLatest([...new Set(events.map(e => targetKeyOf(e.storeNumber, e.partNumber, e.market)))])).map(l => [l._id, l]));
       for (const event of events) {
         if (!canPlan() || !await lease.renew()) return { snapshot, more: taskCount > 0 };
         const nextCursor = { detectedAt: event.detectedAt, id: event._id };
         const now = clock();
-        const state = await confirmation(event, latestByKey.get(targetKeyOf(event.storeNumber, event.partNumber)));
+        const state = await confirmation(event, latestByKey.get(targetKeyOf(event.storeNumber, event.partNumber, event.market)));
         if (state === 'waiting' && now.getTime() - Date.parse(event.detectedAt) <= maxAgeMs) {
           // An event first seen after its old burst window still needs a prompt
           // confirmation. Re-reading it must not renew the quiet window. Keep
           // one bounded entry per event until its original expiry; never evict
           // a live entry to make room, which would permit repeated bursts.
           const waitingKey = `${event._id}\0${event.detectedAt}`;
-          if (!hurriedWaitingEvents.has(waitingKey) && hurriedWaitingEvents.size < WAITING_CONFIRMATION_LIMIT
+          if (event.market && event.market !== 'CN') {
+            if (planningConfig.notifications.enabled && planningConfig.internationalNotifications?.[event.market]) marketMonitor.requestConfirmation(event, maxAgeMs);
+          } else if (!hurriedWaitingEvents.has(waitingKey) && hurriedWaitingEvents.size < WAITING_CONFIRMATION_LIMIT
             && scheduler.hurry(event.storeNumber, now.getTime()) > 0) {
             hurriedWaitingEvents.set(waitingKey, Date.parse(event.detectedAt) + maxAgeMs);
           }
@@ -210,6 +220,7 @@ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = cons
     // The cursor is persisted in scheduled heartbeats so a large set of paid
     // accounts cannot leave later accounts permanently behind the first page.
     const candidates = follows.flatMap(follow => {
+      if (follow.market && follow.market !== 'CN') return [];
       const user = users.get(follow.userKey);
       if (!user || !canUseReminders(user, clock())) return [];
       const templateId = planningConfig.notifications.templateIds.restock;
@@ -340,7 +351,8 @@ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = cons
       const allowance = followAllowance(user, follow, follows, now);
       return allowance.eligibleStoreNumbers.length ? [{ ...follow, storeNumbers: allowance.eligibleStoreNumbers }] : [];
     });
-    const groups = config.collector.enabled ? buildGroups(eligible, config.collector.maxPartsPerRequest || 20) : [];
+    marketMonitor.configure(eligible, config);
+    const groups = config.collector.enabled ? buildGroups(eligible.filter(follow => !follow.market || follow.market === 'CN'), config.collector.maxPartsPerRequest || 20) : [];
     // Continuous monitoring in both modes fits the sustainable automatic lane,
     // independent of user count. Bursts still pass the shared admission guard.
     // Explicit daily mode retains the previous resident-mode cadence.
@@ -419,6 +431,7 @@ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = cons
       maxConcurrency: snap.maxConcurrency,
       budget: { ...budget, budgetMode: config.collector.budgetMode, maxRequestsPerMinute: config.collector.maxRequestsPerMinute || 60, maxRequestsPerDay: config.collector.maxRequestsPerDay || 10000 },
       notifications: notificationStatus(),
+      markets: marketMonitor.status(),
       observationHealth: health,
       stats,
       updatedAt: now.toISOString(),
@@ -459,6 +472,7 @@ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = cons
     if (!lease.isHeld()) return { held: false, started: [] };
     await flushOrKickNotifications();
     const started = shouldContinue() ? scheduler.tick() : [];
+    if (mode !== 'scheduled' && shouldContinue()) started.push(...marketMonitor.tick());
     await publishStatus(undefined, { force: false });
     return { held: true, started };
   }
@@ -477,16 +491,17 @@ function createCollector({ repo, fetchImpl, clock = () => new Date(), log = cons
       }
     }
     scheduler.pause();
-    await scheduler.drain();
+    marketMonitor.pause();
+    await Promise.all([scheduler.drain(), marketMonitor.drain()]);
     await notificationWork;
     await notifyChain;
     if (lease.isHeld()) await publishStatus({ state: 'stopped' });
     await lease.release();
   }
 
-  return { step, run, stop: () => { stopping = true; running = false; notificationRequested = false; scheduler.pause(); },
+  return { step, run, stop: () => { stopping = true; running = false; notificationRequested = false; scheduler.pause(); marketMonitor.pause(); },
     settleNotifications: async () => { await notificationWork; await notifyChain; },
-    drainNotifications, refreshTargets, publishStatus, scheduler, lease, stats, ownerId, currentConfig: () => config };
+    drainNotifications, refreshTargets, publishStatus, scheduler, marketMonitor, lease, stats, ownerId, currentConfig: () => config };
 }
 
 module.exports = { createCollector };

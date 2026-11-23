@@ -95,7 +95,7 @@ test('disabled or capped browse rewards never fabricate a +1 entry and a balance
   assert.equal(ok(await f.call('history.browse')).task.granted, 1);
 });
 
-test('task entry loads free history, updates member Mine and refreshes its already open ledger on return', async () => {
+test('new accounts have no history entry; a legacy link still credits and refreshes its open ledger', async () => {
   const f = createFixture();
   ok(await f.call('user.bootstrap'));
   await f.repo.updateUser(userKeyOf(), { membership: { expiresAt: '2027-01-01T00:00:00Z' } });
@@ -104,8 +104,8 @@ test('task entry loads free history, updates member Mine and refreshes its alrea
   await mine.onLoad(); await mine.onToggleLedger();
   assert.equal(mine.data.ledger.length, 0);
   let route;
-  rt.wx.switchTab = options => { route = options.url; };
-  mine.onGoHistory(); assert.equal(route, '/pages/history/index'); mine.onHide();
+  rt.wx.navigateTo = options => { route = options.url; };
+  mine.onOpenPendingReward(); assert.equal(route, undefined); assert.equal(mine.data.tasks.length, 0); mine.onHide();
   const history = rt.instance('pages/history/index.js');
   await history.onLoad(); await history.loadBrowse();
   assert.equal(history.data.browse.recentViews.length, 0);
@@ -229,9 +229,34 @@ test('Mine shows successful browsing separately from an unclaimed capped reward'
     const history = rt.instance('pages/history/index.js'); history.applyBoot(await rt.load('utils/store.js').getBootstrap());
     await history.loadBrowse();
     assert.equal(mine.data.tasks[0].done, false);
-    assert.match(mine.data.tasks[0].pendingLabel, /已浏览/);
+    assert.equal(mine.data.tasks[0].pendingLabel, quota.balance === 10 ? '余额已满，今日用次后可领' : '今日领取已达上限');
+    assert.equal(mine.data.tasks[0].claimable, false);
+    let target;
+    rt.wx.navigateTo = ({url}) => { target = url; };
+    mine.onOpenPendingReward();
+    assert.equal(target, undefined);
     assert.equal((await f.repo.listLedger(userKeyOf())).length, 0);
+    if (quota.balance === 10) {
+      await f.repo.updateUser(userKeyOf(), { quota: { balance: 9 } });
+      mine.applyBoot(ok(await f.call('user.bootstrap')));
+      assert.equal(mine.data.tasks[0].claimable, true);
+      mine.onOpenPendingReward();
+      assert.equal(target, '/pages/history/index');
+      assert.equal(ok(await f.call('history.browse')).task.granted, 1);
+    }
   }
+});
+
+test('a completed query from a previous client makes its earned reward visible after upgrading', async () => {
+  const f = createFixture();
+  ok(await f.call('user.bootstrap'));
+  const userKey = userKeyOf(), finishedAt = f.state.now.toISOString();
+  await f.repo.saveQuery({ _id: 'previous-success', userKey, kind: 'history', status: 'success', response: { ok: true }, finishedAt });
+  await f.repo.updateUser(userKey, { taskEvidence: { view_history: { queryId: 'previous-success', dayKey: '2026-09-15', completedAt: finishedAt } } });
+  assert.deepEqual(ok(await f.call('user.bootstrap')).quota.tasksViewedToday, ['view_history']);
+  assert.equal(ok(await f.call('quota.completeTask', { taskId: 'view_history' })).granted, 1);
+  f.advance(86400000);
+  assert.deepEqual(ok(await f.call('user.bootstrap')).quota.tasksViewedToday, []);
 });
 
 test('history hour totals name their original snapshot cutoff after the page remains open', async () => {

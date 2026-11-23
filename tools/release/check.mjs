@@ -81,8 +81,13 @@ check('consumer AppID matches project and frontend', json('project.config.json')
 check('shared resource identifiers match', miniConnection.resourceEnv === connection.envId && miniConnection.resourceAppid === connection.resourceAppid && backendConnection.envId === connection.envId && backendConnection.consumerAppid === connection.consumerAppid);
 const { authorize } = require(path.join(root, 'cloudfunctions/cloudbase_auth/authorize.js'));
 check('shared auth allows configured consumer and rejects payload spoofing', authorize({ FROM_APPID: connection.consumerAppid }, {}).allowed && !authorize({}, { fromAppid: connection.consumerAppid }).allowed);
-const consumerPages = json('miniprogram/app.json').pages;
-check('consumer package opens inventory query and contains four main pages, notice board, notification test, buying guide and deadline trial', consumerPages.length === 8 && ['query', 'follow', 'history', 'mine', 'notice-board', 'notification-test', 'guide', 'deadlines'].every(name => consumerPages.includes(`pages/${name}/index`)) && consumerPages[0] === 'pages/query/index' && !fs.existsSync(path.join(root, 'miniprogram/pages/admin')));
+const consumerApp = json('miniprogram/app.json');
+const mainRoutes = ['query', 'follow', 'markets', 'mine'].map(name => `pages/${name}/index`);
+const supportingRoutes = ['history', 'notice-board', 'notification-test', 'guide', 'deadlines'].map(name => `pages/${name}/index`);
+check('consumer opens mainland query, offers three regional markets in the third tab and retains legacy deep links', consumerApp.pages[0] === mainRoutes[0]
+  && JSON.stringify(consumerApp.tabBar.list.map(tab => tab.pagePath)) === JSON.stringify(mainRoutes)
+  && consumerApp.pages.length === mainRoutes.length + supportingRoutes.length
+  && [...mainRoutes, ...supportingRoutes].every(route => consumerApp.pages.includes(route)) && !fs.existsSync(path.join(root, 'miniprogram/pages/admin')));
 const adminProject = json('tools/admin-miniprogram/project.config.json');
 const adminApp = json('tools/admin-miniprogram/miniprogram/app.json');
 check('operator project is separate and uses the existing resource AppID', adminProject.appid === connection.resourceAppid && adminProject.miniprogramRoot === 'miniprogram/' && adminProject.setting.urlCheck === true && adminApp.pages.length === 1 && adminApp.pages[0] === 'pages/admin/index');

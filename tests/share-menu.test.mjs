@@ -35,16 +35,25 @@ test('query share title reflects selected product when present', () => {
 });
 
 test('every consumer tab page exposes onShareAppMessage and onShareTimeline', () => {
-  for (const route of ['pages/query/index.js', 'pages/follow/index.js', 'pages/history/index.js', 'pages/mine/index.js']) {
+  for (const route of ['pages/query/index.js', 'pages/follow/index.js', 'pages/markets/index.js', 'pages/mine/index.js']) {
     const rt = runtime();
     const page = rt.instance(route);
     assert.equal(typeof page.onShareAppMessage, 'function', route);
     assert.equal(typeof page.onShareTimeline, 'function', route);
     const appShare = page.onShareAppMessage();
-    assert.ok(appShare && appShare.path.includes(route.includes('/follow/') ? '/pages/follow/index' : '/pages/query/index'));
+    assert.ok(appShare && appShare.path.includes(route.includes('/follow/') ? '/pages/follow/index' : route.includes('/markets/') ? '/pages/markets/index' : '/pages/query/index'));
     const timeline = page.onShareTimeline();
     assert.equal(timeline.imageUrl, share.IMAGE);
   }
+});
+
+test('legacy history shares use the current query entry and never capture the private browsing screen', () => {
+  const page = runtime().instance('pages/history/index.js');
+  const card = page.onShareAppMessage();
+  assert.match(card.path, /^\/pages\/query\/index\?/);
+  assert.doesNotMatch(card.title, /历史/);
+  assert.equal(card.imageUrl, share.IMAGE);
+  assert.equal(page.onShareTimeline, undefined);
 });
 
 test('personal home shares the generic brand card and never private deadline titles or a page screenshot', () => {
@@ -57,7 +66,7 @@ test('personal home shares the generic brand card and never private deadline tit
 test('share menus come from the page handlers, not an invalid page json key', () => {
   // Defining onShareAppMessage and onShareTimeline (tested above) shows both menu
   // items. "menus" is a wx.showShareMenu option, not a page configuration field.
-  for (const page of ['query', 'follow', 'history', 'mine']) {
+  for (const page of ['query', 'follow', 'markets', 'mine']) {
     const config = JSON.parse(fs.readFileSync(path.join(miniprogramRoot, 'pages', page, 'index.json'), 'utf8'));
     assert.equal(Object.prototype.hasOwnProperty.call(config, 'menus'), false, page);
   }

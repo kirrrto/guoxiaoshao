@@ -119,17 +119,18 @@ export function createMemoryRepo(seed = {}) {
     },
     async listEvents({ partNumber, storeNumbers, dayKey, limit }) {
       return all(COLLECTIONS.events)
-        .filter(e => e.partNumber === partNumber && e.dayKey === dayKey && (!storeNumbers || !storeNumbers.length || storeNumbers.includes(e.storeNumber)))
+        .filter(e => (e.market == null || e.market === 'CN') && e.partNumber === partNumber && e.dayKey === dayKey && (!storeNumbers || !storeNumbers.length || storeNumbers.includes(e.storeNumber)))
         .sort(byDesc('detectedAt')).slice(0, limit || 100);
     },
     async getEventHistory({ partNumber, storeNumbers, dayKey, cursor, limit = 100, snapshotAt, includeCounts = true }) {
-      const rows = all(COLLECTIONS.events).filter(e => e.partNumber === partNumber && e.dayKey === dayKey && (!storeNumbers.length || storeNumbers.includes(e.storeNumber)) && e.detectedAt <= snapshotAt).sort((a, b) => byDesc('detectedAt')(a, b) || byDesc('_id')(a, b));
+      const scoped = all(COLLECTIONS.events).filter(e => (e.market == null || e.market === 'CN') && e.partNumber === partNumber && (!storeNumbers.length || storeNumbers.includes(e.storeNumber)) && e.detectedAt <= snapshotAt);
+      const rows = scoped.filter(e => e.dayKey === dayKey).sort((a, b) => byDesc('detectedAt')(a, b) || byDesc('_id')(a, b));
       const page = rows.filter(e => !cursor || e.detectedAt < cursor.detectedAt || (e.detectedAt === cursor.detectedAt && e._id < cursor.id));
       if (!includeCounts) return { events: page.slice(0, limit), hasMore: page.length > limit, total: null, summary: null };
       const types = { first_seen_available: 'available', restock_confirmed: 'restocks', recovered_available: 'recoveries', became_unavailable: 'ended' };
       const summary = { available: 0, restocks: 0, recoveries: 0, ended: 0, lastHourRestocks: 0 };
       for (const event of rows) if (types[event.type]) summary[types[event.type]]++;
-      summary.lastHourRestocks = dayKey === beijingDayKey(snapshotAt) ? all(COLLECTIONS.events).filter(e => e.partNumber === partNumber && (!storeNumbers.length || storeNumbers.includes(e.storeNumber)) && e.type === 'restock_confirmed' && e.detectedAt <= snapshotAt && Date.parse(e.detectedAt) >= Date.parse(snapshotAt) - 3600000).length : 0;
+      summary.lastHourRestocks = dayKey === beijingDayKey(snapshotAt) ? scoped.filter(e => e.type === 'restock_confirmed' && Date.parse(e.detectedAt) >= Date.parse(snapshotAt) - 3600000).length : 0;
       return { events: page.slice(0, limit), hasMore: page.length > limit, total: rows.length, summary };
     },
     async listEventsByTargets(targetKeys, { since, limit } = {}) {
@@ -238,6 +239,7 @@ export function createMemoryRepo(seed = {}) {
       drop('subscriptionGrants', COLLECTIONS.config, doc => doc.kind === 'subscription_grant' && doc.createdAt < cutoffIso);
       drop('queryGuards', COLLECTIONS.config, doc => doc.kind === 'query_guard' && doc.updatedAt < cutoffIso);
       drop('queryTargets', COLLECTIONS.config, doc => doc.kind === 'query_target' && doc.updatedAt < cutoffIso);
+      drop('marketBudgets', COLLECTIONS.config, doc => doc.kind === 'market_budget' && doc.updatedAt < cutoffIso);
       // Same 60-day _id window as the CloudBase implementation.
       const oldestBudget = beijingDayKey(addDays(startOfDay(firstDay), -60));
       drop('budgets', COLLECTIONS.config, doc => /^collector_budget_\d{4}-\d{2}-\d{2}$/.test(doc._id) && doc._id.slice(-10) < firstDay && doc._id.slice(-10) >= oldestBudget);

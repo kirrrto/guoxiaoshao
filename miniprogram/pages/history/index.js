@@ -6,11 +6,13 @@ const { localKey } = require('../../utils/local-key');
 const { readSession, writeSession } = require('../../utils/session');
 const operation = require('../../utils/operation');
 const { startProgress, stopProgress } = require('../../utils/request-progress');
-const { syncTabBar, switchToTab, releaseTabBar } = require('../../utils/tab-bar');
-const { shareAppMessage, shareTimeline } = require('../../utils/share');
+const { switchToTab } = require('../../utils/tab-bar');
+const navigation = require('../../utils/navigation');
+const { subscribeNetwork, isOnline } = require('../../utils/network');
+const { shareAppMessage, IMAGE } = require('../../utils/share');
 const { historyInsights } = require('../../utils/observation-insights');
 const { productThumbnailUrl } = require('../../utils/product-image-fit');
-const { consumeHistoryContext, returnToSource, currentOwner } = require('../../utils/journey-context');
+const { currentOwner } = require('../../utils/journey-context');
 
 const SELECTION_KEY = 'gxs_history_selection_v1';
 const SOURCE_TEXT = { auto: '自动监测', manual: '手动查询' };
@@ -127,7 +129,6 @@ Page({
     browseExpanded: false,
     coverageExpanded: false,
     latestExpanded: false,
-    journeySource: '',
     resultTargetDifferent: false,
     dayKey: fmt.todayKey(),
     today: fmt.todayKey(),
@@ -195,22 +196,30 @@ Page({
 
   async onShow() {
     if (this.pageRetired) return;
-    syncTabBar(this, '/pages/history/index');
+    navigation.confirmNavigation('pages/history/index');
+    if (!this.unsubscribeNetwork) {
+      const update = (online, restored) => {
+        if (this.data.networkOffline !== !online) this.setData({ networkOffline: !online });
+        if (restored) this.onNetworkRestored();
+      };
+      this.unsubscribeNetwork = subscribeNetwork(update);
+      update(isOnline(), false);
+    }
     this.refreshDateWindow();
     if (!this.data.ready) return;
     this.refreshObservationSnapshot();
     try { const boot = await getBootstrap(); if (this.pageRetired) return; this.applyBoot(boot); getCatalog(); this.loadBrowse(); } catch (e) { /* keep snapshot */ }
   },
 
-  onHide() { releaseTabBar(this); },
-  onUnload() { releaseTabBar(this); stopProgress(this); this.pageRetired = true; this.taskClaimPending = null; if (this.unsubscribeCatalog) this.unsubscribeCatalog(); if (this.unsubscribeQuota) this.unsubscribeQuota(); },
+  onHide() {
+    if (this.unsubscribeNetwork) this.unsubscribeNetwork();
+    this.unsubscribeNetwork = null;
+  },
+  onUnload() { this.onHide(); stopProgress(this); this.pageRetired = true; this.taskClaimPending = null; if (this.unsubscribeCatalog) this.unsubscribeCatalog(); if (this.unsubscribeQuota) this.unsubscribeQuota(); },
 
   onShareAppMessage() {
-    return shareAppMessage('/pages/history/index', { ...this.data, selection: this.selection });
-  },
-
-  onShareTimeline() {
-    return shareTimeline('/pages/history/index', { ...this.data, selection: this.selection });
+    const card = shareAppMessage('/pages/query/index', { selection: this.selection });
+    return { ...card, imageUrl: card.imageUrl || IMAGE };
   },
 
   applyCatalog(catalog) {
@@ -284,35 +293,7 @@ Page({
       },
       collector: { ...boot.collector, ...fmt.collectorMeta(boot.collector && boot.collector.state) },
     });
-    this.consumeJourneyTarget();
   },
-
-  consumeJourneyTarget() {
-    if (!this.data.ready || !this.data.accountReady || this.data.querying || this.data.loadingMore || this.data.sheetVisible) return;
-    const intent = consumeHistoryContext();
-    if (!intent) return;
-    const target = intent.target;
-    const summary = selectionSummary(target, this.catalog);
-    if (!summary || !summary.valid) {
-      this.setData({ restoreNotice: '原配置或门店已变化，请重新核对；当前条件未改变。', restoreWarning: true });
-      return;
-    }
-    const dayKey = this.data.boot.member ? fmt.todayKey() : fmt.fmtDate(Date.now() - 86400000);
-    this.journeyOwner = intent.ownerUserKey;
-    this.journeyRequestId = intent.requestId;
-    this.dateExplicit = true;
-    this.selection = { ...target, product: this.catalog.productByPart[target.partNumber],
-      stores: target.storeNumbers.map(number => this.catalog.storeByNumber[number]) };
-    this.selectionNeedsReview = false;
-    this.restrictionReason = null;
-    this.setData({ dayKey, selectionSummary: summary, legacyQueryPending: !!this.legacyHistoryId(this.selection, dayKey), journeySource: intent.from,
-      restriction: null, queryFailureMessage: '', restoreWarning: false,
-      resultTargetDifferent: this.hasDifferentResult(this.selection, dayKey),
-      restoreNotice: `已带入${intent.from === 'follow' ? '关注' : '查询'}配置与门店，尚未查询，也未扣次。${this.data.boot.member ? '' : '默认选择昨天，可自行修改日期。'}` });
-    writeSession(localKey(SELECTION_KEY), { ...target, storeNumbers: target.storeNumbers.slice() });
-  },
-
-  onReturnJourney() { returnToSource(this.data.journeySource, this.journeyOwner || currentOwner()); },
 
   refreshDateWindow() {
     const today = fmt.todayKey(), earliestDay = fmt.retentionStartKey();
@@ -639,7 +620,7 @@ Page({
     this.onLoad();
   },
 
-  /** Called by the tab bar when the phone reconnects. */
+  /** Recover an interrupted load when this legacy page is visible. */
   onNetworkRestored() {
     if (this.pageRetired) return;
     if (this.data.loadError) return this.onRetryLoad();

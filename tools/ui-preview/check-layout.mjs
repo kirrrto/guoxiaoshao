@@ -187,6 +187,29 @@ try {
       }
       return { viewport: width, scrollWidth: document.documentElement.scrollWidth, bodyHeight: document.body.scrollHeight, overflow, clippedText, images, alternativeGeometry, alternativeLayoutErrors, calendarLayoutErrors };
     });
+    if (item.page === 'markets') {
+      metrics.marketLayoutErrors = await page.evaluate(() => {
+        const errors = [];
+        const bounds = selector => document.querySelector(selector)?.getBoundingClientRect();
+        const controls = bounds('.markets-controls'), details = bounds('.markets-details');
+        if (!controls || !details) return ['Missing market configuration or result'];
+        if (innerWidth >= 900 ? details.left < controls.right || Math.abs(controls.top - details.top) > 1 : details.top < controls.bottom - 1) {
+          errors.push('Configuration and results must stack below 900px and sit side by side above it');
+        }
+        if (document.querySelectorAll('.markets-region').length !== 3 || document.querySelectorAll('.markets-region--selected').length !== 1) {
+          errors.push('Exactly one of the three regions must be selected');
+        }
+        const thumbnail = document.querySelector('.markets-editor img');
+        if (!thumbnail || !thumbnail.src.startsWith('data:image/') || !thumbnail.complete || thumbnail.naturalWidth === 0) {
+          errors.push('The selected regional configuration must render a decoded packaged product thumbnail');
+        }
+        for (const control of document.querySelectorAll('.markets-page button, .market-field')) {
+          const rect = control.getBoundingClientRect();
+          if (rect.width < 43.99 || rect.height < 43.99) errors.push('Undersized control: ' + control.textContent.trim());
+        }
+        return errors;
+      });
+    }
     if (item.page === 'admin') {
       metrics.operatorControlErrors = await page.evaluate(saving => {
         const errors = [];
@@ -393,6 +416,10 @@ try {
 } finally { await context.close(); await browser.close(); }
 verifyPreviewSources();
 report.summary = { total: report.snapshots.length, indexNavigationFailures: report.indexNavigation.invalidTargets.length + report.indexNavigation.missingTargets.length, expressionErrors: manifest.expressionErrors || 0, missingText: report.snapshots.filter(x => x.missingText.length).length, forbiddenText: report.snapshots.filter(x => x.forbiddenTextFound.length).length, horizontalOverflow: report.snapshots.filter(x => x.scrollWidth > x.width + 1 || x.overflow.length).length, clippedText: report.snapshots.filter(x => x.clippedText.length).length, failedImages: report.snapshots.flatMap(x => x.images).filter(x => !x.loaded).length, alternativeLayoutFailures: report.snapshots.filter(x => x.alternativeLayoutErrors.length).length, calendarLayoutFailures: report.snapshots.filter(x => x.calendarLayoutErrors.length).length, membershipLayoutFailures: report.snapshots.filter(x => x.membershipLayoutErrors.length).length, notificationLayoutFailures: report.snapshots.filter(x => x.notificationLayoutErrors.length).length, v3LayoutFailures: report.snapshots.filter(x => x.v3LayoutErrors.length).length, stockLayoutFailures: report.snapshots.filter(x => x.stockLayoutErrors.length).length, followFontFailures: report.snapshots.filter(x => x.followFontErrors.length).length, deadlineLayoutFailures: report.snapshots.filter(x => x.deadlineLayoutErrors.length).length, configurationLayoutFailures: report.snapshots.filter(x => x.configurationLayoutErrors.length).length };
+if (report.snapshots.some(item => item.page === 'markets')) {
+  report.summary.marketLayoutFailures = report.snapshots.filter(item => item.marketLayoutErrors?.length).length;
+  if (report.summary.marketLayoutFailures) process.exitCode = 1;
+}
 if (report.snapshots.some(item => item.page === 'admin')) {
   report.summary.operatorControlFailures = report.snapshots.filter(item => item.operatorControlErrors.length).length;
   if (report.summary.operatorControlFailures) process.exitCode = 1;

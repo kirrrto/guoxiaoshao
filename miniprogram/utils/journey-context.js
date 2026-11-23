@@ -1,10 +1,8 @@
 const navigation = require('./navigation');
-const { isPublicTargetIdentity } = require('./product-capabilities');
 // Short-lived navigation intents only. Never store payments, balances or consent here.
 const MAX_AGE = 10 * 60 * 1000;
 const SOURCES = ['query', 'follow', 'mine', 'guide', 'history'];
 const REQUEST_ID = /^[A-Za-z0-9_-]{8,64}$/;
-let historyIntent = null;
 let testReturn = null;
 let testReturnGeneration = 0;
 
@@ -18,22 +16,6 @@ function sourceOf(value, fallback = 'mine') { return SOURCES.includes(value) ? v
 function validIntent(value, owner = currentOwner()) {
   return Boolean(value && value.version === 1 && owner && value.ownerUserKey === owner
     && Number.isFinite(value.createdAt) && Date.now() >= value.createdAt && Date.now() - value.createdAt <= MAX_AGE);
-}
-function stageHistoryContext({ from, target, requestId } = {}) {
-  const ownerUserKey = currentOwner();
-  if (!ownerUserKey || !['query', 'follow'].includes(from) || !target
-    || !isPublicTargetIdentity(target.partNumber)
-    || !Array.isArray(target.storeNumbers) || target.storeNumbers.length > 10
-    || target.storeNumbers.some(number => typeof number !== 'string' || !/^R\d{3}$/.test(number))
-    || new Set(target.storeNumbers).size !== target.storeNumbers.length) return false;
-  historyIntent = { version: 1, ownerUserKey, createdAt: Date.now(), from,
-    target: { partNumber: target.partNumber, storeNumbers: target.storeNumbers.slice() },
-    requestId: REQUEST_ID.test(requestId || '') ? requestId : null };
-  return true;
-}
-function consumeHistoryContext() {
-  const value = historyIntent; historyIntent = null;
-  return validIntent(value) ? value : null;
 }
 function stageTestReturn({ from, requestId, ownerUserKey } = {}) {
   if (!ownerUserKey || currentOwner() && currentOwner() !== ownerUserKey) return false;
@@ -61,6 +43,13 @@ function returnToSource(from, ownerUserKey) {
   if (navigation.isNavigating()) return false;
   let source = sourceOf(from);
   if (ownerUserKey && currentOwner() && ownerUserKey !== currentOwner()) source = 'mine';
+  if (source === 'history') {
+    const pages = typeof getCurrentPages === 'function' ? getCurrentPages() : [];
+    if (pages.length > 1 && pages[pages.length - 2].route === 'pages/history/index') {
+      navigation.navigateBack({ delta: 1 }); return;
+    }
+    navigation.navigateTo({ url: '/pages/history/index' }); return;
+  }
   if (source === 'guide') {
     const pages = typeof getCurrentPages === 'function' ? getCurrentPages() : [];
     const previous = pages[pages.length - 2];
@@ -72,5 +61,5 @@ function returnToSource(from, ownerUserKey) {
   if (source === 'mine') getApp().globalData.pendingMineSection = 'reminder-center';
   navigation.switchTab({ url: `/pages/${source}/index` });
 }
-module.exports = { sourceOf, currentOwner, stageHistoryContext, consumeHistoryContext,
+module.exports = { sourceOf, currentOwner,
   stageTestReturn, peekTestReturn, peekTestReturnUrl, consumeTestReturnUrl, returnToSource };

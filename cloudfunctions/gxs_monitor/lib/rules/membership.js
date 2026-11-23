@@ -101,7 +101,7 @@ function validateFollowLimits(follows, candidate, maxFollows = LIMITS.maxFollows
   if (stores.length === 0) return { ok: false, reason: 'no_stores' };
   if (stores.length > maxStores) return { ok: false, reason: 'too_many_stores' };
   if (!candidate.partNumber) return { ok: false, reason: 'no_part_number' };
-  if (follows.some(follow => follow.partNumber === candidate.partNumber)) return { ok: false, reason: 'duplicate_part_number' };
+  if (follows.some(follow => (follow.market || 'CN') === (candidate.market || 'CN') && follow.partNumber === candidate.partNumber)) return { ok: false, reason: 'duplicate_part_number' };
   if (follows.length >= maxFollows) return { ok: false, reason: 'too_many_follows' };
   return { ok: true, reason: null, storeNumbers: stores };
 }

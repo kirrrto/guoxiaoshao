@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import { runtime } from './helpers/miniprogram-runtime.mjs';
 import { nativeTabBar } from './helpers/native-tab-bar.mjs';
 
-const routes = ['pages/query/index', 'pages/follow/index', 'pages/history/index', 'pages/mine/index'];
+const routes = ['pages/query/index', 'pages/follow/index', 'pages/markets/index', 'pages/mine/index'];
 function navigationRuntime(initialRoute = routes[0], options = {}) {
   const stack = [{ route: initialRoute }], switches = [];
   const rt = runtime(undefined, { getCurrentPages: () => stack });
@@ -20,7 +20,9 @@ test('the four routes and themed icons are registered with the native tab bar on
   assert.notEqual(app.tabBar.custom, true);
   assert.equal(app.pages[0], 'pages/query/index', 'normal launch opens inventory query');
   assert.deepEqual(app.tabBar.list.map(tab => tab.pagePath), routes);
-  assert.deepEqual(app.tabBar.list.map(tab => tab.text), ['查询', '小哨', '历史', '我的']);
+  assert.deepEqual(app.tabBar.list.map(tab => tab.text), ['查询', '小哨', '其他站点', '我的']);
+  const sitemap = JSON.parse(fs.readFileSync(new URL('../miniprogram/' + app.sitemapLocation, import.meta.url)));
+  assert.deepEqual(sitemap.rules.find(rule => ['*', 'pages/history/index'].includes(rule.page)), { action: 'disallow', page: 'pages/history/index' });
   const h = navigationRuntime();
   h.stack.length = 0;
   assert.equal(h.tabs.getCurrentTabPath(), '/pages/query/index', 'fallback selection agrees with normal launch');
@@ -36,7 +38,11 @@ test('each cold tab confirms its route without loading or hiding the native bar'
     const h = navigationRuntime(routes[index]);
     const page = h.rt.instance(`${routes[index]}.js`);
     h.stack.splice(0, 1, { ...page, route: routes[index] });
-    assert.equal(page.data.ready, false);
+    if (index === 2) {
+      page.onLoad();
+      // This page obtains its market catalog independently of native navigation.
+      page.refresh = () => {};
+    } else assert.equal(page.data.ready, false);
     await page.onShow();
     h.stack.length = 0;
     assert.equal(h.tabs.getCurrentTabPath(), `/${routes[index]}`);
@@ -92,7 +98,7 @@ test('real page navigation retains intent and caller failure cleanup while suppr
 
 test('explicit programmatic navigation retains success and completion callbacks', () => {
   const h = navigationRuntime(), page = h.makePage(), seen = []; h.show(page);
-  assert.equal(h.tabs.switchToTab({ url: '/pages/history/index', success: result => seen.push(['success', result]),
+  assert.equal(h.tabs.switchToTab({ url: '/pages/markets/index', success: result => seen.push(['success', result]),
     complete: result => seen.push(['complete', result]) }), true);
   const result = { errMsg: 'switchTab:ok' };
   h.switches[0].success(result); h.switches[0].complete(result);

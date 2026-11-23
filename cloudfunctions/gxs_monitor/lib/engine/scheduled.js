@@ -68,11 +68,13 @@ async function runScheduled({ repo, fetchImpl, sendImpl, clock = () => new Date(
     refreshEveryMs: 60000, statusEveryMs: 5000, shouldContinue, remainingMs: () => Math.max(0, deadline - clock().getTime()) });
   if (!await collector.lease.acquire()) return { state: 'standby', scanned: 0 };
   let failed = false;
+  let regionalWork;
   try {
     const previous = await repo.getCollectorStatus();
     await collector.refreshTargets();
     if (previous && previous.mode === 'scheduled') {
       collector.scheduler.restore(previous.scheduler, previous.intervalMs);
+      collector.marketMonitor.restore(previous.markets);
       const current = collector.currentConfig().collector;
       if (current.budgetMode === 'continuous') {
         const oldBudget = previous.budget || {};
@@ -100,6 +102,9 @@ async function runScheduled({ repo, fetchImpl, sendImpl, clock = () => new Date(
       collector.stats.availabilityCursor = previous.stats && previous.stats.availabilityCursor || null;
       collector.stats.notificationEventCursor = previous.stats && previous.stats.notificationEventCursor || null;
     }
+    // Start regional work independently. Slow overseas stores cannot hold up
+    // mainland scheduling waves or borrow their admission budget.
+    regionalWork = collector.marketMonitor.scan().then(() => null, error => error);
     const snap = collector.scheduler.snapshot();
     // Same-store SKU batches cannot occupy concurrent slots. Allow one wave
     // per group and wait briefly for store spacing so later batches are still
@@ -134,7 +139,12 @@ async function runScheduled({ repo, fetchImpl, sendImpl, clock = () => new Date(
     }
     // Pending events are read from the durable outbox on every invocation,
     // including when no target is due or all user follows have been paused.
+    const regionalError = await regionalWork;
+    if (regionalError) throw regionalError;
     if (shouldContinue()) await collector.drainNotifications();
+    // A manual query can create a restock between timer runs. Planning may
+    // discover it after the regular regional scan has already finished.
+    if (shouldContinue() && await collector.marketMonitor.scan({ confirmationsOnly: true })) await collector.drainNotifications();
     // Once per Beijing day: purge expired history inside this lease and time budget.
     if (shouldContinue() && collector.lease.isHeld() && await collector.lease.renew()) {
       await runRetentionIfDue({ repo, now: clock(), log, remainingMs: () => Math.max(0, deadline - clock().getTime()) });
@@ -147,7 +157,10 @@ async function runScheduled({ repo, fetchImpl, sendImpl, clock = () => new Date(
     failed = true;
     throw error;
   } finally {
+    collector.marketMonitor.pause();
     collector.scheduler.pause();
+    await regionalWork;
+    await collector.marketMonitor.drain();
     await collector.scheduler.drain();
     // Inventory and the single notification chain may overlap. Stop new
     // delivery work, then let an already-started bounded send settle before

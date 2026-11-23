@@ -7,7 +7,7 @@ const { CAPACITY_ID, AUTO_SHARE, reserveCapacity } = require('../engine/capacity
 
 const accountId = userKey => `query_guard_${createHash('sha256').update(userKey).digest('hex')}`;
 async function reserveAccountQuery(tx, { record, ownerId, nowIso, leaseMs, config }) {
-  if (record.kind !== 'live') return null;
+  if (record.kind !== 'live' && record.kind !== 'market') return null;
   const now = Date.parse(nowIso);
   const id = accountId(record.userKey);
   const stored = await tx.get(C.config, id) || { _id: id };
@@ -22,7 +22,7 @@ async function reserveAccountQuery(tx, { record, ownerId, nowIso, leaseMs, confi
   return null;
 }
 async function releaseAccountQuery(tx, record, ownerId, nowIso) {
-  if (record.kind !== 'live') return;
+  if (record.kind !== 'live' && record.kind !== 'market') return;
   const id = accountId(record.userKey);
   const stored = await tx.get(C.config, id);
   if (stored) await tx.put(C.config, { ...stored, active: (stored.active || []).filter(item => !(item.id === record._id && item.ownerId === ownerId) && item.expiresAt > nowIso), updatedAt: nowIso });
@@ -44,33 +44,51 @@ function upstreamGuardMethods(run, { readUpstreamBreaker } = {}) {
       collector: await tx.get(C.config, 'collector_status'),
     })),
     // Legacy method name retained; this is now the shared manual + auto budget.
-    consumeCollectorBudget: ({ now, maxRequestsPerMinute, maxRequestsPerDay, budgetMode = 'continuous', source = 'manual', autoShare = AUTO_SHARE }) => run(async tx => {
+    consumeCollectorBudget: ({ now, maxRequestsPerMinute, maxRequestsPerDay, budgetMode = 'continuous', source = 'manual', autoShare = AUTO_SHARE, market = null }) => run(async tx => {
       source = source === 'auto' ? 'auto' : 'manual';
       const nowMs = Date.parse(now);
-      const breaker = await tx.get(C.config, 'upstream_breaker') || { _id: 'upstream_breaker', generation: 0, trips: 0 };
+      const prefix = market ? 'market_' + market + '_' : '';
+      let marketMonitoringEnabled = false;
+      // Regional rollouts can be stopped while a timer or manual request is
+      // waiting for admission. Check the authoritative flags before reserving.
+      if (market) {
+        const runtime = await tx.get(C.config, 'runtime');
+        marketMonitoringEnabled = runtime?.collector?.enabled === true && runtime?.internationalMonitoring?.[market] === true;
+        const enabled = source === 'auto' ? marketMonitoringEnabled : runtime?.internationalMarkets?.[market] === true;
+        if (!enabled) return { allowed: false, reason: 'market_disabled', retryAt: 0 };
+      }
+      const breakerId = prefix + 'upstream_breaker';
+      const breaker = await tx.get(C.config, breakerId) || { _id: breakerId, generation: 0, trips: 0 };
       if (breaker.until > nowMs) return { allowed: false, reason: 'upstream_paused', retryAt: breaker.until };
       if (breaker.probeUntil > nowMs) return { allowed: false, reason: 'upstream_paused', retryAt: breaker.probeUntil };
       const date = dayKey(now);
-      const id = `collector_budget_${date}`;
+      const id = prefix + `collector_budget_${date}`;
       const minuteKey = new Date(now).toISOString().slice(0, 16);
       const current = await tx.get(C.config, id) || { _id: id, dayCount: 0 };
       const minuteCount = current.minuteKey === minuteKey ? current.minuteCount || 0 : 0;
       const sourceCounts = { auto: current.autoCount || 0, manual: current.manualCount || 0 };
+      const minuteManual = current.minuteKey === minuteKey ? current.minuteManual || 0 : 0;
       let detail = { budgetMode, source, sourceCounts };
       if (budgetMode === 'daily') {
         // Explicit compatibility/cost-control mode. This is the only mode that
         // can stop all queries until the next Beijing calendar day.
         const autoLimit = Math.max(1, Math.floor(maxRequestsPerDay * autoShare));
-        if (source === 'auto' && current.dayCount >= autoLimit && current.dayCount < maxRequestsPerDay) {
+        if (marketMonitoringEnabled && source === 'manual') {
+          if (sourceCounts.manual >= maxRequestsPerDay - autoLimit) return { allowed: false, reason: 'daily_budget', retryAt: endOfDay(date).getTime(), ...detail };
+          const manualMinuteLimit = Math.max(1, maxRequestsPerMinute - Math.floor(maxRequestsPerMinute * autoShare));
+          if (minuteManual >= manualMinuteLimit) return { allowed: false, reason: 'minute_budget', retryAt: Math.floor(nowMs / 60000) * 60000 + 60000, ...detail };
+        }
+        const autoSpent = market ? sourceCounts.auto : current.dayCount;
+        if (source === 'auto' && autoSpent >= autoLimit && current.dayCount < maxRequestsPerDay) {
           return { allowed: false, reason: 'auto_budget_reserved', retryAt: endOfDay(date).getTime(), minuteCount, dayCount: current.dayCount, ...detail };
         }
         if (current.dayCount >= maxRequestsPerDay) {
           return { allowed: false, reason: 'daily_budget', retryAt: endOfDay(date).getTime(), minuteCount, dayCount: current.dayCount, ...detail };
         }
       } else {
-        const capacity = reserveCapacity(await tx.get(C.config, CAPACITY_ID), { nowMs, maxRequestsPerMinute, maxRequestsPerDay, source, autoShare,
+        const capacity = reserveCapacity(await tx.get(C.config, prefix + CAPACITY_ID), { nowMs, maxRequestsPerMinute, maxRequestsPerDay, source, autoShare,
           legacyDayCount: current.dayCount, consume: minuteCount < maxRequestsPerMinute });
-        await tx.put(C.config, capacity.state);
+        await tx.put(C.config, { ...capacity.state, _id: prefix + CAPACITY_ID });
         detail = { ...capacity.detail, sourceCounts };
         if (!capacity.allowed && minuteCount < maxRequestsPerMinute) {
           return { allowed: false, reason: 'capacity_wait', retryAt: capacity.retryAt, minuteCount, dayCount: current.dayCount, ...detail };
@@ -79,15 +97,16 @@ function upstreamGuardMethods(run, { readUpstreamBreaker } = {}) {
       if (minuteCount >= maxRequestsPerMinute) {
         return { allowed: false, reason: 'minute_budget', retryAt: Math.floor(nowMs / 60000) * 60000 + 60000, minuteCount, dayCount: current.dayCount, ...detail };
       }
-      const token = { id: randomUUID(), generation: breaker.generation || 0, probe: Boolean(breaker.until), expiresAt: nowMs + 30000 };
+      const token = { id: randomUUID(), ...(market ? { market } : {}), generation: breaker.generation || 0, probe: Boolean(breaker.until), expiresAt: nowMs + 30000 };
       if (token.probe) await tx.put(C.config, { ...breaker, probeId: token.id, probeUntil: nowMs + 30000, updatedAt: now });
       sourceCounts[source] += 1;
-      await tx.put(C.config, { ...current, minuteKey, minuteCount: minuteCount + 1, dayCount: current.dayCount + 1,
+      await tx.put(C.config, { ...current, ...(market ? { market, kind: 'market_budget', minuteManual: minuteManual + (source === 'manual' ? 1 : 0) } : {}), minuteKey, minuteCount: minuteCount + 1, dayCount: current.dayCount + 1,
         autoCount: sourceCounts.auto, manualCount: sourceCounts.manual, updatedAt: now, expiresAt: new Date(nowMs + 7 * 86400000).toISOString() });
       return { allowed: true, reason: null, minuteCount: minuteCount + 1, dayCount: current.dayCount + 1, ...detail, token };
     }),
     recordUpstreamOutcome: async ({ token, record, success, now }) => {
-      if (readUpstreamBreaker && success === true && token && token.probe === false) {
+      const breakerId = token && token.market ? 'market_' + token.market + '_upstream_breaker' : 'upstream_breaker';
+      if (readUpstreamBreaker && success === true && token && token.probe === false && !token.market) {
         const snapshot = await readUpstreamBreaker();
         // A normal success has nothing to mutate in an already clean generation.
         // Never create a default generation from an absent/malformed snapshot.
@@ -99,7 +118,7 @@ function upstreamGuardMethods(run, { readUpstreamBreaker } = {}) {
         }
       }
       return run(async tx => {
-        const state = await tx.get(C.config, 'upstream_breaker') || { _id: 'upstream_breaker', generation: 0, trips: 0 };
+        const state = await tx.get(C.config, breakerId) || { _id: breakerId, generation: 0, trips: 0 };
         const nowMs = Date.parse(now);
         const ownsProbe = token && token.probe && state.probeId === token.id && token.generation === state.generation && state.probeUntil > nowMs;
         if (success) {
@@ -114,7 +133,7 @@ function upstreamGuardMethods(run, { readUpstreamBreaker } = {}) {
           return { paused: Boolean(state.until && !ownsProbe) };
         }
         const failures = (state.failures || []).filter(at => at > nowMs - 60000).concat(nowMs).slice(-5);
-        const immediate = record.httpStatus === 429 || record.httpStatus === 503;
+        const immediate = record.httpStatus === 429 || record.httpStatus === 503 || Boolean(token && token.market && record.httpStatus === 541);
         if (!immediate && !ownsProbe && failures.length < 5) {
           await tx.put(C.config, { ...state, failures, updatedAt: now });
           return { paused: Boolean(state.until), retryAt: state.until || null };
@@ -122,7 +141,7 @@ function upstreamGuardMethods(run, { readUpstreamBreaker } = {}) {
         const trips = (state.trips || 0) + 1;
         const cooldown = Math.max(retryAfterMs(record.retryAfter, nowMs), Math.min(1800000, 30000 * 2 ** Math.min(trips - 1, 6)));
         const until = Math.max(state.until || 0, nowMs + cooldown);
-        await tx.put(C.config, { _id: 'upstream_breaker', generation: (state.generation || 0) + 1, trips, until, reason: immediate ? `http_${record.httpStatus}` : 'failure_burst', failures: [], probeId: null, probeUntil: null, updatedAt: now });
+        await tx.put(C.config, { _id: breakerId, generation: (state.generation || 0) + 1, trips, until, reason: immediate ? `http_${record.httpStatus}` : 'failure_burst', failures: [], probeId: null, probeUntil: null, updatedAt: now });
         return { paused: true, retryAt: until };
       });
     },

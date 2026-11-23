@@ -149,3 +149,30 @@ test('retained HTTP and decode evidence covers every unique URL and every SKU in
   assert.ok(manifest.galleries.every(g => g.matched && g.httpStatus === 200));
   assert.deepEqual(new Set(manifest.sources.map(s => s.familyKey)), new Set(catalog.families.map(f => f.familyKey)));
 });
+
+test('each regional SKU uses the exact existing mainland thumbnail for its model and finish, independently of storage and language', () => {
+  const { MARKETS } = require('../cloudfunctions/gxs_api/lib/markets.js');
+  const { selections } = require('../miniprogram/pages/markets/presentation.js');
+  const { withImageFit } = require('../miniprogram/utils/product-image-fit.js');
+  const expected = new Map();
+  for (const product of catalog.products.filter(p => p.familyKey === 'iphone-18-pro')) {
+    const key = product.model + '|' + product.attributes.color;
+    const url = withImageFit(product).imageDisplayUrl;
+    assert.match(url, /^\/images\/products\//);
+    if (expected.has(key)) assert.equal(url, expected.get(key), key);
+    expected.set(key, url);
+  }
+  assert.equal(expected.size, 8);
+  assert.equal(new Set(expected.values()).size, 8, 'each appearance has its own thumbnail');
+  for (const market of MARKETS) {
+    for (const lang of ['zh-CN', 'en']) {
+      const { products } = selections(market, lang);
+      assert.equal(products.length, 32);
+      for (const view of products) {
+        const image = expected.get(view.model + '|' + view.color);
+        assert.ok(image);
+        assert.equal(view.imageDisplayUrl, image, market.code + '/' + view.id + '/' + lang);
+      }
+    }
+  }
+});

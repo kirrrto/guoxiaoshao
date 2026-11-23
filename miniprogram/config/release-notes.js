@@ -8,6 +8,15 @@
 // Keep technical details and complete acceptance records in release documents.
 const RELEASE_NOTES = [
   {
+    version: '3.8.0',
+    title: '其他站点',
+    dateText: '版本记录 · 2026-11-23',
+    highlights: [
+      '在底栏「其他站点」选择日本、台湾或香港，查询当地直营店的取货情况。',
+      '可关注当地配置与门店，并在站点开放提醒后订阅微信到货通知。',
+    ],
+  },
+  {
     version: '3.7.3',
     title: '宽窗口双栏',
     dateText: '版本记录 · 2026-11-23',

@@ -147,7 +147,7 @@ function createScheduler(options) {
   }
 
   function dueAt(entry, nowMs) {
-    const earliest = Math.max(entry.nextDueAt, entry.guardUntil || 0, admissionUntil, storeDueAt(entry));
+    const earliest = Math.max(Math.min(entry.nextDueAt, confirmationDueAt(entry, nowMs)), entry.guardUntil || 0, admissionUntil, storeDueAt(entry));
     if (!entry.available || !opts.availableIntervalMs || !Number.isFinite(entry.availableRequestAt)) return earliest;
     // A fixed phase or another SKU's shorter store spacing cannot shorten
     // this group's interval. A change burst may, if still active at dispatch.
@@ -160,12 +160,34 @@ function createScheduler(options) {
     return Math.max(earliest, requested + normalOrAvailable);
   }
 
-  function configure({ intervalMs, maxConcurrency, timeoutMs, burstIntervalMs, burstQuietMs, availableIntervalMs, fixedCadence } = {}) {
+  // One slot per request group. A sample for that group covers every SKU in
+  // it; rereading the same durable event cannot grant another priority slot.
+  function confirmationDueAt(entry, nowMs) {
+    const c = entry.confirmation;
+    return c && opts.confirmationMaxAgeMs > 0 && !entry.failures
+      && nowMs < Math.min(c.expiresAt, c.detectedAt + opts.confirmationMaxAgeMs) ? c.dueAt : Infinity;
+  }
+
+  function scheduleConfirmation(storeNumber, partNumber, detectedAt, dueAtMs, expiresAt) {
+    const nowMs = clock().getTime();
+    if (!(opts.confirmationMaxAgeMs > 0 && Number.isFinite(detectedAt) && detectedAt <= nowMs
+      && Number.isFinite(dueAtMs) && dueAtMs > detectedAt && Number.isFinite(expiresAt)
+      && Math.max(nowMs, dueAtMs) < Math.min(expiresAt, detectedAt + opts.confirmationMaxAgeMs))) return;
+    for (const entry of groups.values()) {
+      if (entry.group.storeNumber !== storeNumber || !entry.group.partNumbers.includes(partNumber)) continue;
+      if (entry.failures || entry.health.lastRequestAt > detectedAt || entry.confirmationAttemptedAt > detectedAt) return;
+      if (confirmationDueAt(entry, nowMs) > dueAtMs) entry.confirmation = { detectedAt, dueAt: dueAtMs, expiresAt };
+      return;
+    }
+  }
+
+  function configure({ intervalMs, maxConcurrency, timeoutMs, burstIntervalMs, burstQuietMs, availableIntervalMs, fixedCadence, confirmationMaxAgeMs } = {}) {
     const cadenceChanged = (intervalMs !== undefined && intervalMs !== opts.intervalMs)
       || (availableIntervalMs !== undefined && availableIntervalMs !== opts.availableIntervalMs)
       || (burstIntervalMs !== undefined && burstIntervalMs !== opts.burstIntervalMs)
       || (fixedCadence !== undefined && Boolean(fixedCadence) !== Boolean(opts.fixedCadence));
     if (fixedCadence !== undefined) opts.fixedCadence = Boolean(fixedCadence);
+    if (confirmationMaxAgeMs !== undefined) opts.confirmationMaxAgeMs = confirmationMaxAgeMs;
     if (availableIntervalMs !== undefined) {
       if (!Number.isSafeInteger(availableIntervalMs) || availableIntervalMs < 0 || availableIntervalMs > 60000 || (availableIntervalMs > 0 && availableIntervalMs < 1000)) throw new TypeError('invalid available interval');
       opts.availableIntervalMs = availableIntervalMs;
@@ -269,8 +291,15 @@ function createScheduler(options) {
   async function dispatch(entry, nowMs) {
     const { group, health } = entry;
     entry.inFlight = true;
+    const confirmationDue = confirmationDueAt(entry, nowMs);
+    const extraCheck = confirmationDue <= nowMs && entry.nextDueAt > nowMs;
+    const normalDueAt = entry.nextDueAt;
+    if (entry.confirmation && nowMs > entry.confirmation.detectedAt) {
+      entry.confirmationAttemptedAt = nowMs;
+      entry.confirmation = null;
+    }
     // Until the transport reports its start, the tick is our best estimate.
-    entry.plannedAt = Number.isFinite(entry.nextDueAt) ? entry.nextDueAt : nowMs;
+    entry.plannedAt = Math.min(Number.isFinite(entry.nextDueAt) ? entry.nextDueAt : nowMs, confirmationDue);
     entry.scheduleDelayMs = Math.max(0, nowMs - entry.plannedAt);
     const wasProbe = breaker.state === 'half_open';
     const generation = breaker.trips;
@@ -288,7 +317,7 @@ function createScheduler(options) {
       const reason = record.error && record.error.message || null;
       // Cancellation happens before HTTP starts. Keep the unserved slot and
       // its queue priority; the guard alone prevents an immediate retry.
-      if (reason !== 'request_cancelled') entry.nextDueAt = retryAt;
+      if (reason !== 'request_cancelled' && !extraCheck) entry.nextDueAt = retryAt;
       entry.guardUntil = retryAt;
       entry.guardReason = reason;
       // The automatic lane is shared by every store. Once it is exhausted,
@@ -368,6 +397,7 @@ function createScheduler(options) {
       entry.nextDueAt = clock().getTime() + backoffMs(entry.failures);
       if (log) log.error('[scheduler] onBatch failed', error && error.message);
     } finally {
+      if (extraCheck && entry.failures) entry.nextDueAt = Math.max(normalDueAt, entry.nextDueAt);
       entry.inFlight = false;
     }
   }
@@ -399,7 +429,7 @@ function createScheduler(options) {
   }
 
   /** Dispatch every due group within the concurrency cap. Returns the in-flight promises started by this tick. */
-  function tick() {
+  function tick({ confirmationsOnly = false } = {}) {
     const nowMs = clock().getTime();
     if (paused || admissionUntil > nowMs) return [];
     admissionUntil = 0;
@@ -407,7 +437,9 @@ function createScheduler(options) {
     const inFlight = pending.size;
     let slots = Math.max(0, opts.maxConcurrency - inFlight);
     const started = [];
-    const due = [...groups.values()].filter(e => !e.inFlight && dueAt(e, nowMs) <= nowMs).sort((a, b) => a.nextDueAt - b.nextDueAt || a.group.key.localeCompare(b.group.key));
+    const priorityAt = e => confirmationDueAt(e, nowMs) <= nowMs ? e.confirmation.expiresAt : Infinity;
+    const due = [...groups.values()].filter(e => !e.inFlight && dueAt(e, nowMs) <= nowMs && (!confirmationsOnly || confirmationDueAt(e, nowMs) <= nowMs))
+      .sort((a, b) => priorityAt(a) - priorityAt(b) || a.nextDueAt - b.nextDueAt || a.group.key.localeCompare(b.group.key));
     for (const entry of due) {
       if (slots <= 0) break;
       // A store may have multiple SKU batches or a changed group key after a
@@ -450,7 +482,16 @@ function createScheduler(options) {
   // starts. Otherwise each minute would bypass Retry-After and start again at
   // the first target, starving later stores when a scan reaches its deadline.
   function checkpoint() {
-    return { version: 1, intervalMs: opts.intervalMs, breaker: { ...breaker, failures: [...breaker.failures], probeInFlight: false }, admissionUntil, admissionReason, storeLastRequestAt: [...storeLastRequestAt], targets: [...groups.values()].map(e => ({ key: e.group.key, trackedAt: e.trackedAt, nextDueAt: e.nextDueAt, guardUntil: e.guardUntil || 0, guardReason: e.guardReason || null, failures: e.failures, burstUntil: e.burstUntil || 0, available: e.available, availableObservedAt: e.availableObservedAt, availableRequestAt: e.availableRequestAt, health: e.health })) };
+    const targets = [...groups.values()].map(e => ({
+      key: e.group.key, trackedAt: e.trackedAt, nextDueAt: e.nextDueAt,
+      guardUntil: e.guardUntil || 0, guardReason: e.guardReason || null, failures: e.failures,
+      burstUntil: e.burstUntil || 0, available: e.available, availableObservedAt: e.availableObservedAt,
+      availableRequestAt: e.availableRequestAt, health: e.health,
+      ...(e.confirmation ? { confirmation: e.confirmation } : {}),
+      ...(e.confirmationAttemptedAt ? { confirmationAttemptedAt: e.confirmationAttemptedAt } : {}),
+    }));
+    return { version: 1, intervalMs: opts.intervalMs, breaker: { ...breaker, failures: [...breaker.failures], probeInFlight: false },
+      admissionUntil, admissionReason, storeLastRequestAt: [...storeLastRequestAt], targets };
   }
 
   function restore(saved, previousIntervalMs) {
@@ -479,6 +520,12 @@ function createScheduler(options) {
       entry.trackedAt = pastTimestamp(item.trackedAt)
         ?? pastTimestamp(item.health && item.health.lastRequestAt, entry.trackedAt);
       entry.nextDueAt = item.nextDueAt;
+      entry.confirmationAttemptedAt = pastTimestamp(item.confirmationAttemptedAt);
+      const c = item.confirmation;
+      if (opts.confirmationMaxAgeMs > 0 && c && Number.isFinite(c.detectedAt) && c.detectedAt <= restoredAt
+        && Number.isFinite(c.dueAt) && c.dueAt > c.detectedAt && Number.isFinite(c.expiresAt)
+        && Math.max(restoredAt, c.dueAt) < Math.min(c.expiresAt, c.detectedAt + opts.confirmationMaxAgeMs)
+        && !(entry.confirmationAttemptedAt > c.detectedAt)) entry.confirmation = c;
       entry.plannedAt = Number.isFinite(item.plannedAt) ? item.plannedAt : null;
       entry.guardUntil = Number.isFinite(item.guardUntil) ? item.guardUntil : 0;
       entry.guardReason = typeof item.guardReason === 'string' ? item.guardReason : null;
@@ -558,6 +605,7 @@ function createScheduler(options) {
     drain: () => Promise.allSettled([...pending]),
     tick,
     hurry,
+    scheduleConfirmation,
     bursting,
     snapshot,
     checkpoint,

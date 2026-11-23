@@ -193,7 +193,7 @@ Page({
   },
   onStart() {
     if (this.retired || !this.visible || this.data.busy || this.data.loading || !this.data.ready || this.data.blocked || this.data.canContinue || this.data.pendingOther) return Promise.resolve();
-    if (this.data.balance < 1) { showError(Error('测试需要 1 次额度，请先到「我的」签到或完成任务。')); return Promise.resolve(); }
+    if (this.data.balance < 1) { showError(Error('测试需要 1 次额度，请到「我的」查看签到和余额。')); return Promise.resolve(); }
     this.setData({ busy: true, error: null, checkNote: '', operationNote: '请在微信提示中确认授权…' });
     this.pendingStage = 'authorize';
     const context = this.accountContext();
