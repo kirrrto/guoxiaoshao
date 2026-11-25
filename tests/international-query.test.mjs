@@ -38,6 +38,32 @@ test('each region unlocks credits at local midnight on day 31 and ignores mainla
   }
 });
 
+test('US public pickup checks the selected store midnight before spending a credit or fetching', async () => {
+  for (const [storeNumber, endsAt] of [['R102', '2026-10-18T04:00:00.000Z'], ['R073', '2026-10-18T10:00:00.000Z']]) {
+    const fetchImpl = fakeFetch({ [storeNumber]: { display: 'available' } });
+    const f = createFixture({ config: { internationalMarkets: enabled }, start: new Date(Date.parse(endsAt) - 1).toISOString(), fetchImpl });
+    ok(await f.call('quota.signin'));
+    const request = { ...payload('US'), storeNumbers: [storeNumber] };
+    const before = ok(await f.call('market.pickup', request));
+    assert.deepEqual([before.reason, before.restrictionEndsAt, before.balance, fetchImpl.calls.length], ['new_product_restricted', endsAt, 1, 0]);
+    f.advance(1);
+    const after = ok(await f.call('market.pickup', request));
+    assert.deepEqual([after.ok, after.charged, after.balance, fetchImpl.calls.length], [true, 1, 0, 1]);
+    assert.equal(ok(await f.call('market.pickup', request)).replayed, true);
+  }
+});
+
+test('catalog opening dates keep the east-coast midnight offset on US clock change days', () => {
+  const { storeFreeQueryStartsAt } = require('../cloudfunctions/gxs_api/lib/market-catalog');
+  for (const [pacificMidnight, easternMidnight] of [
+    ['2026-03-08T08:00:00.000Z', '2026-03-08T05:00:00.000Z'],
+    ['2026-11-01T07:00:00.000Z', '2026-11-01T04:00:00.000Z'],
+    ['2026-11-02T08:00:00.000Z', '2026-11-02T05:00:00.000Z'],
+  ]) {
+    assert.equal(storeFreeQueryStartsAt(pacificMidnight, 'America/Los_Angeles', 'America/New_York'), easternMidnight);
+  }
+});
+
 test('regional early access checks actual plan benefits rather than time remaining; trial members keep normal-period free checks', async () => {
   for (const [plan, qualifies] of [['member_7d',true], ['member_30d',true], ['member_365d',true], ['member_trial',false], ['legacy',false]]) {
     const f = createFixture({ config: { internationalMarkets: enabled }, start: '2026-09-16T18:00:00Z', fetchImpl: fakeFetch({ R128: { display: 'available' } }) });

@@ -44,7 +44,7 @@
 
 `history.list` 增加 `dataAvailability`、`billing.reason` 和 `observationCoverage`。日摘要在其独立 `checkedAt` 时刻读取后冻结用于分页，不伪装成事件 `snapshotAt` 的严格快照。没有事件时按完整总数原子退还已扣次数；未知采样、有效但无事件、无日摘要分别显示，均不将空事件等同于全天无货。零余额仍有查询前门槛。下文较早的计费说明若有差异，以本补充和当前源码为准。
 
-全部业务集合位于共享环境，前缀为 `gxs_`。客户端禁止直接读写，经过 `gxs_api` 服务端鉴权后访问。时间使用 UTC ISO 8601 字符串，业务日 `dayKey` 使用北京时间 YYYY-MM-DD。
+全部业务集合位于共享环境，前缀为 `gxs_`。客户端禁止直接读写，经过 `gxs_api` 服务端鉴权后访问。时间使用 UTC ISO 8601 字符串。库存事件与观测摘要的 `dayKey` 使用门店当地日期，账户次数和预算按北京时间日期结算。
 
 身份仅从 `cloud.getWXContext()` 获取。跨账号调用使用完整的 FROM_APPID + FROM_OPENID，本账号调用使用 APPID + OPENID，用户主键为 appid:openid。请求中自报的 openid、会员状态或余额没有授权作用。
 
@@ -57,7 +57,7 @@
 - `gxs_queries`：实时查询主键 userKey|queryId，历史查询主键 userKey|history|historyQueryId。绑定 SKU、门店、日期及操作类型，保存状态、执行租约、扣次信息和响应。首次扣次与 pending 记录同事务写入，结果及失败退次同事务完成。
 - `gxs_follows`：主键 userKey|followId。保存 partNumber/storeNumbers/status/statusReason；保存状态为 active、paused、removed。展示时可返回派生 expired 与原始 savedStatus，到期不会伪装成正在监测。
 - `gxs_latest`：主键 storeNumber|partNumber。保存 status/statusSince/observedAt/knownAt/unknownSince/quote/sampleCount 等。latest 和对应状态事件同事务提交；旧观测不能覆盖新观测。
-- `gxs_events`：确定性状态迁移 ID，保存目标、事件类型、北京时间业务日、发现时间、前后状态和原始取货说明。notificationPlannedAt 用于持久提醒消费者去重规划。
+- `gxs_events` 保留目标、事件类型、门店当地日期 `dayKey`、发现时间 `detectedAt`、前后状态和原始取货说明。大陆门店使用北京时间。原始事件清理与运营滚动统计使用 `detectedAt` 索引，日摘要继续按当地日期累计。提醒消费者通过确定性事件 ID 和 `notificationPlannedAt` 去重。
 - `gxs_target_health`：旧版按目标与分钟桶写入的健康数据，没有任何接口读取；当前代码已不再写入，各目标健康数据保存在 `collector_status` 的调度检查点中。云端已有文档可在控制台删除。
 - `gxs_orders`：兑换与管理员发放保留原主键。虚拟支付订单主键及平台单号为 `G + SHA256(userKey|orderId)前31位`，保存服务器固定的商品、买家与套餐快照，金额为下单时实际价。2026-10-13 候选的新月／年卡使用 v4，冻结实际商品价并保留 10 分钟报价期限；旧 v1／v2／v3 的金额、快照及时间约束不重写。`quoteCancelledAt` 标记未发签名的报价取消，仍保留订单号屏障。兑换订单继续使用 `redeem_launch_30d_v1`、`type=membership_redemption`、`source=redemption_code`、`days=30`、`amountFen=0`。用户会员发放与订单 `fulfilled` 同事务完成；`membership.entitlements` 按订单记录剩余时长，累计退款只撤销所属订单未用权益。
 - `gxs_notifications`：主键 userKey|eventId。保存 pending、sending、accepted、failed、uncertain 或 skipped 状态，发送租约、模板、原因及授权预占信息。用户在提醒落地卡片回答后写入 `feedback: { outcome: bought|missed|skipped, at }`。
@@ -68,7 +68,7 @@
 
 索引唯一来源为 `cloudfunctions/gxs_api/lib/collections.js` 的 INDEX_PLAN。运行 `node tools/db/export-plan.mjs` 导出 `config/database-deployment-plan.json`。2026-09-23 起计划不再包含 5 个前缀冗余索引：`gxs_quota_ledger.user_day`、`gxs_queries.user_created`、`gxs_events.part_day_detected`、`gxs_notifications.user_created`、`gxs_notifications.status_created`，它们的字段和方向与同集合更长索引的开头完全相同，查询可由更长索引承担；云端这 5 个已于 2026-09-23 在控制台删除。
 
-**数据保留 10 天**：定时监测每天北京时间 04:00 后的第一次运行执行一次清理（`lib/engine/retention.js`），保留最近 10 个北京时间日（含当天）。`gxs_events` 按 dayKey 删除更早数据；`gxs_queries`（pending 除外，它可能仍需退还次数）、`gxs_notifications`（pending、sending 除外）、`gxs_target_health`，以及 `gxs_config` 中的订阅授权去重、查询限流和每日预算计数按时间删除。用户、次数账本、订单、关注、当前观测、每日观测摘要（`gxs_observation_days`，长期保留用于统计到货规律）、支付回执、兑换计数与运行配置不清理。每次结果写入 `gxs_config/retention_status`，部分失败次日重试。历史查询只接受最近 10 天，更早日期返回 `history_day_expired` 且不扣次。数据库操作与 SDK 契约验证详见 [后端与数据库说明](BACKEND_RELIABILITY_AND_DATABASE.md)。
+**数据保留 10 天**：定时监测每天北京时间 04:00 后的第一次运行执行一次清理（`lib/engine/retention.js`），保留最近 10 个北京时间日（含当天）。`gxs_events` 删除 `detectedAt` 早于首个保留日北京时间零点的事件。`gxs_queries`（pending 除外，它可能仍需退还次数）、`gxs_notifications`（pending、sending 除外）、`gxs_target_health`，以及 `gxs_config` 中的订阅授权去重、查询限流和每日预算计数按时间删除。用户、次数账本、订单、关注、当前观测、每日观测摘要（`gxs_observation_days`，长期保留用于统计到货规律）、支付回执、兑换计数与运行配置不清理。每次结果写入 `gxs_config/retention_status`，部分失败次日重试。历史查询只接受最近 10 天，更早日期返回 `history_day_expired` 且不扣次。数据库操作与 SDK 契约验证详见 [后端与数据库说明](BACKEND_RELIABILITY_AND_DATABASE.md)。
 
 ## 3. 次数与查询幂等
 

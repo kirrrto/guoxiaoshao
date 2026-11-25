@@ -1,3 +1,4 @@
+const { zoneOffsetHours, storeFreeQueryStartsAt } = require('../../utils/market-catalog');
 const { observation } = require('../../utils/format');
 const { regionalProductThumbnail } = require('../../utils/product-image-fit');
 const { compareCapacities } = require('../../utils/catalog-order');
@@ -138,7 +139,7 @@ function selections(site, lang, failedImages) {
   };
 }
 
-function regionalAccess(membership, product, now = Date.now()) {
+function regionalAccess(membership, product, now = Date.now(), siteZone, storeZone) {
   const expiry = Date.parse(membership?.expiresAt);
   const member = membership?.active === true && (!Number.isFinite(expiry) || expiry > now);
   const enhanced = Date.parse(membership?.enhancedExpiresAt);
@@ -146,11 +147,12 @@ function regionalAccess(membership, product, now = Date.now()) {
   let plan = member ? membership.planId : '';
   if (plan === 'member_365d' && annual <= now) plan = enhanced > now ? 'member_30d' : '';
   if (plan === 'member_30d' && enhanced <= now) plan = '';
-  const launchUntil = Date.parse(product?.freeQueryStartsAt);
+  const freeQueryStartsAt = storeFreeQueryStartsAt(product?.freeQueryStartsAt, siteZone, storeZone);
+  const launchUntil = Date.parse(freeQueryStartsAt);
   const launch = !Number.isFinite(launchUntil) || now < launchUntil;
   const tester = member && membership.isTester === true;
   const monthlyOrAnnual = plan === 'member_30d' || plan === 'member_365d';
-  return { member, tester, hasRegionalPass: monthlyOrAnnual, canWatch: tester || monthlyOrAnnual,
+  return { member, tester, freeQueryStartsAt, hasRegionalPass: monthlyOrAnnual, canWatch: tester || monthlyOrAnnual,
     memberQuery: monthlyOrAnnual && expiry > now && enhanced > now,
     launchRestricted: launch && !tester && !['member_7d','member_30d','member_365d'].includes(plan),
     nextPlanChange: Math.min(...[expiry,enhanced,annual].filter(stamp => stamp > now)),
@@ -192,21 +194,6 @@ function productChoices(products, product, lang = 'zh-CN') {
 }
 
 function messageKey(reason) { return ERROR_KEYS[reason] || 'unavailableService'; }
-
-const FIXED_ZONE_OFFSETS = { 'Asia/Tokyo': 9, 'Asia/Taipei': 8, 'Asia/Hong_Kong': 8, 'Pacific/Honolulu': -10, 'America/Phoenix': -7 };
-const US_DST_ZONE_OFFSETS = { 'America/Anchorage': -9, 'America/Los_Angeles': -8, 'America/Denver': -7, 'America/Chicago': -6, 'America/New_York': -5 };
-const hasKey = (object, key) => Object.prototype.hasOwnProperty.call(object, key);
-
-// Matches backend `cloudfunctions/gxs_api/lib/markets.js` without relying on runtime Intl timeZone support.
-function zoneOffsetHours(stamp, timeZone) {
-  if (hasKey(FIXED_ZONE_OFFSETS, timeZone)) return FIXED_ZONE_OFFSETS[timeZone];
-  if (!hasKey(US_DST_ZONE_OFFSETS, timeZone)) return 0;
-  const std = US_DST_ZONE_OFFSETS[timeZone];
-  const year = new Date(stamp + std * 3600000).getUTCFullYear();
-  const marStart = Date.UTC(year, 2, 8 + ((7 - new Date(Date.UTC(year, 2, 1)).getUTCDay()) % 7), 2 - std);
-  const novEnd = Date.UTC(year, 10, 1 + ((7 - new Date(Date.UTC(year, 10, 1)).getUTCDay()) % 7), 2 - (std + 1));
-  return stamp >= marStart && stamp < novEnd ? std + 1 : std;
-}
 
 // An unknown zone gets an explicit UTC timestamp rather than the device's time under a store label.
 function localTime(iso, timeZone) {

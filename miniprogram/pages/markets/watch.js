@@ -54,7 +54,6 @@ function watchView(page, site, ready, eligiblePlan) {
   const lang = page.lang || 'zh-CN', w = WORDS[lang], list = ready && page.watchList;
   const member = eligiblePlan && list?.canWatch !== false;
   const boot = ready && page.boot, notify = boot && boot.notifications || {};
-  const hasEnTemplate = Boolean(notify.templateIds?.restockEn);
   const rows = (list && list.follows || []).filter(f => f && f.status !== 'removed').map(f => {
     const home = (page.sites || []).find(s => s.code === f.market);
     const choices = home && page.optionsFor(home, lang);
@@ -71,8 +70,8 @@ function watchView(page, site, ready, eligiblePlan) {
     const additionalStores = editing && canResume && !f.limitPaused && stores.length < list.limits?.maxStoresPerFollow
       ? choices.stores.filter(store => !stores.includes(store.id)).map(store => ({ ...store, location: store.fullLocation || store.location })) : [];
     const rowLanguage = f.language === 'en' ? 'en' : 'zh-CN';
-    const siteEnClosed = Boolean((home?.notificationsEnabled || notify.enabled) && !home?.notificationsEnabledEn && !hasEnTemplate);
-    const canEditLanguage = Boolean(member && (rowLanguage === 'en' || !siteEnClosed));
+    const chineseAlertsOnly = home?.notificationsEnabled && !home.notificationsEnabledEn;
+    const canEditLanguage = Boolean(member && home && (rowLanguage === 'en' || !chineseAlertsOnly));
     return { id: f.followId, name, product: p && p.label || f.partNumber, stores: selectedStores.map(s => s.label).join(' · '),
       market: f.market, partNumber: f.partNumber, revision: f.updatedAt || null, editing, canEditLanguage,
       ...(editing ? { selectedStores, additionalStores: additionalStores.length ? [{ id: '', location: w.addStore }, ...additionalStores] : [] } : {}),

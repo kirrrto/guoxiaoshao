@@ -189,7 +189,8 @@ const report = { checkedAt: new Date().toISOString(), version: project.version, 
   { item: 'iOS and Android layout, images, failure recovery and package size', status: 'requires physical-device acceptance' },
   { item: 'Automatic collection and actual subscription delivery', status: 'separate checks: verify automatic observations; enable messages only with real template, credentials and user authorization' },
   { item: 'Virtual payment callback, production credentials and real-device payment/refund', status: 'requires cloud gateway, credential and real-order verification; local mocks never prove a payment succeeded' },
-  { item: '300 simultaneous querying members, with representative distinct targets and acceptable latency/freshness', status: 'requires real staging-cloud load acceptance; same-target memory tests and server request rates do not prove 300-user capacity' },
+  { item: `${deliveryTargets.simultaneousQueryingMembers} simultaneous querying members`, status: 'pending isolated staging acceptance with shared and distinct targets (up to 900); record full, partial and failed queries plus latency' },
+  { item: `Automatic observation freshness: ${deliveryTargets.followNormalDetectionSeconds}s detection and ${deliveryTargets.followAvailableRecheckSeconds}s available rechecks`, status: 'pending isolated staging acceptance under concurrent demand; report actual observation timestamps, coverage, unknowns, source limits and missed intervals per market' },
   { item: 'Actual observations across Beijing midnight and business-stall alert delivery/recovery', status: 'requires deployed observation evidence and a tested operator alert rule; a heartbeat or structured log alone is insufficient' },
   { item: 'Current dependency advisories', status: 'Run npm audit against the current registry for each deployable package; this preflight checks only installed packages and pinned locks' }
 ] };

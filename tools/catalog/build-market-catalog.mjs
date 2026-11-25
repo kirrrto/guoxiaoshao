@@ -9,7 +9,7 @@ import membershipWindow from '../../cloudfunctions/gxs_api/lib/rules/new-product
 const root = new URL('../../', import.meta.url);
 const sources = new URL('catalog/markets/', root);
 const output = new URL('cloudfunctions/gxs_api/lib/market-products.json', root);
-const { PRODUCT_FIELDS } = schema;
+const { PRODUCT_FIELDS, localMidnightMs } = schema;
 const { RESTRICTION_DAYS } = membershipWindow;
 const byPart = JSON.parse(fs.readFileSync(new URL('catalog/products.json', root))).products;
 const artwork = new Set(byPart.map(product => product.partNumber));
@@ -26,24 +26,12 @@ function officialLink(value, code) {
     assert.ok(link.pathname.toLowerCase().includes(code.toLowerCase()), 'Wrong storefront: ' + link);
   }
 }
-function usPacificOffsetHours(utcProbeMs) {
-  const std = -8;
-  const year = new Date(utcProbeMs + std * 3600000).getUTCFullYear();
-  const marStart = Date.UTC(year, 2, 8 + ((7 - new Date(Date.UTC(year, 2, 1)).getUTCDay()) % 7), 2 - std);
-  const novEnd = Date.UTC(year, 10, 1 + ((7 - new Date(Date.UTC(year, 10, 1)).getUTCDay()) % 7), 2 - (std + 1));
-  return utcProbeMs >= marStart && utcProbeMs < novEnd ? std + 1 : std;
-}
 function localMidnight(date, code) {
   assert.match(date, /^\d{4}-\d{2}-\d{2}$/);
   const stamp = new Date(date + 'T00:00:00Z');
   assert.equal(stamp.toISOString().slice(0, 10), date);
-  if (code === 'US') {
-    const [y, m, d] = date.split('-').map(Number);
-    const offset = usPacificOffsetHours(Date.UTC(y, m - 1, d, 8, 0, 0));
-    return Date.UTC(y, m - 1, d, -offset, 0, 0);
-  }
-  stamp.setUTCHours(code === 'JP' ? -9 : -8);
-  return stamp.getTime();
+  const zone = { US: 'America/Los_Angeles', JP: 'Asia/Tokyo', TW: 'Asia/Taipei', HK: 'Asia/Hong_Kong' }[code];
+  return localMidnightMs(date, zone);
 }
 function addCalendarDays(date, days) {
   const stamp = new Date(date + 'T00:00:00Z');

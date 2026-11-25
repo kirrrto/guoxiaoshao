@@ -1,0 +1,60 @@
+{
+  "version": "3.9.1",
+  "checkedAt": "2026-11-25T03:05:35.931Z",
+  "environment": "flowermean-6gjaxfqhf6c13e88",
+  "index": {
+    "collection": "gxs_events",
+    "name": "detected_at",
+    "keys": {
+      "detectedAt": -1
+    },
+    "unique": false,
+    "verifiedBy": "CloudBase console index list after successful creation",
+    "checkedAt": "2026-11-25T03:01Z (minute precision)"
+  },
+  "functions": [
+    {
+      "name": "gxs_api",
+      "sourceFiles": 93,
+      "differences": 0,
+      "status": "Active",
+      "sdk": "4.0.2",
+      "configAndTriggersUnchanged": true
+    },
+    {
+      "name": "gxs_monitor",
+      "sourceFiles": 62,
+      "differences": 0,
+      "status": "Active",
+      "sdk": "4.0.2",
+      "configAndTriggersUnchanged": true
+    }
+  ],
+  "apiPing": {
+    "ok": true,
+    "version": "3.9.1"
+  },
+  "us": {
+    "stores": 269,
+    "products": 357,
+    "publicQuery": false,
+    "automaticMonitor": false,
+    "notifications": false
+  },
+  "monitorTimer": {
+    "observedAt": "2026-11-25 11:04:13.971 CST",
+    "statusCode": 200,
+    "source": "TRIGGER_TIMER",
+    "ok": true,
+    "state": "running",
+    "deadlines": "ready"
+  },
+  "publication": "not submitted or released",
+  "apiPaymentTimer": {
+    "observedAt": "2026-11-25 11:05:12.988 CST",
+    "statusCode": 200,
+    "source": "TRIGGER_TIMER",
+    "ok": true,
+    "state": "completed"
+  }
+}

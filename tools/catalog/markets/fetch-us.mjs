@@ -5,6 +5,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
+import { verifyUsCatalog, replaceUsCatalog } from './us-catalog.mjs';
 import { extractProductSelectionData, extractMetricsProducts } from '../lib/parse-buy-page.mjs';
 
 const require = createRequire(import.meta.url);
@@ -14,6 +15,8 @@ const families = require('../families.json').families;
 const labels = require('../../i18n/source/catalog');
 const mode = process.argv.includes('--check') ? 'check' : process.argv.includes('--sample-pickup') ? 'sample' : 'fetch';
 
+const destination = path.join(root, 'catalog/markets/us.json');
+const usableFamilies = families.filter(f => !['ipad-10-2', 'homepod-mini'].includes(f.familyKey) && !['watch', 'vision'].includes(f.category));
 const normalize = value => String(value || '').replace(/\s+/g, ' ').trim();
 const news = 'https://www.apple.com/newsroom/';
 const spring = '2026/03/macbook-neo-iphone-17e-ipad-air-with-m4-and-more-are-now-available/';
@@ -183,34 +186,6 @@ async function macDetails(family, url, fixedNeoMemory) {
   return row;
 }
 
-function verifyOfflineUsCatalog() {
-  const file = path.join(root, 'catalog/markets/us.json');
-  const us = JSON.parse(fs.readFileSync(file, 'utf8'));
-  assert.equal(us.code, 'US');
-  const expectedFamilies = families.filter(f => !['ipad-10-2', 'homepod-mini'].includes(f.familyKey) && !['watch', 'vision'].includes(f.category));
-  assert.deepEqual(us.families.map(f => f.familyKey), expectedFamilies.map(f => f.familyKey));
-  const mainlandParts = new Set(mainland.map(p => p.partNumber));
-  const seenParts = new Set();
-  const categories = new Set();
-  for (const family of us.families) {
-    assert.ok(['iphone', 'ipad', 'mac', 'airpods', 'homepod'].includes(family.category), family.category);
-    categories.add(family.category);
-    assert.match(family.sourceUrl || '', /^https:\/\/www\.apple\.com\/shop\/buy-/);
-    assert.ok(Array.isArray(family.products) && family.products.length > 0, family.familyKey);
-    for (const product of family.products) {
-      assert.match(product.partNumber || '', /^[A-Z0-9]{5,12}\/A$/);
-      assert.equal(seenParts.has(product.partNumber), false, 'Duplicate US SKU: ' + product.partNumber);
-      seenParts.add(product.partNumber);
-      assert.notEqual(product.querySupported, false);
-      assert.notEqual(product.monitorSupported, false);
-      assert.ok(product.title && product.titleEn && product.model, product.partNumber);
-      if (product.artworkPart) assert.ok(mainlandParts.has(product.artworkPart), 'Unknown artworkPart: ' + product.artworkPart);
-    }
-  }
-  assert.deepEqual([...categories].sort(), ['airpods', 'homepod', 'ipad', 'iphone', 'mac']);
-  return { checked: true, code: 'US', families: us.families.length, products: seenParts.size };
-}
-
 async function sampleUsPickup() {
   const { MARKETS } = require('../../../cloudfunctions/gxs_api/lib/markets.js');
   const { fetchPickup } = require('../../../cloudfunctions/gxs_api/lib/apple-pickup.js');
@@ -269,7 +244,7 @@ async function sampleUsPickup() {
 }
 
 if (mode === 'check') {
-  console.log(JSON.stringify(verifyOfflineUsCatalog()));
+  console.log(JSON.stringify(verifyUsCatalog(JSON.parse(fs.readFileSync(destination, 'utf8')), usableFamilies, mainland)));
   process.exit(0);
 }
 if (mode === 'sample') {
@@ -280,7 +255,6 @@ if (mode === 'sample') {
 const neoSpecs = await fetchHtml('https://www.apple.com/macbook-neo/specs/');
 const fixedNeoMemory = /8GB\s+unified\s+memory/i.test(neoSpecs);
 
-const usableFamilies = families.filter(f => !['ipad-10-2', 'homepod-mini'].includes(f.familyKey) && !['watch', 'vision'].includes(f.category));
 const output = [];
 
 for (const rawFamily of usableFamilies) {
@@ -347,6 +321,5 @@ for (const rawFamily of usableFamilies) {
   console.log('Fetched US family:', family.familyKey, 'products:', products.length);
 }
 
-const destination = new URL('../../../catalog/markets/us.json', import.meta.url);
-fs.writeFileSync(destination, JSON.stringify({ code: 'US', families: output }, null, 2) + '\n');
+replaceUsCatalog(destination, { code: 'US', families: output }, usableFamilies, mainland);
 console.log('Wrote catalog/markets/us.json · total products:', output.reduce((s, f) => s + f.products.length, 0));

@@ -234,13 +234,13 @@ Page(require('../../utils/language').page('markets', {
     const accountReady = this.visible && this.accountReady && this.isAccount();
     const quota = accountReady && (currentQuota(this.owner) || this.boot.quota);
     const now = bootstrapNow(this.boot);
-    const access = regionalAccess(accountReady && this.boot.membership, product, now);
+    const access = regionalAccess(accountReady && this.boot.membership, product, now, site?.timeZone, store?.timeZone);
     const queryEnabled = this.queryOpen(site, access) && product?.querySupported === true;
     const launchRestricted = Boolean(accountReady && product?.querySupported && access.launchRestricted);
     const costText = quota && (access.tester ? c.tester : access.member ? c.member : c.cost.replace('{balance}', quota.balance));
     const receipt = accountReady && !launchRestricted && (queryEnabled || !this.snapshot?.requiresAccountAccess)
       && receiptView(this.snapshot, store, lang, now, !queryEnabled, observationLeadMs(this.boot));
-    const opening = launchRestricted && localTime(product.freeQueryStartsAt, store?.timeZone);
+    const opening = launchRestricted && localTime(access.freeQueryStartsAt, store?.timeZone);
     const launchNotice = launchRestricted ? c.launchGate + (opening ? ' ' + c.unlockAt.replace('{date}', opening.slice(0,10)) : '') : '';
     const showSignin = Boolean(quota && !access.member && !quota.signedInToday);
     const outcome = this.signinOutcome;
@@ -348,7 +348,7 @@ Page(require('../../utils/language').page('markets', {
     if (!product) return;
     if (key === 'area') {
       const chosenArea = areas && areas[index];
-      if (chosenArea && chosenArea.firstStoreId && this.store !== chosenArea.firstStoreId) {
+      if (chosenArea?.firstStoreId && chosenArea.id !== this.data.area?.id) {
         confirmTap();
         this.store = chosenArea.firstStoreId;
         this.clearTarget();

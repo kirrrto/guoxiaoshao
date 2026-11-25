@@ -8,6 +8,15 @@
 // Keep technical details and complete acceptance records in release documents.
 const RELEASE_NOTES = [
   {
+    version: '3.9.1',
+    title: '门店选择与查询日期',
+    dateText: '版本记录 · 2026-11-25',
+    highlights: [
+      '在美国站再次确认同一州，会保留已选门店。新品免费查询按门店当地日期开放。',
+      '下拉手势被系统打断时，抽屉会回弹，已选内容会保留。',
+    ],
+  },
+  {
     version: '3.9.0',
     title: '美国站点与交互体验更新',
     dateText: '版本记录 · 2026-11-25',

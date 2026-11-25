@@ -356,3 +356,58 @@ for (const edit of ['language', 'removeStore']) {
     }
   });
 }
+
+test('a saved US watch crosses store midnight, confirms on a new timer sample and uses one English authorization', async () => {
+  const partNumber = 'MJWE4LL/A', storeNumber = 'R073'; // Honolulu (UTC−10)
+  const plan = { [storeNumber]: { display: 'unavailable' } };
+  const upstream = fakeFetch(plan);
+  const f = createFixture({ start: '2026-11-25T09:58:00Z', fetchImpl: upstream, config: {
+    collector: { enabled: true, intervalSeconds: 60 },
+    internationalMarkets: { US: false }, internationalMonitoring: { US: true }, internationalNotifications: { US: true },
+    notifications: { enabled: true, templateIds: { restockEn: 'US_EN' } },
+  } });
+  await f.call('user.bootstrap');
+  await f.repo.updateUser(userKeyOf(), { membership: marketMembership(f.state.now, 'member_30d'),
+    subscriptions: { US_EN: { credits: 2 } }, settings: { notifyEnabled: true, dnd: { enabled: false } } });
+  const saved = await f.call('market.watch', { market: 'US', storeNumbers: [storeNumber], partNumber,
+    language: 'en', expectedUserKey: userKeyOf() });
+  assert.ok(saved.ok, JSON.stringify(saved.error));
+  const balance = (await f.repo.getUser(userKeyOf())).quota.balance;
+  const messages = [];
+  const tick = () => runScheduled({ repo: f.repo, fetchImpl: upstream, clock: () => f.state.now, log,
+    sendImpl: async message => { messages.push(message); return { errcode: 0 }; } });
+  await tick();
+  assert.equal(messages.length, 0);
+  plan[storeNumber].display = 'available';
+  f.advance(60000);
+  await tick();
+  await tick();
+  assert.equal(upstream.calls.length, 2);
+  assert.equal(messages.length, 0);
+  f.advance(60000);
+  await tick();
+  assert.equal(upstream.calls.length, 3);
+  assert.equal(messages.length, 1);
+  const [message] = messages;
+  assert.deepEqual([message.templateId, message.lang], ['US_EN', 'en']);
+  const link = new URL(message.page, 'https://example.invalid/');
+  assert.equal(link.pathname, '/pages/markets/index');
+  assert.deepEqual(['market', 'storeNumber', 'partNumber'].map(key => link.searchParams.get(key)), ['US', storeNumber, partNumber]);
+  const detail = await f.call('notify.detail', { eventId: link.searchParams.get('eid') });
+  assert.equal(detail.data.notification.market, 'US');
+  assert.equal(detail.data.latest.status, 'available');
+  const days = [...f.repo.tables.get(COLLECTIONS.observationDays).values()];
+  assert.deepEqual(days.map(row => [row.market, row.dayKey, row.autoCount]), [
+    ['US', '2026-11-24', 2], ['US', '2026-11-25', 1],
+  ]);
+  await tick();
+  f.advance(60000);
+  await tick();
+  assert.equal(messages.length, 1);
+  for (const call of upstream.calls) {
+    assert.equal(new URL(call.href).pathname, '/shop/retail/pickup-message');
+    assert.deepEqual([call.storeNumber, call.parts], [storeNumber, [partNumber]]);
+  }
+  const account = await f.repo.getUser(userKeyOf());
+  assert.deepEqual([account.quota.balance, account.subscriptions.US_EN.credits], [balance, 1]);
+});

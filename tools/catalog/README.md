@@ -14,7 +14,8 @@
 
 - **日本和香港**。将当地公开购买页保存为 `<familyKey>.html`，另将当地 MacBook Neo 技术规格页保存为 `macbook-neo-specs.html`。将各 Mac 系列购买页直接链接的标准配置页保存到 `config/`，在 `config/links.json` 记录数组，每项含 `key`（familyKey）、`url`（当地完整配置页地址）和 `file`（该目录中的 HTML 文件名）。运行 `node tools/catalog/markets/extract-regional.mjs JP <快照目录> --check`，香港将 `JP` 替换为 `HK`。核实选项、货号或发售日期的变化后，去掉 `--check` 重建对应 JSON。校验会比对系列页列出的全部标准 Mac 链接、配置页的 canonical 地址和实际零售货号。
 - **台湾**。将当地系列页保存为 `<sourceUrl 路径末段>.html`，将标准 Mac 配置页保存为 `<familyKey>-<完整 sourceUrl 的 SHA-256 前 14 位>.html`。运行 `node tools/catalog/markets/tw.mjs <快照目录>` 核对三方对应关系（系列链接、配置页货号和已登记选项）。`--exact` 还会检查系列页正文的原始哈希。新增或下架选项由维护者依据当地页面更新 `tw.json`，然后重新校验。
-- **美国**。运行 `node tools/catalog/markets/build-us-stores.mjs` 从美国 Apple 官网门店目录同步全美 45 州（含特区，免税州置顶）共 269 家直营店、7 个美国时区与 20 字提醒安全简称（可用 `--check` 离线复核）。运行 `node tools/catalog/markets/fetch-us.mjs` 从 `https://www.apple.com/shop/...` 获取当地无锁版及 Mac 选中零售 `LL/A` 货号更新 `us.json`，可用 `--check` 做结构完整性校验，用 `--sample-pickup` 按 5 大品类抽测官方 `/shop/retail/pickup-message` 接口并写入 `evidence/pickup-samples/<日期>/us-regions.json`。
+- **美国**。运行 `node tools/catalog/markets/build-us-stores.mjs` 从美国 Apple 官网门店目录同步 44 个州及哥伦比亚特区（共 45 个选项，免税州置顶）共 269 家直营店、7 个美国时区与 20 字提醒安全简称（可用 `--check` 离线复核）。运行 `node tools/catalog/markets/fetch-us.mjs` 从 `https://www.apple.com/shop/...` 获取当地已核实零售货号更新 `us.json`（当前 347 个 `LL/A`、10 个 `AM/A`），可用 `--check` 做结构完整性校验，用 `--sample-pickup` 按 5 大品类抽测官方 `/shop/retail/pickup-message` 接口并写入 `evidence/pickup-samples/<日期>/us-regions.json`。
+  常规更新会先校验完整目录，再按系列和货号逐个比对。任一既有货号消失时以 `us_catalog_removal_requires_review` 报告差异，旧文件保留。确认实际下架后，单独审查源目录变更并重建运行目录。并行写入会返回 `EEXIST`，待先前进程完成后重试。若进程异常中断，先确认没有刷新进程并核对旧目录与暂存文件，再清理同目录的 `.us-catalog-replacement`。
 - **生成运行目录**。更新四站源数据后运行 `node tools/catalog/build-market-catalog.mjs`，再加 `--check` 核对生成结果。发售日期依据当地 Apple 新闻稿；资料只给出时间范围时登记有证据的最迟日期。官网定制无零售货号的配置不放入海外目录。
 
 ## 逐货号开放取货

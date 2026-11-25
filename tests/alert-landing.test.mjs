@@ -109,6 +109,26 @@ test('operator insights summarise availability windows, skipped alerts, send del
   assert.equal(data.truncated, false);
 });
 
+test('operator rolling windows select by detection time before limiting rows, across local dates', async () => {
+  const f = createFixture({ start: '2026-11-25T17:00:00.000Z' });
+  const { COLLECTIONS: C } = require('../cloudfunctions/gxs_api/lib/collections');
+  const { observationDayKey } = require('../cloudfunctions/gxs_api/lib/engine/observation-day');
+  const events = f.repo.tables.get(C.events);
+  const add = (id, at, duration) => {
+    const detectedAt = new Date(at).toISOString();
+    events.set(id, { _id: id, market: 'US', storeNumber: 'R073', dayKey: observationDayKey(detectedAt, 'US', 'R073'),
+      detectedAt, type: 'became_unavailable', availableDurationMs: duration });
+  };
+  const end = f.state.now.getTime(), start = end - 86400000;
+  add('before', start - 1, 999);
+  add('start', start, 1000);
+  add('end', end, 2000);
+  for (let i = 1; i <= 2000; i++) add('future-' + i, end + i, 9999);
+  const data = ok(await f.call('admin.insights', { days: 1 }, operatorContext()));
+  assert.equal(data.truncated, false);
+  assert.deepEqual([data.availability.count, data.availability.maxMs], [2, 2000]);
+});
+
 test('only an explicit rendered-view acknowledgment records a view; detail reads remain available on metric failure', async () => {
   const { f } = await alerted();
   const taskId = `${userKeyOf()}|${EVENT}`;

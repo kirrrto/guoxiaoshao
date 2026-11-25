@@ -10,6 +10,7 @@ const { isRetiredPartNumber, retiredProductMessage } = require('../rules/follow-
 const { recordObservations } = require('../engine/observations');
 const { isProductIdentity } = require('../rules/product-target');
 const { MARKETS, findMarket, findMarketProduct, catalog } = require('../markets');
+const { storeFreeQueryStartsAt } = require('../market-catalog');
 const { isValidTemplateId } = require('../config');
 const { monitoringSnapshot } = require('../monitor-readiness');
 const ID_PATTERN = /^[A-Za-z0-9_-]{8,64}$/;
@@ -136,16 +137,17 @@ async function marketPickup(ctx, payload) {
     throw new ApiError('invalid_market_target', '请在当前站点重新选择商品与门店。');
   }
   const product = findMarketProduct(market, partNumber);
-  const listed = product?.querySupported && site.stores.some(store => store.storeNumber === storeNumbers[0]);
+  const store = site.stores.find(store => store.storeNumber === storeNumbers[0]);
   const target = { market, queryId, partNumber, storeNumbers };
-  if (!listed) return settleUnavailablePickup(ctx, target, new ApiError('invalid_market_target', '请在当前站点重新选择商品与门店。'));
+  if (!product?.querySupported || !store) return settleUnavailablePickup(ctx, target, new ApiError('invalid_market_target', '请在当前站点重新选择商品与门店。'));
   const user = await ensureUser(ctx);
   const publicQuery = ctx.config.internationalMarkets?.[market] === true;
   const preview = !publicQuery && canPreviewMarket(market, user, ctx.config);
   if (!preview && !canReadMarket(market, user, ctx.config, ctx.clock())) {
     return settleUnavailablePickup(ctx, target, new ApiError('market_disabled', '该站点尚未开放实时查询。'));
   }
-  const reply = await executePickup(ctx, { user, product, queryId, partNumber, storeNumbers, startedAt, market, maxCost: publicQuery ? maxCost : 0, preview });
+  const localProduct = { ...product, freeQueryStartsAt: storeFreeQueryStartsAt(product.freeQueryStartsAt, site.timeZone, store.timeZone) };
+  const reply = await executePickup(ctx, { user, product: localProduct, queryId, partNumber, storeNumbers, startedAt, market, maxCost: publicQuery ? maxCost : 0, preview });
   return { ...reply, market, queryId };
 }
 

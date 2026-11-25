@@ -172,6 +172,13 @@
       },
       "indexes": [
         {
+          "name": "detected_at",
+          "keys": {
+            "detectedAt": -1
+          },
+          "unique": false
+        },
+        {
           "name": "target_detected",
           "keys": {
             "targetKey": 1,

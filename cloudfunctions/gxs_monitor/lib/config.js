@@ -103,6 +103,7 @@ const DEFAULTS = Object.freeze({
 });
 
 const EDITABLE = new Set(['quota', 'tasks', 'memberProduct', 'memberPlans', 'virtualPayment', 'memberRedemption', 'newProductWindows', 'notifications', 'collector', 'query', 'internationalMarkets', 'internationalMonitoring', 'internationalNotifications', 'internationalQueryLimits', 'adminUserKeys', 'announcement', 'notices', 'features', 'growthExperiment', 'deadlineReminders']);
+const MARKET_FLAGS = ['internationalMarkets', 'internationalMonitoring', 'internationalNotifications'];
 
 // A template library number is not an ID. Do not guess a fixed ID length.
 function isValidTemplateId(value) {
@@ -167,6 +168,12 @@ function patchConfig(stored, patch) {
         if (mapping && typeof mapping === 'object' && !Array.isArray(mapping)) next[key][id] = { ...(stored.memberPlans && stored.memberPlans[id] || {}), ...mapping };
       }
     } else next[key] = value;
+    // An absent US flag reads as false in this version. 3.8.8 rejects even
+    // US:false on an unrelated save. Drop only the explicitly closed flag.
+    if (MARKET_FLAGS.includes(key) && value?.US === false) {
+      next[key] = { ...next[key] };
+      delete next[key].US;
+    }
   }
   validateConfig(mergeConfig(next));
   return next;
@@ -182,7 +189,7 @@ function validateConfig(config) {
       if (value != null && (typeof value !== 'string' || value.length > max || /[\x00-\x1f\x7f]/.test(value))) invalid(`${name}.${key}`);
     }
   };
-  for (const field of ['internationalMarkets', 'internationalMonitoring', 'internationalNotifications']) {
+  for (const field of MARKET_FLAGS) {
     const flags = config[field];
     if (!flags || typeof flags !== 'object' || Array.isArray(flags)
       || Object.keys(flags).some(code => !MARKETS.some(m => m.code === code))

@@ -121,11 +121,14 @@ Component(require('../../utils/language').component('config-sheet', {
         this.setData({ dragging: true, dragActivated: true, dragOffset: rounded });
       }
     },
+    onSheetTouchCancel() {
+      this.dragStartY = null;
+      if (this.data.dragging || this.data.dragOffset) this.setData({ dragging: false, dragOffset: 0 });
+    },
     onSheetTouchEnd() {
       if (this.dragStartY == null) return;
-      this.dragStartY = null;
       const offset = this.data.dragOffset || 0;
-      if (this.data.dragging || offset) this.setData({ dragging: false, dragOffset: 0 });
+      this.onSheetTouchCancel();
       if (offset >= 84 && !this.data.docked && !this.data.busy && this.data.visible && !this.confirmingClose) {
         confirmTap();
         this.onCloseTap();

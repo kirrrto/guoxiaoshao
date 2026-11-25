@@ -16,7 +16,7 @@ const old = '2026-09-14T15:59:59.000Z', kept = '2026-09-14T16:00:00.000Z';
 function seeded() {
   const repo = createMemoryRepo();
   const put = (collection, doc) => repo.tables.get(collection).set(doc._id, doc);
-  put(C.events, { _id: 'old-event', dayKey: '2026-09-14' }); put(C.events, { _id: 'kept-event', dayKey: '2026-09-15' });
+  put(C.events, { _id: 'old-event', detectedAt: old, dayKey: '2026-09-14' }); put(C.events, { _id: 'kept-event', detectedAt: kept, dayKey: '2026-09-15' });
   put(C.observationDays, { _id: 'old-day', dayKey: '2026-09-14' }); put(C.observationDays, { _id: 'kept-day', dayKey: '2026-09-15' });
   put(C.queries, { _id: 'old-query', createdAt: old, status: 'success' }); put(C.queries, { _id: 'old-pending', createdAt: old, status: 'pending' }); put(C.queries, { _id: 'kept-query', createdAt: kept, status: 'success' });
   put(C.notifications, { _id: 'old-sent', createdAt: old, status: 'accepted' }); put(C.notifications, { _id: 'old-sending', createdAt: old, status: 'sending' }); put(C.notifications, { _id: 'kept-sent', createdAt: kept, status: 'accepted' });
@@ -48,6 +48,20 @@ test('retention keeps the latest 10 Beijing days and never touches accounts, mon
   assert.deepEqual(status.removed, { events: 1, queries: 1, notifications: 1, targetHealth: 1, subscriptionGrants: 1, queryGuards: 1, queryTargets: 1, marketBudgets: 1, budgets: 1 });
 });
 
+test('retention compares instants on both sides of the Beijing cutoff and preserves store-local day keys', async () => {
+  const repo = createMemoryRepo();
+  const { observationDayKey } = require('../cloudfunctions/gxs_api/lib/engine/observation-day');
+  const events = repo.tables.get(C.events);
+  for (const [id, market, storeNumber, detectedAt] of [['expired-tokyo', 'JP', 'R128', old], ['kept-hawaii', 'US', 'R073', kept]]) {
+    events.set(id, { _id: id, market, storeNumber, detectedAt, dayKey: observationDayKey(detectedAt, market, storeNumber) });
+  }
+  assert.equal(events.get('expired-tokyo').dayKey, '2026-09-15');
+  assert.equal(events.get('kept-hawaii').dayKey, '2026-09-14');
+  await runRetentionIfDue({ repo, now, log });
+  assert.deepEqual([...events.keys()], ['kept-hawaii']);
+  assert.equal(events.get('kept-hawaii').dayKey, '2026-09-14');
+});
+
 test('retention runs once per Beijing day, only after 04:00, and never fails the monitor', async () => {
   const repo = seeded();
   assert.equal(await runRetentionIfDue({ repo, now: new Date('2026-09-23T19:59:00.000Z'), log }), null, '03:59 Beijing is too early');
@@ -66,7 +80,7 @@ test('the scheduled monitor purges expired history after its scan', async () => 
   await f.call('user.bootstrap');
   await f.repo.updateUser(userKeyOf(), { membership: { expiresAt: '2026-10-30T00:00:00Z' } });
   await f.repo.saveFollow({ _id: 'F', userKey: userKeyOf(), partNumber: 'MJYH4CH/A', storeNumbers: ['R577'], status: 'active' });
-  f.repo.tables.get(C.events).set('old-event', { _id: 'old-event', dayKey: '2026-09-01', type: 'status_changed', notificationPlannedAt: old });
+  f.repo.tables.get(C.events).set('old-event', { _id: 'old-event', dayKey: '2026-09-14', detectedAt: old, type: 'status_changed', notificationPlannedAt: old });
   const result = await runScheduled({ repo: f.repo, fetchImpl: fakeFetch(() => ({ display: 'unavailable' })), clock: () => new Date(f.state.now), log });
   assert.equal(result.scanned, 1);
   assert.equal(f.repo.tables.get(C.events).has('old-event'), false);

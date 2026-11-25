@@ -187,12 +187,14 @@ function validateUsStores(us) {
   }
   assert.deepEqual(seenStates.slice(0, 4), ['Oregon (Tax-free)', 'Delaware (Tax-free)', 'New Hampshire (Tax-free)', 'Alaska (Tax-free)']);
   assert.equal(seenStates.length, 45);
+  assert.ok(seenStates.includes('District of Columbia'));
+  return { regions: seenStates.length, states: seenStates.length - 1 };
 }
 
 const current = JSON.parse(fs.readFileSync(storeFile, 'utf8'));
 if (checkOnly) {
-  validateUsStores(current.US);
-  console.log(JSON.stringify({ checked: true, usStores: current.US.length, states: 45, timeZones: [...new Set(current.US.map(s => s.timeZone))].sort() }));
+  const coverage = validateUsStores(current.US);
+  console.log(JSON.stringify({ checked: true, usStores: current.US.length, ...coverage, timeZones: [...new Set(current.US.map(s => s.timeZone))].sort() }));
   process.exit(0);
 }
 
@@ -253,6 +255,6 @@ for (const rawState of orderedStates) {
   }
 }
 
-validateUsStores(usStores);
+const coverage = validateUsStores(usStores);
 fs.writeFileSync(storeFile, JSON.stringify({ ...current, US: usStores }, null, 2) + '\n');
-console.log(JSON.stringify({ updated: true, usStores: usStores.length, states: orderedStates.length }));
+console.log(JSON.stringify({ updated: true, usStores: usStores.length, ...coverage }));

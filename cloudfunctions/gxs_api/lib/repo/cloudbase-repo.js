@@ -380,9 +380,10 @@ function createCloudbaseRepo(db, { sleep = ms => new Promise(resolve => setTimeo
       }
       return { rows, complete: false };
     },
-    /** Operator insights: newest documents with `field` >= `since` (events by dayKey, notifications by createdAt). */
-    async listSince(collection, field, since, limit) {
-      return readAll(col(collection).where({ [field]: _.gte(since) }).orderBy(field, 'desc'), limit);
+    /** Select the reporting interval before applying its read limit. */
+    async listSince(collection, field, since, limit, through) {
+      const range = through ? _.gte(since).and(_.lte(through)) : _.gte(since);
+      return readAll(col(collection).where({ [field]: range }).orderBy(field, 'desc'), limit);
     },
     // Insertion and per-user view sequence are attached via atomicMethods.
     async getNotification(id) {
@@ -496,7 +497,7 @@ function createCloudbaseRepo(db, { sleep = ms => new Promise(resolve => setTimeo
       const budgetIds = Array.from({ length: 60 }, (_, i) => `collector_budget_${beijingDayKey(addDays(startOfDay(firstDay), -(i + 1)))}`);
       const byIds = (collection, ids) => Array.from({ length: Math.ceil(ids.length / CHUNK) }, (unused, i) => col(collection).where({ _id: _.in(ids.slice(i * CHUNK, (i + 1) * CHUNK)) }));
       const targets = {
-        events: [col(COLLECTIONS.events).where({ dayKey: _.lt(firstDay) })],
+        events: [col(COLLECTIONS.events).where({ detectedAt: _.lt(cutoffIso) })],
         // A pending query may still owe its refund on the user's next bootstrap.
         queries: [col(COLLECTIONS.queries).where({ createdAt: _.lt(cutoffIso), status: _.neq('pending') })],
         notifications: [col(COLLECTIONS.notifications).where({ createdAt: _.lt(cutoffIso), status: _.nin(['pending', 'sending']) })],

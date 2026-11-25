@@ -1,0 +1,35 @@
+{
+  "size": {
+    "total": 1325230,
+    "packages": [
+      {
+        "name": "TOTAL",
+        "size": 1325230
+      },
+      {
+        "name": "main",
+        "size": 1186697
+      },
+      {
+        "name": "/pages/deadlines/",
+        "size": 21753
+      },
+      {
+        "name": "/pages/guide/",
+        "size": 21672
+      },
+      {
+        "name": "/pages/history/",
+        "size": 55865
+      },
+      {
+        "name": "/pages/notice-board/",
+        "size": 7995
+      },
+      {
+        "name": "/pages/notification-test/",
+        "size": 31248
+      }
+    ]
+  }
+}

@@ -23,8 +23,8 @@
     },
     {
       "path": "collections.js",
-      "bytes": 5048,
-      "sha256": "7448ccbaf4715beafc7647293734108112457b2811d00fb6a8a870dd438295f3"
+      "bytes": 5118,
+      "sha256": "78b17c5ffb7233697d85f340b88e66ea6a1b633af8451d685eaf8f8085908787"
     },
     {
       "path": "config-audit.js",
@@ -33,8 +33,8 @@
     },
     {
       "path": "config.js",
-      "bytes": 25746,
-      "sha256": "8ae330df8a792ef380244a58fcc03d6cc2e2ea5a9b1b93d0f285404e60bda9c7"
+      "bytes": 26063,
+      "sha256": "e82b685731f76d65367a6d891a8f9ee6a691da5835e880cb717a358e8f0f4623"
     },
     {
       "path": "connection.js",
@@ -138,8 +138,8 @@
     },
     {
       "path": "market-catalog.js",
-      "bytes": 1634,
-      "sha256": "395106bcf02587140181bb13e476e09332fda30726b2266c6d878e745353c1f6"
+      "bytes": 3481,
+      "sha256": "18fca98de6dfc6c61ab7a9a74a4d80ac772631d004e3d8d4d89f0e9e95528d8c"
     },
     {
       "path": "market-products.json",
@@ -153,8 +153,8 @@
     },
     {
       "path": "markets.js",
-      "bytes": 1996,
-      "sha256": "cedae7acf533a1a244af09d7988d7c1ad8c2695edcc7184a95d0f26071a7be41"
+      "bytes": 1166,
+      "sha256": "9adf17778f5c87e7e33fbd96652b2ed8537b80e5aacb51c1782f8608056037b8"
     },
     {
       "path": "member-redemption.js",
@@ -183,8 +183,8 @@
     },
     {
       "path": "repo/cloudbase-repo.js",
-      "bytes": 29661,
-      "sha256": "2f07aee6817d6d68cb4126626631355857027a4b71da66cf6c1cc52772e6b400"
+      "bytes": 29701,
+      "sha256": "b2696d2d6b9c1659d8ffb619fc7f0d0f3c4a94314c287f14989645464af88bd9"
     },
     {
       "path": "repo/current-availability.js",

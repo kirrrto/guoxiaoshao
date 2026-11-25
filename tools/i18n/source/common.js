@@ -1,4 +1,7 @@
 module.exports = {
+  '门店选择与查询日期': 'Store selection and search dates',
+  '在美国站再次确认同一州，会保留已选门店。新品免费查询按门店当地日期开放。': 'Confirming the same US state keeps your selected store. Free searches for new products open on the store’s local date.',
+  '下拉手势被系统打断时，抽屉会回弹，已选内容会保留。': 'If the system interrupts a downward swipe, the sheet springs back with your selection intact.',
   '版本记录 · 2026-11-25': 'Version record · 2026-11-25',
   '美国站点与交互体验更新': 'US stores and interaction polish',
   '「其他站点」新增美国全境门店（免税州置顶），移除无自提接口商品。': 'Added all US stores in Regions (tax-free states first) and removed unsupported items.',

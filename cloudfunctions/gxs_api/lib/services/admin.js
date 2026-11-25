@@ -193,7 +193,7 @@ async function insights(ctx, payload) {
   const days = Math.min(10, Math.max(1, Math.floor(Number(payload.days) || 7)));
   const since = new Date(ctx.now.getTime() - days * 86400000);
   const [eventRows, notificationRows, queryRows, followRows, testRows] = await Promise.all([
-    ctx.repo.listSince(COLLECTIONS.events, 'dayKey', dayKey(since), INSIGHT_LIMIT),
+    ctx.repo.listSince(COLLECTIONS.events, 'detectedAt', since.toISOString(), INSIGHT_LIMIT, ctx.nowIso),
     ctx.repo.listSince(COLLECTIONS.notifications, 'createdAt', since.toISOString(), INSIGHT_LIMIT),
     ctx.repo.listSince(COLLECTIONS.queries, 'createdAt', since.toISOString(), INSIGHT_LIMIT),
     ctx.repo.listSince(COLLECTIONS.follows, 'createdAt', since.toISOString(), INSIGHT_LIMIT),

@@ -21,13 +21,20 @@ function present(user, follow, all, ctx) {
     updatedAt: follow.updatedAt, ...allowance };
 }
 
+// Existing regional watches can outlive the catalog that originally accepted
+// them. Keep the saved account/region namespace authoritative for removal.
+function isSavedRegionalWatch(follow, owner) {
+  return follow?.userKey === owner && /^[A-Z]{2}$/.test(follow.market) && follow.market !== 'CN'
+    && typeof follow._id === 'string' && follow._id.startsWith(owner + '|market:' + follow.market + ':');
+}
+
 async function marketFollows(ctx, payload = {}) {
   checkOwner(ctx, payload, false);
   const user = await ensureUser(ctx);
   const all = await ctx.repo.listFollows(user._id);
   const { collector, notifications, internationalMonitoring, internationalNotifications } = ctx.config;
   const monitoring = Object.fromEntries(MARKETS.map(({ code }) => [code, collector.enabled && internationalMonitoring[code] === true]));
-  return { follows: all.filter(follow => findMarket(follow.market)).map(follow => present(user, follow, all, ctx)),
+  return { follows: all.filter(follow => findMarket(follow.market) || isSavedRegionalWatch(follow, user._id)).map(follow => present(user, follow, all, ctx)),
     savedCount: all.length, limits: memberLimits(user, ctx.now, ctx.config), canWatch: canWatchMarkets(user, ctx.now, ctx.config),
     watchRegistrationOpen: true, watchEditing: true, monitoring,
     notifications: Object.fromEntries(MARKETS.map(({ code }) => [code, monitoring[code] && notifications.enabled && internationalNotifications[code] === true])) };
@@ -61,12 +68,12 @@ async function marketWatch(ctx, payload) {
   return { follow: present(user, saved, [...all.filter(row => row._id !== id), saved], ctx) };
 }
 
-async function ownedWatch(ctx, user, payload) {
+async function ownedWatch(ctx, user, payload, allowWithdrawn = false) {
   const id = payload.followId;
   if (typeof id !== 'string' || !id.startsWith(user._id + '|market:') || id.length > 256) throw new ApiError('unknown_follow', '关注不存在');
   const existing = await ctx.repo.getFollow(id);
   const region = existing && findMarket(existing.market);
-  if (!region || existing.userKey !== user._id) throw new ApiError('unknown_follow', '关注不存在');
+  if (existing?.userKey !== user._id || (!region && !(allowWithdrawn && isSavedRegionalWatch(existing, user._id)))) throw new ApiError('unknown_follow', '关注不存在');
   return { id, existing, region };
 }
 
@@ -89,10 +96,10 @@ async function marketWatchStatus(ctx, payload) {
   checkOwner(ctx, payload, true);
   if (!['active', 'paused', 'removed'].includes(payload.status)) throw new ApiError('invalid_status', '关注状态无效');
   const user = await ensureUser(ctx);
-  const { id, existing, region } = await ownedWatch(ctx, user, payload);
+  const { id, existing, region } = await ownedWatch(ctx, user, payload, payload.status !== 'active');
   if (payload.status === 'active') requireTarget(region, existing.partNumber, existing.storeNumbers);
   const all = await ctx.repo.listFollows(user._id);
-  const saved = await ctx.repo.mutateFollow({ userKey: user._id, followId: id, status: payload.status, market: region.code, nowIso: ctx.nowIso, knownFollows: all,
+  const saved = await ctx.repo.mutateFollow({ userKey: user._id, followId: id, status: payload.status, market: existing.market, nowIso: ctx.nowIso, knownFollows: all,
     expectedUpdatedAt: payload.expectedUpdatedAt });
   return { follow: present(user, saved, all, ctx) };
 }

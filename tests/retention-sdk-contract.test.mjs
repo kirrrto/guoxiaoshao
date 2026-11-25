@@ -34,7 +34,7 @@ test('pinned SDK retention builds bounded budget queries and keeps every deletio
       subscriptionGrants: 1, queryGuards: 1, queryTargets: 1, marketBudgets: 1, budgets: 3 });
     assert.equal(requests.length, 11);
     const queryFor = collection => requests.find(row => row.collection === collection).query;
-    assert.deepEqual(queryFor(C.events), { dayKey: { $lt: firstDay } });
+    assert.deepEqual(queryFor(C.events), { detectedAt: { $lt: cutoffIso } });
     assert.deepEqual(queryFor(C.queries), { createdAt: { $lt: cutoffIso }, status: { $ne: 'pending' } });
     assert.deepEqual(queryFor(C.notifications), { createdAt: { $lt: cutoffIso }, status: { $nin: ['pending', 'sending'] } });
     assert.deepEqual(queryFor(C.health), { recordedAt: { $lt: cutoffIso } });

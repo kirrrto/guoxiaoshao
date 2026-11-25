@@ -58,6 +58,7 @@ const INDEX_PLAN = Object.freeze({
     { name: 'status_id', keys: { status: 1, _id: 1 }, unique: false },
   ],
   [COLLECTIONS.events]: [
+    { name: 'detected_at', keys: { detectedAt: -1 }, unique: false },
     { name: 'target_detected', keys: { targetKey: 1, detectedAt: -1 }, unique: false },
     { name: 'part_day_detected_id', keys: { partNumber: 1, dayKey: 1, detectedAt: -1, _id: -1 }, unique: false },
     { name: 'part_day_store_detected_id', keys: { partNumber: 1, dayKey: 1, storeNumber: 1, detectedAt: -1, _id: -1 }, unique: false },

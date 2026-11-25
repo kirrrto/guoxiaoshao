@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { runtime } from './helpers/miniprogram-runtime.mjs';
 import { nativeTabBar } from './helpers/native-tab-bar.mjs';
 
@@ -351,4 +352,35 @@ test('config-sheet swipe-down follows finger 1:1, bounces back under threshold, 
   sheet.onSheetTouchStart({ touches: [{ clientY: 100 }] });
   sheet.onSheetTouchMove({ touches: [{ clientY: 240 }] });
   assert.deepEqual([sheet.data.dragging, sheet.data.dragOffset], [false, 0]);
+});
+
+test('native touchcancel on either sheet drag handle springs back without dismissing or asking to discard', () => {
+  const wxml = readFileSync(new URL('../miniprogram/components/config-sheet/index.wxml', import.meta.url), 'utf8');
+  const handles = Array.from(wxml.matchAll(/<view\b[^>]*\bbindtouchstart="onSheetTouchStart"[^>]*>/g), match => match[0]);
+  assert.equal(handles.length, 2);
+  for (const handle of handles) {
+    const rt = runtime(), events = [];
+    let haptics = 0;
+    rt.wx.vibrateShort = () => { haptics++; };
+    const sheet = rt.instance('components/config-sheet/index.js', { visible: true, dirty: true });
+    sheet.triggerEvent = name => events.push(name);
+    const gesture = (type, y) => {
+      const method = handle.match(new RegExp('(?:bind|catch)' + type + '="([^"]+)"'))[1];
+      sheet[method]({ type, touches: y === undefined ? [] : [{ clientY: y }] });
+    };
+    gesture('touchstart', 10);
+    gesture('touchmove', 150);
+    gesture('touchcancel');
+    gesture('touchend');
+    assert.deepEqual([sheet.data.dragging, sheet.data.dragOffset, haptics], [false, 0, 0]);
+    assert.equal(rt.messages.length, 0);
+    assert.deepEqual(events, []);
+    gesture('touchstart', 20);
+    gesture('touchmove', 140);
+    gesture('touchend');
+    assert.equal(rt.messages.length, 1);
+    assert.equal(haptics, 1);
+    rt.messages[0].success({ confirm: true });
+    assert.deepEqual(events, ['close']);
+  }
 });

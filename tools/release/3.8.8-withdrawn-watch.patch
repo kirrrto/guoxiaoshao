@@ -1,0 +1,99 @@
+--- a/miniprogram/pages/markets/watch.js
++++ b/miniprogram/pages/markets/watch.js
+@@ -4,6 +4,7 @@
+ const { requestReminderAuthorization, templateConsent, openSubscribeSettings } = require('../../utils/reminder-credits');
+ const { switchToTab } = require('../../utils/tab-bar');
+ const { isNavigating } = require('../../utils/navigation');
++const { MARKETS } = require('./presentation');
+ 
+ const WORDS = {
+   'zh-CN': {
+@@ -11,6 +12,7 @@
+     addHere: '将此门店加入关注', addStore: '添加门店', manage: '管理', collapse: '收起', removeStore: '移除', removeWatch: '取消整条关注',
+     removeStoreTitle: '移除这家门店？', edited: '关注已更新', changed: '关注已变化，请核对后再修改。',
+     lastStore: '如需移除最后一家门店，请取消整条关注。',
++    withdrawn: '站点已停用，已停止监测',
+     removeTitle: '取消这条关注？', cancel: '保留', saved: '关注已保存', active: '已开启关注', paused: '已暂停', expired: '会员已到期',
+     limit_paused: '已超出名额', stopped: '本站尚未开启自动监测', savedStopped: '已保存关注，本站尚未开启自动监测',
+     canSave: '可先保存关注，本站尚未开启自动监测。', closedMembership: '月卡、年卡可先保存关注。本站尚未开启自动监测。', noSender: '本站微信提醒暂未就绪',
+@@ -29,6 +31,7 @@
+     addHere: 'Add this store to watch', addStore: 'Add store', manage: 'Manage', collapse: 'Collapse', removeStore: 'Remove', removeWatch: 'Remove watch',
+     removeStoreTitle: 'Remove this store?', edited: 'Watch updated', changed: 'This watch changed. Check its current settings.',
+     lastStore: 'To remove the last store, remove the watch.',
++    withdrawn: 'Region discontinued. Monitoring has stopped.',
+     removeTitle: 'Remove this watch?', cancel: 'Keep watch', saved: 'Watch saved', active: 'Watch enabled', paused: 'Paused', expired: 'Membership expired',
+     limit_paused: 'Over plan limit', stopped: 'Monitoring is not yet open in this region.', savedStopped: 'Watch saved. Monitoring is not active in this region.',
+     canSave: 'You can save a watch now. Monitoring is not active in this region.', closedMembership: 'Monthly and annual pass holders can save watches here. Monitoring is not active in this region.', noSender: 'WeChat alerts are not ready in this region.',
+@@ -53,10 +56,14 @@
+   const lang = page.lang || 'zh-CN', w = WORDS[lang], list = ready && page.watchList;
+   const member = eligiblePlan && list?.canWatch !== false;
+   const rows = (list && list.follows || []).filter(f => f && f.status !== 'removed').map(f => {
++    const stores = Array.isArray(f.storeNumbers) ? f.storeNumbers : [];
++    if (!MARKETS.includes(f.market)) {
++      return { id: f.followId, market: f.market, name: f.market, product: f.partNumber, stores: stores.join(' · '),
++        revision: f.updatedAt || null, withdrawn: true, status: w.withdrawn, canResume: false, editing: false, selected: false };
++    }
+     const home = (page.sites || []).find(s => s.code === f.market);
+     const choices = home && page.optionsFor(home, lang);
+     const p = choices && choices.byId.get(f.partNumber);
+-    const stores = Array.isArray(f.storeNumbers) ? f.storeNumbers : [];
+     const name = home && ((lang === 'en' && home.nameEn) || home.name) || f.market;
+     const overLimit = f.market === page.market && f.partNumber === page.part && stores.includes(page.store)
+       && Array.isArray(f.eligibleStoreNumbers) && !f.eligibleStoreNumbers.includes(page.store);
+@@ -135,7 +142,7 @@
+   },
+   onManageWatch(e) {
+     const id = e.currentTarget.dataset.id;
+-    if (!this.visible || !this.isAccount() || !this.data.watchEditing || this.watchToken || !this.data.watchRows.some(row => row.id === id)) return;
++    if (!this.visible || !this.isAccount() || !this.data.watchEditing || this.watchToken || !this.data.watchRows.some(row => row.id === id && !row.withdrawn)) return;
+     this.editingWatch = this.editingWatch === id ? null : id;
+     this.paint();
+   },
+@@ -169,7 +176,7 @@
+   onSelectWatch(e) {
+     if (!this.visible || !this.accountReady || !this.isAccount()) return;
+     const follow = this.watchList?.follows.find(row => row.followId === e.currentTarget.dataset.id);
+-    if (!follow || !Array.isArray(follow.storeNumbers) || !follow.storeNumbers.length) return;
++    if (!follow || !MARKETS.includes(follow.market) || !Array.isArray(follow.storeNumbers) || !follow.storeNumbers.length) return;
+     this.applySelection({ market: follow.market, partNumber: follow.partNumber, storeNumber: follow.storeNumbers[0] });
+     this.rememberMarket();
+     this.paint();
+@@ -178,7 +185,7 @@
+   onWatchStatus(e) {
+     const { id, status } = e.currentTarget.dataset;
+     const row = this.data.watchRows.find(row => row.id === id);
+-    if (!row || this.watchToken || !this.accountReady || !this.visible || !this.isAccount()) return;
++    if (!row || (row.withdrawn && status !== 'removed') || this.watchToken || !this.accountReady || !this.visible || !this.isAccount()) return;
+     if (status === row.pauseTo && (status === 'paused' || row.canResume)) return this.writeWatch('market.watchStatus', { followId: id, status, ...(this.data.watchEditing ? { expectedUpdatedAt: row.revision } : {}) });
+     if (status === 'removed') this.confirmWatchChange(row, this.data.w.removeTitle, row.stores, this.data.w.remove, 'market.watchStatus', { status });
+   },
+--- a/miniprogram/pages/markets/index.wxml
++++ b/miniprogram/pages/markets/index.wxml
+@@ -102,7 +102,10 @@
+       <view wx:if="{{watchRows.length}}" class="card markets-watchlist">
+         <view class="card-title">{{w.title}}</view>
+         <view wx:for="{{watchRows}}" wx:key="id" class="market-watch">
+-          <button class="market-watch-target" hover-class="ui-control-pressed" bindtap="onSelectWatch" data-id="{{item.id}}" aria-pressed="{{item.selected}}">
++          <view wx:if="{{item.withdrawn}}" class="market-watch-copy">
++            <text class="market-watch-title">{{item.product}}</text><text class="market-meta">{{item.name}} · {{item.stores}}</text>
++          </view>
++          <button wx:else class="market-watch-target" hover-class="ui-control-pressed" bindtap="onSelectWatch" data-id="{{item.id}}" aria-pressed="{{item.selected}}">
+             <view wx:if="{{item.imageDisplayUrl}}" class="product-tile market-product-tile">
+               <image src="{{item.imageDisplayUrl}}" mode="aspectFit" aria-hidden="true" data-src="{{item.imageDisplayUrl}}" binderror="onProductImageError" />
+             </view>
+@@ -111,9 +114,12 @@
+           </button>
+           <text class="market-meta">{{item.status}}</text>
+           <view class="market-watch-actions">
+-            <button class="ui-action" disabled="{{watchBusy || networkOffline || (item.pauseTo === 'active' && !item.canResume)}}" data-id="{{item.id}}" data-status="{{item.pauseTo}}" bindtap="onWatchStatus">{{item.pauseTo === 'paused' ? w.pause : w.resume}}</button>
+-            <button wx:if="{{watchEditing}}" class="ui-action" disabled="{{watchBusy}}" data-id="{{item.id}}" aria-expanded="{{item.editing}}" bindtap="onManageWatch">{{item.editing ? w.collapse : w.manage}}</button>
+-            <button wx:else class="ui-action ui-action--plain" disabled="{{watchBusy || networkOffline}}" data-id="{{item.id}}" data-status="removed" bindtap="onWatchStatus">{{w.remove}}</button>
++            <button wx:if="{{item.withdrawn}}" class="ui-action ui-action--plain" disabled="{{watchBusy || networkOffline}}" data-id="{{item.id}}" data-status="removed" bindtap="onWatchStatus">{{w.removeWatch}}</button>
++            <block wx:else>
++              <button class="ui-action" disabled="{{watchBusy || networkOffline || (item.pauseTo === 'active' && !item.canResume)}}" data-id="{{item.id}}" data-status="{{item.pauseTo}}" bindtap="onWatchStatus">{{item.pauseTo === 'paused' ? w.pause : w.resume}}</button>
++              <button wx:if="{{watchEditing}}" class="ui-action" disabled="{{watchBusy}}" data-id="{{item.id}}" aria-expanded="{{item.editing}}" bindtap="onManageWatch">{{item.editing ? w.collapse : w.manage}}</button>
++              <button wx:else class="ui-action ui-action--plain" disabled="{{watchBusy || networkOffline}}" data-id="{{item.id}}" data-status="removed" bindtap="onWatchStatus">{{w.remove}}</button>
++            </block>
+           </view>
+           <view wx:if="{{item.editing}}" class="market-watch-editor">
+             <view wx:for="{{item.selectedStores}}" wx:for-item="savedStore" wx:key="id" class="market-field">

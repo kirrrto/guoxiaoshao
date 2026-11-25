@@ -578,6 +578,24 @@ test('release access starts at local midnight and uses plan ID instead of remain
   }
 });
 
+test('US credit query and opening date follow the selected store at the same instant', async () => {
+  const { page, rt } = await setup({ 'user.bootstrap': () => ({
+    identity: { userKey: 'Alice' }, membership: { active: false }, quota: { balance: 1, revision: 1 },
+    serverTime: '2026-10-18T08:00:00.000Z',
+  }) }, { market: 'US', partNumber: 'MJQ34LL/A', storeNumber: 'R073' });
+  assert.equal(page.data.canQuery, false, 'Hawaii is still on October 17');
+  assert.match(page.data.launchNotice, /2026-10-18/);
+  await page.onQuery();
+  assert.equal(rt.calls.filter(call => call.action === 'market.pickup').length, 0);
+  const areaIndex = page.data.areas.findIndex(row => row.firstStoreId === 'R102');
+  page.onChoice({ ...tap({ field: 'area' }), detail: { value: areaIndex } });
+  assert.equal(page.data.store.id, 'R102');
+  assert.equal(page.data.canQuery, true, 'Delaware has reached October 18');
+  assert.equal(page.data.launchNotice, '');
+  await page.onQuery();
+  assert.equal(rt.calls.find(call => call.action === 'market.pickup').payload.storeNumbers[0], 'R102');
+});
+
 test('regional check-in uses the shared daily quota, renders the account-confirmed balance and blocks double taps', async () => {
   const wait=deferred();
   const {page,rt}=await setup({
@@ -884,5 +902,69 @@ test('US region labels, DST store local timestamps and English notification avai
   assert.equal(page.data.watchRows.find(r => r.id === 'en-watch').canEditLanguage, true, 'existing EN watch can still switch back');
   page.onMarket(tap({ market: 'JP' }));
   assert.equal(page.data.areas.length, 0);
+  page.onUnload();
+});
+
+test('confirming the current US state keeps the selected store and its receipt until the state actually changes', async () => {
+  const { page, rt } = await setup();
+  page.onMarket(tap({ market: 'US' }));
+  const choose = (field, value) => page.onChoice({ ...tap({ field }), detail: { value } });
+  choose('store', 1);
+  const store = page.store, area = page.data.areaIndex;
+  assert.notEqual(store, page.data.area.firstStoreId);
+  await page.onQuery();
+  const snapshot = page.snapshot, scope = page.scope;
+  assert.ok(snapshot && page.data.receipt);
+  let haptics = 0;
+  rt.wx.vibrateShort = () => { haptics++; };
+  choose('area', String(area));
+  assert.equal(page.store, store);
+  assert.equal(page.scope, scope);
+  assert.equal(page.snapshot, snapshot);
+  assert.equal(haptics, 0);
+  choose('area', area + 1);
+  assert.equal(page.store, page.data.areas[area + 1].firstStoreId);
+  assert.equal(page.data.receipt, null);
+  assert.equal(haptics, 1);
+  assert.equal(rt.calls.filter(c => c.action === 'market.pickup').length, 1);
+  page.onUnload();
+});
+
+test('the watch language editor uses each saved region’s notification capability despite global settings', async () => {
+  const rows = MARKETS.map(site => ({
+    followId: site.code, market: site.code, partNumber: site.products[0].partNumber,
+    storeNumbers: [site.stores[0].storeNumber], status: 'active', language: 'zh-CN',
+  }));
+  const { page, rt, handlers } = await setup({
+    'market.catalog': () => ({ markets: MARKETS.map(site => ({ ...site, enabled: true, monitorEnabled: true,
+      notificationsEnabled: site.code !== 'US', notificationsEnabledEn: site.code === 'JP' })) }),
+    'market.follows': () => ({ follows: rows, canWatch: true, watchEditing: true }),
+    'market.editWatch': p => {
+      const follow = rows.find(row => row.followId === p.followId);
+      follow.language = p.language;
+      return { follow };
+    },
+  }, { market: 'JP' });
+  const row = id => page.data.watchRows.find(item => item.id === id);
+  const edit = (id, value) => page.onEditWatch({ ...tap({ id, field: 'language' }), detail: { value } });
+  // US alerts are closed in both languages, so a member can save a preference for later.
+  assert.equal(row('US').canEditLanguage, true);
+  page.onManageWatch(tap({ id: 'US' }));
+  await edit('US', 1);
+  assert.equal(row('US').language, 'en');
+  // A global English template does not make it available for a Chinese-only station.
+  const boot = handlers['user.bootstrap'];
+  handlers['user.bootstrap'] = () => {
+    const result = boot();
+    result.notifications.templateIds.restockEn = 'english';
+    return result;
+  };
+  await page.onPullDownRefresh();
+  assert.equal(row('HK').canEditLanguage, false);
+  assert.equal(row('JP').canEditLanguage, true);
+  page.onManageWatch(tap({ id: 'HK' }));
+  await edit('HK', 1);
+  assert.equal(row('HK').language, 'zh-CN');
+  assert.deepEqual(rt.calls.filter(c => c.action === 'market.editWatch').map(c => c.payload.followId), ['US']);
   page.onUnload();
 });
