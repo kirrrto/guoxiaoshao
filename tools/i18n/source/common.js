@@ -1,4 +1,7 @@
 module.exports = {
+  '到期事项一览': 'Upcoming deadlines',
+  '「小哨」并排显示到期日和事项名称，名称下方显示计划提醒时间。': 'In Watches, see the due date beside each item and its scheduled reminder underneath.',
+  '需要授权或发送失败的事项会标出状态，点「管理」可查看详情。': 'Items show when permission is needed or a reminder failed. Open Manage for details.',
   '页头哨标': 'Whistle in page headers',
   '「查询」和「其他站点」换上了「我的小哨」的绿色哨标。': 'Search and Regional stores now use the green whistle from Watches.',
   '打开查询页时，加载画面也显示同一枚哨标。': 'The same whistle appears while Search is loading.',

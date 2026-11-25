@@ -23,25 +23,36 @@
           </button>
         </view>
       </view>
-      <!-- 到期提醒：下一次计划提醒时间在前，事项与微信状态在后。 -->
-      <view class="card deadline-home">
-        <view class="deadline-home-heading">
-          <view class="deadline-heading-copy"><view class="card-title section-title">{{i18n.t(ui,'到期提醒')}}</view><text class="deadline-service-label">{{i18n.t(ui,(deadlineServiceLabel))}}</text></view>
-          <button wx:if="{{deadlineCanOpen && !deadlineCount}}" class="btn btn-sm {{deadlineRecordOnly && follows.length ? '' : 'btn-primary'}} deadline-home-action" hover-class="btn-primary-pressed" disabled="{{deadlinesLoading}}" bindtap="onOpenDeadlines">{{i18n.t(ui,'添加到期事项')}}</button>
-          <button wx:if="{{deadlineCanOpen && deadlineCount}}" class="ui-action ui-action--plain deadline-home-manage" hover-class="ui-control-pressed" disabled="{{deadlinesLoading}}" bindtap="onOpenDeadlines" aria-label="{{i18n.m(ui,'管理到期事项，共 {0} 条',[(deadlineCount)])}}">{{i18n.m(ui,'管理到期事项（{0}）',[(deadlineCount)])}}<view class="ui-chevron" aria-hidden="true"></view></button>
+      <view class="deadline-home">
+        <view class="section-heading deadline-home-heading">
+          <text class="section-title">{{i18n.t(ui,'到期提醒')}}</text>
+          <button wx:if="{{deadlineCanOpen && !deadlineCount}}" class="ui-action ui-action--plain deadline-home-action" hover-class="ui-control-pressed" disabled="{{deadlinesLoading}}" bindtap="onOpenDeadlines" aria-label="{{i18n.t(ui,'添加到期事项')}}">{{i18n.t(ui,'添加事项')}}<view class="ui-chevron" aria-hidden="true"></view></button>
+          <button wx:elif="{{deadlineCanOpen}}" class="ui-action ui-action--plain deadline-home-manage" hover-class="ui-control-pressed" disabled="{{deadlinesLoading}}" bindtap="onOpenDeadlines" aria-label="{{i18n.m(ui,'管理到期事项，共 {0} 条',[deadlineCount])}}"><text wx:if="{{deadlineCount > deadlines.length}}">{{i18n.m(ui,'全部 {0} 项',[deadlineCount])}}</text><text wx:else>{{i18n.t(ui,'管理')}}</text><view class="ui-chevron" aria-hidden="true"></view></button>
         </view>
         <view class="deadline-agenda">
-          <view wx:if="{{deadlinesError}}" class="deadline-home-error" aria-role="alert"><text>{{i18n.t(ui,(deadlinesError))}}</text><button class="ui-action" hover-class="ui-control-pressed" disabled="{{deadlinesLoading}}" bindtap="onRetryDeadlines">{{i18n.t(ui,'重试')}}</button></view>
-          <view wx:elif="{{deadlinesLoading && !deadlinesLoaded}}" class="deadline-home-empty" aria-busy="true">{{i18n.t(ui,'正在读取到期事项…')}}</view>
-          <view wx:elif="{{!deadlineCount}}" class="deadline-home-empty">{{i18n.t(ui,'暂无到期事项')}}</view>
-          <view wx:if="{{deadlineCanOpen && deadlineRecordOnly}}" class="deadline-record-only">{{i18n.t(ui,'微信通知尚未开启。')}}</view>
-          <view wx:for="{{deadlines}}" wx:key="id" class="deadline-home-row">
-            <view class="deadline-home-item"><text class="deadline-home-title">{{item.title}}</text><text class="deadline-home-date">{{i18n.t(ui,(item.dueText))}}</text></view>
-            <view wx:if="{{deadlineCanOpen && nextDeadline && item.id === nextDeadline.id}}" class="deadline-home-next">
-              <text>{{i18n.t(ui,'下一次计划提醒')}}</text><text class="deadline-next-time">{{i18n.t(ui,(item.remindText))}}</text>
-            </view>
-            <view class="deadline-home-delivery"><text class="deadline-home-state deadline-home-state--{{item.tone}}">{{i18n.t(ui,(item.statusLabel))}}</text><text>{{i18n.t(ui,(item.statusNote))}}</text></view>
+          <view wx:if="{{deadlinesError}}" class="deadline-home-error" aria-role="alert">
+            <text>{{i18n.t(ui,deadlinesError)}}</text><button class="ui-action" hover-class="ui-control-pressed" disabled="{{deadlinesLoading}}" bindtap="onRetryDeadlines">{{i18n.t(ui,'重试')}}</button>
           </view>
+          <view wx:elif="{{!deadlinesLoaded}}" class="deadline-home-empty" aria-busy="true">{{i18n.t(ui,'正在读取到期事项…')}}</view>
+          <block wx:else>
+            <view wx:if="{{!deadlineCount}}" class="deadline-home-empty">{{i18n.t(ui,'暂无到期事项')}}</view>
+            <view wx:for="{{deadlines}}" wx:key="id" class="deadline-home-row">
+              <view wx:if="{{item.calendarDay}}" class="deadline-home-date" aria-label="{{i18n.t(ui,item.dueText)}}">
+                <text class="deadline-date-month">{{i18n.t(ui,item.calendarMonth)}}</text>
+                <text class="deadline-date-day">{{item.calendarDay}}</text>
+              </view>
+              <view wx:else class="deadline-home-date deadline-date-unknown">{{i18n.t(ui,'到期日待确认')}}</view>
+              <view class="deadline-home-item">
+                <text class="deadline-home-title">{{item.title}}</text>
+                <block wx:if="{{deadlineCanOpen && item.summaryReminder}}">
+                  <text wx:if="{{item.summaryReminder.year}}" class="deadline-next-time">{{i18n.m(ui,'{0}年{1}{2}日 {3} 提醒（北京时间）',[item.summaryReminder.year,item.summaryReminder.month,item.summaryReminder.day,item.summaryReminder.time])}}</text>
+                  <text wx:else class="deadline-next-time">{{i18n.m(ui,'{0}{1}日 {2} 提醒（北京时间）',[item.summaryReminder.month,item.summaryReminder.day,item.summaryReminder.time])}}</text>
+                </block>
+                <text wx:elif="{{deadlineCanOpen && item.statusLabel}}" class="deadline-home-state deadline-home-state--{{item.tone}}">{{i18n.t(ui,item.statusLabel)}}</text>
+              </view>
+            </view>
+            <view wx:if="{{deadlineCanOpen && deadlineRecordOnly}}" class="deadline-record-only">{{i18n.t(ui,'当前仅保存事项，不会发送微信通知。')}}</view>
+          </block>
         </view>
       </view>
     </view>

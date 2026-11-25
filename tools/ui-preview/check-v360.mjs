@@ -76,7 +76,11 @@ try {
               checks.nextPlan = Boolean(find('.deadline-next-time')) === scheduled;
               if (scheduled) {
                 const row = find('.deadline-next-time')?.closest('.deadline-home-row');
-                checks.planInContext = Boolean(row?.querySelector('.deadline-home-date') && row?.querySelector('.deadline-home-state'));
+                checks.planInContext = row?.querySelector('.deadline-home-title')?.textContent.trim() === '周末优惠券'
+                  && Number(row.querySelector('.deadline-date-day')?.textContent) === 1
+                  && row.querySelector('.deadline-date-month')?.textContent.includes('11')
+                  && row.querySelector('.deadline-next-time').textContent.includes('09:00')
+                  && !row.querySelector('.deadline-home-state');
                 checks.fixtureTitleOccursOnce = find('.deadline-home').innerText.split('周末优惠券').length === 2;
                 checks.followBeforeRoutineAuthorization = before('.follow-stock-time', '.reminder-status-strip');
                 checks.whistleMark = Boolean(find('.whistle-mark')?.naturalWidth);

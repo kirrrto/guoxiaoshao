@@ -16,6 +16,19 @@ export function inspectDeadlineLayout({ saving = false, conflict = false, unavai
   const deadlineText = scopes.flatMap(scope => [...scope.querySelectorAll('*')]).filter(element => visible(element) && !element.children.length && element.textContent.trim())
     .map(element => ({ class: element.className, label: element.textContent.trim(), fontSize: parseFloat(getComputedStyle(element).fontSize) }));
   for (const text of deadlineText) if (text.fontSize < 11.99) deadlineLayoutErrors.push(`Functional text ${text.label} is ${text.fontSize.toFixed(1)}px`);
+  const manageLabel = document.querySelector('.deadline-home-manage > span');
+  if (manageLabel && ['管理', 'Manage'].includes(manageLabel.textContent.trim())) {
+    const label = document.createRange();
+    label.selectNodeContents(manageLabel);
+    if (label.getClientRects().length > 1) deadlineLayoutErrors.push('The short management action wraps mid-word');
+  }
+  for (const row of document.querySelectorAll('.deadline-home-row')) {
+    const date = row.querySelector('.deadline-home-date')?.getBoundingClientRect();
+    const title = row.querySelector('.deadline-home-title')?.getBoundingClientRect();
+    if (!date || !title || date.right > title.left + 1) deadlineLayoutErrors.push('Due date and item title need separate columns');
+    const plan = row.querySelector('.deadline-next-time');
+    if (plan && row.querySelector('.deadline-home-state')) deadlineLayoutErrors.push('Scheduled item repeats its status beside the reminder time');
+  }
   for (const input of document.querySelectorAll('.deadline-editor input')) if (!input.getAttribute('aria-label')) deadlineLayoutErrors.push('Deadline input is missing an accessible name');
   if (unavailable) {
     for (const element of document.querySelectorAll('button[data-preview-action="onOpenDeadlines"], .deadline-add, button[data-preview-action="onSave"]')) if (visible(element) && !disabled(element)) deadlineLayoutErrors.push('Unavailable service has an enabled create/manage/save action');

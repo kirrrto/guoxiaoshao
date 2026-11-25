@@ -19,7 +19,7 @@ const { createCheckoutContext } = require('../../utils/checkout-context');
 const { activationStatus } = require('../../utils/activation-status');
 const { targetSignature } = require('../../utils/result-next-action');
 const conversion = require('../../utils/conversion-events');
-const { presentDeadline, deadlineError } = require('../../utils/deadlines');
+const { presentHomeDeadline, deadlineError } = require('../../utils/deadlines');
 
 const FOLLOW_STATUS = {
   active: { label: '关注已开启', cls: 'ok' },
@@ -260,9 +260,7 @@ Page(require('../../utils/language').page('follow', {
     deadlinesLoading: false,
     deadlinesError: '',
     deadlineCanOpen: false,
-    deadlineServiceLabel: '读取中',
     deadlineRecordOnly: false,
-    nextDeadline: null,
     networkOffline: false,
     ready: false,
     loadError: null,
@@ -758,8 +756,8 @@ Page(require('../../utils/language').page('follow', {
     if (this.deadlineUserKey && boot.identity && this.deadlineUserKey !== boot.identity.userKey) {
       this.retireDeadlineRead();
       this.deadlineUserKey = null;
-      this.setData({ deadlines: [], deadlineCount: 0, deadlinesLoaded: false, deadlinesError: '', nextDeadline: null,
-        deadlineCanOpen: false, deadlineServiceLabel: '读取中', deadlineRecordOnly: false });
+      this.setData({ deadlines: [], deadlineCount: 0, deadlinesLoaded: false, deadlinesError: '',
+        deadlineCanOpen: false, deadlineRecordOnly: false });
       reloadDeadlines = hadDeadlineRead;
     }
     const previousIdentity = this.accountSnapshot && this.accountSnapshot.identity;
@@ -773,8 +771,8 @@ Page(require('../../utils/language').page('follow', {
       this.removeConfirmation = null;
       this.retireDeadlineRead();
       this.deadlineUserKey = null;
-      this.setData({ deadlines: [], deadlineCount: 0, deadlinesLoaded: false, deadlinesError: '', nextDeadline: null,
-        deadlineCanOpen: false, deadlineServiceLabel: '读取中', deadlineRecordOnly: false });
+      this.setData({ deadlines: [], deadlineCount: 0, deadlinesLoaded: false, deadlinesError: '',
+        deadlineCanOpen: false, deadlineRecordOnly: false });
       reloadDeadlines = hadDeadlineRead;
       this.statusRefreshEpoch = (this.statusRefreshEpoch || 0) + 1;
       this.editorEpoch = (this.editorEpoch || 0) + 1;
@@ -1315,36 +1313,36 @@ Page(require('../../utils/language').page('follow', {
     const current = () => !this.pageRetired && this.visible !== false && epoch === (this.deadlineReadEpoch || 0)
       && (!userKey || !identity() || userKey === identity());
     if (this.deadlineUserKey && userKey && this.deadlineUserKey !== userKey) {
-      this.setData({ deadlines: [], deadlineCount: 0, deadlinesLoaded: false, nextDeadline: null,
+      this.setData({ deadlines: [], deadlineCount: 0, deadlinesLoaded: false,
         deadlineCanOpen: false, deadlineRecordOnly: false });
     }
-    this.setData({ deadlinesLoading: true, deadlinesError: '', deadlineCanOpen: false, deadlineServiceLabel: '读取中' });
+    this.setData({ deadlinesLoading: true, deadlinesError: '', deadlineCanOpen: false });
     const pending = call('deadline.list').then(result => {
       if (!current()) return false;
       if (!result || !Array.isArray(result.items) || !result.userKey) throw Error('到期提醒暂未读取成功，请重试。');
       if (identity() && result.userKey !== identity()) {
         this.deadlineUserKey = null;
-        this.setData({ deadlines: [], deadlineCount: 0, deadlinesLoaded: false, nextDeadline: null,
-          deadlinesError: '账户已变化，请刷新状态后重新读取到期事项。', deadlineServiceLabel: '暂不可用' });
+        this.setData({ deadlines: [], deadlineCount: 0, deadlinesLoaded: false,
+          deadlinesError: '账户已变化，请刷新状态后重新读取到期事项。' });
         return false;
       }
       this.deadlineUserKey = result.userKey;
-      const items = result.items.map(item => presentDeadline(item));
+      const now = Date.now();
       const notificationsEnabled = Boolean(result.capability && result.capability.enabled);
-      const planned = items.filter(item => notificationsEnabled && item.delivery && item.delivery.status === 'scheduled' && Date.parse(item.remindAt) > Date.now())
-        .sort((a, b) => Date.parse(a.remindAt) - Date.parse(b.remindAt));
-      const upcoming = items.filter(item => !['accepted', 'missed'].includes(item.delivery && item.delivery.status))
-        .sort((a, b) => Date.parse(a.remindAt) - Date.parse(b.remindAt));
-      const nextDeadline = planned[0] || null;
+      const items = result.items.map(item => {
+        const at = Date.parse(item.remindAt);
+        return { summary: presentHomeDeadline(item, now, notificationsEnabled),
+          at: Number.isFinite(at) ? at : Infinity, status: item.delivery && item.delivery.status };
+      });
+      const upcoming = items.filter(row => !['accepted', 'missed'].includes(row.status)).sort((a, b) => a.at - b.at);
+      const nextDeadline = upcoming.find(row => row.summary.summaryReminder);
       const preview = upcoming.length ? upcoming : items;
-      const ordered = nextDeadline ? [nextDeadline, ...preview.filter(item => item.id !== nextDeadline.id)] : preview;
-      this.setData({ deadlines: ordered.slice(0, 3), deadlineCount: items.length,
-        deadlinesLoaded: true, deadlinesError: '', nextDeadline,
-        deadlineCanOpen: true, deadlineRecordOnly: !notificationsEnabled,
-        deadlineServiceLabel: notificationsEnabled ? '免费试用' : '仅保存事项' });
+      const ordered = nextDeadline ? [nextDeadline, ...preview.filter(row => row.summary.id !== nextDeadline.summary.id)] : preview;
+      this.setData({ deadlines: ordered.slice(0, 3).map(row => row.summary), deadlineCount: items.length,
+        deadlinesLoaded: true, deadlinesError: '', deadlineCanOpen: true, deadlineRecordOnly: !notificationsEnabled });
       return true;
     }).catch(error => {
-      if (current()) this.setData({ deadlinesError: deadlineError(error), deadlineCanOpen: false, deadlineServiceLabel: '暂不可用', nextDeadline: null });
+      if (current()) this.setData({ deadlinesError: deadlineError(error), deadlineCanOpen: false });
       return false;
     }).finally(() => {
       if (this.deadlineReadPromise === pending) {
@@ -1358,7 +1356,7 @@ Page(require('../../utils/language').page('follow', {
 
   onOpenDeadlines() {
     if (!this.data.deadlineCanOpen || this.data.deadlinesLoading || this.data.deadlinesError) return;
-    navigation.navigateTo({ url: '/pages/deadlines/index' });
+    navigation.navigateTo({ url: this.data.deadlineCount ? '/pages/deadlines/index' : '/pages/deadlines/index?mode=add' });
   },
   onRetryDeadlines() { return this.loadDeadlines(); },
   onOpenInventory() { switchToTab({ url: '/pages/query/index' }); },

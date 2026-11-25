@@ -5,30 +5,22 @@
 .follow-list-pane { display: none; }
 
 /* ── 到期提醒 ─────────────────────────────────────────── */
-.deadline-home-heading { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--sp-8) var(--sp-12); margin-bottom: var(--sp-8); }
-.deadline-heading-copy { display: flex; flex: 1 1 auto; flex-wrap: wrap; align-items: baseline; gap: var(--sp-2) var(--sp-8); min-width: 0; }
-.deadline-heading-copy .card-title { margin-bottom: 0; }
-.deadline-service-label { color: var(--text-3); font-size: var(--fs-sub); }
-.deadline-home-action.btn { flex: none; }
-.deadline-home-manage.ui-action { flex: 0 1 auto; }
-.deadline-home-empty { color: var(--text-2); font-size: var(--fs-sub); }
-.deadline-record-only { color: var(--text-3); font-size: var(--fs-sub); }
-.deadline-home-row { padding: var(--sp-12) 0; border-top: 1px solid var(--line); }
-.deadline-home-row:first-child { padding-top: 0; border-top: 0; }
-.deadline-home-row:last-child { padding-bottom: 0; }
-.deadline-record-only + .deadline-home-row { margin-top: var(--sp-12); }
-.deadline-home-item { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--sp-2) var(--sp-12); }
-.deadline-home-title { flex: 1 1 90px; min-width: 0; font-weight: 600; line-height: var(--lh-snug); overflow-wrap: anywhere; }
-.deadline-home-date { color: var(--text-2); font-size: var(--fs-sub); }
-.deadline-home-next { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--sp-2) var(--sp-8); margin-top: var(--sp-4); color: var(--text-2); font-size: var(--fs-sub); }
-.deadline-next-time { color: var(--text); font-size: var(--fs-title); font-weight: 600; line-height: var(--lh-tight); }
-.deadline-home-delivery { display: flex; flex-direction: column; gap: var(--sp-2); margin-top: var(--sp-4); color: var(--text-2); font-size: var(--fs-sub); overflow-wrap: anywhere; }
-.deadline-home-state { display: flex; align-items: center; gap: var(--sp-8); font-weight: 600; }
-.deadline-home-state::before { content: ''; flex: none; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.deadline-home .deadline-home-heading { margin-top: 0; }
+.deadline-home-heading .ui-action { flex: 0 0 auto; max-width: 50%; }
+.deadline-agenda { padding: 0 var(--sp-16); background: var(--surface); border-radius: var(--radius-tray); }
+.deadline-home-row { display: flex; align-items: center; gap: var(--sp-16); padding: var(--sp-16) 0; }
+.deadline-home-row + .deadline-home-row { border-top: 1px solid var(--line); }
+.deadline-home-date { display: flex; flex: 0 0 60px; flex-direction: column; align-items: center; justify-content: center; align-self: stretch; padding-right: var(--sp-12); border-right: 1px solid var(--line); color: var(--text-2); font-size: var(--fs-caption); line-height: var(--lh-snug); text-align: center; }
+.deadline-date-day { color: var(--text); font-size: var(--fs-title); font-weight: 600; line-height: var(--lh-tight); font-variant-numeric: tabular-nums; }
+.deadline-home-item { display: flex; flex: 1 1 0; flex-direction: column; gap: var(--sp-4); min-width: 0; overflow-wrap: anywhere; }
+.deadline-home-title { color: var(--text); font-size: var(--fs-headline); font-weight: 600; line-height: var(--lh-snug); }
+.deadline-next-time, .deadline-home-state, .deadline-home-empty, .deadline-record-only, .deadline-home-error { color: var(--text-2); font-size: var(--fs-sub); line-height: var(--lh-snug); }
+.deadline-home-empty, .deadline-record-only, .deadline-home-error { padding: var(--sp-12) 0; }
+.deadline-home-row + .deadline-record-only, .deadline-home-empty + .deadline-record-only { padding-top: 0; }
 .deadline-home-state--ok { color: var(--green-text); }
 .deadline-home-state--warn { color: var(--warn); }
 .deadline-home-state--bad { color: var(--bad); }
-.deadline-home-error { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-8); color: var(--warn); font-size: var(--fs-sub); }
+.deadline-home-error { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-8); }
 .deadline-home-error > text { flex: 1 1 120px; min-width: 0; overflow-wrap: anywhere; }
 
 /* ── 苹果库存：分区标题与同步状态 ─────────────────────── */

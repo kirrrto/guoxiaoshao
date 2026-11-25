@@ -12,6 +12,58 @@ async function setup(handler = action => action === 'deadline.list' ? list() : {
 }
 function fill(page) { page.onNew(); for (const [field, value] of Object.entries({ title: '会员续费', dueDate: '2027-12-31', advanceDays: '3' })) page.onField({ currentTarget: { dataset: { field } }, detail: { value } }); }
 
+test('the empty-state add link opens one draft after a successful read; ordinary management opens the list', async () => {
+  const { page: manage } = await setup();
+  assert.equal(manage.data.editing, false);
+  let offline = true;
+  const rt = runtime(() => { if (offline) throw Error('offline'); return list(); });
+  const page = rt.instance('pages/deadlines/index.js');
+  page.onLoad({ mode: 'add' });
+  await page.onShow();
+  assert.equal(page.data.editing, false);
+  offline = false;
+  await page.load();
+  assert.equal(page.data.editing, true);
+  const request = page.saveRequestId;
+  page.onField({ currentTarget: { dataset: { field: 'title' } }, detail: { value: '自己的草稿' } });
+  await page.onPullDownRefresh();
+  assert.equal(page.saveRequestId, request);
+  assert.equal(page.data.draft.title, '自己的草稿');
+  page.onCancel();
+  page.onHide(); await page.onShow();
+  assert.equal(page.data.editing, false);
+  assert.deepEqual(rt.calls.map(call => call.action), Array(4).fill('deadline.list'));
+});
+
+test('add navigation leaves a pending save to recover and never starts a draft for a different account', async () => {
+  const rt = runtime(() => list());
+  rt.wx.setStorageSync('gxs_deadline_pending_v1', { alice: { action: 'deadline.create', payload: { requestId: 'still-pending' } } });
+  const page = rt.instance('pages/deadlines/index.js');
+  page.onLoad({ mode: 'add' }); await page.onShow();
+  assert.equal(page.data.pending, true);
+  assert.equal(page.data.editing, false);
+  assert.equal(page.pendingOperation.payload.requestId, 'still-pending');
+  rt.wx.removeStorageSync('gxs_deadline_pending_v1');
+  await page.load();
+  assert.equal(page.data.editing, false);
+  assert.deepEqual(rt.calls.map(call => call.action), ['deadline.list', 'deadline.list']);
+
+  const firstRead = deferred();
+  let first = true;
+  const switched = runtime(() => first ? firstRead.promise : { ...list(), userKey: 'bob' });
+  switched.app.globalData.bootstrap = { identity: { userKey: 'alice' } };
+  const other = switched.instance('pages/deadlines/index.js');
+  other.onLoad({ mode: 'add' });
+  const loading = other.onShow();
+  switched.app.globalData.bootstrap = { identity: { userKey: 'bob' } };
+  firstRead.resolve(list()); await loading;
+  assert.equal(other.data.editing, false);
+  first = false; await other.load();
+  assert.equal(other.data.serviceAvailable, true);
+  assert.equal(other.data.editing, false);
+  assert.deepEqual(switched.calls.map(call => call.action), ['deadline.list', 'deadline.list']);
+});
+
 test('a failed refresh retains the draft but prevents new writes until a successful retry', async () => {
   let fail = false;
   const { page, rt } = await setup(action => {

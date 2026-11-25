@@ -636,7 +636,8 @@ for (const scenario of scenarios) {
     if (marketsPreview && action.startsWith('market.')) return marketFixture(action, payload, scenario, now);
     if (action === 'deadline.list') {
       if (v350Fixture?.error) throw Object.assign(Error('模拟错误：到期事项暂未读取成功'), { code: v350Fixture.errorCode || 'call_failed' });
-      const result = v350DeadlineResponse(v350Fixture || { empty: true, enabled: false }, bootstrap.identity.userKey, now);
+      const fixture = v350Fixture || (languagePreview && member ? v350Scenarios['v350-single-reminder'] : { empty: true, enabled: false });
+      const result = v350DeadlineResponse(fixture, bootstrap.identity.userKey, now);
       if (v350Fixture?.conflict) result.items = result.items.map(item => ({ ...item, revision: deadlinePreviewRevision, ...(deadlinePreviewRevision > 1 ? { title: '另一台设备已修改的事项' } : {}) }));
       return result;
     }
@@ -1256,6 +1257,7 @@ for (const scenario of scenarios) {
         : desktopPreview && pageName === 'query' && scenario === 'free' ? ['想查哪一款？', '选择配置与门店']
         : pageName === 'admin' ? ['运行统计', '128'] : [p.title, ...(sheetPreview ? ['选商品', '选门店', '已选 2 家门店', '保存选择'] : [])];
       if (adminPreview && ['operator-ready', 'operator-longcontent'].includes(scenario)) expectedText.push('成功查询 56', '已确认呈现详情 12', '测试通知：28 条／20 人', '各行为分别计数', ...(scenario === 'operator-longcontent' ? ['以上不是完整统计'] : []));
+      if (languagePreview && pageName === 'follow' && member) expectedText.push('Due date reminders', 'Nov 27', '09:00', 'Beijing time');
       if (languagePreview && pageName === 'mine') {
         const { t } = rt.load('utils/language.js');
         expectedText.push(t('剩余查询次数'), t(page.data.quota.signedInToday ? '今日已签到' : '每日签到'));

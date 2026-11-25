@@ -9,6 +9,11 @@ export const v350Scenarios = {
   'v350-loading': { pages: both, loading: true },
   'v350-empty': { pages: both, empty: true, enabled: false },
   'v350-scheduled': { pages: both, enabled: true, status: 'scheduled' },
+  'v350-single-reminder': { pages: ['follow'], enabled: true, status: 'scheduled',
+    items: [{ title: '1', dueDate: '2026-11-28', dueAt: '2026-11-28T15:59:59.000Z', remindAt: '2026-11-27T01:00:00.000Z' }] },
+  'v350-more-reminders': { pages: ['follow'], enabled: true, status: 'failed', items: [
+    { title: '会员续费' }, { title: '之前的预约' }, { title: '保修服务' }, { title: '稍后的事项', category: 'event', remindAt: '2026-11-01T12:00:00.000Z' },
+  ] },
   'v350-service-off': { pages: both, enabled: false, status: 'not_enabled' },
   'v350-needs-authorization': { pages: both, enabled: true, status: 'awaiting_authorization' },
   'v350-authorization-elapsed': { pages: both, enabled: true, status: 'awaiting_authorization', overdue: true },
@@ -26,7 +31,8 @@ export const v350Scenarios = {
 
 export function v350DeadlineResponse(fixture, userKey, now) {
   const capability = { enabled: Boolean(fixture.enabled), templateId: fixture.enabled ? 'offline-v350-deadline' : null, reason: fixture.enabled ? null : 'template_missing' };
-  const statuses = fixture.statuses || [fixture.status || 'not_enabled', fixture.enabled ? 'awaiting_authorization' : 'not_enabled'];
+  const statuses = fixture.statuses || (fixture.items ? fixture.items.map(() => fixture.status)
+    : [fixture.status || 'not_enabled', fixture.enabled ? 'awaiting_authorization' : 'not_enabled']);
   const items = fixture.empty ? [] : statuses.map((status, index) => ({
     id: `offline-deadline-${index}`, revision: 1,
     title: fixture.long ? '家庭共享视频会员续费与跨设备权益确认提醒ABCDEFGHIJK' : ['周末优惠券', '视频会员续费', '延长保修服务'][index],
@@ -34,7 +40,7 @@ export function v350DeadlineResponse(fixture, userKey, now) {
     advanceDays: fixture.overdue ? 3 : fixture.statuses ? 1 : index === 1 ? 0 : 1, remindTime: '09:00',
     remindAt: fixture.overdue ? '2026-10-29T01:00:00.000Z' : index === 2 ? '2026-10-28T01:00:00.000Z' : fixture.statuses ? '2026-10-30T01:00:00.000Z' : index === 1 ? '2026-11-01T01:00:00.000Z' : '2026-10-31T01:00:00.000Z',
     dueAt: index === 2 ? '2026-10-29T15:59:59.000Z' : fixture.statuses ? '2026-10-31T15:59:59.000Z' : '2026-11-01T15:59:59.000Z',
-    createdAt: now.toISOString(), updatedAt: now.toISOString(),
+    ...fixture.items?.[index], createdAt: now.toISOString(), updatedAt: now.toISOString(),
     delivery: { status, reason: status === 'not_enabled' ? 'template_missing' : null,
       attemptedAt: ['accepted', 'uncertain'].includes(status) ? now.toISOString() : null,
       acceptedAt: status === 'accepted' ? now.toISOString() : null },
@@ -48,7 +54,7 @@ export async function prepareV350Page({ fixture, page, pageName }) {
     return;
   }
   if (pageName === 'follow' && page.deadlineReadPromise) await page.deadlineReadPromise;
-  if (fixture.error && pageName === 'follow' && (page.data.deadlineCanOpen || page.data.nextDeadline)) throw Error('Unreadable deadline service must not offer an entry or next-reminder claim');
+  if (fixture.error && pageName === 'follow' && (page.data.deadlineCanOpen || !page.data.deadlinesError)) throw Error('Unreadable deadline service must show the problem and withhold the management entry');
   if (fixture.error && pageName === 'deadlines') {
     page.onNew();
     if (page.data.serviceAvailable || page.data.editing) throw Error('Unreadable deadline service must not create a draft');
@@ -90,26 +96,33 @@ export function v350TextExpectations({ fixture, pageName }) {
     }
     return { expected, forbidden };
   }
-  expected.push(fixture.loading ? '读取中' : fixture.error ? '暂不可用' : fixture.enabled ? '免费试用' : '仅保存事项');
-  if (pageName === 'follow') expected.push('苹果库存', '查询库存');
+  const summary = pageName === 'follow';
+  if (summary) {
+    expected.push('苹果库存', '查询库存');
+    forbidden.push('免费试用', '下一次计划提醒', '按北京时间安排；微信受理不代表实际收到。', '已安排提醒');
+  } else {
+    expected.push(fixture.loading ? '读取中' : fixture.error ? '暂不可用' : fixture.enabled ? '免费试用' : '仅保存事项');
+  }
   if (fixture.loading) expected.push('正在读取到期事项');
   else if (fixture.error) expected.push(fixture.errorCode === 'unknown_action' ? '到期事项尚未开放，请稍后再试。' : '模拟错误：到期事项暂未读取成功', pageName === 'follow' ? '重试' : '重新读取');
   else if (fixture.editor) expected.push('事项名称', '到期日期', '提前几天', '提醒时刻', ...(fixture.blank ? [] : ['2026-11-12 09:00']), fixture.saving ? '保存中' : '保存事项');
-  else if (fixture.empty) expected.push(pageName === 'follow' ? '添加到期事项' : '还没有到期事项');
+  else if (fixture.empty) expected.push(summary ? '添加事项' : '还没有到期事项');
   else {
-    expected.push(fixture.long ? '家庭共享视频会员续费与跨设备权益确认提醒ABCDEFGHIJK' : fixture.statuses && pageName === 'follow' ? '视频会员续费' : '周末优惠券');
-    if (fixture.status === 'scheduled') expected.push('已安排提醒');
+    expected.push(fixture.items?.[0]?.title || (fixture.long ? '家庭共享视频会员续费与跨设备权益确认提醒ABCDEFGHIJK' : fixture.statuses && summary ? '视频会员续费' : '周末优惠券'));
+    if (fixture.status === 'scheduled') expected.push(summary ? '09:00' : '已安排提醒');
+    if (fixture.items?.length > 3) expected.push('全部 4 项');
+    if (fixture.status === 'failed') expected.push('提醒发送失败');
     if (fixture.status === 'awaiting_authorization') expected.push(fixture.overdue ? '提醒时间已过' : '待授权微信提醒');
-    if (fixture.status === 'not_enabled') expected.push('仅保存，微信提醒未开启');
+    if (fixture.status === 'not_enabled' && !summary) expected.push('仅保存，微信提醒未开启');
     if (fixture.statuses) expected.push(...(pageName === 'deadlines' ? ['微信已受理', '已错过提醒时间'] : []), '发送结果待确认');
   }
   if (fixture.saveError) expected.push('操作结果尚未确认', '确认原保存结果');
   if (fixture.saving) forbidden.push('原操作尚待确认', '确认原保存结果');
   if (fixture.conflict) expected.push('草稿仍保留', '用最新内容替换草稿');
   if (fixture.overdue) forbidden.push('允许一次微信提醒');
-  if (fixture.appleError) expected.push('后台记录暂未更新', '管理到期事项');
+  if (fixture.appleError) expected.push('后台记录暂未更新', '管理');
   if (fixture.loading || fixture.error) forbidden.push('添加到期事项', '管理到期事项', '免费试用', '仅保存事项', '保存事项');
-  else if (!fixture.enabled) { expected.push(pageName === 'follow' ? '微信通知尚未开启' : '微信到期提醒尚未开启'); forbidden.push('免费试用'); }
+  else if (!fixture.enabled) { expected.push(summary ? '当前仅保存事项，不会发送微信通知。' : '微信到期提醒尚未开启'); forbidden.push('免费试用'); }
   if (fixture.status !== 'scheduled') forbidden.push('下一次计划提醒');
   return { expected, forbidden };
 }

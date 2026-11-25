@@ -12,7 +12,10 @@ Page(require('../../utils/language').page('deadlines', {
   data: { loading: true, ready: false, serviceAvailable: false, busy: false, items: [], limit: 20, capability: { enabled: false },
     error: '', formError: '', feedback: '', editing: false, editingId: '', editConflict: false, draft: makeDraft(),
     categories: CATEGORIES, categoryIndex: 0, earliestDate: '', previewTime: '', pending: false, pendingLabel: '' },
-  onLoad() { this.retired = false; this.epoch = 0; },
+  onLoad(options = {}) {
+    this.retired = false; this.epoch = 0;
+    this.addOnEntry = options.mode === 'add' ? { owner: cachedOwner() } : null;
+  },
   onShow() { navigation.confirmNavigation('pages/deadlines/index'); this.visible = true; return this.load(); },
   onHide() { this.visible = false; this.removeConfirmation = null; },
   onUnload() { this.retireNativeAuthorization(); this.retired = true; this.epoch += 1; },
@@ -44,6 +47,7 @@ Page(require('../../utils/language').page('deadlines', {
     if (this.retired) return;
     const beforeOwner = cachedOwner();
     if (beforeOwner && this.owner && beforeOwner !== this.owner) {
+      this.addOnEntry = null;
       this.retireNativeAuthorization();
       this.epoch += 1; this.loadingPromise = null;
       this.owner = ''; this.pendingOperation = null;
@@ -62,6 +66,7 @@ Page(require('../../utils/language').page('deadlines', {
           // A newer server identity must never leave the previous user's records
           // or draft visible while bootstrap is stale. Owner-keyed receipts stay
           // in storage, but cannot be retried from this mismatched session.
+          this.addOnEntry = null;
           this.owner = ''; this.pendingOperation = null; this.editRevision = null; this.saveRequestId = null;
           this.setData({ items: [], ready: false, serviceAvailable: false, editing: false, editingId: '',
             pending: false, pendingLabel: '', busy: false, editConflict: false, draft: makeDraft(),
@@ -70,6 +75,7 @@ Page(require('../../utils/language').page('deadlines', {
           return;
         }
         if (this.owner && this.owner !== result.userKey) {
+          this.addOnEntry = null;
           this.pendingOperation = null;
           this.setData({ editing: false, draft: makeDraft(), feedback: '', pending: false, pendingLabel: '' });
         }
@@ -79,6 +85,11 @@ Page(require('../../utils/language').page('deadlines', {
         const pending = this.readPending();
         this.pendingOperation = pending;
         this.setData({ serviceAvailable: true, pending: Boolean(pending), pendingLabel: pending && pending.action === 'deadline.authorize' ? '同步原授权' : '确认原保存结果' });
+        if (this.visible && this.addOnEntry) {
+          const owner = this.addOnEntry.owner || beforeOwner;
+          this.addOnEntry = null;
+          if ((!owner || owner === result.userKey) && !this.data.editing) this.onNew();
+        }
       } catch (error) { if (!this.retired && epoch === this.epoch) this.setData({ error: friendlyError(error) }); }
       finally { if (!this.retired && epoch === this.epoch) this.setData({ loading: false }); }
     })();

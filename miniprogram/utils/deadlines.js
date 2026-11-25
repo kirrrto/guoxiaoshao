@@ -63,4 +63,35 @@ function presentDeadline(item, now = Date.now()) {
     canAuthorize: status === 'awaiting_authorization' && future,
     canEdit: status !== 'sending' };
 }
-module.exports = { CATEGORIES, beijingDate, remindAt, dateTime, makeDraft, validateDraft, presentDeadline, deadlineError };
+function calendarParts(value, currentYear) {
+  if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
+  const parsed = Date.parse(value + 'T00:00:00Z');
+  if (!Number.isFinite(parsed) || new Date(parsed).toISOString().slice(0, 10) !== value) return null;
+  const [year, month, day] = value.split('-');
+  return { year: year === currentYear ? '' : year, month: Number(month) + '月', day: String(Number(day)) };
+}
+function presentHomeDeadline(item, now, notificationsEnabled) {
+  const view = presentDeadline(item, now);
+  const year = beijingDate(now).slice(0, 4);
+  const due = calendarParts(item.dueDate, year);
+  const status = item.delivery && item.delivery.status;
+  const reason = item.delivery && item.delivery.reason;
+  let { statusLabel, tone } = view;
+  let summaryReminder = null;
+  if (!notificationsEnabled && ['not_enabled', 'scheduled', 'awaiting_authorization'].includes(status)) {
+    statusLabel = '';
+  } else if (status === 'scheduled' && reason !== 'dnd' && reason !== 'user_disabled') {
+    const at = Date.parse(item.remindAt);
+    if (reason || !due || !Number.isFinite(at)) {
+      statusLabel = '提醒状态待确认';
+      tone = 'warn';
+    } else if (at > now) {
+      const reminder = calendarParts(view.remindText.slice(0, 10), year);
+      summaryReminder = { ...reminder, time: view.remindText.slice(11) };
+    }
+  }
+  const calendarMonth = due ? (due.year ? due.year + '年' : '') + due.month : '';
+  return { id: item.id, title: item.title, dueText: view.dueText, calendarMonth, calendarDay: due ? due.day : '',
+    summaryReminder, statusLabel: summaryReminder ? '' : statusLabel, tone };
+}
+module.exports = { CATEGORIES, beijingDate, remindAt, dateTime, makeDraft, validateDraft, presentDeadline, presentHomeDeadline, deadlineError };

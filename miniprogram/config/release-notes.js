@@ -8,6 +8,15 @@
 // Keep technical details and complete acceptance records in release documents.
 const RELEASE_NOTES = [
   {
+    version: '3.9.4',
+    title: '到期事项一览',
+    dateText: '版本记录 · 2026-11-25',
+    highlights: [
+      '「小哨」并排显示到期日和事项名称，名称下方显示计划提醒时间。',
+      '需要授权或发送失败的事项会标出状态，点「管理」可查看详情。',
+    ],
+  },
+  {
     version: '3.9.3',
     title: '页头哨标',
     dateText: '版本记录 · 2026-11-25',
