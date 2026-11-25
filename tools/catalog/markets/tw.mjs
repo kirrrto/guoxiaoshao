@@ -28,14 +28,7 @@ for (const family of catalog.families) {
   const roots = new Set(options.map(row => row.partNumber || row.btrOrFdPartNumber).filter(Boolean));
   const verified = new Set(), configurationUrls = new Set();
   for (const row of family.products) {
-    if (!row.partNumber) {
-      assert.ok(row.id && row.reason && row.querySupported === false && row.monitorSupported === false);
-      if (row.reason === 'case_and_band') assert.ok(options.some(option => 'case-' + String(option.part).split('/')[0].toLowerCase() === row.id));
-      if (row.reason === 'fitting_required') assert.ok(options.some(option => option['apple_vision_pro_2025-dimensionCapacity'] === row.capacity.toLowerCase()));
-      if (row.reason === 'custom_configuration') assert.ok(options.some(option => !option.btrOrFdPartNumber));
-      reference++;
-      continue;
-    }
+    assert.ok(row.partNumber && row.querySupported !== false && row.monitorSupported !== false);
     if (row.sourceUrl) {
       const selectionUrl = new URL(row.sourceUrl);
       assert.equal(selectionUrl.origin, base.origin);

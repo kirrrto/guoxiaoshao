@@ -147,7 +147,7 @@
 .observed-store-choice-copy { display: flex; flex-direction: column; }
 .observed-store-choices .observed-store-choice { margin-top: var(--sp-8); }
 .alternative-current { display: block; color: var(--text-3); font-size: var(--fs-caption); }
-.alternative-check { display: flex; align-items: center; justify-content: center; flex: none; width: 22px; height: 22px; border: 1.5px solid var(--text-3); border-radius: 50%; color: transparent; }
+.alternative-check { display: flex; align-items: center; justify-content: center; flex: none; width: 22px; height: 22px; border: 1.5px solid var(--text-3); border-radius: 50%; color: transparent; transition: border-color var(--dur-fast) var(--ease), background-color var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease); }
 .alternative-check--on { border-color: var(--green); background: var(--green); color: var(--green-ink); }
 .alternative-check .ui-check { margin-bottom: var(--sp-2); }
 .alternative-city-picker { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-12); min-height: var(--tap); margin-bottom: var(--sp-8); padding: var(--sp-8) var(--sp-12); border-radius: var(--radius-control); background: var(--control); }
@@ -179,3 +179,6 @@
 .query-notice > text { flex: 1 1 150px; min-width: 0; }
 .ui-icon.query-follow-icon { filter: none; }
 .query-link-meta { max-width: 160px; overflow-wrap: anywhere; text-align: right; }
+@media (prefers-reduced-motion: reduce) {
+  .alternative-check { transition: none; }
+}

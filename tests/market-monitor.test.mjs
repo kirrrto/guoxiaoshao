@@ -11,7 +11,7 @@ const { createWechatSender } = require('../cloudfunctions/gxs_api/lib/engine/wec
 const { applyObservation, targetKeyOf } = require('../cloudfunctions/gxs_api/lib/engine/events');
 const { COLLECTIONS } = require('../cloudfunctions/gxs_api/lib/collections');
 const log = { info() {}, warn() {}, error() {} };
-const all = { JP: true, TW: true, HK: true };
+const all = { JP: true, TW: true, HK: true, US: true };
 const sites = [
   ['JP', 'R128', 'MJR54J/A', 'en'],
   ['TW', 'R713', 'MJRP4ZP/A', 'zh-CN'],
@@ -49,7 +49,7 @@ async function setupTestAdmin(t) {
 }
 
 test('monthly and annual members can save all three regions before monitoring starts; the timer picks up the saved watches when enabled', async () => {
-  const off = { JP: false, TW: false, HK: false };
+  const off = { JP: false, TW: false, HK: false, US: false };
   for (const planId of ['member_30d', 'member_365d']) {
     const { f, messages, pass, upstream } = await setup({
       internationalMarkets: off, internationalMonitoring: off, internationalNotifications: off,

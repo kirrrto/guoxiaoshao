@@ -25,7 +25,7 @@ async function memberFixture() {
 test('only verified market targets can be watched, under the signed-in account and current plan', async () => {
   const f = createFixture();
   assert.equal((await f.call('market.watch', target('JP'))).error.code, 'market_watch_plan_required');
-  assert.equal((await f.call('market.watch', { ...target('JP'), market: 'US' })).error.code, 'unknown_market');
+  assert.equal((await f.call('market.watch', { ...target('JP'), market: 'UK' })).error.code, 'unknown_market');
   await f.repo.saveConfig({ ...await f.repo.getConfig(), internationalMarkets: enabled });
   assert.equal((await f.call('market.watch', target('JP'))).error.code, 'market_watch_plan_required');
   assert.equal((await f.call('market.watch', { ...target('HK'), language: 'ja' })).error.code, 'invalid_language');
@@ -128,6 +128,8 @@ test('international notification entries stay in the markets tab on cold and war
     assert.equal(rt.app.globalData.pendingAlert, null);
   }
   rt.app.captureSharedTarget({ ...options, query: { ...options.query, market: 'US' } });
+  assert.equal(rt.app.globalData.pendingMarketTarget.market, 'US');
+  rt.app.captureSharedTarget({ ...options, query: { ...options.query, market: 'UK' } });
   assert.equal(rt.app.globalData.pendingMarketTarget, null);
   rt.app.captureSharedTarget({ ...options, query: { ...options.query, eid: '%qq' } });
   assert.equal(rt.app.globalData.pendingMarketTarget, null);

@@ -297,8 +297,20 @@ view, text, button, input, textarea, image, scroll-view, picker { box-sizing: bo
 
 /* ── 动效：只表达状态变化；减少动态时保持静止 ─────────── */
 @keyframes panel-appear {
-  from { opacity: 0; transform: translateY(4px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; transform: translate3d(0, 6px, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+@keyframes scrim-appear {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes sheet-rise {
+  from { opacity: 0; transform: translate3d(0, 28px, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+@keyframes dialog-pop {
+  from { opacity: 0; transform: translate3d(0, 8px, 0) scale(0.97); }
+  to { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
 }
 @keyframes skeleton-pulse {
   50% { opacity: 0.5; }
@@ -310,12 +322,15 @@ view, text, button, input, textarea, image, scroll-view, picker { box-sizing: bo
 }
 .ui-live-dot { display: inline-block; flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--green); }
 @media (prefers-reduced-motion: no-preference) {
-  .ui-reveal { animation: panel-appear var(--dur) var(--ease); }
-  .ui-chevron { transition: transform var(--dur) var(--ease); }
+  .ui-reveal { animation: panel-appear var(--dur) var(--ease-out); }
+  .ui-scrim-enter { animation: scrim-appear var(--dur) var(--ease-out); }
+  .ui-sheet-enter { animation: sheet-rise var(--dur-sheet) var(--ease-out); }
+  .ui-dialog-enter { animation: dialog-pop var(--dur) var(--ease-out); }
+  .ui-chevron { transition: transform var(--dur) var(--ease-out); }
   .skeleton-line, .skeleton-bar { animation: skeleton-pulse 1.2s ease-in-out 3; }
   .ui-live-dot { animation: stock-breathe 2.8s ease-in-out infinite; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .btn.btn, .ui-action.ui-action, .ui-disclosure.ui-disclosure { transition: none; }
+  .btn.btn, .ui-action.ui-action, .ui-disclosure.ui-disclosure, .ui-chevron { transition: none; }
   .btn.btn-primary-pressed { transform: none; }
 }

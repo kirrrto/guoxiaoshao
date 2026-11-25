@@ -62,13 +62,13 @@ test('the operator can enable one region with the loaded revision and leave othe
   const page = rt.instance('pages/admin/index.js', { allowed: true, checked: true });
   await page.loadConfig();
   const config = JSON.parse(page.data.configText);
-  assert.deepEqual(config.internationalMarkets, { JP: false, TW: false, HK: false });
+  assert.deepEqual(config.internationalMarkets, { JP: false, TW: false, HK: false, US: false });
   assert.equal(config.internationalQueryLimits.maxRequestsPerDay, 7200);
   page.onConfigInput({ detail: { value: JSON.stringify({ internationalMarkets: { TW: true } }) } });
   await page.onSaveConfig();
   const saved = (await f.call('admin.getConfig', {}, operatorContext())).data;
   assert.equal(saved.revision, 1);
-  assert.deepEqual(saved.config.internationalMarkets, { JP: false, TW: true, HK: false });
+  assert.deepEqual(saved.config.internationalMarkets, { JP: false, TW: true, HK: false, US: false });
   assert.deepEqual(saved.config.internationalMonitoring, config.internationalMonitoring);
   assert.deepEqual(saved.config.internationalNotifications, config.internationalNotifications);
 });

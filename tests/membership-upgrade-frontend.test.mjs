@@ -78,7 +78,7 @@ test('only monthly and annual offers include regional watches, and only entitled
   rt.wx.switchTab = options => { destinations.push(options.url); options.success?.({}); options.complete?.({}); };
   page.applyBoot(boot);
   assert.deepEqual(Array.from(page.data.boot.memberProducts, p => [p.nameText, p.watchScope]), [
-    ['周卡', '可关注中国大陆门店'], ['月卡', '可查询和关注大陆、日本、台湾和香港门店'], ['年卡', '可查询和关注大陆、日本、台湾和香港门店'],
+    ['周卡', '可关注中国大陆门店'], ['月卡', '可查询和关注大陆、日本、台湾、香港和美国门店'], ['年卡', '可查询和关注大陆、日本、台湾、香港和美国门店'],
   ]);
   page.onOpenRegionalWatches();
   for (const planId of ['member_30d', 'member_365d']) {

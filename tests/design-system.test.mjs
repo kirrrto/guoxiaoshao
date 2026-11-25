@@ -194,9 +194,16 @@ test('status never relies on color alone and headings never turn green', () => {
 test('motion is limited to state changes and stops for reduced motion', () => {
   const common = stripComments(read('styles/common.wxss'));
   const animated = styles.flatMap(file => rules(read(file)).filter(rule => rule.declarations.some(([property]) => property === 'animation')).map(rule => `${file} · ${rule.selector}`));
-  assert.deepEqual(animated, ['styles/common.wxss · .ui-reveal', 'styles/common.wxss · .skeleton-line, .skeleton-bar', 'styles/common.wxss · .ui-live-dot']);
+  assert.deepEqual(animated, [
+    'styles/common.wxss · .ui-reveal',
+    'styles/common.wxss · .ui-scrim-enter',
+    'styles/common.wxss · .ui-sheet-enter',
+    'styles/common.wxss · .ui-dialog-enter',
+    'styles/common.wxss · .skeleton-line, .skeleton-bar',
+    'styles/common.wxss · .ui-live-dot',
+  ]);
   const guarded = common.slice(common.indexOf('@media (prefers-reduced-motion: no-preference)'));
-  for (const name of ['.ui-reveal', '.skeleton-line', '.ui-live-dot']) assert.ok(guarded.includes(name), `${name} animates only without a reduced-motion preference`);
+  for (const name of ['.ui-reveal', '.ui-scrim-enter', '.ui-sheet-enter', '.ui-dialog-enter', '.skeleton-line', '.ui-live-dot']) assert.ok(guarded.includes(name), `${name} animates only without a reduced-motion preference`);
   const looping = rules(common).filter(rule => rule.declarations.some(([property,value]) => property === 'animation' && value.includes('infinite')));
   assert.deepEqual(looping.map(rule => rule.selector), ['.ui-live-dot']);
   assert.match(guarded, /\.ui-live-dot\s*\{\s*animation:\s*stock-breathe 2\.8s ease-in-out infinite/);

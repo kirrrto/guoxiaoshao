@@ -8,9 +8,9 @@ const { mergeConfig, patchConfig } = require('../cloudfunctions/gxs_api/lib/conf
 const { buildPickupUrl } = require('../cloudfunctions/gxs_api/lib/apple-pickup');
 const { COLLECTIONS: C } = require('../cloudfunctions/gxs_api/lib/collections');
 const samples = {
-  JP: ['R128', 'MJR54J/A'], TW: ['R713', 'MJRP4ZP/A'], HK: ['R409', 'MJRP4ZA/A'],
+  JP: ['R128', 'MJR54J/A'], TW: ['R713', 'MJRP4ZP/A'], HK: ['R409', 'MJRP4ZA/A'], US: ['R077', 'MJQ34LL/A'],
 };
-const enabled = { JP: true, TW: true, HK: true };
+const enabled = { JP: true, TW: true, HK: true, US: true };
 const createFixture = options => fixture({ start: '2026-11-23T02:00:00Z', ...options });
 const ok = reply => { assert.equal(reply.ok, true, JSON.stringify(reply.error)); return reply.data; };
 function payload(market, id = 'market-query-01') {
@@ -21,7 +21,7 @@ function payload(market, id = 'market-query-01') {
 test('each region unlocks credits at local midnight on day 31 and ignores mainland prices and release windows', async () => {
   const config = { internationalMarkets: enabled, quota: { queryCost: 6 },
     newProductWindows: [{ familyKey: 'iphone-18-pro', releaseAt: '2026-10-17T00:00:00Z' }] };
-  for (const [market, endsAt] of [['JP','2026-10-17T15:00:00.000Z'], ['TW','2026-10-17T16:00:00.000Z'], ['HK','2026-10-17T16:00:00.000Z']]) {
+  for (const [market, endsAt] of [['JP','2026-10-17T15:00:00.000Z'], ['TW','2026-10-17T16:00:00.000Z'], ['HK','2026-10-17T16:00:00.000Z'], ['US','2026-10-18T07:00:00.000Z']]) {
     const [store] = samples[market];
     const fetchImpl = fakeFetch({ [store]: { display: 'available' } });
     const f = createFixture({ config, start: new Date(Date.parse(endsAt) - 1).toISOString(), fetchImpl });
@@ -79,12 +79,12 @@ test('recovering an old pending regional debit after a permission change refunds
   assert.equal((await f.repo.listLedger(userKeyOf())).filter(r => r.type === 'query_refund').length, 1);
 });
 
-test('three market catalogs expose verified local SKUs and stores even while rollout is closed', async () => {
+test('four market catalogs expose verified local SKUs and stores even while rollout is closed', async () => {
   const f = createFixture();
   const { markets } = ok(await f.call('market.catalog', {}));
-  assert.deepEqual(markets.map(m => m.code), ['JP', 'TW', 'HK']);
-  assert.deepEqual(markets.map(m => m.stores.length), [11, 2, 6]);
-  const categories = ['airpods', 'homepod', 'ipad', 'iphone', 'mac', 'vision', 'watch'];
+  assert.deepEqual(markets.map(m => m.code), ['JP', 'TW', 'HK', 'US']);
+  assert.deepEqual(markets.map(m => m.stores.length), [11, 2, 6, 269]);
+  const categories = ['airpods', 'homepod', 'ipad', 'iphone', 'mac'];
   for (const site of markets) {
     const [store, sku] = samples[site.code];
     assert.equal(site.enabled, false);
@@ -100,7 +100,7 @@ test('three market catalogs expose verified local SKUs and stores even while rol
   }
   assert.equal((await f.repo.listLedger(userKeyOf())).length, 0);
   assert.equal(f.state.fetchImpl.calls.length, 0);
-  assert.throws(() => patchConfig({}, { internationalMarkets: { US: true } }), { code: 'invalid_config' });
+  assert.throws(() => patchConfig({}, { internationalMarkets: { UK: true } }), { code: 'invalid_config' });
   assert.throws(() => patchConfig({}, { internationalMonitoring: { TW: 'true' } }), { code: 'invalid_config' });
   assert.throws(() => patchConfig({}, { internationalQueryLimits: { maxRequestsPerMinute: 0 } }), { code: 'invalid_config' });
   assert.throws(() => patchConfig({}, { notifications: { templateIds: { restock: 'zh-id', restockEn: 'zh-id' } } }), { code: 'invalid_config' });
@@ -422,16 +422,32 @@ test('compact regional directories round trip with every current product and no 
     for (const model of ['iPhone 16','iPhone 17','iPhone 17e','iPhone Air','iPhone Duo','iPhone 18 Pro','iPhone 18 Pro Max']) assert.ok(phones.has(model),site.code+' '+model);
     const activeModels = new Set(queryable.map(product => product.category));
     for (const category of ['iphone','ipad','mac','airpods','homepod']) assert.ok(activeModels.has(category),site.code+' '+category);
-    for (const row of site.products.filter(p => !p.querySupported)) {
-      assert.equal(row.monitorSupported, false);
-      assert.equal(row.partNumber, null);
-      assert.ok(row.reason);
-    }
+    assert.equal(site.products.some(p => !p.querySupported || !p.partNumber), false, site.code + ' publishes only retail SKUs');
   }
 });
 
-test('local retail configurations of each queryable category execute through the pickup API; fitting or component references never spend', async () => {
-  const { MARKETS } = require('../cloudfunctions/gxs_api/lib/markets');
+test('local retail configurations of each queryable category execute through the pickup API; invalid or unverified SKUs never spend', async () => {
+  const { MARKETS, zoneOffsetHours } = require('../cloudfunctions/gxs_api/lib/markets');
+  const { observationDayKey } = require('../cloudfunctions/gxs_api/lib/engine/observation-day');
+  assert.equal(observationDayKey('2026-07-15T06:30:00.000Z', 'US'), '2026-07-14');
+  assert.equal(observationDayKey('2026-07-15T07:30:00.000Z', 'US'), '2026-07-15');
+  assert.equal(observationDayKey('2026-11-23T07:30:00.000Z', 'US'), '2026-11-22');
+  assert.equal(observationDayKey('2026-11-23T08:30:00.000Z', 'US'), '2026-11-23');
+  assert.equal(observationDayKey('2026-07-15T03:30:00.000Z', 'US', 'R095'), '2026-07-14');
+  assert.equal(observationDayKey('2026-07-15T04:30:00.000Z', 'US', 'R095'), '2026-07-15');
+  assert.equal(observationDayKey('2026-07-15T09:30:00.000Z', 'US', 'R073'), '2026-07-14');
+  assert.equal(observationDayKey('2026-07-15T10:30:00.000Z', 'US', 'R073'), '2026-07-15');
+  assert.deepEqual(
+    [
+      zoneOffsetHours(Date.parse('2026-07-15T12:00:00Z'), 'America/Denver'),
+      zoneOffsetHours(Date.parse('2026-11-23T12:00:00Z'), 'America/Denver'),
+      zoneOffsetHours(Date.parse('2026-07-15T12:00:00Z'), 'America/Phoenix'),
+      zoneOffsetHours(Date.parse('2026-11-23T12:00:00Z'), 'America/Phoenix'),
+      zoneOffsetHours(Date.parse('2026-07-15T12:00:00Z'), 'America/Anchorage'),
+      zoneOffsetHours(Date.parse('2026-11-23T12:00:00Z'), 'America/Anchorage'),
+    ],
+    [-6, -7, -7, -7, -8, -9],
+  );
   for (const site of MARKETS) {
     const storeNumber = site.stores[0].storeNumber, userKey = userKeyOf();
     const fetchImpl = fakeFetch({ [storeNumber]: {display:'available'} });
@@ -443,20 +459,17 @@ test('local retail configurations of each queryable category execute through the
       const request = {market:site.code,partNumber:p.partNumber,storeNumbers:[storeNumber],queryId:'full-category-'+category,maxCost:0,expectedUserKey:userKey};
       const result = ok(await f.call('market.pickup',request));
       const url = new URL(fetchImpl.calls.at(-1).href);
+      if (site.code === 'US') assert.equal(url.pathname, '/shop/retail/pickup-message');
       assert.equal(url.searchParams.get('parts.0'),p.partNumber);
       assert.equal(result.results[0].status,'available');
       assert.equal(result.charged,0);
       f.advance(61000);
     }
     const count = fetchImpl.calls.length;
-    for (const category of ['vision','watch']) {
-      const ref = site.products.find(p => p.category === category && !p.querySupported);
-      assert.ok(ref,site.code+' reference '+category);
-      for (const partNumber of [ref.id,ref.partNumber]) {
-        const input={market:site.code,partNumber,storeNumbers:[storeNumber],queryId:'reference-'+category,expectedUserKey:userKey};
-        assert.equal((await f.call('market.pickup',input)).error.code,'invalid_market_target');
-        assert.equal((await f.call('market.watch',input)).error.code,'unknown_product');
-      }
+    for (const partNumber of ['reference/watch-ultra', 'M0000LL/A']) {
+      const input={market:site.code,partNumber,storeNumbers:[storeNumber],queryId:'reference-' + partNumber.replace(/[^a-z0-9]/gi, '-'),expectedUserKey:userKey};
+      assert.equal((await f.call('market.pickup',input)).error.code,'invalid_market_target');
+      assert.equal((await f.call('market.watch',input)).error.code,'unknown_product');
     }
     assert.equal(fetchImpl.calls.length,count);
     assert.equal((await f.repo.listLedger(userKey)).length,0);

@@ -5,6 +5,7 @@ const { sortFamilies, sortModels, compareCapacities, storeMatches } = require('.
 const { currentCatalog } = require('../../utils/store');
 const { canQuery, canMonitor } = require('../../utils/product-capabilities');
 const { presentStore, storeLabelWithCity } = require('../../utils/store-label');
+const { confirmTap } = require('../../utils/haptic');
 const unique = items => [...new Set(items.filter(Boolean))];
 const memoryOf = p => (p.attributes || {}).memory || '';
 const capacityOf = p => (p.attributes || {}).capacity || '标准配置';
@@ -253,7 +254,7 @@ Component(require('../../utils/language').component('target-picker', {
       supported: canMonitor(p), querySupported: canQuery(p), monitorSupported: canMonitor(p), targetType: p.targetType || 'retail',
       comingSoon: p.comingSoon, priceCny: p.priceCny, verificationStatus: p.verificationStatus,
       imageUrl: p.imageUrl || '', imageDisplayUrl: productThumbnailUrl(p.imageUrl, 'card', p.partNumber), imageAlt: p.imageAlt || p.title, attributes: p.attributes || {} }; },
-    onCategoryTap(e) { if (this.isInteractionLocked()) return; this.batch(() => this.selectCategory(Number(e.currentTarget.dataset.index))); },
+    onCategoryTap(e) { if (this.isInteractionLocked()) return; confirmTap(); this.batch(() => this.selectCategory(Number(e.currentTarget.dataset.index))); },
     onFamilyChange(e) { if (this.isInteractionLocked()) return; this.batch(() => this.selectFamily(Number(e.detail.value))); },
     onModelChange(e) {
       if (this.isInteractionLocked()) return;
@@ -275,7 +276,7 @@ Component(require('../../utils/language').component('target-picker', {
         this.emit();
       });
     },
-    onMemoryTap(e) { this.onMemoryChange({ detail: { value: e.currentTarget.dataset.index } }); },
+    onMemoryTap(e) { if (!this.isInteractionLocked()) confirmTap(); this.onMemoryChange({ detail: { value: e.currentTarget.dataset.index } }); },
     onCapacityChange(e) {
       if (this.isInteractionLocked()) return;
       const capacity = this.data.capacities[Number(e.detail.value)]; if (!capacity) return;
@@ -286,8 +287,8 @@ Component(require('../../utils/language').component('target-picker', {
         this.emit();
       });
     },
-    onCapacityTap(e) { this.onCapacityChange({ detail: { value: e.currentTarget.dataset.index } }); },
-    onColorTap(e) { if (this.isInteractionLocked()) return; this.batch(() => { this.stage({ selectionNote: '' }); this.updateFilters({ ...this.currentAttributes(), color: this.data.colors[Number(e.currentTarget.dataset.index)] }); this.emit(); }); },
+    onCapacityTap(e) { if (!this.isInteractionLocked()) confirmTap(); this.onCapacityChange({ detail: { value: e.currentTarget.dataset.index } }); },
+    onColorTap(e) { if (this.isInteractionLocked()) return; confirmTap(); this.batch(() => { this.stage({ selectionNote: '' }); this.updateFilters({ ...this.currentAttributes(), color: this.data.colors[Number(e.currentTarget.dataset.index)] }); this.emit(); }); },
     onProductChange(e) { if (this.isInteractionLocked()) return; const p = this.currentCandidates[Number(e.detail.value)]; if (!p) return; this.unavailablePartNumber = null; this.setData({ productIndex: Number(e.detail.value), product: this.publicProduct(p), imageFailed: false, selectionNote: '' }); this.emit(); },
     onImageError() { this.setData({ imageFailed: true }); },
     selectCity(index) {
@@ -295,8 +296,25 @@ Component(require('../../utils/language').component('target-picker', {
       const selected = new Set(this.read('selectedStores').map(s => s.storeNumber));
       this.stage({ cityIndex: index, cityStores: city.stores.map(s => ({ storeNumber: s.storeNumber, name: s.name, city: s.city, on: selected.has(s.storeNumber) })) });
     },
-    onCityChange(e) { if (this.isInteractionLocked()) return; this.selectCity(Number(e.detail.value)); },
-    onHotCityTap(e) { if (this.isInteractionLocked()) return; this.selectCity(Number(e.currentTarget.dataset.index)); },
+    selectCityWithAutoStore(index) {
+      const city = this.catalogCities[index];
+      const sole = !this.data.storesOptional && city && city.stores.length === 1 ? city.stores[0] : null;
+      const selected = this.read('selectedStores').slice();
+      const autoAdd = Boolean(sole && !selected.some(s => s.storeNumber === sole.storeNumber) && selected.length < this.data.maxStores);
+      this.batch(() => {
+        if (autoAdd) {
+          selected.push({ storeNumber: sole.storeNumber, name: sole.name, city: sole.city, label: storeLabelWithCity(sole.storeNumber, sole.name, sole.city) });
+          this.stage({ selectedStores: selected });
+        }
+        this.selectCity(index);
+        if (autoAdd) {
+          this.updateSearchResults();
+          this.emit();
+        }
+      });
+    },
+    onCityChange(e) { if (this.isInteractionLocked()) return; this.selectCityWithAutoStore(Number(e.detail.value)); },
+    onHotCityTap(e) { if (this.isInteractionLocked()) return; confirmTap(); this.selectCityWithAutoStore(Number(e.currentTarget.dataset.index)); },
     onSearchInput(e) { if (this.isInteractionLocked()) return; this.batch(() => { this.stage({ searchKeyword: String(e.detail.value || '').slice(0, 60) }); this.updateSearchResults(); }); },
     onClearSearch() { if (this.isInteractionLocked()) return; this.batch(() => { this.stage({ searchKeyword: '' }); this.updateSearchResults(); }); },
     updateSearchResults() {
@@ -314,6 +332,7 @@ Component(require('../../utils/language').component('target-picker', {
         if (selected.length >= this.data.maxStores) { languageUI.toast({ title: `最多选择 ${this.data.maxStores} 家门店`, icon: 'none' }); return; }
         selected.push({ storeNumber: store.storeNumber, name: store.name, city: store.city, label: storeLabelWithCity(store.storeNumber, store.name, store.city) });
       }
+      confirmTap();
       this.batch(() => { this.stage({ selectedStores: selected }); this.selectCity(this.data.cityIndex); this.updateSearchResults(); this.emit(); });
     },
     onRemoveStore(e) { this.onStoreTap(e); },

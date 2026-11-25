@@ -17,7 +17,7 @@ async function setup(extra = {}, options = {}, seed = {}) {
     'market.catalog': () => ({ markets: MARKETS.map(m => ({ ...m, enabled: state.enabled, monitorEnabled: state.enabled,
       memberQueryAvailable: state.memberQueryAvailable,
       notificationsEnabled: state.enabled, notificationsEnabledEn: false })) }),
-    'market.follows': () => ({ follows: state.rows, watchRegistrationOpen: true, monitoring: { JP: true, TW: true, HK: true }, notifications: { JP: true, TW: true, HK: true } }),
+    'market.follows': () => ({ follows: state.rows, watchRegistrationOpen: true, monitoring: { JP: true, TW: true, HK: true, US: true }, notifications: { JP: true, TW: true, HK: true, US: true } }),
     'market.pickup': p => receipt(p),
     ...extra,
   };
@@ -34,7 +34,7 @@ function receipt(p, overrides = {}) {
 
 test('regional page loads directory on demand and maps model/finish/storage/store to exact local SKU', async () => {
   const { page, rt } = await setup();
-  assert.deepEqual(Array.from(page.data.sites, s => s.code), ['JP','TW','HK']);
+  assert.deepEqual(Array.from(page.data.sites, s => s.code), ['JP','TW','HK','US']);
   assert.ok(page.data.models.includes('iPhone 18 Pro') && page.data.models.includes('iPhone 18 Pro Max'));
   assert.equal(rt.calls.find(call => call.action === 'market.catalog').payload.format, 'compact-v1');
   page.onMarket(tap({ market: 'TW' }));
@@ -213,11 +213,7 @@ test('only a supported product in a verified members-only region shows the query
   noPrompt();
   page.setData({ networkOffline: false });
   page.paint();
-  const watchCategory = page.data.categories.findIndex(row => row.id === 'watch');
-  page.onChoice({ ...tap({ field: 'category' }), detail: { value: watchCategory } });
-  assert.equal(page.data.product.querySupported, false);
-  noPrompt();
-  page.onChoice({ ...tap({ field: 'category' }), detail: { value: 0 } });
+  assert.equal(page.data.categories.some(row => ['watch', 'vision'].includes(row.id)), false);
   const bootstrap = handlers['user.bootstrap'];
   const expiry = new Date(Date.now() + 86400000).toISOString();
   handlers['user.bootstrap'] = (payload, account) => ({
@@ -239,7 +235,7 @@ test('a private Taiwan preview stays scoped to the verified tester account', asy
   const { page, rt, state } = await setup({
     'user.bootstrap': (_, s) => ({
       identity: { userKey: s.owner }, membership: { active: true, isTester: s.owner === 'Alice' },
-      ...(s.owner === 'Alice' ? { regionalQueryPreview: ['JP', 'TW', 'HK'] } : {}),
+      ...(s.owner === 'Alice' ? { regionalQueryPreview: ['JP', 'TW', 'HK', 'US'] } : {}),
       quota: { balance: 0, revision: 1 }, notifications: {}, subscriptions: {}, settings: {},
     }),
   }, { market: 'TW', partNumber: 'MJY04ZP/A', storeNumber: 'R694' }, { enabled: false });
@@ -264,7 +260,7 @@ test('monthly and annual customers manually check all three regions through the 
     const { page, rt } = await setup({ 'user.bootstrap': () => ({
       identity: { userKey: 'Alice' }, serverTime: new Date().toISOString(),
       membership: { active: true, planId, expiresAt: expiry, enhancedExpiresAt: expiry, annualExpiresAt: planId === 'member_365d' ? expiry : null },
-      regionalMemberQueryMarkets: ['JP', 'TW', 'HK'], quota: { balance: 0, revision: 1 }, notifications: {}, subscriptions: {},
+      regionalMemberQueryMarkets: ['JP', 'TW', 'HK', 'US'], quota: { balance: 0, revision: 1 }, notifications: {}, subscriptions: {},
     }) }, {}, { enabled: false, memberQueryAvailable: true });
     const calls = () => rt.calls.filter(row => row.action === 'market.pickup');
     for (const [index, site] of MARKETS.entries()) {
@@ -421,7 +417,7 @@ test('monthly and annual members can save, pause, and resume across three closed
       await page.onWatchStatus(tap({ id: site.code, status: 'active' }));
       assert.equal(page.data.targetWatch.status, '已保存关注，本站尚未开启自动监测');
     }
-    assert.equal(rt.calls.filter(c => c.action === 'market.watch').length, 3);
+    assert.equal(rt.calls.filter(c => c.action === 'market.watch').length, 4);
     assert.equal(rt.calls.filter(c => c.action === 'market.pickup' || c.action === 'notify.recordSubscription').length, 0);
     rt.load('utils/language.js').setLanguage('en'); assert.equal(page.data.targetWatch.status, 'Watch saved. Monitoring is not active in this region.');
   }
@@ -630,7 +626,7 @@ test('optional regional check-in owner is verified before rewarding; old clients
   const old=await f.call('quota.signin');assert.equal(old.data.granted,0);assert.equal(old.data.reason,'already_signed_in');
 });
 
-test('mixed categories keep regional IDs and real variants while reference-only rows cannot start a watch or stock check', async () => {
+test('mixed categories keep regional IDs and real variants while reference-only rows are filtered out of regional shelves', async () => {
   const base = MARKETS[0];
   const products = [
     ...base.products.filter(row => !row.category || row.category === 'iphone'),
@@ -642,17 +638,13 @@ test('mixed categories keep regional IDs and real variants while reference-only 
   const { page,rt } = await setup({'market.catalog':()=>({markets:[{...base,products,enabled:true,monitorEnabled:true}]})});
   const choice=(field,value)=>page.onChoice({...tap({field}),detail:{value}});
   const chooseCategory=code=>choice('category',page.data.categories.findIndex(row=>row.id===code));
+  assert.equal(page.data.categories.some(row => row.id === 'watch'), false);
   chooseCategory('mac');assert.equal(page.data.product.modelLabel,'Mac 测试机型');assert.equal(page.data.colors.length,0);assert.equal(page.data.capacities.length,0);
   assert.deepEqual(Array.from(page.data.variants,x=>x.id),['LOCAL-A','LOCAL-B']);
   choice('variant',1);assert.equal(page.data.product.id,'LOCAL-B');rt.load('utils/language.js').setLanguage('en');
   assert.equal(page.data.variants[1].label,'24GB memory');
   assert.equal(page.data.modelLabels[page.data.modelIndex],'Mac test model');assert.equal(page.data.product.modelLabel,'Mac test model');
   await page.onQuery();assert.equal(rt.calls.find(c=>c.action==='market.pickup').payload.partNumber,'LOCAL-B');
-  chooseCategory('watch');assert.equal(page.data.product.id,'reference/watch-ultra');assert.equal(page.payload().partNumber,'');
-  assert.match(page.data.product.referenceText,/case and a band/);
-  assert.equal(page.data.canQuery,false);assert.equal(page.data.watchEnabled,false);assert.equal(page.data.receipt,null);
-  await page.onWatch();await page.onQuery();
-  assert.equal(rt.calls.filter(c=>c.action==='market.pickup').length,1);assert.equal(rt.calls.filter(c=>c.action==='market.watch').length,0);
   chooseCategory('airpods');assert.equal(page.data.variants.length,10);assert.equal(page.data.models.length,70);
   assert.equal(page.data.products,undefined);
   assert.ok(JSON.stringify({...page.data,ui:undefined}).length < JSON.stringify(products).length/3);
@@ -703,7 +695,7 @@ test('every published regional configuration is reachable and distinguishable in
     if (page.data.lang !== lang) rt.load('utils/language.js').setLanguage(lang);
     for (const site of MARKETS) {
       page.onMarket(tap({market:site.code}));
-      assert.equal(page.data.categories.length,7);
+      assert.equal(page.data.categories.length,5);
       for (const raw of site.products) {
         if (page.data.product.category!==raw.category) choose('category',lookup(page.data.categories,raw.category));
         if (page.data.product.model!==raw.model) {
@@ -729,12 +721,6 @@ test('every published regional configuration is reachable and distinguishable in
         assert.equal(page.payload().partNumber,raw.partNumber||'');
         assert.equal(page.data.canQuery,raw.querySupported);
         assert.equal(page.data.watchEnabled,raw.monitorSupported);
-        if (!raw.partNumber) {
-          assert.equal(page.data.receipt,null);assert.ok(product.referenceText);
-          if (raw.reason?.startsWith('case_and_band')) assert.match(product.referenceText,lang==='en'? /band/:/表带/);
-          if (raw.reason==='fitting_required') assert.match(product.referenceText,lang==='en'? /face/:/面部/);
-          if (raw.reason==='custom_configuration') assert.match(product.referenceText,lang==='en'? /Configure/:/定制/);
-        }
       }
     }
   }
@@ -854,5 +840,49 @@ test('the regional watch editor adds and removes individual stores and changes o
   assert.equal(rt.calls.some(c => ['market.pickup', 'notify.recordSubscription'].includes(c.action)), false);
   page.onHide();
   assert.equal(page.editingWatch, null);
+  page.onUnload();
+});
+
+test('US region labels, DST store local timestamps and English notification availability follow store readiness', async () => {
+  assert.equal(localTime('2026-07-15T12:00:00Z', 'America/Los_Angeles'), '2026-07-15 05:00:00 UTC-7');
+  assert.equal(localTime('2026-11-23T12:00:00Z', 'America/Los_Angeles'), '2026-11-23 04:00:00 UTC-8');
+  assert.equal(localTime('2026-07-15T12:00:00Z', 'America/New_York'), '2026-07-15 08:00:00 UTC-4');
+  assert.equal(localTime('2026-11-23T12:00:00Z', 'America/New_York'), '2026-11-23 07:00:00 UTC-5');
+  assert.equal(localTime('2026-07-15T12:00:00Z', 'America/Chicago'), '2026-07-15 07:00:00 UTC-5');
+  assert.equal(localTime('2026-07-15T12:00:00Z', 'America/Denver'), '2026-07-15 06:00:00 UTC-6');
+  assert.equal(localTime('2026-11-23T12:00:00Z', 'America/Denver'), '2026-11-23 05:00:00 UTC-7');
+  assert.equal(localTime('2026-07-15T12:00:00Z', 'America/Phoenix'), '2026-07-15 05:00:00 UTC-7');
+  assert.equal(localTime('2026-11-23T12:00:00Z', 'America/Phoenix'), '2026-11-23 05:00:00 UTC-7');
+  assert.equal(localTime('2026-07-15T12:00:00Z', 'America/Anchorage'), '2026-07-15 04:00:00 UTC-8');
+  assert.equal(localTime('2026-11-23T12:00:00Z', 'America/Anchorage'), '2026-11-23 03:00:00 UTC-9');
+  assert.equal(localTime('2026-11-23T12:00:00Z', 'Pacific/Honolulu'), '2026-11-23 02:00:00 UTC-10');
+
+  const usProduct = MARKETS.find(site => site.code === 'US').products[0].partNumber;
+  const usStore = MARKETS.find(site => site.code === 'US').stores[0].storeNumber;
+  const { page, rt } = await setup({}, { market: 'US' }, {
+    rows: [
+      { followId: 'zh-watch', market: 'US', partNumber: usProduct, storeNumbers: [usStore], status: 'active', language: 'zh-CN' },
+      { followId: 'en-watch', market: 'US', partNumber: usProduct, storeNumbers: [usStore], status: 'active', language: 'en' },
+    ],
+  });
+  page.onMarket(tap({ market: 'US' }));
+  assert.equal(page.data.sites.find(s => s.code === 'US').label, '美国');
+  assert.equal(page.data.areas.length, 45);
+  assert.deepEqual(Array.from(page.data.areas.slice(0, 4), a => a.id), ['Oregon (Tax-free)', 'Delaware (Tax-free)', 'New Hampshire (Tax-free)', 'Alaska (Tax-free)']);
+  assert.equal(page.data.stores.length, 3);
+  assert.equal(page.data.store.id, 'R077');
+  page.onChoice({ ...tap({ field: 'area' }), detail: { value: 1 } });
+  assert.equal(page.data.area.id, 'Delaware (Tax-free)');
+  assert.equal(page.data.stores.length, 1);
+  assert.equal(page.data.store.id, 'R102');
+  rt.load('utils/language.js').setLanguage('en');
+  assert.deepEqual(
+    { label: page.data.sites.find(s => s.code === 'US').label, full: page.data.sites.find(s => s.code === 'US').fullLabel },
+    { label: 'US', full: 'United States' },
+  );
+  assert.equal(page.data.watchRows.find(r => r.id === 'zh-watch').canEditLanguage, false, 'hide dead EN picker when ZH-only alerts are live');
+  assert.equal(page.data.watchRows.find(r => r.id === 'en-watch').canEditLanguage, true, 'existing EN watch can still switch back');
+  page.onMarket(tap({ market: 'JP' }));
+  assert.equal(page.data.areas.length, 0);
   page.onUnload();
 });

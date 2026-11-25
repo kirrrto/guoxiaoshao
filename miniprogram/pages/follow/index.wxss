@@ -122,7 +122,7 @@
 /* ── 开通后的设置步骤、到货提醒落地卡 ─────────────────── */
 .activation-steps { display: flex; flex-wrap: wrap; gap: var(--sp-8) var(--sp-16); margin: var(--sp-12) 0; }
 .activation-step { display: flex; align-items: center; gap: var(--sp-8); color: var(--text-2); font-size: var(--fs-sub); }
-.activation-dot { display: flex; align-items: center; justify-content: center; width: 20px; height: 20px; border: 1.5px solid var(--text-3); border-radius: 50%; font-size: var(--fs-caption); line-height: 1; }
+.activation-dot { display: flex; align-items: center; justify-content: center; width: 20px; height: 20px; border: 1.5px solid var(--text-3); border-radius: 50%; font-size: var(--fs-caption); line-height: 1; transition: border-color var(--dur-fast) var(--ease), background-color var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease); }
 .activation-step--done .activation-dot { border-color: var(--green); background: var(--green); color: var(--green-ink); }
 .activation-dot .ui-check { margin-bottom: var(--sp-2); }
 .alert-product { display: block; font-size: var(--fs-headline); font-weight: 600; line-height: var(--lh-snug); overflow-wrap: anywhere; }
@@ -178,6 +178,7 @@
     font-weight: 400;
     line-height: var(--lh-snug);
     text-align: left;
+    transition: background-color var(--dur-fast) var(--ease);
   }
   .follow-list .follow-list-choice::after { border: 0; }
   .follow-list .follow-list-choice--selected { background: var(--surface-top); }
@@ -187,4 +188,7 @@
   .follow-configurations { order: 0; }
   .follow-configurations .follow { display: none; }
   .follow-configurations .follow--selected { display: block; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .activation-dot, .follow-list .follow-list-choice { transition: none; }
 }

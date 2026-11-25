@@ -434,7 +434,7 @@ for (const scenario of scenarios) {
     notifications: { enabled: false, templateIds: {} }, subscriptions: {}, settings: { notifyEnabled: true, dnd: { enabled: true, startMinute: 1380, endMinute: 480 } },
     limits: { maxFollows: 3, maxStoresPerFollow: 3, queryMaxStores: 3 }, followCount: scenario === 'empty' ? 0 : 1, catalogVersion: 'offline-preview' };
   if (marketsPreview && marketScenarios[scenario].memberQuery) {
-    bootstrap.regionalMemberQueryMarkets = ['JP', 'TW', 'HK'];
+    bootstrap.regionalMemberQueryMarkets = ['JP', 'TW', 'HK', 'US'];
     bootstrap.membership.enhancedExpiresAt = bootstrap.membership.expiresAt;
     if (bootstrap.membership.planId === 'member_365d') bootstrap.membership.annualExpiresAt = bootstrap.membership.expiresAt;
   }

@@ -198,8 +198,8 @@ try {
         if (innerWidth >= 900 ? details.left < controls.right || Math.abs(controls.top - details.top) > 1 : details.top < controls.bottom - 1) {
           errors.push('Configuration and results must stack below 900px and sit side by side above it');
         }
-        if (document.querySelectorAll('.markets-region').length !== 3 || document.querySelectorAll('.markets-region--selected').length !== 1) {
-          errors.push('Exactly one of the three regions must be selected');
+        if (document.querySelectorAll('.markets-region').length !== 4 || document.querySelectorAll('.markets-region--selected').length !== 1) {
+          errors.push('Exactly one of the four regions must be selected');
         }
         const tile = document.querySelector('.markets-editor .market-product-tile');
         if (Boolean(tile) !== expectImage) errors.push('Product tile must match available artwork');

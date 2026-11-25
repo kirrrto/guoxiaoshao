@@ -74,7 +74,7 @@
         </view>
         <view wx:if="{{membership.annualExpiresText}}" class="member-enhanced">{{i18n.m(ui,'年卡 5 配置 × 5 门店权益至 {0}',[(membership.annualExpiresText)])}}</view>
         <view wx:elif="{{membership.enhancedExpiresText}}" class="member-enhanced">{{i18n.m(ui,'额外名额有效至 {0}',[(membership.enhancedExpiresText)])}}</view>
-        <button wx:if="{{membership.enhanced}}" class="ui-action ui-action--plain member-regional-link" hover-class="member-delivery-pressed" disabled="{{paymentBusy || paymentChecking || paymentConfirming}}" bindtap="onOpenRegionalWatches"><text class="ui-action-label">{{i18n.t(ui,'查询或关注日本、台湾和香港门店')}}</text><view class="ui-chevron" aria-hidden="true"></view></button>
+        <button wx:if="{{membership.enhanced}}" class="ui-action ui-action--plain member-regional-link" hover-class="member-delivery-pressed" disabled="{{paymentBusy || paymentChecking || paymentConfirming}}" bindtap="onOpenRegionalWatches"><text class="ui-action-label">{{i18n.t(ui,'查询或关注日本、台湾、香港和美国门店')}}</text><view class="ui-chevron" aria-hidden="true"></view></button>
       </view>
       <view wx:elif="{{!paymentPendingId && (!contextualCheckout || !checkoutTarget)}}" class="member-pass member-vip-offer">
         <image class="member-pass-watermark" src="/images/brand/whistle-pass.png" mode="aspectFit" aria-hidden="true" />
@@ -156,8 +156,8 @@
       </view>
       <button wx:if="{{contextualCheckout && checkoutTarget && !membership.active}}" class="ui-action ui-action--plain identity-copy checkout-identity" hover-class="ui-control-pressed" bindtap="onCopyId" aria-label="{{i18n.t(ui,'复制用户编号')}}"><text class="ui-action-label">{{i18n.m(ui,'当前账户 {0}',[(boot.identity.openidMasked)])}}</text><text class="identity-copy-label">{{i18n.t(ui,'复制')}}</text></button>
 
-      <view wx:if="{{redemptionOpen}}" class="redemption-mask" catchtap="onOpenRedemption" catchtouchmove="noop">
-        <view class="redemption-modal" catchtap="noop" aria-role="dialog" aria-modal="true" aria-label="{{i18n.t(ui,'兑换会员')}}">
+      <view wx:if="{{redemptionOpen}}" class="redemption-mask ui-scrim-enter" catchtap="onOpenRedemption" catchtouchmove="noop">
+        <view class="redemption-modal ui-dialog-enter" catchtap="noop" aria-role="dialog" aria-modal="true" aria-label="{{i18n.t(ui,'兑换会员')}}">
           <view class="redemption-title">{{i18n.t(ui,'兑换会员')}}</view>
           <input class="redemption-input" type="text" value="{{redemptionCode}}" aria-label="{{i18n.t(ui,'会员兑换码')}}" placeholder="{{i18n.t(ui,'请输入兑换码')}}" placeholder-class="redemption-placeholder" maxlength="64" disabled="{{redeeming}}" confirm-type="done" adjust-position="{{true}}" cursor-spacing="24" bindinput="onRedemptionInput" bindconfirm="onRedeemCode" focus="{{redemptionOpen}}" />
           <button class="btn btn-primary btn-block member-entry redemption-entry" disabled="{{subscribing || redeeming || paymentBusy || paymentChecking || !redemptionCode}}" bindtap="onRedeemCode">{{i18n.t(ui,(redeeming ? '兑换中，请稍候…' : '确认兑换'))}}</button>
@@ -217,7 +217,7 @@
       </view>
       <button wx:if="{{!paymentPendingId}}" class="ui-disclosure reminder-row member-notification-experience notification-test-entry" hover-class="ui-control-pressed" disabled="{{paymentBusy || paymentChecking || paymentConfirming}}" bindtap="onTestNotification"><text class="ui-disclosure-label">{{i18n.t(ui,'体验微信提醒')}}</text><view class="ui-chevron" aria-hidden="true"></view></button>
       <button id="notification-records" class="ui-disclosure reminder-row" hover-class="ui-control-pressed" bindtap="onToggleNotifications" aria-expanded="{{showNotifications}}"><text class="ui-disclosure-label">{{i18n.t(ui,'提醒记录')}}</text><view class="ui-disclosure-meta"><text wx:if="{{notifications.length}}">{{i18n.m(ui,'{0} 条',[(notifications.length)])}}</text><view class="ui-chevron {{showNotifications ? 'ui-chevron--up' : 'ui-chevron--down'}}" aria-hidden="true"></view></view></button>
-      <view wx:if="{{showNotifications}}" class="notification-panel">
+      <view wx:if="{{showNotifications}}" class="notification-panel ui-reveal">
         <view wx:if="{{notificationsLoading && !notifications.length}}" class="loading-line">{{i18n.t(ui,'正在加载提醒记录…')}}</view>
         <view wx:elif="{{notificationsLoading}}" class="loading-line">{{i18n.t(ui,'正在更新提醒记录…')}}</view>
         <view wx:if="{{notificationsError}}" class="record-error"><text>{{i18n.t(ui,(notificationsError))}}</text><button class="ui-action notification-button notification-retry" hover-class="ui-control-pressed" disabled="{{notificationsLoading || notificationActionBusy || notificationConfirming}}" bindtap="onRetryNotifications">{{i18n.t(ui,'重试加载')}}</button></view>

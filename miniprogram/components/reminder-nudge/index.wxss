@@ -24,8 +24,14 @@
   font-size: var(--fs-body);
   font-weight: 600;
   line-height: var(--lh-snug);
+  transition: transform var(--dur-fast) var(--ease), opacity var(--dur-fast) var(--ease);
 }
 .reminder-overlay .reminder-dialog .reminder-allow { background: var(--green); color: var(--green-ink); }
 .reminder-overlay .reminder-dialog .reminder-busy { opacity: 0.5; }
+.reminder-overlay .reminder-dialog .reminder-button-pressed { opacity: 0.86; transform: scale(0.985); }
 .reminder-overlay .reminder-dialog .reminder-later { margin-top: var(--sp-4); background: transparent; color: var(--text-2); font-weight: 400; }
 .reminder-footnote { color: var(--text-3); font-size: var(--fs-caption); text-align: center; }
+@media (prefers-reduced-motion: reduce) {
+  .reminder-overlay .reminder-dialog .reminder-allow, .reminder-overlay .reminder-dialog .reminder-later { transition: none; }
+  .reminder-overlay .reminder-dialog .reminder-button-pressed { transform: none; }
+}

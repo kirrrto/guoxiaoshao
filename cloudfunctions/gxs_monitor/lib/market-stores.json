@@ -1,27 +1,2908 @@
 {
   "JP": [
-    {"storeNumber": "R711", "name": "京都", "nameEn": "Kyoto", "city": "京都", "cityEn": "Kyoto", "timeZone": "Asia/Tokyo"},
-    {"storeNumber": "R768", "name": "梅田", "nameEn": "Umeda", "city": "大阪", "cityEn": "Osaka", "timeZone": "Asia/Tokyo"},
-    {"storeNumber": "R091", "name": "心斎橋", "nameEn": "Shinsaibashi", "city": "大阪", "cityEn": "Osaka", "timeZone": "Asia/Tokyo"},
-    {"storeNumber": "R005", "name": "名古屋栄", "nameEn": "Nagoya Sakae", "city": "名古屋", "cityEn": "Nagoya", "timeZone": "Asia/Tokyo"},
-    {"storeNumber": "R079", "name": "銀座", "nameEn": "Ginza", "city": "东京", "cityEn": "Tokyo", "timeZone": "Asia/Tokyo"},
-    {"storeNumber": "R718", "name": "丸の内", "nameEn": "Marunouchi", "city": "东京", "cityEn": "Tokyo", "timeZone": "Asia/Tokyo"},
-    {"storeNumber": "R128", "name": "新宿", "nameEn": "Shinjuku", "city": "东京", "cityEn": "Tokyo", "timeZone": "Asia/Tokyo"},
-    {"storeNumber": "R119", "name": "渋谷", "nameEn": "Shibuya", "city": "东京", "cityEn": "Tokyo", "timeZone": "Asia/Tokyo"},
-    {"storeNumber": "R224", "name": "表参道", "nameEn": "Omotesando", "city": "东京", "cityEn": "Tokyo", "timeZone": "Asia/Tokyo"},
-    {"storeNumber": "R710", "name": "川崎", "nameEn": "Kawasaki", "city": "川崎", "cityEn": "Kawasaki", "timeZone": "Asia/Tokyo"},
-    {"storeNumber": "R048", "name": "福岡", "nameEn": "Fukuoka", "city": "福冈", "cityEn": "Fukuoka", "timeZone": "Asia/Tokyo"}
+    {
+      "storeNumber": "R711",
+      "name": "京都",
+      "nameEn": "Kyoto",
+      "city": "京都",
+      "cityEn": "Kyoto",
+      "timeZone": "Asia/Tokyo"
+    },
+    {
+      "storeNumber": "R768",
+      "name": "梅田",
+      "nameEn": "Umeda",
+      "city": "大阪",
+      "cityEn": "Osaka",
+      "timeZone": "Asia/Tokyo"
+    },
+    {
+      "storeNumber": "R091",
+      "name": "心斎橋",
+      "nameEn": "Shinsaibashi",
+      "city": "大阪",
+      "cityEn": "Osaka",
+      "timeZone": "Asia/Tokyo"
+    },
+    {
+      "storeNumber": "R005",
+      "name": "名古屋栄",
+      "nameEn": "Nagoya Sakae",
+      "city": "名古屋",
+      "cityEn": "Nagoya",
+      "timeZone": "Asia/Tokyo"
+    },
+    {
+      "storeNumber": "R079",
+      "name": "銀座",
+      "nameEn": "Ginza",
+      "city": "东京",
+      "cityEn": "Tokyo",
+      "timeZone": "Asia/Tokyo"
+    },
+    {
+      "storeNumber": "R718",
+      "name": "丸の内",
+      "nameEn": "Marunouchi",
+      "city": "东京",
+      "cityEn": "Tokyo",
+      "timeZone": "Asia/Tokyo"
+    },
+    {
+      "storeNumber": "R128",
+      "name": "新宿",
+      "nameEn": "Shinjuku",
+      "city": "东京",
+      "cityEn": "Tokyo",
+      "timeZone": "Asia/Tokyo"
+    },
+    {
+      "storeNumber": "R119",
+      "name": "渋谷",
+      "nameEn": "Shibuya",
+      "city": "东京",
+      "cityEn": "Tokyo",
+      "timeZone": "Asia/Tokyo"
+    },
+    {
+      "storeNumber": "R224",
+      "name": "表参道",
+      "nameEn": "Omotesando",
+      "city": "东京",
+      "cityEn": "Tokyo",
+      "timeZone": "Asia/Tokyo"
+    },
+    {
+      "storeNumber": "R710",
+      "name": "川崎",
+      "nameEn": "Kawasaki",
+      "city": "川崎",
+      "cityEn": "Kawasaki",
+      "timeZone": "Asia/Tokyo"
+    },
+    {
+      "storeNumber": "R048",
+      "name": "福岡",
+      "nameEn": "Fukuoka",
+      "city": "福冈",
+      "cityEn": "Fukuoka",
+      "timeZone": "Asia/Tokyo"
+    }
   ],
   "TW": [
-    {"storeNumber": "R694", "name": "信義 A13", "nameEn": "Xinyi A13", "city": "台北", "cityEn": "Taipei", "timeZone": "Asia/Taipei"},
-    {"storeNumber": "R713", "name": "台北 101", "nameEn": "Taipei 101", "city": "台北", "cityEn": "Taipei", "timeZone": "Asia/Taipei"}
+    {
+      "storeNumber": "R694",
+      "name": "信義 A13",
+      "nameEn": "Xinyi A13",
+      "city": "台北",
+      "cityEn": "Taipei",
+      "timeZone": "Asia/Taipei"
+    },
+    {
+      "storeNumber": "R713",
+      "name": "台北 101",
+      "nameEn": "Taipei 101",
+      "city": "台北",
+      "cityEn": "Taipei",
+      "timeZone": "Asia/Taipei"
+    }
   ],
   "HK": [
-    {"storeNumber": "R409", "name": "铜锣湾", "nameEn": "Causeway Bay", "city": "香港", "cityEn": "Hong Kong", "timeZone": "Asia/Hong_Kong"},
-    {"storeNumber": "R428", "name": "国际金融中心", "nameEn": "ifc mall", "city": "香港", "cityEn": "Hong Kong", "timeZone": "Asia/Hong_Kong"},
-    {"storeNumber": "R485", "name": "又一城", "nameEn": "Festival Walk", "city": "香港", "cityEn": "Hong Kong", "timeZone": "Asia/Hong_Kong"},
-    {"storeNumber": "R673", "name": "apm 香港", "nameEn": "apm Hong Kong", "city": "香港", "cityEn": "Hong Kong", "timeZone": "Asia/Hong_Kong"},
-    {"storeNumber": "R610", "name": "新城市广场", "nameEn": "New Town Plaza", "city": "香港", "cityEn": "Hong Kong", "timeZone": "Asia/Hong_Kong"},
-    {"storeNumber": "R499", "name": "广东道", "nameEn": "Canton Road", "city": "香港", "cityEn": "Hong Kong", "timeZone": "Asia/Hong_Kong"}
+    {
+      "storeNumber": "R409",
+      "name": "铜锣湾",
+      "nameEn": "Causeway Bay",
+      "city": "香港",
+      "cityEn": "Hong Kong",
+      "timeZone": "Asia/Hong_Kong"
+    },
+    {
+      "storeNumber": "R428",
+      "name": "国际金融中心",
+      "nameEn": "ifc mall",
+      "city": "香港",
+      "cityEn": "Hong Kong",
+      "timeZone": "Asia/Hong_Kong"
+    },
+    {
+      "storeNumber": "R485",
+      "name": "又一城",
+      "nameEn": "Festival Walk",
+      "city": "香港",
+      "cityEn": "Hong Kong",
+      "timeZone": "Asia/Hong_Kong"
+    },
+    {
+      "storeNumber": "R673",
+      "name": "apm 香港",
+      "nameEn": "apm Hong Kong",
+      "city": "香港",
+      "cityEn": "Hong Kong",
+      "timeZone": "Asia/Hong_Kong"
+    },
+    {
+      "storeNumber": "R610",
+      "name": "新城市广场",
+      "nameEn": "New Town Plaza",
+      "city": "香港",
+      "cityEn": "Hong Kong",
+      "timeZone": "Asia/Hong_Kong"
+    },
+    {
+      "storeNumber": "R499",
+      "name": "广东道",
+      "nameEn": "Canton Road",
+      "city": "香港",
+      "cityEn": "Hong Kong",
+      "timeZone": "Asia/Hong_Kong"
+    }
+  ],
+  "US": [
+    {
+      "storeNumber": "R077",
+      "state": "俄勒冈州（免税州）",
+      "stateEn": "Oregon (Tax-free)",
+      "city": "波特兰",
+      "cityEn": "Portland",
+      "name": "先锋广场 Pioneer Place",
+      "nameEn": "Pioneer Place",
+      "shortName": "波特兰先锋广场",
+      "timeZone": "America/Los_Angeles"
+    },
+    {
+      "storeNumber": "R090",
+      "state": "俄勒冈州（免税州）",
+      "stateEn": "Oregon (Tax-free)",
+      "city": "蒂加德（波特兰都会区）",
+      "cityEn": "Tigard",
+      "name": "华盛顿广场 Washington Sq",
+      "nameEn": "Washington Square",
+      "shortName": "波特兰华盛顿广场",
+      "timeZone": "America/Los_Angeles"
+    },
+    {
+      "storeNumber": "R134",
+      "state": "俄勒冈州（免税州）",
+      "stateEn": "Oregon (Tax-free)",
+      "city": "蒂加德（波特兰都会区）",
+      "cityEn": "Tigard",
+      "name": "Bridgeport Village",
+      "nameEn": "Bridgeport Village",
+      "timeZone": "America/Los_Angeles"
+    },
+    {
+      "storeNumber": "R102",
+      "state": "特拉华州（免税州）",
+      "stateEn": "Delaware (Tax-free)",
+      "city": "纽瓦克（特拉华）",
+      "cityEn": "Newark",
+      "name": "Christiana Mall（免税）",
+      "nameEn": "Christiana Mall",
+      "shortName": "特拉华 Christiana",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R631",
+      "state": "新罕布什尔州（免税州）",
+      "stateEn": "New Hampshire (Tax-free)",
+      "city": "曼彻斯特",
+      "cityEn": "Manchester",
+      "name": "The Mall of New Hampshire",
+      "nameEn": "The Mall of New Hampshire",
+      "shortName": "新罕布什尔 Mall",
+      "shortNameEn": "Mall of NH",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R354",
+      "state": "新罕布什尔州（免税州）",
+      "stateEn": "New Hampshire (Tax-free)",
+      "city": "纳舒厄",
+      "cityEn": "Nashua",
+      "name": "Pheasant Lane",
+      "nameEn": "Pheasant Lane",
+      "shortName": "新罕布什尔 Pheasant",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R027",
+      "state": "新罕布什尔州（免税州）",
+      "stateEn": "New Hampshire (Tax-free)",
+      "city": "塞勒姆（新罕布什尔）",
+      "cityEn": "Salem",
+      "name": "Rockingham Park",
+      "nameEn": "Rockingham Park",
+      "shortName": "新罕布什尔 Rockingham",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R262",
+      "state": "阿拉斯加州（安克雷奇免税）",
+      "stateEn": "Alaska (Tax-free)",
+      "city": "安克雷奇",
+      "cityEn": "Anchorage",
+      "name": "安克雷奇第五大道",
+      "nameEn": "Anchorage 5th Avenue Mall",
+      "shortName": "安克雷奇第五大道",
+      "shortNameEn": "Anchorage 5th Ave",
+      "timeZone": "America/Anchorage"
+    },
+    {
+      "storeNumber": "R824",
+      "state": "加利福尼亚州",
+      "stateEn": "California",
+      "city": "库比蒂诺",
+      "cityEn": "Cupertino",
+      "name": "Apple Park 访客中心",
+      "nameEn": "Apple Park Visitor Center",
+      "shortName": "Apple Park",
+      "shortNameEn": "Apple Park",
+      "timeZone": "America/Los_Angeles"
+    },
+    {
+      "storeNumber": "R075",
+      "state": "加利福尼亚州",
+      "stateEn": "California",
+      "city": "旧金山",
+      "cityEn": "San Francisco",
+      "name": "联合广场 Union Square",
+      "nameEn": "Union Square",
+      "shortName": "旧金山联合广场",
+      "timeZone": "America/Los_Angeles"
+    },
+    {
+      "storeNumber": "R050",
+      "state": "加利福尼亚州",
+      "stateEn": "California",
+      "city": "洛杉矶",
+      "cityEn": "Los Angeles",
+      "name": "The Grove（洛杉矶）",
+      "nameEn": "The Grove",
+      "shortName": "洛杉矶 The Grove",
+      "timeZone": "America/Los_Angeles"
+    },
+    {
+      "storeNumber": "R720",
+      "state": "加利福尼亚州",
+      "stateEn": "California",
+      "city": "洛杉矶",
+      "cityEn": "Los Angeles",
+      "name": "塔楼剧院 Tower Theatre",
+      "nameEn": "Tower Theatre",
+      "shortName": "洛杉矶塔楼剧院",
+      "timeZone": "America/Los_Angeles"
+    },
+    {
+      "storeNumber": "R004",
+      "state": "加利福尼亚州",
+      "stateEn": "California",
+      "city": "科斯塔梅萨",
+      "cityEn": "Costa Mesa",
+      "name": "南海岸广场 South Coast",
+      "nameEn": "South Coast Plaza",
+      "shortName": "南海岸广场",
+      "timeZone": "America/Los_Angeles"
+    },
+    {
+      "storeNumber": "R146",
+      "state": "加利福尼亚州",
+      "stateEn": "California",
+      "city": "尔湾",
+      "cityEn": "Irvine",
+      "name": "尔湾光谱中心 Spectrum",
+      "nameEn": "Irvine Spectrum Center",
+      "shortName": "尔湾光谱中心",
+      "shortNameEn": "Irvine Spectrum",
+      "timeZone": "America/Los_Angeles"
+    },
+    {
+      "storeNumber": "R099",
+      "state": "加利福尼亚州",
+      "stateEn": "California",
+      "city": "帕洛阿尔托",
+      "cityEn": "Palo Alto",
+      "name": "斯坦福购物中心 Stanford",
+      "nameEn": "Stanford Shopping Center",
+      "shortName": "斯坦福购物中心",
+      "shortNameEn": "Stanford Shopping",
+      "timeZone": "America/Los_Angeles"
+    },
+    {
+      "storeNumber": "R550",
+      "state": "加利福尼亚州",
+      "stateEn": "California",
+      "city": "Bakersfield",
+      "cityEn": "Bakersfield",
+      "name": "Valley Plaza",
+      "nameEn": "Valley Plaza",
+      "timeZone": "America/Los_Angeles"
+    },
+    {
+      "storeNumber": "R414",
+      "state": "加利福尼亚州",
+      "stateEn": "California",
+      "city": "Berkeley",
+      "cityEn": "Berkeley",
+      "name": "4th Street",
+      "nameEn": "4th Street",
+      "timeZone": "America/Los_Angeles"
+    },
+    {
+      "storeNumber": "R156",
+      "state": "加利福尼亚州",
+      "stateEn": "California",
+      "city": "Brea",
+      "cityEn": "Brea",
+      "name": "Brea Mall",
+      "nameEn": "Brea Mall",
+      "timeZone": "America/Los_Angeles"
+    },
+    {
+      "storeNumber": "R029",
+      "state": "加利福尼亚州",
+      "stateEn": "California",
+      "city": "伯林盖姆",
+      "cityEn": "Burlingame",
+      "name": "Burlingame",
+      "nameEn": "Burlingame",
+      "timeZone": "America/Los_Angeles"
+    },
+    {
+      "storeNumber": "R189",
+      "state": "加利福尼亚州",
+      "stateEn": "California",
+      "city": "Canoga Park",
+      "cityEn": "Canoga Park",
+      "name": "Topanga",
+      "nameEn": "Topanga",
+      "timeZone": "America/Los_Angeles"
+    },
+    {
+      "storeNumber": "R294",
+      "state": "加利福尼亚州",
+      "stateEn": "California",
+      "city": "Carlsbad",
+      "cityEn": "Carlsbad",
+      "name": "Carlsbad",
+      "nameEn": "Carlsbad",
+      "timeZone": "America/Los_Angeles"
+    },
+    {
+      "storeNumber": "R300",
+      "state": "加利福尼亚州",
+      "stateEn": "California",
+      "city": "Cerritos",
+      "cityEn": "Cerritos",
+      "name": "Los Cerritos",
+      "nameEn": "Los Cerritos",
+      "timeZone": "America/Los_Angeles"
+    },
+    {
+      "storeNumber": "R213",
+      "state": "加利福尼亚州",
+      "stateEn": "California",
+      "city": "Chula Vista",
+      "cityEn": "Chula Vista",
+      "name": "Otay Ranch",
+      "nameEn": "Otay Ranch",
+      "timeZone": "America/Los_Angeles"
+    },
+    {
+      "storeNumber": "R071",
+      "state": "加利福尼亚州",
+      "stateEn": "California",
+      "city": "Corte Madera",
+      "cityEn": "Corte Madera",
+      "name": "Corte Madera",
+      "nameEn": "Corte Madera",
+      "timeZone": "America/Los_Angeles"
+    },
+    {
+      "storeNumber": "R057",
+      "state": "加利福尼亚州",
+      "stateEn": "California",
+      "city": "Emeryville",
+      "cityEn": "Emeryville",
+      "name": "Bay Street",
+      "nameEn": "Bay Street",
+      "timeZone": "America/Los_Angeles"
+    },
+    {
+      "storeNumber": "R236",
+      "state": "加利福尼亚州",
+      "stateEn": "California",
+      "city": "Fresno",
+      "cityEn": "Fresno",
+      "name": "Fashion Fair",
+      "nameEn": "Fashion Fair",
+      "timeZone": "America/Los_Angeles"
+    },
+    {
+      "storeNumber": "R001",
+      "state": "加利福尼亚州",
+      "stateEn": "California",
+      "city": "格伦代尔",
+      "cityEn": "Glendale",
+      "name": "Glendale Galleria",
+      "nameEn": "Glendale Galleria",
+      "timeZone": "America/Los_Angeles"
+    },
+    {
+      "storeNumber": "R451",
+      "state": "加利福尼亚州",
+      "stateEn": "California",
+      "city": "格伦代尔",
+      "cityEn": "Glendale",
+      "name": "The Americana at Brand",
+      "nameEn": "The Americana at Brand",
+      "shortNameEn": "Americana at Brand",
+      "timeZone": "America/Los_Angeles"
+    },
+    {
+      "storeNumber": "R124",
+      "state": "加利福尼亚州",
+      "stateEn": "California",
+      "city": "洛杉矶",
+      "cityEn": "Los Angeles",
+      "name": "比佛利中心 Beverly Center",
+      "nameEn": "Beverly Center",
+      "shortName": "比佛利中心",
+      "timeZone": "America/Los_Angeles"
+    },
+    {
+      "storeNumber": "R108",
+      "state": "加利福尼亚州",
+      "stateEn": "California",
+      "city": "洛杉矶",
+      "cityEn": "Los Angeles",
+      "name": "Century City",
+      "nameEn": "Century City",
+      "timeZone": "America/Los_Angeles"
+    },
+    {
+      "storeNumber": "R240",
+      "state": "加利福尼亚州",
+      "stateEn": "California",
+      "city": "Los Gatos",
+      "cityEn": "Los Gatos",
+      "name": "Los Gatos",
+      "nameEn": "Los Gatos",
+      "timeZone": "America/Los_Angeles"
+    },
+    {
+      "storeNumber": "R122",
+      "state": "加利福尼亚州",
+      "stateEn": "California",
+      "city": "Manhattan Beach",
+      "cityEn": "Manhattan Beach",
+      "name": "Manhattan Village",
+      "nameEn": "Manhattan Village",
+      "timeZone": "America/Los_Angeles"
+    },
+    {
+      "storeNumber": "R069",
+      "state": "加利福尼亚州",
+      "stateEn": "California",
+      "city": "Mission Viejo",
+      "cityEn": "Mission Viejo",
+      "name": "Mission Viejo",
+      "nameEn": "Mission Viejo",
+      "timeZone": "America/Los_Angeles"
+    },
+    {
+      "storeNumber": "R322",
+      "state": "加利福尼亚州",
+      "stateEn": "California",
+      "city": "Modesto",
+      "cityEn": "Modesto",
+      "name": "Vintage Faire",
+      "nameEn": "Vintage Faire",
+      "timeZone": "America/Los_Angeles"
+    },
+    {
+      "storeNumber": "R305",
+      "state": "加利福尼亚州",
+      "stateEn": "California",
+      "city": "Monterey",
+      "cityEn": "Monterey",
+      "name": "Del Monte",
+      "nameEn": "Del Monte",
+      "timeZone": "America/Los_Angeles"
+    },
+    {
+      "storeNumber": "R015",
+      "state": "加利福尼亚州",
+      "stateEn": "California",
+      "city": "Newport Beach",
+      "cityEn": "Newport Beach",
+      "name": "Fashion Island",
+      "nameEn": "Fashion Island",
+      "timeZone": "America/Los_Angeles"
+    },
+    {
+      "storeNumber": "R023",
+      "state": "加利福尼亚州",
+      "stateEn": "California",
+      "city": "Northridge",
+      "cityEn": "Northridge",
+      "name": "Northridge",
+      "nameEn": "Northridge",
+      "timeZone": "America/Los_Angeles"
+    },
+    {
+      "storeNumber": "R297",
+      "state": "加利福尼亚州",
+      "stateEn": "California",
+      "city": "Palm Desert",
+      "cityEn": "Palm Desert",
+      "name": "El Paseo Village",
+      "nameEn": "El Paseo Village",
+      "timeZone": "America/Los_Angeles"
+    },
+    {
+      "storeNumber": "R002",
+      "state": "加利福尼亚州",
+      "stateEn": "California",
+      "city": "帕洛阿尔托",
+      "cityEn": "Palo Alto",
+      "name": "Palo Alto",
+      "nameEn": "Palo Alto",
+      "timeZone": "America/Los_Angeles"
+    },
+    {
+      "storeNumber": "R034",
+      "state": "加利福尼亚州",
+      "stateEn": "California",
+      "city": "帕萨迪纳",
+      "cityEn": "Pasadena",
+      "name": "Pasadena",
+      "nameEn": "Pasadena",
+      "timeZone": "America/Los_Angeles"
+    },
+    {
+      "storeNumber": "R101",
+      "state": "加利福尼亚州",
+      "stateEn": "California",
+      "city": "Pleasanton",
+      "cityEn": "Pleasanton",
+      "name": "Stoneridge Mall",
+      "nameEn": "Stoneridge Mall",
+      "timeZone": "America/Los_Angeles"
+    },
+    {
+      "storeNumber": "R094",
+      "state": "加利福尼亚州",
+      "stateEn": "California",
+      "city": "Rancho Cucamonga",
+      "cityEn": "Rancho Cucamonga",
+      "name": "Victoria Gardens",
+      "nameEn": "Victoria Gardens",
+      "timeZone": "America/Los_Angeles"
+    },
+    {
+      "storeNumber": "R298",
+      "state": "加利福尼亚州",
+      "stateEn": "California",
+      "city": "Roseville",
+      "cityEn": "Roseville",
+      "name": "Roseville",
+      "nameEn": "Roseville",
+      "timeZone": "America/Los_Angeles"
+    },
+    {
+      "storeNumber": "R070",
+      "state": "加利福尼亚州",
+      "stateEn": "California",
+      "city": "Sacramento",
+      "cityEn": "Sacramento",
+      "name": "Arden Fair",
+      "nameEn": "Arden Fair",
+      "timeZone": "America/Los_Angeles"
+    },
+    {
+      "storeNumber": "R040",
+      "state": "加利福尼亚州",
+      "stateEn": "California",
+      "city": "圣地亚哥",
+      "cityEn": "San Diego",
+      "name": "Fashion Valley",
+      "nameEn": "Fashion Valley",
+      "timeZone": "America/Los_Angeles"
+    },
+    {
+      "storeNumber": "R082",
+      "state": "加利福尼亚州",
+      "stateEn": "California",
+      "city": "圣地亚哥",
+      "cityEn": "San Diego",
+      "name": "UTC",
+      "nameEn": "UTC",
+      "timeZone": "America/Los_Angeles"
+    },
+    {
+      "storeNumber": "R217",
+      "state": "加利福尼亚州",
+      "stateEn": "California",
+      "city": "旧金山",
+      "cityEn": "San Francisco",
+      "name": "Chestnut Street",
+      "nameEn": "Chestnut Street",
+      "timeZone": "America/Los_Angeles"
+    },
+    {
+      "storeNumber": "R033",
+      "state": "加利福尼亚州",
+      "stateEn": "California",
+      "city": "旧金山",
+      "cityEn": "San Francisco",
+      "name": "Stonestown",
+      "nameEn": "Stonestown",
+      "timeZone": "America/Los_Angeles"
+    },
+    {
+      "storeNumber": "R105",
+      "state": "加利福尼亚州",
+      "stateEn": "California",
+      "city": "圣何塞",
+      "cityEn": "San Jose",
+      "name": "Oakridge",
+      "nameEn": "Oakridge",
+      "timeZone": "America/Los_Angeles"
+    },
+    {
+      "storeNumber": "R199",
+      "state": "加利福尼亚州",
+      "stateEn": "California",
+      "city": "San Luis Obispo",
+      "cityEn": "San Luis Obispo",
+      "name": "Higuera Street",
+      "nameEn": "Higuera Street",
+      "timeZone": "America/Los_Angeles"
+    },
+    {
+      "storeNumber": "R231",
+      "state": "加利福尼亚州",
+      "stateEn": "California",
+      "city": "圣马特奥",
+      "cityEn": "San Mateo",
+      "name": "Hillsdale",
+      "nameEn": "Hillsdale",
+      "timeZone": "America/Los_Angeles"
+    },
+    {
+      "storeNumber": "R317",
+      "state": "加利福尼亚州",
+      "stateEn": "California",
+      "city": "Santa Barbara",
+      "cityEn": "Santa Barbara",
+      "name": "State Street",
+      "nameEn": "State Street",
+      "timeZone": "America/Los_Angeles"
+    },
+    {
+      "storeNumber": "R039",
+      "state": "加利福尼亚州",
+      "stateEn": "California",
+      "city": "圣克拉拉",
+      "cityEn": "Santa Clara",
+      "name": "Valley Fair",
+      "nameEn": "Valley Fair",
+      "timeZone": "America/Los_Angeles"
+    },
+    {
+      "storeNumber": "R051",
+      "state": "加利福尼亚州",
+      "stateEn": "California",
+      "city": "圣莫尼卡",
+      "cityEn": "Santa Monica",
+      "name": "圣莫尼卡第三街长廊",
+      "nameEn": "Third Street Promenade",
+      "shortName": "圣莫尼卡第三街",
+      "shortNameEn": "3rd St Promenade",
+      "timeZone": "America/Los_Angeles"
+    },
+    {
+      "storeNumber": "R044",
+      "state": "加利福尼亚州",
+      "stateEn": "California",
+      "city": "Santa Rosa",
+      "cityEn": "Santa Rosa",
+      "name": "Montgomery Village",
+      "nameEn": "Montgomery Village",
+      "timeZone": "America/Los_Angeles"
+    },
+    {
+      "storeNumber": "R148",
+      "state": "加利福尼亚州",
+      "stateEn": "California",
+      "city": "Sherman Oaks",
+      "cityEn": "Sherman Oaks",
+      "name": "Sherman Oaks",
+      "nameEn": "Sherman Oaks",
+      "timeZone": "America/Los_Angeles"
+    },
+    {
+      "storeNumber": "R345",
+      "state": "加利福尼亚州",
+      "stateEn": "California",
+      "city": "Temecula",
+      "cityEn": "Temecula",
+      "name": "Promenade Temecula",
+      "nameEn": "Promenade Temecula",
+      "timeZone": "America/Los_Angeles"
+    },
+    {
+      "storeNumber": "R154",
+      "state": "加利福尼亚州",
+      "stateEn": "California",
+      "city": "Thousand Oaks",
+      "cityEn": "Thousand Oaks",
+      "name": "The Oaks",
+      "nameEn": "The Oaks",
+      "timeZone": "America/Los_Angeles"
+    },
+    {
+      "storeNumber": "R777",
+      "state": "加利福尼亚州",
+      "stateEn": "California",
+      "city": "Torrance",
+      "cityEn": "Torrance",
+      "name": "Del Amo",
+      "nameEn": "Del Amo",
+      "timeZone": "America/Los_Angeles"
+    },
+    {
+      "storeNumber": "R462",
+      "state": "加利福尼亚州",
+      "stateEn": "California",
+      "city": "Valencia",
+      "cityEn": "Valencia",
+      "name": "Valencia Town Center",
+      "nameEn": "Valencia Town Center",
+      "timeZone": "America/Los_Angeles"
+    },
+    {
+      "storeNumber": "R014",
+      "state": "加利福尼亚州",
+      "stateEn": "California",
+      "city": "Walnut Creek",
+      "cityEn": "Walnut Creek",
+      "name": "Broadway Plaza",
+      "nameEn": "Broadway Plaza",
+      "timeZone": "America/Los_Angeles"
+    },
+    {
+      "storeNumber": "R095",
+      "state": "纽约州",
+      "stateEn": "New York",
+      "city": "纽约",
+      "cityEn": "New York",
+      "name": "第五大道 Fifth Avenue",
+      "nameEn": "Fifth Avenue",
+      "shortName": "纽约第五大道",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R415",
+      "state": "纽约州",
+      "stateEn": "New York",
+      "city": "纽约",
+      "cityEn": "New York",
+      "name": "中央车站 Grand Central",
+      "nameEn": "Grand Central",
+      "shortName": "纽约中央车站",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R654",
+      "state": "纽约州",
+      "stateEn": "New York",
+      "city": "纽约",
+      "cityEn": "New York",
+      "name": "世贸中心 World Trade Ctr",
+      "nameEn": "World Trade Center",
+      "shortName": "纽约世贸中心",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R032",
+      "state": "纽约州",
+      "stateEn": "New York",
+      "city": "纽约",
+      "cityEn": "New York",
+      "name": "SoHo",
+      "nameEn": "SoHo",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R250",
+      "state": "纽约州",
+      "stateEn": "New York",
+      "city": "纽约",
+      "cityEn": "New York",
+      "name": "西 14 街 West 14th St",
+      "nameEn": "West 14th Street",
+      "shortName": "纽约西 14 街",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R251",
+      "state": "纽约州",
+      "stateEn": "New York",
+      "city": "纽约",
+      "cityEn": "New York",
+      "name": "上西区 Upper West Side",
+      "nameEn": "Upper West Side",
+      "shortName": "纽约上西区",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R582",
+      "state": "纽约州",
+      "stateEn": "New York",
+      "city": "纽约",
+      "cityEn": "New York",
+      "name": "上东区 Upper East Side",
+      "nameEn": "Upper East Side",
+      "shortName": "纽约上东区",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R017",
+      "state": "纽约州",
+      "stateEn": "New York",
+      "city": "Albany",
+      "cityEn": "Albany",
+      "name": "Crossgates",
+      "nameEn": "Crossgates",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R753",
+      "state": "纽约州",
+      "stateEn": "New York",
+      "city": "纽约 · 布朗克斯",
+      "cityEn": "Bronx",
+      "name": "The Mall at Bay Plaza",
+      "nameEn": "The Mall at Bay Plaza",
+      "shortNameEn": "Mall at Bay Plaza",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R715",
+      "state": "纽约州",
+      "stateEn": "New York",
+      "city": "纽约 · 布鲁克林",
+      "cityEn": "Brooklyn",
+      "name": "布鲁克林市中心",
+      "nameEn": "Downtown Brooklyn",
+      "shortName": "布鲁克林市中心",
+      "shortNameEn": "Downtown Brooklyn",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R594",
+      "state": "纽约州",
+      "stateEn": "New York",
+      "city": "纽约 · 布鲁克林",
+      "cityEn": "Brooklyn",
+      "name": "威廉斯堡 Williamsburg",
+      "nameEn": "Williamsburg",
+      "shortName": "布鲁克林威廉斯堡",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R016",
+      "state": "纽约州",
+      "stateEn": "New York",
+      "city": "Buffalo",
+      "cityEn": "Buffalo",
+      "name": "Walden Galleria",
+      "nameEn": "Walden Galleria",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R612",
+      "state": "纽约州",
+      "stateEn": "New York",
+      "city": "Elmhurst",
+      "cityEn": "Elmhurst",
+      "name": "Queens Center",
+      "nameEn": "Queens Center",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R060",
+      "state": "纽约州",
+      "stateEn": "New York",
+      "city": "Garden City",
+      "cityEn": "Garden City",
+      "name": "Roosevelt Field",
+      "nameEn": "Roosevelt Field",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R068",
+      "state": "纽约州",
+      "stateEn": "New York",
+      "city": "Huntington Station",
+      "cityEn": "Huntington Station",
+      "name": "Walt Whitman",
+      "nameEn": "Walt Whitman",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R139",
+      "state": "纽约州",
+      "stateEn": "New York",
+      "city": "Lake Grove",
+      "cityEn": "Lake Grove",
+      "name": "Smith Haven",
+      "nameEn": "Smith Haven",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R327",
+      "state": "纽约州",
+      "stateEn": "New York",
+      "city": "Manhasset",
+      "cityEn": "Manhasset",
+      "name": "Manhasset",
+      "nameEn": "Manhasset",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R046",
+      "state": "纽约州",
+      "stateEn": "New York",
+      "city": "Nanuet",
+      "cityEn": "Nanuet",
+      "name": "Nanuet",
+      "nameEn": "Nanuet",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R152",
+      "state": "纽约州",
+      "stateEn": "New York",
+      "city": "纽约 · 斯泰滕岛",
+      "cityEn": "Staten Island",
+      "name": "Staten Island",
+      "nameEn": "Staten Island",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R107",
+      "state": "纽约州",
+      "stateEn": "New York",
+      "city": "Syracuse",
+      "cityEn": "Syracuse",
+      "name": "Syracuse",
+      "nameEn": "Syracuse",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R140",
+      "state": "纽约州",
+      "stateEn": "New York",
+      "city": "Victor",
+      "cityEn": "Victor",
+      "name": "Eastview",
+      "nameEn": "Eastview",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R061",
+      "state": "纽约州",
+      "stateEn": "New York",
+      "city": "White Plains",
+      "cityEn": "White Plains",
+      "name": "The Westchester",
+      "nameEn": "The Westchester",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R261",
+      "state": "纽约州",
+      "stateEn": "New York",
+      "city": "Yonkers",
+      "cityEn": "Yonkers",
+      "name": "Ridge Hill",
+      "nameEn": "Ridge Hill",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R003",
+      "state": "华盛顿州",
+      "stateEn": "Washington",
+      "city": "贝尔维尤（西雅图）",
+      "cityEn": "Bellevue",
+      "name": "贝尔维尤广场 Bellevue Sq",
+      "nameEn": "Bellevue Square",
+      "shortName": "贝尔维尤广场",
+      "timeZone": "America/Los_Angeles"
+    },
+    {
+      "storeNumber": "R072",
+      "state": "华盛顿州",
+      "stateEn": "Washington",
+      "city": "西雅图",
+      "cityEn": "Seattle",
+      "name": "大学村 University Village",
+      "nameEn": "University Village",
+      "shortName": "西雅图大学村",
+      "timeZone": "America/Los_Angeles"
+    },
+    {
+      "storeNumber": "R100",
+      "state": "华盛顿州",
+      "stateEn": "Washington",
+      "city": "Lynnwood",
+      "cityEn": "Lynnwood",
+      "name": "Alderwood",
+      "nameEn": "Alderwood",
+      "timeZone": "America/Los_Angeles"
+    },
+    {
+      "storeNumber": "R420",
+      "state": "华盛顿州",
+      "stateEn": "Washington",
+      "city": "Spokane",
+      "cityEn": "Spokane",
+      "name": "River Park Square",
+      "nameEn": "River Park Square",
+      "timeZone": "America/Los_Angeles"
+    },
+    {
+      "storeNumber": "R339",
+      "state": "华盛顿州",
+      "stateEn": "Washington",
+      "city": "塔科马",
+      "cityEn": "Tacoma",
+      "name": "Tacoma Mall",
+      "nameEn": "Tacoma Mall",
+      "timeZone": "America/Los_Angeles"
+    },
+    {
+      "storeNumber": "R106",
+      "state": "华盛顿州",
+      "stateEn": "Washington",
+      "city": "Tukwila",
+      "cityEn": "Tukwila",
+      "name": "Southcenter",
+      "nameEn": "Southcenter",
+      "timeZone": "America/Los_Angeles"
+    },
+    {
+      "storeNumber": "R149",
+      "state": "马萨诸塞州",
+      "stateEn": "Massachusetts",
+      "city": "波士顿",
+      "cityEn": "Boston",
+      "name": "博伊尔斯顿街 Boylston St",
+      "nameEn": "Boylston Street",
+      "shortName": "波士顿 Boylston",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R110",
+      "state": "马萨诸塞州",
+      "stateEn": "Massachusetts",
+      "city": "Braintree",
+      "cityEn": "Braintree",
+      "name": "South Shore",
+      "nameEn": "South Shore",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R155",
+      "state": "马萨诸塞州",
+      "stateEn": "Massachusetts",
+      "city": "Burlington",
+      "cityEn": "Burlington",
+      "name": "Burlington",
+      "nameEn": "Burlington",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R021",
+      "state": "马萨诸塞州",
+      "stateEn": "Massachusetts",
+      "city": "剑桥（波士顿）",
+      "cityEn": "Cambridge",
+      "name": "CambridgeSide",
+      "nameEn": "CambridgeSide",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R076",
+      "state": "马萨诸塞州",
+      "stateEn": "Massachusetts",
+      "city": "Chestnut Hill",
+      "cityEn": "Chestnut Hill",
+      "name": "Chestnut Hill",
+      "nameEn": "Chestnut Hill",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R346",
+      "state": "马萨诸塞州",
+      "stateEn": "Massachusetts",
+      "city": "Dedham",
+      "cityEn": "Dedham",
+      "name": "Legacy Place",
+      "nameEn": "Legacy Place",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R137",
+      "state": "马萨诸塞州",
+      "stateEn": "Massachusetts",
+      "city": "Hingham",
+      "cityEn": "Hingham",
+      "name": "Derby Street",
+      "nameEn": "Derby Street",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R191",
+      "state": "马萨诸塞州",
+      "stateEn": "Massachusetts",
+      "city": "Holyoke",
+      "cityEn": "Holyoke",
+      "name": "Holyoke",
+      "nameEn": "Holyoke",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R011",
+      "state": "马萨诸塞州",
+      "stateEn": "Massachusetts",
+      "city": "Lynnfield",
+      "cityEn": "Lynnfield",
+      "name": "MarketStreet",
+      "nameEn": "MarketStreet",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R622",
+      "state": "马萨诸塞州",
+      "stateEn": "Massachusetts",
+      "city": "Millbury",
+      "cityEn": "Millbury",
+      "name": "The Shops at Blackstone Valley",
+      "nameEn": "The Shops at Blackstone Valley",
+      "shortNameEn": "Blackstone Valley",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R232",
+      "state": "马萨诸塞州",
+      "stateEn": "Massachusetts",
+      "city": "Natick",
+      "cityEn": "Natick",
+      "name": "Natick",
+      "nameEn": "Natick",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R085",
+      "state": "得克萨斯州",
+      "stateEn": "Texas",
+      "city": "奥斯汀",
+      "cityEn": "Austin",
+      "name": "Barton Creek",
+      "nameEn": "Barton Creek",
+      "timeZone": "America/Chicago"
+    },
+    {
+      "storeNumber": "R216",
+      "state": "得克萨斯州",
+      "stateEn": "Texas",
+      "city": "奥斯汀",
+      "cityEn": "Austin",
+      "name": "Domain NORTHSIDE",
+      "nameEn": "Domain NORTHSIDE",
+      "timeZone": "America/Chicago"
+    },
+    {
+      "storeNumber": "R746",
+      "state": "得克萨斯州",
+      "stateEn": "Texas",
+      "city": "达拉斯",
+      "cityEn": "Dallas",
+      "name": "Galleria Dallas",
+      "nameEn": "Galleria Dallas",
+      "timeZone": "America/Chicago"
+    },
+    {
+      "storeNumber": "R042",
+      "state": "得克萨斯州",
+      "stateEn": "Texas",
+      "city": "达拉斯",
+      "cityEn": "Dallas",
+      "name": "Knox Street",
+      "nameEn": "Knox Street",
+      "timeZone": "America/Chicago"
+    },
+    {
+      "storeNumber": "R144",
+      "state": "得克萨斯州",
+      "stateEn": "Texas",
+      "city": "达拉斯",
+      "cityEn": "Dallas",
+      "name": "NorthPark Center",
+      "nameEn": "NorthPark Center",
+      "timeZone": "America/Chicago"
+    },
+    {
+      "storeNumber": "R492",
+      "state": "得克萨斯州",
+      "stateEn": "Texas",
+      "city": "El Paso",
+      "cityEn": "El Paso",
+      "name": "Cielo Vista Mall",
+      "nameEn": "Cielo Vista Mall",
+      "timeZone": "America/Denver"
+    },
+    {
+      "storeNumber": "R316",
+      "state": "得克萨斯州",
+      "stateEn": "Texas",
+      "city": "Fort Worth",
+      "cityEn": "Fort Worth",
+      "name": "University Park Village",
+      "nameEn": "University Park Village",
+      "shortNameEn": "Univ Park Village",
+      "timeZone": "America/Chicago"
+    },
+    {
+      "storeNumber": "R204",
+      "state": "得克萨斯州",
+      "stateEn": "Texas",
+      "city": "Friendswood",
+      "cityEn": "Friendswood",
+      "name": "Baybrook",
+      "nameEn": "Baybrook",
+      "timeZone": "America/Chicago"
+    },
+    {
+      "storeNumber": "R437",
+      "state": "得克萨斯州",
+      "stateEn": "Texas",
+      "city": "休斯敦",
+      "cityEn": "Houston",
+      "name": "Highland Village",
+      "nameEn": "Highland Village",
+      "timeZone": "America/Chicago"
+    },
+    {
+      "storeNumber": "R058",
+      "state": "得克萨斯州",
+      "stateEn": "Texas",
+      "city": "休斯敦",
+      "cityEn": "Houston",
+      "name": "Houston Galleria",
+      "nameEn": "Houston Galleria",
+      "timeZone": "America/Chicago"
+    },
+    {
+      "storeNumber": "R164",
+      "state": "得克萨斯州",
+      "stateEn": "Texas",
+      "city": "休斯敦",
+      "cityEn": "Houston",
+      "name": "Memorial City",
+      "nameEn": "Memorial City",
+      "timeZone": "America/Chicago"
+    },
+    {
+      "storeNumber": "R321",
+      "state": "得克萨斯州",
+      "stateEn": "Texas",
+      "city": "休斯敦",
+      "cityEn": "Houston",
+      "name": "Willowbrook Mall",
+      "nameEn": "Willowbrook Mall",
+      "timeZone": "America/Chicago"
+    },
+    {
+      "storeNumber": "R131",
+      "state": "得克萨斯州",
+      "stateEn": "Texas",
+      "city": "圣安东尼奥",
+      "cityEn": "San Antonio",
+      "name": "La Cantera",
+      "nameEn": "La Cantera",
+      "timeZone": "America/Chicago"
+    },
+    {
+      "storeNumber": "R290",
+      "state": "得克萨斯州",
+      "stateEn": "Texas",
+      "city": "圣安东尼奥",
+      "cityEn": "San Antonio",
+      "name": "North Star",
+      "nameEn": "North Star",
+      "timeZone": "America/Chicago"
+    },
+    {
+      "storeNumber": "R151",
+      "state": "得克萨斯州",
+      "stateEn": "Texas",
+      "city": "Southlake",
+      "cityEn": "Southlake",
+      "name": "Southlake Town Square",
+      "nameEn": "Southlake Town Square",
+      "shortNameEn": "Southlake Town Sq",
+      "timeZone": "America/Chicago"
+    },
+    {
+      "storeNumber": "R205",
+      "state": "得克萨斯州",
+      "stateEn": "Texas",
+      "city": "Sugar Land",
+      "cityEn": "Sugar Land",
+      "name": "First Colony Mall",
+      "nameEn": "First Colony Mall",
+      "timeZone": "America/Chicago"
+    },
+    {
+      "storeNumber": "R126",
+      "state": "得克萨斯州",
+      "stateEn": "Texas",
+      "city": "The Woodlands",
+      "cityEn": "The Woodlands",
+      "name": "The Woodlands",
+      "nameEn": "The Woodlands",
+      "timeZone": "America/Chicago"
+    },
+    {
+      "storeNumber": "R291",
+      "state": "佛罗里达州",
+      "stateEn": "Florida",
+      "city": "Altamonte Springs",
+      "cityEn": "Altamonte Springs",
+      "name": "Altamonte",
+      "nameEn": "Altamonte",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R087",
+      "state": "佛罗里达州",
+      "stateEn": "Florida",
+      "city": "Aventura",
+      "cityEn": "Aventura",
+      "name": "Aventura",
+      "nameEn": "Aventura",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R074",
+      "state": "佛罗里达州",
+      "stateEn": "Florida",
+      "city": "Boca Raton",
+      "cityEn": "Boca Raton",
+      "name": "Boca Raton",
+      "nameEn": "Boca Raton",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R289",
+      "state": "佛罗里达州",
+      "stateEn": "Florida",
+      "city": "Brandon",
+      "cityEn": "Brandon",
+      "name": "Brandon",
+      "nameEn": "Brandon",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R185",
+      "state": "佛罗里达州",
+      "stateEn": "Florida",
+      "city": "Estero",
+      "cityEn": "Estero",
+      "name": "Coconut Point",
+      "nameEn": "Coconut Point",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R214",
+      "state": "佛罗里达州",
+      "stateEn": "Florida",
+      "city": "Fort Lauderdale",
+      "cityEn": "Fort Lauderdale",
+      "name": "The Galleria",
+      "nameEn": "The Galleria",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R111",
+      "state": "佛罗里达州",
+      "stateEn": "Florida",
+      "city": "Jacksonville",
+      "cityEn": "Jacksonville",
+      "name": "St. Johns Town Center",
+      "nameEn": "St. Johns Town Center",
+      "shortNameEn": "St. Johns Town Ctr",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R623",
+      "state": "佛罗里达州",
+      "stateEn": "Florida",
+      "city": "迈阿密",
+      "cityEn": "Miami",
+      "name": "Brickell City Centre",
+      "nameEn": "Brickell City Centre",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R312",
+      "state": "佛罗里达州",
+      "stateEn": "Florida",
+      "city": "迈阿密",
+      "cityEn": "Miami",
+      "name": "Dadeland",
+      "nameEn": "Dadeland",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R752",
+      "state": "佛罗里达州",
+      "stateEn": "Florida",
+      "city": "迈阿密",
+      "cityEn": "Miami",
+      "name": "Miami Worldcenter",
+      "nameEn": "Miami Worldcenter",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R012",
+      "state": "佛罗里达州",
+      "stateEn": "Florida",
+      "city": "迈阿密",
+      "cityEn": "Miami",
+      "name": "The Falls",
+      "nameEn": "The Falls",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R115",
+      "state": "佛罗里达州",
+      "stateEn": "Florida",
+      "city": "迈阿密海滩",
+      "cityEn": "Miami Beach",
+      "name": "Lincoln Road",
+      "nameEn": "Lincoln Road",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R169",
+      "state": "佛罗里达州",
+      "stateEn": "Florida",
+      "city": "Naples",
+      "cityEn": "Naples",
+      "name": "Waterside Shops",
+      "nameEn": "Waterside Shops",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R143",
+      "state": "佛罗里达州",
+      "stateEn": "Florida",
+      "city": "奥兰多",
+      "cityEn": "Orlando",
+      "name": "Florida Mall",
+      "nameEn": "Florida Mall",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R053",
+      "state": "佛罗里达州",
+      "stateEn": "Florida",
+      "city": "奥兰多",
+      "cityEn": "Orlando",
+      "name": "Millenia",
+      "nameEn": "Millenia",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R127",
+      "state": "佛罗里达州",
+      "stateEn": "Florida",
+      "city": "Palm Beach Gardens",
+      "cityEn": "Palm Beach Gardens",
+      "name": "The Gardens Mall",
+      "nameEn": "The Gardens Mall",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R615",
+      "state": "佛罗里达州",
+      "stateEn": "Florida",
+      "city": "Sarasota",
+      "cityEn": "Sarasota",
+      "name": "University Town Center",
+      "nameEn": "University Town Center",
+      "shortNameEn": "University Town Ctr",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R019",
+      "state": "佛罗里达州",
+      "stateEn": "Florida",
+      "city": "坦帕",
+      "cityEn": "Tampa",
+      "name": "International Plaza",
+      "nameEn": "International Plaza",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R024",
+      "state": "佛罗里达州",
+      "stateEn": "Florida",
+      "city": "Wellington",
+      "cityEn": "Wellington",
+      "name": "Wellington Green",
+      "nameEn": "Wellington Green",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R284",
+      "state": "伊利诺伊州",
+      "stateEn": "Illinois",
+      "city": "芝加哥",
+      "cityEn": "Chicago",
+      "name": "Lincoln Park",
+      "nameEn": "Lincoln Park",
+      "timeZone": "America/Chicago"
+    },
+    {
+      "storeNumber": "R035",
+      "state": "伊利诺伊州",
+      "stateEn": "Illinois",
+      "city": "芝加哥",
+      "cityEn": "Chicago",
+      "name": "密歇根大道 Michigan Ave",
+      "nameEn": "Michigan Avenue",
+      "shortName": "芝加哥密歇根大道",
+      "timeZone": "America/Chicago"
+    },
+    {
+      "storeNumber": "R258",
+      "state": "伊利诺伊州",
+      "stateEn": "Illinois",
+      "city": "Deer Park",
+      "cityEn": "Deer Park",
+      "name": "Deer Park",
+      "nameEn": "Deer Park",
+      "timeZone": "America/Chicago"
+    },
+    {
+      "storeNumber": "R348",
+      "state": "伊利诺伊州",
+      "stateEn": "Illinois",
+      "city": "Naperville",
+      "cityEn": "Naperville",
+      "name": "Main Place",
+      "nameEn": "Main Place",
+      "timeZone": "America/Chicago"
+    },
+    {
+      "storeNumber": "R056",
+      "state": "伊利诺伊州",
+      "stateEn": "Illinois",
+      "city": "Oak Brook",
+      "cityEn": "Oak Brook",
+      "name": "Oakbrook",
+      "nameEn": "Oakbrook",
+      "timeZone": "America/Chicago"
+    },
+    {
+      "storeNumber": "R237",
+      "state": "伊利诺伊州",
+      "stateEn": "Illinois",
+      "city": "Orland Park",
+      "cityEn": "Orland Park",
+      "name": "Orland Square Mall",
+      "nameEn": "Orland Square Mall",
+      "timeZone": "America/Chicago"
+    },
+    {
+      "storeNumber": "R018",
+      "state": "伊利诺伊州",
+      "stateEn": "Illinois",
+      "city": "Schaumburg",
+      "cityEn": "Schaumburg",
+      "name": "Woodfield",
+      "nameEn": "Woodfield",
+      "timeZone": "America/Chicago"
+    },
+    {
+      "storeNumber": "R089",
+      "state": "伊利诺伊州",
+      "stateEn": "Illinois",
+      "city": "Skokie",
+      "cityEn": "Skokie",
+      "name": "Old Orchard",
+      "nameEn": "Old Orchard",
+      "timeZone": "America/Chicago"
+    },
+    {
+      "storeNumber": "R104",
+      "state": "新泽西州",
+      "stateEn": "New Jersey",
+      "city": "Bridgewater",
+      "cityEn": "Bridgewater",
+      "name": "Bridgewater",
+      "nameEn": "Bridgewater",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R206",
+      "state": "新泽西州",
+      "stateEn": "New Jersey",
+      "city": "Cherry Hill",
+      "cityEn": "Cherry Hill",
+      "name": "Cherry Hill",
+      "nameEn": "Cherry Hill",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R755",
+      "state": "新泽西州",
+      "stateEn": "New Jersey",
+      "city": "East Rutherford",
+      "cityEn": "East Rutherford",
+      "name": "American Dream",
+      "nameEn": "American Dream",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R067",
+      "state": "新泽西州",
+      "stateEn": "New Jersey",
+      "city": "Edison",
+      "cityEn": "Edison",
+      "name": "Menlo Park",
+      "nameEn": "Menlo Park",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R138",
+      "state": "新泽西州",
+      "stateEn": "New Jersey",
+      "city": "Freehold",
+      "cityEn": "Freehold",
+      "name": "Freehold Raceway Mall",
+      "nameEn": "Freehold Raceway Mall",
+      "shortNameEn": "Freehold Raceway",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R549",
+      "state": "新泽西州",
+      "stateEn": "New Jersey",
+      "city": "Lawrence Township",
+      "cityEn": "Lawrence Township",
+      "name": "Quaker Bridge",
+      "nameEn": "Quaker Bridge",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R088",
+      "state": "新泽西州",
+      "stateEn": "New Jersey",
+      "city": "Marlton",
+      "cityEn": "Marlton",
+      "name": "Sagemore",
+      "nameEn": "Sagemore",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R117",
+      "state": "新泽西州",
+      "stateEn": "New Jersey",
+      "city": "Paramus",
+      "cityEn": "Paramus",
+      "name": "Garden State Plaza",
+      "nameEn": "Garden State Plaza",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R103",
+      "state": "新泽西州",
+      "stateEn": "New Jersey",
+      "city": "Rockaway",
+      "cityEn": "Rockaway",
+      "name": "Rockaway",
+      "nameEn": "Rockaway",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R043",
+      "state": "新泽西州",
+      "stateEn": "New Jersey",
+      "city": "Short Hills",
+      "cityEn": "Short Hills",
+      "name": "Short Hills",
+      "nameEn": "Short Hills",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R325",
+      "state": "新泽西州",
+      "stateEn": "New Jersey",
+      "city": "Wayne",
+      "cityEn": "Wayne",
+      "name": "Willowbrook",
+      "nameEn": "Willowbrook",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R013",
+      "state": "新泽西州",
+      "stateEn": "New Jersey",
+      "city": "Woodcliff Lake",
+      "cityEn": "Woodcliff Lake",
+      "name": "Tice's Corner",
+      "nameEn": "Tice's Corner",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R166",
+      "state": "宾夕法尼亚州",
+      "stateEn": "Pennsylvania",
+      "city": "Ardmore",
+      "cityEn": "Ardmore",
+      "name": "Suburban Square",
+      "nameEn": "Suburban Square",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R065",
+      "state": "宾夕法尼亚州",
+      "stateEn": "Pennsylvania",
+      "city": "King of Prussia",
+      "cityEn": "King of Prussia",
+      "name": "King of Prussia",
+      "nameEn": "King of Prussia",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R304",
+      "state": "宾夕法尼亚州",
+      "stateEn": "Pennsylvania",
+      "city": "Lancaster",
+      "cityEn": "Lancaster",
+      "name": "Park City",
+      "nameEn": "Park City",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R162",
+      "state": "宾夕法尼亚州",
+      "stateEn": "Pennsylvania",
+      "city": "费城",
+      "cityEn": "Philadelphia",
+      "name": "Walnut Street",
+      "nameEn": "Walnut Street",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R413",
+      "state": "宾夕法尼亚州",
+      "stateEn": "Pennsylvania",
+      "city": "匹兹堡",
+      "cityEn": "Pittsburgh",
+      "name": "Ross Park",
+      "nameEn": "Ross Park",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R096",
+      "state": "宾夕法尼亚州",
+      "stateEn": "Pennsylvania",
+      "city": "匹兹堡",
+      "cityEn": "Pittsburgh",
+      "name": "Shadyside",
+      "nameEn": "Shadyside",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R147",
+      "state": "宾夕法尼亚州",
+      "stateEn": "Pennsylvania",
+      "city": "匹兹堡",
+      "cityEn": "Pittsburgh",
+      "name": "South Hills Village",
+      "nameEn": "South Hills Village",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R281",
+      "state": "宾夕法尼亚州",
+      "stateEn": "Pennsylvania",
+      "city": "Whitehall",
+      "cityEn": "Whitehall",
+      "name": "Lehigh Valley",
+      "nameEn": "Lehigh Valley",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R234",
+      "state": "宾夕法尼亚州",
+      "stateEn": "Pennsylvania",
+      "city": "Willow Grove",
+      "cityEn": "Willow Grove",
+      "name": "Willow Grove Park",
+      "nameEn": "Willow Grove Park",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R036",
+      "state": "弗吉尼亚州",
+      "stateEn": "Virginia",
+      "city": "Arlington",
+      "cityEn": "Arlington",
+      "name": "Clarendon",
+      "nameEn": "Clarendon",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R129",
+      "state": "弗吉尼亚州",
+      "stateEn": "Virginia",
+      "city": "Arlington",
+      "cityEn": "Arlington",
+      "name": "Pentagon City",
+      "nameEn": "Pentagon City",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R221",
+      "state": "弗吉尼亚州",
+      "stateEn": "Virginia",
+      "city": "Fairfax",
+      "cityEn": "Fairfax",
+      "name": "Fairfax Corner",
+      "nameEn": "Fairfax Corner",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R010",
+      "state": "弗吉尼亚州",
+      "stateEn": "Virginia",
+      "city": "McLean",
+      "cityEn": "McLean",
+      "name": "Tysons Corner",
+      "nameEn": "Tysons Corner",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R271",
+      "state": "弗吉尼亚州",
+      "stateEn": "Virginia",
+      "city": "Reston",
+      "cityEn": "Reston",
+      "name": "Reston",
+      "nameEn": "Reston",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R078",
+      "state": "弗吉尼亚州",
+      "stateEn": "Virginia",
+      "city": "Richmond",
+      "cityEn": "Richmond",
+      "name": "Short Pump Town Center",
+      "nameEn": "Short Pump Town Center",
+      "shortNameEn": "Short Pump Town Ctr",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R614",
+      "state": "弗吉尼亚州",
+      "stateEn": "Virginia",
+      "city": "Virginia Beach",
+      "cityEn": "Virginia Beach",
+      "name": "Lynnhaven Mall",
+      "nameEn": "Lynnhaven Mall",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R598",
+      "state": "弗吉尼亚州",
+      "stateEn": "Virginia",
+      "city": "Woodbridge",
+      "cityEn": "Woodbridge",
+      "name": "Stonebridge Potomac Town Center",
+      "nameEn": "Stonebridge Potomac Town Center",
+      "shortNameEn": "Stonebridge Potomac",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R080",
+      "state": "佐治亚州",
+      "stateEn": "Georgia",
+      "city": "Alpharetta",
+      "cityEn": "Alpharetta",
+      "name": "Avalon",
+      "nameEn": "Avalon",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R591",
+      "state": "佐治亚州",
+      "stateEn": "Georgia",
+      "city": "亚特兰大",
+      "cityEn": "Atlanta",
+      "name": "Cumberland Mall",
+      "nameEn": "Cumberland Mall",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R006",
+      "state": "佐治亚州",
+      "stateEn": "Georgia",
+      "city": "亚特兰大",
+      "cityEn": "Atlanta",
+      "name": "Lenox Square",
+      "nameEn": "Lenox Square",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R184",
+      "state": "佐治亚州",
+      "stateEn": "Georgia",
+      "city": "亚特兰大",
+      "cityEn": "Atlanta",
+      "name": "Perimeter",
+      "nameEn": "Perimeter",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R364",
+      "state": "佐治亚州",
+      "stateEn": "Georgia",
+      "city": "Augusta",
+      "cityEn": "Augusta",
+      "name": "Augusta",
+      "nameEn": "Augusta",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R259",
+      "state": "佐治亚州",
+      "stateEn": "Georgia",
+      "city": "Buford",
+      "cityEn": "Buford",
+      "name": "Mall of Georgia",
+      "nameEn": "Mall of Georgia",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R516",
+      "state": "华盛顿特区",
+      "stateEn": "District of Columbia",
+      "city": "华盛顿哥伦比亚特区",
+      "cityEn": "Washington",
+      "name": "卡内基图书馆 Carnegie",
+      "nameEn": "Carnegie Library",
+      "shortName": "华盛顿卡内基馆",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R287",
+      "state": "华盛顿特区",
+      "stateEn": "District of Columbia",
+      "city": "华盛顿哥伦比亚特区",
+      "cityEn": "Washington",
+      "name": "Georgetown",
+      "nameEn": "Georgetown",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R073",
+      "state": "夏威夷州",
+      "stateEn": "Hawaii",
+      "city": "檀香山",
+      "cityEn": "Honolulu",
+      "name": "阿拉莫阿那 Ala Moana",
+      "nameEn": "Ala Moana",
+      "shortName": "檀香山 Ala Moana",
+      "timeZone": "Pacific/Honolulu"
+    },
+    {
+      "storeNumber": "R210",
+      "state": "夏威夷州",
+      "stateEn": "Hawaii",
+      "city": "檀香山",
+      "cityEn": "Honolulu",
+      "name": "Kahala",
+      "nameEn": "Kahala",
+      "timeZone": "Pacific/Honolulu"
+    },
+    {
+      "storeNumber": "R064",
+      "state": "内华达州",
+      "stateEn": "Nevada",
+      "city": "拉斯维加斯",
+      "cityEn": "Las Vegas",
+      "name": "Fashion Show",
+      "nameEn": "Fashion Show",
+      "timeZone": "America/Los_Angeles"
+    },
+    {
+      "storeNumber": "R650",
+      "state": "内华达州",
+      "stateEn": "Nevada",
+      "city": "拉斯维加斯",
+      "cityEn": "Las Vegas",
+      "name": "Summerlin",
+      "nameEn": "Summerlin",
+      "timeZone": "America/Los_Angeles"
+    },
+    {
+      "storeNumber": "R161",
+      "state": "内华达州",
+      "stateEn": "Nevada",
+      "city": "拉斯维加斯",
+      "cityEn": "Las Vegas",
+      "name": "The Forum Shops",
+      "nameEn": "The Forum Shops",
+      "timeZone": "America/Los_Angeles"
+    },
+    {
+      "storeNumber": "R219",
+      "state": "内华达州",
+      "stateEn": "Nevada",
+      "city": "拉斯维加斯",
+      "cityEn": "Las Vegas",
+      "name": "Town Square",
+      "nameEn": "Town Square",
+      "timeZone": "America/Los_Angeles"
+    },
+    {
+      "storeNumber": "R186",
+      "state": "内华达州",
+      "stateEn": "Nevada",
+      "city": "Reno",
+      "cityEn": "Reno",
+      "name": "Shayden Summit",
+      "nameEn": "Shayden Summit",
+      "timeZone": "America/Los_Angeles"
+    },
+    {
+      "storeNumber": "R225",
+      "state": "亚拉巴马州",
+      "stateEn": "Alabama",
+      "city": "Birmingham",
+      "cityEn": "Birmingham",
+      "name": "The Summit",
+      "nameEn": "The Summit",
+      "timeZone": "America/Chicago"
+    },
+    {
+      "storeNumber": "R266",
+      "state": "亚拉巴马州",
+      "stateEn": "Alabama",
+      "city": "Huntsville",
+      "cityEn": "Huntsville",
+      "name": "Bridge Street",
+      "nameEn": "Bridge Street",
+      "timeZone": "America/Chicago"
+    },
+    {
+      "storeNumber": "R026",
+      "state": "亚利桑那州",
+      "stateEn": "Arizona",
+      "city": "Chandler",
+      "cityEn": "Chandler",
+      "name": "Chandler Fashion Center",
+      "nameEn": "Chandler Fashion Center",
+      "shortNameEn": "Chandler Fashion",
+      "timeZone": "America/Phoenix"
+    },
+    {
+      "storeNumber": "R267",
+      "state": "亚利桑那州",
+      "stateEn": "Arizona",
+      "city": "Gilbert",
+      "cityEn": "Gilbert",
+      "name": "SanTan Village",
+      "nameEn": "SanTan Village",
+      "timeZone": "America/Phoenix"
+    },
+    {
+      "storeNumber": "R247",
+      "state": "亚利桑那州",
+      "stateEn": "Arizona",
+      "city": "格伦代尔",
+      "cityEn": "Glendale",
+      "name": "Arrowhead",
+      "nameEn": "Arrowhead",
+      "timeZone": "America/Phoenix"
+    },
+    {
+      "storeNumber": "R031",
+      "state": "亚利桑那州",
+      "stateEn": "Arizona",
+      "city": "斯科茨代尔",
+      "cityEn": "Scottsdale",
+      "name": "Scottsdale Fashion Square",
+      "nameEn": "Scottsdale Fashion Square",
+      "shortNameEn": "Scottsdale Fashion",
+      "timeZone": "America/Phoenix"
+    },
+    {
+      "storeNumber": "R292",
+      "state": "亚利桑那州",
+      "stateEn": "Arizona",
+      "city": "斯科茨代尔",
+      "cityEn": "Scottsdale",
+      "name": "Scottsdale Quarter",
+      "nameEn": "Scottsdale Quarter",
+      "timeZone": "America/Phoenix"
+    },
+    {
+      "storeNumber": "R086",
+      "state": "亚利桑那州",
+      "stateEn": "Arizona",
+      "city": "Tucson",
+      "cityEn": "Tucson",
+      "name": "La Encantada",
+      "nameEn": "La Encantada",
+      "timeZone": "America/Phoenix"
+    },
+    {
+      "storeNumber": "R286",
+      "state": "阿肯色州",
+      "stateEn": "Arkansas",
+      "city": "Little Rock",
+      "cityEn": "Little Rock",
+      "name": "The Promenade at Chenal",
+      "nameEn": "The Promenade at Chenal",
+      "shortNameEn": "Promenade at Chenal",
+      "timeZone": "America/Chicago"
+    },
+    {
+      "storeNumber": "R172",
+      "state": "科罗拉多州",
+      "stateEn": "Colorado",
+      "city": "Boulder",
+      "cityEn": "Boulder",
+      "name": "Twenty Ninth Street",
+      "nameEn": "Twenty Ninth Street",
+      "timeZone": "America/Denver"
+    },
+    {
+      "storeNumber": "R182",
+      "state": "科罗拉多州",
+      "stateEn": "Colorado",
+      "city": "Broomfield",
+      "cityEn": "Broomfield",
+      "name": "FlatIron Crossing",
+      "nameEn": "FlatIron Crossing",
+      "timeZone": "America/Denver"
+    },
+    {
+      "storeNumber": "R338",
+      "state": "科罗拉多州",
+      "stateEn": "Colorado",
+      "city": "Colorado Springs",
+      "cityEn": "Colorado Springs",
+      "name": "The Promenade Shops at Briargate",
+      "nameEn": "The Promenade Shops at Briargate",
+      "shortNameEn": "Briargate Shops",
+      "timeZone": "America/Denver"
+    },
+    {
+      "storeNumber": "R047",
+      "state": "科罗拉多州",
+      "stateEn": "Colorado",
+      "city": "丹佛",
+      "cityEn": "Denver",
+      "name": "Cherry Creek",
+      "nameEn": "Cherry Creek",
+      "timeZone": "America/Denver"
+    },
+    {
+      "storeNumber": "R030",
+      "state": "科罗拉多州",
+      "stateEn": "Colorado",
+      "city": "Littleton",
+      "cityEn": "Littleton",
+      "name": "Aspen Grove",
+      "nameEn": "Aspen Grove",
+      "timeZone": "America/Denver"
+    },
+    {
+      "storeNumber": "R228",
+      "state": "科罗拉多州",
+      "stateEn": "Colorado",
+      "city": "Lone Tree",
+      "cityEn": "Lone Tree",
+      "name": "Park Meadows",
+      "nameEn": "Park Meadows",
+      "timeZone": "America/Denver"
+    },
+    {
+      "storeNumber": "R093",
+      "state": "康涅狄格州",
+      "stateEn": "Connecticut",
+      "city": "Danbury",
+      "cityEn": "Danbury",
+      "name": "Danbury Fair Mall",
+      "nameEn": "Danbury Fair Mall",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R025",
+      "state": "康涅狄格州",
+      "stateEn": "Connecticut",
+      "city": "Farmington",
+      "cityEn": "Farmington",
+      "name": "Westfarms",
+      "nameEn": "Westfarms",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R282",
+      "state": "康涅狄格州",
+      "stateEn": "Connecticut",
+      "city": "Greenwich",
+      "cityEn": "Greenwich",
+      "name": "Greenwich Avenue",
+      "nameEn": "Greenwich Avenue",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R446",
+      "state": "康涅狄格州",
+      "stateEn": "Connecticut",
+      "city": "New Haven",
+      "cityEn": "New Haven",
+      "name": "New Haven",
+      "nameEn": "New Haven",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R202",
+      "state": "康涅狄格州",
+      "stateEn": "Connecticut",
+      "city": "Norwalk",
+      "cityEn": "Norwalk",
+      "name": "SoNo Collection",
+      "nameEn": "SoNo Collection",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R613",
+      "state": "康涅狄格州",
+      "stateEn": "Connecticut",
+      "city": "South Windsor",
+      "cityEn": "South Windsor",
+      "name": "Evergreen Walk",
+      "nameEn": "Evergreen Walk",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R303",
+      "state": "爱达荷州",
+      "stateEn": "Idaho",
+      "city": "Boise",
+      "cityEn": "Boise",
+      "name": "Boise Towne Square",
+      "nameEn": "Boise Towne Square",
+      "timeZone": "America/Denver"
+    },
+    {
+      "storeNumber": "R066",
+      "state": "印第安纳州",
+      "stateEn": "Indiana",
+      "city": "印第安纳波利斯",
+      "cityEn": "Indianapolis",
+      "name": "The Fashion Mall at Keystone",
+      "nameEn": "The Fashion Mall at Keystone",
+      "shortNameEn": "Fashion Mall Keystn",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R360",
+      "state": "印第安纳州",
+      "stateEn": "Indiana",
+      "city": "Mishawaka",
+      "cityEn": "Mishawaka",
+      "name": "University Park Mall",
+      "nameEn": "University Park Mall",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R109",
+      "state": "艾奥瓦州",
+      "stateEn": "Iowa",
+      "city": "West Des Moines",
+      "cityEn": "West Des Moines",
+      "name": "Jordan Creek",
+      "nameEn": "Jordan Creek",
+      "timeZone": "America/Chicago"
+    },
+    {
+      "storeNumber": "R283",
+      "state": "堪萨斯州",
+      "stateEn": "Kansas",
+      "city": "Leawood",
+      "cityEn": "Leawood",
+      "name": "Leawood",
+      "nameEn": "Leawood",
+      "timeZone": "America/Chicago"
+    },
+    {
+      "storeNumber": "R288",
+      "state": "肯塔基州",
+      "stateEn": "Kentucky",
+      "city": "Lexington",
+      "cityEn": "Lexington",
+      "name": "Fritz Farm",
+      "nameEn": "Fritz Farm",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R264",
+      "state": "肯塔基州",
+      "stateEn": "Kentucky",
+      "city": "Louisville",
+      "cityEn": "Louisville",
+      "name": "Oxmoor",
+      "nameEn": "Oxmoor",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R263",
+      "state": "路易斯安那州",
+      "stateEn": "Louisiana",
+      "city": "Baton Rouge",
+      "cityEn": "Baton Rouge",
+      "name": "Mall of Louisiana",
+      "nameEn": "Mall of Louisiana",
+      "timeZone": "America/Chicago"
+    },
+    {
+      "storeNumber": "R235",
+      "state": "路易斯安那州",
+      "stateEn": "Louisiana",
+      "city": "Metairie",
+      "cityEn": "Metairie",
+      "name": "Lakeside Shopping Center",
+      "nameEn": "Lakeside Shopping Center",
+      "shortNameEn": "Lakeside Shopping",
+      "timeZone": "America/Chicago"
+    },
+    {
+      "storeNumber": "R307",
+      "state": "缅因州",
+      "stateEn": "Maine",
+      "city": "South Portland",
+      "cityEn": "South Portland",
+      "name": "Maine Mall",
+      "nameEn": "Maine Mall",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R142",
+      "state": "马里兰州",
+      "stateEn": "Maryland",
+      "city": "Annapolis",
+      "cityEn": "Annapolis",
+      "name": "Annapolis",
+      "nameEn": "Annapolis",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R112",
+      "state": "马里兰州",
+      "stateEn": "Maryland",
+      "city": "Bethesda",
+      "cityEn": "Bethesda",
+      "name": "Bethesda Row",
+      "nameEn": "Bethesda Row",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R084",
+      "state": "马里兰州",
+      "stateEn": "Maryland",
+      "city": "Bethesda",
+      "cityEn": "Bethesda",
+      "name": "Montgomery Mall",
+      "nameEn": "Montgomery Mall",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R168",
+      "state": "马里兰州",
+      "stateEn": "Maryland",
+      "city": "Columbia",
+      "cityEn": "Columbia",
+      "name": "Columbia",
+      "nameEn": "Columbia",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R230",
+      "state": "密歇根州",
+      "stateEn": "Michigan",
+      "city": "Ann Arbor",
+      "cityEn": "Ann Arbor",
+      "name": "Briarwood",
+      "nameEn": "Briarwood",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R763",
+      "state": "密歇根州",
+      "stateEn": "Michigan",
+      "city": "底特律",
+      "cityEn": "Detroit",
+      "name": "Downtown Detroit",
+      "nameEn": "Downtown Detroit",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R132",
+      "state": "密歇根州",
+      "stateEn": "Michigan",
+      "city": "Grand Rapids",
+      "cityEn": "Grand Rapids",
+      "name": "Woodland",
+      "nameEn": "Woodland",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R616",
+      "state": "密歇根州",
+      "stateEn": "Michigan",
+      "city": "Lansing",
+      "cityEn": "Lansing",
+      "name": "Eastwood Towne Center",
+      "nameEn": "Eastwood Towne Center",
+      "shortNameEn": "Eastwood Towne Ctr",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R041",
+      "state": "密歇根州",
+      "stateEn": "Michigan",
+      "city": "Novi",
+      "cityEn": "Novi",
+      "name": "Twelve Oaks",
+      "nameEn": "Twelve Oaks",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R055",
+      "state": "密歇根州",
+      "stateEn": "Michigan",
+      "city": "Troy",
+      "cityEn": "Troy",
+      "name": "Somerset",
+      "nameEn": "Somerset",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R007",
+      "state": "明尼苏达州",
+      "stateEn": "Minnesota",
+      "city": "Bloomington",
+      "cityEn": "Bloomington",
+      "name": "Mall of America",
+      "nameEn": "Mall of America",
+      "timeZone": "America/Chicago"
+    },
+    {
+      "storeNumber": "R054",
+      "state": "明尼苏达州",
+      "stateEn": "Minnesota",
+      "city": "Edina",
+      "cityEn": "Edina",
+      "name": "Southdale",
+      "nameEn": "Southdale",
+      "timeZone": "America/Chicago"
+    },
+    {
+      "storeNumber": "R183",
+      "state": "明尼苏达州",
+      "stateEn": "Minnesota",
+      "city": "Minnetonka",
+      "cityEn": "Minnetonka",
+      "name": "Ridgedale",
+      "nameEn": "Ridgedale",
+      "timeZone": "America/Chicago"
+    },
+    {
+      "storeNumber": "R022",
+      "state": "明尼苏达州",
+      "stateEn": "Minnesota",
+      "city": "Roseville",
+      "cityEn": "Roseville",
+      "name": "Rosedale Center",
+      "nameEn": "Rosedale Center",
+      "timeZone": "America/Chicago"
+    },
+    {
+      "storeNumber": "R324",
+      "state": "密西西比州",
+      "stateEn": "Mississippi",
+      "city": "Ridgeland",
+      "cityEn": "Ridgeland",
+      "name": "Renaissance at Colony Park",
+      "nameEn": "Renaissance at Colony Park",
+      "shortNameEn": "Colony Park",
+      "timeZone": "America/Chicago"
+    },
+    {
+      "storeNumber": "R097",
+      "state": "密苏里州",
+      "stateEn": "Missouri",
+      "city": "堪萨斯城",
+      "cityEn": "Kansas City",
+      "name": "Country Club Plaza",
+      "nameEn": "Country Club Plaza",
+      "timeZone": "America/Chicago"
+    },
+    {
+      "storeNumber": "R114",
+      "state": "密苏里州",
+      "stateEn": "Missouri",
+      "city": "圣路易斯",
+      "cityEn": "Saint Louis",
+      "name": "Saint Louis Galleria",
+      "nameEn": "Saint Louis Galleria",
+      "timeZone": "America/Chicago"
+    },
+    {
+      "storeNumber": "R062",
+      "state": "密苏里州",
+      "stateEn": "Missouri",
+      "city": "圣路易斯",
+      "cityEn": "Saint Louis",
+      "name": "West County",
+      "nameEn": "West County",
+      "timeZone": "America/Chicago"
+    },
+    {
+      "storeNumber": "R190",
+      "state": "内布拉斯加州",
+      "stateEn": "Nebraska",
+      "city": "Omaha",
+      "cityEn": "Omaha",
+      "name": "Village Pointe",
+      "nameEn": "Village Pointe",
+      "timeZone": "America/Chicago"
+    },
+    {
+      "storeNumber": "R177",
+      "state": "新墨西哥州",
+      "stateEn": "New Mexico",
+      "city": "Albuquerque",
+      "cityEn": "Albuquerque",
+      "name": "ABQ Uptown",
+      "nameEn": "ABQ Uptown",
+      "timeZone": "America/Denver"
+    },
+    {
+      "storeNumber": "R083",
+      "state": "北卡罗来纳州",
+      "stateEn": "North Carolina",
+      "city": "夏洛特",
+      "cityEn": "Charlotte",
+      "name": "SouthPark",
+      "nameEn": "SouthPark",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R049",
+      "state": "北卡罗来纳州",
+      "stateEn": "North Carolina",
+      "city": "Durham",
+      "cityEn": "Durham",
+      "name": "Southpoint",
+      "nameEn": "Southpoint",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R293",
+      "state": "北卡罗来纳州",
+      "stateEn": "North Carolina",
+      "city": "Greensboro",
+      "cityEn": "Greensboro",
+      "name": "Friendly Center",
+      "nameEn": "Friendly Center",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R796",
+      "state": "北卡罗来纳州",
+      "stateEn": "North Carolina",
+      "city": "Huntersville",
+      "cityEn": "Huntersville",
+      "name": "Birkdale Village",
+      "nameEn": "Birkdale Village",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R116",
+      "state": "北卡罗来纳州",
+      "stateEn": "North Carolina",
+      "city": "罗利",
+      "cityEn": "Raleigh",
+      "name": "Crabtree Valley Mall",
+      "nameEn": "Crabtree Valley Mall",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R353",
+      "state": "俄亥俄州",
+      "stateEn": "Ohio",
+      "city": "Akron",
+      "cityEn": "Akron",
+      "name": "Summit Mall",
+      "nameEn": "Summit Mall",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R518",
+      "state": "俄亥俄州",
+      "stateEn": "Ohio",
+      "city": "Beavercreek",
+      "cityEn": "Beavercreek",
+      "name": "The Greene",
+      "nameEn": "The Greene",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R028",
+      "state": "俄亥俄州",
+      "stateEn": "Ohio",
+      "city": "辛辛那提",
+      "cityEn": "Cincinnati",
+      "name": "Kenwood Towne Centre",
+      "nameEn": "Kenwood Towne Centre",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R009",
+      "state": "俄亥俄州",
+      "stateEn": "Ohio",
+      "city": "哥伦布",
+      "cityEn": "Columbus",
+      "name": "Easton Town Center",
+      "nameEn": "Easton Town Center",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R417",
+      "state": "俄亥俄州",
+      "stateEn": "Ohio",
+      "city": "哥伦布",
+      "cityEn": "Columbus",
+      "name": "Polaris Fashion Place",
+      "nameEn": "Polaris Fashion Place",
+      "shortNameEn": "Polaris Fashion",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R299",
+      "state": "俄亥俄州",
+      "stateEn": "Ohio",
+      "city": "Toledo",
+      "cityEn": "Toledo",
+      "name": "Franklin Park Mall",
+      "nameEn": "Franklin Park Mall",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R192",
+      "state": "俄亥俄州",
+      "stateEn": "Ohio",
+      "city": "Westlake",
+      "cityEn": "Westlake",
+      "name": "Crocker Park",
+      "nameEn": "Crocker Park",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R081",
+      "state": "俄亥俄州",
+      "stateEn": "Ohio",
+      "city": "Woodmere",
+      "cityEn": "Woodmere",
+      "name": "Eton",
+      "nameEn": "Eton",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R130",
+      "state": "俄克拉荷马州",
+      "stateEn": "Oklahoma",
+      "city": "Oklahoma City",
+      "cityEn": "Oklahoma City",
+      "name": "Penn Square",
+      "nameEn": "Penn Square",
+      "timeZone": "America/Chicago"
+    },
+    {
+      "storeNumber": "R233",
+      "state": "俄克拉荷马州",
+      "stateEn": "Oklahoma",
+      "city": "Tulsa",
+      "cityEn": "Tulsa",
+      "name": "Woodland Hills",
+      "nameEn": "Woodland Hills",
+      "timeZone": "America/Chicago"
+    },
+    {
+      "storeNumber": "R167",
+      "state": "罗得岛州",
+      "stateEn": "Rhode Island",
+      "city": "Providence",
+      "cityEn": "Providence",
+      "name": "Providence Place",
+      "nameEn": "Providence Place",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R318",
+      "state": "南卡罗来纳州",
+      "stateEn": "South Carolina",
+      "city": "Charleston",
+      "cityEn": "Charleston",
+      "name": "Charleston",
+      "nameEn": "Charleston",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R355",
+      "state": "南卡罗来纳州",
+      "stateEn": "South Carolina",
+      "city": "Greenville",
+      "cityEn": "Greenville",
+      "name": "Haywood Mall",
+      "nameEn": "Haywood Mall",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R513",
+      "state": "田纳西州",
+      "stateEn": "Tennessee",
+      "city": "Franklin",
+      "cityEn": "Franklin",
+      "name": "CoolSprings Galleria",
+      "nameEn": "CoolSprings Galleria",
+      "timeZone": "America/Chicago"
+    },
+    {
+      "storeNumber": "R020",
+      "state": "田纳西州",
+      "stateEn": "Tennessee",
+      "city": "Germantown",
+      "cityEn": "Germantown",
+      "name": "Saddle Creek",
+      "nameEn": "Saddle Creek",
+      "timeZone": "America/Chicago"
+    },
+    {
+      "storeNumber": "R203",
+      "state": "田纳西州",
+      "stateEn": "Tennessee",
+      "city": "Knoxville",
+      "cityEn": "Knoxville",
+      "name": "West Town Mall",
+      "nameEn": "West Town Mall",
+      "timeZone": "America/New_York"
+    },
+    {
+      "storeNumber": "R133",
+      "state": "田纳西州",
+      "stateEn": "Tennessee",
+      "city": "纳什维尔",
+      "cityEn": "Nashville",
+      "name": "Downtown Nashville",
+      "nameEn": "Downtown Nashville",
+      "timeZone": "America/Chicago"
+    },
+    {
+      "storeNumber": "R123",
+      "state": "田纳西州",
+      "stateEn": "Tennessee",
+      "city": "纳什维尔",
+      "cityEn": "Nashville",
+      "name": "Green Hills",
+      "nameEn": "Green Hills",
+      "timeZone": "America/Chicago"
+    },
+    {
+      "storeNumber": "R599",
+      "state": "犹他州",
+      "stateEn": "Utah",
+      "city": "Farmington",
+      "cityEn": "Farmington",
+      "name": "Station Park",
+      "nameEn": "Station Park",
+      "timeZone": "America/Denver"
+    },
+    {
+      "storeNumber": "R461",
+      "state": "犹他州",
+      "stateEn": "Utah",
+      "city": "Murray",
+      "cityEn": "Murray",
+      "name": "Fashion Place",
+      "nameEn": "Fashion Place",
+      "timeZone": "America/Denver"
+    },
+    {
+      "storeNumber": "R125",
+      "state": "犹他州",
+      "stateEn": "Utah",
+      "city": "盐湖城",
+      "cityEn": "Salt Lake City",
+      "name": "City Creek Center",
+      "nameEn": "City Creek Center",
+      "timeZone": "America/Denver"
+    },
+    {
+      "storeNumber": "R257",
+      "state": "威斯康星州",
+      "stateEn": "Wisconsin",
+      "city": "格伦代尔",
+      "cityEn": "Glendale",
+      "name": "Bayshore",
+      "nameEn": "Bayshore",
+      "timeZone": "America/Chicago"
+    },
+    {
+      "storeNumber": "R229",
+      "state": "威斯康星州",
+      "stateEn": "Wisconsin",
+      "city": "Madison",
+      "cityEn": "Madison",
+      "name": "Hilldale",
+      "nameEn": "Hilldale",
+      "timeZone": "America/Chicago"
+    },
+    {
+      "storeNumber": "R059",
+      "state": "威斯康星州",
+      "stateEn": "Wisconsin",
+      "city": "Wauwatosa",
+      "cityEn": "Wauwatosa",
+      "name": "Mayfair",
+      "nameEn": "Mayfair",
+      "timeZone": "America/Chicago"
+    }
   ]
 }

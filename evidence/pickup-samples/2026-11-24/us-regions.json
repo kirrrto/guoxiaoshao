@@ -1,0 +1,136 @@
+{
+  "date": "2026-11-24",
+  "method": "GET",
+  "scope": "开发机使用果小哨的取货适配器（fetchPickup），对美国免税州与夏威夷代表门店各发起一次 5 品类公开查询。请求无需账户，未访问生产云环境。",
+  "requests": [
+    {
+      "market": "US",
+      "state": "俄勒冈州（免税州）",
+      "storeNumber": "R077",
+      "storeName": "先锋广场 Pioneer Place",
+      "timeZone": "America/Los_Angeles",
+      "requestUrl": "https://www.apple.com/shop/retail/pickup-message?pl=true&mts.0=regular&parts.0=MJWE4LL%2FA&parts.1=MDWU4LL%2FA&parts.2=MDHC4LL%2FA&parts.3=MFHP4LL%2FA&parts.4=MDEW4LL%2FA&store=R077",
+      "startedAt": "2026-11-24T16:41:13.245Z",
+      "finishedAt": "2026-11-24T16:41:14.501Z",
+      "elapsedMs": 1256,
+      "httpStatus": 200,
+      "bytes": 9160,
+      "contentKind": "json",
+      "error": null,
+      "retryAfter": null,
+      "observations": [
+        {
+          "category": "iphone",
+          "partNumber": "MJWE4LL/A",
+          "status": "available"
+        },
+        {
+          "category": "ipad",
+          "partNumber": "MDWU4LL/A",
+          "status": "ineligible"
+        },
+        {
+          "category": "mac",
+          "partNumber": "MDHC4LL/A",
+          "status": "available"
+        },
+        {
+          "category": "airpods",
+          "partNumber": "MFHP4LL/A",
+          "status": "available"
+        },
+        {
+          "category": "homepod",
+          "partNumber": "MDEW4LL/A",
+          "status": "available"
+        }
+      ]
+    },
+    {
+      "market": "US",
+      "state": "特拉华州（免税州）",
+      "storeNumber": "R102",
+      "storeName": "Christiana Mall（免税）",
+      "timeZone": "America/New_York",
+      "requestUrl": "https://www.apple.com/shop/retail/pickup-message?pl=true&mts.0=regular&parts.0=MJWE4LL%2FA&parts.1=MDWU4LL%2FA&parts.2=MDHC4LL%2FA&parts.3=MFHP4LL%2FA&parts.4=MDEW4LL%2FA&store=R102",
+      "startedAt": "2026-11-24T16:41:14.502Z",
+      "finishedAt": "2026-11-24T16:41:15.545Z",
+      "elapsedMs": 1043,
+      "httpStatus": 200,
+      "bytes": 9179,
+      "contentKind": "json",
+      "error": null,
+      "retryAfter": null,
+      "observations": [
+        {
+          "category": "iphone",
+          "partNumber": "MJWE4LL/A",
+          "status": "available"
+        },
+        {
+          "category": "ipad",
+          "partNumber": "MDWU4LL/A",
+          "status": "ineligible"
+        },
+        {
+          "category": "mac",
+          "partNumber": "MDHC4LL/A",
+          "status": "available"
+        },
+        {
+          "category": "airpods",
+          "partNumber": "MFHP4LL/A",
+          "status": "available"
+        },
+        {
+          "category": "homepod",
+          "partNumber": "MDEW4LL/A",
+          "status": "available"
+        }
+      ]
+    },
+    {
+      "market": "US",
+      "state": "夏威夷州",
+      "storeNumber": "R073",
+      "storeName": "阿拉莫阿那 Ala Moana",
+      "timeZone": "Pacific/Honolulu",
+      "requestUrl": "https://www.apple.com/shop/retail/pickup-message?pl=true&mts.0=regular&parts.0=MJWE4LL%2FA&parts.1=MDWU4LL%2FA&parts.2=MDHC4LL%2FA&parts.3=MFHP4LL%2FA&parts.4=MDEW4LL%2FA&store=R073",
+      "startedAt": "2026-11-24T16:41:15.545Z",
+      "finishedAt": "2026-11-24T16:41:16.656Z",
+      "elapsedMs": 1111,
+      "httpStatus": 200,
+      "bytes": 9021,
+      "contentKind": "json",
+      "error": null,
+      "retryAfter": null,
+      "observations": [
+        {
+          "category": "iphone",
+          "partNumber": "MJWE4LL/A",
+          "status": "unavailable"
+        },
+        {
+          "category": "ipad",
+          "partNumber": "MDWU4LL/A",
+          "status": "ineligible"
+        },
+        {
+          "category": "mac",
+          "partNumber": "MDHC4LL/A",
+          "status": "available"
+        },
+        {
+          "category": "airpods",
+          "partNumber": "MFHP4LL/A",
+          "status": "available"
+        },
+        {
+          "category": "homepod",
+          "partNumber": "MDEW4LL/A",
+          "status": "available"
+        }
+      ]
+    }
+  ]
+}

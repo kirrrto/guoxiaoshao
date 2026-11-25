@@ -8,13 +8,14 @@
 
 目录存在不代表门店支持或有货。后续图片核验、取货抽样和 `sync-to-function.mjs` 仍按各自证据执行。
 
-## 日本、台湾和香港目录
+## 日本、台湾、香港和美国目录
 
-三个站点的源数据保存在 `catalog/markets/{jp,tw,hk}.json`。系列的 `sourceUrl` 指向当地购买页。每个标准 Mac 另存选中配置的 `sourceUrl`，可在该页的 `metrics.data.products` 核对完整零售货号，并通过 `buyflow.userSelections` 核对芯片、内存和容量。门店取货状态由查询或采集时的实际响应决定。
+四个站点的源数据保存在 `catalog/markets/{jp,tw,hk,us}.json`，门店清单保存在 `cloudfunctions/gxs_api/lib/market-stores.json`。系列的 `sourceUrl` 指向当地购买页。每个标准 Mac 另存选中配置的 `sourceUrl`，可在该页的 `metrics.data.products` 核对完整零售货号，并通过 `buyflow.userSelections` 核对芯片、内存和容量。海外站点仅收录已核实当地零售货号且支持门店取货接口的 iPhone、iPad、Mac、AirPods 和 HomePod，不再陈列 Apple Watch 表壳、Vision Pro 验配或定制占位；门店取货状态由查询或采集时的实际响应决定。
 
 - **日本和香港**。将当地公开购买页保存为 `<familyKey>.html`，另将当地 MacBook Neo 技术规格页保存为 `macbook-neo-specs.html`。将各 Mac 系列购买页直接链接的标准配置页保存到 `config/`，在 `config/links.json` 记录数组，每项含 `key`（familyKey）、`url`（当地完整配置页地址）和 `file`（该目录中的 HTML 文件名）。运行 `node tools/catalog/markets/extract-regional.mjs JP <快照目录> --check`，香港将 `JP` 替换为 `HK`。核实选项、货号或发售日期的变化后，去掉 `--check` 重建对应 JSON。校验会比对系列页列出的全部标准 Mac 链接、配置页的 canonical 地址和实际零售货号。
 - **台湾**。将当地系列页保存为 `<sourceUrl 路径末段>.html`，将标准 Mac 配置页保存为 `<familyKey>-<完整 sourceUrl 的 SHA-256 前 14 位>.html`。运行 `node tools/catalog/markets/tw.mjs <快照目录>` 核对三方对应关系（系列链接、配置页货号和已登记选项）。`--exact` 还会检查系列页正文的原始哈希。新增或下架选项由维护者依据当地页面更新 `tw.json`，然后重新校验。
-- **生成运行目录**。更新三站源数据后运行 `node tools/catalog/build-market-catalog.mjs`，再加 `--check` 核对生成结果。发售日期依据当地 Apple 新闻稿；资料只给出时间范围时登记有证据的最迟日期。表壳、需要验配的头显和没有零售货号的定制配置保留为浏览项。
+- **美国**。运行 `node tools/catalog/markets/build-us-stores.mjs` 从美国 Apple 官网门店目录同步全美 45 州（含特区，免税州置顶）共 269 家直营店、7 个美国时区与 20 字提醒安全简称（可用 `--check` 离线复核）。运行 `node tools/catalog/markets/fetch-us.mjs` 从 `https://www.apple.com/shop/...` 获取当地无锁版及 Mac 选中零售 `LL/A` 货号更新 `us.json`，可用 `--check` 做结构完整性校验，用 `--sample-pickup` 按 5 大品类抽测官方 `/shop/retail/pickup-message` 接口并写入 `evidence/pickup-samples/<日期>/us-regions.json`。
+- **生成运行目录**。更新四站源数据后运行 `node tools/catalog/build-market-catalog.mjs`，再加 `--check` 核对生成结果。发售日期依据当地 Apple 新闻稿；资料只给出时间范围时登记有证据的最迟日期。官网定制无零售货号的配置不放入海外目录。
 
 ## 逐货号开放取货
 

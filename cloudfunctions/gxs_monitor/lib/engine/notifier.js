@@ -142,7 +142,13 @@ function buildMessage(task, config) {
   const time = new Date(task.detectedAt);
   const regional = task.market && task.market !== 'CN';
   const english = regional && task.language === 'en';
-  const local = new Date(time.getTime() + (task.market === 'JP' ? 9 : 8) * 3600000);
+  const marketsModule = regional ? require('../markets') : null;
+  const market = marketsModule ? marketsModule.findMarket(task.market) : null;
+  const store = market?.stores.find(item => item.storeNumber === task.storeNumber);
+  const offsetHours = regional
+    ? marketsModule.zoneOffsetHours(time.getTime(), store?.timeZone || market?.timeZone)
+    : 8;
+  const local = new Date(time.getTime() + offsetHours * 3600000);
   const hh = String(local.getUTCHours()).padStart(2, '0');
   const mm = String(local.getUTCMinutes()).padStart(2, '0');
   const ss = String(local.getUTCSeconds()).padStart(2, '0');
@@ -164,16 +170,19 @@ function buildMessage(task, config) {
       : fields.quantity && fields.quantity.startsWith('phrase') ? '有现货' : '有现货，具体数量以门店为准',
   };
   if (regional) {
-    const { findMarket, findMarketProduct } = require('../markets');
-    const market = findMarket(task.market);
-    const store = market?.stores.find(item => item.storeNumber === task.storeNumber);
     if (english) {
       const storeName = store?.nameEn || task.storeNumber;
-      values.store = [`${task.market} · ${storeName}`, storeName].find(fitsThing) || clip(task.storeNumber, 20);
-      values.product = englishRegionalProduct(findMarketProduct(task.market, task.partNumber), task.partNumber);
+      const shortEn = store?.shortNameEn || storeName;
+      values.store = [`${task.market} · ${storeName}`, `${task.market} · ${shortEn}`, storeName, shortEn].find(fitsThing) || clip(shortEn, 20);
+      values.product = englishRegionalProduct(marketsModule.findMarketProduct(task.market, task.partNumber), task.partNumber);
       values.status = fields.status?.startsWith('phrase') ? 'Ready' : 'Available for pickup';
       if (fields.quantity) values.quantity = fields.quantity.startsWith('phrase') ? 'Ready' : 'Available for pickup';
-    } else values.store = clip(`${market?.name || task.market} · ${store?.name || task.storeNumber}`, 20);
+    } else {
+      const zhName = store?.name || task.storeNumber;
+      const shortZh = store?.shortName || store?.shortNameEn || zhName;
+      const regionName = market?.name || task.market;
+      values.store = [`${regionName} · ${zhName}`, `${regionName} · ${shortZh}`, zhName, shortZh].find(fitsThing) || clip(shortZh, 20);
+    }
   }
   const data = {};
   for (const [slot, key] of Object.entries(fields)) if (key) data[key] = { value: values[slot] };

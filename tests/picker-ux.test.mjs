@@ -314,3 +314,22 @@ test('catalog refresh retains a valid draft but never substitutes for a SKU remo
   assert.equal(p.getSelection().partNumber, null, 'another refresh cannot silently choose a replacement');
   assert.deepEqual(p.lastEvent.detail.storeNumbers, ['R577', 'R359']);
 });
+
+test('switching to a single-store city auto-selects its store unless maxStores is full and allows toggle-off', () => {
+  const { instance: p, toasts } = picker(null);
+  const fuzhouIndex = p.catalogCities.findIndex(city => city.city === '福州');
+  assert.ok(fuzhouIndex >= 0);
+  p.onCityChange({ detail: { value: fuzhouIndex } });
+  assert.deepEqual(p.lastEvent.detail.storeNumbers, ['R646']);
+  tapStore(p, 'R646');
+  assert.deepEqual(p.lastEvent.detail.storeNumbers, []);
+
+  tapStore(p, 'R577');
+  tapStore(p, 'R359');
+  tapStore(p, 'R389');
+  assert.equal(p.data.selectedStores.length, 3);
+  const xiamenIndex = p.catalogCities.findIndex(city => city.city === '厦门');
+  p.onCityChange({ detail: { value: xiamenIndex } });
+  assert.equal(p.lastEvent.detail.storeNumbers.length, 3);
+  assert.equal(toasts.length, 0);
+});

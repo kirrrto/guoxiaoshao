@@ -82,7 +82,7 @@ function readSharedSelection(options) {
 
 // WeChat can pass either decoded options or an encoded notification URL.
 function readMarketTarget(query) {
-  if (!query || !['JP', 'TW', 'HK'].includes(query.market)) return null;
+  if (!query || !['JP', 'TW', 'HK', 'US'].includes(query.market)) return null;
   if (typeof query.partNumber !== 'string' || query.partNumber.length > 80 || typeof query.storeNumber !== 'string' || !/^R\d{3}$/.test(query.storeNumber)) return null;
   try {
     const partNumber = decodeURIComponent(query.partNumber);

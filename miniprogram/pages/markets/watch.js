@@ -4,6 +4,7 @@ const { getBootstrap, invalidateFollows, trackFollowCountWrite } = require('../.
 const { requestReminderAuthorization, templateConsent, openSubscribeSettings } = require('../../utils/reminder-credits');
 const { switchToTab } = require('../../utils/tab-bar');
 const { isNavigating } = require('../../utils/navigation');
+const { confirmTap } = require('../../utils/haptic');
 
 const WORDS = {
   'zh-CN': {
@@ -52,6 +53,8 @@ function registrationOpen(list, site) {
 function watchView(page, site, ready, eligiblePlan) {
   const lang = page.lang || 'zh-CN', w = WORDS[lang], list = ready && page.watchList;
   const member = eligiblePlan && list?.canWatch !== false;
+  const boot = ready && page.boot, notify = boot && boot.notifications || {};
+  const hasEnTemplate = Boolean(notify.templateIds?.restockEn);
   const rows = (list && list.follows || []).filter(f => f && f.status !== 'removed').map(f => {
     const home = (page.sites || []).find(s => s.code === f.market);
     const choices = home && page.optionsFor(home, lang);
@@ -66,18 +69,20 @@ function watchView(page, site, ready, eligiblePlan) {
     const editing = list.watchEditing === true && page.editingWatch === f.followId;
     const canResume = Boolean(member && p?.monitorSupported && registrationOpen(list, home));
     const additionalStores = editing && canResume && !f.limitPaused && stores.length < list.limits?.maxStoresPerFollow
-      ? choices.stores.filter(store => !stores.includes(store.id)) : [];
+      ? choices.stores.filter(store => !stores.includes(store.id)).map(store => ({ ...store, location: store.fullLocation || store.location })) : [];
+    const rowLanguage = f.language === 'en' ? 'en' : 'zh-CN';
+    const siteEnClosed = Boolean((home?.notificationsEnabled || notify.enabled) && !home?.notificationsEnabledEn && !hasEnTemplate);
+    const canEditLanguage = Boolean(member && (rowLanguage === 'en' || !siteEnClosed));
     return { id: f.followId, name, product: p && p.label || f.partNumber, stores: selectedStores.map(s => s.label).join(' · '),
-      market: f.market, partNumber: f.partNumber, revision: f.updatedAt || null, editing,
+      market: f.market, partNumber: f.partNumber, revision: f.updatedAt || null, editing, canEditLanguage,
       ...(editing ? { selectedStores, additionalStores: additionalStores.length ? [{ id: '', location: w.addStore }, ...additionalStores] : [] } : {}),
       imageDisplayUrl: p && p.imageDisplayUrl || '', status, canResume, pauseTo: (f.savedStatus || f.status) === 'paused' ? 'active' : 'paused',
-      selected: f.market === page.market && f.partNumber === page.part && stores.includes(page.store), language: f.language === 'en' ? 'en' : 'zh-CN' };
+      selected: f.market === page.market && f.partNumber === page.part && stores.includes(page.store), language: rowLanguage };
   });
   const target = rows.find(row => row.selected), product = page.selectedProduct;
   const canWatch = product?.monitorSupported && registrationOpen(list, site);
   const monitoring = site?.monitorEnabled && list?.monitoring?.[page.market];
   const notifyLanguage = target ? target.language : lang;
-  const boot = ready && page.boot, notify = boot && boot.notifications || {};
   const id = notify.templateIds && notify.templateIds[notifyLanguage === 'en' ? 'restockEn' : 'restock'];
   const credits = boot && boot.subscriptions && boot.subscriptions[id]?.credits || 0;
   const consentBlocked = ['ban', 'reject', 'main_switch_off'].includes(templateConsent(id));
@@ -147,7 +152,7 @@ const methods = {
     if (field === 'add') {
       const choice = row.additionalStores[Number(e.detail.value)];
       if (choice?.id) return this.writeWatch('market.watch', { market: row.market, partNumber: row.partNumber, storeNumbers: [choice.id], language: row.language, expectedUpdatedAt });
-    } else if (field === 'language' && this.data.canEditLanguage) {
+    } else if (field === 'language' && row.canEditLanguage) {
       const language = ['zh-CN', 'en'][Number(e.detail.value)];
       if (language && language !== row.language) return this.writeWatch('market.editWatch', { followId: id, language, expectedUpdatedAt });
     } else if (field === 'remove' && row.selectedStores.length > 1) {
@@ -212,6 +217,7 @@ const methods = {
       if (!this.pageRetired && this.isAccount(owner) && this.scope === scope) {
         if (action === 'market.watch') this.watchMessage = 'saved';
         if (action === 'market.editWatch') this.watchMessage = 'edited';
+        confirmTap();
       }
     } catch (error) {
       const key = { member_required: 'membership', market_watch_plan_required: 'membership', too_many_follows: 'limit', too_many_stores: 'storesLimit',
@@ -244,7 +250,11 @@ const methods = {
     this.paint();
     try {
       const result = await requestReminderAuthorization([id]);
-      if (this.isAccount(owner) && !this.pageRetired && this.scope === scope) this.watchMessage = (result && result.accepted || []).includes(id) ? 'accept' : 'declined';
+      if (this.isAccount(owner) && !this.pageRetired && this.scope === scope) {
+        const granted = (result && result.accepted || []).includes(id);
+        this.watchMessage = granted ? 'accept' : 'declined';
+        if (granted) confirmTap();
+      }
       const boot = await getBootstrap({ force: true });
       if (boot.identity?.userKey === owner && this.isAccount(owner) && !this.pageRetired) this.boot = boot;
     } catch (_) { if (this.isAccount(owner) && this.scope === scope && !this.pageRetired) this.watchMessage = 'grantError'; }

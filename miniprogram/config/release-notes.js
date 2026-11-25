@@ -8,6 +8,16 @@
 // Keep technical details and complete acceptance records in release documents.
 const RELEASE_NOTES = [
   {
+    version: '3.9.0',
+    title: '美国站点与交互体验更新',
+    dateText: '版本记录 · 2026-11-25',
+    highlights: [
+      '「其他站点」新增美国全境门店（免税州置顶），移除无自提接口商品。',
+      '单店城市自动勾选门店，精简重复选项。',
+      '优化抽屉下滑手势与状态切换动效。',
+    ],
+  },
+  {
     version: '3.8.7',
     title: '站点查询权限提示',
     dateText: '版本记录 · 2026-11-24',

@@ -9,8 +9,9 @@ const targets = {
   JP: { store: 'R128', part: 'MJR54J/A' },
   TW: { store: 'R694', part: 'MJY04ZP/A' },
   HK: { store: 'R409', part: 'MJRP4ZA/A' },
+  US: { store: 'R077', part: 'MJQ34LL/A' },
 };
-const closed = { JP: false, TW: false, HK: false };
+const closed = { JP: false, TW: false, HK: false, US: false };
 const launchPeriod = '2026-09-19T00:00:00Z';
 function setup(start = launchPeriod) {
   return createFixture({
@@ -55,7 +56,7 @@ test('monthly and annual customers can check each closed storefront during launc
   const month = await customer(f, 'ordinary-monthly', 'member_30d');
   const year = await customer(f, 'ordinary-annual', 'member_365d');
   const catalog = ok(await f.call('market.catalog')).markets;
-  assert.deepEqual(catalog.map(site => [site.enabled, site.monitorEnabled, site.notificationsEnabled]), Array(3).fill([false, false, false]));
+  assert.deepEqual(catalog.map(site => [site.enabled, site.monitorEnabled, site.notificationsEnabled]), Array(4).fill([false, false, false]));
   for (const user of [month, year]) {
     const boot = ok(await f.call('user.bootstrap', {}, user.actor));
     assert.deepEqual([...(boot.regionalMemberQueryMarkets || [])].sort(), Object.keys(targets).sort());
@@ -72,16 +73,16 @@ test('monthly and annual customers can check each closed storefront during launc
     const [latest] = await f.repo.getLatest([market + '|' + store + '|' + part]);
     assert.deepEqual([latest.source, latest.status], ['manual', 'available']);
   }
-  assert.equal(f.state.fetchImpl.calls.length, 3);
+  assert.equal(f.state.fetchImpl.calls.length, 4);
   f.advance(16000);
   const exhausted = ok(await check(f, year, 'JP', 'annual-jp-limited'));
   assert.deepEqual([exhausted.reason, exhausted.charged, exhausted.budgetScope], ['upstream_budget_limited', 0, 'minute']);
   const runtime = await f.repo.getConfig();
-  await f.repo.saveConfig({ ...runtime, internationalMonitoring: { JP: true, TW: true, HK: true } });
+  await f.repo.saveConfig({ ...runtime, internationalMonitoring: { JP: true, TW: true, HK: true, US: true } });
   const deliveries = [];
   await runScheduled({ repo: f.repo, clock: () => f.state.now, fetchImpl: f.state.fetchImpl,
     log: { info() {}, warn() {}, error() {} }, sendImpl: async message => { deliveries.push(message); return { errcode: 0 }; } });
-  assert.equal(f.state.fetchImpl.calls.length, 3);
+  assert.equal(f.state.fetchImpl.calls.length, 4);
   assert.equal(deliveries.length, 0);
   for (const name of ['follows', 'notifications', 'ledger']) assert.equal(await f.repo.count(COLLECTIONS[name]), 0, name);
 });

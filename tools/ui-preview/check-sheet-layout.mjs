@@ -101,8 +101,34 @@ function inspectSheet({ keyboardHeight = 0, scenario = '', pageName = '' } = {})
 }
 
 try {
-  const page = await browser.newPage({ deviceScaleFactor: 1, colorScheme: dark ? 'dark' : 'light' });
+  const page = await browser.newPage({ deviceScaleFactor: 1, colorScheme: dark ? 'dark' : 'light', reducedMotion: 'reduce' });
   await page.route(/^https?:/, route => route.abort());
+  const motionSample = snapshots.find(item => item.width === 375 && item.scenario === 'sheet-edit');
+  if (motionSample) {
+    await page.setViewportSize({ width: 375, height: 900 });
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+    await page.goto(pathToFileURL(path.join(directory, motionSample.file)).href);
+    const settled = await page.evaluate(() => {
+      const panel = document.querySelector('.config-sheet-panel');
+      const scrim = document.querySelector('.config-sheet-scrim');
+      const anim = {
+        panel: panel ? getComputedStyle(panel).animationName : '',
+        scrim: scrim ? getComputedStyle(scrim).animationName : '',
+      };
+      document.getAnimations().forEach(item => item.finish());
+      return anim;
+    });
+    if (settled.panel !== 'sheet-rise' || settled.scrim !== 'scrim-appear') {
+      throw Error(`Expected sheet entrance animations, got ${JSON.stringify(settled)}`);
+    }
+    const postAnimation = await page.evaluate(inspectSheet, { keyboardHeight: 0, scenario: motionSample.scenario, pageName: motionSample.page });
+    if (postAnimation.issues.length) {
+      throw Error(`Post-animation sheet geometry failed: ${postAnimation.issues.join(', ')}`);
+    }
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    const stopped = await page.evaluate(() => getComputedStyle(document.querySelector('.config-sheet-panel')).animationName);
+    if (stopped !== 'none') throw Error(`Expected reduced-motion to stop sheet animation, got ${stopped}`);
+  }
   for (const item of snapshots) for (const height of [900, 500]) for (const safe of [false, true]) {
     await page.setViewportSize({ width: item.width, height });
     await page.goto(pathToFileURL(path.join(directory, item.file)).href);

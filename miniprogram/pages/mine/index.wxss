@@ -116,7 +116,7 @@
 .membership-packages .membership-package[disabled] { background: transparent; color: var(--text); opacity: 0.5; }
 .membership-packages .membership-package-selected[disabled] { background: var(--surface-top); }
 .membership-packages .membership-package-pressed { background: var(--pressed); }
-.membership-package-radio { display: flex; align-items: center; justify-content: center; width: 22px; height: 22px; border: 1.5px solid var(--text-3); border-radius: 50%; color: transparent; }
+.membership-package-radio { display: flex; align-items: center; justify-content: center; width: 22px; height: 22px; border: 1.5px solid var(--text-3); border-radius: 50%; color: transparent; transition: border-color var(--dur-fast) var(--ease), background-color var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease); }
 .membership-package-radio .ui-check { margin-bottom: var(--sp-2); }
 .membership-package-selected .membership-package-radio { border-color: var(--green); background: var(--green); color: var(--green-ink); }
 .membership-package-heading { display: flex; flex-direction: column; gap: var(--sp-2); min-width: 0; }
@@ -245,4 +245,7 @@
 /* 最窄的屏幕把名额与标价留给主信息，日均价让位。 */
 @media (max-width: 340px) {
   .membership-daily-price { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .membership-packages .membership-package, .membership-package-radio { transition: none; }
 }

@@ -175,7 +175,7 @@ for (const [planId, days, amount] of [['member_30d', 30, 1499], ['member_365d', 
     assert.equal(checked.membership.expiresAt, new Date(f.state.now.getTime() + days * DAY).toISOString());
     assert.equal(ok(await f.check(id)).membership.expiresAt, checked.membership.expiresAt);
     assert.equal((await f.repo.listOrders(userKeyOf(), 20)).length, 1);
-    assert.deepEqual(ok(await f.call('user.bootstrap')).regionalMemberQueryMarkets, ['JP', 'TW', 'HK']);
+    assert.deepEqual(ok(await f.call('user.bootstrap')).regionalMemberQueryMarkets, ['JP', 'TW', 'HK', 'US']);
     f.setRemote(id, { order_fee: amount, paid_fee: amount, left_fee: 0, status: 5 });
     ok(await f.check(id));
     assert.equal(ok(await f.call('user.bootstrap')).regionalMemberQueryMarkets, undefined);

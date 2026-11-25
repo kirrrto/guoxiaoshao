@@ -1,11 +1,17 @@
 'use strict';
-const { dayKey } = require('../time');
+const { dayKey, toDate } = require('../time');
+const { findMarket, zoneOffsetHours } = require('../markets');
 const { KNOWN_STATUSES, targetKeyOf } = require('./events');
 
 const observationDayId = (storeNumber, partNumber, date, market) => `${targetKeyOf(storeNumber, partNumber, market)}|${date}`;
-// The three supported overseas markets have no daylight saving time. TW/HK
-// share the mainland UTC+8 date boundary, while Japan changes day an hour earlier.
-const observationDayKey = (time, market) => market === 'JP' ? dayKey(new Date(time).getTime() + 3600000) : dayKey(time);
+// Mainland uses Beijing UTC+8 calendar days; each overseas store follows its own IANA timeZone (DST-aware for US).
+const observationDayKey = (time, market, storeNumber) => {
+  const site = market && findMarket(market);
+  if (!site) return dayKey(time);
+  const store = storeNumber ? site.stores.find(item => item.storeNumber === storeNumber) : null;
+  const stamp = toDate(time).getTime();
+  return new Date(stamp + zoneOffsetHours(stamp, store?.timeZone || site.timeZone) * 3600000).toISOString().slice(0, 10);
+};
 const AVAILABLE_TYPES = new Set(['first_seen_available', 'restock_confirmed', 'recovered_available']);
 
 /** Counts accepted samples, not HTTP requests or continuous time coverage.
@@ -14,7 +20,7 @@ const AVAILABLE_TYPES = new Set(['first_seen_available', 'restock_confirmed', 'r
  */
 function appendObservationDay(previous, observation, events = []) {
   const observedAt = new Date(observation.observedAt).toISOString();
-  const date = observationDayKey(observedAt, observation.market);
+  const date = observationDayKey(observedAt, observation.market, observation.storeNumber);
   const known = KNOWN_STATUSES.has(observation.status);
   const count = name => Number.isSafeInteger(previous && previous[name]) && previous[name] >= 0 ? previous[name] : 0;
   // Raw events are purged after 10 days; these per-day counters are kept long

@@ -165,7 +165,7 @@ test('regional Pro and Pro Max retain all eight verified finishes across capacit
   }
   assert.equal(expected.size, 8);
   assert.equal(new Set(expected.values()).size, 8);
-  const black256 = { JP: 'MJR54J/A', TW: 'MJRP4ZP/A', HK: 'MJRP4ZA/A' };
+  const black256 = { JP: 'MJR54J/A', TW: 'MJRP4ZP/A', HK: 'MJRP4ZA/A', US: 'MJQ34LL/A' };
   for (const market of MARKETS) {
     const pro = market.products.filter(row => row.familyKey === 'iphone-18-pro');
     for (const lang of ['zh-CN', 'en']) {

@@ -3,7 +3,8 @@
 .markets-regions .markets-region {
   flex: 1 1 0; min-width: 0; min-height: var(--tap); width: auto; margin: 0; padding: var(--sp-8) var(--sp-4);
   display: flex; align-items: center; justify-content: center; border: 0; border-radius: var(--radius-control);
-  font-size: var(--fs-body); font-weight: 400; line-height: var(--lh-snug); color: var(--text-2); background: transparent;
+  font-size: var(--fs-sub); font-weight: 400; line-height: var(--lh-snug); color: var(--text-2); background: transparent;
+  transition: background-color var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease);
 }
 .markets-region::after, .market-watch-target::after { border: 0; }
 .markets-regions .markets-region--selected { color: var(--text); background: var(--surface-top); font-weight: 600; }
@@ -16,7 +17,7 @@
 .market-product-tile--main { width: 64px; height: 64px; }
 .market-local-sku { color: var(--text-3); font-size: var(--fs-sub); }
 .market-capacities, .market-watch-actions { display: flex; flex-wrap: wrap; gap: var(--sp-4); }
-.market-capacities .market-capacity { min-height: var(--tap); padding: var(--sp-8); background: transparent; }
+.market-capacities .market-capacity { min-height: var(--tap); padding: var(--sp-8); background: transparent; transition: background-color var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease); }
 .market-capacities .market-capacity--selected { color: var(--text); background: var(--surface-top); font-weight: 600; }
 .market-store { border-top: 1px solid var(--line); }
 .market-actions, .market-closed { margin-top: var(--sp-12); }
@@ -36,7 +37,13 @@
 .market-watch-title { font-size: var(--fs-body); font-weight: 600; }
 .market-watch-actions { margin-top: var(--sp-8); }
 .market-watch-editor { margin-top: var(--sp-8); border-top: 1px solid var(--line); }
+@media (min-width: 600px) {
+  .markets-regions .markets-region { font-size: var(--fs-body); }
+}
 @media (min-width: 900px) {
   .markets-workspace { display: grid; grid-template-columns: minmax(300px, 0.85fr) minmax(0, 1.5fr); gap: var(--sp-24); align-items: start; }
   .markets-result--empty { display: block; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .markets-regions .markets-region, .market-capacities .market-capacity { transition: none; }
 }

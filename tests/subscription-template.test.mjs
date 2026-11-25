@@ -12,13 +12,26 @@ const ID = '6vsQ7AjaRjwfyNWIJIETQQIKKnjzkgVZhClfrHB47q0';
 const config = mergeConfig({ notifications: { enabled: true, templateIds: { restock: ID }, templateTitle: '订单状态提醒', contentMode: 'watch_item', templateFields: { product: 'thing17', store: 'thing14', time: 'time20', status: 'thing33' } } });
 
 test('English pickup notices keep each store name and distinguish every monitored retail configuration within 20 characters', () => {
+  const fits = value => value && Array.from(value).length <= 20;
   for (const market of MARKETS) {
     const products = market.products.filter(product => product.monitorSupported);
-    const labels = new Set();
-    const message = (product, store) => buildMessage({ market: market.code, language: 'en', eventId: 'regional-notice',
+    const labels = new Set(), enStores = new Set(), zhStores = new Set();
+    const message = (product, store, language = 'en') => buildMessage({ market: market.code, language, eventId: 'regional-notice',
       partNumber: product.partNumber, storeNumber: store.storeNumber, detectedAt: '2026-11-23T23:00:00Z' }, config);
     for (const store of market.stores) {
-      assert.equal(message(products[0], store).data.thing14.value, market.code + ' · ' + store.nameEn);
+      const shortEn = store.shortNameEn || store.nameEn;
+      const expectedEn = [market.code + ' · ' + store.nameEn, market.code + ' · ' + shortEn, store.nameEn, shortEn].find(fits);
+      const actualEn = message(products[0], store, 'en').data.thing14.value;
+      assert.equal(actualEn, expectedEn);
+      assert.ok(fits(actualEn) && actualEn !== store.storeNumber && !enStores.has(actualEn), market.code + ' EN store collision: ' + actualEn);
+      enStores.add(actualEn);
+
+      const shortZh = store.shortName || store.shortNameEn || store.name;
+      const expectedZh = [market.name + ' · ' + store.name, market.name + ' · ' + shortZh, store.name, shortZh].find(fits);
+      const actualZh = message(products[0], store, 'zh-CN').data.thing14.value;
+      assert.equal(actualZh, expectedZh);
+      assert.ok(fits(actualZh) && actualZh !== store.storeNumber && !zhStores.has(actualZh), market.code + ' ZH store collision: ' + actualZh);
+      zhStores.add(actualZh);
     }
     for (const product of products) {
       const result = message(product, market.stores[0]), label = result.data.thing17.value;

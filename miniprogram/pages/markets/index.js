@@ -7,6 +7,7 @@ const { readSession, writeSession } = require('../../utils/session');
 const operation = require('../../utils/operation');
 const { syncTabBar, releaseTabBar } = require('../../utils/tab-bar');
 const { shareAppMessage, shareTimeline, readMarketTarget } = require('../../utils/share');
+const { confirmTap } = require('../../utils/haptic');
 const { MARKETS, COPY, catalogOptions, matchRegionalProduct, selections, productChoices, messageKey, receiptView, localTime, regionalAccess } = require('./presentation');
 const watch = require('./watch');
 
@@ -212,12 +213,20 @@ Page(require('../../utils/language').page('markets', {
   paint() {
     if (this.pageRetired) return;
     const lang = this.lang || 'zh-CN', c = COPY[lang];
-    const sites = (this.sites || []).map(site => ({ code: site.code, label: (lang === 'en' && site.nameEn) || site.name }));
+    const sites = (this.sites || []).map(site => ({
+      code: site.code,
+      label: (lang === 'en' && (site.shortNameEn || site.nameEn)) || site.name,
+      fullLabel: (lang === 'en' && site.nameEn) || site.name,
+    }));
     const site = this.site();
-    const { products, stores, byId } = site ? this.optionsFor(site, lang) : { products: [], stores: [] };
+    const { products, stores: allStores, areas = [], byId } = site ? this.optionsFor(site, lang) : { products: [], stores: [], areas: [] };
     this.products = products;
-    const storeIndex = Math.max(0, stores.findIndex(row => row.id === this.store));
-    const product = byId?.get(this.part) || null, store = stores[storeIndex] || null;
+    const currentStore = allStores.find(row => row.id === this.store) || allStores[0] || null;
+    const areaIndex = areas.length > 1 && currentStore ? Math.max(0, areas.findIndex(row => row.id === currentStore.areaId)) : 0;
+    const area = areas.length > 1 ? areas[areaIndex] || null : null;
+    const stores = area ? allStores.filter(row => row.areaId === area.id) : allStores;
+    const storeIndex = currentStore ? Math.max(0, stores.findIndex(row => row.id === currentStore.id)) : 0;
+    const product = byId?.get(this.part) || null, store = stores[storeIndex] || currentStore;
     const targetChanged = this.selectedProduct !== product || !this.activeChoices;
     if (targetChanged) this.activeChoices = productChoices(products, product, lang);
     this.selectedProduct = product;
@@ -243,7 +252,7 @@ Page(require('../../utils/language').page('markets', {
     const { w, ...watchState } = watch.view(this, site, accountReady, access.canWatch);
     const copy = this.data.w && lang === this.data.lang ? {} : { c, w, lang };
     this.setData({
-      ...copy, sites, market: this.market || '', stores, ...(targetChanged ? choices : {}), product, store,
+      ...copy, sites, market: this.market || '', areas, areaIndex, area, stores, ...(targetChanged ? choices : {}), product, store,
       selectionNotice: this.selectionChanged ? c.regionChanged : '',
       categoryIndex: product ? choices.categories.findIndex(row => row.id === product.category) : 0,
       variantIndex: product ? choices.variants.findIndex(row => row.id === product.id) : 0,
@@ -292,6 +301,7 @@ Page(require('../../utils/language').page('markets', {
       publishQuota(result.quota, owner);
       const reasons = { already_signed_in: 'signed', daily_cap_reached: 'dailyCap', balance_cap_reached: 'balanceCap' };
       this.signinOutcome = { key: result.granted > 0 ? 'granted' : reasons[result.reason] || 'signinUnknown', n: result.granted };
+      if (result.granted > 0) confirmTap();
     } catch (error) {
       if (this.signinToken === token && this.isAccount(owner)) {
         const changed = ['signin_account_changed', 'query_account_changed'].includes(error?.code);
@@ -318,6 +328,7 @@ Page(require('../../utils/language').page('markets', {
     const code = e.currentTarget.dataset.market;
     const destination = this.sites?.find(site => site.code === code);
     if (this.market === code || !destination) return;
+    confirmTap();
     const previous = this.site()?.products.find(row => (row.partNumber || row.id) === this.part);
     const match = matchRegionalProduct(previous, destination.products);
     this.applySelection({ market: code }, match.id);
@@ -332,9 +343,19 @@ Page(require('../../utils/language').page('markets', {
   onChoice(e) {
     const key = e.currentTarget.dataset.field;
     const index = Number(e.detail.value);
-    const { product, categories, models, colors, variants, stores } = this.data;
+    const { product, categories, models, colors, variants, areas, stores } = this.data;
     const products = this.products;
     if (!product) return;
+    if (key === 'area') {
+      const chosenArea = areas && areas[index];
+      if (chosenArea && chosenArea.firstStoreId && this.store !== chosenArea.firstStoreId) {
+        confirmTap();
+        this.store = chosenArea.firstStoreId;
+        this.clearTarget();
+        this.paint();
+      }
+      return;
+    }
     let option;
     if (key === 'category' && categories[index]) {
       const rows = products.filter(row => row.category === categories[index].id);
@@ -357,6 +378,7 @@ Page(require('../../utils/language').page('markets', {
   onCapacity(e) {
     const id = e.currentTarget.dataset.id;
     if (id !== this.part && this.data.capacities.some(row => row.id === id)) {
+      confirmTap();
       this.part = id;
       this.clearTarget();
       this.paint();

@@ -33,12 +33,12 @@ function summaryIssues(row, latest, { matchLatest = true } = {}) {
   if (!(row.sampleCount > 0) || row.knownCount + row.unknownCount !== row.sampleCount
       || row.manualCount + row.autoCount > row.sampleCount) issues.push('sample_counts_mismatch');
   for (const name of ['firstObservedAt', 'lastObservedAt']) {
-    if (!Number.isFinite(Date.parse(row[name])) || observationDayKey(row[name], latest.market) !== row.dayKey) issues.push(`invalid_${name}`);
+    if (!Number.isFinite(Date.parse(row[name])) || observationDayKey(row[name], latest.market, latest.storeNumber) !== row.dayKey) issues.push(`invalid_${name}`);
   }
   if (Date.parse(row.firstObservedAt) > Date.parse(row.lastObservedAt)) issues.push('summary_time_order');
   if (row.knownCount === 0 ? row.firstKnownAt !== null || row.lastKnownAt !== null
     : !Number.isFinite(Date.parse(row.firstKnownAt)) || !Number.isFinite(Date.parse(row.lastKnownAt))
-      || observationDayKey(row.firstKnownAt, latest.market) !== row.dayKey || observationDayKey(row.lastKnownAt, latest.market) !== row.dayKey
+      || observationDayKey(row.firstKnownAt, latest.market, latest.storeNumber) !== row.dayKey || observationDayKey(row.lastKnownAt, latest.market, latest.storeNumber) !== row.dayKey
       || Date.parse(row.firstKnownAt) > Date.parse(row.lastKnownAt)
       || Date.parse(row.firstKnownAt) < Date.parse(row.firstObservedAt)
       || Date.parse(row.lastKnownAt) > Date.parse(row.lastObservedAt)) issues.push('known_times_mismatch');
@@ -50,9 +50,9 @@ function summaryIssues(row, latest, { matchLatest = true } = {}) {
       || (windows.minMs !== null && (!Number.isSafeInteger(windows.minMs) || windows.minMs < 0))
       || (windows.count === 0 ? windows.totalMs !== 0 || windows.maxMs !== 0 || windows.minMs !== null
         : windows.minMs === null || windows.minMs > windows.maxMs || windows.maxMs > windows.totalMs)) issues.push('invalid_available_windows');
-  if (row.firstAvailableAt !== null && (!Number.isFinite(Date.parse(row.firstAvailableAt)) || observationDayKey(row.firstAvailableAt, latest.market) !== row.dayKey)) issues.push('invalid_first_available');
+  if (row.firstAvailableAt !== null && (!Number.isFinite(Date.parse(row.firstAvailableAt)) || observationDayKey(row.firstAvailableAt, latest.market, latest.storeNumber) !== row.dayKey)) issues.push('invalid_first_available');
   // latest.sampleCount is a lifetime/recovery counter, never daily evidence.
-  if (matchLatest && (observationDayKey(latest.observedAt, latest.market) !== row.dayKey || row.lastObservedAt !== latest.observedAt)) issues.push('latest_summary_mismatch');
+  if (matchLatest && (observationDayKey(latest.observedAt, latest.market, latest.storeNumber) !== row.dayKey || row.lastObservedAt !== latest.observedAt)) issues.push('latest_summary_mismatch');
   return [...new Set(issues)];
 }
 
@@ -98,7 +98,7 @@ function observationStorageMethods(run) {
         ...(Number.isFinite(Date.parse(nowIso)) ? { nowMs: Date.parse(nowIso) } : {}),
       });
       if (result.outcome === 'stale' || result.outcome === 'duplicate') return { ...result, observation };
-      const storage = storageOf(previous), date = observationDayKey(observation.observedAt, observation.market);
+      const storage = storageOf(previous), date = observationDayKey(observation.observedAt, observation.market, observation.storeNumber);
       if (previous && previous.observationStorage && (storage.schemaVersion !== 1 || !Number.isSafeInteger(storage.revision) || storage.revision < 0)) throw new ApiError('observation_storage_invalid', '库存持久化版本或修订号需要核对');
       const summaryId = observationDayId(observation.storeNumber, observation.partNumber, date, observation.market);
       const revision = nextRevision(storage);
@@ -124,7 +124,7 @@ function observationStorageMethods(run) {
       } else if (storage.mode === 'legacy') {
         const previousDay = await tx.get(C.observationDays, summaryId);
         let baselineIssue = storage.baselineIssue && storage.baselineIssue.dayKey === date ? storage.baselineIssue : null;
-        if (previous && Number.isFinite(Date.parse(previous.observedAt)) && observationDayKey(previous.observedAt, previous.market) === date
+        if (previous && Number.isFinite(Date.parse(previous.observedAt)) && observationDayKey(previous.observedAt, previous.market, previous.storeNumber) === date
             && (!previousDay || previousDay.lastObservedAt !== previous.observedAt) && result.outcome !== 'repaired') {
           baselineIssue = { dayKey: date, reason: previousDay ? 'legacy_baseline_mismatch' : 'legacy_baseline_missing' };
         }
@@ -136,7 +136,7 @@ function observationStorageMethods(run) {
         await tx.put(C.observationDays, daily);
       } else throw new ApiError('observation_storage_unknown', '库存持久化版本暂不支持');
       await tx.put(C.latest, result.latest);
-      for (const event of result.events) await tx.put(C.events, { ...event, dayKey: observationDayKey(event.detectedAt, event.market), notificationPlannedAt: null });
+      for (const event of result.events) await tx.put(C.events, { ...event, dayKey: observationDayKey(event.detectedAt, event.market, event.storeNumber), notificationPlannedAt: null });
       return { ...result, observation };
     }),
 
@@ -151,7 +151,7 @@ function observationStorageMethods(run) {
       if (!Number.isFinite(Date.parse(latest.observedAt)) || Date.parse(latest.observedAt) > Date.parse(nowIso) + 30000) return { ...report, status: 'blocked', issues: ['invalid_latest_time'] };
       if (!['legacy', 'embedded'].includes(storage.mode) || (latest.observationStorage && (storage.schemaVersion !== 1 || !Number.isSafeInteger(storage.revision) || storage.revision < 0))) return { ...report, status: 'blocked', issues: ['unknown_storage_version'] };
       if (storage.mode === 'embedded' && (!storage.day || storage.day.storageRevision !== storage.revision || storage.day.storageMode !== 'embedded')) return { ...report, status: 'blocked', issues: ['embedded_revision_mismatch'] };
-      const baselineDate = observationDayKey(latest.observedAt, latest.market);
+      const baselineDate = observationDayKey(latest.observedAt, latest.market, latest.storeNumber);
       if (storage.baselineIssue && storage.baselineIssue.dayKey === baselineDate) return { ...report, status: 'blocked', baselineDate, issues: [storage.baselineIssue.reason] };
       const daily = storage.mode === 'legacy' ? await tx.get(C.observationDays, `${targetKey}|${baselineDate}`) : storage.day;
       const issues = summaryIssues(daily, latest, { matchLatest: true });

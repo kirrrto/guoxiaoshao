@@ -18,8 +18,8 @@
   "files": [
     {
       "path": "apple-pickup.js",
-      "bytes": 11026,
-      "sha256": "cfe09480b849c88afdf7a0206fc22329a355d743d88651c3846688dc63a53d28"
+      "bytes": 11112,
+      "sha256": "4e7865f726e2ba56f9413b0b2864dd28a91c059d252bf6eb030044563b5e45c7"
     },
     {
       "path": "collections.js",
@@ -88,13 +88,13 @@
     },
     {
       "path": "engine/notifier.js",
-      "bytes": 23054,
-      "sha256": "41a710120bf852420b8111127b67fdf390cfa539248819d4112445f67b493770"
+      "bytes": 23523,
+      "sha256": "5990729670bc83fd296a6f68d621c3ef14fd3304c68af04ff823b7a24078067e"
     },
     {
       "path": "engine/observation-day.js",
-      "bytes": 3311,
-      "sha256": "6109c205004fd9ecdd00fa99af9d8fbea83e71a14f8c9a6c224341e3c2968570"
+      "bytes": 3642,
+      "sha256": "07b5f7778cfbac3ca28860506d09c5d4529126ae1f5a2f98eb2f5b0af4e3aad0"
     },
     {
       "path": "engine/observation-health.js",
@@ -143,18 +143,18 @@
     },
     {
       "path": "market-products.json",
-      "bytes": 205604,
-      "sha256": "6da260e2c9be05cd68360015f8ad215249ebface442740cacfbe15fd7ed79b01"
+      "bytes": 214951,
+      "sha256": "f4107ce2275bef048acdfd4b59bb2ed262335b2a6999283301878dad806564df"
     },
     {
       "path": "market-stores.json",
-      "bytes": 2698,
-      "sha256": "46540d7103ffcd7aba01b8d8b2ea1e3b4c342f2aea6f1e78c06e305e31b3431f"
+      "bytes": 77619,
+      "sha256": "8eceffe6263d2ce1360623a5ad9e1c3d8182f7fc8c6881a604525c69cbbd9295"
     },
     {
       "path": "markets.js",
-      "bytes": 1021,
-      "sha256": "e38f1127ebc424801e00c863935d1b927d2a43dd5c3a13b5167504396ed889e5"
+      "bytes": 1996,
+      "sha256": "cedae7acf533a1a244af09d7988d7c1ad8c2695edcc7184a95d0f26071a7be41"
     },
     {
       "path": "member-redemption.js",
@@ -218,8 +218,8 @@
     },
     {
       "path": "repo/observation-storage.js",
-      "bytes": 15651,
-      "sha256": "58a56aea3dd7fe5a431e0aad5dcf411d4aa9786163f8567b05255408a37280bc"
+      "bytes": 15837,
+      "sha256": "0668901a9ba764d1a03dcbfe6077208b2cf65212655527ae88d62fd727248982"
     },
     {
       "path": "repo/owner-annual-gift.js",
@@ -303,8 +303,8 @@
     },
     {
       "path": "rules/regional-query-access.js",
-      "bytes": 559,
-      "sha256": "34822dc283b03a95e1903af9fafccd6c2ee684bd0f8234ba5f6b2c07db30580c"
+      "bytes": 565,
+      "sha256": "d55bf6d34f0ef2ccee429e84c681d6b13bb1f3b480052b606e8d0ef7a8b6797a"
     },
     {
       "path": "time.js",

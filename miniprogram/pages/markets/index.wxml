@@ -14,7 +14,7 @@
     <view class="markets-controls">
       <view class="markets-regions" aria-label="{{c.sites}}">
         <button wx:for="{{sites}}" wx:key="code" class="markets-region {{market === item.code ? 'markets-region--selected' : ''}}"
-          hover-class="ui-control-pressed" aria-pressed="{{market === item.code}}" data-market="{{item.code}}" bindtap="onMarket">{{item.label}}</button>
+          hover-class="ui-control-pressed" aria-pressed="{{market === item.code}}" aria-label="{{item.fullLabel}}" data-market="{{item.code}}" bindtap="onMarket">{{item.label}}</button>
       </view>
       <view class="card markets-editor">
         <view class="market-product-line">
@@ -27,8 +27,8 @@
         <picker wx:if="{{categories.length > 1}}" mode="selector" range="{{categories}}" range-key="label" value="{{categoryIndex}}" data-field="category" bindchange="onChoice" aria-label="{{c.category + ' ' + categories[categoryIndex].label}}">
           <view class="market-field"><text class="market-label">{{c.category}}</text><view class="market-field-value"><text>{{categories[categoryIndex].label}}</text><view class="ui-chevron ui-chevron--down" aria-hidden="true" /></view></view>
         </picker>
-        <picker disabled="{{models.length <= 1}}" mode="selector" range="{{modelLabels}}" value="{{modelIndex}}" data-field="model" bindchange="onChoice" aria-label="{{c.model + ' ' + product.modelLabel}}">
-          <view class="market-field"><text class="market-label">{{c.model}}</text><view class="market-field-value"><text>{{product.modelLabel}}</text><view wx:if="{{models.length > 1}}" class="ui-chevron ui-chevron--down" aria-hidden="true" /></view></view>
+        <picker wx:if="{{models.length > 1}}" mode="selector" range="{{modelLabels}}" value="{{modelIndex}}" data-field="model" bindchange="onChoice" aria-label="{{c.model + ' ' + product.modelLabel}}">
+          <view class="market-field"><text class="market-label">{{c.model}}</text><view class="market-field-value"><text>{{product.modelLabel}}</text><view class="ui-chevron ui-chevron--down" aria-hidden="true" /></view></view>
         </picker>
         <picker wx:if="{{colors.length}}" disabled="{{colors.length <= 1}}" mode="selector" range="{{colors}}" range-key="label" value="{{colorIndex}}" data-field="color" bindchange="onChoice" aria-label="{{c.color + ' ' + (product.colorLabel || c.noColor)}}">
           <view class="market-field"><text class="market-label">{{c.color}}</text><view class="market-field-value"><text>{{product.colorLabel || c.noColor}}</text><view wx:if="{{colors.length > 1}}" class="ui-chevron ui-chevron--down" aria-hidden="true" /></view></view>
@@ -41,9 +41,11 @@
         <picker wx:if="{{showVariants}}" disabled="{{variants.length <= 1}}" mode="selector" range="{{variants}}" range-key="label" value="{{variantIndex}}" data-field="variant" bindchange="onChoice" aria-label="{{c.variant + ' ' + variants[variantIndex].label}}">
           <view class="market-field"><text class="market-label">{{c.variant}}</text><view class="market-field-value"><text>{{variants[variantIndex].label}}</text><view wx:if="{{variants.length > 1}}" class="ui-chevron ui-chevron--down" aria-hidden="true" /></view></view>
         </picker>
-        <view wx:if="{{!product.querySupported && !product.monitorSupported}}" class="market-meta market-reference mt">{{product.referenceText}}</view>
-        <picker wx:else disabled="{{stores.length <= 1}}" mode="selector" range="{{stores}}" range-key="location" value="{{storeIndex}}" data-field="store" bindchange="onChoice" aria-label="{{c.store + ' ' + store.location}}">
-          <view class="market-field market-store"><text class="market-label">{{c.store}}</text><view class="market-field-value"><text>{{store.location}}</text><view wx:if="{{stores.length > 1}}" class="ui-chevron ui-chevron--down" aria-hidden="true" /></view></view>
+        <picker wx:if="{{areas.length > 1}}" mode="selector" range="{{areas}}" range-key="label" value="{{areaIndex}}" data-field="area" bindchange="onChoice" aria-label="{{c.area + ' ' + area.name}}">
+          <view class="market-field market-store"><text class="market-label">{{c.area}}</text><view class="market-field-value"><text>{{area.name}}</text><view class="ui-chevron ui-chevron--down" aria-hidden="true" /></view></view>
+        </picker>
+        <picker disabled="{{stores.length <= 1}}" mode="selector" range="{{stores}}" range-key="location" value="{{storeIndex}}" data-field="store" bindchange="onChoice" aria-label="{{c.store + ' ' + store.location}}">
+          <view class="market-field {{areas.length > 1 ? '' : 'market-store'}}"><text class="market-label">{{c.store}}</text><view class="market-field-value"><text>{{store.location}}</text><view wx:if="{{stores.length > 1}}" class="ui-chevron ui-chevron--down" aria-hidden="true" /></view></view>
         </picker>
         <view wx:if="{{enabled || pending}}" class="market-actions">
           <text wx:if="{{launchNotice}}" class="market-meta">{{launchNotice}}</text>
@@ -86,7 +88,7 @@
           <button class="ui-action mt" bindtap="onPullDownRefresh">{{c.refreshed}}</button>
         </block>
         <view wx:if="{{queryError}}" class="market-issue">{{queryError}}</view>
-        <block wx:if="{{receipt}}">
+        <view wx:if="{{receipt}}" class="ui-reveal">
           <view class="market-result-status {{receipt.tone === 'ok' ? 'market-result-status--ok' : ''}}"><view wx:if="{{receipt.tone === 'ok' && enabled && !networkOffline}}" class="ui-live-dot" aria-hidden="true" /><text>{{receipt.previous ? receipt.timeLabel + ' · ' : ''}}{{receipt.status}}</text></view>
           <view class="market-product-line">
             <view wx:if="{{product.imageDisplayUrl}}" class="product-tile market-product-tile">
@@ -95,7 +97,7 @@
             <view class="market-product-copy"><view>{{product.label}}</view><view>{{receipt.store}}</view></view>
           </view>
           <view class="market-meta">{{receipt.previous ? '' : receipt.timeLabel + ' · '}}{{receipt.time}}</view>
-        </block>
+        </view>
         <view wx:elif="{{enabled && !queryError}}" class="market-meta mt">{{busyHere ? c.checking : c.empty}}</view>
         <view wx:if="{{billingText}}" class="market-meta mt">{{billingText}}</view>
       </view>
@@ -115,7 +117,7 @@
             <button wx:if="{{watchEditing}}" class="ui-action" disabled="{{watchBusy}}" data-id="{{item.id}}" aria-expanded="{{item.editing}}" bindtap="onManageWatch">{{item.editing ? w.collapse : w.manage}}</button>
             <button wx:else class="ui-action ui-action--plain" disabled="{{watchBusy || networkOffline}}" data-id="{{item.id}}" data-status="removed" bindtap="onWatchStatus">{{w.remove}}</button>
           </view>
-          <view wx:if="{{item.editing}}" class="market-watch-editor">
+          <view wx:if="{{item.editing}}" class="market-watch-editor ui-reveal">
             <view wx:for="{{item.selectedStores}}" wx:for-item="savedStore" wx:key="id" class="market-field">
               <text>{{savedStore.label}}</text>
               <button wx:if="{{item.selectedStores.length > 1}}" class="ui-action ui-action--plain" disabled="{{watchBusy || networkOffline}}" data-id="{{item.id}}" data-store="{{savedStore.id}}" data-field="remove" aria-label="{{w.removeStore + ' ' + savedStore.label}}" bindtap="onEditWatch">{{w.removeStore}}</button>
@@ -123,7 +125,7 @@
             <picker wx:if="{{item.additionalStores.length}}" mode="selector" range="{{item.additionalStores}}" range-key="location" value="{{0}}" disabled="{{watchBusy || networkOffline}}" data-id="{{item.id}}" data-field="add" bindchange="onEditWatch" aria-label="{{w.addStore}}">
               <view class="market-field"><text>{{w.addStore}}</text><view class="ui-chevron ui-chevron--down" aria-hidden="true" /></view>
             </picker>
-            <picker wx:if="{{canEditLanguage}}" mode="selector" range="{{editLanguages}}" value="{{item.language === 'en' ? 1 : 0}}" disabled="{{watchBusy || networkOffline}}" data-id="{{item.id}}" data-field="language" bindchange="onEditWatch" aria-label="{{w.notifyLanguage + ' ' + (item.language === 'en' ? w.en : w.zh)}}">
+            <picker wx:if="{{item.canEditLanguage}}" mode="selector" range="{{editLanguages}}" value="{{item.language === 'en' ? 1 : 0}}" disabled="{{watchBusy || networkOffline}}" data-id="{{item.id}}" data-field="language" bindchange="onEditWatch" aria-label="{{w.notifyLanguage + ' ' + (item.language === 'en' ? w.en : w.zh)}}">
               <view class="market-field"><text>{{w.notifyLanguage}}</text><view class="market-field-value"><text>{{item.language === 'en' ? w.en : w.zh}}</text><view class="ui-chevron ui-chevron--down" aria-hidden="true" /></view></view>
             </picker>
             <button class="ui-action ui-action--plain mt" disabled="{{watchBusy || networkOffline}}" data-id="{{item.id}}" data-status="removed" bindtap="onWatchStatus">{{w.removeWatch}}</button>

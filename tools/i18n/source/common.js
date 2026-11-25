@@ -1,4 +1,9 @@
 module.exports = {
+  '版本记录 · 2026-11-25': 'Version record · 2026-11-25',
+  '美国站点与交互体验更新': 'US stores and interaction polish',
+  '「其他站点」新增美国全境门店（免税州置顶），移除无自提接口商品。': 'Added all US stores in Regions (tax-free states first) and removed unsupported items.',
+  '单店城市自动勾选门店，精简重复选项。': 'Auto-select sole stores in single-store cities and trim redundant pickers.',
+  '优化抽屉下滑手势与状态切换动效。': 'Refined swipe-to-dismiss sheets and state transitions.',
   '站点查询权限提示': 'Access to regional stock checks',
   '其他站点仅向月卡、年卡开放查询时，页面会显示所需会员。': 'If a region limits stock checks to monthly and annual pass holders, you’ll see which passes qualify.',
   '查询受限时，点查询可查看会员说明，不消耗查询次数。': 'When access is restricted, tap the check button to view pass details without using a search credit.',

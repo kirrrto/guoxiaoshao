@@ -15,7 +15,12 @@
   background: var(--elevated);
   box-shadow: var(--shadow-sheet);
   font-size: var(--fs-body);
+  transform: translate3d(0, 0, 0);
+  transition: transform var(--dur-sheet) var(--ease-out), bottom var(--dur) var(--ease-out);
 }
+.config-sheet-panel--dragging { transition: none; }
+.config-sheet-grabber-bar { display: flex; flex: none; justify-content: center; padding: var(--sp-8) 0 var(--sp-2); }
+.config-sheet-grabber { width: 36px; height: 4px; border-radius: var(--radius-pill); background: var(--pressed); }
 .config-sheet-header { display: flex; flex: none; align-items: center; gap: var(--sp-12); padding: var(--sp-8) var(--sp-8) var(--sp-8) var(--sp-16); border-bottom: 1px solid var(--line); }
 .config-sheet-heading { flex: 1 1 0; min-width: 0; }
 .config-sheet-title { font-size: var(--fs-headline); font-weight: 600; line-height: var(--lh-snug); overflow-wrap: anywhere; }
@@ -62,3 +67,6 @@
   --control: var(--surface-top);
 }
 .config-sheet-root--docked .config-sheet-footer { background: var(--surface); }
+@media (prefers-reduced-motion: reduce) {
+  .config-sheet-panel { transition: none; }
+}

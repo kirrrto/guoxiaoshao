@@ -7,8 +7,8 @@
       <view wx:if="{{prompt.soldoutEnabled}}" class="reminder-count"><text>{{i18n.t(ui,'断货')}}</text><text class="reminder-number">{{i18n.t(ui,(prompt.soldoutCount))}}<text class="reminder-unit"> {{i18n.t(ui,'次')}}</text></text></view>
     </view>
     <view class="reminder-detail">{{i18n.t(ui,(prompt.detail))}}</view>
-    <button class="reminder-allow {{submitting ? 'reminder-busy' : ''}}" bindtap="authorize" loading="{{submitting}}" disabled="{{submitting}}">{{i18n.t(ui,'补充提醒次数')}}</button>
-    <button class="reminder-later {{submitting ? 'reminder-busy' : ''}}" bindtap="dismiss" disabled="{{submitting}}">{{i18n.t(ui,'稍后再说')}}</button>
+    <button class="reminder-allow {{submitting ? 'reminder-busy' : ''}}" hover-class="reminder-button-pressed" bindtap="authorize" loading="{{submitting}}" disabled="{{submitting}}">{{i18n.t(ui,'补充提醒次数')}}</button>
+    <button class="reminder-later {{submitting ? 'reminder-busy' : ''}}" hover-class="reminder-button-pressed" bindtap="dismiss" disabled="{{submitting}}">{{i18n.t(ui,'稍后再说')}}</button>
     <view class="reminder-footnote">{{i18n.t(ui,'24 小时内不再主动提示')}}</view>
   </view>
 </view>

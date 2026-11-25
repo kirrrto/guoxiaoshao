@@ -22,7 +22,7 @@ export const marketScenarios = {
   'hk-mac': { market: 'HK', category: 'mac', language: 'en', available: true,
     expected: ['Mac', 'Category', 'Available for pickup', 'UTC+8'] },
   'jp-ipad': { market: 'JP', category: 'ipad', available: true, expected: ['iPad', '产品类别', '可自提', 'UTC+9'] },
-  'tw-watch-reference': { market: 'TW', category: 'watch', blocked: true, expected: ['Apple Watch', '产品类别'] },
+  'us-pickup': { market: 'US', available: true, expected: ['其他站点', '俄勒冈州（免税州）', '波特兰 · 先锋广场 Pioneer Place', '可自提', 'UTC-8'] },
 };
 
 export function marketMember(scenario) {

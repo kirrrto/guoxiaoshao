@@ -23,7 +23,7 @@ test('only the bound admin can manually check a closed regional site and the pri
   const fetchImpl = fakeFetch(() => ({ display: 'unavailable' }));
   const f = createFixture({ config: { adminUserKeys: [owner, userKeyOf(other)], query: { sharedFreshnessSeconds: 30 } }, fetchImpl });
   const boot = ok(await f.call('user.bootstrap'));
-  assert.deepEqual(boot.regionalQueryPreview, ['JP', 'TW', 'HK']);
+  assert.deepEqual(boot.regionalQueryPreview, ['JP', 'TW', 'HK', 'US']);
   assert.equal(ok(await f.call('user.bootstrap', {}, userContext(other))).regionalQueryPreview, undefined);
   const tw = { market: 'TW', partNumber: 'MJY04ZP/A', storeNumbers: ['R694'], queryId: 'taipei-private-query', expectedUserKey: owner, maxCost: 0 };
   const shared = { _id: 'TW|R694|MJY04ZP/A', market: 'TW', storeNumber: 'R694', partNumber: tw.partNumber,

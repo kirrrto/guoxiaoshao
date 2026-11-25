@@ -169,7 +169,7 @@ function macDetails(family, link) {
 const configLinks = JSON.parse(read('config/links.json'));
 const output = [];
 for (const family of families) {
-  if (['ipad-10-2','homepod-mini'].includes(family.familyKey)) continue; // redirects / duplicate prior generation
+  if (['ipad-10-2','homepod-mini'].includes(family.familyKey) || ['watch','vision'].includes(family.category)) continue; // unsupported or retired
   const html=read(family.familyKey+'.html');
   const sourceUrl=canonical(html);
   if (!sourceUrl.includes('/shop/buy-')) throw Error('Not a local buy page: '+sourceUrl);
@@ -178,8 +178,7 @@ for (const family of families) {
   if(!selection?.products?.length) throw Error('Missing regional selector: '+sourceUrl);
   const metrics = new Map(extractMetricsProducts(html).map(item=>[item.partNumber,item]));
   let products;
-  if (family.category==='watch') products=selection.products.map(raw=>watchRow(family,selection,raw));
-  else if (family.familyKey.startsWith('studio-display')) products=selection.products.map(raw=>monitorRow(family,raw,metrics.get(raw.partNumber)));
+  if (family.familyKey.startsWith('studio-display')) products=selection.products.map(raw=>monitorRow(family,raw,metrics.get(raw.partNumber)));
   else if (family.category==='mac') {
     products=configLinks.filter(link=>link.key===family.familyKey).map(link=>macDetails(family,link));
     const linked = new Set([...html.matchAll(/<a\b[^>]*?\shref\s*=\s*(["'])([\s\S]*?)\1/gi)]
@@ -189,12 +188,6 @@ for (const family of families) {
     const included=new Set(products.map(row=>row.partNumber));
     assert.equal(included.size,products.length,'Duplicate regional Mac SKU: '+family.familyKey);
     for (const raw of selection.products) if(raw.btrOrFdPartNumber && !included.has(raw.btrOrFdPartNumber)) throw Error('Missing regional retail configuration '+raw.btrOrFdPartNumber);
-    if (selection.products.some(raw => raw.type === 'CONFIGURABLE' && !raw.btrOrFdPartNumber)) {
-      const model = family.displayName.replace('PROLED XDR 显示屏','PROLED XDR');
-      products.push({ id:'custom-'+family.familyKey, partNumber:null, model,
-        title:model+' 定制配置', titleEn:model+' custom configuration',
-        querySupported:false, monitorSupported:false, reason:'custom_configuration' });
-    }
   } else products=selection.products.filter(raw=>raw.partNumber && !raw.isCarrierDevice && !raw.comingSoon && !raw.isComingSoon).map(raw=>{
     const dims=localDimensions(raw), metric=metrics.get(raw.partNumber);
     if (family.category==='iphone' && !dims.dimensionCapacity) {
@@ -208,9 +201,7 @@ for (const family of families) {
       && ['midnight','white'].includes(dims.dimensionColor)
       && raw.imageKey === 'homepod-select-'+dims.dimensionColor+'-202610';
     const match = matchMainland(family.familyKey,dims,sameHomePod ? null : raw.imageKey);
-    const row = catalogRow(match,raw.partNumber);
-    if (family.category==='vision') Object.assign(row,{id:'vision-'+row.capacity.toLowerCase(),partNumber:null,querySupported:false,monitorSupported:false,reason:'fitting_required'});
-    return row;
+    return catalogRow(match,raw.partNumber);
   });
   for(const product of products) if(product.partNumber && !/^[A-Z0-9]{5,12}\/A$/.test(product.partNumber)) throw Error('Unverified retail part: '+product.partNumber);
   const date=dates.find(([, ,keys])=>keys.split(' ').includes(family.familyKey));

@@ -1,11 +1,12 @@
 <wxs module="i18n" src="../../i18n/render.wxs" />
 <page-container wx:if="{{nativeGuardSupported && !docked}}" show="{{nativeGuardShow}}" overlay="{{false}}" duration="{{0}}" position="bottom" close-on-slide-down="{{false}}" custom-style="height:1px;min-height:0;background:transparent;pointer-events:none;" bindafterleave="onNativeLeave" aria-hidden="true" />
 <view wx:if="{{visible}}" class="config-sheet-root {{docked ? 'config-sheet-root--docked' : ''}}">
-  <view wx:if="{{!docked}}" class="config-sheet-scrim" catchtap="onCloseTap" catchtouchmove="stopTouch" aria-hidden="true"></view>
-  <view class="config-sheet-panel" style="{{docked ? '' : 'bottom: ' + keyboardHeight + 'px; max-height: calc(100vh - ' + keyboardHeight + 'px - max(12px, env(safe-area-inset-top)));'}}" aria-role="{{docked ? 'group' : 'dialog'}}" aria-modal="{{!docked}}" aria-label="{{i18n.t(ui,(title))}}">
-    <view class="config-sheet-header">
+  <view wx:if="{{!docked}}" class="config-sheet-scrim ui-scrim-enter" catchtap="onCloseTap" catchtouchmove="stopTouch" aria-hidden="true"></view>
+  <view class="config-sheet-panel {{!docked && !dragActivated ? 'ui-sheet-enter' : ''}} {{dragging ? 'config-sheet-panel--dragging' : ''}}" style="{{docked ? '' : 'bottom: ' + keyboardHeight + 'px; max-height: calc(100vh - ' + keyboardHeight + 'px - max(12px, env(safe-area-inset-top)));' + (dragOffset > 0 ? ' transform: translate3d(0, ' + dragOffset + 'px, 0);' : '')}}" aria-role="{{docked ? 'group' : 'dialog'}}" aria-modal="{{!docked}}" aria-label="{{i18n.t(ui,(title))}}">
+    <view wx:if="{{!docked}}" class="config-sheet-grabber-bar" bindtouchstart="onSheetTouchStart" catchtouchmove="onSheetTouchMove" bindtouchend="onSheetTouchEnd" bindtouchcancel="onSheetTouchEnd" aria-hidden="true"><view class="config-sheet-grabber"></view></view>
+    <view class="config-sheet-header" bindtouchstart="onSheetTouchStart" catchtouchmove="onSheetTouchMove" bindtouchend="onSheetTouchEnd" bindtouchcancel="onSheetTouchEnd">
       <view class="config-sheet-heading"><view class="config-sheet-title">{{i18n.t(ui,(title))}}</view></view>
-      <button class="config-sheet-close {{busy ? 'config-sheet-close--busy' : ''}}" disabled="{{busy}}" bindtap="onCloseTap" aria-label="{{i18n.t(ui,'关闭配置面板')}}"><view class="ui-close" aria-hidden="true"></view></button>
+      <button class="config-sheet-close {{busy ? 'config-sheet-close--busy' : ''}}" hover-class="ui-control-pressed" disabled="{{busy}}" bindtap="onCloseTap" aria-label="{{i18n.t(ui,'关闭配置面板')}}"><view class="ui-close" aria-hidden="true"></view></button>
     </view>
     <scroll-view class="config-sheet-body" scroll-y enhanced show-scrollbar="{{true}}"><view class="config-sheet-content">
       <view wx:if="{{subtitle}}" class="config-sheet-subtitle">{{i18n.t(ui,(subtitle))}}</view>

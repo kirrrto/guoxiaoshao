@@ -2,17 +2,14 @@ const { observation } = require('../../utils/format');
 const { regionalProductThumbnail } = require('../../utils/product-image-fit');
 const { compareCapacities } = require('../../utils/catalog-order');
 
-const MARKETS = ['JP', 'TW', 'HK'];
-const CATEGORY_NAMES = { iphone: 'iPhone', ipad: 'iPad', mac: 'Mac', watch: 'Apple Watch', airpods: 'AirPods', vision: 'Apple Vision Pro', homepod: 'HomePod' };
+const MARKETS = ['JP', 'TW', 'HK', 'US'];
+const CATEGORY_NAMES = { iphone: 'iPhone', ipad: 'iPad', mac: 'Mac', airpods: 'AirPods', homepod: 'HomePod' };
 const COPY = {
   'zh-CN': {
     title: '其他站点',
-    sites: '选择地区', model: '机型', color: '颜色', capacity: '容量', store: 'Apple 直营店', results: '门店自提',
-    category: '产品类别', variant: '具体配置', reference: '此配置尚未确认当地货号，暂不支持库存查询或关注。',
+    sites: '选择地区', model: '机型', color: '颜色', capacity: '容量', area: '州 / 地区', store: 'Apple 直营店', results: '门店自提',
+    category: '产品类别', variant: '具体配置',
     regionChanged: '已换至本站配置，请核对规格与门店。',
-    watchCase: '需在 Apple 选定表壳和表带后才能确定整表货号。此处仅展示表壳，暂不支持查询或关注。',
-    fitting: '需在 Apple 完成面部测量后才能确定适配配置，暂不支持查询或关注。',
-    custom: '此配置需在 Apple 官网定制，尚无可核对的标准零售货号，暂不支持查询或关注。',
     noColor: '未指定颜色', noCapacity: '未指定容量',
     query: '查询自提状态', checking: '查询中…', resume: '核对上次查询', retry: '重试',
     passOnly: '本站目前仅限有效月卡或年卡会员查询。', viewPass: '查看会员',
@@ -35,12 +32,9 @@ const COPY = {
   },
   en: {
     title: 'Regional stores',
-    sites: 'Choose a region', model: 'Model', color: 'Finish', capacity: 'Storage', store: 'Apple Store', results: 'Store pickup',
-    category: 'Category', variant: 'Configuration options', reference: 'A local part number has yet to be confirmed. Stock checks and watches are unavailable.',
+    sites: 'Choose a region', model: 'Model', color: 'Finish', capacity: 'Storage', area: 'State / region', store: 'Apple Store', results: 'Store pickup',
+    category: 'Category', variant: 'Configuration options',
     regionChanged: 'A local configuration is selected. Check its specifications and store.',
-    watchCase: 'Apple assigns a part number after you select a case and a band. This listing shows the case only, so stock checks and watches are unavailable.',
-    fitting: 'Apple needs your face measurements to match the fit. Stock checks and watches are unavailable here.',
-    custom: 'Configure this model on the Apple website. It has no verified standard retail part number for stock checks or watches.',
     noColor: 'No finish specified', noCapacity: 'No storage specified',
     query: 'Check pickup', checking: 'Checking…', resume: 'Check previous request', retry: 'Retry',
     passOnly: 'Stock checks here require an active monthly or annual pass.', viewPass: 'Passes',
@@ -97,29 +91,50 @@ function matchRegionalProduct(previous, products) {
 
 function selections(site, lang, failedImages) {
   const en = lang === 'en';
-  const referenceKeys = { case_and_band: 'watchCase', case_and_band_required: 'watchCase', fitting_required: 'fitting', custom_configuration: 'custom' };
   return {
-    products: site.products.filter(product => product && (product.partNumber || product.id)).map(product => {
+    products: site.products.filter(product => product && product.partNumber && product.querySupported !== false).map(product => {
       const image = regionalProductThumbnail(product);
       return {
-        id: product.partNumber || product.id, partNumber: product.partNumber || '',
+        id: product.partNumber, partNumber: product.partNumber,
         label: (en && product.titleEn) || product.title || product.model, category: product.category || 'iphone',
         model: product.model || product.title, modelLabel: (en && product.modelEn) || product.model || product.title,
         color: product.color || '', colorLabel: (en && product.colorEn) || product.color || '',
         capacity: typeof product.capacity === 'number' ? product.capacity + 'GB' : product.capacity || '',
         configuration: (en && product.configurationEn) || product.configuration || '',
-        querySupported: Boolean(product.partNumber && product.querySupported !== false),
-        monitorSupported: Boolean(product.partNumber && product.monitorSupported !== false && (product.querySupported !== false || product.monitorSupported === true)),
+        querySupported: true,
+        monitorSupported: Boolean(product.monitorSupported !== false),
         freeQueryStartsAt: product.freeQueryStartsAt || '',
-        referenceText: COPY[lang][referenceKeys[product.reason] || 'reference'],
         imageDisplayUrl: failedImages && failedImages.has(image) ? '' : image,
       };
     }),
-    stores: site.stores.map(store => {
-      const label = (en && store.nameEn) || store.name, city = (en && store.cityEn) || store.city;
-      return { id: store.storeNumber, label, location: city && !label.startsWith(city) ? city + ' · ' + label : label,
-        timeZone: store.timeZone || site.timeZone };
-    }),
+    stores: (() => {
+      return site.stores.map(store => {
+        const label = (en && store.nameEn) || store.name, city = (en && store.cityEn) || store.city;
+        const areaId = store.stateEn || store.state || '', areaName = (en && store.stateEn) || store.state || '';
+        const location = city && !label.startsWith(city) ? city + ' · ' + label : label;
+        return { id: store.storeNumber, label, location, fullLocation: areaName ? areaName + ' · ' + location : location,
+          areaId, areaName, timeZone: store.timeZone || site.timeZone };
+      });
+    })(),
+    areas: (() => {
+      if (!site.stores.some(store => store.stateEn || store.state)) return [];
+      const groups = [], byArea = new Map();
+      for (const store of site.stores) {
+        const id = store.stateEn || store.state || '', name = (en && store.stateEn) || store.state || '';
+        if (!id) continue;
+        let group = byArea.get(id);
+        if (!group) {
+          group = { id, name, firstStoreId: store.storeNumber, count: 0 };
+          byArea.set(id, group);
+          groups.push(group);
+        }
+        group.count += 1;
+      }
+      for (const group of groups) {
+        group.label = en ? `${group.name} · ${group.count} ${group.count === 1 ? 'store' : 'stores'}` : `${group.name} · ${group.count} 店`;
+      }
+      return groups;
+    })(),
   };
 }
 
@@ -178,14 +193,28 @@ function productChoices(products, product, lang = 'zh-CN') {
 
 function messageKey(reason) { return ERROR_KEYS[reason] || 'unavailableService'; }
 
-// These three verified store time zones have no daylight-saving transitions in the release window.
+const FIXED_ZONE_OFFSETS = { 'Asia/Tokyo': 9, 'Asia/Taipei': 8, 'Asia/Hong_Kong': 8, 'Pacific/Honolulu': -10, 'America/Phoenix': -7 };
+const US_DST_ZONE_OFFSETS = { 'America/Anchorage': -9, 'America/Los_Angeles': -8, 'America/Denver': -7, 'America/Chicago': -6, 'America/New_York': -5 };
+const hasKey = (object, key) => Object.prototype.hasOwnProperty.call(object, key);
+
+// Matches backend `cloudfunctions/gxs_api/lib/markets.js` without relying on runtime Intl timeZone support.
+function zoneOffsetHours(stamp, timeZone) {
+  if (hasKey(FIXED_ZONE_OFFSETS, timeZone)) return FIXED_ZONE_OFFSETS[timeZone];
+  if (!hasKey(US_DST_ZONE_OFFSETS, timeZone)) return 0;
+  const std = US_DST_ZONE_OFFSETS[timeZone];
+  const year = new Date(stamp + std * 3600000).getUTCFullYear();
+  const marStart = Date.UTC(year, 2, 8 + ((7 - new Date(Date.UTC(year, 2, 1)).getUTCDay()) % 7), 2 - std);
+  const novEnd = Date.UTC(year, 10, 1 + ((7 - new Date(Date.UTC(year, 10, 1)).getUTCDay()) % 7), 2 - (std + 1));
+  return stamp >= marStart && stamp < novEnd ? std + 1 : std;
+}
+
 // An unknown zone gets an explicit UTC timestamp rather than the device's time under a store label.
 function localTime(iso, timeZone) {
-  const offsets = { 'Asia/Tokyo': 9, 'Asia/Taipei': 8, 'Asia/Hong_Kong': 8 };
-  const offset = offsets[timeZone] || 0;
   const stamp = Date.parse(iso);
   if (!Number.isFinite(stamp)) return '';
-  return new Date(stamp + offset * 3600000).toISOString().slice(0, 19).replace('T', ' ') + (offset ? ' UTC+' + offset : ' UTC');
+  const offset = zoneOffsetHours(stamp, timeZone);
+  const suffix = offset > 0 ? ' UTC+' + offset : offset < 0 ? ' UTC' + offset : ' UTC';
+  return new Date(stamp + offset * 3600000).toISOString().slice(0, 19).replace('T', ' ') + suffix;
 }
 
 function receiptView(snapshot, store, lang, now = Date.now(), previousOnly = false, leadMs = 0) {
@@ -198,4 +227,4 @@ function receiptView(snapshot, store, lang, now = Date.now(), previousOnly = fal
     previous, store: store.label };
 }
 
-module.exports = { MARKETS, COPY, catalogOptions, matchRegionalProduct, selections, productChoices, messageKey, receiptView, localTime, regionalAccess };
+module.exports = { MARKETS, COPY, catalogOptions, matchRegionalProduct, selections, productChoices, messageKey, receiptView, localTime, zoneOffsetHours, regionalAccess };

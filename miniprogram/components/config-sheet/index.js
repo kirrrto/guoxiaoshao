@@ -1,5 +1,6 @@
 const languageUI = require('../../utils/language');
 const { setTabBarOverlay } = require('../../utils/tab-bar');
+const { confirmTap } = require('../../utils/haptic');
 
 Component(require('../../utils/language').component('config-sheet', {
   options: { multipleSlots: true, styleIsolation: 'apply-shared' },
@@ -15,7 +16,7 @@ Component(require('../../utils/language').component('config-sheet', {
     dirty: { type: Boolean, value: false },
     externalClose: { type: Boolean, value: false },
   },
-  data: { keyboardHeight: 0, nativeGuardSupported: false, nativeGuardShow: false },
+  data: { keyboardHeight: 0, nativeGuardSupported: false, nativeGuardShow: false, dragging: false, dragActivated: false, dragOffset: 0 },
   lifetimes: {
     attached() {
       this.retired = false;
@@ -41,9 +42,10 @@ Component(require('../../utils/language').component('config-sheet', {
     hide() {
       this.pageHidden = true;
       this.guardEpoch = (this.guardEpoch || 0) + 1;
+      this.dragStartY = null;
       this.setTabHidden(false);
       this.unbindKeyboard();
-      const patch = { nativeGuardShow: false };
+      const patch = { nativeGuardShow: false, dragging: false, dragActivated: false, dragOffset: 0 };
       if (this.data.keyboardHeight) patch.keyboardHeight = 0;
       this.setData(patch);
     },
@@ -73,10 +75,15 @@ Component(require('../../utils/language').component('config-sheet', {
     onDocked() { this.syncPresentation(this.data.visible); },
     syncPresentation(visible) {
       const modal = Boolean(visible && !this.data.docked && !this.pageHidden && !this.retired);
+      this.dragStartY = null;
       this.syncKeyboard();
       this.setTabHidden(modal);
       this.guardEpoch = (this.guardEpoch || 0) + 1;
-      this.setData({ nativeGuardShow: Boolean(modal && this.data.nativeGuardSupported) });
+      const patch = { nativeGuardShow: Boolean(modal && this.data.nativeGuardSupported) };
+      if (!modal && (this.data.dragging || this.data.dragActivated || this.data.dragOffset)) {
+        patch.dragging = false; patch.dragActivated = false; patch.dragOffset = 0;
+      }
+      this.setData(patch);
       if (!modal && this.data.keyboardHeight) this.setData({ keyboardHeight: 0 });
     },
     setTabHidden(hidden) {
@@ -96,6 +103,34 @@ Component(require('../../utils/language').component('config-sheet', {
       if (typeof wx.nextTick === 'function') wx.nextTick(sync); else setTimeout(sync, 0);
     },
     stopTouch() {},
+    onSheetTouchStart(e) {
+      if (this.data.docked || this.data.busy || !this.data.visible || this.confirmingClose) return;
+      const point = e && e.touches && e.touches[0];
+      if (!point || !Number.isFinite(point.clientY)) return;
+      this.dragStartY = point.clientY;
+    },
+    onSheetTouchMove(e) {
+      if (this.dragStartY == null || this.data.docked || this.data.busy || !this.data.visible || this.confirmingClose) return;
+      const point = e && e.touches && e.touches[0];
+      if (!point || !Number.isFinite(point.clientY)) return;
+      const deltaY = Math.max(0, point.clientY - this.dragStartY);
+      const offset = deltaY <= 180 ? deltaY : 180 + (deltaY - 180) * 0.35;
+      const rounded = Math.round(offset);
+      if (!this.data.dragging && rounded <= 2) return;
+      if (!this.data.dragging || !this.data.dragActivated || this.data.dragOffset !== rounded) {
+        this.setData({ dragging: true, dragActivated: true, dragOffset: rounded });
+      }
+    },
+    onSheetTouchEnd() {
+      if (this.dragStartY == null) return;
+      this.dragStartY = null;
+      const offset = this.data.dragOffset || 0;
+      if (this.data.dragging || offset) this.setData({ dragging: false, dragOffset: 0 });
+      if (offset >= 84 && !this.data.docked && !this.data.busy && this.data.visible && !this.confirmingClose) {
+        confirmTap();
+        this.onCloseTap();
+      }
+    },
     armNativeGuard() {
       if (!this.data.nativeGuardSupported || this.retired || this.pageHidden || this.data.docked || !this.data.visible || this.data.nativeGuardShow) return;
       const epoch = this.guardEpoch = (this.guardEpoch || 0) + 1;

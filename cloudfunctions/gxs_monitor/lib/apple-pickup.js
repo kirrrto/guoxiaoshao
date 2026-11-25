@@ -57,7 +57,9 @@ function buildPickupUrl(storeNumber, partNumbers, products = [], market = null) 
     const site = findMarket(market);
     if (!site || cto || !site.stores.some(s => s.storeNumber === storeNumber)
       || !partNumbers.every(part => findMarketProduct(market, part)?.querySupported)) throw new TypeError('invalid_market_target');
-    endpoint = 'https://www.apple.com/' + site.code.toLowerCase() + '/shop/retail/pickup-message';
+    endpoint = site.code === 'US'
+      ? 'https://www.apple.com/shop/retail/pickup-message'
+      : 'https://www.apple.com/' + site.code.toLowerCase() + '/shop/retail/pickup-message';
   }
   const url = new URL(endpoint);
   url.searchParams.set(cto ? 'fae' : 'pl', 'true');

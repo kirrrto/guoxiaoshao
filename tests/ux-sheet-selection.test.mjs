@@ -312,3 +312,43 @@ test('corrupted saved catalog keys cannot select inherited objects or create unr
   picker.onStoreTap({ currentTarget: { dataset: { store: '__proto__' } } });
   assert.deepEqual(copy(picker.getSelection().storeNumbers), ['R765']);
 });
+
+test('config-sheet swipe-down follows finger 1:1, bounces back under threshold, and guards dirty drafts on dismiss', () => {
+  const rt = runtime();
+  const events = [];
+  const sheet = rt.instance('components/config-sheet/index.js', { visible: true, dirty: false, docked: false, busy: false });
+  sheet.triggerEvent = name => events.push(name);
+  sheet.onSheetTouchStart({ touches: [{ clientY: 100 }] });
+  sheet.onSheetTouchMove({ touches: [{ clientY: 150 }] });
+  assert.deepEqual([sheet.data.dragging, sheet.data.dragActivated, sheet.data.dragOffset], [true, true, 50]);
+  sheet.onSheetTouchEnd();
+  assert.deepEqual([sheet.data.dragging, sheet.data.dragActivated, sheet.data.dragOffset], [false, true, 0]);
+  assert.deepEqual(events, []);
+
+  sheet.setData({ visible: false });
+  sheet.onVisible(false);
+  assert.equal(sheet.data.dragActivated, false);
+  sheet.setData({ visible: true });
+  sheet.onVisible(true);
+
+  sheet.onSheetTouchStart({ touches: [{ clientY: 100 }] });
+  sheet.onSheetTouchMove({ touches: [{ clientY: 310 }] });
+  assert.deepEqual([sheet.data.dragging, sheet.data.dragOffset], [true, 191]);
+  sheet.onSheetTouchEnd();
+  assert.deepEqual([sheet.data.dragging, sheet.data.dragOffset], [false, 0]);
+  assert.deepEqual(events, ['close']);
+
+  sheet.setData({ dirty: true });
+  sheet.onSheetTouchStart({ touches: [{ clientY: 100 }] });
+  sheet.onSheetTouchMove({ touches: [{ clientY: 220 }] });
+  sheet.onSheetTouchEnd();
+  assert.equal(rt.messages.length, 1);
+  assert.equal(events.length, 1);
+  rt.messages[0].success({ confirm: true });
+  assert.deepEqual(events, ['close', 'close']);
+
+  sheet.setData({ busy: true, dragOffset: 0, dragging: false });
+  sheet.onSheetTouchStart({ touches: [{ clientY: 100 }] });
+  sheet.onSheetTouchMove({ touches: [{ clientY: 240 }] });
+  assert.deepEqual([sheet.data.dragging, sheet.data.dragOffset], [false, 0]);
+});
