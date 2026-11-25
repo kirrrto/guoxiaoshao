@@ -2,7 +2,7 @@
 <view class="page tab-page desktop-split-page markets-page">
   <view wx:if="{{networkOffline}}" class="network-notice" aria-role="status">{{c.offline}}</view>
   <view class="page-heading">
-    <image class="page-mark" src="/images/brand/logo-mint-144.png" mode="aspectFit" aria-hidden="true" />
+    <image class="page-mark page-mark-glyph whistle-mark" src="/images/brand/whistle-green.png" mode="aspectFit" aria-hidden="true" />
     <view class="page-title">{{c.title}}</view>
   </view>
   <view wx:if="{{catalogError}}" class="card" aria-role="alert">

@@ -10,7 +10,7 @@
 
   <block wx:elif="{{!ready}}">
     <view class="page-heading brand-page-heading">
-      <image class="page-mark brand-page-logo" src="/images/brand/logo-mint-144.png" mode="aspectFit" aria-hidden="true" />
+      <image class="page-mark page-mark-glyph whistle-mark" src="/images/brand/whistle-green.png" mode="aspectFit" aria-hidden="true" />
       <view class="page-title">{{i18n.t(ui,'门店取货查询')}}</view>
       <button class="heading-notice-btn" hover-class="ui-control-pressed" bindtap="onOpenNoticeBoard" aria-label="{{i18n.t(ui,'查看公告')}}">
         <image class="heading-notice-icon" src="/images/ui/news.png" mode="aspectFit" aria-hidden="true" />
@@ -26,7 +26,7 @@
 
   <block wx:else>
     <view class="page-heading brand-page-heading">
-      <image class="page-mark brand-page-logo" src="/images/brand/logo-mint-144.png" mode="aspectFit" aria-hidden="true" />
+      <image class="page-mark page-mark-glyph whistle-mark" src="/images/brand/whistle-green.png" mode="aspectFit" aria-hidden="true" />
       <view class="page-title">{{i18n.t(ui,'门店取货查询')}}</view>
       <button class="heading-notice-btn" hover-class="ui-control-pressed" bindtap="onOpenNoticeBoard" aria-label="{{i18n.t(ui,'查看公告')}}">
         <image class="heading-notice-icon" src="/images/ui/news.png" mode="aspectFit" aria-hidden="true" />

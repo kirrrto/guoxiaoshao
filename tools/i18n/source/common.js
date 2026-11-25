@@ -1,4 +1,7 @@
 module.exports = {
+  '页头哨标': 'Whistle in page headers',
+  '「查询」和「其他站点」换上了「我的小哨」的绿色哨标。': 'Search and Regional stores now use the green whistle from Watches.',
+  '打开查询页时，加载画面也显示同一枚哨标。': 'The same whistle appears while Search is loading.',
   '套餐权益与提醒次数': 'Pass benefits and alert credits',
   '切换周卡、月卡或年卡，可直接比较关注名额和站点权益。': 'Switch between weekly, monthly and annual passes to compare watch limits and regional store access.',
   '刷新和增加次数时精简了成功提示。「其他站点」按美国、香港、台湾、日本排列。': 'Refreshing and adding credits now show fewer messages. Regional stores are listed in the order US, Hong Kong, Taiwan and Japan.',

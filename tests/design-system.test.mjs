@@ -167,6 +167,21 @@ test('window chrome matches the page surface in both themes', () => {
   assert.equal(list.length, 4, 'four native tabs');
 });
 
+test('query, follow and regional store headings use the same standalone whistle', () => {
+  for (const [page, count] of [['query', 2], ['follow', 1], ['markets', 1]]) {
+    const markup = read(`pages/${page}/index.wxml`);
+    const marks = [...markup.matchAll(/<view\b[^>]*class="[^"]*\bpage-heading\b[^"]*"[^>]*>\s*(<image\b[^>]*>)/g)];
+    assert.equal(marks.length, count, `${page}: every heading, including the query loading state, starts with a mark`);
+    for (const [, image] of marks) {
+      assert.match(image, /\bsrc="\/images\/brand\/whistle-green\.png"/);
+      const classes = image.match(/\bclass="([^"]+)"/)[1].split(/\s+/);
+      assert.ok(classes.includes('page-mark') && classes.includes('page-mark-glyph'), `${page}: use the unframed page mark`);
+      assert.match(image, /\bmode="aspectFit"/);
+      assert.match(image, /\baria-hidden="true"/);
+    }
+  }
+});
+
 test('templates use the shared vocabulary: no inline styles, glyph icons or retired classes', () => {
   for (const file of templates) {
     const source = read(file).replace(/<!--[\s\S]*?-->/g, '');

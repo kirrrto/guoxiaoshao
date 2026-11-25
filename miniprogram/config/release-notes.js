@@ -8,6 +8,15 @@
 // Keep technical details and complete acceptance records in release documents.
 const RELEASE_NOTES = [
   {
+    version: '3.9.3',
+    title: '页头哨标',
+    dateText: '版本记录 · 2026-11-25',
+    highlights: [
+      '「查询」和「其他站点」换上了「我的小哨」的绿色哨标。',
+      '打开查询页时，加载画面也显示同一枚哨标。',
+    ],
+  },
+  {
     version: '3.9.2',
     title: '套餐权益与提醒次数',
     dateText: '版本记录 · 2026-11-25',
