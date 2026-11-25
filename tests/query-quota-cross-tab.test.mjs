@@ -25,7 +25,7 @@ test('sign-in confirms the reward and shows the latest same-account quota when a
   await signing;
   assert.equal(page.data.boot.signedInToday, true);
   assert.equal(page.data.boot.balance, newer.quota.balance);
-  assert.equal(rt.messages.filter(value => value === '签到成功 +1 次').length, 1);
+  assert.equal(rt.messages.length, 0);
   assert.equal(rt.calls.filter(item => item.action === 'quota.signin').length, 1);
   page.onUnload();
 });
@@ -61,7 +61,7 @@ for (const kind of ['query', 'mine']) {
     await second;
     assert.equal(page.data.signing, false);
     assert.equal(store.currentQuota().balance, 1);
-    assert.equal(rt.messages.filter(item => item === '签到成功 +1 次').length, 1);
+    assert.equal(rt.messages.length, 0);
   });
   test(`${kind}: a cached page cannot dispatch sign-in after its verified account is cleared`, async () => {
     const f = createFixture(), base = ok(await f.call('user.bootstrap'));

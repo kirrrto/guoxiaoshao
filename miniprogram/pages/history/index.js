@@ -139,8 +139,6 @@ Page(require('../../utils/language').page('history', {
     querying: false,
     requestSlow: false,
     requestProgressText: '',
-    refreshing: false,
-    refreshMessage: '',
     result: null,
     restriction: null,
     queryFailureMessage: '',
@@ -256,9 +254,8 @@ Page(require('../../utils/language').page('history', {
   onPullDownRefresh() {
     if (this.pageRetired) return wx.stopPullDownRefresh();
     if (this.refreshPending) return this.refreshPending;
-    this.setData({ refreshing: true, refreshMessage: '' });
     this.refreshObservationSnapshot();
-    const pending = Promise.all([getBootstrap({ force: true }), getCatalog({ force: true })]).then(results => { if (this.pageRetired) return; this.applyBoot(results[0]); this.applyCatalog(results[1]); this.setData({ ready: true, loadError: null, refreshMessage: '页面已更新；查看新记录请点「查看历史」，按页面规则计次。' }); return this.loadBrowse({ force: true }); }).catch(error => { if (!this.pageRetired) showError(error); }).finally(() => { if (this.refreshPending === pending) this.refreshPending = null; if (!this.pageRetired) this.setData({ refreshing: false }); wx.stopPullDownRefresh(); });
+    const pending = Promise.all([getBootstrap({ force: true }), getCatalog({ force: true })]).then(results => { if (this.pageRetired) return; this.applyBoot(results[0]); this.applyCatalog(results[1]); this.setData({ ready: true, loadError: null }); return this.loadBrowse({ force: true }); }).catch(error => { if (!this.pageRetired) showError(error); }).finally(() => { if (this.refreshPending === pending) this.refreshPending = null; wx.stopPullDownRefresh(); });
     this.refreshPending = pending;
     return pending;
   },

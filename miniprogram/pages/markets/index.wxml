@@ -49,7 +49,7 @@
         </picker>
         <view wx:if="{{enabled || pending}}" class="market-actions">
           <text wx:if="{{launchNotice}}" class="market-meta">{{launchNotice}}</text>
-          <text wx:elif="{{accountReady && enabled}}" class="market-meta">{{costText}}</text>
+          <text wx:elif="{{accountReady && enabled}}" class="market-meta" aria-live="polite">{{costText}}</text>
           <button wx:if="{{(!launchNotice || pending) && !signinPrimary}}" class="btn btn-primary btn-block" disabled="{{!canQuery || networkOffline}}" loading="{{busyHere}}" hover-class="btn-primary-pressed" bindtap="onQuery">{{queryLabel}}</button>
           <button wx:if="{{showSignin}}" class="btn btn-block {{signinPrimary ? 'btn-primary' : ''}}" disabled="{{signing || busyHere || networkOffline}}" loading="{{signing}}" bindtap="onSignin">{{c.signin}}</button>
           <text wx:if="{{signinMessage}}" class="market-meta" aria-live="polite">{{signinMessage}}</text>
@@ -66,7 +66,7 @@
           <view wx:if="{{watchService}}" class="market-meta mt" aria-live="polite">{{watchService}}</view>
           <button wx:if="{{membershipLink}}" class="ui-action mt" bindtap="onViewMembership">{{w.memberAction}}</button>
           <view wx:if="{{targetWatch}}" class="market-meta mt">{{w.notifyLanguage}} · {{targetLanguage}}</view>
-          <view wx:if="{{creditText}}" class="market-meta">{{creditText}}</view>
+          <view wx:if="{{creditText}}" class="market-meta" aria-live="polite">{{creditText}}</view>
           <button wx:if="{{alertTemplate}}" class="btn btn-block mt" disabled="{{watchBusy || networkOffline}}" bindtap="onAuthorize">{{w.grant}}</button>
           <button wx:if="{{allowSettings}}" class="btn btn-block mt" bindtap="onOpenSettings">{{w.settings}}</button>
         </block>

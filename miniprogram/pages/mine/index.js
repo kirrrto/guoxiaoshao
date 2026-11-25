@@ -47,13 +47,16 @@ function presentMemberProduct(item) {
   const promotion = item.promotion || {};
   const discounted = promotion.active === true && Number.isSafeInteger(item.standardPriceFen)
     && item.standardPriceFen > item.priceFen;
+  const benefitText = productBenefit(item);
+  const includesOtherSites = ['member_30d', 'member_365d'].includes(item.planId);
+  const watchScope = includesOtherSites ? '其他站点可查阅' : '可关注中国大陆门店';
   return { ...item, priceText: fmt.fen(item.priceFen), standardPriceText: discounted ? fmt.fen(item.standardPriceFen) : '',
     promotionText: discounted ? '优惠价' : '',
     recommendedText: item.planId === 'member_30d' ? '推荐' : '',
     dailyPriceText: `约 ¥${(item.priceFen / item.days / 100).toFixed(2)} / 天`,
-    benefitText: productBenefit(item),
-    benefitShort: `${item.limits && item.limits.maxFollows || 3} 配置 × ${item.limits && item.limits.maxStoresPerFollow || 3} 门店`,
-    watchScope: ['member_30d', 'member_365d'].includes(item.planId) ? '可查询和关注大陆、日本、台湾、香港和美国门店' : '可关注中国大陆门店',
+    benefitText, includesOtherSites,
+    coreBenefits: [benefitText, '库存查询不扣次，含开售 30 天内新品', watchScope],
+    benefitShort: productBenefit(item, true),
     nameText: ({ member_7d: '周卡', member_30d: '月卡', member_365d: '年卡' })[item.planId] || '会员',
     durationText: `${item.days} 天`,
     available: paymentAvailability(item, wx).ready };
@@ -245,6 +248,7 @@ Page(require('../../utils/language').page('mine', {
     paymentPendingId: '',
     paymentOrderSummary: '',
     selectedPlanId: 'member_7d',
+    membershipOverviewBenefits: ['库存查询不扣次数', '可授权接收取货变化提醒', '新品开售 30 天内实时查询'],
     paymentConfirming: false,
     paymentCanRetry: false,
     paymentMessage: '',
@@ -1236,7 +1240,7 @@ Page(require('../../utils/language').page('mine', {
       const data = await call('quota.signin', { expectedUserKey: owner });
       if (!this.isCurrentSession(session) || owner !== currentQuotaOwner()) return;
       if (invalidateBootstrap(owner) === false) return;
-      if (data.granted > 0) { confirmTap(); toast(`签到成功 +${data.granted} 次`, 'success'); }
+      if (data.granted > 0) confirmTap();
       else if (data.reason === 'already_signed_in') toast('今天已签到');
       else if (data.reason === 'daily_cap_reached') toast('今日获取次数已达上限');
       else if (data.reason === 'balance_cap_reached') toast(`余额已达上限 ${data.quota.balanceCap} 次`);

@@ -123,7 +123,8 @@
 .membership-package-name-line { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2) var(--sp-8); min-width: 0; }
 .membership-package-name { font-size: var(--fs-headline); font-weight: 600; }
 .membership-package-duration, .membership-package-benefit { color: var(--text-2); font-size: var(--fs-sub); }
-.membership-package-scope { grid-column: 2 / -1; }
+.checkout-plan-summary { display: flex; flex-direction: column; gap: var(--sp-4); margin: 0 0 var(--sp-12); color: var(--text-2); font-size: var(--fs-sub); }
+.checkout-plan-summary .bold { margin-bottom: var(--sp-2); color: var(--text); font-size: var(--fs-body); }
 .membership-recommended-tag { padding: 0 var(--sp-8); border-radius: var(--radius-pill); background: var(--green-soft); color: var(--green-text); font-size: var(--fs-caption); font-weight: 600; line-height: var(--lh-normal); }
 .membership-package-pricing { display: flex; flex-direction: column; align-items: flex-end; gap: var(--sp-2); min-width: 0; }
 .membership-package-price { font-size: var(--fs-headline); font-weight: 600; white-space: nowrap; }

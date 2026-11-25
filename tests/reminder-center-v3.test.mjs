@@ -280,7 +280,7 @@ test('direct authorization shows a retryable sync failure in place and retry reu
   }
 });
 
-test('a direct native result arriving before onShow remains visible after return and starts its feedback timeout then', async () => {
+test('a direct result before onShow updates balances quietly and only unsuccessful choices start a feedback timeout on return', async () => {
   for (const target of ['mine', 'follow']) {
     for (const accepted of [true, false]) {
       const native = deferred();
@@ -291,19 +291,19 @@ test('a direct native result arriving before onShow remains visible after return
       await page.onSubscribe(); assert.equal(s.prompts(), 1, 'a hidden page cannot start a native request');
       native.resolve({ RESTOCK: accepted ? 'accept' : 'reject', SOLDOUT: accepted ? 'accept' : 'reject' });
       await authorizing; await settle();
-      assert.match(page.data.authorizationFeedback, accepted ? /微信已允许/ : /未授权/);
+      assert.equal(page.data.authorizationFeedback, accepted ? '' : '到货未授权，断货未授权');
       assert.equal(page.authorizationFeedbackTimer, null, 'feedback must not expire before the page returns');
       await page.onShow();
       assert.equal(s.rt.calls.filter(call => call.action === 'user.bootstrap').length, target === 'follow' ? 1 : 0);
       assert.equal(s.rt.calls.filter(call => call.action === 'follow.list').length, target === 'follow' ? 1 : 0);
       assert.equal(s.rt.calls.some(call => call.action === 'query.pickup'), false, 'returning from authorization only reads existing records');
-      assert.match(page.data.authorizationFeedback, accepted ? /微信已允许/ : /未授权/);
+      assert.equal(page.data.authorizationFeedback, accepted ? '' : '到货未授权，断货未授权');
       const timer = s.rt.timers.get(page.authorizationFeedbackTimer);
-      assert.ok(timer);
+      assert.equal(Boolean(timer), !accepted);
       assert.equal(page.data.authorizationOpen, false);
       assert.equal(s.tabbar.hidden, false);
       assert.equal(page.data.subscription.credits, accepted ? 6 : 5);
-      s.rt.timers.delete(page.authorizationFeedbackTimer); timer.fn();
+      if (timer) { s.rt.timers.delete(page.authorizationFeedbackTimer); timer.fn(); }
       assert.equal(page.data.authorizationFeedback, '');
     }
   }

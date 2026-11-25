@@ -42,7 +42,6 @@
 .follow-inventory-status { display: flex; flex-direction: column; gap: var(--sp-2); margin-bottom: var(--sp-12); color: var(--text-2); font-size: var(--fs-sub); }
 .follow-inventory-status .bold { color: var(--text); }
 .follow-inventory-status--warn .bold { color: var(--warn); }
-.follow-refresh-feedback { margin-bottom: var(--sp-12); color: var(--text-2); font-size: var(--fs-sub); overflow-wrap: anywhere; }
 
 /* 需要处理的提醒授权排在关注列表前，日常状态排在后。 */
 .follow-content { display: flex; flex-direction: column; }

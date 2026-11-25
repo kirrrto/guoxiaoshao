@@ -1,6 +1,6 @@
 const languageUI = require('./language');
 const { subscribeSubscriptions } = require('./store');
-const { restockSubscription, soldoutSubscription, canRemind } = require('./reminder-readiness');
+const { restockSubscription, soldoutSubscription, canRemind, authorizationIssue } = require('./reminder-readiness');
 const { getAuthorizationState, subscribeAuthorizationState, requestReminderAuthorization, syncPendingAuthorization, whenAuthorizationReady, consentLockState, refreshConsentSetting, refreshConsentSettingAsync, showConsentSettingsGuide, buildConsentReport, openSubscribeSettings, getConsentSetting } = require('./reminder-credits');
 const { confirmTap } = require('./haptic');
 const { toast } = require('./api');
@@ -170,12 +170,8 @@ const reminderPanelMethods = {
     // persistence and server reconciliation continue in the shared queue.
     return requestReminderAuthorization(tmplIds, { deferSync: true }).then(result => {
       if (!currentAction(this, owner, epoch)) return;
-      const accepted = result.accepted || [], filtered = result.filtered || [];
-      const outcome = (label, id) => accepted.includes(id) ? label + ' +1' : filtered.includes(id) ? label + '模板被过滤' : result.results && result.results[id] === 'ban' ? label + '授权已关闭' : label + '未授权';
-      let feedback;
-      if (!Object.keys(result.results || {}).length) feedback = filtered.length ? '提醒模板被微信过滤，已有次数保留' : '本次未授权，已有次数保留';
-      else if (this.data.boot.soldoutId) feedback = (accepted.length ? '微信已允许：' : '') + outcome('到货', tmplIds[0]) + '，' + outcome('断货', this.data.boot.soldoutId);
-      else feedback = accepted.length ? '微信已允许到货 +1，可继续点击增加' : result.results[tmplIds[0]] === 'ban' ? '微信授权已关闭，本次未增加' : '本次未授权，次数未增加';
+      const accepted = result.accepted || [];
+      const feedback = authorizationIssue(result, tmplIds[0], this.data.boot.soldoutId);
       const decided = Object.values(result.results || {});
       const silentReject = decided.length > 0 && decided.every(value => value === 'reject' || value === 'ban');
       const finishFeedback = () => {

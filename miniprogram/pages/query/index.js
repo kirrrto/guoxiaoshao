@@ -163,7 +163,6 @@ Page(require('../../utils/language').page('query', {
     requestSlow: false,
     requestProgressText: '',
     refreshing: false,
-    refreshMessage: '',
     sharedTargetSource: '',
     result: null,
     resultIsCache: false,
@@ -441,11 +440,11 @@ Page(require('../../utils/language').page('query', {
   onPullDownRefresh() {
     if (this.pageRetired) return wx.stopPullDownRefresh();
     if (this.refreshPending) return this.refreshPending;
-    this.setData({ refreshing: true, refreshMessage: '' });
+    this.setData({ refreshing: true });
     this.beginAccountVerification();
     this.refreshQuerySnapshot();
     const pending = Promise.all([getBootstrap({ force: true }), getCatalog({ force: true })])
-      .then(results => { if (this.pageRetired) return; this.applyBoot(results[0]); this.applyCatalog(results[1]); this.setData({ ready: true, loadError: null, refreshMessage: '页面已更新；确认最新库存请点「立即查询」。' }); this.startFollowPolling({ skipInitialActions: true }); })
+      .then(results => { if (this.pageRetired) return; this.applyBoot(results[0]); this.applyCatalog(results[1]); this.setData({ ready: true, loadError: null }); this.startFollowPolling({ skipInitialActions: true }); })
       .catch(error => { if (!this.pageRetired) { this.setData({ accountError: '账户连接失败，库存权限尚未核验，请重试。' }); showError(error); } })
       .finally(() => { if (this.refreshPending === pending) this.refreshPending = null; if (!this.pageRetired) this.setData({ refreshing: false }); wx.stopPullDownRefresh(); });
     this.refreshPending = pending;
@@ -846,7 +845,7 @@ Page(require('../../utils/language').page('query', {
         this.applyQuota(newer);
       }
       if (this.pageRetired) return;
-      if (result.granted > 0) { confirmTap(); toast(`签到成功 +${result.granted} 次`, 'success'); }
+      if (result.granted > 0) confirmTap();
       else if (result.reason === 'already_signed_in') toast('今天已签到');
       else if (result.reason === 'daily_cap_reached') toast('今日获取次数已达上限');
       else if (result.reason === 'balance_cap_reached') toast('查询次数已达余额上限');

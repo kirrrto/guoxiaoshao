@@ -1,4 +1,7 @@
 module.exports = {
+  '套餐权益与提醒次数': 'Pass benefits and alert credits',
+  '切换周卡、月卡或年卡，可直接比较关注名额和站点权益。': 'Switch between weekly, monthly and annual passes to compare watch limits and regional store access.',
+  '刷新和增加次数时精简了成功提示。「其他站点」按美国、香港、台湾、日本排列。': 'Refreshing and adding credits now show fewer messages. Regional stores are listed in the order US, Hong Kong, Taiwan and Japan.',
   '门店选择与查询日期': 'Store selection and search dates',
   '在美国站再次确认同一州，会保留已选门店。新品免费查询按门店当地日期开放。': 'Confirming the same US state keeps your selected store. Free searches for new products open on the store’s local date.',
   '下拉手势被系统打断时，抽屉会回弹，已选内容会保留。': 'If the system interrupts a downward swipe, the sheet springs back with your selection intact.',

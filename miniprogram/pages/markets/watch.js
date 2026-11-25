@@ -1,6 +1,6 @@
 const languageUI = require('../../utils/language');
 const { call } = require('../../utils/api');
-const { getBootstrap, invalidateFollows, trackFollowCountWrite } = require('../../utils/store');
+const { invalidateFollows, trackFollowCountWrite } = require('../../utils/store');
 const { requestReminderAuthorization, templateConsent, openSubscribeSettings } = require('../../utils/reminder-credits');
 const { switchToTab } = require('../../utils/tab-bar');
 const { isNavigating } = require('../../utils/navigation');
@@ -21,7 +21,7 @@ const WORDS = {
     unavailable: '暂时无法更改关注，请刷新后确认。', listError: '暂时无法读取关注，请刷新重试。',
     limit: '关注名额已满，请先取消一条关注。', storesLimit: '此配置已达门店上限。', refreshing: '刷新关注', disabled: '此配置暂不支持关注',
     grant: '授权到货提醒', settings: '前往微信设置', blocked: '微信提醒权限已关闭',
-    accept: '微信授权已记录', declined: '本次未新增提醒次数', grantError: '授权未确认，请稍后重试。',
+    declined: '本次未新增提醒次数', grantError: '授权未确认，请稍后重试。',
     selected: '所选配置', uses: '到货提醒次数 {n}', notificationsOff: '账户提醒已关闭',
     notice: '到货提醒', alertMissing: '这条提醒暂时无法查看。', en: '英语', zh: '简体中文', notifyLanguage: '提醒语言',
   },
@@ -39,7 +39,7 @@ const WORDS = {
     unavailable: 'Could not confirm the change. Refresh your watches.', listError: 'Could not load your watches. Try again.',
     limit: 'Your watch list is full. Remove a watch to make room.', storesLimit: 'The store limit for this configuration is reached.', refreshing: 'Refresh watches', disabled: 'Watching is unavailable for this configuration.',
     grant: 'Allow pickup alerts', settings: 'Open WeChat settings', blocked: 'WeChat alert permission is turned off.',
-    accept: 'WeChat permission recorded', declined: 'No alert credits added', grantError: 'Could not confirm permission. Try again later.',
+    declined: 'No alert credits added', grantError: 'Could not confirm permission. Try again later.',
     selected: 'Selected configuration', uses: 'Pickup alert credits: {n}', notificationsOff: 'Account alerts are turned off.',
     notice: 'Pickup alert', alertMissing: 'This alert is unavailable.', en: 'English', zh: 'Simplified Chinese', notifyLanguage: 'Alert language',
   },
@@ -251,11 +251,11 @@ const methods = {
       const result = await requestReminderAuthorization([id]);
       if (this.isAccount(owner) && !this.pageRetired && this.scope === scope) {
         const granted = (result && result.accepted || []).includes(id);
-        this.watchMessage = granted ? 'accept' : 'declined';
+        this.watchMessage = granted ? '' : 'declined';
         if (granted) confirmTap();
       }
-      const boot = await getBootstrap({ force: true });
-      if (boot.identity?.userKey === owner && this.isAccount(owner) && !this.pageRetired) this.boot = boot;
+      const boot = getApp().globalData.bootstrap;
+      if (boot?.identity?.userKey === owner && this.isAccount(owner) && !this.pageRetired) this.boot = boot;
     } catch (_) { if (this.isAccount(owner) && this.scope === scope && !this.pageRetired) this.watchMessage = 'grantError'; }
     finally { if (this.watchToken === token) this.watchToken = null; this.paint(); }
   },

@@ -80,7 +80,7 @@ test('refresh status is single flight and never opens a permission prompt or sto
   assert.equal(page.data.refreshing, false); assert.equal(prompts, 0);
   assert.equal(rt.calls.filter(call => call.action === 'user.bootstrap').length, 1);
   assert.equal(rt.calls.some(call => call.action === 'query.pickup'), false);
-  assert.match(page.data.refreshFeedback, /状态已刷新/);
+  assert.equal(rt.messages.length, 0);
 });
 
 test('a previous account refresh cannot claim delivery status has refreshed for the next account', async () => {
@@ -90,6 +90,6 @@ test('a previous account refresh cannot claim delivery status has refreshed for 
   for (let i = 0; i < 15; i++) await Promise.resolve();
   page.applyBoot(boot({ identity: { userKey: 'consumer:other' } }));
   d.resolve({ follows: [], limits: boot().limits }); await pending;
-  assert.equal(page.data.refreshFeedback, ''); assert.equal(page.data.refreshing, false);
+  assert.equal(page.data.refreshing, false);
   assert.equal(page.data.followsLoaded, false);
 });

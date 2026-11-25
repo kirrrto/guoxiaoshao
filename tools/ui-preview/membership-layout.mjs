@@ -62,6 +62,16 @@ export function inspectMembershipLayout(expected = null) {
       for (const action of actions) if (bounds(action).height < 43.5) errors.push('Purchase entry is shorter than a 44px touch target');
     }
     if (!visible(membership)) errors.push('Membership section is missing');
+    if (expected.selectedOffer) {
+      const summary = membership?.querySelector('.member-vip-offer, .checkout-plan-summary');
+      const title = summary?.querySelector('.member-pass-title, .bold')?.textContent.trim();
+      const benefits = summary?.classList.contains('member-vip-offer')
+        ? [...summary.querySelectorAll('.member-pass-benefit')] : [...(summary?.children || [])].slice(1);
+      if (title !== expected.selectedOffer.title || benefits.some(item => !visible(item))
+        || JSON.stringify(benefits.map(item => item.textContent.trim())) !== JSON.stringify(expected.selectedOffer.benefits)) {
+        errors.push('The offer must show the selected plan title and its three benefits');
+      }
+    }
 
     // Identity row: brand mark, status and the copyable account id.
     if (expected.accountHeader) {

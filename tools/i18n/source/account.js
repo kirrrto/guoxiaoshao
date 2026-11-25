@@ -2,6 +2,11 @@
 
 // Keep {0}, {1}, … aligned with the original order of values.
 module.exports = {
+  '其他站点可查阅': 'Check stock in other regions',
+  '查看其他站点': 'View regional stores',
+  '{0}权益': '{0} benefits',
+  '库存查询不扣次，含开售 30 天内新品': 'Credit-free searches, including the first 30 days after launch',
+  '可保存其他站点的关注，与大陆共用名额。站点开放监测后自动检查，微信到货提醒需另行授权。': 'Watches in other regions share your mainland watch limit. Checks start when monitoring opens in that region. WeChat restock alerts need separate permission.',
   // Membership and account controls
   '会员': 'Membership',
   '这笔订单已付款。': 'This order has been paid.',

@@ -110,6 +110,21 @@ function reminderReadiness({ boot, follows = [], followsLoaded = false, collecto
   return { ...state('ready', '已准备接收补货提醒', `剩余 ${subscription.credits} 次提醒，每次消耗 1 次。${boost}实际横幅与提示音随微信及手机设置。`, 'subscribe', '增加提醒次数', 'ok'), ready: true };
 }
 
+// Confirmed totals carry successful grants. Only an ungranted choice needs an explanation.
+function authorizationIssue(result, restockId, soldoutId) {
+  if (result.replayed) return '已有授权已同步，未重复增加次数';
+  const decisions = result.results || {}, filtered = result.filtered || [];
+  if (!Object.keys(decisions).length) return filtered.length ? '提醒模板被微信过滤，已有次数保留' : '本次未授权，已有次数保留';
+  const issues = [];
+  for (const [id, label] of [[restockId, '到货'], [soldoutId, '断货']]) {
+    if (!id || decisions[id] === 'accept') continue;
+    if (filtered.includes(id)) issues.push(label + '模板被过滤');
+    else if (decisions[id] === 'ban') issues.push(label + '授权已关闭');
+    else issues.push(label + '未授权');
+  }
+  return issues.join('，');
+}
+
 function notificationAdvice(notification) {
   if (notification.status === 'uncertain') return { action: 'uncertain', actionLabel: '查看结果说明' };
   if (!['failed', 'skipped'].includes(notification.status)) return { action: '', actionLabel: '' };
@@ -123,4 +138,4 @@ function notificationAdvice(notification) {
   return { action: 'service', actionLabel: '查看提醒体检' };
 }
 
-module.exports = { LOW_CREDITS, RECOMMENDED_CREDITS, creditBoostTip, restockSubscription, soldoutSubscription, activeDnd, canRemind, reminderReadiness, notificationAdvice };
+module.exports = { LOW_CREDITS, RECOMMENDED_CREDITS, creditBoostTip, restockSubscription, soldoutSubscription, activeDnd, canRemind, reminderReadiness, notificationAdvice, authorizationIssue };

@@ -262,7 +262,6 @@ view, text, button, input, textarea, image, scroll-view, picker { box-sizing: bo
 .network-notice { margin-bottom: var(--sp-12); padding: var(--sp-8) var(--sp-16); border-radius: var(--radius-control); background: var(--warn-soft); color: var(--warn); font-size: var(--fs-sub); }
 .stale-note { color: var(--warn); }
 /* 请求进度贴近触发它的操作；连接慢时转为警示色。 */
-.refresh-feedback { margin-bottom: var(--sp-8); color: var(--text-2); font-size: var(--fs-sub); }
 .request-progress { margin-top: var(--sp-8); color: var(--text-2); font-size: var(--fs-sub); text-align: center; }
 .request-progress--slow { color: var(--warn); }
 

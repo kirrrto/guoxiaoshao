@@ -78,7 +78,7 @@ test('an entry displays a custom prompt and invokes WeChat only synchronously fr
   assert.equal(component.data.open, false);
   assert.equal(component.data.submitting, false);
   assert.equal(rt.app.globalData.bootstrap.subscriptions.R.credits, 2);
-  assert.match(rt.messages.at(-1), /到货 \+1，断货 \+1/);
+  assert.equal(rt.messages.length, 0);
   component.lifetimes.detached.call(component);
 });
 

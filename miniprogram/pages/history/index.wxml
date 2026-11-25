@@ -18,7 +18,6 @@
   </block>
 
   <block wx:else>
-    <view wx:if="{{refreshing || refreshMessage}}" class="refresh-feedback" aria-role="status">{{i18n.t(ui,(refreshing ? '正在更新账户与页面…' : refreshMessage))}}</view>
     <view wx:if="{{!accountReady}}" class="banner banner-info">{{i18n.t(ui,(accountError || '正在连接微信账户，你可以先选择查询条件。'))}}<button wx:if="{{accountError}}" class="btn btn-sm mt" bindtap="onRetryAccount">{{i18n.t(ui,'重试账户连接')}}</button></view>
     <view class="page-heading history-heading"><view class="page-title">{{i18n.t(ui,'供应历史')}}</view><button class="ui-action ui-action--plain history-explain" hover-class="ui-control-pressed" bindtap="onExplain"><text class="ui-action-label">{{i18n.t(ui,'数据说明')}}</text></button></view>
 

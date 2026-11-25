@@ -77,8 +77,8 @@ test('only monthly and annual offers include regional watches, and only entitled
   const destinations = [];
   rt.wx.switchTab = options => { destinations.push(options.url); options.success?.({}); options.complete?.({}); };
   page.applyBoot(boot);
-  assert.deepEqual(Array.from(page.data.boot.memberProducts, p => [p.nameText, p.watchScope]), [
-    ['周卡', '可关注中国大陆门店'], ['月卡', '可查询和关注大陆、日本、台湾、香港和美国门店'], ['年卡', '可查询和关注大陆、日本、台湾、香港和美国门店'],
+  assert.deepEqual(Array.from(page.data.boot.memberProducts, p => [p.nameText, p.includesOtherSites, p.coreBenefits[2]]), [
+    ['周卡', false, '可关注中国大陆门店'], ['月卡', true, '其他站点可查阅'], ['年卡', true, '其他站点可查阅'],
   ]);
   page.onOpenRegionalWatches();
   for (const planId of ['member_30d', 'member_365d']) {
@@ -90,6 +90,26 @@ test('only monthly and annual offers include regional watches, and only entitled
   }
   assert.deepEqual(destinations, ['/pages/markets/index', '/pages/markets/index']);
   assert.equal(rt.calls.length, 0);
+});
+
+test('choosing a plan updates its three benefit lines without changing current entitlements or reading the network', () => {
+  for (const active of [false, true]) {
+    const { page, boot, rt } = account(active);
+    boot.memberProducts = products.map((product, i) => ({ ...product, limits: { maxFollows: 3 + i, maxStoresPerFollow: 3 + i } }));
+    boot.limits = { maxFollows: 3, maxStoresPerFollow: 3 };
+    page.applyBoot(boot);
+    page.onOpenMembershipRenew();
+    for (const i of [2, 1, 0]) {
+      page.onSelectMemberProduct({ currentTarget: { dataset: { planId: products[i].planId } } });
+      assert.equal(page.data.boot.memberProduct.nameText, ['周卡', '月卡', '年卡'][i]);
+      assert.deepEqual(Array.from(page.data.boot.memberProduct.coreBenefits), [
+        `${3 + i} 个配置 · 每配置 ${3 + i} 家门店`, '库存查询不扣次，含开售 30 天内新品', i ? '其他站点可查阅' : '可关注中国大陆门店',
+      ]);
+      assert.equal(page.data.boot.limits.maxFollows, 3);
+      assert.equal(page.data.membership.active, active);
+    }
+    assert.equal(rt.calls.length, 0);
+  }
 });
 
 test('each plan row shows its own advertised allowance while the current account keeps its own actual limit', () => {
@@ -108,9 +128,14 @@ test('each plan row shows its own advertised allowance while the current account
 });
 
 test('legacy product snapshots never advertise enhanced slots based only on a long duration', () => {
-  const { page } = account();
+  const { page, boot } = account();
   assert.deepEqual(JSON.parse(JSON.stringify(page.data.boot.memberProducts.map(product => product.benefitShort))),
     ['3 配置 × 3 门店', '3 配置 × 3 门店', '3 配置 × 3 门店']);
+  boot.memberProducts = products.map(p => p.planId === 'member_365d' ? { ...p, limits: { maxFollows: 99, maxStoresPerFollow: -1 } } : p);
+  page.applyBoot(boot);
+  const annual = page.data.boot.memberProducts[2];
+  assert.equal(annual.benefitShort, '3 配置 × 3 门店');
+  assert.equal(annual.coreBenefits[0], '3 个配置 · 每配置 3 家门店');
 });
 
 test('annual products advertise five configurations by five stores and current plan shows its actual expiry', () => {

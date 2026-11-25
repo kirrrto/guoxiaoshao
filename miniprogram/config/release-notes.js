@@ -8,6 +8,15 @@
 // Keep technical details and complete acceptance records in release documents.
 const RELEASE_NOTES = [
   {
+    version: '3.9.2',
+    title: '套餐权益与提醒次数',
+    dateText: '版本记录 · 2026-11-25',
+    highlights: [
+      '切换周卡、月卡或年卡，可直接比较关注名额和站点权益。',
+      '刷新和增加次数时精简了成功提示。「其他站点」按美国、香港、台湾、日本排列。',
+    ],
+  },
+  {
     version: '3.9.1',
     title: '门店选择与查询日期',
     dateText: '版本记录 · 2026-11-25',

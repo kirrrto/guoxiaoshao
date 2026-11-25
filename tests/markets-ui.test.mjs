@@ -34,7 +34,8 @@ function receipt(p, overrides = {}) {
 
 test('regional page loads directory on demand and maps model/finish/storage/store to exact local SKU', async () => {
   const { page, rt } = await setup();
-  assert.deepEqual(Array.from(page.data.sites, s => s.code), ['JP','TW','HK','US']);
+  assert.deepEqual(Array.from(page.data.sites, s => s.code), ['US','HK','TW','JP']);
+  assert.equal(page.data.market, 'US');
   assert.ok(page.data.models.includes('iPhone 18 Pro') && page.data.models.includes('iPhone 18 Pro Max'));
   assert.equal(rt.calls.find(call => call.action === 'market.catalog').payload.format, 'compact-v1');
   page.onMarket(tap({ market: 'TW' }));
@@ -56,12 +57,28 @@ test('regional page loads directory on demand and maps model/finish/storage/stor
   rt.load('utils/language.js').setLanguage('en'); assert.equal(page.data.receipt.status, 'Available for pickup');
   assert.equal(rt.storage.get('gxs_markets_region_v1'), 'TW');
   assert.equal(rt.storage.get('gxs_ui_language_v1'), 'en');
+  page.onUnload();
+  const returning = rt.instance('pages/markets/index.js');
+  returning.onLoad(); await returning.onShow();
+  assert.equal(returning.data.market, 'TW');
+  assert.deepEqual(Array.from(returning.data.sites, s => s.label), ['US','Hong Kong','Taiwan','Japan']);
+  returning.onUnload();
+  const linkedSite = MARKETS.find(s => s.code === 'JP');
+  const linked = rt.instance('pages/markets/index.js');
+  linked.onLoad({ market: 'JP', partNumber: linkedSite.products[0].partNumber, storeNumber: linkedSite.stores.at(-1).storeNumber });
+  await linked.onShow();
+  assert.equal(linked.data.market, 'JP');
+  assert.equal(linked.store, linkedSite.stores.at(-1).storeNumber);
+  assert.equal(rt.storage.get('gxs_markets_region_v1'), 'TW');
+  assert.equal(rt.calls.filter(c => c.action === 'market.pickup').length, 1);
+  linked.onUnload();
 });
 
 test('changing region and returning while waiting suppresses older receipts; does not spend twice', async () => {
   const q = deferred(), { page, rt } = await setup({ 'market.pickup': async p => { await q.promise; return receipt(p); } });
+  const original = page.data.market;
   const call = page.onQuery(); await page.onQuery();
-  page.onMarket(tap({ market: 'HK' })); page.onMarket(tap({ market: 'JP' }));
+  page.onMarket(tap({ market: 'HK' })); page.onMarket(tap({ market: original }));
   q.resolve(); await call;
   assert.equal(page.data.receipt, null);
   assert.equal(rt.calls.filter(c => c.action === 'market.pickup').length, 1);
@@ -100,9 +117,10 @@ test('uncertain request retains its ID across markets and can settle after rollo
     if (first) { first = false; throw Object.assign(Error(), { code: 'call_failed' }); }
     return receipt(p, { charged: 1, refunded: 1, replayed: true });
   } }, {}, { member: false, memberQueryAvailable: true });
+  const original = page.data.market;
   await page.onQuery();
   assert.equal(page.data.queryLabel, '核对上次查询');
-  page.onMarket(tap({ market: 'TW' })); page.onMarket(tap({ market: 'JP' }));
+  page.onMarket(tap({ market: 'TW' })); page.onMarket(tap({ market: original }));
   state.enabled = false; await page.onPullDownRefresh();
   assert.equal(page.data.enabled, false); assert.ok(page.data.canQuery);
   assert.equal(page.data.queryPassRequired, false, 'a pending receipt can be recovered even after public access closes');
@@ -356,7 +374,7 @@ test('notification destination uses only authorized exact detail and never queri
 
 test('English watches request only English when that template and sender are ready', async () => {
   const { page, state, handlers, rt } = await setup({
-    'notify.recordSubscription': p => ({ accepted:Object.keys(p.results).filter(id=>p.results[id]==='accept'), subscriptions:{enId:{credits:1}} }),
+    'notify.recordSubscription': p => ({ accepted:Object.keys(p.results).filter(id=>p.results[id]==='accept'), subscriptions:{enId:{credits:3}} }),
   });
   const baseCatalog=handlers['market.catalog'], baseBoot=handlers['user.bootstrap'];
   handlers['market.catalog'] = () => ({markets:baseCatalog().markets.map(m=>({...m,notificationsEnabledEn:true}))});
@@ -366,13 +384,16 @@ test('English watches request only English when that template and sender are rea
     boot.subscriptions={enId:{credits:2},chinese:{credits:33}};
     return boot;
   };
-  state.rows=[{followId:'watch-en',market:'JP',partNumber:page.part,storeNumbers:[page.store],language:'en',status:'active'}];
+  state.rows=[{followId:'watch-en',market:page.data.market,partNumber:page.part,storeNumbers:[page.store],language:'en',status:'active'}];
   await page.onPullDownRefresh(); assert.equal(page.data.alertTemplate,'enId'); assert.match(page.data.creditText,/2$/);
   const requests=[];
   rt.wx.requestSubscribeMessage = ({tmplIds, success}) => {requests.push(Array.from(tmplIds));success({[tmplIds[0]]:'accept'});};
+  const accountReads = rt.calls.filter(c => c.action === 'user.bootstrap').length;
   await page.onAuthorize();
+  assert.equal(rt.calls.filter(c => c.action === 'user.bootstrap').length, accountReads);
+  assert.match(page.data.creditText, /3$/);
   assert.deepEqual(requests,[['enId']]);
-  assert.equal(page.data.watchMessage,'微信授权已记录');
+  assert.equal(page.data.watchMessage,'');
   assert.deepEqual(Object.keys(rt.calls.find(c=>c.action==='notify.recordSubscription').payload.results),['enId']);
 });
 
@@ -606,15 +627,16 @@ test('regional check-in uses the shared daily quota, renders the account-confirm
   assert.equal(rt.calls.filter(c=>c.action==='quota.signin').length,1);
   assert.equal(rt.calls.filter(c=>c.action==='market.pickup').length,0);
   wait.resolve();await a;
-  assert.equal(page.data.signinMessage,'签到成功，增加 1 次查询');assert.equal(page.data.canQuery,true);
+  assert.equal(page.data.signinMessage,'今天已签到');assert.equal(page.data.canQuery,true);
   assert.equal(page.data.showSignin,false);assert.equal(page.data.maxCost,1);
   assert.equal(rt.app.globalData.bootstrap.quota.balance,1);
-  rt.load('utils/language.js').setLanguage('en');assert.equal(page.data.signinMessage,'Checked in · Credits added: 1');
+  rt.load('utils/language.js').setLanguage('en');assert.equal(page.data.signinMessage,'Already checked in today');
   await page.onQuery();assert.equal(rt.calls.find(c=>c.action==='market.pickup').payload.maxCost,1);
 });
 
 test('a weekly member can check a launch but can only pause or delete a previously saved regional watch', async () => {
   const {page,state,handlers,rt}=await setup({}, {}, { planId:'member_7d', memberQueryAvailable:true });
+  page.onMarket(tap({market:'JP'}));
   const fixture=handlers['market.catalog'];
   handlers['market.catalog']=()=>({markets:fixture().markets.map(m=>({...m,products:m.products.map(p=>({...p, freeQueryStartsAt:'2099-12-01T15:00:00Z'}))}))});
   const query=page.payload(); state.rows=[{...query, followId:'old',status:'plan_required',savedStatus:'paused'}];
@@ -787,6 +809,7 @@ test('a region with different or ambiguous Mac options retains the model or cate
     {...hk,products:[row('H1','Mac Studio · 32GB memory',{model:'Mac Studio'})]},
   ].map(site=>({...site,enabled:true,monitorEnabled:true}));
   const {page,rt}=await setup({'market.catalog':()=>({markets})});
+  page.onMarket(tap({market:'JP'}));
   page.onMarket(tap({market:'TW'}));
   assert.equal(page.part,'T1');assert.equal(page.data.product.model,'Mac mini');assert.ok(page.data.selectionNotice);
   rt.load('utils/language.js').setLanguage('en');assert.match(page.data.selectionNotice,/local configuration/);

@@ -5,7 +5,7 @@
 .reminder-balance-label, .reminder-balance-pending { color: var(--text-2); font-size: var(--fs-sub); overflow-wrap: anywhere; }
 .reminder-balance-value { font-size: var(--fs-title); font-weight: 600; line-height: var(--lh-tight); }
 
-.authorization-feedback { margin-top: var(--sp-12); color: var(--green-text); font-size: var(--fs-sub); }
+.authorization-feedback { margin-top: var(--sp-12); color: var(--text-2); font-size: var(--fs-sub); }
 .authorization-hint { margin-top: var(--sp-12); color: var(--text-2); font-size: var(--fs-sub); }
 .authorization-sync-error {
   display: flex;

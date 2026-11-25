@@ -27,6 +27,11 @@ test('English consent actions name the actual language and show test cost before
     if (caption.includes('测试')) assert.match(t(I, caption), /1 credit/, caption);
   }
   assert.equal(m(I, '本次扣除 {0} 次 · 已退回 {1} 次', [1, 0]), 'Credits used: 1 · Refunded: 0');
+  for (const restock of ['未授权', '授权已关闭', '模板被过滤']) {
+    for (const soldout of ['未授权', '授权已关闭', '模板被过滤']) {
+      assert.equal(t(I, '到货' + restock + '，断货' + soldout), 'Restock: ' + t(I, restock) + '. Sold-out: ' + t(I, soldout) + '.');
+    }
+  }
 });
 
 test('operator translations survive validation, bootstrap, expiry and local banner selection without altering originals', async () => {

@@ -25,7 +25,6 @@
   </block>
 
   <block wx:else>
-    <view wx:if="{{refreshing || refreshMessage}}" class="refresh-feedback" aria-role="status">{{i18n.t(ui,(refreshing ? '正在更新账户与页面…' : refreshMessage))}}</view>
     <view class="page-heading brand-page-heading">
       <image class="page-mark brand-page-logo" src="/images/brand/logo-mint-144.png" mode="aspectFit" aria-hidden="true" />
       <view class="page-title">{{i18n.t(ui,'门店取货查询')}}</view>
@@ -53,7 +52,7 @@
           <button class="ui-action ui-action--plain selection-summary-change" hover-class="ui-control-pressed" bindtap="onEditSelection"><text class="ui-action-label">{{i18n.t(ui,'修改')}}</text><text class="ui-chevron" aria-hidden="true"></text></button>
         </view>
       </view>
-      <text class="pickup-quota">{{i18n.t(ui,(!accountReady ? '账户连接中' : (boot.isTester ? '库存查询不扣次数' : boot.member ? '会员查询不扣次' : '剩余 ' + boot.balance + ' 次查询')))}}</text>
+      <text class="pickup-quota" aria-live="polite">{{i18n.t(ui,(!accountReady ? '账户连接中' : (boot.isTester ? '库存查询不扣次数' : boot.member ? '会员查询不扣次' : '剩余 ' + boot.balance + ' 次查询')))}}</text>
       <view wx:if="{{!selectionSummary}}" class="selection-empty">
         <button class="btn btn-primary btn-block" hover-class="btn-primary-pressed" bindtap="onEditSelection">{{i18n.t(ui,'选择配置与门店')}}</button>
       </view>

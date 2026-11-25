@@ -41,7 +41,8 @@ test('a second tap can authorize before the first cloud response without inflati
   assert.equal(page.data.subscription.credits, 5);
   assert.equal(page.data.subscription.soldoutCredits, 3);
   assert.equal(page.data.readiness.ready, true, 'pending top-ups do not suspend existing credits');
-  assert.match(page.data.authorizationFeedback, /微信已允许/);
+  assert.equal(page.data.authorizationFeedback, '');
+  assert.equal(page.data.authorization.errorMessage, '');
   await page.onSubscribe(); await settle();
   assert.equal(prompts, 2);
   assert.equal(records, 1, 'one cloud writer drains the queued results in order');

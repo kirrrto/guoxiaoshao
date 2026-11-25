@@ -894,7 +894,6 @@ for (const scenario of scenarios) {
     if (pageName === 'follow' && monitoringPreview) {
       page.setData({ showServiceDetails: !scenario.startsWith('monitor-dual-') });
       if (['monitor-dual-pending', 'monitor-dual-native', 'monitor-dual-sync-error', 'monitor-dual-storage-error'].includes(scenario)) {
-        page.setData({ authorizationSession: true, authorizationPanelFirst: true, authorizationFeedback: '微信已允许：到货 +1，断货 +1' });
         page.applyAuthorizationState({
           nativeBusy: scenario === 'monitor-dual-native', syncing: scenario === 'monitor-dual-pending', pendingCount: 100,
           acceptedByTemplate: { 'offline-template-example': 100, 'offline-soldout-template': 99 },
@@ -1119,12 +1118,15 @@ for (const scenario of scenarios) {
       if (scenario.startsWith('v3-dnd-')) expectedV2Text.push('通知与免打扰', '时段 1', '跨午夜', '时段 2', '23:00', '08:00', '12:00', '13:00', `新增免打扰时段（${page.data.dndPeriods.length} / 8）`, '监测继续', '结束后不补发旧提醒');
       if (scenario === 'v3-dnd-eight') expectedV2Text.push('时段 8', '18:00', '18:30');
       if (scenario.startsWith('v3-authorization-')) {
-        expectedV2Text.push('补充提醒次数', '微信已允许：到货 +1，断货 +1');
+        expectedV2Text.push('补充提醒次数');
+        forbiddenText.push('到货 +1，断货 +1');
+        if (!scenario.endsWith('-sync-error')) forbiddenText.push('重试同步');
         if (scenario.endsWith('-sync-error')) expectedV2Text.push('3 次', '2 次', '待同步 +1', '网络较慢，授权记录尚未同步。', '重试同步');
         else expectedV2Text.push('4 次', '3 次');
       }
       if (previewCalls.some(item => item.action === 'growth.ingest')) throw Error('Layout fixtures must keep event ingestion disabled');
     }
+    if (['monitor-dual-pending', 'monitor-dual-native'].includes(scenario)) forbiddenText.push('重试同步', '到货 +1，断货 +1', '待同步 +');
     if (pageName === 'follow' || pageName === 'query') forbiddenText.push('查看供应历史', '查看可用历史');
     if (pageName === 'mine' && previewCalls.some(call => call.action === 'quota.ledger')) {
       throw Error('Opening Mine must use the confirmed account balance without requesting its credit history');
@@ -1210,12 +1212,12 @@ for (const scenario of scenarios) {
         'monitor-dnd': ['当前处于免打扰时段', '查看免打扰设置'],
         'monitor-free-account': ['关注与到货提醒为会员专属', '了解会员', '免费用户'],
         'monitor-alert': ['到货提醒', '确认补货', '2 分钟前', '可取货', '复制型号和门店', '增加提醒次数', '买到了吗？'],
-        'monitor-dual-ready': ['提醒条件已就绪', '到货 8 次', '断货 5 次', '增加提醒次数', '每次允许'],
+        'monitor-dual-ready': ['提醒条件已就绪', '到货 8 次', '断货 5 次', '增加提醒次数'],
         'monitor-dual-soldout-empty': ['断货提醒为可选项', '到货提醒还可发送 8 次', '增加提醒次数'],
         'monitor-dual-restock-empty': ['到货提醒暂无次数', '断货提醒还可发送 5 次', '增加提醒次数'],
         'monitor-dual-soldout-low': ['断货提醒只剩 1 次', '增加提醒次数'],
-        'monitor-dual-pending': ['待同步', '增加提醒次数', '到货 8 次', '断货 5 次'],
-        'monitor-dual-native': ['待同步', '到货 8 次', '断货 5 次'],
+        'monitor-dual-pending': ['增加提醒次数', '到货 8 次', '断货 5 次'],
+        'monitor-dual-native': ['到货 8 次', '断货 5 次'],
         'monitor-dual-sync-error': ['待同步', '重试同步', '增加提醒次数'],
         'monitor-dual-storage-error': ['授权暂存在本次运行', '重试同步'],
       }[scenario]] : paymentPreview ? ['兑换码开通', ...(page.data.paymentPendingId ? ['继续处理原订单', '查询支付结果', '继续支付这笔订单', '放弃这笔订单'] : page.data.membershipUpgradeOpen ? page.data.displayMemberProducts.flatMap(item => [item.nameText, item.priceText, ...(item.standardPriceText ? [item.standardPriceText] : [])]) : page.data.showPurchaseShop ? [page.data.membership.active ? '延长会员' : '开通会员'] : ['会员购买暂不可用，现有会员权益不受影响。']), ...{
@@ -1312,6 +1314,8 @@ for (const scenario of scenarios) {
         active: page.data.membership.active,
         offer: !page.data.membership.active && !page.data.paymentPendingId && (!page.data.contextualCheckout || !page.data.checkoutTarget),
         currentPlanId: page.data.membership.planId,
+        selectedOffer: !page.data.paymentPendingId && page.data.membershipUpgradeOpen && page.data.displayMemberProducts.length
+          ? { title: page.data.boot.memberProduct.nameText + '权益', benefits: page.data.boot.memberProduct.coreBenefits } : null,
         accountState: page.data.membership.active ? 'member' : page.data.membership.expired ? 'expired' : 'free',
         packages: !page.data.paymentPendingId && page.data.membershipUpgradeOpen ? page.data.displayMemberProducts.length : 0,
         planIds: !page.data.paymentPendingId && page.data.membershipUpgradeOpen ? page.data.displayMemberProducts.map(item => item.planId) : [],

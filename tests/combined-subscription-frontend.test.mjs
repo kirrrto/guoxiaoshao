@@ -38,7 +38,7 @@ test('an accepted template is recorded even when WeChat filters the other templa
   await page.onSubscribe(); await settle();
   assert.equal(page.data.subscription.credits, 6);
   assert.equal(page.data.subscription.soldoutCredits, 3);
-  assert.match(feedback(rt), /到货 \+1，断货模板被过滤/);
+  assert.equal(feedback(rt), '断货模板被过滤');
   assert.equal(rt.load('utils/reminder-credits.js').readPending(), null);
 });
 
@@ -56,9 +56,9 @@ test('all filtered templates do not create an empty pending authorization or los
 });
 
 for (const [restockResult, soldoutResult, expected] of [
-  ['accept', 'accept', ['到货 +1', '断货 +1']],
-  ['reject', 'accept', ['断货 +1', '到货未授权']],
-  ['accept', 'reject', ['到货 +1', '断货未授权']],
+  ['accept', 'accept', ''],
+  ['reject', 'accept', '到货未授权'],
+  ['accept', 'reject', '断货未授权'],
 ]) {
   test(`one shared authorization reports both outcomes accurately: ${restockResult}/${soldoutResult}`, async () => {
     const results = { [RESTOCK]: restockResult, [SOLDOUT]: soldoutResult };
@@ -77,7 +77,7 @@ for (const [restockResult, soldoutResult, expected] of [
     assert.deepEqual(records[0].payload.results, results);
     assert.equal(page.data.subscription.credits, balances[RESTOCK].credits);
     assert.equal(page.data.subscription.soldoutCredits, balances[SOLDOUT].credits);
-    for (const text of expected) assert.ok(feedback(rt).includes(text), feedback(rt));
+    assert.equal(feedback(rt), expected);
     assert.equal(page.data.subscriptionPending, false);
     assert.equal(page.data.subscribing, false);
   });
@@ -94,7 +94,7 @@ for (const banned of ['restock', 'soldout']) {
     await page.onSubscribe(); await settle();
     const text = feedback(rt), bannedLabel = banned === 'restock' ? '到货' : '断货', acceptedLabel = banned === 'restock' ? '断货' : '到货';
     assert.match(text, new RegExp(`${bannedLabel}(?:[^，。；]*)(?:未授权|关闭|未增加)`));
-    assert.ok(text.includes(`${acceptedLabel} +1`), text);
+    assert.ok(!text.includes(acceptedLabel), text);
     assert.ok(!text.includes(`${bannedLabel} +1`), text);
     assert.equal(rt.calls.find(call => call.action === 'notify.recordSubscription').payload.results[banned === 'restock' ? RESTOCK : SOLDOUT], 'ban');
   });
@@ -276,7 +276,7 @@ for (const accepted of ['restock', 'soldout']) {
     assert.equal(page.data.subscription.credits, balances[RESTOCK].credits);
     assert.equal(page.data.subscription.soldoutCredits, balances[SOLDOUT].credits);
     const text = feedback(rt);
-    assert.ok(text.includes(`${grantedLabel} +1`), text);
+    assert.ok(!text.includes(grantedLabel), text);
     assert.match(text, new RegExp(`${missingLabel}(?:[^，。；]*)(?:未授权|未增加|未返回)`));
   });
 }
@@ -336,7 +336,7 @@ test('rejecting or banning both choices preserves the confirmed balances and nev
 });
 
 for (const accepted of [[RESTOCK], [SOLDOUT], []]) {
-  test(`the balance uses server confirmation while inline feedback labels the native consent: ${accepted.join(',') || 'none'}`, async () => {
+  test(`the balance uses server confirmation without announcing unconfirmed credits: ${accepted.join(',') || 'none'}`, async () => {
     const balances = subscriptions(accepted.includes(RESTOCK) ? 6 : 5, accepted.includes(SOLDOUT) ? 4 : 3);
     const rt = runtime(async action => action === 'notify.recordSubscription'
       ? { accepted, subscriptions: balances } : boot(balances[RESTOCK].credits, balances[SOLDOUT].credits));
@@ -344,7 +344,7 @@ for (const accepted of [[RESTOCK], [SOLDOUT], []]) {
     const page = pageFor(rt, boot(5, 3));
     await page.onSubscribe(); await settle();
     const text = feedback(rt);
-    assert.match(text, /微信已允许：到货 \+1，断货 \+1/);
+    assert.equal(text, '');
     assert.equal(page.data.subscription.credits, balances[RESTOCK].credits);
     assert.equal(page.data.subscription.soldoutCredits, balances[SOLDOUT].credits);
   });

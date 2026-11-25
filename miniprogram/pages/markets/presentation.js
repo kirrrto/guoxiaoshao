@@ -3,7 +3,7 @@ const { observation } = require('../../utils/format');
 const { regionalProductThumbnail } = require('../../utils/product-image-fit');
 const { compareCapacities } = require('../../utils/catalog-order');
 
-const MARKETS = ['JP', 'TW', 'HK', 'US'];
+const MARKETS = ['US', 'HK', 'TW', 'JP'];
 const CATEGORY_NAMES = { iphone: 'iPhone', ipad: 'iPad', mac: 'Mac', airpods: 'AirPods', homepod: 'HomePod' };
 const COPY = {
   'zh-CN': {
@@ -18,7 +18,7 @@ const COPY = {
     accountError: '暂时无法确认账户，请重试。', accountLoading: '正在确认查询额度…',
     tester: '库存查询不扣次数', member: '会员查询不扣次', cost: '本次查询使用 1 次，剩余 {balance} 次',
     launchGate: '新品开售前及开售后前 30 天，查询需有效周卡、月卡或年卡。', unlockAt: '{date} 起可使用查询次数（门店当地时间）。',
-    signin: '签到领取查询次数', signed: '今天已签到', granted: '签到成功，增加 {n} 次查询', dailyCap: '今日领取次数已达上限',
+    signin: '签到领取查询次数', signed: '今天已签到', dailyCap: '今日领取次数已达上限',
     balanceCap: '查询次数已达余额上限', signinUnknown: '签到结果尚未确认，可重试；同一天不会重复领取。',
     closed: '当前账号暂时无法查询此站点的库存。', empty: '查询后可查看所选门店的自提状态。',
     current: '最近查询', previous: '上次有效结果', available: '可自提', unavailable: '暂不可自提',
@@ -43,7 +43,7 @@ const COPY = {
     accountError: 'Could not verify your account. Try again.', accountLoading: 'Checking your credits…',
     tester: 'No credits needed for stock checks', member: 'Included with membership', cost: '1 credit per check · {balance} remaining',
     launchGate: 'Before launch and for the first 30 days on sale, checks require a weekly, monthly or annual pass.', unlockAt: 'Query credits can be used from {date} (store local time).',
-    signin: 'Check in for query credits', signed: 'Already checked in today', granted: 'Checked in · Credits added: {n}', dailyCap: 'Daily credit limit reached',
+    signin: 'Check in for query credits', signed: 'Already checked in today', dailyCap: 'Daily credit limit reached',
     balanceCap: 'Credit balance limit reached', signinUnknown: 'Check-in is unconfirmed. Retry safely. Credits are awarded once per day.',
     closed: 'Pickup checks are currently unavailable for your account in this region.', empty: 'Check this store to see pickup availability.',
     current: 'Last checked', previous: 'Last known result', available: 'Available for pickup', unavailable: 'Not available for pickup',

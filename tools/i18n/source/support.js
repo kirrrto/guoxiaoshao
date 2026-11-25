@@ -1,5 +1,6 @@
 // English presentation copy. Business data and WeChat permissions retain their original values.
 module.exports = {
+  '到货和断货可分别授权。': 'Choose restock and sold-out alerts separately.',
   "含公告原文": "Includes original notice text",
   "公告原文": "Original notice",
   "{0}未开启。库存监测会继续，相关微信提醒可能无法正常接收。": "{0} is off. Monitoring continues, but these WeChat alerts may be unavailable.",

@@ -7,8 +7,9 @@ function selectionLimits(account) {
   const limits = account && account.limits || {};
   return { colors: bounded(limits.alternativeMaxColors), stores: bounded(limits.queryMaxStores, 3, 5) };
 }
-function productBenefit(product) {
+function productBenefit(product, compact = false) {
   const limits = product && product.limits || {};
-  return `${bounded(limits.maxFollows, 3, 5)} 个配置 · 每配置 ${bounded(limits.maxStoresPerFollow, 3, 5)} 家门店`;
+  const configs = bounded(limits.maxFollows, 3, 5), stores = bounded(limits.maxStoresPerFollow, 3, 5);
+  return compact ? `${configs} 配置 × ${stores} 门店` : `${configs} 个配置 · 每配置 ${stores} 家门店`;
 }
 module.exports = { selectionLimits, productBenefit };

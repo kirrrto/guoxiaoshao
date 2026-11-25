@@ -1,6 +1,7 @@
 const { getBootstrap, getFollows, subscribeSubscriptions } = require('../../utils/store');
 const { nudgeFor, claimNudge } = require('../../utils/reminder-nudge');
 const { readPending, isSubscriptionBusy, getConsentSetting, getAuthorizationState, syncPendingAuthorization, requestReminderAuthorization, consentLockState, refreshConsentSettingAsync, showConsentSettingsGuide } = require('../../utils/reminder-credits');
+const { authorizationIssue } = require('../../utils/reminder-readiness');
 const { toast } = require('../../utils/api');
 
 Component(require('../../utils/language').component('reminder-nudge', {
@@ -82,29 +83,20 @@ Component(require('../../utils/language').component('reminder-nudge', {
       this.setData({ submitting: true });
       // Invoke synchronously in this button's tap, before any await.
       return requestReminderAuthorization(prompt.templateIds).then(result => {
-        const accepted = result.accepted || [];
-        const filtered = result.filtered || [];
         if (!this.attachedToPage || !this.pageVisible) return;
         const decided = Object.values(result.results || {});
+        const templates = boot.notifications.templateIds;
+        const feedback = authorizationIssue(result, templates.restock, templates.soldout);
         const silentReject = decided.length > 0 && decided.every(value => value === 'reject' || value === 'ban');
         if (silentReject) {
           return refreshConsentSettingAsync().then(() => {
+            if (!this.attachedToPage || !this.pageVisible) return;
             const lock = consentLockState(prompt.templateIds);
-            if (lock) { if (this.attachedToPage) this.setData({ open: false, submitting: false }); showConsentSettingsGuide(lock); return; }
-            if (result.replayed) toast('已有授权已同步，未重复增加次数');
-            else {
-              const templates = boot.notifications.templateIds;
-              const outcome = (label, id) => accepted.includes(id) ? `${label} +1` : filtered.includes(id) ? `${label}模板被过滤` : `${label}未授权`;
-              toast([outcome('到货', templates.restock), ...(templates.soldout ? [outcome('断货', templates.soldout)] : [])].join('，'));
-            }
+            if (lock) { this.dismiss(); showConsentSettingsGuide(lock); }
+            else if (feedback) toast(feedback);
           });
         }
-        if (result.replayed) toast('已有授权已同步，未重复增加次数');
-        else {
-          const templates = boot.notifications.templateIds;
-          const outcome = (label, id) => accepted.includes(id) ? `${label} +1` : filtered.includes(id) ? `${label}模板被过滤` : `${label}未授权`;
-          toast([outcome('到货', templates.restock), ...(templates.soldout ? [outcome('断货', templates.soldout)] : [])].join('，'));
-        }
+        if (feedback) toast(feedback);
       }, error => {
         if (!this.attachedToPage || !this.pageVisible) return;
         const text = String(error && (error.errMsg || error.message) || '');

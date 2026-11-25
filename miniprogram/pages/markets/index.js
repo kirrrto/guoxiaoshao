@@ -261,7 +261,7 @@ Page(require('../../utils/language').page('markets', {
       storeIndex, enabled: queryEnabled, queryPassRequired, pending: !!pending, loading: !!this.loading,
       catalogError: c[this.catalogError] || '', accountReady: !!accountReady, accountError: !!this.accountError,
       launchNotice, showSignin, signing: !!this.signinToken,
-      signinMessage: accountReady && outcome ? c[outcome.key].replace('{n}', outcome.n || 0) : quota && !access.member && quota.signedInToday ? c.signed : '',
+      signinMessage: accountReady && outcome ? c[outcome.key] : quota && !access.member && quota.signedInToday ? c.signed : '',
       signinPrimary: Boolean(showSignin && !launchRestricted && !pending && quota.balance < 1),
       costText: costText || '', maxCost: quota ? (access.member ? 0 : 1) : null,
       queryLabel: busyHere ? c.checking : pending ? c.resume : c.query, busyHere: !!busyHere,
@@ -300,7 +300,7 @@ Page(require('../../utils/language').page('markets', {
       if (!result?.quota || !Number.isSafeInteger(result.granted) || result.granted < 0) throw Error('Invalid check-in receipt');
       publishQuota(result.quota, owner);
       const reasons = { already_signed_in: 'signed', daily_cap_reached: 'dailyCap', balance_cap_reached: 'balanceCap' };
-      this.signinOutcome = { key: result.granted > 0 ? 'granted' : reasons[result.reason] || 'signinUnknown', n: result.granted };
+      this.signinOutcome = result.granted > 0 ? null : { key: reasons[result.reason] || 'signinUnknown' };
       if (result.granted > 0) confirmTap();
     } catch (error) {
       if (this.signinToken === token && this.isAccount(owner)) {

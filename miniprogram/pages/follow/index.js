@@ -295,7 +295,6 @@ Page(require('../../utils/language').page('follow', {
     authorizationFeedback: '',
     authorizationOpen: false,
     refreshError: null,
-    refreshFeedback: '',
     refreshedText: null,
     liveSync: { state: 'waiting', lastReadText: '', nextReadText: '', detail: '页面打开时自动读取后台记录，不消耗查询次数。' },
     alert: null,
@@ -461,7 +460,7 @@ Page(require('../../utils/language').page('follow', {
     this.followReadGeneration = (this.followReadGeneration || 0) + 1;
     this.followsPromise = null;
     this.statusRefreshEpoch = (this.statusRefreshEpoch || 0) + 1;
-    if (!this.pageRetired && this.data.refreshing) this.setData({ refreshing: false, refreshFeedback: '' });
+    if (!this.pageRetired && this.data.refreshing) this.setData({ refreshing: false });
   },
 
   /** Both tab-bar and page network listeners share the same in-flight refresh. */
@@ -790,7 +789,7 @@ Page(require('../../utils/language').page('follow', {
       this.invalidateFollowRead();
       this.editorSelection = null;
       this.setData({ follows: [], otherMarketCount: 0, selectedFollowId: '', followsLoaded: false, editing: false, saving: false, followBusyId: '', followActionId: '', followActionError: '',
-        activation: null, authorizationOpen: false, authorizationFeedback: '', refreshing: false, refreshFeedback: '', refreshError: null, alert: null, alertBusy: false });
+        activation: null, authorizationOpen: false, authorizationFeedback: '', refreshing: false, refreshError: null, alert: null, alertBusy: false });
     }
     this.accountSnapshot = boot;
     if (reloadDeadlines) this.loadDeadlines();
@@ -967,13 +966,9 @@ Page(require('../../utils/language').page('follow', {
     if (this.pageRetired || this.data.refreshing) return;
     const epoch = this.statusRefreshEpoch = (this.statusRefreshEpoch || 0) + 1;
     const current = () => !this.pageRetired && epoch === this.statusRefreshEpoch;
-    this.setData({ refreshing: true, refreshFeedback: '正在读取后台检测与提醒状态…', refreshError: null });
+    this.setData({ refreshing: true, refreshError: null });
     try {
-      const [result] = await Promise.all([this.refreshLiveStatus(), this.loadDeadlines()]);
-      if (!current()) return;
-      this.setData({ refreshFeedback: result.ok
-        ? '状态已刷新，库存时间见各配置；查最新库存请使用卡片按钮。'
-        : result.offline ? '网络已断开，联网后自动更新；上次记录已保留。' : '' });
+      await Promise.all([this.refreshLiveStatus(), this.loadDeadlines()]);
     } finally { if (current()) this.setData({ refreshing: false }); }
   },
 

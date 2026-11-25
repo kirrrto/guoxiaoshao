@@ -1,5 +1,6 @@
 // English surface copy for stock checks, watches, history and configuration controls.
 module.exports = {
+  "到货{0}，断货{1}": "Restock: {0}. Sold-out: {1}.",
   // Saved watches and past notifications keep their original product titles after catalog retirement.
   "MacBook Pro 14 英寸 M5 Pro 15核CPU/16核GPU 24GB 2TB 标准显示屏 深空黑色": "14-inch MacBook Pro M5 Pro 15-core CPU/16-core GPU 24GB 2TB Standard display Space Black",
   "MacBook Pro 14 英寸 M5 Pro 15核CPU/16核GPU 24GB 2TB 标准显示屏 银色": "14-inch MacBook Pro M5 Pro 15-core CPU/16-core GPU 24GB 2TB Standard display Silver",

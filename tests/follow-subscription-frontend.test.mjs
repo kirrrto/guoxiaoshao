@@ -65,7 +65,7 @@ test('a configured template can be authorized by a tap before sending is enabled
     assert.equal(page.data.readiness.code, 'delivery_unready');
     assert.equal(page.data.readiness.ready, false);
     assert.match(page.data.readiness.detail, /已记录的 1 次提醒会保留/);
-    assert.match(page.data.authorizationFeedback, /微信已允许到货 \+1/);
+    assert.equal(page.data.authorizationFeedback, '');
     assert.equal(rt.messages.length, 0);
   }
 });
@@ -76,7 +76,7 @@ test('a ready sender confirms recorded authorization without promising delivery'
   const page = pageFor(rt, data);
   await page.onSubscribe(); await settle();
   assert.equal(page.data.subscription.credits, 1);
-  assert.match(page.data.authorizationFeedback, /微信已允许到货 \+1/);
+  assert.equal(page.data.authorizationFeedback, '');
   assert.doesNotMatch(page.data.authorizationFeedback, /可接收|送达|已发送/);
   assert.equal(rt.messages.length, 0);
 });
@@ -100,7 +100,7 @@ test('declining or banning the current prompt never claims that existing credits
     assert.equal(page.data.subscription.credits, 2);
     assert.equal(page.data.subscriptionPending, false);
     assert.equal(rt.calls.find(call => call.action === 'notify.recordSubscription').payload.results['restock-A'], result);
-    assert.match(page.data.authorizationFeedback, /本次未|次数未增加/);
+    assert.match(page.data.authorizationFeedback, /未授权|授权已关闭/);
     assert.doesNotMatch(page.data.authorizationFeedback, /提醒次数 +1|已记录|可接收/);
   }
 });

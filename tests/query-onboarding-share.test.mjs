@@ -29,6 +29,21 @@ async function opened({ signin, query, catalog, options, saved, cached, realApp 
   return { rt, page };
 }
 
+test('home pull-to-refresh ends the native spinner without adding text above the heading or querying stock', async () => {
+  const { rt, page } = await opened();
+  let stops = 0;
+  rt.wx.stopPullDownRefresh = () => { stops++; };
+  const refresh = page.onPullDownRefresh();
+  assert.equal(page.data.refreshing, true);
+  assert.equal(page.onPullDownRefresh(), refresh);
+  await refresh;
+  assert.equal(stops, 1);
+  assert.equal(page.data.refreshing, false);
+  assert.equal(page.data.refreshMessage, undefined);
+  assert.equal(rt.messages.length, 0);
+  assert.equal(rt.calls.some(item => ['query.pickup', 'quota.signin'].includes(item.action)), false);
+});
+
 test('home signin needs an explicit tap, deduplicates taps, keeps selection and publishes confirmed quota', async () => {
   const pending = deferred();
   const saved = { partNumber: product.partNumber, storeNumbers: ['R577'] };

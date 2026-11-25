@@ -74,19 +74,17 @@
         </view>
         <view wx:if="{{membership.annualExpiresText}}" class="member-enhanced">{{i18n.m(ui,'年卡 5 配置 × 5 门店权益至 {0}',[(membership.annualExpiresText)])}}</view>
         <view wx:elif="{{membership.enhancedExpiresText}}" class="member-enhanced">{{i18n.m(ui,'额外名额有效至 {0}',[(membership.enhancedExpiresText)])}}</view>
-        <button wx:if="{{membership.enhanced}}" class="ui-action ui-action--plain member-regional-link" hover-class="member-delivery-pressed" disabled="{{paymentBusy || paymentChecking || paymentConfirming}}" bindtap="onOpenRegionalWatches"><text class="ui-action-label">{{i18n.t(ui,'查询或关注日本、台湾、香港和美国门店')}}</text><view class="ui-chevron" aria-hidden="true"></view></button>
+        <button wx:if="{{membership.enhanced}}" class="ui-action ui-action--plain member-regional-link" hover-class="member-delivery-pressed" disabled="{{paymentBusy || paymentChecking || paymentConfirming}}" bindtap="onOpenRegionalWatches"><text class="ui-action-label">{{i18n.t(ui,'查看其他站点')}}</text><view class="ui-chevron" aria-hidden="true"></view></button>
       </view>
       <view wx:elif="{{!paymentPendingId && (!contextualCheckout || !checkoutTarget)}}" class="member-pass member-vip-offer">
         <image class="member-pass-watermark" src="/images/brand/whistle-pass.png" mode="aspectFit" aria-hidden="true" />
-        <view class="member-pass-title member-card-heading">{{i18n.t(ui,'果小哨会员')}}</view>
-        <view class="member-pass-benefits" aria-label="{{i18n.t(ui,'会员核心权益')}}">
-          <view class="member-pass-benefit"><view class="ui-check" aria-hidden="true"></view><text>{{i18n.t(ui,'库存查询不扣次数')}}</text></view>
-          <view class="member-pass-benefit"><view class="ui-check" aria-hidden="true"></view><text>{{i18n.t(ui,'可授权接收取货变化提醒')}}</text></view>
-          <view class="member-pass-benefit"><view class="ui-check" aria-hidden="true"></view><text>{{i18n.t(ui,'新品开售 30 天内实时查询')}}</text></view>
+        <view class="member-pass-title member-card-heading">{{membershipUpgradeOpen ? i18n.m(ui,'{0}权益',[boot.memberProduct.nameText]) : i18n.t(ui,'果小哨会员')}}</view>
+        <view class="member-pass-benefits" aria-label="{{i18n.t(ui,'会员核心权益')}}" aria-live="polite">
+          <view wx:for="{{membershipUpgradeOpen ? boot.memberProduct.coreBenefits : membershipOverviewBenefits}}" wx:key="*this" class="member-pass-benefit"><view class="ui-check" aria-hidden="true"></view><text>{{i18n.t(ui,item)}}</text></view>
         </view>
         <button wx:if="{{showPurchaseShop && !membershipUpgradeOpen}}" class="btn btn-primary btn-block member-vip-cta" hover-class="btn-primary-pressed" disabled="{{subscribing || paymentBusy || paymentChecking || paymentConfirming || redeeming}}" bindtap="onOpenMembershipRenew">{{i18n.t(ui,'开通会员')}}</button>
       </view>
-      <view wx:elif="{{!paymentPendingId}}" class="checkout-core-benefits">{{i18n.t(ui,'会员库存查询不扣次。保存关注并授权后，提醒服务可用时会发送取货变化消息。')}}</view>
+      <view wx:elif="{{!paymentPendingId && !membershipUpgradeOpen}}" class="checkout-core-benefits">{{i18n.t(ui,'会员库存查询不扣次。保存关注并授权后，提醒服务可用时会发送取货变化消息。')}}</view>
 
       <button wx:if="{{membership.active && !boot.followCount}}" class="btn btn-primary btn-block member-delivery-action" hover-class="btn-primary-pressed" disabled="{{paymentBusy || paymentChecking || paymentConfirming}}" bindtap="onOpenFollows">{{i18n.t(ui,'添加第一个关注')}}</button>
       <view wx:if="{{showPurchaseShop && membership.active && !membershipUpgradeOpen && !paymentPendingId}}" class="membership-member-actions">
@@ -106,8 +104,12 @@
           <button class="btn btn-primary btn-block mt" hover-class="btn-primary-pressed" disabled="{{subscribing || redeeming || paymentBusy || paymentChecking || paymentConfirming}}" bindtap="onOpenMembershipRenew">{{i18n.t(ui,'延长会员')}}</button>
         </view>
         <block wx:if="{{displayMemberProducts.length}}">
+          <view wx:if="{{membership.active || (contextualCheckout && checkoutTarget)}}" class="checkout-plan-summary" aria-live="polite">
+            <view class="bold">{{i18n.m(ui,'{0}权益',[boot.memberProduct.nameText])}}</view>
+            <view wx:for="{{boot.memberProduct.coreBenefits}}" wx:key="*this">{{i18n.t(ui,item)}}</view>
+          </view>
           <view class="membership-packages {{contextualCheckout && !membership.active ? 'membership-packages-context' : ''}}" aria-label="{{i18n.t(ui,'选择会员套餐')}}">
-            <button wx:for="{{displayMemberProducts}}" wx:key="planId" class="membership-package {{selectedPlanId === item.planId ? 'membership-package-selected' : ''}}" hover-class="membership-package-pressed" data-plan-id="{{item.planId}}" disabled="{{subscribing || redeeming || paymentBusy || paymentChecking || paymentPendingId || paymentConfirming}}" bindtap="onSelectMemberProduct" aria-label="{{i18n.t(ui,item.nameText)}} · {{i18n.t(ui,item.durationText)}} · {{i18n.t(ui,item.benefitShort)}} · {{i18n.t(ui,item.watchScope)}} · {{item.standardPriceText ? i18n.m(ui,'优惠价{0}，标准价{1}',[item.priceText,item.standardPriceText]) : item.priceText}}{{selectedPlanId === item.planId ? i18n.t(ui,'，已选') : ''}}">
+            <button wx:for="{{displayMemberProducts}}" wx:key="planId" class="membership-package {{selectedPlanId === item.planId ? 'membership-package-selected' : ''}}" hover-class="membership-package-pressed" data-plan-id="{{item.planId}}" disabled="{{subscribing || redeeming || paymentBusy || paymentChecking || paymentPendingId || paymentConfirming}}" bindtap="onSelectMemberProduct" aria-label="{{i18n.t(ui,item.nameText)}} · {{i18n.t(ui,item.durationText)}} · {{i18n.t(ui,item.benefitShort)}} · {{item.standardPriceText ? i18n.m(ui,'优惠价{0}，标准价{1}',[item.priceText,item.standardPriceText]) : item.priceText}}{{selectedPlanId === item.planId ? i18n.t(ui,'，已选') : ''}}">
               <view class="membership-package-radio" aria-hidden="true"><view class="ui-check"></view></view>
               <view class="membership-package-heading">
                 <view class="membership-package-name-line"><text class="membership-package-name">{{i18n.t(ui,(item.nameText))}}</text><text class="membership-package-duration">{{i18n.t(ui,(item.durationText))}}</text><text wx:if="{{item.recommendedText}}" class="membership-recommended-tag">{{i18n.t(ui,(item.recommendedText))}}</text></view>
@@ -117,10 +119,9 @@
                 <text class="membership-package-price">{{i18n.t(ui,(item.priceText))}}</text>
                 <view class="membership-package-price-note"><text wx:if="{{item.standardPriceText}}" class="membership-standard-price">{{i18n.t(ui,(item.standardPriceText))}}</text><text wx:if="{{item.dailyPriceText}}" class="membership-daily-price">{{i18n.t(ui,(item.dailyPriceText))}}</text></view>
               </view>
-              <text class="membership-package-benefit membership-package-scope">{{i18n.t(ui,item.watchScope)}}</text>
             </button>
           </view>
-          <view class="small text-2 mt">{{i18n.t(ui,'各站点共用关注名额。其他站点开放监测后，系统会自动检查已关注的配置，微信到货提醒需另行授权。')}}</view>
+          <view class="small text-2 mt">{{i18n.t(ui,boot.memberProduct.includesOtherSites ? '可保存其他站点的关注，与大陆共用名额。站点开放监测后自动检查，微信到货提醒需另行授权。' : '可授权接收取货变化提醒')}}</view>
           <view wx:if="{{membership.active && membershipUpgradePreview}}" class="membership-extension">
             <text class="membership-extension-detail">{{i18n.t(ui,(membershipUpgradePreview.extensionText))}}</text>
             <text wx:if="{{membershipUpgradePreview.expiresAtText}}" class="membership-extension-date">{{i18n.m(ui,'预计到期 {0}',[(membershipUpgradePreview.expiresAtText)])}}</text>
@@ -174,7 +175,7 @@
         <view class="mine-reminder-summary">
           <view class="card-title">{{i18n.t(ui,'微信提醒')}}</view>
           <view class="mine-reminder-status">{{i18n.t(ui,(reminderCenterStatus))}}</view>
-          <view wx:if="{{boot.member && subscription.templateCount}}" class="mine-reminder-balance">{{i18n.m(ui,'到货 {0} 次{1}',[(subscription.credits),(authorization.pendingRestock ? '（待同步 +' + authorization.pendingRestock + '）' : '')])}}<text wx:if="{{subscription.soldoutEnabled}}"> {{i18n.m(ui,'· 断货 {0} 次{1}',[(subscription.soldoutCredits),(authorization.pendingSoldout ? '（待同步 +' + authorization.pendingSoldout + '）' : '')])}}</text></view>
+          <view wx:if="{{boot.member && subscription.templateCount}}" class="mine-reminder-balance" aria-live="polite">{{i18n.m(ui,'到货 {0} 次{1}',[(subscription.credits),(authorization.errorMessage && authorization.pendingRestock ? '（待同步 +' + authorization.pendingRestock + '）' : '')])}}<text wx:if="{{subscription.soldoutEnabled}}"> {{i18n.m(ui,'· 断货 {0} 次{1}',[(subscription.soldoutCredits),(authorization.errorMessage && authorization.pendingSoldout ? '（待同步 +' + authorization.pendingSoldout + '）' : '')])}}</text></view>
         </view>
         <button class="ui-action mine-reminder-action {{reminderTopUpNeeded && !subscriptionPending && !authorization.errorMessage && !authorization.storageBlocked ? 'mine-reminder-action--primary' : ''}}" hover-class="ui-control-pressed" disabled="{{paymentBusy || paymentChecking || paymentConfirming || paymentPendingId || redemptionOpen || redeeming || subscribing || authorization.storageBlocked}}" loading="{{subscribing}}" bindtap="onSubscribe">{{i18n.t(ui,(subscribing ? '等待微信授权…' : !subscription.templateCount && !subscription.soldoutEnabled ? '查看服务说明' : !boot.member ? '了解会员提醒' : '补充提醒次数'))}}</button>
       </view>
@@ -186,7 +187,7 @@
         <view class="consent-recovery-steps">{{i18n.t(ui,'微信设置 → 订阅消息 → 改为「接收」后返回补充次数。')}}</view>
       </view>
       <view wx:if="{{authorizationFeedback}}" class="authorization-feedback" aria-live="polite">{{i18n.t(ui,(authorizationFeedback))}}</view>
-      <view wx:if="{{authorization.errorMessage || subscriptionPending}}" class="authorization-sync-error"><text>{{i18n.t(ui,(authorization.errorMessage || '微信授权待同步，尚未计入可用次数。'))}}</text><button class="ui-action" disabled="{{authorization.syncing}}" loading="{{authorization.syncing}}" bindtap="onRetryAuthorizationSync">{{i18n.t(ui,'重试同步')}}</button></view>
+      <view wx:if="{{authorization.errorMessage}}" class="authorization-sync-error"><text>{{i18n.t(ui,(authorization.errorMessage))}}</text><button class="ui-action" disabled="{{authorization.syncing}}" loading="{{authorization.syncing}}" bindtap="onRetryAuthorizationSync">{{i18n.t(ui,'重试同步')}}</button></view>
 
       <button id="reminder-settings" class="ui-disclosure ui-entry reminder-row" hover-class="ui-control-pressed" bindtap="onToggleReminderSettings" aria-expanded="{{showReminderSettings}}" aria-label="{{i18n.t(ui,('通知与免打扰，' + dndSummary))}}">
         <view class="ui-entry-copy"><text class="ui-disclosure-label">{{i18n.t(ui,'通知与免打扰')}}</text><text wx:if="{{settings}}" class="ui-entry-note">{{i18n.t(ui,(settings.notifyEnabled ? (settings.dnd.enabled ? dndStatus : '补货提醒已开启') : '补货提醒已关闭'))}}</text></view>
